@@ -9411,12 +9411,17 @@ public struct RomaTranscriptionOutputFilter {
         let originalInnerText = preservedBoundaryInnerText(in: trimmedOriginalText) ??
             preservedBoundaryInnerText(in: originalTextWithoutOuterPunctuation)
         let hadOuterPunctuationAfterBoundary = originalTextWithoutOuterPunctuation != trimmedOriginalText
+        let isRawWrapperArtifactBoundary = isRawParenthesisOrBraceBoundary(trimmedOriginalText) ||
+            isRawParenthesisOrBraceBoundary(originalTextWithoutOuterPunctuation)
         guard shouldUnwrapGeneratedContinuationBoundary(trimmedOriginalText),
               let innerText = preservedBoundaryInnerText(in: trimmedText),
               let originalInnerText,
               shouldUnwrapNoisyGeneratedBoundaryContinuationInnerText(originalInnerText) ||
-                (hadOuterPunctuationAfterBoundary &&
-                    shouldUnwrapOuterPunctuatedGeneratedBoundaryContinuationInnerText(originalInnerText)) else {
+                (isRawWrapperArtifactBoundary &&
+                    shouldUnwrapGeneratedBoundaryArtifactContinuationInnerText(
+                        originalInnerText,
+                        hadOuterPunctuationAfterBoundary: hadOuterPunctuationAfterBoundary
+                    )) else {
             return text
         }
 
@@ -9430,7 +9435,10 @@ public struct RomaTranscriptionOutputFilter {
         return cleanedInnerText
     }
 
-    private static func shouldUnwrapOuterPunctuatedGeneratedBoundaryContinuationInnerText(_ text: String) -> Bool {
+    private static func shouldUnwrapGeneratedBoundaryArtifactContinuationInnerText(
+        _ text: String,
+        hadOuterPunctuationAfterBoundary: Bool
+    ) -> Bool {
         let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedText.isEmpty,
               wordCount(in: trimmedText) <= 5,
@@ -9440,7 +9448,32 @@ public struct RomaTranscriptionOutputFilter {
             return false
         }
 
-        return firstLetter.isUppercase
+        guard firstLetter.isUppercase else {
+            return false
+        }
+
+        if hadOuterPunctuationAfterBoundary {
+            return true
+        }
+
+        guard let lastCharacter = trimmedText.last,
+              "!?".contains(lastCharacter) else {
+            return false
+        }
+
+        let baseText = String(trimmedText.dropLast()).trimmingCharacters(in: .whitespacesAndNewlines)
+        return !baseText.isEmpty &&
+            wordCount(in: baseText) <= 5 &&
+            !baseText.contains(".") &&
+            !hasInternalSentenceBoundary(baseText)
+    }
+
+    private static func isRawParenthesisOrBraceBoundary(_ text: String) -> Bool {
+        guard let first = text.trimmingCharacters(in: .whitespacesAndNewlines).first else {
+            return false
+        }
+
+        return first == "(" || first == "{"
     }
 
     private static func shouldUnwrapGeneratedContinuationBoundary(_ text: String) -> Bool {

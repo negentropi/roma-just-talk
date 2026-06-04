@@ -31,33 +31,14 @@ Set-StrictMode -Version Latest
 
 $hasExplicitClipboardRestoreDelay = $PSBoundParameters.ContainsKey("ClipboardRestoreDelaySeconds")
 
-function Invoke-Step {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Name,
-        [Parameter(Mandatory = $true)]
-        [scriptblock]$Command
-    )
-
-    Write-Host ""
-    Write-Host "== $Name =="
-    & $Command
+$proofCommonScript = Join-Path $PSScriptRoot "windows-proof-common.ps1"
+if (!(Test-Path -LiteralPath $proofCommonScript)) {
+    throw "Windows proof common helper was not found: $proofCommonScript"
 }
-
-function Assert-OutputContains {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Output,
-        [Parameter(Mandatory = $true)]
-        [string]$Expected
-    )
-
-    if (!$Output.Contains($Expected)) {
-        throw "Expected command output to contain '$Expected'"
-    }
-
-    Write-Host "asserted_output=$Expected"
-}
+. $proofCommonScript
+Set-Alias -Name Invoke-Step -Value Invoke-RomaWindowsProofStep -Scope Local -Force
+Set-Alias -Name Assert-OutputContains -Value Assert-RomaWindowsOutputContains -Scope Local -Force
+Set-Alias -Name Resolve-FullPath -Value Resolve-RomaWindowsFullPath -Scope Local -Force
 
 function Assert-NonEmptyFile {
     param(
@@ -111,15 +92,6 @@ function Assert-WavFileWithBytes {
     if ($item.Length -le 44) {
         throw "Expected WAV payload larger than header: $Path bytes=$($item.Length)"
     }
-}
-
-function Resolve-FullPath {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Path
-    )
-
-    return $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Path)
 }
 
 if ($UseHoldHook -and $UseToggle) {

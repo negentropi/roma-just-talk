@@ -6238,6 +6238,10 @@ struct RomaCoreChecks {
             contentsOf: scriptsRoot.appendingPathComponent("windows-package-identity.ps1"),
             encoding: .utf8
         )
+        let proofCommonScript = try String(
+            contentsOf: scriptsRoot.appendingPathComponent("windows-proof-common.ps1"),
+            encoding: .utf8
+        )
         let windowsAgentSource = try String(
             contentsOf: packageRoot.appendingPathComponent("Sources/RomaWindowsAgent/main.swift"),
             encoding: .utf8
@@ -6450,8 +6454,7 @@ struct RomaCoreChecks {
                 "Windows smoke script should assert packaged agent default output \(expectedLine)"
             )
             try require(
-                runScript.contains("function Assert-OutputContains") &&
-                    runScript.contains(#"Assert-OutputContains -Output $doctorOutput"#) &&
+                runScript.contains(#"Assert-OutputContains -Output $doctorOutput"#) &&
                     runScript.contains(#"-Expected "\#(expectedLine)""#),
                 "Windows run script should assert installed launcher default output \(expectedLine)"
             )
@@ -6469,8 +6472,7 @@ struct RomaCoreChecks {
         ]
         for expectedLine in installedLauncherContractAssertions {
             try require(
-                runScript.contains("function Assert-OutputContains") &&
-                    runScript.contains(#"Assert-OutputContains -Output $doctorOutput"#) &&
+                runScript.contains(#"Assert-OutputContains -Output $doctorOutput"#) &&
                     runScript.contains(#"-Expected "\#(expectedLine)""#),
                 "Windows run script should assert installed launcher contract output \(expectedLine)"
             )
@@ -6675,9 +6677,45 @@ struct RomaCoreChecks {
             "Windows manifest parsing should be computed by one shared packaged helper"
         )
         try require(
+            proofCommonScript.contains("function Invoke-RomaWindowsProofStep") &&
+                proofCommonScript.contains("function Resolve-RomaWindowsFullPath") &&
+                proofCommonScript.contains("function Require-RomaWindowsFile") &&
+                proofCommonScript.contains("function Assert-RomaWindowsOutputContains") &&
+                proofCommonScript.contains("function Get-RomaWindowsFileHashProof"),
+            "Windows proof helper should own shared script utilities"
+        )
+        let proofCommonHelperScripts = [
+            ("windows-proof.ps1", windowsProofScript, ["Invoke-Step", "Assert-OutputContains"]),
+            ("package-windows-agent.ps1", packageScript, ["Invoke-Step", "Assert-OutputContains"]),
+            ("smoke-windows-agent.ps1", smokeScript, ["Invoke-Step", "Assert-OutputContains", "Resolve-FullPath"]),
+            ("install-windows-agent.ps1", installScript, ["Invoke-Step", "Resolve-FullPath", "Require-File"]),
+            ("run-windows-agent.ps1", runScript, ["Resolve-FullPath", "Require-File", "Assert-OutputContains"]),
+            ("prove-windows-agent-artifact.ps1", proveScript, ["Invoke-Step", "Resolve-FullPath", "Require-File", "Assert-OutputContains", "Get-FileProof", "Get-FileHashProof"]),
+            ("run-windows-laptop-proof.ps1", laptopProofScript, ["Invoke-Step", "Resolve-FullPath", "Require-File", "Assert-OutputContains", "Get-FileProof"])
+        ]
+        for (scriptName, scriptSource, aliases) in proofCommonHelperScripts {
+            try require(
+                scriptSource.contains(#"windows-proof-common.ps1"#) &&
+                    scriptSource.contains(". $proofCommonScript"),
+                "\(scriptName) should load the shared Windows proof helper"
+            )
+            for alias in aliases {
+                try require(
+                    scriptSource.contains("Set-Alias -Name \(alias)"),
+                    "\(scriptName) should alias \(alias) to the shared Windows proof helper"
+                )
+            }
+        }
+        try require(
+            packageIdentityScript.contains("Get-RomaWindowsFileHashProof") &&
+                packageIdentityScript.contains("windows-proof-common.ps1"),
+            "Windows package identity should reuse the shared proof helper for file hash proof"
+        )
+        try require(
             packageIdentityScript.contains("function Get-RomaPackageIdentityProof") &&
                 packageIdentityScript.contains("windows-package-identity.ps1") &&
                 packageIdentityScript.contains("windows-manifest.ps1") &&
+                packageIdentityScript.contains("windows-proof-common.ps1") &&
                 packageIdentityScript.contains("RomaWhisperCLIMock.exe") &&
                 packageIdentityScript.contains("Get-RomaPackageIdentityHash"),
             "Windows package identity should be computed by one shared packaged helper"

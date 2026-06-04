@@ -9060,14 +9060,14 @@ public struct RomaTranscriptionOutputFilter {
         guard !isPreservedGeneratedQuestionFragment(candidate) else { return text }
         if let first = candidate.first,
            let closingBoundary = generatedContinuationClosingBoundary(for: first),
-           !candidate.contains(closingBoundary) {
+           !hasGeneratedContinuationClosingBoundary(closingBoundary, afterOpeningAtStartOf: candidate) {
             candidate.removeFirst()
             return cleanedUnmatchedBoundaryContinuation(candidate, originalText: text)
         }
 
         if let last = candidate.last,
            let openingBoundary = generatedContinuationOpeningBoundary(for: last),
-           !candidate.contains(openingBoundary),
+           !hasGeneratedContinuationOpeningBoundary(openingBoundary, beforeClosingAtEndOf: candidate),
            !hasUnmatchedOpeningBoundary(openingBoundary, closedBy: last, in: precedingText) {
             candidate.removeLast()
             return cleanedUnmatchedBoundaryContinuation(candidate, originalText: text)
@@ -9087,11 +9087,49 @@ public struct RomaTranscriptionOutputFilter {
         return cleanedText
     }
 
+    private static func hasGeneratedContinuationClosingBoundary(
+        _ closing: Character,
+        afterOpeningAtStartOf text: String
+    ) -> Bool {
+        guard !text.isEmpty else { return false }
+        var index = text.index(after: text.startIndex)
+        while index < text.endIndex {
+            if text[index] == closing {
+                return true
+            }
+            index = text.index(after: index)
+        }
+        return false
+    }
+
+    private static func hasGeneratedContinuationOpeningBoundary(
+        _ opening: Character,
+        beforeClosingAtEndOf text: String
+    ) -> Bool {
+        guard !text.isEmpty else { return false }
+        let closingIndex = text.index(before: text.endIndex)
+        var index = text.startIndex
+        while index < closingIndex {
+            if text[index] == opening {
+                return true
+            }
+            index = text.index(after: index)
+        }
+        return false
+    }
+
     private static func generatedContinuationClosingBoundary(for opening: Character) -> Character? {
         switch opening {
         case "(": return ")"
         case "[": return "]"
         case "{": return "}"
+        case "\"": return "\""
+        case "'": return "'"
+        case "“": return "”"
+        case "‘": return "’"
+        case "`": return "`"
+        case "*": return "*"
+        case "_": return "_"
         default: return nil
         }
     }
@@ -9101,13 +9139,24 @@ public struct RomaTranscriptionOutputFilter {
         case ")": return "("
         case "]": return "["
         case "}": return "{"
+        case "\"": return "\""
+        case "'": return "'"
+        case "”": return "“"
+        case "’": return "‘"
+        case "`": return "`"
+        case "*": return "*"
+        case "_": return "_"
         default: return nil
         }
     }
 
     private static func hasUnmatchedOpeningBoundary(_ opening: Character, closedBy closing: Character, in text: String) -> Bool {
+        if opening == closing {
+            return hasUnmatchedSymmetricOpeningBoundary(opening, in: text)
+        }
+
         var balance = 0
-        for character in text {
+        for character in text where character == opening || character == closing {
             if character == opening {
                 balance += 1
             } else if character == closing,
@@ -9116,6 +9165,41 @@ public struct RomaTranscriptionOutputFilter {
             }
         }
         return balance > 0
+    }
+
+    private static func hasUnmatchedSymmetricOpeningBoundary(_ boundary: Character, in text: String) -> Bool {
+        var hasOpenBoundary = false
+        var index = text.startIndex
+        while index < text.endIndex {
+            if text[index] == boundary,
+               isPotentialSymmetricBoundary(boundary, at: index, in: text) {
+                hasOpenBoundary.toggle()
+            }
+            index = text.index(after: index)
+        }
+        return hasOpenBoundary
+    }
+
+    private static func isPotentialSymmetricBoundary(_ boundary: Character, at index: String.Index, in text: String) -> Bool {
+        switch boundary {
+        case "'":
+            return !isBetweenWordCharacters(index, in: text)
+        case "_":
+            return !isBetweenWordCharacters(index, in: text)
+        default:
+            return true
+        }
+    }
+
+    private static func isBetweenWordCharacters(_ index: String.Index, in text: String) -> Bool {
+        guard index > text.startIndex,
+              index < text.index(before: text.endIndex) else {
+            return false
+        }
+
+        let previousIndex = text.index(before: index)
+        let nextIndex = text.index(after: index)
+        return isWordCharacter(text[previousIndex]) && isWordCharacter(text[nextIndex])
     }
 
     private static func containsInlinePreservedBoundary(_ text: String) -> Bool {

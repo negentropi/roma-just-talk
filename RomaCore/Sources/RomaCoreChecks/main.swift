@@ -5883,7 +5883,11 @@ struct RomaCoreChecks {
         let unmatchedStraightQuoteContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "She said \"hello")
         let unmatchedStraightSingleQuoteContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "She said 'hello")
         let contractionContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "I don't")
+        let openBacktickContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "Use `")
+        let openStarContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "Use *")
+        let openUnderscoreContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "Use _")
         let openSmartQuoteContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "She said “")
+        let openSmartSingleQuoteContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "She said ‘")
         let closingSmartQuoteContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "She said “hello”")
         let closingSmartSingleQuoteContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "She said ‘hello’")
         let likePredicateContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "looks")
@@ -6115,6 +6119,55 @@ struct RomaCoreChecks {
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "A final word or single\".",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "insertion polish should remove unmatched trailing quotes from longer generated fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "A final word or single”.",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "insertion polish should remove unmatched trailing smart quotes from longer generated fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "A final word or single'.",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "insertion polish should remove unmatched trailing single quotes from longer generated fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "A final word or single’.",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "insertion polish should remove unmatched trailing smart single quotes from longer generated fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "A final word or single`.",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "insertion polish should remove unmatched trailing backticks from longer generated fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "A final word or single*.",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "insertion polish should remove unmatched trailing star markers from longer generated fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "A final word or single_.",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "insertion polish should remove unmatched trailing underscore markers from longer generated fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "Model).",
                 context: RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "(")
             ) == "model)",
@@ -6133,6 +6186,62 @@ struct RomaCoreChecks {
                 context: RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "{")
             ) == "model}",
             "insertion polish should preserve trailing braces after matching open context"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "A final word or single\".",
+                context: unmatchedStraightQuoteContext
+            ) == "a final word or single\"",
+            "insertion polish should preserve trailing quotes after matching open context"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "A final word or single'.",
+                context: unmatchedStraightSingleQuoteContext
+            ) == "a final word or single'",
+            "insertion polish should preserve trailing single quotes after matching open context"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "A final word or single'.",
+                context: contractionContext
+            ) == "a final word or single",
+            "insertion polish should not treat contraction apostrophes as open quotes"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "A final word or single”.",
+                context: openSmartQuoteContext
+            ) == "a final word or single”",
+            "insertion polish should preserve trailing smart quotes after matching open context"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "A final word or single’.",
+                context: openSmartSingleQuoteContext
+            ) == "a final word or single’",
+            "insertion polish should preserve trailing smart single quotes after matching open context"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "A final word or single`.",
+                context: openBacktickContext
+            ) == "a final word or single`",
+            "insertion polish should preserve trailing backticks after matching open context"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "A final word or single*.",
+                context: openStarContext
+            ) == "a final word or single*",
+            "insertion polish should preserve trailing star markers after matching open context"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "A final word or single_.",
+                context: openUnderscoreContext
+            ) == "a final word or single_",
+            "insertion polish should preserve trailing underscore markers after matching open context"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("U.S.\"", context: midSentenceContext) == "U.S.",

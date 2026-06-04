@@ -6258,6 +6258,12 @@ struct RomaCoreChecks {
             ),
             encoding: .utf8
         )
+        let keyboardHookNativeSource = try String(
+            contentsOf: packageRoot.appendingPathComponent(
+                "Sources/CWindowsSupport/roma_windows_keyboard_hook.c"
+            ),
+            encoding: .utf8
+        )
         let windowsDictationRuntimeSource = try String(
             contentsOf: packageRoot.appendingPathComponent(
                 "Sources/RomaCore/Windows/WindowsDictationRuntime.swift"
@@ -6569,6 +6575,12 @@ struct RomaCoreChecks {
             ) &&
                 !keyboardHookSource.contains("timeoutMilliseconds: UInt32 = 15_000"),
             "Windows keyboard hook proof should share the agent hold timeout default"
+        )
+        try require(
+            keyboardHookNativeSource.contains("roma_windows_keyboard_current_modifier_state") &&
+                keyboardHookNativeSource.contains("GetAsyncKeyState") &&
+                keyboardHookNativeSource.contains("g_keyboard_state.modifier_state = roma_windows_keyboard_current_modifier_state();"),
+            "Windows keyboard hook should seed modifier state from already-held modifier keys"
         )
         try require(
             checkReportScript.contains(#"Assert-Boolean -Object $Proof -Name "native_windows_adapters" -Expected $true"#),

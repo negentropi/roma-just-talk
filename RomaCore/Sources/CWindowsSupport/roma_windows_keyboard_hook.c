@@ -57,6 +57,36 @@ static uint32_t roma_windows_keyboard_modifier_for_vk(DWORD virtual_key) {
     }
 }
 
+static int roma_windows_keyboard_is_vk_down(int virtual_key) {
+    return (GetAsyncKeyState(virtual_key) & 0x8000) != 0;
+}
+
+static uint32_t roma_windows_keyboard_current_modifier_state(void) {
+    uint32_t state = 0;
+
+    if (roma_windows_keyboard_is_vk_down(VK_CONTROL) ||
+        roma_windows_keyboard_is_vk_down(VK_LCONTROL) ||
+        roma_windows_keyboard_is_vk_down(VK_RCONTROL)) {
+        state |= ROMA_WINDOWS_KEYBOARD_MOD_CONTROL;
+    }
+    if (roma_windows_keyboard_is_vk_down(VK_SHIFT) ||
+        roma_windows_keyboard_is_vk_down(VK_LSHIFT) ||
+        roma_windows_keyboard_is_vk_down(VK_RSHIFT)) {
+        state |= ROMA_WINDOWS_KEYBOARD_MOD_SHIFT;
+    }
+    if (roma_windows_keyboard_is_vk_down(VK_MENU) ||
+        roma_windows_keyboard_is_vk_down(VK_LMENU) ||
+        roma_windows_keyboard_is_vk_down(VK_RMENU)) {
+        state |= ROMA_WINDOWS_KEYBOARD_MOD_ALT;
+    }
+    if (roma_windows_keyboard_is_vk_down(VK_LWIN) ||
+        roma_windows_keyboard_is_vk_down(VK_RWIN)) {
+        state |= ROMA_WINDOWS_KEYBOARD_MOD_WIN;
+    }
+
+    return state;
+}
+
 static void roma_windows_keyboard_update_modifier(DWORD virtual_key, WPARAM message) {
     uint32_t modifier = roma_windows_keyboard_modifier_for_vk(virtual_key);
     if (modifier == 0) {
@@ -121,7 +151,7 @@ static roma_windows_keyboard_status_t roma_windows_keyboard_wait_for_event_inter
     g_keyboard_state.required_modifiers = required_modifiers;
     g_keyboard_state.target_event = target_event;
     g_keyboard_state.observed_events = 0;
-    g_keyboard_state.modifier_state = 0;
+    g_keyboard_state.modifier_state = roma_windows_keyboard_current_modifier_state();
     g_keyboard_state.target_is_down = 0;
     g_keyboard_state.thread_id = GetCurrentThreadId();
     g_keyboard_state.hook = SetWindowsHookExA(WH_KEYBOARD_LL, roma_windows_keyboard_proc, GetModuleHandleA(NULL), 0);

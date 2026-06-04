@@ -7833,6 +7833,9 @@ struct RomaCoreChecks {
                 packageScript.contains("manifest_script=$manifestScriptOutput") &&
                 packageScript.contains("windows-package-identity.ps1") &&
                 packageScript.contains("package_identity_script=$identityScriptOutput") &&
+                packageScript.contains("check-windows-scripts-parse.ps1") &&
+                packageScript.contains("parse_script=$parseScriptOutput") &&
+                packageScript.contains(#"Invoke-Step "packaged script parse check""#) &&
                 packageScript.contains("windows-proof-common.ps1") &&
                 packageScript.contains("proof_common_script=$proofCommonScriptOutput") &&
                 packageScript.contains("Get-RomaPackageIdentityProof -PackageDir $PackageDir") &&
@@ -7924,6 +7927,7 @@ struct RomaCoreChecks {
                 packageIdentityScript.contains("windows-package-identity.ps1") &&
                 packageIdentityScript.contains("windows-manifest.ps1") &&
                 packageIdentityScript.contains("windows-proof-common.ps1") &&
+                packageIdentityScript.contains("check-windows-scripts-parse.ps1") &&
                 packageIdentityScript.contains("RomaWhisperCLIMock.exe") &&
                 packageIdentityScript.contains("Get-RomaPackageIdentityHash"),
             "Windows package identity should be computed by one shared packaged helper"
@@ -8021,6 +8025,7 @@ struct RomaCoreChecks {
             installScript.contains(#""RomaProofAgent.exe""#) &&
                 installScript.contains(#""run-windows-laptop-proof.ps1""#) &&
                 installScript.contains(#""WINDOWS-LAPTOP-PROOF.txt""#) &&
+                installScript.contains(#""check-windows-scripts-parse.ps1""#) &&
                 installScript.contains(#""windows-proof-common.ps1""#) &&
                 installScript.contains(#""windows-manifest.ps1""#) &&
                 installScript.contains(#""windows-package-identity.ps1""#) &&
@@ -8031,6 +8036,9 @@ struct RomaCoreChecks {
             proveScript.contains("installed_proof_agent") &&
                 proveScript.contains("installed_laptop_proof_script") &&
                 proveScript.contains("installed_laptop_proof_guide") &&
+                proveScript.contains("installed_parse_script") &&
+                proveScript.contains("installed_script_parse") &&
+                proveScript.contains(#"Invoke-Step "installed script parse check""#) &&
                 proveScript.contains("installed_proof_common_script") &&
                 proveScript.contains("installed_manifest_script") &&
                 proveScript.contains("installed_package_identity_script") &&
@@ -8041,6 +8049,8 @@ struct RomaCoreChecks {
             checkReportScript.contains("installed_proof_agent_matches_package") &&
                 checkReportScript.contains("installed_laptop_proof_script_matches_package") &&
                 checkReportScript.contains("installed_laptop_proof_guide_matches_package") &&
+                checkReportScript.contains("installed_parse_script_matches_package") &&
+                checkReportScript.contains("installed_script_parse") &&
                 checkReportScript.contains("installed_proof_common_script_matches_package") &&
                 checkReportScript.contains("installed_manifest_script_matches_package") &&
                 checkReportScript.contains("installed_package_identity_script_matches_package") &&

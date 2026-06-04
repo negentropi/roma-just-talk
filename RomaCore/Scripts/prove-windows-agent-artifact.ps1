@@ -621,6 +621,18 @@ function Get-ListenerSmokeProof {
     }
 }
 
+function Get-ScriptParseProof {
+    param(
+        [string]$Output = ""
+    )
+
+    return [ordered]@{
+        output_present = ![string]::IsNullOrWhiteSpace($Output)
+        ok = $Output.Contains("windows_scripts_parse_ok=true")
+        count_present = $Output.Contains("windows_scripts_parse_count=")
+    }
+}
+
 function Get-ConfigDoctorOutputProof {
     param(
         [string]$Output = ""
@@ -741,6 +753,7 @@ function Write-ProofReport {
             installed_proof_script = (Get-FileHashProof -Path (Join-Path $InstallDir "prove-windows-agent-artifact.ps1"))
             installed_laptop_proof_script = (Get-FileHashProof -Path (Join-Path $InstallDir "run-windows-laptop-proof.ps1"))
             installed_laptop_proof_guide = (Get-FileHashProof -Path (Join-Path $InstallDir "WINDOWS-LAPTOP-PROOF.txt"))
+            installed_parse_script = (Get-FileHashProof -Path (Join-Path $InstallDir "check-windows-scripts-parse.ps1"))
             installed_proof_common_script = (Get-FileHashProof -Path (Join-Path $InstallDir "windows-proof-common.ps1"))
             installed_manifest_script = (Get-FileHashProof -Path (Join-Path $InstallDir "windows-manifest.ps1"))
             installed_package_identity_script = (Get-FileHashProof -Path (Join-Path $InstallDir "windows-package-identity.ps1"))
@@ -749,6 +762,7 @@ function Write-ProofReport {
         }
         manifest = $script:artifactManifest
         package_identity = (Get-RomaPackageIdentityProof -PackageDir $PackageDir)
+        installed_script_parse = (Get-ScriptParseProof -Output $script:installedScriptParseOutput)
     }
     if (![string]::IsNullOrWhiteSpace($shortcutPath)) {
         $report["shortcut"] = Get-ShortcutProof `
@@ -826,6 +840,7 @@ $installScript = Join-Path $PackageDir "install-windows-agent.ps1"
 $runScript = Join-Path $PackageDir "run-windows-agent.ps1"
 $proofScript = Join-Path $PackageDir "prove-windows-agent-artifact.ps1"
 $laptopProofScript = Join-Path $PackageDir "run-windows-laptop-proof.ps1"
+$parseScript = Join-Path $PackageDir "check-windows-scripts-parse.ps1"
 $packagedProofCommonScript = Join-Path $PackageDir "windows-proof-common.ps1"
 $checkReportScript = Join-Path $PackageDir "check-windows-proof-report.ps1"
 $checkSetScript = Join-Path $PackageDir "check-windows-proof-set.ps1"
@@ -836,6 +851,7 @@ $script:packagedAgentDoctorOutput = ""
 $script:packagedProofAgentDoctorOutput = ""
 $script:packagedListenerOutput = ""
 $script:installedListenerOutput = ""
+$script:installedScriptParseOutput = ""
 $script:installedConfigDoctorOutput = ""
 $script:packagedNativeDoctorOutputs = [ordered]@{
     register_hotkey = ""
@@ -856,6 +872,7 @@ Invoke-Step "artifact files" {
     Require-File -Path $runScript
     Require-File -Path $proofScript
     Require-File -Path $laptopProofScript
+    Require-File -Path $parseScript
     Require-File -Path $packagedProofCommonScript
     Require-File -Path $checkReportScript
     Require-File -Path $checkSetScript
@@ -878,6 +895,7 @@ Invoke-Step "artifact manifest" {
         "install_script",
         "proof_script",
         "laptop_proof_script",
+        "parse_script",
         "check_report_script",
         "check_set_script",
         "install_proof_config",
@@ -1085,6 +1103,18 @@ if ($CreateStartupShortcut) {
 
 Invoke-Step "install packaged agent" {
     & $installScript @installArgs
+}
+
+Invoke-Step "installed script parse check" {
+    $installedParseScript = Join-Path $InstallDir "check-windows-scripts-parse.ps1"
+    Require-File -Path $installedParseScript
+    $script:installedScriptParseOutput = & $installedParseScript -ScriptsDir $InstallDir 2>&1 | Out-String
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host $script:installedScriptParseOutput
+        throw "Installed script parse check failed"
+    }
+    Write-Host $script:installedScriptParseOutput
+    Assert-OutputContains -Output $script:installedScriptParseOutput -Expected "windows_scripts_parse_ok=true"
 }
 
 Invoke-Step "installed launcher doctor" {

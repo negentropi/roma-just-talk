@@ -428,6 +428,8 @@ try {
     $proofScriptOutput = Join-Path $OutputDir "prove-windows-agent-artifact.ps1"
     $laptopProofScriptSource = Join-Path $PSScriptRoot "run-windows-laptop-proof.ps1"
     $laptopProofScriptOutput = Join-Path $OutputDir "run-windows-laptop-proof.ps1"
+    $parseScriptSource = Join-Path $PSScriptRoot "check-windows-scripts-parse.ps1"
+    $parseScriptOutput = Join-Path $OutputDir "check-windows-scripts-parse.ps1"
     $identityScriptSource = Join-Path $PSScriptRoot "windows-package-identity.ps1"
     $identityScriptOutput = Join-Path $OutputDir "windows-package-identity.ps1"
     $proofCommonScriptSource = Join-Path $PSScriptRoot "windows-proof-common.ps1"
@@ -503,6 +505,8 @@ try {
         Write-Host "proof_script=$proofScriptOutput"
         Copy-Item -LiteralPath $laptopProofScriptSource -Destination $laptopProofScriptOutput -Force
         Write-Host "laptop_proof_script=$laptopProofScriptOutput"
+        Copy-Item -LiteralPath $parseScriptSource -Destination $parseScriptOutput -Force
+        Write-Host "parse_script=$parseScriptOutput"
         Copy-Item -LiteralPath $identityScriptSource -Destination $identityScriptOutput -Force
         Write-Host "package_identity_script=$identityScriptOutput"
         Copy-Item -LiteralPath $proofCommonScriptSource -Destination $proofCommonScriptOutput -Force
@@ -514,6 +518,10 @@ try {
         Copy-Item -LiteralPath $checkSetScriptSource -Destination $checkSetScriptOutput -Force
         Write-Host "check_set_script=$checkSetScriptOutput"
         Write-LaptopProofGuide -OutputPath $laptopProofGuideOutput
+    }
+
+    Invoke-Step "packaged script parse check" {
+        & $parseScriptOutput -ScriptsDir $OutputDir
     }
 
     $swiftRuntime = @{}
@@ -622,6 +630,7 @@ try {
         "proof_script=$proofScriptOutput",
         "laptop_proof_script=$laptopProofScriptOutput",
         "laptop_proof_guide=$laptopProofGuideOutput",
+        "parse_script=$parseScriptOutput",
         "package_identity_script=$identityScriptOutput",
         "proof_common_script=$proofCommonScriptOutput",
         "manifest_script=$manifestScriptOutput",

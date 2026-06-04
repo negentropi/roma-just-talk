@@ -41,6 +41,7 @@ function Get-RomaPackageIdentityProof {
         "prove-windows-agent-artifact.ps1",
         "run-windows-laptop-proof.ps1",
         "WINDOWS-LAPTOP-PROOF.txt",
+        "check-windows-scripts-parse.ps1",
         "check-windows-proof-report.ps1",
         "check-windows-proof-set.ps1",
         "windows-proof-common.ps1",

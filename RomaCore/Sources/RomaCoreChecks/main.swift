@@ -1030,6 +1030,13 @@ struct RomaCoreChecks {
             "shared insertion polish should unwrap corner-bracketed fragments"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "【a final word or single】",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "shared insertion polish should unwrap plain corner-bracketed continuation fragments"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("【Model!】", context: midSentenceContext) == "model",
             "shared insertion polish should unwrap noisy emphatic corner-bracketed fragments"
         )
@@ -1038,8 +1045,22 @@ struct RomaCoreChecks {
             "shared insertion polish should unwrap book-title-bracketed fragments"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "《a final word or single》",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "shared insertion polish should unwrap plain book-title-bracketed continuation fragments"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("（Model.）", context: midSentenceContext) == "model",
             "shared insertion polish should unwrap full-width parenthesized fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "（a final word or single）",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "shared insertion polish should unwrap plain full-width parenthesized continuation fragments"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("... 【Model.】", context: midSentenceContext) == "model",
@@ -5203,6 +5224,27 @@ struct RomaCoreChecks {
             "insertion polish should unwrap noisy low-high single-quoted final fragments"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "【a final word or single】",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "insertion polish should unwrap plain corner-bracketed continuation fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "《a final word or single》",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "insertion polish should unwrap plain book-title-bracketed continuation fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "（a final word or single）",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "insertion polish should unwrap plain full-width parenthesized continuation fragments"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("What?\"", context: midSentenceContext) == "what?\"",
             "insertion polish should preserve trailing quotes after question words"
         )
@@ -6953,6 +6995,39 @@ struct RomaCoreChecks {
         try require(
             await straightSingleQuotedFragmentInserter.pastedText == " model",
             "pipeline should paste straight-single-quoted noisy mid-sentence final fragments"
+        )
+
+        let nonASCIIBoundaryFragmentRecorder = FakeRecorder()
+        let nonASCIIBoundaryFragmentInserter = FakeTextInsertion()
+        let nonASCIIBoundaryFragmentPipeline = DictationPipeline(
+            recorder: nonASCIIBoundaryFragmentRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "non-ascii-boundary-fragment-proof.wav",
+                text: "【a final word or single】"
+            ),
+            textInsertion: nonASCIIBoundaryFragmentInserter
+        )
+        let nonASCIIBoundaryFragmentRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/non-ascii-boundary-fragment-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await nonASCIIBoundaryFragmentRecorder.startPreRollBuffering()
+        let nonASCIIBoundaryFragmentResult = try await nonASCIIBoundaryFragmentPipeline.runRecordingWindow(
+            nonASCIIBoundaryFragmentRequest
+        ) {}
+
+        try require(
+            nonASCIIBoundaryFragmentResult.processedText == " a final word or single",
+            "pipeline should clean plain non-ASCII wrapper artifacts during mid-sentence polish"
+        )
+        try require(
+            await nonASCIIBoundaryFragmentInserter.pastedText == " a final word or single",
+            "pipeline should paste plain non-ASCII wrapper artifacts as clean continuation text"
         )
 
         let backtickFragmentRecorder = FakeRecorder()

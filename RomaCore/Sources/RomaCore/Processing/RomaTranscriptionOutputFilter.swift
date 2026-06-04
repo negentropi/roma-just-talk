@@ -1426,11 +1426,14 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         let isContinuingInsertion = activeContext.map { isContinuingSentence(after: $0.precedingText) } ?? false
+        let isPlainNonASCIIBoundaryContinuation = isContinuingInsertion &&
+            isPlainNonASCIIBoundaryContinuationFragment(polishedText)
         let shouldTreatAsFragment = isShortFragment(polishedText) ||
             (wasWholeSquareBracketedOutput &&
                 isShortFragment(removeTrailingNoisyFragmentPunctuation(from: polishedText))) ||
             (isContinuingInsertion &&
-                isNoisyPreservedBoundaryContinuationFragment(polishedText))
+                isNoisyPreservedBoundaryContinuationFragment(polishedText)) ||
+            isPlainNonASCIIBoundaryContinuation
         let shouldUseFragmentPolish: Bool
         if isContinuingInsertion {
             shouldUseFragmentPolish = shouldTreatAsFragment
@@ -1453,6 +1456,7 @@ public struct RomaTranscriptionOutputFilter {
                     from: polishedText,
                     after: activeContext.precedingText
                 )
+                polishedText = unwrapPlainNonASCIIBoundaryContinuationFragment(from: polishedText)
             }
             if wasWholeSquareBracketedOutput {
                 polishedText = removeTrailingNoisyFragmentPunctuation(from: polishedText)
@@ -8933,6 +8937,26 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         return nonASCIIUnwrappedText
+    }
+
+    private static func isPlainNonASCIIBoundaryContinuationFragment(_ text: String) -> Bool {
+        guard let innerText = nonASCIIBoundaryInnerText(in: text),
+              wordCount(in: innerText) <= 5,
+              !hasInternalSentenceBoundary(innerText),
+              innerText.rangeOfCharacter(from: CharacterSet(charactersIn: ".!?。！？")) == nil else {
+            return false
+        }
+
+        return true
+    }
+
+    private static func unwrapPlainNonASCIIBoundaryContinuationFragment(from text: String) -> String {
+        guard isPlainNonASCIIBoundaryContinuationFragment(text),
+              let innerText = nonASCIIBoundaryInnerText(in: text) else {
+            return text
+        }
+
+        return innerText
     }
 
     private static func nonASCIIBoundaryInnerText(in text: String) -> String? {

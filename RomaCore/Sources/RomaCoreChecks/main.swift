@@ -702,6 +702,62 @@ struct RomaCoreChecks {
             "shared insertion polish should preserve non-technical change-that-to continuations"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Scratch that module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim scratch-that erase commands before module continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Scratch that out model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim scratch-that-out erase commands before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Delete that model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim delete-that erase commands before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Remove this module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim remove-this erase commands before module continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Erase that module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim erase-that erase commands before module continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Undo that model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim undo-that erase commands before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Delete that now.",
+                context: midSentenceContext
+            ) == "delete that now",
+            "shared insertion polish should preserve non-technical delete-that continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Scratch that out now.",
+                context: midSentenceContext
+            ) == "scratch that out now",
+            "shared insertion polish should preserve non-technical scratch-that-out continuations"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("Right model.", context: midSentenceContext) == "right model",
             "shared insertion polish should preserve right as an ordinary fragment word"
         )
@@ -7991,6 +8047,37 @@ struct RomaCoreChecks {
         try require(
             await makeItInserter.pastedText == " module",
             "pipeline should paste make-it correction command continuations"
+        )
+
+        let scratchThatRecorder = FakeRecorder()
+        let scratchThatInserter = FakeTextInsertion()
+        let scratchThatPipeline = DictationPipeline(
+            recorder: scratchThatRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "scratch-that-continuation-proof.wav",
+                text: "Scratch that module."
+            ),
+            textInsertion: scratchThatInserter
+        )
+        let scratchThatRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/scratch-that-continuation-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await scratchThatRecorder.startPreRollBuffering()
+        let scratchThatResult = try await scratchThatPipeline.runRecordingWindow(scratchThatRequest) {}
+
+        try require(
+            scratchThatResult.processedText == " module",
+            "pipeline should clean scratch-that erase command continuations"
+        )
+        try require(
+            await scratchThatInserter.pastedText == " module",
+            "pipeline should paste scratch-that erase command continuations"
         )
 
         let orWaitNoIMeanRecorder = FakeRecorder()

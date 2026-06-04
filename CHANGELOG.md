@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Required Windows artifact proof reports to expose that listener mode reuses the pre-roll dictation runtime path.
 - Archived Windows laptop permission-surface preflight proof before hotkey and microphone checks.
 - Printed the direct Windows microphone Settings URI in permission proof output.
 - Wrote an exact Windows full-laptop proof recheck script into the proof directory after a successful full proof.

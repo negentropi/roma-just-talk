@@ -728,6 +728,7 @@ try {
         Assert-RomaWindowsRuntimeDefaultOutput -Output $proofAgentOutputText
         Assert-OutputContains -Output $proofAgentOutputText -Expected "windows_paste_adapter_source=true"
         Assert-OutputContains -Output $proofAgentOutputText -Expected "windows_dictation_runtime_uses_pipeline_source=true"
+        Assert-OutputContains -Output $proofAgentOutputText -Expected "windows_listener_pre_roll_runtime_source=true"
         Assert-OutputContains -Output $proofAgentOutputText -Expected "windows_hold_hook_single_window_source=true"
         Assert-OutputContains -Output $proofAgentOutputText -Expected "windows_dictation_proof_source=true"
     }

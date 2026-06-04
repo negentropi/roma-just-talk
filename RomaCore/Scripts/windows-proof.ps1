@@ -294,6 +294,7 @@ try {
         Write-Host $proofAgentDoctorOutput
         Assert-RomaWindowsRuntimeDefaultOutput -Output $proofAgentDoctorOutput
         Assert-OutputContains -Output $proofAgentDoctorOutput -Expected "windows_dictation_runtime_uses_pipeline_source=true"
+        Assert-OutputContains -Output $proofAgentDoctorOutput -Expected "windows_listener_pre_roll_runtime_source=true"
         Assert-OutputContains -Output $proofAgentDoctorOutput -Expected "windows_hold_hook_single_window_source=true"
     }
 

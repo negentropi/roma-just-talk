@@ -556,6 +556,7 @@ function Get-ProofAgentDoctorOutputProof {
         windows_dictation_runtime_source = $Output.Contains("windows_dictation_runtime_source=true")
         windows_dictation_runtime_uses_pipeline_source = $Output.Contains("windows_dictation_runtime_uses_pipeline_source=true")
         windows_listener_output_isolation_source = $Output.Contains("windows_listener_output_isolation_source=true")
+        windows_listener_pre_roll_runtime_source = $Output.Contains("windows_listener_pre_roll_runtime_source=true")
         windows_hold_hook_single_window_source = $Output.Contains("windows_hold_hook_single_window_source=true")
         windows_dictation_proof_source = $Output.Contains("windows_dictation_proof_source=true")
         miniaudio_capture_adapter_source = $Output.Contains("miniaudio_capture_adapter_source=true")
@@ -941,6 +942,7 @@ Invoke-Step "packaged proof agent doctor" {
     Assert-OutputContains -Output $script:packagedProofAgentDoctorOutput -Expected "windows_paste_adapter_source=true"
     Assert-OutputContains -Output $script:packagedProofAgentDoctorOutput -Expected "windows_dictation_runtime_uses_pipeline_source=true"
     Assert-OutputContains -Output $script:packagedProofAgentDoctorOutput -Expected "windows_listener_output_isolation_source=true"
+    Assert-OutputContains -Output $script:packagedProofAgentDoctorOutput -Expected "windows_listener_pre_roll_runtime_source=true"
     Assert-OutputContains -Output $script:packagedProofAgentDoctorOutput -Expected "windows_hold_hook_single_window_source=true"
     Assert-OutputContains -Output $script:packagedProofAgentDoctorOutput -Expected "windows_dictation_proof_source=true"
     Assert-OutputContains -Output $script:packagedProofAgentDoctorOutput -Expected "roma_transcription_client_source=true"

@@ -595,6 +595,7 @@ function Assert-ProofAgentDoctorOutputProof {
     Assert-Boolean -Object $Proof -Name "windows_dictation_runtime_source" -Expected $true
     Assert-Boolean -Object $Proof -Name "windows_dictation_runtime_uses_pipeline_source" -Expected $true
     Assert-Boolean -Object $Proof -Name "windows_listener_output_isolation_source" -Expected $true
+    Assert-Boolean -Object $Proof -Name "windows_listener_pre_roll_runtime_source" -Expected $true
     Assert-Boolean -Object $Proof -Name "windows_hold_hook_single_window_source" -Expected $true
     Assert-Boolean -Object $Proof -Name "windows_dictation_proof_source" -Expected $true
     Assert-Boolean -Object $Proof -Name "miniaudio_capture_adapter_source" -Expected $true
@@ -836,6 +837,7 @@ function Get-ProofProfileRequirements {
                 "proof_agent_source_surface",
                 "shared_windows_transcription_path",
                 "shared_windows_proof_args",
+                "listener_pre_roll_runtime_source",
                 "hold_hook_single_window_source",
                 "native_doctor_surface",
                 "packaged_listener"
@@ -866,6 +868,7 @@ function Get-ProofProfileRequirements {
                 "proof_agent_source_surface",
                 "shared_windows_transcription_path",
                 "shared_windows_proof_args",
+                "listener_pre_roll_runtime_source",
                 "hold_hook_single_window_source",
                 "native_doctor_surface",
                 "packaged_listener",
@@ -896,6 +899,7 @@ function Get-ProofProfileRequirements {
                 "proof_agent_source_surface",
                 "shared_windows_transcription_path",
                 "shared_windows_proof_args",
+                "listener_pre_roll_runtime_source",
                 "hold_hook_single_window_source",
                 "native_doctor_surface",
                 "packaged_listener",
@@ -924,6 +928,7 @@ function Get-ProofProfileRequirements {
                 "proof_agent_source_surface",
                 "shared_windows_transcription_path",
                 "shared_windows_proof_args",
+                "listener_pre_roll_runtime_source",
                 "hold_hook_single_window_source",
                 "native_doctor_surface",
                 "packaged_listener",
@@ -949,6 +954,7 @@ function Get-ProofProfileRequirements {
                 "proof_agent_source_surface",
                 "shared_windows_transcription_path",
                 "shared_windows_proof_args",
+                "listener_pre_roll_runtime_source",
                 "hold_hook_single_window_source",
                 "native_doctor_surface",
                 "packaged_listener",

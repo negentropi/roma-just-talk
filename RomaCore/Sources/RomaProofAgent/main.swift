@@ -80,6 +80,7 @@ struct RomaProofAgent {
         print("windows_dictation_runtime_source=true")
         print("windows_dictation_runtime_uses_pipeline_source=true")
         print("windows_listener_output_isolation_source=true")
+        print("windows_listener_pre_roll_runtime_source=true")
         print("windows_hold_hook_single_window_source=true")
         print("windows_dictation_proof_source=true")
         print("windows_proof_args_shared_source=true")

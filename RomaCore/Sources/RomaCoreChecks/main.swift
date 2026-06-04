@@ -7727,6 +7727,16 @@ struct RomaCoreChecks {
             "Windows proof agent should expose that listener sessions isolate default WAV output paths"
         )
         try require(
+            windowsAgentSource.contains(
+                "try await runDictation(arguments: arguments, listenerSessionIndex: completedSessions + 1)"
+            ) &&
+                windowsAgentSource.contains("WindowsDictationRuntime.run(") &&
+                windowsAgentSource.contains("case .preRollBuffering:") &&
+                windowsAgentSource.contains(#"print("pre_roll_buffering=true")"#) &&
+                proofAgentSource.contains(#"print("windows_listener_pre_roll_runtime_source=true")"#),
+            "Windows proof agent should expose that listener sessions reuse the pre-roll dictation runtime path"
+        )
+        try require(
             proofAgentSource.contains(#"print("windows_hold_hook_single_window_source=true")"#),
             "Windows proof agent should expose that hold-to-talk uses one native hook window"
         )
@@ -7766,6 +7776,10 @@ struct RomaCoreChecks {
                 scriptSource.contains(#"-Expected "windows_dictation_runtime_uses_pipeline_source=true""#),
                 "\(scriptName) should assert that the Windows runtime uses the shared DictationPipeline"
             )
+            try require(
+                scriptSource.contains(#"-Expected "windows_listener_pre_roll_runtime_source=true""#),
+                "\(scriptName) should assert that listener mode reuses the pre-roll dictation runtime path"
+            )
             if scriptName == "prove-windows-agent-artifact.ps1" {
                 try require(
                     scriptSource.contains(#"-Expected "windows_listener_output_isolation_source=true""#),
@@ -7803,6 +7817,12 @@ struct RomaCoreChecks {
         )
         try require(
             proveScript.contains(
+                #"windows_listener_pre_roll_runtime_source = $Output.Contains("windows_listener_pre_roll_runtime_source=true")"#
+            ),
+            "Windows artifact proof reports should record that listener mode reuses the pre-roll dictation runtime path"
+        )
+        try require(
+            proveScript.contains(
                 #"windows_hold_hook_single_window_source = $Output.Contains("windows_hold_hook_single_window_source=true")"#
             ),
             "Windows artifact proof reports should record that hold-to-talk uses one native hook window"
@@ -7830,6 +7850,12 @@ struct RomaCoreChecks {
         )
         try require(
             checkReportScript.contains(
+                #"Assert-Boolean -Object $Proof -Name "windows_listener_pre_roll_runtime_source" -Expected $true"#
+            ),
+            "Windows proof checker should require that listener mode reuses the pre-roll dictation runtime path"
+        )
+        try require(
+            checkReportScript.contains(
                 #"Assert-Boolean -Object $Proof -Name "windows_hold_hook_single_window_source" -Expected $true"#
             ),
             "Windows proof checker should require that hold-to-talk uses one native hook window"
@@ -7846,6 +7872,10 @@ struct RomaCoreChecks {
         try require(
             checkReportScript.contains(#""hold_hook_single_window_source""#),
             "Windows proof profiles should print hold single-window source coverage"
+        )
+        try require(
+            checkReportScript.contains(#""listener_pre_roll_runtime_source""#),
+            "Windows proof profiles should print listener pre-roll runtime source coverage"
         )
         try require(
             checkReportScript.contains(#""shared_windows_transcription_path""#) &&

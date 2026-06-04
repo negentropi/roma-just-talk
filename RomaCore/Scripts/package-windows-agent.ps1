@@ -329,13 +329,10 @@ function Invoke-LaptopPreflightReportProfileSmoke {
         throw "$Name laptop preflight report profile smoke failed"
     }
 
-    $expectedLocalWhisperMarker = $ExpectLocalWhisper.ToString()
     Write-Host $profileOutputText
-    Assert-OutputContains -Output $profileOutputText -Expected "proof_profile_ok=laptop-preflight"
-    Assert-OutputContains -Output $profileOutputText -Expected "proof_report_ok="
-    Assert-OutputContains -Output $profileOutputText -Expected "proof_set_laptop_preflight_permission_surface=true"
-    Assert-OutputContains -Output $profileOutputText -Expected "proof_set_laptop_preflight_local_whisper=$expectedLocalWhisperMarker"
-    Assert-OutputContains -Output $profileOutputText -Expected "proof_set_laptop_preflight_source_dirty=false"
+    Assert-RomaWindowsLaptopPreflightProfileOutput `
+        -Output $profileOutputText `
+        -ExpectLocalWhisper $ExpectLocalWhisper
     return $profileOutputText
 }
 
@@ -388,13 +385,10 @@ function Invoke-LaptopPreflightCheckerSmoke {
         throw "$Name laptop preflight report checker smoke failed"
     }
 
-    $expectedLocalWhisperMarker = $IncludeLocalWhisper.ToString()
     Write-Host $checkerOutputText
-    Assert-OutputContains -Output $checkerOutputText -Expected "proof_set_laptop_preflight_permission_surface=true"
-    Assert-OutputContains -Output $checkerOutputText -Expected "proof_set_laptop_preflight_local_whisper=$expectedLocalWhisperMarker"
-    Assert-OutputContains -Output $checkerOutputText -Expected "proof_set_laptop_preflight_source_dirty=false"
-    Assert-OutputContains -Output $checkerOutputText -Expected "proof_profile_ok=laptop-preflight"
-    Assert-OutputContains -Output $checkerOutputText -Expected "proof_set_ok=laptop-preflight"
+    Assert-RomaWindowsLaptopPreflightSetOutput `
+        -Output $checkerOutputText `
+        -ExpectLocalWhisper $IncludeLocalWhisper
     return $checkerOutputText
 }
 

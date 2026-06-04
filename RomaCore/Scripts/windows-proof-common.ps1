@@ -265,6 +265,50 @@ function Assert-RomaWindowsOutputMarkers {
     }
 }
 
+function Get-RomaWindowsLaptopPreflightCommonOutputMarkers {
+    param(
+        [bool]$ExpectLocalWhisper = $true
+    )
+
+    return [ordered]@{
+        permission_surface = "proof_set_laptop_preflight_permission_surface=true"
+        local_whisper = "proof_set_laptop_preflight_local_whisper=$($ExpectLocalWhisper.ToString())"
+        source_dirty = "proof_set_laptop_preflight_source_dirty=false"
+    }
+}
+
+function Assert-RomaWindowsLaptopPreflightProfileOutput {
+    param(
+        [string]$Output = "",
+        [bool]$ExpectLocalWhisper = $true
+    )
+
+    $markers = [ordered]@{
+        profile = "proof_profile_ok=laptop-preflight"
+        report_ok = "proof_report_ok="
+    }
+
+    $commonMarkers = Get-RomaWindowsLaptopPreflightCommonOutputMarkers -ExpectLocalWhisper $ExpectLocalWhisper
+    foreach ($key in $commonMarkers.Keys) {
+        $markers[$key] = $commonMarkers[$key]
+    }
+
+    Assert-RomaWindowsOutputMarkers -Output $Output -Markers $markers
+}
+
+function Assert-RomaWindowsLaptopPreflightSetOutput {
+    param(
+        [string]$Output = "",
+        [bool]$ExpectLocalWhisper = $true
+    )
+
+    $markers = Get-RomaWindowsLaptopPreflightCommonOutputMarkers -ExpectLocalWhisper $ExpectLocalWhisper
+    $markers["profile"] = "proof_profile_ok=laptop-preflight"
+    $markers["proof_set"] = "proof_set_ok=laptop-preflight"
+
+    Assert-RomaWindowsOutputMarkers -Output $Output -Markers $markers
+}
+
 function Assert-RomaWindowsFullLaptopProofSetOutput {
     param(
         [string]$Output = ""

@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Shared Windows preflight smoke assertion helpers so package smoke and guide markers use one proof-helper contract.
 - Shared Windows preflight proof marker lists so the generated laptop guide uses the same helper-owned markers as the full proof.
 - Shared Windows full-laptop proof marker lists so the generated guide and archived recheck script assert the same profile markers.
 - Shared Windows proof-set profile routing through one table so single-report and set-level proof checks stay aligned.

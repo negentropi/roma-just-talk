@@ -9366,7 +9366,12 @@ struct RomaCoreChecks {
                 packageScript.contains("-ReportCheckerScriptPath $checkReportScriptOutput") &&
                 packageScript.contains("-SetCheckerScriptPath $checkSetScriptOutput") &&
                 packageScript.contains("-RequireProofProfile laptop-preflight") &&
-                packageScript.contains(#"-Expected "proof_report_ok=""#) &&
+                packageScript.contains("Assert-RomaWindowsLaptopPreflightProfileOutput") &&
+                packageScript.contains("Assert-RomaWindowsLaptopPreflightSetOutput") &&
+                proofCommonScript.contains("function Get-RomaWindowsLaptopPreflightCommonOutputMarkers") &&
+                proofCommonScript.contains("function Assert-RomaWindowsLaptopPreflightProfileOutput") &&
+                proofCommonScript.contains("function Assert-RomaWindowsLaptopPreflightSetOutput") &&
+                proofCommonScript.contains("proof_report_ok=") &&
                 packageScript.contains("IncludeLocalWhisper") &&
                 packageScript.contains("windows-manifest.ps1") &&
                 packageScript.contains("manifest_script=$manifestScriptOutput") &&
@@ -9398,12 +9403,12 @@ struct RomaCoreChecks {
                 packageScript.contains(#"Invoke-Step "manifest nested relocation smoke""#) &&
                 packageScript.contains("manifest_nested_relocation_duplicate_leaf=") &&
                 packageScript.contains("manifest_nested_relocation_ok=true") &&
-                packageScript.contains(#"-Expected "proof_set_laptop_preflight_permission_surface=true""#) &&
-                packageScript.contains(#"-Expected "proof_set_laptop_preflight_local_whisper=$expectedLocalWhisperMarker""#) &&
-                packageScript.contains(#"-Expected "proof_set_laptop_preflight_source_dirty=false""#) &&
-                packageScript.contains(#"-Expected "proof_profile_ok=laptop-preflight""#) &&
+                proofCommonScript.contains("proof_set_laptop_preflight_permission_surface=true") &&
+                proofCommonScript.contains("proof_set_laptop_preflight_local_whisper=") &&
+                proofCommonScript.contains("proof_set_laptop_preflight_source_dirty=false") &&
+                proofCommonScript.contains("proof_profile_ok=laptop-preflight") &&
                 packageScript.contains("check-windows-proof-report.ps1 -ProofReportPath C:\\tmp\\roma-windows-laptop-proof\\preflight-proof.json -RequireProofProfile laptop-preflight") &&
-                packageScript.contains(#"-Expected "proof_set_ok=laptop-preflight""#),
+                proofCommonScript.contains("proof_set_ok=laptop-preflight"),
             "Windows package smoke should exercise the laptop preflight report profile output markers and identity shape on Windows CI"
         )
         try require(

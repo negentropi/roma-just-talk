@@ -7667,6 +7667,10 @@ struct RomaCoreChecks {
             "Windows dictation proof profiles should print pre-roll and speech PCM coverage"
         )
         try require(
+            checkReportScript.contains(#""paste_restore_intent""#),
+            "Windows dictation proof profiles should print paste restore intent coverage"
+        )
+        try require(
             doctorOutputSource.contains("public static var clipboardRestoreProofLines") &&
                 doctorOutputSource.contains(#""default_clipboard_restore_delay_seconds=\(WindowsClipboardRestoreConfiguration.defaultRestoreDelaySeconds)""#) &&
                 doctorOutputSource.contains(#""maximum_clipboard_restore_delay_seconds=\(WindowsClipboardRestoreConfiguration.maximumRestoreDelaySeconds)""#),

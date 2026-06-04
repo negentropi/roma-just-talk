@@ -879,6 +879,7 @@ function Get-ProofProfileRequirements {
                 "pre_roll_audio",
                 "speech_pcm_contract",
                 "expected_transcript_text",
+                "paste_restore_intent",
                 "paste_sent"
             )
         }
@@ -908,6 +909,7 @@ function Get-ProofProfileRequirements {
                 "pre_roll_audio",
                 "speech_pcm_contract",
                 "expected_transcript_text",
+                "paste_restore_intent",
                 "paste_sent"
             )
         }

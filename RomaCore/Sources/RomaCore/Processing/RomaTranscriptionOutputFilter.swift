@@ -1426,6 +1426,9 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         let isContinuingInsertion = activeContext.map { isContinuingSentence(after: $0.precedingText) } ?? false
+        if isContinuingInsertion {
+            polishedText = removeUnmatchedSquareBracketContinuationArtifact(from: polishedText)
+        }
         let isPlainNonASCIIBoundaryContinuation = isContinuingInsertion &&
             isPlainNonASCIIBoundaryContinuationFragment(polishedText)
         let isLeadingDiscourseFillerContinuation = activeContext.map {
@@ -9038,6 +9041,40 @@ public struct RomaTranscriptionOutputFilter {
         let boundaryCharacters = CharacterSet(charactersIn: #"[]{}()"“”‘’'"【】《》〈〉（）｛｝［］「」『』〔〕"#)
         strippedText = strippedText.trimmingCharacters(in: boundaryCharacters.union(.whitespacesAndNewlines))
         return normalizeWhitespace(strippedText)
+    }
+
+    private static func removeUnmatchedSquareBracketContinuationArtifact(from text: String) -> String {
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedText.isEmpty,
+              !hasInternalSentenceBoundary(trimmedText),
+              wordCount(in: trimmedText) <= 5,
+              !isWholeSquareBracketedOutput(trimmedText) else {
+            return text
+        }
+
+        var candidate = removeTrailingFragmentPunctuationPreservingAbbreviation(from: trimmedText)
+        guard !isPreservedGeneratedQuestionFragment(candidate) else { return text }
+        var didRemoveBoundary = false
+        if candidate.first == "[",
+           !candidate.contains("]") {
+            candidate.removeFirst()
+            didRemoveBoundary = true
+        }
+        if candidate.last == "]",
+           !candidate.contains("[") {
+            candidate.removeLast()
+            didRemoveBoundary = true
+        }
+
+        let cleanedText = candidate.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard didRemoveBoundary,
+              !cleanedText.isEmpty,
+              wordCount(in: cleanedText) <= 5,
+              !hasInternalSentenceBoundary(cleanedText) else {
+            return text
+        }
+
+        return cleanedText
     }
 
     private static func containsInlinePreservedBoundary(_ text: String) -> Bool {

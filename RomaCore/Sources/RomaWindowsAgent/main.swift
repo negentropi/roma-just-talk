@@ -86,7 +86,7 @@ struct RomaWindowsAgent {
             options: options,
             listenerSessionIndex: listenerSessionIndex
         )
-        let transcriptionClient = try makeTranscriptionClient(from: configuration)
+        let transcriptionClient = try RomaTranscriptionClient.make(from: configuration)
         let shouldPaste = configuration.shouldPaste ?? false
         let clipboardRestoreConfiguration = configuration.clipboardRestoreConfiguration()
         let shouldUseHoldHook = configuration.usesHoldHook ?? false
@@ -236,8 +236,8 @@ struct RomaWindowsAgent {
             .applyingOverrides(from: options)
 
         try configuration.validateTranscriptionSettings()
-        let setupProofLines = try runnableTranscriptionSetupProof(configuration)
-        let transcriptionClient = try makeTranscriptionClient(from: configuration)
+        let setupProofLines = try RomaTranscriptionClient.runnableSetupProofLines(for: configuration)
+        let transcriptionClient = try RomaTranscriptionClient.make(from: configuration)
         let clipboardRestoreConfiguration = configuration.clipboardRestoreConfiguration()
 
         print("agent=roma-windows-agent")
@@ -311,83 +311,6 @@ struct RomaWindowsAgent {
         return try RomaWindowsAgentConfiguration.load(from: url)
     }
 
-    private static func makeTranscriptionClient(
-        from configuration: RomaWindowsAgentConfiguration
-    ) throws -> AgentTranscriptionClient {
-        if configuration.usesWhisperCLI {
-            let whisperConfiguration = try configuration.whisperCLIConfiguration()
-            let modelName = whisperConfiguration.modelURL.lastPathComponent
-            return AgentTranscriptionClient(
-                name: "whisper.cpp-cli",
-                service: WhisperCLITranscriptionService(configuration: whisperConfiguration),
-                model: TranscriptionModelDescriptor(
-                    name: modelName,
-                    displayName: modelName,
-                    provider: .whisper
-                ),
-                details: [
-                    "whisper_cli=\(whisperConfiguration.executableURL.path)",
-                    "whisper_model=\(whisperConfiguration.modelURL.path)",
-                    "whisper_output_dir=\(whisperConfiguration.outputDirectoryURL.path)",
-                    "whisper_extra_args=\(whisperConfiguration.extraArguments.count)"
-                ]
-            )
-        }
-
-        let endpointText = try configuration.requireEndpoint()
-        let modelName = try configuration.requireModel()
-        let apiKeySource = try configuration.apiKeySource()
-
-        guard let endpointURL = URL(string: endpointText), endpointURL.scheme != nil else {
-            throw RomaCommandLineOptionsError.invalidOptionValue("--endpoint")
-        }
-
-        return AgentTranscriptionClient(
-            name: "openai-compatible",
-            service: OpenAICompatibleTranscriptionService(
-                configuration: OpenAICompatibleTranscriptionConfiguration(
-                    endpointURL: endpointURL,
-                    apiKey: try apiKeySource.resolve()
-                )
-            ),
-            model: TranscriptionModelDescriptor(
-                name: modelName,
-                displayName: modelName,
-                provider: .custom
-            ),
-            details: [
-                "endpoint=\(endpointText)",
-                "model=\(modelName)",
-                "api_key_source=\(apiKeySource.kind)",
-                "api_key_ref=\(apiKeySource.reference)"
-            ]
-        )
-    }
-
-    private static func runnableTranscriptionSetupProof(
-        _ configuration: RomaWindowsAgentConfiguration
-    ) throws -> [String] {
-        guard configuration.usesWhisperCLI else {
-            _ = try configuration.apiKeySource().resolve()
-            return ["api_key_resolved=true"]
-        }
-
-        try requireExistingFile(try configuration.requireWhisperCLIPath(), option: "--whisper-cli")
-        try requireExistingFile(try configuration.requireWhisperModelPath(), option: "--whisper-model")
-        return [
-            "whisper_cli_exists=true",
-            "whisper_model_exists=true"
-        ]
-    }
-
-    private static func requireExistingFile(_ path: String, option: String) throws {
-        var isDirectory: ObjCBool = false
-        guard FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory),
-              !isDirectory.boolValue else {
-            throw RomaCommandLineOptionsError.invalidOptionValue(option)
-        }
-    }
-
     private static var platformName: String {
         #if os(Windows)
         return "windows"
@@ -425,11 +348,4 @@ struct RomaWindowsAgent {
         let line = "error=\(RomaCommandLineText.oneLine(description))\n"
         FileHandle.standardError.write(Data(line.utf8))
     }
-}
-
-private struct AgentTranscriptionClient {
-    var name: String
-    var service: any TranscriptionService
-    var model: TranscriptionModelDescriptor
-    var details: [String]
 }

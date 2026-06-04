@@ -301,57 +301,39 @@ struct RomaProofAgent {
     }
 
     private static func runWindowsDictationProof(arguments: [String]) async throws {
-        let outputURL = URL(fileURLWithPath: try value(after: "--out", in: arguments))
-        let seconds = try positiveDoubleValue(
-            after: "--seconds",
-            in: arguments,
-            default: RomaWindowsAgentConfiguration.defaultRecordSeconds,
-            minimum: RomaWindowsAgentConfiguration.minimumRecordSeconds,
-            maximum: RomaWindowsAgentConfiguration.maximumRecordSeconds
-        )
-        let timeoutSeconds = try positiveDoubleValue(
-            after: "--timeout",
-            in: arguments,
-            default: RomaWindowsAgentConfiguration.defaultHoldTimeoutSeconds,
-            minimum: RomaWindowsAgentConfiguration.minimumHoldTimeoutSeconds,
-            maximum: RomaWindowsAgentConfiguration.maximumHoldTimeoutSeconds
-        )
-        let timeoutMilliseconds = try RomaWindowsAgentConfiguration.holdTimeoutMilliseconds(
-            fromSeconds: timeoutSeconds
-        )
-        let endpointText = try value(after: "--endpoint", in: arguments)
-        let modelName = try value(after: "--model", in: arguments)
-        let apiKeySource = try makeAPIKeySource(arguments: arguments)
-        let shouldPaste = arguments.contains("--paste")
-        let shouldUseHoldHook = arguments.contains("--hold-hook")
-        let wordReplacements = try replacementRules(from: arguments)
-        let service = try makeTranscriptionService(
-            endpointText: endpointText,
-            apiKeySource: apiKeySource
-        )
-        let model = TranscriptionModelDescriptor(
-            name: modelName,
-            displayName: modelName,
-            provider: .custom
-        )
+        let options = RomaCommandLineOptions(arguments)
+        let outputURL = URL(fileURLWithPath: try options.value(after: "--out"))
+        let configuration = try RomaWindowsAgentConfiguration()
+            .applyingOverrides(from: options)
+        try configuration.validateTranscriptionSettings()
+
+        let transcriptionClient = try RomaTranscriptionClient.make(from: configuration)
+        let shouldPaste = configuration.shouldPaste ?? false
+        let shouldUseHoldHook = configuration.usesHoldHook ?? false
+        let wordReplacements = configuration.wordReplacements
         let trigger: WindowsDictationTrigger = shouldUseHoldHook
-            ? .hold(timeoutMilliseconds: timeoutMilliseconds)
-            : .toggle(recordSeconds: seconds)
+            ? .hold(timeoutMilliseconds: try configuration.resolvedHoldTimeoutMilliseconds())
+            : .toggle(recordSeconds: configuration.resolvedRecordSeconds)
+
+        print("transcription_client=\(transcriptionClient.name)")
+        for line in transcriptionClient.details {
+            print(line)
+        }
         print("recording_mode=\(shouldUseHoldHook ? "hold" : "toggle")")
 
         let result = try await WindowsDictationRuntime.run(
             WindowsDictationRuntimeRequest(
                 outputURL: outputURL,
-                model: model,
-                language: optionalValue(after: "--language", in: arguments),
-                prompt: optionalValue(after: "--prompt", in: arguments),
+                model: transcriptionClient.model,
+                language: configuration.language,
+                prompt: configuration.prompt,
                 shouldPaste: shouldPaste,
                 textProcessing: DictationTextProcessingConfiguration(
                     wordReplacements: wordReplacements
                 ),
                 trigger: trigger
             ),
-            transcriptionService: service
+            transcriptionService: transcriptionClient.service
         ) { event in
             switch event {
             case .preRollBuffering:
@@ -377,9 +359,7 @@ struct RomaProofAgent {
         print("channels=\(audio.format.channelCount)")
         printTranscriptionResult(
             result.transcription,
-            endpointText: endpointText,
-            modelName: modelName,
-            apiKeySource: apiKeySource,
+            client: transcriptionClient,
             audioURL: audio.fileURL
         )
         print("processed_transcript_length=\(result.processedText.count)")
@@ -681,6 +661,26 @@ struct RomaProofAgent {
 
     private static func printTranscriptionResult(
         _ result: TranscriptionResult,
+        client: RomaTranscriptionClient,
+        audioURL: URL
+    ) {
+        print("provider=\(client.name)")
+        for line in client.details {
+            print(line)
+        }
+        print("audio=\(audioURL.path)")
+        if let language = result.language {
+            print("language=\(language)")
+        }
+        if let duration = result.durationSeconds {
+            print("duration_seconds=\(String(format: "%.3f", duration))")
+        }
+        print("transcript_length=\(result.text.count)")
+        print("transcript_text=\(oneLine(result.text))")
+    }
+
+    private static func printTranscriptionResult(
+        _ result: TranscriptionResult,
         endpointText: String,
         modelName: String,
         apiKeySource: TranscriptionAPIKeySource,
@@ -785,6 +785,7 @@ struct RomaProofAgent {
         print("  RomaProofAgent windows-dictation-proof --out proof.wav --seconds 2 --endpoint https://api.example.com/v1/audio/transcriptions --model whisper-large-v3-turbo --api-key-env OPENAI_API_KEY [--replace \"original=replacement\"] [--paste]")
         print("  RomaProofAgent windows-dictation-proof --out proof.wav --hold-hook --timeout 15 --endpoint https://api.example.com/v1/audio/transcriptions --model whisper-large-v3-turbo --api-key-env OPENAI_API_KEY [--paste]")
         print("  RomaProofAgent windows-dictation-proof --out proof.wav --seconds 2 --endpoint https://api.example.com/v1/audio/transcriptions --model whisper-large-v3-turbo --api-key-name groq --secret-dir C:\\tmp\\roma-secrets [--paste]")
+        print("  RomaProofAgent windows-dictation-proof --out proof.wav --hold-hook --whisper-cli C:\\path\\whisper-cli.exe --whisper-model C:\\path\\ggml-base.en.bin [--paste]")
         print("  RomaProofAgent dictation-pipeline-proof --out proof.wav --text \"hmm... just talk.\" --replace \"just talk=roma-just-talk\"")
         print("  RomaProofAgent dictation-pipeline-proof --out proof.wav --text \"Model.\" --preceding-text \"...so this\"")
         print("  RomaProofAgent miniaudio-capture-doctor")

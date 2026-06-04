@@ -222,6 +222,57 @@ function New-WindowsAgentConfigArgs {
     return $configArgs
 }
 
+function New-WindowsDictationProofArgs {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$OutputPath
+    )
+
+    $dictationArgs = @(
+        "run", "RomaProofAgent", "windows-dictation-proof",
+        "--out", $OutputPath
+    )
+    if (![string]::IsNullOrWhiteSpace($WhisperCLI)) {
+        $dictationArgs += @("--whisper-cli", $WhisperCLI, "--whisper-model", $WhisperModel)
+        if (![string]::IsNullOrWhiteSpace($WhisperOutputDir)) {
+            $dictationArgs += @("--whisper-output-dir", $WhisperOutputDir)
+        }
+        foreach ($argument in $WhisperArgument) {
+            if (![string]::IsNullOrWhiteSpace($argument)) {
+                $dictationArgs += @("--whisper-arg", $argument)
+            }
+        }
+    } else {
+        $dictationArgs += @("--endpoint", $TranscribeEndpoint, "--model", $TranscribeModel)
+        if (![string]::IsNullOrWhiteSpace($TranscribeApiKeyName)) {
+            $dictationArgs += @("--api-key-name", $TranscribeApiKeyName, "--secret-dir", $secretProofDir)
+        } else {
+            $dictationArgs += @("--api-key-env", $TranscribeApiKeyEnv)
+        }
+    }
+    if ($UseHoldHook) {
+        $dictationArgs += @("--hold-hook", "--timeout", "$HoldTimeoutSeconds")
+    } else {
+        $dictationArgs += @("--toggle", "--seconds", "$RecordSeconds")
+    }
+    if (![string]::IsNullOrWhiteSpace($TranscribeLanguage)) {
+        $dictationArgs += @("--language", $TranscribeLanguage)
+    }
+    if (![string]::IsNullOrWhiteSpace($TranscribePrompt)) {
+        $dictationArgs += @("--prompt", $TranscribePrompt)
+    }
+    foreach ($replacement in $WordReplacement) {
+        if (![string]::IsNullOrWhiteSpace($replacement)) {
+            $dictationArgs += @("--replace", $replacement)
+        }
+    }
+    if ($PasteDictation) {
+        $dictationArgs += "--paste"
+    }
+
+    return $dictationArgs
+}
+
 if ($RestoreClipboard -and $NoRestoreClipboard) {
     throw "RestoreClipboard and NoRestoreClipboard are mutually exclusive"
 }
@@ -622,10 +673,8 @@ try {
     }
 
     if ($RunInteractiveDictation) {
-        if ([string]::IsNullOrWhiteSpace($TranscribeEndpoint) -or
-            [string]::IsNullOrWhiteSpace($TranscribeModel) -or
-            !$hasTranscriptionKey) {
-            throw "RunInteractiveDictation requires -TranscribeEndpoint, -TranscribeModel, and -TranscribeApiKeyEnv or -TranscribeApiKeyName"
+        if (!$hasWindowsAgentTranscriptionConfig) {
+            throw "RunInteractiveDictation requires local -WhisperCLI and -WhisperModel, or cloud -TranscribeEndpoint, -TranscribeModel, and key args"
         }
 
         $dictationProof = Join-Path $OutputDir "dictation-proof.wav"
@@ -638,42 +687,14 @@ try {
             if ($PasteDictation) {
                 Write-Host "Focus Notepad or another normal-integrity text field before transcription completes."
             }
-            $dictationArgs = @(
-                "run", "RomaProofAgent", "windows-dictation-proof",
-                "--out", $dictationProof,
-                "--seconds", "$RecordSeconds",
-                "--endpoint", $TranscribeEndpoint,
-                "--model", $TranscribeModel
-            )
-            if ($UseHoldHook) {
-                $dictationArgs += @("--hold-hook", "--timeout", "$HoldTimeoutSeconds")
-            }
-            if (![string]::IsNullOrWhiteSpace($TranscribeApiKeyName)) {
-                $dictationArgs += @("--api-key-name", $TranscribeApiKeyName, "--secret-dir", $secretProofDir)
-            } else {
-                $dictationArgs += @("--api-key-env", $TranscribeApiKeyEnv)
-            }
-            if (![string]::IsNullOrWhiteSpace($TranscribeLanguage)) {
-                $dictationArgs += @("--language", $TranscribeLanguage)
-            }
-            if (![string]::IsNullOrWhiteSpace($TranscribePrompt)) {
-                $dictationArgs += @("--prompt", $TranscribePrompt)
-            }
-            foreach ($replacement in $WordReplacement) {
-                if (![string]::IsNullOrWhiteSpace($replacement)) {
-                    $dictationArgs += @("--replace", $replacement)
-                }
-            }
-            if ($PasteDictation) {
-                $dictationArgs += "--paste"
-            }
+            $dictationArgs = New-WindowsDictationProofArgs -OutputPath $dictationProof
             swift @dictationArgs
             Assert-FileWithBytes -Path $dictationProof
         }
     } else {
         Write-Host ""
         Write-Host "== windows dictation proof skipped =="
-        Write-Host "rerun with -RunInteractiveDictation and cloud transcription args to prove proof-agent hotkey -> pre-roll WAV -> STT"
+        Write-Host "rerun with -RunInteractiveDictation and cloud or local whisper transcription args to prove proof-agent hotkey -> pre-roll WAV -> STT"
     }
 
     if ($RunInteractiveWindowsAgent) {

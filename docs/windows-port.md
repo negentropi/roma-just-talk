@@ -57,6 +57,7 @@ Reusable now:
 - `RomaTranscriptionOutputFilter` now lives in `RomaCore` as the shared Foundation-only post-STT cleanup and insertion-polish path.
 - `RomaWordReplacementProcessor` now lives in `RomaCore` as the shared dictionary replacement matching path.
 - `ClipboardRestoreConfiguration` now lives in `RomaCore` as the shared default for restoring clipboard text after paste; the Windows-specific name remains an alias for compatibility with the Windows adapter/proof surface.
+- `RomaTranscriptionClient` now lives in `RomaCore` so proof tooling, `RomaWindowsAgent`, and future Windows UI code share the same OpenAI-compatible vs local `whisper-cli` selection.
 - `WindowsDictationRuntime` now lives in `RomaCore` as the reusable Windows hotkey/hook -> miniaudio -> shared `DictationPipeline` -> optional Win32 paste composition.
 - `RomaWindowsAgent` is the first user-facing Windows executable. It stays thin and calls `WindowsDictationRuntime` instead of duplicating recorder/STT/paste orchestration. Its `dictate` mode runs one proofable session; its `listen` mode stays alive for repeated hotkey sessions.
 - `RomaWindowsAgentConfiguration` now lives in `RomaCore` as the reusable JSON settings shape for endpoint, model, key source, trigger mode, paste, clipboard restore, language/prompt, and replacement defaults.
@@ -165,7 +166,7 @@ Run `swift run RomaProofAgent windows-permission-doctor` or `RomaWindowsAgent do
    - `RegisterHotKey` toggles start/stop
    - cloud STT first, or whisper.cpp CLI/DLL if model packaging is ready
    - Win32 clipboard + `SendInput` pastes text
-   - `windows-dictation-proof` composes those pieces into one hotkey -> pre-roll WAV -> STT -> optional paste proof
+   - `windows-dictation-proof` composes those pieces into one hotkey -> pre-roll WAV -> STT -> optional paste proof through the same cloud/local transcription config path as `RomaWindowsAgent`
 7. Use `RomaWindowsAgent` as the first laptop-usable Windows entrypoint, then add tray/settings UI around the same runtime.
 
 ## Windows Proof Checklist
@@ -331,6 +332,7 @@ swift run RomaWindowsAgent dictate --hold-hook --endpoint https://api.groq.com/o
 swift run RomaProofAgent transcribe-proof --audio mic-proof.wav --endpoint https://api.groq.com/openai/v1/audio/transcriptions --model whisper-large-v3-turbo --api-key-name groq --secret-dir C:\tmp\roma-secrets
 swift run RomaProofAgent windows-dictation-proof --out dictation-proof.wav --seconds 2 --endpoint https://api.groq.com/openai/v1/audio/transcriptions --model whisper-large-v3-turbo --api-key-env GROQ_API_KEY --replace "just talk=roma-just-talk" --paste
 swift run RomaProofAgent windows-dictation-proof --out hold-dictation-proof.wav --hold-hook --timeout 15 --endpoint https://api.groq.com/openai/v1/audio/transcriptions --model whisper-large-v3-turbo --api-key-env GROQ_API_KEY --paste
+swift run RomaProofAgent windows-dictation-proof --out local-hold-dictation-proof.wav --hold-hook --whisper-cli C:\path\whisper-cli.exe --whisper-model C:\path\ggml-base.en.bin --paste
 powershell -ExecutionPolicy Bypass -File .\Scripts\package-windows-agent.ps1 -OutputDir C:\tmp\roma-windows-agent
 ```
 

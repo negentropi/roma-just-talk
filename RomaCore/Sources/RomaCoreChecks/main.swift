@@ -1304,6 +1304,26 @@ struct RomaCoreChecks {
                 "deadline time restatement correction"
             ),
             (
+                "Send it to John to Mary.",
+                "Send it to Mary.",
+                "proper-name to-preposition correction"
+            ),
+            (
+                "Meet with Alice with Bob.",
+                "Meet with Bob.",
+                "proper-name with-preposition correction"
+            ),
+            (
+                "Forward it from Alice from Bob.",
+                "Forward it from Bob.",
+                "proper-name from-preposition correction"
+            ),
+            (
+                "Send it to John Smith to Mary Jones tomorrow.",
+                "Send it to Mary Jones tomorrow.",
+                "multi-word proper-name preposition correction"
+            ),
+            (
                 "Meet at office at three.",
                 "Meet at office at three.",
                 "location plus time preposition guard"
@@ -1337,6 +1357,21 @@ struct RomaCoreChecks {
                 "Schedule after June after launch.",
                 "Schedule after June after launch.",
                 "after-month plus prose preposition guard"
+            ),
+            (
+                "I talked to John to coordinate.",
+                "I talked to John to coordinate.",
+                "proper-name to-preposition prose guard"
+            ),
+            (
+                "Meet with Alice with the team.",
+                "Meet with Alice with the team.",
+                "proper-name with-preposition prose guard"
+            ),
+            (
+                "Forward it from Alice from the inbox.",
+                "Forward it from Alice from the inbox.",
+                "proper-name from-preposition prose guard"
             ),
             (
                 "Use model use module.",
@@ -5969,6 +6004,19 @@ struct RomaCoreChecks {
             whisperCLIConfiguration.modelURL.path == "/models/ggml-base.en.bin",
             "whisper CLI config should resolve model URL"
         )
+        let localTranscriptionClient = try RomaTranscriptionClient.make(from: localWhisper)
+        try require(
+            localTranscriptionClient.name == "whisper.cpp-cli",
+            "shared transcription client should select local whisper"
+        )
+        try require(
+            localTranscriptionClient.model.provider == .whisper,
+            "shared transcription client should expose whisper model metadata"
+        )
+        try require(
+            localTranscriptionClient.details.contains("whisper_model=/models/ggml-base.en.bin"),
+            "shared transcription client should expose local whisper proof details"
+        )
 
         let cloudAgain = try localWhisper.applyingOverrides(from: RomaCommandLineOptions([
             "--endpoint", "https://api.example.com/v1/audio/transcriptions",
@@ -6067,6 +6115,18 @@ struct RomaCoreChecks {
                 clipboardRestoreDelaySeconds: WindowsClipboardRestoreConfiguration.maximumRestoreDelaySeconds + 1
             ).validate()
             throw CheckFailure("config should reject oversized clipboard restore delay")
+        } catch RomaCommandLineOptionsError.invalidOptionValue {
+        }
+
+        do {
+            _ = try RomaTranscriptionClient.make(
+                from: RomaWindowsAgentConfiguration(
+                    endpoint: "api.example.com/v1/audio/transcriptions",
+                    model: "cloud-model",
+                    apiKeyEnvironment: "PATH"
+                )
+            )
+            throw CheckFailure("shared transcription client should reject cloud endpoints without a scheme")
         } catch RomaCommandLineOptionsError.invalidOptionValue {
         }
 
@@ -6995,6 +7055,12 @@ struct RomaCoreChecks {
             ),
             encoding: .utf8
         )
+        let transcriptionClientSource = try String(
+            contentsOf: packageRoot.appendingPathComponent(
+                "Sources/RomaCore/Transcription/RomaTranscriptionClient.swift"
+            ),
+            encoding: .utf8
+        )
         let proveScript = try String(
             contentsOf: scriptsRoot.appendingPathComponent("prove-windows-agent-artifact.ps1"),
             encoding: .utf8
@@ -7118,8 +7184,8 @@ struct RomaCoreChecks {
         try require(
             windowsAgentSource.contains(#"case "config-doctor":"#) &&
                 windowsAgentSource.contains(#"print("config_valid=true")"#) &&
-                windowsAgentSource.contains(#""api_key_resolved=true""#) &&
-                windowsAgentSource.contains(#""whisper_cli_exists=true""#),
+                transcriptionClientSource.contains(#""api_key_resolved=true""#) &&
+                transcriptionClientSource.contains(#""whisper_cli_exists=true""#),
             "Windows agent should expose a config doctor before capture starts"
         )
         try require(
@@ -7455,6 +7521,22 @@ struct RomaCoreChecks {
                 !windowsDictationRuntimeSource.contains("WindowsLowLevelKeyboardHookProof.waitForKeyDown(") &&
                 !windowsDictationRuntimeSource.contains("WindowsLowLevelKeyboardHookProof.waitForKeyUp("),
             "Windows hold dictation runtime should keep one native hook alive from keydown until keyup"
+        )
+        try require(
+            windowsAgentSource.contains("RomaTranscriptionClient.make(from: configuration)") &&
+                windowsAgentSource.contains("RomaTranscriptionClient.runnableSetupProofLines(for: configuration)") &&
+                !windowsAgentSource.contains("private struct AgentTranscriptionClient"),
+            "Windows agent should share transcription client selection through RomaCore"
+        )
+        try require(
+            proofAgentSource.contains("RomaTranscriptionClient.make(from: configuration)") &&
+                proofAgentSource.contains("configuration.validateTranscriptionSettings()"),
+            "Windows dictation proof should share the user-facing transcription config path"
+        )
+        try require(
+            windowsProofScript.contains("New-WindowsDictationProofArgs") &&
+                windowsProofScript.contains("RunInteractiveDictation requires local -WhisperCLI and -WhisperModel"),
+            "Windows source proof script should allow cloud or local whisper dictation proof"
         )
         try require(
             checkReportScript.contains(#"Assert-Boolean -Object $Proof -Name "native_windows_adapters" -Expected $true"#),

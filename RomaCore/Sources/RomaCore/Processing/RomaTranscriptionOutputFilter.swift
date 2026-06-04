@@ -339,6 +339,23 @@ public struct RomaTranscriptionOutputFilter {
     private static let leadingCurrencySignWords: Set<String> = [
         "dollar", "euro", "pound"
     ]
+    private static let standaloneShellVariableWords: Set<String> = [
+        "ci", "home", "host", "lang", "path", "port", "pwd", "shell", "term", "user"
+    ]
+    private static let shellVariablePhraseAliases: [[String]: String] = [
+        ["api", "key"]: "API_KEY",
+        ["auth", "token"]: "AUTH_TOKEN",
+        ["base", "url"]: "BASE_URL",
+        ["database", "url"]: "DATABASE_URL",
+        ["db", "url"]: "DB_URL",
+        ["github", "token"]: "GITHUB_TOKEN",
+        ["node", "env"]: "NODE_ENV",
+        ["npm", "token"]: "NPM_TOKEN",
+        ["open", "ai", "api", "key"]: "OPENAI_API_KEY"
+    ]
+    private static let shellVariableTailWords: Set<String> = [
+        "env", "key", "path", "port", "token", "url"
+    ]
     private static let compactConnectorWords: Set<String> = [
         "at", "back", "backslash", "dash", "dot", "forward", "hyphen", "sign", "slash", "underscore"
     ]
@@ -626,6 +643,9 @@ public struct RomaTranscriptionOutputFilter {
     private static let closeCodeBlockPattern = #"(?im)(^|\n)[ \t]*(?:close|end)[ \t]+code[ \t]+block[ \t]*(?=\n|$)"#
     private static let spokenSchemeURLPattern = #"(?i)(?<![\p{L}\p{N}])((?:h[ \t]+t[ \t]+t[ \t]+p[ \t]+s?)|https?)[ \t]*(?:colon|:)[ \t]+(?:slash[ \t]+slash|forward[ \t]+slash[ \t]+forward[ \t]+slash)[ \t]+((?:(?:[A-Za-z0-9-]+[ \t]+dot[ \t]+)+(?:ai|app|co|com|dev|edu|gov|io|net|org)(?:(?:[ \t]+(?:slash|forward[ \t]+slash)[ \t]+[A-Za-z0-9_-]+)+)?)|(?:localhost(?:[ \t]+colon[ \t]+\d{1,5})?(?:(?:[ \t]+(?:slash|forward[ \t]+slash)[ \t]+[A-Za-z0-9_-]+)+)?))([.!?])?(?=\s|$|\n)"#
     private static let spokenWWWURLPattern = #"(?i)(?<![\p{L}\p{N}])www[ \t]+dot[ \t]+((?:[A-Za-z0-9-]+[ \t]+dot[ \t]+)*(?:ai|app|co|com|dev|edu|gov|io|net|org)(?:(?:[ \t]+(?:slash|forward[ \t]+slash)[ \t]+[A-Za-z0-9_-]+)+)?)([.!?])?(?=\s|$|\n)"#
+    private static let spokenDotEnvPattern = #"(?i)(?<![\p{L}\p{N}])dot[ \t]+env(?![\p{L}\p{N}])"#
+    private static let spokenReadmeFilePattern = #"(?i)(?<![\p{L}\p{N}])read[ \t]+me[ \t]+dot[ \t]+(?:m[ \t]+d|md)(?![\p{L}\p{N}])"#
+    private static let spokenShellVariableMarkerPattern = #"(?i)(?<![\p{L}\p{N}])dollar[ \t]+sign(?![\p{L}\p{N}])"#
     private static let monthOrdinalDatePattern = #"(?i)(?<![\p{L}\p{N}])(january|february|march|april|may|june|july|august|september|october|november|december)[ \t]+(thirty[ \t]+first|thirtieth|twenty[ \t]+ninth|twenty[ \t]+eighth|twenty[ \t]+seventh|twenty[ \t]+sixth|twenty[ \t]+fifth|twenty[ \t]+fourth|twenty[ \t]+third|twenty[ \t]+second|twenty[ \t]+first|twentieth|nineteenth|eighteenth|seventeenth|sixteenth|fifteenth|fourteenth|thirteenth|twelfth|eleventh|tenth|ninth|eighth|seventh|sixth|fifth|fourth|third|second|first)(?:[ \t]+(\d{4}))?(?![\p{L}\p{N}])"#
     private static let monthNumberDatePattern = #"(?i)(?<![\p{L}\p{N}])(january|february|march|april|may|june|july|august|september|october|november|december)[ \t]+(\d{1,2})(?:st|nd|rd|th)?(?:[ \t]+(\d{4}))?(?![\p{L}\p{N}])"#
     private static let spokenTimePattern = #"(?i)(?<![\p{L}\p{N}])(\d{1,2})(?:[ \t]+(?:(?:colon|:)[ \t]*)?(\d{2}))?[ \t]*(a[ \t]*m|p[ \t]*m|am|pm)(?![\p{L}\p{N}])"#
@@ -1111,6 +1131,7 @@ public struct RomaTranscriptionOutputFilter {
         filteredText = applySpokenEnclosureCommands(in: filteredText)
         filteredText = applySpokenURLCommands(in: filteredText)
         filteredText = applySpokenValueFormattingCommands(in: filteredText)
+        filteredText = applySpokenDeveloperTokenCommands(in: filteredText)
         filteredText = applySpokenPunctuationCommands(in: filteredText)
         filteredText = applySpokenNumberedOutlineCommands(in: filteredText)
         filteredText = replaceSpokenSequenceListMarkers(in: filteredText)
@@ -3000,6 +3021,133 @@ public struct RomaTranscriptionOutputFilter {
         formattedText = replaceSpokenPercents(in: formattedText)
         formattedText = replaceSpokenWordPercents(in: formattedText)
         return formattedText
+    }
+
+    private static func applySpokenDeveloperTokenCommands(in text: String) -> String {
+        var tokenText = replaceSimpleSpokenToken(in: text, pattern: spokenDotEnvPattern, replacement: ".env")
+        tokenText = replaceSimpleSpokenToken(in: tokenText, pattern: spokenReadmeFilePattern, replacement: "README.md")
+        tokenText = replaceSpokenShellVariables(in: tokenText)
+        return tokenText
+    }
+
+    private static func replaceSimpleSpokenToken(
+        in text: String,
+        pattern: String,
+        replacement: String
+    ) -> String {
+        guard let regex = try? NSRegularExpression(pattern: pattern) else {
+            return text
+        }
+
+        return regex.stringByReplacingMatches(
+            in: text,
+            options: [],
+            range: NSRange(text.startIndex..., in: text),
+            withTemplate: replacement
+        )
+    }
+
+    private static func replaceSpokenShellVariables(in text: String) -> String {
+        guard let regex = try? NSRegularExpression(pattern: spokenShellVariableMarkerPattern) else {
+            return text
+        }
+
+        var variableText = text
+        let matches = regex.matches(in: variableText, range: NSRange(variableText.startIndex..., in: variableText))
+
+        for match in matches.reversed() {
+            guard let markerRange = Range(match.range, in: variableText),
+                  shouldApplySpokenShellVariableMarker(in: variableText, markerRange: markerRange),
+                  let candidate = spokenShellVariableCandidate(
+                    in: variableText,
+                    after: markerRange.upperBound
+                  ) else {
+                continue
+            }
+
+            variableText.replaceSubrange(
+                markerRange.lowerBound..<candidate.range.upperBound,
+                with: "$\(candidate.name)"
+            )
+        }
+
+        return variableText
+    }
+
+    private static func shouldApplySpokenShellVariableMarker(
+        in text: String,
+        markerRange: Range<String.Index>
+    ) -> Bool {
+        let beforeMarker = String(text[..<markerRange.lowerBound])
+        guard let previousWord = previousWord(in: beforeMarker) else {
+            return true
+        }
+
+        if ["a", "an", "literal", "phrase", "sign", "symbol", "the", "word"].contains(previousWord) {
+            return false
+        }
+
+        if [
+            "and", "command", "echo", "enter", "env", "environment", "export", "key", "pass",
+            "path", "print", "read", "run", "secret", "set", "shell", "then", "token", "type",
+            "use", "using", "variable", "with", "without"
+        ].contains(previousWord) {
+            return true
+        }
+
+        let lowercasedLine = currentLinePrefix(in: beforeMarker).lowercased()
+        let shellContextPattern = #"(?i)(?:^|\s)(?:env|environment|export|shell|terminal|command|secret|token|api|github|npm|openai)\b"#
+        guard let contextRegex = try? NSRegularExpression(pattern: shellContextPattern) else {
+            return false
+        }
+
+        return contextRegex.firstMatch(
+            in: lowercasedLine,
+            range: NSRange(lowercasedLine.startIndex..., in: lowercasedLine)
+        ) != nil
+    }
+
+    private static func spokenShellVariableCandidate(
+        in text: String,
+        after markerEnd: String.Index
+    ) -> (name: String, range: Range<String.Index>)? {
+        let tokens = wordTokens(in: text, range: markerEnd..<text.endIndex)
+        guard let firstToken = tokens.first,
+              String(text[markerEnd..<firstToken.range.lowerBound])
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+                .isEmpty else {
+            return nil
+        }
+
+        let maxAliasLength = min(tokens.count, shellVariablePhraseAliases.keys.map(\.count).max() ?? 0)
+        if maxAliasLength > 0 {
+            for length in stride(from: maxAliasLength, through: 1, by: -1) {
+                let words = tokens.prefix(length).map(\.text)
+                if let alias = shellVariablePhraseAliases[words] {
+                    return (alias, firstToken.range.lowerBound..<tokens[length - 1].range.upperBound)
+                }
+            }
+        }
+
+        if standaloneShellVariableWords.contains(firstToken.text) {
+            return (firstToken.text.uppercased(), firstToken.range)
+        }
+
+        let maxGenericLength = min(tokens.count, 4)
+        for length in stride(from: maxGenericLength, through: 2, by: -1) {
+            let words = tokens.prefix(length).map(\.text)
+            guard let lastWord = words.last,
+                  shellVariableTailWords.contains(lastWord) else {
+                continue
+            }
+
+            return (
+                words.map { $0.uppercased() }.joined(separator: "_"),
+                firstToken.range.lowerBound..<tokens[length - 1].range.upperBound
+            )
+        }
+
+        return nil
     }
 
     private static func replaceSpokenMonthOrdinalDates(in text: String) -> String {
@@ -8203,6 +8351,10 @@ public struct RomaTranscriptionOutputFilter {
     }
 
     private static func removeLeadingFragmentPunctuation(from text: String) -> String {
+        if isLeadingDotfileFragment(text) {
+            return text.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+
         if isStandaloneCLIFlagFragment(text) {
             return text.trimmingCharacters(in: .whitespacesAndNewlines)
         }
@@ -8214,6 +8366,20 @@ public struct RomaTranscriptionOutputFilter {
             result = result.trimmingCharacters(in: .whitespacesAndNewlines)
         }
         return result
+    }
+
+    private static func isLeadingDotfileFragment(_ text: String) -> Bool {
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let regex = try? NSRegularExpression(
+            pattern: #"^\.[A-Za-z0-9][A-Za-z0-9_.-]{0,63}(?:[ \t]+[A-Za-z][A-Za-z0-9_-]{0,31})?[.!?]?$"#
+        ) else {
+            return false
+        }
+
+        return regex.firstMatch(
+            in: trimmedText,
+            range: NSRange(trimmedText.startIndex..., in: trimmedText)
+        ) != nil
     }
 
     private static func isStandaloneCLIFlagFragment(_ text: String) -> Bool {
@@ -8859,6 +9025,10 @@ public struct RomaTranscriptionOutputFilter {
             }
 
             let word = String(result[wordRange])
+            if isWordRangeInsideShellVariable(in: result, wordRange: wordRange) {
+                continue
+            }
+
             let nextWord = matchIndex + 1 < matchedWords.count ? matchedWords[matchIndex + 1] : nil
             guard shouldNormalizeLikelyFragmentWord(word, nextWord: nextWord) else {
                 continue
@@ -8877,6 +9047,10 @@ public struct RomaTranscriptionOutputFilter {
     ) -> String {
         let firstWordRange = firstLetterRange.lowerBound..<firstWordEnd
         let firstWord = String(text[firstWordRange])
+        if isWordRangeInsideShellVariable(in: text, wordRange: firstWordRange) {
+            return text
+        }
+
         guard shouldNormalizeLikelyFragmentWord(firstWord, nextWord: nil) else {
             return text
         }
@@ -8884,6 +9058,23 @@ public struct RomaTranscriptionOutputFilter {
         var result = text
         result.replaceSubrange(firstWordRange, with: normalizeLikelyFragmentWord(firstWord))
         return result
+    }
+
+    private static func isWordRangeInsideShellVariable(in text: String, wordRange: Range<String.Index>) -> Bool {
+        var index = wordRange.lowerBound
+        while index > text.startIndex {
+            let previousIndex = text.index(before: index)
+            let previousCharacter = text[previousIndex]
+            if previousCharacter == "$" {
+                return true
+            }
+            guard previousCharacter == "_" || previousCharacter.isLetter || previousCharacter.isNumber else {
+                return false
+            }
+            index = previousIndex
+        }
+
+        return false
     }
 
     private static func shouldNormalizeLikelyFragmentWord(_ word: String, nextWord: String?) -> Bool {
@@ -9001,6 +9192,12 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         let leadingSpaceAfter = CharacterSet(charactersIn: ".,;:!?)]}”’")
+        if isLeadingDotfileFragment(text) {
+            return previousCharacter.isLetter ||
+                previousCharacter.isNumber ||
+                previousCharacter.unicodeScalars.allSatisfy { leadingSpaceAfter.contains($0) }
+        }
+
         if isStandaloneCLIFlagFragment(text) {
             return previousCharacter.isLetter ||
                 previousCharacter.isNumber ||

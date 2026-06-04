@@ -269,6 +269,31 @@ struct RomaCoreChecks {
             "shared filter should apply guarded spoken URL cleanup"
         )
         try require(
+            RomaTranscriptionOutputFilter.filter("Open dot env and read me dot m d.") ==
+                "Open .env and README.md.",
+            "shared filter should apply spoken developer file tokens"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.filter("Export dollar sign open ai api key.") ==
+                "Export $OPENAI_API_KEY.",
+            "shared filter should apply spoken shell variable aliases"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.filter("Use dollar sign path in the shell.") ==
+                "Use $PATH in the shell.",
+            "shared filter should apply standalone spoken shell variables"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.filter("Pay dollar sign twenty tomorrow.") ==
+                "Pay $20 tomorrow.",
+            "shared filter should keep currency formatting ahead of developer shell variables"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.filter("The dollar sign path is literal.") ==
+                "The dollar sign path is literal.",
+            "shared filter should preserve shell-variable prose"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("Model.", context: midSentenceContext) == "model",
             "shared insertion polish should lowercase mid-sentence fragments"
         )
@@ -419,6 +444,27 @@ struct RomaCoreChecks {
                 context: midSentenceContext
             ) == "--verbose",
             "shared insertion polish should preserve spoken double-dash CLI flags in continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                RomaTranscriptionOutputFilter.filter("read me dot md."),
+                context: midSentenceContext
+            ) == "README.md",
+            "shared insertion polish should preserve spoken README filenames in continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                RomaTranscriptionOutputFilter.filter("dot env file."),
+                context: midSentenceContext
+            ) == ".env file",
+            "shared insertion polish should preserve spoken dot-env files in continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                RomaTranscriptionOutputFilter.filter("dollar sign path."),
+                context: midSentenceContext
+            ) == "$PATH",
+            "shared insertion polish should preserve spoken shell variables in continuations"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
@@ -945,6 +991,10 @@ struct RomaCoreChecks {
         try require(
             RomaTranscriptionOutputFilter.applyInsertionSpacing("-m", context: midSentenceContext) == " -m",
             "shared insertion spacing should add a leading space before standalone short CLI flags"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionSpacing(".env file", context: midSentenceContext) == " .env file",
+            "shared insertion spacing should add a leading space before dotfile fragments"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionSpacing(
@@ -3675,6 +3725,36 @@ struct RomaCoreChecks {
                 ".env file.",
                 ".env file.",
                 "dot-prefixed token guard"
+            ),
+            (
+                "Update dot env file.",
+                "Update .env file.",
+                "spoken dot-env filename"
+            ),
+            (
+                "Open read me dot md.",
+                "Open README.md.",
+                "spoken README filename"
+            ),
+            (
+                "Use dollar sign path.",
+                "Use $PATH.",
+                "spoken shell path variable"
+            ),
+            (
+                "Use dollar sign node env.",
+                "Use $NODE_ENV.",
+                "spoken shell compound variable"
+            ),
+            (
+                "Use dollar sign api key.",
+                "Use $API_KEY.",
+                "spoken shell API key variable"
+            ),
+            (
+                "The dollar sign is confusing.",
+                "The dollar sign is confusing.",
+                "dollar sign prose guard"
             ),
             (
                 "Use version one two today.",

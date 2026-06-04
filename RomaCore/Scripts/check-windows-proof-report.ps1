@@ -867,6 +867,64 @@ function Set-ExpectedModeFromProfile {
     $script:ExpectedMode = $Mode
 }
 
+function Join-ProofRequirements {
+    param(
+        [string[]]$Base = @(),
+        [string[]]$Extra = @()
+    )
+
+    return @($Base + $Extra)
+}
+
+function Get-InstalledProofProfileRequirements {
+    param(
+        [bool]$IncludeShortcutProof = $false
+    )
+
+    $requirements = @(
+        "windows_platform",
+        "windows_user",
+        "install",
+        "installed_hash_match"
+    )
+    if ($IncludeShortcutProof) {
+        $requirements += @(
+            "shortcut",
+            "startup_shortcut"
+        )
+    }
+    $requirements += @(
+        "permission_surface",
+        "agent_runtime_wiring",
+        "proof_agent_source_surface",
+        "shared_windows_transcription_path",
+        "shared_windows_proof_args",
+        "listener_pre_roll_runtime_source",
+        "hold_hook_single_window_source",
+        "native_doctor_surface",
+        "packaged_listener",
+        "installed_listener",
+        "listener_shared_pre_roll_runtime",
+        "config_doctor",
+        "installed_listener_agent_path",
+        "hold_hook_config"
+    )
+
+    return $requirements
+}
+
+function Write-ProofProfileRequirements {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Profile
+    )
+
+    foreach ($requirement in (Get-ProofProfileRequirements -Profile $Profile)) {
+        Write-Host "proof_requirement=$requirement status=pass"
+    }
+    Write-Host "proof_profile_ok=$Profile"
+}
+
 function Get-ProofProfileRequirements {
     param(
         [Parameter(Mandatory = $true)]
@@ -903,119 +961,49 @@ function Get-ProofProfileRequirements {
             )
         }
         "cloud-dictation" {
-            return @(
-                "windows_platform",
-                "windows_user",
-                "install",
-                "installed_hash_match",
-                "shortcut",
-                "startup_shortcut",
-                "permission_surface",
-                "agent_runtime_wiring",
-                "proof_agent_source_surface",
-                "shared_windows_transcription_path",
-                "shared_windows_proof_args",
-                "listener_pre_roll_runtime_source",
-                "hold_hook_single_window_source",
-                "native_doctor_surface",
-                "packaged_listener",
-                "installed_listener",
-                "listener_shared_pre_roll_runtime",
-                "config_doctor",
-                "installed_listener_agent_path",
-                "hold_hook_config",
-                "cloud_config",
-                "real_cloud_backend",
-                "dictation_runtime",
-                "pre_roll_audio",
-                "speech_pcm_contract",
-                "expected_transcript_text",
-                "paste_restore_intent",
-                "paste_sent"
+            return Join-ProofRequirements `
+                -Base (Get-InstalledProofProfileRequirements -IncludeShortcutProof $true) `
+                -Extra @(
+                    "cloud_config",
+                    "real_cloud_backend",
+                    "dictation_runtime",
+                    "pre_roll_audio",
+                    "speech_pcm_contract",
+                    "expected_transcript_text",
+                    "paste_restore_intent",
+                    "paste_sent"
             )
         }
         "local-whisper-dictation" {
-            return @(
-                "windows_platform",
-                "windows_user",
-                "install",
-                "installed_hash_match",
-                "shortcut",
-                "startup_shortcut",
-                "permission_surface",
-                "agent_runtime_wiring",
-                "proof_agent_source_surface",
-                "shared_windows_transcription_path",
-                "shared_windows_proof_args",
-                "listener_pre_roll_runtime_source",
-                "hold_hook_single_window_source",
-                "native_doctor_surface",
-                "packaged_listener",
-                "installed_listener",
-                "listener_shared_pre_roll_runtime",
-                "config_doctor",
-                "installed_listener_agent_path",
-                "hold_hook_config",
-                "local_whisper_config",
-                "real_whisper_backend",
-                "dictation_runtime",
-                "listener_runtime",
-                "pre_roll_audio",
-                "speech_pcm_contract",
-                "expected_transcript_text",
-                "paste_restore_intent",
-                "paste_sent"
+            return Join-ProofRequirements `
+                -Base (Get-InstalledProofProfileRequirements -IncludeShortcutProof $true) `
+                -Extra @(
+                    "local_whisper_config",
+                    "real_whisper_backend",
+                    "dictation_runtime",
+                    "listener_runtime",
+                    "pre_roll_audio",
+                    "speech_pcm_contract",
+                    "expected_transcript_text",
+                    "paste_restore_intent",
+                    "paste_sent"
             )
         }
         "local-whisper-notepad-paste" {
-            return @(
-                "windows_platform",
-                "windows_user",
-                "install",
-                "installed_hash_match",
-                "permission_surface",
-                "agent_runtime_wiring",
-                "proof_agent_source_surface",
-                "shared_windows_transcription_path",
-                "shared_windows_proof_args",
-                "listener_pre_roll_runtime_source",
-                "hold_hook_single_window_source",
-                "native_doctor_surface",
-                "packaged_listener",
-                "installed_listener",
-                "listener_shared_pre_roll_runtime",
-                "config_doctor",
-                "installed_listener_agent_path",
-                "hold_hook_config",
-                "local_whisper_config",
-                "real_whisper_backend",
-                "notepad_paste"
+            return Join-ProofRequirements `
+                -Base (Get-InstalledProofProfileRequirements) `
+                -Extra @(
+                    "local_whisper_config",
+                    "real_whisper_backend",
+                    "notepad_paste"
             )
         }
         "packaged-whisper-mock-install" {
-            return @(
-                "windows_platform",
-                "windows_user",
-                "install",
-                "installed_hash_match",
-                "shortcut",
-                "startup_shortcut",
-                "permission_surface",
-                "agent_runtime_wiring",
-                "proof_agent_source_surface",
-                "shared_windows_transcription_path",
-                "shared_windows_proof_args",
-                "listener_pre_roll_runtime_source",
-                "hold_hook_single_window_source",
-                "native_doctor_surface",
-                "packaged_listener",
-                "installed_listener",
-                "listener_shared_pre_roll_runtime",
-                "config_doctor",
-                "installed_listener_agent_path",
-                "packaged_whisper_mock",
-                "hold_hook_config",
-                "local_whisper_config"
+            return Join-ProofRequirements `
+                -Base (Get-InstalledProofProfileRequirements -IncludeShortcutProof $true) `
+                -Extra @(
+                    "packaged_whisper_mock",
+                    "local_whisper_config"
             )
         }
         default {
@@ -1123,10 +1111,7 @@ if (![string]::IsNullOrWhiteSpace($RequireProofProfile)) {
 
 if ($RequireProofProfile -eq "laptop-preflight") {
     Assert-LaptopPreflightReport -Report $report
-    foreach ($requirement in (Get-ProofProfileRequirements -Profile $RequireProofProfile)) {
-        Write-Host "proof_requirement=$requirement status=pass"
-    }
-    Write-Host "proof_profile_ok=$RequireProofProfile"
+    Write-ProofProfileRequirements -Profile $RequireProofProfile
     Write-Host "proof_report_ok=$ProofReportPath"
     return
 }
@@ -1366,10 +1351,7 @@ if ($RequireNotepadPaste) {
 }
 
 if (![string]::IsNullOrWhiteSpace($RequireProofProfile)) {
-    foreach ($requirement in (Get-ProofProfileRequirements -Profile $RequireProofProfile)) {
-        Write-Host "proof_requirement=$requirement status=pass"
-    }
-    Write-Host "proof_profile_ok=$RequireProofProfile"
+    Write-ProofProfileRequirements -Profile $RequireProofProfile
 }
 
 Write-Host "proof_report_ok=$ProofReportPath"

@@ -8523,6 +8523,14 @@ struct RomaCoreChecks {
             "Windows proof profiles should print shared Windows transcription/proof-arg coverage"
         )
         try require(
+            checkReportScript.contains("function Get-InstalledProofProfileRequirements") &&
+                checkReportScript.contains("function Join-ProofRequirements") &&
+                checkReportScript.contains("function Write-ProofProfileRequirements") &&
+                checkReportScript.contains(#"return Join-ProofRequirements `"#) &&
+                checkReportScript.contains("Write-ProofProfileRequirements -Profile $RequireProofProfile"),
+            "Windows proof checker should share installed profile requirements and profile output"
+        )
+        try require(
             checkReportScript.contains(#""pre_roll_audio""#) &&
                 checkReportScript.contains(#""speech_pcm_contract""#),
             "Windows dictation proof profiles should print pre-roll and speech PCM coverage"
@@ -8954,7 +8962,8 @@ struct RomaCoreChecks {
                 checkReportScript.contains("proof_set_laptop_preflight_package_fingerprint=") &&
                 checkSetScript.contains("proof_set_laptop_preflight_matches_full=true") &&
                 checkSetScript.contains("proof_set_ok=laptop-preflight") &&
-                checkReportScript.contains("proof_profile_ok=$RequireProofProfile") &&
+                checkReportScript.contains("function Write-ProofProfileRequirements") &&
+                checkReportScript.contains("proof_profile_ok=$Profile") &&
                 checkReportScript.contains("Laptop preflight proof must run on Windows"),
             "Windows proof report profile should validate laptop preflight reports, output markers, and artifact identity"
         )

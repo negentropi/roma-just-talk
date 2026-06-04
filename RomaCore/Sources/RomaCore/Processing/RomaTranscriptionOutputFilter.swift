@@ -291,6 +291,16 @@ public struct RomaTranscriptionOutputFilter {
     private static let preservedRepeatedClauses: Set<String> = [
         "i know", "new york", "you know"
     ]
+    private static let blockedUnpunctuatedPartialRestartPrefixes: Set<String> = [
+        "a", "am", "an", "and", "are", "as", "at", "be", "but", "by",
+        "can", "do", "does", "for", "from", "go", "had", "has", "have",
+        "he", "her", "here", "his", "i", "if", "in", "is", "it", "its",
+        "let", "me", "my", "new", "no", "not", "of", "on", "or", "our",
+        "re", "she", "so", "that", "the", "their", "them", "then", "there",
+        "these", "they", "this", "to", "up", "us", "use", "we", "what",
+        "when", "where", "which", "while", "who", "will", "with", "would",
+        "you", "your"
+    ]
     private static let allowedSingleWordRepeatedLeadInCorrectionWords: Set<String> = [
         "a", "an", "her", "his", "its", "my", "our", "that", "the", "their",
         "this", "your"
@@ -1205,6 +1215,7 @@ public struct RomaTranscriptionOutputFilter {
             filteredText = collapseAdjacentRepeatedWords(in: filteredText)
             filteredText = collapseSeparatorRepeatedWords(in: filteredText)
             filteredText = collapsePartialWordRestarts(in: filteredText)
+            filteredText = collapseUnpunctuatedPartialWordRestarts(in: filteredText)
             filteredText = collapseRepeatedShortPhrases(in: filteredText)
             filteredText = collapseRepeatedShortClauses(in: filteredText)
             filteredText = collapseRepeatedLeadInCorrections(in: filteredText)
@@ -7518,6 +7529,46 @@ public struct RomaTranscriptionOutputFilter {
         return collapsedText
     }
 
+    private static func collapseUnpunctuatedPartialWordRestarts(in text: String) -> String {
+        guard let regex = try? NSRegularExpression(
+            pattern: #"(?i)(?<![\p{L}\p{N}])([\p{L}]{2,5})[ \t]+([\p{L}][\p{L}'’ʼ-]{2,63})(?=[ \t]+[\p{L}\p{N}]|[.!?,;:…]|\s*$)"#
+        ) else {
+            return text
+        }
+
+        var collapsedText = text
+        var rewriteCount = 0
+
+        while rewriteCount < 4 {
+            let range = NSRange(collapsedText.startIndex..., in: collapsedText)
+            let matches = regex.matches(in: collapsedText, range: range).reversed()
+            var didRewrite = false
+
+            for match in matches {
+                guard match.numberOfRanges >= 3,
+                      let fullRange = Range(match.range(at: 0), in: collapsedText),
+                      let partialRange = Range(match.range(at: 1), in: collapsedText),
+                      let completedRange = Range(match.range(at: 2), in: collapsedText) else {
+                    continue
+                }
+
+                let partialWord = String(collapsedText[partialRange])
+                let completedWord = String(collapsedText[completedRange])
+                guard isUnpunctuatedPartialRestartPrefix(partialWord, of: completedWord) else {
+                    continue
+                }
+
+                collapsedText.replaceSubrange(fullRange, with: completedWord)
+                didRewrite = true
+            }
+
+            guard didRewrite else { break }
+            rewriteCount += 1
+        }
+
+        return collapsedText
+    }
+
     private static func isPartialRestartPrefix(_ partialWord: String, of completedWord: String) -> Bool {
         let normalizedPartial = partialWord.lowercased()
         let normalizedCompleted = completedWord.lowercased()
@@ -7527,6 +7578,18 @@ public struct RomaTranscriptionOutputFilter {
               normalizedCompleted.hasPrefix(normalizedPartial),
               partialWord.rangeOfCharacter(from: .letters) != nil,
               completedWord.rangeOfCharacter(from: .letters) != nil else {
+            return false
+        }
+
+        return true
+    }
+
+    private static func isUnpunctuatedPartialRestartPrefix(_ partialWord: String, of completedWord: String) -> Bool {
+        let normalizedPartial = partialWord.lowercased()
+        guard isPartialRestartPrefix(partialWord, of: completedWord),
+              !blockedUnpunctuatedPartialRestartPrefixes.contains(normalizedPartial),
+              !likelyLowercaseFragments.contains(normalizedPartial),
+              commonTechnicalAcronyms[normalizedPartial] == nil else {
             return false
         }
 

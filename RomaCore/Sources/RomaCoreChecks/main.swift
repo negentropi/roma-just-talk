@@ -4856,6 +4856,8 @@ struct RomaCoreChecks {
         let emailUserContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "felix")
         let variableContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "user")
         let unmatchedStraightQuoteContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "She said \"hello")
+        let unmatchedStraightSingleQuoteContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "She said 'hello")
+        let contractionContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "I don't")
         let openSmartQuoteContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "She said “")
         let closingSmartQuoteContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "She said “hello”")
         let closingSmartSingleQuoteContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "She said ‘hello’")
@@ -5472,6 +5474,33 @@ struct RomaCoreChecks {
         try require(
             RomaTranscriptionOutputFilter.applyInsertionSpacing("\"", context: unmatchedStraightQuoteContext) == "\"",
             "insertion spacing should attach standalone closing straight quotes"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Single quote.", context: wordContext) == "'",
+            "insertion polish should attach standalone single quote commands"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Open single quote.", context: wordContext) == "'",
+            "insertion polish should attach standalone open single quote commands"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionSpacing("'", context: wordContext) == " '",
+            "insertion spacing should add a space before standalone opening single quotes"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Close single quote.",
+                context: unmatchedStraightSingleQuoteContext
+            ) == "'",
+            "insertion polish should attach standalone close single quote commands"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionSpacing("'", context: unmatchedStraightSingleQuoteContext) == "'",
+            "insertion spacing should attach standalone closing single quotes"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionSpacing("'", context: contractionContext) == " '",
+            "insertion spacing should not treat apostrophes inside contractions as open quotes"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(

@@ -1077,6 +1077,24 @@ public struct RomaTranscriptionOutputFilter {
         "close quotation marks": "\"",
         "end quotation mark": "\"",
         "end quotation marks": "\"",
+        "single quote": "'",
+        "single quotes": "'",
+        "open single quote": "'",
+        "open single quotes": "'",
+        "start single quote": "'",
+        "start single quotes": "'",
+        "open single quotation mark": "'",
+        "open single quotation marks": "'",
+        "start single quotation mark": "'",
+        "start single quotation marks": "'",
+        "close single quote": "'",
+        "close single quotes": "'",
+        "end single quote": "'",
+        "end single quotes": "'",
+        "close single quotation mark": "'",
+        "close single quotation marks": "'",
+        "end single quotation mark": "'",
+        "end single quotation marks": "'",
         "open paren": "(",
         "open parenthesis": "(",
         "open parentheses": "(",
@@ -9277,6 +9295,10 @@ public struct RomaTranscriptionOutputFilter {
            hasUnclosedStraightDoubleQuote(in: context.precedingText) {
             return false
         }
+        if text == "'",
+           hasUnclosedStraightSingleQuote(in: context.precedingText) {
+            return false
+        }
 
         let leadingSpaceAfter = CharacterSet(charactersIn: ".,;:!?)]}”’")
         if isLeadingDotfileFragment(text) {
@@ -9341,6 +9363,36 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         return quoteCount % 2 == 1
+    }
+
+    private static func hasUnclosedStraightSingleQuote(in precedingText: String) -> Bool {
+        let linePrefix = currentLinePrefix(in: precedingText)
+        var quoteCount = 0
+        var index = linePrefix.startIndex
+
+        while index < linePrefix.endIndex {
+            guard linePrefix[index] == "'" else {
+                index = linePrefix.index(after: index)
+                continue
+            }
+
+            let previousIndex = index > linePrefix.startIndex ? linePrefix.index(before: index) : nil
+            let nextIndex = linePrefix.index(after: index)
+            let previousCharacter = previousIndex.map { linePrefix[$0] }
+            let nextCharacter = nextIndex < linePrefix.endIndex ? linePrefix[nextIndex] : nil
+            let isApostrophe = previousCharacter.map(isWordQuoteNeighbor) == true &&
+                nextCharacter.map(isWordQuoteNeighbor) == true
+            if !isApostrophe {
+                quoteCount += 1
+            }
+            index = nextIndex
+        }
+
+        return quoteCount % 2 == 1
+    }
+
+    private static func isWordQuoteNeighbor(_ character: Character) -> Bool {
+        character.isLetter || character.isNumber
     }
 
     private static func normalizeWhitespace(_ text: String) -> String {

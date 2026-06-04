@@ -9761,18 +9761,25 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Get-RomaWindowsInstalledProofProfileRequirements") &&
                 proofCommonScript.contains("function Get-RomaWindowsProofProfileAssertions") &&
                 proofCommonScript.contains("function Get-RomaWindowsInstalledProofProfileAssertions") &&
+                proofCommonScript.contains("function Get-RomaWindowsProofReportProfileChecks") &&
                 proofCommonScript.contains(#"profile = "laptop-preflight""#) &&
                 proofCommonScript.contains(#"expected_mode = "windows-laptop-preflight""#) &&
                 proofCommonScript.contains(#"read_as_laptop_preflight = $true"#) &&
                 checkSetScript.contains(". $proofCommonScript") &&
-                checkSetScript.contains("$profiles = Get-RomaWindowsProofProfileSpecs") &&
+                checkSetScript.contains("function New-ProofReportProfilePathMap") &&
+                checkSetScript.contains("function New-ProofReportProfileRequiredMap") &&
                 checkSetScript.contains("function Get-ProofReportProfileChecks") &&
+                checkSetScript.contains("Get-RomaWindowsProofReportProfileChecks") &&
+                checkSetScript.contains("-Paths (New-ProofReportProfilePathMap)") &&
+                checkSetScript.contains("-Required (New-ProofReportProfileRequiredMap)") &&
                 checkSetScript.contains("function Test-AnyRequiredProofReportProfile") &&
                 checkSetScript.contains("function Invoke-RequiredProofReportProfileChecks") &&
-                checkSetScript.contains(#"Profile = [string]$profiles["laptop_preflight"]["profile"]"#) &&
-                checkSetScript.contains(#"ReadAsLaptopPreflight = [bool]$profiles["laptop_preflight"]["read_as_laptop_preflight"]"#) &&
+                proofCommonScript.contains(#"Profile = [string]$profiles[$name]["profile"]"#) &&
+                proofCommonScript.contains(#"ReadAsLaptopPreflight = [bool]$profiles[$name]["read_as_laptop_preflight"]"#) &&
                 checkSetScript.contains("Invoke-RequiredProofReportProfileChecks -Checks $profileChecks") &&
                 !checkSetScript.contains("function Assert-LaptopPreflightReport") &&
+                !checkSetScript.contains(#"Profile = [string]$profiles["#) &&
+                !checkSetScript.contains(#"ReadAsLaptopPreflight = [bool]$profiles["#) &&
                 checkReportScript.contains("Get-RomaWindowsProofProfileExpectedMode -Profile $RequireProofProfile") &&
                 checkReportScript.contains("Get-RomaWindowsProofProfileRequirements -Profile $Profile") &&
                 checkReportScript.contains(#"-Expected (Get-RomaWindowsProofProfileExpectedMode -Profile (Get-RomaWindowsProofProfileName -Name "laptop_preflight"))"#) &&

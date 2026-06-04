@@ -951,6 +951,26 @@ struct RomaCoreChecks {
                 "repeated lead-in correction"
             ),
             (
+                "The model the module.",
+                "The module.",
+                "single-word repeated lead-in correction"
+            ),
+            (
+                "A model a module.",
+                "A module.",
+                "article repeated lead-in correction"
+            ),
+            (
+                "My model my module.",
+                "My module.",
+                "possessive repeated lead-in correction"
+            ),
+            (
+                "This model this module today.",
+                "This module today.",
+                "determiner repeated lead-in correction with suffix"
+            ),
+            (
                 "I think we need model we need module today.",
                 "I think we need module today.",
                 "inline repeated lead-in correction"
@@ -964,6 +984,16 @@ struct RomaCoreChecks {
                 "We need the model and we need the module.",
                 "We need the model and we need the module.",
                 "conjoined repeated lead-in guard"
+            ),
+            (
+                "The sooner the better.",
+                "The sooner the better.",
+                "idiomatic repeated lead-in guard"
+            ),
+            (
+                "The model is the module.",
+                "The model is the module.",
+                "predicate repeated lead-in guard"
             ),
             (
                 "We should ship today. We should",
@@ -6681,6 +6711,8 @@ struct RomaCoreChecks {
                 packageScript.contains("manifest_script=$manifestScriptOutput") &&
                 packageScript.contains("windows-package-identity.ps1") &&
                 packageScript.contains("package_identity_script=$identityScriptOutput") &&
+                packageScript.contains("windows-proof-common.ps1") &&
+                packageScript.contains("proof_common_script=$proofCommonScriptOutput") &&
                 packageScript.contains("Get-RomaPackageIdentityProof -PackageDir $PackageDir") &&
                 packageScript.contains("preflight_outputs") &&
                 packageScript.contains("transcription_client_whisper") &&
@@ -6809,6 +6841,7 @@ struct RomaCoreChecks {
             installScript.contains(#""RomaProofAgent.exe""#) &&
                 installScript.contains(#""run-windows-laptop-proof.ps1""#) &&
                 installScript.contains(#""WINDOWS-LAPTOP-PROOF.txt""#) &&
+                installScript.contains(#""windows-proof-common.ps1""#) &&
                 installScript.contains(#""windows-manifest.ps1""#) &&
                 installScript.contains(#""windows-package-identity.ps1""#) &&
                 installScript.contains(#""check-windows-proof-set.ps1""#),
@@ -6818,6 +6851,7 @@ struct RomaCoreChecks {
             proveScript.contains("installed_proof_agent") &&
                 proveScript.contains("installed_laptop_proof_script") &&
                 proveScript.contains("installed_laptop_proof_guide") &&
+                proveScript.contains("installed_proof_common_script") &&
                 proveScript.contains("installed_manifest_script") &&
                 proveScript.contains("installed_package_identity_script") &&
                 proveScript.contains("installed_check_set_script"),
@@ -6827,6 +6861,7 @@ struct RomaCoreChecks {
             checkReportScript.contains("installed_proof_agent_matches_package") &&
                 checkReportScript.contains("installed_laptop_proof_script_matches_package") &&
                 checkReportScript.contains("installed_laptop_proof_guide_matches_package") &&
+                checkReportScript.contains("installed_proof_common_script_matches_package") &&
                 checkReportScript.contains("installed_manifest_script_matches_package") &&
                 checkReportScript.contains("installed_package_identity_script_matches_package") &&
                 checkReportScript.contains("installed_check_set_script_matches_package"),

@@ -290,6 +290,10 @@ public struct RomaTranscriptionOutputFilter {
     private static let preservedRepeatedClauses: Set<String> = [
         "i know", "new york", "you know"
     ]
+    private static let allowedSingleWordRepeatedLeadInCorrectionWords: Set<String> = [
+        "a", "an", "her", "his", "its", "my", "our", "that", "the", "their",
+        "this", "your"
+    ]
     private static let allowedPreviousWordsForSpokenCodeCase: Set<String> = [
         "argument", "branch", "call", "called", "class", "constant", "enum",
         "field", "file", "folder", "function", "identifier", "key", "method",
@@ -7651,15 +7655,15 @@ public struct RomaTranscriptionOutputFilter {
 
     private static func repeatedLeadInCorrectionRewrite(in text: String) -> (range: Range<String.Index>, replacement: String)? {
         let tokens = wordTokens(in: text)
-        guard tokens.count >= 5 && tokens.count <= 18 else { return nil }
+        guard tokens.count >= 3 && tokens.count <= 18 else { return nil }
 
         let normalizedWords = tokens.map(\.text)
-        for leadInWordCount in stride(from: 5, through: 2, by: -1) {
+        for leadInWordCount in stride(from: 5, through: 1, by: -1) {
             guard tokens.count >= leadInWordCount * 2 + 1 else { continue }
 
             for firstLeadStart in 0...(tokens.count - leadInWordCount * 2 - 1) {
                 let firstLeadWords = Array(normalizedWords[firstLeadStart..<(firstLeadStart + leadInWordCount)])
-                guard !preservedRepeatedClauses.contains(firstLeadWords.joined(separator: " ")) else {
+                guard canCollapseRepeatedLeadInCorrection(firstLeadWords) else {
                     continue
                 }
 
@@ -7679,6 +7683,11 @@ public struct RomaTranscriptionOutputFilter {
                 guard sourceTailWords.count >= 1 && sourceTailWords.count <= 4,
                       correctionTailWords.count >= 1 && correctionTailWords.count <= 6,
                       sourceTailWords != correctionTailWords,
+                      canCollapseRepeatedLeadInCorrectionTail(
+                        leadInWords: firstLeadWords,
+                        sourceTailWords: sourceTailWords,
+                        correctionTailWords: correctionTailWords
+                      ),
                       !sourceTailWords.contains(where: { preservedRepeatedWords.contains($0) }),
                       !correctionTailWords.contains(where: { preservedRepeatedWords.contains($0) }) else {
                     continue
@@ -7701,6 +7710,29 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         return nil
+    }
+
+    private static func canCollapseRepeatedLeadInCorrection(_ words: [String]) -> Bool {
+        guard !preservedRepeatedClauses.contains(words.joined(separator: " ")) else {
+            return false
+        }
+
+        guard words.count == 1 else { return true }
+        return allowedSingleWordRepeatedLeadInCorrectionWords.contains(words[0])
+    }
+
+    private static func canCollapseRepeatedLeadInCorrectionTail(
+        leadInWords: [String],
+        sourceTailWords: [String],
+        correctionTailWords: [String]
+    ) -> Bool {
+        guard leadInWords.count == 1 else { return true }
+        guard let sourceWord = sourceTailWords.first,
+              let correctionWord = correctionTailWords.first else {
+            return false
+        }
+        return productCorrectionTailWords.contains(sourceWord) &&
+            productCorrectionTailWords.contains(correctionWord)
     }
 
     private static func normalizedRepeatWord(_ token: String) -> String? {

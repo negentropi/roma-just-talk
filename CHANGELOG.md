@@ -3,6 +3,7 @@
 ## v1.81 - Unreleased
 
 - Replaced the README, source app icon, and menu bar logo with the roma-just-talk split-keyboard mark.
+- Collapsed repeated determiner self-corrections such as "the model the module".
 - Collapsed repeated lead-in self-corrections such as "we need the model we need the module".
 - Cleaned short unpunctuated correction fragments such as "model instead module".
 - Trimmed repeated cursor-context words from pre-roll continuation transcripts such as "so this Model".

@@ -2100,6 +2100,14 @@ public struct RomaTranscriptionOutputFilter {
             return markerIndex + 1
         case "instead":
             return tokens[markerIndex + 1].text == "of" ? nil : markerIndex + 1
+        case "rather":
+            return tokens[markerIndex + 1].text == "than" ? nil : markerIndex + 1
+        case "make":
+            guard ["it", "that"].contains(tokens[markerIndex + 1].text) else { return nil }
+            return markerIndex + 2
+        case "call":
+            guard tokens[markerIndex + 1].text == "it" else { return nil }
+            return markerIndex + 2
         case "actually", "nope":
             return markerIndex + 1
         case "no":
@@ -2133,6 +2141,14 @@ public struct RomaTranscriptionOutputFilter {
             sourceTokens: Array(sourceTokens),
             replacementTokens: Array(replacementTokens)
            )
+
+        if isMakeOrCallUnpunctuatedContinuationCorrection(tokens: tokens, markerIndex: markerIndex),
+           sourceTokens.count == 1,
+           let previousSourceWord = sourceTokens.last?.text,
+           blockedSingleWordPrefixesForMakeCallCorrection.contains(previousSourceWord) {
+            return false
+        }
+
         if isBareProductCorrectionMarker,
            !isBareProductCorrection {
             return false
@@ -2149,6 +2165,20 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         return true
+    }
+
+    private static func isMakeOrCallUnpunctuatedContinuationCorrection(
+        tokens: [WordToken],
+        markerIndex: Int
+    ) -> Bool {
+        guard markerIndex + 1 < tokens.count else { return false }
+
+        let marker = tokens[markerIndex].text
+        let nextWord = tokens[markerIndex + 1].text
+        if marker == "make" {
+            return ["it", "that"].contains(nextWord)
+        }
+        return marker == "call" && nextWord == "it"
     }
 
     private static func isBareUnpunctuatedContinuationCorrectionMarker(_ marker: String) -> Bool {

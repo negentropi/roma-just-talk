@@ -9570,9 +9570,24 @@ struct RomaCoreChecks {
                 packageScript.contains("Expected preflight-only proof markers:") &&
                 packageScript.contains("Local whisper preflight also prints:") &&
                 packageScript.contains("Expected full-proof markers:") &&
+                packageScript.contains("Get-RomaWindowsLaptopPreflightGuideMarkers") &&
+                packageScript.contains("Get-RomaWindowsLaptopPreflightLocalWhisperGuideMarkers") &&
+                proofCommonScript.contains("function Get-RomaWindowsLaptopPreflightGuideMarkers") &&
+                proofCommonScript.contains("function Get-RomaWindowsLaptopPreflightLocalWhisperGuideMarkers") &&
                 packageScript.contains("Get-RomaWindowsFullLaptopProofGuideMarkers") &&
                 proofCommonScript.contains("function Get-RomaWindowsFullLaptopProofGuideMarkers") &&
-                packageScript.contains("windows_laptop_preflight_report=") &&
+                proofCommonScript.contains("windows_laptop_preflight_report=") &&
+                proofCommonScript.contains("proof_set_ok=laptop-preflight") &&
+                proofCommonScript.contains("windows_laptop_preflight_ok=true") &&
+                proofCommonScript.contains("proof_set_laptop_preflight_package_fingerprint=") &&
+                proofCommonScript.contains("proof_set_laptop_preflight_permission_surface=true") &&
+                proofCommonScript.contains("proof_set_laptop_preflight_source_dirty=false") &&
+                proofCommonScript.contains("proof_set_laptop_preflight_local_whisper=False") &&
+                proofCommonScript.contains("proof_set_laptop_preflight_local_whisper=True") &&
+                proofCommonScript.contains("microphone_preflight_duration_seconds=") &&
+                proofCommonScript.contains("microphone_preflight_included_pre_roll_seconds=") &&
+                proofCommonScript.contains("proof_bool=reported_positive_pre_roll value=True") &&
+                proofCommonScript.contains("proof_number=included_pre_roll_seconds value=") &&
                 proofCommonScript.contains("proof_set_laptop_preflight_matches_full=true") &&
                 proofCommonScript.contains("proof_set_generated_at_window_minutes=") &&
                 proofCommonScript.contains("proof_profile_ok=cloud-dictation") &&
@@ -9580,12 +9595,6 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("proof_profile_ok=local-whisper-notepad-paste") &&
                 proofCommonScript.contains("proof_listener_runtime=installed_listener") &&
                 proofCommonScript.contains("listen_completed_sessions=1") &&
-                packageScript.contains("proof_set_laptop_preflight_local_whisper=False") &&
-                packageScript.contains("proof_set_laptop_preflight_local_whisper=True") &&
-                packageScript.contains("proof_set_laptop_preflight_source_dirty=false") &&
-                packageScript.contains("microphone_preflight_included_pre_roll_seconds=") &&
-                packageScript.contains("proof_bool=reported_positive_pre_roll value=True") &&
-                packageScript.contains("proof_number=included_pre_roll_seconds value=") &&
                 proofCommonScript.contains("proof_set_source_dirty=false") &&
                 packageScript.contains("Archived full-proof recheck") &&
                 packageScript.contains("check-windows-proof-set.ps1 -LaptopPreflightReportPath") &&

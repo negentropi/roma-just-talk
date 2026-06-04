@@ -470,6 +470,8 @@ function Write-LaptopProofGuide {
         [string]$OutputPath
     )
 
+    $preflightMarkers = @((Get-RomaWindowsLaptopPreflightGuideMarkers).Values) -join [System.Environment]::NewLine
+    $localWhisperPreflightMarkers = @((Get-RomaWindowsLaptopPreflightLocalWhisperGuideMarkers).Values) -join [System.Environment]::NewLine
     $fullProofMarkers = @((Get-RomaWindowsFullLaptopProofGuideMarkers).Values) -join [System.Environment]::NewLine
 
     @"
@@ -491,22 +493,11 @@ powershell -ExecutionPolicy Bypass -File .\run-windows-laptop-proof.ps1 -Package
 
 Expected preflight-only proof markers:
 
-proof_set_ok=laptop-preflight
-windows_laptop_preflight_ok=true
-windows_laptop_preflight_report=C:\tmp\roma-windows-laptop-proof\preflight-proof.json
-proof_set_laptop_preflight_package_fingerprint=
-proof_set_laptop_preflight_source_dirty=false
-proof_set_laptop_preflight_permission_surface=true
-proof_set_laptop_preflight_local_whisper=False
-microphone_preflight_duration_seconds=
-microphone_preflight_included_pre_roll_seconds=
-proof_bool=reported_positive_pre_roll value=True
-proof_number=included_pre_roll_seconds value=
-proof_profile_ok=laptop-preflight
+$preflightMarkers
 
 Local whisper preflight also prints:
 
-proof_set_laptop_preflight_local_whisper=True
+$localWhisperPreflightMarkers
 
 Archived preflight report recheck, without rerunning hotkey or microphone proof:
 

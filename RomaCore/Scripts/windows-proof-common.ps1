@@ -200,6 +200,29 @@ function Get-RomaWindowsMinimumPermissionOutputMarkers {
     }
 }
 
+function Get-RomaWindowsLaptopPreflightGuideMarkers {
+    return [ordered]@{
+        laptop_preflight_proof_set = "proof_set_ok=laptop-preflight"
+        laptop_preflight_ok = "windows_laptop_preflight_ok=true"
+        laptop_preflight_report = "windows_laptop_preflight_report=C:\tmp\roma-windows-laptop-proof\preflight-proof.json"
+        package_fingerprint = "proof_set_laptop_preflight_package_fingerprint="
+        source_dirty = "proof_set_laptop_preflight_source_dirty=false"
+        permission_surface = "proof_set_laptop_preflight_permission_surface=true"
+        local_whisper_disabled = "proof_set_laptop_preflight_local_whisper=False"
+        microphone_duration = "microphone_preflight_duration_seconds="
+        microphone_pre_roll = "microphone_preflight_included_pre_roll_seconds="
+        positive_pre_roll = "proof_bool=reported_positive_pre_roll value=True"
+        included_pre_roll_seconds = "proof_number=included_pre_roll_seconds value="
+        laptop_preflight_profile = "proof_profile_ok=laptop-preflight"
+    }
+}
+
+function Get-RomaWindowsLaptopPreflightLocalWhisperGuideMarkers {
+    return [ordered]@{
+        local_whisper_enabled = "proof_set_laptop_preflight_local_whisper=True"
+    }
+}
+
 function Get-RomaWindowsFullLaptopProofSetOutputMarkers {
     return [ordered]@{
         laptop_preflight_profile = "proof_profile_ok=laptop-preflight"

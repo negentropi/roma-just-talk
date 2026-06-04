@@ -2,6 +2,8 @@
 
 ## v1.81 - Unreleased
 
+- Shared Windows preflight proof marker lists so the generated laptop guide uses the same helper-owned markers as the full proof.
+- Shared Windows full-laptop proof marker lists so the generated guide and archived recheck script assert the same profile markers.
 - Shared Windows proof-set profile routing through one table so single-report and set-level proof checks stay aligned.
 - Shared Windows proof-agent source-marker output through the doctor output module instead of literal-printing the marker list in the proof CLI.
 - Shared Windows proof-report doctor default assertions so agent, proof-agent, keyboard-hook, and paste checks use one default contract.

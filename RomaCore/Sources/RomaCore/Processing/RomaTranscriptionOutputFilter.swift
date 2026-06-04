@@ -1228,6 +1228,7 @@ public struct RomaTranscriptionOutputFilter {
             filteredText = collapseRepeatedShortClauses(in: filteredText)
             filteredText = collapseRepeatedLeadInCorrections(in: filteredText)
             filteredText = collapseRepeatedTemporalPrepositionCorrections(in: filteredText)
+            filteredText = collapseRepeatedProperNamePrepositionCorrections(in: filteredText)
             filteredText = collapseRepeatedShortSentences(in: filteredText)
             filteredText = collapseMismatchedRepeatedShortSentences(in: filteredText)
             filteredText = collapseTrailingUnpunctuatedRepeatedShortSentences(in: filteredText)
@@ -8434,6 +8435,91 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         return nil
+    }
+
+    private static func collapseRepeatedProperNamePrepositionCorrections(in text: String) -> String {
+        var collapsedText = text
+        var rewriteCount = 0
+
+        while rewriteCount < 4 {
+            guard let rewrite = repeatedProperNamePrepositionCorrectionRewrite(in: collapsedText) else {
+                break
+            }
+            collapsedText.replaceSubrange(rewrite.range, with: rewrite.replacement)
+            rewriteCount += 1
+        }
+
+        return collapsedText
+    }
+
+    private static func repeatedProperNamePrepositionCorrectionRewrite(
+        in text: String
+    ) -> (range: Range<String.Index>, replacement: String)? {
+        let tokens = wordTokens(in: text)
+        guard tokens.count >= 4 else { return nil }
+        let words = tokens.map(\.text)
+
+        for prepositionIndex in 0..<(tokens.count - 3) {
+            let preposition = words[prepositionIndex]
+            guard ["to", "with", "from"].contains(preposition) else { continue }
+
+            let maxSecondPrepositionIndex = min(prepositionIndex + 3, tokens.count - 2)
+            guard prepositionIndex + 2 <= maxSecondPrepositionIndex else { continue }
+
+            for secondPrepositionIndex in (prepositionIndex + 2)...maxSecondPrepositionIndex
+                where words[secondPrepositionIndex] == preposition {
+                let sourceTokens = Array(tokens[(prepositionIndex + 1)..<secondPrepositionIndex])
+                guard sourceTokens.count >= 1 && sourceTokens.count <= 2,
+                      sourceTokens.allSatisfy({ isProperNameCorrectionToken($0, in: text) }) else {
+                    continue
+                }
+
+                let correctionTokens = Array(tokens[(secondPrepositionIndex + 1)...])
+                let correctionWordCount = leadingProperNameCorrectionTokenCount(correctionTokens, in: text)
+                guard correctionWordCount > 0,
+                      sourceTokens.map(\.text) != Array(correctionTokens.prefix(correctionWordCount)).map(\.text) else {
+                    continue
+                }
+
+                let rewriteStart = tokens[prepositionIndex].range.lowerBound
+                let rewriteEnd = tokens[secondPrepositionIndex + correctionWordCount].range.upperBound
+                let replacementStart = tokens[secondPrepositionIndex].range.lowerBound
+                let replacementEnd = tokens[secondPrepositionIndex + correctionWordCount].range.upperBound
+                var replacement = String(text[replacementStart..<replacementEnd])
+                let sourcePreposition = String(text[tokens[prepositionIndex].range])
+                if let firstCharacter = sourcePreposition.first,
+                   firstCharacter.isUppercase {
+                    replacement = uppercaseFirstLetterPreservingRest(in: replacement)
+                }
+
+                return (rewriteStart..<rewriteEnd, replacement)
+            }
+        }
+
+        return nil
+    }
+
+    private static func leadingProperNameCorrectionTokenCount(_ tokens: [WordToken], in text: String) -> Int {
+        var count = 0
+        for token in tokens.prefix(2) {
+            guard isProperNameCorrectionToken(token, in: text) else {
+                break
+            }
+            count += 1
+        }
+        return count
+    }
+
+    private static func isProperNameCorrectionToken(_ token: WordToken, in text: String) -> Bool {
+        let tokenText = String(text[token.range])
+        guard tokenText.count > 1,
+              tokenText.first?.isUppercase == true,
+              tokenText.dropFirst().contains(where: \.isUppercase) == false,
+              tokenText.contains(where: \.isLetter) else {
+            return false
+        }
+
+        return commonTechnicalAcronyms[token.text] == nil
     }
 
     private static func normalizedRepeatWord(_ token: String) -> String? {

@@ -359,6 +359,48 @@ struct RomaCoreChecks {
             "shared insertion polish should preserve non-technical alright continuations"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Yes model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim yes acknowledgement fillers before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Yep model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim yep acknowledgement fillers before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Yup module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim yup acknowledgement fillers before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Yes now.",
+                context: midSentenceContext
+            ) == "yes now",
+            "shared insertion polish should preserve non-technical yes continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Yep now.",
+                context: midSentenceContext
+            ) == "yep now",
+            "shared insertion polish should preserve non-technical yep continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Yup sure.",
+                context: midSentenceContext
+            ) == "yup sure",
+            "shared insertion polish should preserve non-technical yup continuations"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("Right model.", context: midSentenceContext) == "right model",
             "shared insertion polish should preserve right as an ordinary fragment word"
         )
@@ -7400,6 +7442,37 @@ struct RomaCoreChecks {
         try require(
             await allRightInserter.pastedText == " model",
             "pipeline should paste all-right acknowledgement filler continuations"
+        )
+
+        let yepRecorder = FakeRecorder()
+        let yepInserter = FakeTextInsertion()
+        let yepPipeline = DictationPipeline(
+            recorder: yepRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "yep-continuation-proof.wav",
+                text: "Yep model."
+            ),
+            textInsertion: yepInserter
+        )
+        let yepRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/yep-continuation-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await yepRecorder.startPreRollBuffering()
+        let yepResult = try await yepPipeline.runRecordingWindow(yepRequest) {}
+
+        try require(
+            yepResult.processedText == " model",
+            "pipeline should clean yes/yep/yup acknowledgement filler continuations"
+        )
+        try require(
+            await yepInserter.pastedText == " model",
+            "pipeline should paste yes/yep/yup acknowledgement filler continuations"
         )
 
         let orWaitNoIMeanRecorder = FakeRecorder()

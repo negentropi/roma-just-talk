@@ -34,6 +34,7 @@
 - Collapsed short "I should say" and "I was trying to say" correction fragments in cursor-aware post-STT cleanup.
 - Lowercased "sure ..." continuation fragments and trimmed stacked "okay sure ..." acknowledgement filler before short technical dictation.
 - Trimmed "all right ..." and "alright ..." acknowledgement fillers before short technical continuations while preserving ordinary "all right now" prose.
+- Trimmed "yes ...", "yep ...", and "yup ..." acknowledgement fillers before short technical continuations while preserving ordinary literal continuations.
 - Collapsed short backtrack and hold-on correction fragments in cursor-aware post-STT cleanup.
 - Collapsed nested "correction actually" and "sorry actually" fragments in cursor-aware post-STT cleanup.
 - Collapsed short "or actually" and "or wait no" correction fragments in cursor-aware post-STT cleanup.

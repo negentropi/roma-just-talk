@@ -555,6 +555,55 @@ struct RomaCoreChecks {
             "shared insertion polish should preserve non-technical my-bad continuations"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Actually model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim actually correction fillers before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Actually module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim actually correction fillers before module continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Instead module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim instead correction fillers before module continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Rather model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim rather correction fillers before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Actually now.",
+                context: midSentenceContext
+            ) == "actually now",
+            "shared insertion polish should preserve non-technical actually continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Instead of module.",
+                context: midSentenceContext
+            ) == "instead of module",
+            "shared insertion polish should preserve instead-of continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Rather than model.",
+                context: midSentenceContext
+            ) == "rather than model",
+            "shared insertion polish should preserve rather-than continuations"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("Right model.", context: midSentenceContext) == "right model",
             "shared insertion polish should preserve right as an ordinary fragment word"
         )
@@ -7751,6 +7800,37 @@ struct RomaCoreChecks {
         try require(
             await sorryInserter.pastedText == " model",
             "pipeline should paste sorry correction filler continuations"
+        )
+
+        let actuallyRecorder = FakeRecorder()
+        let actuallyInserter = FakeTextInsertion()
+        let actuallyPipeline = DictationPipeline(
+            recorder: actuallyRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "actually-continuation-proof.wav",
+                text: "Actually model."
+            ),
+            textInsertion: actuallyInserter
+        )
+        let actuallyRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/actually-continuation-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await actuallyRecorder.startPreRollBuffering()
+        let actuallyResult = try await actuallyPipeline.runRecordingWindow(actuallyRequest) {}
+
+        try require(
+            actuallyResult.processedText == " model",
+            "pipeline should clean actually correction filler continuations"
+        )
+        try require(
+            await actuallyInserter.pastedText == " model",
+            "pipeline should paste actually correction filler continuations"
         )
 
         let orWaitNoIMeanRecorder = FakeRecorder()

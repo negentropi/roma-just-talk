@@ -497,7 +497,7 @@ public struct RomaTranscriptionOutputFilter {
         "in", "is", "left", "needed", "of", "shortcut", "shortcuts", "there", "to"
     ]
     private static let likelyLowercaseFragments: Set<String> = [
-        "a", "about", "after", "again", "all", "alright", "also", "an", "and", "any", "app", "are",
+        "a", "about", "actually", "after", "again", "all", "alright", "also", "an", "and", "any", "app", "are",
         "argument", "arguments", "array", "arrays", "as", "at", "back", "bad", "be", "because", "branch", "branches",
         "bug", "bugs", "button", "buttons", "but", "by", "cache", "caches", "can", "case", "class", "classes",
         "client", "code", "command", "commands", "commit", "commits", "component", "components", "config",
@@ -505,15 +505,15 @@ public struct RomaTranscriptionOutputFilter {
         "did", "diff", "diffs", "do", "does", "done", "email", "emails", "endpoint", "endpoints", "enum",
         "enums", "error", "errors", "field", "fields", "file", "files", "final", "first", "flag", "flags",
         "folder", "folders", "for", "from", "function", "functions", "get", "go", "got", "gotcha", "had", "hang", "has", "have",
-        "here", "hold", "how", "if", "in", "input", "inputs", "is", "it", "issue", "issues", "just", "key", "keys",
+        "here", "hold", "how", "if", "in", "input", "inputs", "instead", "is", "it", "issue", "issues", "just", "key", "keys",
         "last", "like", "line", "lines", "make", "maybe", "mean", "message", "messages", "method", "methods",
         "model", "models", "module", "modules", "my", "name", "names", "need", "next", "not", "now", "of", "on", "one",
         "oops", "option", "options", "or", "out", "output", "outputs", "package", "packages", "page", "parameter",
         "parameters", "parser", "path", "paths", "payload", "payloads", "phrase", "phrases", "project", "projects",
-        "pod", "pods", "prompt", "property", "properties", "protocol", "protocols", "put", "really", "repo", "repos", "repository",
+        "pod", "pods", "prompt", "property", "properties", "protocol", "protocols", "put", "rather", "really", "repo", "repos", "repository",
         "repositories", "request", "response", "result", "results", "right", "route", "routes", "router", "screen",
         "script", "scripts", "second", "see", "server", "service", "setting", "settings", "should", "single", "site", "sites", "so", "sorry",
-        "some", "state", "states", "struct", "structs", "sure", "that", "the", "then", "there", "third", "this", "ticket",
+        "some", "state", "states", "struct", "structs", "sure", "than", "that", "the", "then", "there", "third", "this", "ticket",
         "tickets", "to", "token", "tool", "type", "types", "use", "user", "users", "value", "values", "variable",
         "variables", "view", "voice", "voices", "wait", "was", "we", "what", "when", "where", "which", "whoops", "will", "window", "with",
         "word", "words", "work", "worker", "workers", "workspace", "workspaces", "would", "yeah", "yep", "yes", "you", "yup"
@@ -564,7 +564,7 @@ public struct RomaTranscriptionOutputFilter {
         (#"(?i)^\s*(?:ok(?:ay)?|all\s+right|alright|right|yeah|yes|yep|yup|sure)(?:[ \t]*[,;:…]+[ \t]*)+so[,;:…]*[ \t]+"#, ""),
         (#"(?i)^\s*(?:you\s+know|i\s+mean|like)[,;:…]+[ \t]*"#, "")
     ]
-    private static let continuationFragmentLeadingDiscourseFillerPattern = #"(?i)^\s*(you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?|i[ \t]+mean(?:[ \t]+to[ \t]+say)?|i[ \t]+meant(?:[ \t]+to[ \t]+say)?|ok(?:ay)?|all[ \t]+right|alright|got[ \t]+it|gotcha|no[ \t]+wait|wait|hold[ \t]+on|hang[ \t]+on|sorry|oops|whoops|my[ \t]+bad|yeah|yes|yep|yup|like|basically|so|well)(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
+    private static let continuationFragmentLeadingDiscourseFillerPattern = #"(?i)^\s*(you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?|i[ \t]+mean(?:[ \t]+to[ \t]+say)?|i[ \t]+meant(?:[ \t]+to[ \t]+say)?|ok(?:ay)?|all[ \t]+right|alright|got[ \t]+it|gotcha|no[ \t]+wait|wait|hold[ \t]+on|hang[ \t]+on|sorry|oops|whoops|my[ \t]+bad|actually|instead|rather|yeah|yes|yep|yup|like|basically|so|well)(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let standaloneDiscourseFillerPattern = #"(?i)^\s*you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?[ \t]*[.,;:…]*\s*$"#
     private static let blockedPreviousWordsForTerminalYouKnow: Set<String> = [
         "do", "does", "did", "don't", "if", "know", "let", "should", "to", "whether", "will", "would"
@@ -2008,7 +2008,7 @@ public struct RomaTranscriptionOutputFilter {
 
         if [
             "all right", "alright", "got it", "gotcha", "no wait", "wait", "hold on", "hang on",
-            "sorry", "oops", "whoops", "my bad", "yes", "yep", "yup"
+            "sorry", "oops", "whoops", "my bad", "actually", "instead", "rather", "yes", "yep", "yup"
         ].contains(filler) {
             guard let firstSuffixWord = wordTokens(in: trimmedSuffix).first?.text,
                   isTechnicalContinuationFragmentHead(firstSuffixWord) else {

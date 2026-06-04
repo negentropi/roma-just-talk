@@ -7445,6 +7445,11 @@ struct RomaCoreChecks {
             workflowScript.contains(#"source_dirty=false"#),
             "Windows CI should fail artifacts packaged from dirty source"
         )
+        try require(
+            workflowScript.contains("Run shared core checks") &&
+                workflowScript.contains("swift run RomaCoreChecks"),
+            "Windows CI should run shared core checks before packaging the Windows agent"
+        )
     }
 
     private static func asciiString(_ data: Data, offset: Int, count: Int) throws -> String {

@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Added a Windows CI shared-core check before packaging the Windows agent.
 - Required Windows package smoke to assert clean-source laptop preflight markers.
 - Required Windows laptop preflight proof reports to come from clean packaged source checkouts.
 - Required Windows artifact proof reports to expose the listener's per-session WAV output isolation marker.

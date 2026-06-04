@@ -940,7 +940,9 @@ Invoke-Step "packaged native proof doctors" {
 }
 
 if ($DoctorOnly) {
-    Write-ProofReport -Mode "doctor-only" -IsDoctorOnly $true
+    Write-ProofReport `
+        -Mode (Get-RomaWindowsProofProfileExpectedModeByName -Name "doctor_only") `
+        -IsDoctorOnly $true
     Write-Host ""
     Write-Host "artifact_doctor_only=true"
     exit 0
@@ -975,13 +977,16 @@ if ($usesCloud -and
     throw "Cloud proof requires ApiKeyEnv or ApiKeyName"
 }
 
-$proofMode = if ($UsePackagedWhisperMock) {
-    "packaged-whisper-mock"
+$proofModeProfileName = if ($UsePackagedWhisperMock) {
+    "packaged_whisper_mock_install"
+} elseif ($usesWhisper -and $RunNotepadPasteProof) {
+    "local_whisper_notepad_paste"
 } elseif ($usesWhisper) {
-    "local-whisper"
+    "local_whisper_dictation"
 } else {
-    "cloud"
+    "cloud_dictation"
 }
+$proofMode = Get-RomaWindowsProofProfileExpectedModeByName -Name $proofModeProfileName
 
 if ([string]::IsNullOrWhiteSpace($ConfigPath)) {
     if (($usesCloud -or $usesWhisper -or $RunDictation) -and

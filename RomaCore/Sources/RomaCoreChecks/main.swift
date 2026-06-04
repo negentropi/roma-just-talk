@@ -10184,6 +10184,19 @@ struct RomaCoreChecks {
             "Windows artifact proof should reuse the shared output parser"
         )
         try require(
+            proveScript.contains(#"-Mode (Get-RomaWindowsProofProfileExpectedModeByName -Name "doctor_only")"#) &&
+                proveScript.contains("$proofModeProfileName = if ($UsePackagedWhisperMock)") &&
+                proveScript.contains(#""packaged_whisper_mock_install""#) &&
+                proveScript.contains(#""local_whisper_notepad_paste""#) &&
+                proveScript.contains(#""local_whisper_dictation""#) &&
+                proveScript.contains(#""cloud_dictation""#) &&
+                proveScript.contains("Get-RomaWindowsProofProfileExpectedModeByName -Name $proofModeProfileName") &&
+                !proveScript.contains(#"Write-ProofReport -Mode "doctor-only""#) &&
+                !proveScript.contains(#""packaged-whisper-mock""#) &&
+                !proveScript.contains(#""local-whisper""#),
+            "Windows artifact proof reports should derive proof modes from shared profile specs"
+        )
+        try require(
             windowsProofScript.contains("$configArgs = Add-RomaWindowsAgentConfigurationArgs") &&
                 windowsProofScript.contains("return Add-RomaWindowsAgentConfigurationArgs") &&
                 windowsProofScript.contains(

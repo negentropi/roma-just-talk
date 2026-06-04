@@ -7,39 +7,19 @@ param(
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
+$proofCommonScript = Join-Path $PSScriptRoot "windows-proof-common.ps1"
+if (!(Test-Path -LiteralPath $proofCommonScript)) {
+    throw "Windows proof common helper was not found: $proofCommonScript"
+}
+. $proofCommonScript
+Set-Alias -Name Invoke-Step -Value Invoke-RomaWindowsProofStep -Scope Local -Force
+Set-Alias -Name Assert-OutputContains -Value Assert-RomaWindowsOutputContains -Scope Local -Force
+
 $packageIdentityScript = Join-Path $PSScriptRoot "windows-package-identity.ps1"
 if (!(Test-Path -LiteralPath $packageIdentityScript)) {
     throw "Windows package identity helper was not found: $packageIdentityScript"
 }
 . $packageIdentityScript
-
-function Invoke-Step {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Name,
-        [Parameter(Mandatory = $true)]
-        [scriptblock]$Command
-    )
-
-    Write-Host ""
-    Write-Host "== $Name =="
-    & $Command
-}
-
-function Assert-OutputContains {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Output,
-        [Parameter(Mandatory = $true)]
-        [string]$Expected
-    )
-
-    if (!$Output.Contains($Expected)) {
-        throw "Expected command output to contain '$Expected'"
-    }
-
-    Write-Host "asserted_output=$Expected"
-}
 
 function Resolve-ProductExecutable {
     param(
@@ -391,6 +371,8 @@ try {
     $laptopProofScriptOutput = Join-Path $OutputDir "run-windows-laptop-proof.ps1"
     $identityScriptSource = Join-Path $PSScriptRoot "windows-package-identity.ps1"
     $identityScriptOutput = Join-Path $OutputDir "windows-package-identity.ps1"
+    $proofCommonScriptSource = Join-Path $PSScriptRoot "windows-proof-common.ps1"
+    $proofCommonScriptOutput = Join-Path $OutputDir "windows-proof-common.ps1"
     $manifestScriptSource = Join-Path $PSScriptRoot "windows-manifest.ps1"
     $manifestScriptOutput = Join-Path $OutputDir "windows-manifest.ps1"
     $checkReportScriptSource = Join-Path $PSScriptRoot "check-windows-proof-report.ps1"
@@ -462,6 +444,8 @@ try {
         Write-Host "laptop_proof_script=$laptopProofScriptOutput"
         Copy-Item -LiteralPath $identityScriptSource -Destination $identityScriptOutput -Force
         Write-Host "package_identity_script=$identityScriptOutput"
+        Copy-Item -LiteralPath $proofCommonScriptSource -Destination $proofCommonScriptOutput -Force
+        Write-Host "proof_common_script=$proofCommonScriptOutput"
         Copy-Item -LiteralPath $manifestScriptSource -Destination $manifestScriptOutput -Force
         Write-Host "manifest_script=$manifestScriptOutput"
         Copy-Item -LiteralPath $checkReportScriptSource -Destination $checkReportScriptOutput -Force
@@ -581,6 +565,7 @@ try {
         "laptop_proof_script=$laptopProofScriptOutput",
         "laptop_proof_guide=$laptopProofGuideOutput",
         "package_identity_script=$identityScriptOutput",
+        "proof_common_script=$proofCommonScriptOutput",
         "manifest_script=$manifestScriptOutput",
         "check_report_script=$checkReportScriptOutput",
         "check_set_script=$checkSetScriptOutput",

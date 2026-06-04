@@ -789,6 +789,7 @@ if ($RequireInstall) {
     $installedProofScript = Require-Property -Object $files -Name "installed_proof_script"
     $installedLaptopProofScript = Require-Property -Object $files -Name "installed_laptop_proof_script"
     $installedLaptopProofGuide = Require-Property -Object $files -Name "installed_laptop_proof_guide"
+    $installedProofCommonScript = Require-Property -Object $files -Name "installed_proof_common_script"
     $installedManifestScript = Require-Property -Object $files -Name "installed_manifest_script"
     $installedPackageIdentityScript = Require-Property -Object $files -Name "installed_package_identity_script"
     $installedCheckReportScript = Require-Property -Object $files -Name "installed_check_report_script"
@@ -799,6 +800,7 @@ if ($RequireInstall) {
     Assert-FileProof -Proof $installedProofScript -Name "installed_proof_script"
     Assert-FileProof -Proof $installedLaptopProofScript -Name "installed_laptop_proof_script"
     Assert-FileProof -Proof $installedLaptopProofGuide -Name "installed_laptop_proof_guide"
+    Assert-FileProof -Proof $installedProofCommonScript -Name "installed_proof_common_script"
     Assert-FileProof -Proof $installedManifestScript -Name "installed_manifest_script"
     Assert-FileProof -Proof $installedPackageIdentityScript -Name "installed_package_identity_script"
     Assert-FileProof -Proof $installedCheckReportScript -Name "installed_check_report_script"
@@ -828,6 +830,10 @@ if ($RequireInstall) {
         -ActualProof $installedLaptopProofGuide `
         -ExpectedProof (Require-Property -Object $packageIdentityFiles -Name "WINDOWS-LAPTOP-PROOF.txt") `
         -Name "installed_laptop_proof_guide_matches_package"
+    Assert-FileHashEquals `
+        -ActualProof $installedProofCommonScript `
+        -ExpectedProof (Require-Property -Object $packageIdentityFiles -Name "windows-proof-common.ps1") `
+        -Name "installed_proof_common_script_matches_package"
     Assert-FileHashEquals `
         -ActualProof $installedManifestScript `
         -ExpectedProof (Require-Property -Object $packageIdentityFiles -Name "windows-manifest.ps1") `

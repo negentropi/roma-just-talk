@@ -40,6 +40,18 @@ param(
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
+$proofCommonScript = Join-Path $PSScriptRoot "windows-proof-common.ps1"
+if (!(Test-Path -LiteralPath $proofCommonScript)) {
+    throw "Windows proof common helper was not found: $proofCommonScript"
+}
+. $proofCommonScript
+Set-Alias -Name Invoke-Step -Value Invoke-RomaWindowsProofStep -Scope Local -Force
+Set-Alias -Name Resolve-FullPath -Value Resolve-RomaWindowsFullPath -Scope Local -Force
+Set-Alias -Name Require-File -Value Require-RomaWindowsFile -Scope Local -Force
+Set-Alias -Name Assert-OutputContains -Value Assert-RomaWindowsOutputContains -Scope Local -Force
+Set-Alias -Name Get-FileProof -Value Get-RomaWindowsFileProof -Scope Local -Force
+Set-Alias -Name Get-FileHashProof -Value Get-RomaWindowsFileHashProof -Scope Local -Force
+
 $packageIdentityScript = Join-Path $PSScriptRoot "windows-package-identity.ps1"
 if (!(Test-Path -LiteralPath $packageIdentityScript)) {
     throw "Windows package identity helper was not found: $packageIdentityScript"
@@ -52,28 +64,6 @@ if (!(Test-Path -LiteralPath $manifestScript)) {
 }
 . $manifestScript
 
-function Invoke-Step {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Name,
-        [Parameter(Mandatory = $true)]
-        [scriptblock]$Command
-    )
-
-    Write-Host ""
-    Write-Host "== $Name =="
-    & $Command
-}
-
-function Resolve-FullPath {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Path
-    )
-
-    return $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Path)
-}
-
 function Resolve-PackagePath {
     param(
         [Parameter(Mandatory = $true)]
@@ -85,32 +75,6 @@ function Resolve-PackagePath {
     }
 
     return Resolve-FullPath -Path (Join-Path $PackageDir $Path)
-}
-
-function Require-File {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Path
-    )
-
-    if (!(Test-Path -LiteralPath $Path)) {
-        throw "Required file was not found: $Path"
-    }
-}
-
-function Assert-OutputContains {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Output,
-        [Parameter(Mandatory = $true)]
-        [string]$Expected
-    )
-
-    if (!$Output.Contains($Expected)) {
-        throw "Expected command output to contain '$Expected'"
-    }
-
-    Write-Host "asserted_output=$Expected"
 }
 
 function Invoke-ProofAgentDoctorCommand {
@@ -197,40 +161,6 @@ function Invoke-ConfigDoctor {
     Assert-OutputContains -Output $output -Expected "config_valid=true"
     Assert-OutputContains -Output $output -Expected "transcription_client="
     return $output
-}
-
-function Get-FileProof {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Path
-    )
-
-    $exists = Test-Path -LiteralPath $Path
-    $bytes = 0
-    if ($exists) {
-        $bytes = (Get-Item -LiteralPath $Path).Length
-    }
-
-    return [ordered]@{
-        path = $Path
-        exists = $exists
-        bytes = $bytes
-    }
-}
-
-function Get-FileHashProof {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Path
-    )
-
-    $proof = Get-FileProof -Path $Path
-    $proof["sha256"] = ""
-    if ($proof["exists"]) {
-        $proof["sha256"] = (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant()
-    }
-
-    return $proof
 }
 
 function Test-ContainsText {
@@ -820,6 +750,7 @@ function Write-ProofReport {
             installed_proof_script = (Get-FileHashProof -Path (Join-Path $InstallDir "prove-windows-agent-artifact.ps1"))
             installed_laptop_proof_script = (Get-FileHashProof -Path (Join-Path $InstallDir "run-windows-laptop-proof.ps1"))
             installed_laptop_proof_guide = (Get-FileHashProof -Path (Join-Path $InstallDir "WINDOWS-LAPTOP-PROOF.txt"))
+            installed_proof_common_script = (Get-FileHashProof -Path (Join-Path $InstallDir "windows-proof-common.ps1"))
             installed_manifest_script = (Get-FileHashProof -Path (Join-Path $InstallDir "windows-manifest.ps1"))
             installed_package_identity_script = (Get-FileHashProof -Path (Join-Path $InstallDir "windows-package-identity.ps1"))
             installed_check_report_script = (Get-FileHashProof -Path (Join-Path $InstallDir "check-windows-proof-report.ps1"))
@@ -904,6 +835,7 @@ $installScript = Join-Path $PackageDir "install-windows-agent.ps1"
 $runScript = Join-Path $PackageDir "run-windows-agent.ps1"
 $proofScript = Join-Path $PackageDir "prove-windows-agent-artifact.ps1"
 $laptopProofScript = Join-Path $PackageDir "run-windows-laptop-proof.ps1"
+$packagedProofCommonScript = Join-Path $PackageDir "windows-proof-common.ps1"
 $checkReportScript = Join-Path $PackageDir "check-windows-proof-report.ps1"
 $checkSetScript = Join-Path $PackageDir "check-windows-proof-set.ps1"
 $manifestPath = Join-Path $PackageDir "manifest.txt"
@@ -933,6 +865,7 @@ Invoke-Step "artifact files" {
     Require-File -Path $runScript
     Require-File -Path $proofScript
     Require-File -Path $laptopProofScript
+    Require-File -Path $packagedProofCommonScript
     Require-File -Path $checkReportScript
     Require-File -Path $checkSetScript
     Require-File -Path $manifestPath
@@ -960,6 +893,7 @@ Invoke-Step "artifact manifest" {
         "install_proof_shortcut",
         "local_whisper_install_config",
         "local_whisper_shortcut",
+        "proof_common_script",
         "manifest_script",
         "package_identity_script",
         "swift_runtime_dlls"

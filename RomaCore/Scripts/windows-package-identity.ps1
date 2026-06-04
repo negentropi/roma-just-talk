@@ -1,39 +1,11 @@
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-function Get-RomaPackageIdentityFileProof {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Path
-    )
-
-    $exists = Test-Path -LiteralPath $Path
-    $bytes = 0
-    if ($exists) {
-        $bytes = (Get-Item -LiteralPath $Path).Length
-    }
-
-    return [ordered]@{
-        path = $Path
-        exists = $exists
-        bytes = $bytes
-    }
+$proofCommonScript = Join-Path $PSScriptRoot "windows-proof-common.ps1"
+if (!(Test-Path -LiteralPath $proofCommonScript)) {
+    throw "Windows proof common helper was not found: $proofCommonScript"
 }
-
-function Get-RomaPackageIdentityFileHashProof {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Path
-    )
-
-    $proof = Get-RomaPackageIdentityFileProof -Path $Path
-    $proof["sha256"] = ""
-    if ($proof["exists"]) {
-        $proof["sha256"] = (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant()
-    }
-
-    return $proof
-}
+. $proofCommonScript
 
 function Get-RomaPackageIdentityHash {
     param(
@@ -71,6 +43,7 @@ function Get-RomaPackageIdentityProof {
         "WINDOWS-LAPTOP-PROOF.txt",
         "check-windows-proof-report.ps1",
         "check-windows-proof-set.ps1",
+        "windows-proof-common.ps1",
         "windows-manifest.ps1",
         "windows-package-identity.ps1",
         "manifest.txt"
@@ -88,7 +61,7 @@ function Get-RomaPackageIdentityProof {
     $entries = @()
     foreach ($relativePath in $relativePaths) {
         $path = Join-Path $PackageDir $relativePath
-        $proof = Get-RomaPackageIdentityFileHashProof -Path $path
+        $proof = Get-RomaWindowsFileHashProof -Path $path
         $files[$relativePath] = $proof
         if (!$proof["exists"] -or [string]::IsNullOrWhiteSpace([string]$proof["sha256"])) {
             throw "Package identity file was not hashable: $path"

@@ -34,6 +34,17 @@ $script:hotkeyDeliveryPreflightOutput = ""
 $script:microphonePreflightOutput = ""
 $script:localWhisperPreflightOutput = ""
 
+$proofCommonScript = Join-Path $PSScriptRoot "windows-proof-common.ps1"
+if (!(Test-Path -LiteralPath $proofCommonScript)) {
+    throw "Windows proof common helper was not found: $proofCommonScript"
+}
+. $proofCommonScript
+Set-Alias -Name Invoke-Step -Value Invoke-RomaWindowsProofStep -Scope Local -Force
+Set-Alias -Name Resolve-FullPath -Value Resolve-RomaWindowsFullPath -Scope Local -Force
+Set-Alias -Name Require-File -Value Require-RomaWindowsFile -Scope Local -Force
+Set-Alias -Name Assert-OutputContains -Value Assert-RomaWindowsOutputContains -Scope Local -Force
+Set-Alias -Name Get-FileProof -Value Get-RomaWindowsFileProof -Scope Local -Force
+
 $packageIdentityScript = Join-Path $PSScriptRoot "windows-package-identity.ps1"
 if (!(Test-Path -LiteralPath $packageIdentityScript)) {
     throw "Windows package identity helper was not found: $packageIdentityScript"
@@ -45,26 +56,6 @@ if (!(Test-Path -LiteralPath $manifestScript)) {
     throw "Windows manifest helper was not found: $manifestScript"
 }
 . $manifestScript
-
-function Resolve-FullPath {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Path
-    )
-
-    return $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Path)
-}
-
-function Require-File {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Path
-    )
-
-    if (!(Test-Path -LiteralPath $Path)) {
-        throw "Required file was not found: $Path"
-    }
-}
 
 function Require-FileWithMinimumBytes {
     param(
@@ -83,25 +74,6 @@ function Require-FileWithMinimumBytes {
     Write-Host "proof_file_bytes=$($item.Length)"
 }
 
-function Get-FileProof {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Path
-    )
-
-    $exists = Test-Path -LiteralPath $Path
-    $bytes = 0
-    if ($exists) {
-        $bytes = (Get-Item -LiteralPath $Path).Length
-    }
-
-    return [ordered]@{
-        path = $Path
-        exists = $exists
-        bytes = $bytes
-    }
-}
-
 function Get-CurrentWindowsUserSid {
     if ([System.Environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT) {
         return ""
@@ -117,21 +89,6 @@ function Get-CurrentWindowsUserSid {
     }
 
     return ""
-}
-
-function Assert-OutputContains {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Output,
-        [Parameter(Mandatory = $true)]
-        [string]$Expected
-    )
-
-    if (!$Output.Contains($Expected)) {
-        throw "Expected command output to contain '$Expected'"
-    }
-
-    Write-Host "asserted_output=$Expected"
 }
 
 function Get-HotkeyDeliveryPreflightProof {
@@ -173,19 +130,6 @@ function Get-LocalWhisperPreflightProof {
         executable_present = $Output.Contains("executable=")
         model_file_present = $Output.Contains("model_file=")
     }
-}
-
-function Invoke-Step {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Name,
-        [Parameter(Mandatory = $true)]
-        [scriptblock]$Command
-    )
-
-    Write-Host ""
-    Write-Host "== $Name =="
-    & $Command
 }
 
 function Write-HoldDictationPrompt {
@@ -502,10 +446,12 @@ $whisperArguments = @(
 $proofScript = Join-Path $PackageDir "prove-windows-agent-artifact.ps1"
 $checkSetScript = Join-Path $PackageDir "check-windows-proof-set.ps1"
 $proofAgent = Join-Path $PackageDir "RomaProofAgent.exe"
+$packagedProofCommonScript = Join-Path $PackageDir "windows-proof-common.ps1"
 $manifestPath = Join-Path $PackageDir "manifest.txt"
 Require-File -Path $proofScript
 Require-File -Path $checkSetScript
 Require-File -Path $proofAgent
+Require-File -Path $packagedProofCommonScript
 Require-File -Path $manifestPath
 $script:artifactManifest = Read-RomaWindowsManifest -Path $manifestPath
 

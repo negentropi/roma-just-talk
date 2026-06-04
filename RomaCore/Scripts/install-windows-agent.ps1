@@ -36,38 +36,14 @@ param(
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-function Invoke-Step {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Name,
-        [Parameter(Mandatory = $true)]
-        [scriptblock]$Command
-    )
-
-    Write-Host ""
-    Write-Host "== $Name =="
-    & $Command
+$proofCommonScript = Join-Path $PSScriptRoot "windows-proof-common.ps1"
+if (!(Test-Path -LiteralPath $proofCommonScript)) {
+    throw "Windows proof common helper was not found: $proofCommonScript"
 }
-
-function Resolve-FullPath {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Path
-    )
-
-    return $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Path)
-}
-
-function Require-File {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Path
-    )
-
-    if (!(Test-Path -LiteralPath $Path)) {
-        throw "Required file was not found: $Path"
-    }
-}
+. $proofCommonScript
+Set-Alias -Name Invoke-Step -Value Invoke-RomaWindowsProofStep -Scope Local -Force
+Set-Alias -Name Resolve-FullPath -Value Resolve-RomaWindowsFullPath -Scope Local -Force
+Set-Alias -Name Require-File -Value Require-RomaWindowsFile -Scope Local -Force
 
 function New-AgentShortcut {
     param(
@@ -221,6 +197,7 @@ Invoke-Step "copy package files" {
         "prove-windows-agent-artifact.ps1",
         "run-windows-laptop-proof.ps1",
         "WINDOWS-LAPTOP-PROOF.txt",
+        "windows-proof-common.ps1",
         "windows-manifest.ps1",
         "windows-package-identity.ps1",
         "check-windows-proof-report.ps1",
@@ -248,6 +225,7 @@ Invoke-Step "copy package files" {
     Require-File -Path (Join-Path $InstallDir "RomaProofAgent.exe")
     Require-File -Path (Join-Path $InstallDir "smoke-windows-agent.ps1")
     Require-File -Path (Join-Path $InstallDir "run-windows-laptop-proof.ps1")
+    Require-File -Path (Join-Path $InstallDir "windows-proof-common.ps1")
     Require-File -Path (Join-Path $InstallDir "windows-manifest.ps1")
     Require-File -Path (Join-Path $InstallDir "windows-package-identity.ps1")
     Require-File -Path (Join-Path $InstallDir "check-windows-proof-set.ps1")

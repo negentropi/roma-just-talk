@@ -8960,6 +8960,7 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Assert-RomaWindowsHoldTimeoutDefaultOutput") &&
                 proofCommonScript.contains("function Assert-RomaWindowsClipboardRestoreDefaultOutput") &&
                 proofCommonScript.contains("function Assert-RomaWindowsMinimumPermissionOutput") &&
+                proofCommonScript.contains("function Assert-RomaWindowsAgentScriptCommonOptions") &&
                 proofCommonScript.contains("function Get-RomaWindowsProofSurfaceFiles") &&
                 proofCommonScript.contains("function Get-RomaWindowsInstalledProofSurfaceFileMap") &&
                 proofCommonScript.contains("function Get-RomaWindowsRuntimeDefaultOutputProof") &&
@@ -9167,21 +9168,25 @@ struct RomaCoreChecks {
             "Windows laptop proof runner should distinguish explicit clipboard restore delay from the default"
         )
         try require(
-            laptopProofScript.contains(#"if ($NoRestoreClipboard -and $hasExplicitClipboardRestoreDelay)"#),
-            "Windows laptop proof runner should reject no-restore plus explicit restore delay before invoking nested scripts"
+            proofCommonScript.contains(#"if ($NoRestoreClipboard -and $HasClipboardRestoreDelay)"#) &&
+                proofCommonScript.contains(#"throw "NoRestoreClipboard and ClipboardRestoreDelaySeconds are mutually exclusive""#),
+            "Windows proof helper should own no-restore plus explicit restore-delay validation"
         )
-        let clipboardRestoreDelayConflictScripts = [
+        let sharedOptionValidationScripts = [
             ("windows-proof.ps1", windowsProofScript),
             ("run-windows-agent.ps1", runScript),
             ("smoke-windows-agent.ps1", smokeScript),
             ("install-windows-agent.ps1", installScript),
-            ("prove-windows-agent-artifact.ps1", proveScript)
+            ("prove-windows-agent-artifact.ps1", proveScript),
+            ("run-windows-laptop-proof.ps1", laptopProofScript)
         ]
-        for (scriptName, scriptSource) in clipboardRestoreDelayConflictScripts {
+        for (scriptName, scriptSource) in sharedOptionValidationScripts {
             try require(
                 scriptSource.contains(#"$hasExplicitClipboardRestoreDelay = $PSBoundParameters.ContainsKey("ClipboardRestoreDelaySeconds")"#) &&
-                    scriptSource.contains(#"if ($NoRestoreClipboard -and $hasExplicitClipboardRestoreDelay)"#),
-                "\(scriptName) should reject no-restore plus explicit restore delay before forwarding options"
+                    scriptSource.contains("Assert-RomaWindowsAgentScriptCommonOptions") &&
+                    scriptSource.contains("-HasClipboardRestoreDelay $hasExplicitClipboardRestoreDelay") &&
+                    !scriptSource.contains(#"if ($NoRestoreClipboard -and $hasExplicitClipboardRestoreDelay)"#),
+                "\(scriptName) should use the shared Windows script option validation helper"
             )
         }
         try require(

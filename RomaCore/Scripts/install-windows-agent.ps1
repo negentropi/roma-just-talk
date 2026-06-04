@@ -155,17 +155,14 @@ if ([string]::IsNullOrWhiteSpace($ConfigPath)) {
 }
 $ConfigPath = Resolve-FullPath -Path $ConfigPath
 
-if ($RestoreClipboard -and $NoRestoreClipboard) {
-    throw "RestoreClipboard and NoRestoreClipboard are mutually exclusive"
-}
-
-if ($NoRestoreClipboard -and $hasExplicitClipboardRestoreDelay) {
-    throw "NoRestoreClipboard and ClipboardRestoreDelaySeconds are mutually exclusive"
-}
-
-if ($ClipboardRestoreDelaySeconds -lt 0) {
-    throw "ClipboardRestoreDelaySeconds must be non-negative"
-}
+Assert-RomaWindowsAgentScriptCommonOptions `
+    -UseHoldHook $UseHoldHook.IsPresent `
+    -UseToggle $UseToggle.IsPresent `
+    -PasteDictation $PasteDictation.IsPresent `
+    -RestoreClipboard $RestoreClipboard.IsPresent `
+    -NoRestoreClipboard $NoRestoreClipboard.IsPresent `
+    -HasClipboardRestoreDelay $hasExplicitClipboardRestoreDelay `
+    -ClipboardRestoreDelaySeconds $ClipboardRestoreDelaySeconds
 
 if ([string]::IsNullOrWhiteSpace($SecretDir) -and
     ![string]::IsNullOrWhiteSpace($ApiKeyName)) {

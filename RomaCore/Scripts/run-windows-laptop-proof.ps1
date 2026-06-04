@@ -448,17 +448,12 @@ function Add-ShortcutProofArgs {
     return $ArgumentList
 }
 
-if ($RestoreClipboard -and $NoRestoreClipboard) {
-    throw "RestoreClipboard and NoRestoreClipboard are mutually exclusive"
-}
-
-if ($NoRestoreClipboard -and $hasExplicitClipboardRestoreDelay) {
-    throw "NoRestoreClipboard and ClipboardRestoreDelaySeconds are mutually exclusive"
-}
-
-if ($ClipboardRestoreDelaySeconds -lt 0) {
-    throw "ClipboardRestoreDelaySeconds must be non-negative"
-}
+Assert-RomaWindowsAgentScriptCommonOptions `
+    -PasteDictation $true `
+    -RestoreClipboard $RestoreClipboard.IsPresent `
+    -NoRestoreClipboard $NoRestoreClipboard.IsPresent `
+    -HasClipboardRestoreDelay $hasExplicitClipboardRestoreDelay `
+    -ClipboardRestoreDelaySeconds $ClipboardRestoreDelaySeconds
 
 if ($MicPreflightSeconds -le 0) {
     throw "MicPreflightSeconds must be positive"

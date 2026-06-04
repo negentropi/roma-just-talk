@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Shared Windows proof-script option validation so source proof, install, launcher, smoke, artifact, and laptop proof paths reject incompatible hold/paste/clipboard options through one helper.
 - Required full Windows laptop local-whisper proof to archive one real installed listener session, not only one-shot dictation and zero-session listener smoke.
 - Required Windows laptop microphone preflight proof to report positive recorded duration and positive included pre-roll seconds.
 - Required Windows shortcuts and startup shortcuts to pass the exact install dir to the launcher.

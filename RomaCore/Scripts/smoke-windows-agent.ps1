@@ -94,21 +94,14 @@ function Assert-WavFileWithBytes {
     }
 }
 
-if ($UseHoldHook -and $UseToggle) {
-    throw "UseHoldHook and UseToggle are mutually exclusive"
-}
-
-if ($RestoreClipboard -and $NoRestoreClipboard) {
-    throw "RestoreClipboard and NoRestoreClipboard are mutually exclusive"
-}
-
-if ($NoRestoreClipboard -and $hasExplicitClipboardRestoreDelay) {
-    throw "NoRestoreClipboard and ClipboardRestoreDelaySeconds are mutually exclusive"
-}
-
-if ($ClipboardRestoreDelaySeconds -lt 0) {
-    throw "ClipboardRestoreDelaySeconds must be non-negative"
-}
+Assert-RomaWindowsAgentScriptCommonOptions `
+    -UseHoldHook $UseHoldHook.IsPresent `
+    -UseToggle $UseToggle.IsPresent `
+    -PasteDictation $PasteDictation.IsPresent `
+    -RestoreClipboard $RestoreClipboard.IsPresent `
+    -NoRestoreClipboard $NoRestoreClipboard.IsPresent `
+    -HasClipboardRestoreDelay $hasExplicitClipboardRestoreDelay `
+    -ClipboardRestoreDelaySeconds $ClipboardRestoreDelaySeconds
 
 if ([string]::IsNullOrWhiteSpace($PackageDir)) {
     $PackageDir = $PSScriptRoot

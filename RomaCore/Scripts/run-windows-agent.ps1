@@ -42,25 +42,15 @@ Set-Alias -Name Resolve-FullPath -Value Resolve-RomaWindowsFullPath -Scope Local
 Set-Alias -Name Require-File -Value Require-RomaWindowsFile -Scope Local -Force
 Set-Alias -Name Assert-OutputContains -Value Assert-RomaWindowsOutputContains -Scope Local -Force
 
-if ($UseHoldHook -and $UseToggle) {
-    throw "UseHoldHook and UseToggle are mutually exclusive"
-}
-
-if ($PasteDictation -and $NoPaste) {
-    throw "PasteDictation and NoPaste are mutually exclusive"
-}
-
-if ($RestoreClipboard -and $NoRestoreClipboard) {
-    throw "RestoreClipboard and NoRestoreClipboard are mutually exclusive"
-}
-
-if ($NoRestoreClipboard -and $hasExplicitClipboardRestoreDelay) {
-    throw "NoRestoreClipboard and ClipboardRestoreDelaySeconds are mutually exclusive"
-}
-
-if ($ClipboardRestoreDelaySeconds -lt 0) {
-    throw "ClipboardRestoreDelaySeconds must be non-negative"
-}
+Assert-RomaWindowsAgentScriptCommonOptions `
+    -UseHoldHook $UseHoldHook.IsPresent `
+    -UseToggle $UseToggle.IsPresent `
+    -PasteDictation $PasteDictation.IsPresent `
+    -NoPaste $NoPaste.IsPresent `
+    -RestoreClipboard $RestoreClipboard.IsPresent `
+    -NoRestoreClipboard $NoRestoreClipboard.IsPresent `
+    -HasClipboardRestoreDelay $hasExplicitClipboardRestoreDelay `
+    -ClipboardRestoreDelaySeconds $ClipboardRestoreDelaySeconds
 
 if ($PSBoundParameters.ContainsKey("MaxSessions") -and $MaxSessions -lt 0) {
     throw "MaxSessions must be non-negative"

@@ -335,6 +335,39 @@ function Assert-RomaWindowsMinimumPermissionOutput {
     Assert-RomaWindowsOutputMarkers -Output $Output -Markers (Get-RomaWindowsMinimumPermissionOutputMarkers)
 }
 
+function Assert-RomaWindowsAgentScriptCommonOptions {
+    param(
+        [bool]$UseHoldHook = $false,
+        [bool]$UseToggle = $false,
+        [bool]$PasteDictation = $false,
+        [bool]$NoPaste = $false,
+        [bool]$RestoreClipboard = $false,
+        [bool]$NoRestoreClipboard = $false,
+        [bool]$HasClipboardRestoreDelay = $false,
+        [double]$ClipboardRestoreDelaySeconds = 2
+    )
+
+    if ($UseHoldHook -and $UseToggle) {
+        throw "UseHoldHook and UseToggle are mutually exclusive"
+    }
+
+    if ($PasteDictation -and $NoPaste) {
+        throw "PasteDictation and NoPaste are mutually exclusive"
+    }
+
+    if ($RestoreClipboard -and $NoRestoreClipboard) {
+        throw "RestoreClipboard and NoRestoreClipboard are mutually exclusive"
+    }
+
+    if ($NoRestoreClipboard -and $HasClipboardRestoreDelay) {
+        throw "NoRestoreClipboard and ClipboardRestoreDelaySeconds are mutually exclusive"
+    }
+
+    if ($ClipboardRestoreDelaySeconds -lt 0) {
+        throw "ClipboardRestoreDelaySeconds must be non-negative"
+    }
+}
+
 function Get-RomaWindowsRuntimeDefaultOutputProof {
     param(
         [string]$Output = ""

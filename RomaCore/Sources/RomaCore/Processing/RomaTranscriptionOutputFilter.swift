@@ -1994,9 +1994,12 @@ public struct RomaTranscriptionOutputFilter {
         after precedingText: String
     ) -> Bool {
         let trimmedSuffix = suffix.trimmingCharacters(in: .whitespacesAndNewlines)
+        let isNoisyFinalWordOrSingleContinuation = isNoisyFinalWordOrSingleContinuationFragment(trimmedSuffix)
         guard !trimmedSuffix.isEmpty,
               !hasInternalSentenceBoundary(trimmedSuffix),
-              isShortFragment(trimmedSuffix) || isNoisyPreservedBoundaryContinuationFragment(trimmedSuffix) else {
+              isShortFragment(trimmedSuffix) ||
+                isNoisyPreservedBoundaryContinuationFragment(trimmedSuffix) ||
+                isNoisyFinalWordOrSingleContinuation else {
             return false
         }
 
@@ -2051,6 +2054,32 @@ public struct RomaTranscriptionOutputFilter {
 
         return ["final", "single"].contains(tokens[index].text) &&
             ["word", "words"].contains(tokens[index + 1].text)
+    }
+
+    private static func isNoisyFinalWordOrSingleContinuationFragment(_ text: String) -> Bool {
+        let tokens = wordTokens(in: text)
+        guard let firstWord = tokens.first?.text else { return false }
+        let headIndex: Int
+
+        if ["a", "an", "the"].contains(firstWord),
+           tokens.count >= 2 {
+            headIndex = 1
+        } else {
+            headIndex = 0
+        }
+
+        guard tokens.indices.contains(headIndex + 3),
+              tokens[headIndex].text == "final",
+              ["word", "words"].contains(tokens[headIndex + 1].text),
+              tokens[headIndex + 2].text == "or",
+              tokens[headIndex + 3].text == "single" else {
+            return false
+        }
+
+        let nextIndex = headIndex + 4
+        guard nextIndex < tokens.count else { return true }
+        return nextIndex + 1 == tokens.count &&
+            ["word", "words"].contains(tokens[nextIndex].text)
     }
 
     private static func isTechnicalContinuationFragmentHead(_ word: String) -> Bool {

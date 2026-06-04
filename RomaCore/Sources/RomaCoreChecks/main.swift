@@ -8838,6 +8838,9 @@ struct RomaCoreChecks {
                 packageScript.contains("proof_set_laptop_preflight_local_whisper=False") &&
                 packageScript.contains("proof_set_laptop_preflight_local_whisper=True") &&
                 packageScript.contains("proof_set_laptop_preflight_source_dirty=false") &&
+                packageScript.contains("microphone_preflight_included_pre_roll_seconds=") &&
+                packageScript.contains("proof_bool=reported_positive_pre_roll value=True") &&
+                packageScript.contains("proof_number=included_pre_roll_seconds value=") &&
                 packageScript.contains("proof_set_source_dirty=false") &&
                 packageScript.contains("Archived full-proof recheck") &&
                 packageScript.contains("check-windows-proof-set.ps1 -LaptopPreflightReportPath") &&

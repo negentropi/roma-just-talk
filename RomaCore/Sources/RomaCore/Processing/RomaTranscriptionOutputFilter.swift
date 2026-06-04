@@ -1426,8 +1426,12 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         let isContinuingInsertion = activeContext.map { isContinuingSentence(after: $0.precedingText) } ?? false
-        if isContinuingInsertion {
-            polishedText = removeUnmatchedSquareBracketContinuationArtifact(from: polishedText)
+        if isContinuingInsertion,
+           let activeContext {
+            polishedText = removeUnmatchedBoundaryContinuationArtifact(
+                from: polishedText,
+                after: activeContext.precedingText
+            )
         }
         let isPlainNonASCIIBoundaryContinuation = isContinuingInsertion &&
             isPlainNonASCIIBoundaryContinuationFragment(polishedText)
@@ -9043,7 +9047,7 @@ public struct RomaTranscriptionOutputFilter {
         return normalizeWhitespace(strippedText)
     }
 
-    private static func removeUnmatchedSquareBracketContinuationArtifact(from text: String) -> String {
+    private static func removeUnmatchedBoundaryContinuationArtifact(from text: String, after precedingText: String) -> String {
         let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedText.isEmpty,
               !hasInternalSentenceBoundary(trimmedText),
@@ -9054,27 +9058,64 @@ public struct RomaTranscriptionOutputFilter {
 
         var candidate = removeTrailingFragmentPunctuationPreservingAbbreviation(from: trimmedText)
         guard !isPreservedGeneratedQuestionFragment(candidate) else { return text }
-        var didRemoveBoundary = false
-        if candidate.first == "[",
-           !candidate.contains("]") {
+        if let first = candidate.first,
+           let closingBoundary = generatedContinuationClosingBoundary(for: first),
+           !candidate.contains(closingBoundary) {
             candidate.removeFirst()
-            didRemoveBoundary = true
-        }
-        if candidate.last == "]",
-           !candidate.contains("[") {
-            candidate.removeLast()
-            didRemoveBoundary = true
+            return cleanedUnmatchedBoundaryContinuation(candidate, originalText: text)
         }
 
-        let cleanedText = candidate.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard didRemoveBoundary,
-              !cleanedText.isEmpty,
+        if let last = candidate.last,
+           let openingBoundary = generatedContinuationOpeningBoundary(for: last),
+           !candidate.contains(openingBoundary),
+           !hasUnmatchedOpeningBoundary(openingBoundary, closedBy: last, in: precedingText) {
+            candidate.removeLast()
+            return cleanedUnmatchedBoundaryContinuation(candidate, originalText: text)
+        }
+
+        return text
+    }
+
+    private static func cleanedUnmatchedBoundaryContinuation(_ text: String, originalText: String) -> String {
+        let cleanedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !cleanedText.isEmpty,
               wordCount(in: cleanedText) <= 5,
               !hasInternalSentenceBoundary(cleanedText) else {
-            return text
+            return originalText
         }
 
         return cleanedText
+    }
+
+    private static func generatedContinuationClosingBoundary(for opening: Character) -> Character? {
+        switch opening {
+        case "(": return ")"
+        case "[": return "]"
+        case "{": return "}"
+        default: return nil
+        }
+    }
+
+    private static func generatedContinuationOpeningBoundary(for closing: Character) -> Character? {
+        switch closing {
+        case ")": return "("
+        case "]": return "["
+        case "}": return "{"
+        default: return nil
+        }
+    }
+
+    private static func hasUnmatchedOpeningBoundary(_ opening: Character, closedBy closing: Character, in text: String) -> Bool {
+        var balance = 0
+        for character in text {
+            if character == opening {
+                balance += 1
+            } else if character == closing,
+                      balance > 0 {
+                balance -= 1
+            }
+        }
+        return balance > 0
     }
 
     private static func containsInlinePreservedBoundary(_ text: String) -> Bool {

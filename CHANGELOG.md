@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Trimmed unmatched parenthesis and brace artifacts around short continuation fragments while preserving real delimiter closures.
 - Trimmed unmatched square-bracket artifacts around short continuation fragments.
 - Trimmed leading correction markers before "final word or single" continuations while preserving longer ordinary continuations.
 - Routed Windows proof profile validation through the shared proof profile specs instead of a duplicate parameter list.

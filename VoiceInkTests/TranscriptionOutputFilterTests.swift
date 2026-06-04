@@ -387,6 +387,8 @@ struct TranscriptionOutputFilterTests {
         let selectedTextContext = TranscriptionOutputFilter.TextInsertionContext(precedingText: "Done?", selectedText: "old")
         let selectedMidSentenceContext = TranscriptionOutputFilter.TextInsertionContext(precedingText: "Use ", selectedText: "old")
         let openParenthesisContext = TranscriptionOutputFilter.TextInsertionContext(precedingText: "(")
+        let openBracketContext = TranscriptionOutputFilter.TextInsertionContext(precedingText: "[")
+        let openBraceContext = TranscriptionOutputFilter.TextInsertionContext(precedingText: "{")
         let wordBeforeParenthesisContext = TranscriptionOutputFilter.TextInsertionContext(precedingText: "Use")
         let wordBeforeQuoteContext = TranscriptionOutputFilter.TextInsertionContext(precedingText: "She said")
         let unmatchedStraightQuoteContext = TranscriptionOutputFilter.TextInsertionContext(precedingText: "She said \"hello")
@@ -695,6 +697,13 @@ struct TranscriptionOutputFilterTests {
         #expect(TranscriptionOutputFilter.applyInsertionPolish("What?]", context: midSentenceContext) == "what?]")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("【What?】", context: midSentenceContext) == "【what?】")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("«What?»", context: midSentenceContext) == "«what?»")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("Model).", context: midSentenceContext) == "model")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("A final word or single).", context: midSentenceContext) == "a final word or single")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("Model}.", context: midSentenceContext) == "model")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("A final word or single}.", context: midSentenceContext) == "a final word or single")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("Model).", context: openParenthesisContext) == "model)")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("Model].", context: openBracketContext) == "model]")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("Model}.", context: openBraceContext) == "model}")
         #expect(
             TranscriptionOutputFilter.applyInsertionSpacing(
                 TranscriptionOutputFilter.applyInsertionPolish(

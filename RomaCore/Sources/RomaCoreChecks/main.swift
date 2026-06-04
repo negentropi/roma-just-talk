@@ -6092,6 +6092,49 @@ struct RomaCoreChecks {
             "insertion polish should preserve trailing brackets after question words"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Model).", context: midSentenceContext) == "model",
+            "insertion polish should remove unmatched trailing parentheses from generated fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "A final word or single).",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "insertion polish should remove unmatched trailing parentheses from longer generated fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Model}.", context: midSentenceContext) == "model",
+            "insertion polish should remove unmatched trailing braces from generated fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "A final word or single}.",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "insertion polish should remove unmatched trailing braces from longer generated fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Model).",
+                context: RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "(")
+            ) == "model)",
+            "insertion polish should preserve trailing parentheses after matching open context"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Model].",
+                context: RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "[")
+            ) == "model]",
+            "insertion polish should preserve trailing brackets after matching open context"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Model}.",
+                context: RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "{")
+            ) == "model}",
+            "insertion polish should preserve trailing braces after matching open context"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("U.S.\"", context: midSentenceContext) == "U.S.",
             "insertion polish should preserve abbreviation periods when removing trailing generated quotes"
         )
@@ -7938,6 +7981,39 @@ struct RomaCoreChecks {
         try require(
             await unmatchedBracketFragmentInserter.pastedText == " a final word or single",
             "pipeline should paste unmatched square bracket artifacts as clean continuation text"
+        )
+
+        let unmatchedBraceFragmentRecorder = FakeRecorder()
+        let unmatchedBraceFragmentInserter = FakeTextInsertion()
+        let unmatchedBraceFragmentPipeline = DictationPipeline(
+            recorder: unmatchedBraceFragmentRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "unmatched-brace-fragment-proof.wav",
+                text: "A final word or single}."
+            ),
+            textInsertion: unmatchedBraceFragmentInserter
+        )
+        let unmatchedBraceFragmentRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/unmatched-brace-fragment-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await unmatchedBraceFragmentRecorder.startPreRollBuffering()
+        let unmatchedBraceFragmentResult = try await unmatchedBraceFragmentPipeline.runRecordingWindow(
+            unmatchedBraceFragmentRequest
+        ) {}
+
+        try require(
+            unmatchedBraceFragmentResult.processedText == " a final word or single",
+            "pipeline should clean unmatched brace artifacts during mid-sentence polish"
+        )
+        try require(
+            await unmatchedBraceFragmentInserter.pastedText == " a final word or single",
+            "pipeline should paste unmatched brace artifacts as clean continuation text"
         )
 
         let noWaitIMeanRecorder = FakeRecorder()

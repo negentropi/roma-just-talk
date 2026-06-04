@@ -1159,9 +1159,29 @@ struct RomaCoreChecks {
                 "ellipsis separated partial-word restart"
             ),
             (
+                "I think the mo module works.",
+                "I think the module works.",
+                "unpunctuated partial-word restart"
+            ),
+            (
+                "I think we sh should ship.",
+                "I think we should ship.",
+                "short unpunctuated partial-word restart"
+            ),
+            (
                 "The pre-flight check runs.",
                 "The pre-flight check runs.",
                 "hyphenated word guard"
+            ),
+            (
+                "Type in input mode.",
+                "Type in input mode.",
+                "common-prefix prose guard"
+            ),
+            (
+                "We went today.",
+                "We went today.",
+                "pronoun-prefix prose guard"
             ),
             (
                 "x - x is zero.",
@@ -6972,6 +6992,12 @@ struct RomaCoreChecks {
             checkReportScript.contains(#"$uri.Scheme -ne "https""#) &&
                 checkReportScript.contains("Cloud laptop proof must use an https endpoint"),
             "Windows cloud laptop proof should require secure cloud endpoints"
+        )
+        try require(
+            checkReportScript.contains(#"$endpointPath = $uri.AbsolutePath.ToLowerInvariant().TrimEnd("/")"#) &&
+                checkReportScript.contains(#"$endpointPath.EndsWith("/audio/transcriptions")"#) &&
+                checkReportScript.contains("Cloud laptop proof must use an audio transcription endpoint"),
+            "Windows cloud laptop proof should require an audio transcription endpoint route"
         )
         try require(
             checkReportScript.contains(#"$endpointHost.EndsWith(".test")"#) &&

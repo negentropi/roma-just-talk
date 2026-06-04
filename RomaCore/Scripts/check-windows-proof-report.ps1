@@ -191,6 +191,10 @@ function Assert-RealCloudBackendProof {
     if ($uri.Scheme -ne "https") {
         throw "Cloud laptop proof must use an https endpoint: $endpoint"
     }
+    $endpointPath = $uri.AbsolutePath.ToLowerInvariant().TrimEnd("/")
+    if (!$endpointPath.EndsWith("/audio/transcriptions")) {
+        throw "Cloud laptop proof must use an audio transcription endpoint: $endpoint"
+    }
 
     $endpointHost = $uri.Host.ToLowerInvariant()
     if ($endpointHost -eq "localhost" -or

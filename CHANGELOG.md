@@ -2,6 +2,8 @@
 
 ## v1.81 - Unreleased
 
+- Collapsed unpunctuated partial-word false starts such as "mo module" and "sh should" in post-STT cleanup.
+- Required real Windows cloud laptop proof to use an audio transcription endpoint route.
 - Collapsed partial-word false starts such as "mod- module" and "sh- should" in post-STT cleanup.
 - Rejected private, local, and reserved endpoints in real Windows cloud laptop proof.
 - Required real Windows local-whisper laptop proof to use non-mock `.bin` or `.gguf` model files.

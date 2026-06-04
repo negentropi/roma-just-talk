@@ -63,52 +63,32 @@ function Invoke-ProofReportProfileCheck {
     Write-Host "proof_set_requirement=$Name status=pass report=$resolvedPath"
 }
 
+function New-ProofReportProfilePathMap {
+    return @{
+        doctor_only = $DoctorOnlyReportPath
+        cloud_dictation = $CloudDictationReportPath
+        local_whisper_dictation = $LocalWhisperDictationReportPath
+        local_whisper_notepad_paste = $LocalWhisperNotepadPasteReportPath
+        laptop_preflight = $LaptopPreflightReportPath
+        packaged_whisper_mock_install = $PackagedWhisperMockInstallReportPath
+    }
+}
+
+function New-ProofReportProfileRequiredMap {
+    return @{
+        doctor_only = [bool]$RequireDoctorOnly
+        cloud_dictation = [bool]$RequireCloudDictation
+        local_whisper_dictation = [bool]$RequireLocalWhisperDictation
+        local_whisper_notepad_paste = [bool]$RequireLocalWhisperNotepadPaste
+        laptop_preflight = [bool]$RequireLaptopPreflight
+        packaged_whisper_mock_install = [bool]$RequirePackagedWhisperMockInstall
+    }
+}
+
 function Get-ProofReportProfileChecks {
-    $profiles = Get-RomaWindowsProofProfileSpecs
-    return @(
-        [pscustomobject]@{
-            Name = "doctor_only"
-            Profile = [string]$profiles["doctor_only"]["profile"]
-            Path = $DoctorOnlyReportPath
-            Required = [bool]$RequireDoctorOnly
-            ReadAsLaptopPreflight = [bool]$profiles["doctor_only"]["read_as_laptop_preflight"]
-        },
-        [pscustomobject]@{
-            Name = "cloud_dictation"
-            Profile = [string]$profiles["cloud_dictation"]["profile"]
-            Path = $CloudDictationReportPath
-            Required = [bool]$RequireCloudDictation
-            ReadAsLaptopPreflight = [bool]$profiles["cloud_dictation"]["read_as_laptop_preflight"]
-        },
-        [pscustomobject]@{
-            Name = "local_whisper_dictation"
-            Profile = [string]$profiles["local_whisper_dictation"]["profile"]
-            Path = $LocalWhisperDictationReportPath
-            Required = [bool]$RequireLocalWhisperDictation
-            ReadAsLaptopPreflight = [bool]$profiles["local_whisper_dictation"]["read_as_laptop_preflight"]
-        },
-        [pscustomobject]@{
-            Name = "local_whisper_notepad_paste"
-            Profile = [string]$profiles["local_whisper_notepad_paste"]["profile"]
-            Path = $LocalWhisperNotepadPasteReportPath
-            Required = [bool]$RequireLocalWhisperNotepadPaste
-            ReadAsLaptopPreflight = [bool]$profiles["local_whisper_notepad_paste"]["read_as_laptop_preflight"]
-        },
-        [pscustomobject]@{
-            Name = "laptop_preflight"
-            Profile = [string]$profiles["laptop_preflight"]["profile"]
-            Path = $LaptopPreflightReportPath
-            Required = [bool]$RequireLaptopPreflight
-            ReadAsLaptopPreflight = [bool]$profiles["laptop_preflight"]["read_as_laptop_preflight"]
-        },
-        [pscustomobject]@{
-            Name = "packaged_whisper_mock_install"
-            Profile = [string]$profiles["packaged_whisper_mock_install"]["profile"]
-            Path = $PackagedWhisperMockInstallReportPath
-            Required = [bool]$RequirePackagedWhisperMockInstall
-            ReadAsLaptopPreflight = [bool]$profiles["packaged_whisper_mock_install"]["read_as_laptop_preflight"]
-        }
-    )
+    return Get-RomaWindowsProofReportProfileChecks `
+        -Paths (New-ProofReportProfilePathMap) `
+        -Required (New-ProofReportProfileRequiredMap)
 }
 
 function Test-AnyRequiredProofReportProfile {

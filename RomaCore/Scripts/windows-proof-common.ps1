@@ -595,6 +595,37 @@ function Get-RomaWindowsProofProfileAssertions {
     }
 }
 
+function Get-RomaWindowsProofReportProfileChecks {
+    param(
+        [hashtable]$Paths = @{},
+        [hashtable]$Required = @{}
+    )
+
+    $checks = @()
+    $profiles = Get-RomaWindowsProofProfileSpecs
+    foreach ($name in $profiles.Keys) {
+        $path = ""
+        if ($Paths.ContainsKey($name)) {
+            $path = [string]$Paths[$name]
+        }
+
+        $isRequired = $false
+        if ($Required.ContainsKey($name)) {
+            $isRequired = [bool]$Required[$name]
+        }
+
+        $checks += [pscustomobject]@{
+            Name = [string]$name
+            Profile = [string]$profiles[$name]["profile"]
+            Path = $path
+            Required = $isRequired
+            ReadAsLaptopPreflight = [bool]$profiles[$name]["read_as_laptop_preflight"]
+        }
+    }
+
+    return $checks
+}
+
 function Get-RomaWindowsLaptopPreflightGuideMarkers {
     return [ordered]@{
         laptop_preflight_proof_set = "proof_set_ok=laptop-preflight"

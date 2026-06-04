@@ -46,6 +46,7 @@ Set-Alias -Name Resolve-FullPath -Value Resolve-RomaWindowsFullPath -Scope Local
 Set-Alias -Name Require-File -Value Require-RomaWindowsFile -Scope Local -Force
 Set-Alias -Name Assert-OutputContains -Value Assert-RomaWindowsOutputContains -Scope Local -Force
 Set-Alias -Name Get-FileProof -Value Get-RomaWindowsFileProof -Scope Local -Force
+Set-Alias -Name Get-CurrentWindowsUserSid -Value Get-RomaWindowsCurrentUserSid -Scope Local -Force
 
 $packageIdentityScript = Join-Path $PSScriptRoot "windows-package-identity.ps1"
 if (!(Test-Path -LiteralPath $packageIdentityScript)) {
@@ -74,23 +75,6 @@ function Require-FileWithMinimumBytes {
 
     Write-Host "proof_file=$Path"
     Write-Host "proof_file_bytes=$($item.Length)"
-}
-
-function Get-CurrentWindowsUserSid {
-    if ([System.Environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT) {
-        return ""
-    }
-
-    try {
-        $identity = [System.Security.Principal.WindowsIdentity]::GetCurrent()
-        if ($null -ne $identity -and $null -ne $identity.User) {
-            return [string]$identity.User.Value
-        }
-    } catch {
-        return ""
-    }
-
-    return ""
 }
 
 function Get-HotkeyDeliveryPreflightProof {

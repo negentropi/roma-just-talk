@@ -210,15 +210,6 @@ function New-EmptyFileProof {
     }
 }
 
-function Get-CurrentWindowsUserSid {
-    $identity = [System.Security.Principal.WindowsIdentity]::GetCurrent()
-    if ($null -eq $identity -or $null -eq $identity.User) {
-        throw "Current Windows user SID was not available"
-    }
-
-    return [string]$identity.User.Value
-}
-
 function Write-LaptopPreflightCheckerSmokeReport {
     param(
         [Parameter(Mandatory = $true)]
@@ -275,7 +266,7 @@ function Write-LaptopPreflightCheckerSmokeReport {
             machine = $env:COMPUTERNAME
             user_name = $env:USERNAME
             user_domain = $env:USERDOMAIN
-            user_sid = Get-CurrentWindowsUserSid
+            user_sid = Require-RomaWindowsCurrentUserSid
         }
         preflights = [ordered]@{
             permission_surface = $true

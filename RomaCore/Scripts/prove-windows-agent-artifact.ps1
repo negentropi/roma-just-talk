@@ -54,6 +54,7 @@ Set-Alias -Name Get-FileHashProof -Value Get-RomaWindowsFileHashProof -Scope Loc
 Set-Alias -Name Get-OutputValue -Value Get-RomaWindowsOutputValue -Scope Local -Force
 Set-Alias -Name Get-OutputNumber -Value Get-RomaWindowsOutputNumber -Scope Local -Force
 Set-Alias -Name Get-OutputLineNumber -Value Get-RomaWindowsOutputLineNumber -Scope Local -Force
+Set-Alias -Name Get-CurrentWindowsUserSid -Value Get-RomaWindowsCurrentUserSid -Scope Local -Force
 
 $packageIdentityScript = Join-Path $PSScriptRoot "windows-package-identity.ps1"
 if (!(Test-Path -LiteralPath $packageIdentityScript)) {
@@ -599,23 +600,6 @@ function Get-ConfigDoctorOutputProof {
         whisper_cli_exists = $Output.Contains("whisper_cli_exists=true")
         whisper_model_exists = $Output.Contains("whisper_model_exists=true")
     }
-}
-
-function Get-CurrentWindowsUserSid {
-    if ([System.Environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT) {
-        return ""
-    }
-
-    try {
-        $identity = [System.Security.Principal.WindowsIdentity]::GetCurrent()
-        if ($null -ne $identity -and $null -ne $identity.User) {
-            return [string]$identity.User.Value
-        }
-    } catch {
-        return ""
-    }
-
-    return ""
 }
 
 function Write-ProofReport {

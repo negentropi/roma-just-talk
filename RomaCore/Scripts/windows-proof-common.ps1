@@ -34,6 +34,32 @@ function Require-RomaWindowsFile {
     }
 }
 
+function Get-RomaWindowsCurrentUserSid {
+    if ([System.Environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT) {
+        return ""
+    }
+
+    try {
+        $identity = [System.Security.Principal.WindowsIdentity]::GetCurrent()
+        if ($null -ne $identity -and $null -ne $identity.User) {
+            return [string]$identity.User.Value
+        }
+    } catch {
+        return ""
+    }
+
+    return ""
+}
+
+function Require-RomaWindowsCurrentUserSid {
+    $userSid = Get-RomaWindowsCurrentUserSid
+    if ([string]::IsNullOrWhiteSpace($userSid)) {
+        throw "Current Windows user SID was not available"
+    }
+
+    return $userSid
+}
+
 function Get-RomaWindowsProofSurfaceFiles {
     return @(
         "smoke-windows-agent.ps1",

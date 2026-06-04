@@ -8758,6 +8758,8 @@ struct RomaCoreChecks {
             proofCommonScript.contains("function Invoke-RomaWindowsProofStep") &&
                 proofCommonScript.contains("function Resolve-RomaWindowsFullPath") &&
                 proofCommonScript.contains("function Require-RomaWindowsFile") &&
+                proofCommonScript.contains("function Get-RomaWindowsCurrentUserSid") &&
+                proofCommonScript.contains("function Require-RomaWindowsCurrentUserSid") &&
                 proofCommonScript.contains("function Assert-RomaWindowsOutputContains") &&
                 proofCommonScript.contains("function Get-RomaWindowsOutputValue") &&
                 proofCommonScript.contains("function Get-RomaWindowsOutputNumber") &&
@@ -8778,6 +8780,15 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Get-RomaWindowsFileHashProof") &&
                 proofCommonScript.contains("function Get-RomaWindowsInstalledProofSurfaceFileProofs"),
             "Windows proof helper should own shared script utilities"
+        )
+        try require(
+            packageScript.contains("user_sid = Require-RomaWindowsCurrentUserSid") &&
+                !packageScript.contains("function Get-CurrentWindowsUserSid") &&
+                proveScript.contains("Set-Alias -Name Get-CurrentWindowsUserSid -Value Get-RomaWindowsCurrentUserSid") &&
+                laptopProofScript.contains("Set-Alias -Name Get-CurrentWindowsUserSid -Value Get-RomaWindowsCurrentUserSid") &&
+                !proveScript.contains("function Get-CurrentWindowsUserSid") &&
+                !laptopProofScript.contains("function Get-CurrentWindowsUserSid"),
+            "Windows package, artifact, and laptop proof scripts should share Windows user SID lookup"
         )
         try require(
             proveScript.contains("Set-Alias -Name Get-OutputNumber -Value Get-RomaWindowsOutputNumber") &&

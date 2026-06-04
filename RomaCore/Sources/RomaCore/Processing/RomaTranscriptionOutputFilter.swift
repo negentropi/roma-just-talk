@@ -791,6 +791,22 @@ public struct RomaTranscriptionOutputFilter {
     private static let blockedPrefixesForPlainIMeanCorrection: Set<String> = [
         "all right", "alright", "ok", "okay", "right", "well", "yeah"
     ]
+    private static let blockedFirstWordsForPredicateTailCorrection: Set<String> = [
+        "after", "and", "as", "at", "because", "before", "but", "for", "from", "if", "in", "of",
+        "on", "or", "since", "so", "to", "until", "when", "while", "with", "without"
+    ]
+    private static let predicateTailAuxiliaryWords: Set<String> = [
+        "am", "are", "aren't", "be", "can", "can't", "cannot", "could", "couldn't", "did", "didn't",
+        "do", "does", "doesn't", "don't", "has", "hasn't", "have", "haven't", "is", "isn't", "may",
+        "might", "must", "should", "shouldn't", "was", "wasn't", "were", "weren't", "will", "won't",
+        "would", "wouldn't"
+    ]
+    private static let predicateTailWords: Set<String> = [
+        "available", "bad", "blocked", "broken", "complete", "done", "fail", "failed", "fails",
+        "fast", "fine", "finished", "good", "invalid", "ok", "okay", "pass", "passed", "passes",
+        "ready", "required", "right", "slow", "unavailable", "valid", "work", "worked", "works",
+        "wrong"
+    ]
     private static let blockedPreviousWordsForDeleteCommand: Set<String> = [
         "a", "an", "command", "commands", "shortcut", "shortcuts", "the"
     ]
@@ -5474,7 +5490,58 @@ public struct RomaTranscriptionOutputFilter {
             return defaultCorrection
         }
 
+        if let sourcePredicateWordCount = trailingPredicateCorrectionSourceWordCount(
+            beforeMarker: beforeMarker,
+            correctionTokens: correctionTokens
+        ) {
+            return (firstToken.range, 1, sourcePredicateWordCount, nil)
+        }
+
         return (firstToken.range, 1, 1, nil)
+    }
+
+    private static func trailingPredicateCorrectionSourceWordCount(
+        beforeMarker: String,
+        correctionTokens: [WordToken]
+    ) -> Int? {
+        let correctionWords = correctionTokens.map { $0.text }
+        guard correctionWords.count >= 2,
+              let firstCorrectionWord = correctionWords.first,
+              !blockedFirstWordsForPredicateTailCorrection.contains(firstCorrectionWord) else {
+            return nil
+        }
+
+        let trailingFourWords = trailingWords(4, in: beforeMarker)
+        if trailingFourWords.count == 4,
+           ["a", "an", "the"].contains(trailingFourWords[0]),
+           predicateTailAuxiliaryWords.contains(trailingFourWords[2]),
+           isLikelyPredicateTailWord(trailingFourWords[3]) {
+            return 4
+        }
+
+        let trailingThreeWords = trailingWords(3, in: beforeMarker)
+        if trailingThreeWords.count == 3 {
+            if ["a", "an", "the"].contains(trailingThreeWords[0]),
+               isLikelyPredicateTailWord(trailingThreeWords[2]) {
+                return 3
+            }
+
+            if predicateTailAuxiliaryWords.contains(trailingThreeWords[1]),
+               isLikelyPredicateTailWord(trailingThreeWords[2]) {
+                return 3
+            }
+        }
+
+        let trailingTwoWords = trailingWords(2, in: beforeMarker)
+        guard trailingTwoWords.count == 2,
+              isLikelyPredicateTailWord(trailingTwoWords[1]) else {
+            return nil
+        }
+        return 2
+    }
+
+    private static func isLikelyPredicateTailWord(_ word: String) -> Bool {
+        predicateTailWords.contains(word)
     }
 
     private static func correctionSourceAfterNestedIntro(_ text: String, markerText: String) -> String {

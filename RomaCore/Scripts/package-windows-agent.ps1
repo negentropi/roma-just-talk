@@ -351,6 +351,7 @@ proof_set_laptop_preflight_local_whisper=True
 Expected full-proof markers:
 
 proof_set_laptop_preflight_matches_full=true
+proof_set_generated_at_window_minutes=
 proof_set_source_dirty=false
 proof_set_ok=full-laptop
 windows_laptop_proof_ok=true

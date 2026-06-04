@@ -138,6 +138,66 @@ function Assert-ProofSessionId {
     return $Value.ToLowerInvariant()
 }
 
+function Get-ReportGeneratedAt {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Report,
+        [Parameter(Mandatory = $true)]
+        [string]$ReportName
+    )
+
+    $value = [string](Require-ReportProperty -Report $Report -Name "generated_at" -ReportName $ReportName)
+    if ([string]::IsNullOrWhiteSpace($value)) {
+        throw "Proof set report $ReportName has empty generated_at"
+    }
+
+    try {
+        return [System.DateTimeOffset]::Parse(
+            $value,
+            [System.Globalization.CultureInfo]::InvariantCulture,
+            [System.Globalization.DateTimeStyles]::AssumeUniversal
+        ).ToUniversalTime()
+    } catch {
+        throw "Proof set report $ReportName has invalid generated_at timestamp: $value"
+    }
+}
+
+function Assert-ReportsGeneratedWithinWindow {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object[]]$Reports,
+        [int]$WindowMinutes = 120,
+        [string]$ProofName = "proof set"
+    )
+
+    if ($Reports.Count -lt 2) {
+        throw "$ProofName needs at least two reports for generated_at window validation"
+    }
+
+    $timestamps = @()
+    foreach ($entry in $Reports) {
+        $name = [string]$entry.Name
+        $report = $entry.Report
+        $timestamps += [pscustomobject]@{
+            Name = $name
+            GeneratedAt = Get-ReportGeneratedAt -Report $report -ReportName $name
+        }
+    }
+
+    $orderedTimestamps = @($timestamps | Sort-Object -Property GeneratedAt)
+    $first = $orderedTimestamps[0]
+    $last = $orderedTimestamps[$orderedTimestamps.Count - 1]
+    $window = $last.GeneratedAt - $first.GeneratedAt
+    $windowTotalMinutes = [System.Math]::Round($window.TotalMinutes, 3)
+    if ($window.TotalMinutes -gt $WindowMinutes) {
+        throw "$ProofName reports must be generated within $WindowMinutes minutes; got $windowTotalMinutes minutes between $($first.Name) and $($last.Name)"
+    }
+
+    Write-Host ("proof_set_generated_at_first={0} utc={1}" -f $first.Name, $first.GeneratedAt.ToString("o"))
+    Write-Host ("proof_set_generated_at_last={0} utc={1}" -f $last.Name, $last.GeneratedAt.ToString("o"))
+    Write-Host "proof_set_generated_at_window_minutes=$windowTotalMinutes"
+}
+
 function Assert-ReportBoolean {
     param(
         [Parameter(Mandatory = $true)]
@@ -389,6 +449,7 @@ function Assert-LaptopPreflightReport {
     $proofSessionId = Assert-ProofSessionId `
         -Value (Assert-NonEmptyReportString -Report $report -Name "proof_session_id" -ReportName $reportName) `
         -ReportName $reportName
+    $generatedAt = Get-ReportGeneratedAt -Report $report -ReportName $reportName
     $packageDir = Assert-NonEmptyReportString -Report $report -Name "package_dir" -ReportName $reportName
     $proofDir = Assert-NonEmptyReportString -Report $report -Name "proof_dir" -ReportName $reportName
     $packageFingerprint = Get-ReportPackageFingerprint -Report $report -ReportName $reportName
@@ -448,6 +509,7 @@ function Assert-LaptopPreflightReport {
     }
 
     Write-Host "proof_set_laptop_preflight_session_id=$proofSessionId"
+    Write-Host "proof_set_laptop_preflight_generated_at=$($generatedAt.ToString("o"))"
     Write-Host "proof_set_laptop_preflight_machine=$machine"
     Write-Host "proof_set_laptop_preflight_user=$userName"
     Write-Host "proof_set_laptop_preflight_user_sid=$userSid"
@@ -645,6 +707,24 @@ function Assert-SameLaptopProofSet {
             -ExpectedSource $expectedSource
         Assert-LaptopPreflightIncludesLocalWhisper -PreflightReport $LaptopPreflightReport
     }
+
+    $reportsWithTimestamps = @()
+    if ($null -ne $LaptopPreflightReport) {
+        $reportsWithTimestamps += [pscustomobject]@{
+            Name = "laptop_preflight"
+            Report = $LaptopPreflightReport
+        }
+    }
+    foreach ($entry in $reports) {
+        $reportsWithTimestamps += [pscustomobject]@{
+            Name = [string]$entry["Name"]
+            Report = $entry["Report"]
+        }
+    }
+    Assert-ReportsGeneratedWithinWindow `
+        -Reports $reportsWithTimestamps `
+        -WindowMinutes 120 `
+        -ProofName "Full laptop proof"
 
     foreach ($entry in $reports) {
         $reportName = $entry["Name"]

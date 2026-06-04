@@ -7599,6 +7599,7 @@ struct RomaCoreChecks {
                 packageScript.contains("Expected full-proof markers:") &&
                 packageScript.contains("windows_laptop_preflight_report=") &&
                 packageScript.contains("proof_set_laptop_preflight_matches_full=true") &&
+                packageScript.contains("proof_set_generated_at_window_minutes=") &&
                 packageScript.contains("proof_set_laptop_preflight_local_whisper=False") &&
                 packageScript.contains("proof_set_laptop_preflight_local_whisper=True") &&
                 packageScript.contains("proof_set_laptop_preflight_source_dirty=false") &&
@@ -7684,6 +7685,16 @@ struct RomaCoreChecks {
                 checkSetScript.contains(#"$proofSessionId = Assert-ProofSessionId"#) &&
                 checkSetScript.contains(#"$expectedProofSessionId = Assert-ProofSessionId"#),
             "Windows proof-set checker should require runner-style GUID proof session ids"
+        )
+        try require(
+            checkSetScript.contains("function Get-ReportGeneratedAt") &&
+                checkSetScript.contains("[System.DateTimeOffset]::Parse") &&
+                checkSetScript.contains("function Assert-ReportsGeneratedWithinWindow") &&
+                checkSetScript.contains(#"-WindowMinutes 120"#) &&
+                checkSetScript.contains(#"$ProofName reports must be generated within $WindowMinutes minutes"#) &&
+                checkSetScript.contains("proof_set_generated_at_window_minutes=") &&
+                checkSetScript.contains("proof_set_laptop_preflight_generated_at="),
+            "Windows proof-set checker should require full laptop reports from one generated_at window"
         )
         try require(
             checkSetScript.contains("proof_set_session_id="),

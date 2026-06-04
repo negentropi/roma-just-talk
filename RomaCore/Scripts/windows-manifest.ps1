@@ -41,3 +41,41 @@ function Require-RomaWindowsManifestKey {
     Write-Host "manifest_$Key=$($Manifest[$Key])"
     return [string]$Manifest[$Key]
 }
+
+function Resolve-RomaWindowsManifestPath {
+    param(
+        [Parameter(Mandatory = $true)]
+        [hashtable]$Manifest,
+        [Parameter(Mandatory = $true)]
+        [string]$Key,
+        [string]$BaseDir = ""
+    )
+
+    $path = Require-RomaWindowsManifestKey -Manifest $Manifest -Key $Key
+    if ([System.IO.Path]::IsPathRooted($path)) {
+        return [System.IO.Path]::GetFullPath($path)
+    }
+    if ([string]::IsNullOrWhiteSpace($BaseDir)) {
+        return $path
+    }
+
+    return [System.IO.Path]::GetFullPath((Join-Path $BaseDir $path))
+}
+
+function Require-RomaWindowsManifestFile {
+    param(
+        [Parameter(Mandatory = $true)]
+        [hashtable]$Manifest,
+        [Parameter(Mandatory = $true)]
+        [string]$Key,
+        [string]$BaseDir = ""
+    )
+
+    $path = Resolve-RomaWindowsManifestPath -Manifest $Manifest -Key $Key -BaseDir $BaseDir
+    if (!(Test-Path -LiteralPath $path)) {
+        throw "Manifest file key $Key did not point at an existing file: $path"
+    }
+
+    Write-Host ("manifest_{0}_exists=true" -f $Key)
+    return $path
+}

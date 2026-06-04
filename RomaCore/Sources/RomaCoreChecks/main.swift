@@ -7966,7 +7966,10 @@ struct RomaCoreChecks {
         )
         try require(
             manifestScript.contains("function Read-RomaWindowsManifest") &&
-                manifestScript.contains("function Require-RomaWindowsManifestKey"),
+                manifestScript.contains("function Require-RomaWindowsManifestKey") &&
+                manifestScript.contains("function Resolve-RomaWindowsManifestPath") &&
+                manifestScript.contains("function Require-RomaWindowsManifestFile") &&
+                manifestScript.contains("Test-Path -LiteralPath $path"),
             "Windows manifest parsing should be computed by one shared packaged helper"
         )
         try require(
@@ -8056,8 +8059,14 @@ struct RomaCoreChecks {
             proveScript.contains(". $manifestScript") &&
                 laptopProofScript.contains(". $manifestScript") &&
                 proveScript.contains("Read-RomaWindowsManifest -Path $manifestPath") &&
+                proveScript.contains("Require-RomaWindowsManifestFile") &&
+                proveScript.contains(#"-Key "whisper_cli_mock""#) &&
+                proveScript.contains(#"-Key "proof_agent""#) &&
+                !proveScript.contains("function Resolve-PackagePath") &&
                 laptopProofScript.contains("Read-RomaWindowsManifest -Path $manifestPath") &&
                 workflowScript.contains("Read-RomaWindowsManifest -Path $manifestPath") &&
+                workflowScript.contains(#"-Key "laptop_native_preflight_checker_smoke_report""#) &&
+                workflowScript.contains(#"-Key "laptop_preflight_checker_smoke_report""#) &&
                 !proveScript.contains("function Read-Manifest") &&
                 !laptopProofScript.contains("function Read-Manifest"),
             "Windows proof scripts and CI should reuse the shared manifest helper instead of duplicating manifest parsing"
@@ -8206,8 +8215,10 @@ struct RomaCoreChecks {
         try require(
             parseScriptsScript.contains(#"-Filter "*.ps1""#) &&
                 manifestScript.contains("function Read-RomaWindowsManifest") &&
+                manifestScript.contains("function Require-RomaWindowsManifestFile") &&
                 workflowScript.contains(#"$env:RUNNER_TEMP\roma-windows-agent\windows-manifest.ps1"#) &&
-                workflowScript.contains("Require-RomaWindowsManifestKey"),
+                workflowScript.contains("Require-RomaWindowsManifestKey") &&
+                workflowScript.contains("Require-RomaWindowsManifestFile"),
             "Windows CI should parse and use the shared manifest helper"
         )
         try require(

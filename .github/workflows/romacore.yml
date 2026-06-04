@@ -224,6 +224,8 @@ jobs:
           $manifest = Read-RomaWindowsManifest -Path $manifestPath
           $sourceCommit = Require-RomaWindowsManifestKey -Manifest $manifest -Key "source_commit"
           $sourceDirty = Require-RomaWindowsManifestKey -Manifest $manifest -Key "source_dirty"
+          $nativePreflightReport = Require-RomaWindowsManifestFile -Manifest $manifest -Key "laptop_native_preflight_checker_smoke_report"
+          $localPreflightReport = Require-RomaWindowsManifestFile -Manifest $manifest -Key "laptop_preflight_checker_smoke_report"
           if ($sourceCommit -notmatch "^[0-9a-fA-F]{40}$") {
             throw "Windows package manifest has invalid source_commit: $sourceCommit"
           }
@@ -233,6 +235,8 @@ jobs:
 
           Write-Host "ci_package_source_commit=$sourceCommit"
           Write-Host "ci_package_source_dirty=false"
+          Write-Host "ci_package_laptop_native_preflight_checker_smoke_report=$nativePreflightReport"
+          Write-Host "ci_package_laptop_preflight_checker_smoke_report=$localPreflightReport"
 
       - name: Verify Windows agent artifact wrapper
         run: |

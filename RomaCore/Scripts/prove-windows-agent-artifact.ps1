@@ -64,19 +64,6 @@ if (!(Test-Path -LiteralPath $manifestScript)) {
 }
 . $manifestScript
 
-function Resolve-PackagePath {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Path
-    )
-
-    if ([System.IO.Path]::IsPathRooted($Path)) {
-        return Resolve-FullPath -Path $Path
-    }
-
-    return Resolve-FullPath -Path (Join-Path $PackageDir $Path)
-}
-
 function Invoke-ProofAgentDoctorCommand {
     param(
         [Parameter(Mandatory = $true)]
@@ -904,11 +891,15 @@ Invoke-Step "artifact manifest" {
     )) {
         Require-RomaWindowsManifestKey -Manifest $script:artifactManifest -Key $key
     }
-    $script:packagedWhisperCLI = Resolve-PackagePath -Path $script:artifactManifest["whisper_cli_mock"]
-    Require-File -Path $script:packagedWhisperCLI
+    $script:packagedWhisperCLI = Require-RomaWindowsManifestFile `
+        -Manifest $script:artifactManifest `
+        -Key "whisper_cli_mock" `
+        -BaseDir $PackageDir
     Write-Host "manifest_whisper_cli_mock_path=$script:packagedWhisperCLI"
-    $script:proofAgentPath = Resolve-PackagePath -Path $script:artifactManifest["proof_agent"]
-    Require-File -Path $script:proofAgentPath
+    $script:proofAgentPath = Require-RomaWindowsManifestFile `
+        -Manifest $script:artifactManifest `
+        -Key "proof_agent" `
+        -BaseDir $PackageDir
     Write-Host "manifest_proof_agent_path=$script:proofAgentPath"
 }
 

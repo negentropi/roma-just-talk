@@ -9,6 +9,7 @@
 - Required Windows laptop preflight proof reports to come from clean packaged source checkouts.
 - Required Windows artifact proof reports to expose the listener's per-session WAV output isolation marker.
 - Attached standalone single-quote dictation commands in cursor-aware insertion polish.
+- Attached standalone percent, currency, degree, copyright, registered, and trademark sign dictation commands in cursor-aware insertion polish.
 - Attached standalone spoken developer symbols such as plus sign, equals sign, hash sign, asterisk, tilde, ampersand, and angle signs in cursor-aware insertion polish.
 - Unwrapped short smart-quoted final-word artifacts such as "“Model.”" in mid-sentence continuations.
 - Unwrapped short smart-single and backtick-wrapped final-word artifacts such as "‘Model.’" and "\`Model.\`" in mid-sentence continuations.

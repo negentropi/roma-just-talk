@@ -1050,6 +1050,19 @@ public struct RomaTranscriptionOutputFilter {
         "and sign": "&",
         "less than sign": "<",
         "greater than sign": ">",
+        "percent sign": "%",
+        "percentage sign": "%",
+        "per cent sign": "%",
+        "dollar sign": "$",
+        "euro sign": "€",
+        "pound sterling sign": "£",
+        "yen sign": "¥",
+        "cent sign": "¢",
+        "degree sign": "°",
+        "copyright sign": "©",
+        "registered sign": "®",
+        "registered trademark sign": "®",
+        "trademark sign": "™",
         "dash": "-",
         "hyphen": "-",
         "comma": ",",
@@ -9313,7 +9326,7 @@ public struct RomaTranscriptionOutputFilter {
                 previousCharacter.unicodeScalars.allSatisfy { leadingSpaceAfter.contains($0) }
         }
 
-        let noLeadingSpaceBefore = CharacterSet(charactersIn: ".,;:!?)]}”’/\\-@_+=#*~&<>")
+        let noLeadingSpaceBefore = CharacterSet(charactersIn: ".,;:!?)]}”’/\\-@_+=#*~&<>%°©®™")
         if firstCharacter.unicodeScalars.allSatisfy({ noLeadingSpaceBefore.contains($0) }) {
             return false
         }

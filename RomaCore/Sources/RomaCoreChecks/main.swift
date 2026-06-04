@@ -5392,6 +5392,46 @@ struct RomaCoreChecks {
             "insertion polish should attach standalone greater-than commands"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Percent sign.", context: compactTokenContext) == "%",
+            "insertion polish should attach standalone percent sign commands"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Dollar sign.", context: compactTokenContext) == "$",
+            "insertion polish should attach standalone dollar sign commands"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Euro sign.", context: compactTokenContext) == "€",
+            "insertion polish should attach standalone euro sign commands"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Pound sterling sign.", context: compactTokenContext) == "£",
+            "insertion polish should attach standalone pound sterling sign commands"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Yen sign.", context: compactTokenContext) == "¥",
+            "insertion polish should attach standalone yen sign commands"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Cent sign.", context: compactTokenContext) == "¢",
+            "insertion polish should attach standalone cent sign commands"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Degree sign.", context: compactTokenContext) == "°",
+            "insertion polish should attach standalone degree sign commands"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Copyright sign.", context: compactTokenContext) == "©",
+            "insertion polish should attach standalone copyright sign commands"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Registered trademark sign.", context: compactTokenContext) == "®",
+            "insertion polish should attach standalone registered trademark commands"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Trademark sign.", context: compactTokenContext) == "™",
+            "insertion polish should attach standalone trademark sign commands"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionSpacing("@", context: emailUserContext) == "@",
             "insertion spacing should not add a space before at signs"
         )
@@ -5414,6 +5454,34 @@ struct RomaCoreChecks {
         try require(
             RomaTranscriptionOutputFilter.applyInsertionSpacing("&", context: compactTokenContext) == "&",
             "insertion spacing should not add a space before ampersands"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionSpacing("%", context: compactTokenContext) == "%",
+            "insertion spacing should not add a space before percent signs"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionSpacing("°", context: compactTokenContext) == "°",
+            "insertion spacing should not add a space before degree signs"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionSpacing("©", context: compactTokenContext) == "©",
+            "insertion spacing should not add a space before copyright signs"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionSpacing("®", context: compactTokenContext) == "®",
+            "insertion spacing should not add a space before registered signs"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionSpacing("™", context: compactTokenContext) == "™",
+            "insertion spacing should not add a space before trademark signs"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionSpacing("$", context: compactTokenContext) == " $",
+            "insertion spacing should keep currency signs as prefix symbols"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionSpacing("€", context: compactTokenContext) == " €",
+            "insertion spacing should keep euro signs as prefix symbols"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("Underscore.", context: variableContext) == "_",

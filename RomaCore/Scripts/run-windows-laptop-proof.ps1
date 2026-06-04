@@ -194,10 +194,14 @@ function Write-FullLaptopProofRecheckScript {
         '$ErrorActionPreference = "Stop"',
         "Set-StrictMode -Version Latest",
         "",
-        '$checkSetScript = Join-Path $PackageDir "check-windows-proof-set.ps1"',
-        'if (!(Test-Path -LiteralPath $checkSetScript)) {',
-        '    throw "Windows proof-set checker was not found: $checkSetScript"',
+        '$manifestScript = Join-Path $PackageDir "windows-manifest.ps1"',
+        'if (!(Test-Path -LiteralPath $manifestScript)) {',
+        '    throw "Windows manifest helper was not found: $manifestScript"',
         '}',
+        ". `$manifestScript",
+        '$manifestPath = Join-Path $PackageDir "manifest.txt"',
+        '$manifest = Read-RomaWindowsManifest -Path $manifestPath',
+        '$checkSetScript = Require-RomaWindowsManifestFile -Manifest $manifest -Key "check_set_script" -BaseDir $PackageDir',
         "",
         "`$laptopPreflightReportPath = $(ConvertTo-PowerShellSingleQuotedString -Value $LaptopPreflightReportPath)",
         "`$cloudDictationReportPath = $(ConvertTo-PowerShellSingleQuotedString -Value $CloudDictationReportPath)",
@@ -517,17 +521,25 @@ $whisperArguments = @(
         Where-Object { ![string]::IsNullOrWhiteSpace($_) }
 )
 
-$proofScript = Join-Path $PackageDir "prove-windows-agent-artifact.ps1"
-$checkSetScript = Join-Path $PackageDir "check-windows-proof-set.ps1"
-$proofAgent = Join-Path $PackageDir "RomaProofAgent.exe"
-$packagedProofCommonScript = Join-Path $PackageDir "windows-proof-common.ps1"
 $manifestPath = Join-Path $PackageDir "manifest.txt"
-Require-File -Path $proofScript
-Require-File -Path $checkSetScript
-Require-File -Path $proofAgent
-Require-File -Path $packagedProofCommonScript
 Require-File -Path $manifestPath
 $script:artifactManifest = Read-RomaWindowsManifest -Path $manifestPath
+$proofScript = Require-RomaWindowsManifestFile `
+    -Manifest $script:artifactManifest `
+    -Key "proof_script" `
+    -BaseDir $PackageDir
+$checkSetScript = Require-RomaWindowsManifestFile `
+    -Manifest $script:artifactManifest `
+    -Key "check_set_script" `
+    -BaseDir $PackageDir
+$proofAgent = Require-RomaWindowsManifestFile `
+    -Manifest $script:artifactManifest `
+    -Key "proof_agent" `
+    -BaseDir $PackageDir
+$packagedProofCommonScript = Require-RomaWindowsManifestFile `
+    -Manifest $script:artifactManifest `
+    -Key "proof_common_script" `
+    -BaseDir $PackageDir
 
 $proofSessionId = [guid]::NewGuid().ToString("D")
 

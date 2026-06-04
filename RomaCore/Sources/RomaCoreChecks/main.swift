@@ -707,6 +707,10 @@ struct RomaCoreChecks {
             "shared insertion polish should preserve smart-single-quoted question fragments"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("'What?'", context: midSentenceContext) == "'what?'",
+            "shared insertion polish should preserve straight-single-quoted question fragments"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("Model!\"", context: midSentenceContext) == "model",
             "shared insertion polish should remove trailing generated quotes after emphatic punctuation"
         )
@@ -6914,6 +6918,39 @@ struct RomaCoreChecks {
             "pipeline should paste smart-single-quoted noisy mid-sentence final fragments"
         )
 
+        let straightSingleQuotedFragmentRecorder = FakeRecorder()
+        let straightSingleQuotedFragmentInserter = FakeTextInsertion()
+        let straightSingleQuotedFragmentPipeline = DictationPipeline(
+            recorder: straightSingleQuotedFragmentRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "straight-single-quoted-fragment-proof.wav",
+                text: "'Model.'"
+            ),
+            textInsertion: straightSingleQuotedFragmentInserter
+        )
+        let straightSingleQuotedFragmentRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/straight-single-quoted-fragment-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await straightSingleQuotedFragmentRecorder.startPreRollBuffering()
+        let straightSingleQuotedFragmentResult = try await straightSingleQuotedFragmentPipeline.runRecordingWindow(
+            straightSingleQuotedFragmentRequest
+        ) {}
+
+        try require(
+            straightSingleQuotedFragmentResult.processedText == " model",
+            "pipeline should clean straight-single-quoted noisy mid-sentence final fragments"
+        )
+        try require(
+            await straightSingleQuotedFragmentInserter.pastedText == " model",
+            "pipeline should paste straight-single-quoted noisy mid-sentence final fragments"
+        )
+
         let backtickFragmentRecorder = FakeRecorder()
         let backtickFragmentInserter = FakeTextInsertion()
         let backtickFragmentPipeline = DictationPipeline(
@@ -8064,6 +8101,12 @@ struct RomaCoreChecks {
                 proveScript.contains(#"-Key "proof_agent""#) &&
                 !proveScript.contains("function Resolve-PackagePath") &&
                 laptopProofScript.contains("Read-RomaWindowsManifest -Path $manifestPath") &&
+                laptopProofScript.contains("Require-RomaWindowsManifestFile") &&
+                laptopProofScript.contains(#"-Key "proof_script""#) &&
+                laptopProofScript.contains(#"-Key "check_set_script""#) &&
+                laptopProofScript.contains(#"-Key "proof_agent""#) &&
+                laptopProofScript.contains(#"-Key "proof_common_script""#) &&
+                !laptopProofScript.contains(#"$proofScript = Join-Path $PackageDir "prove-windows-agent-artifact.ps1""#) &&
                 workflowScript.contains("Read-RomaWindowsManifest -Path $manifestPath") &&
                 workflowScript.contains(#"-Key "laptop_native_preflight_checker_smoke_report""#) &&
                 workflowScript.contains(#"-Key "laptop_preflight_checker_smoke_report""#) &&
@@ -8100,7 +8143,7 @@ struct RomaCoreChecks {
             laptopProofScript.contains("function Write-FullLaptopProofRecheckScript") &&
                 laptopProofScript.contains(#""recheck-full-laptop-proof.ps1""#) &&
                 laptopProofScript.contains("windows_laptop_recheck_script=") &&
-                laptopProofScript.contains("check-windows-proof-set.ps1") &&
+                laptopProofScript.contains(#"$checkSetScript = Require-RomaWindowsManifestFile -Manifest $manifest -Key "check_set_script" -BaseDir $PackageDir"#) &&
                 laptopProofScript.contains("ConvertTo-PowerShellSingleQuotedString") &&
                 laptopProofScript.contains("RequireFullLaptopProof"),
             "Windows laptop proof runner should write an archived full-proof recheck script with exact report paths"

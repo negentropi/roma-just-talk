@@ -112,17 +112,11 @@ function Get-PermissionPreflightProof {
         [string]$Output = ""
     )
 
-    return [ordered]@{
+    $proof = [ordered]@{
         output_present = ![string]::IsNullOrWhiteSpace($Output)
-        os_permission_grants_microphone = $Output.Contains("os_permission_grants=microphone")
-        microphone_settings_uri = $Output.Contains("microphone_settings_uri=ms-settings:privacy-microphone")
-        desktop_app_microphone_access_required = $Output.Contains("desktop_app_microphone_access_required=true")
-        native_capabilities_register_hotkey = $Output.Contains("native_capabilities=RegisterHotKey")
-        no_accessibility_permission_prompt = $Output.Contains("accessibility_permission_prompt=false")
-        no_automation_permission_prompt = $Output.Contains("automation_permission_prompt=false")
-        no_screen_capture_required = $Output.Contains("screen_capture_required=false")
-        no_screen_recording_permission_prompt = $Output.Contains("screen_recording_permission_prompt=false")
     }
+    Add-RomaWindowsProofFields -Proof $proof -Fields (Get-RomaWindowsMinimumPermissionOutputProof -Output $Output) | Out-Null
+    return $proof
 }
 
 function Get-MicrophonePreflightProof {

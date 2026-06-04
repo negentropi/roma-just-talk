@@ -7759,6 +7759,8 @@ struct RomaCoreChecks {
             laptopProofScript.contains("permission surface preflight") &&
                 laptopProofScript.contains("windows-permission-doctor") &&
                 laptopProofScript.contains("Get-PermissionPreflightProof") &&
+                laptopProofScript.contains("Get-RomaWindowsMinimumPermissionOutputProof -Output $Output") &&
+                laptopProofScript.contains("Add-RomaWindowsProofFields -Proof $proof") &&
                 laptopProofScript.contains("permission_surface_preflight_ok=true") &&
                 laptopProofScript.contains("windows_laptop_permission_preflight=true"),
             "Windows laptop proof runner should preflight the permission surface through packaged RomaProofAgent"
@@ -7777,7 +7779,7 @@ struct RomaCoreChecks {
                 laptopProofScript.contains(#"proof_mode = "windows-laptop-preflight""#) &&
                 laptopProofScript.contains("preflight_outputs") &&
                 laptopProofScript.contains("permission_surface = $true") &&
-                laptopProofScript.contains("microphone_settings_uri") &&
+                laptopProofScript.contains("permission_surface = Get-PermissionPreflightProof -Output $script:permissionPreflightOutput") &&
                 laptopProofScript.contains("Get-HotkeyDeliveryPreflightProof") &&
                 laptopProofScript.contains("Get-OptionalFileProof") &&
                 laptopProofScript.contains("sample_rate_16000") &&
@@ -7795,6 +7797,10 @@ struct RomaCoreChecks {
                 checkSetScript.contains(#"$RequireLaptopPreflight = $true"#) &&
                 checkSetScript.contains("preflight_outputs") &&
                 checkSetScript.contains(#"Assert-ReportBoolean -Report $permissionOutput -Name "microphone_settings_uri" -Expected $true"#) &&
+                checkSetScript.contains(#"Assert-ReportBoolean -Report $permissionOutput -Name "no_admin_required" -Expected $true"#) &&
+                checkSetScript.contains(#"Assert-ReportBoolean -Report $permissionOutput -Name "startup_launcher_run_script" -Expected $true"#) &&
+                checkSetScript.contains(#"Assert-ReportBoolean -Report $permissionOutput -Name "startup_launch_mode_listen" -Expected $true"#) &&
+                checkSetScript.contains(#"Assert-ReportBoolean -Report $permissionOutput -Name "no_startup_permission_prompt" -Expected $true"#) &&
                 checkSetScript.contains(#"Assert-ReportBoolean -Report $hotkeyOutput -Name "key_down" -Expected $true"#) &&
                 checkSetScript.contains(#"Assert-ReportBoolean -Report $microphoneOutput -Name "sample_rate_16000" -Expected $true"#) &&
                 checkSetScript.contains(#"Assert-ReportBoolean -Report $localWhisperOutput -Name "network_required_false" -Expected $true"#) &&
@@ -7827,6 +7833,10 @@ struct RomaCoreChecks {
                 packageScript.contains("proof_common_script=$proofCommonScriptOutput") &&
                 packageScript.contains("Get-RomaPackageIdentityProof -PackageDir $PackageDir") &&
                 packageScript.contains("permission_surface = $true") &&
+                packageScript.contains("no_admin_required = $true") &&
+                packageScript.contains("startup_launcher_run_script = $true") &&
+                packageScript.contains("startup_launch_mode_listen = $true") &&
+                packageScript.contains("no_startup_permission_prompt = $true") &&
                 packageScript.contains("preflight_outputs") &&
                 packageScript.contains("transcription_client_whisper") &&
                 packageScript.contains("package_identity") &&

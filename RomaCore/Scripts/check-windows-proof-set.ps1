@@ -485,6 +485,10 @@ function Assert-LaptopPreflightReport {
     Assert-ReportBoolean -Report $permissionOutput -Name "native_capabilities_register_hotkey" -Expected $true -ReportName $reportName
     Assert-ReportBoolean -Report $permissionOutput -Name "no_accessibility_permission_prompt" -Expected $true -ReportName $reportName
     Assert-ReportBoolean -Report $permissionOutput -Name "no_automation_permission_prompt" -Expected $true -ReportName $reportName
+    Assert-ReportBoolean -Report $permissionOutput -Name "no_admin_required" -Expected $true -ReportName $reportName
+    Assert-ReportBoolean -Report $permissionOutput -Name "startup_launcher_run_script" -Expected $true -ReportName $reportName
+    Assert-ReportBoolean -Report $permissionOutput -Name "startup_launch_mode_listen" -Expected $true -ReportName $reportName
+    Assert-ReportBoolean -Report $permissionOutput -Name "no_startup_permission_prompt" -Expected $true -ReportName $reportName
     Assert-ReportBoolean -Report $permissionOutput -Name "no_screen_capture_required" -Expected $true -ReportName $reportName
     Assert-ReportBoolean -Report $permissionOutput -Name "no_screen_recording_permission_prompt" -Expected $true -ReportName $reportName
 

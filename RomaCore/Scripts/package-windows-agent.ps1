@@ -286,6 +286,10 @@ function Write-LaptopPreflightCheckerSmokeReport {
                 native_capabilities_register_hotkey = $true
                 no_accessibility_permission_prompt = $true
                 no_automation_permission_prompt = $true
+                no_admin_required = $true
+                startup_launcher_run_script = $true
+                startup_launch_mode_listen = $true
+                no_startup_permission_prompt = $true
                 no_screen_capture_required = $true
                 no_screen_recording_permission_prompt = $true
             }

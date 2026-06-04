@@ -969,10 +969,31 @@ struct RomaCoreChecks {
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Correction is a final word or single.",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "shared insertion polish should trim correction markers before final-word-or-single continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "It's a final word or single word.",
+                context: midSentenceContext
+            ) == "a final word or single word",
+            "shared insertion polish should trim it's markers before final-word-or-single-word continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "It's a final now.",
                 context: midSentenceContext
             ) == "It's a final now",
             "shared insertion polish should preserve non-final-word article continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Correction is a final word or single now.",
+                context: midSentenceContext
+            ) == "correction is a final word or single now",
+            "shared insertion polish should preserve longer non-exact final-word-or-single continuations"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("Right model.", context: midSentenceContext) == "right model",
@@ -8452,6 +8473,37 @@ struct RomaCoreChecks {
             "pipeline should paste final-word continuations after correction markers"
         )
 
+        let finalWordOrSingleRecorder = FakeRecorder()
+        let finalWordOrSingleInserter = FakeTextInsertion()
+        let finalWordOrSinglePipeline = DictationPipeline(
+            recorder: finalWordOrSingleRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "final-word-or-single-continuation-proof.wav",
+                text: "Correction is a final word or single."
+            ),
+            textInsertion: finalWordOrSingleInserter
+        )
+        let finalWordOrSingleRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/final-word-or-single-continuation-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await finalWordOrSingleRecorder.startPreRollBuffering()
+        let finalWordOrSingleResult = try await finalWordOrSinglePipeline.runRecordingWindow(finalWordOrSingleRequest) {}
+
+        try require(
+            finalWordOrSingleResult.processedText == " a final word or single",
+            "pipeline should clean correction markers before final-word-or-single continuations"
+        )
+        try require(
+            await finalWordOrSingleInserter.pastedText == " a final word or single",
+            "pipeline should paste final-word-or-single continuations after correction markers"
+        )
+
         let orWaitNoIMeanRecorder = FakeRecorder()
         let orWaitNoIMeanInserter = FakeTextInsertion()
         let orWaitNoIMeanPipeline = DictationPipeline(
@@ -9657,7 +9709,8 @@ struct RomaCoreChecks {
                 checkReportScript.contains(#"-Expected (Get-RomaWindowsProofProfileExpectedMode -Profile (Get-RomaWindowsProofProfileName -Name "laptop_preflight"))"#) &&
                 !checkReportScript.contains(#"Set-ExpectedModeFromProfile -Mode "cloud""#) &&
                 !checkReportScript.contains(#"Set-ExpectedModeFromProfile -Mode "local-whisper""#) &&
-                checkReportScript.contains(#"[ValidateSet("", "doctor-only", "laptop-preflight""#) &&
+                !checkReportScript.contains(#"[ValidateSet("", "doctor-only", "laptop-preflight""#) &&
+                proofCommonScript.contains("throw \"Unknown Windows proof profile: $Profile\"") &&
                 checkReportScript.contains("function Assert-LaptopPreflightReport") &&
                 checkReportScript.contains(#""laptop-preflight" {"#) &&
                 checkSetScript.contains("Assert-SameLaptopPreflightProof") &&

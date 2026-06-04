@@ -78,6 +78,7 @@ struct RomaProofAgent {
         print("miniaudio_capture_adapter_source=true")
         print("openai_compatible_transcription_source=true")
         print("whisper_cli_transcription_source=true")
+        print("roma_transcription_client_source=true")
         print("transcription_output_filter_source=true")
         print("word_replacement_processor_source=true")
         print("windows_dictation_runtime_source=true")
@@ -85,6 +86,7 @@ struct RomaProofAgent {
         print("windows_listener_output_isolation_source=true")
         print("windows_hold_hook_single_window_source=true")
         print("windows_dictation_proof_source=true")
+        print("windows_proof_args_shared_source=true")
     }
 
     private static func printWindowsHotKeyDoctor() {

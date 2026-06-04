@@ -7182,6 +7182,11 @@ struct RomaCoreChecks {
             "Windows proof agent should print native adapter runtime availability on Windows"
         )
         try require(
+            proofAgentSource.contains(#"roma_transcription_client_source=true"#) &&
+                proofAgentSource.contains(#"windows_proof_args_shared_source=true"#),
+            "Windows proof agent doctor should expose shared Windows transcription/proof-arg source markers"
+        )
+        try require(
             windowsAgentSource.contains(#"case "config-doctor":"#) &&
                 windowsAgentSource.contains(#"print("config_valid=true")"#) &&
                 transcriptionClientSource.contains(#""api_key_resolved=true""#) &&
@@ -7290,6 +7295,15 @@ struct RomaCoreChecks {
             "Windows artifact proof reports should record that hold-to-talk uses one native hook window"
         )
         try require(
+            proveScript.contains(
+                #"roma_transcription_client_source = $Output.Contains("roma_transcription_client_source=true")"#
+            ) &&
+                proveScript.contains(
+                    #"windows_proof_args_shared_source = $Output.Contains("windows_proof_args_shared_source=true")"#
+                ),
+            "Windows artifact proof reports should record shared transcription client and proof arg markers"
+        )
+        try require(
             checkReportScript.contains(
                 #"Assert-Boolean -Object $Proof -Name "windows_dictation_runtime_uses_pipeline_source" -Expected $true"#
             ),
@@ -7306,6 +7320,15 @@ struct RomaCoreChecks {
                 #"Assert-Boolean -Object $Proof -Name "windows_hold_hook_single_window_source" -Expected $true"#
             ),
             "Windows proof checker should require that hold-to-talk uses one native hook window"
+        )
+        try require(
+            checkReportScript.contains(
+                #"Assert-Boolean -Object $Proof -Name "roma_transcription_client_source" -Expected $true"#
+            ) &&
+                checkReportScript.contains(
+                    #"Assert-Boolean -Object $Proof -Name "windows_proof_args_shared_source" -Expected $true"#
+                ),
+            "Windows proof checker should require shared transcription client and proof arg markers"
         )
         try require(
             checkReportScript.contains(#""hold_hook_single_window_source""#),

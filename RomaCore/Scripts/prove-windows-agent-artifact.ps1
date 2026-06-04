@@ -591,8 +591,10 @@ function Get-ProofAgentDoctorOutputProof {
         miniaudio_capture_adapter_source = $Output.Contains("miniaudio_capture_adapter_source=true")
         openai_compatible_transcription_source = $Output.Contains("openai_compatible_transcription_source=true")
         whisper_cli_transcription_source = $Output.Contains("whisper_cli_transcription_source=true")
+        roma_transcription_client_source = $Output.Contains("roma_transcription_client_source=true")
         transcription_output_filter_source = $Output.Contains("transcription_output_filter_source=true")
         word_replacement_processor_source = $Output.Contains("word_replacement_processor_source=true")
+        windows_proof_args_shared_source = $Output.Contains("windows_proof_args_shared_source=true")
     }
 }
 
@@ -958,6 +960,8 @@ Invoke-Step "packaged proof agent doctor" {
     Assert-OutputContains -Output $script:packagedProofAgentDoctorOutput -Expected "windows_listener_output_isolation_source=true"
     Assert-OutputContains -Output $script:packagedProofAgentDoctorOutput -Expected "windows_hold_hook_single_window_source=true"
     Assert-OutputContains -Output $script:packagedProofAgentDoctorOutput -Expected "windows_dictation_proof_source=true"
+    Assert-OutputContains -Output $script:packagedProofAgentDoctorOutput -Expected "roma_transcription_client_source=true"
+    Assert-OutputContains -Output $script:packagedProofAgentDoctorOutput -Expected "windows_proof_args_shared_source=true"
 }
 
 Invoke-Step "packaged listener smoke" {

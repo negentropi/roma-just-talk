@@ -487,8 +487,10 @@ function Assert-ProofAgentDoctorOutputProof {
     Assert-Boolean -Object $Proof -Name "miniaudio_capture_adapter_source" -Expected $true
     Assert-Boolean -Object $Proof -Name "openai_compatible_transcription_source" -Expected $true
     Assert-Boolean -Object $Proof -Name "whisper_cli_transcription_source" -Expected $true
+    Assert-Boolean -Object $Proof -Name "roma_transcription_client_source" -Expected $true
     Assert-Boolean -Object $Proof -Name "transcription_output_filter_source" -Expected $true
     Assert-Boolean -Object $Proof -Name "word_replacement_processor_source" -Expected $true
+    Assert-Boolean -Object $Proof -Name "windows_proof_args_shared_source" -Expected $true
     Write-Host "proof_agent_doctor=$Name"
 }
 

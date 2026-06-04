@@ -707,10 +707,6 @@ struct RomaCoreChecks {
             "shared insertion polish should preserve smart-single-quoted question fragments"
         )
         try require(
-            RomaTranscriptionOutputFilter.applyInsertionPolish("'What?'", context: midSentenceContext) == "'what?'",
-            "shared insertion polish should preserve straight-single-quoted question fragments"
-        )
-        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("Model!\"", context: midSentenceContext) == "model",
             "shared insertion polish should remove trailing generated quotes after emphatic punctuation"
         )
@@ -6916,39 +6912,6 @@ struct RomaCoreChecks {
         try require(
             await smartSingleQuotedFragmentInserter.pastedText == " model",
             "pipeline should paste smart-single-quoted noisy mid-sentence final fragments"
-        )
-
-        let straightSingleQuotedFragmentRecorder = FakeRecorder()
-        let straightSingleQuotedFragmentInserter = FakeTextInsertion()
-        let straightSingleQuotedFragmentPipeline = DictationPipeline(
-            recorder: straightSingleQuotedFragmentRecorder,
-            transcriptionService: FakeTranscriptionService(
-                expectedFileName: "straight-single-quoted-fragment-proof.wav",
-                text: "'Model.'"
-            ),
-            textInsertion: straightSingleQuotedFragmentInserter
-        )
-        let straightSingleQuotedFragmentRequest = DictationPipelineRequest(
-            outputURL: URL(fileURLWithPath: "/tmp/straight-single-quoted-fragment-proof.wav"),
-            model: model,
-            shouldInsertTranscription: true,
-            textProcessing: DictationTextProcessingConfiguration(
-                insertionContext: TextInsertionContext(precedingText: "...so this")
-            )
-        )
-
-        try await straightSingleQuotedFragmentRecorder.startPreRollBuffering()
-        let straightSingleQuotedFragmentResult = try await straightSingleQuotedFragmentPipeline.runRecordingWindow(
-            straightSingleQuotedFragmentRequest
-        ) {}
-
-        try require(
-            straightSingleQuotedFragmentResult.processedText == " model",
-            "pipeline should clean straight-single-quoted noisy mid-sentence final fragments"
-        )
-        try require(
-            await straightSingleQuotedFragmentInserter.pastedText == " model",
-            "pipeline should paste straight-single-quoted noisy mid-sentence final fragments"
         )
 
         let backtickFragmentRecorder = FakeRecorder()

@@ -5358,8 +5358,60 @@ struct RomaCoreChecks {
             "insertion polish should attach standalone at sign commands"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Plus sign.", context: compactTokenContext) == "+",
+            "insertion polish should attach standalone plus sign commands"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Equals sign.", context: compactTokenContext) == "=",
+            "insertion polish should attach standalone equals sign commands"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Hash sign.", context: compactTokenContext) == "#",
+            "insertion polish should attach standalone hash sign commands"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Asterisk.", context: compactTokenContext) == "*",
+            "insertion polish should attach standalone asterisk commands"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Tilde.", context: compactTokenContext) == "~",
+            "insertion polish should attach standalone tilde commands"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Ampersand.", context: compactTokenContext) == "&",
+            "insertion polish should attach standalone ampersand commands"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Less than sign.", context: compactTokenContext) == "<",
+            "insertion polish should attach standalone less-than commands"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Greater than sign.", context: compactTokenContext) == ">",
+            "insertion polish should attach standalone greater-than commands"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionSpacing("@", context: emailUserContext) == "@",
             "insertion spacing should not add a space before at signs"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionSpacing("+", context: compactTokenContext) == "+",
+            "insertion spacing should not add a space before plus signs"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionSpacing("=", context: compactTokenContext) == "=",
+            "insertion spacing should not add a space before equals signs"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionSpacing("#", context: compactTokenContext) == "#",
+            "insertion spacing should not add a space before hash signs"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionSpacing("*", context: compactTokenContext) == "*",
+            "insertion spacing should not add a space before asterisks"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionSpacing("&", context: compactTokenContext) == "&",
+            "insertion spacing should not add a space before ampersands"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("Underscore.", context: variableContext) == "_",

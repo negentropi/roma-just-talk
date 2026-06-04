@@ -9880,6 +9880,9 @@ struct RomaCoreChecks {
                 checkReportScript.contains(#"$RequireProofProfile -eq "laptop-preflight""#) &&
                 checkSetScript.contains("Assert-SameLaptopPreflightProof") &&
                 proofCommonScript.contains(#"ok_marker = "proof_set_ok=laptop-preflight""#) &&
+                proofCommonScript.contains(#"laptop_preflight_proof_set = Get-RomaWindowsProofSetOkMarker -Name "laptop_preflight""#) &&
+                proofCommonScript.contains(#"full_laptop_proof_set = Get-RomaWindowsProofSetOkMarker -Name "full_laptop""#) &&
+                proofCommonScript.contains(#"$markers["proof_set"] = Get-RomaWindowsProofSetOkMarker -Name "laptop_preflight""#) &&
                 checkSetScript.contains(#"Get-RomaWindowsProofSetOkMarker -Name "laptop_preflight""#) &&
                 checkSetScript.contains(#"Get-RomaWindowsProofSetOkMarker -Name "full_laptop""#) &&
                 checkSetScript.contains(#"Get-RomaWindowsProofSetOkMarker -Name "artifact_smoke""#) &&
@@ -9965,7 +9968,7 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("proof_set_laptop_preflight_source_dirty=false") &&
                 proofCommonScript.contains("proof_profile_ok=laptop-preflight") &&
                 packageScript.contains("check-windows-proof-report.ps1 -ProofReportPath C:\\tmp\\roma-windows-laptop-proof\\preflight-proof.json -RequireProofProfile laptop-preflight") &&
-                proofCommonScript.contains("proof_set_ok=laptop-preflight"),
+                proofCommonScript.contains(#"$markers["proof_set"] = Get-RomaWindowsProofSetOkMarker -Name "laptop_preflight""#),
             "Windows package smoke should exercise the laptop preflight report profile output markers and identity shape on Windows CI"
         )
         try require(
@@ -10139,7 +10142,7 @@ struct RomaCoreChecks {
                 packageScript.contains("Get-RomaWindowsFullLaptopProofGuideMarkers") &&
                 proofCommonScript.contains("function Get-RomaWindowsFullLaptopProofGuideMarkers") &&
                 proofCommonScript.contains("windows_laptop_preflight_report=") &&
-                proofCommonScript.contains("proof_set_ok=laptop-preflight") &&
+                proofCommonScript.contains(#"laptop_preflight_proof_set = Get-RomaWindowsProofSetOkMarker -Name "laptop_preflight""#) &&
                 proofCommonScript.contains("windows_laptop_preflight_ok=true") &&
                 proofCommonScript.contains("proof_set_laptop_preflight_package_fingerprint=") &&
                 proofCommonScript.contains("proof_set_laptop_preflight_permission_surface=true") &&
@@ -10179,7 +10182,7 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Get-RomaWindowsFullLaptopProofSetOutputMarkers") &&
                 proofCommonScript.contains("function Assert-RomaWindowsFullLaptopProofSetOutput") &&
                 proofCommonScript.contains("proof_profile_ok=laptop-preflight") &&
-                proofCommonScript.contains("proof_set_ok=full-laptop") &&
+                proofCommonScript.contains(#"full_laptop_proof_set = Get-RomaWindowsProofSetOkMarker -Name "full_laptop""#) &&
                 laptopProofScript.contains("Assert-RomaWindowsFullLaptopProofSetOutput -Output `$proofSetOutput") &&
                 laptopProofScript.contains("windows_laptop_recheck_ok=true") &&
                 laptopProofScript.contains("ConvertTo-PowerShellSingleQuotedString") &&

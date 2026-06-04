@@ -696,7 +696,7 @@ function Add-RomaWindowsProofSetRequiredProfiles {
 
 function Get-RomaWindowsLaptopPreflightGuideMarkers {
     return [ordered]@{
-        laptop_preflight_proof_set = "proof_set_ok=laptop-preflight"
+        laptop_preflight_proof_set = Get-RomaWindowsProofSetOkMarker -Name "laptop_preflight"
         laptop_preflight_ok = "windows_laptop_preflight_ok=true"
         laptop_preflight_report = "windows_laptop_preflight_report=C:\tmp\roma-windows-laptop-proof\preflight-proof.json"
         package_fingerprint = "proof_set_laptop_preflight_package_fingerprint="
@@ -724,7 +724,7 @@ function Get-RomaWindowsFullLaptopProofSetOutputMarkers {
         cloud_dictation_profile = "proof_profile_ok=$($profiles["cloud_dictation"]["profile"])"
         local_whisper_dictation_profile = "proof_profile_ok=$($profiles["local_whisper_dictation"]["profile"])"
         local_whisper_notepad_paste_profile = "proof_profile_ok=$($profiles["local_whisper_notepad_paste"]["profile"])"
-        full_laptop_proof_set = "proof_set_ok=full-laptop"
+        full_laptop_proof_set = Get-RomaWindowsProofSetOkMarker -Name "full_laptop"
     }
 }
 
@@ -828,7 +828,7 @@ function Assert-RomaWindowsLaptopPreflightSetOutput {
 
     $markers = Get-RomaWindowsLaptopPreflightCommonOutputMarkers -ExpectLocalWhisper $ExpectLocalWhisper
     $markers["profile"] = "proof_profile_ok=laptop-preflight"
-    $markers["proof_set"] = "proof_set_ok=laptop-preflight"
+    $markers["proof_set"] = Get-RomaWindowsProofSetOkMarker -Name "laptop_preflight"
 
     Assert-RomaWindowsOutputMarkers -Output $Output -Markers $markers
 }

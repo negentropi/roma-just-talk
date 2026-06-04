@@ -43,6 +43,24 @@ if (!(Test-Path -LiteralPath $proofCommonScript)) {
 Set-Alias -Name Invoke-Step -Value Invoke-RomaWindowsProofStep -Scope Local -Force
 Set-Alias -Name Assert-OutputContains -Value Assert-RomaWindowsOutputContains -Scope Local -Force
 
+function Invoke-RomaProofAgentNativeDoctor {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    $doctorSpec = Get-RomaWindowsNativeDoctorSpec -Name $Name
+    $command = [string]$doctorSpec["command"]
+    $output = swift run RomaProofAgent $command 2>&1 | Out-String
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host $output
+        throw "RomaProofAgent $command failed"
+    }
+
+    Write-Host $output
+    Assert-RomaWindowsNativeDoctorOutput -Output $output -Name $Name
+}
+
 function Assert-FileWithBytes {
     param(
         [Parameter(Mandatory = $true)]
@@ -310,7 +328,7 @@ try {
     }
 
     Invoke-Step "miniaudio capture doctor" {
-        swift run RomaProofAgent miniaudio-capture-doctor
+        Invoke-RomaProofAgentNativeDoctor -Name "miniaudio_capture"
     }
 
     $micProof = Join-Path $OutputDir "mic-proof.wav"
@@ -426,23 +444,11 @@ try {
     }
 
     Invoke-Step "windows hotkey doctor" {
-        $hotkeyDoctorOutput = swift run RomaProofAgent windows-hotkey-doctor 2>&1 | Out-String
-        if ($LASTEXITCODE -ne 0) {
-            Write-Host $hotkeyDoctorOutput
-            throw "RomaProofAgent windows-hotkey-doctor failed"
-        }
-        Write-Host $hotkeyDoctorOutput
-        Assert-RomaWindowsNativeDoctorOutput -Output $hotkeyDoctorOutput -Name "register_hotkey"
+        Invoke-RomaProofAgentNativeDoctor -Name "register_hotkey"
     }
 
     Invoke-Step "windows hotkey availability proof" {
-        $hotkeyAvailabilityOutput = swift run RomaProofAgent windows-hotkey-availability-proof 2>&1 | Out-String
-        if ($LASTEXITCODE -ne 0) {
-            Write-Host $hotkeyAvailabilityOutput
-            throw "RomaProofAgent windows-hotkey-availability-proof failed"
-        }
-        Write-Host $hotkeyAvailabilityOutput
-        Assert-RomaWindowsNativeDoctorOutput -Output $hotkeyAvailabilityOutput -Name "register_hotkey_available"
+        Invoke-RomaProofAgentNativeDoctor -Name "register_hotkey_available"
     }
 
     if ($RunInteractiveHotkey) {
@@ -457,13 +463,7 @@ try {
     }
 
     Invoke-Step "windows keyboard hook doctor" {
-        $keyboardHookDoctorOutput = swift run RomaProofAgent windows-keyboard-hook-doctor 2>&1 | Out-String
-        if ($LASTEXITCODE -ne 0) {
-            Write-Host $keyboardHookDoctorOutput
-            throw "RomaProofAgent windows-keyboard-hook-doctor failed"
-        }
-        Write-Host $keyboardHookDoctorOutput
-        Assert-RomaWindowsNativeDoctorOutput -Output $keyboardHookDoctorOutput -Name "keyboard_hook"
+        Invoke-RomaProofAgentNativeDoctor -Name "keyboard_hook"
     }
 
     if ($RunInteractiveKeyboardHook) {
@@ -478,13 +478,7 @@ try {
     }
 
     Invoke-Step "windows paste doctor" {
-        $pasteDoctorOutput = swift run RomaProofAgent windows-paste-doctor 2>&1 | Out-String
-        if ($LASTEXITCODE -ne 0) {
-            Write-Host $pasteDoctorOutput
-            throw "RomaProofAgent windows-paste-doctor failed"
-        }
-        Write-Host $pasteDoctorOutput
-        Assert-RomaWindowsNativeDoctorOutput -Output $pasteDoctorOutput -Name "paste"
+        Invoke-RomaProofAgentNativeDoctor -Name "paste"
     }
 
     Invoke-Step "windows permission doctor" {
@@ -498,7 +492,7 @@ try {
     }
 
     Invoke-Step "windows secret doctor" {
-        swift run RomaProofAgent windows-secret-doctor
+        Invoke-RomaProofAgentNativeDoctor -Name "dpapi_secret"
     }
 
     Invoke-Step "windows secret proof" {

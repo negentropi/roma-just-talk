@@ -223,15 +223,61 @@ function Get-RomaWindowsProofAgentSourceOutputMarkers {
     }
 }
 
-function Get-RomaWindowsNativeDoctorExpectedMarkers {
+function Get-RomaWindowsNativeDoctorSpecs {
     return [ordered]@{
-        register_hotkey = "windows_hotkey_runtime=true"
-        register_hotkey_available = "hotkey_registration_available=true"
-        keyboard_hook = "runtime=true"
-        paste = "windows_paste_runtime=true"
-        dpapi_secret = "dpapi_runtime=true"
-        miniaudio_capture = "native_capture_adapter=true"
+        register_hotkey = [ordered]@{
+            label = "register hotkey"
+            command = "windows-hotkey-doctor"
+            expected_marker = "windows_hotkey_runtime=true"
+        }
+        register_hotkey_available = [ordered]@{
+            label = "register hotkey availability"
+            command = "windows-hotkey-availability-proof"
+            expected_marker = "hotkey_registration_available=true"
+        }
+        keyboard_hook = [ordered]@{
+            label = "keyboard hook"
+            command = "windows-keyboard-hook-doctor"
+            expected_marker = "runtime=true"
+        }
+        paste = [ordered]@{
+            label = "paste"
+            command = "windows-paste-doctor"
+            expected_marker = "windows_paste_runtime=true"
+        }
+        dpapi_secret = [ordered]@{
+            label = "dpapi secret"
+            command = "windows-secret-doctor"
+            expected_marker = "dpapi_runtime=true"
+        }
+        miniaudio_capture = [ordered]@{
+            label = "miniaudio capture"
+            command = "miniaudio-capture-doctor"
+            expected_marker = "native_capture_adapter=true"
+        }
     }
+}
+
+function Get-RomaWindowsNativeDoctorSpec {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    $specs = Get-RomaWindowsNativeDoctorSpecs
+    if (!$specs.Contains($Name)) {
+        throw "Unknown Windows native doctor proof name: $Name"
+    }
+    return $specs[$Name]
+}
+
+function Get-RomaWindowsNativeDoctorExpectedMarkers {
+    $markers = [ordered]@{}
+    $specs = Get-RomaWindowsNativeDoctorSpecs
+    foreach ($name in $specs.Keys) {
+        $markers[$name] = [string]$specs[$name]["expected_marker"]
+    }
+    return $markers
 }
 
 function Get-RomaWindowsNativeDoctorExpectedMarker {
@@ -240,11 +286,17 @@ function Get-RomaWindowsNativeDoctorExpectedMarker {
         [string]$Name
     )
 
-    $markers = Get-RomaWindowsNativeDoctorExpectedMarkers
-    if (!$markers.Contains($Name)) {
-        throw "Unknown Windows native doctor proof name: $Name"
+    $spec = Get-RomaWindowsNativeDoctorSpec -Name $Name
+    return [string]$spec["expected_marker"]
+}
+
+function New-RomaWindowsNativeDoctorOutputTable {
+    $outputs = [ordered]@{}
+    $specs = Get-RomaWindowsNativeDoctorSpecs
+    foreach ($name in $specs.Keys) {
+        $outputs[$name] = ""
     }
-    return [string]$markers[$Name]
+    return $outputs
 }
 
 function Get-RomaWindowsLaptopPreflightGuideMarkers {
@@ -437,6 +489,23 @@ function Get-RomaWindowsNativeDoctorOutputProof {
     Add-RomaWindowsProofFields -Proof $proof -Fields (Get-RomaWindowsHoldTimeoutDefaultOutputProof -Output $Output) | Out-Null
     Add-RomaWindowsProofFields -Proof $proof -Fields (Get-RomaWindowsClipboardRestoreDefaultOutputProof -Output $Output) | Out-Null
     return $proof
+}
+
+function Get-RomaWindowsNativeDoctorOutputProofs {
+    param(
+        [object]$Outputs
+    )
+
+    $proofs = [ordered]@{}
+    $specs = Get-RomaWindowsNativeDoctorSpecs
+    foreach ($name in $specs.Keys) {
+        $output = ""
+        if ($null -ne $Outputs -and $Outputs.Contains($name)) {
+            $output = $Outputs[$name]
+        }
+        $proofs[$name] = Get-RomaWindowsNativeDoctorOutputProof -Output $output -Name $name
+    }
+    return $proofs
 }
 
 function Get-RomaWindowsOutputValue {

@@ -2157,6 +2157,20 @@ public struct RomaTranscriptionOutputFilter {
                 return nil
             }
             return markerIndex + 4
+        case "on":
+            guard markerIndex + 2 < tokens.count,
+                  tokens[markerIndex + 1].text == "second",
+                  tokens[markerIndex + 2].text == "thought" else {
+                return nil
+            }
+            return markerIndex + 3
+        case "let":
+            guard markerIndex + 2 < tokens.count,
+                  tokens[markerIndex + 1].text == "me",
+                  tokens[markerIndex + 2].text == "rephrase" else {
+                return nil
+            }
+            return markerIndex + 3
         case "i":
             guard ["mean", "meant"].contains(tokens[markerIndex + 1].text) else { return nil }
             let replacementStartIndex = markerIndex + 2

@@ -3,6 +3,7 @@
 ## v1.81 - Unreleased
 
 - Trimmed leading correction markers before "final word or single" continuations while preserving longer ordinary continuations.
+- Routed Windows proof profile validation through the shared proof profile specs instead of a duplicate parameter list.
 - Shared Windows proof profile expected modes with the proof helper specs.
 - Shared Windows proof profile metadata between the proof helper and proof-set checker.
 - Shared Windows laptop preflight proof field shaping across the runner and checker surface.

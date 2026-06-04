@@ -2,7 +2,6 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$ProofReportPath,
     [string]$ExpectedMode = "",
-    [ValidateSet("", "doctor-only", "laptop-preflight", "cloud-dictation", "local-whisper-dictation", "local-whisper-notepad-paste", "packaged-whisper-mock-install")]
     [string]$RequireProofProfile = "",
     [switch]$RequireWindowsPlatform,
     [switch]$RequireInstall,

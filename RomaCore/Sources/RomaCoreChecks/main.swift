@@ -7899,6 +7899,7 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Assert-RomaWindowsClipboardRestoreDefaultOutput") &&
                 proofCommonScript.contains("function Assert-RomaWindowsMinimumPermissionOutput") &&
                 proofCommonScript.contains("function Get-RomaWindowsProofSurfaceFiles") &&
+                proofCommonScript.contains("function Get-RomaWindowsInstalledProofSurfaceFileMap") &&
                 proofCommonScript.contains("function Get-RomaWindowsRuntimeDefaultOutputProof") &&
                 proofCommonScript.contains("function Get-RomaWindowsHoldTimeoutDefaultOutputProof") &&
                 proofCommonScript.contains("function Get-RomaWindowsClipboardRestoreDefaultOutputProof") &&
@@ -7906,7 +7907,8 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Add-RomaWindowsProofFields") &&
                 proofCommonScript.contains("function Add-RomaWindowsAgentConfigurationArgs") &&
                 proofCommonScript.contains("function Add-RomaWindowsAgentScriptCommonArgs") &&
-                proofCommonScript.contains("function Get-RomaWindowsFileHashProof"),
+                proofCommonScript.contains("function Get-RomaWindowsFileHashProof") &&
+                proofCommonScript.contains("function Get-RomaWindowsInstalledProofSurfaceFileProofs"),
             "Windows proof helper should own shared script utilities"
         )
         try require(
@@ -8064,31 +8066,27 @@ struct RomaCoreChecks {
         )
         try require(
             proveScript.contains("installed_proof_agent") &&
-                proveScript.contains("installed_laptop_proof_script") &&
-                proveScript.contains("installed_laptop_proof_guide") &&
-                proveScript.contains("installed_parse_script") &&
+                proveScript.contains("Get-RomaWindowsInstalledProofSurfaceFileProofs -InstallDir $InstallDir") &&
                 proveScript.contains("installed_script_parse") &&
                 proveScript.contains(#"Invoke-Step "installed script parse check""#) &&
-                proveScript.contains("installed_proof_common_script") &&
-                proveScript.contains("installed_manifest_script") &&
-                proveScript.contains("installed_package_identity_script") &&
-                proveScript.contains("installed_check_set_script"),
-            "Windows artifact proof reports should record the installed proof surface"
+                proofCommonScript.contains(#"ReportProperty = "installed_laptop_proof_script""#) &&
+                proofCommonScript.contains(#"ReportProperty = "installed_laptop_proof_guide""#) &&
+                proofCommonScript.contains(#"ReportProperty = "installed_parse_script""#) &&
+                proofCommonScript.contains(#"ReportProperty = "installed_proof_common_script""#) &&
+                proofCommonScript.contains(#"ReportProperty = "installed_manifest_script""#) &&
+                proofCommonScript.contains(#"ReportProperty = "installed_package_identity_script""#) &&
+                proofCommonScript.contains(#"ReportProperty = "installed_check_set_script""#),
+            "Windows artifact proof reports should record the installed proof surface through the shared helper"
         )
         try require(
             checkReportScript.contains("installed_proof_agent_matches_package") &&
-                checkReportScript.contains(#"$installedProofSurfaceFiles = @("#) &&
-                checkReportScript.contains(#"@{ ReportProperty = "installed_laptop_proof_script"; PackageFile = "run-windows-laptop-proof.ps1" }"#) &&
-                checkReportScript.contains(#"@{ ReportProperty = "installed_laptop_proof_guide"; PackageFile = "WINDOWS-LAPTOP-PROOF.txt" }"#) &&
-                checkReportScript.contains(#"@{ ReportProperty = "installed_parse_script"; PackageFile = "check-windows-scripts-parse.ps1" }"#) &&
-                checkReportScript.contains(#"@{ ReportProperty = "installed_proof_common_script"; PackageFile = "windows-proof-common.ps1" }"#) &&
-                checkReportScript.contains(#"@{ ReportProperty = "installed_manifest_script"; PackageFile = "windows-manifest.ps1" }"#) &&
-                checkReportScript.contains(#"@{ ReportProperty = "installed_package_identity_script"; PackageFile = "windows-package-identity.ps1" }"#) &&
-                checkReportScript.contains(#"foreach ($proofSurfaceFile in $installedProofSurfaceFiles)"#) &&
+                checkReportScript.contains(#"windows-proof-common.ps1"#) &&
+                checkReportScript.contains(". $proofCommonScript") &&
+                checkReportScript.contains("foreach ($proofSurfaceFile in Get-RomaWindowsInstalledProofSurfaceFileMap)") &&
                 checkReportScript.contains(#""$($reportProperty)_matches_package""#) &&
                 checkReportScript.contains("installed_script_parse") &&
-                checkReportScript.contains(#"@{ ReportProperty = "installed_check_set_script"; PackageFile = "check-windows-proof-set.ps1" }"#),
-            "Windows proof checker should verify installed proof surface hashes"
+                proofCommonScript.contains(#"PackageFile = "check-windows-proof-set.ps1""#),
+            "Windows proof checker should verify installed proof surface hashes through the shared helper"
         )
         try require(
             checkSetScript.contains("proof_session_id"),

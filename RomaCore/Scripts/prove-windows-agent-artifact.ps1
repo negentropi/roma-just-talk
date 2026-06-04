@@ -703,6 +703,17 @@ function Write-ProofReport {
         }
     }
     $installedRunScriptPath = Join-Path $InstallDir "run-windows-agent.ps1"
+    $fileProofs = [ordered]@{
+        packaged_agent = (Get-FileHashProof -Path $agentPath)
+        packaged_proof_agent = (Get-FileHashProof -Path $script:proofAgentPath)
+        packaged_whisper_cli_mock = (Get-FileHashProof -Path $script:packagedWhisperCLI)
+        installed_agent = (Get-FileHashProof -Path (Join-Path $InstallDir "RomaWindowsAgent.exe"))
+        installed_proof_agent = (Get-FileHashProof -Path (Join-Path $InstallDir "RomaProofAgent.exe"))
+    }
+    Add-RomaWindowsProofFields `
+        -Proof $fileProofs `
+        -Fields (Get-RomaWindowsInstalledProofSurfaceFileProofs -InstallDir $InstallDir) |
+        Out-Null
 
     $report = [ordered]@{
         generated_at = (Get-Date).ToUniversalTime().ToString("o")
@@ -743,23 +754,7 @@ function Write-ProofReport {
         packaged_listener = (Get-ListenerSmokeProof -Output $script:packagedListenerOutput)
         installed_listener = (Get-ListenerSmokeProof -Output $script:installedListenerOutput)
         config_doctor = (Get-ConfigDoctorOutputProof -Output $script:installedConfigDoctorOutput)
-        files = [ordered]@{
-            packaged_agent = (Get-FileHashProof -Path $agentPath)
-            packaged_proof_agent = (Get-FileHashProof -Path $script:proofAgentPath)
-            packaged_whisper_cli_mock = (Get-FileHashProof -Path $script:packagedWhisperCLI)
-            installed_agent = (Get-FileHashProof -Path (Join-Path $InstallDir "RomaWindowsAgent.exe"))
-            installed_proof_agent = (Get-FileHashProof -Path (Join-Path $InstallDir "RomaProofAgent.exe"))
-            installed_run_script = (Get-FileHashProof -Path (Join-Path $InstallDir "run-windows-agent.ps1"))
-            installed_proof_script = (Get-FileHashProof -Path (Join-Path $InstallDir "prove-windows-agent-artifact.ps1"))
-            installed_laptop_proof_script = (Get-FileHashProof -Path (Join-Path $InstallDir "run-windows-laptop-proof.ps1"))
-            installed_laptop_proof_guide = (Get-FileHashProof -Path (Join-Path $InstallDir "WINDOWS-LAPTOP-PROOF.txt"))
-            installed_parse_script = (Get-FileHashProof -Path (Join-Path $InstallDir "check-windows-scripts-parse.ps1"))
-            installed_proof_common_script = (Get-FileHashProof -Path (Join-Path $InstallDir "windows-proof-common.ps1"))
-            installed_manifest_script = (Get-FileHashProof -Path (Join-Path $InstallDir "windows-manifest.ps1"))
-            installed_package_identity_script = (Get-FileHashProof -Path (Join-Path $InstallDir "windows-package-identity.ps1"))
-            installed_check_report_script = (Get-FileHashProof -Path (Join-Path $InstallDir "check-windows-proof-report.ps1"))
-            installed_check_set_script = (Get-FileHashProof -Path (Join-Path $InstallDir "check-windows-proof-set.ps1"))
-        }
+        files = $fileProofs
         manifest = $script:artifactManifest
         package_identity = (Get-RomaPackageIdentityProof -PackageDir $PackageDir)
         installed_script_parse = (Get-ScriptParseProof -Output $script:installedScriptParseOutput)

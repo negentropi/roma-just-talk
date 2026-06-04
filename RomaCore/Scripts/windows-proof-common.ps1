@@ -51,6 +51,21 @@ function Get-RomaWindowsProofSurfaceFiles {
     )
 }
 
+function Get-RomaWindowsInstalledProofSurfaceFileMap {
+    return @(
+        @{ ReportProperty = "installed_run_script"; PackageFile = "run-windows-agent.ps1" },
+        @{ ReportProperty = "installed_proof_script"; PackageFile = "prove-windows-agent-artifact.ps1" },
+        @{ ReportProperty = "installed_laptop_proof_script"; PackageFile = "run-windows-laptop-proof.ps1" },
+        @{ ReportProperty = "installed_laptop_proof_guide"; PackageFile = "WINDOWS-LAPTOP-PROOF.txt" },
+        @{ ReportProperty = "installed_parse_script"; PackageFile = "check-windows-scripts-parse.ps1" },
+        @{ ReportProperty = "installed_proof_common_script"; PackageFile = "windows-proof-common.ps1" },
+        @{ ReportProperty = "installed_manifest_script"; PackageFile = "windows-manifest.ps1" },
+        @{ ReportProperty = "installed_package_identity_script"; PackageFile = "windows-package-identity.ps1" },
+        @{ ReportProperty = "installed_check_report_script"; PackageFile = "check-windows-proof-report.ps1" },
+        @{ ReportProperty = "installed_check_set_script"; PackageFile = "check-windows-proof-set.ps1" }
+    )
+}
+
 function Assert-RomaWindowsOutputContains {
     param(
         [Parameter(Mandatory = $true)]
@@ -388,4 +403,20 @@ function Get-RomaWindowsFileHashProof {
     }
 
     return $proof
+}
+
+function Get-RomaWindowsInstalledProofSurfaceFileProofs {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$InstallDir
+    )
+
+    $proofs = [ordered]@{}
+    foreach ($proofSurfaceFile in Get-RomaWindowsInstalledProofSurfaceFileMap) {
+        $reportProperty = [string]$proofSurfaceFile.ReportProperty
+        $packageFile = [string]$proofSurfaceFile.PackageFile
+        $proofs[$reportProperty] = Get-RomaWindowsFileHashProof -Path (Join-Path $InstallDir $packageFile)
+    }
+
+    return $proofs
 }

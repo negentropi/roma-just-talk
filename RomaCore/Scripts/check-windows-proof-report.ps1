@@ -29,6 +29,12 @@ param(
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
+$proofCommonScript = Join-Path $PSScriptRoot "windows-proof-common.ps1"
+if (!(Test-Path -LiteralPath $proofCommonScript)) {
+    throw "Windows proof common helper was not found: $proofCommonScript"
+}
+. $proofCommonScript
+
 function Require-Property {
     param(
         [Parameter(Mandatory = $true)]
@@ -880,19 +886,7 @@ if ($RequireInstall) {
         -ExpectedProof (Require-Property -Object $files -Name "packaged_proof_agent") `
         -Name "installed_proof_agent_matches_package"
     $packageIdentityFiles = Require-Property -Object $packageIdentity -Name "files"
-    $installedProofSurfaceFiles = @(
-        @{ ReportProperty = "installed_run_script"; PackageFile = "run-windows-agent.ps1" },
-        @{ ReportProperty = "installed_proof_script"; PackageFile = "prove-windows-agent-artifact.ps1" },
-        @{ ReportProperty = "installed_laptop_proof_script"; PackageFile = "run-windows-laptop-proof.ps1" },
-        @{ ReportProperty = "installed_laptop_proof_guide"; PackageFile = "WINDOWS-LAPTOP-PROOF.txt" },
-        @{ ReportProperty = "installed_parse_script"; PackageFile = "check-windows-scripts-parse.ps1" },
-        @{ ReportProperty = "installed_proof_common_script"; PackageFile = "windows-proof-common.ps1" },
-        @{ ReportProperty = "installed_manifest_script"; PackageFile = "windows-manifest.ps1" },
-        @{ ReportProperty = "installed_package_identity_script"; PackageFile = "windows-package-identity.ps1" },
-        @{ ReportProperty = "installed_check_report_script"; PackageFile = "check-windows-proof-report.ps1" },
-        @{ ReportProperty = "installed_check_set_script"; PackageFile = "check-windows-proof-set.ps1" }
-    )
-    foreach ($proofSurfaceFile in $installedProofSurfaceFiles) {
+    foreach ($proofSurfaceFile in Get-RomaWindowsInstalledProofSurfaceFileMap) {
         $reportProperty = [string]$proofSurfaceFile.ReportProperty
         $packageFile = [string]$proofSurfaceFile.PackageFile
         $installedFile = Require-Property -Object $files -Name $reportProperty

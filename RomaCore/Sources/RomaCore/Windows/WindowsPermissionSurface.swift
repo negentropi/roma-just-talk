@@ -87,4 +87,27 @@ public struct WindowsPermissionSurface: Equatable, Hashable, Sendable {
         screenCaptureRequired: false,
         screenRecordingPermissionPrompt: false
     )
+
+    public var proofOutputLines: [String] {
+        [
+            "minimum_permission_surface=\(minimumPermissions.joined(separator: ","))",
+            "os_permission_grants=\(osPermissionGrants.joined(separator: ","))",
+            "native_capabilities=\(nativeCapabilities.joined(separator: ","))",
+            "microphone_settings=\(microphoneSettingsPath)",
+            "microphone_settings_uri=\(microphoneSettingsURI)",
+            "desktop_app_microphone_access_required=\(requiresDesktopAppMicrophoneAccess)",
+            "hotkey_permission_prompt=\(hotKeyPermissionPrompt)",
+            "paste_permission_prompt=\(pastePermissionPrompt)",
+            "accessibility_permission_prompt=\(accessibilityPermissionPrompt)",
+            "automation_permission_prompt=\(automationPermissionPrompt)",
+            "paste_integrity_limit=\(pasteIntegrityLimit)",
+            "admin_required=\(adminRequired)",
+            "startup_mechanism=\(startupMechanism)",
+            "startup_launcher=\(startupLauncher)",
+            "startup_launch_mode=\(startupLaunchMode)",
+            "startup_permission_prompt=\(startupPermissionPrompt)",
+            "screen_capture_required=\(screenCaptureRequired)",
+            "screen_recording_permission_prompt=\(screenRecordingPermissionPrompt)"
+        ]
+    }
 }

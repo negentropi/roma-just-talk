@@ -34,8 +34,6 @@ struct RomaWindowsAgent {
     }
 
     private static func printDoctor() {
-        let permissionSurface = WindowsPermissionSurface.minimumMVP
-
         print("agent=roma-windows-agent")
         print("platform=\(platformName)")
         print("runtime_available=\(WindowsDictationRuntime.isRuntimeAvailable)")
@@ -54,24 +52,7 @@ struct RomaWindowsAgent {
         print("maximum_clipboard_restore_delay_seconds=\(WindowsClipboardRestoreConfiguration.maximumRestoreDelaySeconds)")
         print("secret_store=dpapi")
         print("config_default=\(RomaWindowsAgentConfiguration.defaultURL().path)")
-        print("minimum_permission_surface=\(permissionSurface.minimumPermissions.joined(separator: ","))")
-        print("os_permission_grants=\(permissionSurface.osPermissionGrants.joined(separator: ","))")
-        print("native_capabilities=\(permissionSurface.nativeCapabilities.joined(separator: ","))")
-        print("microphone_settings=\(permissionSurface.microphoneSettingsPath)")
-        print("microphone_settings_uri=\(permissionSurface.microphoneSettingsURI)")
-        print("desktop_app_microphone_access_required=\(permissionSurface.requiresDesktopAppMicrophoneAccess)")
-        print("hotkey_permission_prompt=\(permissionSurface.hotKeyPermissionPrompt)")
-        print("paste_permission_prompt=\(permissionSurface.pastePermissionPrompt)")
-        print("accessibility_permission_prompt=\(permissionSurface.accessibilityPermissionPrompt)")
-        print("automation_permission_prompt=\(permissionSurface.automationPermissionPrompt)")
-        print("paste_integrity_limit=\(permissionSurface.pasteIntegrityLimit)")
-        print("admin_required=\(permissionSurface.adminRequired)")
-        print("startup_mechanism=\(permissionSurface.startupMechanism)")
-        print("startup_launcher=\(permissionSurface.startupLauncher)")
-        print("startup_launch_mode=\(permissionSurface.startupLaunchMode)")
-        print("startup_permission_prompt=\(permissionSurface.startupPermissionPrompt)")
-        print("screen_capture_required=\(permissionSurface.screenCaptureRequired)")
-        print("screen_recording_permission_prompt=\(permissionSurface.screenRecordingPermissionPrompt)")
+        WindowsPermissionSurface.minimumMVP.proofOutputLines.forEach { print($0) }
     }
 
     private static func runDictation(arguments: [String]) async throws {

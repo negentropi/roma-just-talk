@@ -195,27 +195,8 @@ struct RomaProofAgent {
     }
 
     private static func printWindowsPermissionDoctor() {
-        let surface = WindowsPermissionSurface.minimumMVP
-
         print("platform=\(platformName)")
-        print("minimum_permission_surface=\(surface.minimumPermissions.joined(separator: ","))")
-        print("os_permission_grants=\(surface.osPermissionGrants.joined(separator: ","))")
-        print("native_capabilities=\(surface.nativeCapabilities.joined(separator: ","))")
-        print("microphone_settings=\(surface.microphoneSettingsPath)")
-        print("microphone_settings_uri=\(surface.microphoneSettingsURI)")
-        print("desktop_app_microphone_access_required=\(surface.requiresDesktopAppMicrophoneAccess)")
-        print("hotkey_permission_prompt=\(surface.hotKeyPermissionPrompt)")
-        print("paste_permission_prompt=\(surface.pastePermissionPrompt)")
-        print("accessibility_permission_prompt=\(surface.accessibilityPermissionPrompt)")
-        print("automation_permission_prompt=\(surface.automationPermissionPrompt)")
-        print("paste_integrity_limit=\(surface.pasteIntegrityLimit)")
-        print("admin_required=\(surface.adminRequired)")
-        print("startup_mechanism=\(surface.startupMechanism)")
-        print("startup_launcher=\(surface.startupLauncher)")
-        print("startup_launch_mode=\(surface.startupLaunchMode)")
-        print("startup_permission_prompt=\(surface.startupPermissionPrompt)")
-        print("screen_capture_required=\(surface.screenCaptureRequired)")
-        print("screen_recording_permission_prompt=\(surface.screenRecordingPermissionPrompt)")
+        WindowsPermissionSurface.minimumMVP.proofOutputLines.forEach { print($0) }
     }
 
     private static func printWindowsSecretDoctor() {

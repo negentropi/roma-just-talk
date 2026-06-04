@@ -6418,6 +6418,27 @@ struct RomaCoreChecks {
         try require(!surface.startupPermissionPrompt, "Startup folder shortcut should not be documented as a prompt flow")
         try require(!surface.screenCaptureRequired, "Windows MVP should not require screen capture")
         try require(!surface.screenRecordingPermissionPrompt, "Windows MVP should not need Screen Recording permission")
+
+        let proofOutputLines = surface.proofOutputLines
+        try require(
+            proofOutputLines.contains("minimum_permission_surface=microphone,hotkey,clipboard"),
+            "Windows permission proof lines should expose the minimal surface"
+        )
+        try require(
+            proofOutputLines.contains("microphone_settings_uri=ms-settings:privacy-microphone"),
+            "Windows permission proof lines should expose the direct microphone Settings URI"
+        )
+        try require(
+            proofOutputLines.contains("screen_recording_permission_prompt=false"),
+            "Windows permission proof lines should expose the negative screen-recording prompt"
+        )
+        let proofOutputKeys = proofOutputLines.map { line in
+            line.split(separator: "=", maxSplits: 1).first.map(String.init) ?? ""
+        }
+        try require(
+            Set(proofOutputKeys).count == proofOutputKeys.count,
+            "Windows permission proof lines should not duplicate marker keys"
+        )
     }
 
     private static func checkTranscriptionRequestMetadata() throws {
@@ -7417,9 +7438,14 @@ struct RomaCoreChecks {
             "Windows permission surface should expose the direct microphone Settings URI"
         )
         try require(
-            proofAgentSource.contains(#"print("microphone_settings_uri=\(surface.microphoneSettingsURI)")"#) &&
-                windowsAgentSource.contains(#"print("microphone_settings_uri=\(permissionSurface.microphoneSettingsURI)")"#),
-            "Windows doctors should print the direct microphone Settings URI"
+            permissionSurfaceSource.contains("public var proofOutputLines: [String]") &&
+                permissionSurfaceSource.contains(#""microphone_settings_uri=\(microphoneSettingsURI)""#),
+            "Windows permission surface should own the shared proof output lines"
+        )
+        try require(
+            proofAgentSource.contains("WindowsPermissionSurface.minimumMVP.proofOutputLines") &&
+                windowsAgentSource.contains("WindowsPermissionSurface.minimumMVP.proofOutputLines"),
+            "Windows doctors should print permission markers through the shared permission surface"
         )
         try require(
             proveScript.contains(#"microphone_settings_uri = $Output.Contains("microphone_settings_uri=ms-settings:privacy-microphone")"#) &&

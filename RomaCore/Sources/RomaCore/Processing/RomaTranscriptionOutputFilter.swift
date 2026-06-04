@@ -564,7 +564,7 @@ public struct RomaTranscriptionOutputFilter {
         (#"(?i)^\s*(?:ok(?:ay)?|all\s+right|alright|right|yeah|yes|yep|yup|sure)(?:[ \t]*[,;:…]+[ \t]*)+so[,;:…]*[ \t]+"#, ""),
         (#"(?i)^\s*(?:you\s+know|i\s+mean|like)[,;:…]+[ \t]*"#, "")
     ]
-    private static let continuationFragmentLeadingDiscourseFillerPattern = #"(?i)^\s*(you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?|i[ \t]+mean|ok(?:ay)?|yeah|like|basically|so|well)(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
+    private static let continuationFragmentLeadingDiscourseFillerPattern = #"(?i)^\s*(you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?|i[ \t]+mean(?:[ \t]+to[ \t]+say)?|i[ \t]+meant(?:[ \t]+to[ \t]+say)?|ok(?:ay)?|yeah|like|basically|so|well)(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let standaloneDiscourseFillerPattern = #"(?i)^\s*you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?[ \t]*[.,;:…]*\s*$"#
     private static let blockedPreviousWordsForTerminalYouKnow: Set<String> = [
         "do", "does", "did", "don't", "if", "know", "let", "should", "to", "whether", "will", "would"
@@ -1428,12 +1428,16 @@ public struct RomaTranscriptionOutputFilter {
         let isContinuingInsertion = activeContext.map { isContinuingSentence(after: $0.precedingText) } ?? false
         let isPlainNonASCIIBoundaryContinuation = isContinuingInsertion &&
             isPlainNonASCIIBoundaryContinuationFragment(polishedText)
+        let isLeadingDiscourseFillerContinuation = activeContext.map {
+            isLeadingDiscourseFillerContinuationFragment(polishedText, after: $0.precedingText)
+        } ?? false
         let shouldTreatAsFragment = isShortFragment(polishedText) ||
             (wasWholeSquareBracketedOutput &&
                 isShortFragment(removeTrailingNoisyFragmentPunctuation(from: polishedText))) ||
             (isContinuingInsertion &&
                 isNoisyPreservedBoundaryContinuationFragment(polishedText)) ||
-            isPlainNonASCIIBoundaryContinuation
+            isPlainNonASCIIBoundaryContinuation ||
+            isLeadingDiscourseFillerContinuation
         let shouldUseFragmentPolish: Bool
         if isContinuingInsertion {
             shouldUseFragmentPolish = shouldTreatAsFragment
@@ -1935,6 +1939,26 @@ public struct RomaTranscriptionOutputFilter {
         return didRemoveFiller ? candidate : text
     }
 
+    private static func isLeadingDiscourseFillerContinuationFragment(_ text: String, after precedingText: String) -> Bool {
+        guard isContinuingSentence(after: precedingText),
+              let regex = try? NSRegularExpression(pattern: continuationFragmentLeadingDiscourseFillerPattern) else {
+            return false
+        }
+
+        let candidate = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let match = regex.firstMatch(in: candidate, range: NSRange(candidate.startIndex..., in: candidate)),
+              match.numberOfRanges >= 2,
+              let matchRange = Range(match.range, in: candidate),
+              let fillerRange = Range(match.range(at: 1), in: candidate) else {
+            return false
+        }
+
+        let suffix = String(candidate[matchRange.upperBound...])
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let filler = normalizedRepeatedClause(String(candidate[fillerRange]))
+        return shouldRemoveLeadingContinuationDiscourseFiller(filler, suffix: suffix, after: precedingText)
+    }
+
     private static func shouldRemoveLeadingContinuationDiscourseFiller(
         _ filler: String,
         suffix: String,
@@ -2135,12 +2159,7 @@ public struct RomaTranscriptionOutputFilter {
             if tokens[replacementStartIndex].text == "actually" {
                 return replacementStartIndex + 1
             }
-            if replacementStartIndex + 1 < tokens.count,
-               tokens[replacementStartIndex].text == "i",
-               ["mean", "meant"].contains(tokens[replacementStartIndex + 1].text) {
-                return replacementStartIndex + 2
-            }
-            return replacementStartIndex
+            return replacementStartAfterOptionalIMeanMarker(tokens: tokens, startingAt: replacementStartIndex)
         case "instead":
             return tokens[markerIndex + 1].text == "of" ? nil : markerIndex + 1
         case "rather":
@@ -2186,7 +2205,7 @@ public struct RomaTranscriptionOutputFilter {
                   tokens[markerIndex + 2].text == "no" else {
                 return nil
             }
-            return markerIndex + 3
+            return replacementStartAfterOptionalIMeanMarker(tokens: tokens, startingAt: markerIndex + 3)
         case "my":
             guard tokens[markerIndex + 1].text == "bad" else { return nil }
             return markerIndex + 2
@@ -2221,15 +2240,13 @@ public struct RomaTranscriptionOutputFilter {
             guard tokens[markerIndex + 1].text == "on" else { return nil }
             return markerIndex + 2
         case "i":
-            guard ["mean", "meant"].contains(tokens[markerIndex + 1].text) else { return nil }
-            let replacementStartIndex = markerIndex + 2
-            if replacementStartIndex + 1 < tokens.count,
-               tokens[replacementStartIndex].text == "to",
-               tokens[replacementStartIndex + 1].text == "say" {
-                return replacementStartIndex + 2
-            }
-            return replacementStartIndex
+            return iMeanCorrectionReplacementStartIndex(tokens: tokens, startingAt: markerIndex)
         case "actually":
+            if markerIndex + 2 < tokens.count,
+               tokens[markerIndex + 1].text == "wait",
+               tokens[markerIndex + 2].text == "no" {
+                return replacementStartAfterOptionalIMeanMarker(tokens: tokens, startingAt: markerIndex + 3)
+            }
             if let neverMindStartIndex = neverMindReplacementStartIndex(
                 tokens: tokens,
                 markerIndex: markerIndex + 1
@@ -2244,9 +2261,11 @@ public struct RomaTranscriptionOutputFilter {
             ) {
                 return neverMindStartIndex
             }
-            if tokens[markerIndex + 1].text == "actually" ||
-                tokens[markerIndex + 1].text == "no" {
+            if tokens[markerIndex + 1].text == "actually" {
                 return markerIndex + 2
+            }
+            if tokens[markerIndex + 1].text == "no" {
+                return replacementStartAfterOptionalIMeanMarker(tokens: tokens, startingAt: markerIndex + 2)
             }
             guard markerIndex + 2 < tokens.count,
                   tokens[markerIndex + 1].text == "i",
@@ -2263,18 +2282,7 @@ public struct RomaTranscriptionOutputFilter {
             if markerIndex + 2 < tokens.count,
                tokens[markerIndex + 1].text == "wait" {
                 let replacementStartIndex = markerIndex + 2
-                if replacementStartIndex + 1 < tokens.count,
-                   tokens[replacementStartIndex].text == "i",
-                   ["mean", "meant"].contains(tokens[replacementStartIndex + 1].text) {
-                    let afterIMeanIndex = replacementStartIndex + 2
-                    if afterIMeanIndex + 1 < tokens.count,
-                       tokens[afterIMeanIndex].text == "to",
-                       tokens[afterIMeanIndex + 1].text == "say" {
-                        return afterIMeanIndex + 2
-                    }
-                    return afterIMeanIndex
-                }
-                return replacementStartIndex
+                return replacementStartAfterOptionalIMeanMarker(tokens: tokens, startingAt: replacementStartIndex)
             }
             if markerIndex + 2 < tokens.count,
                tokens[markerIndex + 1].text == "actually" {
@@ -2284,6 +2292,29 @@ public struct RomaTranscriptionOutputFilter {
         default:
             return nil
         }
+    }
+
+    private static func replacementStartAfterOptionalIMeanMarker(
+        tokens: [WordToken],
+        startingAt startIndex: Int
+    ) -> Int {
+        iMeanCorrectionReplacementStartIndex(tokens: tokens, startingAt: startIndex) ?? startIndex
+    }
+
+    private static func iMeanCorrectionReplacementStartIndex(tokens: [WordToken], startingAt startIndex: Int) -> Int? {
+        guard startIndex + 1 < tokens.count,
+              tokens[startIndex].text == "i",
+              ["mean", "meant"].contains(tokens[startIndex + 1].text) else {
+            return nil
+        }
+
+        let afterIMeanIndex = startIndex + 2
+        if afterIMeanIndex + 1 < tokens.count,
+           tokens[afterIMeanIndex].text == "to",
+           tokens[afterIMeanIndex + 1].text == "say" {
+            return afterIMeanIndex + 2
+        }
+        return afterIMeanIndex
     }
 
     private static func shouldApplyUnpunctuatedContinuationCorrectionMarker(

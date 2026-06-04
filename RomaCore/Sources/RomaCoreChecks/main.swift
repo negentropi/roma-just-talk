@@ -406,6 +406,34 @@ struct RomaCoreChecks {
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model wait no I meant module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should apply wait-no-i-meant corrections in short continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model wait no I mean to say module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should apply wait-no-i-mean-to-say corrections in short continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model or wait no I mean module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should apply or-wait-no-i-mean corrections in short continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model actually wait no I mean module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should apply actually-wait-no-i-mean corrections in short continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "cloud flare actually vercel.",
                 context: midSentenceContext
             ) == "Vercel",
@@ -5144,6 +5172,27 @@ struct RomaCoreChecks {
             "insertion polish should drop leading i-mean before short continuation fragments"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "I meant module.",
+                context: midSentenceContext
+            ) == "module",
+            "insertion polish should drop leading i-meant before short continuation fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "I mean to say module.",
+                context: midSentenceContext
+            ) == "module",
+            "insertion polish should drop leading i-mean-to-say before short continuation fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "I meant to say module.",
+                context: midSentenceContext
+            ) == "module",
+            "insertion polish should drop leading i-meant-to-say before short continuation fragments"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("like Model.", context: midSentenceContext) == "model",
             "insertion polish should drop leading like before short continuation fragments"
         )
@@ -7073,6 +7122,37 @@ struct RomaCoreChecks {
         try require(
             await noWaitIMeanInserter.pastedText == " module",
             "pipeline should paste no-wait-i-mean continuation corrections"
+        )
+
+        let orWaitNoIMeanRecorder = FakeRecorder()
+        let orWaitNoIMeanInserter = FakeTextInsertion()
+        let orWaitNoIMeanPipeline = DictationPipeline(
+            recorder: orWaitNoIMeanRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "or-wait-no-i-mean-continuation-proof.wav",
+                text: "model or wait no I mean module."
+            ),
+            textInsertion: orWaitNoIMeanInserter
+        )
+        let orWaitNoIMeanRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/or-wait-no-i-mean-continuation-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await orWaitNoIMeanRecorder.startPreRollBuffering()
+        let orWaitNoIMeanResult = try await orWaitNoIMeanPipeline.runRecordingWindow(orWaitNoIMeanRequest) {}
+
+        try require(
+            orWaitNoIMeanResult.processedText == " module",
+            "pipeline should clean or-wait-no-i-mean continuation corrections"
+        )
+        try require(
+            await orWaitNoIMeanInserter.pastedText == " module",
+            "pipeline should paste or-wait-no-i-mean continuation corrections"
         )
 
         let backtickFragmentRecorder = FakeRecorder()

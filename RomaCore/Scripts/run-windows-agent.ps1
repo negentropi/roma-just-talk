@@ -167,59 +167,35 @@ if ($hasEndpoint -or $hasModel -or $hasWhisperCLI -or $hasWhisperModel) {
         Write-Host $saveKeyOutput
     }
 
-    if ($hasWhisperCLI) {
-        $configArgs += @("--whisper-cli", $WhisperCLI, "--whisper-model", $WhisperModel)
-        if (![string]::IsNullOrWhiteSpace($WhisperOutputDir)) {
-            $configArgs += @("--whisper-output-dir", $WhisperOutputDir)
-        }
-        foreach ($argument in $WhisperArgument) {
-            if (![string]::IsNullOrWhiteSpace($argument)) {
-                $configArgs += @("--whisper-arg", $argument)
-            }
-        }
-    } else {
-        $configArgs += @("--endpoint", $Endpoint, "--model", $Model)
-    }
-    if ($UseHoldHook -or !$UseToggle) {
-        $configArgs += @("--hold-hook", "--timeout", "$HoldTimeoutSeconds")
-    } else {
-        $configArgs += @("--toggle", "--seconds", "$RecordSeconds")
-    }
     if ($hasEndpoint) {
-        if (![string]::IsNullOrWhiteSpace($ApiKeyName)) {
-            $configArgs += @("--api-key-name", $ApiKeyName, "--secret-dir", $SecretDir)
-        } elseif (![string]::IsNullOrWhiteSpace($ApiKeyEnv)) {
-            $configArgs += @("--api-key-env", $ApiKeyEnv)
-        } else {
+        if ([string]::IsNullOrWhiteSpace($ApiKeyName) -and [string]::IsNullOrWhiteSpace($ApiKeyEnv)) {
             throw "Pass ApiKeyEnv or ApiKeyName when writing cloud config"
         }
     }
-    if (![string]::IsNullOrWhiteSpace($Language)) {
-        $configArgs += @("--language", $Language)
-    }
-    if (![string]::IsNullOrWhiteSpace($Prompt)) {
-        $configArgs += @("--prompt", $Prompt)
-    }
-    foreach ($replacement in $WordReplacement) {
-        if (![string]::IsNullOrWhiteSpace($replacement)) {
-            $configArgs += @("--replace", $replacement)
-        }
-    }
-    if ($PasteDictation) {
-        $configArgs += "--paste"
-    }
-    if ($NoPaste) {
-        $configArgs += "--no-paste"
-    }
-    if ($RestoreClipboard) {
-        $configArgs += "--restore-clipboard"
-    }
-    if ($NoRestoreClipboard) {
-        $configArgs += "--no-restore-clipboard"
-    }
-    if ($hasExplicitClipboardRestoreDelay) {
-        $configArgs += @("--clipboard-restore-delay", "$ClipboardRestoreDelaySeconds")
-    }
+    $configArgs = Add-RomaWindowsAgentConfigurationArgs `
+        -Arguments $configArgs `
+        -UseWhisperCLI $hasWhisperCLI `
+        -WhisperCLI $WhisperCLI `
+        -WhisperModel $WhisperModel `
+        -WhisperOutputDir $WhisperOutputDir `
+        -WhisperArgument $WhisperArgument `
+        -Endpoint $Endpoint `
+        -Model $Model `
+        -UseHoldHook ($UseHoldHook -or !$UseToggle) `
+        -HoldTimeoutSeconds $HoldTimeoutSeconds `
+        -RecordSeconds $RecordSeconds `
+        -ApiKeyName $ApiKeyName `
+        -ApiKeyEnv $ApiKeyEnv `
+        -SecretDir $SecretDir `
+        -Language $Language `
+        -Prompt $Prompt `
+        -WordReplacement $WordReplacement `
+        -PasteDictation $PasteDictation.IsPresent `
+        -NoPaste $NoPaste.IsPresent `
+        -RestoreClipboard $RestoreClipboard.IsPresent `
+        -NoRestoreClipboard $NoRestoreClipboard.IsPresent `
+        -HasClipboardRestoreDelay $hasExplicitClipboardRestoreDelay `
+        -ClipboardRestoreDelaySeconds $ClipboardRestoreDelaySeconds
 
     $configOutput = & $AgentPath @configArgs 2>&1 | Out-String
     if ($LASTEXITCODE -ne 0) {

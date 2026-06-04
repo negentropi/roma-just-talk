@@ -227,54 +227,29 @@ Invoke-Step "agent config" {
         "--config", $ConfigPath,
         "--out", $dictationOutput
     )
-    if ($usesWhisperCLI) {
-        $configArgs += @("--whisper-cli", $WhisperCLI, "--whisper-model", $WhisperModel)
-        if (![string]::IsNullOrWhiteSpace($WhisperOutputDir)) {
-            $configArgs += @("--whisper-output-dir", $WhisperOutputDir)
-        }
-        foreach ($argument in $WhisperArgument) {
-            if (![string]::IsNullOrWhiteSpace($argument)) {
-                $configArgs += @("--whisper-arg", $argument)
-            }
-        }
-    } else {
-        $configArgs += @("--endpoint", $Endpoint, "--model", $Model)
-    }
-    if ($shouldUseHoldHook) {
-        $configArgs += @("--hold-hook", "--timeout", "$HoldTimeoutSeconds")
-    } else {
-        $configArgs += @("--toggle", "--seconds", "$RecordSeconds")
-    }
-    if (!$usesWhisperCLI) {
-        if (![string]::IsNullOrWhiteSpace($ApiKeyName)) {
-            $configArgs += @("--api-key-name", $ApiKeyName, "--secret-dir", $SecretDir)
-        } else {
-            $configArgs += @("--api-key-env", $ApiKeyEnv)
-        }
-    }
-    if (![string]::IsNullOrWhiteSpace($Language)) {
-        $configArgs += @("--language", $Language)
-    }
-    if (![string]::IsNullOrWhiteSpace($Prompt)) {
-        $configArgs += @("--prompt", $Prompt)
-    }
-    foreach ($replacement in $WordReplacement) {
-        if (![string]::IsNullOrWhiteSpace($replacement)) {
-            $configArgs += @("--replace", $replacement)
-        }
-    }
-    if ($PasteDictation) {
-        $configArgs += "--paste"
-    }
-    if ($RestoreClipboard) {
-        $configArgs += "--restore-clipboard"
-    }
-    if ($NoRestoreClipboard) {
-        $configArgs += "--no-restore-clipboard"
-    }
-    if ($hasExplicitClipboardRestoreDelay) {
-        $configArgs += @("--clipboard-restore-delay", "$ClipboardRestoreDelaySeconds")
-    }
+    $configArgs = Add-RomaWindowsAgentConfigurationArgs `
+        -Arguments $configArgs `
+        -UseWhisperCLI $usesWhisperCLI `
+        -WhisperCLI $WhisperCLI `
+        -WhisperModel $WhisperModel `
+        -WhisperOutputDir $WhisperOutputDir `
+        -WhisperArgument $WhisperArgument `
+        -Endpoint $Endpoint `
+        -Model $Model `
+        -UseHoldHook $shouldUseHoldHook `
+        -HoldTimeoutSeconds $HoldTimeoutSeconds `
+        -RecordSeconds $RecordSeconds `
+        -ApiKeyName $ApiKeyName `
+        -ApiKeyEnv $ApiKeyEnv `
+        -SecretDir $SecretDir `
+        -Language $Language `
+        -Prompt $Prompt `
+        -WordReplacement $WordReplacement `
+        -PasteDictation $PasteDictation.IsPresent `
+        -RestoreClipboard $RestoreClipboard.IsPresent `
+        -NoRestoreClipboard $NoRestoreClipboard.IsPresent `
+        -HasClipboardRestoreDelay $hasExplicitClipboardRestoreDelay `
+        -ClipboardRestoreDelaySeconds $ClipboardRestoreDelaySeconds
 
     $configOutput = & $AgentPath @configArgs 2>&1 | Out-String
     if ($LASTEXITCODE -ne 0) {

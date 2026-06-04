@@ -7754,8 +7754,14 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Resolve-RomaWindowsFullPath") &&
                 proofCommonScript.contains("function Require-RomaWindowsFile") &&
                 proofCommonScript.contains("function Assert-RomaWindowsOutputContains") &&
+                proofCommonScript.contains("function Add-RomaWindowsAgentConfigurationArgs") &&
                 proofCommonScript.contains("function Get-RomaWindowsFileHashProof"),
             "Windows proof helper should own shared script utilities"
+        )
+        try require(
+            runScript.contains("$configArgs = Add-RomaWindowsAgentConfigurationArgs") &&
+                smokeScript.contains("$configArgs = Add-RomaWindowsAgentConfigurationArgs"),
+            "Windows runner and smoke scripts should share agent config argument construction"
         )
         let proofCommonHelperScripts = [
             ("windows-proof.ps1", windowsProofScript, ["Invoke-Step", "Assert-OutputContains"]),

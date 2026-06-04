@@ -8074,6 +8074,10 @@ struct RomaCoreChecks {
                 packageScript.contains("laptop_preflight_checker_smoke_report") &&
                 packageScript.contains("-IncludeLocalWhisper $false") &&
                 packageScript.contains("-IncludeLocalWhisper $true") &&
+                packageScript.contains("function Invoke-ManifestNestedRelocationSmoke") &&
+                packageScript.contains(#"Invoke-Step "manifest nested relocation smoke""#) &&
+                packageScript.contains("manifest_nested_relocation_duplicate_leaf=") &&
+                packageScript.contains("manifest_nested_relocation_ok=true") &&
                 packageScript.contains(#"-Expected "proof_set_laptop_preflight_permission_surface=true""#) &&
                 packageScript.contains(#"-Expected "proof_set_laptop_preflight_local_whisper=$expectedLocalWhisperMarker""#) &&
                 packageScript.contains(#"-Expected "proof_set_laptop_preflight_source_dirty=false""#) &&

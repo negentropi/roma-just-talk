@@ -435,6 +435,9 @@ public struct RomaTranscriptionOutputFilter {
         "settings", "site", "sites", "ticket", "tickets", "type", "types",
         "voice", "voices", "worker", "workers"
     ]
+    private static let codeCaseIdentifierTailWords: Set<String> = [
+        "id", "key", "name", "path", "token", "value"
+    ]
     private static let blockedNextWordsForSpokenPossessive: Set<String> = [
         "character", "characters", "is", "mark", "marks", "means", "meaning", "suffix", "symbol", "symbols"
     ]
@@ -1365,6 +1368,7 @@ public struct RomaTranscriptionOutputFilter {
                 after: activeContext.precedingText
             )
             polishedText = replaceUnpunctuatedCorrectionMarkerInContinuation(from: polishedText)
+            polishedText = applyTrailingSpokenCodeCaseCommandInContinuation(from: polishedText)
             return restoreLeadingNewlines(leadingNewlineCount, to: lowercaseFragmentWordsIfSafe(in: polishedText))
         }
 
@@ -1916,6 +1920,62 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         return text
+    }
+
+    private static func applyTrailingSpokenCodeCaseCommandInContinuation(from text: String) -> String {
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        let tokens = wordTokens(in: trimmedText)
+        guard tokens.count >= 3,
+              tokens.count <= 8,
+              !hasInternalSentenceBoundary(trimmedText) else {
+            return text
+        }
+
+        let words = tokens.map(\.text)
+        guard let style = trailingCodeCaseStyle(in: Array(words.suffix(2))) else {
+            return text
+        }
+
+        let argumentEndIndex = tokens.count - 2
+        let argumentWords = Array(words[..<argumentEndIndex])
+        guard argumentWords.count >= 2,
+              isCodeCaseArgumentWords(argumentWords),
+              shouldApplyTrailingSpokenCodeCaseCommand(argumentWords: argumentWords) else {
+            return text
+        }
+
+        let argumentRange = tokens[0].range.lowerBound..<tokens[argumentEndIndex - 1].range.upperBound
+        let argumentText = normalizeKnownProductPhraseFragments(in: String(trimmedText[argumentRange]))
+        return formatSpokenCodeCasePhrase(argumentText, style: style)
+    }
+
+    private static func trailingCodeCaseStyle(in words: [String]) -> SpokenCodeCaseStyle? {
+        guard words.count == 2,
+              words[1] == "case" else {
+            return nil
+        }
+
+        switch words[0] {
+        case "camel":
+            return .camel
+        case "snake":
+            return .snake
+        case "kebab", "dash", "hyphen":
+            return .kebab
+        case "pascal":
+            return .pascal
+        default:
+            return nil
+        }
+    }
+
+    private static func shouldApplyTrailingSpokenCodeCaseCommand(argumentWords: [String]) -> Bool {
+        argumentWords.contains { word in
+            productCorrectionTailWords.contains(word) ||
+                codeCaseIdentifierTailWords.contains(word) ||
+                commonTechnicalAcronyms[word] != nil ||
+                properNameFragmentCasing[word] != nil
+        }
     }
 
     private static func unpunctuatedContinuationCorrectionReplacementStartIndex(

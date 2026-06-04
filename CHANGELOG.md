@@ -3,6 +3,7 @@
 ## v1.81 - Unreleased
 
 - Replaced the README, source app icon, and menu bar logo with the roma-just-talk split-keyboard mark.
+- Formatted trailing developer case commands in short continuations such as "user id camel case".
 - Normalized lowercase product-name fragments such as "vercel project" and product corrections such as "cloud flare actually vercel".
 - Cleaned short bare correction fragments such as "model no module" and "model actually module".
 - Collapsed repeated determiner self-corrections such as "the model the module".
@@ -91,6 +92,7 @@
 - Required Windows hold-to-talk proof reports to preserve the runtime event order from pre-roll through transcript output.
 - Seeded the Windows hold-hook modifier state from already-held Ctrl/Shift/Alt/Win keys before waiting for the target key.
 - Kept one Windows hold-to-talk keyboard hook alive from keydown through keyup so release cannot be missed while recording starts.
+- Required Windows proof reports to assert the hold-to-talk runtime uses one native hook window.
 - Hardened Windows targeted paste foreground activation with `AttachThreadInput` before `SetForegroundWindow`.
 - Required full Windows laptop proof reports to share one proof session id.
 - Kept cloud and local Windows laptop startup shortcut proofs in separate proof-owned directories.

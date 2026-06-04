@@ -373,6 +373,41 @@ struct RomaCoreChecks {
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "user id camel case.",
+                context: midSentenceContext
+            ) == "userId",
+            "shared insertion polish should apply trailing camel case commands"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "api key snake case.",
+                context: midSentenceContext
+            ) == "api_key",
+            "shared insertion polish should apply trailing snake case commands"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "cloud flare worker id camel case.",
+                context: midSentenceContext
+            ) == "cloudflareWorkerId",
+            "shared insertion polish should apply trailing code case to product fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "next js route path snake case.",
+                context: midSentenceContext
+            ) == "next_js_route_path",
+            "shared insertion polish should apply trailing snake case to product phrase fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "prefer snake case user id.",
+                context: midSentenceContext
+            ) == "prefer snake case user id",
+            "shared insertion polish should preserve trailing code case prose without developer argument"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "I think no module.",
                 context: midSentenceContext
             ) == "I think no module",
@@ -6460,6 +6495,10 @@ struct RomaCoreChecks {
             proofAgentSource.contains(#"print("windows_dictation_runtime_uses_pipeline_source=true")"#),
             "Windows proof agent should expose that Windows runtime uses the shared DictationPipeline"
         )
+        try require(
+            proofAgentSource.contains(#"print("windows_hold_hook_single_window_source=true")"#),
+            "Windows proof agent should expose that hold-to-talk uses one native hook window"
+        )
         let doctorDefaultOutputLines = [
             #"print("default_record_seconds=\(RomaWindowsAgentConfiguration.defaultRecordSeconds)")"#,
             #"print("default_hold_timeout_seconds=\(RomaWindowsAgentConfiguration.defaultHoldTimeoutSeconds)")"#,
@@ -6492,6 +6531,10 @@ struct RomaCoreChecks {
                 scriptSource.contains(#"-Expected "windows_dictation_runtime_uses_pipeline_source=true""#),
                 "\(scriptName) should assert that the Windows runtime uses the shared DictationPipeline"
             )
+            try require(
+                scriptSource.contains(#"-Expected "windows_hold_hook_single_window_source=true""#),
+                "\(scriptName) should assert that hold-to-talk uses one native hook window"
+            )
         }
         let hotKeyAvailabilityProofAssertions = [
             ("windows-proof.ps1", windowsProofScript, "windows-hotkey-availability-proof", "hotkey_registration_available=true"),
@@ -6512,10 +6555,22 @@ struct RomaCoreChecks {
             "Windows artifact proof reports should record that the Windows runtime uses the shared DictationPipeline"
         )
         try require(
+            proveScript.contains(
+                #"windows_hold_hook_single_window_source = $Output.Contains("windows_hold_hook_single_window_source=true")"#
+            ),
+            "Windows artifact proof reports should record that hold-to-talk uses one native hook window"
+        )
+        try require(
             checkReportScript.contains(
                 #"Assert-Boolean -Object $Proof -Name "windows_dictation_runtime_uses_pipeline_source" -Expected $true"#
             ),
             "Windows proof checker should require that the Windows runtime uses the shared DictationPipeline"
+        )
+        try require(
+            checkReportScript.contains(
+                #"Assert-Boolean -Object $Proof -Name "windows_hold_hook_single_window_source" -Expected $true"#
+            ),
+            "Windows proof checker should require that hold-to-talk uses one native hook window"
         )
         try require(
             proofAgentSource.contains(

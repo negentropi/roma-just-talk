@@ -9407,10 +9407,16 @@ public struct RomaTranscriptionOutputFilter {
     ) -> String {
         let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
         let trimmedOriginalText = originalText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let originalTextWithoutOuterPunctuation = removeTrailingPunctuationAfterPreservedBoundary(from: trimmedOriginalText)
+        let originalInnerText = preservedBoundaryInnerText(in: trimmedOriginalText) ??
+            preservedBoundaryInnerText(in: originalTextWithoutOuterPunctuation)
+        let hadOuterPunctuationAfterBoundary = originalTextWithoutOuterPunctuation != trimmedOriginalText
         guard shouldUnwrapGeneratedContinuationBoundary(trimmedOriginalText),
               let innerText = preservedBoundaryInnerText(in: trimmedText),
-              let originalInnerText = preservedBoundaryInnerText(in: trimmedOriginalText),
-              shouldUnwrapNoisyGeneratedBoundaryContinuationInnerText(originalInnerText) else {
+              let originalInnerText,
+              shouldUnwrapNoisyGeneratedBoundaryContinuationInnerText(originalInnerText) ||
+                (hadOuterPunctuationAfterBoundary &&
+                    shouldUnwrapOuterPunctuatedGeneratedBoundaryContinuationInnerText(originalInnerText)) else {
             return text
         }
 
@@ -9422,6 +9428,19 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         return cleanedInnerText
+    }
+
+    private static func shouldUnwrapOuterPunctuatedGeneratedBoundaryContinuationInnerText(_ text: String) -> Bool {
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedText.isEmpty,
+              wordCount(in: trimmedText) <= 5,
+              !trimmedText.contains("."),
+              !hasInternalSentenceBoundary(trimmedText),
+              let firstLetter = trimmedText.first(where: { $0.isLetter }) else {
+            return false
+        }
+
+        return firstLetter.isUppercase
     }
 
     private static func shouldUnwrapGeneratedContinuationBoundary(_ text: String) -> Bool {

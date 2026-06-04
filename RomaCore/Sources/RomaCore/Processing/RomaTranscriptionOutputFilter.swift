@@ -8162,7 +8162,7 @@ public struct RomaTranscriptionOutputFilter {
             return normalizeWhitespace(strippedText)
         }
 
-        let boundaryCharacters = CharacterSet(charactersIn: #"[]{}()"“”‘’'"`【】《》〈〉（）｛｝［］「」『』〔〕"#)
+        let boundaryCharacters = CharacterSet(charactersIn: #"[]{}()"“”‘’'"【】《》〈〉（）｛｝［］「」『』〔〕"#)
         strippedText = strippedText.trimmingCharacters(in: boundaryCharacters.union(.whitespacesAndNewlines))
         return normalizeWhitespace(strippedText)
     }

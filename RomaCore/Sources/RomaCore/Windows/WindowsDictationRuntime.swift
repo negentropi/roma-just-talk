@@ -49,6 +49,7 @@ public enum WindowsDictationRuntimeError: Error, LocalizedError, Equatable {
     case unsupported
     case invalidRecordDuration(TimeInterval)
     case invalidHoldTimeoutMilliseconds(UInt32)
+    case invalidMaxSessions(Int)
     case invalidClipboardRestoreDelay(TimeInterval)
 
     public var errorDescription: String? {
@@ -59,6 +60,8 @@ public enum WindowsDictationRuntimeError: Error, LocalizedError, Equatable {
             return "Windows toggle record duration must be finite and between \(RomaWindowsAgentConfiguration.minimumRecordSeconds) and \(RomaWindowsAgentConfiguration.maximumRecordSeconds) seconds; got \(seconds)."
         case .invalidHoldTimeoutMilliseconds(let milliseconds):
             return "Windows hold timeout must be positive; got \(milliseconds) milliseconds."
+        case .invalidMaxSessions(let sessions):
+            return "Windows listener max sessions must be non-negative; got \(sessions)."
         case .invalidClipboardRestoreDelay(let seconds):
             return "Windows clipboard restore delay must be finite and between 0 and \(WindowsClipboardRestoreConfiguration.maximumRestoreDelaySeconds) seconds; got \(seconds)."
         }
@@ -82,66 +85,63 @@ public enum WindowsDictationRuntime {
         try validateRequest(request)
 
         #if os(Windows)
-        let recorder = MiniaudioCaptureRecorder()
-        let pipeline = DictationPipeline(
-            recorder: recorder,
+        let session = WindowsDictationRuntimeSession(
             transcriptionService: transcriptionService,
-            textInsertion: request.shouldPaste
-                ? WindowsClipboardTextInsertion(
-                    restoreConfiguration: request.clipboardRestoreConfiguration
-                )
-                : nil
-        )
-        let pipelineRequest = DictationPipelineRequest(
-            outputURL: request.outputURL,
-            model: request.model,
-            language: request.language,
-            prompt: request.prompt,
-            shouldInsertTranscription: request.shouldPaste,
-            textProcessing: request.textProcessing
+            onEvent: onEvent
         )
 
         do {
-            try await recorder.startPreRollBuffering()
-            onEvent(.preRollBuffering)
-
-            switch request.trigger {
-            case .toggle(let recordSeconds):
-                let hotKey = WindowsHotKey.proofToggle
-                onEvent(.waitingForToggle(displayName: hotKey.displayName))
-                try WindowsRegisterHotKeyProof.waitForSingleTrigger(hotKey: hotKey)
-                onEvent(.toggleReceived)
-
-                return try await pipeline.runRecordingWindow(pipelineRequest) {
-                    try await sleep(recordSeconds: recordSeconds)
-                }
-            case .hold(let timeoutMilliseconds):
-                let chord = WindowsLowLevelKeyboardHookChord.proofHold
-                let holdWindow = WindowsHoldWindowSignal()
-                onEvent(.waitingForHoldKeyDown(displayName: chord.displayName))
-                DispatchQueue.global(qos: .userInitiated).async {
-                    do {
-                        let result = try WindowsLowLevelKeyboardHookProof.waitForHoldWindow(
-                            chord: chord,
-                            timeoutMilliseconds: timeoutMilliseconds
-                        ) {
-                            holdWindow.signalKeyDown()
-                        }
-                        holdWindow.finish(.success(result))
-                    } catch {
-                        holdWindow.finish(.failure(error))
-                    }
-                }
-                try await holdWindow.waitForKeyDown()
-                onEvent(.holdKeyDown)
-
-                return try await pipeline.runRecordingWindow(pipelineRequest) {
-                    _ = try await holdWindow.waitForKeyUp()
-                    onEvent(.holdKeyUp)
-                }
-            }
+            try await session.startPreRollBuffering()
+            return try await session.run(request, captureLifecycle: .stopAfterRun)
         } catch {
-            await recorder.stopCapture()
+            await session.stopCapture()
+            throw error
+        }
+        #else
+        throw WindowsDictationRuntimeError.unsupported
+        #endif
+    }
+
+    public static func runListener(
+        _ request: WindowsDictationRuntimeRequest,
+        maxSessions: Int?,
+        outputURLForSession: @escaping (Int) -> URL,
+        transcriptionService: TranscriptionService,
+        onEvent: @escaping @Sendable (WindowsDictationRuntimeEvent) -> Void = { _ in },
+        onSessionCompleted: @escaping (Int, DictationPipelineResult) -> Void = { _, _ in }
+    ) async throws -> Int {
+        try validateRequest(request)
+        if let maxSessions, maxSessions < 0 {
+            throw WindowsDictationRuntimeError.invalidMaxSessions(maxSessions)
+        }
+        if maxSessions == 0 {
+            return 0
+        }
+
+        #if os(Windows)
+        let session = WindowsDictationRuntimeSession(
+            transcriptionService: transcriptionService,
+            onEvent: onEvent
+        )
+        var completedSessions = 0
+
+        do {
+            try await session.startPreRollBuffering()
+            while maxSessions.map({ completedSessions < $0 }) ?? true {
+                var sessionRequest = request
+                let sessionIndex = completedSessions + 1
+                sessionRequest.outputURL = outputURLForSession(sessionIndex)
+                let result = try await session.run(
+                    sessionRequest,
+                    captureLifecycle: .keepAliveAfterRun
+                )
+                completedSessions += 1
+                onSessionCompleted(completedSessions, result)
+            }
+            await session.stopCapture()
+            return completedSessions
+        } catch {
+            await session.stopCapture()
             throw error
         }
         #else
@@ -183,13 +183,103 @@ public enum WindowsDictationRuntime {
         }
     }
 
-    private static func sleep(recordSeconds: TimeInterval) async throws {
+    fileprivate static func sleep(recordSeconds: TimeInterval) async throws {
         let nanoseconds = try RomaWindowsAgentConfiguration.recordDurationNanoseconds(
             fromSeconds: recordSeconds
         )
         try await Task.sleep(nanoseconds: nanoseconds)
     }
 }
+
+#if os(Windows)
+private final class WindowsDictationRuntimeSession: @unchecked Sendable {
+    private let recorder = MiniaudioCaptureRecorder()
+    private let transcriptionService: any TranscriptionService
+    private let onEvent: @Sendable (WindowsDictationRuntimeEvent) -> Void
+
+    init(
+        transcriptionService: TranscriptionService,
+        onEvent: @escaping @Sendable (WindowsDictationRuntimeEvent) -> Void
+    ) {
+        self.transcriptionService = transcriptionService
+        self.onEvent = onEvent
+    }
+
+    func startPreRollBuffering() async throws {
+        try await recorder.startPreRollBuffering()
+        onEvent(.preRollBuffering)
+    }
+
+    func run(
+        _ request: WindowsDictationRuntimeRequest,
+        captureLifecycle: DictationPipelineCaptureLifecycle
+    ) async throws -> DictationPipelineResult {
+        let pipeline = DictationPipeline(
+            recorder: recorder,
+            transcriptionService: transcriptionService,
+            textInsertion: request.shouldPaste
+                ? WindowsClipboardTextInsertion(
+                    restoreConfiguration: request.clipboardRestoreConfiguration
+                )
+                : nil
+        )
+        let pipelineRequest = DictationPipelineRequest(
+            outputURL: request.outputURL,
+            model: request.model,
+            language: request.language,
+            prompt: request.prompt,
+            shouldInsertTranscription: request.shouldPaste,
+            textProcessing: request.textProcessing
+        )
+
+        switch request.trigger {
+        case .toggle(let recordSeconds):
+            let hotKey = WindowsHotKey.proofToggle
+            onEvent(.waitingForToggle(displayName: hotKey.displayName))
+            try WindowsRegisterHotKeyProof.waitForSingleTrigger(hotKey: hotKey)
+            onEvent(.toggleReceived)
+
+            return try await pipeline.runRecordingWindow(
+                pipelineRequest,
+                captureLifecycle: captureLifecycle
+            ) {
+                try await WindowsDictationRuntime.sleep(recordSeconds: recordSeconds)
+            }
+        case .hold(let timeoutMilliseconds):
+            let chord = WindowsLowLevelKeyboardHookChord.proofHold
+            let holdWindow = WindowsHoldWindowSignal()
+            onEvent(.waitingForHoldKeyDown(displayName: chord.displayName))
+            DispatchQueue.global(qos: .userInitiated).async {
+                do {
+                    let result = try WindowsLowLevelKeyboardHookProof.waitForHoldWindow(
+                        chord: chord,
+                        timeoutMilliseconds: timeoutMilliseconds
+                    ) {
+                        holdWindow.signalKeyDown()
+                    }
+                    holdWindow.finish(.success(result))
+                } catch {
+                    holdWindow.finish(.failure(error))
+                }
+            }
+            try await holdWindow.waitForKeyDown()
+            onEvent(.holdKeyDown)
+
+            return try await pipeline.runRecordingWindow(
+                pipelineRequest,
+                captureLifecycle: captureLifecycle
+            ) {
+                _ = try await holdWindow.waitForKeyUp()
+                onEvent(.holdKeyUp)
+            }
+        }
+    }
+
+    func stopCapture() async {
+        await recorder.stopCapture()
+    }
+}
+#endif
 
 private final class WindowsHoldWindowSignal: @unchecked Sendable {
     private let lock = NSLock()

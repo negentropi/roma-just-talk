@@ -41,6 +41,11 @@ public struct DictationPipelineResult: Equatable, Hashable, Sendable {
     }
 }
 
+public enum DictationPipelineCaptureLifecycle: Equatable, Hashable, Sendable {
+    case stopAfterRun
+    case keepAliveAfterRun
+}
+
 public struct DictationTextProcessingConfiguration: Equatable, Hashable, Sendable {
     public var removesFillerWords: Bool
     public var fillerWords: [String]
@@ -96,6 +101,7 @@ public final class DictationPipeline: @unchecked Sendable {
 
     public func runRecordingWindow(
         _ request: DictationPipelineRequest,
+        captureLifecycle: DictationPipelineCaptureLifecycle = .stopAfterRun,
         recordingWindow: @escaping @Sendable () async throws -> Void
     ) async throws -> DictationPipelineResult {
         if request.shouldInsertTranscription, textInsertion == nil {
@@ -124,7 +130,9 @@ public final class DictationPipeline: @unchecked Sendable {
                 insertedText = processedText
             }
 
-            await recorder.stopCapture()
+            if captureLifecycle == .stopAfterRun {
+                await recorder.stopCapture()
+            }
             let session = DictationSession(
                 recordedAudio: recordedAudio,
                 model: request.model,
@@ -138,7 +146,9 @@ public final class DictationPipeline: @unchecked Sendable {
                 processedText: processedText
             )
         } catch {
-            await recorder.stopCapture()
+            if captureLifecycle == .stopAfterRun {
+                await recorder.stopCapture()
+            }
             throw error
         }
     }

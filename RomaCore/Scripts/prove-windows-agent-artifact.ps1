@@ -100,6 +100,7 @@ function Invoke-PackagedListenerSmoke {
 
     Write-Host $output
     Assert-OutputContains -Output $output -Expected "mode=listen"
+    Assert-OutputContains -Output $output -Expected "listener_capture_lifecycle=shared_pre_roll_runtime"
     Assert-OutputContains -Output $output -Expected "listen_completed_sessions=0"
     return $output
 }
@@ -124,6 +125,7 @@ function Invoke-InstalledListenerSmoke {
 
     Write-Host $output
     Assert-OutputContains -Output $output -Expected "mode=RomaWindowsAgent listen"
+    Assert-OutputContains -Output $output -Expected "listener_capture_lifecycle=shared_pre_roll_runtime"
     Assert-OutputContains -Output $output -Expected "listen_completed_sessions=0"
     return $output
 }
@@ -600,6 +602,7 @@ function Get-ListenerSmokeProof {
     return [ordered]@{
         output_present = ![string]::IsNullOrWhiteSpace($Output)
         mode_listen = $Output.Contains("mode=listen")
+        shared_pre_roll_runtime = $Output.Contains("listener_capture_lifecycle=shared_pre_roll_runtime")
         zero_session = $Output.Contains("max_sessions=0")
         completed_zero_sessions = $Output.Contains("listen_completed_sessions=0")
         config_path = $configPath

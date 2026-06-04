@@ -51,11 +51,41 @@ struct RomaWindowsAgent {
         WindowsPermissionSurface.minimumMVP.proofOutputLines.forEach { print($0) }
     }
 
+    private struct DictationRunContext {
+        var configuration: RomaWindowsAgentConfiguration
+        var options: RomaCommandLineOptions
+        var transcriptionClient: RomaTranscriptionClient
+        var shouldPaste: Bool
+        var clipboardRestoreConfiguration: WindowsClipboardRestoreConfiguration
+        var shouldUseHoldHook: Bool
+        var wordReplacements: [RomaWordReplacementRule]
+        var request: WindowsDictationRuntimeRequest
+    }
+
     private static func runDictation(arguments: [String]) async throws {
         try await runDictation(arguments: arguments, listenerSessionIndex: nil)
     }
 
     private static func runDictation(arguments: [String], listenerSessionIndex: Int?) async throws {
+        let context = try makeDictationRunContext(
+            arguments: arguments,
+            listenerSessionIndex: listenerSessionIndex
+        )
+
+        printDictationHeader(context)
+        let result = try await WindowsDictationRuntime.run(
+            context.request,
+            transcriptionService: context.transcriptionClient.service
+        ) { event in
+            printEvent(event)
+        }
+        printDictationResult(result, wordReplacementCount: context.wordReplacements.count)
+    }
+
+    private static func makeDictationRunContext(
+        arguments: [String],
+        listenerSessionIndex: Int?
+    ) throws -> DictationRunContext {
         let options = RomaCommandLineOptions(arguments)
         let configuration = try loadConfiguration(from: options)
             .applyingOverrides(from: options)
@@ -75,34 +105,47 @@ struct RomaWindowsAgent {
             ? .hold(timeoutMilliseconds: timeoutMilliseconds)
             : .toggle(recordSeconds: seconds)
 
+        let request = WindowsDictationRuntimeRequest(
+            outputURL: outputURL,
+            model: transcriptionClient.model,
+            language: configuration.language,
+            prompt: configuration.prompt,
+            shouldPaste: shouldPaste,
+            clipboardRestoreConfiguration: clipboardRestoreConfiguration,
+            textProcessing: DictationTextProcessingConfiguration(
+                wordReplacements: wordReplacements
+            ),
+            trigger: trigger
+        )
+
+        return DictationRunContext(
+            configuration: configuration,
+            options: options,
+            transcriptionClient: transcriptionClient,
+            shouldPaste: shouldPaste,
+            clipboardRestoreConfiguration: clipboardRestoreConfiguration,
+            shouldUseHoldHook: shouldUseHoldHook,
+            wordReplacements: wordReplacements,
+            request: request
+        )
+    }
+
+    private static func printDictationHeader(_ context: DictationRunContext) {
         print("agent=roma-windows-agent")
-        print("transcription_client=\(transcriptionClient.name)")
-        for line in transcriptionClient.details {
+        print("transcription_client=\(context.transcriptionClient.name)")
+        for line in context.transcriptionClient.details {
             print(line)
         }
-        print("recording_mode=\(shouldUseHoldHook ? "hold" : "toggle")")
-        print("paste_requested=\(shouldPaste)")
-        print("restore_clipboard_after_paste=\(clipboardRestoreConfiguration.restoreClipboard)")
-        print("clipboard_restore_delay_seconds=\(clipboardRestoreConfiguration.restoreDelaySeconds)")
+        print("recording_mode=\(context.shouldUseHoldHook ? "hold" : "toggle")")
+        print("paste_requested=\(context.shouldPaste)")
+        print("restore_clipboard_after_paste=\(context.clipboardRestoreConfiguration.restoreClipboard)")
+        print("clipboard_restore_delay_seconds=\(context.clipboardRestoreConfiguration.restoreDelaySeconds)")
+    }
 
-        let result = try await WindowsDictationRuntime.run(
-            WindowsDictationRuntimeRequest(
-                outputURL: outputURL,
-                model: transcriptionClient.model,
-                language: configuration.language,
-                prompt: configuration.prompt,
-                shouldPaste: shouldPaste,
-                clipboardRestoreConfiguration: clipboardRestoreConfiguration,
-                textProcessing: DictationTextProcessingConfiguration(
-                    wordReplacements: wordReplacements
-                ),
-                trigger: trigger
-            ),
-            transcriptionService: transcriptionClient.service
-        ) { event in
-            printEvent(event)
-        }
-
+    private static func printDictationResult(
+        _ result: DictationPipelineResult,
+        wordReplacementCount: Int
+    ) {
         let audio = result.session.recordedAudio
         print("wrote=\(audio.fileURL.path)")
         print("duration_seconds=\(String(format: "%.3f", audio.durationSeconds ?? 0))")
@@ -118,7 +161,7 @@ struct RomaWindowsAgent {
         print("raw_transcript_length=\(result.transcription.text.count)")
         print("processed_transcript_length=\(result.processedText.count)")
         print("processed_transcript_text=\(RomaCommandLineText.oneLine(result.processedText))")
-        print("word_replacements=\(wordReplacements.count)")
+        print("word_replacements=\(wordReplacementCount)")
         print("paste_sent=\(result.session.insertedText != nil)")
     }
 
@@ -132,14 +175,35 @@ struct RomaWindowsAgent {
         print("agent=roma-windows-agent")
         print("mode=listen")
         print("max_sessions=\(maxSessions.map(String.init) ?? "unbounded")")
+        print("listener_capture_lifecycle=shared_pre_roll_runtime")
 
-        var completedSessions = 0
-        while maxSessions.map({ completedSessions < $0 }) ?? true {
-            print("listen_session_start=\(completedSessions + 1)")
-            try await runDictation(arguments: arguments, listenerSessionIndex: completedSessions + 1)
-            completedSessions += 1
-            print("listen_session_completed=\(completedSessions)")
+        if maxSessions == 0 {
+            print("listen_completed_sessions=0")
+            return
         }
+
+        let context = try makeDictationRunContext(arguments: arguments, listenerSessionIndex: nil)
+        printDictationHeader(context)
+        let completedSessions = try await WindowsDictationRuntime.runListener(
+            context.request,
+            maxSessions: maxSessions,
+            outputURLForSession: { sessionIndex in
+                print("listen_session_start=\(sessionIndex)")
+                return resolvedOutputURL(
+                    configuration: context.configuration,
+                    options: context.options,
+                    listenerSessionIndex: sessionIndex
+                )
+            },
+            transcriptionService: context.transcriptionClient.service,
+            onEvent: { event in
+                printEvent(event)
+            },
+            onSessionCompleted: { sessionIndex, result in
+                printDictationResult(result, wordReplacementCount: context.wordReplacements.count)
+                print("listen_session_completed=\(sessionIndex)")
+            }
+        )
 
         print("listen_completed_sessions=\(completedSessions)")
     }

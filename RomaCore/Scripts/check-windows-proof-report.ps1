@@ -642,6 +642,7 @@ function Assert-PackagedListenerProof {
 
     Assert-Boolean -Object $Proof -Name "output_present" -Expected $true
     Assert-Boolean -Object $Proof -Name "mode_listen" -Expected $true
+    Assert-Boolean -Object $Proof -Name "shared_pre_roll_runtime" -Expected $true
     Assert-Boolean -Object $Proof -Name "zero_session" -Expected $true
     Assert-Boolean -Object $Proof -Name "completed_zero_sessions" -Expected $true
     Write-Host "proof_packaged_listener=listen_zero_session"
@@ -678,6 +679,7 @@ function Assert-InstalledListenerProof {
 
     Assert-Boolean -Object $Proof -Name "output_present" -Expected $true
     Assert-Boolean -Object $Proof -Name "mode_listen" -Expected $true
+    Assert-Boolean -Object $Proof -Name "shared_pre_roll_runtime" -Expected $true
     Assert-Boolean -Object $Proof -Name "zero_session" -Expected $true
     Assert-Boolean -Object $Proof -Name "completed_zero_sessions" -Expected $true
     Assert-Boolean -Object $Proof -Name "config_path_present" -Expected $true
@@ -840,7 +842,8 @@ function Get-ProofProfileRequirements {
                 "listener_pre_roll_runtime_source",
                 "hold_hook_single_window_source",
                 "native_doctor_surface",
-                "packaged_listener"
+                "packaged_listener",
+                "listener_shared_pre_roll_runtime"
             )
         }
         "laptop-preflight" {
@@ -873,6 +876,7 @@ function Get-ProofProfileRequirements {
                 "native_doctor_surface",
                 "packaged_listener",
                 "installed_listener",
+                "listener_shared_pre_roll_runtime",
                 "config_doctor",
                 "installed_listener_agent_path",
                 "hold_hook_config",
@@ -904,6 +908,7 @@ function Get-ProofProfileRequirements {
                 "native_doctor_surface",
                 "packaged_listener",
                 "installed_listener",
+                "listener_shared_pre_roll_runtime",
                 "config_doctor",
                 "installed_listener_agent_path",
                 "hold_hook_config",
@@ -933,6 +938,7 @@ function Get-ProofProfileRequirements {
                 "native_doctor_surface",
                 "packaged_listener",
                 "installed_listener",
+                "listener_shared_pre_roll_runtime",
                 "config_doctor",
                 "installed_listener_agent_path",
                 "hold_hook_config",
@@ -959,6 +965,7 @@ function Get-ProofProfileRequirements {
                 "native_doctor_surface",
                 "packaged_listener",
                 "installed_listener",
+                "listener_shared_pre_roll_runtime",
                 "config_doctor",
                 "installed_listener_agent_path",
                 "packaged_whisper_mock",

@@ -6591,6 +6591,15 @@ struct RomaCoreChecks {
             trigger: .toggle(recordSeconds: 1)
         )
         try WindowsDictationRuntime.validateRequest(request)
+        try require(
+            try await WindowsDictationRuntime.runListener(
+                request,
+                maxSessions: 0,
+                outputURLForSession: { _ in URL(fileURLWithPath: "/tmp/unused-listener-proof.wav") },
+                transcriptionService: FakeTranscriptionService()
+            ) == 0,
+            "Windows listener runtime should allow zero-session smoke checks without Windows-only adapters"
+        )
         try WindowsDictationRuntime.validateRequest(
             WindowsDictationRuntimeRequest(
                 outputURL: URL(fileURLWithPath: "/tmp/windows-runtime-proof.wav"),
@@ -6621,11 +6630,33 @@ struct RomaCoreChecks {
         }
 
         do {
+            _ = try await WindowsDictationRuntime.runListener(
+                request,
+                maxSessions: -1,
+                outputURLForSession: { _ in URL(fileURLWithPath: "/tmp/unused-listener-proof.wav") },
+                transcriptionService: FakeTranscriptionService()
+            )
+            throw CheckFailure("Windows listener runtime should reject negative max sessions")
+        } catch WindowsDictationRuntimeError.invalidMaxSessions(_) {
+        }
+
+        do {
             _ = try await WindowsDictationRuntime.run(
                 request,
                 transcriptionService: FakeTranscriptionService()
             )
             throw CheckFailure("Windows dictation runtime should be unsupported off Windows")
+        } catch WindowsDictationRuntimeError.unsupported {
+        }
+
+        do {
+            _ = try await WindowsDictationRuntime.runListener(
+                request,
+                maxSessions: 1,
+                outputURLForSession: { _ in URL(fileURLWithPath: "/tmp/unsupported-listener-proof.wav") },
+                transcriptionService: FakeTranscriptionService()
+            )
+            throw CheckFailure("Windows listener runtime should be unsupported off Windows")
         } catch WindowsDictationRuntimeError.unsupported {
         }
     }
@@ -6822,6 +6853,30 @@ struct RomaCoreChecks {
         try require(result.processedText == "roma just talk proof", "pipeline should return processed transcript")
         try require(await inserter.pastedText == "roma just talk proof", "pipeline should paste through injected text insertion")
         try require(recorder.stopCaptureCallCount == 1, "pipeline should stop capture after success")
+
+        let keepAliveRecorder = FakeRecorder()
+        let keepAlivePipeline = DictationPipeline(
+            recorder: keepAliveRecorder,
+            transcriptionService: FakeTranscriptionService(expectedFileName: "keep-alive-proof.wav")
+        )
+        let keepAliveRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/keep-alive-proof.wav"),
+            model: model
+        )
+        try await keepAliveRecorder.startPreRollBuffering()
+        _ = try await keepAlivePipeline.runRecordingWindow(
+            keepAliveRequest,
+            captureLifecycle: .keepAliveAfterRun
+        ) {}
+        try require(
+            keepAliveRecorder.stopCaptureCallCount == 0,
+            "pipeline should keep capture alive when caller owns listener lifecycle"
+        )
+        await keepAliveRecorder.stopCapture()
+        try require(
+            keepAliveRecorder.stopCaptureCallCount == 1,
+            "listener lifecycle caller should still be able to stop capture explicitly"
+        )
 
         let cleanupRecorder = FakeRecorder()
         let cleanupInserter = FakeTextInsertion()
@@ -7660,6 +7715,10 @@ struct RomaCoreChecks {
             ),
             encoding: .utf8
         )
+        let dictationPipelineSource = try String(
+            contentsOf: packageRoot.appendingPathComponent("Sources/RomaCore/Pipeline/DictationPipeline.swift"),
+            encoding: .utf8
+        )
         let transcriptionClientSource = try String(
             contentsOf: packageRoot.appendingPathComponent(
                 "Sources/RomaCore/Transcription/RomaTranscriptionClient.swift"
@@ -7821,6 +7880,14 @@ struct RomaCoreChecks {
             "Windows listener should generate per-session WAV paths unless --out is explicit"
         )
         try require(
+            dictationPipelineSource.contains("public enum DictationPipelineCaptureLifecycle") &&
+                dictationPipelineSource.contains("case keepAliveAfterRun") &&
+                windowsDictationRuntimeSource.contains("captureLifecycle: .keepAliveAfterRun") &&
+                windowsAgentSource.contains("WindowsDictationRuntime.runListener") &&
+                windowsAgentSource.contains("listener_capture_lifecycle=shared_pre_roll_runtime"),
+            "Windows listener should keep the shared pre-roll capture runtime alive between sessions"
+        )
+        try require(
             proofAgentSource.contains(#"case "windows-hotkey-availability-proof":"#) &&
                 proofAgentSource.contains(#"print("hotkey_registration_available=true")"#),
             "Windows proof agent should expose a noninteractive RegisterHotKey availability proof"
@@ -7839,14 +7906,13 @@ struct RomaCoreChecks {
             "Windows proof agent should expose that listener sessions isolate default WAV output paths"
         )
         try require(
-            windowsAgentSource.contains(
-                "try await runDictation(arguments: arguments, listenerSessionIndex: completedSessions + 1)"
-            ) &&
-                windowsAgentSource.contains("WindowsDictationRuntime.run(") &&
+            windowsAgentSource.contains("WindowsDictationRuntime.runListener(") &&
+                windowsDictationRuntimeSource.contains("try await session.startPreRollBuffering()") &&
+                windowsDictationRuntimeSource.contains("captureLifecycle: .keepAliveAfterRun") &&
                 windowsAgentSource.contains("case .preRollBuffering:") &&
                 windowsAgentSource.contains(#"print("pre_roll_buffering=true")"#) &&
                 proofAgentSource.contains(#"print("windows_listener_pre_roll_runtime_source=true")"#),
-            "Windows proof agent should expose that listener sessions reuse the pre-roll dictation runtime path"
+            "Windows proof agent should expose that listener sessions reuse the shared pre-roll runtime path"
         )
         try require(
             proofAgentSource.contains(#"print("windows_hold_hook_single_window_source=true")"#),
@@ -7892,6 +7958,12 @@ struct RomaCoreChecks {
                 scriptSource.contains(#"-Expected "windows_listener_pre_roll_runtime_source=true""#),
                 "\(scriptName) should assert that listener mode reuses the pre-roll dictation runtime path"
             )
+            if scriptName != "windows-proof.ps1" {
+                try require(
+                    scriptSource.contains(#"-Expected "listener_capture_lifecycle=shared_pre_roll_runtime""#),
+                    "\(scriptName) should assert the listener keeps shared pre-roll runtime lifecycle"
+                )
+            }
             if scriptName == "prove-windows-agent-artifact.ps1" {
                 try require(
                     scriptSource.contains(#"-Expected "windows_listener_output_isolation_source=true""#),
@@ -7988,6 +8060,13 @@ struct RomaCoreChecks {
         try require(
             checkReportScript.contains(#""listener_pre_roll_runtime_source""#),
             "Windows proof profiles should print listener pre-roll runtime source coverage"
+        )
+        try require(
+            checkReportScript.contains(#""listener_shared_pre_roll_runtime""#) &&
+                checkReportScript.contains(
+                    #"Assert-Boolean -Object $Proof -Name "shared_pre_roll_runtime" -Expected $true"#
+                ),
+            "Windows proof profiles should print and require listener shared pre-roll runtime coverage"
         )
         try require(
             checkReportScript.contains(#""shared_windows_transcription_path""#) &&

@@ -707,6 +707,10 @@ struct RomaCoreChecks {
             "shared insertion polish should preserve smart-single-quoted question fragments"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("'What?'", context: midSentenceContext) == "'what?'",
+            "shared insertion polish should preserve straight-single-quoted question fragments"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("Model!\"", context: midSentenceContext) == "model",
             "shared insertion polish should remove trailing generated quotes after emphatic punctuation"
         )
@@ -906,8 +910,8 @@ struct RomaCoreChecks {
             "shared insertion polish should preserve lowercase braced command output"
         )
         try require(
-            RomaTranscriptionOutputFilter.applyInsertionPolish("'Model.'", context: midSentenceContext) == "'model'",
-            "shared insertion polish should trim noisy periods inside single-quoted short fragments"
+            RomaTranscriptionOutputFilter.applyInsertionPolish("'Model.'", context: midSentenceContext) == "model",
+            "shared insertion polish should unwrap noisy straight-single-quoted short fragments"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("\"What?\".", context: midSentenceContext) == "\"what?\"",
@@ -5219,6 +5223,10 @@ struct RomaCoreChecks {
             "insertion polish should preserve smart-single-quoted question words"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("'What?'", context: midSentenceContext) == "'what?'",
+            "insertion polish should preserve straight-single-quoted question words"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionSpacing(
                 RomaTranscriptionOutputFilter.applyInsertionPolish(
                     RomaTranscriptionOutputFilter.filter("【What?】"),
@@ -6914,6 +6922,39 @@ struct RomaCoreChecks {
             "pipeline should paste smart-single-quoted noisy mid-sentence final fragments"
         )
 
+        let straightSingleQuotedFragmentRecorder = FakeRecorder()
+        let straightSingleQuotedFragmentInserter = FakeTextInsertion()
+        let straightSingleQuotedFragmentPipeline = DictationPipeline(
+            recorder: straightSingleQuotedFragmentRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "straight-single-quoted-fragment-proof.wav",
+                text: "'Model.'"
+            ),
+            textInsertion: straightSingleQuotedFragmentInserter
+        )
+        let straightSingleQuotedFragmentRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/straight-single-quoted-fragment-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await straightSingleQuotedFragmentRecorder.startPreRollBuffering()
+        let straightSingleQuotedFragmentResult = try await straightSingleQuotedFragmentPipeline.runRecordingWindow(
+            straightSingleQuotedFragmentRequest
+        ) {}
+
+        try require(
+            straightSingleQuotedFragmentResult.processedText == " model",
+            "pipeline should clean straight-single-quoted noisy mid-sentence final fragments"
+        )
+        try require(
+            await straightSingleQuotedFragmentInserter.pastedText == " model",
+            "pipeline should paste straight-single-quoted noisy mid-sentence final fragments"
+        )
+
         let backtickFragmentRecorder = FakeRecorder()
         let backtickFragmentInserter = FakeTextInsertion()
         let backtickFragmentPipeline = DictationPipeline(
@@ -7833,7 +7874,9 @@ struct RomaCoreChecks {
         )
         try require(
             laptopProofScript.contains("local whisper CLI preflight") &&
-                laptopProofScript.contains(#""RomaProofAgent.exe""#) &&
+                laptopProofScript.contains(#"$proofAgent = Require-RomaWindowsManifestFile"#) &&
+                laptopProofScript.contains(#"-Key "proof_agent""#) &&
+                laptopProofScript.contains("-ProofAgentPath $proofAgent") &&
                 laptopProofScript.contains("whisper-cli-doctor") &&
                 laptopProofScript.contains("local_whisper_preflight_ok=true"),
             "Windows laptop proof runner should preflight real whisper CLI paths through packaged RomaProofAgent"

@@ -5081,7 +5081,7 @@ public struct RomaTranscriptionOutputFilter {
 
     private static func protectPunctuationSpacingSpans(in text: String) -> (text: String, spans: [String]) {
         guard let regex = try? NSRegularExpression(
-            pattern: #"(?i)\b\d{1,2}:\d{2}(?::\d{2})?(?:\.\d{1,3})?\b|\b(?:https?://|www\.)[A-Za-z0-9._~:/?#\[\]@!$&'()*+,;=%-]+|\b[A-Za-z][A-Za-z0-9_-]{1,63}\.[A-Za-z][A-Za-z0-9_-]{1,63}(?:\.[A-Za-z][A-Za-z0-9_-]{1,63})*\b|(?<![\p{L}\p{N}])(?:[A-Za-z]{1,4}\.){2,}(?![\p{L}\p{N}])|(?<![\p{L}\p{N}])\.[A-Za-z][A-Za-z0-9._-]{0,63}"#
+            pattern: #"(?i)\b\d{1,2}:\d{2}(?::\d{2})?(?:\.\d{1,3})?\b|\b(?:https?://|www\.)[A-Za-z0-9._~:/?#\[\]@!$&'()*+,;=%-]+|(?<![\p{L}\p{N}])'[^'\n]{1,80}'(?![\p{L}\p{N}])|\b[A-Za-z][A-Za-z0-9_-]{1,63}\.[A-Za-z][A-Za-z0-9_-]{1,63}(?:\.[A-Za-z][A-Za-z0-9_-]{1,63})*\b|(?<![\p{L}\p{N}])(?:[A-Za-z]{1,4}\.){2,}(?![\p{L}\p{N}])|(?<![\p{L}\p{N}])\.[A-Za-z][A-Za-z0-9._-]{0,63}"#
         ) else {
             return (text, [])
         }
@@ -9600,7 +9600,7 @@ public struct RomaTranscriptionOutputFilter {
             return false
         }
 
-        return first == "\"" || first == "“" || first == "‘" || first == "(" || first == "{"
+        return first == "\"" || first == "'" || first == "“" || first == "‘" || first == "(" || first == "{"
     }
 
     private static func isNoisyPreservedBoundaryContinuationFragment(_ text: String) -> Bool {

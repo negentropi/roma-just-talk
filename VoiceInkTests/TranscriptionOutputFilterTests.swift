@@ -543,6 +543,8 @@ struct TranscriptionOutputFilterTests {
         #expect(TranscriptionOutputFilter.applyInsertionPolish("NEW YORK.", context: midSentenceContext) == "NEW YORK")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("Model.\"", context: midSentenceContext) == "model")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("\"Model.\"", context: midSentenceContext) == "model")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("'Model.'", context: midSentenceContext) == "model")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("'A final word.'", context: midSentenceContext) == "a final word")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("“Model.”", context: midSentenceContext) == "model")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("‘Model.’", context: midSentenceContext) == "model")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("“A final word.”", context: midSentenceContext) == "a final word")
@@ -554,6 +556,7 @@ struct TranscriptionOutputFilterTests {
         #expect(TranscriptionOutputFilter.applyInsertionPolish("\"What?\"", context: midSentenceContext) == "\"what?\"")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("“What?”", context: midSentenceContext) == "“what?”")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("‘What?’", context: midSentenceContext) == "‘what?’")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("'What?'", context: midSentenceContext) == "'what?'")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("Model!\"", context: midSentenceContext) == "model")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("Model!”", context: midSentenceContext) == "model")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("Model?\"", context: midSentenceContext) == "model")
@@ -586,6 +589,9 @@ struct TranscriptionOutputFilterTests {
                 context: midSentenceContext
             ) == " «what?»"
         )
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("Close single quote.", context: unmatchedStraightSingleQuoteContext) == "'")
+        #expect(TranscriptionOutputFilter.applyInsertionSpacing("'", context: unmatchedStraightSingleQuoteContext) == "'")
+        #expect(TranscriptionOutputFilter.applyInsertionSpacing("'", context: contractionContext) == " '")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("U.S.\"", context: midSentenceContext) == "U.S.")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("The Model.", context: midSentenceContext) == "the model")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("API.", context: midSentenceContext) == "API")

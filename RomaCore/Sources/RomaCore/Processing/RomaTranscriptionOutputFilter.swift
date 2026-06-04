@@ -8849,7 +8849,7 @@ public struct RomaTranscriptionOutputFilter {
             return false
         }
 
-        return first == "\"" || first == "(" || first == "{"
+        return first == "\"" || first == "“" || first == "(" || first == "{"
     }
 
     private static func isNoisyPreservedBoundaryContinuationFragment(_ text: String) -> Bool {

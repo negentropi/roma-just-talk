@@ -657,6 +657,17 @@ struct RomaCoreChecks {
             "shared insertion polish should unwrap quoted final-word artifacts"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("“Model.”", context: midSentenceContext) == "model",
+            "shared insertion polish should unwrap smart-quoted final-word artifacts"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "“A final word.”",
+                context: midSentenceContext
+            ) == "a final word",
+            "shared insertion polish should unwrap smart-quoted short phrase artifacts"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("(Model.)", context: midSentenceContext) == "model",
             "shared insertion polish should unwrap parenthesized final-word artifacts"
         )
@@ -678,6 +689,10 @@ struct RomaCoreChecks {
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("\"What?\"", context: midSentenceContext) == "\"what?\"",
             "shared insertion polish should preserve quoted question fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("“What?”", context: midSentenceContext) == "“what?”",
+            "shared insertion polish should preserve smart-quoted question fragments"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("Model!\"", context: midSentenceContext) == "model",
@@ -4891,6 +4906,15 @@ struct RomaCoreChecks {
             "insertion polish should remove trailing generated quotes after final punctuation"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("“Model.”", context: midSentenceContext) == "model",
+            "insertion polish should unwrap smart-quoted final-word artifacts"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("“A final word.”", context: midSentenceContext) ==
+                "a final word",
+            "insertion polish should unwrap smart-quoted short phrase artifacts"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("Model!\"", context: midSentenceContext) == "model",
             "insertion polish should remove trailing generated quotes after emphatic punctuation"
         )
@@ -4921,6 +4945,10 @@ struct RomaCoreChecks {
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("【What?】", context: midSentenceContext) == "【what?】",
             "insertion polish should preserve corner-bracketed question words"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("“What?”", context: midSentenceContext) == "“what?”",
+            "insertion polish should preserve smart-quoted question words"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionSpacing(
@@ -6339,11 +6367,11 @@ struct RomaCoreChecks {
         ) {}
 
         try require(
-            smartQuotedFragmentResult.processedText == " “model”",
+            smartQuotedFragmentResult.processedText == " model",
             "pipeline should clean smart-quoted noisy mid-sentence final fragments"
         )
         try require(
-            await smartQuotedFragmentInserter.pastedText == " “model”",
+            await smartQuotedFragmentInserter.pastedText == " model",
             "pipeline should paste smart-quoted noisy mid-sentence final fragments"
         )
 

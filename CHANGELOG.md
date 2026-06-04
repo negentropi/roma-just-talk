@@ -3,6 +3,7 @@
 ## v1.81 - Unreleased
 
 - Required Windows artifact proof reports to expose the listener's per-session WAV output isolation marker.
+- Unwrapped short smart-quoted final-word artifacts such as "“Model.”" in mid-sentence continuations.
 - Cleaned embedded and terminal "uhm"/"erm" pause fillers without leaving stray commas.
 - Replaced the README, source app icon, and menu bar logo with the roma-just-talk split-keyboard mark.
 - Formatted spoken developer filenames and environment members such as "dot git ignore", "t s config dot json", "dot t s x", and "process dot env dot api key".

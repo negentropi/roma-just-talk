@@ -6218,6 +6218,74 @@ struct RomaCoreChecks {
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "A final word or single/.",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "insertion polish should remove tight trailing slash symbols from longer generated fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "A final word or single\\.",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "insertion polish should remove tight trailing backslash symbols from longer generated fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "A final word or single|.",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "insertion polish should remove tight trailing pipe symbols from longer generated fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "A final word or single#.",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "insertion polish should remove tight trailing hash symbols from longer generated fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "/A final word or single",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "insertion polish should remove tight leading slash symbols from longer generated fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "\\A final word or single",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "insertion polish should remove tight leading backslash symbols from longer generated fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "|A final word or single",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "insertion polish should remove tight leading pipe symbols from longer generated fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "#A final word or single",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "insertion polish should remove tight leading hash symbols from longer generated fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("/users", context: midSentenceContext) == "/users",
+            "insertion polish should preserve compact leading slash fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("docs/", context: midSentenceContext) == "docs/",
+            "insertion polish should preserve compact trailing slash fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("#tag", context: midSentenceContext) == "#tag",
+            "insertion polish should preserve compact hash fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "Model).",
                 context: RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "(")
             ) == "model)",

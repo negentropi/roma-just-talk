@@ -9058,6 +9058,11 @@ public struct RomaTranscriptionOutputFilter {
 
         var candidate = removeTrailingFragmentPunctuationPreservingAbbreviation(from: trimmedText)
         guard !isPreservedGeneratedQuestionFragment(candidate) else { return text }
+
+        if let cleanedSymbolText = removeTightGeneratedContinuationEdgeSymbol(from: candidate) {
+            return cleanedUnmatchedBoundaryContinuation(cleanedSymbolText, originalText: text)
+        }
+
         if let first = candidate.first,
            let closingBoundary = generatedContinuationClosingBoundary(for: first),
            !hasGeneratedContinuationClosingBoundary(closingBoundary, afterOpeningAtStartOf: candidate) {
@@ -9085,6 +9090,51 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         return cleanedText
+    }
+
+    private static func removeTightGeneratedContinuationEdgeSymbol(from text: String) -> String? {
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard containsWhitespace(trimmedText) else { return nil }
+
+        if let first = trimmedText.first,
+           isTightGeneratedContinuationEdgeSymbol(first),
+           !hasWhitespaceAfterFirstCharacter(in: trimmedText) {
+            return String(trimmedText.dropFirst())
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+
+        if let last = trimmedText.last,
+           isTightGeneratedContinuationEdgeSymbol(last),
+           !hasWhitespaceBeforeLastCharacter(in: trimmedText) {
+            return String(trimmedText.dropLast())
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+
+        return nil
+    }
+
+    private static func isTightGeneratedContinuationEdgeSymbol(_ character: Character) -> Bool {
+        switch character {
+        case "/", "\\", "|", "#": return true
+        default: return false
+        }
+    }
+
+    private static func containsWhitespace(_ text: String) -> Bool {
+        text.contains { $0.isWhitespace }
+    }
+
+    private static func hasWhitespaceAfterFirstCharacter(in text: String) -> Bool {
+        guard !text.isEmpty else { return false }
+        let nextIndex = text.index(after: text.startIndex)
+        return nextIndex < text.endIndex && text[nextIndex].isWhitespace
+    }
+
+    private static func hasWhitespaceBeforeLastCharacter(in text: String) -> Bool {
+        guard text.count >= 2 else { return false }
+        let lastIndex = text.index(before: text.endIndex)
+        let previousIndex = text.index(before: lastIndex)
+        return text[previousIndex].isWhitespace
     }
 
     private static func hasGeneratedContinuationClosingBoundary(

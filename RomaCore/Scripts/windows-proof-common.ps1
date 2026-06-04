@@ -200,6 +200,29 @@ function Get-RomaWindowsMinimumPermissionOutputMarkers {
     }
 }
 
+function Get-RomaWindowsProofAgentSourceOutputMarkers {
+    return [ordered]@{
+        windows_register_hotkey_adapter_source = "windows_register_hotkey_adapter_source=true"
+        windows_low_level_keyboard_hook_source = "windows_low_level_keyboard_hook_source=true"
+        windows_paste_adapter_source = "windows_paste_adapter_source=true"
+        windows_permission_surface_source = "windows_permission_surface_source=true"
+        windows_dpapi_secret_store_source = "windows_dpapi_secret_store_source=true"
+        miniaudio_capture_adapter_source = "miniaudio_capture_adapter_source=true"
+        openai_compatible_transcription_source = "openai_compatible_transcription_source=true"
+        whisper_cli_transcription_source = "whisper_cli_transcription_source=true"
+        roma_transcription_client_source = "roma_transcription_client_source=true"
+        transcription_output_filter_source = "transcription_output_filter_source=true"
+        word_replacement_processor_source = "word_replacement_processor_source=true"
+        windows_dictation_runtime_source = "windows_dictation_runtime_source=true"
+        windows_dictation_runtime_uses_pipeline_source = "windows_dictation_runtime_uses_pipeline_source=true"
+        windows_listener_output_isolation_source = "windows_listener_output_isolation_source=true"
+        windows_listener_pre_roll_runtime_source = "windows_listener_pre_roll_runtime_source=true"
+        windows_hold_hook_single_window_source = "windows_hold_hook_single_window_source=true"
+        windows_dictation_proof_source = "windows_dictation_proof_source=true"
+        windows_proof_args_shared_source = "windows_proof_args_shared_source=true"
+    }
+}
+
 function Get-RomaWindowsLaptopPreflightGuideMarkers {
     return [ordered]@{
         laptop_preflight_proof_set = "proof_set_ok=laptop-preflight"
@@ -263,6 +286,16 @@ function Assert-RomaWindowsOutputMarkers {
     foreach ($key in $Markers.Keys) {
         Assert-RomaWindowsOutputContains -Output $Output -Expected $Markers[$key]
     }
+}
+
+function Assert-RomaWindowsProofAgentSourceOutput {
+    param(
+        [string]$Output = ""
+    )
+
+    Assert-RomaWindowsOutputMarkers `
+        -Output $Output `
+        -Markers (Get-RomaWindowsProofAgentSourceOutputMarkers)
 }
 
 function Get-RomaWindowsLaptopPreflightCommonOutputMarkers {
@@ -331,6 +364,16 @@ function Get-RomaWindowsOutputMarkerProof {
         $proof[$key] = $Output.Contains($Markers[$key])
     }
     return $proof
+}
+
+function Get-RomaWindowsProofAgentSourceOutputProof {
+    param(
+        [string]$Output = ""
+    )
+
+    return Get-RomaWindowsOutputMarkerProof `
+        -Output $Output `
+        -Markers (Get-RomaWindowsProofAgentSourceOutputMarkers)
 }
 
 function Get-RomaWindowsOutputValue {

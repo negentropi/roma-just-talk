@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Shared Windows proof-agent source-marker assertions and proof-shaping so source, package, and artifact proof scripts use one marker contract.
 - Shared Windows preflight smoke assertion helpers so package smoke and guide markers use one proof-helper contract.
 - Shared Windows preflight proof marker lists so the generated laptop guide uses the same helper-owned markers as the full proof.
 - Shared Windows full-laptop proof marker lists so the generated guide and archived recheck script assert the same profile markers.

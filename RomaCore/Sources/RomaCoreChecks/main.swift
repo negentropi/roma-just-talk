@@ -8829,19 +8829,27 @@ struct RomaCoreChecks {
             proofAgentSource.contains("WindowsDoctorOutput.clipboardRestoreProofLines"),
             "Windows paste doctor should expose shared clipboard restore defaults"
         )
-        let pipelineSourceAssertions = [
+        let proofAgentSourceAssertionScripts = [
             ("windows-proof.ps1", windowsProofScript),
             ("package-windows-agent.ps1", packageScript),
             ("prove-windows-agent-artifact.ps1", proveScript)
         ]
-        for (scriptName, scriptSource) in pipelineSourceAssertions {
+        try require(
+            proofCommonScript.contains("function Get-RomaWindowsProofAgentSourceOutputMarkers") &&
+                proofCommonScript.contains("function Assert-RomaWindowsProofAgentSourceOutput") &&
+                proofCommonScript.contains("function Get-RomaWindowsProofAgentSourceOutputProof") &&
+                proofCommonScript.contains("windows_dictation_runtime_uses_pipeline_source=true") &&
+                proofCommonScript.contains("windows_listener_output_isolation_source=true") &&
+                proofCommonScript.contains("windows_listener_pre_roll_runtime_source=true") &&
+                proofCommonScript.contains("windows_hold_hook_single_window_source=true") &&
+                proofCommonScript.contains("roma_transcription_client_source=true") &&
+                proofCommonScript.contains("windows_proof_args_shared_source=true"),
+            "Windows proof helper should own proof-agent source output markers, assertions, and proof shaping"
+        )
+        for (scriptName, scriptSource) in proofAgentSourceAssertionScripts {
             try require(
-                scriptSource.contains(#"-Expected "windows_dictation_runtime_uses_pipeline_source=true""#),
-                "\(scriptName) should assert that the Windows runtime uses the shared DictationPipeline"
-            )
-            try require(
-                scriptSource.contains(#"-Expected "windows_listener_pre_roll_runtime_source=true""#),
-                "\(scriptName) should assert that listener mode reuses the pre-roll dictation runtime path"
+                scriptSource.contains("Assert-RomaWindowsProofAgentSourceOutput"),
+                "\(scriptName) should assert proof-agent source markers through the shared helper"
             )
             if scriptName != "windows-proof.ps1" {
                 try require(
@@ -8849,16 +8857,6 @@ struct RomaCoreChecks {
                     "\(scriptName) should assert the listener keeps shared pre-roll runtime lifecycle"
                 )
             }
-            if scriptName == "prove-windows-agent-artifact.ps1" {
-                try require(
-                    scriptSource.contains(#"-Expected "windows_listener_output_isolation_source=true""#),
-                    "\(scriptName) should assert that listener sessions isolate default WAV output paths"
-                )
-            }
-            try require(
-                scriptSource.contains(#"-Expected "windows_hold_hook_single_window_source=true""#),
-                "\(scriptName) should assert that hold-to-talk uses one native hook window"
-            )
         }
         let hotKeyAvailabilityProofAssertions = [
             ("windows-proof.ps1", windowsProofScript, "windows-hotkey-availability-proof", "hotkey_registration_available=true"),
@@ -8873,37 +8871,8 @@ struct RomaCoreChecks {
             )
         }
         try require(
-            proveScript.contains(
-                #"windows_dictation_runtime_uses_pipeline_source = $Output.Contains("windows_dictation_runtime_uses_pipeline_source=true")"#
-            ),
-            "Windows artifact proof reports should record that the Windows runtime uses the shared DictationPipeline"
-        )
-        try require(
-            proveScript.contains(
-                #"windows_listener_output_isolation_source = $Output.Contains("windows_listener_output_isolation_source=true")"#
-            ),
-            "Windows artifact proof reports should record that listener sessions isolate default WAV output paths"
-        )
-        try require(
-            proveScript.contains(
-                #"windows_listener_pre_roll_runtime_source = $Output.Contains("windows_listener_pre_roll_runtime_source=true")"#
-            ),
-            "Windows artifact proof reports should record that listener mode reuses the pre-roll dictation runtime path"
-        )
-        try require(
-            proveScript.contains(
-                #"windows_hold_hook_single_window_source = $Output.Contains("windows_hold_hook_single_window_source=true")"#
-            ),
-            "Windows artifact proof reports should record that hold-to-talk uses one native hook window"
-        )
-        try require(
-            proveScript.contains(
-                #"roma_transcription_client_source = $Output.Contains("roma_transcription_client_source=true")"#
-            ) &&
-                proveScript.contains(
-                    #"windows_proof_args_shared_source = $Output.Contains("windows_proof_args_shared_source=true")"#
-                ),
-            "Windows artifact proof reports should record shared transcription client and proof arg markers"
+            proveScript.contains("Get-RomaWindowsProofAgentSourceOutputProof -Output $Output"),
+            "Windows artifact proof reports should record proof-agent source markers through the shared helper"
         )
         try require(
             checkReportScript.contains(

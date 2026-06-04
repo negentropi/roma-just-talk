@@ -7535,6 +7535,7 @@ struct RomaCoreChecks {
         )
         try require(
             windowsProofScript.contains("New-WindowsDictationProofArgs") &&
+                windowsProofScript.contains("Add-WindowsDictationConfigurationArgs") &&
                 windowsProofScript.contains("RunInteractiveDictation requires local -WhisperCLI and -WhisperModel"),
             "Windows source proof script should allow cloud or local whisper dictation proof"
         )

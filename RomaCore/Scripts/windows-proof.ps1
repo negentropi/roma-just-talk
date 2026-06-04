@@ -170,45 +170,7 @@ function New-WindowsAgentConfigArgs {
     if (![string]::IsNullOrWhiteSpace($OutputPath)) {
         $configArgs += @("--out", $OutputPath)
     }
-    if (![string]::IsNullOrWhiteSpace($WhisperCLI)) {
-        $configArgs += @("--whisper-cli", $WhisperCLI, "--whisper-model", $WhisperModel)
-        if (![string]::IsNullOrWhiteSpace($WhisperOutputDir)) {
-            $configArgs += @("--whisper-output-dir", $WhisperOutputDir)
-        }
-        foreach ($argument in $WhisperArgument) {
-            if (![string]::IsNullOrWhiteSpace($argument)) {
-                $configArgs += @("--whisper-arg", $argument)
-            }
-        }
-    } else {
-        $configArgs += @("--endpoint", $TranscribeEndpoint, "--model", $TranscribeModel)
-    }
-    if ($UseHoldHook) {
-        $configArgs += @("--hold-hook", "--timeout", "$HoldTimeoutSeconds")
-    } else {
-        $configArgs += @("--toggle", "--seconds", "$RecordSeconds")
-    }
-    if ([string]::IsNullOrWhiteSpace($WhisperCLI)) {
-        if (![string]::IsNullOrWhiteSpace($TranscribeApiKeyName)) {
-            $configArgs += @("--api-key-name", $TranscribeApiKeyName, "--secret-dir", $secretProofDir)
-        } else {
-            $configArgs += @("--api-key-env", $TranscribeApiKeyEnv)
-        }
-    }
-    if (![string]::IsNullOrWhiteSpace($TranscribeLanguage)) {
-        $configArgs += @("--language", $TranscribeLanguage)
-    }
-    if (![string]::IsNullOrWhiteSpace($TranscribePrompt)) {
-        $configArgs += @("--prompt", $TranscribePrompt)
-    }
-    foreach ($replacement in $WordReplacement) {
-        if (![string]::IsNullOrWhiteSpace($replacement)) {
-            $configArgs += @("--replace", $replacement)
-        }
-    }
-    if ($PasteDictation) {
-        $configArgs += "--paste"
-    }
+    $configArgs = Add-WindowsDictationConfigurationArgs -Arguments $configArgs
     if ($RestoreClipboard) {
         $configArgs += "--restore-clipboard"
     }
@@ -232,6 +194,16 @@ function New-WindowsDictationProofArgs {
         "run", "RomaProofAgent", "windows-dictation-proof",
         "--out", $OutputPath
     )
+    return Add-WindowsDictationConfigurationArgs -Arguments $dictationArgs
+}
+
+function Add-WindowsDictationConfigurationArgs {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string[]]$Arguments
+    )
+
+    $dictationArgs = @($Arguments)
     if (![string]::IsNullOrWhiteSpace($WhisperCLI)) {
         $dictationArgs += @("--whisper-cli", $WhisperCLI, "--whisper-model", $WhisperModel)
         if (![string]::IsNullOrWhiteSpace($WhisperOutputDir)) {

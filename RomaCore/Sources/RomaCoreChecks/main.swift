@@ -5158,12 +5158,32 @@ struct RomaCoreChecks {
             "insertion polish should unwrap noisy emphatic corner-bracketed fragments"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("«Model.»", context: midSentenceContext) == "model",
+            "insertion polish should unwrap noisy guillemet-quoted final fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("‹Model.›", context: midSentenceContext) == "model",
+            "insertion polish should unwrap noisy single-guillemet final fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("„Model.“", context: midSentenceContext) == "model",
+            "insertion polish should unwrap noisy low-high double-quoted final fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("‚Model.‘", context: midSentenceContext) == "model",
+            "insertion polish should unwrap noisy low-high single-quoted final fragments"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("What?\"", context: midSentenceContext) == "what?\"",
             "insertion polish should preserve trailing quotes after question words"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("【What?】", context: midSentenceContext) == "【what?】",
             "insertion polish should preserve corner-bracketed question words"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("«What?»", context: midSentenceContext) == "«what?»",
+            "insertion polish should preserve guillemet-quoted question words"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("“What?”", context: midSentenceContext) == "“what?”",
@@ -5182,6 +5202,16 @@ struct RomaCoreChecks {
                 context: midSentenceContext
             ) == " 【what?】",
             "insertion pipeline should not add internal spacing before non-ascii closing boundaries"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionSpacing(
+                RomaTranscriptionOutputFilter.applyInsertionPolish(
+                    RomaTranscriptionOutputFilter.filter("«What?»"),
+                    context: midSentenceContext
+                ),
+                context: midSentenceContext
+            ) == " «what?»",
+            "insertion pipeline should not add internal spacing before guillemet closing boundaries"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("What?]", context: midSentenceContext) == "what?]",

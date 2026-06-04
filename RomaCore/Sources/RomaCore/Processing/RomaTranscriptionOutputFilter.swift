@@ -252,7 +252,7 @@ public struct RomaTranscriptionOutputFilter {
     private static let removableLeadingFragmentPunctuation = CharacterSet(charactersIn: ".,;:…-–—。．，、；：")
     private static let removableTrailingFragmentPunctuation = CharacterSet(charactersIn: ".,;:…-–—。．，、；：")
     private static let removableTrailingSentenceFragmentPunctuation = CharacterSet(charactersIn: "!?！？")
-    private static let removableTrailingGeneratedBoundaryPunctuation = CharacterSet(charactersIn: "\"'”’)]}>】》〉）｝］」』〕")
+    private static let removableTrailingGeneratedBoundaryPunctuation = CharacterSet(charactersIn: "\"'”’»›)]}>】》〉）｝］」』〕")
     private static let removableLeadingSpacedFragmentSymbols = "/\\|•‣◦"
     private static let removableTrailingSpacedFragmentSymbols = "/\\|"
     private static let removableOpeningNonASCIIBoundaryWrappers = CharacterSet(charactersIn: "【《〈（｛［「『〔")
@@ -5028,8 +5028,8 @@ public struct RomaTranscriptionOutputFilter {
         let punctuatedText = normalizeDuplicatePhrasePunctuation(protectedText.text)
         let spacedText = punctuatedText
             .replacingOccurrences(of: #"\s+([,.;:!?])"#, with: "$1", options: .regularExpression)
-            .replacingOccurrences(of: #"([,.;:!?])([^\s,.;:!?\]\)}"”’】》〉）｝］」』〕])"#, with: "$1 $2", options: .regularExpression)
-            .replacingOccurrences(of: #"\s+([)\]\}】》〉）｝］」』〕])"#, with: "$1", options: .regularExpression)
+            .replacingOccurrences(of: #"([,.;:!?])([^\s,.;:!?\]\)}"”’»›“‘】》〉）｝］」』〕])"#, with: "$1 $2", options: .regularExpression)
+            .replacingOccurrences(of: #"\s+([)\]\}»›“‘】》〉）｝］」』〕])"#, with: "$1", options: .regularExpression)
 
         let normalizedText = spacedText
             .replacingOccurrences(
@@ -8047,7 +8047,7 @@ public struct RomaTranscriptionOutputFilter {
         return collapsedText
     }
 
-    private static let generatedWrappedBoundaryFragmentPattern = #"(?:\[[^\[\]\n]{1,80}\]|"[^"\n]{1,80}"|'[^'\n]{1,80}'|“[^”\n]{1,80}”|‘[^’\n]{1,80}’|\([^\(\)\n]{1,80}\)|\{[^\{\}\n]{1,80}\}|<[^<>\n]{1,80}>|【[^】\n]{1,80}】|《[^》\n]{1,80}》|〈[^〉\n]{1,80}〉|（[^）\n]{1,80}）|｛[^｝\n]{1,80}｝|［[^］\n]{1,80}］|「[^」\n]{1,80}」|『[^』\n]{1,80}』|〔[^〕\n]{1,80}〕|\*{1,2}[^*\n]{1,80}\*{1,2}|_{1,2}[^_\n]{1,80}_{1,2})"#
+    private static let generatedWrappedBoundaryFragmentPattern = #"(?:\[[^\[\]\n]{1,80}\]|"[^"\n]{1,80}"|'[^'\n]{1,80}'|“[^”\n]{1,80}”|‘[^’\n]{1,80}’|«[^»\n]{1,80}»|‹[^›\n]{1,80}›|„[^“\n]{1,80}“|‚[^‘\n]{1,80}‘|\([^\(\)\n]{1,80}\)|\{[^\{\}\n]{1,80}\}|<[^<>\n]{1,80}>|【[^】\n]{1,80}】|《[^》\n]{1,80}》|〈[^〉\n]{1,80}〉|（[^）\n]{1,80}）|｛[^｝\n]{1,80}｝|［[^］\n]{1,80}］|「[^」\n]{1,80}」|『[^』\n]{1,80}』|〔[^〕\n]{1,80}〕|\*{1,2}[^*\n]{1,80}\*{1,2}|_{1,2}[^_\n]{1,80}_{1,2})"#
 
     private static func collapseGeneratedSeparatorBeforeShortFragment(in text: String) -> String {
         var collapsedText = collapseGeneratedNonASCIISeparatorBeforeWrappedShortFragment(in: text)
@@ -8885,6 +8885,10 @@ public struct RomaTranscriptionOutputFilter {
 
     private static func nonASCIIClosingBoundary(for opening: Character) -> Character? {
         switch opening {
+        case "«": return "»"
+        case "‹": return "›"
+        case "„": return "“"
+        case "‚": return "‘"
         case "【": return "】"
         case "《": return "》"
         case "〈": return "〉"

@@ -560,9 +560,14 @@ struct TranscriptionOutputFilterTests {
         #expect(TranscriptionOutputFilter.applyInsertionPolish("Model!]", context: midSentenceContext) == "model")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("Model?)", context: midSentenceContext) == "model")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("【Model!】", context: midSentenceContext) == "model")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("«Model.»", context: midSentenceContext) == "model")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("‹Model.›", context: midSentenceContext) == "model")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("„Model.“", context: midSentenceContext) == "model")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("‚Model.‘", context: midSentenceContext) == "model")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("What?\"", context: midSentenceContext) == "what?\"")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("What?]", context: midSentenceContext) == "what?]")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("【What?】", context: midSentenceContext) == "【what?】")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("«What?»", context: midSentenceContext) == "«what?»")
         #expect(
             TranscriptionOutputFilter.applyInsertionSpacing(
                 TranscriptionOutputFilter.applyInsertionPolish(
@@ -571,6 +576,15 @@ struct TranscriptionOutputFilterTests {
                 ),
                 context: midSentenceContext
             ) == " 【what?】"
+        )
+        #expect(
+            TranscriptionOutputFilter.applyInsertionSpacing(
+                TranscriptionOutputFilter.applyInsertionPolish(
+                    TranscriptionOutputFilter.filter("«What?»"),
+                    context: midSentenceContext
+                ),
+                context: midSentenceContext
+            ) == " «what?»"
         )
         #expect(TranscriptionOutputFilter.applyInsertionPolish("U.S.\"", context: midSentenceContext) == "U.S.")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("The Model.", context: midSentenceContext) == "the model")

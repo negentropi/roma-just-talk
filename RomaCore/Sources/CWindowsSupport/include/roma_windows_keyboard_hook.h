@@ -27,6 +27,8 @@ enum {
     ROMA_WINDOWS_KEYBOARD_EVENT_KEY_UP = 1u << 1
 };
 
+typedef void (*roma_windows_keyboard_hold_callback_t)(void *context);
+
 roma_windows_keyboard_status_t roma_windows_keyboard_wait_for_hold(
     uint32_t virtual_key,
     uint32_t required_modifiers,
@@ -40,6 +42,16 @@ roma_windows_keyboard_status_t roma_windows_keyboard_wait_for_event(
     uint32_t required_modifiers,
     uint32_t target_event,
     uint32_t timeout_milliseconds,
+    uint32_t *observed_events,
+    uint32_t *last_error
+);
+
+roma_windows_keyboard_status_t roma_windows_keyboard_wait_for_hold_window(
+    uint32_t virtual_key,
+    uint32_t required_modifiers,
+    uint32_t timeout_milliseconds,
+    roma_windows_keyboard_hold_callback_t on_key_down,
+    void *context,
     uint32_t *observed_events,
     uint32_t *last_error
 );

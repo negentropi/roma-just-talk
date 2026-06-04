@@ -90,6 +90,7 @@
 - Required installed Windows launcher doctor checks to assert shared user-facing agent defaults.
 - Required Windows hold-to-talk proof reports to preserve the runtime event order from pre-roll through transcript output.
 - Seeded the Windows hold-hook modifier state from already-held Ctrl/Shift/Alt/Win keys before waiting for the target key.
+- Kept one Windows hold-to-talk keyboard hook alive from keydown through keyup so release cannot be missed while recording starts.
 - Hardened Windows targeted paste foreground activation with `AttachThreadInput` before `SetForegroundWindow`.
 - Required full Windows laptop proof reports to share one proof session id.
 - Kept cloud and local Windows laptop startup shortcut proofs in separate proof-owned directories.

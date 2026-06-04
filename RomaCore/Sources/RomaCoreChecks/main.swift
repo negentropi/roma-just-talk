@@ -5572,6 +5572,11 @@ struct RomaCoreChecks {
                 throw CheckFailure("low-level hook keyup wait should be unsupported off Windows")
             } catch WindowsLowLevelKeyboardHookError.unsupported {
             }
+            do {
+                _ = try WindowsLowLevelKeyboardHookProof.waitForHoldWindow(timeoutMilliseconds: 1) {}
+                throw CheckFailure("low-level hook hold-window wait should be unsupported off Windows")
+            } catch WindowsLowLevelKeyboardHookError.unsupported {
+            }
         }
     }
 
@@ -6660,6 +6665,23 @@ struct RomaCoreChecks {
                 keyboardHookNativeSource.contains("GetAsyncKeyState") &&
                 keyboardHookNativeSource.contains("g_keyboard_state.modifier_state = roma_windows_keyboard_current_modifier_state();"),
             "Windows keyboard hook should seed modifier state from already-held modifier keys"
+        )
+        try require(
+            keyboardHookSource.contains("waitForHoldWindow") &&
+                keyboardHookSource.contains("roma_windows_keyboard_wait_for_hold_window") &&
+                keyboardHookNativeSource.contains("roma_windows_keyboard_hold_callback_t on_key_down") &&
+                keyboardHookNativeSource.contains("key_down_callback_called") &&
+                keyboardHookNativeSource.contains("g_keyboard_state.on_key_down(g_keyboard_state.callback_context);"),
+            "Windows keyboard hook should expose one hold-window callback from keydown through keyup"
+        )
+        try require(
+            windowsDictationRuntimeSource.contains("WindowsHoldWindowSignal") &&
+                windowsDictationRuntimeSource.contains("WindowsLowLevelKeyboardHookProof.waitForHoldWindow") &&
+                windowsDictationRuntimeSource.contains("try await holdWindow.waitForKeyDown()") &&
+                windowsDictationRuntimeSource.contains("try await holdWindow.waitForKeyUp()") &&
+                !windowsDictationRuntimeSource.contains("WindowsLowLevelKeyboardHookProof.waitForKeyDown(") &&
+                !windowsDictationRuntimeSource.contains("WindowsLowLevelKeyboardHookProof.waitForKeyUp("),
+            "Windows hold dictation runtime should keep one native hook alive from keydown until keyup"
         )
         try require(
             checkReportScript.contains(#"Assert-Boolean -Object $Proof -Name "native_windows_adapters" -Expected $true"#),

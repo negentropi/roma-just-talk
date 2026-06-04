@@ -117,18 +117,26 @@ public enum WindowsDictationRuntime {
                 }
             case .hold(let timeoutMilliseconds):
                 let chord = WindowsLowLevelKeyboardHookChord.proofHold
+                let holdWindow = WindowsHoldWindowSignal()
                 onEvent(.waitingForHoldKeyDown(displayName: chord.displayName))
-                _ = try WindowsLowLevelKeyboardHookProof.waitForKeyDown(
-                    chord: chord,
-                    timeoutMilliseconds: timeoutMilliseconds
-                )
+                DispatchQueue.global(qos: .userInitiated).async {
+                    do {
+                        let result = try WindowsLowLevelKeyboardHookProof.waitForHoldWindow(
+                            chord: chord,
+                            timeoutMilliseconds: timeoutMilliseconds
+                        ) {
+                            holdWindow.signalKeyDown()
+                        }
+                        holdWindow.finish(.success(result))
+                    } catch {
+                        holdWindow.finish(.failure(error))
+                    }
+                }
+                try await holdWindow.waitForKeyDown()
                 onEvent(.holdKeyDown)
 
                 return try await pipeline.runRecordingWindow(pipelineRequest) {
-                    _ = try WindowsLowLevelKeyboardHookProof.waitForKeyUp(
-                        chord: chord,
-                        timeoutMilliseconds: timeoutMilliseconds
-                    )
+                    _ = try await holdWindow.waitForKeyUp()
                     onEvent(.holdKeyUp)
                 }
             }
@@ -180,5 +188,122 @@ public enum WindowsDictationRuntime {
             fromSeconds: recordSeconds
         )
         try await Task.sleep(nanoseconds: nanoseconds)
+    }
+}
+
+private final class WindowsHoldWindowSignal: @unchecked Sendable {
+    private let lock = NSLock()
+    private var didSignalKeyDown = false
+    private var completion: Result<WindowsLowLevelKeyboardHookResult, Error>?
+    private var keyDownContinuation: CheckedContinuation<Void, Error>?
+    private var keyUpContinuation: CheckedContinuation<WindowsLowLevelKeyboardHookResult, Error>?
+
+    func signalKeyDown() {
+        let continuation: CheckedContinuation<Void, Error>?
+        lock.lock()
+        if didSignalKeyDown {
+            continuation = nil
+        } else {
+            didSignalKeyDown = true
+            continuation = keyDownContinuation
+            keyDownContinuation = nil
+        }
+        lock.unlock()
+
+        continuation?.resume()
+    }
+
+    func finish(_ result: Result<WindowsLowLevelKeyboardHookResult, Error>) {
+        let keyDownContinuation: CheckedContinuation<Void, Error>?
+        let keyDownError: Error?
+        let keyUpContinuation: CheckedContinuation<WindowsLowLevelKeyboardHookResult, Error>?
+
+        lock.lock()
+        completion = result
+        if didSignalKeyDown {
+            keyDownContinuation = nil
+            keyDownError = nil
+        } else {
+            keyDownContinuation = self.keyDownContinuation
+            self.keyDownContinuation = nil
+            keyDownError = Self.keyDownError(from: result)
+        }
+        keyUpContinuation = self.keyUpContinuation
+        self.keyUpContinuation = nil
+        lock.unlock()
+
+        if let keyDownContinuation, let keyDownError {
+            keyDownContinuation.resume(throwing: keyDownError)
+        }
+        if let keyUpContinuation {
+            switch result {
+            case .success(let hookResult):
+                keyUpContinuation.resume(returning: hookResult)
+            case .failure(let error):
+                keyUpContinuation.resume(throwing: error)
+            }
+        }
+    }
+
+    func waitForKeyDown() async throws {
+        try await withCheckedThrowingContinuation { continuation in
+            let shouldResume: Bool
+            let resumeError: Error?
+
+            lock.lock()
+            if didSignalKeyDown {
+                shouldResume = true
+                resumeError = nil
+            } else if let completion {
+                shouldResume = true
+                resumeError = Self.keyDownError(from: completion)
+            } else {
+                shouldResume = false
+                resumeError = nil
+                keyDownContinuation = continuation
+            }
+            lock.unlock()
+
+            if shouldResume {
+                if let resumeError {
+                    continuation.resume(throwing: resumeError)
+                } else {
+                    continuation.resume()
+                }
+            }
+        }
+    }
+
+    func waitForKeyUp() async throws -> WindowsLowLevelKeyboardHookResult {
+        try await withCheckedThrowingContinuation { continuation in
+            let completion: Result<WindowsLowLevelKeyboardHookResult, Error>?
+
+            lock.lock()
+            completion = self.completion
+            if completion == nil {
+                keyUpContinuation = continuation
+            }
+            lock.unlock()
+
+            if let completion {
+                switch completion {
+                case .success(let hookResult):
+                    continuation.resume(returning: hookResult)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+
+    private static func keyDownError(
+        from result: Result<WindowsLowLevelKeyboardHookResult, Error>
+    ) -> Error {
+        switch result {
+        case .success(let hookResult):
+            return WindowsLowLevelKeyboardHookError.invalidResult(observedEvents: hookResult.observedEvents)
+        case .failure(let error):
+            return error
+        }
     }
 }

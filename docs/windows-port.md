@@ -61,6 +61,7 @@ Reusable now:
 - `RomaWindowsAgentConfiguration` now lives in `RomaCore` as the reusable JSON settings shape for endpoint, model, key source, trigger mode, paste, clipboard restore, language/prompt, and replacement defaults.
 - `WindowsHotKey.proofToggle` and the Windows-only `WindowsRegisterHotKeyProof` source define the first `RegisterHotKey` toggle proof path. `windows-hotkey-availability-proof` performs a noninteractive register/unregister check before the interactive keypress proof.
 - `WindowsLowLevelKeyboardHookProof` now defines the first `WH_KEYBOARD_LL` hold-to-talk keydown/keyup proof path.
+- The user-facing hold-to-talk runtime keeps one low-level hook alive from keydown through keyup, so recording starts after the same hook observes keydown and stops when that hook observes release.
 - `WindowsClipboardPayload` and the Windows-only `WindowsPasteProof` source define the first `CF_UNICODETEXT` plus `SendInput` paste proof path.
 - `WindowsPermissionSurface` now lives in `RomaCore` as the shared permission/native-limit descriptor for laptop proof output.
 - `WindowsDPAPISecretStore` now lives in `RomaCore` as the first Windows API-key storage adapter.

@@ -84,6 +84,46 @@ public enum WindowsLowLevelKeyboardHookProof {
         )
     }
 
+    public static func waitForHoldWindow(
+        chord: WindowsLowLevelKeyboardHookChord = .proofHold,
+        timeoutMilliseconds: UInt32 = RomaWindowsAgentConfiguration.defaultHoldTimeoutMilliseconds,
+        onKeyDown: @escaping @Sendable () -> Void
+    ) throws -> WindowsLowLevelKeyboardHookResult {
+        #if os(Windows)
+        var observedEvents: UInt32 = 0
+        var lastError: UInt32 = 0
+        let callbackBox = WindowsLowLevelKeyboardHookCallbackBox(onKeyDown: onKeyDown)
+        let status = withExtendedLifetime(callbackBox) {
+            roma_windows_keyboard_wait_for_hold_window(
+                chord.virtualKeyCode,
+                chord.requiredModifiers,
+                timeoutMilliseconds,
+                { context in
+                    guard let context else { return }
+                    let box = Unmanaged<WindowsLowLevelKeyboardHookCallbackBox>
+                        .fromOpaque(context)
+                        .takeUnretainedValue()
+                    box.onKeyDown()
+                },
+                Unmanaged.passUnretained(callbackBox).toOpaque(),
+                &observedEvents,
+                &lastError
+            )
+        }
+
+        return try makeResult(
+            status: status,
+            observedEvents: observedEvents,
+            lastError: lastError,
+            requireKeyDown: true,
+            requireKeyUp: true
+        )
+        #else
+        _ = onKeyDown
+        throw WindowsLowLevelKeyboardHookError.unsupported
+        #endif
+    }
+
     public static func waitForKeyDown(
         chord: WindowsLowLevelKeyboardHookChord = .proofHold,
         timeoutMilliseconds: UInt32 = RomaWindowsAgentConfiguration.defaultHoldTimeoutMilliseconds
@@ -128,6 +168,22 @@ public enum WindowsLowLevelKeyboardHookProof {
             &lastError
         )
 
+        return try makeResult(
+            status: status,
+            observedEvents: observedEvents,
+            lastError: lastError,
+            requireKeyDown: requireKeyDown,
+            requireKeyUp: requireKeyUp
+        )
+    }
+
+    private static func makeResult(
+        status: roma_windows_keyboard_status_t,
+        observedEvents: UInt32,
+        lastError: UInt32,
+        requireKeyDown: Bool,
+        requireKeyUp: Bool
+    ) throws -> WindowsLowLevelKeyboardHookResult {
         switch status {
         case ROMA_WINDOWS_KEYBOARD_OK:
             let result = WindowsLowLevelKeyboardHookResult(observedEvents: observedEvents)
@@ -147,5 +203,13 @@ public enum WindowsLowLevelKeyboardHookProof {
         default:
             throw WindowsLowLevelKeyboardHookError.messageLoopFailed
         }
+    }
+}
+
+private final class WindowsLowLevelKeyboardHookCallbackBox: @unchecked Sendable {
+    let onKeyDown: @Sendable () -> Void
+
+    init(onKeyDown: @escaping @Sendable () -> Void) {
+        self.onKeyDown = onKeyDown
     }
 }

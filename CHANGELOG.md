@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Added an archived Windows laptop proof recheck command to the packaged laptop guide.
 - Shared packaged Windows config-argument construction across source proof, installed launcher, and smoke proof scripts.
 - Printed explicit Windows proof-profile coverage for shared transcription and proof-argument paths.
 - Required Windows artifact proof reports to expose shared transcription-client and proof-argument markers.

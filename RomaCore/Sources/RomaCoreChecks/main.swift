@@ -7840,6 +7840,11 @@ struct RomaCoreChecks {
                 packageScript.contains("proof_set_laptop_preflight_local_whisper=True") &&
                 packageScript.contains("proof_set_laptop_preflight_source_dirty=false") &&
                 packageScript.contains("proof_set_source_dirty=false") &&
+                packageScript.contains("Archived full-proof recheck") &&
+                packageScript.contains("check-windows-proof-set.ps1 -LaptopPreflightReportPath") &&
+                packageScript.contains("cloud-dictation-proof.json") &&
+                packageScript.contains("local-whisper-dictation-proof.json") &&
+                packageScript.contains("local-whisper-notepad-paste-proof.json") &&
                 packageScript.contains("Full proof validates four JSON reports") &&
                 packageScript.contains("laptop_proof_guide="),
             "Windows package should include an artifact-local laptop proof guide with full proof markers"

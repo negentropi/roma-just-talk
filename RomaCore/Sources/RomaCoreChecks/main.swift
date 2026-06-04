@@ -2621,9 +2621,19 @@ struct RomaCoreChecks {
                 "trailing repeated sentence prefix"
             ),
             (
+                "I think this works. I think this works so.",
+                "I think this works.",
+                "trailing repeated sentence prefix with orphan so filler"
+            ),
+            (
                 "New York. New York",
                 "New York. New York",
                 "intentional repeated sentence guard"
+            ),
+            (
+                "New York. New York so.",
+                "New York. New York so.",
+                "intentional repeated proper-name sentence plus so guard"
             ),
             (
                 "New York is busy. New York",

@@ -639,6 +639,69 @@ struct RomaCoreChecks {
             "shared insertion polish should preserve non-technical what-I-meant continuations"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Make it module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim make-it correction commands before module continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Make that model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim make-that correction commands before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Call it module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim call-it correction commands before module continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Replace that with module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim replace-that-with correction commands before module continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Change that to model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim change-that-to correction commands before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Make it now.",
+                context: midSentenceContext
+            ) == "make it now",
+            "shared insertion polish should preserve non-technical make-it continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Call it now.",
+                context: midSentenceContext
+            ) == "call it now",
+            "shared insertion polish should preserve non-technical call-it continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Replace that with now.",
+                context: midSentenceContext
+            ) == "replace that with now",
+            "shared insertion polish should preserve non-technical replace-that-with continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Change that to now.",
+                context: midSentenceContext
+            ) == "change that to now",
+            "shared insertion polish should preserve non-technical change-that-to continuations"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("Right model.", context: midSentenceContext) == "right model",
             "shared insertion polish should preserve right as an ordinary fragment word"
         )
@@ -7897,6 +7960,37 @@ struct RomaCoreChecks {
         try require(
             await whatIMeanInserter.pastedText == " module",
             "pipeline should paste full what-I-mean-is correction continuations"
+        )
+
+        let makeItRecorder = FakeRecorder()
+        let makeItInserter = FakeTextInsertion()
+        let makeItPipeline = DictationPipeline(
+            recorder: makeItRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "make-it-continuation-proof.wav",
+                text: "Make it module."
+            ),
+            textInsertion: makeItInserter
+        )
+        let makeItRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/make-it-continuation-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await makeItRecorder.startPreRollBuffering()
+        let makeItResult = try await makeItPipeline.runRecordingWindow(makeItRequest) {}
+
+        try require(
+            makeItResult.processedText == " module",
+            "pipeline should clean make-it correction command continuations"
+        )
+        try require(
+            await makeItInserter.pastedText == " module",
+            "pipeline should paste make-it correction command continuations"
         )
 
         let orWaitNoIMeanRecorder = FakeRecorder()

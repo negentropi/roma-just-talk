@@ -499,7 +499,7 @@ public struct RomaTranscriptionOutputFilter {
     private static let likelyLowercaseFragments: Set<String> = [
         "a", "about", "actually", "after", "again", "all", "alright", "also", "an", "and", "any", "app", "are",
         "argument", "arguments", "array", "arrays", "as", "at", "back", "bad", "be", "because", "branch", "branches",
-        "bug", "bugs", "button", "buttons", "but", "by", "cache", "caches", "can", "case", "class", "classes",
+        "bug", "bugs", "button", "buttons", "but", "by", "cache", "caches", "call", "can", "case", "change", "class", "classes",
         "client", "code", "command", "commands", "commit", "commits", "component", "components", "config",
         "constant", "constants", "could", "data", "database", "databases", "dictionary", "dictionaries",
         "did", "diff", "diffs", "do", "does", "done", "email", "emails", "endpoint", "endpoints", "enum",
@@ -510,7 +510,7 @@ public struct RomaTranscriptionOutputFilter {
         "model", "models", "module", "modules", "my", "name", "names", "need", "next", "not", "now", "of", "on", "one",
         "oops", "option", "options", "or", "out", "output", "outputs", "package", "packages", "page", "parameter",
         "parameters", "parser", "path", "paths", "payload", "payloads", "phrase", "phrases", "project", "projects",
-        "pod", "pods", "prompt", "property", "properties", "protocol", "protocols", "put", "rather", "really", "repo", "repos", "repository",
+        "pod", "pods", "prompt", "property", "properties", "protocol", "protocols", "put", "rather", "really", "replace", "repo", "repos", "repository",
         "repositories", "request", "response", "result", "results", "right", "route", "routes", "router", "screen",
         "script", "scripts", "second", "see", "server", "service", "setting", "settings", "should", "single", "site", "sites", "so", "sorry",
         "some", "state", "states", "struct", "structs", "sure", "than", "that", "the", "then", "there", "third", "this", "ticket",
@@ -564,7 +564,7 @@ public struct RomaTranscriptionOutputFilter {
         (#"(?i)^\s*(?:ok(?:ay)?|all\s+right|alright|right|yeah|yes|yep|yup|sure)(?:[ \t]*[,;:…]+[ \t]*)+so[,;:…]*[ \t]+"#, ""),
         (#"(?i)^\s*(?:you\s+know|i\s+mean|like)[,;:…]+[ \t]*"#, "")
     ]
-    private static let continuationFragmentLeadingDiscourseFillerPattern = #"(?i)^\s*(you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?|what[ \t]+i[ \t]+mean[ \t]+is|what[ \t]+i[ \t]+meant[ \t]+(?:is|was)|i[ \t]+mean(?:[ \t]+to[ \t]+say)?|i[ \t]+meant(?:[ \t]+to[ \t]+say)?|ok(?:ay)?|all[ \t]+right|alright|got[ \t]+it|gotcha|no[ \t]+wait|wait|hold[ \t]+on|hang[ \t]+on|sorry|oops|whoops|my[ \t]+bad|actually|instead|rather|yeah|yes|yep|yup|like|basically|so|well)(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
+    private static let continuationFragmentLeadingDiscourseFillerPattern = #"(?i)^\s*(you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?|what[ \t]+i[ \t]+mean[ \t]+is|what[ \t]+i[ \t]+meant[ \t]+(?:is|was)|i[ \t]+mean(?:[ \t]+to[ \t]+say)?|i[ \t]+meant(?:[ \t]+to[ \t]+say)?|ok(?:ay)?|all[ \t]+right|alright|got[ \t]+it|gotcha|no[ \t]+wait|wait|hold[ \t]+on|hang[ \t]+on|make[ \t]+(?:it|that)|call[ \t]+it|replace[ \t]+(?:that|it)[ \t]+with|change[ \t]+(?:that|it)[ \t]+to|sorry|oops|whoops|my[ \t]+bad|actually|instead|rather|yeah|yes|yep|yup|like|basically|so|well)(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let standaloneDiscourseFillerPattern = #"(?i)^\s*you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?[ \t]*[.,;:…]*\s*$"#
     private static let blockedPreviousWordsForTerminalYouKnow: Set<String> = [
         "do", "does", "did", "don't", "if", "know", "let", "should", "to", "whether", "will", "would"
@@ -2008,6 +2008,7 @@ public struct RomaTranscriptionOutputFilter {
 
         if [
             "all right", "alright", "got it", "gotcha", "no wait", "wait", "hold on", "hang on",
+            "make it", "make that", "call it", "replace that with", "replace it with", "change that to", "change it to",
             "sorry", "oops", "whoops", "my bad", "actually", "instead", "rather",
             "what i mean is", "what i meant is", "what i meant was", "yes", "yep", "yup"
         ].contains(filler) {

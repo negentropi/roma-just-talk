@@ -752,7 +752,7 @@ public struct RomaTranscriptionOutputFilter {
             or\s+actually |
             or\s+wait\s*[,;:]?\s+no |
             (?:[,;:…]|\.\.\.)\s*instead(?!\s+of\b)\s*[,;:]? |
-            i\s+mean
+            (?<!wait)\s+i\s+mean
         )
         \s*[,;:]?\s+
         """#
@@ -2188,6 +2188,23 @@ public struct RomaTranscriptionOutputFilter {
                 return neverMindStartIndex
             }
             return markerIndex + 1
+        case "wait":
+            if let neverMindStartIndex = neverMindReplacementStartIndex(
+                tokens: tokens,
+                markerIndex: markerIndex + 1
+            ) {
+                return neverMindStartIndex
+            }
+            if tokens[markerIndex + 1].text == "actually" ||
+                tokens[markerIndex + 1].text == "no" {
+                return markerIndex + 2
+            }
+            guard markerIndex + 2 < tokens.count,
+                  tokens[markerIndex + 1].text == "i",
+                  ["mean", "meant"].contains(tokens[markerIndex + 2].text) else {
+                return nil
+            }
+            return markerIndex + 3
         case "never":
             guard tokens[markerIndex + 1].text == "mind" else { return nil }
             return markerIndex + 2
@@ -2265,7 +2282,7 @@ public struct RomaTranscriptionOutputFilter {
     }
 
     private static func isBareUnpunctuatedContinuationCorrectionMarker(_ marker: String) -> Bool {
-        ["actually", "no", "nope"].contains(marker)
+        ["actually", "no", "nope", "wait"].contains(marker)
     }
 
     private static func shouldApplyBareUnpunctuatedContinuationCorrectionMarker(

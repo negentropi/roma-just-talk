@@ -25,6 +25,7 @@
 - Collapsed short replace/change and oops-style correction fragments in cursor-aware post-STT cleanup.
 - Collapsed short "what I mean is" correction fragments in cursor-aware post-STT cleanup.
 - Collapsed short "on second thought" and "let me rephrase" correction fragments in cursor-aware post-STT cleanup.
+- Collapsed short "wait actually" and "wait I mean" correction fragments in cursor-aware post-STT cleanup.
 - Required Windows laptop proof sets to use runner-style GUID proof session IDs.
 - Collapsed unpunctuated partial-word false starts such as "mo module" and "sh should" in post-STT cleanup.
 - Required real Windows cloud laptop proof to use an audio transcription endpoint route.

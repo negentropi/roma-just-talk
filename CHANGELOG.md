@@ -21,6 +21,7 @@
 - Collapsed short erase-style correction fragments such as "model scratch that module" in cursor-aware post-STT cleanup.
 - Collapsed short "I meant" and "I mean to say" correction fragments in cursor-aware post-STT cleanup.
 - Collapsed short replace/change and oops-style correction fragments in cursor-aware post-STT cleanup.
+- Collapsed short "what I mean is" correction fragments in cursor-aware post-STT cleanup.
 - Required Windows laptop proof sets to use runner-style GUID proof session IDs.
 - Collapsed unpunctuated partial-word false starts such as "mo module" and "sh should" in post-STT cleanup.
 - Required real Windows cloud laptop proof to use an audio transcription endpoint route.

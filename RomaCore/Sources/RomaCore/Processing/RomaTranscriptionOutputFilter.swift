@@ -2000,7 +2000,7 @@ public struct RomaTranscriptionOutputFilter {
         let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
         let tokens = correctionMarkerWordTokens(in: trimmedText)
         guard tokens.count >= 3,
-              tokens.count <= 6,
+              tokens.count <= 8,
               !hasInternalSentenceBoundary(trimmedText) else {
             return text
         }
@@ -2149,6 +2149,14 @@ public struct RomaTranscriptionOutputFilter {
         case "my":
             guard tokens[markerIndex + 1].text == "bad" else { return nil }
             return markerIndex + 2
+        case "what":
+            guard markerIndex + 3 < tokens.count,
+                  tokens[markerIndex + 1].text == "i",
+                  ["mean", "meant"].contains(tokens[markerIndex + 2].text),
+                  tokens[markerIndex + 3].text == "is" else {
+                return nil
+            }
+            return markerIndex + 4
         case "i":
             guard ["mean", "meant"].contains(tokens[markerIndex + 1].text) else { return nil }
             let replacementStartIndex = markerIndex + 2

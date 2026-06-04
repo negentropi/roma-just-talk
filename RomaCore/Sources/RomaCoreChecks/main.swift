@@ -295,6 +295,48 @@ struct RomaCoreChecks {
             "shared insertion polish should preserve unguarded single-word context repeats"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model instead module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should apply unpunctuated instead corrections in short continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model sorry module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should apply unpunctuated sorry corrections in short continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model correction module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should apply unpunctuated correction markers in short continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "I would instead wait.",
+                context: midSentenceContext
+            ) == "I would instead wait",
+            "shared insertion polish should preserve instead prose after auxiliaries"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Use correction module today.",
+                context: midSentenceContext
+            ) == "use correction module today",
+            "shared insertion polish should preserve correction noun phrases"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model instead of module.",
+                context: midSentenceContext
+            ) == "model instead of module",
+            "shared insertion polish should preserve instead-of prose"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("MODEL.", context: midSentenceContext) == "model",
             "shared insertion polish should lowercase all-caps ordinary mid-sentence fragments"
         )

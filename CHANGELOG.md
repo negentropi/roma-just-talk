@@ -3,6 +3,7 @@
 ## v1.81 - Unreleased
 
 - Replaced the README, source app icon, and menu bar logo with the roma-just-talk split-keyboard mark.
+- Cleaned short unpunctuated correction fragments such as "model instead module".
 - Trimmed repeated cursor-context words from pre-roll continuation transcripts such as "so this Model".
 - Dropped leading discourse fillers such as "okay Model" and "you know Model" from short mid-sentence fragments.
 - Unwrapped short generated parenthesis, brace, and quote artifacts such as "(Model.)" mid-sentence.

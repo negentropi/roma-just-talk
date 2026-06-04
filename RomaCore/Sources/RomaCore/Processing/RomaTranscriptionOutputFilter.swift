@@ -564,6 +564,15 @@ public struct RomaTranscriptionOutputFilter {
     private static let singleWordContinuationOverlapWords: Set<String> = [
         "a", "an", "it", "that", "the", "these", "this", "those"
     ]
+    private static let blockedPreviousWordsForUnpunctuatedContinuationCorrection: Set<String> = [
+        "am", "are", "be", "been", "being", "can", "could", "did", "do", "does",
+        "had", "has", "have", "is", "might", "must", "shall", "should", "was",
+        "were", "will", "would"
+    ]
+    private static let blockedSourceWordsForUnpunctuatedCorrectionMarker: Set<String> = [
+        "a", "an", "add", "build", "click", "create", "explain", "open", "run",
+        "say", "set", "show", "tell", "the", "this", "that", "use", "write"
+    ]
     private static let leadingLikeClauseStarterVerbs: Set<String> = [
         "am", "are", "can", "could", "did", "do", "does", "had", "has",
         "have", "is", "might", "must", "need", "needs", "should", "think",
@@ -1350,6 +1359,7 @@ public struct RomaTranscriptionOutputFilter {
                 from: polishedText,
                 after: activeContext.precedingText
             )
+            polishedText = replaceUnpunctuatedCorrectionMarkerInContinuation(from: polishedText)
             return restoreLeadingNewlines(leadingNewlineCount, to: lowercaseFragmentWordsIfSafe(in: polishedText))
         }
 
@@ -1869,6 +1879,58 @@ public struct RomaTranscriptionOutputFilter {
 
         let previousToken = precedingTokens[precedingTokens.count - 2]
         return singleWordContinuationOverlapPreviousWords.contains(previousToken.text)
+    }
+
+    private static func replaceUnpunctuatedCorrectionMarkerInContinuation(from text: String) -> String {
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        let tokens = wordTokens(in: trimmedText)
+        guard tokens.count >= 3,
+              tokens.count <= 5,
+              !hasInternalSentenceBoundary(trimmedText) else {
+            return text
+        }
+
+        for markerIndex in 1..<(tokens.count - 1) {
+            let marker = tokens[markerIndex].text
+            guard ["correction", "instead", "sorry"].contains(marker),
+                  marker != "instead" || tokens[markerIndex + 1].text != "of",
+                  shouldApplyUnpunctuatedContinuationCorrectionMarker(tokens: tokens, markerIndex: markerIndex) else {
+                continue
+            }
+
+            let replacementRange = tokens[markerIndex + 1].range.lowerBound..<tokens[tokens.count - 1].range.upperBound
+            let replacement = String(trimmedText[replacementRange])
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !replacement.isEmpty else { continue }
+            return replacement
+        }
+
+        return text
+    }
+
+    private static func shouldApplyUnpunctuatedContinuationCorrectionMarker(
+        tokens: [WordToken],
+        markerIndex: Int
+    ) -> Bool {
+        let sourceTokens = tokens[..<markerIndex]
+        let replacementTokens = tokens[(markerIndex + 1)...]
+        guard !sourceTokens.isEmpty,
+              !replacementTokens.isEmpty,
+              sourceTokens.count <= 2,
+              replacementTokens.count <= 2 else {
+            return false
+        }
+
+        if sourceTokens.contains(where: { blockedSourceWordsForUnpunctuatedCorrectionMarker.contains($0.text) }) {
+            return false
+        }
+
+        if let previousSourceWord = sourceTokens.last?.text,
+           blockedPreviousWordsForUnpunctuatedContinuationCorrection.contains(previousSourceWord) {
+            return false
+        }
+
+        return true
     }
 
     private static func isLeadingFillerFollowedByClauseStarter(_ text: String) -> Bool {

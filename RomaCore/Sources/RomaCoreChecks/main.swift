@@ -8946,8 +8946,8 @@ struct RomaCoreChecks {
             }
         }
         let hotKeyAvailabilityProofAssertions = [
-            ("windows-proof.ps1", windowsProofScript, "windows-hotkey-availability-proof", "hotkey_registration_available=true"),
-            ("prove-windows-agent-artifact.ps1", proveScript, "windows-hotkey-availability-proof", "hotkey_registration_available=true"),
+            ("windows-proof.ps1", windowsProofScript, "windows-hotkey-availability-proof", #"Assert-RomaWindowsNativeDoctorOutput -Output $hotkeyAvailabilityOutput -Name "register_hotkey_available""#),
+            ("prove-windows-agent-artifact.ps1", proveScript, "windows-hotkey-availability-proof", #"Assert-RomaWindowsNativeDoctorOutput -Output ($script:packagedNativeDoctorOutputs["register_hotkey_available"]) -Name "register_hotkey_available""#),
             ("check-windows-proof-report.ps1", checkReportScript, "register_hotkey_available", #"Assert-Boolean -Object $Proof -Name "register_hotkey_available" -Expected $true"#)
         ]
         for (scriptName, scriptSource, commandMarker, proofMarker) in hotKeyAvailabilityProofAssertions {
@@ -9078,9 +9078,10 @@ struct RomaCoreChecks {
         try require(
             windowsProofScript.contains("Assert-RomaWindowsRuntimeDefaultOutput -Output $proofAgentDoctorOutput") &&
                 windowsProofScript.contains("Assert-RomaWindowsRuntimeDefaultOutput -Output $windowsAgentDoctorOutput") &&
-                windowsProofScript.contains("Assert-RomaWindowsHoldTimeoutDefaultOutput -Output $keyboardHookDoctorOutput") &&
-                windowsProofScript.contains("Assert-RomaWindowsClipboardRestoreDefaultOutput -Output $pasteDoctorOutput"),
-            "Windows proof script should use shared doctor default assertions"
+                windowsProofScript.contains(#"Assert-RomaWindowsNativeDoctorOutput -Output $hotkeyDoctorOutput -Name "register_hotkey""#) &&
+                windowsProofScript.contains(#"Assert-RomaWindowsNativeDoctorOutput -Output $keyboardHookDoctorOutput -Name "keyboard_hook""#) &&
+                windowsProofScript.contains(#"Assert-RomaWindowsNativeDoctorOutput -Output $pasteDoctorOutput -Name "paste""#),
+            "Windows proof script should use shared doctor default and native-doctor assertions"
         )
         let proofReportDefaultFields = [
             "default_record_seconds",
@@ -9132,12 +9133,38 @@ struct RomaCoreChecks {
         try require(
             proveScript.contains("Get-RomaWindowsMinimumPermissionOutputProof -Output $Output") &&
                 proveScript.contains("Get-RomaWindowsRuntimeDefaultOutputProof -Output $Output") &&
-                proveScript.contains("Get-RomaWindowsHoldTimeoutDefaultOutputProof -Output $Output") &&
-                proveScript.contains("Get-RomaWindowsClipboardRestoreDefaultOutputProof -Output $Output") &&
+                proveScript.contains("Get-RomaWindowsNativeDoctorOutputProof") &&
+                proofCommonScript.contains("Get-RomaWindowsHoldTimeoutDefaultOutputProof -Output $Output") &&
+                proofCommonScript.contains("Get-RomaWindowsClipboardRestoreDefaultOutputProof -Output $Output") &&
                 checkReportScript.contains(#"Assert-Boolean -Object $Proof -Name "microphone_settings_uri" -Expected $true"#) &&
                 checkReportScript.contains(#"Assert-Boolean -Object $Proof -Name "desktop_app_microphone_access_required" -Expected $true"#),
             "Windows artifact proof should record shared doctor marker proof fields"
         )
+        let nativeDoctorExpectedMarkers = [
+            ("register_hotkey", "windows_hotkey_runtime=true"),
+            ("register_hotkey_available", "hotkey_registration_available=true"),
+            ("keyboard_hook", "runtime=true"),
+            ("paste", "windows_paste_runtime=true"),
+            ("dpapi_secret", "dpapi_runtime=true"),
+            ("miniaudio_capture", "native_capture_adapter=true")
+        ]
+        try require(
+            proofCommonScript.contains("function Get-RomaWindowsNativeDoctorExpectedMarkers") &&
+                proofCommonScript.contains("function Get-RomaWindowsNativeDoctorExpectedMarker") &&
+                proofCommonScript.contains("function Assert-RomaWindowsNativeDoctorOutput") &&
+                proofCommonScript.contains("function Get-RomaWindowsNativeDoctorOutputProof"),
+            "Windows proof helper should own native-doctor marker lookup, assertions, and proof shaping"
+        )
+        for (name, marker) in nativeDoctorExpectedMarkers {
+            try require(
+                proofCommonScript.contains("\(name) = \"\(marker)\""),
+                "Windows proof helper should own native doctor marker \(name)"
+            )
+            try require(
+                proveScript.contains(#"-Name "\#(name)""#),
+                "Windows artifact proof should route native doctor \(name) through the shared marker helper"
+            )
+        }
         let artifactDefaultAssertions = [
             "default_record_seconds=2.0",
             "default_hold_timeout_seconds=15.0",
@@ -9156,9 +9183,10 @@ struct RomaCoreChecks {
         try require(
             proveScript.contains("Assert-RomaWindowsRuntimeDefaultOutput -Output $script:packagedAgentDoctorOutput") &&
                 proveScript.contains("Assert-RomaWindowsRuntimeDefaultOutput -Output $script:packagedProofAgentDoctorOutput") &&
-                proveScript.contains(#"Assert-RomaWindowsHoldTimeoutDefaultOutput -Output ($script:packagedNativeDoctorOutputs["keyboard_hook"])"#) &&
-                proveScript.contains(#"Assert-RomaWindowsClipboardRestoreDefaultOutput -Output ($script:packagedNativeDoctorOutputs["paste"])"#),
-            "Windows artifact proof script should use shared doctor default assertions"
+                proveScript.contains(#"Assert-RomaWindowsNativeDoctorOutput -Output ($script:packagedNativeDoctorOutputs["keyboard_hook"]) -Name "keyboard_hook""#) &&
+                proveScript.contains(#"Assert-RomaWindowsNativeDoctorOutput -Output ($script:packagedNativeDoctorOutputs["paste"]) -Name "paste""#) &&
+                !proveScript.contains("function Get-NativeDoctorOutputProof"),
+            "Windows artifact proof script should use shared doctor default and native-doctor assertions"
         )
         let packageDefaultAssertions = [
             "default_record_seconds=2.0",

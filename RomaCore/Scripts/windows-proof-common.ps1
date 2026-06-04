@@ -223,6 +223,30 @@ function Get-RomaWindowsProofAgentSourceOutputMarkers {
     }
 }
 
+function Get-RomaWindowsNativeDoctorExpectedMarkers {
+    return [ordered]@{
+        register_hotkey = "windows_hotkey_runtime=true"
+        register_hotkey_available = "hotkey_registration_available=true"
+        keyboard_hook = "runtime=true"
+        paste = "windows_paste_runtime=true"
+        dpapi_secret = "dpapi_runtime=true"
+        miniaudio_capture = "native_capture_adapter=true"
+    }
+}
+
+function Get-RomaWindowsNativeDoctorExpectedMarker {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    $markers = Get-RomaWindowsNativeDoctorExpectedMarkers
+    if (!$markers.Contains($Name)) {
+        throw "Unknown Windows native doctor proof name: $Name"
+    }
+    return [string]$markers[$Name]
+}
+
 function Get-RomaWindowsLaptopPreflightGuideMarkers {
     return [ordered]@{
         laptop_preflight_proof_set = "proof_set_ok=laptop-preflight"
@@ -296,6 +320,25 @@ function Assert-RomaWindowsProofAgentSourceOutput {
     Assert-RomaWindowsOutputMarkers `
         -Output $Output `
         -Markers (Get-RomaWindowsProofAgentSourceOutputMarkers)
+}
+
+function Assert-RomaWindowsNativeDoctorOutput {
+    param(
+        [string]$Output = "",
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    Assert-RomaWindowsOutputContains `
+        -Output $Output `
+        -Expected (Get-RomaWindowsNativeDoctorExpectedMarker -Name $Name)
+
+    if ($Name -eq "keyboard_hook") {
+        Assert-RomaWindowsHoldTimeoutDefaultOutput -Output $Output
+    }
+    if ($Name -eq "paste") {
+        Assert-RomaWindowsClipboardRestoreDefaultOutput -Output $Output
+    }
 }
 
 function Get-RomaWindowsLaptopPreflightCommonOutputMarkers {
@@ -374,6 +417,26 @@ function Get-RomaWindowsProofAgentSourceOutputProof {
     return Get-RomaWindowsOutputMarkerProof `
         -Output $Output `
         -Markers (Get-RomaWindowsProofAgentSourceOutputMarkers)
+}
+
+function Get-RomaWindowsNativeDoctorOutputProof {
+    param(
+        [string]$Output = "",
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    $expectedMarker = Get-RomaWindowsNativeDoctorExpectedMarker -Name $Name
+    $proof = [ordered]@{
+        output_present = ![string]::IsNullOrWhiteSpace($Output)
+        platform_windows = $Output.Contains("platform=windows")
+        expected_marker = $expectedMarker
+        expected_marker_present = $Output.Contains($expectedMarker)
+        register_hotkey_available = $Output.Contains((Get-RomaWindowsNativeDoctorExpectedMarker -Name "register_hotkey_available"))
+    }
+    Add-RomaWindowsProofFields -Proof $proof -Fields (Get-RomaWindowsHoldTimeoutDefaultOutputProof -Output $Output) | Out-Null
+    Add-RomaWindowsProofFields -Proof $proof -Fields (Get-RomaWindowsClipboardRestoreDefaultOutputProof -Output $Output) | Out-Null
+    return $proof
 }
 
 function Get-RomaWindowsOutputValue {

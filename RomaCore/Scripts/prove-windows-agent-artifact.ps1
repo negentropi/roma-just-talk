@@ -603,25 +603,6 @@ function Get-ProofAgentDoctorOutputProof {
     return $proof
 }
 
-function Get-NativeDoctorOutputProof {
-    param(
-        [string]$Output = "",
-        [Parameter(Mandatory = $true)]
-        [string]$ExpectedMarker
-    )
-
-    $proof = [ordered]@{
-        output_present = ![string]::IsNullOrWhiteSpace($Output)
-        platform_windows = $Output.Contains("platform=windows")
-        expected_marker = $ExpectedMarker
-        expected_marker_present = $Output.Contains($ExpectedMarker)
-        register_hotkey_available = $Output.Contains("hotkey_registration_available=true")
-    }
-    Add-RomaWindowsProofFields -Proof $proof -Fields (Get-RomaWindowsHoldTimeoutDefaultOutputProof -Output $Output) | Out-Null
-    Add-RomaWindowsProofFields -Proof $proof -Fields (Get-RomaWindowsClipboardRestoreDefaultOutputProof -Output $Output) | Out-Null
-    return $proof
-}
-
 function Get-ListenerSmokeProof {
     param(
         [string]$Output = ""
@@ -749,12 +730,12 @@ function Write-ProofReport {
             packaged_agent = (Get-DoctorOutputProof -Output $script:packagedAgentDoctorOutput)
             packaged_proof_agent = (Get-ProofAgentDoctorOutputProof -Output $script:packagedProofAgentDoctorOutput)
             packaged_native_doctors = [ordered]@{
-                register_hotkey = (Get-NativeDoctorOutputProof -Output ($script:packagedNativeDoctorOutputs["register_hotkey"]) -ExpectedMarker "windows_hotkey_runtime=true")
-                register_hotkey_available = (Get-NativeDoctorOutputProof -Output ($script:packagedNativeDoctorOutputs["register_hotkey_available"]) -ExpectedMarker "hotkey_registration_available=true")
-                keyboard_hook = (Get-NativeDoctorOutputProof -Output ($script:packagedNativeDoctorOutputs["keyboard_hook"]) -ExpectedMarker "runtime=true")
-                paste = (Get-NativeDoctorOutputProof -Output ($script:packagedNativeDoctorOutputs["paste"]) -ExpectedMarker "windows_paste_runtime=true")
-                dpapi_secret = (Get-NativeDoctorOutputProof -Output ($script:packagedNativeDoctorOutputs["dpapi_secret"]) -ExpectedMarker "dpapi_runtime=true")
-                miniaudio_capture = (Get-NativeDoctorOutputProof -Output ($script:packagedNativeDoctorOutputs["miniaudio_capture"]) -ExpectedMarker "native_capture_adapter=true")
+                register_hotkey = (Get-RomaWindowsNativeDoctorOutputProof -Output ($script:packagedNativeDoctorOutputs["register_hotkey"]) -Name "register_hotkey")
+                register_hotkey_available = (Get-RomaWindowsNativeDoctorOutputProof -Output ($script:packagedNativeDoctorOutputs["register_hotkey_available"]) -Name "register_hotkey_available")
+                keyboard_hook = (Get-RomaWindowsNativeDoctorOutputProof -Output ($script:packagedNativeDoctorOutputs["keyboard_hook"]) -Name "keyboard_hook")
+                paste = (Get-RomaWindowsNativeDoctorOutputProof -Output ($script:packagedNativeDoctorOutputs["paste"]) -Name "paste")
+                dpapi_secret = (Get-RomaWindowsNativeDoctorOutputProof -Output ($script:packagedNativeDoctorOutputs["dpapi_secret"]) -Name "dpapi_secret")
+                miniaudio_capture = (Get-RomaWindowsNativeDoctorOutputProof -Output ($script:packagedNativeDoctorOutputs["miniaudio_capture"]) -Name "miniaudio_capture")
             }
             installed_launcher = (Get-DoctorOutputProof -Output $script:installedLauncherDoctorOutput)
         }
@@ -961,24 +942,22 @@ Invoke-Step "packaged listener smoke" {
 
 Invoke-Step "packaged native proof doctors" {
     $script:packagedNativeDoctorOutputs["register_hotkey"] = Invoke-ProofAgentDoctorCommand -Name "register hotkey" -Command "windows-hotkey-doctor"
-    Assert-OutputContains -Output ($script:packagedNativeDoctorOutputs["register_hotkey"]) -Expected "windows_hotkey_runtime=true"
+    Assert-RomaWindowsNativeDoctorOutput -Output ($script:packagedNativeDoctorOutputs["register_hotkey"]) -Name "register_hotkey"
 
     $script:packagedNativeDoctorOutputs["register_hotkey_available"] = Invoke-ProofAgentDoctorCommand -Name "register hotkey availability" -Command "windows-hotkey-availability-proof"
-    Assert-OutputContains -Output ($script:packagedNativeDoctorOutputs["register_hotkey_available"]) -Expected "hotkey_registration_available=true"
+    Assert-RomaWindowsNativeDoctorOutput -Output ($script:packagedNativeDoctorOutputs["register_hotkey_available"]) -Name "register_hotkey_available"
 
     $script:packagedNativeDoctorOutputs["keyboard_hook"] = Invoke-ProofAgentDoctorCommand -Name "keyboard hook" -Command "windows-keyboard-hook-doctor"
-    Assert-OutputContains -Output ($script:packagedNativeDoctorOutputs["keyboard_hook"]) -Expected "runtime=true"
-    Assert-RomaWindowsHoldTimeoutDefaultOutput -Output ($script:packagedNativeDoctorOutputs["keyboard_hook"])
+    Assert-RomaWindowsNativeDoctorOutput -Output ($script:packagedNativeDoctorOutputs["keyboard_hook"]) -Name "keyboard_hook"
 
     $script:packagedNativeDoctorOutputs["paste"] = Invoke-ProofAgentDoctorCommand -Name "paste" -Command "windows-paste-doctor"
-    Assert-OutputContains -Output ($script:packagedNativeDoctorOutputs["paste"]) -Expected "windows_paste_runtime=true"
-    Assert-RomaWindowsClipboardRestoreDefaultOutput -Output ($script:packagedNativeDoctorOutputs["paste"])
+    Assert-RomaWindowsNativeDoctorOutput -Output ($script:packagedNativeDoctorOutputs["paste"]) -Name "paste"
 
     $script:packagedNativeDoctorOutputs["dpapi_secret"] = Invoke-ProofAgentDoctorCommand -Name "dpapi secret" -Command "windows-secret-doctor"
-    Assert-OutputContains -Output ($script:packagedNativeDoctorOutputs["dpapi_secret"]) -Expected "dpapi_runtime=true"
+    Assert-RomaWindowsNativeDoctorOutput -Output ($script:packagedNativeDoctorOutputs["dpapi_secret"]) -Name "dpapi_secret"
 
     $script:packagedNativeDoctorOutputs["miniaudio_capture"] = Invoke-ProofAgentDoctorCommand -Name "miniaudio capture" -Command "miniaudio-capture-doctor"
-    Assert-OutputContains -Output ($script:packagedNativeDoctorOutputs["miniaudio_capture"]) -Expected "native_capture_adapter=true"
+    Assert-RomaWindowsNativeDoctorOutput -Output ($script:packagedNativeDoctorOutputs["miniaudio_capture"]) -Name "miniaudio_capture"
 }
 
 if ($DoctorOnly) {

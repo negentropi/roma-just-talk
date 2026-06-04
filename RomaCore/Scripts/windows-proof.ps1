@@ -426,7 +426,13 @@ try {
     }
 
     Invoke-Step "windows hotkey doctor" {
-        swift run RomaProofAgent windows-hotkey-doctor
+        $hotkeyDoctorOutput = swift run RomaProofAgent windows-hotkey-doctor 2>&1 | Out-String
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host $hotkeyDoctorOutput
+            throw "RomaProofAgent windows-hotkey-doctor failed"
+        }
+        Write-Host $hotkeyDoctorOutput
+        Assert-RomaWindowsNativeDoctorOutput -Output $hotkeyDoctorOutput -Name "register_hotkey"
     }
 
     Invoke-Step "windows hotkey availability proof" {
@@ -436,7 +442,7 @@ try {
             throw "RomaProofAgent windows-hotkey-availability-proof failed"
         }
         Write-Host $hotkeyAvailabilityOutput
-        Assert-OutputContains -Output $hotkeyAvailabilityOutput -Expected "hotkey_registration_available=true"
+        Assert-RomaWindowsNativeDoctorOutput -Output $hotkeyAvailabilityOutput -Name "register_hotkey_available"
     }
 
     if ($RunInteractiveHotkey) {
@@ -457,7 +463,7 @@ try {
             throw "RomaProofAgent windows-keyboard-hook-doctor failed"
         }
         Write-Host $keyboardHookDoctorOutput
-        Assert-RomaWindowsHoldTimeoutDefaultOutput -Output $keyboardHookDoctorOutput
+        Assert-RomaWindowsNativeDoctorOutput -Output $keyboardHookDoctorOutput -Name "keyboard_hook"
     }
 
     if ($RunInteractiveKeyboardHook) {
@@ -478,7 +484,7 @@ try {
             throw "RomaProofAgent windows-paste-doctor failed"
         }
         Write-Host $pasteDoctorOutput
-        Assert-RomaWindowsClipboardRestoreDefaultOutput -Output $pasteDoctorOutput
+        Assert-RomaWindowsNativeDoctorOutput -Output $pasteDoctorOutput -Name "paste"
     }
 
     Invoke-Step "windows permission doctor" {

@@ -1274,6 +1274,16 @@ struct RomaCoreChecks {
                 "month date restatement correction"
             ),
             (
+                "Schedule it for Tuesday for Wednesday.",
+                "Schedule it for Wednesday.",
+                "for-date restatement correction"
+            ),
+            (
+                "Launch in June in July.",
+                "Launch in July.",
+                "in-month restatement correction"
+            ),
+            (
                 "Meet at office at three.",
                 "Meet at office at three.",
                 "location plus time preposition guard"
@@ -1282,6 +1292,16 @@ struct RomaCoreChecks {
                 "We talked on Tuesday on the phone.",
                 "We talked on Tuesday on the phone.",
                 "date plus prose preposition guard"
+            ),
+            (
+                "I bought gifts for Tuesday for the team.",
+                "I bought gifts for Tuesday for the team.",
+                "for-date plus prose preposition guard"
+            ),
+            (
+                "Launch in June in Europe.",
+                "Launch in June in Europe.",
+                "in-month plus location preposition guard"
             ),
             (
                 "Use model use module.",

@@ -8301,7 +8301,7 @@ public struct RomaTranscriptionOutputFilter {
 
         for prepositionIndex in 0..<(tokens.count - 3) {
             let preposition = words[prepositionIndex]
-            guard ["at", "on"].contains(preposition) else { continue }
+            guard ["at", "on", "for", "in"].contains(preposition) else { continue }
 
             let maxSecondPrepositionIndex = min(prepositionIndex + 4, tokens.count - 2)
             guard prepositionIndex + 2 <= maxSecondPrepositionIndex else { continue }
@@ -8359,8 +8359,13 @@ public struct RomaTranscriptionOutputFilter {
                 return nil
             }
             return (.time, wordCount)
-        case "on":
+        case "on", "for":
             guard let wordCount = leadingTemporalDateWordCount(in: words) else {
+                return nil
+            }
+            return (.date, wordCount)
+        case "in":
+            guard let wordCount = leadingTemporalMonthDateWordCount(in: words) else {
                 return nil
             }
             return (.date, wordCount)
@@ -8397,6 +8402,19 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         return nil
+    }
+
+    private static func leadingTemporalMonthDateWordCount(in words: [String]) -> Int? {
+        guard let firstWord = words.first,
+              monthWords.contains(firstWord) else {
+            return nil
+        }
+
+        if let spokenDate = leadingSpokenDate(in: words) {
+            return spokenDate.wordCount
+        }
+
+        return 1
     }
 
     private static func normalizedRepeatWord(_ token: String) -> String? {

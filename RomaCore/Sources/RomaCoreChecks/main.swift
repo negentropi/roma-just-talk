@@ -9638,11 +9638,17 @@ struct RomaCoreChecks {
         )
         try require(
             checkSetScript.contains("RequireLaptopPreflight") &&
+                proofCommonScript.contains("function Get-RomaWindowsProofProfileSpecs") &&
+                proofCommonScript.contains("function Get-RomaWindowsProofProfileName") &&
+                proofCommonScript.contains(#"profile = "laptop-preflight""#) &&
+                proofCommonScript.contains(#"read_as_laptop_preflight = $true"#) &&
+                checkSetScript.contains(". $proofCommonScript") &&
+                checkSetScript.contains("$profiles = Get-RomaWindowsProofProfileSpecs") &&
                 checkSetScript.contains("function Get-ProofReportProfileChecks") &&
                 checkSetScript.contains("function Test-AnyRequiredProofReportProfile") &&
                 checkSetScript.contains("function Invoke-RequiredProofReportProfileChecks") &&
-                checkSetScript.contains(#"Profile = "laptop-preflight""#) &&
-                checkSetScript.contains(#"ReadAsLaptopPreflight = $true"#) &&
+                checkSetScript.contains(#"Profile = [string]$profiles["laptop_preflight"]["profile"]"#) &&
+                checkSetScript.contains(#"ReadAsLaptopPreflight = [bool]$profiles["laptop_preflight"]["read_as_laptop_preflight"]"#) &&
                 checkSetScript.contains("Invoke-RequiredProofReportProfileChecks -Checks $profileChecks") &&
                 !checkSetScript.contains("function Assert-LaptopPreflightReport") &&
                 checkReportScript.contains(#"[ValidateSet("", "doctor-only", "laptop-preflight""#) &&
@@ -9917,9 +9923,9 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("proof_number=included_pre_roll_seconds value=") &&
                 proofCommonScript.contains("proof_set_laptop_preflight_matches_full=true") &&
                 proofCommonScript.contains("proof_set_generated_at_window_minutes=") &&
-                proofCommonScript.contains("proof_profile_ok=cloud-dictation") &&
-                proofCommonScript.contains("proof_profile_ok=local-whisper-dictation") &&
-                proofCommonScript.contains("proof_profile_ok=local-whisper-notepad-paste") &&
+                proofCommonScript.contains(#"cloud_dictation_profile = "proof_profile_ok=$($profiles["cloud_dictation"]["profile"])"#) &&
+                proofCommonScript.contains(#"local_whisper_dictation_profile = "proof_profile_ok=$($profiles["local_whisper_dictation"]["profile"])"#) &&
+                proofCommonScript.contains(#"local_whisper_notepad_paste_profile = "proof_profile_ok=$($profiles["local_whisper_notepad_paste"]["profile"])"#) &&
                 proofCommonScript.contains("proof_listener_runtime=installed_listener") &&
                 proofCommonScript.contains("listen_completed_sessions=1") &&
                 proofCommonScript.contains("proof_set_source_dirty=false") &&

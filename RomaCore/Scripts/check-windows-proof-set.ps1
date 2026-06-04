@@ -18,6 +18,12 @@ param(
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
+$proofCommonScript = Join-Path $PSScriptRoot "windows-proof-common.ps1"
+if (!(Test-Path -LiteralPath $proofCommonScript)) {
+    throw "Windows proof common helper was not found: $proofCommonScript"
+}
+. $proofCommonScript
+
 function Resolve-RequiredReportPath {
     param(
         [Parameter(Mandatory = $true)]
@@ -58,48 +64,49 @@ function Invoke-ProofReportProfileCheck {
 }
 
 function Get-ProofReportProfileChecks {
+    $profiles = Get-RomaWindowsProofProfileSpecs
     return @(
         [pscustomobject]@{
             Name = "doctor_only"
-            Profile = "doctor-only"
+            Profile = [string]$profiles["doctor_only"]["profile"]
             Path = $DoctorOnlyReportPath
             Required = [bool]$RequireDoctorOnly
-            ReadAsLaptopPreflight = $false
+            ReadAsLaptopPreflight = [bool]$profiles["doctor_only"]["read_as_laptop_preflight"]
         },
         [pscustomobject]@{
             Name = "cloud_dictation"
-            Profile = "cloud-dictation"
+            Profile = [string]$profiles["cloud_dictation"]["profile"]
             Path = $CloudDictationReportPath
             Required = [bool]$RequireCloudDictation
-            ReadAsLaptopPreflight = $false
+            ReadAsLaptopPreflight = [bool]$profiles["cloud_dictation"]["read_as_laptop_preflight"]
         },
         [pscustomobject]@{
             Name = "local_whisper_dictation"
-            Profile = "local-whisper-dictation"
+            Profile = [string]$profiles["local_whisper_dictation"]["profile"]
             Path = $LocalWhisperDictationReportPath
             Required = [bool]$RequireLocalWhisperDictation
-            ReadAsLaptopPreflight = $false
+            ReadAsLaptopPreflight = [bool]$profiles["local_whisper_dictation"]["read_as_laptop_preflight"]
         },
         [pscustomobject]@{
             Name = "local_whisper_notepad_paste"
-            Profile = "local-whisper-notepad-paste"
+            Profile = [string]$profiles["local_whisper_notepad_paste"]["profile"]
             Path = $LocalWhisperNotepadPasteReportPath
             Required = [bool]$RequireLocalWhisperNotepadPaste
-            ReadAsLaptopPreflight = $false
+            ReadAsLaptopPreflight = [bool]$profiles["local_whisper_notepad_paste"]["read_as_laptop_preflight"]
         },
         [pscustomobject]@{
             Name = "laptop_preflight"
-            Profile = "laptop-preflight"
+            Profile = [string]$profiles["laptop_preflight"]["profile"]
             Path = $LaptopPreflightReportPath
             Required = [bool]$RequireLaptopPreflight
-            ReadAsLaptopPreflight = $true
+            ReadAsLaptopPreflight = [bool]$profiles["laptop_preflight"]["read_as_laptop_preflight"]
         },
         [pscustomobject]@{
             Name = "packaged_whisper_mock_install"
-            Profile = "packaged-whisper-mock-install"
+            Profile = [string]$profiles["packaged_whisper_mock_install"]["profile"]
             Path = $PackagedWhisperMockInstallReportPath
             Required = [bool]$RequirePackagedWhisperMockInstall
-            ReadAsLaptopPreflight = $false
+            ReadAsLaptopPreflight = [bool]$profiles["packaged_whisper_mock_install"]["read_as_laptop_preflight"]
         }
     )
 }

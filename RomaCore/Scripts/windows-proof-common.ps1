@@ -299,6 +299,48 @@ function New-RomaWindowsNativeDoctorOutputTable {
     return $outputs
 }
 
+function Get-RomaWindowsProofProfileSpecs {
+    return [ordered]@{
+        doctor_only = [ordered]@{
+            profile = "doctor-only"
+            read_as_laptop_preflight = $false
+        }
+        cloud_dictation = [ordered]@{
+            profile = "cloud-dictation"
+            read_as_laptop_preflight = $false
+        }
+        local_whisper_dictation = [ordered]@{
+            profile = "local-whisper-dictation"
+            read_as_laptop_preflight = $false
+        }
+        local_whisper_notepad_paste = [ordered]@{
+            profile = "local-whisper-notepad-paste"
+            read_as_laptop_preflight = $false
+        }
+        laptop_preflight = [ordered]@{
+            profile = "laptop-preflight"
+            read_as_laptop_preflight = $true
+        }
+        packaged_whisper_mock_install = [ordered]@{
+            profile = "packaged-whisper-mock-install"
+            read_as_laptop_preflight = $false
+        }
+    }
+}
+
+function Get-RomaWindowsProofProfileName {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    $profiles = Get-RomaWindowsProofProfileSpecs
+    if (!$profiles.Contains($Name)) {
+        throw "Unknown Windows proof profile name: $Name"
+    }
+    return [string]$profiles[$Name]["profile"]
+}
+
 function Get-RomaWindowsLaptopPreflightGuideMarkers {
     return [ordered]@{
         laptop_preflight_proof_set = "proof_set_ok=laptop-preflight"
@@ -323,11 +365,12 @@ function Get-RomaWindowsLaptopPreflightLocalWhisperGuideMarkers {
 }
 
 function Get-RomaWindowsFullLaptopProofSetOutputMarkers {
+    $profiles = Get-RomaWindowsProofProfileSpecs
     return [ordered]@{
-        laptop_preflight_profile = "proof_profile_ok=laptop-preflight"
-        cloud_dictation_profile = "proof_profile_ok=cloud-dictation"
-        local_whisper_dictation_profile = "proof_profile_ok=local-whisper-dictation"
-        local_whisper_notepad_paste_profile = "proof_profile_ok=local-whisper-notepad-paste"
+        laptop_preflight_profile = "proof_profile_ok=$($profiles["laptop_preflight"]["profile"])"
+        cloud_dictation_profile = "proof_profile_ok=$($profiles["cloud_dictation"]["profile"])"
+        local_whisper_dictation_profile = "proof_profile_ok=$($profiles["local_whisper_dictation"]["profile"])"
+        local_whisper_notepad_paste_profile = "proof_profile_ok=$($profiles["local_whisper_notepad_paste"]["profile"])"
         full_laptop_proof_set = "proof_set_ok=full-laptop"
     }
 }

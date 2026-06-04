@@ -442,14 +442,24 @@ function Get-RomaWindowsProofProfileName {
         [string]$Name
     )
 
+    $spec = Get-RomaWindowsProofProfileSpecByName -Name $Name
+    return [string]$spec["profile"]
+}
+
+function Get-RomaWindowsProofProfileSpecByName {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
     $profiles = Get-RomaWindowsProofProfileSpecs
     if (!$profiles.Contains($Name)) {
         throw "Unknown Windows proof profile name: $Name"
     }
-    return [string]$profiles[$Name]["profile"]
+    return $profiles[$Name]
 }
 
-function Get-RomaWindowsProofProfileExpectedMode {
+function Get-RomaWindowsProofProfileSpecByProfile {
     param(
         [Parameter(Mandatory = $true)]
         [string]$Profile
@@ -458,10 +468,20 @@ function Get-RomaWindowsProofProfileExpectedMode {
     $profiles = Get-RomaWindowsProofProfileSpecs
     foreach ($name in $profiles.Keys) {
         if ([string]$profiles[$name]["profile"] -eq $Profile) {
-            return [string]$profiles[$name]["expected_mode"]
+            return $profiles[$name]
         }
     }
     throw "Unknown Windows proof profile: $Profile"
+}
+
+function Get-RomaWindowsProofProfileExpectedMode {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Profile
+    )
+
+    $spec = Get-RomaWindowsProofProfileSpecByProfile -Profile $Profile
+    return [string]$spec["expected_mode"]
 }
 
 function Get-RomaWindowsProofProfileExpectedModeByName {
@@ -470,8 +490,8 @@ function Get-RomaWindowsProofProfileExpectedModeByName {
         [string]$Name
     )
 
-    return Get-RomaWindowsProofProfileExpectedMode `
-        -Profile (Get-RomaWindowsProofProfileName -Name $Name)
+    $spec = Get-RomaWindowsProofProfileSpecByName -Name $Name
+    return [string]$spec["expected_mode"]
 }
 
 function Get-RomaWindowsProofProfileOkMarkerByName {
@@ -535,13 +555,8 @@ function Get-RomaWindowsProofProfileRequirements {
         [string]$Profile
     )
 
-    $profiles = Get-RomaWindowsProofProfileSpecs
-    foreach ($name in $profiles.Keys) {
-        if ([string]$profiles[$name]["profile"] -eq $Profile) {
-            return @($profiles[$name]["requirements"])
-        }
-    }
-    return @()
+    $spec = Get-RomaWindowsProofProfileSpecByProfile -Profile $Profile
+    return @($spec["requirements"])
 }
 
 function Join-RomaWindowsProofAssertions {
@@ -585,13 +600,8 @@ function Get-RomaWindowsProofProfileAssertions {
         [string]$Profile
     )
 
-    $profiles = Get-RomaWindowsProofProfileSpecs
-    foreach ($name in $profiles.Keys) {
-        if ([string]$profiles[$name]["profile"] -eq $Profile) {
-            return @($profiles[$name]["assertions"])
-        }
-    }
-    return @()
+    $spec = Get-RomaWindowsProofProfileSpecByProfile -Profile $Profile
+    return @($spec["assertions"])
 }
 
 function Get-RomaWindowsProofReportProfileChecks {

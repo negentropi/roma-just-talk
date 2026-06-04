@@ -9582,6 +9582,8 @@ struct RomaCoreChecks {
         try require(
             proofCommonScript.contains("function Get-RomaWindowsInstalledProofProfileRequirements") &&
                 proofCommonScript.contains("function Join-RomaWindowsProofRequirements") &&
+                proofCommonScript.contains("function Get-RomaWindowsProofProfileSpecByName") &&
+                proofCommonScript.contains("function Get-RomaWindowsProofProfileSpecByProfile") &&
                 proofCommonScript.contains("function Get-RomaWindowsInstalledProofProfileAssertions") &&
                 proofCommonScript.contains("function Get-RomaWindowsProofProfileAssertions") &&
                 proofCommonScript.contains("function Join-RomaWindowsProofAssertions") &&
@@ -9592,8 +9594,9 @@ struct RomaCoreChecks {
                 checkReportScript.contains("Get-RomaWindowsProofProfileAssertions -Profile $Profile") &&
                 proofCommonScript.contains("requirements = Join-RomaWindowsProofRequirements") &&
                 proofCommonScript.contains("assertions = Join-RomaWindowsProofAssertions") &&
-                proofCommonScript.contains(#"return @($profiles[$name]["requirements"])"#) &&
-                proofCommonScript.contains(#"return @($profiles[$name]["assertions"])"#) &&
+                proofCommonScript.contains(#"$spec = Get-RomaWindowsProofProfileSpecByProfile -Profile $Profile"#) &&
+                proofCommonScript.contains(#"return @($spec["requirements"])"#) &&
+                proofCommonScript.contains(#"return @($spec["assertions"])"#) &&
                 checkReportScript.contains("$script:RequireInstalledListener = $true") &&
                 checkReportScript.contains("$script:RequireConfigDoctor = $true") &&
                 checkReportScript.contains(#""listener_runtime" { $script:RequireListenerRuntime = $true }"#) &&
@@ -10080,6 +10083,8 @@ struct RomaCoreChecks {
             checkSetScript.contains("RequireLaptopPreflight") &&
                 proofCommonScript.contains("function Get-RomaWindowsProofProfileSpecs") &&
                 proofCommonScript.contains("function Get-RomaWindowsProofProfileName") &&
+                proofCommonScript.contains("function Get-RomaWindowsProofProfileSpecByName") &&
+                proofCommonScript.contains("function Get-RomaWindowsProofProfileSpecByProfile") &&
                 proofCommonScript.contains("function Get-RomaWindowsProofProfileExpectedMode") &&
                 proofCommonScript.contains("function Get-RomaWindowsProofProfileExpectedModeByName") &&
                 proofCommonScript.contains("function Get-RomaWindowsProofProfileOkMarkerByName") &&

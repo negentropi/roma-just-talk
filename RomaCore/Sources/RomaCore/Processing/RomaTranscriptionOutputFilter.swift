@@ -2115,6 +2115,20 @@ public struct RomaTranscriptionOutputFilter {
             return tokens[markerIndex + 1].text == "of" ? nil : markerIndex + 1
         case "rather":
             return tokens[markerIndex + 1].text == "than" ? nil : markerIndex + 1
+        case "replace":
+            guard ["that", "it"].contains(tokens[markerIndex + 1].text),
+                  markerIndex + 2 < tokens.count,
+                  tokens[markerIndex + 2].text == "with" else {
+                return nil
+            }
+            return markerIndex + 3
+        case "change":
+            guard ["that", "it"].contains(tokens[markerIndex + 1].text),
+                  markerIndex + 2 < tokens.count,
+                  tokens[markerIndex + 2].text == "to" else {
+                return nil
+            }
+            return markerIndex + 3
         case "make":
             guard ["it", "that"].contains(tokens[markerIndex + 1].text) else { return nil }
             return markerIndex + 2
@@ -2130,6 +2144,11 @@ public struct RomaTranscriptionOutputFilter {
                 return replacementStartIndex + 1
             }
             return replacementStartIndex
+        case "oops", "whoops", "woops":
+            return markerIndex + 1
+        case "my":
+            guard tokens[markerIndex + 1].text == "bad" else { return nil }
+            return markerIndex + 2
         case "i":
             guard ["mean", "meant"].contains(tokens[markerIndex + 1].text) else { return nil }
             let replacementStartIndex = markerIndex + 2

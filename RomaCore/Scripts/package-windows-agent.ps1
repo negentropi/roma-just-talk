@@ -518,12 +518,14 @@ proof_profile_ok=laptop-preflight
 proof_profile_ok=cloud-dictation
 proof_profile_ok=local-whisper-dictation
 proof_profile_ok=local-whisper-notepad-paste
+proof_listener_runtime=installed_listener
+listen_completed_sessions=1
 proof_set_source_dirty=false
 proof_set_ok=full-laptop
 windows_laptop_recheck_script=C:\tmp\roma-windows-laptop-proof\recheck-full-laptop-proof.ps1
 windows_laptop_proof_ok=true
 
-Archived full-proof recheck, without rerunning capture, transcription, or paste:
+Archived full-proof recheck, without rerunning capture, transcription, listener, or paste:
 
 powershell -ExecutionPolicy Bypass -File .\check-windows-proof-set.ps1 -LaptopPreflightReportPath C:\tmp\roma-windows-laptop-proof\preflight-proof.json -CloudDictationReportPath C:\tmp\roma-windows-laptop-proof\cloud-dictation-proof.json -LocalWhisperDictationReportPath C:\tmp\roma-windows-laptop-proof\local-whisper-dictation-proof.json -LocalWhisperNotepadPasteReportPath C:\tmp\roma-windows-laptop-proof\local-whisper-notepad-paste-proof.json -RequireLaptopPreflight -RequireFullLaptopProof
 

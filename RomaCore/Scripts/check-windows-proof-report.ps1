@@ -21,6 +21,7 @@ param(
     [switch]$RequireWhisperConfig,
     [switch]$RequireRealWhisperBackend,
     [switch]$RequireDictation,
+    [switch]$RequireListenerRuntime,
     [switch]$RequireExpectedTranscriptText,
     [switch]$RequirePaste,
     [switch]$RequireNotepadPaste
@@ -461,17 +462,19 @@ function Assert-NumberEquals {
     Write-Host "proof_number=$Name value=$actual expected=$Expected"
 }
 
-function Assert-DictationRuntimeProof {
+function Assert-DictationRuntimeFields {
     param(
         [Parameter(Mandatory = $true)]
-        [object]$Report
+        [object]$Runtime,
+        [Parameter(Mandatory = $true)]
+        [string]$Name
     )
 
-    $runtime = Require-Property -Object $Report -Name "dictation_runtime"
-    Assert-FileProof -Proof $runtime -Name "dictation_runtime_log"
+    $runtime = $Runtime
+    Assert-FileProof -Proof $runtime -Name "$Name.log"
     Assert-Boolean -Object $runtime -Name "reported_wrote" -Expected $true
     Assert-NonEmptyString -Object $runtime -Name "wrote_path"
-    Assert-FileProof -Proof (Require-Property -Object $runtime -Name "wrote_file") -Name "dictation_runtime_wav"
+    Assert-FileProof -Proof (Require-Property -Object $runtime -Name "wrote_file") -Name "$Name.wav"
     Assert-Boolean -Object $runtime -Name "reported_positive_duration" -Expected $true
     Assert-NumberGreaterThan -Object $runtime -Name "duration_seconds" -Minimum 0
     Assert-Boolean -Object $runtime -Name "reported_pre_roll" -Expected $true
@@ -495,6 +498,37 @@ function Assert-DictationRuntimeProof {
             -Name "expected_transcript_text_source"
         Assert-Boolean -Object $runtime -Name "expected_transcript_text_found" -Expected $true
     }
+
+    return $runtime
+}
+
+function Assert-DictationRuntimeProof {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Report
+    )
+
+    return Assert-DictationRuntimeFields `
+        -Runtime (Require-Property -Object $Report -Name "dictation_runtime") `
+        -Name "dictation_runtime"
+}
+
+function Assert-ListenerRuntimeProof {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Report
+    )
+
+    $runtime = Assert-DictationRuntimeFields `
+        -Runtime (Require-Property -Object $Report -Name "listener_runtime") `
+        -Name "listener_runtime"
+    Assert-Boolean -Object $runtime -Name "mode_listen" -Expected $true
+    Assert-Boolean -Object $runtime -Name "shared_pre_roll_runtime" -Expected $true
+    Assert-Boolean -Object $runtime -Name "max_sessions_one" -Expected $true
+    Assert-Boolean -Object $runtime -Name "session_start_one" -Expected $true
+    Assert-Boolean -Object $runtime -Name "session_completed_one" -Expected $true
+    Assert-Boolean -Object $runtime -Name "completed_one_session" -Expected $true
+    Write-Host "proof_listener_runtime=installed_listener"
 
     return $runtime
 }
@@ -925,6 +959,7 @@ function Get-ProofProfileRequirements {
                 "local_whisper_config",
                 "real_whisper_backend",
                 "dictation_runtime",
+                "listener_runtime",
                 "pre_roll_audio",
                 "speech_pcm_contract",
                 "expected_transcript_text",
@@ -1044,6 +1079,7 @@ switch ($RequireProofProfile) {
         $RequireWhisperConfig = $true
         $RequireRealWhisperBackend = $true
         $RequireDictation = $true
+        $RequireListenerRuntime = $true
         $RequireExpectedTranscriptText = $true
         $RequirePaste = $true
     }
@@ -1291,6 +1327,17 @@ if ($RequireDictation) {
         -Name "dictation_runtime_wrote_path"
     if ($RequireHoldHook) {
         Assert-HoldHookRuntimeProof -Runtime $dictationRuntime
+    }
+}
+
+if ($RequireListenerRuntime) {
+    Assert-Boolean -Object $report -Name "run_listener_proof" -Expected $true
+    $listenerRuntime = Assert-ListenerRuntimeProof -Report $report
+    if ($RequireHoldHook) {
+        Assert-HoldHookRuntimeProof -Runtime $listenerRuntime
+    }
+    if ($RequirePaste) {
+        Assert-Boolean -Object $listenerRuntime -Name "reported_paste_sent" -Expected $true
     }
 }
 

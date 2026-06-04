@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Required full Windows laptop local-whisper proof to archive one real installed listener session, not only one-shot dictation and zero-session listener smoke.
 - Required Windows laptop microphone preflight proof to report positive recorded duration and positive included pre-roll seconds.
 - Required Windows shortcuts and startup shortcuts to pass the exact install dir to the launcher.
 - Kept the Windows listener's shared pre-roll capture runtime alive between repeated hotkey sessions.

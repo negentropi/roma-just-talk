@@ -8179,6 +8179,15 @@ struct RomaCoreChecks {
             "Windows proof agent should expose that listener sessions reuse the shared pre-roll runtime path"
         )
         try require(
+            proveScript.contains("[switch]$RunListenerProof") &&
+                proveScript.contains("function Invoke-InstalledListenerRuntimeProof") &&
+                proveScript.contains("windows-agent-listen.log") &&
+                proveScript.contains("Get-DictationRuntimeLogProof") &&
+                proveScript.contains(#"$report["listener_runtime"] = Get-ListenerRuntimeProof"#) &&
+                laptopProofScript.contains("-RunListenerProof"),
+            "Windows full laptop proof should archive a real installed listener runtime session"
+        )
+        try require(
             proofAgentSource.contains(#"print("windows_hold_hook_single_window_source=true")"#),
             "Windows proof agent should expose that hold-to-talk uses one native hook window"
         )
@@ -8331,6 +8340,15 @@ struct RomaCoreChecks {
                     #"Assert-Boolean -Object $Proof -Name "shared_pre_roll_runtime" -Expected $true"#
                 ),
             "Windows proof profiles should print and require listener shared pre-roll runtime coverage"
+        )
+        try require(
+            checkReportScript.contains("[switch]$RequireListenerRuntime") &&
+                checkReportScript.contains("function Assert-ListenerRuntimeProof") &&
+                checkReportScript.contains(#""listener_runtime""#) &&
+                checkReportScript.contains(#"$RequireListenerRuntime = $true"#) &&
+                checkReportScript.contains(#"Assert-Boolean -Object $listenerRuntime -Name "reported_paste_sent" -Expected $true"#) &&
+                checkReportScript.contains("proof_listener_runtime=installed_listener"),
+            "Windows local-whisper laptop profile should require a real installed listener runtime proof"
         )
         try require(
             checkReportScript.contains(#""shared_windows_transcription_path""#) &&
@@ -8997,6 +9015,8 @@ struct RomaCoreChecks {
                 packageScript.contains("proof_profile_ok=cloud-dictation") &&
                 packageScript.contains("proof_profile_ok=local-whisper-dictation") &&
                 packageScript.contains("proof_profile_ok=local-whisper-notepad-paste") &&
+                packageScript.contains("proof_listener_runtime=installed_listener") &&
+                packageScript.contains("listen_completed_sessions=1") &&
                 packageScript.contains("proof_set_laptop_preflight_local_whisper=False") &&
                 packageScript.contains("proof_set_laptop_preflight_local_whisper=True") &&
                 packageScript.contains("proof_set_laptop_preflight_source_dirty=false") &&

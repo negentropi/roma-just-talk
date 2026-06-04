@@ -691,6 +691,7 @@ $localArgs = Add-RomaWindowsAgentScriptCommonArgs `
     -HasClipboardRestoreDelay $hasExplicitClipboardRestoreDelay `
     -ClipboardRestoreDelaySeconds $ClipboardRestoreDelaySeconds
 $localArgs += @("-RunDictation", "-PasteDictation")
+$localArgs += "-RunListenerProof"
 $localArgs = Add-ShortcutProofArgs `
     -ArgumentList $localArgs `
     -ShortcutDir (Join-Path $ProofDir "local-whisper-shortcuts") `

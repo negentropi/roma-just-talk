@@ -27,6 +27,7 @@ param(
     [double]$ClipboardRestoreDelaySeconds = 2,
     [switch]$UsePackagedWhisperMock,
     [switch]$RunDictation,
+    [switch]$RunListenerProof,
     [switch]$CreateShortcut,
     [switch]$CreateStartupShortcut,
     [string]$ShortcutDir = "",
@@ -131,6 +132,63 @@ function Invoke-InstalledListenerSmoke {
     Assert-OutputContains -Output $output -Expected "mode=RomaWindowsAgent listen"
     Assert-OutputContains -Output $output -Expected "listener_capture_lifecycle=shared_pre_roll_runtime"
     Assert-OutputContains -Output $output -Expected "listen_completed_sessions=0"
+    return $output
+}
+
+function Write-HoldDictationPrompt {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Name,
+        [string]$ExpectedTranscriptText = ""
+    )
+
+    Write-Host ""
+    Write-Host "ACTION_REQUIRED=$Name"
+    Write-Host "focus_target=normal_text_field_or_notepad"
+    if (![string]::IsNullOrWhiteSpace($ExpectedTranscriptText)) {
+        Write-Host "say_expected_phrase_before_hotkey=$ExpectedTranscriptText"
+    }
+    Write-Host "hold_hotkey=Ctrl+Shift+R"
+    Write-Host "speak_before_pressing_hotkey=true"
+    Write-Host "release_hotkey_to_finish=true"
+    Write-Host "listener_session_count=1"
+}
+
+function Invoke-InstalledListenerRuntimeProof {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$RunScriptPath,
+        [Parameter(Mandatory = $true)]
+        [string]$ConfigPath
+    )
+
+    $logDir = Join-Path $InstallDir "smoke"
+    New-Item -ItemType Directory -Force -Path $logDir | Out-Null
+    $logPath = Join-Path $logDir "windows-agent-listen.log"
+
+    Write-HoldDictationPrompt `
+        -Name "installed_listener_runtime" `
+        -ExpectedTranscriptText $ExpectedTranscriptText
+
+    $output = & $RunScriptPath `
+        -InstallDir $InstallDir `
+        -ConfigPath $ConfigPath `
+        -Listen `
+        -MaxSessions 1 2>&1 | Out-String
+    Set-Content -LiteralPath $logPath -Encoding UTF8 -Value $output
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host $output
+        throw "Installed launcher listener runtime proof failed"
+    }
+
+    Write-Host $output
+    Assert-OutputContains -Output $output -Expected "mode=RomaWindowsAgent listen"
+    Assert-OutputContains -Output $output -Expected "listener_capture_lifecycle=shared_pre_roll_runtime"
+    Assert-OutputContains -Output $output -Expected "listen_session_start=1"
+    Assert-OutputContains -Output $output -Expected "listen_session_completed=1"
+    Assert-OutputContains -Output $output -Expected "listen_completed_sessions=1"
+    Write-Host "installed_listener_runtime_log=$logPath"
+    Write-Host "installed_listener_runtime_ok=true"
     return $output
 }
 
@@ -401,8 +459,14 @@ function Get-ConfigProof {
     return $proof
 }
 
-function Get-DictationRuntimeProof {
-    $logPath = Join-Path (Join-Path $InstallDir "smoke") "windows-agent-dictate.log"
+function Get-DictationRuntimeLogProof {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$LogPath,
+        [string]$ExpectedText = ""
+    )
+
+    $logPath = $LogPath
     $proof = Get-FileProof -Path $logPath
     if (!$proof["exists"]) {
         return $proof
@@ -468,13 +532,39 @@ function Get-DictationRuntimeProof {
         $processedTextLine -gt $wroteLine
     )
     $expectedTranscriptTextFound = $false
-    if (![string]::IsNullOrWhiteSpace($ExpectedTranscriptText)) {
-        $expectedTranscriptTextFound = Test-ContainsText -Text $processedTranscriptText -Needle $ExpectedTranscriptText
+    if (![string]::IsNullOrWhiteSpace($ExpectedText)) {
+        $expectedTranscriptTextFound = Test-ContainsText -Text $processedTranscriptText -Needle $ExpectedText
     }
-    $proof["expected_transcript_text"] = $ExpectedTranscriptText
-    $proof["expected_transcript_text_required"] = ![string]::IsNullOrWhiteSpace($ExpectedTranscriptText)
+    $proof["expected_transcript_text"] = $ExpectedText
+    $proof["expected_transcript_text_required"] = ![string]::IsNullOrWhiteSpace($ExpectedText)
     $proof["expected_transcript_text_source"] = "processed_transcript_text"
     $proof["expected_transcript_text_found"] = $expectedTranscriptTextFound
+
+    return $proof
+}
+
+function Get-DictationRuntimeProof {
+    return Get-DictationRuntimeLogProof `
+        -LogPath (Join-Path (Join-Path $InstallDir "smoke") "windows-agent-dictate.log") `
+        -ExpectedText $ExpectedTranscriptText
+}
+
+function Get-ListenerRuntimeProof {
+    $logPath = Join-Path (Join-Path $InstallDir "smoke") "windows-agent-listen.log"
+    $proof = Get-DictationRuntimeLogProof `
+        -LogPath $logPath `
+        -ExpectedText $ExpectedTranscriptText
+    if (!$proof["exists"]) {
+        return $proof
+    }
+
+    $content = Get-Content -LiteralPath $logPath -Raw
+    $proof["mode_listen"] = $content.Contains("mode=RomaWindowsAgent listen") -and $content.Contains("mode=listen")
+    $proof["shared_pre_roll_runtime"] = $content.Contains("listener_capture_lifecycle=shared_pre_roll_runtime")
+    $proof["max_sessions_one"] = $content.Contains("max_sessions=1")
+    $proof["session_start_one"] = $content.Contains("listen_session_start=1")
+    $proof["session_completed_one"] = $content.Contains("listen_session_completed=1")
+    $proof["completed_one_session"] = $content.Contains("listen_completed_sessions=1")
 
     return $proof
 }
@@ -651,6 +741,7 @@ function Write-ProofReport {
         proof_mode = $Mode
         doctor_only = $IsDoctorOnly
         run_dictation = $RunDictation.IsPresent
+        run_listener_proof = $RunListenerProof.IsPresent
         paste_dictation = $PasteDictation.IsPresent
         expected_transcript_text = $ExpectedTranscriptText
         create_shortcut = $CreateShortcut.IsPresent
@@ -705,6 +796,9 @@ function Write-ProofReport {
     }
     if ($RunDictation) {
         $report["dictation_runtime"] = Get-DictationRuntimeProof
+    }
+    if ($RunListenerProof) {
+        $report["listener_runtime"] = Get-ListenerRuntimeProof
     }
     if ($RunNotepadPasteProof) {
         $report["notepad_paste"] = $script:notepadPasteProof
@@ -1081,6 +1175,16 @@ Invoke-Step "installed listener smoke" {
     $script:installedListenerOutput = Invoke-InstalledListenerSmoke `
         -RunScriptPath $installedRun `
         -ConfigPath $ConfigPath
+}
+
+if ($RunListenerProof) {
+    Invoke-Step "installed listener runtime proof" {
+        $installedRun = Join-Path $InstallDir "run-windows-agent.ps1"
+        Require-File -Path $installedRun
+        $null = Invoke-InstalledListenerRuntimeProof `
+            -RunScriptPath $installedRun `
+            -ConfigPath $ConfigPath
+    }
 }
 
 if ($RunNotepadPasteProof) {

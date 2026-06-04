@@ -9457,16 +9457,15 @@ public struct RomaTranscriptionOutputFilter {
             return true
         }
 
-        guard let lastCharacter = trimmedText.last,
-              "!?".contains(lastCharacter) else {
+        let noisyPunctuationBaseText = removeTrailingNoisyFragmentPunctuation(from: trimmedText)
+        guard noisyPunctuationBaseText != trimmedText else {
             return false
         }
 
-        let baseText = String(trimmedText.dropLast()).trimmingCharacters(in: .whitespacesAndNewlines)
-        return !baseText.isEmpty &&
-            wordCount(in: baseText) <= 5 &&
-            !baseText.contains(".") &&
-            !hasInternalSentenceBoundary(baseText)
+        return !noisyPunctuationBaseText.isEmpty &&
+            wordCount(in: noisyPunctuationBaseText) <= 5 &&
+            !noisyPunctuationBaseText.contains(".") &&
+            !hasInternalSentenceBoundary(noisyPunctuationBaseText)
     }
 
     private static func isRawParenthesisOrBraceBoundary(_ text: String) -> Bool {

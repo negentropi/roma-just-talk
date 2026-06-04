@@ -867,6 +867,25 @@ struct RomaCoreChecks {
             "shared insertion polish should unwrap raw braced noisy short fragments"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("(Model —)", context: midSentenceContext) == "model",
+            "shared insertion polish should unwrap raw parenthesized dash artifacts"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("(Model |)", context: midSentenceContext) == "model",
+            "shared insertion polish should unwrap raw parenthesized pipe artifacts"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("{Model？}", context: midSentenceContext) == "model",
+            "shared insertion polish should unwrap raw braced full-width question artifacts"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "(Final word —)",
+                context: midSentenceContext
+            ) == "final word",
+            "shared insertion polish should unwrap raw parenthesized dash phrase artifacts"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("\"Model!\".", context: midSentenceContext) == "\"model\"",
             "shared insertion polish should trim trailing periods after quoted noisy fragments"
         )

@@ -30,6 +30,7 @@
 - Collapsed nested "correction actually" and "sorry actually" fragments in cursor-aware post-STT cleanup.
 - Collapsed short "or actually" and "or wait no" correction fragments in cursor-aware post-STT cleanup.
 - Unwrapped short raw parenthesis and brace wrapper artifacts such as "(Model!)" and "{Model?}" during cursor-aware post-STT cleanup while preserving intentional lowercase enclosures.
+- Unwrapped short raw wrapper artifacts with generated dash, pipe, and full-width punctuation marks during cursor-aware post-STT cleanup.
 - Required Windows laptop proof sets to use runner-style GUID proof session IDs.
 - Collapsed unpunctuated partial-word false starts such as "mo module" and "sh should" in post-STT cleanup.
 - Required real Windows cloud laptop proof to use an audio transcription endpoint route.

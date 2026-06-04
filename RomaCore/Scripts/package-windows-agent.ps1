@@ -335,13 +335,21 @@ Full laptop proof, after cloud credentials and local whisper are ready:
 
 powershell -ExecutionPolicy Bypass -File .\run-windows-laptop-proof.ps1 -PackageDir . -ProofDir C:\tmp\roma-windows-laptop-proof -Endpoint https://api.groq.com/openai/v1/audio/transcriptions -Model whisper-large-v3-turbo -ApiKeyEnv GROQ_API_KEY -ApiKeyName groq -WhisperCLI C:\path\whisper-cli.exe -WhisperModel C:\path\ggml-base.en.bin
 
-Expected proof markers:
+Expected preflight-only proof markers:
 
 proof_set_ok=laptop-preflight
 windows_laptop_preflight_ok=true
 windows_laptop_preflight_report=C:\tmp\roma-windows-laptop-proof\preflight-proof.json
 proof_set_laptop_preflight_package_fingerprint=
 proof_set_laptop_preflight_source_dirty=false
+proof_set_laptop_preflight_local_whisper=False
+
+Local whisper preflight also prints:
+
+proof_set_laptop_preflight_local_whisper=True
+
+Expected full-proof markers:
+
 proof_set_laptop_preflight_matches_full=true
 proof_set_source_dirty=false
 proof_set_ok=full-laptop

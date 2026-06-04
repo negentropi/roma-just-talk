@@ -7397,8 +7397,13 @@ struct RomaCoreChecks {
             packageScript.contains("Write-LaptopProofGuide") &&
                 packageScript.contains("WINDOWS-LAPTOP-PROOF.txt") &&
                 packageScript.contains("-NativePreflightOnly") &&
+                packageScript.contains("Expected preflight-only proof markers:") &&
+                packageScript.contains("Local whisper preflight also prints:") &&
+                packageScript.contains("Expected full-proof markers:") &&
                 packageScript.contains("windows_laptop_preflight_report=") &&
                 packageScript.contains("proof_set_laptop_preflight_matches_full=true") &&
+                packageScript.contains("proof_set_laptop_preflight_local_whisper=False") &&
+                packageScript.contains("proof_set_laptop_preflight_local_whisper=True") &&
                 packageScript.contains("proof_set_laptop_preflight_source_dirty=false") &&
                 packageScript.contains("proof_set_source_dirty=false") &&
                 packageScript.contains("Full proof validates four JSON reports") &&

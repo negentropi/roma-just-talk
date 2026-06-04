@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Split Windows laptop proof guide markers into preflight-only and full-proof sections.
 - Added a Windows CI shared-core check before packaging the Windows agent.
 - Required Windows package smoke to assert clean-source laptop preflight markers.
 - Required Windows laptop preflight proof reports to come from clean packaged source checkouts.

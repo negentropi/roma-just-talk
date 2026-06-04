@@ -38,6 +38,7 @@
 - Trimmed "all right ..." and "alright ..." acknowledgement fillers before short technical continuations while preserving ordinary "all right now" prose.
 - Trimmed "yes ...", "yep ...", and "yup ..." acknowledgement fillers before short technical continuations while preserving ordinary literal continuations.
 - Trimmed "got it ..." acknowledgement filler before short technical continuations while preserving ordinary "got it now" prose.
+- Trimmed "gotcha ..." acknowledgement filler before short technical continuations while preserving ordinary literal continuations.
 - Collapsed short backtrack and hold-on correction fragments in cursor-aware post-STT cleanup.
 - Collapsed nested "correction actually" and "sorry actually" fragments in cursor-aware post-STT cleanup.
 - Collapsed short "or actually" and "or wait no" correction fragments in cursor-aware post-STT cleanup.

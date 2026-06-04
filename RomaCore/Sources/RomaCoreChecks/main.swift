@@ -422,6 +422,27 @@ struct RomaCoreChecks {
             "shared insertion polish should preserve non-technical got-it continuations"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Gotcha model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim gotcha acknowledgement fillers before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Gotcha module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim gotcha acknowledgement fillers before module continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Gotcha now.",
+                context: midSentenceContext
+            ) == "gotcha now",
+            "shared insertion polish should preserve non-technical gotcha continuations"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("Right model.", context: midSentenceContext) == "right model",
             "shared insertion polish should preserve right as an ordinary fragment word"
         )
@@ -7525,6 +7546,37 @@ struct RomaCoreChecks {
         try require(
             await gotItInserter.pastedText == " model",
             "pipeline should paste got-it acknowledgement filler continuations"
+        )
+
+        let gotchaRecorder = FakeRecorder()
+        let gotchaInserter = FakeTextInsertion()
+        let gotchaPipeline = DictationPipeline(
+            recorder: gotchaRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "gotcha-continuation-proof.wav",
+                text: "Gotcha model."
+            ),
+            textInsertion: gotchaInserter
+        )
+        let gotchaRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/gotcha-continuation-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await gotchaRecorder.startPreRollBuffering()
+        let gotchaResult = try await gotchaPipeline.runRecordingWindow(gotchaRequest) {}
+
+        try require(
+            gotchaResult.processedText == " model",
+            "pipeline should clean gotcha acknowledgement filler continuations"
+        )
+        try require(
+            await gotchaInserter.pastedText == " model",
+            "pipeline should paste gotcha acknowledgement filler continuations"
         )
 
         let orWaitNoIMeanRecorder = FakeRecorder()

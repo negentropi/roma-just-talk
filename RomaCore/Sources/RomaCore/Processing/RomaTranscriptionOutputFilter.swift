@@ -504,7 +504,7 @@ public struct RomaTranscriptionOutputFilter {
         "constant", "constants", "could", "data", "database", "databases", "dictionary", "dictionaries",
         "did", "diff", "diffs", "do", "does", "done", "email", "emails", "endpoint", "endpoints", "enum",
         "enums", "error", "errors", "field", "fields", "file", "files", "final", "first", "flag", "flags",
-        "folder", "folders", "for", "from", "function", "functions", "get", "go", "got", "had", "has", "have",
+        "folder", "folders", "for", "from", "function", "functions", "get", "go", "got", "gotcha", "had", "has", "have",
         "here", "how", "if", "in", "input", "inputs", "is", "it", "issue", "issues", "just", "key", "keys",
         "last", "like", "line", "lines", "make", "maybe", "mean", "message", "messages", "method", "methods",
         "model", "models", "module", "modules", "name", "names", "need", "next", "not", "now", "of", "on", "one",
@@ -564,7 +564,7 @@ public struct RomaTranscriptionOutputFilter {
         (#"(?i)^\s*(?:ok(?:ay)?|all\s+right|alright|right|yeah|yes|yep|yup|sure)(?:[ \t]*[,;:…]+[ \t]*)+so[,;:…]*[ \t]+"#, ""),
         (#"(?i)^\s*(?:you\s+know|i\s+mean|like)[,;:…]+[ \t]*"#, "")
     ]
-    private static let continuationFragmentLeadingDiscourseFillerPattern = #"(?i)^\s*(you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?|i[ \t]+mean(?:[ \t]+to[ \t]+say)?|i[ \t]+meant(?:[ \t]+to[ \t]+say)?|ok(?:ay)?|all[ \t]+right|alright|got[ \t]+it|yeah|yes|yep|yup|like|basically|so|well)(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
+    private static let continuationFragmentLeadingDiscourseFillerPattern = #"(?i)^\s*(you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?|i[ \t]+mean(?:[ \t]+to[ \t]+say)?|i[ \t]+meant(?:[ \t]+to[ \t]+say)?|ok(?:ay)?|all[ \t]+right|alright|got[ \t]+it|gotcha|yeah|yes|yep|yup|like|basically|so|well)(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let standaloneDiscourseFillerPattern = #"(?i)^\s*you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?[ \t]*[.,;:…]*\s*$"#
     private static let blockedPreviousWordsForTerminalYouKnow: Set<String> = [
         "do", "does", "did", "don't", "if", "know", "let", "should", "to", "whether", "will", "would"
@@ -2006,7 +2006,7 @@ public struct RomaTranscriptionOutputFilter {
             return false
         }
 
-        if ["all right", "alright", "got it", "yes", "yep", "yup"].contains(filler) {
+        if ["all right", "alright", "got it", "gotcha", "yes", "yep", "yup"].contains(filler) {
             guard let firstSuffixWord = wordTokens(in: trimmedSuffix).first?.text,
                   isTechnicalContinuationFragmentHead(firstSuffixWord) else {
                 return false

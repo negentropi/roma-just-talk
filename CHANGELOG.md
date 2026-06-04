@@ -58,6 +58,7 @@
 - Trimmed leading "scratch that ...", "delete that ...", "remove this ...", and "undo that ..." erase commands before short technical continuations while preserving ordinary literal continuations.
 - Trimmed leading "correction ...", "correction is ...", and "correction should be ..." markers before short technical continuations while preserving ordinary literal continuations.
 - Trimmed leading "it should be ...", "that should be ...", and "I should say ..." markers before short technical continuations while preserving ordinary literal continuations.
+- Trimmed leading "it is ...", "it's ...", "that is ...", and "that's ..." markers before short technical continuations while preserving ordinary literal continuations.
 - Collapsed short backtrack and hold-on correction fragments in cursor-aware post-STT cleanup.
 - Collapsed nested "correction actually" and "sorry actually" fragments in cursor-aware post-STT cleanup.
 - Collapsed short "or actually" and "or wait no" correction fragments in cursor-aware post-STT cleanup.

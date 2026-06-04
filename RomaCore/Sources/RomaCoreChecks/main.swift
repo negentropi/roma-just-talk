@@ -856,6 +856,62 @@ struct RomaCoreChecks {
             "shared insertion polish should preserve bare should-be continuations"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "It is module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim it-is markers before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "It's module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim it's markers before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "That is model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim that-is markers before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "That's model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim that's markers before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "It is now.",
+                context: midSentenceContext
+            ) == "it is now",
+            "shared insertion polish should preserve non-technical it-is continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "It's now.",
+                context: midSentenceContext
+            ) == "It's now",
+            "shared insertion polish should preserve non-technical it's continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "That is now.",
+                context: midSentenceContext
+            ) == "that is now",
+            "shared insertion polish should preserve non-technical that-is continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "That's now.",
+                context: midSentenceContext
+            ) == "That's now",
+            "shared insertion polish should preserve non-technical that's continuations"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("Right model.", context: midSentenceContext) == "right model",
             "shared insertion polish should preserve right as an ordinary fragment word"
         )
@@ -8238,6 +8294,37 @@ struct RomaCoreChecks {
         try require(
             await itShouldBeInserter.pastedText == " module",
             "pipeline should paste it-should-be marker continuations"
+        )
+
+        let itsRecorder = FakeRecorder()
+        let itsInserter = FakeTextInsertion()
+        let itsPipeline = DictationPipeline(
+            recorder: itsRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "its-continuation-proof.wav",
+                text: "It's module."
+            ),
+            textInsertion: itsInserter
+        )
+        let itsRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/its-continuation-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await itsRecorder.startPreRollBuffering()
+        let itsResult = try await itsPipeline.runRecordingWindow(itsRequest) {}
+
+        try require(
+            itsResult.processedText == " module",
+            "pipeline should clean it's marker continuations"
+        )
+        try require(
+            await itsInserter.pastedText == " module",
+            "pipeline should paste it's marker continuations"
         )
 
         let orWaitNoIMeanRecorder = FakeRecorder()

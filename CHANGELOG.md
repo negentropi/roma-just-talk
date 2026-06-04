@@ -3,6 +3,7 @@
 ## v1.81 - Unreleased
 
 - Replaced the README, source app icon, and menu bar logo with the roma-just-talk split-keyboard mark.
+- Formatted spoken short and "double dash" CLI flags in developer dictation such as "git commit dash m".
 - Formatted trailing developer case commands in short continuations such as "user id camel case".
 - Normalized lowercase product-name fragments such as "vercel project" and product corrections such as "cloud flare actually vercel".
 - Cleaned short bare correction fragments such as "model no module" and "model actually module".

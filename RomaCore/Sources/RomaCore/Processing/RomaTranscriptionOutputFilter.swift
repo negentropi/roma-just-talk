@@ -803,7 +803,8 @@ public struct RomaTranscriptionOutputFilter {
     private static let spokenDoubleQuotePairPattern = #"(?i)(?<![\p{L}\p{N}])quote[ \t]+([^.!?\n]{1,160}?)[ \t]+unquote([.!?])?(?![\p{L}\p{N}])"#
     private static let spokenSingleQuotePairPattern = #"(?i)(?<![\p{L}\p{N}])single[ \t]+quote[ \t]+([^.!?\n]{1,160}?)[ \t]+single[ \t]+quote([.!?])?(?![\p{L}\p{N}])"#
     private static let spokenPutEnclosurePattern = #"(?i)(?<![\p{L}\p{N}])(?:put|wrap|enclose)[ \t]+([^.!?\n]{1,120}?)[ \t]+(?:in|inside)[ \t]+(single[ \t]+quotes?|quotes?|quotation[ \t]+marks?|parentheses|parenthesis|parens?|brackets?|square[ \t]+brackets?|braces?|curly[ \t]+braces?)([.!?])?(?![\p{L}\p{N}])"#
-    private static let spokenLongCLIFlagPattern = #"(?i)(?<![\p{L}\p{N}])(?:dash|hyphen)[ \t]+(?:dash|hyphen)[ \t]+([A-Za-z][A-Za-z0-9]*(?:[ \t]+(?:dash|hyphen)[ \t]+[A-Za-z0-9]+){0,4})(?=[.!?,;:]|\s+(?:and|or|then|with|without)\b|$)"#
+    private static let spokenLongCLIFlagPattern = #"(?i)(?<![\p{L}\p{N}])(?:(?:dash|hyphen)[ \t]+(?:dash|hyphen)|double[ \t]+(?:dash|hyphen))[ \t]+([A-Za-z][A-Za-z0-9]*(?:[ \t]+(?:dash|hyphen)[ \t]+[A-Za-z0-9]+){0,4})(?=[.!?,;:]|\s+(?:and|or|then|with|without)\b|$)"#
+    private static let spokenShortCLIFlagPattern = #"(?i)(?<![\p{L}\p{N}])(?:dash|hyphen)[ \t]+([A-Za-z0-9])(?=[.!?,;:]|\s|$)"#
     private static let spokenSymbolCommands = [
         SpokenSymbolCommand(
             pattern: #"(?i)(?<![\p{L}\p{N}])(?:forward\s+slash|slash)(?![\p{L}\p{N}])"#,
@@ -2562,6 +2563,12 @@ public struct RomaTranscriptionOutputFilter {
     }
 
     private static func applySpokenCLIFlagCommands(in text: String) -> String {
+        var flagText = applySpokenLongCLIFlagCommands(in: text)
+        flagText = applySpokenShortCLIFlagCommands(in: flagText)
+        return flagText
+    }
+
+    private static func applySpokenLongCLIFlagCommands(in text: String) -> String {
         guard let regex = try? NSRegularExpression(pattern: spokenLongCLIFlagPattern) else {
             return text
         }
@@ -2583,6 +2590,33 @@ public struct RomaTranscriptionOutputFilter {
             let prefix = String(flagText[..<fullRange.lowerBound])
             let separator = prefix.last.map { $0.isWhitespace || $0.isNewline ? "" : " " } ?? ""
             flagText.replaceSubrange(fullRange, with: "\(separator)--\(flagName)")
+        }
+
+        return flagText
+    }
+
+    private static func applySpokenShortCLIFlagCommands(in text: String) -> String {
+        guard let regex = try? NSRegularExpression(pattern: spokenShortCLIFlagPattern) else {
+            return text
+        }
+
+        var flagText = text
+        let matches = regex.matches(in: flagText, range: NSRange(flagText.startIndex..., in: flagText))
+
+        for match in matches.reversed() {
+            guard match.numberOfRanges >= 2,
+                  let fullRange = Range(match.range(at: 0), in: flagText),
+                  let flagRange = Range(match.range(at: 1), in: flagText),
+                  shouldApplySpokenCLIFlag(in: flagText, commandRange: fullRange) else {
+                continue
+            }
+
+            let flagName = String(flagText[flagRange]).trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !flagName.isEmpty else { continue }
+
+            let prefix = String(flagText[..<fullRange.lowerBound])
+            let separator = prefix.last.map { $0.isWhitespace || $0.isNewline ? "" : " " } ?? ""
+            flagText.replaceSubrange(fullRange, with: "\(separator)-\(flagName)")
         }
 
         return flagText
@@ -2721,6 +2755,12 @@ public struct RomaTranscriptionOutputFilter {
 
         if command.output == "-",
            hasAdjacentSpokenDashWord(before: beforeCommand, after: afterCommand) {
+            return false
+        }
+
+        if command.output == "-",
+           nextWord.count == 1,
+           !shouldApplySpokenCLIFlag(in: text, commandRange: commandRange) {
             return false
         }
 
@@ -8163,6 +8203,10 @@ public struct RomaTranscriptionOutputFilter {
     }
 
     private static func removeLeadingFragmentPunctuation(from text: String) -> String {
+        if isStandaloneCLIFlagFragment(text) {
+            return text.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+
         var result = removeLeadingSpacedFragmentSymbols(from: text)
         while let firstScalar = result.unicodeScalars.first,
               removableLeadingFragmentPunctuation.contains(firstScalar) {
@@ -8170,6 +8214,20 @@ public struct RomaTranscriptionOutputFilter {
             result = result.trimmingCharacters(in: .whitespacesAndNewlines)
         }
         return result
+    }
+
+    private static func isStandaloneCLIFlagFragment(_ text: String) -> Bool {
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let regex = try? NSRegularExpression(
+            pattern: #"^-{1,2}[A-Za-z0-9][A-Za-z0-9_-]{0,63}[.!?]?$"#
+        ) else {
+            return false
+        }
+
+        return regex.firstMatch(
+            in: trimmedText,
+            range: NSRange(trimmedText.startIndex..., in: trimmedText)
+        ) != nil
     }
 
     private static func removeLeadingSpacedFragmentSymbols(from text: String) -> String {
@@ -8942,6 +9000,13 @@ public struct RomaTranscriptionOutputFilter {
             return false
         }
 
+        let leadingSpaceAfter = CharacterSet(charactersIn: ".,;:!?)]}”’")
+        if isStandaloneCLIFlagFragment(text) {
+            return previousCharacter.isLetter ||
+                previousCharacter.isNumber ||
+                previousCharacter.unicodeScalars.allSatisfy { leadingSpaceAfter.contains($0) }
+        }
+
         let noLeadingSpaceBefore = CharacterSet(charactersIn: ".,;:!?)]}”’/\\-@_")
         if firstCharacter.unicodeScalars.allSatisfy({ noLeadingSpaceBefore.contains($0) }) {
             return false
@@ -8952,7 +9017,6 @@ public struct RomaTranscriptionOutputFilter {
             return false
         }
 
-        let leadingSpaceAfter = CharacterSet(charactersIn: ".,;:!?)]}”’")
         return previousCharacter.isLetter ||
             previousCharacter.isNumber ||
             previousCharacter.unicodeScalars.allSatisfy { leadingSpaceAfter.contains($0) }

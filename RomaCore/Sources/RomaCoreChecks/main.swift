@@ -408,6 +408,20 @@ struct RomaCoreChecks {
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
+                RomaTranscriptionOutputFilter.filter("git commit dash m."),
+                context: midSentenceContext
+            ) == "git commit -m",
+            "shared insertion polish should preserve spoken short CLI flags in continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                RomaTranscriptionOutputFilter.filter("double dash verbose."),
+                context: midSentenceContext
+            ) == "--verbose",
+            "shared insertion polish should preserve spoken double-dash CLI flags in continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "I think no module.",
                 context: midSentenceContext
             ) == "I think no module",
@@ -3435,9 +3449,24 @@ struct RomaCoreChecks {
                 "spoken long CLI flag command"
             ),
             (
+                "Run git commit dash m.",
+                "Run git commit -m.",
+                "spoken short CLI flag command"
+            ),
+            (
+                "Run git checkout dash b feature branch.",
+                "Run git checkout -b feature branch.",
+                "spoken short CLI flag with value"
+            ),
+            (
                 "Run npm install dash dash save dash dev.",
                 "Run npm install --save-dev.",
                 "spoken hyphenated long CLI flag command"
+            ),
+            (
+                "Use double dash verbose.",
+                "Use --verbose.",
+                "spoken double dash CLI flag command"
             ),
             (
                 "Use dash dash help and dash dash version.",
@@ -4283,6 +4312,11 @@ struct RomaCoreChecks {
                 "The dash dash pattern is useful.",
                 "The dash dash pattern is useful.",
                 "dash dash prose guard"
+            ),
+            (
+                "The dash m pattern is useful.",
+                "The dash m pattern is useful.",
+                "short dash prose guard"
             ),
             (
                 "Quote from the docs.",

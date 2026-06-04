@@ -8591,10 +8591,15 @@ struct RomaCoreChecks {
         try require(
             checkReportScript.contains("function Get-InstalledProofProfileRequirements") &&
                 checkReportScript.contains("function Join-ProofRequirements") &&
+                checkReportScript.contains("function Enable-InstalledProofProfileAssertions") &&
                 checkReportScript.contains("function Write-ProofProfileRequirements") &&
                 checkReportScript.contains(#"return Join-ProofRequirements `"#) &&
+                checkReportScript.contains("$script:RequireInstalledListener = $true") &&
+                checkReportScript.contains("$script:RequireConfigDoctor = $true") &&
+                checkReportScript.contains("Enable-InstalledProofProfileAssertions -IncludeShortcutProof $true") &&
+                checkReportScript.contains("Enable-InstalledProofProfileAssertions\n        $RequireWhisperConfig = $true") &&
                 checkReportScript.contains("Write-ProofProfileRequirements -Profile $RequireProofProfile"),
-            "Windows proof checker should share installed profile requirements and profile output"
+            "Windows proof checker should share installed profile requirements, assertion flags, and profile output"
         )
         try require(
             checkReportScript.contains(#""pre_roll_audio""#) &&
@@ -8777,7 +8782,7 @@ struct RomaCoreChecks {
         )
         try require(
             checkReportScript.contains("function Assert-ConfigDoctorProof") &&
-                checkReportScript.contains(#"$RequireConfigDoctor = $true"#) &&
+                checkReportScript.contains(#"$script:RequireConfigDoctor = $true"#) &&
                 checkReportScript.contains(#"Assert-Boolean -Object $configDoctor -Name "api_key_resolved" -Expected $true"#) &&
                 checkReportScript.contains(#"Assert-Boolean -Object $configDoctor -Name "whisper_cli_exists" -Expected $true"#),
             "Windows proof checker should require config doctor evidence for installed proofs"

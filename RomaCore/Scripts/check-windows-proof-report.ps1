@@ -925,6 +925,26 @@ function Write-ProofProfileRequirements {
     Write-Host "proof_profile_ok=$Profile"
 }
 
+function Enable-InstalledProofProfileAssertions {
+    param(
+        [bool]$IncludeShortcutProof = $false
+    )
+
+    $script:RequireWindowsPlatform = $true
+    $script:RequireInstall = $true
+    if ($IncludeShortcutProof) {
+        $script:RequireShortcut = $true
+        $script:RequireStartupShortcut = $true
+    }
+    $script:RequirePermissionSurface = $true
+    $script:RequireProofAgentSurface = $true
+    $script:RequireNativeDoctorSurface = $true
+    $script:RequirePackagedListener = $true
+    $script:RequireInstalledListener = $true
+    $script:RequireConfigDoctor = $true
+    $script:RequireHoldHook = $true
+}
+
 function Get-ProofProfileRequirements {
     param(
         [Parameter(Mandatory = $true)]
@@ -1034,17 +1054,7 @@ switch ($RequireProofProfile) {
     }
     "cloud-dictation" {
         Set-ExpectedModeFromProfile -Mode "cloud" -Profile $RequireProofProfile
-        $RequireWindowsPlatform = $true
-        $RequireInstall = $true
-        $RequireShortcut = $true
-        $RequireStartupShortcut = $true
-        $RequirePermissionSurface = $true
-        $RequireProofAgentSurface = $true
-        $RequireNativeDoctorSurface = $true
-        $RequirePackagedListener = $true
-        $RequireInstalledListener = $true
-        $RequireConfigDoctor = $true
-        $RequireHoldHook = $true
+        Enable-InstalledProofProfileAssertions -IncludeShortcutProof $true
         $RequireCloudConfig = $true
         $RequireRealCloudBackend = $true
         $RequireDictation = $true
@@ -1053,17 +1063,7 @@ switch ($RequireProofProfile) {
     }
     "local-whisper-dictation" {
         Set-ExpectedModeFromProfile -Mode "local-whisper" -Profile $RequireProofProfile
-        $RequireWindowsPlatform = $true
-        $RequireInstall = $true
-        $RequireShortcut = $true
-        $RequireStartupShortcut = $true
-        $RequirePermissionSurface = $true
-        $RequireProofAgentSurface = $true
-        $RequireNativeDoctorSurface = $true
-        $RequirePackagedListener = $true
-        $RequireInstalledListener = $true
-        $RequireConfigDoctor = $true
-        $RequireHoldHook = $true
+        Enable-InstalledProofProfileAssertions -IncludeShortcutProof $true
         $RequireWhisperConfig = $true
         $RequireRealWhisperBackend = $true
         $RequireDictation = $true
@@ -1073,33 +1073,15 @@ switch ($RequireProofProfile) {
     }
     "local-whisper-notepad-paste" {
         Set-ExpectedModeFromProfile -Mode "local-whisper" -Profile $RequireProofProfile
-        $RequireWindowsPlatform = $true
-        $RequireInstall = $true
-        $RequirePermissionSurface = $true
-        $RequireProofAgentSurface = $true
-        $RequireNativeDoctorSurface = $true
-        $RequirePackagedListener = $true
-        $RequireInstalledListener = $true
-        $RequireConfigDoctor = $true
-        $RequireHoldHook = $true
+        Enable-InstalledProofProfileAssertions
         $RequireWhisperConfig = $true
         $RequireRealWhisperBackend = $true
         $RequireNotepadPaste = $true
     }
     "packaged-whisper-mock-install" {
         Set-ExpectedModeFromProfile -Mode "packaged-whisper-mock" -Profile $RequireProofProfile
-        $RequireWindowsPlatform = $true
-        $RequireInstall = $true
-        $RequireShortcut = $true
-        $RequireStartupShortcut = $true
-        $RequirePermissionSurface = $true
-        $RequireProofAgentSurface = $true
-        $RequireNativeDoctorSurface = $true
-        $RequirePackagedListener = $true
-        $RequireInstalledListener = $true
-        $RequireConfigDoctor = $true
+        Enable-InstalledProofProfileAssertions -IncludeShortcutProof $true
         $RequirePackagedMock = $true
-        $RequireHoldHook = $true
         $RequireWhisperConfig = $true
     }
     default {}

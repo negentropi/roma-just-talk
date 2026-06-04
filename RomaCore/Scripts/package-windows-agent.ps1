@@ -354,11 +354,16 @@ proof_set_laptop_preflight_matches_full=true
 proof_set_generated_at_window_minutes=
 proof_set_source_dirty=false
 proof_set_ok=full-laptop
+windows_laptop_recheck_script=C:\tmp\roma-windows-laptop-proof\recheck-full-laptop-proof.ps1
 windows_laptop_proof_ok=true
 
 Archived full-proof recheck, without rerunning capture, transcription, or paste:
 
 powershell -ExecutionPolicy Bypass -File .\check-windows-proof-set.ps1 -LaptopPreflightReportPath C:\tmp\roma-windows-laptop-proof\preflight-proof.json -CloudDictationReportPath C:\tmp\roma-windows-laptop-proof\cloud-dictation-proof.json -LocalWhisperDictationReportPath C:\tmp\roma-windows-laptop-proof\local-whisper-dictation-proof.json -LocalWhisperNotepadPasteReportPath C:\tmp\roma-windows-laptop-proof\local-whisper-notepad-paste-proof.json -RequireLaptopPreflight -RequireFullLaptopProof
+
+Or run the proof-dir script written by the full laptop proof:
+
+powershell -ExecutionPolicy Bypass -File C:\tmp\roma-windows-laptop-proof\recheck-full-laptop-proof.ps1
 
 Full proof validates four JSON reports: preflight, cloud dictation, local whisper dictation, and local whisper Notepad paste.
 Do not claim Windows support until the full laptop proof passes on the target Windows machine.

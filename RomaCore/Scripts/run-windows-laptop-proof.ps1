@@ -149,6 +149,61 @@ function Get-OptionalFileProof {
     return Get-FileProof -Path $Path
 }
 
+function ConvertTo-PowerShellSingleQuotedString {
+    param(
+        [string]$Value = ""
+    )
+
+    return "'" + $Value.Replace("'", "''") + "'"
+}
+
+function Write-FullLaptopProofRecheckScript {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path,
+        [Parameter(Mandatory = $true)]
+        [string]$PackageDir,
+        [Parameter(Mandatory = $true)]
+        [string]$LaptopPreflightReportPath,
+        [Parameter(Mandatory = $true)]
+        [string]$CloudDictationReportPath,
+        [Parameter(Mandatory = $true)]
+        [string]$LocalWhisperDictationReportPath,
+        [Parameter(Mandatory = $true)]
+        [string]$LocalWhisperNotepadPasteReportPath
+    )
+
+    $scriptLines = @(
+        "param(",
+        "    [string]`$PackageDir = $(ConvertTo-PowerShellSingleQuotedString -Value $PackageDir)",
+        ")",
+        "",
+        '$ErrorActionPreference = "Stop"',
+        "Set-StrictMode -Version Latest",
+        "",
+        '$checkSetScript = Join-Path $PackageDir "check-windows-proof-set.ps1"',
+        'if (!(Test-Path -LiteralPath $checkSetScript)) {',
+        '    throw "Windows proof-set checker was not found: $checkSetScript"',
+        '}',
+        "",
+        "`$laptopPreflightReportPath = $(ConvertTo-PowerShellSingleQuotedString -Value $LaptopPreflightReportPath)",
+        "`$cloudDictationReportPath = $(ConvertTo-PowerShellSingleQuotedString -Value $CloudDictationReportPath)",
+        "`$localWhisperDictationReportPath = $(ConvertTo-PowerShellSingleQuotedString -Value $LocalWhisperDictationReportPath)",
+        "`$localWhisperNotepadPasteReportPath = $(ConvertTo-PowerShellSingleQuotedString -Value $LocalWhisperNotepadPasteReportPath)",
+        "",
+        "& `$checkSetScript ``",
+        "    -LaptopPreflightReportPath `$laptopPreflightReportPath ``",
+        "    -CloudDictationReportPath `$cloudDictationReportPath ``",
+        "    -LocalWhisperDictationReportPath `$localWhisperDictationReportPath ``",
+        "    -LocalWhisperNotepadPasteReportPath `$localWhisperNotepadPasteReportPath ``",
+        "    -RequireLaptopPreflight ``",
+        "    -RequireFullLaptopProof"
+    )
+
+    $scriptLines | Set-Content -LiteralPath $Path -Encoding UTF8
+    Write-Host "windows_laptop_recheck_script=$Path"
+}
+
 function Write-HoldDictationPrompt {
     param(
         [Parameter(Mandatory = $true)]
@@ -446,6 +501,7 @@ $proofSessionId = [guid]::NewGuid().ToString("D")
 $cloudReport = Join-Path $ProofDir "cloud-dictation-proof.json"
 $localWhisperDictationReport = Join-Path $ProofDir "local-whisper-dictation-proof.json"
 $localWhisperNotepadReport = Join-Path $ProofDir "local-whisper-notepad-paste-proof.json"
+$recheckScriptPath = Join-Path $ProofDir "recheck-full-laptop-proof.ps1"
 $micPreflightPath = Join-Path $ProofDir "mic-preflight.wav"
 
 $cloudInstallDir = Join-Path $ProofDir "cloud-install"
@@ -648,6 +704,16 @@ Invoke-Step "full laptop proof set check" {
         -RequireFullLaptopProof
 }
 
+Invoke-Step "write full laptop proof recheck" {
+    Write-FullLaptopProofRecheckScript `
+        -Path $recheckScriptPath `
+        -PackageDir $PackageDir `
+        -LaptopPreflightReportPath $PreflightReportPath `
+        -CloudDictationReportPath $cloudReport `
+        -LocalWhisperDictationReportPath $localWhisperDictationReport `
+        -LocalWhisperNotepadPasteReportPath $localWhisperNotepadReport
+}
+
 Write-Host ""
 Write-Host "windows_laptop_proof_dir=$ProofDir"
 Write-Host "windows_laptop_proof_session_id=$proofSessionId"
@@ -658,4 +724,5 @@ Write-Host "windows_laptop_preflight_report=$PreflightReportPath"
 Write-Host "windows_laptop_cloud_report=$cloudReport"
 Write-Host "windows_laptop_local_whisper_report=$localWhisperDictationReport"
 Write-Host "windows_laptop_notepad_report=$localWhisperNotepadReport"
+Write-Host "windows_laptop_recheck_script=$recheckScriptPath"
 Write-Host "windows_laptop_proof_ok=true"

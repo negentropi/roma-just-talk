@@ -7842,12 +7842,23 @@ struct RomaCoreChecks {
                 packageScript.contains("proof_set_source_dirty=false") &&
                 packageScript.contains("Archived full-proof recheck") &&
                 packageScript.contains("check-windows-proof-set.ps1 -LaptopPreflightReportPath") &&
+                packageScript.contains("windows_laptop_recheck_script=C:\\tmp\\roma-windows-laptop-proof\\recheck-full-laptop-proof.ps1") &&
+                packageScript.contains("powershell -ExecutionPolicy Bypass -File C:\\tmp\\roma-windows-laptop-proof\\recheck-full-laptop-proof.ps1") &&
                 packageScript.contains("cloud-dictation-proof.json") &&
                 packageScript.contains("local-whisper-dictation-proof.json") &&
                 packageScript.contains("local-whisper-notepad-paste-proof.json") &&
                 packageScript.contains("Full proof validates four JSON reports") &&
                 packageScript.contains("laptop_proof_guide="),
             "Windows package should include an artifact-local laptop proof guide with full proof markers"
+        )
+        try require(
+            laptopProofScript.contains("function Write-FullLaptopProofRecheckScript") &&
+                laptopProofScript.contains(#""recheck-full-laptop-proof.ps1""#) &&
+                laptopProofScript.contains("windows_laptop_recheck_script=") &&
+                laptopProofScript.contains("check-windows-proof-set.ps1") &&
+                laptopProofScript.contains("ConvertTo-PowerShellSingleQuotedString") &&
+                laptopProofScript.contains("RequireFullLaptopProof"),
+            "Windows laptop proof runner should write an archived full-proof recheck script with exact report paths"
         )
         try require(
             laptopProofScript.contains("startup-shortcuts"),

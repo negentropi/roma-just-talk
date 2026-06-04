@@ -51,6 +51,13 @@ function Get-RomaWindowsProofSurfaceFiles {
     )
 }
 
+function Get-RomaWindowsProofSurfaceScriptCount {
+    return @(
+        Get-RomaWindowsProofSurfaceFiles |
+            Where-Object { [string]$_ -like "*.ps1" }
+    ).Count
+}
+
 function Get-RomaWindowsInstalledProofSurfaceFileMap {
     return @(
         @{ ReportProperty = "installed_smoke_script"; PackageFile = "smoke-windows-agent.ps1" },
@@ -68,6 +75,13 @@ function Get-RomaWindowsInstalledProofSurfaceFileMap {
     )
 }
 
+function Get-RomaWindowsInstalledProofSurfaceScriptCount {
+    return @(
+        Get-RomaWindowsInstalledProofSurfaceFileMap |
+            Where-Object { [string]$_.PackageFile -like "*.ps1" }
+    ).Count
+}
+
 function Assert-RomaWindowsOutputContains {
     param(
         [Parameter(Mandatory = $true)]
@@ -81,6 +95,42 @@ function Assert-RomaWindowsOutputContains {
     }
 
     Write-Host "asserted_output=$Expected"
+}
+
+function Get-RomaWindowsScriptParseCount {
+    param(
+        [string]$Output = ""
+    )
+
+    $match = [regex]::Match($Output, "(?m)^windows_scripts_parse_count=(\d+)\s*$")
+    if (!$match.Success) {
+        return $null
+    }
+
+    return [int]::Parse(
+        $match.Groups[1].Value,
+        [System.Globalization.CultureInfo]::InvariantCulture
+    )
+}
+
+function Assert-RomaWindowsScriptParseCount {
+    param(
+        [string]$Output = "",
+        [Parameter(Mandatory = $true)]
+        [int]$ExpectedCount,
+        [string]$Name = "scripts"
+    )
+
+    Assert-RomaWindowsOutputContains -Output $Output -Expected "windows_scripts_parse_ok=true"
+    $actualCount = Get-RomaWindowsScriptParseCount -Output $Output
+    if ($null -eq $actualCount) {
+        throw "Windows script parse count was not found for $Name"
+    }
+    if ($actualCount -ne $ExpectedCount) {
+        throw "Expected $Name script parse count to be $ExpectedCount, got $actualCount"
+    }
+
+    Write-Host "asserted_script_parse_count=$Name count=$actualCount expected=$ExpectedCount"
 }
 
 function Get-RomaWindowsRuntimeDefaultOutputMarkers {

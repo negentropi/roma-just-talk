@@ -613,7 +613,7 @@ function Get-ScriptParseProof {
         [string]$Output = ""
     )
 
-    $count = Get-OutputNumber -Content $Output -Name "windows_scripts_parse_count"
+    $count = Get-RomaWindowsScriptParseCount -Output $Output
     return [ordered]@{
         output_present = ![string]::IsNullOrWhiteSpace($Output)
         ok = $Output.Contains("windows_scripts_parse_ok=true")
@@ -1102,7 +1102,10 @@ Invoke-Step "installed script parse check" {
         throw "Installed script parse check failed"
     }
     Write-Host $script:installedScriptParseOutput
-    Assert-OutputContains -Output $script:installedScriptParseOutput -Expected "windows_scripts_parse_ok=true"
+    Assert-RomaWindowsScriptParseCount `
+        -Output $script:installedScriptParseOutput `
+        -ExpectedCount (Get-RomaWindowsInstalledProofSurfaceScriptCount) `
+        -Name "installed"
 }
 
 Invoke-Step "installed launcher doctor" {

@@ -687,7 +687,12 @@ try {
     }
 
     Invoke-Step "packaged script parse check" {
-        & $parseScriptOutput -ScriptsDir $OutputDir
+        $packagedScriptParseOutput = & $parseScriptOutput -ScriptsDir $OutputDir 2>&1 | Out-String
+        Write-Host $packagedScriptParseOutput
+        Assert-RomaWindowsScriptParseCount `
+            -Output $packagedScriptParseOutput `
+            -ExpectedCount (Get-RomaWindowsProofSurfaceScriptCount) `
+            -Name "packaged"
     }
 
     $swiftRuntime = @{}

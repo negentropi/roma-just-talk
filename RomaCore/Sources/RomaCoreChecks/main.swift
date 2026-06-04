@@ -8570,9 +8570,15 @@ struct RomaCoreChecks {
         try require(
             proofCommonScript.contains(#"installed_smoke_script"#) &&
                 proofCommonScript.contains(#"installed_install_script"#) &&
-                proveScript.contains(#"count = $count"#) &&
-                checkReportScript.contains("expectedInstalledScriptParseCount") &&
-                checkReportScript.contains(#"Where-Object { [string]$_.PackageFile -like "*.ps1" }"#) &&
+                proofCommonScript.contains("function Get-RomaWindowsProofSurfaceScriptCount") &&
+                proofCommonScript.contains("function Get-RomaWindowsInstalledProofSurfaceScriptCount") &&
+                proofCommonScript.contains("function Get-RomaWindowsScriptParseCount") &&
+                proofCommonScript.contains("function Assert-RomaWindowsScriptParseCount") &&
+                packageScript.contains("Assert-RomaWindowsScriptParseCount") &&
+                packageScript.contains("Get-RomaWindowsProofSurfaceScriptCount") &&
+                proveScript.contains("Get-RomaWindowsScriptParseCount -Output $Output") &&
+                proveScript.contains("Get-RomaWindowsInstalledProofSurfaceScriptCount") &&
+                checkReportScript.contains("Get-RomaWindowsInstalledProofSurfaceScriptCount") &&
                 checkReportScript.contains(#"-Name "count""#),
             "Windows proof checker should require installed script parse count to match the shared proof surface"
         )

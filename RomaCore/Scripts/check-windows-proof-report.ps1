@@ -1148,14 +1148,10 @@ if ($RequireInstall) {
     Assert-Boolean -Object $installedScriptParse -Name "output_present" -Expected $true
     Assert-Boolean -Object $installedScriptParse -Name "ok" -Expected $true
     Assert-Boolean -Object $installedScriptParse -Name "count_present" -Expected $true
-    $expectedInstalledScriptParseCount = @(
-        Get-RomaWindowsInstalledProofSurfaceFileMap |
-            Where-Object { [string]$_.PackageFile -like "*.ps1" }
-    ).Count
     Assert-NumberEquals `
         -Object $installedScriptParse `
         -Name "count" `
-        -Expected $expectedInstalledScriptParseCount
+        -Expected (Get-RomaWindowsInstalledProofSurfaceScriptCount)
 }
 
 if ($RequireShortcut) {

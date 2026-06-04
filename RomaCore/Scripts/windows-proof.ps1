@@ -225,7 +225,11 @@ function New-WindowsDictationProofArgs {
         -Language $TranscribeLanguage `
         -Prompt $TranscribePrompt `
         -WordReplacement $WordReplacement `
-        -PasteDictation $PasteDictation.IsPresent
+        -PasteDictation $PasteDictation.IsPresent `
+        -RestoreClipboard $RestoreClipboard.IsPresent `
+        -NoRestoreClipboard $NoRestoreClipboard.IsPresent `
+        -HasClipboardRestoreDelay $hasExplicitClipboardRestoreDelay `
+        -ClipboardRestoreDelaySeconds $ClipboardRestoreDelaySeconds
 }
 
 if ($RestoreClipboard -and $NoRestoreClipboard) {

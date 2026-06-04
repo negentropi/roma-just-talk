@@ -8169,13 +8169,13 @@ struct RomaCoreChecks {
         try require(
             windowsProofScript.contains("$configArgs = Add-RomaWindowsAgentConfigurationArgs") &&
                 windowsProofScript.contains("return Add-RomaWindowsAgentConfigurationArgs") &&
-                windowsProofScript.contains("""
-                -WordReplacement $WordReplacement `
-                -PasteDictation $PasteDictation.IsPresent `
-                -RestoreClipboard $RestoreClipboard.IsPresent `
-                -NoRestoreClipboard $NoRestoreClipboard.IsPresent `
-                -HasClipboardRestoreDelay $hasExplicitClipboardRestoreDelay
-                """) &&
+                windowsProofScript.contains(
+                    "        -WordReplacement $WordReplacement `\n" +
+                    "        -PasteDictation $PasteDictation.IsPresent `\n" +
+                    "        -RestoreClipboard $RestoreClipboard.IsPresent `\n" +
+                    "        -NoRestoreClipboard $NoRestoreClipboard.IsPresent `\n" +
+                    "        -HasClipboardRestoreDelay $hasExplicitClipboardRestoreDelay"
+                ) &&
                 runScript.contains("$configArgs = Add-RomaWindowsAgentConfigurationArgs") &&
                 smokeScript.contains("$configArgs = Add-RomaWindowsAgentConfigurationArgs"),
             "Windows source proof, runner, and smoke scripts should share agent config argument construction"

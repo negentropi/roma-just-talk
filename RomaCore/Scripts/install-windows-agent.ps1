@@ -190,19 +190,10 @@ Invoke-Step "copy package files" {
         "RomaProofAgent.exe",
         "RomaWhisperCLIMock.exe",
         "RomaWindowsAgent.pdb",
-        "RomaProofAgent.pdb",
-        "smoke-windows-agent.ps1",
-        "run-windows-agent.ps1",
-        "install-windows-agent.ps1",
-        "prove-windows-agent-artifact.ps1",
-        "run-windows-laptop-proof.ps1",
-        "WINDOWS-LAPTOP-PROOF.txt",
-        "check-windows-scripts-parse.ps1",
-        "windows-proof-common.ps1",
-        "windows-manifest.ps1",
-        "windows-package-identity.ps1",
-        "check-windows-proof-report.ps1",
-        "check-windows-proof-set.ps1",
+        "RomaProofAgent.pdb"
+    )
+    $knownFiles += Get-RomaWindowsProofSurfaceFiles
+    $knownFiles += @(
         "manifest.txt",
         "sample-windows-agent.json",
         "sample-local-whisper-agent.json"

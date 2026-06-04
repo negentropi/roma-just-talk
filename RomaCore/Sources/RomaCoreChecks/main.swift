@@ -859,24 +859,32 @@ struct RomaCoreChecks {
             "shared insertion polish should trim noisy marks inside quoted short fragments"
         )
         try require(
-            RomaTranscriptionOutputFilter.applyInsertionPolish("(Model!)", context: midSentenceContext) == "(model)",
-            "shared insertion polish should trim noisy marks inside parenthesized short fragments"
+            RomaTranscriptionOutputFilter.applyInsertionPolish("(Model!)", context: midSentenceContext) == "model",
+            "shared insertion polish should unwrap raw parenthesized noisy short fragments"
         )
         try require(
-            RomaTranscriptionOutputFilter.applyInsertionPolish("{Model?}", context: midSentenceContext) == "{model}",
-            "shared insertion polish should trim noisy marks inside braced short fragments"
+            RomaTranscriptionOutputFilter.applyInsertionPolish("{Model?}", context: midSentenceContext) == "model",
+            "shared insertion polish should unwrap raw braced noisy short fragments"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("\"Model!\".", context: midSentenceContext) == "\"model\"",
             "shared insertion polish should trim trailing periods after quoted noisy fragments"
         )
         try require(
-            RomaTranscriptionOutputFilter.applyInsertionPolish("(Model!).", context: midSentenceContext) == "(model)",
-            "shared insertion polish should trim trailing periods after parenthesized noisy fragments"
+            RomaTranscriptionOutputFilter.applyInsertionPolish("(Model!).", context: midSentenceContext) == "model",
+            "shared insertion polish should unwrap raw parenthesized noisy fragments with outer punctuation"
         )
         try require(
-            RomaTranscriptionOutputFilter.applyInsertionPolish("{Model?}.", context: midSentenceContext) == "{model}",
-            "shared insertion polish should trim trailing periods after braced noisy fragments"
+            RomaTranscriptionOutputFilter.applyInsertionPolish("{Model?}.", context: midSentenceContext) == "model",
+            "shared insertion polish should unwrap raw braced noisy fragments with outer punctuation"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("(model!)", context: midSentenceContext) == "(model)",
+            "shared insertion polish should preserve lowercase parenthesized command output"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("{model?}", context: midSentenceContext) == "{model}",
+            "shared insertion polish should preserve lowercase braced command output"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("'Model.'", context: midSentenceContext) == "'model'",
@@ -7871,6 +7879,7 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Assert-RomaWindowsHoldTimeoutDefaultOutput") &&
                 proofCommonScript.contains("function Assert-RomaWindowsClipboardRestoreDefaultOutput") &&
                 proofCommonScript.contains("function Assert-RomaWindowsMinimumPermissionOutput") &&
+                proofCommonScript.contains("function Get-RomaWindowsProofSurfaceFiles") &&
                 proofCommonScript.contains("function Get-RomaWindowsRuntimeDefaultOutputProof") &&
                 proofCommonScript.contains("function Get-RomaWindowsHoldTimeoutDefaultOutputProof") &&
                 proofCommonScript.contains("function Get-RomaWindowsClipboardRestoreDefaultOutputProof") &&
@@ -7924,10 +7933,11 @@ struct RomaCoreChecks {
         )
         try require(
             packageIdentityScript.contains("function Get-RomaPackageIdentityProof") &&
-                packageIdentityScript.contains("windows-package-identity.ps1") &&
-                packageIdentityScript.contains("windows-manifest.ps1") &&
                 packageIdentityScript.contains("windows-proof-common.ps1") &&
-                packageIdentityScript.contains("check-windows-scripts-parse.ps1") &&
+                packageIdentityScript.contains("Get-RomaWindowsProofSurfaceFiles") &&
+                proofCommonScript.contains("WINDOWS-LAPTOP-PROOF.txt") &&
+                proofCommonScript.contains("check-windows-scripts-parse.ps1") &&
+                proofCommonScript.contains("windows-package-identity.ps1") &&
                 packageIdentityScript.contains("RomaWhisperCLIMock.exe") &&
                 packageIdentityScript.contains("Get-RomaPackageIdentityHash"),
             "Windows package identity should be computed by one shared packaged helper"
@@ -8023,13 +8033,14 @@ struct RomaCoreChecks {
         )
         try require(
             installScript.contains(#""RomaProofAgent.exe""#) &&
-                installScript.contains(#""run-windows-laptop-proof.ps1""#) &&
-                installScript.contains(#""WINDOWS-LAPTOP-PROOF.txt""#) &&
-                installScript.contains(#""check-windows-scripts-parse.ps1""#) &&
-                installScript.contains(#""windows-proof-common.ps1""#) &&
-                installScript.contains(#""windows-manifest.ps1""#) &&
-                installScript.contains(#""windows-package-identity.ps1""#) &&
-                installScript.contains(#""check-windows-proof-set.ps1""#),
+                installScript.contains("$knownFiles += Get-RomaWindowsProofSurfaceFiles") &&
+                proofCommonScript.contains(#""run-windows-laptop-proof.ps1""#) &&
+                proofCommonScript.contains(#""WINDOWS-LAPTOP-PROOF.txt""#) &&
+                proofCommonScript.contains(#""check-windows-scripts-parse.ps1""#) &&
+                proofCommonScript.contains(#""windows-proof-common.ps1""#) &&
+                proofCommonScript.contains(#""windows-manifest.ps1""#) &&
+                proofCommonScript.contains(#""windows-package-identity.ps1""#) &&
+                proofCommonScript.contains(#""check-windows-proof-set.ps1""#),
             "Windows installer should preserve the packaged proof surface"
         )
         try require(

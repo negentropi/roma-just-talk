@@ -131,6 +131,64 @@ function Add-RomaWindowsAgentConfigurationArgs {
     return $configArgs
 }
 
+function Add-RomaWindowsAgentScriptCommonArgs {
+    param(
+        [object[]]$ArgumentList = @(),
+        [string]$Language = "",
+        [string]$Prompt = "",
+        [string[]]$WordReplacement = @(),
+        [bool]$UseHoldHook = $false,
+        [bool]$UseToggle = $false,
+        [double]$HoldTimeoutSeconds = 15,
+        [double]$RecordSeconds = 2,
+        [bool]$PasteDictation = $false,
+        [bool]$RestoreClipboard = $false,
+        [bool]$NoRestoreClipboard = $false,
+        [bool]$HasClipboardRestoreDelay = $false,
+        [double]$ClipboardRestoreDelaySeconds = 2
+    )
+
+    $scriptArgs = @($ArgumentList)
+    if (![string]::IsNullOrWhiteSpace($Language)) {
+        $scriptArgs += @("-Language", $Language)
+    }
+    if (![string]::IsNullOrWhiteSpace($Prompt)) {
+        $scriptArgs += @("-Prompt", $Prompt)
+    }
+
+    $replacementValues = @(
+        $WordReplacement |
+            Where-Object { ![string]::IsNullOrWhiteSpace($_) }
+    )
+    if ($replacementValues.Count -gt 0) {
+        $scriptArgs += "-WordReplacement"
+        $scriptArgs += $replacementValues
+    }
+
+    if ($UseHoldHook) {
+        $scriptArgs += "-UseHoldHook"
+    }
+    if ($UseToggle) {
+        $scriptArgs += "-UseToggle"
+    }
+    $scriptArgs += @("-HoldTimeoutSeconds", "$HoldTimeoutSeconds")
+    $scriptArgs += @("-RecordSeconds", "$RecordSeconds")
+    if ($PasteDictation) {
+        $scriptArgs += "-PasteDictation"
+    }
+    if ($RestoreClipboard) {
+        $scriptArgs += "-RestoreClipboard"
+    }
+    if ($NoRestoreClipboard) {
+        $scriptArgs += "-NoRestoreClipboard"
+    }
+    if ($HasClipboardRestoreDelay) {
+        $scriptArgs += @("-ClipboardRestoreDelaySeconds", "$ClipboardRestoreDelaySeconds")
+    }
+
+    return $scriptArgs
+}
+
 function Get-RomaWindowsFileProof {
     param(
         [Parameter(Mandatory = $true)]

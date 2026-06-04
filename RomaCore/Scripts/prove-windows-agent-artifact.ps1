@@ -1078,40 +1078,20 @@ if ($usesWhisper) {
         $installArgs += @("-SecretDir", $SecretDir)
     }
 }
-if (![string]::IsNullOrWhiteSpace($Language)) {
-    $installArgs += @("-Language", $Language)
-}
-if (![string]::IsNullOrWhiteSpace($Prompt)) {
-    $installArgs += @("-Prompt", $Prompt)
-}
-$replacementValues = @(
-    $WordReplacement |
-        Where-Object { ![string]::IsNullOrWhiteSpace($_) }
-)
-if ($replacementValues.Count -gt 0) {
-    $installArgs += "-WordReplacement"
-    $installArgs += $replacementValues
-}
-if ($UseHoldHook) {
-    $installArgs += "-UseHoldHook"
-}
-if ($UseToggle) {
-    $installArgs += "-UseToggle"
-}
-$installArgs += @("-HoldTimeoutSeconds", "$HoldTimeoutSeconds")
-$installArgs += @("-RecordSeconds", "$RecordSeconds")
-if ($PasteDictation) {
-    $installArgs += "-PasteDictation"
-}
-if ($RestoreClipboard) {
-    $installArgs += "-RestoreClipboard"
-}
-if ($NoRestoreClipboard) {
-    $installArgs += "-NoRestoreClipboard"
-}
-if ($hasExplicitClipboardRestoreDelay) {
-    $installArgs += @("-ClipboardRestoreDelaySeconds", "$ClipboardRestoreDelaySeconds")
-}
+$installArgs = Add-RomaWindowsAgentScriptCommonArgs `
+    -ArgumentList $installArgs `
+    -Language $Language `
+    -Prompt $Prompt `
+    -WordReplacement $WordReplacement `
+    -UseHoldHook $UseHoldHook.IsPresent `
+    -UseToggle $UseToggle.IsPresent `
+    -HoldTimeoutSeconds $HoldTimeoutSeconds `
+    -RecordSeconds $RecordSeconds `
+    -PasteDictation $PasteDictation.IsPresent `
+    -RestoreClipboard $RestoreClipboard.IsPresent `
+    -NoRestoreClipboard $NoRestoreClipboard.IsPresent `
+    -HasClipboardRestoreDelay $hasExplicitClipboardRestoreDelay `
+    -ClipboardRestoreDelaySeconds $ClipboardRestoreDelaySeconds
 if ($RunDictation) {
     $installArgs += "-RunDictation"
 }

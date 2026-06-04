@@ -338,44 +338,6 @@ function Write-PreflightReport {
     Write-Host "windows_laptop_preflight_report=$Path"
 }
 
-function Add-CommonProofArgs {
-    param(
-        [Parameter(Mandatory = $true)]
-        [object[]]$ArgumentList
-    )
-
-    if (![string]::IsNullOrWhiteSpace($Language)) {
-        $ArgumentList += @("-Language", $Language)
-    }
-    if (![string]::IsNullOrWhiteSpace($Prompt)) {
-        $ArgumentList += @("-Prompt", $Prompt)
-    }
-
-    $replacementValues = @(
-        $WordReplacement |
-            Where-Object { ![string]::IsNullOrWhiteSpace($_) }
-    )
-    if ($replacementValues.Count -gt 0) {
-        $ArgumentList += "-WordReplacement"
-        $ArgumentList += $replacementValues
-    }
-
-    $ArgumentList += @("-UseHoldHook")
-    $ArgumentList += @("-HoldTimeoutSeconds", "$HoldTimeoutSeconds")
-    $ArgumentList += @("-RecordSeconds", "$RecordSeconds")
-    if ($RestoreClipboard) {
-        $ArgumentList += "-RestoreClipboard"
-    }
-    if ($NoRestoreClipboard) {
-        $ArgumentList += "-NoRestoreClipboard"
-    }
-    if ($hasExplicitClipboardRestoreDelay) {
-        $ArgumentList += @("-ClipboardRestoreDelaySeconds", "$ClipboardRestoreDelaySeconds")
-    }
-
-    return $ArgumentList
-}
-
 function Add-ShortcutProofArgs {
     param(
         [Parameter(Mandatory = $true)]
@@ -576,7 +538,18 @@ if (![string]::IsNullOrWhiteSpace($SecretDir)) {
 if (![string]::IsNullOrWhiteSpace($CloudExpectedTranscriptText)) {
     $cloudArgs += @("-ExpectedTranscriptText", $CloudExpectedTranscriptText)
 }
-$cloudArgs = Add-CommonProofArgs -ArgumentList $cloudArgs
+$cloudArgs = Add-RomaWindowsAgentScriptCommonArgs `
+    -ArgumentList $cloudArgs `
+    -Language $Language `
+    -Prompt $Prompt `
+    -WordReplacement $WordReplacement `
+    -UseHoldHook $true `
+    -HoldTimeoutSeconds $HoldTimeoutSeconds `
+    -RecordSeconds $RecordSeconds `
+    -RestoreClipboard $RestoreClipboard.IsPresent `
+    -NoRestoreClipboard $NoRestoreClipboard.IsPresent `
+    -HasClipboardRestoreDelay $hasExplicitClipboardRestoreDelay `
+    -ClipboardRestoreDelaySeconds $ClipboardRestoreDelaySeconds
 $cloudArgs += @("-RunDictation", "-PasteDictation")
 $cloudArgs = Add-ShortcutProofArgs `
     -ArgumentList $cloudArgs `
@@ -602,7 +575,18 @@ if ($whisperArguments.Count -gt 0) {
 if (![string]::IsNullOrWhiteSpace($LocalWhisperExpectedTranscriptText)) {
     $localArgs += @("-ExpectedTranscriptText", $LocalWhisperExpectedTranscriptText)
 }
-$localArgs = Add-CommonProofArgs -ArgumentList $localArgs
+$localArgs = Add-RomaWindowsAgentScriptCommonArgs `
+    -ArgumentList $localArgs `
+    -Language $Language `
+    -Prompt $Prompt `
+    -WordReplacement $WordReplacement `
+    -UseHoldHook $true `
+    -HoldTimeoutSeconds $HoldTimeoutSeconds `
+    -RecordSeconds $RecordSeconds `
+    -RestoreClipboard $RestoreClipboard.IsPresent `
+    -NoRestoreClipboard $NoRestoreClipboard.IsPresent `
+    -HasClipboardRestoreDelay $hasExplicitClipboardRestoreDelay `
+    -ClipboardRestoreDelaySeconds $ClipboardRestoreDelaySeconds
 $localArgs += @("-RunDictation", "-PasteDictation")
 $localArgs = Add-ShortcutProofArgs `
     -ArgumentList $localArgs `
@@ -626,7 +610,18 @@ if ($whisperArguments.Count -gt 0) {
     $notepadArgs += "-WhisperArgument"
     $notepadArgs += $whisperArguments
 }
-$notepadArgs = Add-CommonProofArgs -ArgumentList $notepadArgs
+$notepadArgs = Add-RomaWindowsAgentScriptCommonArgs `
+    -ArgumentList $notepadArgs `
+    -Language $Language `
+    -Prompt $Prompt `
+    -WordReplacement $WordReplacement `
+    -UseHoldHook $true `
+    -HoldTimeoutSeconds $HoldTimeoutSeconds `
+    -RecordSeconds $RecordSeconds `
+    -RestoreClipboard $RestoreClipboard.IsPresent `
+    -NoRestoreClipboard $NoRestoreClipboard.IsPresent `
+    -HasClipboardRestoreDelay $hasExplicitClipboardRestoreDelay `
+    -ClipboardRestoreDelaySeconds $ClipboardRestoreDelaySeconds
 
 Invoke-Step "cloud dictation laptop proof" {
     Write-HoldDictationPrompt -Name "cloud_dictation" -ExpectedTranscriptText $CloudExpectedTranscriptText

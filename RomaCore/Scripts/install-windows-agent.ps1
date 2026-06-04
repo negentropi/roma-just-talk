@@ -284,40 +284,20 @@ if (!$SkipSmoke) {
             $smokeArgs += "-WhisperArgument"
             $smokeArgs += $whisperArguments
         }
-        if (![string]::IsNullOrWhiteSpace($Language)) {
-            $smokeArgs += @("-Language", $Language)
-        }
-        if (![string]::IsNullOrWhiteSpace($Prompt)) {
-            $smokeArgs += @("-Prompt", $Prompt)
-        }
-        $replacementValues = @(
-            $WordReplacement |
-                Where-Object { ![string]::IsNullOrWhiteSpace($_) }
-        )
-        if ($replacementValues.Count -gt 0) {
-            $smokeArgs += "-WordReplacement"
-            $smokeArgs += $replacementValues
-        }
-        if ($UseHoldHook) {
-            $smokeArgs += "-UseHoldHook"
-        }
-        if ($UseToggle) {
-            $smokeArgs += "-UseToggle"
-        }
-        $smokeArgs += @("-HoldTimeoutSeconds", "$HoldTimeoutSeconds")
-        $smokeArgs += @("-RecordSeconds", "$RecordSeconds")
-        if ($PasteDictation) {
-            $smokeArgs += "-PasteDictation"
-        }
-        if ($RestoreClipboard) {
-            $smokeArgs += "-RestoreClipboard"
-        }
-        if ($NoRestoreClipboard) {
-            $smokeArgs += "-NoRestoreClipboard"
-        }
-        if ($hasExplicitClipboardRestoreDelay) {
-            $smokeArgs += @("-ClipboardRestoreDelaySeconds", "$ClipboardRestoreDelaySeconds")
-        }
+        $smokeArgs = Add-RomaWindowsAgentScriptCommonArgs `
+            -ArgumentList $smokeArgs `
+            -Language $Language `
+            -Prompt $Prompt `
+            -WordReplacement $WordReplacement `
+            -UseHoldHook $UseHoldHook.IsPresent `
+            -UseToggle $UseToggle.IsPresent `
+            -HoldTimeoutSeconds $HoldTimeoutSeconds `
+            -RecordSeconds $RecordSeconds `
+            -PasteDictation $PasteDictation.IsPresent `
+            -RestoreClipboard $RestoreClipboard.IsPresent `
+            -NoRestoreClipboard $NoRestoreClipboard.IsPresent `
+            -HasClipboardRestoreDelay $hasExplicitClipboardRestoreDelay `
+            -ClipboardRestoreDelaySeconds $ClipboardRestoreDelaySeconds
         if ($RunDictation) {
             $smokeArgs += "-RunDictation"
         }

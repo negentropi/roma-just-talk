@@ -940,6 +940,41 @@ struct RomaCoreChecks {
             "shared insertion polish should preserve non-technical article continuations"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Correction is a final word.",
+                context: midSentenceContext
+            ) == "a final word",
+            "shared insertion polish should trim correction markers before final-word continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "It's a final word.",
+                context: midSentenceContext
+            ) == "a final word",
+            "shared insertion polish should trim it's markers before final-word continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Correction is a single word.",
+                context: midSentenceContext
+            ) == "a single word",
+            "shared insertion polish should trim correction markers before single-word continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "It's a single word.",
+                context: midSentenceContext
+            ) == "a single word",
+            "shared insertion polish should trim it's markers before single-word continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "It's a final now.",
+                context: midSentenceContext
+            ) == "It's a final now",
+            "shared insertion polish should preserve non-final-word article continuations"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("Right model.", context: midSentenceContext) == "right model",
             "shared insertion polish should preserve right as an ordinary fragment word"
         )
@@ -8384,6 +8419,37 @@ struct RomaCoreChecks {
         try require(
             await correctionArticleInserter.pastedText == " a model",
             "pipeline should paste article technical continuations after correction markers"
+        )
+
+        let finalWordRecorder = FakeRecorder()
+        let finalWordInserter = FakeTextInsertion()
+        let finalWordPipeline = DictationPipeline(
+            recorder: finalWordRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "final-word-continuation-proof.wav",
+                text: "Correction is a final word."
+            ),
+            textInsertion: finalWordInserter
+        )
+        let finalWordRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/final-word-continuation-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await finalWordRecorder.startPreRollBuffering()
+        let finalWordResult = try await finalWordPipeline.runRecordingWindow(finalWordRequest) {}
+
+        try require(
+            finalWordResult.processedText == " a final word",
+            "pipeline should clean correction markers before final-word continuations"
+        )
+        try require(
+            await finalWordInserter.pastedText == " a final word",
+            "pipeline should paste final-word continuations after correction markers"
         )
 
         let orWaitNoIMeanRecorder = FakeRecorder()

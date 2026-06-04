@@ -2030,13 +2030,27 @@ public struct RomaTranscriptionOutputFilter {
     private static func hasTechnicalContinuationFragmentHead(_ text: String) -> Bool {
         let tokens = wordTokens(in: text)
         guard let firstWord = tokens.first?.text else { return false }
+        let headIndex: Int
 
         if ["a", "an", "the"].contains(firstWord),
            tokens.count >= 2 {
-            return isTechnicalContinuationFragmentHead(tokens[1].text)
+            headIndex = 1
+        } else {
+            headIndex = 0
         }
 
-        return isTechnicalContinuationFragmentHead(firstWord)
+        return isTechnicalContinuationFragmentHead(tokens[headIndex].text) ||
+            isNoisyFinalWordContinuationHead(tokens, startingAt: headIndex)
+    }
+
+    private static func isNoisyFinalWordContinuationHead(_ tokens: [WordToken], startingAt index: Int) -> Bool {
+        guard tokens.indices.contains(index),
+              tokens.indices.contains(index + 1) else {
+            return false
+        }
+
+        return ["final", "single"].contains(tokens[index].text) &&
+            ["word", "words"].contains(tokens[index + 1].text)
     }
 
     private static func isTechnicalContinuationFragmentHead(_ word: String) -> Bool {

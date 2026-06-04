@@ -5883,6 +5883,7 @@ struct RomaCoreChecks {
         let unmatchedStraightQuoteContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "She said \"hello")
         let unmatchedStraightSingleQuoteContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "She said 'hello")
         let contractionContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "I don't")
+        let openAngleContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "<")
         let openBacktickContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "Use `")
         let openStarContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "Use *")
         let openUnderscoreContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "Use _")
@@ -6119,6 +6120,24 @@ struct RomaCoreChecks {
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "A final word or single>.",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "insertion polish should remove unmatched trailing angle brackets from longer generated fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "<A final word or single",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "insertion polish should remove unmatched leading angle brackets from longer generated fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("<model>", context: midSentenceContext) == "<model>",
+            "insertion polish should preserve literal balanced angle tokens"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "A final word or single\".",
                 context: midSentenceContext
             ) == "a final word or single",
@@ -6186,6 +6205,10 @@ struct RomaCoreChecks {
                 context: RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "{")
             ) == "model}",
             "insertion polish should preserve trailing braces after matching open context"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Model>.", context: openAngleContext) == "model>",
+            "insertion polish should preserve trailing angle brackets after matching open context"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(

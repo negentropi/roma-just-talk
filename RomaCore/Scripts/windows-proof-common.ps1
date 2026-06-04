@@ -305,31 +305,133 @@ function Get-RomaWindowsProofProfileSpecs {
             profile = "doctor-only"
             expected_mode = "doctor-only"
             read_as_laptop_preflight = $false
+            requirements = @(
+                "windows_platform",
+                "windows_user",
+                "permission_surface",
+                "agent_runtime_wiring",
+                "proof_agent_source_surface",
+                "shared_windows_transcription_path",
+                "shared_windows_proof_args",
+                "listener_pre_roll_runtime_source",
+                "hold_hook_single_window_source",
+                "native_doctor_surface",
+                "packaged_listener",
+                "listener_shared_pre_roll_runtime"
+            )
+            assertions = @(
+                "windows_platform",
+                "permission_surface",
+                "proof_agent_surface",
+                "native_doctor_surface",
+                "packaged_listener"
+            )
         }
         cloud_dictation = [ordered]@{
             profile = "cloud-dictation"
             expected_mode = "cloud"
             read_as_laptop_preflight = $false
+            requirements = Join-RomaWindowsProofRequirements `
+                -Base (Get-RomaWindowsInstalledProofProfileRequirements -IncludeShortcutProof $true) `
+                -Extra @(
+                    "cloud_config",
+                    "real_cloud_backend",
+                    "dictation_runtime",
+                    "pre_roll_audio",
+                    "speech_pcm_contract",
+                    "expected_transcript_text",
+                    "paste_restore_intent",
+                    "paste_sent"
+            )
+            assertions = Join-RomaWindowsProofAssertions `
+                -Base (Get-RomaWindowsInstalledProofProfileAssertions -IncludeShortcutProof $true) `
+                -Extra @(
+                    "cloud_config",
+                    "real_cloud_backend",
+                    "dictation",
+                    "expected_transcript_text",
+                    "paste"
+            )
         }
         local_whisper_dictation = [ordered]@{
             profile = "local-whisper-dictation"
             expected_mode = "local-whisper"
             read_as_laptop_preflight = $false
+            requirements = Join-RomaWindowsProofRequirements `
+                -Base (Get-RomaWindowsInstalledProofProfileRequirements -IncludeShortcutProof $true) `
+                -Extra @(
+                    "local_whisper_config",
+                    "real_whisper_backend",
+                    "dictation_runtime",
+                    "listener_runtime",
+                    "pre_roll_audio",
+                    "speech_pcm_contract",
+                    "expected_transcript_text",
+                    "paste_restore_intent",
+                    "paste_sent"
+            )
+            assertions = Join-RomaWindowsProofAssertions `
+                -Base (Get-RomaWindowsInstalledProofProfileAssertions -IncludeShortcutProof $true) `
+                -Extra @(
+                    "whisper_config",
+                    "real_whisper_backend",
+                    "dictation",
+                    "listener_runtime",
+                    "expected_transcript_text",
+                    "paste"
+            )
         }
         local_whisper_notepad_paste = [ordered]@{
             profile = "local-whisper-notepad-paste"
             expected_mode = "local-whisper"
             read_as_laptop_preflight = $false
+            requirements = Join-RomaWindowsProofRequirements `
+                -Base (Get-RomaWindowsInstalledProofProfileRequirements) `
+                -Extra @(
+                    "local_whisper_config",
+                    "real_whisper_backend",
+                    "notepad_paste"
+            )
+            assertions = Join-RomaWindowsProofAssertions `
+                -Base (Get-RomaWindowsInstalledProofProfileAssertions) `
+                -Extra @(
+                    "whisper_config",
+                    "real_whisper_backend",
+                    "notepad_paste"
+            )
         }
         laptop_preflight = [ordered]@{
             profile = "laptop-preflight"
             expected_mode = "windows-laptop-preflight"
             read_as_laptop_preflight = $true
+            requirements = @(
+                "windows_platform",
+                "windows_user",
+                "clean_source_provenance",
+                "package_identity",
+                "minimum_permission_surface",
+                "hotkey_delivery_preflight",
+                "microphone_preflight",
+                "optional_local_whisper_preflight"
+            )
+            assertions = @()
         }
         packaged_whisper_mock_install = [ordered]@{
             profile = "packaged-whisper-mock-install"
             expected_mode = "packaged-whisper-mock"
             read_as_laptop_preflight = $false
+            requirements = Join-RomaWindowsProofRequirements `
+                -Base (Get-RomaWindowsInstalledProofProfileRequirements -IncludeShortcutProof $true) `
+                -Extra @(
+                    "packaged_whisper_mock",
+                    "local_whisper_config"
+            )
+            assertions = Join-RomaWindowsProofAssertions `
+                -Base (Get-RomaWindowsInstalledProofProfileAssertions -IncludeShortcutProof $true) `
+                -Extra @(
+                    "packaged_mock",
+                    "whisper_config"
+            )
         }
     }
 }
@@ -433,85 +535,13 @@ function Get-RomaWindowsProofProfileRequirements {
         [string]$Profile
     )
 
-    switch ($Profile) {
-        "doctor-only" {
-            return @(
-                "windows_platform",
-                "windows_user",
-                "permission_surface",
-                "agent_runtime_wiring",
-                "proof_agent_source_surface",
-                "shared_windows_transcription_path",
-                "shared_windows_proof_args",
-                "listener_pre_roll_runtime_source",
-                "hold_hook_single_window_source",
-                "native_doctor_surface",
-                "packaged_listener",
-                "listener_shared_pre_roll_runtime"
-            )
-        }
-        "laptop-preflight" {
-            return @(
-                "windows_platform",
-                "windows_user",
-                "clean_source_provenance",
-                "package_identity",
-                "minimum_permission_surface",
-                "hotkey_delivery_preflight",
-                "microphone_preflight",
-                "optional_local_whisper_preflight"
-            )
-        }
-        "cloud-dictation" {
-            return Join-RomaWindowsProofRequirements `
-                -Base (Get-RomaWindowsInstalledProofProfileRequirements -IncludeShortcutProof $true) `
-                -Extra @(
-                    "cloud_config",
-                    "real_cloud_backend",
-                    "dictation_runtime",
-                    "pre_roll_audio",
-                    "speech_pcm_contract",
-                    "expected_transcript_text",
-                    "paste_restore_intent",
-                    "paste_sent"
-            )
-        }
-        "local-whisper-dictation" {
-            return Join-RomaWindowsProofRequirements `
-                -Base (Get-RomaWindowsInstalledProofProfileRequirements -IncludeShortcutProof $true) `
-                -Extra @(
-                    "local_whisper_config",
-                    "real_whisper_backend",
-                    "dictation_runtime",
-                    "listener_runtime",
-                    "pre_roll_audio",
-                    "speech_pcm_contract",
-                    "expected_transcript_text",
-                    "paste_restore_intent",
-                    "paste_sent"
-            )
-        }
-        "local-whisper-notepad-paste" {
-            return Join-RomaWindowsProofRequirements `
-                -Base (Get-RomaWindowsInstalledProofProfileRequirements) `
-                -Extra @(
-                    "local_whisper_config",
-                    "real_whisper_backend",
-                    "notepad_paste"
-            )
-        }
-        "packaged-whisper-mock-install" {
-            return Join-RomaWindowsProofRequirements `
-                -Base (Get-RomaWindowsInstalledProofProfileRequirements -IncludeShortcutProof $true) `
-                -Extra @(
-                    "packaged_whisper_mock",
-                    "local_whisper_config"
-            )
-        }
-        default {
-            return @()
+    $profiles = Get-RomaWindowsProofProfileSpecs
+    foreach ($name in $profiles.Keys) {
+        if ([string]$profiles[$name]["profile"] -eq $Profile) {
+            return @($profiles[$name]["requirements"])
         }
     }
+    return @()
 }
 
 function Join-RomaWindowsProofAssertions {
@@ -555,63 +585,13 @@ function Get-RomaWindowsProofProfileAssertions {
         [string]$Profile
     )
 
-    switch ($Profile) {
-        "doctor-only" {
-            return @(
-                "windows_platform",
-                "permission_surface",
-                "proof_agent_surface",
-                "native_doctor_surface",
-                "packaged_listener"
-            )
-        }
-        "laptop-preflight" {
-            return @()
-        }
-        "cloud-dictation" {
-            return Join-RomaWindowsProofAssertions `
-                -Base (Get-RomaWindowsInstalledProofProfileAssertions -IncludeShortcutProof $true) `
-                -Extra @(
-                    "cloud_config",
-                    "real_cloud_backend",
-                    "dictation",
-                    "expected_transcript_text",
-                    "paste"
-            )
-        }
-        "local-whisper-dictation" {
-            return Join-RomaWindowsProofAssertions `
-                -Base (Get-RomaWindowsInstalledProofProfileAssertions -IncludeShortcutProof $true) `
-                -Extra @(
-                    "whisper_config",
-                    "real_whisper_backend",
-                    "dictation",
-                    "listener_runtime",
-                    "expected_transcript_text",
-                    "paste"
-            )
-        }
-        "local-whisper-notepad-paste" {
-            return Join-RomaWindowsProofAssertions `
-                -Base (Get-RomaWindowsInstalledProofProfileAssertions) `
-                -Extra @(
-                    "whisper_config",
-                    "real_whisper_backend",
-                    "notepad_paste"
-            )
-        }
-        "packaged-whisper-mock-install" {
-            return Join-RomaWindowsProofAssertions `
-                -Base (Get-RomaWindowsInstalledProofProfileAssertions -IncludeShortcutProof $true) `
-                -Extra @(
-                    "packaged_mock",
-                    "whisper_config"
-            )
-        }
-        default {
-            return @()
+    $profiles = Get-RomaWindowsProofProfileSpecs
+    foreach ($name in $profiles.Keys) {
+        if ([string]$profiles[$name]["profile"] -eq $Profile) {
+            return @($profiles[$name]["assertions"])
         }
     }
+    return @()
 }
 
 function Get-RomaWindowsProofReportProfileChecks {

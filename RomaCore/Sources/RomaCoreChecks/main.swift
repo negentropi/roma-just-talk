@@ -9590,8 +9590,10 @@ struct RomaCoreChecks {
                 checkReportScript.contains("function Write-ProofProfileRequirements") &&
                 checkReportScript.contains("Get-RomaWindowsProofProfileRequirements -Profile $Profile") &&
                 checkReportScript.contains("Get-RomaWindowsProofProfileAssertions -Profile $Profile") &&
-                proofCommonScript.contains(#"return Join-RomaWindowsProofRequirements `"#) &&
-                proofCommonScript.contains(#"return Join-RomaWindowsProofAssertions `"#) &&
+                proofCommonScript.contains("requirements = Join-RomaWindowsProofRequirements") &&
+                proofCommonScript.contains("assertions = Join-RomaWindowsProofAssertions") &&
+                proofCommonScript.contains(#"return @($profiles[$name]["requirements"])"#) &&
+                proofCommonScript.contains(#"return @($profiles[$name]["assertions"])"#) &&
                 checkReportScript.contains("$script:RequireInstalledListener = $true") &&
                 checkReportScript.contains("$script:RequireConfigDoctor = $true") &&
                 checkReportScript.contains(#""listener_runtime" { $script:RequireListenerRuntime = $true }"#) &&

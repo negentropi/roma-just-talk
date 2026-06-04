@@ -8058,14 +8058,17 @@ struct RomaCoreChecks {
         )
         try require(
             checkReportScript.contains("installed_proof_agent_matches_package") &&
-                checkReportScript.contains("installed_laptop_proof_script_matches_package") &&
-                checkReportScript.contains("installed_laptop_proof_guide_matches_package") &&
-                checkReportScript.contains("installed_parse_script_matches_package") &&
+                checkReportScript.contains(#"$installedProofSurfaceFiles = @("#) &&
+                checkReportScript.contains(#"@{ ReportProperty = "installed_laptop_proof_script"; PackageFile = "run-windows-laptop-proof.ps1" }"#) &&
+                checkReportScript.contains(#"@{ ReportProperty = "installed_laptop_proof_guide"; PackageFile = "WINDOWS-LAPTOP-PROOF.txt" }"#) &&
+                checkReportScript.contains(#"@{ ReportProperty = "installed_parse_script"; PackageFile = "check-windows-scripts-parse.ps1" }"#) &&
+                checkReportScript.contains(#"@{ ReportProperty = "installed_proof_common_script"; PackageFile = "windows-proof-common.ps1" }"#) &&
+                checkReportScript.contains(#"@{ ReportProperty = "installed_manifest_script"; PackageFile = "windows-manifest.ps1" }"#) &&
+                checkReportScript.contains(#"@{ ReportProperty = "installed_package_identity_script"; PackageFile = "windows-package-identity.ps1" }"#) &&
+                checkReportScript.contains(#"foreach ($proofSurfaceFile in $installedProofSurfaceFiles)"#) &&
+                checkReportScript.contains(#""$($reportProperty)_matches_package""#) &&
                 checkReportScript.contains("installed_script_parse") &&
-                checkReportScript.contains("installed_proof_common_script_matches_package") &&
-                checkReportScript.contains("installed_manifest_script_matches_package") &&
-                checkReportScript.contains("installed_package_identity_script_matches_package") &&
-                checkReportScript.contains("installed_check_set_script_matches_package"),
+                checkReportScript.contains(#"@{ ReportProperty = "installed_check_set_script"; PackageFile = "check-windows-proof-set.ps1" }"#),
             "Windows proof checker should verify installed proof surface hashes"
         )
         try require(

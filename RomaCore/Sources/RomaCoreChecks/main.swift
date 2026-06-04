@@ -9229,15 +9229,15 @@ struct RomaCoreChecks {
             "Windows proof checker should require shared transcription client and proof arg markers"
         )
         try require(
-            checkReportScript.contains(#""hold_hook_single_window_source""#),
+            proofCommonScript.contains(#""hold_hook_single_window_source""#),
             "Windows proof profiles should print hold single-window source coverage"
         )
         try require(
-            checkReportScript.contains(#""listener_pre_roll_runtime_source""#),
+            proofCommonScript.contains(#""listener_pre_roll_runtime_source""#),
             "Windows proof profiles should print listener pre-roll runtime source coverage"
         )
         try require(
-            checkReportScript.contains(#""listener_shared_pre_roll_runtime""#) &&
+            proofCommonScript.contains(#""listener_shared_pre_roll_runtime""#) &&
                 checkReportScript.contains(
                     #"Assert-Boolean -Object $Proof -Name "shared_pre_roll_runtime" -Expected $true"#
                 ),
@@ -9246,15 +9246,15 @@ struct RomaCoreChecks {
         try require(
             checkReportScript.contains("[switch]$RequireListenerRuntime") &&
                 checkReportScript.contains("function Assert-ListenerRuntimeProof") &&
-                checkReportScript.contains(#""listener_runtime""#) &&
+                proofCommonScript.contains(#""listener_runtime""#) &&
                 checkReportScript.contains(#"$RequireListenerRuntime = $true"#) &&
                 checkReportScript.contains(#"Assert-Boolean -Object $listenerRuntime -Name "reported_paste_sent" -Expected $true"#) &&
                 checkReportScript.contains("proof_listener_runtime=installed_listener"),
             "Windows local-whisper laptop profile should require a real installed listener runtime proof"
         )
         try require(
-            checkReportScript.contains(#""shared_windows_transcription_path""#) &&
-                checkReportScript.contains(#""shared_windows_proof_args""#),
+            proofCommonScript.contains(#""shared_windows_transcription_path""#) &&
+                proofCommonScript.contains(#""shared_windows_proof_args""#),
             "Windows proof profiles should print shared Windows transcription/proof-arg coverage"
         )
         try require(
@@ -9272,12 +9272,12 @@ struct RomaCoreChecks {
             "Windows proof checker should share installed profile requirements, assertion flags, and profile output"
         )
         try require(
-            checkReportScript.contains(#""pre_roll_audio""#) &&
-                checkReportScript.contains(#""speech_pcm_contract""#),
+            proofCommonScript.contains(#""pre_roll_audio""#) &&
+                proofCommonScript.contains(#""speech_pcm_contract""#),
             "Windows dictation proof profiles should print pre-roll and speech PCM coverage"
         )
         try require(
-            checkReportScript.contains(#""paste_restore_intent""#),
+            proofCommonScript.contains(#""paste_restore_intent""#),
             "Windows dictation proof profiles should print paste restore intent coverage"
         )
         try require(
@@ -9605,7 +9605,7 @@ struct RomaCoreChecks {
             "Windows proof checker should require the user-facing agent to report no macOS-style permission prompts"
         )
         try require(
-            checkReportScript.contains(#""agent_runtime_wiring""#),
+            proofCommonScript.contains(#""agent_runtime_wiring""#),
             "Windows proof profiles should print agent runtime wiring coverage"
         )
         try require(

@@ -9851,6 +9851,12 @@ struct RomaCoreChecks {
                 checkSetScript.contains("function New-ProofReportProfilePathMap") &&
                 checkSetScript.contains("function New-ProofReportProfileRequiredMap") &&
                 checkSetScript.contains("function Get-ProofReportProfileChecks") &&
+                checkSetScript.contains("function Get-ProofSetReportEntries") &&
+                checkSetScript.contains(#"Get-RomaWindowsProofSetProfileNames -Name $Name"#) &&
+                checkSetScript.contains(#"Get-ProofSetReportEntries `"#) &&
+                checkSetScript.contains(#"-Name "artifact_smoke" `"#) &&
+                checkSetScript.contains(#"-Name "full_laptop" `"#) &&
+                checkSetScript.contains(#"-ExcludedProfileNames @("laptop_preflight")"#) &&
                 checkSetScript.contains(#"Add-RomaWindowsProofSetRequiredProfiles -Required $required -Name "artifact_smoke""#) &&
                 checkSetScript.contains(#"Add-RomaWindowsProofSetRequiredProfiles -Required $required -Name "full_laptop""#) &&
                 checkSetScript.contains("Get-RomaWindowsProofReportProfileChecks") &&
@@ -9864,6 +9870,11 @@ struct RomaCoreChecks {
                 !checkSetScript.contains("function Assert-LaptopPreflightReport") &&
                 !checkSetScript.contains(#"Profile = [string]$profiles["#) &&
                 !checkSetScript.contains(#"ReadAsLaptopPreflight = [bool]$profiles["#) &&
+                !checkSetScript.contains(#"Name = "doctor_only""#) &&
+                !checkSetScript.contains(#"Name = "packaged_whisper_mock_install""#) &&
+                !checkSetScript.contains(#"Name = "cloud_dictation""#) &&
+                !checkSetScript.contains(#"Name = "local_whisper_dictation""#) &&
+                !checkSetScript.contains(#"Name = "local_whisper_notepad_paste""#) &&
                 checkReportScript.contains("Get-RomaWindowsProofProfileExpectedMode -Profile $RequireProofProfile") &&
                 checkReportScript.contains("Get-RomaWindowsProofProfileRequirements -Profile $Profile") &&
                 checkReportScript.contains(#"-Expected (Get-RomaWindowsProofProfileExpectedMode -Profile (Get-RomaWindowsProofProfileName -Name "laptop_preflight"))"#) &&

@@ -138,11 +138,39 @@ function Invoke-RequiredProofReportProfileChecks {
 function Read-ProofReport {
     param(
         [Parameter(Mandatory = $true)]
-        [string]$Path
+        [string]$Path,
+        [string]$Name = "report"
     )
 
-    $resolvedPath = Resolve-RequiredReportPath -Path $Path -Name "report"
+    $resolvedPath = Resolve-RequiredReportPath -Path $Path -Name $Name
     return Get-Content -LiteralPath $resolvedPath -Raw | ConvertFrom-Json -ErrorAction Stop
+}
+
+function Get-ProofSetReportEntries {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Name,
+        [Parameter(Mandatory = $true)]
+        [hashtable]$Paths,
+        [string[]]$ExcludedProfileNames = @()
+    )
+
+    $reports = @()
+    foreach ($profileName in (Get-RomaWindowsProofSetProfileNames -Name $Name)) {
+        if ($ExcludedProfileNames -contains $profileName) {
+            continue
+        }
+        if (!$Paths.ContainsKey($profileName)) {
+            throw "Proof set $Name path map is missing profile: $profileName"
+        }
+
+        $reports += @{
+            Name = $profileName
+            Report = (Read-ProofReport -Path ([string]$Paths[$profileName]) -Name $profileName)
+        }
+    }
+
+    return $reports
 }
 
 function Require-ReportProperty {
@@ -390,16 +418,12 @@ function Assert-SameArtifactSmokeProofSet {
         [string]$PackagedWhisperMockInstallReportPath
     )
 
-    $reports = @(
-        @{
-            Name = "doctor_only"
-            Report = (Read-ProofReport -Path $DoctorOnlyReportPath)
-        },
-        @{
-            Name = "packaged_whisper_mock_install"
-            Report = (Read-ProofReport -Path $PackagedWhisperMockInstallReportPath)
+    $reports = Get-ProofSetReportEntries `
+        -Name "artifact_smoke" `
+        -Paths @{
+            doctor_only = $DoctorOnlyReportPath
+            packaged_whisper_mock_install = $PackagedWhisperMockInstallReportPath
         }
-    )
 
     $first = $reports[0]
     $firstName = [string]$first["Name"]
@@ -622,20 +646,14 @@ function Assert-SameLaptopProofSet {
         [object]$LaptopPreflightReport = $null
     )
 
-    $reports = @(
-        @{
-            Name = "cloud_dictation"
-            Report = (Read-ProofReport -Path $CloudReportPath)
-        },
-        @{
-            Name = "local_whisper_dictation"
-            Report = (Read-ProofReport -Path $LocalWhisperReportPath)
-        },
-        @{
-            Name = "local_whisper_notepad_paste"
-            Report = (Read-ProofReport -Path $NotepadReportPath)
-        }
-    )
+    $reports = Get-ProofSetReportEntries `
+        -Name "full_laptop" `
+        -Paths @{
+            cloud_dictation = $CloudReportPath
+            local_whisper_dictation = $LocalWhisperReportPath
+            local_whisper_notepad_paste = $NotepadReportPath
+        } `
+        -ExcludedProfileNames @("laptop_preflight")
 
     $first = $reports[0]
     $firstName = [string]$first["Name"]

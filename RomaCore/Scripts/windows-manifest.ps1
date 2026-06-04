@@ -58,9 +58,45 @@ function Resolve-RomaWindowsManifestPath {
             return $fullPath
         }
 
-        $relocatedPath = Join-Path $BaseDir (Split-Path -Leaf $fullPath)
+        $leaf = Split-Path -Leaf $fullPath
+        $parentPath = Split-Path -Parent $fullPath
+        $parentLeaf = ""
+        if (![string]::IsNullOrWhiteSpace($parentPath)) {
+            $parentLeaf = Split-Path -Leaf $parentPath
+        }
+
+        if (![string]::IsNullOrWhiteSpace($parentLeaf)) {
+            $relocatedSubdirPath = Join-Path (Join-Path $BaseDir $parentLeaf) $leaf
+            if (Test-Path -LiteralPath $relocatedSubdirPath) {
+                return [System.IO.Path]::GetFullPath($relocatedSubdirPath)
+            }
+        }
+
+        $relocatedPath = Join-Path $BaseDir $leaf
         if (Test-Path -LiteralPath $relocatedPath) {
             return [System.IO.Path]::GetFullPath($relocatedPath)
+        }
+
+        $candidateFiles = @()
+        try {
+            $candidateFiles = @(Get-ChildItem -LiteralPath $BaseDir -Filter $leaf -Recurse -File -ErrorAction Stop)
+        } catch {
+            $candidateFiles = @()
+        }
+
+        if (![string]::IsNullOrWhiteSpace($parentLeaf)) {
+            $parentMatchedCandidates = @(
+                $candidateFiles | Where-Object {
+                    (Split-Path -Leaf $_.DirectoryName) -eq $parentLeaf
+                }
+            )
+            if ($parentMatchedCandidates.Count -eq 1) {
+                return [System.IO.Path]::GetFullPath($parentMatchedCandidates[0].FullName)
+            }
+        }
+
+        if ($candidateFiles.Count -eq 1) {
+            return [System.IO.Path]::GetFullPath($candidateFiles[0].FullName)
         }
 
         return $fullPath

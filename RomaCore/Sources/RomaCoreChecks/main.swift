@@ -8013,7 +8013,10 @@ struct RomaCoreChecks {
                 manifestScript.contains("function Resolve-RomaWindowsManifestPath") &&
                 manifestScript.contains("function Require-RomaWindowsManifestFile") &&
                 manifestScript.contains("Split-Path -Leaf $fullPath") &&
+                manifestScript.contains("$parentLeaf = Split-Path -Leaf $parentPath") &&
                 manifestScript.contains("Join-Path $BaseDir") &&
+                manifestScript.contains("Get-ChildItem -LiteralPath $BaseDir -Filter $leaf -Recurse -File") &&
+                manifestScript.contains("$parentMatchedCandidates.Count -eq 1") &&
                 manifestScript.contains("Test-Path -LiteralPath $path"),
             "Windows manifest parsing should be computed by one shared packaged helper"
         )

@@ -752,7 +752,7 @@ public struct RomaTranscriptionOutputFilter {
             or\s+actually |
             or\s+wait\s*[,;:]?\s+no |
             (?:[,;:…]|\.\.\.)\s*instead(?!\s+of\b)\s*[,;:]? |
-            (?<!wait)\s+i\s+mean
+            (?<!wait)(?<!correction)\s+i\s+mean
         )
         \s*[,;:]?\s+
         """#
@@ -2110,7 +2110,16 @@ public struct RomaTranscriptionOutputFilter {
         let marker = tokens[markerIndex].text
         switch marker {
         case "correction", "sorry":
-            return markerIndex + 1
+            let replacementStartIndex = markerIndex + 1
+            if tokens[replacementStartIndex].text == "actually" {
+                return replacementStartIndex + 1
+            }
+            if replacementStartIndex + 1 < tokens.count,
+               tokens[replacementStartIndex].text == "i",
+               ["mean", "meant"].contains(tokens[replacementStartIndex + 1].text) {
+                return replacementStartIndex + 2
+            }
+            return replacementStartIndex
         case "instead":
             return tokens[markerIndex + 1].text == "of" ? nil : markerIndex + 1
         case "rather":

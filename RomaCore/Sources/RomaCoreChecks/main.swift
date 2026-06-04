@@ -392,6 +392,20 @@ struct RomaCoreChecks {
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model no wait I mean module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should apply no-wait-i-mean corrections in short continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model no wait I mean to say module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should apply no-wait-i-mean-to-say corrections in short continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "cloud flare actually vercel.",
                 context: midSentenceContext
             ) == "Vercel",
@@ -7030,6 +7044,37 @@ struct RomaCoreChecks {
             "pipeline should paste plain non-ASCII wrapper artifacts as clean continuation text"
         )
 
+        let noWaitIMeanRecorder = FakeRecorder()
+        let noWaitIMeanInserter = FakeTextInsertion()
+        let noWaitIMeanPipeline = DictationPipeline(
+            recorder: noWaitIMeanRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "no-wait-i-mean-continuation-proof.wav",
+                text: "model no wait I mean module."
+            ),
+            textInsertion: noWaitIMeanInserter
+        )
+        let noWaitIMeanRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/no-wait-i-mean-continuation-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await noWaitIMeanRecorder.startPreRollBuffering()
+        let noWaitIMeanResult = try await noWaitIMeanPipeline.runRecordingWindow(noWaitIMeanRequest) {}
+
+        try require(
+            noWaitIMeanResult.processedText == " module",
+            "pipeline should clean no-wait-i-mean continuation corrections"
+        )
+        try require(
+            await noWaitIMeanInserter.pastedText == " module",
+            "pipeline should paste no-wait-i-mean continuation corrections"
+        )
+
         let backtickFragmentRecorder = FakeRecorder()
         let backtickFragmentInserter = FakeTextInsertion()
         let backtickFragmentPipeline = DictationPipeline(
@@ -8124,6 +8169,13 @@ struct RomaCoreChecks {
         try require(
             windowsProofScript.contains("$configArgs = Add-RomaWindowsAgentConfigurationArgs") &&
                 windowsProofScript.contains("return Add-RomaWindowsAgentConfigurationArgs") &&
+                windowsProofScript.contains("""
+                -WordReplacement $WordReplacement `
+                -PasteDictation $PasteDictation.IsPresent `
+                -RestoreClipboard $RestoreClipboard.IsPresent `
+                -NoRestoreClipboard $NoRestoreClipboard.IsPresent `
+                -HasClipboardRestoreDelay $hasExplicitClipboardRestoreDelay
+                """) &&
                 runScript.contains("$configArgs = Add-RomaWindowsAgentConfigurationArgs") &&
                 smokeScript.contains("$configArgs = Add-RomaWindowsAgentConfigurationArgs"),
             "Windows source proof, runner, and smoke scripts should share agent config argument construction"

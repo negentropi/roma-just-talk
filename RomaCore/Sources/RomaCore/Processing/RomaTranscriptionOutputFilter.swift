@@ -2261,7 +2261,23 @@ public struct RomaTranscriptionOutputFilter {
             return markerIndex + 1
         case "no":
             if markerIndex + 2 < tokens.count,
-               ["actually", "wait"].contains(tokens[markerIndex + 1].text) {
+               tokens[markerIndex + 1].text == "wait" {
+                let replacementStartIndex = markerIndex + 2
+                if replacementStartIndex + 1 < tokens.count,
+                   tokens[replacementStartIndex].text == "i",
+                   ["mean", "meant"].contains(tokens[replacementStartIndex + 1].text) {
+                    let afterIMeanIndex = replacementStartIndex + 2
+                    if afterIMeanIndex + 1 < tokens.count,
+                       tokens[afterIMeanIndex].text == "to",
+                       tokens[afterIMeanIndex + 1].text == "say" {
+                        return afterIMeanIndex + 2
+                    }
+                    return afterIMeanIndex
+                }
+                return replacementStartIndex
+            }
+            if markerIndex + 2 < tokens.count,
+               tokens[markerIndex + 1].text == "actually" {
                 return markerIndex + 2
             }
             return markerIndex + 1

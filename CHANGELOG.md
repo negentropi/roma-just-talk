@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Required Windows artifact proof reports to expose the listener's per-session WAV output isolation marker.
 - Replaced the README, source app icon, and menu bar logo with the roma-just-talk split-keyboard mark.
 - Formatted spoken developer tokens such as "read me dot md", "dot env file", and "dollar sign path".
 - Formatted spoken short and "double dash" CLI flags in developer dictation such as "git commit dash m".

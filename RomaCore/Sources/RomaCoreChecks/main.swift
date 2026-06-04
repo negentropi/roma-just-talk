@@ -6624,6 +6624,10 @@ struct RomaCoreChecks {
             "Windows proof agent should expose that Windows runtime uses the shared DictationPipeline"
         )
         try require(
+            proofAgentSource.contains(#"print("windows_listener_output_isolation_source=true")"#),
+            "Windows proof agent should expose that listener sessions isolate default WAV output paths"
+        )
+        try require(
             proofAgentSource.contains(#"print("windows_hold_hook_single_window_source=true")"#),
             "Windows proof agent should expose that hold-to-talk uses one native hook window"
         )
@@ -6659,6 +6663,12 @@ struct RomaCoreChecks {
                 scriptSource.contains(#"-Expected "windows_dictation_runtime_uses_pipeline_source=true""#),
                 "\(scriptName) should assert that the Windows runtime uses the shared DictationPipeline"
             )
+            if scriptName == "prove-windows-agent-artifact.ps1" {
+                try require(
+                    scriptSource.contains(#"-Expected "windows_listener_output_isolation_source=true""#),
+                    "\(scriptName) should assert that listener sessions isolate default WAV output paths"
+                )
+            }
             try require(
                 scriptSource.contains(#"-Expected "windows_hold_hook_single_window_source=true""#),
                 "\(scriptName) should assert that hold-to-talk uses one native hook window"
@@ -6684,6 +6694,12 @@ struct RomaCoreChecks {
         )
         try require(
             proveScript.contains(
+                #"windows_listener_output_isolation_source = $Output.Contains("windows_listener_output_isolation_source=true")"#
+            ),
+            "Windows artifact proof reports should record that listener sessions isolate default WAV output paths"
+        )
+        try require(
+            proveScript.contains(
                 #"windows_hold_hook_single_window_source = $Output.Contains("windows_hold_hook_single_window_source=true")"#
             ),
             "Windows artifact proof reports should record that hold-to-talk uses one native hook window"
@@ -6693,6 +6709,12 @@ struct RomaCoreChecks {
                 #"Assert-Boolean -Object $Proof -Name "windows_dictation_runtime_uses_pipeline_source" -Expected $true"#
             ),
             "Windows proof checker should require that the Windows runtime uses the shared DictationPipeline"
+        )
+        try require(
+            checkReportScript.contains(
+                #"Assert-Boolean -Object $Proof -Name "windows_listener_output_isolation_source" -Expected $true"#
+            ),
+            "Windows proof checker should require that listener sessions isolate default WAV output paths"
         )
         try require(
             checkReportScript.contains(

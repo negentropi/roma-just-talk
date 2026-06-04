@@ -124,9 +124,18 @@ function Get-MicrophonePreflightProof {
         [string]$Output = ""
     )
 
+    $durationSeconds = Get-RomaWindowsOutputNumber -Output $Output -Name "duration_seconds"
+    $includedPreRollSeconds = Get-RomaWindowsOutputNumber -Output $Output -Name "included_pre_roll_seconds"
+
     return [ordered]@{
         output_present = ![string]::IsNullOrWhiteSpace($Output)
         wrote_present = $Output.Contains("wrote=")
+        reported_duration = $Output.Contains("duration_seconds=")
+        duration_seconds = $durationSeconds
+        reported_positive_duration = ($null -ne $durationSeconds) -and ($durationSeconds -gt 0)
+        reported_pre_roll = $Output.Contains("included_pre_roll_seconds=")
+        included_pre_roll_seconds = $includedPreRollSeconds
+        reported_positive_pre_roll = ($null -ne $includedPreRollSeconds) -and ($includedPreRollSeconds -gt 0)
         sample_rate_16000 = $Output.Contains("sample_rate=16000")
         channels_mono = $Output.Contains("channels=1")
     }
@@ -326,7 +335,17 @@ function Invoke-MicrophonePreflight {
     Write-Host $output
     Assert-OutputContains -Output $output -Expected "sample_rate=16000"
     Assert-OutputContains -Output $output -Expected "channels=1"
+    $durationSeconds = Get-RomaWindowsOutputNumber -Output $output -Name "duration_seconds"
+    if (($null -eq $durationSeconds) -or ($durationSeconds -le 0)) {
+        throw "Laptop microphone preflight did not report positive duration_seconds"
+    }
+    $includedPreRollSeconds = Get-RomaWindowsOutputNumber -Output $output -Name "included_pre_roll_seconds"
+    if (($null -eq $includedPreRollSeconds) -or ($includedPreRollSeconds -le 0)) {
+        throw "Laptop microphone preflight did not report positive included_pre_roll_seconds"
+    }
     Require-FileWithMinimumBytes -Path $OutputPath -MinimumBytes 45
+    Write-Host "microphone_preflight_duration_seconds=$durationSeconds"
+    Write-Host "microphone_preflight_included_pre_roll_seconds=$includedPreRollSeconds"
     Write-Host "microphone_preflight_wav=$OutputPath"
     Write-Host "microphone_preflight_ok=true"
     return $output

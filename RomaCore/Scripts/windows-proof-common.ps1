@@ -201,6 +201,64 @@ function Get-RomaWindowsOutputMarkerProof {
     return $proof
 }
 
+function Get-RomaWindowsOutputValue {
+    param(
+        [Alias("Content")]
+        [Parameter(Mandatory = $true)]
+        [string]$Output,
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    $escapedName = [regex]::Escape($Name)
+    $match = [regex]::Match($Output, "(?m)^$escapedName=(.+?)\s*$")
+    if (!$match.Success) {
+        return ""
+    }
+
+    return $match.Groups[1].Value
+}
+
+function Get-RomaWindowsOutputNumber {
+    param(
+        [Alias("Content")]
+        [Parameter(Mandatory = $true)]
+        [string]$Output,
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    $escapedName = [regex]::Escape($Name)
+    $match = [regex]::Match($Output, "(?m)^$escapedName=([+-]?\d+(?:\.\d+)?)\s*$")
+    if (!$match.Success) {
+        return $null
+    }
+
+    return [double]::Parse(
+        $match.Groups[1].Value,
+        [System.Globalization.CultureInfo]::InvariantCulture
+    )
+}
+
+function Get-RomaWindowsOutputLineNumber {
+    param(
+        [Alias("Content")]
+        [Parameter(Mandatory = $true)]
+        [string]$Output,
+        [Parameter(Mandatory = $true)]
+        [string]$Needle
+    )
+
+    $lines = $Output -split "\r?\n"
+    for ($index = 0; $index -lt $lines.Count; $index += 1) {
+        if ($lines[$index].Contains($Needle)) {
+            return $index + 1
+        }
+    }
+
+    return 0
+}
+
 function Add-RomaWindowsProofFields {
     param(
         [Parameter(Mandatory = $true)]

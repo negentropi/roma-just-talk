@@ -774,6 +774,12 @@ function Assert-LaptopPreflightReport {
     $microphoneOutput = Require-Property -Object $preflightOutputs -Name "microphone"
     Assert-Boolean -Object $microphoneOutput -Name "output_present" -Expected $true
     Assert-Boolean -Object $microphoneOutput -Name "wrote_present" -Expected $true
+    Assert-Boolean -Object $microphoneOutput -Name "reported_duration" -Expected $true
+    Assert-Boolean -Object $microphoneOutput -Name "reported_positive_duration" -Expected $true
+    Assert-NumberGreaterThan -Object $microphoneOutput -Name "duration_seconds" -Minimum 0
+    Assert-Boolean -Object $microphoneOutput -Name "reported_pre_roll" -Expected $true
+    Assert-Boolean -Object $microphoneOutput -Name "reported_positive_pre_roll" -Expected $true
+    Assert-NumberGreaterThan -Object $microphoneOutput -Name "included_pre_roll_seconds" -Minimum 0
     Assert-Boolean -Object $microphoneOutput -Name "sample_rate_16000" -Expected $true
     Assert-Boolean -Object $microphoneOutput -Name "channels_mono" -Expected $true
 

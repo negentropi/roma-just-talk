@@ -8554,8 +8554,11 @@ struct RomaCoreChecks {
             laptopProofScript.contains("microphone preflight") &&
                 laptopProofScript.contains("miniaudio-record-proof") &&
                 laptopProofScript.contains("MicPreflightSeconds") &&
+                laptopProofScript.contains(#"Get-RomaWindowsOutputNumber -Output $Output -Name "included_pre_roll_seconds""#) &&
+                laptopProofScript.contains("reported_positive_pre_roll") &&
+                laptopProofScript.contains("microphone_preflight_included_pre_roll_seconds=") &&
                 laptopProofScript.contains("microphone_preflight_ok=true"),
-            "Windows laptop proof runner should preflight real microphone capture through packaged RomaProofAgent"
+            "Windows laptop proof runner should preflight real microphone capture and positive pre-roll through packaged RomaProofAgent"
         )
         try require(
             laptopProofScript.contains("hotkey delivery preflight") &&
@@ -8591,6 +8594,8 @@ struct RomaCoreChecks {
                 laptopProofScript.contains("Get-HotkeyDeliveryPreflightProof") &&
                 laptopProofScript.contains("Get-OptionalFileProof") &&
                 laptopProofScript.contains("sample_rate_16000") &&
+                laptopProofScript.contains("included_pre_roll_seconds") &&
+                laptopProofScript.contains("reported_positive_pre_roll") &&
                 laptopProofScript.contains("local_whisper = $hasLocalWhisperPreflight") &&
                 laptopProofScript.contains("manifest = $script:artifactManifest") &&
                 laptopProofScript.contains("package_identity = (Get-RomaPackageIdentityProof -PackageDir $PackageDir)") &&
@@ -8615,6 +8620,8 @@ struct RomaCoreChecks {
                 checkReportScript.contains(#"Assert-Boolean -Object $permissionOutput -Name "no_startup_permission_prompt" -Expected $true"#) &&
                 checkReportScript.contains(#"Assert-Boolean -Object $hotkeyOutput -Name "key_down" -Expected $true"#) &&
                 checkReportScript.contains(#"Assert-Boolean -Object $microphoneOutput -Name "sample_rate_16000" -Expected $true"#) &&
+                checkReportScript.contains(#"Assert-Boolean -Object $microphoneOutput -Name "reported_positive_pre_roll" -Expected $true"#) &&
+                checkReportScript.contains(#"Assert-NumberGreaterThan -Object $microphoneOutput -Name "included_pre_roll_seconds" -Minimum 0"#) &&
                 checkReportScript.contains(#"Assert-Boolean -Object $localWhisperOutput -Name "network_required_false" -Expected $true"#) &&
                 checkReportScript.contains(#"Assert-Boolean -Object $localWhisperOutput -Name "output_present" -Expected $false"#) &&
                 checkSetScript.contains("function Assert-LaptopPreflightIncludesLocalWhisper") &&
@@ -8660,6 +8667,8 @@ struct RomaCoreChecks {
                 packageScript.contains("startup_launch_mode_listen = $true") &&
                 packageScript.contains("no_startup_permission_prompt = $true") &&
                 packageScript.contains("preflight_outputs") &&
+                packageScript.contains("reported_positive_pre_roll = $true") &&
+                packageScript.contains("included_pre_roll_seconds = 0.5") &&
                 packageScript.contains("transcription_client_whisper") &&
                 packageScript.contains("package_identity") &&
                 !packageScript.contains(String(repeating: "0", count: 64)) &&
@@ -8698,6 +8707,9 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Resolve-RomaWindowsFullPath") &&
                 proofCommonScript.contains("function Require-RomaWindowsFile") &&
                 proofCommonScript.contains("function Assert-RomaWindowsOutputContains") &&
+                proofCommonScript.contains("function Get-RomaWindowsOutputValue") &&
+                proofCommonScript.contains("function Get-RomaWindowsOutputNumber") &&
+                proofCommonScript.contains("function Get-RomaWindowsOutputLineNumber") &&
                 proofCommonScript.contains("function Assert-RomaWindowsRuntimeDefaultOutput") &&
                 proofCommonScript.contains("function Assert-RomaWindowsHoldTimeoutDefaultOutput") &&
                 proofCommonScript.contains("function Assert-RomaWindowsClipboardRestoreDefaultOutput") &&
@@ -8714,6 +8726,11 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Get-RomaWindowsFileHashProof") &&
                 proofCommonScript.contains("function Get-RomaWindowsInstalledProofSurfaceFileProofs"),
             "Windows proof helper should own shared script utilities"
+        )
+        try require(
+            proveScript.contains("Set-Alias -Name Get-OutputNumber -Value Get-RomaWindowsOutputNumber") &&
+                !proveScript.contains("function Get-OutputNumber"),
+            "Windows artifact proof should reuse the shared output parser"
         )
         try require(
             windowsProofScript.contains("$configArgs = Add-RomaWindowsAgentConfigurationArgs") &&

@@ -309,6 +309,12 @@ function Write-LaptopPreflightCheckerSmokeReport {
             microphone = [ordered]@{
                 output_present = $true
                 wrote_present = $true
+                reported_duration = $true
+                duration_seconds = 1.0
+                reported_positive_duration = $true
+                reported_pre_roll = $true
+                included_pre_roll_seconds = 0.5
+                reported_positive_pre_roll = $true
                 sample_rate_16000 = $true
                 channels_mono = $true
             }

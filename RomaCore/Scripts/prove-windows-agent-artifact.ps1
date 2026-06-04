@@ -51,6 +51,9 @@ Set-Alias -Name Require-File -Value Require-RomaWindowsFile -Scope Local -Force
 Set-Alias -Name Assert-OutputContains -Value Assert-RomaWindowsOutputContains -Scope Local -Force
 Set-Alias -Name Get-FileProof -Value Get-RomaWindowsFileProof -Scope Local -Force
 Set-Alias -Name Get-FileHashProof -Value Get-RomaWindowsFileHashProof -Scope Local -Force
+Set-Alias -Name Get-OutputValue -Value Get-RomaWindowsOutputValue -Scope Local -Force
+Set-Alias -Name Get-OutputNumber -Value Get-RomaWindowsOutputNumber -Scope Local -Force
+Set-Alias -Name Get-OutputLineNumber -Value Get-RomaWindowsOutputLineNumber -Scope Local -Force
 
 $packageIdentityScript = Join-Path $PSScriptRoot "windows-package-identity.ps1"
 if (!(Test-Path -LiteralPath $packageIdentityScript)) {
@@ -473,61 +476,6 @@ function Get-DictationRuntimeProof {
     $proof["expected_transcript_text_found"] = $expectedTranscriptTextFound
 
     return $proof
-}
-
-function Get-OutputValue {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Content,
-        [Parameter(Mandatory = $true)]
-        [string]$Name
-    )
-
-    $escapedName = [regex]::Escape($Name)
-    $match = [regex]::Match($Content, "(?m)^$escapedName=(.+?)\s*$")
-    if (!$match.Success) {
-        return ""
-    }
-
-    return $match.Groups[1].Value
-}
-
-function Get-OutputNumber {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Content,
-        [Parameter(Mandatory = $true)]
-        [string]$Name
-    )
-
-    $escapedName = [regex]::Escape($Name)
-    $match = [regex]::Match($Content, "(?m)^$escapedName=([+-]?\d+(?:\.\d+)?)\s*$")
-    if (!$match.Success) {
-        return $null
-    }
-
-    return [double]::Parse(
-        $match.Groups[1].Value,
-        [System.Globalization.CultureInfo]::InvariantCulture
-    )
-}
-
-function Get-OutputLineNumber {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Content,
-        [Parameter(Mandatory = $true)]
-        [string]$Needle
-    )
-
-    $lines = $Content -split "\r?\n"
-    for ($index = 0; $index -lt $lines.Count; $index += 1) {
-        if ($lines[$index].Contains($Needle)) {
-            return $index + 1
-        }
-    }
-
-    return 0
 }
 
 function Get-DoctorOutputProof {

@@ -403,6 +403,10 @@ struct TranscriptionOutputFilterTests {
         let thinkContext = TranscriptionOutputFilter.TextInsertionContext(precedingText: "I think")
 
         #expect(TranscriptionOutputFilter.applyInsertionPolish("Model.", context: midSentenceContext) == "model")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("Sure model.", context: midSentenceContext) == "sure model")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("Okay sure model.", context: midSentenceContext) == "model")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("Okay sure thing.", context: midSentenceContext) == "sure thing")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("Right model.", context: midSentenceContext) == "right model")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("so this Model.", context: midSentenceContext) == "model")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("this Model.", context: midSentenceContext) == "model")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("so this final word.", context: midSentenceContext) == "final word")

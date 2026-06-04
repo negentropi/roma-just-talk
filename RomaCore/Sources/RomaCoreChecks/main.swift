@@ -313,6 +313,28 @@ struct RomaCoreChecks {
             "shared insertion polish should lowercase mid-sentence fragments"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Sure model.", context: midSentenceContext) == "sure model",
+            "shared insertion polish should lowercase sure-prefixed mid-sentence fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Okay sure model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim stacked acknowledgement fillers in continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Okay sure thing.",
+                context: midSentenceContext
+            ) == "sure thing",
+            "shared insertion polish should preserve non-technical sure-prefixed continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Right model.", context: midSentenceContext) == "right model",
+            "shared insertion polish should preserve right as an ordinary fragment word"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "so this Model.",
                 context: midSentenceContext
@@ -7233,6 +7255,37 @@ struct RomaCoreChecks {
         try require(
             await iShouldSayInserter.pastedText == " module",
             "pipeline should paste i-should-say continuation corrections"
+        )
+
+        let okaySureRecorder = FakeRecorder()
+        let okaySureInserter = FakeTextInsertion()
+        let okaySurePipeline = DictationPipeline(
+            recorder: okaySureRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "okay-sure-continuation-proof.wav",
+                text: "Okay sure model."
+            ),
+            textInsertion: okaySureInserter
+        )
+        let okaySureRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/okay-sure-continuation-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await okaySureRecorder.startPreRollBuffering()
+        let okaySureResult = try await okaySurePipeline.runRecordingWindow(okaySureRequest) {}
+
+        try require(
+            okaySureResult.processedText == " model",
+            "pipeline should clean stacked acknowledgement fillers in continuations"
+        )
+        try require(
+            await okaySureInserter.pastedText == " model",
+            "pipeline should paste stacked acknowledgement filler continuations"
         )
 
         let orWaitNoIMeanRecorder = FakeRecorder()

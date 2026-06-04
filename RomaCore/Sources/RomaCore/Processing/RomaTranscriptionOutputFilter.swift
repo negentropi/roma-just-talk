@@ -513,7 +513,7 @@ public struct RomaTranscriptionOutputFilter {
         "pod", "pods", "prompt", "property", "properties", "protocol", "protocols", "put", "really", "repo", "repos", "repository",
         "repositories", "request", "response", "result", "results", "right", "route", "routes", "router", "screen",
         "script", "scripts", "second", "see", "server", "service", "setting", "settings", "should", "single", "site", "sites", "so",
-        "some", "state", "states", "struct", "structs", "that", "the", "then", "there", "third", "this", "ticket",
+        "some", "state", "states", "struct", "structs", "sure", "that", "the", "then", "there", "third", "this", "ticket",
         "tickets", "to", "token", "tool", "type", "types", "use", "user", "users", "value", "values", "variable",
         "variables", "view", "voice", "voices", "was", "we", "what", "when", "where", "which", "will", "window", "with",
         "word", "words", "work", "worker", "workers", "workspace", "workspaces", "would", "yeah", "you"
@@ -1936,7 +1936,36 @@ public struct RomaTranscriptionOutputFilter {
             didRemoveFiller = true
         }
 
+        if didRemoveFiller {
+            candidate = removeStackedAcknowledgementFillerFromContinuationFragment(
+                from: candidate,
+                after: precedingText
+            )
+        }
+
         return didRemoveFiller ? candidate : text
+    }
+
+    private static func removeStackedAcknowledgementFillerFromContinuationFragment(
+        from text: String,
+        after precedingText: String
+    ) -> String {
+        let candidate = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let regex = try? NSRegularExpression(pattern: #"(?i)^sure(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#),
+              let match = regex.firstMatch(in: candidate, range: NSRange(candidate.startIndex..., in: candidate)),
+              let matchRange = Range(match.range, in: candidate) else {
+            return text
+        }
+
+        let suffix = String(candidate[matchRange.upperBound...])
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard shouldRemoveLeadingContinuationDiscourseFiller("sure", suffix: suffix, after: precedingText),
+              let firstSuffixWord = wordTokens(in: suffix).first?.text,
+              isLikelyFragmentContinuationWord(firstSuffixWord) else {
+            return text
+        }
+
+        return suffix
     }
 
     private static func isLeadingDiscourseFillerContinuationFragment(_ text: String, after precedingText: String) -> Bool {

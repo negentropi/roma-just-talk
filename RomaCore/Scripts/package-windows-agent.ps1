@@ -535,6 +535,10 @@ Expected full-proof markers:
 
 proof_set_laptop_preflight_matches_full=true
 proof_set_generated_at_window_minutes=
+proof_profile_ok=laptop-preflight
+proof_profile_ok=cloud-dictation
+proof_profile_ok=local-whisper-dictation
+proof_profile_ok=local-whisper-notepad-paste
 proof_set_source_dirty=false
 proof_set_ok=full-laptop
 windows_laptop_recheck_script=C:\tmp\roma-windows-laptop-proof\recheck-full-laptop-proof.ps1
@@ -547,6 +551,10 @@ powershell -ExecutionPolicy Bypass -File .\check-windows-proof-set.ps1 -LaptopPr
 Or run the proof-dir script written by the full laptop proof:
 
 powershell -ExecutionPolicy Bypass -File C:\tmp\roma-windows-laptop-proof\recheck-full-laptop-proof.ps1
+
+That recheck script asserts the four profile markers and prints:
+
+windows_laptop_recheck_ok=true
 
 Full proof validates four JSON reports: preflight, cloud dictation, local whisper dictation, and local whisper Notepad paste.
 Do not claim Windows support until the full laptop proof passes on the target Windows machine.

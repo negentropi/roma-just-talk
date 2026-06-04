@@ -201,6 +201,8 @@ function Write-FullLaptopProofRecheckScript {
         ". `$manifestScript",
         '$manifestPath = Join-Path $PackageDir "manifest.txt"',
         '$manifest = Read-RomaWindowsManifest -Path $manifestPath',
+        '$proofCommonScript = Require-RomaWindowsManifestFile -Manifest $manifest -Key "proof_common_script" -BaseDir $PackageDir',
+        ". `$proofCommonScript",
         '$checkSetScript = Require-RomaWindowsManifestFile -Manifest $manifest -Key "check_set_script" -BaseDir $PackageDir',
         "",
         "`$laptopPreflightReportPath = $(ConvertTo-PowerShellSingleQuotedString -Value $LaptopPreflightReportPath)",
@@ -208,13 +210,20 @@ function Write-FullLaptopProofRecheckScript {
         "`$localWhisperDictationReportPath = $(ConvertTo-PowerShellSingleQuotedString -Value $LocalWhisperDictationReportPath)",
         "`$localWhisperNotepadPasteReportPath = $(ConvertTo-PowerShellSingleQuotedString -Value $LocalWhisperNotepadPasteReportPath)",
         "",
-        "& `$checkSetScript ``",
+        "`$proofSetOutput = & `$checkSetScript ``",
         "    -LaptopPreflightReportPath `$laptopPreflightReportPath ``",
         "    -CloudDictationReportPath `$cloudDictationReportPath ``",
         "    -LocalWhisperDictationReportPath `$localWhisperDictationReportPath ``",
         "    -LocalWhisperNotepadPasteReportPath `$localWhisperNotepadPasteReportPath ``",
         "    -RequireLaptopPreflight ``",
-        "    -RequireFullLaptopProof"
+        "    -RequireFullLaptopProof 2>&1 | Out-String",
+        "Write-Host `$proofSetOutput",
+        'Assert-RomaWindowsOutputContains -Output $proofSetOutput -Expected "proof_profile_ok=laptop-preflight"',
+        'Assert-RomaWindowsOutputContains -Output $proofSetOutput -Expected "proof_profile_ok=cloud-dictation"',
+        'Assert-RomaWindowsOutputContains -Output $proofSetOutput -Expected "proof_profile_ok=local-whisper-dictation"',
+        'Assert-RomaWindowsOutputContains -Output $proofSetOutput -Expected "proof_profile_ok=local-whisper-notepad-paste"',
+        'Assert-RomaWindowsOutputContains -Output $proofSetOutput -Expected "proof_set_ok=full-laptop"',
+        'Write-Host "windows_laptop_recheck_ok=true"'
     )
 
     $scriptLines | Set-Content -LiteralPath $Path -Encoding UTF8

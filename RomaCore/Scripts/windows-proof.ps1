@@ -170,16 +170,29 @@ function New-WindowsAgentConfigArgs {
     if (![string]::IsNullOrWhiteSpace($OutputPath)) {
         $configArgs += @("--out", $OutputPath)
     }
-    $configArgs = Add-WindowsDictationConfigurationArgs -Arguments $configArgs
-    if ($RestoreClipboard) {
-        $configArgs += "--restore-clipboard"
-    }
-    if ($NoRestoreClipboard) {
-        $configArgs += "--no-restore-clipboard"
-    }
-    if ($hasExplicitClipboardRestoreDelay) {
-        $configArgs += @("--clipboard-restore-delay", "$ClipboardRestoreDelaySeconds")
-    }
+    $configArgs = Add-RomaWindowsAgentConfigurationArgs `
+        -Arguments $configArgs `
+        -UseWhisperCLI $hasLocalWhisper `
+        -WhisperCLI $WhisperCLI `
+        -WhisperModel $WhisperModel `
+        -WhisperOutputDir $WhisperOutputDir `
+        -WhisperArgument $WhisperArgument `
+        -Endpoint $TranscribeEndpoint `
+        -Model $TranscribeModel `
+        -UseHoldHook $UseHoldHook.IsPresent `
+        -HoldTimeoutSeconds $HoldTimeoutSeconds `
+        -RecordSeconds $RecordSeconds `
+        -ApiKeyName $TranscribeApiKeyName `
+        -ApiKeyEnv $TranscribeApiKeyEnv `
+        -SecretDir $secretProofDir `
+        -Language $TranscribeLanguage `
+        -Prompt $TranscribePrompt `
+        -WordReplacement $WordReplacement `
+        -PasteDictation $PasteDictation.IsPresent `
+        -RestoreClipboard $RestoreClipboard.IsPresent `
+        -NoRestoreClipboard $NoRestoreClipboard.IsPresent `
+        -HasClipboardRestoreDelay $hasExplicitClipboardRestoreDelay `
+        -ClipboardRestoreDelaySeconds $ClipboardRestoreDelaySeconds
 
     return $configArgs
 }
@@ -194,55 +207,25 @@ function New-WindowsDictationProofArgs {
         "run", "RomaProofAgent", "windows-dictation-proof",
         "--out", $OutputPath
     )
-    return Add-WindowsDictationConfigurationArgs -Arguments $dictationArgs
-}
-
-function Add-WindowsDictationConfigurationArgs {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string[]]$Arguments
-    )
-
-    $dictationArgs = @($Arguments)
-    if (![string]::IsNullOrWhiteSpace($WhisperCLI)) {
-        $dictationArgs += @("--whisper-cli", $WhisperCLI, "--whisper-model", $WhisperModel)
-        if (![string]::IsNullOrWhiteSpace($WhisperOutputDir)) {
-            $dictationArgs += @("--whisper-output-dir", $WhisperOutputDir)
-        }
-        foreach ($argument in $WhisperArgument) {
-            if (![string]::IsNullOrWhiteSpace($argument)) {
-                $dictationArgs += @("--whisper-arg", $argument)
-            }
-        }
-    } else {
-        $dictationArgs += @("--endpoint", $TranscribeEndpoint, "--model", $TranscribeModel)
-        if (![string]::IsNullOrWhiteSpace($TranscribeApiKeyName)) {
-            $dictationArgs += @("--api-key-name", $TranscribeApiKeyName, "--secret-dir", $secretProofDir)
-        } else {
-            $dictationArgs += @("--api-key-env", $TranscribeApiKeyEnv)
-        }
-    }
-    if ($UseHoldHook) {
-        $dictationArgs += @("--hold-hook", "--timeout", "$HoldTimeoutSeconds")
-    } else {
-        $dictationArgs += @("--toggle", "--seconds", "$RecordSeconds")
-    }
-    if (![string]::IsNullOrWhiteSpace($TranscribeLanguage)) {
-        $dictationArgs += @("--language", $TranscribeLanguage)
-    }
-    if (![string]::IsNullOrWhiteSpace($TranscribePrompt)) {
-        $dictationArgs += @("--prompt", $TranscribePrompt)
-    }
-    foreach ($replacement in $WordReplacement) {
-        if (![string]::IsNullOrWhiteSpace($replacement)) {
-            $dictationArgs += @("--replace", $replacement)
-        }
-    }
-    if ($PasteDictation) {
-        $dictationArgs += "--paste"
-    }
-
-    return $dictationArgs
+    return Add-RomaWindowsAgentConfigurationArgs `
+        -Arguments $dictationArgs `
+        -UseWhisperCLI $hasLocalWhisper `
+        -WhisperCLI $WhisperCLI `
+        -WhisperModel $WhisperModel `
+        -WhisperOutputDir $WhisperOutputDir `
+        -WhisperArgument $WhisperArgument `
+        -Endpoint $TranscribeEndpoint `
+        -Model $TranscribeModel `
+        -UseHoldHook $UseHoldHook.IsPresent `
+        -HoldTimeoutSeconds $HoldTimeoutSeconds `
+        -RecordSeconds $RecordSeconds `
+        -ApiKeyName $TranscribeApiKeyName `
+        -ApiKeyEnv $TranscribeApiKeyEnv `
+        -SecretDir $secretProofDir `
+        -Language $TranscribeLanguage `
+        -Prompt $TranscribePrompt `
+        -WordReplacement $WordReplacement `
+        -PasteDictation $PasteDictation.IsPresent
 }
 
 if ($RestoreClipboard -and $NoRestoreClipboard) {

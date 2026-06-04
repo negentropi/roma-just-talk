@@ -2,7 +2,7 @@
 
 ## v1.81 - Unreleased
 
-- Shared packaged Windows config-argument construction between installed launcher and smoke proof scripts.
+- Shared packaged Windows config-argument construction across source proof, installed launcher, and smoke proof scripts.
 - Printed explicit Windows proof-profile coverage for shared transcription and proof-argument paths.
 - Required Windows artifact proof reports to expose shared transcription-client and proof-argument markers.
 - Shared Windows transcription client selection between the user-facing agent and dictation proof, including local `whisper-cli`.

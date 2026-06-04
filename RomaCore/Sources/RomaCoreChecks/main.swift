@@ -7563,9 +7563,7 @@ struct RomaCoreChecks {
         )
         try require(
             windowsProofScript.contains("New-WindowsDictationProofArgs") &&
-                windowsProofScript.contains("Add-WindowsDictationConfigurationArgs") &&
-                windowsProofScript.contains("$configArgs = Add-WindowsDictationConfigurationArgs -Arguments $configArgs") &&
-                windowsProofScript.contains("return Add-WindowsDictationConfigurationArgs -Arguments $dictationArgs") &&
+                windowsProofScript.contains("Add-RomaWindowsAgentConfigurationArgs") &&
                 windowsProofScript.contains("RunInteractiveDictation requires local -WhisperCLI and -WhisperModel"),
             "Windows source proof script should allow cloud or local whisper dictation proof"
         )
@@ -7759,9 +7757,11 @@ struct RomaCoreChecks {
             "Windows proof helper should own shared script utilities"
         )
         try require(
-            runScript.contains("$configArgs = Add-RomaWindowsAgentConfigurationArgs") &&
+            windowsProofScript.contains("$configArgs = Add-RomaWindowsAgentConfigurationArgs") &&
+                windowsProofScript.contains("return Add-RomaWindowsAgentConfigurationArgs") &&
+                runScript.contains("$configArgs = Add-RomaWindowsAgentConfigurationArgs") &&
                 smokeScript.contains("$configArgs = Add-RomaWindowsAgentConfigurationArgs"),
-            "Windows runner and smoke scripts should share agent config argument construction"
+            "Windows source proof, runner, and smoke scripts should share agent config argument construction"
         )
         let proofCommonHelperScripts = [
             ("windows-proof.ps1", windowsProofScript, ["Invoke-Step", "Assert-OutputContains"]),

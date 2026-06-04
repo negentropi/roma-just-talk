@@ -376,6 +376,9 @@ function Assert-LaptopPreflightReport {
         throw "Laptop preflight proof report is missing package identity fingerprint"
     }
     $source = Get-ReportSourceProvenance -Report $report -ReportName $reportName
+    if ([string]$source['Dirty'] -ne "false") {
+        throw "Laptop preflight proof requires a clean packaged source checkout, got source_dirty=$($source['Dirty'])"
+    }
 
     $os = Require-ReportProperty -Report $report -Name "os" -ReportName $reportName
     $platform = [string](Require-ReportProperty -Report $os -Name "platform" -ReportName $reportName)

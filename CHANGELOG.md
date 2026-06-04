@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Required Windows laptop preflight proof reports to come from clean packaged source checkouts.
 - Required Windows artifact proof reports to expose the listener's per-session WAV output isolation marker.
 - Unwrapped short smart-quoted final-word artifacts such as "“Model.”" in mid-sentence continuations.
 - Cleaned embedded and terminal "uhm"/"erm" pause fillers without leaving stray commas.

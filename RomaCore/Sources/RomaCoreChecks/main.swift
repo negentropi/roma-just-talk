@@ -7103,6 +7103,10 @@ struct RomaCoreChecks {
             "Windows proof-set checker should reject dirty packaged source for final laptop proof"
         )
         try require(
+            checkSetScript.contains("Laptop preflight proof requires a clean packaged source checkout"),
+            "Windows proof-set checker should reject dirty packaged source for laptop preflight proof"
+        )
+        try require(
             checkSetScript.contains("function Assert-SameArtifactSmokeProofSet") &&
                 checkSetScript.contains("Artifact smoke proof requires a clean packaged source checkout") &&
                 checkSetScript.contains("proof_set_artifact_smoke_package_fingerprint="),
@@ -7276,6 +7280,7 @@ struct RomaCoreChecks {
                 packageScript.contains("-NativePreflightOnly") &&
                 packageScript.contains("windows_laptop_preflight_report=") &&
                 packageScript.contains("proof_set_laptop_preflight_matches_full=true") &&
+                packageScript.contains("proof_set_laptop_preflight_source_dirty=false") &&
                 packageScript.contains("proof_set_source_dirty=false") &&
                 packageScript.contains("Full proof validates four JSON reports") &&
                 packageScript.contains("laptop_proof_guide="),

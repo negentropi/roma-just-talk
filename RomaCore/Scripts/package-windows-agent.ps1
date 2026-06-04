@@ -341,6 +341,7 @@ proof_set_ok=laptop-preflight
 windows_laptop_preflight_ok=true
 windows_laptop_preflight_report=C:\tmp\roma-windows-laptop-proof\preflight-proof.json
 proof_set_laptop_preflight_package_fingerprint=
+proof_set_laptop_preflight_source_dirty=false
 proof_set_laptop_preflight_matches_full=true
 proof_set_source_dirty=false
 proof_set_ok=full-laptop

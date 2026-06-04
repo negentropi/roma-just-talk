@@ -46,6 +46,7 @@ Set-Alias -Name Resolve-FullPath -Value Resolve-RomaWindowsFullPath -Scope Local
 Set-Alias -Name Require-File -Value Require-RomaWindowsFile -Scope Local -Force
 Set-Alias -Name Assert-OutputContains -Value Assert-RomaWindowsOutputContains -Scope Local -Force
 Set-Alias -Name Get-FileProof -Value Get-RomaWindowsFileProof -Scope Local -Force
+Set-Alias -Name Get-OptionalFileProof -Value Get-RomaWindowsOptionalFileProof -Scope Local -Force
 Set-Alias -Name Get-CurrentWindowsUserSid -Value Get-RomaWindowsCurrentUserSid -Scope Local -Force
 
 $packageIdentityScript = Join-Path $PSScriptRoot "windows-package-identity.ps1"
@@ -137,22 +138,6 @@ function Get-LocalWhisperPreflightProof {
         executable_present = $Output.Contains("executable=")
         model_file_present = $Output.Contains("model_file=")
     }
-}
-
-function Get-OptionalFileProof {
-    param(
-        [string]$Path = ""
-    )
-
-    if ([string]::IsNullOrWhiteSpace($Path)) {
-        return [ordered]@{
-            path = ""
-            exists = $false
-            bytes = 0
-        }
-    }
-
-    return Get-FileProof -Path $Path
 }
 
 function ConvertTo-PowerShellSingleQuotedString {

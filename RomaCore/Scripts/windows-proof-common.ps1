@@ -526,6 +526,36 @@ function Get-RomaWindowsFileProof {
     }
 }
 
+function Get-RomaWindowsEmptyFileProof {
+    return [ordered]@{
+        path = ""
+        exists = $false
+        bytes = 0
+    }
+}
+
+function Get-RomaWindowsOptionalFileProof {
+    param(
+        [string]$Path = ""
+    )
+
+    if ([string]::IsNullOrWhiteSpace($Path)) {
+        return Get-RomaWindowsEmptyFileProof
+    }
+
+    return Get-RomaWindowsFileProof -Path $Path
+}
+
+function Require-RomaWindowsFileProof {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path
+    )
+
+    Require-RomaWindowsFile -Path $Path
+    return Get-RomaWindowsFileProof -Path $Path
+}
+
 function Get-RomaWindowsFileHashProof {
     param(
         [Parameter(Mandatory = $true)]

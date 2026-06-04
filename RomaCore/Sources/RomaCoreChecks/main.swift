@@ -8777,9 +8777,21 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Add-RomaWindowsProofFields") &&
                 proofCommonScript.contains("function Add-RomaWindowsAgentConfigurationArgs") &&
                 proofCommonScript.contains("function Add-RomaWindowsAgentScriptCommonArgs") &&
+                proofCommonScript.contains("function Get-RomaWindowsEmptyFileProof") &&
+                proofCommonScript.contains("function Get-RomaWindowsOptionalFileProof") &&
+                proofCommonScript.contains("function Require-RomaWindowsFileProof") &&
                 proofCommonScript.contains("function Get-RomaWindowsFileHashProof") &&
                 proofCommonScript.contains("function Get-RomaWindowsInstalledProofSurfaceFileProofs"),
             "Windows proof helper should own shared script utilities"
+        )
+        try require(
+            packageScript.contains("Require-RomaWindowsFileProof -Path $ProofAgentPath") &&
+                packageScript.contains("Get-RomaWindowsEmptyFileProof") &&
+                !packageScript.contains("function New-FileProof") &&
+                !packageScript.contains("function New-EmptyFileProof") &&
+                laptopProofScript.contains("Set-Alias -Name Get-OptionalFileProof -Value Get-RomaWindowsOptionalFileProof") &&
+                !laptopProofScript.contains("function Get-OptionalFileProof"),
+            "Windows package and laptop proof reports should share file-proof report shaping"
         )
         try require(
             packageScript.contains("user_sid = Require-RomaWindowsCurrentUserSid") &&

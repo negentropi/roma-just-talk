@@ -188,28 +188,6 @@ function Get-GitMetadata {
     }
 }
 
-function New-FileProof {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Path
-    )
-
-    $item = Get-Item -LiteralPath $Path
-    return [ordered]@{
-        path = $Path
-        exists = $true
-        bytes = $item.Length
-    }
-}
-
-function New-EmptyFileProof {
-    return [ordered]@{
-        path = ""
-        exists = $false
-        bytes = 0
-    }
-}
-
 function Write-LaptopPreflightCheckerSmokeReport {
     param(
         [Parameter(Mandatory = $true)]
@@ -236,14 +214,14 @@ function Write-LaptopPreflightCheckerSmokeReport {
     [System.Array]::Copy($riffBytes, $wavBytes, $riffBytes.Length)
     [System.IO.File]::WriteAllBytes($micPreflightPath, $wavBytes)
     $whisperCLIProof = if ($IncludeLocalWhisper) {
-        New-FileProof -Path $WhisperCLIPath
+        Require-RomaWindowsFileProof -Path $WhisperCLIPath
     } else {
-        New-EmptyFileProof
+        Get-RomaWindowsEmptyFileProof
     }
     $whisperModelProof = if ($IncludeLocalWhisper) {
-        New-FileProof -Path $WhisperModelPath
+        Require-RomaWindowsFileProof -Path $WhisperModelPath
     } else {
-        New-EmptyFileProof
+        Get-RomaWindowsEmptyFileProof
     }
 
     $report = [ordered]@{
@@ -318,8 +296,8 @@ function Write-LaptopPreflightCheckerSmokeReport {
             }
         }
         files = [ordered]@{
-            proof_agent = New-FileProof -Path $ProofAgentPath
-            mic_preflight_wav = New-FileProof -Path $micPreflightPath
+            proof_agent = Require-RomaWindowsFileProof -Path $ProofAgentPath
+            mic_preflight_wav = Require-RomaWindowsFileProof -Path $micPreflightPath
             whisper_cli = $whisperCLIProof
             whisper_model = $whisperModelProof
         }

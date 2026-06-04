@@ -443,6 +443,62 @@ struct RomaCoreChecks {
             "shared insertion polish should preserve non-technical gotcha continuations"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Wait model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim wait correction fillers before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "No wait module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim no-wait correction fillers before module continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Hold on model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim hold-on correction fillers before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Hang on module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim hang-on correction fillers before module continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Wait now.",
+                context: midSentenceContext
+            ) == "wait now",
+            "shared insertion polish should preserve non-technical wait continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Wait for model.",
+                context: midSentenceContext
+            ) == "wait for model",
+            "shared insertion polish should preserve wait when a technical word is not the immediate continuation"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Hold on now.",
+                context: midSentenceContext
+            ) == "hold on now",
+            "shared insertion polish should preserve non-technical hold-on continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Hang on now.",
+                context: midSentenceContext
+            ) == "hang on now",
+            "shared insertion polish should preserve non-technical hang-on continuations"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("Right model.", context: midSentenceContext) == "right model",
             "shared insertion polish should preserve right as an ordinary fragment word"
         )
@@ -7577,6 +7633,37 @@ struct RomaCoreChecks {
         try require(
             await gotchaInserter.pastedText == " model",
             "pipeline should paste gotcha acknowledgement filler continuations"
+        )
+
+        let waitRecorder = FakeRecorder()
+        let waitInserter = FakeTextInsertion()
+        let waitPipeline = DictationPipeline(
+            recorder: waitRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "wait-continuation-proof.wav",
+                text: "Wait model."
+            ),
+            textInsertion: waitInserter
+        )
+        let waitRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/wait-continuation-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await waitRecorder.startPreRollBuffering()
+        let waitResult = try await waitPipeline.runRecordingWindow(waitRequest) {}
+
+        try require(
+            waitResult.processedText == " model",
+            "pipeline should clean wait correction filler continuations"
+        )
+        try require(
+            await waitInserter.pastedText == " model",
+            "pipeline should paste wait correction filler continuations"
         )
 
         let orWaitNoIMeanRecorder = FakeRecorder()

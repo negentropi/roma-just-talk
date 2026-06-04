@@ -6403,6 +6403,72 @@ struct RomaCoreChecks {
             "pipeline should paste smart-quoted noisy mid-sentence final fragments"
         )
 
+        let smartSingleQuotedFragmentRecorder = FakeRecorder()
+        let smartSingleQuotedFragmentInserter = FakeTextInsertion()
+        let smartSingleQuotedFragmentPipeline = DictationPipeline(
+            recorder: smartSingleQuotedFragmentRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "smart-single-quoted-fragment-proof.wav",
+                text: "‘Model.’."
+            ),
+            textInsertion: smartSingleQuotedFragmentInserter
+        )
+        let smartSingleQuotedFragmentRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/smart-single-quoted-fragment-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await smartSingleQuotedFragmentRecorder.startPreRollBuffering()
+        let smartSingleQuotedFragmentResult = try await smartSingleQuotedFragmentPipeline.runRecordingWindow(
+            smartSingleQuotedFragmentRequest
+        ) {}
+
+        try require(
+            smartSingleQuotedFragmentResult.processedText == " model",
+            "pipeline should clean smart-single-quoted noisy mid-sentence final fragments"
+        )
+        try require(
+            await smartSingleQuotedFragmentInserter.pastedText == " model",
+            "pipeline should paste smart-single-quoted noisy mid-sentence final fragments"
+        )
+
+        let backtickFragmentRecorder = FakeRecorder()
+        let backtickFragmentInserter = FakeTextInsertion()
+        let backtickFragmentPipeline = DictationPipeline(
+            recorder: backtickFragmentRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "backtick-fragment-proof.wav",
+                text: "`Model.`"
+            ),
+            textInsertion: backtickFragmentInserter
+        )
+        let backtickFragmentRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/backtick-fragment-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await backtickFragmentRecorder.startPreRollBuffering()
+        let backtickFragmentResult = try await backtickFragmentPipeline.runRecordingWindow(
+            backtickFragmentRequest
+        ) {}
+
+        try require(
+            backtickFragmentResult.processedText == " model",
+            "pipeline should clean backtick-wrapped noisy mid-sentence final fragments"
+        )
+        try require(
+            await backtickFragmentInserter.pastedText == " model",
+            "pipeline should paste backtick-wrapped noisy mid-sentence final fragments"
+        )
+
         let properNameReplacementRecorder = FakeRecorder()
         let properNameReplacementInserter = FakeTextInsertion()
         let properNameReplacementPipeline = DictationPipeline(

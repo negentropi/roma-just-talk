@@ -2171,6 +2171,14 @@ public struct RomaTranscriptionOutputFilter {
                 return nil
             }
             return markerIndex + 3
+        case "backtrack":
+            return markerIndex + 1
+        case "back":
+            guard tokens[markerIndex + 1].text == "track" else { return nil }
+            return markerIndex + 2
+        case "hold", "hang":
+            guard tokens[markerIndex + 1].text == "on" else { return nil }
+            return markerIndex + 2
         case "i":
             guard ["mean", "meant"].contains(tokens[markerIndex + 1].text) else { return nil }
             let replacementStartIndex = markerIndex + 2
@@ -2282,7 +2290,7 @@ public struct RomaTranscriptionOutputFilter {
     }
 
     private static func isBareUnpunctuatedContinuationCorrectionMarker(_ marker: String) -> Bool {
-        ["actually", "no", "nope", "wait"].contains(marker)
+        ["actually", "back", "backtrack", "hang", "hold", "no", "nope", "wait"].contains(marker)
     }
 
     private static func shouldApplyBareUnpunctuatedContinuationCorrectionMarker(

@@ -317,6 +317,48 @@ struct RomaCoreChecks {
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model no module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should apply bare no corrections in short continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model nope module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should apply bare nope corrections in short continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model actually module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should apply bare actually corrections in short continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model no actually module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should apply no actually corrections in short continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model no wait module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should apply no wait corrections in short continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "I think no module.",
+                context: midSentenceContext
+            ) == "I think no module",
+            "shared insertion polish should preserve bare no prose after non-product source words"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "I would instead wait.",
                 context: midSentenceContext
             ) == "I would instead wait",

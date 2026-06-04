@@ -1896,14 +1896,19 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         for markerIndex in 1..<(tokens.count - 1) {
-            let marker = tokens[markerIndex].text
-            guard ["correction", "instead", "sorry"].contains(marker),
-                  marker != "instead" || tokens[markerIndex + 1].text != "of",
-                  shouldApplyUnpunctuatedContinuationCorrectionMarker(tokens: tokens, markerIndex: markerIndex) else {
+            guard let replacementStartIndex = unpunctuatedContinuationCorrectionReplacementStartIndex(
+                    tokens: tokens,
+                    markerIndex: markerIndex
+                  ),
+                  shouldApplyUnpunctuatedContinuationCorrectionMarker(
+                    tokens: tokens,
+                    markerIndex: markerIndex,
+                    replacementStartIndex: replacementStartIndex
+                  ) else {
                 continue
             }
 
-            let replacementRange = tokens[markerIndex + 1].range.lowerBound..<tokens[tokens.count - 1].range.upperBound
+            let replacementRange = tokens[replacementStartIndex].range.lowerBound..<tokens[tokens.count - 1].range.upperBound
             let replacement = String(trimmedText[replacementRange])
                 .trimmingCharacters(in: .whitespacesAndNewlines)
             guard !replacement.isEmpty else { continue }
@@ -1913,16 +1918,48 @@ public struct RomaTranscriptionOutputFilter {
         return text
     }
 
-    private static func shouldApplyUnpunctuatedContinuationCorrectionMarker(
+    private static func unpunctuatedContinuationCorrectionReplacementStartIndex(
         tokens: [WordToken],
         markerIndex: Int
+    ) -> Int? {
+        let marker = tokens[markerIndex].text
+        switch marker {
+        case "correction", "sorry":
+            return markerIndex + 1
+        case "instead":
+            return tokens[markerIndex + 1].text == "of" ? nil : markerIndex + 1
+        case "actually", "nope":
+            return markerIndex + 1
+        case "no":
+            if markerIndex + 2 < tokens.count,
+               ["actually", "wait"].contains(tokens[markerIndex + 1].text) {
+                return markerIndex + 2
+            }
+            return markerIndex + 1
+        default:
+            return nil
+        }
+    }
+
+    private static func shouldApplyUnpunctuatedContinuationCorrectionMarker(
+        tokens: [WordToken],
+        markerIndex: Int,
+        replacementStartIndex: Int
     ) -> Bool {
         let sourceTokens = tokens[..<markerIndex]
-        let replacementTokens = tokens[(markerIndex + 1)...]
+        let replacementTokens = tokens[replacementStartIndex...]
         guard !sourceTokens.isEmpty,
               !replacementTokens.isEmpty,
               sourceTokens.count <= 2,
               replacementTokens.count <= 2 else {
+            return false
+        }
+
+        if isBareUnpunctuatedContinuationCorrectionMarker(tokens[markerIndex].text),
+           !shouldApplyBareUnpunctuatedContinuationCorrectionMarker(
+            sourceTokens: Array(sourceTokens),
+            replacementTokens: Array(replacementTokens)
+           ) {
             return false
         }
 
@@ -1936,6 +1973,24 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         return true
+    }
+
+    private static func isBareUnpunctuatedContinuationCorrectionMarker(_ marker: String) -> Bool {
+        ["actually", "no", "nope"].contains(marker)
+    }
+
+    private static func shouldApplyBareUnpunctuatedContinuationCorrectionMarker(
+        sourceTokens: [WordToken],
+        replacementTokens: [WordToken]
+    ) -> Bool {
+        guard sourceTokens.count == 1,
+              let sourceWord = sourceTokens.first?.text,
+              let replacementWord = replacementTokens.first?.text else {
+            return false
+        }
+
+        return productCorrectionTailWords.contains(sourceWord) &&
+            productCorrectionTailWords.contains(replacementWord)
     }
 
     private static func isLeadingFillerFollowedByClauseStarter(_ text: String) -> Bool {

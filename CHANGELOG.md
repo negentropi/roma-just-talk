@@ -7,6 +7,7 @@
 - Required Windows full laptop proof reports to come from one generated-at proof window.
 - Collapsed temporal natural restatements such as "at two at three" and "on Tuesday on Wednesday" in post-STT cleanup.
 - Collapsed more date restatements such as "for Tuesday for Wednesday" and "in June in July" in post-STT cleanup.
+- Collapsed deadline and window restatements such as "by Tuesday by Wednesday" and "before Tuesday before Wednesday" in post-STT cleanup.
 - Required Windows laptop proof sets to use runner-style GUID proof session IDs.
 - Collapsed unpunctuated partial-word false starts such as "mo module" and "sh should" in post-STT cleanup.
 - Required real Windows cloud laptop proof to use an audio transcription endpoint route.

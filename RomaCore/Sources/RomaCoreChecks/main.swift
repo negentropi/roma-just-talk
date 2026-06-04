@@ -1284,6 +1284,26 @@ struct RomaCoreChecks {
                 "in-month restatement correction"
             ),
             (
+                "Finish it by Tuesday by Wednesday.",
+                "Finish it by Wednesday.",
+                "deadline date restatement correction"
+            ),
+            (
+                "Submit before Tuesday before Wednesday.",
+                "Submit before Wednesday.",
+                "before-date restatement correction"
+            ),
+            (
+                "Schedule after June after July.",
+                "Schedule after July.",
+                "after-month restatement correction"
+            ),
+            (
+                "Finish it by two by three.",
+                "Finish it by three.",
+                "deadline time restatement correction"
+            ),
+            (
                 "Meet at office at three.",
                 "Meet at office at three.",
                 "location plus time preposition guard"
@@ -1302,6 +1322,21 @@ struct RomaCoreChecks {
                 "Launch in June in Europe.",
                 "Launch in June in Europe.",
                 "in-month plus location preposition guard"
+            ),
+            (
+                "Finish it by Tuesday by the team.",
+                "Finish it by Tuesday by the team.",
+                "deadline date plus actor preposition guard"
+            ),
+            (
+                "Submit before Tuesday before lunch.",
+                "Submit before Tuesday before lunch.",
+                "before-date plus prose preposition guard"
+            ),
+            (
+                "Schedule after June after launch.",
+                "Schedule after June after launch.",
+                "after-month plus prose preposition guard"
             ),
             (
                 "Use model use module.",

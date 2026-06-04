@@ -8301,7 +8301,7 @@ public struct RomaTranscriptionOutputFilter {
 
         for prepositionIndex in 0..<(tokens.count - 3) {
             let preposition = words[prepositionIndex]
-            guard ["at", "on", "for", "in"].contains(preposition) else { continue }
+            guard ["at", "on", "for", "in", "by", "before", "after"].contains(preposition) else { continue }
 
             let maxSecondPrepositionIndex = min(prepositionIndex + 4, tokens.count - 2)
             guard prepositionIndex + 2 <= maxSecondPrepositionIndex else { continue }
@@ -8369,6 +8369,11 @@ public struct RomaTranscriptionOutputFilter {
                 return nil
             }
             return (.date, wordCount)
+        case "by", "before", "after":
+            guard let phrase = leadingTemporalDateOrTimePhrase(in: words) else {
+                return nil
+            }
+            return phrase
         default:
             return nil
         }
@@ -8415,6 +8420,20 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         return 1
+    }
+
+    private static func leadingTemporalDateOrTimePhrase(
+        in words: [String]
+    ) -> (kind: TemporalCorrectionKind, wordCount: Int)? {
+        if let wordCount = leadingTemporalDateWordCount(in: words) {
+            return (.date, wordCount)
+        }
+
+        if let wordCount = leadingTemporalTimeWordCount(in: words) {
+            return (.time, wordCount)
+        }
+
+        return nil
     }
 
     private static func normalizedRepeatWord(_ token: String) -> String? {

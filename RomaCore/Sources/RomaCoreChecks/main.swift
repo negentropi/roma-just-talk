@@ -7952,6 +7952,7 @@ struct RomaCoreChecks {
                 packageScript.contains("package_identity") &&
                 !packageScript.contains(String(repeating: "0", count: 64)) &&
                 packageScript.contains("source_repository = $GitMetadata.Repository") &&
+                packageScript.contains("laptop_native_preflight_checker_smoke_report") &&
                 packageScript.contains("laptop_preflight_checker_smoke_report") &&
                 packageScript.contains("-IncludeLocalWhisper $false") &&
                 packageScript.contains("-IncludeLocalWhisper $true") &&

@@ -717,6 +717,7 @@ try {
         "local_whisper_install_proof_dir=$localWhisperInstallProofDir",
         "local_whisper_install_config=$localWhisperInstallConfigPath",
         "local_whisper_shortcut=$localWhisperShortcutPath",
+        "laptop_native_preflight_checker_smoke_report=$laptopNativePreflightCheckerSmokeReport",
         "laptop_preflight_checker_smoke_report=$laptopPreflightCheckerSmokeReport",
         "smoke_script=$smokeScriptOutput",
         "run_script=$runScriptOutput",

@@ -52,6 +52,7 @@
 - Trimmed full leading "what I mean is ..." and "what I meant was ..." correction fillers before short technical continuations without leaving orphan "is" or "was" fragments.
 - Trimmed leading "make it ...", "call it ...", "replace that with ...", and "change that to ..." correction commands before short technical continuations while preserving ordinary literal continuations.
 - Trimmed leading "scratch that ...", "delete that ...", "remove this ...", and "undo that ..." erase commands before short technical continuations while preserving ordinary literal continuations.
+- Trimmed leading "correction ...", "correction is ...", and "correction should be ..." markers before short technical continuations while preserving ordinary literal continuations.
 - Collapsed short backtrack and hold-on correction fragments in cursor-aware post-STT cleanup.
 - Collapsed nested "correction actually" and "sorry actually" fragments in cursor-aware post-STT cleanup.
 - Collapsed short "or actually" and "or wait no" correction fragments in cursor-aware post-STT cleanup.

@@ -470,7 +470,9 @@ function Write-LaptopProofGuide {
         [string]$OutputPath
     )
 
-    @'
+    $fullProofMarkers = @((Get-RomaWindowsFullLaptopProofGuideMarkers).Values) -join [System.Environment]::NewLine
+
+    @"
 Roma Just Talk Windows laptop proof
 
 Run these commands from this artifact directory.
@@ -512,18 +514,7 @@ powershell -ExecutionPolicy Bypass -File .\check-windows-proof-report.ps1 -Proof
 
 Expected full-proof markers:
 
-proof_set_laptop_preflight_matches_full=true
-proof_set_generated_at_window_minutes=
-proof_profile_ok=laptop-preflight
-proof_profile_ok=cloud-dictation
-proof_profile_ok=local-whisper-dictation
-proof_profile_ok=local-whisper-notepad-paste
-proof_listener_runtime=installed_listener
-listen_completed_sessions=1
-proof_set_source_dirty=false
-proof_set_ok=full-laptop
-windows_laptop_recheck_script=C:\tmp\roma-windows-laptop-proof\recheck-full-laptop-proof.ps1
-windows_laptop_proof_ok=true
+$fullProofMarkers
 
 Archived full-proof recheck, without rerunning capture, transcription, listener, or paste:
 
@@ -539,7 +530,7 @@ windows_laptop_recheck_ok=true
 
 Full proof validates four JSON reports: preflight, cloud dictation, local whisper dictation, and local whisper Notepad paste.
 Do not claim Windows support until the full laptop proof passes on the target Windows machine.
-'@ | Set-Content -LiteralPath $OutputPath -Encoding UTF8
+"@ | Set-Content -LiteralPath $OutputPath -Encoding UTF8
     Write-Host "laptop_proof_guide=$OutputPath"
 }
 

@@ -196,11 +196,7 @@ function Write-FullLaptopProofRecheckScript {
         "    -RequireLaptopPreflight ``",
         "    -RequireFullLaptopProof 2>&1 | Out-String",
         "Write-Host `$proofSetOutput",
-        'Assert-RomaWindowsOutputContains -Output $proofSetOutput -Expected "proof_profile_ok=laptop-preflight"',
-        'Assert-RomaWindowsOutputContains -Output $proofSetOutput -Expected "proof_profile_ok=cloud-dictation"',
-        'Assert-RomaWindowsOutputContains -Output $proofSetOutput -Expected "proof_profile_ok=local-whisper-dictation"',
-        'Assert-RomaWindowsOutputContains -Output $proofSetOutput -Expected "proof_profile_ok=local-whisper-notepad-paste"',
-        'Assert-RomaWindowsOutputContains -Output $proofSetOutput -Expected "proof_set_ok=full-laptop"',
+        "Assert-RomaWindowsFullLaptopProofSetOutput -Output `$proofSetOutput",
         'Write-Host "windows_laptop_recheck_ok=true"'
     )
 

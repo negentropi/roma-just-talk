@@ -9490,24 +9490,26 @@ struct RomaCoreChecks {
                 packageScript.contains("Expected preflight-only proof markers:") &&
                 packageScript.contains("Local whisper preflight also prints:") &&
                 packageScript.contains("Expected full-proof markers:") &&
+                packageScript.contains("Get-RomaWindowsFullLaptopProofGuideMarkers") &&
+                proofCommonScript.contains("function Get-RomaWindowsFullLaptopProofGuideMarkers") &&
                 packageScript.contains("windows_laptop_preflight_report=") &&
-                packageScript.contains("proof_set_laptop_preflight_matches_full=true") &&
-                packageScript.contains("proof_set_generated_at_window_minutes=") &&
-                packageScript.contains("proof_profile_ok=cloud-dictation") &&
-                packageScript.contains("proof_profile_ok=local-whisper-dictation") &&
-                packageScript.contains("proof_profile_ok=local-whisper-notepad-paste") &&
-                packageScript.contains("proof_listener_runtime=installed_listener") &&
-                packageScript.contains("listen_completed_sessions=1") &&
+                proofCommonScript.contains("proof_set_laptop_preflight_matches_full=true") &&
+                proofCommonScript.contains("proof_set_generated_at_window_minutes=") &&
+                proofCommonScript.contains("proof_profile_ok=cloud-dictation") &&
+                proofCommonScript.contains("proof_profile_ok=local-whisper-dictation") &&
+                proofCommonScript.contains("proof_profile_ok=local-whisper-notepad-paste") &&
+                proofCommonScript.contains("proof_listener_runtime=installed_listener") &&
+                proofCommonScript.contains("listen_completed_sessions=1") &&
                 packageScript.contains("proof_set_laptop_preflight_local_whisper=False") &&
                 packageScript.contains("proof_set_laptop_preflight_local_whisper=True") &&
                 packageScript.contains("proof_set_laptop_preflight_source_dirty=false") &&
                 packageScript.contains("microphone_preflight_included_pre_roll_seconds=") &&
                 packageScript.contains("proof_bool=reported_positive_pre_roll value=True") &&
                 packageScript.contains("proof_number=included_pre_roll_seconds value=") &&
-                packageScript.contains("proof_set_source_dirty=false") &&
+                proofCommonScript.contains("proof_set_source_dirty=false") &&
                 packageScript.contains("Archived full-proof recheck") &&
                 packageScript.contains("check-windows-proof-set.ps1 -LaptopPreflightReportPath") &&
-                packageScript.contains("windows_laptop_recheck_script=C:\\tmp\\roma-windows-laptop-proof\\recheck-full-laptop-proof.ps1") &&
+                proofCommonScript.contains("windows_laptop_recheck_script=C:\\tmp\\roma-windows-laptop-proof\\recheck-full-laptop-proof.ps1") &&
                 packageScript.contains("powershell -ExecutionPolicy Bypass -File C:\\tmp\\roma-windows-laptop-proof\\recheck-full-laptop-proof.ps1") &&
                 packageScript.contains("windows_laptop_recheck_ok=true") &&
                 packageScript.contains("cloud-dictation-proof.json") &&
@@ -9523,11 +9525,11 @@ struct RomaCoreChecks {
                 laptopProofScript.contains("windows_laptop_recheck_script=") &&
                 laptopProofScript.contains(#"$checkSetScript = Require-RomaWindowsManifestFile -Manifest $manifest -Key "check_set_script" -BaseDir $PackageDir"#) &&
                 laptopProofScript.contains(#"$proofCommonScript = Require-RomaWindowsManifestFile -Manifest $manifest -Key "proof_common_script" -BaseDir $PackageDir"#) &&
-                laptopProofScript.contains(#"Assert-RomaWindowsOutputContains -Output $proofSetOutput -Expected "proof_profile_ok=laptop-preflight""#) &&
-                laptopProofScript.contains(#"Assert-RomaWindowsOutputContains -Output $proofSetOutput -Expected "proof_profile_ok=cloud-dictation""#) &&
-                laptopProofScript.contains(#"Assert-RomaWindowsOutputContains -Output $proofSetOutput -Expected "proof_profile_ok=local-whisper-dictation""#) &&
-                laptopProofScript.contains(#"Assert-RomaWindowsOutputContains -Output $proofSetOutput -Expected "proof_profile_ok=local-whisper-notepad-paste""#) &&
-                laptopProofScript.contains(#"Assert-RomaWindowsOutputContains -Output $proofSetOutput -Expected "proof_set_ok=full-laptop""#) &&
+                proofCommonScript.contains("function Get-RomaWindowsFullLaptopProofSetOutputMarkers") &&
+                proofCommonScript.contains("function Assert-RomaWindowsFullLaptopProofSetOutput") &&
+                proofCommonScript.contains("proof_profile_ok=laptop-preflight") &&
+                proofCommonScript.contains("proof_set_ok=full-laptop") &&
+                laptopProofScript.contains("Assert-RomaWindowsFullLaptopProofSetOutput -Output `$proofSetOutput") &&
                 laptopProofScript.contains("windows_laptop_recheck_ok=true") &&
                 laptopProofScript.contains("ConvertTo-PowerShellSingleQuotedString") &&
                 laptopProofScript.contains("RequireFullLaptopProof"),

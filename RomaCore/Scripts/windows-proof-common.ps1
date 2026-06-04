@@ -200,6 +200,35 @@ function Get-RomaWindowsMinimumPermissionOutputMarkers {
     }
 }
 
+function Get-RomaWindowsFullLaptopProofSetOutputMarkers {
+    return [ordered]@{
+        laptop_preflight_profile = "proof_profile_ok=laptop-preflight"
+        cloud_dictation_profile = "proof_profile_ok=cloud-dictation"
+        local_whisper_dictation_profile = "proof_profile_ok=local-whisper-dictation"
+        local_whisper_notepad_paste_profile = "proof_profile_ok=local-whisper-notepad-paste"
+        full_laptop_proof_set = "proof_set_ok=full-laptop"
+    }
+}
+
+function Get-RomaWindowsFullLaptopProofGuideMarkers {
+    $markers = [ordered]@{
+        laptop_preflight_matches_full = "proof_set_laptop_preflight_matches_full=true"
+        generated_at_window_minutes = "proof_set_generated_at_window_minutes="
+    }
+
+    $proofSetMarkers = Get-RomaWindowsFullLaptopProofSetOutputMarkers
+    foreach ($key in $proofSetMarkers.Keys) {
+        $markers[$key] = $proofSetMarkers[$key]
+    }
+
+    $markers["listener_runtime"] = "proof_listener_runtime=installed_listener"
+    $markers["listen_completed_sessions"] = "listen_completed_sessions=1"
+    $markers["source_dirty"] = "proof_set_source_dirty=false"
+    $markers["recheck_script"] = "windows_laptop_recheck_script=C:\tmp\roma-windows-laptop-proof\recheck-full-laptop-proof.ps1"
+    $markers["proof_ok"] = "windows_laptop_proof_ok=true"
+    return $markers
+}
+
 function Assert-RomaWindowsOutputMarkers {
     param(
         [Parameter(Mandatory = $true)]
@@ -211,6 +240,16 @@ function Assert-RomaWindowsOutputMarkers {
     foreach ($key in $Markers.Keys) {
         Assert-RomaWindowsOutputContains -Output $Output -Expected $Markers[$key]
     }
+}
+
+function Assert-RomaWindowsFullLaptopProofSetOutput {
+    param(
+        [string]$Output = ""
+    )
+
+    Assert-RomaWindowsOutputMarkers `
+        -Output $Output `
+        -Markers (Get-RomaWindowsFullLaptopProofSetOutputMarkers)
 }
 
 function Get-RomaWindowsOutputMarkerProof {

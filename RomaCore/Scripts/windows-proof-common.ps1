@@ -727,13 +727,22 @@ function Get-RomaWindowsLaptopPreflightLocalWhisperGuideMarkers {
 }
 
 function Get-RomaWindowsFullLaptopProofSetOutputMarkers {
-    return [ordered]@{
-        laptop_preflight_profile = Get-RomaWindowsProofProfileOkMarkerByName -Name "laptop_preflight"
-        cloud_dictation_profile = Get-RomaWindowsProofProfileOkMarkerByName -Name "cloud_dictation"
-        local_whisper_dictation_profile = Get-RomaWindowsProofProfileOkMarkerByName -Name "local_whisper_dictation"
-        local_whisper_notepad_paste_profile = Get-RomaWindowsProofProfileOkMarkerByName -Name "local_whisper_notepad_paste"
-        full_laptop_proof_set = Get-RomaWindowsProofSetOkMarker -Name "full_laptop"
+    $markers = Get-RomaWindowsProofSetProfileOkMarkers -Name "full_laptop"
+    $markers["full_laptop_proof_set"] = Get-RomaWindowsProofSetOkMarker -Name "full_laptop"
+    return $markers
+}
+
+function Get-RomaWindowsProofSetProfileOkMarkers {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    $markers = [ordered]@{}
+    foreach ($profileName in (Get-RomaWindowsProofSetProfileNames -Name $Name)) {
+        $markers["${profileName}_profile"] = Get-RomaWindowsProofProfileOkMarkerByName -Name $profileName
     }
+    return $markers
 }
 
 function Get-RomaWindowsFullLaptopProofGuideMarkers {

@@ -10148,7 +10148,7 @@ struct RomaCoreChecks {
                 checkSetScript.contains("Assert-SameLaptopPreflightProof") &&
                 proofCommonScript.contains(#"ok_marker = "proof_set_ok=laptop-preflight""#) &&
                 proofCommonScript.contains(#"laptop_preflight_proof_set = Get-RomaWindowsProofSetOkMarker -Name "laptop_preflight""#) &&
-                proofCommonScript.contains(#"full_laptop_proof_set = Get-RomaWindowsProofSetOkMarker -Name "full_laptop""#) &&
+                proofCommonScript.contains(#"$markers["full_laptop_proof_set"] = Get-RomaWindowsProofSetOkMarker -Name "full_laptop""#) &&
                 proofCommonScript.contains(#"$markers["proof_set"] = Get-RomaWindowsProofSetOkMarker -Name "laptop_preflight""#) &&
                 checkSetScript.contains(#"Get-RomaWindowsProofSetOkMarker -Name "laptop_preflight""#) &&
                 checkSetScript.contains(#"Get-RomaWindowsProofSetOkMarker -Name "full_laptop""#) &&
@@ -10435,9 +10435,13 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("proof_number=included_pre_roll_seconds value=") &&
                 proofCommonScript.contains("proof_set_laptop_preflight_matches_full=true") &&
                 proofCommonScript.contains("proof_set_generated_at_window_minutes=") &&
-                proofCommonScript.contains(#"cloud_dictation_profile = Get-RomaWindowsProofProfileOkMarkerByName -Name "cloud_dictation""#) &&
-                proofCommonScript.contains(#"local_whisper_dictation_profile = Get-RomaWindowsProofProfileOkMarkerByName -Name "local_whisper_dictation""#) &&
-                proofCommonScript.contains(#"local_whisper_notepad_paste_profile = Get-RomaWindowsProofProfileOkMarkerByName -Name "local_whisper_notepad_paste""#) &&
+                proofCommonScript.contains("function Get-RomaWindowsProofSetProfileOkMarkers") &&
+                proofCommonScript.contains(#"$markers = Get-RomaWindowsProofSetProfileOkMarkers -Name "full_laptop""#) &&
+                proofCommonScript.contains(#"foreach ($profileName in (Get-RomaWindowsProofSetProfileNames -Name $Name))"#) &&
+                proofCommonScript.contains(#"$markers["${profileName}_profile"] = Get-RomaWindowsProofProfileOkMarkerByName -Name $profileName"#) &&
+                !proofCommonScript.contains(#"cloud_dictation_profile = Get-RomaWindowsProofProfileOkMarkerByName -Name "cloud_dictation""#) &&
+                !proofCommonScript.contains(#"local_whisper_dictation_profile = Get-RomaWindowsProofProfileOkMarkerByName -Name "local_whisper_dictation""#) &&
+                !proofCommonScript.contains(#"local_whisper_notepad_paste_profile = Get-RomaWindowsProofProfileOkMarkerByName -Name "local_whisper_notepad_paste""#) &&
                 proofCommonScript.contains("proof_listener_runtime=installed_listener") &&
                 proofCommonScript.contains("listen_completed_sessions=1") &&
                 proofCommonScript.contains("proof_set_source_dirty=false") &&
@@ -10461,8 +10465,9 @@ struct RomaCoreChecks {
                 laptopProofScript.contains(#"$proofCommonScript = Require-RomaWindowsManifestFile -Manifest $manifest -Key "proof_common_script" -BaseDir $PackageDir"#) &&
                 proofCommonScript.contains("function Get-RomaWindowsFullLaptopProofSetOutputMarkers") &&
                 proofCommonScript.contains("function Assert-RomaWindowsFullLaptopProofSetOutput") &&
-                proofCommonScript.contains(#"laptop_preflight_profile = Get-RomaWindowsProofProfileOkMarkerByName -Name "laptop_preflight""#) &&
-                proofCommonScript.contains(#"full_laptop_proof_set = Get-RomaWindowsProofSetOkMarker -Name "full_laptop""#) &&
+                proofCommonScript.contains("function Get-RomaWindowsProofSetProfileOkMarkers") &&
+                proofCommonScript.contains(#"$markers = Get-RomaWindowsProofSetProfileOkMarkers -Name "full_laptop""#) &&
+                proofCommonScript.contains(#"$markers["full_laptop_proof_set"] = Get-RomaWindowsProofSetOkMarker -Name "full_laptop""#) &&
                 laptopProofScript.contains("Assert-RomaWindowsFullLaptopProofSetOutput -Output `$proofSetOutput") &&
                 laptopProofScript.contains("windows_laptop_recheck_ok=true") &&
                 laptopProofScript.contains("ConvertTo-PowerShellSingleQuotedString") &&

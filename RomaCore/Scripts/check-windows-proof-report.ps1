@@ -892,59 +892,13 @@ function Set-ExpectedModeFromProfile {
     $script:ExpectedMode = $Mode
 }
 
-function Join-ProofRequirements {
-    param(
-        [string[]]$Base = @(),
-        [string[]]$Extra = @()
-    )
-
-    return @($Base + $Extra)
-}
-
-function Get-InstalledProofProfileRequirements {
-    param(
-        [bool]$IncludeShortcutProof = $false
-    )
-
-    $requirements = @(
-        "windows_platform",
-        "windows_user",
-        "install",
-        "installed_hash_match"
-    )
-    if ($IncludeShortcutProof) {
-        $requirements += @(
-            "shortcut",
-            "startup_shortcut"
-        )
-    }
-    $requirements += @(
-        "permission_surface",
-        "agent_runtime_wiring",
-        "proof_agent_source_surface",
-        "shared_windows_transcription_path",
-        "shared_windows_proof_args",
-        "listener_pre_roll_runtime_source",
-        "hold_hook_single_window_source",
-        "native_doctor_surface",
-        "packaged_listener",
-        "installed_listener",
-        "listener_shared_pre_roll_runtime",
-        "config_doctor",
-        "installed_listener_agent_path",
-        "hold_hook_config"
-    )
-
-    return $requirements
-}
-
 function Write-ProofProfileRequirements {
     param(
         [Parameter(Mandatory = $true)]
         [string]$Profile
     )
 
-    foreach ($requirement in (Get-ProofProfileRequirements -Profile $Profile)) {
+    foreach ($requirement in (Get-RomaWindowsProofProfileRequirements -Profile $Profile)) {
         Write-Host "proof_requirement=$requirement status=pass"
     }
     Write-Host "proof_profile_ok=$Profile"
@@ -968,93 +922,6 @@ function Enable-InstalledProofProfileAssertions {
     $script:RequireInstalledListener = $true
     $script:RequireConfigDoctor = $true
     $script:RequireHoldHook = $true
-}
-
-function Get-ProofProfileRequirements {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Profile
-    )
-
-    switch ($Profile) {
-        "doctor-only" {
-            return @(
-                "windows_platform",
-                "windows_user",
-                "permission_surface",
-                "agent_runtime_wiring",
-                "proof_agent_source_surface",
-                "shared_windows_transcription_path",
-                "shared_windows_proof_args",
-                "listener_pre_roll_runtime_source",
-                "hold_hook_single_window_source",
-                "native_doctor_surface",
-                "packaged_listener",
-                "listener_shared_pre_roll_runtime"
-            )
-        }
-        "laptop-preflight" {
-            return @(
-                "windows_platform",
-                "windows_user",
-                "clean_source_provenance",
-                "package_identity",
-                "minimum_permission_surface",
-                "hotkey_delivery_preflight",
-                "microphone_preflight",
-                "optional_local_whisper_preflight"
-            )
-        }
-        "cloud-dictation" {
-            return Join-ProofRequirements `
-                -Base (Get-InstalledProofProfileRequirements -IncludeShortcutProof $true) `
-                -Extra @(
-                    "cloud_config",
-                    "real_cloud_backend",
-                    "dictation_runtime",
-                    "pre_roll_audio",
-                    "speech_pcm_contract",
-                    "expected_transcript_text",
-                    "paste_restore_intent",
-                    "paste_sent"
-            )
-        }
-        "local-whisper-dictation" {
-            return Join-ProofRequirements `
-                -Base (Get-InstalledProofProfileRequirements -IncludeShortcutProof $true) `
-                -Extra @(
-                    "local_whisper_config",
-                    "real_whisper_backend",
-                    "dictation_runtime",
-                    "listener_runtime",
-                    "pre_roll_audio",
-                    "speech_pcm_contract",
-                    "expected_transcript_text",
-                    "paste_restore_intent",
-                    "paste_sent"
-            )
-        }
-        "local-whisper-notepad-paste" {
-            return Join-ProofRequirements `
-                -Base (Get-InstalledProofProfileRequirements) `
-                -Extra @(
-                    "local_whisper_config",
-                    "real_whisper_backend",
-                    "notepad_paste"
-            )
-        }
-        "packaged-whisper-mock-install" {
-            return Join-ProofRequirements `
-                -Base (Get-InstalledProofProfileRequirements -IncludeShortcutProof $true) `
-                -Extra @(
-                    "packaged_whisper_mock",
-                    "local_whisper_config"
-            )
-        }
-        default {
-            return @()
-        }
-    }
 }
 
 $ProofReportPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($ProofReportPath)

@@ -362,6 +362,139 @@ function Get-RomaWindowsProofProfileExpectedMode {
     throw "Unknown Windows proof profile: $Profile"
 }
 
+function Join-RomaWindowsProofRequirements {
+    param(
+        [string[]]$Base = @(),
+        [string[]]$Extra = @()
+    )
+
+    return @($Base + $Extra)
+}
+
+function Get-RomaWindowsInstalledProofProfileRequirements {
+    param(
+        [bool]$IncludeShortcutProof = $false
+    )
+
+    $requirements = @(
+        "windows_platform",
+        "windows_user",
+        "install",
+        "installed_hash_match"
+    )
+    if ($IncludeShortcutProof) {
+        $requirements += @(
+            "shortcut",
+            "startup_shortcut"
+        )
+    }
+    $requirements += @(
+        "permission_surface",
+        "agent_runtime_wiring",
+        "proof_agent_source_surface",
+        "shared_windows_transcription_path",
+        "shared_windows_proof_args",
+        "listener_pre_roll_runtime_source",
+        "hold_hook_single_window_source",
+        "native_doctor_surface",
+        "packaged_listener",
+        "installed_listener",
+        "listener_shared_pre_roll_runtime",
+        "config_doctor",
+        "installed_listener_agent_path",
+        "hold_hook_config"
+    )
+
+    return $requirements
+}
+
+function Get-RomaWindowsProofProfileRequirements {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Profile
+    )
+
+    switch ($Profile) {
+        "doctor-only" {
+            return @(
+                "windows_platform",
+                "windows_user",
+                "permission_surface",
+                "agent_runtime_wiring",
+                "proof_agent_source_surface",
+                "shared_windows_transcription_path",
+                "shared_windows_proof_args",
+                "listener_pre_roll_runtime_source",
+                "hold_hook_single_window_source",
+                "native_doctor_surface",
+                "packaged_listener",
+                "listener_shared_pre_roll_runtime"
+            )
+        }
+        "laptop-preflight" {
+            return @(
+                "windows_platform",
+                "windows_user",
+                "clean_source_provenance",
+                "package_identity",
+                "minimum_permission_surface",
+                "hotkey_delivery_preflight",
+                "microphone_preflight",
+                "optional_local_whisper_preflight"
+            )
+        }
+        "cloud-dictation" {
+            return Join-RomaWindowsProofRequirements `
+                -Base (Get-RomaWindowsInstalledProofProfileRequirements -IncludeShortcutProof $true) `
+                -Extra @(
+                    "cloud_config",
+                    "real_cloud_backend",
+                    "dictation_runtime",
+                    "pre_roll_audio",
+                    "speech_pcm_contract",
+                    "expected_transcript_text",
+                    "paste_restore_intent",
+                    "paste_sent"
+            )
+        }
+        "local-whisper-dictation" {
+            return Join-RomaWindowsProofRequirements `
+                -Base (Get-RomaWindowsInstalledProofProfileRequirements -IncludeShortcutProof $true) `
+                -Extra @(
+                    "local_whisper_config",
+                    "real_whisper_backend",
+                    "dictation_runtime",
+                    "listener_runtime",
+                    "pre_roll_audio",
+                    "speech_pcm_contract",
+                    "expected_transcript_text",
+                    "paste_restore_intent",
+                    "paste_sent"
+            )
+        }
+        "local-whisper-notepad-paste" {
+            return Join-RomaWindowsProofRequirements `
+                -Base (Get-RomaWindowsInstalledProofProfileRequirements) `
+                -Extra @(
+                    "local_whisper_config",
+                    "real_whisper_backend",
+                    "notepad_paste"
+            )
+        }
+        "packaged-whisper-mock-install" {
+            return Join-RomaWindowsProofRequirements `
+                -Base (Get-RomaWindowsInstalledProofProfileRequirements -IncludeShortcutProof $true) `
+                -Extra @(
+                    "packaged_whisper_mock",
+                    "local_whisper_config"
+            )
+        }
+        default {
+            return @()
+        }
+    }
+}
+
 function Get-RomaWindowsLaptopPreflightGuideMarkers {
     return [ordered]@{
         laptop_preflight_proof_set = "proof_set_ok=laptop-preflight"

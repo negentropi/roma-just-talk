@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Trimmed unmatched square-bracket artifacts around short continuation fragments.
 - Trimmed leading correction markers before "final word or single" continuations while preserving longer ordinary continuations.
 - Routed Windows proof profile validation through the shared proof profile specs instead of a duplicate parameter list.
 - Shared Windows proof profile expected modes with the proof helper specs.
@@ -18,7 +19,7 @@
 - Shared Windows proof-agent source-marker output through the doctor output module instead of literal-printing the marker list in the proof CLI.
 - Shared Windows proof-report doctor default assertions so agent, proof-agent, keyboard-hook, and paste checks use one default contract.
 - Shared installed Windows proof-profile assertion setup so cloud, local-whisper, Notepad, and packaged-mock profiles enable the same install, doctor, listener, hold-hook, and native-adapter checks.
-- Shared installed Windows proof-profile requirements so cloud, local-whisper, Notepad, and packaged-mock profiles keep the same install, doctor, listener, and native-adapter coverage.
+- Shared Windows proof-profile requirement lists so doctor, preflight, cloud, local-whisper, Notepad, and packaged-mock profiles keep the same install, doctor, listener, and native-adapter coverage.
 - Shared Windows proof-script option validation so source proof, install, launcher, smoke, artifact, and laptop proof paths reject incompatible hold/paste/clipboard options through one helper.
 - Required full Windows laptop local-whisper proof to archive one real installed listener session, not only one-shot dictation and zero-session listener smoke.
 - Required Windows laptop microphone preflight proof to report positive recorded duration and positive included pre-roll seconds.

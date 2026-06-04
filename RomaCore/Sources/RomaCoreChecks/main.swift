@@ -6241,6 +6241,29 @@ struct RomaCoreChecks {
             "insertion polish should unwrap angle-wrapped pipe fragments"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Model].", context: midSentenceContext) == "model",
+            "insertion polish should remove unmatched trailing square brackets from generated fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "A final word or single].",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "insertion polish should remove unmatched trailing square brackets from longer generated fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "[A final word or single",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "insertion polish should remove unmatched leading square brackets from longer generated fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("array[index].", context: midSentenceContext) ==
+                "array[index]",
+            "insertion polish should preserve literal balanced square brackets"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("<model>", context: midSentenceContext) == "<model>",
             "insertion polish should preserve literal angle tokens"
         )
@@ -7884,6 +7907,39 @@ struct RomaCoreChecks {
             "pipeline should paste plain non-ASCII wrapper artifacts as clean continuation text"
         )
 
+        let unmatchedBracketFragmentRecorder = FakeRecorder()
+        let unmatchedBracketFragmentInserter = FakeTextInsertion()
+        let unmatchedBracketFragmentPipeline = DictationPipeline(
+            recorder: unmatchedBracketFragmentRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "unmatched-bracket-fragment-proof.wav",
+                text: "A final word or single]."
+            ),
+            textInsertion: unmatchedBracketFragmentInserter
+        )
+        let unmatchedBracketFragmentRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/unmatched-bracket-fragment-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await unmatchedBracketFragmentRecorder.startPreRollBuffering()
+        let unmatchedBracketFragmentResult = try await unmatchedBracketFragmentPipeline.runRecordingWindow(
+            unmatchedBracketFragmentRequest
+        ) {}
+
+        try require(
+            unmatchedBracketFragmentResult.processedText == " a final word or single",
+            "pipeline should clean unmatched square bracket artifacts during mid-sentence polish"
+        )
+        try require(
+            await unmatchedBracketFragmentInserter.pastedText == " a final word or single",
+            "pipeline should paste unmatched square bracket artifacts as clean continuation text"
+        )
+
         let noWaitIMeanRecorder = FakeRecorder()
         let noWaitIMeanInserter = FakeTextInsertion()
         let noWaitIMeanPipeline = DictationPipeline(
@@ -9202,11 +9258,12 @@ struct RomaCoreChecks {
             "Windows proof profiles should print shared Windows transcription/proof-arg coverage"
         )
         try require(
-            checkReportScript.contains("function Get-InstalledProofProfileRequirements") &&
-                checkReportScript.contains("function Join-ProofRequirements") &&
+            proofCommonScript.contains("function Get-RomaWindowsInstalledProofProfileRequirements") &&
+                proofCommonScript.contains("function Join-RomaWindowsProofRequirements") &&
                 checkReportScript.contains("function Enable-InstalledProofProfileAssertions") &&
                 checkReportScript.contains("function Write-ProofProfileRequirements") &&
-                checkReportScript.contains(#"return Join-ProofRequirements `"#) &&
+                checkReportScript.contains("Get-RomaWindowsProofProfileRequirements -Profile $Profile") &&
+                proofCommonScript.contains(#"return Join-RomaWindowsProofRequirements `"#) &&
                 checkReportScript.contains("$script:RequireInstalledListener = $true") &&
                 checkReportScript.contains("$script:RequireConfigDoctor = $true") &&
                 checkReportScript.contains("Enable-InstalledProofProfileAssertions -IncludeShortcutProof $true") &&
@@ -9693,6 +9750,8 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Get-RomaWindowsProofProfileSpecs") &&
                 proofCommonScript.contains("function Get-RomaWindowsProofProfileName") &&
                 proofCommonScript.contains("function Get-RomaWindowsProofProfileExpectedMode") &&
+                proofCommonScript.contains("function Get-RomaWindowsProofProfileRequirements") &&
+                proofCommonScript.contains("function Get-RomaWindowsInstalledProofProfileRequirements") &&
                 proofCommonScript.contains(#"profile = "laptop-preflight""#) &&
                 proofCommonScript.contains(#"expected_mode = "windows-laptop-preflight""#) &&
                 proofCommonScript.contains(#"read_as_laptop_preflight = $true"#) &&
@@ -9706,7 +9765,11 @@ struct RomaCoreChecks {
                 checkSetScript.contains("Invoke-RequiredProofReportProfileChecks -Checks $profileChecks") &&
                 !checkSetScript.contains("function Assert-LaptopPreflightReport") &&
                 checkReportScript.contains("Get-RomaWindowsProofProfileExpectedMode -Profile $RequireProofProfile") &&
+                checkReportScript.contains("Get-RomaWindowsProofProfileRequirements -Profile $Profile") &&
                 checkReportScript.contains(#"-Expected (Get-RomaWindowsProofProfileExpectedMode -Profile (Get-RomaWindowsProofProfileName -Name "laptop_preflight"))"#) &&
+                !checkReportScript.contains("function Get-ProofProfileRequirements") &&
+                !checkReportScript.contains("function Get-InstalledProofProfileRequirements") &&
+                !checkReportScript.contains("function Join-ProofRequirements") &&
                 !checkReportScript.contains(#"Set-ExpectedModeFromProfile -Mode "cloud""#) &&
                 !checkReportScript.contains(#"Set-ExpectedModeFromProfile -Mode "local-whisper""#) &&
                 !checkReportScript.contains(#"[ValidateSet("", "doctor-only", "laptop-preflight""#) &&

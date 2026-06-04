@@ -34,6 +34,12 @@ $script:hotkeyDeliveryPreflightOutput = ""
 $script:microphonePreflightOutput = ""
 $script:localWhisperPreflightOutput = ""
 
+$packageIdentityScript = Join-Path $PSScriptRoot "windows-package-identity.ps1"
+if (!(Test-Path -LiteralPath $packageIdentityScript)) {
+    throw "Windows package identity helper was not found: $packageIdentityScript"
+}
+. $packageIdentityScript
+
 function Resolve-FullPath {
     param(
         [Parameter(Mandatory = $true)]
@@ -108,85 +114,6 @@ function Get-FileProof {
         path = $Path
         exists = $exists
         bytes = $bytes
-    }
-}
-
-function Get-FileHashProof {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Path
-    )
-
-    $proof = Get-FileProof -Path $Path
-    $proof["sha256"] = ""
-    if ($proof["exists"]) {
-        $proof["sha256"] = (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant()
-    }
-
-    return $proof
-}
-
-function Get-PackageIdentityHash {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string[]]$Entries
-    )
-
-    $inputText = [string]::Join("`n", $Entries)
-    $inputBytes = [System.Text.Encoding]::UTF8.GetBytes($inputText)
-    $sha256 = [System.Security.Cryptography.SHA256]::Create()
-    try {
-        $hashBytes = $sha256.ComputeHash($inputBytes)
-    } finally {
-        $sha256.Dispose()
-    }
-
-    return [System.BitConverter]::ToString($hashBytes).Replace("-", "").ToLowerInvariant()
-}
-
-function Get-PackageIdentityProof {
-    $relativePaths = @(
-        "RomaWindowsAgent.exe",
-        "RomaProofAgent.exe",
-        "RomaWhisperCLIMock.exe",
-        "smoke-windows-agent.ps1",
-        "run-windows-agent.ps1",
-        "install-windows-agent.ps1",
-        "prove-windows-agent-artifact.ps1",
-        "run-windows-laptop-proof.ps1",
-        "WINDOWS-LAPTOP-PROOF.txt",
-        "check-windows-proof-report.ps1",
-        "check-windows-proof-set.ps1",
-        "manifest.txt"
-    )
-
-    $dlls = @(
-        Get-ChildItem -LiteralPath $PackageDir -Filter "*.dll" |
-            Sort-Object Name
-    )
-    foreach ($dll in $dlls) {
-        $relativePaths += $dll.Name
-    }
-
-    $files = [ordered]@{}
-    $entries = @()
-    foreach ($relativePath in $relativePaths) {
-        $path = Join-Path $PackageDir $relativePath
-        $proof = Get-FileHashProof -Path $path
-        $files[$relativePath] = $proof
-        if (!$proof["exists"] -or [string]::IsNullOrWhiteSpace([string]$proof["sha256"])) {
-            throw "Package identity file was not hashable: $path"
-        }
-
-        $entries += ("{0}|{1}|{2}" -f $relativePath, $proof["bytes"], $proof["sha256"])
-    }
-
-    return [ordered]@{
-        algorithm = "sha256"
-        fingerprint = (Get-PackageIdentityHash -Entries $entries)
-        entry_count = $entries.Count
-        entries = $entries
-        files = $files
     }
 }
 
@@ -432,7 +359,7 @@ function Write-PreflightReport {
         package_dir = $PackageDir
         proof_dir = $ProofDir
         manifest = $script:artifactManifest
-        package_identity = (Get-PackageIdentityProof)
+        package_identity = (Get-RomaPackageIdentityProof -PackageDir $PackageDir)
         os = [ordered]@{
             platform = [System.Environment]::OSVersion.Platform.ToString()
             version = [System.Environment]::OSVersion.VersionString

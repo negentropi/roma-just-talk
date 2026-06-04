@@ -7,6 +7,12 @@ param(
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
+$packageIdentityScript = Join-Path $PSScriptRoot "windows-package-identity.ps1"
+if (!(Test-Path -LiteralPath $packageIdentityScript)) {
+    throw "Windows package identity helper was not found: $packageIdentityScript"
+}
+. $packageIdentityScript
+
 function Invoke-Step {
     param(
         [Parameter(Mandatory = $true)]
@@ -210,86 +216,6 @@ function New-FileProof {
     }
 }
 
-function New-FileHashProof {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Path
-    )
-
-    $proof = New-FileProof -Path $Path
-    $proof["sha256"] = (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant()
-    return $proof
-}
-
-function Get-PackageIdentityHash {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string[]]$Entries
-    )
-
-    $inputText = [string]::Join("`n", $Entries)
-    $inputBytes = [System.Text.Encoding]::UTF8.GetBytes($inputText)
-    $sha256 = [System.Security.Cryptography.SHA256]::Create()
-    try {
-        $hashBytes = $sha256.ComputeHash($inputBytes)
-    } finally {
-        $sha256.Dispose()
-    }
-
-    return [System.BitConverter]::ToString($hashBytes).Replace("-", "").ToLowerInvariant()
-}
-
-function Get-PackageIdentityProof {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$PackageDir
-    )
-
-    $relativePaths = @(
-        "RomaWindowsAgent.exe",
-        "RomaProofAgent.exe",
-        "RomaWhisperCLIMock.exe",
-        "smoke-windows-agent.ps1",
-        "run-windows-agent.ps1",
-        "install-windows-agent.ps1",
-        "prove-windows-agent-artifact.ps1",
-        "run-windows-laptop-proof.ps1",
-        "WINDOWS-LAPTOP-PROOF.txt",
-        "check-windows-proof-report.ps1",
-        "check-windows-proof-set.ps1",
-        "manifest.txt"
-    )
-
-    $dlls = @(
-        Get-ChildItem -LiteralPath $PackageDir -Filter "*.dll" |
-            Sort-Object Name
-    )
-    foreach ($dll in $dlls) {
-        $relativePaths += $dll.Name
-    }
-
-    $files = [ordered]@{}
-    $entries = @()
-    foreach ($relativePath in $relativePaths) {
-        $path = Join-Path $PackageDir $relativePath
-        $proof = New-FileHashProof -Path $path
-        $files[$relativePath] = $proof
-        if ([string]::IsNullOrWhiteSpace([string]$proof["sha256"])) {
-            throw "Package identity file was not hashable: $path"
-        }
-
-        $entries += ("{0}|{1}|{2}" -f $relativePath, $proof["bytes"], $proof["sha256"])
-    }
-
-    return [ordered]@{
-        algorithm = "sha256"
-        fingerprint = (Get-PackageIdentityHash -Entries $entries)
-        entry_count = $entries.Count
-        entries = $entries
-        files = $files
-    }
-}
-
 function Get-CurrentWindowsUserSid {
     $identity = [System.Security.Principal.WindowsIdentity]::GetCurrent()
     if ($null -eq $identity -or $null -eq $identity.User) {
@@ -337,7 +263,7 @@ function Write-LaptopPreflightCheckerSmokeReport {
             source_commit = $GitMetadata.Commit
             source_dirty = $GitMetadata.Dirty
         }
-        package_identity = (Get-PackageIdentityProof -PackageDir $PackageDir)
+        package_identity = (Get-RomaPackageIdentityProof -PackageDir $PackageDir)
         os = [ordered]@{
             platform = [System.Environment]::OSVersion.Platform.ToString()
             version = [System.Environment]::OSVersion.VersionString
@@ -463,6 +389,8 @@ try {
     $proofScriptOutput = Join-Path $OutputDir "prove-windows-agent-artifact.ps1"
     $laptopProofScriptSource = Join-Path $PSScriptRoot "run-windows-laptop-proof.ps1"
     $laptopProofScriptOutput = Join-Path $OutputDir "run-windows-laptop-proof.ps1"
+    $identityScriptSource = Join-Path $PSScriptRoot "windows-package-identity.ps1"
+    $identityScriptOutput = Join-Path $OutputDir "windows-package-identity.ps1"
     $checkReportScriptSource = Join-Path $PSScriptRoot "check-windows-proof-report.ps1"
     $checkReportScriptOutput = Join-Path $OutputDir "check-windows-proof-report.ps1"
     $checkSetScriptSource = Join-Path $PSScriptRoot "check-windows-proof-set.ps1"
@@ -530,6 +458,8 @@ try {
         Write-Host "proof_script=$proofScriptOutput"
         Copy-Item -LiteralPath $laptopProofScriptSource -Destination $laptopProofScriptOutput -Force
         Write-Host "laptop_proof_script=$laptopProofScriptOutput"
+        Copy-Item -LiteralPath $identityScriptSource -Destination $identityScriptOutput -Force
+        Write-Host "package_identity_script=$identityScriptOutput"
         Copy-Item -LiteralPath $checkReportScriptSource -Destination $checkReportScriptOutput -Force
         Write-Host "check_report_script=$checkReportScriptOutput"
         Copy-Item -LiteralPath $checkSetScriptSource -Destination $checkSetScriptOutput -Force
@@ -646,6 +576,7 @@ try {
         "proof_script=$proofScriptOutput",
         "laptop_proof_script=$laptopProofScriptOutput",
         "laptop_proof_guide=$laptopProofGuideOutput",
+        "package_identity_script=$identityScriptOutput",
         "check_report_script=$checkReportScriptOutput",
         "check_set_script=$checkSetScriptOutput",
         "swift_runtime_dir=$($swiftRuntime.Directory)",

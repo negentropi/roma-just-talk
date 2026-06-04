@@ -53,7 +53,17 @@ function Resolve-RomaWindowsManifestPath {
 
     $path = Require-RomaWindowsManifestKey -Manifest $Manifest -Key $Key
     if ([System.IO.Path]::IsPathRooted($path)) {
-        return [System.IO.Path]::GetFullPath($path)
+        $fullPath = [System.IO.Path]::GetFullPath($path)
+        if ((Test-Path -LiteralPath $fullPath) -or [string]::IsNullOrWhiteSpace($BaseDir)) {
+            return $fullPath
+        }
+
+        $relocatedPath = Join-Path $BaseDir (Split-Path -Leaf $fullPath)
+        if (Test-Path -LiteralPath $relocatedPath) {
+            return [System.IO.Path]::GetFullPath($relocatedPath)
+        }
+
+        return $fullPath
     }
     if ([string]::IsNullOrWhiteSpace($BaseDir)) {
         return $path

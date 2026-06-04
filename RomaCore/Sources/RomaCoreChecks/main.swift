@@ -8012,6 +8012,8 @@ struct RomaCoreChecks {
                 manifestScript.contains("function Require-RomaWindowsManifestKey") &&
                 manifestScript.contains("function Resolve-RomaWindowsManifestPath") &&
                 manifestScript.contains("function Require-RomaWindowsManifestFile") &&
+                manifestScript.contains("Split-Path -Leaf $fullPath") &&
+                manifestScript.contains("Join-Path $BaseDir") &&
                 manifestScript.contains("Test-Path -LiteralPath $path"),
             "Windows manifest parsing should be computed by one shared packaged helper"
         )

@@ -202,6 +202,7 @@ struct RomaProofAgent {
         print("os_permission_grants=\(surface.osPermissionGrants.joined(separator: ","))")
         print("native_capabilities=\(surface.nativeCapabilities.joined(separator: ","))")
         print("microphone_settings=\(surface.microphoneSettingsPath)")
+        print("microphone_settings_uri=\(surface.microphoneSettingsURI)")
         print("desktop_app_microphone_access_required=\(surface.requiresDesktopAppMicrophoneAccess)")
         print("hotkey_permission_prompt=\(surface.hotKeyPermissionPrompt)")
         print("paste_permission_prompt=\(surface.pastePermissionPrompt)")

@@ -6390,6 +6390,10 @@ struct RomaCoreChecks {
             "Windows permission surface should point users to microphone settings"
         )
         try require(
+            surface.microphoneSettingsURI == "ms-settings:privacy-microphone",
+            "Windows permission surface should expose the direct microphone Settings URI"
+        )
+        try require(
             surface.requiresDesktopAppMicrophoneAccess,
             "Windows microphone proof should require desktop app microphone access"
         )
@@ -7061,6 +7065,12 @@ struct RomaCoreChecks {
             ),
             encoding: .utf8
         )
+        let permissionSurfaceSource = try String(
+            contentsOf: packageRoot.appendingPathComponent(
+                "Sources/RomaCore/Windows/WindowsPermissionSurface.swift"
+            ),
+            encoding: .utf8
+        )
         let proveScript = try String(
             contentsOf: scriptsRoot.appendingPathComponent("prove-windows-agent-artifact.ps1"),
             encoding: .utf8
@@ -7401,6 +7411,21 @@ struct RomaCoreChecks {
                 "Windows proof report checker should require negative permission field \(field)"
             )
         }
+        try require(
+            permissionSurfaceSource.contains("microphoneSettingsURI") &&
+                permissionSurfaceSource.contains("ms-settings:privacy-microphone"),
+            "Windows permission surface should expose the direct microphone Settings URI"
+        )
+        try require(
+            proofAgentSource.contains(#"print("microphone_settings_uri=\(surface.microphoneSettingsURI)")"#) &&
+                windowsAgentSource.contains(#"print("microphone_settings_uri=\(permissionSurface.microphoneSettingsURI)")"#),
+            "Windows doctors should print the direct microphone Settings URI"
+        )
+        try require(
+            proveScript.contains(#"microphone_settings_uri = $Output.Contains("microphone_settings_uri=ms-settings:privacy-microphone")"#) &&
+                checkReportScript.contains(#"Assert-Boolean -Object $Proof -Name "microphone_settings_uri" -Expected $true"#),
+            "Windows artifact proof should record and require the direct microphone Settings URI"
+        )
         let artifactDefaultAssertions = [
             "default_record_seconds=2.0",
             "default_hold_timeout_seconds=15.0",
@@ -7446,6 +7471,7 @@ struct RomaCoreChecks {
             "native_capabilities=RegisterHotKey",
             "paste=win32_clipboard_sendinput",
             "secret_store=dpapi",
+            "microphone_settings_uri=ms-settings:privacy-microphone",
             "accessibility_permission_prompt=false",
             "automation_permission_prompt=false",
             "admin_required=false",
@@ -7463,6 +7489,7 @@ struct RomaCoreChecks {
             )
         }
         let minimumPermissionOutputAssertions = [
+            "microphone_settings_uri=ms-settings:privacy-microphone",
             "accessibility_permission_prompt=false",
             "automation_permission_prompt=false",
             "screen_recording_permission_prompt=false"

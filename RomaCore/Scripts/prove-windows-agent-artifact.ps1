@@ -549,6 +549,7 @@ function Get-DoctorOutputProof {
         paste_win32_clipboard_sendinput = $Output.Contains("paste=win32_clipboard_sendinput")
         secret_store_dpapi = $Output.Contains("secret_store=dpapi")
         os_permission_grants_microphone = $Output.Contains("os_permission_grants=microphone")
+        microphone_settings_uri = $Output.Contains("microphone_settings_uri=ms-settings:privacy-microphone")
         native_capabilities_register_hotkey = $Output.Contains("native_capabilities=RegisterHotKey")
         default_record_seconds = $Output.Contains("default_record_seconds=2.0")
         default_hold_timeout_seconds = $Output.Contains("default_hold_timeout_seconds=15.0")
@@ -941,6 +942,7 @@ Invoke-Step "packaged agent doctor" {
     Assert-OutputContains -Output $script:packagedAgentDoctorOutput -Expected "default_hold_timeout_milliseconds=15000"
     Assert-OutputContains -Output $script:packagedAgentDoctorOutput -Expected "default_clipboard_restore_delay_seconds=2.0"
     Assert-OutputContains -Output $script:packagedAgentDoctorOutput -Expected "maximum_clipboard_restore_delay_seconds=4294967.295"
+    Assert-OutputContains -Output $script:packagedAgentDoctorOutput -Expected "microphone_settings_uri=ms-settings:privacy-microphone"
 }
 
 Invoke-Step "packaged proof agent doctor" {

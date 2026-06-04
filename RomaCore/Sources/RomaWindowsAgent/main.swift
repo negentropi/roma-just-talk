@@ -58,6 +58,7 @@ struct RomaWindowsAgent {
         print("os_permission_grants=\(permissionSurface.osPermissionGrants.joined(separator: ","))")
         print("native_capabilities=\(permissionSurface.nativeCapabilities.joined(separator: ","))")
         print("microphone_settings=\(permissionSurface.microphoneSettingsPath)")
+        print("microphone_settings_uri=\(permissionSurface.microphoneSettingsURI)")
         print("desktop_app_microphone_access_required=\(permissionSurface.requiresDesktopAppMicrophoneAccess)")
         print("hotkey_permission_prompt=\(permissionSurface.hotKeyPermissionPrompt)")
         print("paste_permission_prompt=\(permissionSurface.pastePermissionPrompt)")

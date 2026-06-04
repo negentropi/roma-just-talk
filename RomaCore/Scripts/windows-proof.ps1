@@ -312,6 +312,7 @@ try {
         Assert-OutputContains -Output $windowsAgentDoctorOutput -Expected "default_clipboard_restore_delay_seconds=2.0"
         Assert-OutputContains -Output $windowsAgentDoctorOutput -Expected "maximum_clipboard_restore_delay_seconds=4294967.295"
         Assert-OutputContains -Output $windowsAgentDoctorOutput -Expected "admin_required=false"
+        Assert-OutputContains -Output $windowsAgentDoctorOutput -Expected "microphone_settings_uri=ms-settings:privacy-microphone"
         Assert-OutputContains -Output $windowsAgentDoctorOutput -Expected "accessibility_permission_prompt=false"
         Assert-OutputContains -Output $windowsAgentDoctorOutput -Expected "automation_permission_prompt=false"
         Assert-OutputContains -Output $windowsAgentDoctorOutput -Expected "startup_launcher=run-windows-agent.ps1"
@@ -510,6 +511,7 @@ try {
         Write-Host $permissionDoctorOutput
         Assert-OutputContains -Output $permissionDoctorOutput -Expected "os_permission_grants=microphone"
         Assert-OutputContains -Output $permissionDoctorOutput -Expected "native_capabilities=RegisterHotKey"
+        Assert-OutputContains -Output $permissionDoctorOutput -Expected "microphone_settings_uri=ms-settings:privacy-microphone"
         Assert-OutputContains -Output $permissionDoctorOutput -Expected "admin_required=false"
         Assert-OutputContains -Output $permissionDoctorOutput -Expected "accessibility_permission_prompt=false"
         Assert-OutputContains -Output $permissionDoctorOutput -Expected "automation_permission_prompt=false"

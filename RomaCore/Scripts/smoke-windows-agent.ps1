@@ -184,6 +184,7 @@ Invoke-Step "agent doctor" {
     Assert-OutputContains -Output $doctorOutput -Expected "default_clipboard_restore_delay_seconds=2.0"
     Assert-OutputContains -Output $doctorOutput -Expected "maximum_clipboard_restore_delay_seconds=4294967.295"
     Assert-OutputContains -Output $doctorOutput -Expected "admin_required=false"
+    Assert-OutputContains -Output $doctorOutput -Expected "microphone_settings_uri=ms-settings:privacy-microphone"
     Assert-OutputContains -Output $doctorOutput -Expected "accessibility_permission_prompt=false"
     Assert-OutputContains -Output $doctorOutput -Expected "automation_permission_prompt=false"
     Assert-OutputContains -Output $doctorOutput -Expected "startup_launcher=run-windows-agent.ps1"

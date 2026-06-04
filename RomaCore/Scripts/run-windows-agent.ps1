@@ -115,6 +115,7 @@ Assert-OutputContains -Output $doctorOutput -Expected "os_permission_grants=micr
 Assert-OutputContains -Output $doctorOutput -Expected "native_capabilities=RegisterHotKey"
 Assert-OutputContains -Output $doctorOutput -Expected "paste=win32_clipboard_sendinput"
 Assert-OutputContains -Output $doctorOutput -Expected "secret_store=dpapi"
+Assert-OutputContains -Output $doctorOutput -Expected "microphone_settings_uri=ms-settings:privacy-microphone"
 Assert-OutputContains -Output $doctorOutput -Expected "accessibility_permission_prompt=false"
 Assert-OutputContains -Output $doctorOutput -Expected "automation_permission_prompt=false"
 Assert-OutputContains -Output $doctorOutput -Expected "admin_required=false"

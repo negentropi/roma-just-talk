@@ -144,7 +144,7 @@ Windows is not macOS TCC.
 - Screen/window context: skip for MVP. Screen OCR/context has a separate permission and product-risk surface on both platforms.
 
 Minimum Windows MVP surface: microphone + shortcut + clipboard/paste. The only OS permission grant in that MVP is microphone access; hotkey, paste, DPAPI, and login start are native capabilities with no prompt flow, and the Windows doctor explicitly reports no Accessibility, Automation, Screen Recording, or screen-capture requirement. Paste is still limited to equal-or-lower integrity targets. Do not start with screen capture, browser URL detection, media control, or app-aware modes.
-Run `swift run RomaProofAgent windows-permission-doctor` or `RomaWindowsAgent doctor` to print the shared OS-grant/native-capability split before laptop smoke tests.
+Run `swift run RomaProofAgent windows-permission-doctor` or `RomaWindowsAgent doctor` to print the shared OS-grant/native-capability split before laptop smoke tests. The doctor also prints `microphone_settings_uri=ms-settings:privacy-microphone`, which is the direct Windows Settings page to open when laptop microphone access blocks preflight.
 
 ## First Implementation Plan
 

@@ -5,6 +5,7 @@ public struct WindowsPermissionSurface: Equatable, Hashable, Sendable {
     public var osPermissionGrants: [String]
     public var nativeCapabilities: [String]
     public var microphoneSettingsPath: String
+    public var microphoneSettingsURI: String
     public var requiresDesktopAppMicrophoneAccess: Bool
     public var hotKeyPermissionPrompt: Bool
     public var pastePermissionPrompt: Bool
@@ -24,6 +25,7 @@ public struct WindowsPermissionSurface: Equatable, Hashable, Sendable {
         osPermissionGrants: [String],
         nativeCapabilities: [String],
         microphoneSettingsPath: String,
+        microphoneSettingsURI: String,
         requiresDesktopAppMicrophoneAccess: Bool,
         hotKeyPermissionPrompt: Bool,
         pastePermissionPrompt: Bool,
@@ -42,6 +44,7 @@ public struct WindowsPermissionSurface: Equatable, Hashable, Sendable {
         self.osPermissionGrants = osPermissionGrants
         self.nativeCapabilities = nativeCapabilities
         self.microphoneSettingsPath = microphoneSettingsPath
+        self.microphoneSettingsURI = microphoneSettingsURI
         self.requiresDesktopAppMicrophoneAccess = requiresDesktopAppMicrophoneAccess
         self.hotKeyPermissionPrompt = hotKeyPermissionPrompt
         self.pastePermissionPrompt = pastePermissionPrompt
@@ -69,6 +72,7 @@ public struct WindowsPermissionSurface: Equatable, Hashable, Sendable {
             "user Startup folder shortcut"
         ],
         microphoneSettingsPath: "Settings > Privacy & security > Microphone",
+        microphoneSettingsURI: "ms-settings:privacy-microphone",
         requiresDesktopAppMicrophoneAccess: true,
         hotKeyPermissionPrompt: false,
         pastePermissionPrompt: false,

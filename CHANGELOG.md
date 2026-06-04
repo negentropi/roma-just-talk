@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Shared Windows proof profile expected modes with the proof helper specs.
 - Shared Windows proof profile metadata between the proof helper and proof-set checker.
 - Shared Windows laptop preflight proof field shaping across the runner and checker surface.
 - Shared Windows proof-report native-doctor validation with the native-doctor spec map.

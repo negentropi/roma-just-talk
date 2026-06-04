@@ -767,7 +767,7 @@ function Assert-LaptopPreflightReport {
 
     Assert-StringEquals `
         -Actual ([string](Require-Property -Object $Report -Name "proof_mode")) `
-        -Expected "windows-laptop-preflight" `
+        -Expected (Get-RomaWindowsProofProfileExpectedMode -Profile (Get-RomaWindowsProofProfileName -Name "laptop_preflight")) `
         -Name "proof_mode"
     Assert-Boolean -Object $Report -Name "preflight_only" -Expected $true
     $proofSessionId = Assert-ProofSessionId `
@@ -1066,9 +1066,14 @@ if (!(Test-Path -LiteralPath $ProofReportPath)) {
 $report = Get-Content -LiteralPath $ProofReportPath -Raw | ConvertFrom-Json
 $dictationRuntime = $null
 
+if (![string]::IsNullOrWhiteSpace($RequireProofProfile)) {
+    Set-ExpectedModeFromProfile `
+        -Mode (Get-RomaWindowsProofProfileExpectedMode -Profile $RequireProofProfile) `
+        -Profile $RequireProofProfile
+}
+
 switch ($RequireProofProfile) {
     "doctor-only" {
-        Set-ExpectedModeFromProfile -Mode "doctor-only" -Profile $RequireProofProfile
         $RequireWindowsPlatform = $true
         $RequirePermissionSurface = $true
         $RequireProofAgentSurface = $true
@@ -1076,10 +1081,8 @@ switch ($RequireProofProfile) {
         $RequirePackagedListener = $true
     }
     "laptop-preflight" {
-        Set-ExpectedModeFromProfile -Mode "windows-laptop-preflight" -Profile $RequireProofProfile
     }
     "cloud-dictation" {
-        Set-ExpectedModeFromProfile -Mode "cloud" -Profile $RequireProofProfile
         Enable-InstalledProofProfileAssertions -IncludeShortcutProof $true
         $RequireCloudConfig = $true
         $RequireRealCloudBackend = $true
@@ -1088,7 +1091,6 @@ switch ($RequireProofProfile) {
         $RequirePaste = $true
     }
     "local-whisper-dictation" {
-        Set-ExpectedModeFromProfile -Mode "local-whisper" -Profile $RequireProofProfile
         Enable-InstalledProofProfileAssertions -IncludeShortcutProof $true
         $RequireWhisperConfig = $true
         $RequireRealWhisperBackend = $true
@@ -1098,14 +1100,12 @@ switch ($RequireProofProfile) {
         $RequirePaste = $true
     }
     "local-whisper-notepad-paste" {
-        Set-ExpectedModeFromProfile -Mode "local-whisper" -Profile $RequireProofProfile
         Enable-InstalledProofProfileAssertions
         $RequireWhisperConfig = $true
         $RequireRealWhisperBackend = $true
         $RequireNotepadPaste = $true
     }
     "packaged-whisper-mock-install" {
-        Set-ExpectedModeFromProfile -Mode "packaged-whisper-mock" -Profile $RequireProofProfile
         Enable-InstalledProofProfileAssertions -IncludeShortcutProof $true
         $RequirePackagedMock = $true
         $RequireWhisperConfig = $true

@@ -9640,7 +9640,9 @@ struct RomaCoreChecks {
             checkSetScript.contains("RequireLaptopPreflight") &&
                 proofCommonScript.contains("function Get-RomaWindowsProofProfileSpecs") &&
                 proofCommonScript.contains("function Get-RomaWindowsProofProfileName") &&
+                proofCommonScript.contains("function Get-RomaWindowsProofProfileExpectedMode") &&
                 proofCommonScript.contains(#"profile = "laptop-preflight""#) &&
+                proofCommonScript.contains(#"expected_mode = "windows-laptop-preflight""#) &&
                 proofCommonScript.contains(#"read_as_laptop_preflight = $true"#) &&
                 checkSetScript.contains(". $proofCommonScript") &&
                 checkSetScript.contains("$profiles = Get-RomaWindowsProofProfileSpecs") &&
@@ -9651,6 +9653,10 @@ struct RomaCoreChecks {
                 checkSetScript.contains(#"ReadAsLaptopPreflight = [bool]$profiles["laptop_preflight"]["read_as_laptop_preflight"]"#) &&
                 checkSetScript.contains("Invoke-RequiredProofReportProfileChecks -Checks $profileChecks") &&
                 !checkSetScript.contains("function Assert-LaptopPreflightReport") &&
+                checkReportScript.contains("Get-RomaWindowsProofProfileExpectedMode -Profile $RequireProofProfile") &&
+                checkReportScript.contains(#"-Expected (Get-RomaWindowsProofProfileExpectedMode -Profile (Get-RomaWindowsProofProfileName -Name "laptop_preflight"))"#) &&
+                !checkReportScript.contains(#"Set-ExpectedModeFromProfile -Mode "cloud""#) &&
+                !checkReportScript.contains(#"Set-ExpectedModeFromProfile -Mode "local-whisper""#) &&
                 checkReportScript.contains(#"[ValidateSet("", "doctor-only", "laptop-preflight""#) &&
                 checkReportScript.contains("function Assert-LaptopPreflightReport") &&
                 checkReportScript.contains(#""laptop-preflight" {"#) &&

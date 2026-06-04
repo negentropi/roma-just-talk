@@ -303,26 +303,32 @@ function Get-RomaWindowsProofProfileSpecs {
     return [ordered]@{
         doctor_only = [ordered]@{
             profile = "doctor-only"
+            expected_mode = "doctor-only"
             read_as_laptop_preflight = $false
         }
         cloud_dictation = [ordered]@{
             profile = "cloud-dictation"
+            expected_mode = "cloud"
             read_as_laptop_preflight = $false
         }
         local_whisper_dictation = [ordered]@{
             profile = "local-whisper-dictation"
+            expected_mode = "local-whisper"
             read_as_laptop_preflight = $false
         }
         local_whisper_notepad_paste = [ordered]@{
             profile = "local-whisper-notepad-paste"
+            expected_mode = "local-whisper"
             read_as_laptop_preflight = $false
         }
         laptop_preflight = [ordered]@{
             profile = "laptop-preflight"
+            expected_mode = "windows-laptop-preflight"
             read_as_laptop_preflight = $true
         }
         packaged_whisper_mock_install = [ordered]@{
             profile = "packaged-whisper-mock-install"
+            expected_mode = "packaged-whisper-mock"
             read_as_laptop_preflight = $false
         }
     }
@@ -339,6 +345,21 @@ function Get-RomaWindowsProofProfileName {
         throw "Unknown Windows proof profile name: $Name"
     }
     return [string]$profiles[$Name]["profile"]
+}
+
+function Get-RomaWindowsProofProfileExpectedMode {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Profile
+    )
+
+    $profiles = Get-RomaWindowsProofProfileSpecs
+    foreach ($name in $profiles.Keys) {
+        if ([string]$profiles[$name]["profile"] -eq $Profile) {
+            return [string]$profiles[$name]["expected_mode"]
+        }
+    }
+    throw "Unknown Windows proof profile: $Profile"
 }
 
 function Get-RomaWindowsLaptopPreflightGuideMarkers {

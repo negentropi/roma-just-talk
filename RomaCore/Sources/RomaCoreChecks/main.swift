@@ -7446,8 +7446,8 @@ struct RomaCoreChecks {
         ]
         for field in proofReportDefaultFields {
             try require(
-                proveScript.contains(#"\#(field) = $Output.Contains("#),
-                "Windows artifact proof reports should record doctor default field \(field)"
+                proofCommonScript.contains("\(field) ="),
+                "Windows proof helper should map doctor default proof field \(field)"
             )
             try require(
                 checkReportScript.contains(#"Assert-Boolean -Object $Proof -Name "\#(field)" -Expected $true"#),
@@ -7461,8 +7461,8 @@ struct RomaCoreChecks {
         ]
         for field in proofReportNegativePermissionFields {
             try require(
-                proveScript.contains(#"\#(field) = $Output.Contains("#),
-                "Windows artifact proof reports should record negative permission field \(field)"
+                proofCommonScript.contains("\(field) ="),
+                "Windows proof helper should map negative permission proof field \(field)"
             )
             try require(
                 checkReportScript.contains(#"Assert-Boolean -Object $Proof -Name "\#(field)" -Expected $true"#),
@@ -7485,9 +7485,13 @@ struct RomaCoreChecks {
             "Windows doctors should print permission markers through the shared permission surface"
         )
         try require(
-            proveScript.contains(#"microphone_settings_uri = $Output.Contains("microphone_settings_uri=ms-settings:privacy-microphone")"#) &&
-                checkReportScript.contains(#"Assert-Boolean -Object $Proof -Name "microphone_settings_uri" -Expected $true"#),
-            "Windows artifact proof should record and require the direct microphone Settings URI"
+            proveScript.contains("Get-RomaWindowsMinimumPermissionOutputProof -Output $Output") &&
+                proveScript.contains("Get-RomaWindowsRuntimeDefaultOutputProof -Output $Output") &&
+                proveScript.contains("Get-RomaWindowsHoldTimeoutDefaultOutputProof -Output $Output") &&
+                proveScript.contains("Get-RomaWindowsClipboardRestoreDefaultOutputProof -Output $Output") &&
+                checkReportScript.contains(#"Assert-Boolean -Object $Proof -Name "microphone_settings_uri" -Expected $true"#) &&
+                checkReportScript.contains(#"Assert-Boolean -Object $Proof -Name "desktop_app_microphone_access_required" -Expected $true"#),
+            "Windows artifact proof should record shared doctor marker proof fields"
         )
         let artifactDefaultAssertions = [
             "default_record_seconds=2.0",
@@ -7850,6 +7854,11 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Assert-RomaWindowsHoldTimeoutDefaultOutput") &&
                 proofCommonScript.contains("function Assert-RomaWindowsClipboardRestoreDefaultOutput") &&
                 proofCommonScript.contains("function Assert-RomaWindowsMinimumPermissionOutput") &&
+                proofCommonScript.contains("function Get-RomaWindowsRuntimeDefaultOutputProof") &&
+                proofCommonScript.contains("function Get-RomaWindowsHoldTimeoutDefaultOutputProof") &&
+                proofCommonScript.contains("function Get-RomaWindowsClipboardRestoreDefaultOutputProof") &&
+                proofCommonScript.contains("function Get-RomaWindowsMinimumPermissionOutputProof") &&
+                proofCommonScript.contains("function Add-RomaWindowsProofFields") &&
                 proofCommonScript.contains("function Add-RomaWindowsAgentConfigurationArgs") &&
                 proofCommonScript.contains("function Add-RomaWindowsAgentScriptCommonArgs") &&
                 proofCommonScript.contains("function Get-RomaWindowsFileHashProof"),

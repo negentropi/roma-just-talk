@@ -541,30 +541,17 @@ function Get-DoctorOutputProof {
         [string]$Output = ""
     )
 
-    return [ordered]@{
+    $proof = [ordered]@{
         output_present = ![string]::IsNullOrWhiteSpace($Output)
         runtime_available = $Output.Contains("runtime_available=true")
         dictation_runtime = $Output.Contains("dictation_runtime=WindowsDictationRuntime")
         recorder_miniaudio = $Output.Contains("recorder=miniaudio")
         paste_win32_clipboard_sendinput = $Output.Contains("paste=win32_clipboard_sendinput")
         secret_store_dpapi = $Output.Contains("secret_store=dpapi")
-        os_permission_grants_microphone = $Output.Contains("os_permission_grants=microphone")
-        microphone_settings_uri = $Output.Contains("microphone_settings_uri=ms-settings:privacy-microphone")
-        native_capabilities_register_hotkey = $Output.Contains("native_capabilities=RegisterHotKey")
-        default_record_seconds = $Output.Contains("default_record_seconds=2.0")
-        default_hold_timeout_seconds = $Output.Contains("default_hold_timeout_seconds=15.0")
-        default_hold_timeout_milliseconds = $Output.Contains("default_hold_timeout_milliseconds=15000")
-        default_clipboard_restore_delay_seconds = $Output.Contains("default_clipboard_restore_delay_seconds=2.0")
-        maximum_clipboard_restore_delay_seconds = $Output.Contains("maximum_clipboard_restore_delay_seconds=4294967.295")
-        no_accessibility_permission_prompt = $Output.Contains("accessibility_permission_prompt=false")
-        no_automation_permission_prompt = $Output.Contains("automation_permission_prompt=false")
-        no_admin_required = $Output.Contains("admin_required=false")
-        startup_launcher_run_script = $Output.Contains("startup_launcher=run-windows-agent.ps1")
-        startup_launch_mode_listen = $Output.Contains("startup_launch_mode=listen")
-        no_startup_permission_prompt = $Output.Contains("startup_permission_prompt=false")
-        no_screen_capture_required = $Output.Contains("screen_capture_required=false")
-        no_screen_recording_permission_prompt = $Output.Contains("screen_recording_permission_prompt=false")
     }
+    Add-RomaWindowsProofFields -Proof $proof -Fields (Get-RomaWindowsMinimumPermissionOutputProof -Output $Output) | Out-Null
+    Add-RomaWindowsProofFields -Proof $proof -Fields (Get-RomaWindowsRuntimeDefaultOutputProof -Output $Output) | Out-Null
+    return $proof
 }
 
 function Get-ProofAgentDoctorOutputProof {
@@ -572,16 +559,11 @@ function Get-ProofAgentDoctorOutputProof {
         [string]$Output = ""
     )
 
-    return [ordered]@{
+    $proof = [ordered]@{
         output_present = ![string]::IsNullOrWhiteSpace($Output)
         swift_core = $Output.Contains("swift_core=true")
         native_windows_adapters = $Output.Contains("native_windows_adapters=true")
         pre_roll_config = $Output.Contains("pre_roll_seconds=")
-        default_record_seconds = $Output.Contains("default_record_seconds=2.0")
-        default_hold_timeout_seconds = $Output.Contains("default_hold_timeout_seconds=15.0")
-        default_hold_timeout_milliseconds = $Output.Contains("default_hold_timeout_milliseconds=15000")
-        default_clipboard_restore_delay_seconds = $Output.Contains("default_clipboard_restore_delay_seconds=2.0")
-        maximum_clipboard_restore_delay_seconds = $Output.Contains("maximum_clipboard_restore_delay_seconds=4294967.295")
         windows_paste_adapter_source = $Output.Contains("windows_paste_adapter_source=true")
         windows_permission_surface_source = $Output.Contains("windows_permission_surface_source=true")
         windows_dictation_runtime_source = $Output.Contains("windows_dictation_runtime_source=true")
@@ -597,6 +579,8 @@ function Get-ProofAgentDoctorOutputProof {
         word_replacement_processor_source = $Output.Contains("word_replacement_processor_source=true")
         windows_proof_args_shared_source = $Output.Contains("windows_proof_args_shared_source=true")
     }
+    Add-RomaWindowsProofFields -Proof $proof -Fields (Get-RomaWindowsRuntimeDefaultOutputProof -Output $Output) | Out-Null
+    return $proof
 }
 
 function Get-NativeDoctorOutputProof {
@@ -606,17 +590,16 @@ function Get-NativeDoctorOutputProof {
         [string]$ExpectedMarker
     )
 
-    return [ordered]@{
+    $proof = [ordered]@{
         output_present = ![string]::IsNullOrWhiteSpace($Output)
         platform_windows = $Output.Contains("platform=windows")
         expected_marker = $ExpectedMarker
         expected_marker_present = $Output.Contains($ExpectedMarker)
         register_hotkey_available = $Output.Contains("hotkey_registration_available=true")
-        default_hold_timeout_seconds = $Output.Contains("default_timeout_seconds=15.0")
-        default_hold_timeout_milliseconds = $Output.Contains("default_timeout_milliseconds=15000")
-        default_clipboard_restore_delay_seconds = $Output.Contains("default_clipboard_restore_delay_seconds=2.0")
-        maximum_clipboard_restore_delay_seconds = $Output.Contains("maximum_clipboard_restore_delay_seconds=4294967.295")
     }
+    Add-RomaWindowsProofFields -Proof $proof -Fields (Get-RomaWindowsHoldTimeoutDefaultOutputProof -Output $Output) | Out-Null
+    Add-RomaWindowsProofFields -Proof $proof -Fields (Get-RomaWindowsClipboardRestoreDefaultOutputProof -Output $Output) | Out-Null
+    return $proof
 }
 
 function Get-ListenerSmokeProof {

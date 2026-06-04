@@ -444,6 +444,7 @@ function Assert-DoctorOutputProof {
     Assert-Boolean -Object $Proof -Name "secret_store_dpapi" -Expected $true
     Assert-Boolean -Object $Proof -Name "os_permission_grants_microphone" -Expected $true
     Assert-Boolean -Object $Proof -Name "microphone_settings_uri" -Expected $true
+    Assert-Boolean -Object $Proof -Name "desktop_app_microphone_access_required" -Expected $true
     Assert-Boolean -Object $Proof -Name "native_capabilities_register_hotkey" -Expected $true
     Assert-Boolean -Object $Proof -Name "default_record_seconds" -Expected $true
     Assert-Boolean -Object $Proof -Name "default_hold_timeout_seconds" -Expected $true

@@ -49,21 +49,95 @@ function Assert-RomaWindowsOutputContains {
     Write-Host "asserted_output=$Expected"
 }
 
+function Get-RomaWindowsRuntimeDefaultOutputMarkers {
+    return [ordered]@{
+        default_record_seconds = "default_record_seconds=2.0"
+        default_hold_timeout_seconds = "default_hold_timeout_seconds=15.0"
+        default_hold_timeout_milliseconds = "default_hold_timeout_milliseconds=15000"
+        default_clipboard_restore_delay_seconds = "default_clipboard_restore_delay_seconds=2.0"
+        maximum_clipboard_restore_delay_seconds = "maximum_clipboard_restore_delay_seconds=4294967.295"
+    }
+}
+
+function Get-RomaWindowsHoldTimeoutDefaultOutputMarkers {
+    return [ordered]@{
+        default_hold_timeout_seconds = "default_timeout_seconds=15.0"
+        default_hold_timeout_milliseconds = "default_timeout_milliseconds=15000"
+    }
+}
+
+function Get-RomaWindowsClipboardRestoreDefaultOutputMarkers {
+    return [ordered]@{
+        default_clipboard_restore_delay_seconds = "default_clipboard_restore_delay_seconds=2.0"
+        maximum_clipboard_restore_delay_seconds = "maximum_clipboard_restore_delay_seconds=4294967.295"
+    }
+}
+
+function Get-RomaWindowsMinimumPermissionOutputMarkers {
+    return [ordered]@{
+        os_permission_grants_microphone = "os_permission_grants=microphone"
+        native_capabilities_register_hotkey = "native_capabilities=RegisterHotKey"
+        microphone_settings_uri = "microphone_settings_uri=ms-settings:privacy-microphone"
+        desktop_app_microphone_access_required = "desktop_app_microphone_access_required=true"
+        no_accessibility_permission_prompt = "accessibility_permission_prompt=false"
+        no_automation_permission_prompt = "automation_permission_prompt=false"
+        no_admin_required = "admin_required=false"
+        startup_launcher_run_script = "startup_launcher=run-windows-agent.ps1"
+        startup_launch_mode_listen = "startup_launch_mode=listen"
+        no_startup_permission_prompt = "startup_permission_prompt=false"
+        no_screen_capture_required = "screen_capture_required=false"
+        no_screen_recording_permission_prompt = "screen_recording_permission_prompt=false"
+    }
+}
+
+function Assert-RomaWindowsOutputMarkers {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Output,
+        [Parameter(Mandatory = $true)]
+        [object]$Markers
+    )
+
+    foreach ($key in $Markers.Keys) {
+        Assert-RomaWindowsOutputContains -Output $Output -Expected $Markers[$key]
+    }
+}
+
+function Get-RomaWindowsOutputMarkerProof {
+    param(
+        [string]$Output = "",
+        [Parameter(Mandatory = $true)]
+        [object]$Markers
+    )
+
+    $proof = [ordered]@{}
+    foreach ($key in $Markers.Keys) {
+        $proof[$key] = $Output.Contains($Markers[$key])
+    }
+    return $proof
+}
+
+function Add-RomaWindowsProofFields {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Proof,
+        [Parameter(Mandatory = $true)]
+        [object]$Fields
+    )
+
+    foreach ($key in $Fields.Keys) {
+        $Proof[$key] = $Fields[$key]
+    }
+    return $Proof
+}
+
 function Assert-RomaWindowsRuntimeDefaultOutput {
     param(
         [Parameter(Mandatory = $true)]
         [string]$Output
     )
 
-    foreach ($expected in @(
-        "default_record_seconds=2.0",
-        "default_hold_timeout_seconds=15.0",
-        "default_hold_timeout_milliseconds=15000",
-        "default_clipboard_restore_delay_seconds=2.0",
-        "maximum_clipboard_restore_delay_seconds=4294967.295"
-    )) {
-        Assert-RomaWindowsOutputContains -Output $Output -Expected $expected
-    }
+    Assert-RomaWindowsOutputMarkers -Output $Output -Markers (Get-RomaWindowsRuntimeDefaultOutputMarkers)
 }
 
 function Assert-RomaWindowsHoldTimeoutDefaultOutput {
@@ -72,12 +146,7 @@ function Assert-RomaWindowsHoldTimeoutDefaultOutput {
         [string]$Output
     )
 
-    foreach ($expected in @(
-        "default_timeout_seconds=15.0",
-        "default_timeout_milliseconds=15000"
-    )) {
-        Assert-RomaWindowsOutputContains -Output $Output -Expected $expected
-    }
+    Assert-RomaWindowsOutputMarkers -Output $Output -Markers (Get-RomaWindowsHoldTimeoutDefaultOutputMarkers)
 }
 
 function Assert-RomaWindowsClipboardRestoreDefaultOutput {
@@ -86,12 +155,7 @@ function Assert-RomaWindowsClipboardRestoreDefaultOutput {
         [string]$Output
     )
 
-    foreach ($expected in @(
-        "default_clipboard_restore_delay_seconds=2.0",
-        "maximum_clipboard_restore_delay_seconds=4294967.295"
-    )) {
-        Assert-RomaWindowsOutputContains -Output $Output -Expected $expected
-    }
+    Assert-RomaWindowsOutputMarkers -Output $Output -Markers (Get-RomaWindowsClipboardRestoreDefaultOutputMarkers)
 }
 
 function Assert-RomaWindowsMinimumPermissionOutput {
@@ -100,22 +164,39 @@ function Assert-RomaWindowsMinimumPermissionOutput {
         [string]$Output
     )
 
-    foreach ($expected in @(
-        "os_permission_grants=microphone",
-        "native_capabilities=RegisterHotKey",
-        "microphone_settings_uri=ms-settings:privacy-microphone",
-        "desktop_app_microphone_access_required=true",
-        "accessibility_permission_prompt=false",
-        "automation_permission_prompt=false",
-        "admin_required=false",
-        "startup_launcher=run-windows-agent.ps1",
-        "startup_launch_mode=listen",
-        "startup_permission_prompt=false",
-        "screen_capture_required=false",
-        "screen_recording_permission_prompt=false"
-    )) {
-        Assert-RomaWindowsOutputContains -Output $Output -Expected $expected
-    }
+    Assert-RomaWindowsOutputMarkers -Output $Output -Markers (Get-RomaWindowsMinimumPermissionOutputMarkers)
+}
+
+function Get-RomaWindowsRuntimeDefaultOutputProof {
+    param(
+        [string]$Output = ""
+    )
+
+    return Get-RomaWindowsOutputMarkerProof -Output $Output -Markers (Get-RomaWindowsRuntimeDefaultOutputMarkers)
+}
+
+function Get-RomaWindowsHoldTimeoutDefaultOutputProof {
+    param(
+        [string]$Output = ""
+    )
+
+    return Get-RomaWindowsOutputMarkerProof -Output $Output -Markers (Get-RomaWindowsHoldTimeoutDefaultOutputMarkers)
+}
+
+function Get-RomaWindowsClipboardRestoreDefaultOutputProof {
+    param(
+        [string]$Output = ""
+    )
+
+    return Get-RomaWindowsOutputMarkerProof -Output $Output -Markers (Get-RomaWindowsClipboardRestoreDefaultOutputMarkers)
+}
+
+function Get-RomaWindowsMinimumPermissionOutputProof {
+    param(
+        [string]$Output = ""
+    )
+
+    return Get-RomaWindowsOutputMarkerProof -Output $Output -Markers (Get-RomaWindowsMinimumPermissionOutputMarkers)
 }
 
 function Add-RomaWindowsAgentConfigurationArgs {

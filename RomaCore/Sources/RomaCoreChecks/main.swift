@@ -8516,6 +8516,15 @@ struct RomaCoreChecks {
             "Windows script parse checker should auto-discover and parse every proof script"
         )
         try require(
+            proofCommonScript.contains(#"installed_smoke_script"#) &&
+                proofCommonScript.contains(#"installed_install_script"#) &&
+                proveScript.contains(#"count = $count"#) &&
+                checkReportScript.contains("expectedInstalledScriptParseCount") &&
+                checkReportScript.contains(#"Where-Object { [string]$_.PackageFile -like "*.ps1" }"#) &&
+                checkReportScript.contains(#"-Name "count""#),
+            "Windows proof checker should require installed script parse count to match the shared proof surface"
+        )
+        try require(
             workflowScript.contains("Parse Windows proof scripts") &&
                 workflowScript.contains(#".\Scripts\check-windows-scripts-parse.ps1"#) &&
                 !workflowScript.contains(#"foreach ($script in @("#),

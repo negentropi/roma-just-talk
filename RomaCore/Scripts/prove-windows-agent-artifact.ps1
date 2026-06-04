@@ -613,10 +613,12 @@ function Get-ScriptParseProof {
         [string]$Output = ""
     )
 
+    $count = Get-OutputNumber -Content $Output -Name "windows_scripts_parse_count"
     return [ordered]@{
         output_present = ![string]::IsNullOrWhiteSpace($Output)
         ok = $Output.Contains("windows_scripts_parse_ok=true")
         count_present = $Output.Contains("windows_scripts_parse_count=")
+        count = $count
     }
 }
 

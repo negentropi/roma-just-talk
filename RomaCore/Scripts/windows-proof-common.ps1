@@ -53,7 +53,9 @@ function Get-RomaWindowsProofSurfaceFiles {
 
 function Get-RomaWindowsInstalledProofSurfaceFileMap {
     return @(
+        @{ ReportProperty = "installed_smoke_script"; PackageFile = "smoke-windows-agent.ps1" },
         @{ ReportProperty = "installed_run_script"; PackageFile = "run-windows-agent.ps1" },
+        @{ ReportProperty = "installed_install_script"; PackageFile = "install-windows-agent.ps1" },
         @{ ReportProperty = "installed_proof_script"; PackageFile = "prove-windows-agent-artifact.ps1" },
         @{ ReportProperty = "installed_laptop_proof_script"; PackageFile = "run-windows-laptop-proof.ps1" },
         @{ ReportProperty = "installed_laptop_proof_guide"; PackageFile = "WINDOWS-LAPTOP-PROOF.txt" },

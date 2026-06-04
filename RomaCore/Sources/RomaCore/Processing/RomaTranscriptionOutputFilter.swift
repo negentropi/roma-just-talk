@@ -8287,7 +8287,7 @@ public struct RomaTranscriptionOutputFilter {
     private static func unwrapNoisyMarkdownBoundaryOutput(_ text: String) -> String {
         let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard let marker = trimmedText.first,
-              marker == "*" || marker == "_" else {
+              marker == "*" || marker == "_" || marker == "`" else {
             return text
         }
 
@@ -8849,7 +8849,7 @@ public struct RomaTranscriptionOutputFilter {
             return false
         }
 
-        return first == "\"" || first == "“" || first == "(" || first == "{"
+        return first == "\"" || first == "“" || first == "‘" || first == "(" || first == "{"
     }
 
     private static func isNoisyPreservedBoundaryContinuationFragment(_ text: String) -> Bool {

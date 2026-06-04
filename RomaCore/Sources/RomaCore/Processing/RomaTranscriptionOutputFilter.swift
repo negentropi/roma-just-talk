@@ -521,6 +521,7 @@ public struct RomaTranscriptionOutputFilter {
         (#"(?i)^\s*(?:ok(?:ay)?|all\s+right|alright|right|yeah|yes|yep|yup|sure)(?:[ \t]*[,;:…]+[ \t]*)+so[,;:…]*[ \t]+"#, ""),
         (#"(?i)^\s*(?:you\s+know|i\s+mean|like)[,;:…]+[ \t]*"#, "")
     ]
+    private static let continuationFragmentLeadingDiscourseFillerPattern = #"(?i)^\s*(you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?|i[ \t]+mean|ok(?:ay)?|yeah|like|basically|so|well)(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let standaloneDiscourseFillerPattern = #"(?i)^\s*you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?[ \t]*[.,;:…]*\s*$"#
     private static let blockedPreviousWordsForTerminalYouKnow: Set<String> = [
         "do", "does", "did", "don't", "if", "know", "let", "should", "to", "whether", "will", "would"
@@ -551,6 +552,11 @@ public struct RomaTranscriptionOutputFilter {
         "actually", "almost", "basically", "close", "done", "fine", "going",
         "good", "just", "maybe", "not", "probably", "ready", "really",
         "thinking", "trying", "waiting", "working"
+    ]
+    private static let blockedPreviousWordsForLeadingLikeContinuationFiller: Set<String> = [
+        "am", "are", "be", "been", "being", "feel", "feels", "felt", "is",
+        "less", "look", "looks", "more", "not", "seem", "seems", "sound",
+        "sounds", "was", "were"
     ]
     private static let leadingLikeClauseStarterVerbs: Set<String> = [
         "am", "are", "can", "could", "did", "do", "does", "had", "has",
@@ -1301,6 +1307,13 @@ public struct RomaTranscriptionOutputFilter {
                 polishedText = removeLeadingGeneratedFragmentMarker(from: polishedText)
             }
             polishedText = removeLeadingFragmentPunctuation(from: polishedText)
+            if let activeContext,
+               isContinuingSentence(after: activeContext.precedingText) {
+                polishedText = removeLeadingDiscourseFillerFromContinuationFragment(
+                    from: polishedText,
+                    after: activeContext.precedingText
+                )
+            }
             if wasWholeSquareBracketedOutput {
                 polishedText = removeTrailingNoisyFragmentPunctuation(from: polishedText)
             } else {
@@ -1731,6 +1744,60 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         return suffix
+    }
+
+    private static func removeLeadingDiscourseFillerFromContinuationFragment(
+        from text: String,
+        after precedingText: String
+    ) -> String {
+        guard let regex = try? NSRegularExpression(pattern: continuationFragmentLeadingDiscourseFillerPattern) else {
+            return text
+        }
+
+        var candidate = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        var didRemoveFiller = false
+
+        while let match = regex.firstMatch(in: candidate, range: NSRange(candidate.startIndex..., in: candidate)),
+              match.numberOfRanges >= 2,
+              let matchRange = Range(match.range, in: candidate),
+              let fillerRange = Range(match.range(at: 1), in: candidate) {
+            let suffix = String(candidate[matchRange.upperBound...])
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            let filler = normalizedRepeatedClause(String(candidate[fillerRange]))
+            guard shouldRemoveLeadingContinuationDiscourseFiller(
+                filler,
+                suffix: suffix,
+                after: precedingText
+            ) else {
+                break
+            }
+
+            candidate = suffix
+            didRemoveFiller = true
+        }
+
+        return didRemoveFiller ? candidate : text
+    }
+
+    private static func shouldRemoveLeadingContinuationDiscourseFiller(
+        _ filler: String,
+        suffix: String,
+        after precedingText: String
+    ) -> Bool {
+        let trimmedSuffix = suffix.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedSuffix.isEmpty,
+              !hasInternalSentenceBoundary(trimmedSuffix),
+              isShortFragment(trimmedSuffix) || isNoisyPreservedBoundaryContinuationFragment(trimmedSuffix) else {
+            return false
+        }
+
+        if filler == "like",
+           let previousWord = previousWord(in: precedingText),
+           blockedPreviousWordsForLeadingLikeContinuationFiller.contains(previousWord) {
+            return false
+        }
+
+        return true
     }
 
     private static func isLeadingFillerFollowedByClauseStarter(_ text: String) -> Bool {

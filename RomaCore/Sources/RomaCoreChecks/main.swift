@@ -4388,6 +4388,7 @@ struct RomaCoreChecks {
         let midSentenceContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "...so this")
         let listIntroContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "Tasks:")
         let wordContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "Use")
+        let sentenceStartContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "Done. ")
         let compactTokenContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "docs")
         let emailUserContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "felix")
         let variableContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "user")
@@ -4395,9 +4396,59 @@ struct RomaCoreChecks {
         let openSmartQuoteContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "She said “")
         let closingSmartQuoteContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "She said “hello”")
         let closingSmartSingleQuoteContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "She said ‘hello’")
+        let likePredicateContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "looks")
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("Model.", context: midSentenceContext) == "model",
             "insertion polish should lowercase final mid-sentence word"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("okay Model.", context: midSentenceContext) == "model",
+            "insertion polish should drop leading okay before short continuation fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("yeah Model.", context: midSentenceContext) == "model",
+            "insertion polish should drop leading yeah before short continuation fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("you know Model.", context: midSentenceContext) == "model",
+            "insertion polish should drop leading you-know before short continuation fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("I mean Model.", context: midSentenceContext) == "model",
+            "insertion polish should drop leading i-mean before short continuation fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("like Model.", context: midSentenceContext) == "model",
+            "insertion polish should drop leading like before short continuation fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "basically Model.",
+                context: midSentenceContext
+            ) == "model",
+            "insertion polish should drop leading basically before short continuation fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("so Model.", context: midSentenceContext) == "model",
+            "insertion polish should drop leading so before short continuation fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("well Model.", context: midSentenceContext) == "model",
+            "insertion polish should drop leading well before short continuation fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "okay Model.",
+                context: sentenceStartContext
+            ) == "okay Model.",
+            "insertion polish should preserve leading okay at sentence start"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "like Model.",
+                context: likePredicateContext
+            ) == "like model",
+            "insertion polish should preserve like after predicate words"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("Model.\"", context: midSentenceContext) == "model",

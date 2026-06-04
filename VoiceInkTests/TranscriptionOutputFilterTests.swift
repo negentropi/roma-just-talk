@@ -347,6 +347,7 @@ struct TranscriptionOutputFilterTests {
         let closingSmartQuoteContext = TranscriptionOutputFilter.TextInsertionContext(precedingText: "She said “hello”")
         let closingSmartSingleQuoteContext = TranscriptionOutputFilter.TextInsertionContext(precedingText: "She said ‘hello’")
         let newLineContext = TranscriptionOutputFilter.TextInsertionContext(precedingText: "Done\n")
+        let likePredicateContext = TranscriptionOutputFilter.TextInsertionContext(precedingText: "looks")
 
         #expect(TranscriptionOutputFilter.applyInsertionPolish("Model.", context: midSentenceContext) == "model")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("MODEL.", context: midSentenceContext) == "model")
@@ -383,6 +384,16 @@ struct TranscriptionOutputFilterTests {
                 context: midSentenceContext
             ) == "Linear ticket"
         )
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("okay Model.", context: midSentenceContext) == "model")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("yeah Model.", context: midSentenceContext) == "model")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("you know Model.", context: midSentenceContext) == "model")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("I mean Model.", context: midSentenceContext) == "model")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("like Model.", context: midSentenceContext) == "model")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("basically Model.", context: midSentenceContext) == "model")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("so Model.", context: midSentenceContext) == "model")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("well Model.", context: midSentenceContext) == "model")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("okay Model.", context: sentenceStartContext) == "okay Model.")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("like Model.", context: likePredicateContext) == "like model")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("NEW YORK.", context: midSentenceContext) == "NEW YORK")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("Model.\"", context: midSentenceContext) == "model")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("\"Model.\"", context: midSentenceContext) == "model")

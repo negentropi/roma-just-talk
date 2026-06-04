@@ -462,10 +462,38 @@ struct RomaCoreChecks {
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model I should say module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should apply i-should-say corrections in short continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model I was trying to say module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should apply i-was-trying-to-say corrections in short continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model I am trying to say module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should apply i-am-trying-to-say corrections in short continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "please what I meant was module.",
                 context: midSentenceContext
             ) == "please what I meant was module",
             "shared insertion polish should preserve please-prefixed what-i-meant-was prose"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "please I should say module.",
+                context: midSentenceContext
+            ) == "please I should say module",
+            "shared insertion polish should preserve please-prefixed i-should-say prose"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
@@ -7174,6 +7202,37 @@ struct RomaCoreChecks {
         try require(
             await whatIMeantWasInserter.pastedText == " module",
             "pipeline should paste what-i-meant-was continuation corrections"
+        )
+
+        let iShouldSayRecorder = FakeRecorder()
+        let iShouldSayInserter = FakeTextInsertion()
+        let iShouldSayPipeline = DictationPipeline(
+            recorder: iShouldSayRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "i-should-say-continuation-proof.wav",
+                text: "model I should say module."
+            ),
+            textInsertion: iShouldSayInserter
+        )
+        let iShouldSayRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/i-should-say-continuation-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await iShouldSayRecorder.startPreRollBuffering()
+        let iShouldSayResult = try await iShouldSayPipeline.runRecordingWindow(iShouldSayRequest) {}
+
+        try require(
+            iShouldSayResult.processedText == " module",
+            "pipeline should clean i-should-say continuation corrections"
+        )
+        try require(
+            await iShouldSayInserter.pastedText == " module",
+            "pipeline should paste i-should-say continuation corrections"
         )
 
         let orWaitNoIMeanRecorder = FakeRecorder()

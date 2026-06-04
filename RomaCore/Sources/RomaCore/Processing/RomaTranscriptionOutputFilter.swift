@@ -2240,6 +2240,18 @@ public struct RomaTranscriptionOutputFilter {
             guard tokens[markerIndex + 1].text == "on" else { return nil }
             return markerIndex + 2
         case "i":
+            if markerIndex + 2 < tokens.count,
+               tokens[markerIndex + 1].text == "should",
+               tokens[markerIndex + 2].text == "say" {
+                return markerIndex + 3
+            }
+            if markerIndex + 4 < tokens.count,
+               ["am", "was"].contains(tokens[markerIndex + 1].text),
+               tokens[markerIndex + 2].text == "trying",
+               tokens[markerIndex + 3].text == "to",
+               tokens[markerIndex + 4].text == "say" {
+                return markerIndex + 5
+            }
             return iMeanCorrectionReplacementStartIndex(tokens: tokens, startingAt: markerIndex)
         case "actually":
             if markerIndex + 2 < tokens.count,

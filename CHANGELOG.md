@@ -29,6 +29,7 @@
 - Collapsed short "no wait I mean" correction fragments in cursor-aware post-STT cleanup.
 - Collapsed short "wait no I mean", "or wait no I mean", and leading "I meant to say" correction fragments in cursor-aware post-STT cleanup.
 - Collapsed short "what I meant was" correction fragments in cursor-aware post-STT cleanup.
+- Collapsed short "I should say" and "I was trying to say" correction fragments in cursor-aware post-STT cleanup.
 - Collapsed short backtrack and hold-on correction fragments in cursor-aware post-STT cleanup.
 - Collapsed nested "correction actually" and "sorry actually" fragments in cursor-aware post-STT cleanup.
 - Collapsed short "or actually" and "or wait no" correction fragments in cursor-aware post-STT cleanup.

@@ -8452,9 +8452,43 @@ struct RomaCoreChecks {
             proofAgentSource.contains(#"print("native_windows_adapters=true")"#),
             "Windows proof agent should print native adapter runtime availability on Windows"
         )
+        let proofAgentPrintsSharedSourceMarkers = proofAgentSource.contains(
+            "WindowsDoctorOutput.proofAgentSourceProofLines.forEach"
+        )
+        let proofAgentSourceMarkerLines = [
+            #""windows_register_hotkey_adapter_source=true""#,
+            #""windows_low_level_keyboard_hook_source=true""#,
+            #""windows_paste_adapter_source=true""#,
+            #""windows_permission_surface_source=true""#,
+            #""windows_dpapi_secret_store_source=true""#,
+            #""miniaudio_capture_adapter_source=true""#,
+            #""openai_compatible_transcription_source=true""#,
+            #""whisper_cli_transcription_source=true""#,
+            #""roma_transcription_client_source=true""#,
+            #""transcription_output_filter_source=true""#,
+            #""word_replacement_processor_source=true""#,
+            #""windows_dictation_runtime_source=true""#,
+            #""windows_dictation_runtime_uses_pipeline_source=true""#,
+            #""windows_listener_output_isolation_source=true""#,
+            #""windows_listener_pre_roll_runtime_source=true""#,
+            #""windows_hold_hook_single_window_source=true""#,
+            #""windows_dictation_proof_source=true""#,
+            #""windows_proof_args_shared_source=true""#
+        ]
+        for markerLine in proofAgentSourceMarkerLines {
+            try require(
+                doctorOutputSource.contains(markerLine),
+                "Windows doctor output should own proof-agent source marker \(markerLine)"
+            )
+        }
         try require(
-            proofAgentSource.contains(#"roma_transcription_client_source=true"#) &&
-                proofAgentSource.contains(#"windows_proof_args_shared_source=true"#),
+            proofAgentPrintsSharedSourceMarkers,
+            "Windows proof agent doctor should print source markers from shared doctor output"
+        )
+        try require(
+            doctorOutputSource.contains(#""roma_transcription_client_source=true""#) &&
+                doctorOutputSource.contains(#""windows_proof_args_shared_source=true""#) &&
+                proofAgentPrintsSharedSourceMarkers,
             "Windows proof agent doctor should expose shared Windows transcription/proof-arg source markers"
         )
         try require(
@@ -8489,11 +8523,13 @@ struct RomaCoreChecks {
             "Windows dictation runtime should compose the shared DictationPipeline with the Windows paste adapter"
         )
         try require(
-            proofAgentSource.contains(#"print("windows_dictation_runtime_uses_pipeline_source=true")"#),
+            doctorOutputSource.contains(#""windows_dictation_runtime_uses_pipeline_source=true""#) &&
+                proofAgentPrintsSharedSourceMarkers,
             "Windows proof agent should expose that Windows runtime uses the shared DictationPipeline"
         )
         try require(
-            proofAgentSource.contains(#"print("windows_listener_output_isolation_source=true")"#),
+            doctorOutputSource.contains(#""windows_listener_output_isolation_source=true""#) &&
+                proofAgentPrintsSharedSourceMarkers,
             "Windows proof agent should expose that listener sessions isolate default WAV output paths"
         )
         try require(
@@ -8502,7 +8538,8 @@ struct RomaCoreChecks {
                 windowsDictationRuntimeSource.contains("captureLifecycle: .keepAliveAfterRun") &&
                 windowsAgentSource.contains("case .preRollBuffering:") &&
                 windowsAgentSource.contains(#"print("pre_roll_buffering=true")"#) &&
-                proofAgentSource.contains(#"print("windows_listener_pre_roll_runtime_source=true")"#),
+                doctorOutputSource.contains(#""windows_listener_pre_roll_runtime_source=true""#) &&
+                proofAgentPrintsSharedSourceMarkers,
             "Windows proof agent should expose that listener sessions reuse the shared pre-roll runtime path"
         )
         try require(
@@ -8515,7 +8552,8 @@ struct RomaCoreChecks {
             "Windows full laptop proof should archive a real installed listener runtime session"
         )
         try require(
-            proofAgentSource.contains(#"print("windows_hold_hook_single_window_source=true")"#),
+            doctorOutputSource.contains(#""windows_hold_hook_single_window_source=true""#) &&
+                proofAgentPrintsSharedSourceMarkers,
             "Windows proof agent should expose that hold-to-talk uses one native hook window"
         )
         let doctorDefaultOutputLines = [

@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Shared Windows proof-agent source-marker output through the doctor output module instead of literal-printing the marker list in the proof CLI.
 - Shared Windows proof-report doctor default assertions so agent, proof-agent, keyboard-hook, and paste checks use one default contract.
 - Shared installed Windows proof-profile assertion setup so cloud, local-whisper, Notepad, and packaged-mock profiles enable the same install, doctor, listener, hold-hook, and native-adapter checks.
 - Shared installed Windows proof-profile requirements so cloud, local-whisper, Notepad, and packaged-mock profiles keep the same install, doctor, listener, and native-adapter coverage.

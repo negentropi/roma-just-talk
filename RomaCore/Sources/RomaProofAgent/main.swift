@@ -66,24 +66,7 @@ struct RomaProofAgent {
         #else
         print("native_windows_adapters=false")
         #endif
-        print("windows_register_hotkey_adapter_source=true")
-        print("windows_low_level_keyboard_hook_source=true")
-        print("windows_paste_adapter_source=true")
-        print("windows_permission_surface_source=true")
-        print("windows_dpapi_secret_store_source=true")
-        print("miniaudio_capture_adapter_source=true")
-        print("openai_compatible_transcription_source=true")
-        print("whisper_cli_transcription_source=true")
-        print("roma_transcription_client_source=true")
-        print("transcription_output_filter_source=true")
-        print("word_replacement_processor_source=true")
-        print("windows_dictation_runtime_source=true")
-        print("windows_dictation_runtime_uses_pipeline_source=true")
-        print("windows_listener_output_isolation_source=true")
-        print("windows_listener_pre_roll_runtime_source=true")
-        print("windows_hold_hook_single_window_source=true")
-        print("windows_dictation_proof_source=true")
-        print("windows_proof_args_shared_source=true")
+        WindowsDoctorOutput.proofAgentSourceProofLines.forEach { print($0) }
     }
 
     private static func printWindowsHotKeyDoctor() {

@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Collapsed temporal natural restatements such as "at two at three" and "on Tuesday on Wednesday" in post-STT cleanup.
 - Required Windows laptop proof sets to use runner-style GUID proof session IDs.
 - Collapsed unpunctuated partial-word false starts such as "mo module" and "sh should" in post-STT cleanup.
 - Required real Windows cloud laptop proof to use an audio transcription endpoint route.

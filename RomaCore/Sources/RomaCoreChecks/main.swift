@@ -1254,6 +1254,36 @@ struct RomaCoreChecks {
                 "inline repeated lead-in correction"
             ),
             (
+                "Let us meet at two at three tomorrow.",
+                "Let us meet at three tomorrow.",
+                "temporal at-preposition restatement correction"
+            ),
+            (
+                "At two at three.",
+                "At three.",
+                "sentence-wide temporal at-preposition correction"
+            ),
+            (
+                "The meeting is on Tuesday on Wednesday.",
+                "The meeting is on Wednesday.",
+                "weekday on-preposition restatement correction"
+            ),
+            (
+                "The meeting is on June first on July second.",
+                "The meeting is on July 2.",
+                "month date restatement correction"
+            ),
+            (
+                "Meet at office at three.",
+                "Meet at office at three.",
+                "location plus time preposition guard"
+            ),
+            (
+                "We talked on Tuesday on the phone.",
+                "We talked on Tuesday on the phone.",
+                "date plus prose preposition guard"
+            ),
+            (
                 "Use model use module.",
                 "Use model use module.",
                 "one-word repeated lead-in correction guard"

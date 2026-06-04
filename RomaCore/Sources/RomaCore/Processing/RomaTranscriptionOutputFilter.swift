@@ -139,6 +139,11 @@ public struct RomaTranscriptionOutputFilter {
         let unitPlacement: SpokenAmountUnitPlacement
     }
 
+    private enum TemporalCorrectionKind {
+        case date
+        case time
+    }
+
     private struct SpokenCompactConnector {
         let wordCount: Int
         let output: String
@@ -328,6 +333,9 @@ public struct RomaTranscriptionOutputFilter {
     private static let monthWords: Set<String> = [
         "january", "february", "march", "april", "may", "june",
         "july", "august", "september", "october", "november", "december"
+    ]
+    private static let weekdayWords: Set<String> = [
+        "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"
     ]
     private static let ordinalDayValues: [String: Int] = [
         "first": 1, "second": 2, "third": 3, "fourth": 4, "fifth": 5,
@@ -1219,6 +1227,7 @@ public struct RomaTranscriptionOutputFilter {
             filteredText = collapseRepeatedShortPhrases(in: filteredText)
             filteredText = collapseRepeatedShortClauses(in: filteredText)
             filteredText = collapseRepeatedLeadInCorrections(in: filteredText)
+            filteredText = collapseRepeatedTemporalPrepositionCorrections(in: filteredText)
             filteredText = collapseRepeatedShortSentences(in: filteredText)
             filteredText = collapseMismatchedRepeatedShortSentences(in: filteredText)
             filteredText = collapseTrailingUnpunctuatedRepeatedShortSentences(in: filteredText)
@@ -8266,6 +8275,128 @@ public struct RomaTranscriptionOutputFilter {
         }
         return productCorrectionTailWords.contains(sourceWord) &&
             productCorrectionTailWords.contains(correctionWord)
+    }
+
+    private static func collapseRepeatedTemporalPrepositionCorrections(in text: String) -> String {
+        var collapsedText = text
+        var rewriteCount = 0
+
+        while rewriteCount < 4 {
+            guard let rewrite = repeatedTemporalPrepositionCorrectionRewrite(in: collapsedText) else {
+                break
+            }
+            collapsedText.replaceSubrange(rewrite.range, with: rewrite.replacement)
+            rewriteCount += 1
+        }
+
+        return collapsedText
+    }
+
+    private static func repeatedTemporalPrepositionCorrectionRewrite(
+        in text: String
+    ) -> (range: Range<String.Index>, replacement: String)? {
+        let tokens = wordTokens(in: text)
+        guard tokens.count >= 4 else { return nil }
+        let words = tokens.map(\.text)
+
+        for prepositionIndex in 0..<(tokens.count - 3) {
+            let preposition = words[prepositionIndex]
+            guard ["at", "on"].contains(preposition) else { continue }
+
+            let maxSecondPrepositionIndex = min(prepositionIndex + 4, tokens.count - 2)
+            guard prepositionIndex + 2 <= maxSecondPrepositionIndex else { continue }
+
+            for secondPrepositionIndex in (prepositionIndex + 2)...maxSecondPrepositionIndex
+                where words[secondPrepositionIndex] == preposition {
+                let sourceWords = Array(words[(prepositionIndex + 1)..<secondPrepositionIndex])
+                guard let sourcePhrase = temporalCorrectionPhrase(
+                    preposition: preposition,
+                    words: sourceWords
+                ),
+                      sourcePhrase.wordCount == sourceWords.count else {
+                    continue
+                }
+
+                let correctionWords = Array(words[(secondPrepositionIndex + 1)...])
+                guard let correctionPhrase = temporalCorrectionPhrase(
+                    preposition: preposition,
+                    words: correctionWords
+                ),
+                      sourcePhrase.kind == correctionPhrase.kind,
+                      correctionPhrase.wordCount > 0,
+                      sourceWords != Array(correctionWords.prefix(correctionPhrase.wordCount)) else {
+                    continue
+                }
+
+                let rewriteStart = tokens[prepositionIndex].range.lowerBound
+                let rewriteEnd = tokens[secondPrepositionIndex + correctionPhrase.wordCount].range.upperBound
+                let replacementStart = tokens[secondPrepositionIndex].range.lowerBound
+                let replacementEnd = tokens[secondPrepositionIndex + correctionPhrase.wordCount].range.upperBound
+                var replacement = String(text[replacementStart..<replacementEnd])
+                let sourcePreposition = String(text[tokens[prepositionIndex].range])
+                if let firstCharacter = sourcePreposition.first,
+                   firstCharacter.isUppercase {
+                    replacement = uppercaseFirstLetterPreservingRest(in: replacement)
+                }
+
+                return (
+                    rewriteStart..<rewriteEnd,
+                    replacement
+                )
+            }
+        }
+
+        return nil
+    }
+
+    private static func temporalCorrectionPhrase(
+        preposition: String,
+        words: [String]
+    ) -> (kind: TemporalCorrectionKind, wordCount: Int)? {
+        switch preposition {
+        case "at":
+            guard let wordCount = leadingTemporalTimeWordCount(in: words) else {
+                return nil
+            }
+            return (.time, wordCount)
+        case "on":
+            guard let wordCount = leadingTemporalDateWordCount(in: words) else {
+                return nil
+            }
+            return (.date, wordCount)
+        default:
+            return nil
+        }
+    }
+
+    private static func leadingTemporalTimeWordCount(in words: [String]) -> Int? {
+        if let wordCount = leadingSpokenTimeWordCount(in: words) {
+            return wordCount
+        }
+
+        guard let firstWord = words.first,
+              spokenHourValue(firstWord) != nil else {
+            return nil
+        }
+
+        return 1
+    }
+
+    private static func leadingTemporalDateWordCount(in words: [String]) -> Int? {
+        guard let firstWord = words.first else { return nil }
+        if weekdayWords.contains(firstWord) {
+            return 1
+        }
+
+        if let spokenDate = leadingSpokenDate(in: words) {
+            return spokenDate.wordCount
+        }
+
+        if monthWords.contains(firstWord) {
+            return 1
+        }
+
+        return nil
     }
 
     private static func normalizedRepeatWord(_ token: String) -> String? {

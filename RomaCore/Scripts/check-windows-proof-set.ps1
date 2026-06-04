@@ -75,7 +75,7 @@ function New-ProofReportProfilePathMap {
 }
 
 function New-ProofReportProfileRequiredMap {
-    return @{
+    $required = @{
         doctor_only = [bool]$RequireDoctorOnly
         cloud_dictation = [bool]$RequireCloudDictation
         local_whisper_dictation = [bool]$RequireLocalWhisperDictation
@@ -83,6 +83,13 @@ function New-ProofReportProfileRequiredMap {
         laptop_preflight = [bool]$RequireLaptopPreflight
         packaged_whisper_mock_install = [bool]$RequirePackagedWhisperMockInstall
     }
+    if ($RequireArtifactSmokeProof) {
+        Add-RomaWindowsProofSetRequiredProfiles -Required $required -Name "artifact_smoke" | Out-Null
+    }
+    if ($RequireFullLaptopProof) {
+        Add-RomaWindowsProofSetRequiredProfiles -Required $required -Name "full_laptop" | Out-Null
+    }
+    return $required
 }
 
 function Get-ProofReportProfileChecks {
@@ -788,18 +795,6 @@ if (!(Test-Path -LiteralPath $script:checkReportScript)) {
     throw "check-windows-proof-report.ps1 was not found next to this script: $script:checkReportScript"
 }
 
-if ($RequireArtifactSmokeProof) {
-    $RequireDoctorOnly = $true
-    $RequirePackagedWhisperMockInstall = $true
-}
-
-if ($RequireFullLaptopProof) {
-    $RequireCloudDictation = $true
-    $RequireLocalWhisperDictation = $true
-    $RequireLocalWhisperNotepadPaste = $true
-    $RequireLaptopPreflight = $true
-}
-
 $profileChecks = Get-ProofReportProfileChecks
 $hasExplicitRequirement = Test-AnyRequiredProofReportProfile -Checks $profileChecks
 
@@ -827,14 +822,14 @@ if ($RequireFullLaptopProof) {
         -LocalWhisperReportPath $LocalWhisperDictationReportPath `
         -NotepadReportPath $LocalWhisperNotepadPasteReportPath `
         -LaptopPreflightReport $script:laptopPreflightReport
-    Write-Host "proof_set_ok=full-laptop"
+    Write-Host (Get-RomaWindowsProofSetOkMarker -Name "full_laptop")
 } elseif ($RequireArtifactSmokeProof) {
     Assert-SameArtifactSmokeProofSet `
         -DoctorOnlyReportPath $DoctorOnlyReportPath `
         -PackagedWhisperMockInstallReportPath $PackagedWhisperMockInstallReportPath
-    Write-Host "proof_set_ok=artifact-smoke"
+    Write-Host (Get-RomaWindowsProofSetOkMarker -Name "artifact_smoke")
 } elseif ($RequireLaptopPreflight) {
-    Write-Host "proof_set_ok=laptop-preflight"
+    Write-Host (Get-RomaWindowsProofSetOkMarker -Name "laptop_preflight")
 } else {
-    Write-Host "proof_set_ok=custom"
+    Write-Host (Get-RomaWindowsProofSetOkMarker -Name "custom")
 }

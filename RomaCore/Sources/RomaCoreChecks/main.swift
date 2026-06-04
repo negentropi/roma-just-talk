@@ -9762,6 +9762,12 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Get-RomaWindowsProofProfileAssertions") &&
                 proofCommonScript.contains("function Get-RomaWindowsInstalledProofProfileAssertions") &&
                 proofCommonScript.contains("function Get-RomaWindowsProofReportProfileChecks") &&
+                proofCommonScript.contains("function Get-RomaWindowsProofSetSpecs") &&
+                proofCommonScript.contains("function Add-RomaWindowsProofSetRequiredProfiles") &&
+                proofCommonScript.contains(#"artifact_smoke = [ordered]@{"#) &&
+                proofCommonScript.contains(#"profiles = @("doctor_only", "packaged_whisper_mock_install")"#) &&
+                proofCommonScript.contains(#"full_laptop = [ordered]@{"#) &&
+                proofCommonScript.contains(#"profiles = @("cloud_dictation", "local_whisper_dictation", "local_whisper_notepad_paste", "laptop_preflight")"#) &&
                 proofCommonScript.contains(#"profile = "laptop-preflight""#) &&
                 proofCommonScript.contains(#"expected_mode = "windows-laptop-preflight""#) &&
                 proofCommonScript.contains(#"read_as_laptop_preflight = $true"#) &&
@@ -9769,6 +9775,8 @@ struct RomaCoreChecks {
                 checkSetScript.contains("function New-ProofReportProfilePathMap") &&
                 checkSetScript.contains("function New-ProofReportProfileRequiredMap") &&
                 checkSetScript.contains("function Get-ProofReportProfileChecks") &&
+                checkSetScript.contains(#"Add-RomaWindowsProofSetRequiredProfiles -Required $required -Name "artifact_smoke""#) &&
+                checkSetScript.contains(#"Add-RomaWindowsProofSetRequiredProfiles -Required $required -Name "full_laptop""#) &&
                 checkSetScript.contains("Get-RomaWindowsProofReportProfileChecks") &&
                 checkSetScript.contains("-Paths (New-ProofReportProfilePathMap)") &&
                 checkSetScript.contains("-Required (New-ProofReportProfileRequiredMap)") &&
@@ -9795,7 +9803,13 @@ struct RomaCoreChecks {
                 checkReportScript.contains("function Assert-LaptopPreflightReport") &&
                 checkReportScript.contains(#"$RequireProofProfile -eq "laptop-preflight""#) &&
                 checkSetScript.contains("Assert-SameLaptopPreflightProof") &&
-                checkSetScript.contains(#"$RequireLaptopPreflight = $true"#) &&
+                proofCommonScript.contains(#"ok_marker = "proof_set_ok=laptop-preflight""#) &&
+                checkSetScript.contains(#"Get-RomaWindowsProofSetOkMarker -Name "laptop_preflight""#) &&
+                checkSetScript.contains(#"Get-RomaWindowsProofSetOkMarker -Name "full_laptop""#) &&
+                checkSetScript.contains(#"Get-RomaWindowsProofSetOkMarker -Name "artifact_smoke""#) &&
+                !checkSetScript.contains(#"$RequireCloudDictation = $true"#) &&
+                !checkSetScript.contains(#"$RequireLocalWhisperDictation = $true"#) &&
+                !checkSetScript.contains(#"$RequireLaptopPreflight = $true"#) &&
                 checkReportScript.contains("preflight_outputs") &&
                 checkReportScript.contains(#"Assert-Boolean -Object $permissionOutput -Name "microphone_settings_uri" -Expected $true"#) &&
                 checkReportScript.contains(#"Assert-Boolean -Object $permissionOutput -Name "no_admin_required" -Expected $true"#) &&
@@ -9813,7 +9827,6 @@ struct RomaCoreChecks {
                 checkReportScript.contains("proof_set_laptop_preflight_local_whisper=") &&
                 checkReportScript.contains("proof_set_laptop_preflight_package_fingerprint=") &&
                 checkSetScript.contains("proof_set_laptop_preflight_matches_full=true") &&
-                checkSetScript.contains("proof_set_ok=laptop-preflight") &&
                 checkReportScript.contains("function Write-ProofProfileRequirements") &&
                 checkReportScript.contains("proof_profile_ok=$Profile") &&
                 checkReportScript.contains("Laptop preflight proof must run on Windows"),

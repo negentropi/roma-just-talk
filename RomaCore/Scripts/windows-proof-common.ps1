@@ -626,6 +626,74 @@ function Get-RomaWindowsProofReportProfileChecks {
     return $checks
 }
 
+function Get-RomaWindowsProofSetSpecs {
+    return [ordered]@{
+        artifact_smoke = [ordered]@{
+            profiles = @("doctor_only", "packaged_whisper_mock_install")
+            ok_marker = "proof_set_ok=artifact-smoke"
+        }
+        full_laptop = [ordered]@{
+            profiles = @("cloud_dictation", "local_whisper_dictation", "local_whisper_notepad_paste", "laptop_preflight")
+            ok_marker = "proof_set_ok=full-laptop"
+        }
+        laptop_preflight = [ordered]@{
+            profiles = @("laptop_preflight")
+            ok_marker = "proof_set_ok=laptop-preflight"
+        }
+        custom = [ordered]@{
+            profiles = @()
+            ok_marker = "proof_set_ok=custom"
+        }
+    }
+}
+
+function Get-RomaWindowsProofSetSpec {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    $proofSets = Get-RomaWindowsProofSetSpecs
+    if (!$proofSets.Contains($Name)) {
+        throw "Unknown Windows proof set: $Name"
+    }
+    return $proofSets[$Name]
+}
+
+function Get-RomaWindowsProofSetProfileNames {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    $spec = Get-RomaWindowsProofSetSpec -Name $Name
+    return @($spec["profiles"])
+}
+
+function Get-RomaWindowsProofSetOkMarker {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    $spec = Get-RomaWindowsProofSetSpec -Name $Name
+    return [string]$spec["ok_marker"]
+}
+
+function Add-RomaWindowsProofSetRequiredProfiles {
+    param(
+        [Parameter(Mandatory = $true)]
+        [hashtable]$Required,
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    foreach ($profileName in (Get-RomaWindowsProofSetProfileNames -Name $Name)) {
+        $Required[$profileName] = $true
+    }
+    return $Required
+}
+
 function Get-RomaWindowsLaptopPreflightGuideMarkers {
     return [ordered]@{
         laptop_preflight_proof_set = "proof_set_ok=laptop-preflight"

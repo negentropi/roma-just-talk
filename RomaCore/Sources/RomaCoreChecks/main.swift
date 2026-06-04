@@ -448,6 +448,27 @@ struct RomaCoreChecks {
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model what I meant was module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should apply what-i-meant-was corrections in short continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model what I mean was final word.",
+                context: midSentenceContext
+            ) == "final word",
+            "shared insertion polish should apply what-i-mean-was corrections in short continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "please what I meant was module.",
+                context: midSentenceContext
+            ) == "please what I meant was module",
+            "shared insertion polish should preserve please-prefixed what-i-meant-was prose"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "git hub actually linear.",
                 context: midSentenceContext
             ) == "Linear",
@@ -7122,6 +7143,37 @@ struct RomaCoreChecks {
         try require(
             await noWaitIMeanInserter.pastedText == " module",
             "pipeline should paste no-wait-i-mean continuation corrections"
+        )
+
+        let whatIMeantWasRecorder = FakeRecorder()
+        let whatIMeantWasInserter = FakeTextInsertion()
+        let whatIMeantWasPipeline = DictationPipeline(
+            recorder: whatIMeantWasRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "what-i-meant-was-continuation-proof.wav",
+                text: "model what I meant was module."
+            ),
+            textInsertion: whatIMeantWasInserter
+        )
+        let whatIMeantWasRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/what-i-meant-was-continuation-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await whatIMeantWasRecorder.startPreRollBuffering()
+        let whatIMeantWasResult = try await whatIMeantWasPipeline.runRecordingWindow(whatIMeantWasRequest) {}
+
+        try require(
+            whatIMeantWasResult.processedText == " module",
+            "pipeline should clean what-i-meant-was continuation corrections"
+        )
+        try require(
+            await whatIMeantWasInserter.pastedText == " module",
+            "pipeline should paste what-i-meant-was continuation corrections"
         )
 
         let orWaitNoIMeanRecorder = FakeRecorder()

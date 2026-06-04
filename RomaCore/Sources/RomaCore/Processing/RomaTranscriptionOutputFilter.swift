@@ -2213,7 +2213,7 @@ public struct RomaTranscriptionOutputFilter {
             guard markerIndex + 3 < tokens.count,
                   tokens[markerIndex + 1].text == "i",
                   ["mean", "meant"].contains(tokens[markerIndex + 2].text),
-                  tokens[markerIndex + 3].text == "is" else {
+                  ["is", "was"].contains(tokens[markerIndex + 3].text) else {
                 return nil
             }
             return markerIndex + 4

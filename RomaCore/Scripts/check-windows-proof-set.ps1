@@ -389,7 +389,7 @@ function Assert-LaptopPreflightReport {
     $preflights = Require-ReportProperty -Report $report -Name "preflights" -ReportName $reportName
     Assert-ReportBoolean -Report $preflights -Name "hotkey_delivery" -Expected $true -ReportName $reportName
     Assert-ReportBoolean -Report $preflights -Name "microphone" -Expected $true -ReportName $reportName
-    Assert-ReportBoolean -Report $preflights -Name "local_whisper" -Expected $true -ReportName $reportName
+    $hasLocalWhisperPreflight = [bool](Require-ReportProperty -Report $preflights -Name "local_whisper" -ReportName $reportName)
 
     $preflightOutputs = Require-ReportProperty -Report $report -Name "preflight_outputs" -ReportName $reportName
     $hotkeyOutput = Require-ReportProperty -Report $preflightOutputs -Name "hotkey_delivery" -ReportName $reportName
@@ -406,17 +406,23 @@ function Assert-LaptopPreflightReport {
     Assert-ReportBoolean -Report $microphoneOutput -Name "channels_mono" -Expected $true -ReportName $reportName
 
     $localWhisperOutput = Require-ReportProperty -Report $preflightOutputs -Name "local_whisper" -ReportName $reportName
-    Assert-ReportBoolean -Report $localWhisperOutput -Name "output_present" -Expected $true -ReportName $reportName
-    Assert-ReportBoolean -Report $localWhisperOutput -Name "transcription_client_whisper" -Expected $true -ReportName $reportName
-    Assert-ReportBoolean -Report $localWhisperOutput -Name "network_required_false" -Expected $true -ReportName $reportName
-    Assert-ReportBoolean -Report $localWhisperOutput -Name "executable_present" -Expected $true -ReportName $reportName
-    Assert-ReportBoolean -Report $localWhisperOutput -Name "model_file_present" -Expected $true -ReportName $reportName
+    if ($hasLocalWhisperPreflight) {
+        Assert-ReportBoolean -Report $localWhisperOutput -Name "output_present" -Expected $true -ReportName $reportName
+        Assert-ReportBoolean -Report $localWhisperOutput -Name "transcription_client_whisper" -Expected $true -ReportName $reportName
+        Assert-ReportBoolean -Report $localWhisperOutput -Name "network_required_false" -Expected $true -ReportName $reportName
+        Assert-ReportBoolean -Report $localWhisperOutput -Name "executable_present" -Expected $true -ReportName $reportName
+        Assert-ReportBoolean -Report $localWhisperOutput -Name "model_file_present" -Expected $true -ReportName $reportName
+    } else {
+        Assert-ReportBoolean -Report $localWhisperOutput -Name "output_present" -Expected $false -ReportName $reportName
+    }
 
     $files = Require-ReportProperty -Report $report -Name "files" -ReportName $reportName
     Assert-ReportFileProof -Proof (Require-ReportProperty -Report $files -Name "proof_agent" -ReportName $reportName) -Name "laptop_preflight.proof_agent"
     Assert-ReportFileProof -Proof (Require-ReportProperty -Report $files -Name "mic_preflight_wav" -ReportName $reportName) -Name "laptop_preflight.mic_preflight_wav" -MinimumBytes 45
-    Assert-ReportFileProof -Proof (Require-ReportProperty -Report $files -Name "whisper_cli" -ReportName $reportName) -Name "laptop_preflight.whisper_cli"
-    Assert-ReportFileProof -Proof (Require-ReportProperty -Report $files -Name "whisper_model" -ReportName $reportName) -Name "laptop_preflight.whisper_model"
+    if ($hasLocalWhisperPreflight) {
+        Assert-ReportFileProof -Proof (Require-ReportProperty -Report $files -Name "whisper_cli" -ReportName $reportName) -Name "laptop_preflight.whisper_cli"
+        Assert-ReportFileProof -Proof (Require-ReportProperty -Report $files -Name "whisper_model" -ReportName $reportName) -Name "laptop_preflight.whisper_model"
+    }
 
     Write-Host "proof_set_laptop_preflight_session_id=$proofSessionId"
     Write-Host "proof_set_laptop_preflight_machine=$machine"
@@ -429,7 +435,20 @@ function Assert-LaptopPreflightReport {
     Write-Host "proof_set_laptop_preflight_source_commit=$($source['Commit'])"
     Write-Host "proof_set_laptop_preflight_source_dirty=$($source['Dirty'])"
     Write-Host "proof_set_laptop_preflight_proof_dir=$proofDir"
+    Write-Host "proof_set_laptop_preflight_local_whisper=$hasLocalWhisperPreflight"
     return $report
+}
+
+function Assert-LaptopPreflightIncludesLocalWhisper {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$PreflightReport
+    )
+
+    $reportName = "laptop_preflight"
+    $preflights = Require-ReportProperty -Report $PreflightReport -Name "preflights" -ReportName $reportName
+    Assert-ReportBoolean -Report $preflights -Name "local_whisper" -Expected $true -ReportName $reportName
+    Write-Host "proof_set_laptop_preflight_local_whisper_required=true"
 }
 
 function Assert-SameLaptopPreflightProof {
@@ -599,6 +618,7 @@ function Assert-SameLaptopProofSet {
             -ExpectedPackageDir $expectedPackageDir `
             -ExpectedPackageFingerprint $expectedPackageFingerprint `
             -ExpectedSource $expectedSource
+        Assert-LaptopPreflightIncludesLocalWhisper -PreflightReport $LaptopPreflightReport
     }
 
     foreach ($entry in $reports) {

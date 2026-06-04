@@ -21,6 +21,7 @@ param(
     [int]$RecordSeconds = 2,
     [double]$MicPreflightSeconds = 1,
     [switch]$PreflightOnly,
+    [switch]$NativePreflightOnly,
     [switch]$RestoreClipboard,
     [switch]$NoRestoreClipboard,
     [double]$ClipboardRestoreDelaySeconds = 2
@@ -130,6 +131,22 @@ function Get-LocalWhisperPreflightProof {
         executable_present = $Output.Contains("executable=")
         model_file_present = $Output.Contains("model_file=")
     }
+}
+
+function Get-OptionalFileProof {
+    param(
+        [string]$Path = ""
+    )
+
+    if ([string]::IsNullOrWhiteSpace($Path)) {
+        return [ordered]@{
+            path = ""
+            exists = $false
+            bytes = 0
+        }
+    }
+
+    return Get-FileProof -Path $Path
 }
 
 function Write-HoldDictationPrompt {
@@ -269,16 +286,16 @@ function Write-PreflightReport {
         [string]$ProofAgentPath,
         [Parameter(Mandatory = $true)]
         [string]$MicPreflightPath,
-        [Parameter(Mandatory = $true)]
-        [string]$WhisperCLIPath,
-        [Parameter(Mandatory = $true)]
-        [string]$WhisperModelPath
+        [string]$WhisperCLIPath = "",
+        [string]$WhisperModelPath = ""
     )
 
     $reportParent = Split-Path -Parent $Path
     if (![string]::IsNullOrWhiteSpace($reportParent)) {
         New-Item -ItemType Directory -Force -Path $reportParent | Out-Null
     }
+    $hasLocalWhisperPreflight = ![string]::IsNullOrWhiteSpace($WhisperCLIPath) -and
+        ![string]::IsNullOrWhiteSpace($WhisperModelPath)
 
     $report = [ordered]@{
         generated_at = (Get-Date).ToUniversalTime().ToString("o")
@@ -300,7 +317,7 @@ function Write-PreflightReport {
         preflights = [ordered]@{
             hotkey_delivery = $true
             microphone = $true
-            local_whisper = $true
+            local_whisper = $hasLocalWhisperPreflight
         }
         preflight_outputs = [ordered]@{
             hotkey_delivery = Get-HotkeyDeliveryPreflightProof -Output $script:hotkeyDeliveryPreflightOutput
@@ -310,8 +327,8 @@ function Write-PreflightReport {
         files = [ordered]@{
             proof_agent = Get-FileProof -Path $ProofAgentPath
             mic_preflight_wav = Get-FileProof -Path $MicPreflightPath
-            whisper_cli = Get-FileProof -Path $WhisperCLIPath
-            whisper_model = Get-FileProof -Path $WhisperModelPath
+            whisper_cli = Get-OptionalFileProof -Path $WhisperCLIPath
+            whisper_model = Get-OptionalFileProof -Path $WhisperModelPath
         }
     }
 
@@ -396,6 +413,10 @@ if ($MicPreflightSeconds -le 0) {
     throw "MicPreflightSeconds must be positive"
 }
 
+if ($NativePreflightOnly -and !$PreflightOnly) {
+    throw "NativePreflightOnly can only be used with PreflightOnly"
+}
+
 if ([System.Environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT) {
     throw "Windows laptop proof must run on Windows"
 }
@@ -430,14 +451,17 @@ if (!$PreflightOnly) {
     }
 }
 
-if ([string]::IsNullOrWhiteSpace($WhisperCLI) -or
-    [string]::IsNullOrWhiteSpace($WhisperModel)) {
+if (!$NativePreflightOnly -and (
+    [string]::IsNullOrWhiteSpace($WhisperCLI) -or
+    [string]::IsNullOrWhiteSpace($WhisperModel))) {
     throw "WhisperCLI and WhisperModel are required for local whisper laptop proof"
 }
-$WhisperCLI = Resolve-FullPath -Path $WhisperCLI
-$WhisperModel = Resolve-FullPath -Path $WhisperModel
-Require-File -Path $WhisperCLI
-Require-File -Path $WhisperModel
+if (!$NativePreflightOnly) {
+    $WhisperCLI = Resolve-FullPath -Path $WhisperCLI
+    $WhisperModel = Resolve-FullPath -Path $WhisperModel
+    Require-File -Path $WhisperCLI
+    Require-File -Path $WhisperModel
+}
 $whisperArguments = @(
     $WhisperArgument |
         Where-Object { ![string]::IsNullOrWhiteSpace($_) }
@@ -489,17 +513,23 @@ Invoke-Step "microphone preflight" {
         -Seconds $MicPreflightSeconds
 }
 
-Invoke-Step "local whisper CLI preflight" {
-    $preflightOutputDir = ""
-    if (![string]::IsNullOrWhiteSpace($WhisperOutputDir)) {
-        $preflightOutputDir = Resolve-FullPath -Path $WhisperOutputDir
+if ($NativePreflightOnly) {
+    Write-Host ""
+    Write-Host "== local whisper CLI preflight skipped =="
+    Write-Host "native_preflight_only=true"
+} else {
+    Invoke-Step "local whisper CLI preflight" {
+        $preflightOutputDir = ""
+        if (![string]::IsNullOrWhiteSpace($WhisperOutputDir)) {
+            $preflightOutputDir = Resolve-FullPath -Path $WhisperOutputDir
+        }
+        $script:localWhisperPreflightOutput = Invoke-LocalWhisperPreflight `
+            -ProofAgentPath $proofAgent `
+            -WhisperCLIPath $WhisperCLI `
+            -WhisperModelPath $WhisperModel `
+            -OutputDir $preflightOutputDir `
+            -ExtraArguments $whisperArguments
     }
-    $script:localWhisperPreflightOutput = Invoke-LocalWhisperPreflight `
-        -ProofAgentPath $proofAgent `
-        -WhisperCLIPath $WhisperCLI `
-        -WhisperModelPath $WhisperModel `
-        -OutputDir $preflightOutputDir `
-        -ExtraArguments $whisperArguments
 }
 
 Write-PreflightReport `
@@ -519,6 +549,7 @@ if ($PreflightOnly) {
     Write-Host "windows_laptop_proof_session_id=$proofSessionId"
     Write-Host "windows_laptop_hotkey_delivery_preflight=true"
     Write-Host "windows_laptop_mic_preflight=$micPreflightPath"
+    Write-Host "windows_laptop_local_whisper_preflight=$(!$NativePreflightOnly)"
     Write-Host "windows_laptop_preflight_only=true"
     Write-Host "windows_laptop_preflight_ok=true"
     exit 0

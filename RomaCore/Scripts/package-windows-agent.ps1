@@ -304,7 +304,11 @@ Roma Just Talk Windows laptop proof
 
 Run these commands from this artifact directory.
 
-Preflight only, before cloud credentials:
+Native preflight only, before cloud credentials or local whisper setup:
+
+powershell -ExecutionPolicy Bypass -File .\run-windows-laptop-proof.ps1 -PackageDir . -ProofDir C:\tmp\roma-windows-laptop-proof -PreflightOnly -NativePreflightOnly
+
+Local whisper preflight, before cloud credentials:
 
 powershell -ExecutionPolicy Bypass -File .\run-windows-laptop-proof.ps1 -PackageDir . -ProofDir C:\tmp\roma-windows-laptop-proof -PreflightOnly -WhisperCLI C:\path\whisper-cli.exe -WhisperModel C:\path\ggml-base.en.bin
 

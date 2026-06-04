@@ -74,6 +74,7 @@
 - Cleaned bounded "hold on" and "hang on" hesitation self-corrections.
 - Cleaned bounded bare "wait" self-corrections such as "Use model, wait module.".
 - Added explicit action prompts for the Windows laptop proof runner's hold-to-talk and Notepad paste steps.
+- Added a native-only Windows laptop preflight mode for proving hotkey delivery and microphone access before local whisper setup.
 - Added a packaged `whisper-cli-doctor` preflight to the Windows laptop proof runner so local-whisper setup fails before interactive proof steps.
 - Added a packaged `miniaudio-record-proof` preflight to the Windows laptop proof runner so microphone access fails before interactive proof steps.
 - Added a packaged `windows-keyboard-hook-proof` preflight to the Windows laptop proof runner so hold-hotkey delivery fails before dictation.

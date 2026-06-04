@@ -7038,6 +7038,8 @@ struct RomaCoreChecks {
         )
         try require(
             laptopProofScript.contains("PreflightOnly") &&
+                laptopProofScript.contains("NativePreflightOnly") &&
+                laptopProofScript.contains("native_preflight_only=true") &&
                 laptopProofScript.contains("windows_laptop_preflight_only=true") &&
                 laptopProofScript.contains("windows_laptop_preflight_ok=true"),
             "Windows laptop proof runner should let native preflights run before cloud/full-proof setup"
@@ -7048,7 +7050,9 @@ struct RomaCoreChecks {
                 laptopProofScript.contains(#"proof_mode = "windows-laptop-preflight""#) &&
                 laptopProofScript.contains("preflight_outputs") &&
                 laptopProofScript.contains("Get-HotkeyDeliveryPreflightProof") &&
+                laptopProofScript.contains("Get-OptionalFileProof") &&
                 laptopProofScript.contains("sample_rate_16000") &&
+                laptopProofScript.contains("local_whisper = $hasLocalWhisperPreflight") &&
                 laptopProofScript.contains("manifest = $script:artifactManifest") &&
                 laptopProofScript.contains("package_identity = (Get-RomaPackageIdentityProof -PackageDir $PackageDir)") &&
                 laptopProofScript.contains("-LaptopPreflightReportPath") &&
@@ -7064,6 +7068,9 @@ struct RomaCoreChecks {
                 checkSetScript.contains(#"Assert-ReportBoolean -Report $hotkeyOutput -Name "key_down" -Expected $true"#) &&
                 checkSetScript.contains(#"Assert-ReportBoolean -Report $microphoneOutput -Name "sample_rate_16000" -Expected $true"#) &&
                 checkSetScript.contains(#"Assert-ReportBoolean -Report $localWhisperOutput -Name "network_required_false" -Expected $true"#) &&
+                checkSetScript.contains(#"Assert-ReportBoolean -Report $localWhisperOutput -Name "output_present" -Expected $false"#) &&
+                checkSetScript.contains("function Assert-LaptopPreflightIncludesLocalWhisper") &&
+                checkSetScript.contains("proof_set_laptop_preflight_local_whisper=") &&
                 checkSetScript.contains("proof_set_laptop_preflight_package_fingerprint=") &&
                 checkSetScript.contains("proof_set_laptop_preflight_matches_full=true") &&
                 checkSetScript.contains("proof_set_ok=laptop-preflight") &&
@@ -7166,6 +7173,7 @@ struct RomaCoreChecks {
         try require(
             packageScript.contains("Write-LaptopProofGuide") &&
                 packageScript.contains("WINDOWS-LAPTOP-PROOF.txt") &&
+                packageScript.contains("-NativePreflightOnly") &&
                 packageScript.contains("windows_laptop_preflight_report=") &&
                 packageScript.contains("proof_set_laptop_preflight_matches_full=true") &&
                 packageScript.contains("proof_set_source_dirty=false") &&

@@ -49,6 +49,51 @@ function Assert-RomaWindowsOutputContains {
     Write-Host "asserted_output=$Expected"
 }
 
+function Assert-RomaWindowsRuntimeDefaultOutput {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Output
+    )
+
+    foreach ($expected in @(
+        "default_record_seconds=2.0",
+        "default_hold_timeout_seconds=15.0",
+        "default_hold_timeout_milliseconds=15000",
+        "default_clipboard_restore_delay_seconds=2.0",
+        "maximum_clipboard_restore_delay_seconds=4294967.295"
+    )) {
+        Assert-RomaWindowsOutputContains -Output $Output -Expected $expected
+    }
+}
+
+function Assert-RomaWindowsHoldTimeoutDefaultOutput {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Output
+    )
+
+    foreach ($expected in @(
+        "default_timeout_seconds=15.0",
+        "default_timeout_milliseconds=15000"
+    )) {
+        Assert-RomaWindowsOutputContains -Output $Output -Expected $expected
+    }
+}
+
+function Assert-RomaWindowsClipboardRestoreDefaultOutput {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Output
+    )
+
+    foreach ($expected in @(
+        "default_clipboard_restore_delay_seconds=2.0",
+        "maximum_clipboard_restore_delay_seconds=4294967.295"
+    )) {
+        Assert-RomaWindowsOutputContains -Output $Output -Expected $expected
+    }
+}
+
 function Add-RomaWindowsAgentConfigurationArgs {
     param(
         [string[]]$Arguments = @(),

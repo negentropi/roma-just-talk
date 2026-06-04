@@ -288,11 +288,7 @@ try {
             throw "RomaProofAgent doctor failed"
         }
         Write-Host $proofAgentDoctorOutput
-        Assert-OutputContains -Output $proofAgentDoctorOutput -Expected "default_record_seconds=2.0"
-        Assert-OutputContains -Output $proofAgentDoctorOutput -Expected "default_hold_timeout_seconds=15.0"
-        Assert-OutputContains -Output $proofAgentDoctorOutput -Expected "default_hold_timeout_milliseconds=15000"
-        Assert-OutputContains -Output $proofAgentDoctorOutput -Expected "default_clipboard_restore_delay_seconds=2.0"
-        Assert-OutputContains -Output $proofAgentDoctorOutput -Expected "maximum_clipboard_restore_delay_seconds=4294967.295"
+        Assert-RomaWindowsRuntimeDefaultOutput -Output $proofAgentDoctorOutput
         Assert-OutputContains -Output $proofAgentDoctorOutput -Expected "windows_dictation_runtime_uses_pipeline_source=true"
         Assert-OutputContains -Output $proofAgentDoctorOutput -Expected "windows_hold_hook_single_window_source=true"
     }
@@ -306,11 +302,7 @@ try {
         Write-Host $windowsAgentDoctorOutput
         Assert-OutputContains -Output $windowsAgentDoctorOutput -Expected "os_permission_grants=microphone"
         Assert-OutputContains -Output $windowsAgentDoctorOutput -Expected "native_capabilities=RegisterHotKey"
-        Assert-OutputContains -Output $windowsAgentDoctorOutput -Expected "default_record_seconds=2.0"
-        Assert-OutputContains -Output $windowsAgentDoctorOutput -Expected "default_hold_timeout_seconds=15.0"
-        Assert-OutputContains -Output $windowsAgentDoctorOutput -Expected "default_hold_timeout_milliseconds=15000"
-        Assert-OutputContains -Output $windowsAgentDoctorOutput -Expected "default_clipboard_restore_delay_seconds=2.0"
-        Assert-OutputContains -Output $windowsAgentDoctorOutput -Expected "maximum_clipboard_restore_delay_seconds=4294967.295"
+        Assert-RomaWindowsRuntimeDefaultOutput -Output $windowsAgentDoctorOutput
         Assert-OutputContains -Output $windowsAgentDoctorOutput -Expected "admin_required=false"
         Assert-OutputContains -Output $windowsAgentDoctorOutput -Expected "microphone_settings_uri=ms-settings:privacy-microphone"
         Assert-OutputContains -Output $windowsAgentDoctorOutput -Expected "accessibility_permission_prompt=false"
@@ -476,8 +468,7 @@ try {
             throw "RomaProofAgent windows-keyboard-hook-doctor failed"
         }
         Write-Host $keyboardHookDoctorOutput
-        Assert-OutputContains -Output $keyboardHookDoctorOutput -Expected "default_timeout_seconds=15.0"
-        Assert-OutputContains -Output $keyboardHookDoctorOutput -Expected "default_timeout_milliseconds=15000"
+        Assert-RomaWindowsHoldTimeoutDefaultOutput -Output $keyboardHookDoctorOutput
     }
 
     if ($RunInteractiveKeyboardHook) {
@@ -498,8 +489,7 @@ try {
             throw "RomaProofAgent windows-paste-doctor failed"
         }
         Write-Host $pasteDoctorOutput
-        Assert-OutputContains -Output $pasteDoctorOutput -Expected "default_clipboard_restore_delay_seconds=2.0"
-        Assert-OutputContains -Output $pasteDoctorOutput -Expected "maximum_clipboard_restore_delay_seconds=4294967.295"
+        Assert-RomaWindowsClipboardRestoreDefaultOutput -Output $pasteDoctorOutput
     }
 
     Invoke-Step "windows permission doctor" {

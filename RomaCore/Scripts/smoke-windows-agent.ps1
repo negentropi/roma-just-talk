@@ -178,11 +178,7 @@ Invoke-Step "agent doctor" {
     Assert-OutputContains -Output $doctorOutput -Expected "agent=roma-windows-agent"
     Assert-OutputContains -Output $doctorOutput -Expected "os_permission_grants=microphone"
     Assert-OutputContains -Output $doctorOutput -Expected "native_capabilities=RegisterHotKey"
-    Assert-OutputContains -Output $doctorOutput -Expected "default_record_seconds=2.0"
-    Assert-OutputContains -Output $doctorOutput -Expected "default_hold_timeout_seconds=15.0"
-    Assert-OutputContains -Output $doctorOutput -Expected "default_hold_timeout_milliseconds=15000"
-    Assert-OutputContains -Output $doctorOutput -Expected "default_clipboard_restore_delay_seconds=2.0"
-    Assert-OutputContains -Output $doctorOutput -Expected "maximum_clipboard_restore_delay_seconds=4294967.295"
+    Assert-RomaWindowsRuntimeDefaultOutput -Output $doctorOutput
     Assert-OutputContains -Output $doctorOutput -Expected "admin_required=false"
     Assert-OutputContains -Output $doctorOutput -Expected "microphone_settings_uri=ms-settings:privacy-microphone"
     Assert-OutputContains -Output $doctorOutput -Expected "accessibility_permission_prompt=false"

@@ -7426,11 +7426,17 @@ struct RomaCoreChecks {
         ]
         for expectedLine in proofDefaultAssertions {
             try require(
-                windowsProofScript.contains(#"Assert-OutputContains -Output "#) &&
-                    windowsProofScript.contains(#"-Expected "\#(expectedLine)""#),
-                "Windows proof script should assert doctor default output \(expectedLine)"
+                proofCommonScript.contains(#""\#(expectedLine)""#),
+                "Windows proof helper should own doctor default output \(expectedLine)"
             )
         }
+        try require(
+            windowsProofScript.contains("Assert-RomaWindowsRuntimeDefaultOutput -Output $proofAgentDoctorOutput") &&
+                windowsProofScript.contains("Assert-RomaWindowsRuntimeDefaultOutput -Output $windowsAgentDoctorOutput") &&
+                windowsProofScript.contains("Assert-RomaWindowsHoldTimeoutDefaultOutput -Output $keyboardHookDoctorOutput") &&
+                windowsProofScript.contains("Assert-RomaWindowsClipboardRestoreDefaultOutput -Output $pasteDoctorOutput"),
+            "Windows proof script should use shared doctor default assertions"
+        )
         let proofReportDefaultFields = [
             "default_record_seconds",
             "default_hold_timeout_seconds",
@@ -7494,11 +7500,17 @@ struct RomaCoreChecks {
         ]
         for expectedLine in artifactDefaultAssertions {
             try require(
-                proveScript.contains(#"Assert-OutputContains -Output "#) &&
-                    proveScript.contains(#"-Expected "\#(expectedLine)""#),
-                "Windows artifact proof script should assert doctor default output \(expectedLine)"
+                proofCommonScript.contains(#""\#(expectedLine)""#),
+                "Windows proof helper should own artifact doctor default output \(expectedLine)"
             )
         }
+        try require(
+            proveScript.contains("Assert-RomaWindowsRuntimeDefaultOutput -Output $script:packagedAgentDoctorOutput") &&
+                proveScript.contains("Assert-RomaWindowsRuntimeDefaultOutput -Output $script:packagedProofAgentDoctorOutput") &&
+                proveScript.contains(#"Assert-RomaWindowsHoldTimeoutDefaultOutput -Output ($script:packagedNativeDoctorOutputs["keyboard_hook"])"#) &&
+                proveScript.contains(#"Assert-RomaWindowsClipboardRestoreDefaultOutput -Output ($script:packagedNativeDoctorOutputs["paste"])"#),
+            "Windows artifact proof script should use shared doctor default assertions"
+        )
         let packageDefaultAssertions = [
             "default_record_seconds=2.0",
             "default_hold_timeout_seconds=15.0",
@@ -7508,21 +7520,16 @@ struct RomaCoreChecks {
         ]
         for expectedLine in packageDefaultAssertions {
             try require(
-                packageScript.contains(#"Assert-OutputContains -Output $proofAgentOutputText"#) &&
-                    packageScript.contains(#"-Expected "\#(expectedLine)""#),
-                "Windows package script should assert packaged proof-agent default output \(expectedLine)"
-            )
-            try require(
-                smokeScript.contains(#"Assert-OutputContains -Output $doctorOutput"#) &&
-                    smokeScript.contains(#"-Expected "\#(expectedLine)""#),
-                "Windows smoke script should assert packaged agent default output \(expectedLine)"
-            )
-            try require(
-                runScript.contains(#"Assert-OutputContains -Output $doctorOutput"#) &&
-                    runScript.contains(#"-Expected "\#(expectedLine)""#),
-                "Windows run script should assert installed launcher default output \(expectedLine)"
+                proofCommonScript.contains(#""\#(expectedLine)""#),
+                "Windows proof helper should own packaged default output \(expectedLine)"
             )
         }
+        try require(
+            packageScript.contains("Assert-RomaWindowsRuntimeDefaultOutput -Output $proofAgentOutputText") &&
+                smokeScript.contains("Assert-RomaWindowsRuntimeDefaultOutput -Output $doctorOutput") &&
+                runScript.contains("Assert-RomaWindowsRuntimeDefaultOutput -Output $doctorOutput"),
+            "Windows package, smoke, and run scripts should use shared doctor default assertions"
+        )
         let installedLauncherContractAssertions = [
             "os_permission_grants=microphone",
             "native_capabilities=RegisterHotKey",
@@ -7850,6 +7857,9 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Resolve-RomaWindowsFullPath") &&
                 proofCommonScript.contains("function Require-RomaWindowsFile") &&
                 proofCommonScript.contains("function Assert-RomaWindowsOutputContains") &&
+                proofCommonScript.contains("function Assert-RomaWindowsRuntimeDefaultOutput") &&
+                proofCommonScript.contains("function Assert-RomaWindowsHoldTimeoutDefaultOutput") &&
+                proofCommonScript.contains("function Assert-RomaWindowsClipboardRestoreDefaultOutput") &&
                 proofCommonScript.contains("function Add-RomaWindowsAgentConfigurationArgs") &&
                 proofCommonScript.contains("function Add-RomaWindowsAgentScriptCommonArgs") &&
                 proofCommonScript.contains("function Get-RomaWindowsFileHashProof"),

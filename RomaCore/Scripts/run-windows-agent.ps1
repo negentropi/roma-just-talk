@@ -106,11 +106,7 @@ if ($LASTEXITCODE -ne 0) {
     throw "RomaWindowsAgent doctor failed"
 }
 Write-Host $doctorOutput
-Assert-OutputContains -Output $doctorOutput -Expected "default_record_seconds=2.0"
-Assert-OutputContains -Output $doctorOutput -Expected "default_hold_timeout_seconds=15.0"
-Assert-OutputContains -Output $doctorOutput -Expected "default_hold_timeout_milliseconds=15000"
-Assert-OutputContains -Output $doctorOutput -Expected "default_clipboard_restore_delay_seconds=2.0"
-Assert-OutputContains -Output $doctorOutput -Expected "maximum_clipboard_restore_delay_seconds=4294967.295"
+Assert-RomaWindowsRuntimeDefaultOutput -Output $doctorOutput
 Assert-OutputContains -Output $doctorOutput -Expected "os_permission_grants=microphone"
 Assert-OutputContains -Output $doctorOutput -Expected "native_capabilities=RegisterHotKey"
 Assert-OutputContains -Output $doctorOutput -Expected "paste=win32_clipboard_sendinput"

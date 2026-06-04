@@ -937,11 +937,7 @@ Invoke-Step "packaged agent doctor" {
         throw "RomaWindowsAgent doctor failed"
     }
     Write-Host $script:packagedAgentDoctorOutput
-    Assert-OutputContains -Output $script:packagedAgentDoctorOutput -Expected "default_record_seconds=2.0"
-    Assert-OutputContains -Output $script:packagedAgentDoctorOutput -Expected "default_hold_timeout_seconds=15.0"
-    Assert-OutputContains -Output $script:packagedAgentDoctorOutput -Expected "default_hold_timeout_milliseconds=15000"
-    Assert-OutputContains -Output $script:packagedAgentDoctorOutput -Expected "default_clipboard_restore_delay_seconds=2.0"
-    Assert-OutputContains -Output $script:packagedAgentDoctorOutput -Expected "maximum_clipboard_restore_delay_seconds=4294967.295"
+    Assert-RomaWindowsRuntimeDefaultOutput -Output $script:packagedAgentDoctorOutput
     Assert-OutputContains -Output $script:packagedAgentDoctorOutput -Expected "microphone_settings_uri=ms-settings:privacy-microphone"
 }
 
@@ -952,11 +948,7 @@ Invoke-Step "packaged proof agent doctor" {
         throw "RomaProofAgent doctor failed"
     }
     Write-Host $script:packagedProofAgentDoctorOutput
-    Assert-OutputContains -Output $script:packagedProofAgentDoctorOutput -Expected "default_record_seconds=2.0"
-    Assert-OutputContains -Output $script:packagedProofAgentDoctorOutput -Expected "default_hold_timeout_seconds=15.0"
-    Assert-OutputContains -Output $script:packagedProofAgentDoctorOutput -Expected "default_hold_timeout_milliseconds=15000"
-    Assert-OutputContains -Output $script:packagedProofAgentDoctorOutput -Expected "default_clipboard_restore_delay_seconds=2.0"
-    Assert-OutputContains -Output $script:packagedProofAgentDoctorOutput -Expected "maximum_clipboard_restore_delay_seconds=4294967.295"
+    Assert-RomaWindowsRuntimeDefaultOutput -Output $script:packagedProofAgentDoctorOutput
     Assert-OutputContains -Output $script:packagedProofAgentDoctorOutput -Expected "windows_paste_adapter_source=true"
     Assert-OutputContains -Output $script:packagedProofAgentDoctorOutput -Expected "windows_dictation_runtime_uses_pipeline_source=true"
     Assert-OutputContains -Output $script:packagedProofAgentDoctorOutput -Expected "windows_listener_output_isolation_source=true"
@@ -979,13 +971,11 @@ Invoke-Step "packaged native proof doctors" {
 
     $script:packagedNativeDoctorOutputs["keyboard_hook"] = Invoke-ProofAgentDoctorCommand -Name "keyboard hook" -Command "windows-keyboard-hook-doctor"
     Assert-OutputContains -Output ($script:packagedNativeDoctorOutputs["keyboard_hook"]) -Expected "runtime=true"
-    Assert-OutputContains -Output ($script:packagedNativeDoctorOutputs["keyboard_hook"]) -Expected "default_timeout_seconds=15.0"
-    Assert-OutputContains -Output ($script:packagedNativeDoctorOutputs["keyboard_hook"]) -Expected "default_timeout_milliseconds=15000"
+    Assert-RomaWindowsHoldTimeoutDefaultOutput -Output ($script:packagedNativeDoctorOutputs["keyboard_hook"])
 
     $script:packagedNativeDoctorOutputs["paste"] = Invoke-ProofAgentDoctorCommand -Name "paste" -Command "windows-paste-doctor"
     Assert-OutputContains -Output ($script:packagedNativeDoctorOutputs["paste"]) -Expected "windows_paste_runtime=true"
-    Assert-OutputContains -Output ($script:packagedNativeDoctorOutputs["paste"]) -Expected "default_clipboard_restore_delay_seconds=2.0"
-    Assert-OutputContains -Output ($script:packagedNativeDoctorOutputs["paste"]) -Expected "maximum_clipboard_restore_delay_seconds=4294967.295"
+    Assert-RomaWindowsClipboardRestoreDefaultOutput -Output ($script:packagedNativeDoctorOutputs["paste"])
 
     $script:packagedNativeDoctorOutputs["dpapi_secret"] = Invoke-ProofAgentDoctorCommand -Name "dpapi secret" -Command "windows-secret-doctor"
     Assert-OutputContains -Output ($script:packagedNativeDoctorOutputs["dpapi_secret"]) -Expected "dpapi_runtime=true"

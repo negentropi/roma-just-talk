@@ -534,11 +534,7 @@ try {
             throw "RomaProofAgent doctor failed"
         }
         Write-Host $proofAgentOutputText
-        Assert-OutputContains -Output $proofAgentOutputText -Expected "default_record_seconds=2.0"
-        Assert-OutputContains -Output $proofAgentOutputText -Expected "default_hold_timeout_seconds=15.0"
-        Assert-OutputContains -Output $proofAgentOutputText -Expected "default_hold_timeout_milliseconds=15000"
-        Assert-OutputContains -Output $proofAgentOutputText -Expected "default_clipboard_restore_delay_seconds=2.0"
-        Assert-OutputContains -Output $proofAgentOutputText -Expected "maximum_clipboard_restore_delay_seconds=4294967.295"
+        Assert-RomaWindowsRuntimeDefaultOutput -Output $proofAgentOutputText
         Assert-OutputContains -Output $proofAgentOutputText -Expected "windows_paste_adapter_source=true"
         Assert-OutputContains -Output $proofAgentOutputText -Expected "windows_dictation_runtime_uses_pipeline_source=true"
         Assert-OutputContains -Output $proofAgentOutputText -Expected "windows_hold_hook_single_window_source=true"

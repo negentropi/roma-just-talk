@@ -71,6 +71,7 @@ function Get-RomaPackageIdentityProof {
         "WINDOWS-LAPTOP-PROOF.txt",
         "check-windows-proof-report.ps1",
         "check-windows-proof-set.ps1",
+        "windows-manifest.ps1",
         "windows-package-identity.ps1",
         "manifest.txt"
     )

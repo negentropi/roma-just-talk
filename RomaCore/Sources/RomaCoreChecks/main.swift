@@ -6165,6 +6165,10 @@ struct RomaCoreChecks {
             contentsOf: scriptsRoot.appendingPathComponent("run-windows-laptop-proof.ps1"),
             encoding: .utf8
         )
+        let manifestScript = try String(
+            contentsOf: scriptsRoot.appendingPathComponent("windows-manifest.ps1"),
+            encoding: .utf8
+        )
         let packageIdentityScript = try String(
             contentsOf: scriptsRoot.appendingPathComponent("windows-package-identity.ps1"),
             encoding: .utf8
@@ -6586,6 +6590,8 @@ struct RomaCoreChecks {
         try require(
             packageScript.contains("laptop preflight report checker smoke") &&
                 packageScript.contains("Write-LaptopPreflightCheckerSmokeReport") &&
+                packageScript.contains("windows-manifest.ps1") &&
+                packageScript.contains("manifest_script=$manifestScriptOutput") &&
                 packageScript.contains("windows-package-identity.ps1") &&
                 packageScript.contains("package_identity_script=$identityScriptOutput") &&
                 packageScript.contains("Get-RomaPackageIdentityProof -PackageDir $PackageDir") &&
@@ -6599,8 +6605,14 @@ struct RomaCoreChecks {
             "Windows package smoke should exercise the laptop preflight report checker output markers and identity shape on Windows CI"
         )
         try require(
+            manifestScript.contains("function Read-RomaWindowsManifest") &&
+                manifestScript.contains("function Require-RomaWindowsManifestKey"),
+            "Windows manifest parsing should be computed by one shared packaged helper"
+        )
+        try require(
             packageIdentityScript.contains("function Get-RomaPackageIdentityProof") &&
                 packageIdentityScript.contains("windows-package-identity.ps1") &&
+                packageIdentityScript.contains("windows-manifest.ps1") &&
                 packageIdentityScript.contains("RomaWhisperCLIMock.exe") &&
                 packageIdentityScript.contains("Get-RomaPackageIdentityHash"),
             "Windows package identity should be computed by one shared packaged helper"
@@ -6613,6 +6625,16 @@ struct RomaCoreChecks {
                 !proveScript.contains("function Get-PackageIdentityProof") &&
                 !laptopProofScript.contains("function Get-PackageIdentityProof"),
             "Windows package scripts should reuse the shared package identity helper instead of duplicating it"
+        )
+        try require(
+            proveScript.contains(". $manifestScript") &&
+                laptopProofScript.contains(". $manifestScript") &&
+                proveScript.contains("Read-RomaWindowsManifest -Path $manifestPath") &&
+                laptopProofScript.contains("Read-RomaWindowsManifest -Path $manifestPath") &&
+                workflowScript.contains("Read-RomaWindowsManifest -Path $manifestPath") &&
+                !proveScript.contains("function Read-Manifest") &&
+                !laptopProofScript.contains("function Read-Manifest"),
+            "Windows proof scripts and CI should reuse the shared manifest helper instead of duplicating manifest parsing"
         )
         try require(
             packageScript.contains("Write-LaptopProofGuide") &&
@@ -6664,6 +6686,7 @@ struct RomaCoreChecks {
             installScript.contains(#""RomaProofAgent.exe""#) &&
                 installScript.contains(#""run-windows-laptop-proof.ps1""#) &&
                 installScript.contains(#""WINDOWS-LAPTOP-PROOF.txt""#) &&
+                installScript.contains(#""windows-manifest.ps1""#) &&
                 installScript.contains(#""windows-package-identity.ps1""#) &&
                 installScript.contains(#""check-windows-proof-set.ps1""#),
             "Windows installer should preserve the packaged proof surface"
@@ -6672,6 +6695,7 @@ struct RomaCoreChecks {
             proveScript.contains("installed_proof_agent") &&
                 proveScript.contains("installed_laptop_proof_script") &&
                 proveScript.contains("installed_laptop_proof_guide") &&
+                proveScript.contains("installed_manifest_script") &&
                 proveScript.contains("installed_package_identity_script") &&
                 proveScript.contains("installed_check_set_script"),
             "Windows artifact proof reports should record the installed proof surface"
@@ -6680,6 +6704,7 @@ struct RomaCoreChecks {
             checkReportScript.contains("installed_proof_agent_matches_package") &&
                 checkReportScript.contains("installed_laptop_proof_script_matches_package") &&
                 checkReportScript.contains("installed_laptop_proof_guide_matches_package") &&
+                checkReportScript.contains("installed_manifest_script_matches_package") &&
                 checkReportScript.contains("installed_package_identity_script_matches_package") &&
                 checkReportScript.contains("installed_check_set_script_matches_package"),
             "Windows proof checker should verify installed proof surface hashes"
@@ -6699,6 +6724,12 @@ struct RomaCoreChecks {
         try require(
             workflowScript.contains(#".\Scripts\windows-package-identity.ps1"#),
             "Windows CI should parse the shared package identity helper"
+        )
+        try require(
+            workflowScript.contains(#".\Scripts\windows-manifest.ps1"#) &&
+                workflowScript.contains(#"$env:RUNNER_TEMP\roma-windows-agent\windows-manifest.ps1"#) &&
+                workflowScript.contains("Require-RomaWindowsManifestKey"),
+            "Windows CI should parse and use the shared manifest helper"
         )
         try require(
             workflowScript.contains(#"source_dirty=false"#),

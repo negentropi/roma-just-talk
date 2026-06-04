@@ -103,6 +103,7 @@
 - Added a package identity fingerprint to Windows artifact proof reports and full laptop proof-set validation.
 - Replaced the Windows laptop preflight checker smoke's placeholder package fingerprint with the real artifact identity.
 - Shared Windows package identity hashing through one packaged proof helper.
+- Shared Windows manifest parsing through one packaged proof helper.
 - Added a persistent Windows agent listener mode and made installed shortcuts/startup shortcuts launch it.
 - Smoked packaged Windows listener mode with a zero-session run during artifact packaging.
 - Added packaged listener smoke evidence to Windows artifact proof reports and profile checks.

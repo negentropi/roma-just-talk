@@ -391,6 +391,8 @@ try {
     $laptopProofScriptOutput = Join-Path $OutputDir "run-windows-laptop-proof.ps1"
     $identityScriptSource = Join-Path $PSScriptRoot "windows-package-identity.ps1"
     $identityScriptOutput = Join-Path $OutputDir "windows-package-identity.ps1"
+    $manifestScriptSource = Join-Path $PSScriptRoot "windows-manifest.ps1"
+    $manifestScriptOutput = Join-Path $OutputDir "windows-manifest.ps1"
     $checkReportScriptSource = Join-Path $PSScriptRoot "check-windows-proof-report.ps1"
     $checkReportScriptOutput = Join-Path $OutputDir "check-windows-proof-report.ps1"
     $checkSetScriptSource = Join-Path $PSScriptRoot "check-windows-proof-set.ps1"
@@ -460,6 +462,8 @@ try {
         Write-Host "laptop_proof_script=$laptopProofScriptOutput"
         Copy-Item -LiteralPath $identityScriptSource -Destination $identityScriptOutput -Force
         Write-Host "package_identity_script=$identityScriptOutput"
+        Copy-Item -LiteralPath $manifestScriptSource -Destination $manifestScriptOutput -Force
+        Write-Host "manifest_script=$manifestScriptOutput"
         Copy-Item -LiteralPath $checkReportScriptSource -Destination $checkReportScriptOutput -Force
         Write-Host "check_report_script=$checkReportScriptOutput"
         Copy-Item -LiteralPath $checkSetScriptSource -Destination $checkSetScriptOutput -Force
@@ -577,6 +581,7 @@ try {
         "laptop_proof_script=$laptopProofScriptOutput",
         "laptop_proof_guide=$laptopProofGuideOutput",
         "package_identity_script=$identityScriptOutput",
+        "manifest_script=$manifestScriptOutput",
         "check_report_script=$checkReportScriptOutput",
         "check_set_script=$checkSetScriptOutput",
         "swift_runtime_dir=$($swiftRuntime.Directory)",

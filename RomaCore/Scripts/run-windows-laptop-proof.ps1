@@ -40,6 +40,12 @@ if (!(Test-Path -LiteralPath $packageIdentityScript)) {
 }
 . $packageIdentityScript
 
+$manifestScript = Join-Path $PSScriptRoot "windows-manifest.ps1"
+if (!(Test-Path -LiteralPath $manifestScript)) {
+    throw "Windows manifest helper was not found: $manifestScript"
+}
+. $manifestScript
+
 function Resolve-FullPath {
     param(
         [Parameter(Mandatory = $true)]
@@ -58,27 +64,6 @@ function Require-File {
     if (!(Test-Path -LiteralPath $Path)) {
         throw "Required file was not found: $Path"
     }
-}
-
-function Read-Manifest {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Path
-    )
-
-    $manifest = @{}
-    foreach ($line in Get-Content -LiteralPath $Path) {
-        if ([string]::IsNullOrWhiteSpace($line) -or !$line.Contains("=")) {
-            continue
-        }
-
-        $separator = $line.IndexOf("=")
-        $key = $line.Substring(0, $separator)
-        $value = $line.Substring($separator + 1)
-        $manifest[$key] = $value
-    }
-
-    return $manifest
 }
 
 function Require-FileWithMinimumBytes {
@@ -522,7 +507,7 @@ Require-File -Path $proofScript
 Require-File -Path $checkSetScript
 Require-File -Path $proofAgent
 Require-File -Path $manifestPath
-$script:artifactManifest = Read-Manifest -Path $manifestPath
+$script:artifactManifest = Read-RomaWindowsManifest -Path $manifestPath
 
 $proofSessionId = [guid]::NewGuid().ToString("D")
 

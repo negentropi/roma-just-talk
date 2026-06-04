@@ -46,6 +46,12 @@ if (!(Test-Path -LiteralPath $packageIdentityScript)) {
 }
 . $packageIdentityScript
 
+$manifestScript = Join-Path $PSScriptRoot "windows-manifest.ps1"
+if (!(Test-Path -LiteralPath $manifestScript)) {
+    throw "Windows manifest helper was not found: $manifestScript"
+}
+. $manifestScript
+
 function Invoke-Step {
     param(
         [Parameter(Mandatory = $true)]
@@ -90,42 +96,6 @@ function Require-File {
     if (!(Test-Path -LiteralPath $Path)) {
         throw "Required file was not found: $Path"
     }
-}
-
-function Read-Manifest {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Path
-    )
-
-    $manifest = @{}
-    foreach ($line in Get-Content -LiteralPath $Path) {
-        if ([string]::IsNullOrWhiteSpace($line) -or !$line.Contains("=")) {
-            continue
-        }
-
-        $separator = $line.IndexOf("=")
-        $key = $line.Substring(0, $separator)
-        $value = $line.Substring($separator + 1)
-        $manifest[$key] = $value
-    }
-
-    return $manifest
-}
-
-function Require-ManifestKey {
-    param(
-        [Parameter(Mandatory = $true)]
-        [hashtable]$Manifest,
-        [Parameter(Mandatory = $true)]
-        [string]$Key
-    )
-
-    if (!$Manifest.ContainsKey($Key) -or [string]::IsNullOrWhiteSpace($Manifest[$Key])) {
-        throw "Manifest key was not found: $Key"
-    }
-
-    Write-Host "manifest_$Key=$($Manifest[$Key])"
 }
 
 function Assert-OutputContains {
@@ -850,6 +820,7 @@ function Write-ProofReport {
             installed_proof_script = (Get-FileHashProof -Path (Join-Path $InstallDir "prove-windows-agent-artifact.ps1"))
             installed_laptop_proof_script = (Get-FileHashProof -Path (Join-Path $InstallDir "run-windows-laptop-proof.ps1"))
             installed_laptop_proof_guide = (Get-FileHashProof -Path (Join-Path $InstallDir "WINDOWS-LAPTOP-PROOF.txt"))
+            installed_manifest_script = (Get-FileHashProof -Path (Join-Path $InstallDir "windows-manifest.ps1"))
             installed_package_identity_script = (Get-FileHashProof -Path (Join-Path $InstallDir "windows-package-identity.ps1"))
             installed_check_report_script = (Get-FileHashProof -Path (Join-Path $InstallDir "check-windows-proof-report.ps1"))
             installed_check_set_script = (Get-FileHashProof -Path (Join-Path $InstallDir "check-windows-proof-set.ps1"))
@@ -972,7 +943,7 @@ Invoke-Step "artifact files" {
 }
 
 Invoke-Step "artifact manifest" {
-    $script:artifactManifest = Read-Manifest -Path $manifestPath
+    $script:artifactManifest = Read-RomaWindowsManifest -Path $manifestPath
     foreach ($key in @(
         "agent",
         "output",
@@ -989,9 +960,11 @@ Invoke-Step "artifact manifest" {
         "install_proof_shortcut",
         "local_whisper_install_config",
         "local_whisper_shortcut",
+        "manifest_script",
+        "package_identity_script",
         "swift_runtime_dlls"
     )) {
-        Require-ManifestKey -Manifest $script:artifactManifest -Key $key
+        Require-RomaWindowsManifestKey -Manifest $script:artifactManifest -Key $key
     }
     $script:packagedWhisperCLI = Resolve-PackagePath -Path $script:artifactManifest["whisper_cli_mock"]
     Require-File -Path $script:packagedWhisperCLI

@@ -118,7 +118,7 @@ jobs:
 
       - name: Parse Windows proof script
         run: |
-          foreach ($script in @(".\Scripts\windows-proof.ps1", ".\Scripts\package-windows-agent.ps1", ".\Scripts\smoke-windows-agent.ps1", ".\Scripts\install-windows-agent.ps1", ".\Scripts\run-windows-agent.ps1", ".\Scripts\prove-windows-agent-artifact.ps1", ".\Scripts\run-windows-laptop-proof.ps1", ".\Scripts\windows-package-identity.ps1", ".\Scripts\check-windows-proof-report.ps1", ".\Scripts\check-windows-proof-set.ps1")) {
+          foreach ($script in @(".\Scripts\windows-proof.ps1", ".\Scripts\package-windows-agent.ps1", ".\Scripts\smoke-windows-agent.ps1", ".\Scripts\install-windows-agent.ps1", ".\Scripts\run-windows-agent.ps1", ".\Scripts\prove-windows-agent-artifact.ps1", ".\Scripts\run-windows-laptop-proof.ps1", ".\Scripts\windows-manifest.ps1", ".\Scripts\windows-package-identity.ps1", ".\Scripts\check-windows-proof-report.ps1", ".\Scripts\check-windows-proof-set.ps1")) {
             $errors = $null
             [System.Management.Automation.PSParser]::Tokenize(
               (Get-Content -Raw $script),
@@ -229,17 +229,18 @@ jobs:
             throw "manifest.txt was not found: $manifestPath"
           }
 
-          $manifestLines = Get-Content -LiteralPath $manifestPath
-          $sourceCommit = $manifestLines | Where-Object { $_ -like "source_commit=*" } | Select-Object -First 1
-          $sourceDirty = $manifestLines | Where-Object { $_ -like "source_dirty=*" } | Select-Object -First 1
-          if ($sourceCommit -notmatch "^source_commit=[0-9a-fA-F]{40}$") {
+          . "$env:RUNNER_TEMP\roma-windows-agent\windows-manifest.ps1"
+          $manifest = Read-RomaWindowsManifest -Path $manifestPath
+          $sourceCommit = Require-RomaWindowsManifestKey -Manifest $manifest -Key "source_commit"
+          $sourceDirty = Require-RomaWindowsManifestKey -Manifest $manifest -Key "source_dirty"
+          if ($sourceCommit -notmatch "^[0-9a-fA-F]{40}$") {
             throw "Windows package manifest has invalid source_commit: $sourceCommit"
           }
-          if ($sourceDirty -ne "source_dirty=false") {
+          if ($sourceDirty -ne "false") {
             throw "Windows package manifest must come from a clean checkout, got: $sourceDirty"
           }
 
-          Write-Host "ci_package_source_commit=$($sourceCommit.Substring('source_commit='.Length))"
+          Write-Host "ci_package_source_commit=$sourceCommit"
           Write-Host "ci_package_source_dirty=false"
 
       - name: Verify Windows agent artifact wrapper

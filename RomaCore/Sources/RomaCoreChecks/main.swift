@@ -8632,6 +8632,15 @@ struct RomaCoreChecks {
             )
         }
         try require(
+            checkReportScript.contains("function Assert-RuntimeDefaultProof") &&
+                checkReportScript.contains("function Assert-HoldTimeoutDefaultProof") &&
+                checkReportScript.contains("function Assert-ClipboardRestoreDefaultProof") &&
+                checkReportScript.contains("Assert-RuntimeDefaultProof -Proof $Proof") &&
+                checkReportScript.contains("Assert-HoldTimeoutDefaultProof -Proof $Proof") &&
+                checkReportScript.contains("Assert-ClipboardRestoreDefaultProof -Proof $Proof"),
+            "Windows proof report checker should share doctor default proof assertions"
+        )
+        try require(
             windowsProofScript.contains("Assert-RomaWindowsRuntimeDefaultOutput -Output $proofAgentDoctorOutput") &&
                 windowsProofScript.contains("Assert-RomaWindowsRuntimeDefaultOutput -Output $windowsAgentDoctorOutput") &&
                 windowsProofScript.contains("Assert-RomaWindowsHoldTimeoutDefaultOutput -Output $keyboardHookDoctorOutput") &&

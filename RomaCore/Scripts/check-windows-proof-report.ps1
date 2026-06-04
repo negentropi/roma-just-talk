@@ -577,6 +577,37 @@ function Assert-HoldHookRuntimeProof {
     Assert-Boolean -Object $Runtime -Name "reported_ordered_hold_sequence" -Expected $true
 }
 
+function Assert-HoldTimeoutDefaultProof {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Proof
+    )
+
+    Assert-Boolean -Object $Proof -Name "default_hold_timeout_seconds" -Expected $true
+    Assert-Boolean -Object $Proof -Name "default_hold_timeout_milliseconds" -Expected $true
+}
+
+function Assert-ClipboardRestoreDefaultProof {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Proof
+    )
+
+    Assert-Boolean -Object $Proof -Name "default_clipboard_restore_delay_seconds" -Expected $true
+    Assert-Boolean -Object $Proof -Name "maximum_clipboard_restore_delay_seconds" -Expected $true
+}
+
+function Assert-RuntimeDefaultProof {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Proof
+    )
+
+    Assert-Boolean -Object $Proof -Name "default_record_seconds" -Expected $true
+    Assert-HoldTimeoutDefaultProof -Proof $Proof
+    Assert-ClipboardRestoreDefaultProof -Proof $Proof
+}
+
 function Assert-DoctorOutputProof {
     param(
         [Parameter(Mandatory = $true)]
@@ -595,11 +626,7 @@ function Assert-DoctorOutputProof {
     Assert-Boolean -Object $Proof -Name "microphone_settings_uri" -Expected $true
     Assert-Boolean -Object $Proof -Name "desktop_app_microphone_access_required" -Expected $true
     Assert-Boolean -Object $Proof -Name "native_capabilities_register_hotkey" -Expected $true
-    Assert-Boolean -Object $Proof -Name "default_record_seconds" -Expected $true
-    Assert-Boolean -Object $Proof -Name "default_hold_timeout_seconds" -Expected $true
-    Assert-Boolean -Object $Proof -Name "default_hold_timeout_milliseconds" -Expected $true
-    Assert-Boolean -Object $Proof -Name "default_clipboard_restore_delay_seconds" -Expected $true
-    Assert-Boolean -Object $Proof -Name "maximum_clipboard_restore_delay_seconds" -Expected $true
+    Assert-RuntimeDefaultProof -Proof $Proof
     Assert-Boolean -Object $Proof -Name "no_accessibility_permission_prompt" -Expected $true
     Assert-Boolean -Object $Proof -Name "no_automation_permission_prompt" -Expected $true
     Assert-Boolean -Object $Proof -Name "no_admin_required" -Expected $true
@@ -623,11 +650,7 @@ function Assert-ProofAgentDoctorOutputProof {
     Assert-Boolean -Object $Proof -Name "swift_core" -Expected $true
     Assert-Boolean -Object $Proof -Name "native_windows_adapters" -Expected $true
     Assert-Boolean -Object $Proof -Name "pre_roll_config" -Expected $true
-    Assert-Boolean -Object $Proof -Name "default_record_seconds" -Expected $true
-    Assert-Boolean -Object $Proof -Name "default_hold_timeout_seconds" -Expected $true
-    Assert-Boolean -Object $Proof -Name "default_hold_timeout_milliseconds" -Expected $true
-    Assert-Boolean -Object $Proof -Name "default_clipboard_restore_delay_seconds" -Expected $true
-    Assert-Boolean -Object $Proof -Name "maximum_clipboard_restore_delay_seconds" -Expected $true
+    Assert-RuntimeDefaultProof -Proof $Proof
     Assert-Boolean -Object $Proof -Name "windows_paste_adapter_source" -Expected $true
     Assert-Boolean -Object $Proof -Name "windows_permission_surface_source" -Expected $true
     Assert-Boolean -Object $Proof -Name "windows_dictation_runtime_source" -Expected $true
@@ -659,15 +682,13 @@ function Assert-NativeDoctorOutputProof {
     Assert-NonEmptyString -Object $Proof -Name "expected_marker"
     Assert-Boolean -Object $Proof -Name "expected_marker_present" -Expected $true
     if ($Name -eq "keyboard_hook") {
-        Assert-Boolean -Object $Proof -Name "default_hold_timeout_seconds" -Expected $true
-        Assert-Boolean -Object $Proof -Name "default_hold_timeout_milliseconds" -Expected $true
+        Assert-HoldTimeoutDefaultProof -Proof $Proof
     }
     if ($Name -eq "register_hotkey_available") {
         Assert-Boolean -Object $Proof -Name "register_hotkey_available" -Expected $true
     }
     if ($Name -eq "paste") {
-        Assert-Boolean -Object $Proof -Name "default_clipboard_restore_delay_seconds" -Expected $true
-        Assert-Boolean -Object $Proof -Name "maximum_clipboard_restore_delay_seconds" -Expected $true
+        Assert-ClipboardRestoreDefaultProof -Proof $Proof
     }
     Write-Host "proof_native_doctor=$Name"
 }

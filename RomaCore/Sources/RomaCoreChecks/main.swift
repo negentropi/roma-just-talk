@@ -246,6 +246,7 @@ struct RomaCoreChecks {
         let midSentenceContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "...so this")
         let listIntroContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "Tasks:")
         let sentenceStartContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "Done. ")
+        let thinkContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "I think")
         let selectedMidSentenceContext = RomaTranscriptionOutputFilter.TextInsertionContext(
             precedingText: "Use ",
             selectedText: "old"
@@ -270,6 +271,28 @@ struct RomaCoreChecks {
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("Model.", context: midSentenceContext) == "model",
             "shared insertion polish should lowercase mid-sentence fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "so this Model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim repeated two-word context from continuation fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("this Model.", context: midSentenceContext) == "model",
+            "shared insertion polish should trim repeated one-word context after discourse connectors"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "so this final word.",
+                context: midSentenceContext
+            ) == "final word",
+            "shared insertion polish should trim repeated context from longer continuation fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("think model.", context: thinkContext) == "think model",
+            "shared insertion polish should preserve unguarded single-word context repeats"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("MODEL.", context: midSentenceContext) == "model",

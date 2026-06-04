@@ -348,8 +348,13 @@ struct TranscriptionOutputFilterTests {
         let closingSmartSingleQuoteContext = TranscriptionOutputFilter.TextInsertionContext(precedingText: "She said ‘hello’")
         let newLineContext = TranscriptionOutputFilter.TextInsertionContext(precedingText: "Done\n")
         let likePredicateContext = TranscriptionOutputFilter.TextInsertionContext(precedingText: "looks")
+        let thinkContext = TranscriptionOutputFilter.TextInsertionContext(precedingText: "I think")
 
         #expect(TranscriptionOutputFilter.applyInsertionPolish("Model.", context: midSentenceContext) == "model")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("so this Model.", context: midSentenceContext) == "model")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("this Model.", context: midSentenceContext) == "model")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("so this final word.", context: midSentenceContext) == "final word")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("think model.", context: thinkContext) == "think model")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("MODEL.", context: midSentenceContext) == "model")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("MODULE.", context: midSentenceContext) == "module")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("FUNCTION.", context: midSentenceContext) == "function")

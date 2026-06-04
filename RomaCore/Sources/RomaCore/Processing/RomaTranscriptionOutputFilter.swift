@@ -558,6 +558,12 @@ public struct RomaTranscriptionOutputFilter {
         "less", "look", "looks", "more", "not", "seem", "seems", "sound",
         "sounds", "was", "were"
     ]
+    private static let singleWordContinuationOverlapPreviousWords: Set<String> = [
+        "and", "as", "because", "but", "if", "or", "since", "so", "then", "when", "while"
+    ]
+    private static let singleWordContinuationOverlapWords: Set<String> = [
+        "a", "an", "it", "that", "the", "these", "this", "those"
+    ]
     private static let leadingLikeClauseStarterVerbs: Set<String> = [
         "am", "are", "can", "could", "did", "do", "does", "had", "has",
         "have", "is", "might", "must", "need", "needs", "should", "think",
@@ -1340,6 +1346,10 @@ public struct RomaTranscriptionOutputFilter {
                 return restoreLeadingNewlines(leadingNewlineCount, to: polishedText)
             }
             polishedText = removeTrailingContinuationPeriod(from: polishedText)
+            polishedText = removeLeadingContextOverlapFromContinuation(
+                from: polishedText,
+                after: activeContext.precedingText
+            )
             return restoreLeadingNewlines(leadingNewlineCount, to: lowercaseFragmentWordsIfSafe(in: polishedText))
         }
 
@@ -1798,6 +1808,67 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         return true
+    }
+
+    private static func removeLeadingContextOverlapFromContinuation(
+        from text: String,
+        after precedingText: String
+    ) -> String {
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        let precedingLine = currentLinePrefix(in: precedingText)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let precedingTokens = wordTokens(in: precedingLine)
+        let candidateTokens = wordTokens(in: trimmedText)
+        guard !trimmedText.isEmpty,
+              !precedingTokens.isEmpty,
+              candidateTokens.count >= 2 else {
+            return text
+        }
+
+        let maxOverlapCount = min(4, precedingTokens.count, candidateTokens.count - 1)
+        guard maxOverlapCount >= 1 else { return text }
+
+        for overlapCount in stride(from: maxOverlapCount, through: 1, by: -1) {
+            let precedingSuffix = precedingTokens.suffix(overlapCount).map(\.text)
+            let candidatePrefix = candidateTokens.prefix(overlapCount).map(\.text)
+            guard precedingSuffix == candidatePrefix,
+                  shouldRemoveLeadingContinuationContextOverlap(
+                    precedingTokens: precedingTokens,
+                    overlapCount: overlapCount
+                  ) else {
+                continue
+            }
+
+            let suffixStart = candidateTokens[overlapCount].range.lowerBound
+            let suffix = String(trimmedText[suffixStart...])
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !suffix.isEmpty,
+                  !hasInternalSentenceBoundary(suffix) else {
+                continue
+            }
+
+            return suffix
+        }
+
+        return text
+    }
+
+    private static func shouldRemoveLeadingContinuationContextOverlap(
+        precedingTokens: [WordToken],
+        overlapCount: Int
+    ) -> Bool {
+        if overlapCount >= 2 {
+            return true
+        }
+
+        guard let overlapWord = precedingTokens.last?.text,
+              singleWordContinuationOverlapWords.contains(overlapWord),
+              precedingTokens.count >= 2 else {
+            return false
+        }
+
+        let previousToken = precedingTokens[precedingTokens.count - 2]
+        return singleWordContinuationOverlapPreviousWords.contains(previousToken.text)
     }
 
     private static func isLeadingFillerFollowedByClauseStarter(_ text: String) -> Bool {

@@ -758,6 +758,55 @@ struct RomaCoreChecks {
             "shared insertion polish should preserve non-technical scratch-that-out continuations"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Correction module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim leading correction markers before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Correction: module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim punctuated leading correction markers"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Correction is module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim correction-is markers before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Correction should be model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim correction-should-be markers before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Correction now.",
+                context: midSentenceContext
+            ) == "correction now",
+            "shared insertion polish should preserve non-technical correction continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Correction is now.",
+                context: midSentenceContext
+            ) == "correction is now",
+            "shared insertion polish should preserve non-technical correction-is continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Correction should be now.",
+                context: midSentenceContext
+            ) == "correction should be now",
+            "shared insertion polish should preserve non-technical correction-should-be continuations"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("Right model.", context: midSentenceContext) == "right model",
             "shared insertion polish should preserve right as an ordinary fragment word"
         )
@@ -8078,6 +8127,37 @@ struct RomaCoreChecks {
         try require(
             await scratchThatInserter.pastedText == " module",
             "pipeline should paste scratch-that erase command continuations"
+        )
+
+        let correctionIsRecorder = FakeRecorder()
+        let correctionIsInserter = FakeTextInsertion()
+        let correctionIsPipeline = DictationPipeline(
+            recorder: correctionIsRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "correction-is-continuation-proof.wav",
+                text: "Correction is module."
+            ),
+            textInsertion: correctionIsInserter
+        )
+        let correctionIsRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/correction-is-continuation-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await correctionIsRecorder.startPreRollBuffering()
+        let correctionIsResult = try await correctionIsPipeline.runRecordingWindow(correctionIsRequest) {}
+
+        try require(
+            correctionIsResult.processedText == " module",
+            "pipeline should clean correction-is marker continuations"
+        )
+        try require(
+            await correctionIsInserter.pastedText == " module",
+            "pipeline should paste correction-is marker continuations"
         )
 
         let orWaitNoIMeanRecorder = FakeRecorder()

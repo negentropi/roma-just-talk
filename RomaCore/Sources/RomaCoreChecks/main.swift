@@ -604,6 +604,41 @@ struct RomaCoreChecks {
             "shared insertion polish should preserve rather-than continuations"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "What I mean is module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim full what-I-mean-is correction fillers before module continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "What I meant is module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim full what-I-meant-is correction fillers before module continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "What I meant was model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim full what-I-meant-was correction fillers before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "What I mean is now.",
+                context: midSentenceContext
+            ) == "what I mean is now",
+            "shared insertion polish should preserve non-technical what-I-mean continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "What I meant was now.",
+                context: midSentenceContext
+            ) == "what I meant was now",
+            "shared insertion polish should preserve non-technical what-I-meant continuations"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("Right model.", context: midSentenceContext) == "right model",
             "shared insertion polish should preserve right as an ordinary fragment word"
         )
@@ -7831,6 +7866,37 @@ struct RomaCoreChecks {
         try require(
             await actuallyInserter.pastedText == " model",
             "pipeline should paste actually correction filler continuations"
+        )
+
+        let whatIMeanRecorder = FakeRecorder()
+        let whatIMeanInserter = FakeTextInsertion()
+        let whatIMeanPipeline = DictationPipeline(
+            recorder: whatIMeanRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "what-i-mean-continuation-proof.wav",
+                text: "What I mean is module."
+            ),
+            textInsertion: whatIMeanInserter
+        )
+        let whatIMeanRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/what-i-mean-continuation-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await whatIMeanRecorder.startPreRollBuffering()
+        let whatIMeanResult = try await whatIMeanPipeline.runRecordingWindow(whatIMeanRequest) {}
+
+        try require(
+            whatIMeanResult.processedText == " module",
+            "pipeline should clean full what-I-mean-is correction continuations"
+        )
+        try require(
+            await whatIMeanInserter.pastedText == " module",
+            "pipeline should paste full what-I-mean-is correction continuations"
         )
 
         let orWaitNoIMeanRecorder = FakeRecorder()

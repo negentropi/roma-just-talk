@@ -45,6 +45,7 @@
 - Trimmed leading "wait ...", "no wait ...", "hold on ...", and "hang on ..." correction fillers before short technical continuations while preserving ordinary literal continuations.
 - Trimmed leading "sorry ...", "oops ...", "whoops ...", and "my bad ..." correction fillers before short technical continuations while preserving ordinary literal continuations.
 - Trimmed leading "actually ...", "instead ...", and "rather ..." correction fillers before short technical continuations while preserving ordinary literal continuations.
+- Trimmed full leading "what I mean is ..." and "what I meant was ..." correction fillers before short technical continuations without leaving orphan "is" or "was" fragments.
 - Collapsed short backtrack and hold-on correction fragments in cursor-aware post-STT cleanup.
 - Collapsed nested "correction actually" and "sorry actually" fragments in cursor-aware post-STT cleanup.
 - Collapsed short "or actually" and "or wait no" correction fragments in cursor-aware post-STT cleanup.

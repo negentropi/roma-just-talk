@@ -119,20 +119,8 @@ jobs:
       - name: Run shared core checks
         run: swift run RomaCoreChecks
 
-      - name: Parse Windows proof script
-        run: |
-          foreach ($script in @(".\Scripts\windows-proof.ps1", ".\Scripts\package-windows-agent.ps1", ".\Scripts\smoke-windows-agent.ps1", ".\Scripts\install-windows-agent.ps1", ".\Scripts\run-windows-agent.ps1", ".\Scripts\prove-windows-agent-artifact.ps1", ".\Scripts\run-windows-laptop-proof.ps1", ".\Scripts\windows-proof-common.ps1", ".\Scripts\windows-manifest.ps1", ".\Scripts\windows-package-identity.ps1", ".\Scripts\check-windows-proof-report.ps1", ".\Scripts\check-windows-proof-set.ps1")) {
-            $errors = $null
-            [System.Management.Automation.PSParser]::Tokenize(
-              (Get-Content -Raw $script),
-              [ref]$errors
-            ) | Out-Null
-            if ($errors.Count -gt 0) {
-              $errors | Format-List | Out-String | Write-Host
-              throw "PowerShell parse errors in $script"
-            }
-            Write-Host "parsed=$script"
-          }
+      - name: Parse Windows proof scripts
+        run: .\Scripts\check-windows-scripts-parse.ps1
 
       - name: Run noninteractive Windows proof
         run: |

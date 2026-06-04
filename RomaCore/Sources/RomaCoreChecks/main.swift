@@ -7150,6 +7150,10 @@ struct RomaCoreChecks {
             contentsOf: scriptsRoot.appendingPathComponent("windows-proof-common.ps1"),
             encoding: .utf8
         )
+        let parseScriptsScript = try String(
+            contentsOf: scriptsRoot.appendingPathComponent("check-windows-scripts-parse.ps1"),
+            encoding: .utf8
+        )
         let windowsAgentSource = try String(
             contentsOf: packageRoot.appendingPathComponent("Sources/RomaWindowsAgent/main.swift"),
             encoding: .utf8
@@ -8074,11 +8078,13 @@ struct RomaCoreChecks {
             "Windows CI should explicitly verify clean package provenance"
         )
         try require(
-            workflowScript.contains(#".\Scripts\windows-package-identity.ps1"#),
-            "Windows CI should parse the shared package identity helper"
+            parseScriptsScript.contains(#"-Filter "*.ps1""#) &&
+                packageIdentityScript.contains("function Get-RomaPackageIdentityProof"),
+            "Windows CI script parser should discover the shared package identity helper"
         )
         try require(
-            workflowScript.contains(#".\Scripts\windows-manifest.ps1"#) &&
+            parseScriptsScript.contains(#"-Filter "*.ps1""#) &&
+                manifestScript.contains("function Read-RomaWindowsManifest") &&
                 workflowScript.contains(#"$env:RUNNER_TEMP\roma-windows-agent\windows-manifest.ps1"#) &&
                 workflowScript.contains("Require-RomaWindowsManifestKey"),
             "Windows CI should parse and use the shared manifest helper"
@@ -8091,6 +8097,20 @@ struct RomaCoreChecks {
             workflowScript.contains("Run shared core checks") &&
                 workflowScript.contains("swift run RomaCoreChecks"),
             "Windows CI should run shared core checks before packaging the Windows agent"
+        )
+        try require(
+            parseScriptsScript.contains(#"$ScriptsDir = $PSScriptRoot"#) &&
+                parseScriptsScript.contains(#"Get-ChildItem -LiteralPath $resolvedScriptsDir -Filter "*.ps1" -File"#) &&
+                parseScriptsScript.contains("[System.Management.Automation.PSParser]::Tokenize") &&
+                parseScriptsScript.contains("windows_scripts_parse_ok=true") &&
+                parseScriptsScript.contains("windows_scripts_parse_count="),
+            "Windows script parse checker should auto-discover and parse every proof script"
+        )
+        try require(
+            workflowScript.contains("Parse Windows proof scripts") &&
+                workflowScript.contains(#".\Scripts\check-windows-scripts-parse.ps1"#) &&
+                !workflowScript.contains(#"foreach ($script in @("#),
+            "Windows CI should use the shared script parser instead of a hard-coded proof-script list"
         )
     }
 

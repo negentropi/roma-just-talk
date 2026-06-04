@@ -572,6 +572,8 @@ function Get-ProofProfileRequirements {
                 "cloud_config",
                 "real_cloud_backend",
                 "dictation_runtime",
+                "pre_roll_audio",
+                "speech_pcm_contract",
                 "expected_transcript_text",
                 "paste_sent"
             )
@@ -597,6 +599,8 @@ function Get-ProofProfileRequirements {
                 "local_whisper_config",
                 "real_whisper_backend",
                 "dictation_runtime",
+                "pre_roll_audio",
+                "speech_pcm_contract",
                 "expected_transcript_text",
                 "paste_sent"
             )

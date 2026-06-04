@@ -6619,6 +6619,11 @@ struct RomaCoreChecks {
             "Windows proof profiles should print hold single-window source coverage"
         )
         try require(
+            checkReportScript.contains(#""pre_roll_audio""#) &&
+                checkReportScript.contains(#""speech_pcm_contract""#),
+            "Windows dictation proof profiles should print pre-roll and speech PCM coverage"
+        )
+        try require(
             proofAgentSource.contains(
                 #"print("default_clipboard_restore_delay_seconds=\(WindowsClipboardRestoreConfiguration.defaultRestoreDelaySeconds)")"#
             ) &&

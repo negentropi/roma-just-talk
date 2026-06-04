@@ -95,6 +95,7 @@
 - Kept one Windows hold-to-talk keyboard hook alive from keydown through keyup so release cannot be missed while recording starts.
 - Required Windows proof reports to assert the hold-to-talk runtime uses one native hook window.
 - Printed explicit Windows proof-profile coverage for the single native hold-hook window source marker.
+- Printed explicit Windows dictation proof-profile coverage for pre-roll audio and the 16 kHz mono PCM contract.
 - Hardened Windows targeted paste foreground activation with `AttachThreadInput` before `SetForegroundWindow`.
 - Required full Windows laptop proof reports to share one proof session id.
 - Kept cloud and local Windows laptop startup shortcut proofs in separate proof-owned directories.

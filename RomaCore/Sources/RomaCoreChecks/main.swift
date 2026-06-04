@@ -7269,6 +7269,7 @@ struct RomaCoreChecks {
                 packageScript.contains("laptop_preflight_checker_smoke_report") &&
                 packageScript.contains(#"-Expected "proof_set_laptop_preflight_local_whisper=False""#) &&
                 packageScript.contains(#"-Expected "proof_set_laptop_preflight_local_whisper=True""#) &&
+                packageScript.contains(#"-Expected "proof_set_laptop_preflight_source_dirty=false""#) &&
                 packageScript.contains(#"-Expected "proof_set_ok=laptop-preflight""#),
             "Windows package smoke should exercise the laptop preflight report checker output markers and identity shape on Windows CI"
         )

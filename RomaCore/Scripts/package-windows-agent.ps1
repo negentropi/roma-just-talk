@@ -620,6 +620,7 @@ try {
         }
         Write-Host $checkerOutputText
         Assert-OutputContains -Output $checkerOutputText -Expected "proof_set_laptop_preflight_local_whisper=False"
+        Assert-OutputContains -Output $checkerOutputText -Expected "proof_set_laptop_preflight_source_dirty=false"
         Assert-OutputContains -Output $checkerOutputText -Expected "proof_set_ok=laptop-preflight"
     }
 
@@ -642,6 +643,7 @@ try {
         }
         Write-Host $checkerOutputText
         Assert-OutputContains -Output $checkerOutputText -Expected "proof_set_laptop_preflight_local_whisper=True"
+        Assert-OutputContains -Output $checkerOutputText -Expected "proof_set_laptop_preflight_source_dirty=false"
         Assert-OutputContains -Output $checkerOutputText -Expected "proof_set_ok=laptop-preflight"
     }
 

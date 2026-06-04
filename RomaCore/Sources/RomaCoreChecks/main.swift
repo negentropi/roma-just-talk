@@ -9247,7 +9247,7 @@ struct RomaCoreChecks {
             checkReportScript.contains("[switch]$RequireListenerRuntime") &&
                 checkReportScript.contains("function Assert-ListenerRuntimeProof") &&
                 proofCommonScript.contains(#""listener_runtime""#) &&
-                checkReportScript.contains(#"$RequireListenerRuntime = $true"#) &&
+                checkReportScript.contains(#""listener_runtime" { $script:RequireListenerRuntime = $true }"#) &&
                 checkReportScript.contains(#"Assert-Boolean -Object $listenerRuntime -Name "reported_paste_sent" -Expected $true"#) &&
                 checkReportScript.contains("proof_listener_runtime=installed_listener"),
             "Windows local-whisper laptop profile should require a real installed listener runtime proof"
@@ -9260,14 +9260,21 @@ struct RomaCoreChecks {
         try require(
             proofCommonScript.contains("function Get-RomaWindowsInstalledProofProfileRequirements") &&
                 proofCommonScript.contains("function Join-RomaWindowsProofRequirements") &&
-                checkReportScript.contains("function Enable-InstalledProofProfileAssertions") &&
+                proofCommonScript.contains("function Get-RomaWindowsInstalledProofProfileAssertions") &&
+                proofCommonScript.contains("function Get-RomaWindowsProofProfileAssertions") &&
+                proofCommonScript.contains("function Join-RomaWindowsProofAssertions") &&
+                checkReportScript.contains("function Enable-ProofProfileAssertion") &&
+                checkReportScript.contains("function Enable-ProofProfileAssertions") &&
                 checkReportScript.contains("function Write-ProofProfileRequirements") &&
                 checkReportScript.contains("Get-RomaWindowsProofProfileRequirements -Profile $Profile") &&
+                checkReportScript.contains("Get-RomaWindowsProofProfileAssertions -Profile $Profile") &&
                 proofCommonScript.contains(#"return Join-RomaWindowsProofRequirements `"#) &&
+                proofCommonScript.contains(#"return Join-RomaWindowsProofAssertions `"#) &&
                 checkReportScript.contains("$script:RequireInstalledListener = $true") &&
                 checkReportScript.contains("$script:RequireConfigDoctor = $true") &&
-                checkReportScript.contains("Enable-InstalledProofProfileAssertions -IncludeShortcutProof $true") &&
-                checkReportScript.contains("Enable-InstalledProofProfileAssertions\n        $RequireWhisperConfig = $true") &&
+                checkReportScript.contains(#""listener_runtime" { $script:RequireListenerRuntime = $true }"#) &&
+                checkReportScript.contains("Enable-ProofProfileAssertion -Name $assertion") &&
+                !checkReportScript.contains("function Enable-InstalledProofProfileAssertions") &&
                 checkReportScript.contains("Write-ProofProfileRequirements -Profile $RequireProofProfile"),
             "Windows proof checker should share installed profile requirements, assertion flags, and profile output"
         )
@@ -9752,6 +9759,8 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Get-RomaWindowsProofProfileExpectedMode") &&
                 proofCommonScript.contains("function Get-RomaWindowsProofProfileRequirements") &&
                 proofCommonScript.contains("function Get-RomaWindowsInstalledProofProfileRequirements") &&
+                proofCommonScript.contains("function Get-RomaWindowsProofProfileAssertions") &&
+                proofCommonScript.contains("function Get-RomaWindowsInstalledProofProfileAssertions") &&
                 proofCommonScript.contains(#"profile = "laptop-preflight""#) &&
                 proofCommonScript.contains(#"expected_mode = "windows-laptop-preflight""#) &&
                 proofCommonScript.contains(#"read_as_laptop_preflight = $true"#) &&
@@ -9770,12 +9779,14 @@ struct RomaCoreChecks {
                 !checkReportScript.contains("function Get-ProofProfileRequirements") &&
                 !checkReportScript.contains("function Get-InstalledProofProfileRequirements") &&
                 !checkReportScript.contains("function Join-ProofRequirements") &&
+                !checkReportScript.contains("function Enable-InstalledProofProfileAssertions") &&
+                !checkReportScript.contains("switch ($RequireProofProfile)") &&
                 !checkReportScript.contains(#"Set-ExpectedModeFromProfile -Mode "cloud""#) &&
                 !checkReportScript.contains(#"Set-ExpectedModeFromProfile -Mode "local-whisper""#) &&
                 !checkReportScript.contains(#"[ValidateSet("", "doctor-only", "laptop-preflight""#) &&
                 proofCommonScript.contains("throw \"Unknown Windows proof profile: $Profile\"") &&
                 checkReportScript.contains("function Assert-LaptopPreflightReport") &&
-                checkReportScript.contains(#""laptop-preflight" {"#) &&
+                checkReportScript.contains(#"$RequireProofProfile -eq "laptop-preflight""#) &&
                 checkSetScript.contains("Assert-SameLaptopPreflightProof") &&
                 checkSetScript.contains(#"$RequireLaptopPreflight = $true"#) &&
                 checkReportScript.contains("preflight_outputs") &&

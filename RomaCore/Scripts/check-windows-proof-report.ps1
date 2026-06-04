@@ -904,24 +904,47 @@ function Write-ProofProfileRequirements {
     Write-Host "proof_profile_ok=$Profile"
 }
 
-function Enable-InstalledProofProfileAssertions {
+function Enable-ProofProfileAssertion {
     param(
-        [bool]$IncludeShortcutProof = $false
+        [Parameter(Mandatory = $true)]
+        [string]$Name
     )
 
-    $script:RequireWindowsPlatform = $true
-    $script:RequireInstall = $true
-    if ($IncludeShortcutProof) {
-        $script:RequireShortcut = $true
-        $script:RequireStartupShortcut = $true
+    switch ($Name) {
+        "windows_platform" { $script:RequireWindowsPlatform = $true }
+        "install" { $script:RequireInstall = $true }
+        "shortcut" { $script:RequireShortcut = $true }
+        "startup_shortcut" { $script:RequireStartupShortcut = $true }
+        "permission_surface" { $script:RequirePermissionSurface = $true }
+        "proof_agent_surface" { $script:RequireProofAgentSurface = $true }
+        "native_doctor_surface" { $script:RequireNativeDoctorSurface = $true }
+        "packaged_listener" { $script:RequirePackagedListener = $true }
+        "installed_listener" { $script:RequireInstalledListener = $true }
+        "config_doctor" { $script:RequireConfigDoctor = $true }
+        "hold_hook" { $script:RequireHoldHook = $true }
+        "cloud_config" { $script:RequireCloudConfig = $true }
+        "real_cloud_backend" { $script:RequireRealCloudBackend = $true }
+        "dictation" { $script:RequireDictation = $true }
+        "expected_transcript_text" { $script:RequireExpectedTranscriptText = $true }
+        "paste" { $script:RequirePaste = $true }
+        "whisper_config" { $script:RequireWhisperConfig = $true }
+        "real_whisper_backend" { $script:RequireRealWhisperBackend = $true }
+        "listener_runtime" { $script:RequireListenerRuntime = $true }
+        "notepad_paste" { $script:RequireNotepadPaste = $true }
+        "packaged_mock" { $script:RequirePackagedMock = $true }
+        default { throw "Unknown Windows proof profile assertion: $Name" }
     }
-    $script:RequirePermissionSurface = $true
-    $script:RequireProofAgentSurface = $true
-    $script:RequireNativeDoctorSurface = $true
-    $script:RequirePackagedListener = $true
-    $script:RequireInstalledListener = $true
-    $script:RequireConfigDoctor = $true
-    $script:RequireHoldHook = $true
+}
+
+function Enable-ProofProfileAssertions {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Profile
+    )
+
+    foreach ($assertion in (Get-RomaWindowsProofProfileAssertions -Profile $Profile)) {
+        Enable-ProofProfileAssertion -Name $assertion
+    }
 }
 
 $ProofReportPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($ProofReportPath)
@@ -936,47 +959,7 @@ if (![string]::IsNullOrWhiteSpace($RequireProofProfile)) {
     Set-ExpectedModeFromProfile `
         -Mode (Get-RomaWindowsProofProfileExpectedMode -Profile $RequireProofProfile) `
         -Profile $RequireProofProfile
-}
-
-switch ($RequireProofProfile) {
-    "doctor-only" {
-        $RequireWindowsPlatform = $true
-        $RequirePermissionSurface = $true
-        $RequireProofAgentSurface = $true
-        $RequireNativeDoctorSurface = $true
-        $RequirePackagedListener = $true
-    }
-    "laptop-preflight" {
-    }
-    "cloud-dictation" {
-        Enable-InstalledProofProfileAssertions -IncludeShortcutProof $true
-        $RequireCloudConfig = $true
-        $RequireRealCloudBackend = $true
-        $RequireDictation = $true
-        $RequireExpectedTranscriptText = $true
-        $RequirePaste = $true
-    }
-    "local-whisper-dictation" {
-        Enable-InstalledProofProfileAssertions -IncludeShortcutProof $true
-        $RequireWhisperConfig = $true
-        $RequireRealWhisperBackend = $true
-        $RequireDictation = $true
-        $RequireListenerRuntime = $true
-        $RequireExpectedTranscriptText = $true
-        $RequirePaste = $true
-    }
-    "local-whisper-notepad-paste" {
-        Enable-InstalledProofProfileAssertions
-        $RequireWhisperConfig = $true
-        $RequireRealWhisperBackend = $true
-        $RequireNotepadPaste = $true
-    }
-    "packaged-whisper-mock-install" {
-        Enable-InstalledProofProfileAssertions -IncludeShortcutProof $true
-        $RequirePackagedMock = $true
-        $RequireWhisperConfig = $true
-    }
-    default {}
+    Enable-ProofProfileAssertions -Profile $RequireProofProfile
 }
 
 if (![string]::IsNullOrWhiteSpace($RequireProofProfile)) {

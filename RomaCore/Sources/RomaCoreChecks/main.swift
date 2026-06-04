@@ -499,6 +499,62 @@ struct RomaCoreChecks {
             "shared insertion polish should preserve non-technical hang-on continuations"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Sorry model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim sorry correction fillers before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Oops module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim oops correction fillers before module continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Whoops model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim whoops correction fillers before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "My bad module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim my-bad correction fillers before module continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Sorry now.",
+                context: midSentenceContext
+            ) == "sorry now",
+            "shared insertion polish should preserve non-technical sorry continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Oops now.",
+                context: midSentenceContext
+            ) == "oops now",
+            "shared insertion polish should preserve non-technical oops continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Whoops now.",
+                context: midSentenceContext
+            ) == "whoops now",
+            "shared insertion polish should preserve non-technical whoops continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "My bad now.",
+                context: midSentenceContext
+            ) == "my bad now",
+            "shared insertion polish should preserve non-technical my-bad continuations"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("Right model.", context: midSentenceContext) == "right model",
             "shared insertion polish should preserve right as an ordinary fragment word"
         )
@@ -7664,6 +7720,37 @@ struct RomaCoreChecks {
         try require(
             await waitInserter.pastedText == " model",
             "pipeline should paste wait correction filler continuations"
+        )
+
+        let sorryRecorder = FakeRecorder()
+        let sorryInserter = FakeTextInsertion()
+        let sorryPipeline = DictationPipeline(
+            recorder: sorryRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "sorry-continuation-proof.wav",
+                text: "Sorry model."
+            ),
+            textInsertion: sorryInserter
+        )
+        let sorryRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/sorry-continuation-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await sorryRecorder.startPreRollBuffering()
+        let sorryResult = try await sorryPipeline.runRecordingWindow(sorryRequest) {}
+
+        try require(
+            sorryResult.processedText == " model",
+            "pipeline should clean sorry correction filler continuations"
+        )
+        try require(
+            await sorryInserter.pastedText == " model",
+            "pipeline should paste sorry correction filler continuations"
         )
 
         let orWaitNoIMeanRecorder = FakeRecorder()

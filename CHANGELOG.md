@@ -41,6 +41,7 @@
 - Trimmed "got it ..." acknowledgement filler before short technical continuations while preserving ordinary "got it now" prose.
 - Trimmed "gotcha ..." acknowledgement filler before short technical continuations while preserving ordinary literal continuations.
 - Trimmed leading "wait ...", "no wait ...", "hold on ...", and "hang on ..." correction fillers before short technical continuations while preserving ordinary literal continuations.
+- Trimmed leading "sorry ...", "oops ...", "whoops ...", and "my bad ..." correction fillers before short technical continuations while preserving ordinary literal continuations.
 - Collapsed short backtrack and hold-on correction fragments in cursor-aware post-STT cleanup.
 - Collapsed nested "correction actually" and "sorry actually" fragments in cursor-aware post-STT cleanup.
 - Collapsed short "or actually" and "or wait no" correction fragments in cursor-aware post-STT cleanup.

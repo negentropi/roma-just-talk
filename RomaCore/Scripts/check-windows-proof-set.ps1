@@ -57,6 +57,90 @@ function Invoke-ProofReportProfileCheck {
     Write-Host "proof_set_requirement=$Name status=pass report=$resolvedPath"
 }
 
+function Get-ProofReportProfileChecks {
+    return @(
+        [pscustomobject]@{
+            Name = "doctor_only"
+            Profile = "doctor-only"
+            Path = $DoctorOnlyReportPath
+            Required = [bool]$RequireDoctorOnly
+            ReadAsLaptopPreflight = $false
+        },
+        [pscustomobject]@{
+            Name = "cloud_dictation"
+            Profile = "cloud-dictation"
+            Path = $CloudDictationReportPath
+            Required = [bool]$RequireCloudDictation
+            ReadAsLaptopPreflight = $false
+        },
+        [pscustomobject]@{
+            Name = "local_whisper_dictation"
+            Profile = "local-whisper-dictation"
+            Path = $LocalWhisperDictationReportPath
+            Required = [bool]$RequireLocalWhisperDictation
+            ReadAsLaptopPreflight = $false
+        },
+        [pscustomobject]@{
+            Name = "local_whisper_notepad_paste"
+            Profile = "local-whisper-notepad-paste"
+            Path = $LocalWhisperNotepadPasteReportPath
+            Required = [bool]$RequireLocalWhisperNotepadPaste
+            ReadAsLaptopPreflight = $false
+        },
+        [pscustomobject]@{
+            Name = "laptop_preflight"
+            Profile = "laptop-preflight"
+            Path = $LaptopPreflightReportPath
+            Required = [bool]$RequireLaptopPreflight
+            ReadAsLaptopPreflight = $true
+        },
+        [pscustomobject]@{
+            Name = "packaged_whisper_mock_install"
+            Profile = "packaged-whisper-mock-install"
+            Path = $PackagedWhisperMockInstallReportPath
+            Required = [bool]$RequirePackagedWhisperMockInstall
+            ReadAsLaptopPreflight = $false
+        }
+    )
+}
+
+function Test-AnyRequiredProofReportProfile {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object[]]$Checks
+    )
+
+    foreach ($check in $Checks) {
+        if ([bool]$check.Required) {
+            return $true
+        }
+    }
+
+    return $false
+}
+
+function Invoke-RequiredProofReportProfileChecks {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object[]]$Checks
+    )
+
+    foreach ($check in $Checks) {
+        if (!([bool]$check.Required)) {
+            continue
+        }
+
+        Invoke-ProofReportProfileCheck `
+            -Name ([string]$check.Name) `
+            -Profile ([string]$check.Profile) `
+            -Path ([string]$check.Path)
+
+        if ([bool]$check.ReadAsLaptopPreflight) {
+            $script:laptopPreflightReport = Read-ProofReport -Path ([string]$check.Path)
+        }
+    }
+}
+
 function Read-ProofReport {
     param(
         [Parameter(Mandatory = $true)]
@@ -729,12 +813,8 @@ if ($RequireFullLaptopProof) {
     $RequireLaptopPreflight = $true
 }
 
-$hasExplicitRequirement = $RequireDoctorOnly -or
-    $RequireCloudDictation -or
-    $RequireLocalWhisperDictation -or
-    $RequireLocalWhisperNotepadPaste -or
-    $RequireLaptopPreflight -or
-    $RequirePackagedWhisperMockInstall
+$profileChecks = Get-ProofReportProfileChecks
+$hasExplicitRequirement = Test-AnyRequiredProofReportProfile -Checks $profileChecks
 
 if (!$hasExplicitRequirement) {
     $RequireDoctorOnly = ![string]::IsNullOrWhiteSpace($DoctorOnlyReportPath)
@@ -743,61 +823,16 @@ if (!$hasExplicitRequirement) {
     $RequireLocalWhisperNotepadPaste = ![string]::IsNullOrWhiteSpace($LocalWhisperNotepadPasteReportPath)
     $RequireLaptopPreflight = ![string]::IsNullOrWhiteSpace($LaptopPreflightReportPath)
     $RequirePackagedWhisperMockInstall = ![string]::IsNullOrWhiteSpace($PackagedWhisperMockInstallReportPath)
+    $profileChecks = Get-ProofReportProfileChecks
 }
 
-$hasRequirement = $RequireDoctorOnly -or
-    $RequireCloudDictation -or
-    $RequireLocalWhisperDictation -or
-    $RequireLocalWhisperNotepadPaste -or
-    $RequireLaptopPreflight -or
-    $RequirePackagedWhisperMockInstall
+$hasRequirement = Test-AnyRequiredProofReportProfile -Checks $profileChecks
 
 if (!$hasRequirement) {
     throw "Pass at least one proof report path or require a proof set"
 }
 
-if ($RequireDoctorOnly) {
-    Invoke-ProofReportProfileCheck `
-        -Name "doctor_only" `
-        -Profile "doctor-only" `
-        -Path $DoctorOnlyReportPath
-}
-
-if ($RequireCloudDictation) {
-    Invoke-ProofReportProfileCheck `
-        -Name "cloud_dictation" `
-        -Profile "cloud-dictation" `
-        -Path $CloudDictationReportPath
-}
-
-if ($RequireLocalWhisperDictation) {
-    Invoke-ProofReportProfileCheck `
-        -Name "local_whisper_dictation" `
-        -Profile "local-whisper-dictation" `
-        -Path $LocalWhisperDictationReportPath
-}
-
-if ($RequireLocalWhisperNotepadPaste) {
-    Invoke-ProofReportProfileCheck `
-        -Name "local_whisper_notepad_paste" `
-        -Profile "local-whisper-notepad-paste" `
-        -Path $LocalWhisperNotepadPasteReportPath
-}
-
-if ($RequireLaptopPreflight) {
-    Invoke-ProofReportProfileCheck `
-        -Name "laptop_preflight" `
-        -Profile "laptop-preflight" `
-        -Path $LaptopPreflightReportPath
-    $script:laptopPreflightReport = Read-ProofReport -Path $LaptopPreflightReportPath
-}
-
-if ($RequirePackagedWhisperMockInstall) {
-    Invoke-ProofReportProfileCheck `
-        -Name "packaged_whisper_mock_install" `
-        -Profile "packaged-whisper-mock-install" `
-        -Path $PackagedWhisperMockInstallReportPath
-}
+Invoke-RequiredProofReportProfileChecks -Checks $profileChecks
 
 if ($RequireFullLaptopProof) {
     Assert-SameLaptopProofSet `

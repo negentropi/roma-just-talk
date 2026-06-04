@@ -9149,7 +9149,12 @@ struct RomaCoreChecks {
         )
         try require(
             checkSetScript.contains("RequireLaptopPreflight") &&
-                checkSetScript.contains(#"-Profile "laptop-preflight""#) &&
+                checkSetScript.contains("function Get-ProofReportProfileChecks") &&
+                checkSetScript.contains("function Test-AnyRequiredProofReportProfile") &&
+                checkSetScript.contains("function Invoke-RequiredProofReportProfileChecks") &&
+                checkSetScript.contains(#"Profile = "laptop-preflight""#) &&
+                checkSetScript.contains(#"ReadAsLaptopPreflight = $true"#) &&
+                checkSetScript.contains("Invoke-RequiredProofReportProfileChecks -Checks $profileChecks") &&
                 !checkSetScript.contains("function Assert-LaptopPreflightReport") &&
                 checkReportScript.contains(#"[ValidateSet("", "doctor-only", "laptop-preflight""#) &&
                 checkReportScript.contains("function Assert-LaptopPreflightReport") &&

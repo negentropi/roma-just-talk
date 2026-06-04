@@ -401,6 +401,27 @@ struct RomaCoreChecks {
             "shared insertion polish should preserve non-technical yup continuations"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Got it model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim got-it acknowledgement fillers before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Got it module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim got-it acknowledgement fillers before module continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Got it now.",
+                context: midSentenceContext
+            ) == "got it now",
+            "shared insertion polish should preserve non-technical got-it continuations"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("Right model.", context: midSentenceContext) == "right model",
             "shared insertion polish should preserve right as an ordinary fragment word"
         )
@@ -7473,6 +7494,37 @@ struct RomaCoreChecks {
         try require(
             await yepInserter.pastedText == " model",
             "pipeline should paste yes/yep/yup acknowledgement filler continuations"
+        )
+
+        let gotItRecorder = FakeRecorder()
+        let gotItInserter = FakeTextInsertion()
+        let gotItPipeline = DictationPipeline(
+            recorder: gotItRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "got-it-continuation-proof.wav",
+                text: "Got it model."
+            ),
+            textInsertion: gotItInserter
+        )
+        let gotItRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/got-it-continuation-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await gotItRecorder.startPreRollBuffering()
+        let gotItResult = try await gotItPipeline.runRecordingWindow(gotItRequest) {}
+
+        try require(
+            gotItResult.processedText == " model",
+            "pipeline should clean got-it acknowledgement filler continuations"
+        )
+        try require(
+            await gotItInserter.pastedText == " model",
+            "pipeline should paste got-it acknowledgement filler continuations"
         )
 
         let orWaitNoIMeanRecorder = FakeRecorder()

@@ -7763,8 +7763,8 @@ struct RomaCoreChecks {
             "Windows proof-set checker should reject dirty packaged source for final laptop proof"
         )
         try require(
-            checkSetScript.contains("Laptop preflight proof requires a clean packaged source checkout"),
-            "Windows proof-set checker should reject dirty packaged source for laptop preflight proof"
+            checkReportScript.contains("Laptop preflight proof requires a clean packaged source checkout"),
+            "Windows proof report profile should reject dirty packaged source for laptop preflight proof"
         )
         try require(
             checkSetScript.contains("function Assert-SameArtifactSmokeProofSet") &&
@@ -7833,33 +7833,38 @@ struct RomaCoreChecks {
         )
         try require(
             checkSetScript.contains("RequireLaptopPreflight") &&
-                checkSetScript.contains("Assert-LaptopPreflightReport") &&
+                checkSetScript.contains(#"-Profile "laptop-preflight""#) &&
+                !checkSetScript.contains("function Assert-LaptopPreflightReport") &&
+                checkReportScript.contains(#"[ValidateSet("", "doctor-only", "laptop-preflight""#) &&
+                checkReportScript.contains("function Assert-LaptopPreflightReport") &&
+                checkReportScript.contains(#""laptop-preflight" {"#) &&
                 checkSetScript.contains("Assert-SameLaptopPreflightProof") &&
                 checkSetScript.contains(#"$RequireLaptopPreflight = $true"#) &&
-                checkSetScript.contains("preflight_outputs") &&
-                checkSetScript.contains(#"Assert-ReportBoolean -Report $permissionOutput -Name "microphone_settings_uri" -Expected $true"#) &&
-                checkSetScript.contains(#"Assert-ReportBoolean -Report $permissionOutput -Name "no_admin_required" -Expected $true"#) &&
-                checkSetScript.contains(#"Assert-ReportBoolean -Report $permissionOutput -Name "startup_launcher_run_script" -Expected $true"#) &&
-                checkSetScript.contains(#"Assert-ReportBoolean -Report $permissionOutput -Name "startup_launch_mode_listen" -Expected $true"#) &&
-                checkSetScript.contains(#"Assert-ReportBoolean -Report $permissionOutput -Name "no_startup_permission_prompt" -Expected $true"#) &&
-                checkSetScript.contains(#"Assert-ReportBoolean -Report $hotkeyOutput -Name "key_down" -Expected $true"#) &&
-                checkSetScript.contains(#"Assert-ReportBoolean -Report $microphoneOutput -Name "sample_rate_16000" -Expected $true"#) &&
-                checkSetScript.contains(#"Assert-ReportBoolean -Report $localWhisperOutput -Name "network_required_false" -Expected $true"#) &&
-                checkSetScript.contains(#"Assert-ReportBoolean -Report $localWhisperOutput -Name "output_present" -Expected $false"#) &&
+                checkReportScript.contains("preflight_outputs") &&
+                checkReportScript.contains(#"Assert-Boolean -Object $permissionOutput -Name "microphone_settings_uri" -Expected $true"#) &&
+                checkReportScript.contains(#"Assert-Boolean -Object $permissionOutput -Name "no_admin_required" -Expected $true"#) &&
+                checkReportScript.contains(#"Assert-Boolean -Object $permissionOutput -Name "startup_launcher_run_script" -Expected $true"#) &&
+                checkReportScript.contains(#"Assert-Boolean -Object $permissionOutput -Name "startup_launch_mode_listen" -Expected $true"#) &&
+                checkReportScript.contains(#"Assert-Boolean -Object $permissionOutput -Name "no_startup_permission_prompt" -Expected $true"#) &&
+                checkReportScript.contains(#"Assert-Boolean -Object $hotkeyOutput -Name "key_down" -Expected $true"#) &&
+                checkReportScript.contains(#"Assert-Boolean -Object $microphoneOutput -Name "sample_rate_16000" -Expected $true"#) &&
+                checkReportScript.contains(#"Assert-Boolean -Object $localWhisperOutput -Name "network_required_false" -Expected $true"#) &&
+                checkReportScript.contains(#"Assert-Boolean -Object $localWhisperOutput -Name "output_present" -Expected $false"#) &&
                 checkSetScript.contains("function Assert-LaptopPreflightIncludesLocalWhisper") &&
-                checkSetScript.contains("proof_set_laptop_preflight_permission_surface=true") &&
-                checkSetScript.contains("proof_set_laptop_preflight_local_whisper=") &&
-                checkSetScript.contains("proof_set_laptop_preflight_package_fingerprint=") &&
+                checkReportScript.contains("proof_set_laptop_preflight_permission_surface=true") &&
+                checkReportScript.contains("proof_set_laptop_preflight_local_whisper=") &&
+                checkReportScript.contains("proof_set_laptop_preflight_package_fingerprint=") &&
                 checkSetScript.contains("proof_set_laptop_preflight_matches_full=true") &&
                 checkSetScript.contains("proof_set_ok=laptop-preflight") &&
-                checkSetScript.contains("Laptop preflight proof must run on Windows"),
-            "Windows proof-set checker should validate laptop preflight reports, output markers, and artifact identity"
+                checkReportScript.contains("proof_profile_ok=$RequireProofProfile") &&
+                checkReportScript.contains("Laptop preflight proof must run on Windows"),
+            "Windows proof report profile should validate laptop preflight reports, output markers, and artifact identity"
         )
         try require(
-            checkSetScript.contains("^[0-9a-fA-F]{64}$") &&
-                checkSetScript.contains("^0{64}$") &&
-                checkSetScript.contains("placeholder package identity fingerprint"),
-            "Windows proof-set checker should reject malformed and placeholder package identity fingerprints"
+            checkReportScript.contains("^[0-9a-fA-F]{64}$") &&
+                checkReportScript.contains("^0{64}$") &&
+                checkReportScript.contains("package_identity.fingerprint to be non-placeholder"),
+            "Windows proof report checker should reject malformed and placeholder package identity fingerprints"
         )
         try require(
             packageScript.contains("native laptop preflight report checker smoke") &&
@@ -7891,8 +7896,10 @@ struct RomaCoreChecks {
                 packageScript.contains(#"-Expected "proof_set_laptop_preflight_local_whisper=False""#) &&
                 packageScript.contains(#"-Expected "proof_set_laptop_preflight_local_whisper=True""#) &&
                 packageScript.contains(#"-Expected "proof_set_laptop_preflight_source_dirty=false""#) &&
+                packageScript.contains(#"-Expected "proof_profile_ok=laptop-preflight""#) &&
+                packageScript.contains("check-windows-proof-report.ps1 -ProofReportPath C:\\tmp\\roma-windows-laptop-proof\\preflight-proof.json -RequireProofProfile laptop-preflight") &&
                 packageScript.contains(#"-Expected "proof_set_ok=laptop-preflight""#),
-            "Windows package smoke should exercise the laptop preflight report checker output markers and identity shape on Windows CI"
+            "Windows package smoke should exercise the laptop preflight report profile output markers and identity shape on Windows CI"
         )
         try require(
             manifestScript.contains("function Read-RomaWindowsManifest") &&
@@ -8106,7 +8113,7 @@ struct RomaCoreChecks {
             checkSetScript.contains("function Assert-ProofSessionId") &&
                 checkSetScript.contains("invalid proof_session_id; expected GUID") &&
                 checkSetScript.contains("placeholder proof_session_id") &&
-                checkSetScript.contains(#"$proofSessionId = Assert-ProofSessionId"#) &&
+                checkReportScript.contains(#"$proofSessionId = Assert-ProofSessionId"#) &&
                 checkSetScript.contains(#"$expectedProofSessionId = Assert-ProofSessionId"#),
             "Windows proof-set checker should require runner-style GUID proof session ids"
         )
@@ -8117,7 +8124,7 @@ struct RomaCoreChecks {
                 checkSetScript.contains(#"-WindowMinutes 120"#) &&
                 checkSetScript.contains(#"$ProofName reports must be generated within $WindowMinutes minutes"#) &&
                 checkSetScript.contains("proof_set_generated_at_window_minutes=") &&
-                checkSetScript.contains("proof_set_laptop_preflight_generated_at="),
+                checkReportScript.contains("proof_set_laptop_preflight_generated_at="),
             "Windows proof-set checker should require full laptop reports from one generated_at window"
         )
         try require(

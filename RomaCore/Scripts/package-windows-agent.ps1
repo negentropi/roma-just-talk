@@ -360,10 +360,15 @@ proof_set_laptop_preflight_package_fingerprint=
 proof_set_laptop_preflight_source_dirty=false
 proof_set_laptop_preflight_permission_surface=true
 proof_set_laptop_preflight_local_whisper=False
+proof_profile_ok=laptop-preflight
 
 Local whisper preflight also prints:
 
 proof_set_laptop_preflight_local_whisper=True
+
+Archived preflight report recheck, without rerunning hotkey or microphone proof:
+
+powershell -ExecutionPolicy Bypass -File .\check-windows-proof-report.ps1 -ProofReportPath C:\tmp\roma-windows-laptop-proof\preflight-proof.json -RequireProofProfile laptop-preflight
 
 Expected full-proof markers:
 
@@ -662,6 +667,7 @@ try {
         Assert-OutputContains -Output $checkerOutputText -Expected "proof_set_laptop_preflight_permission_surface=true"
         Assert-OutputContains -Output $checkerOutputText -Expected "proof_set_laptop_preflight_local_whisper=False"
         Assert-OutputContains -Output $checkerOutputText -Expected "proof_set_laptop_preflight_source_dirty=false"
+        Assert-OutputContains -Output $checkerOutputText -Expected "proof_profile_ok=laptop-preflight"
         Assert-OutputContains -Output $checkerOutputText -Expected "proof_set_ok=laptop-preflight"
     }
 
@@ -686,6 +692,7 @@ try {
         Assert-OutputContains -Output $checkerOutputText -Expected "proof_set_laptop_preflight_permission_surface=true"
         Assert-OutputContains -Output $checkerOutputText -Expected "proof_set_laptop_preflight_local_whisper=True"
         Assert-OutputContains -Output $checkerOutputText -Expected "proof_set_laptop_preflight_source_dirty=false"
+        Assert-OutputContains -Output $checkerOutputText -Expected "proof_profile_ok=laptop-preflight"
         Assert-OutputContains -Output $checkerOutputText -Expected "proof_set_ok=laptop-preflight"
     }
 

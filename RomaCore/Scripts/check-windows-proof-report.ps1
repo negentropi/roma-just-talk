@@ -2,7 +2,7 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$ProofReportPath,
     [string]$ExpectedMode = "",
-    [ValidateSet("", "doctor-only", "cloud-dictation", "local-whisper-dictation", "local-whisper-notepad-paste", "packaged-whisper-mock-install")]
+    [ValidateSet("", "doctor-only", "laptop-preflight", "cloud-dictation", "local-whisper-dictation", "local-whisper-notepad-paste", "packaged-whisper-mock-install")]
     [string]$RequireProofProfile = "",
     [switch]$RequireWindowsPlatform,
     [switch]$RequireInstall,
@@ -161,6 +161,18 @@ function Assert-NonEmptyString {
     Write-Host "proof_value=$Name value=$value"
 }
 
+function Get-NonEmptyStringProperty {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Object,
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    Assert-NonEmptyString -Object $Object -Name $Name
+    return [string](Require-Property -Object $Object -Name $Name)
+}
+
 function Assert-StringEquals {
     param(
         [Parameter(Mandatory = $true)]
@@ -176,6 +188,74 @@ function Assert-StringEquals {
     }
 
     Write-Host "proof_value=$Name value=$Actual"
+}
+
+function Assert-ProofSessionId {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Value,
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    if ($Value -notmatch "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$") {
+        throw "Expected $Name to be a GUID, got: $Value"
+    }
+    if ($Value -eq "00000000-0000-0000-0000-000000000000") {
+        throw "Expected $Name to be a non-placeholder GUID"
+    }
+
+    $normalizedValue = $Value.ToLowerInvariant()
+    Write-Host "proof_value=$Name value=$normalizedValue"
+    return $normalizedValue
+}
+
+function Assert-GeneratedAtTimestamp {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Value,
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    if ([string]::IsNullOrWhiteSpace($Value)) {
+        throw "Expected non-empty timestamp: $Name"
+    }
+
+    try {
+        $timestamp = [System.DateTimeOffset]::Parse(
+            $Value,
+            [System.Globalization.CultureInfo]::InvariantCulture,
+            [System.Globalization.DateTimeStyles]::AssumeUniversal
+        ).ToUniversalTime()
+    } catch {
+        throw "Expected valid timestamp for $Name, got: $Value"
+    }
+
+    Write-Host "proof_value=$Name utc=$($timestamp.ToString("o"))"
+    return $timestamp
+}
+
+function Assert-PackageIdentityProof {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$PackageIdentity
+    )
+
+    Assert-StringEquals `
+        -Actual ([string](Require-Property -Object $PackageIdentity -Name "algorithm")) `
+        -Expected "sha256" `
+        -Name "package_identity.algorithm"
+    $fingerprint = [string](Require-Property -Object $PackageIdentity -Name "fingerprint")
+    if ($fingerprint -notmatch "^[0-9a-fA-F]{64}$") {
+        throw "Expected package_identity.fingerprint to be a sha256 hash, got: $fingerprint"
+    }
+    if ($fingerprint -match "^0{64}$") {
+        throw "Expected package_identity.fingerprint to be non-placeholder"
+    }
+    Assert-NumberGreaterThan -Object $PackageIdentity -Name "entry_count" -Minimum 0
+
+    return $fingerprint.ToLowerInvariant()
 }
 
 function Assert-RealCloudBackendProof {
@@ -587,6 +667,119 @@ function Assert-InstalledListenerProof {
     Write-Host "proof_installed_listener=listen_zero_session"
 }
 
+function Assert-LaptopPreflightReport {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Report
+    )
+
+    Assert-StringEquals `
+        -Actual ([string](Require-Property -Object $Report -Name "proof_mode")) `
+        -Expected "windows-laptop-preflight" `
+        -Name "proof_mode"
+    Assert-Boolean -Object $Report -Name "preflight_only" -Expected $true
+    $proofSessionId = Assert-ProofSessionId `
+        -Value ([string](Require-Property -Object $Report -Name "proof_session_id")) `
+        -Name "proof_session_id"
+    $generatedAt = Assert-GeneratedAtTimestamp `
+        -Value ([string](Require-Property -Object $Report -Name "generated_at")) `
+        -Name "generated_at"
+    $packageDir = Get-NonEmptyStringProperty -Object $Report -Name "package_dir"
+    $proofDir = Get-NonEmptyStringProperty -Object $Report -Name "proof_dir"
+
+    $packageIdentity = Require-Property -Object $Report -Name "package_identity"
+    $packageFingerprint = Assert-PackageIdentityProof -PackageIdentity $packageIdentity
+
+    $manifest = Require-Property -Object $Report -Name "manifest"
+    Assert-ManifestSourceProof -Manifest $manifest
+    $sourceRepository = [string](Require-Property -Object $manifest -Name "source_repository")
+    $sourceBranch = [string](Require-Property -Object $manifest -Name "source_branch")
+    $sourceCommit = [string](Require-Property -Object $manifest -Name "source_commit")
+    $sourceDirty = [string](Require-Property -Object $manifest -Name "source_dirty")
+    if ($sourceDirty -ne "false") {
+        throw "Laptop preflight proof requires a clean packaged source checkout, got source_dirty=$sourceDirty"
+    }
+
+    $os = Require-Property -Object $Report -Name "os"
+    $platform = [string](Require-Property -Object $os -Name "platform")
+    if ($platform -ne "Win32NT") {
+        throw "Laptop preflight proof must run on Windows, got platform $platform"
+    }
+    Write-Host "proof_windows_platform=$platform"
+    $machine = Get-NonEmptyStringProperty -Object $os -Name "machine"
+    $userName = Get-NonEmptyStringProperty -Object $os -Name "user_name"
+    $userSid = Get-NonEmptyStringProperty -Object $os -Name "user_sid"
+
+    $preflights = Require-Property -Object $Report -Name "preflights"
+    Assert-Boolean -Object $preflights -Name "permission_surface" -Expected $true
+    Assert-Boolean -Object $preflights -Name "hotkey_delivery" -Expected $true
+    Assert-Boolean -Object $preflights -Name "microphone" -Expected $true
+    $hasLocalWhisperPreflight = [bool](Require-Property -Object $preflights -Name "local_whisper")
+
+    $preflightOutputs = Require-Property -Object $Report -Name "preflight_outputs"
+    $permissionOutput = Require-Property -Object $preflightOutputs -Name "permission_surface"
+    Assert-Boolean -Object $permissionOutput -Name "output_present" -Expected $true
+    Assert-Boolean -Object $permissionOutput -Name "os_permission_grants_microphone" -Expected $true
+    Assert-Boolean -Object $permissionOutput -Name "microphone_settings_uri" -Expected $true
+    Assert-Boolean -Object $permissionOutput -Name "desktop_app_microphone_access_required" -Expected $true
+    Assert-Boolean -Object $permissionOutput -Name "native_capabilities_register_hotkey" -Expected $true
+    Assert-Boolean -Object $permissionOutput -Name "no_accessibility_permission_prompt" -Expected $true
+    Assert-Boolean -Object $permissionOutput -Name "no_automation_permission_prompt" -Expected $true
+    Assert-Boolean -Object $permissionOutput -Name "no_admin_required" -Expected $true
+    Assert-Boolean -Object $permissionOutput -Name "startup_launcher_run_script" -Expected $true
+    Assert-Boolean -Object $permissionOutput -Name "startup_launch_mode_listen" -Expected $true
+    Assert-Boolean -Object $permissionOutput -Name "no_startup_permission_prompt" -Expected $true
+    Assert-Boolean -Object $permissionOutput -Name "no_screen_capture_required" -Expected $true
+    Assert-Boolean -Object $permissionOutput -Name "no_screen_recording_permission_prompt" -Expected $true
+
+    $hotkeyOutput = Require-Property -Object $preflightOutputs -Name "hotkey_delivery"
+    Assert-Boolean -Object $hotkeyOutput -Name "output_present" -Expected $true
+    Assert-Boolean -Object $hotkeyOutput -Name "waiting_for_hold" -Expected $true
+    Assert-Boolean -Object $hotkeyOutput -Name "key_down" -Expected $true
+    Assert-Boolean -Object $hotkeyOutput -Name "key_up" -Expected $true
+    Assert-Boolean -Object $hotkeyOutput -Name "observed_events_present" -Expected $true
+
+    $microphoneOutput = Require-Property -Object $preflightOutputs -Name "microphone"
+    Assert-Boolean -Object $microphoneOutput -Name "output_present" -Expected $true
+    Assert-Boolean -Object $microphoneOutput -Name "wrote_present" -Expected $true
+    Assert-Boolean -Object $microphoneOutput -Name "sample_rate_16000" -Expected $true
+    Assert-Boolean -Object $microphoneOutput -Name "channels_mono" -Expected $true
+
+    $localWhisperOutput = Require-Property -Object $preflightOutputs -Name "local_whisper"
+    if ($hasLocalWhisperPreflight) {
+        Assert-Boolean -Object $localWhisperOutput -Name "output_present" -Expected $true
+        Assert-Boolean -Object $localWhisperOutput -Name "transcription_client_whisper" -Expected $true
+        Assert-Boolean -Object $localWhisperOutput -Name "network_required_false" -Expected $true
+        Assert-Boolean -Object $localWhisperOutput -Name "executable_present" -Expected $true
+        Assert-Boolean -Object $localWhisperOutput -Name "model_file_present" -Expected $true
+    } else {
+        Assert-Boolean -Object $localWhisperOutput -Name "output_present" -Expected $false
+    }
+
+    $files = Require-Property -Object $Report -Name "files"
+    Assert-FileProof -Proof (Require-Property -Object $files -Name "proof_agent") -Name "laptop_preflight.proof_agent"
+    Assert-FileProof -Proof (Require-Property -Object $files -Name "mic_preflight_wav") -Name "laptop_preflight.mic_preflight_wav" -MinimumBytes 45
+    if ($hasLocalWhisperPreflight) {
+        Assert-FileProof -Proof (Require-Property -Object $files -Name "whisper_cli") -Name "laptop_preflight.whisper_cli"
+        Assert-FileProof -Proof (Require-Property -Object $files -Name "whisper_model") -Name "laptop_preflight.whisper_model"
+    }
+
+    Write-Host "proof_set_laptop_preflight_session_id=$proofSessionId"
+    Write-Host "proof_set_laptop_preflight_generated_at=$($generatedAt.ToString("o"))"
+    Write-Host "proof_set_laptop_preflight_machine=$machine"
+    Write-Host "proof_set_laptop_preflight_user=$userName"
+    Write-Host "proof_set_laptop_preflight_user_sid=$userSid"
+    Write-Host "proof_set_laptop_preflight_package_dir=$packageDir"
+    Write-Host "proof_set_laptop_preflight_package_fingerprint=$packageFingerprint"
+    Write-Host "proof_set_laptop_preflight_source_repository=$sourceRepository"
+    Write-Host "proof_set_laptop_preflight_source_branch=$sourceBranch"
+    Write-Host "proof_set_laptop_preflight_source_commit=$sourceCommit"
+    Write-Host "proof_set_laptop_preflight_source_dirty=$sourceDirty"
+    Write-Host "proof_set_laptop_preflight_proof_dir=$proofDir"
+    Write-Host "proof_set_laptop_preflight_permission_surface=true"
+    Write-Host "proof_set_laptop_preflight_local_whisper=$hasLocalWhisperPreflight"
+}
+
 function Set-ExpectedModeFromProfile {
     param(
         [Parameter(Mandatory = $true)]
@@ -621,6 +814,18 @@ function Get-ProofProfileRequirements {
                 "hold_hook_single_window_source",
                 "native_doctor_surface",
                 "packaged_listener"
+            )
+        }
+        "laptop-preflight" {
+            return @(
+                "windows_platform",
+                "windows_user",
+                "clean_source_provenance",
+                "package_identity",
+                "minimum_permission_surface",
+                "hotkey_delivery_preflight",
+                "microphone_preflight",
+                "optional_local_whisper_preflight"
             )
         }
         "cloud-dictation" {
@@ -751,6 +956,9 @@ switch ($RequireProofProfile) {
         $RequireNativeDoctorSurface = $true
         $RequirePackagedListener = $true
     }
+    "laptop-preflight" {
+        Set-ExpectedModeFromProfile -Mode "windows-laptop-preflight" -Profile $RequireProofProfile
+    }
     "cloud-dictation" {
         Set-ExpectedModeFromProfile -Mode "cloud" -Profile $RequireProofProfile
         $RequireWindowsPlatform = $true
@@ -825,6 +1033,16 @@ switch ($RequireProofProfile) {
 
 if (![string]::IsNullOrWhiteSpace($RequireProofProfile)) {
     Write-Host "proof_profile=$RequireProofProfile"
+}
+
+if ($RequireProofProfile -eq "laptop-preflight") {
+    Assert-LaptopPreflightReport -Report $report
+    foreach ($requirement in (Get-ProofProfileRequirements -Profile $RequireProofProfile)) {
+        Write-Host "proof_requirement=$requirement status=pass"
+    }
+    Write-Host "proof_profile_ok=$RequireProofProfile"
+    Write-Host "proof_report_ok=$ProofReportPath"
+    return
 }
 
 Assert-NonEmptyString -Object $report -Name "generated_at"

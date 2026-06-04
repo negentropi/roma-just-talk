@@ -431,116 +431,6 @@ function Assert-SameArtifactSmokeProofSet {
     Write-Host "proof_set_artifact_smoke_source_dirty=$($expectedSource['Dirty'])"
 }
 
-function Assert-LaptopPreflightReport {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Path
-    )
-
-    $reportName = "laptop_preflight"
-    $report = Read-ProofReport -Path $Path
-
-    Assert-SameReportValue `
-        -Name "proof_mode" `
-        -Expected "windows-laptop-preflight" `
-        -Actual ([string](Require-ReportProperty -Report $report -Name "proof_mode" -ReportName $reportName)) `
-        -ReportName $reportName
-    Assert-ReportBoolean -Report $report -Name "preflight_only" -Expected $true -ReportName $reportName
-    $proofSessionId = Assert-ProofSessionId `
-        -Value (Assert-NonEmptyReportString -Report $report -Name "proof_session_id" -ReportName $reportName) `
-        -ReportName $reportName
-    $generatedAt = Get-ReportGeneratedAt -Report $report -ReportName $reportName
-    $packageDir = Assert-NonEmptyReportString -Report $report -Name "package_dir" -ReportName $reportName
-    $proofDir = Assert-NonEmptyReportString -Report $report -Name "proof_dir" -ReportName $reportName
-    $packageFingerprint = Get-ReportPackageFingerprint -Report $report -ReportName $reportName
-    if ([string]::IsNullOrWhiteSpace($packageFingerprint)) {
-        throw "Laptop preflight proof report is missing package identity fingerprint"
-    }
-    $source = Get-ReportSourceProvenance -Report $report -ReportName $reportName
-    if ([string]$source['Dirty'] -ne "false") {
-        throw "Laptop preflight proof requires a clean packaged source checkout, got source_dirty=$($source['Dirty'])"
-    }
-
-    $os = Require-ReportProperty -Report $report -Name "os" -ReportName $reportName
-    $platform = [string](Require-ReportProperty -Report $os -Name "platform" -ReportName $reportName)
-    if ($platform -ne "Win32NT") {
-        throw "Laptop preflight proof must run on Windows, got platform $platform"
-    }
-    $machine = Assert-NonEmptyReportString -Report $os -Name "machine" -ReportName $reportName
-    $userName = Assert-NonEmptyReportString -Report $os -Name "user_name" -ReportName $reportName
-    $userSid = Assert-NonEmptyReportString -Report $os -Name "user_sid" -ReportName $reportName
-
-    $preflights = Require-ReportProperty -Report $report -Name "preflights" -ReportName $reportName
-    Assert-ReportBoolean -Report $preflights -Name "permission_surface" -Expected $true -ReportName $reportName
-    Assert-ReportBoolean -Report $preflights -Name "hotkey_delivery" -Expected $true -ReportName $reportName
-    Assert-ReportBoolean -Report $preflights -Name "microphone" -Expected $true -ReportName $reportName
-    $hasLocalWhisperPreflight = [bool](Require-ReportProperty -Report $preflights -Name "local_whisper" -ReportName $reportName)
-
-    $preflightOutputs = Require-ReportProperty -Report $report -Name "preflight_outputs" -ReportName $reportName
-    $permissionOutput = Require-ReportProperty -Report $preflightOutputs -Name "permission_surface" -ReportName $reportName
-    Assert-ReportBoolean -Report $permissionOutput -Name "output_present" -Expected $true -ReportName $reportName
-    Assert-ReportBoolean -Report $permissionOutput -Name "os_permission_grants_microphone" -Expected $true -ReportName $reportName
-    Assert-ReportBoolean -Report $permissionOutput -Name "microphone_settings_uri" -Expected $true -ReportName $reportName
-    Assert-ReportBoolean -Report $permissionOutput -Name "desktop_app_microphone_access_required" -Expected $true -ReportName $reportName
-    Assert-ReportBoolean -Report $permissionOutput -Name "native_capabilities_register_hotkey" -Expected $true -ReportName $reportName
-    Assert-ReportBoolean -Report $permissionOutput -Name "no_accessibility_permission_prompt" -Expected $true -ReportName $reportName
-    Assert-ReportBoolean -Report $permissionOutput -Name "no_automation_permission_prompt" -Expected $true -ReportName $reportName
-    Assert-ReportBoolean -Report $permissionOutput -Name "no_admin_required" -Expected $true -ReportName $reportName
-    Assert-ReportBoolean -Report $permissionOutput -Name "startup_launcher_run_script" -Expected $true -ReportName $reportName
-    Assert-ReportBoolean -Report $permissionOutput -Name "startup_launch_mode_listen" -Expected $true -ReportName $reportName
-    Assert-ReportBoolean -Report $permissionOutput -Name "no_startup_permission_prompt" -Expected $true -ReportName $reportName
-    Assert-ReportBoolean -Report $permissionOutput -Name "no_screen_capture_required" -Expected $true -ReportName $reportName
-    Assert-ReportBoolean -Report $permissionOutput -Name "no_screen_recording_permission_prompt" -Expected $true -ReportName $reportName
-
-    $hotkeyOutput = Require-ReportProperty -Report $preflightOutputs -Name "hotkey_delivery" -ReportName $reportName
-    Assert-ReportBoolean -Report $hotkeyOutput -Name "output_present" -Expected $true -ReportName $reportName
-    Assert-ReportBoolean -Report $hotkeyOutput -Name "waiting_for_hold" -Expected $true -ReportName $reportName
-    Assert-ReportBoolean -Report $hotkeyOutput -Name "key_down" -Expected $true -ReportName $reportName
-    Assert-ReportBoolean -Report $hotkeyOutput -Name "key_up" -Expected $true -ReportName $reportName
-    Assert-ReportBoolean -Report $hotkeyOutput -Name "observed_events_present" -Expected $true -ReportName $reportName
-
-    $microphoneOutput = Require-ReportProperty -Report $preflightOutputs -Name "microphone" -ReportName $reportName
-    Assert-ReportBoolean -Report $microphoneOutput -Name "output_present" -Expected $true -ReportName $reportName
-    Assert-ReportBoolean -Report $microphoneOutput -Name "wrote_present" -Expected $true -ReportName $reportName
-    Assert-ReportBoolean -Report $microphoneOutput -Name "sample_rate_16000" -Expected $true -ReportName $reportName
-    Assert-ReportBoolean -Report $microphoneOutput -Name "channels_mono" -Expected $true -ReportName $reportName
-
-    $localWhisperOutput = Require-ReportProperty -Report $preflightOutputs -Name "local_whisper" -ReportName $reportName
-    if ($hasLocalWhisperPreflight) {
-        Assert-ReportBoolean -Report $localWhisperOutput -Name "output_present" -Expected $true -ReportName $reportName
-        Assert-ReportBoolean -Report $localWhisperOutput -Name "transcription_client_whisper" -Expected $true -ReportName $reportName
-        Assert-ReportBoolean -Report $localWhisperOutput -Name "network_required_false" -Expected $true -ReportName $reportName
-        Assert-ReportBoolean -Report $localWhisperOutput -Name "executable_present" -Expected $true -ReportName $reportName
-        Assert-ReportBoolean -Report $localWhisperOutput -Name "model_file_present" -Expected $true -ReportName $reportName
-    } else {
-        Assert-ReportBoolean -Report $localWhisperOutput -Name "output_present" -Expected $false -ReportName $reportName
-    }
-
-    $files = Require-ReportProperty -Report $report -Name "files" -ReportName $reportName
-    Assert-ReportFileProof -Proof (Require-ReportProperty -Report $files -Name "proof_agent" -ReportName $reportName) -Name "laptop_preflight.proof_agent"
-    Assert-ReportFileProof -Proof (Require-ReportProperty -Report $files -Name "mic_preflight_wav" -ReportName $reportName) -Name "laptop_preflight.mic_preflight_wav" -MinimumBytes 45
-    if ($hasLocalWhisperPreflight) {
-        Assert-ReportFileProof -Proof (Require-ReportProperty -Report $files -Name "whisper_cli" -ReportName $reportName) -Name "laptop_preflight.whisper_cli"
-        Assert-ReportFileProof -Proof (Require-ReportProperty -Report $files -Name "whisper_model" -ReportName $reportName) -Name "laptop_preflight.whisper_model"
-    }
-
-    Write-Host "proof_set_laptop_preflight_session_id=$proofSessionId"
-    Write-Host "proof_set_laptop_preflight_generated_at=$($generatedAt.ToString("o"))"
-    Write-Host "proof_set_laptop_preflight_machine=$machine"
-    Write-Host "proof_set_laptop_preflight_user=$userName"
-    Write-Host "proof_set_laptop_preflight_user_sid=$userSid"
-    Write-Host "proof_set_laptop_preflight_package_dir=$packageDir"
-    Write-Host "proof_set_laptop_preflight_package_fingerprint=$packageFingerprint"
-    Write-Host "proof_set_laptop_preflight_source_repository=$($source['Repository'])"
-    Write-Host "proof_set_laptop_preflight_source_branch=$($source['Branch'])"
-    Write-Host "proof_set_laptop_preflight_source_commit=$($source['Commit'])"
-    Write-Host "proof_set_laptop_preflight_source_dirty=$($source['Dirty'])"
-    Write-Host "proof_set_laptop_preflight_proof_dir=$proofDir"
-    Write-Host "proof_set_laptop_preflight_permission_surface=true"
-    Write-Host "proof_set_laptop_preflight_local_whisper=$hasLocalWhisperPreflight"
-    return $report
-}
-
 function Assert-LaptopPreflightIncludesLocalWhisper {
     param(
         [Parameter(Mandatory = $true)]
@@ -895,10 +785,11 @@ if ($RequireLocalWhisperNotepadPaste) {
 }
 
 if ($RequireLaptopPreflight) {
-    Write-Host ""
-    Write-Host "== proof_set_check=laptop_preflight =="
-    $script:laptopPreflightReport = Assert-LaptopPreflightReport -Path $LaptopPreflightReportPath
-    Write-Host "proof_set_requirement=laptop_preflight status=pass report=$LaptopPreflightReportPath"
+    Invoke-ProofReportProfileCheck `
+        -Name "laptop_preflight" `
+        -Profile "laptop-preflight" `
+        -Path $LaptopPreflightReportPath
+    $script:laptopPreflightReport = Read-ProofReport -Path $LaptopPreflightReportPath
 }
 
 if ($RequirePackagedWhisperMockInstall) {

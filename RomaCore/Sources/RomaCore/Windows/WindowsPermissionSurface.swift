@@ -8,6 +8,8 @@ public struct WindowsPermissionSurface: Equatable, Hashable, Sendable {
     public var requiresDesktopAppMicrophoneAccess: Bool
     public var hotKeyPermissionPrompt: Bool
     public var pastePermissionPrompt: Bool
+    public var accessibilityPermissionPrompt: Bool
+    public var automationPermissionPrompt: Bool
     public var pasteIntegrityLimit: String
     public var adminRequired: Bool
     public var startupMechanism: String
@@ -15,6 +17,7 @@ public struct WindowsPermissionSurface: Equatable, Hashable, Sendable {
     public var startupLaunchMode: String
     public var startupPermissionPrompt: Bool
     public var screenCaptureRequired: Bool
+    public var screenRecordingPermissionPrompt: Bool
 
     public init(
         minimumPermissions: [String],
@@ -24,13 +27,16 @@ public struct WindowsPermissionSurface: Equatable, Hashable, Sendable {
         requiresDesktopAppMicrophoneAccess: Bool,
         hotKeyPermissionPrompt: Bool,
         pastePermissionPrompt: Bool,
+        accessibilityPermissionPrompt: Bool,
+        automationPermissionPrompt: Bool,
         pasteIntegrityLimit: String,
         adminRequired: Bool,
         startupMechanism: String,
         startupLauncher: String,
         startupLaunchMode: String,
         startupPermissionPrompt: Bool,
-        screenCaptureRequired: Bool
+        screenCaptureRequired: Bool,
+        screenRecordingPermissionPrompt: Bool
     ) {
         self.minimumPermissions = minimumPermissions
         self.osPermissionGrants = osPermissionGrants
@@ -39,6 +45,8 @@ public struct WindowsPermissionSurface: Equatable, Hashable, Sendable {
         self.requiresDesktopAppMicrophoneAccess = requiresDesktopAppMicrophoneAccess
         self.hotKeyPermissionPrompt = hotKeyPermissionPrompt
         self.pastePermissionPrompt = pastePermissionPrompt
+        self.accessibilityPermissionPrompt = accessibilityPermissionPrompt
+        self.automationPermissionPrompt = automationPermissionPrompt
         self.pasteIntegrityLimit = pasteIntegrityLimit
         self.adminRequired = adminRequired
         self.startupMechanism = startupMechanism
@@ -46,6 +54,7 @@ public struct WindowsPermissionSurface: Equatable, Hashable, Sendable {
         self.startupLaunchMode = startupLaunchMode
         self.startupPermissionPrompt = startupPermissionPrompt
         self.screenCaptureRequired = screenCaptureRequired
+        self.screenRecordingPermissionPrompt = screenRecordingPermissionPrompt
     }
 
     public static let minimumMVP = WindowsPermissionSurface(
@@ -63,12 +72,15 @@ public struct WindowsPermissionSurface: Equatable, Hashable, Sendable {
         requiresDesktopAppMicrophoneAccess: true,
         hotKeyPermissionPrompt: false,
         pastePermissionPrompt: false,
+        accessibilityPermissionPrompt: false,
+        automationPermissionPrompt: false,
         pasteIntegrityLimit: "equal_or_lower",
         adminRequired: false,
         startupMechanism: "user_startup_folder_shortcut",
         startupLauncher: "run-windows-agent.ps1",
         startupLaunchMode: "listen",
         startupPermissionPrompt: false,
-        screenCaptureRequired: false
+        screenCaptureRequired: false,
+        screenRecordingPermissionPrompt: false
     )
 }

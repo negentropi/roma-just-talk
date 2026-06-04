@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Reported explicit no-Accessibility, no-Automation, and no-Screen-Recording markers in Windows permission proof.
 - Rejected more reserved IP cloud endpoints from real Windows laptop proof.
 - Required Windows full laptop proof reports to come from one generated-at proof window.
 - Collapsed temporal natural restatements such as "at two at three" and "on Tuesday on Wednesday" in post-STT cleanup.

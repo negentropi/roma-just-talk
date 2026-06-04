@@ -449,11 +449,14 @@ function Assert-DoctorOutputProof {
     Assert-Boolean -Object $Proof -Name "default_hold_timeout_milliseconds" -Expected $true
     Assert-Boolean -Object $Proof -Name "default_clipboard_restore_delay_seconds" -Expected $true
     Assert-Boolean -Object $Proof -Name "maximum_clipboard_restore_delay_seconds" -Expected $true
+    Assert-Boolean -Object $Proof -Name "no_accessibility_permission_prompt" -Expected $true
+    Assert-Boolean -Object $Proof -Name "no_automation_permission_prompt" -Expected $true
     Assert-Boolean -Object $Proof -Name "no_admin_required" -Expected $true
     Assert-Boolean -Object $Proof -Name "startup_launcher_run_script" -Expected $true
     Assert-Boolean -Object $Proof -Name "startup_launch_mode_listen" -Expected $true
     Assert-Boolean -Object $Proof -Name "no_startup_permission_prompt" -Expected $true
     Assert-Boolean -Object $Proof -Name "no_screen_capture_required" -Expected $true
+    Assert-Boolean -Object $Proof -Name "no_screen_recording_permission_prompt" -Expected $true
     Write-Host "proof_doctor=$Name"
 }
 

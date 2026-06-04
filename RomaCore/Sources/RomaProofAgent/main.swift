@@ -203,6 +203,8 @@ struct RomaProofAgent {
         print("desktop_app_microphone_access_required=\(surface.requiresDesktopAppMicrophoneAccess)")
         print("hotkey_permission_prompt=\(surface.hotKeyPermissionPrompt)")
         print("paste_permission_prompt=\(surface.pastePermissionPrompt)")
+        print("accessibility_permission_prompt=\(surface.accessibilityPermissionPrompt)")
+        print("automation_permission_prompt=\(surface.automationPermissionPrompt)")
         print("paste_integrity_limit=\(surface.pasteIntegrityLimit)")
         print("admin_required=\(surface.adminRequired)")
         print("startup_mechanism=\(surface.startupMechanism)")
@@ -210,6 +212,7 @@ struct RomaProofAgent {
         print("startup_launch_mode=\(surface.startupLaunchMode)")
         print("startup_permission_prompt=\(surface.startupPermissionPrompt)")
         print("screen_capture_required=\(surface.screenCaptureRequired)")
+        print("screen_recording_permission_prompt=\(surface.screenRecordingPermissionPrompt)")
     }
 
     private static func printWindowsSecretDoctor() {

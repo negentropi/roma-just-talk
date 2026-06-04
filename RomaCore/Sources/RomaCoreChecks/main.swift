@@ -6300,6 +6300,8 @@ struct RomaCoreChecks {
         )
         try require(!surface.hotKeyPermissionPrompt, "RegisterHotKey should not be documented as a prompt flow")
         try require(!surface.pastePermissionPrompt, "SendInput paste should not be documented as a prompt flow")
+        try require(!surface.accessibilityPermissionPrompt, "Windows MVP should not need Accessibility permission")
+        try require(!surface.automationPermissionPrompt, "Windows MVP should not need Automation permission")
         try require(surface.pasteIntegrityLimit == "equal_or_lower", "paste integrity limit should be explicit")
         try require(!surface.adminRequired, "Windows MVP should not require admin")
         try require(
@@ -6316,6 +6318,7 @@ struct RomaCoreChecks {
         )
         try require(!surface.startupPermissionPrompt, "Startup folder shortcut should not be documented as a prompt flow")
         try require(!surface.screenCaptureRequired, "Windows MVP should not require screen capture")
+        try require(!surface.screenRecordingPermissionPrompt, "Windows MVP should not need Screen Recording permission")
     }
 
     private static func checkTranscriptionRequestMetadata() throws {
@@ -7254,6 +7257,21 @@ struct RomaCoreChecks {
                 "Windows proof report checker should require doctor default field \(field)"
             )
         }
+        let proofReportNegativePermissionFields = [
+            "no_accessibility_permission_prompt",
+            "no_automation_permission_prompt",
+            "no_screen_recording_permission_prompt"
+        ]
+        for field in proofReportNegativePermissionFields {
+            try require(
+                proveScript.contains(#"\#(field) = $Output.Contains("#),
+                "Windows artifact proof reports should record negative permission field \(field)"
+            )
+            try require(
+                checkReportScript.contains(#"Assert-Boolean -Object $Proof -Name "\#(field)" -Expected $true"#),
+                "Windows proof report checker should require negative permission field \(field)"
+            )
+        }
         let artifactDefaultAssertions = [
             "default_record_seconds=2.0",
             "default_hold_timeout_seconds=15.0",
@@ -7299,17 +7317,42 @@ struct RomaCoreChecks {
             "native_capabilities=RegisterHotKey",
             "paste=win32_clipboard_sendinput",
             "secret_store=dpapi",
+            "accessibility_permission_prompt=false",
+            "automation_permission_prompt=false",
             "admin_required=false",
             "startup_launcher=run-windows-agent.ps1",
             "startup_launch_mode=listen",
             "startup_permission_prompt=false",
-            "screen_capture_required=false"
+            "screen_capture_required=false",
+            "screen_recording_permission_prompt=false"
         ]
         for expectedLine in installedLauncherContractAssertions {
             try require(
                 runScript.contains(#"Assert-OutputContains -Output $doctorOutput"#) &&
                     runScript.contains(#"-Expected "\#(expectedLine)""#),
                 "Windows run script should assert installed launcher contract output \(expectedLine)"
+            )
+        }
+        let minimumPermissionOutputAssertions = [
+            "accessibility_permission_prompt=false",
+            "automation_permission_prompt=false",
+            "screen_recording_permission_prompt=false"
+        ]
+        for expectedLine in minimumPermissionOutputAssertions {
+            try require(
+                smokeScript.contains(#"Assert-OutputContains -Output $doctorOutput"#) &&
+                    smokeScript.contains(#"-Expected "\#(expectedLine)""#),
+                "Windows smoke script should assert minimal permission output \(expectedLine)"
+            )
+            try require(
+                windowsProofScript.contains(#"Assert-OutputContains -Output $windowsAgentDoctorOutput"#) &&
+                    windowsProofScript.contains(#"-Expected "\#(expectedLine)""#),
+                "Windows proof script should assert agent minimal permission output \(expectedLine)"
+            )
+            try require(
+                windowsProofScript.contains(#"Assert-OutputContains -Output $permissionDoctorOutput"#) &&
+                    windowsProofScript.contains(#"-Expected "\#(expectedLine)""#),
+                "Windows proof script should assert permission doctor output \(expectedLine)"
             )
         }
         try require(
@@ -7397,6 +7440,12 @@ struct RomaCoreChecks {
         try require(
             checkReportScript.contains(#"Assert-Boolean -Object $Proof -Name "secret_store_dpapi" -Expected $true"#),
             "Windows proof checker should require the user-facing agent to report DPAPI secrets"
+        )
+        try require(
+            checkReportScript.contains(#"Assert-Boolean -Object $Proof -Name "no_accessibility_permission_prompt" -Expected $true"#) &&
+                checkReportScript.contains(#"Assert-Boolean -Object $Proof -Name "no_automation_permission_prompt" -Expected $true"#) &&
+                checkReportScript.contains(#"Assert-Boolean -Object $Proof -Name "no_screen_recording_permission_prompt" -Expected $true"#),
+            "Windows proof checker should require the user-facing agent to report no macOS-style permission prompts"
         )
         try require(
             checkReportScript.contains(#""agent_runtime_wiring""#),

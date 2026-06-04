@@ -61,6 +61,8 @@ struct RomaWindowsAgent {
         print("desktop_app_microphone_access_required=\(permissionSurface.requiresDesktopAppMicrophoneAccess)")
         print("hotkey_permission_prompt=\(permissionSurface.hotKeyPermissionPrompt)")
         print("paste_permission_prompt=\(permissionSurface.pastePermissionPrompt)")
+        print("accessibility_permission_prompt=\(permissionSurface.accessibilityPermissionPrompt)")
+        print("automation_permission_prompt=\(permissionSurface.automationPermissionPrompt)")
         print("paste_integrity_limit=\(permissionSurface.pasteIntegrityLimit)")
         print("admin_required=\(permissionSurface.adminRequired)")
         print("startup_mechanism=\(permissionSurface.startupMechanism)")
@@ -68,6 +70,7 @@ struct RomaWindowsAgent {
         print("startup_launch_mode=\(permissionSurface.startupLaunchMode)")
         print("startup_permission_prompt=\(permissionSurface.startupPermissionPrompt)")
         print("screen_capture_required=\(permissionSurface.screenCaptureRequired)")
+        print("screen_recording_permission_prompt=\(permissionSurface.screenRecordingPermissionPrompt)")
     }
 
     private static func runDictation(arguments: [String]) async throws {

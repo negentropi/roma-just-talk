@@ -9908,7 +9908,7 @@ struct RomaCoreChecks {
         try require(
             laptopProofScript.contains("PreflightReportPath") &&
                 laptopProofScript.contains("windows_laptop_preflight_report=") &&
-                laptopProofScript.contains(#"proof_mode = "windows-laptop-preflight""#) &&
+                laptopProofScript.contains(#"proof_mode = Get-RomaWindowsProofProfileExpectedModeByName -Name "laptop_preflight""#) &&
                 laptopProofScript.contains("preflight_outputs") &&
                 laptopProofScript.contains("permission_surface = $true") &&
                 laptopProofScript.contains("permission_surface = Get-RomaWindowsPermissionPreflightOutputProof -Output $script:permissionPreflightOutput") &&
@@ -9942,6 +9942,7 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Get-RomaWindowsProofProfileSpecs") &&
                 proofCommonScript.contains("function Get-RomaWindowsProofProfileName") &&
                 proofCommonScript.contains("function Get-RomaWindowsProofProfileExpectedMode") &&
+                proofCommonScript.contains("function Get-RomaWindowsProofProfileExpectedModeByName") &&
                 proofCommonScript.contains("function Get-RomaWindowsProofProfileRequirements") &&
                 proofCommonScript.contains("function Get-RomaWindowsInstalledProofProfileRequirements") &&
                 proofCommonScript.contains("function Get-RomaWindowsProofProfileAssertions") &&
@@ -9986,7 +9987,8 @@ struct RomaCoreChecks {
                 !checkSetScript.contains(#"Name = "local_whisper_notepad_paste""#) &&
                 checkReportScript.contains("Get-RomaWindowsProofProfileExpectedMode -Profile $RequireProofProfile") &&
                 checkReportScript.contains("Get-RomaWindowsProofProfileRequirements -Profile $Profile") &&
-                checkReportScript.contains(#"-Expected (Get-RomaWindowsProofProfileExpectedMode -Profile (Get-RomaWindowsProofProfileName -Name "laptop_preflight"))"#) &&
+                checkReportScript.contains(#"-Expected (Get-RomaWindowsProofProfileExpectedModeByName -Name "laptop_preflight")"#) &&
+                packageScript.contains(#"proof_mode = Get-RomaWindowsProofProfileExpectedModeByName -Name "laptop_preflight""#) &&
                 !checkReportScript.contains("function Get-ProofProfileRequirements") &&
                 !checkReportScript.contains("function Get-InstalledProofProfileRequirements") &&
                 !checkReportScript.contains("function Join-ProofRequirements") &&

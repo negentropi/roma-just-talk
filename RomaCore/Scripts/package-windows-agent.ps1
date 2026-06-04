@@ -227,7 +227,7 @@ function Write-LaptopPreflightCheckerSmokeReport {
     $report = [ordered]@{
         generated_at = (Get-Date).ToUniversalTime().ToString("o")
         proof_session_id = [guid]::NewGuid().ToString("D")
-        proof_mode = "windows-laptop-preflight"
+        proof_mode = Get-RomaWindowsProofProfileExpectedModeByName -Name "laptop_preflight"
         preflight_only = $true
         package_dir = $PackageDir
         proof_dir = $ProofDir

@@ -766,7 +766,7 @@ function Assert-LaptopPreflightReport {
 
     Assert-StringEquals `
         -Actual ([string](Require-Property -Object $Report -Name "proof_mode")) `
-        -Expected (Get-RomaWindowsProofProfileExpectedMode -Profile (Get-RomaWindowsProofProfileName -Name "laptop_preflight")) `
+        -Expected (Get-RomaWindowsProofProfileExpectedModeByName -Name "laptop_preflight") `
         -Name "proof_mode"
     Assert-Boolean -Object $Report -Name "preflight_only" -Expected $true
     $proofSessionId = Assert-ProofSessionId `

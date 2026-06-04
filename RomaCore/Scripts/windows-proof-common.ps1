@@ -362,6 +362,16 @@ function Get-RomaWindowsProofProfileExpectedMode {
     throw "Unknown Windows proof profile: $Profile"
 }
 
+function Get-RomaWindowsProofProfileExpectedModeByName {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    return Get-RomaWindowsProofProfileExpectedMode `
+        -Profile (Get-RomaWindowsProofProfileName -Name $Name)
+}
+
 function Join-RomaWindowsProofRequirements {
     param(
         [string[]]$Base = @(),

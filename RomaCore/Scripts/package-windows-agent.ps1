@@ -328,6 +328,35 @@ function Write-LaptopPreflightCheckerSmokeReport {
     Write-Host "laptop_preflight_checker_smoke_report=$ReportPath"
 }
 
+function Invoke-LaptopPreflightReportProfileSmoke {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$CheckerScriptPath,
+        [Parameter(Mandatory = $true)]
+        [string]$ReportPath,
+        [Parameter(Mandatory = $true)]
+        [string]$Name,
+        [Parameter(Mandatory = $true)]
+        [string]$ExpectedLocalWhisperMarker
+    )
+
+    $profileOutputText = & $CheckerScriptPath `
+        -ProofReportPath $ReportPath `
+        -RequireProofProfile laptop-preflight 2>&1 | Out-String
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host $profileOutputText
+        throw "$Name laptop preflight report profile smoke failed"
+    }
+
+    Write-Host $profileOutputText
+    Assert-OutputContains -Output $profileOutputText -Expected "proof_profile_ok=laptop-preflight"
+    Assert-OutputContains -Output $profileOutputText -Expected "proof_report_ok="
+    Assert-OutputContains -Output $profileOutputText -Expected "proof_set_laptop_preflight_permission_surface=true"
+    Assert-OutputContains -Output $profileOutputText -Expected "proof_set_laptop_preflight_local_whisper=$ExpectedLocalWhisperMarker"
+    Assert-OutputContains -Output $profileOutputText -Expected "proof_set_laptop_preflight_source_dirty=false"
+    return $profileOutputText
+}
+
 function Write-LaptopProofGuide {
     param(
         [Parameter(Mandatory = $true)]
@@ -656,6 +685,11 @@ try {
             -WhisperModelPath $agentOutput `
             -GitMetadata $gitMetadata `
             -IncludeLocalWhisper $false
+        Invoke-LaptopPreflightReportProfileSmoke `
+            -CheckerScriptPath $checkReportScriptOutput `
+            -ReportPath $laptopNativePreflightCheckerSmokeReport `
+            -Name "Native" `
+            -ExpectedLocalWhisperMarker "False" | Out-Null
         $checkerOutputText = & $checkSetScriptOutput `
             -LaptopPreflightReportPath $laptopNativePreflightCheckerSmokeReport `
             -RequireLaptopPreflight 2>&1 | Out-String
@@ -681,6 +715,11 @@ try {
             -WhisperModelPath $agentOutput `
             -GitMetadata $gitMetadata `
             -IncludeLocalWhisper $true
+        Invoke-LaptopPreflightReportProfileSmoke `
+            -CheckerScriptPath $checkReportScriptOutput `
+            -ReportPath $laptopPreflightCheckerSmokeReport `
+            -Name "Local whisper" `
+            -ExpectedLocalWhisperMarker "True" | Out-Null
         $checkerOutputText = & $checkSetScriptOutput `
             -LaptopPreflightReportPath $laptopPreflightCheckerSmokeReport `
             -RequireLaptopPreflight 2>&1 | Out-String

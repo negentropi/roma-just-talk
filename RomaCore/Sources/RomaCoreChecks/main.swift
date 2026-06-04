@@ -7900,6 +7900,10 @@ struct RomaCoreChecks {
             packageScript.contains("native laptop preflight report checker smoke") &&
                 packageScript.contains("local whisper laptop preflight report checker smoke") &&
                 packageScript.contains("Write-LaptopPreflightCheckerSmokeReport") &&
+                packageScript.contains("function Invoke-LaptopPreflightReportProfileSmoke") &&
+                packageScript.contains("-CheckerScriptPath $checkReportScriptOutput") &&
+                packageScript.contains("-RequireProofProfile laptop-preflight") &&
+                packageScript.contains(#"-Expected "proof_report_ok=""#) &&
                 packageScript.contains("IncludeLocalWhisper") &&
                 packageScript.contains("windows-manifest.ps1") &&
                 packageScript.contains("manifest_script=$manifestScriptOutput") &&

@@ -3161,6 +3161,31 @@ struct RomaCoreChecks {
                 "what i mean is correction should preserve suffix"
             ),
             (
+                "I think this works, wait, no, it doesn't.",
+                "I think it doesn't.",
+                "wait no pronoun correction should remove repeated predicate tail"
+            ),
+            (
+                "I think the model is ready, wait no it isn't.",
+                "I think it isn't.",
+                "wait no pronoun correction should remove article predicate tail"
+            ),
+            (
+                "This will pass, wait no it won't.",
+                "it won't.",
+                "wait no pronoun correction should remove modal predicate tail"
+            ),
+            (
+                "I think this works, wait no user mode.",
+                "I think user mode.",
+                "wait no noun correction should remove demonstrative predicate tail"
+            ),
+            (
+                "Use model, wait new module.",
+                "Use new module.",
+                "predicate-tail guard should preserve ordinary bare wait short phrase correction"
+            ),
+            (
                 "Use model, wait actually module.",
                 "Use module.",
                 "wait actually correction"
@@ -7901,7 +7926,9 @@ struct RomaCoreChecks {
                 packageScript.contains("local whisper laptop preflight report checker smoke") &&
                 packageScript.contains("Write-LaptopPreflightCheckerSmokeReport") &&
                 packageScript.contains("function Invoke-LaptopPreflightReportProfileSmoke") &&
-                packageScript.contains("-CheckerScriptPath $checkReportScriptOutput") &&
+                packageScript.contains("function Invoke-LaptopPreflightCheckerSmoke") &&
+                packageScript.contains("-ReportCheckerScriptPath $checkReportScriptOutput") &&
+                packageScript.contains("-SetCheckerScriptPath $checkSetScriptOutput") &&
                 packageScript.contains("-RequireProofProfile laptop-preflight") &&
                 packageScript.contains(#"-Expected "proof_report_ok=""#) &&
                 packageScript.contains("IncludeLocalWhisper") &&
@@ -7926,9 +7953,10 @@ struct RomaCoreChecks {
                 !packageScript.contains(String(repeating: "0", count: 64)) &&
                 packageScript.contains("source_repository = $GitMetadata.Repository") &&
                 packageScript.contains("laptop_preflight_checker_smoke_report") &&
+                packageScript.contains("-IncludeLocalWhisper $false") &&
+                packageScript.contains("-IncludeLocalWhisper $true") &&
                 packageScript.contains(#"-Expected "proof_set_laptop_preflight_permission_surface=true""#) &&
-                packageScript.contains(#"-Expected "proof_set_laptop_preflight_local_whisper=False""#) &&
-                packageScript.contains(#"-Expected "proof_set_laptop_preflight_local_whisper=True""#) &&
+                packageScript.contains(#"-Expected "proof_set_laptop_preflight_local_whisper=$expectedLocalWhisperMarker""#) &&
                 packageScript.contains(#"-Expected "proof_set_laptop_preflight_source_dirty=false""#) &&
                 packageScript.contains(#"-Expected "proof_profile_ok=laptop-preflight""#) &&
                 packageScript.contains("check-windows-proof-report.ps1 -ProofReportPath C:\\tmp\\roma-windows-laptop-proof\\preflight-proof.json -RequireProofProfile laptop-preflight") &&

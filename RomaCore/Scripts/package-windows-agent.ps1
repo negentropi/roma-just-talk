@@ -272,11 +272,23 @@ function Write-LaptopPreflightCheckerSmokeReport {
             user_sid = Get-CurrentWindowsUserSid
         }
         preflights = [ordered]@{
+            permission_surface = $true
             hotkey_delivery = $true
             microphone = $true
             local_whisper = $IncludeLocalWhisper
         }
         preflight_outputs = [ordered]@{
+            permission_surface = [ordered]@{
+                output_present = $true
+                os_permission_grants_microphone = $true
+                microphone_settings_uri = $true
+                desktop_app_microphone_access_required = $true
+                native_capabilities_register_hotkey = $true
+                no_accessibility_permission_prompt = $true
+                no_automation_permission_prompt = $true
+                no_screen_capture_required = $true
+                no_screen_recording_permission_prompt = $true
+            }
             hotkey_delivery = [ordered]@{
                 output_present = $true
                 waiting_for_hold = $true
@@ -342,6 +354,7 @@ windows_laptop_preflight_ok=true
 windows_laptop_preflight_report=C:\tmp\roma-windows-laptop-proof\preflight-proof.json
 proof_set_laptop_preflight_package_fingerprint=
 proof_set_laptop_preflight_source_dirty=false
+proof_set_laptop_preflight_permission_surface=true
 proof_set_laptop_preflight_local_whisper=False
 
 Local whisper preflight also prints:
@@ -637,6 +650,7 @@ try {
             throw "Native laptop preflight report checker smoke failed"
         }
         Write-Host $checkerOutputText
+        Assert-OutputContains -Output $checkerOutputText -Expected "proof_set_laptop_preflight_permission_surface=true"
         Assert-OutputContains -Output $checkerOutputText -Expected "proof_set_laptop_preflight_local_whisper=False"
         Assert-OutputContains -Output $checkerOutputText -Expected "proof_set_laptop_preflight_source_dirty=false"
         Assert-OutputContains -Output $checkerOutputText -Expected "proof_set_ok=laptop-preflight"
@@ -660,6 +674,7 @@ try {
             throw "Laptop preflight report checker smoke failed"
         }
         Write-Host $checkerOutputText
+        Assert-OutputContains -Output $checkerOutputText -Expected "proof_set_laptop_preflight_permission_surface=true"
         Assert-OutputContains -Output $checkerOutputText -Expected "proof_set_laptop_preflight_local_whisper=True"
         Assert-OutputContains -Output $checkerOutputText -Expected "proof_set_laptop_preflight_source_dirty=false"
         Assert-OutputContains -Output $checkerOutputText -Expected "proof_set_ok=laptop-preflight"

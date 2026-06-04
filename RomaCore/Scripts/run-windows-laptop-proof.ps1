@@ -31,6 +31,7 @@ $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
 $hasExplicitClipboardRestoreDelay = $PSBoundParameters.ContainsKey("ClipboardRestoreDelaySeconds")
+$script:permissionPreflightOutput = ""
 $script:hotkeyDeliveryPreflightOutput = ""
 $script:microphonePreflightOutput = ""
 $script:localWhisperPreflightOutput = ""
@@ -103,6 +104,24 @@ function Get-HotkeyDeliveryPreflightProof {
         key_down = $Output.Contains("key_down=true")
         key_up = $Output.Contains("key_up=true")
         observed_events_present = $Output.Contains("observed_events=")
+    }
+}
+
+function Get-PermissionPreflightProof {
+    param(
+        [string]$Output = ""
+    )
+
+    return [ordered]@{
+        output_present = ![string]::IsNullOrWhiteSpace($Output)
+        os_permission_grants_microphone = $Output.Contains("os_permission_grants=microphone")
+        microphone_settings_uri = $Output.Contains("microphone_settings_uri=ms-settings:privacy-microphone")
+        desktop_app_microphone_access_required = $Output.Contains("desktop_app_microphone_access_required=true")
+        native_capabilities_register_hotkey = $Output.Contains("native_capabilities=RegisterHotKey")
+        no_accessibility_permission_prompt = $Output.Contains("accessibility_permission_prompt=false")
+        no_automation_permission_prompt = $Output.Contains("automation_permission_prompt=false")
+        no_screen_capture_required = $Output.Contains("screen_capture_required=false")
+        no_screen_recording_permission_prompt = $Output.Contains("screen_recording_permission_prompt=false")
     }
 }
 
@@ -238,6 +257,31 @@ function Write-HotkeyDeliveryPreflightPrompt {
     Write-Host "hold_timeout_seconds=$HoldTimeoutSeconds"
 }
 
+function Invoke-PermissionPreflight {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ProofAgentPath
+    )
+
+    $output = & $ProofAgentPath windows-permission-doctor 2>&1 | Out-String
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host $output
+        throw "RomaProofAgent windows-permission-doctor failed during laptop permission preflight"
+    }
+
+    Write-Host $output
+    Assert-OutputContains -Output $output -Expected "os_permission_grants=microphone"
+    Assert-OutputContains -Output $output -Expected "microphone_settings_uri=ms-settings:privacy-microphone"
+    Assert-OutputContains -Output $output -Expected "desktop_app_microphone_access_required=true"
+    Assert-OutputContains -Output $output -Expected "native_capabilities=RegisterHotKey"
+    Assert-OutputContains -Output $output -Expected "accessibility_permission_prompt=false"
+    Assert-OutputContains -Output $output -Expected "automation_permission_prompt=false"
+    Assert-OutputContains -Output $output -Expected "screen_capture_required=false"
+    Assert-OutputContains -Output $output -Expected "screen_recording_permission_prompt=false"
+    Write-Host "permission_surface_preflight_ok=true"
+    return $output
+}
+
 function Invoke-HotkeyDeliveryPreflight {
     param(
         [Parameter(Mandatory = $true)]
@@ -370,11 +414,13 @@ function Write-PreflightReport {
             user_sid = Get-CurrentWindowsUserSid
         }
         preflights = [ordered]@{
+            permission_surface = $true
             hotkey_delivery = $true
             microphone = $true
             local_whisper = $hasLocalWhisperPreflight
         }
         preflight_outputs = [ordered]@{
+            permission_surface = Get-PermissionPreflightProof -Output $script:permissionPreflightOutput
             hotkey_delivery = Get-HotkeyDeliveryPreflightProof -Output $script:hotkeyDeliveryPreflightOutput
             microphone = Get-MicrophonePreflightProof -Output $script:microphonePreflightOutput
             local_whisper = Get-LocalWhisperPreflightProof -Output $script:localWhisperPreflightOutput
@@ -517,6 +563,10 @@ if ([string]::IsNullOrWhiteSpace($startupShortcutBaseDir)) {
 $cloudStartupShortcutDir = Join-Path $startupShortcutBaseDir "cloud"
 $localStartupShortcutDir = Join-Path $startupShortcutBaseDir "local-whisper"
 
+Invoke-Step "permission surface preflight" {
+    $script:permissionPreflightOutput = Invoke-PermissionPreflight -ProofAgentPath $proofAgent
+}
+
 Invoke-Step "hotkey delivery preflight" {
     Write-HotkeyDeliveryPreflightPrompt
     $script:hotkeyDeliveryPreflightOutput = Invoke-HotkeyDeliveryPreflight `
@@ -565,6 +615,7 @@ if ($PreflightOnly) {
     Write-Host ""
     Write-Host "windows_laptop_proof_dir=$ProofDir"
     Write-Host "windows_laptop_proof_session_id=$proofSessionId"
+    Write-Host "windows_laptop_permission_preflight=true"
     Write-Host "windows_laptop_hotkey_delivery_preflight=true"
     Write-Host "windows_laptop_mic_preflight=$micPreflightPath"
     Write-Host "windows_laptop_local_whisper_preflight=$(!$NativePreflightOnly)"
@@ -718,6 +769,7 @@ Write-Host ""
 Write-Host "windows_laptop_proof_dir=$ProofDir"
 Write-Host "windows_laptop_proof_session_id=$proofSessionId"
 Write-Host "windows_laptop_startup_shortcut_base_dir=$startupShortcutBaseDir"
+Write-Host "windows_laptop_permission_preflight=true"
 Write-Host "windows_laptop_hotkey_delivery_preflight=true"
 Write-Host "windows_laptop_mic_preflight=$micPreflightPath"
 Write-Host "windows_laptop_preflight_report=$PreflightReportPath"

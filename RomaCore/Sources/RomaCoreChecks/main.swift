@@ -7699,6 +7699,14 @@ struct RomaCoreChecks {
             "Windows laptop proof runner should preflight real hold-hotkey delivery through packaged RomaProofAgent"
         )
         try require(
+            laptopProofScript.contains("permission surface preflight") &&
+                laptopProofScript.contains("windows-permission-doctor") &&
+                laptopProofScript.contains("Get-PermissionPreflightProof") &&
+                laptopProofScript.contains("permission_surface_preflight_ok=true") &&
+                laptopProofScript.contains("windows_laptop_permission_preflight=true"),
+            "Windows laptop proof runner should preflight the permission surface through packaged RomaProofAgent"
+        )
+        try require(
             laptopProofScript.contains("PreflightOnly") &&
                 laptopProofScript.contains("NativePreflightOnly") &&
                 laptopProofScript.contains("native_preflight_only=true") &&
@@ -7711,6 +7719,8 @@ struct RomaCoreChecks {
                 laptopProofScript.contains("windows_laptop_preflight_report=") &&
                 laptopProofScript.contains(#"proof_mode = "windows-laptop-preflight""#) &&
                 laptopProofScript.contains("preflight_outputs") &&
+                laptopProofScript.contains("permission_surface = $true") &&
+                laptopProofScript.contains("microphone_settings_uri") &&
                 laptopProofScript.contains("Get-HotkeyDeliveryPreflightProof") &&
                 laptopProofScript.contains("Get-OptionalFileProof") &&
                 laptopProofScript.contains("sample_rate_16000") &&
@@ -7727,11 +7737,13 @@ struct RomaCoreChecks {
                 checkSetScript.contains("Assert-SameLaptopPreflightProof") &&
                 checkSetScript.contains(#"$RequireLaptopPreflight = $true"#) &&
                 checkSetScript.contains("preflight_outputs") &&
+                checkSetScript.contains(#"Assert-ReportBoolean -Report $permissionOutput -Name "microphone_settings_uri" -Expected $true"#) &&
                 checkSetScript.contains(#"Assert-ReportBoolean -Report $hotkeyOutput -Name "key_down" -Expected $true"#) &&
                 checkSetScript.contains(#"Assert-ReportBoolean -Report $microphoneOutput -Name "sample_rate_16000" -Expected $true"#) &&
                 checkSetScript.contains(#"Assert-ReportBoolean -Report $localWhisperOutput -Name "network_required_false" -Expected $true"#) &&
                 checkSetScript.contains(#"Assert-ReportBoolean -Report $localWhisperOutput -Name "output_present" -Expected $false"#) &&
                 checkSetScript.contains("function Assert-LaptopPreflightIncludesLocalWhisper") &&
+                checkSetScript.contains("proof_set_laptop_preflight_permission_surface=true") &&
                 checkSetScript.contains("proof_set_laptop_preflight_local_whisper=") &&
                 checkSetScript.contains("proof_set_laptop_preflight_package_fingerprint=") &&
                 checkSetScript.contains("proof_set_laptop_preflight_matches_full=true") &&
@@ -7757,12 +7769,14 @@ struct RomaCoreChecks {
                 packageScript.contains("windows-proof-common.ps1") &&
                 packageScript.contains("proof_common_script=$proofCommonScriptOutput") &&
                 packageScript.contains("Get-RomaPackageIdentityProof -PackageDir $PackageDir") &&
+                packageScript.contains("permission_surface = $true") &&
                 packageScript.contains("preflight_outputs") &&
                 packageScript.contains("transcription_client_whisper") &&
                 packageScript.contains("package_identity") &&
                 !packageScript.contains(String(repeating: "0", count: 64)) &&
                 packageScript.contains("source_repository = $GitMetadata.Repository") &&
                 packageScript.contains("laptop_preflight_checker_smoke_report") &&
+                packageScript.contains(#"-Expected "proof_set_laptop_preflight_permission_surface=true""#) &&
                 packageScript.contains(#"-Expected "proof_set_laptop_preflight_local_whisper=False""#) &&
                 packageScript.contains(#"-Expected "proof_set_laptop_preflight_local_whisper=True""#) &&
                 packageScript.contains(#"-Expected "proof_set_laptop_preflight_source_dirty=false""#) &&

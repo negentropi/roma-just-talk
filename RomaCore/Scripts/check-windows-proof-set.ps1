@@ -471,11 +471,23 @@ function Assert-LaptopPreflightReport {
     $userSid = Assert-NonEmptyReportString -Report $os -Name "user_sid" -ReportName $reportName
 
     $preflights = Require-ReportProperty -Report $report -Name "preflights" -ReportName $reportName
+    Assert-ReportBoolean -Report $preflights -Name "permission_surface" -Expected $true -ReportName $reportName
     Assert-ReportBoolean -Report $preflights -Name "hotkey_delivery" -Expected $true -ReportName $reportName
     Assert-ReportBoolean -Report $preflights -Name "microphone" -Expected $true -ReportName $reportName
     $hasLocalWhisperPreflight = [bool](Require-ReportProperty -Report $preflights -Name "local_whisper" -ReportName $reportName)
 
     $preflightOutputs = Require-ReportProperty -Report $report -Name "preflight_outputs" -ReportName $reportName
+    $permissionOutput = Require-ReportProperty -Report $preflightOutputs -Name "permission_surface" -ReportName $reportName
+    Assert-ReportBoolean -Report $permissionOutput -Name "output_present" -Expected $true -ReportName $reportName
+    Assert-ReportBoolean -Report $permissionOutput -Name "os_permission_grants_microphone" -Expected $true -ReportName $reportName
+    Assert-ReportBoolean -Report $permissionOutput -Name "microphone_settings_uri" -Expected $true -ReportName $reportName
+    Assert-ReportBoolean -Report $permissionOutput -Name "desktop_app_microphone_access_required" -Expected $true -ReportName $reportName
+    Assert-ReportBoolean -Report $permissionOutput -Name "native_capabilities_register_hotkey" -Expected $true -ReportName $reportName
+    Assert-ReportBoolean -Report $permissionOutput -Name "no_accessibility_permission_prompt" -Expected $true -ReportName $reportName
+    Assert-ReportBoolean -Report $permissionOutput -Name "no_automation_permission_prompt" -Expected $true -ReportName $reportName
+    Assert-ReportBoolean -Report $permissionOutput -Name "no_screen_capture_required" -Expected $true -ReportName $reportName
+    Assert-ReportBoolean -Report $permissionOutput -Name "no_screen_recording_permission_prompt" -Expected $true -ReportName $reportName
+
     $hotkeyOutput = Require-ReportProperty -Report $preflightOutputs -Name "hotkey_delivery" -ReportName $reportName
     Assert-ReportBoolean -Report $hotkeyOutput -Name "output_present" -Expected $true -ReportName $reportName
     Assert-ReportBoolean -Report $hotkeyOutput -Name "waiting_for_hold" -Expected $true -ReportName $reportName
@@ -520,6 +532,7 @@ function Assert-LaptopPreflightReport {
     Write-Host "proof_set_laptop_preflight_source_commit=$($source['Commit'])"
     Write-Host "proof_set_laptop_preflight_source_dirty=$($source['Dirty'])"
     Write-Host "proof_set_laptop_preflight_proof_dir=$proofDir"
+    Write-Host "proof_set_laptop_preflight_permission_surface=true"
     Write-Host "proof_set_laptop_preflight_local_whisper=$hasLocalWhisperPreflight"
     return $report
 }

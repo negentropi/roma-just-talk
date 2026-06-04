@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Rejected more reserved IP cloud endpoints from real Windows laptop proof.
 - Required Windows full laptop proof reports to come from one generated-at proof window.
 - Collapsed temporal natural restatements such as "at two at three" and "on Tuesday on Wednesday" in post-STT cleanup.
 - Required Windows laptop proof sets to use runner-style GUID proof session IDs.

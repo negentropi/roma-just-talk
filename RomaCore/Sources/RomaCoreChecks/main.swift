@@ -7034,8 +7034,13 @@ struct RomaCoreChecks {
                 checkReportScript.contains(#"$endpointHost.EndsWith(".invalid")"#) &&
                 checkReportScript.contains(#"$endpointHost.EndsWith(".local")"#) &&
                 checkReportScript.contains(#"[System.Net.IPAddress]::TryParse($endpointHost, [ref]$endpointAddress)"#) &&
+                checkReportScript.contains(#"[System.Net.IPAddress]::IsLoopback($endpointAddress)"#) &&
                 checkReportScript.contains(#"$addressBytes[0] -eq 10"#) &&
+                checkReportScript.contains(#"$addressBytes[0] -eq 0"#) &&
                 checkReportScript.contains(#"$addressBytes[0] -eq 192 -and $addressBytes[1] -eq 168"#) &&
+                checkReportScript.contains(#"$addressBytes[0] -ge 224"#) &&
+                checkReportScript.contains(#"$addressBytes[0] -eq 0xff"#) &&
+                checkReportScript.contains(#"$addressBytes[0] -eq 0x20 -and $addressBytes[1] -eq 0x01"#) &&
                 checkReportScript.contains("Cloud laptop proof cannot use a private or reserved endpoint"),
             "Windows cloud laptop proof should reject private, local, and reserved endpoints"
         )

@@ -211,22 +211,34 @@ function Assert-RealCloudBackendProof {
     }
     $endpointAddress = $null
     if ([System.Net.IPAddress]::TryParse($endpointHost, [ref]$endpointAddress)) {
+        if ([System.Net.IPAddress]::IsLoopback($endpointAddress)) {
+            throw "Cloud laptop proof cannot use a loopback/mock endpoint: $endpoint"
+        }
         $addressBytes = $endpointAddress.GetAddressBytes()
         if ($endpointAddress.AddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetwork) {
             $isPrivateOrReserved = $addressBytes[0] -eq 10 -or
+                $addressBytes[0] -eq 0 -or
+                $addressBytes[0] -eq 127 -or
                 ($addressBytes[0] -eq 172 -and $addressBytes[1] -ge 16 -and $addressBytes[1] -le 31) -or
                 ($addressBytes[0] -eq 192 -and $addressBytes[1] -eq 168) -or
                 ($addressBytes[0] -eq 169 -and $addressBytes[1] -eq 254) -or
                 ($addressBytes[0] -eq 100 -and $addressBytes[1] -ge 64 -and $addressBytes[1] -le 127) -or
+                ($addressBytes[0] -eq 192 -and $addressBytes[1] -eq 0 -and $addressBytes[2] -eq 0) -or
                 ($addressBytes[0] -eq 192 -and $addressBytes[1] -eq 0 -and $addressBytes[2] -eq 2) -or
+                ($addressBytes[0] -eq 198 -and ($addressBytes[1] -eq 18 -or $addressBytes[1] -eq 19)) -or
                 ($addressBytes[0] -eq 198 -and $addressBytes[1] -eq 51 -and $addressBytes[2] -eq 100) -or
-                ($addressBytes[0] -eq 203 -and $addressBytes[1] -eq 0 -and $addressBytes[2] -eq 113)
+                ($addressBytes[0] -eq 203 -and $addressBytes[1] -eq 0 -and $addressBytes[2] -eq 113) -or
+                ($addressBytes[0] -ge 224)
             if ($isPrivateOrReserved) {
                 throw "Cloud laptop proof cannot use a private or reserved endpoint: $endpoint"
             }
         } elseif ($endpointAddress.AddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetworkV6) {
-            $isPrivateOrReserved = (($addressBytes[0] -band 0xfe) -eq 0xfc) -or
-                ($addressBytes[0] -eq 0xfe -and (($addressBytes[1] -band 0xc0) -eq 0x80))
+            $isUnspecified = ($addressBytes | Where-Object { $_ -ne 0 }).Count -eq 0
+            $isPrivateOrReserved = $isUnspecified -or
+                (($addressBytes[0] -band 0xfe) -eq 0xfc) -or
+                ($addressBytes[0] -eq 0xfe -and (($addressBytes[1] -band 0xc0) -eq 0x80)) -or
+                ($addressBytes[0] -eq 0xff) -or
+                ($addressBytes[0] -eq 0x20 -and $addressBytes[1] -eq 0x01 -and $addressBytes[2] -eq 0x0d -and $addressBytes[3] -eq 0xb8)
             if ($isPrivateOrReserved) {
                 throw "Cloud laptop proof cannot use a private or reserved endpoint: $endpoint"
             }

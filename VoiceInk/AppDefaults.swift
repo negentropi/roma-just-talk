@@ -1,4 +1,5 @@
 import Foundation
+import RomaCore
 
 enum AppDefaults {
     static func registerDefaults() {
@@ -8,8 +9,8 @@ enum AppDefaults {
             "enableAnnouncements": true,
 
             // Clipboard
-            "restoreClipboardAfterPaste": true,
-            "clipboardRestoreDelay": 2.0,
+            "restoreClipboardAfterPaste": ClipboardRestoreConfiguration.defaultRestoreClipboard,
+            "clipboardRestoreDelay": ClipboardRestoreConfiguration.defaultRestoreDelaySeconds,
             "useAppleScriptPaste": false,
 
             // Audio & Media

@@ -3,6 +3,7 @@ import Cocoa
 import Carbon.HIToolbox
 import LaunchAtLogin
 import AVFoundation
+import RomaCore
 
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
@@ -18,8 +19,10 @@ struct SettingsView: View {
     @ObservedObject private var playbackController = PlaybackController.shared
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = true
     @AppStorage("enableAnnouncements") private var enableAnnouncements = true
-    @AppStorage("restoreClipboardAfterPaste") private var restoreClipboardAfterPaste = true
-    @AppStorage("clipboardRestoreDelay") private var clipboardRestoreDelay = 2.0
+    @AppStorage("restoreClipboardAfterPaste") private var restoreClipboardAfterPaste =
+        ClipboardRestoreConfiguration.defaultRestoreClipboard
+    @AppStorage("clipboardRestoreDelay") private var clipboardRestoreDelay =
+        ClipboardRestoreConfiguration.defaultRestoreDelaySeconds
     @AppStorage(PasteMethod.userDefaultsKey) private var pasteMethodRawValue = PasteMethod.standard.rawValue
     @State private var showResetOnboardingAlert = false
     @State private var hasCancelRecordingShortcut = ShortcutStore.shortcut(for: .cancelRecorder) != nil

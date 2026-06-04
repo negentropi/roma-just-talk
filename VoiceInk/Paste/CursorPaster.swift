@@ -1,12 +1,15 @@
 import Foundation
 import AppKit
 import Carbon
+import RomaCore
 import os
 
 class CursorPaster {
     private typealias ClipboardItemSnapshot = [(NSPasteboard.PasteboardType, Data)]
     private typealias ClipboardSnapshot = [ClipboardItemSnapshot]
     private static let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "CursorPaster")
+    private static let restoreClipboardAfterPasteKey = "restoreClipboardAfterPaste"
+    private static let clipboardRestoreDelayKey = "clipboardRestoreDelay"
 
     enum PasteResult: Equatable {
         case commandPosted
@@ -46,7 +49,8 @@ class CursorPaster {
     @MainActor
     private static func performPasteSession(_ text: String) async -> PasteResult {
         let pasteboard = NSPasteboard.general
-        let shouldRestoreClipboard = UserDefaults.standard.bool(forKey: "restoreClipboardAfterPaste")
+        let shouldRestoreClipboard = UserDefaults.standard.object(forKey: restoreClipboardAfterPasteKey) as? Bool ??
+            ClipboardRestoreConfiguration.defaultRestoreClipboard
         let savedContents = shouldRestoreClipboard ? snapshotClipboard(from: pasteboard) : []
         let sessionID = UUID().uuidString
 
@@ -100,10 +104,9 @@ class CursorPaster {
         sessionID: String,
         on pasteboard: NSPasteboard
     ) {
-        let delay = max(
-            UserDefaults.standard.double(forKey: "clipboardRestoreDelay"),
-            minimumClipboardRestoreDelay
-        )
+        let configuredDelay = UserDefaults.standard.object(forKey: clipboardRestoreDelayKey) as? TimeInterval ??
+            ClipboardRestoreConfiguration.defaultRestoreDelaySeconds
+        let delay = max(configuredDelay, minimumClipboardRestoreDelay)
 
         Task { @MainActor in
             await wait(delay)

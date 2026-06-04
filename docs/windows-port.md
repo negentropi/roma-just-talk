@@ -56,6 +56,7 @@ Reusable now:
 - `DictationPipeline` now lives in `RomaCore` as the shared record -> transcribe -> shared cleanup -> optional paste orchestration.
 - `RomaTranscriptionOutputFilter` now lives in `RomaCore` as the shared Foundation-only post-STT cleanup and insertion-polish path.
 - `RomaWordReplacementProcessor` now lives in `RomaCore` as the shared dictionary replacement matching path.
+- `ClipboardRestoreConfiguration` now lives in `RomaCore` as the shared default for restoring clipboard text after paste; the Windows-specific name remains an alias for compatibility with the Windows adapter/proof surface.
 - `WindowsDictationRuntime` now lives in `RomaCore` as the reusable Windows hotkey/hook -> miniaudio -> shared `DictationPipeline` -> optional Win32 paste composition.
 - `RomaWindowsAgent` is the first user-facing Windows executable. It stays thin and calls `WindowsDictationRuntime` instead of duplicating recorder/STT/paste orchestration. Its `dictate` mode runs one proofable session; its `listen` mode stays alive for repeated hotkey sessions.
 - `RomaWindowsAgentConfiguration` now lives in `RomaCore` as the reusable JSON settings shape for endpoint, model, key source, trigger mode, paste, clipboard restore, language/prompt, and replacement defaults.

@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Required real Windows cloud laptop proof to use HTTPS STT endpoints.
 - Split Windows laptop proof guide markers into preflight-only and full-proof sections.
 - Added a Windows CI shared-core check before packaging the Windows agent.
 - Required Windows package smoke to assert clean-source laptop preflight markers.

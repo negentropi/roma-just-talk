@@ -6881,6 +6881,11 @@ struct RomaCoreChecks {
             "Windows proof checker should reject missing or malformed source commits"
         )
         try require(
+            checkReportScript.contains(#"$uri.Scheme -ne "https""#) &&
+                checkReportScript.contains("Cloud laptop proof must use an https endpoint"),
+            "Windows cloud laptop proof should require secure cloud endpoints"
+        )
+        try require(
             proofAgentSource.contains(#"print("native_windows_adapters=true")"#),
             "Windows proof agent should print native adapter runtime availability on Windows"
         )

@@ -188,6 +188,9 @@ function Assert-RealCloudBackendProof {
     if (!$uri.IsAbsoluteUri -or [string]::IsNullOrWhiteSpace($uri.Host)) {
         throw "Cloud endpoint must be an absolute URI with a host: $endpoint"
     }
+    if ($uri.Scheme -ne "https") {
+        throw "Cloud laptop proof must use an https endpoint: $endpoint"
+    }
 
     $endpointHost = $uri.Host.ToLowerInvariant()
     if ($endpointHost -eq "localhost" -or

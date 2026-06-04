@@ -270,14 +270,7 @@ function Invoke-PermissionPreflight {
     }
 
     Write-Host $output
-    Assert-OutputContains -Output $output -Expected "os_permission_grants=microphone"
-    Assert-OutputContains -Output $output -Expected "microphone_settings_uri=ms-settings:privacy-microphone"
-    Assert-OutputContains -Output $output -Expected "desktop_app_microphone_access_required=true"
-    Assert-OutputContains -Output $output -Expected "native_capabilities=RegisterHotKey"
-    Assert-OutputContains -Output $output -Expected "accessibility_permission_prompt=false"
-    Assert-OutputContains -Output $output -Expected "automation_permission_prompt=false"
-    Assert-OutputContains -Output $output -Expected "screen_capture_required=false"
-    Assert-OutputContains -Output $output -Expected "screen_recording_permission_prompt=false"
+    Assert-RomaWindowsMinimumPermissionOutput -Output $output
     Write-Host "permission_surface_preflight_ok=true"
     return $output
 }

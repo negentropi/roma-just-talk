@@ -7533,9 +7533,8 @@ struct RomaCoreChecks {
         let installedLauncherContractAssertions = [
             "os_permission_grants=microphone",
             "native_capabilities=RegisterHotKey",
-            "paste=win32_clipboard_sendinput",
-            "secret_store=dpapi",
             "microphone_settings_uri=ms-settings:privacy-microphone",
+            "desktop_app_microphone_access_required=true",
             "accessibility_permission_prompt=false",
             "automation_permission_prompt=false",
             "admin_required=false",
@@ -7547,34 +7546,24 @@ struct RomaCoreChecks {
         ]
         for expectedLine in installedLauncherContractAssertions {
             try require(
-                runScript.contains(#"Assert-OutputContains -Output $doctorOutput"#) &&
-                    runScript.contains(#"-Expected "\#(expectedLine)""#),
-                "Windows run script should assert installed launcher contract output \(expectedLine)"
+                proofCommonScript.contains(#""\#(expectedLine)""#),
+                "Windows proof helper should own minimum permission output \(expectedLine)"
             )
         }
-        let minimumPermissionOutputAssertions = [
-            "microphone_settings_uri=ms-settings:privacy-microphone",
-            "accessibility_permission_prompt=false",
-            "automation_permission_prompt=false",
-            "screen_recording_permission_prompt=false"
-        ]
-        for expectedLine in minimumPermissionOutputAssertions {
-            try require(
-                smokeScript.contains(#"Assert-OutputContains -Output $doctorOutput"#) &&
-                    smokeScript.contains(#"-Expected "\#(expectedLine)""#),
-                "Windows smoke script should assert minimal permission output \(expectedLine)"
-            )
-            try require(
-                windowsProofScript.contains(#"Assert-OutputContains -Output $windowsAgentDoctorOutput"#) &&
-                    windowsProofScript.contains(#"-Expected "\#(expectedLine)""#),
-                "Windows proof script should assert agent minimal permission output \(expectedLine)"
-            )
-            try require(
-                windowsProofScript.contains(#"Assert-OutputContains -Output $permissionDoctorOutput"#) &&
-                    windowsProofScript.contains(#"-Expected "\#(expectedLine)""#),
-                "Windows proof script should assert permission doctor output \(expectedLine)"
-            )
-        }
+        try require(
+            runScript.contains("Assert-RomaWindowsMinimumPermissionOutput -Output $doctorOutput") &&
+                runScript.contains(#"Assert-OutputContains -Output $doctorOutput -Expected "paste=win32_clipboard_sendinput""#) &&
+                runScript.contains(#"Assert-OutputContains -Output $doctorOutput -Expected "secret_store=dpapi""#),
+            "Windows run script should use shared minimum permission output and keep non-permission checks explicit"
+        )
+        try require(
+            smokeScript.contains("Assert-RomaWindowsMinimumPermissionOutput -Output $doctorOutput") &&
+                windowsProofScript.contains("Assert-RomaWindowsMinimumPermissionOutput -Output $windowsAgentDoctorOutput") &&
+                windowsProofScript.contains("Assert-RomaWindowsMinimumPermissionOutput -Output $permissionDoctorOutput") &&
+                laptopProofScript.contains("Assert-RomaWindowsMinimumPermissionOutput -Output $output") &&
+                proveScript.contains("Assert-RomaWindowsMinimumPermissionOutput -Output $script:packagedAgentDoctorOutput"),
+            "Windows proof scripts should use shared minimum permission output assertions"
+        )
         try require(
             runScript.contains("config-doctor --config $ConfigPath") &&
                 runScript.contains(#"Assert-OutputContains -Output $configDoctorOutput -Expected "config_valid=true""#),
@@ -7860,6 +7849,7 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Assert-RomaWindowsRuntimeDefaultOutput") &&
                 proofCommonScript.contains("function Assert-RomaWindowsHoldTimeoutDefaultOutput") &&
                 proofCommonScript.contains("function Assert-RomaWindowsClipboardRestoreDefaultOutput") &&
+                proofCommonScript.contains("function Assert-RomaWindowsMinimumPermissionOutput") &&
                 proofCommonScript.contains("function Add-RomaWindowsAgentConfigurationArgs") &&
                 proofCommonScript.contains("function Add-RomaWindowsAgentScriptCommonArgs") &&
                 proofCommonScript.contains("function Get-RomaWindowsFileHashProof"),

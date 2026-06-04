@@ -94,6 +94,30 @@ function Assert-RomaWindowsClipboardRestoreDefaultOutput {
     }
 }
 
+function Assert-RomaWindowsMinimumPermissionOutput {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Output
+    )
+
+    foreach ($expected in @(
+        "os_permission_grants=microphone",
+        "native_capabilities=RegisterHotKey",
+        "microphone_settings_uri=ms-settings:privacy-microphone",
+        "desktop_app_microphone_access_required=true",
+        "accessibility_permission_prompt=false",
+        "automation_permission_prompt=false",
+        "admin_required=false",
+        "startup_launcher=run-windows-agent.ps1",
+        "startup_launch_mode=listen",
+        "startup_permission_prompt=false",
+        "screen_capture_required=false",
+        "screen_recording_permission_prompt=false"
+    )) {
+        Assert-RomaWindowsOutputContains -Output $Output -Expected $expected
+    }
+}
+
 function Add-RomaWindowsAgentConfigurationArgs {
     param(
         [string[]]$Arguments = @(),

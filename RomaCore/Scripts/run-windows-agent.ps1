@@ -107,19 +107,9 @@ if ($LASTEXITCODE -ne 0) {
 }
 Write-Host $doctorOutput
 Assert-RomaWindowsRuntimeDefaultOutput -Output $doctorOutput
-Assert-OutputContains -Output $doctorOutput -Expected "os_permission_grants=microphone"
-Assert-OutputContains -Output $doctorOutput -Expected "native_capabilities=RegisterHotKey"
+Assert-RomaWindowsMinimumPermissionOutput -Output $doctorOutput
 Assert-OutputContains -Output $doctorOutput -Expected "paste=win32_clipboard_sendinput"
 Assert-OutputContains -Output $doctorOutput -Expected "secret_store=dpapi"
-Assert-OutputContains -Output $doctorOutput -Expected "microphone_settings_uri=ms-settings:privacy-microphone"
-Assert-OutputContains -Output $doctorOutput -Expected "accessibility_permission_prompt=false"
-Assert-OutputContains -Output $doctorOutput -Expected "automation_permission_prompt=false"
-Assert-OutputContains -Output $doctorOutput -Expected "admin_required=false"
-Assert-OutputContains -Output $doctorOutput -Expected "startup_launcher=run-windows-agent.ps1"
-Assert-OutputContains -Output $doctorOutput -Expected "startup_launch_mode=listen"
-Assert-OutputContains -Output $doctorOutput -Expected "startup_permission_prompt=false"
-Assert-OutputContains -Output $doctorOutput -Expected "screen_capture_required=false"
-Assert-OutputContains -Output $doctorOutput -Expected "screen_recording_permission_prompt=false"
 if ($DoctorOnly) {
     exit 0
 }

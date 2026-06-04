@@ -938,7 +938,7 @@ Invoke-Step "packaged agent doctor" {
     }
     Write-Host $script:packagedAgentDoctorOutput
     Assert-RomaWindowsRuntimeDefaultOutput -Output $script:packagedAgentDoctorOutput
-    Assert-OutputContains -Output $script:packagedAgentDoctorOutput -Expected "microphone_settings_uri=ms-settings:privacy-microphone"
+    Assert-RomaWindowsMinimumPermissionOutput -Output $script:packagedAgentDoctorOutput
 }
 
 Invoke-Step "packaged proof agent doctor" {

@@ -300,18 +300,8 @@ try {
             throw "RomaWindowsAgent doctor failed"
         }
         Write-Host $windowsAgentDoctorOutput
-        Assert-OutputContains -Output $windowsAgentDoctorOutput -Expected "os_permission_grants=microphone"
-        Assert-OutputContains -Output $windowsAgentDoctorOutput -Expected "native_capabilities=RegisterHotKey"
         Assert-RomaWindowsRuntimeDefaultOutput -Output $windowsAgentDoctorOutput
-        Assert-OutputContains -Output $windowsAgentDoctorOutput -Expected "admin_required=false"
-        Assert-OutputContains -Output $windowsAgentDoctorOutput -Expected "microphone_settings_uri=ms-settings:privacy-microphone"
-        Assert-OutputContains -Output $windowsAgentDoctorOutput -Expected "accessibility_permission_prompt=false"
-        Assert-OutputContains -Output $windowsAgentDoctorOutput -Expected "automation_permission_prompt=false"
-        Assert-OutputContains -Output $windowsAgentDoctorOutput -Expected "startup_launcher=run-windows-agent.ps1"
-        Assert-OutputContains -Output $windowsAgentDoctorOutput -Expected "startup_launch_mode=listen"
-        Assert-OutputContains -Output $windowsAgentDoctorOutput -Expected "startup_permission_prompt=false"
-        Assert-OutputContains -Output $windowsAgentDoctorOutput -Expected "screen_capture_required=false"
-        Assert-OutputContains -Output $windowsAgentDoctorOutput -Expected "screen_recording_permission_prompt=false"
+        Assert-RomaWindowsMinimumPermissionOutput -Output $windowsAgentDoctorOutput
     }
 
     $coreProof = Join-Path $OutputDir "core-proof.wav"
@@ -499,17 +489,7 @@ try {
             throw "RomaProofAgent windows-permission-doctor failed"
         }
         Write-Host $permissionDoctorOutput
-        Assert-OutputContains -Output $permissionDoctorOutput -Expected "os_permission_grants=microphone"
-        Assert-OutputContains -Output $permissionDoctorOutput -Expected "native_capabilities=RegisterHotKey"
-        Assert-OutputContains -Output $permissionDoctorOutput -Expected "microphone_settings_uri=ms-settings:privacy-microphone"
-        Assert-OutputContains -Output $permissionDoctorOutput -Expected "admin_required=false"
-        Assert-OutputContains -Output $permissionDoctorOutput -Expected "accessibility_permission_prompt=false"
-        Assert-OutputContains -Output $permissionDoctorOutput -Expected "automation_permission_prompt=false"
-        Assert-OutputContains -Output $permissionDoctorOutput -Expected "startup_launcher=run-windows-agent.ps1"
-        Assert-OutputContains -Output $permissionDoctorOutput -Expected "startup_launch_mode=listen"
-        Assert-OutputContains -Output $permissionDoctorOutput -Expected "startup_permission_prompt=false"
-        Assert-OutputContains -Output $permissionDoctorOutput -Expected "screen_capture_required=false"
-        Assert-OutputContains -Output $permissionDoctorOutput -Expected "screen_recording_permission_prompt=false"
+        Assert-RomaWindowsMinimumPermissionOutput -Output $permissionDoctorOutput
     }
 
     Invoke-Step "windows secret doctor" {

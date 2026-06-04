@@ -946,6 +946,26 @@ struct RomaCoreChecks {
                 "trailing repeated sentence prefix"
             ),
             (
+                "We need the model we need the module.",
+                "We need the module.",
+                "repeated lead-in correction"
+            ),
+            (
+                "I think we need model we need module today.",
+                "I think we need module today.",
+                "inline repeated lead-in correction"
+            ),
+            (
+                "Use model use module.",
+                "Use model use module.",
+                "one-word repeated lead-in correction guard"
+            ),
+            (
+                "We need the model and we need the module.",
+                "We need the model and we need the module.",
+                "conjoined repeated lead-in guard"
+            ),
+            (
                 "We should ship today. We should",
                 "We should ship today.",
                 "trailing repeated sentence prefix with two words"

@@ -1121,6 +1121,7 @@ public struct RomaTranscriptionOutputFilter {
             filteredText = collapseSeparatorRepeatedWords(in: filteredText)
             filteredText = collapseRepeatedShortPhrases(in: filteredText)
             filteredText = collapseRepeatedShortClauses(in: filteredText)
+            filteredText = collapseRepeatedLeadInCorrections(in: filteredText)
             filteredText = collapseRepeatedShortSentences(in: filteredText)
             filteredText = collapseMismatchedRepeatedShortSentences(in: filteredText)
             filteredText = collapseTrailingUnpunctuatedRepeatedShortSentences(in: filteredText)
@@ -7631,6 +7632,75 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         return collapsedText
+    }
+
+    private static func collapseRepeatedLeadInCorrections(in text: String) -> String {
+        var collapsedText = text
+        var rewriteCount = 0
+
+        while rewriteCount < 4 {
+            guard let rewrite = repeatedLeadInCorrectionRewrite(in: collapsedText) else {
+                break
+            }
+            collapsedText.replaceSubrange(rewrite.range, with: rewrite.replacement)
+            rewriteCount += 1
+        }
+
+        return collapsedText
+    }
+
+    private static func repeatedLeadInCorrectionRewrite(in text: String) -> (range: Range<String.Index>, replacement: String)? {
+        let tokens = wordTokens(in: text)
+        guard tokens.count >= 5 && tokens.count <= 18 else { return nil }
+
+        let normalizedWords = tokens.map(\.text)
+        for leadInWordCount in stride(from: 5, through: 2, by: -1) {
+            guard tokens.count >= leadInWordCount * 2 + 1 else { continue }
+
+            for firstLeadStart in 0...(tokens.count - leadInWordCount * 2 - 1) {
+                let firstLeadWords = Array(normalizedWords[firstLeadStart..<(firstLeadStart + leadInWordCount)])
+                guard !preservedRepeatedClauses.contains(firstLeadWords.joined(separator: " ")) else {
+                    continue
+                }
+
+                let secondLeadStart = firstLeadStart + leadInWordCount + 1
+                guard secondLeadStart + leadInWordCount < tokens.count,
+                      Array(normalizedWords[secondLeadStart..<(secondLeadStart + leadInWordCount)]) == firstLeadWords else {
+                    continue
+                }
+
+                let sourceTailStart = firstLeadStart + leadInWordCount
+                let sourceTailEnd = secondLeadStart
+                let correctionTailStart = secondLeadStart + leadInWordCount
+                let correctionTailEnd = tokens.count
+                let sourceTailWords = Array(normalizedWords[sourceTailStart..<sourceTailEnd])
+                let correctionTailWords = Array(normalizedWords[correctionTailStart..<correctionTailEnd])
+
+                guard sourceTailWords.count >= 1 && sourceTailWords.count <= 4,
+                      correctionTailWords.count >= 1 && correctionTailWords.count <= 6,
+                      sourceTailWords != correctionTailWords,
+                      !sourceTailWords.contains(where: { preservedRepeatedWords.contains($0) }),
+                      !correctionTailWords.contains(where: { preservedRepeatedWords.contains($0) }) else {
+                    continue
+                }
+
+                let rewriteStart = tokens[firstLeadStart].range.lowerBound
+                let rewriteEnd = tokens.last!.range.upperBound
+                let leadingText = String(text[..<rewriteStart])
+                guard leadingText.rangeOfCharacter(from: CharacterSet(charactersIn: "\n.!?")) == nil else {
+                    continue
+                }
+
+                let firstLeadText = String(text[tokens[firstLeadStart].range.lowerBound..<tokens[firstLeadStart + leadInWordCount - 1].range.upperBound])
+                let correctionTailText = String(text[tokens[correctionTailStart].range.lowerBound..<tokens[correctionTailEnd - 1].range.upperBound])
+                return (
+                    rewriteStart..<rewriteEnd,
+                    join("", firstLeadText, correctionTailText)
+                )
+            }
+        }
+
+        return nil
     }
 
     private static func normalizedRepeatWord(_ token: String) -> String? {

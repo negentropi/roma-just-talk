@@ -3,6 +3,7 @@
 ## v1.81 - Unreleased
 
 - Replaced the README, source app icon, and menu bar logo with the roma-just-talk split-keyboard mark.
+- Collapsed repeated lead-in self-corrections such as "we need the model we need the module".
 - Cleaned short unpunctuated correction fragments such as "model instead module".
 - Trimmed repeated cursor-context words from pre-roll continuation transcripts such as "so this Model".
 - Dropped leading discourse fillers such as "okay Model" and "you know Model" from short mid-sentence fragments.
@@ -106,6 +107,8 @@
 - Replaced the Windows laptop preflight checker smoke's placeholder package fingerprint with the real artifact identity.
 - Shared Windows package identity hashing through one packaged proof helper.
 - Shared Windows manifest parsing through one packaged proof helper.
+- Shared Windows proof script step, path, file, assertion, and hash utilities through one packaged helper.
+- Required packaged and installed Windows proof surfaces to carry and hash-check the shared proof helper.
 - Added a persistent Windows agent listener mode and made installed shortcuts/startup shortcuts launch it.
 - Smoked packaged Windows listener mode with a zero-session run during artifact packaging.
 - Added packaged listener smoke evidence to Windows artifact proof reports and profile checks.

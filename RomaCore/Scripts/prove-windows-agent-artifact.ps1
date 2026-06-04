@@ -188,6 +188,7 @@ function Get-ShortcutProof {
     $arguments = [string]$shortcut.Arguments
     $savedWorkingDirectory = [string]$shortcut.WorkingDirectory
     $expectedFileArgument = "-File `"$RunScriptPath`""
+    $expectedInstallDirArgument = "-InstallDir `"$WorkingDirectory`""
     $expectedConfigArgument = "-ConfigPath `"$ConfigPath`""
 
     $proof["target_path"] = $targetPath
@@ -197,10 +198,14 @@ function Get-ShortcutProof {
     $proof["window_style"] = [int]$shortcut.WindowStyle
     $proof["target_is_powershell"] = $targetPath.EndsWith("powershell.exe", [System.StringComparison]::OrdinalIgnoreCase)
     $proof["references_run_script"] = ![string]::IsNullOrWhiteSpace($RunScriptPath) -and (Test-ContainsText -Text $arguments -Needle $RunScriptPath)
+    $proof["references_install_dir"] = ![string]::IsNullOrWhiteSpace($WorkingDirectory) -and (Test-ContainsText -Text $arguments -Needle $WorkingDirectory)
     $proof["references_config_path"] = ![string]::IsNullOrWhiteSpace($ConfigPath) -and (Test-ContainsText -Text $arguments -Needle $ConfigPath)
     $proof["expected_file_argument"] = $expectedFileArgument
+    $proof["expected_install_dir_argument"] = $expectedInstallDirArgument
     $proof["expected_config_argument"] = $expectedConfigArgument
     $proof["has_exact_file_argument"] = Test-ContainsText -Text $arguments -Needle $expectedFileArgument
+    $proof["has_install_dir_argument"] = Test-ContainsText -Text $arguments -Needle "-InstallDir"
+    $proof["has_exact_install_dir_argument"] = Test-ContainsText -Text $arguments -Needle $expectedInstallDirArgument
     $proof["has_config_path_argument"] = Test-ContainsText -Text $arguments -Needle "-ConfigPath"
     $proof["has_exact_config_argument"] = Test-ContainsText -Text $arguments -Needle $expectedConfigArgument
     $proof["has_no_profile_argument"] = Test-ContainsText -Text $arguments -Needle "-NoProfile"

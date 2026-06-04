@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Required Windows shortcuts and startup shortcuts to pass the exact install dir to the launcher.
 - Kept the Windows listener's shared pre-roll capture runtime alive between repeated hotkey sessions.
 - Required Windows artifact proof reports to expose that listener mode reuses the pre-roll dictation runtime path.
 - Archived Windows laptop permission-surface preflight proof before hotkey and microphone checks.

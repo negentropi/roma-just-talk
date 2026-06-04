@@ -8808,6 +8808,20 @@ struct RomaCoreChecks {
             "Windows laptop proof runner should keep cloud and local startup shortcut proofs separate"
         )
         try require(
+            installScript.contains(#"-InstallDir `"$WorkingDirectory`""#) &&
+                installScript.contains(#"!$savedShortcut.Arguments.Contains("-InstallDir")"#) &&
+                installScript.contains(#"!$savedShortcut.Arguments.Contains($WorkingDirectory)"#),
+            "Windows shortcuts should pass the exact install dir to the launcher"
+        )
+        try require(
+            proveScript.contains(#"$expectedInstallDirArgument = "-InstallDir `"$WorkingDirectory`"""#) &&
+                proveScript.contains(#"$proof["references_install_dir"]"#) &&
+                proveScript.contains(#"$proof["has_exact_install_dir_argument"]"#) &&
+                checkReportScript.contains(#"Assert-Boolean -Object $Proof -Name "references_install_dir" -Expected $true"#) &&
+                checkReportScript.contains(#"Assert-Boolean -Object $Proof -Name "has_exact_install_dir_argument" -Expected $true"#),
+            "Windows shortcut proof reports should require exact install-dir launcher arguments"
+        )
+        try require(
             laptopProofScript.contains(#"$hasExplicitClipboardRestoreDelay = $PSBoundParameters.ContainsKey("ClipboardRestoreDelaySeconds")"#),
             "Windows laptop proof runner should distinguish explicit clipboard restore delay from the default"
         )

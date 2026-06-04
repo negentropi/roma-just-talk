@@ -117,6 +117,10 @@ function Assert-ShortcutProof {
     Assert-Boolean -Object $Proof -Name "references_run_script" -Expected $true
     Assert-NonEmptyString -Object $Proof -Name "expected_file_argument"
     Assert-Boolean -Object $Proof -Name "has_exact_file_argument" -Expected $true
+    Assert-Boolean -Object $Proof -Name "has_install_dir_argument" -Expected $true
+    Assert-Boolean -Object $Proof -Name "references_install_dir" -Expected $true
+    Assert-NonEmptyString -Object $Proof -Name "expected_install_dir_argument"
+    Assert-Boolean -Object $Proof -Name "has_exact_install_dir_argument" -Expected $true
     Assert-Boolean -Object $Proof -Name "has_config_path_argument" -Expected $true
     Assert-Boolean -Object $Proof -Name "references_config_path" -Expected $true
     Assert-NonEmptyString -Object $Proof -Name "expected_config_argument"

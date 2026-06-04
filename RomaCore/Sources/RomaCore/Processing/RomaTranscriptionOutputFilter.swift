@@ -9425,7 +9425,8 @@ public struct RomaTranscriptionOutputFilter {
             return text
         }
 
-        let cleanedInnerText = innerText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let cleanedInnerText = removeTrailingNoisyFragmentPunctuation(from: innerText)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
         guard !cleanedInnerText.isEmpty,
               wordCount(in: cleanedInnerText) <= 5,
               !hasInternalSentenceBoundary(cleanedInnerText) else {

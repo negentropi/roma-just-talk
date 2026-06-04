@@ -331,6 +331,34 @@ struct RomaCoreChecks {
             "shared insertion polish should preserve non-technical sure-prefixed continuations"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "All right model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim all-right acknowledgement fillers before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Alright module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim compact alright fillers before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "All right now.",
+                context: midSentenceContext
+            ) == "all right now",
+            "shared insertion polish should preserve non-technical all-right continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Alright now.",
+                context: midSentenceContext
+            ) == "alright now",
+            "shared insertion polish should preserve non-technical alright continuations"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("Right model.", context: midSentenceContext) == "right model",
             "shared insertion polish should preserve right as an ordinary fragment word"
         )
@@ -7286,6 +7314,37 @@ struct RomaCoreChecks {
         try require(
             await okaySureInserter.pastedText == " model",
             "pipeline should paste stacked acknowledgement filler continuations"
+        )
+
+        let allRightRecorder = FakeRecorder()
+        let allRightInserter = FakeTextInsertion()
+        let allRightPipeline = DictationPipeline(
+            recorder: allRightRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "all-right-continuation-proof.wav",
+                text: "All right model."
+            ),
+            textInsertion: allRightInserter
+        )
+        let allRightRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/all-right-continuation-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await allRightRecorder.startPreRollBuffering()
+        let allRightResult = try await allRightPipeline.runRecordingWindow(allRightRequest) {}
+
+        try require(
+            allRightResult.processedText == " model",
+            "pipeline should clean all-right acknowledgement filler continuations"
+        )
+        try require(
+            await allRightInserter.pastedText == " model",
+            "pipeline should paste all-right acknowledgement filler continuations"
         )
 
         let orWaitNoIMeanRecorder = FakeRecorder()

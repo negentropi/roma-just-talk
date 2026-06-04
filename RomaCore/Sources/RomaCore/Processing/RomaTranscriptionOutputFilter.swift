@@ -497,7 +497,7 @@ public struct RomaTranscriptionOutputFilter {
         "in", "is", "left", "needed", "of", "shortcut", "shortcuts", "there", "to"
     ]
     private static let likelyLowercaseFragments: Set<String> = [
-        "a", "about", "after", "again", "all", "also", "an", "and", "any", "app", "are",
+        "a", "about", "after", "again", "all", "alright", "also", "an", "and", "any", "app", "are",
         "argument", "arguments", "array", "arrays", "as", "at", "back", "be", "because", "branch", "branches",
         "bug", "bugs", "button", "buttons", "but", "by", "cache", "caches", "can", "case", "class", "classes",
         "client", "code", "command", "commands", "commit", "commits", "component", "components", "config",
@@ -564,7 +564,7 @@ public struct RomaTranscriptionOutputFilter {
         (#"(?i)^\s*(?:ok(?:ay)?|all\s+right|alright|right|yeah|yes|yep|yup|sure)(?:[ \t]*[,;:…]+[ \t]*)+so[,;:…]*[ \t]+"#, ""),
         (#"(?i)^\s*(?:you\s+know|i\s+mean|like)[,;:…]+[ \t]*"#, "")
     ]
-    private static let continuationFragmentLeadingDiscourseFillerPattern = #"(?i)^\s*(you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?|i[ \t]+mean(?:[ \t]+to[ \t]+say)?|i[ \t]+meant(?:[ \t]+to[ \t]+say)?|ok(?:ay)?|yeah|like|basically|so|well)(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
+    private static let continuationFragmentLeadingDiscourseFillerPattern = #"(?i)^\s*(you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?|i[ \t]+mean(?:[ \t]+to[ \t]+say)?|i[ \t]+meant(?:[ \t]+to[ \t]+say)?|ok(?:ay)?|all[ \t]+right|alright|yeah|like|basically|so|well)(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let standaloneDiscourseFillerPattern = #"(?i)^\s*you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?[ \t]*[.,;:…]*\s*$"#
     private static let blockedPreviousWordsForTerminalYouKnow: Set<String> = [
         "do", "does", "did", "don't", "if", "know", "let", "should", "to", "whether", "will", "would"
@@ -2006,7 +2006,21 @@ public struct RomaTranscriptionOutputFilter {
             return false
         }
 
+        if ["all right", "alright"].contains(filler) {
+            guard let firstSuffixWord = wordTokens(in: trimmedSuffix).first?.text,
+                  isTechnicalContinuationFragmentHead(firstSuffixWord) else {
+                return false
+            }
+        }
+
         return true
+    }
+
+    private static func isTechnicalContinuationFragmentHead(_ word: String) -> Bool {
+        productCorrectionTailWords.contains(word) ||
+            codeCaseIdentifierTailWords.contains(word) ||
+            commonTechnicalAcronyms[word] != nil ||
+            properNameFragmentCasing[word] != nil
     }
 
     private static func removeLeadingContextOverlapFromContinuation(

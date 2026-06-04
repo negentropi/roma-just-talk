@@ -1998,7 +1998,7 @@ public struct RomaTranscriptionOutputFilter {
 
     private static func replaceUnpunctuatedCorrectionMarkerInContinuation(from text: String) -> String {
         let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        let tokens = wordTokens(in: trimmedText)
+        let tokens = correctionMarkerWordTokens(in: trimmedText)
         guard tokens.count >= 3,
               tokens.count <= 5,
               !hasInternalSentenceBoundary(trimmedText) else {
@@ -2026,6 +2026,12 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         return text
+    }
+
+    private static func correctionMarkerWordTokens(in text: String) -> [WordToken] {
+        wordTokens(in: text).filter { token in
+            token.text.contains { $0.isLetter || $0.isNumber }
+        }
     }
 
     private static func applyTrailingSpokenCodeCaseCommandInContinuation(from text: String) -> String {

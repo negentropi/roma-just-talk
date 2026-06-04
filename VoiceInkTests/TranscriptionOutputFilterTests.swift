@@ -413,6 +413,7 @@ struct TranscriptionOutputFilterTests {
         #expect(TranscriptionOutputFilter.applyInsertionPolish("model actually module.", context: midSentenceContext) == "module")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("model no actually module.", context: midSentenceContext) == "module")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("model no wait module.", context: midSentenceContext) == "module")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("model - no module.", context: midSentenceContext) == "module")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("cloud flare actually vercel.", context: midSentenceContext) == "Vercel")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("open ai no anthropic.", context: midSentenceContext) == "Anthropic")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("git hub actually linear.", context: midSentenceContext) == "Linear")

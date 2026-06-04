@@ -6954,6 +6954,16 @@ struct RomaCoreChecks {
             "Windows cloud laptop proof should require secure cloud endpoints"
         )
         try require(
+            checkReportScript.contains(#"$endpointHost.EndsWith(".test")"#) &&
+                checkReportScript.contains(#"$endpointHost.EndsWith(".invalid")"#) &&
+                checkReportScript.contains(#"$endpointHost.EndsWith(".local")"#) &&
+                checkReportScript.contains(#"[System.Net.IPAddress]::TryParse($endpointHost, [ref]$endpointAddress)"#) &&
+                checkReportScript.contains(#"$addressBytes[0] -eq 10"#) &&
+                checkReportScript.contains(#"$addressBytes[0] -eq 192 -and $addressBytes[1] -eq 168"#) &&
+                checkReportScript.contains("Cloud laptop proof cannot use a private or reserved endpoint"),
+            "Windows cloud laptop proof should reject private, local, and reserved endpoints"
+        )
+        try require(
             checkReportScript.contains(#"$whisperCLIName.Contains("mock")"#) &&
                 checkReportScript.contains(#"$whisperModelName.Contains("mock")"#) &&
                 checkReportScript.contains(#"$allowedModelExtensions = @(".bin", ".gguf")"#) &&

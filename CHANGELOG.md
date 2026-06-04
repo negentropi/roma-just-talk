@@ -15,6 +15,7 @@
 - Collapsed repeated proper-name preposition corrections such as "to John to Mary" and "with Alice with Bob" in post-STT cleanup.
 - Collapsed short ASCII-dash correction fragments such as "model - no module" in cursor-aware post-STT cleanup.
 - Collapsed short "rather", "make it", and "call it" correction fragments in cursor-aware post-STT cleanup.
+- Collapsed short "never mind" correction fragments in cursor-aware post-STT cleanup while preserving "please ..." imperatives.
 - Required Windows laptop proof sets to use runner-style GUID proof session IDs.
 - Collapsed unpunctuated partial-word false starts such as "mo module" and "sh should" in post-STT cleanup.
 - Required real Windows cloud laptop proof to use an audio transcription endpoint route.

@@ -614,7 +614,7 @@ public struct RomaTranscriptionOutputFilter {
     ]
     private static let blockedSourceWordsForUnpunctuatedCorrectionMarker: Set<String> = [
         "a", "an", "add", "build", "click", "create", "explain", "open", "run",
-        "say", "set", "show", "tell", "the", "this", "that", "use", "write"
+        "please", "say", "set", "show", "tell", "the", "this", "that", "use", "write"
     ]
     private static let leadingLikeClauseStarterVerbs: Set<String> = [
         "am", "are", "can", "could", "did", "do", "does", "had", "has",
@@ -2034,6 +2034,19 @@ public struct RomaTranscriptionOutputFilter {
         }
     }
 
+    private static func neverMindReplacementStartIndex(tokens: [WordToken], markerIndex: Int) -> Int? {
+        guard markerIndex < tokens.count else { return nil }
+        if tokens[markerIndex].text == "nevermind" {
+            return markerIndex + 1
+        }
+        guard markerIndex + 1 < tokens.count,
+              tokens[markerIndex].text == "never",
+              tokens[markerIndex + 1].text == "mind" else {
+            return nil
+        }
+        return markerIndex + 2
+    }
+
     private static func applyTrailingSpokenCodeCaseCommandInContinuation(from text: String) -> String {
         let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
         let tokens = wordTokens(in: trimmedText)
@@ -2108,7 +2121,18 @@ public struct RomaTranscriptionOutputFilter {
         case "call":
             guard tokens[markerIndex + 1].text == "it" else { return nil }
             return markerIndex + 2
-        case "actually", "nope":
+        case "actually":
+            if let neverMindStartIndex = neverMindReplacementStartIndex(
+                tokens: tokens,
+                markerIndex: markerIndex + 1
+            ) {
+                return neverMindStartIndex
+            }
+            return markerIndex + 1
+        case "never":
+            guard tokens[markerIndex + 1].text == "mind" else { return nil }
+            return markerIndex + 2
+        case "nevermind", "nope":
             return markerIndex + 1
         case "no":
             if markerIndex + 2 < tokens.count,

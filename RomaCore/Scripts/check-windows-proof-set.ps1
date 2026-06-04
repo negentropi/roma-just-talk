@@ -120,6 +120,24 @@ function Assert-NonEmptyReportString {
     return $value
 }
 
+function Assert-ProofSessionId {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Value,
+        [Parameter(Mandatory = $true)]
+        [string]$ReportName
+    )
+
+    if ($Value -notmatch "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$") {
+        throw "Proof set report $ReportName has invalid proof_session_id; expected GUID, got: $Value"
+    }
+    if ($Value -eq "00000000-0000-0000-0000-000000000000") {
+        throw "Proof set report $ReportName has placeholder proof_session_id"
+    }
+
+    return $Value.ToLowerInvariant()
+}
+
 function Assert-ReportBoolean {
     param(
         [Parameter(Mandatory = $true)]
@@ -368,7 +386,9 @@ function Assert-LaptopPreflightReport {
         -Actual ([string](Require-ReportProperty -Report $report -Name "proof_mode" -ReportName $reportName)) `
         -ReportName $reportName
     Assert-ReportBoolean -Report $report -Name "preflight_only" -Expected $true -ReportName $reportName
-    $proofSessionId = Assert-NonEmptyReportString -Report $report -Name "proof_session_id" -ReportName $reportName
+    $proofSessionId = Assert-ProofSessionId `
+        -Value (Assert-NonEmptyReportString -Report $report -Name "proof_session_id" -ReportName $reportName) `
+        -ReportName $reportName
     $packageDir = Assert-NonEmptyReportString -Report $report -Name "package_dir" -ReportName $reportName
     $proofDir = Assert-NonEmptyReportString -Report $report -Name "proof_dir" -ReportName $reportName
     $packageFingerprint = Get-ReportPackageFingerprint -Report $report -ReportName $reportName
@@ -573,7 +593,9 @@ function Assert-SameLaptopProofSet {
     $first = $reports[0]
     $firstName = [string]$first["Name"]
     $firstReport = $first["Report"]
-    $expectedProofSessionId = [string](Require-ReportProperty -Report $firstReport -Name "proof_session_id" -ReportName $firstName)
+    $expectedProofSessionId = Assert-ProofSessionId `
+        -Value ([string](Require-ReportProperty -Report $firstReport -Name "proof_session_id" -ReportName $firstName)) `
+        -ReportName $firstName
     $firstOS = Require-ReportProperty -Report $firstReport -Name "os" -ReportName $firstName
     $expectedPlatform = [string](Require-ReportProperty -Report $firstOS -Name "platform" -ReportName $firstName)
     $expectedMachine = [string](Require-ReportProperty -Report $firstOS -Name "machine" -ReportName $firstName)

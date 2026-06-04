@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Required Windows laptop proof sets to use runner-style GUID proof session IDs.
 - Collapsed unpunctuated partial-word false starts such as "mo module" and "sh should" in post-STT cleanup.
 - Required real Windows cloud laptop proof to use an audio transcription endpoint route.
 - Collapsed partial-word false starts such as "mod- module" and "sh- should" in post-STT cleanup.

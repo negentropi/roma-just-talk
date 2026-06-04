@@ -7648,6 +7648,14 @@ struct RomaCoreChecks {
             "Windows proof-set checker should compare proof session ids across laptop reports"
         )
         try require(
+            checkSetScript.contains("function Assert-ProofSessionId") &&
+                checkSetScript.contains("invalid proof_session_id; expected GUID") &&
+                checkSetScript.contains("placeholder proof_session_id") &&
+                checkSetScript.contains(#"$proofSessionId = Assert-ProofSessionId"#) &&
+                checkSetScript.contains(#"$expectedProofSessionId = Assert-ProofSessionId"#),
+            "Windows proof-set checker should require runner-style GUID proof session ids"
+        )
+        try require(
             checkSetScript.contains("proof_set_session_id="),
             "Windows proof-set checker should print matched proof session evidence"
         )

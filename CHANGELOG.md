@@ -3,6 +3,7 @@
 ## v1.81 - Unreleased
 
 - Replaced the README, source app icon, and menu bar logo with the roma-just-talk split-keyboard mark.
+- Normalized lowercase product-name fragments such as "vercel project" and product corrections such as "cloud flare actually vercel".
 - Cleaned short bare correction fragments such as "model no module" and "model actually module".
 - Collapsed repeated determiner self-corrections such as "the model the module".
 - Collapsed repeated lead-in self-corrections such as "we need the model we need the module".

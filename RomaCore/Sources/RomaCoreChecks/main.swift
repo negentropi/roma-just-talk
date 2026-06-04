@@ -352,6 +352,27 @@ struct RomaCoreChecks {
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "cloud flare actually vercel.",
+                context: midSentenceContext
+            ) == "Vercel",
+            "shared insertion polish should apply bare product-name corrections"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "open ai no anthropic.",
+                context: midSentenceContext
+            ) == "Anthropic",
+            "shared insertion polish should apply bare product-name no corrections"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "git hub actually linear.",
+                context: midSentenceContext
+            ) == "Linear",
+            "shared insertion polish should apply bare product-name actually corrections"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "I think no module.",
                 context: midSentenceContext
             ) == "I think no module",
@@ -429,6 +450,22 @@ struct RomaCoreChecks {
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("VERCEL PROJECT.", context: midSentenceContext) == "Vercel project",
             "shared insertion polish should normalize all-caps deployment product names"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("vercel project.", context: midSentenceContext) == "Vercel project",
+            "shared insertion polish should normalize lowercase deployment product names"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("linear ticket.", context: midSentenceContext) == "Linear ticket",
+            "shared insertion polish should normalize lowercase planning product names"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("apple pie.", context: midSentenceContext) == "apple pie",
+            "shared insertion polish should preserve ordinary lowercase apple phrases"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("linear algebra.", context: midSentenceContext) == "linear algebra",
+            "shared insertion polish should preserve ordinary lowercase linear phrases"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("SUPABASE CLIENT.", context: midSentenceContext) == "Supabase client",

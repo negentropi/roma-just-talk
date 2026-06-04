@@ -1912,7 +1912,7 @@ public struct RomaTranscriptionOutputFilter {
             let replacement = String(trimmedText[replacementRange])
                 .trimmingCharacters(in: .whitespacesAndNewlines)
             guard !replacement.isEmpty else { continue }
-            return replacement
+            return normalizeKnownProductCorrectionReplacement(in: replacement)
         }
 
         return text
@@ -1955,15 +1955,19 @@ public struct RomaTranscriptionOutputFilter {
             return false
         }
 
-        if isBareUnpunctuatedContinuationCorrectionMarker(tokens[markerIndex].text),
-           !shouldApplyBareUnpunctuatedContinuationCorrectionMarker(
+        let isBareProductCorrectionMarker = isBareUnpunctuatedContinuationCorrectionMarker(tokens[markerIndex].text)
+        let isBareProductCorrection = isBareProductCorrectionMarker &&
+            shouldApplyBareUnpunctuatedContinuationCorrectionMarker(
             sourceTokens: Array(sourceTokens),
             replacementTokens: Array(replacementTokens)
-           ) {
+           )
+        if isBareProductCorrectionMarker,
+           !isBareProductCorrection {
             return false
         }
 
-        if sourceTokens.contains(where: { blockedSourceWordsForUnpunctuatedCorrectionMarker.contains($0.text) }) {
+        if !isBareProductCorrection,
+           sourceTokens.contains(where: { blockedSourceWordsForUnpunctuatedCorrectionMarker.contains($0.text) }) {
             return false
         }
 
@@ -1983,14 +1987,22 @@ public struct RomaTranscriptionOutputFilter {
         sourceTokens: [WordToken],
         replacementTokens: [WordToken]
     ) -> Bool {
-        guard sourceTokens.count == 1,
-              let sourceWord = sourceTokens.first?.text,
-              let replacementWord = replacementTokens.first?.text else {
+        let sourceWords = sourceTokens.map(\.text)
+        let replacementWords = replacementTokens.map(\.text)
+        return isBareProductCorrectionPhrase(sourceWords) &&
+            isBareProductCorrectionPhrase(replacementWords)
+    }
+
+    private static func isBareProductCorrectionPhrase(_ words: [String]) -> Bool {
+        guard !words.isEmpty else { return false }
+        if words.count == 1, productCorrectionTailWords.contains(words[0]) {
+            return true
+        }
+        guard let headWordCount = productPhraseHeadWordCount(in: words) else {
             return false
         }
-
-        return productCorrectionTailWords.contains(sourceWord) &&
-            productCorrectionTailWords.contains(replacementWord)
+        return words.count == headWordCount ||
+            words.dropFirst(headWordCount).allSatisfy(isProductCorrectionTailWord)
     }
 
     private static func isLeadingFillerFollowedByClauseStarter(_ text: String) -> Bool {
@@ -8806,6 +8818,40 @@ public struct RomaTranscriptionOutputFilter {
                 options: .regularExpression
             )
         }
+        return normalizeKnownSingleProductFragments(in: normalizedText, allowsStandaloneProductName: false)
+    }
+
+    private static func normalizeKnownProductCorrectionReplacement(in text: String) -> String {
+        normalizeKnownSingleProductFragments(
+            in: normalizeKnownProductPhraseFragments(in: text),
+            allowsStandaloneProductName: true
+        )
+    }
+
+    private static func normalizeKnownSingleProductFragments(
+        in text: String,
+        allowsStandaloneProductName: Bool
+    ) -> String {
+        let tokens = wordTokens(in: text)
+        guard !tokens.isEmpty else { return text }
+
+        var normalizedText = text
+        for index in tokens.indices.reversed() {
+            let token = tokens[index]
+            let normalizedWord = token.text
+            guard let replacement = properNameFragmentCasing[normalizedWord] else {
+                continue
+            }
+
+            let nextWord = index + 1 < tokens.count ? tokens[index + 1].text : nil
+            guard (allowsStandaloneProductName && tokens.count == 1) ||
+                    nextWord.map(isProductCorrectionTailWord) == true else {
+                continue
+            }
+
+            normalizedText.replaceSubrange(token.range, with: replacement)
+        }
+
         return normalizedText
     }
 

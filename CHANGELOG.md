@@ -3,6 +3,7 @@
 ## v1.81 - Unreleased
 
 - Required Windows artifact proof reports to expose the listener's per-session WAV output isolation marker.
+- Cleaned embedded and terminal "uhm"/"erm" pause fillers without leaving stray commas.
 - Replaced the README, source app icon, and menu bar logo with the roma-just-talk split-keyboard mark.
 - Formatted spoken developer filenames and environment members such as "dot git ignore", "t s config dot json", "dot t s x", and "process dot env dot api key".
 - Formatted spoken developer tokens such as "read me dot md", "dot env file", and "dollar sign path".
@@ -75,6 +76,7 @@
 - Cleaned bounded bare "wait" self-corrections such as "Use model, wait module.".
 - Added explicit action prompts for the Windows laptop proof runner's hold-to-talk and Notepad paste steps.
 - Added a native-only Windows laptop preflight mode for proving hotkey delivery and microphone access before local whisper setup.
+- Added Windows package smoke coverage for both native-only and local-whisper laptop preflight reports.
 - Added a packaged `whisper-cli-doctor` preflight to the Windows laptop proof runner so local-whisper setup fails before interactive proof steps.
 - Added a packaged `miniaudio-record-proof` preflight to the Windows laptop proof runner so microphone access fails before interactive proof steps.
 - Added a packaged `windows-keyboard-hook-proof` preflight to the Windows laptop proof runner so hold-hotkey delivery fails before dictation.

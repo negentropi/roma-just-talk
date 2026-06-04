@@ -1072,6 +1072,16 @@ struct RomaCoreChecks {
                 "leading ehm pause filler"
             ),
             (
+                "uhm... I think this works.",
+                "I think this works.",
+                "leading uhm pause filler"
+            ),
+            (
+                "erm... I think this works.",
+                "I think this works.",
+                "leading erm pause filler"
+            ),
+            (
                 "I, I think this works.",
                 "I think this works.",
                 "punctuated repeated word"
@@ -1422,6 +1432,16 @@ struct RomaCoreChecks {
                 "terminal pause plus sure acknowledgement filler"
             ),
             (
+                "This works, uhm yeah.",
+                "This works.",
+                "terminal uhm plus acknowledgement filler"
+            ),
+            (
+                "This works, erm yeah.",
+                "This works.",
+                "terminal erm plus acknowledgement filler"
+            ),
+            (
                 "Yes, this works.",
                 "Yes, this works.",
                 "no-pause yes acknowledgement prose guard"
@@ -1460,6 +1480,16 @@ struct RomaCoreChecks {
                 "This, ahem, works.",
                 "This works.",
                 "embedded ahem pause filler"
+            ),
+            (
+                "This, uhm, works.",
+                "This works.",
+                "embedded uhm pause filler"
+            ),
+            (
+                "This, erm, works.",
+                "This works.",
+                "embedded erm pause filler"
             ),
             (
                 "This; eh, works.",
@@ -2740,6 +2770,16 @@ struct RomaCoreChecks {
                 "Use model, ehm wait no module.",
                 "Use module.",
                 "ehm before wait no correction"
+            ),
+            (
+                "Use model, uhm wait no module.",
+                "Use module.",
+                "uhm before wait no correction"
+            ),
+            (
+                "Use model, erm wait no module.",
+                "Use module.",
+                "erm before wait no correction"
             ),
             (
                 "Use model, wait module.",
@@ -7084,8 +7124,10 @@ struct RomaCoreChecks {
             "Windows proof-set checker should reject malformed and placeholder package identity fingerprints"
         )
         try require(
-            packageScript.contains("laptop preflight report checker smoke") &&
+            packageScript.contains("native laptop preflight report checker smoke") &&
+                packageScript.contains("local whisper laptop preflight report checker smoke") &&
                 packageScript.contains("Write-LaptopPreflightCheckerSmokeReport") &&
+                packageScript.contains("IncludeLocalWhisper") &&
                 packageScript.contains("windows-manifest.ps1") &&
                 packageScript.contains("manifest_script=$manifestScriptOutput") &&
                 packageScript.contains("windows-package-identity.ps1") &&
@@ -7099,6 +7141,8 @@ struct RomaCoreChecks {
                 !packageScript.contains(String(repeating: "0", count: 64)) &&
                 packageScript.contains("source_repository = $GitMetadata.Repository") &&
                 packageScript.contains("laptop_preflight_checker_smoke_report") &&
+                packageScript.contains(#"-Expected "proof_set_laptop_preflight_local_whisper=False""#) &&
+                packageScript.contains(#"-Expected "proof_set_laptop_preflight_local_whisper=True""#) &&
                 packageScript.contains(#"-Expected "proof_set_ok=laptop-preflight""#),
             "Windows package smoke should exercise the laptop preflight report checker output markers and identity shape on Windows CI"
         )

@@ -196,6 +196,14 @@ function New-FileProof {
     }
 }
 
+function New-EmptyFileProof {
+    return [ordered]@{
+        path = ""
+        exists = $false
+        bytes = 0
+    }
+}
+
 function Get-CurrentWindowsUserSid {
     $identity = [System.Security.Principal.WindowsIdentity]::GetCurrent()
     if ($null -eq $identity -or $null -eq $identity.User) {
@@ -220,7 +228,8 @@ function Write-LaptopPreflightCheckerSmokeReport {
         [Parameter(Mandatory = $true)]
         [string]$WhisperModelPath,
         [Parameter(Mandatory = $true)]
-        [hashtable]$GitMetadata
+        [hashtable]$GitMetadata,
+        [bool]$IncludeLocalWhisper = $true
     )
 
     New-Item -ItemType Directory -Force -Path $ProofDir | Out-Null
@@ -229,6 +238,16 @@ function Write-LaptopPreflightCheckerSmokeReport {
     $riffBytes = [System.Text.Encoding]::ASCII.GetBytes("RIFF")
     [System.Array]::Copy($riffBytes, $wavBytes, $riffBytes.Length)
     [System.IO.File]::WriteAllBytes($micPreflightPath, $wavBytes)
+    $whisperCLIProof = if ($IncludeLocalWhisper) {
+        New-FileProof -Path $WhisperCLIPath
+    } else {
+        New-EmptyFileProof
+    }
+    $whisperModelProof = if ($IncludeLocalWhisper) {
+        New-FileProof -Path $WhisperModelPath
+    } else {
+        New-EmptyFileProof
+    }
 
     $report = [ordered]@{
         generated_at = (Get-Date).ToUniversalTime().ToString("o")
@@ -255,7 +274,7 @@ function Write-LaptopPreflightCheckerSmokeReport {
         preflights = [ordered]@{
             hotkey_delivery = $true
             microphone = $true
-            local_whisper = $true
+            local_whisper = $IncludeLocalWhisper
         }
         preflight_outputs = [ordered]@{
             hotkey_delivery = [ordered]@{
@@ -272,18 +291,18 @@ function Write-LaptopPreflightCheckerSmokeReport {
                 channels_mono = $true
             }
             local_whisper = [ordered]@{
-                output_present = $true
-                transcription_client_whisper = $true
-                network_required_false = $true
-                executable_present = $true
-                model_file_present = $true
+                output_present = $IncludeLocalWhisper
+                transcription_client_whisper = $IncludeLocalWhisper
+                network_required_false = $IncludeLocalWhisper
+                executable_present = $IncludeLocalWhisper
+                model_file_present = $IncludeLocalWhisper
             }
         }
         files = [ordered]@{
             proof_agent = New-FileProof -Path $ProofAgentPath
             mic_preflight_wav = New-FileProof -Path $micPreflightPath
-            whisper_cli = New-FileProof -Path $WhisperCLIPath
-            whisper_model = New-FileProof -Path $WhisperModelPath
+            whisper_cli = $whisperCLIProof
+            whisper_model = $whisperModelProof
         }
     }
 
@@ -396,6 +415,8 @@ try {
     $localWhisperShortcutPath = Join-Path $localWhisperShortcutDir "Roma Just Talk Agent.lnk"
     $laptopPreflightCheckerSmokeDir = Join-Path $OutputDir "laptop-preflight-checker-smoke"
     $laptopPreflightCheckerSmokeReport = Join-Path $laptopPreflightCheckerSmokeDir "preflight-proof.json"
+    $laptopNativePreflightCheckerSmokeDir = Join-Path $OutputDir "laptop-native-preflight-checker-smoke"
+    $laptopNativePreflightCheckerSmokeReport = Join-Path $laptopNativePreflightCheckerSmokeDir "preflight-proof.json"
 
     Invoke-Step "copy agent executable" {
         Copy-Item -LiteralPath $agentSource.FullName -Destination $agentOutput -Force
@@ -579,7 +600,29 @@ try {
         "bytes=$($agentFile.Length)"
     ) | Set-Content -LiteralPath $manifestPath -Encoding UTF8
 
-    Invoke-Step "laptop preflight report checker smoke" {
+    Invoke-Step "native laptop preflight report checker smoke" {
+        Write-LaptopPreflightCheckerSmokeReport `
+            -ReportPath $laptopNativePreflightCheckerSmokeReport `
+            -PackageDir $OutputDir `
+            -ProofDir $laptopNativePreflightCheckerSmokeDir `
+            -ProofAgentPath $proofAgentOutput `
+            -WhisperCLIPath $mockWhisperOutput `
+            -WhisperModelPath $agentOutput `
+            -GitMetadata $gitMetadata `
+            -IncludeLocalWhisper $false
+        $checkerOutputText = & $checkSetScriptOutput `
+            -LaptopPreflightReportPath $laptopNativePreflightCheckerSmokeReport `
+            -RequireLaptopPreflight 2>&1 | Out-String
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host $checkerOutputText
+            throw "Native laptop preflight report checker smoke failed"
+        }
+        Write-Host $checkerOutputText
+        Assert-OutputContains -Output $checkerOutputText -Expected "proof_set_laptop_preflight_local_whisper=False"
+        Assert-OutputContains -Output $checkerOutputText -Expected "proof_set_ok=laptop-preflight"
+    }
+
+    Invoke-Step "local whisper laptop preflight report checker smoke" {
         Write-LaptopPreflightCheckerSmokeReport `
             -ReportPath $laptopPreflightCheckerSmokeReport `
             -PackageDir $OutputDir `
@@ -587,7 +630,8 @@ try {
             -ProofAgentPath $proofAgentOutput `
             -WhisperCLIPath $mockWhisperOutput `
             -WhisperModelPath $agentOutput `
-            -GitMetadata $gitMetadata
+            -GitMetadata $gitMetadata `
+            -IncludeLocalWhisper $true
         $checkerOutputText = & $checkSetScriptOutput `
             -LaptopPreflightReportPath $laptopPreflightCheckerSmokeReport `
             -RequireLaptopPreflight 2>&1 | Out-String
@@ -596,6 +640,7 @@ try {
             throw "Laptop preflight report checker smoke failed"
         }
         Write-Host $checkerOutputText
+        Assert-OutputContains -Output $checkerOutputText -Expected "proof_set_laptop_preflight_local_whisper=True"
         Assert-OutputContains -Output $checkerOutputText -Expected "proof_set_ok=laptop-preflight"
     }
 

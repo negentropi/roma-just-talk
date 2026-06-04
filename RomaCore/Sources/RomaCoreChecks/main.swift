@@ -6573,6 +6573,10 @@ struct RomaCoreChecks {
             "Windows proof checker should require that hold-to-talk uses one native hook window"
         )
         try require(
+            checkReportScript.contains(#""hold_hook_single_window_source""#),
+            "Windows proof profiles should print hold single-window source coverage"
+        )
+        try require(
             proofAgentSource.contains(
                 #"print("default_clipboard_restore_delay_seconds=\(WindowsClipboardRestoreConfiguration.defaultRestoreDelaySeconds)")"#
             ) &&

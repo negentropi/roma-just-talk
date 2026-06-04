@@ -9119,6 +9119,10 @@ public struct RomaTranscriptionOutputFilter {
     }
 
     private static func generatedContinuationClosingBoundary(for opening: Character) -> Character? {
+        if let closing = nonASCIIClosingBoundary(for: opening) {
+            return closing
+        }
+
         switch opening {
         case "(": return ")"
         case "[": return "]"
@@ -9136,6 +9140,10 @@ public struct RomaTranscriptionOutputFilter {
     }
 
     private static func generatedContinuationOpeningBoundary(for closing: Character) -> Character? {
+        if let opening = nonASCIIOpeningBoundary(for: closing) {
+            return opening
+        }
+
         switch closing {
         case ")": return "("
         case "]": return "["
@@ -9148,6 +9156,25 @@ public struct RomaTranscriptionOutputFilter {
         case "`": return "`"
         case "*": return "*"
         case "_": return "_"
+        default: return nil
+        }
+    }
+
+    private static func nonASCIIOpeningBoundary(for closing: Character) -> Character? {
+        switch closing {
+        case "»": return "«"
+        case "›": return "‹"
+        case "“": return "„"
+        case "‘": return "‚"
+        case "】": return "【"
+        case "》": return "《"
+        case "〉": return "〈"
+        case "）": return "（"
+        case "｝": return "｛"
+        case "］": return "［"
+        case "」": return "「"
+        case "』": return "『"
+        case "〕": return "〔"
         default: return nil
         }
     }

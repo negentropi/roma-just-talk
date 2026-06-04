@@ -5884,6 +5884,9 @@ struct RomaCoreChecks {
         let unmatchedStraightSingleQuoteContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "She said 'hello")
         let contractionContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "I don't")
         let openAngleContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "<")
+        let openGuillemetContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "«")
+        let openCornerBracketContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "【")
+        let openFullwidthParenthesisContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "（")
         let openBacktickContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "Use `")
         let openStarContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "Use *")
         let openUnderscoreContext = RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "Use _")
@@ -6138,6 +6141,34 @@ struct RomaCoreChecks {
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "A final word or single».",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "insertion polish should remove unmatched trailing guillemets from longer generated fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "A final word or single】.",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "insertion polish should remove unmatched trailing corner brackets from longer generated fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "A final word or single）.",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "insertion polish should remove unmatched trailing full-width parentheses from longer generated fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "«A final word or single",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "insertion polish should remove unmatched leading guillemets from longer generated fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "A final word or single\".",
                 context: midSentenceContext
             ) == "a final word or single",
@@ -6209,6 +6240,21 @@ struct RomaCoreChecks {
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("Model>.", context: openAngleContext) == "model>",
             "insertion polish should preserve trailing angle brackets after matching open context"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Model».", context: openGuillemetContext) == "model»",
+            "insertion polish should preserve trailing guillemets after matching open context"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Model】.", context: openCornerBracketContext) == "model】",
+            "insertion polish should preserve trailing corner brackets after matching open context"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Model）.",
+                context: openFullwidthParenthesisContext
+            ) == "model）",
+            "insertion polish should preserve trailing full-width parentheses after matching open context"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(

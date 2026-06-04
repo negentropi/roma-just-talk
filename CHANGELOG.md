@@ -4,6 +4,7 @@
 
 - Required Windows artifact proof reports to expose the listener's per-session WAV output isolation marker.
 - Replaced the README, source app icon, and menu bar logo with the roma-just-talk split-keyboard mark.
+- Formatted spoken developer filenames and environment members such as "dot git ignore", "t s config dot json", "dot t s x", and "process dot env dot api key".
 - Formatted spoken developer tokens such as "read me dot md", "dot env file", and "dollar sign path".
 - Formatted spoken short and "double dash" CLI flags in developer dictation such as "git commit dash m".
 - Formatted trailing developer case commands in short continuations such as "user id camel case".

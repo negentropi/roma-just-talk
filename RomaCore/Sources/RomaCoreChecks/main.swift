@@ -274,6 +274,21 @@ struct RomaCoreChecks {
             "shared filter should apply spoken developer file tokens"
         )
         try require(
+            RomaTranscriptionOutputFilter.filter("Open dot git ignore dot npm r c and t s config dot json.") ==
+                "Open .gitignore .npmrc and tsconfig.json.",
+            "shared filter should apply spoken developer config filenames"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.filter("Open source slash app slash page dot t s x.") ==
+                "Open source/app/page.tsx.",
+            "shared filter should apply spelled developer extensions"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.filter("Use process dot env dot api key.") ==
+                "Use process.env.API_KEY.",
+            "shared filter should apply process environment member aliases"
+        )
+        try require(
             RomaTranscriptionOutputFilter.filter("Export dollar sign open ai api key.") ==
                 "Export $OPENAI_API_KEY.",
             "shared filter should apply spoken shell variable aliases"
@@ -3735,6 +3750,36 @@ struct RomaCoreChecks {
                 "Open read me dot md.",
                 "Open README.md.",
                 "spoken README filename"
+            ),
+            (
+                "Open dot git ignore.",
+                "Open .gitignore.",
+                "spoken gitignore filename"
+            ),
+            (
+                "Open dot npm r c.",
+                "Open .npmrc.",
+                "spoken npmrc filename"
+            ),
+            (
+                "Open t s config dot json.",
+                "Open tsconfig.json.",
+                "spoken tsconfig filename"
+            ),
+            (
+                "Open source slash app slash page dot t s x.",
+                "Open source/app/page.tsx.",
+                "spoken spelled extension filename"
+            ),
+            (
+                "Use process dot env dot api key.",
+                "Use process.env.API_KEY.",
+                "spoken process environment member"
+            ),
+            (
+                "Show dot file behavior.",
+                "Show dot file behavior.",
+                "dot prose guard"
             ),
             (
                 "Use dollar sign path.",

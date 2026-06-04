@@ -643,9 +643,21 @@ public struct RomaTranscriptionOutputFilter {
     private static let closeCodeBlockPattern = #"(?im)(^|\n)[ \t]*(?:close|end)[ \t]+code[ \t]+block[ \t]*(?=\n|$)"#
     private static let spokenSchemeURLPattern = #"(?i)(?<![\p{L}\p{N}])((?:h[ \t]+t[ \t]+t[ \t]+p[ \t]+s?)|https?)[ \t]*(?:colon|:)[ \t]+(?:slash[ \t]+slash|forward[ \t]+slash[ \t]+forward[ \t]+slash)[ \t]+((?:(?:[A-Za-z0-9-]+[ \t]+dot[ \t]+)+(?:ai|app|co|com|dev|edu|gov|io|net|org)(?:(?:[ \t]+(?:slash|forward[ \t]+slash)[ \t]+[A-Za-z0-9_-]+)+)?)|(?:localhost(?:[ \t]+colon[ \t]+\d{1,5})?(?:(?:[ \t]+(?:slash|forward[ \t]+slash)[ \t]+[A-Za-z0-9_-]+)+)?))([.!?])?(?=\s|$|\n)"#
     private static let spokenWWWURLPattern = #"(?i)(?<![\p{L}\p{N}])www[ \t]+dot[ \t]+((?:[A-Za-z0-9-]+[ \t]+dot[ \t]+)*(?:ai|app|co|com|dev|edu|gov|io|net|org)(?:(?:[ \t]+(?:slash|forward[ \t]+slash)[ \t]+[A-Za-z0-9_-]+)+)?)([.!?])?(?=\s|$|\n)"#
+    private static let spokenProcessEnvironmentMarkerPattern = #"(?i)(?<![\p{L}\p{N}])process[ \t]+dot[ \t]+env[ \t]+dot(?![\p{L}\p{N}])"#
     private static let spokenDotEnvPattern = #"(?i)(?<![\p{L}\p{N}])dot[ \t]+env(?![\p{L}\p{N}])"#
     private static let spokenReadmeFilePattern = #"(?i)(?<![\p{L}\p{N}])read[ \t]+me[ \t]+dot[ \t]+(?:m[ \t]+d|md)(?![\p{L}\p{N}])"#
     private static let spokenShellVariableMarkerPattern = #"(?i)(?<![\p{L}\p{N}])dollar[ \t]+sign(?![\p{L}\p{N}])"#
+    private static let spokenDeveloperFilenameCommands: [(pattern: String, replacement: String)] = [
+        (#"(?i)(?<![\p{L}\p{N}])dot[ \t]+git[ \t]+ignore(?![\p{L}\p{N}])"#, ".gitignore"),
+        (#"(?i)(?<![\p{L}\p{N}])dot[ \t]+npm[ \t]+(?:r[ \t]+c|rc)(?![\p{L}\p{N}])"#, ".npmrc"),
+        (#"(?i)(?<![\p{L}\p{N}])(?:t[ \t]+s|type[ \t]+script)[ \t]+config[ \t]+dot[ \t]+json(?![\p{L}\p{N}])"#, "tsconfig.json")
+    ]
+    private static let spokenDeveloperExtensionCommands: [(pattern: String, replacement: String)] = [
+        (#"(?i)(?<![\p{L}\p{N}])dot[ \t]+t[ \t]+s[ \t]+x(?![\p{L}\p{N}])"#, "dot tsx"),
+        (#"(?i)(?<![\p{L}\p{N}])dot[ \t]+j[ \t]+s[ \t]+x(?![\p{L}\p{N}])"#, "dot jsx"),
+        (#"(?i)(?<![\p{L}\p{N}])dot[ \t]+t[ \t]+s(?![\p{L}\p{N}])"#, "dot ts"),
+        (#"(?i)(?<![\p{L}\p{N}])dot[ \t]+j[ \t]+s(?![\p{L}\p{N}])"#, "dot js")
+    ]
     private static let monthOrdinalDatePattern = #"(?i)(?<![\p{L}\p{N}])(january|february|march|april|may|june|july|august|september|october|november|december)[ \t]+(thirty[ \t]+first|thirtieth|twenty[ \t]+ninth|twenty[ \t]+eighth|twenty[ \t]+seventh|twenty[ \t]+sixth|twenty[ \t]+fifth|twenty[ \t]+fourth|twenty[ \t]+third|twenty[ \t]+second|twenty[ \t]+first|twentieth|nineteenth|eighteenth|seventeenth|sixteenth|fifteenth|fourteenth|thirteenth|twelfth|eleventh|tenth|ninth|eighth|seventh|sixth|fifth|fourth|third|second|first)(?:[ \t]+(\d{4}))?(?![\p{L}\p{N}])"#
     private static let monthNumberDatePattern = #"(?i)(?<![\p{L}\p{N}])(january|february|march|april|may|june|july|august|september|october|november|december)[ \t]+(\d{1,2})(?:st|nd|rd|th)?(?:[ \t]+(\d{4}))?(?![\p{L}\p{N}])"#
     private static let spokenTimePattern = #"(?i)(?<![\p{L}\p{N}])(\d{1,2})(?:[ \t]+(?:(?:colon|:)[ \t]*)?(\d{2}))?[ \t]*(a[ \t]*m|p[ \t]*m|am|pm)(?![\p{L}\p{N}])"#
@@ -3024,7 +3036,14 @@ public struct RomaTranscriptionOutputFilter {
     }
 
     private static func applySpokenDeveloperTokenCommands(in text: String) -> String {
-        var tokenText = replaceSimpleSpokenToken(in: text, pattern: spokenDotEnvPattern, replacement: ".env")
+        var tokenText = replaceSpokenProcessEnvironmentVariables(in: text)
+        for command in spokenDeveloperFilenameCommands {
+            tokenText = replaceSimpleSpokenToken(in: tokenText, pattern: command.pattern, replacement: command.replacement)
+        }
+        for command in spokenDeveloperExtensionCommands {
+            tokenText = replaceSimpleSpokenToken(in: tokenText, pattern: command.pattern, replacement: command.replacement)
+        }
+        tokenText = replaceSimpleSpokenToken(in: tokenText, pattern: spokenDotEnvPattern, replacement: ".env")
         tokenText = replaceSimpleSpokenToken(in: tokenText, pattern: spokenReadmeFilePattern, replacement: "README.md")
         tokenText = replaceSpokenShellVariables(in: tokenText)
         return tokenText
@@ -3045,6 +3064,32 @@ public struct RomaTranscriptionOutputFilter {
             range: NSRange(text.startIndex..., in: text),
             withTemplate: replacement
         )
+    }
+
+    private static func replaceSpokenProcessEnvironmentVariables(in text: String) -> String {
+        guard let regex = try? NSRegularExpression(pattern: spokenProcessEnvironmentMarkerPattern) else {
+            return text
+        }
+
+        var environmentText = text
+        let matches = regex.matches(in: environmentText, range: NSRange(environmentText.startIndex..., in: environmentText))
+
+        for match in matches.reversed() {
+            guard let markerRange = Range(match.range, in: environmentText),
+                  let candidate = spokenShellVariableCandidate(
+                    in: environmentText,
+                    after: markerRange.upperBound
+                  ) else {
+                continue
+            }
+
+            environmentText.replaceSubrange(
+                markerRange.lowerBound..<candidate.range.upperBound,
+                with: "process.env.\(candidate.name)"
+            )
+        }
+
+        return environmentText
     }
 
     private static func replaceSpokenShellVariables(in text: String) -> String {
@@ -9025,7 +9070,8 @@ public struct RomaTranscriptionOutputFilter {
             }
 
             let word = String(result[wordRange])
-            if isWordRangeInsideShellVariable(in: result, wordRange: wordRange) {
+            if isWordRangeInsideShellVariable(in: result, wordRange: wordRange) ||
+                isWordRangeInsideProcessEnvironmentMember(in: result, wordRange: wordRange) {
                 continue
             }
 
@@ -9047,7 +9093,8 @@ public struct RomaTranscriptionOutputFilter {
     ) -> String {
         let firstWordRange = firstLetterRange.lowerBound..<firstWordEnd
         let firstWord = String(text[firstWordRange])
-        if isWordRangeInsideShellVariable(in: text, wordRange: firstWordRange) {
+        if isWordRangeInsideShellVariable(in: text, wordRange: firstWordRange) ||
+            isWordRangeInsideProcessEnvironmentMember(in: text, wordRange: firstWordRange) {
             return text
         }
 
@@ -9075,6 +9122,23 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         return false
+    }
+
+    private static func isWordRangeInsideProcessEnvironmentMember(
+        in text: String,
+        wordRange: Range<String.Index>
+    ) -> Bool {
+        var memberStart = wordRange.lowerBound
+        while memberStart > text.startIndex {
+            let previousIndex = text.index(before: memberStart)
+            let previousCharacter = text[previousIndex]
+            guard previousCharacter == "_" || previousCharacter.isLetter || previousCharacter.isNumber else {
+                break
+            }
+            memberStart = previousIndex
+        }
+
+        return String(text[..<memberStart]).lowercased().hasSuffix("process.env.")
     }
 
     private static func shouldNormalizeLikelyFragmentWord(_ word: String, nextWord: String?) -> Bool {

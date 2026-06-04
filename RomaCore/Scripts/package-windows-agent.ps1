@@ -484,6 +484,7 @@ try {
         Assert-OutputContains -Output $proofAgentOutputText -Expected "maximum_clipboard_restore_delay_seconds=4294967.295"
         Assert-OutputContains -Output $proofAgentOutputText -Expected "windows_paste_adapter_source=true"
         Assert-OutputContains -Output $proofAgentOutputText -Expected "windows_dictation_runtime_uses_pipeline_source=true"
+        Assert-OutputContains -Output $proofAgentOutputText -Expected "windows_hold_hook_single_window_source=true"
         Assert-OutputContains -Output $proofAgentOutputText -Expected "windows_dictation_proof_source=true"
     }
 

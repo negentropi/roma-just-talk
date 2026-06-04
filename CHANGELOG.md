@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Collapsed partial-word false starts such as "mod- module" and "sh- should" in post-STT cleanup.
 - Rejected private, local, and reserved endpoints in real Windows cloud laptop proof.
 - Required real Windows local-whisper laptop proof to use non-mock `.bin` or `.gguf` model files.
 - Required real Windows cloud laptop proof to use HTTPS STT endpoints.

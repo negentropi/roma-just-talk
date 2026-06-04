@@ -1144,6 +1144,26 @@ struct RomaCoreChecks {
                 "tight dash separated repeated word"
             ),
             (
+                "I think the mod- module works.",
+                "I think the module works.",
+                "dash separated partial-word restart"
+            ),
+            (
+                "I think we sh- should ship.",
+                "I think we should ship.",
+                "short dash separated partial-word restart"
+            ),
+            (
+                "I think the mod... module works.",
+                "I think the module works.",
+                "ellipsis separated partial-word restart"
+            ),
+            (
+                "The pre-flight check runs.",
+                "The pre-flight check runs.",
+                "hyphenated word guard"
+            ),
+            (
                 "x - x is zero.",
                 "x - x is zero.",
                 "single-letter separator repeat guard"

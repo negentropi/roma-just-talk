@@ -1204,6 +1204,7 @@ public struct RomaTranscriptionOutputFilter {
         if cleanupLevel == .polished {
             filteredText = collapseAdjacentRepeatedWords(in: filteredText)
             filteredText = collapseSeparatorRepeatedWords(in: filteredText)
+            filteredText = collapsePartialWordRestarts(in: filteredText)
             filteredText = collapseRepeatedShortPhrases(in: filteredText)
             filteredText = collapseRepeatedShortClauses(in: filteredText)
             filteredText = collapseRepeatedLeadInCorrections(in: filteredText)
@@ -7475,6 +7476,61 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         return collapsedText
+    }
+
+    private static func collapsePartialWordRestarts(in text: String) -> String {
+        guard let regex = try? NSRegularExpression(
+            pattern: #"(?i)(?<![\p{L}\p{N}])([\p{L}\p{N}]{2,20})[ \t]*(?:[-–—]|\.\.\.|…)[ \t]+([\p{L}\p{N}][\p{L}\p{N}'’ʼ-]{1,63})(?=[ \t]+[\p{L}\p{N}]|[.!?,;:…]|\s*$)"#
+        ) else {
+            return text
+        }
+
+        var collapsedText = text
+        var rewriteCount = 0
+
+        while rewriteCount < 4 {
+            let range = NSRange(collapsedText.startIndex..., in: collapsedText)
+            let matches = regex.matches(in: collapsedText, range: range).reversed()
+            var didRewrite = false
+
+            for match in matches {
+                guard match.numberOfRanges >= 3,
+                      let fullRange = Range(match.range(at: 0), in: collapsedText),
+                      let partialRange = Range(match.range(at: 1), in: collapsedText),
+                      let completedRange = Range(match.range(at: 2), in: collapsedText) else {
+                    continue
+                }
+
+                let partialWord = String(collapsedText[partialRange])
+                let completedWord = String(collapsedText[completedRange])
+                guard isPartialRestartPrefix(partialWord, of: completedWord) else {
+                    continue
+                }
+
+                collapsedText.replaceSubrange(fullRange, with: completedWord)
+                didRewrite = true
+            }
+
+            guard didRewrite else { break }
+            rewriteCount += 1
+        }
+
+        return collapsedText
+    }
+
+    private static func isPartialRestartPrefix(_ partialWord: String, of completedWord: String) -> Bool {
+        let normalizedPartial = partialWord.lowercased()
+        let normalizedCompleted = completedWord.lowercased()
+
+        guard normalizedPartial.count >= 2,
+              normalizedCompleted.count >= normalizedPartial.count + 2,
+              normalizedCompleted.hasPrefix(normalizedPartial),
+              partialWord.rangeOfCharacter(from: .letters) != nil,
+              completedWord.rangeOfCharacter(from: .letters) != nil else {
+            return false
+        }
+
+        return true
     }
 
     private static func hasTrailingSentencePunctuation(_ token: String) -> Bool {

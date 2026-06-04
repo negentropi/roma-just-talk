@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Required real Windows local-whisper laptop proof to use non-mock `.bin` or `.gguf` model files.
 - Required real Windows cloud laptop proof to use HTTPS STT endpoints.
 - Split Windows laptop proof guide markers into preflight-only and full-proof sections.
 - Added a Windows CI shared-core check before packaging the Windows agent.

@@ -6954,6 +6954,15 @@ struct RomaCoreChecks {
             "Windows cloud laptop proof should require secure cloud endpoints"
         )
         try require(
+            checkReportScript.contains(#"$whisperCLIName.Contains("mock")"#) &&
+                checkReportScript.contains(#"$whisperModelName.Contains("mock")"#) &&
+                checkReportScript.contains(#"$allowedModelExtensions = @(".bin", ".gguf")"#) &&
+                checkReportScript.contains("Local whisper laptop proof model must be a .bin or .gguf file") &&
+                checkReportScript.contains(#"Assert-PathNotEqual -Actual $whisperCLIPath -Blocked ([string](Require-Property -Object $packagedAgent -Name "path")) -Name "whisper_cli_path""#) &&
+                checkReportScript.contains(#"Assert-PathNotEqual -Actual $whisperCLIPath -Blocked ([string](Require-Property -Object $packagedProofAgent -Name "path")) -Name "whisper_cli_path""#),
+            "Windows local whisper laptop proof should reject mock/package executable backends and require real model files"
+        )
+        try require(
             proofAgentSource.contains(#"print("native_windows_adapters=true")"#),
             "Windows proof agent should print native adapter runtime availability on Windows"
         )

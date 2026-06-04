@@ -261,20 +261,28 @@ function Assert-RealWhisperBackendProof {
     $whisperCLIName = [System.IO.Path]::GetFileName($whisperCLIPath).ToLowerInvariant()
     $whisperModelName = [System.IO.Path]::GetFileName($whisperModelPath).ToLowerInvariant()
 
-    if ($whisperCLIName -eq "romawhisperclimock.exe") {
-        throw "Local whisper laptop proof cannot use RomaWhisperCLIMock.exe"
+    if ($whisperCLIName -eq "romawhisperclimock.exe" -or $whisperCLIName.Contains("mock")) {
+        throw "Local whisper laptop proof cannot use a mock whisper CLI: $whisperCLIPath"
     }
     if ($whisperModelName -eq "romawindowsagent.exe" -or
         $whisperModelName -eq "romaproofagent.exe" -or
         $whisperModelName -eq "romawhisperclimock.exe" -or
-        $whisperModelName.EndsWith(".exe")) {
+        $whisperModelName.EndsWith(".exe") -or
+        $whisperModelName.Contains("mock")) {
         throw "Local whisper laptop proof must point at a model file, got: $whisperModelPath"
+    }
+    $allowedModelExtensions = @(".bin", ".gguf")
+    $whisperModelExtension = [System.IO.Path]::GetExtension($whisperModelPath).ToLowerInvariant()
+    if ($allowedModelExtensions -notcontains $whisperModelExtension) {
+        throw "Local whisper laptop proof model must be a .bin or .gguf file, got: $whisperModelPath"
     }
 
     $packagedMock = Require-Property -Object $Files -Name "packaged_whisper_cli_mock"
     $packagedAgent = Require-Property -Object $Files -Name "packaged_agent"
     $packagedProofAgent = Require-Property -Object $Files -Name "packaged_proof_agent"
     Assert-PathNotEqual -Actual $whisperCLIPath -Blocked ([string](Require-Property -Object $packagedMock -Name "path")) -Name "whisper_cli_path"
+    Assert-PathNotEqual -Actual $whisperCLIPath -Blocked ([string](Require-Property -Object $packagedAgent -Name "path")) -Name "whisper_cli_path"
+    Assert-PathNotEqual -Actual $whisperCLIPath -Blocked ([string](Require-Property -Object $packagedProofAgent -Name "path")) -Name "whisper_cli_path"
     Assert-PathNotEqual -Actual $whisperModelPath -Blocked ([string](Require-Property -Object $packagedMock -Name "path")) -Name "whisper_model_path"
     Assert-PathNotEqual -Actual $whisperModelPath -Blocked ([string](Require-Property -Object $packagedAgent -Name "path")) -Name "whisper_model_path"
     Assert-PathNotEqual -Actual $whisperModelPath -Blocked ([string](Require-Property -Object $packagedProofAgent -Name "path")) -Name "whisper_model_path"

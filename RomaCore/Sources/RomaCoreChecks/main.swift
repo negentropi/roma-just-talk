@@ -9508,8 +9508,8 @@ struct RomaCoreChecks {
             laptopProofScript.contains("microphone preflight") &&
                 laptopProofScript.contains("miniaudio-record-proof") &&
                 laptopProofScript.contains("MicPreflightSeconds") &&
-                laptopProofScript.contains(#"Get-RomaWindowsOutputNumber -Output $Output -Name "included_pre_roll_seconds""#) &&
-                laptopProofScript.contains("reported_positive_pre_roll") &&
+                proofCommonScript.contains(#"Get-RomaWindowsOutputNumber -Output $Output -Name "included_pre_roll_seconds""#) &&
+                proofCommonScript.contains("reported_positive_pre_roll") &&
                 laptopProofScript.contains("microphone_preflight_included_pre_roll_seconds=") &&
                 laptopProofScript.contains("microphone_preflight_ok=true"),
             "Windows laptop proof runner should preflight real microphone capture and positive pre-roll through packaged RomaProofAgent"
@@ -9523,9 +9523,9 @@ struct RomaCoreChecks {
         try require(
             laptopProofScript.contains("permission surface preflight") &&
                 laptopProofScript.contains("windows-permission-doctor") &&
-                laptopProofScript.contains("Get-PermissionPreflightProof") &&
-                laptopProofScript.contains("Get-RomaWindowsMinimumPermissionOutputProof -Output $Output") &&
-                laptopProofScript.contains("Add-RomaWindowsProofFields -Proof $proof") &&
+                laptopProofScript.contains("Get-RomaWindowsPermissionPreflightOutputProof") &&
+                proofCommonScript.contains("Get-RomaWindowsMinimumPermissionOutputProof -Output $Output") &&
+                proofCommonScript.contains("Add-RomaWindowsProofFields -Proof $proof") &&
                 laptopProofScript.contains("permission_surface_preflight_ok=true") &&
                 laptopProofScript.contains("windows_laptop_permission_preflight=true"),
             "Windows laptop proof runner should preflight the permission surface through packaged RomaProofAgent"
@@ -9544,18 +9544,31 @@ struct RomaCoreChecks {
                 laptopProofScript.contains(#"proof_mode = "windows-laptop-preflight""#) &&
                 laptopProofScript.contains("preflight_outputs") &&
                 laptopProofScript.contains("permission_surface = $true") &&
-                laptopProofScript.contains("permission_surface = Get-PermissionPreflightProof -Output $script:permissionPreflightOutput") &&
-                laptopProofScript.contains("Get-HotkeyDeliveryPreflightProof") &&
+                laptopProofScript.contains("permission_surface = Get-RomaWindowsPermissionPreflightOutputProof -Output $script:permissionPreflightOutput") &&
+                laptopProofScript.contains("Get-RomaWindowsHotkeyDeliveryPreflightOutputProof") &&
+                laptopProofScript.contains("Get-RomaWindowsMicrophonePreflightOutputProof") &&
+                laptopProofScript.contains("Get-RomaWindowsLocalWhisperPreflightOutputProof") &&
                 laptopProofScript.contains("Get-OptionalFileProof") &&
-                laptopProofScript.contains("sample_rate_16000") &&
-                laptopProofScript.contains("included_pre_roll_seconds") &&
-                laptopProofScript.contains("reported_positive_pre_roll") &&
+                proofCommonScript.contains("sample_rate_16000") &&
+                proofCommonScript.contains("included_pre_roll_seconds") &&
+                proofCommonScript.contains("reported_positive_pre_roll") &&
                 laptopProofScript.contains("local_whisper = $hasLocalWhisperPreflight") &&
                 laptopProofScript.contains("manifest = $script:artifactManifest") &&
                 laptopProofScript.contains("package_identity = (Get-RomaPackageIdentityProof -PackageDir $PackageDir)") &&
                 laptopProofScript.contains("-LaptopPreflightReportPath") &&
                 laptopProofScript.contains("-RequireLaptopPreflight"),
             "Windows laptop preflight-only runner should write an archivable JSON proof report with output markers and artifact identity"
+        )
+        try require(
+            proofCommonScript.contains("function Get-RomaWindowsHotkeyDeliveryPreflightOutputProof") &&
+                proofCommonScript.contains("function Get-RomaWindowsPermissionPreflightOutputProof") &&
+                proofCommonScript.contains("function Get-RomaWindowsMicrophonePreflightOutputProof") &&
+                proofCommonScript.contains("function Get-RomaWindowsLocalWhisperPreflightOutputProof") &&
+                !laptopProofScript.contains("function Get-HotkeyDeliveryPreflightProof") &&
+                !laptopProofScript.contains("function Get-PermissionPreflightProof") &&
+                !laptopProofScript.contains("function Get-MicrophonePreflightProof") &&
+                !laptopProofScript.contains("function Get-LocalWhisperPreflightProof"),
+            "Windows proof helper should own laptop preflight output proof shaping"
         )
         try require(
             checkSetScript.contains("RequireLaptopPreflight") &&

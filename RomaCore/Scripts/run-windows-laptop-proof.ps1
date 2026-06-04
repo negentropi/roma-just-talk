@@ -78,68 +78,6 @@ function Require-FileWithMinimumBytes {
     Write-Host "proof_file_bytes=$($item.Length)"
 }
 
-function Get-HotkeyDeliveryPreflightProof {
-    param(
-        [string]$Output = ""
-    )
-
-    return [ordered]@{
-        output_present = ![string]::IsNullOrWhiteSpace($Output)
-        waiting_for_hold = $Output.Contains("waiting_for_hold=Ctrl+Shift+R")
-        key_down = $Output.Contains("key_down=true")
-        key_up = $Output.Contains("key_up=true")
-        observed_events_present = $Output.Contains("observed_events=")
-    }
-}
-
-function Get-PermissionPreflightProof {
-    param(
-        [string]$Output = ""
-    )
-
-    $proof = [ordered]@{
-        output_present = ![string]::IsNullOrWhiteSpace($Output)
-    }
-    Add-RomaWindowsProofFields -Proof $proof -Fields (Get-RomaWindowsMinimumPermissionOutputProof -Output $Output) | Out-Null
-    return $proof
-}
-
-function Get-MicrophonePreflightProof {
-    param(
-        [string]$Output = ""
-    )
-
-    $durationSeconds = Get-RomaWindowsOutputNumber -Output $Output -Name "duration_seconds"
-    $includedPreRollSeconds = Get-RomaWindowsOutputNumber -Output $Output -Name "included_pre_roll_seconds"
-
-    return [ordered]@{
-        output_present = ![string]::IsNullOrWhiteSpace($Output)
-        wrote_present = $Output.Contains("wrote=")
-        reported_duration = $Output.Contains("duration_seconds=")
-        duration_seconds = $durationSeconds
-        reported_positive_duration = ($null -ne $durationSeconds) -and ($durationSeconds -gt 0)
-        reported_pre_roll = $Output.Contains("included_pre_roll_seconds=")
-        included_pre_roll_seconds = $includedPreRollSeconds
-        reported_positive_pre_roll = ($null -ne $includedPreRollSeconds) -and ($includedPreRollSeconds -gt 0)
-        sample_rate_16000 = $Output.Contains("sample_rate=16000")
-        channels_mono = $Output.Contains("channels=1")
-    }
-}
-
-function Get-LocalWhisperPreflightProof {
-    param(
-        [string]$Output = ""
-    )
-
-    return [ordered]@{
-        output_present = ![string]::IsNullOrWhiteSpace($Output)
-        transcription_client_whisper = $Output.Contains("transcription_client=whisper.cpp-cli")
-        network_required_false = $Output.Contains("network_required=false")
-        executable_present = $Output.Contains("executable=")
-        model_file_present = $Output.Contains("model_file=")
-    }
-}
-
 function ConvertTo-PowerShellSingleQuotedString {
     param(
         [string]$Value = ""
@@ -404,10 +342,10 @@ function Write-PreflightReport {
             local_whisper = $hasLocalWhisperPreflight
         }
         preflight_outputs = [ordered]@{
-            permission_surface = Get-PermissionPreflightProof -Output $script:permissionPreflightOutput
-            hotkey_delivery = Get-HotkeyDeliveryPreflightProof -Output $script:hotkeyDeliveryPreflightOutput
-            microphone = Get-MicrophonePreflightProof -Output $script:microphonePreflightOutput
-            local_whisper = Get-LocalWhisperPreflightProof -Output $script:localWhisperPreflightOutput
+            permission_surface = Get-RomaWindowsPermissionPreflightOutputProof -Output $script:permissionPreflightOutput
+            hotkey_delivery = Get-RomaWindowsHotkeyDeliveryPreflightOutputProof -Output $script:hotkeyDeliveryPreflightOutput
+            microphone = Get-RomaWindowsMicrophonePreflightOutputProof -Output $script:microphonePreflightOutput
+            local_whisper = Get-RomaWindowsLocalWhisperPreflightOutputProof -Output $script:localWhisperPreflightOutput
         }
         files = [ordered]@{
             proof_agent = Get-FileProof -Path $ProofAgentPath

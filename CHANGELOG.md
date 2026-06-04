@@ -91,6 +91,7 @@
 - Required Windows package smoke to assert shared proof-agent defaults.
 - Required Windows agent smoke to assert shared user-facing agent defaults.
 - Required installed Windows launcher doctor checks to assert shared user-facing agent defaults.
+- Made Windows listener sessions write unique WAV outputs unless `--out` is explicitly passed.
 - Required Windows hold-to-talk proof reports to preserve the runtime event order from pre-roll through transcript output.
 - Seeded the Windows hold-hook modifier state from already-held Ctrl/Shift/Alt/Win keys before waiting for the target key.
 - Kept one Windows hold-to-talk keyboard hook alive from keydown through keyup so release cannot be missed while recording starts.

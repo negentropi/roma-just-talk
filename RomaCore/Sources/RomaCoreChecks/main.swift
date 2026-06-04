@@ -6604,6 +6604,12 @@ struct RomaCoreChecks {
             "Windows agent should expose a config doctor before capture starts"
         )
         try require(
+            windowsAgentSource.contains("listenerSessionIndex") &&
+                windowsAgentSource.contains(#"options.contains("--out")"#) &&
+                windowsAgentSource.contains("defaultOutputPath(sessionIndex: listenerSessionIndex)"),
+            "Windows listener should generate per-session WAV paths unless --out is explicit"
+        )
+        try require(
             proofAgentSource.contains(#"case "windows-hotkey-availability-proof":"#) &&
                 proofAgentSource.contains(#"print("hotkey_registration_available=true")"#),
             "Windows proof agent should expose a noninteractive RegisterHotKey availability proof"

@@ -245,6 +245,8 @@ powershell -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\roma-just-talk\agent
 powershell -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\roma-just-talk\agent\run-windows-agent.ps1" -WhisperCLI C:\path\whisper-cli.exe -WhisperModel C:\path\ggml-base.en.bin -PasteDictation
 ```
 
+Listener mode generates a fresh temp WAV path for each completed session even when the saved config contains an `outputPath`; pass `--out` directly to `RomaWindowsAgent listen` only when you intentionally want a fixed proof file.
+
 Artifact-to-laptop proof wrapper:
 
 ```powershell

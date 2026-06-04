@@ -71,10 +71,18 @@ struct RomaWindowsAgent {
     }
 
     private static func runDictation(arguments: [String]) async throws {
+        try await runDictation(arguments: arguments, listenerSessionIndex: nil)
+    }
+
+    private static func runDictation(arguments: [String], listenerSessionIndex: Int?) async throws {
         let options = RomaCommandLineOptions(arguments)
         let configuration = try loadConfiguration(from: options)
             .applyingOverrides(from: options)
-        let outputURL = URL(fileURLWithPath: configuration.outputPath ?? defaultOutputPath())
+        let outputURL = resolvedOutputURL(
+            configuration: configuration,
+            options: options,
+            listenerSessionIndex: listenerSessionIndex
+        )
         let transcriptionClient = try makeTranscriptionClient(from: configuration)
         let shouldPaste = configuration.shouldPaste ?? false
         let clipboardRestoreConfiguration = configuration.clipboardRestoreConfiguration()
@@ -147,7 +155,7 @@ struct RomaWindowsAgent {
         var completedSessions = 0
         while maxSessions.map({ completedSessions < $0 }) ?? true {
             print("listen_session_start=\(completedSessions + 1)")
-            try await runDictation(arguments: arguments)
+            try await runDictation(arguments: arguments, listenerSessionIndex: completedSessions + 1)
             completedSessions += 1
             print("listen_session_completed=\(completedSessions)")
         }
@@ -264,9 +272,25 @@ struct RomaWindowsAgent {
         }
     }
 
-    private static func defaultOutputPath() -> String {
-        FileManager.default.temporaryDirectory
-            .appendingPathComponent("roma-just-talk-\(Int(Date().timeIntervalSince1970)).wav")
+    private static func resolvedOutputURL(
+        configuration: RomaWindowsAgentConfiguration,
+        options: RomaCommandLineOptions,
+        listenerSessionIndex: Int?
+    ) -> URL {
+        if options.contains("--out"), let outputPath = configuration.outputPath {
+            return URL(fileURLWithPath: outputPath)
+        }
+        if listenerSessionIndex != nil {
+            return URL(fileURLWithPath: defaultOutputPath(sessionIndex: listenerSessionIndex))
+        }
+        return URL(fileURLWithPath: configuration.outputPath ?? defaultOutputPath())
+    }
+
+    private static func defaultOutputPath(sessionIndex: Int? = nil) -> String {
+        let timestampMilliseconds = Int(Date().timeIntervalSince1970 * 1_000)
+        let sessionSuffix = sessionIndex.map { "-session-\($0)" } ?? ""
+        return FileManager.default.temporaryDirectory
+            .appendingPathComponent("roma-just-talk-\(timestampMilliseconds)\(sessionSuffix)-\(UUID().uuidString).wav")
             .path
     }
 

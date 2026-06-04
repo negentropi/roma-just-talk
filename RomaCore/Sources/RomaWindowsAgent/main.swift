@@ -45,11 +45,7 @@ struct RomaWindowsAgent {
         print("hold_hook=WH_KEYBOARD_LL Ctrl+Shift+R")
         print("paste=win32_clipboard_sendinput")
         print("clipboard_restore=text_only_after_delay")
-        print("default_record_seconds=\(RomaWindowsAgentConfiguration.defaultRecordSeconds)")
-        print("default_hold_timeout_seconds=\(RomaWindowsAgentConfiguration.defaultHoldTimeoutSeconds)")
-        print("default_hold_timeout_milliseconds=\(RomaWindowsAgentConfiguration.defaultHoldTimeoutMilliseconds)")
-        print("default_clipboard_restore_delay_seconds=\(WindowsClipboardRestoreConfiguration.defaultRestoreDelaySeconds)")
-        print("maximum_clipboard_restore_delay_seconds=\(WindowsClipboardRestoreConfiguration.maximumRestoreDelaySeconds)")
+        WindowsDoctorOutput.runtimeDefaultProofLines.forEach { print($0) }
         print("secret_store=dpapi")
         print("config_default=\(RomaWindowsAgentConfiguration.defaultURL().path)")
         WindowsPermissionSurface.minimumMVP.proofOutputLines.forEach { print($0) }

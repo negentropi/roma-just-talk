@@ -5921,6 +5921,30 @@ struct RomaCoreChecks {
             "Windows clipboard restore maximum delay should fit Sleep milliseconds"
         )
         try require(
+            WindowsDoctorOutput.runtimeDefaultProofLines == [
+                "default_record_seconds=2.0",
+                "default_hold_timeout_seconds=15.0",
+                "default_hold_timeout_milliseconds=15000",
+                "default_clipboard_restore_delay_seconds=2.0",
+                "maximum_clipboard_restore_delay_seconds=4294967.295"
+            ],
+            "Windows doctor runtime default proof lines should stay shared"
+        )
+        try require(
+            WindowsDoctorOutput.holdTimeoutProofLines == [
+                "default_timeout_seconds=15.0",
+                "default_timeout_milliseconds=15000"
+            ],
+            "Windows doctor hold-timeout proof lines should stay shared"
+        )
+        try require(
+            WindowsDoctorOutput.clipboardRestoreProofLines == [
+                "default_clipboard_restore_delay_seconds=2.0",
+                "maximum_clipboard_restore_delay_seconds=4294967.295"
+            ],
+            "Windows doctor clipboard restore proof lines should stay shared"
+        )
+        try require(
             WindowsClipboardRestoreConfiguration.restoreDelayMilliseconds(fromSeconds: .nan) == nil,
             "Windows clipboard restore delay conversion should reject NaN"
         )
@@ -7092,6 +7116,12 @@ struct RomaCoreChecks {
             ),
             encoding: .utf8
         )
+        let doctorOutputSource = try String(
+            contentsOf: packageRoot.appendingPathComponent(
+                "Sources/RomaCore/Windows/WindowsDoctorOutput.swift"
+            ),
+            encoding: .utf8
+        )
         let proveScript = try String(
             contentsOf: scriptsRoot.appendingPathComponent("prove-windows-agent-artifact.ps1"),
             encoding: .utf8
@@ -7253,26 +7283,30 @@ struct RomaCoreChecks {
             "Windows proof agent should expose that hold-to-talk uses one native hook window"
         )
         let doctorDefaultOutputLines = [
-            #"print("default_record_seconds=\(RomaWindowsAgentConfiguration.defaultRecordSeconds)")"#,
-            #"print("default_hold_timeout_seconds=\(RomaWindowsAgentConfiguration.defaultHoldTimeoutSeconds)")"#,
-            #"print("default_hold_timeout_milliseconds=\(RomaWindowsAgentConfiguration.defaultHoldTimeoutMilliseconds)")"#,
-            #"print("default_clipboard_restore_delay_seconds=\(WindowsClipboardRestoreConfiguration.defaultRestoreDelaySeconds)")"#,
-            #"print("maximum_clipboard_restore_delay_seconds=\(WindowsClipboardRestoreConfiguration.maximumRestoreDelaySeconds)")"#
+            #""default_record_seconds=\(RomaWindowsAgentConfiguration.defaultRecordSeconds)""#,
+            #""default_hold_timeout_seconds=\(RomaWindowsAgentConfiguration.defaultHoldTimeoutSeconds)""#,
+            #""default_hold_timeout_milliseconds=\(RomaWindowsAgentConfiguration.defaultHoldTimeoutMilliseconds)""#,
+            #""default_clipboard_restore_delay_seconds=\(WindowsClipboardRestoreConfiguration.defaultRestoreDelaySeconds)""#,
+            #""maximum_clipboard_restore_delay_seconds=\(WindowsClipboardRestoreConfiguration.maximumRestoreDelaySeconds)""#
         ]
         for outputLine in doctorDefaultOutputLines {
             try require(
-                windowsAgentSource.contains(outputLine),
-                "Windows agent doctor should expose shared default line \(outputLine)"
-            )
-            try require(
-                proofAgentSource.contains(outputLine),
-                "Windows proof agent doctor should expose shared default line \(outputLine)"
+                doctorOutputSource.contains(outputLine),
+                "Windows doctor output module should own shared default line \(outputLine)"
             )
         }
         try require(
-            proofAgentSource.contains(#"print("default_timeout_seconds=\(RomaWindowsAgentConfiguration.defaultHoldTimeoutSeconds)")"#) &&
-                proofAgentSource.contains(#"print("default_timeout_milliseconds=\(RomaWindowsAgentConfiguration.defaultHoldTimeoutMilliseconds)")"#),
+            windowsAgentSource.contains("WindowsDoctorOutput.runtimeDefaultProofLines") &&
+                proofAgentSource.contains("WindowsDoctorOutput.runtimeDefaultProofLines"),
+            "Windows doctors should expose runtime defaults through shared doctor output"
+        )
+        try require(
+            proofAgentSource.contains("WindowsDoctorOutput.holdTimeoutProofLines"),
             "Windows keyboard hook doctor should expose shared hold timeout defaults"
+        )
+        try require(
+            proofAgentSource.contains("WindowsDoctorOutput.clipboardRestoreProofLines"),
+            "Windows paste doctor should expose shared clipboard restore defaults"
         )
         let pipelineSourceAssertions = [
             ("windows-proof.ps1", windowsProofScript),
@@ -7376,13 +7410,10 @@ struct RomaCoreChecks {
             "Windows dictation proof profiles should print pre-roll and speech PCM coverage"
         )
         try require(
-            proofAgentSource.contains(
-                #"print("default_clipboard_restore_delay_seconds=\(WindowsClipboardRestoreConfiguration.defaultRestoreDelaySeconds)")"#
-            ) &&
-                proofAgentSource.contains(
-                    #"print("maximum_clipboard_restore_delay_seconds=\(WindowsClipboardRestoreConfiguration.maximumRestoreDelaySeconds)")"#
-                ),
-            "Windows paste doctor should expose shared clipboard restore delay defaults"
+            doctorOutputSource.contains("public static var clipboardRestoreProofLines") &&
+                doctorOutputSource.contains(#""default_clipboard_restore_delay_seconds=\(WindowsClipboardRestoreConfiguration.defaultRestoreDelaySeconds)""#) &&
+                doctorOutputSource.contains(#""maximum_clipboard_restore_delay_seconds=\(WindowsClipboardRestoreConfiguration.maximumRestoreDelaySeconds)""#),
+            "Windows doctor output module should own shared clipboard restore delay defaults"
         )
         let proofDefaultAssertions = [
             "default_record_seconds=2.0",

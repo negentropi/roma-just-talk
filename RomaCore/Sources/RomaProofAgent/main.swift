@@ -60,11 +60,7 @@ struct RomaProofAgent {
         print("pre_roll_seconds=\(PreRollConfiguration().durationSeconds)")
         print("audio_format=pcm16_16000_mono")
         print("wav_writer=true")
-        print("default_record_seconds=\(RomaWindowsAgentConfiguration.defaultRecordSeconds)")
-        print("default_hold_timeout_seconds=\(RomaWindowsAgentConfiguration.defaultHoldTimeoutSeconds)")
-        print("default_hold_timeout_milliseconds=\(RomaWindowsAgentConfiguration.defaultHoldTimeoutMilliseconds)")
-        print("default_clipboard_restore_delay_seconds=\(WindowsClipboardRestoreConfiguration.defaultRestoreDelaySeconds)")
-        print("maximum_clipboard_restore_delay_seconds=\(WindowsClipboardRestoreConfiguration.maximumRestoreDelaySeconds)")
+        WindowsDoctorOutput.runtimeDefaultProofLines.forEach { print($0) }
         #if os(Windows)
         print("native_windows_adapters=true")
         #else
@@ -145,8 +141,7 @@ struct RomaProofAgent {
         print("virtual_key=0x\(String(chord.virtualKeyCode, radix: 16, uppercase: true))")
         print("required_modifiers=0x\(String(chord.requiredModifiers, radix: 16, uppercase: true))")
         print("message_loop_required=true")
-        print("default_timeout_seconds=\(RomaWindowsAgentConfiguration.defaultHoldTimeoutSeconds)")
-        print("default_timeout_milliseconds=\(RomaWindowsAgentConfiguration.defaultHoldTimeoutMilliseconds)")
+        WindowsDoctorOutput.holdTimeoutProofLines.forEach { print($0) }
         print("permission_prompt=false")
         print("runtime=\(WindowsLowLevelKeyboardHookProof.isRuntimeAvailable)")
     }
@@ -183,8 +178,7 @@ struct RomaProofAgent {
         print("input_api=SendInput")
         print("paste_chord=Ctrl+V")
         print("clipboard_restore=text_only_after_delay")
-        print("default_clipboard_restore_delay_seconds=\(WindowsClipboardRestoreConfiguration.defaultRestoreDelaySeconds)")
-        print("maximum_clipboard_restore_delay_seconds=\(WindowsClipboardRestoreConfiguration.maximumRestoreDelaySeconds)")
+        WindowsDoctorOutput.clipboardRestoreProofLines.forEach { print($0) }
         print("permission_prompt=false")
         print("integrity_limit=equal_or_lower")
         #if os(Windows)

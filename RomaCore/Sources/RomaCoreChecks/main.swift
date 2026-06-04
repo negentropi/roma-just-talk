@@ -939,6 +939,14 @@ struct RomaCoreChecks {
             "shared insertion spacing should add a leading space after words"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionSpacing("--verbose", context: midSentenceContext) == " --verbose",
+            "shared insertion spacing should add a leading space before standalone long CLI flags"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionSpacing("-m", context: midSentenceContext) == " -m",
+            "shared insertion spacing should add a leading space before standalone short CLI flags"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionSpacing(
                 "1. finish the report\n2. send the slides",
                 context: RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "Tasks:")

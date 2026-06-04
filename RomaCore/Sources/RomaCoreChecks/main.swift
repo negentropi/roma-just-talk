@@ -7953,6 +7953,14 @@ struct RomaCoreChecks {
             "Windows proof checker should require ordered hold-to-talk runtime evidence"
         )
         try require(
+            checkReportScript.contains("function Assert-PasteIntentProof") &&
+                checkReportScript.contains("Paste proof cannot request both restore_clipboard and no_restore_clipboard") &&
+                checkReportScript.contains(#"Assert-Boolean -Object $Config -Name "restore_clipboard_after_paste" -Expected $true"#) &&
+                checkReportScript.contains(#"Assert-Boolean -Object $Config -Name "restore_clipboard_after_paste" -Expected $false"#) &&
+                checkReportScript.contains("Assert-PasteIntentProof -Report $report -Config $config"),
+            "Windows proof checker should require paste restore intent to match the generated config"
+        )
+        try require(
             checkReportScript.contains(#"Assert-Boolean -Object $runtime -Name "reported_speech_pcm_contract" -Expected $true"#) &&
                 checkReportScript.contains(#"Assert-NumberEquals -Object $runtime -Name "sample_rate" -Expected 16000"#) &&
                 checkReportScript.contains(#"Assert-NumberEquals -Object $runtime -Name "channels" -Expected 1"#),

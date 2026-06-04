@@ -495,6 +495,31 @@ function Assert-DictationRuntimeProof {
     return $runtime
 }
 
+function Assert-PasteIntentProof {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Report,
+        [Parameter(Mandatory = $true)]
+        [object]$Config
+    )
+
+    $restoreClipboard = [bool](Require-Property -Object $Report -Name "restore_clipboard")
+    $noRestoreClipboard = [bool](Require-Property -Object $Report -Name "no_restore_clipboard")
+    if ($restoreClipboard -and $noRestoreClipboard) {
+        throw "Paste proof cannot request both restore_clipboard and no_restore_clipboard"
+    }
+
+    if ($restoreClipboard) {
+        Assert-Boolean -Object $Config -Name "restore_clipboard_after_paste" -Expected $true
+    }
+    if ($noRestoreClipboard) {
+        Assert-Boolean -Object $Config -Name "restore_clipboard_after_paste" -Expected $false
+    }
+
+    Write-Host "proof_paste_restore_clipboard=$restoreClipboard"
+    Write-Host "proof_paste_no_restore_clipboard=$noRestoreClipboard"
+}
+
 function Assert-HoldHookRuntimeProof {
     param(
         [Parameter(Mandatory = $true)]
@@ -1244,6 +1269,7 @@ if ($RequirePaste) {
     Assert-Boolean -Object $report -Name "paste_dictation" -Expected $true
     $config = Require-Property -Object $report -Name "config"
     Assert-Boolean -Object $config -Name "should_paste" -Expected $true
+    Assert-PasteIntentProof -Report $report -Config $config
     if ($null -eq $dictationRuntime) {
         $dictationRuntime = Assert-DictationRuntimeProof -Report $report
     }

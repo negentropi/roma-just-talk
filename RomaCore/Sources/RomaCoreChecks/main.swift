@@ -912,6 +912,34 @@ struct RomaCoreChecks {
             "shared insertion polish should preserve non-technical that's continuations"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Correction is a model.",
+                context: midSentenceContext
+            ) == "a model",
+            "shared insertion polish should trim correction markers before article technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "It's a model.",
+                context: midSentenceContext
+            ) == "a model",
+            "shared insertion polish should trim it's markers before article technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "That is the module.",
+                context: midSentenceContext
+            ) == "the module",
+            "shared insertion polish should trim that-is markers before article technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "It's a now.",
+                context: midSentenceContext
+            ) == "It's a now",
+            "shared insertion polish should preserve non-technical article continuations"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("Right model.", context: midSentenceContext) == "right model",
             "shared insertion polish should preserve right as an ordinary fragment word"
         )
@@ -8325,6 +8353,37 @@ struct RomaCoreChecks {
         try require(
             await itsInserter.pastedText == " module",
             "pipeline should paste it's marker continuations"
+        )
+
+        let correctionArticleRecorder = FakeRecorder()
+        let correctionArticleInserter = FakeTextInsertion()
+        let correctionArticlePipeline = DictationPipeline(
+            recorder: correctionArticleRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "correction-article-continuation-proof.wav",
+                text: "Correction is a model."
+            ),
+            textInsertion: correctionArticleInserter
+        )
+        let correctionArticleRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/correction-article-continuation-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await correctionArticleRecorder.startPreRollBuffering()
+        let correctionArticleResult = try await correctionArticlePipeline.runRecordingWindow(correctionArticleRequest) {}
+
+        try require(
+            correctionArticleResult.processedText == " a model",
+            "pipeline should clean correction markers before article technical continuations"
+        )
+        try require(
+            await correctionArticleInserter.pastedText == " a model",
+            "pipeline should paste article technical continuations after correction markers"
         )
 
         let orWaitNoIMeanRecorder = FakeRecorder()

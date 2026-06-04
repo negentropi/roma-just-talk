@@ -2019,13 +2019,24 @@ public struct RomaTranscriptionOutputFilter {
             "sorry", "oops", "whoops", "my bad", "actually", "instead", "rather",
             "what i mean is", "what i meant is", "what i meant was", "yes", "yep", "yup"
         ].contains(filler) {
-            guard let firstSuffixWord = wordTokens(in: trimmedSuffix).first?.text,
-                  isTechnicalContinuationFragmentHead(firstSuffixWord) else {
+            guard hasTechnicalContinuationFragmentHead(trimmedSuffix) else {
                 return false
             }
         }
 
         return true
+    }
+
+    private static func hasTechnicalContinuationFragmentHead(_ text: String) -> Bool {
+        let tokens = wordTokens(in: text)
+        guard let firstWord = tokens.first?.text else { return false }
+
+        if ["a", "an", "the"].contains(firstWord),
+           tokens.count >= 2 {
+            return isTechnicalContinuationFragmentHead(tokens[1].text)
+        }
+
+        return isTechnicalContinuationFragmentHead(firstWord)
     }
 
     private static func isTechnicalContinuationFragmentHead(_ word: String) -> Bool {

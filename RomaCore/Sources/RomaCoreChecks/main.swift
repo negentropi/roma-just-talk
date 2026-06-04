@@ -9232,6 +9232,13 @@ struct RomaCoreChecks {
                 "Windows proof helper should own native doctor spec \(name)"
             )
         }
+        try require(
+            checkReportScript.contains("Get-RomaWindowsNativeDoctorExpectedMarker -Name $Name") &&
+                checkReportScript.contains("$actualMarker -ne $expectedMarker") &&
+                checkReportScript.contains("throw \"$Name expected_marker mismatch: actual=$actualMarker expected=$expectedMarker\"") &&
+                checkReportScript.contains("foreach ($name in $nativeDoctorSpecs.Keys)"),
+            "Windows proof report checker should validate native doctor reports against the shared spec map"
+        )
         let artifactDefaultAssertions = [
             "default_record_seconds=2.0",
             "default_hold_timeout_seconds=15.0",

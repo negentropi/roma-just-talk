@@ -680,6 +680,11 @@ function Assert-NativeDoctorOutputProof {
     Assert-Boolean -Object $Proof -Name "output_present" -Expected $true
     Assert-Boolean -Object $Proof -Name "platform_windows" -Expected $true
     Assert-NonEmptyString -Object $Proof -Name "expected_marker"
+    $actualMarker = [string](Require-Property -Object $Proof -Name "expected_marker")
+    $expectedMarker = Get-RomaWindowsNativeDoctorExpectedMarker -Name $Name
+    if ($actualMarker -ne $expectedMarker) {
+        throw "$Name expected_marker mismatch: actual=$actualMarker expected=$expectedMarker"
+    }
     Assert-Boolean -Object $Proof -Name "expected_marker_present" -Expected $true
     if ($Name -eq "keyboard_hook") {
         Assert-HoldTimeoutDefaultProof -Proof $Proof
@@ -1228,14 +1233,8 @@ if ($RequireProofAgentSurface) {
 if ($RequireNativeDoctorSurface) {
     $doctor = Require-Property -Object $report -Name "doctor"
     $nativeDoctors = Require-Property -Object $doctor -Name "packaged_native_doctors"
-    foreach ($name in @(
-        "register_hotkey",
-        "register_hotkey_available",
-        "keyboard_hook",
-        "paste",
-        "dpapi_secret",
-        "miniaudio_capture"
-    )) {
+    $nativeDoctorSpecs = Get-RomaWindowsNativeDoctorSpecs
+    foreach ($name in $nativeDoctorSpecs.Keys) {
         Assert-NativeDoctorOutputProof `
             -Proof (Require-Property -Object $nativeDoctors -Name $name) `
             -Name $name

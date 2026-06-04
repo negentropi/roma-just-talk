@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Shared Windows proof-report native-doctor validation with the native-doctor spec map.
 - Shared Windows native-doctor command metadata so source and artifact proof scripts use one command/label/marker contract.
 - Shared Windows native-doctor marker assertions and proof-shaping so source and artifact proof scripts use one native-adapter contract.
 - Shared Windows proof-agent source-marker assertions and proof-shaping so source, package, and artifact proof scripts use one marker contract.

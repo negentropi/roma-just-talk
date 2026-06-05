@@ -1218,6 +1218,27 @@ struct RomaCoreChecks {
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Correction is *Model.*",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should unwrap italic markdown markers after correction lead-ins"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Correction is **Model.**",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should unwrap bold markdown markers after correction lead-ins"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "It's _final word._",
+                context: midSentenceContext
+            ) == "final word",
+            "shared insertion polish should unwrap underscore markdown markers after it's lead-ins"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "It's a final word.",
                 context: midSentenceContext
             ) == "a final word",
@@ -9554,6 +9575,21 @@ struct RomaCoreChecks {
             expectedText: " final word",
             fileName: "mid-sentence-correction-bullet-marker-proof.wav"
         )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "Correction is *Model.*",
+            expectedText: " model",
+            fileName: "mid-sentence-correction-italic-marker-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "Correction is **Model.**",
+            expectedText: " model",
+            fileName: "mid-sentence-correction-bold-marker-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "It's _final word._",
+            expectedText: " final word",
+            fileName: "mid-sentence-its-underscore-final-word-proof.wav"
+        )
 
         let bracketedFragmentRecorder = FakeRecorder()
         let bracketedFragmentInserter = FakeTextInsertion()
@@ -12647,7 +12683,7 @@ struct RomaCoreChecks {
             ("smoke-windows-agent.ps1", smokeScript, ["Invoke-Step", "Assert-OutputContains", "Resolve-FullPath"]),
             ("install-windows-agent.ps1", installScript, ["Invoke-Step", "Resolve-FullPath", "Require-File"]),
             ("run-windows-agent.ps1", runScript, ["Resolve-FullPath", "Require-File", "Assert-OutputContains"]),
-            ("prove-windows-agent-artifact.ps1", proveScript, ["Invoke-Step", "Resolve-FullPath", "Require-File", "Assert-OutputContains", "Get-FileProof", "Get-FileHashProof"]),
+            ("prove-windows-agent-artifact.ps1", proveScript, ["Invoke-Step", "Resolve-FullPath", "Require-File", "Assert-OutputContains"]),
             ("run-windows-laptop-proof.ps1", laptopProofScript, ["Invoke-Step", "Resolve-FullPath", "Require-File", "Assert-OutputContains"])
         ]
         for (scriptName, scriptSource, aliases) in proofCommonHelperScripts {
@@ -12678,6 +12714,17 @@ struct RomaCoreChecks {
                 packageIdentityScript.contains("RomaWhisperCLIMock.exe") &&
                 packageIdentityScript.contains("Get-RomaPackageIdentityHash"),
             "Windows package identity should be computed by one shared packaged helper"
+        )
+        try require(
+            proofCommonScript.contains("function New-RomaWindowsNotepadPasteProof") &&
+                proofCommonScript.contains(#"file = Get-RomaWindowsFileProof -Path $Path"#) &&
+                proveScript.contains("New-RomaWindowsNotepadPasteProof") &&
+                proveScript.contains(#"$proof["file"] = Get-RomaWindowsFileProof -Path $NotepadPasteProofPath"#) &&
+                proveScript.contains("Get-RomaWindowsFileHashProof -Path $agentPath") &&
+                !proveScript.contains("function New-NotepadPasteProof") &&
+                !proveScript.contains("Set-Alias -Name Get-FileProof") &&
+                !proveScript.contains("Set-Alias -Name Get-FileHashProof"),
+            "Windows artifact proof should share Notepad paste proof initialization and call file proof helpers directly"
         )
         try require(
             packageScript.contains(". $packageIdentityScript") &&

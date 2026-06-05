@@ -50,8 +50,6 @@ Set-Alias -Name Invoke-Step -Value Invoke-RomaWindowsProofStep -Scope Local -For
 Set-Alias -Name Resolve-FullPath -Value Resolve-RomaWindowsFullPath -Scope Local -Force
 Set-Alias -Name Require-File -Value Require-RomaWindowsFile -Scope Local -Force
 Set-Alias -Name Assert-OutputContains -Value Assert-RomaWindowsOutputContains -Scope Local -Force
-Set-Alias -Name Get-FileProof -Value Get-RomaWindowsFileProof -Scope Local -Force
-Set-Alias -Name Get-FileHashProof -Value Get-RomaWindowsFileHashProof -Scope Local -Force
 Set-Alias -Name Get-OutputValue -Value Get-RomaWindowsOutputValue -Scope Local -Force
 Set-Alias -Name Get-OutputNumber -Value Get-RomaWindowsOutputNumber -Scope Local -Force
 Set-Alias -Name Get-OutputLineNumber -Value Get-RomaWindowsOutputLineNumber -Scope Local -Force
@@ -187,21 +185,11 @@ function Invoke-ConfigDoctor {
     return $output
 }
 
-function New-NotepadPasteProof {
-    return [ordered]@{
-        requested = $RunNotepadPasteProof.IsPresent
-        text = $PasteProofText
-        output_present = $false
-        target_process_id = 0
-        paste_sent = $false
-        text_found = $false
-        verified = $false
-        file = Get-FileProof -Path $NotepadPasteProofPath
-    }
-}
-
 function Invoke-NotepadPasteProof {
-    $proof = New-NotepadPasteProof
+    $proof = New-RomaWindowsNotepadPasteProof `
+        -Requested $RunNotepadPasteProof.IsPresent `
+        -Text $PasteProofText `
+        -Path $NotepadPasteProofPath
     if (!$RunNotepadPasteProof) {
         return $proof
     }
@@ -250,7 +238,7 @@ function Invoke-NotepadPasteProof {
         }
 
         $proof["verified"] = $true
-        $proof["file"] = Get-FileProof -Path $NotepadPasteProofPath
+        $proof["file"] = Get-RomaWindowsFileProof -Path $NotepadPasteProofPath
         Write-Host "notepad_paste_file=$NotepadPasteProofPath"
         Write-Host "notepad_paste_verified=true"
         return $proof
@@ -313,11 +301,11 @@ function Write-ProofReport {
     }
     $installedRunScriptPath = Join-Path $InstallDir "run-windows-agent.ps1"
     $fileProofs = [ordered]@{
-        packaged_agent = (Get-FileHashProof -Path $agentPath)
-        packaged_proof_agent = (Get-FileHashProof -Path $script:proofAgentPath)
-        packaged_whisper_cli_mock = (Get-FileHashProof -Path $script:packagedWhisperCLI)
-        installed_agent = (Get-FileHashProof -Path (Join-Path $InstallDir "RomaWindowsAgent.exe"))
-        installed_proof_agent = (Get-FileHashProof -Path (Join-Path $InstallDir "RomaProofAgent.exe"))
+        packaged_agent = (Get-RomaWindowsFileHashProof -Path $agentPath)
+        packaged_proof_agent = (Get-RomaWindowsFileHashProof -Path $script:proofAgentPath)
+        packaged_whisper_cli_mock = (Get-RomaWindowsFileHashProof -Path $script:packagedWhisperCLI)
+        installed_agent = (Get-RomaWindowsFileHashProof -Path (Join-Path $InstallDir "RomaWindowsAgent.exe"))
+        installed_proof_agent = (Get-RomaWindowsFileHashProof -Path (Join-Path $InstallDir "RomaProofAgent.exe"))
     }
     Add-RomaWindowsProofFields `
         -Proof $fileProofs `
@@ -449,7 +437,10 @@ $script:installedScriptParseOutput = ""
 $script:installedConfigDoctorOutput = ""
 $script:packagedNativeDoctorOutputs = New-RomaWindowsNativeDoctorOutputTable
 $script:installedLauncherDoctorOutput = ""
-$script:notepadPasteProof = New-NotepadPasteProof
+$script:notepadPasteProof = New-RomaWindowsNotepadPasteProof `
+    -Requested $RunNotepadPasteProof.IsPresent `
+    -Text $PasteProofText `
+    -Path $NotepadPasteProofPath
 
 Invoke-Step "artifact files" {
     Require-File -Path $agentPath

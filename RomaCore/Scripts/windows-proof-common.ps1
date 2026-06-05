@@ -2308,6 +2308,25 @@ function Get-RomaWindowsShortcutProof {
     return $proof
 }
 
+function New-RomaWindowsNotepadPasteProof {
+    param(
+        [bool]$Requested = $false,
+        [string]$Text = "",
+        [string]$Path = ""
+    )
+
+    return [ordered]@{
+        requested = $Requested
+        text = $Text
+        output_present = $false
+        target_process_id = 0
+        paste_sent = $false
+        text_found = $false
+        verified = $false
+        file = Get-RomaWindowsFileProof -Path $Path
+    }
+}
+
 function Add-RomaWindowsAgentConfigurationArgs {
     param(
         [string[]]$Arguments = @(),

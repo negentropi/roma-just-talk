@@ -4,12 +4,14 @@
 
 - Shared installed Windows agent config-file proof shaping through proof-helper helpers.
 - Shared installed Windows shortcut proof shaping through proof-helper helpers.
+- Shared installed Windows Notepad paste proof initialization through proof-helper helpers.
 - Shared installed Windows listener-smoke report path proof shaping through proof-helper helpers.
 - Shared installed Windows listener runtime output assertions through proof-helper marker maps.
 - Shared Windows script-parse proof markers through proof-helper marker maps.
 - Shared Windows native-doctor proof markers through proof-helper marker maps.
 - Shared packaged and installed Windows listener-smoke proof markers through proof-helper marker maps.
 - Shared Windows laptop preflight hotkey, microphone, and local-whisper proof markers through proof-helper marker maps.
+- Unwrapped noisy markdown emphasis around fragments exposed after correction lead-ins in mid-sentence hotkey dictation.
 - Removed generated hash, numbered, and bullet markers exposed after correction lead-ins in mid-sentence hotkey dictation.
 - Unwrapped square-bracketed final-word fragments after correction lead-ins in mid-sentence hotkey dictation.
 - Preserved explicit punctuation commands after correction-marked "final word" continuations.

@@ -1593,6 +1593,62 @@ struct RomaCoreChecks {
             "shared insertion polish should remove noisy question marks from mid-sentence fragments"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Model!",
+                context: midSentenceContext,
+                preservesTerminalPunctuation: true
+            ) == "model!",
+            "shared insertion polish should preserve explicit exclamation commands in mid-sentence fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Model?",
+                context: midSentenceContext,
+                preservesTerminalPunctuation: true
+            ) == "model?",
+            "shared insertion polish should preserve explicit question commands in mid-sentence fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Model.",
+                context: midSentenceContext,
+                preservesTerminalPunctuation: true
+            ) == "model.",
+            "shared insertion polish should preserve explicit period commands in mid-sentence fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Model...",
+                context: midSentenceContext,
+                preservesTerminalPunctuation: true
+            ) == "model...",
+            "shared insertion polish should preserve explicit ellipsis commands in mid-sentence fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.terminalSpokenPunctuationOutput(in: "Model exclamation mark.") == "!",
+            "shared filter should detect terminal exclamation commands"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.terminalSpokenPunctuationOutput(in: "Model exclamation mark!") == "!",
+            "shared filter should detect terminal exclamation commands with auto punctuation"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.terminalSpokenPunctuationOutput(in: "Model question mark?") == "?",
+            "shared filter should detect terminal question commands with auto punctuation"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.terminalSpokenPunctuationOutput(in: "Model period.") == ".",
+            "shared filter should detect terminal period commands"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.terminalSpokenPunctuationOutput(in: "Model ellipsis.") == "...",
+            "shared filter should detect terminal ellipsis commands"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.terminalSpokenPunctuationOutput(in: "This is a trial period.") == nil,
+            "shared filter should not treat prose period as a terminal punctuation command"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("Model -", context: midSentenceContext) == "model",
             "shared insertion polish should remove noisy hyphens from mid-sentence fragments"
         )
@@ -7891,6 +7947,67 @@ struct RomaCoreChecks {
         try require(
             await midSentenceInserter.pastedText == " model",
             "pipeline should paste mid-sentence polished text"
+        )
+
+        func requireMidSentenceSpokenPunctuationPipeline(
+            rawText: String,
+            expectedText: String,
+            fileName: String
+        ) async throws {
+            let punctuationRecorder = FakeRecorder()
+            let punctuationInserter = FakeTextInsertion()
+            let punctuationPipeline = DictationPipeline(
+                recorder: punctuationRecorder,
+                transcriptionService: FakeTranscriptionService(
+                    expectedFileName: fileName,
+                    text: rawText
+                ),
+                textInsertion: punctuationInserter
+            )
+            let punctuationRequest = DictationPipelineRequest(
+                outputURL: URL(fileURLWithPath: "/tmp/\(fileName)"),
+                model: model,
+                shouldInsertTranscription: true,
+                textProcessing: DictationTextProcessingConfiguration(
+                    insertionContext: TextInsertionContext(precedingText: "...so this")
+                )
+            )
+
+            try await punctuationRecorder.startPreRollBuffering()
+            let punctuationResult = try await punctuationPipeline.runRecordingWindow(punctuationRequest) {}
+            try require(
+                punctuationResult.processedText == expectedText,
+                "pipeline should preserve explicit spoken punctuation for \(rawText)"
+            )
+            try require(
+                punctuationResult.session.insertedText == expectedText,
+                "pipeline session should store explicit spoken punctuation for \(rawText)"
+            )
+            try require(
+                await punctuationInserter.pastedText == expectedText,
+                "pipeline should paste explicit spoken punctuation for \(rawText)"
+            )
+        }
+
+        try await requireMidSentenceSpokenPunctuationPipeline(
+            rawText: "Model exclamation mark.",
+            expectedText: " model!",
+            fileName: "mid-sentence-exclamation-command-proof.wav"
+        )
+        try await requireMidSentenceSpokenPunctuationPipeline(
+            rawText: "Model question mark?",
+            expectedText: " model?",
+            fileName: "mid-sentence-question-command-proof.wav"
+        )
+        try await requireMidSentenceSpokenPunctuationPipeline(
+            rawText: "Model period.",
+            expectedText: " model.",
+            fileName: "mid-sentence-period-command-proof.wav"
+        )
+        try await requireMidSentenceSpokenPunctuationPipeline(
+            rawText: "Model ellipsis.",
+            expectedText: " model...",
+            fileName: "mid-sentence-ellipsis-command-proof.wav"
         )
 
         let bracketedFragmentRecorder = FakeRecorder()

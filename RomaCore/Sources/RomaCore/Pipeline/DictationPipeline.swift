@@ -157,6 +157,8 @@ public final class DictationPipeline: @unchecked Sendable {
         _ text: String,
         using configuration: DictationTextProcessingConfiguration
     ) -> String {
+        let preservesTerminalPunctuation =
+            RomaTranscriptionOutputFilter.terminalSpokenPunctuationOutput(in: text) != nil
         let filteredText = RomaTranscriptionOutputFilter.filter(
             text,
             removesFillerWords: configuration.removesFillerWords,
@@ -177,7 +179,11 @@ public final class DictationPipeline: @unchecked Sendable {
                 selectedText: $0.selectedText
             )
         }
-        let polishedText = RomaTranscriptionOutputFilter.applyInsertionPolish(cleanedText, context: context)
+        let polishedText = RomaTranscriptionOutputFilter.applyInsertionPolish(
+            cleanedText,
+            context: context,
+            preservesTerminalPunctuation: preservesTerminalPunctuation
+        )
         return RomaTranscriptionOutputFilter.applyInsertionSpacing(polishedText, context: context)
     }
 }

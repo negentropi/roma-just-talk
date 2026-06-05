@@ -1406,7 +1406,40 @@ public struct RomaTranscriptionOutputFilter {
         return regex.firstMatch(in: text, range: range) != nil
     }
 
+    public static func terminalSpokenPunctuationOutput(in text: String) -> String? {
+        let normalizedText = normalizeWhitespace(text)
+        for command in spokenPunctuationCommands {
+            guard let regex = try? NSRegularExpression(pattern: command.pattern) else {
+                continue
+            }
+
+            let fullRange = NSRange(normalizedText.startIndex..., in: normalizedText)
+            let matches = regex.matches(in: normalizedText, range: fullRange).reversed()
+            for match in matches {
+                guard let range = Range(match.range, in: normalizedText),
+                      shouldApplySpokenPunctuationCommand(command, in: normalizedText, commandRange: range),
+                      isTerminalSpokenPunctuationCommandSuffix(
+                        String(normalizedText[range.upperBound...])
+                      ) else {
+                    continue
+                }
+
+                return command.output
+            }
+        }
+
+        return nil
+    }
+
     public static func applyInsertionPolish(_ text: String, context: TextInsertionContext?) -> String {
+        applyInsertionPolish(text, context: context, preservesTerminalPunctuation: false)
+    }
+
+    public static func applyInsertionPolish(
+        _ text: String,
+        context: TextInsertionContext?,
+        preservesTerminalPunctuation: Bool
+    ) -> String {
         let leadingNewlineCount = leadingNewlineCount(in: text)
         let activeContext = leadingNewlineCount > 0 ? nil : context
         let polishInput = text.dropFirst(leadingNewlineCount)
@@ -1470,10 +1503,14 @@ public struct RomaTranscriptionOutputFilter {
                 polishedText = unwrapPlainNonASCIIBoundaryContinuationFragment(from: polishedText)
             }
             if wasWholeSquareBracketedOutput {
-                polishedText = removeTrailingNoisyFragmentPunctuation(from: polishedText)
+                if !preservesTerminalPunctuation {
+                    polishedText = removeTrailingNoisyFragmentPunctuation(from: polishedText)
+                }
             } else {
                 let textBeforeTrailingCleanup = polishedText
-                polishedText = removeTrailingShortFragmentPunctuation(from: polishedText)
+                if !preservesTerminalPunctuation {
+                    polishedText = removeTrailingShortFragmentPunctuation(from: polishedText)
+                }
                 if let activeContext,
                    isContinuingSentence(after: activeContext.precedingText) {
                     polishedText = unwrapNoisyPreservedBoundaryContinuationFragment(
@@ -1494,7 +1531,9 @@ public struct RomaTranscriptionOutputFilter {
             guard isContinuingSentence(after: activeContext.precedingText) else {
                 return restoreLeadingNewlines(leadingNewlineCount, to: polishedText)
             }
-            polishedText = removeTrailingContinuationPeriod(from: polishedText)
+            if !preservesTerminalPunctuation {
+                polishedText = removeTrailingContinuationPeriod(from: polishedText)
+            }
             polishedText = removeLeadingContextOverlapFromContinuation(
                 from: polishedText,
                 after: activeContext.precedingText
@@ -5024,6 +5063,15 @@ public struct RomaTranscriptionOutputFilter {
 
         guard didDropPunctuation else { return nil }
         return String(text[suffixStart...])
+    }
+
+    private static func isTerminalSpokenPunctuationCommandSuffix(_ text: String) -> Bool {
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedText.isEmpty else { return true }
+
+        return trimmedText.allSatisfy { character in
+            character.unicodeScalars.allSatisfy { phraseBoundaryPunctuation.contains($0) }
+        }
     }
 
     private static func formatInlineNumberedLists(in text: String) -> String {

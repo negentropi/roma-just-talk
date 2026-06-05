@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Trimmed what-I-said replacement markers before bracketed final-word fragments.
 - Trimmed whole/last pronoun-unit correction markers before bracketed final-word fragments.
 - Trimmed pronoun-unit correction markers such as "delete that bit" before bracketed final-word fragments.
 - Trimmed couple/few previous-unit correction markers before bracketed final-word fragments.

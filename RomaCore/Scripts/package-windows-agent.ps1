@@ -501,31 +501,32 @@ try {
     $agentSource = Resolve-ProductExecutable -BuildDirectory $buildDirectory -Configuration $Configuration -Name "RomaWindowsAgent"
     $proofAgentSource = Resolve-ProductExecutable -BuildDirectory $buildDirectory -Configuration $Configuration -Name "RomaProofAgent"
     $mockWhisperSource = Resolve-ProductExecutable -BuildDirectory $buildDirectory -Configuration $Configuration -Name "RomaWhisperCLIMock"
+    $sourceArtifactPaths = Get-RomaWindowsAgentArtifactPathSet -ArtifactDir $PSScriptRoot
     $outputArtifactPaths = Get-RomaWindowsAgentArtifactPathSet -ArtifactDir $OutputDir
     $agentOutput = $outputArtifactPaths["agent"]
     $proofAgentOutput = $outputArtifactPaths["proof_agent"]
     $mockWhisperOutput = $outputArtifactPaths["whisper_cli_mock"]
-    $smokeScriptSource = Join-Path $PSScriptRoot "smoke-windows-agent.ps1"
+    $smokeScriptSource = $sourceArtifactPaths["smoke_script"]
     $smokeScriptOutput = $outputArtifactPaths["smoke_script"]
-    $runScriptSource = Join-Path $PSScriptRoot "run-windows-agent.ps1"
+    $runScriptSource = $sourceArtifactPaths["run_script"]
     $runScriptOutput = $outputArtifactPaths["run_script"]
-    $installScriptSource = Join-Path $PSScriptRoot "install-windows-agent.ps1"
+    $installScriptSource = $sourceArtifactPaths["install_script"]
     $installScriptOutput = $outputArtifactPaths["install_script"]
-    $proofScriptSource = Join-Path $PSScriptRoot "prove-windows-agent-artifact.ps1"
+    $proofScriptSource = $sourceArtifactPaths["proof_script"]
     $proofScriptOutput = $outputArtifactPaths["proof_script"]
-    $laptopProofScriptSource = Join-Path $PSScriptRoot "run-windows-laptop-proof.ps1"
+    $laptopProofScriptSource = $sourceArtifactPaths["laptop_proof_script"]
     $laptopProofScriptOutput = $outputArtifactPaths["laptop_proof_script"]
-    $parseScriptSource = Join-Path $PSScriptRoot "check-windows-scripts-parse.ps1"
+    $parseScriptSource = $sourceArtifactPaths["parse_script"]
     $parseScriptOutput = $outputArtifactPaths["parse_script"]
-    $identityScriptSource = Join-Path $PSScriptRoot "windows-package-identity.ps1"
+    $identityScriptSource = $sourceArtifactPaths["package_identity_script"]
     $identityScriptOutput = $outputArtifactPaths["package_identity_script"]
-    $proofCommonScriptSource = Join-Path $PSScriptRoot "windows-proof-common.ps1"
+    $proofCommonScriptSource = $sourceArtifactPaths["proof_common_script"]
     $proofCommonScriptOutput = $outputArtifactPaths["proof_common_script"]
-    $manifestScriptSource = Join-Path $PSScriptRoot "windows-manifest.ps1"
+    $manifestScriptSource = $sourceArtifactPaths["manifest_script"]
     $manifestScriptOutput = $outputArtifactPaths["manifest_script"]
-    $checkReportScriptSource = Join-Path $PSScriptRoot "check-windows-proof-report.ps1"
+    $checkReportScriptSource = $sourceArtifactPaths["check_report_script"]
     $checkReportScriptOutput = $outputArtifactPaths["check_report_script"]
-    $checkSetScriptSource = Join-Path $PSScriptRoot "check-windows-proof-set.ps1"
+    $checkSetScriptSource = $sourceArtifactPaths["check_set_script"]
     $checkSetScriptOutput = $outputArtifactPaths["check_set_script"]
     $laptopProofGuideOutput = $outputArtifactPaths["laptop_proof_guide"]
     $configPath = $outputArtifactPaths["sample_config"]
@@ -554,7 +555,7 @@ try {
 
         $pdbSource = [System.IO.Path]::ChangeExtension($agentSource.FullName, ".pdb")
         if (Test-Path -LiteralPath $pdbSource) {
-            $pdbOutput = Join-Path $OutputDir "RomaWindowsAgent.pdb"
+            $pdbOutput = $outputArtifactPaths["agent_pdb"]
             Copy-Item -LiteralPath $pdbSource -Destination $pdbOutput -Force
             Write-Host "agent_pdb=$pdbOutput"
         }
@@ -569,7 +570,7 @@ try {
 
         $proofAgentPdbSource = [System.IO.Path]::ChangeExtension($proofAgentSource.FullName, ".pdb")
         if (Test-Path -LiteralPath $proofAgentPdbSource) {
-            $proofAgentPdbOutput = Join-Path $OutputDir "RomaProofAgent.pdb"
+            $proofAgentPdbOutput = $outputArtifactPaths["proof_agent_pdb"]
             Copy-Item -LiteralPath $proofAgentPdbSource -Destination $proofAgentPdbOutput -Force
             Write-Host "proof_agent_pdb=$proofAgentPdbOutput"
         }

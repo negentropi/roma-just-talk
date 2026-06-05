@@ -112,6 +112,8 @@ function Get-RomaWindowsAgentArtifactPathSet {
         agent = Join-Path $ArtifactDir "RomaWindowsAgent.exe"
         proof_agent = Join-Path $ArtifactDir "RomaProofAgent.exe"
         whisper_cli_mock = Join-Path $ArtifactDir "RomaWhisperCLIMock.exe"
+        agent_pdb = Join-Path $ArtifactDir "RomaWindowsAgent.pdb"
+        proof_agent_pdb = Join-Path $ArtifactDir "RomaProofAgent.pdb"
         smoke_script = Join-Path $ArtifactDir "smoke-windows-agent.ps1"
         run_script = Join-Path $ArtifactDir "run-windows-agent.ps1"
         install_script = Join-Path $ArtifactDir "install-windows-agent.ps1"

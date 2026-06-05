@@ -412,6 +412,38 @@ function Assert-RomaWindowsProofReportFileHashEquals {
     Write-Host "proof_hash=$Name sha256=$actualHash"
 }
 
+function Assert-RomaWindowsProofReportShortcut {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Proof,
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    Assert-RomaWindowsProofReportFile -Proof $Proof -Name $Name
+    Assert-RomaWindowsProofReportNonEmptyString -Object $Proof -Name "target_path"
+    Assert-RomaWindowsProofReportNonEmptyString -Object $Proof -Name "arguments"
+    Assert-RomaWindowsProofReportNonEmptyString -Object $Proof -Name "working_directory"
+    Assert-RomaWindowsProofReportNonEmptyString -Object $Proof -Name "expected_arguments"
+    Assert-RomaWindowsProofReportBoolean -Object $Proof -Name "target_is_powershell" -Expected $true
+    Assert-RomaWindowsProofReportBoolean -Object $Proof -Name "has_exact_arguments" -Expected $true
+    Assert-RomaWindowsProofReportBoolean -Object $Proof -Name "references_run_script" -Expected $true
+    Assert-RomaWindowsProofReportNonEmptyString -Object $Proof -Name "expected_file_argument"
+    Assert-RomaWindowsProofReportBoolean -Object $Proof -Name "has_exact_file_argument" -Expected $true
+    Assert-RomaWindowsProofReportBoolean -Object $Proof -Name "has_install_dir_argument" -Expected $true
+    Assert-RomaWindowsProofReportBoolean -Object $Proof -Name "references_install_dir" -Expected $true
+    Assert-RomaWindowsProofReportNonEmptyString -Object $Proof -Name "expected_install_dir_argument"
+    Assert-RomaWindowsProofReportBoolean -Object $Proof -Name "has_exact_install_dir_argument" -Expected $true
+    Assert-RomaWindowsProofReportBoolean -Object $Proof -Name "has_config_path_argument" -Expected $true
+    Assert-RomaWindowsProofReportBoolean -Object $Proof -Name "references_config_path" -Expected $true
+    Assert-RomaWindowsProofReportNonEmptyString -Object $Proof -Name "expected_config_argument"
+    Assert-RomaWindowsProofReportBoolean -Object $Proof -Name "has_exact_config_argument" -Expected $true
+    Assert-RomaWindowsProofReportBoolean -Object $Proof -Name "has_no_profile_argument" -Expected $true
+    Assert-RomaWindowsProofReportBoolean -Object $Proof -Name "has_execution_policy_bypass" -Expected $true
+    Assert-RomaWindowsProofReportBoolean -Object $Proof -Name "runs_listener" -Expected $true
+    Assert-RomaWindowsProofReportBoolean -Object $Proof -Name "working_directory_is_install_dir" -Expected $true
+}
+
 function Get-RomaWindowsPackageIdentityFingerprint {
     param(
         [Parameter(Mandatory = $true)]

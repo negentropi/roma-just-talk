@@ -13456,8 +13456,11 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("Assert-RomaWindowsAgentShortcutContract") &&
                 proofCommonScript.contains(#"$proof["expected_arguments"] = $expectedArguments"#) &&
                 proofCommonScript.contains(#"$proof["has_exact_arguments"] = $arguments.Equals($expectedArguments"#) &&
-                checkReportScript.contains(#"Assert-NonEmptyString -Object $Proof -Name "expected_arguments""#) &&
-                checkReportScript.contains(#"Assert-Boolean -Object $Proof -Name "has_exact_arguments" -Expected $true"#) &&
+                proofCommonScript.contains("function Assert-RomaWindowsProofReportShortcut") &&
+                proofCommonScript.contains(#"Assert-RomaWindowsProofReportNonEmptyString -Object $Proof -Name "expected_arguments""#) &&
+                proofCommonScript.contains(#"Assert-RomaWindowsProofReportBoolean -Object $Proof -Name "has_exact_arguments" -Expected $true"#) &&
+                checkReportScript.contains("Set-Alias -Name Assert-ShortcutProof -Value Assert-RomaWindowsProofReportShortcut") &&
+                !checkReportScript.contains("function Assert-ShortcutProof") &&
                 !installScript.contains(#"$shortcut.TargetPath = "powershell.exe""#) &&
                 !installScript.contains(#"$shortcut.Arguments = "-NoProfile -ExecutionPolicy Bypass"#) &&
                 !installScript.contains(#"$savedShortcut.Arguments.Contains("#) &&
@@ -13697,8 +13700,8 @@ struct RomaCoreChecks {
                 proofCommonScript.contains(#"$proof["has_exact_install_dir_argument"]"#) &&
                 proveScript.contains("Get-RomaWindowsShortcutProof") &&
                 !proveScript.contains("function Get-ShortcutProof") &&
-                checkReportScript.contains(#"Assert-Boolean -Object $Proof -Name "references_install_dir" -Expected $true"#) &&
-                checkReportScript.contains(#"Assert-Boolean -Object $Proof -Name "has_exact_install_dir_argument" -Expected $true"#),
+                proofCommonScript.contains(#"Assert-RomaWindowsProofReportBoolean -Object $Proof -Name "references_install_dir" -Expected $true"#) &&
+                proofCommonScript.contains(#"Assert-RomaWindowsProofReportBoolean -Object $Proof -Name "has_exact_install_dir_argument" -Expected $true"#),
             "Windows shortcut proof reports should require exact install-dir launcher arguments"
         )
         try require(

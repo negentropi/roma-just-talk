@@ -166,7 +166,7 @@ public final class DictationPipeline: @unchecked Sendable {
         )
         let replacedText = RomaWordReplacementProcessor.apply(
             configuration.wordReplacements,
-            to: filteredText.trimmingCharacters(in: .whitespaces)
+            to: Self.trimmingBoundarySpaces(from: filteredText)
         )
         let cleanedText = RomaTranscriptionOutputFilter.applyCleanupPreferences(
             replacedText,
@@ -195,5 +195,16 @@ public final class DictationPipeline: @unchecked Sendable {
         return text.contains { character in
             character.isNewline || character == "\t"
         }
+    }
+
+    private static func trimmingBoundarySpaces(from text: String) -> String {
+        var result = text
+        while result.first == " " {
+            result.removeFirst()
+        }
+        while result.last == " " {
+            result.removeLast()
+        }
+        return result
     }
 }

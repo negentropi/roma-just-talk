@@ -1223,10 +1223,10 @@ public struct RomaTranscriptionOutputFilter {
         if cleanupLevel == .polished {
             filteredText = applyBacktrackingCorrections(in: filteredText)
         }
-        let leadingFormattingNewlineCount = leadingSpokenFormattingNewlineCount(in: filteredText)
         filteredText = applySpokenFormattingCommands(in: filteredText)
-        filteredText = removeGeneratedTerminalPunctuationAfterFormattingNewline(from: filteredText)
-        let trailingFormattingNewlineCount = trailingNewlineCount(in: filteredText)
+        filteredText = removeGeneratedTerminalPunctuationAfterFormattingWhitespace(from: filteredText)
+        let leadingFormattingWhitespace = leadingStructuralWhitespace(in: filteredText)
+        let trailingFormattingWhitespace = trailingStructuralWhitespace(in: filteredText)
         if cleanupLevel == .polished {
             filteredText = applyDeletePreviousLineCommands(in: filteredText)
             filteredText = applyDeletePreviousParagraphCommands(in: filteredText)
@@ -1271,8 +1271,8 @@ public struct RomaTranscriptionOutputFilter {
         // Clean whitespace
         filteredText = normalizeWhitespace(filteredText)
         filteredText = applyNestedBulletCommands(in: filteredText)
-        filteredText = restoreLeadingNewlines(leadingFormattingNewlineCount, to: filteredText)
-        filteredText = restoreTrailingNewlines(trailingFormattingNewlineCount, to: filteredText)
+        filteredText = restoreLeadingStructuralWhitespace(leadingFormattingWhitespace, to: filteredText)
+        filteredText = restoreTrailingStructuralWhitespace(trailingFormattingWhitespace, to: filteredText)
 
         return filteredText
     }
@@ -1456,16 +1456,16 @@ public struct RomaTranscriptionOutputFilter {
         context: TextInsertionContext?,
         preservesTerminalPunctuation: Bool
     ) -> String {
-        let leadingNewlineCount = leadingNewlineCount(in: text)
-        let textAfterLeadingNewlines = String(text.dropFirst(leadingNewlineCount))
-        let trailingNewlineCount = trailingNewlineCount(in: textAfterLeadingNewlines)
-        let activeContext = leadingNewlineCount > 0 ? nil : context
-        let polishInput = textAfterLeadingNewlines.dropLast(trailingNewlineCount)
+        let leadingStructuralWhitespace = leadingStructuralWhitespace(in: text)
+        let textAfterLeadingStructuralWhitespace = String(text.dropFirst(leadingStructuralWhitespace.count))
+        let trailingStructuralWhitespace = trailingStructuralWhitespace(in: textAfterLeadingStructuralWhitespace)
+        let activeContext = leadingStructuralWhitespace.isEmpty ? context : nil
+        let polishInput = textAfterLeadingStructuralWhitespace.dropLast(trailingStructuralWhitespace.count)
         let normalizedText = normalizeWhitespace(String(polishInput))
 
         if activeContext != nil,
            let enclosure = standaloneSpokenEnclosureOutput(in: normalizedText) {
-            return restoreInsertionNewlines(leadingNewlineCount, trailingNewlineCount, to: enclosure)
+            return restoreInsertionStructuralWhitespace(leadingStructuralWhitespace, trailingStructuralWhitespace, to: enclosure)
         }
 
         let wasWholeSquareBracketedOutput = isWholeSquareBracketedOutput(normalizedText)
@@ -1473,7 +1473,7 @@ public struct RomaTranscriptionOutputFilter {
         polishedText = removeRedundantOuterPunctuationAfterPreservedBoundary(from: polishedText)
         polishedText = removeLeadingPausePunctuation(from: polishedText)
         guard !polishedText.isEmpty else {
-            return restoreInsertionNewlines(leadingNewlineCount, trailingNewlineCount, to: polishedText)
+            return restoreInsertionStructuralWhitespace(leadingStructuralWhitespace, trailingStructuralWhitespace, to: polishedText)
         }
 
         let isContinuingInsertion = activeContext.map { isContinuingSentence(after: $0.precedingText) } ?? false
@@ -1542,12 +1542,12 @@ public struct RomaTranscriptionOutputFilter {
         if let activeContext,
            let punctuation = standaloneSpokenPunctuationOutput(in: polishedText),
            canAttachStandalonePunctuation(after: activeContext.precedingText) {
-            return restoreInsertionNewlines(leadingNewlineCount, trailingNewlineCount, to: punctuation)
+            return restoreInsertionStructuralWhitespace(leadingStructuralWhitespace, trailingStructuralWhitespace, to: punctuation)
         }
 
         if let activeContext {
             guard isContinuingSentence(after: activeContext.precedingText) else {
-                return restoreInsertionNewlines(leadingNewlineCount, trailingNewlineCount, to: polishedText)
+                return restoreInsertionStructuralWhitespace(leadingStructuralWhitespace, trailingStructuralWhitespace, to: polishedText)
             }
             if !preservesTerminalPunctuation {
                 polishedText = removeTrailingContinuationPeriod(from: polishedText)
@@ -1558,19 +1558,19 @@ public struct RomaTranscriptionOutputFilter {
             )
             polishedText = replaceUnpunctuatedCorrectionMarkerInContinuation(from: polishedText)
             polishedText = applyTrailingSpokenCodeCaseCommandInContinuation(from: polishedText)
-            return restoreInsertionNewlines(
-                leadingNewlineCount,
-                trailingNewlineCount,
+            return restoreInsertionStructuralWhitespace(
+                leadingStructuralWhitespace,
+                trailingStructuralWhitespace,
                 to: lowercaseFragmentWordsIfSafe(in: polishedText, allowsPredicateTailWords: true)
             )
         }
 
         guard shouldUseFragmentPolish else {
-            return restoreInsertionNewlines(leadingNewlineCount, trailingNewlineCount, to: polishedText)
+            return restoreInsertionStructuralWhitespace(leadingStructuralWhitespace, trailingStructuralWhitespace, to: polishedText)
         }
-        return restoreInsertionNewlines(
-            leadingNewlineCount,
-            trailingNewlineCount,
+        return restoreInsertionStructuralWhitespace(
+            leadingStructuralWhitespace,
+            trailingStructuralWhitespace,
             to: lowercaseFragmentWordsIfSafe(in: polishedText)
         )
     }
@@ -5738,8 +5738,8 @@ public struct RomaTranscriptionOutputFilter {
         )
     }
 
-    private static func removeGeneratedTerminalPunctuationAfterFormattingNewline(from text: String) -> String {
-        guard let regex = try? NSRegularExpression(pattern: #"(\n+)[ \t]*(?:[.!?…]+|[。！？]+)[ \t]*$"#) else {
+    private static func removeGeneratedTerminalPunctuationAfterFormattingWhitespace(from text: String) -> String {
+        guard let regex = try? NSRegularExpression(pattern: #"([\n\t]+)[ \t]*(?:[.!?…]+|[。！？]+)[ \t]*$"#) else {
             return text
         }
 
@@ -5812,96 +5812,46 @@ public struct RomaTranscriptionOutputFilter {
         return nil
     }
 
-    private static func leadingSpokenFormattingNewlineCount(in text: String) -> Int {
-        for command in spokenFormattingCommands where command.replacement == "\n" || command.replacement == "\n\n" {
-            if let count = leadingSpokenFormattingNewlineCount(
-                in: text,
-                pattern: command.pattern,
-                replacement: command.replacement,
-                blockedNextWords: []
-            ) {
-                return count
-            }
-        }
-
-        for command in guardedSpokenFormattingCommands where command.replacement == "\n" || command.replacement == "\n\n" {
-            if let count = leadingSpokenFormattingNewlineCount(
-                in: text,
-                pattern: command.pattern,
-                replacement: command.replacement,
-                blockedNextWords: command.blockedNextWords
-            ) {
-                return count
-            }
-        }
-
-        return 0
-    }
-
-    private static func leadingSpokenFormattingNewlineCount(
-        in text: String,
-        pattern: String,
-        replacement: String,
-        blockedNextWords: Set<String>
-    ) -> Int? {
-        guard let regex = try? NSRegularExpression(pattern: pattern),
-              let match = regex.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)),
-              let matchRange = Range(match.range, in: text) else {
-            return nil
-        }
-
-        let prefix = text[..<matchRange.lowerBound]
-        guard prefix.allSatisfy(\.isWhitespace) else { return nil }
-
-        let suffix = String(text[matchRange.upperBound...])
-        if let nextWord = nextWord(in: suffix),
-           blockedNextWords.contains(nextWord) {
-            return nil
-        }
-
-        return replacement.filter(\.isNewline).count
-    }
-
-    private static func restoreLeadingNewlines(_ count: Int, to text: String) -> String {
-        guard count > 0,
-              text.first?.isNewline != true else {
+    private static func restoreLeadingStructuralWhitespace(_ prefix: String, to text: String) -> String {
+        guard !prefix.isEmpty,
+              text.first.map({ !$0.isNewline && $0 != "\t" }) ?? true else {
             return text
         }
 
-        return String(repeating: "\n", count: count) + text
+        return prefix + text
     }
 
-    private static func restoreTrailingNewlines(_ count: Int, to text: String) -> String {
-        guard count > 0,
-              text.last?.isNewline != true else {
+    private static func restoreTrailingStructuralWhitespace(_ suffix: String, to text: String) -> String {
+        guard !suffix.isEmpty,
+              text.last.map({ !$0.isNewline && $0 != "\t" }) ?? true else {
             return text
         }
 
-        return text + String(repeating: "\n", count: count)
+        return text + suffix
     }
 
-    private static func restoreInsertionNewlines(_ leadingCount: Int, _ trailingCount: Int, to text: String) -> String {
-        var restoredText = restoreLeadingNewlines(leadingCount, to: text)
-        restoredText = restoreTrailingNewlines(trailingCount, to: restoredText)
+    private static func restoreInsertionStructuralWhitespace(_ prefix: String, _ suffix: String, to text: String) -> String {
+        var restoredText = restoreLeadingStructuralWhitespace(prefix, to: text)
+        restoredText = restoreTrailingStructuralWhitespace(suffix, to: restoredText)
         return restoredText
     }
 
-    private static func leadingNewlineCount(in text: String) -> Int {
-        var count = 0
+    private static func leadingStructuralWhitespace(in text: String) -> String {
+        var result = ""
         for character in text {
-            guard character.isNewline else { break }
-            count += 1
+            guard character.isNewline || character == "\t" else { break }
+            result.append(character)
         }
-        return count
+        return result
     }
 
-    private static func trailingNewlineCount(in text: String) -> Int {
-        var count = 0
+    private static func trailingStructuralWhitespace(in text: String) -> String {
+        var result = ""
         for character in text.reversed() {
-            guard character.isNewline else { break }
-            count += 1
+            guard character.isNewline || character == "\t" else { break }
+            result.insert(character, at: result.startIndex)
         }
-        return count
+        return result
     }
 
     private static func applyBacktrackingCorrections(in text: String) -> String {

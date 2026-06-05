@@ -2140,6 +2140,14 @@ struct RomaCoreChecks {
             "shared insertion polish should preserve standalone line break output"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Column one\t", context: midSentenceContext) == "Column one\t",
+            "shared insertion polish should preserve trailing tab commands"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("\t", context: midSentenceContext) == "\t",
+            "shared insertion polish should preserve standalone tab output"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionSpacing("model", context: midSentenceContext) == " model",
             "shared insertion spacing should add a leading space after words"
         )
@@ -5309,6 +5317,21 @@ struct RomaCoreChecks {
                 "Column one hit tab key column two.",
                 "Column one\tcolumn two.",
                 "hit tab key command"
+            ),
+            (
+                "Column one press tab.",
+                "Column one\t",
+                "terminal press tab command should drop generated period"
+            ),
+            (
+                "Press tab.",
+                "\t",
+                "standalone press tab command should drop generated period"
+            ),
+            (
+                "Hit tab key.",
+                "\t",
+                "standalone hit tab key command should drop generated period"
             ),
             (
                 "Bullet parent indent bullet child outdent bullet sibling.",
@@ -10081,6 +10104,43 @@ struct RomaCoreChecks {
         try require(
             await standaloneNewlineInserter.pastedText == "\n",
             "pipeline should paste standalone structural newline output"
+        )
+
+        let standaloneTabRecorder = FakeRecorder()
+        let standaloneTabInserter = FakeTextInsertion()
+        let standaloneTabPipeline = DictationPipeline(
+            recorder: standaloneTabRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "standalone-tab-proof.wav",
+                text: "Press tab."
+            ),
+            textInsertion: standaloneTabInserter
+        )
+        let standaloneTabRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/standalone-tab-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await standaloneTabRecorder.startPreRollBuffering()
+        let standaloneTabResult = try await standaloneTabPipeline.runRecordingWindow(
+            standaloneTabRequest
+        ) {}
+
+        try require(
+            standaloneTabResult.processedText == "\t",
+            "pipeline should clean standalone tab commands to a tab"
+        )
+        try require(
+            standaloneTabResult.session.insertedText == "\t",
+            "pipeline session should store standalone structural tab output"
+        )
+        try require(
+            await standaloneTabInserter.pastedText == "\t",
+            "pipeline should paste standalone structural tab output"
         )
 
         let fillerOnlyRecorder = FakeRecorder()

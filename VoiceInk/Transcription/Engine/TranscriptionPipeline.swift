@@ -144,7 +144,7 @@ class TranscriptionPipeline {
             if shouldCancel() { await finishCanceledTranscription(); return }
 
             let filteredText = text
-            text = text.trimmingCharacters(in: .whitespacesAndNewlines)
+            text = trimmingBoundarySpaces(from: text)
             logCleanupStage("trim", before: filteredText, after: text)
 
             if UserDefaults.standard.bool(forKey: "IsTextFormattingEnabled") {
@@ -313,5 +313,16 @@ class TranscriptionPipeline {
         return text.contains { character in
             character.isNewline || character == "\t"
         }
+    }
+
+    private func trimmingBoundarySpaces(from text: String) -> String {
+        var result = text
+        while result.first == " " {
+            result.removeFirst()
+        }
+        while result.last == " " {
+            result.removeLast()
+        }
+        return result
     }
 }

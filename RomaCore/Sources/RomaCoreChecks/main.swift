@@ -12854,7 +12854,7 @@ struct RomaCoreChecks {
             "Windows manifest parsing should be computed by one shared packaged helper"
         )
         try require(
-                proofCommonScript.contains("function Invoke-RomaWindowsProofStep") &&
+            proofCommonScript.contains("function Invoke-RomaWindowsProofStep") &&
                 proofCommonScript.contains("function Resolve-RomaWindowsFullPath") &&
                 proofCommonScript.contains("function Get-RomaWindowsDefaultInstallDir") &&
                 proofCommonScript.contains("function Get-RomaWindowsUserAgentConfigPath") &&

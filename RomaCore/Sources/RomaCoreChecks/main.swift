@@ -11210,9 +11210,14 @@ struct RomaCoreChecks {
         try require(
             proofCommonScript.contains("function Write-RomaWindowsHoldDictationPrompt") &&
                 proofCommonScript.contains("function Write-RomaWindowsDictationOperatorPrompt") &&
+                proofCommonScript.contains("function Write-RomaWindowsHotkeyDeliveryPreflightPrompt") &&
+                proofCommonScript.contains("function Write-RomaWindowsNotepadPastePrompt") &&
                 proofCommonScript.contains("focus_target=normal_text_field_or_notepad") &&
                 proofCommonScript.contains("speak_before_pressing_hotkey=true") &&
                 proofCommonScript.contains("release_hotkey_to_finish=true") &&
+                proofCommonScript.contains("press_and_release_hotkey=true") &&
+                proofCommonScript.contains("notepad=will_open_and_verify_file") &&
+                proofCommonScript.contains("manual_focus_required=false") &&
                 proofCommonScript.contains("toggle_hotkey=Ctrl+Shift+R") &&
                 proofCommonScript.contains("speak_after_hotkey=true") &&
                 proofCommonScript.contains("paste_focus_target=normal_integrity_text_field") &&
@@ -11221,6 +11226,8 @@ struct RomaCoreChecks {
                 proveScript.contains("Write-RomaWindowsHoldDictationPrompt") &&
                 proveScript.contains("-ListenerSessionCount 1") &&
                 laptopProofScript.contains("Write-RomaWindowsHoldDictationPrompt") &&
+                laptopProofScript.contains("Write-RomaWindowsHotkeyDeliveryPreflightPrompt -HoldTimeoutSeconds $HoldTimeoutSeconds") &&
+                laptopProofScript.contains("Write-RomaWindowsNotepadPastePrompt") &&
                 laptopProofScript.contains("-HoldTimeoutSeconds $HoldTimeoutSeconds") &&
                 windowsProofScript.contains("Write-RomaWindowsDictationOperatorPrompt") &&
                 windowsProofScript.contains(#"-Name "source_dictation_proof""#) &&
@@ -11230,7 +11237,9 @@ struct RomaCoreChecks {
                 !windowsProofScript.contains("Say a phrase before Ctrl+Shift+R") &&
                 !smokeScript.contains("Say a phrase before Ctrl+Shift+R") &&
                 !proveScript.contains("function Write-HoldDictationPrompt") &&
-                !laptopProofScript.contains("function Write-HoldDictationPrompt"),
+                !laptopProofScript.contains("function Write-HoldDictationPrompt") &&
+                !laptopProofScript.contains("function Write-HotkeyDeliveryPreflightPrompt") &&
+                !laptopProofScript.contains("function Write-NotepadPastePrompt"),
             "Windows proof scripts should share hold-to-talk operator prompts"
         )
         try require(

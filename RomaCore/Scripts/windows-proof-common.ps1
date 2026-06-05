@@ -330,6 +330,27 @@ function Write-RomaWindowsHoldDictationPrompt {
         -ListenerSessionCount $ListenerSessionCount
 }
 
+function Write-RomaWindowsHotkeyDeliveryPreflightPrompt {
+    param(
+        [int]$HoldTimeoutSeconds = -1
+    )
+
+    Write-Host ""
+    Write-Host "ACTION_REQUIRED=hotkey_delivery_preflight"
+    Write-Host "hold_hotkey=Ctrl+Shift+R"
+    Write-Host "press_and_release_hotkey=true"
+    if ($HoldTimeoutSeconds -ge 0) {
+        Write-Host "hold_timeout_seconds=$HoldTimeoutSeconds"
+    }
+}
+
+function Write-RomaWindowsNotepadPastePrompt {
+    Write-Host ""
+    Write-Host "ACTION_REQUIRED=local_whisper_notepad_paste"
+    Write-Host "notepad=will_open_and_verify_file"
+    Write-Host "manual_focus_required=false"
+}
+
 function ConvertTo-RomaWindowsPowerShellSingleQuotedString {
     param(
         [string]$Value = ""

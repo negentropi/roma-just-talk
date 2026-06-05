@@ -58,21 +58,6 @@ if (!(Test-Path -LiteralPath $manifestScript)) {
 }
 . $manifestScript
 
-function Write-NotepadPastePrompt {
-    Write-Host ""
-    Write-Host "ACTION_REQUIRED=local_whisper_notepad_paste"
-    Write-Host "notepad=will_open_and_verify_file"
-    Write-Host "manual_focus_required=false"
-}
-
-function Write-HotkeyDeliveryPreflightPrompt {
-    Write-Host ""
-    Write-Host "ACTION_REQUIRED=hotkey_delivery_preflight"
-    Write-Host "hold_hotkey=Ctrl+Shift+R"
-    Write-Host "press_and_release_hotkey=true"
-    Write-Host "hold_timeout_seconds=$HoldTimeoutSeconds"
-}
-
 function Invoke-PermissionPreflight {
     param(
         [Parameter(Mandatory = $true)]
@@ -375,7 +360,7 @@ Invoke-Step "permission surface preflight" {
 }
 
 Invoke-Step "hotkey delivery preflight" {
-    Write-HotkeyDeliveryPreflightPrompt
+    Write-RomaWindowsHotkeyDeliveryPreflightPrompt -HoldTimeoutSeconds $HoldTimeoutSeconds
     $script:hotkeyDeliveryPreflightOutput = Invoke-HotkeyDeliveryPreflight `
         -ProofAgentPath $proofAgent `
         -TimeoutSeconds $HoldTimeoutSeconds
@@ -555,7 +540,7 @@ Invoke-Step "local whisper dictation laptop proof" {
 }
 
 Invoke-Step "local whisper Notepad paste proof" {
-    Write-NotepadPastePrompt
+    Write-RomaWindowsNotepadPastePrompt
     & $proofScript @notepadArgs
 }
 

@@ -2655,18 +2655,26 @@ public struct RomaTranscriptionOutputFilter {
     }
 
     private static func removeLeadingPauseFillerFromContinuationFragment(from text: String) -> String {
-        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        var candidate = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        var didRemoveFiller = false
         guard let regex = try? NSRegularExpression(
             pattern: #"(?i)^\s*(?:"# +
                 pauseFillerNoisePattern +
                 #")(?:[ \t]*(?:[.,;:!?…]+|\.\.\.|[-–—]+))*[ \t]+"#
-        ),
-        let match = regex.firstMatch(in: trimmedText, range: NSRange(trimmedText.startIndex..., in: trimmedText)),
-        let matchRange = Range(match.range, in: trimmedText) else {
+        ) else {
             return text
         }
 
-        let suffix = String(trimmedText[matchRange.upperBound...])
+        while let match = regex.firstMatch(in: candidate, range: NSRange(candidate.startIndex..., in: candidate)),
+              let matchRange = Range(match.range, in: candidate) {
+            candidate = String(candidate[matchRange.upperBound...])
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            didRemoveFiller = true
+        }
+
+        guard didRemoveFiller else { return text }
+
+        let suffix = candidate
             .trimmingCharacters(in: .whitespacesAndNewlines)
         let cleanedSuffix = removeLeadingAcknowledgementFillerFromContextOverlapContinuation(
             cleanDanglingGeneratedLeadInSuffix(suffix)

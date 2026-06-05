@@ -366,10 +366,7 @@ if ([string]::IsNullOrWhiteSpace($PackageDir)) {
 $PackageDir = Resolve-FullPath -Path $PackageDir
 
 if ([string]::IsNullOrWhiteSpace($InstallDir)) {
-    if ([string]::IsNullOrWhiteSpace($env:LOCALAPPDATA)) {
-        throw "LOCALAPPDATA is not set; pass -InstallDir explicitly"
-    }
-    $InstallDir = Join-Path $env:LOCALAPPDATA "roma-just-talk\agent"
+    $InstallDir = Get-RomaWindowsDefaultInstallDir
 }
 $InstallDir = Resolve-FullPath -Path $InstallDir
 

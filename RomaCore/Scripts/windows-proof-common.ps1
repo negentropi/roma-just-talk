@@ -23,6 +23,14 @@ function Resolve-RomaWindowsFullPath {
     return $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Path)
 }
 
+function Get-RomaWindowsDefaultInstallDir {
+    if ([string]::IsNullOrWhiteSpace($env:LOCALAPPDATA)) {
+        throw "LOCALAPPDATA is not set; pass -InstallDir explicitly"
+    }
+
+    return Join-Path $env:LOCALAPPDATA "roma-just-talk\agent"
+}
+
 function Require-RomaWindowsFile {
     param(
         [Parameter(Mandatory = $true)]

@@ -12856,6 +12856,7 @@ struct RomaCoreChecks {
         try require(
             proofCommonScript.contains("function Invoke-RomaWindowsProofStep") &&
                 proofCommonScript.contains("function Resolve-RomaWindowsFullPath") &&
+                proofCommonScript.contains("function Get-RomaWindowsDefaultInstallDir") &&
                 proofCommonScript.contains("function Require-RomaWindowsFile") &&
                 proofCommonScript.contains("function Assert-RomaWindowsFileWithMinimumBytes") &&
                 proofCommonScript.contains("function Get-RomaWindowsCurrentUserSid") &&
@@ -12946,6 +12947,12 @@ struct RomaCoreChecks {
         )
         try require(
             proveScript.contains("Get-RomaWindowsAgentShortcutReportPaths") &&
+                installScript.contains("$InstallDir = Get-RomaWindowsDefaultInstallDir") &&
+                runScript.contains("$InstallDir = Get-RomaWindowsDefaultInstallDir") &&
+                proveScript.contains("$InstallDir = Get-RomaWindowsDefaultInstallDir") &&
+                !installScript.contains(#"Join-Path $env:LOCALAPPDATA "roma-just-talk\agent""#) &&
+                !runScript.contains(#"Join-Path $env:LOCALAPPDATA "roma-just-talk\agent""#) &&
+                !proveScript.contains(#"Join-Path $env:LOCALAPPDATA "roma-just-talk\agent""#) &&
                 runScript.contains("$AgentPath = Join-RomaWindowsInstalledAgentPath -InstallDir $InstallDir") &&
                 installScript.contains("$installedAgent = Join-RomaWindowsInstalledAgentPath -InstallDir $InstallDir") &&
                 installScript.contains("$installedProofAgent = Join-RomaWindowsInstalledProofAgentPath -InstallDir $InstallDir") &&

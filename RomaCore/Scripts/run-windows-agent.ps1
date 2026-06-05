@@ -57,10 +57,7 @@ if ($PSBoundParameters.ContainsKey("MaxSessions") -and $MaxSessions -lt 0) {
 }
 
 if ([string]::IsNullOrWhiteSpace($InstallDir)) {
-    if ([string]::IsNullOrWhiteSpace($env:LOCALAPPDATA)) {
-        throw "LOCALAPPDATA is not set; pass -InstallDir explicitly"
-    }
-    $InstallDir = Join-Path $env:LOCALAPPDATA "roma-just-talk\agent"
+    $InstallDir = Get-RomaWindowsDefaultInstallDir
 }
 $InstallDir = Resolve-FullPath -Path $InstallDir
 

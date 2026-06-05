@@ -13312,6 +13312,9 @@ struct RomaCoreChecks {
                 packageScript.contains(#"Invoke-Step "packaged script parse check""#) &&
                 proofCommonScript.contains(#""proof_common_script""#) &&
                 !packageScript.contains("proof_common_script=$proofCommonScriptOutput") &&
+                proofCommonScript.contains("function Get-RomaWindowsAgentInstallerRequiredPackagePathKeys") &&
+                proofCommonScript.contains("function Require-RomaWindowsAgentArtifactPathKeys") &&
+                proofCommonScript.contains("function Require-RomaWindowsAgentInstallerPackageArtifacts") &&
                 proofCommonScript.contains("function Write-RomaWindowsAgentArtifactManifest") &&
                 packageScript.contains("Write-RomaWindowsAgentArtifactManifest `") &&
                 !packageScript.contains(#"$manifestScriptSource = $sourceArtifactPaths["manifest_script"]"#) &&
@@ -14095,6 +14098,11 @@ struct RomaCoreChecks {
             "Windows installer should fail early when the installed listener is running"
         )
         try require(
+            installScript.contains("Require-RomaWindowsAgentInstallerPackageArtifacts -PackageArtifactPaths $packageArtifactPaths") &&
+                !installScript.contains(#"$smokeSource = $packageArtifactPaths["smoke_script"]"#) &&
+                !installScript.contains(#"$runSource = $packageArtifactPaths["run_script"]"#) &&
+                !installScript.contains("Require-File -Path $smokeSource") &&
+                !installScript.contains("Require-File -Path $runSource") &&
             installScript.contains("$knownFiles = Get-RomaWindowsAgentArtifactInstallFiles") &&
                 !installScript.contains(#"$knownFiles = @("#) &&
                 !installScript.contains(#""RomaProofAgent.exe""#) &&
@@ -14238,6 +14246,9 @@ struct RomaCoreChecks {
                 !proofCommonScript.contains(#"count_present = $Output.Contains("windows_scripts_parse_count=")"#) &&
                 packageScript.contains("Assert-RomaWindowsScriptParseCount") &&
                 packageScript.contains("Get-RomaWindowsProofSurfaceScriptCount") &&
+                proveScript.contains(#"$installedArtifactPaths = Get-RomaWindowsAgentArtifactPathSet -ArtifactDir $InstallDir"#) &&
+                proveScript.contains(#"$installedParseScript = $installedArtifactPaths["parse_script"]"#) &&
+                !proveScript.contains(#"$installedParseScript = Join-Path $InstallDir "check-windows-scripts-parse.ps1""#) &&
                 proveScript.contains("Get-RomaWindowsScriptParseOutputProof -Output $script:installedScriptParseOutput") &&
                 !proveScript.contains("function Get-ScriptParseProof") &&
                 proveScript.contains("Get-RomaWindowsInstalledProofSurfaceScriptCount") &&

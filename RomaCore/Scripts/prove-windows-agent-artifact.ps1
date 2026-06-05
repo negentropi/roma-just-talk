@@ -382,6 +382,7 @@ if ([string]::IsNullOrWhiteSpace($NotepadPasteProofPath)) {
 $NotepadPasteProofPath = Resolve-FullPath -Path $NotepadPasteProofPath
 
 $packageArtifactPaths = Get-RomaWindowsAgentArtifactPathSet -ArtifactDir $PackageDir
+$installedArtifactPaths = Get-RomaWindowsAgentArtifactPathSet -ArtifactDir $InstallDir
 $agentPath = $packageArtifactPaths["agent"]
 $script:proofAgentPath = $packageArtifactPaths["proof_agent"]
 $smokeScript = $packageArtifactPaths["smoke_script"]
@@ -604,7 +605,7 @@ Invoke-Step "install packaged agent" {
 }
 
 Invoke-Step "installed script parse check" {
-    $installedParseScript = Join-Path $InstallDir "check-windows-scripts-parse.ps1"
+    $installedParseScript = $installedArtifactPaths["parse_script"]
     Require-File -Path $installedParseScript
     $script:installedScriptParseOutput = & $installedParseScript -ScriptsDir $InstallDir 2>&1 | Out-String
     if ($LASTEXITCODE -ne 0) {

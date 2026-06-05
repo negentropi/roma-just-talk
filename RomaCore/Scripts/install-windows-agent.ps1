@@ -147,11 +147,7 @@ $SecretDir = Resolve-RomaWindowsAgentSecretDir `
 
 $packageArtifactPaths = Get-RomaWindowsAgentArtifactPathSet -ArtifactDir $PackageDir
 $agentSource = $packageArtifactPaths["agent"]
-$smokeSource = $packageArtifactPaths["smoke_script"]
-$runSource = $packageArtifactPaths["run_script"]
-Require-File -Path $agentSource
-Require-File -Path $smokeSource
-Require-File -Path $runSource
+Require-RomaWindowsAgentInstallerPackageArtifacts -PackageArtifactPaths $packageArtifactPaths
 $installedArtifactPaths = Get-RomaWindowsAgentArtifactPathSet -ArtifactDir $InstallDir
 $installedAgent = Join-RomaWindowsInstalledAgentPath -InstallDir $InstallDir
 $installedProofAgent = Join-RomaWindowsInstalledProofAgentPath -InstallDir $InstallDir

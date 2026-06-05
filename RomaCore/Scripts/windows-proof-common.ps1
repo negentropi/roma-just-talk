@@ -358,6 +358,14 @@ function Get-RomaWindowsAgentArtifactCopiedProofSurfacePathKeys {
         Where-Object { [string]$_ -ne "laptop_proof_guide" }
 }
 
+function Get-RomaWindowsAgentInstallerRequiredPackagePathKeys {
+    return @(
+        "agent",
+        "smoke_script",
+        "run_script"
+    )
+}
+
 function Get-RomaWindowsAgentArtifactManifestPathKeys {
     return @(
         Get-RomaWindowsAgentArtifactManifestConfigPathKeys
@@ -388,6 +396,33 @@ function Get-RomaWindowsAgentArtifactFileNamesForKeys {
     foreach ($key in $Keys) {
         Get-RomaWindowsAgentArtifactFileNameForKey -Key ([string]$key)
     }
+}
+
+function Require-RomaWindowsAgentArtifactPathKeys {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$ArtifactPaths,
+        [Parameter(Mandatory = $true)]
+        [object[]]$Keys
+    )
+
+    foreach ($key in $Keys) {
+        if (!$ArtifactPaths.Contains([string]$key)) {
+            throw "Unknown Windows agent artifact key: $key"
+        }
+        Require-RomaWindowsFile -Path $ArtifactPaths[[string]$key]
+    }
+}
+
+function Require-RomaWindowsAgentInstallerPackageArtifacts {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$PackageArtifactPaths
+    )
+
+    Require-RomaWindowsAgentArtifactPathKeys `
+        -ArtifactPaths $PackageArtifactPaths `
+        -Keys (Get-RomaWindowsAgentInstallerRequiredPackagePathKeys)
 }
 
 function Write-RomaWindowsAgentArtifactManifest {

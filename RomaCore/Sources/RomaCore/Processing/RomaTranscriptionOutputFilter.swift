@@ -510,7 +510,7 @@ public struct RomaTranscriptionOutputFilter {
         "model", "models", "module", "modules", "my", "name", "names", "need", "next", "not", "now", "of", "on", "one",
         "oops", "option", "options", "or", "out", "output", "outputs", "package", "packages", "page", "parameter",
         "parameters", "parser", "path", "paths", "payload", "payloads", "phrase", "phrases", "project", "projects", "remove",
-        "pod", "pods", "prompt", "property", "properties", "protocol", "protocols", "put", "rather", "really", "replace", "repo", "repos", "repository",
+        "pod", "pods", "prompt", "property", "properties", "protocol", "protocols", "put", "rather", "ready", "really", "replace", "repo", "repos", "repository",
         "repositories", "request", "response", "result", "results", "right", "route", "routes", "router", "scratch", "screen",
         "script", "scripts", "second", "see", "server", "service", "setting", "settings", "should", "single", "site", "sites", "so", "sorry",
         "some", "state", "states", "struct", "structs", "sure", "than", "that", "the", "then", "there", "third", "this", "ticket",

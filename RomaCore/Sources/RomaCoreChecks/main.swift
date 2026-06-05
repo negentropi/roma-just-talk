@@ -6608,6 +6608,10 @@ struct RomaCoreChecks {
             "insertion polish should strip auto period from longer mid-sentence fragments"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Ready.", context: midSentenceContext) == "ready",
+            "insertion polish should lowercase ready as a short mid-sentence predicate fragment"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "A Final Word.",
                 context: midSentenceContext
@@ -6904,6 +6908,13 @@ struct RomaCoreChecks {
                 context: RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "Done. ")
             ) == "Model is actually ready.",
             "insertion polish should preserve longer sentence-start punctuation"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Ready.",
+                context: RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "Done. ")
+            ) == "Ready",
+            "insertion polish should preserve ready capitalization at sentence start"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("Question mark.", context: midSentenceContext) == "?",

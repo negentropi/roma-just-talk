@@ -41,8 +41,8 @@ struct RomaWindowsAgent {
         print("recorder=miniaudio")
         print("audio_format=pcm16_16000_mono")
         print("pre_roll_seconds=\(PreRollConfiguration().durationSeconds)")
-        print("toggle_hotkey=RegisterHotKey Ctrl+Shift+R")
-        print("hold_hook=WH_KEYBOARD_LL Ctrl+Shift+R")
+        print("toggle_hotkey=RegisterHotKey \(WindowsHotKey.proofToggle.displayName)")
+        print("hold_hook=WH_KEYBOARD_LL \(WindowsLowLevelKeyboardHookChord.proofHold.displayName)")
         print("paste=win32_clipboard_sendinput")
         print("clipboard_restore=text_only_after_delay")
         WindowsDoctorOutput.runtimeDefaultProofLines.forEach { print($0) }

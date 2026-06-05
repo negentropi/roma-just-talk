@@ -8509,14 +8509,38 @@ struct RomaCoreChecks {
     }
 
     private static func checkWindowsLowLevelKeyboardHookProofDescriptor() throws {
+        let hotKey = WindowsHotKey.proofToggle
         let chord = WindowsLowLevelKeyboardHookChord.proofHold
 
-        try require(chord.virtualKeyCode == 0x52, "low-level hook proof should use virtual-key R")
+        try require(chord.virtualKeyCode == hotKey.virtualKeyCode, "low-level hook proof should share the hotkey virtual key")
         try require(
             chord.requiredModifiers == 0x3,
             "low-level hook proof should require Ctrl+Shift"
         )
-        try require(chord.displayName == "Ctrl+Shift+R", "low-level hook proof should match the hotkey proof")
+        try require(chord.displayName == hotKey.displayName, "low-level hook proof should match the hotkey proof")
+
+        let altChord = WindowsLowLevelKeyboardHookChord(
+            hotKey: WindowsHotKey(id: 7, modifiers: [.control, .alt], virtualKeyCode: 0x4D)
+        )
+        try require(altChord.virtualKeyCode == 0x4D, "low-level hook chord should reuse hotkey virtual key")
+        try require(altChord.requiredModifiers == 0x5, "low-level hook chord should translate Ctrl+Alt modifiers")
+        try require(altChord.displayName == "Ctrl+Alt+M", "low-level hook chord should reuse hotkey display name")
+
+        #if !os(Windows)
+        let hookSource = try String(
+            contentsOf: URL(fileURLWithPath: #filePath)
+                .deletingLastPathComponent()
+                .deletingLastPathComponent()
+                .appendingPathComponent("RomaCore/Windows/WindowsLowLevelKeyboardHookProof.swift"),
+            encoding: .utf8
+        )
+        try require(
+            hookSource.contains("public init(hotKey: WindowsHotKey)") &&
+                hookSource.contains("public static let proofHold = WindowsLowLevelKeyboardHookChord(hotKey: .proofToggle)") &&
+                !hookSource.contains(#"displayName: "Ctrl+Shift+R""#),
+            "low-level hook proof should derive the hold chord from the shared WindowsHotKey"
+        )
+        #endif
 
         let result = WindowsLowLevelKeyboardHookResult(
             observedEvents: 0x3
@@ -10857,6 +10881,15 @@ struct RomaCoreChecks {
             windowsDictationRuntimeSource.contains("let pipeline = DictationPipeline(") &&
                 windowsDictationRuntimeSource.contains("WindowsClipboardTextInsertion("),
             "Windows dictation runtime should compose the shared DictationPipeline with the Windows paste adapter"
+        )
+        try require(
+            keyboardHookSource.contains("public static let proofHold = WindowsLowLevelKeyboardHookChord(hotKey: .proofToggle)") &&
+                !keyboardHookSource.contains(#"displayName: "Ctrl+Shift+R""#) &&
+                windowsAgentSource.contains(#"WindowsHotKey.proofToggle.displayName"#) &&
+                windowsAgentSource.contains(#"WindowsLowLevelKeyboardHookChord.proofHold.displayName"#) &&
+                !windowsAgentSource.contains(#"RegisterHotKey Ctrl+Shift+R"#) &&
+                !windowsAgentSource.contains(#"WH_KEYBOARD_LL Ctrl+Shift+R"#),
+            "Windows agent doctor and hold-hook proof should share the Swift hotkey module instead of literal hotkey labels"
         )
         try require(
             windowsAgentConfigurationSource.contains("public func windowsDictationRuntimeRequest(") &&

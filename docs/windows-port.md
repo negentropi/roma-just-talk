@@ -213,6 +213,8 @@ Useful script options:
 - `-RunNotepadPasteProof` opens a real Notepad file, targets its process id through the Swift paste proof, saves the file, and verifies the pasted text on disk.
 - `-PasteDictation` adds the final paste step to the interactive dictation proof.
 
+The Swift default hotkey lives in `WindowsHotKey.proofToggle`; the low-level hold-hook chord derives from that same module, and the Windows agent doctor prints both RegisterHotKey and `WH_KEYBOARD_LL` labels from those Swift values instead of duplicate string literals.
+
 Packaged artifact smoke test:
 
 ```powershell

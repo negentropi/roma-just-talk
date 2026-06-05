@@ -16,11 +16,29 @@ public struct WindowsLowLevelKeyboardHookChord: Equatable, Hashable, Sendable {
         self.displayName = displayName
     }
 
-    public static let proofHold = WindowsLowLevelKeyboardHookChord(
-        virtualKeyCode: 0x52,
-        requiredModifiers: UInt32(ROMA_WINDOWS_KEYBOARD_MOD_CONTROL | ROMA_WINDOWS_KEYBOARD_MOD_SHIFT),
-        displayName: "Ctrl+Shift+R"
-    )
+    public init(hotKey: WindowsHotKey) {
+        var requiredModifiers: UInt32 = 0
+        if hotKey.modifiers.contains(.control) {
+            requiredModifiers |= UInt32(ROMA_WINDOWS_KEYBOARD_MOD_CONTROL)
+        }
+        if hotKey.modifiers.contains(.shift) {
+            requiredModifiers |= UInt32(ROMA_WINDOWS_KEYBOARD_MOD_SHIFT)
+        }
+        if hotKey.modifiers.contains(.alt) {
+            requiredModifiers |= UInt32(ROMA_WINDOWS_KEYBOARD_MOD_ALT)
+        }
+        if hotKey.modifiers.contains(.win) {
+            requiredModifiers |= UInt32(ROMA_WINDOWS_KEYBOARD_MOD_WIN)
+        }
+
+        self.init(
+            virtualKeyCode: hotKey.virtualKeyCode,
+            requiredModifiers: requiredModifiers,
+            displayName: hotKey.displayName
+        )
+    }
+
+    public static let proofHold = WindowsLowLevelKeyboardHookChord(hotKey: .proofToggle)
 }
 
 public struct WindowsLowLevelKeyboardHookResult: Equatable, Hashable, Sendable {

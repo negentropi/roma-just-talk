@@ -316,7 +316,8 @@ $whisperArguments = @(
         Where-Object { ![string]::IsNullOrWhiteSpace($_) }
 )
 
-$manifestPath = Join-Path $PackageDir "manifest.txt"
+$packageArtifactPaths = Get-RomaWindowsAgentArtifactPathSet -ArtifactDir $PackageDir
+$manifestPath = $packageArtifactPaths["manifest"]
 Require-File -Path $manifestPath
 $script:artifactManifest = Read-RomaWindowsManifest -Path $manifestPath
 $proofScript = Require-RomaWindowsManifestFile `

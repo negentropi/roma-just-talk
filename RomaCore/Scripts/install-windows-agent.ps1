@@ -148,6 +148,7 @@ $runSource = $packageArtifactPaths["run_script"]
 Require-File -Path $agentSource
 Require-File -Path $smokeSource
 Require-File -Path $runSource
+$installedArtifactPaths = Get-RomaWindowsAgentArtifactPathSet -ArtifactDir $InstallDir
 $installedAgent = Join-RomaWindowsInstalledAgentPath -InstallDir $InstallDir
 $installedProofAgent = Join-RomaWindowsInstalledProofAgentPath -InstallDir $InstallDir
 $installedRun = Join-RomaWindowsInstalledRunScriptPath -InstallDir $InstallDir
@@ -179,8 +180,8 @@ Invoke-Step "copy package files" {
     Write-Host "runtime_dlls=$($runtimeLibraries.Count)"
 }
 
-$packageWhisperMock = Join-Path $PackageDir "RomaWhisperCLIMock.exe"
-$installedWhisperMock = Join-Path $InstallDir "RomaWhisperCLIMock.exe"
+$packageWhisperMock = $packageArtifactPaths["whisper_cli_mock"]
+$installedWhisperMock = $installedArtifactPaths["whisper_cli_mock"]
 if ($hasExplicitWhisperCLI -and
     (Resolve-FullPath -Path $WhisperCLI) -eq (Resolve-FullPath -Path $packageWhisperMock) -and
     (Test-Path -LiteralPath $installedWhisperMock)) {
@@ -196,7 +197,6 @@ if ($hasExplicitWhisperModel -and
 
 if (!$SkipSmoke) {
     Invoke-Step "installed agent smoke" {
-        $installedArtifactPaths = Get-RomaWindowsAgentArtifactPathSet -ArtifactDir $InstallDir
         $installedSmoke = $installedArtifactPaths["smoke_script"]
         $smokeArgs = @(
             "-PackageDir", $InstallDir,
@@ -319,7 +319,6 @@ if ($CreateShortcut -or $CreateStartupShortcut) {
 }
 
 Write-Host ""
-$installedArtifactPaths = Get-RomaWindowsAgentArtifactPathSet -ArtifactDir $InstallDir
 $installedSmoke = $installedArtifactPaths["smoke_script"]
 Write-Host "installed_agent=$installedAgent"
 Write-Host "installed_smoke=$installedSmoke"

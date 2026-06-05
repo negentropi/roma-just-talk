@@ -13099,6 +13099,12 @@ struct RomaCoreChecks {
                 packageScript.contains(#"$checkSetScriptSource = $sourceArtifactPaths["check_set_script"]"#) &&
                 packageScript.contains(#"$pdbOutput = $outputArtifactPaths["agent_pdb"]"#) &&
                 packageScript.contains(#"$proofAgentPdbOutput = $outputArtifactPaths["proof_agent_pdb"]"#) &&
+                installScript.contains(#"$packageWhisperMock = $packageArtifactPaths["whisper_cli_mock"]"#) &&
+                installScript.contains(#"$installedWhisperMock = $installedArtifactPaths["whisper_cli_mock"]"#) &&
+                proveScript.contains(#"$sampleConfigPath = $packageArtifactPaths["sample_config"]"#) &&
+                proveScript.contains("Invoke-PackagedListenerSmoke -ConfigPath $sampleConfigPath") &&
+                laptopProofScript.contains("Get-RomaWindowsAgentArtifactPathSet -ArtifactDir $PackageDir") &&
+                laptopProofScript.contains(#"$manifestPath = $packageArtifactPaths["manifest"]"#) &&
                 proofCommonScript.contains("Join-RomaWindowsInstalledSmokeDirPath -InstallDir $InstallDir") &&
                 proveScript.contains("Join-RomaWindowsInstalledNotepadPasteProofPath -InstallDir $InstallDir") &&
                 !proveScript.contains(#"Join-Path $InstallDir "smoke\notepad-paste-proof.txt""#) &&
@@ -13111,6 +13117,10 @@ struct RomaCoreChecks {
                 !packageScript.contains(#"$checkSetScriptSource = Join-Path $PSScriptRoot "check-windows-proof-set.ps1""#) &&
                 !packageScript.contains(#"$pdbOutput = Join-Path $OutputDir "RomaWindowsAgent.pdb""#) &&
                 !packageScript.contains(#"$proofAgentPdbOutput = Join-Path $OutputDir "RomaProofAgent.pdb""#) &&
+                !installScript.contains(#"$packageWhisperMock = Join-Path $PackageDir "RomaWhisperCLIMock.exe""#) &&
+                !installScript.contains(#"$installedWhisperMock = Join-Path $InstallDir "RomaWhisperCLIMock.exe""#) &&
+                !proveScript.contains(#"Join-Path $PackageDir "sample-windows-agent.json""#) &&
+                !laptopProofScript.contains(#"$manifestPath = Join-Path $PackageDir "manifest.txt""#) &&
                 proofCommonScript.contains("function Require-RomaWindowsFile") &&
                 proofCommonScript.contains("function Assert-RomaWindowsFileWithMinimumBytes") &&
                 proofCommonScript.contains("function Get-RomaWindowsCurrentUserSid") &&

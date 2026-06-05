@@ -395,6 +395,7 @@ $checkReportScript = $packageArtifactPaths["check_report_script"]
 $checkSetScript = $packageArtifactPaths["check_set_script"]
 $installedRunScriptPath = Join-RomaWindowsInstalledRunScriptPath -InstallDir $InstallDir
 $manifestPath = $packageArtifactPaths["manifest"]
+$sampleConfigPath = $packageArtifactPaths["sample_config"]
 $script:artifactManifest = @{}
 $script:packagedWhisperCLI = ""
 $script:packagedAgentDoctorOutput = ""
@@ -506,7 +507,7 @@ Invoke-Step "packaged proof agent doctor" {
 }
 
 Invoke-Step "packaged listener smoke" {
-    $script:packagedListenerOutput = Invoke-PackagedListenerSmoke -ConfigPath (Join-Path $PackageDir "sample-windows-agent.json")
+    $script:packagedListenerOutput = Invoke-PackagedListenerSmoke -ConfigPath $sampleConfigPath
 }
 
 Invoke-Step "packaged native proof doctors" {

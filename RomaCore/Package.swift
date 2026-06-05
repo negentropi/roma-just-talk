@@ -36,7 +36,11 @@ let package = Package(
         ),
         .target(
             name: "CWindowsSupport",
-            publicHeadersPath: "include"
+            publicHeadersPath: "include",
+            linkerSettings: [
+                .linkedLibrary("User32", .when(platforms: [.windows])),
+                .linkedLibrary("Crypt32", .when(platforms: [.windows]))
+            ]
         ),
         .target(
             name: "RomaCore",

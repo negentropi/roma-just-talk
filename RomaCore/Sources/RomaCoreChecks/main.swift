@@ -28,6 +28,7 @@ struct RomaCoreChecks {
         try checkWindowsProofScriptContracts()
         try checkSourcesDoNotImportApplePlatformFrameworks()
         try checkWindowsNativeAdapterImportsStayGuarded()
+        try checkWindowsSupportNativeLinkerSettings()
     }
 
     private static func checkDefaultPreRollContract() throws {
@@ -11717,6 +11718,44 @@ struct RomaCoreChecks {
                 "\(file.path) imports WinSDK outside an os(Windows) file guard"
             )
         }
+    }
+
+    private static func checkWindowsSupportNativeLinkerSettings() throws {
+        let packageRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let manifest = try String(
+            contentsOf: packageRoot.appendingPathComponent("Package.swift"),
+            encoding: .utf8
+        )
+        let keyboardHookSource = try String(
+            contentsOf: packageRoot.appendingPathComponent("Sources/CWindowsSupport/roma_windows_keyboard_hook.c"),
+            encoding: .utf8
+        )
+        let foregroundSource = try String(
+            contentsOf: packageRoot.appendingPathComponent("Sources/CWindowsSupport/roma_windows_foreground.c"),
+            encoding: .utf8
+        )
+        let dpapiSource = try String(
+            contentsOf: packageRoot.appendingPathComponent("Sources/CWindowsSupport/roma_windows_dpapi.c"),
+            encoding: .utf8
+        )
+
+        try require(
+            keyboardHookSource.contains(#"#pragma comment(lib, "User32.lib")"#) &&
+                foregroundSource.contains(#"#pragma comment(lib, "User32.lib")"#),
+            "Windows keyboard and foreground adapters should declare their User32 dependency"
+        )
+        try require(
+            dpapiSource.contains(#"#pragma comment(lib, "Crypt32.lib")"#),
+            "Windows DPAPI adapter should declare its Crypt32 dependency"
+        )
+        try require(
+            manifest.contains(#".linkedLibrary("User32", .when(platforms: [.windows]))"#) &&
+                manifest.contains(#".linkedLibrary("Crypt32", .when(platforms: [.windows]))"#),
+            "CWindowsSupport should link User32 and Crypt32 only on Windows"
+        )
     }
 
     private static func checkWindowsProofScriptContracts() throws {

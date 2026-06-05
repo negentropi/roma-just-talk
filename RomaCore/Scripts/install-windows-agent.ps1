@@ -135,7 +135,7 @@ Assert-RomaWindowsAgentScriptCommonOptions `
 
 if ([string]::IsNullOrWhiteSpace($SecretDir) -and
     ![string]::IsNullOrWhiteSpace($ApiKeyName)) {
-    $SecretDir = Join-Path $InstallDir "secrets"
+    $SecretDir = Join-RomaWindowsInstalledSecretDirPath -InstallDir $InstallDir
 }
 if (![string]::IsNullOrWhiteSpace($SecretDir)) {
     $SecretDir = Resolve-FullPath -Path $SecretDir

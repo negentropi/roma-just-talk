@@ -48,6 +48,15 @@ function Join-RomaWindowsInstalledAgentConfigPath {
     return Join-Path $InstallDir "windows-agent.json"
 }
 
+function Join-RomaWindowsInstalledSecretDirPath {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$InstallDir
+    )
+
+    return Join-Path $InstallDir "secrets"
+}
+
 function Join-RomaWindowsInstallSmokeConfigPath {
     param(
         [Parameter(Mandatory = $true)]

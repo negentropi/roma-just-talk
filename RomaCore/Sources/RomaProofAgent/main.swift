@@ -499,65 +499,24 @@ struct RomaProofAgent {
         let endpointText = try options.value(after: "--endpoint")
         let modelName = try options.value(after: "--model")
         let apiKeySource = try TranscriptionAPIKeySource.make(from: options)
-
-        let result = try await transcribeAudio(
-            audioURL: audioURL,
+        let client = try RomaTranscriptionClient.openAICompatible(
             endpointText: endpointText,
             modelName: modelName,
-            apiKeySource: apiKeySource,
-            language: options.optionalValue(after: "--language"),
-            prompt: options.optionalValue(after: "--prompt")
+            apiKeySource: apiKeySource
+        )
+
+        let result = try await client.service.transcribe(
+            TranscriptionRequest(
+                audioURL: audioURL,
+                model: client.model,
+                language: options.optionalValue(after: "--language"),
+                prompt: options.optionalValue(after: "--prompt")
+            )
         )
         printTranscriptionResult(
             result,
-            endpointText: endpointText,
-            modelName: modelName,
-            apiKeySource: apiKeySource,
+            client: client,
             audioURL: audioURL
-        )
-    }
-
-    private static func transcribeAudio(
-        audioURL: URL,
-        endpointText: String,
-        modelName: String,
-        apiKeySource: TranscriptionAPIKeySource,
-        language: String?,
-        prompt: String?
-    ) async throws -> TranscriptionResult {
-        let service = try makeTranscriptionService(
-            endpointText: endpointText,
-            apiKeySource: apiKeySource
-        )
-        let model = TranscriptionModelDescriptor(
-            name: modelName,
-            displayName: modelName,
-            provider: .custom
-        )
-        return try await service.transcribe(
-            TranscriptionRequest(
-                audioURL: audioURL,
-                model: model,
-                language: language,
-                prompt: prompt
-            )
-        )
-    }
-
-    private static func makeTranscriptionService(
-        endpointText: String,
-        apiKeySource: TranscriptionAPIKeySource
-    ) throws -> OpenAICompatibleTranscriptionService {
-        guard let endpointURL = URL(string: endpointText), endpointURL.scheme != nil else {
-            throw RomaCommandLineOptionsError.invalidOptionValue("--endpoint")
-        }
-        let apiKey = try apiKeySource.resolve()
-
-        return OpenAICompatibleTranscriptionService(
-            configuration: OpenAICompatibleTranscriptionConfiguration(
-                endpointURL: endpointURL,
-                apiKey: apiKey
-            )
         )
     }
 
@@ -605,29 +564,6 @@ struct RomaProofAgent {
         for line in client.details {
             print(line)
         }
-        print("audio=\(audioURL.path)")
-        if let language = result.language {
-            print("language=\(language)")
-        }
-        if let duration = result.durationSeconds {
-            print("duration_seconds=\(String(format: "%.3f", duration))")
-        }
-        print("transcript_length=\(result.text.count)")
-        print("transcript_text=\(RomaCommandLineText.oneLine(result.text))")
-    }
-
-    private static func printTranscriptionResult(
-        _ result: TranscriptionResult,
-        endpointText: String,
-        modelName: String,
-        apiKeySource: TranscriptionAPIKeySource,
-        audioURL: URL
-    ) {
-        print("provider=openai-compatible")
-        print("endpoint=\(endpointText)")
-        print("model=\(modelName)")
-        print("api_key_source=\(apiKeySource.kind)")
-        print("api_key_ref=\(apiKeySource.reference)")
         print("audio=\(audioURL.path)")
         if let language = result.language {
             print("language=\(language)")

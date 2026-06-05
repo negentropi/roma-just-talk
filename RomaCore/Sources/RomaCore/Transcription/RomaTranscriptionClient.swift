@@ -43,6 +43,18 @@ public struct RomaTranscriptionClient: Sendable {
         let modelName = try configuration.requireModel()
         let apiKeySource = try configuration.apiKeySource()
 
+        return try openAICompatible(
+            endpointText: endpointText,
+            modelName: modelName,
+            apiKeySource: apiKeySource
+        )
+    }
+
+    public static func openAICompatible(
+        endpointText: String,
+        modelName: String,
+        apiKeySource: TranscriptionAPIKeySource
+    ) throws -> RomaTranscriptionClient {
         guard let endpointURL = URL(string: endpointText), endpointURL.scheme != nil else {
             throw RomaCommandLineOptionsError.invalidOptionValue("--endpoint")
         }

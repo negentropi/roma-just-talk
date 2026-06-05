@@ -6612,6 +6612,18 @@ struct RomaCoreChecks {
             "insertion polish should lowercase ready as a short mid-sentence predicate fragment"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Good.", context: midSentenceContext) == "good",
+            "insertion polish should lowercase good as a short mid-sentence predicate fragment"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Available.", context: midSentenceContext) == "available",
+            "insertion polish should lowercase available as a short mid-sentence predicate fragment"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Blocked.", context: midSentenceContext) == "blocked",
+            "insertion polish should lowercase blocked as a short mid-sentence predicate fragment"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "A Final Word.",
                 context: midSentenceContext
@@ -6888,6 +6900,10 @@ struct RomaCoreChecks {
             "insertion polish should preserve no-context longer sentence punctuation"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Good.", context: nil) == "Good",
+            "insertion polish should preserve no-context standalone good capitalization"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("... This is good.", context: nil) == "This is good.",
             "insertion polish should strip leading pause ellipsis from full sentences"
         )
@@ -6915,6 +6931,20 @@ struct RomaCoreChecks {
                 context: RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "Done. ")
             ) == "Ready",
             "insertion polish should preserve ready capitalization at sentence start"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Good.",
+                context: RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "Done. ")
+            ) == "Good",
+            "insertion polish should preserve good capitalization at sentence start"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Available.",
+                context: RomaTranscriptionOutputFilter.TextInsertionContext(precedingText: "Done. ")
+            ) == "Available",
+            "insertion polish should preserve available capitalization at sentence start"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("Question mark.", context: midSentenceContext) == "?",
@@ -7564,6 +7594,22 @@ struct RomaCoreChecks {
         try require(
             localTranscriptionClient.details.contains("whisper_model=/models/ggml-base.en.bin"),
             "shared transcription client should expose local whisper proof details"
+        )
+        let proofEnvironmentName = ProcessInfo.processInfo.environment.first { !$0.value.isEmpty }?.key ?? "PATH"
+        let cloudTranscriptionClient = try RomaTranscriptionClient.openAICompatible(
+            endpointText: "https://api.example.com/v1/audio/transcriptions",
+            modelName: "cloud-model",
+            apiKeySource: .environment(name: proofEnvironmentName)
+        )
+        try require(
+            cloudTranscriptionClient.name == "openai-compatible",
+            "shared transcription client should build direct cloud proof clients"
+        )
+        try require(
+            cloudTranscriptionClient.details.contains("endpoint=https://api.example.com/v1/audio/transcriptions") &&
+                cloudTranscriptionClient.details.contains("model=cloud-model") &&
+                cloudTranscriptionClient.details.contains("api_key_source=environment"),
+            "shared transcription client should expose cloud proof details"
         )
 
         let cloudAgain = try localWhisper.applyingOverrides(from: RomaCommandLineOptions([
@@ -9874,7 +9920,7 @@ struct RomaCoreChecks {
                 proofAgentSource.contains("RomaCommandLineText.wordReplacementRules(from: options)") &&
                 proofAgentSource.contains("RomaCommandLineText.oneLine(result.text)") &&
                 proofAgentSource.contains("throw RomaCommandLineOptionsError.invalidOptionValue(\"--focus-delay\")") &&
-                proofAgentSource.contains("throw RomaCommandLineOptionsError.invalidOptionValue(\"--endpoint\")") &&
+                transcriptionClientSource.contains("throw RomaCommandLineOptionsError.invalidOptionValue(\"--endpoint\")") &&
                 proofAgentSource.contains("throw RomaCommandLineOptionsError.missingOption(\"--whisper-cli\")") &&
                 proofAgentSource.contains("throw TranscriptionAPIKeySourceError.missingEnvironmentValue") &&
                 !proofAgentSource.contains("private static func value(after option") &&
@@ -10398,6 +10444,15 @@ struct RomaCoreChecks {
             proofAgentSource.contains("RomaTranscriptionClient.make(from: configuration)") &&
                 proofAgentSource.contains("configuration.validateTranscriptionSettings()"),
             "Windows dictation proof should share the user-facing transcription config path"
+        )
+        try require(
+            transcriptionClientSource.contains("public static func openAICompatible(") &&
+                proofAgentSource.contains("RomaTranscriptionClient.openAICompatible(") &&
+                proofAgentSource.contains("client.service.transcribe(") &&
+                !proofAgentSource.contains("private static func transcribeAudio(") &&
+                !proofAgentSource.contains("private static func makeTranscriptionService(") &&
+                !proofAgentSource.contains("OpenAICompatibleTranscriptionService("),
+            "OpenAI-compatible proof transcription should use the shared transcription client"
         )
         try require(
             windowsProofScript.contains("New-WindowsDictationProofArgs") &&

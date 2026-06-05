@@ -595,7 +595,9 @@ public struct RomaTranscriptionOutputFilter {
     private static let continuationFragmentLeadingWasntItCorrectionPattern = #"(?i)^\s*((?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?(?:(?:that|this|it)[ \t]+)?(?:wasn['’]t|was[ \t]+not)[ \t]+(?:that|this|it))(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let continuationFragmentLeadingWrongUtteranceCorrectionPattern = #"(?i)^\s*((?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?(?:(?:that|this|it)[ \t]+came[ \t]+out[ \t]+wrong|(?:i[ \t]+)?said[ \t]+(?:(?:that|this|it)[ \t]+)?wrong|wrong[ \t]+one))(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let continuationFragmentLeadingWhatISaidCorrectionPattern = #"(?i)^\s*((?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?(?:scratch|strike|delete|remove|erase|undo|cancel|disregard|ignore|forget|cut|drop)[ \t]+what[ \t]+i(?:[ \t]+just)?[ \t]+said)(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
+    private static let continuationFragmentLeadingRestartCorrectionPattern = #"(?i)^\s*((?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?(?:(?:let[ \t]+me|let['’]s)[ \t]+)?(?:start[ \t]+over|try[ \t]+again|redo[ \t]+(?:that|this|it)))(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let continuationFragmentLeadingSupplementalCorrectionPatterns = [
+        continuationFragmentLeadingRestartCorrectionPattern,
         continuationFragmentLeadingWhatISaidCorrectionPattern,
         continuationFragmentLeadingWrongUtteranceCorrectionPattern,
         continuationFragmentLeadingWasntItCorrectionPattern,

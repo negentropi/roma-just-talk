@@ -726,6 +726,27 @@ struct RomaCoreChecks {
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "What I mean was module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim full what-I-mean-was correction fillers before module continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "I want to say module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim i-want-to-say correction fillers before module continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "I wanted to say module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim i-wanted-to-say correction fillers before module continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "What I mean is now.",
                 context: midSentenceContext
             ) == "what I mean is now",
@@ -758,6 +779,27 @@ struct RomaCoreChecks {
                 context: midSentenceContext
             ) == "what I meant was now",
             "shared insertion polish should preserve non-technical what-I-meant continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "What I mean was now.",
+                context: midSentenceContext
+            ) == "what I mean was now",
+            "shared insertion polish should preserve non-technical what-I-mean-was continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "I want to say now.",
+                context: midSentenceContext
+            ) == "I want to say now",
+            "shared insertion polish should preserve non-technical i-want-to-say continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "I wanted to say now.",
+                context: midSentenceContext
+            ) == "I wanted to say now",
+            "shared insertion polish should preserve non-technical i-wanted-to-say continuations"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
@@ -1295,6 +1337,20 @@ struct RomaCoreChecks {
                 context: midSentenceContext
             ) == "final word",
             "shared insertion polish should apply what-i-mean-was corrections in short continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model I want to say module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should apply i-want-to-say corrections in short continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model I wanted to say final word.",
+                context: midSentenceContext
+            ) == "final word",
+            "shared insertion polish should apply i-wanted-to-say corrections in short continuations"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(

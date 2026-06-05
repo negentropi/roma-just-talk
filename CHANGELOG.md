@@ -4,13 +4,13 @@
 
 - Shared the Windows proof hotkey display and waiting-for-hold markers through the proof helper.
 - Shared Windows laptop proof report filenames through the proof helper so the runner, package smoke, and generated guide use one report path contract.
+- Trimmed "what I mean was..." and "I want(ed) to say..." correction lead-ins before short technical continuations.
 - Treated "nope wait", "nah wait", "nope actually", and "nah actually" as bounded correction markers.
 - Shared the Windows laptop proof claim gate through the proof helper so generated guide closeout text stays tied to the full proof-set markers.
 - Added shared Windows laptop proof prerequisites to the generated artifact guide.
 - Shared Windows laptop hotkey-preflight and Notepad-paste operator prompts through the proof helper.
 - Shared Windows dictation operator prompts across source proof and installed smoke paths.
 - Added operator action steps to the generated Windows laptop proof guide from the shared proof helper.
-- Treated "nope wait", "nah wait", "nope actually", and "nah actually" as guarded correction markers in post-STT cleanup.
 - Preserved empty Markdown task markers from explicit "new todo", "new checkbox", and "new checked task" spoken commands through cleanup and paste.
 - Preserved empty bullet markers from standalone or terminal spoken bullet commands through cleanup and paste.
 - Removed generated terminal punctuation after spoken tab commands and allowed standalone tab output to paste.

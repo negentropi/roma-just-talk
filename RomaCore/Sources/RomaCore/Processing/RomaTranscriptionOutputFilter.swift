@@ -564,7 +564,7 @@ public struct RomaTranscriptionOutputFilter {
         (#"(?i)^\s*(?:ok(?:ay)?|all\s+right|alright|right|yeah|yes|yep|yup|sure)(?:[ \t]*[,;:…]+[ \t]*)+so[,;:…]*[ \t]+"#, ""),
         (#"(?i)^\s*(?:you\s+know|i\s+mean|like)[,;:…]+[ \t]*"#, "")
     ]
-    private static let continuationFragmentLeadingDiscourseFillerPattern = #"(?i)^\s*(you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?|what[ \t]+i[ \t]+mean[ \t]+is|what[ \t]+i(?:[ \t]+(?:am|was)|['’]m)[ \t]+trying[ \t]+to[ \t]+say[ \t]+is|what[ \t]+i[ \t]+was[ \t]+(?:going[ \t]+to|gonna)[ \t]+say[ \t]+is|what[ \t]+i[ \t]+(?:meant|want(?:ed)?)[ \t]+to[ \t]+say[ \t]+(?:is|was)|what[ \t]+i[ \t]+meant[ \t]+(?:is|was)|i[ \t]+(?:am|was)[ \t]+trying[ \t]+to[ \t]+say|i[ \t]+was[ \t]+(?:going[ \t]+to|gonna)[ \t]+say|i[ \t]+mean(?:[ \t]+to[ \t]+say)?|i[ \t]+meant(?:[ \t]+to[ \t]+say)?|i[ \t]+should[ \t]+say|(?:it|that)[ \t]+should[ \t]+be|(?:it|that)(?:[ \t]+is|['’]s)|ok(?:ay)?|all[ \t]+right|alright|got[ \t]+it|gotcha|no[ \t]+wait|(?:nope|nah)[ \t]+(?:wait|actually)|wait|hold[ \t]+on|hang[ \t]+on|make[ \t]+(?:it|that)|call[ \t]+it|replace[ \t]+(?:that|it)[ \t]+with|change[ \t]+(?:that|it)[ \t]+to|(?:scratch|delete|remove|erase|undo)[ \t]+(?:that|this)(?:[ \t]+out)?|correction(?:[ \t]+(?:is|should[ \t]+be))?|sorry|oops|whoops|my[ \t]+bad|actually|instead|rather|yeah|yes|yep|yup|like|basically|so|well)(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
+    private static let continuationFragmentLeadingDiscourseFillerPattern = #"(?i)^\s*(you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?|what[ \t]+i[ \t]+mean[ \t]+(?:is|was)|what[ \t]+i(?:[ \t]+(?:am|was)|['’]m)[ \t]+trying[ \t]+to[ \t]+say[ \t]+is|what[ \t]+i[ \t]+was[ \t]+(?:going[ \t]+to|gonna)[ \t]+say[ \t]+is|what[ \t]+i[ \t]+(?:meant|want(?:ed)?)[ \t]+to[ \t]+say[ \t]+(?:is|was)|what[ \t]+i[ \t]+meant[ \t]+(?:is|was)|i[ \t]+(?:am|was)[ \t]+trying[ \t]+to[ \t]+say|i[ \t]+was[ \t]+(?:going[ \t]+to|gonna)[ \t]+say|i[ \t]+(?:want|wanted)[ \t]+to[ \t]+say|i[ \t]+mean(?:[ \t]+to[ \t]+say)?|i[ \t]+meant(?:[ \t]+to[ \t]+say)?|i[ \t]+should[ \t]+say|(?:it|that)[ \t]+should[ \t]+be|(?:it|that)(?:[ \t]+is|['’]s)|ok(?:ay)?|all[ \t]+right|alright|got[ \t]+it|gotcha|no[ \t]+wait|(?:nope|nah)[ \t]+(?:wait|actually)|wait|hold[ \t]+on|hang[ \t]+on|make[ \t]+(?:it|that)|call[ \t]+it|replace[ \t]+(?:that|it)[ \t]+with|change[ \t]+(?:that|it)[ \t]+to|(?:scratch|delete|remove|erase|undo)[ \t]+(?:that|this)(?:[ \t]+out)?|correction(?:[ \t]+(?:is|should[ \t]+be))?|sorry|oops|whoops|my[ \t]+bad|actually|instead|rather|yeah|yes|yep|yup|like|basically|so|well)(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let standaloneDiscourseFillerPattern = #"(?i)^\s*you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?[ \t]*[.,;:…]*\s*$"#
     private static let blockedPreviousWordsForTerminalYouKnow: Set<String> = [
         "do", "does", "did", "don't", "if", "know", "let", "should", "to", "whether", "will", "would"
@@ -727,6 +727,7 @@ public struct RomaTranscriptionOutputFilter {
             (?:[,;:…]|\.\.\.)\s*what\s+i\s+(?:meant|want(?:ed)?)\s+to\s+say\s+(?:is|was)\s*[,;:]? |
             (?:[,;:…]|\.\.\.)\s*i\s+(?:am|was)\s+trying\s+to\s+say\s*[,;:]? |
             (?:[,;:…]|\.\.\.)\s*i\s+was\s+(?:going\s+to|gonna)\s+say\s*[,;:]? |
+            (?:[,;:…]|\.\.\.)?\s*i\s+want(?:ed)?\s+to\s+say\s*[,;:]? |
             (?:[,;:…]|\.\.\.)\s*i\s+mean\s+to\s+say\s*[,;:]? |
             (?:[,;:…]|\.\.\.)\s*i\s+meant\s+to\s+say\s*[,;:]? |
             sorry\s*[,;:]?\s+i\s+mean\s*[,;:]? |
@@ -1746,7 +1747,7 @@ public struct RomaTranscriptionOutputFilter {
         guard let regex = try? NSRegularExpression(
             pattern: #"(?i)([,;:…]|\.\.\.)[ \t]+(?:"# +
                 pauseFillerNoisePattern +
-                #")(?:[.,;:!?…]+)?[ \t]+(actually(?:[ \t]+no|[ \t]+make[ \t]+it)?|better[ \t]+make[ \t]+it|sorry[ \t]+i[ \t]+mean|sorry[ \t]+i[ \t]+meant|what[ \t]+i[ \t]+mean[ \t]+is|what[ \t]+i(?:[ \t]+(?:am|was)|['’]m)[ \t]+trying[ \t]+to[ \t]+say[ \t]+is|what[ \t]+i[ \t]+was[ \t]+(?:going[ \t]+to|gonna)[ \t]+say[ \t]+is|what[ \t]+i[ \t]+(?:meant|want(?:ed)?)[ \t]+to[ \t]+say[ \t]+(?:is|was)|i[ \t]+(?:am|was)[ \t]+trying[ \t]+to[ \t]+say|i[ \t]+was[ \t]+(?:going[ \t]+to|gonna)[ \t]+say|i[ \t]+mean[ \t]+to[ \t]+say|i[ \t]+meant[ \t]+to[ \t]+say|i[ \t]+mean|i[ \t]+meant|i[ \t]+should[ \t]+say|make[ \t]+that|make[ \t]+it|call[ \t]+it|wait[ \t]+no|no[ \t]+wait|no[ \t]+actually|on[ \t]+second[ \t]+thought|let[ \t]+me[ \t]+rephrase|(?:just[ \t]+)?to[ \t]+clarify|(?:just[ \t]+)?to[ \t]+be[ \t]+clear|for[ \t]+clarity|rather|instead|oops|whoops|woops|my[ \t]+bad|correction)(?=\s)"#
+                #")(?:[.,;:!?…]+)?[ \t]+(actually(?:[ \t]+no|[ \t]+make[ \t]+it)?|better[ \t]+make[ \t]+it|sorry[ \t]+i[ \t]+mean|sorry[ \t]+i[ \t]+meant|what[ \t]+i[ \t]+mean[ \t]+is|what[ \t]+i(?:[ \t]+(?:am|was)|['’]m)[ \t]+trying[ \t]+to[ \t]+say[ \t]+is|what[ \t]+i[ \t]+was[ \t]+(?:going[ \t]+to|gonna)[ \t]+say[ \t]+is|what[ \t]+i[ \t]+(?:meant|want(?:ed)?)[ \t]+to[ \t]+say[ \t]+(?:is|was)|i[ \t]+(?:am|was)[ \t]+trying[ \t]+to[ \t]+say|i[ \t]+was[ \t]+(?:going[ \t]+to|gonna)[ \t]+say|i[ \t]+want(?:ed)?[ \t]+to[ \t]+say|i[ \t]+mean[ \t]+to[ \t]+say|i[ \t]+meant[ \t]+to[ \t]+say|i[ \t]+mean|i[ \t]+meant|i[ \t]+should[ \t]+say|make[ \t]+that|make[ \t]+it|call[ \t]+it|wait[ \t]+no|no[ \t]+wait|no[ \t]+actually|on[ \t]+second[ \t]+thought|let[ \t]+me[ \t]+rephrase|(?:just[ \t]+)?to[ \t]+clarify|(?:just[ \t]+)?to[ \t]+be[ \t]+clear|for[ \t]+clarity|rather|instead|oops|whoops|woops|my[ \t]+bad|correction)(?=\s)"#
         ) else {
             return text
         }
@@ -2130,6 +2131,7 @@ public struct RomaTranscriptionOutputFilter {
             "undo that", "undo this", "undo that out", "undo this out",
             "correction", "correction is", "correction should be", "i should say",
             "i am trying to say", "i was trying to say", "i was going to say", "i was gonna say",
+            "i want to say", "i wanted to say",
             "it should be", "that should be",
             "it is", "it's", "it’s", "that is", "that's", "that’s",
             "sorry", "oops", "whoops", "my bad", "actually", "instead", "rather",
@@ -2138,7 +2140,7 @@ public struct RomaTranscriptionOutputFilter {
             "what i was gonna say is", "what i meant to say is", "what i meant to say was",
             "what i want to say is", "what i want to say was",
             "what i wanted to say is", "what i wanted to say was", "what i meant is",
-            "what i meant was", "yes", "yep", "yup"
+            "what i meant was", "what i mean was", "yes", "yep", "yup"
         ].contains(filler) {
             guard hasTechnicalContinuationFragmentHead(trimmedSuffix) else {
                 return false
@@ -2531,6 +2533,12 @@ public struct RomaTranscriptionOutputFilter {
             if markerIndex + 3 < tokens.count,
                tokens[markerIndex + 1].text == "was",
                tokens[markerIndex + 2].text == "gonna",
+               tokens[markerIndex + 3].text == "say" {
+                return markerIndex + 4
+            }
+            if markerIndex + 3 < tokens.count,
+               ["want", "wanted"].contains(tokens[markerIndex + 1].text),
+               tokens[markerIndex + 2].text == "to",
                tokens[markerIndex + 3].text == "say" {
                 return markerIndex + 4
             }
@@ -7477,6 +7485,19 @@ public struct RomaTranscriptionOutputFilter {
             return false
         }
 
+        if isWantToSayBacktrackingMarker(markerText),
+           wordCount(in: beforeMarker) == 1 {
+            guard let previousWord = previousWord(in: beforeMarker),
+                  isTechnicalContinuationFragmentHead(previousWord),
+                  let firstCorrectionWord = firstWord(in: correctionText),
+                  hasTechnicalContinuationFragmentHead(correctionText) ||
+                    ["final", "single"].contains(firstCorrectionWord) else {
+                return false
+            }
+
+            return true
+        }
+
         if isBareSorryBacktrackingMarker(markerText),
            !shouldApplyBareSorryBacktrackingMarker(beforeMarker: beforeMarker, correctionText: correctionText) {
             return false
@@ -7563,6 +7584,8 @@ public struct RomaTranscriptionOutputFilter {
             "i was trying to say",
             "i was going to say",
             "i was gonna say",
+            "i want to say",
+            "i wanted to say",
             "what i mean is",
             "what i am trying to say is",
             "what i was trying to say is",
@@ -7726,6 +7749,12 @@ public struct RomaTranscriptionOutputFilter {
         normalizedBacktrackingMarker(markerText) == "actually"
     }
 
+    private static func isWantToSayBacktrackingMarker(_ markerText: String) -> Bool {
+        let normalizedMarker = normalizedBacktrackingMarker(markerText)
+        return normalizedMarker == "i want to say" ||
+            normalizedMarker == "i wanted to say"
+    }
+
     private static func shouldApplyBareSorryBacktrackingMarker(beforeMarker: String, correctionText: String) -> Bool {
         if let previousWord = previousWord(in: beforeMarker),
            blockedPreviousWordsForBareSorryCorrection.contains(previousWord) {
@@ -7815,6 +7844,8 @@ public struct RomaTranscriptionOutputFilter {
             "i was trying to say",
             "i was going to say",
             "i was gonna say",
+            "i want to say",
+            "i wanted to say",
             "what i mean is",
             "what i am trying to say is",
             "what i was trying to say is",

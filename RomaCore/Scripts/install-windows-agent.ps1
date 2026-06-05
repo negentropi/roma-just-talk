@@ -187,13 +187,7 @@ Invoke-Step "copy package files" {
 
     Require-File -Path $installedAgent
     Require-File -Path $installedProofAgent
-    Require-File -Path (Join-Path $InstallDir "smoke-windows-agent.ps1")
-    Require-File -Path (Join-Path $InstallDir "run-windows-laptop-proof.ps1")
-    Require-File -Path (Join-Path $InstallDir "check-windows-scripts-parse.ps1")
-    Require-File -Path (Join-Path $InstallDir "windows-proof-common.ps1")
-    Require-File -Path (Join-Path $InstallDir "windows-manifest.ps1")
-    Require-File -Path (Join-Path $InstallDir "windows-package-identity.ps1")
-    Require-File -Path (Join-Path $InstallDir "check-windows-proof-set.ps1")
+    Require-RomaWindowsInstalledProofSurfaceFiles -InstallDir $InstallDir
     Write-Host "install_dir=$InstallDir"
     Write-Host "runtime_dlls=$($runtimeLibraries.Count)"
 }

@@ -479,6 +479,18 @@ function Get-RomaWindowsInstalledProofSurfaceScriptCount {
     ).Count
 }
 
+function Require-RomaWindowsInstalledProofSurfaceFiles {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$InstallDir
+    )
+
+    foreach ($proofSurfaceFile in Get-RomaWindowsInstalledProofSurfaceFileMap) {
+        $packageFile = [string]$proofSurfaceFile.PackageFile
+        Require-RomaWindowsFile -Path (Join-Path $InstallDir $packageFile)
+    }
+}
+
 function Assert-RomaWindowsOutputContains {
     param(
         [Parameter(Mandatory = $true)]

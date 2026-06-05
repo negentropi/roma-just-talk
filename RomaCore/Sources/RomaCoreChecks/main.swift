@@ -12883,6 +12883,7 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Require-RomaWindowsFileProof") &&
                 proofCommonScript.contains("function Get-RomaWindowsFileHashProof") &&
                 proofCommonScript.contains("function Get-RomaWindowsInstalledProofSurfaceFileProofs") &&
+                proofCommonScript.contains("function Require-RomaWindowsInstalledProofSurfaceFiles") &&
                 proofCommonScript.contains("function Get-RomaWindowsAgentArtifactFileProofs") &&
                 proofCommonScript.contains("function Get-RomaWindowsAgentShortcutFileName") &&
                 proofCommonScript.contains("function Join-RomaWindowsAgentShortcutPath") &&
@@ -13270,13 +13271,17 @@ struct RomaCoreChecks {
         try require(
             installScript.contains(#""RomaProofAgent.exe""#) &&
                 installScript.contains("$knownFiles += Get-RomaWindowsProofSurfaceFiles") &&
+                installScript.contains("Require-RomaWindowsInstalledProofSurfaceFiles -InstallDir $InstallDir") &&
                 proofCommonScript.contains(#""run-windows-laptop-proof.ps1""#) &&
                 proofCommonScript.contains(#""WINDOWS-LAPTOP-PROOF.txt""#) &&
                 proofCommonScript.contains(#""check-windows-scripts-parse.ps1""#) &&
                 proofCommonScript.contains(#""windows-proof-common.ps1""#) &&
                 proofCommonScript.contains(#""windows-manifest.ps1""#) &&
                 proofCommonScript.contains(#""windows-package-identity.ps1""#) &&
-                proofCommonScript.contains(#""check-windows-proof-set.ps1""#),
+                proofCommonScript.contains(#""check-windows-proof-set.ps1""#) &&
+                !installScript.contains(#"Require-File -Path (Join-Path $InstallDir "smoke-windows-agent.ps1")"#) &&
+                !installScript.contains(#"Require-File -Path (Join-Path $InstallDir "windows-proof-common.ps1")"#) &&
+                !installScript.contains(#"Require-File -Path (Join-Path $InstallDir "check-windows-proof-set.ps1")"#),
             "Windows installer should preserve the packaged proof surface"
         )
         try require(

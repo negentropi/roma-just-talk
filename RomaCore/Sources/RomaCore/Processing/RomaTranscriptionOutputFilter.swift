@@ -592,6 +592,7 @@ public struct RomaTranscriptionOutputFilter {
     ]
     private static let continuationFragmentLeadingDiscourseFillerPattern = #"(?i)^\s*(you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?|what[ \t]+i[ \t]+mean[ \t]+(?:is|was)|what[ \t]+i(?:[ \t]+(?:am|was)|['’]m)[ \t]+trying[ \t]+to[ \t]+say[ \t]+is|what[ \t]+i[ \t]+was[ \t]+(?:going[ \t]+to|gonna)[ \t]+say[ \t]+is|what[ \t]+i[ \t]+(?:meant|want(?:ed)?)[ \t]+to[ \t]+say[ \t]+(?:is|was)|what[ \t]+i[ \t]+meant[ \t]+(?:is|was)|i[ \t]+(?:am|was)[ \t]+trying[ \t]+to[ \t]+say|i[ \t]+was[ \t]+(?:going[ \t]+to|gonna)[ \t]+say|i[ \t]+(?:want|wanted)[ \t]+to[ \t]+say|i[ \t]+mean(?:[ \t]+to[ \t]+say)?|i[ \t]+meant(?:[ \t]+to[ \t]+say)?|i[ \t]+should[ \t]+say|(?:it|that)[ \t]+should[ \t]+be|(?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?(?:(?:that|this|it)(?:[ \t]+(?:is|was)|['’]s)?[ \t]+)?not[ \t]+what[ \t]+i[ \t]+meant|(?:(?:that|this|it)[ \t]+)?(?:wasn['’]t|was[ \t]+not)[ \t]+what[ \t]+i[ \t]+meant|(?:(?:that|this|it)(?:[ \t]+(?:is|was)|['’]s)?[ \t]+)?(?:wrong|incorrect|not[ \t]+right)|(?:(?:that|this|it)(?:[ \t]+(?:is|was)|['’]s)?[ \t]+)?not[ \t]+(?:that|this|it)|(?:it|that)(?:[ \t]+is|['’]s)|ok(?:ay)?|all[ \t]+right|alright|got[ \t]+it|gotcha|no[ \t]+correction(?:[ \t]+(?:is|should[ \t]+be))?|no[ \t]+(?:(?:(?:that|this|it)(?:[ \t]+(?:is|was)|['’]s)?[ \t]+)?(?:not[ \t]+(?:that|this|it)|wrong|incorrect|not[ \t]+right)|(?:it|that)[ \t]+should[ \t]+be|(?:it|that)(?:[ \t]+is|['’]s))|no[ \t]+wait|(?:nope|nah)[ \t]+(?:(?:(?:that|this|it)(?:[ \t]+(?:is|was)|['’]s)?[ \t]+)?(?:not[ \t]+(?:that|this|it)|wrong|incorrect|not[ \t]+right)|wait|actually)|actually[ \t]+wait[ \t]+(?:no|never[ \t]+mind|nevermind|scratch[ \t]+(?:that|this|it)|changed[ \t]+my[ \t]+mind|take[ \t]+(?:that|this|it)[ \t]+back)|wait[ \t]+(?:no|never[ \t]+mind|nevermind|scratch[ \t]+(?:that|this|it)|changed[ \t]+my[ \t]+mind|take[ \t]+(?:that|this|it)[ \t]+back)|(?:actually[ \t]+)?(?:(?:i[ \t]+)?changed[ \t]+my[ \t]+mind|(?:i[ \t]+)?take[ \t]+(?:that|this|it)[ \t]+back|(?:i[ \t]+)?(?:don['’]t|do[ \t]+not|didn['’]t|did[ \t]+not)[ \t]+mean[ \t]+(?:that|this|it)|not[ \t]+(?:that|this|it))|back[ \t]*track|on[ \t]+second[ \t]+thought|let[ \t]+me[ \t]+rephrase|(?:just[ \t]+)?to[ \t]+clarify|(?:just[ \t]+)?to[ \t]+be[ \t]+clear|for[ \t]+clarity|never[ \t]+mind(?:[ \t]+(?:that|this|it))?|nevermind(?:[ \t]+(?:that|this|it))?|wait|hold[ \t]+on|hang[ \t]+on|make[ \t]+(?:it|that)|call[ \t]+it|replace[ \t]+(?:that|it)[ \t]+with|change[ \t]+(?:that|it)[ \t]+to|correct[ \t]+(?:that|it)[ \t]+to|forget[ \t]+about[ \t]+(?:that|this|it)|skip[ \t]+(?:that|this|it)|omit[ \t]+(?:that|this|it)|leave[ \t]+(?:that|this|it)[ \t]+out|(?:(?:scratch|strike|delete|remove|erase|undo|cancel|disregard|ignore|forget|cut|drop)[ \t]+(?:that|this|it)(?:[ \t]+out)?|cross[ \t]+(?:that|this|it)[ \t]+out)|correction(?:[ \t]+(?:is|should[ \t]+be))?|sorry|oops|whoops|my[ \t]+bad|actually|instead|rather|yeah|yes|yep|yup|like|basically|so|well)(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let continuationFragmentLeadingAccuracyCorrectionPattern = #"(?i)^\s*((?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?(?:(?:that|this|it)(?:[ \t]+(?:is|was)|['’]s)?[ \t]+)?not[ \t]+(?:correct|accurate))(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
+    private static let continuationFragmentLeadingWasntItCorrectionPattern = #"(?i)^\s*((?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?(?:(?:that|this|it)[ \t]+)?(?:wasn['’]t|was[ \t]+not)[ \t]+(?:that|this|it))(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let punctuatedContinuationCorrectionPrefixPattern = #"(?i)^\s*((?:(?:actually[ \t]*(?:[,;:…]+|\.\.\.)[ \t]*)?(?:no|nope|nah)|actually)[ \t]*(?:[,;:…]+|\.\.\.)[ \t]*)(.+)$"#
     private static let standaloneDiscourseFillerPattern = #"(?i)^\s*you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?[ \t]*[.,;:…]*\s*$"#
     private static let blockedPreviousWordsForTerminalYouKnow: Set<String> = [
@@ -2094,6 +2095,15 @@ public struct RomaTranscriptionOutputFilter {
         )
     }
 
+    private static func leadingWasntItContinuationCorrectionCandidate(
+        from text: String
+    ) -> (filler: String, suffix: String)? {
+        leadingContinuationCorrectionCandidate(
+            from: text,
+            patterns: [continuationFragmentLeadingWasntItCorrectionPattern]
+        )
+    }
+
     private static func leadingPunctuatedContinuationCorrectionCandidate(
         from text: String
     ) -> (filler: String, suffix: String)? {
@@ -2113,6 +2123,7 @@ public struct RomaTranscriptionOutputFilter {
         guard let marker = leadingContinuationCorrectionCandidate(
             from: remainder,
             patterns: [
+                continuationFragmentLeadingWasntItCorrectionPattern,
                 continuationFragmentLeadingAccuracyCorrectionPattern,
                 continuationFragmentLeadingDiscourseFillerPattern
             ]
@@ -2172,6 +2183,17 @@ public struct RomaTranscriptionOutputFilter {
         var didRemoveFiller = false
 
         while true {
+            if let wasntItCorrection = leadingWasntItContinuationCorrectionCandidate(from: candidate),
+               shouldRemoveLeadingContinuationDiscourseFiller(
+                wasntItCorrection.filler,
+                suffix: wasntItCorrection.suffix,
+                after: precedingText
+               ) {
+                candidate = wasntItCorrection.suffix
+                didRemoveFiller = true
+                continue
+            }
+
             if let accuracyCorrection = leadingAccuracyContinuationCorrectionCandidate(from: candidate),
                shouldRemoveLeadingContinuationDiscourseFiller(
                 accuracyCorrection.filler,
@@ -2255,6 +2277,14 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         let candidate = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let wasntItCorrection = leadingWasntItContinuationCorrectionCandidate(from: candidate) {
+            return shouldRemoveLeadingContinuationDiscourseFiller(
+                wasntItCorrection.filler,
+                suffix: wasntItCorrection.suffix,
+                after: precedingText
+            )
+        }
+
         if let accuracyCorrection = leadingAccuracyContinuationCorrectionCandidate(from: candidate) {
             return shouldRemoveLeadingContinuationDiscourseFiller(
                 accuracyCorrection.filler,
@@ -2388,6 +2418,10 @@ public struct RomaTranscriptionOutputFilter {
 
     private static func unwrapStackedLeadingContinuationCorrectionMarker(from text: String) -> String {
         let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let wasntItCorrection = leadingWasntItContinuationCorrectionCandidate(from: trimmedText) {
+            return wasntItCorrection.suffix
+        }
+
         if let accuracyCorrection = leadingAccuracyContinuationCorrectionCandidate(from: trimmedText) {
             return accuracyCorrection.suffix
         }
@@ -6251,6 +6285,16 @@ public struct RomaTranscriptionOutputFilter {
 
         var removalCount = 0
         while removalCount < 3 {
+            if let wasntItCorrection = leadingWasntItContinuationCorrectionCandidate(from: candidate) {
+                candidate = wasntItCorrection.suffix
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                if isNoisyFinalWordContinuationFragment(candidate) {
+                    return true
+                }
+                removalCount += 1
+                continue
+            }
+
             if let accuracyCorrection = leadingAccuracyContinuationCorrectionCandidate(from: candidate) {
                 candidate = accuracyCorrection.suffix
                     .trimmingCharacters(in: .whitespacesAndNewlines)

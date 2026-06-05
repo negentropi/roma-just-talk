@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Trimmed was-not-it/wasnt-it correction markers before bracketed final-word fragments.
 - Trimmed not-correct/not-accurate correction markers before bracketed final-word fragments.
 - Trimmed punctuated correction lead-ins before bracketed final-word fragments.
 - Trimmed prefixed not-what-I-meant correction lead-ins before bracketed final-word fragments.

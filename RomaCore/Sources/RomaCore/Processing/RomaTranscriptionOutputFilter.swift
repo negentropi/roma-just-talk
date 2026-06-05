@@ -564,7 +564,7 @@ public struct RomaTranscriptionOutputFilter {
         (#"(?i)^\s*(?:ok(?:ay)?|all\s+right|alright|right|yeah|yes|yep|yup|sure)(?:[ \t]*[,;:…]+[ \t]*)+so[,;:…]*[ \t]+"#, ""),
         (#"(?i)^\s*(?:you\s+know|i\s+mean|like)[,;:…]+[ \t]*"#, "")
     ]
-    private static let continuationFragmentLeadingDiscourseFillerPattern = #"(?i)^\s*(you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?|what[ \t]+i[ \t]+mean[ \t]+(?:is|was)|what[ \t]+i(?:[ \t]+(?:am|was)|['’]m)[ \t]+trying[ \t]+to[ \t]+say[ \t]+is|what[ \t]+i[ \t]+was[ \t]+(?:going[ \t]+to|gonna)[ \t]+say[ \t]+is|what[ \t]+i[ \t]+(?:meant|want(?:ed)?)[ \t]+to[ \t]+say[ \t]+(?:is|was)|what[ \t]+i[ \t]+meant[ \t]+(?:is|was)|i[ \t]+(?:am|was)[ \t]+trying[ \t]+to[ \t]+say|i[ \t]+was[ \t]+(?:going[ \t]+to|gonna)[ \t]+say|i[ \t]+(?:want|wanted)[ \t]+to[ \t]+say|i[ \t]+mean(?:[ \t]+to[ \t]+say)?|i[ \t]+meant(?:[ \t]+to[ \t]+say)?|i[ \t]+should[ \t]+say|(?:it|that)[ \t]+should[ \t]+be|(?:it|that)(?:[ \t]+is|['’]s)|ok(?:ay)?|all[ \t]+right|alright|got[ \t]+it|gotcha|no[ \t]+wait|(?:nope|nah)[ \t]+(?:wait|actually)|wait|hold[ \t]+on|hang[ \t]+on|make[ \t]+(?:it|that)|call[ \t]+it|replace[ \t]+(?:that|it)[ \t]+with|change[ \t]+(?:that|it)[ \t]+to|correct[ \t]+(?:that|it)[ \t]+to|(?:scratch|delete|remove|erase|undo)[ \t]+(?:that|this)(?:[ \t]+out)?|correction(?:[ \t]+(?:is|should[ \t]+be))?|sorry|oops|whoops|my[ \t]+bad|actually|instead|rather|yeah|yes|yep|yup|like|basically|so|well)(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
+    private static let continuationFragmentLeadingDiscourseFillerPattern = #"(?i)^\s*(you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?|what[ \t]+i[ \t]+mean[ \t]+(?:is|was)|what[ \t]+i(?:[ \t]+(?:am|was)|['’]m)[ \t]+trying[ \t]+to[ \t]+say[ \t]+is|what[ \t]+i[ \t]+was[ \t]+(?:going[ \t]+to|gonna)[ \t]+say[ \t]+is|what[ \t]+i[ \t]+(?:meant|want(?:ed)?)[ \t]+to[ \t]+say[ \t]+(?:is|was)|what[ \t]+i[ \t]+meant[ \t]+(?:is|was)|i[ \t]+(?:am|was)[ \t]+trying[ \t]+to[ \t]+say|i[ \t]+was[ \t]+(?:going[ \t]+to|gonna)[ \t]+say|i[ \t]+(?:want|wanted)[ \t]+to[ \t]+say|i[ \t]+mean(?:[ \t]+to[ \t]+say)?|i[ \t]+meant(?:[ \t]+to[ \t]+say)?|i[ \t]+should[ \t]+say|(?:it|that)[ \t]+should[ \t]+be|(?:it|that)(?:[ \t]+is|['’]s)|ok(?:ay)?|all[ \t]+right|alright|got[ \t]+it|gotcha|no[ \t]+(?:(?:it|that)[ \t]+should[ \t]+be|(?:it|that)(?:[ \t]+is|['’]s))|no[ \t]+wait|(?:nope|nah)[ \t]+(?:wait|actually)|wait|hold[ \t]+on|hang[ \t]+on|make[ \t]+(?:it|that)|call[ \t]+it|replace[ \t]+(?:that|it)[ \t]+with|change[ \t]+(?:that|it)[ \t]+to|correct[ \t]+(?:that|it)[ \t]+to|(?:scratch|delete|remove|erase|undo)[ \t]+(?:that|this)(?:[ \t]+out)?|correction(?:[ \t]+(?:is|should[ \t]+be))?|sorry|oops|whoops|my[ \t]+bad|actually|instead|rather|yeah|yes|yep|yup|like|basically|so|well)(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let standaloneDiscourseFillerPattern = #"(?i)^\s*you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?[ \t]*[.,;:…]*\s*$"#
     private static let blockedPreviousWordsForTerminalYouKnow: Set<String> = [
         "do", "does", "did", "don't", "if", "know", "let", "should", "to", "whether", "will", "would"
@@ -2157,6 +2157,12 @@ public struct RomaTranscriptionOutputFilter {
         let punctuationStrippedMarkdownUnwrappedSuffix = removeTrailingNoisyFragmentPunctuation(
             from: markdownUnwrappedSuffix
         )
+        let stackedCorrectionUnwrappedSuffix = unwrapStackedLeadingContinuationCorrectionMarker(
+            from: markdownUnwrappedSuffix
+        )
+        let punctuationStrippedStackedCorrectionUnwrappedSuffix = removeTrailingNoisyFragmentPunctuation(
+            from: stackedCorrectionUnwrappedSuffix
+        )
         let isNoisyFinalWordOrSingleContinuation = isNoisyFinalWordContinuationFragment(trimmedSuffix) ||
             isNoisyFinalWordContinuationFragment(punctuationStrippedSuffix) ||
             isNoisyFinalWordContinuationFragment(boundaryUnwrappedSuffix) ||
@@ -2164,15 +2170,19 @@ public struct RomaTranscriptionOutputFilter {
             isNoisyFinalWordContinuationFragment(leadingCleanedSuffix) ||
             isNoisyFinalWordContinuationFragment(punctuationStrippedLeadingCleanedSuffix) ||
             isNoisyFinalWordContinuationFragment(markdownUnwrappedSuffix) ||
-            isNoisyFinalWordContinuationFragment(punctuationStrippedMarkdownUnwrappedSuffix)
+            isNoisyFinalWordContinuationFragment(punctuationStrippedMarkdownUnwrappedSuffix) ||
+            isNoisyFinalWordContinuationFragment(stackedCorrectionUnwrappedSuffix) ||
+            isNoisyFinalWordContinuationFragment(punctuationStrippedStackedCorrectionUnwrappedSuffix)
         guard !trimmedSuffix.isEmpty,
               !hasInternalSentenceBoundary(trimmedSuffix) ||
                 !hasInternalSentenceBoundary(leadingCleanedSuffix) ||
-                !hasInternalSentenceBoundary(markdownUnwrappedSuffix),
+                !hasInternalSentenceBoundary(markdownUnwrappedSuffix) ||
+                !hasInternalSentenceBoundary(stackedCorrectionUnwrappedSuffix),
               isShortFragment(trimmedSuffix) ||
                 isShortFragment(boundaryUnwrappedSuffix) ||
                 isShortFragment(leadingCleanedSuffix) ||
                 isShortFragment(markdownUnwrappedSuffix) ||
+                isShortFragment(stackedCorrectionUnwrappedSuffix) ||
                 isNoisyPreservedBoundaryContinuationFragment(trimmedSuffix) ||
                 isNoisyFinalWordOrSingleContinuation else {
             return false
@@ -2194,6 +2204,8 @@ public struct RomaTranscriptionOutputFilter {
             "remove that", "remove this", "remove that out", "remove this out",
             "erase that", "erase this", "erase that out", "erase this out",
             "undo that", "undo this", "undo that out", "undo this out",
+            "no it is", "no it's", "no it’s", "no that is", "no that's", "no that’s",
+            "no it should be", "no that should be",
             "correction", "correction is", "correction should be", "i should say",
             "i am trying to say", "i was trying to say", "i was going to say", "i was gonna say",
             "i want to say", "i wanted to say",
@@ -2210,12 +2222,50 @@ public struct RomaTranscriptionOutputFilter {
             guard hasTechnicalContinuationFragmentHead(trimmedSuffix) ||
                     hasTechnicalContinuationFragmentHead(boundaryUnwrappedSuffix) ||
                     hasTechnicalContinuationFragmentHead(leadingCleanedSuffix) ||
-                    hasTechnicalContinuationFragmentHead(markdownUnwrappedSuffix) else {
+                    hasTechnicalContinuationFragmentHead(markdownUnwrappedSuffix) ||
+                    hasTechnicalContinuationFragmentHead(stackedCorrectionUnwrappedSuffix) ||
+                    hasTechnicalContinuationFragmentHead(punctuationStrippedStackedCorrectionUnwrappedSuffix) else {
                 return false
             }
         }
 
         return true
+    }
+
+    private static func unwrapStackedLeadingContinuationCorrectionMarker(from text: String) -> String {
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let regex = try? NSRegularExpression(pattern: continuationFragmentLeadingDiscourseFillerPattern),
+              let match = regex.firstMatch(in: trimmedText, range: NSRange(trimmedText.startIndex..., in: trimmedText)),
+              match.numberOfRanges >= 2,
+              let matchRange = Range(match.range, in: trimmedText),
+              let fillerRange = Range(match.range(at: 1), in: trimmedText) else {
+            return trimmedText
+        }
+
+        let filler = normalizedRepeatedClause(String(trimmedText[fillerRange]))
+        guard [
+            "correction", "correction is", "correction should be",
+            "i should say", "i mean", "i mean to say", "i meant", "i meant to say",
+            "i am trying to say", "i was trying to say", "i was going to say", "i was gonna say",
+            "i want to say", "i wanted to say",
+            "it should be", "that should be",
+            "it is", "it's", "it’s", "that is", "that's", "that’s",
+            "what i mean is", "what i mean was", "what i meant is", "what i meant was",
+            "what i am trying to say is", "what i was trying to say is",
+            "what i'm trying to say is", "what i’m trying to say is",
+            "what i was going to say is", "what i was gonna say is",
+            "what i meant to say is", "what i meant to say was",
+            "what i want to say is", "what i want to say was",
+            "what i wanted to say is", "what i wanted to say was",
+            "no it is", "no it's", "no it’s", "no that is", "no that's", "no that’s",
+            "no it should be", "no that should be"
+        ].contains(filler) else {
+            return trimmedText
+        }
+
+        let suffix = String(trimmedText[matchRange.upperBound...])
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return suffix.isEmpty ? trimmedText : suffix
     }
 
     private static func hasTechnicalContinuationFragmentHead(_ text: String) -> Bool {

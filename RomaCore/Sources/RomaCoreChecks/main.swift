@@ -1098,6 +1098,27 @@ struct RomaCoreChecks {
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "actually it's module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim stacked actually it's correction markers"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "wait it's module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim stacked wait it's correction markers"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "no it's module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim stacked no it's correction markers"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "That is model.",
                 context: midSentenceContext
             ) == "model",
@@ -1123,6 +1144,13 @@ struct RomaCoreChecks {
                 context: midSentenceContext
             ) == "It's now",
             "shared insertion polish should preserve non-technical it's continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "actually it's now.",
+                context: midSentenceContext
+            ) == "actually it's now",
+            "shared insertion polish should preserve stacked actually it's markers before non-technical continuations"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
@@ -9625,6 +9653,21 @@ struct RomaCoreChecks {
             rawText: "It's _final word._",
             expectedText: " final word",
             fileName: "mid-sentence-its-underscore-final-word-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "actually it's module.",
+            expectedText: " module",
+            fileName: "mid-sentence-actually-its-module-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "wait it's module.",
+            expectedText: " module",
+            fileName: "mid-sentence-wait-its-module-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "no it's module.",
+            expectedText: " module",
+            fileName: "mid-sentence-no-its-module-proof.wav"
         )
 
         let bracketedFragmentRecorder = FakeRecorder()

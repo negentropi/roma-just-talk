@@ -14,6 +14,7 @@
 - Shared Windows native-doctor proof markers through proof-helper marker maps.
 - Shared packaged and installed Windows listener-smoke proof markers through proof-helper marker maps.
 - Shared Windows laptop preflight hotkey, microphone, and local-whisper proof markers through proof-helper marker maps.
+- Trimmed stacked "actually/wait/no it's ..." correction markers before technical mid-sentence hotkey dictation fragments.
 - Unwrapped nested markdown and bracket/quote artifacts exposed after correction lead-ins in mid-sentence hotkey dictation.
 - Unwrapped noisy markdown emphasis around fragments exposed after correction lead-ins in mid-sentence hotkey dictation.
 - Removed generated hash, numbered, and bullet markers exposed after correction lead-ins in mid-sentence hotkey dictation.

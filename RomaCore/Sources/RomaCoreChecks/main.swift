@@ -1517,6 +1517,34 @@ struct RomaCoreChecks {
             "shared insertion polish should trim repeated context from longer continuation fragments"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "this correction is Model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim repeated context plus correction-is before technical fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "so this correction is Model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim repeated multi-word context plus correction-is before technical fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "this no correction is Model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim repeated context plus no-correction-is before technical fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "so this no correction is Model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim repeated multi-word context plus no-correction-is before technical fragments"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("think model.", context: thinkContext) == "think model",
             "shared insertion polish should preserve unguarded single-word context repeats"
         )
@@ -10032,6 +10060,26 @@ struct RomaCoreChecks {
             rawText: "this should be ready.",
             expectedText: " should be ready",
             fileName: "mid-sentence-this-should-be-ready-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "this correction is Model.",
+            expectedText: " model",
+            fileName: "mid-sentence-this-correction-is-model-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "so this correction is Model.",
+            expectedText: " model",
+            fileName: "mid-sentence-so-this-correction-is-model-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "this no correction is Model.",
+            expectedText: " model",
+            fileName: "mid-sentence-this-no-correction-is-model-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "so this no correction is Model.",
+            expectedText: " model",
+            fileName: "mid-sentence-so-this-no-correction-is-model-proof.wav"
         )
 
         let bracketedFragmentRecorder = FakeRecorder()

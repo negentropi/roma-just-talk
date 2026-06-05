@@ -2492,6 +2492,10 @@ public struct RomaTranscriptionOutputFilter {
     private static func danglingGeneratedLeadInWordCount(in tokens: [WordToken]) -> Int? {
         guard let firstToken = tokens.first else { return nil }
 
+        if let correctionLeadInWordCount = danglingGeneratedCorrectionLeadInWordCount(in: tokens) {
+            return correctionLeadInWordCount
+        }
+
         if firstToken.text == "is" ||
             ["it's", "it’s", "that's", "that’s"].contains(firstToken.text) {
             return 1
@@ -2517,6 +2521,37 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         return nil
+    }
+
+    private static func danglingGeneratedCorrectionLeadInWordCount(in tokens: [WordToken]) -> Int? {
+        guard !tokens.isEmpty else { return nil }
+
+        let markerIndex: Int
+        if tokens[0].text == "correction" {
+            markerIndex = 0
+        } else if tokens.count >= 2,
+                  tokens[0].text == "no",
+                  tokens[1].text == "correction" {
+            markerIndex = 1
+        } else {
+            return nil
+        }
+
+        var replacementStartIndex = markerIndex + 1
+        if tokens.indices.contains(replacementStartIndex),
+           tokens[replacementStartIndex].text == "actually" {
+            replacementStartIndex += 1
+        }
+        replacementStartIndex = replacementStartAfterOptionalCorrectionCopula(
+            tokens: tokens,
+            startingAt: replacementStartIndex
+        )
+        guard replacementStartIndex > markerIndex,
+              replacementStartIndex < tokens.count else {
+            return nil
+        }
+
+        return replacementStartIndex
     }
 
     private static func cleanDanglingGeneratedLeadInSuffix(_ text: String) -> String {

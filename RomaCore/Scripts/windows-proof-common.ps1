@@ -222,6 +222,70 @@ function Write-RomaWindowsHoldDictationPrompt {
     }
 }
 
+function ConvertTo-RomaWindowsPowerShellSingleQuotedString {
+    param(
+        [string]$Value = ""
+    )
+
+    return "'" + $Value.Replace("'", "''") + "'"
+}
+
+function Write-RomaWindowsFullLaptopProofRecheckScript {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path,
+        [Parameter(Mandatory = $true)]
+        [string]$PackageDir,
+        [Parameter(Mandatory = $true)]
+        [string]$LaptopPreflightReportPath,
+        [Parameter(Mandatory = $true)]
+        [string]$CloudDictationReportPath,
+        [Parameter(Mandatory = $true)]
+        [string]$LocalWhisperDictationReportPath,
+        [Parameter(Mandatory = $true)]
+        [string]$LocalWhisperNotepadPasteReportPath
+    )
+
+    $scriptLines = @(
+        "param(",
+        "    [string]`$PackageDir = $(ConvertTo-RomaWindowsPowerShellSingleQuotedString -Value $PackageDir)",
+        ")",
+        "",
+        '$ErrorActionPreference = "Stop"',
+        "Set-StrictMode -Version Latest",
+        "",
+        '$manifestScript = Join-Path $PackageDir "windows-manifest.ps1"',
+        'if (!(Test-Path -LiteralPath $manifestScript)) {',
+        '    throw "Windows manifest helper was not found: $manifestScript"',
+        '}',
+        ". `$manifestScript",
+        '$manifestPath = Join-Path $PackageDir "manifest.txt"',
+        '$manifest = Read-RomaWindowsManifest -Path $manifestPath',
+        '$proofCommonScript = Require-RomaWindowsManifestFile -Manifest $manifest -Key "proof_common_script" -BaseDir $PackageDir',
+        ". `$proofCommonScript",
+        '$checkSetScript = Require-RomaWindowsManifestFile -Manifest $manifest -Key "check_set_script" -BaseDir $PackageDir',
+        "",
+        "`$laptopPreflightReportPath = $(ConvertTo-RomaWindowsPowerShellSingleQuotedString -Value $LaptopPreflightReportPath)",
+        "`$cloudDictationReportPath = $(ConvertTo-RomaWindowsPowerShellSingleQuotedString -Value $CloudDictationReportPath)",
+        "`$localWhisperDictationReportPath = $(ConvertTo-RomaWindowsPowerShellSingleQuotedString -Value $LocalWhisperDictationReportPath)",
+        "`$localWhisperNotepadPasteReportPath = $(ConvertTo-RomaWindowsPowerShellSingleQuotedString -Value $LocalWhisperNotepadPasteReportPath)",
+        "",
+        "`$proofSetOutput = & `$checkSetScript ``",
+        "    -LaptopPreflightReportPath `$laptopPreflightReportPath ``",
+        "    -CloudDictationReportPath `$cloudDictationReportPath ``",
+        "    -LocalWhisperDictationReportPath `$localWhisperDictationReportPath ``",
+        "    -LocalWhisperNotepadPasteReportPath `$localWhisperNotepadPasteReportPath ``",
+        "    -RequireLaptopPreflight ``",
+        "    -RequireFullLaptopProof 2>&1 | Out-String",
+        "Write-Host `$proofSetOutput",
+        "Assert-RomaWindowsFullLaptopProofSetOutput -Output `$proofSetOutput",
+        'Write-Host "windows_laptop_recheck_ok=true"'
+    )
+
+    $scriptLines | Set-Content -LiteralPath $Path -Encoding UTF8
+    Write-Host "windows_laptop_recheck_script=$Path"
+}
+
 function Get-RomaWindowsProofSurfaceFiles {
     return @(
         "smoke-windows-agent.ps1",

@@ -58,70 +58,6 @@ if (!(Test-Path -LiteralPath $manifestScript)) {
 }
 . $manifestScript
 
-function ConvertTo-PowerShellSingleQuotedString {
-    param(
-        [string]$Value = ""
-    )
-
-    return "'" + $Value.Replace("'", "''") + "'"
-}
-
-function Write-FullLaptopProofRecheckScript {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Path,
-        [Parameter(Mandatory = $true)]
-        [string]$PackageDir,
-        [Parameter(Mandatory = $true)]
-        [string]$LaptopPreflightReportPath,
-        [Parameter(Mandatory = $true)]
-        [string]$CloudDictationReportPath,
-        [Parameter(Mandatory = $true)]
-        [string]$LocalWhisperDictationReportPath,
-        [Parameter(Mandatory = $true)]
-        [string]$LocalWhisperNotepadPasteReportPath
-    )
-
-    $scriptLines = @(
-        "param(",
-        "    [string]`$PackageDir = $(ConvertTo-PowerShellSingleQuotedString -Value $PackageDir)",
-        ")",
-        "",
-        '$ErrorActionPreference = "Stop"',
-        "Set-StrictMode -Version Latest",
-        "",
-        '$manifestScript = Join-Path $PackageDir "windows-manifest.ps1"',
-        'if (!(Test-Path -LiteralPath $manifestScript)) {',
-        '    throw "Windows manifest helper was not found: $manifestScript"',
-        '}',
-        ". `$manifestScript",
-        '$manifestPath = Join-Path $PackageDir "manifest.txt"',
-        '$manifest = Read-RomaWindowsManifest -Path $manifestPath',
-        '$proofCommonScript = Require-RomaWindowsManifestFile -Manifest $manifest -Key "proof_common_script" -BaseDir $PackageDir',
-        ". `$proofCommonScript",
-        '$checkSetScript = Require-RomaWindowsManifestFile -Manifest $manifest -Key "check_set_script" -BaseDir $PackageDir',
-        "",
-        "`$laptopPreflightReportPath = $(ConvertTo-PowerShellSingleQuotedString -Value $LaptopPreflightReportPath)",
-        "`$cloudDictationReportPath = $(ConvertTo-PowerShellSingleQuotedString -Value $CloudDictationReportPath)",
-        "`$localWhisperDictationReportPath = $(ConvertTo-PowerShellSingleQuotedString -Value $LocalWhisperDictationReportPath)",
-        "`$localWhisperNotepadPasteReportPath = $(ConvertTo-PowerShellSingleQuotedString -Value $LocalWhisperNotepadPasteReportPath)",
-        "",
-        "`$proofSetOutput = & `$checkSetScript ``",
-        "    -LaptopPreflightReportPath `$laptopPreflightReportPath ``",
-        "    -CloudDictationReportPath `$cloudDictationReportPath ``",
-        "    -LocalWhisperDictationReportPath `$localWhisperDictationReportPath ``",
-        "    -LocalWhisperNotepadPasteReportPath `$localWhisperNotepadPasteReportPath ``",
-        "    -RequireLaptopPreflight ``",
-        "    -RequireFullLaptopProof 2>&1 | Out-String",
-        "Write-Host `$proofSetOutput",
-        "Assert-RomaWindowsFullLaptopProofSetOutput -Output `$proofSetOutput",
-        'Write-Host "windows_laptop_recheck_ok=true"'
-    )
-
-    $scriptLines | Set-Content -LiteralPath $Path -Encoding UTF8
-    Write-Host "windows_laptop_recheck_script=$Path"
-}
-
 function Write-NotepadPastePrompt {
     Write-Host ""
     Write-Host "ACTION_REQUIRED=local_whisper_notepad_paste"
@@ -634,7 +570,7 @@ Invoke-Step "full laptop proof set check" {
 }
 
 Invoke-Step "write full laptop proof recheck" {
-    Write-FullLaptopProofRecheckScript `
+    Write-RomaWindowsFullLaptopProofRecheckScript `
         -Path $recheckScriptPath `
         -PackageDir $PackageDir `
         -LaptopPreflightReportPath $PreflightReportPath `

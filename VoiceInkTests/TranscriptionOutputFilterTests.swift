@@ -305,6 +305,8 @@ struct TranscriptionOutputFilterTests {
         #expect(TranscriptionOutputFilter.filter("I think this is I mean really good.") == "I think this is really good.")
         #expect(TranscriptionOutputFilter.filter("I think this is like ready.") == "I think this is ready.")
         #expect(TranscriptionOutputFilter.filter("I think this is like good.") == "I think this is good.")
+        #expect(TranscriptionOutputFilter.filter("I think this is you see ready.") == "I think this is ready.")
+        #expect(TranscriptionOutputFilter.filter("I think this is if that makes sense ready.") == "I think this is ready.")
         #expect(TranscriptionOutputFilter.filter("This works I mean") == "This works")
         #expect(TranscriptionOutputFilter.filter("This works like") == "This works")
         #expect(TranscriptionOutputFilter.filter("This works basically") == "This works")

@@ -3365,6 +3365,16 @@ struct RomaCoreChecks {
                 "embedded unpunctuated like before good predicate"
             ),
             (
+                "I think this is you see ready.",
+                "I think this is ready.",
+                "embedded unpunctuated you see filler"
+            ),
+            (
+                "I think this is if that makes sense ready.",
+                "I think this is ready.",
+                "embedded unpunctuated if-that-makes-sense filler"
+            ),
+            (
                 "This works I mean",
                 "This works",
                 "unpunctuated terminal i mean filler"

@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Removed embedded unpunctuated "you see" and "if that makes sense" clarification fillers in guarded copula contexts.
 - Removed embedded unpunctuated "I mean" and more copula-context "like" fillers without dropping the surrounding verb.
 - Removed embedded unpunctuated "you know" filler after copula-style words while preserving real "you know" prose.
 - Treated bare "actually" as a bounded correction marker for short time, amount, and product-name dictation fixes while preserving ordinary "actually" prose.

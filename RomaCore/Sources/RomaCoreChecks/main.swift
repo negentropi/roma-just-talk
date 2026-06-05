@@ -8002,6 +8002,14 @@ struct RomaCoreChecks {
                 "model=whisper-large-v3"
             ]
         )
+        try require(
+            sourceProofClient.proofOutputLines(label: "provider") == [
+                "provider=openai-compatible",
+                "endpoint=https://api.example.com/v1/audio/transcriptions",
+                "model=whisper-large-v3"
+            ],
+            "transcription client should own labeled proof output lines"
+        )
         let sourceProofLines = WindowsDictationRuntimeResultProof.outputLines(
             for: windowsProofResult,
             options: WindowsDictationRuntimeResultProofOptions(
@@ -10525,13 +10533,16 @@ struct RomaCoreChecks {
         try require(
             windowsAgentSource.contains("RomaTranscriptionClient.make(from: configuration)") &&
                 windowsAgentSource.contains("RomaTranscriptionClient.runnableSetupProofLines(for: configuration)") &&
+                windowsAgentSource.contains("proofOutputLines(label: \"transcription_client\")") &&
                 !windowsAgentSource.contains("private struct AgentTranscriptionClient"),
-            "Windows agent should share transcription client selection through RomaCore"
+            "Windows agent should share transcription client selection and proof output through RomaCore"
         )
         try require(
             proofAgentSource.contains("RomaTranscriptionClient.make(from: configuration)") &&
-                proofAgentSource.contains("configuration.validateTranscriptionSettings()"),
-            "Windows dictation proof should share the user-facing transcription config path"
+                proofAgentSource.contains("configuration.validateTranscriptionSettings()") &&
+                proofAgentSource.contains("proofOutputLines(label: \"transcription_client\")") &&
+                proofAgentSource.contains("proofOutputLines(label: \"provider\")"),
+            "Windows dictation proof should share the user-facing transcription config and proof output path"
         )
         try require(
             transcriptionClientSource.contains("public static func openAICompatible(") &&

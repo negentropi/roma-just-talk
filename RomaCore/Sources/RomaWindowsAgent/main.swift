@@ -115,10 +115,7 @@ struct RomaWindowsAgent {
 
     private static func printDictationHeader(_ context: DictationRunContext) {
         print("agent=roma-windows-agent")
-        print("transcription_client=\(context.transcriptionClient.name)")
-        for line in context.transcriptionClient.details {
-            print(line)
-        }
+        context.transcriptionClient.proofOutputLines(label: "transcription_client").forEach { print($0) }
         print(context.request.trigger.recordingModeProofLine)
         print("paste_requested=\(context.shouldPaste)")
         print("restore_clipboard_after_paste=\(context.clipboardRestoreConfiguration.restoreClipboard)")
@@ -258,10 +255,7 @@ struct RomaWindowsAgent {
         print("config=\(url.path)")
         print("config_exists=\(FileManager.default.fileExists(atPath: url.path))")
         print("config_valid=true")
-        print("transcription_client=\(transcriptionClient.name)")
-        for line in transcriptionClient.details {
-            print(line)
-        }
+        transcriptionClient.proofOutputLines(label: "transcription_client").forEach { print($0) }
         for line in setupProofLines {
             print(line)
         }

@@ -18,6 +18,10 @@ public struct RomaTranscriptionClient: Sendable {
         self.details = details
     }
 
+    public func proofOutputLines(label: String) -> [String] {
+        ["\(label)=\(name)"] + details
+    }
+
     public static func make(from configuration: RomaWindowsAgentConfiguration) throws -> RomaTranscriptionClient {
         if configuration.usesWhisperCLI {
             return try whisperCLI(configuration: configuration.whisperCLIConfiguration())

@@ -279,10 +279,7 @@ struct RomaProofAgent {
             model: transcriptionClient.model
         )
 
-        print("transcription_client=\(transcriptionClient.name)")
-        for line in transcriptionClient.details {
-            print(line)
-        }
+        transcriptionClient.proofOutputLines(label: "transcription_client").forEach { print($0) }
         print(request.trigger.recordingModeProofLine)
 
         let result = try await WindowsDictationRuntime.run(
@@ -513,10 +510,7 @@ struct RomaProofAgent {
         client: RomaTranscriptionClient,
         audioURL: URL
     ) {
-        print("provider=\(client.name)")
-        for line in client.details {
-            print(line)
-        }
+        client.proofOutputLines(label: "provider").forEach { print($0) }
         print("audio=\(audioURL.path)")
         if let language = result.language {
             print("language=\(language)")

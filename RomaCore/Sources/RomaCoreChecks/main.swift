@@ -13258,14 +13258,15 @@ struct RomaCoreChecks {
         try require(
             packageScript.contains("native laptop preflight report checker smoke") &&
                 packageScript.contains("local whisper laptop preflight report checker smoke") &&
-                packageScript.contains("Write-LaptopPreflightCheckerSmokeReport") &&
-                packageScript.contains("function Invoke-LaptopPreflightReportProfileSmoke") &&
-                packageScript.contains("function Invoke-LaptopPreflightCheckerSmoke") &&
+                packageScript.contains("Invoke-RomaWindowsLaptopPreflightCheckerSmoke") &&
+                proofCommonScript.contains("function Write-RomaWindowsLaptopPreflightCheckerSmokeReport") &&
+                proofCommonScript.contains("function Invoke-RomaWindowsLaptopPreflightReportProfileSmoke") &&
+                proofCommonScript.contains("function Invoke-RomaWindowsLaptopPreflightCheckerSmoke") &&
                 packageScript.contains("-ReportCheckerScriptPath $checkReportScriptOutput") &&
                 packageScript.contains("-SetCheckerScriptPath $checkSetScriptOutput") &&
-                packageScript.contains("-RequireProofProfile laptop-preflight") &&
-                packageScript.contains("Assert-RomaWindowsLaptopPreflightProfileOutput") &&
-                packageScript.contains("Assert-RomaWindowsLaptopPreflightSetOutput") &&
+                proofCommonScript.contains("-RequireProofProfile laptop-preflight") &&
+                proofCommonScript.contains("Assert-RomaWindowsLaptopPreflightProfileOutput") &&
+                proofCommonScript.contains("Assert-RomaWindowsLaptopPreflightSetOutput") &&
                 proofCommonScript.contains("function Get-RomaWindowsLaptopPreflightCommonOutputMarkers") &&
                 proofCommonScript.contains("function Assert-RomaWindowsLaptopPreflightProfileOutput") &&
                 proofCommonScript.contains("function Assert-RomaWindowsLaptopPreflightSetOutput") &&
@@ -13284,10 +13285,12 @@ struct RomaCoreChecks {
                 packageScript.contains(#"Invoke-Step "packaged script parse check""#) &&
                 packageScript.contains(#"$proofCommonScriptSource = $sourceArtifactPaths["proof_common_script"]"#) &&
                 packageScript.contains("proof_common_script=$proofCommonScriptOutput") &&
-                packageScript.contains("New-RomaWindowsLaptopPreflightSyntheticReport") &&
-                packageScript.contains("Get-RomaPackageIdentityProof -PackageDir $PackageDir") &&
+                proofCommonScript.contains("New-RomaWindowsLaptopPreflightSyntheticReport") &&
+                packageScript.contains("$packageIdentityProof = Get-RomaPackageIdentityProof -PackageDir $OutputDir") &&
+                packageScript.contains("-PackageIdentity $packageIdentityProof") &&
                 proofCommonScript.contains("function New-RomaWindowsLaptopPreflightSyntheticReport") &&
                 proofCommonScript.contains("New-RomaWindowsLaptopPreflightSyntheticOutputProofs -IncludeLocalWhisper $IncludeLocalWhisper") &&
+                proofCommonScript.contains("-PackageIdentity $PackageIdentity") &&
                 proofCommonScript.contains("proof_agent = Require-RomaWindowsFileProof -Path $ProofAgentPath") &&
                 proofCommonScript.contains("mic_preflight_wav = Require-RomaWindowsFileProof -Path $MicPreflightPath") &&
                 proofCommonScript.contains("whisper_cli = $whisperCLIProof") &&
@@ -13302,12 +13305,19 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("included_pre_roll_seconds = 0.5") &&
                 proofCommonScript.contains("transcription_client_whisper") &&
                 proofCommonScript.contains("package_identity = $PackageIdentity") &&
+                !packageScript.contains("function Write-LaptopPreflightCheckerSmokeReport") &&
+                !packageScript.contains("function Invoke-LaptopPreflightReportProfileSmoke") &&
+                !packageScript.contains("function Invoke-LaptopPreflightCheckerSmoke") &&
+                !packageScript.contains("New-RomaWindowsLaptopPreflightSyntheticReport") &&
                 !packageScript.contains("New-RomaWindowsLaptopPreflightReport `") &&
                 !packageScript.contains("New-RomaWindowsLaptopPreflightSyntheticOutputProofs") &&
+                !packageScript.contains("Assert-RomaWindowsLaptopPreflightProfileOutput") &&
+                !packageScript.contains("Assert-RomaWindowsLaptopPreflightSetOutput") &&
                 !packageScript.contains("proof_agent = Require-RomaWindowsFileProof -Path $ProofAgentPath") &&
                 !packageScript.contains("whisper_cli = $whisperCLIProof") &&
                 !packageScript.contains(String(repeating: "0", count: 64)) &&
-                packageScript.contains("source_repository = $GitMetadata.Repository") &&
+                proofCommonScript.contains("source_repository = $GitMetadata.Repository") &&
+                !packageScript.contains("source_repository = $GitMetadata.Repository") &&
                 packageScript.contains("laptop_native_preflight_checker_smoke_report") &&
                 packageScript.contains("laptop_preflight_checker_smoke_report") &&
                 packageScript.contains("-IncludeLocalWhisper $false") &&
@@ -13496,9 +13506,10 @@ struct RomaCoreChecks {
         try require(
             proofCommonScript.contains("Require-RomaWindowsFileProof -Path $ProofAgentPath") &&
                 proofCommonScript.contains("Get-RomaWindowsEmptyFileProof") &&
-                packageScript.contains("New-RomaWindowsLaptopPreflightSyntheticReport") &&
+                proofCommonScript.contains("New-RomaWindowsLaptopPreflightSyntheticReport") &&
                 laptopProofScript.contains("Get-RomaWindowsOptionalFileProof -Path $WhisperCLIPath") &&
                 laptopProofScript.contains("Get-RomaWindowsOptionalFileProof -Path $WhisperModelPath") &&
+                !packageScript.contains("New-RomaWindowsLaptopPreflightSyntheticReport") &&
                 !packageScript.contains("Require-RomaWindowsFileProof -Path $ProofAgentPath") &&
                 !packageScript.contains("Get-RomaWindowsEmptyFileProof") &&
                 !packageScript.contains("function New-FileProof") &&
@@ -13511,7 +13522,8 @@ struct RomaCoreChecks {
             proofCommonScript.contains("function Get-RomaWindowsOSReportProof") &&
                 proofCommonScript.contains("Require-RomaWindowsCurrentUserSid") &&
                 proofCommonScript.contains("Get-RomaWindowsCurrentUserSid") &&
-                packageScript.contains("-RequireUserSid") &&
+                proofCommonScript.contains("-RequireUserSid") &&
+                !packageScript.contains("-RequireUserSid") &&
                 !packageScript.contains("function Get-CurrentWindowsUserSid") &&
                 proveScript.contains("os = Get-RomaWindowsOSReportProof") &&
                 !proveScript.contains("Set-Alias -Name Get-CurrentWindowsUserSid") &&

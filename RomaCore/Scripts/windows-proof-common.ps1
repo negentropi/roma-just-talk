@@ -2815,6 +2815,143 @@ function New-RomaWindowsLaptopPreflightSyntheticReport {
         -RequireUserSid:$RequireUserSid
 }
 
+function Write-RomaWindowsLaptopPreflightCheckerSmokeReport {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ReportPath,
+        [Parameter(Mandatory = $true)]
+        [string]$PackageDir,
+        [Parameter(Mandatory = $true)]
+        [string]$ProofDir,
+        [Parameter(Mandatory = $true)]
+        [string]$ProofAgentPath,
+        [Parameter(Mandatory = $true)]
+        [string]$WhisperCLIPath,
+        [Parameter(Mandatory = $true)]
+        [string]$WhisperModelPath,
+        [Parameter(Mandatory = $true)]
+        [hashtable]$GitMetadata,
+        [Parameter(Mandatory = $true)]
+        [object]$PackageIdentity,
+        [bool]$IncludeLocalWhisper = $true
+    )
+
+    New-Item -ItemType Directory -Force -Path $ProofDir | Out-Null
+    $micPreflightPath = Join-Path $ProofDir "ci-mic-preflight.wav"
+    $wavBytes = [byte[]]::new(46)
+    $riffBytes = [System.Text.Encoding]::ASCII.GetBytes("RIFF")
+    [System.Array]::Copy($riffBytes, $wavBytes, $riffBytes.Length)
+    [System.IO.File]::WriteAllBytes($micPreflightPath, $wavBytes)
+
+    $report = New-RomaWindowsLaptopPreflightSyntheticReport `
+        -PackageDir $PackageDir `
+        -ProofDir $ProofDir `
+        -Manifest ([ordered]@{
+            source_repository = $GitMetadata.Repository
+            source_branch = $GitMetadata.Branch
+            source_commit = $GitMetadata.Commit
+            source_dirty = $GitMetadata.Dirty
+        }) `
+        -PackageIdentity $PackageIdentity `
+        -ProofAgentPath $ProofAgentPath `
+        -MicPreflightPath $micPreflightPath `
+        -WhisperCLIPath $WhisperCLIPath `
+        -WhisperModelPath $WhisperModelPath `
+        -IncludeLocalWhisper $IncludeLocalWhisper `
+        -RequireUserSid
+
+    $report |
+        ConvertTo-Json -Depth 6 |
+        Set-Content -LiteralPath $ReportPath -Encoding UTF8
+    Write-Host "laptop_preflight_checker_smoke_report=$ReportPath"
+}
+
+function Invoke-RomaWindowsLaptopPreflightReportProfileSmoke {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$CheckerScriptPath,
+        [Parameter(Mandatory = $true)]
+        [string]$ReportPath,
+        [Parameter(Mandatory = $true)]
+        [string]$Name,
+        [Parameter(Mandatory = $true)]
+        [bool]$ExpectLocalWhisper
+    )
+
+    $profileOutputText = & $CheckerScriptPath `
+        -ProofReportPath $ReportPath `
+        -RequireProofProfile laptop-preflight 2>&1 | Out-String
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host $profileOutputText
+        throw "$Name laptop preflight report profile smoke failed"
+    }
+
+    Write-Host $profileOutputText
+    Assert-RomaWindowsLaptopPreflightProfileOutput `
+        -Output $profileOutputText `
+        -ExpectLocalWhisper $ExpectLocalWhisper
+    return $profileOutputText
+}
+
+function Invoke-RomaWindowsLaptopPreflightCheckerSmoke {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ReportPath,
+        [Parameter(Mandatory = $true)]
+        [string]$PackageDir,
+        [Parameter(Mandatory = $true)]
+        [string]$ProofDir,
+        [Parameter(Mandatory = $true)]
+        [string]$ProofAgentPath,
+        [Parameter(Mandatory = $true)]
+        [string]$WhisperCLIPath,
+        [Parameter(Mandatory = $true)]
+        [string]$WhisperModelPath,
+        [Parameter(Mandatory = $true)]
+        [hashtable]$GitMetadata,
+        [Parameter(Mandatory = $true)]
+        [object]$PackageIdentity,
+        [Parameter(Mandatory = $true)]
+        [string]$ReportCheckerScriptPath,
+        [Parameter(Mandatory = $true)]
+        [string]$SetCheckerScriptPath,
+        [Parameter(Mandatory = $true)]
+        [string]$Name,
+        [bool]$IncludeLocalWhisper = $true
+    )
+
+    Write-RomaWindowsLaptopPreflightCheckerSmokeReport `
+        -ReportPath $ReportPath `
+        -PackageDir $PackageDir `
+        -ProofDir $ProofDir `
+        -ProofAgentPath $ProofAgentPath `
+        -WhisperCLIPath $WhisperCLIPath `
+        -WhisperModelPath $WhisperModelPath `
+        -GitMetadata $GitMetadata `
+        -PackageIdentity $PackageIdentity `
+        -IncludeLocalWhisper $IncludeLocalWhisper
+
+    Invoke-RomaWindowsLaptopPreflightReportProfileSmoke `
+        -CheckerScriptPath $ReportCheckerScriptPath `
+        -ReportPath $ReportPath `
+        -Name $Name `
+        -ExpectLocalWhisper $IncludeLocalWhisper | Out-Null
+
+    $checkerOutputText = & $SetCheckerScriptPath `
+        -LaptopPreflightReportPath $ReportPath `
+        -RequireLaptopPreflight 2>&1 | Out-String
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host $checkerOutputText
+        throw "$Name laptop preflight report checker smoke failed"
+    }
+
+    Write-Host $checkerOutputText
+    Assert-RomaWindowsLaptopPreflightSetOutput `
+        -Output $checkerOutputText `
+        -ExpectLocalWhisper $IncludeLocalWhisper
+    return $checkerOutputText
+}
+
 function Get-RomaWindowsListenerSmokeOutputMarkers {
     return [ordered]@{
         mode_listen = "mode=listen"

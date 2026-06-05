@@ -2868,7 +2868,7 @@ public struct RomaTranscriptionOutputFilter {
 
     private static func removeUnpunctuatedUncertaintyFillers(from text: String) -> String {
         guard let regex = try? NSRegularExpression(
-            pattern: #"(?i)(?<![\p{L}\p{N}])i[ \t]+(?:guess|suppose|think|would[ \t]+say|feel[ \t]+like)(?:[ \t]*[,;:…]+)?(?![\p{L}\p{N}])"#
+            pattern: #"(?i)(?<![\p{L}\p{N}])i[ \t]+(?:guess|suppose|think|would(?:[ \t]+(?:probably|maybe))?[ \t]+say|feel[ \t]+like)(?:[ \t]*[,;:…]+)?(?![\p{L}\p{N}])"#
         ) else {
             return text
         }

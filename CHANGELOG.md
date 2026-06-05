@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Removed embedded unpunctuated "I would probably say" and "I would maybe say" hesitation fillers before short predicates.
 - Removed embedded unpunctuated "I would say" and "I feel like" hesitation fillers before short predicates while preserving meaningful leading and terminal uses.
 - Removed embedded unpunctuated "I guess", "I suppose", and "I think" hesitation fillers before short predicates while preserving meaningful leading and terminal uncertainty.
 - Collapsed repeated copula false starts such as "The model is the module is ready" while preserving normal prose clauses.

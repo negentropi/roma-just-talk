@@ -501,7 +501,7 @@ public struct RomaTranscriptionOutputFilter {
         "argument", "arguments", "array", "arrays", "as", "at", "back", "bad", "be", "because", "branch", "branches",
         "bug", "bugs", "button", "buttons", "but", "by", "cache", "caches", "call", "can", "case", "change", "class", "classes",
         "client", "code", "command", "commands", "commit", "commits", "component", "components", "config",
-        "constant", "constants", "correction", "could", "data", "database", "databases", "dictionary", "dictionaries",
+        "constant", "constants", "correct", "correction", "could", "data", "database", "databases", "dictionary", "dictionaries",
         "delete", "did", "diff", "diffs", "do", "does", "done", "email", "emails", "endpoint", "endpoints", "enum",
         "enums", "erase", "error", "errors", "field", "fields", "file", "files", "final", "first", "flag", "flags",
         "folder", "folders", "for", "from", "function", "functions", "get", "go", "got", "gotcha", "had", "hang", "has", "have",
@@ -564,7 +564,7 @@ public struct RomaTranscriptionOutputFilter {
         (#"(?i)^\s*(?:ok(?:ay)?|all\s+right|alright|right|yeah|yes|yep|yup|sure)(?:[ \t]*[,;:…]+[ \t]*)+so[,;:…]*[ \t]+"#, ""),
         (#"(?i)^\s*(?:you\s+know|i\s+mean|like)[,;:…]+[ \t]*"#, "")
     ]
-    private static let continuationFragmentLeadingDiscourseFillerPattern = #"(?i)^\s*(you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?|what[ \t]+i[ \t]+mean[ \t]+(?:is|was)|what[ \t]+i(?:[ \t]+(?:am|was)|['’]m)[ \t]+trying[ \t]+to[ \t]+say[ \t]+is|what[ \t]+i[ \t]+was[ \t]+(?:going[ \t]+to|gonna)[ \t]+say[ \t]+is|what[ \t]+i[ \t]+(?:meant|want(?:ed)?)[ \t]+to[ \t]+say[ \t]+(?:is|was)|what[ \t]+i[ \t]+meant[ \t]+(?:is|was)|i[ \t]+(?:am|was)[ \t]+trying[ \t]+to[ \t]+say|i[ \t]+was[ \t]+(?:going[ \t]+to|gonna)[ \t]+say|i[ \t]+(?:want|wanted)[ \t]+to[ \t]+say|i[ \t]+mean(?:[ \t]+to[ \t]+say)?|i[ \t]+meant(?:[ \t]+to[ \t]+say)?|i[ \t]+should[ \t]+say|(?:it|that)[ \t]+should[ \t]+be|(?:it|that)(?:[ \t]+is|['’]s)|ok(?:ay)?|all[ \t]+right|alright|got[ \t]+it|gotcha|no[ \t]+wait|(?:nope|nah)[ \t]+(?:wait|actually)|wait|hold[ \t]+on|hang[ \t]+on|make[ \t]+(?:it|that)|call[ \t]+it|replace[ \t]+(?:that|it)[ \t]+with|change[ \t]+(?:that|it)[ \t]+to|(?:scratch|delete|remove|erase|undo)[ \t]+(?:that|this)(?:[ \t]+out)?|correction(?:[ \t]+(?:is|should[ \t]+be))?|sorry|oops|whoops|my[ \t]+bad|actually|instead|rather|yeah|yes|yep|yup|like|basically|so|well)(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
+    private static let continuationFragmentLeadingDiscourseFillerPattern = #"(?i)^\s*(you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?|what[ \t]+i[ \t]+mean[ \t]+(?:is|was)|what[ \t]+i(?:[ \t]+(?:am|was)|['’]m)[ \t]+trying[ \t]+to[ \t]+say[ \t]+is|what[ \t]+i[ \t]+was[ \t]+(?:going[ \t]+to|gonna)[ \t]+say[ \t]+is|what[ \t]+i[ \t]+(?:meant|want(?:ed)?)[ \t]+to[ \t]+say[ \t]+(?:is|was)|what[ \t]+i[ \t]+meant[ \t]+(?:is|was)|i[ \t]+(?:am|was)[ \t]+trying[ \t]+to[ \t]+say|i[ \t]+was[ \t]+(?:going[ \t]+to|gonna)[ \t]+say|i[ \t]+(?:want|wanted)[ \t]+to[ \t]+say|i[ \t]+mean(?:[ \t]+to[ \t]+say)?|i[ \t]+meant(?:[ \t]+to[ \t]+say)?|i[ \t]+should[ \t]+say|(?:it|that)[ \t]+should[ \t]+be|(?:it|that)(?:[ \t]+is|['’]s)|ok(?:ay)?|all[ \t]+right|alright|got[ \t]+it|gotcha|no[ \t]+wait|(?:nope|nah)[ \t]+(?:wait|actually)|wait|hold[ \t]+on|hang[ \t]+on|make[ \t]+(?:it|that)|call[ \t]+it|replace[ \t]+(?:that|it)[ \t]+with|change[ \t]+(?:that|it)[ \t]+to|correct[ \t]+(?:that|it)[ \t]+to|(?:scratch|delete|remove|erase|undo)[ \t]+(?:that|this)(?:[ \t]+out)?|correction(?:[ \t]+(?:is|should[ \t]+be))?|sorry|oops|whoops|my[ \t]+bad|actually|instead|rather|yeah|yes|yep|yup|like|basically|so|well)(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let standaloneDiscourseFillerPattern = #"(?i)^\s*you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?[ \t]*[.,;:…]*\s*$"#
     private static let blockedPreviousWordsForTerminalYouKnow: Set<String> = [
         "do", "does", "did", "don't", "if", "know", "let", "should", "to", "whether", "will", "would"
@@ -738,6 +738,7 @@ public struct RomaTranscriptionOutputFilter {
             (?:[,;:…]|\.\.\.)\s*call\s+it\s*[,;:]? |
             replace\s+(?:that|it)\s+with |
             change\s+(?:that|it)\s+to |
+            correct\s+(?:that|it)\s+to |
             (?:(?:scratch|strike|delete|remove|erase|undo|cancel|disregard|ignore|forget|cut|drop)\s+(?:that|this)\s+out|cross\s+(?:that|this)\s+out|(?:scratch|strike|delete|remove|erase|undo|cancel|disregard|ignore|forget|cut|drop)\s+(?:that|this)(?!\s+(?:out|words?|lines?|sentences?|paragraphs?)\b)) |
             (?:[,;:…]|\.\.\.)\s*hold\s+on\s*[,;:]? |
             (?:[,;:…]|\.\.\.)\s*hang\s+on\s*[,;:]? |
@@ -2123,7 +2124,8 @@ public struct RomaTranscriptionOutputFilter {
         if [
             "all right", "alright", "got it", "gotcha", "no wait", "nope wait", "nope actually",
             "nah wait", "nah actually", "wait", "hold on", "hang on",
-            "make it", "make that", "call it", "replace that with", "replace it with", "change that to", "change it to",
+            "make it", "make that", "call it", "replace that with", "replace it with",
+            "change that to", "change it to", "correct that to", "correct it to",
             "scratch that", "scratch this", "scratch that out", "scratch this out",
             "delete that", "delete this", "delete that out", "delete this out",
             "remove that", "remove this", "remove that out", "remove this out",
@@ -2401,6 +2403,13 @@ public struct RomaTranscriptionOutputFilter {
             }
             return markerIndex + 3
         case "change":
+            guard ["that", "it"].contains(tokens[markerIndex + 1].text),
+                  markerIndex + 2 < tokens.count,
+                  tokens[markerIndex + 2].text == "to" else {
+                return nil
+            }
+            return markerIndex + 3
+        case "correct":
             guard ["that", "it"].contains(tokens[markerIndex + 1].text),
                   markerIndex + 2 < tokens.count,
                   tokens[markerIndex + 2].text == "to" else {
@@ -7556,7 +7565,9 @@ public struct RomaTranscriptionOutputFilter {
             "replace that with",
             "replace it with",
             "change that to",
-            "change it to"
+            "change it to",
+            "correct that to",
+            "correct it to"
         ].contains(normalizedMarker)
     }
 

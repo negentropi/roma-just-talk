@@ -838,6 +838,20 @@ struct RomaCoreChecks {
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Correct that to module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim correct-that-to correction commands before module continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Correct it to model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim correct-it-to correction commands before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "Make it now.",
                 context: midSentenceContext
             ) == "make it now",
@@ -863,6 +877,13 @@ struct RomaCoreChecks {
                 context: midSentenceContext
             ) == "change that to now",
             "shared insertion polish should preserve non-technical change-that-to continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Correct that to now.",
+                context: midSentenceContext
+            ) == "correct that to now",
+            "shared insertion polish should preserve non-technical correct-that-to continuations"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
@@ -1354,6 +1375,20 @@ struct RomaCoreChecks {
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model correct that to module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should apply correct-that-to corrections in short continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model correct it to final word.",
+                context: midSentenceContext
+            ) == "final word",
+            "shared insertion polish should apply correct-it-to corrections in short continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "model I should say module.",
                 context: midSentenceContext
             ) == "module",
@@ -1477,6 +1512,13 @@ struct RomaCoreChecks {
                 context: midSentenceContext
             ) == "please I was going to say module",
             "shared insertion polish should preserve please-prefixed i-was-going-to-say prose"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "please correct that to module.",
+                context: midSentenceContext
+            ) == "please correct that to module",
+            "shared insertion polish should preserve please-prefixed correct-that-to prose"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
@@ -4857,6 +4899,16 @@ struct RomaCoreChecks {
                 "replace it with correction"
             ),
             (
+                "Use model correct that to module.",
+                "Use module.",
+                "correct that to correction"
+            ),
+            (
+                "Use model correct it to module.",
+                "Use module.",
+                "correct it to correction"
+            ),
+            (
                 "Use model replace that with a module.",
                 "Use a module.",
                 "replace that with article correction"
@@ -4865,6 +4917,11 @@ struct RomaCoreChecks {
                 "Set color blue change it to red.",
                 "Set color red.",
                 "change it to correction"
+            ),
+            (
+                "Set color blue correct that to red.",
+                "Set color red.",
+                "correct that to correction"
             ),
             (
                 "Use the model replace that with a module.",
@@ -5717,6 +5774,16 @@ struct RomaCoreChecks {
                 "change it command prose guard"
             ),
             (
+                "The command correct that to is useful.",
+                "The command correct that to is useful.",
+                "correct that command prose guard"
+            ),
+            (
+                "The command correct it to is useful.",
+                "The command correct it to is useful.",
+                "correct it command prose guard"
+            ),
+            (
                 "The phrase no I mean is useful.",
                 "The phrase no I mean is useful.",
                 "no i mean phrase guard"
@@ -5765,6 +5832,11 @@ struct RomaCoreChecks {
                 "Please change it to red.",
                 "Please change it to red.",
                 "single-prefix change it prose guard"
+            ),
+            (
+                "Please correct that to red.",
+                "Please correct that to red.",
+                "single-prefix correct that prose guard"
             ),
             (
                 "Please replace it with red.",

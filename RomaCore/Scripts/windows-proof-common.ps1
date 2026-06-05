@@ -2546,3 +2546,30 @@ function Get-RomaWindowsInstalledProofSurfaceFileProofs {
 
     return $proofs
 }
+
+function Get-RomaWindowsAgentArtifactFileProofs {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$AgentPath,
+        [Parameter(Mandatory = $true)]
+        [string]$ProofAgentPath,
+        [Parameter(Mandatory = $true)]
+        [string]$WhisperCLIMockPath,
+        [Parameter(Mandatory = $true)]
+        [string]$InstallDir
+    )
+
+    $proofs = [ordered]@{
+        packaged_agent = (Get-RomaWindowsFileHashProof -Path $AgentPath)
+        packaged_proof_agent = (Get-RomaWindowsFileHashProof -Path $ProofAgentPath)
+        packaged_whisper_cli_mock = (Get-RomaWindowsFileHashProof -Path $WhisperCLIMockPath)
+        installed_agent = (Get-RomaWindowsFileHashProof -Path (Join-Path $InstallDir "RomaWindowsAgent.exe"))
+        installed_proof_agent = (Get-RomaWindowsFileHashProof -Path (Join-Path $InstallDir "RomaProofAgent.exe"))
+    }
+    Add-RomaWindowsProofFields `
+        -Proof $proofs `
+        -Fields (Get-RomaWindowsInstalledProofSurfaceFileProofs -InstallDir $InstallDir) |
+        Out-Null
+
+    return $proofs
+}

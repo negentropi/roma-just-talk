@@ -300,17 +300,11 @@ function Write-ProofReport {
         }
     }
     $installedRunScriptPath = Join-Path $InstallDir "run-windows-agent.ps1"
-    $fileProofs = [ordered]@{
-        packaged_agent = (Get-RomaWindowsFileHashProof -Path $agentPath)
-        packaged_proof_agent = (Get-RomaWindowsFileHashProof -Path $script:proofAgentPath)
-        packaged_whisper_cli_mock = (Get-RomaWindowsFileHashProof -Path $script:packagedWhisperCLI)
-        installed_agent = (Get-RomaWindowsFileHashProof -Path (Join-Path $InstallDir "RomaWindowsAgent.exe"))
-        installed_proof_agent = (Get-RomaWindowsFileHashProof -Path (Join-Path $InstallDir "RomaProofAgent.exe"))
-    }
-    Add-RomaWindowsProofFields `
-        -Proof $fileProofs `
-        -Fields (Get-RomaWindowsInstalledProofSurfaceFileProofs -InstallDir $InstallDir) |
-        Out-Null
+    $fileProofs = Get-RomaWindowsAgentArtifactFileProofs `
+        -AgentPath $agentPath `
+        -ProofAgentPath $script:proofAgentPath `
+        -WhisperCLIMockPath $script:packagedWhisperCLI `
+        -InstallDir $InstallDir
 
     $report = [ordered]@{
         generated_at = (Get-Date).ToUniversalTime().ToString("o")

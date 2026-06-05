@@ -12596,7 +12596,8 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Get-RomaWindowsOptionalFileProof") &&
                 proofCommonScript.contains("function Require-RomaWindowsFileProof") &&
                 proofCommonScript.contains("function Get-RomaWindowsFileHashProof") &&
-                proofCommonScript.contains("function Get-RomaWindowsInstalledProofSurfaceFileProofs"),
+                proofCommonScript.contains("function Get-RomaWindowsInstalledProofSurfaceFileProofs") &&
+                proofCommonScript.contains("function Get-RomaWindowsAgentArtifactFileProofs"),
             "Windows proof helper should own shared script utilities"
         )
         try require(
@@ -12720,11 +12721,12 @@ struct RomaCoreChecks {
                 proofCommonScript.contains(#"file = Get-RomaWindowsFileProof -Path $Path"#) &&
                 proveScript.contains("New-RomaWindowsNotepadPasteProof") &&
                 proveScript.contains(#"$proof["file"] = Get-RomaWindowsFileProof -Path $NotepadPasteProofPath"#) &&
-                proveScript.contains("Get-RomaWindowsFileHashProof -Path $agentPath") &&
+                proofCommonScript.contains("Get-RomaWindowsFileHashProof -Path $AgentPath") &&
+                proveScript.contains("Get-RomaWindowsAgentArtifactFileProofs") &&
                 !proveScript.contains("function New-NotepadPasteProof") &&
                 !proveScript.contains("Set-Alias -Name Get-FileProof") &&
                 !proveScript.contains("Set-Alias -Name Get-FileHashProof"),
-            "Windows artifact proof should share Notepad paste proof initialization and call file proof helpers directly"
+            "Windows artifact proof should share Notepad paste proof initialization and artifact file proof shaping"
         )
         try require(
             packageScript.contains(". $packageIdentityScript") &&
@@ -12933,8 +12935,9 @@ struct RomaCoreChecks {
             "Windows installer should preserve the packaged proof surface"
         )
         try require(
-            proveScript.contains("installed_proof_agent") &&
-                proveScript.contains("Get-RomaWindowsInstalledProofSurfaceFileProofs -InstallDir $InstallDir") &&
+            proofCommonScript.contains("installed_proof_agent") &&
+                proofCommonScript.contains("Get-RomaWindowsInstalledProofSurfaceFileProofs -InstallDir $InstallDir") &&
+                proveScript.contains("Get-RomaWindowsAgentArtifactFileProofs") &&
                 proveScript.contains("installed_script_parse") &&
                 proveScript.contains(#"Invoke-Step "installed script parse check""#) &&
                 proofCommonScript.contains(#"ReportProperty = "installed_laptop_proof_script""#) &&

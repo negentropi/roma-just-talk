@@ -1570,6 +1570,7 @@ public struct RomaTranscriptionOutputFilter {
             }
             if !preservesTerminalPunctuation {
                 polishedText = removeTrailingContinuationPeriod(from: polishedText)
+                polishedText = removeTrailingNoisyFinalWordContinuationSentencePunctuation(from: polishedText)
             }
             polishedText = removeLeadingContextOverlapFromContinuation(
                 from: polishedText,
@@ -2202,6 +2203,28 @@ public struct RomaTranscriptionOutputFilter {
         guard nextIndex < tokens.count else { return true }
         return nextIndex + 1 == tokens.count &&
             ["word", "words"].contains(tokens[nextIndex].text)
+    }
+
+    private static func isNoisyFinalWordContinuationFragment(_ text: String) -> Bool {
+        let tokens = wordTokens(in: text)
+        guard let firstWord = tokens.first?.text else { return false }
+        let headIndex: Int
+
+        if ["a", "an", "the"].contains(firstWord),
+           tokens.count >= 2 {
+            headIndex = 1
+        } else {
+            headIndex = 0
+        }
+
+        if tokens.indices.contains(headIndex + 1),
+           headIndex + 2 == tokens.count,
+           ["final", "single"].contains(tokens[headIndex].text),
+           ["word", "words"].contains(tokens[headIndex + 1].text) {
+            return true
+        }
+
+        return isNoisyFinalWordOrSingleContinuationFragment(text)
     }
 
     private static func isTechnicalContinuationFragmentHead(_ word: String) -> Bool {
@@ -10387,7 +10410,8 @@ public struct RomaTranscriptionOutputFilter {
         result = unwrapNoisyNestedBoundaryInsidePreservedBoundary(from: result)
         while let lastScalar = result.unicodeScalars.last,
               removableTrailingSentenceFragmentPunctuation.contains(lastScalar),
-              isLikelyPunctuatedShortFragment(result) {
+              isLikelyPunctuatedShortFragment(result) ||
+                isNoisyFinalWordContinuationFragment(result) {
             result.removeLast()
         }
         return result
@@ -10512,6 +10536,21 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         return withoutFinalPeriod
+    }
+
+    private static func removeTrailingNoisyFinalWordContinuationSentencePunctuation(from text: String) -> String {
+        var result = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        while let lastScalar = result.unicodeScalars.last,
+              removableTrailingSentenceFragmentPunctuation.contains(lastScalar) {
+            let candidate = String(result.dropLast()).trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !candidate.isEmpty,
+                  !hasInternalSentenceBoundary(candidate),
+                  isNoisyFinalWordContinuationFragment(candidate) else {
+                break
+            }
+            result = candidate
+        }
+        return result
     }
 
     private static func hasInternalSentenceBoundary(_ text: String) -> Bool {

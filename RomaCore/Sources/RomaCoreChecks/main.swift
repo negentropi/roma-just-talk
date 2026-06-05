@@ -6982,6 +6982,56 @@ struct RomaCoreChecks {
             "insertion polish should unwrap smart-quoted short phrase artifacts"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Final word?", context: midSentenceContext) ==
+                "final word",
+            "insertion polish should strip noisy question marks from final-word continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Final word!", context: midSentenceContext) ==
+                "final word",
+            "insertion polish should strip noisy exclamation marks from final-word continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "A final word or single?",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "insertion polish should strip noisy question marks from final-word-or-single continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "A final word or single!",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "insertion polish should strip noisy exclamation marks from final-word-or-single continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "[A final word or single?]",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "insertion polish should unwrap and strip noisy final-word-or-single question artifacts"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "[A final word or single!]",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "insertion polish should unwrap and strip noisy final-word-or-single exclamation artifacts"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("API?", context: midSentenceContext) == "API?",
+            "insertion polish should preserve all-caps question fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("U.S.?", context: midSentenceContext) == "U.S.?",
+            "insertion polish should preserve abbreviation question fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("No?", context: midSentenceContext) == "No?",
+            "insertion polish should preserve explicit no question fragments"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("`Model.`", context: midSentenceContext) == "model",
             "insertion polish should unwrap noisy backtick final-word artifacts"
         )
@@ -10287,6 +10337,39 @@ struct RomaCoreChecks {
         try require(
             await finalWordOrSingleInserter.pastedText == " a final word or single",
             "pipeline should paste final-word-or-single continuations after correction markers"
+        )
+
+        let noisyFinalWordSentenceMarkRecorder = FakeRecorder()
+        let noisyFinalWordSentenceMarkInserter = FakeTextInsertion()
+        let noisyFinalWordSentenceMarkPipeline = DictationPipeline(
+            recorder: noisyFinalWordSentenceMarkRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "noisy-final-word-sentence-mark-proof.wav",
+                text: "A final word or single?"
+            ),
+            textInsertion: noisyFinalWordSentenceMarkInserter
+        )
+        let noisyFinalWordSentenceMarkRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/noisy-final-word-sentence-mark-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await noisyFinalWordSentenceMarkRecorder.startPreRollBuffering()
+        let noisyFinalWordSentenceMarkResult = try await noisyFinalWordSentenceMarkPipeline.runRecordingWindow(
+            noisyFinalWordSentenceMarkRequest
+        ) {}
+
+        try require(
+            noisyFinalWordSentenceMarkResult.processedText == " a final word or single",
+            "pipeline should trim noisy final-word-or-single sentence marks in continuations"
+        )
+        try require(
+            await noisyFinalWordSentenceMarkInserter.pastedText == " a final word or single",
+            "pipeline should paste final-word-or-single continuations without noisy sentence marks"
         )
 
         let orWaitNoIMeanRecorder = FakeRecorder()

@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Stripped noisy question and exclamation marks from short "final word" continuation artifacts.
 - Shared the Windows proof-agent doctor runtime, native-adapter, default, and source-marker proof lines through `WindowsDoctorOutput`.
 - Shared the Windows agent doctor runtime, hotkey, paste, default, and DPAPI proof lines through `WindowsDoctorOutput`.
 - Shared the Windows Swift hotkey definition with the low-level hold-hook proof and agent doctor output.

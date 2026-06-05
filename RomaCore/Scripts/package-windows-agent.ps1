@@ -82,72 +82,6 @@ function Get-GitMetadata {
     }
 }
 
-function Invoke-ManifestNestedRelocationSmoke {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$ManifestPath,
-        [Parameter(Mandatory = $true)]
-        [string]$PackageDir,
-        [Parameter(Mandatory = $true)]
-        [string[]]$Keys
-    )
-
-    $manifest = Read-RomaWindowsManifest -Path $ManifestPath
-    $staleRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("roma-stale-artifact-" + [guid]::NewGuid().ToString("N"))
-    $proofs = @()
-    foreach ($key in $Keys) {
-        $expectedPath = Require-RomaWindowsManifestFile -Manifest $manifest -Key $key -BaseDir $PackageDir
-        $expectedFullPath = [System.IO.Path]::GetFullPath($expectedPath)
-        $leaf = Split-Path -Leaf $expectedFullPath
-        $parentPath = Split-Path -Parent $expectedFullPath
-        $parentLeaf = Split-Path -Leaf $parentPath
-        if ([string]::IsNullOrWhiteSpace($parentLeaf)) {
-            throw "Manifest relocation smoke could not resolve parent directory for $key"
-        }
-
-        $proofs += [pscustomobject]@{
-            Key = $key
-            ExpectedFullPath = $expectedFullPath
-            Leaf = $leaf
-            ParentLeaf = $parentLeaf
-        }
-    }
-
-    $uniqueLeaves = @($proofs | ForEach-Object { $_.Leaf } | Sort-Object -Unique)
-    if ($uniqueLeaves.Count -ne 1) {
-        throw "Manifest nested relocation smoke expected duplicate leaf names, got: $($uniqueLeaves -join ', ')"
-    }
-    Write-Host "manifest_nested_relocation_duplicate_leaf=$($uniqueLeaves[0])"
-
-    foreach ($proof in $proofs) {
-        $key = [string]$proof.Key
-        $expectedFullPath = [string]$proof.ExpectedFullPath
-        $leaf = [string]$proof.Leaf
-        $parentLeaf = [string]$proof.ParentLeaf
-        $relocatedManifest = @{}
-        foreach ($manifestKey in $manifest.Keys) {
-            $relocatedManifest[$manifestKey] = $manifest[$manifestKey]
-        }
-
-        $stalePath = Join-Path (Join-Path $staleRoot $parentLeaf) $leaf
-        if (Test-Path -LiteralPath $stalePath) {
-            throw "Manifest relocation smoke stale path unexpectedly exists: $stalePath"
-        }
-        $relocatedManifest[$key] = $stalePath
-
-        $actualPath = Require-RomaWindowsManifestFile -Manifest $relocatedManifest -Key $key -BaseDir $PackageDir
-        $actualFullPath = [System.IO.Path]::GetFullPath($actualPath)
-        if ($actualFullPath -ne $expectedFullPath) {
-            throw "Manifest relocation smoke resolved $key to $actualFullPath, expected $expectedFullPath"
-        }
-
-        Write-Host "manifest_nested_relocation_key=$key"
-        Write-Host "manifest_nested_relocation_path=$actualFullPath"
-    }
-
-    Write-Host "manifest_nested_relocation_ok=true"
-}
-
 $packageRoot = Resolve-Path "$PSScriptRoot\.."
 if ([System.Environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT) {
     throw "package-windows-agent.ps1 must run on Windows so packaged executables and Swift runtime DLLs are Windows artifacts"
@@ -441,7 +375,7 @@ try {
     }
 
     Invoke-Step "manifest nested relocation smoke" {
-        Invoke-ManifestNestedRelocationSmoke `
+        Invoke-RomaWindowsManifestNestedRelocationSmoke `
             -ManifestPath $manifestPath `
             -PackageDir $OutputDir `
             -Keys @(

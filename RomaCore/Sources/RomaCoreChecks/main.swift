@@ -13322,10 +13322,15 @@ struct RomaCoreChecks {
                 packageScript.contains("laptop_preflight_checker_smoke_report") &&
                 packageScript.contains("-IncludeLocalWhisper $false") &&
                 packageScript.contains("-IncludeLocalWhisper $true") &&
-                packageScript.contains("function Invoke-ManifestNestedRelocationSmoke") &&
+                packageScript.contains("Invoke-RomaWindowsManifestNestedRelocationSmoke") &&
                 packageScript.contains(#"Invoke-Step "manifest nested relocation smoke""#) &&
-                packageScript.contains("manifest_nested_relocation_duplicate_leaf=") &&
-                packageScript.contains("manifest_nested_relocation_ok=true") &&
+                manifestScript.contains("function Invoke-RomaWindowsManifestNestedRelocationSmoke") &&
+                manifestScript.contains("manifest_nested_relocation_duplicate_leaf=") &&
+                manifestScript.contains("manifest_nested_relocation_ok=true") &&
+                manifestScript.contains("$relocatedManifest[$key] = $stalePath") &&
+                !packageScript.contains("function Invoke-ManifestNestedRelocationSmoke") &&
+                !packageScript.contains("manifest_nested_relocation_duplicate_leaf=") &&
+                !packageScript.contains("manifest_nested_relocation_ok=true") &&
                 proofCommonScript.contains("proof_set_laptop_preflight_permission_surface=true") &&
                 proofCommonScript.contains("proof_set_laptop_preflight_local_whisper=") &&
                 proofCommonScript.contains("proof_set_laptop_preflight_source_dirty=false") &&

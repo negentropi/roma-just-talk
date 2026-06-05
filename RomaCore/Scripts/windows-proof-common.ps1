@@ -2281,6 +2281,59 @@ function Get-RomaWindowsAgentConfigFileProof {
     return $proof
 }
 
+function Get-RomaWindowsAgentShortcutFileName {
+    return "Roma Just Talk Agent.lnk"
+}
+
+function Join-RomaWindowsInstalledRunScriptPath {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$InstallDir
+    )
+
+    return Join-Path $InstallDir "run-windows-agent.ps1"
+}
+
+function Get-RomaWindowsAgentShortcutReportPaths {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$InstallDir,
+        [string]$ShortcutDir = "",
+        [string]$StartupShortcutDir = "",
+        [bool]$CreateStartupShortcut = $false,
+        [string]$ShortcutName = "",
+        [string]$StartupShortcutName = ""
+    )
+
+    if ([string]::IsNullOrWhiteSpace($ShortcutName)) {
+        $ShortcutName = Get-RomaWindowsAgentShortcutFileName
+    }
+    if ([string]::IsNullOrWhiteSpace($StartupShortcutName)) {
+        $StartupShortcutName = Get-RomaWindowsAgentShortcutFileName
+    }
+
+    $shortcutPath = ""
+    if (![string]::IsNullOrWhiteSpace($ShortcutDir)) {
+        $shortcutPath = Join-Path $ShortcutDir $ShortcutName
+    }
+
+    $startupShortcutPath = ""
+    if (![string]::IsNullOrWhiteSpace($StartupShortcutDir)) {
+        $startupShortcutPath = Join-Path $StartupShortcutDir $StartupShortcutName
+    } elseif ($CreateStartupShortcut) {
+        $startup = [System.Environment]::GetFolderPath("Startup")
+        if (![string]::IsNullOrWhiteSpace($startup)) {
+            $startupShortcutPath = Join-Path $startup $StartupShortcutName
+        }
+    }
+
+    return [ordered]@{
+        installed_run_script_path = Join-RomaWindowsInstalledRunScriptPath -InstallDir $InstallDir
+        shortcut_path = $shortcutPath
+        startup_shortcut_path = $startupShortcutPath
+    }
+}
+
 function Get-RomaWindowsShortcutProof {
     param(
         [Parameter(Mandatory = $true)]

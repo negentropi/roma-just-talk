@@ -270,20 +270,14 @@ function Write-ProofReport {
         New-Item -ItemType Directory -Force -Path $reportParent | Out-Null
     }
 
-    $shortcutPath = ""
-    if (![string]::IsNullOrWhiteSpace($ShortcutDir)) {
-        $shortcutPath = Join-Path $ShortcutDir "Roma Just Talk Agent.lnk"
-    }
-    $startupShortcutPath = ""
-    if (![string]::IsNullOrWhiteSpace($StartupShortcutDir)) {
-        $startupShortcutPath = Join-Path $StartupShortcutDir "Roma Just Talk Agent.lnk"
-    } elseif ($CreateStartupShortcut) {
-        $startup = [System.Environment]::GetFolderPath("Startup")
-        if (![string]::IsNullOrWhiteSpace($startup)) {
-            $startupShortcutPath = Join-Path $startup "Roma Just Talk Agent.lnk"
-        }
-    }
-    $installedRunScriptPath = Join-Path $InstallDir "run-windows-agent.ps1"
+    $shortcutReportPaths = Get-RomaWindowsAgentShortcutReportPaths `
+        -InstallDir $InstallDir `
+        -ShortcutDir $ShortcutDir `
+        -StartupShortcutDir $StartupShortcutDir `
+        -CreateStartupShortcut $CreateStartupShortcut.IsPresent
+    $shortcutPath = [string]$shortcutReportPaths["shortcut_path"]
+    $startupShortcutPath = [string]$shortcutReportPaths["startup_shortcut_path"]
+    $installedRunScriptPath = [string]$shortcutReportPaths["installed_run_script_path"]
     $fileProofs = Get-RomaWindowsAgentArtifactFileProofs `
         -AgentPath $agentPath `
         -ProofAgentPath $script:proofAgentPath `

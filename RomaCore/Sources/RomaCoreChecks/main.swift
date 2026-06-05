@@ -12680,7 +12680,10 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Require-RomaWindowsFileProof") &&
                 proofCommonScript.contains("function Get-RomaWindowsFileHashProof") &&
                 proofCommonScript.contains("function Get-RomaWindowsInstalledProofSurfaceFileProofs") &&
-                proofCommonScript.contains("function Get-RomaWindowsAgentArtifactFileProofs"),
+                proofCommonScript.contains("function Get-RomaWindowsAgentArtifactFileProofs") &&
+                proofCommonScript.contains("function Get-RomaWindowsAgentShortcutFileName") &&
+                proofCommonScript.contains("function Join-RomaWindowsInstalledRunScriptPath") &&
+                proofCommonScript.contains("function Get-RomaWindowsAgentShortcutReportPaths"),
             "Windows proof helper should own shared script utilities"
         )
         try require(
@@ -12729,6 +12732,17 @@ struct RomaCoreChecks {
                 !proveScript.contains("Set-Alias -Name Get-OutputLineNumber") &&
                 !proveScript.contains("function Get-OutputNumber"),
             "Windows artifact proof should not keep stale output-parser pass-through aliases"
+        )
+        try require(
+            proveScript.contains("Get-RomaWindowsAgentShortcutReportPaths") &&
+                proveScript.contains(#"$shortcutReportPaths["shortcut_path"]"#) &&
+                proveScript.contains(#"$shortcutReportPaths["startup_shortcut_path"]"#) &&
+                proveScript.contains(#"$shortcutReportPaths["installed_run_script_path"]"#) &&
+                !proveScript.contains(#"Join-Path $ShortcutDir "Roma Just Talk Agent.lnk""#) &&
+                !proveScript.contains(#"Join-Path $StartupShortcutDir "Roma Just Talk Agent.lnk""#) &&
+                !proveScript.contains(#"[System.Environment]::GetFolderPath("Startup")"#) &&
+                !proveScript.contains(#"$installedRunScriptPath = Join-Path $InstallDir "run-windows-agent.ps1""#),
+            "Windows artifact proof should share installed launcher and shortcut report path shaping"
         )
         try require(
             proveScript.contains(#"-Mode (Get-RomaWindowsProofProfileExpectedModeByName -Name "doctor_only")"#) &&

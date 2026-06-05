@@ -27,6 +27,7 @@ struct RomaCoreChecks {
         try await checkFakeAdaptersSatisfyCorePorts()
         try checkWindowsProofScriptContracts()
         try checkSourcesDoNotImportApplePlatformFrameworks()
+        try checkWindowsNativeAdapterImportsStayGuarded()
     }
 
     private static func checkDefaultPreRollContract() throws {
@@ -11684,6 +11685,37 @@ struct RomaCoreChecks {
                     "\(file.path) imports \(bannedImport), which blocks Windows portability"
                 )
             }
+        }
+    }
+
+    private static func checkWindowsNativeAdapterImportsStayGuarded() throws {
+        let packageRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let sourcesRoot = packageRoot.appendingPathComponent("Sources/RomaCore")
+
+        guard let enumerator = FileManager.default.enumerator(at: sourcesRoot, includingPropertiesForKeys: nil) else {
+            throw CheckFailure("could not enumerate \(sourcesRoot.path)")
+        }
+
+        let swiftFiles = enumerator
+            .compactMap { $0 as? URL }
+            .filter { $0.pathExtension == "swift" }
+
+        try require(!swiftFiles.isEmpty, "RomaCore should contain Swift sources")
+
+        for file in swiftFiles {
+            let source = try String(contentsOf: file, encoding: .utf8)
+            guard source.contains("import WinSDK") else {
+                continue
+            }
+
+            let trimmed = source.trimmingCharacters(in: .whitespacesAndNewlines)
+            try require(
+                trimmed.hasPrefix("#if os(Windows)"),
+                "\(file.path) imports WinSDK outside an os(Windows) file guard"
+            )
         }
     }
 

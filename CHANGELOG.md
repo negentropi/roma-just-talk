@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Preserved explicit terminal spoken punctuation commands such as "exclamation mark", "question mark", "period", and "ellipsis" in mid-sentence continuations.
 - Trimmed unmatched parenthesis and brace artifacts around short continuation fragments while preserving real delimiter closures.
 - Trimmed unmatched square-bracket artifacts around short continuation fragments.
 - Trimmed leading correction markers before "final word or single" continuations while preserving longer ordinary continuations.

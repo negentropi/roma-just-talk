@@ -520,6 +520,31 @@ function Assert-RomaWindowsProofReportListenerRuntime {
     return $runtime
 }
 
+function Assert-RomaWindowsProofReportPasteIntent {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Report,
+        [Parameter(Mandatory = $true)]
+        [object]$Config
+    )
+
+    $restoreClipboard = [bool](Require-RomaWindowsProofReportProperty -Object $Report -Name "restore_clipboard")
+    $noRestoreClipboard = [bool](Require-RomaWindowsProofReportProperty -Object $Report -Name "no_restore_clipboard")
+    if ($restoreClipboard -and $noRestoreClipboard) {
+        throw "Paste proof cannot request both restore_clipboard and no_restore_clipboard"
+    }
+
+    if ($restoreClipboard) {
+        Assert-RomaWindowsProofReportBoolean -Object $Config -Name "restore_clipboard_after_paste" -Expected $true
+    }
+    if ($noRestoreClipboard) {
+        Assert-RomaWindowsProofReportBoolean -Object $Config -Name "restore_clipboard_after_paste" -Expected $false
+    }
+
+    Write-Host "proof_paste_restore_clipboard=$restoreClipboard"
+    Write-Host "proof_paste_no_restore_clipboard=$noRestoreClipboard"
+}
+
 function Get-RomaWindowsPackageIdentityFingerprint {
     param(
         [Parameter(Mandatory = $true)]

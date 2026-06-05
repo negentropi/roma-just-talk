@@ -47,6 +47,7 @@ Set-Alias -Name Assert-FileHashEquals -Value Assert-RomaWindowsProofReportFileHa
 Set-Alias -Name Assert-ShortcutProof -Value Assert-RomaWindowsProofReportShortcut -Scope Local -Force
 Set-Alias -Name Assert-DictationRuntimeProof -Value Assert-RomaWindowsProofReportDictationRuntime -Scope Local -Force
 Set-Alias -Name Assert-ListenerRuntimeProof -Value Assert-RomaWindowsProofReportListenerRuntime -Scope Local -Force
+Set-Alias -Name Assert-PasteIntentProof -Value Assert-RomaWindowsProofReportPasteIntent -Scope Local -Force
 
 function Assert-PackageIdentityProof {
     param(
@@ -156,31 +157,6 @@ function Assert-ManifestSourceProof {
 
     Write-Host "proof_source_commit=$($source['Commit'])"
     Write-Host "proof_source_dirty=$($source['Dirty'])"
-}
-
-function Assert-PasteIntentProof {
-    param(
-        [Parameter(Mandatory = $true)]
-        [object]$Report,
-        [Parameter(Mandatory = $true)]
-        [object]$Config
-    )
-
-    $restoreClipboard = [bool](Require-Property -Object $Report -Name "restore_clipboard")
-    $noRestoreClipboard = [bool](Require-Property -Object $Report -Name "no_restore_clipboard")
-    if ($restoreClipboard -and $noRestoreClipboard) {
-        throw "Paste proof cannot request both restore_clipboard and no_restore_clipboard"
-    }
-
-    if ($restoreClipboard) {
-        Assert-Boolean -Object $Config -Name "restore_clipboard_after_paste" -Expected $true
-    }
-    if ($noRestoreClipboard) {
-        Assert-Boolean -Object $Config -Name "restore_clipboard_after_paste" -Expected $false
-    }
-
-    Write-Host "proof_paste_restore_clipboard=$restoreClipboard"
-    Write-Host "proof_paste_no_restore_clipboard=$noRestoreClipboard"
 }
 
 function Assert-HoldHookRuntimeProof {

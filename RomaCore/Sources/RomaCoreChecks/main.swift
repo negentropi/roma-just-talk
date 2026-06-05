@@ -8252,6 +8252,27 @@ struct RomaCoreChecks {
             "Windows doctor agent runtime proof lines should stay shared"
         )
         try require(
+            WindowsDoctorOutput.proofAgentRuntimeProofLines(nativeWindowsAdaptersAvailable: true) == [
+                "swift_core=true",
+                "pre_roll_seconds=3.0",
+                "audio_format=pcm16_16000_mono",
+                "wav_writer=true",
+                "default_record_seconds=2.0",
+                "default_hold_timeout_seconds=15.0",
+                "default_hold_timeout_milliseconds=15000",
+                "default_clipboard_restore_delay_seconds=2.0",
+                "maximum_clipboard_restore_delay_seconds=4294967.295",
+                "native_windows_adapters=true"
+            ],
+            "Windows proof-agent doctor runtime proof lines should stay shared"
+        )
+        try require(
+            WindowsDoctorOutput.proofAgentDoctorProofLines(nativeWindowsAdaptersAvailable: true) ==
+                WindowsDoctorOutput.proofAgentRuntimeProofLines(nativeWindowsAdaptersAvailable: true) +
+                WindowsDoctorOutput.proofAgentSourceProofLines,
+            "Windows proof-agent doctor should compose runtime and source proof lines from shared output"
+        )
+        try require(
             WindowsDoctorOutput.runtimeDefaultProofLines == [
                 "default_record_seconds=2.0",
                 "default_hold_timeout_seconds=15.0",
@@ -10901,11 +10922,17 @@ struct RomaCoreChecks {
             "Windows local whisper laptop proof should reject mock/package executable backends and require real model files"
         )
         try require(
-            proofAgentSource.contains(#"print("native_windows_adapters=true")"#),
-            "Windows proof agent should print native adapter runtime availability on Windows"
+            doctorOutputSource.contains("public static func proofAgentDoctorProofLines(nativeWindowsAdaptersAvailable: Bool)") &&
+                doctorOutputSource.contains("public static func proofAgentRuntimeProofLines(nativeWindowsAdaptersAvailable: Bool)") &&
+                proofAgentSource.contains("WindowsDoctorOutput.proofAgentDoctorProofLines(") &&
+                !proofAgentSource.contains(#"print("swift_core=true")"#) &&
+                !proofAgentSource.contains(#"print("wav_writer=true")"#) &&
+                !proofAgentSource.contains(#"print("native_windows_adapters=true")"#) &&
+                !proofAgentSource.contains("WindowsDoctorOutput.runtimeDefaultProofLines.forEach"),
+            "Windows proof agent doctor should print runtime proof lines from shared doctor output"
         )
         let proofAgentPrintsSharedSourceMarkers = proofAgentSource.contains(
-            "WindowsDoctorOutput.proofAgentSourceProofLines.forEach"
+            "WindowsDoctorOutput.proofAgentDoctorProofLines("
         )
         let proofAgentSourceMarkerLines = [
             #""windows_register_hotkey_adapter_source=true""#,
@@ -10940,6 +10967,7 @@ struct RomaCoreChecks {
         try require(
             doctorOutputSource.contains(#""roma_transcription_client_source=true""#) &&
                 doctorOutputSource.contains(#""windows_proof_args_shared_source=true""#) &&
+                doctorOutputSource.contains("proofAgentRuntimeProofLines(") &&
                 proofAgentPrintsSharedSourceMarkers,
             "Windows proof agent doctor should expose shared Windows transcription/proof-arg source markers"
         )
@@ -11122,7 +11150,7 @@ struct RomaCoreChecks {
         }
         try require(
             windowsAgentSource.contains("WindowsDoctorOutput.agentRuntimeProofLines") &&
-                proofAgentSource.contains("WindowsDoctorOutput.runtimeDefaultProofLines"),
+                proofAgentSource.contains("WindowsDoctorOutput.proofAgentDoctorProofLines"),
             "Windows doctors should expose runtime defaults through shared doctor output"
         )
         try require(

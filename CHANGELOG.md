@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Shared the Windows proof-agent doctor runtime, native-adapter, default, and source-marker proof lines through `WindowsDoctorOutput`.
 - Shared the Windows agent doctor runtime, hotkey, paste, default, and DPAPI proof lines through `WindowsDoctorOutput`.
 - Shared the Windows Swift hotkey definition with the low-level hold-hook proof and agent doctor output.
 - Shared the Windows proof hotkey display and waiting-for-hold markers through the proof helper.

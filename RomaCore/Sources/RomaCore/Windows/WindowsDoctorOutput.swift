@@ -17,6 +17,23 @@ public enum WindowsDoctorOutput {
         ]
     }
 
+    public static func proofAgentDoctorProofLines(nativeWindowsAdaptersAvailable: Bool) -> [String] {
+        proofAgentRuntimeProofLines(
+            nativeWindowsAdaptersAvailable: nativeWindowsAdaptersAvailable
+        ) + proofAgentSourceProofLines
+    }
+
+    public static func proofAgentRuntimeProofLines(nativeWindowsAdaptersAvailable: Bool) -> [String] {
+        [
+            "swift_core=true",
+            "pre_roll_seconds=\(PreRollConfiguration().durationSeconds)",
+            "audio_format=pcm16_16000_mono",
+            "wav_writer=true"
+        ] + runtimeDefaultProofLines + [
+            "native_windows_adapters=\(nativeWindowsAdaptersAvailable)"
+        ]
+    }
+
     public static var runtimeDefaultProofLines: [String] {
         [
             "default_record_seconds=\(RomaWindowsAgentConfiguration.defaultRecordSeconds)",

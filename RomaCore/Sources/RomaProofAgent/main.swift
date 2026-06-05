@@ -56,17 +56,14 @@ struct RomaProofAgent {
 
     private static func printDoctor() {
         print("platform=\(platformName)")
-        print("swift_core=true")
-        print("pre_roll_seconds=\(PreRollConfiguration().durationSeconds)")
-        print("audio_format=pcm16_16000_mono")
-        print("wav_writer=true")
-        WindowsDoctorOutput.runtimeDefaultProofLines.forEach { print($0) }
         #if os(Windows)
-        print("native_windows_adapters=true")
+        let nativeWindowsAdaptersAvailable = true
         #else
-        print("native_windows_adapters=false")
+        let nativeWindowsAdaptersAvailable = false
         #endif
-        WindowsDoctorOutput.proofAgentSourceProofLines.forEach { print($0) }
+        WindowsDoctorOutput.proofAgentDoctorProofLines(
+            nativeWindowsAdaptersAvailable: nativeWindowsAdaptersAvailable
+        ).forEach { print($0) }
     }
 
     private static func printWindowsHotKeyDoctor() {

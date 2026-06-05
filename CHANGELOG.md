@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Lowercased short status/predicate continuation fragments like "Good.", "Available.", and "Blocked." after ongoing text without changing standalone utterances.
 - Lowercased short "Ready." continuation fragments after ongoing text while preserving sentence-start capitalization.
 - Removed embedded unpunctuated "basically" fillers before short predicate words while preserving meaningful "basically ..." prose and uncertainty words.
 - Removed embedded unpunctuated "you see" and "if that makes sense" clarification fillers in guarded copula contexts.

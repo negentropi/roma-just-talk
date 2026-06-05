@@ -1547,7 +1547,10 @@ public struct RomaTranscriptionOutputFilter {
             )
             polishedText = replaceUnpunctuatedCorrectionMarkerInContinuation(from: polishedText)
             polishedText = applyTrailingSpokenCodeCaseCommandInContinuation(from: polishedText)
-            return restoreLeadingNewlines(leadingNewlineCount, to: lowercaseFragmentWordsIfSafe(in: polishedText))
+            return restoreLeadingNewlines(
+                leadingNewlineCount,
+                to: lowercaseFragmentWordsIfSafe(in: polishedText, allowsPredicateTailWords: true)
+            )
         }
 
         guard shouldUseFragmentPolish else {
@@ -10524,35 +10527,57 @@ public struct RomaTranscriptionOutputFilter {
         return String(text[text.index(after: lastNewlineIndex)...])
     }
 
-    private static func lowercaseInitialWordIfSafe(in text: String) -> String {
+    private static func lowercaseInitialWordIfSafe(
+        in text: String,
+        allowsPredicateTailWords: Bool = false
+    ) -> String {
         guard let firstLetterRange = text.rangeOfCharacter(from: .letters) else {
             return text
         }
 
         let suffixFromFirstLetter = text[firstLetterRange.lowerBound...]
         guard let firstWordEnd = suffixFromFirstLetter.firstIndex(where: { !$0.isLetter && !$0.isNumber && $0 != "'" && $0 != "’" }) else {
-            return lowercaseInitialWordIfSafe(in: text, firstLetterRange: firstLetterRange, firstWordEnd: text.endIndex)
+            return lowercaseInitialWordIfSafe(
+                in: text,
+                firstLetterRange: firstLetterRange,
+                firstWordEnd: text.endIndex,
+                allowsPredicateTailWords: allowsPredicateTailWords
+            )
         }
 
-        return lowercaseInitialWordIfSafe(in: text, firstLetterRange: firstLetterRange, firstWordEnd: firstWordEnd)
+        return lowercaseInitialWordIfSafe(
+            in: text,
+            firstLetterRange: firstLetterRange,
+            firstWordEnd: firstWordEnd,
+            allowsPredicateTailWords: allowsPredicateTailWords
+        )
     }
 
-    private static func lowercaseFragmentWordsIfSafe(in text: String) -> String {
+    private static func lowercaseFragmentWordsIfSafe(
+        in text: String,
+        allowsPredicateTailWords: Bool = false
+    ) -> String {
         if shouldLowercaseLikelyTitleCasedFragmentWords(in: text) {
-            let lowercasedText = lowercaseLikelyTitleCasedWordsIfSafe(in: text)
+            let lowercasedText = lowercaseLikelyTitleCasedWordsIfSafe(
+                in: text,
+                allowsPredicateTailWords: allowsPredicateTailWords
+            )
             if lowercasedText != text {
                 return lowercasedText
             }
         }
 
-        return lowercaseInitialWordIfSafe(in: text)
+        return lowercaseInitialWordIfSafe(in: text, allowsPredicateTailWords: allowsPredicateTailWords)
     }
 
     private static func shouldLowercaseLikelyTitleCasedFragmentWords(in text: String) -> Bool {
         !text.contains { ".!?。！？".contains($0) }
     }
 
-    private static func lowercaseLikelyTitleCasedWordsIfSafe(in text: String) -> String {
+    private static func lowercaseLikelyTitleCasedWordsIfSafe(
+        in text: String,
+        allowsPredicateTailWords: Bool = false
+    ) -> String {
         guard let regex = try? NSRegularExpression(
             pattern: #"(?<![\p{L}\p{N}'’ʼ-])[\p{L}][\p{L}\p{N}'’ʼ-]*(?![\p{L}\p{N}'’ʼ-])"#
         ) else {
@@ -10577,7 +10602,11 @@ public struct RomaTranscriptionOutputFilter {
             }
 
             let nextWord = matchIndex + 1 < matchedWords.count ? matchedWords[matchIndex + 1] : nil
-            guard shouldNormalizeLikelyFragmentWord(word, nextWord: nextWord) else {
+            guard shouldNormalizeLikelyFragmentWord(
+                word,
+                nextWord: nextWord,
+                allowsPredicateTailWords: allowsPredicateTailWords
+            ) else {
                 continue
             }
 
@@ -10590,7 +10619,8 @@ public struct RomaTranscriptionOutputFilter {
     private static func lowercaseInitialWordIfSafe(
         in text: String,
         firstLetterRange: Range<String.Index>,
-        firstWordEnd: String.Index
+        firstWordEnd: String.Index,
+        allowsPredicateTailWords: Bool = false
     ) -> String {
         let firstWordRange = firstLetterRange.lowerBound..<firstWordEnd
         let firstWord = String(text[firstWordRange])
@@ -10599,7 +10629,11 @@ public struct RomaTranscriptionOutputFilter {
             return text
         }
 
-        guard shouldNormalizeLikelyFragmentWord(firstWord, nextWord: nil) else {
+        guard shouldNormalizeLikelyFragmentWord(
+            firstWord,
+            nextWord: nil,
+            allowsPredicateTailWords: allowsPredicateTailWords
+        ) else {
             return text
         }
 
@@ -10642,7 +10676,11 @@ public struct RomaTranscriptionOutputFilter {
         return String(text[..<memberStart]).lowercased().hasSuffix("process.env.")
     }
 
-    private static func shouldNormalizeLikelyFragmentWord(_ word: String, nextWord: String?) -> Bool {
+    private static func shouldNormalizeLikelyFragmentWord(
+        _ word: String,
+        nextWord: String?,
+        allowsPredicateTailWords: Bool = false
+    ) -> Bool {
         let comparisonWord = word.trimmingCharacters(in: apostropheLikeCharacters)
         guard let firstCharacter = comparisonWord.first, firstCharacter.isUppercase else {
             return false
@@ -10662,7 +10700,10 @@ public struct RomaTranscriptionOutputFilter {
             return true
         }
 
-        guard likelyLowercaseFragments.contains(normalizedWord) else { return false }
+        guard likelyLowercaseFragments.contains(normalizedWord) ||
+                (allowsPredicateTailWords && predicateTailWords.contains(normalizedWord)) else {
+            return false
+        }
 
         if isAllCapsWord {
             return commonTechnicalAcronyms[normalizedWord] == nil

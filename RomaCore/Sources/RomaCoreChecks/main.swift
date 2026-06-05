@@ -1197,6 +1197,27 @@ struct RomaCoreChecks {
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Correction is # Model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim generated hash markers after correction lead-ins"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Correction is 1. Model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim generated numbered markers after correction lead-ins"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Correction is • final word.",
+                context: midSentenceContext
+            ) == "final word",
+            "shared insertion polish should trim generated bullet markers after correction lead-ins"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "It's a final word.",
                 context: midSentenceContext
             ) == "a final word",
@@ -9438,6 +9459,46 @@ struct RomaCoreChecks {
             )
         }
 
+        func requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: String,
+            expectedText: String,
+            fileName: String
+        ) async throws {
+            let markerRecorder = FakeRecorder()
+            let markerInserter = FakeTextInsertion()
+            let markerPipeline = DictationPipeline(
+                recorder: markerRecorder,
+                transcriptionService: FakeTranscriptionService(
+                    expectedFileName: fileName,
+                    text: rawText
+                ),
+                textInsertion: markerInserter
+            )
+            let markerRequest = DictationPipelineRequest(
+                outputURL: URL(fileURLWithPath: "/tmp/\(fileName)"),
+                model: model,
+                shouldInsertTranscription: true,
+                textProcessing: DictationTextProcessingConfiguration(
+                    insertionContext: TextInsertionContext(precedingText: "...so this")
+                )
+            )
+
+            try await markerRecorder.startPreRollBuffering()
+            let markerResult = try await markerPipeline.runRecordingWindow(markerRequest) {}
+            try require(
+                markerResult.processedText == expectedText,
+                "pipeline should clean generated markers after correction lead-ins for \(rawText)"
+            )
+            try require(
+                markerResult.session.insertedText == expectedText,
+                "pipeline session should store generated-marker cleanup for \(rawText)"
+            )
+            try require(
+                await markerInserter.pastedText == expectedText,
+                "pipeline should paste generated-marker cleanup for \(rawText)"
+            )
+        }
+
         try await requireMidSentenceSpokenPunctuationPipeline(
             rawText: "Model exclamation mark.",
             expectedText: " model!",
@@ -9477,6 +9538,21 @@ struct RomaCoreChecks {
             rawText: "Model ellipsis.",
             expectedText: " model...",
             fileName: "mid-sentence-ellipsis-command-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "Correction is # Model.",
+            expectedText: " model",
+            fileName: "mid-sentence-correction-hash-marker-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "Correction is 1. Model.",
+            expectedText: " model",
+            fileName: "mid-sentence-correction-numbered-marker-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "Correction is • final word.",
+            expectedText: " final word",
+            fileName: "mid-sentence-correction-bullet-marker-proof.wav"
         )
 
         let bracketedFragmentRecorder = FakeRecorder()

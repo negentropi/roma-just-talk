@@ -1552,6 +1552,10 @@ public struct RomaTranscriptionOutputFilter {
                     from: polishedText,
                     after: activeContext.precedingText
                 )
+                polishedText = removeLeadingGeneratedContinuationFragmentNoise(
+                    from: polishedText,
+                    after: activeContext.precedingText
+                )
                 polishedText = unwrapPlainSquareBracketedBoundaryContinuationFragment(from: polishedText)
                 polishedText = unwrapPlainNonASCIIBoundaryContinuationFragment(from: polishedText)
             }
@@ -2137,18 +2141,29 @@ public struct RomaTranscriptionOutputFilter {
     ) -> Bool {
         let trimmedSuffix = suffix.trimmingCharacters(in: .whitespacesAndNewlines)
         let boundaryUnwrappedSuffix = unwrapPlainSquareBracketedBoundaryContinuationFragment(from: trimmedSuffix)
+        let leadingCleanedSuffix = removeLeadingGeneratedContinuationFragmentNoise(
+            from: boundaryUnwrappedSuffix,
+            after: precedingText
+        )
         let punctuationStrippedSuffix = removeTrailingNoisyFragmentPunctuation(from: trimmedSuffix)
         let punctuationStrippedBoundaryUnwrappedSuffix = removeTrailingNoisyFragmentPunctuation(
             from: boundaryUnwrappedSuffix
         )
+        let punctuationStrippedLeadingCleanedSuffix = removeTrailingNoisyFragmentPunctuation(
+            from: leadingCleanedSuffix
+        )
         let isNoisyFinalWordOrSingleContinuation = isNoisyFinalWordContinuationFragment(trimmedSuffix) ||
             isNoisyFinalWordContinuationFragment(punctuationStrippedSuffix) ||
             isNoisyFinalWordContinuationFragment(boundaryUnwrappedSuffix) ||
-            isNoisyFinalWordContinuationFragment(punctuationStrippedBoundaryUnwrappedSuffix)
+            isNoisyFinalWordContinuationFragment(punctuationStrippedBoundaryUnwrappedSuffix) ||
+            isNoisyFinalWordContinuationFragment(leadingCleanedSuffix) ||
+            isNoisyFinalWordContinuationFragment(punctuationStrippedLeadingCleanedSuffix)
         guard !trimmedSuffix.isEmpty,
-              !hasInternalSentenceBoundary(trimmedSuffix),
+              !hasInternalSentenceBoundary(trimmedSuffix) ||
+                !hasInternalSentenceBoundary(leadingCleanedSuffix),
               isShortFragment(trimmedSuffix) ||
                 isShortFragment(boundaryUnwrappedSuffix) ||
+                isShortFragment(leadingCleanedSuffix) ||
                 isNoisyPreservedBoundaryContinuationFragment(trimmedSuffix) ||
                 isNoisyFinalWordOrSingleContinuation else {
             return false
@@ -2184,7 +2199,8 @@ public struct RomaTranscriptionOutputFilter {
             "what i meant was", "what i mean was", "yes", "yep", "yup"
         ].contains(filler) {
             guard hasTechnicalContinuationFragmentHead(trimmedSuffix) ||
-                    hasTechnicalContinuationFragmentHead(boundaryUnwrappedSuffix) else {
+                    hasTechnicalContinuationFragmentHead(boundaryUnwrappedSuffix) ||
+                    hasTechnicalContinuationFragmentHead(leadingCleanedSuffix) else {
                 return false
             }
         }
@@ -10445,6 +10461,20 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         return text
+    }
+
+    private static func removeLeadingGeneratedContinuationFragmentNoise(
+        from text: String,
+        after precedingText: String
+    ) -> String {
+        var result = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        if shouldRemoveLeadingGeneratedFragmentMarker(after: precedingText) {
+            result = removeLeadingGeneratedFragmentMarker(from: result)
+        }
+        if !startsWithListMarker(result) {
+            result = removeLeadingFragmentPunctuation(from: result)
+        }
+        return result
     }
 
     private static func removeLeadingHashFragmentMarker(from text: String) -> String? {

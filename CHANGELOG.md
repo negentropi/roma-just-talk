@@ -9,6 +9,7 @@
 - Shared Windows native-doctor proof markers through proof-helper marker maps.
 - Shared packaged and installed Windows listener-smoke proof markers through proof-helper marker maps.
 - Shared Windows laptop preflight hotkey, microphone, and local-whisper proof markers through proof-helper marker maps.
+- Removed generated hash, numbered, and bullet markers exposed after correction lead-ins in mid-sentence hotkey dictation.
 - Unwrapped square-bracketed final-word fragments after correction lead-ins in mid-sentence hotkey dictation.
 - Preserved explicit punctuation commands after correction-marked "final word" continuations.
 - Shared Windows dictation and listener runtime-log proof markers through proof-helper marker maps.

@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Trimmed make/call-it correction markers before bracketed final-word fragments.
 - Trimmed use-instead correction wrappers before bracketed final-word fragments.
 - Trimmed what-I-said replacement markers before bracketed final-word fragments.
 - Trimmed whole/last pronoun-unit correction markers before bracketed final-word fragments.

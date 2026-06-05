@@ -603,7 +603,9 @@ public struct RomaTranscriptionOutputFilter {
     private static let continuationFragmentLeadingPreviousUnitDeletionCorrectionPattern = #"(?i)^\s*((?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?(?:scratch|strike|delete|remove|erase|undo|cancel|disregard|ignore|forget|cut|drop)[ \t]+\#(continuationFragmentPreviousUnitTargetPattern))(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let continuationFragmentLeadingPreviousUnitReplacementCorrectionPattern = #"(?i)^\s*((?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?(?:replace|change|correct|swap|switch|set|turn)[ \t]+\#(continuationFragmentPreviousUnitTargetPattern)[ \t]+(?:with|to|into))(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let continuationFragmentLeadingPreviousUnitMakeCorrectionPattern = #"(?i)^\s*((?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?make[ \t]+\#(continuationFragmentPreviousUnitTargetPattern))(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
+    private static let continuationFragmentLeadingMakeCallItCorrectionPattern = #"(?i)^\s*((?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?(?:make[ \t]+(?:it|that)|call[ \t]+it))(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let continuationFragmentLeadingSupplementalCorrectionPatterns = [
+        continuationFragmentLeadingMakeCallItCorrectionPattern,
         continuationFragmentLeadingPreviousUnitMakeCorrectionPattern,
         continuationFragmentLeadingPreviousUnitReplacementCorrectionPattern,
         continuationFragmentLeadingPreviousUnitDeletionCorrectionPattern,

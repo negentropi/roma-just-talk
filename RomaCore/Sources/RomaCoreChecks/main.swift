@@ -488,6 +488,27 @@ struct RomaCoreChecks {
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Nope wait model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim nope-wait correction fillers before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Nah actually module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim nah-actually correction fillers before module continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Nope model.",
+                context: midSentenceContext
+            ) == "Nope model",
+            "shared insertion polish should preserve bare nope continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "Hold on model.",
                 context: midSentenceContext
             ) == "model",
@@ -4600,6 +4621,31 @@ struct RomaCoreChecks {
                 "wait actually correction"
             ),
             (
+                "Use model, nope wait module.",
+                "Use module.",
+                "nope wait correction"
+            ),
+            (
+                "Use model, nah wait module.",
+                "Use module.",
+                "nah wait correction"
+            ),
+            (
+                "Use model, nope actually module.",
+                "Use module.",
+                "nope actually correction"
+            ),
+            (
+                "Use model, nah actually module.",
+                "Use module.",
+                "nah actually correction"
+            ),
+            (
+                "Use model, nope, module.",
+                "Use model, nope, module.",
+                "standalone nope prose guard"
+            ),
+            (
                 "Use model, wait, I mean module.",
                 "Use module.",
                 "wait i mean correction"
@@ -5638,6 +5684,16 @@ struct RomaCoreChecks {
                 "The phrase wait actually is useful.",
                 "The phrase wait actually is useful.",
                 "wait actually phrase guard"
+            ),
+            (
+                "The phrase nope wait is useful.",
+                "The phrase nope wait is useful.",
+                "nope wait phrase guard"
+            ),
+            (
+                "The phrase nah actually is useful.",
+                "The phrase nah actually is useful.",
+                "nah actually phrase guard"
             ),
             (
                 "The phrase, wait actually, is useful.",
@@ -9666,6 +9722,37 @@ struct RomaCoreChecks {
         try require(
             await waitInserter.pastedText == " model",
             "pipeline should paste wait correction filler continuations"
+        )
+
+        let nopeWaitRecorder = FakeRecorder()
+        let nopeWaitInserter = FakeTextInsertion()
+        let nopeWaitPipeline = DictationPipeline(
+            recorder: nopeWaitRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "nope-wait-continuation-proof.wav",
+                text: "Nope wait model."
+            ),
+            textInsertion: nopeWaitInserter
+        )
+        let nopeWaitRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/nope-wait-continuation-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await nopeWaitRecorder.startPreRollBuffering()
+        let nopeWaitResult = try await nopeWaitPipeline.runRecordingWindow(nopeWaitRequest) {}
+
+        try require(
+            nopeWaitResult.processedText == " model",
+            "pipeline should clean nope-wait correction filler continuations"
+        )
+        try require(
+            await nopeWaitInserter.pastedText == " model",
+            "pipeline should paste nope-wait correction filler continuations"
         )
 
         let sorryRecorder = FakeRecorder()

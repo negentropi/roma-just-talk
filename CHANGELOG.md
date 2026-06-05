@@ -7,6 +7,7 @@
 - Shared installed Windows Notepad paste proof initialization through proof-helper helpers.
 - Shared installed Windows artifact file proof table shaping through proof-helper helpers.
 - Shared installed Windows artifact OS report shaping through proof-helper helpers.
+- Shared installed Windows dictation and listener runtime proof path shaping through proof-helper helpers.
 - Shared installed Windows listener-smoke report path proof shaping through proof-helper helpers.
 - Shared installed Windows listener runtime output assertions through proof-helper marker maps.
 - Shared Windows script-parse proof markers through proof-helper marker maps.

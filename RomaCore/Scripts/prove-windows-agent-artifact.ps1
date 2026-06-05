@@ -256,18 +256,6 @@ function Invoke-NotepadPasteProof {
     }
 }
 
-function Get-DictationRuntimeProof {
-    return Get-RomaWindowsDictationRuntimeLogProof `
-        -LogPath (Join-Path (Join-Path $InstallDir "smoke") "windows-agent-dictate.log") `
-        -ExpectedText $ExpectedTranscriptText
-}
-
-function Get-ListenerRuntimeProof {
-    return Get-RomaWindowsListenerRuntimeLogProof `
-        -LogPath (Join-Path (Join-Path $InstallDir "smoke") "windows-agent-listen.log") `
-        -ExpectedText $ExpectedTranscriptText
-}
-
 function Write-ProofReport {
     param(
         [Parameter(Mandatory = $true)]
@@ -351,10 +339,14 @@ function Write-ProofReport {
             -WorkingDirectory $InstallDir
     }
     if ($RunDictation) {
-        $report["dictation_runtime"] = Get-DictationRuntimeProof
+        $report["dictation_runtime"] = Get-RomaWindowsInstalledDictationRuntimeLogProof `
+            -InstallDir $InstallDir `
+            -ExpectedText $ExpectedTranscriptText
     }
     if ($RunListenerProof) {
-        $report["listener_runtime"] = Get-ListenerRuntimeProof
+        $report["listener_runtime"] = Get-RomaWindowsInstalledListenerRuntimeLogProof `
+            -InstallDir $InstallDir `
+            -ExpectedText $ExpectedTranscriptText
     }
     if ($RunNotepadPasteProof) {
         $report["notepad_paste"] = $script:notepadPasteProof

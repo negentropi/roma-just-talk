@@ -11549,6 +11549,8 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("Assert-RomaWindowsOutputMarkers -Output $Output -Markers (Get-RomaWindowsListenerRuntimeLogOutputMarkers)") &&
                 proofCommonScript.contains("function Get-RomaWindowsDictationRuntimeLogProof") &&
                 proofCommonScript.contains("function Get-RomaWindowsListenerRuntimeLogProof") &&
+                proofCommonScript.contains("function Get-RomaWindowsInstalledDictationRuntimeLogProof") &&
+                proofCommonScript.contains("function Get-RomaWindowsInstalledListenerRuntimeLogProof") &&
                 proofCommonScript.contains("function Test-RomaWindowsContainsText") &&
                 proofCommonScript.contains("Get-RomaWindowsOutputMarkerProof -Output $content -Markers (Get-RomaWindowsDictationRuntimeLogOutputMarkers)") &&
                 proofCommonScript.contains("Get-RomaWindowsOutputMarkerProof -Output $content -Markers (Get-RomaWindowsListenerRuntimeLogOutputMarkers)") &&
@@ -11562,16 +11564,18 @@ struct RomaCoreChecks {
                 !proofCommonScript.contains(#"$proof["reported_hold_key_down"] = $content.Contains("hold_key_down=true")"#) &&
                 !proofCommonScript.contains(#"$proof["reported_hold_key_up"] = $content.Contains("hold_key_up=true")"#) &&
                 !proofCommonScript.contains(#"$proof["mode_listen"] = $content.Contains("mode=RomaWindowsAgent listen") -and $content.Contains("mode=listen")"#) &&
-                proveScript.contains("Get-RomaWindowsDictationRuntimeLogProof `") &&
-                proveScript.contains("Get-RomaWindowsListenerRuntimeLogProof `") &&
+                proveScript.contains("Get-RomaWindowsInstalledDictationRuntimeLogProof `") &&
+                proveScript.contains("Get-RomaWindowsInstalledListenerRuntimeLogProof `") &&
                 proveScript.contains("Assert-RomaWindowsListenerRuntimeLogOutput -Output $output") &&
                 !proveScript.contains(#"Assert-OutputContains -Output $output -Expected "listener_capture_lifecycle=shared_pre_roll_runtime""#) &&
                 !proveScript.contains(#"Assert-OutputContains -Output $output -Expected "listen_session_start=1""#) &&
                 !proveScript.contains(#"Assert-OutputContains -Output $output -Expected "listen_session_completed=1""#) &&
                 !proveScript.contains(#"Assert-OutputContains -Output $output -Expected "listen_completed_sessions=1""#) &&
                 !proveScript.contains("function Get-DictationRuntimeLogProof") &&
+                !proveScript.contains("function Get-DictationRuntimeProof") &&
+                !proveScript.contains("function Get-ListenerRuntimeProof") &&
                 !proveScript.contains("function Test-ContainsText") &&
-                proveScript.contains(#"$report["listener_runtime"] = Get-ListenerRuntimeProof"#) &&
+                proveScript.contains(#"$report["listener_runtime"] = Get-RomaWindowsInstalledListenerRuntimeLogProof"#) &&
                 laptopProofScript.contains("-RunListenerProof"),
             "Windows full laptop proof should archive real installed dictation/listener runtime sessions through shared runtime proof shaping"
         )

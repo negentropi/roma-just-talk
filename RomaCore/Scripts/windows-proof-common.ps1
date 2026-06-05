@@ -1986,6 +1986,30 @@ function Get-RomaWindowsListenerRuntimeLogProof {
     return $proof
 }
 
+function Get-RomaWindowsInstalledDictationRuntimeLogProof {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$InstallDir,
+        [string]$ExpectedText = ""
+    )
+
+    return Get-RomaWindowsDictationRuntimeLogProof `
+        -LogPath (Join-Path (Join-Path $InstallDir "smoke") "windows-agent-dictate.log") `
+        -ExpectedText $ExpectedText
+}
+
+function Get-RomaWindowsInstalledListenerRuntimeLogProof {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$InstallDir,
+        [string]$ExpectedText = ""
+    )
+
+    return Get-RomaWindowsListenerRuntimeLogProof `
+        -LogPath (Join-Path (Join-Path $InstallDir "smoke") "windows-agent-listen.log") `
+        -ExpectedText $ExpectedText
+}
+
 function Add-RomaWindowsProofFields {
     param(
         [Parameter(Mandatory = $true)]

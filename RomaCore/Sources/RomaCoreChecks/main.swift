@@ -1347,8 +1347,59 @@ struct RomaCoreChecks {
             "shared insertion polish should trim repeated two-word context from continuation fragments"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "so this, Model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim punctuation exposed after repeated two-word context"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "so this # Model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim generated markers exposed after repeated two-word context"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "so this - Model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim generated dash markers exposed after repeated two-word context"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "so this [*Model.*]",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should unwrap generated markup exposed after repeated two-word context"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "so this [*Model. *]",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should unwrap spaced generated markup exposed after repeated two-word context"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("this Model.", context: midSentenceContext) == "model",
             "shared insertion polish should trim repeated one-word context after discourse connectors"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("this, Model.", context: midSentenceContext) == "model",
+            "shared insertion polish should trim punctuation exposed after repeated one-word context"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("this - Model.", context: midSentenceContext) == "model",
+            "shared insertion polish should trim generated dash markers exposed after repeated one-word context"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("this [*Model.*]", context: midSentenceContext) == "model",
+            "shared insertion polish should unwrap generated markup exposed after repeated one-word context"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("this [*Model. *]", context: midSentenceContext) == "model",
+            "shared insertion polish should unwrap spaced generated markup exposed after repeated one-word context"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("this is Model.", context: midSentenceContext) == "model",
@@ -1421,6 +1472,14 @@ struct RomaCoreChecks {
         try require(
             repeatedShouldBeMarkupModel == "model",
             "shared insertion polish should trim repeated context plus generated should-be before markup-wrapped technical fragments, got \(repeatedShouldBeMarkupModel)"
+        )
+        let repeatedShouldBeSpacedMarkupModel = RomaTranscriptionOutputFilter.applyInsertionPolish(
+            "this should be [*Model. *]",
+            context: midSentenceContext
+        )
+        try require(
+            repeatedShouldBeSpacedMarkupModel == "model",
+            "shared insertion polish should trim repeated context plus generated should-be before spaced markup-wrapped technical fragments, got \(repeatedShouldBeSpacedMarkupModel)"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
@@ -9898,6 +9957,26 @@ struct RomaCoreChecks {
             rawText: "this is Model.",
             expectedText: " model",
             fileName: "mid-sentence-this-is-model-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "so this, Model.",
+            expectedText: " model",
+            fileName: "mid-sentence-so-this-comma-model-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "so this # Model.",
+            expectedText: " model",
+            fileName: "mid-sentence-so-this-hash-model-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "so this - Model.",
+            expectedText: " model",
+            fileName: "mid-sentence-so-this-dash-model-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "so this [*Model.*]",
+            expectedText: " model",
+            fileName: "mid-sentence-so-this-markup-model-proof.wav"
         )
         try await requireMidSentenceGeneratedMarkerCleanupPipeline(
             rawText: "this is [Model.]",

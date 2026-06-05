@@ -25,6 +25,7 @@
 - Removed generated `should be` after repeated context before short technical and final-word hotkey dictation fragments.
 - Removed generated `it is` and `that should be` lead-ins exposed after repeated context before technical and final-word fragments.
 - Unwrapped generated bracket and markdown wrappers exposed after repeated context plus `is` or `should be` lead-ins.
+- Removed generated dash-list and markup wrappers exposed immediately after repeated context in hotkey dictation fragments.
 - Unwrapped square-bracketed final-word fragments after correction lead-ins in mid-sentence hotkey dictation.
 - Preserved explicit punctuation commands after correction-marked "final word" continuations.
 - Shared Windows dictation and listener runtime-log proof markers through proof-helper marker maps.

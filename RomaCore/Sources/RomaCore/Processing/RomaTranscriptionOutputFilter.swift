@@ -2405,18 +2405,48 @@ public struct RomaTranscriptionOutputFilter {
                 .trimmingCharacters(in: .whitespacesAndNewlines)
             guard !suffix.isEmpty else { continue }
 
-            if hasInternalSentenceBoundary(suffix) {
-                let cleanedSuffix = removeLeadingDanglingGeneratedLeadInAfterContextOverlap(from: suffix)
-                if cleanedSuffix != suffix {
-                    return cleanedSuffix
+            let originalLeadInCleanedSuffix = removeLeadingDanglingGeneratedLeadInAfterContextOverlap(from: suffix)
+            if originalLeadInCleanedSuffix != suffix {
+                return originalLeadInCleanedSuffix
+            }
+
+            let cleanedSuffix = cleanLeadingContextOverlapContinuationSuffix(
+                suffix,
+                after: precedingText
+            )
+            let continuationSuffix = cleanedSuffix.isEmpty ? suffix : cleanedSuffix
+
+            if hasInternalSentenceBoundary(continuationSuffix) {
+                let leadInCleanedSuffix = removeLeadingDanglingGeneratedLeadInAfterContextOverlap(from: continuationSuffix)
+                if leadInCleanedSuffix != continuationSuffix {
+                    return leadInCleanedSuffix
                 }
                 continue
             }
 
-            return removeLeadingDanglingGeneratedLeadInAfterContextOverlap(from: suffix)
+            return removeLeadingDanglingGeneratedLeadInAfterContextOverlap(from: continuationSuffix)
         }
 
         return text
+    }
+
+    private static func cleanLeadingContextOverlapContinuationSuffix(
+        _ text: String,
+        after precedingText: String
+    ) -> String {
+        var result = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        if shouldRemoveLeadingGeneratedFragmentMarker(after: precedingText) {
+            result = removeLeadingGeneratedFragmentMarker(from: result)
+            result = removeLeadingGeneratedDashListFragmentMarker(
+                from: result,
+                after: precedingText
+            )
+        }
+        result = cleanDanglingGeneratedLeadInSuffix(result)
+        if !startsWithListMarker(result) {
+            result = removeLeadingFragmentPunctuation(from: result)
+        }
+        return cleanDanglingGeneratedLeadInSuffix(result)
     }
 
     private static func removeLeadingDanglingGeneratedLeadInAfterContextOverlap(from text: String) -> String {
@@ -2491,12 +2521,156 @@ public struct RomaTranscriptionOutputFilter {
 
     private static func cleanDanglingGeneratedLeadInSuffix(_ text: String) -> String {
         var result = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        result = unwrapSpacedGeneratedMarkdownBoundaryFragment(from: result)
         result = unwrapNoisyNestedContinuationBoundaryFragment(from: result)
         result = unwrapPlainNonASCIIBoundaryContinuationFragment(from: result)
+        result = removeTrailingGeneratedMarkdownBoundaryArtifact(from: result)
         result = removeUnmatchedBoundaryContinuationArtifact(from: result, after: "")
+        result = removeTrailingGeneratedMarkdownFragmentMarker(from: result)
         result = removeLeadingFragmentPunctuation(from: result)
         result = removeTrailingNoisyFragmentPunctuation(from: result)
         return result
+    }
+
+    private static func unwrapSpacedGeneratedMarkdownBoundaryFragment(from text: String) -> String {
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        let innerText = preservedBoundaryInnerText(in: trimmedText) ??
+            angleBoundaryInnerText(in: trimmedText)
+        guard let innerText,
+              let unwrappedText = unwrapSpacedGeneratedMarkdownFragment(from: innerText) else {
+            return text
+        }
+
+        return unwrappedText
+    }
+
+    private static func unwrapSpacedGeneratedMarkdownFragment(from text: String) -> String? {
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let marker = trimmedText.first,
+              marker == "*" || marker == "_" || marker == "`" else {
+            return nil
+        }
+
+        var prefixEnd = trimmedText.startIndex
+        var markerCount = 0
+        while prefixEnd < trimmedText.endIndex,
+              trimmedText[prefixEnd] == marker,
+              markerCount < 3 {
+            markerCount += 1
+            prefixEnd = trimmedText.index(after: prefixEnd)
+        }
+        guard markerCount > 0,
+              prefixEnd < trimmedText.endIndex else {
+            return nil
+        }
+
+        var markerStart = trimmedText.index(before: trimmedText.endIndex)
+        var trailingMarkerCount = 1
+        guard trimmedText[markerStart] == marker else { return nil }
+        while markerStart > prefixEnd,
+              trailingMarkerCount < markerCount {
+            let previousIndex = trimmedText.index(before: markerStart)
+            guard trimmedText[previousIndex] == marker else { return nil }
+            markerStart = previousIndex
+            trailingMarkerCount += 1
+        }
+        guard trailingMarkerCount == markerCount,
+              markerStart > prefixEnd else {
+            return nil
+        }
+
+        let beforeMarkerIndex = trimmedText.index(before: markerStart)
+        guard trimmedText[beforeMarkerIndex].isWhitespace else { return nil }
+
+        let candidate = String(trimmedText[prefixEnd..<markerStart])
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let punctuationStrippedCandidate = removeTrailingNoisyFragmentPunctuation(from: candidate)
+        guard !candidate.isEmpty,
+              punctuationStrippedCandidate != candidate,
+              !punctuationStrippedCandidate.isEmpty,
+              wordCount(in: punctuationStrippedCandidate) <= 5,
+              !hasInternalSentenceBoundary(punctuationStrippedCandidate) else {
+            return nil
+        }
+
+        return candidate
+    }
+
+    private static func removeTrailingGeneratedMarkdownBoundaryArtifact(from text: String) -> String {
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let closingBoundary = trimmedText.last,
+              let closingScalar = closingBoundary.unicodeScalars.first,
+              removableTrailingGeneratedBoundaryPunctuation.contains(closingScalar) else {
+            return text
+        }
+
+        let closingIndex = trimmedText.index(before: trimmedText.endIndex)
+        guard closingIndex > trimmedText.startIndex else { return text }
+        let markerEnd = trimmedText.index(before: closingIndex)
+        let marker = trimmedText[markerEnd]
+        guard marker == "*" || marker == "_" || marker == "`" else { return text }
+
+        var markerStart = markerEnd
+        var markerCount = 1
+        while markerStart > trimmedText.startIndex,
+              markerCount < 3 {
+            let previousIndex = trimmedText.index(before: markerStart)
+            guard trimmedText[previousIndex] == marker else { break }
+            markerStart = previousIndex
+            markerCount += 1
+        }
+
+        guard markerStart > trimmedText.startIndex else { return text }
+        let beforeMarkerIndex = trimmedText.index(before: markerStart)
+        guard trimmedText[beforeMarkerIndex].isWhitespace else { return text }
+
+        let candidate = String(trimmedText[..<markerStart])
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let punctuationStrippedCandidate = removeTrailingNoisyFragmentPunctuation(from: candidate)
+        guard !candidate.isEmpty,
+              punctuationStrippedCandidate != candidate,
+              !punctuationStrippedCandidate.isEmpty,
+              wordCount(in: punctuationStrippedCandidate) <= 5,
+              !hasInternalSentenceBoundary(punctuationStrippedCandidate) else {
+            return text
+        }
+
+        return candidate
+    }
+
+    private static func removeTrailingGeneratedMarkdownFragmentMarker(from text: String) -> String {
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let marker = trimmedText.last,
+              marker == "*" || marker == "_" || marker == "`" else {
+            return text
+        }
+
+        var markerStart = trimmedText.index(before: trimmedText.endIndex)
+        var markerCount = 1
+        while markerStart > trimmedText.startIndex,
+              markerCount < 3 {
+            let previousIndex = trimmedText.index(before: markerStart)
+            guard trimmedText[previousIndex] == marker else { break }
+            markerStart = previousIndex
+            markerCount += 1
+        }
+
+        guard markerStart > trimmedText.startIndex else { return text }
+        let beforeMarkerIndex = trimmedText.index(before: markerStart)
+        guard trimmedText[beforeMarkerIndex].isWhitespace else { return text }
+
+        let candidate = String(trimmedText[..<markerStart])
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let punctuationStrippedCandidate = removeTrailingNoisyFragmentPunctuation(from: candidate)
+        guard !candidate.isEmpty,
+              punctuationStrippedCandidate != candidate,
+              !punctuationStrippedCandidate.isEmpty,
+              wordCount(in: punctuationStrippedCandidate) <= 5,
+              !hasInternalSentenceBoundary(punctuationStrippedCandidate) else {
+            return text
+        }
+
+        return candidate
     }
 
     private static func shouldRemoveLeadingContinuationContextOverlap(

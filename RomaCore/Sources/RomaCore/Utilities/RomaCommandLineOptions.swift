@@ -74,6 +74,29 @@ public struct RomaCommandLineOptions: Sendable {
         }
         return value
     }
+
+    public func boundedDoubleValue(
+        after option: String,
+        default defaultValue: Double,
+        minimum: Double,
+        maximum: Double
+    ) throws -> Double {
+        let value = try doubleValue(after: option, default: defaultValue)
+        guard value.isFinite, value >= minimum, value <= maximum else {
+            throw RomaCommandLineOptionsError.invalidOptionValue(option)
+        }
+        return value
+    }
+
+    public func optionalUInt32Value(after option: String) throws -> UInt32? {
+        guard let value = optionalValue(after: option) else {
+            return nil
+        }
+        guard let parsed = UInt32(value) else {
+            throw RomaCommandLineOptionsError.invalidOptionValue(option)
+        }
+        return parsed
+    }
 }
 
 public enum RomaCommandLineText {

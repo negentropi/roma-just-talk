@@ -131,9 +131,8 @@ struct RomaProofAgent {
     }
 
     private static func runWindowsKeyboardHookProof(arguments: [String]) throws {
-        let timeoutSeconds = try positiveDoubleValue(
+        let timeoutSeconds = try RomaCommandLineOptions(arguments).boundedDoubleValue(
             after: "--timeout",
-            in: arguments,
             default: RomaWindowsAgentConfiguration.defaultHoldTimeoutSeconds,
             minimum: RomaWindowsAgentConfiguration.minimumHoldTimeoutSeconds,
             maximum: RomaWindowsAgentConfiguration.maximumHoldTimeoutSeconds
@@ -237,7 +236,7 @@ struct RomaProofAgent {
     private static func runWindowsPasteProof(arguments: [String]) throws {
         let text = try value(after: "--text", in: arguments)
         let focusDelaySeconds = try doubleValue(after: "--focus-delay", in: arguments, default: 0)
-        let targetProcessID = try optionalUInt32Value(after: "--target-process-id", in: arguments)
+        let targetProcessID = try RomaCommandLineOptions(arguments).optionalUInt32Value(after: "--target-process-id")
         guard focusDelaySeconds >= 0 else {
             throw AgentError.invalidOptionValue("--focus-delay")
         }
@@ -441,9 +440,8 @@ struct RomaProofAgent {
 
     private static func runMiniaudioRecordProof(arguments: [String]) async throws {
         let outputURL = URL(fileURLWithPath: try value(after: "--out", in: arguments))
-        let seconds = try positiveDoubleValue(
+        let seconds = try RomaCommandLineOptions(arguments).boundedDoubleValue(
             after: "--seconds",
-            in: arguments,
             default: RomaWindowsAgentConfiguration.defaultRecordSeconds,
             minimum: RomaWindowsAgentConfiguration.minimumRecordSeconds,
             maximum: RomaWindowsAgentConfiguration.maximumRecordSeconds
@@ -652,31 +650,6 @@ struct RomaProofAgent {
 
     private static func doubleValue(after option: String, in arguments: [String], default defaultValue: Double) throws -> Double {
         try RomaCommandLineOptions(arguments).doubleValue(after: option, default: defaultValue)
-    }
-
-    private static func positiveDoubleValue(
-        after option: String,
-        in arguments: [String],
-        default defaultValue: Double,
-        minimum: Double,
-        maximum: Double
-    ) throws -> Double {
-        let value = try doubleValue(after: option, in: arguments, default: defaultValue)
-        guard value.isFinite, value >= minimum, value <= maximum else {
-            throw AgentError.invalidOptionValue(option)
-        }
-
-        return value
-    }
-
-    private static func optionalUInt32Value(after option: String, in arguments: [String]) throws -> UInt32? {
-        guard let value = optionalValue(after: option, in: arguments) else {
-            return nil
-        }
-        guard let parsed = UInt32(value) else {
-            throw AgentError.invalidOptionValue(option)
-        }
-        return parsed
     }
 
     private static func sleep(seconds: Double) async throws {

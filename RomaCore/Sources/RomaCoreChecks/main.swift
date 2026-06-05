@@ -7259,6 +7259,18 @@ struct RomaCoreChecks {
         try require(!options.contains("--paste"), "options should detect absent flags")
         try require(try options.doubleValue(after: "--seconds", default: 1) == 2.5, "options should parse doubles")
         try require(try options.doubleValue(after: "--missing", default: 7) == 7, "options should use numeric defaults")
+        try require(
+            try options.boundedDoubleValue(after: "--seconds", default: 1, minimum: 1, maximum: 3) == 2.5,
+            "options should parse bounded doubles"
+        )
+        try require(
+            try options.boundedDoubleValue(after: "--missing", default: 7, minimum: 1, maximum: 10) == 7,
+            "options should validate bounded double defaults"
+        )
+        try require(
+            try RomaCommandLineOptions(["--target-process-id", "123"]).optionalUInt32Value(after: "--target-process-id") == 123,
+            "options should parse optional UInt32 values"
+        )
         try require(options.optionalValue(after: "--missing") == nil, "missing optional values should be nil")
 
         let rules = try RomaCommandLineText.wordReplacementRules(from: options)
@@ -7293,6 +7305,16 @@ struct RomaCoreChecks {
         do {
             _ = try RomaCommandLineText.wordReplacementRule(from: "missing equals")
             throw CheckFailure("replacement parser should reject malformed values")
+        } catch RomaCommandLineOptionsError.invalidOptionValue {
+        }
+        do {
+            _ = try options.boundedDoubleValue(after: "--seconds", default: 1, minimum: 3, maximum: 4)
+            throw CheckFailure("bounded double parser should reject values below minimum")
+        } catch RomaCommandLineOptionsError.invalidOptionValue {
+        }
+        do {
+            _ = try RomaCommandLineOptions(["--target-process-id", "-1"]).optionalUInt32Value(after: "--target-process-id")
+            throw CheckFailure("optional UInt32 parser should reject signed values")
         } catch RomaCommandLineOptionsError.invalidOptionValue {
         }
     }
@@ -9615,6 +9637,12 @@ struct RomaCoreChecks {
             ),
             encoding: .utf8
         )
+        let commandLineOptionsSource = try String(
+            contentsOf: packageRoot.appendingPathComponent(
+                "Sources/RomaCore/Utilities/RomaCommandLineOptions.swift"
+            ),
+            encoding: .utf8
+        )
         let permissionSurfaceSource = try String(
             contentsOf: packageRoot.appendingPathComponent(
                 "Sources/RomaCore/Windows/WindowsPermissionSurface.swift"
@@ -9836,6 +9864,15 @@ struct RomaCoreChecks {
                 !windowsAgentSource.contains("let trigger: WindowsDictationTrigger") &&
                 !proofAgentSource.contains("let trigger: WindowsDictationTrigger"),
             "Windows agent and proof agent should reuse shared config-to-runtime request composition and trigger proof labels"
+        )
+        try require(
+            commandLineOptionsSource.contains("public func boundedDoubleValue") &&
+                commandLineOptionsSource.contains("public func optionalUInt32Value") &&
+                proofAgentSource.contains("RomaCommandLineOptions(arguments).boundedDoubleValue") &&
+                proofAgentSource.contains("RomaCommandLineOptions(arguments).optionalUInt32Value") &&
+                !proofAgentSource.contains("private static func positiveDoubleValue") &&
+                !proofAgentSource.contains("private static func optionalUInt32Value"),
+            "Windows proof agent should reuse shared command-line numeric parsing"
         )
         try require(
             doctorOutputSource.contains(#""windows_dictation_runtime_uses_pipeline_source=true""#) &&

@@ -594,6 +594,7 @@ public struct RomaTranscriptionOutputFilter {
     private static let continuationFragmentLeadingAccuracyCorrectionPattern = #"(?i)^\s*((?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?(?:(?:that|this|it)(?:[ \t]+(?:is|was)|['’]s)?[ \t]+)?not[ \t]+(?:correct|accurate))(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let continuationFragmentLeadingWasntItCorrectionPattern = #"(?i)^\s*((?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?(?:(?:that|this|it)[ \t]+)?(?:wasn['’]t|was[ \t]+not)[ \t]+(?:that|this|it))(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let continuationFragmentLeadingWrongUtteranceCorrectionPattern = #"(?i)^\s*((?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?(?:(?:that|this|it)[ \t]+came[ \t]+out[ \t]+wrong|(?:i[ \t]+)?said[ \t]+(?:(?:that|this|it)[ \t]+)?wrong|wrong[ \t]+one))(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
+    private static let continuationFragmentLeadingWhatISaidCorrectionPattern = #"(?i)^\s*((?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?(?:scratch|strike|delete|remove|erase|undo|cancel|disregard|ignore|forget|cut|drop)[ \t]+what[ \t]+i(?:[ \t]+just)?[ \t]+said)(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let punctuatedContinuationCorrectionPrefixPattern = #"(?i)^\s*((?:(?:actually[ \t]*(?:[,;:…]+|\.\.\.)[ \t]*)?(?:no|nope|nah)|actually)[ \t]*(?:[,;:…]+|\.\.\.)[ \t]*)(.+)$"#
     private static let standaloneDiscourseFillerPattern = #"(?i)^\s*you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?[ \t]*[.,;:…]*\s*$"#
     private static let blockedPreviousWordsForTerminalYouKnow: Set<String> = [
@@ -2114,6 +2115,15 @@ public struct RomaTranscriptionOutputFilter {
         )
     }
 
+    private static func leadingWhatISaidContinuationCorrectionCandidate(
+        from text: String
+    ) -> (filler: String, suffix: String)? {
+        leadingContinuationCorrectionCandidate(
+            from: text,
+            patterns: [continuationFragmentLeadingWhatISaidCorrectionPattern]
+        )
+    }
+
     private static func leadingPunctuatedContinuationCorrectionCandidate(
         from text: String
     ) -> (filler: String, suffix: String)? {
@@ -2133,6 +2143,7 @@ public struct RomaTranscriptionOutputFilter {
         guard let marker = leadingContinuationCorrectionCandidate(
             from: remainder,
             patterns: [
+                continuationFragmentLeadingWhatISaidCorrectionPattern,
                 continuationFragmentLeadingWrongUtteranceCorrectionPattern,
                 continuationFragmentLeadingWasntItCorrectionPattern,
                 continuationFragmentLeadingAccuracyCorrectionPattern,
@@ -2194,6 +2205,17 @@ public struct RomaTranscriptionOutputFilter {
         var didRemoveFiller = false
 
         while true {
+            if let whatISaidCorrection = leadingWhatISaidContinuationCorrectionCandidate(from: candidate),
+               shouldRemoveLeadingContinuationDiscourseFiller(
+                whatISaidCorrection.filler,
+                suffix: whatISaidCorrection.suffix,
+                after: precedingText
+               ) {
+                candidate = whatISaidCorrection.suffix
+                didRemoveFiller = true
+                continue
+            }
+
             if let wrongUtteranceCorrection = leadingWrongUtteranceContinuationCorrectionCandidate(from: candidate),
                shouldRemoveLeadingContinuationDiscourseFiller(
                 wrongUtteranceCorrection.filler,
@@ -2299,6 +2321,14 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         let candidate = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let whatISaidCorrection = leadingWhatISaidContinuationCorrectionCandidate(from: candidate) {
+            return shouldRemoveLeadingContinuationDiscourseFiller(
+                whatISaidCorrection.filler,
+                suffix: whatISaidCorrection.suffix,
+                after: precedingText
+            )
+        }
+
         if let wrongUtteranceCorrection = leadingWrongUtteranceContinuationCorrectionCandidate(from: candidate) {
             return shouldRemoveLeadingContinuationDiscourseFiller(
                 wrongUtteranceCorrection.filler,
@@ -2448,6 +2478,10 @@ public struct RomaTranscriptionOutputFilter {
 
     private static func unwrapStackedLeadingContinuationCorrectionMarker(from text: String) -> String {
         let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let whatISaidCorrection = leadingWhatISaidContinuationCorrectionCandidate(from: trimmedText) {
+            return whatISaidCorrection.suffix
+        }
+
         if let wrongUtteranceCorrection = leadingWrongUtteranceContinuationCorrectionCandidate(from: trimmedText) {
             return wrongUtteranceCorrection.suffix
         }
@@ -6319,6 +6353,16 @@ public struct RomaTranscriptionOutputFilter {
 
         var removalCount = 0
         while removalCount < 3 {
+            if let whatISaidCorrection = leadingWhatISaidContinuationCorrectionCandidate(from: candidate) {
+                candidate = whatISaidCorrection.suffix
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                if isNoisyFinalWordContinuationFragment(candidate) {
+                    return true
+                }
+                removalCount += 1
+                continue
+            }
+
             if let wrongUtteranceCorrection = leadingWrongUtteranceContinuationCorrectionCandidate(from: candidate) {
                 candidate = wrongUtteranceCorrection.suffix
                     .trimmingCharacters(in: .whitespacesAndNewlines)

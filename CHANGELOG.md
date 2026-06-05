@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Trimmed what-I-said correction markers before bracketed final-word fragments.
 - Trimmed wrong-utterance correction markers before bracketed final-word fragments.
 - Trimmed was-not-it/wasnt-it correction markers before bracketed final-word fragments.
 - Trimmed not-correct/not-accurate correction markers before bracketed final-word fragments.

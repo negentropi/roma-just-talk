@@ -329,6 +329,13 @@ function Get-RomaWindowsAgentArtifactManifestConfigPathKeys {
     )
 }
 
+function Get-RomaWindowsAgentArtifactConfigPathKeys {
+    return @(
+        "manifest"
+        Get-RomaWindowsAgentArtifactManifestConfigPathKeys
+    )
+}
+
 function Get-RomaWindowsAgentArtifactManifestScriptPathKeys {
     return @(
         "smoke_script",
@@ -1542,11 +1549,7 @@ function Get-RomaWindowsAgentArtifactDebugFiles {
 }
 
 function Get-RomaWindowsAgentArtifactConfigFiles {
-    return @(
-        "manifest.txt",
-        "sample-windows-agent.json",
-        "sample-local-whisper-agent.json"
-    )
+    return Get-RomaWindowsAgentArtifactFileNamesForKeys -Keys (Get-RomaWindowsAgentArtifactConfigPathKeys)
 }
 
 function Get-RomaWindowsAgentArtifactRequiredManifestKeys {
@@ -1650,7 +1653,7 @@ function Get-RomaWindowsPackageIdentityFiles {
     $files = @()
     $files += Get-RomaWindowsAgentArtifactExecutableFiles
     $files += Get-RomaWindowsProofSurfaceFiles
-    $files += "manifest.txt"
+    $files += Get-RomaWindowsAgentArtifactFileNameForKey -Key "manifest"
     return $files
 }
 

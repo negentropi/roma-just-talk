@@ -13433,6 +13433,7 @@ struct RomaCoreChecks {
                 packageScript.contains(#"$manifestPath = $outputArtifactPaths["manifest"]"#) &&
                 proofCommonScript.contains(#""smoke_script""#) &&
                 proofCommonScript.contains(#""check_set_script""#) &&
+                proofCommonScript.contains("function Get-RomaWindowsAgentArtifactConfigPathKeys") &&
                 proofCommonScript.contains("Get-RomaWindowsAgentArtifactFileNameForKey") &&
                 proofCommonScript.contains("Get-RomaWindowsAgentArtifactFileNamesForKeys") &&
                 proofCommonScript.contains(#"$pdbOutput = $OutputArtifactPaths["agent_pdb"]"#) &&
@@ -13785,8 +13786,10 @@ struct RomaCoreChecks {
                 !packageIdentityScript.contains(#""RomaWindowsAgent.exe","#) &&
                 !packageIdentityScript.contains("Get-RomaWindowsProofSurfaceFiles") &&
                 proofCommonScript.contains("function Get-RomaWindowsPackageIdentityFiles") &&
+                proofCommonScript.contains(#"$files += Get-RomaWindowsAgentArtifactFileNameForKey -Key "manifest""#) &&
                 proofCommonScript.contains("function Get-RomaWindowsAgentArtifactExecutableFiles") &&
                 proofCommonScript.contains("function Get-RomaWindowsAgentArtifactConfigFiles") &&
+                proofCommonScript.contains("return Get-RomaWindowsAgentArtifactFileNamesForKeys -Keys (Get-RomaWindowsAgentArtifactConfigPathKeys)") &&
                 proofCommonScript.contains("WINDOWS-LAPTOP-PROOF.txt") &&
                 proofCommonScript.contains("check-windows-scripts-parse.ps1") &&
                 proofCommonScript.contains("windows-package-identity.ps1") &&

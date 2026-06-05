@@ -141,9 +141,10 @@ if (![string]::IsNullOrWhiteSpace($SecretDir)) {
     $SecretDir = Resolve-FullPath -Path $SecretDir
 }
 
-$agentSource = Join-Path $PackageDir "RomaWindowsAgent.exe"
-$smokeSource = Join-Path $PackageDir "smoke-windows-agent.ps1"
-$runSource = Join-Path $PackageDir "run-windows-agent.ps1"
+$packageArtifactPaths = Get-RomaWindowsAgentArtifactPathSet -ArtifactDir $PackageDir
+$agentSource = $packageArtifactPaths["agent"]
+$smokeSource = $packageArtifactPaths["smoke_script"]
+$runSource = $packageArtifactPaths["run_script"]
 Require-File -Path $agentSource
 Require-File -Path $smokeSource
 Require-File -Path $runSource
@@ -207,7 +208,8 @@ if ($hasExplicitWhisperModel -and
 
 if (!$SkipSmoke) {
     Invoke-Step "installed agent smoke" {
-        $installedSmoke = Join-Path $InstallDir "smoke-windows-agent.ps1"
+        $installedArtifactPaths = Get-RomaWindowsAgentArtifactPathSet -ArtifactDir $InstallDir
+        $installedSmoke = $installedArtifactPaths["smoke_script"]
         $smokeArgs = @(
             "-PackageDir", $InstallDir,
             "-OutputDir", (Join-Path $InstallDir "smoke"),
@@ -329,7 +331,8 @@ if ($CreateShortcut -or $CreateStartupShortcut) {
 }
 
 Write-Host ""
-$installedSmoke = Join-Path $InstallDir "smoke-windows-agent.ps1"
+$installedArtifactPaths = Get-RomaWindowsAgentArtifactPathSet -ArtifactDir $InstallDir
+$installedSmoke = $installedArtifactPaths["smoke_script"]
 Write-Host "installed_agent=$installedAgent"
 Write-Host "installed_smoke=$installedSmoke"
 Write-Host "installed_run=$installedRun"

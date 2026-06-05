@@ -102,6 +102,34 @@ function Join-RomaWindowsInstalledNotepadPasteProofPath {
     return Join-Path (Join-RomaWindowsInstalledSmokeDirPath -InstallDir $InstallDir) "notepad-paste-proof.txt"
 }
 
+function Get-RomaWindowsAgentArtifactPathSet {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ArtifactDir
+    )
+
+    return [ordered]@{
+        agent = Join-Path $ArtifactDir "RomaWindowsAgent.exe"
+        proof_agent = Join-Path $ArtifactDir "RomaProofAgent.exe"
+        whisper_cli_mock = Join-Path $ArtifactDir "RomaWhisperCLIMock.exe"
+        smoke_script = Join-Path $ArtifactDir "smoke-windows-agent.ps1"
+        run_script = Join-Path $ArtifactDir "run-windows-agent.ps1"
+        install_script = Join-Path $ArtifactDir "install-windows-agent.ps1"
+        proof_script = Join-Path $ArtifactDir "prove-windows-agent-artifact.ps1"
+        laptop_proof_script = Join-Path $ArtifactDir "run-windows-laptop-proof.ps1"
+        laptop_proof_guide = Join-Path $ArtifactDir "WINDOWS-LAPTOP-PROOF.txt"
+        parse_script = Join-Path $ArtifactDir "check-windows-scripts-parse.ps1"
+        package_identity_script = Join-Path $ArtifactDir "windows-package-identity.ps1"
+        proof_common_script = Join-Path $ArtifactDir "windows-proof-common.ps1"
+        manifest_script = Join-Path $ArtifactDir "windows-manifest.ps1"
+        check_report_script = Join-Path $ArtifactDir "check-windows-proof-report.ps1"
+        check_set_script = Join-Path $ArtifactDir "check-windows-proof-set.ps1"
+        manifest = Join-Path $ArtifactDir "manifest.txt"
+        sample_config = Join-Path $ArtifactDir "sample-windows-agent.json"
+        sample_local_whisper_config = Join-Path $ArtifactDir "sample-local-whisper-agent.json"
+    }
+}
+
 function Require-RomaWindowsFile {
     param(
         [Parameter(Mandatory = $true)]

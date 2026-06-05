@@ -381,19 +381,20 @@ if ([string]::IsNullOrWhiteSpace($NotepadPasteProofPath)) {
 }
 $NotepadPasteProofPath = Resolve-FullPath -Path $NotepadPasteProofPath
 
-$agentPath = Join-Path $PackageDir "RomaWindowsAgent.exe"
-$script:proofAgentPath = Join-Path $PackageDir "RomaProofAgent.exe"
-$smokeScript = Join-Path $PackageDir "smoke-windows-agent.ps1"
-$installScript = Join-Path $PackageDir "install-windows-agent.ps1"
-$runScript = Join-Path $PackageDir "run-windows-agent.ps1"
-$proofScript = Join-Path $PackageDir "prove-windows-agent-artifact.ps1"
-$laptopProofScript = Join-Path $PackageDir "run-windows-laptop-proof.ps1"
-$parseScript = Join-Path $PackageDir "check-windows-scripts-parse.ps1"
-$packagedProofCommonScript = Join-Path $PackageDir "windows-proof-common.ps1"
-$checkReportScript = Join-Path $PackageDir "check-windows-proof-report.ps1"
-$checkSetScript = Join-Path $PackageDir "check-windows-proof-set.ps1"
+$packageArtifactPaths = Get-RomaWindowsAgentArtifactPathSet -ArtifactDir $PackageDir
+$agentPath = $packageArtifactPaths["agent"]
+$script:proofAgentPath = $packageArtifactPaths["proof_agent"]
+$smokeScript = $packageArtifactPaths["smoke_script"]
+$installScript = $packageArtifactPaths["install_script"]
+$runScript = $packageArtifactPaths["run_script"]
+$proofScript = $packageArtifactPaths["proof_script"]
+$laptopProofScript = $packageArtifactPaths["laptop_proof_script"]
+$parseScript = $packageArtifactPaths["parse_script"]
+$packagedProofCommonScript = $packageArtifactPaths["proof_common_script"]
+$checkReportScript = $packageArtifactPaths["check_report_script"]
+$checkSetScript = $packageArtifactPaths["check_set_script"]
 $installedRunScriptPath = Join-RomaWindowsInstalledRunScriptPath -InstallDir $InstallDir
-$manifestPath = Join-Path $PackageDir "manifest.txt"
+$manifestPath = $packageArtifactPaths["manifest"]
 $script:artifactManifest = @{}
 $script:packagedWhisperCLI = ""
 $script:packagedAgentDoctorOutput = ""

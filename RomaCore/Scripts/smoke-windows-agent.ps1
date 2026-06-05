@@ -77,7 +77,8 @@ if ([string]::IsNullOrWhiteSpace($PackageDir)) {
 $PackageDir = Resolve-FullPath -Path $PackageDir
 
 if ([string]::IsNullOrWhiteSpace($AgentPath)) {
-    $AgentPath = Join-Path $PackageDir "RomaWindowsAgent.exe"
+    $packageArtifactPaths = Get-RomaWindowsAgentArtifactPathSet -ArtifactDir $PackageDir
+    $AgentPath = $packageArtifactPaths["agent"]
 }
 $AgentPath = Resolve-FullPath -Path $AgentPath
 

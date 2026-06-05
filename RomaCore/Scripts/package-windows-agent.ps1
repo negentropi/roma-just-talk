@@ -501,34 +501,35 @@ try {
     $agentSource = Resolve-ProductExecutable -BuildDirectory $buildDirectory -Configuration $Configuration -Name "RomaWindowsAgent"
     $proofAgentSource = Resolve-ProductExecutable -BuildDirectory $buildDirectory -Configuration $Configuration -Name "RomaProofAgent"
     $mockWhisperSource = Resolve-ProductExecutable -BuildDirectory $buildDirectory -Configuration $Configuration -Name "RomaWhisperCLIMock"
-    $agentOutput = Join-Path $OutputDir "RomaWindowsAgent.exe"
-    $proofAgentOutput = Join-Path $OutputDir "RomaProofAgent.exe"
-    $mockWhisperOutput = Join-Path $OutputDir "RomaWhisperCLIMock.exe"
+    $outputArtifactPaths = Get-RomaWindowsAgentArtifactPathSet -ArtifactDir $OutputDir
+    $agentOutput = $outputArtifactPaths["agent"]
+    $proofAgentOutput = $outputArtifactPaths["proof_agent"]
+    $mockWhisperOutput = $outputArtifactPaths["whisper_cli_mock"]
     $smokeScriptSource = Join-Path $PSScriptRoot "smoke-windows-agent.ps1"
-    $smokeScriptOutput = Join-Path $OutputDir "smoke-windows-agent.ps1"
+    $smokeScriptOutput = $outputArtifactPaths["smoke_script"]
     $runScriptSource = Join-Path $PSScriptRoot "run-windows-agent.ps1"
-    $runScriptOutput = Join-Path $OutputDir "run-windows-agent.ps1"
+    $runScriptOutput = $outputArtifactPaths["run_script"]
     $installScriptSource = Join-Path $PSScriptRoot "install-windows-agent.ps1"
-    $installScriptOutput = Join-Path $OutputDir "install-windows-agent.ps1"
+    $installScriptOutput = $outputArtifactPaths["install_script"]
     $proofScriptSource = Join-Path $PSScriptRoot "prove-windows-agent-artifact.ps1"
-    $proofScriptOutput = Join-Path $OutputDir "prove-windows-agent-artifact.ps1"
+    $proofScriptOutput = $outputArtifactPaths["proof_script"]
     $laptopProofScriptSource = Join-Path $PSScriptRoot "run-windows-laptop-proof.ps1"
-    $laptopProofScriptOutput = Join-Path $OutputDir "run-windows-laptop-proof.ps1"
+    $laptopProofScriptOutput = $outputArtifactPaths["laptop_proof_script"]
     $parseScriptSource = Join-Path $PSScriptRoot "check-windows-scripts-parse.ps1"
-    $parseScriptOutput = Join-Path $OutputDir "check-windows-scripts-parse.ps1"
+    $parseScriptOutput = $outputArtifactPaths["parse_script"]
     $identityScriptSource = Join-Path $PSScriptRoot "windows-package-identity.ps1"
-    $identityScriptOutput = Join-Path $OutputDir "windows-package-identity.ps1"
+    $identityScriptOutput = $outputArtifactPaths["package_identity_script"]
     $proofCommonScriptSource = Join-Path $PSScriptRoot "windows-proof-common.ps1"
-    $proofCommonScriptOutput = Join-Path $OutputDir "windows-proof-common.ps1"
+    $proofCommonScriptOutput = $outputArtifactPaths["proof_common_script"]
     $manifestScriptSource = Join-Path $PSScriptRoot "windows-manifest.ps1"
-    $manifestScriptOutput = Join-Path $OutputDir "windows-manifest.ps1"
+    $manifestScriptOutput = $outputArtifactPaths["manifest_script"]
     $checkReportScriptSource = Join-Path $PSScriptRoot "check-windows-proof-report.ps1"
-    $checkReportScriptOutput = Join-Path $OutputDir "check-windows-proof-report.ps1"
+    $checkReportScriptOutput = $outputArtifactPaths["check_report_script"]
     $checkSetScriptSource = Join-Path $PSScriptRoot "check-windows-proof-set.ps1"
-    $checkSetScriptOutput = Join-Path $OutputDir "check-windows-proof-set.ps1"
-    $laptopProofGuideOutput = Join-Path $OutputDir "WINDOWS-LAPTOP-PROOF.txt"
-    $configPath = Join-Path $OutputDir "sample-windows-agent.json"
-    $localWhisperConfigPath = Join-Path $OutputDir "sample-local-whisper-agent.json"
+    $checkSetScriptOutput = $outputArtifactPaths["check_set_script"]
+    $laptopProofGuideOutput = $outputArtifactPaths["laptop_proof_guide"]
+    $configPath = $outputArtifactPaths["sample_config"]
+    $localWhisperConfigPath = $outputArtifactPaths["sample_local_whisper_config"]
     $installProofDir = Join-Path $OutputDir "install-proof"
     $installProofConfigPath = Join-Path $installProofDir "windows-agent.json"
     $shortcutDir = Join-Path $OutputDir "shortcuts"
@@ -690,7 +691,7 @@ try {
             -ShortcutDir $localWhisperShortcutDir
     }
 
-    $manifestPath = Join-Path $OutputDir "manifest.txt"
+    $manifestPath = $outputArtifactPaths["manifest"]
     $agentFile = Get-Item -LiteralPath $agentOutput
     @(
         "agent=RomaWindowsAgent",

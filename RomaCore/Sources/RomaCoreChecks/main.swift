@@ -13374,6 +13374,16 @@ struct RomaCoreChecks {
                 proofCommonScript.contains(#"agent_pdb = Join-Path $ArtifactDir (Get-RomaWindowsAgentDebugFileName)"#) &&
                 proofCommonScript.contains(#"proof_agent_pdb = Join-Path $ArtifactDir (Get-RomaWindowsProofAgentDebugFileName)"#) &&
                 proofCommonScript.contains(#"manifest = Join-Path $ArtifactDir "manifest.txt""#) &&
+                proofCommonScript.contains("function Resolve-RomaWindowsProductExecutable") &&
+                proofCommonScript.contains(#"$preferred = Join-Path $BuildDirectory "$Configuration\$Name.exe""#) &&
+                proofCommonScript.contains("function Resolve-RomaWindowsSwiftRuntimeDirectory") &&
+                proofCommonScript.contains(#"Join-Path $directory "swiftCore.dll""#) &&
+                proofCommonScript.contains("function Copy-RomaWindowsSwiftRuntimeLibraries") &&
+                proofCommonScript.contains("Write-Host \"swift_runtime_dir=$($runtimeDirectory.FullName)\"") &&
+                proofCommonScript.contains("Write-Host \"swift_runtime_dlls=$($runtimeLibraries.Count)\"") &&
+                proofCommonScript.contains("function Assert-RomaWindowsSwiftRuntimePackaged") &&
+                proofCommonScript.contains(#"$swiftCore = Join-Path $OutputDir "swiftCore.dll""#) &&
+                proofCommonScript.contains("Write-Host \"asserted_runtime_dll=swiftCore.dll\"") &&
                 smokeScript.contains("Get-RomaWindowsAgentArtifactPathSet -ArtifactDir $PackageDir") &&
                 packageScript.contains("Get-RomaWindowsAgentArtifactPathSet -ArtifactDir $PSScriptRoot") &&
                 packageScript.contains("Get-RomaWindowsAgentArtifactPathSet -ArtifactDir $OutputDir") &&
@@ -13395,6 +13405,11 @@ struct RomaCoreChecks {
                 proveScript.contains("Invoke-PackagedListenerSmoke -ConfigPath $sampleConfigPath") &&
                 laptopProofScript.contains("Get-RomaWindowsAgentArtifactPathSet -ArtifactDir $PackageDir") &&
                 laptopProofScript.contains(#"$manifestPath = $packageArtifactPaths["manifest"]"#) &&
+                packageScript.contains("Resolve-RomaWindowsProductExecutable -BuildDirectory $buildDirectory -Configuration $Configuration -Name \"RomaWindowsAgent\"") &&
+                packageScript.contains("Resolve-RomaWindowsProductExecutable -BuildDirectory $buildDirectory -Configuration $Configuration -Name \"RomaProofAgent\"") &&
+                packageScript.contains("Resolve-RomaWindowsProductExecutable -BuildDirectory $buildDirectory -Configuration $Configuration -Name \"RomaWhisperCLIMock\"") &&
+                packageScript.contains("Copy-RomaWindowsSwiftRuntimeLibraries -OutputDir $OutputDir") &&
+                packageScript.contains("Assert-RomaWindowsSwiftRuntimePackaged -OutputDir $OutputDir -SwiftRuntime $script:swiftRuntime") &&
                 proofCommonScript.contains("Join-RomaWindowsInstalledSmokeDirPath -InstallDir $InstallDir") &&
                 proveScript.contains("Join-RomaWindowsInstalledNotepadPasteProofPath -InstallDir $InstallDir") &&
                 !proveScript.contains(#"Join-Path $InstallDir "smoke\notepad-paste-proof.txt""#) &&
@@ -13407,6 +13422,15 @@ struct RomaCoreChecks {
                 !packageScript.contains(#"$checkSetScriptSource = Join-Path $PSScriptRoot "check-windows-proof-set.ps1""#) &&
                 !packageScript.contains(#"$pdbOutput = Join-Path $OutputDir "RomaWindowsAgent.pdb""#) &&
                 !packageScript.contains(#"$proofAgentPdbOutput = Join-Path $OutputDir "RomaProofAgent.pdb""#) &&
+                !packageScript.contains("function Resolve-ProductExecutable") &&
+                !packageScript.contains("function Resolve-SwiftRuntimeDirectory") &&
+                !packageScript.contains("function Copy-SwiftRuntimeLibraries") &&
+                !packageScript.contains("function Assert-SwiftRuntimePackaged") &&
+                !packageScript.contains("Resolve-ProductExecutable -BuildDirectory") &&
+                !packageScript.contains("Copy-SwiftRuntimeLibraries -OutputDir") &&
+                !packageScript.contains("Assert-SwiftRuntimePackaged -OutputDir") &&
+                !packageScript.contains("Set-Alias -Name Assert-OutputContains") &&
+                !packageScript.contains(#"Join-Path $directory "swiftCore.dll""#) &&
                 !installScript.contains(#"$packageWhisperMock = Join-Path $PackageDir "RomaWhisperCLIMock.exe""#) &&
                 !installScript.contains(#"$installedWhisperMock = Join-Path $InstallDir "RomaWhisperCLIMock.exe""#) &&
                 !proveScript.contains(#"Join-Path $PackageDir "sample-windows-agent.json""#) &&
@@ -13679,7 +13703,7 @@ struct RomaCoreChecks {
         )
         let proofCommonHelperScripts = [
             ("windows-proof.ps1", windowsProofScript, ["Invoke-Step", "Assert-OutputContains"]),
-            ("package-windows-agent.ps1", packageScript, ["Invoke-Step", "Assert-OutputContains"]),
+            ("package-windows-agent.ps1", packageScript, ["Invoke-Step"]),
             ("smoke-windows-agent.ps1", smokeScript, ["Invoke-Step", "Assert-OutputContains", "Resolve-FullPath"]),
             ("install-windows-agent.ps1", installScript, ["Invoke-Step", "Resolve-FullPath", "Require-File"]),
             ("run-windows-agent.ps1", runScript, ["Resolve-FullPath", "Require-File", "Assert-OutputContains"]),

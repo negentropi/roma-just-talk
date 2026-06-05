@@ -13,7 +13,6 @@ if (!(Test-Path -LiteralPath $proofCommonScript)) {
 }
 . $proofCommonScript
 Set-Alias -Name Invoke-Step -Value Invoke-RomaWindowsProofStep -Scope Local -Force
-Set-Alias -Name Assert-OutputContains -Value Assert-RomaWindowsOutputContains -Scope Local -Force
 
 $packageIdentityScript = Join-Path $PSScriptRoot "windows-package-identity.ps1"
 if (!(Test-Path -LiteralPath $packageIdentityScript)) {
@@ -26,111 +25,6 @@ if (!(Test-Path -LiteralPath $manifestScript)) {
     throw "Windows manifest helper was not found: $manifestScript"
 }
 . $manifestScript
-
-function Resolve-ProductExecutable {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$BuildDirectory,
-        [Parameter(Mandatory = $true)]
-        [string]$Configuration,
-        [Parameter(Mandatory = $true)]
-        [string]$Name
-    )
-
-    $preferred = Join-Path $BuildDirectory "$Configuration\$Name.exe"
-    if (Test-Path -LiteralPath $preferred) {
-        return Get-Item -LiteralPath $preferred
-    }
-
-    $matchingConfiguration = Get-ChildItem -Path $BuildDirectory -Filter "$Name.exe" -Recurse |
-        Where-Object { $_.FullName -like "*\$Configuration\*" } |
-        Sort-Object LastWriteTime -Descending |
-        Select-Object -First 1
-    if ($matchingConfiguration) {
-        return $matchingConfiguration
-    }
-
-    $anyExecutable = Get-ChildItem -Path $BuildDirectory -Filter "$Name.exe" -Recurse |
-        Sort-Object LastWriteTime -Descending |
-        Select-Object -First 1
-    if ($anyExecutable) {
-        return $anyExecutable
-    }
-
-    throw "$Name executable was not found under $BuildDirectory"
-}
-
-function Resolve-SwiftRuntimeDirectory {
-    $pathSeparator = [System.IO.Path]::PathSeparator
-    $pathDirectories = $env:PATH -split [regex]::Escape($pathSeparator) |
-        Where-Object { ![string]::IsNullOrWhiteSpace($_) }
-
-    foreach ($directory in $pathDirectories) {
-        $candidate = Join-Path $directory "swiftCore.dll"
-        if (Test-Path -LiteralPath $candidate) {
-            return Get-Item -LiteralPath $directory
-        }
-    }
-
-    return $null
-}
-
-function Copy-SwiftRuntimeLibraries {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$OutputDir
-    )
-
-    $runtimeDirectory = Resolve-SwiftRuntimeDirectory
-    if (!$runtimeDirectory) {
-        Write-Host "swift_runtime_dir=not_found"
-        Write-Host "swift_runtime_dlls=0"
-        return @{
-            Directory = ""
-            DllCount = 0
-        }
-    }
-
-    $runtimeLibraries = @(
-        Get-ChildItem -LiteralPath $runtimeDirectory.FullName -Filter "*.dll" |
-            Sort-Object Name
-    )
-    foreach ($library in $runtimeLibraries) {
-        Copy-Item -LiteralPath $library.FullName -Destination (Join-Path $OutputDir $library.Name) -Force
-    }
-
-    Write-Host "swift_runtime_dir=$($runtimeDirectory.FullName)"
-    Write-Host "swift_runtime_dlls=$($runtimeLibraries.Count)"
-
-    return @{
-        Directory = $runtimeDirectory.FullName
-        DllCount = $runtimeLibraries.Count
-    }
-}
-
-function Assert-SwiftRuntimePackaged {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$OutputDir,
-        [Parameter(Mandatory = $true)]
-        [hashtable]$SwiftRuntime
-    )
-
-    if ([System.Environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT) {
-        return
-    }
-
-    if ($SwiftRuntime.DllCount -le 0) {
-        throw "Swift runtime DLLs were not copied into the Windows agent artifact"
-    }
-
-    $swiftCore = Join-Path $OutputDir "swiftCore.dll"
-    if (!(Test-Path -LiteralPath $swiftCore)) {
-        throw "swiftCore.dll was not copied into the Windows agent artifact"
-    }
-
-    Write-Host "asserted_runtime_dll=swiftCore.dll"
-}
 
 function Invoke-GitLines {
     param(
@@ -278,9 +172,9 @@ try {
     }
 
     $buildDirectory = Join-Path $packageRoot ".build"
-    $agentSource = Resolve-ProductExecutable -BuildDirectory $buildDirectory -Configuration $Configuration -Name "RomaWindowsAgent"
-    $proofAgentSource = Resolve-ProductExecutable -BuildDirectory $buildDirectory -Configuration $Configuration -Name "RomaProofAgent"
-    $mockWhisperSource = Resolve-ProductExecutable -BuildDirectory $buildDirectory -Configuration $Configuration -Name "RomaWhisperCLIMock"
+    $agentSource = Resolve-RomaWindowsProductExecutable -BuildDirectory $buildDirectory -Configuration $Configuration -Name "RomaWindowsAgent"
+    $proofAgentSource = Resolve-RomaWindowsProductExecutable -BuildDirectory $buildDirectory -Configuration $Configuration -Name "RomaProofAgent"
+    $mockWhisperSource = Resolve-RomaWindowsProductExecutable -BuildDirectory $buildDirectory -Configuration $Configuration -Name "RomaWhisperCLIMock"
     $sourceArtifactPaths = Get-RomaWindowsAgentArtifactPathSet -ArtifactDir $PSScriptRoot
     $outputArtifactPaths = Get-RomaWindowsAgentArtifactPathSet -ArtifactDir $OutputDir
     $agentOutput = $outputArtifactPaths["agent"]
@@ -399,8 +293,8 @@ try {
 
     $swiftRuntime = @{}
     Invoke-Step "copy Swift runtime libraries" {
-        $script:swiftRuntime = Copy-SwiftRuntimeLibraries -OutputDir $OutputDir
-        Assert-SwiftRuntimePackaged -OutputDir $OutputDir -SwiftRuntime $script:swiftRuntime
+        $script:swiftRuntime = Copy-RomaWindowsSwiftRuntimeLibraries -OutputDir $OutputDir
+        Assert-RomaWindowsSwiftRuntimePackaged -OutputDir $OutputDir -SwiftRuntime $script:swiftRuntime
     }
 
     Invoke-Step "packaged agent smoke" {

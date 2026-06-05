@@ -13797,18 +13797,30 @@ struct RomaCoreChecks {
                 proofCommonScript.contains(#"$scriptArgs += @("-ApiKeyName", $ApiKeyName)"#) &&
                 proofCommonScript.contains(#"Resolve-RomaWindowsFullPath -Path $SecretDir"#) &&
                 laptopProofScript.contains("$cloudArgs = Add-RomaWindowsAgentScriptCloudArgs `") &&
+                installScript.contains("$smokeArgs = Add-RomaWindowsAgentScriptCloudArgs `") &&
+                proveScript.contains("$installArgs = Add-RomaWindowsAgentScriptCloudArgs `") &&
                 !laptopProofScript.contains(#"$cloudArgs += @("-ApiKeyEnv", $ApiKeyEnv)"#) &&
                 !laptopProofScript.contains(#"$cloudArgs += @("-SecretDir", (Resolve-FullPath -Path $SecretDir))"#) &&
+                !installScript.contains(#"$smokeArgs += @("-ApiKeyEnv", $ApiKeyEnv)"#) &&
+                !installScript.contains(#"$smokeArgs += @("-SecretDir", $SecretDir)"#) &&
+                !proveScript.contains(#"$installArgs += @("-ApiKeyEnv", $ApiKeyEnv)"#) &&
+                !proveScript.contains(#"$installArgs += @("-SecretDir", $SecretDir)"#) &&
                 proofCommonScript.contains("function Add-RomaWindowsAgentScriptLocalWhisperArgs") &&
                 proofCommonScript.contains(#"$scriptArgs += @("-WhisperCLI", $WhisperCLI, "-WhisperModel", $WhisperModel)"#) &&
                 proofCommonScript.contains(#"Resolve-RomaWindowsFullPath -Path $WhisperOutputDir"#) &&
                 proofCommonScript.contains(#"$scriptArgs += "-WhisperArgument""#) &&
                 laptopProofScript.contains("$localArgs = Add-RomaWindowsAgentScriptLocalWhisperArgs `") &&
                 laptopProofScript.contains("$notepadArgs = Add-RomaWindowsAgentScriptLocalWhisperArgs `") &&
+                installScript.contains("$smokeArgs = Add-RomaWindowsAgentScriptLocalWhisperArgs `") &&
+                proveScript.contains("$installArgs = Add-RomaWindowsAgentScriptLocalWhisperArgs `") &&
                 !laptopProofScript.contains(#"$localArgs += @("-WhisperOutputDir", (Resolve-FullPath -Path $WhisperOutputDir))"#) &&
                 !laptopProofScript.contains(#"$notepadArgs += @("-WhisperOutputDir", (Resolve-FullPath -Path $WhisperOutputDir))"#) &&
                 !laptopProofScript.contains(#"$localArgs += "-WhisperArgument""#) &&
                 !laptopProofScript.contains(#"$notepadArgs += "-WhisperArgument""#) &&
+                !installScript.contains(#"$smokeArgs += @("-WhisperOutputDir", $WhisperOutputDir)"#) &&
+                !installScript.contains(#"$smokeArgs += "-WhisperArgument""#) &&
+                !proveScript.contains(#"$installArgs += @("-WhisperOutputDir", $WhisperOutputDir)"#) &&
+                !proveScript.contains(#"$installArgs += "-WhisperArgument""#) &&
                 proofCommonScript.contains("Prerequisites before full proof:") &&
                 proofCommonScript.contains("microphone_settings_uri=ms-settings:privacy-microphone") &&
                 proofCommonScript.contains("RomaWhisperCLIMock.exe is CI-only") &&

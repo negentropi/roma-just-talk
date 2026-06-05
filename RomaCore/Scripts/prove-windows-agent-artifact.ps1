@@ -565,30 +565,25 @@ $installArgs = @(
 if (![string]::IsNullOrWhiteSpace($ConfigPath)) {
     $installArgs += @("-ConfigPath", $ConfigPath)
 }
+$whisperArguments = @(
+    $WhisperArgument |
+        Where-Object { ![string]::IsNullOrWhiteSpace($_) }
+)
 if ($usesWhisper) {
-    $installArgs += @("-WhisperCLI", $WhisperCLI, "-WhisperModel", $WhisperModel)
-    if (![string]::IsNullOrWhiteSpace($WhisperOutputDir)) {
-        $installArgs += @("-WhisperOutputDir", $WhisperOutputDir)
-    }
-    $whisperArguments = @(
-        $WhisperArgument |
-            Where-Object { ![string]::IsNullOrWhiteSpace($_) }
-    )
-    if ($whisperArguments.Count -gt 0) {
-        $installArgs += "-WhisperArgument"
-        $installArgs += $whisperArguments
-    }
+    $installArgs = Add-RomaWindowsAgentScriptLocalWhisperArgs `
+        -ArgumentList $installArgs `
+        -WhisperCLI $WhisperCLI `
+        -WhisperModel $WhisperModel `
+        -WhisperOutputDir $WhisperOutputDir `
+        -WhisperArgument $whisperArguments
 } else {
-    $installArgs += @("-Endpoint", $Endpoint, "-Model", $Model)
-    if (![string]::IsNullOrWhiteSpace($ApiKeyEnv)) {
-        $installArgs += @("-ApiKeyEnv", $ApiKeyEnv)
-    }
-    if (![string]::IsNullOrWhiteSpace($ApiKeyName)) {
-        $installArgs += @("-ApiKeyName", $ApiKeyName)
-    }
-    if (![string]::IsNullOrWhiteSpace($SecretDir)) {
-        $installArgs += @("-SecretDir", $SecretDir)
-    }
+    $installArgs = Add-RomaWindowsAgentScriptCloudArgs `
+        -ArgumentList $installArgs `
+        -Endpoint $Endpoint `
+        -Model $Model `
+        -ApiKeyEnv $ApiKeyEnv `
+        -ApiKeyName $ApiKeyName `
+        -SecretDir $SecretDir
 }
 $installArgs = Add-RomaWindowsAgentScriptCommonArgs `
     -ArgumentList $installArgs `

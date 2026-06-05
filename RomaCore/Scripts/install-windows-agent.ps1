@@ -105,13 +105,20 @@ $hasExplicitModel = $PSBoundParameters.ContainsKey("Model")
 $hasExplicitConfigPath = $PSBoundParameters.ContainsKey("ConfigPath") -and ![string]::IsNullOrWhiteSpace($ConfigPath)
 $hasExplicitWhisperCLI = $PSBoundParameters.ContainsKey("WhisperCLI")
 $hasExplicitWhisperModel = $PSBoundParameters.ContainsKey("WhisperModel")
+$hasWhisperCLIValue = ![string]::IsNullOrWhiteSpace($WhisperCLI)
+$hasWhisperModelValue = ![string]::IsNullOrWhiteSpace($WhisperModel)
 $hasExplicitApiKeyEnv = $PSBoundParameters.ContainsKey("ApiKeyEnv") -and ![string]::IsNullOrWhiteSpace($ApiKeyEnv)
 $hasExplicitApiKeyName = ![string]::IsNullOrWhiteSpace($ApiKeyName)
 $hasExplicitClipboardRestoreDelay = $PSBoundParameters.ContainsKey("ClipboardRestoreDelaySeconds")
 $hasCloudShortcutConfig = $hasExplicitEndpoint -and $hasExplicitModel -and ($hasExplicitApiKeyEnv -or $hasExplicitApiKeyName)
-$hasWhisperShortcutConfig = $hasExplicitWhisperCLI -and $hasExplicitWhisperModel
+$hasWhisperShortcutConfig = $hasWhisperCLIValue -and $hasWhisperModelValue
 $hasExistingShortcutConfig = $SkipSmoke -and $hasExplicitConfigPath
 $shortcutHasRunnableConfig = $hasCloudShortcutConfig -or $hasWhisperShortcutConfig -or $hasExistingShortcutConfig
+
+if (($hasExplicitWhisperCLI -or $hasExplicitWhisperModel) -and
+    (!$hasWhisperCLIValue -or !$hasWhisperModelValue)) {
+    throw "WhisperCLI and WhisperModel must be provided together"
+}
 
 if ([string]::IsNullOrWhiteSpace($ConfigPath)) {
     $userConfigPath = Get-RomaWindowsUserAgentConfigPath
@@ -201,35 +208,30 @@ if (!$SkipSmoke) {
         $smokeArgs = @(
             "-PackageDir", $InstallDir,
             "-OutputDir", (Join-Path $InstallDir "smoke"),
-            "-ConfigPath", $ConfigPath,
-            "-Endpoint", $Endpoint,
-            "-Model", $Model
+            "-ConfigPath", $ConfigPath
         )
-        if ($PSBoundParameters.ContainsKey("ApiKeyEnv")) {
-            $smokeArgs += @("-ApiKeyEnv", $ApiKeyEnv)
+        $smokeApiKeyEnv = ""
+        if ($hasExplicitApiKeyEnv) {
+            $smokeApiKeyEnv = $ApiKeyEnv
         }
-        if (![string]::IsNullOrWhiteSpace($ApiKeyName)) {
-            $smokeArgs += @("-ApiKeyName", $ApiKeyName)
-        }
-        if (![string]::IsNullOrWhiteSpace($SecretDir)) {
-            $smokeArgs += @("-SecretDir", $SecretDir)
-        }
-        if ($hasExplicitWhisperCLI) {
-            $smokeArgs += @("-WhisperCLI", $WhisperCLI)
-        }
-        if ($hasExplicitWhisperModel) {
-            $smokeArgs += @("-WhisperModel", $WhisperModel)
-        }
-        if (![string]::IsNullOrWhiteSpace($WhisperOutputDir)) {
-            $smokeArgs += @("-WhisperOutputDir", $WhisperOutputDir)
-        }
+        $smokeArgs = Add-RomaWindowsAgentScriptCloudArgs `
+            -ArgumentList $smokeArgs `
+            -Endpoint $Endpoint `
+            -Model $Model `
+            -ApiKeyEnv $smokeApiKeyEnv `
+            -ApiKeyName $ApiKeyName `
+            -SecretDir $SecretDir
         $whisperArguments = @(
             $WhisperArgument |
                 Where-Object { ![string]::IsNullOrWhiteSpace($_) }
         )
-        if ($whisperArguments.Count -gt 0) {
-            $smokeArgs += "-WhisperArgument"
-            $smokeArgs += $whisperArguments
+        if ($hasWhisperShortcutConfig) {
+            $smokeArgs = Add-RomaWindowsAgentScriptLocalWhisperArgs `
+                -ArgumentList $smokeArgs `
+                -WhisperCLI $WhisperCLI `
+                -WhisperModel $WhisperModel `
+                -WhisperOutputDir $WhisperOutputDir `
+                -WhisperArgument $whisperArguments
         }
         $smokeArgs = Add-RomaWindowsAgentScriptCommonArgs `
             -ArgumentList $smokeArgs `

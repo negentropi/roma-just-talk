@@ -10318,6 +10318,19 @@ struct RomaCoreChecks {
             "Windows foreground paste adapter should call SetForegroundWindow"
         )
         try require(
+            proofCommonScript.contains("function Wait-RomaWindowsProcessMainWindow") &&
+                proofCommonScript.contains("function Set-RomaWindowsProcessForeground") &&
+                windowsProofScript.contains("Wait-RomaWindowsProcessMainWindow -Process $notepad") &&
+                windowsProofScript.contains("Set-RomaWindowsProcessForeground -Process $notepad") &&
+                proveScript.contains("Wait-RomaWindowsProcessMainWindow -Process $notepad") &&
+                proveScript.contains("Set-RomaWindowsProcessForeground -Process $notepad") &&
+                !windowsProofScript.contains("function Wait-ProcessMainWindow") &&
+                !windowsProofScript.contains("function Set-ProcessForeground") &&
+                !proveScript.contains("function Wait-ProcessMainWindow") &&
+                !proveScript.contains("function Set-ProcessForeground"),
+            "Windows proof scripts should share Notepad process activation helpers"
+        )
+        try require(
             checkSetScript.contains("manifest.source_commit"),
             "Windows proof-set checker should compare source commits across laptop reports"
         )

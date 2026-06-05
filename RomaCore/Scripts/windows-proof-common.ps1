@@ -60,6 +60,53 @@ function Require-RomaWindowsCurrentUserSid {
     return $userSid
 }
 
+function Wait-RomaWindowsProcessMainWindow {
+    param(
+        [Parameter(Mandatory = $true)]
+        [System.Diagnostics.Process]$Process,
+        [int]$TimeoutSeconds = 10
+    )
+
+    $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
+    while ((Get-Date) -lt $deadline) {
+        $Process.Refresh()
+        if ($Process.HasExited) {
+            throw "Process exited before creating a main window: pid=$($Process.Id)"
+        }
+        if ($Process.MainWindowHandle -ne [IntPtr]::Zero) {
+            Write-Host "process_window=ready pid=$($Process.Id) handle=$($Process.MainWindowHandle)"
+            return
+        }
+        Start-Sleep -Milliseconds 200
+    }
+
+    throw "Timed out waiting for process main window: pid=$($Process.Id)"
+}
+
+function Set-RomaWindowsProcessForeground {
+    param(
+        [Parameter(Mandatory = $true)]
+        [System.Diagnostics.Process]$Process,
+        [int]$TimeoutSeconds = 5
+    )
+
+    $shell = New-Object -ComObject WScript.Shell
+    $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
+    while ((Get-Date) -lt $deadline) {
+        $Process.Refresh()
+        if ($Process.HasExited) {
+            throw "Process exited before activation: pid=$($Process.Id)"
+        }
+        if ($shell.AppActivate($Process.Id)) {
+            Write-Host "process_foreground=activated pid=$($Process.Id)"
+            return $shell
+        }
+        Start-Sleep -Milliseconds 200
+    }
+
+    throw "Timed out activating process: pid=$($Process.Id)"
+}
+
 function Get-RomaWindowsProofSurfaceFiles {
     return @(
         "smoke-windows-agent.ps1",

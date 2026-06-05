@@ -99,53 +99,6 @@ function Assert-NonEmptyFile {
     Write-Host "bytes=$($item.Length)"
 }
 
-function Wait-ProcessMainWindow {
-    param(
-        [Parameter(Mandatory = $true)]
-        [System.Diagnostics.Process]$Process,
-        [int]$TimeoutSeconds = 10
-    )
-
-    $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
-    while ((Get-Date) -lt $deadline) {
-        $Process.Refresh()
-        if ($Process.HasExited) {
-            throw "Process exited before creating a main window: pid=$($Process.Id)"
-        }
-        if ($Process.MainWindowHandle -ne [IntPtr]::Zero) {
-            Write-Host "process_window=ready pid=$($Process.Id) handle=$($Process.MainWindowHandle)"
-            return
-        }
-        Start-Sleep -Milliseconds 200
-    }
-
-    throw "Timed out waiting for process main window: pid=$($Process.Id)"
-}
-
-function Set-ProcessForeground {
-    param(
-        [Parameter(Mandatory = $true)]
-        [System.Diagnostics.Process]$Process,
-        [int]$TimeoutSeconds = 5
-    )
-
-    $shell = New-Object -ComObject WScript.Shell
-    $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
-    while ((Get-Date) -lt $deadline) {
-        $Process.Refresh()
-        if ($Process.HasExited) {
-            throw "Process exited before activation: pid=$($Process.Id)"
-        }
-        if ($shell.AppActivate($Process.Id)) {
-            Write-Host "process_foreground=activated pid=$($Process.Id)"
-            return $shell
-        }
-        Start-Sleep -Milliseconds 200
-    }
-
-    throw "Timed out activating process: pid=$($Process.Id)"
-}
-
 function Resolve-SwiftProductExecutable {
     param(
         [Parameter(Mandatory = $true)]
@@ -555,7 +508,7 @@ try {
                 -PassThru
 
             try {
-                Wait-ProcessMainWindow -Process $notepad
+                Wait-RomaWindowsProcessMainWindow -Process $notepad
                 $pasteOutput = swift run RomaProofAgent windows-paste-proof `
                     --text $PasteText `
                     --target-process-id $notepad.Id 2>&1 | Out-String
@@ -567,7 +520,7 @@ try {
                 Assert-OutputContains -Output $pasteOutput -Expected "target_process_id=$($notepad.Id)"
                 Assert-OutputContains -Output $pasteOutput -Expected "paste_sent=true"
 
-                $shell = Set-ProcessForeground -Process $notepad
+                $shell = Set-RomaWindowsProcessForeground -Process $notepad
                 $shell.SendKeys("^s")
                 Start-Sleep -Milliseconds 750
 

@@ -1376,6 +1376,13 @@ struct RomaCoreChecks {
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "so this **Model**",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should unwrap generated bold markup exposed after repeated two-word context"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "so this [*Model. *]",
                 context: midSentenceContext
             ) == "model",
@@ -1396,6 +1403,10 @@ struct RomaCoreChecks {
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("this [*Model.*]", context: midSentenceContext) == "model",
             "shared insertion polish should unwrap generated markup exposed after repeated one-word context"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("this **Model**", context: midSentenceContext) == "model",
+            "shared insertion polish should unwrap generated bold markup exposed after repeated one-word context"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("this [*Model. *]", context: midSentenceContext) == "model",
@@ -1553,10 +1564,24 @@ struct RomaCoreChecks {
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "this you know *Model*",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim repeated context plus you-know filler before italic technical fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "so this you know Model.",
                 context: midSentenceContext
             ) == "model",
             "shared insertion polish should trim repeated multi-word context plus you-know filler before technical fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "so this you know **Model**",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim repeated multi-word context plus you-know filler before bold technical fragments"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
@@ -10042,6 +10067,11 @@ struct RomaCoreChecks {
             fileName: "mid-sentence-so-this-markup-model-proof.wav"
         )
         try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "so this **Model**",
+            expectedText: " model",
+            fileName: "mid-sentence-so-this-bold-model-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
             rawText: "this is [Model.]",
             expectedText: " model",
             fileName: "mid-sentence-this-is-bracketed-model-proof.wav"
@@ -10120,6 +10150,11 @@ struct RomaCoreChecks {
             rawText: "this you know Model.",
             expectedText: " model",
             fileName: "mid-sentence-this-you-know-model-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "this you know *Model*",
+            expectedText: " model",
+            fileName: "mid-sentence-this-you-know-italic-model-proof.wav"
         )
         try await requireMidSentenceGeneratedMarkerCleanupPipeline(
             rawText: "this like Model.",
@@ -13246,6 +13281,30 @@ struct RomaCoreChecks {
                 !smokeScript.contains("function Assert-NonEmptyFile") &&
                 !smokeScript.contains("function Assert-WavFileWithBytes"),
             "Windows source proof and smoke proof should share file byte assertions"
+        )
+        try require(
+            proofCommonScript.contains("function Require-RomaWindowsProofReportProperty") &&
+                proofCommonScript.contains("function Assert-RomaWindowsProofReportBoolean") &&
+                proofCommonScript.contains("function Assert-RomaWindowsProofReportNonEmptyString") &&
+                proofCommonScript.contains("function Get-RomaWindowsProofReportNonEmptyString") &&
+                proofCommonScript.contains("function Assert-RomaWindowsProofReportStringEquals") &&
+                proofCommonScript.contains("function Assert-RomaWindowsProofReportNumberGreaterThan") &&
+                proofCommonScript.contains("function Assert-RomaWindowsProofReportNumberEquals") &&
+                checkReportScript.contains("Set-Alias -Name Require-Property -Value Require-RomaWindowsProofReportProperty") &&
+                checkReportScript.contains("Set-Alias -Name Assert-Boolean -Value Assert-RomaWindowsProofReportBoolean") &&
+                checkReportScript.contains("Set-Alias -Name Assert-NonEmptyString -Value Assert-RomaWindowsProofReportNonEmptyString") &&
+                checkReportScript.contains("Set-Alias -Name Get-NonEmptyStringProperty -Value Get-RomaWindowsProofReportNonEmptyString") &&
+                checkReportScript.contains("Set-Alias -Name Assert-StringEquals -Value Assert-RomaWindowsProofReportStringEquals") &&
+                checkReportScript.contains("Set-Alias -Name Assert-NumberGreaterThan -Value Assert-RomaWindowsProofReportNumberGreaterThan") &&
+                checkReportScript.contains("Set-Alias -Name Assert-NumberEquals -Value Assert-RomaWindowsProofReportNumberEquals") &&
+                !checkReportScript.contains("function Require-Property") &&
+                !checkReportScript.contains("function Assert-Boolean") &&
+                !checkReportScript.contains("function Assert-NonEmptyString") &&
+                !checkReportScript.contains("function Get-NonEmptyStringProperty") &&
+                !checkReportScript.contains("function Assert-StringEquals") &&
+                !checkReportScript.contains("function Assert-NumberGreaterThan") &&
+                !checkReportScript.contains("function Assert-NumberEquals"),
+            "Windows proof report checker should share generic proof report assertions"
         )
         try require(
             packageScript.contains("Require-RomaWindowsFileProof -Path $ProofAgentPath") &&

@@ -2459,6 +2459,7 @@ public struct RomaTranscriptionOutputFilter {
             result = removeLeadingFragmentPunctuation(from: result)
         }
         result = removeLeadingPauseFillerFromContinuationFragment(from: result)
+        result = removeLeadingAcknowledgementFillerFromContextOverlapContinuation(result)
         return cleanDanglingGeneratedLeadInSuffix(result)
     }
 
@@ -2476,7 +2477,9 @@ public struct RomaTranscriptionOutputFilter {
 
         let suffix = String(trimmedText[matchRange.upperBound...])
             .trimmingCharacters(in: .whitespacesAndNewlines)
-        let cleanedSuffix = cleanDanglingGeneratedLeadInSuffix(suffix)
+        let cleanedSuffix = removeLeadingAcknowledgementFillerFromContextOverlapContinuation(
+            cleanDanglingGeneratedLeadInSuffix(suffix)
+        )
             .trimmingCharacters(in: .whitespacesAndNewlines)
         guard !cleanedSuffix.isEmpty,
               !hasInternalSentenceBoundary(cleanedSuffix),
@@ -2487,6 +2490,36 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         return cleanedSuffix
+    }
+
+    private static func removeLeadingAcknowledgementFillerFromContextOverlapContinuation(_ text: String) -> String {
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let regex = try? NSRegularExpression(
+            pattern: #"(?i)^(?:(?:"# +
+                acknowledgementFillerWordPattern +
+                #")(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+)+"#
+        ),
+        let match = regex.firstMatch(in: trimmedText, range: NSRange(trimmedText.startIndex..., in: trimmedText)),
+        let matchRange = Range(match.range, in: trimmedText) else {
+            return text
+        }
+
+        let chain = String(trimmedText[..<matchRange.upperBound])
+        guard !isLiteralYeahRightAcknowledgementChain(chain) else {
+            return text
+        }
+
+        let suffix = cleanDanglingGeneratedLeadInSuffix(String(trimmedText[matchRange.upperBound...]))
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !suffix.isEmpty,
+              !hasInternalSentenceBoundary(suffix),
+              isShortFragment(suffix) ||
+                isNoisyFinalWordContinuationFragment(suffix) ||
+                hasTechnicalContinuationFragmentHead(suffix) else {
+            return text
+        }
+
+        return suffix
     }
 
     private static func removeLeadingDanglingGeneratedLeadInAfterContextOverlap(from text: String) -> String {

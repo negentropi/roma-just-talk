@@ -3345,6 +3345,26 @@ struct RomaCoreChecks {
                 "embedded unpunctuated you know what i mean filler"
             ),
             (
+                "I think this is I mean ready.",
+                "I think this is ready.",
+                "embedded unpunctuated i mean filler should preserve copula"
+            ),
+            (
+                "I think this is I mean really good.",
+                "I think this is really good.",
+                "embedded unpunctuated i mean before predicate"
+            ),
+            (
+                "I think this is like ready.",
+                "I think this is ready.",
+                "embedded unpunctuated like before ready predicate"
+            ),
+            (
+                "I think this is like good.",
+                "I think this is good.",
+                "embedded unpunctuated like before good predicate"
+            ),
+            (
                 "This works I mean",
                 "This works",
                 "unpunctuated terminal i mean filler"

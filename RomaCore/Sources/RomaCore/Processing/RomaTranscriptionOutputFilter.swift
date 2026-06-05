@@ -587,9 +587,10 @@ public struct RomaTranscriptionOutputFilter {
         "that's", "thats", "they're", "theyre", "was", "we're", "were", "you're", "youre"
     ]
     private static let allowedNextWordsForUnpunctuatedLikeFiller: Set<String> = [
-        "actually", "almost", "basically", "doing", "going", "just", "kind", "kinda",
-        "looking", "maybe", "not", "probably", "really", "saying", "so", "sort",
-        "sorta", "thinking", "trying", "using", "waiting", "working"
+        "actually", "almost", "basically", "close", "doing", "done", "fine",
+        "going", "good", "just", "kind", "kinda", "looking", "maybe", "not",
+        "probably", "ready", "really", "saying", "so", "sort", "sorta",
+        "thinking", "trying", "using", "waiting", "working"
     ]
     private static let allowedNextWordsForUnpunctuatedHedgeFiller: Set<String> = [
         "actually", "almost", "basically", "close", "done", "fine", "going",
@@ -1629,6 +1630,7 @@ public struct RomaTranscriptionOutputFilter {
         filteredText = removeTerminalHedgeFillerTails(from: filteredText)
         filteredText = removeTerminalClarificationFillerTails(from: filteredText)
         filteredText = removeTerminalAcknowledgementFillers(from: filteredText)
+        filteredText = removeUnpunctuatedIMeanFillers(from: filteredText)
         filteredText = removeUnpunctuatedYouKnowFillers(from: filteredText)
         filteredText = removeUnpunctuatedLikeFillers(from: filteredText)
         filteredText = removeUnpunctuatedHedgeFillers(from: filteredText)
@@ -2767,6 +2769,37 @@ public struct RomaTranscriptionOutputFilter {
     private static func removeUnpunctuatedYouKnowFillers(from text: String) -> String {
         guard let regex = try? NSRegularExpression(
             pattern: #"(?i)(?<![\p{L}\p{N}])you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?(?:[ \t]*[,;:…]+)?(?![\p{L}\p{N}])"#
+        ) else {
+            return text
+        }
+
+        var filteredText = text
+        let range = NSRange(filteredText.startIndex..., in: filteredText)
+        let matches = regex.matches(in: filteredText, range: range).reversed()
+
+        for match in matches {
+            guard let matchRange = Range(match.range, in: filteredText) else {
+                continue
+            }
+
+            let prefix = String(filteredText[..<matchRange.lowerBound])
+            let suffix = String(filteredText[matchRange.upperBound...])
+            guard let previousWord = previousWord(in: prefix),
+                  let nextWord = nextWord(in: suffix),
+                  allowedPreviousWordsForUnpunctuatedLikeFiller.contains(previousWord),
+                  allowedNextWordsForUnpunctuatedYouKnowFiller.contains(nextWord) else {
+                continue
+            }
+
+            filteredText.replaceSubrange(matchRange, with: "")
+        }
+
+        return filteredText
+    }
+
+    private static func removeUnpunctuatedIMeanFillers(from text: String) -> String {
+        guard let regex = try? NSRegularExpression(
+            pattern: #"(?i)(?<![\p{L}\p{N}])i[ \t]+mean(?:[ \t]*[,;:…]+)?(?![\p{L}\p{N}])"#
         ) else {
             return text
         }
@@ -7132,6 +7165,12 @@ public struct RomaTranscriptionOutputFilter {
 
         if isPlainIMeanBacktrackingMarker(markerText),
            previousWord(in: beforeMarker) == "what" {
+            return false
+        }
+
+        if isPlainIMeanBacktrackingMarker(markerText),
+           let previousWord = previousWord(in: beforeMarker),
+           allowedPreviousWordsForUnpunctuatedLikeFiller.contains(previousWord) {
             return false
         }
 

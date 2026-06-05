@@ -196,11 +196,10 @@ function Require-ReportProperty {
         [string]$ReportName
     )
 
-    if ($null -eq $Report -or !($Report.PSObject.Properties.Name -contains $Name)) {
-        throw "Proof set report $ReportName is missing property: $Name"
-    }
-
-    return $Report.PSObject.Properties[$Name].Value
+    return Require-RomaWindowsObjectProperty `
+        -Object $Report `
+        -Name $Name `
+        -Context "Proof set report $ReportName"
 }
 
 function Assert-SameReportValue {
@@ -215,9 +214,11 @@ function Assert-SameReportValue {
         [string]$ReportName
     )
 
-    if ($Expected -ne $Actual) {
-        throw ("Proof set mismatch for {0} in {1}: expected '{2}', got '{3}'" -f $Name, $ReportName, $Expected, $Actual)
-    }
+    Assert-RomaWindowsSameProofReportValue `
+        -Name $Name `
+        -Expected $Expected `
+        -Actual $Actual `
+        -ReportName $ReportName
 }
 
 function Assert-NonEmptyReportString {
@@ -310,35 +311,6 @@ function Assert-ReportBoolean {
     Write-Host "proof_set_bool=$ReportName.$Name value=$actual"
 }
 
-function Get-ReportPackageFingerprint {
-    param(
-        [Parameter(Mandatory = $true)]
-        [object]$Report,
-        [Parameter(Mandatory = $true)]
-        [string]$ReportName
-    )
-
-    $packageIdentity = Require-ReportProperty -Report $Report -Name "package_identity" -ReportName $ReportName
-    return Get-RomaWindowsPackageIdentityFingerprint `
-        -PackageIdentity $packageIdentity `
-        -Context "Proof set report $ReportName package_identity" `
-        -RequireEntryCount
-}
-
-function Get-ReportSourceProvenance {
-    param(
-        [Parameter(Mandatory = $true)]
-        [object]$Report,
-        [Parameter(Mandatory = $true)]
-        [string]$ReportName
-    )
-
-    $manifest = Require-ReportProperty -Report $Report -Name "manifest" -ReportName $ReportName
-    return Get-RomaWindowsManifestSourceProvenance `
-        -Manifest $manifest `
-        -Context "Proof set report $ReportName manifest"
-}
-
 function Assert-SameArtifactSmokeProofSet {
     param(
         [Parameter(Mandatory = $true)]
@@ -357,109 +329,26 @@ function Assert-SameArtifactSmokeProofSet {
     $first = $reports[0]
     $firstName = [string]$first["Name"]
     $firstReport = $first["Report"]
-    $firstOS = Require-ReportProperty -Report $firstReport -Name "os" -ReportName $firstName
-    $expectedPlatform = [string](Require-ReportProperty -Report $firstOS -Name "platform" -ReportName $firstName)
-    $expectedMachine = [string](Require-ReportProperty -Report $firstOS -Name "machine" -ReportName $firstName)
-    $expectedUserName = [string](Require-ReportProperty -Report $firstOS -Name "user_name" -ReportName $firstName)
-    $expectedUserDomain = [string](Require-ReportProperty -Report $firstOS -Name "user_domain" -ReportName $firstName)
-    $expectedUserSid = [string](Require-ReportProperty -Report $firstOS -Name "user_sid" -ReportName $firstName)
-    $expectedPackageDir = [string](Require-ReportProperty -Report $firstReport -Name "package_dir" -ReportName $firstName)
-    $expectedPackageFingerprint = Get-ReportPackageFingerprint -Report $firstReport -ReportName $firstName
-    $expectedSource = Get-ReportSourceProvenance -Report $firstReport -ReportName $firstName
-
-    if ($expectedPlatform -ne "Win32NT") {
-        throw "Artifact smoke proof must run on Windows, got platform $expectedPlatform"
-    }
-    if ([string]::IsNullOrWhiteSpace($expectedMachine)) {
-        throw "Artifact smoke proof report is missing machine name"
-    }
-    if ([string]::IsNullOrWhiteSpace($expectedUserName)) {
-        throw "Artifact smoke proof report is missing Windows user name"
-    }
-    if ([string]::IsNullOrWhiteSpace($expectedUserSid)) {
-        throw "Artifact smoke proof report is missing Windows user SID"
-    }
-    if ([string]::IsNullOrWhiteSpace($expectedPackageDir)) {
-        throw "Artifact smoke proof report is missing package_dir"
-    }
-    if ([string]::IsNullOrWhiteSpace($expectedPackageFingerprint)) {
-        throw "Artifact smoke proof report is missing package identity fingerprint"
-    }
-    if ([string]$expectedSource['Dirty'] -ne "false") {
-        throw "Artifact smoke proof requires a clean packaged source checkout, got source_dirty=$($expectedSource['Dirty'])"
-    }
+    $expectedIdentity = Get-RomaWindowsProofReportIdentity -Report $firstReport -ReportName $firstName
+    Assert-RomaWindowsProofReportIdentityComplete `
+        -Identity $expectedIdentity `
+        -ProofName "Artifact smoke proof" `
+        -RequireWindows `
+        -RequireCleanSource
 
     foreach ($entry in $reports) {
         $reportName = $entry["Name"]
         $report = $entry["Report"]
-        $reportOS = Require-ReportProperty -Report $report -Name "os" -ReportName $reportName
-        Assert-SameReportValue `
-            -Name "os.platform" `
-            -Expected $expectedPlatform `
-            -Actual ([string](Require-ReportProperty -Report $reportOS -Name "platform" -ReportName $reportName)) `
-            -ReportName $reportName
-        Assert-SameReportValue `
-            -Name "os.machine" `
-            -Expected $expectedMachine `
-            -Actual ([string](Require-ReportProperty -Report $reportOS -Name "machine" -ReportName $reportName)) `
-            -ReportName $reportName
-        Assert-SameReportValue `
-            -Name "os.user_name" `
-            -Expected $expectedUserName `
-            -Actual ([string](Require-ReportProperty -Report $reportOS -Name "user_name" -ReportName $reportName)) `
-            -ReportName $reportName
-        Assert-SameReportValue `
-            -Name "os.user_domain" `
-            -Expected $expectedUserDomain `
-            -Actual ([string](Require-ReportProperty -Report $reportOS -Name "user_domain" -ReportName $reportName)) `
-            -ReportName $reportName
-        Assert-SameReportValue `
-            -Name "os.user_sid" `
-            -Expected $expectedUserSid `
-            -Actual ([string](Require-ReportProperty -Report $reportOS -Name "user_sid" -ReportName $reportName)) `
-            -ReportName $reportName
-        Assert-SameReportValue `
-            -Name "package_dir" `
-            -Expected $expectedPackageDir `
-            -Actual ([string](Require-ReportProperty -Report $report -Name "package_dir" -ReportName $reportName)) `
-            -ReportName $reportName
-        Assert-SameReportValue `
-            -Name "package_identity.fingerprint" `
-            -Expected $expectedPackageFingerprint `
-            -Actual (Get-ReportPackageFingerprint -Report $report -ReportName $reportName) `
-            -ReportName $reportName
-        $source = Get-ReportSourceProvenance -Report $report -ReportName $reportName
-        Assert-SameReportValue `
-            -Name "manifest.source_repository" `
-            -Expected ([string]$expectedSource['Repository']) `
-            -Actual ([string]$source['Repository']) `
-            -ReportName $reportName
-        Assert-SameReportValue `
-            -Name "manifest.source_branch" `
-            -Expected ([string]$expectedSource['Branch']) `
-            -Actual ([string]$source['Branch']) `
-            -ReportName $reportName
-        Assert-SameReportValue `
-            -Name "manifest.source_commit" `
-            -Expected ([string]$expectedSource['Commit']) `
-            -Actual ([string]$source['Commit']) `
-            -ReportName $reportName
-        Assert-SameReportValue `
-            -Name "manifest.source_dirty" `
-            -Expected ([string]$expectedSource['Dirty']) `
-            -Actual ([string]$source['Dirty']) `
+        $identity = Get-RomaWindowsProofReportIdentity -Report $report -ReportName $reportName
+        Assert-RomaWindowsProofReportIdentityMatches `
+            -ExpectedIdentity $expectedIdentity `
+            -ActualIdentity $identity `
             -ReportName $reportName
     }
 
-    Write-Host "proof_set_artifact_smoke_machine=$expectedMachine"
-    Write-Host "proof_set_artifact_smoke_user=$expectedUserName"
-    Write-Host "proof_set_artifact_smoke_user_sid=$expectedUserSid"
-    Write-Host "proof_set_artifact_smoke_package_dir=$expectedPackageDir"
-    Write-Host "proof_set_artifact_smoke_package_fingerprint=$expectedPackageFingerprint"
-    Write-Host "proof_set_artifact_smoke_source_repository=$($expectedSource['Repository'])"
-    Write-Host "proof_set_artifact_smoke_source_branch=$($expectedSource['Branch'])"
-    Write-Host "proof_set_artifact_smoke_source_commit=$($expectedSource['Commit'])"
-    Write-Host "proof_set_artifact_smoke_source_dirty=$($expectedSource['Dirty'])"
+    Write-RomaWindowsProofReportIdentityMarkers `
+        -Identity $expectedIdentity `
+        -Prefix "proof_set_artifact_smoke"
 }
 
 function Assert-LaptopPreflightIncludesLocalWhisper {
@@ -481,21 +370,7 @@ function Assert-SameLaptopPreflightProof {
         [Parameter(Mandatory = $true)]
         [string]$ExpectedProofSessionId,
         [Parameter(Mandatory = $true)]
-        [string]$ExpectedPlatform,
-        [Parameter(Mandatory = $true)]
-        [string]$ExpectedMachine,
-        [Parameter(Mandatory = $true)]
-        [string]$ExpectedUserName,
-        [Parameter(Mandatory = $true)]
-        [string]$ExpectedUserDomain,
-        [Parameter(Mandatory = $true)]
-        [string]$ExpectedUserSid,
-        [Parameter(Mandatory = $true)]
-        [string]$ExpectedPackageDir,
-        [Parameter(Mandatory = $true)]
-        [string]$ExpectedPackageFingerprint,
-        [Parameter(Mandatory = $true)]
-        [object]$ExpectedSource
+        [object]$ExpectedIdentity
     )
 
     $reportName = "laptop_preflight"
@@ -504,62 +379,11 @@ function Assert-SameLaptopPreflightProof {
         -Expected $ExpectedProofSessionId `
         -Actual ([string](Require-ReportProperty -Report $PreflightReport -Name "proof_session_id" -ReportName $reportName)) `
         -ReportName $reportName
-    $reportOS = Require-ReportProperty -Report $PreflightReport -Name "os" -ReportName $reportName
-    Assert-SameReportValue `
-        -Name "os.platform" `
-        -Expected $ExpectedPlatform `
-        -Actual ([string](Require-ReportProperty -Report $reportOS -Name "platform" -ReportName $reportName)) `
-        -ReportName $reportName
-    Assert-SameReportValue `
-        -Name "os.machine" `
-        -Expected $ExpectedMachine `
-        -Actual ([string](Require-ReportProperty -Report $reportOS -Name "machine" -ReportName $reportName)) `
-        -ReportName $reportName
-    Assert-SameReportValue `
-        -Name "os.user_name" `
-        -Expected $ExpectedUserName `
-        -Actual ([string](Require-ReportProperty -Report $reportOS -Name "user_name" -ReportName $reportName)) `
-        -ReportName $reportName
-    Assert-SameReportValue `
-        -Name "os.user_domain" `
-        -Expected $ExpectedUserDomain `
-        -Actual ([string](Require-ReportProperty -Report $reportOS -Name "user_domain" -ReportName $reportName)) `
-        -ReportName $reportName
-    Assert-SameReportValue `
-        -Name "os.user_sid" `
-        -Expected $ExpectedUserSid `
-        -Actual ([string](Require-ReportProperty -Report $reportOS -Name "user_sid" -ReportName $reportName)) `
-        -ReportName $reportName
-    Assert-SameReportValue `
-        -Name "package_dir" `
-        -Expected $ExpectedPackageDir `
-        -Actual ([string](Require-ReportProperty -Report $PreflightReport -Name "package_dir" -ReportName $reportName)) `
-        -ReportName $reportName
-    Assert-SameReportValue `
-        -Name "package_identity.fingerprint" `
-        -Expected $ExpectedPackageFingerprint `
-        -Actual (Get-ReportPackageFingerprint -Report $PreflightReport -ReportName $reportName) `
-        -ReportName $reportName
-    $source = Get-ReportSourceProvenance -Report $PreflightReport -ReportName $reportName
-    Assert-SameReportValue `
-        -Name "manifest.source_repository" `
-        -Expected ([string]$ExpectedSource['Repository']) `
-        -Actual ([string]$source['Repository']) `
-        -ReportName $reportName
-    Assert-SameReportValue `
-        -Name "manifest.source_branch" `
-        -Expected ([string]$ExpectedSource['Branch']) `
-        -Actual ([string]$source['Branch']) `
-        -ReportName $reportName
-    Assert-SameReportValue `
-        -Name "manifest.source_commit" `
-        -Expected ([string]$ExpectedSource['Commit']) `
-        -Actual ([string]$source['Commit']) `
-        -ReportName $reportName
-    Assert-SameReportValue `
-        -Name "manifest.source_dirty" `
-        -Expected ([string]$ExpectedSource['Dirty']) `
-        -Actual ([string]$source['Dirty']) `
+
+    $identity = Get-RomaWindowsProofReportIdentity -Report $PreflightReport -ReportName $reportName
+    Assert-RomaWindowsProofReportIdentityMatches `
+        -ExpectedIdentity $ExpectedIdentity `
+        -ActualIdentity $identity `
         -ReportName $reportName
     Write-Host "proof_set_laptop_preflight_matches_full=true"
 }
@@ -591,53 +415,18 @@ function Assert-SameLaptopProofSet {
         -Value ([string](Require-ReportProperty -Report $firstReport -Name "proof_session_id" -ReportName $firstName)) `
         -Name "proof_session_id" `
         -ReportName $firstName
-    $firstOS = Require-ReportProperty -Report $firstReport -Name "os" -ReportName $firstName
-    $expectedPlatform = [string](Require-ReportProperty -Report $firstOS -Name "platform" -ReportName $firstName)
-    $expectedMachine = [string](Require-ReportProperty -Report $firstOS -Name "machine" -ReportName $firstName)
-    $expectedUserName = [string](Require-ReportProperty -Report $firstOS -Name "user_name" -ReportName $firstName)
-    $expectedUserDomain = [string](Require-ReportProperty -Report $firstOS -Name "user_domain" -ReportName $firstName)
-    $expectedUserSid = [string](Require-ReportProperty -Report $firstOS -Name "user_sid" -ReportName $firstName)
-    $expectedPackageDir = [string](Require-ReportProperty -Report $firstReport -Name "package_dir" -ReportName $firstName)
-    $expectedPackageFingerprint = Get-ReportPackageFingerprint -Report $firstReport -ReportName $firstName
-    $expectedSource = Get-ReportSourceProvenance -Report $firstReport -ReportName $firstName
-
-    if ($expectedPlatform -ne "Win32NT") {
-        throw "Full laptop proof must run on Windows, got platform $expectedPlatform"
-    }
-    if ([string]::IsNullOrWhiteSpace($expectedProofSessionId)) {
-        throw "Full laptop proof report is missing proof_session_id; use run-windows-laptop-proof.ps1 or pass one shared ProofSessionId"
-    }
-    if ([string]::IsNullOrWhiteSpace($expectedMachine)) {
-        throw "Full laptop proof report is missing machine name"
-    }
-    if ([string]::IsNullOrWhiteSpace($expectedUserName)) {
-        throw "Full laptop proof report is missing Windows user name"
-    }
-    if ([string]::IsNullOrWhiteSpace($expectedUserSid)) {
-        throw "Full laptop proof report is missing Windows user SID"
-    }
-    if ([string]::IsNullOrWhiteSpace($expectedPackageDir)) {
-        throw "Full laptop proof report is missing package_dir"
-    }
-    if ([string]::IsNullOrWhiteSpace($expectedPackageFingerprint)) {
-        throw "Full laptop proof report is missing package identity fingerprint"
-    }
-    if ([string]$expectedSource['Dirty'] -ne "false") {
-        throw "Full laptop proof requires a clean packaged source checkout, got source_dirty=$($expectedSource['Dirty'])"
-    }
+    $expectedIdentity = Get-RomaWindowsProofReportIdentity -Report $firstReport -ReportName $firstName
+    Assert-RomaWindowsProofReportIdentityComplete `
+        -Identity $expectedIdentity `
+        -ProofName "Full laptop proof" `
+        -RequireWindows `
+        -RequireCleanSource
 
     if ($null -ne $LaptopPreflightReport) {
         Assert-SameLaptopPreflightProof `
             -PreflightReport $LaptopPreflightReport `
             -ExpectedProofSessionId $expectedProofSessionId `
-            -ExpectedPlatform $expectedPlatform `
-            -ExpectedMachine $expectedMachine `
-            -ExpectedUserName $expectedUserName `
-            -ExpectedUserDomain $expectedUserDomain `
-            -ExpectedUserSid $expectedUserSid `
-            -ExpectedPackageDir $expectedPackageDir `
-            -ExpectedPackageFingerprint $expectedPackageFingerprint `
-            -ExpectedSource $expectedSource
+            -ExpectedIdentity $expectedIdentity
         Assert-LaptopPreflightIncludesLocalWhisper -PreflightReport $LaptopPreflightReport
     }
 
@@ -667,75 +456,18 @@ function Assert-SameLaptopProofSet {
             -Expected $expectedProofSessionId `
             -Actual ([string](Require-ReportProperty -Report $report -Name "proof_session_id" -ReportName $reportName)) `
             -ReportName $reportName
-        $reportOS = Require-ReportProperty -Report $report -Name "os" -ReportName $reportName
-        Assert-SameReportValue `
-            -Name "os.platform" `
-            -Expected $expectedPlatform `
-            -Actual ([string](Require-ReportProperty -Report $reportOS -Name "platform" -ReportName $reportName)) `
-            -ReportName $reportName
-        Assert-SameReportValue `
-            -Name "os.machine" `
-            -Expected $expectedMachine `
-            -Actual ([string](Require-ReportProperty -Report $reportOS -Name "machine" -ReportName $reportName)) `
-            -ReportName $reportName
-        Assert-SameReportValue `
-            -Name "os.user_name" `
-            -Expected $expectedUserName `
-            -Actual ([string](Require-ReportProperty -Report $reportOS -Name "user_name" -ReportName $reportName)) `
-            -ReportName $reportName
-        Assert-SameReportValue `
-            -Name "os.user_domain" `
-            -Expected $expectedUserDomain `
-            -Actual ([string](Require-ReportProperty -Report $reportOS -Name "user_domain" -ReportName $reportName)) `
-            -ReportName $reportName
-        Assert-SameReportValue `
-            -Name "os.user_sid" `
-            -Expected $expectedUserSid `
-            -Actual ([string](Require-ReportProperty -Report $reportOS -Name "user_sid" -ReportName $reportName)) `
-            -ReportName $reportName
-        Assert-SameReportValue `
-            -Name "package_dir" `
-            -Expected $expectedPackageDir `
-            -Actual ([string](Require-ReportProperty -Report $report -Name "package_dir" -ReportName $reportName)) `
-            -ReportName $reportName
-        Assert-SameReportValue `
-            -Name "package_identity.fingerprint" `
-            -Expected $expectedPackageFingerprint `
-            -Actual (Get-ReportPackageFingerprint -Report $report -ReportName $reportName) `
-            -ReportName $reportName
-        $source = Get-ReportSourceProvenance -Report $report -ReportName $reportName
-        Assert-SameReportValue `
-            -Name "manifest.source_repository" `
-            -Expected ([string]$expectedSource['Repository']) `
-            -Actual ([string]$source['Repository']) `
-            -ReportName $reportName
-        Assert-SameReportValue `
-            -Name "manifest.source_branch" `
-            -Expected ([string]$expectedSource['Branch']) `
-            -Actual ([string]$source['Branch']) `
-            -ReportName $reportName
-        Assert-SameReportValue `
-            -Name "manifest.source_commit" `
-            -Expected ([string]$expectedSource['Commit']) `
-            -Actual ([string]$source['Commit']) `
-            -ReportName $reportName
-        Assert-SameReportValue `
-            -Name "manifest.source_dirty" `
-            -Expected ([string]$expectedSource['Dirty']) `
-            -Actual ([string]$source['Dirty']) `
+
+        $identity = Get-RomaWindowsProofReportIdentity -Report $report -ReportName $reportName
+        Assert-RomaWindowsProofReportIdentityMatches `
+            -ExpectedIdentity $expectedIdentity `
+            -ActualIdentity $identity `
             -ReportName $reportName
     }
 
     Write-Host "proof_set_session_id=$expectedProofSessionId"
-    Write-Host "proof_set_machine=$expectedMachine"
-    Write-Host "proof_set_user=$expectedUserName"
-    Write-Host "proof_set_user_sid=$expectedUserSid"
-    Write-Host "proof_set_package_dir=$expectedPackageDir"
-    Write-Host "proof_set_package_fingerprint=$expectedPackageFingerprint"
-    Write-Host "proof_set_source_repository=$($expectedSource['Repository'])"
-    Write-Host "proof_set_source_branch=$($expectedSource['Branch'])"
-    Write-Host "proof_set_source_commit=$($expectedSource['Commit'])"
-    Write-Host "proof_set_source_dirty=$($expectedSource['Dirty'])"
+    Write-RomaWindowsProofReportIdentityMarkers `
+        -Identity $expectedIdentity `
+        -Prefix "proof_set"
 }
 
 $script:checkReportScript = Join-Path $PSScriptRoot "check-windows-proof-report.ps1"

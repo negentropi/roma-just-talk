@@ -11810,14 +11810,15 @@ struct RomaCoreChecks {
         try require(
             proofCommonScript.contains("function Get-RomaWindowsManifestSourceProvenance") &&
                 checkReportScript.contains("Get-RomaWindowsManifestSourceProvenance") &&
-                checkSetScript.contains("Get-RomaWindowsManifestSourceProvenance") &&
+                proofCommonScript.contains("function Get-RomaWindowsProofReportIdentity") &&
+                checkSetScript.contains("Get-RomaWindowsProofReportIdentity") &&
                 proofCommonScript.contains("source_repository must identify the packaged source repository"),
             "Windows proof checker should reject placeholder source repositories"
         )
         try require(
             proofCommonScript.contains("source_commit must be a 40-character git SHA") &&
                 checkReportScript.contains(#"-Context "manifest""#) &&
-                checkSetScript.contains(#"-Context "Proof set report $ReportName manifest""#),
+                proofCommonScript.contains(#"-Context "$context manifest""#),
             "Windows proof checker should reject missing or malformed source commits"
         )
         try require(
@@ -12811,15 +12812,18 @@ struct RomaCoreChecks {
             "Windows proof scripts should share hold-to-talk operator prompts"
         )
         try require(
-            checkSetScript.contains("manifest.source_commit"),
+            proofCommonScript.contains("manifest.source_commit") &&
+                checkSetScript.contains("Assert-RomaWindowsProofReportIdentityMatches"),
             "Windows proof-set checker should compare source commits across laptop reports"
         )
         try require(
-            checkSetScript.contains("proof_set_source_commit="),
+            proofCommonScript.contains(#""{0}_source_commit={1}""#) &&
+                checkSetScript.contains(#"-Prefix "proof_set""#),
             "Windows proof-set checker should print matched source commit evidence"
         )
         try require(
-            checkSetScript.contains("Full laptop proof requires a clean packaged source checkout"),
+            proofCommonScript.contains("requires a clean packaged source checkout, got source_dirty") &&
+                checkSetScript.contains(#"-ProofName "Full laptop proof""#),
             "Windows proof-set checker should reject dirty packaged source for final laptop proof"
         )
         try require(
@@ -12828,8 +12832,10 @@ struct RomaCoreChecks {
         )
         try require(
             checkSetScript.contains("function Assert-SameArtifactSmokeProofSet") &&
-                checkSetScript.contains("Artifact smoke proof requires a clean packaged source checkout") &&
-                checkSetScript.contains("proof_set_artifact_smoke_package_fingerprint="),
+                proofCommonScript.contains("requires a clean packaged source checkout, got source_dirty") &&
+                checkSetScript.contains(#"-ProofName "Artifact smoke proof""#) &&
+                proofCommonScript.contains(#""{0}_package_fingerprint={1}""#) &&
+                checkSetScript.contains(#"-Prefix "proof_set_artifact_smoke""#),
             "Windows artifact smoke proof-set checker should tie doctor and install reports to one package"
         )
         try require(
@@ -13052,11 +13058,12 @@ struct RomaCoreChecks {
         )
         try require(
             proofCommonScript.contains("function Get-RomaWindowsPackageIdentityFingerprint") &&
+                proofCommonScript.contains("function Get-RomaWindowsProofReportIdentity") &&
                 proofCommonScript.contains("^[0-9a-fA-F]{64}$") &&
                 proofCommonScript.contains("^0{64}$") &&
                 proofCommonScript.contains("fingerprint must be non-placeholder") &&
                 checkReportScript.contains("Get-RomaWindowsPackageIdentityFingerprint") &&
-                checkSetScript.contains("Get-RomaWindowsPackageIdentityFingerprint"),
+                checkSetScript.contains("Get-RomaWindowsProofReportIdentity"),
             "Windows proof report checker should reject malformed and placeholder package identity fingerprints"
         )
         try require(

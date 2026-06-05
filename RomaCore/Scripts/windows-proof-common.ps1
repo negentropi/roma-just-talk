@@ -312,6 +312,154 @@ function Get-RomaWindowsManifestSourceProvenance {
     }
 }
 
+function Get-RomaWindowsProofReportIdentity {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Report,
+        [Parameter(Mandatory = $true)]
+        [string]$ReportName
+    )
+
+    $context = "Proof set report $ReportName"
+    $os = Require-RomaWindowsObjectProperty -Object $Report -Name "os" -Context $context
+    $packageIdentity = Require-RomaWindowsObjectProperty -Object $Report -Name "package_identity" -Context $context
+    $manifest = Require-RomaWindowsObjectProperty -Object $Report -Name "manifest" -Context $context
+    $source = Get-RomaWindowsManifestSourceProvenance `
+        -Manifest $manifest `
+        -Context "$context manifest"
+
+    return [ordered]@{
+        Platform = [string](Require-RomaWindowsObjectProperty -Object $os -Name "platform" -Context "$context os")
+        Machine = [string](Require-RomaWindowsObjectProperty -Object $os -Name "machine" -Context "$context os")
+        UserName = [string](Require-RomaWindowsObjectProperty -Object $os -Name "user_name" -Context "$context os")
+        UserDomain = [string](Require-RomaWindowsObjectProperty -Object $os -Name "user_domain" -Context "$context os")
+        UserSid = [string](Require-RomaWindowsObjectProperty -Object $os -Name "user_sid" -Context "$context os")
+        PackageDir = [string](Require-RomaWindowsObjectProperty -Object $Report -Name "package_dir" -Context $context)
+        PackageFingerprint = Get-RomaWindowsPackageIdentityFingerprint `
+            -PackageIdentity $packageIdentity `
+            -Context "$context package_identity" `
+            -RequireEntryCount
+        Source = $source
+    }
+}
+
+function Assert-RomaWindowsSameProofReportValue {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Name,
+        [Parameter(Mandatory = $true)]
+        [string]$Expected,
+        [Parameter(Mandatory = $true)]
+        [string]$Actual,
+        [Parameter(Mandatory = $true)]
+        [string]$ReportName
+    )
+
+    if ($Expected -ne $Actual) {
+        throw ("Proof set mismatch for {0} in {1}: expected '{2}', got '{3}'" -f $Name, $ReportName, $Expected, $Actual)
+    }
+}
+
+function Assert-RomaWindowsProofReportIdentityMatches {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$ExpectedIdentity,
+        [Parameter(Mandatory = $true)]
+        [object]$ActualIdentity,
+        [Parameter(Mandatory = $true)]
+        [string]$ReportName
+    )
+
+    $identityFields = @(
+        [pscustomobject]@{ Key = "Platform"; Name = "os.platform" },
+        [pscustomobject]@{ Key = "Machine"; Name = "os.machine" },
+        [pscustomobject]@{ Key = "UserName"; Name = "os.user_name" },
+        [pscustomobject]@{ Key = "UserDomain"; Name = "os.user_domain" },
+        [pscustomobject]@{ Key = "UserSid"; Name = "os.user_sid" },
+        [pscustomobject]@{ Key = "PackageDir"; Name = "package_dir" },
+        [pscustomobject]@{ Key = "PackageFingerprint"; Name = "package_identity.fingerprint" }
+    )
+    foreach ($field in $identityFields) {
+        $fieldKey = [string]$field.Key
+        Assert-RomaWindowsSameProofReportValue `
+            -Name ([string]$field.Name) `
+            -Expected ([string]$ExpectedIdentity[$fieldKey]) `
+            -Actual ([string]$ActualIdentity[$fieldKey]) `
+            -ReportName $ReportName
+    }
+
+    $expectedSource = $ExpectedIdentity["Source"]
+    $actualSource = $ActualIdentity["Source"]
+    $sourceFields = @(
+        [pscustomobject]@{ Key = "Repository"; Name = "manifest.source_repository" },
+        [pscustomobject]@{ Key = "Branch"; Name = "manifest.source_branch" },
+        [pscustomobject]@{ Key = "Commit"; Name = "manifest.source_commit" },
+        [pscustomobject]@{ Key = "Dirty"; Name = "manifest.source_dirty" }
+    )
+    foreach ($sourceField in $sourceFields) {
+        $sourceKey = [string]$sourceField.Key
+        Assert-RomaWindowsSameProofReportValue `
+            -Name ([string]$sourceField.Name) `
+            -Expected ([string]$expectedSource[$sourceKey]) `
+            -Actual ([string]$actualSource[$sourceKey]) `
+            -ReportName $ReportName
+    }
+}
+
+function Assert-RomaWindowsProofReportIdentityComplete {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Identity,
+        [Parameter(Mandatory = $true)]
+        [string]$ProofName,
+        [switch]$RequireWindows,
+        [switch]$RequireCleanSource
+    )
+
+    if ($RequireWindows -and [string]$Identity["Platform"] -ne "Win32NT") {
+        throw ("{0} must run on Windows, got platform {1}" -f $ProofName, [string]$Identity["Platform"])
+    }
+
+    $requiredFields = @(
+        [pscustomobject]@{ Key = "Machine"; Message = "machine name" },
+        [pscustomobject]@{ Key = "UserName"; Message = "Windows user name" },
+        [pscustomobject]@{ Key = "UserSid"; Message = "Windows user SID" },
+        [pscustomobject]@{ Key = "PackageDir"; Message = "package_dir" },
+        [pscustomobject]@{ Key = "PackageFingerprint"; Message = "package identity fingerprint" }
+    )
+    foreach ($field in $requiredFields) {
+        $fieldKey = [string]$field.Key
+        if ([string]::IsNullOrWhiteSpace([string]$Identity[$fieldKey])) {
+            throw "$ProofName report is missing $($field.Message)"
+        }
+    }
+
+    $source = $Identity["Source"]
+    if ($RequireCleanSource -and [string]$source["Dirty"] -ne "false") {
+        throw ("{0} requires a clean packaged source checkout, got source_dirty={1}" -f $ProofName, [string]$source["Dirty"])
+    }
+}
+
+function Write-RomaWindowsProofReportIdentityMarkers {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Identity,
+        [Parameter(Mandatory = $true)]
+        [string]$Prefix
+    )
+
+    $source = $Identity["Source"]
+    Write-Host ("{0}_machine={1}" -f $Prefix, [string]$Identity["Machine"])
+    Write-Host ("{0}_user={1}" -f $Prefix, [string]$Identity["UserName"])
+    Write-Host ("{0}_user_sid={1}" -f $Prefix, [string]$Identity["UserSid"])
+    Write-Host ("{0}_package_dir={1}" -f $Prefix, [string]$Identity["PackageDir"])
+    Write-Host ("{0}_package_fingerprint={1}" -f $Prefix, [string]$Identity["PackageFingerprint"])
+    Write-Host ("{0}_source_repository={1}" -f $Prefix, [string]$source["Repository"])
+    Write-Host ("{0}_source_branch={1}" -f $Prefix, [string]$source["Branch"])
+    Write-Host ("{0}_source_commit={1}" -f $Prefix, [string]$source["Commit"])
+    Write-Host ("{0}_source_dirty={1}" -f $Prefix, [string]$source["Dirty"])
+}
+
 function Assert-RomaWindowsPathNotPackagedArtifact {
     param(
         [Parameter(Mandatory = $true)]

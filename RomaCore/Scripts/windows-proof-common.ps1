@@ -3616,6 +3616,33 @@ function Add-RomaWindowsAgentScriptCommonArgs {
     return $scriptArgs
 }
 
+function Add-RomaWindowsAgentScriptCloudArgs {
+    param(
+        [object[]]$ArgumentList = @(),
+        [Parameter(Mandatory = $true)]
+        [string]$Endpoint,
+        [Parameter(Mandatory = $true)]
+        [string]$Model,
+        [string]$ApiKeyEnv = "",
+        [string]$ApiKeyName = "",
+        [string]$SecretDir = ""
+    )
+
+    $scriptArgs = @($ArgumentList)
+    $scriptArgs += @("-Endpoint", $Endpoint, "-Model", $Model)
+    if (![string]::IsNullOrWhiteSpace($ApiKeyEnv)) {
+        $scriptArgs += @("-ApiKeyEnv", $ApiKeyEnv)
+    }
+    if (![string]::IsNullOrWhiteSpace($ApiKeyName)) {
+        $scriptArgs += @("-ApiKeyName", $ApiKeyName)
+    }
+    if (![string]::IsNullOrWhiteSpace($SecretDir)) {
+        $scriptArgs += @("-SecretDir", (Resolve-RomaWindowsFullPath -Path $SecretDir))
+    }
+
+    return $scriptArgs
+}
+
 function Add-RomaWindowsAgentScriptLocalWhisperArgs {
     param(
         [object[]]$ArgumentList = @(),

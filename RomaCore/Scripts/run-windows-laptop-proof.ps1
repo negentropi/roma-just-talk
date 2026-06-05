@@ -416,19 +416,15 @@ $cloudArgs = @(
     "-InstallDir", $cloudInstallDir,
     "-ConfigPath", $cloudConfigPath,
     "-ProofReportPath", $cloudReport,
-    "-ProofSessionId", $proofSessionId,
-    "-Endpoint", $Endpoint,
-    "-Model", $Model
+    "-ProofSessionId", $proofSessionId
 )
-if (![string]::IsNullOrWhiteSpace($ApiKeyEnv)) {
-    $cloudArgs += @("-ApiKeyEnv", $ApiKeyEnv)
-}
-if (![string]::IsNullOrWhiteSpace($ApiKeyName)) {
-    $cloudArgs += @("-ApiKeyName", $ApiKeyName)
-}
-if (![string]::IsNullOrWhiteSpace($SecretDir)) {
-    $cloudArgs += @("-SecretDir", (Resolve-FullPath -Path $SecretDir))
-}
+$cloudArgs = Add-RomaWindowsAgentScriptCloudArgs `
+    -ArgumentList $cloudArgs `
+    -Endpoint $Endpoint `
+    -Model $Model `
+    -ApiKeyEnv $ApiKeyEnv `
+    -ApiKeyName $ApiKeyName `
+    -SecretDir $SecretDir
 if (![string]::IsNullOrWhiteSpace($CloudExpectedTranscriptText)) {
     $cloudArgs += @("-ExpectedTranscriptText", $CloudExpectedTranscriptText)
 }

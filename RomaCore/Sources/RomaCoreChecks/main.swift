@@ -13414,6 +13414,7 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Add-RomaWindowsProofFields") &&
                 proofCommonScript.contains("function Add-RomaWindowsAgentConfigurationArgs") &&
                 proofCommonScript.contains("function Add-RomaWindowsAgentScriptCommonArgs") &&
+                proofCommonScript.contains("function Add-RomaWindowsAgentScriptCloudArgs") &&
                 proofCommonScript.contains("function Add-RomaWindowsAgentScriptLocalWhisperArgs") &&
                 proofCommonScript.contains("function Get-RomaWindowsEmptyFileProof") &&
                 proofCommonScript.contains("function Get-RomaWindowsOptionalFileProof") &&
@@ -13790,6 +13791,14 @@ struct RomaCoreChecks {
                 !laptopProofScript.contains(#"Join-Path $ProofDir "local-whisper-notepad-install""#) &&
                 !laptopProofScript.contains(#"Join-Path $ProofDir "cloud-shortcuts""#) &&
                 !laptopProofScript.contains(#"Join-Path $ProofDir "local-whisper-shortcuts""#) &&
+                proofCommonScript.contains("function Add-RomaWindowsAgentScriptCloudArgs") &&
+                proofCommonScript.contains(#"$scriptArgs += @("-Endpoint", $Endpoint, "-Model", $Model)"#) &&
+                proofCommonScript.contains(#"$scriptArgs += @("-ApiKeyEnv", $ApiKeyEnv)"#) &&
+                proofCommonScript.contains(#"$scriptArgs += @("-ApiKeyName", $ApiKeyName)"#) &&
+                proofCommonScript.contains(#"Resolve-RomaWindowsFullPath -Path $SecretDir"#) &&
+                laptopProofScript.contains("$cloudArgs = Add-RomaWindowsAgentScriptCloudArgs `") &&
+                !laptopProofScript.contains(#"$cloudArgs += @("-ApiKeyEnv", $ApiKeyEnv)"#) &&
+                !laptopProofScript.contains(#"$cloudArgs += @("-SecretDir", (Resolve-FullPath -Path $SecretDir))"#) &&
                 proofCommonScript.contains("function Add-RomaWindowsAgentScriptLocalWhisperArgs") &&
                 proofCommonScript.contains(#"$scriptArgs += @("-WhisperCLI", $WhisperCLI, "-WhisperModel", $WhisperModel)"#) &&
                 proofCommonScript.contains(#"Resolve-RomaWindowsFullPath -Path $WhisperOutputDir"#) &&

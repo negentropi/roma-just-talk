@@ -45,44 +45,6 @@ Set-Alias -Name Invoke-Step -Value Invoke-RomaWindowsProofStep -Scope Local -For
 Set-Alias -Name Resolve-FullPath -Value Resolve-RomaWindowsFullPath -Scope Local -Force
 Set-Alias -Name Require-File -Value Require-RomaWindowsFile -Scope Local -Force
 
-function New-AgentShortcut {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$ShortcutPath,
-        [Parameter(Mandatory = $true)]
-        [string]$RunScript,
-        [Parameter(Mandatory = $true)]
-        [string]$ConfigPath,
-        [Parameter(Mandatory = $true)]
-        [string]$WorkingDirectory,
-        [Parameter(Mandatory = $true)]
-        [string]$Description
-    )
-
-    $shell = New-Object -ComObject WScript.Shell
-    $shortcut = $shell.CreateShortcut($ShortcutPath)
-    $shortcut.TargetPath = Get-RomaWindowsAgentShortcutTargetPath
-    $shortcut.Arguments = New-RomaWindowsAgentShortcutArguments `
-        -RunScriptPath $RunScript `
-        -InstallDir $WorkingDirectory `
-        -ConfigPath $ConfigPath
-    $shortcut.WorkingDirectory = $WorkingDirectory
-    $shortcut.Description = $Description
-    $shortcut.WindowStyle = 7
-    $shortcut.Save()
-
-    Require-File -Path $ShortcutPath
-    $savedShortcut = $shell.CreateShortcut($ShortcutPath)
-    Assert-RomaWindowsAgentShortcutContract `
-        -Shortcut $savedShortcut `
-        -RunScriptPath $RunScript `
-        -InstallDir $WorkingDirectory `
-        -ConfigPath $ConfigPath |
-        Out-Null
-
-    return $savedShortcut
-}
-
 function Get-ProcessExecutablePath {
     param(
         [Parameter(Mandatory = $true)]
@@ -332,11 +294,11 @@ if ($CreateShortcut -or $CreateStartupShortcut) {
             New-Item -ItemType Directory -Force -Path $ShortcutDir | Out-Null
 
             $shortcutPath = Join-Path $ShortcutDir $ShortcutName
-            $savedShortcut = New-AgentShortcut `
+            $savedShortcut = New-RomaWindowsAgentShortcut `
                 -ShortcutPath $shortcutPath `
-                -RunScript $runScript `
+                -RunScriptPath $runScript `
                 -ConfigPath $ConfigPath `
-                -WorkingDirectory $InstallDir `
+                -InstallDir $InstallDir `
                 -Description "Start roma-just-talk Windows dictation agent"
             Write-Host "shortcut=$shortcutPath"
             Write-Host "shortcut_args=$($savedShortcut.Arguments)"
@@ -354,11 +316,11 @@ if ($CreateShortcut -or $CreateStartupShortcut) {
             New-Item -ItemType Directory -Force -Path $StartupShortcutDir | Out-Null
 
             $startupShortcutPath = Join-Path $StartupShortcutDir $StartupShortcutName
-            $savedStartupShortcut = New-AgentShortcut `
+            $savedStartupShortcut = New-RomaWindowsAgentShortcut `
                 -ShortcutPath $startupShortcutPath `
-                -RunScript $runScript `
+                -RunScriptPath $runScript `
                 -ConfigPath $ConfigPath `
-                -WorkingDirectory $InstallDir `
+                -InstallDir $InstallDir `
                 -Description "Start roma-just-talk Windows dictation agent at login"
             Write-Host "startup_shortcut=$startupShortcutPath"
             Write-Host "startup_shortcut_args=$($savedStartupShortcut.Arguments)"

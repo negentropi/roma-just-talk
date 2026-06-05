@@ -2336,6 +2336,44 @@ function Assert-RomaWindowsAgentShortcutContract {
     return $true
 }
 
+function New-RomaWindowsAgentShortcut {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ShortcutPath,
+        [Parameter(Mandatory = $true)]
+        [string]$RunScriptPath,
+        [Parameter(Mandatory = $true)]
+        [string]$ConfigPath,
+        [Parameter(Mandatory = $true)]
+        [string]$InstallDir,
+        [Parameter(Mandatory = $true)]
+        [string]$Description
+    )
+
+    $shell = New-Object -ComObject WScript.Shell
+    $shortcut = $shell.CreateShortcut($ShortcutPath)
+    $shortcut.TargetPath = Get-RomaWindowsAgentShortcutTargetPath
+    $shortcut.Arguments = New-RomaWindowsAgentShortcutArguments `
+        -RunScriptPath $RunScriptPath `
+        -InstallDir $InstallDir `
+        -ConfigPath $ConfigPath
+    $shortcut.WorkingDirectory = $InstallDir
+    $shortcut.Description = $Description
+    $shortcut.WindowStyle = 7
+    $shortcut.Save()
+
+    Require-RomaWindowsFile -Path $ShortcutPath
+    $savedShortcut = $shell.CreateShortcut($ShortcutPath)
+    Assert-RomaWindowsAgentShortcutContract `
+        -Shortcut $savedShortcut `
+        -RunScriptPath $RunScriptPath `
+        -InstallDir $InstallDir `
+        -ConfigPath $ConfigPath |
+        Out-Null
+
+    return $savedShortcut
+}
+
 function Join-RomaWindowsInstalledRunScriptPath {
     param(
         [Parameter(Mandatory = $true)]

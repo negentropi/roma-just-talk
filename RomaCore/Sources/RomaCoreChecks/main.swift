@@ -7656,6 +7656,32 @@ struct RomaCoreChecks {
             displayName: "Proof",
             provider: .custom
         )
+        try require(
+            WindowsDictationRuntimeEvent.preRollBuffering.proofOutputLine == "pre_roll_buffering=true",
+            "Windows runtime event should own pre-roll proof output"
+        )
+        try require(
+            WindowsDictationRuntimeEvent.waitingForToggle(displayName: "Ctrl+Shift+R").proofOutputLine ==
+                "waiting_for=Ctrl+Shift+R",
+            "Windows runtime event should own toggle wait proof output"
+        )
+        try require(
+            WindowsDictationRuntimeEvent.toggleReceived.proofOutputLine == "hotkey_received=true",
+            "Windows runtime event should own toggle received proof output"
+        )
+        try require(
+            WindowsDictationRuntimeEvent.waitingForHoldKeyDown(displayName: "Ctrl+Shift+R").proofOutputLine ==
+                "waiting_for_key_down=Ctrl+Shift+R",
+            "Windows runtime event should own hold wait proof output"
+        )
+        try require(
+            WindowsDictationRuntimeEvent.holdKeyDown.proofOutputLine == "hold_key_down=true",
+            "Windows runtime event should own hold keydown proof output"
+        )
+        try require(
+            WindowsDictationRuntimeEvent.holdKeyUp.proofOutputLine == "hold_key_up=true",
+            "Windows runtime event should own hold keyup proof output"
+        )
         let request = WindowsDictationRuntimeRequest(
             outputURL: URL(fileURLWithPath: "/tmp/windows-runtime-proof.wav"),
             model: model,
@@ -9624,8 +9650,13 @@ struct RomaCoreChecks {
             windowsAgentSource.contains("WindowsDictationRuntime.runListener(") &&
                 windowsDictationRuntimeSource.contains("try await session.startPreRollBuffering()") &&
                 windowsDictationRuntimeSource.contains("captureLifecycle: .keepAliveAfterRun") &&
-                windowsAgentSource.contains("case .preRollBuffering:") &&
-                windowsAgentSource.contains(#"print("pre_roll_buffering=true")"#) &&
+                windowsDictationRuntimeSource.contains("public var proofOutputLine: String") &&
+                windowsDictationRuntimeSource.contains(#"return "pre_roll_buffering=true""#) &&
+                windowsDictationRuntimeSource.contains(#"return "waiting_for_key_down=\(displayName)""#) &&
+                windowsAgentSource.contains("print(event.proofOutputLine)") &&
+                proofAgentSource.contains("print(event.proofOutputLine)") &&
+                !windowsAgentSource.contains("case .preRollBuffering:") &&
+                !proofAgentSource.contains("case .preRollBuffering:") &&
                 doctorOutputSource.contains(#""windows_listener_pre_roll_runtime_source=true""#) &&
                 proofAgentPrintsSharedSourceMarkers,
             "Windows proof agent should expose that listener sessions reuse the shared pre-roll runtime path"

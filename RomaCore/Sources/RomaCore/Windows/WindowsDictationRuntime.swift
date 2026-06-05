@@ -12,6 +12,23 @@ public enum WindowsDictationRuntimeEvent: Equatable, Hashable, Sendable {
     case waitingForHoldKeyDown(displayName: String)
     case holdKeyDown
     case holdKeyUp
+
+    public var proofOutputLine: String {
+        switch self {
+        case .preRollBuffering:
+            return "pre_roll_buffering=true"
+        case .waitingForToggle(let displayName):
+            return "waiting_for=\(displayName)"
+        case .toggleReceived:
+            return "hotkey_received=true"
+        case .waitingForHoldKeyDown(let displayName):
+            return "waiting_for_key_down=\(displayName)"
+        case .holdKeyDown:
+            return "hold_key_down=true"
+        case .holdKeyUp:
+            return "hold_key_up=true"
+        }
+    }
 }
 
 public struct WindowsDictationRuntimeRequest: Sendable {

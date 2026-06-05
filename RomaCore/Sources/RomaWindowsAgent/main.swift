@@ -287,20 +287,7 @@ struct RomaWindowsAgent {
     }
 
     private static func printEvent(_ event: WindowsDictationRuntimeEvent) {
-        switch event {
-        case .preRollBuffering:
-            print("pre_roll_buffering=true")
-        case .waitingForToggle(let displayName):
-            print("waiting_for=\(displayName)")
-        case .toggleReceived:
-            print("hotkey_received=true")
-        case .waitingForHoldKeyDown(let displayName):
-            print("waiting_for_key_down=\(displayName)")
-        case .holdKeyDown:
-            print("hold_key_down=true")
-        case .holdKeyUp:
-            print("hold_key_up=true")
-        }
+        print(event.proofOutputLine)
     }
 
     private static func resolvedOutputURL(

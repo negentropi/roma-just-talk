@@ -224,84 +224,26 @@ function Write-LaptopPreflightCheckerSmokeReport {
         Get-RomaWindowsEmptyFileProof
     }
 
-    $report = [ordered]@{
-        generated_at = (Get-Date).ToUniversalTime().ToString("o")
-        proof_session_id = [guid]::NewGuid().ToString("D")
-        proof_mode = Get-RomaWindowsProofProfileExpectedModeByName -Name "laptop_preflight"
-        preflight_only = $true
-        package_dir = $PackageDir
-        proof_dir = $ProofDir
-        manifest = [ordered]@{
+    $report = New-RomaWindowsLaptopPreflightReport `
+        -ProofSessionId ([guid]::NewGuid().ToString("D")) `
+        -PackageDir $PackageDir `
+        -ProofDir $ProofDir `
+        -Manifest ([ordered]@{
             source_repository = $GitMetadata.Repository
             source_branch = $GitMetadata.Branch
             source_commit = $GitMetadata.Commit
             source_dirty = $GitMetadata.Dirty
-        }
-        package_identity = (Get-RomaPackageIdentityProof -PackageDir $PackageDir)
-        os = [ordered]@{
-            platform = [System.Environment]::OSVersion.Platform.ToString()
-            version = [System.Environment]::OSVersion.VersionString
-            machine = $env:COMPUTERNAME
-            user_name = $env:USERNAME
-            user_domain = $env:USERDOMAIN
-            user_sid = Require-RomaWindowsCurrentUserSid
-        }
-        preflights = [ordered]@{
-            permission_surface = $true
-            hotkey_delivery = $true
-            microphone = $true
-            local_whisper = $IncludeLocalWhisper
-        }
-        preflight_outputs = [ordered]@{
-            permission_surface = [ordered]@{
-                output_present = $true
-                os_permission_grants_microphone = $true
-                microphone_settings_uri = $true
-                desktop_app_microphone_access_required = $true
-                native_capabilities_register_hotkey = $true
-                no_accessibility_permission_prompt = $true
-                no_automation_permission_prompt = $true
-                no_admin_required = $true
-                startup_launcher_run_script = $true
-                startup_launch_mode_listen = $true
-                no_startup_permission_prompt = $true
-                no_screen_capture_required = $true
-                no_screen_recording_permission_prompt = $true
-            }
-            hotkey_delivery = [ordered]@{
-                output_present = $true
-                waiting_for_hold = $true
-                key_down = $true
-                key_up = $true
-                observed_events_present = $true
-            }
-            microphone = [ordered]@{
-                output_present = $true
-                wrote_present = $true
-                reported_duration = $true
-                duration_seconds = 1.0
-                reported_positive_duration = $true
-                reported_pre_roll = $true
-                included_pre_roll_seconds = 0.5
-                reported_positive_pre_roll = $true
-                sample_rate_16000 = $true
-                channels_mono = $true
-            }
-            local_whisper = [ordered]@{
-                output_present = $IncludeLocalWhisper
-                transcription_client_whisper = $IncludeLocalWhisper
-                network_required_false = $IncludeLocalWhisper
-                executable_present = $IncludeLocalWhisper
-                model_file_present = $IncludeLocalWhisper
-            }
-        }
-        files = [ordered]@{
+        }) `
+        -PackageIdentity (Get-RomaPackageIdentityProof -PackageDir $PackageDir) `
+        -PreflightOutputs (New-RomaWindowsLaptopPreflightSyntheticOutputProofs -IncludeLocalWhisper $IncludeLocalWhisper) `
+        -FileProofs ([ordered]@{
             proof_agent = Require-RomaWindowsFileProof -Path $ProofAgentPath
             mic_preflight_wav = Require-RomaWindowsFileProof -Path $micPreflightPath
             whisper_cli = $whisperCLIProof
             whisper_model = $whisperModelProof
-        }
-    }
+        }) `
+        -IncludeLocalWhisper $IncludeLocalWhisper `
+        -RequireUserSid
 
     $report |
         ConvertTo-Json -Depth 6 |

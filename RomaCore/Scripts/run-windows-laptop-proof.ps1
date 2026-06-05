@@ -45,9 +45,6 @@ Set-Alias -Name Invoke-Step -Value Invoke-RomaWindowsProofStep -Scope Local -For
 Set-Alias -Name Resolve-FullPath -Value Resolve-RomaWindowsFullPath -Scope Local -Force
 Set-Alias -Name Require-File -Value Require-RomaWindowsFile -Scope Local -Force
 Set-Alias -Name Assert-OutputContains -Value Assert-RomaWindowsOutputContains -Scope Local -Force
-Set-Alias -Name Get-FileProof -Value Get-RomaWindowsFileProof -Scope Local -Force
-Set-Alias -Name Get-OptionalFileProof -Value Get-RomaWindowsOptionalFileProof -Scope Local -Force
-Set-Alias -Name Get-CurrentWindowsUserSid -Value Get-RomaWindowsCurrentUserSid -Scope Local -Force
 
 $packageIdentityScript = Join-Path $PSScriptRoot "windows-package-identity.ps1"
 if (!(Test-Path -LiteralPath $packageIdentityScript)) {
@@ -285,42 +282,24 @@ function Write-PreflightReport {
     $hasLocalWhisperPreflight = ![string]::IsNullOrWhiteSpace($WhisperCLIPath) -and
         ![string]::IsNullOrWhiteSpace($WhisperModelPath)
 
-    $report = [ordered]@{
-        generated_at = (Get-Date).ToUniversalTime().ToString("o")
-        proof_session_id = $ProofSessionId
-        proof_mode = Get-RomaWindowsProofProfileExpectedModeByName -Name "laptop_preflight"
-        preflight_only = $true
-        package_dir = $PackageDir
-        proof_dir = $ProofDir
-        manifest = $script:artifactManifest
-        package_identity = (Get-RomaPackageIdentityProof -PackageDir $PackageDir)
-        os = [ordered]@{
-            platform = [System.Environment]::OSVersion.Platform.ToString()
-            version = [System.Environment]::OSVersion.VersionString
-            machine = $env:COMPUTERNAME
-            user_name = $env:USERNAME
-            user_domain = $env:USERDOMAIN
-            user_sid = Get-CurrentWindowsUserSid
-        }
-        preflights = [ordered]@{
-            permission_surface = $true
-            hotkey_delivery = $true
-            microphone = $true
-            local_whisper = $hasLocalWhisperPreflight
-        }
-        preflight_outputs = [ordered]@{
-            permission_surface = Get-RomaWindowsPermissionPreflightOutputProof -Output $script:permissionPreflightOutput
-            hotkey_delivery = Get-RomaWindowsHotkeyDeliveryPreflightOutputProof -Output $script:hotkeyDeliveryPreflightOutput
-            microphone = Get-RomaWindowsMicrophonePreflightOutputProof -Output $script:microphonePreflightOutput
-            local_whisper = Get-RomaWindowsLocalWhisperPreflightOutputProof -Output $script:localWhisperPreflightOutput
-        }
-        files = [ordered]@{
-            proof_agent = Get-FileProof -Path $ProofAgentPath
-            mic_preflight_wav = Get-FileProof -Path $MicPreflightPath
-            whisper_cli = Get-OptionalFileProof -Path $WhisperCLIPath
-            whisper_model = Get-OptionalFileProof -Path $WhisperModelPath
-        }
-    }
+    $report = New-RomaWindowsLaptopPreflightReport `
+        -ProofSessionId $ProofSessionId `
+        -PackageDir $PackageDir `
+        -ProofDir $ProofDir `
+        -Manifest $script:artifactManifest `
+        -PackageIdentity (Get-RomaPackageIdentityProof -PackageDir $PackageDir) `
+        -PreflightOutputs (New-RomaWindowsLaptopPreflightOutputProofs `
+            -PermissionSurfaceOutput $script:permissionPreflightOutput `
+            -HotkeyDeliveryOutput $script:hotkeyDeliveryPreflightOutput `
+            -MicrophoneOutput $script:microphonePreflightOutput `
+            -LocalWhisperOutput $script:localWhisperPreflightOutput) `
+        -FileProofs ([ordered]@{
+            proof_agent = Get-RomaWindowsFileProof -Path $ProofAgentPath
+            mic_preflight_wav = Get-RomaWindowsFileProof -Path $MicPreflightPath
+            whisper_cli = Get-RomaWindowsOptionalFileProof -Path $WhisperCLIPath
+            whisper_model = Get-RomaWindowsOptionalFileProof -Path $WhisperModelPath
+        }) `
+        -IncludeLocalWhisper $hasLocalWhisperPreflight
 
     $report |
         ConvertTo-Json -Depth 8 |

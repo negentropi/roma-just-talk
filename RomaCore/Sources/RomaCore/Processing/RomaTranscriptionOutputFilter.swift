@@ -2670,7 +2670,7 @@ public struct RomaTranscriptionOutputFilter {
     private static func removeLeadingGeneratedMarkerBoundaryRemnant(from text: String) -> String {
         let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard let regex = try? NSRegularExpression(
-            pattern: #"(?i)^\s*(?:#{1,6}|\d{1,3}[\.)]|[-*•+=~^]|>{1,3}|=>)\s+(.+)$"#
+            pattern: #"(?i)^\s*(?:#{1,6}|\d{1,3}[\.)]|[-*•+=~^✅]|>{1,3}|=>)\s+(.+)$"#
         ),
         let match = regex.firstMatch(in: trimmedText, range: NSRange(trimmedText.startIndex..., in: trimmedText)),
         match.numberOfRanges >= 2,
@@ -11535,7 +11535,7 @@ public struct RomaTranscriptionOutputFilter {
         let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedText.contains("\n"),
               let markerRange = trimmedText.range(
-                of: #"^(?:[-*•+=~^]|>{1,3}|=>)\s+"#,
+                of: #"^(?:[-*•+=~^✅]|>{1,3}|=>)\s+"#,
                 options: .regularExpression
               ) else {
             return text

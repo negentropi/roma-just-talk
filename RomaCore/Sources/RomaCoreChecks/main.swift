@@ -10287,11 +10287,17 @@ struct RomaCoreChecks {
             )
             if scriptName != "windows-proof.ps1" {
                 try require(
-                    scriptSource.contains(#"-Expected "listener_capture_lifecycle=shared_pre_roll_runtime""#),
-                    "\(scriptName) should assert the listener keeps shared pre-roll runtime lifecycle"
+                    scriptSource.contains("Assert-RomaWindowsListenerSmokeOutput"),
+                    "\(scriptName) should assert listener smoke output through the shared helper"
                 )
             }
         }
+        try require(
+            proofCommonScript.contains("function Assert-RomaWindowsListenerSmokeOutput") &&
+                proofCommonScript.contains("function Get-RomaWindowsListenerSmokeOutputProof") &&
+                proveScript.contains("Get-RomaWindowsListenerSmokeOutputProof -Output $Output"),
+            "Windows proof helper should own listener smoke output assertions and proof shaping"
+        )
         let hotKeyAvailabilityProofAssertions = [
             ("windows-proof.ps1", windowsProofScript, #"Invoke-RomaProofAgentNativeDoctor -Name "register_hotkey_available""#),
             ("prove-windows-agent-artifact.ps1", proveScript, "Get-RomaWindowsNativeDoctorSpecs"),

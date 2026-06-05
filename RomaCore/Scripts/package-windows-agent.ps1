@@ -695,9 +695,7 @@ try {
             throw "RomaWindowsAgent listen smoke failed"
         }
         Write-Host $listenerOutputText
-        Assert-OutputContains -Output $listenerOutputText -Expected "mode=listen"
-        Assert-OutputContains -Output $listenerOutputText -Expected "listener_capture_lifecycle=shared_pre_roll_runtime"
-        Assert-OutputContains -Output $listenerOutputText -Expected "listen_completed_sessions=0"
+        Assert-RomaWindowsListenerSmokeOutput -Output $listenerOutputText
     }
 
     Invoke-Step "packaged local whisper config smoke" {

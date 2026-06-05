@@ -1039,6 +1039,21 @@ function Assert-RomaWindowsFullLaptopProofSetOutput {
         -Markers (Get-RomaWindowsFullLaptopProofSetOutputMarkers)
 }
 
+function Assert-RomaWindowsListenerSmokeOutput {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Output,
+        [bool]$RequireLauncherMode = $false
+    )
+
+    if ($RequireLauncherMode) {
+        Assert-RomaWindowsOutputContains -Output $Output -Expected "mode=RomaWindowsAgent listen"
+    }
+    Assert-RomaWindowsOutputContains -Output $Output -Expected "mode=listen"
+    Assert-RomaWindowsOutputContains -Output $Output -Expected "listener_capture_lifecycle=shared_pre_roll_runtime"
+    Assert-RomaWindowsOutputContains -Output $Output -Expected "listen_completed_sessions=0"
+}
+
 function Get-RomaWindowsOutputMarkerProof {
     param(
         [string]$Output = "",
@@ -1159,6 +1174,21 @@ function Get-RomaWindowsLocalWhisperPreflightOutputProof {
         network_required_false = $Output.Contains("network_required=false")
         executable_present = $Output.Contains("executable=")
         model_file_present = $Output.Contains("model_file=")
+    }
+}
+
+function Get-RomaWindowsListenerSmokeOutputProof {
+    param(
+        [string]$Output = ""
+    )
+
+    return [ordered]@{
+        output_present = ![string]::IsNullOrWhiteSpace($Output)
+        mode_listen = $Output.Contains("mode=listen")
+        launcher_mode_listen = $Output.Contains("mode=RomaWindowsAgent listen")
+        shared_pre_roll_runtime = $Output.Contains("listener_capture_lifecycle=shared_pre_roll_runtime")
+        zero_session = $Output.Contains("max_sessions=0")
+        completed_zero_sessions = $Output.Contains("listen_completed_sessions=0")
     }
 }
 

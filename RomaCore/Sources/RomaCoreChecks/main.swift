@@ -12939,6 +12939,11 @@ struct RomaCoreChecks {
                 laptopProofScript.contains("Get-RomaWindowsWaitingForHoldOutputMarker") &&
                 laptopProofScript.contains("Write-RomaWindowsNotepadPastePrompt") &&
                 laptopProofScript.contains("-HoldTimeoutSeconds $HoldTimeoutSeconds") &&
+                runScript.contains("Write-RomaWindowsDictationOperatorPrompt `") &&
+                runScript.contains(#"$operatorPromptName = if ($Listen) { "installed_agent_listener" } else { "installed_agent_dictation" }"#) &&
+                runScript.contains(#"$usesHoldHook = !(Test-RomaWindowsContainsText -Text $configDoctorOutput -Needle "recording_mode=toggle")"#) &&
+                runScript.contains(#"$promptsPaste = Test-RomaWindowsContainsText -Text $configDoctorOutput -Needle "paste=true""#) &&
+                runScript.contains("-ListenerSessionCount $listenerSessionCount") &&
                 windowsProofScript.contains("Write-RomaWindowsDictationOperatorPrompt") &&
                 windowsProofScript.contains(#"-Name "source_dictation_proof""#) &&
                 windowsProofScript.contains(#"-Name "source_windows_agent_dictation""#) &&
@@ -12946,6 +12951,7 @@ struct RomaCoreChecks {
                 smokeScript.contains(#"-Name "installed_agent_dictation""#) &&
                 !proofCommonScript.contains("Write-Host \"hold_hotkey=Ctrl+Shift+R\"") &&
                 !proofCommonScript.contains("Write-Host \"toggle_hotkey=Ctrl+Shift+R\"") &&
+                !runScript.contains(#"Write-Host "waiting_for_hotkey=Ctrl+Shift+R""#) &&
                 !windowsProofScript.contains("Say a phrase before Ctrl+Shift+R") &&
                 !smokeScript.contains("Say a phrase before Ctrl+Shift+R") &&
                 !proveScript.contains("function Write-HoldDictationPrompt") &&

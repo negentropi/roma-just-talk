@@ -199,7 +199,16 @@ if ($Listen -and $PSBoundParameters.ContainsKey("MaxSessions")) {
     $agentArgs += @("--max-sessions", "$MaxSessions")
 }
 
-Write-Host "waiting_for_hotkey=Ctrl+Shift+R"
+$operatorPromptName = if ($Listen) { "installed_agent_listener" } else { "installed_agent_dictation" }
+$usesHoldHook = !(Test-RomaWindowsContainsText -Text $configDoctorOutput -Needle "recording_mode=toggle")
+$promptsPaste = Test-RomaWindowsContainsText -Text $configDoctorOutput -Needle "paste=true"
+$listenerSessionCount = if ($Listen -and $PSBoundParameters.ContainsKey("MaxSessions")) { $MaxSessions } else { -1 }
+Write-RomaWindowsDictationOperatorPrompt `
+    -Name $operatorPromptName `
+    -UseHoldHook $usesHoldHook `
+    -HoldTimeoutSeconds $HoldTimeoutSeconds `
+    -ListenerSessionCount $listenerSessionCount `
+    -PasteDictation $promptsPaste
 Write-Host "mode=RomaWindowsAgent $agentMode"
 & $AgentPath @agentArgs
 if ($LASTEXITCODE -ne 0) {

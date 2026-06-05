@@ -11044,13 +11044,20 @@ struct RomaCoreChecks {
         )
         try require(
             checkSetScript.contains("function Get-ReportGeneratedAt") &&
-                checkSetScript.contains("[System.DateTimeOffset]::Parse") &&
+                proofCommonScript.contains("function ConvertTo-RomaWindowsProofTimestamp") &&
+                proofCommonScript.contains("[System.DateTimeOffset]::Parse") &&
+                checkReportScript.contains(#"$generatedAt = ConvertTo-RomaWindowsProofTimestamp"#) &&
+                checkReportScript.contains("-WriteProofValue") &&
+                checkSetScript.contains("ConvertTo-RomaWindowsProofTimestamp") &&
+                !checkReportScript.contains("function Assert-GeneratedAtTimestamp") &&
+                !checkReportScript.contains("[System.DateTimeOffset]::Parse") &&
+                !checkSetScript.contains("[System.DateTimeOffset]::Parse") &&
                 checkSetScript.contains("function Assert-ReportsGeneratedWithinWindow") &&
                 checkSetScript.contains(#"-WindowMinutes 120"#) &&
                 checkSetScript.contains(#"$ProofName reports must be generated within $WindowMinutes minutes"#) &&
                 checkSetScript.contains("proof_set_generated_at_window_minutes=") &&
                 checkReportScript.contains("proof_set_laptop_preflight_generated_at="),
-            "Windows proof-set checker should require full laptop reports from one generated_at window"
+            "Windows proof checkers should share generated_at timestamp parsing and require one full-laptop time window"
         )
         try require(
             checkSetScript.contains("proof_set_session_id="),

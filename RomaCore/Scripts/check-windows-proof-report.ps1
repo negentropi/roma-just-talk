@@ -194,32 +194,6 @@ function Assert-StringEquals {
     Write-Host "proof_value=$Name value=$Actual"
 }
 
-function Assert-GeneratedAtTimestamp {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Value,
-        [Parameter(Mandatory = $true)]
-        [string]$Name
-    )
-
-    if ([string]::IsNullOrWhiteSpace($Value)) {
-        throw "Expected non-empty timestamp: $Name"
-    }
-
-    try {
-        $timestamp = [System.DateTimeOffset]::Parse(
-            $Value,
-            [System.Globalization.CultureInfo]::InvariantCulture,
-            [System.Globalization.DateTimeStyles]::AssumeUniversal
-        ).ToUniversalTime()
-    } catch {
-        throw "Expected valid timestamp for $Name, got: $Value"
-    }
-
-    Write-Host "proof_value=$Name utc=$($timestamp.ToString("o"))"
-    return $timestamp
-}
-
 function Assert-PackageIdentityProof {
     param(
         [Parameter(Mandatory = $true)]
@@ -753,9 +727,10 @@ function Assert-LaptopPreflightReport {
         -Value ([string](Require-Property -Object $Report -Name "proof_session_id")) `
         -Name "proof_session_id" `
         -WriteProofValue
-    $generatedAt = Assert-GeneratedAtTimestamp `
+    $generatedAt = ConvertTo-RomaWindowsProofTimestamp `
         -Value ([string](Require-Property -Object $Report -Name "generated_at")) `
-        -Name "generated_at"
+        -Name "generated_at" `
+        -WriteProofValue
     $packageDir = Get-NonEmptyStringProperty -Object $Report -Name "package_dir"
     $proofDir = Get-NonEmptyStringProperty -Object $Report -Name "proof_dir"
 

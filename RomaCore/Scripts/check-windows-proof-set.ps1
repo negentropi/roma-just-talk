@@ -248,19 +248,10 @@ function Get-ReportGeneratedAt {
     )
 
     $value = [string](Require-ReportProperty -Report $Report -Name "generated_at" -ReportName $ReportName)
-    if ([string]::IsNullOrWhiteSpace($value)) {
-        throw "Proof set report $ReportName has empty generated_at"
-    }
-
-    try {
-        return [System.DateTimeOffset]::Parse(
-            $value,
-            [System.Globalization.CultureInfo]::InvariantCulture,
-            [System.Globalization.DateTimeStyles]::AssumeUniversal
-        ).ToUniversalTime()
-    } catch {
-        throw "Proof set report $ReportName has invalid generated_at timestamp: $value"
-    }
+    return ConvertTo-RomaWindowsProofTimestamp `
+        -Value $value `
+        -Name "generated_at" `
+        -ReportName $ReportName
 }
 
 function Assert-ReportsGeneratedWithinWindow {

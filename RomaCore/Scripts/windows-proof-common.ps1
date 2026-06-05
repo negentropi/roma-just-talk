@@ -88,6 +88,41 @@ function Assert-RomaWindowsProofSessionId {
     return $normalizedValue
 }
 
+function ConvertTo-RomaWindowsProofTimestamp {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Value,
+        [string]$Name = "generated_at",
+        [string]$ReportName = "",
+        [switch]$WriteProofValue
+    )
+
+    if ([string]::IsNullOrWhiteSpace($Value)) {
+        if ([string]::IsNullOrWhiteSpace($ReportName)) {
+            throw "Expected non-empty timestamp: $Name"
+        }
+        throw "Proof set report $ReportName has empty $Name"
+    }
+
+    try {
+        $timestamp = [System.DateTimeOffset]::Parse(
+            $Value,
+            [System.Globalization.CultureInfo]::InvariantCulture,
+            [System.Globalization.DateTimeStyles]::AssumeUniversal
+        ).ToUniversalTime()
+    } catch {
+        if ([string]::IsNullOrWhiteSpace($ReportName)) {
+            throw "Expected valid timestamp for $Name, got: $Value"
+        }
+        throw "Proof set report $ReportName has invalid $Name timestamp: $Value"
+    }
+
+    if ($WriteProofValue) {
+        Write-Host "proof_value=$Name utc=$($timestamp.ToString("o"))"
+    }
+    return $timestamp
+}
+
 function Get-RomaWindowsCurrentUserSid {
     if ([System.Environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT) {
         return ""

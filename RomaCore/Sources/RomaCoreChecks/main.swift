@@ -2128,6 +2128,18 @@ struct RomaCoreChecks {
             "shared insertion polish should preserve leading paragraph breaks"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("First line\n", context: midSentenceContext) == "first line\n",
+            "shared insertion polish should preserve trailing line breaks"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Intro\n\n", context: midSentenceContext) == "Intro\n\n",
+            "shared insertion polish should preserve trailing paragraph breaks"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("\n", context: midSentenceContext) == "\n",
+            "shared insertion polish should preserve standalone line break output"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionSpacing("model", context: midSentenceContext) == " model",
             "shared insertion spacing should add a leading space after words"
         )
@@ -5227,6 +5239,31 @@ struct RomaCoreChecks {
                 "Intro split here Details.",
                 "Intro\n\nDetails.",
                 "split here paragraph command"
+            ),
+            (
+                "First line new line.",
+                "First line\n",
+                "terminal new line command should drop generated period"
+            ),
+            (
+                "Intro new paragraph.",
+                "Intro\n\n",
+                "terminal new paragraph command should drop generated period"
+            ),
+            (
+                "New line.",
+                "\n",
+                "standalone new line command should drop generated period"
+            ),
+            (
+                "New paragraph.",
+                "\n\n",
+                "standalone new paragraph command should drop generated period"
+            ),
+            (
+                "Line break.",
+                "\n",
+                "standalone line break command should drop generated period"
             ),
             (
                 "New line details.",
@@ -10007,6 +10044,43 @@ struct RomaCoreChecks {
         try require(
             await selectedReplacementInserter.pastedText == "model",
             "pipeline should paste selected replacement text without leading space"
+        )
+
+        let standaloneNewlineRecorder = FakeRecorder()
+        let standaloneNewlineInserter = FakeTextInsertion()
+        let standaloneNewlinePipeline = DictationPipeline(
+            recorder: standaloneNewlineRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "standalone-newline-proof.wav",
+                text: "New line."
+            ),
+            textInsertion: standaloneNewlineInserter
+        )
+        let standaloneNewlineRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/standalone-newline-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await standaloneNewlineRecorder.startPreRollBuffering()
+        let standaloneNewlineResult = try await standaloneNewlinePipeline.runRecordingWindow(
+            standaloneNewlineRequest
+        ) {}
+
+        try require(
+            standaloneNewlineResult.processedText == "\n",
+            "pipeline should clean standalone new-line commands to a newline"
+        )
+        try require(
+            standaloneNewlineResult.session.insertedText == "\n",
+            "pipeline session should store standalone structural newline output"
+        )
+        try require(
+            await standaloneNewlineInserter.pastedText == "\n",
+            "pipeline should paste standalone structural newline output"
         )
 
         let fillerOnlyRecorder = FakeRecorder()

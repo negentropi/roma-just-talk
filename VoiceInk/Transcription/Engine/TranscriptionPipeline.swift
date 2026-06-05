@@ -306,6 +306,12 @@ class TranscriptionPipeline {
     }
 
     private func isPasteableText(_ text: String) -> Bool {
-        !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        guard !text.isEmpty else { return false }
+        if text.contains(where: { !$0.isWhitespace }) {
+            return true
+        }
+        return text.contains { character in
+            character.isNewline || character == "\t"
+        }
     }
 }

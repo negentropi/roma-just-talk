@@ -125,7 +125,7 @@ public final class DictationPipeline: @unchecked Sendable {
 
             var insertedText: String?
             if request.shouldInsertTranscription,
-               !processedText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+               Self.isPasteableText(processedText) {
                 try await textInsertion?.pasteAtCursor(processedText)
                 insertedText = processedText
             }
@@ -185,5 +185,15 @@ public final class DictationPipeline: @unchecked Sendable {
             preservesTerminalPunctuation: preservesTerminalPunctuation
         )
         return RomaTranscriptionOutputFilter.applyInsertionSpacing(polishedText, context: context)
+    }
+
+    private static func isPasteableText(_ text: String) -> Bool {
+        guard !text.isEmpty else { return false }
+        if text.contains(where: { !$0.isWhitespace }) {
+            return true
+        }
+        return text.contains { character in
+            character.isNewline || character == "\t"
+        }
     }
 }

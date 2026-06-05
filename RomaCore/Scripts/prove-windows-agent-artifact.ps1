@@ -514,20 +514,6 @@ function Get-ListenerSmokeProof {
     return $proof
 }
 
-function Get-ScriptParseProof {
-    param(
-        [string]$Output = ""
-    )
-
-    $count = Get-RomaWindowsScriptParseCount -Output $Output
-    return [ordered]@{
-        output_present = ![string]::IsNullOrWhiteSpace($Output)
-        ok = $Output.Contains("windows_scripts_parse_ok=true")
-        count_present = $Output.Contains("windows_scripts_parse_count=")
-        count = $count
-    }
-}
-
 function Write-ProofReport {
     param(
         [Parameter(Mandatory = $true)]
@@ -607,7 +593,7 @@ function Write-ProofReport {
         files = $fileProofs
         manifest = $script:artifactManifest
         package_identity = (Get-RomaPackageIdentityProof -PackageDir $PackageDir)
-        installed_script_parse = (Get-ScriptParseProof -Output $script:installedScriptParseOutput)
+        installed_script_parse = (Get-RomaWindowsScriptParseOutputProof -Output $script:installedScriptParseOutput)
     }
     if (![string]::IsNullOrWhiteSpace($shortcutPath)) {
         $report["shortcut"] = Get-ShortcutProof `

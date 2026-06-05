@@ -301,6 +301,20 @@ function Get-RomaWindowsScriptParseCount {
     )
 }
 
+function Get-RomaWindowsScriptParseOutputProof {
+    param(
+        [string]$Output = ""
+    )
+
+    $count = Get-RomaWindowsScriptParseCount -Output $Output
+    return [ordered]@{
+        output_present = ![string]::IsNullOrWhiteSpace($Output)
+        ok = $Output.Contains("windows_scripts_parse_ok=true")
+        count_present = $Output.Contains("windows_scripts_parse_count=")
+        count = $count
+    }
+}
+
 function Assert-RomaWindowsScriptParseCount {
     param(
         [string]$Output = "",

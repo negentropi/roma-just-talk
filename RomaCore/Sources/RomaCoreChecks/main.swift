@@ -11639,10 +11639,12 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Get-RomaWindowsProofSurfaceScriptCount") &&
                 proofCommonScript.contains("function Get-RomaWindowsInstalledProofSurfaceScriptCount") &&
                 proofCommonScript.contains("function Get-RomaWindowsScriptParseCount") &&
+                proofCommonScript.contains("function Get-RomaWindowsScriptParseOutputProof") &&
                 proofCommonScript.contains("function Assert-RomaWindowsScriptParseCount") &&
                 packageScript.contains("Assert-RomaWindowsScriptParseCount") &&
                 packageScript.contains("Get-RomaWindowsProofSurfaceScriptCount") &&
-                proveScript.contains("Get-RomaWindowsScriptParseCount -Output $Output") &&
+                proveScript.contains("Get-RomaWindowsScriptParseOutputProof -Output $script:installedScriptParseOutput") &&
+                !proveScript.contains("function Get-ScriptParseProof") &&
                 proveScript.contains("Get-RomaWindowsInstalledProofSurfaceScriptCount") &&
                 checkReportScript.contains("Get-RomaWindowsInstalledProofSurfaceScriptCount") &&
                 checkReportScript.contains(#"-Name "count""#),

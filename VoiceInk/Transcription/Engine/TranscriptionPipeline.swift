@@ -144,7 +144,7 @@ class TranscriptionPipeline {
             if shouldCancel() { await finishCanceledTranscription(); return }
 
             let filteredText = text
-            text = trimmingBoundarySpaces(from: text)
+            text = TranscriptionOutputFilter.trimBoundarySpacesPreservingStructuralMarkers(text)
             logCleanupStage("trim", before: filteredText, after: text)
 
             if UserDefaults.standard.bool(forKey: "IsTextFormattingEnabled") {
@@ -315,14 +315,4 @@ class TranscriptionPipeline {
         }
     }
 
-    private func trimmingBoundarySpaces(from text: String) -> String {
-        var result = text
-        while result.first == " " {
-            result.removeFirst()
-        }
-        while result.last == " " {
-            result.removeLast()
-        }
-        return result
-    }
 }

@@ -2148,6 +2148,26 @@ struct RomaCoreChecks {
             "shared insertion polish should preserve standalone tab output"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Todo\n- ", context: midSentenceContext) == "Todo\n- ",
+            "shared insertion polish should preserve trailing empty bullet markers"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("\n- ", context: midSentenceContext) == "- ",
+            "shared insertion polish should normalize standalone empty bullet markers"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionSpacing("- ", context: midSentenceContext) == "\n- ",
+            "shared insertion spacing should start empty bullet markers on a new line"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.trimBoundarySpacesPreservingStructuralMarkers(" model ") == "model",
+            "shared boundary trim should remove plain surrounding spaces"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.trimBoundarySpacesPreservingStructuralMarkers(" - ") == "- ",
+            "shared boundary trim should preserve empty bullet marker trailing space"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionSpacing("model", context: midSentenceContext) == " model",
             "shared insertion spacing should add a leading space after words"
         )
@@ -5332,6 +5352,21 @@ struct RomaCoreChecks {
                 "Hit tab key.",
                 "\t",
                 "standalone hit tab key command should drop generated period"
+            ),
+            (
+                "Todo new line bullet point.",
+                "Todo\n- ",
+                "terminal bullet point command should preserve the empty marker"
+            ),
+            (
+                "Bullet point.",
+                "- ",
+                "standalone bullet point command should preserve the empty marker"
+            ),
+            (
+                "New bullet.",
+                "- ",
+                "standalone new bullet command should preserve the empty marker"
             ),
             (
                 "Bullet parent indent bullet child outdent bullet sibling.",
@@ -10141,6 +10176,43 @@ struct RomaCoreChecks {
         try require(
             await standaloneTabInserter.pastedText == "\t",
             "pipeline should paste standalone structural tab output"
+        )
+
+        let standaloneBulletRecorder = FakeRecorder()
+        let standaloneBulletInserter = FakeTextInsertion()
+        let standaloneBulletPipeline = DictationPipeline(
+            recorder: standaloneBulletRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "standalone-bullet-proof.wav",
+                text: "Bullet point."
+            ),
+            textInsertion: standaloneBulletInserter
+        )
+        let standaloneBulletRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/standalone-bullet-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await standaloneBulletRecorder.startPreRollBuffering()
+        let standaloneBulletResult = try await standaloneBulletPipeline.runRecordingWindow(
+            standaloneBulletRequest
+        ) {}
+
+        try require(
+            standaloneBulletResult.processedText == "\n- ",
+            "pipeline should clean standalone bullet commands to an empty bullet marker"
+        )
+        try require(
+            standaloneBulletResult.session.insertedText == "\n- ",
+            "pipeline session should store standalone empty bullet markers"
+        )
+        try require(
+            await standaloneBulletInserter.pastedText == "\n- ",
+            "pipeline should paste standalone empty bullet markers"
         )
 
         let fillerOnlyRecorder = FakeRecorder()

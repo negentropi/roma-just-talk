@@ -161,6 +161,10 @@ struct TranscriptionOutputFilter {
         RomaTranscriptionOutputFilter.applyInsertionSpacing(text, context: context)
     }
 
+    static func trimBoundarySpacesPreservingStructuralMarkers(_ text: String) -> String {
+        RomaTranscriptionOutputFilter.trimBoundarySpacesPreservingStructuralMarkers(text)
+    }
+
     static func applyUserCleanupPreferences(_ text: String) -> String {
         let punctuationMode = PunctuationCleanupMode.current()
         let shouldLowercase = UserDefaults.standard.bool(forKey: lowercaseTranscriptionKey)

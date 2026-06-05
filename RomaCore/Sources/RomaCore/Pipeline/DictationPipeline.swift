@@ -166,7 +166,7 @@ public final class DictationPipeline: @unchecked Sendable {
         )
         let replacedText = RomaWordReplacementProcessor.apply(
             configuration.wordReplacements,
-            to: Self.trimmingBoundarySpaces(from: filteredText)
+            to: RomaTranscriptionOutputFilter.trimBoundarySpacesPreservingStructuralMarkers(filteredText)
         )
         let cleanedText = RomaTranscriptionOutputFilter.applyCleanupPreferences(
             replacedText,
@@ -197,14 +197,4 @@ public final class DictationPipeline: @unchecked Sendable {
         }
     }
 
-    private static func trimmingBoundarySpaces(from text: String) -> String {
-        var result = text
-        while result.first == " " {
-            result.removeFirst()
-        }
-        while result.last == " " {
-            result.removeLast()
-        }
-        return result
-    }
 }

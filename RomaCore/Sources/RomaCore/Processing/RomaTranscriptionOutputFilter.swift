@@ -1225,8 +1225,10 @@ public struct RomaTranscriptionOutputFilter {
         }
         filteredText = applySpokenFormattingCommands(in: filteredText)
         filteredText = removeGeneratedTerminalPunctuationAfterFormattingWhitespace(from: filteredText)
-        let leadingFormattingWhitespace = leadingStructuralWhitespace(in: filteredText)
-        let trailingFormattingWhitespace = trailingStructuralWhitespace(in: filteredText)
+        let leadingFormattingWhitespace = leadingStructuralFormattingBoundary(in: filteredText)
+        let textAfterLeadingFormatting = String(filteredText.dropFirst(leadingFormattingWhitespace.count))
+        let trailingFormattingWhitespace = trailingStructuralFormattingBoundary(in: textAfterLeadingFormatting)
+        filteredText = String(textAfterLeadingFormatting.dropLast(trailingFormattingWhitespace.count))
         if cleanupLevel == .polished {
             filteredText = applyDeletePreviousLineCommands(in: filteredText)
             filteredText = applyDeletePreviousParagraphCommands(in: filteredText)
@@ -1456,9 +1458,9 @@ public struct RomaTranscriptionOutputFilter {
         context: TextInsertionContext?,
         preservesTerminalPunctuation: Bool
     ) -> String {
-        let leadingStructuralWhitespace = leadingStructuralWhitespace(in: text)
+        let leadingStructuralWhitespace = leadingStructuralFormattingBoundary(in: text)
         let textAfterLeadingStructuralWhitespace = String(text.dropFirst(leadingStructuralWhitespace.count))
-        let trailingStructuralWhitespace = trailingStructuralWhitespace(in: textAfterLeadingStructuralWhitespace)
+        let trailingStructuralWhitespace = trailingStructuralFormattingBoundary(in: textAfterLeadingStructuralWhitespace)
         let activeContext = leadingStructuralWhitespace.isEmpty ? context : nil
         let polishInput = textAfterLeadingStructuralWhitespace.dropLast(trailingStructuralWhitespace.count)
         let normalizedText = normalizeWhitespace(String(polishInput))
@@ -1511,7 +1513,9 @@ public struct RomaTranscriptionOutputFilter {
                shouldRemoveLeadingGeneratedFragmentMarker(after: activeContext.precedingText) {
                 polishedText = removeLeadingGeneratedFragmentMarker(from: polishedText)
             }
-            polishedText = removeLeadingFragmentPunctuation(from: polishedText)
+            if !startsWithListMarker(polishedText) {
+                polishedText = removeLeadingFragmentPunctuation(from: polishedText)
+            }
             if let activeContext,
                isContinuingSentence(after: activeContext.precedingText) {
                 polishedText = removeLeadingDiscourseFillerFromContinuationFragment(
@@ -1623,6 +1627,20 @@ public struct RomaTranscriptionOutputFilter {
         }
         guard needsLeadingSpace(before: text, context: context) else { return text }
         return " \(text)"
+    }
+
+    public static func trimBoundarySpacesPreservingStructuralMarkers(_ text: String) -> String {
+        var result = text
+        while result.first == " " {
+            result.removeFirst()
+        }
+        guard !hasTrailingEmptyBulletMarker(result) else {
+            return result
+        }
+        while result.last == " " {
+            result.removeLast()
+        }
+        return result
     }
 
     private static func removeFillerWords(from text: String, fillerWords configuredFillerWords: [String]) -> String {
@@ -5729,7 +5747,7 @@ public struct RomaTranscriptionOutputFilter {
             .replacingOccurrences(of: #"\n{2,}(?=- )"#, with: "\n", options: .regularExpression)
             .replacingOccurrences(of: #"\n{3,}"#, with: "\n\n", options: .regularExpression)
             .replacingOccurrences(of: #"\n-\s*"#, with: "\n- ", options: .regularExpression)
-            .replacingOccurrences(of: #"^\s*-\s*"#, with: "- ", options: .regularExpression)
+            .replacingOccurrences(of: #"^\s*-\s+(?=\S)"#, with: "- ", options: .regularExpression)
 
         return formattedText.replacingOccurrences(
             of: #"(?m)^(-\s+\S+(?:\s+\S+){0,2})\.$"#,
@@ -5739,7 +5757,7 @@ public struct RomaTranscriptionOutputFilter {
     }
 
     private static func removeGeneratedTerminalPunctuationAfterFormattingWhitespace(from text: String) -> String {
-        guard let regex = try? NSRegularExpression(pattern: #"([\n\t]+)[ \t]*(?:[.!?…]+|[。！？]+)[ \t]*$"#) else {
+        guard let regex = try? NSRegularExpression(pattern: #"((?:\n- |- |[\n\t]+))[ \t]*(?:[.!?…]+|[。！？]+)[ \t]*$"#) else {
             return text
         }
 
@@ -5845,6 +5863,15 @@ public struct RomaTranscriptionOutputFilter {
         return result
     }
 
+    private static func leadingStructuralFormattingBoundary(in text: String) -> String {
+        let whitespace = leadingStructuralWhitespace(in: text)
+        let suffix = String(text.dropFirst(whitespace.count))
+        if suffix.hasPrefix("- ") || suffix == "-" {
+            return ""
+        }
+        return whitespace
+    }
+
     private static func trailingStructuralWhitespace(in text: String) -> String {
         var result = ""
         for character in text.reversed() {
@@ -5852,6 +5879,19 @@ public struct RomaTranscriptionOutputFilter {
             result.insert(character, at: result.startIndex)
         }
         return result
+    }
+
+    private static func trailingStructuralFormattingBoundary(in text: String) -> String {
+        if text == "\n- " {
+            return "- "
+        }
+        if text.hasSuffix("\n- ") {
+            return "\n- "
+        }
+        if text == "- " || text == "-" {
+            return text
+        }
+        return trailingStructuralWhitespace(in: text)
     }
 
     private static func applyBacktrackingCorrections(in text: String) -> String {
@@ -11124,11 +11164,15 @@ public struct RomaTranscriptionOutputFilter {
     }
 
     private static func startsWithListMarker(_ text: String) -> Bool {
-        guard let regex = try? NSRegularExpression(pattern: #"^\s*(?:-\s+\S|\d{1,2}\.\s+\S)"#) else {
+        guard let regex = try? NSRegularExpression(pattern: #"^\s*(?:-(?:\s+\S|\s*$)|\d{1,2}\.\s+\S)"#) else {
             return false
         }
 
         return regex.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)) != nil
+    }
+
+    private static func hasTrailingEmptyBulletMarker(_ text: String) -> Bool {
+        text == "- " || text.hasSuffix("\n- ")
     }
 
     private static func hasUnclosedStraightDoubleQuote(in precedingText: String) -> Bool {

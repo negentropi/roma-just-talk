@@ -13310,11 +13310,22 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Join-RomaWindowsInstalledSmokeDirPath") &&
                 proofCommonScript.contains("function Join-RomaWindowsInstallSmokeConfigPath") &&
                 proofCommonScript.contains("function Join-RomaWindowsInstalledNotepadPasteProofPath") &&
+                proofCommonScript.contains("function Get-RomaWindowsAgentExecutableFileName") &&
+                proofCommonScript.contains(#"return "RomaWindowsAgent.exe""#) &&
+                proofCommonScript.contains("function Get-RomaWindowsProofAgentExecutableFileName") &&
+                proofCommonScript.contains(#"return "RomaProofAgent.exe""#) &&
+                proofCommonScript.contains("function Get-RomaWindowsWhisperCLIMockExecutableFileName") &&
+                proofCommonScript.contains(#"return "RomaWhisperCLIMock.exe""#) &&
+                proofCommonScript.contains("function Get-RomaWindowsAgentDebugFileName") &&
+                proofCommonScript.contains(#"return "RomaWindowsAgent.pdb""#) &&
+                proofCommonScript.contains("function Get-RomaWindowsProofAgentDebugFileName") &&
+                proofCommonScript.contains(#"return "RomaProofAgent.pdb""#) &&
                 proofCommonScript.contains("function Get-RomaWindowsAgentArtifactPathSet") &&
-                proofCommonScript.contains(#"agent = Join-Path $ArtifactDir "RomaWindowsAgent.exe""#) &&
-                proofCommonScript.contains(#"proof_agent = Join-Path $ArtifactDir "RomaProofAgent.exe""#) &&
-                proofCommonScript.contains(#"agent_pdb = Join-Path $ArtifactDir "RomaWindowsAgent.pdb""#) &&
-                proofCommonScript.contains(#"proof_agent_pdb = Join-Path $ArtifactDir "RomaProofAgent.pdb""#) &&
+                proofCommonScript.contains(#"agent = Join-Path $ArtifactDir (Get-RomaWindowsAgentExecutableFileName)"#) &&
+                proofCommonScript.contains(#"proof_agent = Join-Path $ArtifactDir (Get-RomaWindowsProofAgentExecutableFileName)"#) &&
+                proofCommonScript.contains(#"whisper_cli_mock = Join-Path $ArtifactDir (Get-RomaWindowsWhisperCLIMockExecutableFileName)"#) &&
+                proofCommonScript.contains(#"agent_pdb = Join-Path $ArtifactDir (Get-RomaWindowsAgentDebugFileName)"#) &&
+                proofCommonScript.contains(#"proof_agent_pdb = Join-Path $ArtifactDir (Get-RomaWindowsProofAgentDebugFileName)"#) &&
                 proofCommonScript.contains(#"manifest = Join-Path $ArtifactDir "manifest.txt""#) &&
                 smokeScript.contains("Get-RomaWindowsAgentArtifactPathSet -ArtifactDir $PackageDir") &&
                 packageScript.contains("Get-RomaWindowsAgentArtifactPathSet -ArtifactDir $PSScriptRoot") &&
@@ -13329,6 +13340,8 @@ struct RomaCoreChecks {
                 packageScript.contains(#"$checkSetScriptSource = $sourceArtifactPaths["check_set_script"]"#) &&
                 packageScript.contains(#"$pdbOutput = $outputArtifactPaths["agent_pdb"]"#) &&
                 packageScript.contains(#"$proofAgentPdbOutput = $outputArtifactPaths["proof_agent_pdb"]"#) &&
+                packageScript.contains(#""proof_agent=$(Get-RomaWindowsProofAgentExecutableFileName)""#) &&
+                packageScript.contains(#""whisper_cli_mock=$(Get-RomaWindowsWhisperCLIMockExecutableFileName)""#) &&
                 installScript.contains(#"$packageWhisperMock = $packageArtifactPaths["whisper_cli_mock"]"#) &&
                 installScript.contains(#"$installedWhisperMock = $installedArtifactPaths["whisper_cli_mock"]"#) &&
                 proveScript.contains(#"$sampleConfigPath = $packageArtifactPaths["sample_config"]"#) &&
@@ -13498,6 +13511,8 @@ struct RomaCoreChecks {
                 installScript.contains("$installedProofAgent = Join-RomaWindowsInstalledProofAgentPath -InstallDir $InstallDir") &&
                 installScript.contains("$installedRun = Join-RomaWindowsInstalledRunScriptPath -InstallDir $InstallDir") &&
                 proveScript.contains("$installedAgent = Join-RomaWindowsInstalledAgentPath -InstallDir $InstallDir") &&
+                proofCommonScript.contains("return Join-Path $InstallDir (Get-RomaWindowsAgentExecutableFileName)") &&
+                proofCommonScript.contains("return Join-Path $InstallDir (Get-RomaWindowsProofAgentExecutableFileName)") &&
                 proofCommonScript.contains("installed_agent = (Get-RomaWindowsFileHashProof -Path (Join-RomaWindowsInstalledAgentPath -InstallDir $InstallDir))") &&
                 proofCommonScript.contains("installed_proof_agent = (Get-RomaWindowsFileHashProof -Path (Join-RomaWindowsInstalledProofAgentPath -InstallDir $InstallDir))") &&
                 proveScript.contains("$installedRunScriptPath = Join-RomaWindowsInstalledRunScriptPath -InstallDir $InstallDir") &&

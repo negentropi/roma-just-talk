@@ -102,6 +102,26 @@ function Join-RomaWindowsInstalledNotepadPasteProofPath {
     return Join-Path (Join-RomaWindowsInstalledSmokeDirPath -InstallDir $InstallDir) "notepad-paste-proof.txt"
 }
 
+function Get-RomaWindowsAgentExecutableFileName {
+    return "RomaWindowsAgent.exe"
+}
+
+function Get-RomaWindowsProofAgentExecutableFileName {
+    return "RomaProofAgent.exe"
+}
+
+function Get-RomaWindowsWhisperCLIMockExecutableFileName {
+    return "RomaWhisperCLIMock.exe"
+}
+
+function Get-RomaWindowsAgentDebugFileName {
+    return "RomaWindowsAgent.pdb"
+}
+
+function Get-RomaWindowsProofAgentDebugFileName {
+    return "RomaProofAgent.pdb"
+}
+
 function Get-RomaWindowsAgentArtifactPathSet {
     param(
         [Parameter(Mandatory = $true)]
@@ -109,11 +129,11 @@ function Get-RomaWindowsAgentArtifactPathSet {
     )
 
     return [ordered]@{
-        agent = Join-Path $ArtifactDir "RomaWindowsAgent.exe"
-        proof_agent = Join-Path $ArtifactDir "RomaProofAgent.exe"
-        whisper_cli_mock = Join-Path $ArtifactDir "RomaWhisperCLIMock.exe"
-        agent_pdb = Join-Path $ArtifactDir "RomaWindowsAgent.pdb"
-        proof_agent_pdb = Join-Path $ArtifactDir "RomaProofAgent.pdb"
+        agent = Join-Path $ArtifactDir (Get-RomaWindowsAgentExecutableFileName)
+        proof_agent = Join-Path $ArtifactDir (Get-RomaWindowsProofAgentExecutableFileName)
+        whisper_cli_mock = Join-Path $ArtifactDir (Get-RomaWindowsWhisperCLIMockExecutableFileName)
+        agent_pdb = Join-Path $ArtifactDir (Get-RomaWindowsAgentDebugFileName)
+        proof_agent_pdb = Join-Path $ArtifactDir (Get-RomaWindowsProofAgentDebugFileName)
         smoke_script = Join-Path $ArtifactDir "smoke-windows-agent.ps1"
         run_script = Join-Path $ArtifactDir "run-windows-agent.ps1"
         install_script = Join-Path $ArtifactDir "install-windows-agent.ps1"
@@ -1108,16 +1128,16 @@ function Get-RomaWindowsProofSurfaceFiles {
 
 function Get-RomaWindowsAgentArtifactExecutableFiles {
     return @(
-        "RomaWindowsAgent.exe",
-        "RomaProofAgent.exe",
-        "RomaWhisperCLIMock.exe"
+        Get-RomaWindowsAgentExecutableFileName,
+        Get-RomaWindowsProofAgentExecutableFileName,
+        Get-RomaWindowsWhisperCLIMockExecutableFileName
     )
 }
 
 function Get-RomaWindowsAgentArtifactDebugFiles {
     return @(
-        "RomaWindowsAgent.pdb",
-        "RomaProofAgent.pdb"
+        Get-RomaWindowsAgentDebugFileName,
+        Get-RomaWindowsProofAgentDebugFileName
     )
 }
 
@@ -3159,7 +3179,7 @@ function Join-RomaWindowsInstalledAgentPath {
         [string]$InstallDir
     )
 
-    return Join-Path $InstallDir "RomaWindowsAgent.exe"
+    return Join-Path $InstallDir (Get-RomaWindowsAgentExecutableFileName)
 }
 
 function Join-RomaWindowsInstalledProofAgentPath {
@@ -3168,7 +3188,7 @@ function Join-RomaWindowsInstalledProofAgentPath {
         [string]$InstallDir
     )
 
-    return Join-Path $InstallDir "RomaProofAgent.exe"
+    return Join-Path $InstallDir (Get-RomaWindowsProofAgentExecutableFileName)
 }
 
 function Join-RomaWindowsInstalledRunScriptPath {

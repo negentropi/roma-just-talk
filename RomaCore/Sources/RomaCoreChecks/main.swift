@@ -1923,6 +1923,30 @@ struct RomaCoreChecks {
             "shared insertion polish should normalize spaced all-caps OpenAI fragments"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("CHATGPT RESPONSE.", context: midSentenceContext) == "ChatGPT response",
+            "shared insertion polish should normalize all-caps ChatGPT fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("CHAT GPT RESPONSE.", context: midSentenceContext) == "ChatGPT response",
+            "shared insertion polish should normalize spaced all-caps ChatGPT fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("CLAUDE CODE.", context: midSentenceContext) == "Claude Code",
+            "shared insertion polish should normalize all-caps Claude Code fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("CODEX THREAD.", context: midSentenceContext) == "Codex thread",
+            "shared insertion polish should normalize all-caps Codex thread fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("WISPR FLOW FEATURE.", context: midSentenceContext) == "Wispr Flow feature",
+            "shared insertion polish should normalize all-caps Wispr Flow fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("SUPER WHISPER SETTING.", context: midSentenceContext) == "Superwhisper setting",
+            "shared insertion polish should normalize all-caps Superwhisper fragments"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("ELEVEN LABS VOICE.", context: midSentenceContext) == "ElevenLabs voice",
             "shared insertion polish should normalize spaced all-caps ElevenLabs fragments"
         )
@@ -9754,6 +9778,21 @@ struct RomaCoreChecks {
             rawText: "model correction is module.",
             expectedText: " module",
             fileName: "mid-sentence-model-correction-is-module-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "CHATGPT RESPONSE.",
+            expectedText: " ChatGPT response",
+            fileName: "mid-sentence-chatgpt-response-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "CLAUDE CODE.",
+            expectedText: " Claude Code",
+            fileName: "mid-sentence-claude-code-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "CODEX THREAD.",
+            expectedText: " Codex thread",
+            fileName: "mid-sentence-codex-thread-proof.wav"
         )
 
         let bracketedFragmentRecorder = FakeRecorder()

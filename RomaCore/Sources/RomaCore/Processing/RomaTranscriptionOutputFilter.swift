@@ -408,9 +408,15 @@ public struct RomaTranscriptionOutputFilter {
     private static let properNameFragmentCasing = [
         "apple": "Apple",
         "anthropic": "Anthropic",
+        "arc": "Arc",
+        "chatgpt": "ChatGPT",
+        "claude": "Claude",
         "cloudflare": "Cloudflare",
+        "codex": "Codex",
+        "cursor": "Cursor",
         "docker": "Docker",
         "elevenlabs": "ElevenLabs",
+        "gemini": "Gemini",
         "github": "GitHub",
         "ios": "iOS",
         "ipados": "iPadOS",
@@ -422,6 +428,7 @@ public struct RomaTranscriptionOutputFilter {
         "nextjs": "Next.js",
         "node": "Node",
         "openai": "OpenAI",
+        "perplexity": "Perplexity",
         "postgres": "Postgres",
         "raycast": "Raycast",
         "react": "React",
@@ -431,9 +438,12 @@ public struct RomaTranscriptionOutputFilter {
         "typescript": "TypeScript",
         "vercel": "Vercel",
         "voiceink": "VoiceInk",
+        "wispr": "Wispr",
         "xcode": "Xcode"
     ]
     private static let knownProductPhraseFragmentCasing = [
+        "chat gpt": "ChatGPT",
+        "claude code": "Claude Code",
         "cloud flare": "Cloudflare",
         "eleven labs": "ElevenLabs",
         "git hub": "GitHub",
@@ -443,11 +453,15 @@ public struct RomaTranscriptionOutputFilter {
         "open ai": "OpenAI",
         "ray cast": "Raycast",
         "supa base": "Supabase",
+        "super whisper": "Superwhisper",
         "type script": "TypeScript",
         "voice ink": "VoiceInk",
+        "wispr flow": "Wispr Flow",
         "x code": "Xcode"
     ]
     private static let multiWordProductPhraseHeads: [[String]] = [
+        ["chat", "gpt"],
+        ["claude", "code"],
         ["cloud", "flare"],
         ["eleven", "labs"],
         ["git", "hub"],
@@ -457,18 +471,20 @@ public struct RomaTranscriptionOutputFilter {
         ["open", "ai"],
         ["ray", "cast"],
         ["supa", "base"],
+        ["super", "whisper"],
         ["type", "script"],
         ["voice", "ink"],
+        ["wispr", "flow"],
         ["x", "code"]
     ]
     private static let productCorrectionTailWords: Set<String> = [
         "agent", "agents", "api", "apis", "app", "apps", "branch", "branches",
         "client", "clients", "command", "commands", "component", "components",
-        "database", "databases", "endpoint", "endpoints", "file", "files",
+        "database", "databases", "endpoint", "endpoints", "feature", "features", "file", "files",
         "function", "functions", "issue", "issues", "model", "models", "module",
         "modules", "package", "packages", "pod", "pods", "project", "projects",
         "request", "requests", "route", "routes", "server", "servers", "setting",
-        "settings", "site", "sites", "ticket", "tickets", "type", "types",
+        "settings", "site", "sites", "ticket", "tickets", "thread", "threads", "type", "types",
         "voice", "voices", "worker", "workers"
     ]
     private static let codeCaseIdentifierTailWords: Set<String> = [
@@ -503,7 +519,7 @@ public struct RomaTranscriptionOutputFilter {
         "client", "code", "command", "commands", "commit", "commits", "component", "components", "config",
         "constant", "constants", "correct", "correction", "could", "data", "database", "databases", "dictionary", "dictionaries",
         "delete", "did", "diff", "diffs", "do", "does", "done", "email", "emails", "endpoint", "endpoints", "enum",
-        "enums", "erase", "error", "errors", "field", "fields", "file", "files", "final", "first", "flag", "flags",
+        "enums", "erase", "error", "errors", "feature", "features", "field", "fields", "file", "files", "final", "first", "flag", "flags",
         "folder", "folders", "for", "from", "function", "functions", "get", "go", "got", "gotcha", "had", "hang", "has", "have",
         "here", "hold", "how", "if", "in", "input", "inputs", "instead", "is", "it", "issue", "issues", "just", "key", "keys",
         "last", "like", "line", "lines", "make", "maybe", "mean", "message", "messages", "method", "methods",
@@ -514,7 +530,7 @@ public struct RomaTranscriptionOutputFilter {
         "repositories", "request", "response", "result", "results", "right", "route", "routes", "router", "scratch", "screen",
         "script", "scripts", "second", "see", "server", "service", "setting", "settings", "should", "single", "site", "sites", "so", "sorry",
         "some", "state", "states", "struct", "structs", "sure", "than", "that", "the", "then", "there", "third", "this", "ticket",
-        "tickets", "to", "token", "tool", "type", "types", "undo", "use", "user", "users", "value", "values", "variable",
+        "tickets", "thread", "threads", "to", "token", "tool", "type", "types", "undo", "use", "user", "users", "value", "values", "variable",
         "variables", "view", "voice", "voices", "wait", "was", "we", "what", "when", "where", "which", "whoops", "will", "window", "with",
         "word", "words", "work", "worker", "workers", "workspace", "workspaces", "would", "yeah", "yep", "yes", "you", "yup"
     ]

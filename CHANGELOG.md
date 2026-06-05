@@ -20,6 +20,7 @@
 - Unwrapped noisy markdown emphasis around fragments exposed after correction lead-ins in mid-sentence hotkey dictation.
 - Removed generated hash, numbered, and bullet markers exposed after correction lead-ins in mid-sentence hotkey dictation.
 - Removed generated one-line dash-list markers before short mid-sentence hotkey dictation fragments.
+- Normalized all-caps ChatGPT, Claude Code, Codex, Wispr Flow, and Superwhisper fragments in mid-sentence hotkey dictation.
 - Unwrapped square-bracketed final-word fragments after correction lead-ins in mid-sentence hotkey dictation.
 - Preserved explicit punctuation commands after correction-marked "final word" continuations.
 - Shared Windows dictation and listener runtime-log proof markers through proof-helper marker maps.

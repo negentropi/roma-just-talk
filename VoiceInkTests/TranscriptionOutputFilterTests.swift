@@ -776,6 +776,12 @@ struct TranscriptionOutputFilterTests {
         #expect(TranscriptionOutputFilter.applyInsertionPolish("JAVA SCRIPT FILE.", context: midSentenceContext) == "JavaScript file")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("OPENAI MODEL.", context: midSentenceContext) == "OpenAI model")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("OPEN AI MODEL.", context: midSentenceContext) == "OpenAI model")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("CHATGPT RESPONSE.", context: midSentenceContext) == "ChatGPT response")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("CHAT GPT RESPONSE.", context: midSentenceContext) == "ChatGPT response")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("CLAUDE CODE.", context: midSentenceContext) == "Claude Code")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("CODEX THREAD.", context: midSentenceContext) == "Codex thread")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("WISPR FLOW FEATURE.", context: midSentenceContext) == "Wispr Flow feature")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("SUPER WHISPER SETTING.", context: midSentenceContext) == "Superwhisper setting")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("ELEVEN LABS VOICE.", context: midSentenceContext) == "ElevenLabs voice")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("VOICE INK SETTING.", context: midSentenceContext) == "VoiceInk setting")
         #expect(

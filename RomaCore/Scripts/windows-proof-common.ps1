@@ -1200,16 +1200,50 @@ function Join-RomaWindowsLaptopProofReportPath {
     return Join-Path $ProofDir (Get-RomaWindowsLaptopProofReportFileName -Name $Name)
 }
 
+function Get-RomaWindowsLaptopProofPathSet {
+    param(
+        [string]$ProofDir = "C:\tmp\roma-windows-laptop-proof",
+        [string]$StartupShortcutDir = ""
+    )
+
+    $reports = [ordered]@{}
+    foreach ($name in (Get-RomaWindowsLaptopProofReportFileNames).Keys) {
+        $reports[$name] = Join-RomaWindowsLaptopProofReportPath -ProofDir $ProofDir -Name $name
+    }
+
+    $cloudInstallDir = Join-Path $ProofDir "cloud-install"
+    $localWhisperInstallDir = Join-Path $ProofDir "local-whisper-install"
+    $localWhisperNotepadInstallDir = Join-Path $ProofDir "local-whisper-notepad-install"
+    $startupShortcutBaseDir = $StartupShortcutDir
+    if ([string]::IsNullOrWhiteSpace($startupShortcutBaseDir)) {
+        $startupShortcutBaseDir = Join-Path $ProofDir "startup-shortcuts"
+    }
+
+    return [ordered]@{
+        reports = $reports
+        recheck_script = Join-Path $ProofDir "recheck-full-laptop-proof.ps1"
+        mic_preflight_wav = Join-Path $ProofDir "mic-preflight.wav"
+        cloud_install_dir = $cloudInstallDir
+        cloud_config_path = Join-RomaWindowsInstalledAgentConfigPath -InstallDir $cloudInstallDir
+        cloud_shortcut_dir = Join-Path $ProofDir "cloud-shortcuts"
+        cloud_startup_shortcut_dir = Join-Path $startupShortcutBaseDir "cloud"
+        local_whisper_install_dir = $localWhisperInstallDir
+        local_whisper_config_path = Join-RomaWindowsInstalledAgentConfigPath -InstallDir $localWhisperInstallDir
+        local_whisper_shortcut_dir = Join-Path $ProofDir "local-whisper-shortcuts"
+        local_whisper_startup_shortcut_dir = Join-Path $startupShortcutBaseDir "local-whisper"
+        local_whisper_notepad_install_dir = $localWhisperNotepadInstallDir
+        local_whisper_notepad_config_path = Join-RomaWindowsInstalledAgentConfigPath -InstallDir $localWhisperNotepadInstallDir
+        startup_shortcut_base_dir = $startupShortcutBaseDir
+    }
+}
+
 function Get-RomaWindowsLaptopProofGuideReportPaths {
     param(
         [string]$ProofDir = "C:\tmp\roma-windows-laptop-proof"
     )
 
-    $paths = [ordered]@{}
-    foreach ($name in (Get-RomaWindowsLaptopProofReportFileNames).Keys) {
-        $paths[$name] = Join-RomaWindowsLaptopProofReportPath -ProofDir $ProofDir -Name $name
-    }
-    return $paths
+    $pathSet = Get-RomaWindowsLaptopProofPathSet -ProofDir $ProofDir
+    return $pathSet["reports"]
 }
 
 function Get-RomaWindowsLaptopPreflightGuideMarkers {
@@ -1290,6 +1324,7 @@ function Get-RomaWindowsProofSetProfileOkMarkers {
 }
 
 function Get-RomaWindowsFullLaptopProofGuideMarkers {
+    $guidePaths = Get-RomaWindowsLaptopProofPathSet
     $markers = [ordered]@{
         laptop_preflight_matches_full = "proof_set_laptop_preflight_matches_full=true"
         generated_at_window_minutes = "proof_set_generated_at_window_minutes="
@@ -1303,7 +1338,7 @@ function Get-RomaWindowsFullLaptopProofGuideMarkers {
     $markers["listener_runtime"] = "proof_listener_runtime=installed_listener"
     $markers["listen_completed_sessions"] = "listen_completed_sessions=1"
     $markers["source_dirty"] = "proof_set_source_dirty=false"
-    $markers["recheck_script"] = "windows_laptop_recheck_script=C:\tmp\roma-windows-laptop-proof\recheck-full-laptop-proof.ps1"
+    $markers["recheck_script"] = "windows_laptop_recheck_script=$($guidePaths["recheck_script"])"
     $markers["proof_ok"] = "windows_laptop_proof_ok=true"
     return $markers
 }

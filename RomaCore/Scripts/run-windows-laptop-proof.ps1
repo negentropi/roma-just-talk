@@ -281,8 +281,10 @@ New-Item -ItemType Directory -Force -Path $ProofDir | Out-Null
 if (![string]::IsNullOrWhiteSpace($StartupShortcutDir)) {
     $StartupShortcutDir = Resolve-FullPath -Path $StartupShortcutDir
 }
+$laptopProofPaths = Get-RomaWindowsLaptopProofPathSet -ProofDir $ProofDir -StartupShortcutDir $StartupShortcutDir
+$laptopProofReports = $laptopProofPaths["reports"]
 if ([string]::IsNullOrWhiteSpace($PreflightReportPath)) {
-    $PreflightReportPath = Join-RomaWindowsLaptopProofReportPath -ProofDir $ProofDir -Name "laptop_preflight"
+    $PreflightReportPath = $laptopProofReports["laptop_preflight"]
 }
 $PreflightReportPath = Resolve-FullPath -Path $PreflightReportPath
 
@@ -336,24 +338,20 @@ $packagedProofCommonScript = Require-RomaWindowsManifestFile `
 
 $proofSessionId = [guid]::NewGuid().ToString("D")
 
-$cloudReport = Join-RomaWindowsLaptopProofReportPath -ProofDir $ProofDir -Name "cloud_dictation"
-$localWhisperDictationReport = Join-RomaWindowsLaptopProofReportPath -ProofDir $ProofDir -Name "local_whisper_dictation"
-$localWhisperNotepadReport = Join-RomaWindowsLaptopProofReportPath -ProofDir $ProofDir -Name "local_whisper_notepad_paste"
-$recheckScriptPath = Join-Path $ProofDir "recheck-full-laptop-proof.ps1"
-$micPreflightPath = Join-Path $ProofDir "mic-preflight.wav"
-
-$cloudInstallDir = Join-Path $ProofDir "cloud-install"
-$cloudConfigPath = Join-Path $cloudInstallDir "windows-agent.json"
-$localInstallDir = Join-Path $ProofDir "local-whisper-install"
-$localConfigPath = Join-Path $localInstallDir "windows-agent.json"
-$notepadInstallDir = Join-Path $ProofDir "local-whisper-notepad-install"
-$notepadConfigPath = Join-Path $notepadInstallDir "windows-agent.json"
-$startupShortcutBaseDir = $StartupShortcutDir
-if ([string]::IsNullOrWhiteSpace($startupShortcutBaseDir)) {
-    $startupShortcutBaseDir = Join-Path $ProofDir "startup-shortcuts"
-}
-$cloudStartupShortcutDir = Join-Path $startupShortcutBaseDir "cloud"
-$localStartupShortcutDir = Join-Path $startupShortcutBaseDir "local-whisper"
+$cloudReport = $laptopProofReports["cloud_dictation"]
+$localWhisperDictationReport = $laptopProofReports["local_whisper_dictation"]
+$localWhisperNotepadReport = $laptopProofReports["local_whisper_notepad_paste"]
+$recheckScriptPath = $laptopProofPaths["recheck_script"]
+$micPreflightPath = $laptopProofPaths["mic_preflight_wav"]
+$cloudInstallDir = $laptopProofPaths["cloud_install_dir"]
+$cloudConfigPath = $laptopProofPaths["cloud_config_path"]
+$localInstallDir = $laptopProofPaths["local_whisper_install_dir"]
+$localConfigPath = $laptopProofPaths["local_whisper_config_path"]
+$notepadInstallDir = $laptopProofPaths["local_whisper_notepad_install_dir"]
+$notepadConfigPath = $laptopProofPaths["local_whisper_notepad_config_path"]
+$startupShortcutBaseDir = $laptopProofPaths["startup_shortcut_base_dir"]
+$cloudStartupShortcutDir = $laptopProofPaths["cloud_startup_shortcut_dir"]
+$localStartupShortcutDir = $laptopProofPaths["local_whisper_startup_shortcut_dir"]
 
 Invoke-Step "permission surface preflight" {
     $script:permissionPreflightOutput = Invoke-PermissionPreflight -ProofAgentPath $proofAgent
@@ -452,7 +450,7 @@ $cloudArgs = Add-RomaWindowsAgentScriptCommonArgs `
 $cloudArgs += @("-RunDictation", "-PasteDictation")
 $cloudArgs = Add-ShortcutProofArgs `
     -ArgumentList $cloudArgs `
-    -ShortcutDir (Join-Path $ProofDir "cloud-shortcuts") `
+    -ShortcutDir ($laptopProofPaths["cloud_shortcut_dir"]) `
     -StartupDir $cloudStartupShortcutDir
 
 $localArgs = @(
@@ -490,7 +488,7 @@ $localArgs += @("-RunDictation", "-PasteDictation")
 $localArgs += "-RunListenerProof"
 $localArgs = Add-ShortcutProofArgs `
     -ArgumentList $localArgs `
-    -ShortcutDir (Join-Path $ProofDir "local-whisper-shortcuts") `
+    -ShortcutDir ($laptopProofPaths["local_whisper_shortcut_dir"]) `
     -StartupDir $localStartupShortcutDir
 
 $notepadArgs = @(

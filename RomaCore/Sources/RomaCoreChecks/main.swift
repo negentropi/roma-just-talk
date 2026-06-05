@@ -13224,7 +13224,8 @@ struct RomaCoreChecks {
                 packageScript.contains("Get-RomaWindowsLaptopProofOperatorGuideLines") &&
                 packageScript.contains("Get-RomaWindowsLaptopProofPrerequisiteGuideLines") &&
                 packageScript.contains("Get-RomaWindowsLaptopProofClaimGuideLines") &&
-                packageScript.contains("Get-RomaWindowsLaptopProofGuideReportPaths") &&
+                packageScript.contains("Get-RomaWindowsLaptopProofPathSet") &&
+                packageScript.contains(#"$guideReportPaths = $guidePaths["reports"]"#) &&
                 packageScript.contains(#"$cloudDictationReportPath = $guideReportPaths["cloud_dictation"]"#) &&
                 proofCommonScript.contains("function Get-RomaWindowsLaptopPreflightGuideMarkers") &&
                 proofCommonScript.contains("function Get-RomaWindowsLaptopPreflightLocalWhisperGuideMarkers") &&
@@ -13234,18 +13235,33 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Get-RomaWindowsLaptopProofReportFileNames") &&
                 proofCommonScript.contains("function Get-RomaWindowsLaptopProofReportFileName") &&
                 proofCommonScript.contains("function Join-RomaWindowsLaptopProofReportPath") &&
+                proofCommonScript.contains("function Get-RomaWindowsLaptopProofPathSet") &&
                 proofCommonScript.contains("function Get-RomaWindowsLaptopProofGuideReportPaths") &&
+                proofCommonScript.contains(#"reports = $reports"#) &&
+                proofCommonScript.contains(#"recheck_script = Join-Path $ProofDir "recheck-full-laptop-proof.ps1""#) &&
+                proofCommonScript.contains(#"mic_preflight_wav = Join-Path $ProofDir "mic-preflight.wav""#) &&
+                proofCommonScript.contains(#"cloud_config_path = Join-RomaWindowsInstalledAgentConfigPath -InstallDir $cloudInstallDir"#) &&
+                proofCommonScript.contains(#"local_whisper_config_path = Join-RomaWindowsInstalledAgentConfigPath -InstallDir $localWhisperInstallDir"#) &&
+                proofCommonScript.contains(#"local_whisper_notepad_config_path = Join-RomaWindowsInstalledAgentConfigPath -InstallDir $localWhisperNotepadInstallDir"#) &&
                 proofCommonScript.contains(#"cloud_dictation = "cloud-dictation-proof.json""#) &&
                 proofCommonScript.contains(#"local_whisper_dictation = "local-whisper-dictation-proof.json""#) &&
                 proofCommonScript.contains(#"local_whisper_notepad_paste = "local-whisper-notepad-paste-proof.json""#) &&
-                laptopProofScript.contains(#"Join-RomaWindowsLaptopProofReportPath -ProofDir $ProofDir -Name "laptop_preflight""#) &&
-                laptopProofScript.contains(#"Join-RomaWindowsLaptopProofReportPath -ProofDir $ProofDir -Name "cloud_dictation""#) &&
-                laptopProofScript.contains(#"Join-RomaWindowsLaptopProofReportPath -ProofDir $ProofDir -Name "local_whisper_dictation""#) &&
-                laptopProofScript.contains(#"Join-RomaWindowsLaptopProofReportPath -ProofDir $ProofDir -Name "local_whisper_notepad_paste""#) &&
+                laptopProofScript.contains("Get-RomaWindowsLaptopProofPathSet -ProofDir $ProofDir -StartupShortcutDir $StartupShortcutDir") &&
+                laptopProofScript.contains(#"$PreflightReportPath = $laptopProofReports["laptop_preflight"]"#) &&
+                laptopProofScript.contains(#"$cloudReport = $laptopProofReports["cloud_dictation"]"#) &&
+                laptopProofScript.contains(#"$localWhisperDictationReport = $laptopProofReports["local_whisper_dictation"]"#) &&
+                laptopProofScript.contains(#"$localWhisperNotepadReport = $laptopProofReports["local_whisper_notepad_paste"]"#) &&
                 !laptopProofScript.contains(#"Join-Path $ProofDir "preflight-proof.json""#) &&
                 !laptopProofScript.contains(#"Join-Path $ProofDir "cloud-dictation-proof.json""#) &&
                 !laptopProofScript.contains(#"Join-Path $ProofDir "local-whisper-dictation-proof.json""#) &&
                 !laptopProofScript.contains(#"Join-Path $ProofDir "local-whisper-notepad-paste-proof.json""#) &&
+                !laptopProofScript.contains(#"Join-Path $ProofDir "recheck-full-laptop-proof.ps1""#) &&
+                !laptopProofScript.contains(#"Join-Path $ProofDir "mic-preflight.wav""#) &&
+                !laptopProofScript.contains(#"Join-Path $ProofDir "cloud-install""#) &&
+                !laptopProofScript.contains(#"Join-Path $ProofDir "local-whisper-install""#) &&
+                !laptopProofScript.contains(#"Join-Path $ProofDir "local-whisper-notepad-install""#) &&
+                !laptopProofScript.contains(#"Join-Path $ProofDir "cloud-shortcuts""#) &&
+                !laptopProofScript.contains(#"Join-Path $ProofDir "local-whisper-shortcuts""#) &&
                 proofCommonScript.contains("Prerequisites before full proof:") &&
                 proofCommonScript.contains("microphone_settings_uri=ms-settings:privacy-microphone") &&
                 proofCommonScript.contains("RomaWhisperCLIMock.exe is CI-only") &&
@@ -13287,8 +13303,8 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("proof_set_source_dirty=false") &&
                 packageScript.contains("Archived full-proof recheck") &&
                 packageScript.contains("check-windows-proof-set.ps1 -LaptopPreflightReportPath") &&
-                proofCommonScript.contains("windows_laptop_recheck_script=C:\\tmp\\roma-windows-laptop-proof\\recheck-full-laptop-proof.ps1") &&
-                packageScript.contains("powershell -ExecutionPolicy Bypass -File C:\\tmp\\roma-windows-laptop-proof\\recheck-full-laptop-proof.ps1") &&
+                proofCommonScript.contains(#"$markers["recheck_script"] = "windows_laptop_recheck_script=$($guidePaths["recheck_script"])"#) &&
+                packageScript.contains("powershell -ExecutionPolicy Bypass -File $recheckScriptPath") &&
                 packageScript.contains("windows_laptop_recheck_ok=true") &&
                 !packageScript.contains("C:\\tmp\\roma-windows-laptop-proof\\cloud-dictation-proof.json") &&
                 !packageScript.contains("C:\\tmp\\roma-windows-laptop-proof\\local-whisper-dictation-proof.json") &&
@@ -13304,7 +13320,7 @@ struct RomaCoreChecks {
                 laptopProofScript.contains("Write-RomaWindowsFullLaptopProofRecheckScript") &&
                 !laptopProofScript.contains("function Write-FullLaptopProofRecheckScript") &&
                 !laptopProofScript.contains("ConvertTo-PowerShellSingleQuotedString") &&
-                laptopProofScript.contains(#""recheck-full-laptop-proof.ps1""#) &&
+                proofCommonScript.contains(#"recheck_script = Join-Path $ProofDir "recheck-full-laptop-proof.ps1""#) &&
                 laptopProofScript.contains("windows_laptop_recheck_script=") &&
                 proofCommonScript.contains(#"$checkSetScript = Require-RomaWindowsManifestFile -Manifest $manifest -Key "check_set_script" -BaseDir $PackageDir"#) &&
                 proofCommonScript.contains(#"$proofCommonScript = Require-RomaWindowsManifestFile -Manifest $manifest -Key "proof_common_script" -BaseDir $PackageDir"#) &&

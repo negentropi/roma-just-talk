@@ -412,11 +412,13 @@ function Write-LaptopProofGuide {
     $operatorGuide = @(Get-RomaWindowsLaptopProofOperatorGuideLines) -join [System.Environment]::NewLine
     $prerequisiteGuide = @(Get-RomaWindowsLaptopProofPrerequisiteGuideLines) -join [System.Environment]::NewLine
     $claimGuide = @(Get-RomaWindowsLaptopProofClaimGuideLines) -join [System.Environment]::NewLine
-    $guideReportPaths = Get-RomaWindowsLaptopProofGuideReportPaths
+    $guidePaths = Get-RomaWindowsLaptopProofPathSet
+    $guideReportPaths = $guidePaths["reports"]
     $laptopPreflightReportPath = $guideReportPaths["laptop_preflight"]
     $cloudDictationReportPath = $guideReportPaths["cloud_dictation"]
     $localWhisperDictationReportPath = $guideReportPaths["local_whisper_dictation"]
     $localWhisperNotepadPasteReportPath = $guideReportPaths["local_whisper_notepad_paste"]
+    $recheckScriptPath = $guidePaths["recheck_script"]
 
     @"
 Roma Just Talk Windows laptop proof
@@ -461,7 +463,7 @@ powershell -ExecutionPolicy Bypass -File .\check-windows-proof-set.ps1 -LaptopPr
 
 Or run the proof-dir script written by the full laptop proof:
 
-powershell -ExecutionPolicy Bypass -File C:\tmp\roma-windows-laptop-proof\recheck-full-laptop-proof.ps1
+powershell -ExecutionPolicy Bypass -File $recheckScriptPath
 
 That recheck script asserts the four profile markers and prints:
 

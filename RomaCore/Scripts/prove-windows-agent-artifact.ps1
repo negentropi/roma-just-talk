@@ -456,14 +456,12 @@ Invoke-Step "artifact manifest" {
     )) {
         Require-RomaWindowsManifestKey -Manifest $script:artifactManifest -Key $key
     }
-    $script:packagedWhisperCLI = Require-RomaWindowsManifestFile `
+    $script:packagedWhisperCLI = Require-RomaWindowsPackagedWhisperCLIMock `
         -Manifest $script:artifactManifest `
-        -Key "whisper_cli_mock" `
         -BaseDir $PackageDir
     Write-Host "manifest_whisper_cli_mock_path=$script:packagedWhisperCLI"
-    $script:proofAgentPath = Require-RomaWindowsManifestFile `
+    $script:proofAgentPath = Require-RomaWindowsPackagedProofAgent `
         -Manifest $script:artifactManifest `
-        -Key "proof_agent" `
         -BaseDir $PackageDir
     Write-Host "manifest_proof_agent_path=$script:proofAgentPath"
 }

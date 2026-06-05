@@ -13005,8 +13005,7 @@ struct RomaCoreChecks {
         )
         try require(
             laptopProofScript.contains("local whisper CLI preflight") &&
-                laptopProofScript.contains(#"$proofAgent = Require-RomaWindowsManifestFile"#) &&
-                laptopProofScript.contains(#"-Key "proof_agent""#) &&
+                laptopProofScript.contains(#"$proofAgent = Require-RomaWindowsPackagedProofAgent"#) &&
                 laptopProofScript.contains("-ProofAgentPath $proofAgent") &&
                 laptopProofScript.contains("whisper-cli-doctor") &&
                 laptopProofScript.contains("local_whisper_preflight_ok=true"),
@@ -13655,16 +13654,30 @@ struct RomaCoreChecks {
             proveScript.contains(". $manifestScript") &&
                 laptopProofScript.contains(". $manifestScript") &&
                 proveScript.contains("Read-RomaWindowsManifest -Path $manifestPath") &&
-                proveScript.contains("Require-RomaWindowsManifestFile") &&
-                proveScript.contains(#"-Key "whisper_cli_mock""#) &&
-                proveScript.contains(#"-Key "proof_agent""#) &&
+                proofCommonScript.contains("function Require-RomaWindowsPackagedProofScript") &&
+                proofCommonScript.contains(#"Require-RomaWindowsManifestFile -Manifest $Manifest -Key "proof_script" -BaseDir $BaseDir"#) &&
+                proofCommonScript.contains("function Require-RomaWindowsPackagedCheckSetScript") &&
+                proofCommonScript.contains(#"Require-RomaWindowsManifestFile -Manifest $Manifest -Key "check_set_script" -BaseDir $BaseDir"#) &&
+                proofCommonScript.contains("function Require-RomaWindowsPackagedProofAgent") &&
+                proofCommonScript.contains(#"Require-RomaWindowsManifestFile -Manifest $Manifest -Key "proof_agent" -BaseDir $BaseDir"#) &&
+                proofCommonScript.contains("function Require-RomaWindowsPackagedProofCommonScript") &&
+                proofCommonScript.contains(#"Require-RomaWindowsManifestFile -Manifest $Manifest -Key "proof_common_script" -BaseDir $BaseDir"#) &&
+                proofCommonScript.contains("function Require-RomaWindowsPackagedWhisperCLIMock") &&
+                proofCommonScript.contains(#"Require-RomaWindowsManifestFile -Manifest $Manifest -Key "whisper_cli_mock" -BaseDir $BaseDir"#) &&
+                proveScript.contains("Require-RomaWindowsPackagedWhisperCLIMock") &&
+                proveScript.contains("Require-RomaWindowsPackagedProofAgent") &&
+                !proveScript.contains(#"-Key "whisper_cli_mock""#) &&
+                !proveScript.contains(#"-Key "proof_agent""#) &&
                 !proveScript.contains("function Resolve-PackagePath") &&
                 laptopProofScript.contains("Read-RomaWindowsManifest -Path $manifestPath") &&
-                laptopProofScript.contains("Require-RomaWindowsManifestFile") &&
-                laptopProofScript.contains(#"-Key "proof_script""#) &&
-                laptopProofScript.contains(#"-Key "check_set_script""#) &&
-                laptopProofScript.contains(#"-Key "proof_agent""#) &&
-                laptopProofScript.contains(#"-Key "proof_common_script""#) &&
+                laptopProofScript.contains("Require-RomaWindowsPackagedProofScript") &&
+                laptopProofScript.contains("Require-RomaWindowsPackagedCheckSetScript") &&
+                laptopProofScript.contains("Require-RomaWindowsPackagedProofAgent") &&
+                laptopProofScript.contains("Require-RomaWindowsPackagedProofCommonScript") &&
+                !laptopProofScript.contains(#"-Key "proof_script""#) &&
+                !laptopProofScript.contains(#"-Key "check_set_script""#) &&
+                !laptopProofScript.contains(#"-Key "proof_agent""#) &&
+                !laptopProofScript.contains(#"-Key "proof_common_script""#) &&
                 !laptopProofScript.contains(#"$proofScript = Join-Path $PackageDir "prove-windows-agent-artifact.ps1""#) &&
                 workflowScript.contains("Read-RomaWindowsManifest -Path $manifestPath") &&
                 workflowScript.contains(#"-Key "laptop_native_preflight_checker_smoke_report""#) &&

@@ -1149,6 +1149,56 @@ function Get-RomaWindowsAgentArtifactConfigFiles {
     )
 }
 
+function Require-RomaWindowsPackagedProofScript {
+    param(
+        [Parameter(Mandatory = $true)]
+        [hashtable]$Manifest,
+        [string]$BaseDir = ""
+    )
+
+    return Require-RomaWindowsManifestFile -Manifest $Manifest -Key "proof_script" -BaseDir $BaseDir
+}
+
+function Require-RomaWindowsPackagedCheckSetScript {
+    param(
+        [Parameter(Mandatory = $true)]
+        [hashtable]$Manifest,
+        [string]$BaseDir = ""
+    )
+
+    return Require-RomaWindowsManifestFile -Manifest $Manifest -Key "check_set_script" -BaseDir $BaseDir
+}
+
+function Require-RomaWindowsPackagedProofAgent {
+    param(
+        [Parameter(Mandatory = $true)]
+        [hashtable]$Manifest,
+        [string]$BaseDir = ""
+    )
+
+    return Require-RomaWindowsManifestFile -Manifest $Manifest -Key "proof_agent" -BaseDir $BaseDir
+}
+
+function Require-RomaWindowsPackagedProofCommonScript {
+    param(
+        [Parameter(Mandatory = $true)]
+        [hashtable]$Manifest,
+        [string]$BaseDir = ""
+    )
+
+    return Require-RomaWindowsManifestFile -Manifest $Manifest -Key "proof_common_script" -BaseDir $BaseDir
+}
+
+function Require-RomaWindowsPackagedWhisperCLIMock {
+    param(
+        [Parameter(Mandatory = $true)]
+        [hashtable]$Manifest,
+        [string]$BaseDir = ""
+    )
+
+    return Require-RomaWindowsManifestFile -Manifest $Manifest -Key "whisper_cli_mock" -BaseDir $BaseDir
+}
+
 function Get-RomaWindowsPackageIdentityFiles {
     $files = @()
     $files += Get-RomaWindowsAgentArtifactExecutableFiles

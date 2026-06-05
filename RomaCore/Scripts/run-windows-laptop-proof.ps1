@@ -320,21 +320,17 @@ $packageArtifactPaths = Get-RomaWindowsAgentArtifactPathSet -ArtifactDir $Packag
 $manifestPath = $packageArtifactPaths["manifest"]
 Require-File -Path $manifestPath
 $script:artifactManifest = Read-RomaWindowsManifest -Path $manifestPath
-$proofScript = Require-RomaWindowsManifestFile `
+$proofScript = Require-RomaWindowsPackagedProofScript `
     -Manifest $script:artifactManifest `
-    -Key "proof_script" `
     -BaseDir $PackageDir
-$checkSetScript = Require-RomaWindowsManifestFile `
+$checkSetScript = Require-RomaWindowsPackagedCheckSetScript `
     -Manifest $script:artifactManifest `
-    -Key "check_set_script" `
     -BaseDir $PackageDir
-$proofAgent = Require-RomaWindowsManifestFile `
+$proofAgent = Require-RomaWindowsPackagedProofAgent `
     -Manifest $script:artifactManifest `
-    -Key "proof_agent" `
     -BaseDir $PackageDir
-$packagedProofCommonScript = Require-RomaWindowsManifestFile `
+$packagedProofCommonScript = Require-RomaWindowsPackagedProofCommonScript `
     -Manifest $script:artifactManifest `
-    -Key "proof_common_script" `
     -BaseDir $PackageDir
 
 $proofSessionId = [guid]::NewGuid().ToString("D")

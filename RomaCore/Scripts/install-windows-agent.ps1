@@ -149,7 +149,8 @@ $runSource = Join-Path $PackageDir "run-windows-agent.ps1"
 Require-File -Path $agentSource
 Require-File -Path $smokeSource
 Require-File -Path $runSource
-$installedAgent = Join-Path $InstallDir "RomaWindowsAgent.exe"
+$installedAgent = Join-RomaWindowsInstalledAgentPath -InstallDir $InstallDir
+$installedProofAgent = Join-RomaWindowsInstalledProofAgentPath -InstallDir $InstallDir
 $installedRun = Join-RomaWindowsInstalledRunScriptPath -InstallDir $InstallDir
 Assert-InstalledAgentNotRunning -InstalledAgentPath $installedAgent
 
@@ -184,8 +185,8 @@ Invoke-Step "copy package files" {
         Copy-Item -LiteralPath $library.FullName -Destination (Join-Path $InstallDir $library.Name) -Force
     }
 
-    Require-File -Path (Join-Path $InstallDir "RomaWindowsAgent.exe")
-    Require-File -Path (Join-Path $InstallDir "RomaProofAgent.exe")
+    Require-File -Path $installedAgent
+    Require-File -Path $installedProofAgent
     Require-File -Path (Join-Path $InstallDir "smoke-windows-agent.ps1")
     Require-File -Path (Join-Path $InstallDir "run-windows-laptop-proof.ps1")
     Require-File -Path (Join-Path $InstallDir "check-windows-scripts-parse.ps1")

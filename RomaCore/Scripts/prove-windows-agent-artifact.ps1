@@ -682,7 +682,7 @@ Invoke-Step "installed launcher doctor" {
 }
 
 Invoke-Step "installed config doctor" {
-    $installedAgent = Join-Path $InstallDir "RomaWindowsAgent.exe"
+    $installedAgent = Join-RomaWindowsInstalledAgentPath -InstallDir $InstallDir
     $script:installedConfigDoctorOutput = Invoke-ConfigDoctor `
         -AgentPath $installedAgent `
         -ConfigPath $ConfigPath

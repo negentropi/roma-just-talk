@@ -2388,6 +2388,24 @@ function New-RomaWindowsAgentShortcut {
     return $savedShortcut
 }
 
+function Join-RomaWindowsInstalledAgentPath {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$InstallDir
+    )
+
+    return Join-Path $InstallDir "RomaWindowsAgent.exe"
+}
+
+function Join-RomaWindowsInstalledProofAgentPath {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$InstallDir
+    )
+
+    return Join-Path $InstallDir "RomaProofAgent.exe"
+}
+
 function Join-RomaWindowsInstalledRunScriptPath {
     param(
         [Parameter(Mandatory = $true)]
@@ -2749,8 +2767,8 @@ function Get-RomaWindowsAgentArtifactFileProofs {
         packaged_agent = (Get-RomaWindowsFileHashProof -Path $AgentPath)
         packaged_proof_agent = (Get-RomaWindowsFileHashProof -Path $ProofAgentPath)
         packaged_whisper_cli_mock = (Get-RomaWindowsFileHashProof -Path $WhisperCLIMockPath)
-        installed_agent = (Get-RomaWindowsFileHashProof -Path (Join-Path $InstallDir "RomaWindowsAgent.exe"))
-        installed_proof_agent = (Get-RomaWindowsFileHashProof -Path (Join-Path $InstallDir "RomaProofAgent.exe"))
+        installed_agent = (Get-RomaWindowsFileHashProof -Path (Join-RomaWindowsInstalledAgentPath -InstallDir $InstallDir))
+        installed_proof_agent = (Get-RomaWindowsFileHashProof -Path (Join-RomaWindowsInstalledProofAgentPath -InstallDir $InstallDir))
     }
     Add-RomaWindowsProofFields `
         -Proof $proofs `

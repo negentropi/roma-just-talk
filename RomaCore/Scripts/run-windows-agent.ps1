@@ -65,7 +65,7 @@ if ([string]::IsNullOrWhiteSpace($InstallDir)) {
 $InstallDir = Resolve-FullPath -Path $InstallDir
 
 if ([string]::IsNullOrWhiteSpace($AgentPath)) {
-    $AgentPath = Join-Path $InstallDir "RomaWindowsAgent.exe"
+    $AgentPath = Join-RomaWindowsInstalledAgentPath -InstallDir $InstallDir
 }
 $AgentPath = Resolve-FullPath -Path $AgentPath
 Require-File -Path $AgentPath

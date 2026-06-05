@@ -31,6 +31,83 @@ public enum WindowsDictationRuntimeEvent: Equatable, Hashable, Sendable {
     }
 }
 
+public struct WindowsDictationRuntimeResultProofOptions: Sendable {
+    public var wordReplacementCount: Int
+    public var transcriptionClient: RomaTranscriptionClient?
+    public var includesPasteTextSource: Bool
+
+    public init(
+        wordReplacementCount: Int,
+        transcriptionClient: RomaTranscriptionClient? = nil,
+        includesPasteTextSource: Bool = false
+    ) {
+        self.wordReplacementCount = wordReplacementCount
+        self.transcriptionClient = transcriptionClient
+        self.includesPasteTextSource = includesPasteTextSource
+    }
+}
+
+public enum WindowsDictationRuntimeResultProof {
+    public static func outputLines(
+        for result: DictationPipelineResult,
+        options: WindowsDictationRuntimeResultProofOptions
+    ) -> [String] {
+        let audio = result.session.recordedAudio
+        var lines = [
+            "wrote=\(audio.fileURL.path)",
+            "duration_seconds=\(String(format: "%.3f", audio.durationSeconds ?? 0))",
+            "included_pre_roll_seconds=\(audio.includedPreRollSeconds ?? 0)",
+            "sample_rate=\(audio.format.sampleRate)",
+            "channels=\(audio.format.channelCount)"
+        ]
+
+        if let client = options.transcriptionClient {
+            lines.append("provider=\(client.name)")
+            lines.append(contentsOf: client.details)
+            lines.append("audio=\(audio.fileURL.path)")
+            appendRawTranscriptionLines(to: &lines, result: result.transcription)
+        } else {
+            appendAgentTranscriptionLines(to: &lines, result: result.transcription)
+        }
+
+        lines.append("processed_transcript_length=\(result.processedText.count)")
+        lines.append("processed_transcript_text=\(RomaCommandLineText.oneLine(result.processedText))")
+        lines.append("word_replacements=\(options.wordReplacementCount)")
+        lines.append("paste_sent=\(result.session.insertedText != nil)")
+        if options.includesPasteTextSource {
+            lines.append("paste_text_source=processed_transcript")
+        }
+        return lines
+    }
+
+    private static func appendAgentTranscriptionLines(
+        to lines: inout [String],
+        result: TranscriptionResult
+    ) {
+        if let language = result.language {
+            lines.append("language=\(language)")
+        }
+        if let duration = result.durationSeconds {
+            lines.append("transcription_duration_seconds=\(String(format: "%.3f", duration))")
+        }
+        lines.append("raw_transcript_length=\(result.text.count)")
+    }
+
+    private static func appendRawTranscriptionLines(
+        to lines: inout [String],
+        result: TranscriptionResult
+    ) {
+        if let language = result.language {
+            lines.append("language=\(language)")
+        }
+        if let duration = result.durationSeconds {
+            lines.append("duration_seconds=\(String(format: "%.3f", duration))")
+        }
+        lines.append("transcript_length=\(result.text.count)")
+        lines.append("transcript_text=\(RomaCommandLineText.oneLine(result.text))")
+    }
+}
+
 public struct WindowsDictationRuntimeRequest: Sendable {
     public var outputURL: URL
     public var model: TranscriptionModelDescriptor

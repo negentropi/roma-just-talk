@@ -132,23 +132,12 @@ struct RomaWindowsAgent {
         _ result: DictationPipelineResult,
         wordReplacementCount: Int
     ) {
-        let audio = result.session.recordedAudio
-        print("wrote=\(audio.fileURL.path)")
-        print("duration_seconds=\(String(format: "%.3f", audio.durationSeconds ?? 0))")
-        print("included_pre_roll_seconds=\(audio.includedPreRollSeconds ?? 0)")
-        print("sample_rate=\(audio.format.sampleRate)")
-        print("channels=\(audio.format.channelCount)")
-        if let language = result.transcription.language {
-            print("language=\(language)")
-        }
-        if let duration = result.transcription.durationSeconds {
-            print("transcription_duration_seconds=\(String(format: "%.3f", duration))")
-        }
-        print("raw_transcript_length=\(result.transcription.text.count)")
-        print("processed_transcript_length=\(result.processedText.count)")
-        print("processed_transcript_text=\(RomaCommandLineText.oneLine(result.processedText))")
-        print("word_replacements=\(wordReplacementCount)")
-        print("paste_sent=\(result.session.insertedText != nil)")
+        WindowsDictationRuntimeResultProof.outputLines(
+            for: result,
+            options: WindowsDictationRuntimeResultProofOptions(
+                wordReplacementCount: wordReplacementCount
+            )
+        ).forEach { print($0) }
     }
 
     private static func runListener(arguments: [String]) async throws {

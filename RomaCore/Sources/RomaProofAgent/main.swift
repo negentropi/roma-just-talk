@@ -270,7 +270,6 @@ struct RomaProofAgent {
         try configuration.validateTranscriptionSettings()
 
         let transcriptionClient = try RomaTranscriptionClient.make(from: configuration)
-        let shouldPaste = configuration.resolvedShouldPaste
         let shouldUseHoldHook = configuration.resolvedUsesHoldHook
         let wordReplacements = configuration.wordReplacements
 
@@ -289,24 +288,14 @@ struct RomaProofAgent {
         ) { event in
             print(event.proofOutputLine)
         }
-        let audio = result.session.recordedAudio
-
-        print("wrote=\(audio.fileURL.path)")
-        print("duration_seconds=\(String(format: "%.3f", audio.durationSeconds ?? 0))")
-        print("included_pre_roll_seconds=\(audio.includedPreRollSeconds ?? 0)")
-        print("sample_rate=\(audio.format.sampleRate)")
-        print("channels=\(audio.format.channelCount)")
-        printTranscriptionResult(
-            result.transcription,
-            client: transcriptionClient,
-            audioURL: audio.fileURL
-        )
-        print("processed_transcript_length=\(result.processedText.count)")
-        print("processed_transcript_text=\(oneLine(result.processedText))")
-        print("word_replacements=\(wordReplacements.count)")
-
-        print("paste_sent=\(shouldPaste)")
-        print("paste_text_source=processed_transcript")
+        WindowsDictationRuntimeResultProof.outputLines(
+            for: result,
+            options: WindowsDictationRuntimeResultProofOptions(
+                wordReplacementCount: wordReplacements.count,
+                transcriptionClient: transcriptionClient,
+                includesPasteTextSource: true
+            )
+        ).forEach { print($0) }
     }
 
     private static func runDictationPipelineProof(arguments: [String]) async throws {

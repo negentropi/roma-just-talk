@@ -7717,6 +7717,74 @@ struct RomaCoreChecks {
             WindowsDictationRuntimeEvent.holdKeyUp.proofOutputLine == "hold_key_up=true",
             "Windows runtime event should own hold keyup proof output"
         )
+        let windowsProofAudio = RecordedAudio(
+            fileURL: URL(fileURLWithPath: "/tmp/windows-runtime-proof.wav"),
+            format: .speechPCM16kMono,
+            sampleCount: 32_000,
+            includedPreRollSampleCount: 8_000
+        )
+        let windowsProofResult = DictationPipelineResult(
+            session: DictationSession(
+                recordedAudio: windowsProofAudio,
+                model: model,
+                status: .completed,
+                rawText: "roma just talk",
+                insertedText: "roma-just-talk"
+            ),
+            transcription: TranscriptionResult(
+                text: "roma just talk",
+                language: "en",
+                durationSeconds: 1.25
+            ),
+            processedText: "roma-just-talk"
+        )
+        let agentProofLines = WindowsDictationRuntimeResultProof.outputLines(
+            for: windowsProofResult,
+            options: WindowsDictationRuntimeResultProofOptions(wordReplacementCount: 1)
+        )
+        try require(
+            agentProofLines.contains("wrote=/tmp/windows-runtime-proof.wav") &&
+                agentProofLines.contains("duration_seconds=2.000") &&
+                agentProofLines.contains("included_pre_roll_seconds=0.5") &&
+                agentProofLines.contains("sample_rate=16000") &&
+                agentProofLines.contains("channels=1") &&
+                agentProofLines.contains("language=en") &&
+                agentProofLines.contains("transcription_duration_seconds=1.250") &&
+                agentProofLines.contains("raw_transcript_length=14") &&
+                agentProofLines.contains("processed_transcript_length=14") &&
+                agentProofLines.contains("processed_transcript_text=roma-just-talk") &&
+                agentProofLines.contains("word_replacements=1") &&
+                agentProofLines.contains("paste_sent=true") &&
+                !agentProofLines.contains("paste_text_source=processed_transcript"),
+            "Windows runtime result proof should format user-facing agent dictation output"
+        )
+        let sourceProofClient = RomaTranscriptionClient(
+            name: "openai-compatible",
+            service: FakeTranscriptionService(),
+            model: model,
+            details: [
+                "endpoint=https://api.example.com/v1/audio/transcriptions",
+                "model=whisper-large-v3"
+            ]
+        )
+        let sourceProofLines = WindowsDictationRuntimeResultProof.outputLines(
+            for: windowsProofResult,
+            options: WindowsDictationRuntimeResultProofOptions(
+                wordReplacementCount: 1,
+                transcriptionClient: sourceProofClient,
+                includesPasteTextSource: true
+            )
+        )
+        try require(
+            sourceProofLines.contains("provider=openai-compatible") &&
+                sourceProofLines.contains("endpoint=https://api.example.com/v1/audio/transcriptions") &&
+                sourceProofLines.contains("audio=/tmp/windows-runtime-proof.wav") &&
+                sourceProofLines.contains("duration_seconds=1.250") &&
+                sourceProofLines.contains("transcript_length=14") &&
+                sourceProofLines.contains("transcript_text=roma just talk") &&
+                sourceProofLines.contains("paste_text_source=processed_transcript"),
+            "Windows runtime result proof should preserve source proof transcription details"
+        )
         let request = WindowsDictationRuntimeRequest(
             outputURL: URL(fileURLWithPath: "/tmp/windows-runtime-proof.wav"),
             model: model,
@@ -9686,10 +9754,16 @@ struct RomaCoreChecks {
                 windowsDictationRuntimeSource.contains("try await session.startPreRollBuffering()") &&
                 windowsDictationRuntimeSource.contains("captureLifecycle: .keepAliveAfterRun") &&
                 windowsDictationRuntimeSource.contains("public var proofOutputLine: String") &&
+                windowsDictationRuntimeSource.contains("public enum WindowsDictationRuntimeResultProof") &&
+                windowsDictationRuntimeSource.contains("public struct WindowsDictationRuntimeResultProofOptions") &&
+                windowsDictationRuntimeSource.contains("processed_transcript_text=\\(RomaCommandLineText.oneLine(result.processedText))") &&
                 windowsDictationRuntimeSource.contains(#"return "pre_roll_buffering=true""#) &&
                 windowsDictationRuntimeSource.contains(#"return "waiting_for_key_down=\(displayName)""#) &&
                 windowsAgentSource.contains("print(event.proofOutputLine)") &&
+                windowsAgentSource.contains("WindowsDictationRuntimeResultProof.outputLines") &&
                 proofAgentSource.contains("print(event.proofOutputLine)") &&
+                proofAgentSource.contains("WindowsDictationRuntimeResultProof.outputLines") &&
+                proofAgentSource.contains("includesPasteTextSource: true") &&
                 !windowsAgentSource.contains("case .preRollBuffering:") &&
                 !proofAgentSource.contains("case .preRollBuffering:") &&
                 doctorOutputSource.contains(#""windows_listener_pre_roll_runtime_source=true""#) &&

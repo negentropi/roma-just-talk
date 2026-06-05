@@ -443,6 +443,7 @@ public struct RomaTranscriptionOutputFilter {
         "typescript": "TypeScript",
         "vercel": "Vercel",
         "voiceink": "VoiceInk",
+        "whatsapp": "WhatsApp",
         "windsurf": "Windsurf",
         "wispr": "Wispr",
         "xcode": "Xcode"
@@ -453,6 +454,7 @@ public struct RomaTranscriptionOutputFilter {
         "cloud flare": "Cloudflare",
         "eleven labs": "ElevenLabs",
         "git hub": "GitHub",
+        "google docs": "Google Docs",
         "java script": "JavaScript",
         "next js": "Next.js",
         "node js": "Node.js",
@@ -472,6 +474,7 @@ public struct RomaTranscriptionOutputFilter {
         ["cloud", "flare"],
         ["eleven", "labs"],
         ["git", "hub"],
+        ["google", "docs"],
         ["java", "script"],
         ["next", "js"],
         ["node", "js"],

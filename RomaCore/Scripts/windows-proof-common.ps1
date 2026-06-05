@@ -123,6 +123,86 @@ function ConvertTo-RomaWindowsProofTimestamp {
     return $timestamp
 }
 
+function Require-RomaWindowsObjectProperty {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Object,
+        [Parameter(Mandatory = $true)]
+        [string]$Name,
+        [string]$Context = "proof object"
+    )
+
+    if ($null -eq $Object -or !($Object.PSObject.Properties.Name -contains $Name)) {
+        throw "$Context is missing property: $Name"
+    }
+
+    return $Object.PSObject.Properties[$Name].Value
+}
+
+function Get-RomaWindowsPackageIdentityFingerprint {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$PackageIdentity,
+        [string]$Context = "package_identity",
+        [switch]$RequireEntryCount
+    )
+
+    $algorithm = [string](Require-RomaWindowsObjectProperty -Object $PackageIdentity -Name "algorithm" -Context $Context)
+    if ($algorithm -ne "sha256") {
+        throw "$Context has unsupported package identity algorithm: $algorithm"
+    }
+
+    $fingerprint = [string](Require-RomaWindowsObjectProperty -Object $PackageIdentity -Name "fingerprint" -Context $Context)
+    if ($fingerprint -notmatch "^[0-9a-fA-F]{64}$") {
+        throw "$Context fingerprint must be a sha256 hash, got: $fingerprint"
+    }
+    if ($fingerprint -match "^0{64}$") {
+        throw "$Context fingerprint must be non-placeholder"
+    }
+
+    if ($RequireEntryCount) {
+        $entryCount = [int64](Require-RomaWindowsObjectProperty -Object $PackageIdentity -Name "entry_count" -Context $Context)
+        if ($entryCount -le 0) {
+            throw "$Context entry_count must be positive, got: $entryCount"
+        }
+    }
+
+    return $fingerprint.ToLowerInvariant()
+}
+
+function Get-RomaWindowsManifestSourceProvenance {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Manifest,
+        [string]$Context = "manifest"
+    )
+
+    $repository = [string](Require-RomaWindowsObjectProperty -Object $Manifest -Name "source_repository" -Context $Context)
+    $branch = [string](Require-RomaWindowsObjectProperty -Object $Manifest -Name "source_branch" -Context $Context)
+    $commit = [string](Require-RomaWindowsObjectProperty -Object $Manifest -Name "source_commit" -Context $Context)
+    $dirty = [string](Require-RomaWindowsObjectProperty -Object $Manifest -Name "source_dirty" -Context $Context)
+
+    if ([string]::IsNullOrWhiteSpace($repository) -or $repository -eq "unknown") {
+        throw "$Context source_repository must identify the packaged source repository"
+    }
+    if ([string]::IsNullOrWhiteSpace($branch)) {
+        throw "$Context source_branch must be non-empty"
+    }
+    if ($commit -notmatch "^[0-9a-fA-F]{40}$") {
+        throw "$Context source_commit must be a 40-character git SHA, got: $commit"
+    }
+    if ($dirty -ne "true" -and $dirty -ne "false") {
+        throw "$Context source_dirty must be true or false, got: $dirty"
+    }
+
+    return [ordered]@{
+        Repository = $repository
+        Branch = $branch
+        Commit = $commit
+        Dirty = $dirty
+    }
+}
+
 function Get-RomaWindowsCurrentUserSid {
     if ([System.Environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT) {
         return ""

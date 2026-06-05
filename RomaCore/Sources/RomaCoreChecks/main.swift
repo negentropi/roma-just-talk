@@ -10305,11 +10305,16 @@ struct RomaCoreChecks {
             "Windows proof checker should validate manifest source provenance"
         )
         try require(
-            checkReportScript.contains("source_repository to identify the packaged source repository"),
+            proofCommonScript.contains("function Get-RomaWindowsManifestSourceProvenance") &&
+                checkReportScript.contains("Get-RomaWindowsManifestSourceProvenance") &&
+                checkSetScript.contains("Get-RomaWindowsManifestSourceProvenance") &&
+                proofCommonScript.contains("source_repository must identify the packaged source repository"),
             "Windows proof checker should reject placeholder source repositories"
         )
         try require(
-            checkReportScript.contains("source_commit to be a 40-character git SHA"),
+            proofCommonScript.contains("source_commit must be a 40-character git SHA") &&
+                checkReportScript.contains(#"-Context "manifest""#) &&
+                checkSetScript.contains(#"-Context "Proof set report $ReportName manifest""#),
             "Windows proof checker should reject missing or malformed source commits"
         )
         try require(
@@ -11363,9 +11368,12 @@ struct RomaCoreChecks {
             "Windows proof report profile should validate laptop preflight reports, output markers, and artifact identity"
         )
         try require(
-            checkReportScript.contains("^[0-9a-fA-F]{64}$") &&
-                checkReportScript.contains("^0{64}$") &&
-                checkReportScript.contains("package_identity.fingerprint to be non-placeholder"),
+            proofCommonScript.contains("function Get-RomaWindowsPackageIdentityFingerprint") &&
+                proofCommonScript.contains("^[0-9a-fA-F]{64}$") &&
+                proofCommonScript.contains("^0{64}$") &&
+                proofCommonScript.contains("fingerprint must be non-placeholder") &&
+                checkReportScript.contains("Get-RomaWindowsPackageIdentityFingerprint") &&
+                checkSetScript.contains("Get-RomaWindowsPackageIdentityFingerprint"),
             "Windows proof report checker should reject malformed and placeholder package identity fingerprints"
         )
         try require(

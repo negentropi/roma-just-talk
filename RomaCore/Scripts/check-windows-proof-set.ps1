@@ -319,20 +319,10 @@ function Get-ReportPackageFingerprint {
     )
 
     $packageIdentity = Require-ReportProperty -Report $Report -Name "package_identity" -ReportName $ReportName
-    $algorithm = [string](Require-ReportProperty -Report $packageIdentity -Name "algorithm" -ReportName $ReportName)
-    if ($algorithm -ne "sha256") {
-        throw "Proof set report $ReportName has unsupported package identity algorithm: $algorithm"
-    }
-
-    $fingerprint = [string](Require-ReportProperty -Report $packageIdentity -Name "fingerprint" -ReportName $ReportName)
-    if ($fingerprint -notmatch "^[0-9a-fA-F]{64}$") {
-        throw "Proof set report $ReportName has invalid package identity fingerprint: $fingerprint"
-    }
-    if ($fingerprint -match "^0{64}$") {
-        throw "Proof set report $ReportName has placeholder package identity fingerprint"
-    }
-
-    return $fingerprint.ToLowerInvariant()
+    return Get-RomaWindowsPackageIdentityFingerprint `
+        -PackageIdentity $packageIdentity `
+        -Context "Proof set report $ReportName package_identity" `
+        -RequireEntryCount
 }
 
 function Get-ReportSourceProvenance {
@@ -344,30 +334,9 @@ function Get-ReportSourceProvenance {
     )
 
     $manifest = Require-ReportProperty -Report $Report -Name "manifest" -ReportName $ReportName
-    $repository = [string](Require-ReportProperty -Report $manifest -Name "source_repository" -ReportName $ReportName)
-    $branch = [string](Require-ReportProperty -Report $manifest -Name "source_branch" -ReportName $ReportName)
-    $commit = [string](Require-ReportProperty -Report $manifest -Name "source_commit" -ReportName $ReportName)
-    $dirty = [string](Require-ReportProperty -Report $manifest -Name "source_dirty" -ReportName $ReportName)
-
-    if ([string]::IsNullOrWhiteSpace($repository) -or $repository -eq "unknown") {
-        throw "Proof set report $ReportName is missing source repository provenance"
-    }
-    if ([string]::IsNullOrWhiteSpace($branch)) {
-        throw "Proof set report $ReportName is missing source branch provenance"
-    }
-    if ($commit -notmatch "^[0-9a-fA-F]{40}$") {
-        throw "Proof set report $ReportName has invalid source commit provenance: $commit"
-    }
-    if ($dirty -ne "true" -and $dirty -ne "false") {
-        throw "Proof set report $ReportName has invalid source dirty provenance: $dirty"
-    }
-
-    return [ordered]@{
-        Repository = $repository
-        Branch = $branch
-        Commit = $commit
-        Dirty = $dirty
-    }
+    return Get-RomaWindowsManifestSourceProvenance `
+        -Manifest $manifest `
+        -Context "Proof set report $ReportName manifest"
 }
 
 function Assert-SameArtifactSmokeProofSet {

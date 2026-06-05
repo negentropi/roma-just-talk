@@ -200,20 +200,14 @@ function Assert-PackageIdentityProof {
         [object]$PackageIdentity
     )
 
-    Assert-StringEquals `
-        -Actual ([string](Require-Property -Object $PackageIdentity -Name "algorithm")) `
-        -Expected "sha256" `
-        -Name "package_identity.algorithm"
-    $fingerprint = [string](Require-Property -Object $PackageIdentity -Name "fingerprint")
-    if ($fingerprint -notmatch "^[0-9a-fA-F]{64}$") {
-        throw "Expected package_identity.fingerprint to be a sha256 hash, got: $fingerprint"
-    }
-    if ($fingerprint -match "^0{64}$") {
-        throw "Expected package_identity.fingerprint to be non-placeholder"
-    }
-    Assert-NumberGreaterThan -Object $PackageIdentity -Name "entry_count" -Minimum 0
+    $fingerprint = Get-RomaWindowsPackageIdentityFingerprint `
+        -PackageIdentity $PackageIdentity `
+        -Context "package_identity" `
+        -RequireEntryCount
+    Write-Host "proof_value=package_identity.algorithm value=sha256"
+    Write-Host "proof_number=package_identity.entry_count value=$([int64](Require-Property -Object $PackageIdentity -Name "entry_count")) minimum=0"
 
-    return $fingerprint.ToLowerInvariant()
+    return $fingerprint
 }
 
 function Assert-RealCloudBackendProof {
@@ -301,24 +295,13 @@ function Assert-ManifestSourceProof {
         [object]$Manifest
     )
 
-    $repository = [string](Require-Property -Object $Manifest -Name "source_repository")
-    if ([string]::IsNullOrWhiteSpace($repository) -or $repository -eq "unknown") {
-        throw "Expected manifest source_repository to identify the packaged source repository"
-    }
-
+    $source = Get-RomaWindowsManifestSourceProvenance `
+        -Manifest $Manifest `
+        -Context "manifest"
     Assert-NonEmptyString -Object $Manifest -Name "source_branch"
-    $commit = [string](Require-Property -Object $Manifest -Name "source_commit")
-    if ($commit -notmatch "^[0-9a-fA-F]{40}$") {
-        throw "Expected manifest source_commit to be a 40-character git SHA, got $commit"
-    }
 
-    $dirty = [string](Require-Property -Object $Manifest -Name "source_dirty")
-    if ($dirty -ne "true" -and $dirty -ne "false") {
-        throw "Expected manifest source_dirty to be true or false, got $dirty"
-    }
-
-    Write-Host "proof_source_commit=$commit"
-    Write-Host "proof_source_dirty=$dirty"
+    Write-Host "proof_source_commit=$($source['Commit'])"
+    Write-Host "proof_source_dirty=$($source['Dirty'])"
 }
 
 function Assert-PathNotEqual {

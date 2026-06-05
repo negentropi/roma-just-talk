@@ -13335,8 +13335,9 @@ struct RomaCoreChecks {
             "Windows laptop proof runner should write an archived full-proof recheck script with exact report paths"
         )
         try require(
-            laptopProofScript.contains("startup-shortcuts"),
-            "Windows laptop proof runner should use proof-owned startup shortcut directories"
+            proofCommonScript.contains("$startupShortcutBaseDir = $StartupShortcutDir") &&
+                proofCommonScript.contains("startup-shortcuts"),
+            "Windows laptop proof path helper should accept explicit startup shortcut directories and keep a proof-owned fallback"
         )
         try require(
             laptopProofScript.contains("cloudStartupShortcutDir") &&

@@ -1261,27 +1261,47 @@ function Assert-RomaWindowsScriptParseCount {
     Write-Host "asserted_script_parse_count=$Name count=$actualCount expected=$ExpectedCount"
 }
 
+function Get-RomaWindowsDefaultRecordSecondsProofValue {
+    return "2.0"
+}
+
+function Get-RomaWindowsDefaultHoldTimeoutSecondsProofValue {
+    return "15.0"
+}
+
+function Get-RomaWindowsDefaultHoldTimeoutMillisecondsProofValue {
+    return "15000"
+}
+
+function Get-RomaWindowsDefaultClipboardRestoreDelaySecondsProofValue {
+    return "2.0"
+}
+
+function Get-RomaWindowsMaximumClipboardRestoreDelaySecondsProofValue {
+    return "4294967.295"
+}
+
 function Get-RomaWindowsRuntimeDefaultOutputMarkers {
     return [ordered]@{
-        default_record_seconds = "default_record_seconds=2.0"
-        default_hold_timeout_seconds = "default_hold_timeout_seconds=15.0"
-        default_hold_timeout_milliseconds = "default_hold_timeout_milliseconds=15000"
-        default_clipboard_restore_delay_seconds = "default_clipboard_restore_delay_seconds=2.0"
-        maximum_clipboard_restore_delay_seconds = "maximum_clipboard_restore_delay_seconds=4294967.295"
+        default_record_seconds = "default_record_seconds=$(Get-RomaWindowsDefaultRecordSecondsProofValue)"
+        default_hold_timeout_seconds = "default_hold_timeout_seconds=$(Get-RomaWindowsDefaultHoldTimeoutSecondsProofValue)"
+        default_hold_timeout_milliseconds = "default_hold_timeout_milliseconds=$(Get-RomaWindowsDefaultHoldTimeoutMillisecondsProofValue)"
+        default_clipboard_restore_delay_seconds = "default_clipboard_restore_delay_seconds=$(Get-RomaWindowsDefaultClipboardRestoreDelaySecondsProofValue)"
+        maximum_clipboard_restore_delay_seconds = "maximum_clipboard_restore_delay_seconds=$(Get-RomaWindowsMaximumClipboardRestoreDelaySecondsProofValue)"
     }
 }
 
 function Get-RomaWindowsHoldTimeoutDefaultOutputMarkers {
     return [ordered]@{
-        default_hold_timeout_seconds = "default_timeout_seconds=15.0"
-        default_hold_timeout_milliseconds = "default_timeout_milliseconds=15000"
+        default_hold_timeout_seconds = "default_timeout_seconds=$(Get-RomaWindowsDefaultHoldTimeoutSecondsProofValue)"
+        default_hold_timeout_milliseconds = "default_timeout_milliseconds=$(Get-RomaWindowsDefaultHoldTimeoutMillisecondsProofValue)"
     }
 }
 
 function Get-RomaWindowsClipboardRestoreDefaultOutputMarkers {
     return [ordered]@{
-        default_clipboard_restore_delay_seconds = "default_clipboard_restore_delay_seconds=2.0"
-        maximum_clipboard_restore_delay_seconds = "maximum_clipboard_restore_delay_seconds=4294967.295"
+        default_clipboard_restore_delay_seconds = "default_clipboard_restore_delay_seconds=$(Get-RomaWindowsDefaultClipboardRestoreDelaySecondsProofValue)"
+        maximum_clipboard_restore_delay_seconds = "maximum_clipboard_restore_delay_seconds=$(Get-RomaWindowsMaximumClipboardRestoreDelaySecondsProofValue)"
     }
 }
 

@@ -12442,19 +12442,33 @@ struct RomaCoreChecks {
                 doctorOutputSource.contains(#""maximum_clipboard_restore_delay_seconds=\(WindowsClipboardRestoreConfiguration.maximumRestoreDelaySeconds)""#),
             "Windows doctor output module should own shared clipboard restore delay defaults"
         )
-        let proofDefaultAssertions = [
-            "default_record_seconds=2.0",
-            "default_hold_timeout_seconds=15.0",
-            "default_hold_timeout_milliseconds=15000",
-            "default_clipboard_restore_delay_seconds=2.0",
-            "maximum_clipboard_restore_delay_seconds=4294967.295",
-            "default_timeout_seconds=15.0",
-            "default_timeout_milliseconds=15000"
+        let proofDefaultValueFunctions = [
+            ("Get-RomaWindowsDefaultRecordSecondsProofValue", "2.0"),
+            ("Get-RomaWindowsDefaultHoldTimeoutSecondsProofValue", "15.0"),
+            ("Get-RomaWindowsDefaultHoldTimeoutMillisecondsProofValue", "15000"),
+            ("Get-RomaWindowsDefaultClipboardRestoreDelaySecondsProofValue", "2.0"),
+            ("Get-RomaWindowsMaximumClipboardRestoreDelaySecondsProofValue", "4294967.295")
         ]
-        for expectedLine in proofDefaultAssertions {
+        for (functionName, expectedValue) in proofDefaultValueFunctions {
             try require(
-                proofCommonScript.contains(#""\#(expectedLine)""#),
-                "Windows proof helper should own doctor default output \(expectedLine)"
+                proofCommonScript.contains("function \(functionName)") &&
+                    proofCommonScript.contains(#"return "\#(expectedValue)""#),
+                "Windows proof helper should own doctor default value \(functionName)"
+            )
+        }
+        let proofDefaultMarkers = [
+            ("default_record_seconds", "default_record_seconds", "Get-RomaWindowsDefaultRecordSecondsProofValue"),
+            ("default_hold_timeout_seconds", "default_hold_timeout_seconds", "Get-RomaWindowsDefaultHoldTimeoutSecondsProofValue"),
+            ("default_hold_timeout_milliseconds", "default_hold_timeout_milliseconds", "Get-RomaWindowsDefaultHoldTimeoutMillisecondsProofValue"),
+            ("default_clipboard_restore_delay_seconds", "default_clipboard_restore_delay_seconds", "Get-RomaWindowsDefaultClipboardRestoreDelaySecondsProofValue"),
+            ("maximum_clipboard_restore_delay_seconds", "maximum_clipboard_restore_delay_seconds", "Get-RomaWindowsMaximumClipboardRestoreDelaySecondsProofValue"),
+            ("default_hold_timeout_seconds", "default_timeout_seconds", "Get-RomaWindowsDefaultHoldTimeoutSecondsProofValue"),
+            ("default_hold_timeout_milliseconds", "default_timeout_milliseconds", "Get-RomaWindowsDefaultHoldTimeoutMillisecondsProofValue")
+        ]
+        for (mapKey, markerName, functionName) in proofDefaultMarkers {
+            try require(
+                proofCommonScript.contains(#"\#(mapKey) = "\#(markerName)=$(\#(functionName))""#),
+                "Windows proof helper should derive \(markerName) from \(functionName)"
             )
         }
         try require(
@@ -12601,21 +12615,12 @@ struct RomaCoreChecks {
                 checkReportScript.contains("foreach ($name in $nativeDoctorSpecs.Keys)"),
             "Windows proof report checker should validate native doctor reports against the shared spec map"
         )
-        let artifactDefaultAssertions = [
-            "default_record_seconds=2.0",
-            "default_hold_timeout_seconds=15.0",
-            "default_hold_timeout_milliseconds=15000",
-            "default_clipboard_restore_delay_seconds=2.0",
-            "maximum_clipboard_restore_delay_seconds=4294967.295",
-            "default_timeout_seconds=15.0",
-            "default_timeout_milliseconds=15000"
-        ]
-        for expectedLine in artifactDefaultAssertions {
-            try require(
-                proofCommonScript.contains(#""\#(expectedLine)""#),
-                "Windows proof helper should own artifact doctor default output \(expectedLine)"
-            )
-        }
+        try require(
+            proofCommonScript.contains("function Get-RomaWindowsRuntimeDefaultOutputMarkers") &&
+                proofCommonScript.contains("function Get-RomaWindowsHoldTimeoutDefaultOutputMarkers") &&
+                proofCommonScript.contains("function Get-RomaWindowsClipboardRestoreDefaultOutputMarkers"),
+            "Windows proof helper should own artifact doctor default marker functions"
+        )
         try require(
             proveScript.contains("Assert-RomaWindowsAgentDoctorOutput `") &&
                 proveScript.contains("-RequireRuntimeAvailable") &&
@@ -12633,19 +12638,12 @@ struct RomaCoreChecks {
                 !proveScript.contains("function Get-NativeDoctorOutputProof"),
             "Windows artifact proof script should use shared doctor output and native-doctor assertions"
         )
-        let packageDefaultAssertions = [
-            "default_record_seconds=2.0",
-            "default_hold_timeout_seconds=15.0",
-            "default_hold_timeout_milliseconds=15000",
-            "default_clipboard_restore_delay_seconds=2.0",
-            "maximum_clipboard_restore_delay_seconds=4294967.295"
-        ]
-        for expectedLine in packageDefaultAssertions {
-            try require(
-                proofCommonScript.contains(#""\#(expectedLine)""#),
-                "Windows proof helper should own packaged default output \(expectedLine)"
-            )
-        }
+        try require(
+            proofCommonScript.contains("Get-RomaWindowsRuntimeDefaultOutputProof -Output $Output") &&
+                proofCommonScript.contains("Get-RomaWindowsHoldTimeoutDefaultOutputProof -Output $Output") &&
+                proofCommonScript.contains("Get-RomaWindowsClipboardRestoreDefaultOutputProof -Output $Output"),
+            "Windows proof helper should route packaged default proof fields through shared output proof functions"
+        )
         try require(
             packageScript.contains("Assert-RomaWindowsProofAgentDoctorOutput `") &&
                 packageScript.contains("-RequireNativeWindowsAdapters") &&

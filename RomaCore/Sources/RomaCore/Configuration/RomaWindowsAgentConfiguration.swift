@@ -303,6 +303,41 @@ public struct RomaWindowsAgentConfiguration: Codable, Equatable, Sendable {
         )
     }
 
+    public var resolvedShouldPaste: Bool {
+        shouldPaste ?? false
+    }
+
+    public var resolvedUsesHoldHook: Bool {
+        usesHoldHook ?? false
+    }
+
+    public func dictationTrigger() throws -> WindowsDictationTrigger {
+        if resolvedUsesHoldHook {
+            return .hold(timeoutMilliseconds: try resolvedHoldTimeoutMilliseconds())
+        }
+        return .toggle(recordSeconds: resolvedRecordSeconds)
+    }
+
+    public func textProcessingConfiguration() -> DictationTextProcessingConfiguration {
+        DictationTextProcessingConfiguration(wordReplacements: wordReplacements)
+    }
+
+    public func windowsDictationRuntimeRequest(
+        outputURL: URL,
+        model: TranscriptionModelDescriptor
+    ) throws -> WindowsDictationRuntimeRequest {
+        WindowsDictationRuntimeRequest(
+            outputURL: outputURL,
+            model: model,
+            language: language,
+            prompt: prompt,
+            shouldPaste: resolvedShouldPaste,
+            clipboardRestoreConfiguration: clipboardRestoreConfiguration(),
+            textProcessing: textProcessingConfiguration(),
+            trigger: try dictationTrigger()
+        )
+    }
+
     public var resolvedRecordSeconds: Double {
         recordSeconds ?? Self.defaultRecordSeconds
     }

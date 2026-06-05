@@ -7320,12 +7320,58 @@ struct RomaCoreChecks {
                 RomaWindowsAgentConfiguration.defaultHoldTimeoutMilliseconds,
             "Windows default hold timeout conversion should use the shared millisecond default"
         )
+        try require(merged.resolvedShouldPaste, "Windows config should resolve paste from CLI overrides")
+        try require(merged.resolvedUsesHoldHook, "Windows config should resolve hold mode from CLI overrides")
         try require(
             merged.wordReplacements == [
                 RomaWordReplacementRule(originalText: "just talk", replacementText: "roma-just-talk")
             ],
             "CLI replacement values should override config replacements"
         )
+        let mergedRuntimeModel = TranscriptionModelDescriptor(
+            name: "merged-runtime-model",
+            displayName: "Merged Runtime Model",
+            provider: .custom
+        )
+        let mergedRuntimeOutputURL = URL(fileURLWithPath: "/tmp/merged-runtime-proof.wav")
+        let mergedRuntimeRequest = try merged.windowsDictationRuntimeRequest(
+            outputURL: mergedRuntimeOutputURL,
+            model: mergedRuntimeModel
+        )
+        try require(
+            mergedRuntimeRequest.outputURL == mergedRuntimeOutputURL,
+            "Windows config should own runtime request output path"
+        )
+        try require(
+            mergedRuntimeRequest.model == mergedRuntimeModel,
+            "Windows config should own runtime request model"
+        )
+        try require(
+            mergedRuntimeRequest.shouldPaste,
+            "Windows config should own runtime request paste setting"
+        )
+        try require(
+            mergedRuntimeRequest.clipboardRestoreConfiguration == WindowsClipboardRestoreConfiguration(
+                restoreClipboard: true,
+                restoreDelaySeconds: 0.75
+            ),
+            "Windows config should own runtime request clipboard restore setting"
+        )
+        try require(
+            mergedRuntimeRequest.textProcessing == DictationTextProcessingConfiguration(
+                wordReplacements: merged.wordReplacements
+            ),
+            "Windows config should own runtime request text processing"
+        )
+        switch mergedRuntimeRequest.trigger {
+        case .hold(let timeoutMilliseconds):
+            try require(
+                timeoutMilliseconds == 22_000,
+                "Windows config should own runtime request hold trigger"
+            )
+        case .toggle:
+            throw CheckFailure("Windows config should resolve hold-hook config to a hold trigger")
+        }
         try require(
             try merged.apiKeySource() == .environment(name: "ROMA_KEY"),
             "merged config should resolve env key source"
@@ -9342,6 +9388,12 @@ struct RomaCoreChecks {
             ),
             encoding: .utf8
         )
+        let windowsAgentConfigurationSource = try String(
+            contentsOf: packageRoot.appendingPathComponent(
+                "Sources/RomaCore/Configuration/RomaWindowsAgentConfiguration.swift"
+            ),
+            encoding: .utf8
+        )
         let permissionSurfaceSource = try String(
             contentsOf: packageRoot.appendingPathComponent(
                 "Sources/RomaCore/Windows/WindowsPermissionSurface.swift"
@@ -9547,6 +9599,16 @@ struct RomaCoreChecks {
             windowsDictationRuntimeSource.contains("let pipeline = DictationPipeline(") &&
                 windowsDictationRuntimeSource.contains("WindowsClipboardTextInsertion("),
             "Windows dictation runtime should compose the shared DictationPipeline with the Windows paste adapter"
+        )
+        try require(
+            windowsAgentConfigurationSource.contains("public func windowsDictationRuntimeRequest(") &&
+                windowsAgentConfigurationSource.contains("public func dictationTrigger() throws -> WindowsDictationTrigger") &&
+                windowsAgentConfigurationSource.contains("public func textProcessingConfiguration() -> DictationTextProcessingConfiguration") &&
+                windowsAgentSource.contains("try configuration.windowsDictationRuntimeRequest(") &&
+                proofAgentSource.contains("try configuration.windowsDictationRuntimeRequest(") &&
+                !windowsAgentSource.contains("let trigger: WindowsDictationTrigger") &&
+                !proofAgentSource.contains("let trigger: WindowsDictationTrigger"),
+            "Windows agent and proof agent should reuse shared config-to-runtime request composition"
         )
         try require(
             doctorOutputSource.contains(#""windows_dictation_runtime_uses_pipeline_source=true""#) &&

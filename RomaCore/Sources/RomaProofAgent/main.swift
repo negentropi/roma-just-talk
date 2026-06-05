@@ -270,12 +270,9 @@ struct RomaProofAgent {
         try configuration.validateTranscriptionSettings()
 
         let transcriptionClient = try RomaTranscriptionClient.make(from: configuration)
-        let shouldPaste = configuration.shouldPaste ?? false
-        let shouldUseHoldHook = configuration.usesHoldHook ?? false
+        let shouldPaste = configuration.resolvedShouldPaste
+        let shouldUseHoldHook = configuration.resolvedUsesHoldHook
         let wordReplacements = configuration.wordReplacements
-        let trigger: WindowsDictationTrigger = shouldUseHoldHook
-            ? .hold(timeoutMilliseconds: try configuration.resolvedHoldTimeoutMilliseconds())
-            : .toggle(recordSeconds: configuration.resolvedRecordSeconds)
 
         print("transcription_client=\(transcriptionClient.name)")
         for line in transcriptionClient.details {
@@ -284,16 +281,9 @@ struct RomaProofAgent {
         print("recording_mode=\(shouldUseHoldHook ? "hold" : "toggle")")
 
         let result = try await WindowsDictationRuntime.run(
-            WindowsDictationRuntimeRequest(
+            try configuration.windowsDictationRuntimeRequest(
                 outputURL: outputURL,
-                model: transcriptionClient.model,
-                language: configuration.language,
-                prompt: configuration.prompt,
-                shouldPaste: shouldPaste,
-                textProcessing: DictationTextProcessingConfiguration(
-                    wordReplacements: wordReplacements
-                ),
-                trigger: trigger
+                model: transcriptionClient.model
             ),
             transcriptionService: transcriptionClient.service
         ) { event in

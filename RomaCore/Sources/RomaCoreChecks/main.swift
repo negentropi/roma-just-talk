@@ -13320,7 +13320,7 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("proof_set_laptop_preflight_local_whisper=") &&
                 proofCommonScript.contains("proof_set_laptop_preflight_source_dirty=false") &&
                 proofCommonScript.contains(#"profile = Get-RomaWindowsProofProfileOkMarkerByName -Name "laptop_preflight""#) &&
-                packageScript.contains("check-windows-proof-report.ps1 -ProofReportPath $laptopPreflightReportPath -RequireProofProfile laptop-preflight") &&
+                proofCommonScript.contains("check-windows-proof-report.ps1 -ProofReportPath $laptopPreflightReportPath -RequireProofProfile laptop-preflight") &&
                 proofCommonScript.contains(#"$markers["proof_set"] = Get-RomaWindowsProofSetOkMarker -Name "laptop_preflight""#),
             "Windows package smoke should exercise the laptop preflight report profile output markers and identity shape on Windows CI"
         )
@@ -13790,20 +13790,15 @@ struct RomaCoreChecks {
             "Windows proof scripts and CI should reuse the shared manifest helper instead of duplicating manifest parsing"
         )
         try require(
-            packageScript.contains("Write-LaptopProofGuide") &&
+            packageScript.contains("Write-RomaWindowsLaptopProofGuide") &&
                 packageScript.contains(#"$laptopProofGuideOutput = $outputArtifactPaths["laptop_proof_guide"]"#) &&
-                packageScript.contains("-NativePreflightOnly") &&
-                packageScript.contains("Expected preflight-only proof markers:") &&
-                packageScript.contains("Local whisper preflight also prints:") &&
-                packageScript.contains("Expected full-proof markers:") &&
-                packageScript.contains("Get-RomaWindowsLaptopPreflightGuideMarkers") &&
-                packageScript.contains("Get-RomaWindowsLaptopPreflightLocalWhisperGuideMarkers") &&
-                packageScript.contains("Get-RomaWindowsLaptopProofOperatorGuideLines") &&
-                packageScript.contains("Get-RomaWindowsLaptopProofPrerequisiteGuideLines") &&
-                packageScript.contains("Get-RomaWindowsLaptopProofClaimGuideLines") &&
-                packageScript.contains("Get-RomaWindowsLaptopProofPathSet") &&
-                packageScript.contains(#"$guideReportPaths = $guidePaths["reports"]"#) &&
-                packageScript.contains(#"$cloudDictationReportPath = $guideReportPaths["cloud_dictation"]"#) &&
+                proofCommonScript.contains("function Write-RomaWindowsLaptopProofGuide") &&
+                proofCommonScript.contains("-NativePreflightOnly") &&
+                proofCommonScript.contains("Expected preflight-only proof markers:") &&
+                proofCommonScript.contains("Local whisper preflight also prints:") &&
+                proofCommonScript.contains("Expected full-proof markers:") &&
+                proofCommonScript.contains(#"$guideReportPaths = $guidePaths["reports"]"#) &&
+                proofCommonScript.contains(#"$cloudDictationReportPath = $guideReportPaths["cloud_dictation"]"#) &&
                 proofCommonScript.contains("function Get-RomaWindowsLaptopPreflightGuideMarkers") &&
                 proofCommonScript.contains("function Get-RomaWindowsLaptopPreflightLocalWhisperGuideMarkers") &&
                 proofCommonScript.contains("function Get-RomaWindowsLaptopProofOperatorGuideLines") &&
@@ -13814,6 +13809,9 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Join-RomaWindowsLaptopProofReportPath") &&
                 proofCommonScript.contains("function Get-RomaWindowsLaptopProofPathSet") &&
                 proofCommonScript.contains("function Get-RomaWindowsLaptopProofGuideReportPaths") &&
+                !packageScript.contains("function Write-LaptopProofGuide") &&
+                !packageScript.contains("Expected preflight-only proof markers:") &&
+                !packageScript.contains("Get-RomaWindowsLaptopPreflightGuideMarkers") &&
                 proofCommonScript.contains(#"reports = $reports"#) &&
                 proofCommonScript.contains(#"recheck_script = Join-Path $ProofDir "recheck-full-laptop-proof.ps1""#) &&
                 proofCommonScript.contains(#"mic_preflight_wav = Join-Path $ProofDir "mic-preflight.wav""#) &&
@@ -13882,7 +13880,7 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("local whisper pre roll proof") &&
                 proofCommonScript.contains("processed_transcript_text") &&
                 !proofCommonScript.contains("press and release Ctrl+Shift+R once") &&
-                packageScript.contains("Get-RomaWindowsFullLaptopProofGuideMarkers") &&
+                proofCommonScript.contains("$fullProofMarkers = @((Get-RomaWindowsFullLaptopProofGuideMarkers).Values)") &&
                 proofCommonScript.contains("function Get-RomaWindowsFullLaptopProofGuideMarkers") &&
                 proofCommonScript.contains("windows_laptop_preflight_report=") &&
                 proofCommonScript.contains(#"laptop_preflight_proof_set = Get-RomaWindowsProofSetOkMarker -Name "laptop_preflight""#) &&
@@ -13908,11 +13906,11 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("proof_listener_runtime=installed_listener") &&
                 proofCommonScript.contains("listen_completed_sessions=1") &&
                 proofCommonScript.contains("proof_set_source_dirty=false") &&
-                packageScript.contains("Archived full-proof recheck") &&
-                packageScript.contains("check-windows-proof-set.ps1 -LaptopPreflightReportPath") &&
-                proofCommonScript.contains(#"$markers["recheck_script"] = "windows_laptop_recheck_script=$($guidePaths["recheck_script"])"#) &&
-                packageScript.contains("powershell -ExecutionPolicy Bypass -File $recheckScriptPath") &&
-                packageScript.contains("windows_laptop_recheck_ok=true") &&
+                proofCommonScript.contains("Archived full-proof recheck") &&
+                proofCommonScript.contains("check-windows-proof-set.ps1 -LaptopPreflightReportPath") &&
+                proofCommonScript.contains(#"$markers["recheck_script"] = "windows_laptop_recheck_script=$($guidePaths["recheck_script"])""#) &&
+                proofCommonScript.contains("powershell -ExecutionPolicy Bypass -File $recheckScriptPath") &&
+                proofCommonScript.contains("windows_laptop_recheck_ok=true") &&
                 !packageScript.contains("C:\\tmp\\roma-windows-laptop-proof\\cloud-dictation-proof.json") &&
                 !packageScript.contains("C:\\tmp\\roma-windows-laptop-proof\\local-whisper-dictation-proof.json") &&
                 !packageScript.contains("C:\\tmp\\roma-windows-laptop-proof\\local-whisper-notepad-paste-proof.json") &&

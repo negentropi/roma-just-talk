@@ -386,80 +386,6 @@ function Invoke-ManifestNestedRelocationSmoke {
     Write-Host "manifest_nested_relocation_ok=true"
 }
 
-function Write-LaptopProofGuide {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$OutputPath
-    )
-
-    $preflightMarkers = @((Get-RomaWindowsLaptopPreflightGuideMarkers).Values) -join [System.Environment]::NewLine
-    $localWhisperPreflightMarkers = @((Get-RomaWindowsLaptopPreflightLocalWhisperGuideMarkers).Values) -join [System.Environment]::NewLine
-    $fullProofMarkers = @((Get-RomaWindowsFullLaptopProofGuideMarkers).Values) -join [System.Environment]::NewLine
-    $operatorGuide = @(Get-RomaWindowsLaptopProofOperatorGuideLines) -join [System.Environment]::NewLine
-    $prerequisiteGuide = @(Get-RomaWindowsLaptopProofPrerequisiteGuideLines) -join [System.Environment]::NewLine
-    $claimGuide = @(Get-RomaWindowsLaptopProofClaimGuideLines) -join [System.Environment]::NewLine
-    $guidePaths = Get-RomaWindowsLaptopProofPathSet
-    $guideReportPaths = $guidePaths["reports"]
-    $laptopPreflightReportPath = $guideReportPaths["laptop_preflight"]
-    $cloudDictationReportPath = $guideReportPaths["cloud_dictation"]
-    $localWhisperDictationReportPath = $guideReportPaths["local_whisper_dictation"]
-    $localWhisperNotepadPasteReportPath = $guideReportPaths["local_whisper_notepad_paste"]
-    $recheckScriptPath = $guidePaths["recheck_script"]
-
-    @"
-Roma Just Talk Windows laptop proof
-
-Run these commands from this artifact directory.
-
-$operatorGuide
-
-$prerequisiteGuide
-
-Native preflight only, before cloud credentials or local whisper setup:
-
-powershell -ExecutionPolicy Bypass -File .\run-windows-laptop-proof.ps1 -PackageDir . -ProofDir C:\tmp\roma-windows-laptop-proof -PreflightOnly -NativePreflightOnly
-
-Local whisper preflight, before cloud credentials:
-
-powershell -ExecutionPolicy Bypass -File .\run-windows-laptop-proof.ps1 -PackageDir . -ProofDir C:\tmp\roma-windows-laptop-proof -PreflightOnly -WhisperCLI C:\path\whisper-cli.exe -WhisperModel C:\path\ggml-base.en.bin
-
-Full laptop proof, after cloud credentials and local whisper are ready:
-
-powershell -ExecutionPolicy Bypass -File .\run-windows-laptop-proof.ps1 -PackageDir . -ProofDir C:\tmp\roma-windows-laptop-proof -Endpoint https://api.groq.com/openai/v1/audio/transcriptions -Model whisper-large-v3-turbo -ApiKeyEnv GROQ_API_KEY -ApiKeyName groq -WhisperCLI C:\path\whisper-cli.exe -WhisperModel C:\path\ggml-base.en.bin
-
-Expected preflight-only proof markers:
-
-$preflightMarkers
-
-Local whisper preflight also prints:
-
-$localWhisperPreflightMarkers
-
-Archived preflight report recheck, without rerunning hotkey or microphone proof:
-
-powershell -ExecutionPolicy Bypass -File .\check-windows-proof-report.ps1 -ProofReportPath $laptopPreflightReportPath -RequireProofProfile laptop-preflight
-
-Expected full-proof markers:
-
-$fullProofMarkers
-
-Archived full-proof recheck, without rerunning capture, transcription, listener, or paste:
-
-powershell -ExecutionPolicy Bypass -File .\check-windows-proof-set.ps1 -LaptopPreflightReportPath $laptopPreflightReportPath -CloudDictationReportPath $cloudDictationReportPath -LocalWhisperDictationReportPath $localWhisperDictationReportPath -LocalWhisperNotepadPasteReportPath $localWhisperNotepadPasteReportPath -RequireLaptopPreflight -RequireFullLaptopProof
-
-Or run the proof-dir script written by the full laptop proof:
-
-powershell -ExecutionPolicy Bypass -File $recheckScriptPath
-
-That recheck script asserts the four profile markers and prints:
-
-windows_laptop_recheck_ok=true
-
-$claimGuide
-"@ | Set-Content -LiteralPath $OutputPath -Encoding UTF8
-    Write-Host "laptop_proof_guide=$OutputPath"
-}
-
 $packageRoot = Resolve-Path "$PSScriptRoot\.."
 if ([System.Environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT) {
     throw "package-windows-agent.ps1 must run on Windows so packaged executables and Swift runtime DLLs are Windows artifacts"
@@ -591,7 +517,7 @@ try {
         Write-Host "check_report_script=$checkReportScriptOutput"
         Copy-Item -LiteralPath $checkSetScriptSource -Destination $checkSetScriptOutput -Force
         Write-Host "check_set_script=$checkSetScriptOutput"
-        Write-LaptopProofGuide -OutputPath $laptopProofGuideOutput
+        Write-RomaWindowsLaptopProofGuide -OutputPath $laptopProofGuideOutput
     }
 
     Invoke-Step "packaged script parse check" {

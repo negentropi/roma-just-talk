@@ -2648,13 +2648,20 @@ public struct RomaTranscriptionOutputFilter {
         if !startsWithListMarker(result) {
             result = removeLeadingFragmentPunctuation(from: result)
         }
-        result = removeLeadingPauseFillerFromContinuationFragment(from: result)
+        result = removeLeadingPauseFillerFromContinuationFragment(from: result, after: precedingText)
         result = removeLeadingAcknowledgementFillerFromContextOverlapContinuation(result)
+        result = removeLeadingDiscourseFillerFromContinuationFragment(from: result, after: precedingText)
+        result = unwrapNoisyNestedContinuationBoundaryFragment(from: result)
+        result = unwrapPlainSquareBracketedBoundaryContinuationFragment(from: result)
+        result = unwrapPlainNonASCIIBoundaryContinuationFragment(from: result)
         result = collapseRepeatedContextOverlapContinuationFragment(result)
         return cleanDanglingGeneratedLeadInSuffix(result)
     }
 
-    private static func removeLeadingPauseFillerFromContinuationFragment(from text: String) -> String {
+    private static func removeLeadingPauseFillerFromContinuationFragment(
+        from text: String,
+        after precedingText: String
+    ) -> String {
         var candidate = text.trimmingCharacters(in: .whitespacesAndNewlines)
         var didRemoveFiller = false
         guard let regex = try? NSRegularExpression(
@@ -2676,9 +2683,11 @@ public struct RomaTranscriptionOutputFilter {
 
         let suffix = candidate
             .trimmingCharacters(in: .whitespacesAndNewlines)
-        let cleanedSuffix = removeLeadingAcknowledgementFillerFromContextOverlapContinuation(
+        var cleanedSuffix = removeLeadingAcknowledgementFillerFromContextOverlapContinuation(
             cleanDanglingGeneratedLeadInSuffix(suffix)
         )
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        cleanedSuffix = removeLeadingDiscourseFillerFromContinuationFragment(from: cleanedSuffix, after: precedingText)
             .trimmingCharacters(in: .whitespacesAndNewlines)
         guard !cleanedSuffix.isEmpty,
               !hasInternalSentenceBoundary(cleanedSuffix),

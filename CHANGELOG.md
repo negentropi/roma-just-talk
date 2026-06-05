@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Trimmed pause-plus-discourse filler chains after repeated cursor context before bracketed short fragments.
 - Trimmed stacked pause fillers after repeated cursor context before bracketed short fragments.
 - Trimmed make/call-it correction markers before bracketed final-word fragments.
 - Trimmed use-instead correction wrappers before bracketed final-word fragments.

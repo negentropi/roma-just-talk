@@ -1381,6 +1381,24 @@ function Get-RomaWindowsProofAgentSourceOutputProof {
         -Markers (Get-RomaWindowsProofAgentSourceOutputMarkers)
 }
 
+function Get-RomaWindowsAgentDoctorOutputMarkers {
+    return [ordered]@{
+        runtime_available = "runtime_available=true"
+        dictation_runtime = "dictation_runtime=WindowsDictationRuntime"
+        recorder_miniaudio = "recorder=miniaudio"
+        paste_win32_clipboard_sendinput = "paste=win32_clipboard_sendinput"
+        secret_store_dpapi = "secret_store=dpapi"
+    }
+}
+
+function Get-RomaWindowsProofAgentDoctorOutputMarkers {
+    return [ordered]@{
+        swift_core = "swift_core=true"
+        native_windows_adapters = "native_windows_adapters=true"
+        pre_roll_config = "pre_roll_seconds="
+    }
+}
+
 function Get-RomaWindowsAgentDoctorOutputProof {
     param(
         [string]$Output = ""
@@ -1388,12 +1406,8 @@ function Get-RomaWindowsAgentDoctorOutputProof {
 
     $proof = [ordered]@{
         output_present = ![string]::IsNullOrWhiteSpace($Output)
-        runtime_available = $Output.Contains("runtime_available=true")
-        dictation_runtime = $Output.Contains("dictation_runtime=WindowsDictationRuntime")
-        recorder_miniaudio = $Output.Contains("recorder=miniaudio")
-        paste_win32_clipboard_sendinput = $Output.Contains("paste=win32_clipboard_sendinput")
-        secret_store_dpapi = $Output.Contains("secret_store=dpapi")
     }
+    Add-RomaWindowsProofFields -Proof $proof -Fields (Get-RomaWindowsOutputMarkerProof -Output $Output -Markers (Get-RomaWindowsAgentDoctorOutputMarkers)) | Out-Null
     Add-RomaWindowsProofFields -Proof $proof -Fields (Get-RomaWindowsMinimumPermissionOutputProof -Output $Output) | Out-Null
     Add-RomaWindowsProofFields -Proof $proof -Fields (Get-RomaWindowsRuntimeDefaultOutputProof -Output $Output) | Out-Null
     return $proof
@@ -1406,10 +1420,8 @@ function Get-RomaWindowsProofAgentDoctorOutputProof {
 
     $proof = [ordered]@{
         output_present = ![string]::IsNullOrWhiteSpace($Output)
-        swift_core = $Output.Contains("swift_core=true")
-        native_windows_adapters = $Output.Contains("native_windows_adapters=true")
-        pre_roll_config = $Output.Contains("pre_roll_seconds=")
     }
+    Add-RomaWindowsProofFields -Proof $proof -Fields (Get-RomaWindowsOutputMarkerProof -Output $Output -Markers (Get-RomaWindowsProofAgentDoctorOutputMarkers)) | Out-Null
     Add-RomaWindowsProofFields -Proof $proof -Fields (Get-RomaWindowsProofAgentSourceOutputProof -Output $Output) | Out-Null
     Add-RomaWindowsProofFields -Proof $proof -Fields (Get-RomaWindowsRuntimeDefaultOutputProof -Output $Output) | Out-Null
     return $proof

@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Shared Windows agent and proof-agent doctor output marker parsing through proof-helper marker maps.
 - Stripped noisy question and exclamation marks from short "final word" continuation artifacts.
 - Shared the Windows proof-agent doctor runtime, native-adapter, default, and source-marker proof lines through `WindowsDoctorOutput`.
 - Shared the Windows agent doctor runtime, hotkey, paste, default, and DPAPI proof lines through `WindowsDoctorOutput`.

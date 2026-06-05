@@ -11486,6 +11486,10 @@ struct RomaCoreChecks {
         try require(
             proofCommonScript.contains("function Get-RomaWindowsAgentDoctorOutputProof") &&
                 proofCommonScript.contains("function Get-RomaWindowsProofAgentDoctorOutputProof") &&
+                proofCommonScript.contains("function Get-RomaWindowsAgentDoctorOutputMarkers") &&
+                proofCommonScript.contains("function Get-RomaWindowsProofAgentDoctorOutputMarkers") &&
+                proofCommonScript.contains("Get-RomaWindowsOutputMarkerProof -Output $Output -Markers (Get-RomaWindowsAgentDoctorOutputMarkers)") &&
+                proofCommonScript.contains("Get-RomaWindowsOutputMarkerProof -Output $Output -Markers (Get-RomaWindowsProofAgentDoctorOutputMarkers)") &&
                 proofCommonScript.contains("Get-RomaWindowsMinimumPermissionOutputProof -Output $Output") &&
                 proofCommonScript.contains("Get-RomaWindowsRuntimeDefaultOutputProof -Output $Output") &&
                 proofCommonScript.contains("Get-RomaWindowsProofAgentSourceOutputProof -Output $Output") &&
@@ -11494,6 +11498,14 @@ struct RomaCoreChecks {
                 proveScript.contains("Get-RomaWindowsNativeDoctorOutputProofs -Outputs $script:packagedNativeDoctorOutputs") &&
                 !proveScript.contains("function Get-DoctorOutputProof") &&
                 !proveScript.contains("function Get-ProofAgentDoctorOutputProof") &&
+                !proofCommonScript.contains(#"runtime_available = $Output.Contains("runtime_available=true")"#) &&
+                !proofCommonScript.contains(#"dictation_runtime = $Output.Contains("dictation_runtime=WindowsDictationRuntime")"#) &&
+                !proofCommonScript.contains(#"recorder_miniaudio = $Output.Contains("recorder=miniaudio")"#) &&
+                !proofCommonScript.contains(#"paste_win32_clipboard_sendinput = $Output.Contains("paste=win32_clipboard_sendinput")"#) &&
+                !proofCommonScript.contains(#"secret_store_dpapi = $Output.Contains("secret_store=dpapi")"#) &&
+                !proofCommonScript.contains(#"swift_core = $Output.Contains("swift_core=true")"#) &&
+                !proofCommonScript.contains(#"native_windows_adapters = $Output.Contains("native_windows_adapters=true")"#) &&
+                !proofCommonScript.contains(#"pre_roll_config = $Output.Contains("pre_roll_seconds=")"#) &&
                 proofCommonScript.contains("Get-RomaWindowsHoldTimeoutDefaultOutputProof -Output $Output") &&
                 proofCommonScript.contains("Get-RomaWindowsClipboardRestoreDefaultOutputProof -Output $Output") &&
                 checkReportScript.contains(#"Assert-Boolean -Object $Proof -Name "microphone_settings_uri" -Expected $true"#) &&

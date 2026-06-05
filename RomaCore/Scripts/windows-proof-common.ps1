@@ -312,6 +312,70 @@ function Get-RomaWindowsManifestSourceProvenance {
     }
 }
 
+function Assert-RomaWindowsPathNotPackagedArtifact {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Actual,
+        [Parameter(Mandatory = $true)]
+        [string]$Blocked,
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    if (![string]::IsNullOrWhiteSpace($Blocked) -and
+        $Actual.Equals($Blocked, [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw "$Name points at packaged mock artifact: $Actual"
+    }
+}
+
+function Get-RomaWindowsRealWhisperBackendModelExtensions {
+    return @(".bin", ".gguf")
+}
+
+function Assert-RomaWindowsRealWhisperBackendProof {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Config,
+        [Parameter(Mandatory = $true)]
+        [object]$Files
+    )
+
+    $whisperCLIPath = [string](Require-RomaWindowsObjectProperty -Object $Config -Name "whisper_cli_path" -Context "real whisper config")
+    $whisperModelPath = [string](Require-RomaWindowsObjectProperty -Object $Config -Name "whisper_model_path" -Context "real whisper config")
+    $whisperCLIName = [System.IO.Path]::GetFileName($whisperCLIPath).ToLowerInvariant()
+    $whisperModelName = [System.IO.Path]::GetFileName($whisperModelPath).ToLowerInvariant()
+    $packagedExecutableNames = @(
+        Get-RomaWindowsAgentArtifactExecutableFiles |
+            ForEach-Object { ([string]$_).ToLowerInvariant() }
+    )
+
+    if ($packagedExecutableNames -contains $whisperCLIName -or $whisperCLIName.Contains("mock")) {
+        throw "Local whisper laptop proof cannot use a mock/package whisper CLI: $whisperCLIPath"
+    }
+    if ($packagedExecutableNames -contains $whisperModelName -or
+        $whisperModelName.EndsWith(".exe") -or
+        $whisperModelName.Contains("mock")) {
+        throw "Local whisper laptop proof must point at a model file, got: $whisperModelPath"
+    }
+    $allowedModelExtensions = Get-RomaWindowsRealWhisperBackendModelExtensions
+    $whisperModelExtension = [System.IO.Path]::GetExtension($whisperModelPath).ToLowerInvariant()
+    if ($allowedModelExtensions -notcontains $whisperModelExtension) {
+        throw "Local whisper laptop proof model must be a .bin or .gguf file, got: $whisperModelPath"
+    }
+
+    $packagedMock = Require-RomaWindowsObjectProperty -Object $Files -Name "packaged_whisper_cli_mock" -Context "real whisper files"
+    $packagedAgent = Require-RomaWindowsObjectProperty -Object $Files -Name "packaged_agent" -Context "real whisper files"
+    $packagedProofAgent = Require-RomaWindowsObjectProperty -Object $Files -Name "packaged_proof_agent" -Context "real whisper files"
+    Assert-RomaWindowsPathNotPackagedArtifact -Actual $whisperCLIPath -Blocked ([string](Require-RomaWindowsObjectProperty -Object $packagedMock -Name "path" -Context "packaged_whisper_cli_mock")) -Name "whisper_cli_path"
+    Assert-RomaWindowsPathNotPackagedArtifact -Actual $whisperCLIPath -Blocked ([string](Require-RomaWindowsObjectProperty -Object $packagedAgent -Name "path" -Context "packaged_agent")) -Name "whisper_cli_path"
+    Assert-RomaWindowsPathNotPackagedArtifact -Actual $whisperCLIPath -Blocked ([string](Require-RomaWindowsObjectProperty -Object $packagedProofAgent -Name "path" -Context "packaged_proof_agent")) -Name "whisper_cli_path"
+    Assert-RomaWindowsPathNotPackagedArtifact -Actual $whisperModelPath -Blocked ([string](Require-RomaWindowsObjectProperty -Object $packagedMock -Name "path" -Context "packaged_whisper_cli_mock")) -Name "whisper_model_path"
+    Assert-RomaWindowsPathNotPackagedArtifact -Actual $whisperModelPath -Blocked ([string](Require-RomaWindowsObjectProperty -Object $packagedAgent -Name "path" -Context "packaged_agent")) -Name "whisper_model_path"
+    Assert-RomaWindowsPathNotPackagedArtifact -Actual $whisperModelPath -Blocked ([string](Require-RomaWindowsObjectProperty -Object $packagedProofAgent -Name "path" -Context "packaged_proof_agent")) -Name "whisper_model_path"
+
+    Write-Host "proof_real_whisper_backend cli=$whisperCLIPath model=$whisperModelPath"
+}
+
 function Get-RomaWindowsCurrentUserSid {
     if ([System.Environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT) {
         return ""

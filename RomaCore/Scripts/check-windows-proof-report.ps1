@@ -306,64 +306,6 @@ function Assert-ManifestSourceProof {
     Write-Host "proof_source_dirty=$($source['Dirty'])"
 }
 
-function Assert-PathNotEqual {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Actual,
-        [Parameter(Mandatory = $true)]
-        [string]$Blocked,
-        [Parameter(Mandatory = $true)]
-        [string]$Name
-    )
-
-    if (![string]::IsNullOrWhiteSpace($Blocked) -and
-        $Actual.Equals($Blocked, [System.StringComparison]::OrdinalIgnoreCase)) {
-        throw "$Name points at packaged mock artifact: $Actual"
-    }
-}
-
-function Assert-RealWhisperBackendProof {
-    param(
-        [Parameter(Mandatory = $true)]
-        [object]$Config,
-        [Parameter(Mandatory = $true)]
-        [object]$Files
-    )
-
-    $whisperCLIPath = [string](Require-Property -Object $Config -Name "whisper_cli_path")
-    $whisperModelPath = [string](Require-Property -Object $Config -Name "whisper_model_path")
-    $whisperCLIName = [System.IO.Path]::GetFileName($whisperCLIPath).ToLowerInvariant()
-    $whisperModelName = [System.IO.Path]::GetFileName($whisperModelPath).ToLowerInvariant()
-
-    if ($whisperCLIName -eq "romawhisperclimock.exe" -or $whisperCLIName.Contains("mock")) {
-        throw "Local whisper laptop proof cannot use a mock whisper CLI: $whisperCLIPath"
-    }
-    if ($whisperModelName -eq "romawindowsagent.exe" -or
-        $whisperModelName -eq "romaproofagent.exe" -or
-        $whisperModelName -eq "romawhisperclimock.exe" -or
-        $whisperModelName.EndsWith(".exe") -or
-        $whisperModelName.Contains("mock")) {
-        throw "Local whisper laptop proof must point at a model file, got: $whisperModelPath"
-    }
-    $allowedModelExtensions = @(".bin", ".gguf")
-    $whisperModelExtension = [System.IO.Path]::GetExtension($whisperModelPath).ToLowerInvariant()
-    if ($allowedModelExtensions -notcontains $whisperModelExtension) {
-        throw "Local whisper laptop proof model must be a .bin or .gguf file, got: $whisperModelPath"
-    }
-
-    $packagedMock = Require-Property -Object $Files -Name "packaged_whisper_cli_mock"
-    $packagedAgent = Require-Property -Object $Files -Name "packaged_agent"
-    $packagedProofAgent = Require-Property -Object $Files -Name "packaged_proof_agent"
-    Assert-PathNotEqual -Actual $whisperCLIPath -Blocked ([string](Require-Property -Object $packagedMock -Name "path")) -Name "whisper_cli_path"
-    Assert-PathNotEqual -Actual $whisperCLIPath -Blocked ([string](Require-Property -Object $packagedAgent -Name "path")) -Name "whisper_cli_path"
-    Assert-PathNotEqual -Actual $whisperCLIPath -Blocked ([string](Require-Property -Object $packagedProofAgent -Name "path")) -Name "whisper_cli_path"
-    Assert-PathNotEqual -Actual $whisperModelPath -Blocked ([string](Require-Property -Object $packagedMock -Name "path")) -Name "whisper_model_path"
-    Assert-PathNotEqual -Actual $whisperModelPath -Blocked ([string](Require-Property -Object $packagedAgent -Name "path")) -Name "whisper_model_path"
-    Assert-PathNotEqual -Actual $whisperModelPath -Blocked ([string](Require-Property -Object $packagedProofAgent -Name "path")) -Name "whisper_model_path"
-
-    Write-Host "proof_real_whisper_backend cli=$whisperCLIPath model=$whisperModelPath"
-}
-
 function Assert-NumberGreaterThan {
     param(
         [Parameter(Mandatory = $true)]
@@ -1089,7 +1031,7 @@ if ($RequireWhisperConfig) {
 
 if ($RequireRealWhisperBackend) {
     $config = Require-Property -Object $report -Name "config"
-    Assert-RealWhisperBackendProof -Config $config -Files $files
+    Assert-RomaWindowsRealWhisperBackendProof -Config $config -Files $files
 }
 
 if ($RequireDictation) {

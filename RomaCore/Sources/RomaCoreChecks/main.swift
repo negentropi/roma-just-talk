@@ -11792,12 +11792,19 @@ struct RomaCoreChecks {
             "Windows cloud laptop proof should reject private, local, and reserved endpoints"
         )
         try require(
-            checkReportScript.contains(#"$whisperCLIName.Contains("mock")"#) &&
-                checkReportScript.contains(#"$whisperModelName.Contains("mock")"#) &&
-                checkReportScript.contains(#"$allowedModelExtensions = @(".bin", ".gguf")"#) &&
-                checkReportScript.contains("Local whisper laptop proof model must be a .bin or .gguf file") &&
-                checkReportScript.contains(#"Assert-PathNotEqual -Actual $whisperCLIPath -Blocked ([string](Require-Property -Object $packagedAgent -Name "path")) -Name "whisper_cli_path""#) &&
-                checkReportScript.contains(#"Assert-PathNotEqual -Actual $whisperCLIPath -Blocked ([string](Require-Property -Object $packagedProofAgent -Name "path")) -Name "whisper_cli_path""#),
+            proofCommonScript.contains("function Assert-RomaWindowsRealWhisperBackendProof") &&
+                proofCommonScript.contains("function Assert-RomaWindowsPathNotPackagedArtifact") &&
+                proofCommonScript.contains("function Get-RomaWindowsRealWhisperBackendModelExtensions") &&
+                proofCommonScript.contains(#"$packagedExecutableNames -contains $whisperCLIName"#) &&
+                proofCommonScript.contains(#"$whisperCLIName.Contains("mock")"#) &&
+                proofCommonScript.contains(#"$whisperModelName.Contains("mock")"#) &&
+                proofCommonScript.contains("Get-RomaWindowsAgentArtifactExecutableFiles") &&
+                proofCommonScript.contains(#"$allowedModelExtensions = Get-RomaWindowsRealWhisperBackendModelExtensions"#) &&
+                proofCommonScript.contains("Local whisper laptop proof model must be a .bin or .gguf file") &&
+                proofCommonScript.contains(#"Assert-RomaWindowsPathNotPackagedArtifact -Actual $whisperCLIPath"#) &&
+                checkReportScript.contains("Assert-RomaWindowsRealWhisperBackendProof -Config $config -Files $files") &&
+                !checkReportScript.contains("function Assert-RealWhisperBackendProof") &&
+                !checkReportScript.contains("function Assert-PathNotEqual"),
             "Windows local whisper laptop proof should reject mock/package executable backends and require real model files"
         )
         try require(

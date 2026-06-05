@@ -2257,6 +2257,57 @@ function Get-RomaWindowsAgentConfigFileProof {
     return $proof
 }
 
+function Get-RomaWindowsShortcutProof {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path,
+        [Parameter(Mandatory = $true)]
+        [string]$RunScriptPath,
+        [string]$ConfigPath = "",
+        [Parameter(Mandatory = $true)]
+        [string]$WorkingDirectory
+    )
+
+    $proof = Get-RomaWindowsFileProof -Path $Path
+    if (!$proof["exists"] -or
+        [System.Environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT) {
+        return $proof
+    }
+
+    $shell = New-Object -ComObject WScript.Shell
+    $shortcut = $shell.CreateShortcut($Path)
+    $targetPath = [string]$shortcut.TargetPath
+    $arguments = [string]$shortcut.Arguments
+    $savedWorkingDirectory = [string]$shortcut.WorkingDirectory
+    $expectedFileArgument = "-File `"$RunScriptPath`""
+    $expectedInstallDirArgument = "-InstallDir `"$WorkingDirectory`""
+    $expectedConfigArgument = "-ConfigPath `"$ConfigPath`""
+
+    $proof["target_path"] = $targetPath
+    $proof["arguments"] = $arguments
+    $proof["working_directory"] = $savedWorkingDirectory
+    $proof["description"] = [string]$shortcut.Description
+    $proof["window_style"] = [int]$shortcut.WindowStyle
+    $proof["target_is_powershell"] = $targetPath.EndsWith("powershell.exe", [System.StringComparison]::OrdinalIgnoreCase)
+    $proof["references_run_script"] = ![string]::IsNullOrWhiteSpace($RunScriptPath) -and (Test-RomaWindowsContainsText -Text $arguments -Needle $RunScriptPath)
+    $proof["references_install_dir"] = ![string]::IsNullOrWhiteSpace($WorkingDirectory) -and (Test-RomaWindowsContainsText -Text $arguments -Needle $WorkingDirectory)
+    $proof["references_config_path"] = ![string]::IsNullOrWhiteSpace($ConfigPath) -and (Test-RomaWindowsContainsText -Text $arguments -Needle $ConfigPath)
+    $proof["expected_file_argument"] = $expectedFileArgument
+    $proof["expected_install_dir_argument"] = $expectedInstallDirArgument
+    $proof["expected_config_argument"] = $expectedConfigArgument
+    $proof["has_exact_file_argument"] = Test-RomaWindowsContainsText -Text $arguments -Needle $expectedFileArgument
+    $proof["has_install_dir_argument"] = Test-RomaWindowsContainsText -Text $arguments -Needle "-InstallDir"
+    $proof["has_exact_install_dir_argument"] = Test-RomaWindowsContainsText -Text $arguments -Needle $expectedInstallDirArgument
+    $proof["has_config_path_argument"] = Test-RomaWindowsContainsText -Text $arguments -Needle "-ConfigPath"
+    $proof["has_exact_config_argument"] = Test-RomaWindowsContainsText -Text $arguments -Needle $expectedConfigArgument
+    $proof["has_no_profile_argument"] = Test-RomaWindowsContainsText -Text $arguments -Needle "-NoProfile"
+    $proof["has_execution_policy_bypass"] = Test-RomaWindowsContainsText -Text $arguments -Needle "-ExecutionPolicy Bypass"
+    $proof["runs_listener"] = Test-RomaWindowsContainsText -Text $arguments -Needle "-Listen"
+    $proof["working_directory_is_install_dir"] = $savedWorkingDirectory.Equals($WorkingDirectory, [System.StringComparison]::OrdinalIgnoreCase)
+
+    return $proof
+}
+
 function Add-RomaWindowsAgentConfigurationArgs {
     param(
         [string[]]$Arguments = @(),

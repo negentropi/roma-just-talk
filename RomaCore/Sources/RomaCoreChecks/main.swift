@@ -12832,9 +12832,12 @@ struct RomaCoreChecks {
             "Windows shortcuts should pass the exact install dir to the launcher"
         )
         try require(
-            proveScript.contains(#"$expectedInstallDirArgument = "-InstallDir `"$WorkingDirectory`"""#) &&
-                proveScript.contains(#"$proof["references_install_dir"]"#) &&
-                proveScript.contains(#"$proof["has_exact_install_dir_argument"]"#) &&
+            proofCommonScript.contains("function Get-RomaWindowsShortcutProof") &&
+                proofCommonScript.contains(#"$expectedInstallDirArgument = "-InstallDir `"$WorkingDirectory`"""#) &&
+                proofCommonScript.contains(#"$proof["references_install_dir"]"#) &&
+                proofCommonScript.contains(#"$proof["has_exact_install_dir_argument"]"#) &&
+                proveScript.contains("Get-RomaWindowsShortcutProof") &&
+                !proveScript.contains("function Get-ShortcutProof") &&
                 checkReportScript.contains(#"Assert-Boolean -Object $Proof -Name "references_install_dir" -Expected $true"#) &&
                 checkReportScript.contains(#"Assert-Boolean -Object $Proof -Name "has_exact_install_dir_argument" -Expected $true"#),
             "Windows shortcut proof reports should require exact install-dir launcher arguments"

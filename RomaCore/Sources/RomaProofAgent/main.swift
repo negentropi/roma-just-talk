@@ -194,11 +194,11 @@ struct RomaProofAgent {
         let valueEnvironmentName = try options.value(after: "--value-env")
 
         guard RomaCommandLineText.isValidEnvironmentName(valueEnvironmentName) else {
-            throw AgentError.invalidOptionValue("--value-env")
+            throw RomaCommandLineOptionsError.invalidOptionValue("--value-env")
         }
         guard let secret = ProcessInfo.processInfo.environment[valueEnvironmentName],
               !secret.isEmpty else {
-            throw AgentError.missingEnvironmentValue(valueEnvironmentName)
+            throw TranscriptionAPIKeySourceError.missingEnvironmentValue(valueEnvironmentName)
         }
 
         let store = WindowsDPAPISecretStore(directoryURL: directoryURL)
@@ -242,7 +242,7 @@ struct RomaProofAgent {
         let focusDelaySeconds = try options.doubleValue(after: "--focus-delay", default: 0)
         let targetProcessID = try options.optionalUInt32Value(after: "--target-process-id")
         guard focusDelaySeconds >= 0 else {
-            throw AgentError.invalidOptionValue("--focus-delay")
+            throw RomaCommandLineOptionsError.invalidOptionValue("--focus-delay")
         }
 
         #if os(Windows)
@@ -549,7 +549,7 @@ struct RomaProofAgent {
         apiKeySource: TranscriptionAPIKeySource
     ) throws -> OpenAICompatibleTranscriptionService {
         guard let endpointURL = URL(string: endpointText), endpointURL.scheme != nil else {
-            throw AgentError.invalidOptionValue("--endpoint")
+            throw RomaCommandLineOptionsError.invalidOptionValue("--endpoint")
         }
         let apiKey = try apiKeySource.resolve()
 
@@ -572,7 +572,7 @@ struct RomaProofAgent {
         } else if allowPlaceholders {
             executablePath = defaultWhisperCLIPath
         } else {
-            throw AgentError.missingOption("--whisper-cli")
+            throw RomaCommandLineOptionsError.missingOption("--whisper-cli")
         }
 
         let modelPath: String
@@ -581,7 +581,7 @@ struct RomaProofAgent {
         } else if allowPlaceholders {
             modelPath = defaultWhisperModelPath
         } else {
-            throw AgentError.missingOption("--whisper-model")
+            throw RomaCommandLineOptionsError.missingOption("--whisper-model")
         }
 
         let outputDirectory = options.optionalValue(after: "--output-dir")
@@ -715,23 +715,11 @@ struct RomaProofAgent {
 }
 
 private enum AgentError: Error, CustomStringConvertible {
-    case missingOption(String)
-    case invalidOptionValue(String)
-    case missingEnvironmentValue(String)
-    case conflictingOptions(String)
     case secretProofFailed(String)
     case unsupportedPlatform(String)
 
     var description: String {
         switch self {
-        case .missingOption(let option):
-            return "missing required option \(option)"
-        case .invalidOptionValue(let option):
-            return "invalid value for option \(option)"
-        case .missingEnvironmentValue(let name):
-            return "missing environment value \(name)"
-        case .conflictingOptions(let message):
-            return "conflicting options: \(message)"
         case .secretProofFailed(let message):
             return message
         case .unsupportedPlatform(let message):
@@ -753,7 +741,7 @@ private final class ProofRecorder: RollingRecorder, @unchecked Sendable {
 
     func finishRecording() async throws -> RecordedAudio {
         guard let outputURL else {
-            throw AgentError.invalidOptionValue("--out")
+            throw RomaCommandLineOptionsError.invalidOptionValue("--out")
         }
 
         let samples = Array(repeating: Int16(0), count: preRollConfiguration.outputFormat.sampleRate / 10)

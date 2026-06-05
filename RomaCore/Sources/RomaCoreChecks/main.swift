@@ -9873,6 +9873,10 @@ struct RomaCoreChecks {
                 proofAgentSource.contains("try options.doubleValue(after: \"--focus-delay\"") &&
                 proofAgentSource.contains("RomaCommandLineText.wordReplacementRules(from: options)") &&
                 proofAgentSource.contains("RomaCommandLineText.oneLine(result.text)") &&
+                proofAgentSource.contains("throw RomaCommandLineOptionsError.invalidOptionValue(\"--focus-delay\")") &&
+                proofAgentSource.contains("throw RomaCommandLineOptionsError.invalidOptionValue(\"--endpoint\")") &&
+                proofAgentSource.contains("throw RomaCommandLineOptionsError.missingOption(\"--whisper-cli\")") &&
+                proofAgentSource.contains("throw TranscriptionAPIKeySourceError.missingEnvironmentValue") &&
                 !proofAgentSource.contains("private static func value(after option") &&
                 !proofAgentSource.contains("private static func optionalValue(after option") &&
                 !proofAgentSource.contains("private static func values(after option") &&
@@ -9880,8 +9884,14 @@ struct RomaCoreChecks {
                 !proofAgentSource.contains("private static func isValidEnvironmentName") &&
                 !proofAgentSource.contains("private static func oneLine") &&
                 !proofAgentSource.contains("private static func positiveDoubleValue") &&
-                !proofAgentSource.contains("private static func optionalUInt32Value"),
-            "Windows proof agent should reuse shared command-line parsing and text formatting"
+                !proofAgentSource.contains("private static func optionalUInt32Value") &&
+                !proofAgentSource.contains("AgentError.missingOption") &&
+                !proofAgentSource.contains("AgentError.invalidOptionValue") &&
+                !proofAgentSource.contains("AgentError.conflictingOptions") &&
+                !proofAgentSource.contains("case missingOption(") &&
+                !proofAgentSource.contains("case invalidOptionValue(") &&
+                !proofAgentSource.contains("case conflictingOptions("),
+            "Windows proof agent should reuse shared command-line parsing, text formatting, and option errors"
         )
         try require(
             doctorOutputSource.contains(#""windows_dictation_runtime_uses_pipeline_source=true""#) &&

@@ -11057,6 +11057,10 @@ struct RomaCoreChecks {
             "Windows proof-set checker should print matched proof session evidence"
         )
         try require(
+            !checkSetScript.contains("function Assert-ReportFileProof"),
+            "Windows proof-set checker should not retain unused file-proof validators"
+        )
+        try require(
             workflowScript.contains("Verify clean Windows package provenance"),
             "Windows CI should explicitly verify clean package provenance"
         )

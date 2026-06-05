@@ -319,32 +319,6 @@ function Assert-ReportBoolean {
     Write-Host "proof_set_bool=$ReportName.$Name value=$actual"
 }
 
-function Assert-ReportFileProof {
-    param(
-        [Parameter(Mandatory = $true)]
-        [object]$Proof,
-        [Parameter(Mandatory = $true)]
-        [string]$Name,
-        [int64]$MinimumBytes = 1
-    )
-
-    $path = [string](Require-ReportProperty -Report $Proof -Name "path" -ReportName $Name)
-    $exists = [bool](Require-ReportProperty -Report $Proof -Name "exists" -ReportName $Name)
-    $bytes = [int64](Require-ReportProperty -Report $Proof -Name "bytes" -ReportName $Name)
-
-    if ([string]::IsNullOrWhiteSpace($path)) {
-        throw "Proof set file proof $Name has empty path"
-    }
-    if (!$exists) {
-        throw "Proof set file proof $Name does not exist: $path"
-    }
-    if ($bytes -lt $MinimumBytes) {
-        throw "Proof set file proof $Name has too few bytes: $path bytes=$bytes minimum=$MinimumBytes"
-    }
-
-    Write-Host "proof_set_file=$Name path=$path bytes=$bytes"
-}
-
 function Get-ReportPackageFingerprint {
     param(
         [Parameter(Mandatory = $true)]

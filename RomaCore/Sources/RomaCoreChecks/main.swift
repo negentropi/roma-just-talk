@@ -10210,6 +10210,7 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Get-RomaWindowsProofProfileAssertions") &&
                 proofCommonScript.contains("function Get-RomaWindowsInstalledProofProfileAssertions") &&
                 proofCommonScript.contains("function Get-RomaWindowsProofReportProfileChecks") &&
+                proofCommonScript.contains("function Add-RomaWindowsProofReportPathRequiredProfiles") &&
                 proofCommonScript.contains("function Get-RomaWindowsProofSetSpecs") &&
                 proofCommonScript.contains("function Add-RomaWindowsProofSetRequiredProfiles") &&
                 proofCommonScript.contains(#"artifact_smoke = [ordered]@{"#) &&
@@ -10231,9 +10232,11 @@ struct RomaCoreChecks {
                 checkSetScript.contains(#"-ExcludedProfileNames @("laptop_preflight")"#) &&
                 checkSetScript.contains(#"Add-RomaWindowsProofSetRequiredProfiles -Required $required -Name "artifact_smoke""#) &&
                 checkSetScript.contains(#"Add-RomaWindowsProofSetRequiredProfiles -Required $required -Name "full_laptop""#) &&
+                checkSetScript.contains(#"Add-RomaWindowsProofReportPathRequiredProfiles -Required $required -Paths $Paths"#) &&
+                checkSetScript.contains("Get-ProofReportProfileChecks -IncludePathRequirements $true") &&
                 checkSetScript.contains("Get-RomaWindowsProofReportProfileChecks") &&
-                checkSetScript.contains("-Paths (New-ProofReportProfilePathMap)") &&
-                checkSetScript.contains("-Required (New-ProofReportProfileRequiredMap)") &&
+                checkSetScript.contains("-Paths $paths") &&
+                checkSetScript.contains("-Required (New-ProofReportProfileRequiredMap -Paths $paths -IncludePathRequirements $IncludePathRequirements)") &&
                 checkSetScript.contains("function Test-AnyRequiredProofReportProfile") &&
                 checkSetScript.contains("function Invoke-RequiredProofReportProfileChecks") &&
                 proofCommonScript.contains(#"Profile = [string]$profiles[$name]["profile"]"#) &&
@@ -10270,6 +10273,12 @@ struct RomaCoreChecks {
                 checkSetScript.contains(#"Get-RomaWindowsProofSetOkMarker -Name "laptop_preflight""#) &&
                 checkSetScript.contains(#"Get-RomaWindowsProofSetOkMarker -Name "full_laptop""#) &&
                 checkSetScript.contains(#"Get-RomaWindowsProofSetOkMarker -Name "artifact_smoke""#) &&
+                !checkSetScript.contains(#"$RequireDoctorOnly = ![string]::IsNullOrWhiteSpace($DoctorOnlyReportPath)"#) &&
+                !checkSetScript.contains(#"$RequireCloudDictation = ![string]::IsNullOrWhiteSpace($CloudDictationReportPath)"#) &&
+                !checkSetScript.contains(#"$RequireLocalWhisperDictation = ![string]::IsNullOrWhiteSpace($LocalWhisperDictationReportPath)"#) &&
+                !checkSetScript.contains(#"$RequireLocalWhisperNotepadPaste = ![string]::IsNullOrWhiteSpace($LocalWhisperNotepadPasteReportPath)"#) &&
+                !checkSetScript.contains(#"$RequireLaptopPreflight = ![string]::IsNullOrWhiteSpace($LaptopPreflightReportPath)"#) &&
+                !checkSetScript.contains(#"$RequirePackagedWhisperMockInstall = ![string]::IsNullOrWhiteSpace($PackagedWhisperMockInstallReportPath)"#) &&
                 !checkSetScript.contains(#"$RequireCloudDictation = $true"#) &&
                 !checkSetScript.contains(#"$RequireLocalWhisperDictation = $true"#) &&
                 !checkSetScript.contains(#"$RequireLaptopPreflight = $true"#) &&

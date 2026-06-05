@@ -635,6 +635,23 @@ function Get-RomaWindowsProofReportProfileChecks {
     return $checks
 }
 
+function Add-RomaWindowsProofReportPathRequiredProfiles {
+    param(
+        [Parameter(Mandatory = $true)]
+        [hashtable]$Required,
+        [Parameter(Mandatory = $true)]
+        [hashtable]$Paths
+    )
+
+    $profiles = Get-RomaWindowsProofProfileSpecs
+    foreach ($profileName in $profiles.Keys) {
+        if ($Paths.ContainsKey($profileName) -and ![string]::IsNullOrWhiteSpace([string]$Paths[$profileName])) {
+            $Required[$profileName] = $true
+        }
+    }
+    return $Required
+}
+
 function Get-RomaWindowsProofSetSpecs {
     return [ordered]@{
         artifact_smoke = [ordered]@{

@@ -75,6 +75,11 @@ function New-ProofReportProfilePathMap {
 }
 
 function New-ProofReportProfileRequiredMap {
+    param(
+        [hashtable]$Paths = @{},
+        [bool]$IncludePathRequirements = $false
+    )
+
     $required = @{
         doctor_only = [bool]$RequireDoctorOnly
         cloud_dictation = [bool]$RequireCloudDictation
@@ -82,6 +87,9 @@ function New-ProofReportProfileRequiredMap {
         local_whisper_notepad_paste = [bool]$RequireLocalWhisperNotepadPaste
         laptop_preflight = [bool]$RequireLaptopPreflight
         packaged_whisper_mock_install = [bool]$RequirePackagedWhisperMockInstall
+    }
+    if ($IncludePathRequirements) {
+        Add-RomaWindowsProofReportPathRequiredProfiles -Required $required -Paths $Paths | Out-Null
     }
     if ($RequireArtifactSmokeProof) {
         Add-RomaWindowsProofSetRequiredProfiles -Required $required -Name "artifact_smoke" | Out-Null
@@ -93,9 +101,14 @@ function New-ProofReportProfileRequiredMap {
 }
 
 function Get-ProofReportProfileChecks {
+    param(
+        [bool]$IncludePathRequirements = $false
+    )
+
+    $paths = New-ProofReportProfilePathMap
     return Get-RomaWindowsProofReportProfileChecks `
-        -Paths (New-ProofReportProfilePathMap) `
-        -Required (New-ProofReportProfileRequiredMap)
+        -Paths $paths `
+        -Required (New-ProofReportProfileRequiredMap -Paths $paths -IncludePathRequirements $IncludePathRequirements)
 }
 
 function Test-AnyRequiredProofReportProfile {
@@ -817,13 +830,7 @@ $profileChecks = Get-ProofReportProfileChecks
 $hasExplicitRequirement = Test-AnyRequiredProofReportProfile -Checks $profileChecks
 
 if (!$hasExplicitRequirement) {
-    $RequireDoctorOnly = ![string]::IsNullOrWhiteSpace($DoctorOnlyReportPath)
-    $RequireCloudDictation = ![string]::IsNullOrWhiteSpace($CloudDictationReportPath)
-    $RequireLocalWhisperDictation = ![string]::IsNullOrWhiteSpace($LocalWhisperDictationReportPath)
-    $RequireLocalWhisperNotepadPaste = ![string]::IsNullOrWhiteSpace($LocalWhisperNotepadPasteReportPath)
-    $RequireLaptopPreflight = ![string]::IsNullOrWhiteSpace($LaptopPreflightReportPath)
-    $RequirePackagedWhisperMockInstall = ![string]::IsNullOrWhiteSpace($PackagedWhisperMockInstallReportPath)
-    $profileChecks = Get-ProofReportProfileChecks
+    $profileChecks = Get-ProofReportProfileChecks -IncludePathRequirements $true
 }
 
 $hasRequirement = Test-AnyRequiredProofReportProfile -Checks $profileChecks

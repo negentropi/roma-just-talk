@@ -615,6 +615,7 @@ public struct RomaTranscriptionOutputFilter {
         continuationFragmentLeadingAccuracyCorrectionPattern
     ]
     private static let punctuatedContinuationCorrectionPrefixPattern = #"(?i)^\s*((?:(?:actually[ \t]*(?:[,;:…]+|\.\.\.)[ \t]*)?(?:no|nope|nah)|actually)[ \t]*(?:[,;:…]+|\.\.\.)[ \t]*)(.+)$"#
+    private static let continuationFragmentUseInsteadCorrectionPattern = #"(?i)^\s*(?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]*(?:(?:[,;:…]+|\.\.\.)[ \t]*)?)?use[ \t]+(.+?)[ \t]+(?:instead|rather)(?:[ \t]*(?:[,;:…]+|\.\.\.|[.!?]))?\s*$"#
     private static let standaloneDiscourseFillerPattern = #"(?i)^\s*you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?[ \t]*[.,;:…]*\s*$"#
     private static let blockedPreviousWordsForTerminalYouKnow: Set<String> = [
         "do", "does", "did", "don't", "if", "know", "let", "should", "to", "whether", "will", "would"
@@ -1651,6 +1652,7 @@ public struct RomaTranscriptionOutputFilter {
                 from: polishedText,
                 after: activeContext.precedingText
             )
+            polishedText = removeUseInsteadContinuationCorrectionWrapper(from: polishedText)
             polishedText = replaceUnpunctuatedCorrectionMarkerInContinuation(from: polishedText)
             polishedText = applyTrailingSpokenCodeCaseCommandInContinuation(from: polishedText)
             return restoreInsertionStructuralWhitespace(
@@ -2179,6 +2181,30 @@ public struct RomaTranscriptionOutputFilter {
             )
             .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
             .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private static func removeUseInsteadContinuationCorrectionWrapper(from text: String) -> String {
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let regex = try? NSRegularExpression(pattern: continuationFragmentUseInsteadCorrectionPattern),
+              let match = regex.firstMatch(in: trimmedText, range: NSRange(trimmedText.startIndex..., in: trimmedText)),
+              match.numberOfRanges >= 2,
+              let candidateRange = Range(match.range(at: 1), in: trimmedText) else {
+            return text
+        }
+
+        let candidate = String(trimmedText[candidateRange])
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        var cleanedCandidate = unwrapNoisyNestedContinuationBoundaryFragment(from: candidate)
+        cleanedCandidate = unwrapPlainSquareBracketedBoundaryContinuationFragment(from: cleanedCandidate)
+        cleanedCandidate = unwrapPlainNonASCIIBoundaryContinuationFragment(from: cleanedCandidate)
+        cleanedCandidate = removeTrailingNoisyFragmentPunctuation(from: cleanedCandidate)
+        guard !cleanedCandidate.isEmpty,
+              isShortFragment(cleanedCandidate) ||
+                isNoisyFinalWordContinuationFragment(cleanedCandidate) else {
+            return text
+        }
+
+        return cleanedCandidate
     }
 
     private static func removeLeadingDiscourseFillerFromContinuationFragment(

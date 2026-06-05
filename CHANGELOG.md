@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Trimmed wait-nevermind correction lead-ins before bracketed final-word fragments.
 - Trimmed omit correction lead-ins before bracketed final-word fragments.
 - Trimmed skip/leave-out correction lead-ins before bracketed final-word fragments.
 - Trimmed object-form correction lead-ins such as "never mind that" and "forget about that" before bracketed final-word fragments.

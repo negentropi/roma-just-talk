@@ -11209,15 +11209,26 @@ struct RomaCoreChecks {
         )
         try require(
             proofCommonScript.contains("function Write-RomaWindowsHoldDictationPrompt") &&
+                proofCommonScript.contains("function Write-RomaWindowsDictationOperatorPrompt") &&
                 proofCommonScript.contains("focus_target=normal_text_field_or_notepad") &&
                 proofCommonScript.contains("speak_before_pressing_hotkey=true") &&
                 proofCommonScript.contains("release_hotkey_to_finish=true") &&
+                proofCommonScript.contains("toggle_hotkey=Ctrl+Shift+R") &&
+                proofCommonScript.contains("speak_after_hotkey=true") &&
+                proofCommonScript.contains("paste_focus_target=normal_integrity_text_field") &&
                 proofCommonScript.contains("hold_timeout_seconds=$HoldTimeoutSeconds") &&
                 proofCommonScript.contains("listener_session_count=$ListenerSessionCount") &&
                 proveScript.contains("Write-RomaWindowsHoldDictationPrompt") &&
                 proveScript.contains("-ListenerSessionCount 1") &&
                 laptopProofScript.contains("Write-RomaWindowsHoldDictationPrompt") &&
                 laptopProofScript.contains("-HoldTimeoutSeconds $HoldTimeoutSeconds") &&
+                windowsProofScript.contains("Write-RomaWindowsDictationOperatorPrompt") &&
+                windowsProofScript.contains(#"-Name "source_dictation_proof""#) &&
+                windowsProofScript.contains(#"-Name "source_windows_agent_dictation""#) &&
+                smokeScript.contains("Write-RomaWindowsDictationOperatorPrompt") &&
+                smokeScript.contains(#"-Name "installed_agent_dictation""#) &&
+                !windowsProofScript.contains("Say a phrase before Ctrl+Shift+R") &&
+                !smokeScript.contains("Say a phrase before Ctrl+Shift+R") &&
                 !proveScript.contains("function Write-HoldDictationPrompt") &&
                 !laptopProofScript.contains("function Write-HoldDictationPrompt"),
             "Windows proof scripts should share hold-to-talk operator prompts"

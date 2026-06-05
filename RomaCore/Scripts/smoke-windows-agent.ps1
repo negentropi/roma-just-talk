@@ -254,14 +254,11 @@ Invoke-Step "agent config doctor" {
 
 if ($RunDictation) {
     Invoke-Step "agent dictate" {
-        if ($shouldUseHoldHook) {
-            Write-Host "Say a phrase before Ctrl+Shift+R, hold Ctrl+Shift+R while speaking, then release it."
-        } else {
-            Write-Host "Say a phrase before Ctrl+Shift+R, press Ctrl+Shift+R, then say a phrase after it."
-        }
-        if ($PasteDictation) {
-            Write-Host "Focus Notepad or another normal-integrity text field before transcription completes."
-        }
+        Write-RomaWindowsDictationOperatorPrompt `
+            -Name "installed_agent_dictation" `
+            -UseHoldHook $shouldUseHoldHook `
+            -HoldTimeoutSeconds $HoldTimeoutSeconds `
+            -PasteDictation $PasteDictation.IsPresent
 
         $dictateOutput = & $AgentPath dictate --config $ConfigPath 2>&1 | Out-String
         Write-Host $dictateOutput

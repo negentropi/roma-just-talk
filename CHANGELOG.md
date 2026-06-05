@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Shared Windows dictation operator prompts across source proof and installed smoke paths.
 - Added operator action steps to the generated Windows laptop proof guide from the shared proof helper.
 - Removed generated terminal punctuation after spoken line-break and paragraph-break commands, preserved trailing structural newlines through insertion polish, and allowed standalone newline output to paste.
 - Treated "I am/was trying to say", "I was going to say", and "I was gonna say" as guarded correction markers in post-STT cleanup.

@@ -519,14 +519,11 @@ try {
 
         $dictationProof = Join-Path $OutputDir "dictation-proof.wav"
         Invoke-Step "windows dictation proof" {
-            if ($UseHoldHook) {
-                Write-Host "Say a phrase before Ctrl+Shift+R, hold Ctrl+Shift+R while speaking, then release it."
-            } else {
-                Write-Host "Say a phrase before Ctrl+Shift+R, press Ctrl+Shift+R, then say a phrase after it."
-            }
-            if ($PasteDictation) {
-                Write-Host "Focus Notepad or another normal-integrity text field before transcription completes."
-            }
+            Write-RomaWindowsDictationOperatorPrompt `
+                -Name "source_dictation_proof" `
+                -UseHoldHook $UseHoldHook.IsPresent `
+                -HoldTimeoutSeconds $HoldTimeoutSeconds `
+                -PasteDictation $PasteDictation.IsPresent
             $dictationArgs = New-WindowsDictationProofArgs -OutputPath $dictationProof
             swift @dictationArgs
             Assert-RomaWindowsFileWithMinimumBytes -Path $dictationProof -MinimumBytes 45
@@ -544,14 +541,11 @@ try {
 
         $agentProof = Join-Path $OutputDir "windows-agent-dictation.wav"
         Invoke-Step "windows agent dictate" {
-            if ($UseHoldHook) {
-                Write-Host "Say a phrase before Ctrl+Shift+R, hold Ctrl+Shift+R while speaking, then release it."
-            } else {
-                Write-Host "Say a phrase before Ctrl+Shift+R, press Ctrl+Shift+R, then say a phrase after it."
-            }
-            if ($PasteDictation) {
-                Write-Host "Focus Notepad or another normal-integrity text field before transcription completes."
-            }
+            Write-RomaWindowsDictationOperatorPrompt `
+                -Name "source_windows_agent_dictation" `
+                -UseHoldHook $UseHoldHook.IsPresent `
+                -HoldTimeoutSeconds $HoldTimeoutSeconds `
+                -PasteDictation $PasteDictation.IsPresent
             $agentConfigArgs = New-WindowsAgentConfigArgs -ConfigPath $agentConfig -OutputPath $agentProof
             $configOutput = swift @agentConfigArgs 2>&1 | Out-String
             if ($LASTEXITCODE -ne 0) {

@@ -594,6 +594,7 @@ public struct RomaTranscriptionOutputFilter {
     private static let continuationFragmentLeadingAccuracyCorrectionPattern = #"(?i)^\s*((?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?(?:(?:that|this|it)(?:[ \t]+(?:is|was)|['’]s)?[ \t]+)?not[ \t]+(?:correct|accurate))(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let continuationFragmentLeadingWasntItCorrectionPattern = #"(?i)^\s*((?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?(?:(?:that|this|it)[ \t]+)?(?:wasn['’]t|was[ \t]+not)[ \t]+(?:that|this|it))(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let continuationFragmentLeadingWrongUtteranceCorrectionPattern = #"(?i)^\s*((?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?(?:(?:that|this|it)[ \t]+came[ \t]+out[ \t]+wrong|(?:i[ \t]+)?said[ \t]+(?:(?:that|this|it)[ \t]+)?wrong|wrong[ \t]+one))(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
+    private static let continuationFragmentLeadingRephraseCorrectionPattern = #"(?i)^\s*((?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?(?:let[ \t]+me[ \t]+(?:phrase[ \t]+(?:that|this|it)[ \t]+differently|say[ \t]+(?:that|this|it)[ \t]+differently|try[ \t]+(?:that|this|it)[ \t]+again)|(?:i(?:['’]ll|[ \t]+will))[ \t]+(?:say|try)[ \t]+(?:that|this|it)[ \t]+again|(?:or[ \t]+)?rather))(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let continuationFragmentLeadingWhatISaidReplacementCorrectionPattern = #"(?i)^\s*((?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?(?:replace|change|correct|swap|switch|set|turn)[ \t]+what[ \t]+i(?:[ \t]+just)?[ \t]+said[ \t]+(?:with|to|into))(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let continuationFragmentLeadingWhatISaidCorrectionPattern = #"(?i)^\s*((?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?(?:scratch|strike|delete|remove|erase|undo|cancel|disregard|ignore|forget|cut|drop)[ \t]+what[ \t]+i(?:[ \t]+just)?[ \t]+said)(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let continuationFragmentLeadingRestartCorrectionPattern = #"(?i)^\s*((?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?(?:(?:let[ \t]+me|let['’]s)[ \t]+)?(?:start[ \t]+over|try[ \t]+again|redo[ \t]+(?:that|this|it)))(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
@@ -612,6 +613,7 @@ public struct RomaTranscriptionOutputFilter {
         continuationFragmentLeadingRestartCorrectionPattern,
         continuationFragmentLeadingWhatISaidReplacementCorrectionPattern,
         continuationFragmentLeadingWhatISaidCorrectionPattern,
+        continuationFragmentLeadingRephraseCorrectionPattern,
         continuationFragmentLeadingWrongUtteranceCorrectionPattern,
         continuationFragmentLeadingWasntItCorrectionPattern,
         continuationFragmentLeadingAccuracyCorrectionPattern
@@ -2419,6 +2421,12 @@ public struct RomaTranscriptionOutputFilter {
             "what i wanted to say is", "what i wanted to say was", "what i meant is",
             "what i meant was", "what i mean was",
             "on second thought", "let me rephrase", "backtrack", "back track",
+            "let me phrase that differently", "let me phrase this differently", "let me phrase it differently",
+            "let me say that differently", "let me say this differently", "let me say it differently",
+            "let me try that again", "let me try this again", "let me try it again",
+            "i'll say that again", "i’ll say that again", "i will say that again",
+            "i'll try that again", "i’ll try that again", "i will try that again",
+            "or rather", "no rather", "nope rather", "nah rather", "actually rather",
             "just to clarify", "to clarify",
             "just to be clear", "to be clear", "for clarity", "never mind", "nevermind",
             "yes", "yep", "yup"

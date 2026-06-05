@@ -45,6 +45,8 @@ Set-Alias -Name Assert-NumberEquals -Value Assert-RomaWindowsProofReportNumberEq
 Set-Alias -Name Assert-FileProof -Value Assert-RomaWindowsProofReportFile -Scope Local -Force
 Set-Alias -Name Assert-FileHashEquals -Value Assert-RomaWindowsProofReportFileHashEquals -Scope Local -Force
 Set-Alias -Name Assert-ShortcutProof -Value Assert-RomaWindowsProofReportShortcut -Scope Local -Force
+Set-Alias -Name Assert-DictationRuntimeProof -Value Assert-RomaWindowsProofReportDictationRuntime -Scope Local -Force
+Set-Alias -Name Assert-ListenerRuntimeProof -Value Assert-RomaWindowsProofReportListenerRuntime -Scope Local -Force
 
 function Assert-PackageIdentityProof {
     param(
@@ -154,77 +156,6 @@ function Assert-ManifestSourceProof {
 
     Write-Host "proof_source_commit=$($source['Commit'])"
     Write-Host "proof_source_dirty=$($source['Dirty'])"
-}
-
-function Assert-DictationRuntimeFields {
-    param(
-        [Parameter(Mandatory = $true)]
-        [object]$Runtime,
-        [Parameter(Mandatory = $true)]
-        [string]$Name
-    )
-
-    $runtime = $Runtime
-    Assert-FileProof -Proof $runtime -Name "$Name.log"
-    Assert-Boolean -Object $runtime -Name "reported_wrote" -Expected $true
-    Assert-NonEmptyString -Object $runtime -Name "wrote_path"
-    Assert-FileProof -Proof (Require-Property -Object $runtime -Name "wrote_file") -Name "$Name.wav"
-    Assert-Boolean -Object $runtime -Name "reported_positive_duration" -Expected $true
-    Assert-NumberGreaterThan -Object $runtime -Name "duration_seconds" -Minimum 0
-    Assert-Boolean -Object $runtime -Name "reported_pre_roll" -Expected $true
-    Assert-Boolean -Object $runtime -Name "reported_positive_pre_roll" -Expected $true
-    Assert-NumberGreaterThan -Object $runtime -Name "included_pre_roll_seconds" -Minimum 0
-    Assert-Boolean -Object $runtime -Name "reported_speech_pcm_contract" -Expected $true
-    Assert-NumberEquals -Object $runtime -Name "sample_rate" -Expected 16000
-    Assert-NumberEquals -Object $runtime -Name "channels" -Expected 1
-    Assert-Boolean -Object $runtime -Name "reported_processed_text" -Expected $true
-    Assert-Boolean -Object $runtime -Name "reported_positive_raw_transcript" -Expected $true
-    Assert-Boolean -Object $runtime -Name "reported_positive_processed_transcript" -Expected $true
-    Assert-NumberGreaterThan -Object $runtime -Name "raw_transcript_length" -Minimum 0
-    Assert-NumberGreaterThan -Object $runtime -Name "processed_transcript_length" -Minimum 0
-    if ($RequireExpectedTranscriptText) {
-        Assert-Boolean -Object $runtime -Name "expected_transcript_text_required" -Expected $true
-        Assert-NonEmptyString -Object $runtime -Name "expected_transcript_text"
-        Assert-Boolean -Object $runtime -Name "processed_transcript_text_present" -Expected $true
-        Assert-StringEquals `
-            -Actual ([string](Require-Property -Object $runtime -Name "expected_transcript_text_source")) `
-            -Expected "processed_transcript_text" `
-            -Name "expected_transcript_text_source"
-        Assert-Boolean -Object $runtime -Name "expected_transcript_text_found" -Expected $true
-    }
-
-    return $runtime
-}
-
-function Assert-DictationRuntimeProof {
-    param(
-        [Parameter(Mandatory = $true)]
-        [object]$Report
-    )
-
-    return Assert-DictationRuntimeFields `
-        -Runtime (Require-Property -Object $Report -Name "dictation_runtime") `
-        -Name "dictation_runtime"
-}
-
-function Assert-ListenerRuntimeProof {
-    param(
-        [Parameter(Mandatory = $true)]
-        [object]$Report
-    )
-
-    $runtime = Assert-DictationRuntimeFields `
-        -Runtime (Require-Property -Object $Report -Name "listener_runtime") `
-        -Name "listener_runtime"
-    Assert-Boolean -Object $runtime -Name "mode_listen" -Expected $true
-    Assert-Boolean -Object $runtime -Name "shared_pre_roll_runtime" -Expected $true
-    Assert-Boolean -Object $runtime -Name "max_sessions_one" -Expected $true
-    Assert-Boolean -Object $runtime -Name "session_start_one" -Expected $true
-    Assert-Boolean -Object $runtime -Name "session_completed_one" -Expected $true
-    Assert-Boolean -Object $runtime -Name "completed_one_session" -Expected $true
-    Write-Host "proof_listener_runtime=installed_listener"
-
-    return $runtime
 }
 
 function Assert-PasteIntentProof {
@@ -853,7 +784,9 @@ if ($RequireDictation) {
     $config = Require-Property -Object $report -Name "config"
     $outputFile = Require-Property -Object $config -Name "output_file"
     Assert-FileProof -Proof $outputFile -Name "dictation_output" -MinimumBytes 45
-    $dictationRuntime = Assert-DictationRuntimeProof -Report $report
+    $dictationRuntime = Assert-DictationRuntimeProof `
+        -Report $report `
+        -RequireExpectedTranscriptText:$RequireExpectedTranscriptText.IsPresent
     Assert-StringEquals `
         -Actual ([string](Require-Property -Object $dictationRuntime -Name "wrote_path")) `
         -Expected ([string](Require-Property -Object $outputFile -Name "path")) `
@@ -865,7 +798,9 @@ if ($RequireDictation) {
 
 if ($RequireListenerRuntime) {
     Assert-Boolean -Object $report -Name "run_listener_proof" -Expected $true
-    $listenerRuntime = Assert-ListenerRuntimeProof -Report $report
+    $listenerRuntime = Assert-ListenerRuntimeProof `
+        -Report $report `
+        -RequireExpectedTranscriptText:$RequireExpectedTranscriptText.IsPresent
     if ($RequireHoldHook) {
         Assert-HoldHookRuntimeProof -Runtime $listenerRuntime
     }
@@ -880,7 +815,9 @@ if ($RequirePaste) {
     Assert-Boolean -Object $config -Name "should_paste" -Expected $true
     Assert-PasteIntentProof -Report $report -Config $config
     if ($null -eq $dictationRuntime) {
-        $dictationRuntime = Assert-DictationRuntimeProof -Report $report
+        $dictationRuntime = Assert-DictationRuntimeProof `
+            -Report $report `
+            -RequireExpectedTranscriptText:$RequireExpectedTranscriptText.IsPresent
     }
     if ($RequireHoldHook) {
         Assert-HoldHookRuntimeProof -Runtime $dictationRuntime

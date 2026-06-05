@@ -444,6 +444,82 @@ function Assert-RomaWindowsProofReportShortcut {
     Assert-RomaWindowsProofReportBoolean -Object $Proof -Name "working_directory_is_install_dir" -Expected $true
 }
 
+function Assert-RomaWindowsProofReportDictationRuntimeFields {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Runtime,
+        [Parameter(Mandatory = $true)]
+        [string]$Name,
+        [switch]$RequireExpectedTranscriptText
+    )
+
+    $runtime = $Runtime
+    Assert-RomaWindowsProofReportFile -Proof $runtime -Name "$Name.log"
+    Assert-RomaWindowsProofReportBoolean -Object $runtime -Name "reported_wrote" -Expected $true
+    Assert-RomaWindowsProofReportNonEmptyString -Object $runtime -Name "wrote_path"
+    Assert-RomaWindowsProofReportFile -Proof (Require-RomaWindowsProofReportProperty -Object $runtime -Name "wrote_file") -Name "$Name.wav"
+    Assert-RomaWindowsProofReportBoolean -Object $runtime -Name "reported_positive_duration" -Expected $true
+    Assert-RomaWindowsProofReportNumberGreaterThan -Object $runtime -Name "duration_seconds" -Minimum 0
+    Assert-RomaWindowsProofReportBoolean -Object $runtime -Name "reported_pre_roll" -Expected $true
+    Assert-RomaWindowsProofReportBoolean -Object $runtime -Name "reported_positive_pre_roll" -Expected $true
+    Assert-RomaWindowsProofReportNumberGreaterThan -Object $runtime -Name "included_pre_roll_seconds" -Minimum 0
+    Assert-RomaWindowsProofReportBoolean -Object $runtime -Name "reported_speech_pcm_contract" -Expected $true
+    Assert-RomaWindowsProofReportNumberEquals -Object $runtime -Name "sample_rate" -Expected 16000
+    Assert-RomaWindowsProofReportNumberEquals -Object $runtime -Name "channels" -Expected 1
+    Assert-RomaWindowsProofReportBoolean -Object $runtime -Name "reported_processed_text" -Expected $true
+    Assert-RomaWindowsProofReportBoolean -Object $runtime -Name "reported_positive_raw_transcript" -Expected $true
+    Assert-RomaWindowsProofReportBoolean -Object $runtime -Name "reported_positive_processed_transcript" -Expected $true
+    Assert-RomaWindowsProofReportNumberGreaterThan -Object $runtime -Name "raw_transcript_length" -Minimum 0
+    Assert-RomaWindowsProofReportNumberGreaterThan -Object $runtime -Name "processed_transcript_length" -Minimum 0
+    if ($RequireExpectedTranscriptText) {
+        Assert-RomaWindowsProofReportBoolean -Object $runtime -Name "expected_transcript_text_required" -Expected $true
+        Assert-RomaWindowsProofReportNonEmptyString -Object $runtime -Name "expected_transcript_text"
+        Assert-RomaWindowsProofReportBoolean -Object $runtime -Name "processed_transcript_text_present" -Expected $true
+        Assert-RomaWindowsProofReportStringEquals `
+            -Actual ([string](Require-RomaWindowsProofReportProperty -Object $runtime -Name "expected_transcript_text_source")) `
+            -Expected "processed_transcript_text" `
+            -Name "expected_transcript_text_source"
+        Assert-RomaWindowsProofReportBoolean -Object $runtime -Name "expected_transcript_text_found" -Expected $true
+    }
+
+    return $runtime
+}
+
+function Assert-RomaWindowsProofReportDictationRuntime {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Report,
+        [switch]$RequireExpectedTranscriptText
+    )
+
+    return Assert-RomaWindowsProofReportDictationRuntimeFields `
+        -Runtime (Require-RomaWindowsProofReportProperty -Object $Report -Name "dictation_runtime") `
+        -Name "dictation_runtime" `
+        -RequireExpectedTranscriptText:$RequireExpectedTranscriptText.IsPresent
+}
+
+function Assert-RomaWindowsProofReportListenerRuntime {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Report,
+        [switch]$RequireExpectedTranscriptText
+    )
+
+    $runtime = Assert-RomaWindowsProofReportDictationRuntimeFields `
+        -Runtime (Require-RomaWindowsProofReportProperty -Object $Report -Name "listener_runtime") `
+        -Name "listener_runtime" `
+        -RequireExpectedTranscriptText:$RequireExpectedTranscriptText.IsPresent
+    Assert-RomaWindowsProofReportBoolean -Object $runtime -Name "mode_listen" -Expected $true
+    Assert-RomaWindowsProofReportBoolean -Object $runtime -Name "shared_pre_roll_runtime" -Expected $true
+    Assert-RomaWindowsProofReportBoolean -Object $runtime -Name "max_sessions_one" -Expected $true
+    Assert-RomaWindowsProofReportBoolean -Object $runtime -Name "session_start_one" -Expected $true
+    Assert-RomaWindowsProofReportBoolean -Object $runtime -Name "session_completed_one" -Expected $true
+    Assert-RomaWindowsProofReportBoolean -Object $runtime -Name "completed_one_session" -Expected $true
+    Write-Host "proof_listener_runtime=installed_listener"
+
+    return $runtime
+}
+
 function Get-RomaWindowsPackageIdentityFingerprint {
     param(
         [Parameter(Mandatory = $true)]

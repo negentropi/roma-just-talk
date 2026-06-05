@@ -12300,18 +12300,25 @@ struct RomaCoreChecks {
         )
         try require(
             proofCommonScript.contains(#""listener_shared_pre_roll_runtime""#) &&
-                checkReportScript.contains(
-                    #"Assert-Boolean -Object $Proof -Name "shared_pre_roll_runtime" -Expected $true"#
+                proofCommonScript.contains(
+                    #"Assert-RomaWindowsProofReportBoolean -Object $runtime -Name "shared_pre_roll_runtime" -Expected $true"#
                 ),
             "Windows proof profiles should print and require listener shared pre-roll runtime coverage"
         )
         try require(
             checkReportScript.contains("[switch]$RequireListenerRuntime") &&
-                checkReportScript.contains("function Assert-ListenerRuntimeProof") &&
+                proofCommonScript.contains("function Assert-RomaWindowsProofReportDictationRuntimeFields") &&
+                proofCommonScript.contains("function Assert-RomaWindowsProofReportListenerRuntime") &&
+                checkReportScript.contains("Set-Alias -Name Assert-DictationRuntimeProof -Value Assert-RomaWindowsProofReportDictationRuntime") &&
+                checkReportScript.contains("Set-Alias -Name Assert-ListenerRuntimeProof -Value Assert-RomaWindowsProofReportListenerRuntime") &&
+                checkReportScript.contains(#"-RequireExpectedTranscriptText:$RequireExpectedTranscriptText.IsPresent"#) &&
+                !checkReportScript.contains("function Assert-DictationRuntimeFields") &&
+                !checkReportScript.contains("function Assert-DictationRuntimeProof") &&
+                !checkReportScript.contains("function Assert-ListenerRuntimeProof") &&
                 proofCommonScript.contains(#""listener_runtime""#) &&
                 checkReportScript.contains(#""listener_runtime" { $script:RequireListenerRuntime = $true }"#) &&
                 checkReportScript.contains(#"Assert-Boolean -Object $listenerRuntime -Name "reported_paste_sent" -Expected $true"#) &&
-                checkReportScript.contains("proof_listener_runtime=installed_listener"),
+                proofCommonScript.contains("proof_listener_runtime=installed_listener"),
             "Windows local-whisper laptop profile should require a real installed listener runtime proof"
         )
         try require(
@@ -12797,9 +12804,9 @@ struct RomaCoreChecks {
             "Windows proof checker should require paste restore intent to match the generated config"
         )
         try require(
-            checkReportScript.contains(#"Assert-Boolean -Object $runtime -Name "reported_speech_pcm_contract" -Expected $true"#) &&
-                checkReportScript.contains(#"Assert-NumberEquals -Object $runtime -Name "sample_rate" -Expected 16000"#) &&
-                checkReportScript.contains(#"Assert-NumberEquals -Object $runtime -Name "channels" -Expected 1"#),
+            proofCommonScript.contains(#"Assert-RomaWindowsProofReportBoolean -Object $runtime -Name "reported_speech_pcm_contract" -Expected $true"#) &&
+                proofCommonScript.contains(#"Assert-RomaWindowsProofReportNumberEquals -Object $runtime -Name "sample_rate" -Expected 16000"#) &&
+                proofCommonScript.contains(#"Assert-RomaWindowsProofReportNumberEquals -Object $runtime -Name "channels" -Expected 1"#),
             "Windows proof checker should require the dictation audio speech PCM contract"
         )
         try require(

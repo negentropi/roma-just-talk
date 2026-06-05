@@ -3330,6 +3330,21 @@ struct RomaCoreChecks {
                 "punctuated long terminal discourse filler"
             ),
             (
+                "I think this is you know ready.",
+                "I think this is ready.",
+                "embedded unpunctuated you know filler"
+            ),
+            (
+                "I think this is you know really good.",
+                "I think this is really good.",
+                "embedded unpunctuated you know before predicate"
+            ),
+            (
+                "I think this is you know what I mean a module.",
+                "I think this is a module.",
+                "embedded unpunctuated you know what i mean filler"
+            ),
+            (
                 "This works I mean",
                 "This works",
                 "unpunctuated terminal i mean filler"
@@ -5803,6 +5818,11 @@ struct RomaCoreChecks {
                 "I know you know",
                 "I know you know",
                 "unpunctuated terminal you know guard"
+            ),
+            (
+                "I think you know this already.",
+                "I think you know this already.",
+                "embedded you know prose guard"
             ),
             (
                 "You know this already.",

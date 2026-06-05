@@ -596,6 +596,10 @@ public struct RomaTranscriptionOutputFilter {
         "good", "just", "maybe", "not", "probably", "ready", "really",
         "thinking", "trying", "waiting", "working"
     ]
+    private static let allowedNextWordsForUnpunctuatedYouKnowFiller: Set<String> =
+        allowedNextWordsForUnpunctuatedHedgeFiller.union([
+            "a", "an", "the", "this", "that"
+        ])
     private static let blockedPreviousWordsForLeadingLikeContinuationFiller: Set<String> = [
         "am", "are", "be", "been", "being", "feel", "feels", "felt", "is",
         "less", "look", "looks", "more", "not", "seem", "seems", "sound",
@@ -1625,6 +1629,7 @@ public struct RomaTranscriptionOutputFilter {
         filteredText = removeTerminalHedgeFillerTails(from: filteredText)
         filteredText = removeTerminalClarificationFillerTails(from: filteredText)
         filteredText = removeTerminalAcknowledgementFillers(from: filteredText)
+        filteredText = removeUnpunctuatedYouKnowFillers(from: filteredText)
         filteredText = removeUnpunctuatedLikeFillers(from: filteredText)
         filteredText = removeUnpunctuatedHedgeFillers(from: filteredText)
         filteredText = preserveBacktrackingMarkersAfterPauseFillers(in: filteredText)
@@ -2750,6 +2755,37 @@ public struct RomaTranscriptionOutputFilter {
                   let nextWord = nextWord(in: suffix),
                   allowedPreviousWordsForUnpunctuatedLikeFiller.contains(previousWord),
                   allowedNextWordsForUnpunctuatedLikeFiller.contains(nextWord) else {
+                continue
+            }
+
+            filteredText.replaceSubrange(matchRange, with: "")
+        }
+
+        return filteredText
+    }
+
+    private static func removeUnpunctuatedYouKnowFillers(from text: String) -> String {
+        guard let regex = try? NSRegularExpression(
+            pattern: #"(?i)(?<![\p{L}\p{N}])you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?(?:[ \t]*[,;:…]+)?(?![\p{L}\p{N}])"#
+        ) else {
+            return text
+        }
+
+        var filteredText = text
+        let range = NSRange(filteredText.startIndex..., in: filteredText)
+        let matches = regex.matches(in: filteredText, range: range).reversed()
+
+        for match in matches {
+            guard let matchRange = Range(match.range, in: filteredText) else {
+                continue
+            }
+
+            let prefix = String(filteredText[..<matchRange.lowerBound])
+            let suffix = String(filteredText[matchRange.upperBound...])
+            guard let previousWord = previousWord(in: prefix),
+                  let nextWord = nextWord(in: suffix),
+                  allowedPreviousWordsForUnpunctuatedLikeFiller.contains(previousWord),
+                  allowedNextWordsForUnpunctuatedYouKnowFiller.contains(nextWord) else {
                 continue
             }
 

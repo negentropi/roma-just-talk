@@ -1791,6 +1791,31 @@ function Test-RomaWindowsContainsText {
     return $Text.IndexOf($Needle, [System.StringComparison]::OrdinalIgnoreCase) -ge 0
 }
 
+function Get-RomaWindowsDictationRuntimeLogOutputMarkers {
+    return [ordered]@{
+        reported_wrote = "wrote="
+        reported_pre_roll = "included_pre_roll_seconds="
+        reported_paste_sent = "paste_sent=true"
+        reported_paste_not_sent = "paste_sent=false"
+        reported_hold_mode = "recording_mode=hold"
+        reported_waiting_for_hold_key_down = "waiting_for_key_down="
+        reported_hold_key_down = "hold_key_down=true"
+        reported_hold_key_up = "hold_key_up=true"
+    }
+}
+
+function Get-RomaWindowsListenerRuntimeLogOutputMarkers {
+    return [ordered]@{
+        launcher_mode_listen = "mode=RomaWindowsAgent listen"
+        agent_mode_listen = "mode=listen"
+        shared_pre_roll_runtime = "listener_capture_lifecycle=shared_pre_roll_runtime"
+        max_sessions_one = "max_sessions=1"
+        session_start_one = "listen_session_start=1"
+        session_completed_one = "listen_session_completed=1"
+        completed_one_session = "listen_completed_sessions=1"
+    }
+}
+
 function Get-RomaWindowsDictationRuntimeLogProof {
     param(
         [Parameter(Mandatory = $true)]
@@ -1818,12 +1843,11 @@ function Get-RomaWindowsDictationRuntimeLogProof {
     $holdKeyUpLine = Get-RomaWindowsOutputLineNumber -Content $content -Needle "hold_key_up=true"
     $wroteLine = Get-RomaWindowsOutputLineNumber -Content $content -Needle "wrote="
     $processedTextLine = Get-RomaWindowsOutputLineNumber -Content $content -Needle "processed_transcript_text="
-    $proof["reported_wrote"] = $content.Contains("wrote=")
+    Add-RomaWindowsProofFields -Proof $proof -Fields (Get-RomaWindowsOutputMarkerProof -Output $content -Markers (Get-RomaWindowsDictationRuntimeLogOutputMarkers)) | Out-Null
     $proof["wrote_path"] = $wrotePath
     if (![string]::IsNullOrWhiteSpace($wrotePath)) {
         $proof["wrote_file"] = Get-RomaWindowsFileProof -Path $wrotePath
     }
-    $proof["reported_pre_roll"] = $content.Contains("included_pre_roll_seconds=")
     $proof["duration_seconds"] = $durationSeconds
     $proof["included_pre_roll_seconds"] = $includedPreRollSeconds
     $proof["reported_positive_duration"] = ($null -ne $durationSeconds) -and ($durationSeconds -gt 0)
@@ -1842,12 +1866,6 @@ function Get-RomaWindowsDictationRuntimeLogProof {
     $proof["reported_positive_processed_transcript"] = ($null -ne $processedTranscriptLength) -and ($processedTranscriptLength -gt 0)
     $proof["reported_processed_text"] = ![string]::IsNullOrWhiteSpace($processedTranscriptText)
     $proof["processed_transcript_text_present"] = ![string]::IsNullOrWhiteSpace($processedTranscriptText)
-    $proof["reported_paste_sent"] = $content.Contains("paste_sent=true")
-    $proof["reported_paste_not_sent"] = $content.Contains("paste_sent=false")
-    $proof["reported_hold_mode"] = $content.Contains("recording_mode=hold")
-    $proof["reported_waiting_for_hold_key_down"] = $content.Contains("waiting_for_key_down=")
-    $proof["reported_hold_key_down"] = $content.Contains("hold_key_down=true")
-    $proof["reported_hold_key_up"] = $content.Contains("hold_key_up=true")
     $proof["pre_roll_buffering_line"] = $preRollBufferingLine
     $proof["waiting_for_hold_key_down_line"] = $waitingForHoldLine
     $proof["hold_key_down_line"] = $holdKeyDownLine
@@ -1891,12 +1909,8 @@ function Get-RomaWindowsListenerRuntimeLogProof {
     }
 
     $content = Get-Content -LiteralPath $LogPath -Raw
-    $proof["mode_listen"] = $content.Contains("mode=RomaWindowsAgent listen") -and $content.Contains("mode=listen")
-    $proof["shared_pre_roll_runtime"] = $content.Contains("listener_capture_lifecycle=shared_pre_roll_runtime")
-    $proof["max_sessions_one"] = $content.Contains("max_sessions=1")
-    $proof["session_start_one"] = $content.Contains("listen_session_start=1")
-    $proof["session_completed_one"] = $content.Contains("listen_session_completed=1")
-    $proof["completed_one_session"] = $content.Contains("listen_completed_sessions=1")
+    Add-RomaWindowsProofFields -Proof $proof -Fields (Get-RomaWindowsOutputMarkerProof -Output $content -Markers (Get-RomaWindowsListenerRuntimeLogOutputMarkers)) | Out-Null
+    $proof["mode_listen"] = $proof["launcher_mode_listen"] -and $proof["agent_mode_listen"]
 
     return $proof
 }

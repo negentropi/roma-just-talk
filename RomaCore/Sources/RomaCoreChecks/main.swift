@@ -11289,9 +11289,23 @@ struct RomaCoreChecks {
             proveScript.contains("[switch]$RunListenerProof") &&
                 proveScript.contains("function Invoke-InstalledListenerRuntimeProof") &&
                 proveScript.contains("windows-agent-listen.log") &&
+                proofCommonScript.contains("function Get-RomaWindowsDictationRuntimeLogOutputMarkers") &&
+                proofCommonScript.contains("function Get-RomaWindowsListenerRuntimeLogOutputMarkers") &&
                 proofCommonScript.contains("function Get-RomaWindowsDictationRuntimeLogProof") &&
                 proofCommonScript.contains("function Get-RomaWindowsListenerRuntimeLogProof") &&
                 proofCommonScript.contains("function Test-RomaWindowsContainsText") &&
+                proofCommonScript.contains("Get-RomaWindowsOutputMarkerProof -Output $content -Markers (Get-RomaWindowsDictationRuntimeLogOutputMarkers)") &&
+                proofCommonScript.contains("Get-RomaWindowsOutputMarkerProof -Output $content -Markers (Get-RomaWindowsListenerRuntimeLogOutputMarkers)") &&
+                proofCommonScript.contains(#"$proof["mode_listen"] = $proof["launcher_mode_listen"] -and $proof["agent_mode_listen"]"#) &&
+                !proofCommonScript.contains(#"$proof["reported_wrote"] = $content.Contains("wrote=")"#) &&
+                !proofCommonScript.contains(#"$proof["reported_pre_roll"] = $content.Contains("included_pre_roll_seconds=")"#) &&
+                !proofCommonScript.contains(#"$proof["reported_paste_sent"] = $content.Contains("paste_sent=true")"#) &&
+                !proofCommonScript.contains(#"$proof["reported_paste_not_sent"] = $content.Contains("paste_sent=false")"#) &&
+                !proofCommonScript.contains(#"$proof["reported_hold_mode"] = $content.Contains("recording_mode=hold")"#) &&
+                !proofCommonScript.contains(#"$proof["reported_waiting_for_hold_key_down"] = $content.Contains("waiting_for_key_down=")"#) &&
+                !proofCommonScript.contains(#"$proof["reported_hold_key_down"] = $content.Contains("hold_key_down=true")"#) &&
+                !proofCommonScript.contains(#"$proof["reported_hold_key_up"] = $content.Contains("hold_key_up=true")"#) &&
+                !proofCommonScript.contains(#"$proof["mode_listen"] = $content.Contains("mode=RomaWindowsAgent listen") -and $content.Contains("mode=listen")"#) &&
                 proveScript.contains("Get-RomaWindowsDictationRuntimeLogProof `") &&
                 proveScript.contains("Get-RomaWindowsListenerRuntimeLogProof `") &&
                 !proveScript.contains("function Get-DictationRuntimeLogProof") &&

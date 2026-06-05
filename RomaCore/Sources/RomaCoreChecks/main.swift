@@ -11860,9 +11860,15 @@ struct RomaCoreChecks {
                 packageScript.contains("Get-RomaWindowsLaptopPreflightGuideMarkers") &&
                 packageScript.contains("Get-RomaWindowsLaptopPreflightLocalWhisperGuideMarkers") &&
                 packageScript.contains("Get-RomaWindowsLaptopProofOperatorGuideLines") &&
+                packageScript.contains("Get-RomaWindowsLaptopProofPrerequisiteGuideLines") &&
                 proofCommonScript.contains("function Get-RomaWindowsLaptopPreflightGuideMarkers") &&
                 proofCommonScript.contains("function Get-RomaWindowsLaptopPreflightLocalWhisperGuideMarkers") &&
                 proofCommonScript.contains("function Get-RomaWindowsLaptopProofOperatorGuideLines") &&
+                proofCommonScript.contains("function Get-RomaWindowsLaptopProofPrerequisiteGuideLines") &&
+                proofCommonScript.contains("Prerequisites before full proof:") &&
+                proofCommonScript.contains("microphone_settings_uri=ms-settings:privacy-microphone") &&
+                proofCommonScript.contains("RomaWhisperCLIMock.exe is CI-only") &&
+                proofCommonScript.contains("source_dirty=true") &&
                 proofCommonScript.contains("ACTION_REQUIRED=hotkey_delivery_preflight") &&
                 proofCommonScript.contains("cloud pre roll proof") &&
                 proofCommonScript.contains("local whisper pre roll proof") &&

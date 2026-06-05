@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Added shared Windows laptop proof prerequisites to the generated artifact guide.
 - Shared Windows laptop hotkey-preflight and Notepad-paste operator prompts through the proof helper.
 - Shared Windows dictation operator prompts across source proof and installed smoke paths.
 - Added operator action steps to the generated Windows laptop proof guide from the shared proof helper.

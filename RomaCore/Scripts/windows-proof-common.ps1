@@ -1125,6 +1125,18 @@ function Get-RomaWindowsLaptopProofOperatorGuideLines {
     )
 }
 
+function Get-RomaWindowsLaptopProofPrerequisiteGuideLines {
+    return @(
+        "Prerequisites before full proof:",
+        "",
+        "1. Run on the target Windows laptop from the unpacked artifact directory, not from the source checkout.",
+        "2. Ensure microphone access is enabled; the permission doctor prints microphone_settings_uri=ms-settings:privacy-microphone when Windows blocks capture.",
+        "3. For cloud dictation, set GROQ_API_KEY or pass another -ApiKeyEnv / -ApiKeyName pair before the full proof command.",
+        "4. For local whisper, pass real whisper-cli.exe plus .bin or .gguf model paths; RomaWhisperCLIMock.exe is CI-only and is rejected by real laptop proof profiles.",
+        "5. Package from a clean source checkout; final laptop proof rejects source_dirty=true."
+    )
+}
+
 function Get-RomaWindowsFullLaptopProofSetOutputMarkers {
     $markers = Get-RomaWindowsProofSetProfileOkMarkers -Name "full_laptop"
     $markers["full_laptop_proof_set"] = Get-RomaWindowsProofSetOkMarker -Name "full_laptop"

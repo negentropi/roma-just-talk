@@ -3365,6 +3365,16 @@ struct RomaCoreChecks {
                 "embedded unpunctuated like before good predicate"
             ),
             (
+                "I think this is basically ready.",
+                "I think this is ready.",
+                "embedded unpunctuated basically before ready predicate"
+            ),
+            (
+                "I think this is basically good.",
+                "I think this is good.",
+                "embedded unpunctuated basically before good predicate"
+            ),
+            (
                 "I think this is you see ready.",
                 "I think this is ready.",
                 "embedded unpunctuated you see filler"
@@ -5793,6 +5803,16 @@ struct RomaCoreChecks {
                 "Click like",
                 "Click like",
                 "terminal like command guard"
+            ),
+            (
+                "The model is basically a function.",
+                "The model is basically a function.",
+                "embedded basically prose guard"
+            ),
+            (
+                "I think this is maybe ready.",
+                "I think this is maybe ready.",
+                "embedded maybe uncertainty guard"
             ),
             (
                 "I like",

@@ -35,20 +35,13 @@ if (!(Test-Path -LiteralPath $proofCommonScript)) {
 }
 . $proofCommonScript
 
-function Require-Property {
-    param(
-        [Parameter(Mandatory = $true)]
-        [object]$Object,
-        [Parameter(Mandatory = $true)]
-        [string]$Name
-    )
-
-    if ($null -eq $Object -or !($Object.PSObject.Properties.Name -contains $Name)) {
-        throw "Proof report property was not found: $Name"
-    }
-
-    return $Object.PSObject.Properties[$Name].Value
-}
+Set-Alias -Name Require-Property -Value Require-RomaWindowsProofReportProperty -Scope Local -Force
+Set-Alias -Name Assert-Boolean -Value Assert-RomaWindowsProofReportBoolean -Scope Local -Force
+Set-Alias -Name Assert-NonEmptyString -Value Assert-RomaWindowsProofReportNonEmptyString -Scope Local -Force
+Set-Alias -Name Get-NonEmptyStringProperty -Value Get-RomaWindowsProofReportNonEmptyString -Scope Local -Force
+Set-Alias -Name Assert-StringEquals -Value Assert-RomaWindowsProofReportStringEquals -Scope Local -Force
+Set-Alias -Name Assert-NumberGreaterThan -Value Assert-RomaWindowsProofReportNumberGreaterThan -Scope Local -Force
+Set-Alias -Name Assert-NumberEquals -Value Assert-RomaWindowsProofReportNumberEquals -Scope Local -Force
 
 function Assert-FileProof {
     param(
@@ -131,69 +124,6 @@ function Assert-ShortcutProof {
     Assert-Boolean -Object $Proof -Name "has_execution_policy_bypass" -Expected $true
     Assert-Boolean -Object $Proof -Name "runs_listener" -Expected $true
     Assert-Boolean -Object $Proof -Name "working_directory_is_install_dir" -Expected $true
-}
-
-function Assert-Boolean {
-    param(
-        [Parameter(Mandatory = $true)]
-        [object]$Object,
-        [Parameter(Mandatory = $true)]
-        [string]$Name,
-        [Parameter(Mandatory = $true)]
-        [bool]$Expected
-    )
-
-    $actual = [bool](Require-Property -Object $Object -Name $Name)
-    if ($actual -ne $Expected) {
-        throw "Expected $Name to be $Expected, got $actual"
-    }
-
-    Write-Host "proof_bool=$Name value=$actual"
-}
-
-function Assert-NonEmptyString {
-    param(
-        [Parameter(Mandatory = $true)]
-        [object]$Object,
-        [Parameter(Mandatory = $true)]
-        [string]$Name
-    )
-
-    $value = [string](Require-Property -Object $Object -Name $Name)
-    if ([string]::IsNullOrWhiteSpace($value)) {
-        throw "Expected non-empty proof report property: $Name"
-    }
-
-    Write-Host "proof_value=$Name value=$value"
-}
-
-function Get-NonEmptyStringProperty {
-    param(
-        [Parameter(Mandatory = $true)]
-        [object]$Object,
-        [Parameter(Mandatory = $true)]
-        [string]$Name
-    )
-
-    Assert-NonEmptyString -Object $Object -Name $Name
-    return [string](Require-Property -Object $Object -Name $Name)
-}
-
-function Assert-StringEquals {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Actual,
-        [Parameter(Mandatory = $true)]
-        [string]$Expected,
-        [Parameter(Mandatory = $true)]
-        [string]$Name
-    )
-
-    if ($Actual -ne $Expected) {
-        throw "Expected $Name to be '$Expected', got '$Actual'"
-    }
-
-    Write-Host "proof_value=$Name value=$Actual"
 }
 
 function Assert-PackageIdentityProof {
@@ -304,42 +234,6 @@ function Assert-ManifestSourceProof {
 
     Write-Host "proof_source_commit=$($source['Commit'])"
     Write-Host "proof_source_dirty=$($source['Dirty'])"
-}
-
-function Assert-NumberGreaterThan {
-    param(
-        [Parameter(Mandatory = $true)]
-        [object]$Object,
-        [Parameter(Mandatory = $true)]
-        [string]$Name,
-        [Parameter(Mandatory = $true)]
-        [double]$Minimum
-    )
-
-    $actual = [double](Require-Property -Object $Object -Name $Name)
-    if ($actual -le $Minimum) {
-        throw "Expected $Name to be greater than $Minimum, got $actual"
-    }
-
-    Write-Host "proof_number=$Name value=$actual minimum=$Minimum"
-}
-
-function Assert-NumberEquals {
-    param(
-        [Parameter(Mandatory = $true)]
-        [object]$Object,
-        [Parameter(Mandatory = $true)]
-        [string]$Name,
-        [Parameter(Mandatory = $true)]
-        [double]$Expected
-    )
-
-    $actual = [double](Require-Property -Object $Object -Name $Name)
-    if ($actual -ne $Expected) {
-        throw "Expected $Name to equal $Expected, got $actual"
-    }
-
-    Write-Host "proof_number=$Name value=$actual expected=$Expected"
 }
 
 function Assert-DictationRuntimeFields {

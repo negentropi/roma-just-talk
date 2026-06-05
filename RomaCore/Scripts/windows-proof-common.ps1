@@ -248,6 +248,119 @@ function Require-RomaWindowsObjectProperty {
     return $Object.PSObject.Properties[$Name].Value
 }
 
+function Require-RomaWindowsProofReportProperty {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Object,
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    return Require-RomaWindowsObjectProperty `
+        -Object $Object `
+        -Name $Name `
+        -Context "proof report"
+}
+
+function Assert-RomaWindowsProofReportBoolean {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Object,
+        [Parameter(Mandatory = $true)]
+        [string]$Name,
+        [Parameter(Mandatory = $true)]
+        [bool]$Expected
+    )
+
+    $actual = [bool](Require-RomaWindowsProofReportProperty -Object $Object -Name $Name)
+    if ($actual -ne $Expected) {
+        throw "Expected $Name to be $Expected, got $actual"
+    }
+
+    Write-Host "proof_bool=$Name value=$actual"
+}
+
+function Assert-RomaWindowsProofReportNonEmptyString {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Object,
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    $value = [string](Require-RomaWindowsProofReportProperty -Object $Object -Name $Name)
+    if ([string]::IsNullOrWhiteSpace($value)) {
+        throw "Expected non-empty proof report property: $Name"
+    }
+
+    Write-Host "proof_value=$Name value=$value"
+}
+
+function Get-RomaWindowsProofReportNonEmptyString {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Object,
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    Assert-RomaWindowsProofReportNonEmptyString -Object $Object -Name $Name
+    return [string](Require-RomaWindowsProofReportProperty -Object $Object -Name $Name)
+}
+
+function Assert-RomaWindowsProofReportStringEquals {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Actual,
+        [Parameter(Mandatory = $true)]
+        [string]$Expected,
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    if ($Actual -ne $Expected) {
+        throw "Expected $Name to be '$Expected', got '$Actual'"
+    }
+
+    Write-Host "proof_value=$Name value=$Actual"
+}
+
+function Assert-RomaWindowsProofReportNumberGreaterThan {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Object,
+        [Parameter(Mandatory = $true)]
+        [string]$Name,
+        [Parameter(Mandatory = $true)]
+        [double]$Minimum
+    )
+
+    $actual = [double](Require-RomaWindowsProofReportProperty -Object $Object -Name $Name)
+    if ($actual -le $Minimum) {
+        throw "Expected $Name to be greater than $Minimum, got $actual"
+    }
+
+    Write-Host "proof_number=$Name value=$actual minimum=$Minimum"
+}
+
+function Assert-RomaWindowsProofReportNumberEquals {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Object,
+        [Parameter(Mandatory = $true)]
+        [string]$Name,
+        [Parameter(Mandatory = $true)]
+        [double]$Expected
+    )
+
+    $actual = [double](Require-RomaWindowsProofReportProperty -Object $Object -Name $Name)
+    if ($actual -ne $Expected) {
+        throw "Expected $Name to equal $Expected, got $actual"
+    }
+
+    Write-Host "proof_number=$Name value=$actual expected=$Expected"
+}
+
 function Get-RomaWindowsPackageIdentityFingerprint {
     param(
         [Parameter(Mandatory = $true)]

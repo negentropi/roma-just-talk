@@ -8157,6 +8157,23 @@ struct RomaCoreChecks {
             try WindowsDPAPISecretStore.fileName(forKey: "groqAPIKey") == "67726f714150494b6579.dpapi",
             "secret file names should be deterministic UTF-8 hex"
         )
+        let saveProof = WindowsDPAPISecretSaveProof(
+            directoryURL: URL(fileURLWithPath: "/tmp/roma-secrets", isDirectory: true),
+            key: "groq",
+            keyFileName: try WindowsDPAPISecretStore.fileName(forKey: "groq"),
+            valueEnvironmentName: "GROQ_API_KEY"
+        )
+        try require(
+            saveProof.proofOutputLines == [
+                "secret_store=dpapi",
+                "directory=/tmp/roma-secrets",
+                "key=groq",
+                "key_file=67726f71.dpapi",
+                "value_env=GROQ_API_KEY",
+                "stored=true"
+            ],
+            "secret save proof should expose stable output lines"
+        )
         do {
             _ = try WindowsDPAPISecretStore.fileName(forKey: "   ")
             throw CheckFailure("empty secret keys should be rejected")
@@ -9804,6 +9821,12 @@ struct RomaCoreChecks {
             ),
             encoding: .utf8
         )
+        let secretStoreSource = try String(
+            contentsOf: packageRoot.appendingPathComponent(
+                "Sources/RomaCore/Windows/WindowsDPAPISecretStore.swift"
+            ),
+            encoding: .utf8
+        )
         let doctorOutputSource = try String(
             contentsOf: packageRoot.appendingPathComponent(
                 "Sources/RomaCore/Windows/WindowsDoctorOutput.swift"
@@ -10035,7 +10058,7 @@ struct RomaCoreChecks {
                 proofAgentSource.contains("WhisperCLITranscriptionConfiguration.make(") &&
                 windowsAgentConfigurationSource.contains("executablePath: try requireWhisperCLIPath()") &&
                 windowsAgentConfigurationSource.contains("modelPath: try requireWhisperModelPath()") &&
-                proofAgentSource.contains("throw TranscriptionAPIKeySourceError.missingEnvironmentValue") &&
+                secretStoreSource.contains("throw TranscriptionAPIKeySourceError.missingEnvironmentValue") &&
                 !proofAgentSource.contains("private static func value(after option") &&
                 !proofAgentSource.contains("private static func optionalValue(after option") &&
                 !proofAgentSource.contains("private static func values(after option") &&
@@ -10054,6 +10077,18 @@ struct RomaCoreChecks {
                 !proofAgentSource.contains("case invalidOptionValue(") &&
                 !proofAgentSource.contains("case conflictingOptions("),
             "Windows proof agent should reuse shared command-line parsing, text formatting, and option errors"
+        )
+        try require(
+            secretStoreSource.contains("public func saveFromEnvironment(") &&
+                secretStoreSource.contains("WindowsDPAPISecretSaveProof") &&
+                secretStoreSource.contains("public var proofOutputLines: [String]") &&
+                windowsAgentSource.contains(".saveFromEnvironment(key: key, environmentName: environmentName)") &&
+                proofAgentSource.contains(".saveFromEnvironment(key: key, environmentName: valueEnvironmentName)") &&
+                windowsAgentSource.contains("proof.proofOutputLines.forEach") &&
+                proofAgentSource.contains("proof.proofOutputLines.forEach") &&
+                !windowsAgentSource.contains("guard RomaCommandLineText.isValidEnvironmentName(environmentName)") &&
+                !proofAgentSource.contains("guard RomaCommandLineText.isValidEnvironmentName(valueEnvironmentName)"),
+            "Windows agent and proof agent should share DPAPI save-from-environment proof behavior"
         )
         try require(
             doctorOutputSource.contains(#""windows_dictation_runtime_uses_pipeline_source=true""#) &&

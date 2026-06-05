@@ -78,6 +78,31 @@ public enum WindowsDPAPIProtectedData {
     }
 }
 
+public struct WindowsDPAPISecretSaveProof: Equatable, Sendable {
+    public var directoryURL: URL
+    public var key: String
+    public var keyFileName: String
+    public var valueEnvironmentName: String
+
+    public init(directoryURL: URL, key: String, keyFileName: String, valueEnvironmentName: String) {
+        self.directoryURL = directoryURL
+        self.key = key
+        self.keyFileName = keyFileName
+        self.valueEnvironmentName = valueEnvironmentName
+    }
+
+    public var proofOutputLines: [String] {
+        [
+            "secret_store=dpapi",
+            "directory=\(directoryURL.path)",
+            "key=\(key)",
+            "key_file=\(keyFileName)",
+            "value_env=\(valueEnvironmentName)",
+            "stored=true"
+        ]
+    }
+}
+
 public final class WindowsDPAPISecretStore: SecretStoring, @unchecked Sendable {
     public let directoryURL: URL
 
@@ -94,6 +119,23 @@ public final class WindowsDPAPISecretStore: SecretStoring, @unchecked Sendable {
             withIntermediateDirectories: true
         )
         try protectedData.write(to: fileURL, options: [.atomic])
+    }
+
+    public func saveFromEnvironment(key: String, environmentName: String) throws -> WindowsDPAPISecretSaveProof {
+        guard RomaCommandLineText.isValidEnvironmentName(environmentName) else {
+            throw RomaCommandLineOptionsError.invalidOptionValue("--value-env")
+        }
+        guard let secret = ProcessInfo.processInfo.environment[environmentName], !secret.isEmpty else {
+            throw TranscriptionAPIKeySourceError.missingEnvironmentValue(environmentName)
+        }
+
+        try save(secret, forKey: key)
+        return try WindowsDPAPISecretSaveProof(
+            directoryURL: directoryURL,
+            key: key,
+            keyFileName: Self.fileName(forKey: key),
+            valueEnvironmentName: environmentName
+        )
     }
 
     public func get(_ key: String) throws -> String? {

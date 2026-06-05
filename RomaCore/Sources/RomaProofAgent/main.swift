@@ -193,23 +193,9 @@ struct RomaProofAgent {
         let key = try options.value(after: "--key")
         let valueEnvironmentName = try options.value(after: "--value-env")
 
-        guard RomaCommandLineText.isValidEnvironmentName(valueEnvironmentName) else {
-            throw RomaCommandLineOptionsError.invalidOptionValue("--value-env")
-        }
-        guard let secret = ProcessInfo.processInfo.environment[valueEnvironmentName],
-              !secret.isEmpty else {
-            throw TranscriptionAPIKeySourceError.missingEnvironmentValue(valueEnvironmentName)
-        }
-
-        let store = WindowsDPAPISecretStore(directoryURL: directoryURL)
-        try store.save(secret, forKey: key)
-
-        print("secret_store=dpapi")
-        print("directory=\(directoryURL.path)")
-        print("key=\(key)")
-        print("key_file=\(try WindowsDPAPISecretStore.fileName(forKey: key))")
-        print("value_env=\(valueEnvironmentName)")
-        print("stored=true")
+        let proof = try WindowsDPAPISecretStore(directoryURL: directoryURL)
+            .saveFromEnvironment(key: key, environmentName: valueEnvironmentName)
+        proof.proofOutputLines.forEach { print($0) }
     }
 
     private static func runWindowsSecretProof(arguments: [String]) throws {

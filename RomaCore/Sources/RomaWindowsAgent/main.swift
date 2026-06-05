@@ -194,21 +194,10 @@ struct RomaWindowsAgent {
         let directoryPath = options.optionalValue(after: "--secret-dir")
             ?? WindowsDPAPISecretStore.defaultDirectoryURL().path
 
-        guard RomaCommandLineText.isValidEnvironmentName(environmentName) else {
-            throw RomaCommandLineOptionsError.invalidOptionValue("--value-env")
-        }
-        guard let secret = ProcessInfo.processInfo.environment[environmentName], !secret.isEmpty else {
-            throw TranscriptionAPIKeySourceError.missingEnvironmentValue(environmentName)
-        }
-
         let directoryURL = URL(fileURLWithPath: directoryPath, isDirectory: true)
-        try WindowsDPAPISecretStore(directoryURL: directoryURL).save(secret, forKey: key)
-        print("secret_store=dpapi")
-        print("directory=\(directoryURL.path)")
-        print("key=\(key)")
-        print("key_file=\(try WindowsDPAPISecretStore.fileName(forKey: key))")
-        print("value_env=\(environmentName)")
-        print("stored=true")
+        let proof = try WindowsDPAPISecretStore(directoryURL: directoryURL)
+            .saveFromEnvironment(key: key, environmentName: environmentName)
+        proof.proofOutputLines.forEach { print($0) }
     }
 
     private static func writeConfiguration(arguments: [String]) throws {

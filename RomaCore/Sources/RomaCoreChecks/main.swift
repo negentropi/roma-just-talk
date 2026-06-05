@@ -11376,7 +11376,14 @@ struct RomaCoreChecks {
         }
         try require(
             proofCommonScript.contains("function Assert-RomaWindowsListenerSmokeOutput") &&
+                proofCommonScript.contains("function Get-RomaWindowsListenerSmokeOutputMarkers") &&
                 proofCommonScript.contains("function Get-RomaWindowsListenerSmokeOutputProof") &&
+                proofCommonScript.contains("Get-RomaWindowsOutputMarkerProof -Output $Output -Markers (Get-RomaWindowsListenerSmokeOutputMarkers)") &&
+                !proofCommonScript.contains(#"mode_listen = $Output.Contains("mode=listen")"#) &&
+                !proofCommonScript.contains(#"launcher_mode_listen = $Output.Contains("mode=RomaWindowsAgent listen")"#) &&
+                !proofCommonScript.contains(#"shared_pre_roll_runtime = $Output.Contains("listener_capture_lifecycle=shared_pre_roll_runtime")"#) &&
+                !proofCommonScript.contains(#"zero_session = $Output.Contains("max_sessions=0")"#) &&
+                !proofCommonScript.contains(#"completed_zero_sessions = $Output.Contains("listen_completed_sessions=0")"#) &&
                 proveScript.contains("Get-RomaWindowsListenerSmokeOutputProof -Output $Output"),
             "Windows proof helper should own listener smoke output assertions and proof shaping"
         )

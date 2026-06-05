@@ -1726,19 +1726,26 @@ function New-RomaWindowsLaptopPreflightReport {
     }
 }
 
+function Get-RomaWindowsListenerSmokeOutputMarkers {
+    return [ordered]@{
+        mode_listen = "mode=listen"
+        launcher_mode_listen = "mode=RomaWindowsAgent listen"
+        shared_pre_roll_runtime = "listener_capture_lifecycle=shared_pre_roll_runtime"
+        zero_session = "max_sessions=0"
+        completed_zero_sessions = "listen_completed_sessions=0"
+    }
+}
+
 function Get-RomaWindowsListenerSmokeOutputProof {
     param(
         [string]$Output = ""
     )
 
-    return [ordered]@{
+    $proof = [ordered]@{
         output_present = ![string]::IsNullOrWhiteSpace($Output)
-        mode_listen = $Output.Contains("mode=listen")
-        launcher_mode_listen = $Output.Contains("mode=RomaWindowsAgent listen")
-        shared_pre_roll_runtime = $Output.Contains("listener_capture_lifecycle=shared_pre_roll_runtime")
-        zero_session = $Output.Contains("max_sessions=0")
-        completed_zero_sessions = $Output.Contains("listen_completed_sessions=0")
     }
+    Add-RomaWindowsProofFields -Proof $proof -Fields (Get-RomaWindowsOutputMarkerProof -Output $Output -Markers (Get-RomaWindowsListenerSmokeOutputMarkers)) | Out-Null
+    return $proof
 }
 
 function Get-RomaWindowsOutputValue {

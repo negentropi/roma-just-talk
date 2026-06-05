@@ -1552,6 +1552,7 @@ public struct RomaTranscriptionOutputFilter {
                     from: polishedText,
                     after: activeContext.precedingText
                 )
+                polishedText = unwrapPlainSquareBracketedBoundaryContinuationFragment(from: polishedText)
                 polishedText = unwrapPlainNonASCIIBoundaryContinuationFragment(from: polishedText)
             }
             if wasWholeSquareBracketedOutput {
@@ -2135,12 +2136,19 @@ public struct RomaTranscriptionOutputFilter {
         after precedingText: String
     ) -> Bool {
         let trimmedSuffix = suffix.trimmingCharacters(in: .whitespacesAndNewlines)
+        let boundaryUnwrappedSuffix = unwrapPlainSquareBracketedBoundaryContinuationFragment(from: trimmedSuffix)
         let punctuationStrippedSuffix = removeTrailingNoisyFragmentPunctuation(from: trimmedSuffix)
+        let punctuationStrippedBoundaryUnwrappedSuffix = removeTrailingNoisyFragmentPunctuation(
+            from: boundaryUnwrappedSuffix
+        )
         let isNoisyFinalWordOrSingleContinuation = isNoisyFinalWordContinuationFragment(trimmedSuffix) ||
-            isNoisyFinalWordContinuationFragment(punctuationStrippedSuffix)
+            isNoisyFinalWordContinuationFragment(punctuationStrippedSuffix) ||
+            isNoisyFinalWordContinuationFragment(boundaryUnwrappedSuffix) ||
+            isNoisyFinalWordContinuationFragment(punctuationStrippedBoundaryUnwrappedSuffix)
         guard !trimmedSuffix.isEmpty,
               !hasInternalSentenceBoundary(trimmedSuffix),
               isShortFragment(trimmedSuffix) ||
+                isShortFragment(boundaryUnwrappedSuffix) ||
                 isNoisyPreservedBoundaryContinuationFragment(trimmedSuffix) ||
                 isNoisyFinalWordOrSingleContinuation else {
             return false
@@ -2175,7 +2183,8 @@ public struct RomaTranscriptionOutputFilter {
             "what i wanted to say is", "what i wanted to say was", "what i meant is",
             "what i meant was", "what i mean was", "yes", "yep", "yup"
         ].contains(filler) {
-            guard hasTechnicalContinuationFragmentHead(trimmedSuffix) else {
+            guard hasTechnicalContinuationFragmentHead(trimmedSuffix) ||
+                    hasTechnicalContinuationFragmentHead(boundaryUnwrappedSuffix) else {
                 return false
             }
         }
@@ -10165,6 +10174,24 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         return innerText
+    }
+
+    private static func unwrapPlainSquareBracketedBoundaryContinuationFragment(from text: String) -> String {
+        guard let innerText = wholeSquareBracketedOutputInnerText(in: text) else {
+            return text
+        }
+
+        let cleanedInnerText = innerText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let punctuationStrippedInnerText = removeTrailingNoisyFragmentPunctuation(from: cleanedInnerText)
+        guard !cleanedInnerText.isEmpty,
+              isShortFragment(punctuationStrippedInnerText) ||
+                isNoisyFinalWordContinuationFragment(punctuationStrippedInnerText),
+              !hasInternalSentenceBoundary(cleanedInnerText),
+              !containsInlinePreservedBoundary(cleanedInnerText) else {
+            return text
+        }
+
+        return cleanedInnerText
     }
 
     private static func nonASCIIBoundaryInnerText(in text: String) -> String? {

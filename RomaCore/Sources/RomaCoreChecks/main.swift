@@ -503,6 +503,13 @@ struct RomaCoreChecks {
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Nope wait [final word]",
+                context: midSentenceContext
+            ) == "final word",
+            "shared insertion polish should trim nope-wait correction fillers before square-bracketed final-word continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "Nah actually module.",
                 context: midSentenceContext
             ) == "module",
@@ -1173,6 +1180,20 @@ struct RomaCoreChecks {
                 preservesTerminalPunctuation: true
             ) == "a final word?",
             "shared insertion polish should trim correction markers before punctuated final-word continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Correction is [a final word or single]",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "shared insertion polish should trim correction markers before square-bracketed final-word continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "It's [a final word or single]",
+                context: midSentenceContext
+            ) == "a final word or single",
+            "shared insertion polish should trim it's markers before square-bracketed final-word continuations"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
@@ -9497,6 +9518,39 @@ struct RomaCoreChecks {
         try require(
             await bracketedFragmentInserter.pastedText == " model",
             "pipeline should paste bracketed artifact polish"
+        )
+
+        let correctionBracketedFragmentRecorder = FakeRecorder()
+        let correctionBracketedFragmentInserter = FakeTextInsertion()
+        let correctionBracketedFragmentPipeline = DictationPipeline(
+            recorder: correctionBracketedFragmentRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "correction-bracketed-fragment-proof.wav",
+                text: "Correction is [a final word or single]"
+            ),
+            textInsertion: correctionBracketedFragmentInserter
+        )
+        let correctionBracketedFragmentRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/correction-bracketed-fragment-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await correctionBracketedFragmentRecorder.startPreRollBuffering()
+        let correctionBracketedFragmentResult = try await correctionBracketedFragmentPipeline.runRecordingWindow(
+            correctionBracketedFragmentRequest
+        ) {}
+
+        try require(
+            correctionBracketedFragmentResult.processedText == " a final word or single",
+            "pipeline should trim correction markers before unwrapping bracketed continuation fragments"
+        )
+        try require(
+            await correctionBracketedFragmentInserter.pastedText == " a final word or single",
+            "pipeline should paste correction bracketed continuation fragments as clean text"
         )
 
         let bracketedAbbreviationRecorder = FakeRecorder()

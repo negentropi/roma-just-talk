@@ -1374,6 +1374,31 @@ struct RomaCoreChecks {
             "shared insertion polish should preserve ordinary is-continuations after repeated context"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("this should be Model.", context: midSentenceContext) == "model",
+            "shared insertion polish should trim repeated context plus generated should-be before technical fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "so this should be Model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim repeated multi-word context plus generated should-be fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "this should be final word.",
+                context: midSentenceContext
+            ) == "final word",
+            "shared insertion polish should trim repeated context plus generated should-be before final-word fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "this should be ready.",
+                context: midSentenceContext
+            ) == "should be ready",
+            "shared insertion polish should preserve ordinary should-be continuations after repeated context"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "so this final word.",
                 context: midSentenceContext
@@ -9831,6 +9856,21 @@ struct RomaCoreChecks {
             rawText: "this is ready.",
             expectedText: " is ready",
             fileName: "mid-sentence-this-is-ready-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "this should be Model.",
+            expectedText: " model",
+            fileName: "mid-sentence-this-should-be-model-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "this should be final word.",
+            expectedText: " final word",
+            fileName: "mid-sentence-this-should-be-final-word-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "this should be ready.",
+            expectedText: " should be ready",
+            fileName: "mid-sentence-this-should-be-ready-proof.wav"
         )
 
         let bracketedFragmentRecorder = FakeRecorder()

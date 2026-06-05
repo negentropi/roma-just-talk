@@ -2408,22 +2408,32 @@ public struct RomaTranscriptionOutputFilter {
                 continue
             }
 
-            return removeLeadingDanglingCopulaAfterContextOverlap(from: suffix)
+            return removeLeadingDanglingGeneratedLeadInAfterContextOverlap(from: suffix)
         }
 
         return text
     }
 
-    private static func removeLeadingDanglingCopulaAfterContextOverlap(from text: String) -> String {
+    private static func removeLeadingDanglingGeneratedLeadInAfterContextOverlap(from text: String) -> String {
         let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
         let tokens = wordTokens(in: trimmedText)
         guard tokens.count >= 2,
-              tokens[0].text == "is",
               !hasInternalSentenceBoundary(trimmedText) else {
             return text
         }
 
-        let suffixStart = tokens[1].range.lowerBound
+        let leadInWordCount: Int
+        if tokens[0].text == "is" {
+            leadInWordCount = 1
+        } else if tokens.count >= 3,
+                  tokens[0].text == "should",
+                  tokens[1].text == "be" {
+            leadInWordCount = 2
+        } else {
+            return text
+        }
+
+        let suffixStart = tokens[leadInWordCount].range.lowerBound
         let suffix = String(trimmedText[suffixStart...])
             .trimmingCharacters(in: .whitespacesAndNewlines)
         let suffixTokens = wordTokens(in: suffix)

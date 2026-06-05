@@ -1251,6 +1251,7 @@ public struct RomaTranscriptionOutputFilter {
             filteredText = collapseRepeatedShortPhrases(in: filteredText)
             filteredText = collapseRepeatedShortClauses(in: filteredText)
             filteredText = collapseRepeatedLeadInCorrections(in: filteredText)
+            filteredText = collapseRepeatedCopulaLeadInCorrections(in: filteredText)
             filteredText = collapseRepeatedTemporalPrepositionCorrections(in: filteredText)
             filteredText = collapseRepeatedProperNamePrepositionCorrections(in: filteredText)
             filteredText = collapseRepeatedShortSentences(in: filteredText)
@@ -9043,6 +9044,86 @@ public struct RomaTranscriptionOutputFilter {
         }
         return productCorrectionTailWords.contains(sourceWord) &&
             productCorrectionTailWords.contains(correctionWord)
+    }
+
+    private static func collapseRepeatedCopulaLeadInCorrections(in text: String) -> String {
+        var collapsedText = text
+        var rewriteCount = 0
+
+        while rewriteCount < 4 {
+            guard let rewrite = repeatedCopulaLeadInCorrectionRewrite(in: collapsedText) else {
+                break
+            }
+            collapsedText.replaceSubrange(rewrite.range, with: rewrite.replacement)
+            rewriteCount += 1
+        }
+
+        return collapsedText
+    }
+
+    private static func repeatedCopulaLeadInCorrectionRewrite(
+        in text: String
+    ) -> (range: Range<String.Index>, replacement: String)? {
+        let tokens = wordTokens(in: text)
+        guard tokens.count >= 6 && tokens.count <= 18 else { return nil }
+
+        let normalizedWords = tokens.map(\.text)
+        for leadInWordCount in stride(from: 5, through: 1, by: -1) {
+            guard tokens.count >= leadInWordCount * 2 + 4 else { continue }
+
+            for firstLeadStart in 0...(tokens.count - leadInWordCount * 2 - 4) {
+                let firstLeadEnd = firstLeadStart + leadInWordCount
+                let firstLeadWords = Array(normalizedWords[firstLeadStart..<firstLeadEnd])
+                guard canCollapseRepeatedLeadInCorrection(firstLeadWords) else {
+                    continue
+                }
+
+                let sourceSubjectIndex = firstLeadEnd
+                let firstCopulaIndex = sourceSubjectIndex + 1
+                let secondLeadStart = firstCopulaIndex + 1
+                let secondLeadEnd = secondLeadStart + leadInWordCount
+                let correctionSubjectIndex = secondLeadEnd
+                let secondCopulaIndex = correctionSubjectIndex + 1
+                let predicateTailStart = secondCopulaIndex + 1
+                guard predicateTailStart < tokens.count,
+                      Array(normalizedWords[secondLeadStart..<secondLeadEnd]) == firstLeadWords,
+                      normalizedWords[firstCopulaIndex] == normalizedWords[secondCopulaIndex],
+                      ["is", "are", "was", "were"].contains(normalizedWords[firstCopulaIndex]) else {
+                    continue
+                }
+
+                let sourceSubject = normalizedWords[sourceSubjectIndex]
+                let correctionSubject = normalizedWords[correctionSubjectIndex]
+                let predicateTailWords = Array(normalizedWords[predicateTailStart..<tokens.count])
+                guard sourceSubject != correctionSubject,
+                      productCorrectionTailWords.contains(sourceSubject),
+                      productCorrectionTailWords.contains(correctionSubject),
+                      predicateTailWords.count <= 4,
+                      predicateTailWords.contains(where: isLikelyPredicateTailWord) else {
+                    continue
+                }
+
+                let rewriteStart = tokens[firstLeadStart].range.lowerBound
+                let rewriteEnd = tokens.last!.range.upperBound
+                let leadingText = String(text[..<rewriteStart])
+                guard leadingText.rangeOfCharacter(from: CharacterSet(charactersIn: "\n.!?")) == nil else {
+                    continue
+                }
+
+                let firstLeadText = String(
+                    text[tokens[firstLeadStart].range.lowerBound..<tokens[firstLeadEnd - 1].range.upperBound]
+                )
+                let correctionTailText = String(
+                    text[tokens[correctionSubjectIndex].range.lowerBound..<tokens.last!.range.upperBound]
+                )
+                return (
+                    rewriteStart..<rewriteEnd,
+                    join("", firstLeadText, correctionTailText)
+                )
+            }
+        }
+
+        return nil
     }
 
     private static func collapseRepeatedTemporalPrepositionCorrections(in text: String) -> String {

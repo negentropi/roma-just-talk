@@ -2190,6 +2190,16 @@ struct RomaCoreChecks {
                 "inline repeated lead-in correction"
             ),
             (
+                "The model is the module is ready.",
+                "The module is ready.",
+                "repeated copula lead-in correction"
+            ),
+            (
+                "I think the model is I think the module is ready.",
+                "I think the module is ready.",
+                "long repeated copula lead-in correction"
+            ),
+            (
                 "Let us meet at two at three tomorrow.",
                 "Let us meet at three tomorrow.",
                 "temporal at-preposition restatement correction"
@@ -2328,6 +2338,11 @@ struct RomaCoreChecks {
                 "The model is the module.",
                 "The model is the module.",
                 "predicate repeated lead-in guard"
+            ),
+            (
+                "The problem is the team is late.",
+                "The problem is the team is late.",
+                "copula clause prose guard"
             ),
             (
                 "We should ship today. We should",

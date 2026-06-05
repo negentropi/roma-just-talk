@@ -191,19 +191,6 @@ function Invoke-ConfigDoctor {
     return $output
 }
 
-function Test-ContainsText {
-    param(
-        [string]$Text = "",
-        [string]$Needle = ""
-    )
-
-    if ([string]::IsNullOrEmpty($Needle)) {
-        return $false
-    }
-
-    return $Text.IndexOf($Needle, [System.StringComparison]::OrdinalIgnoreCase) -ge 0
-}
-
 function Get-ShortcutProof {
     param(
         [Parameter(Mandatory = $true)]
@@ -236,20 +223,20 @@ function Get-ShortcutProof {
     $proof["description"] = [string]$shortcut.Description
     $proof["window_style"] = [int]$shortcut.WindowStyle
     $proof["target_is_powershell"] = $targetPath.EndsWith("powershell.exe", [System.StringComparison]::OrdinalIgnoreCase)
-    $proof["references_run_script"] = ![string]::IsNullOrWhiteSpace($RunScriptPath) -and (Test-ContainsText -Text $arguments -Needle $RunScriptPath)
-    $proof["references_install_dir"] = ![string]::IsNullOrWhiteSpace($WorkingDirectory) -and (Test-ContainsText -Text $arguments -Needle $WorkingDirectory)
-    $proof["references_config_path"] = ![string]::IsNullOrWhiteSpace($ConfigPath) -and (Test-ContainsText -Text $arguments -Needle $ConfigPath)
+    $proof["references_run_script"] = ![string]::IsNullOrWhiteSpace($RunScriptPath) -and (Test-RomaWindowsContainsText -Text $arguments -Needle $RunScriptPath)
+    $proof["references_install_dir"] = ![string]::IsNullOrWhiteSpace($WorkingDirectory) -and (Test-RomaWindowsContainsText -Text $arguments -Needle $WorkingDirectory)
+    $proof["references_config_path"] = ![string]::IsNullOrWhiteSpace($ConfigPath) -and (Test-RomaWindowsContainsText -Text $arguments -Needle $ConfigPath)
     $proof["expected_file_argument"] = $expectedFileArgument
     $proof["expected_install_dir_argument"] = $expectedInstallDirArgument
     $proof["expected_config_argument"] = $expectedConfigArgument
-    $proof["has_exact_file_argument"] = Test-ContainsText -Text $arguments -Needle $expectedFileArgument
-    $proof["has_install_dir_argument"] = Test-ContainsText -Text $arguments -Needle "-InstallDir"
-    $proof["has_exact_install_dir_argument"] = Test-ContainsText -Text $arguments -Needle $expectedInstallDirArgument
-    $proof["has_config_path_argument"] = Test-ContainsText -Text $arguments -Needle "-ConfigPath"
-    $proof["has_exact_config_argument"] = Test-ContainsText -Text $arguments -Needle $expectedConfigArgument
-    $proof["has_no_profile_argument"] = Test-ContainsText -Text $arguments -Needle "-NoProfile"
-    $proof["has_execution_policy_bypass"] = Test-ContainsText -Text $arguments -Needle "-ExecutionPolicy Bypass"
-    $proof["runs_listener"] = Test-ContainsText -Text $arguments -Needle "-Listen"
+    $proof["has_exact_file_argument"] = Test-RomaWindowsContainsText -Text $arguments -Needle $expectedFileArgument
+    $proof["has_install_dir_argument"] = Test-RomaWindowsContainsText -Text $arguments -Needle "-InstallDir"
+    $proof["has_exact_install_dir_argument"] = Test-RomaWindowsContainsText -Text $arguments -Needle $expectedInstallDirArgument
+    $proof["has_config_path_argument"] = Test-RomaWindowsContainsText -Text $arguments -Needle "-ConfigPath"
+    $proof["has_exact_config_argument"] = Test-RomaWindowsContainsText -Text $arguments -Needle $expectedConfigArgument
+    $proof["has_no_profile_argument"] = Test-RomaWindowsContainsText -Text $arguments -Needle "-NoProfile"
+    $proof["has_execution_policy_bypass"] = Test-RomaWindowsContainsText -Text $arguments -Needle "-ExecutionPolicy Bypass"
+    $proof["runs_listener"] = Test-RomaWindowsContainsText -Text $arguments -Needle "-Listen"
     $proof["working_directory_is_install_dir"] = $savedWorkingDirectory.Equals($WorkingDirectory, [System.StringComparison]::OrdinalIgnoreCase)
 
     return $proof
@@ -389,114 +376,16 @@ function Get-ConfigProof {
     return $proof
 }
 
-function Get-DictationRuntimeLogProof {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$LogPath,
-        [string]$ExpectedText = ""
-    )
-
-    $logPath = $LogPath
-    $proof = Get-FileProof -Path $logPath
-    if (!$proof["exists"]) {
-        return $proof
-    }
-
-    $content = Get-Content -LiteralPath $logPath -Raw
-    $wrotePath = Get-OutputValue -Content $content -Name "wrote"
-    $durationSeconds = Get-OutputNumber -Content $content -Name "duration_seconds"
-    $includedPreRollSeconds = Get-OutputNumber -Content $content -Name "included_pre_roll_seconds"
-    $sampleRate = Get-OutputNumber -Content $content -Name "sample_rate"
-    $channelCount = Get-OutputNumber -Content $content -Name "channels"
-    $rawTranscriptLength = Get-OutputNumber -Content $content -Name "raw_transcript_length"
-    $processedTranscriptLength = Get-OutputNumber -Content $content -Name "processed_transcript_length"
-    $processedTranscriptText = Get-OutputValue -Content $content -Name "processed_transcript_text"
-    $preRollBufferingLine = Get-OutputLineNumber -Content $content -Needle "pre_roll_buffering=true"
-    $waitingForHoldLine = Get-OutputLineNumber -Content $content -Needle "waiting_for_key_down="
-    $holdKeyDownLine = Get-OutputLineNumber -Content $content -Needle "hold_key_down=true"
-    $holdKeyUpLine = Get-OutputLineNumber -Content $content -Needle "hold_key_up=true"
-    $wroteLine = Get-OutputLineNumber -Content $content -Needle "wrote="
-    $processedTextLine = Get-OutputLineNumber -Content $content -Needle "processed_transcript_text="
-    $proof["reported_wrote"] = $content.Contains("wrote=")
-    $proof["wrote_path"] = $wrotePath
-    if (![string]::IsNullOrWhiteSpace($wrotePath)) {
-        $proof["wrote_file"] = Get-FileProof -Path $wrotePath
-    }
-    $proof["reported_pre_roll"] = $content.Contains("included_pre_roll_seconds=")
-    $proof["duration_seconds"] = $durationSeconds
-    $proof["included_pre_roll_seconds"] = $includedPreRollSeconds
-    $proof["reported_positive_duration"] = ($null -ne $durationSeconds) -and ($durationSeconds -gt 0)
-    $proof["reported_positive_pre_roll"] = ($null -ne $includedPreRollSeconds) -and ($includedPreRollSeconds -gt 0)
-    $proof["sample_rate"] = $sampleRate
-    $proof["channels"] = $channelCount
-    $proof["reported_speech_pcm_contract"] = (
-        ($null -ne $sampleRate) -and
-        ($null -ne $channelCount) -and
-        ($sampleRate -eq 16000) -and
-        ($channelCount -eq 1)
-    )
-    $proof["raw_transcript_length"] = $rawTranscriptLength
-    $proof["processed_transcript_length"] = $processedTranscriptLength
-    $proof["reported_positive_raw_transcript"] = ($null -ne $rawTranscriptLength) -and ($rawTranscriptLength -gt 0)
-    $proof["reported_positive_processed_transcript"] = ($null -ne $processedTranscriptLength) -and ($processedTranscriptLength -gt 0)
-    $proof["reported_processed_text"] = ![string]::IsNullOrWhiteSpace($processedTranscriptText)
-    $proof["processed_transcript_text_present"] = ![string]::IsNullOrWhiteSpace($processedTranscriptText)
-    $proof["reported_paste_sent"] = $content.Contains("paste_sent=true")
-    $proof["reported_paste_not_sent"] = $content.Contains("paste_sent=false")
-    $proof["reported_hold_mode"] = $content.Contains("recording_mode=hold")
-    $proof["reported_waiting_for_hold_key_down"] = $content.Contains("waiting_for_key_down=")
-    $proof["reported_hold_key_down"] = $content.Contains("hold_key_down=true")
-    $proof["reported_hold_key_up"] = $content.Contains("hold_key_up=true")
-    $proof["pre_roll_buffering_line"] = $preRollBufferingLine
-    $proof["waiting_for_hold_key_down_line"] = $waitingForHoldLine
-    $proof["hold_key_down_line"] = $holdKeyDownLine
-    $proof["hold_key_up_line"] = $holdKeyUpLine
-    $proof["wrote_line"] = $wroteLine
-    $proof["processed_transcript_text_line"] = $processedTextLine
-    $proof["reported_ordered_hold_sequence"] = (
-        $preRollBufferingLine -gt 0 -and
-        $waitingForHoldLine -gt $preRollBufferingLine -and
-        $holdKeyDownLine -gt $waitingForHoldLine -and
-        $holdKeyUpLine -gt $holdKeyDownLine -and
-        $wroteLine -gt $holdKeyUpLine -and
-        $processedTextLine -gt $wroteLine
-    )
-    $expectedTranscriptTextFound = $false
-    if (![string]::IsNullOrWhiteSpace($ExpectedText)) {
-        $expectedTranscriptTextFound = Test-ContainsText -Text $processedTranscriptText -Needle $ExpectedText
-    }
-    $proof["expected_transcript_text"] = $ExpectedText
-    $proof["expected_transcript_text_required"] = ![string]::IsNullOrWhiteSpace($ExpectedText)
-    $proof["expected_transcript_text_source"] = "processed_transcript_text"
-    $proof["expected_transcript_text_found"] = $expectedTranscriptTextFound
-
-    return $proof
-}
-
 function Get-DictationRuntimeProof {
-    return Get-DictationRuntimeLogProof `
+    return Get-RomaWindowsDictationRuntimeLogProof `
         -LogPath (Join-Path (Join-Path $InstallDir "smoke") "windows-agent-dictate.log") `
         -ExpectedText $ExpectedTranscriptText
 }
 
 function Get-ListenerRuntimeProof {
-    $logPath = Join-Path (Join-Path $InstallDir "smoke") "windows-agent-listen.log"
-    $proof = Get-DictationRuntimeLogProof `
-        -LogPath $logPath `
+    return Get-RomaWindowsListenerRuntimeLogProof `
+        -LogPath (Join-Path (Join-Path $InstallDir "smoke") "windows-agent-listen.log") `
         -ExpectedText $ExpectedTranscriptText
-    if (!$proof["exists"]) {
-        return $proof
-    }
-
-    $content = Get-Content -LiteralPath $logPath -Raw
-    $proof["mode_listen"] = $content.Contains("mode=RomaWindowsAgent listen") -and $content.Contains("mode=listen")
-    $proof["shared_pre_roll_runtime"] = $content.Contains("listener_capture_lifecycle=shared_pre_roll_runtime")
-    $proof["max_sessions_one"] = $content.Contains("max_sessions=1")
-    $proof["session_start_one"] = $content.Contains("listen_session_start=1")
-    $proof["session_completed_one"] = $content.Contains("listen_session_completed=1")
-    $proof["completed_one_session"] = $content.Contains("listen_completed_sessions=1")
-
-    return $proof
 }
 
 function Get-ListenerSmokeProof {

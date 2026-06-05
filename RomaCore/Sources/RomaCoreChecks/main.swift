@@ -10405,10 +10405,16 @@ struct RomaCoreChecks {
             proveScript.contains("[switch]$RunListenerProof") &&
                 proveScript.contains("function Invoke-InstalledListenerRuntimeProof") &&
                 proveScript.contains("windows-agent-listen.log") &&
-                proveScript.contains("Get-DictationRuntimeLogProof") &&
+                proofCommonScript.contains("function Get-RomaWindowsDictationRuntimeLogProof") &&
+                proofCommonScript.contains("function Get-RomaWindowsListenerRuntimeLogProof") &&
+                proofCommonScript.contains("function Test-RomaWindowsContainsText") &&
+                proveScript.contains("Get-RomaWindowsDictationRuntimeLogProof `") &&
+                proveScript.contains("Get-RomaWindowsListenerRuntimeLogProof `") &&
+                !proveScript.contains("function Get-DictationRuntimeLogProof") &&
+                !proveScript.contains("function Test-ContainsText") &&
                 proveScript.contains(#"$report["listener_runtime"] = Get-ListenerRuntimeProof"#) &&
                 laptopProofScript.contains("-RunListenerProof"),
-            "Windows full laptop proof should archive a real installed listener runtime session"
+            "Windows full laptop proof should archive real installed dictation/listener runtime sessions through shared runtime proof shaping"
         )
         try require(
             doctorOutputSource.contains(#""windows_hold_hook_single_window_source=true""#) &&
@@ -10960,13 +10966,13 @@ struct RomaCoreChecks {
             "Windows proof profiles should print agent runtime wiring coverage"
         )
         try require(
-            proveScript.contains("reported_ordered_hold_sequence"),
+            proofCommonScript.contains("reported_ordered_hold_sequence"),
             "Windows artifact proof reports should record ordered hold-to-talk runtime evidence"
         )
         try require(
-            proveScript.contains(#"$sampleRate = Get-OutputNumber -Content $content -Name "sample_rate""#) &&
-                proveScript.contains(#"$channelCount = Get-OutputNumber -Content $content -Name "channels""#) &&
-                proveScript.contains("reported_speech_pcm_contract"),
+            proofCommonScript.contains(#"$sampleRate = Get-RomaWindowsOutputNumber -Content $content -Name "sample_rate""#) &&
+                proofCommonScript.contains(#"$channelCount = Get-RomaWindowsOutputNumber -Content $content -Name "channels""#) &&
+                proofCommonScript.contains("reported_speech_pcm_contract"),
             "Windows artifact proof reports should record the dictation audio speech PCM contract"
         )
         try require(

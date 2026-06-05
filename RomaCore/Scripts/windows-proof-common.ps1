@@ -38,7 +38,8 @@ function Assert-RomaWindowsFileWithMinimumBytes {
     param(
         [Parameter(Mandatory = $true)]
         [string]$Path,
-        [int64]$MinimumBytes = 1
+        [int64]$MinimumBytes = 1,
+        [switch]$WriteProofFileMarkers
     )
 
     if (!(Test-Path -LiteralPath $Path)) {
@@ -52,6 +53,10 @@ function Assert-RomaWindowsFileWithMinimumBytes {
 
     Write-Host "file=$Path"
     Write-Host "bytes=$($item.Length)"
+    if ($WriteProofFileMarkers) {
+        Write-Host "proof_file=$Path"
+        Write-Host "proof_file_bytes=$($item.Length)"
+    }
 }
 
 function Get-RomaWindowsCurrentUserSid {

@@ -61,23 +61,6 @@ if (!(Test-Path -LiteralPath $manifestScript)) {
 }
 . $manifestScript
 
-function Require-FileWithMinimumBytes {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Path,
-        [int64]$MinimumBytes = 1
-    )
-
-    Require-File -Path $Path
-    $item = Get-Item -LiteralPath $Path
-    if ($item.Length -lt $MinimumBytes) {
-        throw "Expected file to have at least $MinimumBytes bytes: $Path bytes=$($item.Length)"
-    }
-
-    Write-Host "proof_file=$Path"
-    Write-Host "proof_file_bytes=$($item.Length)"
-}
-
 function ConvertTo-PowerShellSingleQuotedString {
     param(
         [string]$Value = ""
@@ -227,7 +210,10 @@ function Invoke-MicrophonePreflight {
     if (($null -eq $includedPreRollSeconds) -or ($includedPreRollSeconds -le 0)) {
         throw "Laptop microphone preflight did not report positive included_pre_roll_seconds"
     }
-    Require-FileWithMinimumBytes -Path $OutputPath -MinimumBytes 45
+    Assert-RomaWindowsFileWithMinimumBytes `
+        -Path $OutputPath `
+        -MinimumBytes 45 `
+        -WriteProofFileMarkers
     Write-Host "microphone_preflight_duration_seconds=$durationSeconds"
     Write-Host "microphone_preflight_included_pre_roll_seconds=$includedPreRollSeconds"
     Write-Host "microphone_preflight_wav=$OutputPath"

@@ -10714,6 +10714,11 @@ struct RomaCoreChecks {
                 windowsProofScript.contains("Assert-RomaWindowsFileWithMinimumBytes -Path $agentConfig") &&
                 smokeScript.contains("Assert-RomaWindowsFileWithMinimumBytes -Path $ConfigPath") &&
                 smokeScript.contains("Assert-RomaWindowsFileWithMinimumBytes -Path $dictationOutput -MinimumBytes 45") &&
+                laptopProofScript.contains("Assert-RomaWindowsFileWithMinimumBytes `") &&
+                laptopProofScript.contains("-WriteProofFileMarkers") &&
+                proofCommonScript.contains("[switch]$WriteProofFileMarkers") &&
+                proofCommonScript.contains("proof_file=$Path") &&
+                !laptopProofScript.contains("function Require-FileWithMinimumBytes") &&
                 !windowsProofScript.contains("function Assert-FileWithBytes") &&
                 !windowsProofScript.contains("function Assert-NonEmptyFile") &&
                 !smokeScript.contains("function Assert-NonEmptyFile") &&

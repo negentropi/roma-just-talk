@@ -427,6 +427,7 @@ public struct RomaTranscriptionOutputFilter {
         "netlify": "Netlify",
         "nextjs": "Next.js",
         "node": "Node",
+        "opencode": "OpenCode",
         "openai": "OpenAI",
         "perplexity": "Perplexity",
         "postgres": "Postgres",
@@ -515,7 +516,7 @@ public struct RomaTranscriptionOutputFilter {
         "in", "is", "left", "needed", "of", "shortcut", "shortcuts", "there", "to"
     ]
     private static let likelyLowercaseFragments: Set<String> = [
-        "a", "about", "actually", "after", "again", "all", "alright", "also", "an", "and", "any", "app", "are",
+        "a", "about", "actually", "after", "again", "agent", "agents", "all", "alright", "also", "an", "and", "any", "app", "are",
         "argument", "arguments", "array", "arrays", "as", "at", "back", "bad", "be", "because", "branch", "branches",
         "bug", "bugs", "button", "buttons", "but", "by", "cache", "caches", "call", "can", "case", "change", "class", "classes",
         "client", "code", "command", "commands", "commit", "commits", "component", "components", "config",

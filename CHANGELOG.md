@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Preserved OpenCode casing and lowercased all-caps agent tails in short agentic-coding dictation fragments.
 - Preserved Windsurf casing in short developer dictation fragments, including spoken `wind surf`.
 - Shared installed Windows agent config-file proof shaping through proof-helper helpers.
 - Shared installed Windows shortcut proof shaping through proof-helper helpers.

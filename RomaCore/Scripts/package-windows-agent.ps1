@@ -409,11 +409,14 @@ function Write-LaptopProofGuide {
     $preflightMarkers = @((Get-RomaWindowsLaptopPreflightGuideMarkers).Values) -join [System.Environment]::NewLine
     $localWhisperPreflightMarkers = @((Get-RomaWindowsLaptopPreflightLocalWhisperGuideMarkers).Values) -join [System.Environment]::NewLine
     $fullProofMarkers = @((Get-RomaWindowsFullLaptopProofGuideMarkers).Values) -join [System.Environment]::NewLine
+    $operatorGuide = @(Get-RomaWindowsLaptopProofOperatorGuideLines) -join [System.Environment]::NewLine
 
     @"
 Roma Just Talk Windows laptop proof
 
 Run these commands from this artifact directory.
+
+$operatorGuide
 
 Native preflight only, before cloud credentials or local whisper setup:
 

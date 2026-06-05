@@ -1063,6 +1063,19 @@ function Get-RomaWindowsLaptopPreflightLocalWhisperGuideMarkers {
     }
 }
 
+function Get-RomaWindowsLaptopProofOperatorGuideLines {
+    return @(
+        "Operator actions during proof:",
+        "",
+        "1. When ACTION_REQUIRED=hotkey_delivery_preflight appears, press and release Ctrl+Shift+R once.",
+        "2. Before cloud dictation, focus a normal text field, say 'cloud pre roll proof' before pressing the hotkey, then hold Ctrl+Shift+R while speaking and release to finish.",
+        "3. Before local whisper dictation, focus a normal text field, say 'local whisper pre roll proof' before pressing the hotkey, then hold Ctrl+Shift+R while speaking and release to finish.",
+        "4. The local whisper Notepad paste proof opens and verifies Notepad itself; no manual focus step should be required.",
+        "",
+        "The transcript checker matches the expected phrase against processed_transcript_text, so say the phrase clearly and do not substitute another phrase unless you pass -CloudExpectedTranscriptText or -LocalWhisperExpectedTranscriptText."
+    )
+}
+
 function Get-RomaWindowsFullLaptopProofSetOutputMarkers {
     $markers = Get-RomaWindowsProofSetProfileOkMarkers -Name "full_laptop"
     $markers["full_laptop_proof_set"] = Get-RomaWindowsProofSetOkMarker -Name "full_laptop"

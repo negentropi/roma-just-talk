@@ -11633,8 +11633,14 @@ struct RomaCoreChecks {
                 packageScript.contains("Expected full-proof markers:") &&
                 packageScript.contains("Get-RomaWindowsLaptopPreflightGuideMarkers") &&
                 packageScript.contains("Get-RomaWindowsLaptopPreflightLocalWhisperGuideMarkers") &&
+                packageScript.contains("Get-RomaWindowsLaptopProofOperatorGuideLines") &&
                 proofCommonScript.contains("function Get-RomaWindowsLaptopPreflightGuideMarkers") &&
                 proofCommonScript.contains("function Get-RomaWindowsLaptopPreflightLocalWhisperGuideMarkers") &&
+                proofCommonScript.contains("function Get-RomaWindowsLaptopProofOperatorGuideLines") &&
+                proofCommonScript.contains("ACTION_REQUIRED=hotkey_delivery_preflight") &&
+                proofCommonScript.contains("cloud pre roll proof") &&
+                proofCommonScript.contains("local whisper pre roll proof") &&
+                proofCommonScript.contains("processed_transcript_text") &&
                 packageScript.contains("Get-RomaWindowsFullLaptopProofGuideMarkers") &&
                 proofCommonScript.contains("function Get-RomaWindowsFullLaptopProofGuideMarkers") &&
                 proofCommonScript.contains("windows_laptop_preflight_report=") &&

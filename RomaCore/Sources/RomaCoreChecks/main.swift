@@ -2152,12 +2152,24 @@ struct RomaCoreChecks {
             "shared insertion polish should preserve trailing empty bullet markers"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("Todo\n- [ ] ", context: midSentenceContext) == "Todo\n- [ ] ",
+            "shared insertion polish should preserve trailing empty task markers"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("\n- ", context: midSentenceContext) == "- ",
             "shared insertion polish should normalize standalone empty bullet markers"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("\n- [ ] ", context: midSentenceContext) == "- [ ] ",
+            "shared insertion polish should normalize standalone empty task markers"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionSpacing("- ", context: midSentenceContext) == "\n- ",
             "shared insertion spacing should start empty bullet markers on a new line"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionSpacing("- [ ] ", context: midSentenceContext) == "\n- [ ] ",
+            "shared insertion spacing should start empty task markers on a new line"
         )
         try require(
             RomaTranscriptionOutputFilter.trimBoundarySpacesPreservingStructuralMarkers(" model ") == "model",
@@ -2166,6 +2178,10 @@ struct RomaCoreChecks {
         try require(
             RomaTranscriptionOutputFilter.trimBoundarySpacesPreservingStructuralMarkers(" - ") == "- ",
             "shared boundary trim should preserve empty bullet marker trailing space"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.trimBoundarySpacesPreservingStructuralMarkers(" - [ ] ") == "- [ ] ",
+            "shared boundary trim should preserve empty task marker trailing space"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionSpacing("model", context: midSentenceContext) == " model",
@@ -5369,6 +5385,26 @@ struct RomaCoreChecks {
                 "standalone new bullet command should preserve the empty marker"
             ),
             (
+                "New todo.",
+                "- [ ] ",
+                "standalone new todo command should preserve the empty task marker"
+            ),
+            (
+                "New checkbox.",
+                "- [ ] ",
+                "standalone new checkbox command should preserve the empty task marker"
+            ),
+            (
+                "New checked task.",
+                "- [x] ",
+                "standalone new checked task command should preserve the empty checked task marker"
+            ),
+            (
+                "New todo item.",
+                "- [ ] item",
+                "leading new todo command should keep following task text"
+            ),
+            (
                 "Bullet parent indent bullet child outdent bullet sibling.",
                 "- parent\n  - child\n- sibling",
                 "nested bullet indent outdent command"
@@ -5777,6 +5813,16 @@ struct RomaCoreChecks {
                 "Explain how to press tab in docs.",
                 "Explain how to press tab in docs.",
                 "press tab prose guard"
+            ),
+            (
+                "The new todo command is useful.",
+                "The new todo command is useful.",
+                "new todo command prose guard"
+            ),
+            (
+                "Explain how to create a new checkbox in docs.",
+                "Explain how to create a new checkbox in docs.",
+                "new checkbox docs prose guard"
             ),
             (
                 "All caps is loud.",
@@ -10213,6 +10259,43 @@ struct RomaCoreChecks {
         try require(
             await standaloneBulletInserter.pastedText == "\n- ",
             "pipeline should paste standalone empty bullet markers"
+        )
+
+        let standaloneTaskRecorder = FakeRecorder()
+        let standaloneTaskInserter = FakeTextInsertion()
+        let standaloneTaskPipeline = DictationPipeline(
+            recorder: standaloneTaskRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "standalone-task-proof.wav",
+                text: "New todo."
+            ),
+            textInsertion: standaloneTaskInserter
+        )
+        let standaloneTaskRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/standalone-task-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await standaloneTaskRecorder.startPreRollBuffering()
+        let standaloneTaskResult = try await standaloneTaskPipeline.runRecordingWindow(
+            standaloneTaskRequest
+        ) {}
+
+        try require(
+            standaloneTaskResult.processedText == "\n- [ ] ",
+            "pipeline should clean standalone new-todo commands to an empty task marker"
+        )
+        try require(
+            standaloneTaskResult.session.insertedText == "\n- [ ] ",
+            "pipeline session should store standalone empty task markers"
+        )
+        try require(
+            await standaloneTaskInserter.pastedText == "\n- [ ] ",
+            "pipeline should paste standalone empty task markers"
         )
 
         let fillerOnlyRecorder = FakeRecorder()

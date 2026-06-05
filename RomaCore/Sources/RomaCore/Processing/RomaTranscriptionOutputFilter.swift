@@ -866,6 +866,18 @@ public struct RomaTranscriptionOutputFilter {
             replacement: "\t",
             blockedPreviousWords: ["command", "commands", "how", "phrase", "phrases", "say", "saying", "the", "to", "word", "words"],
             blockedNextWords: ["command", "commands", "from", "in", "is", "means", "of", "phrase", "phrases", "shortcut", "shortcuts"]
+        ),
+        GuardedSpokenFormattingCommand(
+            pattern: #"(?i)(?<![\p{L}\p{N}])(?:new|next)\s+(?:(?:checked|done|completed)\s+(?:task|checkbox|check\s+box)|checked\s+(?:todo|to\s+do)|done\s+(?:todo|to\s+do))(?![\p{L}\p{N}])"#,
+            replacement: "\n- [x] ",
+            blockedPreviousWords: ["a", "an", "command", "commands", "feature", "features", "how", "phrase", "phrases", "say", "saying", "the", "to", "word", "words"],
+            blockedNextWords: ["command", "commands", "feature", "features", "from", "in", "is", "means", "of", "phrase", "phrases", "shortcut", "shortcuts"]
+        ),
+        GuardedSpokenFormattingCommand(
+            pattern: #"(?i)(?<![\p{L}\p{N}])(?:new|next)\s+(?:todo|to\s+do|task|checkbox|check\s+box|unchecked\s+(?:task|checkbox|check\s+box))(?![\p{L}\p{N}])"#,
+            replacement: "\n- [ ] ",
+            blockedPreviousWords: ["a", "an", "command", "commands", "feature", "features", "how", "phrase", "phrases", "say", "saying", "the", "to", "word", "words"],
+            blockedNextWords: ["command", "commands", "feature", "features", "from", "in", "is", "means", "of", "phrase", "phrases", "shortcut", "shortcuts"]
         )
     ]
     private static let spokenEnclosureCommands: [(pattern: String, replacement: String)] = [
@@ -1634,7 +1646,7 @@ public struct RomaTranscriptionOutputFilter {
         while result.first == " " {
             result.removeFirst()
         }
-        guard !hasTrailingEmptyBulletMarker(result) else {
+        guard !hasTrailingEmptyStructuralListMarker(result) else {
             return result
         }
         while result.last == " " {
@@ -5644,7 +5656,7 @@ public struct RomaTranscriptionOutputFilter {
 
     private static func protectPunctuationSpacingSpans(in text: String) -> (text: String, spans: [String]) {
         guard let regex = try? NSRegularExpression(
-            pattern: #"(?i)\b\d{1,2}:\d{2}(?::\d{2})?(?:\.\d{1,3})?\b|\b(?:https?://|www\.)[A-Za-z0-9._~:/?#\[\]@!$&'()*+,;=%-]+|(?<![\p{L}\p{N}])'[^'\n]{1,80}'(?![\p{L}\p{N}])|\b[A-Za-z][A-Za-z0-9_-]{1,63}\.[A-Za-z][A-Za-z0-9_-]{1,63}(?:\.[A-Za-z][A-Za-z0-9_-]{1,63})*\b|(?<![\p{L}\p{N}])(?:[A-Za-z]{1,4}\.){2,}(?![\p{L}\p{N}])|(?<![\p{L}\p{N}])\.[A-Za-z][A-Za-z0-9._-]{0,63}"#
+            pattern: #"(?m)(?:^|(?<=[ \t\n]))- \[(?: |x)\](?=\s|$)|(?i)\b\d{1,2}:\d{2}(?::\d{2})?(?:\.\d{1,3})?\b|\b(?:https?://|www\.)[A-Za-z0-9._~:/?#\[\]@!$&'()*+,;=%-]+|(?<![\p{L}\p{N}])'[^'\n]{1,80}'(?![\p{L}\p{N}])|\b[A-Za-z][A-Za-z0-9_-]{1,63}\.[A-Za-z][A-Za-z0-9_-]{1,63}(?:\.[A-Za-z][A-Za-z0-9_-]{1,63})*\b|(?<![\p{L}\p{N}])(?:[A-Za-z]{1,4}\.){2,}(?![\p{L}\p{N}])|(?<![\p{L}\p{N}])\.[A-Za-z][A-Za-z0-9._-]{0,63}"#
         ) else {
             return (text, [])
         }
@@ -5757,7 +5769,7 @@ public struct RomaTranscriptionOutputFilter {
     }
 
     private static func removeGeneratedTerminalPunctuationAfterFormattingWhitespace(from text: String) -> String {
-        guard let regex = try? NSRegularExpression(pattern: #"((?:\n- |- |[\n\t]+))[ \t]*(?:[.!?…]+|[。！？]+)[ \t]*$"#) else {
+        guard let regex = try? NSRegularExpression(pattern: #"((?:\n- \[[ x]\] |- \[[ x]\] |\n- |- |[\n\t]+))[ \t]*(?:[.!?…]+|[。！？]+)[ \t]*$"#) else {
             return text
         }
 
@@ -5882,6 +5894,21 @@ public struct RomaTranscriptionOutputFilter {
     }
 
     private static func trailingStructuralFormattingBoundary(in text: String) -> String {
+        if text == "\n- [ ] " {
+            return "- [ ] "
+        }
+        if text == "\n- [x] " {
+            return "- [x] "
+        }
+        if text.hasSuffix("\n- [ ] ") {
+            return "\n- [ ] "
+        }
+        if text.hasSuffix("\n- [x] ") {
+            return "\n- [x] "
+        }
+        if text == "- [ ] " || text == "- [x] " {
+            return text
+        }
         if text == "\n- " {
             return "- "
         }
@@ -11171,8 +11198,13 @@ public struct RomaTranscriptionOutputFilter {
         return regex.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)) != nil
     }
 
-    private static func hasTrailingEmptyBulletMarker(_ text: String) -> Bool {
-        text == "- " || text.hasSuffix("\n- ")
+    private static func hasTrailingEmptyStructuralListMarker(_ text: String) -> Bool {
+        text == "- " ||
+            text == "- [ ] " ||
+            text == "- [x] " ||
+            text.hasSuffix("\n- ") ||
+            text.hasSuffix("\n- [ ] ") ||
+            text.hasSuffix("\n- [x] ")
     }
 
     private static func hasUnclosedStraightDoubleQuote(in precedingText: String) -> Bool {

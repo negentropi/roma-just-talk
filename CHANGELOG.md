@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Preserved Slack, Gmail, and Notion casing in short app dictation fragments.
 - Preserved Amp casing in short agentic-coding dictation fragments.
 - Preserved OpenCode casing and lowercased all-caps agent tails in short agentic-coding dictation fragments.
 - Preserved Windsurf casing in short developer dictation fragments, including spoken `wind surf`.

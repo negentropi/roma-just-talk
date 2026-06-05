@@ -2410,6 +2410,18 @@ public struct RomaTranscriptionOutputFilter {
                 return originalLeadInCleanedSuffix
             }
 
+            let originalFillerCleanedSuffix = removeLeadingDiscourseFillerFromContinuationFragment(
+                from: suffix,
+                after: precedingText
+            )
+            if originalFillerCleanedSuffix != suffix {
+                let cleanedFillerSuffix = cleanLeadingContextOverlapContinuationSuffix(
+                    originalFillerCleanedSuffix,
+                    after: precedingText
+                )
+                return cleanedFillerSuffix.isEmpty ? originalFillerCleanedSuffix : cleanedFillerSuffix
+            }
+
             let cleanedSuffix = cleanLeadingContextOverlapContinuationSuffix(
                 suffix,
                 after: precedingText

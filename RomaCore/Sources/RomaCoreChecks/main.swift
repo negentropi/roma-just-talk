@@ -1545,6 +1545,41 @@ struct RomaCoreChecks {
             "shared insertion polish should trim repeated multi-word context plus no-correction-is before technical fragments"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "this you know Model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim repeated context plus you-know filler before technical fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "so this you know Model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim repeated multi-word context plus you-know filler before technical fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "this like Model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim repeated context plus like filler before technical fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "this basically Model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim repeated context plus basically filler before technical fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "this wait Model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim repeated context plus wait filler before technical fragments"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("think model.", context: thinkContext) == "think model",
             "shared insertion polish should preserve unguarded single-word context repeats"
         )
@@ -10080,6 +10115,26 @@ struct RomaCoreChecks {
             rawText: "so this no correction is Model.",
             expectedText: " model",
             fileName: "mid-sentence-so-this-no-correction-is-model-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "this you know Model.",
+            expectedText: " model",
+            fileName: "mid-sentence-this-you-know-model-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "this like Model.",
+            expectedText: " model",
+            fileName: "mid-sentence-this-like-model-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "this basically Model.",
+            expectedText: " model",
+            fileName: "mid-sentence-this-basically-model-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "this wait Model.",
+            expectedText: " model",
+            fileName: "mid-sentence-this-wait-model-proof.wav"
         )
 
         let bracketedFragmentRecorder = FakeRecorder()

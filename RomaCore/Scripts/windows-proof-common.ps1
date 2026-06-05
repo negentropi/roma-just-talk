@@ -1863,6 +1863,15 @@ function Get-RomaWindowsListenerRuntimeLogOutputMarkers {
     }
 }
 
+function Assert-RomaWindowsListenerRuntimeLogOutput {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Output
+    )
+
+    Assert-RomaWindowsOutputMarkers -Output $Output -Markers (Get-RomaWindowsListenerRuntimeLogOutputMarkers)
+}
+
 function Get-RomaWindowsDictationRuntimeLogProof {
     param(
         [Parameter(Mandatory = $true)]

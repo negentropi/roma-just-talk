@@ -160,11 +160,7 @@ function Invoke-InstalledListenerRuntimeProof {
     }
 
     Write-Host $output
-    Assert-OutputContains -Output $output -Expected "mode=RomaWindowsAgent listen"
-    Assert-OutputContains -Output $output -Expected "listener_capture_lifecycle=shared_pre_roll_runtime"
-    Assert-OutputContains -Output $output -Expected "listen_session_start=1"
-    Assert-OutputContains -Output $output -Expected "listen_session_completed=1"
-    Assert-OutputContains -Output $output -Expected "listen_completed_sessions=1"
+    Assert-RomaWindowsListenerRuntimeLogOutput -Output $output
     Write-Host "installed_listener_runtime_log=$logPath"
     Write-Host "installed_listener_runtime_ok=true"
     return $output

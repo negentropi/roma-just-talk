@@ -11343,6 +11343,8 @@ struct RomaCoreChecks {
                 proveScript.contains("windows-agent-listen.log") &&
                 proofCommonScript.contains("function Get-RomaWindowsDictationRuntimeLogOutputMarkers") &&
                 proofCommonScript.contains("function Get-RomaWindowsListenerRuntimeLogOutputMarkers") &&
+                proofCommonScript.contains("function Assert-RomaWindowsListenerRuntimeLogOutput") &&
+                proofCommonScript.contains("Assert-RomaWindowsOutputMarkers -Output $Output -Markers (Get-RomaWindowsListenerRuntimeLogOutputMarkers)") &&
                 proofCommonScript.contains("function Get-RomaWindowsDictationRuntimeLogProof") &&
                 proofCommonScript.contains("function Get-RomaWindowsListenerRuntimeLogProof") &&
                 proofCommonScript.contains("function Test-RomaWindowsContainsText") &&
@@ -11360,6 +11362,11 @@ struct RomaCoreChecks {
                 !proofCommonScript.contains(#"$proof["mode_listen"] = $content.Contains("mode=RomaWindowsAgent listen") -and $content.Contains("mode=listen")"#) &&
                 proveScript.contains("Get-RomaWindowsDictationRuntimeLogProof `") &&
                 proveScript.contains("Get-RomaWindowsListenerRuntimeLogProof `") &&
+                proveScript.contains("Assert-RomaWindowsListenerRuntimeLogOutput -Output $output") &&
+                !proveScript.contains(#"Assert-OutputContains -Output $output -Expected "listener_capture_lifecycle=shared_pre_roll_runtime""#) &&
+                !proveScript.contains(#"Assert-OutputContains -Output $output -Expected "listen_session_start=1""#) &&
+                !proveScript.contains(#"Assert-OutputContains -Output $output -Expected "listen_session_completed=1""#) &&
+                !proveScript.contains(#"Assert-OutputContains -Output $output -Expected "listen_completed_sessions=1""#) &&
                 !proveScript.contains("function Get-DictationRuntimeLogProof") &&
                 !proveScript.contains("function Test-ContainsText") &&
                 proveScript.contains(#"$report["listener_runtime"] = Get-ListenerRuntimeProof"#) &&

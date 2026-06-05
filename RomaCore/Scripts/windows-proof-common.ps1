@@ -1510,18 +1510,25 @@ function Get-RomaWindowsNativeDoctorOutputProofs {
     return $proofs
 }
 
+function Get-RomaWindowsHotkeyDeliveryPreflightOutputMarkers {
+    return [ordered]@{
+        waiting_for_hold = Get-RomaWindowsWaitingForHoldOutputMarker
+        key_down = "key_down=true"
+        key_up = "key_up=true"
+        observed_events_present = "observed_events="
+    }
+}
+
 function Get-RomaWindowsHotkeyDeliveryPreflightOutputProof {
     param(
         [string]$Output = ""
     )
 
-    return [ordered]@{
+    $proof = [ordered]@{
         output_present = ![string]::IsNullOrWhiteSpace($Output)
-        waiting_for_hold = $Output.Contains((Get-RomaWindowsWaitingForHoldOutputMarker))
-        key_down = $Output.Contains("key_down=true")
-        key_up = $Output.Contains("key_up=true")
-        observed_events_present = $Output.Contains("observed_events=")
     }
+    Add-RomaWindowsProofFields -Proof $proof -Fields (Get-RomaWindowsOutputMarkerProof -Output $Output -Markers (Get-RomaWindowsHotkeyDeliveryPreflightOutputMarkers)) | Out-Null
+    return $proof
 }
 
 function Get-RomaWindowsPermissionPreflightOutputProof {
@@ -1536,6 +1543,16 @@ function Get-RomaWindowsPermissionPreflightOutputProof {
     return $proof
 }
 
+function Get-RomaWindowsMicrophonePreflightOutputMarkers {
+    return [ordered]@{
+        wrote_present = "wrote="
+        reported_duration = "duration_seconds="
+        reported_pre_roll = "included_pre_roll_seconds="
+        sample_rate_16000 = "sample_rate=16000"
+        channels_mono = "channels=1"
+    }
+}
+
 function Get-RomaWindowsMicrophonePreflightOutputProof {
     param(
         [string]$Output = ""
@@ -1544,17 +1561,23 @@ function Get-RomaWindowsMicrophonePreflightOutputProof {
     $durationSeconds = Get-RomaWindowsOutputNumber -Output $Output -Name "duration_seconds"
     $includedPreRollSeconds = Get-RomaWindowsOutputNumber -Output $Output -Name "included_pre_roll_seconds"
 
-    return [ordered]@{
+    $proof = [ordered]@{
         output_present = ![string]::IsNullOrWhiteSpace($Output)
-        wrote_present = $Output.Contains("wrote=")
-        reported_duration = $Output.Contains("duration_seconds=")
         duration_seconds = $durationSeconds
         reported_positive_duration = ($null -ne $durationSeconds) -and ($durationSeconds -gt 0)
-        reported_pre_roll = $Output.Contains("included_pre_roll_seconds=")
         included_pre_roll_seconds = $includedPreRollSeconds
         reported_positive_pre_roll = ($null -ne $includedPreRollSeconds) -and ($includedPreRollSeconds -gt 0)
-        sample_rate_16000 = $Output.Contains("sample_rate=16000")
-        channels_mono = $Output.Contains("channels=1")
+    }
+    Add-RomaWindowsProofFields -Proof $proof -Fields (Get-RomaWindowsOutputMarkerProof -Output $Output -Markers (Get-RomaWindowsMicrophonePreflightOutputMarkers)) | Out-Null
+    return $proof
+}
+
+function Get-RomaWindowsLocalWhisperPreflightOutputMarkers {
+    return [ordered]@{
+        transcription_client_whisper = "transcription_client=whisper.cpp-cli"
+        network_required_false = "network_required=false"
+        executable_present = "executable="
+        model_file_present = "model_file="
     }
 }
 
@@ -1563,13 +1586,11 @@ function Get-RomaWindowsLocalWhisperPreflightOutputProof {
         [string]$Output = ""
     )
 
-    return [ordered]@{
+    $proof = [ordered]@{
         output_present = ![string]::IsNullOrWhiteSpace($Output)
-        transcription_client_whisper = $Output.Contains("transcription_client=whisper.cpp-cli")
-        network_required_false = $Output.Contains("network_required=false")
-        executable_present = $Output.Contains("executable=")
-        model_file_present = $Output.Contains("model_file=")
     }
+    Add-RomaWindowsProofFields -Proof $proof -Fields (Get-RomaWindowsOutputMarkerProof -Output $Output -Markers (Get-RomaWindowsLocalWhisperPreflightOutputMarkers)) | Out-Null
+    return $proof
 }
 
 function New-RomaWindowsLaptopPreflightOutputProofs {

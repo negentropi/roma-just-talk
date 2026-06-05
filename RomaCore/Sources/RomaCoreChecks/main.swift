@@ -12096,14 +12096,32 @@ struct RomaCoreChecks {
         )
         try require(
             proofCommonScript.contains("function Get-RomaWindowsHotkeyDeliveryPreflightOutputProof") &&
-                proofCommonScript.contains("waiting_for_hold = $Output.Contains((Get-RomaWindowsWaitingForHoldOutputMarker))") &&
+                proofCommonScript.contains("function Get-RomaWindowsHotkeyDeliveryPreflightOutputMarkers") &&
                 proofCommonScript.contains("function Get-RomaWindowsPermissionPreflightOutputProof") &&
                 proofCommonScript.contains("function Get-RomaWindowsMicrophonePreflightOutputProof") &&
+                proofCommonScript.contains("function Get-RomaWindowsMicrophonePreflightOutputMarkers") &&
                 proofCommonScript.contains("function Get-RomaWindowsLocalWhisperPreflightOutputProof") &&
+                proofCommonScript.contains("function Get-RomaWindowsLocalWhisperPreflightOutputMarkers") &&
+                proofCommonScript.contains("Get-RomaWindowsOutputMarkerProof -Output $Output -Markers (Get-RomaWindowsHotkeyDeliveryPreflightOutputMarkers)") &&
+                proofCommonScript.contains("Get-RomaWindowsOutputMarkerProof -Output $Output -Markers (Get-RomaWindowsMicrophonePreflightOutputMarkers)") &&
+                proofCommonScript.contains("Get-RomaWindowsOutputMarkerProof -Output $Output -Markers (Get-RomaWindowsLocalWhisperPreflightOutputMarkers)") &&
                 proofCommonScript.contains("function New-RomaWindowsLaptopPreflightOutputProofs") &&
                 proofCommonScript.contains("function New-RomaWindowsLaptopPreflightSyntheticOutputProofs") &&
                 proofCommonScript.contains("function Get-RomaWindowsOSReportProof") &&
                 proofCommonScript.contains("function New-RomaWindowsLaptopPreflightReport") &&
+                !proofCommonScript.contains("waiting_for_hold = $Output.Contains((Get-RomaWindowsWaitingForHoldOutputMarker))") &&
+                !proofCommonScript.contains(#"key_down = $Output.Contains("key_down=true")"#) &&
+                !proofCommonScript.contains(#"key_up = $Output.Contains("key_up=true")"#) &&
+                !proofCommonScript.contains(#"observed_events_present = $Output.Contains("observed_events=")"#) &&
+                !proofCommonScript.contains(#"wrote_present = $Output.Contains("wrote=")"#) &&
+                !proofCommonScript.contains(#"reported_duration = $Output.Contains("duration_seconds=")"#) &&
+                !proofCommonScript.contains(#"reported_pre_roll = $Output.Contains("included_pre_roll_seconds=")"#) &&
+                !proofCommonScript.contains(#"sample_rate_16000 = $Output.Contains("sample_rate=16000")"#) &&
+                !proofCommonScript.contains(#"channels_mono = $Output.Contains("channels=1")"#) &&
+                !proofCommonScript.contains(#"transcription_client_whisper = $Output.Contains("transcription_client=whisper.cpp-cli")"#) &&
+                !proofCommonScript.contains(#"network_required_false = $Output.Contains("network_required=false")"#) &&
+                !proofCommonScript.contains(#"executable_present = $Output.Contains("executable=")"#) &&
+                !proofCommonScript.contains(#"model_file_present = $Output.Contains("model_file=")"#) &&
                 !proofCommonScript.contains("$Output.Contains(\"waiting_for_hold=Ctrl+Shift+R\")") &&
                 !laptopProofScript.contains("waiting_for_hold=Ctrl+Shift+R") &&
                 !laptopProofScript.contains("preflight_outputs = [ordered]@{") &&

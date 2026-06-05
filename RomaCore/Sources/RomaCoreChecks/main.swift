@@ -11948,6 +11948,8 @@ struct RomaCoreChecks {
         )
         try require(
             proofCommonScript.contains("source_commit must be a 40-character git SHA") &&
+                proofCommonScript.contains("function Assert-RomaWindowsCleanManifestSourceProvenance") &&
+                proofCommonScript.contains(#"Get-RomaWindowsManifestSourceProvenance `"#) &&
                 checkReportScript.contains(#"-Context "manifest""#) &&
                 proofCommonScript.contains(#"-Context "$context manifest""#),
             "Windows proof checker should reject missing or malformed source commits"
@@ -12988,7 +12990,10 @@ struct RomaCoreChecks {
             "Windows proof-set checker should reject dirty packaged source for final laptop proof"
         )
         try require(
-            checkReportScript.contains("Laptop preflight proof requires a clean packaged source checkout"),
+            checkReportScript.contains("Assert-RomaWindowsCleanManifestSourceProvenance") &&
+                checkReportScript.contains(#"-ProofName "Laptop preflight proof""#) &&
+                proofCommonScript.contains("requires a clean packaged source checkout, got source_dirty") &&
+                !checkReportScript.contains(#"$sourceDirty -ne "false""#),
             "Windows proof report profile should reject dirty packaged source for laptop preflight proof"
         )
         try require(
@@ -13670,10 +13675,8 @@ struct RomaCoreChecks {
                 proofCommonScript.contains(#""swift_runtime_dlls""#) &&
                 proofCommonScript.contains("function Assert-RomaWindowsAgentArtifactManifestKeys") &&
                 proofCommonScript.contains("foreach ($key in Get-RomaWindowsAgentArtifactRequiredManifestKeys)") &&
-                proofCommonScript.contains("function Require-RomaWindowsPackagedSourceCommit") &&
-                proofCommonScript.contains(#"Require-RomaWindowsManifestKey -Manifest $Manifest -Key "source_commit""#) &&
-                proofCommonScript.contains("function Require-RomaWindowsPackagedSourceDirty") &&
-                proofCommonScript.contains(#"Require-RomaWindowsManifestKey -Manifest $Manifest -Key "source_dirty""#) &&
+                proofCommonScript.contains("function Assert-RomaWindowsCleanManifestSourceProvenance") &&
+                proofCommonScript.contains(#"ProofName = "Windows package manifest""#) &&
                 proofCommonScript.contains("function Require-RomaWindowsPackagedNativePreflightCheckerSmokeReport") &&
                 proofCommonScript.contains(#"Require-RomaWindowsManifestFile -Manifest $Manifest -Key "laptop_native_preflight_checker_smoke_report" -BaseDir $BaseDir"#) &&
                 proofCommonScript.contains("function Require-RomaWindowsPackagedLocalWhisperPreflightCheckerSmokeReport") &&
@@ -13697,10 +13700,13 @@ struct RomaCoreChecks {
                 !laptopProofScript.contains(#"$proofScript = Join-Path $PackageDir "prove-windows-agent-artifact.ps1""#) &&
                 workflowScript.contains("Read-RomaWindowsManifest -Path $manifestPath") &&
                 workflowScript.contains(#"$env:RUNNER_TEMP\roma-windows-agent\windows-proof-common.ps1"#) &&
-                workflowScript.contains("Require-RomaWindowsPackagedSourceCommit") &&
-                workflowScript.contains("Require-RomaWindowsPackagedSourceDirty") &&
+                workflowScript.contains("Assert-RomaWindowsCleanManifestSourceProvenance") &&
+                workflowScript.contains(#"$sourceCommit = [string]$source["Commit"]"#) &&
+                workflowScript.contains(#"$sourceDirty = [string]$source["Dirty"]"#) &&
                 workflowScript.contains("Require-RomaWindowsPackagedNativePreflightCheckerSmokeReport") &&
                 workflowScript.contains("Require-RomaWindowsPackagedLocalWhisperPreflightCheckerSmokeReport") &&
+                !workflowScript.contains(#"$sourceCommit -notmatch"#) &&
+                !workflowScript.contains(#"$sourceDirty -ne "false""#) &&
                 !workflowScript.contains(#"-Key "source_commit""#) &&
                 !workflowScript.contains(#"-Key "source_dirty""#) &&
                 !workflowScript.contains(#"-Key "laptop_native_preflight_checker_smoke_report""#) &&
@@ -13991,7 +13997,7 @@ struct RomaCoreChecks {
                 manifestScript.contains("function Require-RomaWindowsManifestFile") &&
                 workflowScript.contains(#"$env:RUNNER_TEMP\roma-windows-agent\windows-manifest.ps1"#) &&
                 workflowScript.contains(#"$env:RUNNER_TEMP\roma-windows-agent\windows-proof-common.ps1"#) &&
-                workflowScript.contains("Require-RomaWindowsPackagedSourceCommit") &&
+                workflowScript.contains("Assert-RomaWindowsCleanManifestSourceProvenance") &&
                 workflowScript.contains("Require-RomaWindowsPackagedLocalWhisperPreflightCheckerSmokeReport"),
             "Windows CI should parse and use the shared manifest helper"
         )

@@ -648,6 +648,23 @@ function Get-RomaWindowsManifestSourceProvenance {
     }
 }
 
+function Assert-RomaWindowsCleanManifestSourceProvenance {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Manifest,
+        [string]$Context = "manifest",
+        [string]$ProofName = "Windows package manifest"
+    )
+
+    $source = Get-RomaWindowsManifestSourceProvenance `
+        -Manifest $Manifest `
+        -Context $Context
+    if ([string]$source["Dirty"] -ne "false") {
+        throw ("{0} requires a clean packaged source checkout, got source_dirty={1}" -f $ProofName, [string]$source["Dirty"])
+    }
+    return $source
+}
+
 function Get-RomaWindowsProofReportIdentity {
     param(
         [Parameter(Mandatory = $true)]
@@ -1183,24 +1200,6 @@ function Assert-RomaWindowsAgentArtifactManifestKeys {
     foreach ($key in Get-RomaWindowsAgentArtifactRequiredManifestKeys) {
         Require-RomaWindowsManifestKey -Manifest $Manifest -Key $key | Out-Null
     }
-}
-
-function Require-RomaWindowsPackagedSourceCommit {
-    param(
-        [Parameter(Mandatory = $true)]
-        [hashtable]$Manifest
-    )
-
-    return Require-RomaWindowsManifestKey -Manifest $Manifest -Key "source_commit"
-}
-
-function Require-RomaWindowsPackagedSourceDirty {
-    param(
-        [Parameter(Mandatory = $true)]
-        [hashtable]$Manifest
-    )
-
-    return Require-RomaWindowsManifestKey -Manifest $Manifest -Key "source_dirty"
 }
 
 function Require-RomaWindowsPackagedNativePreflightCheckerSmokeReport {

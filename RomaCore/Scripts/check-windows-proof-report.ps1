@@ -368,14 +368,16 @@ function Assert-LaptopPreflightReport {
     $packageFingerprint = Assert-PackageIdentityProof -PackageIdentity $packageIdentity
 
     $manifest = Require-Property -Object $Report -Name "manifest"
-    Assert-ManifestSourceProof -Manifest $manifest
-    $sourceRepository = [string](Require-Property -Object $manifest -Name "source_repository")
-    $sourceBranch = [string](Require-Property -Object $manifest -Name "source_branch")
-    $sourceCommit = [string](Require-Property -Object $manifest -Name "source_commit")
-    $sourceDirty = [string](Require-Property -Object $manifest -Name "source_dirty")
-    if ($sourceDirty -ne "false") {
-        throw "Laptop preflight proof requires a clean packaged source checkout, got source_dirty=$sourceDirty"
-    }
+    $source = Assert-RomaWindowsCleanManifestSourceProvenance `
+        -Manifest $manifest `
+        -Context "manifest" `
+        -ProofName "Laptop preflight proof"
+    $sourceRepository = [string]$source["Repository"]
+    $sourceBranch = [string]$source["Branch"]
+    $sourceCommit = [string]$source["Commit"]
+    $sourceDirty = [string]$source["Dirty"]
+    Write-Host "proof_source_commit=$sourceCommit"
+    Write-Host "proof_source_dirty=$sourceDirty"
 
     $os = Require-Property -Object $Report -Name "os"
     $platform = [string](Require-Property -Object $os -Name "platform")

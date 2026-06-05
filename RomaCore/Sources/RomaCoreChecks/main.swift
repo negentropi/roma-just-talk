@@ -1232,6 +1232,27 @@ struct RomaCoreChecks {
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Correction is [*Model.*]",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should unwrap bracketed italic markdown markers after correction lead-ins"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Correction is <*Model.*>",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should unwrap angle-wrapped italic markdown markers after correction lead-ins"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "Correction is \"*Model.*\"",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should unwrap quoted italic markdown markers after correction lead-ins"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "It's _final word._",
                 context: midSentenceContext
             ) == "final word",
@@ -9584,6 +9605,21 @@ struct RomaCoreChecks {
             rawText: "Correction is **Model.**",
             expectedText: " model",
             fileName: "mid-sentence-correction-bold-marker-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "Correction is [*Model.*]",
+            expectedText: " model",
+            fileName: "mid-sentence-correction-bracket-italic-marker-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "Correction is <*Model.*>",
+            expectedText: " model",
+            fileName: "mid-sentence-correction-angle-italic-marker-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "Correction is \"*Model.*\"",
+            expectedText: " model",
+            fileName: "mid-sentence-correction-quote-italic-marker-proof.wav"
         )
         try await requireMidSentenceGeneratedMarkerCleanupPipeline(
             rawText: "It's _final word._",

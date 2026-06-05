@@ -1556,7 +1556,7 @@ public struct RomaTranscriptionOutputFilter {
                     from: polishedText,
                     after: activeContext.precedingText
                 )
-                polishedText = unwrapNoisyMarkdownBoundaryOutput(polishedText)
+                polishedText = unwrapNoisyNestedContinuationBoundaryFragment(from: polishedText)
                 polishedText = unwrapPlainSquareBracketedBoundaryContinuationFragment(from: polishedText)
                 polishedText = unwrapPlainNonASCIIBoundaryContinuationFragment(from: polishedText)
             }
@@ -2146,7 +2146,7 @@ public struct RomaTranscriptionOutputFilter {
             from: boundaryUnwrappedSuffix,
             after: precedingText
         )
-        let markdownUnwrappedSuffix = unwrapNoisyMarkdownBoundaryOutput(leadingCleanedSuffix)
+        let markdownUnwrappedSuffix = unwrapNoisyNestedContinuationBoundaryFragment(from: leadingCleanedSuffix)
         let punctuationStrippedSuffix = removeTrailingNoisyFragmentPunctuation(from: trimmedSuffix)
         let punctuationStrippedBoundaryUnwrappedSuffix = removeTrailingNoisyFragmentPunctuation(
             from: boundaryUnwrappedSuffix
@@ -10218,6 +10218,81 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         return cleanedInnerText
+    }
+
+    private static func unwrapNoisyNestedContinuationBoundaryFragment(from text: String) -> String {
+        unwrapNoisyNestedContinuationBoundaryFragment(from: text, depth: 0)
+    }
+
+    private static func unwrapNoisyNestedContinuationBoundaryFragment(from text: String, depth: Int) -> String {
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard depth < 4, !trimmedText.isEmpty else {
+            return trimmedText
+        }
+
+        let squareUnwrappedText = unwrapPlainSquareBracketedBoundaryContinuationFragment(from: trimmedText)
+        if squareUnwrappedText != trimmedText {
+            return unwrapNoisyNestedContinuationBoundaryFragment(from: squareUnwrappedText, depth: depth + 1)
+        }
+
+        if let angleInnerText = angleBoundaryInnerText(in: trimmedText),
+           let unwrappedText = noisyNestedContinuationBoundaryInnerText(angleInnerText, depth: depth) {
+            return unwrappedText
+        }
+
+        if let preservedInnerText = preservedBoundaryInnerText(in: trimmedText),
+           let unwrappedText = noisyNestedContinuationBoundaryInnerText(
+                preservedInnerText,
+                depth: depth,
+                requiresNestedCleanup: true
+           ) {
+            return unwrappedText
+        }
+
+        let markdownUnwrappedText = unwrapNoisyMarkdownBoundaryOutput(trimmedText)
+        if markdownUnwrappedText != trimmedText {
+            return unwrapNoisyNestedContinuationBoundaryFragment(from: markdownUnwrappedText, depth: depth + 1)
+        }
+
+        return trimmedText
+    }
+
+    private static func angleBoundaryInnerText(in text: String) -> String? {
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard trimmedText.first == "<",
+              trimmedText.last == ">" else {
+            return nil
+        }
+
+        let innerStart = trimmedText.index(after: trimmedText.startIndex)
+        let innerEnd = trimmedText.index(before: trimmedText.endIndex)
+        let innerText = String(trimmedText[innerStart..<innerEnd])
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return innerText.isEmpty ? nil : innerText
+    }
+
+    private static func noisyNestedContinuationBoundaryInnerText(
+        _ text: String,
+        depth: Int,
+        requiresNestedCleanup: Bool = false
+    ) -> String? {
+        let innerText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        let unwrappedText = unwrapNoisyNestedContinuationBoundaryFragment(from: innerText, depth: depth + 1)
+        let punctuationStrippedText = removeTrailingNoisyFragmentPunctuation(from: unwrappedText)
+        let didNestedCleanup = unwrappedText != innerText
+        let didClean = didNestedCleanup || punctuationStrippedText != unwrappedText
+        let isNestedSquareBracketOutput = wholeSquareBracketedOutputInnerText(in: innerText) != nil
+        guard (!requiresNestedCleanup || (didNestedCleanup && !isNestedSquareBracketOutput)),
+              didClean,
+              !unwrappedText.isEmpty,
+              isShortFragment(punctuationStrippedText) ||
+                isNoisyFinalWordContinuationFragment(punctuationStrippedText),
+              !hasInternalSentenceBoundary(unwrappedText),
+              !containsInlinePreservedBoundary(unwrappedText) else {
+            return nil
+        }
+
+        return unwrappedText
     }
 
     private static func nonASCIIBoundaryInnerText(in text: String) -> String? {

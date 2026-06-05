@@ -12633,7 +12633,8 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("Get-RomaWindowsCurrentUserSid") &&
                 packageScript.contains("-RequireUserSid") &&
                 !packageScript.contains("function Get-CurrentWindowsUserSid") &&
-                proveScript.contains("Set-Alias -Name Get-CurrentWindowsUserSid -Value Get-RomaWindowsCurrentUserSid") &&
+                proveScript.contains("os = Get-RomaWindowsOSReportProof") &&
+                !proveScript.contains("Set-Alias -Name Get-CurrentWindowsUserSid") &&
                 !laptopProofScript.contains("Set-Alias -Name Get-CurrentWindowsUserSid") &&
                 !proveScript.contains("function Get-CurrentWindowsUserSid") &&
                 !laptopProofScript.contains("function Get-CurrentWindowsUserSid"),

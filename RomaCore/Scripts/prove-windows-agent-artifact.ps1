@@ -53,7 +53,6 @@ Set-Alias -Name Assert-OutputContains -Value Assert-RomaWindowsOutputContains -S
 Set-Alias -Name Get-OutputValue -Value Get-RomaWindowsOutputValue -Scope Local -Force
 Set-Alias -Name Get-OutputNumber -Value Get-RomaWindowsOutputNumber -Scope Local -Force
 Set-Alias -Name Get-OutputLineNumber -Value Get-RomaWindowsOutputLineNumber -Scope Local -Force
-Set-Alias -Name Get-CurrentWindowsUserSid -Value Get-RomaWindowsCurrentUserSid -Scope Local -Force
 
 $packageIdentityScript = Join-Path $PSScriptRoot "windows-package-identity.ps1"
 if (!(Test-Path -LiteralPath $packageIdentityScript)) {
@@ -319,14 +318,7 @@ function Write-ProofReport {
         create_startup_shortcut = $CreateStartupShortcut.IsPresent
         restore_clipboard = $RestoreClipboard.IsPresent
         no_restore_clipboard = $NoRestoreClipboard.IsPresent
-        os = [ordered]@{
-            platform = [System.Environment]::OSVersion.Platform.ToString()
-            version = [System.Environment]::OSVersion.VersionString
-            machine = $env:COMPUTERNAME
-            user_name = $env:USERNAME
-            user_domain = $env:USERDOMAIN
-            user_sid = Get-CurrentWindowsUserSid
-        }
+        os = Get-RomaWindowsOSReportProof
         package_dir = $PackageDir
         install_dir = $InstallDir
         config = (Get-RomaWindowsAgentConfigFileProof -ConfigPath $ConfigPath)

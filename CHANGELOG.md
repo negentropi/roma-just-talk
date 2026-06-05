@@ -29,6 +29,7 @@
 - Removed generated `correction is` and `no correction is` lead-ins exposed immediately after repeated context in hotkey dictation fragments.
 - Removed discourse fillers such as `you know`, `like`, `basically`, and `wait` exposed immediately after repeated context in hotkey dictation fragments.
 - Unwrapped generated Markdown emphasis markers exposed after repeated context and discourse fillers in hotkey dictation fragments.
+- Removed pause fillers such as `hmm`, `eh`, and `um` exposed after repeated context in hotkey dictation fragments.
 - Unwrapped square-bracketed final-word fragments after correction lead-ins in mid-sentence hotkey dictation.
 - Preserved explicit punctuation commands after correction-marked "final word" continuations.
 - Shared Windows dictation and listener runtime-log proof markers through proof-helper marker maps.

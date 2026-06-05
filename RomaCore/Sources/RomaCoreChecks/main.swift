@@ -1585,6 +1585,27 @@ struct RomaCoreChecks {
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "so this hmm... Model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim repeated context plus hmm pause filler before technical fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "this eh... Model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim repeated context plus eh pause filler before technical fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "this, um, Model.",
+                context: midSentenceContext
+            ) == "model",
+            "shared insertion polish should trim repeated context plus comma-wrapped um pause filler before technical fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "this like Model.",
                 context: midSentenceContext
             ) == "model",

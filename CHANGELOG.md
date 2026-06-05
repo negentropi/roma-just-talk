@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Trimmed "I was trying to say is" correction lead-ins after repeated cursor context.
 - Trimmed rephrase and rather correction lead-ins after repeated cursor context.
 - Trimmed generated checkmark markers after repeated cursor context plus pause fillers.
 - Trimmed generated bracketed task and callout markers after repeated cursor context plus pause fillers.

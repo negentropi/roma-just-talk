@@ -723,6 +723,8 @@ struct TranscriptionOutputFilterTests {
         #expect(TranscriptionOutputFilter.applyInsertionPolish("so this I did not mean that [A final word.]", context: midSentenceContext) == "a final word")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("so this I don't mean that [A final word.]", context: midSentenceContext) == "a final word")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("so this I do not mean that [A final word.]", context: midSentenceContext) == "a final word")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("so this I was trying to say is [A final word.]", context: midSentenceContext) == "a final word")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("so this I am trying to say is [A final word.]", context: midSentenceContext) == "a final word")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("so this not that [A final word.]", context: midSentenceContext) == "a final word")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("so this that is not what I meant [A final word.]", context: midSentenceContext) == "a final word")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("so this that's not what I meant [A final word.]", context: midSentenceContext) == "a final word")

@@ -594,6 +594,7 @@ public struct RomaTranscriptionOutputFilter {
     private static let continuationFragmentLeadingAccuracyCorrectionPattern = #"(?i)^\s*((?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?(?:(?:that|this|it)(?:[ \t]+(?:is|was)|['’]s)?[ \t]+)?not[ \t]+(?:correct|accurate))(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let continuationFragmentLeadingWasntItCorrectionPattern = #"(?i)^\s*((?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?(?:(?:that|this|it)[ \t]+)?(?:wasn['’]t|was[ \t]+not)[ \t]+(?:that|this|it))(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let continuationFragmentLeadingWrongUtteranceCorrectionPattern = #"(?i)^\s*((?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?(?:(?:that|this|it)[ \t]+came[ \t]+out[ \t]+wrong|(?:i[ \t]+)?said[ \t]+(?:(?:that|this|it)[ \t]+)?wrong|wrong[ \t]+one))(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
+    private static let continuationFragmentLeadingTryingToSayCopulaCorrectionPattern = #"(?i)^\s*(i[ \t]+(?:am|was)[ \t]+trying[ \t]+to[ \t]+say[ \t]+is)(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let continuationFragmentLeadingRephraseCorrectionPattern = #"(?i)^\s*((?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?(?:let[ \t]+me[ \t]+(?:phrase[ \t]+(?:that|this|it)[ \t]+differently|say[ \t]+(?:that|this|it)[ \t]+differently|try[ \t]+(?:that|this|it)[ \t]+again)|(?:i(?:['’]ll|[ \t]+will))[ \t]+(?:say|try)[ \t]+(?:that|this|it)[ \t]+again|(?:or[ \t]+)?rather))(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let continuationFragmentLeadingWhatISaidReplacementCorrectionPattern = #"(?i)^\s*((?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?(?:replace|change|correct|swap|switch|set|turn)[ \t]+what[ \t]+i(?:[ \t]+just)?[ \t]+said[ \t]+(?:with|to|into))(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let continuationFragmentLeadingWhatISaidCorrectionPattern = #"(?i)^\s*((?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?(?:scratch|strike|delete|remove|erase|undo|cancel|disregard|ignore|forget|cut|drop)[ \t]+what[ \t]+i(?:[ \t]+just)?[ \t]+said)(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
@@ -614,6 +615,7 @@ public struct RomaTranscriptionOutputFilter {
         continuationFragmentLeadingWhatISaidReplacementCorrectionPattern,
         continuationFragmentLeadingWhatISaidCorrectionPattern,
         continuationFragmentLeadingRephraseCorrectionPattern,
+        continuationFragmentLeadingTryingToSayCopulaCorrectionPattern,
         continuationFragmentLeadingWrongUtteranceCorrectionPattern,
         continuationFragmentLeadingWasntItCorrectionPattern,
         continuationFragmentLeadingAccuracyCorrectionPattern
@@ -2410,6 +2412,7 @@ public struct RomaTranscriptionOutputFilter {
             "no it should be", "no that should be",
             "correction", "correction is", "correction should be", "i should say",
             "i am trying to say", "i was trying to say", "i was going to say", "i was gonna say",
+            "i am trying to say is", "i was trying to say is",
             "i want to say", "i wanted to say",
             "it should be", "that should be",
             "it is", "it's", "it’s", "that is", "that's", "that’s",

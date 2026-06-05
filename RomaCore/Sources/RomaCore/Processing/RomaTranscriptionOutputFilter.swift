@@ -1616,6 +1616,7 @@ public struct RomaTranscriptionOutputFilter {
                 polishedText = unwrapNoisyNestedContinuationBoundaryFragment(from: polishedText)
                 polishedText = unwrapPlainSquareBracketedBoundaryContinuationFragment(from: polishedText)
                 polishedText = unwrapPlainNonASCIIBoundaryContinuationFragment(from: polishedText)
+                polishedText = unwrapGeneratedInlineTagContinuationFragment(from: polishedText)
             }
             if wasWholeSquareBracketedOutput {
                 if !preservesTerminalPunctuation {
@@ -2655,6 +2656,7 @@ public struct RomaTranscriptionOutputFilter {
         result = unwrapNoisyNestedContinuationBoundaryFragment(from: result)
         result = unwrapPlainSquareBracketedBoundaryContinuationFragment(from: result)
         result = unwrapPlainNonASCIIBoundaryContinuationFragment(from: result)
+        result = unwrapGeneratedInlineTagContinuationFragment(from: result)
         result = stripBoundaryNoise(from: result)
         result = removeLeadingGeneratedContinuationFragmentNoise(from: result, after: precedingText)
         result = unwrapPlainSquareBracketedBoundaryContinuationFragment(from: result)
@@ -2736,6 +2738,7 @@ public struct RomaTranscriptionOutputFilter {
         cleanedSuffix = removeLeadingGeneratedContinuationFragmentNoise(from: cleanedSuffix, after: precedingText)
         cleanedSuffix = unwrapNoisyNestedContinuationBoundaryFragment(from: cleanedSuffix)
         cleanedSuffix = unwrapPlainSquareBracketedBoundaryContinuationFragment(from: cleanedSuffix)
+        cleanedSuffix = unwrapGeneratedInlineTagContinuationFragment(from: cleanedSuffix)
         cleanedSuffix = stripBoundaryNoise(from: cleanedSuffix)
         cleanedSuffix = removeLeadingDiscourseFillerFromContinuationFragment(from: cleanedSuffix, after: precedingText)
             .trimmingCharacters(in: .whitespacesAndNewlines)
@@ -2939,6 +2942,7 @@ public struct RomaTranscriptionOutputFilter {
         var result = text.trimmingCharacters(in: .whitespacesAndNewlines)
         result = unwrapSpacedGeneratedMarkdownBoundaryFragment(from: result)
         result = unwrapGeneratedMarkdownContinuationFragment(from: result)
+        result = unwrapGeneratedInlineTagContinuationFragment(from: result)
         result = unwrapNoisyNestedContinuationBoundaryFragment(from: result)
         result = unwrapPlainNonASCIIBoundaryContinuationFragment(from: result)
         result = removeTrailingGeneratedMarkdownContinuationMarker(from: result)
@@ -2974,6 +2978,45 @@ public struct RomaTranscriptionOutputFilter {
             return nil
         }
     }
+
+    private static func unwrapGeneratedInlineTagContinuationFragment(from text: String) -> String {
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let regex = try? NSRegularExpression(
+            pattern: #"(?is)^<([A-Za-z][A-Za-z0-9:_-]{0,31})(?:\s+[^<>]{0,120})?>\s*(.*?)\s*</\1>$"#
+        ),
+        let match = regex.firstMatch(in: trimmedText, range: NSRange(trimmedText.startIndex..., in: trimmedText)),
+        match.numberOfRanges >= 3,
+        let tagRange = Range(match.range(at: 1), in: trimmedText),
+        let innerRange = Range(match.range(at: 2), in: trimmedText) else {
+            return text
+        }
+
+        let tag = String(trimmedText[tagRange]).lowercased()
+        guard generatedInlineFormattingTags.contains(tag) else { return text }
+
+        var innerText = String(trimmedText[innerRange])
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        innerText = unwrapNoisyNestedContinuationBoundaryFragment(from: innerText)
+        innerText = unwrapPlainSquareBracketedBoundaryContinuationFragment(from: innerText)
+        innerText = stripBoundaryNoise(from: innerText)
+        guard isGeneratedMarkdownContinuationInnerText(innerText) else {
+            return text
+        }
+
+        return innerText
+    }
+
+    private static let generatedInlineFormattingTags: Set<String> = [
+        "b",
+        "del",
+        "em",
+        "i",
+        "mark",
+        "s",
+        "span",
+        "strong",
+        "u"
+    ]
 
     private static func unwrapSpacedGeneratedMarkdownFragment(from text: String) -> String? {
         let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)

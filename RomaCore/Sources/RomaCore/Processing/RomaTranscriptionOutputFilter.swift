@@ -2654,6 +2654,7 @@ public struct RomaTranscriptionOutputFilter {
         result = unwrapNoisyNestedContinuationBoundaryFragment(from: result)
         result = unwrapPlainSquareBracketedBoundaryContinuationFragment(from: result)
         result = unwrapPlainNonASCIIBoundaryContinuationFragment(from: result)
+        result = stripBoundaryNoise(from: result)
         result = collapseRepeatedContextOverlapContinuationFragment(result)
         return cleanDanglingGeneratedLeadInSuffix(result)
     }
@@ -11120,7 +11121,9 @@ public struct RomaTranscriptionOutputFilter {
         let didNestedCleanup = unwrappedText != innerText
         let didClean = didNestedCleanup || punctuationStrippedText != unwrappedText
         let isNestedSquareBracketOutput = wholeSquareBracketedOutputInnerText(in: innerText) != nil
-        guard (!requiresNestedCleanup || (didNestedCleanup && !isNestedSquareBracketOutput)),
+        let shouldPreserveNestedSquareBracketOutput = isNestedSquareBracketOutput &&
+            !isSingleWordFinalFragment(punctuationStrippedText)
+        guard (!requiresNestedCleanup || (didNestedCleanup && !shouldPreserveNestedSquareBracketOutput)),
               didClean,
               !unwrappedText.isEmpty,
               isShortFragment(punctuationStrippedText) ||

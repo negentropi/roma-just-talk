@@ -371,13 +371,13 @@ try {
 
     if ($RunInteractiveHotkey) {
         Invoke-Step "windows hotkey proof" {
-            Write-Host "Press Ctrl+Shift+R in this session to complete the proof."
+            Write-RomaWindowsRegisterHotkeyProofPrompt
             swift run RomaProofAgent windows-hotkey-proof
         }
     } else {
         Write-Host ""
         Write-Host "== windows hotkey proof skipped =="
-        Write-Host "rerun with -RunInteractiveHotkey, then press Ctrl+Shift+R"
+        Write-Host "rerun with -RunInteractiveHotkey to verify RegisterHotKey delivery"
     }
 
     Invoke-Step "windows keyboard hook doctor" {
@@ -386,13 +386,13 @@ try {
 
     if ($RunInteractiveKeyboardHook) {
         Invoke-Step "windows keyboard hook proof" {
-            Write-Host "Press and release Ctrl+Shift+R in this session to complete the low-level hook proof."
-            swift run RomaProofAgent windows-keyboard-hook-proof --timeout 15
+            Write-RomaWindowsKeyboardHookProofPrompt -HoldTimeoutSeconds $HoldTimeoutSeconds
+            swift run RomaProofAgent windows-keyboard-hook-proof --timeout $HoldTimeoutSeconds
         }
     } else {
         Write-Host ""
         Write-Host "== windows keyboard hook proof skipped =="
-        Write-Host "rerun with -RunInteractiveKeyboardHook, then press and release Ctrl+Shift+R"
+        Write-Host "rerun with -RunInteractiveKeyboardHook to verify low-level hold-hook delivery"
     }
 
     Invoke-Step "windows paste doctor" {

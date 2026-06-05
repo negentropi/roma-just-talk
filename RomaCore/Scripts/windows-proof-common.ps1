@@ -929,6 +929,13 @@ function Get-RomaWindowsToggleHotkeyOutputMarker {
     return "toggle_hotkey=$(Get-RomaWindowsDefaultHotkeyDisplayName)"
 }
 
+function Write-RomaWindowsRegisterHotkeyProofPrompt {
+    Write-Host ""
+    Write-Host "ACTION_REQUIRED=register_hotkey_proof"
+    Write-Host (Get-RomaWindowsToggleHotkeyOutputMarker)
+    Write-Host "press_and_release_hotkey=true"
+}
+
 function Write-RomaWindowsDictationOperatorPrompt {
     param(
         [Parameter(Mandatory = $true)]
@@ -990,6 +997,20 @@ function Write-RomaWindowsHotkeyDeliveryPreflightPrompt {
 
     Write-Host ""
     Write-Host "ACTION_REQUIRED=hotkey_delivery_preflight"
+    Write-Host (Get-RomaWindowsHoldHotkeyOutputMarker)
+    Write-Host "press_and_release_hotkey=true"
+    if ($HoldTimeoutSeconds -ge 0) {
+        Write-Host "hold_timeout_seconds=$HoldTimeoutSeconds"
+    }
+}
+
+function Write-RomaWindowsKeyboardHookProofPrompt {
+    param(
+        [int]$HoldTimeoutSeconds = -1
+    )
+
+    Write-Host ""
+    Write-Host "ACTION_REQUIRED=keyboard_hook_proof"
     Write-Host (Get-RomaWindowsHoldHotkeyOutputMarker)
     Write-Host "press_and_release_hotkey=true"
     if ($HoldTimeoutSeconds -ge 0) {

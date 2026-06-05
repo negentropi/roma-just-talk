@@ -12913,6 +12913,8 @@ struct RomaCoreChecks {
         try require(
             proofCommonScript.contains("function Write-RomaWindowsHoldDictationPrompt") &&
                 proofCommonScript.contains("function Write-RomaWindowsDictationOperatorPrompt") &&
+                proofCommonScript.contains("function Write-RomaWindowsRegisterHotkeyProofPrompt") &&
+                proofCommonScript.contains("function Write-RomaWindowsKeyboardHookProofPrompt") &&
                 proofCommonScript.contains("function Write-RomaWindowsHotkeyDeliveryPreflightPrompt") &&
                 proofCommonScript.contains("function Write-RomaWindowsNotepadPastePrompt") &&
                 proofCommonScript.contains("function Get-RomaWindowsDefaultHotkeyDisplayName") &&
@@ -12944,6 +12946,9 @@ struct RomaCoreChecks {
                 runScript.contains(#"$usesHoldHook = !(Test-RomaWindowsContainsText -Text $configDoctorOutput -Needle "recording_mode=toggle")"#) &&
                 runScript.contains(#"$promptsPaste = Test-RomaWindowsContainsText -Text $configDoctorOutput -Needle "paste=true""#) &&
                 runScript.contains("-ListenerSessionCount $listenerSessionCount") &&
+                windowsProofScript.contains("Write-RomaWindowsRegisterHotkeyProofPrompt") &&
+                windowsProofScript.contains("Write-RomaWindowsKeyboardHookProofPrompt -HoldTimeoutSeconds $HoldTimeoutSeconds") &&
+                windowsProofScript.contains("windows-keyboard-hook-proof --timeout $HoldTimeoutSeconds") &&
                 windowsProofScript.contains("Write-RomaWindowsDictationOperatorPrompt") &&
                 windowsProofScript.contains(#"-Name "source_dictation_proof""#) &&
                 windowsProofScript.contains(#"-Name "source_windows_agent_dictation""#) &&
@@ -12952,6 +12957,11 @@ struct RomaCoreChecks {
                 !proofCommonScript.contains("Write-Host \"hold_hotkey=Ctrl+Shift+R\"") &&
                 !proofCommonScript.contains("Write-Host \"toggle_hotkey=Ctrl+Shift+R\"") &&
                 !runScript.contains(#"Write-Host "waiting_for_hotkey=Ctrl+Shift+R""#) &&
+                !windowsProofScript.contains("Press Ctrl+Shift+R") &&
+                !windowsProofScript.contains("press Ctrl+Shift+R") &&
+                !windowsProofScript.contains("Press and release Ctrl+Shift+R") &&
+                !windowsProofScript.contains("press and release Ctrl+Shift+R") &&
+                !windowsProofScript.contains("windows-keyboard-hook-proof --timeout 15") &&
                 !windowsProofScript.contains("Say a phrase before Ctrl+Shift+R") &&
                 !smokeScript.contains("Say a phrase before Ctrl+Shift+R") &&
                 !proveScript.contains("function Write-HoldDictationPrompt") &&

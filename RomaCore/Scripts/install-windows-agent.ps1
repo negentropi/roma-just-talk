@@ -28,9 +28,9 @@ param(
     [switch]$CreateStartupShortcut,
     [switch]$AllowSmokeShortcut,
     [string]$ShortcutDir = "",
-    [string]$ShortcutName = "Roma Just Talk Agent.lnk",
+    [string]$ShortcutName = "",
     [string]$StartupShortcutDir = "",
-    [string]$StartupShortcutName = "Roma Just Talk Agent.lnk"
+    [string]$StartupShortcutName = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -44,6 +44,13 @@ if (!(Test-Path -LiteralPath $proofCommonScript)) {
 Set-Alias -Name Invoke-Step -Value Invoke-RomaWindowsProofStep -Scope Local -Force
 Set-Alias -Name Resolve-FullPath -Value Resolve-RomaWindowsFullPath -Scope Local -Force
 Set-Alias -Name Require-File -Value Require-RomaWindowsFile -Scope Local -Force
+
+if ([string]::IsNullOrWhiteSpace($ShortcutName)) {
+    $ShortcutName = Get-RomaWindowsAgentShortcutFileName
+}
+if ([string]::IsNullOrWhiteSpace($StartupShortcutName)) {
+    $StartupShortcutName = Get-RomaWindowsAgentShortcutFileName
+}
 
 function Get-ProcessExecutablePath {
     param(
@@ -293,7 +300,7 @@ if ($CreateShortcut -or $CreateStartupShortcut) {
             $ShortcutDir = Resolve-FullPath -Path $ShortcutDir
             New-Item -ItemType Directory -Force -Path $ShortcutDir | Out-Null
 
-            $shortcutPath = Join-Path $ShortcutDir $ShortcutName
+            $shortcutPath = Join-RomaWindowsAgentShortcutPath -ShortcutDir $ShortcutDir -ShortcutName $ShortcutName
             $savedShortcut = New-RomaWindowsAgentShortcut `
                 -ShortcutPath $shortcutPath `
                 -RunScriptPath $runScript `
@@ -315,7 +322,7 @@ if ($CreateShortcut -or $CreateStartupShortcut) {
             $StartupShortcutDir = Resolve-FullPath -Path $StartupShortcutDir
             New-Item -ItemType Directory -Force -Path $StartupShortcutDir | Out-Null
 
-            $startupShortcutPath = Join-Path $StartupShortcutDir $StartupShortcutName
+            $startupShortcutPath = Join-RomaWindowsAgentShortcutPath -ShortcutDir $StartupShortcutDir -ShortcutName $StartupShortcutName
             $savedStartupShortcut = New-RomaWindowsAgentShortcut `
                 -ShortcutPath $startupShortcutPath `
                 -RunScriptPath $runScript `

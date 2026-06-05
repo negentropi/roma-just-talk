@@ -12807,6 +12807,7 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Get-RomaWindowsInstalledProofSurfaceFileProofs") &&
                 proofCommonScript.contains("function Get-RomaWindowsAgentArtifactFileProofs") &&
                 proofCommonScript.contains("function Get-RomaWindowsAgentShortcutFileName") &&
+                proofCommonScript.contains("function Join-RomaWindowsAgentShortcutPath") &&
                 proofCommonScript.contains("function Get-RomaWindowsAgentShortcutTargetPath") &&
                 proofCommonScript.contains("function New-RomaWindowsAgentShortcutArguments") &&
                 proofCommonScript.contains("function Assert-RomaWindowsAgentShortcutContract") &&
@@ -12864,9 +12865,14 @@ struct RomaCoreChecks {
         )
         try require(
             proveScript.contains("Get-RomaWindowsAgentShortcutReportPaths") &&
+                installScript.contains("Join-RomaWindowsAgentShortcutPath") &&
+                packageScript.contains("$shortcutPath = Join-RomaWindowsAgentShortcutPath -ShortcutDir $shortcutDir") &&
+                packageScript.contains("$localWhisperShortcutPath = Join-RomaWindowsAgentShortcutPath -ShortcutDir $localWhisperShortcutDir") &&
                 proveScript.contains(#"$shortcutReportPaths["shortcut_path"]"#) &&
                 proveScript.contains(#"$shortcutReportPaths["startup_shortcut_path"]"#) &&
                 proveScript.contains(#"$shortcutReportPaths["installed_run_script_path"]"#) &&
+                !installScript.contains(#""Roma Just Talk Agent.lnk""#) &&
+                !packageScript.contains(#""Roma Just Talk Agent.lnk""#) &&
                 !proveScript.contains(#"Join-Path $ShortcutDir "Roma Just Talk Agent.lnk""#) &&
                 !proveScript.contains(#"Join-Path $StartupShortcutDir "Roma Just Talk Agent.lnk""#) &&
                 !proveScript.contains(#"[System.Environment]::GetFolderPath("Startup")"#) &&

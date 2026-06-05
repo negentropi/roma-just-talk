@@ -530,11 +530,11 @@ try {
     $installProofDir = Join-Path $OutputDir "install-proof"
     $installProofConfigPath = Join-Path $installProofDir "windows-agent.json"
     $shortcutDir = Join-Path $OutputDir "shortcuts"
-    $shortcutPath = Join-Path $shortcutDir "Roma Just Talk Agent.lnk"
+    $shortcutPath = Join-RomaWindowsAgentShortcutPath -ShortcutDir $shortcutDir
     $localWhisperInstallProofDir = Join-Path $OutputDir "install-proof-local-whisper"
     $localWhisperInstallConfigPath = Join-Path $localWhisperInstallProofDir "windows-agent.json"
     $localWhisperShortcutDir = Join-Path $OutputDir "shortcuts-local-whisper"
-    $localWhisperShortcutPath = Join-Path $localWhisperShortcutDir "Roma Just Talk Agent.lnk"
+    $localWhisperShortcutPath = Join-RomaWindowsAgentShortcutPath -ShortcutDir $localWhisperShortcutDir
     $laptopPreflightCheckerSmokeDir = Join-Path $OutputDir "laptop-preflight-checker-smoke"
     $laptopPreflightCheckerSmokeReport = Join-RomaWindowsLaptopProofReportPath -ProofDir $laptopPreflightCheckerSmokeDir -Name "laptop_preflight"
     $laptopNativePreflightCheckerSmokeDir = Join-Path $OutputDir "laptop-native-preflight-checker-smoke"

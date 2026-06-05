@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Removed embedded unpunctuated "I guess", "I suppose", and "I think" hesitation fillers before short predicates while preserving meaningful leading and terminal uncertainty.
 - Collapsed repeated copula false starts such as "The model is the module is ready" while preserving normal prose clauses.
 - Lowercased short status/predicate continuation fragments like "Good.", "Available.", and "Blocked." after ongoing text without changing standalone utterances.
 - Lowercased short "Ready." continuation fragments after ongoing text while preserving sentence-start capitalization.

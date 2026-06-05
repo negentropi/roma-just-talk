@@ -3420,6 +3420,21 @@ struct RomaCoreChecks {
                 "embedded unpunctuated basically before good predicate"
             ),
             (
+                "I think this is I guess ready.",
+                "I think this is ready.",
+                "embedded unpunctuated i guess before ready predicate"
+            ),
+            (
+                "I think this is I suppose ready.",
+                "I think this is ready.",
+                "embedded unpunctuated i suppose before ready predicate"
+            ),
+            (
+                "I think this is I think ready.",
+                "I think this is ready.",
+                "embedded unpunctuated i think before ready predicate"
+            ),
+            (
                 "I think this is you see ready.",
                 "I think this is ready.",
                 "embedded unpunctuated you see filler"
@@ -5858,6 +5873,21 @@ struct RomaCoreChecks {
                 "I think this is maybe ready.",
                 "I think this is maybe ready.",
                 "embedded maybe uncertainty guard"
+            ),
+            (
+                "This works I guess.",
+                "This works I guess.",
+                "terminal i guess uncertainty guard"
+            ),
+            (
+                "I guess this works.",
+                "I guess this works.",
+                "leading i guess uncertainty guard"
+            ),
+            (
+                "I suppose the model is ready.",
+                "I suppose the model is ready.",
+                "leading i suppose uncertainty guard"
             ),
             (
                 "I like",

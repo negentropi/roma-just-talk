@@ -1635,6 +1635,7 @@ public struct RomaTranscriptionOutputFilter {
         filteredText = removeTerminalClarificationFillerTails(from: filteredText)
         filteredText = removeTerminalAcknowledgementFillers(from: filteredText)
         filteredText = removeUnpunctuatedBasicallyFillers(from: filteredText)
+        filteredText = removeUnpunctuatedUncertaintyFillers(from: filteredText)
         filteredText = removeUnpunctuatedIMeanFillers(from: filteredText)
         filteredText = removeUnpunctuatedYouKnowFillers(from: filteredText)
         filteredText = removeUnpunctuatedClarificationFillers(from: filteredText)
@@ -2837,6 +2838,37 @@ public struct RomaTranscriptionOutputFilter {
     private static func removeUnpunctuatedBasicallyFillers(from text: String) -> String {
         guard let regex = try? NSRegularExpression(
             pattern: #"(?i)(?<![\p{L}\p{N}])basically(?:[ \t]*[,;:…]+)?(?![\p{L}\p{N}])"#
+        ) else {
+            return text
+        }
+
+        var filteredText = text
+        let range = NSRange(filteredText.startIndex..., in: filteredText)
+        let matches = regex.matches(in: filteredText, range: range).reversed()
+
+        for match in matches {
+            guard let matchRange = Range(match.range, in: filteredText) else {
+                continue
+            }
+
+            let prefix = String(filteredText[..<matchRange.lowerBound])
+            let suffix = String(filteredText[matchRange.upperBound...])
+            guard let previousWord = previousWord(in: prefix),
+                  let nextWord = nextWord(in: suffix),
+                  allowedPreviousWordsForUnpunctuatedLikeFiller.contains(previousWord),
+                  allowedNextWordsForUnpunctuatedHedgeFiller.contains(nextWord) else {
+                continue
+            }
+
+            filteredText.replaceSubrange(matchRange, with: "")
+        }
+
+        return filteredText
+    }
+
+    private static func removeUnpunctuatedUncertaintyFillers(from text: String) -> String {
+        guard let regex = try? NSRegularExpression(
+            pattern: #"(?i)(?<![\p{L}\p{N}])i[ \t]+(?:guess|suppose|think)(?:[ \t]*[,;:…]+)?(?![\p{L}\p{N}])"#
         ) else {
             return text
         }

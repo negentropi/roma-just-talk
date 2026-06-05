@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Shared installed Windows agent config-file proof shaping through proof-helper helpers.
 - Shared installed Windows listener-smoke report path proof shaping through proof-helper helpers.
 - Shared installed Windows listener runtime output assertions through proof-helper marker maps.
 - Shared Windows script-parse proof markers through proof-helper marker maps.

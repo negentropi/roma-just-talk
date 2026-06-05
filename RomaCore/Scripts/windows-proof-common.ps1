@@ -2201,6 +2201,62 @@ function Get-RomaWindowsConfigDoctorOutputProof {
     return $proof
 }
 
+function Get-RomaWindowsAgentConfigFileProof {
+    param(
+        [string]$ConfigPath = ""
+    )
+
+    if ([string]::IsNullOrWhiteSpace($ConfigPath)) {
+        return [ordered]@{
+            path = ""
+            exists = $false
+        }
+    }
+
+    $proof = Get-RomaWindowsFileProof -Path $ConfigPath
+    if (!$proof["exists"]) {
+        return $proof
+    }
+
+    $config = Get-Content -LiteralPath $ConfigPath -Raw | ConvertFrom-Json
+    if ($config.PSObject.Properties.Name -contains "outputPath") {
+        $outputPath = [string]$config.outputPath
+        $proof["output_path"] = $outputPath
+        if (![string]::IsNullOrWhiteSpace($outputPath)) {
+            $proof["output_file"] = Get-RomaWindowsFileProof -Path $outputPath
+        }
+    }
+    if ($config.PSObject.Properties.Name -contains "usesHoldHook") {
+        $proof["uses_hold_hook"] = [bool]$config.usesHoldHook
+    }
+    if ($config.PSObject.Properties.Name -contains "shouldPaste") {
+        $proof["should_paste"] = [bool]$config.shouldPaste
+    }
+    if ($config.PSObject.Properties.Name -contains "restoreClipboardAfterPaste") {
+        $proof["restore_clipboard_after_paste"] = [bool]$config.restoreClipboardAfterPaste
+    }
+    if ($config.PSObject.Properties.Name -contains "whisperCLIPath" -and
+        ![string]::IsNullOrWhiteSpace([string]$config.whisperCLIPath)) {
+        $proof["uses_whisper_cli"] = $true
+        $proof["whisper_cli_path"] = [string]$config.whisperCLIPath
+        $proof["whisper_cli_file"] = Get-RomaWindowsFileProof -Path ([string]$config.whisperCLIPath)
+        if ($config.PSObject.Properties.Name -contains "whisperModelPath") {
+            $proof["whisper_model_path"] = [string]$config.whisperModelPath
+            $proof["whisper_model_file"] = Get-RomaWindowsFileProof -Path ([string]$config.whisperModelPath)
+        }
+    } else {
+        $proof["uses_whisper_cli"] = $false
+    }
+    if ($config.PSObject.Properties.Name -contains "endpoint") {
+        $proof["endpoint"] = [string]$config.endpoint
+    }
+    if ($config.PSObject.Properties.Name -contains "model") {
+        $proof["model"] = [string]$config.model
+    }
+
+    return $proof
+}
+
 function Add-RomaWindowsAgentConfigurationArgs {
     param(
         [string[]]$Arguments = @(),

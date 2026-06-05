@@ -11883,6 +11883,7 @@ struct RomaCoreChecks {
         try require(
             proofCommonScript.contains("function Assert-RomaWindowsConfigDoctorOutput") &&
                 proofCommonScript.contains("function Get-RomaWindowsConfigDoctorOutputProof") &&
+                proofCommonScript.contains("function Get-RomaWindowsAgentConfigFileProof") &&
                 proofCommonScript.contains("function Get-RomaWindowsConfigDoctorOutputMarkers") &&
                 proofCommonScript.contains("function Get-RomaWindowsCloudConfigDoctorOutputMarkers") &&
                 proofCommonScript.contains("function Get-RomaWindowsWhisperConfigDoctorOutputMarkers") &&
@@ -11900,7 +11901,9 @@ struct RomaCoreChecks {
                 !proofCommonScript.contains(#"whisper_cli_exists = $Output.Contains("whisper_cli_exists=true")"#) &&
                 !proofCommonScript.contains(#"whisper_model_exists = $Output.Contains("whisper_model_exists=true")"#) &&
                 proveScript.contains(#"config_doctor = (Get-RomaWindowsConfigDoctorOutputProof"#) &&
+                proveScript.contains("config = (Get-RomaWindowsAgentConfigFileProof -ConfigPath $ConfigPath)") &&
                 !proveScript.contains("function Get-ConfigDoctorOutputProof") &&
+                !proveScript.contains("function Get-ConfigProof") &&
                 proveScript.contains(#"Invoke-Step "installed config doctor""#),
             "Windows artifact proof reports should record installed config doctor evidence through shared helpers"
         )

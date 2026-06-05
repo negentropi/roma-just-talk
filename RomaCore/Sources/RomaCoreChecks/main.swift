@@ -13664,6 +13664,14 @@ struct RomaCoreChecks {
                 proofCommonScript.contains(#"Require-RomaWindowsManifestFile -Manifest $Manifest -Key "proof_common_script" -BaseDir $BaseDir"#) &&
                 proofCommonScript.contains("function Require-RomaWindowsPackagedWhisperCLIMock") &&
                 proofCommonScript.contains(#"Require-RomaWindowsManifestFile -Manifest $Manifest -Key "whisper_cli_mock" -BaseDir $BaseDir"#) &&
+                proofCommonScript.contains("function Get-RomaWindowsAgentArtifactRequiredManifestKeys") &&
+                proofCommonScript.contains(#""install_proof_config""#) &&
+                proofCommonScript.contains(#""local_whisper_shortcut""#) &&
+                proofCommonScript.contains(#""swift_runtime_dlls""#) &&
+                proofCommonScript.contains("function Assert-RomaWindowsAgentArtifactManifestKeys") &&
+                proofCommonScript.contains("foreach ($key in Get-RomaWindowsAgentArtifactRequiredManifestKeys)") &&
+                proveScript.contains("Assert-RomaWindowsAgentArtifactManifestKeys -Manifest $script:artifactManifest") &&
+                !proveScript.contains("foreach ($key in @(") &&
                 proveScript.contains("Require-RomaWindowsPackagedWhisperCLIMock") &&
                 proveScript.contains("Require-RomaWindowsPackagedProofAgent") &&
                 !proveScript.contains(#"-Key "whisper_cli_mock""#) &&

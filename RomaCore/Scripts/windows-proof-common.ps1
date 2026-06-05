@@ -1149,6 +1149,42 @@ function Get-RomaWindowsAgentArtifactConfigFiles {
     )
 }
 
+function Get-RomaWindowsAgentArtifactRequiredManifestKeys {
+    return @(
+        "agent",
+        "output",
+        "proof_agent",
+        "whisper_cli_mock",
+        "smoke_script",
+        "run_script",
+        "install_script",
+        "proof_script",
+        "laptop_proof_script",
+        "parse_script",
+        "check_report_script",
+        "check_set_script",
+        "install_proof_config",
+        "install_proof_shortcut",
+        "local_whisper_install_config",
+        "local_whisper_shortcut",
+        "proof_common_script",
+        "manifest_script",
+        "package_identity_script",
+        "swift_runtime_dlls"
+    )
+}
+
+function Assert-RomaWindowsAgentArtifactManifestKeys {
+    param(
+        [Parameter(Mandatory = $true)]
+        [hashtable]$Manifest
+    )
+
+    foreach ($key in Get-RomaWindowsAgentArtifactRequiredManifestKeys) {
+        Require-RomaWindowsManifestKey -Manifest $Manifest -Key $key | Out-Null
+    }
+}
+
 function Require-RomaWindowsPackagedProofScript {
     param(
         [Parameter(Mandatory = $true)]

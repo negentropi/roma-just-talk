@@ -432,30 +432,7 @@ Invoke-Step "artifact files" {
 
 Invoke-Step "artifact manifest" {
     $script:artifactManifest = Read-RomaWindowsManifest -Path $manifestPath
-    foreach ($key in @(
-        "agent",
-        "output",
-        "proof_agent",
-        "whisper_cli_mock",
-        "smoke_script",
-        "run_script",
-        "install_script",
-        "proof_script",
-        "laptop_proof_script",
-        "parse_script",
-        "check_report_script",
-        "check_set_script",
-        "install_proof_config",
-        "install_proof_shortcut",
-        "local_whisper_install_config",
-        "local_whisper_shortcut",
-        "proof_common_script",
-        "manifest_script",
-        "package_identity_script",
-        "swift_runtime_dlls"
-    )) {
-        Require-RomaWindowsManifestKey -Manifest $script:artifactManifest -Key $key
-    }
+    Assert-RomaWindowsAgentArtifactManifestKeys -Manifest $script:artifactManifest
     $script:packagedWhisperCLI = Require-RomaWindowsPackagedWhisperCLIMock `
         -Manifest $script:artifactManifest `
         -BaseDir $PackageDir

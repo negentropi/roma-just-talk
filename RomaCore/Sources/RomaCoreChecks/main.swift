@@ -10536,14 +10536,16 @@ struct RomaCoreChecks {
         )
         try require(
             runScript.contains("config-doctor --config $ConfigPath") &&
-                runScript.contains(#"Assert-OutputContains -Output $configDoctorOutput -Expected "config_valid=true""#),
+                runScript.contains("Assert-RomaWindowsConfigDoctorOutput -Output $configDoctorOutput"),
             "Windows run script should validate config before launching sessions"
         )
         try require(
-            proveScript.contains("function Get-ConfigDoctorOutputProof") &&
-                proveScript.contains(#"config_doctor = (Get-ConfigDoctorOutputProof"#) &&
+            proofCommonScript.contains("function Assert-RomaWindowsConfigDoctorOutput") &&
+                proofCommonScript.contains("function Get-RomaWindowsConfigDoctorOutputProof") &&
+                proveScript.contains(#"config_doctor = (Get-RomaWindowsConfigDoctorOutputProof"#) &&
+                !proveScript.contains("function Get-ConfigDoctorOutputProof") &&
                 proveScript.contains(#"Invoke-Step "installed config doctor""#),
-            "Windows artifact proof reports should record installed config doctor evidence"
+            "Windows artifact proof reports should record installed config doctor evidence through shared helpers"
         )
         try require(
             checkReportScript.contains("function Assert-ConfigDoctorProof") &&
@@ -10554,9 +10556,10 @@ struct RomaCoreChecks {
         )
         try require(
             smokeScript.contains(#"Invoke-Step "agent config doctor""#) &&
-                smokeScript.contains(#"Assert-OutputContains -Output $configDoctorOutput -Expected "config_valid=true""#) &&
-                smokeScript.contains(#"Assert-OutputContains -Output $configDoctorOutput -Expected "api_key_resolved=true""#) &&
-                smokeScript.contains(#"Assert-OutputContains -Output $configDoctorOutput -Expected "whisper_cli_exists=true""#),
+                smokeScript.contains(#"$requiresCloudConfigDoctor = !$usesWhisperCLI"#) &&
+                smokeScript.contains("Assert-RomaWindowsConfigDoctorOutput `") &&
+                smokeScript.contains("-RequireWhisperCLI $usesWhisperCLI") &&
+                smokeScript.contains("-RequireCloud $requiresCloudConfigDoctor"),
             "Windows smoke script should prove config doctor for cloud and local whisper setup"
         )
         try require(

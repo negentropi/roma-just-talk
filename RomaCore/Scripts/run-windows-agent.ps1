@@ -193,8 +193,7 @@ if ($LASTEXITCODE -ne 0) {
     throw "RomaWindowsAgent config-doctor failed"
 }
 Write-Host $configDoctorOutput
-Assert-OutputContains -Output $configDoctorOutput -Expected "config_valid=true"
-Assert-OutputContains -Output $configDoctorOutput -Expected "transcription_client="
+Assert-RomaWindowsConfigDoctorOutput -Output $configDoctorOutput
 
 $agentMode = if ($Listen) { "listen" } else { "dictate" }
 $agentArgs = @(

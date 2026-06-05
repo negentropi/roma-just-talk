@@ -245,14 +245,11 @@ Invoke-Step "agent config doctor" {
         throw "RomaWindowsAgent config-doctor failed"
     }
     Write-Host $configDoctorOutput
-    Assert-OutputContains -Output $configDoctorOutput -Expected "config_valid=true"
-    Assert-OutputContains -Output $configDoctorOutput -Expected "transcription_client="
-    if ($usesWhisperCLI) {
-        Assert-OutputContains -Output $configDoctorOutput -Expected "whisper_cli_exists=true"
-        Assert-OutputContains -Output $configDoctorOutput -Expected "whisper_model_exists=true"
-    } else {
-        Assert-OutputContains -Output $configDoctorOutput -Expected "api_key_resolved=true"
-    }
+    $requiresCloudConfigDoctor = !$usesWhisperCLI
+    Assert-RomaWindowsConfigDoctorOutput `
+        -Output $configDoctorOutput `
+        -RequireWhisperCLI $usesWhisperCLI `
+        -RequireCloud $requiresCloudConfigDoctor
 }
 
 if ($RunDictation) {

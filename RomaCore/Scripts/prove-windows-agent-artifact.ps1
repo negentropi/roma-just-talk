@@ -191,8 +191,7 @@ function Invoke-ConfigDoctor {
     }
 
     Write-Host $output
-    Assert-OutputContains -Output $output -Expected "config_valid=true"
-    Assert-OutputContains -Output $output -Expected "transcription_client="
+    Assert-RomaWindowsConfigDoctorOutput -Output $output
     return $output
 }
 
@@ -572,28 +571,6 @@ function Get-ScriptParseProof {
     }
 }
 
-function Get-ConfigDoctorOutputProof {
-    param(
-        [string]$Output = ""
-    )
-
-    $configPath = Get-OutputValue -Content $Output -Name "config"
-    $transcriptionClient = Get-OutputValue -Content $Output -Name "transcription_client"
-    return [ordered]@{
-        output_present = ![string]::IsNullOrWhiteSpace($Output)
-        config_path = $configPath
-        config_path_present = ![string]::IsNullOrWhiteSpace($configPath)
-        config_valid = $Output.Contains("config_valid=true")
-        transcription_client = $transcriptionClient
-        transcription_client_present = ![string]::IsNullOrWhiteSpace($transcriptionClient)
-        uses_cloud = $Output.Contains("transcription_client=openai-compatible")
-        api_key_resolved = $Output.Contains("api_key_resolved=true")
-        uses_whisper_cli = $Output.Contains("transcription_client=whisper.cpp-cli")
-        whisper_cli_exists = $Output.Contains("whisper_cli_exists=true")
-        whisper_model_exists = $Output.Contains("whisper_model_exists=true")
-    }
-}
-
 function Write-ProofReport {
     param(
         [Parameter(Mandatory = $true)]
@@ -669,7 +646,7 @@ function Write-ProofReport {
         }
         packaged_listener = (Get-ListenerSmokeProof -Output $script:packagedListenerOutput)
         installed_listener = (Get-ListenerSmokeProof -Output $script:installedListenerOutput)
-        config_doctor = (Get-ConfigDoctorOutputProof -Output $script:installedConfigDoctorOutput)
+        config_doctor = (Get-RomaWindowsConfigDoctorOutputProof -Output $script:installedConfigDoctorOutput)
         files = $fileProofs
         manifest = $script:artifactManifest
         package_identity = (Get-RomaPackageIdentityProof -PackageDir $PackageDir)

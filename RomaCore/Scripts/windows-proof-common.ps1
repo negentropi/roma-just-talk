@@ -1270,6 +1270,27 @@ function Assert-RomaWindowsMinimumPermissionOutput {
     Assert-RomaWindowsOutputMarkers -Output $Output -Markers (Get-RomaWindowsMinimumPermissionOutputMarkers)
 }
 
+function Assert-RomaWindowsConfigDoctorOutput {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Output,
+        [bool]$RequireCloud = $false,
+        [bool]$RequireWhisperCLI = $false
+    )
+
+    Assert-RomaWindowsOutputContains -Output $Output -Expected "config_valid=true"
+    Assert-RomaWindowsOutputContains -Output $Output -Expected "transcription_client="
+    if ($RequireCloud) {
+        Assert-RomaWindowsOutputContains -Output $Output -Expected "transcription_client=openai-compatible"
+        Assert-RomaWindowsOutputContains -Output $Output -Expected "api_key_resolved=true"
+    }
+    if ($RequireWhisperCLI) {
+        Assert-RomaWindowsOutputContains -Output $Output -Expected "transcription_client=whisper.cpp-cli"
+        Assert-RomaWindowsOutputContains -Output $Output -Expected "whisper_cli_exists=true"
+        Assert-RomaWindowsOutputContains -Output $Output -Expected "whisper_model_exists=true"
+    }
+}
+
 function Assert-RomaWindowsAgentScriptCommonOptions {
     param(
         [bool]$UseHoldHook = $false,
@@ -1333,6 +1354,28 @@ function Get-RomaWindowsMinimumPermissionOutputProof {
     )
 
     return Get-RomaWindowsOutputMarkerProof -Output $Output -Markers (Get-RomaWindowsMinimumPermissionOutputMarkers)
+}
+
+function Get-RomaWindowsConfigDoctorOutputProof {
+    param(
+        [string]$Output = ""
+    )
+
+    $configPath = Get-RomaWindowsOutputValue -Content $Output -Name "config"
+    $transcriptionClient = Get-RomaWindowsOutputValue -Content $Output -Name "transcription_client"
+    return [ordered]@{
+        output_present = ![string]::IsNullOrWhiteSpace($Output)
+        config_path = $configPath
+        config_path_present = ![string]::IsNullOrWhiteSpace($configPath)
+        config_valid = $Output.Contains("config_valid=true")
+        transcription_client = $transcriptionClient
+        transcription_client_present = ![string]::IsNullOrWhiteSpace($transcriptionClient)
+        uses_cloud = $Output.Contains("transcription_client=openai-compatible")
+        api_key_resolved = $Output.Contains("api_key_resolved=true")
+        uses_whisper_cli = $Output.Contains("transcription_client=whisper.cpp-cli")
+        whisper_cli_exists = $Output.Contains("whisper_cli_exists=true")
+        whisper_model_exists = $Output.Contains("whisper_model_exists=true")
+    }
 }
 
 function Add-RomaWindowsAgentConfigurationArgs {

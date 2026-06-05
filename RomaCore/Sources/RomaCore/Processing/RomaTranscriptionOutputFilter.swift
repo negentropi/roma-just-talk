@@ -2525,9 +2525,15 @@ public struct RomaTranscriptionOutputFilter {
 
     private static func collapseRepeatedContextOverlapContinuationFragment(_ text: String) -> String {
         let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        let collapsedText = collapseSeparatorRepeatedWords(
-            in: collapseAdjacentRepeatedWords(in: trimmedText)
-        )
+        var collapsedText = repeatedContextOverlapContinuationWordSequence(in: trimmedText) ??
+            collapseAdjacentRepeatedWords(in: trimmedText)
+        collapsedText = collapseSeparatorRepeatedWords(in: collapsedText)
+        collapsedText = collapseRepeatedShortPhrases(in: collapsedText)
+        collapsedText = collapseRepeatedShortClauses(in: collapsedText)
+        collapsedText = collapseRepeatedShortSentences(in: collapsedText)
+        collapsedText = collapseMismatchedRepeatedShortSentences(in: collapsedText)
+        collapsedText = collapseGeneratedSeparatorBeforeShortFragment(in: collapsedText)
+        collapsedText = cleanDanglingGeneratedLeadInSuffix(collapsedText)
             .trimmingCharacters(in: .whitespacesAndNewlines)
         guard collapsedText != trimmedText,
               !collapsedText.isEmpty,
@@ -2539,6 +2545,32 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         return collapsedText
+    }
+
+    private static func repeatedContextOverlapContinuationWordSequence(in text: String) -> String? {
+        let tokens = wordTokens(in: text)
+        guard tokens.count >= 2,
+              tokens.count.isMultiple(of: 2) else {
+            return nil
+        }
+
+        let repeatedWordCount = tokens.count / 2
+        guard repeatedWordCount <= 5 else { return nil }
+
+        let firstWords = tokens.prefix(repeatedWordCount).map(\.text)
+        let secondWords = tokens.dropFirst(repeatedWordCount).map(\.text)
+        guard firstWords == secondWords else { return nil }
+
+        let normalizedClause = firstWords.joined(separator: " ")
+        guard !preservedRepeatedClauses.contains(normalizedClause),
+              !(repeatedWordCount == 1 && preservedRepeatedWords.contains(normalizedClause)) else {
+            return nil
+        }
+
+        let firstToken = tokens[0]
+        let lastToken = tokens[repeatedWordCount - 1]
+        return String(text[firstToken.range.lowerBound..<lastToken.range.upperBound])
+            .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     private static func removeLeadingDanglingGeneratedLeadInAfterContextOverlap(from text: String) -> String {

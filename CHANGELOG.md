@@ -32,6 +32,7 @@
 - Removed pause fillers such as `hmm`, `eh`, and `um` exposed after repeated context in hotkey dictation fragments.
 - Removed acknowledgement fillers such as `yeah`, `okay`, `yep okay`, and `sure` exposed after repeated context in hotkey dictation fragments.
 - Collapsed duplicated final fragments such as `Model Model` after repeated context in hotkey dictation.
+- Collapsed duplicated multi-word final fragments such as `final word final word` and repeated bracketed final-word artifacts after repeated context.
 - Unwrapped square-bracketed final-word fragments after correction lead-ins in mid-sentence hotkey dictation.
 - Preserved explicit punctuation commands after correction-marked "final word" continuations.
 - Shared Windows dictation and listener runtime-log proof markers through proof-helper marker maps.

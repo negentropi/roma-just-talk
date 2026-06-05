@@ -1,6 +1,22 @@
 import Foundation
 
 public enum WindowsDoctorOutput {
+    public static func agentRuntimeProofLines(runtimeAvailable: Bool) -> [String] {
+        [
+            "runtime_available=\(runtimeAvailable)",
+            "dictation_runtime=WindowsDictationRuntime",
+            "recorder=miniaudio",
+            "audio_format=pcm16_16000_mono",
+            "pre_roll_seconds=\(PreRollConfiguration().durationSeconds)",
+            "toggle_hotkey=RegisterHotKey \(WindowsHotKey.proofToggle.displayName)",
+            "hold_hook=WH_KEYBOARD_LL \(WindowsLowLevelKeyboardHookChord.proofHold.displayName)",
+            "paste=win32_clipboard_sendinput",
+            "clipboard_restore=text_only_after_delay"
+        ] + runtimeDefaultProofLines + [
+            "secret_store=dpapi"
+        ]
+    }
+
     public static var runtimeDefaultProofLines: [String] {
         [
             "default_record_seconds=\(RomaWindowsAgentConfiguration.defaultRecordSeconds)",

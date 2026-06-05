@@ -8232,6 +8232,26 @@ struct RomaCoreChecks {
             "Windows clipboard restore maximum delay should fit Sleep milliseconds"
         )
         try require(
+            WindowsDoctorOutput.agentRuntimeProofLines(runtimeAvailable: true) == [
+                "runtime_available=true",
+                "dictation_runtime=WindowsDictationRuntime",
+                "recorder=miniaudio",
+                "audio_format=pcm16_16000_mono",
+                "pre_roll_seconds=3.0",
+                "toggle_hotkey=RegisterHotKey Ctrl+Shift+R",
+                "hold_hook=WH_KEYBOARD_LL Ctrl+Shift+R",
+                "paste=win32_clipboard_sendinput",
+                "clipboard_restore=text_only_after_delay",
+                "default_record_seconds=2.0",
+                "default_hold_timeout_seconds=15.0",
+                "default_hold_timeout_milliseconds=15000",
+                "default_clipboard_restore_delay_seconds=2.0",
+                "maximum_clipboard_restore_delay_seconds=4294967.295",
+                "secret_store=dpapi"
+            ],
+            "Windows doctor agent runtime proof lines should stay shared"
+        )
+        try require(
             WindowsDoctorOutput.runtimeDefaultProofLines == [
                 "default_record_seconds=2.0",
                 "default_hold_timeout_seconds=15.0",
@@ -10957,11 +10977,21 @@ struct RomaCoreChecks {
         try require(
             keyboardHookSource.contains("public static let proofHold = WindowsLowLevelKeyboardHookChord(hotKey: .proofToggle)") &&
                 !keyboardHookSource.contains(#"displayName: "Ctrl+Shift+R""#) &&
-                windowsAgentSource.contains(#"WindowsHotKey.proofToggle.displayName"#) &&
-                windowsAgentSource.contains(#"WindowsLowLevelKeyboardHookChord.proofHold.displayName"#) &&
+                doctorOutputSource.contains("public static func agentRuntimeProofLines(runtimeAvailable: Bool)") &&
+                doctorOutputSource.contains(#"WindowsHotKey.proofToggle.displayName"#) &&
+                doctorOutputSource.contains(#"WindowsLowLevelKeyboardHookChord.proofHold.displayName"#) &&
                 !windowsAgentSource.contains(#"RegisterHotKey Ctrl+Shift+R"#) &&
                 !windowsAgentSource.contains(#"WH_KEYBOARD_LL Ctrl+Shift+R"#),
             "Windows agent doctor and hold-hook proof should share the Swift hotkey module instead of literal hotkey labels"
+        )
+        try require(
+            windowsAgentSource.contains("WindowsDoctorOutput.agentRuntimeProofLines(") &&
+                !windowsAgentSource.contains(#"print("runtime_available="#) &&
+                !windowsAgentSource.contains(#"print("dictation_runtime=WindowsDictationRuntime")"#) &&
+                !windowsAgentSource.contains(#"print("recorder=miniaudio")"#) &&
+                !windowsAgentSource.contains(#"print("paste=win32_clipboard_sendinput")"#) &&
+                !windowsAgentSource.contains(#"print("secret_store=dpapi")"#),
+            "Windows agent doctor should print agent runtime proof lines from shared doctor output"
         )
         try require(
             windowsAgentConfigurationSource.contains("public func windowsDictationRuntimeRequest(") &&
@@ -11091,7 +11121,7 @@ struct RomaCoreChecks {
             )
         }
         try require(
-            windowsAgentSource.contains("WindowsDoctorOutput.runtimeDefaultProofLines") &&
+            windowsAgentSource.contains("WindowsDoctorOutput.agentRuntimeProofLines") &&
                 proofAgentSource.contains("WindowsDoctorOutput.runtimeDefaultProofLines"),
             "Windows doctors should expose runtime defaults through shared doctor output"
         )

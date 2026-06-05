@@ -36,17 +36,9 @@ struct RomaWindowsAgent {
     private static func printDoctor() {
         print("agent=roma-windows-agent")
         print("platform=\(platformName)")
-        print("runtime_available=\(WindowsDictationRuntime.isRuntimeAvailable)")
-        print("dictation_runtime=WindowsDictationRuntime")
-        print("recorder=miniaudio")
-        print("audio_format=pcm16_16000_mono")
-        print("pre_roll_seconds=\(PreRollConfiguration().durationSeconds)")
-        print("toggle_hotkey=RegisterHotKey \(WindowsHotKey.proofToggle.displayName)")
-        print("hold_hook=WH_KEYBOARD_LL \(WindowsLowLevelKeyboardHookChord.proofHold.displayName)")
-        print("paste=win32_clipboard_sendinput")
-        print("clipboard_restore=text_only_after_delay")
-        WindowsDoctorOutput.runtimeDefaultProofLines.forEach { print($0) }
-        print("secret_store=dpapi")
+        WindowsDoctorOutput.agentRuntimeProofLines(
+            runtimeAvailable: WindowsDictationRuntime.isRuntimeAvailable
+        ).forEach { print($0) }
         print("config_default=\(RomaWindowsAgentConfiguration.defaultURL().path)")
         WindowsPermissionSurface.minimumMVP.proofOutputLines.forEach { print($0) }
     }

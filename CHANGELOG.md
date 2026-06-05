@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Shared the Windows agent doctor runtime, hotkey, paste, default, and DPAPI proof lines through `WindowsDoctorOutput`.
 - Shared the Windows Swift hotkey definition with the low-level hold-hook proof and agent doctor output.
 - Shared the Windows proof hotkey display and waiting-for-hold markers through the proof helper.
 - Shared Windows laptop proof report filenames through the proof helper so the runner, package smoke, and generated guide use one report path contract.

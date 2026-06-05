@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Trimmed did-not-mean-that correction lead-ins before bracketed final-word fragments.
 - Trimmed take-that-back correction lead-ins before bracketed final-word fragments.
 - Trimmed standalone changed-my-mind correction lead-ins before bracketed final-word fragments.
 - Trimmed wait-scratch and changed-my-mind correction lead-ins before bracketed final-word fragments.

@@ -12746,6 +12746,8 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Get-RomaWindowsInstalledProofSurfaceFileProofs") &&
                 proofCommonScript.contains("function Get-RomaWindowsAgentArtifactFileProofs") &&
                 proofCommonScript.contains("function Get-RomaWindowsAgentShortcutFileName") &&
+                proofCommonScript.contains("function Get-RomaWindowsAgentShortcutTargetPath") &&
+                proofCommonScript.contains("function New-RomaWindowsAgentShortcutArguments") &&
                 proofCommonScript.contains("function Join-RomaWindowsInstalledRunScriptPath") &&
                 proofCommonScript.contains("function Get-RomaWindowsAgentShortcutReportPaths"),
             "Windows proof helper should own shared script utilities"
@@ -12841,6 +12843,17 @@ struct RomaCoreChecks {
                 laptopProofScript.contains("Add-RomaWindowsAgentScriptCommonArgs") &&
                 !laptopProofScript.contains("function Add-CommonProofArgs"),
             "Windows install, artifact, and laptop proof scripts should share wrapper option argument construction"
+        )
+        try require(
+            installScript.contains("$shortcut.TargetPath = Get-RomaWindowsAgentShortcutTargetPath") &&
+                installScript.contains("$shortcut.Arguments = New-RomaWindowsAgentShortcutArguments") &&
+                proofCommonScript.contains(#"$proof["expected_arguments"] = $expectedArguments"#) &&
+                proofCommonScript.contains(#"$proof["has_exact_arguments"] = $arguments.Equals($expectedArguments"#) &&
+                checkReportScript.contains(#"Assert-NonEmptyString -Object $Proof -Name "expected_arguments""#) &&
+                checkReportScript.contains(#"Assert-Boolean -Object $Proof -Name "has_exact_arguments" -Expected $true"#) &&
+                !installScript.contains(#"$shortcut.TargetPath = "powershell.exe""#) &&
+                !installScript.contains(#"$shortcut.Arguments = "-NoProfile -ExecutionPolicy Bypass"#),
+            "Windows installer and shortcut proof should share launcher target and argument construction"
         )
         let proofCommonHelperScripts = [
             ("windows-proof.ps1", windowsProofScript, ["Invoke-Step", "Assert-OutputContains"]),
@@ -13039,7 +13052,8 @@ struct RomaCoreChecks {
             "Windows laptop proof runner should keep cloud and local startup shortcut proofs separate"
         )
         try require(
-            installScript.contains(#"-InstallDir `"$WorkingDirectory`""#) &&
+            proofCommonScript.contains(#"-InstallDir `"$InstallDir`""#) &&
+                installScript.contains("-InstallDir $WorkingDirectory") &&
                 installScript.contains(#"!$savedShortcut.Arguments.Contains("-InstallDir")"#) &&
                 installScript.contains(#"!$savedShortcut.Arguments.Contains($WorkingDirectory)"#),
             "Windows shortcuts should pass the exact install dir to the launcher"

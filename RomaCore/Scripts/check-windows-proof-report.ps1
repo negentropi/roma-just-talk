@@ -113,7 +113,9 @@ function Assert-ShortcutProof {
     Assert-NonEmptyString -Object $Proof -Name "target_path"
     Assert-NonEmptyString -Object $Proof -Name "arguments"
     Assert-NonEmptyString -Object $Proof -Name "working_directory"
+    Assert-NonEmptyString -Object $Proof -Name "expected_arguments"
     Assert-Boolean -Object $Proof -Name "target_is_powershell" -Expected $true
+    Assert-Boolean -Object $Proof -Name "has_exact_arguments" -Expected $true
     Assert-Boolean -Object $Proof -Name "references_run_script" -Expected $true
     Assert-NonEmptyString -Object $Proof -Name "expected_file_argument"
     Assert-Boolean -Object $Proof -Name "has_exact_file_argument" -Expected $true

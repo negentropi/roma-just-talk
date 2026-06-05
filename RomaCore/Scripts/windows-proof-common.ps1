@@ -2285,6 +2285,23 @@ function Get-RomaWindowsAgentShortcutFileName {
     return "Roma Just Talk Agent.lnk"
 }
 
+function Get-RomaWindowsAgentShortcutTargetPath {
+    return "powershell.exe"
+}
+
+function New-RomaWindowsAgentShortcutArguments {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$RunScriptPath,
+        [Parameter(Mandatory = $true)]
+        [string]$InstallDir,
+        [Parameter(Mandatory = $true)]
+        [string]$ConfigPath
+    )
+
+    return "-NoProfile -ExecutionPolicy Bypass -File `"$RunScriptPath`" -InstallDir `"$InstallDir`" -ConfigPath `"$ConfigPath`" -Listen"
+}
+
 function Join-RomaWindowsInstalledRunScriptPath {
     param(
         [Parameter(Mandatory = $true)]
@@ -2356,6 +2373,10 @@ function Get-RomaWindowsShortcutProof {
     $targetPath = [string]$shortcut.TargetPath
     $arguments = [string]$shortcut.Arguments
     $savedWorkingDirectory = [string]$shortcut.WorkingDirectory
+    $expectedArguments = New-RomaWindowsAgentShortcutArguments `
+        -RunScriptPath $RunScriptPath `
+        -InstallDir $WorkingDirectory `
+        -ConfigPath $ConfigPath
     $expectedFileArgument = "-File `"$RunScriptPath`""
     $expectedInstallDirArgument = "-InstallDir `"$WorkingDirectory`""
     $expectedConfigArgument = "-ConfigPath `"$ConfigPath`""
@@ -2365,7 +2386,9 @@ function Get-RomaWindowsShortcutProof {
     $proof["working_directory"] = $savedWorkingDirectory
     $proof["description"] = [string]$shortcut.Description
     $proof["window_style"] = [int]$shortcut.WindowStyle
-    $proof["target_is_powershell"] = $targetPath.EndsWith("powershell.exe", [System.StringComparison]::OrdinalIgnoreCase)
+    $proof["expected_arguments"] = $expectedArguments
+    $proof["target_is_powershell"] = $targetPath.EndsWith((Get-RomaWindowsAgentShortcutTargetPath), [System.StringComparison]::OrdinalIgnoreCase)
+    $proof["has_exact_arguments"] = $arguments.Equals($expectedArguments, [System.StringComparison]::Ordinal)
     $proof["references_run_script"] = ![string]::IsNullOrWhiteSpace($RunScriptPath) -and (Test-RomaWindowsContainsText -Text $arguments -Needle $RunScriptPath)
     $proof["references_install_dir"] = ![string]::IsNullOrWhiteSpace($WorkingDirectory) -and (Test-RomaWindowsContainsText -Text $arguments -Needle $WorkingDirectory)
     $proof["references_config_path"] = ![string]::IsNullOrWhiteSpace($ConfigPath) -and (Test-RomaWindowsContainsText -Text $arguments -Needle $ConfigPath)

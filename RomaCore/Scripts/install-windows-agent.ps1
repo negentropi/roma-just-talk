@@ -61,8 +61,11 @@ function New-AgentShortcut {
 
     $shell = New-Object -ComObject WScript.Shell
     $shortcut = $shell.CreateShortcut($ShortcutPath)
-    $shortcut.TargetPath = "powershell.exe"
-    $shortcut.Arguments = "-NoProfile -ExecutionPolicy Bypass -File `"$RunScript`" -InstallDir `"$WorkingDirectory`" -ConfigPath `"$ConfigPath`" -Listen"
+    $shortcut.TargetPath = Get-RomaWindowsAgentShortcutTargetPath
+    $shortcut.Arguments = New-RomaWindowsAgentShortcutArguments `
+        -RunScriptPath $RunScript `
+        -InstallDir $WorkingDirectory `
+        -ConfigPath $ConfigPath
     $shortcut.WorkingDirectory = $WorkingDirectory
     $shortcut.Description = $Description
     $shortcut.WindowStyle = 7

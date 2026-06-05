@@ -1767,6 +1767,21 @@ function Get-RomaWindowsListenerSmokeOutputProof {
     return $proof
 }
 
+function Get-RomaWindowsInstalledListenerSmokeOutputProof {
+    param(
+        [string]$Output = ""
+    )
+
+    $configPath = Get-RomaWindowsOutputValue -Content $Output -Name "config"
+    $agentPath = Get-RomaWindowsOutputValue -Content $Output -Name "agent_exe"
+    $proof = Get-RomaWindowsListenerSmokeOutputProof -Output $Output
+    $proof["config_path"] = $configPath
+    $proof["config_path_present"] = ![string]::IsNullOrWhiteSpace($configPath)
+    $proof["agent_path"] = $agentPath
+    $proof["agent_path_present"] = ![string]::IsNullOrWhiteSpace($agentPath)
+    return $proof
+}
+
 function Get-RomaWindowsOutputValue {
     param(
         [Alias("Content")]

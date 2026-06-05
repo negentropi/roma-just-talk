@@ -384,21 +384,6 @@ function Get-ListenerRuntimeProof {
         -ExpectedText $ExpectedTranscriptText
 }
 
-function Get-ListenerSmokeProof {
-    param(
-        [string]$Output = ""
-    )
-
-    $configPath = Get-OutputValue -Content $Output -Name "config"
-    $agentPath = Get-OutputValue -Content $Output -Name "agent_exe"
-    $proof = Get-RomaWindowsListenerSmokeOutputProof -Output $Output
-    $proof["config_path"] = $configPath
-    $proof["config_path_present"] = ![string]::IsNullOrWhiteSpace($configPath)
-    $proof["agent_path"] = $agentPath
-    $proof["agent_path_present"] = ![string]::IsNullOrWhiteSpace($agentPath)
-    return $proof
-}
-
 function Write-ProofReport {
     param(
         [Parameter(Mandatory = $true)]
@@ -472,8 +457,8 @@ function Write-ProofReport {
             packaged_native_doctors = (Get-RomaWindowsNativeDoctorOutputProofs -Outputs $script:packagedNativeDoctorOutputs)
             installed_launcher = (Get-RomaWindowsAgentDoctorOutputProof -Output $script:installedLauncherDoctorOutput)
         }
-        packaged_listener = (Get-ListenerSmokeProof -Output $script:packagedListenerOutput)
-        installed_listener = (Get-ListenerSmokeProof -Output $script:installedListenerOutput)
+        packaged_listener = (Get-RomaWindowsListenerSmokeOutputProof -Output $script:packagedListenerOutput)
+        installed_listener = (Get-RomaWindowsInstalledListenerSmokeOutputProof -Output $script:installedListenerOutput)
         config_doctor = (Get-RomaWindowsConfigDoctorOutputProof -Output $script:installedConfigDoctorOutput)
         files = $fileProofs
         manifest = $script:artifactManifest

@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Trimmed pronoun-unit correction markers such as "delete that bit" before bracketed final-word fragments.
 - Trimmed couple/few previous-unit correction markers before bracketed final-word fragments.
 - Trimmed counted previous-unit correction markers before bracketed final-word fragments.
 - Trimmed word-before-that correction markers before bracketed final-word fragments.

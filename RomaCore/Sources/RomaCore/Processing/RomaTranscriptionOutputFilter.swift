@@ -2962,10 +2962,23 @@ public struct RomaTranscriptionOutputFilter {
         return unwrappedText
     }
 
+    private static func generatedMarkdownFragmentMarkerLimits(
+        for marker: Character
+    ) -> (minimum: Int, maximum: Int)? {
+        switch marker {
+        case "*", "_", "`":
+            return (1, 3)
+        case "~", "=":
+            return (2, 2)
+        default:
+            return nil
+        }
+    }
+
     private static func unwrapSpacedGeneratedMarkdownFragment(from text: String) -> String? {
         let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard let marker = trimmedText.first,
-              marker == "*" || marker == "_" || marker == "`" else {
+              let markerLimits = generatedMarkdownFragmentMarkerLimits(for: marker) else {
             return nil
         }
 
@@ -2973,11 +2986,11 @@ public struct RomaTranscriptionOutputFilter {
         var markerCount = 0
         while prefixEnd < trimmedText.endIndex,
               trimmedText[prefixEnd] == marker,
-              markerCount < 3 {
+              markerCount < markerLimits.maximum {
             markerCount += 1
             prefixEnd = trimmedText.index(after: prefixEnd)
         }
-        guard markerCount > 0,
+        guard markerCount >= markerLimits.minimum,
               prefixEnd < trimmedText.endIndex else {
             return nil
         }
@@ -3017,7 +3030,7 @@ public struct RomaTranscriptionOutputFilter {
     private static func unwrapGeneratedMarkdownContinuationFragment(from text: String) -> String {
         let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard let marker = trimmedText.first,
-              marker == "*" || marker == "_" || marker == "`" else {
+              let markerLimits = generatedMarkdownFragmentMarkerLimits(for: marker) else {
             return text
         }
 
@@ -3025,11 +3038,11 @@ public struct RomaTranscriptionOutputFilter {
         var markerCount = 0
         while prefixEnd < trimmedText.endIndex,
               trimmedText[prefixEnd] == marker,
-              markerCount < 3 {
+              markerCount < markerLimits.maximum {
             markerCount += 1
             prefixEnd = trimmedText.index(after: prefixEnd)
         }
-        guard markerCount > 0,
+        guard markerCount >= markerLimits.minimum,
               prefixEnd < trimmedText.endIndex else {
             return text
         }
@@ -3061,21 +3074,22 @@ public struct RomaTranscriptionOutputFilter {
     private static func removeTrailingGeneratedMarkdownContinuationMarker(from text: String) -> String {
         let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard let marker = trimmedText.last,
-              marker == "*" || marker == "_" || marker == "`" else {
+              let markerLimits = generatedMarkdownFragmentMarkerLimits(for: marker) else {
             return text
         }
 
         var markerStart = trimmedText.index(before: trimmedText.endIndex)
         var markerCount = 1
         while markerStart > trimmedText.startIndex,
-              markerCount < 3 {
+              markerCount < markerLimits.maximum {
             let previousIndex = trimmedText.index(before: markerStart)
             guard trimmedText[previousIndex] == marker else { break }
             markerStart = previousIndex
             markerCount += 1
         }
 
-        guard markerStart > trimmedText.startIndex else { return text }
+        guard markerCount >= markerLimits.minimum,
+              markerStart > trimmedText.startIndex else { return text }
 
         let candidateText = String(trimmedText[..<markerStart])
             .trimmingCharacters(in: .whitespacesAndNewlines)
@@ -3114,19 +3128,20 @@ public struct RomaTranscriptionOutputFilter {
         guard closingIndex > trimmedText.startIndex else { return text }
         let markerEnd = trimmedText.index(before: closingIndex)
         let marker = trimmedText[markerEnd]
-        guard marker == "*" || marker == "_" || marker == "`" else { return text }
+        guard let markerLimits = generatedMarkdownFragmentMarkerLimits(for: marker) else { return text }
 
         var markerStart = markerEnd
         var markerCount = 1
         while markerStart > trimmedText.startIndex,
-              markerCount < 3 {
+              markerCount < markerLimits.maximum {
             let previousIndex = trimmedText.index(before: markerStart)
             guard trimmedText[previousIndex] == marker else { break }
             markerStart = previousIndex
             markerCount += 1
         }
 
-        guard markerStart > trimmedText.startIndex else { return text }
+        guard markerCount >= markerLimits.minimum,
+              markerStart > trimmedText.startIndex else { return text }
         let beforeMarkerIndex = trimmedText.index(before: markerStart)
         guard trimmedText[beforeMarkerIndex].isWhitespace else { return text }
 
@@ -3147,21 +3162,22 @@ public struct RomaTranscriptionOutputFilter {
     private static func removeTrailingGeneratedMarkdownFragmentMarker(from text: String) -> String {
         let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard let marker = trimmedText.last,
-              marker == "*" || marker == "_" || marker == "`" else {
+              let markerLimits = generatedMarkdownFragmentMarkerLimits(for: marker) else {
             return text
         }
 
         var markerStart = trimmedText.index(before: trimmedText.endIndex)
         var markerCount = 1
         while markerStart > trimmedText.startIndex,
-              markerCount < 3 {
+              markerCount < markerLimits.maximum {
             let previousIndex = trimmedText.index(before: markerStart)
             guard trimmedText[previousIndex] == marker else { break }
             markerStart = previousIndex
             markerCount += 1
         }
 
-        guard markerStart > trimmedText.startIndex else { return text }
+        guard markerCount >= markerLimits.minimum,
+              markerStart > trimmedText.startIndex else { return text }
         let beforeMarkerIndex = trimmedText.index(before: markerStart)
         guard trimmedText[beforeMarkerIndex].isWhitespace else { return text }
 

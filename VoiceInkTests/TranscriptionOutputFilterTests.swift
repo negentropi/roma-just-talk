@@ -670,6 +670,8 @@ struct TranscriptionOutputFilterTests {
         #expect(TranscriptionOutputFilter.applyInsertionPolish("so this hmm... # [Model.]", context: midSentenceContext) == "model")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("so this uh... 1. [A final word.]", context: midSentenceContext) == "a final word")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("this eh... - [Model.]", context: midSentenceContext) == "model")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("so this hmm... * [Model.]", context: midSentenceContext) == "model")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("so this uh... > [Model.]", context: midSentenceContext) == "model")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("this eh... # Model.", context: midSentenceContext) == "model")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("this, um, Model.", context: midSentenceContext) == "model")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("so this okay Model.", context: midSentenceContext) == "model")

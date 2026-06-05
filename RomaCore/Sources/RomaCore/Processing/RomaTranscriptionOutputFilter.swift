@@ -1595,7 +1595,7 @@ public struct RomaTranscriptionOutputFilter {
             if let activeContext,
                shouldRemoveLeadingGeneratedFragmentMarker(after: activeContext.precedingText) {
                 polishedText = removeLeadingGeneratedFragmentMarker(from: polishedText)
-                polishedText = removeLeadingGeneratedDashListFragmentMarker(
+                polishedText = removeLeadingGeneratedLineFragmentMarker(
                     from: polishedText,
                     after: activeContext.precedingText
                 )
@@ -2639,7 +2639,7 @@ public struct RomaTranscriptionOutputFilter {
         var result = text.trimmingCharacters(in: .whitespacesAndNewlines)
         if shouldRemoveLeadingGeneratedFragmentMarker(after: precedingText) {
             result = removeLeadingGeneratedFragmentMarker(from: result)
-            result = removeLeadingGeneratedDashListFragmentMarker(
+            result = removeLeadingGeneratedLineFragmentMarker(
                 from: result,
                 after: precedingText
             )
@@ -2667,7 +2667,7 @@ public struct RomaTranscriptionOutputFilter {
     private static func removeLeadingGeneratedMarkerBoundaryRemnant(from text: String) -> String {
         let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard let regex = try? NSRegularExpression(
-            pattern: #"(?i)^\s*(?:#{1,6}|\d{1,3}[\.)]|[-•])\s+(.+)$"#
+            pattern: #"(?i)^\s*(?:#{1,6}|\d{1,3}[\.)]|[-*•]|>{1,3})\s+(.+)$"#
         ),
         let match = regex.firstMatch(in: trimmedText, range: NSRange(trimmedText.startIndex..., in: trimmedText)),
         match.numberOfRanges >= 2,
@@ -11438,7 +11438,7 @@ public struct RomaTranscriptionOutputFilter {
         return text
     }
 
-    private static func removeLeadingGeneratedDashListFragmentMarker(
+    private static func removeLeadingGeneratedLineFragmentMarker(
         from text: String,
         after precedingText: String
     ) -> String {
@@ -11446,12 +11446,14 @@ public struct RomaTranscriptionOutputFilter {
 
         let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedText.contains("\n"),
-              trimmedText.hasPrefix("- ") else {
+              let markerRange = trimmedText.range(
+                of: #"^(?:[-*•]|>{1,3})\s+"#,
+                options: .regularExpression
+              ) else {
             return text
         }
 
-        let suffixStart = trimmedText.index(trimmedText.startIndex, offsetBy: 2)
-        let suffix = String(trimmedText[suffixStart...])
+        let suffix = String(trimmedText[markerRange.upperBound...])
             .trimmingCharacters(in: .whitespacesAndNewlines)
         guard !suffix.isEmpty,
               !suffix.hasPrefix("[ ]"),
@@ -11473,7 +11475,7 @@ public struct RomaTranscriptionOutputFilter {
         var result = text.trimmingCharacters(in: .whitespacesAndNewlines)
         if shouldRemoveLeadingGeneratedFragmentMarker(after: precedingText) {
             result = removeLeadingGeneratedFragmentMarker(from: result)
-            result = removeLeadingGeneratedDashListFragmentMarker(
+            result = removeLeadingGeneratedLineFragmentMarker(
                 from: result,
                 after: precedingText
             )

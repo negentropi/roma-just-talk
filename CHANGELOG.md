@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Trimmed generated markdown star and blockquote markers after repeated cursor context plus pause fillers.
 - Trimmed generated list and heading markers after repeated cursor context plus pause fillers.
 - Trimmed quoted and nested bracket wrappers after repeated cursor context plus pause fillers.
 - Trimmed pause-plus-discourse filler chains after repeated cursor context before bracketed short fragments.

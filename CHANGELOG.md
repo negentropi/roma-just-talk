@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Treated "what I'm trying to say is" and "what I am trying to say is" as guarded correction markers in post-STT cleanup.
 - Removed embedded unpunctuated "I would probably say" and "I would maybe say" hesitation fillers before short predicates.
 - Removed embedded unpunctuated "I would say" and "I feel like" hesitation fillers before short predicates while preserving meaningful leading and terminal uses.
 - Removed embedded unpunctuated "I guess", "I suppose", and "I think" hesitation fillers before short predicates while preserving meaningful leading and terminal uncertainty.

@@ -564,7 +564,7 @@ public struct RomaTranscriptionOutputFilter {
         (#"(?i)^\s*(?:ok(?:ay)?|all\s+right|alright|right|yeah|yes|yep|yup|sure)(?:[ \t]*[,;:…]+[ \t]*)+so[,;:…]*[ \t]+"#, ""),
         (#"(?i)^\s*(?:you\s+know|i\s+mean|like)[,;:…]+[ \t]*"#, "")
     ]
-    private static let continuationFragmentLeadingDiscourseFillerPattern = #"(?i)^\s*(you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?|what[ \t]+i[ \t]+mean[ \t]+is|what[ \t]+i[ \t]+meant[ \t]+(?:is|was)|i[ \t]+mean(?:[ \t]+to[ \t]+say)?|i[ \t]+meant(?:[ \t]+to[ \t]+say)?|i[ \t]+should[ \t]+say|(?:it|that)[ \t]+should[ \t]+be|(?:it|that)(?:[ \t]+is|['’]s)|ok(?:ay)?|all[ \t]+right|alright|got[ \t]+it|gotcha|no[ \t]+wait|wait|hold[ \t]+on|hang[ \t]+on|make[ \t]+(?:it|that)|call[ \t]+it|replace[ \t]+(?:that|it)[ \t]+with|change[ \t]+(?:that|it)[ \t]+to|(?:scratch|delete|remove|erase|undo)[ \t]+(?:that|this)(?:[ \t]+out)?|correction(?:[ \t]+(?:is|should[ \t]+be))?|sorry|oops|whoops|my[ \t]+bad|actually|instead|rather|yeah|yes|yep|yup|like|basically|so|well)(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
+    private static let continuationFragmentLeadingDiscourseFillerPattern = #"(?i)^\s*(you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?|what[ \t]+i[ \t]+mean[ \t]+is|what[ \t]+i(?:[ \t]+am|['’]m)[ \t]+trying[ \t]+to[ \t]+say[ \t]+is|what[ \t]+i[ \t]+meant[ \t]+(?:is|was)|i[ \t]+mean(?:[ \t]+to[ \t]+say)?|i[ \t]+meant(?:[ \t]+to[ \t]+say)?|i[ \t]+should[ \t]+say|(?:it|that)[ \t]+should[ \t]+be|(?:it|that)(?:[ \t]+is|['’]s)|ok(?:ay)?|all[ \t]+right|alright|got[ \t]+it|gotcha|no[ \t]+wait|wait|hold[ \t]+on|hang[ \t]+on|make[ \t]+(?:it|that)|call[ \t]+it|replace[ \t]+(?:that|it)[ \t]+with|change[ \t]+(?:that|it)[ \t]+to|(?:scratch|delete|remove|erase|undo)[ \t]+(?:that|this)(?:[ \t]+out)?|correction(?:[ \t]+(?:is|should[ \t]+be))?|sorry|oops|whoops|my[ \t]+bad|actually|instead|rather|yeah|yes|yep|yup|like|basically|so|well)(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let standaloneDiscourseFillerPattern = #"(?i)^\s*you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?[ \t]*[.,;:…]*\s*$"#
     private static let blockedPreviousWordsForTerminalYouKnow: Set<String> = [
         "do", "does", "did", "don't", "if", "know", "let", "should", "to", "whether", "will", "would"
@@ -722,6 +722,7 @@ public struct RomaTranscriptionOutputFilter {
             (?:[,;:…]|\.\.\.)\s*sorry\s*[,;:]?\s+i\s+mean\s*[,;:]? |
             (?:[,;:…]|\.\.\.)\s*sorry\s*[,;:]?\s+i\s+meant\s*[,;:]? |
             (?:[,;:…]|\.\.\.)\s*what\s+i\s+mean\s+is\s*[,;:]? |
+            (?:[,;:…]|\.\.\.)\s*what\s+i(?:\s+am|['’]m)\s+trying\s+to\s+say\s+is\s*[,;:]? |
             (?:[,;:…]|\.\.\.)\s*i\s+mean\s+to\s+say\s*[,;:]? |
             (?:[,;:…]|\.\.\.)\s*i\s+meant\s+to\s+say\s*[,;:]? |
             sorry\s*[,;:]?\s+i\s+mean\s*[,;:]? |
@@ -1636,6 +1637,7 @@ public struct RomaTranscriptionOutputFilter {
         filteredText = removeTerminalAcknowledgementFillers(from: filteredText)
         filteredText = removeUnpunctuatedBasicallyFillers(from: filteredText)
         filteredText = removeUnpunctuatedUncertaintyFillers(from: filteredText)
+        filteredText = removeUnpunctuatedWhatITryingToSayFillers(from: filteredText)
         filteredText = removeUnpunctuatedIMeanFillers(from: filteredText)
         filteredText = removeUnpunctuatedYouKnowFillers(from: filteredText)
         filteredText = removeUnpunctuatedClarificationFillers(from: filteredText)
@@ -1698,7 +1700,7 @@ public struct RomaTranscriptionOutputFilter {
         guard let regex = try? NSRegularExpression(
             pattern: #"(?i)([,;:…]|\.\.\.)[ \t]+(?:"# +
                 pauseFillerNoisePattern +
-                #")(?:[.,;:!?…]+)?[ \t]+(actually(?:[ \t]+no|[ \t]+make[ \t]+it)?|better[ \t]+make[ \t]+it|sorry[ \t]+i[ \t]+mean|sorry[ \t]+i[ \t]+meant|what[ \t]+i[ \t]+mean[ \t]+is|i[ \t]+mean[ \t]+to[ \t]+say|i[ \t]+meant[ \t]+to[ \t]+say|i[ \t]+mean|i[ \t]+meant|i[ \t]+should[ \t]+say|make[ \t]+that|make[ \t]+it|call[ \t]+it|wait[ \t]+no|no[ \t]+wait|no[ \t]+actually|on[ \t]+second[ \t]+thought|let[ \t]+me[ \t]+rephrase|(?:just[ \t]+)?to[ \t]+clarify|(?:just[ \t]+)?to[ \t]+be[ \t]+clear|for[ \t]+clarity|rather|instead|oops|whoops|woops|my[ \t]+bad|correction)(?=\s)"#
+                #")(?:[.,;:!?…]+)?[ \t]+(actually(?:[ \t]+no|[ \t]+make[ \t]+it)?|better[ \t]+make[ \t]+it|sorry[ \t]+i[ \t]+mean|sorry[ \t]+i[ \t]+meant|what[ \t]+i[ \t]+mean[ \t]+is|what[ \t]+i(?:[ \t]+am|['’]m)[ \t]+trying[ \t]+to[ \t]+say[ \t]+is|i[ \t]+mean[ \t]+to[ \t]+say|i[ \t]+meant[ \t]+to[ \t]+say|i[ \t]+mean|i[ \t]+meant|i[ \t]+should[ \t]+say|make[ \t]+that|make[ \t]+it|call[ \t]+it|wait[ \t]+no|no[ \t]+wait|no[ \t]+actually|on[ \t]+second[ \t]+thought|let[ \t]+me[ \t]+rephrase|(?:just[ \t]+)?to[ \t]+clarify|(?:just[ \t]+)?to[ \t]+be[ \t]+clear|for[ \t]+clarity|rather|instead|oops|whoops|woops|my[ \t]+bad|correction)(?=\s)"#
         ) else {
             return text
         }
@@ -2082,7 +2084,8 @@ public struct RomaTranscriptionOutputFilter {
             "correction", "correction is", "correction should be", "i should say", "it should be", "that should be",
             "it is", "it's", "it’s", "that is", "that's", "that’s",
             "sorry", "oops", "whoops", "my bad", "actually", "instead", "rather",
-            "what i mean is", "what i meant is", "what i meant was", "yes", "yep", "yup"
+            "what i mean is", "what i am trying to say is", "what i'm trying to say is",
+            "what i’m trying to say is", "what i meant is", "what i meant was", "yes", "yep", "yup"
         ].contains(filler) {
             guard hasTechnicalContinuationFragmentHead(trimmedSuffix) else {
                 return false
@@ -2216,7 +2219,7 @@ public struct RomaTranscriptionOutputFilter {
         let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
         let tokens = correctionMarkerWordTokens(in: trimmedText)
         guard tokens.count >= 3,
-              tokens.count <= 8,
+              tokens.count <= 10,
               !hasInternalSentenceBoundary(trimmedText) else {
             return text
         }
@@ -2381,6 +2384,23 @@ public struct RomaTranscriptionOutputFilter {
             guard tokens[markerIndex + 1].text == "bad" else { return nil }
             return markerIndex + 2
         case "what":
+            if markerIndex + 6 < tokens.count,
+               tokens[markerIndex + 1].text == "i",
+               tokens[markerIndex + 2].text == "am",
+               tokens[markerIndex + 3].text == "trying",
+               tokens[markerIndex + 4].text == "to",
+               tokens[markerIndex + 5].text == "say",
+               tokens[markerIndex + 6].text == "is" {
+                return markerIndex + 7
+            }
+            if markerIndex + 5 < tokens.count,
+               ["i'm", "i’m", "im"].contains(tokens[markerIndex + 1].text),
+               tokens[markerIndex + 2].text == "trying",
+               tokens[markerIndex + 3].text == "to",
+               tokens[markerIndex + 4].text == "say",
+               tokens[markerIndex + 5].text == "is" {
+                return markerIndex + 6
+            }
             guard markerIndex + 3 < tokens.count,
                   tokens[markerIndex + 1].text == "i",
                   ["mean", "meant"].contains(tokens[markerIndex + 2].text),
@@ -2888,6 +2908,37 @@ public struct RomaTranscriptionOutputFilter {
                   let nextWord = nextWord(in: suffix),
                   allowedPreviousWordsForUnpunctuatedLikeFiller.contains(previousWord),
                   allowedNextWordsForUnpunctuatedHedgeFiller.contains(nextWord) else {
+                continue
+            }
+
+            filteredText.replaceSubrange(matchRange, with: "")
+        }
+
+        return filteredText
+    }
+
+    private static func removeUnpunctuatedWhatITryingToSayFillers(from text: String) -> String {
+        guard let regex = try? NSRegularExpression(
+            pattern: #"(?i)(?<![\p{L}\p{N}])what[ \t]+i(?:[ \t]+am|['’]m)[ \t]+trying[ \t]+to[ \t]+say[ \t]+is(?:[ \t]*[,;:…]+)?(?![\p{L}\p{N}])"#
+        ) else {
+            return text
+        }
+
+        var filteredText = text
+        let range = NSRange(filteredText.startIndex..., in: filteredText)
+        let matches = regex.matches(in: filteredText, range: range).reversed()
+
+        for match in matches {
+            guard let matchRange = Range(match.range, in: filteredText) else {
+                continue
+            }
+
+            let prefix = String(filteredText[..<matchRange.lowerBound])
+            let suffix = String(filteredText[matchRange.upperBound...])
+            guard let previousWord = previousWord(in: prefix),
+                  let nextWord = nextWord(in: suffix),
+                  allowedPreviousWordsForUnpunctuatedLikeFiller.contains(previousWord),
+                  allowedNextWordsForUnpunctuatedYouKnowFiller.contains(nextWord) else {
                 continue
             }
 
@@ -7362,6 +7413,9 @@ public struct RomaTranscriptionOutputFilter {
             "no i meant",
             "no actually",
             "what i mean is",
+            "what i am trying to say is",
+            "what i'm trying to say is",
+            "what i’m trying to say is",
             "i mean to say",
             "i meant to say",
             "on second thought",
@@ -7594,6 +7648,9 @@ public struct RomaTranscriptionOutputFilter {
             "no actually",
             "no wait",
             "what i mean is",
+            "what i am trying to say is",
+            "what i'm trying to say is",
+            "what i’m trying to say is",
             "i mean to say",
             "i meant to say",
             "on second thought",

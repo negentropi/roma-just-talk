@@ -642,6 +642,20 @@ struct RomaCoreChecks {
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "What I am trying to say is module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim full what-I-am-trying-to-say-is correction fillers before module continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "What I'm trying to say is module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim full what-I'm-trying-to-say-is correction fillers before module continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "What I meant is module.",
                 context: midSentenceContext
             ) == "module",
@@ -660,6 +674,13 @@ struct RomaCoreChecks {
                 context: midSentenceContext
             ) == "what I mean is now",
             "shared insertion polish should preserve non-technical what-I-mean continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "What I am trying to say is now.",
+                context: midSentenceContext
+            ) == "what I am trying to say is now",
+            "shared insertion polish should preserve non-technical what-I-am-trying-to-say continuations"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
@@ -1200,10 +1221,31 @@ struct RomaCoreChecks {
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model what I am trying to say is module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should apply what-i-am-trying-to-say-is corrections in short continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model what I'm trying to say is final word.",
+                context: midSentenceContext
+            ) == "final word",
+            "shared insertion polish should apply what-I'm-trying-to-say-is corrections in short continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "please what I meant was module.",
                 context: midSentenceContext
             ) == "please what I meant was module",
             "shared insertion polish should preserve please-prefixed what-i-meant-was prose"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "please what I am trying to say is module.",
+                context: midSentenceContext
+            ) == "please what I am trying to say is module",
+            "shared insertion polish should preserve please-prefixed what-i-am-trying-to-say-is prose"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
@@ -3455,6 +3497,16 @@ struct RomaCoreChecks {
                 "embedded unpunctuated i feel like before good predicate"
             ),
             (
+                "I think this is what I am trying to say is ready.",
+                "I think this is ready.",
+                "embedded unpunctuated what-i-am-trying-to-say-is before ready predicate"
+            ),
+            (
+                "I think this is what I'm trying to say is good.",
+                "I think this is good.",
+                "embedded unpunctuated what-I'm-trying-to-say-is before good predicate"
+            ),
+            (
                 "I think this is you see ready.",
                 "I think this is ready.",
                 "embedded unpunctuated you see filler"
@@ -4195,6 +4247,16 @@ struct RomaCoreChecks {
                 "what i mean is correction"
             ),
             (
+                "Use model, what I am trying to say is module.",
+                "Use module.",
+                "what i am trying to say is correction"
+            ),
+            (
+                "Use model, um what I'm trying to say is module.",
+                "Use module.",
+                "pause filler before what i'm trying to say is correction"
+            ),
+            (
                 "Use model, um what I mean is module.",
                 "Use module.",
                 "pause filler before what i mean is correction"
@@ -4203,6 +4265,11 @@ struct RomaCoreChecks {
                 "Let's meet at two, what I mean is three tomorrow.",
                 "Let's meet at three tomorrow.",
                 "what i mean is correction should preserve suffix"
+            ),
+            (
+                "Let's meet at two, what I am trying to say is three tomorrow.",
+                "Let's meet at three tomorrow.",
+                "what i am trying to say is correction should preserve suffix"
             ),
             (
                 "I think this works, wait, no, it doesn't.",
@@ -5573,6 +5640,26 @@ struct RomaCoreChecks {
                 "What I mean is, module loads.",
                 "What I mean is, module loads.",
                 "what i mean is prose guard"
+            ),
+            (
+                "What I am trying to say is, module loads.",
+                "What I am trying to say is, module loads.",
+                "what i am trying to say is prose guard"
+            ),
+            (
+                "What I'm trying to say is, module loads.",
+                "What I'm trying to say is, module loads.",
+                "what i'm trying to say is prose guard"
+            ),
+            (
+                "I think this is what I am trying to say is important.",
+                "I think this is what I am trying to say is important.",
+                "embedded what i am trying to say is prose guard"
+            ),
+            (
+                "I know what I'm trying to say is confusing.",
+                "I know what I'm trying to say is confusing.",
+                "embedded what i'm trying to say is prose guard"
             ),
             (
                 "The phrase actually wait no is useful.",

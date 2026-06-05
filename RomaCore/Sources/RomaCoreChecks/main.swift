@@ -12681,9 +12681,11 @@ struct RomaCoreChecks {
             "Windows package, artifact, and laptop proof scripts should share Windows user SID lookup"
         )
         try require(
-            proveScript.contains("Set-Alias -Name Get-OutputNumber -Value Get-RomaWindowsOutputNumber") &&
+            !proveScript.contains("Set-Alias -Name Get-OutputValue") &&
+                !proveScript.contains("Set-Alias -Name Get-OutputNumber") &&
+                !proveScript.contains("Set-Alias -Name Get-OutputLineNumber") &&
                 !proveScript.contains("function Get-OutputNumber"),
-            "Windows artifact proof should reuse the shared output parser"
+            "Windows artifact proof should not keep stale output-parser pass-through aliases"
         )
         try require(
             proveScript.contains(#"-Mode (Get-RomaWindowsProofProfileExpectedModeByName -Name "doctor_only")"#) &&

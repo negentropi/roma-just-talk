@@ -59,6 +59,35 @@ function Assert-RomaWindowsFileWithMinimumBytes {
     }
 }
 
+function Assert-RomaWindowsProofSessionId {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Value,
+        [string]$Name = "proof_session_id",
+        [string]$ReportName = "",
+        [switch]$WriteProofValue
+    )
+
+    if ($Value -notmatch "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$") {
+        if ([string]::IsNullOrWhiteSpace($ReportName)) {
+            throw "Expected $Name to be a GUID, got: $Value"
+        }
+        throw "Proof set report $ReportName has invalid ${Name}; expected GUID, got: $Value"
+    }
+    if ($Value -eq "00000000-0000-0000-0000-000000000000") {
+        if ([string]::IsNullOrWhiteSpace($ReportName)) {
+            throw "Expected $Name to be a non-placeholder GUID"
+        }
+        throw "Proof set report $ReportName has placeholder $Name"
+    }
+
+    $normalizedValue = $Value.ToLowerInvariant()
+    if ($WriteProofValue) {
+        Write-Host "proof_value=$Name value=$normalizedValue"
+    }
+    return $normalizedValue
+}
+
 function Get-RomaWindowsCurrentUserSid {
     if ([System.Environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT) {
         return ""

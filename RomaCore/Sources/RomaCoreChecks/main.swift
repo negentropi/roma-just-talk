@@ -11012,12 +11012,15 @@ struct RomaCoreChecks {
             "Windows proof-set checker should compare proof session ids across laptop reports"
         )
         try require(
-            checkSetScript.contains("function Assert-ProofSessionId") &&
-                checkSetScript.contains("invalid proof_session_id; expected GUID") &&
-                checkSetScript.contains("placeholder proof_session_id") &&
-                checkReportScript.contains(#"$proofSessionId = Assert-ProofSessionId"#) &&
-                checkSetScript.contains(#"$expectedProofSessionId = Assert-ProofSessionId"#),
-            "Windows proof-set checker should require runner-style GUID proof session ids"
+            proofCommonScript.contains("function Assert-RomaWindowsProofSessionId") &&
+                proofCommonScript.contains("invalid ${Name}; expected GUID") &&
+                proofCommonScript.contains("placeholder $Name") &&
+                checkReportScript.contains(#"$proofSessionId = Assert-RomaWindowsProofSessionId"#) &&
+                checkReportScript.contains("-WriteProofValue") &&
+                checkSetScript.contains(#"$expectedProofSessionId = Assert-RomaWindowsProofSessionId"#) &&
+                !checkReportScript.contains("function Assert-ProofSessionId") &&
+                !checkSetScript.contains("function Assert-ProofSessionId"),
+            "Windows proof checkers should share runner-style GUID proof session id validation"
         )
         try require(
             checkSetScript.contains("function Get-ReportGeneratedAt") &&

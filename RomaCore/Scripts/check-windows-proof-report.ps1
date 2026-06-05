@@ -194,26 +194,6 @@ function Assert-StringEquals {
     Write-Host "proof_value=$Name value=$Actual"
 }
 
-function Assert-ProofSessionId {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Value,
-        [Parameter(Mandatory = $true)]
-        [string]$Name
-    )
-
-    if ($Value -notmatch "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$") {
-        throw "Expected $Name to be a GUID, got: $Value"
-    }
-    if ($Value -eq "00000000-0000-0000-0000-000000000000") {
-        throw "Expected $Name to be a non-placeholder GUID"
-    }
-
-    $normalizedValue = $Value.ToLowerInvariant()
-    Write-Host "proof_value=$Name value=$normalizedValue"
-    return $normalizedValue
-}
-
 function Assert-GeneratedAtTimestamp {
     param(
         [Parameter(Mandatory = $true)]
@@ -769,9 +749,10 @@ function Assert-LaptopPreflightReport {
         -Expected (Get-RomaWindowsProofProfileExpectedModeByName -Name "laptop_preflight") `
         -Name "proof_mode"
     Assert-Boolean -Object $Report -Name "preflight_only" -Expected $true
-    $proofSessionId = Assert-ProofSessionId `
+    $proofSessionId = Assert-RomaWindowsProofSessionId `
         -Value ([string](Require-Property -Object $Report -Name "proof_session_id")) `
-        -Name "proof_session_id"
+        -Name "proof_session_id" `
+        -WriteProofValue
     $generatedAt = Assert-GeneratedAtTimestamp `
         -Value ([string](Require-Property -Object $Report -Name "generated_at")) `
         -Name "generated_at"

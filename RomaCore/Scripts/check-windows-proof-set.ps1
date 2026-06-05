@@ -239,24 +239,6 @@ function Assert-NonEmptyReportString {
     return $value
 }
 
-function Assert-ProofSessionId {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Value,
-        [Parameter(Mandatory = $true)]
-        [string]$ReportName
-    )
-
-    if ($Value -notmatch "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$") {
-        throw "Proof set report $ReportName has invalid proof_session_id; expected GUID, got: $Value"
-    }
-    if ($Value -eq "00000000-0000-0000-0000-000000000000") {
-        throw "Proof set report $ReportName has placeholder proof_session_id"
-    }
-
-    return $Value.ToLowerInvariant()
-}
-
 function Get-ReportGeneratedAt {
     param(
         [Parameter(Mandatory = $true)]
@@ -671,8 +653,9 @@ function Assert-SameLaptopProofSet {
     $first = $reports[0]
     $firstName = [string]$first["Name"]
     $firstReport = $first["Report"]
-    $expectedProofSessionId = Assert-ProofSessionId `
+    $expectedProofSessionId = Assert-RomaWindowsProofSessionId `
         -Value ([string](Require-ReportProperty -Report $firstReport -Name "proof_session_id" -ReportName $firstName)) `
+        -Name "proof_session_id" `
         -ReportName $firstName
     $firstOS = Require-ReportProperty -Report $firstReport -Name "os" -ReportName $firstName
     $expectedPlatform = [string](Require-ReportProperty -Report $firstOS -Name "platform" -ReportName $firstName)

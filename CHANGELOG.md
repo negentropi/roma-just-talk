@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Shared the Windows proof hotkey display and waiting-for-hold markers through the proof helper.
 - Shared Windows laptop proof report filenames through the proof helper so the runner, package smoke, and generated guide use one report path contract.
 - Treated "nope wait", "nah wait", "nope actually", and "nah actually" as bounded correction markers.
 - Shared the Windows laptop proof claim gate through the proof helper so generated guide closeout text stays tied to the full proof-set markers.

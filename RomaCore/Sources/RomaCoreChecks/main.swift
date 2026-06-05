@@ -11514,13 +11514,19 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Write-RomaWindowsDictationOperatorPrompt") &&
                 proofCommonScript.contains("function Write-RomaWindowsHotkeyDeliveryPreflightPrompt") &&
                 proofCommonScript.contains("function Write-RomaWindowsNotepadPastePrompt") &&
+                proofCommonScript.contains("function Get-RomaWindowsDefaultHotkeyDisplayName") &&
+                proofCommonScript.contains("function Get-RomaWindowsWaitingForHoldOutputMarker") &&
+                proofCommonScript.contains("function Get-RomaWindowsHoldHotkeyOutputMarker") &&
+                proofCommonScript.contains("function Get-RomaWindowsToggleHotkeyOutputMarker") &&
+                proofCommonScript.contains(#"return "Ctrl+Shift+R""#) &&
                 proofCommonScript.contains("focus_target=normal_text_field_or_notepad") &&
                 proofCommonScript.contains("speak_before_pressing_hotkey=true") &&
                 proofCommonScript.contains("release_hotkey_to_finish=true") &&
                 proofCommonScript.contains("press_and_release_hotkey=true") &&
                 proofCommonScript.contains("notepad=will_open_and_verify_file") &&
                 proofCommonScript.contains("manual_focus_required=false") &&
-                proofCommonScript.contains("toggle_hotkey=Ctrl+Shift+R") &&
+                proofCommonScript.contains("Write-Host (Get-RomaWindowsHoldHotkeyOutputMarker)") &&
+                proofCommonScript.contains("Write-Host (Get-RomaWindowsToggleHotkeyOutputMarker)") &&
                 proofCommonScript.contains("speak_after_hotkey=true") &&
                 proofCommonScript.contains("paste_focus_target=normal_integrity_text_field") &&
                 proofCommonScript.contains("hold_timeout_seconds=$HoldTimeoutSeconds") &&
@@ -11529,6 +11535,7 @@ struct RomaCoreChecks {
                 proveScript.contains("-ListenerSessionCount 1") &&
                 laptopProofScript.contains("Write-RomaWindowsHoldDictationPrompt") &&
                 laptopProofScript.contains("Write-RomaWindowsHotkeyDeliveryPreflightPrompt -HoldTimeoutSeconds $HoldTimeoutSeconds") &&
+                laptopProofScript.contains("Get-RomaWindowsWaitingForHoldOutputMarker") &&
                 laptopProofScript.contains("Write-RomaWindowsNotepadPastePrompt") &&
                 laptopProofScript.contains("-HoldTimeoutSeconds $HoldTimeoutSeconds") &&
                 windowsProofScript.contains("Write-RomaWindowsDictationOperatorPrompt") &&
@@ -11536,6 +11543,8 @@ struct RomaCoreChecks {
                 windowsProofScript.contains(#"-Name "source_windows_agent_dictation""#) &&
                 smokeScript.contains("Write-RomaWindowsDictationOperatorPrompt") &&
                 smokeScript.contains(#"-Name "installed_agent_dictation""#) &&
+                !proofCommonScript.contains("Write-Host \"hold_hotkey=Ctrl+Shift+R\"") &&
+                !proofCommonScript.contains("Write-Host \"toggle_hotkey=Ctrl+Shift+R\"") &&
                 !windowsProofScript.contains("Say a phrase before Ctrl+Shift+R") &&
                 !smokeScript.contains("Say a phrase before Ctrl+Shift+R") &&
                 !proveScript.contains("function Write-HoldDictationPrompt") &&
@@ -11640,6 +11649,7 @@ struct RomaCoreChecks {
         )
         try require(
             proofCommonScript.contains("function Get-RomaWindowsHotkeyDeliveryPreflightOutputProof") &&
+                proofCommonScript.contains("waiting_for_hold = $Output.Contains((Get-RomaWindowsWaitingForHoldOutputMarker))") &&
                 proofCommonScript.contains("function Get-RomaWindowsPermissionPreflightOutputProof") &&
                 proofCommonScript.contains("function Get-RomaWindowsMicrophonePreflightOutputProof") &&
                 proofCommonScript.contains("function Get-RomaWindowsLocalWhisperPreflightOutputProof") &&
@@ -11647,6 +11657,8 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function New-RomaWindowsLaptopPreflightSyntheticOutputProofs") &&
                 proofCommonScript.contains("function Get-RomaWindowsOSReportProof") &&
                 proofCommonScript.contains("function New-RomaWindowsLaptopPreflightReport") &&
+                !proofCommonScript.contains("$Output.Contains(\"waiting_for_hold=Ctrl+Shift+R\")") &&
+                !laptopProofScript.contains("waiting_for_hold=Ctrl+Shift+R") &&
                 !laptopProofScript.contains("preflight_outputs = [ordered]@{") &&
                 !packageScript.contains("preflight_outputs = [ordered]@{") &&
                 !laptopProofScript.contains("function Get-HotkeyDeliveryPreflightProof") &&
@@ -12065,10 +12077,12 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("Full proof validates four JSON reports") &&
                 proofCommonScript.contains("proof_set_ok=full-laptop") &&
                 proofCommonScript.contains("Do not claim Windows support until the full laptop proof passes on the target Windows machine") &&
+                proofCommonScript.contains("$hotkeyDisplayName = Get-RomaWindowsDefaultHotkeyDisplayName") &&
                 proofCommonScript.contains("ACTION_REQUIRED=hotkey_delivery_preflight") &&
                 proofCommonScript.contains("cloud pre roll proof") &&
                 proofCommonScript.contains("local whisper pre roll proof") &&
                 proofCommonScript.contains("processed_transcript_text") &&
+                !proofCommonScript.contains("press and release Ctrl+Shift+R once") &&
                 packageScript.contains("Get-RomaWindowsFullLaptopProofGuideMarkers") &&
                 proofCommonScript.contains("function Get-RomaWindowsFullLaptopProofGuideMarkers") &&
                 proofCommonScript.contains("windows_laptop_preflight_report=") &&

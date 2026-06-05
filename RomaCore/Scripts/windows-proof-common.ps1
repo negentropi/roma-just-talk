@@ -276,6 +276,22 @@ function Set-RomaWindowsProcessForeground {
     throw "Timed out activating process: pid=$($Process.Id)"
 }
 
+function Get-RomaWindowsDefaultHotkeyDisplayName {
+    return "Ctrl+Shift+R"
+}
+
+function Get-RomaWindowsWaitingForHoldOutputMarker {
+    return "waiting_for_hold=$(Get-RomaWindowsDefaultHotkeyDisplayName)"
+}
+
+function Get-RomaWindowsHoldHotkeyOutputMarker {
+    return "hold_hotkey=$(Get-RomaWindowsDefaultHotkeyDisplayName)"
+}
+
+function Get-RomaWindowsToggleHotkeyOutputMarker {
+    return "toggle_hotkey=$(Get-RomaWindowsDefaultHotkeyDisplayName)"
+}
+
 function Write-RomaWindowsDictationOperatorPrompt {
     param(
         [Parameter(Mandatory = $true)]
@@ -294,11 +310,11 @@ function Write-RomaWindowsDictationOperatorPrompt {
         Write-Host "say_expected_phrase_before_hotkey=$ExpectedTranscriptText"
     }
     if ($UseHoldHook) {
-        Write-Host "hold_hotkey=Ctrl+Shift+R"
+        Write-Host (Get-RomaWindowsHoldHotkeyOutputMarker)
         Write-Host "speak_before_pressing_hotkey=true"
         Write-Host "release_hotkey_to_finish=true"
     } else {
-        Write-Host "toggle_hotkey=Ctrl+Shift+R"
+        Write-Host (Get-RomaWindowsToggleHotkeyOutputMarker)
         Write-Host "speak_after_hotkey=true"
     }
     if ($HoldTimeoutSeconds -ge 0) {
@@ -337,7 +353,7 @@ function Write-RomaWindowsHotkeyDeliveryPreflightPrompt {
 
     Write-Host ""
     Write-Host "ACTION_REQUIRED=hotkey_delivery_preflight"
-    Write-Host "hold_hotkey=Ctrl+Shift+R"
+    Write-Host (Get-RomaWindowsHoldHotkeyOutputMarker)
     Write-Host "press_and_release_hotkey=true"
     if ($HoldTimeoutSeconds -ge 0) {
         Write-Host "hold_timeout_seconds=$HoldTimeoutSeconds"
@@ -1159,12 +1175,13 @@ function Get-RomaWindowsLaptopPreflightLocalWhisperGuideMarkers {
 }
 
 function Get-RomaWindowsLaptopProofOperatorGuideLines {
+    $hotkeyDisplayName = Get-RomaWindowsDefaultHotkeyDisplayName
     return @(
         "Operator actions during proof:",
         "",
-        "1. When ACTION_REQUIRED=hotkey_delivery_preflight appears, press and release Ctrl+Shift+R once.",
-        "2. Before cloud dictation, focus a normal text field, say 'cloud pre roll proof' before pressing the hotkey, then hold Ctrl+Shift+R while speaking and release to finish.",
-        "3. Before local whisper dictation, focus a normal text field, say 'local whisper pre roll proof' before pressing the hotkey, then hold Ctrl+Shift+R while speaking and release to finish.",
+        "1. When ACTION_REQUIRED=hotkey_delivery_preflight appears, press and release $hotkeyDisplayName once.",
+        "2. Before cloud dictation, focus a normal text field, say 'cloud pre roll proof' before pressing the hotkey, then hold $hotkeyDisplayName while speaking and release to finish.",
+        "3. Before local whisper dictation, focus a normal text field, say 'local whisper pre roll proof' before pressing the hotkey, then hold $hotkeyDisplayName while speaking and release to finish.",
         "4. The local whisper Notepad paste proof opens and verifies Notepad itself; no manual focus step should be required.",
         "",
         "The transcript checker matches the expected phrase against processed_transcript_text, so say the phrase clearly and do not substitute another phrase unless you pass -CloudExpectedTranscriptText or -LocalWhisperExpectedTranscriptText."
@@ -1442,7 +1459,7 @@ function Get-RomaWindowsHotkeyDeliveryPreflightOutputProof {
 
     return [ordered]@{
         output_present = ![string]::IsNullOrWhiteSpace($Output)
-        waiting_for_hold = $Output.Contains("waiting_for_hold=Ctrl+Shift+R")
+        waiting_for_hold = $Output.Contains((Get-RomaWindowsWaitingForHoldOutputMarker))
         key_down = $Output.Contains("key_down=true")
         key_up = $Output.Contains("key_up=true")
         observed_events_present = $Output.Contains("observed_events=")

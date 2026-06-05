@@ -92,7 +92,7 @@ function Invoke-HotkeyDeliveryPreflight {
     }
 
     Write-Host $output
-    Assert-OutputContains -Output $output -Expected "waiting_for_hold=Ctrl+Shift+R"
+    Assert-OutputContains -Output $output -Expected (Get-RomaWindowsWaitingForHoldOutputMarker)
     Assert-OutputContains -Output $output -Expected "key_down=true"
     Assert-OutputContains -Output $output -Expected "key_up=true"
     Write-Host "hotkey_delivery_preflight_ok=true"

@@ -555,6 +555,46 @@ function Get-RomaWindowsProofSurfaceFiles {
     )
 }
 
+function Get-RomaWindowsAgentArtifactExecutableFiles {
+    return @(
+        "RomaWindowsAgent.exe",
+        "RomaProofAgent.exe",
+        "RomaWhisperCLIMock.exe"
+    )
+}
+
+function Get-RomaWindowsAgentArtifactDebugFiles {
+    return @(
+        "RomaWindowsAgent.pdb",
+        "RomaProofAgent.pdb"
+    )
+}
+
+function Get-RomaWindowsAgentArtifactConfigFiles {
+    return @(
+        "manifest.txt",
+        "sample-windows-agent.json",
+        "sample-local-whisper-agent.json"
+    )
+}
+
+function Get-RomaWindowsPackageIdentityFiles {
+    $files = @()
+    $files += Get-RomaWindowsAgentArtifactExecutableFiles
+    $files += Get-RomaWindowsProofSurfaceFiles
+    $files += "manifest.txt"
+    return $files
+}
+
+function Get-RomaWindowsAgentArtifactInstallFiles {
+    $files = @()
+    $files += Get-RomaWindowsAgentArtifactExecutableFiles
+    $files += Get-RomaWindowsAgentArtifactDebugFiles
+    $files += Get-RomaWindowsProofSurfaceFiles
+    $files += Get-RomaWindowsAgentArtifactConfigFiles
+    return $files
+}
+
 function Get-RomaWindowsProofSurfaceScriptCount {
     return @(
         Get-RomaWindowsProofSurfaceFiles |

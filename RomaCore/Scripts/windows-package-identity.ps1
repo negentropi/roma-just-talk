@@ -31,13 +31,7 @@ function Get-RomaPackageIdentityProof {
         [string]$PackageDir
     )
 
-    $relativePaths = @(
-        "RomaWindowsAgent.exe",
-        "RomaProofAgent.exe",
-        "RomaWhisperCLIMock.exe"
-    )
-    $relativePaths += Get-RomaWindowsProofSurfaceFiles
-    $relativePaths += "manifest.txt"
+    $relativePaths = @(Get-RomaWindowsPackageIdentityFiles)
 
     $dlls = @(
         Get-ChildItem -LiteralPath $PackageDir -Filter "*.dll" |

@@ -13191,11 +13191,16 @@ struct RomaCoreChecks {
         try require(
             packageIdentityScript.contains("function Get-RomaPackageIdentityProof") &&
                 packageIdentityScript.contains("windows-proof-common.ps1") &&
-                packageIdentityScript.contains("Get-RomaWindowsProofSurfaceFiles") &&
+                packageIdentityScript.contains("$relativePaths = @(Get-RomaWindowsPackageIdentityFiles)") &&
+                !packageIdentityScript.contains(#""RomaWindowsAgent.exe","#) &&
+                !packageIdentityScript.contains("Get-RomaWindowsProofSurfaceFiles") &&
+                proofCommonScript.contains("function Get-RomaWindowsPackageIdentityFiles") &&
+                proofCommonScript.contains("function Get-RomaWindowsAgentArtifactExecutableFiles") &&
+                proofCommonScript.contains("function Get-RomaWindowsAgentArtifactConfigFiles") &&
                 proofCommonScript.contains("WINDOWS-LAPTOP-PROOF.txt") &&
                 proofCommonScript.contains("check-windows-scripts-parse.ps1") &&
                 proofCommonScript.contains("windows-package-identity.ps1") &&
-                packageIdentityScript.contains("RomaWhisperCLIMock.exe") &&
+                proofCommonScript.contains("RomaWhisperCLIMock.exe") &&
                 packageIdentityScript.contains("Get-RomaPackageIdentityHash"),
             "Windows package identity should be computed by one shared packaged helper"
         )
@@ -13425,9 +13430,13 @@ struct RomaCoreChecks {
             "Windows installer should fail early when the installed listener is running"
         )
         try require(
-            installScript.contains(#""RomaProofAgent.exe""#) &&
-                installScript.contains("$knownFiles += Get-RomaWindowsProofSurfaceFiles") &&
+            installScript.contains("$knownFiles = Get-RomaWindowsAgentArtifactInstallFiles") &&
+                !installScript.contains(#"$knownFiles = @("#) &&
+                !installScript.contains(#""RomaProofAgent.exe""#) &&
                 installScript.contains("Require-RomaWindowsInstalledProofSurfaceFiles -InstallDir $InstallDir") &&
+                proofCommonScript.contains("function Get-RomaWindowsAgentArtifactInstallFiles") &&
+                proofCommonScript.contains("function Get-RomaWindowsAgentArtifactDebugFiles") &&
+                proofCommonScript.contains(#""RomaProofAgent.exe""#) &&
                 proofCommonScript.contains(#""run-windows-laptop-proof.ps1""#) &&
                 proofCommonScript.contains(#""WINDOWS-LAPTOP-PROOF.txt""#) &&
                 proofCommonScript.contains(#""check-windows-scripts-parse.ps1""#) &&

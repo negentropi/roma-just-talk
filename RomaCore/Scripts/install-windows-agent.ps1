@@ -156,19 +156,7 @@ Assert-InstalledAgentNotRunning -InstalledAgentPath $installedAgent
 Invoke-Step "copy package files" {
     New-Item -ItemType Directory -Force -Path $InstallDir | Out-Null
 
-    $knownFiles = @(
-        "RomaWindowsAgent.exe",
-        "RomaProofAgent.exe",
-        "RomaWhisperCLIMock.exe",
-        "RomaWindowsAgent.pdb",
-        "RomaProofAgent.pdb"
-    )
-    $knownFiles += Get-RomaWindowsProofSurfaceFiles
-    $knownFiles += @(
-        "manifest.txt",
-        "sample-windows-agent.json",
-        "sample-local-whisper-agent.json"
-    )
+    $knownFiles = Get-RomaWindowsAgentArtifactInstallFiles
     foreach ($file in $knownFiles) {
         $source = Join-Path $PackageDir $file
         if (Test-Path -LiteralPath $source) {

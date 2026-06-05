@@ -13670,6 +13670,14 @@ struct RomaCoreChecks {
                 proofCommonScript.contains(#""swift_runtime_dlls""#) &&
                 proofCommonScript.contains("function Assert-RomaWindowsAgentArtifactManifestKeys") &&
                 proofCommonScript.contains("foreach ($key in Get-RomaWindowsAgentArtifactRequiredManifestKeys)") &&
+                proofCommonScript.contains("function Require-RomaWindowsPackagedSourceCommit") &&
+                proofCommonScript.contains(#"Require-RomaWindowsManifestKey -Manifest $Manifest -Key "source_commit""#) &&
+                proofCommonScript.contains("function Require-RomaWindowsPackagedSourceDirty") &&
+                proofCommonScript.contains(#"Require-RomaWindowsManifestKey -Manifest $Manifest -Key "source_dirty""#) &&
+                proofCommonScript.contains("function Require-RomaWindowsPackagedNativePreflightCheckerSmokeReport") &&
+                proofCommonScript.contains(#"Require-RomaWindowsManifestFile -Manifest $Manifest -Key "laptop_native_preflight_checker_smoke_report" -BaseDir $BaseDir"#) &&
+                proofCommonScript.contains("function Require-RomaWindowsPackagedLocalWhisperPreflightCheckerSmokeReport") &&
+                proofCommonScript.contains(#"Require-RomaWindowsManifestFile -Manifest $Manifest -Key "laptop_preflight_checker_smoke_report" -BaseDir $BaseDir"#) &&
                 proveScript.contains("Assert-RomaWindowsAgentArtifactManifestKeys -Manifest $script:artifactManifest") &&
                 !proveScript.contains("foreach ($key in @(") &&
                 proveScript.contains("Require-RomaWindowsPackagedWhisperCLIMock") &&
@@ -13688,8 +13696,15 @@ struct RomaCoreChecks {
                 !laptopProofScript.contains(#"-Key "proof_common_script""#) &&
                 !laptopProofScript.contains(#"$proofScript = Join-Path $PackageDir "prove-windows-agent-artifact.ps1""#) &&
                 workflowScript.contains("Read-RomaWindowsManifest -Path $manifestPath") &&
-                workflowScript.contains(#"-Key "laptop_native_preflight_checker_smoke_report""#) &&
-                workflowScript.contains(#"-Key "laptop_preflight_checker_smoke_report""#) &&
+                workflowScript.contains(#"$env:RUNNER_TEMP\roma-windows-agent\windows-proof-common.ps1"#) &&
+                workflowScript.contains("Require-RomaWindowsPackagedSourceCommit") &&
+                workflowScript.contains("Require-RomaWindowsPackagedSourceDirty") &&
+                workflowScript.contains("Require-RomaWindowsPackagedNativePreflightCheckerSmokeReport") &&
+                workflowScript.contains("Require-RomaWindowsPackagedLocalWhisperPreflightCheckerSmokeReport") &&
+                !workflowScript.contains(#"-Key "source_commit""#) &&
+                !workflowScript.contains(#"-Key "source_dirty""#) &&
+                !workflowScript.contains(#"-Key "laptop_native_preflight_checker_smoke_report""#) &&
+                !workflowScript.contains(#"-Key "laptop_preflight_checker_smoke_report""#) &&
                 !proveScript.contains("function Read-Manifest") &&
                 !laptopProofScript.contains("function Read-Manifest"),
             "Windows proof scripts and CI should reuse the shared manifest helper instead of duplicating manifest parsing"
@@ -13975,8 +13990,9 @@ struct RomaCoreChecks {
                 manifestScript.contains("function Read-RomaWindowsManifest") &&
                 manifestScript.contains("function Require-RomaWindowsManifestFile") &&
                 workflowScript.contains(#"$env:RUNNER_TEMP\roma-windows-agent\windows-manifest.ps1"#) &&
-                workflowScript.contains("Require-RomaWindowsManifestKey") &&
-                workflowScript.contains("Require-RomaWindowsManifestFile"),
+                workflowScript.contains(#"$env:RUNNER_TEMP\roma-windows-agent\windows-proof-common.ps1"#) &&
+                workflowScript.contains("Require-RomaWindowsPackagedSourceCommit") &&
+                workflowScript.contains("Require-RomaWindowsPackagedLocalWhisperPreflightCheckerSmokeReport"),
             "Windows CI should parse and use the shared manifest helper"
         )
         try require(

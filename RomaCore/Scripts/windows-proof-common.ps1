@@ -1185,6 +1185,44 @@ function Assert-RomaWindowsAgentArtifactManifestKeys {
     }
 }
 
+function Require-RomaWindowsPackagedSourceCommit {
+    param(
+        [Parameter(Mandatory = $true)]
+        [hashtable]$Manifest
+    )
+
+    return Require-RomaWindowsManifestKey -Manifest $Manifest -Key "source_commit"
+}
+
+function Require-RomaWindowsPackagedSourceDirty {
+    param(
+        [Parameter(Mandatory = $true)]
+        [hashtable]$Manifest
+    )
+
+    return Require-RomaWindowsManifestKey -Manifest $Manifest -Key "source_dirty"
+}
+
+function Require-RomaWindowsPackagedNativePreflightCheckerSmokeReport {
+    param(
+        [Parameter(Mandatory = $true)]
+        [hashtable]$Manifest,
+        [string]$BaseDir = ""
+    )
+
+    return Require-RomaWindowsManifestFile -Manifest $Manifest -Key "laptop_native_preflight_checker_smoke_report" -BaseDir $BaseDir
+}
+
+function Require-RomaWindowsPackagedLocalWhisperPreflightCheckerSmokeReport {
+    param(
+        [Parameter(Mandatory = $true)]
+        [hashtable]$Manifest,
+        [string]$BaseDir = ""
+    )
+
+    return Require-RomaWindowsManifestFile -Manifest $Manifest -Key "laptop_preflight_checker_smoke_report" -BaseDir $BaseDir
+}
+
 function Require-RomaWindowsPackagedProofScript {
     param(
         [Parameter(Mandatory = $true)]

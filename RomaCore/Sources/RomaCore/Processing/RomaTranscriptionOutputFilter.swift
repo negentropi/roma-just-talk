@@ -2403,8 +2403,13 @@ public struct RomaTranscriptionOutputFilter {
             let suffixStart = candidateTokens[overlapCount].range.lowerBound
             let suffix = String(trimmedText[suffixStart...])
                 .trimmingCharacters(in: .whitespacesAndNewlines)
-            guard !suffix.isEmpty,
-                  !hasInternalSentenceBoundary(suffix) else {
+            guard !suffix.isEmpty else { continue }
+
+            if hasInternalSentenceBoundary(suffix) {
+                let cleanedSuffix = removeLeadingDanglingGeneratedLeadInAfterContextOverlap(from: suffix)
+                if cleanedSuffix != suffix {
+                    return cleanedSuffix
+                }
                 continue
             }
 
@@ -2417,8 +2422,7 @@ public struct RomaTranscriptionOutputFilter {
     private static func removeLeadingDanglingGeneratedLeadInAfterContextOverlap(from text: String) -> String {
         let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
         let tokens = wordTokens(in: trimmedText)
-        guard tokens.count >= 2,
-              !hasInternalSentenceBoundary(trimmedText) else {
+        guard tokens.count >= 2 else {
             return text
         }
 
@@ -2433,9 +2437,15 @@ public struct RomaTranscriptionOutputFilter {
             return text
         }
 
-        let suffixStart = tokens[leadInWordCount].range.lowerBound
-        let suffix = String(trimmedText[suffixStart...])
+        let suffixStart = tokens[leadInWordCount - 1].range.upperBound
+        let suffix = cleanDanglingGeneratedLeadInSuffix(
+            String(trimmedText[suffixStart...])
+        )
             .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !suffix.isEmpty,
+              !hasInternalSentenceBoundary(suffix) else {
+            return text
+        }
         let suffixTokens = wordTokens(in: suffix)
         guard let firstSuffixToken = suffixTokens.first else { return text }
 
@@ -2454,6 +2464,16 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         return suffix
+    }
+
+    private static func cleanDanglingGeneratedLeadInSuffix(_ text: String) -> String {
+        var result = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        result = unwrapNoisyNestedContinuationBoundaryFragment(from: result)
+        result = unwrapPlainNonASCIIBoundaryContinuationFragment(from: result)
+        result = removeUnmatchedBoundaryContinuationArtifact(from: result, after: "")
+        result = removeLeadingFragmentPunctuation(from: result)
+        result = removeTrailingNoisyFragmentPunctuation(from: result)
+        return result
     }
 
     private static func shouldRemoveLeadingContinuationContextOverlap(

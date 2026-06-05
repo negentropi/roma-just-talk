@@ -131,7 +131,8 @@ struct RomaProofAgent {
     }
 
     private static func runWindowsKeyboardHookProof(arguments: [String]) throws {
-        let timeoutSeconds = try RomaCommandLineOptions(arguments).boundedDoubleValue(
+        let options = RomaCommandLineOptions(arguments)
+        let timeoutSeconds = try options.boundedDoubleValue(
             after: "--timeout",
             default: RomaWindowsAgentConfiguration.defaultHoldTimeoutSeconds,
             minimum: RomaWindowsAgentConfiguration.minimumHoldTimeoutSeconds,
@@ -187,11 +188,12 @@ struct RomaProofAgent {
     }
 
     private static func runWindowsSecretSaveFromEnv(arguments: [String]) throws {
-        let directoryURL = URL(fileURLWithPath: try value(after: "--dir", in: arguments), isDirectory: true)
-        let key = try value(after: "--key", in: arguments)
-        let valueEnvironmentName = try value(after: "--value-env", in: arguments)
+        let options = RomaCommandLineOptions(arguments)
+        let directoryURL = URL(fileURLWithPath: try options.value(after: "--dir"), isDirectory: true)
+        let key = try options.value(after: "--key")
+        let valueEnvironmentName = try options.value(after: "--value-env")
 
-        guard isValidEnvironmentName(valueEnvironmentName) else {
+        guard RomaCommandLineText.isValidEnvironmentName(valueEnvironmentName) else {
             throw AgentError.invalidOptionValue("--value-env")
         }
         guard let secret = ProcessInfo.processInfo.environment[valueEnvironmentName],
@@ -211,7 +213,8 @@ struct RomaProofAgent {
     }
 
     private static func runWindowsSecretProof(arguments: [String]) throws {
-        let directoryURL = URL(fileURLWithPath: try value(after: "--dir", in: arguments), isDirectory: true)
+        let options = RomaCommandLineOptions(arguments)
+        let directoryURL = URL(fileURLWithPath: try options.value(after: "--dir"), isDirectory: true)
         let key = "proof-api-key"
         let value = "roma just talk proof secret"
         let store = WindowsDPAPISecretStore(directoryURL: directoryURL)
@@ -234,9 +237,10 @@ struct RomaProofAgent {
     }
 
     private static func runWindowsPasteProof(arguments: [String]) throws {
-        let text = try value(after: "--text", in: arguments)
-        let focusDelaySeconds = try doubleValue(after: "--focus-delay", in: arguments, default: 0)
-        let targetProcessID = try RomaCommandLineOptions(arguments).optionalUInt32Value(after: "--target-process-id")
+        let options = RomaCommandLineOptions(arguments)
+        let text = try options.value(after: "--text")
+        let focusDelaySeconds = try options.doubleValue(after: "--focus-delay", default: 0)
+        let targetProcessID = try options.optionalUInt32Value(after: "--target-process-id")
         guard focusDelaySeconds >= 0 else {
             throw AgentError.invalidOptionValue("--focus-delay")
         }
@@ -298,13 +302,14 @@ struct RomaProofAgent {
     }
 
     private static func runDictationPipelineProof(arguments: [String]) async throws {
-        let outputURL = URL(fileURLWithPath: try value(after: "--out", in: arguments))
-        let rawText = optionalValue(after: "--text", in: arguments) ?? "hmm... just talk."
-        let wordReplacements = try replacementRules(from: arguments)
-        let insertionContext = optionalValue(after: "--preceding-text", in: arguments).map {
+        let options = RomaCommandLineOptions(arguments)
+        let outputURL = URL(fileURLWithPath: try options.value(after: "--out"))
+        let rawText = options.optionalValue(after: "--text") ?? "hmm... just talk."
+        let wordReplacements = try RomaCommandLineText.wordReplacementRules(from: options)
+        let insertionContext = options.optionalValue(after: "--preceding-text").map {
             TextInsertionContext(
                 precedingText: $0,
-                selectedText: optionalValue(after: "--selected-text", in: arguments)
+                selectedText: options.optionalValue(after: "--selected-text")
             )
         }
         let recorder = ProofRecorder()
@@ -336,14 +341,14 @@ struct RomaProofAgent {
 
         print("wrote=\(result.session.recordedAudio.fileURL.path)")
         print("raw_transcript_length=\(rawText.count)")
-        print("raw_transcript_text=\(oneLine(rawText))")
-        print("preceding_text=\(oneLine(insertionContext?.precedingText ?? ""))")
-        print("selected_text=\(oneLine(insertionContext?.selectedText ?? ""))")
+        print("raw_transcript_text=\(RomaCommandLineText.oneLine(rawText))")
+        print("preceding_text=\(RomaCommandLineText.oneLine(insertionContext?.precedingText ?? ""))")
+        print("selected_text=\(RomaCommandLineText.oneLine(insertionContext?.selectedText ?? ""))")
         print("processed_transcript_length=\(result.processedText.count)")
-        print("processed_transcript_text=\(oneLine(result.processedText))")
+        print("processed_transcript_text=\(RomaCommandLineText.oneLine(result.processedText))")
         print("word_replacements=\(wordReplacements.count)")
         print("fake_paste_sent=\(await textInsertion.pastedText != nil)")
-        print("fake_paste_text=\(oneLine(await textInsertion.pastedText ?? ""))")
+        print("fake_paste_text=\(RomaCommandLineText.oneLine(await textInsertion.pastedText ?? ""))")
         print("paste_text_source=processed_transcript")
     }
 
@@ -372,11 +377,12 @@ struct RomaProofAgent {
     }
 
     private static func printWhisperCLIDoctor(arguments: [String]) throws {
+        let options = RomaCommandLineOptions(arguments)
         let configuration = try makeWhisperCLIConfiguration(
             arguments: arguments,
             allowPlaceholders: true
         )
-        let audioURL = URL(fileURLWithPath: optionalValue(after: "--audio", in: arguments) ?? "proof.wav")
+        let audioURL = URL(fileURLWithPath: options.optionalValue(after: "--audio") ?? "proof.wav")
         let model = TranscriptionModelDescriptor(
             name: configuration.modelURL.lastPathComponent,
             displayName: configuration.modelURL.lastPathComponent,
@@ -386,8 +392,8 @@ struct RomaProofAgent {
             for: TranscriptionRequest(
                 audioURL: audioURL,
                 model: model,
-                language: optionalValue(after: "--language", in: arguments),
-                prompt: optionalValue(after: "--prompt", in: arguments)
+                language: options.optionalValue(after: "--language"),
+                prompt: options.optionalValue(after: "--prompt")
             ),
             outputBaseName: "roma-whisper-proof"
         )
@@ -403,12 +409,13 @@ struct RomaProofAgent {
         print("json_output=\(invocation.jsonOutputURL.path)")
         print("timeout_seconds=\(configuration.timeoutSeconds)")
         print("extra_arguments=\(configuration.extraArguments.count)")
-        print("arguments=\(oneLine(invocation.arguments.joined(separator: " ")))")
+        print("arguments=\(RomaCommandLineText.oneLine(invocation.arguments.joined(separator: " ")))")
     }
 
     private static func runWhisperCLIProof(arguments: [String]) async throws {
+        let options = RomaCommandLineOptions(arguments)
         let configuration = try makeWhisperCLIConfiguration(arguments: arguments)
-        let audioURL = URL(fileURLWithPath: try value(after: "--audio", in: arguments))
+        let audioURL = URL(fileURLWithPath: try options.value(after: "--audio"))
         let model = TranscriptionModelDescriptor(
             name: configuration.modelURL.lastPathComponent,
             displayName: configuration.modelURL.lastPathComponent,
@@ -419,8 +426,8 @@ struct RomaProofAgent {
             TranscriptionRequest(
                 audioURL: audioURL,
                 model: model,
-                language: optionalValue(after: "--language", in: arguments),
-                prompt: optionalValue(after: "--prompt", in: arguments)
+                language: options.optionalValue(after: "--language"),
+                prompt: options.optionalValue(after: "--prompt")
             )
         )
 
@@ -435,12 +442,13 @@ struct RomaProofAgent {
             print("duration_seconds=\(String(format: "%.3f", duration))")
         }
         print("transcript_length=\(result.text.count)")
-        print("transcript_text=\(oneLine(result.text))")
+        print("transcript_text=\(RomaCommandLineText.oneLine(result.text))")
     }
 
     private static func runMiniaudioRecordProof(arguments: [String]) async throws {
-        let outputURL = URL(fileURLWithPath: try value(after: "--out", in: arguments))
-        let seconds = try RomaCommandLineOptions(arguments).boundedDoubleValue(
+        let options = RomaCommandLineOptions(arguments)
+        let outputURL = URL(fileURLWithPath: try options.value(after: "--out"))
+        let seconds = try options.boundedDoubleValue(
             after: "--seconds",
             default: RomaWindowsAgentConfiguration.defaultRecordSeconds,
             minimum: RomaWindowsAgentConfiguration.minimumRecordSeconds,
@@ -463,7 +471,8 @@ struct RomaProofAgent {
     }
 
     private static func writePreRollProof(arguments: [String]) throws {
-        let outputURL = URL(fileURLWithPath: try value(after: "--out", in: arguments))
+        let options = RomaCommandLineOptions(arguments)
+        let outputURL = URL(fileURLWithPath: try options.value(after: "--out"))
         let format = AudioChunkFormat.speechPCM16kMono
         let sampleRate = format.sampleRate
         let buffer = PCMPreRollBuffer(configuration: PreRollConfiguration(durationSeconds: 3, outputFormat: format))
@@ -485,18 +494,19 @@ struct RomaProofAgent {
     }
 
     private static func runTranscribeProof(arguments: [String]) async throws {
-        let audioURL = URL(fileURLWithPath: try value(after: "--audio", in: arguments))
-        let endpointText = try value(after: "--endpoint", in: arguments)
-        let modelName = try value(after: "--model", in: arguments)
-        let apiKeySource = try makeAPIKeySource(arguments: arguments)
+        let options = RomaCommandLineOptions(arguments)
+        let audioURL = URL(fileURLWithPath: try options.value(after: "--audio"))
+        let endpointText = try options.value(after: "--endpoint")
+        let modelName = try options.value(after: "--model")
+        let apiKeySource = try TranscriptionAPIKeySource.make(from: options)
 
         let result = try await transcribeAudio(
             audioURL: audioURL,
             endpointText: endpointText,
             modelName: modelName,
             apiKeySource: apiKeySource,
-            language: optionalValue(after: "--language", in: arguments),
-            prompt: optionalValue(after: "--prompt", in: arguments)
+            language: options.optionalValue(after: "--language"),
+            prompt: options.optionalValue(after: "--prompt")
         )
         printTranscriptionResult(
             result,
@@ -555,8 +565,9 @@ struct RomaProofAgent {
         arguments: [String],
         allowPlaceholders: Bool = false
     ) throws -> WhisperCLITranscriptionConfiguration {
+        let options = RomaCommandLineOptions(arguments)
         let executablePath: String
-        if let value = optionalValue(after: "--whisper-cli", in: arguments) {
+        if let value = options.optionalValue(after: "--whisper-cli") {
             executablePath = value
         } else if allowPlaceholders {
             executablePath = defaultWhisperCLIPath
@@ -565,7 +576,7 @@ struct RomaProofAgent {
         }
 
         let modelPath: String
-        if let value = optionalValue(after: "--whisper-model", in: arguments) {
+        if let value = options.optionalValue(after: "--whisper-model") {
             modelPath = value
         } else if allowPlaceholders {
             modelPath = defaultWhisperModelPath
@@ -573,15 +584,15 @@ struct RomaProofAgent {
             throw AgentError.missingOption("--whisper-model")
         }
 
-        let outputDirectory = optionalValue(after: "--output-dir", in: arguments)
+        let outputDirectory = options.optionalValue(after: "--output-dir")
             ?? FileManager.default.temporaryDirectory.path
 
         return WhisperCLITranscriptionConfiguration(
             executableURL: URL(fileURLWithPath: executablePath),
             modelURL: URL(fileURLWithPath: modelPath),
             outputDirectoryURL: URL(fileURLWithPath: outputDirectory, isDirectory: true),
-            extraArguments: try values(after: "--whisper-arg", in: arguments),
-            timeoutSeconds: try doubleValue(after: "--timeout", in: arguments, default: 120)
+            extraArguments: try options.values(after: "--whisper-arg"),
+            timeoutSeconds: try options.doubleValue(after: "--timeout", default: 120)
         )
     }
 
@@ -602,7 +613,7 @@ struct RomaProofAgent {
             print("duration_seconds=\(String(format: "%.3f", duration))")
         }
         print("transcript_length=\(result.text.count)")
-        print("transcript_text=\(oneLine(result.text))")
+        print("transcript_text=\(RomaCommandLineText.oneLine(result.text))")
     }
 
     private static func printTranscriptionResult(
@@ -625,31 +636,7 @@ struct RomaProofAgent {
             print("duration_seconds=\(String(format: "%.3f", duration))")
         }
         print("transcript_length=\(result.text.count)")
-        print("transcript_text=\(oneLine(result.text))")
-    }
-
-    private static func makeAPIKeySource(arguments: [String]) throws -> TranscriptionAPIKeySource {
-        try TranscriptionAPIKeySource.make(from: RomaCommandLineOptions(arguments))
-    }
-
-    private static func replacementRules(from arguments: [String]) throws -> [RomaWordReplacementRule] {
-        try RomaCommandLineText.wordReplacementRules(from: RomaCommandLineOptions(arguments))
-    }
-
-    private static func value(after option: String, in arguments: [String]) throws -> String {
-        try RomaCommandLineOptions(arguments).value(after: option)
-    }
-
-    private static func optionalValue(after option: String, in arguments: [String]) -> String? {
-        RomaCommandLineOptions(arguments).optionalValue(after: option)
-    }
-
-    private static func values(after option: String, in arguments: [String]) throws -> [String] {
-        try RomaCommandLineOptions(arguments).values(after: option)
-    }
-
-    private static func doubleValue(after option: String, in arguments: [String], default defaultValue: Double) throws -> Double {
-        try RomaCommandLineOptions(arguments).doubleValue(after: option, default: defaultValue)
+        print("transcript_text=\(RomaCommandLineText.oneLine(result.text))")
     }
 
     private static func sleep(seconds: Double) async throws {
@@ -708,14 +695,6 @@ struct RomaProofAgent {
         #else
         return "unknown"
         #endif
-    }
-
-    private static func isValidEnvironmentName(_ value: String) -> Bool {
-        RomaCommandLineText.isValidEnvironmentName(value)
-    }
-
-    private static func oneLine(_ text: String) -> String {
-        RomaCommandLineText.oneLine(text)
     }
 
     private static var defaultWhisperCLIPath: String {

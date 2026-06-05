@@ -9868,11 +9868,20 @@ struct RomaCoreChecks {
         try require(
             commandLineOptionsSource.contains("public func boundedDoubleValue") &&
                 commandLineOptionsSource.contains("public func optionalUInt32Value") &&
-                proofAgentSource.contains("RomaCommandLineOptions(arguments).boundedDoubleValue") &&
-                proofAgentSource.contains("RomaCommandLineOptions(arguments).optionalUInt32Value") &&
+                proofAgentSource.contains("try options.boundedDoubleValue(") &&
+                proofAgentSource.contains("try options.optionalUInt32Value(after: \"--target-process-id\")") &&
+                proofAgentSource.contains("try options.doubleValue(after: \"--focus-delay\"") &&
+                proofAgentSource.contains("RomaCommandLineText.wordReplacementRules(from: options)") &&
+                proofAgentSource.contains("RomaCommandLineText.oneLine(result.text)") &&
+                !proofAgentSource.contains("private static func value(after option") &&
+                !proofAgentSource.contains("private static func optionalValue(after option") &&
+                !proofAgentSource.contains("private static func values(after option") &&
+                !proofAgentSource.contains("private static func doubleValue(after option") &&
+                !proofAgentSource.contains("private static func isValidEnvironmentName") &&
+                !proofAgentSource.contains("private static func oneLine") &&
                 !proofAgentSource.contains("private static func positiveDoubleValue") &&
                 !proofAgentSource.contains("private static func optionalUInt32Value"),
-            "Windows proof agent should reuse shared command-line numeric parsing"
+            "Windows proof agent should reuse shared command-line parsing and text formatting"
         )
         try require(
             doctorOutputSource.contains(#""windows_dictation_runtime_uses_pipeline_source=true""#) &&

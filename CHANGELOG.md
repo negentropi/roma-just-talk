@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Trimmed couple/few previous-unit correction markers before bracketed final-word fragments.
 - Trimmed counted previous-unit correction markers before bracketed final-word fragments.
 - Trimmed word-before-that correction markers before bracketed final-word fragments.
 - Trimmed set/turn previous-unit replacement markers before bracketed final-word fragments.

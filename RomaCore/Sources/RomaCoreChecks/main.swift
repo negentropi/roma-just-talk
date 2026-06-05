@@ -12967,7 +12967,11 @@ struct RomaCoreChecks {
                 !proveScript.contains("function Write-HoldDictationPrompt") &&
                 !laptopProofScript.contains("function Write-HoldDictationPrompt") &&
                 !laptopProofScript.contains("function Write-HotkeyDeliveryPreflightPrompt") &&
-                !laptopProofScript.contains("function Write-NotepadPastePrompt"),
+                !laptopProofScript.contains("function Write-NotepadPastePrompt") &&
+                windowsPortDocs.contains("shared proof-helper hotkey marker") &&
+                windowsPortDocs.contains("helper-owned `hold_hotkey=...` marker") &&
+                windowsPortDocs.contains("prints shared `ACTION_REQUIRED`, `hold_hotkey=...`, or `toggle_hotkey=...` operator markers") &&
+                !windowsPortDocs.contains("Ctrl+Shift+R"),
             "Windows proof scripts should share hold-to-talk operator prompts"
         )
         try require(

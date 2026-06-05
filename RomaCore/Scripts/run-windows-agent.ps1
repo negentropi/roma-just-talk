@@ -77,13 +77,10 @@ if ([string]::IsNullOrWhiteSpace($ConfigPath)) {
 }
 $ConfigPath = Resolve-FullPath -Path $ConfigPath
 
-if ([string]::IsNullOrWhiteSpace($SecretDir) -and
-    ![string]::IsNullOrWhiteSpace($ApiKeyName)) {
-    $SecretDir = Join-RomaWindowsInstalledSecretDirPath -InstallDir $InstallDir
-}
-if (![string]::IsNullOrWhiteSpace($SecretDir)) {
-    $SecretDir = Resolve-FullPath -Path $SecretDir
-}
+$SecretDir = Resolve-RomaWindowsAgentSecretDir `
+    -SecretDir $SecretDir `
+    -DefaultSecretDir (Join-RomaWindowsInstalledSecretDirPath -InstallDir $InstallDir) `
+    -ApiKeyName $ApiKeyName
 
 Write-Host "agent_exe=$AgentPath"
 Write-Host "config=$ConfigPath"
@@ -125,12 +122,10 @@ if ($hasEndpoint -or $hasModel -or $hasWhisperCLI -or $hasWhisperModel) {
         ![string]::IsNullOrWhiteSpace($ApiKeyName) -and
         ![string]::IsNullOrWhiteSpace($ApiKeyEnv) -and
         ![string]::IsNullOrWhiteSpace([Environment]::GetEnvironmentVariable($ApiKeyEnv))) {
-        $saveKeyArgs = @(
-            "save-key-from-env",
-            "--key", $ApiKeyName,
-            "--value-env", $ApiKeyEnv,
-            "--secret-dir", $SecretDir
-        )
+        $saveKeyArgs = New-RomaWindowsAgentSaveKeyArgs `
+            -ApiKeyName $ApiKeyName `
+            -ApiKeyEnv $ApiKeyEnv `
+            -SecretDir $SecretDir
         $saveKeyOutput = & $AgentPath @saveKeyArgs 2>&1 | Out-String
         if ($LASTEXITCODE -ne 0) {
             Write-Host $saveKeyOutput

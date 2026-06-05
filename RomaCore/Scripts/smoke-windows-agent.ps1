@@ -93,13 +93,10 @@ if ([string]::IsNullOrWhiteSpace($ConfigPath)) {
 }
 $ConfigPath = Resolve-FullPath -Path $ConfigPath
 
-if ([string]::IsNullOrWhiteSpace($SecretDir) -and
-    ![string]::IsNullOrWhiteSpace($ApiKeyName)) {
-    $SecretDir = Join-Path $OutputDir "secrets"
-}
-if (![string]::IsNullOrWhiteSpace($SecretDir)) {
-    $SecretDir = Resolve-FullPath -Path $SecretDir
-}
+$SecretDir = Resolve-RomaWindowsAgentSecretDir `
+    -SecretDir $SecretDir `
+    -DefaultSecretDir (Join-Path $OutputDir "secrets") `
+    -ApiKeyName $ApiKeyName
 
 if (!(Test-Path -LiteralPath $AgentPath)) {
     throw "RomaWindowsAgent.exe was not found: $AgentPath"
@@ -144,12 +141,10 @@ if (![string]::IsNullOrWhiteSpace($ApiKeyName) -and
     $hasExplicitApiKeyEnv -and
     ![string]::IsNullOrWhiteSpace($apiKeyEnvValue)) {
     Invoke-Step "agent save key" {
-        $saveKeyArgs = @(
-            "save-key-from-env",
-            "--key", $ApiKeyName,
-            "--value-env", $ApiKeyEnv,
-            "--secret-dir", $SecretDir
-        )
+        $saveKeyArgs = New-RomaWindowsAgentSaveKeyArgs `
+            -ApiKeyName $ApiKeyName `
+            -ApiKeyEnv $ApiKeyEnv `
+            -SecretDir $SecretDir
         $saveKeyOutput = & $AgentPath @saveKeyArgs 2>&1 | Out-String
         if ($LASTEXITCODE -ne 0) {
             Write-Host $saveKeyOutput

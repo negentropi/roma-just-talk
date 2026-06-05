@@ -140,13 +140,10 @@ Assert-RomaWindowsAgentScriptCommonOptions `
     -HasClipboardRestoreDelay $hasExplicitClipboardRestoreDelay `
     -ClipboardRestoreDelaySeconds $ClipboardRestoreDelaySeconds
 
-if ([string]::IsNullOrWhiteSpace($SecretDir) -and
-    ![string]::IsNullOrWhiteSpace($ApiKeyName)) {
-    $SecretDir = Join-RomaWindowsInstalledSecretDirPath -InstallDir $InstallDir
-}
-if (![string]::IsNullOrWhiteSpace($SecretDir)) {
-    $SecretDir = Resolve-FullPath -Path $SecretDir
-}
+$SecretDir = Resolve-RomaWindowsAgentSecretDir `
+    -SecretDir $SecretDir `
+    -DefaultSecretDir (Join-RomaWindowsInstalledSecretDirPath -InstallDir $InstallDir) `
+    -ApiKeyName $ApiKeyName
 
 $packageArtifactPaths = Get-RomaWindowsAgentArtifactPathSet -ArtifactDir $PackageDir
 $agentSource = $packageArtifactPaths["agent"]

@@ -13413,6 +13413,8 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Get-RomaWindowsMinimumPermissionOutputProof") &&
                 proofCommonScript.contains("function Add-RomaWindowsProofFields") &&
                 proofCommonScript.contains("function Add-RomaWindowsAgentConfigurationArgs") &&
+                proofCommonScript.contains("function Resolve-RomaWindowsAgentSecretDir") &&
+                proofCommonScript.contains("function New-RomaWindowsAgentSaveKeyArgs") &&
                 proofCommonScript.contains("function Add-RomaWindowsAgentScriptCommonArgs") &&
                 proofCommonScript.contains("function Add-RomaWindowsAgentScriptCloudArgs") &&
                 proofCommonScript.contains("function Add-RomaWindowsAgentScriptLocalWhisperArgs") &&
@@ -13526,16 +13528,32 @@ struct RomaCoreChecks {
                 installScript.contains("$ConfigPath = Join-RomaWindowsInstallSmokeConfigPath -InstallDir $InstallDir") &&
                 runScript.contains("$ConfigPath = Join-RomaWindowsInstalledAgentConfigPath -InstallDir $InstallDir") &&
                 proveScript.contains("$ConfigPath = Join-RomaWindowsInstallSmokeConfigPath -InstallDir $InstallDir") &&
-                installScript.contains("$SecretDir = Join-RomaWindowsInstalledSecretDirPath -InstallDir $InstallDir") &&
-                runScript.contains("$SecretDir = Join-RomaWindowsInstalledSecretDirPath -InstallDir $InstallDir") &&
+                proofCommonScript.contains("function Resolve-RomaWindowsAgentSecretDir") &&
+                proofCommonScript.contains(#"return Resolve-RomaWindowsFullPath -Path $resolvedSecretDir"#) &&
+                proofCommonScript.contains("function New-RomaWindowsAgentSaveKeyArgs") &&
+                proofCommonScript.contains(#"[object[]]$ArgumentList = @("save-key-from-env")"#) &&
+                proofCommonScript.contains(#""--value-env", $ApiKeyEnv"#) &&
+                proofCommonScript.contains(#""--secret-dir", (Resolve-RomaWindowsFullPath -Path $SecretDir)"#) &&
+                installScript.contains("$SecretDir = Resolve-RomaWindowsAgentSecretDir `") &&
+                installScript.contains("Join-RomaWindowsInstalledSecretDirPath -InstallDir $InstallDir") &&
+                runScript.contains("$SecretDir = Resolve-RomaWindowsAgentSecretDir `") &&
+                runScript.contains("Join-RomaWindowsInstalledSecretDirPath -InstallDir $InstallDir") &&
+                smokeScript.contains("$SecretDir = Resolve-RomaWindowsAgentSecretDir `") &&
+                smokeScript.contains(#"Join-Path $OutputDir "secrets""#) &&
+                runScript.contains("$saveKeyArgs = New-RomaWindowsAgentSaveKeyArgs `") &&
+                smokeScript.contains("$saveKeyArgs = New-RomaWindowsAgentSaveKeyArgs `") &&
                 !installScript.contains(#"Join-Path $env:APPDATA "roma-just-talk\windows-agent.json""#) &&
                 !runScript.contains(#"Join-Path $env:APPDATA "roma-just-talk\windows-agent.json""#) &&
                 !proveScript.contains(#"Join-Path $env:APPDATA "roma-just-talk\windows-agent.json""#) &&
                 !installScript.contains(#"Join-Path $InstallDir "smoke\windows-agent-smoke.json""#) &&
                 !runScript.contains(#"Join-Path $InstallDir "windows-agent.json""#) &&
                 !proveScript.contains(#"Join-Path $InstallDir "smoke\windows-agent-smoke.json""#) &&
-                !installScript.contains(#"Join-Path $InstallDir "secrets""#) &&
-                !runScript.contains(#"Join-Path $InstallDir "secrets""#) &&
+                !installScript.contains(#"$SecretDir = Join-RomaWindowsInstalledSecretDirPath -InstallDir $InstallDir"#) &&
+                !runScript.contains(#"$SecretDir = Join-RomaWindowsInstalledSecretDirPath -InstallDir $InstallDir"#) &&
+                !runScript.contains(#""save-key-from-env","#) &&
+                !smokeScript.contains(#""save-key-from-env","#) &&
+                !runScript.contains(#""--secret-dir", $SecretDir"#) &&
+                !smokeScript.contains(#""--secret-dir", $SecretDir"#) &&
                 runScript.contains("$AgentPath = Join-RomaWindowsInstalledAgentPath -InstallDir $InstallDir") &&
                 installScript.contains("$installedAgent = Join-RomaWindowsInstalledAgentPath -InstallDir $InstallDir") &&
                 installScript.contains("$installedProofAgent = Join-RomaWindowsInstalledProofAgentPath -InstallDir $InstallDir") &&

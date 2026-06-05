@@ -3558,6 +3558,46 @@ function Add-RomaWindowsAgentConfigurationArgs {
     return $configArgs
 }
 
+function Resolve-RomaWindowsAgentSecretDir {
+    param(
+        [string]$SecretDir = "",
+        [string]$DefaultSecretDir = "",
+        [string]$ApiKeyName = ""
+    )
+
+    $resolvedSecretDir = $SecretDir
+    if ([string]::IsNullOrWhiteSpace($resolvedSecretDir) -and
+        ![string]::IsNullOrWhiteSpace($ApiKeyName)) {
+        $resolvedSecretDir = $DefaultSecretDir
+    }
+    if ([string]::IsNullOrWhiteSpace($resolvedSecretDir)) {
+        return ""
+    }
+
+    return Resolve-RomaWindowsFullPath -Path $resolvedSecretDir
+}
+
+function New-RomaWindowsAgentSaveKeyArgs {
+    param(
+        [object[]]$ArgumentList = @("save-key-from-env"),
+        [Parameter(Mandatory = $true)]
+        [string]$ApiKeyName,
+        [Parameter(Mandatory = $true)]
+        [string]$ApiKeyEnv,
+        [Parameter(Mandatory = $true)]
+        [string]$SecretDir
+    )
+
+    $saveKeyArgs = @($ArgumentList)
+    $saveKeyArgs += @(
+        "--key", $ApiKeyName,
+        "--value-env", $ApiKeyEnv,
+        "--secret-dir", (Resolve-RomaWindowsFullPath -Path $SecretDir)
+    )
+
+    return $saveKeyArgs
+}
+
 function Add-RomaWindowsAgentScriptCommonArgs {
     param(
         [object[]]$ArgumentList = @(),

@@ -11694,8 +11694,13 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Get-RomaWindowsNativeDoctorExpectedMarker") &&
                 proofCommonScript.contains("function New-RomaWindowsNativeDoctorOutputTable") &&
                 proofCommonScript.contains("function Assert-RomaWindowsNativeDoctorOutput") &&
+                proofCommonScript.contains("function Get-RomaWindowsNativeDoctorOutputMarkers") &&
                 proofCommonScript.contains("function Get-RomaWindowsNativeDoctorOutputProof") &&
-                proofCommonScript.contains("function Get-RomaWindowsNativeDoctorOutputProofs"),
+                proofCommonScript.contains("function Get-RomaWindowsNativeDoctorOutputProofs") &&
+                proofCommonScript.contains("Get-RomaWindowsOutputMarkerProof -Output $Output -Markers (Get-RomaWindowsNativeDoctorOutputMarkers -Name $Name)") &&
+                !proofCommonScript.contains(#"platform_windows = $Output.Contains("platform=windows")"#) &&
+                !proofCommonScript.contains(#"expected_marker_present = $Output.Contains($expectedMarker)"#) &&
+                !proofCommonScript.contains(#"register_hotkey_available = $Output.Contains((Get-RomaWindowsNativeDoctorExpectedMarker -Name "register_hotkey_available"))"#),
             "Windows proof helper should own native-doctor specs, marker lookup, assertions, and proof shaping"
         )
         for (name, label, command, marker) in nativeDoctorSpecs {

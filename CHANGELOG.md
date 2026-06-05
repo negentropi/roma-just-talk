@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Shared Windows native-doctor proof markers through proof-helper marker maps.
 - Shared packaged and installed Windows listener-smoke proof markers through proof-helper marker maps.
 - Shared Windows laptop preflight hotkey, microphone, and local-whisper proof markers through proof-helper marker maps.
 - Preserved explicit punctuation commands after correction-marked "final word" continuations.

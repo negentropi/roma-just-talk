@@ -1473,6 +1473,20 @@ function Get-RomaWindowsProofAgentDoctorOutputProof {
     return $proof
 }
 
+function Get-RomaWindowsNativeDoctorOutputMarkers {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    $expectedMarker = Get-RomaWindowsNativeDoctorExpectedMarker -Name $Name
+    return [ordered]@{
+        platform_windows = "platform=windows"
+        expected_marker_present = $expectedMarker
+        register_hotkey_available = Get-RomaWindowsNativeDoctorExpectedMarker -Name "register_hotkey_available"
+    }
+}
+
 function Get-RomaWindowsNativeDoctorOutputProof {
     param(
         [string]$Output = "",
@@ -1483,11 +1497,9 @@ function Get-RomaWindowsNativeDoctorOutputProof {
     $expectedMarker = Get-RomaWindowsNativeDoctorExpectedMarker -Name $Name
     $proof = [ordered]@{
         output_present = ![string]::IsNullOrWhiteSpace($Output)
-        platform_windows = $Output.Contains("platform=windows")
         expected_marker = $expectedMarker
-        expected_marker_present = $Output.Contains($expectedMarker)
-        register_hotkey_available = $Output.Contains((Get-RomaWindowsNativeDoctorExpectedMarker -Name "register_hotkey_available"))
     }
+    Add-RomaWindowsProofFields -Proof $proof -Fields (Get-RomaWindowsOutputMarkerProof -Output $Output -Markers (Get-RomaWindowsNativeDoctorOutputMarkers -Name $Name)) | Out-Null
     Add-RomaWindowsProofFields -Proof $proof -Fields (Get-RomaWindowsHoldTimeoutDefaultOutputProof -Output $Output) | Out-Null
     Add-RomaWindowsProofFields -Proof $proof -Fields (Get-RomaWindowsClipboardRestoreDefaultOutputProof -Output $Output) | Out-Null
     return $proof

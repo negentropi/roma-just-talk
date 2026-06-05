@@ -12770,6 +12770,7 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Get-RomaWindowsAgentShortcutFileName") &&
                 proofCommonScript.contains("function Get-RomaWindowsAgentShortcutTargetPath") &&
                 proofCommonScript.contains("function New-RomaWindowsAgentShortcutArguments") &&
+                proofCommonScript.contains("function Assert-RomaWindowsAgentShortcutContract") &&
                 proofCommonScript.contains("function Join-RomaWindowsInstalledRunScriptPath") &&
                 proofCommonScript.contains("function Get-RomaWindowsAgentShortcutReportPaths"),
             "Windows proof helper should own shared script utilities"
@@ -12869,12 +12870,14 @@ struct RomaCoreChecks {
         try require(
             installScript.contains("$shortcut.TargetPath = Get-RomaWindowsAgentShortcutTargetPath") &&
                 installScript.contains("$shortcut.Arguments = New-RomaWindowsAgentShortcutArguments") &&
+                installScript.contains("Assert-RomaWindowsAgentShortcutContract") &&
                 proofCommonScript.contains(#"$proof["expected_arguments"] = $expectedArguments"#) &&
                 proofCommonScript.contains(#"$proof["has_exact_arguments"] = $arguments.Equals($expectedArguments"#) &&
                 checkReportScript.contains(#"Assert-NonEmptyString -Object $Proof -Name "expected_arguments""#) &&
                 checkReportScript.contains(#"Assert-Boolean -Object $Proof -Name "has_exact_arguments" -Expected $true"#) &&
                 !installScript.contains(#"$shortcut.TargetPath = "powershell.exe""#) &&
-                !installScript.contains(#"$shortcut.Arguments = "-NoProfile -ExecutionPolicy Bypass"#),
+                !installScript.contains(#"$shortcut.Arguments = "-NoProfile -ExecutionPolicy Bypass"#) &&
+                !installScript.contains(#"$savedShortcut.Arguments.Contains("#),
             "Windows installer and shortcut proof should share launcher target and argument construction"
         )
         let proofCommonHelperScripts = [
@@ -13076,8 +13079,8 @@ struct RomaCoreChecks {
         try require(
             proofCommonScript.contains(#"-InstallDir `"$InstallDir`""#) &&
                 installScript.contains("-InstallDir $WorkingDirectory") &&
-                installScript.contains(#"!$savedShortcut.Arguments.Contains("-InstallDir")"#) &&
-                installScript.contains(#"!$savedShortcut.Arguments.Contains($WorkingDirectory)"#),
+                proofCommonScript.contains("Shortcut working directory did not match install dir") &&
+                proofCommonScript.contains("Shortcut arguments did not match installed listener contract"),
             "Windows shortcuts should pass the exact install dir to the launcher"
         )
         try require(

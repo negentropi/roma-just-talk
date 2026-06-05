@@ -2302,6 +2302,40 @@ function New-RomaWindowsAgentShortcutArguments {
     return "-NoProfile -ExecutionPolicy Bypass -File `"$RunScriptPath`" -InstallDir `"$InstallDir`" -ConfigPath `"$ConfigPath`" -Listen"
 }
 
+function Assert-RomaWindowsAgentShortcutContract {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Shortcut,
+        [Parameter(Mandatory = $true)]
+        [string]$RunScriptPath,
+        [Parameter(Mandatory = $true)]
+        [string]$InstallDir,
+        [Parameter(Mandatory = $true)]
+        [string]$ConfigPath
+    )
+
+    $targetPath = [string]$Shortcut.TargetPath
+    $arguments = [string]$Shortcut.Arguments
+    $workingDirectory = [string]$Shortcut.WorkingDirectory
+    $expectedTargetPath = Get-RomaWindowsAgentShortcutTargetPath
+    $expectedArguments = New-RomaWindowsAgentShortcutArguments `
+        -RunScriptPath $RunScriptPath `
+        -InstallDir $InstallDir `
+        -ConfigPath $ConfigPath
+
+    if (!$targetPath.EndsWith($expectedTargetPath, [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw "Shortcut target path does not launch $expectedTargetPath`: $targetPath"
+    }
+    if (!$arguments.Equals($expectedArguments, [System.StringComparison]::Ordinal)) {
+        throw "Shortcut arguments did not match installed listener contract: expected=$expectedArguments actual=$arguments"
+    }
+    if (!$workingDirectory.Equals($InstallDir, [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw "Shortcut working directory did not match install dir: expected=$InstallDir actual=$workingDirectory"
+    }
+
+    return $true
+}
+
 function Join-RomaWindowsInstalledRunScriptPath {
     param(
         [Parameter(Mandatory = $true)]

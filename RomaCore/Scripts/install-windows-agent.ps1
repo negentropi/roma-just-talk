@@ -73,13 +73,12 @@ function New-AgentShortcut {
 
     Require-File -Path $ShortcutPath
     $savedShortcut = $shell.CreateShortcut($ShortcutPath)
-    if (!$savedShortcut.Arguments.Contains("-ConfigPath") -or
-        !$savedShortcut.Arguments.Contains($ConfigPath) -or
-        !$savedShortcut.Arguments.Contains("-InstallDir") -or
-        !$savedShortcut.Arguments.Contains($WorkingDirectory) -or
-        !$savedShortcut.Arguments.Contains("-Listen")) {
-        throw "Shortcut does not reference config path: $ConfigPath"
-    }
+    Assert-RomaWindowsAgentShortcutContract `
+        -Shortcut $savedShortcut `
+        -RunScriptPath $RunScript `
+        -InstallDir $WorkingDirectory `
+        -ConfigPath $ConfigPath |
+        Out-Null
 
     return $savedShortcut
 }

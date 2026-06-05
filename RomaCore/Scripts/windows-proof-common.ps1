@@ -1278,6 +1278,10 @@ function Assert-RomaWindowsConfigDoctorOutput {
         [bool]$RequireWhisperCLI = $false
     )
 
+    if ($RequireCloud -and $RequireWhisperCLI) {
+        throw "RequireCloud and RequireWhisperCLI are mutually exclusive"
+    }
+
     Assert-RomaWindowsOutputContains -Output $Output -Expected "config_valid=true"
     Assert-RomaWindowsOutputContains -Output $Output -Expected "transcription_client="
     if ($RequireCloud) {
@@ -1288,6 +1292,44 @@ function Assert-RomaWindowsConfigDoctorOutput {
         Assert-RomaWindowsOutputContains -Output $Output -Expected "transcription_client=whisper.cpp-cli"
         Assert-RomaWindowsOutputContains -Output $Output -Expected "whisper_cli_exists=true"
         Assert-RomaWindowsOutputContains -Output $Output -Expected "whisper_model_exists=true"
+    }
+}
+
+function Assert-RomaWindowsAgentConfigWriteOutput {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Output,
+        [string]$ConfigPath = "",
+        [bool]$RequireCloud = $false,
+        [bool]$RequireWhisperCLI = $false,
+        [string]$ExpectedEndpoint = "",
+        [string]$ExpectedWhisperCLI = "",
+        [bool]$RequireClipboardRestoreFields = $false
+    )
+
+    if ($RequireCloud -and $RequireWhisperCLI) {
+        throw "RequireCloud and RequireWhisperCLI are mutually exclusive"
+    }
+
+    Assert-RomaWindowsOutputContains -Output $Output -Expected "written=true"
+    if (![string]::IsNullOrWhiteSpace($ConfigPath)) {
+        Assert-RomaWindowsOutputContains -Output $Output -Expected "config=$ConfigPath"
+    }
+    if ($RequireCloud) {
+        Assert-RomaWindowsOutputContains -Output $Output -Expected "transcription_client=openai-compatible"
+        if (![string]::IsNullOrWhiteSpace($ExpectedEndpoint)) {
+            Assert-RomaWindowsOutputContains -Output $Output -Expected "endpoint=$ExpectedEndpoint"
+        }
+    }
+    if ($RequireWhisperCLI) {
+        Assert-RomaWindowsOutputContains -Output $Output -Expected "transcription_client=whisper.cpp-cli"
+        if (![string]::IsNullOrWhiteSpace($ExpectedWhisperCLI)) {
+            Assert-RomaWindowsOutputContains -Output $Output -Expected "whisper_cli=$ExpectedWhisperCLI"
+        }
+    }
+    if ($RequireClipboardRestoreFields) {
+        Assert-RomaWindowsOutputContains -Output $Output -Expected "restore_clipboard_after_paste="
+        Assert-RomaWindowsOutputContains -Output $Output -Expected "clipboard_restore_delay_seconds="
     }
 }
 

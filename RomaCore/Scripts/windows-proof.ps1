@@ -424,15 +424,14 @@ try {
                 throw "RomaWindowsAgent write-config failed"
             }
             Write-Host $configOutput
-            Assert-OutputContains -Output $configOutput -Expected "written=true"
-            Assert-OutputContains -Output $configOutput -Expected "config=$agentConfig"
-            if ($hasLocalWhisper) {
-                Assert-OutputContains -Output $configOutput -Expected "transcription_client=whisper.cpp-cli"
-                Assert-OutputContains -Output $configOutput -Expected "whisper_cli=$WhisperCLI"
-            } else {
-                Assert-OutputContains -Output $configOutput -Expected "transcription_client=openai-compatible"
-                Assert-OutputContains -Output $configOutput -Expected "endpoint=$TranscribeEndpoint"
-            }
+            $requiresCloudConfigOutput = !$hasLocalWhisper
+            Assert-RomaWindowsAgentConfigWriteOutput `
+                -Output $configOutput `
+                -ConfigPath $agentConfig `
+                -RequireWhisperCLI $hasLocalWhisper `
+                -RequireCloud $requiresCloudConfigOutput `
+                -ExpectedWhisperCLI $WhisperCLI `
+                -ExpectedEndpoint $TranscribeEndpoint
             Assert-RomaWindowsFileWithMinimumBytes -Path $agentConfig
         }
     } else {
@@ -560,12 +559,14 @@ try {
                 throw "RomaWindowsAgent write-config failed"
             }
             Write-Host $configOutput
-            Assert-OutputContains -Output $configOutput -Expected "written=true"
-            if ($hasLocalWhisper) {
-                Assert-OutputContains -Output $configOutput -Expected "transcription_client=whisper.cpp-cli"
-            } else {
-                Assert-OutputContains -Output $configOutput -Expected "transcription_client=openai-compatible"
-            }
+            $requiresCloudConfigOutput = !$hasLocalWhisper
+            Assert-RomaWindowsAgentConfigWriteOutput `
+                -Output $configOutput `
+                -ConfigPath $agentConfig `
+                -RequireWhisperCLI $hasLocalWhisper `
+                -RequireCloud $requiresCloudConfigOutput `
+                -ExpectedWhisperCLI $WhisperCLI `
+                -ExpectedEndpoint $TranscribeEndpoint
             Assert-RomaWindowsFileWithMinimumBytes -Path $agentConfig
 
             $agentArgs = @(

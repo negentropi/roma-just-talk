@@ -205,10 +205,10 @@ Invoke-Step "agent config" {
         throw "RomaWindowsAgent write-config failed"
     }
     Write-Host $configOutput
-    Assert-OutputContains -Output $configOutput -Expected "written=true"
-    Assert-OutputContains -Output $configOutput -Expected "config=$ConfigPath"
-    Assert-OutputContains -Output $configOutput -Expected "restore_clipboard_after_paste="
-    Assert-OutputContains -Output $configOutput -Expected "clipboard_restore_delay_seconds="
+    Assert-RomaWindowsAgentConfigWriteOutput `
+        -Output $configOutput `
+        -ConfigPath $ConfigPath `
+        -RequireClipboardRestoreFields $true
     Assert-RomaWindowsFileWithMinimumBytes -Path $ConfigPath
 
     $configJson = Get-Content -LiteralPath $ConfigPath -Raw | ConvertFrom-Json

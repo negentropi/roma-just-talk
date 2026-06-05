@@ -10563,6 +10563,18 @@ struct RomaCoreChecks {
             "Windows smoke script should prove config doctor for cloud and local whisper setup"
         )
         try require(
+            proofCommonScript.contains("function Assert-RomaWindowsAgentConfigWriteOutput") &&
+                smokeScript.contains("Assert-RomaWindowsAgentConfigWriteOutput `") &&
+                smokeScript.contains("-RequireClipboardRestoreFields $true") &&
+                windowsProofScript.contains(#"$requiresCloudConfigOutput = !$hasLocalWhisper"#) &&
+                windowsProofScript.contains("Assert-RomaWindowsAgentConfigWriteOutput `") &&
+                windowsProofScript.contains("-ExpectedWhisperCLI $WhisperCLI") &&
+                windowsProofScript.contains("-ExpectedEndpoint $TranscribeEndpoint") &&
+                !smokeScript.contains(#"Assert-OutputContains -Output $configOutput -Expected "written=true""#) &&
+                !windowsProofScript.contains(#"Assert-OutputContains -Output $configOutput -Expected "written=true""#),
+            "Windows config write proof should use shared output assertions"
+        )
+        try require(
             pasteProofSource.contains(
                 "restoreDelaySeconds: TimeInterval = WindowsClipboardRestoreConfiguration.defaultRestoreDelaySeconds"
             ),

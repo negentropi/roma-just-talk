@@ -26,68 +26,12 @@ if (!(Test-Path -LiteralPath $manifestScript)) {
 }
 . $manifestScript
 
-function Invoke-GitLines {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string[]]$Arguments
-    )
-
-    try {
-        $output = & git @Arguments 2>$null
-        if ($LASTEXITCODE -ne 0) {
-            return @()
-        }
-
-        return @($output)
-    } catch {
-        return @()
-    }
-}
-
-function Get-GitMetadata {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$RepositoryRoot
-    )
-
-    Push-Location $RepositoryRoot
-    try {
-        $commit = (@(Invoke-GitLines -Arguments @("rev-parse", "--verify", "HEAD")) -join "`n").Trim()
-        if ([string]::IsNullOrWhiteSpace($commit)) {
-            throw "Could not resolve source git commit"
-        }
-
-        $branch = (@(Invoke-GitLines -Arguments @("rev-parse", "--abbrev-ref", "HEAD")) -join "`n").Trim()
-        if ([string]::IsNullOrWhiteSpace($branch)) {
-            $branch = "unknown"
-        }
-
-        $repository = (@(Invoke-GitLines -Arguments @("config", "--get", "remote.roma-just-talk.url")) -join "`n").Trim()
-        if ([string]::IsNullOrWhiteSpace($repository)) {
-            $repository = (@(Invoke-GitLines -Arguments @("config", "--get", "remote.origin.url")) -join "`n").Trim()
-        }
-        if ([string]::IsNullOrWhiteSpace($repository)) {
-            $repository = "unknown"
-        }
-
-        $statusLines = @(Invoke-GitLines -Arguments @("status", "--porcelain"))
-        return @{
-            Commit = $commit
-            Branch = $branch
-            Repository = $repository
-            Dirty = ($statusLines.Count -gt 0).ToString().ToLowerInvariant()
-        }
-    } finally {
-        Pop-Location
-    }
-}
-
 $packageRoot = Resolve-Path "$PSScriptRoot\.."
 if ([System.Environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT) {
     throw "package-windows-agent.ps1 must run on Windows so packaged executables and Swift runtime DLLs are Windows artifacts"
 }
 
-$gitMetadata = Get-GitMetadata -RepositoryRoot $packageRoot
+$gitMetadata = Get-RomaWindowsSourceGitMetadata -RepositoryRoot $packageRoot
 $OutputDir = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputDir)
 New-Item -ItemType Directory -Force -Path $OutputDir | Out-Null
 

@@ -720,6 +720,62 @@ function Get-RomaWindowsPackageIdentityFingerprint {
     return $fingerprint.ToLowerInvariant()
 }
 
+function Invoke-RomaWindowsGitLines {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string[]]$Arguments
+    )
+
+    try {
+        $output = & git @Arguments 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            return @()
+        }
+
+        return @($output)
+    } catch {
+        return @()
+    }
+}
+
+function Get-RomaWindowsSourceGitMetadata {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$RepositoryRoot
+    )
+
+    Push-Location $RepositoryRoot
+    try {
+        $commit = (@(Invoke-RomaWindowsGitLines -Arguments @("rev-parse", "--verify", "HEAD")) -join "`n").Trim()
+        if ([string]::IsNullOrWhiteSpace($commit)) {
+            throw "Could not resolve source git commit"
+        }
+
+        $branch = (@(Invoke-RomaWindowsGitLines -Arguments @("rev-parse", "--abbrev-ref", "HEAD")) -join "`n").Trim()
+        if ([string]::IsNullOrWhiteSpace($branch)) {
+            $branch = "unknown"
+        }
+
+        $repository = (@(Invoke-RomaWindowsGitLines -Arguments @("config", "--get", "remote.roma-just-talk.url")) -join "`n").Trim()
+        if ([string]::IsNullOrWhiteSpace($repository)) {
+            $repository = (@(Invoke-RomaWindowsGitLines -Arguments @("config", "--get", "remote.origin.url")) -join "`n").Trim()
+        }
+        if ([string]::IsNullOrWhiteSpace($repository)) {
+            $repository = "unknown"
+        }
+
+        $statusLines = @(Invoke-RomaWindowsGitLines -Arguments @("status", "--porcelain"))
+        return @{
+            Commit = $commit
+            Branch = $branch
+            Repository = $repository
+            Dirty = ($statusLines.Count -gt 0).ToString().ToLowerInvariant()
+        }
+    } finally {
+        Pop-Location
+    }
+}
+
 function Get-RomaWindowsManifestSourceProvenance {
     param(
         [Parameter(Mandatory = $true)]

@@ -11923,7 +11923,7 @@ struct RomaCoreChecks {
             "Windows package script should not package non-Windows executables as .exe files"
         )
         guard let gitMetadataRange = packageScript.range(
-            of: "$gitMetadata = Get-GitMetadata -RepositoryRoot $packageRoot"
+            of: "$gitMetadata = Get-RomaWindowsSourceGitMetadata -RepositoryRoot $packageRoot"
         ),
               let outputDirCreationRange = packageScript.range(
                 of: "New-Item -ItemType Directory -Force -Path $OutputDir"
@@ -11933,6 +11933,19 @@ struct RomaCoreChecks {
         try require(
             gitMetadataRange.lowerBound < outputDirCreationRange.lowerBound,
             "Windows package script should record source provenance before creating proof artifacts"
+        )
+        try require(
+            packageScript.contains("$gitMetadata = Get-RomaWindowsSourceGitMetadata -RepositoryRoot $packageRoot") &&
+                proofCommonScript.contains("function Invoke-RomaWindowsGitLines") &&
+                proofCommonScript.contains("function Get-RomaWindowsSourceGitMetadata") &&
+                proofCommonScript.contains(#"Invoke-RomaWindowsGitLines -Arguments @("rev-parse", "--verify", "HEAD")"#) &&
+                proofCommonScript.contains(#"Invoke-RomaWindowsGitLines -Arguments @("config", "--get", "remote.roma-just-talk.url")"#) &&
+                proofCommonScript.contains(#"Invoke-RomaWindowsGitLines -Arguments @("status", "--porcelain")"#) &&
+                !packageScript.contains("function Invoke-GitLines") &&
+                !packageScript.contains("function Get-GitMetadata") &&
+                !packageScript.contains(#"remote.roma-just-talk.url"#) &&
+                !packageScript.contains(#"git @Arguments"#),
+            "Windows package source metadata should be collected by the shared proof helper"
         )
         try require(
             proofCommonScript.contains("function Get-RomaWindowsProofReportIdentity") &&

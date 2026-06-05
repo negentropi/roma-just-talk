@@ -416,33 +416,21 @@ struct RomaProofAgent {
         let options = RomaCommandLineOptions(arguments)
         let configuration = try WhisperCLITranscriptionConfiguration.make(from: options)
         let audioURL = URL(fileURLWithPath: try options.value(after: "--audio"))
-        let model = TranscriptionModelDescriptor(
-            name: configuration.modelURL.lastPathComponent,
-            displayName: configuration.modelURL.lastPathComponent,
-            provider: .whisper
-        )
-        let service = WhisperCLITranscriptionService(configuration: configuration)
-        let result = try await service.transcribe(
+        let client = RomaTranscriptionClient.whisperCLI(configuration: configuration)
+        let result = try await client.service.transcribe(
             TranscriptionRequest(
                 audioURL: audioURL,
-                model: model,
+                model: client.model,
                 language: options.optionalValue(after: "--language"),
                 prompt: options.optionalValue(after: "--prompt")
             )
         )
 
-        print("provider=whisper.cpp-cli")
-        print("whisper_cli=\(configuration.executableURL.path)")
-        print("model_file=\(configuration.modelURL.path)")
-        print("audio=\(audioURL.path)")
-        if let language = result.language {
-            print("language=\(language)")
-        }
-        if let duration = result.durationSeconds {
-            print("duration_seconds=\(String(format: "%.3f", duration))")
-        }
-        print("transcript_length=\(result.text.count)")
-        print("transcript_text=\(RomaCommandLineText.oneLine(result.text))")
+        printTranscriptionResult(
+            result,
+            client: client,
+            audioURL: audioURL
+        )
     }
 
     private static func runMiniaudioRecordProof(arguments: [String]) async throws {

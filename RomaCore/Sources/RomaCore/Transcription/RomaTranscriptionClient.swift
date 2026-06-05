@@ -20,23 +20,7 @@ public struct RomaTranscriptionClient: Sendable {
 
     public static func make(from configuration: RomaWindowsAgentConfiguration) throws -> RomaTranscriptionClient {
         if configuration.usesWhisperCLI {
-            let whisperConfiguration = try configuration.whisperCLIConfiguration()
-            let modelName = whisperConfiguration.modelURL.lastPathComponent
-            return RomaTranscriptionClient(
-                name: "whisper.cpp-cli",
-                service: WhisperCLITranscriptionService(configuration: whisperConfiguration),
-                model: TranscriptionModelDescriptor(
-                    name: modelName,
-                    displayName: modelName,
-                    provider: .whisper
-                ),
-                details: [
-                    "whisper_cli=\(whisperConfiguration.executableURL.path)",
-                    "whisper_model=\(whisperConfiguration.modelURL.path)",
-                    "whisper_output_dir=\(whisperConfiguration.outputDirectoryURL.path)",
-                    "whisper_extra_args=\(whisperConfiguration.extraArguments.count)"
-                ]
-            )
+            return try whisperCLI(configuration: configuration.whisperCLIConfiguration())
         }
 
         let endpointText = try configuration.requireEndpoint()
@@ -47,6 +31,25 @@ public struct RomaTranscriptionClient: Sendable {
             endpointText: endpointText,
             modelName: modelName,
             apiKeySource: apiKeySource
+        )
+    }
+
+    public static func whisperCLI(configuration: WhisperCLITranscriptionConfiguration) -> RomaTranscriptionClient {
+        let modelName = configuration.modelURL.lastPathComponent
+        return RomaTranscriptionClient(
+            name: "whisper.cpp-cli",
+            service: WhisperCLITranscriptionService(configuration: configuration),
+            model: TranscriptionModelDescriptor(
+                name: modelName,
+                displayName: modelName,
+                provider: .whisper
+            ),
+            details: [
+                "whisper_cli=\(configuration.executableURL.path)",
+                "whisper_model=\(configuration.modelURL.path)",
+                "whisper_output_dir=\(configuration.outputDirectoryURL.path)",
+                "whisper_extra_args=\(configuration.extraArguments.count)"
+            ]
         )
     }
 

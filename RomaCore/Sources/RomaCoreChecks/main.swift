@@ -13293,23 +13293,23 @@ struct RomaCoreChecks {
                 !packageScript.contains(#"Join-Path $laptopNativePreflightCheckerSmokeDir "preflight-proof.json""#) &&
                 packageScript.contains("Copy-RomaWindowsAgentArtifactBundle `") &&
                 proofCommonScript.contains("function Copy-RomaWindowsAgentArtifactBundle") &&
-                proofCommonScript.contains(#"@{ Key = "manifest_script"; Marker = "manifest_script" }"#) &&
                 proofCommonScript.contains("function Get-RomaWindowsAgentArtifactManifestConfigPathKeys") &&
                 proofCommonScript.contains("function Get-RomaWindowsAgentArtifactManifestScriptPathKeys") &&
+                proofCommonScript.contains("function Get-RomaWindowsAgentArtifactCopiedProofSurfacePathKeys") &&
                 proofCommonScript.contains("function Get-RomaWindowsAgentArtifactManifestPathKeys") &&
+                proofCommonScript.contains("foreach ($key in Get-RomaWindowsAgentArtifactCopiedProofSurfacePathKeys)") &&
+                proofCommonScript.contains(#"Where-Object { [string]$_ -ne "laptop_proof_guide" }"#) &&
                 proofCommonScript.contains("foreach ($artifactKey in Get-RomaWindowsAgentArtifactManifestConfigPathKeys)") &&
                 proofCommonScript.contains("foreach ($artifactKey in Get-RomaWindowsAgentArtifactManifestScriptPathKeys)") &&
                 proofCommonScript.contains(#"$manifestLines += "$artifactKey=$($OutputArtifactPaths[$artifactKey])""#) &&
+                proofCommonScript.contains(#"Write-Host "$key=$scriptOutput""#) &&
                 proofCommonScript.contains(#""manifest_script""#) &&
                 !packageScript.contains("manifest_script=$manifestScriptOutput") &&
-                proofCommonScript.contains(#"@{ Key = "package_identity_script"; Marker = "package_identity_script" }"#) &&
                 proofCommonScript.contains(#""package_identity_script""#) &&
                 !packageScript.contains("package_identity_script=$identityScriptOutput") &&
-                proofCommonScript.contains(#"@{ Key = "parse_script"; Marker = "parse_script" }"#) &&
                 proofCommonScript.contains(#""parse_script""#) &&
                 !packageScript.contains("parse_script=$parseScriptOutput") &&
                 packageScript.contains(#"Invoke-Step "packaged script parse check""#) &&
-                proofCommonScript.contains(#"@{ Key = "proof_common_script"; Marker = "proof_common_script" }"#) &&
                 proofCommonScript.contains(#""proof_common_script""#) &&
                 !packageScript.contains("proof_common_script=$proofCommonScriptOutput") &&
                 proofCommonScript.contains("function Write-RomaWindowsAgentArtifactManifest") &&
@@ -13431,8 +13431,10 @@ struct RomaCoreChecks {
                 proveScript.contains(#"$manifestPath = $packageArtifactPaths["manifest"]"#) &&
                 packageScript.contains(#"$agentOutput = $outputArtifactPaths["agent"]"#) &&
                 packageScript.contains(#"$manifestPath = $outputArtifactPaths["manifest"]"#) &&
-                proofCommonScript.contains(#"@{ Key = "smoke_script"; Marker = "smoke_script" }"#) &&
-                proofCommonScript.contains(#"@{ Key = "check_set_script"; Marker = "check_set_script" }"#) &&
+                proofCommonScript.contains(#""smoke_script""#) &&
+                proofCommonScript.contains(#""check_set_script""#) &&
+                proofCommonScript.contains("Get-RomaWindowsAgentArtifactFileNameForKey") &&
+                proofCommonScript.contains("Get-RomaWindowsAgentArtifactFileNamesForKeys") &&
                 proofCommonScript.contains(#"$pdbOutput = $OutputArtifactPaths["agent_pdb"]"#) &&
                 proofCommonScript.contains(#"$proofAgentPdbOutput = $OutputArtifactPaths["proof_agent_pdb"]"#) &&
                 proofCommonScript.contains(#""proof_agent=$(Get-RomaWindowsProofAgentExecutableFileName)""#) &&
@@ -13496,6 +13498,7 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Assert-RomaWindowsMinimumPermissionOutput") &&
                 proofCommonScript.contains("function Assert-RomaWindowsAgentScriptCommonOptions") &&
                 proofCommonScript.contains("function Get-RomaWindowsProofSurfaceFiles") &&
+                proofCommonScript.contains("return Get-RomaWindowsAgentArtifactFileNamesForKeys -Keys (Get-RomaWindowsAgentArtifactManifestScriptPathKeys)") &&
                 proofCommonScript.contains("function Get-RomaWindowsInstalledProofSurfaceFileMap") &&
                 proofCommonScript.contains("function Get-RomaWindowsRuntimeDefaultOutputProof") &&
                 proofCommonScript.contains("function Get-RomaWindowsHoldTimeoutDefaultOutputProof") &&
@@ -14114,13 +14117,9 @@ struct RomaCoreChecks {
                 proveScript.contains("Get-RomaWindowsAgentArtifactFileProofs") &&
                 proveScript.contains("installed_script_parse") &&
                 proveScript.contains(#"Invoke-Step "installed script parse check""#) &&
-                proofCommonScript.contains(#"ReportProperty = "installed_laptop_proof_script""#) &&
-                proofCommonScript.contains(#"ReportProperty = "installed_laptop_proof_guide""#) &&
-                proofCommonScript.contains(#"ReportProperty = "installed_parse_script""#) &&
-                proofCommonScript.contains(#"ReportProperty = "installed_proof_common_script""#) &&
-                proofCommonScript.contains(#"ReportProperty = "installed_manifest_script""#) &&
-                proofCommonScript.contains(#"ReportProperty = "installed_package_identity_script""#) &&
-                proofCommonScript.contains(#"ReportProperty = "installed_check_set_script""#),
+                proofCommonScript.contains("foreach ($key in Get-RomaWindowsAgentArtifactManifestScriptPathKeys)") &&
+                proofCommonScript.contains(#"ReportProperty = "installed_$key""#) &&
+                proofCommonScript.contains("PackageFile = Get-RomaWindowsAgentArtifactFileNameForKey -Key $key"),
             "Windows artifact proof reports should record the installed proof surface through the shared helper"
         )
         try require(
@@ -14130,7 +14129,7 @@ struct RomaCoreChecks {
                 checkReportScript.contains("foreach ($proofSurfaceFile in Get-RomaWindowsInstalledProofSurfaceFileMap)") &&
                 checkReportScript.contains(#""$($reportProperty)_matches_package""#) &&
                 checkReportScript.contains("installed_script_parse") &&
-                proofCommonScript.contains(#"PackageFile = "check-windows-proof-set.ps1""#),
+                proofCommonScript.contains("PackageFile = Get-RomaWindowsAgentArtifactFileNameForKey -Key $key"),
             "Windows proof checker should verify installed proof surface hashes through the shared helper"
         )
         try require(
@@ -14223,8 +14222,8 @@ struct RomaCoreChecks {
             "Windows script parse checker should auto-discover and parse every proof script"
         )
         try require(
-            proofCommonScript.contains(#"installed_smoke_script"#) &&
-                proofCommonScript.contains(#"installed_install_script"#) &&
+            proofCommonScript.contains(#"ReportProperty = "installed_$key""#) &&
+                proofCommonScript.contains("PackageFile = Get-RomaWindowsAgentArtifactFileNameForKey -Key $key") &&
                 proofCommonScript.contains("function Get-RomaWindowsProofSurfaceScriptCount") &&
                 proofCommonScript.contains("function Get-RomaWindowsInstalledProofSurfaceScriptCount") &&
                 proofCommonScript.contains("function Get-RomaWindowsScriptParseCount") &&

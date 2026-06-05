@@ -312,26 +312,11 @@ function Copy-RomaWindowsAgentArtifactBundle {
     Write-Host "whisper_cli_mock=$mockWhisperOutput"
     Write-Host "whisper_cli_mock_bytes=$($mockWhisperItem.Length)"
 
-    $scriptCopies = @(
-        @{ Key = "smoke_script"; Marker = "smoke_script" },
-        @{ Key = "run_script"; Marker = "run_script" },
-        @{ Key = "install_script"; Marker = "install_script" },
-        @{ Key = "proof_script"; Marker = "proof_script" },
-        @{ Key = "laptop_proof_script"; Marker = "laptop_proof_script" },
-        @{ Key = "parse_script"; Marker = "parse_script" },
-        @{ Key = "package_identity_script"; Marker = "package_identity_script" },
-        @{ Key = "proof_common_script"; Marker = "proof_common_script" },
-        @{ Key = "manifest_script"; Marker = "manifest_script" },
-        @{ Key = "check_report_script"; Marker = "check_report_script" },
-        @{ Key = "check_set_script"; Marker = "check_set_script" }
-    )
-    foreach ($copy in $scriptCopies) {
-        $key = [string]$copy["Key"]
-        $marker = [string]$copy["Marker"]
+    foreach ($key in Get-RomaWindowsAgentArtifactCopiedProofSurfacePathKeys) {
         $scriptSource = $SourceArtifactPaths[$key]
         $scriptOutput = $OutputArtifactPaths[$key]
         Copy-Item -LiteralPath $scriptSource -Destination $scriptOutput -Force
-        Write-Host "$marker=$scriptOutput"
+        Write-Host "$key=$scriptOutput"
     }
 
     Write-RomaWindowsLaptopProofGuide -OutputPath $OutputArtifactPaths["laptop_proof_guide"]
@@ -361,11 +346,41 @@ function Get-RomaWindowsAgentArtifactManifestScriptPathKeys {
     )
 }
 
+function Get-RomaWindowsAgentArtifactCopiedProofSurfacePathKeys {
+    return Get-RomaWindowsAgentArtifactManifestScriptPathKeys |
+        Where-Object { [string]$_ -ne "laptop_proof_guide" }
+}
+
 function Get-RomaWindowsAgentArtifactManifestPathKeys {
     return @(
         Get-RomaWindowsAgentArtifactManifestConfigPathKeys
         Get-RomaWindowsAgentArtifactManifestScriptPathKeys
     )
+}
+
+function Get-RomaWindowsAgentArtifactFileNameForKey {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Key
+    )
+
+    $artifactPaths = Get-RomaWindowsAgentArtifactPathSet -ArtifactDir "."
+    if (!$artifactPaths.Contains($Key)) {
+        throw "Unknown Windows agent artifact key: $Key"
+    }
+
+    return Split-Path -Leaf $artifactPaths[$Key]
+}
+
+function Get-RomaWindowsAgentArtifactFileNamesForKeys {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object[]]$Keys
+    )
+
+    foreach ($key in $Keys) {
+        Get-RomaWindowsAgentArtifactFileNameForKey -Key ([string]$key)
+    }
 }
 
 function Write-RomaWindowsAgentArtifactManifest {
@@ -1508,20 +1523,7 @@ function Write-RomaWindowsFullLaptopProofRecheckScript {
 }
 
 function Get-RomaWindowsProofSurfaceFiles {
-    return @(
-        "smoke-windows-agent.ps1",
-        "run-windows-agent.ps1",
-        "install-windows-agent.ps1",
-        "prove-windows-agent-artifact.ps1",
-        "run-windows-laptop-proof.ps1",
-        "WINDOWS-LAPTOP-PROOF.txt",
-        "check-windows-scripts-parse.ps1",
-        "check-windows-proof-report.ps1",
-        "check-windows-proof-set.ps1",
-        "windows-proof-common.ps1",
-        "windows-manifest.ps1",
-        "windows-package-identity.ps1"
-    )
+    return Get-RomaWindowsAgentArtifactFileNamesForKeys -Keys (Get-RomaWindowsAgentArtifactManifestScriptPathKeys)
 }
 
 function Get-RomaWindowsAgentArtifactExecutableFiles {
@@ -1669,20 +1671,12 @@ function Get-RomaWindowsProofSurfaceScriptCount {
 }
 
 function Get-RomaWindowsInstalledProofSurfaceFileMap {
-    return @(
-        @{ ReportProperty = "installed_smoke_script"; PackageFile = "smoke-windows-agent.ps1" },
-        @{ ReportProperty = "installed_run_script"; PackageFile = "run-windows-agent.ps1" },
-        @{ ReportProperty = "installed_install_script"; PackageFile = "install-windows-agent.ps1" },
-        @{ ReportProperty = "installed_proof_script"; PackageFile = "prove-windows-agent-artifact.ps1" },
-        @{ ReportProperty = "installed_laptop_proof_script"; PackageFile = "run-windows-laptop-proof.ps1" },
-        @{ ReportProperty = "installed_laptop_proof_guide"; PackageFile = "WINDOWS-LAPTOP-PROOF.txt" },
-        @{ ReportProperty = "installed_parse_script"; PackageFile = "check-windows-scripts-parse.ps1" },
-        @{ ReportProperty = "installed_proof_common_script"; PackageFile = "windows-proof-common.ps1" },
-        @{ ReportProperty = "installed_manifest_script"; PackageFile = "windows-manifest.ps1" },
-        @{ ReportProperty = "installed_package_identity_script"; PackageFile = "windows-package-identity.ps1" },
-        @{ ReportProperty = "installed_check_report_script"; PackageFile = "check-windows-proof-report.ps1" },
-        @{ ReportProperty = "installed_check_set_script"; PackageFile = "check-windows-proof-set.ps1" }
-    )
+    foreach ($key in Get-RomaWindowsAgentArtifactManifestScriptPathKeys) {
+        @{
+            ReportProperty = "installed_$key"
+            PackageFile = Get-RomaWindowsAgentArtifactFileNameForKey -Key $key
+        }
+    }
 }
 
 function Get-RomaWindowsInstalledProofSurfaceScriptCount {

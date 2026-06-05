@@ -2460,6 +2460,7 @@ public struct RomaTranscriptionOutputFilter {
         }
         result = removeLeadingPauseFillerFromContinuationFragment(from: result)
         result = removeLeadingAcknowledgementFillerFromContextOverlapContinuation(result)
+        result = collapseRepeatedContextOverlapContinuationFragment(result)
         return cleanDanglingGeneratedLeadInSuffix(result)
     }
 
@@ -2520,6 +2521,24 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         return suffix
+    }
+
+    private static func collapseRepeatedContextOverlapContinuationFragment(_ text: String) -> String {
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        let collapsedText = collapseSeparatorRepeatedWords(
+            in: collapseAdjacentRepeatedWords(in: trimmedText)
+        )
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard collapsedText != trimmedText,
+              !collapsedText.isEmpty,
+              !hasInternalSentenceBoundary(collapsedText),
+              isShortFragment(collapsedText) ||
+                isNoisyFinalWordContinuationFragment(collapsedText) ||
+                hasTechnicalContinuationFragmentHead(collapsedText) else {
+            return text
+        }
+
+        return collapsedText
     }
 
     private static func removeLeadingDanglingGeneratedLeadInAfterContextOverlap(from text: String) -> String {

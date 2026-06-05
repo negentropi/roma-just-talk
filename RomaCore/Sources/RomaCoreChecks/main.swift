@@ -13294,17 +13294,23 @@ struct RomaCoreChecks {
                 packageScript.contains("Copy-RomaWindowsAgentArtifactBundle `") &&
                 proofCommonScript.contains("function Copy-RomaWindowsAgentArtifactBundle") &&
                 proofCommonScript.contains(#"@{ Key = "manifest_script"; Marker = "manifest_script" }"#) &&
-                proofCommonScript.contains(#""manifest_script=$($OutputArtifactPaths["manifest_script"])""#) &&
+                proofCommonScript.contains("function Get-RomaWindowsAgentArtifactManifestConfigPathKeys") &&
+                proofCommonScript.contains("function Get-RomaWindowsAgentArtifactManifestScriptPathKeys") &&
+                proofCommonScript.contains("function Get-RomaWindowsAgentArtifactManifestPathKeys") &&
+                proofCommonScript.contains("foreach ($artifactKey in Get-RomaWindowsAgentArtifactManifestConfigPathKeys)") &&
+                proofCommonScript.contains("foreach ($artifactKey in Get-RomaWindowsAgentArtifactManifestScriptPathKeys)") &&
+                proofCommonScript.contains(#"$manifestLines += "$artifactKey=$($OutputArtifactPaths[$artifactKey])""#) &&
+                proofCommonScript.contains(#""manifest_script""#) &&
                 !packageScript.contains("manifest_script=$manifestScriptOutput") &&
                 proofCommonScript.contains(#"@{ Key = "package_identity_script"; Marker = "package_identity_script" }"#) &&
-                proofCommonScript.contains(#""package_identity_script=$($OutputArtifactPaths["package_identity_script"])""#) &&
+                proofCommonScript.contains(#""package_identity_script""#) &&
                 !packageScript.contains("package_identity_script=$identityScriptOutput") &&
                 proofCommonScript.contains(#"@{ Key = "parse_script"; Marker = "parse_script" }"#) &&
-                proofCommonScript.contains(#""parse_script=$($OutputArtifactPaths["parse_script"])""#) &&
+                proofCommonScript.contains(#""parse_script""#) &&
                 !packageScript.contains("parse_script=$parseScriptOutput") &&
                 packageScript.contains(#"Invoke-Step "packaged script parse check""#) &&
                 proofCommonScript.contains(#"@{ Key = "proof_common_script"; Marker = "proof_common_script" }"#) &&
-                proofCommonScript.contains(#""proof_common_script=$($OutputArtifactPaths["proof_common_script"])""#) &&
+                proofCommonScript.contains(#""proof_common_script""#) &&
                 !packageScript.contains("proof_common_script=$proofCommonScriptOutput") &&
                 proofCommonScript.contains("function Write-RomaWindowsAgentArtifactManifest") &&
                 packageScript.contains("Write-RomaWindowsAgentArtifactManifest `") &&
@@ -13823,6 +13829,8 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Get-RomaWindowsAgentArtifactRequiredManifestKeys") &&
                 proofCommonScript.contains(#""install_proof_config""#) &&
                 proofCommonScript.contains(#""local_whisper_shortcut""#) &&
+                proofCommonScript.contains(#""laptop_native_preflight_checker_smoke_report""#) &&
+                proofCommonScript.contains("Get-RomaWindowsAgentArtifactManifestPathKeys") &&
                 proofCommonScript.contains(#""swift_runtime_dlls""#) &&
                 proofCommonScript.contains("function Assert-RomaWindowsAgentArtifactManifestKeys") &&
                 proofCommonScript.contains("foreach ($key in Get-RomaWindowsAgentArtifactRequiredManifestKeys)") &&
@@ -13868,7 +13876,8 @@ struct RomaCoreChecks {
         )
         try require(
             packageScript.contains("Write-RomaWindowsAgentArtifactManifest `") &&
-                proofCommonScript.contains(#""laptop_proof_guide=$($OutputArtifactPaths["laptop_proof_guide"])""#) &&
+                proofCommonScript.contains(#""laptop_proof_guide""#) &&
+                proofCommonScript.contains("foreach ($artifactKey in Get-RomaWindowsAgentArtifactManifestScriptPathKeys)") &&
                 proofCommonScript.contains(#"Write-RomaWindowsLaptopProofGuide -OutputPath $OutputArtifactPaths["laptop_proof_guide"]"#) &&
                 !packageScript.contains("Write-RomaWindowsLaptopProofGuide") &&
                 proofCommonScript.contains("function Write-RomaWindowsLaptopProofGuide") &&

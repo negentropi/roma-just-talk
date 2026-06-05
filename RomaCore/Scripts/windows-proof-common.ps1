@@ -337,6 +337,37 @@ function Copy-RomaWindowsAgentArtifactBundle {
     Write-RomaWindowsLaptopProofGuide -OutputPath $OutputArtifactPaths["laptop_proof_guide"]
 }
 
+function Get-RomaWindowsAgentArtifactManifestConfigPathKeys {
+    return @(
+        "sample_config",
+        "sample_local_whisper_config"
+    )
+}
+
+function Get-RomaWindowsAgentArtifactManifestScriptPathKeys {
+    return @(
+        "smoke_script",
+        "run_script",
+        "install_script",
+        "proof_script",
+        "laptop_proof_script",
+        "laptop_proof_guide",
+        "parse_script",
+        "package_identity_script",
+        "proof_common_script",
+        "manifest_script",
+        "check_report_script",
+        "check_set_script"
+    )
+}
+
+function Get-RomaWindowsAgentArtifactManifestPathKeys {
+    return @(
+        Get-RomaWindowsAgentArtifactManifestConfigPathKeys
+        Get-RomaWindowsAgentArtifactManifestScriptPathKeys
+    )
+}
+
 function Write-RomaWindowsAgentArtifactManifest {
     param(
         [Parameter(Mandatory = $true)]
@@ -371,7 +402,7 @@ function Write-RomaWindowsAgentArtifactManifest {
 
     $agentOutput = $OutputArtifactPaths["agent"]
     $agentFile = Get-Item -LiteralPath $agentOutput
-    @(
+    $manifestLines = @(
         "agent=RomaWindowsAgent",
         "configuration=$Configuration",
         "source_repository=$($GitMetadata.Repository)",
@@ -380,9 +411,13 @@ function Write-RomaWindowsAgentArtifactManifest {
         "source_dirty=$($GitMetadata.Dirty)",
         "source=$($AgentSource.FullName)",
         "output=$agentOutput",
-        "proof_agent=$(Get-RomaWindowsProofAgentExecutableFileName)",
-        "sample_config=$($OutputArtifactPaths["sample_config"])",
-        "sample_local_whisper_config=$($OutputArtifactPaths["sample_local_whisper_config"])",
+        "proof_agent=$(Get-RomaWindowsProofAgentExecutableFileName)"
+    )
+    foreach ($artifactKey in Get-RomaWindowsAgentArtifactManifestConfigPathKeys) {
+        $manifestLines += "$artifactKey=$($OutputArtifactPaths[$artifactKey])"
+    }
+
+    $manifestLines += @(
         "whisper_cli_mock=$(Get-RomaWindowsWhisperCLIMockExecutableFileName)",
         "install_proof_dir=$InstallProofDir",
         "install_proof_config=$InstallProofConfigPath",
@@ -391,23 +426,18 @@ function Write-RomaWindowsAgentArtifactManifest {
         "local_whisper_install_config=$LocalWhisperInstallConfigPath",
         "local_whisper_shortcut=$LocalWhisperShortcutPath",
         "laptop_native_preflight_checker_smoke_report=$LaptopNativePreflightCheckerSmokeReport",
-        "laptop_preflight_checker_smoke_report=$LaptopPreflightCheckerSmokeReport",
-        "smoke_script=$($OutputArtifactPaths["smoke_script"])",
-        "run_script=$($OutputArtifactPaths["run_script"])",
-        "install_script=$($OutputArtifactPaths["install_script"])",
-        "proof_script=$($OutputArtifactPaths["proof_script"])",
-        "laptop_proof_script=$($OutputArtifactPaths["laptop_proof_script"])",
-        "laptop_proof_guide=$($OutputArtifactPaths["laptop_proof_guide"])",
-        "parse_script=$($OutputArtifactPaths["parse_script"])",
-        "package_identity_script=$($OutputArtifactPaths["package_identity_script"])",
-        "proof_common_script=$($OutputArtifactPaths["proof_common_script"])",
-        "manifest_script=$($OutputArtifactPaths["manifest_script"])",
-        "check_report_script=$($OutputArtifactPaths["check_report_script"])",
-        "check_set_script=$($OutputArtifactPaths["check_set_script"])",
+        "laptop_preflight_checker_smoke_report=$LaptopPreflightCheckerSmokeReport"
+    )
+    foreach ($artifactKey in Get-RomaWindowsAgentArtifactManifestScriptPathKeys) {
+        $manifestLines += "$artifactKey=$($OutputArtifactPaths[$artifactKey])"
+    }
+
+    $manifestLines += @(
         "swift_runtime_dir=$($SwiftRuntime.Directory)",
         "swift_runtime_dlls=$($SwiftRuntime.DllCount)",
         "bytes=$($agentFile.Length)"
-    ) | Set-Content -LiteralPath $ManifestPath -Encoding UTF8
+    )
+    $manifestLines | Set-Content -LiteralPath $ManifestPath -Encoding UTF8
 }
 
 function Require-RomaWindowsFile {
@@ -1523,23 +1553,14 @@ function Get-RomaWindowsAgentArtifactRequiredManifestKeys {
         "output",
         "proof_agent",
         "whisper_cli_mock",
-        "smoke_script",
-        "run_script",
-        "install_script",
-        "proof_script",
-        "laptop_proof_script",
-        "parse_script",
-        "check_report_script",
-        "check_set_script",
         "install_proof_config",
         "install_proof_shortcut",
         "local_whisper_install_config",
         "local_whisper_shortcut",
-        "proof_common_script",
-        "manifest_script",
-        "package_identity_script",
+        "laptop_native_preflight_checker_smoke_report",
+        "laptop_preflight_checker_smoke_report",
         "swift_runtime_dlls"
-    )
+    ) + (Get-RomaWindowsAgentArtifactManifestPathKeys)
 }
 
 function Assert-RomaWindowsAgentArtifactManifestKeys {

@@ -692,6 +692,7 @@ function Get-RomaWindowsProofReportIdentity {
             -PackageIdentity $packageIdentity `
             -Context "$context package_identity" `
             -RequireEntryCount
+        PackageEntryCount = [int64](Require-RomaWindowsObjectProperty -Object $packageIdentity -Name "entry_count" -Context "$context package_identity")
         Source = $source
     }
 }
@@ -811,6 +812,25 @@ function Write-RomaWindowsProofReportIdentityMarkers {
     Write-Host ("{0}_source_branch={1}" -f $Prefix, [string]$source["Branch"])
     Write-Host ("{0}_source_commit={1}" -f $Prefix, [string]$source["Commit"])
     Write-Host ("{0}_source_dirty={1}" -f $Prefix, [string]$source["Dirty"])
+}
+
+function Write-RomaWindowsProofReportIdentityProofMarkers {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Identity,
+        [switch]$IncludeWindows
+    )
+
+    $source = $Identity["Source"]
+    Write-Host "proof_value=package_identity.algorithm value=sha256"
+    Write-Host ("proof_number=package_identity.entry_count value={0} minimum=0" -f [int64]$Identity["PackageEntryCount"])
+    Write-Host ("proof_source_commit={0}" -f [string]$source["Commit"])
+    Write-Host ("proof_source_dirty={0}" -f [string]$source["Dirty"])
+
+    if ($IncludeWindows) {
+        Write-Host ("proof_windows_platform={0}" -f [string]$Identity["Platform"])
+        Write-Host ("proof_windows_user={0}" -f [string]$Identity["UserName"])
+    }
 }
 
 function Assert-RomaWindowsPathNotPackagedArtifact {

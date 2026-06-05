@@ -11935,12 +11935,16 @@ struct RomaCoreChecks {
             "Windows package script should record source provenance before creating proof artifacts"
         )
         try require(
-            checkReportScript.contains("function Assert-ManifestSourceProof"),
-            "Windows proof checker should validate manifest source provenance"
+            proofCommonScript.contains("function Get-RomaWindowsProofReportIdentity") &&
+                checkReportScript.contains(#"Get-RomaWindowsProofReportIdentity -Report $report -ReportName "report""#) &&
+                checkReportScript.contains(#"Get-RomaWindowsProofReportIdentity -Report $Report -ReportName "laptop_preflight""#) &&
+                !checkReportScript.contains("function Assert-ManifestSourceProof"),
+            "Windows proof checker should validate manifest source provenance through shared report identity"
         )
         try require(
             proofCommonScript.contains("function Get-RomaWindowsManifestSourceProvenance") &&
-                checkReportScript.contains("Get-RomaWindowsManifestSourceProvenance") &&
+                proofCommonScript.contains("function Write-RomaWindowsProofReportIdentityProofMarkers") &&
+                proofCommonScript.contains("proof_source_commit={0}") &&
                 proofCommonScript.contains("function Get-RomaWindowsProofReportIdentity") &&
                 checkSetScript.contains("Get-RomaWindowsProofReportIdentity") &&
                 proofCommonScript.contains("source_repository must identify the packaged source repository"),
@@ -11950,7 +11954,8 @@ struct RomaCoreChecks {
             proofCommonScript.contains("source_commit must be a 40-character git SHA") &&
                 proofCommonScript.contains("function Assert-RomaWindowsCleanManifestSourceProvenance") &&
                 proofCommonScript.contains(#"Get-RomaWindowsManifestSourceProvenance `"#) &&
-                checkReportScript.contains(#"-Context "manifest""#) &&
+                checkReportScript.contains("Assert-RomaWindowsProofReportIdentityComplete") &&
+                checkReportScript.contains("Write-RomaWindowsProofReportIdentityProofMarkers") &&
                 proofCommonScript.contains(#"-Context "$context manifest""#),
             "Windows proof checker should reject missing or malformed source commits"
         )
@@ -13234,9 +13239,12 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("^[0-9a-fA-F]{64}$") &&
                 proofCommonScript.contains("^0{64}$") &&
                 proofCommonScript.contains("fingerprint must be non-placeholder") &&
-                checkReportScript.contains("Get-RomaWindowsPackageIdentityFingerprint") &&
+                proofCommonScript.contains("PackageEntryCount") &&
+                proofCommonScript.contains("function Write-RomaWindowsProofReportIdentityProofMarkers") &&
                 checkReportScript.contains("Get-RomaWindowsProofReportIdentity") &&
+                checkReportScript.contains("Write-RomaWindowsProofReportIdentityProofMarkers") &&
                 checkReportScript.contains("Write-RomaWindowsProofReportIdentityMarkers") &&
+                !checkReportScript.contains("function Assert-PackageIdentityProof") &&
                 checkSetScript.contains("Get-RomaWindowsProofReportIdentity"),
             "Windows proof report checker should reject malformed and placeholder package identity fingerprints"
         )

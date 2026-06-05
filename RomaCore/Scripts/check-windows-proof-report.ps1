@@ -50,22 +50,6 @@ Set-Alias -Name Assert-ListenerRuntimeProof -Value Assert-RomaWindowsProofReport
 Set-Alias -Name Assert-PasteIntentProof -Value Assert-RomaWindowsProofReportPasteIntent -Scope Local -Force
 Set-Alias -Name Assert-HoldHookRuntimeProof -Value Assert-RomaWindowsProofReportHoldHookRuntime -Scope Local -Force
 
-function Assert-PackageIdentityProof {
-    param(
-        [Parameter(Mandatory = $true)]
-        [object]$PackageIdentity
-    )
-
-    $fingerprint = Get-RomaWindowsPackageIdentityFingerprint `
-        -PackageIdentity $PackageIdentity `
-        -Context "package_identity" `
-        -RequireEntryCount
-    Write-Host "proof_value=package_identity.algorithm value=sha256"
-    Write-Host "proof_number=package_identity.entry_count value=$([int64](Require-Property -Object $PackageIdentity -Name "entry_count")) minimum=0"
-
-    return $fingerprint
-}
-
 function Assert-RealCloudBackendProof {
     param(
         [Parameter(Mandatory = $true)]
@@ -143,21 +127,6 @@ function Assert-RealCloudBackendProof {
     }
 
     Write-Host "proof_real_cloud_backend host=$endpointHost model=$model"
-}
-
-function Assert-ManifestSourceProof {
-    param(
-        [Parameter(Mandatory = $true)]
-        [object]$Manifest
-    )
-
-    $source = Get-RomaWindowsManifestSourceProvenance `
-        -Manifest $Manifest `
-        -Context "manifest"
-    Assert-NonEmptyString -Object $Manifest -Name "source_branch"
-
-    Write-Host "proof_source_commit=$($source['Commit'])"
-    Write-Host "proof_source_dirty=$($source['Dirty'])"
 }
 
 function Assert-HoldTimeoutDefaultProof {
@@ -363,22 +332,13 @@ function Assert-LaptopPreflightReport {
         -WriteProofValue
     $proofDir = Get-NonEmptyStringProperty -Object $Report -Name "proof_dir"
 
-    $packageIdentity = Require-Property -Object $Report -Name "package_identity"
-    Assert-PackageIdentityProof -PackageIdentity $packageIdentity | Out-Null
-
-    $manifest = Require-Property -Object $Report -Name "manifest"
-    Assert-ManifestSourceProof -Manifest $manifest
-
     $identity = Get-RomaWindowsProofReportIdentity -Report $Report -ReportName "laptop_preflight"
     Assert-RomaWindowsProofReportIdentityComplete `
         -Identity $identity `
         -ProofName "Laptop preflight proof" `
         -RequireWindows `
         -RequireCleanSource
-
-    $os = Require-Property -Object $Report -Name "os"
-    $platform = [string](Require-Property -Object $os -Name "platform")
-    Write-Host "proof_windows_platform=$platform"
+    Write-RomaWindowsProofReportIdentityProofMarkers -Identity $identity -IncludeWindows
 
     $preflights = Require-Property -Object $Report -Name "preflights"
     Assert-Boolean -Object $preflights -Name "permission_surface" -Expected $true
@@ -550,28 +510,18 @@ Assert-NonEmptyString -Object $report -Name "generated_at"
 Assert-NonEmptyString -Object $report -Name "proof_mode"
 Assert-NonEmptyString -Object $report -Name "package_dir"
 Assert-NonEmptyString -Object $report -Name "install_dir"
+$identity = Get-RomaWindowsProofReportIdentity -Report $report -ReportName "report"
+Assert-RomaWindowsProofReportIdentityComplete `
+    -Identity $identity `
+    -ProofName "Windows proof report" `
+    -RequireWindows:$RequireWindowsPlatform
+Write-RomaWindowsProofReportIdentityProofMarkers `
+    -Identity $identity `
+    -IncludeWindows:$RequireWindowsPlatform
 $packageIdentity = Require-Property -Object $report -Name "package_identity"
-Assert-StringEquals `
-    -Actual ([string](Require-Property -Object $packageIdentity -Name "algorithm")) `
-    -Expected "sha256" `
-    -Name "package_identity.algorithm"
-Assert-NonEmptyString -Object $packageIdentity -Name "fingerprint"
-Assert-NumberGreaterThan -Object $packageIdentity -Name "entry_count" -Minimum 0
-$manifest = Require-Property -Object $report -Name "manifest"
-Assert-ManifestSourceProof -Manifest $manifest
 
 if ($RequireWindowsPlatform) {
-    $os = Require-Property -Object $report -Name "os"
-    $platform = [string](Require-Property -Object $os -Name "platform")
-    if ($platform -ne "Win32NT") {
-        throw "Expected os.platform to be Win32NT, got $platform"
-    }
-
-    Write-Host "proof_windows_platform=$platform"
-    Assert-NonEmptyString -Object $os -Name "user_name"
-    Assert-NonEmptyString -Object $os -Name "user_sid"
-    $userName = [string](Require-Property -Object $os -Name "user_name")
-    Write-Host "proof_windows_user=$userName"
+    Assert-NonEmptyString -Object (Require-Property -Object $report -Name "os") -Name "user_sid"
 }
 
 if (![string]::IsNullOrWhiteSpace($ExpectedMode)) {

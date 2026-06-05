@@ -13290,6 +13290,8 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Assert-RomaWindowsProofReportStringEquals") &&
                 proofCommonScript.contains("function Assert-RomaWindowsProofReportNumberGreaterThan") &&
                 proofCommonScript.contains("function Assert-RomaWindowsProofReportNumberEquals") &&
+                proofCommonScript.contains("function Assert-RomaWindowsProofReportFile") &&
+                proofCommonScript.contains("function Assert-RomaWindowsProofReportFileHashEquals") &&
                 checkReportScript.contains("Set-Alias -Name Require-Property -Value Require-RomaWindowsProofReportProperty") &&
                 checkReportScript.contains("Set-Alias -Name Assert-Boolean -Value Assert-RomaWindowsProofReportBoolean") &&
                 checkReportScript.contains("Set-Alias -Name Assert-NonEmptyString -Value Assert-RomaWindowsProofReportNonEmptyString") &&
@@ -13297,13 +13299,17 @@ struct RomaCoreChecks {
                 checkReportScript.contains("Set-Alias -Name Assert-StringEquals -Value Assert-RomaWindowsProofReportStringEquals") &&
                 checkReportScript.contains("Set-Alias -Name Assert-NumberGreaterThan -Value Assert-RomaWindowsProofReportNumberGreaterThan") &&
                 checkReportScript.contains("Set-Alias -Name Assert-NumberEquals -Value Assert-RomaWindowsProofReportNumberEquals") &&
+                checkReportScript.contains("Set-Alias -Name Assert-FileProof -Value Assert-RomaWindowsProofReportFile") &&
+                checkReportScript.contains("Set-Alias -Name Assert-FileHashEquals -Value Assert-RomaWindowsProofReportFileHashEquals") &&
                 !checkReportScript.contains("function Require-Property") &&
                 !checkReportScript.contains("function Assert-Boolean") &&
                 !checkReportScript.contains("function Assert-NonEmptyString") &&
                 !checkReportScript.contains("function Get-NonEmptyStringProperty") &&
                 !checkReportScript.contains("function Assert-StringEquals") &&
                 !checkReportScript.contains("function Assert-NumberGreaterThan") &&
-                !checkReportScript.contains("function Assert-NumberEquals"),
+                !checkReportScript.contains("function Assert-NumberEquals") &&
+                !checkReportScript.contains("function Assert-FileProof") &&
+                !checkReportScript.contains("function Assert-FileHashEquals"),
             "Windows proof report checker should share generic proof report assertions"
         )
         try require(

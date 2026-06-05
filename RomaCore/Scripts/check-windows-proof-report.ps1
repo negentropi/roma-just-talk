@@ -42,57 +42,8 @@ Set-Alias -Name Get-NonEmptyStringProperty -Value Get-RomaWindowsProofReportNonE
 Set-Alias -Name Assert-StringEquals -Value Assert-RomaWindowsProofReportStringEquals -Scope Local -Force
 Set-Alias -Name Assert-NumberGreaterThan -Value Assert-RomaWindowsProofReportNumberGreaterThan -Scope Local -Force
 Set-Alias -Name Assert-NumberEquals -Value Assert-RomaWindowsProofReportNumberEquals -Scope Local -Force
-
-function Assert-FileProof {
-    param(
-        [Parameter(Mandatory = $true)]
-        [object]$Proof,
-        [Parameter(Mandatory = $true)]
-        [string]$Name,
-        [int64]$MinimumBytes = 1
-    )
-
-    $path = Require-Property -Object $Proof -Name "path"
-    $exists = [bool](Require-Property -Object $Proof -Name "exists")
-    $bytes = [int64](Require-Property -Object $Proof -Name "bytes")
-
-    if ([string]::IsNullOrWhiteSpace($path)) {
-        throw "$Name path is empty"
-    }
-    if (!$exists) {
-        throw "$Name does not exist: $path"
-    }
-    if ($bytes -lt $MinimumBytes) {
-        throw "$Name has too few bytes: $path bytes=$bytes minimum=$MinimumBytes"
-    }
-
-    Write-Host "proof_file=$Name path=$path bytes=$bytes"
-}
-
-function Assert-FileHashEquals {
-    param(
-        [Parameter(Mandatory = $true)]
-        [object]$ActualProof,
-        [Parameter(Mandatory = $true)]
-        [object]$ExpectedProof,
-        [Parameter(Mandatory = $true)]
-        [string]$Name
-    )
-
-    $actualHash = [string](Require-Property -Object $ActualProof -Name "sha256")
-    $expectedHash = [string](Require-Property -Object $ExpectedProof -Name "sha256")
-    if ([string]::IsNullOrWhiteSpace($actualHash)) {
-        throw "$Name actual sha256 is empty"
-    }
-    if ([string]::IsNullOrWhiteSpace($expectedHash)) {
-        throw "$Name expected sha256 is empty"
-    }
-    if ($actualHash -ne $expectedHash) {
-        throw "Expected $Name sha256 to be $expectedHash, got $actualHash"
-    }
-
-    Write-Host "proof_hash=$Name sha256=$actualHash"
-}
+Set-Alias -Name Assert-FileProof -Value Assert-RomaWindowsProofReportFile -Scope Local -Force
+Set-Alias -Name Assert-FileHashEquals -Value Assert-RomaWindowsProofReportFileHashEquals -Scope Local -Force
 
 function Assert-ShortcutProof {
     param(

@@ -361,6 +361,57 @@ function Assert-RomaWindowsProofReportNumberEquals {
     Write-Host "proof_number=$Name value=$actual expected=$Expected"
 }
 
+function Assert-RomaWindowsProofReportFile {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Proof,
+        [Parameter(Mandatory = $true)]
+        [string]$Name,
+        [int64]$MinimumBytes = 1
+    )
+
+    $path = [string](Require-RomaWindowsProofReportProperty -Object $Proof -Name "path")
+    $exists = [bool](Require-RomaWindowsProofReportProperty -Object $Proof -Name "exists")
+    $bytes = [int64](Require-RomaWindowsProofReportProperty -Object $Proof -Name "bytes")
+
+    if ([string]::IsNullOrWhiteSpace($path)) {
+        throw "$Name path is empty"
+    }
+    if (!$exists) {
+        throw "$Name does not exist: $path"
+    }
+    if ($bytes -lt $MinimumBytes) {
+        throw "$Name has too few bytes: $path bytes=$bytes minimum=$MinimumBytes"
+    }
+
+    Write-Host "proof_file=$Name path=$path bytes=$bytes"
+}
+
+function Assert-RomaWindowsProofReportFileHashEquals {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$ActualProof,
+        [Parameter(Mandatory = $true)]
+        [object]$ExpectedProof,
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    $actualHash = [string](Require-RomaWindowsProofReportProperty -Object $ActualProof -Name "sha256")
+    $expectedHash = [string](Require-RomaWindowsProofReportProperty -Object $ExpectedProof -Name "sha256")
+    if ([string]::IsNullOrWhiteSpace($actualHash)) {
+        throw "$Name actual sha256 is empty"
+    }
+    if ([string]::IsNullOrWhiteSpace($expectedHash)) {
+        throw "$Name expected sha256 is empty"
+    }
+    if ($actualHash -ne $expectedHash) {
+        throw "Expected $Name sha256 to be $expectedHash, got $actualHash"
+    }
+
+    Write-Host "proof_hash=$Name sha256=$actualHash"
+}
+
 function Get-RomaWindowsPackageIdentityFingerprint {
     param(
         [Parameter(Mandatory = $true)]

@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Trimmed generated bracketed task and callout markers after repeated cursor context plus pause fillers.
 - Trimmed generated spaced symbol markers after repeated cursor context plus pause fillers.
 - Trimmed generated inline formatting tags after repeated cursor context plus pause fillers.
 - Trimmed generated strikethrough and highlight wrappers after repeated cursor context plus pause fillers.

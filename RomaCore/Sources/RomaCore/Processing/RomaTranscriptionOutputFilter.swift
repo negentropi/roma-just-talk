@@ -2657,6 +2657,7 @@ public struct RomaTranscriptionOutputFilter {
         result = unwrapPlainSquareBracketedBoundaryContinuationFragment(from: result)
         result = unwrapPlainNonASCIIBoundaryContinuationFragment(from: result)
         result = unwrapGeneratedInlineTagContinuationFragment(from: result)
+        result = removeLeadingGeneratedBracketMarkerContinuationPrefix(from: result)
         result = stripBoundaryNoise(from: result)
         result = removeLeadingGeneratedContinuationFragmentNoise(from: result, after: precedingText)
         result = unwrapPlainSquareBracketedBoundaryContinuationFragment(from: result)
@@ -2706,6 +2707,33 @@ public struct RomaTranscriptionOutputFilter {
         return suffix
     }
 
+    private static func removeLeadingGeneratedBracketMarkerContinuationPrefix(from text: String) -> String {
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let regex = try? NSRegularExpression(
+            pattern: #"(?i)^\s*\[(?:\s|x|![a-z][a-z0-9_-]{0,31})\]\s+(.+)$"#
+        ),
+        let match = regex.firstMatch(in: trimmedText, range: NSRange(trimmedText.startIndex..., in: trimmedText)),
+        match.numberOfRanges >= 2,
+        let suffixRange = Range(match.range(at: 1), in: trimmedText) else {
+            return text
+        }
+
+        var suffix = String(trimmedText[suffixRange])
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        suffix = unwrapNoisyNestedContinuationBoundaryFragment(from: suffix)
+        suffix = unwrapPlainSquareBracketedBoundaryContinuationFragment(from: suffix)
+        suffix = stripBoundaryNoise(from: suffix)
+        guard !suffix.isEmpty,
+              !hasInternalSentenceBoundary(suffix),
+              isShortFragment(suffix) ||
+                isNoisyFinalWordContinuationFragment(suffix) ||
+                hasTechnicalContinuationFragmentHead(suffix) else {
+            return text
+        }
+
+        return suffix
+    }
+
     private static func removeLeadingPauseFillerFromContinuationFragment(
         from text: String,
         after precedingText: String
@@ -2739,6 +2767,7 @@ public struct RomaTranscriptionOutputFilter {
         cleanedSuffix = unwrapNoisyNestedContinuationBoundaryFragment(from: cleanedSuffix)
         cleanedSuffix = unwrapPlainSquareBracketedBoundaryContinuationFragment(from: cleanedSuffix)
         cleanedSuffix = unwrapGeneratedInlineTagContinuationFragment(from: cleanedSuffix)
+        cleanedSuffix = removeLeadingGeneratedBracketMarkerContinuationPrefix(from: cleanedSuffix)
         cleanedSuffix = stripBoundaryNoise(from: cleanedSuffix)
         cleanedSuffix = removeLeadingDiscourseFillerFromContinuationFragment(from: cleanedSuffix, after: precedingText)
             .trimmingCharacters(in: .whitespacesAndNewlines)
@@ -11539,6 +11568,7 @@ public struct RomaTranscriptionOutputFilter {
                 after: precedingText
             )
         }
+        result = removeLeadingGeneratedBracketMarkerContinuationPrefix(from: result)
         if !startsWithListMarker(result) {
             result = removeLeadingFragmentPunctuation(from: result)
         }

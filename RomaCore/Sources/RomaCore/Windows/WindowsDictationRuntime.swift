@@ -3,6 +3,19 @@ import Foundation
 public enum WindowsDictationTrigger: Equatable, Hashable, Sendable {
     case toggle(recordSeconds: TimeInterval)
     case hold(timeoutMilliseconds: UInt32)
+
+    public var recordingMode: String {
+        switch self {
+        case .toggle:
+            return "toggle"
+        case .hold:
+            return "hold"
+        }
+    }
+
+    public var recordingModeProofLine: String {
+        "recording_mode=\(recordingMode)"
+    }
 }
 
 public enum WindowsDictationRuntimeEvent: Equatable, Hashable, Sendable {

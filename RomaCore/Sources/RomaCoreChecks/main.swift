@@ -7485,9 +7485,20 @@ struct RomaCoreChecks {
                 timeoutMilliseconds == 22_000,
                 "Windows config should own runtime request hold trigger"
             )
+            try require(
+                mergedRuntimeRequest.trigger.recordingMode == "hold" &&
+                    mergedRuntimeRequest.trigger.recordingModeProofLine == "recording_mode=hold",
+                "Windows runtime trigger should own hold recording-mode proof output"
+            )
         case .toggle:
             throw CheckFailure("Windows config should resolve hold-hook config to a hold trigger")
         }
+        let toggleTrigger = try RomaWindowsAgentConfiguration(usesHoldHook: false).dictationTrigger()
+        try require(
+            toggleTrigger.recordingMode == "toggle" &&
+                toggleTrigger.recordingModeProofLine == "recording_mode=toggle",
+            "Windows runtime trigger should own toggle recording-mode proof output"
+        )
         try require(
             try merged.apiKeySource() == .environment(name: "ROMA_KEY"),
             "merged config should resolve env key source"
@@ -9814,11 +9825,17 @@ struct RomaCoreChecks {
             windowsAgentConfigurationSource.contains("public func windowsDictationRuntimeRequest(") &&
                 windowsAgentConfigurationSource.contains("public func dictationTrigger() throws -> WindowsDictationTrigger") &&
                 windowsAgentConfigurationSource.contains("public func textProcessingConfiguration() -> DictationTextProcessingConfiguration") &&
+                windowsDictationRuntimeSource.contains("public var recordingModeProofLine") &&
                 windowsAgentSource.contains("try configuration.windowsDictationRuntimeRequest(") &&
+                windowsAgentSource.contains("context.request.trigger.recordingModeProofLine") &&
+                windowsAgentSource.contains("configuration.dictationTrigger().recordingModeProofLine") &&
                 proofAgentSource.contains("try configuration.windowsDictationRuntimeRequest(") &&
+                proofAgentSource.contains("request.trigger.recordingModeProofLine") &&
+                !windowsAgentSource.contains(#""recording_mode=\(configuration.resolvedUsesHoldHook ? "hold" : "toggle")""#) &&
+                !proofAgentSource.contains(#""recording_mode=\(shouldUseHoldHook ? "hold" : "toggle")""#) &&
                 !windowsAgentSource.contains("let trigger: WindowsDictationTrigger") &&
                 !proofAgentSource.contains("let trigger: WindowsDictationTrigger"),
-            "Windows agent and proof agent should reuse shared config-to-runtime request composition"
+            "Windows agent and proof agent should reuse shared config-to-runtime request composition and trigger proof labels"
         )
         try require(
             doctorOutputSource.contains(#""windows_dictation_runtime_uses_pipeline_source=true""#) &&

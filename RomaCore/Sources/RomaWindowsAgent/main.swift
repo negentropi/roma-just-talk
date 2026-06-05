@@ -57,7 +57,6 @@ struct RomaWindowsAgent {
         var transcriptionClient: RomaTranscriptionClient
         var shouldPaste: Bool
         var clipboardRestoreConfiguration: WindowsClipboardRestoreConfiguration
-        var shouldUseHoldHook: Bool
         var wordReplacements: [RomaWordReplacementRule]
         var request: WindowsDictationRuntimeRequest
     }
@@ -97,7 +96,6 @@ struct RomaWindowsAgent {
         let transcriptionClient = try RomaTranscriptionClient.make(from: configuration)
         let shouldPaste = configuration.resolvedShouldPaste
         let clipboardRestoreConfiguration = configuration.clipboardRestoreConfiguration()
-        let shouldUseHoldHook = configuration.resolvedUsesHoldHook
         let wordReplacements = configuration.wordReplacements
         let request = try configuration.windowsDictationRuntimeRequest(
             outputURL: outputURL,
@@ -110,7 +108,6 @@ struct RomaWindowsAgent {
             transcriptionClient: transcriptionClient,
             shouldPaste: shouldPaste,
             clipboardRestoreConfiguration: clipboardRestoreConfiguration,
-            shouldUseHoldHook: shouldUseHoldHook,
             wordReplacements: wordReplacements,
             request: request
         )
@@ -122,7 +119,7 @@ struct RomaWindowsAgent {
         for line in context.transcriptionClient.details {
             print(line)
         }
-        print("recording_mode=\(context.shouldUseHoldHook ? "hold" : "toggle")")
+        print(context.request.trigger.recordingModeProofLine)
         print("paste_requested=\(context.shouldPaste)")
         print("restore_clipboard_after_paste=\(context.clipboardRestoreConfiguration.restoreClipboard)")
         print("clipboard_restore_delay_seconds=\(context.clipboardRestoreConfiguration.restoreDelaySeconds)")
@@ -241,7 +238,7 @@ struct RomaWindowsAgent {
         print("paste=\(configuration.resolvedShouldPaste)")
         print("restore_clipboard_after_paste=\(configuration.clipboardRestoreConfiguration().restoreClipboard)")
         print("clipboard_restore_delay_seconds=\(configuration.clipboardRestoreConfiguration().restoreDelaySeconds)")
-        print("recording_mode=\(configuration.resolvedUsesHoldHook ? "hold" : "toggle")")
+        print(try configuration.dictationTrigger().recordingModeProofLine)
         print("word_replacements=\(configuration.wordReplacements.count)")
         print("written=true")
     }
@@ -268,7 +265,7 @@ struct RomaWindowsAgent {
         for line in setupProofLines {
             print(line)
         }
-        print("recording_mode=\(configuration.resolvedUsesHoldHook ? "hold" : "toggle")")
+        print(try configuration.dictationTrigger().recordingModeProofLine)
         print("paste=\(configuration.resolvedShouldPaste)")
         print("restore_clipboard_after_paste=\(clipboardRestoreConfiguration.restoreClipboard)")
         print("clipboard_restore_delay_seconds=\(clipboardRestoreConfiguration.restoreDelaySeconds)")

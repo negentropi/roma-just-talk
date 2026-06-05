@@ -4,6 +4,7 @@
 
 - Shared packaged and installed Windows listener-smoke proof markers through proof-helper marker maps.
 - Shared Windows laptop preflight hotkey, microphone, and local-whisper proof markers through proof-helper marker maps.
+- Preserved explicit punctuation commands after correction-marked "final word" continuations.
 - Shared Windows dictation and listener runtime-log proof markers through proof-helper marker maps.
 - Shared Windows config-doctor output assertions and proof shaping through proof-helper marker maps.
 - Preserved explicit punctuation commands after short "final word" continuation artifacts.

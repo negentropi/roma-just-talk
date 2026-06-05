@@ -2135,7 +2135,9 @@ public struct RomaTranscriptionOutputFilter {
         after precedingText: String
     ) -> Bool {
         let trimmedSuffix = suffix.trimmingCharacters(in: .whitespacesAndNewlines)
-        let isNoisyFinalWordOrSingleContinuation = isNoisyFinalWordOrSingleContinuationFragment(trimmedSuffix)
+        let punctuationStrippedSuffix = removeTrailingNoisyFragmentPunctuation(from: trimmedSuffix)
+        let isNoisyFinalWordOrSingleContinuation = isNoisyFinalWordContinuationFragment(trimmedSuffix) ||
+            isNoisyFinalWordContinuationFragment(punctuationStrippedSuffix)
         guard !trimmedSuffix.isEmpty,
               !hasInternalSentenceBoundary(trimmedSuffix),
               isShortFragment(trimmedSuffix) ||
@@ -5450,7 +5452,32 @@ public struct RomaTranscriptionOutputFilter {
                 .union(removableTrailingSentenceFragmentPunctuation)
                 .union(.whitespacesAndNewlines)
         )
-        return isNoisyFinalWordContinuationFragment(fragment)
+        return isNoisyFinalWordContinuationAfterOptionalLeadingMarker(fragment)
+    }
+
+    private static func isNoisyFinalWordContinuationAfterOptionalLeadingMarker(_ text: String) -> Bool {
+        var candidate = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        if isNoisyFinalWordContinuationFragment(candidate) {
+            return true
+        }
+
+        guard let regex = try? NSRegularExpression(pattern: continuationFragmentLeadingDiscourseFillerPattern) else {
+            return false
+        }
+
+        var removalCount = 0
+        while removalCount < 3,
+              let match = regex.firstMatch(in: candidate, range: NSRange(candidate.startIndex..., in: candidate)),
+              let matchRange = Range(match.range, in: candidate) {
+            candidate = String(candidate[matchRange.upperBound...])
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            if isNoisyFinalWordContinuationFragment(candidate) {
+                return true
+            }
+            removalCount += 1
+        }
+
+        return false
     }
 
     private static func replaceSpokenPunctuationCommand(

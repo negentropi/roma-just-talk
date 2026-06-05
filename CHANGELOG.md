@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Collapsed ellipsis-separated repeated short phrase restarts such as "I think... I think this works" in post-STT cleanup.
 - Preserved explicit terminal spoken punctuation commands such as "exclamation mark", "question mark", "period", and "ellipsis" in mid-sentence continuations.
 - Trimmed unmatched parenthesis and brace artifacts around short continuation fragments while preserving real delimiter closures.
 - Trimmed unmatched square-bracket artifacts around short continuation fragments.

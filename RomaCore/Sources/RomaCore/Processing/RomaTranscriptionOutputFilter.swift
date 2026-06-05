@@ -1238,6 +1238,7 @@ public struct RomaTranscriptionOutputFilter {
         if cleanupLevel == .polished {
             filteredText = collapseAdjacentRepeatedWords(in: filteredText)
             filteredText = collapseSeparatorRepeatedWords(in: filteredText)
+            filteredText = collapseSeparatorRepeatedShortPhrases(in: filteredText)
             filteredText = collapsePartialWordRestarts(in: filteredText)
             filteredText = collapseUnpunctuatedPartialWordRestarts(in: filteredText)
             filteredText = collapseTrailingRepeatedSentencePrefixFillers(in: filteredText)
@@ -7954,6 +7955,50 @@ public struct RomaTranscriptionOutputFilter {
                 }
 
                 collapsedText.replaceSubrange(fullRange, with: word)
+                didRewrite = true
+            }
+
+            guard didRewrite else { break }
+            rewriteCount += 1
+        }
+
+        return collapsedText
+    }
+
+    private static func collapseSeparatorRepeatedShortPhrases(in text: String) -> String {
+        guard let regex = try? NSRegularExpression(
+            pattern: #"(?i)(^|(?<=[.!?])\s+|\n|(?<=[ \t]))((?:[^\s,;:.!?\n]+[ \t]+){1,4}[^\s,;:.!?\n]+)[ \t]*(?:[,;:…–—-]|\.\.\.)+[ \t]+\2(?=[ \t]+[^\s,;:.!?\n]+|[.!?,;:…]|\s*$)"#
+        ) else {
+            return text
+        }
+
+        var collapsedText = text
+        var rewriteCount = 0
+
+        while rewriteCount < 4 {
+            let range = NSRange(collapsedText.startIndex..., in: collapsedText)
+            let matches = regex.matches(in: collapsedText, range: range).reversed()
+            var didRewrite = false
+
+            for match in matches {
+                guard match.numberOfRanges >= 3,
+                      let fullRange = Range(match.range, in: collapsedText),
+                      let prefixRange = Range(match.range(at: 1), in: collapsedText),
+                      let phraseRange = Range(match.range(at: 2), in: collapsedText) else {
+                    continue
+                }
+
+                let phrase = String(collapsedText[phraseRange]).trimmingCharacters(in: .whitespacesAndNewlines)
+                let phraseWordCount = wordCount(in: phrase)
+                guard phraseWordCount >= 2 && phraseWordCount <= 5,
+                      !preservedRepeatedClauses.contains(normalizedRepeatedClause(phrase)) else {
+                    continue
+                }
+
+                collapsedText.replaceSubrange(
+                    fullRange,
+                    with: String(collapsedText[prefixRange]) + phrase
+                )
                 didRewrite = true
             }
 

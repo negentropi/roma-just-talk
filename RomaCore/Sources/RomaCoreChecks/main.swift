@@ -2030,6 +2030,26 @@ struct RomaCoreChecks {
                 "tight dash separated repeated word"
             ),
             (
+                "I think... I think this works.",
+                "I think this works.",
+                "ellipsis separated repeated phrase"
+            ),
+            (
+                "We need... we need module.",
+                "We need module.",
+                "ellipsis separated repeated lead-in phrase"
+            ),
+            (
+                "Use model... use module.",
+                "Use model... use module.",
+                "changed tail ellipsis phrase guard"
+            ),
+            (
+                "New York... New York is busy.",
+                "New York... New York is busy.",
+                "preserved repeated place phrase guard"
+            ),
+            (
                 "I think the mod- module works.",
                 "I think the module works.",
                 "dash separated partial-word restart"

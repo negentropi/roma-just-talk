@@ -10671,6 +10671,7 @@ struct RomaCoreChecks {
             proofCommonScript.contains("function Invoke-RomaWindowsProofStep") &&
                 proofCommonScript.contains("function Resolve-RomaWindowsFullPath") &&
                 proofCommonScript.contains("function Require-RomaWindowsFile") &&
+                proofCommonScript.contains("function Assert-RomaWindowsFileWithMinimumBytes") &&
                 proofCommonScript.contains("function Get-RomaWindowsCurrentUserSid") &&
                 proofCommonScript.contains("function Require-RomaWindowsCurrentUserSid") &&
                 proofCommonScript.contains("function Assert-RomaWindowsOutputContains") &&
@@ -10697,6 +10698,17 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Get-RomaWindowsFileHashProof") &&
                 proofCommonScript.contains("function Get-RomaWindowsInstalledProofSurfaceFileProofs"),
             "Windows proof helper should own shared script utilities"
+        )
+        try require(
+            windowsProofScript.contains("Assert-RomaWindowsFileWithMinimumBytes -Path $coreProof -MinimumBytes 45") &&
+                windowsProofScript.contains("Assert-RomaWindowsFileWithMinimumBytes -Path $agentConfig") &&
+                smokeScript.contains("Assert-RomaWindowsFileWithMinimumBytes -Path $ConfigPath") &&
+                smokeScript.contains("Assert-RomaWindowsFileWithMinimumBytes -Path $dictationOutput -MinimumBytes 45") &&
+                !windowsProofScript.contains("function Assert-FileWithBytes") &&
+                !windowsProofScript.contains("function Assert-NonEmptyFile") &&
+                !smokeScript.contains("function Assert-NonEmptyFile") &&
+                !smokeScript.contains("function Assert-WavFileWithBytes"),
+            "Windows source proof and smoke proof should share file byte assertions"
         )
         try require(
             packageScript.contains("Require-RomaWindowsFileProof -Path $ProofAgentPath") &&

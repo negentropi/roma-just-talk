@@ -40,25 +40,6 @@ Set-Alias -Name Invoke-Step -Value Invoke-RomaWindowsProofStep -Scope Local -For
 Set-Alias -Name Assert-OutputContains -Value Assert-RomaWindowsOutputContains -Scope Local -Force
 Set-Alias -Name Resolve-FullPath -Value Resolve-RomaWindowsFullPath -Scope Local -Force
 
-function Assert-NonEmptyFile {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Path
-    )
-
-    if (!(Test-Path -LiteralPath $Path)) {
-        throw "Expected file was not created: $Path"
-    }
-
-    $item = Get-Item -LiteralPath $Path
-    if ($item.Length -le 0) {
-        throw "Expected non-empty file: $Path"
-    }
-
-    Write-Host "file=$Path"
-    Write-Host "bytes=$($item.Length)"
-}
-
 function Assert-JsonPropertyEquals {
     param(
         [Parameter(Mandatory = $true)]
@@ -79,19 +60,6 @@ function Assert-JsonPropertyEquals {
     }
 
     Write-Host "asserted_json=$Name"
-}
-
-function Assert-WavFileWithBytes {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Path
-    )
-
-    Assert-NonEmptyFile -Path $Path
-    $item = Get-Item -LiteralPath $Path
-    if ($item.Length -le 44) {
-        throw "Expected WAV payload larger than header: $Path bytes=$($item.Length)"
-    }
 }
 
 Assert-RomaWindowsAgentScriptCommonOptions `
@@ -241,7 +209,7 @@ Invoke-Step "agent config" {
     Assert-OutputContains -Output $configOutput -Expected "config=$ConfigPath"
     Assert-OutputContains -Output $configOutput -Expected "restore_clipboard_after_paste="
     Assert-OutputContains -Output $configOutput -Expected "clipboard_restore_delay_seconds="
-    Assert-NonEmptyFile -Path $ConfigPath
+    Assert-RomaWindowsFileWithMinimumBytes -Path $ConfigPath
 
     $configJson = Get-Content -LiteralPath $ConfigPath -Raw | ConvertFrom-Json
     if ($usesWhisperCLI) {
@@ -304,8 +272,8 @@ if ($RunDictation) {
         if ($LASTEXITCODE -ne 0) {
             throw "RomaWindowsAgent dictate failed"
         }
-        Assert-WavFileWithBytes -Path $dictationOutput
-        Assert-NonEmptyFile -Path $dictationLog
+        Assert-RomaWindowsFileWithMinimumBytes -Path $dictationOutput -MinimumBytes 45
+        Assert-RomaWindowsFileWithMinimumBytes -Path $dictationLog
         Assert-OutputContains -Output $dictateOutput -Expected "wrote="
         Assert-OutputContains -Output $dictateOutput -Expected "included_pre_roll_seconds="
         Assert-OutputContains -Output $dictateOutput -Expected "processed_transcript_text="

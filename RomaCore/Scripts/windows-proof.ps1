@@ -61,44 +61,6 @@ function Invoke-RomaProofAgentNativeDoctor {
     Assert-RomaWindowsNativeDoctorOutput -Output $output -Name $Name
 }
 
-function Assert-FileWithBytes {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Path
-    )
-
-    if (!(Test-Path -LiteralPath $Path)) {
-        throw "Expected file was not created: $Path"
-    }
-
-    $item = Get-Item -LiteralPath $Path
-    if ($item.Length -le 44) {
-        throw "Expected WAV payload larger than header: $Path bytes=$($item.Length)"
-    }
-
-    Write-Host "file=$Path"
-    Write-Host "bytes=$($item.Length)"
-}
-
-function Assert-NonEmptyFile {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Path
-    )
-
-    if (!(Test-Path -LiteralPath $Path)) {
-        throw "Expected file was not created: $Path"
-    }
-
-    $item = Get-Item -LiteralPath $Path
-    if ($item.Length -le 0) {
-        throw "Expected non-empty file: $Path"
-    }
-
-    Write-Host "file=$Path"
-    Write-Host "bytes=$($item.Length)"
-}
-
 function Resolve-SwiftProductExecutable {
     param(
         [Parameter(Mandatory = $true)]
@@ -277,7 +239,7 @@ try {
     $coreProof = Join-Path $OutputDir "core-proof.wav"
     Invoke-Step "core pre-roll wav proof" {
         swift run RomaProofAgent pre-roll-proof --out $coreProof
-        Assert-FileWithBytes -Path $coreProof
+        Assert-RomaWindowsFileWithMinimumBytes -Path $coreProof -MinimumBytes 45
     }
 
     Invoke-Step "miniaudio capture doctor" {
@@ -291,7 +253,7 @@ try {
     } else {
         Invoke-Step "miniaudio mic proof" {
             swift run RomaProofAgent miniaudio-record-proof --out $micProof --seconds $RecordSeconds
-            Assert-FileWithBytes -Path $micProof
+            Assert-RomaWindowsFileWithMinimumBytes -Path $micProof -MinimumBytes 45
         }
     }
 
@@ -333,7 +295,7 @@ try {
             throw "dictation-pipeline-proof failed"
         }
         Write-Host $pipelineOutput
-        Assert-FileWithBytes -Path $pipelineProof
+        Assert-RomaWindowsFileWithMinimumBytes -Path $pipelineProof -MinimumBytes 45
         Assert-OutputContains -Output $pipelineOutput -Expected "raw_transcript_text=hmm... just talk."
         Assert-OutputContains -Output $pipelineOutput -Expected "processed_transcript_text=roma-just-talk"
         Assert-OutputContains -Output $pipelineOutput -Expected "word_replacements=1"
@@ -471,7 +433,7 @@ try {
                 Assert-OutputContains -Output $configOutput -Expected "transcription_client=openai-compatible"
                 Assert-OutputContains -Output $configOutput -Expected "endpoint=$TranscribeEndpoint"
             }
-            Assert-NonEmptyFile -Path $agentConfig
+            Assert-RomaWindowsFileWithMinimumBytes -Path $agentConfig
         }
     } else {
         Write-Host ""
@@ -568,7 +530,7 @@ try {
             }
             $dictationArgs = New-WindowsDictationProofArgs -OutputPath $dictationProof
             swift @dictationArgs
-            Assert-FileWithBytes -Path $dictationProof
+            Assert-RomaWindowsFileWithMinimumBytes -Path $dictationProof -MinimumBytes 45
         }
     } else {
         Write-Host ""
@@ -604,14 +566,14 @@ try {
             } else {
                 Assert-OutputContains -Output $configOutput -Expected "transcription_client=openai-compatible"
             }
-            Assert-NonEmptyFile -Path $agentConfig
+            Assert-RomaWindowsFileWithMinimumBytes -Path $agentConfig
 
             $agentArgs = @(
                 "run", "RomaWindowsAgent", "dictate",
                 "--config", $agentConfig
             )
             swift @agentArgs
-            Assert-FileWithBytes -Path $agentProof
+            Assert-RomaWindowsFileWithMinimumBytes -Path $agentProof -MinimumBytes 45
         }
     } else {
         Write-Host ""

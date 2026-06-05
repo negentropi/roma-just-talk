@@ -34,6 +34,26 @@ function Require-RomaWindowsFile {
     }
 }
 
+function Assert-RomaWindowsFileWithMinimumBytes {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path,
+        [int64]$MinimumBytes = 1
+    )
+
+    if (!(Test-Path -LiteralPath $Path)) {
+        throw "Expected file was not created: $Path"
+    }
+
+    $item = Get-Item -LiteralPath $Path
+    if ($item.Length -lt $MinimumBytes) {
+        throw "Expected file to have at least $MinimumBytes bytes: $Path bytes=$($item.Length)"
+    }
+
+    Write-Host "file=$Path"
+    Write-Host "bytes=$($item.Length)"
+}
+
 function Get-RomaWindowsCurrentUserSid {
     if ([System.Environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT) {
         return ""

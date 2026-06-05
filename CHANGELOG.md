@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Treated "I am/was trying to say", "I was going to say", and "I was gonna say" as guarded correction markers in post-STT cleanup.
 - Treated "what I was going to say is" and "what I was gonna say is" as guarded correction markers in post-STT cleanup.
 - Treated "what I meant to say is", "what I wanted to say is", and "what I was trying to say is" as guarded correction markers in post-STT cleanup.
 - Treated "what I'm trying to say is" and "what I am trying to say is" as guarded correction markers in post-STT cleanup.

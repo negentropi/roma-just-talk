@@ -929,6 +929,34 @@ struct RomaCoreChecks {
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "I am trying to say module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim i-am-trying-to-say markers before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "I was trying to say module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim i-was-trying-to-say markers before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "I was going to say module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim i-was-going-to-say markers before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "I was gonna say module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim i-was-gonna-say markers before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "It should be now.",
                 context: midSentenceContext
             ) == "it should be now",
@@ -1270,6 +1298,20 @@ struct RomaCoreChecks {
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model I was going to say module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should apply i-was-going-to-say corrections in short continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model I was gonna say final word.",
+                context: midSentenceContext
+            ) == "final word",
+            "shared insertion polish should apply i-was-gonna-say corrections in short continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "model what I am trying to say is module.",
                 context: midSentenceContext
             ) == "module",
@@ -1351,6 +1393,13 @@ struct RomaCoreChecks {
                 context: midSentenceContext
             ) == "please I should say module",
             "shared insertion polish should preserve please-prefixed i-should-say prose"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "please I was going to say module.",
+                context: midSentenceContext
+            ) == "please I was going to say module",
+            "shared insertion polish should preserve please-prefixed i-was-going-to-say prose"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
@@ -3595,6 +3644,26 @@ struct RomaCoreChecks {
                 "embedded unpunctuated i feel like before good predicate"
             ),
             (
+                "I think this is I am trying to say ready.",
+                "I think this is ready.",
+                "embedded unpunctuated i-am-trying-to-say before ready predicate"
+            ),
+            (
+                "I think this is I was trying to say ready.",
+                "I think this is ready.",
+                "embedded unpunctuated i-was-trying-to-say before ready predicate"
+            ),
+            (
+                "I think this is I was going to say ready.",
+                "I think this is ready.",
+                "embedded unpunctuated i-was-going-to-say before ready predicate"
+            ),
+            (
+                "I think this is I was gonna say good.",
+                "I think this is good.",
+                "embedded unpunctuated i-was-gonna-say before good predicate"
+            ),
+            (
                 "I think this is what I am trying to say is ready.",
                 "I think this is ready.",
                 "embedded unpunctuated what-i-am-trying-to-say-is before ready predicate"
@@ -4363,6 +4432,31 @@ struct RomaCoreChecks {
                 "Let's meet at two, I meant to say three tomorrow.",
                 "Let's meet at three tomorrow.",
                 "i meant to say correction should preserve suffix"
+            ),
+            (
+                "Use model, I am trying to say module.",
+                "Use module.",
+                "i am trying to say correction"
+            ),
+            (
+                "Use model, I was trying to say module.",
+                "Use module.",
+                "i was trying to say correction"
+            ),
+            (
+                "Use model, I was going to say module.",
+                "Use module.",
+                "i was going to say correction"
+            ),
+            (
+                "Use model, um I was gonna say module.",
+                "Use module.",
+                "pause filler before i was gonna say correction"
+            ),
+            (
+                "Let's meet at two, I was going to say three tomorrow.",
+                "Let's meet at three tomorrow.",
+                "i was going to say correction should preserve suffix"
             ),
             (
                 "Use model, what I mean is module.",
@@ -5785,6 +5879,16 @@ struct RomaCoreChecks {
                 "i meant to say prose guard"
             ),
             (
+                "I was trying to say, module loads.",
+                "I was trying to say, module loads.",
+                "i was trying to say prose guard"
+            ),
+            (
+                "I was going to say, module loads.",
+                "I was going to say, module loads.",
+                "i was going to say prose guard"
+            ),
+            (
                 "What I mean is, module loads.",
                 "What I mean is, module loads.",
                 "what i mean is prose guard"
@@ -5823,6 +5927,16 @@ struct RomaCoreChecks {
                 "I think this is what I am trying to say is important.",
                 "I think this is what I am trying to say is important.",
                 "embedded what i am trying to say is prose guard"
+            ),
+            (
+                "I know I was trying to say ready.",
+                "I know I was trying to say ready.",
+                "embedded i was trying to say prose guard"
+            ),
+            (
+                "Please I was going to say module.",
+                "Please I was going to say module.",
+                "please-prefixed i was going to say prose guard"
             ),
             (
                 "I know what I meant to say is important.",
@@ -11552,19 +11666,22 @@ struct RomaCoreChecks {
             "Windows package should include an artifact-local laptop proof guide with full proof markers"
         )
         try require(
-            laptopProofScript.contains("function Write-FullLaptopProofRecheckScript") &&
+            proofCommonScript.contains("function Write-RomaWindowsFullLaptopProofRecheckScript") &&
+                proofCommonScript.contains("function ConvertTo-RomaWindowsPowerShellSingleQuotedString") &&
+                laptopProofScript.contains("Write-RomaWindowsFullLaptopProofRecheckScript") &&
+                !laptopProofScript.contains("function Write-FullLaptopProofRecheckScript") &&
+                !laptopProofScript.contains("ConvertTo-PowerShellSingleQuotedString") &&
                 laptopProofScript.contains(#""recheck-full-laptop-proof.ps1""#) &&
                 laptopProofScript.contains("windows_laptop_recheck_script=") &&
-                laptopProofScript.contains(#"$checkSetScript = Require-RomaWindowsManifestFile -Manifest $manifest -Key "check_set_script" -BaseDir $PackageDir"#) &&
-                laptopProofScript.contains(#"$proofCommonScript = Require-RomaWindowsManifestFile -Manifest $manifest -Key "proof_common_script" -BaseDir $PackageDir"#) &&
+                proofCommonScript.contains(#"$checkSetScript = Require-RomaWindowsManifestFile -Manifest $manifest -Key "check_set_script" -BaseDir $PackageDir"#) &&
+                proofCommonScript.contains(#"$proofCommonScript = Require-RomaWindowsManifestFile -Manifest $manifest -Key "proof_common_script" -BaseDir $PackageDir"#) &&
                 proofCommonScript.contains("function Get-RomaWindowsFullLaptopProofSetOutputMarkers") &&
                 proofCommonScript.contains("function Assert-RomaWindowsFullLaptopProofSetOutput") &&
                 proofCommonScript.contains("function Get-RomaWindowsProofSetProfileOkMarkers") &&
                 proofCommonScript.contains(#"$markers = Get-RomaWindowsProofSetProfileOkMarkers -Name "full_laptop""#) &&
                 proofCommonScript.contains(#"$markers["full_laptop_proof_set"] = Get-RomaWindowsProofSetOkMarker -Name "full_laptop""#) &&
-                laptopProofScript.contains("Assert-RomaWindowsFullLaptopProofSetOutput -Output `$proofSetOutput") &&
-                laptopProofScript.contains("windows_laptop_recheck_ok=true") &&
-                laptopProofScript.contains("ConvertTo-PowerShellSingleQuotedString") &&
+                proofCommonScript.contains("Assert-RomaWindowsFullLaptopProofSetOutput -Output `$proofSetOutput") &&
+                proofCommonScript.contains("windows_laptop_recheck_ok=true") &&
                 laptopProofScript.contains("RequireFullLaptopProof"),
             "Windows laptop proof runner should write an archived full-proof recheck script with exact report paths"
         )

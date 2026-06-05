@@ -395,6 +395,7 @@ $parseScript = Join-Path $PackageDir "check-windows-scripts-parse.ps1"
 $packagedProofCommonScript = Join-Path $PackageDir "windows-proof-common.ps1"
 $checkReportScript = Join-Path $PackageDir "check-windows-proof-report.ps1"
 $checkSetScript = Join-Path $PackageDir "check-windows-proof-set.ps1"
+$installedRunScriptPath = Join-RomaWindowsInstalledRunScriptPath -InstallDir $InstallDir
 $manifestPath = Join-Path $PackageDir "manifest.txt"
 $script:artifactManifest = @{}
 $script:packagedWhisperCLI = ""
@@ -664,8 +665,7 @@ Invoke-Step "installed script parse check" {
 }
 
 Invoke-Step "installed launcher doctor" {
-    $installedRun = Join-Path $InstallDir "run-windows-agent.ps1"
-    Require-File -Path $installedRun
+    Require-File -Path $installedRunScriptPath
     $runArgs = @(
         "-InstallDir", $InstallDir,
         "-DoctorOnly"
@@ -673,7 +673,7 @@ Invoke-Step "installed launcher doctor" {
     if (![string]::IsNullOrWhiteSpace($ConfigPath)) {
         $runArgs += @("-ConfigPath", $ConfigPath)
     }
-    $script:installedLauncherDoctorOutput = & $installedRun @runArgs 2>&1 | Out-String
+    $script:installedLauncherDoctorOutput = & $installedRunScriptPath @runArgs 2>&1 | Out-String
     if ($LASTEXITCODE -ne 0) {
         Write-Host $script:installedLauncherDoctorOutput
         throw "Installed launcher doctor failed"
@@ -689,19 +689,17 @@ Invoke-Step "installed config doctor" {
 }
 
 Invoke-Step "installed listener smoke" {
-    $installedRun = Join-Path $InstallDir "run-windows-agent.ps1"
-    Require-File -Path $installedRun
+    Require-File -Path $installedRunScriptPath
     $script:installedListenerOutput = Invoke-InstalledListenerSmoke `
-        -RunScriptPath $installedRun `
+        -RunScriptPath $installedRunScriptPath `
         -ConfigPath $ConfigPath
 }
 
 if ($RunListenerProof) {
     Invoke-Step "installed listener runtime proof" {
-        $installedRun = Join-Path $InstallDir "run-windows-agent.ps1"
-        Require-File -Path $installedRun
+        Require-File -Path $installedRunScriptPath
         $null = Invoke-InstalledListenerRuntimeProof `
-            -RunScriptPath $installedRun `
+            -RunScriptPath $installedRunScriptPath `
             -ConfigPath $ConfigPath
     }
 }

@@ -150,6 +150,7 @@ Require-File -Path $agentSource
 Require-File -Path $smokeSource
 Require-File -Path $runSource
 $installedAgent = Join-Path $InstallDir "RomaWindowsAgent.exe"
+$installedRun = Join-RomaWindowsInstalledRunScriptPath -InstallDir $InstallDir
 Assert-InstalledAgentNotRunning -InstalledAgentPath $installedAgent
 
 Invoke-Step "copy package files" {
@@ -269,7 +270,6 @@ if (!$SkipSmoke) {
     }
 
     Invoke-Step "installed launcher doctor" {
-        $installedRun = Join-Path $InstallDir "run-windows-agent.ps1"
         Require-File -Path $installedRun
         & $installedRun `
             -InstallDir $InstallDir `
@@ -286,7 +286,7 @@ if ($CreateShortcut -or $CreateStartupShortcut) {
         if ([System.Environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT) {
             throw "Shortcut creation is only available on Windows"
         }
-        $runScript = Join-Path $InstallDir "run-windows-agent.ps1"
+        $runScript = $installedRun
         Require-File -Path $runScript
 
         if ($CreateShortcut) {
@@ -337,7 +337,6 @@ if ($CreateShortcut -or $CreateStartupShortcut) {
 
 Write-Host ""
 $installedSmoke = Join-Path $InstallDir "smoke-windows-agent.ps1"
-$installedRun = Join-Path $InstallDir "run-windows-agent.ps1"
 Write-Host "installed_agent=$installedAgent"
 Write-Host "installed_smoke=$installedSmoke"
 Write-Host "installed_run=$installedRun"

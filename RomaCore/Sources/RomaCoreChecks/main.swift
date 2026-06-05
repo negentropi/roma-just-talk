@@ -12865,6 +12865,8 @@ struct RomaCoreChecks {
         )
         try require(
             proveScript.contains("Get-RomaWindowsAgentShortcutReportPaths") &&
+                installScript.contains("$installedRun = Join-RomaWindowsInstalledRunScriptPath -InstallDir $InstallDir") &&
+                proveScript.contains("$installedRunScriptPath = Join-RomaWindowsInstalledRunScriptPath -InstallDir $InstallDir") &&
                 installScript.contains("Join-RomaWindowsAgentShortcutPath") &&
                 packageScript.contains("$shortcutPath = Join-RomaWindowsAgentShortcutPath -ShortcutDir $shortcutDir") &&
                 packageScript.contains("$localWhisperShortcutPath = Join-RomaWindowsAgentShortcutPath -ShortcutDir $localWhisperShortcutDir") &&
@@ -12876,7 +12878,8 @@ struct RomaCoreChecks {
                 !proveScript.contains(#"Join-Path $ShortcutDir "Roma Just Talk Agent.lnk""#) &&
                 !proveScript.contains(#"Join-Path $StartupShortcutDir "Roma Just Talk Agent.lnk""#) &&
                 !proveScript.contains(#"[System.Environment]::GetFolderPath("Startup")"#) &&
-                !proveScript.contains(#"$installedRunScriptPath = Join-Path $InstallDir "run-windows-agent.ps1""#),
+                !installScript.contains(#"Join-Path $InstallDir "run-windows-agent.ps1""#) &&
+                !proveScript.contains(#"Join-Path $InstallDir "run-windows-agent.ps1""#),
             "Windows artifact proof should share installed launcher and shortcut report path shaping"
         )
         try require(

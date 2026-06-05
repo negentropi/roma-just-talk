@@ -58,27 +58,16 @@ try {
     $agentOutput = $outputArtifactPaths["agent"]
     $proofAgentOutput = $outputArtifactPaths["proof_agent"]
     $mockWhisperOutput = $outputArtifactPaths["whisper_cli_mock"]
-    $smokeScriptSource = $sourceArtifactPaths["smoke_script"]
     $smokeScriptOutput = $outputArtifactPaths["smoke_script"]
-    $runScriptSource = $sourceArtifactPaths["run_script"]
     $runScriptOutput = $outputArtifactPaths["run_script"]
-    $installScriptSource = $sourceArtifactPaths["install_script"]
     $installScriptOutput = $outputArtifactPaths["install_script"]
-    $proofScriptSource = $sourceArtifactPaths["proof_script"]
     $proofScriptOutput = $outputArtifactPaths["proof_script"]
-    $laptopProofScriptSource = $sourceArtifactPaths["laptop_proof_script"]
     $laptopProofScriptOutput = $outputArtifactPaths["laptop_proof_script"]
-    $parseScriptSource = $sourceArtifactPaths["parse_script"]
     $parseScriptOutput = $outputArtifactPaths["parse_script"]
-    $identityScriptSource = $sourceArtifactPaths["package_identity_script"]
     $identityScriptOutput = $outputArtifactPaths["package_identity_script"]
-    $proofCommonScriptSource = $sourceArtifactPaths["proof_common_script"]
     $proofCommonScriptOutput = $outputArtifactPaths["proof_common_script"]
-    $manifestScriptSource = $sourceArtifactPaths["manifest_script"]
     $manifestScriptOutput = $outputArtifactPaths["manifest_script"]
-    $checkReportScriptSource = $sourceArtifactPaths["check_report_script"]
     $checkReportScriptOutput = $outputArtifactPaths["check_report_script"]
-    $checkSetScriptSource = $sourceArtifactPaths["check_set_script"]
     $checkSetScriptOutput = $outputArtifactPaths["check_set_script"]
     $laptopProofGuideOutput = $outputArtifactPaths["laptop_proof_guide"]
     $configPath = $outputArtifactPaths["sample_config"]
@@ -97,67 +86,12 @@ try {
     $laptopNativePreflightCheckerSmokeReport = Join-RomaWindowsLaptopProofReportPath -ProofDir $laptopNativePreflightCheckerSmokeDir -Name "laptop_preflight"
 
     Invoke-Step "copy agent executable" {
-        Copy-Item -LiteralPath $agentSource.FullName -Destination $agentOutput -Force
-        $agentItem = Get-Item -LiteralPath $agentOutput
-        if ($agentItem.Length -le 0) {
-            throw "RomaWindowsAgent.exe is empty: $agentOutput"
-        }
-        Write-Host "agent_exe=$agentOutput"
-        Write-Host "bytes=$($agentItem.Length)"
-
-        $pdbSource = [System.IO.Path]::ChangeExtension($agentSource.FullName, ".pdb")
-        if (Test-Path -LiteralPath $pdbSource) {
-            $pdbOutput = $outputArtifactPaths["agent_pdb"]
-            Copy-Item -LiteralPath $pdbSource -Destination $pdbOutput -Force
-            Write-Host "agent_pdb=$pdbOutput"
-        }
-
-        Copy-Item -LiteralPath $proofAgentSource.FullName -Destination $proofAgentOutput -Force
-        $proofAgentItem = Get-Item -LiteralPath $proofAgentOutput
-        if ($proofAgentItem.Length -le 0) {
-            throw "RomaProofAgent.exe is empty: $proofAgentOutput"
-        }
-        Write-Host "proof_agent_exe=$proofAgentOutput"
-        Write-Host "proof_agent_bytes=$($proofAgentItem.Length)"
-
-        $proofAgentPdbSource = [System.IO.Path]::ChangeExtension($proofAgentSource.FullName, ".pdb")
-        if (Test-Path -LiteralPath $proofAgentPdbSource) {
-            $proofAgentPdbOutput = $outputArtifactPaths["proof_agent_pdb"]
-            Copy-Item -LiteralPath $proofAgentPdbSource -Destination $proofAgentPdbOutput -Force
-            Write-Host "proof_agent_pdb=$proofAgentPdbOutput"
-        }
-
-        Copy-Item -LiteralPath $mockWhisperSource.FullName -Destination $mockWhisperOutput -Force
-        $mockWhisperItem = Get-Item -LiteralPath $mockWhisperOutput
-        if ($mockWhisperItem.Length -le 0) {
-            throw "RomaWhisperCLIMock.exe is empty: $mockWhisperOutput"
-        }
-        Write-Host "whisper_cli_mock=$mockWhisperOutput"
-        Write-Host "whisper_cli_mock_bytes=$($mockWhisperItem.Length)"
-
-        Copy-Item -LiteralPath $smokeScriptSource -Destination $smokeScriptOutput -Force
-        Write-Host "smoke_script=$smokeScriptOutput"
-        Copy-Item -LiteralPath $runScriptSource -Destination $runScriptOutput -Force
-        Write-Host "run_script=$runScriptOutput"
-        Copy-Item -LiteralPath $installScriptSource -Destination $installScriptOutput -Force
-        Write-Host "install_script=$installScriptOutput"
-        Copy-Item -LiteralPath $proofScriptSource -Destination $proofScriptOutput -Force
-        Write-Host "proof_script=$proofScriptOutput"
-        Copy-Item -LiteralPath $laptopProofScriptSource -Destination $laptopProofScriptOutput -Force
-        Write-Host "laptop_proof_script=$laptopProofScriptOutput"
-        Copy-Item -LiteralPath $parseScriptSource -Destination $parseScriptOutput -Force
-        Write-Host "parse_script=$parseScriptOutput"
-        Copy-Item -LiteralPath $identityScriptSource -Destination $identityScriptOutput -Force
-        Write-Host "package_identity_script=$identityScriptOutput"
-        Copy-Item -LiteralPath $proofCommonScriptSource -Destination $proofCommonScriptOutput -Force
-        Write-Host "proof_common_script=$proofCommonScriptOutput"
-        Copy-Item -LiteralPath $manifestScriptSource -Destination $manifestScriptOutput -Force
-        Write-Host "manifest_script=$manifestScriptOutput"
-        Copy-Item -LiteralPath $checkReportScriptSource -Destination $checkReportScriptOutput -Force
-        Write-Host "check_report_script=$checkReportScriptOutput"
-        Copy-Item -LiteralPath $checkSetScriptSource -Destination $checkSetScriptOutput -Force
-        Write-Host "check_set_script=$checkSetScriptOutput"
-        Write-RomaWindowsLaptopProofGuide -OutputPath $laptopProofGuideOutput
+        Copy-RomaWindowsAgentArtifactBundle `
+            -AgentSource $agentSource `
+            -ProofAgentSource $proofAgentSource `
+            -WhisperCLIMockSource $mockWhisperSource `
+            -SourceArtifactPaths $sourceArtifactPaths `
+            -OutputArtifactPaths $outputArtifactPaths
     }
 
     Invoke-Step "packaged script parse check" {

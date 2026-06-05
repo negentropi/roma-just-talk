@@ -257,6 +257,86 @@ function Assert-RomaWindowsSwiftRuntimePackaged {
     Write-Host "asserted_runtime_dll=swiftCore.dll"
 }
 
+function Copy-RomaWindowsAgentArtifactBundle {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$AgentSource,
+        [Parameter(Mandatory = $true)]
+        [object]$ProofAgentSource,
+        [Parameter(Mandatory = $true)]
+        [object]$WhisperCLIMockSource,
+        [Parameter(Mandatory = $true)]
+        [object]$SourceArtifactPaths,
+        [Parameter(Mandatory = $true)]
+        [object]$OutputArtifactPaths
+    )
+
+    $agentOutput = $OutputArtifactPaths["agent"]
+    Copy-Item -LiteralPath $AgentSource.FullName -Destination $agentOutput -Force
+    $agentItem = Get-Item -LiteralPath $agentOutput
+    if ($agentItem.Length -le 0) {
+        throw "RomaWindowsAgent.exe is empty: $agentOutput"
+    }
+    Write-Host "agent_exe=$agentOutput"
+    Write-Host "bytes=$($agentItem.Length)"
+
+    $pdbSource = [System.IO.Path]::ChangeExtension($AgentSource.FullName, ".pdb")
+    if (Test-Path -LiteralPath $pdbSource) {
+        $pdbOutput = $OutputArtifactPaths["agent_pdb"]
+        Copy-Item -LiteralPath $pdbSource -Destination $pdbOutput -Force
+        Write-Host "agent_pdb=$pdbOutput"
+    }
+
+    $proofAgentOutput = $OutputArtifactPaths["proof_agent"]
+    Copy-Item -LiteralPath $ProofAgentSource.FullName -Destination $proofAgentOutput -Force
+    $proofAgentItem = Get-Item -LiteralPath $proofAgentOutput
+    if ($proofAgentItem.Length -le 0) {
+        throw "RomaProofAgent.exe is empty: $proofAgentOutput"
+    }
+    Write-Host "proof_agent_exe=$proofAgentOutput"
+    Write-Host "proof_agent_bytes=$($proofAgentItem.Length)"
+
+    $proofAgentPdbSource = [System.IO.Path]::ChangeExtension($ProofAgentSource.FullName, ".pdb")
+    if (Test-Path -LiteralPath $proofAgentPdbSource) {
+        $proofAgentPdbOutput = $OutputArtifactPaths["proof_agent_pdb"]
+        Copy-Item -LiteralPath $proofAgentPdbSource -Destination $proofAgentPdbOutput -Force
+        Write-Host "proof_agent_pdb=$proofAgentPdbOutput"
+    }
+
+    $mockWhisperOutput = $OutputArtifactPaths["whisper_cli_mock"]
+    Copy-Item -LiteralPath $WhisperCLIMockSource.FullName -Destination $mockWhisperOutput -Force
+    $mockWhisperItem = Get-Item -LiteralPath $mockWhisperOutput
+    if ($mockWhisperItem.Length -le 0) {
+        throw "RomaWhisperCLIMock.exe is empty: $mockWhisperOutput"
+    }
+    Write-Host "whisper_cli_mock=$mockWhisperOutput"
+    Write-Host "whisper_cli_mock_bytes=$($mockWhisperItem.Length)"
+
+    $scriptCopies = @(
+        @{ Key = "smoke_script"; Marker = "smoke_script" },
+        @{ Key = "run_script"; Marker = "run_script" },
+        @{ Key = "install_script"; Marker = "install_script" },
+        @{ Key = "proof_script"; Marker = "proof_script" },
+        @{ Key = "laptop_proof_script"; Marker = "laptop_proof_script" },
+        @{ Key = "parse_script"; Marker = "parse_script" },
+        @{ Key = "package_identity_script"; Marker = "package_identity_script" },
+        @{ Key = "proof_common_script"; Marker = "proof_common_script" },
+        @{ Key = "manifest_script"; Marker = "manifest_script" },
+        @{ Key = "check_report_script"; Marker = "check_report_script" },
+        @{ Key = "check_set_script"; Marker = "check_set_script" }
+    )
+    foreach ($copy in $scriptCopies) {
+        $key = [string]$copy["Key"]
+        $marker = [string]$copy["Marker"]
+        $scriptSource = $SourceArtifactPaths[$key]
+        $scriptOutput = $OutputArtifactPaths[$key]
+        Copy-Item -LiteralPath $scriptSource -Destination $scriptOutput -Force
+        Write-Host "$marker=$scriptOutput"
+    }
+
+    Write-RomaWindowsLaptopProofGuide -OutputPath $OutputArtifactPaths["laptop_proof_guide"]
+}
+
 function Require-RomaWindowsFile {
     param(
         [Parameter(Mandatory = $true)]

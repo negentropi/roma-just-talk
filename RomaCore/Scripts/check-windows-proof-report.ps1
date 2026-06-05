@@ -361,33 +361,24 @@ function Assert-LaptopPreflightReport {
         -Value ([string](Require-Property -Object $Report -Name "generated_at")) `
         -Name "generated_at" `
         -WriteProofValue
-    $packageDir = Get-NonEmptyStringProperty -Object $Report -Name "package_dir"
     $proofDir = Get-NonEmptyStringProperty -Object $Report -Name "proof_dir"
 
     $packageIdentity = Require-Property -Object $Report -Name "package_identity"
-    $packageFingerprint = Assert-PackageIdentityProof -PackageIdentity $packageIdentity
+    Assert-PackageIdentityProof -PackageIdentity $packageIdentity | Out-Null
 
     $manifest = Require-Property -Object $Report -Name "manifest"
-    $source = Assert-RomaWindowsCleanManifestSourceProvenance `
-        -Manifest $manifest `
-        -Context "manifest" `
-        -ProofName "Laptop preflight proof"
-    $sourceRepository = [string]$source["Repository"]
-    $sourceBranch = [string]$source["Branch"]
-    $sourceCommit = [string]$source["Commit"]
-    $sourceDirty = [string]$source["Dirty"]
-    Write-Host "proof_source_commit=$sourceCommit"
-    Write-Host "proof_source_dirty=$sourceDirty"
+    Assert-ManifestSourceProof -Manifest $manifest
+
+    $identity = Get-RomaWindowsProofReportIdentity -Report $Report -ReportName "laptop_preflight"
+    Assert-RomaWindowsProofReportIdentityComplete `
+        -Identity $identity `
+        -ProofName "Laptop preflight proof" `
+        -RequireWindows `
+        -RequireCleanSource
 
     $os = Require-Property -Object $Report -Name "os"
     $platform = [string](Require-Property -Object $os -Name "platform")
-    if ($platform -ne "Win32NT") {
-        throw "Laptop preflight proof must run on Windows, got platform $platform"
-    }
     Write-Host "proof_windows_platform=$platform"
-    $machine = Get-NonEmptyStringProperty -Object $os -Name "machine"
-    $userName = Get-NonEmptyStringProperty -Object $os -Name "user_name"
-    $userSid = Get-NonEmptyStringProperty -Object $os -Name "user_sid"
 
     $preflights = Require-Property -Object $Report -Name "preflights"
     Assert-Boolean -Object $preflights -Name "permission_surface" -Expected $true
@@ -451,15 +442,9 @@ function Assert-LaptopPreflightReport {
 
     Write-Host "proof_set_laptop_preflight_session_id=$proofSessionId"
     Write-Host "proof_set_laptop_preflight_generated_at=$($generatedAt.ToString("o"))"
-    Write-Host "proof_set_laptop_preflight_machine=$machine"
-    Write-Host "proof_set_laptop_preflight_user=$userName"
-    Write-Host "proof_set_laptop_preflight_user_sid=$userSid"
-    Write-Host "proof_set_laptop_preflight_package_dir=$packageDir"
-    Write-Host "proof_set_laptop_preflight_package_fingerprint=$packageFingerprint"
-    Write-Host "proof_set_laptop_preflight_source_repository=$sourceRepository"
-    Write-Host "proof_set_laptop_preflight_source_branch=$sourceBranch"
-    Write-Host "proof_set_laptop_preflight_source_commit=$sourceCommit"
-    Write-Host "proof_set_laptop_preflight_source_dirty=$sourceDirty"
+    Write-RomaWindowsProofReportIdentityMarkers `
+        -Identity $identity `
+        -Prefix "proof_set_laptop_preflight"
     Write-Host "proof_set_laptop_preflight_proof_dir=$proofDir"
     Write-Host "proof_set_laptop_preflight_permission_surface=true"
     Write-Host "proof_set_laptop_preflight_local_whisper=$hasLocalWhisperPreflight"

@@ -12990,8 +12990,10 @@ struct RomaCoreChecks {
             "Windows proof-set checker should reject dirty packaged source for final laptop proof"
         )
         try require(
-            checkReportScript.contains("Assert-RomaWindowsCleanManifestSourceProvenance") &&
+            checkReportScript.contains(#"Get-RomaWindowsProofReportIdentity -Report $Report -ReportName "laptop_preflight""#) &&
+                checkReportScript.contains("Assert-RomaWindowsProofReportIdentityComplete") &&
                 checkReportScript.contains(#"-ProofName "Laptop preflight proof""#) &&
+                checkReportScript.contains("-RequireCleanSource") &&
                 proofCommonScript.contains("requires a clean packaged source checkout, got source_dirty") &&
                 !checkReportScript.contains(#"$sourceDirty -ne "false""#),
             "Windows proof report profile should reject dirty packaged source for laptop preflight proof"
@@ -13214,11 +13216,16 @@ struct RomaCoreChecks {
                 checkSetScript.contains("function Assert-LaptopPreflightIncludesLocalWhisper") &&
                 checkReportScript.contains("proof_set_laptop_preflight_permission_surface=true") &&
                 checkReportScript.contains("proof_set_laptop_preflight_local_whisper=") &&
-                checkReportScript.contains("proof_set_laptop_preflight_package_fingerprint=") &&
+                checkReportScript.contains("Write-RomaWindowsProofReportIdentityMarkers") &&
+                checkReportScript.contains(#"-Prefix "proof_set_laptop_preflight""#) &&
+                proofCommonScript.contains("proof_set_laptop_preflight_package_fingerprint=") &&
                 checkSetScript.contains("proof_set_laptop_preflight_matches_full=true") &&
                 checkReportScript.contains("function Write-ProofProfileRequirements") &&
                 checkReportScript.contains("proof_profile_ok=$Profile") &&
-                checkReportScript.contains("Laptop preflight proof must run on Windows"),
+                checkReportScript.contains("-RequireWindows") &&
+                proofCommonScript.contains("must run on Windows, got platform") &&
+                !checkReportScript.contains("proof_set_laptop_preflight_source_repository=$sourceRepository") &&
+                !checkReportScript.contains("proof_set_laptop_preflight_package_fingerprint=$packageFingerprint"),
             "Windows proof report profile should validate laptop preflight reports, output markers, and artifact identity"
         )
         try require(
@@ -13228,6 +13235,8 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("^0{64}$") &&
                 proofCommonScript.contains("fingerprint must be non-placeholder") &&
                 checkReportScript.contains("Get-RomaWindowsPackageIdentityFingerprint") &&
+                checkReportScript.contains("Get-RomaWindowsProofReportIdentity") &&
+                checkReportScript.contains("Write-RomaWindowsProofReportIdentityMarkers") &&
                 checkSetScript.contains("Get-RomaWindowsProofReportIdentity"),
             "Windows proof report checker should reject malformed and placeholder package identity fingerprints"
         )

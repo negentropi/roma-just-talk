@@ -438,6 +438,7 @@ public struct RomaTranscriptionOutputFilter {
         "typescript": "TypeScript",
         "vercel": "Vercel",
         "voiceink": "VoiceInk",
+        "windsurf": "Windsurf",
         "wispr": "Wispr",
         "xcode": "Xcode"
     ]
@@ -456,6 +457,7 @@ public struct RomaTranscriptionOutputFilter {
         "super whisper": "Superwhisper",
         "type script": "TypeScript",
         "voice ink": "VoiceInk",
+        "wind surf": "Windsurf",
         "wispr flow": "Wispr Flow",
         "x code": "Xcode"
     ]

@@ -838,6 +838,8 @@ struct TranscriptionOutputFilterTests {
         #expect(TranscriptionOutputFilter.applyInsertionPolish("NEXT JS ROUTE.", context: midSentenceContext) == "Next.js route")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("NEXTJS ROUTE.", context: midSentenceContext) == "Next.js route")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("NODE JS SERVER.", context: midSentenceContext) == "Node.js server")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("WINDSURF PROJECT.", context: midSentenceContext) == "Windsurf project")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("WIND SURF PROJECT.", context: midSentenceContext) == "Windsurf project")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("TYPESCRIPT TYPE.", context: midSentenceContext) == "TypeScript type")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("TYPE SCRIPT TYPE.", context: midSentenceContext) == "TypeScript type")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("JAVA SCRIPT FILE.", context: midSentenceContext) == "JavaScript file")

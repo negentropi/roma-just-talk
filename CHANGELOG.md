@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Preserved Windsurf casing in short developer dictation fragments, including spoken `wind surf`.
 - Shared installed Windows agent config-file proof shaping through proof-helper helpers.
 - Shared installed Windows shortcut proof shaping through proof-helper helpers.
 - Shared installed Windows Notepad paste proof initialization through proof-helper helpers.

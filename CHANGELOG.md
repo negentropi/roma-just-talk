@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Shared the Windows laptop proof claim gate through the proof helper so generated guide closeout text stays tied to the full proof-set markers.
 - Added shared Windows laptop proof prerequisites to the generated artifact guide.
 - Shared Windows laptop hotkey-preflight and Notepad-paste operator prompts through the proof helper.
 - Shared Windows dictation operator prompts across source proof and installed smoke paths.

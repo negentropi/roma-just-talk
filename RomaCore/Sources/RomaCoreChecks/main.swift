@@ -11944,14 +11944,19 @@ struct RomaCoreChecks {
                 packageScript.contains("Get-RomaWindowsLaptopPreflightLocalWhisperGuideMarkers") &&
                 packageScript.contains("Get-RomaWindowsLaptopProofOperatorGuideLines") &&
                 packageScript.contains("Get-RomaWindowsLaptopProofPrerequisiteGuideLines") &&
+                packageScript.contains("Get-RomaWindowsLaptopProofClaimGuideLines") &&
                 proofCommonScript.contains("function Get-RomaWindowsLaptopPreflightGuideMarkers") &&
                 proofCommonScript.contains("function Get-RomaWindowsLaptopPreflightLocalWhisperGuideMarkers") &&
                 proofCommonScript.contains("function Get-RomaWindowsLaptopProofOperatorGuideLines") &&
                 proofCommonScript.contains("function Get-RomaWindowsLaptopProofPrerequisiteGuideLines") &&
+                proofCommonScript.contains("function Get-RomaWindowsLaptopProofClaimGuideLines") &&
                 proofCommonScript.contains("Prerequisites before full proof:") &&
                 proofCommonScript.contains("microphone_settings_uri=ms-settings:privacy-microphone") &&
                 proofCommonScript.contains("RomaWhisperCLIMock.exe is CI-only") &&
                 proofCommonScript.contains("source_dirty=true") &&
+                proofCommonScript.contains("Full proof validates four JSON reports") &&
+                proofCommonScript.contains("proof_set_ok=full-laptop") &&
+                proofCommonScript.contains("Do not claim Windows support until the full laptop proof passes on the target Windows machine") &&
                 proofCommonScript.contains("ACTION_REQUIRED=hotkey_delivery_preflight") &&
                 proofCommonScript.contains("cloud pre roll proof") &&
                 proofCommonScript.contains("local whisper pre roll proof") &&
@@ -11990,7 +11995,8 @@ struct RomaCoreChecks {
                 packageScript.contains("cloud-dictation-proof.json") &&
                 packageScript.contains("local-whisper-dictation-proof.json") &&
                 packageScript.contains("local-whisper-notepad-paste-proof.json") &&
-                packageScript.contains("Full proof validates four JSON reports") &&
+                !packageScript.contains("Full proof validates four JSON reports:") &&
+                !packageScript.contains("Do not claim Windows support until") &&
                 packageScript.contains("laptop_proof_guide="),
             "Windows package should include an artifact-local laptop proof guide with full proof markers"
         )

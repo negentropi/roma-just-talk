@@ -411,6 +411,7 @@ function Write-LaptopProofGuide {
     $fullProofMarkers = @((Get-RomaWindowsFullLaptopProofGuideMarkers).Values) -join [System.Environment]::NewLine
     $operatorGuide = @(Get-RomaWindowsLaptopProofOperatorGuideLines) -join [System.Environment]::NewLine
     $prerequisiteGuide = @(Get-RomaWindowsLaptopProofPrerequisiteGuideLines) -join [System.Environment]::NewLine
+    $claimGuide = @(Get-RomaWindowsLaptopProofClaimGuideLines) -join [System.Environment]::NewLine
 
     @"
 Roma Just Talk Windows laptop proof
@@ -461,8 +462,7 @@ That recheck script asserts the four profile markers and prints:
 
 windows_laptop_recheck_ok=true
 
-Full proof validates four JSON reports: preflight, cloud dictation, local whisper dictation, and local whisper Notepad paste.
-Do not claim Windows support until the full laptop proof passes on the target Windows machine.
+$claimGuide
 "@ | Set-Content -LiteralPath $OutputPath -Encoding UTF8
     Write-Host "laptop_proof_guide=$OutputPath"
 }

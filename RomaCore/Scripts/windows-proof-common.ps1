@@ -1137,6 +1137,14 @@ function Get-RomaWindowsLaptopProofPrerequisiteGuideLines {
     )
 }
 
+function Get-RomaWindowsLaptopProofClaimGuideLines {
+    return @(
+        "Full proof validates four JSON reports: preflight, cloud dictation, local whisper dictation, and local whisper Notepad paste.",
+        "The final proof-set checker must print proof_set_ok=full-laptop and the archived recheck script must print windows_laptop_recheck_ok=true.",
+        "Do not claim Windows support until the full laptop proof passes on the target Windows machine."
+    )
+}
+
 function Get-RomaWindowsFullLaptopProofSetOutputMarkers {
     $markers = Get-RomaWindowsProofSetProfileOkMarkers -Name "full_laptop"
     $markers["full_laptop_proof_set"] = Get-RomaWindowsProofSetOkMarker -Name "full_laptop"

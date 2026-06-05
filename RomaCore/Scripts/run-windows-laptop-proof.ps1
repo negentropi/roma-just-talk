@@ -282,7 +282,7 @@ if (![string]::IsNullOrWhiteSpace($StartupShortcutDir)) {
     $StartupShortcutDir = Resolve-FullPath -Path $StartupShortcutDir
 }
 if ([string]::IsNullOrWhiteSpace($PreflightReportPath)) {
-    $PreflightReportPath = Join-Path $ProofDir "preflight-proof.json"
+    $PreflightReportPath = Join-RomaWindowsLaptopProofReportPath -ProofDir $ProofDir -Name "laptop_preflight"
 }
 $PreflightReportPath = Resolve-FullPath -Path $PreflightReportPath
 
@@ -336,9 +336,9 @@ $packagedProofCommonScript = Require-RomaWindowsManifestFile `
 
 $proofSessionId = [guid]::NewGuid().ToString("D")
 
-$cloudReport = Join-Path $ProofDir "cloud-dictation-proof.json"
-$localWhisperDictationReport = Join-Path $ProofDir "local-whisper-dictation-proof.json"
-$localWhisperNotepadReport = Join-Path $ProofDir "local-whisper-notepad-paste-proof.json"
+$cloudReport = Join-RomaWindowsLaptopProofReportPath -ProofDir $ProofDir -Name "cloud_dictation"
+$localWhisperDictationReport = Join-RomaWindowsLaptopProofReportPath -ProofDir $ProofDir -Name "local_whisper_dictation"
+$localWhisperNotepadReport = Join-RomaWindowsLaptopProofReportPath -ProofDir $ProofDir -Name "local_whisper_notepad_paste"
 $recheckScriptPath = Join-Path $ProofDir "recheck-full-laptop-proof.ps1"
 $micPreflightPath = Join-Path $ProofDir "mic-preflight.wav"
 

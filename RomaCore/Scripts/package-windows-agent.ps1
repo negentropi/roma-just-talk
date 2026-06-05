@@ -412,6 +412,11 @@ function Write-LaptopProofGuide {
     $operatorGuide = @(Get-RomaWindowsLaptopProofOperatorGuideLines) -join [System.Environment]::NewLine
     $prerequisiteGuide = @(Get-RomaWindowsLaptopProofPrerequisiteGuideLines) -join [System.Environment]::NewLine
     $claimGuide = @(Get-RomaWindowsLaptopProofClaimGuideLines) -join [System.Environment]::NewLine
+    $guideReportPaths = Get-RomaWindowsLaptopProofGuideReportPaths
+    $laptopPreflightReportPath = $guideReportPaths["laptop_preflight"]
+    $cloudDictationReportPath = $guideReportPaths["cloud_dictation"]
+    $localWhisperDictationReportPath = $guideReportPaths["local_whisper_dictation"]
+    $localWhisperNotepadPasteReportPath = $guideReportPaths["local_whisper_notepad_paste"]
 
     @"
 Roma Just Talk Windows laptop proof
@@ -444,7 +449,7 @@ $localWhisperPreflightMarkers
 
 Archived preflight report recheck, without rerunning hotkey or microphone proof:
 
-powershell -ExecutionPolicy Bypass -File .\check-windows-proof-report.ps1 -ProofReportPath C:\tmp\roma-windows-laptop-proof\preflight-proof.json -RequireProofProfile laptop-preflight
+powershell -ExecutionPolicy Bypass -File .\check-windows-proof-report.ps1 -ProofReportPath $laptopPreflightReportPath -RequireProofProfile laptop-preflight
 
 Expected full-proof markers:
 
@@ -452,7 +457,7 @@ $fullProofMarkers
 
 Archived full-proof recheck, without rerunning capture, transcription, listener, or paste:
 
-powershell -ExecutionPolicy Bypass -File .\check-windows-proof-set.ps1 -LaptopPreflightReportPath C:\tmp\roma-windows-laptop-proof\preflight-proof.json -CloudDictationReportPath C:\tmp\roma-windows-laptop-proof\cloud-dictation-proof.json -LocalWhisperDictationReportPath C:\tmp\roma-windows-laptop-proof\local-whisper-dictation-proof.json -LocalWhisperNotepadPasteReportPath C:\tmp\roma-windows-laptop-proof\local-whisper-notepad-paste-proof.json -RequireLaptopPreflight -RequireFullLaptopProof
+powershell -ExecutionPolicy Bypass -File .\check-windows-proof-set.ps1 -LaptopPreflightReportPath $laptopPreflightReportPath -CloudDictationReportPath $cloudDictationReportPath -LocalWhisperDictationReportPath $localWhisperDictationReportPath -LocalWhisperNotepadPasteReportPath $localWhisperNotepadPasteReportPath -RequireLaptopPreflight -RequireFullLaptopProof
 
 Or run the proof-dir script written by the full laptop proof:
 
@@ -531,9 +536,9 @@ try {
     $localWhisperShortcutDir = Join-Path $OutputDir "shortcuts-local-whisper"
     $localWhisperShortcutPath = Join-Path $localWhisperShortcutDir "Roma Just Talk Agent.lnk"
     $laptopPreflightCheckerSmokeDir = Join-Path $OutputDir "laptop-preflight-checker-smoke"
-    $laptopPreflightCheckerSmokeReport = Join-Path $laptopPreflightCheckerSmokeDir "preflight-proof.json"
+    $laptopPreflightCheckerSmokeReport = Join-RomaWindowsLaptopProofReportPath -ProofDir $laptopPreflightCheckerSmokeDir -Name "laptop_preflight"
     $laptopNativePreflightCheckerSmokeDir = Join-Path $OutputDir "laptop-native-preflight-checker-smoke"
-    $laptopNativePreflightCheckerSmokeReport = Join-Path $laptopNativePreflightCheckerSmokeDir "preflight-proof.json"
+    $laptopNativePreflightCheckerSmokeReport = Join-RomaWindowsLaptopProofReportPath -ProofDir $laptopNativePreflightCheckerSmokeDir -Name "laptop_preflight"
 
     Invoke-Step "copy agent executable" {
         Copy-Item -LiteralPath $agentSource.FullName -Destination $agentOutput -Force

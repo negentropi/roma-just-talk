@@ -663,6 +663,20 @@ struct RomaCoreChecks {
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "What I was going to say is module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim full what-I-was-going-to-say-is correction fillers before module continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "What I was gonna say is module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim full what-I-was-gonna-say-is correction fillers before module continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "What I meant to say is module.",
                 context: midSentenceContext
             ) == "module",
@@ -702,6 +716,13 @@ struct RomaCoreChecks {
                 context: midSentenceContext
             ) == "what I am trying to say is now",
             "shared insertion polish should preserve non-technical what-I-am-trying-to-say continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "What I was going to say is now.",
+                context: midSentenceContext
+            ) == "what I was going to say is now",
+            "shared insertion polish should preserve non-technical what-I-was-going-to-say continuations"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
@@ -1270,6 +1291,20 @@ struct RomaCoreChecks {
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model what I was going to say is module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should apply what-i-was-going-to-say-is corrections in short continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model what I was gonna say is final word.",
+                context: midSentenceContext
+            ) == "final word",
+            "shared insertion polish should apply what-i-was-gonna-say-is corrections in short continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "model what I meant to say is module.",
                 context: midSentenceContext
             ) == "module",
@@ -1295,6 +1330,13 @@ struct RomaCoreChecks {
                 context: midSentenceContext
             ) == "please what I am trying to say is module",
             "shared insertion polish should preserve please-prefixed what-i-am-trying-to-say-is prose"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "please what I was going to say is module.",
+                context: midSentenceContext
+            ) == "please what I was going to say is module",
+            "shared insertion polish should preserve please-prefixed what-i-was-going-to-say-is prose"
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
@@ -3568,6 +3610,16 @@ struct RomaCoreChecks {
                 "embedded unpunctuated what-i-was-trying-to-say-is before good predicate"
             ),
             (
+                "I think this is what I was going to say is ready.",
+                "I think this is ready.",
+                "embedded unpunctuated what-i-was-going-to-say-is before ready predicate"
+            ),
+            (
+                "I think this is what I was gonna say is good.",
+                "I think this is good.",
+                "embedded unpunctuated what-i-was-gonna-say-is before good predicate"
+            ),
+            (
                 "I think this is what I meant to say is ready.",
                 "I think this is ready.",
                 "embedded unpunctuated what-i-meant-to-say-is before ready predicate"
@@ -4331,6 +4383,16 @@ struct RomaCoreChecks {
                 "Use model, what I was trying to say is module.",
                 "Use module.",
                 "what i was trying to say is correction"
+            ),
+            (
+                "Use model, what I was going to say is module.",
+                "Use module.",
+                "what i was going to say is correction"
+            ),
+            (
+                "Use model, um what I was gonna say is module.",
+                "Use module.",
+                "pause filler before what i was gonna say is correction"
             ),
             (
                 "Use model, what I meant to say is module.",
@@ -5738,6 +5800,16 @@ struct RomaCoreChecks {
                 "what i'm trying to say is prose guard"
             ),
             (
+                "What I was going to say is, module loads.",
+                "What I was going to say is, module loads.",
+                "what i was going to say is prose guard"
+            ),
+            (
+                "What I was gonna say is, module loads.",
+                "What I was gonna say is, module loads.",
+                "what i was gonna say is prose guard"
+            ),
+            (
                 "What I meant to say is, module loads.",
                 "What I meant to say is, module loads.",
                 "what i meant to say is prose guard"
@@ -5756,6 +5828,11 @@ struct RomaCoreChecks {
                 "I know what I meant to say is important.",
                 "I know what I meant to say is important.",
                 "embedded what i meant to say is prose guard"
+            ),
+            (
+                "I know what I was going to say is important.",
+                "I know what I was going to say is important.",
+                "embedded what i was going to say is prose guard"
             ),
             (
                 "I know what I'm trying to say is confusing.",

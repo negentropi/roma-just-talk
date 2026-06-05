@@ -564,7 +564,7 @@ public struct RomaTranscriptionOutputFilter {
         (#"(?i)^\s*(?:ok(?:ay)?|all\s+right|alright|right|yeah|yes|yep|yup|sure)(?:[ \t]*[,;:…]+[ \t]*)+so[,;:…]*[ \t]+"#, ""),
         (#"(?i)^\s*(?:you\s+know|i\s+mean|like)[,;:…]+[ \t]*"#, "")
     ]
-    private static let continuationFragmentLeadingDiscourseFillerPattern = #"(?i)^\s*(you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?|what[ \t]+i[ \t]+mean[ \t]+is|what[ \t]+i(?:[ \t]+(?:am|was)|['’]m)[ \t]+trying[ \t]+to[ \t]+say[ \t]+is|what[ \t]+i[ \t]+(?:meant|want(?:ed)?)[ \t]+to[ \t]+say[ \t]+(?:is|was)|what[ \t]+i[ \t]+meant[ \t]+(?:is|was)|i[ \t]+mean(?:[ \t]+to[ \t]+say)?|i[ \t]+meant(?:[ \t]+to[ \t]+say)?|i[ \t]+should[ \t]+say|(?:it|that)[ \t]+should[ \t]+be|(?:it|that)(?:[ \t]+is|['’]s)|ok(?:ay)?|all[ \t]+right|alright|got[ \t]+it|gotcha|no[ \t]+wait|wait|hold[ \t]+on|hang[ \t]+on|make[ \t]+(?:it|that)|call[ \t]+it|replace[ \t]+(?:that|it)[ \t]+with|change[ \t]+(?:that|it)[ \t]+to|(?:scratch|delete|remove|erase|undo)[ \t]+(?:that|this)(?:[ \t]+out)?|correction(?:[ \t]+(?:is|should[ \t]+be))?|sorry|oops|whoops|my[ \t]+bad|actually|instead|rather|yeah|yes|yep|yup|like|basically|so|well)(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
+    private static let continuationFragmentLeadingDiscourseFillerPattern = #"(?i)^\s*(you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?|what[ \t]+i[ \t]+mean[ \t]+is|what[ \t]+i(?:[ \t]+(?:am|was)|['’]m)[ \t]+trying[ \t]+to[ \t]+say[ \t]+is|what[ \t]+i[ \t]+was[ \t]+(?:going[ \t]+to|gonna)[ \t]+say[ \t]+is|what[ \t]+i[ \t]+(?:meant|want(?:ed)?)[ \t]+to[ \t]+say[ \t]+(?:is|was)|what[ \t]+i[ \t]+meant[ \t]+(?:is|was)|i[ \t]+mean(?:[ \t]+to[ \t]+say)?|i[ \t]+meant(?:[ \t]+to[ \t]+say)?|i[ \t]+should[ \t]+say|(?:it|that)[ \t]+should[ \t]+be|(?:it|that)(?:[ \t]+is|['’]s)|ok(?:ay)?|all[ \t]+right|alright|got[ \t]+it|gotcha|no[ \t]+wait|wait|hold[ \t]+on|hang[ \t]+on|make[ \t]+(?:it|that)|call[ \t]+it|replace[ \t]+(?:that|it)[ \t]+with|change[ \t]+(?:that|it)[ \t]+to|(?:scratch|delete|remove|erase|undo)[ \t]+(?:that|this)(?:[ \t]+out)?|correction(?:[ \t]+(?:is|should[ \t]+be))?|sorry|oops|whoops|my[ \t]+bad|actually|instead|rather|yeah|yes|yep|yup|like|basically|so|well)(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let standaloneDiscourseFillerPattern = #"(?i)^\s*you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?[ \t]*[.,;:…]*\s*$"#
     private static let blockedPreviousWordsForTerminalYouKnow: Set<String> = [
         "do", "does", "did", "don't", "if", "know", "let", "should", "to", "whether", "will", "would"
@@ -723,6 +723,7 @@ public struct RomaTranscriptionOutputFilter {
             (?:[,;:…]|\.\.\.)\s*sorry\s*[,;:]?\s+i\s+meant\s*[,;:]? |
             (?:[,;:…]|\.\.\.)\s*what\s+i\s+mean\s+is\s*[,;:]? |
             (?:[,;:…]|\.\.\.)\s*what\s+i(?:\s+(?:am|was)|['’]m)\s+trying\s+to\s+say\s+is\s*[,;:]? |
+            (?:[,;:…]|\.\.\.)\s*what\s+i\s+was\s+(?:going\s+to|gonna)\s+say\s+is\s*[,;:]? |
             (?:[,;:…]|\.\.\.)\s*what\s+i\s+(?:meant|want(?:ed)?)\s+to\s+say\s+(?:is|was)\s*[,;:]? |
             (?:[,;:…]|\.\.\.)\s*i\s+mean\s+to\s+say\s*[,;:]? |
             (?:[,;:…]|\.\.\.)\s*i\s+meant\s+to\s+say\s*[,;:]? |
@@ -1701,7 +1702,7 @@ public struct RomaTranscriptionOutputFilter {
         guard let regex = try? NSRegularExpression(
             pattern: #"(?i)([,;:…]|\.\.\.)[ \t]+(?:"# +
                 pauseFillerNoisePattern +
-                #")(?:[.,;:!?…]+)?[ \t]+(actually(?:[ \t]+no|[ \t]+make[ \t]+it)?|better[ \t]+make[ \t]+it|sorry[ \t]+i[ \t]+mean|sorry[ \t]+i[ \t]+meant|what[ \t]+i[ \t]+mean[ \t]+is|what[ \t]+i(?:[ \t]+(?:am|was)|['’]m)[ \t]+trying[ \t]+to[ \t]+say[ \t]+is|what[ \t]+i[ \t]+(?:meant|want(?:ed)?)[ \t]+to[ \t]+say[ \t]+(?:is|was)|i[ \t]+mean[ \t]+to[ \t]+say|i[ \t]+meant[ \t]+to[ \t]+say|i[ \t]+mean|i[ \t]+meant|i[ \t]+should[ \t]+say|make[ \t]+that|make[ \t]+it|call[ \t]+it|wait[ \t]+no|no[ \t]+wait|no[ \t]+actually|on[ \t]+second[ \t]+thought|let[ \t]+me[ \t]+rephrase|(?:just[ \t]+)?to[ \t]+clarify|(?:just[ \t]+)?to[ \t]+be[ \t]+clear|for[ \t]+clarity|rather|instead|oops|whoops|woops|my[ \t]+bad|correction)(?=\s)"#
+                #")(?:[.,;:!?…]+)?[ \t]+(actually(?:[ \t]+no|[ \t]+make[ \t]+it)?|better[ \t]+make[ \t]+it|sorry[ \t]+i[ \t]+mean|sorry[ \t]+i[ \t]+meant|what[ \t]+i[ \t]+mean[ \t]+is|what[ \t]+i(?:[ \t]+(?:am|was)|['’]m)[ \t]+trying[ \t]+to[ \t]+say[ \t]+is|what[ \t]+i[ \t]+was[ \t]+(?:going[ \t]+to|gonna)[ \t]+say[ \t]+is|what[ \t]+i[ \t]+(?:meant|want(?:ed)?)[ \t]+to[ \t]+say[ \t]+(?:is|was)|i[ \t]+mean[ \t]+to[ \t]+say|i[ \t]+meant[ \t]+to[ \t]+say|i[ \t]+mean|i[ \t]+meant|i[ \t]+should[ \t]+say|make[ \t]+that|make[ \t]+it|call[ \t]+it|wait[ \t]+no|no[ \t]+wait|no[ \t]+actually|on[ \t]+second[ \t]+thought|let[ \t]+me[ \t]+rephrase|(?:just[ \t]+)?to[ \t]+clarify|(?:just[ \t]+)?to[ \t]+be[ \t]+clear|for[ \t]+clarity|rather|instead|oops|whoops|woops|my[ \t]+bad|correction)(?=\s)"#
         ) else {
             return text
         }
@@ -2086,8 +2087,9 @@ public struct RomaTranscriptionOutputFilter {
             "it is", "it's", "it’s", "that is", "that's", "that’s",
             "sorry", "oops", "whoops", "my bad", "actually", "instead", "rather",
             "what i mean is", "what i am trying to say is", "what i was trying to say is",
-            "what i'm trying to say is", "what i’m trying to say is", "what i meant to say is",
-            "what i meant to say was", "what i want to say is", "what i want to say was",
+            "what i'm trying to say is", "what i’m trying to say is", "what i was going to say is",
+            "what i was gonna say is", "what i meant to say is", "what i meant to say was",
+            "what i want to say is", "what i want to say was",
             "what i wanted to say is", "what i wanted to say was", "what i meant is",
             "what i meant was", "yes", "yep", "yup"
         ].contains(filler) {
@@ -2401,6 +2403,23 @@ public struct RomaTranscriptionOutputFilter {
                ["i'm", "i’m", "im"].contains(tokens[markerIndex + 1].text),
                tokens[markerIndex + 2].text == "trying",
                tokens[markerIndex + 3].text == "to",
+               tokens[markerIndex + 4].text == "say",
+               tokens[markerIndex + 5].text == "is" {
+                return markerIndex + 6
+            }
+            if markerIndex + 6 < tokens.count,
+               tokens[markerIndex + 1].text == "i",
+               tokens[markerIndex + 2].text == "was",
+               tokens[markerIndex + 3].text == "going",
+               tokens[markerIndex + 4].text == "to",
+               tokens[markerIndex + 5].text == "say",
+               tokens[markerIndex + 6].text == "is" {
+                return markerIndex + 7
+            }
+            if markerIndex + 5 < tokens.count,
+               tokens[markerIndex + 1].text == "i",
+               tokens[markerIndex + 2].text == "was",
+               tokens[markerIndex + 3].text == "gonna",
                tokens[markerIndex + 4].text == "say",
                tokens[markerIndex + 5].text == "is" {
                 return markerIndex + 6
@@ -2931,7 +2950,7 @@ public struct RomaTranscriptionOutputFilter {
 
     private static func removeUnpunctuatedWhatICorrectionFillers(from text: String) -> String {
         guard let regex = try? NSRegularExpression(
-            pattern: #"(?i)(?<![\p{L}\p{N}])(?:what[ \t]+i(?:[ \t]+(?:am|was)|['’]m)[ \t]+trying[ \t]+to[ \t]+say[ \t]+is|what[ \t]+i[ \t]+(?:meant|want(?:ed)?)[ \t]+to[ \t]+say[ \t]+(?:is|was))(?:[ \t]*[,;:…]+)?(?![\p{L}\p{N}])"#
+            pattern: #"(?i)(?<![\p{L}\p{N}])(?:what[ \t]+i(?:[ \t]+(?:am|was)|['’]m)[ \t]+trying[ \t]+to[ \t]+say[ \t]+is|what[ \t]+i[ \t]+was[ \t]+(?:going[ \t]+to|gonna)[ \t]+say[ \t]+is|what[ \t]+i[ \t]+(?:meant|want(?:ed)?)[ \t]+to[ \t]+say[ \t]+(?:is|was))(?:[ \t]*[,;:…]+)?(?![\p{L}\p{N}])"#
         ) else {
             return text
         }
@@ -7427,6 +7446,8 @@ public struct RomaTranscriptionOutputFilter {
             "what i mean is",
             "what i am trying to say is",
             "what i was trying to say is",
+            "what i was going to say is",
+            "what i was gonna say is",
             "what i'm trying to say is",
             "what i’m trying to say is",
             "what i meant to say is",
@@ -7669,6 +7690,8 @@ public struct RomaTranscriptionOutputFilter {
             "what i mean is",
             "what i am trying to say is",
             "what i was trying to say is",
+            "what i was going to say is",
+            "what i was gonna say is",
             "what i'm trying to say is",
             "what i’m trying to say is",
             "what i meant to say is",

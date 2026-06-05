@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Trimmed was-not-what-I-meant correction lead-ins before bracketed final-word fragments.
 - Trimmed not-what-I-meant correction lead-ins before bracketed final-word fragments.
 - Trimmed did-not-mean-that correction lead-ins before bracketed final-word fragments.
 - Trimmed take-that-back correction lead-ins before bracketed final-word fragments.

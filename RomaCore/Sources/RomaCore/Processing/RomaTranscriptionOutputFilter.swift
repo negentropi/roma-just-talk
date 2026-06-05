@@ -591,6 +591,7 @@ public struct RomaTranscriptionOutputFilter {
         (#"(?i)^\s*(?:you\s+know|i\s+mean|like)[,;:…]+[ \t]*"#, "")
     ]
     private static let continuationFragmentLeadingDiscourseFillerPattern = #"(?i)^\s*(you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?|what[ \t]+i[ \t]+mean[ \t]+(?:is|was)|what[ \t]+i(?:[ \t]+(?:am|was)|['’]m)[ \t]+trying[ \t]+to[ \t]+say[ \t]+is|what[ \t]+i[ \t]+was[ \t]+(?:going[ \t]+to|gonna)[ \t]+say[ \t]+is|what[ \t]+i[ \t]+(?:meant|want(?:ed)?)[ \t]+to[ \t]+say[ \t]+(?:is|was)|what[ \t]+i[ \t]+meant[ \t]+(?:is|was)|i[ \t]+(?:am|was)[ \t]+trying[ \t]+to[ \t]+say|i[ \t]+was[ \t]+(?:going[ \t]+to|gonna)[ \t]+say|i[ \t]+(?:want|wanted)[ \t]+to[ \t]+say|i[ \t]+mean(?:[ \t]+to[ \t]+say)?|i[ \t]+meant(?:[ \t]+to[ \t]+say)?|i[ \t]+should[ \t]+say|(?:it|that)[ \t]+should[ \t]+be|(?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?(?:(?:that|this|it)(?:[ \t]+(?:is|was)|['’]s)?[ \t]+)?not[ \t]+what[ \t]+i[ \t]+meant|(?:(?:that|this|it)[ \t]+)?(?:wasn['’]t|was[ \t]+not)[ \t]+what[ \t]+i[ \t]+meant|(?:(?:that|this|it)(?:[ \t]+(?:is|was)|['’]s)?[ \t]+)?(?:wrong|incorrect|not[ \t]+right)|(?:(?:that|this|it)(?:[ \t]+(?:is|was)|['’]s)?[ \t]+)?not[ \t]+(?:that|this|it)|(?:it|that)(?:[ \t]+is|['’]s)|ok(?:ay)?|all[ \t]+right|alright|got[ \t]+it|gotcha|no[ \t]+correction(?:[ \t]+(?:is|should[ \t]+be))?|no[ \t]+(?:(?:(?:that|this|it)(?:[ \t]+(?:is|was)|['’]s)?[ \t]+)?(?:not[ \t]+(?:that|this|it)|wrong|incorrect|not[ \t]+right)|(?:it|that)[ \t]+should[ \t]+be|(?:it|that)(?:[ \t]+is|['’]s))|no[ \t]+wait|(?:nope|nah)[ \t]+(?:(?:(?:that|this|it)(?:[ \t]+(?:is|was)|['’]s)?[ \t]+)?(?:not[ \t]+(?:that|this|it)|wrong|incorrect|not[ \t]+right)|wait|actually)|actually[ \t]+wait[ \t]+(?:no|never[ \t]+mind|nevermind|scratch[ \t]+(?:that|this|it)|changed[ \t]+my[ \t]+mind|take[ \t]+(?:that|this|it)[ \t]+back)|wait[ \t]+(?:no|never[ \t]+mind|nevermind|scratch[ \t]+(?:that|this|it)|changed[ \t]+my[ \t]+mind|take[ \t]+(?:that|this|it)[ \t]+back)|(?:actually[ \t]+)?(?:(?:i[ \t]+)?changed[ \t]+my[ \t]+mind|(?:i[ \t]+)?take[ \t]+(?:that|this|it)[ \t]+back|(?:i[ \t]+)?(?:don['’]t|do[ \t]+not|didn['’]t|did[ \t]+not)[ \t]+mean[ \t]+(?:that|this|it)|not[ \t]+(?:that|this|it))|back[ \t]*track|on[ \t]+second[ \t]+thought|let[ \t]+me[ \t]+rephrase|(?:just[ \t]+)?to[ \t]+clarify|(?:just[ \t]+)?to[ \t]+be[ \t]+clear|for[ \t]+clarity|never[ \t]+mind(?:[ \t]+(?:that|this|it))?|nevermind(?:[ \t]+(?:that|this|it))?|wait|hold[ \t]+on|hang[ \t]+on|make[ \t]+(?:it|that)|call[ \t]+it|replace[ \t]+(?:that|it)[ \t]+with|change[ \t]+(?:that|it)[ \t]+to|correct[ \t]+(?:that|it)[ \t]+to|forget[ \t]+about[ \t]+(?:that|this|it)|skip[ \t]+(?:that|this|it)|omit[ \t]+(?:that|this|it)|leave[ \t]+(?:that|this|it)[ \t]+out|(?:(?:scratch|strike|delete|remove|erase|undo|cancel|disregard|ignore|forget|cut|drop)[ \t]+(?:that|this|it)(?:[ \t]+out)?|cross[ \t]+(?:that|this|it)[ \t]+out)|correction(?:[ \t]+(?:is|should[ \t]+be))?|sorry|oops|whoops|my[ \t]+bad|actually|instead|rather|yeah|yes|yep|yup|like|basically|so|well)(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
+    private static let punctuatedContinuationCorrectionPrefixPattern = #"(?i)^\s*((?:(?:actually[ \t]*(?:[,;:…]+|\.\.\.)[ \t]*)?(?:no|nope|nah)|actually)[ \t]*(?:[,;:…]+|\.\.\.)[ \t]*)(.+)$"#
     private static let standaloneDiscourseFillerPattern = #"(?i)^\s*you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?[ \t]*[.,;:…]*\s*$"#
     private static let blockedPreviousWordsForTerminalYouKnow: Set<String> = [
         "do", "does", "did", "don't", "if", "know", "let", "should", "to", "whether", "will", "would"
@@ -2083,6 +2084,51 @@ public struct RomaTranscriptionOutputFilter {
         return suffix
     }
 
+    private static func leadingPunctuatedContinuationCorrectionCandidate(
+        from text: String
+    ) -> (filler: String, suffix: String)? {
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let prefixRegex = try? NSRegularExpression(pattern: punctuatedContinuationCorrectionPrefixPattern),
+              let markerRegex = try? NSRegularExpression(pattern: continuationFragmentLeadingDiscourseFillerPattern),
+              let prefixMatch = prefixRegex.firstMatch(
+                in: trimmedText,
+                range: NSRange(trimmedText.startIndex..., in: trimmedText)
+              ),
+              prefixMatch.numberOfRanges >= 3,
+              let prefixRange = Range(prefixMatch.range(at: 1), in: trimmedText),
+              let remainderRange = Range(prefixMatch.range(at: 2), in: trimmedText) else {
+            return nil
+        }
+
+        let remainder = String(trimmedText[remainderRange]).trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let markerMatch = markerRegex.firstMatch(in: remainder, range: NSRange(remainder.startIndex..., in: remainder)),
+              markerMatch.numberOfRanges >= 2,
+              let markerRange = Range(markerMatch.range, in: remainder),
+              let markerFillerRange = Range(markerMatch.range(at: 1), in: remainder) else {
+            return nil
+        }
+
+        let suffix = String(remainder[markerRange.upperBound...])
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let prefix = normalizedPunctuatedCorrectionFillerPart(String(trimmedText[prefixRange]))
+        let marker = normalizedRepeatedClause(String(remainder[markerFillerRange]))
+        let filler = [prefix, marker]
+            .filter { !$0.isEmpty }
+            .joined(separator: " ")
+        return (filler, suffix)
+    }
+
+    private static func normalizedPunctuatedCorrectionFillerPart(_ text: String) -> String {
+        normalizedRepeatedClause(text)
+            .replacingOccurrences(
+                of: #"\s*(?:[,;:…]+|\.\.\.)\s*"#,
+                with: " ",
+                options: .regularExpression
+            )
+            .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
     private static func removeLeadingDiscourseFillerFromContinuationFragment(
         from text: String,
         after precedingText: String
@@ -2094,10 +2140,25 @@ public struct RomaTranscriptionOutputFilter {
         var candidate = text.trimmingCharacters(in: .whitespacesAndNewlines)
         var didRemoveFiller = false
 
-        while let match = regex.firstMatch(in: candidate, range: NSRange(candidate.startIndex..., in: candidate)),
-              match.numberOfRanges >= 2,
-              let matchRange = Range(match.range, in: candidate),
-              let fillerRange = Range(match.range(at: 1), in: candidate) {
+        while true {
+            if let punctuatedCorrection = leadingPunctuatedContinuationCorrectionCandidate(from: candidate),
+               shouldRemoveLeadingContinuationDiscourseFiller(
+                punctuatedCorrection.filler,
+                suffix: punctuatedCorrection.suffix,
+                after: precedingText
+               ) {
+                candidate = punctuatedCorrection.suffix
+                didRemoveFiller = true
+                continue
+            }
+
+            guard let match = regex.firstMatch(in: candidate, range: NSRange(candidate.startIndex..., in: candidate)),
+                  match.numberOfRanges >= 2,
+                  let matchRange = Range(match.range, in: candidate),
+                  let fillerRange = Range(match.range(at: 1), in: candidate) else {
+                break
+            }
+
             let suffix = String(candidate[matchRange.upperBound...])
                 .trimmingCharacters(in: .whitespacesAndNewlines)
             let filler = normalizedRepeatedClause(String(candidate[fillerRange]))
@@ -2152,6 +2213,14 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         let candidate = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let punctuatedCorrection = leadingPunctuatedContinuationCorrectionCandidate(from: candidate) {
+            return shouldRemoveLeadingContinuationDiscourseFiller(
+                punctuatedCorrection.filler,
+                suffix: punctuatedCorrection.suffix,
+                after: precedingText
+            )
+        }
+
         guard let match = regex.firstMatch(in: candidate, range: NSRange(candidate.startIndex..., in: candidate)),
               match.numberOfRanges >= 2,
               let matchRange = Range(match.range, in: candidate),
@@ -2269,6 +2338,10 @@ public struct RomaTranscriptionOutputFilter {
 
     private static func unwrapStackedLeadingContinuationCorrectionMarker(from text: String) -> String {
         let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let punctuatedCorrection = leadingPunctuatedContinuationCorrectionCandidate(from: trimmedText) {
+            return punctuatedCorrection.suffix
+        }
+
         guard let regex = try? NSRegularExpression(pattern: continuationFragmentLeadingDiscourseFillerPattern),
               let match = regex.firstMatch(in: trimmedText, range: NSRange(trimmedText.startIndex..., in: trimmedText)),
               match.numberOfRanges >= 2,
@@ -6123,9 +6196,22 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         var removalCount = 0
-        while removalCount < 3,
-              let match = regex.firstMatch(in: candidate, range: NSRange(candidate.startIndex..., in: candidate)),
-              let matchRange = Range(match.range, in: candidate) {
+        while removalCount < 3 {
+            if let punctuatedCorrection = leadingPunctuatedContinuationCorrectionCandidate(from: candidate) {
+                candidate = punctuatedCorrection.suffix
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                if isNoisyFinalWordContinuationFragment(candidate) {
+                    return true
+                }
+                removalCount += 1
+                continue
+            }
+
+            guard let match = regex.firstMatch(in: candidate, range: NSRange(candidate.startIndex..., in: candidate)),
+                  let matchRange = Range(match.range, in: candidate) else {
+                break
+            }
+
             candidate = String(candidate[matchRange.upperBound...])
                 .trimmingCharacters(in: .whitespacesAndNewlines)
             if isNoisyFinalWordContinuationFragment(candidate) {

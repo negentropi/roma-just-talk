@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Trimmed punctuated correction lead-ins before bracketed final-word fragments.
 - Trimmed prefixed not-what-I-meant correction lead-ins before bracketed final-word fragments.
 - Trimmed nope/nah correction lead-ins before bracketed final-word fragments.
 - Trimmed no-wrong correction lead-ins before bracketed final-word fragments.

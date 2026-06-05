@@ -2,6 +2,8 @@
 
 ## v1.81 - Unreleased
 
+- Trimmed object-form correction lead-ins such as "never mind that" and "forget about that" before bracketed final-word fragments.
+- Trimmed pronoun erase correction lead-ins such as "delete it" before bracketed final-word fragments.
 - Trimmed ignore/forget/disregard/cancel correction lead-ins before bracketed final-word fragments.
 - Preserved Google Docs and WhatsApp casing in short app dictation fragments.
 - Preserved Slack, Gmail, and Notion casing in short app dictation fragments.

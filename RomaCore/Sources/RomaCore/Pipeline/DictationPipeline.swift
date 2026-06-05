@@ -158,7 +158,11 @@ public final class DictationPipeline: @unchecked Sendable {
         using configuration: DictationTextProcessingConfiguration
     ) -> String {
         let preservesTerminalPunctuation =
-            RomaTranscriptionOutputFilter.terminalSpokenPunctuationOutput(in: text) != nil
+            RomaTranscriptionOutputFilter.terminalSpokenPunctuationOutput(
+                in: text,
+                removesFillerWords: configuration.removesFillerWords,
+                fillerWords: configuration.fillerWords
+            ) != nil
         let filteredText = RomaTranscriptionOutputFilter.filter(
             text,
             removesFillerWords: configuration.removesFillerWords,

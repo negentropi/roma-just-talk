@@ -1464,6 +1464,21 @@ public struct RomaTranscriptionOutputFilter {
         return nil
     }
 
+    public static func terminalSpokenPunctuationOutput(
+        in text: String,
+        removesFillerWords: Bool,
+        fillerWords: [String] = Self.defaultFillerWords
+    ) -> String? {
+        if let punctuation = terminalSpokenPunctuationOutput(in: text) {
+            return punctuation
+        }
+
+        guard removesFillerWords else { return nil }
+        let fillerCleanedText = removeFillerWords(from: text, fillerWords: fillerWords)
+        guard fillerCleanedText != text else { return nil }
+        return terminalSpokenPunctuationOutput(in: fillerCleanedText)
+    }
+
     public static func applyInsertionPolish(_ text: String, context: TextInsertionContext?) -> String {
         applyInsertionPolish(text, context: context, preservesTerminalPunctuation: false)
     }
@@ -5403,7 +5418,12 @@ public struct RomaTranscriptionOutputFilter {
 
         guard let previousWord = previousWordBeforeSpokenPunctuationCommand(in: beforeCommand) else { return false }
 
-        if command.blockedPreviousWords.contains(previousWord) {
+        if command.blockedPreviousWords.contains(previousWord),
+           !shouldAllowTerminalPunctuationAfterNoisyFinalWordContinuation(
+            command,
+            beforeCommand: beforeCommand,
+            afterCommand: afterCommand
+           ) {
             return false
         }
 
@@ -5413,6 +5433,24 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         return true
+    }
+
+    private static func shouldAllowTerminalPunctuationAfterNoisyFinalWordContinuation(
+        _ command: SpokenPunctuationCommand,
+        beforeCommand: String,
+        afterCommand: String
+    ) -> Bool {
+        guard [",", ".", "?", "!", ";", ":", "..."].contains(command.output),
+              isTerminalSpokenPunctuationCommandSuffix(afterCommand) else {
+            return false
+        }
+
+        let fragment = beforeCommand.trimmingCharacters(
+            in: removableTrailingFragmentPunctuation
+                .union(removableTrailingSentenceFragmentPunctuation)
+                .union(.whitespacesAndNewlines)
+        )
+        return isNoisyFinalWordContinuationFragment(fragment)
     }
 
     private static func replaceSpokenPunctuationCommand(

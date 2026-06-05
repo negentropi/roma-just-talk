@@ -1975,6 +1975,17 @@ struct RomaCoreChecks {
             "shared filter should detect terminal question commands with auto punctuation"
         )
         try require(
+            RomaTranscriptionOutputFilter.terminalSpokenPunctuationOutput(in: "Final word question mark.") == "?",
+            "shared filter should detect terminal question commands after final-word continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.terminalSpokenPunctuationOutput(
+                in: "hmm...Final word question mark.",
+                removesFillerWords: true
+            ) == "?",
+            "shared filter should detect terminal question commands after filler-cleaned final-word continuations"
+        )
+        try require(
             RomaTranscriptionOutputFilter.terminalSpokenPunctuationOutput(in: "Model period.") == ".",
             "shared filter should detect terminal period commands"
         )
@@ -6484,6 +6495,21 @@ struct RomaCoreChecks {
                 "question mark command prose guard"
             ),
             (
+                "Final word question mark.",
+                "Final word?",
+                "final-word question mark command"
+            ),
+            (
+                "Final word comma.",
+                "Final word,",
+                "final-word comma command"
+            ),
+            (
+                "The final word question mark command is useful.",
+                "The final word question mark command is useful.",
+                "final-word question mark command prose guard"
+            ),
+            (
                 "The exclamation sign command is useful.",
                 "The exclamation sign command is useful.",
                 "exclamation sign command prose guard"
@@ -9363,6 +9389,11 @@ struct RomaCoreChecks {
             rawText: "Model question mark?",
             expectedText: " model?",
             fileName: "mid-sentence-question-command-proof.wav"
+        )
+        try await requireMidSentenceSpokenPunctuationPipeline(
+            rawText: "hmm...Final word question mark.",
+            expectedText: " final word?",
+            fileName: "mid-sentence-final-word-question-command-proof.wav"
         )
         try await requireMidSentenceSpokenPunctuationPipeline(
             rawText: "Model period.",

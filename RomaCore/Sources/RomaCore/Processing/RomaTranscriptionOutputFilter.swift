@@ -1670,6 +1670,7 @@ public struct RomaTranscriptionOutputFilter {
             fillerWords: configuredFillerWords
         )
 
+        filteredText = removeGluedPauseFillerNoise(from: filteredText)
         filteredText = removeStandaloneDiscourseFillers(from: filteredText)
         filteredText = removeLeadingDiscourseFillers(from: filteredText)
         filteredText = removeLeadingAcknowledgementFillerChain(from: filteredText)
@@ -1743,6 +1744,18 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         return filteredText
+    }
+
+    private static func removeGluedPauseFillerNoise(from text: String) -> String {
+        let pattern = #"(?i)(?<![\p{L}\p{N}])(?:"# +
+            pauseFillerNoisePattern +
+            #")[.,;:!?…]+(?=[\p{L}\p{N}])"#
+        guard let regex = try? NSRegularExpression(pattern: pattern) else {
+            return text
+        }
+
+        let range = NSRange(text.startIndex..., in: text)
+        return regex.stringByReplacingMatches(in: text, options: [], range: range, withTemplate: "")
     }
 
     private static func preserveBacktrackingMarkersAfterPauseFillers(in text: String) -> String {

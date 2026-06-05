@@ -2964,6 +2964,31 @@ struct RomaCoreChecks {
                 "leading pause filler with colon separator"
             ),
             (
+                "hmm...Model.",
+                "Model.",
+                "leading glued pause filler before word"
+            ),
+            (
+                "eh...Model.",
+                "Model.",
+                "leading glued eh pause filler before word"
+            ),
+            (
+                "This is hmm...ready.",
+                "This is ready.",
+                "embedded glued pause filler before word"
+            ),
+            (
+                "This is hmm…ready.",
+                "This is ready.",
+                "embedded glued unicode ellipsis pause filler before word"
+            ),
+            (
+                "hmm.Model.",
+                "Model.",
+                "single-dot glued pause filler before word"
+            ),
+            (
                 "— I think this works.",
                 "— I think this works.",
                 "leading dash without filler guard"
@@ -9222,6 +9247,37 @@ struct RomaCoreChecks {
         try require(cleanupResult.processedText == " roma", "pipeline should clean, replace, and space inserted text")
         try require(cleanupResult.session.insertedText == " roma", "pipeline session should store processed inserted text")
         try require(await cleanupInserter.pastedText == " roma", "pipeline should paste processed text")
+
+        let gluedPauseRecorder = FakeRecorder()
+        let gluedPauseInserter = FakeTextInsertion()
+        let gluedPausePipeline = DictationPipeline(
+            recorder: gluedPauseRecorder,
+            transcriptionService: FakeTranscriptionService(
+                expectedFileName: "glued-pause-cleanup-proof.wav",
+                text: "hmm...Model."
+            ),
+            textInsertion: gluedPauseInserter
+        )
+        let gluedPauseRequest = DictationPipelineRequest(
+            outputURL: URL(fileURLWithPath: "/tmp/glued-pause-cleanup-proof.wav"),
+            model: model,
+            shouldInsertTranscription: true,
+            textProcessing: DictationTextProcessingConfiguration(
+                insertionContext: TextInsertionContext(precedingText: "...so this")
+            )
+        )
+
+        try await gluedPauseRecorder.startPreRollBuffering()
+        let gluedPauseResult = try await gluedPausePipeline.runRecordingWindow(gluedPauseRequest) {}
+
+        try require(
+            gluedPauseResult.processedText == " model",
+            "pipeline should remove glued leading pause fillers before insertion polish"
+        )
+        try require(
+            await gluedPauseInserter.pastedText == " model",
+            "pipeline should paste glued-pause continuations without orphan punctuation"
+        )
 
         let midSentenceRecorder = FakeRecorder()
         let midSentenceInserter = FakeTextInsertion()

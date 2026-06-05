@@ -2663,6 +2663,7 @@ public struct RomaTranscriptionOutputFilter {
         result = removeLeadingPauseFillerFromContinuationFragment(from: result, after: precedingText)
         result = removeLeadingGeneratedContinuationFragmentNoise(from: result, after: precedingText)
         result = removeLeadingAcknowledgementFillerFromContextOverlapContinuation(result)
+        result = removeRepeatedLeadingCorrectionMarkerFromContinuationFragment(from: result, after: precedingText)
         result = removeLeadingDiscourseFillerFromContinuationFragment(from: result, after: precedingText)
         result = unwrapNoisyNestedContinuationBoundaryFragment(from: result)
         result = unwrapPlainSquareBracketedBoundaryContinuationFragment(from: result)
@@ -2780,6 +2781,10 @@ public struct RomaTranscriptionOutputFilter {
         cleanedSuffix = unwrapGeneratedInlineTagContinuationFragment(from: cleanedSuffix)
         cleanedSuffix = removeLeadingGeneratedBracketMarkerContinuationPrefix(from: cleanedSuffix)
         cleanedSuffix = stripBoundaryNoise(from: cleanedSuffix)
+        cleanedSuffix = removeRepeatedLeadingCorrectionMarkerFromContinuationFragment(
+            from: cleanedSuffix,
+            after: precedingText
+        )
         cleanedSuffix = removeLeadingDiscourseFillerFromContinuationFragment(from: cleanedSuffix, after: precedingText)
             .trimmingCharacters(in: .whitespacesAndNewlines)
         guard !cleanedSuffix.isEmpty,
@@ -2816,6 +2821,37 @@ public struct RomaTranscriptionOutputFilter {
               !hasInternalSentenceBoundary(suffix),
               isShortFragment(suffix) ||
                 isNoisyFinalWordContinuationFragment(suffix) ||
+                hasTechnicalContinuationFragmentHead(suffix) else {
+            return text
+        }
+
+        return suffix
+    }
+
+    private static func removeRepeatedLeadingCorrectionMarkerFromContinuationFragment(
+        from text: String,
+        after precedingText: String
+    ) -> String {
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard isContinuingSentence(after: precedingText),
+              let regex = try? NSRegularExpression(
+                pattern: #"(?i)^\s*(sorry|wait|actually)(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+\1(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+(.+)$"#
+              ),
+              let match = regex.firstMatch(in: trimmedText, range: NSRange(trimmedText.startIndex..., in: trimmedText)),
+              match.numberOfRanges >= 3,
+              let suffixRange = Range(match.range(at: 2), in: trimmedText) else {
+            return text
+        }
+
+        var suffix = String(trimmedText[suffixRange])
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        suffix = removeLeadingGeneratedContinuationFragmentNoise(from: suffix, after: precedingText)
+        suffix = unwrapNoisyNestedContinuationBoundaryFragment(from: suffix)
+        suffix = unwrapPlainSquareBracketedBoundaryContinuationFragment(from: suffix)
+        suffix = stripBoundaryNoise(from: suffix)
+        guard !suffix.isEmpty,
+              !hasInternalSentenceBoundary(suffix),
+              isNoisyFinalWordContinuationFragment(suffix) ||
                 hasTechnicalContinuationFragmentHead(suffix) else {
             return text
         }

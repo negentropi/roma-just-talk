@@ -1556,6 +1556,7 @@ public struct RomaTranscriptionOutputFilter {
                     from: polishedText,
                     after: activeContext.precedingText
                 )
+                polishedText = unwrapNoisyMarkdownBoundaryOutput(polishedText)
                 polishedText = unwrapPlainSquareBracketedBoundaryContinuationFragment(from: polishedText)
                 polishedText = unwrapPlainNonASCIIBoundaryContinuationFragment(from: polishedText)
             }
@@ -2145,6 +2146,7 @@ public struct RomaTranscriptionOutputFilter {
             from: boundaryUnwrappedSuffix,
             after: precedingText
         )
+        let markdownUnwrappedSuffix = unwrapNoisyMarkdownBoundaryOutput(leadingCleanedSuffix)
         let punctuationStrippedSuffix = removeTrailingNoisyFragmentPunctuation(from: trimmedSuffix)
         let punctuationStrippedBoundaryUnwrappedSuffix = removeTrailingNoisyFragmentPunctuation(
             from: boundaryUnwrappedSuffix
@@ -2152,18 +2154,25 @@ public struct RomaTranscriptionOutputFilter {
         let punctuationStrippedLeadingCleanedSuffix = removeTrailingNoisyFragmentPunctuation(
             from: leadingCleanedSuffix
         )
+        let punctuationStrippedMarkdownUnwrappedSuffix = removeTrailingNoisyFragmentPunctuation(
+            from: markdownUnwrappedSuffix
+        )
         let isNoisyFinalWordOrSingleContinuation = isNoisyFinalWordContinuationFragment(trimmedSuffix) ||
             isNoisyFinalWordContinuationFragment(punctuationStrippedSuffix) ||
             isNoisyFinalWordContinuationFragment(boundaryUnwrappedSuffix) ||
             isNoisyFinalWordContinuationFragment(punctuationStrippedBoundaryUnwrappedSuffix) ||
             isNoisyFinalWordContinuationFragment(leadingCleanedSuffix) ||
-            isNoisyFinalWordContinuationFragment(punctuationStrippedLeadingCleanedSuffix)
+            isNoisyFinalWordContinuationFragment(punctuationStrippedLeadingCleanedSuffix) ||
+            isNoisyFinalWordContinuationFragment(markdownUnwrappedSuffix) ||
+            isNoisyFinalWordContinuationFragment(punctuationStrippedMarkdownUnwrappedSuffix)
         guard !trimmedSuffix.isEmpty,
               !hasInternalSentenceBoundary(trimmedSuffix) ||
-                !hasInternalSentenceBoundary(leadingCleanedSuffix),
+                !hasInternalSentenceBoundary(leadingCleanedSuffix) ||
+                !hasInternalSentenceBoundary(markdownUnwrappedSuffix),
               isShortFragment(trimmedSuffix) ||
                 isShortFragment(boundaryUnwrappedSuffix) ||
                 isShortFragment(leadingCleanedSuffix) ||
+                isShortFragment(markdownUnwrappedSuffix) ||
                 isNoisyPreservedBoundaryContinuationFragment(trimmedSuffix) ||
                 isNoisyFinalWordOrSingleContinuation else {
             return false
@@ -2200,7 +2209,8 @@ public struct RomaTranscriptionOutputFilter {
         ].contains(filler) {
             guard hasTechnicalContinuationFragmentHead(trimmedSuffix) ||
                     hasTechnicalContinuationFragmentHead(boundaryUnwrappedSuffix) ||
-                    hasTechnicalContinuationFragmentHead(leadingCleanedSuffix) else {
+                    hasTechnicalContinuationFragmentHead(leadingCleanedSuffix) ||
+                    hasTechnicalContinuationFragmentHead(markdownUnwrappedSuffix) else {
                 return false
             }
         }

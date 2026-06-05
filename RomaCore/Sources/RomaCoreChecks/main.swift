@@ -11901,6 +11901,10 @@ struct RomaCoreChecks {
             contentsOf: repositoryRoot.appendingPathComponent(".github/workflows/romacore.yml"),
             encoding: .utf8
         )
+        let windowsPortDocs = try String(
+            contentsOf: repositoryRoot.appendingPathComponent("docs/windows-port.md"),
+            encoding: .utf8
+        )
 
         try require(
             packageScript.contains(#""source_commit=$($gitMetadata.Commit)""#),
@@ -13929,6 +13933,19 @@ struct RomaCoreChecks {
             workflowScript.contains("Run shared core checks") &&
                 workflowScript.contains("swift run RomaCoreChecks"),
             "Windows CI should run shared core checks before packaging the Windows agent"
+        )
+        try require(
+            workflowScript.contains(#"$env:RUNNER_TEMP\roma-windows-agent\check-windows-proof-set.ps1"#) &&
+                workflowScript.contains("-RequireArtifactSmokeProof") &&
+                !workflowScript.contains("-RequireFullLaptopProof") &&
+                proofCommonScript.contains(#"ok_marker = "proof_set_ok=artifact-smoke""#) &&
+                proofCommonScript.contains(#"ok_marker = "proof_set_ok=full-laptop""#) &&
+                proofCommonScript.contains("Do not claim Windows support until the full laptop proof passes on the target Windows machine") &&
+                laptopProofScript.contains("-RequireFullLaptopProof") &&
+                windowsPortDocs.contains("CI is noninteractive") &&
+                windowsPortDocs.contains("It does not prove real microphone permission, real hotkey delivery after a user presses the chord, local whisper inference, or paste into Notepad.") &&
+                windowsPortDocs.contains("Use `check-windows-proof-set.ps1 -RequireFullLaptopProof` after the preflight report and three interactive laptop reports exist."),
+            "Windows CI should keep artifact smoke proof separate from the final laptop support proof"
         )
         try require(
             parseScriptsScript.contains(#"$ScriptsDir = $PSScriptRoot"#) &&

@@ -366,6 +366,22 @@ function Get-RomaWindowsAgentInstallerRequiredPackagePathKeys {
     )
 }
 
+function Get-RomaWindowsAgentArtifactExecutablePathKeys {
+    return @(
+        "agent",
+        "proof_agent",
+        "whisper_cli_mock"
+    )
+}
+
+function Get-RomaWindowsAgentArtifactProofRequiredPackagePathKeys {
+    return @(
+        Get-RomaWindowsAgentArtifactExecutablePathKeys
+        Get-RomaWindowsAgentArtifactConfigPathKeys
+        Get-RomaWindowsAgentArtifactManifestScriptPathKeys
+    )
+}
+
 function Get-RomaWindowsAgentArtifactManifestPathKeys {
     return @(
         Get-RomaWindowsAgentArtifactManifestConfigPathKeys
@@ -1569,11 +1585,7 @@ function Get-RomaWindowsProofSurfaceFiles {
 }
 
 function Get-RomaWindowsAgentArtifactExecutableFiles {
-    return @(
-        Get-RomaWindowsAgentExecutableFileName,
-        Get-RomaWindowsProofAgentExecutableFileName,
-        Get-RomaWindowsWhisperCLIMockExecutableFileName
-    )
+    return Get-RomaWindowsAgentArtifactFileNamesForKeys -Keys (Get-RomaWindowsAgentArtifactExecutablePathKeys)
 }
 
 function Get-RomaWindowsAgentArtifactDebugFiles {

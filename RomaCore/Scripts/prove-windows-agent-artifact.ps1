@@ -413,18 +413,9 @@ $script:notepadPasteProof = New-RomaWindowsNotepadPasteProof `
     -Path $NotepadPasteProofPath
 
 Invoke-Step "artifact files" {
-    Require-File -Path $agentPath
-    Require-File -Path $script:proofAgentPath
-    Require-File -Path $smokeScript
-    Require-File -Path $installScript
-    Require-File -Path $runScript
-    Require-File -Path $proofScript
-    Require-File -Path $laptopProofScript
-    Require-File -Path $parseScript
-    Require-File -Path $packagedProofCommonScript
-    Require-File -Path $checkReportScript
-    Require-File -Path $checkSetScript
-    Require-File -Path $manifestPath
+    Require-RomaWindowsAgentArtifactPathKeys `
+        -ArtifactPaths $packageArtifactPaths `
+        -Keys (Get-RomaWindowsAgentArtifactProofRequiredPackagePathKeys)
 
     if ([System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT) {
         Require-File -Path (Join-Path $PackageDir "swiftCore.dll")

@@ -13313,6 +13313,8 @@ struct RomaCoreChecks {
                 proofCommonScript.contains(#""proof_common_script""#) &&
                 !packageScript.contains("proof_common_script=$proofCommonScriptOutput") &&
                 proofCommonScript.contains("function Get-RomaWindowsAgentInstallerRequiredPackagePathKeys") &&
+                proofCommonScript.contains("function Get-RomaWindowsAgentArtifactExecutablePathKeys") &&
+                proofCommonScript.contains("function Get-RomaWindowsAgentArtifactProofRequiredPackagePathKeys") &&
                 proofCommonScript.contains("function Require-RomaWindowsAgentArtifactPathKeys") &&
                 proofCommonScript.contains("function Require-RomaWindowsAgentInstallerPackageArtifacts") &&
                 proofCommonScript.contains("function Write-RomaWindowsAgentArtifactManifest") &&
@@ -13791,6 +13793,7 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Get-RomaWindowsPackageIdentityFiles") &&
                 proofCommonScript.contains(#"$files += Get-RomaWindowsAgentArtifactFileNameForKey -Key "manifest""#) &&
                 proofCommonScript.contains("function Get-RomaWindowsAgentArtifactExecutableFiles") &&
+                proofCommonScript.contains("return Get-RomaWindowsAgentArtifactFileNamesForKeys -Keys (Get-RomaWindowsAgentArtifactExecutablePathKeys)") &&
                 proofCommonScript.contains("function Get-RomaWindowsAgentArtifactConfigFiles") &&
                 proofCommonScript.contains("return Get-RomaWindowsAgentArtifactFileNamesForKeys -Keys (Get-RomaWindowsAgentArtifactConfigPathKeys)") &&
                 proofCommonScript.contains("WINDOWS-LAPTOP-PROOF.txt") &&
@@ -14109,6 +14112,10 @@ struct RomaCoreChecks {
                 installScript.contains("Require-RomaWindowsInstalledProofSurfaceFiles -InstallDir $InstallDir") &&
                 proofCommonScript.contains("function Get-RomaWindowsAgentArtifactInstallFiles") &&
                 proofCommonScript.contains("function Get-RomaWindowsAgentArtifactDebugFiles") &&
+                proveScript.contains("Get-RomaWindowsAgentArtifactProofRequiredPackagePathKeys") &&
+                proveScript.contains("Require-RomaWindowsAgentArtifactPathKeys `") &&
+                !proveScript.contains("Require-File -Path $smokeScript") &&
+                !proveScript.contains("Require-File -Path $checkSetScript") &&
                 proofCommonScript.contains(#""RomaProofAgent.exe""#) &&
                 proofCommonScript.contains(#""run-windows-laptop-proof.ps1""#) &&
                 proofCommonScript.contains(#""WINDOWS-LAPTOP-PROOF.txt""#) &&

@@ -1089,11 +1089,57 @@ function Add-RomaWindowsProofSetRequiredProfiles {
     return $Required
 }
 
+function Get-RomaWindowsLaptopProofReportFileNames {
+    return [ordered]@{
+        laptop_preflight = "preflight-proof.json"
+        cloud_dictation = "cloud-dictation-proof.json"
+        local_whisper_dictation = "local-whisper-dictation-proof.json"
+        local_whisper_notepad_paste = "local-whisper-notepad-paste-proof.json"
+    }
+}
+
+function Get-RomaWindowsLaptopProofReportFileName {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    $fileNames = Get-RomaWindowsLaptopProofReportFileNames
+    if (!$fileNames.Contains($Name)) {
+        throw "Unknown Windows laptop proof report: $Name"
+    }
+    return [string]$fileNames[$Name]
+}
+
+function Join-RomaWindowsLaptopProofReportPath {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ProofDir,
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    return Join-Path $ProofDir (Get-RomaWindowsLaptopProofReportFileName -Name $Name)
+}
+
+function Get-RomaWindowsLaptopProofGuideReportPaths {
+    param(
+        [string]$ProofDir = "C:\tmp\roma-windows-laptop-proof"
+    )
+
+    $paths = [ordered]@{}
+    foreach ($name in (Get-RomaWindowsLaptopProofReportFileNames).Keys) {
+        $paths[$name] = Join-RomaWindowsLaptopProofReportPath -ProofDir $ProofDir -Name $name
+    }
+    return $paths
+}
+
 function Get-RomaWindowsLaptopPreflightGuideMarkers {
+    $guideReportPaths = Get-RomaWindowsLaptopProofGuideReportPaths
     return [ordered]@{
         laptop_preflight_proof_set = Get-RomaWindowsProofSetOkMarker -Name "laptop_preflight"
         laptop_preflight_ok = "windows_laptop_preflight_ok=true"
-        laptop_preflight_report = "windows_laptop_preflight_report=C:\tmp\roma-windows-laptop-proof\preflight-proof.json"
+        laptop_preflight_report = "windows_laptop_preflight_report=$($guideReportPaths["laptop_preflight"])"
         package_fingerprint = "proof_set_laptop_preflight_package_fingerprint="
         source_dirty = "proof_set_laptop_preflight_source_dirty=false"
         permission_surface = "proof_set_laptop_preflight_permission_surface=true"

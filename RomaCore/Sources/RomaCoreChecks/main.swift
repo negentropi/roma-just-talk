@@ -1384,6 +1384,55 @@ struct RomaCoreChecks {
         )
         try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model correction is module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim optional is after unpunctuated correction markers"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model correction final word.",
+                context: midSentenceContext
+            ) == "final word",
+            "shared insertion polish should apply unpunctuated correction markers before final-word continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model correction now.",
+                context: midSentenceContext
+            ) == "model correction now",
+            "shared insertion polish should preserve non-technical unpunctuated correction markers"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "model correction should be now.",
+                context: midSentenceContext
+            ) == "model correction should be now",
+            "shared insertion polish should preserve non-technical correction should-be continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "no correction is module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim leading no-correction-is markers before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "no correction should be module.",
+                context: midSentenceContext
+            ) == "module",
+            "shared insertion polish should trim leading no-correction-should-be markers before technical continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "no correction is now.",
+                context: midSentenceContext
+            ) == "no correction is now",
+            "shared insertion polish should preserve non-technical no-correction continuations"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
                 "model no module.",
                 context: midSentenceContext
             ) == "module",
@@ -9668,6 +9717,21 @@ struct RomaCoreChecks {
             rawText: "no it's module.",
             expectedText: " module",
             fileName: "mid-sentence-no-its-module-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "no correction is module.",
+            expectedText: " module",
+            fileName: "mid-sentence-no-correction-is-module-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "no correction should be module.",
+            expectedText: " module",
+            fileName: "mid-sentence-no-correction-should-be-module-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "model correction is module.",
+            expectedText: " module",
+            fileName: "mid-sentence-model-correction-is-module-proof.wav"
         )
 
         let bracketedFragmentRecorder = FakeRecorder()

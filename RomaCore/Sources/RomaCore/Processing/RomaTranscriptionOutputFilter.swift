@@ -564,7 +564,7 @@ public struct RomaTranscriptionOutputFilter {
         (#"(?i)^\s*(?:ok(?:ay)?|all\s+right|alright|right|yeah|yes|yep|yup|sure)(?:[ \t]*[,;:…]+[ \t]*)+so[,;:…]*[ \t]+"#, ""),
         (#"(?i)^\s*(?:you\s+know|i\s+mean|like)[,;:…]+[ \t]*"#, "")
     ]
-    private static let continuationFragmentLeadingDiscourseFillerPattern = #"(?i)^\s*(you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?|what[ \t]+i[ \t]+mean[ \t]+(?:is|was)|what[ \t]+i(?:[ \t]+(?:am|was)|['’]m)[ \t]+trying[ \t]+to[ \t]+say[ \t]+is|what[ \t]+i[ \t]+was[ \t]+(?:going[ \t]+to|gonna)[ \t]+say[ \t]+is|what[ \t]+i[ \t]+(?:meant|want(?:ed)?)[ \t]+to[ \t]+say[ \t]+(?:is|was)|what[ \t]+i[ \t]+meant[ \t]+(?:is|was)|i[ \t]+(?:am|was)[ \t]+trying[ \t]+to[ \t]+say|i[ \t]+was[ \t]+(?:going[ \t]+to|gonna)[ \t]+say|i[ \t]+(?:want|wanted)[ \t]+to[ \t]+say|i[ \t]+mean(?:[ \t]+to[ \t]+say)?|i[ \t]+meant(?:[ \t]+to[ \t]+say)?|i[ \t]+should[ \t]+say|(?:it|that)[ \t]+should[ \t]+be|(?:it|that)(?:[ \t]+is|['’]s)|ok(?:ay)?|all[ \t]+right|alright|got[ \t]+it|gotcha|no[ \t]+(?:(?:it|that)[ \t]+should[ \t]+be|(?:it|that)(?:[ \t]+is|['’]s))|no[ \t]+wait|(?:nope|nah)[ \t]+(?:wait|actually)|wait|hold[ \t]+on|hang[ \t]+on|make[ \t]+(?:it|that)|call[ \t]+it|replace[ \t]+(?:that|it)[ \t]+with|change[ \t]+(?:that|it)[ \t]+to|correct[ \t]+(?:that|it)[ \t]+to|(?:scratch|delete|remove|erase|undo)[ \t]+(?:that|this)(?:[ \t]+out)?|correction(?:[ \t]+(?:is|should[ \t]+be))?|sorry|oops|whoops|my[ \t]+bad|actually|instead|rather|yeah|yes|yep|yup|like|basically|so|well)(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
+    private static let continuationFragmentLeadingDiscourseFillerPattern = #"(?i)^\s*(you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?|what[ \t]+i[ \t]+mean[ \t]+(?:is|was)|what[ \t]+i(?:[ \t]+(?:am|was)|['’]m)[ \t]+trying[ \t]+to[ \t]+say[ \t]+is|what[ \t]+i[ \t]+was[ \t]+(?:going[ \t]+to|gonna)[ \t]+say[ \t]+is|what[ \t]+i[ \t]+(?:meant|want(?:ed)?)[ \t]+to[ \t]+say[ \t]+(?:is|was)|what[ \t]+i[ \t]+meant[ \t]+(?:is|was)|i[ \t]+(?:am|was)[ \t]+trying[ \t]+to[ \t]+say|i[ \t]+was[ \t]+(?:going[ \t]+to|gonna)[ \t]+say|i[ \t]+(?:want|wanted)[ \t]+to[ \t]+say|i[ \t]+mean(?:[ \t]+to[ \t]+say)?|i[ \t]+meant(?:[ \t]+to[ \t]+say)?|i[ \t]+should[ \t]+say|(?:it|that)[ \t]+should[ \t]+be|(?:it|that)(?:[ \t]+is|['’]s)|ok(?:ay)?|all[ \t]+right|alright|got[ \t]+it|gotcha|no[ \t]+correction(?:[ \t]+(?:is|should[ \t]+be))?|no[ \t]+(?:(?:it|that)[ \t]+should[ \t]+be|(?:it|that)(?:[ \t]+is|['’]s))|no[ \t]+wait|(?:nope|nah)[ \t]+(?:wait|actually)|wait|hold[ \t]+on|hang[ \t]+on|make[ \t]+(?:it|that)|call[ \t]+it|replace[ \t]+(?:that|it)[ \t]+with|change[ \t]+(?:that|it)[ \t]+to|correct[ \t]+(?:that|it)[ \t]+to|(?:scratch|delete|remove|erase|undo)[ \t]+(?:that|this)(?:[ \t]+out)?|correction(?:[ \t]+(?:is|should[ \t]+be))?|sorry|oops|whoops|my[ \t]+bad|actually|instead|rather|yeah|yes|yep|yup|like|basically|so|well)(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let standaloneDiscourseFillerPattern = #"(?i)^\s*you[ \t]+know(?:[ \t]+what[ \t]+i[ \t]+mean)?[ \t]*[.,;:…]*\s*$"#
     private static let blockedPreviousWordsForTerminalYouKnow: Set<String> = [
         "do", "does", "did", "don't", "if", "know", "let", "should", "to", "whether", "will", "would"
@@ -2204,6 +2204,7 @@ public struct RomaTranscriptionOutputFilter {
             "remove that", "remove this", "remove that out", "remove this out",
             "erase that", "erase this", "erase that out", "erase this out",
             "undo that", "undo this", "undo that out", "undo this out",
+            "no correction", "no correction is", "no correction should be",
             "no it is", "no it's", "no it’s", "no that is", "no that's", "no that’s",
             "no it should be", "no that should be",
             "correction", "correction is", "correction should be", "i should say",
@@ -2257,6 +2258,7 @@ public struct RomaTranscriptionOutputFilter {
             "what i meant to say is", "what i meant to say was",
             "what i want to say is", "what i want to say was",
             "what i wanted to say is", "what i wanted to say was",
+            "no correction", "no correction is", "no correction should be",
             "no it is", "no it's", "no it’s", "no that is", "no that's", "no that’s",
             "no it should be", "no that should be"
         ].contains(filler) else {
@@ -2523,7 +2525,13 @@ public struct RomaTranscriptionOutputFilter {
     ) -> Int? {
         let marker = tokens[markerIndex].text
         switch marker {
-        case "correction", "sorry":
+        case "correction":
+            let replacementStartIndex = markerIndex + 1
+            if tokens[replacementStartIndex].text == "actually" {
+                return replacementStartAfterOptionalCorrectionCopula(tokens: tokens, startingAt: replacementStartIndex + 1)
+            }
+            return replacementStartAfterOptionalCorrectionCopula(tokens: tokens, startingAt: replacementStartIndex)
+        case "sorry":
             let replacementStartIndex = markerIndex + 1
             if tokens[replacementStartIndex].text == "actually" {
                 return replacementStartIndex + 1
@@ -2750,6 +2758,25 @@ public struct RomaTranscriptionOutputFilter {
         iMeanCorrectionReplacementStartIndex(tokens: tokens, startingAt: startIndex) ?? startIndex
     }
 
+    private static func replacementStartAfterOptionalCorrectionCopula(
+        tokens: [WordToken],
+        startingAt startIndex: Int
+    ) -> Int {
+        let replacementStartIndex = replacementStartAfterOptionalIMeanMarker(tokens: tokens, startingAt: startIndex)
+        guard tokens.indices.contains(replacementStartIndex) else { return replacementStartIndex }
+
+        if tokens[replacementStartIndex].text == "is" {
+            return replacementStartIndex + 1
+        }
+        if replacementStartIndex + 1 < tokens.count,
+           tokens[replacementStartIndex].text == "should",
+           tokens[replacementStartIndex + 1].text == "be" {
+            return replacementStartIndex + 2
+        }
+
+        return replacementStartIndex
+    }
+
     private static func iMeanCorrectionReplacementStartIndex(tokens: [WordToken], startingAt startIndex: Int) -> Int? {
         guard startIndex + 1 < tokens.count,
               tokens[startIndex].text == "i",
@@ -2833,7 +2860,7 @@ public struct RomaTranscriptionOutputFilter {
     }
 
     private static func isBareUnpunctuatedContinuationCorrectionMarker(_ marker: String) -> Bool {
-        ["actually", "back", "backtrack", "hang", "hold", "no", "nope", "or", "wait"].contains(marker)
+        ["actually", "back", "backtrack", "correction", "hang", "hold", "no", "nope", "or", "wait"].contains(marker)
     }
 
     private static func shouldApplyBareUnpunctuatedContinuationCorrectionMarker(
@@ -2848,6 +2875,9 @@ public struct RomaTranscriptionOutputFilter {
 
     private static func isBareProductCorrectionPhrase(_ words: [String]) -> Bool {
         guard !words.isEmpty else { return false }
+        if isNoisyFinalWordContinuationFragment(words.joined(separator: " ")) {
+            return true
+        }
         if words.count == 1, productCorrectionTailWords.contains(words[0]) {
             return true
         }

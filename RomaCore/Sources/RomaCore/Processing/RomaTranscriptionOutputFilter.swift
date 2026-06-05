@@ -2426,14 +2426,7 @@ public struct RomaTranscriptionOutputFilter {
             return text
         }
 
-        let leadInWordCount: Int
-        if tokens[0].text == "is" {
-            leadInWordCount = 1
-        } else if tokens.count >= 3,
-                  tokens[0].text == "should",
-                  tokens[1].text == "be" {
-            leadInWordCount = 2
-        } else {
+        guard let leadInWordCount = danglingGeneratedLeadInWordCount(in: tokens) else {
             return text
         }
 
@@ -2464,6 +2457,36 @@ public struct RomaTranscriptionOutputFilter {
         }
 
         return suffix
+    }
+
+    private static func danglingGeneratedLeadInWordCount(in tokens: [WordToken]) -> Int? {
+        guard let firstToken = tokens.first else { return nil }
+
+        if firstToken.text == "is" ||
+            ["it's", "it’s", "that's", "that’s"].contains(firstToken.text) {
+            return 1
+        }
+
+        guard tokens.count >= 2 else { return nil }
+        if ["it", "that"].contains(tokens[0].text),
+           tokens[1].text == "is" {
+            return 2
+        }
+
+        if tokens.count >= 3,
+           tokens[0].text == "should",
+           tokens[1].text == "be" {
+            return 2
+        }
+
+        if tokens.count >= 4,
+           ["it", "that"].contains(tokens[0].text),
+           tokens[1].text == "should",
+           tokens[2].text == "be" {
+            return 3
+        }
+
+        return nil
     }
 
     private static func cleanDanglingGeneratedLeadInSuffix(_ text: String) -> String {

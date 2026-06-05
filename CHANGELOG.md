@@ -23,6 +23,7 @@
 - Normalized all-caps ChatGPT, Claude Code, Codex, Wispr Flow, and Superwhisper fragments in mid-sentence hotkey dictation.
 - Removed generated `is` after repeated context before short technical and final-word hotkey dictation fragments.
 - Removed generated `should be` after repeated context before short technical and final-word hotkey dictation fragments.
+- Removed generated `it is` and `that should be` lead-ins exposed after repeated context before technical and final-word fragments.
 - Unwrapped generated bracket and markdown wrappers exposed after repeated context plus `is` or `should be` lead-ins.
 - Unwrapped square-bracketed final-word fragments after correction lead-ins in mid-sentence hotkey dictation.
 - Preserved explicit punctuation commands after correction-marked "final word" continuations.

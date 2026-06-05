@@ -1385,6 +1385,35 @@ struct RomaCoreChecks {
             RomaTranscriptionOutputFilter.applyInsertionPolish("this should be Model.", context: midSentenceContext) == "model",
             "shared insertion polish should trim repeated context plus generated should-be before technical fragments"
         )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("this it is Model.", context: midSentenceContext) == "model",
+            "shared insertion polish should trim repeated context plus generated it-is before technical fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("this it's Model.", context: midSentenceContext) == "model",
+            "shared insertion polish should trim repeated context plus generated it's before technical fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "this that should be final word.",
+                context: midSentenceContext
+            ) == "final word",
+            "shared insertion polish should trim repeated context plus generated that-should-be before final-word fragments"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "this it is ready.",
+                context: midSentenceContext
+            ) == "it is ready",
+            "shared insertion polish should preserve ordinary it-is continuations after repeated context"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish(
+                "this that should be ready.",
+                context: midSentenceContext
+            ) == "that should be ready",
+            "shared insertion polish should preserve ordinary that-should-be continuations after repeated context"
+        )
         let repeatedShouldBeMarkupModel = RomaTranscriptionOutputFilter.applyInsertionPolish(
             "this should be [*Model.*]",
             context: midSentenceContext
@@ -9889,6 +9918,21 @@ struct RomaCoreChecks {
             rawText: "this should be Model.",
             expectedText: " model",
             fileName: "mid-sentence-this-should-be-model-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "this it is Model.",
+            expectedText: " model",
+            fileName: "mid-sentence-this-it-is-model-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "this that should be final word.",
+            expectedText: " final word",
+            fileName: "mid-sentence-this-that-should-be-final-word-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "this it is ready.",
+            expectedText: " it is ready",
+            fileName: "mid-sentence-this-it-is-ready-proof.wav"
         )
         try await requireMidSentenceGeneratedMarkerCleanupPipeline(
             rawText: "this should be [*Model.*]",

@@ -2408,10 +2408,42 @@ public struct RomaTranscriptionOutputFilter {
                 continue
             }
 
-            return suffix
+            return removeLeadingDanglingCopulaAfterContextOverlap(from: suffix)
         }
 
         return text
+    }
+
+    private static func removeLeadingDanglingCopulaAfterContextOverlap(from text: String) -> String {
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        let tokens = wordTokens(in: trimmedText)
+        guard tokens.count >= 2,
+              tokens[0].text == "is",
+              !hasInternalSentenceBoundary(trimmedText) else {
+            return text
+        }
+
+        let suffixStart = tokens[1].range.lowerBound
+        let suffix = String(trimmedText[suffixStart...])
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let suffixTokens = wordTokens(in: suffix)
+        guard let firstSuffixToken = suffixTokens.first else { return text }
+
+        let headIndex: Int
+        if ["a", "an", "the"].contains(firstSuffixToken.text),
+           suffixTokens.count >= 2 {
+            headIndex = 1
+        } else {
+            headIndex = 0
+        }
+
+        guard suffixTokens.indices.contains(headIndex),
+              isNoisyFinalWordContinuationFragment(suffix) ||
+                isTechnicalContinuationFragmentHead(suffixTokens[headIndex].text) else {
+            return text
+        }
+
+        return suffix
     }
 
     private static func shouldRemoveLeadingContinuationContextOverlap(

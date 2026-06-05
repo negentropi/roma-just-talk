@@ -598,7 +598,9 @@ public struct RomaTranscriptionOutputFilter {
     private static let continuationFragmentLeadingRestartCorrectionPattern = #"(?i)^\s*((?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?(?:(?:let[ \t]+me|let['’]s)[ \t]+)?(?:start[ \t]+over|try[ \t]+again|redo[ \t]+(?:that|this|it)))(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let continuationFragmentLeadingPreviousUnitDeletionCorrectionPattern = #"(?i)^\s*((?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?(?:scratch|strike|delete|remove|erase|undo|cancel|disregard|ignore|forget|cut|drop)[ \t]+(?:the[ \t]+)?(?:last|previous|prior)[ \t]+(?:thing|word|sentence|phrase|part|bit|line|one))(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let continuationFragmentLeadingPreviousUnitReplacementCorrectionPattern = #"(?i)^\s*((?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?(?:replace|change|correct|swap|switch)[ \t]+(?:the[ \t]+)?(?:last|previous|prior)[ \t]+(?:thing|word|sentence|phrase|part|bit|line|one)[ \t]+(?:with|to|into))(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
+    private static let continuationFragmentLeadingPreviousUnitMakeCorrectionPattern = #"(?i)^\s*((?:(?:(?:actually[ \t]+)?(?:no|nope|nah)|actually)[ \t]+)?make[ \t]+(?:the[ \t]+)?(?:last|previous|prior)[ \t]+(?:thing|word|sentence|phrase|part|bit|line|one))(?:[ \t]*(?:[,;:…]+|\.\.\.))?[ \t]+"#
     private static let continuationFragmentLeadingSupplementalCorrectionPatterns = [
+        continuationFragmentLeadingPreviousUnitMakeCorrectionPattern,
         continuationFragmentLeadingPreviousUnitReplacementCorrectionPattern,
         continuationFragmentLeadingPreviousUnitDeletionCorrectionPattern,
         continuationFragmentLeadingRestartCorrectionPattern,

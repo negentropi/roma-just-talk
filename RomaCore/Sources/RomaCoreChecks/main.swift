@@ -2384,6 +2384,18 @@ struct RomaCoreChecks {
             "shared insertion polish should remove generated heading fragment markers"
         )
         try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("- Model.", context: midSentenceContext) == "model",
+            "shared insertion polish should remove generated dash-list fragment markers"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("- final word.", context: midSentenceContext) == "final word",
+            "shared insertion polish should remove generated dash-list final-word markers"
+        )
+        try require(
+            RomaTranscriptionOutputFilter.applyInsertionPolish("- [ ] model", context: midSentenceContext) == "- [ ] model",
+            "shared insertion polish should preserve explicit task list markers"
+        )
+        try require(
             RomaTranscriptionOutputFilter.applyInsertionPolish("1. Model.", context: listIntroContext) == "1. model",
             "shared insertion polish should preserve numbered markers after list introducers"
         )
@@ -9672,6 +9684,16 @@ struct RomaCoreChecks {
             rawText: "Correction is • final word.",
             expectedText: " final word",
             fileName: "mid-sentence-correction-bullet-marker-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "- Model.",
+            expectedText: " model",
+            fileName: "mid-sentence-dash-list-marker-proof.wav"
+        )
+        try await requireMidSentenceGeneratedMarkerCleanupPipeline(
+            rawText: "- final word.",
+            expectedText: " final word",
+            fileName: "mid-sentence-dash-list-final-word-proof.wav"
         )
         try await requireMidSentenceGeneratedMarkerCleanupPipeline(
             rawText: "Correction is *Model.*",

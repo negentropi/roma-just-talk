@@ -1542,6 +1542,10 @@ public struct RomaTranscriptionOutputFilter {
             if let activeContext,
                shouldRemoveLeadingGeneratedFragmentMarker(after: activeContext.precedingText) {
                 polishedText = removeLeadingGeneratedFragmentMarker(from: polishedText)
+                polishedText = removeLeadingGeneratedDashListFragmentMarker(
+                    from: polishedText,
+                    after: activeContext.precedingText
+                )
             }
             if !startsWithListMarker(polishedText) {
                 polishedText = removeLeadingFragmentPunctuation(from: polishedText)
@@ -10628,6 +10632,32 @@ public struct RomaTranscriptionOutputFilter {
         return text
     }
 
+    private static func removeLeadingGeneratedDashListFragmentMarker(
+        from text: String,
+        after precedingText: String
+    ) -> String {
+        guard shouldRemoveLeadingGeneratedFragmentMarker(after: precedingText) else { return text }
+
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedText.contains("\n"),
+              trimmedText.hasPrefix("- ") else {
+            return text
+        }
+
+        let suffixStart = trimmedText.index(trimmedText.startIndex, offsetBy: 2)
+        let suffix = String(trimmedText[suffixStart...])
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !suffix.isEmpty,
+              !suffix.hasPrefix("["),
+              !hasInternalSentenceBoundary(suffix),
+              isShortFragment(suffix) ||
+                isNoisyFinalWordContinuationFragment(suffix) else {
+            return text
+        }
+
+        return suffix
+    }
+
     private static func removeLeadingGeneratedContinuationFragmentNoise(
         from text: String,
         after precedingText: String
@@ -10635,6 +10665,10 @@ public struct RomaTranscriptionOutputFilter {
         var result = text.trimmingCharacters(in: .whitespacesAndNewlines)
         if shouldRemoveLeadingGeneratedFragmentMarker(after: precedingText) {
             result = removeLeadingGeneratedFragmentMarker(from: result)
+            result = removeLeadingGeneratedDashListFragmentMarker(
+                from: result,
+                after: precedingText
+            )
         }
         if !startsWithListMarker(result) {
             result = removeLeadingFragmentPunctuation(from: result)

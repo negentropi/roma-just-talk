@@ -13414,6 +13414,7 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Add-RomaWindowsProofFields") &&
                 proofCommonScript.contains("function Add-RomaWindowsAgentConfigurationArgs") &&
                 proofCommonScript.contains("function Add-RomaWindowsAgentScriptCommonArgs") &&
+                proofCommonScript.contains("function Add-RomaWindowsAgentScriptLocalWhisperArgs") &&
                 proofCommonScript.contains("function Get-RomaWindowsEmptyFileProof") &&
                 proofCommonScript.contains("function Get-RomaWindowsOptionalFileProof") &&
                 proofCommonScript.contains("function Require-RomaWindowsFileProof") &&
@@ -13789,6 +13790,16 @@ struct RomaCoreChecks {
                 !laptopProofScript.contains(#"Join-Path $ProofDir "local-whisper-notepad-install""#) &&
                 !laptopProofScript.contains(#"Join-Path $ProofDir "cloud-shortcuts""#) &&
                 !laptopProofScript.contains(#"Join-Path $ProofDir "local-whisper-shortcuts""#) &&
+                proofCommonScript.contains("function Add-RomaWindowsAgentScriptLocalWhisperArgs") &&
+                proofCommonScript.contains(#"$scriptArgs += @("-WhisperCLI", $WhisperCLI, "-WhisperModel", $WhisperModel)"#) &&
+                proofCommonScript.contains(#"Resolve-RomaWindowsFullPath -Path $WhisperOutputDir"#) &&
+                proofCommonScript.contains(#"$scriptArgs += "-WhisperArgument""#) &&
+                laptopProofScript.contains("$localArgs = Add-RomaWindowsAgentScriptLocalWhisperArgs `") &&
+                laptopProofScript.contains("$notepadArgs = Add-RomaWindowsAgentScriptLocalWhisperArgs `") &&
+                !laptopProofScript.contains(#"$localArgs += @("-WhisperOutputDir", (Resolve-FullPath -Path $WhisperOutputDir))"#) &&
+                !laptopProofScript.contains(#"$notepadArgs += @("-WhisperOutputDir", (Resolve-FullPath -Path $WhisperOutputDir))"#) &&
+                !laptopProofScript.contains(#"$localArgs += "-WhisperArgument""#) &&
+                !laptopProofScript.contains(#"$notepadArgs += "-WhisperArgument""#) &&
                 proofCommonScript.contains("Prerequisites before full proof:") &&
                 proofCommonScript.contains("microphone_settings_uri=ms-settings:privacy-microphone") &&
                 proofCommonScript.contains("RomaWhisperCLIMock.exe is CI-only") &&

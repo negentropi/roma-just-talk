@@ -3616,6 +3616,35 @@ function Add-RomaWindowsAgentScriptCommonArgs {
     return $scriptArgs
 }
 
+function Add-RomaWindowsAgentScriptLocalWhisperArgs {
+    param(
+        [object[]]$ArgumentList = @(),
+        [Parameter(Mandatory = $true)]
+        [string]$WhisperCLI,
+        [Parameter(Mandatory = $true)]
+        [string]$WhisperModel,
+        [string]$WhisperOutputDir = "",
+        [string[]]$WhisperArgument = @()
+    )
+
+    $scriptArgs = @($ArgumentList)
+    $scriptArgs += @("-WhisperCLI", $WhisperCLI, "-WhisperModel", $WhisperModel)
+    if (![string]::IsNullOrWhiteSpace($WhisperOutputDir)) {
+        $scriptArgs += @("-WhisperOutputDir", (Resolve-RomaWindowsFullPath -Path $WhisperOutputDir))
+    }
+
+    $whisperArguments = @(
+        $WhisperArgument |
+            Where-Object { ![string]::IsNullOrWhiteSpace($_) }
+    )
+    if ($whisperArguments.Count -gt 0) {
+        $scriptArgs += "-WhisperArgument"
+        $scriptArgs += $whisperArguments
+    }
+
+    return $scriptArgs
+}
+
 function Get-RomaWindowsFileProof {
     param(
         [Parameter(Mandatory = $true)]

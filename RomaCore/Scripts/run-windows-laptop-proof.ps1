@@ -455,17 +455,14 @@ $localArgs = @(
     "-InstallDir", $localInstallDir,
     "-ConfigPath", $localConfigPath,
     "-ProofReportPath", $localWhisperDictationReport,
-    "-ProofSessionId", $proofSessionId,
-    "-WhisperCLI", $WhisperCLI,
-    "-WhisperModel", $WhisperModel
+    "-ProofSessionId", $proofSessionId
 )
-if (![string]::IsNullOrWhiteSpace($WhisperOutputDir)) {
-    $localArgs += @("-WhisperOutputDir", (Resolve-FullPath -Path $WhisperOutputDir))
-}
-if ($whisperArguments.Count -gt 0) {
-    $localArgs += "-WhisperArgument"
-    $localArgs += $whisperArguments
-}
+$localArgs = Add-RomaWindowsAgentScriptLocalWhisperArgs `
+    -ArgumentList $localArgs `
+    -WhisperCLI $WhisperCLI `
+    -WhisperModel $WhisperModel `
+    -WhisperOutputDir $WhisperOutputDir `
+    -WhisperArgument $whisperArguments
 if (![string]::IsNullOrWhiteSpace($LocalWhisperExpectedTranscriptText)) {
     $localArgs += @("-ExpectedTranscriptText", $LocalWhisperExpectedTranscriptText)
 }
@@ -494,17 +491,14 @@ $notepadArgs = @(
     "-ConfigPath", $notepadConfigPath,
     "-ProofReportPath", $localWhisperNotepadReport,
     "-ProofSessionId", $proofSessionId,
-    "-WhisperCLI", $WhisperCLI,
-    "-WhisperModel", $WhisperModel,
     "-RunNotepadPasteProof"
 )
-if (![string]::IsNullOrWhiteSpace($WhisperOutputDir)) {
-    $notepadArgs += @("-WhisperOutputDir", (Resolve-FullPath -Path $WhisperOutputDir))
-}
-if ($whisperArguments.Count -gt 0) {
-    $notepadArgs += "-WhisperArgument"
-    $notepadArgs += $whisperArguments
-}
+$notepadArgs = Add-RomaWindowsAgentScriptLocalWhisperArgs `
+    -ArgumentList $notepadArgs `
+    -WhisperCLI $WhisperCLI `
+    -WhisperModel $WhisperModel `
+    -WhisperOutputDir $WhisperOutputDir `
+    -WhisperArgument $whisperArguments
 $notepadArgs = Add-RomaWindowsAgentScriptCommonArgs `
     -ArgumentList $notepadArgs `
     -Language $Language `

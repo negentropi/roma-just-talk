@@ -107,6 +107,32 @@ function Set-RomaWindowsProcessForeground {
     throw "Timed out activating process: pid=$($Process.Id)"
 }
 
+function Write-RomaWindowsHoldDictationPrompt {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Name,
+        [string]$ExpectedTranscriptText = "",
+        [int]$HoldTimeoutSeconds = -1,
+        [int]$ListenerSessionCount = -1
+    )
+
+    Write-Host ""
+    Write-Host "ACTION_REQUIRED=$Name"
+    Write-Host "focus_target=normal_text_field_or_notepad"
+    if (![string]::IsNullOrWhiteSpace($ExpectedTranscriptText)) {
+        Write-Host "say_expected_phrase_before_hotkey=$ExpectedTranscriptText"
+    }
+    Write-Host "hold_hotkey=Ctrl+Shift+R"
+    Write-Host "speak_before_pressing_hotkey=true"
+    Write-Host "release_hotkey_to_finish=true"
+    if ($HoldTimeoutSeconds -ge 0) {
+        Write-Host "hold_timeout_seconds=$HoldTimeoutSeconds"
+    }
+    if ($ListenerSessionCount -ge 0) {
+        Write-Host "listener_session_count=$ListenerSessionCount"
+    }
+}
+
 function Get-RomaWindowsProofSurfaceFiles {
     return @(
         "smoke-windows-agent.ps1",

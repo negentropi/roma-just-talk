@@ -142,25 +142,6 @@ function Write-FullLaptopProofRecheckScript {
     Write-Host "windows_laptop_recheck_script=$Path"
 }
 
-function Write-HoldDictationPrompt {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Name,
-        [string]$ExpectedTranscriptText = ""
-    )
-
-    Write-Host ""
-    Write-Host "ACTION_REQUIRED=$Name"
-    Write-Host "focus_target=normal_text_field_or_notepad"
-    if (![string]::IsNullOrWhiteSpace($ExpectedTranscriptText)) {
-        Write-Host "say_expected_phrase_before_hotkey=$ExpectedTranscriptText"
-    }
-    Write-Host "hold_hotkey=Ctrl+Shift+R"
-    Write-Host "speak_before_pressing_hotkey=true"
-    Write-Host "release_hotkey_to_finish=true"
-    Write-Host "hold_timeout_seconds=$HoldTimeoutSeconds"
-}
-
 function Write-NotepadPastePrompt {
     Write-Host ""
     Write-Host "ACTION_REQUIRED=local_whisper_notepad_paste"
@@ -657,12 +638,18 @@ $notepadArgs = Add-RomaWindowsAgentScriptCommonArgs `
     -ClipboardRestoreDelaySeconds $ClipboardRestoreDelaySeconds
 
 Invoke-Step "cloud dictation laptop proof" {
-    Write-HoldDictationPrompt -Name "cloud_dictation" -ExpectedTranscriptText $CloudExpectedTranscriptText
+    Write-RomaWindowsHoldDictationPrompt `
+        -Name "cloud_dictation" `
+        -ExpectedTranscriptText $CloudExpectedTranscriptText `
+        -HoldTimeoutSeconds $HoldTimeoutSeconds
     & $proofScript @cloudArgs
 }
 
 Invoke-Step "local whisper dictation laptop proof" {
-    Write-HoldDictationPrompt -Name "local_whisper_dictation" -ExpectedTranscriptText $LocalWhisperExpectedTranscriptText
+    Write-RomaWindowsHoldDictationPrompt `
+        -Name "local_whisper_dictation" `
+        -ExpectedTranscriptText $LocalWhisperExpectedTranscriptText `
+        -HoldTimeoutSeconds $HoldTimeoutSeconds
     & $proofScript @localArgs
 }
 

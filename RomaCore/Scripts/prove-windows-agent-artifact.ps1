@@ -135,25 +135,6 @@ function Invoke-InstalledListenerSmoke {
     return $output
 }
 
-function Write-HoldDictationPrompt {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Name,
-        [string]$ExpectedTranscriptText = ""
-    )
-
-    Write-Host ""
-    Write-Host "ACTION_REQUIRED=$Name"
-    Write-Host "focus_target=normal_text_field_or_notepad"
-    if (![string]::IsNullOrWhiteSpace($ExpectedTranscriptText)) {
-        Write-Host "say_expected_phrase_before_hotkey=$ExpectedTranscriptText"
-    }
-    Write-Host "hold_hotkey=Ctrl+Shift+R"
-    Write-Host "speak_before_pressing_hotkey=true"
-    Write-Host "release_hotkey_to_finish=true"
-    Write-Host "listener_session_count=1"
-}
-
 function Invoke-InstalledListenerRuntimeProof {
     param(
         [Parameter(Mandatory = $true)]
@@ -166,9 +147,10 @@ function Invoke-InstalledListenerRuntimeProof {
     New-Item -ItemType Directory -Force -Path $logDir | Out-Null
     $logPath = Join-Path $logDir "windows-agent-listen.log"
 
-    Write-HoldDictationPrompt `
+    Write-RomaWindowsHoldDictationPrompt `
         -Name "installed_listener_runtime" `
-        -ExpectedTranscriptText $ExpectedTranscriptText
+        -ExpectedTranscriptText $ExpectedTranscriptText `
+        -ListenerSessionCount 1
 
     $output = & $RunScriptPath `
         -InstallDir $InstallDir `

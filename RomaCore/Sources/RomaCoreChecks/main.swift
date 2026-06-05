@@ -10351,6 +10351,21 @@ struct RomaCoreChecks {
             "Windows proof scripts should share Notepad process activation helpers"
         )
         try require(
+            proofCommonScript.contains("function Write-RomaWindowsHoldDictationPrompt") &&
+                proofCommonScript.contains("focus_target=normal_text_field_or_notepad") &&
+                proofCommonScript.contains("speak_before_pressing_hotkey=true") &&
+                proofCommonScript.contains("release_hotkey_to_finish=true") &&
+                proofCommonScript.contains("hold_timeout_seconds=$HoldTimeoutSeconds") &&
+                proofCommonScript.contains("listener_session_count=$ListenerSessionCount") &&
+                proveScript.contains("Write-RomaWindowsHoldDictationPrompt") &&
+                proveScript.contains("-ListenerSessionCount 1") &&
+                laptopProofScript.contains("Write-RomaWindowsHoldDictationPrompt") &&
+                laptopProofScript.contains("-HoldTimeoutSeconds $HoldTimeoutSeconds") &&
+                !proveScript.contains("function Write-HoldDictationPrompt") &&
+                !laptopProofScript.contains("function Write-HoldDictationPrompt"),
+            "Windows proof scripts should share hold-to-talk operator prompts"
+        )
+        try require(
             checkSetScript.contains("manifest.source_commit"),
             "Windows proof-set checker should compare source commits across laptop reports"
         )

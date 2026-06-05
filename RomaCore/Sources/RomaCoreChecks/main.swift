@@ -13415,6 +13415,7 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Add-RomaWindowsAgentConfigurationArgs") &&
                 proofCommonScript.contains("function Resolve-RomaWindowsAgentSecretDir") &&
                 proofCommonScript.contains("function New-RomaWindowsAgentSaveKeyArgs") &&
+                proofCommonScript.contains("function Get-RomaWindowsAgentTranscriptionConfigMode") &&
                 proofCommonScript.contains("function Add-RomaWindowsAgentScriptCommonArgs") &&
                 proofCommonScript.contains("function Add-RomaWindowsAgentScriptCloudArgs") &&
                 proofCommonScript.contains("function Add-RomaWindowsAgentScriptLocalWhisperArgs") &&
@@ -13534,6 +13535,18 @@ struct RomaCoreChecks {
                 proofCommonScript.contains(#"[object[]]$ArgumentList = @("save-key-from-env")"#) &&
                 proofCommonScript.contains(#""--value-env", $ApiKeyEnv"#) &&
                 proofCommonScript.contains(#""--secret-dir", (Resolve-RomaWindowsFullPath -Path $SecretDir)"#) &&
+                proofCommonScript.contains("function Get-RomaWindowsAgentTranscriptionConfigMode") &&
+                proofCommonScript.contains(#"throw "Endpoint/Model and WhisperCLI/WhisperModel are mutually exclusive""#) &&
+                proofCommonScript.contains(#"[string]$CloudApiKeyMessage = "Cloud proof requires ApiKeyEnv or ApiKeyName""#) &&
+                proofCommonScript.contains("throw $CloudApiKeyMessage") &&
+                runScript.contains("$configMode = Get-RomaWindowsAgentTranscriptionConfigMode `") &&
+                runScript.contains(#"-CloudApiKeyMessage "Pass ApiKeyEnv or ApiKeyName when writing cloud config""#) &&
+                runScript.contains(#"$usesCloud = [bool]$configMode["uses_cloud"]"#) &&
+                runScript.contains(#"$usesWhisper = [bool]$configMode["uses_whisper"]"#) &&
+                proveScript.contains("$configMode = Get-RomaWindowsAgentTranscriptionConfigMode `") &&
+                proveScript.contains(#"-MissingConfigMessage "Pass cloud Endpoint/Model/API key, local WhisperCLI/WhisperModel, or -UsePackagedWhisperMock""#) &&
+                proveScript.contains(#"$usesCloud = [bool]$configMode["uses_cloud"]"#) &&
+                proveScript.contains(#"$usesWhisper = [bool]$configMode["uses_whisper"]"#) &&
                 installScript.contains("$SecretDir = Resolve-RomaWindowsAgentSecretDir `") &&
                 installScript.contains("Join-RomaWindowsInstalledSecretDirPath -InstallDir $InstallDir") &&
                 runScript.contains("$SecretDir = Resolve-RomaWindowsAgentSecretDir `") &&
@@ -13554,6 +13567,11 @@ struct RomaCoreChecks {
                 !smokeScript.contains(#""save-key-from-env","#) &&
                 !runScript.contains(#""--secret-dir", $SecretDir"#) &&
                 !smokeScript.contains(#""--secret-dir", $SecretDir"#) &&
+                !runScript.contains(#"Endpoint/Model and WhisperCLI/WhisperModel are mutually exclusive"#) &&
+                !runScript.contains(#"Pass Endpoint and Model together, or pass WhisperCLI and WhisperModel together"#) &&
+                !proveScript.contains(#"if ($usesCloud -and $usesWhisper)"#) &&
+                !proveScript.contains(#"if ($usesWhisper -and (!$hasWhisperCLI -or !$hasWhisperModel))"#) &&
+                !proveScript.contains(#"if (!$usesCloud -and !$usesWhisper)"#) &&
                 runScript.contains("$AgentPath = Join-RomaWindowsInstalledAgentPath -InstallDir $InstallDir") &&
                 installScript.contains("$installedAgent = Join-RomaWindowsInstalledAgentPath -InstallDir $InstallDir") &&
                 installScript.contains("$installedProofAgent = Join-RomaWindowsInstalledProofAgentPath -InstallDir $InstallDir") &&

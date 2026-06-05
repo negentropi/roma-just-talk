@@ -507,34 +507,18 @@ if ($DoctorOnly) {
     exit 0
 }
 
-$hasEndpoint = ![string]::IsNullOrWhiteSpace($Endpoint)
-$hasModel = ![string]::IsNullOrWhiteSpace($Model)
-$hasWhisperCLI = ![string]::IsNullOrWhiteSpace($WhisperCLI)
-$hasWhisperModel = ![string]::IsNullOrWhiteSpace($WhisperModel)
-$usesCloud = $hasEndpoint -or $hasModel
-$usesWhisper = $hasWhisperCLI -or $hasWhisperModel
-
-if ($usesCloud -and $usesWhisper) {
-    throw "Endpoint/Model and WhisperCLI/WhisperModel are mutually exclusive"
-}
-
-if ($usesCloud -and (!$hasEndpoint -or !$hasModel)) {
-    throw "Endpoint and Model must be provided together"
-}
-
-if ($usesWhisper -and (!$hasWhisperCLI -or !$hasWhisperModel)) {
-    throw "WhisperCLI and WhisperModel must be provided together"
-}
-
-if (!$usesCloud -and !$usesWhisper) {
-    throw "Pass cloud Endpoint/Model/API key, local WhisperCLI/WhisperModel, or -UsePackagedWhisperMock"
-}
-
-if ($usesCloud -and
-    [string]::IsNullOrWhiteSpace($ApiKeyEnv) -and
-    [string]::IsNullOrWhiteSpace($ApiKeyName)) {
-    throw "Cloud proof requires ApiKeyEnv or ApiKeyName"
-}
+$configMode = Get-RomaWindowsAgentTranscriptionConfigMode `
+    -Endpoint $Endpoint `
+    -Model $Model `
+    -WhisperCLI $WhisperCLI `
+    -WhisperModel $WhisperModel `
+    -RequireConfig $true `
+    -MissingConfigMessage "Pass cloud Endpoint/Model/API key, local WhisperCLI/WhisperModel, or -UsePackagedWhisperMock" `
+    -RequireCloudApiKey $true `
+    -ApiKeyEnv $ApiKeyEnv `
+    -ApiKeyName $ApiKeyName
+$usesCloud = [bool]$configMode["uses_cloud"]
+$usesWhisper = [bool]$configMode["uses_whisper"]
 
 $proofModeProfileName = if ($UsePackagedWhisperMock) {
     "packaged_whisper_mock_install"

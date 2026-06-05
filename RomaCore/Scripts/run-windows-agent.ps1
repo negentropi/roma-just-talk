@@ -96,29 +96,27 @@ if ($DoctorOnly) {
     exit 0
 }
 
-$hasEndpoint = ![string]::IsNullOrWhiteSpace($Endpoint)
-$hasModel = ![string]::IsNullOrWhiteSpace($Model)
-$hasWhisperCLI = ![string]::IsNullOrWhiteSpace($WhisperCLI)
-$hasWhisperModel = ![string]::IsNullOrWhiteSpace($WhisperModel)
+$configMode = Get-RomaWindowsAgentTranscriptionConfigMode `
+    -Endpoint $Endpoint `
+    -Model $Model `
+    -WhisperCLI $WhisperCLI `
+    -WhisperModel $WhisperModel `
+    -RequireCloudApiKey $true `
+    -ApiKeyEnv $ApiKeyEnv `
+    -ApiKeyName $ApiKeyName `
+    -CloudApiKeyMessage "Pass ApiKeyEnv or ApiKeyName when writing cloud config"
+$usesCloud = [bool]$configMode["uses_cloud"]
+$usesWhisper = [bool]$configMode["uses_whisper"]
+$hasConfigInput = [bool]$configMode["has_config_input"]
 $hasConfig = Test-Path -LiteralPath $ConfigPath
 
-if (($hasEndpoint -or $hasModel) -and ($hasWhisperCLI -or $hasWhisperModel)) {
-    throw "Endpoint/Model and WhisperCLI/WhisperModel are mutually exclusive"
-}
-
-if ($hasEndpoint -or $hasModel -or $hasWhisperCLI -or $hasWhisperModel) {
+if ($hasConfigInput) {
     $configArgs = @(
         "write-config",
         "--config", $ConfigPath
     )
 
-    if (!$hasEndpoint -or !$hasModel) {
-        if (!$hasWhisperCLI -or !$hasWhisperModel) {
-            throw "Pass Endpoint and Model together, or pass WhisperCLI and WhisperModel together"
-        }
-    }
-
-    if ($hasEndpoint -and
+    if ($usesCloud -and
         ![string]::IsNullOrWhiteSpace($ApiKeyName) -and
         ![string]::IsNullOrWhiteSpace($ApiKeyEnv) -and
         ![string]::IsNullOrWhiteSpace([Environment]::GetEnvironmentVariable($ApiKeyEnv))) {
@@ -134,14 +132,9 @@ if ($hasEndpoint -or $hasModel -or $hasWhisperCLI -or $hasWhisperModel) {
         Write-Host $saveKeyOutput
     }
 
-    if ($hasEndpoint) {
-        if ([string]::IsNullOrWhiteSpace($ApiKeyName) -and [string]::IsNullOrWhiteSpace($ApiKeyEnv)) {
-            throw "Pass ApiKeyEnv or ApiKeyName when writing cloud config"
-        }
-    }
     $configArgs = Add-RomaWindowsAgentConfigurationArgs `
         -Arguments $configArgs `
-        -UseWhisperCLI $hasWhisperCLI `
+        -UseWhisperCLI $usesWhisper `
         -WhisperCLI $WhisperCLI `
         -WhisperModel $WhisperModel `
         -WhisperOutputDir $WhisperOutputDir `

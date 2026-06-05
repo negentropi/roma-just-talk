@@ -3598,6 +3598,56 @@ function New-RomaWindowsAgentSaveKeyArgs {
     return $saveKeyArgs
 }
 
+function Get-RomaWindowsAgentTranscriptionConfigMode {
+    param(
+        [string]$Endpoint = "",
+        [string]$Model = "",
+        [string]$WhisperCLI = "",
+        [string]$WhisperModel = "",
+        [bool]$RequireConfig = $false,
+        [string]$MissingConfigMessage = "Pass cloud Endpoint/Model/API key or local WhisperCLI/WhisperModel",
+        [bool]$RequireCloudApiKey = $false,
+        [string]$ApiKeyEnv = "",
+        [string]$ApiKeyName = "",
+        [string]$CloudApiKeyMessage = "Cloud proof requires ApiKeyEnv or ApiKeyName"
+    )
+
+    $hasEndpoint = ![string]::IsNullOrWhiteSpace($Endpoint)
+    $hasModel = ![string]::IsNullOrWhiteSpace($Model)
+    $hasWhisperCLI = ![string]::IsNullOrWhiteSpace($WhisperCLI)
+    $hasWhisperModel = ![string]::IsNullOrWhiteSpace($WhisperModel)
+    $usesCloud = $hasEndpoint -or $hasModel
+    $usesWhisper = $hasWhisperCLI -or $hasWhisperModel
+
+    if ($usesCloud -and $usesWhisper) {
+        throw "Endpoint/Model and WhisperCLI/WhisperModel are mutually exclusive"
+    }
+    if ($usesCloud -and (!$hasEndpoint -or !$hasModel)) {
+        throw "Endpoint and Model must be provided together"
+    }
+    if ($usesWhisper -and (!$hasWhisperCLI -or !$hasWhisperModel)) {
+        throw "WhisperCLI and WhisperModel must be provided together"
+    }
+    if ($RequireConfig -and !$usesCloud -and !$usesWhisper) {
+        throw $MissingConfigMessage
+    }
+    if ($RequireCloudApiKey -and $usesCloud -and
+        [string]::IsNullOrWhiteSpace($ApiKeyEnv) -and
+        [string]::IsNullOrWhiteSpace($ApiKeyName)) {
+        throw $CloudApiKeyMessage
+    }
+
+    return [ordered]@{
+        has_endpoint = $hasEndpoint
+        has_model = $hasModel
+        has_whisper_cli = $hasWhisperCLI
+        has_whisper_model = $hasWhisperModel
+        uses_cloud = $usesCloud
+        uses_whisper = $usesWhisper
+        has_config_input = ($usesCloud -or $usesWhisper)
+    }
+}
+
 function Add-RomaWindowsAgentScriptCommonArgs {
     param(
         [object[]]$ArgumentList = @(),

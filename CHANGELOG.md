@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Treated last/previous-one as a cleanup unit in deletion and replacement markers.
 - Trimmed last/previous-unit replacement markers before bracketed final-word fragments.
 - Trimmed last/previous-unit deletion markers before bracketed final-word fragments.
 - Trimmed restart-style correction markers before bracketed final-word fragments.

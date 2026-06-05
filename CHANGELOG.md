@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Trimmed wait-scratch and changed-my-mind correction lead-ins before bracketed final-word fragments.
 - Trimmed wait-nevermind correction lead-ins before bracketed final-word fragments.
 - Trimmed omit correction lead-ins before bracketed final-word fragments.
 - Trimmed skip/leave-out correction lead-ins before bracketed final-word fragments.

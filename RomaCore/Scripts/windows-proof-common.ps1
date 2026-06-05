@@ -853,6 +853,23 @@ function Get-RomaWindowsRealWhisperBackendModelExtensions {
     return @(".bin", ".gguf")
 }
 
+function Assert-RomaWindowsWhisperConfigProof {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Config
+    )
+
+    Assert-RomaWindowsProofReportBoolean -Object $Config -Name "uses_whisper_cli" -Expected $true
+    Assert-RomaWindowsProofReportNonEmptyString -Object $Config -Name "whisper_cli_path"
+    Assert-RomaWindowsProofReportNonEmptyString -Object $Config -Name "whisper_model_path"
+    Assert-RomaWindowsProofReportFile `
+        -Proof (Require-RomaWindowsObjectProperty -Object $Config -Name "whisper_cli_file" -Context "whisper config") `
+        -Name "whisper_cli"
+    Assert-RomaWindowsProofReportFile `
+        -Proof (Require-RomaWindowsObjectProperty -Object $Config -Name "whisper_model_file" -Context "whisper config") `
+        -Name "whisper_model"
+}
+
 function Assert-RomaWindowsRealWhisperBackendProof {
     param(
         [Parameter(Mandatory = $true)]

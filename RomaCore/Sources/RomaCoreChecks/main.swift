@@ -11987,6 +11987,10 @@ struct RomaCoreChecks {
         )
         try require(
             proofCommonScript.contains("function Assert-RomaWindowsRealWhisperBackendProof") &&
+                proofCommonScript.contains("function Assert-RomaWindowsWhisperConfigProof") &&
+                proofCommonScript.contains(#"Assert-RomaWindowsProofReportBoolean -Object $Config -Name "uses_whisper_cli" -Expected $true"#) &&
+                proofCommonScript.contains(#"Assert-RomaWindowsProofReportNonEmptyString -Object $Config -Name "whisper_cli_path""#) &&
+                proofCommonScript.contains(#"Assert-RomaWindowsProofReportFile `"#) &&
                 proofCommonScript.contains("function Assert-RomaWindowsPathNotPackagedArtifact") &&
                 proofCommonScript.contains("function Get-RomaWindowsRealWhisperBackendModelExtensions") &&
                 proofCommonScript.contains(#"$packagedExecutableNames -contains $whisperCLIName"#) &&
@@ -11996,9 +12000,12 @@ struct RomaCoreChecks {
                 proofCommonScript.contains(#"$allowedModelExtensions = Get-RomaWindowsRealWhisperBackendModelExtensions"#) &&
                 proofCommonScript.contains("Local whisper laptop proof model must be a .bin or .gguf file") &&
                 proofCommonScript.contains(#"Assert-RomaWindowsPathNotPackagedArtifact -Actual $whisperCLIPath"#) &&
+                checkReportScript.contains("Assert-RomaWindowsWhisperConfigProof -Config $config") &&
                 checkReportScript.contains("Assert-RomaWindowsRealWhisperBackendProof -Config $config -Files $files") &&
                 !checkReportScript.contains("function Assert-RealWhisperBackendProof") &&
-                !checkReportScript.contains("function Assert-PathNotEqual"),
+                !checkReportScript.contains("function Assert-PathNotEqual") &&
+                !checkReportScript.contains(#"Assert-NonEmptyString -Object $config -Name "whisper_cli_path""#) &&
+                !checkReportScript.contains(#"Assert-FileProof -Proof (Require-Property -Object $config -Name "whisper_cli_file")"#),
             "Windows local whisper laptop proof should reject mock/package executable backends and require real model files"
         )
         try require(

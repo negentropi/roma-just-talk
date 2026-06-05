@@ -662,11 +662,7 @@ if ($RequireRealCloudBackend) {
 
 if ($RequireWhisperConfig) {
     $config = Require-Property -Object $report -Name "config"
-    Assert-Boolean -Object $config -Name "uses_whisper_cli" -Expected $true
-    Assert-NonEmptyString -Object $config -Name "whisper_cli_path"
-    Assert-NonEmptyString -Object $config -Name "whisper_model_path"
-    Assert-FileProof -Proof (Require-Property -Object $config -Name "whisper_cli_file") -Name "whisper_cli"
-    Assert-FileProof -Proof (Require-Property -Object $config -Name "whisper_model_file") -Name "whisper_model"
+    Assert-RomaWindowsWhisperConfigProof -Config $config
 }
 
 if ($RequireRealWhisperBackend) {

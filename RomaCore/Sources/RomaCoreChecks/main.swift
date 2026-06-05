@@ -11319,8 +11319,8 @@ struct RomaCoreChecks {
         )
         for (scriptName, scriptSource) in proofAgentSourceAssertionScripts {
             try require(
-                scriptSource.contains("Assert-RomaWindowsProofAgentSourceOutput"),
-                "\(scriptName) should assert proof-agent source markers through the shared helper"
+                scriptSource.contains("Assert-RomaWindowsProofAgentDoctorOutput"),
+                "\(scriptName) should assert proof-agent doctor output through the shared helper"
             )
             if scriptName != "windows-proof.ps1" {
                 try require(
@@ -11481,8 +11481,10 @@ struct RomaCoreChecks {
             "Windows proof report checker should share doctor default proof assertions"
         )
         try require(
-            windowsProofScript.contains("Assert-RomaWindowsRuntimeDefaultOutput -Output $proofAgentDoctorOutput") &&
-                windowsProofScript.contains("Assert-RomaWindowsRuntimeDefaultOutput -Output $windowsAgentDoctorOutput") &&
+            windowsProofScript.contains("Assert-RomaWindowsProofAgentDoctorOutput `") &&
+                windowsProofScript.contains("-RequireNativeWindowsAdapters:$isWindowsHost") &&
+                windowsProofScript.contains("Assert-RomaWindowsAgentDoctorOutput `") &&
+                windowsProofScript.contains("-RequireRuntimeAvailable:$isWindowsHost") &&
                 windowsProofScript.contains("function Invoke-RomaProofAgentNativeDoctor") &&
                 windowsProofScript.contains("Get-RomaWindowsNativeDoctorSpec -Name $Name") &&
                 windowsProofScript.contains(#"Invoke-RomaProofAgentNativeDoctor -Name "miniaudio_capture""#) &&
@@ -11490,7 +11492,7 @@ struct RomaCoreChecks {
                 windowsProofScript.contains(#"Invoke-RomaProofAgentNativeDoctor -Name "keyboard_hook""#) &&
                 windowsProofScript.contains(#"Invoke-RomaProofAgentNativeDoctor -Name "paste""#) &&
                 windowsProofScript.contains(#"Invoke-RomaProofAgentNativeDoctor -Name "dpapi_secret""#),
-            "Windows proof script should use shared doctor default and native-doctor assertions"
+            "Windows proof script should use shared doctor output and native-doctor assertions"
         )
         let proofReportDefaultFields = [
             "default_record_seconds",
@@ -11544,6 +11546,11 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Get-RomaWindowsProofAgentDoctorOutputProof") &&
                 proofCommonScript.contains("function Get-RomaWindowsAgentDoctorOutputMarkers") &&
                 proofCommonScript.contains("function Get-RomaWindowsProofAgentDoctorOutputMarkers") &&
+                proofCommonScript.contains("function Assert-RomaWindowsAgentDoctorOutput") &&
+                proofCommonScript.contains("function Assert-RomaWindowsProofAgentDoctorOutput") &&
+                proofCommonScript.contains("Assert-RomaWindowsRuntimeDefaultOutput -Output $Output") &&
+                proofCommonScript.contains("Assert-RomaWindowsMinimumPermissionOutput -Output $Output") &&
+                proofCommonScript.contains("Assert-RomaWindowsProofAgentSourceOutput -Output $Output") &&
                 proofCommonScript.contains("Get-RomaWindowsOutputMarkerProof -Output $Output -Markers (Get-RomaWindowsAgentDoctorOutputMarkers)") &&
                 proofCommonScript.contains("Get-RomaWindowsOutputMarkerProof -Output $Output -Markers (Get-RomaWindowsProofAgentDoctorOutputMarkers)") &&
                 proofCommonScript.contains("Get-RomaWindowsMinimumPermissionOutputProof -Output $Output") &&
@@ -11619,8 +11626,10 @@ struct RomaCoreChecks {
             )
         }
         try require(
-            proveScript.contains("Assert-RomaWindowsRuntimeDefaultOutput -Output $script:packagedAgentDoctorOutput") &&
-                proveScript.contains("Assert-RomaWindowsRuntimeDefaultOutput -Output $script:packagedProofAgentDoctorOutput") &&
+            proveScript.contains("Assert-RomaWindowsAgentDoctorOutput `") &&
+                proveScript.contains("-RequireRuntimeAvailable") &&
+                proveScript.contains("Assert-RomaWindowsProofAgentDoctorOutput `") &&
+                proveScript.contains("-RequireNativeWindowsAdapters") &&
                 proveScript.contains("$script:packagedNativeDoctorOutputs = New-RomaWindowsNativeDoctorOutputTable") &&
                 proveScript.contains("foreach ($doctorName in $nativeDoctorSpecs.Keys)") &&
                 proveScript.contains("Invoke-ProofAgentDoctorCommand `") &&
@@ -11628,8 +11637,10 @@ struct RomaCoreChecks {
                 proveScript.contains("-Command ([string]$doctorSpec[\"command\"])") &&
                 proveScript.contains("Assert-RomaWindowsNativeDoctorOutput `") &&
                 proveScript.contains("-Name $doctorName") &&
+                !proveScript.contains("Assert-RomaWindowsRuntimeDefaultOutput -Output $script:packagedAgentDoctorOutput") &&
+                !proveScript.contains("Assert-RomaWindowsRuntimeDefaultOutput -Output $script:packagedProofAgentDoctorOutput") &&
                 !proveScript.contains("function Get-NativeDoctorOutputProof"),
-            "Windows artifact proof script should use shared doctor default and native-doctor assertions"
+            "Windows artifact proof script should use shared doctor output and native-doctor assertions"
         )
         let packageDefaultAssertions = [
             "default_record_seconds=2.0",
@@ -11645,10 +11656,14 @@ struct RomaCoreChecks {
             )
         }
         try require(
-            packageScript.contains("Assert-RomaWindowsRuntimeDefaultOutput -Output $proofAgentOutputText") &&
-                smokeScript.contains("Assert-RomaWindowsRuntimeDefaultOutput -Output $doctorOutput") &&
-                runScript.contains("Assert-RomaWindowsRuntimeDefaultOutput -Output $doctorOutput"),
-            "Windows package, smoke, and run scripts should use shared doctor default assertions"
+            packageScript.contains("Assert-RomaWindowsProofAgentDoctorOutput `") &&
+                packageScript.contains("-RequireNativeWindowsAdapters") &&
+                smokeScript.contains("Assert-RomaWindowsAgentDoctorOutput -Output $doctorOutput -RequireRuntimeAvailable:$isWindowsHost") &&
+                runScript.contains("Assert-RomaWindowsAgentDoctorOutput -Output $doctorOutput -RequireRuntimeAvailable") &&
+                !packageScript.contains("Assert-RomaWindowsRuntimeDefaultOutput -Output $proofAgentOutputText") &&
+                !smokeScript.contains("Assert-RomaWindowsRuntimeDefaultOutput -Output $doctorOutput") &&
+                !runScript.contains("Assert-RomaWindowsRuntimeDefaultOutput -Output $doctorOutput"),
+            "Windows package, smoke, and run scripts should use shared doctor output assertions"
         )
         let installedLauncherContractAssertions = [
             "os_permission_grants=microphone",
@@ -11671,18 +11686,19 @@ struct RomaCoreChecks {
             )
         }
         try require(
-            runScript.contains("Assert-RomaWindowsMinimumPermissionOutput -Output $doctorOutput") &&
-                runScript.contains(#"Assert-OutputContains -Output $doctorOutput -Expected "paste=win32_clipboard_sendinput""#) &&
-                runScript.contains(#"Assert-OutputContains -Output $doctorOutput -Expected "secret_store=dpapi""#),
-            "Windows run script should use shared minimum permission output and keep non-permission checks explicit"
+            runScript.contains("Assert-RomaWindowsAgentDoctorOutput -Output $doctorOutput -RequireRuntimeAvailable") &&
+                !runScript.contains("Assert-RomaWindowsMinimumPermissionOutput -Output $doctorOutput") &&
+                !runScript.contains(#"Assert-OutputContains -Output $doctorOutput -Expected "paste=win32_clipboard_sendinput""#) &&
+                !runScript.contains(#"Assert-OutputContains -Output $doctorOutput -Expected "secret_store=dpapi""#),
+            "Windows run script should use shared agent doctor output assertions"
         )
         try require(
-            smokeScript.contains("Assert-RomaWindowsMinimumPermissionOutput -Output $doctorOutput") &&
-                windowsProofScript.contains("Assert-RomaWindowsMinimumPermissionOutput -Output $windowsAgentDoctorOutput") &&
+            smokeScript.contains("Assert-RomaWindowsAgentDoctorOutput -Output $doctorOutput") &&
+                windowsProofScript.contains("Assert-RomaWindowsAgentDoctorOutput `") &&
                 windowsProofScript.contains("Assert-RomaWindowsMinimumPermissionOutput -Output $permissionDoctorOutput") &&
                 laptopProofScript.contains("Assert-RomaWindowsMinimumPermissionOutput -Output $output") &&
-                proveScript.contains("Assert-RomaWindowsMinimumPermissionOutput -Output $script:packagedAgentDoctorOutput"),
-            "Windows proof scripts should use shared minimum permission output assertions"
+                proveScript.contains("Assert-RomaWindowsAgentDoctorOutput `"),
+            "Windows proof scripts should use shared agent doctor output and direct permission-doctor assertions"
         )
         try require(
             runScript.contains("config-doctor --config $ConfigPath") &&

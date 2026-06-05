@@ -136,12 +136,7 @@ Invoke-Step "agent doctor" {
         throw "RomaWindowsAgent doctor failed"
     }
     Write-Host $doctorOutput
-    Assert-OutputContains -Output $doctorOutput -Expected "agent=roma-windows-agent"
-    Assert-RomaWindowsRuntimeDefaultOutput -Output $doctorOutput
-    Assert-RomaWindowsMinimumPermissionOutput -Output $doctorOutput
-    if ($isWindowsHost) {
-        Assert-OutputContains -Output $doctorOutput -Expected "runtime_available=true"
-    }
+    Assert-RomaWindowsAgentDoctorOutput -Output $doctorOutput -RequireRuntimeAvailable:$isWindowsHost
 }
 
 if (![string]::IsNullOrWhiteSpace($ApiKeyName) -and

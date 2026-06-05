@@ -651,8 +651,9 @@ Invoke-Step "packaged agent doctor" {
         throw "RomaWindowsAgent doctor failed"
     }
     Write-Host $script:packagedAgentDoctorOutput
-    Assert-RomaWindowsRuntimeDefaultOutput -Output $script:packagedAgentDoctorOutput
-    Assert-RomaWindowsMinimumPermissionOutput -Output $script:packagedAgentDoctorOutput
+    Assert-RomaWindowsAgentDoctorOutput `
+        -Output $script:packagedAgentDoctorOutput `
+        -RequireRuntimeAvailable
 }
 
 Invoke-Step "packaged proof agent doctor" {
@@ -662,8 +663,9 @@ Invoke-Step "packaged proof agent doctor" {
         throw "RomaProofAgent doctor failed"
     }
     Write-Host $script:packagedProofAgentDoctorOutput
-    Assert-RomaWindowsRuntimeDefaultOutput -Output $script:packagedProofAgentDoctorOutput
-    Assert-RomaWindowsProofAgentSourceOutput -Output $script:packagedProofAgentDoctorOutput
+    Assert-RomaWindowsProofAgentDoctorOutput `
+        -Output $script:packagedProofAgentDoctorOutput `
+        -RequireNativeWindowsAdapters
 }
 
 Invoke-Step "packaged listener smoke" {

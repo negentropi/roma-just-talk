@@ -635,8 +635,9 @@ try {
             throw "RomaProofAgent doctor failed"
         }
         Write-Host $proofAgentOutputText
-        Assert-RomaWindowsRuntimeDefaultOutput -Output $proofAgentOutputText
-        Assert-RomaWindowsProofAgentSourceOutput -Output $proofAgentOutputText
+        Assert-RomaWindowsProofAgentDoctorOutput `
+            -Output $proofAgentOutputText `
+            -RequireNativeWindowsAdapters
     }
 
     Invoke-Step "packaged listener smoke" {

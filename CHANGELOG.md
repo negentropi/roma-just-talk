@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Shared Windows agent and proof-agent doctor output assertions through proof-helper doctor assertion modules.
 - Removed glued pause fillers like `hmm...Model` without leaving orphan dots in hotkey dictation output.
 - Shared Windows agent and proof-agent doctor output marker parsing through proof-helper marker maps.
 - Stripped noisy question and exclamation marks from short "final word" continuation artifacts.

@@ -96,10 +96,7 @@ if ($LASTEXITCODE -ne 0) {
     throw "RomaWindowsAgent doctor failed"
 }
 Write-Host $doctorOutput
-Assert-RomaWindowsRuntimeDefaultOutput -Output $doctorOutput
-Assert-RomaWindowsMinimumPermissionOutput -Output $doctorOutput
-Assert-OutputContains -Output $doctorOutput -Expected "paste=win32_clipboard_sendinput"
-Assert-OutputContains -Output $doctorOutput -Expected "secret_store=dpapi"
+Assert-RomaWindowsAgentDoctorOutput -Output $doctorOutput -RequireRuntimeAvailable
 if ($DoctorOnly) {
     exit 0
 }

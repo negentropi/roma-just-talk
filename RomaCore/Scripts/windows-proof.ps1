@@ -34,6 +34,7 @@ param(
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 $hasExplicitClipboardRestoreDelay = $PSBoundParameters.ContainsKey("ClipboardRestoreDelaySeconds")
+$isWindowsHost = [System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT
 
 $proofCommonScript = Join-Path $PSScriptRoot "windows-proof-common.ps1"
 if (!(Test-Path -LiteralPath $proofCommonScript)) {
@@ -221,8 +222,9 @@ try {
             throw "RomaProofAgent doctor failed"
         }
         Write-Host $proofAgentDoctorOutput
-        Assert-RomaWindowsRuntimeDefaultOutput -Output $proofAgentDoctorOutput
-        Assert-RomaWindowsProofAgentSourceOutput -Output $proofAgentDoctorOutput
+        Assert-RomaWindowsProofAgentDoctorOutput `
+            -Output $proofAgentDoctorOutput `
+            -RequireNativeWindowsAdapters:$isWindowsHost
     }
 
     Invoke-Step "windows agent doctor" {
@@ -232,8 +234,9 @@ try {
             throw "RomaWindowsAgent doctor failed"
         }
         Write-Host $windowsAgentDoctorOutput
-        Assert-RomaWindowsRuntimeDefaultOutput -Output $windowsAgentDoctorOutput
-        Assert-RomaWindowsMinimumPermissionOutput -Output $windowsAgentDoctorOutput
+        Assert-RomaWindowsAgentDoctorOutput `
+            -Output $windowsAgentDoctorOutput `
+            -RequireRuntimeAvailable:$isWindowsHost
     }
 
     $coreProof = Join-Path $OutputDir "core-proof.wav"

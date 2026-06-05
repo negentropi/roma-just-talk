@@ -1269,6 +1269,52 @@ function Assert-RomaWindowsProofAgentSourceOutput {
         -Markers (Get-RomaWindowsProofAgentSourceOutputMarkers)
 }
 
+function Assert-RomaWindowsAgentDoctorOutput {
+    param(
+        [string]$Output = "",
+        [switch]$RequireRuntimeAvailable
+    )
+
+    Assert-RomaWindowsOutputContains -Output $Output -Expected "agent=roma-windows-agent"
+    Assert-RomaWindowsOutputContains -Output $Output -Expected "runtime_available="
+    if ($RequireRuntimeAvailable) {
+        Assert-RomaWindowsOutputContains -Output $Output -Expected "runtime_available=true"
+    }
+
+    $markers = Get-RomaWindowsAgentDoctorOutputMarkers
+    foreach ($key in $markers.Keys) {
+        if ($key -ne "runtime_available") {
+            Assert-RomaWindowsOutputContains -Output $Output -Expected $markers[$key]
+        }
+    }
+
+    Assert-RomaWindowsRuntimeDefaultOutput -Output $Output
+    Assert-RomaWindowsMinimumPermissionOutput -Output $Output
+}
+
+function Assert-RomaWindowsProofAgentDoctorOutput {
+    param(
+        [string]$Output = "",
+        [switch]$RequireNativeWindowsAdapters
+    )
+
+    Assert-RomaWindowsOutputContains -Output $Output -Expected "platform="
+    Assert-RomaWindowsOutputContains -Output $Output -Expected "native_windows_adapters="
+
+    $markers = Get-RomaWindowsProofAgentDoctorOutputMarkers
+    foreach ($key in $markers.Keys) {
+        if ($key -ne "native_windows_adapters") {
+            Assert-RomaWindowsOutputContains -Output $Output -Expected $markers[$key]
+        }
+    }
+    if ($RequireNativeWindowsAdapters) {
+        Assert-RomaWindowsOutputContains -Output $Output -Expected $markers["native_windows_adapters"]
+    }
+
+    Assert-RomaWindowsRuntimeDefaultOutput -Output $Output
+    Assert-RomaWindowsProofAgentSourceOutput -Output $Output
+}
+
 function Assert-RomaWindowsNativeDoctorOutput {
     param(
         [string]$Output = "",

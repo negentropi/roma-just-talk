@@ -213,19 +213,8 @@ function Write-LaptopPreflightCheckerSmokeReport {
     $riffBytes = [System.Text.Encoding]::ASCII.GetBytes("RIFF")
     [System.Array]::Copy($riffBytes, $wavBytes, $riffBytes.Length)
     [System.IO.File]::WriteAllBytes($micPreflightPath, $wavBytes)
-    $whisperCLIProof = if ($IncludeLocalWhisper) {
-        Require-RomaWindowsFileProof -Path $WhisperCLIPath
-    } else {
-        Get-RomaWindowsEmptyFileProof
-    }
-    $whisperModelProof = if ($IncludeLocalWhisper) {
-        Require-RomaWindowsFileProof -Path $WhisperModelPath
-    } else {
-        Get-RomaWindowsEmptyFileProof
-    }
 
-    $report = New-RomaWindowsLaptopPreflightReport `
-        -ProofSessionId ([guid]::NewGuid().ToString("D")) `
+    $report = New-RomaWindowsLaptopPreflightSyntheticReport `
         -PackageDir $PackageDir `
         -ProofDir $ProofDir `
         -Manifest ([ordered]@{
@@ -235,13 +224,10 @@ function Write-LaptopPreflightCheckerSmokeReport {
             source_dirty = $GitMetadata.Dirty
         }) `
         -PackageIdentity (Get-RomaPackageIdentityProof -PackageDir $PackageDir) `
-        -PreflightOutputs (New-RomaWindowsLaptopPreflightSyntheticOutputProofs -IncludeLocalWhisper $IncludeLocalWhisper) `
-        -FileProofs ([ordered]@{
-            proof_agent = Require-RomaWindowsFileProof -Path $ProofAgentPath
-            mic_preflight_wav = Require-RomaWindowsFileProof -Path $micPreflightPath
-            whisper_cli = $whisperCLIProof
-            whisper_model = $whisperModelProof
-        }) `
+        -ProofAgentPath $ProofAgentPath `
+        -MicPreflightPath $micPreflightPath `
+        -WhisperCLIPath $WhisperCLIPath `
+        -WhisperModelPath $WhisperModelPath `
         -IncludeLocalWhisper $IncludeLocalWhisper `
         -RequireUserSid
 

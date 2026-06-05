@@ -2690,6 +2690,57 @@ function New-RomaWindowsLaptopPreflightReport {
     }
 }
 
+function New-RomaWindowsLaptopPreflightSyntheticReport {
+    param(
+        [string]$ProofSessionId = "",
+        [Parameter(Mandatory = $true)]
+        [string]$PackageDir,
+        [Parameter(Mandatory = $true)]
+        [string]$ProofDir,
+        [Parameter(Mandatory = $true)]
+        [string]$ProofAgentPath,
+        [Parameter(Mandatory = $true)]
+        [string]$MicPreflightPath,
+        [string]$WhisperCLIPath = "",
+        [string]$WhisperModelPath = "",
+        [object]$Manifest = $null,
+        [object]$PackageIdentity = $null,
+        [bool]$IncludeLocalWhisper = $true,
+        [switch]$RequireUserSid
+    )
+
+    if ([string]::IsNullOrWhiteSpace($ProofSessionId)) {
+        $ProofSessionId = [guid]::NewGuid().ToString("D")
+    }
+
+    $whisperCLIProof = if ($IncludeLocalWhisper) {
+        Require-RomaWindowsFileProof -Path $WhisperCLIPath
+    } else {
+        Get-RomaWindowsEmptyFileProof
+    }
+    $whisperModelProof = if ($IncludeLocalWhisper) {
+        Require-RomaWindowsFileProof -Path $WhisperModelPath
+    } else {
+        Get-RomaWindowsEmptyFileProof
+    }
+
+    return New-RomaWindowsLaptopPreflightReport `
+        -ProofSessionId $ProofSessionId `
+        -PackageDir $PackageDir `
+        -ProofDir $ProofDir `
+        -Manifest $Manifest `
+        -PackageIdentity $PackageIdentity `
+        -PreflightOutputs (New-RomaWindowsLaptopPreflightSyntheticOutputProofs -IncludeLocalWhisper $IncludeLocalWhisper) `
+        -FileProofs ([ordered]@{
+            proof_agent = Require-RomaWindowsFileProof -Path $ProofAgentPath
+            mic_preflight_wav = Require-RomaWindowsFileProof -Path $MicPreflightPath
+            whisper_cli = $whisperCLIProof
+            whisper_model = $whisperModelProof
+        }) `
+        -IncludeLocalWhisper $IncludeLocalWhisper `
+        -RequireUserSid:$RequireUserSid
+}
+
 function Get-RomaWindowsListenerSmokeOutputMarkers {
     return [ordered]@{
         mode_listen = "mode=listen"

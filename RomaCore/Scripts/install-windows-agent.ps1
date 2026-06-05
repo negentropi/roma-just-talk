@@ -114,11 +114,12 @@ $hasExistingShortcutConfig = $SkipSmoke -and $hasExplicitConfigPath
 $shortcutHasRunnableConfig = $hasCloudShortcutConfig -or $hasWhisperShortcutConfig -or $hasExistingShortcutConfig
 
 if ([string]::IsNullOrWhiteSpace($ConfigPath)) {
+    $userConfigPath = Get-RomaWindowsUserAgentConfigPath
     if (($hasExplicitEndpoint -or $hasExplicitModel -or $hasExplicitWhisperCLI -or $hasExplicitWhisperModel -or $RunDictation) -and
-        ![string]::IsNullOrWhiteSpace($env:APPDATA)) {
-        $ConfigPath = Join-Path $env:APPDATA "roma-just-talk\windows-agent.json"
+        ![string]::IsNullOrWhiteSpace($userConfigPath)) {
+        $ConfigPath = $userConfigPath
     } else {
-        $ConfigPath = Join-Path $InstallDir "smoke\windows-agent-smoke.json"
+        $ConfigPath = Join-RomaWindowsInstallSmokeConfigPath -InstallDir $InstallDir
     }
 }
 $ConfigPath = Resolve-FullPath -Path $ConfigPath

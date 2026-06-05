@@ -12854,9 +12854,12 @@ struct RomaCoreChecks {
             "Windows manifest parsing should be computed by one shared packaged helper"
         )
         try require(
-            proofCommonScript.contains("function Invoke-RomaWindowsProofStep") &&
+                proofCommonScript.contains("function Invoke-RomaWindowsProofStep") &&
                 proofCommonScript.contains("function Resolve-RomaWindowsFullPath") &&
                 proofCommonScript.contains("function Get-RomaWindowsDefaultInstallDir") &&
+                proofCommonScript.contains("function Get-RomaWindowsUserAgentConfigPath") &&
+                proofCommonScript.contains("function Join-RomaWindowsInstalledAgentConfigPath") &&
+                proofCommonScript.contains("function Join-RomaWindowsInstallSmokeConfigPath") &&
                 proofCommonScript.contains("function Require-RomaWindowsFile") &&
                 proofCommonScript.contains("function Assert-RomaWindowsFileWithMinimumBytes") &&
                 proofCommonScript.contains("function Get-RomaWindowsCurrentUserSid") &&
@@ -12953,6 +12956,18 @@ struct RomaCoreChecks {
                 !installScript.contains(#"Join-Path $env:LOCALAPPDATA "roma-just-talk\agent""#) &&
                 !runScript.contains(#"Join-Path $env:LOCALAPPDATA "roma-just-talk\agent""#) &&
                 !proveScript.contains(#"Join-Path $env:LOCALAPPDATA "roma-just-talk\agent""#) &&
+                installScript.contains("$userConfigPath = Get-RomaWindowsUserAgentConfigPath") &&
+                runScript.contains("$userConfigPath = Get-RomaWindowsUserAgentConfigPath") &&
+                proveScript.contains("$userConfigPath = Get-RomaWindowsUserAgentConfigPath") &&
+                installScript.contains("$ConfigPath = Join-RomaWindowsInstallSmokeConfigPath -InstallDir $InstallDir") &&
+                runScript.contains("$ConfigPath = Join-RomaWindowsInstalledAgentConfigPath -InstallDir $InstallDir") &&
+                proveScript.contains("$ConfigPath = Join-RomaWindowsInstallSmokeConfigPath -InstallDir $InstallDir") &&
+                !installScript.contains(#"Join-Path $env:APPDATA "roma-just-talk\windows-agent.json""#) &&
+                !runScript.contains(#"Join-Path $env:APPDATA "roma-just-talk\windows-agent.json""#) &&
+                !proveScript.contains(#"Join-Path $env:APPDATA "roma-just-talk\windows-agent.json""#) &&
+                !installScript.contains(#"Join-Path $InstallDir "smoke\windows-agent-smoke.json""#) &&
+                !runScript.contains(#"Join-Path $InstallDir "windows-agent.json""#) &&
+                !proveScript.contains(#"Join-Path $InstallDir "smoke\windows-agent-smoke.json""#) &&
                 runScript.contains("$AgentPath = Join-RomaWindowsInstalledAgentPath -InstallDir $InstallDir") &&
                 installScript.contains("$installedAgent = Join-RomaWindowsInstalledAgentPath -InstallDir $InstallDir") &&
                 installScript.contains("$installedProofAgent = Join-RomaWindowsInstalledProofAgentPath -InstallDir $InstallDir") &&

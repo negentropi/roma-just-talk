@@ -68,10 +68,11 @@ $AgentPath = Resolve-FullPath -Path $AgentPath
 Require-File -Path $AgentPath
 
 if ([string]::IsNullOrWhiteSpace($ConfigPath)) {
-    if (![string]::IsNullOrWhiteSpace($env:APPDATA)) {
-        $ConfigPath = Join-Path $env:APPDATA "roma-just-talk\windows-agent.json"
+    $userConfigPath = Get-RomaWindowsUserAgentConfigPath
+    if (![string]::IsNullOrWhiteSpace($userConfigPath)) {
+        $ConfigPath = $userConfigPath
     } else {
-        $ConfigPath = Join-Path $InstallDir "windows-agent.json"
+        $ConfigPath = Join-RomaWindowsInstalledAgentConfigPath -InstallDir $InstallDir
     }
 }
 $ConfigPath = Resolve-FullPath -Path $ConfigPath

@@ -31,6 +31,32 @@ function Get-RomaWindowsDefaultInstallDir {
     return Join-Path $env:LOCALAPPDATA "roma-just-talk\agent"
 }
 
+function Get-RomaWindowsUserAgentConfigPath {
+    if ([string]::IsNullOrWhiteSpace($env:APPDATA)) {
+        return ""
+    }
+
+    return Join-Path $env:APPDATA "roma-just-talk\windows-agent.json"
+}
+
+function Join-RomaWindowsInstalledAgentConfigPath {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$InstallDir
+    )
+
+    return Join-Path $InstallDir "windows-agent.json"
+}
+
+function Join-RomaWindowsInstallSmokeConfigPath {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$InstallDir
+    )
+
+    return Join-Path $InstallDir "smoke\windows-agent-smoke.json"
+}
+
 function Require-RomaWindowsFile {
     param(
         [Parameter(Mandatory = $true)]

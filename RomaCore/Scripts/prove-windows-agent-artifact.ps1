@@ -571,11 +571,12 @@ $proofModeProfileName = if ($UsePackagedWhisperMock) {
 $proofMode = Get-RomaWindowsProofProfileExpectedModeByName -Name $proofModeProfileName
 
 if ([string]::IsNullOrWhiteSpace($ConfigPath)) {
+    $userConfigPath = Get-RomaWindowsUserAgentConfigPath
     if (($usesCloud -or $usesWhisper -or $RunDictation) -and
-        ![string]::IsNullOrWhiteSpace($env:APPDATA)) {
-        $ConfigPath = Join-Path $env:APPDATA "roma-just-talk\windows-agent.json"
+        ![string]::IsNullOrWhiteSpace($userConfigPath)) {
+        $ConfigPath = $userConfigPath
     } else {
-        $ConfigPath = Join-Path $InstallDir "smoke\windows-agent-smoke.json"
+        $ConfigPath = Join-RomaWindowsInstallSmokeConfigPath -InstallDir $InstallDir
     }
     $ConfigPath = Resolve-FullPath -Path $ConfigPath
 }

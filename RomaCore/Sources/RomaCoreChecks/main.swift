@@ -11708,6 +11708,22 @@ struct RomaCoreChecks {
         try require(
             proofCommonScript.contains("function Assert-RomaWindowsConfigDoctorOutput") &&
                 proofCommonScript.contains("function Get-RomaWindowsConfigDoctorOutputProof") &&
+                proofCommonScript.contains("function Get-RomaWindowsConfigDoctorOutputMarkers") &&
+                proofCommonScript.contains("function Get-RomaWindowsCloudConfigDoctorOutputMarkers") &&
+                proofCommonScript.contains("function Get-RomaWindowsWhisperConfigDoctorOutputMarkers") &&
+                proofCommonScript.contains("Assert-RomaWindowsOutputMarkers -Output $Output -Markers (Get-RomaWindowsConfigDoctorOutputMarkers)") &&
+                proofCommonScript.contains("Assert-RomaWindowsOutputMarkers -Output $Output -Markers (Get-RomaWindowsCloudConfigDoctorOutputMarkers)") &&
+                proofCommonScript.contains("Assert-RomaWindowsOutputMarkers -Output $Output -Markers (Get-RomaWindowsWhisperConfigDoctorOutputMarkers)") &&
+                proofCommonScript.contains("Get-RomaWindowsOutputMarkerProof -Output $Output -Markers (Get-RomaWindowsConfigDoctorOutputMarkers)") &&
+                proofCommonScript.contains("Get-RomaWindowsOutputMarkerProof -Output $Output -Markers (Get-RomaWindowsCloudConfigDoctorOutputMarkers)") &&
+                proofCommonScript.contains("Get-RomaWindowsOutputMarkerProof -Output $Output -Markers (Get-RomaWindowsWhisperConfigDoctorOutputMarkers)") &&
+                !proofCommonScript.contains(#"config_valid = $Output.Contains("config_valid=true")"#) &&
+                !proofCommonScript.contains(#"transcription_client_present = ![string]::IsNullOrWhiteSpace($transcriptionClient)"#) &&
+                !proofCommonScript.contains(#"uses_cloud = $Output.Contains("transcription_client=openai-compatible")"#) &&
+                !proofCommonScript.contains(#"api_key_resolved = $Output.Contains("api_key_resolved=true")"#) &&
+                !proofCommonScript.contains(#"uses_whisper_cli = $Output.Contains("transcription_client=whisper.cpp-cli")"#) &&
+                !proofCommonScript.contains(#"whisper_cli_exists = $Output.Contains("whisper_cli_exists=true")"#) &&
+                !proofCommonScript.contains(#"whisper_model_exists = $Output.Contains("whisper_model_exists=true")"#) &&
                 proveScript.contains(#"config_doctor = (Get-RomaWindowsConfigDoctorOutputProof"#) &&
                 !proveScript.contains("function Get-ConfigDoctorOutputProof") &&
                 proveScript.contains(#"Invoke-Step "installed config doctor""#),

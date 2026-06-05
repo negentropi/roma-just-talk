@@ -1951,6 +1951,28 @@ function Assert-RomaWindowsMinimumPermissionOutput {
     Assert-RomaWindowsOutputMarkers -Output $Output -Markers (Get-RomaWindowsMinimumPermissionOutputMarkers)
 }
 
+function Get-RomaWindowsConfigDoctorOutputMarkers {
+    return [ordered]@{
+        config_valid = "config_valid=true"
+        transcription_client_present = "transcription_client="
+    }
+}
+
+function Get-RomaWindowsCloudConfigDoctorOutputMarkers {
+    return [ordered]@{
+        uses_cloud = "transcription_client=openai-compatible"
+        api_key_resolved = "api_key_resolved=true"
+    }
+}
+
+function Get-RomaWindowsWhisperConfigDoctorOutputMarkers {
+    return [ordered]@{
+        uses_whisper_cli = "transcription_client=whisper.cpp-cli"
+        whisper_cli_exists = "whisper_cli_exists=true"
+        whisper_model_exists = "whisper_model_exists=true"
+    }
+}
+
 function Assert-RomaWindowsConfigDoctorOutput {
     param(
         [Parameter(Mandatory = $true)]
@@ -1963,16 +1985,12 @@ function Assert-RomaWindowsConfigDoctorOutput {
         throw "RequireCloud and RequireWhisperCLI are mutually exclusive"
     }
 
-    Assert-RomaWindowsOutputContains -Output $Output -Expected "config_valid=true"
-    Assert-RomaWindowsOutputContains -Output $Output -Expected "transcription_client="
+    Assert-RomaWindowsOutputMarkers -Output $Output -Markers (Get-RomaWindowsConfigDoctorOutputMarkers)
     if ($RequireCloud) {
-        Assert-RomaWindowsOutputContains -Output $Output -Expected "transcription_client=openai-compatible"
-        Assert-RomaWindowsOutputContains -Output $Output -Expected "api_key_resolved=true"
+        Assert-RomaWindowsOutputMarkers -Output $Output -Markers (Get-RomaWindowsCloudConfigDoctorOutputMarkers)
     }
     if ($RequireWhisperCLI) {
-        Assert-RomaWindowsOutputContains -Output $Output -Expected "transcription_client=whisper.cpp-cli"
-        Assert-RomaWindowsOutputContains -Output $Output -Expected "whisper_cli_exists=true"
-        Assert-RomaWindowsOutputContains -Output $Output -Expected "whisper_model_exists=true"
+        Assert-RomaWindowsOutputMarkers -Output $Output -Markers (Get-RomaWindowsWhisperConfigDoctorOutputMarkers)
     }
 }
 
@@ -2086,19 +2104,16 @@ function Get-RomaWindowsConfigDoctorOutputProof {
 
     $configPath = Get-RomaWindowsOutputValue -Content $Output -Name "config"
     $transcriptionClient = Get-RomaWindowsOutputValue -Content $Output -Name "transcription_client"
-    return [ordered]@{
+    $proof = [ordered]@{
         output_present = ![string]::IsNullOrWhiteSpace($Output)
         config_path = $configPath
         config_path_present = ![string]::IsNullOrWhiteSpace($configPath)
-        config_valid = $Output.Contains("config_valid=true")
         transcription_client = $transcriptionClient
-        transcription_client_present = ![string]::IsNullOrWhiteSpace($transcriptionClient)
-        uses_cloud = $Output.Contains("transcription_client=openai-compatible")
-        api_key_resolved = $Output.Contains("api_key_resolved=true")
-        uses_whisper_cli = $Output.Contains("transcription_client=whisper.cpp-cli")
-        whisper_cli_exists = $Output.Contains("whisper_cli_exists=true")
-        whisper_model_exists = $Output.Contains("whisper_model_exists=true")
     }
+    Add-RomaWindowsProofFields -Proof $proof -Fields (Get-RomaWindowsOutputMarkerProof -Output $Output -Markers (Get-RomaWindowsConfigDoctorOutputMarkers)) | Out-Null
+    Add-RomaWindowsProofFields -Proof $proof -Fields (Get-RomaWindowsOutputMarkerProof -Output $Output -Markers (Get-RomaWindowsCloudConfigDoctorOutputMarkers)) | Out-Null
+    Add-RomaWindowsProofFields -Proof $proof -Fields (Get-RomaWindowsOutputMarkerProof -Output $Output -Markers (Get-RomaWindowsWhisperConfigDoctorOutputMarkers)) | Out-Null
+    return $proof
 }
 
 function Add-RomaWindowsAgentConfigurationArgs {

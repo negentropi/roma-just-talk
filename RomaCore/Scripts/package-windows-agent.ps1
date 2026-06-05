@@ -59,17 +59,10 @@ try {
     $proofAgentOutput = $outputArtifactPaths["proof_agent"]
     $mockWhisperOutput = $outputArtifactPaths["whisper_cli_mock"]
     $smokeScriptOutput = $outputArtifactPaths["smoke_script"]
-    $runScriptOutput = $outputArtifactPaths["run_script"]
     $installScriptOutput = $outputArtifactPaths["install_script"]
-    $proofScriptOutput = $outputArtifactPaths["proof_script"]
-    $laptopProofScriptOutput = $outputArtifactPaths["laptop_proof_script"]
     $parseScriptOutput = $outputArtifactPaths["parse_script"]
-    $identityScriptOutput = $outputArtifactPaths["package_identity_script"]
-    $proofCommonScriptOutput = $outputArtifactPaths["proof_common_script"]
-    $manifestScriptOutput = $outputArtifactPaths["manifest_script"]
     $checkReportScriptOutput = $outputArtifactPaths["check_report_script"]
     $checkSetScriptOutput = $outputArtifactPaths["check_set_script"]
-    $laptopProofGuideOutput = $outputArtifactPaths["laptop_proof_guide"]
     $configPath = $outputArtifactPaths["sample_config"]
     $localWhisperConfigPath = $outputArtifactPaths["sample_local_whisper_config"]
     $installProofDir = Join-Path $OutputDir "install-proof"
@@ -179,44 +172,21 @@ try {
     }
 
     $manifestPath = $outputArtifactPaths["manifest"]
-    $agentFile = Get-Item -LiteralPath $agentOutput
-    @(
-        "agent=RomaWindowsAgent",
-        "configuration=$Configuration",
-        "source_repository=$($gitMetadata.Repository)",
-        "source_branch=$($gitMetadata.Branch)",
-        "source_commit=$($gitMetadata.Commit)",
-        "source_dirty=$($gitMetadata.Dirty)",
-        "source=$($agentSource.FullName)",
-        "output=$agentOutput",
-        "proof_agent=$(Get-RomaWindowsProofAgentExecutableFileName)",
-        "sample_config=$configPath",
-        "sample_local_whisper_config=$localWhisperConfigPath",
-        "whisper_cli_mock=$(Get-RomaWindowsWhisperCLIMockExecutableFileName)",
-        "install_proof_dir=$installProofDir",
-        "install_proof_config=$installProofConfigPath",
-        "install_proof_shortcut=$shortcutPath",
-        "local_whisper_install_proof_dir=$localWhisperInstallProofDir",
-        "local_whisper_install_config=$localWhisperInstallConfigPath",
-        "local_whisper_shortcut=$localWhisperShortcutPath",
-        "laptop_native_preflight_checker_smoke_report=$laptopNativePreflightCheckerSmokeReport",
-        "laptop_preflight_checker_smoke_report=$laptopPreflightCheckerSmokeReport",
-        "smoke_script=$smokeScriptOutput",
-        "run_script=$runScriptOutput",
-        "install_script=$installScriptOutput",
-        "proof_script=$proofScriptOutput",
-        "laptop_proof_script=$laptopProofScriptOutput",
-        "laptop_proof_guide=$laptopProofGuideOutput",
-        "parse_script=$parseScriptOutput",
-        "package_identity_script=$identityScriptOutput",
-        "proof_common_script=$proofCommonScriptOutput",
-        "manifest_script=$manifestScriptOutput",
-        "check_report_script=$checkReportScriptOutput",
-        "check_set_script=$checkSetScriptOutput",
-        "swift_runtime_dir=$($swiftRuntime.Directory)",
-        "swift_runtime_dlls=$($swiftRuntime.DllCount)",
-        "bytes=$($agentFile.Length)"
-    ) | Set-Content -LiteralPath $manifestPath -Encoding UTF8
+    Write-RomaWindowsAgentArtifactManifest `
+        -ManifestPath $manifestPath `
+        -Configuration $Configuration `
+        -GitMetadata $gitMetadata `
+        -AgentSource $agentSource `
+        -OutputArtifactPaths $outputArtifactPaths `
+        -SwiftRuntime $swiftRuntime `
+        -InstallProofDir $installProofDir `
+        -InstallProofConfigPath $installProofConfigPath `
+        -ShortcutPath $shortcutPath `
+        -LocalWhisperInstallProofDir $localWhisperInstallProofDir `
+        -LocalWhisperInstallConfigPath $localWhisperInstallConfigPath `
+        -LocalWhisperShortcutPath $localWhisperShortcutPath `
+        -LaptopNativePreflightCheckerSmokeReport $laptopNativePreflightCheckerSmokeReport `
+        -LaptopPreflightCheckerSmokeReport $laptopPreflightCheckerSmokeReport
 
     $packageIdentityProof = Get-RomaPackageIdentityProof -PackageDir $OutputDir
 

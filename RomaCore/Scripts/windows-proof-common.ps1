@@ -337,6 +337,79 @@ function Copy-RomaWindowsAgentArtifactBundle {
     Write-RomaWindowsLaptopProofGuide -OutputPath $OutputArtifactPaths["laptop_proof_guide"]
 }
 
+function Write-RomaWindowsAgentArtifactManifest {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ManifestPath,
+        [Parameter(Mandatory = $true)]
+        [string]$Configuration,
+        [Parameter(Mandatory = $true)]
+        [object]$GitMetadata,
+        [Parameter(Mandatory = $true)]
+        [object]$AgentSource,
+        [Parameter(Mandatory = $true)]
+        [object]$OutputArtifactPaths,
+        [Parameter(Mandatory = $true)]
+        [hashtable]$SwiftRuntime,
+        [Parameter(Mandatory = $true)]
+        [string]$InstallProofDir,
+        [Parameter(Mandatory = $true)]
+        [string]$InstallProofConfigPath,
+        [Parameter(Mandatory = $true)]
+        [string]$ShortcutPath,
+        [Parameter(Mandatory = $true)]
+        [string]$LocalWhisperInstallProofDir,
+        [Parameter(Mandatory = $true)]
+        [string]$LocalWhisperInstallConfigPath,
+        [Parameter(Mandatory = $true)]
+        [string]$LocalWhisperShortcutPath,
+        [Parameter(Mandatory = $true)]
+        [string]$LaptopNativePreflightCheckerSmokeReport,
+        [Parameter(Mandatory = $true)]
+        [string]$LaptopPreflightCheckerSmokeReport
+    )
+
+    $agentOutput = $OutputArtifactPaths["agent"]
+    $agentFile = Get-Item -LiteralPath $agentOutput
+    @(
+        "agent=RomaWindowsAgent",
+        "configuration=$Configuration",
+        "source_repository=$($GitMetadata.Repository)",
+        "source_branch=$($GitMetadata.Branch)",
+        "source_commit=$($GitMetadata.Commit)",
+        "source_dirty=$($GitMetadata.Dirty)",
+        "source=$($AgentSource.FullName)",
+        "output=$agentOutput",
+        "proof_agent=$(Get-RomaWindowsProofAgentExecutableFileName)",
+        "sample_config=$($OutputArtifactPaths["sample_config"])",
+        "sample_local_whisper_config=$($OutputArtifactPaths["sample_local_whisper_config"])",
+        "whisper_cli_mock=$(Get-RomaWindowsWhisperCLIMockExecutableFileName)",
+        "install_proof_dir=$InstallProofDir",
+        "install_proof_config=$InstallProofConfigPath",
+        "install_proof_shortcut=$ShortcutPath",
+        "local_whisper_install_proof_dir=$LocalWhisperInstallProofDir",
+        "local_whisper_install_config=$LocalWhisperInstallConfigPath",
+        "local_whisper_shortcut=$LocalWhisperShortcutPath",
+        "laptop_native_preflight_checker_smoke_report=$LaptopNativePreflightCheckerSmokeReport",
+        "laptop_preflight_checker_smoke_report=$LaptopPreflightCheckerSmokeReport",
+        "smoke_script=$($OutputArtifactPaths["smoke_script"])",
+        "run_script=$($OutputArtifactPaths["run_script"])",
+        "install_script=$($OutputArtifactPaths["install_script"])",
+        "proof_script=$($OutputArtifactPaths["proof_script"])",
+        "laptop_proof_script=$($OutputArtifactPaths["laptop_proof_script"])",
+        "laptop_proof_guide=$($OutputArtifactPaths["laptop_proof_guide"])",
+        "parse_script=$($OutputArtifactPaths["parse_script"])",
+        "package_identity_script=$($OutputArtifactPaths["package_identity_script"])",
+        "proof_common_script=$($OutputArtifactPaths["proof_common_script"])",
+        "manifest_script=$($OutputArtifactPaths["manifest_script"])",
+        "check_report_script=$($OutputArtifactPaths["check_report_script"])",
+        "check_set_script=$($OutputArtifactPaths["check_set_script"])",
+        "swift_runtime_dir=$($SwiftRuntime.Directory)",
+        "swift_runtime_dlls=$($SwiftRuntime.DllCount)",
+        "bytes=$($agentFile.Length)"
+    ) | Set-Content -LiteralPath $ManifestPath -Encoding UTF8
+}
+
 function Require-RomaWindowsFile {
     param(
         [Parameter(Mandatory = $true)]

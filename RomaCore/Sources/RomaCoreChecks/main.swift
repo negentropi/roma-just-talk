@@ -11907,11 +11907,13 @@ struct RomaCoreChecks {
         )
 
         try require(
-            packageScript.contains(#""source_commit=$($gitMetadata.Commit)""#),
+            proofCommonScript.contains(#""source_commit=$($GitMetadata.Commit)""#) &&
+                packageScript.contains(#"Write-Host "source_commit=$($gitMetadata.Commit)""#),
             "Windows package manifest should record the source git commit"
         )
         try require(
-            packageScript.contains(#""source_dirty=$($gitMetadata.Dirty)""#),
+            proofCommonScript.contains(#""source_dirty=$($GitMetadata.Dirty)""#) &&
+                packageScript.contains(#"Write-Host "source_dirty=$($gitMetadata.Dirty)""#),
             "Windows package manifest should record whether source was dirty"
         )
         try require(
@@ -13292,14 +13294,20 @@ struct RomaCoreChecks {
                 packageScript.contains("Copy-RomaWindowsAgentArtifactBundle `") &&
                 proofCommonScript.contains("function Copy-RomaWindowsAgentArtifactBundle") &&
                 proofCommonScript.contains(#"@{ Key = "manifest_script"; Marker = "manifest_script" }"#) &&
-                packageScript.contains("manifest_script=$manifestScriptOutput") &&
+                proofCommonScript.contains(#""manifest_script=$($OutputArtifactPaths["manifest_script"])""#) &&
+                !packageScript.contains("manifest_script=$manifestScriptOutput") &&
                 proofCommonScript.contains(#"@{ Key = "package_identity_script"; Marker = "package_identity_script" }"#) &&
-                packageScript.contains("package_identity_script=$identityScriptOutput") &&
+                proofCommonScript.contains(#""package_identity_script=$($OutputArtifactPaths["package_identity_script"])""#) &&
+                !packageScript.contains("package_identity_script=$identityScriptOutput") &&
                 proofCommonScript.contains(#"@{ Key = "parse_script"; Marker = "parse_script" }"#) &&
-                packageScript.contains("parse_script=$parseScriptOutput") &&
+                proofCommonScript.contains(#""parse_script=$($OutputArtifactPaths["parse_script"])""#) &&
+                !packageScript.contains("parse_script=$parseScriptOutput") &&
                 packageScript.contains(#"Invoke-Step "packaged script parse check""#) &&
                 proofCommonScript.contains(#"@{ Key = "proof_common_script"; Marker = "proof_common_script" }"#) &&
-                packageScript.contains("proof_common_script=$proofCommonScriptOutput") &&
+                proofCommonScript.contains(#""proof_common_script=$($OutputArtifactPaths["proof_common_script"])""#) &&
+                !packageScript.contains("proof_common_script=$proofCommonScriptOutput") &&
+                proofCommonScript.contains("function Write-RomaWindowsAgentArtifactManifest") &&
+                packageScript.contains("Write-RomaWindowsAgentArtifactManifest `") &&
                 !packageScript.contains(#"$manifestScriptSource = $sourceArtifactPaths["manifest_script"]"#) &&
                 !packageScript.contains(#"$identityScriptSource = $sourceArtifactPaths["package_identity_script"]"#) &&
                 !packageScript.contains(#"$parseScriptSource = $sourceArtifactPaths["parse_script"]"#) &&
@@ -13421,8 +13429,10 @@ struct RomaCoreChecks {
                 proofCommonScript.contains(#"@{ Key = "check_set_script"; Marker = "check_set_script" }"#) &&
                 proofCommonScript.contains(#"$pdbOutput = $OutputArtifactPaths["agent_pdb"]"#) &&
                 proofCommonScript.contains(#"$proofAgentPdbOutput = $OutputArtifactPaths["proof_agent_pdb"]"#) &&
-                packageScript.contains(#""proof_agent=$(Get-RomaWindowsProofAgentExecutableFileName)""#) &&
-                packageScript.contains(#""whisper_cli_mock=$(Get-RomaWindowsWhisperCLIMockExecutableFileName)""#) &&
+                proofCommonScript.contains(#""proof_agent=$(Get-RomaWindowsProofAgentExecutableFileName)""#) &&
+                proofCommonScript.contains(#""whisper_cli_mock=$(Get-RomaWindowsWhisperCLIMockExecutableFileName)""#) &&
+                !packageScript.contains(#""proof_agent=$(Get-RomaWindowsProofAgentExecutableFileName)""#) &&
+                !packageScript.contains(#""whisper_cli_mock=$(Get-RomaWindowsWhisperCLIMockExecutableFileName)""#) &&
                 installScript.contains(#"$packageWhisperMock = $packageArtifactPaths["whisper_cli_mock"]"#) &&
                 installScript.contains(#"$installedWhisperMock = $installedArtifactPaths["whisper_cli_mock"]"#) &&
                 proveScript.contains(#"$sampleConfigPath = $packageArtifactPaths["sample_config"]"#) &&
@@ -13857,7 +13867,8 @@ struct RomaCoreChecks {
             "Windows proof scripts and CI should reuse the shared manifest helper instead of duplicating manifest parsing"
         )
         try require(
-            packageScript.contains(#"$laptopProofGuideOutput = $outputArtifactPaths["laptop_proof_guide"]"#) &&
+            packageScript.contains("Write-RomaWindowsAgentArtifactManifest `") &&
+                proofCommonScript.contains(#""laptop_proof_guide=$($OutputArtifactPaths["laptop_proof_guide"])""#) &&
                 proofCommonScript.contains(#"Write-RomaWindowsLaptopProofGuide -OutputPath $OutputArtifactPaths["laptop_proof_guide"]"#) &&
                 !packageScript.contains("Write-RomaWindowsLaptopProofGuide") &&
                 proofCommonScript.contains("function Write-RomaWindowsLaptopProofGuide") &&
@@ -13984,7 +13995,8 @@ struct RomaCoreChecks {
                 !packageScript.contains("C:\\tmp\\roma-windows-laptop-proof\\local-whisper-notepad-paste-proof.json") &&
                 !packageScript.contains("Full proof validates four JSON reports:") &&
                 !packageScript.contains("Do not claim Windows support until") &&
-                packageScript.contains("laptop_proof_guide="),
+                proofCommonScript.contains("laptop_proof_guide=") &&
+                !packageScript.contains("laptop_proof_guide="),
             "Windows package should include an artifact-local laptop proof guide with full proof markers"
         )
         try require(

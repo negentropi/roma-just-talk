@@ -545,6 +545,25 @@ function Assert-RomaWindowsProofReportPasteIntent {
     Write-Host "proof_paste_no_restore_clipboard=$noRestoreClipboard"
 }
 
+function Assert-RomaWindowsProofReportHoldHookRuntime {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Runtime
+    )
+
+    Assert-RomaWindowsProofReportBoolean -Object $Runtime -Name "reported_hold_mode" -Expected $true
+    Assert-RomaWindowsProofReportBoolean -Object $Runtime -Name "reported_waiting_for_hold_key_down" -Expected $true
+    Assert-RomaWindowsProofReportBoolean -Object $Runtime -Name "reported_hold_key_down" -Expected $true
+    Assert-RomaWindowsProofReportBoolean -Object $Runtime -Name "reported_hold_key_up" -Expected $true
+    Assert-RomaWindowsProofReportNumberGreaterThan -Object $Runtime -Name "pre_roll_buffering_line" -Minimum 0
+    Assert-RomaWindowsProofReportNumberGreaterThan -Object $Runtime -Name "waiting_for_hold_key_down_line" -Minimum 0
+    Assert-RomaWindowsProofReportNumberGreaterThan -Object $Runtime -Name "hold_key_down_line" -Minimum 0
+    Assert-RomaWindowsProofReportNumberGreaterThan -Object $Runtime -Name "hold_key_up_line" -Minimum 0
+    Assert-RomaWindowsProofReportNumberGreaterThan -Object $Runtime -Name "wrote_line" -Minimum 0
+    Assert-RomaWindowsProofReportNumberGreaterThan -Object $Runtime -Name "processed_transcript_text_line" -Minimum 0
+    Assert-RomaWindowsProofReportBoolean -Object $Runtime -Name "reported_ordered_hold_sequence" -Expected $true
+}
+
 function Get-RomaWindowsPackageIdentityFingerprint {
     param(
         [Parameter(Mandatory = $true)]

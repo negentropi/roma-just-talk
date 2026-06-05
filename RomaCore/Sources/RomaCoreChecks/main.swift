@@ -12792,7 +12792,10 @@ struct RomaCoreChecks {
             "Windows artifact proof reports should record the dictation audio speech PCM contract"
         )
         try require(
-            checkReportScript.contains(#"Assert-Boolean -Object $Runtime -Name "reported_ordered_hold_sequence" -Expected $true"#),
+            proofCommonScript.contains("function Assert-RomaWindowsProofReportHoldHookRuntime") &&
+                proofCommonScript.contains(#"Assert-RomaWindowsProofReportBoolean -Object $Runtime -Name "reported_ordered_hold_sequence" -Expected $true"#) &&
+                checkReportScript.contains("Set-Alias -Name Assert-HoldHookRuntimeProof -Value Assert-RomaWindowsProofReportHoldHookRuntime") &&
+                !checkReportScript.contains("function Assert-HoldHookRuntimeProof"),
             "Windows proof checker should require ordered hold-to-talk runtime evidence"
         )
         try require(

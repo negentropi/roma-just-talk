@@ -48,6 +48,7 @@ Set-Alias -Name Assert-ShortcutProof -Value Assert-RomaWindowsProofReportShortcu
 Set-Alias -Name Assert-DictationRuntimeProof -Value Assert-RomaWindowsProofReportDictationRuntime -Scope Local -Force
 Set-Alias -Name Assert-ListenerRuntimeProof -Value Assert-RomaWindowsProofReportListenerRuntime -Scope Local -Force
 Set-Alias -Name Assert-PasteIntentProof -Value Assert-RomaWindowsProofReportPasteIntent -Scope Local -Force
+Set-Alias -Name Assert-HoldHookRuntimeProof -Value Assert-RomaWindowsProofReportHoldHookRuntime -Scope Local -Force
 
 function Assert-PackageIdentityProof {
     param(
@@ -157,25 +158,6 @@ function Assert-ManifestSourceProof {
 
     Write-Host "proof_source_commit=$($source['Commit'])"
     Write-Host "proof_source_dirty=$($source['Dirty'])"
-}
-
-function Assert-HoldHookRuntimeProof {
-    param(
-        [Parameter(Mandatory = $true)]
-        [object]$Runtime
-    )
-
-    Assert-Boolean -Object $Runtime -Name "reported_hold_mode" -Expected $true
-    Assert-Boolean -Object $Runtime -Name "reported_waiting_for_hold_key_down" -Expected $true
-    Assert-Boolean -Object $Runtime -Name "reported_hold_key_down" -Expected $true
-    Assert-Boolean -Object $Runtime -Name "reported_hold_key_up" -Expected $true
-    Assert-NumberGreaterThan -Object $Runtime -Name "pre_roll_buffering_line" -Minimum 0
-    Assert-NumberGreaterThan -Object $Runtime -Name "waiting_for_hold_key_down_line" -Minimum 0
-    Assert-NumberGreaterThan -Object $Runtime -Name "hold_key_down_line" -Minimum 0
-    Assert-NumberGreaterThan -Object $Runtime -Name "hold_key_up_line" -Minimum 0
-    Assert-NumberGreaterThan -Object $Runtime -Name "wrote_line" -Minimum 0
-    Assert-NumberGreaterThan -Object $Runtime -Name "processed_transcript_text_line" -Minimum 0
-    Assert-Boolean -Object $Runtime -Name "reported_ordered_hold_sequence" -Expected $true
 }
 
 function Assert-HoldTimeoutDefaultProof {

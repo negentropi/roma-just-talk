@@ -10545,6 +10545,12 @@ struct RomaCoreChecks {
             "Windows dictation proof should share the user-facing transcription config and proof output path"
         )
         try require(
+            windowsDictationRuntimeSource.contains("client.proofOutputLines(label: \"provider\")") &&
+                !windowsDictationRuntimeSource.contains("lines.append(\"provider=\\(client.name)\")") &&
+                !windowsDictationRuntimeSource.contains("lines.append(contentsOf: client.details)"),
+            "Windows runtime result proof should share transcription client proof output lines"
+        )
+        try require(
             transcriptionClientSource.contains("public static func openAICompatible(") &&
                 proofAgentSource.contains("RomaTranscriptionClient.openAICompatible(") &&
                 proofAgentSource.contains("client.service.transcribe(") &&

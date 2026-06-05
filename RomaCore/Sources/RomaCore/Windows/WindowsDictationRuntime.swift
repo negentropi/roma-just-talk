@@ -75,8 +75,7 @@ public enum WindowsDictationRuntimeResultProof {
         ]
 
         if let client = options.transcriptionClient {
-            lines.append("provider=\(client.name)")
-            lines.append(contentsOf: client.details)
+            lines.append(contentsOf: client.proofOutputLines(label: "provider"))
             lines.append("audio=\(audio.fileURL.path)")
             appendRawTranscriptionLines(to: &lines, result: result.transcription)
         } else {

@@ -2649,14 +2649,59 @@ public struct RomaTranscriptionOutputFilter {
             result = removeLeadingFragmentPunctuation(from: result)
         }
         result = removeLeadingPauseFillerFromContinuationFragment(from: result, after: precedingText)
+        result = removeLeadingGeneratedContinuationFragmentNoise(from: result, after: precedingText)
         result = removeLeadingAcknowledgementFillerFromContextOverlapContinuation(result)
         result = removeLeadingDiscourseFillerFromContinuationFragment(from: result, after: precedingText)
         result = unwrapNoisyNestedContinuationBoundaryFragment(from: result)
         result = unwrapPlainSquareBracketedBoundaryContinuationFragment(from: result)
         result = unwrapPlainNonASCIIBoundaryContinuationFragment(from: result)
         result = stripBoundaryNoise(from: result)
+        result = removeLeadingGeneratedContinuationFragmentNoise(from: result, after: precedingText)
+        result = unwrapPlainSquareBracketedBoundaryContinuationFragment(from: result)
+        result = stripBoundaryNoise(from: result)
+        result = removeLeadingGeneratedMarkerBoundaryRemnant(from: result)
         result = collapseRepeatedContextOverlapContinuationFragment(result)
         return cleanDanglingGeneratedLeadInSuffix(result)
+    }
+
+    private static func removeLeadingGeneratedMarkerBoundaryRemnant(from text: String) -> String {
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let regex = try? NSRegularExpression(
+            pattern: #"(?i)^\s*(?:#{1,6}|\d{1,3}[\.)]|[-•])\s+(.+)$"#
+        ),
+        let match = regex.firstMatch(in: trimmedText, range: NSRange(trimmedText.startIndex..., in: trimmedText)),
+        match.numberOfRanges >= 2,
+        let suffixRange = Range(match.range(at: 1), in: trimmedText) else {
+            return text
+        }
+
+        let suffix = String(trimmedText[suffixRange])
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !suffix.hasPrefix("[ ]"),
+              !suffix.hasPrefix("[x]"),
+              !suffix.hasPrefix("[X]") else {
+            return text
+        }
+
+        let cleanedSuffix = stripBoundaryNoise(from: suffix)
+        guard !cleanedSuffix.isEmpty,
+              !hasInternalSentenceBoundary(cleanedSuffix),
+              isShortFragment(cleanedSuffix) ||
+                isNoisyFinalWordContinuationFragment(cleanedSuffix) else {
+            return text
+        }
+
+        if cleanedSuffix != suffix {
+            return cleanedSuffix
+        }
+
+        let firstSuffixWord = wordTokens(in: suffix).first?.text
+        guard firstSuffixWord.map(hasTechnicalContinuationFragmentHead) == true ||
+                isNoisyFinalWordContinuationFragment(suffix) else {
+            return text
+        }
+
+        return suffix
     }
 
     private static func removeLeadingPauseFillerFromContinuationFragment(
@@ -2688,6 +2733,10 @@ public struct RomaTranscriptionOutputFilter {
             cleanDanglingGeneratedLeadInSuffix(suffix)
         )
             .trimmingCharacters(in: .whitespacesAndNewlines)
+        cleanedSuffix = removeLeadingGeneratedContinuationFragmentNoise(from: cleanedSuffix, after: precedingText)
+        cleanedSuffix = unwrapNoisyNestedContinuationBoundaryFragment(from: cleanedSuffix)
+        cleanedSuffix = unwrapPlainSquareBracketedBoundaryContinuationFragment(from: cleanedSuffix)
+        cleanedSuffix = stripBoundaryNoise(from: cleanedSuffix)
         cleanedSuffix = removeLeadingDiscourseFillerFromContinuationFragment(from: cleanedSuffix, after: precedingText)
             .trimmingCharacters(in: .whitespacesAndNewlines)
         guard !cleanedSuffix.isEmpty,
@@ -11405,7 +11454,9 @@ public struct RomaTranscriptionOutputFilter {
         let suffix = String(trimmedText[suffixStart...])
             .trimmingCharacters(in: .whitespacesAndNewlines)
         guard !suffix.isEmpty,
-              !suffix.hasPrefix("["),
+              !suffix.hasPrefix("[ ]"),
+              !suffix.hasPrefix("[x]"),
+              !suffix.hasPrefix("[X]"),
               !hasInternalSentenceBoundary(suffix),
               isShortFragment(suffix) ||
                 isNoisyFinalWordContinuationFragment(suffix) else {
@@ -11484,9 +11535,14 @@ public struct RomaTranscriptionOutputFilter {
     }
 
     private static func isNoisyMarkedShortFragment(_ text: String) -> Bool {
-        guard !text.isEmpty,
-              isShortFragment(text),
-              removeTrailingNoisyFragmentPunctuation(from: text) != text else {
+        let boundaryUnwrappedText = unwrapPlainSquareBracketedBoundaryContinuationFragment(from: text)
+        let candidateText = boundaryUnwrappedText == text ? text : boundaryUnwrappedText
+        let punctuationStrippedText = removeTrailingNoisyFragmentPunctuation(from: candidateText)
+        guard !candidateText.isEmpty,
+              isShortFragment(candidateText) ||
+                isNoisyFinalWordContinuationFragment(candidateText),
+              punctuationStrippedText != candidateText ||
+                isNoisyFinalWordContinuationFragment(candidateText) else {
             return false
         }
         return true

@@ -407,6 +407,7 @@ public struct RomaTranscriptionOutputFilter {
     ]
     private static let properNameFragmentCasing = [
         "apple": "Apple",
+        "amp": "Amp",
         "anthropic": "Anthropic",
         "arc": "Arc",
         "chatgpt": "ChatGPT",

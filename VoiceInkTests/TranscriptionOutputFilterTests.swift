@@ -850,6 +850,8 @@ struct TranscriptionOutputFilterTests {
         #expect(TranscriptionOutputFilter.applyInsertionPolish("CHATGPT RESPONSE.", context: midSentenceContext) == "ChatGPT response")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("CHAT GPT RESPONSE.", context: midSentenceContext) == "ChatGPT response")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("CLAUDE CODE.", context: midSentenceContext) == "Claude Code")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("AMP AGENT.", context: midSentenceContext) == "Amp agent")
+        #expect(TranscriptionOutputFilter.applyInsertionPolish("amp agent.", context: midSentenceContext) == "Amp agent")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("OPENCODE AGENT.", context: midSentenceContext) == "OpenCode agent")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("opencode agent.", context: midSentenceContext) == "OpenCode agent")
         #expect(TranscriptionOutputFilter.applyInsertionPolish("CODEX THREAD.", context: midSentenceContext) == "Codex thread")

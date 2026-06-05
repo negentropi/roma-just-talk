@@ -133,9 +133,9 @@ function Invoke-InstalledListenerRuntimeProof {
         [string]$ConfigPath
     )
 
-    $logDir = Join-Path $InstallDir "smoke"
+    $logDir = Join-RomaWindowsInstalledSmokeDirPath -InstallDir $InstallDir
     New-Item -ItemType Directory -Force -Path $logDir | Out-Null
-    $logPath = Join-Path $logDir "windows-agent-listen.log"
+    $logPath = Join-RomaWindowsInstalledListenerRuntimeLogPath -InstallDir $InstallDir
 
     Write-RomaWindowsHoldDictationPrompt `
         -Name "installed_listener_runtime" `
@@ -377,7 +377,7 @@ if (![string]::IsNullOrWhiteSpace($ProofReportPath)) {
     $ProofReportPath = Resolve-FullPath -Path $ProofReportPath
 }
 if ([string]::IsNullOrWhiteSpace($NotepadPasteProofPath)) {
-    $NotepadPasteProofPath = Join-Path $InstallDir "smoke\notepad-paste-proof.txt"
+    $NotepadPasteProofPath = Join-RomaWindowsInstalledNotepadPasteProofPath -InstallDir $InstallDir
 }
 $NotepadPasteProofPath = Resolve-FullPath -Path $NotepadPasteProofPath
 

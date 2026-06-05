@@ -57,13 +57,49 @@ function Join-RomaWindowsInstalledSecretDirPath {
     return Join-Path $InstallDir "secrets"
 }
 
+function Join-RomaWindowsInstalledSmokeDirPath {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$InstallDir
+    )
+
+    return Join-Path $InstallDir "smoke"
+}
+
 function Join-RomaWindowsInstallSmokeConfigPath {
     param(
         [Parameter(Mandatory = $true)]
         [string]$InstallDir
     )
 
-    return Join-Path $InstallDir "smoke\windows-agent-smoke.json"
+    return Join-Path (Join-RomaWindowsInstalledSmokeDirPath -InstallDir $InstallDir) "windows-agent-smoke.json"
+}
+
+function Join-RomaWindowsInstalledDictationRuntimeLogPath {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$InstallDir
+    )
+
+    return Join-Path (Join-RomaWindowsInstalledSmokeDirPath -InstallDir $InstallDir) "windows-agent-dictate.log"
+}
+
+function Join-RomaWindowsInstalledListenerRuntimeLogPath {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$InstallDir
+    )
+
+    return Join-Path (Join-RomaWindowsInstalledSmokeDirPath -InstallDir $InstallDir) "windows-agent-listen.log"
+}
+
+function Join-RomaWindowsInstalledNotepadPasteProofPath {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$InstallDir
+    )
+
+    return Join-Path (Join-RomaWindowsInstalledSmokeDirPath -InstallDir $InstallDir) "notepad-paste-proof.txt"
 }
 
 function Require-RomaWindowsFile {
@@ -2084,7 +2120,7 @@ function Get-RomaWindowsInstalledDictationRuntimeLogProof {
     )
 
     return Get-RomaWindowsDictationRuntimeLogProof `
-        -LogPath (Join-Path (Join-Path $InstallDir "smoke") "windows-agent-dictate.log") `
+        -LogPath (Join-RomaWindowsInstalledDictationRuntimeLogPath -InstallDir $InstallDir) `
         -ExpectedText $ExpectedText
 }
 
@@ -2096,7 +2132,7 @@ function Get-RomaWindowsInstalledListenerRuntimeLogProof {
     )
 
     return Get-RomaWindowsListenerRuntimeLogProof `
-        -LogPath (Join-Path (Join-Path $InstallDir "smoke") "windows-agent-listen.log") `
+        -LogPath (Join-RomaWindowsInstalledListenerRuntimeLogPath -InstallDir $InstallDir) `
         -ExpectedText $ExpectedText
 }
 

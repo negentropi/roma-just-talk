@@ -11870,15 +11870,23 @@ struct RomaCoreChecks {
         try require(
             proveScript.contains("[switch]$RunListenerProof") &&
                 proveScript.contains("function Invoke-InstalledListenerRuntimeProof") &&
-                proveScript.contains("windows-agent-listen.log") &&
+                proveScript.contains("Join-RomaWindowsInstalledListenerRuntimeLogPath -InstallDir $InstallDir") &&
+                proveScript.contains("Join-RomaWindowsInstalledSmokeDirPath -InstallDir $InstallDir") &&
+                !proveScript.contains(#"Join-Path $logDir "windows-agent-listen.log""#) &&
                 proofCommonScript.contains("function Get-RomaWindowsDictationRuntimeLogOutputMarkers") &&
                 proofCommonScript.contains("function Get-RomaWindowsListenerRuntimeLogOutputMarkers") &&
                 proofCommonScript.contains("function Assert-RomaWindowsListenerRuntimeLogOutput") &&
                 proofCommonScript.contains("Assert-RomaWindowsOutputMarkers -Output $Output -Markers (Get-RomaWindowsListenerRuntimeLogOutputMarkers)") &&
                 proofCommonScript.contains("function Get-RomaWindowsDictationRuntimeLogProof") &&
                 proofCommonScript.contains("function Get-RomaWindowsListenerRuntimeLogProof") &&
+                proofCommonScript.contains("function Join-RomaWindowsInstalledDictationRuntimeLogPath") &&
+                proofCommonScript.contains("function Join-RomaWindowsInstalledListenerRuntimeLogPath") &&
                 proofCommonScript.contains("function Get-RomaWindowsInstalledDictationRuntimeLogProof") &&
                 proofCommonScript.contains("function Get-RomaWindowsInstalledListenerRuntimeLogProof") &&
+                proofCommonScript.contains("Join-RomaWindowsInstalledDictationRuntimeLogPath -InstallDir $InstallDir") &&
+                proofCommonScript.contains("Join-RomaWindowsInstalledListenerRuntimeLogPath -InstallDir $InstallDir") &&
+                !proofCommonScript.contains(#"Join-Path (Join-Path $InstallDir "smoke") "windows-agent-dictate.log""#) &&
+                !proofCommonScript.contains(#"Join-Path (Join-Path $InstallDir "smoke") "windows-agent-listen.log""#) &&
                 proofCommonScript.contains("function Test-RomaWindowsContainsText") &&
                 proofCommonScript.contains("Get-RomaWindowsOutputMarkerProof -Output $content -Markers (Get-RomaWindowsDictationRuntimeLogOutputMarkers)") &&
                 proofCommonScript.contains("Get-RomaWindowsOutputMarkerProof -Output $content -Markers (Get-RomaWindowsListenerRuntimeLogOutputMarkers)") &&
@@ -12942,7 +12950,12 @@ struct RomaCoreChecks {
                 proofCommonScript.contains("function Get-RomaWindowsUserAgentConfigPath") &&
                 proofCommonScript.contains("function Join-RomaWindowsInstalledAgentConfigPath") &&
                 proofCommonScript.contains("function Join-RomaWindowsInstalledSecretDirPath") &&
+                proofCommonScript.contains("function Join-RomaWindowsInstalledSmokeDirPath") &&
                 proofCommonScript.contains("function Join-RomaWindowsInstallSmokeConfigPath") &&
+                proofCommonScript.contains("function Join-RomaWindowsInstalledNotepadPasteProofPath") &&
+                proofCommonScript.contains("Join-RomaWindowsInstalledSmokeDirPath -InstallDir $InstallDir") &&
+                proveScript.contains("Join-RomaWindowsInstalledNotepadPasteProofPath -InstallDir $InstallDir") &&
+                !proveScript.contains(#"Join-Path $InstallDir "smoke\notepad-paste-proof.txt""#) &&
                 proofCommonScript.contains("function Require-RomaWindowsFile") &&
                 proofCommonScript.contains("function Assert-RomaWindowsFileWithMinimumBytes") &&
                 proofCommonScript.contains("function Get-RomaWindowsCurrentUserSid") &&

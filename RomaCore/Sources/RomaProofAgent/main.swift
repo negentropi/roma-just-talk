@@ -378,8 +378,8 @@ struct RomaProofAgent {
 
     private static func printWhisperCLIDoctor(arguments: [String]) throws {
         let options = RomaCommandLineOptions(arguments)
-        let configuration = try makeWhisperCLIConfiguration(
-            arguments: arguments,
+        let configuration = try WhisperCLITranscriptionConfiguration.make(
+            from: options,
             allowPlaceholders: true
         )
         let audioURL = URL(fileURLWithPath: options.optionalValue(after: "--audio") ?? "proof.wav")
@@ -414,7 +414,7 @@ struct RomaProofAgent {
 
     private static func runWhisperCLIProof(arguments: [String]) async throws {
         let options = RomaCommandLineOptions(arguments)
-        let configuration = try makeWhisperCLIConfiguration(arguments: arguments)
+        let configuration = try WhisperCLITranscriptionConfiguration.make(from: options)
         let audioURL = URL(fileURLWithPath: try options.value(after: "--audio"))
         let model = TranscriptionModelDescriptor(
             name: configuration.modelURL.lastPathComponent,
@@ -520,41 +520,6 @@ struct RomaProofAgent {
         )
     }
 
-    private static func makeWhisperCLIConfiguration(
-        arguments: [String],
-        allowPlaceholders: Bool = false
-    ) throws -> WhisperCLITranscriptionConfiguration {
-        let options = RomaCommandLineOptions(arguments)
-        let executablePath: String
-        if let value = options.optionalValue(after: "--whisper-cli") {
-            executablePath = value
-        } else if allowPlaceholders {
-            executablePath = defaultWhisperCLIPath
-        } else {
-            throw RomaCommandLineOptionsError.missingOption("--whisper-cli")
-        }
-
-        let modelPath: String
-        if let value = options.optionalValue(after: "--whisper-model") {
-            modelPath = value
-        } else if allowPlaceholders {
-            modelPath = defaultWhisperModelPath
-        } else {
-            throw RomaCommandLineOptionsError.missingOption("--whisper-model")
-        }
-
-        let outputDirectory = options.optionalValue(after: "--output-dir")
-            ?? FileManager.default.temporaryDirectory.path
-
-        return WhisperCLITranscriptionConfiguration(
-            executableURL: URL(fileURLWithPath: executablePath),
-            modelURL: URL(fileURLWithPath: modelPath),
-            outputDirectoryURL: URL(fileURLWithPath: outputDirectory, isDirectory: true),
-            extraArguments: try options.values(after: "--whisper-arg"),
-            timeoutSeconds: try options.doubleValue(after: "--timeout", default: 120)
-        )
-    }
-
     private static func printTranscriptionResult(
         _ result: TranscriptionResult,
         client: RomaTranscriptionClient,
@@ -633,21 +598,6 @@ struct RomaProofAgent {
         #endif
     }
 
-    private static var defaultWhisperCLIPath: String {
-        #if os(Windows)
-        return "C:\\path\\whisper-cli.exe"
-        #else
-        return "/path/to/whisper-cli"
-        #endif
-    }
-
-    private static var defaultWhisperModelPath: String {
-        #if os(Windows)
-        return "C:\\path\\ggml-base.en.bin"
-        #else
-        return "/path/to/ggml-base.en.bin"
-        #endif
-    }
 }
 
 private enum AgentError: Error, CustomStringConvertible {

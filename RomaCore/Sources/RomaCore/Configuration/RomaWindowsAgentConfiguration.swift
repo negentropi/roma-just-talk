@@ -285,12 +285,9 @@ public struct RomaWindowsAgentConfiguration: Codable, Equatable, Sendable {
 
     public func whisperCLIConfiguration() throws -> WhisperCLITranscriptionConfiguration {
         WhisperCLITranscriptionConfiguration(
-            executableURL: URL(fileURLWithPath: try requireWhisperCLIPath()),
-            modelURL: URL(fileURLWithPath: try requireWhisperModelPath()),
-            outputDirectoryURL: URL(
-                fileURLWithPath: whisperOutputDirectoryPath ?? FileManager.default.temporaryDirectory.path,
-                isDirectory: true
-            ),
+            executablePath: try requireWhisperCLIPath(),
+            modelPath: try requireWhisperModelPath(),
+            outputDirectoryPath: whisperOutputDirectoryPath,
             extraArguments: whisperExtraArguments
         )
     }

@@ -21,6 +21,50 @@ public struct WhisperCLITranscriptionConfiguration: Equatable, Sendable {
         self.timeoutSeconds = timeoutSeconds
     }
 
+    public init(
+        executablePath: String,
+        modelPath: String,
+        outputDirectoryPath: String? = nil,
+        extraArguments: [String] = [],
+        timeoutSeconds: TimeInterval = 120
+    ) {
+        self.init(
+            executableURL: URL(fileURLWithPath: executablePath),
+            modelURL: URL(fileURLWithPath: modelPath),
+            outputDirectoryURL: URL(
+                fileURLWithPath: outputDirectoryPath ?? FileManager.default.temporaryDirectory.path,
+                isDirectory: true
+            ),
+            extraArguments: extraArguments,
+            timeoutSeconds: timeoutSeconds
+        )
+    }
+
+    public static func make(
+        from options: RomaCommandLineOptions,
+        allowPlaceholders: Bool = false,
+        outputDirectoryOption: String = "--output-dir"
+    ) throws -> WhisperCLITranscriptionConfiguration {
+        let executablePath = try requiredPath(
+            options.optionalValue(after: "--whisper-cli"),
+            fallback: allowPlaceholders ? placeholderExecutablePath : nil,
+            option: "--whisper-cli"
+        )
+        let modelPath = try requiredPath(
+            options.optionalValue(after: "--whisper-model"),
+            fallback: allowPlaceholders ? placeholderModelPath : nil,
+            option: "--whisper-model"
+        )
+
+        return try WhisperCLITranscriptionConfiguration(
+            executablePath: executablePath,
+            modelPath: modelPath,
+            outputDirectoryPath: options.optionalValue(after: outputDirectoryOption),
+            extraArguments: options.values(after: "--whisper-arg"),
+            timeoutSeconds: options.doubleValue(after: "--timeout", default: 120)
+        )
+    }
+
     public func makeInvocation(
         for request: TranscriptionRequest,
         outputBaseName: String = "roma-whisper-\(UUID().uuidString)"
@@ -57,6 +101,29 @@ public struct WhisperCLITranscriptionConfiguration: Equatable, Sendable {
             return nil
         }
         return trimmed
+    }
+
+    private static func requiredPath(_ value: String?, fallback: String?, option: String) throws -> String {
+        guard let path = value ?? fallback else {
+            throw RomaCommandLineOptionsError.missingOption(option)
+        }
+        return path
+    }
+
+    private static var placeholderExecutablePath: String {
+        #if os(Windows)
+        return "C:\\path\\whisper-cli.exe"
+        #else
+        return "/path/to/whisper-cli"
+        #endif
+    }
+
+    private static var placeholderModelPath: String {
+        #if os(Windows)
+        return "C:\\path\\ggml-base.en.bin"
+        #else
+        return "/path/to/ggml-base.en.bin"
+        #endif
     }
 }
 

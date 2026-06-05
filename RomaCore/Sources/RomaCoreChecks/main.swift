@@ -218,6 +218,36 @@ struct RomaCoreChecks {
             "whisper CLI invocation should derive JSON output path"
         )
         try require(configuration.timeoutSeconds == 42, "whisper CLI config should keep timeout")
+        let commandLineConfiguration = try WhisperCLITranscriptionConfiguration.make(from: RomaCommandLineOptions([
+            "--whisper-cli", "/tools/whisper-cli",
+            "--whisper-model", "/models/ggml-base.en.bin",
+            "--output-dir", "/tmp/roma-command-whisper",
+            "--whisper-arg", "--beam-size",
+            "--whisper-arg", "1",
+            "--timeout", "42"
+        ]))
+        try require(
+            commandLineConfiguration.executableURL.path == "/tools/whisper-cli" &&
+                commandLineConfiguration.modelURL.path == "/models/ggml-base.en.bin" &&
+                commandLineConfiguration.outputDirectoryURL.path == "/tmp/roma-command-whisper" &&
+                commandLineConfiguration.extraArguments == ["--beam-size", "1"] &&
+                commandLineConfiguration.timeoutSeconds == 42,
+            "whisper CLI config should parse proof command-line options"
+        )
+        let placeholderConfiguration = try WhisperCLITranscriptionConfiguration.make(
+            from: RomaCommandLineOptions([]),
+            allowPlaceholders: true
+        )
+        try require(
+            !placeholderConfiguration.executableURL.path.isEmpty &&
+                !placeholderConfiguration.modelURL.path.isEmpty,
+            "whisper CLI config should provide doctor-only placeholders"
+        )
+        do {
+            _ = try WhisperCLITranscriptionConfiguration.make(from: RomaCommandLineOptions([]))
+            throw CheckFailure("whisper CLI config should require executable/model paths without placeholders")
+        } catch RomaCommandLineOptionsError.missingOption {
+        }
 
         let topLevelJSON = Data(#"{"text":" roma just talk ","language":"en","duration":1.5}"#.utf8)
         let topLevelResult = try WhisperCLITranscriptionService.decodeJSONResult(from: topLevelJSON)
@@ -9677,6 +9707,12 @@ struct RomaCoreChecks {
             ),
             encoding: .utf8
         )
+        let whisperCLISource = try String(
+            contentsOf: packageRoot.appendingPathComponent(
+                "Sources/RomaCore/Transcription/WhisperCLITranscriptionService.swift"
+            ),
+            encoding: .utf8
+        )
         let windowsAgentConfigurationSource = try String(
             contentsOf: packageRoot.appendingPathComponent(
                 "Sources/RomaCore/Configuration/RomaWindowsAgentConfiguration.swift"
@@ -9921,7 +9957,11 @@ struct RomaCoreChecks {
                 proofAgentSource.contains("RomaCommandLineText.oneLine(result.text)") &&
                 proofAgentSource.contains("throw RomaCommandLineOptionsError.invalidOptionValue(\"--focus-delay\")") &&
                 transcriptionClientSource.contains("throw RomaCommandLineOptionsError.invalidOptionValue(\"--endpoint\")") &&
-                proofAgentSource.contains("throw RomaCommandLineOptionsError.missingOption(\"--whisper-cli\")") &&
+                whisperCLISource.contains("throw RomaCommandLineOptionsError.missingOption(option)") &&
+                whisperCLISource.contains("public static func make(") &&
+                proofAgentSource.contains("WhisperCLITranscriptionConfiguration.make(") &&
+                windowsAgentConfigurationSource.contains("executablePath: try requireWhisperCLIPath()") &&
+                windowsAgentConfigurationSource.contains("modelPath: try requireWhisperModelPath()") &&
                 proofAgentSource.contains("throw TranscriptionAPIKeySourceError.missingEnvironmentValue") &&
                 !proofAgentSource.contains("private static func value(after option") &&
                 !proofAgentSource.contains("private static func optionalValue(after option") &&
@@ -9931,6 +9971,9 @@ struct RomaCoreChecks {
                 !proofAgentSource.contains("private static func oneLine") &&
                 !proofAgentSource.contains("private static func positiveDoubleValue") &&
                 !proofAgentSource.contains("private static func optionalUInt32Value") &&
+                !proofAgentSource.contains("private static func makeWhisperCLIConfiguration") &&
+                !proofAgentSource.contains("defaultWhisperCLIPath") &&
+                !proofAgentSource.contains("defaultWhisperModelPath") &&
                 !proofAgentSource.contains("AgentError.missingOption") &&
                 !proofAgentSource.contains("AgentError.invalidOptionValue") &&
                 !proofAgentSource.contains("AgentError.conflictingOptions") &&

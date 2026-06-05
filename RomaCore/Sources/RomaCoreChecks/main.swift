@@ -10312,8 +10312,9 @@ struct RomaCoreChecks {
             )
         }
         try require(
-            proveScript.contains("Get-RomaWindowsProofAgentSourceOutputProof -Output $Output"),
-            "Windows artifact proof reports should record proof-agent source markers through the shared helper"
+            proofCommonScript.contains("Get-RomaWindowsProofAgentSourceOutputProof -Output $Output") &&
+                proveScript.contains("Get-RomaWindowsProofAgentDoctorOutputProof -Output $script:packagedProofAgentDoctorOutput"),
+            "Windows artifact proof reports should record proof-agent source markers through the shared doctor helper"
         )
         try require(
             checkReportScript.contains(
@@ -10502,14 +10503,21 @@ struct RomaCoreChecks {
             "Windows doctors should print permission markers through the shared permission surface"
         )
         try require(
-            proveScript.contains("Get-RomaWindowsMinimumPermissionOutputProof -Output $Output") &&
-                proveScript.contains("Get-RomaWindowsRuntimeDefaultOutputProof -Output $Output") &&
+            proofCommonScript.contains("function Get-RomaWindowsAgentDoctorOutputProof") &&
+                proofCommonScript.contains("function Get-RomaWindowsProofAgentDoctorOutputProof") &&
+                proofCommonScript.contains("Get-RomaWindowsMinimumPermissionOutputProof -Output $Output") &&
+                proofCommonScript.contains("Get-RomaWindowsRuntimeDefaultOutputProof -Output $Output") &&
+                proofCommonScript.contains("Get-RomaWindowsProofAgentSourceOutputProof -Output $Output") &&
+                proveScript.contains("Get-RomaWindowsAgentDoctorOutputProof -Output $script:packagedAgentDoctorOutput") &&
+                proveScript.contains("Get-RomaWindowsProofAgentDoctorOutputProof -Output $script:packagedProofAgentDoctorOutput") &&
                 proveScript.contains("Get-RomaWindowsNativeDoctorOutputProofs -Outputs $script:packagedNativeDoctorOutputs") &&
+                !proveScript.contains("function Get-DoctorOutputProof") &&
+                !proveScript.contains("function Get-ProofAgentDoctorOutputProof") &&
                 proofCommonScript.contains("Get-RomaWindowsHoldTimeoutDefaultOutputProof -Output $Output") &&
                 proofCommonScript.contains("Get-RomaWindowsClipboardRestoreDefaultOutputProof -Output $Output") &&
                 checkReportScript.contains(#"Assert-Boolean -Object $Proof -Name "microphone_settings_uri" -Expected $true"#) &&
                 checkReportScript.contains(#"Assert-Boolean -Object $Proof -Name "desktop_app_microphone_access_required" -Expected $true"#),
-            "Windows artifact proof should record shared doctor marker proof fields"
+            "Windows artifact proof should record shared doctor marker proof fields through common shapers"
         )
         let nativeDoctorSpecs = [
             ("register_hotkey", "register hotkey", "windows-hotkey-doctor", "windows_hotkey_runtime=true"),

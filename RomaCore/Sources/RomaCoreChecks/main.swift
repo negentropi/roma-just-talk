@@ -3435,6 +3435,16 @@ struct RomaCoreChecks {
                 "embedded unpunctuated i think before ready predicate"
             ),
             (
+                "I think this is I would say ready.",
+                "I think this is ready.",
+                "embedded unpunctuated i would say before ready predicate"
+            ),
+            (
+                "I think this is I feel like good.",
+                "I think this is good.",
+                "embedded unpunctuated i feel like before good predicate"
+            ),
+            (
                 "I think this is you see ready.",
                 "I think this is ready.",
                 "embedded unpunctuated you see filler"
@@ -5888,6 +5898,16 @@ struct RomaCoreChecks {
                 "I suppose the model is ready.",
                 "I suppose the model is ready.",
                 "leading i suppose uncertainty guard"
+            ),
+            (
+                "This works I would say.",
+                "This works I would say.",
+                "terminal i would say uncertainty guard"
+            ),
+            (
+                "I feel like this works.",
+                "I feel like this works.",
+                "leading i feel like uncertainty guard"
             ),
             (
                 "I like",

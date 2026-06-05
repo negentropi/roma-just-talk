@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Treated bare "actually" as a bounded correction marker for short time, amount, and product-name dictation fixes while preserving ordinary "actually" prose.
 - Collapsed ellipsis-separated repeated short phrase restarts such as "I think... I think this works" in post-STT cleanup.
 - Preserved explicit terminal spoken punctuation commands such as "exclamation mark", "question mark", "period", and "ellipsis" in mid-sentence continuations.
 - Trimmed unmatched parenthesis and brace artifacts around short continuation fragments while preserving real delimiter closures.

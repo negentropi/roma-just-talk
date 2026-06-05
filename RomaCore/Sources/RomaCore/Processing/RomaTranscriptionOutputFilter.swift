@@ -702,6 +702,7 @@ public struct RomaTranscriptionOutputFilter {
             (?:[,;:…]|\.\.\.)\s*actually\s+make\s+it\s*[,;:]? |
             (?:[,;:…]|\.\.\.)\s*better\s+make\s+it\s*[,;:]? |
             (?:[,;:…]|\.\.\.)\s*actually |
+            actually |
             (?:[,;:…]|\.\.\.)\s*no\s*[,;:]?\s+actually\s*[,;:]? |
             sorry\s+not\s+that\s*[,;:]?\s+actually |
             (?:[,;:…]|\.\.\.)\s*(?:oops|whoops|woops)\s*[,;:]? |
@@ -7108,6 +7109,11 @@ public struct RomaTranscriptionOutputFilter {
             return false
         }
 
+        if isBareActuallyBacktrackingMarker(markerText),
+           !shouldApplyBareActuallyBacktrackingMarker(beforeMarker: beforeMarker, correctionText: correctionText) {
+            return false
+        }
+
         if isEraseBacktrackingMarker(markerText) {
             guard wordCount(in: beforeMarker) >= 2 else {
                 return false
@@ -7323,6 +7329,10 @@ public struct RomaTranscriptionOutputFilter {
         normalizedBacktrackingMarker(markerText) == "sorry"
     }
 
+    private static func isBareActuallyBacktrackingMarker(_ markerText: String) -> Bool {
+        normalizedBacktrackingMarker(markerText) == "actually"
+    }
+
     private static func shouldApplyBareSorryBacktrackingMarker(beforeMarker: String, correctionText: String) -> Bool {
         if let previousWord = previousWord(in: beforeMarker),
            blockedPreviousWordsForBareSorryCorrection.contains(previousWord) {
@@ -7337,9 +7347,67 @@ public struct RomaTranscriptionOutputFilter {
         return true
     }
 
+    private static func shouldApplyBareActuallyBacktrackingMarker(
+        beforeMarker: String,
+        correctionText: String
+    ) -> Bool {
+        guard wordCount(in: beforeMarker) >= 2,
+              let previousWord = previousWord(in: beforeMarker),
+              !blockedPreviousWordsForUnpunctuatedContinuationCorrection.contains(previousWord),
+              !blockedPreviousWordsForBareSorryCorrection.contains(previousWord) else {
+            return false
+        }
+
+        let correctionWords = wordTokens(in: correctionText).map { $0.text }
+        guard !correctionWords.isEmpty,
+              !blockedFirstCorrectionWordsForReplaceThat.contains(correctionWords[0]) else {
+            return false
+        }
+
+        if let sourceAmount = trailingSpokenAmount(in: beforeMarker),
+           leadingSpokenAmount(in: correctionWords) != nil ||
+            leadingAmountValueWordCount(in: correctionWords) != nil {
+            return sourceAmount.wordCount >= 2
+        }
+
+        if trailingSpokenDate(in: beforeMarker) != nil,
+           leadingSpokenDate(in: correctionWords) != nil ||
+            leadingSpokenDayWordCount(in: correctionWords) != nil {
+            return true
+        }
+
+        if spokenHourValue(previousWord) != nil,
+           spokenHourValue(correctionWords[0]) != nil {
+            return true
+        }
+
+        if trailingProductCorrectionPhraseWordCount(in: beforeMarker) != nil,
+           leadingProductCorrectionPhraseWordCount(in: correctionWords) != nil {
+            return true
+        }
+
+        let correctionWordCount = min(2, correctionWords.count)
+        let sourceTailWords = trailingWords(correctionWordCount, in: beforeMarker)
+        guard sourceTailWords.count == correctionWordCount,
+              correctionWordCount <= 2,
+              sourceTailWords != Array(correctionWords.prefix(correctionWordCount)) else {
+            return false
+        }
+
+        return sourceTailWords.allSatisfy(isSingleWordActuallyCorrectionTerm) &&
+            correctionWords.prefix(correctionWordCount).allSatisfy(isSingleWordActuallyCorrectionTerm)
+    }
+
+    private static func isSingleWordActuallyCorrectionTerm(_ word: String) -> Bool {
+        productCorrectionTailWords.contains(word) ||
+            commonTechnicalAcronyms[word] != nil ||
+            properNameFragmentCasing[word] != nil
+    }
+
     private static func isSingleWordReplacementBacktrackingMarker(_ markerText: String) -> Bool {
         let normalizedMarker = normalizedBacktrackingMarker(markerText)
         return [
+            "actually",
             "actually no",
             "actually wait no",
             "actually wait never mind",

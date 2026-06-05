@@ -3825,9 +3825,39 @@ struct RomaCoreChecks {
                 "wait no correction should replace markdown link target after repeated to"
             ),
             (
+                "Let's meet at two, actually three tomorrow.",
+                "Let's meet at three tomorrow.",
+                "punctuated bare actually time correction should preserve preposition"
+            ),
+            (
+                "Let's meet at two actually three tomorrow.",
+                "Let's meet at three tomorrow.",
+                "unpunctuated bare actually time correction"
+            ),
+            (
+                "Pay twenty dollars, actually thirty dollars tomorrow.",
+                "Pay $30 tomorrow.",
+                "punctuated bare actually amount correction should preserve verb"
+            ),
+            (
+                "Pay twenty dollars actually thirty dollars tomorrow.",
+                "Pay $30 tomorrow.",
+                "unpunctuated bare actually amount correction"
+            ),
+            (
                 "Use model, oops module.",
                 "Use module.",
                 "oops correction"
+            ),
+            (
+                "Use model, actually module.",
+                "Use module.",
+                "punctuated bare actually product correction"
+            ),
+            (
+                "Use model actually module.",
+                "Use module.",
+                "unpunctuated bare actually product correction"
             ),
             (
                 "Use model, oops actually module.",
@@ -5023,6 +5053,11 @@ struct RomaCoreChecks {
                 "Let's wait actually until tomorrow.",
                 "Let's wait actually until tomorrow.",
                 "wait actually prose guard"
+            ),
+            (
+                "The module is actually ready.",
+                "The module is actually ready.",
+                "copula actually prose guard"
             ),
             (
                 "The phrase wait actually is useful.",

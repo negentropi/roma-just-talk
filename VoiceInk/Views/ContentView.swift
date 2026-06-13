@@ -4,11 +4,11 @@ import OSLog
 
 // ViewType enum with all cases
 enum ViewType: String, CaseIterable, Identifiable {
-    case metrics = "Dashboard"
-    case transcribeAudio = "Transcribe Audio"
-    case history = "History"
-    case models = "AI Models"
-    case enhancement = "Enhancement"
+    case metrics = "home"
+    case transcribeAudio = "manual stt"
+    case history = "past"
+    case models = "models"
+    case enhancement = "style"
     case powerMode = "Power Mode"
     case permissions = "Permissions"
     case audioInput = "Audio Input"
@@ -147,17 +147,17 @@ struct ContentView: View {
                 switch destination {
                 case "Settings":
                     selectedView = .settings
-                case "AI Models":
+                case "AI Models", ViewType.models.rawValue:
                     selectedView = .models
                 case "VoiceInk Pro":
                     selectedView = .license
-                case "History":
+                case "History", ViewType.history.rawValue:
                     selectedView = .history
                 case "Permissions":
                     selectedView = .permissions
-                case "Enhancement":
+                case "Enhancement", ViewType.enhancement.rawValue:
                     selectedView = .enhancement
-                case "Transcribe Audio":
+                case "Transcribe Audio", ViewType.transcribeAudio.rawValue:
                     selectedView = .transcribeAudio
                 case "Power Mode":
                     selectedView = .powerMode

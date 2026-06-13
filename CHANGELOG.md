@@ -4,6 +4,7 @@
 
 - Made Special shortcuts fail closed when key evidence is unreliable, including secure text entry, held companion keys at Shift release, and very short no-evidence Shift presses, so hidden typing does not start dictation.
 - Removed the Keyboard Shortcut setup card from App Permissions so the page only lists macOS permission grants.
+- Renamed the main sidebar items to home, manual stt, past, models, and style.
 
 ## v1.92 - 2026-06-13
 

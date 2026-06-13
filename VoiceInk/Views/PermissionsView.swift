@@ -10,7 +10,6 @@ class PermissionManager: ObservableObject {
     @Published var isAccessibilityEnabled = false
     @Published var isInputMonitoringEnabled = false
     @Published var isScreenRecordingEnabled = false
-    @Published var isKeyboardShortcutSet = false
     @Published var inputMonitoringNeedsRelaunch = false
     @Published var screenRecordingNeedsRelaunch = false
     private let permissionFlowGuide = PermissionFlowGuide()
@@ -60,7 +59,6 @@ class PermissionManager: ObservableObject {
         checkInputMonitoringPermission()
         checkScreenRecordingPermission()
         checkAudioPermissionStatus()
-        checkKeyboardShortcut()
     }
     
     func checkAccessibilityPermissions() {
@@ -121,10 +119,6 @@ class PermissionManager: ObservableObject {
         startPermissionRefreshPolling()
     }
     
-    func checkKeyboardShortcut() {
-        isKeyboardShortcutSet = ShortcutStore.shortcut(for: .primaryRecording) != nil
-    }
-
     private func startPermissionRefreshPolling() {
         PermissionRefreshCenter.shared.beginPolling()
         permissionRefreshTimer?.invalidate()
@@ -287,7 +281,6 @@ struct PermissionCard: View {
 }
 
 struct PermissionsView: View {
-    @EnvironmentObject private var recordingShortcutManager: RecordingShortcutManager
     @StateObject private var permissionManager = PermissionManager()
     
     var body: some View {
@@ -302,23 +295,6 @@ struct PermissionsView: View {
                 
                 // Permission Cards
                 VStack(spacing: 16) {
-                    // Keyboard Shortcut Permission
-                    PermissionCard(
-                        icon: "keyboard",
-                        title: "Keyboard Shortcut",
-                        description: "Set up a keyboard shortcut to use roma-just-talk anywhere",
-                        isGranted: recordingShortcutManager.isShortcutConfigured,
-                        buttonTitle: "Configure Shortcut",
-                        buttonAction: {
-                            NotificationCenter.default.post(
-                                name: .navigateToDestination,
-                                object: nil,
-                                userInfo: ["destination": "Settings"]
-                            )
-                        },
-                        checkPermission: { permissionManager.checkKeyboardShortcut() }
-                    )
-
                     // Input Monitoring Permission
                     PermissionCard(
                         icon: "keyboard.badge.eye",

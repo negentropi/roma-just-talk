@@ -219,7 +219,55 @@ struct VoiceInkTests {
         #expect(!sessionActive)
     }
 
-    @Test @MainActor func specialModeEmptyTapStopsRecordingBeforeFallbackInsteadOfImmediatePaste() async throws {
+    @Test @MainActor func specialModeCleanLongPressStopsRecording() async throws {
+        SpecialShortcutEmptyTranscriptionFallback.resetForTesting()
+        defer { SpecialShortcutEmptyTranscriptionFallback.resetForTesting() }
+
+        var sessionActive = false
+        var toggleCount = 0
+        var cancelCount = 0
+
+        let handler = RecordingShortcutModeHandler(
+            logger: Logger(subsystem: "VoiceInkTests", category: "RecordingShortcutModeHandler"),
+            canHandleShortcutAction: { true },
+            isRecorderVisible: { sessionActive },
+            recordingState: { sessionActive ? .recording : .idle },
+            toggleMiniRecorder: { _ in
+                toggleCount += 1
+                sessionActive.toggle()
+            },
+            cancelRecording: {
+                cancelCount += 1
+                sessionActive = false
+            }
+        )
+
+        let specialOptions = SpecialShortcutOptions(
+            keyDownBehavior: .startRecording,
+            allowsKeyDownOnlyTrigger: true,
+            pasteLastTranscriptOnEmptyTap: true
+        )
+
+        await handler.handleKeyDown(
+            action: .primaryRecording,
+            eventTime: 1,
+            mode: .special,
+            specialOptions: specialOptions
+        )
+
+        await handler.handleKeyUp(
+            action: .primaryRecording,
+            eventTime: 1.6,
+            mode: .special,
+            specialOptions: specialOptions
+        )
+
+        #expect(toggleCount == 2)
+        #expect(cancelCount == 0)
+        #expect(!sessionActive)
+    }
+
+    @Test @MainActor func specialModeCancelsShortNoEvidencePresses() async throws {
         SpecialShortcutEmptyTranscriptionFallback.resetForTesting()
         defer { SpecialShortcutEmptyTranscriptionFallback.resetForTesting() }
 
@@ -262,12 +310,65 @@ struct VoiceInkTests {
             specialOptions: specialOptions
         )
 
-        #expect(toggleCount == 2)
-        #expect(cancelCount == 0)
+        #expect(toggleCount == 1)
+        #expect(cancelCount == 1)
         #expect(!sessionActive)
     }
 
-    @Test @MainActor func specialModePreloadOnlyEmptyTapCommitsBeforeFallback() async throws {
+    @Test @MainActor func specialModePreloadOnlyLongPressCommits() async throws {
+        SpecialShortcutEmptyTranscriptionFallback.resetForTesting()
+        defer { SpecialShortcutEmptyTranscriptionFallback.resetForTesting() }
+
+        var recordingState = RecordingState.idle
+        var sessionActive = false
+        var toggleCount = 0
+
+        let handler = RecordingShortcutModeHandler(
+            logger: Logger(subsystem: "VoiceInkTests", category: "RecordingShortcutModeHandler"),
+            canHandleShortcutAction: { true },
+            isRecorderVisible: { sessionActive },
+            recordingState: { recordingState },
+            toggleMiniRecorder: { _ in
+                toggleCount += 1
+                if recordingState == .idle {
+                    recordingState = .recording
+                    sessionActive = true
+                } else {
+                    recordingState = .transcribing
+                    sessionActive = true
+                }
+            },
+            cancelRecording: {
+                recordingState = .idle
+                sessionActive = false
+            }
+        )
+
+        let specialOptions = SpecialShortcutOptions(
+            keyDownBehavior: .preloadOnly,
+            allowsKeyDownOnlyTrigger: true,
+            pasteLastTranscriptOnEmptyTap: true
+        )
+
+        await handler.handleKeyDown(
+            action: .primaryRecording,
+            eventTime: 1,
+            mode: .special,
+            specialOptions: specialOptions
+        )
+
+        await handler.handleKeyUp(
+            action: .primaryRecording,
+            eventTime: 1.6,
+            mode: .special,
+            specialOptions: specialOptions
+        )
+
+        #expect(toggleCount == 2)
+        #expect(recordingState == .transcribing)
+    }
+
+    @Test @MainActor func specialModePreloadOnlyCancelsShortNoEvidencePresses() async throws {
         SpecialShortcutEmptyTranscriptionFallback.resetForTesting()
         defer { SpecialShortcutEmptyTranscriptionFallback.resetForTesting() }
 
@@ -316,8 +417,8 @@ struct VoiceInkTests {
             specialOptions: specialOptions
         )
 
-        #expect(toggleCount == 2)
-        #expect(recordingState == .transcribing)
+        #expect(toggleCount == 0)
+        #expect(recordingState == .idle)
     }
 
     @Test func inputMonitoringPermissionUsesInjectedSystemClient() async throws {
@@ -503,6 +604,84 @@ struct VoiceInkTests {
 
         try await Task.sleep(nanoseconds: 10_000_000)
         #expect(contexts == [ShortcutPressContext(didPressOtherKeyDuringPress: true, didReleaseOtherKeyDuringPress: false)])
+    }
+
+    @Test func modifierOnlyShortcutMarksSecureInputAsUnreliableEvidence() async throws {
+        let monitor = ShortcutMonitor()
+        var contexts: [ShortcutPressContext] = []
+
+        ShortcutMonitor.configureSecureEventInputClientForTesting(
+            SecureEventInputState.Client(isEnabled: { true })
+        )
+        defer {
+            monitor.stop()
+            ShortcutMonitor.resetSecureEventInputClientForTesting()
+        }
+
+        monitor.configureForTesting(
+            shortcuts: [
+                .primaryRecording: .modifierOnly(
+                    keyCode: UInt16(kVK_Shift),
+                    modifierFlags: [.shift]
+                )
+            ],
+            handlesModifierOnlyShortcutsInEventTap: true,
+            onKeyDown: { _, _ in },
+            onKeyUp: { _, _, context in contexts.append(context) }
+        )
+
+        monitor.handleEventTapFlagsChangedForTesting(
+            keyCode: UInt16(kVK_Shift),
+            modifierFlags: [.shift],
+            eventTime: 1
+        )
+        monitor.handleEventTapFlagsChangedForTesting(
+            keyCode: UInt16(kVK_Shift),
+            modifierFlags: [],
+            eventTime: 2
+        )
+
+        try await Task.sleep(nanoseconds: 10_000_000)
+        #expect(contexts == [ShortcutPressContext(hasReliableKeyEvidence: false)])
+    }
+
+    @Test func modifierOnlyShortcutChecksPressedNonModifierKeysAtRelease() async throws {
+        let monitor = ShortcutMonitor()
+        var contexts: [ShortcutPressContext] = []
+
+        ShortcutMonitor.configureKeyboardStateClientForTesting(
+            KeyboardState.Client(isKeyPressed: { keyCode in keyCode == UInt16(kVK_ANSI_X) })
+        )
+        defer {
+            monitor.stop()
+            ShortcutMonitor.resetKeyboardStateClientForTesting()
+        }
+
+        monitor.configureForTesting(
+            shortcuts: [
+                .primaryRecording: .modifierOnly(
+                    keyCode: UInt16(kVK_Shift),
+                    modifierFlags: [.shift]
+                )
+            ],
+            handlesModifierOnlyShortcutsInEventTap: true,
+            onKeyDown: { _, _ in },
+            onKeyUp: { _, _, context in contexts.append(context) }
+        )
+
+        monitor.handleEventTapFlagsChangedForTesting(
+            keyCode: UInt16(kVK_Shift),
+            modifierFlags: [.shift],
+            eventTime: 1
+        )
+        monitor.handleEventTapFlagsChangedForTesting(
+            keyCode: UInt16(kVK_Shift),
+            modifierFlags: [],
+            eventTime: 2
+        )
+
+        try await Task.sleep(nanoseconds: 10_000_000)
+        #expect(contexts == [ShortcutPressContext(didPressOtherKeyDuringPress: true)])
     }
 
     @Test func modifierOnlySpecialShortcutDoesNotStartWithoutKeyEvidenceTap() async throws {

@@ -538,6 +538,7 @@ final class RecordingShortcutModeHandler {
 
     private let shortcutPressCooldown: TimeInterval = 0.5
     private let hybridPressThreshold: TimeInterval = 0.5
+    private let minimumSpecialNoEvidencePressDuration: TimeInterval = 0.5
 
     init(
         logger: Logger,
@@ -636,9 +637,12 @@ final class RecordingShortcutModeHandler {
             let pressDuration = shortcutPressStartTime.map { eventTime - $0 } ?? 0
             let options = activeSpecialOptions
             let hasTypingEvidence = context.didPressOtherKeyDuringPress || context.didReleaseOtherKeyDuringPress
+            let shouldFailClosed =
+                !context.hasReliableKeyEvidence ||
+                (!hasTypingEvidence && pressDuration < minimumSpecialNoEvidencePressDuration)
 
-            if hasTypingEvidence {
-                logger.notice("handleShortcutKeyUp: cancelling special shortcut; typing evidence during hold")
+            if hasTypingEvidence || shouldFailClosed {
+                logger.notice("handleShortcutKeyUp: cancelling special shortcut; unsafe key evidence")
                 if isRecorderVisible() {
                     await cancelRecording()
                 }

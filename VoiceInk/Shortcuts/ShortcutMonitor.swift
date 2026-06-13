@@ -1,5 +1,6 @@
 import AppKit
 import ApplicationServices
+import Carbon.HIToolbox
 import CoreGraphics
 import Foundation
 import os
@@ -51,9 +52,34 @@ enum AccessibilityPermission {
     }
 }
 
+enum SecureEventInputState {
+    struct Client {
+        var isEnabled: () -> Bool
+    }
+
+    static let systemClient = Client(
+        isEnabled: IsSecureEventInputEnabled
+    )
+
+    static func isEnabled(client: Client = systemClient) -> Bool {
+        client.isEnabled()
+    }
+}
+
+enum KeyboardState {
+    struct Client {
+        var isKeyPressed: (UInt16) -> Bool
+    }
+
+    static let systemClient = Client { keyCode in
+        CGEventSource.keyState(.combinedSessionState, key: CGKeyCode(keyCode))
+    }
+}
+
 struct ShortcutPressContext: Equatable {
     var didPressOtherKeyDuringPress = false
     var didReleaseOtherKeyDuringPress = false
+    var hasReliableKeyEvidence = true
 }
 
 final class ShortcutMonitor {
@@ -105,7 +131,12 @@ final class ShortcutMonitor {
     private static var hasRequestedAccessibilityAccess = false
     private static var inputMonitoringClient = InputMonitoringPermission.systemClient
     private static var accessibilityClient = AccessibilityPermission.systemClient
+    private static var secureEventInputClient = SecureEventInputState.systemClient
+    private static var keyboardStateClient = KeyboardState.systemClient
     private static let shortcutInterruptionWindow: TimeInterval = 1.0
+    private static let nonModifierKeyCodes = (0...127)
+        .map(UInt16.init)
+        .filter { !Shortcut.isModifierKeyCode($0) }
 
     deinit {
         stop()
@@ -290,6 +321,14 @@ final class ShortcutMonitor {
         AccessibilityPermission.requestAccess(client: accessibilityClient)
     }
 
+    static func isSecureEventInputEnabled() -> Bool {
+        SecureEventInputState.isEnabled(client: secureEventInputClient)
+    }
+
+    private static func hasPressedNonModifierKey() -> Bool {
+        nonModifierKeyCodes.contains { keyboardStateClient.isKeyPressed($0) }
+    }
+
     private static func ensureListenEventAccessForMonitoring() -> Bool {
         if preflightListenEventAccess() {
             return true
@@ -358,13 +397,15 @@ final class ShortcutMonitor {
 
         for action in pressedActions {
             if var state = shortcuts[action] {
+                var context = state.pressContext
+                context.hasReliableKeyEvidence = false
                 state.isDown = false
                 state.pressedAt = nil
                 state.isInterrupted = false
                 state.pressContext = ShortcutPressContext()
                 shortcuts[action] = state
+                dispatchKeyUp(for: action, eventTime: eventTime, context: context)
             }
-            dispatchKeyUp(for: action, eventTime: eventTime, context: ShortcutPressContext())
         }
     }
 
@@ -376,6 +417,10 @@ final class ShortcutMonitor {
         scope: ShortcutHandlingScope = .all
     ) -> Bool {
         var shouldSuppress = false
+
+        if Self.isSecureEventInputEnabled() {
+            recordUnreliableKeyEvidenceDuringActiveShortcuts()
+        }
 
         if kind == .keyDown {
             recordPressEvidenceDuringActiveShortcuts(
@@ -458,6 +503,19 @@ final class ShortcutMonitor {
         }
 
         return shouldSuppress
+    }
+
+    private func recordUnreliableKeyEvidenceDuringActiveShortcuts() {
+        for action in Array(shortcuts.keys) {
+            guard var state = shortcuts[action],
+                  state.isDown
+            else {
+                continue
+            }
+
+            state.pressContext.hasReliableKeyEvidence = false
+            shortcuts[action] = state
+        }
     }
 
     private func recordPressEvidenceDuringActiveShortcuts(
@@ -590,7 +648,10 @@ final class ShortcutMonitor {
 
         if state.isDown {
             if state.shortcut.shouldReleaseModifierEvent(keyCode: keyCode, modifierFlags: modifierFlags) {
-                let context = state.pressContext
+                var context = state.pressContext
+                if Self.hasPressedNonModifierKey() {
+                    context.didPressOtherKeyDuringPress = true
+                }
                 state.isDown = false
                 state.pressedAt = nil
                 state.isInterrupted = false
@@ -714,6 +775,26 @@ extension ShortcutMonitor {
 
     static func resetPermissionClientsForTesting() {
         configurePermissionClientsForTesting()
+    }
+
+    static func configureSecureEventInputClientForTesting(
+        _ secureEventInputClient: SecureEventInputState.Client
+    ) {
+        self.secureEventInputClient = secureEventInputClient
+    }
+
+    static func resetSecureEventInputClientForTesting() {
+        secureEventInputClient = SecureEventInputState.systemClient
+    }
+
+    static func configureKeyboardStateClientForTesting(
+        _ keyboardStateClient: KeyboardState.Client
+    ) {
+        self.keyboardStateClient = keyboardStateClient
+    }
+
+    static func resetKeyboardStateClientForTesting() {
+        keyboardStateClient = KeyboardState.systemClient
     }
 
     func configureForTesting(

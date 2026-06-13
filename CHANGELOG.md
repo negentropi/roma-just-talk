@@ -2,6 +2,8 @@
 
 ## v1.93 - Unreleased
 
+- Made Special shortcuts fail closed when key evidence is unreliable, including secure text entry, held companion keys at Shift release, and very short no-evidence Shift presses, so hidden typing does not start dictation.
+
 ## v1.92 - 2026-06-13
 
 - Fixed Special shortcut typing detection for Karabiner mappings that emit bare function keys, including `Left Shift` + `X` and `Left Shift` + `S/D/F`.

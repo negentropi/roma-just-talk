@@ -106,8 +106,7 @@ struct LiveTranscriptionPolicyTests {
         let detector = ScriptedSpeechDetector([false, false, false, true])
         let gate = AudioChunkSpeechGate(
             detector: detector,
-            leadInChunkCount: 2,
-            trailingSilenceChunkCount: 1
+            leadInChunkCount: 2
         )
 
         #expect(gate.accept(chunk1).isEmpty)
@@ -117,20 +116,38 @@ struct LiveTranscriptionPolicyTests {
         #expect(detector.checkedChunks == [chunk1, chunk2, chunk3, speech])
     }
 
-    @Test func speechGateKeepsShortTailAfterSpeech() {
+    @Test func speechGatePassesThroughAfterSpeechStarts() {
         let speech = data("speech")
         let tail = data("tail")
         let silence = data("silence")
         let detector = ScriptedSpeechDetector([true, false, false])
         let gate = AudioChunkSpeechGate(
             detector: detector,
-            leadInChunkCount: 1,
-            trailingSilenceChunkCount: 1
+            leadInChunkCount: 1
         )
 
         #expect(gate.accept(speech) == [speech])
         #expect(gate.accept(tail) == [tail])
-        #expect(gate.accept(silence).isEmpty)
+        #expect(gate.accept(silence) == [silence])
+    }
+
+    @Test func speechGateDoesNotDropFalseNegativeChunksInsideAnUtterance() {
+        let chunks = [
+            data("speech-start"),
+            data("missed-word-1"),
+            data("missed-word-2"),
+            data("missed-word-3"),
+            data("speech-end")
+        ]
+        let detector = ScriptedSpeechDetector([true, false, false, false, true])
+        let gate = AudioChunkSpeechGate(
+            detector: detector,
+            leadInChunkCount: 1
+        )
+
+        let accepted = chunks.flatMap { gate.accept($0) }
+
+        #expect(accepted == chunks)
     }
 
     private func temporaryDefaults() -> UserDefaults {

@@ -232,6 +232,11 @@ struct SettingsView: View {
                 }
             }
 
+            // MARK: - Real-time Transcription
+            Section("Real-time Transcription") {
+                LiveTranscriptionSettingsControls()
+            }
+
             // MARK: - Power Mode
             PowerModeSection()
 

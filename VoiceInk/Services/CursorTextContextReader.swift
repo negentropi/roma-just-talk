@@ -3,6 +3,11 @@ import Foundation
 
 enum CursorTextContextReader {
     private static let defaultMaximumLength = 240
+    private static let textInputRoles = Set([
+        kAXComboBoxRole as String,
+        kAXTextAreaRole as String,
+        kAXTextFieldRole as String
+    ])
 
     @MainActor
     static func textBeforeCursor(maximumLength: Int = defaultMaximumLength) -> String? {
@@ -13,21 +18,74 @@ enum CursorTextContextReader {
 
         let systemWideElement = AXUIElementCreateSystemWide()
         guard let focusedElement = focusedElement(from: systemWideElement),
-              let selectedRange = selectedTextRange(from: focusedElement),
-              selectedRange.location != kCFNotFound else {
+              let prefix = textBeforeCursor(in: focusedElement, maximumLength: maximumLength) else {
             return nil
         }
 
-        guard selectedRange.location > 0 else { return "" }
+        return prefix
+    }
 
-        let prefixLength = min(maximumLength, selectedRange.location)
-        let prefixRange = CFRange(
-            location: selectedRange.location - prefixLength,
-            length: prefixLength
-        )
+    private static func textBeforeCursor(in focusedElement: AXUIElement, maximumLength: Int) -> String? {
+        let elements = contextCandidateElements(startingAt: focusedElement)
 
-        return stringForRange(prefixRange, in: focusedElement)
-            ?? valuePrefix(prefixRange, in: focusedElement)
+        for element in elements {
+            guard let selectedRange = selectedTextRange(from: element),
+                  selectedRange.location != kCFNotFound else {
+                continue
+            }
+
+            guard selectedRange.location > 0 else { return "" }
+
+            let prefixLength = min(maximumLength, selectedRange.location)
+            let prefixRange = CFRange(
+                location: selectedRange.location - prefixLength,
+                length: prefixLength
+            )
+
+            if let prefix = stringForRange(prefixRange, in: element)
+                ?? valuePrefix(prefixRange, in: element) {
+                return prefix
+            }
+        }
+
+        for element in elements {
+            if let suffix = valueSuffix(in: element, maximumLength: maximumLength) {
+                return suffix
+            }
+        }
+
+        return nil
+    }
+
+    private static func contextCandidateElements(startingAt element: AXUIElement) -> [AXUIElement] {
+        var elements = [element]
+        var currentElement = element
+
+        for _ in 0..<4 {
+            guard let parent = parentElement(from: currentElement) else {
+                break
+            }
+
+            elements.append(parent)
+            currentElement = parent
+        }
+
+        return elements
+    }
+
+    private static func parentElement(from element: AXUIElement) -> AXUIElement? {
+        var value: CFTypeRef?
+        guard AXUIElementCopyAttributeValue(
+            element,
+            kAXParentAttribute as CFString,
+            &value
+        ) == .success,
+              let value,
+              CFGetTypeID(value) == AXUIElementGetTypeID() else {
+            return nil
+        }
+
+        return (value as! AXUIElement)
     }
 
     private static func focusedElement(from systemWideElement: AXUIElement) -> AXUIElement? {
@@ -105,5 +163,41 @@ enum CursorTextContextReader {
         }
 
         return String(text[stringRange])
+    }
+
+    private static func valueSuffix(in element: AXUIElement, maximumLength: Int) -> String? {
+        guard isTextInput(element) else {
+            return nil
+        }
+
+        var value: CFTypeRef?
+        guard AXUIElementCopyAttributeValue(
+            element,
+            kAXValueAttribute as CFString,
+            &value
+        ) == .success,
+              let text = value as? String else {
+            return nil
+        }
+
+        guard text.count > maximumLength else {
+            return text
+        }
+
+        return String(text.suffix(maximumLength))
+    }
+
+    private static func isTextInput(_ element: AXUIElement) -> Bool {
+        var value: CFTypeRef?
+        guard AXUIElementCopyAttributeValue(
+            element,
+            kAXRoleAttribute as CFString,
+            &value
+        ) == .success,
+              let role = value as? String else {
+            return false
+        }
+
+        return textInputRoles.contains(role)
     }
 }

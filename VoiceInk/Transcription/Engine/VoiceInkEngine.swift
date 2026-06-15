@@ -189,6 +189,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                                     self.recorder.onAudioChunk = preloaded.audioChunkHandler
                                     pendingChunks.withLock { $0.removeAll() }
                                 } else {
+                                    self.rollingBufferPreloadCoordinator.cancelUnclaimedPreload(reason: "recording-start-fallback")
                                     let session = self.serviceRegistry.createSession(
                                         for: model,
                                         onPartialTranscript: { [weak self] partial in

@@ -58,6 +58,14 @@ private struct RollingChunkBuffer {
         chunks
     }
 
+    var count: Int {
+        chunks.count
+    }
+
+    var bytes: Int {
+        byteCount
+    }
+
     private mutating func trimIfNeeded() {
         while byteCount > maxBytes, !chunks.isEmpty {
             byteCount -= chunks.removeFirst().count
@@ -87,6 +95,7 @@ final class RollingBufferPreloadCoordinator {
     private var observeTask: Task<Void, Never>?
     private var detector: SileroSpeechActivityDetector?
     private var detectorLoadTask: Task<SileroSpeechActivityDetector?, Never>?
+    private var detectorLoadAttempted = false
     private var state: State = .idle
     private var recordingInProgress = false
     private var leadInBuffer: RollingChunkBuffer
@@ -94,6 +103,13 @@ final class RollingBufferPreloadCoordinator {
     private var currentSession: TranscriptionSession?
     private var currentCallback: ((Data) -> Void)?
     private var currentModelName: String?
+    private var speechDetectedAt: Date?
+    private var preloadStartedAt: Date?
+    private var observedChunks = 0
+    private var observedBytes = 0
+    private var preloadedChunks = 0
+    private var preloadedBytes = 0
+    private var vadWindowsChecked = 0
 
     private let vadWindowBytes = 8_000 // 250 ms at 16 kHz, 16-bit mono.
 
@@ -149,8 +165,16 @@ final class RollingBufferPreloadCoordinator {
         currentModelName = nil
         vadWindow.removeAll(keepingCapacity: true)
         leadInBuffer.removeAll()
-        logger.notice("Claimed rolling preload session for \(model.displayName, privacy: .public)")
+        let triggerElapsed = speechDetectedAt.map { Date().timeIntervalSince($0) } ?? -1
+        let startupElapsed = preloadStartedAt.map { Date().timeIntervalSince($0) } ?? -1
+        logger.notice("Claimed rolling preload session model=\(model.displayName, privacy: .public) triggerElapsed=\(triggerElapsed, format: .fixed(precision: 3), privacy: .public)s startupElapsed=\(startupElapsed, format: .fixed(precision: 3), privacy: .public)s preloadedChunks=\(self.preloadedChunks, privacy: .public) preloadedBytes=\(self.preloadedBytes, privacy: .public)")
         return RollingBufferPreloadedSession(session: session, audioChunkHandler: callback)
+    }
+
+    func cancelUnclaimedPreload(reason: String) {
+        guard currentSession != nil || state == .starting || state == .active else { return }
+        logger.notice("Canceling unclaimed rolling preload reason=\(reason, privacy: .public) state=\(String(describing: self.state), privacy: .public) preloadedChunks=\(self.preloadedChunks, privacy: .public) preloadedBytes=\(self.preloadedBytes, privacy: .public)")
+        resetPreloadState(cancelSession: true, keepLeadIn: false)
     }
 
     func recordingSessionDidFinish() {
@@ -163,11 +187,14 @@ final class RollingBufferPreloadCoordinator {
         detectorLoadTask?.cancel()
         detectorLoadTask = nil
         detector = nil
+        detectorLoadAttempted = false
         resetPreloadState(cancelSession: true, keepLeadIn: false)
     }
 
     private func processRollingChunk(_ chunk: Data) async {
         guard !chunk.isEmpty else { return }
+        observedChunks += 1
+        observedBytes += chunk.count
 
         let configuration = RollingBufferPreloadSettings.configuration()
         leadInBuffer.updateMaxBytes(Self.bytes(forDuration: configuration.bufferDurationSeconds))
@@ -176,7 +203,8 @@ final class RollingBufferPreloadCoordinator {
             return
         }
 
-        if currentModelName != transcriptionModelManager?.currentTranscriptionModel?.name {
+        if let currentModelName,
+           currentModelName != transcriptionModelManager?.currentTranscriptionModel?.name {
             resetPreloadState(cancelSession: true, keepLeadIn: false)
         }
 
@@ -184,6 +212,8 @@ final class RollingBufferPreloadCoordinator {
 
         if state == .active {
             currentCallback?(chunk)
+            preloadedChunks += 1
+            preloadedBytes += chunk.count
             return
         }
 
@@ -196,12 +226,15 @@ final class RollingBufferPreloadCoordinator {
         guard vadWindow.count >= vadWindowBytes else { return }
         let window = vadWindow
         vadWindow.removeAll(keepingCapacity: true)
+        vadWindowsChecked += 1
 
         guard let detector = await detectorForCurrentSettings(),
               detector.containsSpeech(inPCM16LEData: window) else {
             return
         }
 
+        speechDetectedAt = Date()
+        logger.notice("Rolling preload VAD trigger model=\(plan.model.displayName, privacy: .public) leadInChunks=\(self.leadInBuffer.count, privacy: .public) leadInBytes=\(self.leadInBuffer.bytes, privacy: .public) observedChunks=\(self.observedChunks, privacy: .public) observedBytes=\(self.observedBytes, privacy: .public) vadWindows=\(self.vadWindowsChecked, privacy: .public)")
         await startPreload(with: plan, leadInChunks: leadInBuffer.snapshot())
     }
 
@@ -225,9 +258,13 @@ final class RollingBufferPreloadCoordinator {
         if let detector {
             return detector
         }
+        if detectorLoadAttempted {
+            return nil
+        }
 
         if let detectorLoadTask {
             let loaded = await detectorLoadTask.value
+            detectorLoadAttempted = true
             detector = loaded
             return loaded
         }
@@ -238,6 +275,7 @@ final class RollingBufferPreloadCoordinator {
         detectorLoadTask = task
         let loaded = await task.value
         detectorLoadTask = nil
+        detectorLoadAttempted = true
         detector = loaded
         return loaded
     }
@@ -246,6 +284,7 @@ final class RollingBufferPreloadCoordinator {
         guard state == .idle else { return }
         state = .starting
         currentModelName = plan.model.name
+        preloadStartedAt = Date()
 
         let session = serviceRegistry.createSession(
             for: plan.model,
@@ -272,9 +311,12 @@ final class RollingBufferPreloadCoordinator {
             currentCallback = callback
             for chunk in leadInChunks {
                 callback(chunk)
+                preloadedChunks += 1
+                preloadedBytes += chunk.count
             }
             state = .active
-            logger.notice("Started rolling preload for \(plan.model.displayName, privacy: .public) leadInChunks=\(leadInChunks.count, privacy: .public)")
+            let startupElapsed = preloadStartedAt.map { Date().timeIntervalSince($0) } ?? -1
+            logger.notice("Started rolling preload model=\(plan.model.displayName, privacy: .public) startupElapsed=\(startupElapsed, format: .fixed(precision: 3), privacy: .public)s leadInChunks=\(leadInChunks.count, privacy: .public) leadInBytes=\(leadInChunks.reduce(0) { $0 + $1.count }, privacy: .public)")
         } catch {
             logger.error("Rolling preload failed to start: \(error.localizedDescription, privacy: .public)")
             session.cancel()
@@ -289,6 +331,13 @@ final class RollingBufferPreloadCoordinator {
         currentSession = nil
         currentCallback = nil
         currentModelName = nil
+        speechDetectedAt = nil
+        preloadStartedAt = nil
+        observedChunks = 0
+        observedBytes = 0
+        preloadedChunks = 0
+        preloadedBytes = 0
+        vadWindowsChecked = 0
         vadWindow.removeAll(keepingCapacity: true)
         if !keepLeadIn {
             leadInBuffer.removeAll()

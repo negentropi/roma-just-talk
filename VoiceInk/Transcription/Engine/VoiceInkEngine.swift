@@ -5,6 +5,16 @@ import SwiftData
 import AppKit
 import os
 
+struct RollingBufferPreloadClaim {
+    let preloaded: RollingBufferPreloadedSession
+    let modelName: String
+    let language: String?
+
+    func matches(model: any TranscriptionModel, language: String?) -> Bool {
+        modelName == model.name && self.language == language
+    }
+}
+
 @MainActor
 class VoiceInkEngine: NSObject, ObservableObject {
     @Published var recordingState: RecordingState = .idle
@@ -155,13 +165,14 @@ class VoiceInkEngine: NSObject, ObservableObject {
                             self.recordingState = .recording
                             self.logger.notice("toggleRecord: recording started successfully, state=recording")
 
-                            var claimedPreload: RollingBufferPreloadedSession?
-                            var claimedPreloadModelName: String?
-                            let claimedPreloadLanguage = UserDefaults.standard.string(forKey: "SelectedLanguage")
+                            var claimedPreload: RollingBufferPreloadClaim?
                             if let model = self.transcriptionModelManager.currentTranscriptionModel,
                                let preloaded = await self.rollingBufferPreloadCoordinator.claimPreloadedSession(for: model) {
-                                claimedPreload = preloaded
-                                claimedPreloadModelName = model.name
+                                claimedPreload = RollingBufferPreloadClaim(
+                                    preloaded: preloaded,
+                                    modelName: model.name,
+                                    language: UserDefaults.standard.string(forKey: "SelectedLanguage")
+                                )
                                 self.currentSession = preloaded.session
                                 self.recorder.onAudioChunk = { data in
                                     preloaded.audioChunkHandler(data)
@@ -173,15 +184,14 @@ class VoiceInkEngine: NSObject, ObservableObject {
 
                             if self.recordingState == .recording,
                                let model = self.transcriptionModelManager.currentTranscriptionModel {
-                                if let preloaded = claimedPreload,
-                                   claimedPreloadModelName == model.name,
-                                   claimedPreloadLanguage == UserDefaults.standard.string(forKey: "SelectedLanguage") {
-                                    self.currentSession = preloaded.session
-                                    self.recorder.onAudioChunk = preloaded.audioChunkHandler
+                                if let claim = claimedPreload,
+                                   claim.matches(model: model, language: UserDefaults.standard.string(forKey: "SelectedLanguage")) {
+                                    self.currentSession = claim.preloaded.session
+                                    self.recorder.onAudioChunk = claim.preloaded.audioChunkHandler
                                     pendingChunks.withLock { $0.removeAll() }
                                 } else {
-                                    if let preloaded = claimedPreload {
-                                        preloaded.session.cancel()
+                                    if let claim = claimedPreload {
+                                        claim.preloaded.session.cancel()
                                         self.currentSession = nil
                                         self.recorder.onAudioChunk = { data in
                                             pendingChunks.withLock { $0.append(data) }

@@ -19,7 +19,7 @@ struct SpeechmaticsProvider: CloudProvider {
         CloudModel(
             name: "speechmatics-enhanced",
             displayName: "Speechmatics",
-            description: "Speechmatics enhanced accuracy transcription with real-time streaming and 50+ language support",
+            description: "Speechmatics enhanced accuracy transcription with streaming and 50+ language support",
             provider: .speechmatics,
             speed: 0.99,
             accuracy: 0.98,

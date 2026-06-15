@@ -62,7 +62,7 @@ struct FluidAudioModelCardView: View {
                 .foregroundColor(Color(.labelColor))
 
             if model.supportsStreaming && isDownloaded {
-                Toggle("Real-time", isOn: $streamingEnabled)
+                Toggle("Streaming", isOn: $streamingEnabled)
                     .toggleStyle(.switch)
                     .controlSize(.mini)
                     .font(.system(size: 11, weight: .medium))
@@ -70,7 +70,7 @@ struct FluidAudioModelCardView: View {
                     .onChange(of: streamingEnabled) { _, newValue in
                         UserDefaults.standard.set(newValue, forKey: streamingDefaultsKey)
                     }
-                    .help(streamingEnabled ? "Live streaming enabled — click to switch to batch" : "Batch mode — click to enable live streaming")
+                    .help(streamingEnabled ? "Streaming enabled; click to switch to batch" : "Batch mode; click to stream during recording")
 
                 Toggle("Buffer Preload", isOn: $preloadEnabled)
                     .toggleStyle(.switch)

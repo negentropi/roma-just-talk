@@ -90,7 +90,7 @@ struct CloudModelCardView: View {
 
     private var streamingModeBadge: some View {
         HStack(spacing: 8) {
-            Toggle("Real-time", isOn: isStreamingOnly ? .constant(true) : $streamingEnabled)
+            Toggle("Streaming", isOn: isStreamingOnly ? .constant(true) : $streamingEnabled)
                 .toggleStyle(.switch)
                 .controlSize(.mini)
                 .font(.system(size: 11, weight: .medium))
@@ -103,7 +103,7 @@ struct CloudModelCardView: View {
                         NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
                     }
                 }
-                .help(isStreamingOnly ? "This model only supports real-time streaming" : (streamingEnabled ? "Live streaming enabled — click to switch to batch" : "Batch mode — click to enable live streaming"))
+                .help(isStreamingOnly ? "This model only supports streaming transcription" : (streamingEnabled ? "Streaming enabled; click to switch to batch" : "Batch mode; click to stream during recording"))
 
             Toggle("Buffer Preload", isOn: $preloadEnabled)
                 .toggleStyle(.switch)

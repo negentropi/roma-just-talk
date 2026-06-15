@@ -16,7 +16,7 @@ struct XAIProvider: CloudProvider {
         CloudModel(
             name: "grok-stt",
             displayName: "Grok (xAI)",
-            description: "xAI's Grok speech-to-text with real-time streaming and batch transcription",
+            description: "xAI's Grok speech-to-text with streaming and batch transcription",
             provider: .xai,
             speed: 0.99,
             accuracy: 0.98,

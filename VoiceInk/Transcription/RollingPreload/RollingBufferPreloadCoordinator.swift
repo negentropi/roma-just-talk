@@ -75,6 +75,10 @@ private struct RollingChunkBuffer {
 
 @MainActor
 final class RollingBufferPreloadCoordinator {
+    typealias CurrentModelProvider = @MainActor () -> (any TranscriptionModel)?
+    typealias DetectorProvider = @Sendable () async -> (any SpeechActivityDetecting)?
+    typealias SessionFactory = @MainActor (any TranscriptionModel, @escaping (String) -> Void) -> TranscriptionSession
+
     private enum State {
         case idle
         case starting
@@ -86,15 +90,16 @@ final class RollingBufferPreloadCoordinator {
         let model: any TranscriptionModel
     }
 
-    private let serviceRegistry: TranscriptionServiceRegistry
-    private weak var transcriptionModelManager: TranscriptionModelManager?
+    private let currentModelProvider: CurrentModelProvider
+    private let detectorProvider: DetectorProvider
+    private let sessionFactory: SessionFactory
     private let powerStateProvider: any RollingBufferPowerStateProviding
     private let source = RollingBufferChunkSource()
     private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "RollingBufferPreload")
 
     private var observeTask: Task<Void, Never>?
-    private var detector: SileroSpeechActivityDetector?
-    private var detectorLoadTask: Task<SileroSpeechActivityDetector?, Never>?
+    private var detector: (any SpeechActivityDetecting)?
+    private var detectorLoadTask: Task<(any SpeechActivityDetecting)?, Never>?
     private var detectorLoadAttempted = false
     private var state: State = .idle
     private var recordingInProgress = false
@@ -116,10 +121,37 @@ final class RollingBufferPreloadCoordinator {
     init(
         serviceRegistry: TranscriptionServiceRegistry,
         transcriptionModelManager: TranscriptionModelManager,
-        powerStateProvider: any RollingBufferPowerStateProviding = IOKitRollingBufferPowerStateProvider()
+        powerStateProvider: any RollingBufferPowerStateProviding = IOKitRollingBufferPowerStateProvider(),
+        detectorProvider: @escaping DetectorProvider = {
+            await SileroSpeechActivityDetector.makeDefault()
+        }
     ) {
-        self.serviceRegistry = serviceRegistry
-        self.transcriptionModelManager = transcriptionModelManager
+        self.currentModelProvider = { [weak transcriptionModelManager] in
+            transcriptionModelManager?.currentTranscriptionModel
+        }
+        self.detectorProvider = detectorProvider
+        self.sessionFactory = { model, partialTranscriptHandler in
+            serviceRegistry.createSession(
+                for: model,
+                onPartialTranscript: partialTranscriptHandler,
+                forceStreaming: true
+            )
+        }
+        self.powerStateProvider = powerStateProvider
+        self.leadInBuffer = RollingChunkBuffer(
+            maxBytes: Self.bytes(forDuration: RollingBufferPreloadSettings.defaultBufferDurationSeconds)
+        )
+    }
+
+    init(
+        currentModelProvider: @escaping CurrentModelProvider,
+        powerStateProvider: any RollingBufferPowerStateProviding,
+        detectorProvider: @escaping DetectorProvider,
+        sessionFactory: @escaping SessionFactory
+    ) {
+        self.currentModelProvider = currentModelProvider
+        self.detectorProvider = detectorProvider
+        self.sessionFactory = sessionFactory
         self.powerStateProvider = powerStateProvider
         self.leadInBuffer = RollingChunkBuffer(
             maxBytes: Self.bytes(forDuration: RollingBufferPreloadSettings.defaultBufferDurationSeconds)
@@ -141,6 +173,10 @@ final class RollingBufferPreloadCoordinator {
                 await self?.processRollingChunk(chunk)
             }
         }
+    }
+
+    func processRollingChunkForTesting(_ chunk: Data) async {
+        await processRollingChunk(chunk)
     }
 
     func prepareForRecordingStart() {
@@ -204,7 +240,7 @@ final class RollingBufferPreloadCoordinator {
         }
 
         if let currentModelName,
-           currentModelName != transcriptionModelManager?.currentTranscriptionModel?.name {
+           currentModelName != currentModelProvider()?.name {
             resetPreloadState(cancelSession: true, keepLeadIn: false)
         }
 
@@ -239,7 +275,7 @@ final class RollingBufferPreloadCoordinator {
     }
 
     private func currentPlan(configuration: RollingBufferPreloadConfiguration) -> Plan? {
-        guard let model = transcriptionModelManager?.currentTranscriptionModel else { return nil }
+        guard let model = currentModelProvider() else { return nil }
         let perModelEnabled = RollingBufferPreloadSettings.perModelPreloadEnabled(for: model)
         let powerState = powerStateProvider.currentPowerState()
         let allowed = RollingBufferPreloadPolicy(
@@ -254,7 +290,7 @@ final class RollingBufferPreloadCoordinator {
         return Plan(model: model)
     }
 
-    private func detectorForCurrentSettings() async -> SileroSpeechActivityDetector? {
+    private func detectorForCurrentSettings() async -> (any SpeechActivityDetecting)? {
         if let detector {
             return detector
         }
@@ -269,8 +305,9 @@ final class RollingBufferPreloadCoordinator {
             return loaded
         }
 
+        let detectorProvider = detectorProvider
         let task = Task {
-            await SileroSpeechActivityDetector.makeDefault()
+            await detectorProvider()
         }
         detectorLoadTask = task
         let loaded = await task.value
@@ -286,9 +323,9 @@ final class RollingBufferPreloadCoordinator {
         currentModelName = plan.model.name
         preloadStartedAt = Date()
 
-        let session = serviceRegistry.createSession(
-            for: plan.model,
-            onPartialTranscript: { partial in
+        let session = sessionFactory(
+            plan.model,
+            { partial in
                 Task { @MainActor in
                     NotificationCenter.default.post(
                         name: .rollingBufferPreloadPartialTranscript,
@@ -296,8 +333,7 @@ final class RollingBufferPreloadCoordinator {
                         userInfo: ["text": partial]
                     )
                 }
-            },
-            forceStreaming: true
+            }
         )
 
         do {

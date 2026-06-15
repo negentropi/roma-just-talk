@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.93 - Unreleased
+## v1.93 - 2026-06-15
 
 - Moved real-time transcription controls into the main Settings page while keeping them available from model settings.
 - Improved cursor-context capitalization in editors that expose focused text but not an exact Accessibility cursor range.

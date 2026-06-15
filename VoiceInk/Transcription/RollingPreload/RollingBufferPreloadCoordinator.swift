@@ -102,6 +102,9 @@ final class RollingBufferPreloadCoordinator {
     private var detectorLoadTask: Task<(any SpeechActivityDetecting)?, Never>?
     private var detectorLoadAttempted = false
     private var configuration = RollingBufferPreloadSettings.configuration()
+    private var cachedPlan: Plan?
+    private var cachedPlanModelName: String?
+    private var cachedPlanExpiresAt = Date.distantPast
     private var state: State = .idle
     private var recordingInProgress = false
     private var leadInBuffer: RollingChunkBuffer
@@ -118,6 +121,7 @@ final class RollingBufferPreloadCoordinator {
     private var vadWindowsChecked = 0
 
     private let vadWindowBytes = 8_000 // 250 ms at 16 kHz, 16-bit mono.
+    private let planRefreshInterval: TimeInterval = 30
 
     init(
         serviceRegistry: TranscriptionServiceRegistry,
@@ -222,6 +226,7 @@ final class RollingBufferPreloadCoordinator {
 
     func settingsDidChange() {
         configuration = RollingBufferPreloadSettings.configuration()
+        invalidateCachedPlan()
         detectorLoadTask?.cancel()
         detectorLoadTask = nil
         detector = nil
@@ -255,7 +260,7 @@ final class RollingBufferPreloadCoordinator {
         }
 
         guard state == .idle,
-              let plan = currentPlan(configuration: configuration) else {
+              let currentModel = currentModelProvider() else {
             return
         }
 
@@ -264,6 +269,10 @@ final class RollingBufferPreloadCoordinator {
         let window = vadWindow
         vadWindow.removeAll(keepingCapacity: true)
         vadWindowsChecked += 1
+
+        guard let plan = currentPlan(for: currentModel, configuration: configuration) else {
+            return
+        }
 
         guard let detector = await detectorForCurrentSettings(),
               detector.containsSpeech(inPCM16LEData: window) else {
@@ -275,20 +284,43 @@ final class RollingBufferPreloadCoordinator {
         await startPreload(with: plan, leadInChunks: leadInBuffer.snapshot())
     }
 
-    private func currentPlan(configuration: RollingBufferPreloadConfiguration) -> Plan? {
-        guard let model = currentModelProvider() else { return nil }
+    private func currentPlan(
+        for model: any TranscriptionModel,
+        configuration: RollingBufferPreloadConfiguration
+    ) -> Plan? {
+        let now = Date()
+        if cachedPlanModelName == model.name, now < cachedPlanExpiresAt {
+            return cachedPlan
+        }
+
+        if configuration.mode == .off || !model.supportsStreaming {
+            return cachePlan(nil, for: model.name, now: now)
+        }
+
         let perModelEnabled = RollingBufferPreloadSettings.perModelPreloadEnabled(for: model)
-        let powerState = powerStateProvider.currentPowerState()
+        guard perModelEnabled else {
+            return cachePlan(nil, for: model.name, now: now)
+        }
+
+        let powerState = configuration.mode == .auto
+            ? powerStateProvider.currentPowerState()
+            : RollingBufferPowerState(isOnBattery: false, batteryLevelPercent: nil)
         let allowed = RollingBufferPreloadPolicy(
             configuration: configuration,
             powerState: powerState
         ).allowsPreload(
             for: model,
-            perModelEnabled: perModelEnabled
+            perModelEnabled: true
         )
 
-        guard allowed else { return nil }
-        return Plan(model: model)
+        return cachePlan(allowed ? Plan(model: model) : nil, for: model.name, now: now)
+    }
+
+    private func cachePlan(_ plan: Plan?, for modelName: String, now: Date) -> Plan? {
+        cachedPlan = plan
+        cachedPlanModelName = modelName
+        cachedPlanExpiresAt = now.addingTimeInterval(planRefreshInterval)
+        return plan
     }
 
     private func detectorForCurrentSettings() async -> (any SpeechActivityDetecting)? {
@@ -382,6 +414,12 @@ final class RollingBufferPreloadCoordinator {
         if state != .claimed {
             state = .idle
         }
+    }
+
+    private func invalidateCachedPlan() {
+        cachedPlan = nil
+        cachedPlanModelName = nil
+        cachedPlanExpiresAt = .distantPast
     }
 
     private static func bytes(forDuration seconds: Double) -> Int {

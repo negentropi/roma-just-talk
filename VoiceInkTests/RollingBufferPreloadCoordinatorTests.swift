@@ -179,6 +179,25 @@ struct RollingBufferPreloadCoordinatorTests {
     }
 
     @MainActor
+    @Test func leadInBufferKeepsLatestBytesWhenSingleChunkExceedsDuration() async {
+        let model = streamingModel()
+        let session = FakeTranscriptionSession()
+
+        await withStandardRollingDefaults(for: model) { defaults in
+            setPreloadDefaults(defaults, model: model, preRunFinalization: true)
+            defaults.set(0.25, forKey: RollingBufferPreloadSettings.bufferDurationSecondsKey)
+        } run: {
+            let coordinator = makeCoordinator(model: model, session: session)
+            let chunk = Data(repeating: 1, count: 4_000) + Data(repeating: 2, count: 8_000)
+
+            await coordinator.processRollingChunkForTesting(chunk)
+
+            #expect(session.chunks.snapshot().map(\.count) == [8_000])
+            #expect(session.chunks.snapshot().first == Data(repeating: 2, count: 8_000))
+        }
+    }
+
+    @MainActor
     @Test func preloadFeedsChunksThatArriveDuringSessionPrepareAfterRecordingStart() async {
         let model = streamingModel()
         let session = DelayedFakeTranscriptionSession()

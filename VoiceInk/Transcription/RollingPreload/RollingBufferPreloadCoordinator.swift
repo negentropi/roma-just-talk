@@ -68,7 +68,13 @@ private struct RollingChunkBuffer {
 
     private mutating func trimIfNeeded() {
         while byteCount > maxBytes, !chunks.isEmpty {
-            byteCount -= chunks.removeFirst().count
+            let overflow = byteCount - maxBytes
+            if overflow >= chunks[0].count {
+                byteCount -= chunks.removeFirst().count
+            } else {
+                chunks[0].removeFirst(overflow)
+                byteCount -= overflow
+            }
         }
     }
 }

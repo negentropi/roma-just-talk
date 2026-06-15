@@ -155,15 +155,38 @@ class VoiceInkEngine: NSObject, ObservableObject {
                             self.recordingState = .recording
                             self.logger.notice("toggleRecord: recording started successfully, state=recording")
 
+                            var claimedPreload: RollingBufferPreloadedSession?
+                            var claimedPreloadModelName: String?
+                            let claimedPreloadLanguage = UserDefaults.standard.string(forKey: "SelectedLanguage")
+                            if let model = self.transcriptionModelManager.currentTranscriptionModel,
+                               let preloaded = await self.rollingBufferPreloadCoordinator.claimPreloadedSession(for: model) {
+                                claimedPreload = preloaded
+                                claimedPreloadModelName = model.name
+                                self.currentSession = preloaded.session
+                                self.recorder.onAudioChunk = { data in
+                                    preloaded.audioChunkHandler(data)
+                                    pendingChunks.withLock { $0.append(data) }
+                                }
+                            }
+
                             await ActiveWindowService.shared.applyConfiguration(powerModeId: powerModeId)
 
                             if self.recordingState == .recording,
                                let model = self.transcriptionModelManager.currentTranscriptionModel {
-                                if let preloaded = await self.rollingBufferPreloadCoordinator.claimPreloadedSession(for: model) {
+                                if let preloaded = claimedPreload,
+                                   claimedPreloadModelName == model.name,
+                                   claimedPreloadLanguage == UserDefaults.standard.string(forKey: "SelectedLanguage") {
                                     self.currentSession = preloaded.session
                                     self.recorder.onAudioChunk = preloaded.audioChunkHandler
                                     pendingChunks.withLock { $0.removeAll() }
                                 } else {
+                                    if let preloaded = claimedPreload {
+                                        preloaded.session.cancel()
+                                        self.currentSession = nil
+                                        self.recorder.onAudioChunk = { data in
+                                            pendingChunks.withLock { $0.append(data) }
+                                        }
+                                    }
                                     self.rollingBufferPreloadCoordinator.cancelUnclaimedPreload(reason: "recording-start-fallback")
                                     let session = self.serviceRegistry.createSession(
                                         for: model,

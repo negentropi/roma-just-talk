@@ -159,7 +159,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
 
                             if self.recordingState == .recording,
                                let model = self.transcriptionModelManager.currentTranscriptionModel {
-                                if let preloaded = self.rollingBufferPreloadCoordinator.claimPreloadedSession(for: model) {
+                                if let preloaded = await self.rollingBufferPreloadCoordinator.claimPreloadedSession(for: model) {
                                     self.currentSession = preloaded.session
                                     self.recorder.onAudioChunk = preloaded.audioChunkHandler
                                     pendingChunks.withLock { $0.removeAll() }

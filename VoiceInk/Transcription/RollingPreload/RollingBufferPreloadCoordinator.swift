@@ -186,15 +186,22 @@ final class RollingBufferPreloadCoordinator {
 
     func prepareForRecordingStart() {
         recordingInProgress = true
-        if state != .active {
+        if state != .active && state != .starting {
             resetPreloadState(cancelSession: true, keepLeadIn: true)
         }
     }
 
-    func claimPreloadedSession(for model: any TranscriptionModel) -> RollingBufferPreloadedSession? {
+    func claimPreloadedSession(for model: any TranscriptionModel) async -> RollingBufferPreloadedSession? {
+        guard currentModelName == model.name,
+              configuration.preRunFinalization else {
+            return nil
+        }
+
+        if state == .starting {
+            await waitForStartingPreload()
+        }
+
         guard state == .active,
-              currentModelName == model.name,
-              configuration.preRunFinalization,
               let session = currentSession,
               let callback = currentCallback else {
             return nil
@@ -241,16 +248,18 @@ final class RollingBufferPreloadCoordinator {
 
         leadInBuffer.updateMaxBytes(Self.bytes(forDuration: configuration.bufferDurationSeconds))
 
-        if recordingInProgress, state != .active {
-            return
-        }
-
         if let currentModelName,
            currentModelName != currentModelProvider()?.name {
             resetPreloadState(cancelSession: true, keepLeadIn: false)
         }
 
-        leadInBuffer.append(chunk)
+        if !recordingInProgress || state == .starting || state == .active {
+            leadInBuffer.append(chunk)
+        }
+
+        if recordingInProgress, state != .active {
+            return
+        }
 
         if state == .active {
             currentCallback?(chunk)
@@ -281,7 +290,7 @@ final class RollingBufferPreloadCoordinator {
 
         speechDetectedAt = Date()
         logger.notice("Rolling preload VAD trigger model=\(plan.model.displayName, privacy: .public) leadInChunks=\(self.leadInBuffer.count, privacy: .public) leadInBytes=\(self.leadInBuffer.bytes, privacy: .public) observedChunks=\(self.observedChunks, privacy: .public) observedBytes=\(self.observedBytes, privacy: .public) vadWindows=\(self.vadWindowsChecked, privacy: .public)")
-        await startPreload(with: plan, leadInChunks: leadInBuffer.snapshot())
+        await startPreload(with: plan)
     }
 
     private func currentPlan(
@@ -350,7 +359,7 @@ final class RollingBufferPreloadCoordinator {
         return loaded
     }
 
-    private func startPreload(with plan: Plan, leadInChunks: [Data]) async {
+    private func startPreload(with plan: Plan) async {
         guard state == .idle else { return }
         state = .starting
         currentModelName = plan.model.name
@@ -378,18 +387,28 @@ final class RollingBufferPreloadCoordinator {
 
             currentSession = session
             currentCallback = callback
-            for chunk in leadInChunks {
+            let bufferedChunks = leadInBuffer.snapshot()
+            for chunk in bufferedChunks {
                 callback(chunk)
                 preloadedChunks += 1
                 preloadedBytes += chunk.count
             }
             state = .active
             let startupElapsed = preloadStartedAt.map { Date().timeIntervalSince($0) } ?? -1
-            logger.notice("Started rolling preload model=\(plan.model.displayName, privacy: .public) startupElapsed=\(startupElapsed, format: .fixed(precision: 3), privacy: .public)s leadInChunks=\(leadInChunks.count, privacy: .public) leadInBytes=\(leadInChunks.reduce(0) { $0 + $1.count }, privacy: .public)")
+            logger.notice("Started rolling preload model=\(plan.model.displayName, privacy: .public) startupElapsed=\(startupElapsed, format: .fixed(precision: 3), privacy: .public)s leadInChunks=\(bufferedChunks.count, privacy: .public) leadInBytes=\(bufferedChunks.reduce(0) { $0 + $1.count }, privacy: .public)")
         } catch {
             logger.error("Rolling preload failed to start: \(error.localizedDescription, privacy: .public)")
             session.cancel()
             resetPreloadState(cancelSession: false, keepLeadIn: true)
+        }
+    }
+
+    private func waitForStartingPreload(maxWaitNanoseconds: UInt64 = 750_000_000) async {
+        var remaining = maxWaitNanoseconds
+        while state == .starting, remaining > 0 {
+            let sleepNanoseconds = min(50_000_000, remaining)
+            try? await Task.sleep(nanoseconds: sleepNanoseconds)
+            remaining -= sleepNanoseconds
         }
     }
 

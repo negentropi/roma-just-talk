@@ -91,6 +91,48 @@ private final class FakeTranscriptionSession: TranscriptionSession {
     }
 }
 
+@MainActor
+private final class DelayedFakeTranscriptionSession: TranscriptionSession {
+    let chunks = LockedDataChunks()
+    private var prepareStartedContinuation: CheckedContinuation<Void, Never>?
+    private var prepareContinuation: CheckedContinuation<Void, Never>?
+    private var didStartPrepare = false
+    private(set) var preparedModelName: String?
+
+    func prepare(model: any TranscriptionModel) async throws -> ((Data) -> Void)? {
+        preparedModelName = model.name
+        didStartPrepare = true
+        prepareStartedContinuation?.resume()
+        prepareStartedContinuation = nil
+
+        await withCheckedContinuation { continuation in
+            prepareContinuation = continuation
+        }
+
+        return { [chunks] data in
+            chunks.append(data)
+        }
+    }
+
+    func waitForPrepareToStart() async {
+        guard !didStartPrepare else { return }
+        await withCheckedContinuation { continuation in
+            prepareStartedContinuation = continuation
+        }
+    }
+
+    func finishPrepare() {
+        prepareContinuation?.resume()
+        prepareContinuation = nil
+    }
+
+    func transcribe(audioURL: URL) async throws -> String {
+        "fake transcript"
+    }
+
+    func cancel() {}
+}
+
 struct RollingBufferPreloadCoordinatorTests {
     @MainActor
     @Test func vadTriggerStartsPreloadAndClaimTransfersLeadIn() async {
@@ -105,12 +147,42 @@ struct RollingBufferPreloadCoordinatorTests {
 
             await coordinator.processRollingChunkForTesting(speechWindow)
 
-            let claimed = coordinator.claimPreloadedSession(for: model)
+            let claimed = await coordinator.claimPreloadedSession(for: model)
             #expect(claimed != nil)
             #expect(session.preparedModelName == model.name)
             #expect(session.chunks.snapshot().map(\.count) == [8_000])
 
             claimed?.audioChunkHandler(Data(repeating: 2, count: 1_024))
+            #expect(session.chunks.snapshot().map(\.count) == [8_000, 1_024])
+        }
+    }
+
+    @MainActor
+    @Test func preloadFeedsChunksThatArriveDuringSessionPrepareAfterRecordingStart() async {
+        let model = streamingModel()
+        let session = DelayedFakeTranscriptionSession()
+
+        await withStandardRollingDefaults(for: model) { defaults in
+            setPreloadDefaults(defaults, model: model, preRunFinalization: true)
+        } run: {
+            let coordinator = makeCoordinator(model: model, session: session)
+            let triggerChunk = Data(repeating: 1, count: 8_000)
+            let prepareWindowChunk = Data(repeating: 2, count: 1_024)
+
+            let triggerTask = Task {
+                await coordinator.processRollingChunkForTesting(triggerChunk)
+            }
+
+            await session.waitForPrepareToStart()
+            coordinator.prepareForRecordingStart()
+            await coordinator.processRollingChunkForTesting(prepareWindowChunk)
+            session.finishPrepare()
+            await triggerTask.value
+
+            let claimed = await coordinator.claimPreloadedSession(for: model)
+
+            #expect(claimed != nil)
+            #expect(session.preparedModelName == model.name)
             #expect(session.chunks.snapshot().map(\.count) == [8_000, 1_024])
         }
     }
@@ -131,7 +203,8 @@ struct RollingBufferPreloadCoordinatorTests {
             coordinator.cancelUnclaimedPreload(reason: "test-fallback")
 
             #expect(session.cancelCount == 1)
-            #expect(coordinator.claimPreloadedSession(for: model) == nil)
+            let claimed = await coordinator.claimPreloadedSession(for: model)
+            #expect(claimed == nil)
         }
     }
 
@@ -148,7 +221,8 @@ struct RollingBufferPreloadCoordinatorTests {
             await coordinator.processRollingChunkForTesting(Data(repeating: 1, count: 8_000))
 
             #expect(session.chunks.snapshot().count == 1)
-            #expect(coordinator.claimPreloadedSession(for: model) == nil)
+            let claimed = await coordinator.claimPreloadedSession(for: model)
+            #expect(claimed == nil)
 
             coordinator.cancelUnclaimedPreload(reason: "test-finalization-off")
             #expect(session.cancelCount == 1)
@@ -171,7 +245,8 @@ struct RollingBufferPreloadCoordinatorTests {
             await coordinator.processRollingChunkForTesting(Data(repeating: 1, count: 8_000))
 
             #expect(session.chunks.snapshot().count == 1)
-            #expect(coordinator.claimPreloadedSession(for: model) == nil)
+            let claimed = await coordinator.claimPreloadedSession(for: model)
+            #expect(claimed == nil)
 
             coordinator.cancelUnclaimedPreload(reason: "test-settings-refresh")
             #expect(session.cancelCount == 1)
@@ -280,6 +355,23 @@ struct RollingBufferPreloadCoordinatorTests {
             displayName: "Test Preload",
             provider: .fluidAudio,
             supportsStreaming: true
+        )
+    }
+
+    @MainActor
+    private func makeCoordinator(
+        model: TestPreloadModel,
+        session: DelayedFakeTranscriptionSession,
+        powerStateProvider: any RollingBufferPowerStateProviding = FixedPowerStateProvider(
+            state: RollingBufferPowerState(isOnBattery: false, batteryLevelPercent: nil)
+        ),
+        detector: any SpeechActivityDetecting = FakeSpeechDetector(containsSpeech: true)
+    ) -> RollingBufferPreloadCoordinator {
+        RollingBufferPreloadCoordinator(
+            currentModelProvider: { model },
+            powerStateProvider: powerStateProvider,
+            detectorProvider: { detector },
+            sessionFactory: { _, _ in session }
         )
     }
 

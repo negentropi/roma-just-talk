@@ -26,6 +26,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
 
     let modelContext: ModelContext
     internal let serviceRegistry: TranscriptionServiceRegistry
+    private let rollingBufferPreloadCoordinator: RollingBufferPreloadCoordinator
     let enhancementService: AIEnhancementService?
     private let pipeline: TranscriptionPipeline
 
@@ -46,10 +47,15 @@ class VoiceInkEngine: NSObject, ObservableObject {
             .appendingPathComponent("com.prakashjoshipax.VoiceInk")
         self.recordingsDirectory = appSupportDirectory.appendingPathComponent("Recordings")
 
-        self.serviceRegistry = TranscriptionServiceRegistry(
+        let serviceRegistry = TranscriptionServiceRegistry(
             modelProvider: whisperModelManager,
             modelsDirectory: whisperModelManager.modelsDirectory,
             modelContext: modelContext
+        )
+        self.serviceRegistry = serviceRegistry
+        self.rollingBufferPreloadCoordinator = RollingBufferPreloadCoordinator(
+            serviceRegistry: serviceRegistry,
+            transcriptionModelManager: transcriptionModelManager
         )
         self.pipeline = TranscriptionPipeline(
             modelContext: modelContext,
@@ -64,6 +70,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
         }
 
         setupNotifications()
+        recorder.onRollingAudioChunk = rollingBufferPreloadCoordinator.audioChunkHandler
+        rollingBufferPreloadCoordinator.start()
         createRecordingsDirectoryIfNeeded()
     }
 
@@ -146,6 +154,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                             self.recorder.onAudioChunk = { data in
                                 pendingChunks.withLock { $0.append(data) }
                             }
+                            self.rollingBufferPreloadCoordinator.prepareForRecordingStart()
 
                             self.recordingState = .starting
                             self.logger.notice("toggleRecord: state=starting, starting audio hardware")
@@ -163,6 +172,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                                     }
                                     self.recordingState = .idle
                                     self.activeRecordingStartID = nil
+                                    self.rollingBufferPreloadCoordinator.recordingSessionDidFinish()
                                 }
                                 return
                             }
@@ -174,28 +184,34 @@ class VoiceInkEngine: NSObject, ObservableObject {
 
                             if self.recordingState == .recording,
                                let model = self.transcriptionModelManager.currentTranscriptionModel {
-                                let session = self.serviceRegistry.createSession(
-                                    for: model,
-                                    onPartialTranscript: { [weak self] partial in
-                                        Task { @MainActor in
-                                            self?.partialTranscript = partial
-                                        }
-                                    }
-                                )
-                                self.currentSession = session
-                                let realCallback = try await session.prepare(model: model)
-
-                                if let realCallback {
-                                    self.recorder.onAudioChunk = realCallback
-                                    let buffered = pendingChunks.withLock { chunks -> [Data] in
-                                        let result = chunks
-                                        chunks.removeAll()
-                                        return result
-                                    }
-                                    for chunk in buffered { realCallback(chunk) }
-                                } else {
-                                    self.recorder.onAudioChunk = nil
+                                if let preloaded = self.rollingBufferPreloadCoordinator.claimPreloadedSession(for: model) {
+                                    self.currentSession = preloaded.session
+                                    self.recorder.onAudioChunk = preloaded.audioChunkHandler
                                     pendingChunks.withLock { $0.removeAll() }
+                                } else {
+                                    let session = self.serviceRegistry.createSession(
+                                        for: model,
+                                        onPartialTranscript: { [weak self] partial in
+                                            Task { @MainActor in
+                                                self?.partialTranscript = partial
+                                            }
+                                        }
+                                    )
+                                    self.currentSession = session
+                                    let realCallback = try await session.prepare(model: model)
+
+                                    if let realCallback {
+                                        self.recorder.onAudioChunk = realCallback
+                                        let buffered = pendingChunks.withLock { chunks -> [Data] in
+                                            let result = chunks
+                                            chunks.removeAll()
+                                            return result
+                                        }
+                                        for chunk in buffered { realCallback(chunk) }
+                                    } else {
+                                        self.recorder.onAudioChunk = nil
+                                        pendingChunks.withLock { $0.removeAll() }
+                                    }
                                 }
                             }
 
@@ -227,6 +243,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                             self.recordingState = .idle
                             self.recordedFile = nil
                             self.activeRecordingStartID = nil
+                            self.rollingBufferPreloadCoordinator.recordingSessionDidFinish()
                             NotificationManager.shared.showNotification(title: "Recording failed to start", type: .error)
                             self.logger.notice("toggleRecord: calling dismissMiniRecorder from error handler")
                             await self.recorderUIManager?.dismissMiniRecorder()
@@ -324,6 +341,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
             currentSession = nil
             recordedFile = nil
             shouldCancelRecording = false
+            rollingBufferPreloadCoordinator.recordingSessionDidFinish()
         }
         canceledPipelineTranscriptionIDs.remove(transcriptionID)
 
@@ -371,6 +389,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
         await recorder.stopRecording()
         recordedFile = nil
         recordingState = .idle
+        rollingBufferPreloadCoordinator.recordingSessionDidFinish()
         await cleanupResources()
         await finishRecorderSession()
     }
@@ -393,6 +412,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
         recordedFile = nil
         partialTranscript = ""
         recordingState = .idle
+        rollingBufferPreloadCoordinator.recordingSessionDidFinish()
         await cleanupResources()
     }
 
@@ -463,6 +483,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
     private func cancelCurrentSession() {
         currentSession?.cancel()
         currentSession = nil
+        rollingBufferPreloadCoordinator.settingsDidChange()
     }
 
     private func finishRecorderSession() async {
@@ -500,6 +521,18 @@ class VoiceInkEngine: NSObject, ObservableObject {
             name: .promptDidChange,
             object: nil
         )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleAppSettingsDidChange),
+            name: .AppSettingsDidChange,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleRollingBufferPreloadPartialTranscript(_:)),
+            name: .rollingBufferPreloadPartialTranscript,
+            object: nil
+        )
     }
 
     @objc func handleLicenseStatusChanged() {
@@ -514,6 +547,19 @@ class VoiceInkEngine: NSObject, ObservableObject {
                 await context.setPrompt(currentPrompt)
             }
         }
+    }
+
+    @objc func handleAppSettingsDidChange() {
+        rollingBufferPreloadCoordinator.settingsDidChange()
+        Task { [weak self] in
+            await self?.recorder.reloadRollingBufferSettings()
+        }
+    }
+
+    @objc func handleRollingBufferPreloadPartialTranscript(_ notification: Notification) {
+        guard recordingState == .idle,
+              let text = notification.userInfo?["text"] as? String else { return }
+        partialTranscript = text
     }
 }
 

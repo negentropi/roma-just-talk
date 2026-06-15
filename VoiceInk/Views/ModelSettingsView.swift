@@ -10,6 +10,7 @@ struct ModelSettingsView: View {
     @AppStorage("AppendTrailingSpace") private var appendTrailingSpace = true
     @AppStorage("PrewarmModelOnWake") private var prewarmModelOnWake = true
     @AppStorage("showLiveTextPreview") private var showLiveTextPreview = false
+    @AppStorage("RollingBufferVADModel") private var rollingBufferVADModel = "silero"
     @State private var customPrompt: String = ""
     @State private var isEditing: Bool = false
 
@@ -108,10 +109,23 @@ struct ModelSettingsView: View {
                 Toggle(isOn: $isVADEnabled) {
                     HStack(spacing: 4) {
                         Text("Voice Activity Detection (VAD)")
-                        InfoTip("Detect speech segments and filter out silence to improve accuracy of local models.")
+                        InfoTip("Detect speech locally with the selected VAD model. Rolling buffer preload uses this as a trigger, not as a transcript filter.")
                     }
                 }
                 .toggleStyle(.switch)
+
+                Picker(selection: $rollingBufferVADModel) {
+                    Text("Silero").tag("silero")
+                } label: {
+                    HStack(spacing: 4) {
+                        Text("Rolling VAD Model")
+                        InfoTip("Silero runs locally on CPU and watches rolling audio for speech before STT preload starts.")
+                    }
+                }
+                .pickerStyle(.menu)
+                .onChange(of: rollingBufferVADModel) { _, _ in
+                    NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
+                }
 
                 Toggle(isOn: $prewarmModelOnWake) {
                     HStack(spacing: 4) {
@@ -124,7 +138,7 @@ struct ModelSettingsView: View {
                 Toggle(isOn: $showLiveTextPreview) {
                     HStack(spacing: 4) {
                         Text("Show Live Text Preview")
-                        InfoTip("Displays the live transcript preview in the recorder while speaking. Only applies when using real-time streaming models.")
+                        InfoTip("Displays provisional text from streaming or rolling-buffer preload when available.")
                     }
                 }
                 .toggleStyle(.switch)

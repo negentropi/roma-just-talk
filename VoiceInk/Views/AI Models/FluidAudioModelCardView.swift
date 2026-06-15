@@ -7,6 +7,7 @@ struct FluidAudioModelCardView: View {
     @ObservedObject var fluidAudioModelManager: FluidAudioModelManager
     @ObservedObject var transcriptionModelManager: TranscriptionModelManager
     @State private var streamingEnabled: Bool
+    @State private var preloadEnabled: Bool
 
     init(model: FluidAudioModel, fluidAudioModelManager: FluidAudioModelManager, transcriptionModelManager: TranscriptionModelManager) {
         self.model = model
@@ -14,10 +15,16 @@ struct FluidAudioModelCardView: View {
         _transcriptionModelManager = ObservedObject(wrappedValue: transcriptionModelManager)
         let key = "streaming-enabled-\(model.name)"
         _streamingEnabled = State(initialValue: UserDefaults.standard.object(forKey: key) as? Bool ?? true)
+        let preloadKey = "rolling-buffer-preload-enabled-\(model.name)"
+        _preloadEnabled = State(initialValue: UserDefaults.standard.object(forKey: preloadKey) as? Bool ?? true)
     }
 
     private var streamingDefaultsKey: String {
         "streaming-enabled-\(model.name)"
+    }
+
+    private var preloadDefaultsKey: String {
+        "rolling-buffer-preload-enabled-\(model.name)"
     }
 
     var isCurrent: Bool {
@@ -64,6 +71,17 @@ struct FluidAudioModelCardView: View {
                         UserDefaults.standard.set(newValue, forKey: streamingDefaultsKey)
                     }
                     .help(streamingEnabled ? "Live streaming enabled — click to switch to batch" : "Batch mode — click to enable live streaming")
+
+                Toggle("Buffer Preload", isOn: $preloadEnabled)
+                    .toggleStyle(.switch)
+                    .controlSize(.mini)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(Color(.secondaryLabelColor))
+                    .onChange(of: preloadEnabled) { _, newValue in
+                        UserDefaults.standard.set(newValue, forKey: preloadDefaultsKey)
+                        NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
+                    }
+                    .help(preloadEnabled ? "Rolling buffer can pre-run this model" : "Rolling buffer preload disabled for this model")
             }
 
             Spacer()

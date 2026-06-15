@@ -13,6 +13,7 @@ struct CloudModelCardView: View {
     @State private var isExpanded = false
     @State private var apiKey = ""
     @State private var streamingEnabled: Bool
+    @State private var preloadEnabled: Bool
 
     init(model: CloudModel, isCurrent: Bool, setDefaultAction: @escaping () -> Void) {
         self.model = model
@@ -20,6 +21,8 @@ struct CloudModelCardView: View {
         self.setDefaultAction = setDefaultAction
         let key = "streaming-enabled-\(model.name)"
         _streamingEnabled = State(initialValue: UserDefaults.standard.object(forKey: key) as? Bool ?? true)
+        let preloadKey = "rolling-buffer-preload-enabled-\(model.name)"
+        _preloadEnabled = State(initialValue: UserDefaults.standard.object(forKey: preloadKey) as? Bool ?? true)
     }
     @State private var isVerifying = false
     @State private var verificationStatus: VerificationStatus = .none
@@ -86,20 +89,33 @@ struct CloudModelCardView: View {
     }
 
     private var streamingModeBadge: some View {
-        Toggle("Real-time", isOn: isStreamingOnly ? .constant(true) : $streamingEnabled)
-            .toggleStyle(.switch)
-            .controlSize(.mini)
-            .font(.system(size: 11, weight: .medium))
-            .foregroundColor(Color(.secondaryLabelColor))
-            .disabled(isStreamingOnly)
-            .onChange(of: streamingEnabled) { _, newValue in
-                if !isStreamingOnly {
-                    UserDefaults.standard.set(newValue, forKey: streamingDefaultsKey)
-                    ensureCurrentModelLanguageIsStillValid()
+        HStack(spacing: 8) {
+            Toggle("Real-time", isOn: isStreamingOnly ? .constant(true) : $streamingEnabled)
+                .toggleStyle(.switch)
+                .controlSize(.mini)
+                .font(.system(size: 11, weight: .medium))
+                .foregroundColor(Color(.secondaryLabelColor))
+                .disabled(isStreamingOnly)
+                .onChange(of: streamingEnabled) { _, newValue in
+                    if !isStreamingOnly {
+                        UserDefaults.standard.set(newValue, forKey: streamingDefaultsKey)
+                        ensureCurrentModelLanguageIsStillValid()
+                        NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
+                    }
+                }
+                .help(isStreamingOnly ? "This model only supports real-time streaming" : (streamingEnabled ? "Live streaming enabled — click to switch to batch" : "Batch mode — click to enable live streaming"))
+
+            Toggle("Buffer Preload", isOn: $preloadEnabled)
+                .toggleStyle(.switch)
+                .controlSize(.mini)
+                .font(.system(size: 11, weight: .medium))
+                .foregroundColor(Color(.secondaryLabelColor))
+                .onChange(of: preloadEnabled) { _, newValue in
+                    UserDefaults.standard.set(newValue, forKey: preloadDefaultsKey)
                     NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
                 }
-            }
-            .help(isStreamingOnly ? "This model only supports real-time streaming" : (streamingEnabled ? "Live streaming enabled — click to switch to batch" : "Batch mode — click to enable live streaming"))
+                .help(preloadEnabled ? "Rolling buffer can pre-run this model when global policy allows it" : "Rolling buffer preload disabled for this model")
+        }
     }
 
     private func ensureCurrentModelLanguageIsStillValid() {
@@ -271,6 +287,10 @@ struct CloudModelCardView: View {
     
     private var streamingDefaultsKey: String {
         "streaming-enabled-\(model.name)"
+    }
+
+    private var preloadDefaultsKey: String {
+        "rolling-buffer-preload-enabled-\(model.name)"
     }
 
     private func loadSavedAPIKey() {

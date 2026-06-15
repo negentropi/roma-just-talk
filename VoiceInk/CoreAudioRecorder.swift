@@ -6,13 +6,13 @@ import os
 
 private final class PCMPreRollBuffer: @unchecked Sendable {
     private let lock = NSLock()
-    private let samples: UnsafeMutablePointer<Int16>
-    private let capacity: Int
+    private var samples: UnsafeMutablePointer<Int16>
+    private var capacity: Int
     private var writeIndex = 0
     private var availableSamples = 0
 
-    init(sampleRate: Int, seconds: Int) {
-        capacity = max(sampleRate * seconds, 1)
+    init(sampleRate: Int, seconds: Double) {
+        capacity = max(Int((Double(sampleRate) * seconds).rounded()), 1)
         samples = UnsafeMutablePointer<Int16>.allocate(capacity: capacity)
         samples.initialize(repeating: 0, count: capacity)
     }
@@ -79,6 +79,26 @@ private final class PCMPreRollBuffer: @unchecked Sendable {
         return data
     }
 
+    func resize(sampleRate: Int, seconds: Double) {
+        let newCapacity = max(Int((Double(sampleRate) * seconds).rounded()), 1)
+
+        lock.lock()
+        guard newCapacity != capacity else {
+            lock.unlock()
+            return
+        }
+
+        let oldSamples = samples
+        samples = UnsafeMutablePointer<Int16>.allocate(capacity: newCapacity)
+        samples.initialize(repeating: 0, count: newCapacity)
+        oldSamples.deallocate()
+
+        capacity = newCapacity
+        writeIndex = 0
+        availableSamples = 0
+        lock.unlock()
+    }
+
     func clear() {
         lock.lock()
         writeIndex = 0
@@ -102,7 +122,11 @@ final class CoreAudioRecorder: @unchecked Sendable {
     private var isRecording = false
     private var currentDeviceID: AudioDeviceID = 0
     private var recordingURL: URL?
-    private let preRollBuffer = PCMPreRollBuffer(sampleRate: 16_000, seconds: 3)
+    private let preRollSampleRate = 16_000
+    private let preRollBuffer = PCMPreRollBuffer(
+        sampleRate: 16_000,
+        seconds: RollingBufferPreloadSettings.defaultBufferDurationSeconds
+    )
     private let preRollStreamingChunkBytes = 3_200
 
     // Device format (what the hardware provides)
@@ -137,6 +161,8 @@ final class CoreAudioRecorder: @unchecked Sendable {
 
     /// Called on the audio thread with raw PCM data (16-bit, 16kHz, mono) for streaming.
     var onAudioChunk: ((_ data: Data) -> Void)?
+    /// Called on the audio thread with raw PCM data while the rolling buffer is warm.
+    var onRollingAudioChunk: ((_ data: Data) -> Void)?
 
     // MARK: - Initialization
 
@@ -171,6 +197,7 @@ final class CoreAudioRecorder: @unchecked Sendable {
         }
 
         currentDeviceID = deviceID
+        reloadPreRollBufferSettings()
         preRollBuffer.clear()
 
         logger.notice("🎙️ Starting pre-roll buffering from device \(deviceID, privacy: .public)")
@@ -204,6 +231,8 @@ final class CoreAudioRecorder: @unchecked Sendable {
 
         if !isCapturing || currentDeviceID != deviceID {
             try startPreBuffering(deviceID: deviceID)
+        } else {
+            reloadPreRollBufferSettings()
         }
 
         logger.notice("🎙️ Starting recording from device \(deviceID, privacy: .public)")
@@ -842,6 +871,7 @@ final class CoreAudioRecorder: @unchecked Sendable {
         )
 
         preRollBuffer.append(outputBuffer, sampleCount: Int(outputFrameCount))
+        let rollingAudioChunkHandler = onRollingAudioChunk
 
         fileAccessLock.lock()
         if isRecording, let file = audioFile {
@@ -858,7 +888,17 @@ final class CoreAudioRecorder: @unchecked Sendable {
             let byteCount = Int(outputFrameCount) * MemoryLayout<Int16>.size
             let data = Data(bytes: outputBuffer, count: byteCount)
             onAudioChunk(data)
+            rollingAudioChunkHandler?(data)
+        } else if let rollingAudioChunkHandler {
+            let byteCount = Int(outputFrameCount) * MemoryLayout<Int16>.size
+            let data = Data(bytes: outputBuffer, count: byteCount)
+            rollingAudioChunkHandler(data)
         }
+    }
+
+    func reloadPreRollBufferSettings() {
+        let duration = RollingBufferPreloadSettings.configuration().bufferDurationSeconds
+        preRollBuffer.resize(sampleRate: preRollSampleRate, seconds: duration)
     }
 
     private func writePCMDataToFile(_ data: Data) throws {

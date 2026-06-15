@@ -37,6 +37,13 @@ enum AppDefaults {
             "SelectedLanguage": "en",
             "AppendTrailingSpace": true,
             "showLiveTextPreview": false,
+            RollingBufferPreloadSettings.modeKey: RollingBufferPreloadSettings.defaultMode.rawValue,
+            RollingBufferPreloadSettings.autoDisableCloudModelsKey: RollingBufferPreloadSettings.defaultAutoDisablesCloudModels,
+            RollingBufferPreloadSettings.autoDisableLowBatteryLocalModelsKey: RollingBufferPreloadSettings.defaultAutoDisablesLowBatteryLocalModels,
+            RollingBufferPreloadSettings.lowBatteryThresholdPercentKey: RollingBufferPreloadSettings.defaultLowBatteryThresholdPercent,
+            RollingBufferPreloadSettings.bufferDurationSecondsKey: RollingBufferPreloadSettings.defaultBufferDurationSeconds,
+            RollingBufferPreloadSettings.preRunFinalizationKey: RollingBufferPreloadSettings.defaultPreRunFinalization,
+            "RollingBufferVADModel": "silero",
             "RecorderType": "none",
             "CurrentTranscriptionModel": "parakeet-tdt-0.6b-v2",
 

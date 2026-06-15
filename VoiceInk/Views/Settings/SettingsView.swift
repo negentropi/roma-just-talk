@@ -232,6 +232,11 @@ struct SettingsView: View {
                 }
             }
 
+            // MARK: - Rolling Buffer
+            Section("Rolling Buffer") {
+                RollingBufferPreloadSettingsControls()
+            }
+
             // MARK: - Power Mode
             PowerModeSection()
 

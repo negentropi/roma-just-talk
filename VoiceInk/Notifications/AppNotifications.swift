@@ -19,6 +19,7 @@ extension Notification.Name {
     static let transcriptionCreated = Notification.Name("transcriptionCreated")
     static let transcriptionCompleted = Notification.Name("transcriptionCompleted")
     static let transcriptionDeleted = Notification.Name("transcriptionDeleted")
+    static let rollingBufferPreloadPartialTranscript = Notification.Name("rollingBufferPreloadPartialTranscript")
     static let sessionMetricsDidChange = Notification.Name("sessionMetricsDidChange")
     static let enhancementToggleChanged = Notification.Name("enhancementToggleChanged")
     static let openFileForTranscription = Notification.Name("openFileForTranscription")

@@ -11,6 +11,7 @@ class TranscriptionPipeline {
     private let enhancementService: AIEnhancementService?
     private let promptDetectionService = PromptDetectionService()
     private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "TranscriptionPipeline")
+    private static let autoSendAfterPasteDelayNanoseconds: UInt64 = 120_000_000
 
     var licenseViewModel: LicenseViewModel
 
@@ -241,7 +242,7 @@ class TranscriptionPipeline {
             await restorePromptDetectionSettingsAndDismiss {
                 if let autoSendKey, autoSendKey.isEnabled {
                     Task { @MainActor in
-                        try? await Task.sleep(nanoseconds: 500_000_000)
+                        try? await Task.sleep(nanoseconds: Self.autoSendAfterPasteDelayNanoseconds)
                         CursorPaster.performAutoSend(autoSendKey)
                     }
                 }

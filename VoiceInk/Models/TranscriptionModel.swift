@@ -57,6 +57,13 @@ extension TranscriptionModel {
     }
 
     var supportsStreaming: Bool { false }
+
+    var supportsRecordedFileTranscription: Bool {
+        guard let cloudProvider = CloudProviderRegistry.provider(for: provider) else {
+            return true
+        }
+        return !cloudProvider.isStreamingOnly
+    }
 }
 
 // A new struct for Apple's native models

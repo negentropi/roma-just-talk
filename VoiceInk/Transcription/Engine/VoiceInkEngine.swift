@@ -198,6 +198,18 @@ class VoiceInkEngine: NSObject, ObservableObject {
                                         }
                                     }
                                     self.rollingBufferPreloadCoordinator.cancelUnclaimedPreload(reason: "recording-start-fallback")
+                                    if self.stopRequestedDuringStart,
+                                       self.activeRecordingStartID == startID,
+                                       model.supportsRecordedFileTranscription {
+                                        self.stopRequestedDuringStart = false
+                                        self.currentSession = nil
+                                        self.recorder.onAudioChunk = nil
+                                        pendingChunks.withLock { $0.removeAll() }
+                                        self.logger.notice("toggleRecord: stopping startup recording before fallback streaming setup")
+                                        await self.stopRecordingAndRunPipeline()
+                                        return
+                                    }
+
                                     let session = self.serviceRegistry.createSession(
                                         for: model,
                                         onPartialTranscript: { [weak self] partial in

@@ -1,5 +1,7 @@
 # Changelog
 
+## v1.94 - Unreleased
+
 ## v1.93 - 2026-06-15
 
 - Moved real-time transcription controls into the main Settings page while keeping them available from model settings.

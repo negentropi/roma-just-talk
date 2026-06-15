@@ -254,7 +254,7 @@ struct RollingBufferPreloadCoordinatorTests {
     }
 
     @MainActor
-    @Test func preRunFinalizationOffPreventsClaimingWarmSession() async {
+    @Test func preRunFinalizationOffPreventsPreRunSessionWork() async {
         let model = streamingModel()
         let session = FakeTranscriptionSession()
 
@@ -265,12 +265,10 @@ struct RollingBufferPreloadCoordinatorTests {
 
             await coordinator.processRollingChunkForTesting(Data(repeating: 1, count: 8_000))
 
-            #expect(session.chunks.snapshot().count == 1)
+            #expect(session.preparedModelName == nil)
+            #expect(session.chunks.snapshot().isEmpty)
             let claimed = await coordinator.claimPreloadedSession(for: model)
             #expect(claimed == nil)
-
-            coordinator.cancelUnclaimedPreload(reason: "test-finalization-off")
-            #expect(session.cancelCount == 1)
         }
     }
 
@@ -289,12 +287,10 @@ struct RollingBufferPreloadCoordinatorTests {
 
             await coordinator.processRollingChunkForTesting(Data(repeating: 1, count: 8_000))
 
-            #expect(session.chunks.snapshot().count == 1)
+            #expect(session.preparedModelName == nil)
+            #expect(session.chunks.snapshot().isEmpty)
             let claimed = await coordinator.claimPreloadedSession(for: model)
             #expect(claimed == nil)
-
-            coordinator.cancelUnclaimedPreload(reason: "test-settings-refresh")
-            #expect(session.cancelCount == 1)
         }
     }
 

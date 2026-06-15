@@ -308,7 +308,7 @@ final class RollingBufferPreloadCoordinator {
             return cachedPlan
         }
 
-        if configuration.mode == .off || !model.supportsStreaming {
+        if configuration.mode == .off || !configuration.preRunFinalization || !model.supportsStreaming {
             return cachePlan(nil, for: model.name, now: now)
         }
 

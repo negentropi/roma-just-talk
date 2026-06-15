@@ -14,6 +14,7 @@
 - Claimed ready rolling-preload sessions before Power Mode configuration work so quick releases do not wait on model/session setup when the preloaded model and language still match.
 - Tightened cached rolling-preload finalization so quick releases avoid pasting stale partial hypotheses when the local ASR pass is behind the live buffer.
 - Skipped fallback streaming setup on immediate startup-stop recordings when the selected model can transcribe the saved WAV directly.
+- Included rolling buffer preload mode, Auto policy, duration, finalization, and VAD model settings in settings backup/import.
 
 ## v1.93 - 2026-06-15
 

@@ -104,6 +104,13 @@ struct GeneralBackup: Codable {
     let isExperimentalFeaturesEnabled: Bool?
     let restoreClipboardAfterPaste: Bool?
     let clipboardRestoreDelay: Double?
+    let rollingBufferPreloadModeRawValue: String?
+    let rollingBufferPreloadAutoDisableCloudModels: Bool?
+    let rollingBufferPreloadAutoDisableLowBatteryLocalModels: Bool?
+    let rollingBufferPreloadLowBatteryThresholdPercent: Int?
+    let rollingBufferDurationSeconds: Double?
+    let rollingBufferPreloadFinalization: Bool?
+    let rollingBufferVADModel: String?
 }
 
 struct WordBackup: Codable {

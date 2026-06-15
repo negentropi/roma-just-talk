@@ -152,6 +152,7 @@ class ImportExportService {
         }
 
         let punctuationCleanupMode = PunctuationCleanupMode.current()
+        let rollingBufferConfiguration = RollingBufferPreloadSettings.configuration()
         let generalSettingsToExport = GeneralBackup(
             primaryRecordingShortcut: ShortcutStore.shortcut(for: .primaryRecording).map(ShortcutBackup.init),
             secondaryRecordingShortcut: ShortcutStore.shortcut(for: .secondaryRecording).map(ShortcutBackup.init),
@@ -189,7 +190,14 @@ class ImportExportService {
             lowercaseTranscription: UserDefaults.standard.bool(forKey: keyLowercaseTranscription),
             isExperimentalFeaturesEnabled: UserDefaults.standard.bool(forKey: "isExperimentalFeaturesEnabled"),
             restoreClipboardAfterPaste: UserDefaults.standard.bool(forKey: "restoreClipboardAfterPaste"),
-            clipboardRestoreDelay: UserDefaults.standard.double(forKey: "clipboardRestoreDelay")
+            clipboardRestoreDelay: UserDefaults.standard.double(forKey: "clipboardRestoreDelay"),
+            rollingBufferPreloadModeRawValue: rollingBufferConfiguration.mode.rawValue,
+            rollingBufferPreloadAutoDisableCloudModels: rollingBufferConfiguration.autoDisablesCloudModels,
+            rollingBufferPreloadAutoDisableLowBatteryLocalModels: rollingBufferConfiguration.autoDisablesLowBatteryLocalModels,
+            rollingBufferPreloadLowBatteryThresholdPercent: rollingBufferConfiguration.lowBatteryThresholdPercent,
+            rollingBufferDurationSeconds: rollingBufferConfiguration.bufferDurationSeconds,
+            rollingBufferPreloadFinalization: rollingBufferConfiguration.preRunFinalization,
+            rollingBufferVADModel: RollingBufferVADSettings.selectedModel()
         )
 
         let exportedSettings = BackupFile(

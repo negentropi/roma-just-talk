@@ -211,8 +211,48 @@ enum BackupImporter {
         if let clipboardDelay = general.clipboardRestoreDelay {
             UserDefaults.standard.set(clipboardDelay, forKey: "clipboardRestoreDelay")
         }
+        importRollingBufferSettings(general)
 
         print("Successfully imported general settings.")
+    }
+
+    private static func importRollingBufferSettings(_ general: GeneralBackup) {
+        var didImportRollingBufferSetting = false
+
+        if let modeRawValue = general.rollingBufferPreloadModeRawValue,
+           RollingBufferPreloadMode(rawValue: modeRawValue) != nil {
+            UserDefaults.standard.set(modeRawValue, forKey: RollingBufferPreloadSettings.modeKey)
+            didImportRollingBufferSetting = true
+        }
+        if let autoDisableCloudModels = general.rollingBufferPreloadAutoDisableCloudModels {
+            UserDefaults.standard.set(autoDisableCloudModels, forKey: RollingBufferPreloadSettings.autoDisableCloudModelsKey)
+            didImportRollingBufferSetting = true
+        }
+        if let autoDisableLowBatteryLocalModels = general.rollingBufferPreloadAutoDisableLowBatteryLocalModels {
+            UserDefaults.standard.set(autoDisableLowBatteryLocalModels, forKey: RollingBufferPreloadSettings.autoDisableLowBatteryLocalModelsKey)
+            didImportRollingBufferSetting = true
+        }
+        if let threshold = general.rollingBufferPreloadLowBatteryThresholdPercent {
+            UserDefaults.standard.set(min(max(threshold, 1), 100), forKey: RollingBufferPreloadSettings.lowBatteryThresholdPercentKey)
+            didImportRollingBufferSetting = true
+        }
+        if let duration = general.rollingBufferDurationSeconds {
+            UserDefaults.standard.set(min(max(duration, 0.25), 30.0), forKey: RollingBufferPreloadSettings.bufferDurationSecondsKey)
+            didImportRollingBufferSetting = true
+        }
+        if let finalization = general.rollingBufferPreloadFinalization {
+            UserDefaults.standard.set(finalization, forKey: RollingBufferPreloadSettings.preRunFinalizationKey)
+            didImportRollingBufferSetting = true
+        }
+        if let vadModel = general.rollingBufferVADModel,
+           vadModel == RollingBufferVADSettings.sileroModelName {
+            UserDefaults.standard.set(vadModel, forKey: RollingBufferVADSettings.modelKey)
+            didImportRollingBufferSetting = true
+        }
+
+        if didImportRollingBufferSetting {
+            NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
+        }
     }
 
     @MainActor

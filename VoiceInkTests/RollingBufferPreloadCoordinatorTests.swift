@@ -151,6 +151,10 @@ private final class DelayedFakeTranscriptionSession: TranscriptionSession {
 }
 
 struct RollingBufferPreloadCoordinatorTests {
+    @Test func startingPreloadClaimWaitStaysUnderQuickReleaseBudget() {
+        #expect(RollingBufferPreloadCoordinator.startingPreloadClaimWaitNanoseconds <= 150_000_000)
+    }
+
     @MainActor
     @Test func vadTriggerStartsPreloadAndClaimTransfersLeadIn() async {
         let model = streamingModel()

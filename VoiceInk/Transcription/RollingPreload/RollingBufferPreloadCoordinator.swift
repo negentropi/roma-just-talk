@@ -78,6 +78,7 @@ final class RollingBufferPreloadCoordinator {
     typealias CurrentModelProvider = @MainActor () -> (any TranscriptionModel)?
     typealias DetectorProvider = @Sendable () async -> (any SpeechActivityDetecting)?
     typealias SessionFactory = @MainActor (any TranscriptionModel, @escaping (String) -> Void) -> TranscriptionSession
+    static let startingPreloadClaimWaitNanoseconds: UInt64 = 150_000_000
 
     private enum State {
         case idle
@@ -422,10 +423,10 @@ final class RollingBufferPreloadCoordinator {
         }
     }
 
-    private func waitForStartingPreload(maxWaitNanoseconds: UInt64 = 750_000_000) async {
+    private func waitForStartingPreload(maxWaitNanoseconds: UInt64 = Self.startingPreloadClaimWaitNanoseconds) async {
         var remaining = maxWaitNanoseconds
         while state == .starting, remaining > 0 {
-            let sleepNanoseconds = min(50_000_000, remaining)
+            let sleepNanoseconds = min(10_000_000, remaining)
             try? await Task.sleep(nanoseconds: sleepNanoseconds)
             remaining -= sleepNanoseconds
         }

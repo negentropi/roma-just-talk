@@ -69,6 +69,23 @@ private final class LockedDataChunks: @unchecked Sendable {
     }
 }
 
+private final class LockedCounter: @unchecked Sendable {
+    private let lock = NSLock()
+    private var count = 0
+
+    func increment() {
+        lock.lock()
+        count += 1
+        lock.unlock()
+    }
+
+    var value: Int {
+        lock.lock()
+        defer { lock.unlock() }
+        return count
+    }
+}
+
 @MainActor
 private final class FakeTranscriptionSession: TranscriptionSession {
     let chunks = LockedDataChunks()
@@ -305,6 +322,34 @@ struct RollingBufferPreloadCoordinatorTests {
     }
 
     @MainActor
+    @Test func autoCloudOptOutBlocksPreloadBeforeDetectorWork() async {
+        let model = streamingModel(provider: .deepgram)
+        let session = FakeTranscriptionSession()
+        let detectorLoadCount = LockedCounter()
+
+        await withStandardRollingDefaults(for: model) { defaults in
+            setPreloadDefaults(defaults, model: model, preRunFinalization: true)
+            defaults.set(RollingBufferPreloadMode.auto.rawValue, forKey: RollingBufferPreloadSettings.modeKey)
+            defaults.set(true, forKey: RollingBufferPreloadSettings.autoDisableCloudModelsKey)
+        } run: {
+            let coordinator = makeCoordinator(
+                model: model,
+                session: session,
+                detectorProvider: {
+                    detectorLoadCount.increment()
+                    return FakeSpeechDetector(containsSpeech: true)
+                }
+            )
+
+            await coordinator.processRollingChunkForTesting(Data(repeating: 1, count: 8_000))
+
+            #expect(detectorLoadCount.value == 0)
+            #expect(session.preparedModelName == nil)
+            #expect(session.chunks.snapshot().isEmpty)
+        }
+    }
+
+    @MainActor
     @Test func powerStateIsNotPolledForNonSpeechVadWindows() async {
         let model = streamingModel()
         let session = FakeTranscriptionSession()
@@ -391,21 +436,22 @@ struct RollingBufferPreloadCoordinatorTests {
         powerStateProvider: any RollingBufferPowerStateProviding = FixedPowerStateProvider(
             state: RollingBufferPowerState(isOnBattery: false, batteryLevelPercent: nil)
         ),
-        detector: any SpeechActivityDetecting = FakeSpeechDetector(containsSpeech: true)
+        detector: any SpeechActivityDetecting = FakeSpeechDetector(containsSpeech: true),
+        detectorProvider: RollingBufferPreloadCoordinator.DetectorProvider? = nil
     ) -> RollingBufferPreloadCoordinator {
         RollingBufferPreloadCoordinator(
             currentModelProvider: { model },
             powerStateProvider: powerStateProvider,
-            detectorProvider: { detector },
+            detectorProvider: detectorProvider ?? { detector },
             sessionFactory: { _, _ in session }
         )
     }
 
-    private func streamingModel() -> TestPreloadModel {
+    private func streamingModel(provider: ModelProvider = .fluidAudio) -> TestPreloadModel {
         TestPreloadModel(
             name: "test-preload-\(UUID().uuidString)",
             displayName: "Test Preload",
-            provider: .fluidAudio,
+            provider: provider,
             supportsStreaming: true
         )
     }

@@ -114,10 +114,7 @@ class TranscriptionPipeline {
             text = WordReplacementService.shared.applyReplacements(to: text, using: modelContext)
             let cleanedText = TranscriptionOutputFilter.applyUserCleanupPreferences(text)
 
-            let actualDuration = await AudioFileMetadata.duration(for: audioURL)
-
             transcription.text = cleanedText
-            transcription.duration = actualDuration
             transcription.transcriptionModelName = model.displayName
             transcription.transcriptionDuration = transcriptionDuration
             finalPastedText = cleanedText
@@ -248,6 +245,11 @@ class TranscriptionPipeline {
             }
         } else {
             await restorePromptDetectionSettingsAndDismiss()
+        }
+
+        if transcription.transcriptionStatus == TranscriptionStatus.completed.rawValue,
+           transcription.duration <= 0 {
+            transcription.duration = await AudioFileMetadata.duration(for: audioURL)
         }
 
         saveTranscriptionAndPostCompletion()

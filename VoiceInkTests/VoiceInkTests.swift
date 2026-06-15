@@ -108,6 +108,17 @@ struct VoiceInkTests {
         #expect(manager.isActiveForRecordingShortcut(recordingState: .recording))
     }
 
+    @Test @MainActor func activeRecorderToggleDefersStopInsteadOfCancelingWhileStarting() async throws {
+        let manager = RecorderUIManager()
+
+        #expect(manager.activeSessionToggleAction(for: .starting) == .toggleRecord)
+        #expect(manager.activeSessionToggleAction(for: .recording) == .toggleRecord)
+        #expect(manager.activeSessionToggleAction(for: .transcribing) == .cancelRecording)
+        #expect(manager.activeSessionToggleAction(for: .enhancing) == .cancelRecording)
+        #expect(manager.activeSessionToggleAction(for: .idle) == .dismissRecorder)
+        #expect(manager.activeSessionToggleAction(for: .busy) == .dismissRecorder)
+    }
+
     @Test @MainActor func pushToTalkUsesActiveSessionWhenRecorderWindowIsNone() async throws {
         var sessionActive = false
         var toggleCount = 0

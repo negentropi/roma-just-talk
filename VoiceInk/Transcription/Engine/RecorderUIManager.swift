@@ -2,6 +2,12 @@ import Foundation
 import SwiftUI
 import os
 
+enum RecorderUIToggleAction: Equatable {
+    case toggleRecord
+    case cancelRecording
+    case dismissRecorder
+}
+
 @MainActor
 class RecorderUIManager: ObservableObject {
     @Published var miniRecorderError: String?
@@ -113,6 +119,17 @@ class RecorderUIManager: ObservableObject {
         return isRecorderSessionActive
     }
 
+    func activeSessionToggleAction(for recordingState: RecordingState) -> RecorderUIToggleAction {
+        switch recordingState {
+        case .recording, .starting:
+            return .toggleRecord
+        case .transcribing, .enhancing:
+            return .cancelRecording
+        case .idle, .busy:
+            return .dismissRecorder
+        }
+    }
+
     func toggleMiniRecorder(powerModeId: UUID? = nil) async {
         guard let engine = engine else { return }
         logger.notice("toggleMiniRecorder called – sessionActive=\(self.isRecorderSessionActive, privacy: .public), visible=\(self.isMiniRecorderVisible, privacy: .public), state=\(String(describing: engine.recordingState), privacy: .public)")
@@ -123,17 +140,18 @@ class RecorderUIManager: ObservableObject {
         }
 
         if isRecorderSessionActive {
-            switch engine.recordingState {
-            case .recording:
-                logger.notice("toggleMiniRecorder: stopping recording (was recording)")
+            switch activeSessionToggleAction(for: engine.recordingState) {
+            case .toggleRecord:
+                if engine.recordingState == .starting {
+                    logger.notice("toggleMiniRecorder: deferring stop while recording starts")
+                } else {
+                    logger.notice("toggleMiniRecorder: stopping recording (was recording)")
+                }
                 await engine.toggleRecord(powerModeId: powerModeId)
-            case .starting:
-                logger.notice("toggleMiniRecorder: deferring stop while recording starts")
-                await engine.toggleRecord(powerModeId: powerModeId)
-            case .transcribing, .enhancing:
+            case .cancelRecording:
                 logger.notice("toggleMiniRecorder: cancelling active recorder work")
                 await cancelRecording()
-            case .idle, .busy:
+            case .dismissRecorder:
                 logger.notice("toggleMiniRecorder: dismissing recorder UI")
                 await dismissMiniRecorder()
             }

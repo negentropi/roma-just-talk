@@ -133,6 +133,29 @@ struct RollingBufferPreloadCoordinatorTests {
     }
 
     @MainActor
+    @Test func settingsChangeRefreshesCachedFinalizationPolicy() async {
+        let model = streamingModel()
+        let session = FakeTranscriptionSession()
+
+        await withStandardRollingDefaults(for: model) { defaults in
+            setPreloadDefaults(defaults, model: model, preRunFinalization: true)
+        } run: {
+            let coordinator = makeCoordinator(model: model, session: session)
+
+            UserDefaults.standard.set(false, forKey: RollingBufferPreloadSettings.preRunFinalizationKey)
+            coordinator.settingsDidChange()
+
+            await coordinator.processRollingChunkForTesting(Data(repeating: 1, count: 8_000))
+
+            #expect(session.chunks.snapshot().count == 1)
+            #expect(coordinator.claimPreloadedSession(for: model) == nil)
+
+            coordinator.cancelUnclaimedPreload(reason: "test-settings-refresh")
+            #expect(session.cancelCount == 1)
+        }
+    }
+
+    @MainActor
     private func makeCoordinator(
         model: TestPreloadModel,
         session: FakeTranscriptionSession,

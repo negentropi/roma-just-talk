@@ -101,6 +101,7 @@ final class RollingBufferPreloadCoordinator {
     private var detector: (any SpeechActivityDetecting)?
     private var detectorLoadTask: Task<(any SpeechActivityDetecting)?, Never>?
     private var detectorLoadAttempted = false
+    private var configuration = RollingBufferPreloadSettings.configuration()
     private var state: State = .idle
     private var recordingInProgress = false
     private var leadInBuffer: RollingChunkBuffer
@@ -189,7 +190,7 @@ final class RollingBufferPreloadCoordinator {
     func claimPreloadedSession(for model: any TranscriptionModel) -> RollingBufferPreloadedSession? {
         guard state == .active,
               currentModelName == model.name,
-              RollingBufferPreloadSettings.configuration().preRunFinalization,
+              configuration.preRunFinalization,
               let session = currentSession,
               let callback = currentCallback else {
             return nil
@@ -220,6 +221,7 @@ final class RollingBufferPreloadCoordinator {
     }
 
     func settingsDidChange() {
+        configuration = RollingBufferPreloadSettings.configuration()
         detectorLoadTask?.cancel()
         detectorLoadTask = nil
         detector = nil
@@ -232,7 +234,6 @@ final class RollingBufferPreloadCoordinator {
         observedChunks += 1
         observedBytes += chunk.count
 
-        let configuration = RollingBufferPreloadSettings.configuration()
         leadInBuffer.updateMaxBytes(Self.bytes(forDuration: configuration.bufferDurationSeconds))
 
         if recordingInProgress, state != .active {

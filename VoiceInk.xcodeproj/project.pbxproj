@@ -728,7 +728,7 @@
 /* Begin XCLocalSwiftPackageReference section */
 		A10000022FA0000000000001 /* XCLocalSwiftPackageReference "VoiceInkCore" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = ../VoiceInkCore;
+			relativePath = VoiceInkCore;
 		};
 /* End XCLocalSwiftPackageReference section */
 

@@ -110,6 +110,13 @@ final class StreamingTranscriptionSession: TranscriptionSession {
             throw VoiceInkEngineError.transcriptionFailed
         }
 
+        if let startupTask, !streamingFailed {
+            let waitStart = Date()
+            logger.notice("Streaming transcribe waiting for startup model=\(model.displayName, privacy: .public)")
+            await startupTask.value
+            logger.notice("Streaming startup wait finished elapsed=\(Date().timeIntervalSince(waitStart), format: .fixed(precision: 3), privacy: .public)s")
+        }
+
         if !streamingFailed {
             do {
                 let start = Date()

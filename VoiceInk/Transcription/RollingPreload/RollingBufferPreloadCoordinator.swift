@@ -257,7 +257,8 @@ final class RollingBufferPreloadCoordinator {
                         userInfo: ["text": partial]
                     )
                 }
-            }
+            },
+            forceStreaming: true
         )
 
         do {

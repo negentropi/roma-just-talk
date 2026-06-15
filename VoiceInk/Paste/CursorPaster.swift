@@ -17,7 +17,6 @@ class CursorPaster {
         }
     }
 
-    private static let prePasteDelay: TimeInterval = 0.10
     private static let pasteShortcutEventDelay: TimeInterval = 0.01
     private static let minimumClipboardRestoreDelay: TimeInterval = 0.25
 
@@ -58,8 +57,6 @@ class CursorPaster {
             logger.error("Failed to prepare clipboard for paste")
             return .commandNotPosted
         }
-
-        await wait(prePasteDelay)
 
         let pasteResult = await postPasteCommand()
         if shouldRestoreClipboard {

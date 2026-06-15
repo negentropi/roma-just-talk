@@ -4,7 +4,7 @@ import AudioToolbox
 import AVFoundation
 import os
 
-private final class PCMPreRollBuffer: @unchecked Sendable {
+final class PCMPreRollBuffer: @unchecked Sendable {
     private let lock = NSLock()
     private var samples: UnsafeMutablePointer<Int16>
     private var capacity: Int

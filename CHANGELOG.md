@@ -6,6 +6,7 @@
 - Added configurable rolling buffer duration with decimal seconds support.
 - Renamed model-card transcription mode controls to "Streaming" so they stay separate from rolling buffer preload.
 - Moved recorder audio-duration metadata work after paste so completed text reaches the cursor sooner.
+- Deferred the recorder history save until after transcription work starts so quick releases do not wait on SwiftData I/O before STT.
 
 ## v1.93 - 2026-06-15
 

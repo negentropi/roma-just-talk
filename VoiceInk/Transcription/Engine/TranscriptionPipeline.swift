@@ -82,6 +82,7 @@ class TranscriptionPipeline {
 
             do {
                 try modelContext.save()
+                NotificationCenter.default.post(name: .transcriptionCreated, object: transcription)
             } catch {
                 logger.error("Failed to save canceled transcription: \(error.localizedDescription, privacy: .public)")
             }
@@ -199,6 +200,7 @@ class TranscriptionPipeline {
                 if didInsertSessionMetric {
                     NotificationCenter.default.post(name: .sessionMetricsDidChange, object: nil)
                 }
+                NotificationCenter.default.post(name: .transcriptionCreated, object: transcription)
                 NotificationCenter.default.post(name: .transcriptionCompleted, object: transcription)
             } catch {
                 logger.error("Failed to save transcription: \(error.localizedDescription, privacy: .public)")

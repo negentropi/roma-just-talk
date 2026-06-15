@@ -279,8 +279,6 @@ class VoiceInkEngine: NSObject, ObservableObject {
                     transcriptionStatus: .pending
                 )
                 modelContext.insert(transcription)
-                try? modelContext.save()
-                NotificationCenter.default.post(name: .transcriptionCreated, object: transcription)
 
                 await runPipeline(on: transcription, audioURL: recordedFile)
             } else {

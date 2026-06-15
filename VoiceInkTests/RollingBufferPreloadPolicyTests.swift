@@ -100,6 +100,20 @@ struct RollingBufferPreloadPolicyTests {
         #expect(RollingBufferPreloadSettings.configuration(in: defaults).bufferDurationSeconds == 30.0)
     }
 
+    @Test func batchVadToggleDoesNotDisableRollingPreloadPolicy() {
+        let defaults = temporaryDefaults()
+        defer { removeTemporaryDefaults(defaults) }
+        let model = streamingModel(provider: .fluidAudio)
+
+        defaults.set(false, forKey: "IsVADEnabled")
+        defaults.set(RollingBufferVADSettings.sileroModelName, forKey: RollingBufferVADSettings.modelKey)
+        defaults.set(RollingBufferPreloadMode.on.rawValue, forKey: RollingBufferPreloadSettings.modeKey)
+
+        #expect(RollingBufferVADSettings.usesSilero(in: defaults))
+        #expect(RollingBufferPreloadPolicy(defaults: defaults, powerState: .init(isOnBattery: false, batteryLevelPercent: nil))
+            .allowsPreload(for: model, perModelEnabled: true))
+    }
+
     private func temporaryDefaults() -> UserDefaults {
         let suiteName = "VoiceInkTests.RollingBufferPreloadPolicy.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!

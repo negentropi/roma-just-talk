@@ -74,6 +74,19 @@ enum RollingBufferPreloadSettings {
     }
 }
 
+enum RollingBufferVADSettings {
+    static let modelKey = "RollingBufferVADModel"
+    static let sileroModelName = "silero"
+
+    static func selectedModel(in defaults: UserDefaults = .standard) -> String {
+        defaults.string(forKey: modelKey) ?? sileroModelName
+    }
+
+    static func usesSilero(in defaults: UserDefaults = .standard) -> Bool {
+        selectedModel(in: defaults) == sileroModelName
+    }
+}
+
 struct RollingBufferPowerState: Equatable, Sendable {
     let isOnBattery: Bool
     let batteryLevelPercent: Int?

@@ -43,7 +43,7 @@ enum AppDefaults {
             RollingBufferPreloadSettings.lowBatteryThresholdPercentKey: RollingBufferPreloadSettings.defaultLowBatteryThresholdPercent,
             RollingBufferPreloadSettings.bufferDurationSecondsKey: RollingBufferPreloadSettings.defaultBufferDurationSeconds,
             RollingBufferPreloadSettings.preRunFinalizationKey: RollingBufferPreloadSettings.defaultPreRunFinalization,
-            "RollingBufferVADModel": "silero",
+            RollingBufferVADSettings.modelKey: RollingBufferVADSettings.sileroModelName,
             "RecorderType": "none",
             "CurrentTranscriptionModel": "parakeet-tdt-0.6b-v2",
 

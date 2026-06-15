@@ -10,7 +10,7 @@ struct ModelSettingsView: View {
     @AppStorage("AppendTrailingSpace") private var appendTrailingSpace = true
     @AppStorage("PrewarmModelOnWake") private var prewarmModelOnWake = true
     @AppStorage("showLiveTextPreview") private var showLiveTextPreview = false
-    @AppStorage("RollingBufferVADModel") private var rollingBufferVADModel = "silero"
+    @AppStorage(RollingBufferVADSettings.modelKey) private var rollingBufferVADModel = RollingBufferVADSettings.sileroModelName
     @State private var customPrompt: String = ""
     @State private var isEditing: Bool = false
 
@@ -109,13 +109,13 @@ struct ModelSettingsView: View {
                 Toggle(isOn: $isVADEnabled) {
                     HStack(spacing: 4) {
                         Text("Voice Activity Detection (VAD)")
-                        InfoTip("Detect speech locally with the selected VAD model. Rolling buffer preload uses this as a trigger, not as a transcript filter.")
+                        InfoTip("Use VAD inside batch/final transcription when supported. Rolling buffer preload uses the Rolling VAD Model setting below as its trigger.")
                     }
                 }
                 .toggleStyle(.switch)
 
                 Picker(selection: $rollingBufferVADModel) {
-                    Text("Silero").tag("silero")
+                    Text("Silero").tag(RollingBufferVADSettings.sileroModelName)
                 } label: {
                     HStack(spacing: 4) {
                         Text("Rolling VAD Model")

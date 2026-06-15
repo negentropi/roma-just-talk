@@ -17,8 +17,7 @@ final class SileroSpeechActivityDetector: SpeechActivityDetecting, @unchecked Se
     private var context: OpaquePointer?
 
     static func makeDefault() async -> SileroSpeechActivityDetector? {
-        guard UserDefaults.standard.bool(forKey: "IsVADEnabled"),
-              (UserDefaults.standard.string(forKey: "RollingBufferVADModel") ?? "silero") == "silero",
+        guard RollingBufferVADSettings.usesSilero(),
               let modelPath = await VADModelManager.shared.getModelPath() else {
             return nil
         }

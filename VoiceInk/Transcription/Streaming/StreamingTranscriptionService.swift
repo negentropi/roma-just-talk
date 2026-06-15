@@ -87,15 +87,22 @@ class StreamingTranscriptionService {
     private var committedSegments: [String] = []
     private let modelContext: ModelContext
     private let fluidAudioService: FluidAudioTranscriptionService?
+    private let fluidAudioStreamingConfig: AgreementConfig?
     private var onPartialTranscript: ((String) -> Void)?
     private let metrics = StreamingMetrics()
     private var stopStartedAt: Date?
     private var firstPartialLogged = false
     private var firstCommitLogged = false
 
-    init(modelContext: ModelContext, fluidAudioService: FluidAudioTranscriptionService? = nil, onPartialTranscript: ((String) -> Void)? = nil) {
+    init(
+        modelContext: ModelContext,
+        fluidAudioService: FluidAudioTranscriptionService? = nil,
+        fluidAudioStreamingConfig: AgreementConfig? = nil,
+        onPartialTranscript: ((String) -> Void)? = nil
+    ) {
         self.modelContext = modelContext
         self.fluidAudioService = fluidAudioService
+        self.fluidAudioStreamingConfig = fluidAudioStreamingConfig
         self.onPartialTranscript = onPartialTranscript
     }
 
@@ -224,7 +231,10 @@ class StreamingTranscriptionService {
             guard let fluidAudioService else {
                 fatalError("FluidAudioTranscriptionService required for FluidAudio streaming. Ensure it is passed to StreamingTranscriptionService.")
             }
-            return FluidAudioStreamingProvider(fluidAudioService: fluidAudioService)
+            return FluidAudioStreamingProvider(
+                fluidAudioService: fluidAudioService,
+                config: fluidAudioStreamingConfig ?? AgreementConfig()
+            )
         }
         guard let cloudProvider = CloudProviderRegistry.provider(for: model.provider),
               let streamingProvider = cloudProvider.makeStreamingProvider(modelContext: modelContext) else {

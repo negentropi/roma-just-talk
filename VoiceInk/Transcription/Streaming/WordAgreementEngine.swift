@@ -34,10 +34,24 @@ struct AgreementConfig {
     var minPassConfidence: Float = 0.15
     // All words in the last 3 positions before a sentence boundary must meet this threshold to be confirmed.
     var minWordConfidence: Float = 0.6
+    // If the latest pre-run pass is this close to the live buffer end, commit can use it directly.
+    var cachedFinalizationMaxLagSeconds: Double = 0.35
+
+    static var rollingPreload: AgreementConfig {
+        AgreementConfig(
+            transcribeIntervalSeconds: 0.35,
+            tokenConfirmationsNeeded: 3,
+            minWordsToConfirm: 5,
+            minPassConfidence: 0.15,
+            minWordConfidence: 0.6,
+            cachedFinalizationMaxLagSeconds: 0.75
+        )
+    }
 }
 
 struct AgreementResult {
     let fullText: String
+    let hypothesisText: String
     let newlyConfirmedText: String
 }
 
@@ -248,6 +262,7 @@ final class WordAgreementEngine {
 
         return AgreementResult(
             fullText: fullText,
+            hypothesisText: hypothesisText,
             newlyConfirmedText: newlyConfirmedText
         )
     }

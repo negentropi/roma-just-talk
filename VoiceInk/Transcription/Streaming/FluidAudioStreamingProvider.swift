@@ -26,13 +26,17 @@ final class FluidAudioStreamingProvider: StreamingTranscriptionProvider {
     private var transcriptionTask: Task<Void, Never>?
     private var isTranscribing = false
     private var lastTranscribedSampleCount = 0
+    private var latestHypothesisText = ""
+    private var latestHypothesisSampleCount = 0
     private let minimumAudioSamples = ASRConstants.minimumRequiredSamples(forSampleRate: ASRConstants.sampleRate)
     private let minNewSamples = ASRConstants.minimumRequiredSamples(forSampleRate: ASRConstants.sampleRate)
+    private let maxCachedFinalizationLagSamples: Int
 
     init(fluidAudioService: FluidAudioTranscriptionService, config: AgreementConfig = AgreementConfig()) {
         self.fluidAudioService = fluidAudioService
         self.config = config
         self.agreementEngine = WordAgreementEngine(config: config)
+        self.maxCachedFinalizationLagSamples = Int((config.cachedFinalizationMaxLagSeconds * 16_000.0).rounded())
 
         var continuation: AsyncStream<StreamingTranscriptionEvent>.Continuation!
         transcriptionEvents = AsyncStream { continuation = $0 }
@@ -58,6 +62,8 @@ final class FluidAudioStreamingProvider: StreamingTranscriptionProvider {
         audioBuffer = []
         trimmedSampleCount = 0
         lastTranscribedSampleCount = 0
+        latestHypothesisText = ""
+        latestHypothesisSampleCount = 0
 
         startTranscriptionLoop()
 
@@ -73,12 +79,19 @@ final class FluidAudioStreamingProvider: StreamingTranscriptionProvider {
     }
 
     func commit() async throws {
+        let commitStartedAt = Date()
         transcriptionTask?.cancel()
         await transcriptionTask?.value
         transcriptionTask = nil
 
-        // Run a clean final ASR pass on the unconfirmed audio portion.
+        if let cachedText = cachedFinalTextIfCurrentEnough() {
+            logger.notice("FluidAudio commit used cached hypothesis elapsed=\(Date().timeIntervalSince(commitStartedAt), format: .fixed(precision: 3), privacy: .public)s chars=\(cachedText.count, privacy: .public)")
+            eventsContinuation?.yield(.committed(text: cachedText))
+            return
+        }
+
         let remainingText = await transcribeRemainingAudio() ?? ""
+        logger.notice("FluidAudio commit ran final ASR elapsed=\(Date().timeIntervalSince(commitStartedAt), format: .fixed(precision: 3), privacy: .public)s chars=\(remainingText.count, privacy: .public)")
         eventsContinuation?.yield(.committed(text: remainingText))
     }
 
@@ -95,6 +108,8 @@ final class FluidAudioStreamingProvider: StreamingTranscriptionProvider {
         bufferLock.lock()
         audioBuffer = []
         trimmedSampleCount = 0
+        latestHypothesisText = ""
+        latestHypothesisSampleCount = 0
         bufferLock.unlock()
         agreementEngine.reset()
 
@@ -169,8 +184,11 @@ final class FluidAudioStreamingProvider: StreamingTranscriptionProvider {
             lastTranscribedSampleCount = absoluteSampleCount
 
             guard let tokenTimings = result.tokenTimings, !tokenTimings.isEmpty else {
-                if !result.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    eventsContinuation?.yield(.partial(text: result.text))
+                let text = TextNormalizer.shared.normalizeSentence(result.text.trimmingCharacters(in: .whitespacesAndNewlines))
+                if !text.isEmpty {
+                    latestHypothesisText = text
+                    latestHypothesisSampleCount = absoluteSampleCount
+                    eventsContinuation?.yield(.partial(text: text))
                 }
                 return
             }
@@ -180,6 +198,8 @@ final class FluidAudioStreamingProvider: StreamingTranscriptionProvider {
             guard !words.isEmpty else { return }
 
             let agreementResult = agreementEngine.processTranscriptionResult(words: words, resultConfidence: result.confidence)
+            latestHypothesisText = TextNormalizer.shared.normalizeSentence(agreementResult.hypothesisText)
+            latestHypothesisSampleCount = absoluteSampleCount
 
             if !agreementResult.newlyConfirmedText.isEmpty {
                 let normalizedConfirmed = TextNormalizer.shared.normalizeSentence(agreementResult.newlyConfirmedText)
@@ -249,6 +269,23 @@ final class FluidAudioStreamingProvider: StreamingTranscriptionProvider {
             logger.error("Final transcription failed: \(error.localizedDescription, privacy: .public)")
             return nil
         }
+    }
+
+    private func cachedFinalTextIfCurrentEnough() -> String? {
+        let cachedText = latestHypothesisText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !cachedText.isEmpty else { return nil }
+
+        bufferLock.lock()
+        let absoluteSampleCount = trimmedSampleCount + audioBuffer.count
+        bufferLock.unlock()
+
+        let pendingSamples = max(0, absoluteSampleCount - latestHypothesisSampleCount)
+        guard pendingSamples <= maxCachedFinalizationLagSamples else {
+            logger.notice("FluidAudio cached hypothesis too stale pendingSamples=\(pendingSamples, privacy: .public) limit=\(self.maxCachedFinalizationLagSamples, privacy: .public)")
+            return nil
+        }
+
+        return cachedText
     }
 
     // MARK: - Audio Conversion

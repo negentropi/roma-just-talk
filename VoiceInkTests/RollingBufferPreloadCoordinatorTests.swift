@@ -188,6 +188,30 @@ struct RollingBufferPreloadCoordinatorTests {
     }
 
     @MainActor
+    @Test func activePreloadFeedsChunksThatArriveBeforeRecordingSessionClaim() async {
+        let model = streamingModel()
+        let session = FakeTranscriptionSession()
+
+        await withStandardRollingDefaults(for: model) { defaults in
+            setPreloadDefaults(defaults, model: model, preRunFinalization: true)
+        } run: {
+            let coordinator = makeCoordinator(model: model, session: session)
+            let triggerChunk = Data(repeating: 1, count: 8_000)
+            let recordingStartChunk = Data(repeating: 2, count: 1_024)
+
+            await coordinator.processRollingChunkForTesting(triggerChunk)
+            coordinator.prepareForRecordingStart()
+            await coordinator.processRollingChunkForTesting(recordingStartChunk)
+
+            let claimed = await coordinator.claimPreloadedSession(for: model)
+
+            #expect(claimed != nil)
+            #expect(session.preparedModelName == model.name)
+            #expect(session.chunks.snapshot().map(\.count) == [8_000, 1_024])
+        }
+    }
+
+    @MainActor
     @Test func fallbackCancelStopsUnclaimedPreload() async {
         let model = streamingModel()
         let session = FakeTranscriptionSession()

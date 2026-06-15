@@ -46,7 +46,7 @@ struct AgreementConfig {
             minWordsToConfirm: 5,
             minPassConfidence: 0.15,
             minWordConfidence: 0.6,
-            cachedFinalizationMaxLagSeconds: 0.75,
+            cachedFinalizationMaxLagSeconds: 0.25,
             runsImmediatePassOnBufferedAudio: true
         )
     }

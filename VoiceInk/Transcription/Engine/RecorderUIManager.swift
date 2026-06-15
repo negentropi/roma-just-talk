@@ -127,7 +127,10 @@ class RecorderUIManager: ObservableObject {
             case .recording:
                 logger.notice("toggleMiniRecorder: stopping recording (was recording)")
                 await engine.toggleRecord(powerModeId: powerModeId)
-            case .starting, .transcribing, .enhancing:
+            case .starting:
+                logger.notice("toggleMiniRecorder: deferring stop while recording starts")
+                await engine.toggleRecord(powerModeId: powerModeId)
+            case .transcribing, .enhancing:
                 logger.notice("toggleMiniRecorder: cancelling active recorder work")
                 await cancelRecording()
             case .idle, .busy:

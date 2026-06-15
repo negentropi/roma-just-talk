@@ -14,6 +14,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
     private var activeRecordingStartID: UUID?
     private var activePipelineTranscriptionID: UUID?
     private var canceledPipelineTranscriptionIDs = Set<UUID>()
+    private var stopRequestedDuringStart = false
 
     let recorder = Recorder()
     var recordedFile: URL? = nil
@@ -93,41 +94,13 @@ class VoiceInkEngine: NSObject, ObservableObject {
         logger.notice("toggleRecord called – state=\(String(describing: self.recordingState), privacy: .public)")
 
         if recordingState == .starting {
-            logger.notice("toggleRecord: cancelling in-flight recording start")
-            await cancelRecording()
+            logger.notice("toggleRecord: deferring stop until in-flight recording start finishes")
+            stopRequestedDuringStart = true
             return
         }
 
         if recordingState == .recording {
-            activeRecordingStartID = nil
-            partialTranscript = ""
-            recordingState = .transcribing
-            await recorder.stopRecording()
-
-            if let recordedFile {
-                if !shouldCancelRecording {
-                    let transcription = makeRecordingTranscription(
-                        for: recordedFile,
-                        text: "",
-                        duration: 0,
-                        transcriptionStatus: .pending
-                    )
-                    modelContext.insert(transcription)
-                    try? modelContext.save()
-                    NotificationCenter.default.post(name: .transcriptionCreated, object: transcription)
-
-                    await runPipeline(on: transcription, audioURL: recordedFile)
-                } else {
-                    await finishActiveRecorderCancellation()
-                }
-            } else {
-                cancelCurrentSession()
-                if !shouldCancelRecording {
-                    logger.error("❌ No recorded file found after stopping recording")
-                }
-                recordingState = .idle
-                await cleanupResources()
-            }
+            await stopRecordingAndRunPipeline()
         } else {
             logger.notice("toggleRecord: entering start-recording branch")
             guard transcriptionModelManager.currentTranscriptionModel != nil else {
@@ -137,6 +110,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
             }
             activePipelineTranscriptionID = nil
             shouldCancelRecording = false
+            stopRequestedDuringStart = false
             partialTranscript = ""
 
             requestRecordPermission { [self] granted in
@@ -172,6 +146,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                                     }
                                     self.recordingState = .idle
                                     self.activeRecordingStartID = nil
+                                    self.stopRequestedDuringStart = false
                                     self.rollingBufferPreloadCoordinator.recordingSessionDidFinish()
                                 }
                                 return
@@ -216,6 +191,15 @@ class VoiceInkEngine: NSObject, ObservableObject {
                                 }
                             }
 
+                            if self.stopRequestedDuringStart,
+                               self.activeRecordingStartID == startID,
+                               self.recordingState == .recording {
+                                self.stopRequestedDuringStart = false
+                                self.logger.notice("toggleRecord: applying deferred stop after recording start")
+                                await self.stopRecordingAndRunPipeline()
+                                return
+                            }
+
                             Task { @MainActor [weak self] in
                                 guard let self else { return }
 
@@ -244,6 +228,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                             self.recordingState = .idle
                             self.recordedFile = nil
                             self.activeRecordingStartID = nil
+                            self.stopRequestedDuringStart = false
                             self.rollingBufferPreloadCoordinator.recordingSessionDidFinish()
                             NotificationManager.shared.showNotification(title: "Recording failed to start", type: .error)
                             self.logger.notice("toggleRecord: calling dismissMiniRecorder from error handler")
@@ -275,6 +260,39 @@ class VoiceInkEngine: NSObject, ObservableObject {
                     }
                 }
             }
+        }
+    }
+
+    private func stopRecordingAndRunPipeline() async {
+        activeRecordingStartID = nil
+        stopRequestedDuringStart = false
+        partialTranscript = ""
+        recordingState = .transcribing
+        await recorder.stopRecording()
+
+        if let recordedFile {
+            if !shouldCancelRecording {
+                let transcription = makeRecordingTranscription(
+                    for: recordedFile,
+                    text: "",
+                    duration: 0,
+                    transcriptionStatus: .pending
+                )
+                modelContext.insert(transcription)
+                try? modelContext.save()
+                NotificationCenter.default.post(name: .transcriptionCreated, object: transcription)
+
+                await runPipeline(on: transcription, audioURL: recordedFile)
+            } else {
+                await finishActiveRecorderCancellation()
+            }
+        } else {
+            cancelCurrentSession()
+            if !shouldCancelRecording {
+                logger.error("❌ No recorded file found after stopping recording")
+            }
+            recordingState = .idle
+            await cleanupResources()
         }
     }
 
@@ -356,6 +374,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
 
     func cancelRecording() async {
         logger.notice("cancelRecording called – state=\(String(describing: self.recordingState), privacy: .public)")
+        stopRequestedDuringStart = false
 
         let shouldFinishSessionImmediately: Bool
         switch recordingState {
@@ -386,6 +405,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
         activePipelineTranscriptionID = nil
         canceledPipelineTranscriptionIDs.removeAll()
         shouldCancelRecording = false
+        stopRequestedDuringStart = false
         partialTranscript = ""
         await recorder.stopRecording()
         recordedFile = nil
@@ -408,6 +428,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
 
     private func finishActiveRecorderCancellation() async {
         activeRecordingStartID = nil
+        stopRequestedDuringStart = false
         await recorder.stopRecording()
         await saveCanceledRecording()
         recordedFile = nil
@@ -502,6 +523,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
     func cleanupResources() async {
         logger.notice("cleanupResources: releasing model resources")
         activeRecordingStartID = nil
+        stopRequestedDuringStart = false
         await whisperModelManager.cleanupResources()
         await serviceRegistry.cleanup()
         logger.notice("cleanupResources: completed")

@@ -726,7 +726,11 @@ final class RecordingShortcutModeHandler {
                 guard canHandleShortcutAction() else { return }
                 await toggleMiniRecorder(powerModeId)
                 return
-            case .idle, .starting:
+            case .starting:
+                guard canHandleShortcutAction() else { return }
+                await toggleMiniRecorder(powerModeId)
+                return
+            case .idle:
                 try? await Task.sleep(nanoseconds: 20_000_000)
             case .transcribing, .enhancing, .busy:
                 return

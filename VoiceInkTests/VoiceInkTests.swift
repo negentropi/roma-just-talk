@@ -432,6 +432,59 @@ struct VoiceInkTests {
         #expect(recordingState == .idle)
     }
 
+    @Test @MainActor func specialModePreloadOnlyRequestsDeferredStopWhileStarting() async throws {
+        SpecialShortcutEmptyTranscriptionFallback.resetForTesting()
+        defer { SpecialShortcutEmptyTranscriptionFallback.resetForTesting() }
+
+        var recordingState = RecordingState.idle
+        var sessionActive = false
+        var toggleCount = 0
+
+        let handler = RecordingShortcutModeHandler(
+            logger: Logger(subsystem: "VoiceInkTests", category: "RecordingShortcutModeHandler"),
+            canHandleShortcutAction: { true },
+            isRecorderVisible: { sessionActive },
+            recordingState: { recordingState },
+            toggleMiniRecorder: { _ in
+                toggleCount += 1
+                if toggleCount == 1 {
+                    recordingState = .starting
+                    sessionActive = true
+                } else {
+                    recordingState = .transcribing
+                    sessionActive = true
+                }
+            },
+            cancelRecording: {
+                recordingState = .idle
+                sessionActive = false
+            }
+        )
+
+        let specialOptions = SpecialShortcutOptions(
+            keyDownBehavior: .preloadOnly,
+            allowsKeyDownOnlyTrigger: true,
+            pasteLastTranscriptOnEmptyTap: true
+        )
+
+        await handler.handleKeyDown(
+            action: .primaryRecording,
+            eventTime: 1,
+            mode: .special,
+            specialOptions: specialOptions
+        )
+
+        await handler.handleKeyUp(
+            action: .primaryRecording,
+            eventTime: 1.6,
+            mode: .special,
+            specialOptions: specialOptions
+        )
+
+        #expect(toggleCount == 2)
+        #expect(recordingState == .transcribing)
+    }
+
     @Test func inputMonitoringPermissionUsesInjectedSystemClient() async throws {
         var didRequestAccess = false
         let client = InputMonitoringPermission.Client(

@@ -4,9 +4,7 @@
 
 ## v1.93 - 2026-06-15
 
-- Moved real-time transcription controls into the main Settings page while keeping them available from model settings.
 - Improved cursor-context capitalization in editors that expose focused text but not an exact Accessibility cursor range.
-- Fixed real-time transcription chunk loss when local VAD briefly missed speech inside an utterance.
 - Made Special shortcuts fail closed when key evidence is unreliable, including secure text entry, held companion keys at Shift release, and very short no-evidence Shift presses, so hidden typing does not start dictation.
 - Removed the Keyboard Shortcut setup card from App Permissions so the page only lists macOS permission grants.
 - Renamed the main sidebar items to home, manual stt, past, models, and style.

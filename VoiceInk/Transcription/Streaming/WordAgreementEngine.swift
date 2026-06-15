@@ -36,6 +36,8 @@ struct AgreementConfig {
     var minWordConfidence: Float = 0.6
     // If the latest pre-run pass is this close to the live buffer end, commit can use it directly.
     var cachedFinalizationMaxLagSeconds: Double = 0.35
+    // Rolling preload should start ASR as soon as enough lead-in audio is buffered.
+    var runsImmediatePassOnBufferedAudio: Bool = false
 
     static var rollingPreload: AgreementConfig {
         AgreementConfig(
@@ -44,7 +46,8 @@ struct AgreementConfig {
             minWordsToConfirm: 5,
             minPassConfidence: 0.15,
             minWordConfidence: 0.6,
-            cachedFinalizationMaxLagSeconds: 0.75
+            cachedFinalizationMaxLagSeconds: 0.75,
+            runsImmediatePassOnBufferedAudio: true
         )
     }
 }

@@ -24,8 +24,10 @@ final class FluidAudioStreamingProvider: StreamingTranscriptionProvider {
     private let config: AgreementConfig
 
     private var transcriptionTask: Task<Void, Never>?
+    private var immediateTranscriptionTask: Task<Void, Never>?
     private var isTranscribing = false
     private var lastTranscribedSampleCount = 0
+    private var lastImmediatePassScheduledSampleCount = 0
     private var latestHypothesisText = ""
     private var latestHypothesisSampleCount = 0
     private let minimumAudioSamples = ASRConstants.minimumRequiredSamples(forSampleRate: ASRConstants.sampleRate)
@@ -45,6 +47,7 @@ final class FluidAudioStreamingProvider: StreamingTranscriptionProvider {
 
     deinit {
         transcriptionTask?.cancel()
+        immediateTranscriptionTask?.cancel()
         eventsContinuation?.finish()
     }
 
@@ -62,6 +65,7 @@ final class FluidAudioStreamingProvider: StreamingTranscriptionProvider {
         audioBuffer = []
         trimmedSampleCount = 0
         lastTranscribedSampleCount = 0
+        lastImmediatePassScheduledSampleCount = 0
         latestHypothesisText = ""
         latestHypothesisSampleCount = 0
 
@@ -73,9 +77,25 @@ final class FluidAudioStreamingProvider: StreamingTranscriptionProvider {
 
     func sendAudioChunk(_ data: Data) async throws {
         let samples = Self.convertToFloat32(data)
+        let shouldRunImmediatePass: Bool
         bufferLock.lock()
         audioBuffer.append(contentsOf: samples)
+        let absoluteSampleCount = trimmedSampleCount + audioBuffer.count
+        shouldRunImmediatePass = config.runsImmediatePassOnBufferedAudio &&
+            immediateTranscriptionTask == nil &&
+            absoluteSampleCount >= minimumAudioSamples &&
+            absoluteSampleCount - lastImmediatePassScheduledSampleCount >= minNewSamples
+        if shouldRunImmediatePass {
+            lastImmediatePassScheduledSampleCount = absoluteSampleCount
+        }
         bufferLock.unlock()
+
+        if shouldRunImmediatePass {
+            immediateTranscriptionTask = Task { [weak self] in
+                await self?.runTranscriptionPass()
+                self?.immediateTranscriptionTask = nil
+            }
+        }
     }
 
     func commit() async throws {
@@ -83,6 +103,8 @@ final class FluidAudioStreamingProvider: StreamingTranscriptionProvider {
         transcriptionTask?.cancel()
         await transcriptionTask?.value
         transcriptionTask = nil
+        await immediateTranscriptionTask?.value
+        immediateTranscriptionTask = nil
 
         if let cachedText = cachedFinalTextIfCurrentEnough() {
             logger.notice("FluidAudio commit used cached hypothesis elapsed=\(Date().timeIntervalSince(commitStartedAt), format: .fixed(precision: 3), privacy: .public)s chars=\(cachedText.count, privacy: .public)")
@@ -99,6 +121,9 @@ final class FluidAudioStreamingProvider: StreamingTranscriptionProvider {
         transcriptionTask?.cancel()
         await transcriptionTask?.value
         transcriptionTask = nil
+        immediateTranscriptionTask?.cancel()
+        await immediateTranscriptionTask?.value
+        immediateTranscriptionTask = nil
 
         await asrManager?.cleanup()
         asrManager = nil
@@ -108,6 +133,7 @@ final class FluidAudioStreamingProvider: StreamingTranscriptionProvider {
         bufferLock.lock()
         audioBuffer = []
         trimmedSampleCount = 0
+        lastImmediatePassScheduledSampleCount = 0
         latestHypothesisText = ""
         latestHypothesisSampleCount = 0
         bufferLock.unlock()

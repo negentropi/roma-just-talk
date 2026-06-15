@@ -89,7 +89,7 @@ struct RollingBufferPreloadSettingsControls: View {
                     "Battery cutoff: \(lowBatteryThresholdPercent)%",
                     value: $lowBatteryThresholdPercent,
                     in: 1...100,
-                    step: 5
+                    step: 1
                 )
                 .onChange(of: lowBatteryThresholdPercent) { _, _ in notifySettingsChanged() }
             }

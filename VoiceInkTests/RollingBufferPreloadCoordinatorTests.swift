@@ -115,6 +115,7 @@ private final class DelayedFakeTranscriptionSession: TranscriptionSession {
     private var prepareContinuation: CheckedContinuation<Void, Never>?
     private var didStartPrepare = false
     private(set) var preparedModelName: String?
+    private(set) var cancelCount = 0
 
     func prepare(model: any TranscriptionModel) async throws -> ((Data) -> Void)? {
         preparedModelName = model.name
@@ -147,7 +148,9 @@ private final class DelayedFakeTranscriptionSession: TranscriptionSession {
         "fake transcript"
     }
 
-    func cancel() {}
+    func cancel() {
+        cancelCount += 1
+    }
 }
 
 struct RollingBufferPreloadCoordinatorTests {
@@ -228,6 +231,39 @@ struct RollingBufferPreloadCoordinatorTests {
     }
 
     @MainActor
+    @Test func staleStartingPreloadDoesNotBecomeClaimableAfterLanguageChange() async {
+        let model = streamingModel()
+        let session = DelayedFakeTranscriptionSession()
+        var selectedLanguage = "en"
+
+        await withStandardRollingDefaults(for: model) { defaults in
+            setPreloadDefaults(defaults, model: model, preRunFinalization: true)
+        } run: {
+            let coordinator = makeCoordinator(
+                model: model,
+                session: session,
+                currentLanguageProvider: { selectedLanguage }
+            )
+
+            let triggerTask = Task {
+                await coordinator.processRollingChunkForTesting(Data(repeating: 1, count: 8_000))
+            }
+
+            await session.waitForPrepareToStart()
+            selectedLanguage = "de"
+
+            let staleClaim = await coordinator.claimPreloadedSession(for: model)
+            session.finishPrepare()
+            await triggerTask.value
+            let laterClaim = await coordinator.claimPreloadedSession(for: model)
+
+            #expect(staleClaim == nil)
+            #expect(laterClaim == nil)
+            #expect(session.cancelCount == 1)
+        }
+    }
+
+    @MainActor
     @Test func activePreloadFeedsChunksThatArriveBeforeRecordingSessionClaim() async {
         let model = streamingModel()
         let session = FakeTranscriptionSession()
@@ -248,6 +284,31 @@ struct RollingBufferPreloadCoordinatorTests {
             #expect(claimed != nil)
             #expect(session.preparedModelName == model.name)
             #expect(session.chunks.snapshot().map(\.count) == [8_000, 1_024])
+        }
+    }
+
+    @MainActor
+    @Test func claimCancelsPreloadStartedForPreviousLanguage() async {
+        let model = streamingModel()
+        let session = FakeTranscriptionSession()
+        var selectedLanguage = "en"
+
+        await withStandardRollingDefaults(for: model) { defaults in
+            setPreloadDefaults(defaults, model: model, preRunFinalization: true)
+        } run: {
+            let coordinator = makeCoordinator(
+                model: model,
+                session: session,
+                currentLanguageProvider: { selectedLanguage }
+            )
+
+            await coordinator.processRollingChunkForTesting(Data(repeating: 1, count: 8_000))
+            selectedLanguage = "de"
+
+            let claimed = await coordinator.claimPreloadedSession(for: model)
+
+            #expect(claimed == nil)
+            #expect(session.cancelCount == 1)
         }
     }
 
@@ -452,6 +513,7 @@ struct RollingBufferPreloadCoordinatorTests {
     private func makeCoordinator(
         model: TestPreloadModel,
         session: FakeTranscriptionSession,
+        currentLanguageProvider: @escaping RollingBufferPreloadCoordinator.CurrentLanguageProvider = { "en" },
         powerStateProvider: any RollingBufferPowerStateProviding = FixedPowerStateProvider(
             state: RollingBufferPowerState(isOnBattery: false, batteryLevelPercent: nil)
         ),
@@ -460,6 +522,7 @@ struct RollingBufferPreloadCoordinatorTests {
     ) -> RollingBufferPreloadCoordinator {
         RollingBufferPreloadCoordinator(
             currentModelProvider: { model },
+            currentLanguageProvider: currentLanguageProvider,
             powerStateProvider: powerStateProvider,
             detectorProvider: detectorProvider ?? { detector },
             sessionFactory: { _, _ in session }
@@ -479,6 +542,7 @@ struct RollingBufferPreloadCoordinatorTests {
     private func makeCoordinator(
         model: TestPreloadModel,
         session: DelayedFakeTranscriptionSession,
+        currentLanguageProvider: @escaping RollingBufferPreloadCoordinator.CurrentLanguageProvider = { "en" },
         powerStateProvider: any RollingBufferPowerStateProviding = FixedPowerStateProvider(
             state: RollingBufferPowerState(isOnBattery: false, batteryLevelPercent: nil)
         ),
@@ -486,6 +550,7 @@ struct RollingBufferPreloadCoordinatorTests {
     ) -> RollingBufferPreloadCoordinator {
         RollingBufferPreloadCoordinator(
             currentModelProvider: { model },
+            currentLanguageProvider: currentLanguageProvider,
             powerStateProvider: powerStateProvider,
             detectorProvider: { detector },
             sessionFactory: { _, _ in session }

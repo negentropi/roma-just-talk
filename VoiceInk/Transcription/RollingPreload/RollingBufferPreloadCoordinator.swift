@@ -4,6 +4,7 @@ import os
 struct RollingBufferPreloadedSession {
     let session: TranscriptionSession
     let audioChunkHandler: (Data) -> Void
+    let language: String?
 }
 
 private final class RollingBufferChunkSource: @unchecked Sendable {
@@ -82,6 +83,7 @@ private struct RollingChunkBuffer {
 @MainActor
 final class RollingBufferPreloadCoordinator {
     typealias CurrentModelProvider = @MainActor () -> (any TranscriptionModel)?
+    typealias CurrentLanguageProvider = @MainActor () -> String?
     typealias DetectorProvider = @Sendable () async -> (any SpeechActivityDetecting)?
     typealias SessionFactory = @MainActor (any TranscriptionModel, @escaping (String) -> Void) -> TranscriptionSession
     static let startingPreloadClaimWaitNanoseconds: UInt64 = 150_000_000
@@ -95,9 +97,11 @@ final class RollingBufferPreloadCoordinator {
 
     private struct Plan {
         let model: any TranscriptionModel
+        let language: String?
     }
 
     private let currentModelProvider: CurrentModelProvider
+    private let currentLanguageProvider: CurrentLanguageProvider
     private let detectorProvider: DetectorProvider
     private let sessionFactory: SessionFactory
     private let powerStateProvider: any RollingBufferPowerStateProviding
@@ -111,6 +115,7 @@ final class RollingBufferPreloadCoordinator {
     private var configuration = RollingBufferPreloadSettings.configuration()
     private var cachedPlan: Plan?
     private var cachedPlanModelName: String?
+    private var cachedPlanLanguage: String?
     private var cachedPlanExpiresAt = Date.distantPast
     private var state: State = .idle
     private var recordingInProgress = false
@@ -119,6 +124,7 @@ final class RollingBufferPreloadCoordinator {
     private var currentSession: TranscriptionSession?
     private var currentCallback: ((Data) -> Void)?
     private var currentModelName: String?
+    private var currentLanguage: String?
     private var speechDetectedAt: Date?
     private var preloadStartedAt: Date?
     private var observedChunks = 0
@@ -141,6 +147,9 @@ final class RollingBufferPreloadCoordinator {
         self.currentModelProvider = { [weak transcriptionModelManager] in
             transcriptionModelManager?.currentTranscriptionModel
         }
+        self.currentLanguageProvider = {
+            UserDefaults.standard.string(forKey: "SelectedLanguage")
+        }
         self.detectorProvider = detectorProvider
         self.sessionFactory = { model, partialTranscriptHandler in
             serviceRegistry.createSession(
@@ -157,11 +166,15 @@ final class RollingBufferPreloadCoordinator {
 
     init(
         currentModelProvider: @escaping CurrentModelProvider,
+        currentLanguageProvider: @escaping CurrentLanguageProvider = {
+            UserDefaults.standard.string(forKey: "SelectedLanguage")
+        },
         powerStateProvider: any RollingBufferPowerStateProviding,
         detectorProvider: @escaping DetectorProvider,
         sessionFactory: @escaping SessionFactory
     ) {
         self.currentModelProvider = currentModelProvider
+        self.currentLanguageProvider = currentLanguageProvider
         self.detectorProvider = detectorProvider
         self.sessionFactory = sessionFactory
         self.powerStateProvider = powerStateProvider
@@ -199,8 +212,13 @@ final class RollingBufferPreloadCoordinator {
     }
 
     func claimPreloadedSession(for model: any TranscriptionModel) async -> RollingBufferPreloadedSession? {
+        let selectedLanguage = currentLanguageProvider()
         guard currentModelName == model.name,
+              currentLanguage == selectedLanguage,
               configuration.preRunFinalization else {
+            if currentSession != nil || state == .starting || state == .active {
+                resetPreloadState(cancelSession: true, keepLeadIn: false)
+            }
             return nil
         }
 
@@ -218,12 +236,13 @@ final class RollingBufferPreloadCoordinator {
         currentSession = nil
         currentCallback = nil
         currentModelName = nil
+        currentLanguage = nil
         vadWindow.removeAll(keepingCapacity: true)
         leadInBuffer.removeAll()
         let triggerElapsed = speechDetectedAt.map { Date().timeIntervalSince($0) } ?? -1
         let startupElapsed = preloadStartedAt.map { Date().timeIntervalSince($0) } ?? -1
         logger.notice("Claimed rolling preload session model=\(model.displayName, privacy: .public) triggerElapsed=\(triggerElapsed, format: .fixed(precision: 3), privacy: .public)s startupElapsed=\(startupElapsed, format: .fixed(precision: 3), privacy: .public)s preloadedChunks=\(self.preloadedChunks, privacy: .public) preloadedBytes=\(self.preloadedBytes, privacy: .public)")
-        return RollingBufferPreloadedSession(session: session, audioChunkHandler: callback)
+        return RollingBufferPreloadedSession(session: session, audioChunkHandler: callback, language: selectedLanguage)
     }
 
     func cancelUnclaimedPreload(reason: String) {
@@ -255,8 +274,10 @@ final class RollingBufferPreloadCoordinator {
 
         leadInBuffer.updateMaxBytes(Self.bytes(forDuration: configuration.bufferDurationSeconds))
 
+        let selectedModelName = currentModelProvider()?.name
+        let selectedLanguage = currentLanguageProvider()
         if let currentModelName,
-           currentModelName != currentModelProvider()?.name {
+           currentModelName != selectedModelName || currentLanguage != selectedLanguage {
             resetPreloadState(cancelSession: true, keepLeadIn: false)
         }
 
@@ -286,7 +307,11 @@ final class RollingBufferPreloadCoordinator {
         vadWindow.removeAll(keepingCapacity: true)
         vadWindowsChecked += 1
 
-        guard let plan = currentPlan(for: currentModel, configuration: configuration) else {
+        guard let plan = currentPlan(
+            for: currentModel,
+            language: selectedLanguage,
+            configuration: configuration
+        ) else {
             return
         }
 
@@ -307,29 +332,32 @@ final class RollingBufferPreloadCoordinator {
 
     private func currentPlan(
         for model: any TranscriptionModel,
+        language: String?,
         configuration: RollingBufferPreloadConfiguration
     ) -> Plan? {
         let now = Date()
-        if cachedPlanModelName == model.name, now < cachedPlanExpiresAt {
+        if cachedPlanModelName == model.name,
+           cachedPlanLanguage == language,
+           now < cachedPlanExpiresAt {
             return cachedPlan
         }
 
         if configuration.mode == .off || !configuration.preRunFinalization || !model.supportsStreaming {
-            return cachePlan(nil, for: model.name, now: now)
+            return cachePlan(nil, for: model.name, language: language, now: now)
         }
 
         let perModelEnabled = RollingBufferPreloadSettings.perModelPreloadEnabled(for: model)
         guard perModelEnabled else {
-            return cachePlan(nil, for: model.name, now: now)
+            return cachePlan(nil, for: model.name, language: language, now: now)
         }
 
         if configuration.mode == .auto,
            configuration.autoDisablesCloudModels,
            model.provider.isCloudTranscriptionProvider {
-            return cachePlan(nil, for: model.name, now: now)
+            return cachePlan(nil, for: model.name, language: language, now: now)
         }
 
-        return cachePlan(Plan(model: model), for: model.name, now: now)
+        return cachePlan(Plan(model: model, language: language), for: model.name, language: language, now: now)
     }
 
     private func allowsPreloadAfterSpeech(
@@ -351,9 +379,10 @@ final class RollingBufferPreloadCoordinator {
         )
     }
 
-    private func cachePlan(_ plan: Plan?, for modelName: String, now: Date) -> Plan? {
+    private func cachePlan(_ plan: Plan?, for modelName: String, language: String?, now: Date) -> Plan? {
         cachedPlan = plan
         cachedPlanModelName = modelName
+        cachedPlanLanguage = language
         cachedPlanExpiresAt = now.addingTimeInterval(planRefreshInterval)
         return plan
     }
@@ -389,6 +418,7 @@ final class RollingBufferPreloadCoordinator {
         guard state == .idle else { return }
         state = .starting
         currentModelName = plan.model.name
+        currentLanguage = plan.language
         preloadStartedAt = Date()
 
         let session = sessionFactory(
@@ -408,6 +438,14 @@ final class RollingBufferPreloadCoordinator {
             guard let callback = try await session.prepare(model: plan.model) else {
                 state = .idle
                 currentModelName = nil
+                currentLanguage = nil
+                return
+            }
+
+            guard state == .starting,
+                  currentModelName == plan.model.name,
+                  currentLanguage == plan.language else {
+                session.cancel()
                 return
             }
 
@@ -445,6 +483,7 @@ final class RollingBufferPreloadCoordinator {
         currentSession = nil
         currentCallback = nil
         currentModelName = nil
+        currentLanguage = nil
         speechDetectedAt = nil
         preloadStartedAt = nil
         observedChunks = 0
@@ -464,6 +503,7 @@ final class RollingBufferPreloadCoordinator {
     private func invalidateCachedPlan() {
         cachedPlan = nil
         cachedPlanModelName = nil
+        cachedPlanLanguage = nil
         cachedPlanExpiresAt = .distantPast
     }
 

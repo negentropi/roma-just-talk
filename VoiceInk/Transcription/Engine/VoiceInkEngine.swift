@@ -171,7 +171,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                                 claimedPreload = RollingBufferPreloadClaim(
                                     preloaded: preloaded,
                                     modelName: model.name,
-                                    language: UserDefaults.standard.string(forKey: "SelectedLanguage")
+                                    language: preloaded.language
                                 )
                                 self.currentSession = preloaded.session
                                 self.recorder.onAudioChunk = { data in

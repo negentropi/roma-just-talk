@@ -238,16 +238,29 @@ final class CoreAudioRecorder: @unchecked Sendable {
         logger.notice("🎙️ Starting recording from device \(deviceID, privacy: .public)")
 
         recordingURL = url
-        try createOutputFile(at: url)
+        let fileRef = try createOutputFile(at: url)
 
-        let preRollData = preRollBuffer.snapshotData()
-        if !preRollData.isEmpty {
-            try writePCMDataToFile(preRollData)
-            emitPreRollDataToStreaming(preRollData)
-            logger.notice("🎙️ Wrote pre-roll buffer bytes=\(preRollData.count, privacy: .public)")
+        var preRollData = Data()
+        fileAccessLock.lock()
+        do {
+            audioFile = fileRef
+            preRollData = preRollBuffer.snapshotData()
+            if !preRollData.isEmpty {
+                try writePCMDataToFile(preRollData)
+                emitPreRollDataToStreaming(preRollData)
+            }
+            isRecording = true
+            fileAccessLock.unlock()
+        } catch {
+            audioFile = nil
+            fileAccessLock.unlock()
+            ExtAudioFileDispose(fileRef)
+            throw error
         }
 
-        isRecording = true
+        if !preRollData.isEmpty {
+            logger.notice("🎙️ Wrote pre-roll buffer bytes=\(preRollData.count, privacy: .public)")
+        }
     }
 
     /// Finishes the WAV file while leaving the AudioUnit open so the next hotkey has pre-roll.
@@ -639,7 +652,7 @@ final class CoreAudioRecorder: @unchecked Sendable {
         }
     }
 
-    private func createOutputFile(at url: URL) throws {
+    private func createOutputFile(at url: URL) throws -> ExtAudioFileRef {
         // Remove existing file if any
         if FileManager.default.fileExists(atPath: url.path) {
             try FileManager.default.removeItem(at: url)
@@ -661,11 +674,14 @@ final class CoreAudioRecorder: @unchecked Sendable {
             throw CoreAudioRecorderError.failedToCreateFile(status: status)
         }
 
-        audioFile = fileRef
+        guard let fileRef else {
+            logger.error("Failed to create audio file at \(url.path, privacy: .public): missing file reference")
+            throw CoreAudioRecorderError.failedToCreateFile(status: -1)
+        }
 
         // Set client format (what we'll write)
         status = ExtAudioFileSetProperty(
-            fileRef!,
+            fileRef,
             kExtAudioFileProperty_ClientDataFormat,
             UInt32(MemoryLayout<AudioStreamBasicDescription>.size),
             &outputFormat
@@ -673,8 +689,11 @@ final class CoreAudioRecorder: @unchecked Sendable {
 
         if status != noErr {
             logger.error("Failed to set file format: \(status, privacy: .public)")
+            ExtAudioFileDispose(fileRef)
             throw CoreAudioRecorderError.failedToSetFileFormat(status: status)
         }
+
+        return fileRef
     }
 
     private func startAudioUnit() throws {

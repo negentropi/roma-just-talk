@@ -57,6 +57,17 @@ struct VoiceInkTests {
         #expect(result == "API response")
     }
 
+    @Test func contextualCapitalizationSkipsCursorContextWhenTextCannotChange() async throws {
+        #expect(ContextualCapitalizationFormatter.needsCursorContext("API response") == false)
+        #expect(ContextualCapitalizationFormatter.needsCursorContext("iPhone setup") == false)
+        #expect(ContextualCapitalizationFormatter.needsCursorContext("1234") == false)
+    }
+
+    @Test func contextualCapitalizationReadsCursorContextWhenTextCanChange() async throws {
+        #expect(ContextualCapitalizationFormatter.needsCursorContext("Model output") == true)
+        #expect(ContextualCapitalizationFormatter.needsCursorContext("model output") == true)
+    }
+
     @Test func resolvesAPIKeyEnvironmentReference() async throws {
         let environment = ["ELEVENLABS_API_KEY": "test-key"]
 

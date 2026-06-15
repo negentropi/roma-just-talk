@@ -114,6 +114,10 @@ class LastTranscriptionService: ObservableObject {
             return text
         }
 
+        guard ContextualCapitalizationFormatter.needsCursorContext(text) else {
+            return text
+        }
+
         return ContextualCapitalizationFormatter.format(
             text,
             beforeCursor: CursorTextContextReader.textBeforeCursor()

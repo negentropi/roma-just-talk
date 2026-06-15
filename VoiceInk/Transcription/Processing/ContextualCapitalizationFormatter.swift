@@ -1,6 +1,18 @@
 import Foundation
 
 enum ContextualCapitalizationFormatter {
+    static func needsCursorContext(_ text: String) -> Bool {
+        guard let firstCasedRange = firstCasedCharacterRange(in: text) else {
+            return false
+        }
+
+        let firstWord = word(in: text, startingAt: firstCasedRange.lowerBound)
+        guard !firstWord.isEmpty else { return false }
+
+        return shouldUppercaseFirstCasedCharacter(in: firstWord) ||
+            shouldLowercaseFirstCasedCharacter(in: firstWord)
+    }
+
     static func format(_ text: String, beforeCursor: String?) -> String {
         guard let beforeCursor,
               let firstCasedRange = firstCasedCharacterRange(in: text) else {

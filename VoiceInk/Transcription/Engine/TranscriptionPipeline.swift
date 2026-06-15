@@ -218,7 +218,8 @@ class TranscriptionPipeline {
         } else if var textToPaste = finalPastedText,
            transcription.transcriptionStatus == TranscriptionStatus.completed.rawValue {
             let shouldLowercase = UserDefaults.standard.bool(forKey: "LowercaseTranscription")
-            if !shouldLowercase {
+            if !shouldLowercase,
+               ContextualCapitalizationFormatter.needsCursorContext(textToPaste) {
                 textToPaste = ContextualCapitalizationFormatter.format(
                     textToPaste,
                     beforeCursor: CursorTextContextReader.textBeforeCursor()

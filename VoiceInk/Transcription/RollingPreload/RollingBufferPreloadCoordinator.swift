@@ -288,6 +288,11 @@ final class RollingBufferPreloadCoordinator {
             return
         }
 
+        guard allowsPreloadAfterSpeech(for: plan.model, configuration: configuration) else {
+            logger.notice("Skipping rolling preload after VAD trigger because Auto policy currently disallows it")
+            return
+        }
+
         speechDetectedAt = Date()
         logger.notice("Rolling preload VAD trigger model=\(plan.model.displayName, privacy: .public) leadInChunks=\(self.leadInBuffer.count, privacy: .public) leadInBytes=\(self.leadInBuffer.bytes, privacy: .public) observedChunks=\(self.observedChunks, privacy: .public) observedBytes=\(self.observedBytes, privacy: .public) vadWindows=\(self.vadWindowsChecked, privacy: .public)")
         await startPreload(with: plan)
@@ -311,18 +316,32 @@ final class RollingBufferPreloadCoordinator {
             return cachePlan(nil, for: model.name, now: now)
         }
 
-        let powerState = configuration.mode == .auto
-            ? powerStateProvider.currentPowerState()
-            : RollingBufferPowerState(isOnBattery: false, batteryLevelPercent: nil)
-        let allowed = RollingBufferPreloadPolicy(
+        if configuration.mode == .auto,
+           configuration.autoDisablesCloudModels,
+           model.provider.isCloudTranscriptionProvider {
+            return cachePlan(nil, for: model.name, now: now)
+        }
+
+        return cachePlan(Plan(model: model), for: model.name, now: now)
+    }
+
+    private func allowsPreloadAfterSpeech(
+        for model: any TranscriptionModel,
+        configuration: RollingBufferPreloadConfiguration
+    ) -> Bool {
+        guard configuration.mode == .auto,
+              configuration.autoDisablesLowBatteryLocalModels,
+              model.provider.isLocalTranscriptionProvider else {
+            return true
+        }
+
+        return RollingBufferPreloadPolicy(
             configuration: configuration,
-            powerState: powerState
+            powerState: powerStateProvider.currentPowerState()
         ).allowsPreload(
             for: model,
             perModelEnabled: true
         )
-
-        return cachePlan(allowed ? Plan(model: model) : nil, for: model.name, now: now)
     }
 
     private func cachePlan(_ plan: Plan?, for modelName: String, now: Date) -> Plan? {

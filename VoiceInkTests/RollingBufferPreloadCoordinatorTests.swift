@@ -281,7 +281,7 @@ struct RollingBufferPreloadCoordinatorTests {
     }
 
     @MainActor
-    @Test func policyPlanIsCachedAcrossVadWindows() async {
+    @Test func powerStateIsNotPolledForNonSpeechVadWindows() async {
         let model = streamingModel()
         let session = FakeTranscriptionSession()
         let powerStateProvider = CountingPowerStateProvider(
@@ -300,6 +300,34 @@ struct RollingBufferPreloadCoordinatorTests {
             )
 
             await coordinator.processRollingChunkForTesting(Data(repeating: 1, count: 8_000))
+            await coordinator.processRollingChunkForTesting(Data(repeating: 1, count: 8_000))
+
+            #expect(powerStateProvider.callCount == 0)
+            #expect(session.chunks.snapshot().isEmpty)
+        }
+    }
+
+    @MainActor
+    @Test func lowBatteryAutoPolicyIsEvaluatedAfterSpeechDetection() async {
+        let model = streamingModel()
+        let session = FakeTranscriptionSession()
+        let powerStateProvider = CountingPowerStateProvider(
+            state: RollingBufferPowerState(isOnBattery: true, batteryLevelPercent: 10)
+        )
+
+        await withStandardRollingDefaults(for: model) { defaults in
+            setPreloadDefaults(defaults, model: model, preRunFinalization: true)
+            defaults.set(RollingBufferPreloadMode.auto.rawValue, forKey: RollingBufferPreloadSettings.modeKey)
+            defaults.set(true, forKey: RollingBufferPreloadSettings.autoDisableLowBatteryLocalModelsKey)
+            defaults.set(40, forKey: RollingBufferPreloadSettings.lowBatteryThresholdPercentKey)
+        } run: {
+            let coordinator = makeCoordinator(
+                model: model,
+                session: session,
+                powerStateProvider: powerStateProvider,
+                detector: FakeSpeechDetector(containsSpeech: true)
+            )
+
             await coordinator.processRollingChunkForTesting(Data(repeating: 1, count: 8_000))
 
             #expect(powerStateProvider.callCount == 1)

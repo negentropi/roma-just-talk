@@ -10,6 +10,7 @@
 - Removed the fixed pre-paste delay after verified clipboard writes so completed text posts to the cursor sooner.
 - Skipped cursor-context Accessibility reads when capitalization logic can prove the output text cannot change.
 - Reduced the fixed autosend wait after paste from 500ms to 120ms while keeping a short guard before Return is posted.
+- Moved Auto low-battery checks for rolling buffer preload to after local VAD detects speech, keeping silence cheaper and battery decisions current at preload start.
 
 ## v1.93 - 2026-06-15
 

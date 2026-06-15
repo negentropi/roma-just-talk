@@ -36,6 +36,7 @@ enum RollingBufferPreloadSettings {
     static let lowBatteryThresholdPercentKey = "RollingBufferPreloadLowBatteryThresholdPercent"
     static let bufferDurationSecondsKey = "RollingBufferDurationSeconds"
     static let preRunFinalizationKey = "RollingBufferPreloadFinalization"
+    static let perModelEnabledKeyPrefix = "rolling-buffer-preload-enabled-"
 
     static let defaultMode: RollingBufferPreloadMode = .auto
     static let defaultAutoDisablesCloudModels = false
@@ -70,7 +71,11 @@ enum RollingBufferPreloadSettings {
     }
 
     static func perModelPreloadEnabled(for model: any TranscriptionModel, in defaults: UserDefaults = .standard) -> Bool {
-        defaults.object(forKey: "rolling-buffer-preload-enabled-\(model.name)") as? Bool ?? true
+        defaults.object(forKey: perModelPreloadEnabledKey(forModelName: model.name)) as? Bool ?? true
+    }
+
+    static func perModelPreloadEnabledKey(forModelName modelName: String) -> String {
+        "\(perModelEnabledKeyPrefix)\(modelName)"
     }
 }
 

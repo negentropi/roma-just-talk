@@ -249,6 +249,15 @@ enum BackupImporter {
             UserDefaults.standard.set(vadModel, forKey: RollingBufferVADSettings.modelKey)
             didImportRollingBufferSetting = true
         }
+        if let perModelSettings = general.rollingBufferPreloadEnabledByModel {
+            for (modelName, enabled) in perModelSettings where !modelName.isEmpty {
+                UserDefaults.standard.set(
+                    enabled,
+                    forKey: RollingBufferPreloadSettings.perModelPreloadEnabledKey(forModelName: modelName)
+                )
+            }
+            didImportRollingBufferSetting = didImportRollingBufferSetting || !perModelSettings.isEmpty
+        }
 
         if didImportRollingBufferSetting {
             NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)

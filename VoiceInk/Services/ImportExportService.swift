@@ -153,6 +153,7 @@ class ImportExportService {
 
         let punctuationCleanupMode = PunctuationCleanupMode.current()
         let rollingBufferConfiguration = RollingBufferPreloadSettings.configuration()
+        let perModelPreloadSettings = exportPerModelRollingBufferPreloadSettings()
         let generalSettingsToExport = GeneralBackup(
             primaryRecordingShortcut: ShortcutStore.shortcut(for: .primaryRecording).map(ShortcutBackup.init),
             secondaryRecordingShortcut: ShortcutStore.shortcut(for: .secondaryRecording).map(ShortcutBackup.init),
@@ -197,7 +198,8 @@ class ImportExportService {
             rollingBufferPreloadLowBatteryThresholdPercent: rollingBufferConfiguration.lowBatteryThresholdPercent,
             rollingBufferDurationSeconds: rollingBufferConfiguration.bufferDurationSeconds,
             rollingBufferPreloadFinalization: rollingBufferConfiguration.preRunFinalization,
-            rollingBufferVADModel: RollingBufferVADSettings.selectedModel()
+            rollingBufferVADModel: RollingBufferVADSettings.selectedModel(),
+            rollingBufferPreloadEnabledByModel: perModelPreloadSettings.isEmpty ? nil : perModelPreloadSettings
         )
 
         let exportedSettings = BackupFile(
@@ -336,6 +338,20 @@ class ImportExportService {
 
     private func needsAPIKeyReminder(for categories: Set<BackupCategory>) -> Bool {
         !categories.isDisjoint(with: [.prompts, .powerMode, .customModels])
+    }
+
+    private func exportPerModelRollingBufferPreloadSettings() -> [String: Bool] {
+        let prefix = RollingBufferPreloadSettings.perModelEnabledKeyPrefix
+        return UserDefaults.standard.dictionaryRepresentation().reduce(into: [:]) { result, entry in
+            guard entry.key.hasPrefix(prefix),
+                  let enabled = entry.value as? Bool else {
+                return
+            }
+
+            let modelName = String(entry.key.dropFirst(prefix.count))
+            guard !modelName.isEmpty else { return }
+            result[modelName] = enabled
+        }
     }
 
     private func showAlert(title: String, message: String) {

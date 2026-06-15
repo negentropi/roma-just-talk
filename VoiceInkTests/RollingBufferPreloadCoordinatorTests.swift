@@ -481,7 +481,7 @@ struct RollingBufferPreloadCoordinatorTests {
         defaults.set(RollingBufferPreloadMode.on.rawValue, forKey: RollingBufferPreloadSettings.modeKey)
         defaults.set(3.0, forKey: RollingBufferPreloadSettings.bufferDurationSecondsKey)
         defaults.set(preRunFinalization, forKey: RollingBufferPreloadSettings.preRunFinalizationKey)
-        defaults.set(true, forKey: "rolling-buffer-preload-enabled-\(model.name)")
+        defaults.set(true, forKey: RollingBufferPreloadSettings.perModelPreloadEnabledKey(forModelName: model.name))
     }
 
     private func withStandardRollingDefaults(
@@ -497,7 +497,7 @@ struct RollingBufferPreloadCoordinatorTests {
             RollingBufferPreloadSettings.lowBatteryThresholdPercentKey,
             RollingBufferPreloadSettings.bufferDurationSecondsKey,
             RollingBufferPreloadSettings.preRunFinalizationKey,
-            "rolling-buffer-preload-enabled-\(model.name)"
+            RollingBufferPreloadSettings.perModelPreloadEnabledKey(forModelName: model.name)
         ]
         let savedValues: [(String, Any?)] = keys.map { key in
             (key, defaults.object(forKey: key))

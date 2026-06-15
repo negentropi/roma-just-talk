@@ -111,6 +111,7 @@ struct GeneralBackup: Codable {
     let rollingBufferDurationSeconds: Double?
     let rollingBufferPreloadFinalization: Bool?
     let rollingBufferVADModel: String?
+    let rollingBufferPreloadEnabledByModel: [String: Bool]?
 }
 
 struct WordBackup: Codable {

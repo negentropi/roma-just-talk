@@ -15,7 +15,7 @@ struct FluidAudioModelCardView: View {
         _transcriptionModelManager = ObservedObject(wrappedValue: transcriptionModelManager)
         let key = "streaming-enabled-\(model.name)"
         _streamingEnabled = State(initialValue: UserDefaults.standard.object(forKey: key) as? Bool ?? true)
-        let preloadKey = "rolling-buffer-preload-enabled-\(model.name)"
+        let preloadKey = RollingBufferPreloadSettings.perModelPreloadEnabledKey(forModelName: model.name)
         _preloadEnabled = State(initialValue: UserDefaults.standard.object(forKey: preloadKey) as? Bool ?? true)
     }
 
@@ -24,7 +24,7 @@ struct FluidAudioModelCardView: View {
     }
 
     private var preloadDefaultsKey: String {
-        "rolling-buffer-preload-enabled-\(model.name)"
+        RollingBufferPreloadSettings.perModelPreloadEnabledKey(forModelName: model.name)
     }
 
     var isCurrent: Bool {

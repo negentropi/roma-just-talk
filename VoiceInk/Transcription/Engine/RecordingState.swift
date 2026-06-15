@@ -8,3 +8,9 @@ enum RecordingState: Equatable {
     case enhancing
     case busy
 }
+
+extension RecordingState {
+    var acceptsRollingBufferPreloadPreview: Bool {
+        self == .idle || self == .recording
+    }
+}

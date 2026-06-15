@@ -611,7 +611,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
     }
 
     @objc func handleRollingBufferPreloadPartialTranscript(_ notification: Notification) {
-        guard recordingState == .idle,
+        guard recordingState.acceptsRollingBufferPreloadPreview,
               let text = notification.userInfo?["text"] as? String else { return }
         partialTranscript = text
     }

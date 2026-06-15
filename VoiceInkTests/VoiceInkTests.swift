@@ -21,6 +21,15 @@ struct VoiceInkTests {
         #expect(AppDefaults.registeredDefaults[SpecialShortcutSettings.pasteLastTranscriptOnEmptyTapKey] as? Bool == true)
     }
 
+    @Test func rollingBufferPreloadPreviewStaysVisibleDuringRecording() {
+        #expect(RecordingState.idle.acceptsRollingBufferPreloadPreview)
+        #expect(RecordingState.recording.acceptsRollingBufferPreloadPreview)
+        #expect(!RecordingState.starting.acceptsRollingBufferPreloadPreview)
+        #expect(!RecordingState.transcribing.acceptsRollingBufferPreloadPreview)
+        #expect(!RecordingState.enhancing.acceptsRollingBufferPreloadPreview)
+        #expect(!RecordingState.busy.acceptsRollingBufferPreloadPreview)
+    }
+
     @Test func contextualCapitalizationLowercasesTitlecaseTextAfterMidSentencePrefix() async throws {
         let result = ContextualCapitalizationFormatter.format(
             "Model output",

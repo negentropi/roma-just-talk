@@ -52,6 +52,10 @@ public enum VoiceInkProviderEndpoint: String, CaseIterable, Sendable {
         URL(string: "https://api.assemblyai.com")!
     }
 
+    public static var cartesiaAPIBaseURL: URL {
+        URL(string: "https://api.cartesia.ai")!
+    }
+
     public var chatCompletionsURL: URL? {
         switch self {
         case .groq, .openAI, .cerebras, .gemini:
@@ -180,5 +184,12 @@ public enum VoiceInkProviderEndpoint: String, CaseIterable, Sendable {
 
     public static func assemblyAITranscriptURL(from baseURL: URL, id: String) -> URL {
         assemblyAITranscriptsURL(from: baseURL).appendingPathComponent(id)
+    }
+
+    public static func cartesiaVoicesURL(from baseURL: URL) -> URL {
+        let url = baseURL.appendingPathComponent("voices")
+        var components = URLComponents(url: url, resolvingAgainstBaseURL: false)!
+        components.queryItems = [URLQueryItem(name: "limit", value: "1")]
+        return components.url!
     }
 }

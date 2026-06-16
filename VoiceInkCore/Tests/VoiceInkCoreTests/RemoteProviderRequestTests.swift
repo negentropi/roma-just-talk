@@ -1023,5 +1023,33 @@ final class RemoteProviderRequestTests: XCTestCase {
             )
         )
     }
+
+    func testCartesiaVoicesRequestBuilderUsesVersionedVoicesEndpoint() throws {
+        let request = VoiceInkCartesiaRequestBuilder.makeVoicesRequest(
+            baseURL: VoiceInkProviderEndpoint.cartesiaAPIBaseURL,
+            apiKey: "cartesia-key",
+            timeout: 10
+        )
+
+        XCTAssertEqual(request.url?.absoluteString, "https://api.cartesia.ai/voices?limit=1")
+        XCTAssertEqual(request.value(forHTTPHeaderField: "X-API-Key"), "cartesia-key")
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Cartesia-Version"), "2026-03-01")
+        XCTAssertEqual(request.timeoutInterval, 10)
+    }
+
+    func testCartesiaClientRejectsBlankAPIKeyWithoutNetwork() async throws {
+        let result = await VoiceInkCartesiaClient().verifyAPIKeyDetailed(
+            baseURL: VoiceInkProviderEndpoint.cartesiaAPIBaseURL,
+            apiKey: " \n\t "
+        )
+
+        XCTAssertEqual(
+            result,
+            VoiceInkAPIKeyVerificationResult(
+                isValid: false,
+                errorMessage: "API key is missing or empty."
+            )
+        )
+    }
 }
 #endif

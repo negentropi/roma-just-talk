@@ -1,11 +1,11 @@
 import Foundation
 import SwiftData
-import LLMkit
 import VoiceInkCore
 
 struct CartesiaProvider: CloudProvider {
     let modelProvider: ModelProvider = .cartesia
     let isStreamingOnly: Bool = true
+    private let cartesiaClient = VoiceInkCartesiaClient()
 
     var models: [CloudModel] {
         VoiceInkTranscriptionModelCatalog
@@ -18,6 +18,10 @@ struct CartesiaProvider: CloudProvider {
     }
 
     func verifyAPIKey(_ key: String) async -> (isValid: Bool, errorMessage: String?) {
-        return await CartesiaStreamingClient.verifyAPIKey(key)
+        let result = await cartesiaClient.verifyAPIKeyDetailed(
+            baseURL: VoiceInkProviderEndpoint.cartesiaAPIBaseURL,
+            apiKey: key
+        )
+        return (result.isValid, result.errorMessage)
     }
 }

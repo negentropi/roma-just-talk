@@ -31,6 +31,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - Whisper and VAD model file metadata
 - PCM16 sample conversion
 - OpenAI-compatible, Deepgram, Gemini, Mistral, ElevenLabs, xAI, Soniox, Speechmatics, and AssemblyAI remote transcription request/client helpers
+- Cartesia API-key verification request/client helper
 - shared multipart form-data construction for remote transcription clients
 - shared retried upload helper for multipart remote transcription clients
 
@@ -46,6 +47,7 @@ Current macOS consumers of shared remote transport:
 - Speechmatics batch transcription uses `VoiceInkSpeechmaticsTranscriptionClient`.
 - AssemblyAI batch transcription uses `VoiceInkAssemblyAITranscriptionClient`.
 - Custom OpenAI-compatible batch transcription uses `VoiceInkOpenAICompatibleTranscriptionClient`.
+- Cartesia API-key verification uses `VoiceInkCartesiaClient`; Cartesia transcription remains streaming-only in platform shell code.
 
 Platform shells still own UI, OS permissions, audio capture, paste/keyboard behavior, keychain adapters, local model download storage, SwiftData models, and macOS-only orchestration.
 

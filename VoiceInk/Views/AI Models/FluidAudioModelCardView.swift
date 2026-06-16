@@ -70,7 +70,7 @@ struct FluidAudioModelCardView: View {
                     .onChange(of: streamingEnabled) { _, newValue in
                         UserDefaults.standard.set(newValue, forKey: streamingDefaultsKey)
                     }
-                    .help(streamingEnabled ? "Streaming enabled; click to switch to batch" : "Batch mode; click to stream during recording")
+                    .help(streamingEnabled ? "Streams active-recording audio; click to use saved-file batch mode" : "Saved-file batch mode; click to stream active-recording audio")
 
                 Toggle("Buffer Preload", isOn: $preloadEnabled)
                     .toggleStyle(.switch)

@@ -103,7 +103,7 @@ struct CloudModelCardView: View {
                         NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
                     }
                 }
-                .help(isStreamingOnly ? "This model only supports streaming transcription" : (streamingEnabled ? "Streaming enabled; click to switch to batch" : "Batch mode; click to stream during recording"))
+                .help(isStreamingOnly ? "This model only supports active-recording streaming" : (streamingEnabled ? "Streams active-recording audio; click to use saved-file batch mode" : "Saved-file batch mode; click to stream active-recording audio"))
 
             Toggle("Buffer Preload", isOn: $preloadEnabled)
                 .toggleStyle(.switch)

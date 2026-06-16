@@ -7,6 +7,7 @@ struct RollingBufferPreloadSettingsControls: View {
     @AppStorage(RollingBufferPreloadSettings.lowBatteryThresholdPercentKey) private var lowBatteryThresholdPercent = RollingBufferPreloadSettings.defaultLowBatteryThresholdPercent
     @AppStorage(RollingBufferPreloadSettings.bufferDurationSecondsKey) private var bufferDurationSeconds = RollingBufferPreloadSettings.defaultBufferDurationSeconds
     @AppStorage(RollingBufferPreloadSettings.preRunFinalizationKey) private var preRunFinalization = RollingBufferPreloadSettings.defaultPreRunFinalization
+    @AppStorage(RollingBufferVADSettings.modelKey) private var rollingBufferVADModel = RollingBufferVADSettings.sileroModelName
 
     private var mode: Binding<RollingBufferPreloadMode> {
         Binding(
@@ -64,6 +65,17 @@ struct RollingBufferPreloadSettingsControls: View {
         }
         .toggleStyle(.switch)
         .onChange(of: preRunFinalization) { _, _ in notifySettingsChanged() }
+
+        Picker(selection: $rollingBufferVADModel) {
+            Text("Silero").tag(RollingBufferVADSettings.sileroModelName)
+        } label: {
+            HStack(spacing: 4) {
+                Text("Buffer VAD Model")
+                InfoTip("Silero runs locally on CPU and watches rolling-buffer audio for speech before STT preload starts.")
+            }
+        }
+        .pickerStyle(.menu)
+        .onChange(of: rollingBufferVADModel) { _, _ in notifySettingsChanged() }
 
         if mode.wrappedValue == .auto {
             Toggle(isOn: $autoDisableCloudModels) {

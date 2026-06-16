@@ -10,7 +10,6 @@ struct ModelSettingsView: View {
     @AppStorage("AppendTrailingSpace") private var appendTrailingSpace = true
     @AppStorage("PrewarmModelOnWake") private var prewarmModelOnWake = true
     @AppStorage("showLiveTextPreview") private var showLiveTextPreview = false
-    @AppStorage(RollingBufferVADSettings.modelKey) private var rollingBufferVADModel = RollingBufferVADSettings.sileroModelName
     @State private var customPrompt: String = ""
     @State private var isEditing: Bool = false
 
@@ -109,23 +108,10 @@ struct ModelSettingsView: View {
                 Toggle(isOn: $isVADEnabled) {
                     HStack(spacing: 4) {
                         Text("Voice Activity Detection (VAD)")
-                        InfoTip("Use VAD inside batch/final transcription when supported. Rolling buffer preload uses the Rolling VAD Model setting below as its trigger.")
+                        InfoTip("Use VAD inside batch/final transcription when supported. Buffer preload has its own VAD model in Rolling Buffer settings.")
                     }
                 }
                 .toggleStyle(.switch)
-
-                Picker(selection: $rollingBufferVADModel) {
-                    Text("Silero").tag(RollingBufferVADSettings.sileroModelName)
-                } label: {
-                    HStack(spacing: 4) {
-                        Text("Rolling VAD Model")
-                        InfoTip("Silero runs locally on CPU and watches rolling audio for speech before STT preload starts.")
-                    }
-                }
-                .pickerStyle(.menu)
-                .onChange(of: rollingBufferVADModel) { _, _ in
-                    NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
-                }
 
                 Toggle(isOn: $prewarmModelOnWake) {
                     HStack(spacing: 4) {
@@ -138,7 +124,7 @@ struct ModelSettingsView: View {
                 Toggle(isOn: $showLiveTextPreview) {
                     HStack(spacing: 4) {
                         Text("Show Transcript Preview")
-                        InfoTip("Displays provisional text from streaming or rolling-buffer preload when available.")
+                        InfoTip("Displays in-progress transcript text when a model or buffer preload can provide it.")
                     }
                 }
                 .toggleStyle(.switch)

@@ -35,6 +35,18 @@ final class TranscriptionModelCatalogTests: XCTestCase {
         XCTAssertTrue(models.first?.supportsStreaming == true)
     }
 
+    func testSpeechmaticsLanguageCapabilityAndModelAreSharedProviderMetadata() {
+        XCTAssertEqual(VoiceInkTranscriptionModelProvider.speechmatics.languageCodes?.first, "ar")
+        XCTAssertEqual(VoiceInkTranscriptionModelProvider.speechmatics.languageCodes?.last, "zh")
+        XCTAssertTrue(VoiceInkTranscriptionModelProvider.speechmatics.languageCodes?.contains("en") == true)
+        XCTAssertTrue(VoiceInkTranscriptionModelProvider.speechmatics.includesAutoDetect)
+
+        let models = VoiceInkTranscriptionModelCatalog.cloudModels(for: .speechmatics)
+        XCTAssertEqual(models.map(\.name), ["speechmatics-enhanced"])
+        XCTAssertEqual(models.first?.displayName, "Speechmatics")
+        XCTAssertTrue(models.first?.supportsStreaming == true)
+    }
+
     func testOpenAICompatibleProvidersUseAllLanguagesWithoutAutoDetectFlag() {
         XCTAssertNil(VoiceInkTranscriptionModelProvider.groq.languageCodes)
         XCTAssertFalse(VoiceInkTranscriptionModelProvider.groq.includesAutoDetect)

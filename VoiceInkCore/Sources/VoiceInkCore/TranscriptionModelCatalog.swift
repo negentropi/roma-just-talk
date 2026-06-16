@@ -5,11 +5,21 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
     case mistral
     case gemini
     case soniox
+    case speechmatics
     case local
     case voiceInk
 
     public var languageCodes: [String]? {
         switch self {
+        case .speechmatics:
+            return [
+                "ar", "ba", "eu", "be", "bn", "bg", "yue", "ca", "hr", "cs",
+                "da", "nl", "en", "et", "fi", "fr", "gl", "de", "el", "he",
+                "hi", "hu", "id", "it", "ja", "ko", "lv", "lt", "ms", "mt",
+                "mr", "mn", "no", "fa", "pl", "pt", "ro", "ru", "sk", "sl",
+                "es", "sw", "sv", "tl", "ta", "th", "tr", "uk", "ur", "vi",
+                "cy", "zh"
+            ]
         case .soniox:
             return [
                 "af", "sq", "ar", "az", "eu", "be", "bn", "bs", "bg", "ca",
@@ -36,7 +46,7 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
 
     public var includesAutoDetect: Bool {
         switch self {
-        case .deepgram, .mistral, .soniox:
+        case .deepgram, .mistral, .soniox, .speechmatics:
             return true
         case .groq, .openAI, .gemini, .local, .voiceInk:
             return false
@@ -78,7 +88,7 @@ public enum VoiceInkTranscriptionModelCatalog {
 
     public static func modelNames(for provider: VoiceInkTranscriptionModelProvider) -> [String] {
         switch provider {
-        case .groq, .deepgram, .mistral, .gemini, .soniox:
+        case .groq, .deepgram, .mistral, .gemini, .soniox, .speechmatics:
             return cloudModels(for: provider).map(\.name)
         case .openAI:
             return [
@@ -180,6 +190,18 @@ public enum VoiceInkTranscriptionModelCatalog {
                     name: "stt-async-v4",
                     displayName: "Soniox V4",
                     description: "Soniox transcription model v4 with human-parity accuracy",
+                    speed: 0.99,
+                    accuracy: 0.98,
+                    isMultilingual: true,
+                    supportsStreaming: true
+                )
+            ]
+        case .speechmatics:
+            return [
+                VoiceInkCloudTranscriptionModelSpec(
+                    name: "speechmatics-enhanced",
+                    displayName: "Speechmatics",
+                    description: "Speechmatics enhanced accuracy transcription with streaming and 50+ language support",
                     speed: 0.99,
                     accuracy: 0.98,
                     isMultilingual: true,

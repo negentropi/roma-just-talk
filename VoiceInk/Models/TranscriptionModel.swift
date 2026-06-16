@@ -59,6 +59,8 @@ extension ModelProvider {
             return .gemini
         case .soniox:
             return .soniox
+        case .speechmatics:
+            return .speechmatics
         default:
             return nil
         }

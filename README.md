@@ -3,7 +3,7 @@
   <h1>roma-just-talk</h1>
   <p>speak before press hotkey dictation app.</p>
   <p>rethink UX: pre-roll voice capture, -87% bin size & -83% ram usage (780mb → 132mb), local & cloud stt solution both available.</p>
-  <p>speak is 3~4x faster than type btw </p>
+  <p>Speak is 3~4x faster than type. Read is 2x faster & self-paced & high Seekability than listen </p>
 
   [![License](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
   ![Platform](https://img.shields.io/badge/platform-macOS%2014.0%2B-brightgreen)

@@ -41,6 +41,3 @@ extension VoiceInkEngineError: LocalizedError {
         }
     }
 }
-
-// Backward compatibility
-typealias WhisperStateError = VoiceInkEngineError

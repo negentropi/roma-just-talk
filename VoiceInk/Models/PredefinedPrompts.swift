@@ -3,8 +3,6 @@ import SwiftUI    // Import to ensure we have access to SwiftUI types if needed
 import VoiceInkCore
 
 enum PredefinedPrompts {
-    private static let predefinedPromptsKey = "PredefinedPrompts"
-    
     // Static UUIDs for predefined prompts
     static let defaultPromptId = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
     static let assistantPromptId = UUID(uuidString: "00000000-0000-0000-0000-000000000002")!

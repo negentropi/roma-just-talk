@@ -234,6 +234,10 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
         return verificationTransport
     }
 
+    public var canVerifyAPIKey: Bool {
+        apiKeyVerificationTransport != nil
+    }
+
     public var transcriptionModelProvider: VoiceInkTranscriptionModelProvider? {
         switch self {
         case .groq:

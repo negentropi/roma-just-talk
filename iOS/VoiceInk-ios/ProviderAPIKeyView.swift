@@ -109,7 +109,7 @@ struct ProviderAPIKeyView: View {
     }
 
     private func verifiedAPIKey(_ key: String) async -> Bool {
-        guard provider.apiKeyVerificationTransport != nil else {
+        guard provider.canVerifyAPIKey else {
             return false
         }
 

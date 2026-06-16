@@ -30,6 +30,7 @@ final class ProviderAccessRequirementTests: XCTestCase {
             XCTAssertEqual(provider.apiKeyAccount, policy.account)
             XCTAssertEqual(provider.apiKeyVerificationStateKey, policy.verificationKey)
             XCTAssertEqual(provider.apiKeyVerificationTransport, policy.transport)
+            XCTAssertTrue(provider.canVerifyAPIKey)
         }
     }
 
@@ -41,6 +42,7 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertNil(VoiceInkProviderKind.localWhisper.apiKeyAccount)
         XCTAssertNil(VoiceInkProviderKind.localWhisper.apiKeyVerificationStateKey)
         XCTAssertNil(VoiceInkProviderKind.localWhisper.apiKeyVerificationTransport)
+        XCTAssertFalse(VoiceInkProviderKind.localWhisper.canVerifyAPIKey)
 
         guard case .bundledService = VoiceInkProviderKind.voiceInk.accessRequirement else {
             return XCTFail("VoiceInk should use bundled service access")
@@ -49,6 +51,7 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertNil(VoiceInkProviderKind.voiceInk.apiKeyAccount)
         XCTAssertNil(VoiceInkProviderKind.voiceInk.apiKeyVerificationStateKey)
         XCTAssertNil(VoiceInkProviderKind.voiceInk.apiKeyVerificationTransport)
+        XCTAssertFalse(VoiceInkProviderKind.voiceInk.canVerifyAPIKey)
     }
 
     func testRuntimeAPIKeyFollowsProviderAccessPolicy() {

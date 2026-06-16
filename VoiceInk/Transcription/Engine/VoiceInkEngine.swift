@@ -154,6 +154,9 @@ class VoiceInkEngine: NSObject, ObservableObject {
 
                             self.recordingState = .starting
                             self.logger.notice("toggleRecord: state=starting, starting audio hardware")
+                            let powerModeConfigTask = Task { @MainActor in
+                                await ActiveWindowService.shared.resolveConfiguration(powerModeId: powerModeId)
+                            }
 
                             try await self.recorder.startRecording(toOutputFile: permanentURL)
 
@@ -177,6 +180,10 @@ class VoiceInkEngine: NSObject, ObservableObject {
                             self.recordingState = .recording
                             self.logger.notice("toggleRecord: recording started successfully, state=recording")
 
+                            let resolvedPowerModeConfig = await powerModeConfigTask.value
+                            await ActiveWindowService.shared.applyResolvedConfiguration(resolvedPowerModeConfig)
+                            self.logger.notice("toggleRecord: Power Mode config applied before streaming setup")
+
                             var claimedPreload: RollingBufferPreloadClaim?
                             if let model = self.transcriptionModelManager.currentTranscriptionModel,
                                let preloaded = await self.rollingBufferPreloadCoordinator.claimPreloadedSession(for: model) {
@@ -191,8 +198,6 @@ class VoiceInkEngine: NSObject, ObservableObject {
                                     pendingChunks.withLock { $0.append(data) }
                                 }
                             }
-
-                            await ActiveWindowService.shared.applyConfiguration(powerModeId: powerModeId)
 
                             if self.recordingState == .recording,
                                let model = self.transcriptionModelManager.currentTranscriptionModel {

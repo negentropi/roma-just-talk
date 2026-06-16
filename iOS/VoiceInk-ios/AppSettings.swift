@@ -67,16 +67,18 @@ final class AppSettings: ObservableObject {
     }
 
     func apiKey(for provider: VoiceInkProviderKind) -> String {
-        switch provider {
-        case .groq, .openAI, .deepgram, .cerebras, .gemini:
+        switch provider.accessRequirement {
+        case .userAPIKey:
             return apiKeysByProvider[provider] ?? ""
-        case .localWhisper: return "local" // Local transcription doesn't need an API key
-        case .voiceInk: return "" // TODO: Replace with actual VoiceInk API key
+        case .localWhisperModel:
+            return "local"
+        case .bundledService:
+            return ""
         }
     }
 
     func setAPIKey(_ key: String, for provider: VoiceInkProviderKind) {
-        guard provider.requiresUserAPIKey else {
+        guard case .userAPIKey = provider.accessRequirement else {
             return
         }
 
@@ -90,16 +92,18 @@ final class AppSettings: ObservableObject {
     }
     
     func isKeyVerified(for provider: VoiceInkProviderKind) -> Bool {
-        switch provider {
-        case .groq, .openAI, .deepgram, .cerebras, .gemini:
+        switch provider.accessRequirement {
+        case .userAPIKey:
             return verifiedAPIKeyProviders.contains(provider) && !apiKey(for: provider).isEmpty
-        case .localWhisper: return LocalModelManager.shared.hasAvailableModel
-        case .voiceInk: return true // VoiceInk uses hardcoded API key, always verified
+        case .localWhisperModel:
+            return LocalModelManager.shared.hasAvailableModel
+        case .bundledService:
+            return true
         }
     }
     
     func setKeyVerified(_ verified: Bool, for provider: VoiceInkProviderKind) {
-        guard provider.requiresUserAPIKey else {
+        guard case .userAPIKey = provider.accessRequirement else {
             return
         }
 

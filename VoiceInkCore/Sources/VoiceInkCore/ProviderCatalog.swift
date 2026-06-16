@@ -11,9 +11,15 @@ public enum VoiceInkTranscriptionTransport: Sendable {
     case localWhisper
 }
 
-public enum VoiceInkAPIKeyVerificationTransport: Sendable {
+public enum VoiceInkAPIKeyVerificationTransport: Sendable, Equatable {
     case openAICompatibleModels
     case deepgramProjects
+}
+
+public enum VoiceInkProviderAccessRequirement: Sendable {
+    case userAPIKey(account: String, verificationStateKey: String, verificationTransport: VoiceInkAPIKeyVerificationTransport)
+    case localWhisperModel
+    case bundledService
 }
 
 public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, Sendable {
@@ -122,42 +128,64 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
         }
     }
 
-    public var apiKeyAccount: String? {
+    public var accessRequirement: VoiceInkProviderAccessRequirement {
         switch self {
         case .groq:
-            return VoiceInkProviderAPIKeyAccount.groq
+            return .userAPIKey(
+                account: VoiceInkProviderAPIKeyAccount.groq,
+                verificationStateKey: "groqKeyVerified",
+                verificationTransport: .openAICompatibleModels
+            )
         case .openAI:
-            return VoiceInkProviderAPIKeyAccount.openAI
+            return .userAPIKey(
+                account: VoiceInkProviderAPIKeyAccount.openAI,
+                verificationStateKey: "openAIKeyVerified",
+                verificationTransport: .openAICompatibleModels
+            )
         case .deepgram:
-            return VoiceInkProviderAPIKeyAccount.deepgram
+            return .userAPIKey(
+                account: VoiceInkProviderAPIKeyAccount.deepgram,
+                verificationStateKey: "deepgramKeyVerified",
+                verificationTransport: .deepgramProjects
+            )
         case .cerebras:
-            return VoiceInkProviderAPIKeyAccount.cerebras
+            return .userAPIKey(
+                account: VoiceInkProviderAPIKeyAccount.cerebras,
+                verificationStateKey: "cerebrasKeyVerified",
+                verificationTransport: .openAICompatibleModels
+            )
         case .gemini:
-            return VoiceInkProviderAPIKeyAccount.gemini
-        case .localWhisper, .voiceInk:
+            return .userAPIKey(
+                account: VoiceInkProviderAPIKeyAccount.gemini,
+                verificationStateKey: "geminiKeyVerified",
+                verificationTransport: .openAICompatibleModels
+            )
+        case .localWhisper:
+            return .localWhisperModel
+        case .voiceInk:
+            return .bundledService
+        }
+    }
+
+    public var apiKeyAccount: String? {
+        guard case let .userAPIKey(account, _, _) = accessRequirement else {
             return nil
         }
+        return account
     }
 
     public var apiKeyVerificationStateKey: String? {
-        switch self {
-        case .groq:
-            return "groqKeyVerified"
-        case .openAI:
-            return "openAIKeyVerified"
-        case .deepgram:
-            return "deepgramKeyVerified"
-        case .cerebras:
-            return "cerebrasKeyVerified"
-        case .gemini:
-            return "geminiKeyVerified"
-        case .localWhisper, .voiceInk:
+        guard case let .userAPIKey(_, verificationStateKey, _) = accessRequirement else {
             return nil
         }
+        return verificationStateKey
     }
 
     public var requiresUserAPIKey: Bool {
-        apiKeyAccount != nil
+        guard case .userAPIKey = accessRequirement else {
+            return false
+        }
+        return true
     }
 
     public static var userAPIKeyProviders: [VoiceInkProviderKind] {
@@ -165,14 +193,10 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
     }
 
     public var apiKeyVerificationTransport: VoiceInkAPIKeyVerificationTransport? {
-        switch self {
-        case .deepgram:
-            return .deepgramProjects
-        case .groq, .openAI, .cerebras, .gemini:
-            return .openAICompatibleModels
-        case .localWhisper, .voiceInk:
+        guard case let .userAPIKey(_, _, verificationTransport) = accessRequirement else {
             return nil
         }
+        return verificationTransport
     }
 
     public var transcriptionModelProvider: VoiceInkTranscriptionModelProvider? {

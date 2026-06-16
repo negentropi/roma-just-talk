@@ -12,44 +12,22 @@ protocol TranscriptionService {
 
 struct GroqTranscriptionService: TranscriptionService {
     // OpenAI-compatible APIs. Caller supplies baseURL and model.
+    private let client = VoiceInkOpenAICompatibleTranscriptionClient()
 
     func transcribeAudioFile(apiBaseURL: URL, apiKey: String, model: String, fileURL: URL, language: String? = nil) async throws -> String {
         let fileData = try Data(contentsOf: fileURL)
-        let preparedRequest = VoiceInkOpenAICompatibleTranscriptionRequestBuilder.make(
+        return try await client.transcribeAudioData(
             baseURL: apiBaseURL,
             apiKey: apiKey,
+            model: model,
             audioData: fileData,
             fileName: fileURL.lastPathComponent,
-            model: model,
-            language: language
+            language: language,
+            errorDomain: "GroqAPI"
         )
-
-        let (data, response) = try await URLSession.shared.data(for: preparedRequest.requestWithHTTPBody())
-        guard let http = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
-        guard (200..<300).contains(http.statusCode) else {
-            let errorText = String(data: data, encoding: .utf8) ?? ""
-            throw NSError(domain: "GroqAPI", code: http.statusCode, userInfo: [NSLocalizedDescriptionKey: errorText])
-        }
-
-        // Some OpenAI-compatible APIs return JSON with a text property; others return nested objects.
-        // Try to parse a simple text response first, else fallback to raw string.
-        if let text = try? VoiceInkOpenAICompatibleTranscriptionCodec.textIfPresent(from: data) {
-            return text
-        }
-        if let str = String(data: data, encoding: .utf8) {
-            return str
-        }
-        return ""
     }
 
     func verifyAPIKey(apiBaseURL: URL, _ apiKey: String) async -> Bool {
-        let request = VoiceInkOpenAICompatibleModelsRequestBuilder.make(baseURL: apiBaseURL, apiKey: apiKey)
-        do {
-            let (_, response) = try await URLSession.shared.data(for: request)
-            guard let http = response as? HTTPURLResponse else { return false }
-            return (200..<300).contains(http.statusCode)
-        } catch {
-            return false
-        }
+        await client.verifyAPIKey(baseURL: apiBaseURL, apiKey: apiKey)
     }
 }

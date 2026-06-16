@@ -17,6 +17,7 @@
 - Preserved pre-roll-first streaming order without holding the recorder file lock through the whole pre-roll emission.
 - Removed a fixed post-STT wait before trigger-word AI enhancement starts.
 - Removed fixed sleeps between simulated paste key events so completed text reaches the target app sooner.
+- Kept warmed local STT resources after successful transcription so the next recording and rolling-buffer preload avoid an immediate teardown/reload cycle.
 - Skipped fallback streaming setup on immediate startup-stop recordings when the selected model can transcribe the saved WAV directly.
 - Included rolling buffer preload mode, per-model opt-outs, Auto policy, duration, finalization, and VAD model settings in settings backup/import.
 - Made the pre-run finalization opt-out also skip rolling-buffer STT pre-run work instead of warming an unusable session.

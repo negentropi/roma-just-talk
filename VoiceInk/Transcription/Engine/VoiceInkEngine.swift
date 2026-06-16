@@ -398,7 +398,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
         let didFinishActivePipeline = activePipelineTranscriptionID == transcriptionID
         if didFinishActivePipeline {
             await finishRecorderSession()
-            await cleanupResources()
+            // Keep successful local STT resources warm for the next recording/preload.
+            // Cancellation, reset, and Power Mode model changes still release them.
             activePipelineTranscriptionID = nil
             currentSession = nil
             recordedFile = nil

@@ -1,4 +1,5 @@
 import Foundation
+import VoiceInkCore
 #if canImport(whisper)
 import whisper
 #else
@@ -49,7 +50,7 @@ final class SileroSpeechActivityDetector: SpeechActivityDetecting, @unchecked Se
     }
 
     func containsSpeech(inPCM16LEData data: Data) -> Bool {
-        let samples = Self.floatSamples(fromPCM16LEData: data)
+        let samples = VoiceInkPCM16Audio.floatSamples(fromLittleEndianData: data)
         guard !samples.isEmpty else { return false }
 
         lock.lock()
@@ -78,26 +79,5 @@ final class SileroSpeechActivityDetector: SpeechActivityDetecting, @unchecked Se
         }
 
         return false
-    }
-
-    private static func floatSamples(fromPCM16LEData data: Data) -> [Float] {
-        guard data.count >= MemoryLayout<Int16>.size else { return [] }
-
-        return data.withUnsafeBytes { rawBuffer in
-            guard let bytes = rawBuffer.bindMemory(to: UInt8.self).baseAddress else { return [] }
-
-            let sampleCount = data.count / MemoryLayout<Int16>.size
-            var samples: [Float] = []
-            samples.reserveCapacity(sampleCount)
-
-            for sampleIndex in 0..<sampleCount {
-                let byteIndex = sampleIndex * MemoryLayout<Int16>.size
-                let rawValue = UInt16(bytes[byteIndex]) | (UInt16(bytes[byteIndex + 1]) << 8)
-                let sample = Int16(bitPattern: rawValue)
-                samples.append(max(-1.0, min(Float(sample) / 32767.0, 1.0)))
-            }
-
-            return samples
-        }
     }
 }

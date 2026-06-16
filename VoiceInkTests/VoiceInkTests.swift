@@ -35,7 +35,7 @@ struct VoiceInkTests {
         #expect(SpecialShortcutOptions().keyDownBehavior == .preloadOnly)
     }
 
-    @Test func rollingPreloadQuickReleaseDurationUsesMono16kPCMByteCount() {
+    @Test @MainActor func rollingPreloadQuickReleaseDurationUsesMono16kPCMByteCount() {
         #expect(VoiceInkEngine.durationForMono16kPCMData(Data(count: 32_000)) == 1.0)
         #expect(VoiceInkEngine.durationForMono16kPCMData(Data(count: 16_000)) == 0.5)
         #expect(VoiceInkEngine.durationForMono16kPCMData(Data()) == 0)

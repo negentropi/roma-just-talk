@@ -16,7 +16,7 @@ struct VoiceInkTests {
     @Test func freshDefaultsHideMenuBarIcon() async throws {
         #expect(AppDefaults.registeredDefaults[AppDefaults.Keys.showMenuBarIcon] as? Bool == false)
         #expect(AppDefaults.registeredDefaults["IsMenuBarOnly"] as? Bool == true)
-        #expect(AppDefaults.registeredDefaults[SpecialShortcutSettings.keyDownBehaviorKey] as? String == SpecialShortcutKeyDownBehavior.startRecording.rawValue)
+        #expect(AppDefaults.registeredDefaults[SpecialShortcutSettings.keyDownBehaviorKey] as? String == SpecialShortcutKeyDownBehavior.preloadOnly.rawValue)
         #expect(AppDefaults.registeredDefaults[SpecialShortcutSettings.allowsKeyDownOnlyTriggerKey] as? Bool == true)
         #expect(AppDefaults.registeredDefaults[SpecialShortcutSettings.pasteLastTranscriptOnEmptyTapKey] as? Bool == true)
     }
@@ -28,6 +28,10 @@ struct VoiceInkTests {
         #expect(!RecordingState.transcribing.acceptsRollingBufferPreloadPreview)
         #expect(!RecordingState.enhancing.acceptsRollingBufferPreloadPreview)
         #expect(!RecordingState.busy.acceptsRollingBufferPreloadPreview)
+    }
+
+    @Test func specialShortcutOptionsDefaultToPreloadOnly() {
+        #expect(SpecialShortcutOptions().keyDownBehavior == .preloadOnly)
     }
 
     @Test func contextualCapitalizationLowercasesTitlecaseTextAfterMidSentencePrefix() async throws {

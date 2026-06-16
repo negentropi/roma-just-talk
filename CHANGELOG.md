@@ -3,6 +3,7 @@
 ## v1.94 - Unreleased
 
 - Replaced the misaligned silence-filter path with rolling buffer preload controls that use local VAD to pre-run supported STT before capture finalization, independent from final/batch transcription VAD.
+- Made the fresh Special shortcut default preload-only so quick releases can commit the rolling-buffer pre-run path without opening a recorder first.
 - Added configurable rolling buffer duration with decimal seconds support.
 - Renamed model-card transcription mode controls to "Streaming" so they stay separate from rolling buffer preload.
 - Moved recorder audio-duration metadata work after paste so completed text reaches the cursor sooner.

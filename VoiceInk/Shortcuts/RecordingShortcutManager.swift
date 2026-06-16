@@ -15,7 +15,7 @@ enum SpecialShortcutKeyDownBehavior: String, CaseIterable {
 }
 
 struct SpecialShortcutOptions: Equatable {
-    var keyDownBehavior: SpecialShortcutKeyDownBehavior = .startRecording
+    var keyDownBehavior: SpecialShortcutKeyDownBehavior = .preloadOnly
     var allowsKeyDownOnlyTrigger = true
     var pasteLastTranscriptOnEmptyTap = true
 }
@@ -168,7 +168,7 @@ class RecordingShortcutManager: ObservableObject {
         self.middleClickActivationDelay = UserDefaults.standard.integer(forKey: "middleClickActivationDelay")
         let specialKeyDownBehaviorRawValue = UserDefaults.standard.string(forKey: SpecialShortcutSettings.keyDownBehaviorKey)
         let specialKeyDownBehavior = specialKeyDownBehaviorRawValue
-            .flatMap(SpecialShortcutKeyDownBehavior.init(rawValue:)) ?? .startRecording
+            .flatMap(SpecialShortcutKeyDownBehavior.init(rawValue:)) ?? .preloadOnly
         let specialAllowsKeyDownOnlyTrigger = UserDefaults.standard.bool(forKey: SpecialShortcutSettings.allowsKeyDownOnlyTriggerKey)
         let specialPasteLastTranscriptOnEmptyTap = UserDefaults.standard.bool(forKey: SpecialShortcutSettings.pasteLastTranscriptOnEmptyTapKey)
         self.specialShortcutKeyDownBehavior = specialKeyDownBehavior

@@ -21,8 +21,19 @@ enum AIProvider: String, CaseIterable {
     
     
     var baseURL: String {
-        if let coreProviderEndpoint {
-            return (coreProviderEndpoint.chatCompletionsURL ?? coreProviderEndpoint.deepgramListenURL)!.absoluteString
+        if let coreProviderKind {
+            switch coreProviderKind.transcriptionTransport {
+            case .openAICompatible:
+                return VoiceInkProviderEndpoint
+                    .openAICompatibleChatCompletionsURL(from: coreProviderKind.apiBaseURL)
+                    .absoluteString
+            case .deepgram:
+                return VoiceInkProviderEndpoint
+                    .deepgramListenURL(from: coreProviderKind.apiBaseURL)
+                    .absoluteString
+            case .localWhisper:
+                preconditionFailure("Local Whisper is not an AI enhancement provider")
+            }
         }
 
         switch self {
@@ -52,8 +63,8 @@ enum AIProvider: String, CaseIterable {
     }
     
     var defaultModel: String {
-        if let coreAIModelProvider {
-            return VoiceInkAIModelCatalog.defaultModel(for: coreAIModelProvider)
+        if let provider = coreAIModelProvider {
+            return VoiceInkAIModelCatalog.defaultModel(for: provider)
         }
 
         switch self {
@@ -85,8 +96,8 @@ enum AIProvider: String, CaseIterable {
     }
     
     var availableModels: [String] {
-        if let coreAIModelProvider {
-            return VoiceInkAIModelCatalog.availableModels(for: coreAIModelProvider)
+        if let provider = coreAIModelProvider {
+            return VoiceInkAIModelCatalog.availableModels(for: provider)
         }
 
         switch self {
@@ -128,22 +139,7 @@ enum AIProvider: String, CaseIterable {
         }
     }
 
-    var coreAIModelProvider: VoiceInkAIModelProvider? {
-        switch self {
-        case .cerebras:
-            return .cerebras
-        case .groq:
-            return .groq
-        case .gemini:
-            return .gemini
-        case .openAI:
-            return .openAI
-        default:
-            return nil
-        }
-    }
-
-    var coreProviderEndpoint: VoiceInkProviderEndpoint? {
+    var coreProviderKind: VoiceInkProviderKind? {
         switch self {
         case .cerebras:
             return .cerebras
@@ -158,6 +154,10 @@ enum AIProvider: String, CaseIterable {
         default:
             return nil
         }
+    }
+
+    var coreAIModelProvider: VoiceInkAIModelProvider? {
+        coreProviderKind?.aiModelProvider
     }
     
     var requiresAPIKey: Bool {

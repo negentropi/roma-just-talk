@@ -175,6 +175,40 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
         }
     }
 
+    public var transcriptionModelProvider: VoiceInkTranscriptionModelProvider? {
+        switch self {
+        case .groq:
+            return .groq
+        case .openAI:
+            return .openAI
+        case .deepgram:
+            return .deepgram
+        case .gemini:
+            return .gemini
+        case .localWhisper:
+            return .local
+        case .voiceInk:
+            return .voiceInk
+        case .cerebras:
+            return nil
+        }
+    }
+
+    public var aiModelProvider: VoiceInkAIModelProvider? {
+        switch self {
+        case .groq:
+            return .groq
+        case .openAI:
+            return .openAI
+        case .cerebras:
+            return .cerebras
+        case .gemini:
+            return .gemini
+        case .deepgram, .localWhisper, .voiceInk:
+            return nil
+        }
+    }
+
     public func fixedModel(for use: VoiceInkProviderModelUse) -> String? {
         switch (self, use) {
         case (.voiceInk, .transcription):
@@ -195,35 +229,13 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
     }
 
     public func models(for use: VoiceInkProviderModelUse) -> [String] {
-        switch (self, use) {
-        case (.groq, .transcription):
-            return VoiceInkTranscriptionModelCatalog.modelNames(for: .groq)
-        case (.groq, .postProcessing):
-            return VoiceInkAIModelCatalog.availableModels(for: .groq)
-        case (.openAI, .transcription):
-            return VoiceInkTranscriptionModelCatalog.modelNames(for: .openAI)
-        case (.openAI, .postProcessing):
-            return VoiceInkAIModelCatalog.availableModels(for: .openAI)
-        case (.deepgram, .transcription):
-            return VoiceInkTranscriptionModelCatalog.modelNames(for: .deepgram)
-        case (.deepgram, .postProcessing):
-            return []
-        case (.cerebras, .transcription):
-            return []
-        case (.cerebras, .postProcessing):
-            return VoiceInkAIModelCatalog.availableModels(for: .cerebras)
-        case (.gemini, .transcription):
-            return []
-        case (.gemini, .postProcessing):
-            return VoiceInkAIModelCatalog.availableModels(for: .gemini)
-        case (.localWhisper, .transcription):
-            return VoiceInkTranscriptionModelCatalog.modelNames(for: .local)
-        case (.localWhisper, .postProcessing):
-            return []
-        case (.voiceInk, .transcription):
-            return []
-        case (.voiceInk, .postProcessing):
-            return []
+        switch use {
+        case .transcription:
+            guard let provider = transcriptionModelProvider else { return [] }
+            return VoiceInkTranscriptionModelCatalog.modelNames(for: provider)
+        case .postProcessing:
+            guard let provider = aiModelProvider else { return [] }
+            return VoiceInkAIModelCatalog.availableModels(for: provider)
         }
     }
 }

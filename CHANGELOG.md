@@ -23,6 +23,7 @@
 - Warmed the rolling-buffer VAD model before first speech when preload is eligible, so the first VAD trigger can start STT without paying model-load delay.
 - Broadcast the restored startup transcription model so rolling-buffer preload can warm immediately after launch instead of waiting for a later settings change.
 - Let preload-only quick releases commit an already-ready rolling-buffer STT session directly, without opening and stopping a new recorder session first.
+- Let preload-only quick releases fall back to the current rolling-buffer audio snapshot directly, avoiding a recorder open/stop cycle when no pre-run session is claimable and the model supports saved-WAV transcription.
 - Preserved rolling audio collected while a preload-only quick release finalizes, so the next rolling preload does not restart from an empty lead-in after paste.
 - Deferred quick-release rolling-preload history insertion until the post-paste save boundary, removing avoidable SwiftData work before the cursor paste starts.
 - Warmed and cached word replacement rules outside the dictation hot path so quick-release paste no longer repeats the SwiftData lookup before every cursor paste.

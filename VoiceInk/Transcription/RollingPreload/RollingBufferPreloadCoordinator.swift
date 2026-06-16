@@ -8,6 +8,11 @@ struct RollingBufferPreloadedSession {
     let audioData: Data
 }
 
+struct RollingBufferAudioSnapshot {
+    let audioData: Data
+    let language: String?
+}
+
 private final class RollingBufferChunkSource: @unchecked Sendable {
     let stream: AsyncStream<Data>
     private let continuation: AsyncStream<Data>.Continuation
@@ -253,6 +258,22 @@ final class RollingBufferPreloadCoordinator {
             audioChunkHandler: callback,
             language: selectedLanguage,
             audioData: audioData
+        )
+    }
+
+    func claimBufferedAudioSnapshot() -> RollingBufferAudioSnapshot? {
+        let audioData = leadInBuffer.snapshot().reduce(into: Data()) { result, chunk in
+            result.append(chunk)
+        }
+        guard !audioData.isEmpty else { return nil }
+
+        let selectedLanguage = currentLanguageProvider()
+        state = .claimed
+        resetPreloadState(cancelSession: true, keepLeadIn: false)
+        logger.notice("Claimed rolling buffer audio snapshot bytes=\(audioData.count, privacy: .public)")
+        return RollingBufferAudioSnapshot(
+            audioData: audioData,
+            language: selectedLanguage
         )
     }
 

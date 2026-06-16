@@ -336,6 +336,55 @@ struct RollingBufferPreloadCoordinatorTests {
     }
 
     @MainActor
+    @Test func bufferedAudioSnapshotClaimsLeadInWhenPreRunIsOff() async {
+        let model = streamingModel()
+        let session = FakeTranscriptionSession()
+
+        await withStandardRollingDefaults(for: model) { defaults in
+            setPreloadDefaults(defaults, model: model, preRunFinalization: false)
+        } run: {
+            let coordinator = makeCoordinator(model: model, session: session)
+            let chunk = Data(repeating: 7, count: 8_000)
+
+            await coordinator.processRollingChunkForTesting(chunk)
+            let snapshot = coordinator.claimBufferedAudioSnapshot()
+
+            #expect(snapshot?.audioData == chunk)
+            #expect(snapshot?.language == "en")
+            #expect(session.preparedModelName == nil)
+            #expect(coordinator.claimBufferedAudioSnapshot()?.audioData == nil)
+        }
+    }
+
+    @MainActor
+    @Test func bufferedAudioSnapshotKeepsNewRollingAudioCollectedDuringPipeline() async {
+        let model = streamingModel()
+        let session = FakeTranscriptionSession()
+
+        await withStandardRollingDefaults(for: model) { defaults in
+            setPreloadDefaults(defaults, model: model, preRunFinalization: false)
+        } run: {
+            let coordinator = makeCoordinator(model: model, session: session)
+            let firstChunk = Data(repeating: 1, count: 8_000)
+            let pipelineChunk = Data(repeating: 2, count: 1_024)
+            let nextChunk = Data(repeating: 3, count: 8_000)
+
+            await coordinator.processRollingChunkForTesting(firstChunk)
+            #expect(coordinator.claimBufferedAudioSnapshot()?.audioData == firstChunk)
+
+            await coordinator.processRollingChunkForTesting(pipelineChunk)
+            coordinator.recordingSessionDidFinish()
+            await coordinator.processRollingChunkForTesting(nextChunk)
+
+            let nextSnapshot = coordinator.claimBufferedAudioSnapshot()
+            var expected = Data()
+            expected.append(pipelineChunk)
+            expected.append(nextChunk)
+            #expect(nextSnapshot?.audioData == expected)
+        }
+    }
+
+    @MainActor
     @Test func preloadFeedsChunksThatArriveDuringSessionPrepareAfterRecordingStart() async {
         let model = streamingModel()
         let session = DelayedFakeTranscriptionSession()

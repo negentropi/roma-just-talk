@@ -369,11 +369,41 @@ class VoiceInkEngine: NSObject, ObservableObject {
             return false
         }
 
-        guard let claimedPreload = await rollingBufferPreloadCoordinator.claimPreloadedSession(for: model) else {
+        if let claimedPreload = await rollingBufferPreloadCoordinator.claimPreloadedSession(for: model) {
+            return await commitClaimedRollingBufferPreload(
+                claimedPreload,
+                model: model,
+                powerModeId: powerModeId,
+                latencyTrace: latencyTrace
+            )
+        }
+
+        guard model.supportsRecordedFileTranscription else {
+            discardPreparedQuickReleaseContext()
+            logger.notice("Latency trace preload commit unavailable operation=\(latencyTrace.operation, privacy: .public) reason=no-claim-nonbatch-model elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
+            return false
+        }
+
+        guard let audioSnapshot = rollingBufferPreloadCoordinator.claimBufferedAudioSnapshot() else {
             discardPreparedQuickReleaseContext()
             logger.notice("Latency trace preload commit unavailable operation=\(latencyTrace.operation, privacy: .public) reason=no-claim elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
             return false
         }
+
+        return await commitBufferedRollingAudioSnapshot(
+            audioSnapshot,
+            model: model,
+            powerModeId: powerModeId,
+            latencyTrace: latencyTrace
+        )
+    }
+
+    private func commitClaimedRollingBufferPreload(
+        _ claimedPreload: RollingBufferPreloadedSession,
+        model: any TranscriptionModel,
+        powerModeId: UUID?,
+        latencyTrace: TranscriptionLatencyTrace
+    ) async -> Bool {
         logger.notice("Latency trace preload claimed operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
 
         let claim = RollingBufferPreloadClaim(
@@ -436,6 +466,65 @@ class VoiceInkEngine: NSObject, ObservableObject {
             claimedPreload.session.cancel()
             rollingBufferPreloadCoordinator.recordingSessionDidFinish()
             logger.error("commitReadyRollingBufferPreload failed: \(error.localizedDescription, privacy: .public)")
+            return false
+        }
+    }
+
+    private func commitBufferedRollingAudioSnapshot(
+        _ audioSnapshot: RollingBufferAudioSnapshot,
+        model: any TranscriptionModel,
+        powerModeId: UUID?,
+        latencyTrace: TranscriptionLatencyTrace
+    ) async -> Bool {
+        logger.notice("Latency trace buffered audio claimed operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s bytes=\(audioSnapshot.audioData.count, privacy: .public)")
+
+        let preparedContext = takePreparedQuickReleaseContext(powerModeId: powerModeId)
+        await applyPowerModeConfiguration(powerModeId: powerModeId, preparedContext: preparedContext)
+        logger.notice("Latency trace active window ready operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
+
+        guard let currentModel = transcriptionModelManager.currentTranscriptionModel,
+              currentModel.name == model.name,
+              audioSnapshot.language == UserDefaults.standard.string(forKey: "SelectedLanguage") else {
+            rollingBufferPreloadCoordinator.recordingSessionDidFinish()
+            return false
+        }
+
+        do {
+            let fileName = "\(UUID().uuidString).wav"
+            let permanentURL = recordingsDirectory.appendingPathComponent(fileName)
+            let audioData = audioSnapshot.audioData
+            try await Task.detached(priority: .utility) {
+                try PCM16WAVFileWriter.writeMono16k(audioData, to: permanentURL)
+            }.value
+            logger.notice("Latency trace buffered audio file ready operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s bytes=\(audioData.count, privacy: .public)")
+
+            let transcription = makeRecordingTranscription(
+                for: permanentURL,
+                text: "",
+                duration: 0,
+                transcriptionStatus: .pending
+            )
+
+            recordedFile = permanentURL
+            currentSession = nil
+            activeRecordingStartID = nil
+            stopRequestedDuringStart = false
+            shouldCancelRecording = false
+            partialTranscript = ""
+            recordingState = .transcribing
+
+            await runPipeline(
+                on: transcription,
+                audioURL: permanentURL,
+                latencyTrace: latencyTrace,
+                deferHistoryInsertUntilSave: true,
+                preparedCursorTextContext: preparedContext?.cursorContextTask,
+                preparedPasteContext: preparedContext?.pasteContextTask
+            )
+            return true
+        } catch {
+            rollingBufferPreloadCoordinator.recordingSessionDidFinish()
+            logger.error("commitBufferedRollingAudioSnapshot failed: \(error.localizedDescription, privacy: .public)")
             return false
         }
     }

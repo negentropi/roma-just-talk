@@ -263,8 +263,9 @@ final class RollingBufferPreloadCoordinator {
     }
 
     func recordingSessionDidFinish() {
+        let shouldKeepLeadIn = state == .claimed && !recordingInProgress
         recordingInProgress = false
-        resetPreloadState(cancelSession: state != .claimed, keepLeadIn: false)
+        resetPreloadState(cancelSession: state != .claimed, keepLeadIn: shouldKeepLeadIn)
         state = .idle
     }
 

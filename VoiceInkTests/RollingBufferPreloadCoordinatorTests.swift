@@ -423,6 +423,77 @@ struct RollingBufferPreloadCoordinatorTests {
     }
 
     @MainActor
+    @Test func quickReleaseFinishKeepsRollingAudioCollectedWhilePipelineRuns() async {
+        let model = streamingModel()
+        let firstSession = FakeTranscriptionSession()
+        let secondSession = FakeTranscriptionSession()
+        var sessions = [firstSession, secondSession]
+
+        await withStandardRollingDefaults(for: model) { defaults in
+            setPreloadDefaults(defaults, model: model, preRunFinalization: true)
+        } run: {
+            let coordinator = RollingBufferPreloadCoordinator(
+                currentModelProvider: { model },
+                currentLanguageProvider: { "en" },
+                powerStateProvider: FixedPowerStateProvider(
+                    state: RollingBufferPowerState(isOnBattery: false, batteryLevelPercent: nil)
+                ),
+                detectorProvider: { FakeSpeechDetector(containsSpeech: true) },
+                sessionFactory: { _, _ in sessions.removeFirst() }
+            )
+
+            await coordinator.processRollingChunkForTesting(Data(repeating: 1, count: 8_000))
+            let firstClaim = await coordinator.claimPreloadedSession(for: model)
+            #expect(firstClaim != nil)
+
+            await coordinator.processRollingChunkForTesting(Data(repeating: 2, count: 1_024))
+            coordinator.recordingSessionDidFinish()
+
+            await coordinator.processRollingChunkForTesting(Data(repeating: 3, count: 8_000))
+            let secondClaim = await coordinator.claimPreloadedSession(for: model)
+
+            #expect(secondClaim != nil)
+            #expect(secondSession.chunks.snapshot().map(\.count) == [1_024, 8_000])
+        }
+    }
+
+    @MainActor
+    @Test func recordingFinishClearsClaimedSessionLeadInAfterActiveRecording() async {
+        let model = streamingModel()
+        let firstSession = FakeTranscriptionSession()
+        let secondSession = FakeTranscriptionSession()
+        var sessions = [firstSession, secondSession]
+
+        await withStandardRollingDefaults(for: model) { defaults in
+            setPreloadDefaults(defaults, model: model, preRunFinalization: true)
+        } run: {
+            let coordinator = RollingBufferPreloadCoordinator(
+                currentModelProvider: { model },
+                currentLanguageProvider: { "en" },
+                powerStateProvider: FixedPowerStateProvider(
+                    state: RollingBufferPowerState(isOnBattery: false, batteryLevelPercent: nil)
+                ),
+                detectorProvider: { FakeSpeechDetector(containsSpeech: true) },
+                sessionFactory: { _, _ in sessions.removeFirst() }
+            )
+
+            await coordinator.processRollingChunkForTesting(Data(repeating: 1, count: 8_000))
+            coordinator.prepareForRecordingStart()
+            let firstClaim = await coordinator.claimPreloadedSession(for: model)
+            #expect(firstClaim != nil)
+
+            await coordinator.processRollingChunkForTesting(Data(repeating: 2, count: 1_024))
+            coordinator.recordingSessionDidFinish()
+
+            await coordinator.processRollingChunkForTesting(Data(repeating: 3, count: 8_000))
+            let secondClaim = await coordinator.claimPreloadedSession(for: model)
+
+            #expect(secondClaim != nil)
+            #expect(secondSession.chunks.snapshot().map(\.count) == [8_000])
+        }
+    }
+
+    @MainActor
     @Test func claimCancelsPreloadStartedForPreviousLanguage() async {
         let model = streamingModel()
         let session = FakeTranscriptionSession()

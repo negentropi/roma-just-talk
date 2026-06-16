@@ -23,6 +23,7 @@
 - Warmed the rolling-buffer VAD model before first speech when preload is eligible, so the first VAD trigger can start STT without paying model-load delay.
 - Broadcast the restored startup transcription model so rolling-buffer preload can warm immediately after launch instead of waiting for a later settings change.
 - Let preload-only quick releases commit an already-ready rolling-buffer STT session directly, without opening and stopping a new recorder session first.
+- Preserved rolling audio collected while a preload-only quick release finalizes, so the next rolling preload does not restart from an empty lead-in after paste.
 - Deferred quick-release rolling-preload WAV writing until after cached stream finalization can start, while still waiting for the file before batch fallback or history metadata needs it.
 - Added claim-to-paste latency tracing for rolling-preload quick releases so remaining delays can be measured from runtime logs.
 - Skipped browser URL lookup during automatic Power Mode selection when no enabled URL rules exist, removing an avoidable pre-pipeline quick-release delay.

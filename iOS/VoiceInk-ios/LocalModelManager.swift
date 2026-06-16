@@ -10,7 +10,6 @@ import Combine
 import VoiceInkCore
 
 enum ModelDownloadError: Error {
-    case invalidURL
     case downloadFailed
     case fileSystemError
 }
@@ -19,10 +18,13 @@ struct WhisperModel: Identifiable, Codable {
     let id = UUID()
     let name: String
     let displayName: String
-    let downloadURL: String
     let filename: String
     let size: String
     let description: String
+
+    var downloadURL: URL {
+        VoiceInkWhisperModelFiles.downloadURL(forFilename: filename)
+    }
     
     var fileURL: URL {
         LocalModelManager.modelsDirectory.appendingPathComponent(filename)
@@ -38,7 +40,6 @@ struct WhisperModel: Identifiable, Codable {
     static let baseModel = WhisperModel(
         name: baseModelSpec.modelName,
         displayName: baseModelSpec.displayName,
-        downloadURL: baseModelSpec.downloadURLString,
         filename: baseModelSpec.filename,
         size: baseModelSpec.size,
         description: baseModelSpec.description
@@ -86,18 +87,14 @@ class LocalModelManager: ObservableObject {
             return
         }
         
-        guard let url = URL(string: model.downloadURL) else {
-            throw ModelDownloadError.invalidURL
-        }
-        
-        print("LocalModelManager: Starting download of \(model.name) from \(model.downloadURL)")
+        print("LocalModelManager: Starting download of \(model.name) from \(model.downloadURL.absoluteString)")
         
         isDownloading[model.id] = true
         downloadProgress[model.id] = 0.0
         downloadError = nil
         
         do {
-            let downloadTask = URLSession.shared.downloadTask(with: url) { [weak self] temporaryURL, response, error in
+            let downloadTask = URLSession.shared.downloadTask(with: model.downloadURL) { [weak self] temporaryURL, response, error in
                 Task { @MainActor in
                     self?.handleDownloadCompletion(
                         for: model,

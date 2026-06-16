@@ -107,6 +107,34 @@ final class PCMPreRollBuffer: @unchecked Sendable {
     }
 }
 
+struct PreRollStreamingEmissionGate {
+    private var isActive = false
+    private var queuedLiveChunks: [Data] = []
+
+    mutating func begin() {
+        isActive = true
+        queuedLiveChunks.removeAll(keepingCapacity: true)
+    }
+
+    mutating func queueLiveChunkIfNeeded(_ data: Data) -> Bool {
+        guard isActive else { return false }
+        queuedLiveChunks.append(data)
+        return true
+    }
+
+    mutating func finish() -> [Data] {
+        isActive = false
+        let queued = queuedLiveChunks
+        queuedLiveChunks.removeAll(keepingCapacity: true)
+        return queued
+    }
+
+    mutating func cancel() {
+        isActive = false
+        queuedLiveChunks.removeAll(keepingCapacity: true)
+    }
+}
+
 // MARK: - Core Audio Recorder (AUHAL-based, does not change system default device)
 final class CoreAudioRecorder: @unchecked Sendable {
 
@@ -128,6 +156,7 @@ final class CoreAudioRecorder: @unchecked Sendable {
         seconds: RollingBufferPreloadSettings.defaultBufferDurationSeconds
     )
     private let preRollStreamingChunkBytes = 3_200
+    private var preRollStreamingGate = PreRollStreamingEmissionGate()
 
     // Device format (what the hardware provides)
     private var deviceFormat = AudioStreamBasicDescription()
@@ -247,18 +276,23 @@ final class CoreAudioRecorder: @unchecked Sendable {
             preRollData = preRollBuffer.snapshotData()
             if !preRollData.isEmpty {
                 try writePCMDataToFile(preRollData)
-                emitPreRollDataToStreaming(preRollData)
+                if onAudioChunk != nil {
+                    preRollStreamingGate.begin()
+                }
             }
             isRecording = true
             fileAccessLock.unlock()
         } catch {
             audioFile = nil
+            preRollStreamingGate.cancel()
             fileAccessLock.unlock()
             ExtAudioFileDispose(fileRef)
             throw error
         }
 
         if !preRollData.isEmpty {
+            emitPreRollDataToStreaming(preRollData)
+            finishPreRollStreamingEmission()
             logger.notice("🎙️ Wrote pre-roll buffer bytes=\(preRollData.count, privacy: .public)")
         }
     }
@@ -326,6 +360,7 @@ final class CoreAudioRecorder: @unchecked Sendable {
         currentDeviceID = 0
         recordingURL = nil
         preRollBuffer.clear()
+        preRollStreamingGate.cancel()
 
         // Reset meters
         meterLock.lock()
@@ -891,6 +926,9 @@ final class CoreAudioRecorder: @unchecked Sendable {
 
         preRollBuffer.append(outputBuffer, sampleCount: Int(outputFrameCount))
         let rollingAudioChunkHandler = onRollingAudioChunk
+        var audioChunkData: Data?
+        var audioChunkHandler: ((_ data: Data) -> Void)?
+        var queuedForPreRollStreaming = false
 
         fileAccessLock.lock()
         if isRecording, let file = audioFile {
@@ -899,15 +937,24 @@ final class CoreAudioRecorder: @unchecked Sendable {
                 logger.error("🎙️ ExtAudioFileWrite failed with status: \(writeStatus, privacy: .public)")
             }
         }
-        let shouldSendAudioChunk = isRecording
+        if isRecording, let onAudioChunk {
+            let byteCount = Int(outputFrameCount) * MemoryLayout<Int16>.size
+            let data = Data(bytes: outputBuffer, count: byteCount)
+            if preRollStreamingGate.queueLiveChunkIfNeeded(data) {
+                queuedForPreRollStreaming = true
+            } else {
+                audioChunkHandler = onAudioChunk
+            }
+            audioChunkData = data
+        }
         fileAccessLock.unlock()
 
         // Send the same PCM data to the streaming callback if set
-        if shouldSendAudioChunk, let onAudioChunk = onAudioChunk {
-            let byteCount = Int(outputFrameCount) * MemoryLayout<Int16>.size
-            let data = Data(bytes: outputBuffer, count: byteCount)
-            onAudioChunk(data)
-            rollingAudioChunkHandler?(data)
+        if let audioChunkData {
+            if !queuedForPreRollStreaming {
+                audioChunkHandler?(audioChunkData)
+            }
+            rollingAudioChunkHandler?(audioChunkData)
         } else if let rollingAudioChunkHandler {
             let byteCount = Int(outputFrameCount) * MemoryLayout<Int16>.size
             let data = Data(bytes: outputBuffer, count: byteCount)
@@ -958,6 +1005,16 @@ final class CoreAudioRecorder: @unchecked Sendable {
             onAudioChunk(data.subdata(in: offset..<(offset + length)))
             offset += length
         }
+    }
+
+    private func finishPreRollStreamingEmission() {
+        fileAccessLock.lock()
+        let queuedLiveChunks = preRollStreamingGate.finish()
+        let audioChunkHandler = onAudioChunk
+        for chunk in queuedLiveChunks {
+            audioChunkHandler?(chunk)
+        }
+        fileAccessLock.unlock()
     }
 
     // MARK: - Device Info Logging

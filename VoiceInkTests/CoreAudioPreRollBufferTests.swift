@@ -29,6 +29,32 @@ struct CoreAudioPreRollBufferTests {
         #expect(samples(in: buffer.snapshotData()).isEmpty)
     }
 
+    @Test func streamingEmissionGateQueuesLiveChunksUntilPreRollFinishes() {
+        var gate = PreRollStreamingEmissionGate()
+        let first = Data([1])
+        let second = Data([2])
+
+        #expect(!gate.queueLiveChunkIfNeeded(first))
+
+        gate.begin()
+        #expect(gate.queueLiveChunkIfNeeded(first))
+        #expect(gate.queueLiveChunkIfNeeded(second))
+        #expect(gate.finish() == [first, second])
+        #expect(!gate.queueLiveChunkIfNeeded(Data([3])))
+    }
+
+    @Test func streamingEmissionGateDropsQueuedChunksWhenCanceled() {
+        var gate = PreRollStreamingEmissionGate()
+
+        gate.begin()
+        #expect(gate.queueLiveChunkIfNeeded(Data([1])))
+
+        gate.cancel()
+
+        #expect(gate.finish().isEmpty)
+        #expect(!gate.queueLiveChunkIfNeeded(Data([2])))
+    }
+
     private func append(_ values: [Int16], to buffer: PCMPreRollBuffer) {
         values.withUnsafeBufferPointer { pointer in
             guard let baseAddress = pointer.baseAddress else { return }

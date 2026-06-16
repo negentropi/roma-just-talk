@@ -1,4 +1,5 @@
 import Foundation
+import VoiceInkCore
 
 class OpenAICompatibleTranscriptionService {
     func transcribe(audioURL: URL, model: CustomCloudModel) async throws -> String {
@@ -9,7 +10,7 @@ class OpenAICompatibleTranscriptionService {
         let boundary = "Boundary-\(UUID().uuidString)"
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        request.setValue(VoiceInkOpenAICompatibleTranscriptionCodec.multipartContentType(boundary: boundary), forHTTPHeaderField: "Content-Type")
         request.setValue("Bearer \(model.apiKey)", forHTTPHeaderField: "Authorization")
 
         let body = try buildRequestBody(audioURL: audioURL, modelName: model.modelName, boundary: boundary)
@@ -25,7 +26,10 @@ class OpenAICompatibleTranscriptionService {
         }
 
         do {
-            return try JSONDecoder().decode(TranscriptionResponse.self, from: data).text
+            guard let text = try VoiceInkOpenAICompatibleTranscriptionCodec.textIfPresent(from: data) else {
+                throw CloudTranscriptionError.noTranscriptionReturned
+            }
+            return text
         } catch {
             throw CloudTranscriptionError.noTranscriptionReturned
         }
@@ -38,41 +42,15 @@ class OpenAICompatibleTranscriptionService {
 
         let selectedLanguage = UserDefaults.standard.string(forKey: "SelectedLanguage") ?? "auto"
         let prompt = UserDefaults.standard.string(forKey: "TranscriptionPrompt") ?? ""
-        let crlf = "\r\n"
-        var body = Data()
-
-        func append(_ string: String) { body.append(string.data(using: .utf8)!) }
-        func field(_ name: String, _ value: String) {
-            append("--\(boundary)\(crlf)")
-            append("Content-Disposition: form-data; name=\"\(name)\"\(crlf)\(crlf)")
-            body.append(value.data(using: .utf8)!)
-            append(crlf)
-        }
-
-        append("--\(boundary)\(crlf)")
-        append("Content-Disposition: form-data; name=\"file\"; filename=\"\(audioURL.lastPathComponent)\"\(crlf)")
-        append("Content-Type: audio/wav\(crlf)\(crlf)")
-        body.append(audioData)
-        append(crlf)
-
-        field("model", modelName)
-        field("response_format", "json")
-        field("temperature", "0")
-
-        if selectedLanguage != "auto" && !selectedLanguage.isEmpty {
-            field("language", selectedLanguage)
-        }
-        if !prompt.isEmpty {
-            field("prompt", prompt)
-        }
-
-        append("--\(boundary)--\(crlf)")
-        return body
-    }
-
-    private struct TranscriptionResponse: Decodable {
-        let text: String
-        let language: String?
-        let duration: Double?
+        return VoiceInkOpenAICompatibleTranscriptionCodec.requestBody(
+            audioData: audioData,
+            fileName: audioURL.lastPathComponent,
+            model: modelName,
+            boundary: boundary,
+            language: selectedLanguage == "auto" ? nil : selectedLanguage,
+            prompt: prompt,
+            responseFormat: "json",
+            temperature: "0"
+        )
     }
 }

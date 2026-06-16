@@ -47,6 +47,18 @@ final class TranscriptionModelCatalogTests: XCTestCase {
         XCTAssertTrue(models.first?.supportsStreaming == true)
     }
 
+    func testElevenLabsLanguageCapabilityAndModelsAreSharedProviderMetadata() {
+        XCTAssertEqual(VoiceInkTranscriptionModelProvider.elevenLabs.languageCodes?.first, "af")
+        XCTAssertEqual(VoiceInkTranscriptionModelProvider.elevenLabs.languageCodes?.last, "zu")
+        XCTAssertTrue(VoiceInkTranscriptionModelProvider.elevenLabs.languageCodes?.contains("en") == true)
+        XCTAssertTrue(VoiceInkTranscriptionModelProvider.elevenLabs.includesAutoDetect)
+
+        let models = VoiceInkTranscriptionModelCatalog.cloudModels(for: .elevenLabs)
+        XCTAssertEqual(models.map(\.name), ["scribe_v1", "scribe_v2"])
+        XCTAssertEqual(models.map(\.displayName), ["Scribe v1 (ElevenLabs)", "Scribe V2 (ElevenLabs)"])
+        XCTAssertEqual(models.map(\.supportsStreaming), [false, true])
+    }
+
     func testOpenAICompatibleProvidersUseAllLanguagesWithoutAutoDetectFlag() {
         XCTAssertNil(VoiceInkTranscriptionModelProvider.groq.languageCodes)
         XCTAssertFalse(VoiceInkTranscriptionModelProvider.groq.includesAutoDetect)

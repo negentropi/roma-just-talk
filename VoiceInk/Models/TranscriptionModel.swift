@@ -53,6 +53,8 @@ extension ModelProvider {
             return .groq
         case .deepgram:
             return .deepgram
+        case .elevenLabs:
+            return .elevenLabs
         case .mistral:
             return .mistral
         case .gemini:

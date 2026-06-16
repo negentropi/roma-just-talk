@@ -2,6 +2,7 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
     case groq
     case openAI
     case deepgram
+    case elevenLabs
     case mistral
     case gemini
     case soniox
@@ -11,6 +12,19 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
 
     public var languageCodes: [String]? {
         switch self {
+        case .elevenLabs:
+            return [
+                "af", "am", "ar", "as", "az", "be", "bg", "bn", "bs", "ca",
+                "cs", "cy", "da", "de", "el", "en", "es", "et", "eu", "fa",
+                "fi", "fil", "fr", "ga", "gl", "gu", "ha", "he", "hi", "hr",
+                "hu", "hy", "id", "ig", "is", "it", "ja", "jw", "ka", "kk",
+                "km", "kn", "ko", "ku", "ky", "lb", "ln", "lo", "lt", "lv",
+                "mi", "mk", "ml", "mn", "mr", "ms", "mt", "my", "ne", "nl",
+                "no", "or", "pa", "pl", "ps", "pt", "ro", "ru", "sd", "sk",
+                "sl", "sn", "so", "sr", "sv", "sw", "ta", "tg", "te", "th",
+                "tr", "uk", "ur", "uz", "vi", "wo", "xh", "yo", "yue", "zh",
+                "zu"
+            ]
         case .speechmatics:
             return [
                 "ar", "ba", "eu", "be", "bn", "bg", "yue", "ca", "hr", "cs",
@@ -46,7 +60,7 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
 
     public var includesAutoDetect: Bool {
         switch self {
-        case .deepgram, .mistral, .soniox, .speechmatics:
+        case .deepgram, .elevenLabs, .mistral, .soniox, .speechmatics:
             return true
         case .groq, .openAI, .gemini, .local, .voiceInk:
             return false
@@ -88,7 +102,7 @@ public enum VoiceInkTranscriptionModelCatalog {
 
     public static func modelNames(for provider: VoiceInkTranscriptionModelProvider) -> [String] {
         switch provider {
-        case .groq, .deepgram, .mistral, .gemini, .soniox, .speechmatics:
+        case .groq, .deepgram, .elevenLabs, .mistral, .gemini, .soniox, .speechmatics:
             return cloudModels(for: provider).map(\.name)
         case .openAI:
             return [
@@ -190,6 +204,26 @@ public enum VoiceInkTranscriptionModelCatalog {
                     name: "stt-async-v4",
                     displayName: "Soniox V4",
                     description: "Soniox transcription model v4 with human-parity accuracy",
+                    speed: 0.99,
+                    accuracy: 0.98,
+                    isMultilingual: true,
+                    supportsStreaming: true
+                )
+            ]
+        case .elevenLabs:
+            return [
+                VoiceInkCloudTranscriptionModelSpec(
+                    name: "scribe_v1",
+                    displayName: "Scribe v1 (ElevenLabs)",
+                    description: "ElevenLabs' Scribe model for fast & accurate transcription",
+                    speed: 0.7,
+                    accuracy: 0.98,
+                    isMultilingual: true
+                ),
+                VoiceInkCloudTranscriptionModelSpec(
+                    name: "scribe_v2",
+                    displayName: "Scribe V2 (ElevenLabs)",
+                    description: "ElevenLabs' Scribe V2 model for the most accurate transcription",
                     speed: 0.99,
                     accuracy: 0.98,
                     isMultilingual: true,

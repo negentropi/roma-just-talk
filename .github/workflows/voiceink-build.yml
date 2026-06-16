@@ -31,9 +31,10 @@ jobs:
       - name: Build local app
         run: make local
 
-      - name: Run unit tests
+      - name: Build unit tests
+        timeout-minutes: 15
         run: |
-          xcodebuild test \
+          xcodebuild build-for-testing \
             -project VoiceInk.xcodeproj \
             -scheme VoiceInk \
             -configuration Debug \

@@ -27,7 +27,7 @@ class DefaultModeManager {
     private func createDefaultMode() -> Mode {
         return Mode(
             name: "Default",
-            transcriptionProvider: .local, // Local whisper
+            transcriptionProvider: .localWhisper, // Local whisper
             transcriptionModel: VoiceInkTranscriptionModelCatalog.localBaseModel, // Base model for speed
             isPostProcessingEnabled: false, // No post-processing
             postProcessingProvider: .groq, // Doesn't matter since disabled

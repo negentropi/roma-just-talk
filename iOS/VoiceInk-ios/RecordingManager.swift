@@ -241,7 +241,7 @@ final class RecordingManager: ObservableObject {
                     .appendingPathComponent("Recordings")
                 let fileURL = recordingsDir.appendingPathComponent(audioFileName)
                 let service = TranscriptionServiceFactory.service(for: provider)
-                let rawText = try await service.transcribeAudioFile(apiBaseURL: provider.baseURL, apiKey: apiKey, model: model, fileURL: fileURL, language: nil)
+                let rawText = try await service.transcribeAudioFile(apiBaseURL: provider.apiBaseURL, apiKey: apiKey, model: model, fileURL: fileURL, language: nil)
                 
                 let cleanedText = VoiceInkTranscriptTextNormalizer.normalizeParagraphSpacing(rawText)
                 

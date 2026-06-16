@@ -6,20 +6,20 @@ struct Mode: Identifiable, Codable {
     var name: String
     
     // Transcription settings
-    var transcriptionProvider: Provider
+    var transcriptionProvider: VoiceInkProviderKind
     var transcriptionModel: String
     
     // Post-processing settings
     var isPostProcessingEnabled: Bool
-    var postProcessingProvider: Provider
+    var postProcessingProvider: VoiceInkProviderKind
     var postProcessingModel: String
     var promptTemplate: VoiceInkPostProcessingPromptTemplate
     
     init(name: String, 
-         transcriptionProvider: Provider = .groq,
+         transcriptionProvider: VoiceInkProviderKind = .groq,
          transcriptionModel: String? = nil,
          isPostProcessingEnabled: Bool = false,
-         postProcessingProvider: Provider = .groq,
+         postProcessingProvider: VoiceInkProviderKind = .groq,
          postProcessingModel: String? = nil,
          promptTemplate: VoiceInkPostProcessingPromptTemplate? = nil) {
         self.id = UUID()

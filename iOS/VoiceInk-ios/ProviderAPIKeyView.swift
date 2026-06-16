@@ -2,7 +2,7 @@ import SwiftUI
 import VoiceInkCore
 
 struct ProviderAPIKeyView: View {
-    let provider: Provider
+    let provider: VoiceInkProviderKind
     @StateObject private var settings = AppSettings.shared
     @State private var tempKey: String = ""
     @State private var isVerifying: Bool = false
@@ -102,9 +102,9 @@ struct ProviderAPIKeyView: View {
             let ok: Bool
             switch provider.apiKeyVerificationTransport {
             case .deepgramProjects:
-                ok = await deepgramClient.verifyAPIKey(baseURL: provider.baseURL, apiKey: keyToVerify)
+                ok = await deepgramClient.verifyAPIKey(baseURL: provider.apiBaseURL, apiKey: keyToVerify)
             case .openAICompatibleModels:
-                ok = await openAIClient.verifyAPIKey(baseURL: provider.baseURL, apiKey: keyToVerify)
+                ok = await openAIClient.verifyAPIKey(baseURL: provider.apiBaseURL, apiKey: keyToVerify)
             case nil:
                 ok = false
             }

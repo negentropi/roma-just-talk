@@ -16,7 +16,7 @@ public enum VoiceInkAPIKeyVerificationTransport: Sendable {
     case deepgramProjects
 }
 
-public enum VoiceInkProviderKind: String, CaseIterable, Sendable {
+public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, Sendable {
     case groq
     case openAI
     case deepgram
@@ -24,6 +24,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Sendable {
     case gemini
     case localWhisper
     case voiceInk
+
+    public var id: String { rawValue }
 
     public var displayName: String {
         switch self {
@@ -41,6 +43,48 @@ public enum VoiceInkProviderKind: String, CaseIterable, Sendable {
             return "Local (Whisper)"
         case .voiceInk:
             return "VoiceInk"
+        }
+    }
+
+    private var persistedValue: String {
+        switch self {
+        case .groq:
+            return "Groq"
+        case .openAI:
+            return "OpenAI"
+        case .deepgram:
+            return "Deepgram"
+        case .cerebras:
+            return "Cerebras"
+        case .gemini:
+            return "Gemini"
+        case .localWhisper:
+            return "Local (Whisper)"
+        case .voiceInk:
+            return "VoiceInk"
+        }
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let value = try container.decode(String.self)
+        guard let provider = Self.provider(forPersistedValue: value) else {
+            throw DecodingError.dataCorruptedError(
+                in: container,
+                debugDescription: "Invalid provider: \(value)"
+            )
+        }
+        self = provider
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(persistedValue)
+    }
+
+    private static func provider(forPersistedValue value: String) -> VoiceInkProviderKind? {
+        allCases.first { provider in
+            provider.persistedValue == value || provider.rawValue == value
         }
     }
 

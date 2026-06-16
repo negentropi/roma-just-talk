@@ -23,15 +23,15 @@ struct ModeConfigurationView: View {
     }
     
     /// Available transcription providers (those with valid API keys or downloaded local models)
-    private var availableTranscriptionProviders: [Provider] {
-        Provider.allCases.filter { provider in
+    private var availableTranscriptionProviders: [VoiceInkProviderKind] {
+        VoiceInkProviderKind.allCases.filter { provider in
             provider.supportsModelUse(.transcription) && settings.isKeyVerified(for: provider)
         }
     }
     
     /// Available post-processing providers (those with valid API keys)
-    private var availablePostProcessingProviders: [Provider] {
-        Provider.allCases.filter { provider in
+    private var availablePostProcessingProviders: [VoiceInkProviderKind] {
+        VoiceInkProviderKind.allCases.filter { provider in
             provider.supportsModelUse(.postProcessing) && settings.isKeyVerified(for: provider)
         }
     }

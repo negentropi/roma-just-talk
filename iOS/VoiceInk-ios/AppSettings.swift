@@ -34,7 +34,7 @@ final class AppSettings: ObservableObject {
     }
 
     @Published var openAIAPIKey: String {
-        didSet { saveAPIKey(openAIAPIKey, for: .openai) }
+        didSet { saveAPIKey(openAIAPIKey, for: .openAI) }
     }
 
     @Published var deepgramAPIKey: String {
@@ -55,7 +55,7 @@ final class AppSettings: ObservableObject {
     }
     
     @Published var openAIKeyVerified: Bool {
-        didSet { saveKeyVerified(openAIKeyVerified, for: .openai) }
+        didSet { saveKeyVerified(openAIKeyVerified, for: .openAI) }
     }
 
     @Published var deepgramKeyVerified: Bool {
@@ -90,12 +90,12 @@ final class AppSettings: ObservableObject {
         
 
         self.groqAPIKey = AppSettings.loadAPIKey(for: .groq)
-        self.openAIAPIKey = AppSettings.loadAPIKey(for: .openai)
+        self.openAIAPIKey = AppSettings.loadAPIKey(for: .openAI)
         self.deepgramAPIKey = AppSettings.loadAPIKey(for: .deepgram)
         self.cerebrasAPIKey = AppSettings.loadAPIKey(for: .cerebras)
         self.geminiAPIKey = AppSettings.loadAPIKey(for: .gemini)
         self.groqKeyVerified = Self.loadKeyVerified(for: .groq)
-        self.openAIKeyVerified = Self.loadKeyVerified(for: .openai)
+        self.openAIKeyVerified = Self.loadKeyVerified(for: .openAI)
         self.deepgramKeyVerified = Self.loadKeyVerified(for: .deepgram)
         self.cerebrasKeyVerified = Self.loadKeyVerified(for: .cerebras)
         self.geminiKeyVerified = Self.loadKeyVerified(for: .gemini)
@@ -105,25 +105,25 @@ final class AppSettings: ObservableObject {
 
     }
 
-    func apiKey(for provider: Provider) -> String {
+    func apiKey(for provider: VoiceInkProviderKind) -> String {
         switch provider { 
         case .groq: return groqAPIKey
-        case .openai: return openAIAPIKey
+        case .openAI: return openAIAPIKey
         case .deepgram: return deepgramAPIKey
         case .cerebras: return cerebrasAPIKey
         case .gemini: return geminiAPIKey
-        case .local: return "local" // Local transcription doesn't need an API key
-        case .voiceink: return "" // TODO: Replace with actual VoiceInk API key
+        case .localWhisper: return "local" // Local transcription doesn't need an API key
+        case .voiceInk: return "" // TODO: Replace with actual VoiceInk API key
         }
     }
 
-    func setAPIKey(_ key: String, for provider: Provider) {
+    func setAPIKey(_ key: String, for provider: VoiceInkProviderKind) {
         switch provider { 
         case .groq: 
             groqAPIKey = key
             // Reset verification status when key changes
             if groqAPIKey != key { groqKeyVerified = false }
-        case .openai: 
+        case .openAI:
             openAIAPIKey = key
             // Reset verification status when key changes
             if openAIAPIKey != key { openAIKeyVerified = false }
@@ -139,34 +139,34 @@ final class AppSettings: ObservableObject {
             geminiAPIKey = key
             // Reset verification status when key changes
             if geminiAPIKey != key { geminiKeyVerified = false }
-        case .local:
+        case .localWhisper:
             break // Local provider doesn't use API keys
-        case .voiceink:
+        case .voiceInk:
             break // VoiceInk uses hardcoded API key
         }
     }
     
-    func isKeyVerified(for provider: Provider) -> Bool {
+    func isKeyVerified(for provider: VoiceInkProviderKind) -> Bool {
         switch provider {
         case .groq: return groqKeyVerified && !groqAPIKey.isEmpty
-        case .openai: return openAIKeyVerified && !openAIAPIKey.isEmpty
+        case .openAI: return openAIKeyVerified && !openAIAPIKey.isEmpty
         case .deepgram: return deepgramKeyVerified && !deepgramAPIKey.isEmpty
         case .cerebras: return cerebrasKeyVerified && !cerebrasAPIKey.isEmpty
         case .gemini: return geminiKeyVerified && !geminiAPIKey.isEmpty
-        case .local: return LocalModelManager.shared.hasAvailableModel
-        case .voiceink: return true // VoiceInk uses hardcoded API key, always verified
+        case .localWhisper: return LocalModelManager.shared.hasAvailableModel
+        case .voiceInk: return true // VoiceInk uses hardcoded API key, always verified
         }
     }
     
-    func setKeyVerified(_ verified: Bool, for provider: Provider) {
+    func setKeyVerified(_ verified: Bool, for provider: VoiceInkProviderKind) {
         switch provider {
         case .groq: groqKeyVerified = verified
-        case .openai: openAIKeyVerified = verified
+        case .openAI: openAIKeyVerified = verified
         case .deepgram: deepgramKeyVerified = verified
         case .cerebras: cerebrasKeyVerified = verified
         case .gemini: geminiKeyVerified = verified
-        case .local: break // Local model status is handled by LocalModelManager
-        case .voiceink: break // VoiceInk uses hardcoded API key, no verification needed
+        case .localWhisper: break // Local model status is handled by LocalModelManager
+        case .voiceInk: break // VoiceInk uses hardcoded API key, no verification needed
         }
     }
 
@@ -190,7 +190,7 @@ final class AppSettings: ObservableObject {
     // MARK: - Mode-based Settings
     
     /// Get the effective transcription provider (from selected mode or first mode)
-    var effectiveTranscriptionProvider: Provider {
+    var effectiveTranscriptionProvider: VoiceInkProviderKind {
         if let selectedMode = selectedMode {
             return selectedMode.transcriptionProvider
         } else if let firstMode = modes.first {
@@ -212,7 +212,7 @@ final class AppSettings: ObservableObject {
     }
     
     /// Get the effective post-processing provider (from selected mode or first mode)
-    var effectivePostProcessingProvider: Provider {
+    var effectivePostProcessingProvider: VoiceInkProviderKind {
         if let selectedMode = selectedMode {
             return selectedMode.postProcessingProvider
         } else if let firstMode = modes.first {
@@ -263,7 +263,7 @@ final class AppSettings: ObservableObject {
         }
     }
 
-    private func saveAPIKey(_ key: String, for provider: Provider) {
+    private func saveAPIKey(_ key: String, for provider: VoiceInkProviderKind) {
         guard let account = provider.apiKeyAccount else { return }
         saveAPIKey(key, forKey: account)
     }
@@ -275,27 +275,27 @@ final class AppSettings: ObservableObject {
         return ""
     }
 
-    private static func loadAPIKey(for provider: Provider) -> String {
+    private static func loadAPIKey(for provider: VoiceInkProviderKind) -> String {
         guard let account = provider.apiKeyAccount else { return "" }
         return loadAPIKey(forKey: account)
     }
 
-    private static func deleteAPIKey(for provider: Provider) {
+    private static func deleteAPIKey(for provider: VoiceInkProviderKind) {
         guard let account = provider.apiKeyAccount else { return }
         _ = KeychainService.delete(key: account)
     }
 
-    private func saveKeyVerified(_ verified: Bool, for provider: Provider) {
+    private func saveKeyVerified(_ verified: Bool, for provider: VoiceInkProviderKind) {
         guard let key = provider.apiKeyVerificationStateKey else { return }
         UserDefaults.standard.set(verified, forKey: key)
     }
 
-    private static func loadKeyVerified(for provider: Provider) -> Bool {
+    private static func loadKeyVerified(for provider: VoiceInkProviderKind) -> Bool {
         guard let key = provider.apiKeyVerificationStateKey else { return false }
         return UserDefaults.standard.bool(forKey: key)
     }
 
-    private static func clearKeyVerified(for provider: Provider) {
+    private static func clearKeyVerified(for provider: VoiceInkProviderKind) {
         guard let key = provider.apiKeyVerificationStateKey else { return }
         UserDefaults.standard.removeObject(forKey: key)
     }
@@ -317,7 +317,7 @@ final class AppSettings: ObservableObject {
         cerebrasKeyVerified = false
         geminiKeyVerified = false
         Self.clearKeyVerified(for: .groq)
-        Self.clearKeyVerified(for: .openai)
+        Self.clearKeyVerified(for: .openAI)
         Self.clearKeyVerified(for: .deepgram)
         Self.clearKeyVerified(for: .cerebras)
         Self.clearKeyVerified(for: .gemini)
@@ -333,7 +333,7 @@ final class AppSettings: ObservableObject {
         cerebrasAPIKey = ""
         geminiAPIKey = ""
         Self.deleteAPIKey(for: .groq)
-        Self.deleteAPIKey(for: .openai)
+        Self.deleteAPIKey(for: .openAI)
         Self.deleteAPIKey(for: .deepgram)
         Self.deleteAPIKey(for: .cerebras)
         Self.deleteAPIKey(for: .gemini)

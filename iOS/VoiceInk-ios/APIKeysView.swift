@@ -1,11 +1,12 @@
 import SwiftUI
+import VoiceInkCore
 
 struct APIKeysView: View {
     @StateObject private var settings = AppSettings.shared
     
     var body: some View {
         List {
-            ForEach(Provider.allCases.filter(\.requiresUserAPIKey)) { provider in
+            ForEach(VoiceInkProviderKind.allCases.filter(\.requiresUserAPIKey)) { provider in
                 NavigationLink(destination: ProviderAPIKeyView(provider: provider)) {
                     HStack {
                         Text(provider.displayName)

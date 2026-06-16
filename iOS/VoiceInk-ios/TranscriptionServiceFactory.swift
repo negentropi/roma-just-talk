@@ -6,11 +6,11 @@ import Foundation
 import VoiceInkCore
 
 struct TranscriptionServiceFactory {
-    static func service(for provider: Provider) -> TranscriptionService {
-        switch provider.coreKind.transcriptionTransport {
+    static func service(for provider: VoiceInkProviderKind) -> TranscriptionService {
+        switch provider.transcriptionTransport {
         case .deepgram, .openAICompatible:
             return RemoteTranscriptionService(
-                transport: provider.coreKind.transcriptionTransport
+                transport: provider.transcriptionTransport
             )
         case .localWhisper:
             return WhisperTranscriptionService()

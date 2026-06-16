@@ -34,7 +34,7 @@ class TranscriptionRetryService {
         let fileURL = URL(fileURLWithPath: audioPath)
         let transcriptionService = TranscriptionServiceFactory.service(for: provider)
         let rawText = try await transcriptionService.transcribeAudioFile(
-            apiBaseURL: provider.baseURL,
+            apiBaseURL: provider.apiBaseURL,
             apiKey: apiKey,
             model: model,
             fileURL: fileURL,

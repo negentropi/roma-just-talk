@@ -20,12 +20,19 @@ class ActiveWindowService: ObservableObject {
     }
     
     func applyConfiguration(powerModeId: UUID? = nil) async {
+        let powerModeManager = PowerModeManager.shared
+
         if let powerModeId = powerModeId,
-           let config = PowerModeManager.shared.getConfiguration(with: powerModeId) {
+           let config = powerModeManager.getConfiguration(with: powerModeId) {
             await MainActor.run {
-                PowerModeManager.shared.setActiveConfiguration(config)
+                powerModeManager.setActiveConfiguration(config)
             }
             await PowerModeSessionManager.shared.beginSession(with: config)
+            return
+        }
+
+        let configurations = powerModeManager.configurations
+        guard configurations.hasEnabledAutomaticRules else {
             return
         }
 
@@ -40,10 +47,11 @@ class ActiveWindowService: ObservableObject {
 
         var configToApply: PowerModeConfig?
 
-        if let browserType = BrowserType.allCases.first(where: { $0.bundleIdentifier == bundleIdentifier }) {
+        if configurations.hasEnabledURLRules,
+           let browserType = BrowserType.allCases.first(where: { $0.bundleIdentifier == bundleIdentifier }) {
             do {
                 let currentURL = try await browserURLService.getCurrentURL(from: browserType)
-                if let config = PowerModeManager.shared.getConfigurationForURL(currentURL) {
+                if let config = powerModeManager.getConfigurationForURL(currentURL) {
                     configToApply = config
                 }
             } catch {
@@ -52,16 +60,16 @@ class ActiveWindowService: ObservableObject {
         }
 
         if configToApply == nil {
-            configToApply = PowerModeManager.shared.getConfigurationForApp(bundleIdentifier)
+            configToApply = powerModeManager.getConfigurationForApp(bundleIdentifier)
         }
 
         if configToApply == nil {
-            configToApply = PowerModeManager.shared.getDefaultConfiguration()
+            configToApply = powerModeManager.getDefaultConfiguration()
         }
 
         if let config = configToApply {
             await MainActor.run {
-                PowerModeManager.shared.setActiveConfiguration(config)
+                powerModeManager.setActiveConfiguration(config)
             }
             await PowerModeSessionManager.shared.beginSession(with: config)
         }

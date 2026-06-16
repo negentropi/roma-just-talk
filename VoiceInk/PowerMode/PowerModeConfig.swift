@@ -142,6 +142,24 @@ struct PowerModeConfig: Codable, Identifiable, Equatable {
     }
 }
 
+extension Array where Element == PowerModeConfig {
+    var hasEnabledAutomaticRules: Bool {
+        contains { config in
+            config.isEnabled && (
+                config.isDefault ||
+                !(config.appConfigs?.isEmpty ?? true) ||
+                !(config.urlConfigs?.isEmpty ?? true)
+            )
+        }
+    }
+
+    var hasEnabledURLRules: Bool {
+        contains { config in
+            config.isEnabled && !(config.urlConfigs?.isEmpty ?? true)
+        }
+    }
+}
+
 struct AppConfig: Codable, Identifiable, Equatable {
     let id: UUID
     var bundleIdentifier: String

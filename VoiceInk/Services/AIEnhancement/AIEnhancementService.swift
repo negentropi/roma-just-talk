@@ -218,7 +218,7 @@ class AIEnhancementService: ObservableObject {
             return ""
         }
 
-        let formattedText = "\n<TRANSCRIPT>\n\(text)\n</TRANSCRIPT>"
+        let formattedText = VoiceInkAIRequestPrompts.taggedTranscript(text)
         let systemMessage = await getSystemMessage(for: mode)
 
         await MainActor.run {

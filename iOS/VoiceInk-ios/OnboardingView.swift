@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import VoiceInkCore
 
 struct OnboardingView: View {
     @State private var currentStep = 0
@@ -310,14 +311,23 @@ struct ReadyOnboardingView: View {
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
     }
     
+    @MainActor
     private func completeOnboarding() {
-        // Create default mode for first-time user
-        DefaultModeManager.shared.setupForFirstTimeUser()
-        
+        ensureDefaultModeExists()
         UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
         withAnimation(.easeInOut(duration: 0.5)) {
             isOnboardingComplete = true
         }
+    }
+
+    @MainActor
+    private func ensureDefaultModeExists() {
+        let settings = AppSettings.shared
+        guard settings.modes.isEmpty else { return }
+
+        let defaultMode = Mode.defaultLocalWhisper()
+        settings.modes.append(defaultMode)
+        settings.selectedModeId = defaultMode.id
     }
 }
 

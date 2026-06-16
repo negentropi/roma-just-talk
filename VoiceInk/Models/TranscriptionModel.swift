@@ -65,6 +65,8 @@ extension ModelProvider {
             return .speechmatics
         case .xai:
             return .xai
+        case .cartesia:
+            return .cartesia
         default:
             return nil
         }

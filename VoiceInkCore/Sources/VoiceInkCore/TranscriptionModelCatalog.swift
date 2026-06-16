@@ -1,6 +1,7 @@
 public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
     case groq
     case openAI
+    case cartesia
     case deepgram
     case elevenLabs
     case mistral
@@ -13,6 +14,20 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
 
     public var languageCodes: [String]? {
         switch self {
+        case .cartesia:
+            return [
+                "af", "am", "ar", "as", "az", "ba", "be", "bg", "bn", "bo",
+                "br", "bs", "ca", "cs", "cy", "da", "de", "el", "en", "es",
+                "et", "eu", "fa", "fi", "fo", "fr", "gl", "gu", "ha", "haw",
+                "he", "hi", "hr", "ht", "hu", "hy", "id", "is", "it", "ja",
+                "jw", "ka", "kk", "km", "kn", "ko", "la", "lb", "ln", "lo",
+                "lt", "lv", "mg", "mi", "mk", "ml", "mn", "mr", "ms", "mt",
+                "my", "ne", "nl", "nn", "no", "oc", "pa", "pl", "ps", "pt",
+                "ro", "ru", "sa", "sd", "si", "sk", "sl", "sn", "so", "sq",
+                "sr", "su", "sv", "sw", "ta", "te", "tg", "th", "tk", "tl",
+                "tr", "tt", "uk", "ur", "uz", "vi", "yi", "yo", "yue", "zh",
+                "zu"
+            ]
         case .xai:
             return [
                 "ar", "cs", "da", "nl", "en", "fil", "fr", "de", "hi", "id",
@@ -69,7 +84,7 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
         switch self {
         case .deepgram, .elevenLabs, .mistral, .soniox, .speechmatics, .xai:
             return true
-        case .groq, .openAI, .gemini, .local, .voiceInk:
+        case .cartesia, .groq, .openAI, .gemini, .local, .voiceInk:
             return false
         }
     }
@@ -109,7 +124,7 @@ public enum VoiceInkTranscriptionModelCatalog {
 
     public static func modelNames(for provider: VoiceInkTranscriptionModelProvider) -> [String] {
         switch provider {
-        case .groq, .deepgram, .elevenLabs, .mistral, .gemini, .soniox, .speechmatics, .xai:
+        case .cartesia, .groq, .deepgram, .elevenLabs, .mistral, .gemini, .soniox, .speechmatics, .xai:
             return cloudModels(for: provider).map(\.name)
         case .openAI:
             return [
@@ -126,6 +141,18 @@ public enum VoiceInkTranscriptionModelCatalog {
 
     public static func cloudModels(for provider: VoiceInkTranscriptionModelProvider) -> [VoiceInkCloudTranscriptionModelSpec] {
         switch provider {
+        case .cartesia:
+            return [
+                VoiceInkCloudTranscriptionModelSpec(
+                    name: "ink-whisper",
+                    displayName: "Ink Whisper (Cartesia)",
+                    description: "Cartesia's fastest streaming STT model — engineered for real-time voice agents with 90+ language support",
+                    speed: 0.99,
+                    accuracy: 0.94,
+                    isMultilingual: true,
+                    supportsStreaming: true
+                )
+            ]
         case .groq:
             return [
                 VoiceInkCloudTranscriptionModelSpec(

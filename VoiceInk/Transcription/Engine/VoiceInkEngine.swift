@@ -197,11 +197,6 @@ class VoiceInkEngine: NSObject, ObservableObject {
                                     modelName: model.name,
                                     language: preloaded.language
                                 )
-                                self.currentSession = preloaded.session
-                                self.recorder.onAudioChunk = { data in
-                                    preloaded.audioChunkHandler(data)
-                                    startupAudioRelay.handle(data)
-                                }
                             }
 
                             if self.recordingState == .recording,
@@ -209,8 +204,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
                                 if let claim = claimedPreload,
                                    claim.matches(model: model, language: UserDefaults.standard.string(forKey: "SelectedLanguage")) {
                                     self.currentSession = claim.preloaded.session
+                                    startupAudioRelay.installSink(claim.preloaded.audioChunkHandler)
                                     self.recorder.onAudioChunk = claim.preloaded.audioChunkHandler
-                                    startupAudioRelay.clear()
                                 } else {
                                     if let claim = claimedPreload {
                                         claim.preloaded.session.cancel()

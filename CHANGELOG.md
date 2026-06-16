@@ -32,6 +32,7 @@
 - Let local streaming models transcribe buffered rolling-audio snapshots immediately while the WAV writes in parallel for fallback/history, instead of waiting for the file before STT starts.
 - Let very short active recordings that stop during startup replay their captured pre-roll/live PCM into the streaming session before falling back to batch transcription.
 - Removed the preload-miss shortcut polling timeout by awaiting recorder startup before the immediate stop handoff.
+- Replayed active-recording startup chunks into claimed rolling-preload sessions instead of dropping audio captured during the handoff.
 - Preserved rolling-buffer audio for direct snapshot fallback when an existing pre-run session is canceled by a model, language, or finalization-policy mismatch.
 - Preserved rolling audio collected while a preload-only quick release finalizes, so the next rolling preload does not restart from an empty lead-in after paste.
 - Deferred quick-release rolling-preload history insertion until the post-paste save boundary, removing avoidable SwiftData work before the cursor paste starts.

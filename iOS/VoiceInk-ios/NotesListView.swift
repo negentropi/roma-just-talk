@@ -1,6 +1,6 @@
 import SwiftUI
 import SwiftData
-import AVFoundation
+import VoiceInkCore
 
 struct StaticButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
@@ -22,9 +22,11 @@ struct NotesListView: View {
 
     var filteredNotes: [Transcription] {
         notes.filter { note in
-            searchText.isEmpty ||
-            note.text.localizedCaseInsensitiveContains(searchText) ||
-            (note.enhancedText ?? "").localizedCaseInsensitiveContains(searchText)
+            VoiceInkTranscriptPresentation.matchesSearch(
+                rawText: note.text,
+                enhancedText: note.enhancedText,
+                query: searchText
+            )
         }
     }
 
@@ -190,5 +192,4 @@ struct NotesListView: View {
         .modelContainer(for: [Transcription.self])
         .environmentObject(RecordingManager())
 }
-
 

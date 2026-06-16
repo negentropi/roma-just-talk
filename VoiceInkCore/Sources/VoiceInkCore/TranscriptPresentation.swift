@@ -17,6 +17,15 @@ public enum VoiceInkTranscriptPresentation {
         return nil
     }
 
+    public static func matchesSearch(rawText: String, enhancedText: String?, query: String) -> Bool {
+        guard !query.isEmpty else {
+            return true
+        }
+
+        return rawText.localizedCaseInsensitiveContains(query) ||
+            (enhancedText?.localizedCaseInsensitiveContains(query) ?? false)
+    }
+
     public static func displayText(
         status: VoiceInkTranscriptionStatus,
         rawText: String,

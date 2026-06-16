@@ -195,6 +195,7 @@ class SystemInfoService {
     private func getRollingBufferPreloadInfo() -> String {
         let configuration = RollingBufferPreloadSettings.configuration()
         let powerState = IOKitRollingBufferPowerStateProvider().currentPowerState()
+        let runtimeClaim = RollingBufferPreloadRuntimeDiagnostics.shared.currentQuickReleaseClaim()
         let powerDescription: String
         if powerState.isOnBattery {
             powerDescription = "Battery (\(powerState.batteryLevelPercent.map { "\($0)" } ?? "unknown")%)"
@@ -222,6 +223,7 @@ class SystemInfoService {
         Low Battery Threshold: \(configuration.lowBatteryThresholdPercent)%
         Current Power State: \(powerDescription)
         Current Model Buffer Preload: \(currentModelPreloadEnabled)
+        Last Quick Release Claim: \(runtimeClaim.exportSummary)
         """
     }
 

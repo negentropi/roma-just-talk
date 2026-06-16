@@ -191,6 +191,91 @@ struct RollingBufferPreloadPolicy {
     }
 }
 
+enum RollingBufferQuickReleaseClaimStrategy: String {
+    case none
+    case readyPreload
+    case bufferedAudioSnapshot
+    case unavailable
+    case invalidated
+    case failed
+
+    var displayName: String {
+        switch self {
+        case .none:
+            return "None"
+        case .readyPreload:
+            return "Ready Preload"
+        case .bufferedAudioSnapshot:
+            return "Buffered Audio Snapshot"
+        case .unavailable:
+            return "Unavailable"
+        case .invalidated:
+            return "Invalidated"
+        case .failed:
+            return "Failed"
+        }
+    }
+}
+
+struct RollingBufferQuickReleaseClaimSnapshot: Equatable {
+    let strategy: RollingBufferQuickReleaseClaimStrategy
+    let reason: String?
+    let audioBytes: Int
+    let updatedAt: Date?
+
+    var displaySummary: String {
+        guard updatedAt != nil else { return "None" }
+
+        var parts = [strategy.displayName]
+        if let reason, !reason.isEmpty {
+            parts.append(reason)
+        }
+        if audioBytes > 0 {
+            parts.append(ByteCountFormatter.string(fromByteCount: Int64(audioBytes), countStyle: .file))
+        }
+        return parts.joined(separator: " - ")
+    }
+
+    var exportSummary: String {
+        guard let updatedAt else { return displaySummary }
+        return "\(displaySummary) at \(updatedAt.formatted(date: .numeric, time: .standard))"
+    }
+}
+
+final class RollingBufferPreloadRuntimeDiagnostics {
+    static let shared = RollingBufferPreloadRuntimeDiagnostics()
+
+    private let lock = NSLock()
+    private var snapshot = RollingBufferQuickReleaseClaimSnapshot(
+        strategy: .none,
+        reason: nil,
+        audioBytes: 0,
+        updatedAt: nil
+    )
+
+    func recordQuickReleaseClaim(
+        strategy: RollingBufferQuickReleaseClaimStrategy,
+        reason: String? = nil,
+        audioBytes: Int = 0,
+        at updatedAt: Date = Date()
+    ) {
+        lock.lock()
+        defer { lock.unlock() }
+        snapshot = RollingBufferQuickReleaseClaimSnapshot(
+            strategy: strategy,
+            reason: reason,
+            audioBytes: audioBytes,
+            updatedAt: updatedAt
+        )
+    }
+
+    func currentQuickReleaseClaim() -> RollingBufferQuickReleaseClaimSnapshot {
+        lock.lock()
+        defer { lock.unlock() }
+        return snapshot
+    }
+}
+
 extension ModelProvider {
     var isCloudTranscriptionProvider: Bool {
         switch self {

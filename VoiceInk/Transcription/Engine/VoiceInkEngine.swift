@@ -359,12 +359,20 @@ class VoiceInkEngine: NSObject, ObservableObject {
 
         guard recordingState == .idle else {
             discardPreparedQuickReleaseContext()
+            RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
+                strategy: .unavailable,
+                reason: "state-\(recordingState)"
+            )
             logger.notice("Latency trace preload commit unavailable operation=\(latencyTrace.operation, privacy: .public) reason=state elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
             return false
         }
 
         guard let model = transcriptionModelManager.currentTranscriptionModel else {
             discardPreparedQuickReleaseContext()
+            RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
+                strategy: .unavailable,
+                reason: "no-model"
+            )
             logger.notice("Latency trace preload commit unavailable operation=\(latencyTrace.operation, privacy: .public) reason=no-model elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
             return false
         }
@@ -380,12 +388,20 @@ class VoiceInkEngine: NSObject, ObservableObject {
 
         guard model.supportsRecordedFileTranscription else {
             discardPreparedQuickReleaseContext()
+            RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
+                strategy: .unavailable,
+                reason: "no-claim-nonbatch-model"
+            )
             logger.notice("Latency trace preload commit unavailable operation=\(latencyTrace.operation, privacy: .public) reason=no-claim-nonbatch-model elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
             return false
         }
 
         guard let audioSnapshot = rollingBufferPreloadCoordinator.claimBufferedAudioSnapshot() else {
             discardPreparedQuickReleaseContext()
+            RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
+                strategy: .unavailable,
+                reason: "no-claim"
+            )
             logger.notice("Latency trace preload commit unavailable operation=\(latencyTrace.operation, privacy: .public) reason=no-claim elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
             return false
         }
@@ -420,6 +436,11 @@ class VoiceInkEngine: NSObject, ObservableObject {
               claim.matches(model: currentModel, language: UserDefaults.standard.string(forKey: "SelectedLanguage")) else {
             claimedPreload.session.cancel()
             rollingBufferPreloadCoordinator.recordingSessionDidFinish()
+            RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
+                strategy: .invalidated,
+                reason: "model-or-language-changed",
+                audioBytes: claimedPreload.audioData.count
+            )
             return false
         }
 
@@ -436,6 +457,10 @@ class VoiceInkEngine: NSObject, ObservableObject {
                 try await audioFileReadyTask.value
             }
             logger.notice("Latency trace deferred audio write started operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s bytes=\(audioData.count, privacy: .public)")
+            RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
+                strategy: .readyPreload,
+                audioBytes: audioData.count
+            )
 
             let transcription = makeRecordingTranscription(
                 for: permanentURL,
@@ -465,6 +490,11 @@ class VoiceInkEngine: NSObject, ObservableObject {
         } catch {
             claimedPreload.session.cancel()
             rollingBufferPreloadCoordinator.recordingSessionDidFinish()
+            RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
+                strategy: .failed,
+                reason: "ready-preload-error",
+                audioBytes: claimedPreload.audioData.count
+            )
             logger.error("commitReadyRollingBufferPreload failed: \(error.localizedDescription, privacy: .public)")
             return false
         }
@@ -486,6 +516,11 @@ class VoiceInkEngine: NSObject, ObservableObject {
               currentModel.name == model.name,
               audioSnapshot.language == UserDefaults.standard.string(forKey: "SelectedLanguage") else {
             rollingBufferPreloadCoordinator.recordingSessionDidFinish()
+            RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
+                strategy: .invalidated,
+                reason: "model-or-language-changed",
+                audioBytes: audioSnapshot.audioData.count
+            )
             return false
         }
 
@@ -497,6 +532,10 @@ class VoiceInkEngine: NSObject, ObservableObject {
                 try PCM16WAVFileWriter.writeMono16k(audioData, to: permanentURL)
             }.value
             logger.notice("Latency trace buffered audio file ready operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s bytes=\(audioData.count, privacy: .public)")
+            RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
+                strategy: .bufferedAudioSnapshot,
+                audioBytes: audioData.count
+            )
 
             let transcription = makeRecordingTranscription(
                 for: permanentURL,
@@ -524,6 +563,11 @@ class VoiceInkEngine: NSObject, ObservableObject {
             return true
         } catch {
             rollingBufferPreloadCoordinator.recordingSessionDidFinish()
+            RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
+                strategy: .failed,
+                reason: "buffered-audio-error",
+                audioBytes: audioSnapshot.audioData.count
+            )
             logger.error("commitBufferedRollingAudioSnapshot failed: \(error.localizedDescription, privacy: .public)")
             return false
         }

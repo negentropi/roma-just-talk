@@ -5,33 +5,42 @@ struct DiagnosticsSettingsView: View {
     @State private var exportedLogURL: URL?
     @State private var showLogExportError = false
     @State private var logExportError: String = ""
+    @State private var rollingBufferClaim = RollingBufferPreloadRuntimeDiagnostics.shared.currentQuickReleaseClaim()
 
     var body: some View {
-        LabeledContent {
-            HStack(spacing: 8) {
-                if let url = exportedLogURL {
-                    Button("Show in Finder") {
-                        NSWorkspace.shared.activateFileViewerSelecting([url])
+        Group {
+            LabeledContent("Rolling Buffer Last Claim") {
+                Text(rollingBufferClaim.displaySummary)
+                    .foregroundStyle(.secondary)
+            }
+
+            LabeledContent {
+                HStack(spacing: 8) {
+                    if let url = exportedLogURL {
+                        Button("Show in Finder") {
+                            NSWorkspace.shared.activateFileViewerSelecting([url])
+                        }
+
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(.green)
                     }
 
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.green)
+                    Button("Export") {
+                        exportDiagnosticLogs()
+                    }
+                    .disabled(isExportingLogs)
                 }
-
-                Button("Export") {
-                    exportDiagnosticLogs()
+            } label: {
+                HStack(spacing: 4) {
+                    if isExportingLogs {
+                        ProgressView()
+                            .controlSize(.small)
+                    }
+                    Text("Export Logs")
                 }
-                .disabled(isExportingLogs)
-            }
-        } label: {
-            HStack(spacing: 4) {
-                if isExportingLogs {
-                    ProgressView()
-                        .controlSize(.small)
-                }
-                Text("Export Logs")
             }
         }
+        .onAppear(perform: refreshRollingBufferClaim)
         .alert("Export Failed", isPresented: $showLogExportError) {
             Button("OK", role: .cancel) { }
         } message: {
@@ -40,6 +49,7 @@ struct DiagnosticsSettingsView: View {
     }
 
     private func exportDiagnosticLogs() {
+        refreshRollingBufferClaim()
         isExportingLogs = true
         exportedLogURL = nil
 
@@ -58,5 +68,9 @@ struct DiagnosticsSettingsView: View {
                 }
             }
         }
+    }
+
+    private func refreshRollingBufferClaim() {
+        rollingBufferClaim = RollingBufferPreloadRuntimeDiagnostics.shared.currentQuickReleaseClaim()
     }
 }

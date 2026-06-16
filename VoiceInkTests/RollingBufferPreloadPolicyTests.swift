@@ -114,6 +114,27 @@ struct RollingBufferPreloadPolicyTests {
             .allowsPreload(for: model, perModelEnabled: true))
     }
 
+    @Test func runtimeDiagnosticsKeepLatestQuickReleaseClaim() {
+        let diagnostics = RollingBufferPreloadRuntimeDiagnostics()
+
+        #expect(diagnostics.currentQuickReleaseClaim().displaySummary == "None")
+
+        diagnostics.recordQuickReleaseClaim(
+            strategy: .bufferedAudioSnapshot,
+            reason: "test",
+            audioBytes: 1_024,
+            at: Date(timeIntervalSince1970: 0)
+        )
+
+        let claim = diagnostics.currentQuickReleaseClaim()
+        #expect(claim.strategy == .bufferedAudioSnapshot)
+        #expect(claim.reason == "test")
+        #expect(claim.audioBytes == 1_024)
+        #expect(claim.displaySummary.contains("Buffered Audio Snapshot"))
+        #expect(claim.displaySummary.contains("test"))
+        #expect(claim.exportSummary.contains(claim.displaySummary))
+    }
+
     private func temporaryDefaults() -> UserDefaults {
         let suiteName = "VoiceInkTests.RollingBufferPreloadPolicy.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!

@@ -169,7 +169,7 @@ struct NoteDetailView: View {
                     .foregroundStyle(note.transcriptionStatus == .failed ? .red : .orange)
                 
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(note.transcriptionStatus == .failed ? "Transcription Failed" : "Transcription Pending")
+                    Text(transcriptionStatusTitle)
                         .font(.subheadline.weight(.medium))
                     if let error = note.transcriptionError, !error.isEmpty {
                         Text(error)
@@ -226,6 +226,10 @@ struct NoteDetailView: View {
         .padding()
         .background(Color(.secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    private var transcriptionStatusTitle: String {
+        VoiceInkTranscriptPresentation.statusTitle(for: note.transcriptionStatus) ?? ""
     }
     
     private func retranscribe() {

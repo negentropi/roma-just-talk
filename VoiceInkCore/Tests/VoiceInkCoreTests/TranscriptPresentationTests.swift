@@ -42,5 +42,37 @@ final class TranscriptPresentationTests: XCTestCase {
             )
         )
     }
+
+    func testStatusTitleReturnsRetryStateTitles() {
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.statusTitle(for: .pending),
+            "Transcription Pending"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.statusTitle(for: .failed),
+            "Transcription Failed"
+        )
+    }
+
+    func testStatusTitleReturnsNilForNonRetryStates() {
+        XCTAssertNil(VoiceInkTranscriptPresentation.statusTitle(for: .completed))
+        XCTAssertNil(VoiceInkTranscriptPresentation.statusTitle(for: .canceled))
+    }
+
+    func testStatusBadgeTextReturnsRetryStateLabels() {
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.statusBadgeText(for: .pending),
+            "Processing"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.statusBadgeText(for: .failed),
+            "Failed"
+        )
+    }
+
+    func testStatusBadgeTextReturnsNilForNonRetryStates() {
+        XCTAssertNil(VoiceInkTranscriptPresentation.statusBadgeText(for: .completed))
+        XCTAssertNil(VoiceInkTranscriptPresentation.statusBadgeText(for: .canceled))
+    }
 }
 #endif

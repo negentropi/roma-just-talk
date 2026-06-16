@@ -47,6 +47,28 @@ public enum VoiceInkTranscriptPresentation {
         }
     }
 
+    public static func statusTitle(for status: VoiceInkTranscriptionStatus) -> String? {
+        switch status {
+        case .pending:
+            return "Transcription Pending"
+        case .failed:
+            return "Transcription Failed"
+        case .completed, .canceled:
+            return nil
+        }
+    }
+
+    public static func statusBadgeText(for status: VoiceInkTranscriptionStatus) -> String? {
+        switch status {
+        case .pending:
+            return "Processing"
+        case .failed:
+            return "Failed"
+        case .completed, .canceled:
+            return nil
+        }
+    }
+
     public static func isPasteable(
         rawText: String,
         statusRawValue: String?,

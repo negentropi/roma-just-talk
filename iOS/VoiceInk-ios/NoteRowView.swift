@@ -36,12 +36,12 @@ struct NoteRowView: View {
                     HStack(spacing: 6) {
                         ProgressView()
                             .scaleEffect(0.7)
-                        Text("Processing")
+                        Text(statusBadgeText)
                             .font(.caption)
                     }
                     .foregroundStyle(.secondary)
                 } else if note.transcriptionStatus == .failed {
-                    Text("Failed")
+                    Text(statusBadgeText)
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.orange)
                         .padding(.horizontal, 8)
@@ -69,6 +69,10 @@ struct NoteRowView: View {
         )
     }
 
+    private var statusBadgeText: String {
+        VoiceInkTranscriptPresentation.statusBadgeText(for: note.transcriptionStatus) ?? ""
+    }
+
     private var relativeTimestamp: String {
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .short
@@ -82,5 +86,3 @@ struct NoteRowView: View {
         return String(format: "%02d:%02d", m, r)
     }
 }
-
-

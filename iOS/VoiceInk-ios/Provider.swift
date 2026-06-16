@@ -25,7 +25,7 @@ enum Provider: String, CaseIterable, Codable, Identifiable {
         case .cerebras: return VoiceInkProviderEndpoint.cerebras.apiBaseURL
         case .gemini: return VoiceInkProviderEndpoint.gemini.apiBaseURL
         case .local: return URL(string: "http://localhost")! // Not used for local transcription
-        case .voiceink: return VoiceInkProviderEndpoint.groq.apiBaseURL // VoiceInk uses Groq backend
+        case .voiceink: return VoiceInkProviderEndpoint.voiceInkBackend.apiBaseURL
         }
     }
     

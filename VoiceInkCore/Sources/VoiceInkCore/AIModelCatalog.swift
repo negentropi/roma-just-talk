@@ -6,6 +6,12 @@ public enum VoiceInkAIModelProvider: String, CaseIterable, Sendable {
 }
 
 public enum VoiceInkAIModelCatalog {
+    public static let voiceInkPostProcessingProvider: VoiceInkAIModelProvider = .groq
+
+    public static var voiceInkPostProcessingModel: String {
+        defaultModel(for: voiceInkPostProcessingProvider)
+    }
+
     public static func defaultModel(for provider: VoiceInkAIModelProvider) -> String {
         switch provider {
         case .cerebras:

@@ -264,7 +264,7 @@ final class AppSettings: ObservableObject {
     
     /// Get the hardcoded post-processing model for VoiceInk
     func voiceInkPostProcessingModel() -> String {
-        return VoiceInkAIModelCatalog.defaultModel(for: .groq)
+        return VoiceInkAIModelCatalog.voiceInkPostProcessingModel
     }
 
     private func saveAPIKey(_ key: String, forKey account: String) {

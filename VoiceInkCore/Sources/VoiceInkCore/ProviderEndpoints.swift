@@ -7,6 +7,8 @@ public enum VoiceInkProviderEndpoint: String, CaseIterable, Sendable {
     case cerebras
     case gemini
 
+    public static let voiceInkBackend = VoiceInkProviderEndpoint.groq
+
     public var apiBaseURL: URL {
         switch self {
         case .groq:

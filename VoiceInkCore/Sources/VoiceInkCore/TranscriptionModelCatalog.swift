@@ -5,6 +5,30 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
     case gemini
     case local
     case voiceInk
+
+    public var languageCodes: [String]? {
+        switch self {
+        case .deepgram:
+            return [
+                "ar", "be", "bg", "bn", "bs", "ca", "cs", "da", "de", "el",
+                "en", "es", "et", "fa", "fi", "fr", "he", "hi", "hr", "hu",
+                "id", "it", "ja", "kn", "ko", "lt", "lv", "mk", "mr", "ms",
+                "nl", "no", "pl", "pt", "ro", "ru", "sk", "sl", "sr", "sv",
+                "ta", "te", "th", "tl", "tr", "uk", "ur", "vi", "zh"
+            ]
+        case .groq, .openAI, .gemini, .local, .voiceInk:
+            return nil
+        }
+    }
+
+    public var includesAutoDetect: Bool {
+        switch self {
+        case .deepgram:
+            return true
+        case .groq, .openAI, .gemini, .local, .voiceInk:
+            return false
+        }
+    }
 }
 
 public struct VoiceInkCloudTranscriptionModelSpec: Equatable, Sendable {

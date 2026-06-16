@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import VoiceInkCore
 
 protocol CloudProvider {
     var modelProvider: ModelProvider { get }
@@ -15,6 +16,14 @@ protocol CloudProvider {
 }
 
 extension CloudProvider {
+    var languageCodes: [String]? {
+        modelProvider.coreProviderKind?.transcriptionModelProvider?.languageCodes
+    }
+
+    var includesAutoDetect: Bool {
+        modelProvider.coreProviderKind?.transcriptionModelProvider?.includesAutoDetect ?? false
+    }
+
     var isStreamingOnly: Bool { false }
 
     /// Streaming-only providers inherit this and get a clear error if batch is somehow attempted.

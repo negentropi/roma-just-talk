@@ -5,14 +5,6 @@ import VoiceInkCore
 
 struct DeepgramProvider: CloudProvider {
     let modelProvider: ModelProvider = .deepgram
-    let languageCodes: [String]? = [
-        "ar", "be", "bg", "bn", "bs", "ca", "cs", "da", "de", "el",
-        "en", "es", "et", "fa", "fi", "fr", "he", "hi", "hr", "hu",
-        "id", "it", "ja", "kn", "ko", "lt", "lv", "mk", "mr", "ms",
-        "nl", "no", "pl", "pt", "ro", "ru", "sk", "sl", "sr", "sv",
-        "ta", "te", "th", "tl", "tr", "uk", "ur", "vi", "zh"
-    ]
-    let includesAutoDetect: Bool = true
 
     var models: [CloudModel] {
         VoiceInkTranscriptionModelCatalog

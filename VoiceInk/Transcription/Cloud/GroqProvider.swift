@@ -5,8 +5,6 @@ import VoiceInkCore
 
 struct GroqProvider: CloudProvider {
     let modelProvider: ModelProvider = .groq
-    let languageCodes: [String]? = nil
-    let includesAutoDetect: Bool = false
 
     var models: [CloudModel] {
         VoiceInkTranscriptionModelCatalog

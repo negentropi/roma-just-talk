@@ -39,7 +39,7 @@ enum AIProvider: String, CaseIterable {
         case .elevenLabs:
             return "https://api.elevenlabs.io/v1/speech-to-text"
         case .deepgram:
-            return "https://api.deepgram.com/v1/listen"
+            return VoiceInkProviderEndpoint.deepgram.deepgramListenURL!.absoluteString
         case .soniox:
             return "https://api.soniox.com/v1"
         case .speechmatics:

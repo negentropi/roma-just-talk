@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import VoiceInkCore
 
 struct DeepgramTranscriptionResponse: Decodable {
     let results: DeepgramResults
@@ -35,7 +36,7 @@ struct DeepgramTranscriptionService: TranscriptionService {
             queryItems.append(URLQueryItem(name: "language", value: language))
         }
         
-        var components = URLComponents(url: apiBaseURL.appendingPathComponent("/v1/listen"), resolvingAgainstBaseURL: false)!
+        var components = URLComponents(url: VoiceInkProviderEndpoint.deepgramListenURL(from: apiBaseURL), resolvingAgainstBaseURL: false)!
         components.queryItems = queryItems
         
         guard let url = components.url else { throw URLError(.badURL) }
@@ -63,7 +64,7 @@ struct DeepgramTranscriptionService: TranscriptionService {
     
     func verifyAPIKey(apiBaseURL: URL, _ apiKey: String) async -> Bool {
         // Use the projects endpoint to verify the API key
-        var request = URLRequest(url: apiBaseURL.appendingPathComponent("/v1/projects"))
+        var request = URLRequest(url: VoiceInkProviderEndpoint.deepgramProjectsURL(from: apiBaseURL))
         request.setValue("Token \(apiKey)", forHTTPHeaderField: "Authorization")
         
         do {

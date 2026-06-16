@@ -24,15 +24,18 @@ public enum VoiceInkProviderEndpoint: String, CaseIterable, Sendable {
 
     public var chatCompletionsURL: URL? {
         switch self {
-        case .groq:
-            return URL(string: "https://api.groq.com/openai/v1/chat/completions")!
-        case .openAI:
-            return URL(string: "https://api.openai.com/v1/chat/completions")!
-        case .cerebras:
-            return URL(string: "https://api.cerebras.ai/v1/chat/completions")!
-        case .gemini:
-            return URL(string: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions")!
+        case .groq, .openAI, .cerebras, .gemini:
+            return Self.openAICompatibleChatCompletionsURL(from: apiBaseURL)
         case .deepgram:
+            return nil
+        }
+    }
+
+    public var deepgramListenURL: URL? {
+        switch self {
+        case .deepgram:
+            return Self.deepgramListenURL(from: apiBaseURL)
+        case .groq, .openAI, .cerebras, .gemini:
             return nil
         }
     }
@@ -50,5 +53,25 @@ public enum VoiceInkProviderEndpoint: String, CaseIterable, Sendable {
         case .gemini:
             return URL(string: "https://aistudio.google.com/app/apikey")!
         }
+    }
+
+    public static func openAICompatibleModelsURL(from baseURL: URL) -> URL {
+        baseURL.appendingPathComponent("v1/models")
+    }
+
+    public static func openAICompatibleChatCompletionsURL(from baseURL: URL) -> URL {
+        baseURL.appendingPathComponent("v1/chat/completions")
+    }
+
+    public static func openAICompatibleAudioTranscriptionsURL(from baseURL: URL) -> URL {
+        baseURL.appendingPathComponent("v1/audio/transcriptions")
+    }
+
+    public static func deepgramListenURL(from baseURL: URL) -> URL {
+        baseURL.appendingPathComponent("v1/listen")
+    }
+
+    public static func deepgramProjectsURL(from baseURL: URL) -> URL {
+        baseURL.appendingPathComponent("v1/projects")
     }
 }

@@ -5,7 +5,7 @@ typealias OAChatMessage = VoiceInkOpenAICompatibleChatMessage
 
 struct OpenAICompatibleClient {
     func verifyAPIKey(baseURL: URL, apiKey: String) async -> Bool {
-        var request = URLRequest(url: baseURL.appendingPathComponent("/v1/models"))
+        var request = URLRequest(url: VoiceInkProviderEndpoint.openAICompatibleModelsURL(from: baseURL))
         request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         do {
             let (_, response) = try await URLSession.shared.data(for: request)
@@ -15,7 +15,7 @@ struct OpenAICompatibleClient {
     }
 
     func chatCompletion(baseURL: URL, apiKey: String, model: String, messages: [OAChatMessage], temperature: Double? = 0.2) async throws -> String {
-        var request = URLRequest(url: baseURL.appendingPathComponent("/v1/chat/completions"))
+        var request = URLRequest(url: VoiceInkProviderEndpoint.openAICompatibleChatCompletionsURL(from: baseURL))
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")

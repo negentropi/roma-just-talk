@@ -8,10 +8,7 @@ class VADModelManager {
     private var modelPath: String?
 
     private init() {
-        if let path = Bundle.main.path(
-            forResource: VoiceInkVADModelFiles.sileroResourceName,
-            ofType: VoiceInkVADModelFiles.sileroFileExtension
-        ) {
+        if let path = VoiceInkVADModelFiles.sileroPath() {
             self.modelPath = path
             logger.info("VAD model found at path: \(path)")
         } else {

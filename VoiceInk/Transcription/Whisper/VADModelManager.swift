@@ -9,14 +9,11 @@ class VADModelManager {
     private init() {}
 
     func getModelPath() async -> String? {
-        guard let modelURL = Bundle.main.url(
-            forResource: VoiceInkVADModelFiles.sileroResourceName,
-            withExtension: VoiceInkVADModelFiles.sileroFileExtension
-        ) else {
+        guard let path = VoiceInkVADModelFiles.sileroPath() else {
             logger.error("VAD model not found in bundle resources")
             return nil
         }
         
-        return modelURL.path
+        return path
     }
 } 

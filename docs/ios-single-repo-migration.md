@@ -32,6 +32,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - stored audio-file path resolution
 - duration presentation
 - Whisper and VAD model file metadata
+- VAD bundle resource lookup
 - PCM16 sample conversion
 - OpenAI-compatible, Deepgram, Gemini, Mistral, ElevenLabs, xAI, Soniox, Speechmatics, and AssemblyAI remote transcription request/client helpers
 - Cartesia API-key verification request/client helper

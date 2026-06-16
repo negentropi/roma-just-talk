@@ -9,9 +9,6 @@ struct ProviderAPIKeyView: View {
     @State private var verifyResult: Bool? = nil
     @State private var editingKey: Bool = true
 
-    private let deepgramClient = VoiceInkDeepgramTranscriptionClient()
-    private let openAIClient = VoiceInkOpenAICompatibleClient()
-    
     private var isKeyVerified: Bool {
         settings.isKeyVerified(for: provider)
     }
@@ -99,15 +96,7 @@ struct ProviderAPIKeyView: View {
             let entered = tempKey.trimmingCharacters(in: .whitespacesAndNewlines)
             let keyToVerify = entered.isEmpty ? currentAPIKey() : entered
             
-            let ok: Bool
-            switch provider.apiKeyVerificationTransport {
-            case .deepgramProjects:
-                ok = await deepgramClient.verifyAPIKey(baseURL: provider.apiBaseURL, apiKey: keyToVerify)
-            case .openAICompatibleModels:
-                ok = await openAIClient.verifyAPIKey(baseURL: provider.apiBaseURL, apiKey: keyToVerify)
-            case nil:
-                ok = false
-            }
+            let ok = await verifiedAPIKey(keyToVerify)
             
             verifyResult = ok
             isVerifying = false
@@ -117,6 +106,16 @@ struct ProviderAPIKeyView: View {
                 editingKey = false
             }
         }
+    }
+
+    private func verifiedAPIKey(_ key: String) async -> Bool {
+        guard provider.apiKeyVerificationTransport != nil else {
+            return false
+        }
+
+        return await TranscriptionServiceFactory
+            .service(for: provider)
+            .verifyAPIKey(apiBaseURL: provider.apiBaseURL, key)
     }
 
     private func obfuscatedKey() -> String? {

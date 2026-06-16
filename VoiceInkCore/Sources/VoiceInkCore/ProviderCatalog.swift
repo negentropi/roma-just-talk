@@ -11,6 +11,11 @@ public enum VoiceInkTranscriptionTransport: Sendable {
     case localWhisper
 }
 
+public enum VoiceInkTranscriptionServiceKind: Sendable {
+    case remote
+    case localWhisper
+}
+
 public enum VoiceInkAPIKeyVerificationTransport: Sendable, Equatable {
     case openAICompatibleModels
     case deepgramProjects
@@ -125,6 +130,15 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return .localWhisper
         case .groq, .openAI, .cerebras, .gemini, .voiceInk:
             return .openAICompatible
+        }
+    }
+
+    public var transcriptionServiceKind: VoiceInkTranscriptionServiceKind {
+        switch transcriptionTransport {
+        case .openAICompatible, .deepgram:
+            return .remote
+        case .localWhisper:
+            return .localWhisper
         }
     }
 

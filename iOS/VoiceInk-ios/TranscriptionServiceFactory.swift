@@ -7,8 +7,8 @@ import VoiceInkCore
 
 struct TranscriptionServiceFactory {
     static func service(for provider: VoiceInkProviderKind) -> any VoiceInkAudioTranscriptionService {
-        switch provider.transcriptionTransport {
-        case .deepgram, .openAICompatible:
+        switch provider.transcriptionServiceKind {
+        case .remote:
             return VoiceInkRemoteTranscriptionService(
                 provider: provider
             )

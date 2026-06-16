@@ -60,6 +60,16 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertEqual(VoiceInkProviderKind.voiceInk.runtimeAPIKey(userAPIKey: "ignored"), "")
     }
 
+    func testTranscriptionServiceKindGroupsProvidersByRequiredAdapter() {
+        XCTAssertEqual(VoiceInkProviderKind.groq.transcriptionServiceKind, .remote)
+        XCTAssertEqual(VoiceInkProviderKind.openAI.transcriptionServiceKind, .remote)
+        XCTAssertEqual(VoiceInkProviderKind.deepgram.transcriptionServiceKind, .remote)
+        XCTAssertEqual(VoiceInkProviderKind.cerebras.transcriptionServiceKind, .remote)
+        XCTAssertEqual(VoiceInkProviderKind.gemini.transcriptionServiceKind, .remote)
+        XCTAssertEqual(VoiceInkProviderKind.voiceInk.transcriptionServiceKind, .remote)
+        XCTAssertEqual(VoiceInkProviderKind.localWhisper.transcriptionServiceKind, .localWhisper)
+    }
+
     func testProviderReadinessFollowsProviderAccessPolicy() {
         XCTAssertTrue(VoiceInkProviderKind.groq.isReady(
             userAPIKey: "groq-key",

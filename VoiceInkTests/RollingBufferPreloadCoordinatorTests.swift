@@ -154,6 +154,7 @@ private final class DelayedFakeTranscriptionSession: TranscriptionSession {
 }
 
 struct RollingBufferPreloadCoordinatorTests {
+    @MainActor
     @Test func startingPreloadClaimWaitStaysUnderQuickReleaseBudget() {
         #expect(RollingBufferPreloadCoordinator.startingPreloadClaimWaitNanoseconds <= 150_000_000)
     }

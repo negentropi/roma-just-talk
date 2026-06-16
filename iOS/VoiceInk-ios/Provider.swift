@@ -51,11 +51,7 @@ enum Provider: String, CaseIterable, Codable, Identifiable {
                 "whisper-small"
             ]
         case (.groq, .postProcessing):
-            return [
-                "llama-3.1-8b-instant",
-                "llama-3.1-70b-versatile",
-                "openai/gpt-oss-120b"
-            ]
+            return VoiceInkAIModelCatalog.availableModels(for: .groq)
         case (.openai, .transcription):
             return [
                 "whisper-1",
@@ -63,10 +59,7 @@ enum Provider: String, CaseIterable, Codable, Identifiable {
                 "gpt-4o-mini-transcribe"
             ]
         case (.openai, .postProcessing):
-            return [
-                "gpt-4o-mini",
-                "gpt-3.5-turbo"
-            ]
+            return VoiceInkAIModelCatalog.availableModels(for: .openAI)
         case (.deepgram, .transcription):
             return [
                 "nova-2",
@@ -77,19 +70,11 @@ enum Provider: String, CaseIterable, Codable, Identifiable {
         case (.cerebras, .transcription):
             return []
         case (.cerebras, .postProcessing):
-            return [
-                "llama3.1-8b",
-                "llama3.1-70b"
-            ]
+            return VoiceInkAIModelCatalog.availableModels(for: .cerebras)
         case (.gemini, .transcription):
             return []
         case (.gemini, .postProcessing):
-            return [
-                "gemini-2.0-flash",
-                "gemini-2.5-flash",
-                "gemini-1.5-flash",
-                "gemini-1.5-pro"
-            ]
+            return VoiceInkAIModelCatalog.availableModels(for: .gemini)
         case (.local, .transcription):
             return [
                 "base"
@@ -103,4 +88,3 @@ enum Provider: String, CaseIterable, Codable, Identifiable {
         }
     }
 }
-

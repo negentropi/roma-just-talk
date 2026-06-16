@@ -58,15 +58,15 @@ enum AIProvider: String, CaseIterable {
     var defaultModel: String {
         switch self {
         case .cerebras:
-            return "gpt-oss-120b"
+            return VoiceInkAIModelCatalog.defaultModel(for: .cerebras)
         case .groq:
-            return "openai/gpt-oss-120b"
+            return VoiceInkAIModelCatalog.defaultModel(for: .groq)
         case .gemini:
-            return "gemini-2.5-flash-lite"
+            return VoiceInkAIModelCatalog.defaultModel(for: .gemini)
         case .anthropic:
             return "claude-sonnet-4-6"
         case .openAI:
-            return "gpt-5.4"
+            return VoiceInkAIModelCatalog.defaultModel(for: .openAI)
         case .mistral:
             return "mistral-large-latest"
         case .elevenLabs:
@@ -93,28 +93,11 @@ enum AIProvider: String, CaseIterable {
     var availableModels: [String] {
         switch self {
         case .cerebras:
-            return [
-                "gpt-oss-120b",
-                "zai-glm-4.7"
-            ]
+            return VoiceInkAIModelCatalog.availableModels(for: .cerebras)
         case .groq:
-            return [
-                "llama-3.1-8b-instant",
-                "llama-3.3-70b-versatile",
-                "qwen/qwen3-32b",
-                "openai/gpt-oss-120b",
-                "openai/gpt-oss-20b"
-            ]
+            return VoiceInkAIModelCatalog.availableModels(for: .groq)
         case .gemini:
-            return [
-                "gemini-3.5-flash",
-                "gemini-3.1-pro-preview",
-                "gemini-3-flash-preview",
-                "gemini-3.1-flash-lite",
-                "gemini-2.5-pro",
-                "gemini-2.5-flash",
-                "gemini-2.5-flash-lite"
-            ]
+            return VoiceInkAIModelCatalog.availableModels(for: .gemini)
         case .anthropic:
             return [
                 "claude-opus-4-7",
@@ -125,16 +108,7 @@ enum AIProvider: String, CaseIterable {
                 "claude-haiku-4-5"
             ]
         case .openAI:
-            return [
-                "gpt-5.5",
-                "gpt-5.4",
-                "gpt-5.4-mini",
-                "gpt-5.4-nano",
-                "gpt-5.2",
-                "gpt-4.1",
-                "gpt-4.1-mini",
-                "gpt-4.1-nano"
-            ]
+            return VoiceInkAIModelCatalog.availableModels(for: .openAI)
         case .mistral:
             return [
                 "mistral-large-latest",

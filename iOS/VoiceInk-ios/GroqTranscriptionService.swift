@@ -20,23 +20,17 @@ struct GroqTranscriptionService: TranscriptionService {
         )!
         guard let url = components.url else { throw URLError(.badURL) }
 
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
-
-        let boundary = "Boundary-\(UUID().uuidString)"
         let fileData = try Data(contentsOf: fileURL)
-        request.setValue(VoiceInkOpenAICompatibleTranscriptionCodec.multipartContentType(boundary: boundary), forHTTPHeaderField: "Content-Type")
-        let body = VoiceInkOpenAICompatibleTranscriptionCodec.requestBody(
+        let preparedRequest = VoiceInkOpenAICompatibleTranscriptionRequestBuilder.make(
+            url: url,
+            apiKey: apiKey,
             audioData: fileData,
             fileName: fileURL.lastPathComponent,
             model: model,
-            boundary: boundary,
             language: language
         )
-        request.httpBody = body
 
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await URLSession.shared.data(for: preparedRequest.requestWithHTTPBody())
         guard let http = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
         guard (200..<300).contains(http.statusCode) else {
             let errorText = String(data: data, encoding: .utf8) ?? ""

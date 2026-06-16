@@ -7,14 +7,11 @@ class OpenAICompatibleTranscriptionService {
             throw NSError(domain: "CustomWhisperTranscriptionService", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid API endpoint URL"])
         }
 
-        let boundary = "Boundary-\(UUID().uuidString)"
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue(VoiceInkOpenAICompatibleTranscriptionCodec.multipartContentType(boundary: boundary), forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(model.apiKey)", forHTTPHeaderField: "Authorization")
-
-        let body = try buildRequestBody(audioURL: audioURL, modelName: model.modelName, boundary: boundary)
-        let (data, response) = try await URLSession.shared.upload(for: request, from: body)
+        let preparedRequest = try buildPreparedRequest(audioURL: audioURL, model: model, url: url)
+        let (data, response) = try await URLSession.shared.upload(
+            for: preparedRequest.request,
+            from: preparedRequest.body
+        )
 
         guard let httpResponse = response as? HTTPURLResponse else {
             throw CloudTranscriptionError.networkError(URLError(.badServerResponse))
@@ -35,18 +32,23 @@ class OpenAICompatibleTranscriptionService {
         }
     }
 
-    private func buildRequestBody(audioURL: URL, modelName: String, boundary: String) throws -> Data {
+    private func buildPreparedRequest(
+        audioURL: URL,
+        model: CustomCloudModel,
+        url: URL
+    ) throws -> VoiceInkPreparedOpenAICompatibleTranscriptionRequest {
         guard let audioData = try? Data(contentsOf: audioURL) else {
             throw CloudTranscriptionError.audioFileNotFound
         }
 
         let selectedLanguage = UserDefaults.standard.string(forKey: "SelectedLanguage") ?? "auto"
         let prompt = UserDefaults.standard.string(forKey: "TranscriptionPrompt") ?? ""
-        return VoiceInkOpenAICompatibleTranscriptionCodec.requestBody(
+        return VoiceInkOpenAICompatibleTranscriptionRequestBuilder.make(
+            url: url,
+            apiKey: model.apiKey,
             audioData: audioData,
             fileName: audioURL.lastPathComponent,
-            model: modelName,
-            boundary: boundary,
+            model: model.modelName,
             language: selectedLanguage == "auto" ? nil : selectedLanguage,
             prompt: prompt,
             responseFormat: "json",

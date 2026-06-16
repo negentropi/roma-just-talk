@@ -1,5 +1,6 @@
 import Foundation
 import LLMkit
+import VoiceInkCore
 
 enum AIProvider: String, CaseIterable {
     case cerebras = "Cerebras"
@@ -22,15 +23,15 @@ enum AIProvider: String, CaseIterable {
     var baseURL: String {
         switch self {
         case .cerebras:
-            return "https://api.cerebras.ai/v1/chat/completions"
+            return VoiceInkProviderEndpoint.cerebras.chatCompletionsURL!.absoluteString
         case .groq:
-            return "https://api.groq.com/openai/v1/chat/completions"
+            return VoiceInkProviderEndpoint.groq.chatCompletionsURL!.absoluteString
         case .gemini:
-            return "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+            return VoiceInkProviderEndpoint.gemini.chatCompletionsURL!.absoluteString
         case .anthropic:
             return "https://api.anthropic.com/v1/messages"
         case .openAI:
-            return "https://api.openai.com/v1/chat/completions"
+            return VoiceInkProviderEndpoint.openAI.chatCompletionsURL!.absoluteString
         case .openRouter:
             return "https://openrouter.ai/api/v1/chat/completions"
         case .mistral:

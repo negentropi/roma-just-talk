@@ -1,4 +1,5 @@
 import Foundation
+import VoiceInkCore
 
 enum ModelType {
     case transcription
@@ -18,23 +19,23 @@ enum Provider: String, CaseIterable, Codable, Identifiable {
 
     var baseURL: URL {
         switch self {
-        case .groq: return URL(string: "https://api.groq.com/openai")!
-        case .openai: return URL(string: "https://api.openai.com")!
-        case .deepgram: return URL(string: "https://api.deepgram.com")!
-        case .cerebras: return URL(string: "https://api.cerebras.ai")!
-        case .gemini: return URL(string: "https://generativelanguage.googleapis.com/v1beta/openai")!
+        case .groq: return VoiceInkProviderEndpoint.groq.apiBaseURL
+        case .openai: return VoiceInkProviderEndpoint.openAI.apiBaseURL
+        case .deepgram: return VoiceInkProviderEndpoint.deepgram.apiBaseURL
+        case .cerebras: return VoiceInkProviderEndpoint.cerebras.apiBaseURL
+        case .gemini: return VoiceInkProviderEndpoint.gemini.apiBaseURL
         case .local: return URL(string: "http://localhost")! // Not used for local transcription
-        case .voiceink: return URL(string: "https://api.groq.com/openai")! // VoiceInk uses Groq backend
+        case .voiceink: return VoiceInkProviderEndpoint.groq.apiBaseURL // VoiceInk uses Groq backend
         }
     }
     
     var consoleURL: URL {
         switch self {
-        case .groq: return URL(string: "https://console.groq.com/keys")!
-        case .openai: return URL(string: "https://platform.openai.com/api-keys")!
-        case .deepgram: return URL(string: "https://console.deepgram.com/project/keys")!
-        case .cerebras: return URL(string: "https://cloud.cerebras.ai/platform")!
-        case .gemini: return URL(string: "https://aistudio.google.com/app/apikey")!
+        case .groq: return VoiceInkProviderEndpoint.groq.consoleURL
+        case .openai: return VoiceInkProviderEndpoint.openAI.consoleURL
+        case .deepgram: return VoiceInkProviderEndpoint.deepgram.consoleURL
+        case .cerebras: return VoiceInkProviderEndpoint.cerebras.consoleURL
+        case .gemini: return VoiceInkProviderEndpoint.gemini.consoleURL
         case .local: return URL(string: "https://github.com/ggerganov/whisper.cpp")! // Whisper.cpp GitHub page
         case .voiceink: return URL(string: "https://voiceink.app")! // VoiceInk website
         }
@@ -102,5 +103,4 @@ enum Provider: String, CaseIterable, Codable, Identifiable {
         }
     }
 }
-
 

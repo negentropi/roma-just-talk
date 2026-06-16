@@ -25,14 +25,12 @@ public struct Mode: Identifiable, Codable {
         self.name = name
         self.transcriptionProvider = transcriptionProvider
         self.transcriptionModel = transcriptionModel
-            ?? transcriptionProvider.fixedModel(for: .transcription)
-            ?? transcriptionProvider.models(for: .transcription).first
+            ?? transcriptionProvider.defaultModel(for: .transcription)
             ?? VoiceInkTranscriptionModelCatalog.voiceInkTranscriptionModel
         self.isPostProcessingEnabled = isPostProcessingEnabled
         self.postProcessingProvider = postProcessingProvider
         self.postProcessingModel = postProcessingModel
-            ?? postProcessingProvider.fixedModel(for: .postProcessing)
-            ?? postProcessingProvider.models(for: .postProcessing).first
+            ?? postProcessingProvider.defaultModel(for: .postProcessing)
             ?? VoiceInkAIModelCatalog.firstAvailableModel(for: .groq)
         self.promptTemplate = promptTemplate ?? VoiceInkPostProcessingPromptTemplate(type: .summary)
     }

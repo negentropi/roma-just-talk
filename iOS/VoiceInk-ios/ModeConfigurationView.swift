@@ -127,7 +127,7 @@ struct ModeConfigurationView: View {
             } else {
                 let availableModels = mode.transcriptionProvider.models(for: .transcription)
                 if !availableModels.contains(mode.transcriptionModel) {
-                    mode.transcriptionModel = availableModels.first ?? ""
+                    mode.transcriptionModel = mode.transcriptionProvider.defaultModel(for: .transcription) ?? ""
                 }
             }
         }
@@ -137,7 +137,7 @@ struct ModeConfigurationView: View {
             } else {
                 let availableModels = mode.postProcessingProvider.models(for: .postProcessing)
                 if !availableModels.contains(mode.postProcessingModel) {
-                    mode.postProcessingModel = availableModels.first ?? ""
+                    mode.postProcessingModel = mode.postProcessingProvider.defaultModel(for: .postProcessing) ?? ""
                 }
             }
         }

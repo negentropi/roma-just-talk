@@ -190,6 +190,10 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
         fixedModel(for: use) != nil || !models(for: use).isEmpty
     }
 
+    public func defaultModel(for use: VoiceInkProviderModelUse) -> String? {
+        fixedModel(for: use) ?? models(for: use).first
+    }
+
     public func models(for use: VoiceInkProviderModelUse) -> [String] {
         switch (self, use) {
         case (.groq, .transcription):

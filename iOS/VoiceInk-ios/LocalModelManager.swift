@@ -62,7 +62,7 @@ class LocalModelManager: ObservableObject {
     
     nonisolated static var modelsDirectory: URL {
         let documentsDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        let modelsDir = documentsDir.appendingPathComponent("WhisperModels")
+        let modelsDir = documentsDir.appendingPathComponent(VoiceInkWhisperModelFiles.modelsDirectoryName)
         
         // Create directory if it doesn't exist
         if !FileManager.default.fileExists(atPath: modelsDir.path) {

@@ -31,6 +31,8 @@ public struct VoiceInkWhisperModelFileSpec: Equatable, Sendable {
 }
 
 public enum VoiceInkWhisperModelFiles {
+    public static let modelsDirectoryName = "WhisperModels"
+
     public static let baseModel = VoiceInkWhisperModelFileSpec(
         modelName: VoiceInkTranscriptionModelCatalog.localBaseModel,
         displayName: "Whisper Base Model",

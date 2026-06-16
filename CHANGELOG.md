@@ -30,6 +30,7 @@
 - Warmed and cached word replacement rules outside the dictation hot path so quick-release paste no longer repeats the SwiftData lookup before every cursor paste.
 - Deferred quick-release rolling-preload WAV writing until after cached stream finalization can start, while still waiting for the file before batch fallback or history metadata needs it.
 - Added claim-to-paste latency tracing for rolling-preload quick releases so remaining delays can be measured from runtime logs.
+- Included rolling-buffer preload mode, duration, VAD model, Auto policy, power state, and per-model preload state in diagnostic log exports.
 - Started Power Mode rule resolution on preload-only Special shortcut key-down, so quick releases avoid doing active-window and URL matching work after key-up.
 - Cached prompt trigger-word eligibility and skipped prompt detection in the common no-trigger case, reducing transcript-ready-to-paste work.
 - Pre-read cursor text context on preload-only Special shortcut key-down so contextual capitalization can avoid an Accessibility read immediately before quick-release paste.

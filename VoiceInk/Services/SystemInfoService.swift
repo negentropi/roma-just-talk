@@ -44,6 +44,9 @@ class SystemInfoService {
         AI Provider: \(getAIProvider())
         AI Model: \(getAIModel())
 
+        ROLLING BUFFER PRELOAD:
+        \(getRollingBufferPreloadInfo())
+
         UI SETTINGS:
         Hide Dock Icon: \(UserDefaults.standard.bool(forKey: "IsMenuBarOnly"))
         Recorder Style: \(UserDefaults.standard.string(forKey: "RecorderType") ?? "none")
@@ -188,6 +191,40 @@ class SystemInfoService {
         }
         return "None selected"
     }
+
+    private func getRollingBufferPreloadInfo() -> String {
+        let configuration = RollingBufferPreloadSettings.configuration()
+        let powerState = IOKitRollingBufferPowerStateProvider().currentPowerState()
+        let powerDescription: String
+        if powerState.isOnBattery {
+            powerDescription = "Battery (\(powerState.batteryLevelPercent.map { "\($0)" } ?? "unknown")%)"
+        } else {
+            powerDescription = "External Power"
+        }
+
+        let currentModelName = UserDefaults.standard.string(forKey: "CurrentTranscriptionModel")
+        let currentModelPreloadEnabled: String
+        if let currentModelName {
+            let key = RollingBufferPreloadSettings.perModelPreloadEnabledKey(forModelName: currentModelName)
+            let enabled = UserDefaults.standard.object(forKey: key) as? Bool ?? true
+            currentModelPreloadEnabled = "\(enabled)"
+        } else {
+            currentModelPreloadEnabled = "No model selected"
+        }
+
+        return """
+        Mode: \(configuration.mode.displayName)
+        Pre-run Finalization: \(configuration.preRunFinalization)
+        Buffer Duration: \(configuration.bufferDurationSeconds)s
+        Rolling VAD Model: \(RollingBufferVADSettings.selectedModel())
+        Auto Disable Cloud Models: \(configuration.autoDisablesCloudModels)
+        Auto Disable Local Models on Low Battery: \(configuration.autoDisablesLowBatteryLocalModels)
+        Low Battery Threshold: \(configuration.lowBatteryThresholdPercent)%
+        Current Power State: \(powerDescription)
+        Current Model Buffer Preload: \(currentModelPreloadEnabled)
+        """
+    }
+
     private func getAccessibilityStatus() -> String {
         return AXIsProcessTrusted() ? "Granted" : "Not Granted"
     }

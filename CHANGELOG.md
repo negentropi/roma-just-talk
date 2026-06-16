@@ -13,6 +13,7 @@
 - Moved Auto low-battery checks for rolling buffer preload to after local VAD detects speech, keeping silence cheaper and battery decisions current at preload start.
 - Claimed ready rolling-preload sessions before Power Mode configuration work so quick releases do not wait on model/session setup when the preloaded model and language still match.
 - Tightened cached rolling-preload finalization so quick releases avoid pasting stale partial hypotheses when the local ASR pass is behind the live buffer.
+- Let preload-only Special shortcut quick releases commit the rolling buffer instead of being canceled as short no-evidence presses.
 - Skipped fallback streaming setup on immediate startup-stop recordings when the selected model can transcribe the saved WAV directly.
 - Included rolling buffer preload mode, per-model opt-outs, Auto policy, duration, finalization, and VAD model settings in settings backup/import.
 - Made the pre-run finalization opt-out also skip rolling-buffer STT pre-run work instead of warming an unusable session.

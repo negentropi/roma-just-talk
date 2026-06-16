@@ -637,9 +637,10 @@ final class RecordingShortcutModeHandler {
             let pressDuration = shortcutPressStartTime.map { eventTime - $0 } ?? 0
             let options = activeSpecialOptions
             let hasTypingEvidence = context.didPressOtherKeyDuringPress || context.didReleaseOtherKeyDuringPress
+            let isPreloadOnly = options.keyDownBehavior == .preloadOnly
             let shouldFailClosed =
                 !context.hasReliableKeyEvidence ||
-                (!hasTypingEvidence && pressDuration < minimumSpecialNoEvidencePressDuration)
+                (!isPreloadOnly && !hasTypingEvidence && pressDuration < minimumSpecialNoEvidencePressDuration)
 
             if hasTypingEvidence || shouldFailClosed {
                 logger.notice("handleShortcutKeyUp: cancelling special shortcut; unsafe key evidence")
@@ -654,7 +655,7 @@ final class RecordingShortcutModeHandler {
                 }
                 logger.notice("handleShortcutKeyUp: stopping recording (special shortcut, duration=\(pressDuration, privacy: .public)s)")
                 await toggleMiniRecorder(powerModeId)
-            } else if options.keyDownBehavior == .preloadOnly {
+            } else if isPreloadOnly {
                 if options.pasteLastTranscriptOnEmptyTap,
                    SpecialShortcutEmptyTranscriptionFallback.shouldFallback(pressDuration: pressDuration) {
                     SpecialShortcutEmptyTranscriptionFallback.scheduleFallback()

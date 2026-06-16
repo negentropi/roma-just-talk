@@ -33,11 +33,7 @@ struct CloudModelCardView: View {
     }
     
     private var isConfigured: Bool {
-        return APIKeyManager.shared.hasAPIKey(forProvider: providerKey)
-    }
-    
-    private var providerKey: String {
-        CloudProviderRegistry.provider(for: model.provider)?.providerKey ?? model.provider.rawValue
+        return APIKeyManager.shared.hasAPIKey(forProvider: model.provider.apiKeyProviderName)
     }
     
     var body: some View {
@@ -294,11 +290,11 @@ struct CloudModelCardView: View {
     }
 
     private func loadSavedAPIKey() {
-        if let savedKey = APIKeyManager.shared.getStoredAPIKey(forProvider: providerKey) {
+        if let savedKey = APIKeyManager.shared.getStoredAPIKey(forProvider: model.provider.apiKeyProviderName) {
             apiKey = savedKey
         }
 
-        if APIKeyManager.shared.hasAPIKey(forProvider: providerKey) {
+        if APIKeyManager.shared.hasAPIKey(forProvider: model.provider.apiKeyProviderName) {
             verificationStatus = .success
         }
     }
@@ -331,7 +327,7 @@ struct CloudModelCardView: View {
                 if result.isValid {
                     verificationStatus = .success
                     verificationError = nil
-                    APIKeyManager.shared.saveAPIKey(key, forProvider: providerKey)
+                    APIKeyManager.shared.saveAPIKey(key, forProvider: model.provider.apiKeyProviderName)
                     transcriptionModelManager.refreshAllAvailableModels()
                     withAnimation(.easeInOut(duration: 0.3)) {
                         isExpanded = false
@@ -345,7 +341,7 @@ struct CloudModelCardView: View {
     }
     
     private func clearAPIKey() {
-        APIKeyManager.shared.deleteAPIKey(forProvider: providerKey)
+        APIKeyManager.shared.deleteAPIKey(forProvider: model.provider.apiKeyProviderName)
         apiKey = ""
         verificationStatus = .none
         verificationError = nil

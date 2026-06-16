@@ -58,7 +58,7 @@ class CloudTranscriptionService: TranscriptionService {
             guard let cloudProvider = CloudProviderRegistry.provider(for: model.provider) else {
                 throw CloudTranscriptionError.unsupportedProvider
             }
-            let apiKey = try requireAPIKey(forProvider: cloudProvider.providerKey)
+            let apiKey = try requireAPIKey(forProvider: model.provider.apiKeyProviderName)
             return try await cloudProvider.transcribe(
                 audioData: audioData,
                 fileName: fileName,

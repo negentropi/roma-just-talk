@@ -3,7 +3,6 @@ import SwiftData
 
 protocol CloudProvider {
     var modelProvider: ModelProvider { get }
-    var providerKey: String { get }
     var languageCodes: [String]? { get }
     var includesAutoDetect: Bool { get }
     var models: [CloudModel] { get }
@@ -16,10 +15,6 @@ protocol CloudProvider {
 }
 
 extension CloudProvider {
-    var providerKey: String {
-        modelProvider.apiKeyProviderName
-    }
-
     var isStreamingOnly: Bool { false }
 
     /// Streaming-only providers inherit this and get a clear error if batch is somehow attempted.

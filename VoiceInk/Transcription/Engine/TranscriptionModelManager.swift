@@ -47,8 +47,8 @@ class TranscriptionModelManager: ObservableObject {
             case .custom:
                 return true
             default:
-                if let cloudProvider = CloudProviderRegistry.provider(for: model.provider) {
-                    return APIKeyManager.shared.hasAPIKey(forProvider: cloudProvider.providerKey)
+                if CloudProviderRegistry.provider(for: model.provider) != nil {
+                    return APIKeyManager.shared.hasAPIKey(forProvider: model.provider.apiKeyProviderName)
                 }
                 return false
             }

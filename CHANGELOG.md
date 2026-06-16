@@ -3,6 +3,7 @@
 ## v1.94 - Unreleased
 
 - Shared transcription model catalog metadata between macOS and the imported iOS app, aligning iOS Groq and Deepgram selectable transcription models with the macOS source of truth.
+- Aligned the imported iOS app's empty-mode fallback with its shared local Whisper default instead of falling back to a Groq API-key path.
 - Replaced the misaligned silence-filter path with rolling buffer preload controls that use local VAD to pre-run supported STT before capture finalization, independent from final/batch transcription VAD.
 - Made the fresh Special shortcut default preload-only so quick releases can commit the rolling-buffer pre-run path without opening a recorder first.
 - Added configurable rolling buffer duration with decimal seconds support.

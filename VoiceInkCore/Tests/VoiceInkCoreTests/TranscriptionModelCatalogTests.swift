@@ -10,6 +10,19 @@ final class TranscriptionModelCatalogTests: XCTestCase {
         XCTAssertTrue(VoiceInkTranscriptionModelProvider.deepgram.includesAutoDetect)
     }
 
+    func testMistralLanguageCapabilityAndModelAreSharedProviderMetadata() {
+        XCTAssertEqual(
+            VoiceInkTranscriptionModelProvider.mistral.languageCodes,
+            ["ar", "de", "en", "es", "fr", "hi", "it", "ja", "ko", "nl", "pt", "ru", "zh"]
+        )
+        XCTAssertTrue(VoiceInkTranscriptionModelProvider.mistral.includesAutoDetect)
+
+        let models = VoiceInkTranscriptionModelCatalog.cloudModels(for: .mistral)
+        XCTAssertEqual(models.map(\.name), ["voxtral-mini-latest"])
+        XCTAssertEqual(models.first?.displayName, "Voxtral (Mistral)")
+        XCTAssertTrue(models.first?.supportsStreaming == true)
+    }
+
     func testOpenAICompatibleProvidersUseAllLanguagesWithoutAutoDetectFlag() {
         XCTAssertNil(VoiceInkTranscriptionModelProvider.groq.languageCodes)
         XCTAssertFalse(VoiceInkTranscriptionModelProvider.groq.includesAutoDetect)

@@ -2,12 +2,15 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
     case groq
     case openAI
     case deepgram
+    case mistral
     case gemini
     case local
     case voiceInk
 
     public var languageCodes: [String]? {
         switch self {
+        case .mistral:
+            return ["ar", "de", "en", "es", "fr", "hi", "it", "ja", "ko", "nl", "pt", "ru", "zh"]
         case .deepgram:
             return [
                 "ar", "be", "bg", "bn", "bs", "ca", "cs", "da", "de", "el",
@@ -23,7 +26,7 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
 
     public var includesAutoDetect: Bool {
         switch self {
-        case .deepgram:
+        case .deepgram, .mistral:
             return true
         case .groq, .openAI, .gemini, .local, .voiceInk:
             return false
@@ -65,7 +68,7 @@ public enum VoiceInkTranscriptionModelCatalog {
 
     public static func modelNames(for provider: VoiceInkTranscriptionModelProvider) -> [String] {
         switch provider {
-        case .groq, .deepgram, .gemini:
+        case .groq, .deepgram, .mistral, .gemini:
             return cloudModels(for: provider).map(\.name)
         case .openAI:
             return [
@@ -111,6 +114,18 @@ public enum VoiceInkTranscriptionModelCatalog {
                     speed: 0.99,
                     accuracy: 0.96,
                     isMultilingual: false,
+                    supportsStreaming: true
+                )
+            ]
+        case .mistral:
+            return [
+                VoiceInkCloudTranscriptionModelSpec(
+                    name: "voxtral-mini-latest",
+                    displayName: "Voxtral (Mistral)",
+                    description: "Mistral's Voxtral model for fast and accurate transcription",
+                    speed: 0.99,
+                    accuracy: 0.98,
+                    isMultilingual: true,
                     supportsStreaming: true
                 )
             ]

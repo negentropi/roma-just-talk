@@ -17,11 +17,11 @@ protocol CloudProvider {
 
 extension CloudProvider {
     var languageCodes: [String]? {
-        modelProvider.coreProviderKind?.transcriptionModelProvider?.languageCodes
+        modelProvider.coreTranscriptionModelProvider?.languageCodes
     }
 
     var includesAutoDetect: Bool {
-        modelProvider.coreProviderKind?.transcriptionModelProvider?.includesAutoDetect ?? false
+        modelProvider.coreTranscriptionModelProvider?.includesAutoDetect ?? false
     }
 
     var isStreamingOnly: Bool { false }

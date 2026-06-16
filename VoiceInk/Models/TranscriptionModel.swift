@@ -47,6 +47,21 @@ extension ModelProvider {
         }
     }
 
+    var coreTranscriptionModelProvider: VoiceInkTranscriptionModelProvider? {
+        switch self {
+        case .groq:
+            return .groq
+        case .deepgram:
+            return .deepgram
+        case .mistral:
+            return .mistral
+        case .gemini:
+            return .gemini
+        default:
+            return nil
+        }
+    }
+
     var apiKeyProviderName: String {
         coreProviderKind?.displayName ?? rawValue
     }

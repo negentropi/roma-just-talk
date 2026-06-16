@@ -63,6 +63,8 @@ extension ModelProvider {
             return .soniox
         case .speechmatics:
             return .speechmatics
+        case .xai:
+            return .xai
         default:
             return nil
         }

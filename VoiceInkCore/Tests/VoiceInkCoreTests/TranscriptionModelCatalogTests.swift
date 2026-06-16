@@ -59,6 +59,18 @@ final class TranscriptionModelCatalogTests: XCTestCase {
         XCTAssertEqual(models.map(\.supportsStreaming), [false, true])
     }
 
+    func testXAILanguageCapabilityAndModelAreSharedProviderMetadata() {
+        XCTAssertEqual(VoiceInkTranscriptionModelProvider.xai.languageCodes?.first, "ar")
+        XCTAssertEqual(VoiceInkTranscriptionModelProvider.xai.languageCodes?.last, "vi")
+        XCTAssertTrue(VoiceInkTranscriptionModelProvider.xai.languageCodes?.contains("en") == true)
+        XCTAssertTrue(VoiceInkTranscriptionModelProvider.xai.includesAutoDetect)
+
+        let models = VoiceInkTranscriptionModelCatalog.cloudModels(for: .xai)
+        XCTAssertEqual(models.map(\.name), ["grok-stt"])
+        XCTAssertEqual(models.first?.displayName, "Grok (xAI)")
+        XCTAssertTrue(models.first?.supportsStreaming == true)
+    }
+
     func testOpenAICompatibleProvidersUseAllLanguagesWithoutAutoDetectFlag() {
         XCTAssertNil(VoiceInkTranscriptionModelProvider.groq.languageCodes)
         XCTAssertFalse(VoiceInkTranscriptionModelProvider.groq.includesAutoDetect)

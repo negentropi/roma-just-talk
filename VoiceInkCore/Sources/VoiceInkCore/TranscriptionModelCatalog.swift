@@ -7,11 +7,18 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
     case gemini
     case soniox
     case speechmatics
+    case xai
     case local
     case voiceInk
 
     public var languageCodes: [String]? {
         switch self {
+        case .xai:
+            return [
+                "ar", "cs", "da", "nl", "en", "fil", "fr", "de", "hi", "id",
+                "it", "ja", "ko", "mk", "ms", "fa", "pl", "pt", "ro", "ru",
+                "es", "sv", "th", "tr", "vi"
+            ]
         case .elevenLabs:
             return [
                 "af", "am", "ar", "as", "az", "be", "bg", "bn", "bs", "ca",
@@ -60,7 +67,7 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
 
     public var includesAutoDetect: Bool {
         switch self {
-        case .deepgram, .elevenLabs, .mistral, .soniox, .speechmatics:
+        case .deepgram, .elevenLabs, .mistral, .soniox, .speechmatics, .xai:
             return true
         case .groq, .openAI, .gemini, .local, .voiceInk:
             return false
@@ -102,7 +109,7 @@ public enum VoiceInkTranscriptionModelCatalog {
 
     public static func modelNames(for provider: VoiceInkTranscriptionModelProvider) -> [String] {
         switch provider {
-        case .groq, .deepgram, .elevenLabs, .mistral, .gemini, .soniox, .speechmatics:
+        case .groq, .deepgram, .elevenLabs, .mistral, .gemini, .soniox, .speechmatics, .xai:
             return cloudModels(for: provider).map(\.name)
         case .openAI:
             return [
@@ -224,6 +231,18 @@ public enum VoiceInkTranscriptionModelCatalog {
                     name: "scribe_v2",
                     displayName: "Scribe V2 (ElevenLabs)",
                     description: "ElevenLabs' Scribe V2 model for the most accurate transcription",
+                    speed: 0.99,
+                    accuracy: 0.98,
+                    isMultilingual: true,
+                    supportsStreaming: true
+                )
+            ]
+        case .xai:
+            return [
+                VoiceInkCloudTranscriptionModelSpec(
+                    name: "grok-stt",
+                    displayName: "Grok (xAI)",
+                    description: "xAI's Grok speech-to-text with streaming and batch transcription",
                     speed: 0.99,
                     accuracy: 0.98,
                     isMultilingual: true,

@@ -2,9 +2,6 @@ import Foundation
 import VoiceInkCore
 
 typealias OAChatMessage = VoiceInkOpenAICompatibleChatMessage
-typealias OAChatRequest = VoiceInkOpenAICompatibleChatRequest
-typealias OAChatChoice = VoiceInkOpenAICompatibleChatChoice
-typealias OAChatResponse = VoiceInkOpenAICompatibleChatResponse
 
 struct OpenAICompatibleClient {
     func verifyAPIKey(baseURL: URL, apiKey: String) async -> Bool {
@@ -22,8 +19,11 @@ struct OpenAICompatibleClient {
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
-        let body = OAChatRequest(model: model, messages: messages, temperature: temperature)
-        request.httpBody = try JSONEncoder().encode(body)
+        request.httpBody = try VoiceInkOpenAICompatibleChatCodec.requestBody(
+            model: model,
+            messages: messages,
+            temperature: temperature
+        )
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
         
@@ -32,8 +32,6 @@ struct OpenAICompatibleClient {
             throw NSError(domain: "LLMPostProcessing", code: http.statusCode, userInfo: [NSLocalizedDescriptionKey: errorText])
         }
         
-        let decoded = try JSONDecoder().decode(OAChatResponse.self, from: data)
-        return decoded.choices.first?.message.content ?? ""
+        return try VoiceInkOpenAICompatibleChatCodec.firstMessageContent(from: data)
     }
 }
-

@@ -340,11 +340,26 @@ class VoiceInkEngine: NSObject, ObservableObject {
     }
 
     func commitReadyRollingBufferPreload(powerModeId: UUID? = nil) async -> Bool {
-        guard recordingState == .idle,
-              let model = transcriptionModelManager.currentTranscriptionModel,
-              let claimedPreload = await rollingBufferPreloadCoordinator.claimPreloadedSession(for: model) else {
+        let latencyTrace = TranscriptionLatencyTrace(
+            operation: "rolling-preload-quick-release",
+            startedAt: Date()
+        )
+
+        guard recordingState == .idle else {
+            logger.notice("Latency trace preload commit unavailable operation=\(latencyTrace.operation, privacy: .public) reason=state elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
             return false
         }
+
+        guard let model = transcriptionModelManager.currentTranscriptionModel else {
+            logger.notice("Latency trace preload commit unavailable operation=\(latencyTrace.operation, privacy: .public) reason=no-model elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
+            return false
+        }
+
+        guard let claimedPreload = await rollingBufferPreloadCoordinator.claimPreloadedSession(for: model) else {
+            logger.notice("Latency trace preload commit unavailable operation=\(latencyTrace.operation, privacy: .public) reason=no-claim elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
+            return false
+        }
+        logger.notice("Latency trace preload claimed operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
 
         let claim = RollingBufferPreloadClaim(
             preloaded: claimedPreload,
@@ -353,6 +368,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
         )
 
         await ActiveWindowService.shared.applyConfiguration(powerModeId: powerModeId)
+        logger.notice("Latency trace active window ready operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
 
         guard let currentModel = transcriptionModelManager.currentTranscriptionModel,
               claim.matches(model: currentModel, language: UserDefaults.standard.string(forKey: "SelectedLanguage")) else {
@@ -373,6 +389,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
             } else {
                 try await audioFileReadyTask.value
             }
+            logger.notice("Latency trace deferred audio write started operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s bytes=\(audioData.count, privacy: .public)")
 
             let transcription = makeRecordingTranscription(
                 for: permanentURL,
@@ -393,7 +410,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
             await runPipeline(
                 on: transcription,
                 audioURL: permanentURL,
-                audioFileReadyTask: audioFileReadyTask
+                audioFileReadyTask: audioFileReadyTask,
+                latencyTrace: latencyTrace
             )
             return true
         } catch {
@@ -426,7 +444,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
     private func runPipeline(
         on transcription: Transcription,
         audioURL: URL,
-        audioFileReadyTask: Task<Void, Error>? = nil
+        audioFileReadyTask: Task<Void, Error>? = nil,
+        latencyTrace: TranscriptionLatencyTrace? = nil
     ) async {
         guard let model = transcriptionModelManager.currentTranscriptionModel else {
             transcription.text = "Transcription Failed: No model selected"
@@ -462,7 +481,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
                 guard let self, self.activePipelineTranscriptionID == transcriptionID else { return }
                 await self.recorderUIManager?.dismissMiniRecorder()
             },
-            audioFileReadyTask: audioFileReadyTask
+            audioFileReadyTask: audioFileReadyTask,
+            latencyTrace: latencyTrace
         )
 
         let didFinishActivePipeline = activePipelineTranscriptionID == transcriptionID

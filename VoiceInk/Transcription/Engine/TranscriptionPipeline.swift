@@ -2,6 +2,15 @@ import Foundation
 import SwiftData
 import os
 
+struct TranscriptionLatencyTrace: Sendable {
+    let operation: String
+    let startedAt: Date
+
+    var elapsed: TimeInterval {
+        Date().timeIntervalSince(startedAt)
+    }
+}
+
 /// Handles the full post-recording pipeline:
 /// transcribe → filter → format → word-replace → prompt-detect → AI enhance → start paste + dismiss → save
 @MainActor
@@ -45,13 +54,18 @@ class TranscriptionPipeline {
         shouldCancel: () -> Bool,
         onCancel: @escaping () async -> Void,
         onDismiss: @escaping () async -> Void,
-        audioFileReadyTask: Task<Void, Error>? = nil
+        audioFileReadyTask: Task<Void, Error>? = nil,
+        latencyTrace: TranscriptionLatencyTrace? = nil
     ) async {
         var finalPastedText: String?
         var promptDetectionResult: PromptDetectionService.PromptDetectionResult?
         var didInsertSessionMetric = false
         var didResolveAudioFileReadiness = false
         var audioFileIsReady = audioFileReadyTask == nil
+
+        if let latencyTrace {
+            logger.notice("Latency trace pipeline started operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
+        }
 
         func waitForAudioFileReadyIfNeeded() async -> Bool {
             guard !didResolveAudioFileReadiness else {
@@ -69,6 +83,9 @@ class TranscriptionPipeline {
                 try await audioFileReadyTask.value
                 audioFileIsReady = true
                 logger.notice("Deferred audio file ready elapsed=\(Date().timeIntervalSince(waitStart), format: .fixed(precision: 3), privacy: .public)s")
+                if let latencyTrace {
+                    logger.notice("Latency trace audio file ready operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
+                }
             } catch {
                 audioFileIsReady = false
                 transcription.audioFileURL = nil
@@ -133,6 +150,9 @@ class TranscriptionPipeline {
             }
             text = TranscriptionOutputFilter.filter(text)
             let transcriptionDuration = Date().timeIntervalSince(transcriptionStart)
+            if let latencyTrace {
+                logger.notice("Latency trace transcription ready operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s transcriptionElapsed=\(transcriptionDuration, format: .fixed(precision: 3), privacy: .public)s chars=\(text.count, privacy: .public)")
+            }
 
             if shouldCancel() { await finishCanceledTranscription(); return }
 
@@ -265,7 +285,13 @@ class TranscriptionPipeline {
 
             let appendSpace = UserDefaults.standard.bool(forKey: "AppendTrailingSpace")
             let pastedText = textToPaste + (appendSpace ? " " : "")
+            if let latencyTrace {
+                logger.notice("Latency trace paste starting operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s chars=\(pastedText.count, privacy: .public)")
+            }
             _ = await CursorPaster.startPasteAtCursor(pastedText).value
+            if let latencyTrace {
+                logger.notice("Latency trace paste completed operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s chars=\(pastedText.count, privacy: .public)")
+            }
             let autoSendKey = PowerModeManager.shared.currentActiveConfiguration?.autoSendKey
             SoundManager.shared.playStopSound()
             await restorePromptDetectionSettingsAndDismiss {
@@ -289,5 +315,8 @@ class TranscriptionPipeline {
         }
 
         saveTranscriptionAndPostCompletion()
+        if let latencyTrace {
+            logger.notice("Latency trace pipeline saved operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
+        }
     }
 }

@@ -21,6 +21,7 @@
 - Warmed the rolling-buffer VAD model before first speech when preload is eligible, so the first VAD trigger can start STT without paying model-load delay.
 - Let preload-only quick releases commit an already-ready rolling-buffer STT session directly, without opening and stopping a new recorder session first.
 - Deferred quick-release rolling-preload WAV writing until after cached stream finalization can start, while still waiting for the file before batch fallback or history metadata needs it.
+- Added claim-to-paste latency tracing for rolling-preload quick releases so remaining delays can be measured from runtime logs.
 - Reduced the shortcut duplicate-press guard from 500ms to 80ms so valid back-to-back dictations are not ignored after the app is ready again.
 - Skipped fallback streaming setup on immediate startup-stop recordings when the selected model can transcribe the saved WAV directly.
 - Included rolling buffer preload mode, per-model opt-outs, Auto policy, duration, finalization, and VAD model settings in settings backup/import.

@@ -108,6 +108,31 @@ final class RemoteProviderRequestTests: XCTestCase {
         XCTAssertTrue(body.contains("0"))
     }
 
+    func testOpenAICompatibleTranscriptionRequestBuilderUsesDirectURLForCustomEndpoints() throws {
+        let preparedRequest = VoiceInkOpenAICompatibleTranscriptionRequestBuilder.make(
+            url: try XCTUnwrap(URL(string: "https://custom.example.test/v1/audio/transcriptions")),
+            apiKey: "custom-key",
+            audioData: Data("WAVDATA".utf8),
+            fileName: "sample.wav",
+            model: "custom-whisper",
+            boundary: "Boundary-test",
+            language: "en",
+            prompt: "spell project names correctly",
+            responseFormat: "json",
+            temperature: "0"
+        )
+
+        XCTAssertEqual(
+            preparedRequest.request.url?.absoluteString,
+            "https://custom.example.test/v1/audio/transcriptions"
+        )
+        XCTAssertEqual(preparedRequest.request.value(forHTTPHeaderField: "Authorization"), "Bearer custom-key")
+
+        let body = try XCTUnwrap(String(data: preparedRequest.body, encoding: .utf8))
+        XCTAssertTrue(body.contains("custom-whisper"))
+        XCTAssertTrue(body.contains("Content-Disposition: form-data; name=\"prompt\""))
+    }
+
     func testOpenAICompatibleTranscriptionCodecReturnsTextWhenPresent() throws {
         let response = VoiceInkOpenAICompatibleTranscriptionResponse(
             text: "transcribed text",
@@ -123,6 +148,25 @@ final class RemoteProviderRequestTests: XCTestCase {
             try VoiceInkOpenAICompatibleTranscriptionCodec.textIfPresent(
                 from: JSONEncoder().encode(VoiceInkOpenAICompatibleTranscriptionResponse(text: nil))
             )
+        )
+    }
+
+    func testOpenAICompatibleTranscriptionCodecCanDisablePlainTextFallback() throws {
+        let plainTextData = Data("plain transcription".utf8)
+
+        XCTAssertEqual(
+            VoiceInkOpenAICompatibleTranscriptionCodec.transcriptionText(
+                from: plainTextData,
+                allowPlainTextFallback: true
+            ),
+            "plain transcription"
+        )
+        XCTAssertEqual(
+            VoiceInkOpenAICompatibleTranscriptionCodec.transcriptionText(
+                from: plainTextData,
+                allowPlainTextFallback: false
+            ),
+            ""
         )
     }
 

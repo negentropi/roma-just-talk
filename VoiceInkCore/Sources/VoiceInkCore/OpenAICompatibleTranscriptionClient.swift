@@ -21,10 +21,43 @@ public struct VoiceInkOpenAICompatibleTranscriptionClient: Sendable {
         temperature: String? = nil,
         errorDomain: String = "OpenAICompatibleTranscriptionAPI",
         timeout: TimeInterval? = nil,
-        maxRetries: Int = 0
+        maxRetries: Int = 0,
+        allowPlainTextFallback: Bool = true
+    ) async throws -> String {
+        return try await transcribeAudioData(
+            url: VoiceInkProviderEndpoint.openAICompatibleAudioTranscriptionsURL(from: baseURL),
+            apiKey: apiKey,
+            model: model,
+            audioData: audioData,
+            fileName: fileName,
+            language: language,
+            prompt: prompt,
+            responseFormat: responseFormat,
+            temperature: temperature,
+            errorDomain: errorDomain,
+            timeout: timeout,
+            maxRetries: maxRetries,
+            allowPlainTextFallback: allowPlainTextFallback
+        )
+    }
+
+    public func transcribeAudioData(
+        url: URL,
+        apiKey: String,
+        model: String,
+        audioData: Data,
+        fileName: String,
+        language: String? = nil,
+        prompt: String? = nil,
+        responseFormat: String? = nil,
+        temperature: String? = nil,
+        errorDomain: String = "OpenAICompatibleTranscriptionAPI",
+        timeout: TimeInterval? = nil,
+        maxRetries: Int = 0,
+        allowPlainTextFallback: Bool = true
     ) async throws -> String {
         let preparedRequest = VoiceInkOpenAICompatibleTranscriptionRequestBuilder.make(
-            baseURL: baseURL,
+            url: url,
             apiKey: apiKey,
             audioData: audioData,
             fileName: fileName,
@@ -53,10 +86,10 @@ public struct VoiceInkOpenAICompatibleTranscriptionClient: Sendable {
             )
         }
 
-        if let text = try? VoiceInkOpenAICompatibleTranscriptionCodec.textIfPresent(from: data) {
-            return text
-        }
-        return String(data: data, encoding: .utf8) ?? ""
+        return VoiceInkOpenAICompatibleTranscriptionCodec.transcriptionText(
+            from: data,
+            allowPlainTextFallback: allowPlainTextFallback
+        )
     }
 
     public func verifyAPIKey(baseURL: URL, apiKey: String) async -> Bool {

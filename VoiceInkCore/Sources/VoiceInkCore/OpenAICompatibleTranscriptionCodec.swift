@@ -60,6 +60,16 @@ public enum VoiceInkOpenAICompatibleTranscriptionCodec {
             .text
     }
 
+    static func transcriptionText(from data: Data, allowPlainTextFallback: Bool) -> String {
+        if let text = try? textIfPresent(from: data) {
+            return text
+        }
+        guard allowPlainTextFallback else {
+            return ""
+        }
+        return String(data: data, encoding: .utf8) ?? ""
+    }
+
     private static func appendField(
         _ name: String,
         _ value: String,

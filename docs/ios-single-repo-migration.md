@@ -36,6 +36,7 @@ Current macOS consumers of shared remote transport:
 
 - Groq batch transcription uses `VoiceInkOpenAICompatibleTranscriptionClient`.
 - Deepgram batch transcription uses `VoiceInkDeepgramTranscriptionClient`.
+- Custom OpenAI-compatible batch transcription uses `VoiceInkOpenAICompatibleTranscriptionClient`.
 
 Platform shells still own UI, OS permissions, audio capture, paste/keyboard behavior, keychain adapters, local model download storage, SwiftData models, and macOS-only orchestration.
 

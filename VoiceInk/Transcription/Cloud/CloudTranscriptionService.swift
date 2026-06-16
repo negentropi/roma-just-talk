@@ -36,7 +36,7 @@ enum CloudTranscriptionError: Error, LocalizedError {
 
 class CloudTranscriptionService: TranscriptionService {
     private let modelContext: ModelContext
-    private lazy var openAICompatibleService = OpenAICompatibleTranscriptionService()
+    private let openAICompatibleTranscriptionClient = VoiceInkOpenAICompatibleTranscriptionClient()
 
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
@@ -52,7 +52,13 @@ class CloudTranscriptionService: TranscriptionService {
                 guard let customModel = model as? CustomCloudModel else {
                     throw CloudTranscriptionError.unsupportedProvider
                 }
-                return try await openAICompatibleService.transcribe(audioURL: audioURL, model: customModel)
+                return try await transcribeCustomModel(
+                    audioData: audioData,
+                    fileName: fileName,
+                    model: customModel,
+                    language: language,
+                    prompt: transcriptionPrompt()
+                )
             }
 
             guard let cloudProvider = CloudProviderRegistry.provider(for: model.provider) else {
@@ -120,6 +126,50 @@ class CloudTranscriptionService: TranscriptionService {
             }
         }
         return unique
+    }
+
+    private func transcribeCustomModel(
+        audioData: Data,
+        fileName: String,
+        model: CustomCloudModel,
+        language: String?,
+        prompt: String?
+    ) async throws -> String {
+        guard let url = URL(string: model.apiEndpoint) else {
+            throw NSError(
+                domain: "CustomWhisperTranscriptionService",
+                code: -1,
+                userInfo: [NSLocalizedDescriptionKey: "Invalid API endpoint URL"]
+            )
+        }
+
+        do {
+            let text = try await openAICompatibleTranscriptionClient.transcribeAudioData(
+                url: url,
+                apiKey: model.apiKey,
+                model: model.modelName,
+                audioData: audioData,
+                fileName: fileName,
+                language: language,
+                prompt: prompt,
+                responseFormat: "json",
+                temperature: "0",
+                errorDomain: "CustomWhisperTranscriptionService",
+                allowPlainTextFallback: false
+            )
+            guard !text.isEmpty else {
+                throw CloudTranscriptionError.noTranscriptionReturned
+            }
+            return text
+        } catch let error as CloudTranscriptionError {
+            throw error
+        } catch let error as NSError
+            where error.domain == "CustomWhisperTranscriptionService" && (100...599).contains(error.code) {
+            throw CloudTranscriptionError.apiRequestFailed(
+                statusCode: error.code,
+                message: error.userInfo[NSLocalizedDescriptionKey] as? String ?? error.localizedDescription
+            )
+        }
     }
 
     private func mapLLMKitError(_ error: LLMKitError) -> CloudTranscriptionError {

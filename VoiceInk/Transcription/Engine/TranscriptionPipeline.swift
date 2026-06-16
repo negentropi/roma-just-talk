@@ -180,7 +180,9 @@ class TranscriptionPipeline {
             transcription.transcriptionDuration = transcriptionDuration
             finalPastedText = cleanedText
 
-            if let enhancementService, enhancementService.isConfigured {
+            if let enhancementService,
+               enhancementService.isConfigured,
+               enhancementService.hasPromptTriggerWords {
                 let detectionResult = promptDetectionService.analyzeText(text, with: enhancementService)
                 promptDetectionResult = detectionResult
                 await promptDetectionService.applyDetectionResult(detectionResult, to: enhancementService)

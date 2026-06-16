@@ -42,6 +42,7 @@ class AIEnhancementService: ObservableObject {
             if let encoded = try? JSONEncoder().encode(customPrompts) {
                 UserDefaults.standard.set(encoded, forKey: "customPrompts")
             }
+            refreshPromptDetectionCache()
         }
     }
 
@@ -62,6 +63,12 @@ class AIEnhancementService: ObservableObject {
 
     var allPrompts: [CustomPrompt] {
         return customPrompts
+    }
+
+    private(set) var promptDetectionPrompts: [CustomPrompt] = []
+
+    var hasPromptTriggerWords: Bool {
+        !promptDetectionPrompts.isEmpty
     }
 
     private let aiService: AIService
@@ -109,6 +116,7 @@ class AIEnhancementService: ObservableObject {
         )
 
         initializePredefinedPrompts()
+        refreshPromptDetectionCache()
     }
 
     deinit {
@@ -439,6 +447,12 @@ class AIEnhancementService: ObservableObject {
 
     func setActivePrompt(_ prompt: CustomPrompt) {
         selectedPromptId = prompt.id
+    }
+
+    private func refreshPromptDetectionCache() {
+        promptDetectionPrompts = customPrompts.filter { prompt in
+            prompt.triggerWords.contains { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+        }
     }
 
     private func initializePredefinedPrompts() {

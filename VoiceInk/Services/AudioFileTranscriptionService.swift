@@ -86,7 +86,9 @@ class AudioTranscriptionService: ObservableObject {
             let originalText = cleanedText
             var promptDetectionResult: PromptDetectionService.PromptDetectionResult? = nil
 
-            if let enhancementService = enhancementService, enhancementService.isConfigured {
+            if let enhancementService = enhancementService,
+               enhancementService.isConfigured,
+               enhancementService.hasPromptTriggerWords {
                 let detectionResult = await promptDetectionService.analyzeText(text, with: enhancementService)
                 promptDetectionResult = detectionResult
                 await promptDetectionService.applyDetectionResult(detectionResult, to: enhancementService)

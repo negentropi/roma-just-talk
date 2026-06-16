@@ -21,18 +21,16 @@ class PromptDetectionService {
         let originalEnhancementState = enhancementService.isEnhancementEnabled
         let originalPromptId = enhancementService.selectedPromptId
 
-		for prompt in enhancementService.allPrompts {
-            if !prompt.triggerWords.isEmpty {
-				if let (detectedWord, processedText) = detectAndStripTriggerWord(from: text, triggerWords: prompt.triggerWords) {
-                    return PromptDetectionResult(
-                        shouldEnableAI: true,
-                        selectedPromptId: prompt.id,
-                        processedText: processedText,
-                        detectedTriggerWord: detectedWord,
-                        originalEnhancementState: originalEnhancementState,
-                        originalPromptId: originalPromptId
-                    )
-                }
+        for prompt in enhancementService.promptDetectionPrompts {
+            if let (detectedWord, processedText) = detectAndStripTriggerWord(from: text, triggerWords: prompt.triggerWords) {
+                return PromptDetectionResult(
+                    shouldEnableAI: true,
+                    selectedPromptId: prompt.id,
+                    processedText: processedText,
+                    detectedTriggerWord: detectedWord,
+                    originalEnhancementState: originalEnhancementState,
+                    originalPromptId: originalPromptId
+                )
             }
         }
 

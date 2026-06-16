@@ -134,6 +134,86 @@ struct VoiceInkTests {
         #expect(service.applyReplacements(to: "voice ink", using: context) == "roma")
     }
 
+    @Test @MainActor func aiEnhancementServiceCachesPromptTriggerEligibility() throws {
+        let savedPrompts = UserDefaults.standard.data(forKey: "customPrompts")
+        let savedPromptId = UserDefaults.standard.string(forKey: "selectedPromptId")
+        defer {
+            if let savedPrompts {
+                UserDefaults.standard.set(savedPrompts, forKey: "customPrompts")
+            } else {
+                UserDefaults.standard.removeObject(forKey: "customPrompts")
+            }
+            if let savedPromptId {
+                UserDefaults.standard.set(savedPromptId, forKey: "selectedPromptId")
+            } else {
+                UserDefaults.standard.removeObject(forKey: "selectedPromptId")
+            }
+        }
+
+        let container = try makeWordReplacementContainer()
+        let service = AIEnhancementService(modelContext: container.mainContext)
+        service.customPrompts = []
+
+        #expect(!service.hasPromptTriggerWords)
+        #expect(service.promptDetectionPrompts.isEmpty)
+
+        let triggerPrompt = CustomPrompt(
+            title: "Fast Trigger",
+            promptText: "Clean this",
+            triggerWords: ["clean"]
+        )
+        service.customPrompts = [triggerPrompt]
+
+        #expect(service.hasPromptTriggerWords)
+        #expect(service.promptDetectionPrompts.map(\.id) == [triggerPrompt.id])
+
+        service.customPrompts = [
+            CustomPrompt(
+                title: "Blank Trigger",
+                promptText: "Clean this",
+                triggerWords: ["   "]
+            )
+        ]
+
+        #expect(!service.hasPromptTriggerWords)
+        #expect(service.promptDetectionPrompts.isEmpty)
+    }
+
+    @Test @MainActor func promptDetectionUsesCachedTriggerPrompts() throws {
+        let savedPrompts = UserDefaults.standard.data(forKey: "customPrompts")
+        let savedPromptId = UserDefaults.standard.string(forKey: "selectedPromptId")
+        defer {
+            if let savedPrompts {
+                UserDefaults.standard.set(savedPrompts, forKey: "customPrompts")
+            } else {
+                UserDefaults.standard.removeObject(forKey: "customPrompts")
+            }
+            if let savedPromptId {
+                UserDefaults.standard.set(savedPromptId, forKey: "selectedPromptId")
+            } else {
+                UserDefaults.standard.removeObject(forKey: "selectedPromptId")
+            }
+        }
+
+        let container = try makeWordReplacementContainer()
+        let service = AIEnhancementService(modelContext: container.mainContext)
+        let triggerPrompt = CustomPrompt(
+            title: "Assistant Trigger",
+            promptText: "Answer directly",
+            triggerWords: ["answer"]
+        )
+        service.customPrompts = [
+            CustomPrompt(title: "No Trigger", promptText: "Clean this"),
+            triggerPrompt
+        ]
+
+        let detection = PromptDetectionService().analyzeText("answer what is this?", with: service)
+
+        #expect(detection.shouldEnableAI)
+        #expect(detection.selectedPromptId == triggerPrompt.id)
+        #expect(detection.processedText == "What is this?")
+    }
+
     @Test @MainActor func noneRecorderStyleStartsSessionWithoutShowingRecorderWindow() async throws {
         let oldRecorderType = UserDefaults.standard.string(forKey: "RecorderType")
         defer {

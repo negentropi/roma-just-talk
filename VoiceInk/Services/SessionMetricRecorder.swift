@@ -1,6 +1,7 @@
 import Foundation
 import SwiftData
 import OSLog
+import VoiceInkCore
 
 enum SessionMetricRecorder {
     private static let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "SessionMetricRecorder")
@@ -28,7 +29,7 @@ enum SessionMetricRecorder {
         in modelContext: ModelContext,
         timestamp: Date = Date()
     ) throws -> Bool {
-        guard transcription.transcriptionStatus == TranscriptionStatus.completed.rawValue else {
+        guard transcription.transcriptionStatus == VoiceInkTranscriptionStatus.completed.rawValue else {
             return false
         }
 

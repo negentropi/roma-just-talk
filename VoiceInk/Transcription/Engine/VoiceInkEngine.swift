@@ -796,7 +796,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                 modelContext.insert(transcription)
             }
             transcription.text = "Transcription Failed: No model selected"
-            transcription.transcriptionStatus = TranscriptionStatus.failed.rawValue
+            transcription.transcriptionStatus = VoiceInkTranscriptionStatus.failed.rawValue
             try? modelContext.save()
             recordingState = .idle
             return
@@ -990,7 +990,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
         for audioURL: URL,
         text: String,
         duration: TimeInterval,
-        transcriptionStatus: TranscriptionStatus
+        transcriptionStatus: VoiceInkTranscriptionStatus
     ) -> Transcription {
         let powerModeMetadata = currentPowerModeMetadata()
 

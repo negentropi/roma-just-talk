@@ -2,8 +2,6 @@ import Foundation
 import SwiftData
 import VoiceInkCore
 
-typealias TranscriptionStatus = VoiceInkTranscriptionStatus
-
 @Model
 final class Transcription {
     var id: UUID
@@ -16,10 +14,10 @@ final class Transcription {
     var aiEnhancementModelName: String?
     var transcriptionDuration: TimeInterval?
     var enhancementDuration: TimeInterval?
-    var transcriptionStatus: TranscriptionStatus
+    var transcriptionStatus: VoiceInkTranscriptionStatus
     var transcriptionError: String?
     
-    init(text: String, duration: TimeInterval, enhancedText: String? = nil, audioFileURL: String? = nil, transcriptionModelName: String? = nil, aiEnhancementModelName: String? = nil, transcriptionDuration: TimeInterval? = nil, enhancementDuration: TimeInterval? = nil, transcriptionStatus: TranscriptionStatus = .pending, transcriptionError: String? = nil) {
+    init(text: String, duration: TimeInterval, enhancedText: String? = nil, audioFileURL: String? = nil, transcriptionModelName: String? = nil, aiEnhancementModelName: String? = nil, transcriptionDuration: TimeInterval? = nil, enhancementDuration: TimeInterval? = nil, transcriptionStatus: VoiceInkTranscriptionStatus = .pending, transcriptionError: String? = nil) {
         self.id = UUID()
         self.text = text
         self.enhancedText = enhancedText

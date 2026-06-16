@@ -2,8 +2,6 @@ import Foundation
 import SwiftData
 import VoiceInkCore
 
-typealias TranscriptionStatus = VoiceInkTranscriptionStatus
-
 @Model
 final class Transcription {
     static let canceledTranscriptionText = "The transcription was canceled."
@@ -38,7 +36,7 @@ final class Transcription {
          aiRequestUserMessage: String? = nil,
          powerModeName: String? = nil,
          powerModeEmoji: String? = nil,
-         transcriptionStatus: TranscriptionStatus = .pending) {
+         transcriptionStatus: VoiceInkTranscriptionStatus = .pending) {
         self.id = UUID()
         self.text = text
         self.enhancedText = enhancedText
@@ -63,7 +61,7 @@ final class Transcription {
     ) {
         text = Self.canceledTranscriptionText
         enhancedText = nil
-        transcriptionStatus = TranscriptionStatus.canceled.rawValue
+        transcriptionStatus = VoiceInkTranscriptionStatus.canceled.rawValue
         if let duration {
             self.duration = duration
         }

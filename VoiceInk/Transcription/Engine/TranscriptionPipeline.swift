@@ -1,6 +1,7 @@
 import Foundation
 import SwiftData
 import os
+import VoiceInkCore
 
 typealias TranscriptionPipelineDeferredWork = @MainActor () -> Void
 
@@ -257,7 +258,7 @@ class TranscriptionPipeline {
                 }
             }
 
-            transcription.transcriptionStatus = TranscriptionStatus.completed.rawValue
+            transcription.transcriptionStatus = VoiceInkTranscriptionStatus.completed.rawValue
         } catch {
             let errorDescription = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
 
@@ -273,7 +274,7 @@ class TranscriptionPipeline {
             }
 
             transcription.text = "Transcription Failed: \(errorDescription)"
-            transcription.transcriptionStatus = TranscriptionStatus.failed.rawValue
+            transcription.transcriptionStatus = VoiceInkTranscriptionStatus.failed.rawValue
         }
 
         func recordSessionMetricAndNotifyIfNeeded(modelDisplayName: String?) {
@@ -295,7 +296,7 @@ class TranscriptionPipeline {
         func saveTranscriptionAndPostCompletion() {
             insertHistoryRecordBeforeSaveIfNeeded()
 
-            let shouldRecordSessionMetric = transcription.transcriptionStatus == TranscriptionStatus.completed.rawValue
+            let shouldRecordSessionMetric = transcription.transcriptionStatus == VoiceInkTranscriptionStatus.completed.rawValue
             let shouldDeferSessionMetric = shouldRecordSessionMetric && latencyTrace?.isRollingPreloadQuickRelease == true
             let didInsertSessionMetric: Bool
             if shouldRecordSessionMetric, !shouldDeferSessionMetric {
@@ -365,7 +366,7 @@ class TranscriptionPipeline {
             SoundManager.shared.playStopSound()
             await restorePromptDetectionSettingsAndDismiss()
         } else if var textToPaste = finalPastedText,
-           transcription.transcriptionStatus == TranscriptionStatus.completed.rawValue {
+           transcription.transcriptionStatus == VoiceInkTranscriptionStatus.completed.rawValue {
             let shouldLowercase = UserDefaults.standard.bool(forKey: "LowercaseTranscription")
             if !shouldLowercase,
                ContextualCapitalizationFormatter.needsCursorContext(textToPaste) {
@@ -417,7 +418,7 @@ class TranscriptionPipeline {
             await restorePromptDetectionSettingsAndDismiss()
         }
 
-        if transcription.transcriptionStatus == TranscriptionStatus.completed.rawValue,
+        if transcription.transcriptionStatus == VoiceInkTranscriptionStatus.completed.rawValue,
            transcription.duration <= 0 {
             let audioFileReady = await waitForAudioFileReadyIfNeeded()
             if audioFileReady {

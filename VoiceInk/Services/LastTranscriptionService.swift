@@ -196,7 +196,7 @@ enum SpecialShortcutEmptyTranscriptionFallback {
         self.pendingFallback = nil
 
         guard Date().timeIntervalSince(pendingFallback.createdAt) <= fallbackLifetime,
-              transcription.transcriptionStatus == TranscriptionStatus.completed.rawValue,
+              transcription.transcriptionStatus == VoiceInkTranscriptionStatus.completed.rawValue,
               transcription.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
               transcription.enhancedText?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty != false
         else {

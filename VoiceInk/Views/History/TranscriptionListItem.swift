@@ -1,4 +1,5 @@
 import SwiftUI
+import VoiceInkCore
 
 struct TranscriptionListItem: View {
     let transcription: Transcription
@@ -23,7 +24,7 @@ struct TranscriptionListItem: View {
                         .foregroundColor(.secondary)
                     Spacer()
                     if transcription.duration > 0 {
-                        Text(transcription.duration.formatTiming())
+                        Text(VoiceInkDurationPresentation.compactElapsed(transcription.duration))
                             .font(.system(size: 10, weight: .medium))
                             .padding(.horizontal, 6)
                             .padding(.vertical, 3)

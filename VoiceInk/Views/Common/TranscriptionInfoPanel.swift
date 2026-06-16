@@ -1,4 +1,5 @@
 import SwiftUI
+import VoiceInkCore
 
 /// Reusable component that displays transcription Details and AI Request sections.
 /// Used in both the inline history sliding panel and the separate history window's metadata view.
@@ -27,7 +28,7 @@ struct TranscriptionInfoPanel: View {
             metadataRow(
                 icon: "hourglass",
                 label: "Duration",
-                value: transcription.duration.formatTiming()
+                value: VoiceInkDurationPresentation.compactElapsed(transcription.duration)
             )
 
             if let modelName = transcription.transcriptionModelName {
@@ -41,7 +42,7 @@ struct TranscriptionInfoPanel: View {
                     metadataRow(
                         icon: "clock.fill",
                         label: "Transcription Time",
-                        value: duration.formatTiming()
+                        value: VoiceInkDurationPresentation.compactElapsed(duration)
                     )
                 }
             }
@@ -57,7 +58,7 @@ struct TranscriptionInfoPanel: View {
                     metadataRow(
                         icon: "clock.fill",
                         label: "Enhancement Time",
-                        value: duration.formatTiming()
+                        value: VoiceInkDurationPresentation.compactElapsed(duration)
                     )
                 }
             }

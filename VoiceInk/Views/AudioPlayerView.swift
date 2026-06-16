@@ -1,19 +1,6 @@
 import SwiftUI
 import AVFoundation
-
-extension TimeInterval {
-    func formatTiming() -> String {
-        if self < 1 {
-            return String(format: "%.0fms", self * 1000)
-        }
-        if self < 60 {
-            return String(format: "%.1fs", self)
-        }
-        let minutes = Int(self) / 60
-        let seconds = self.truncatingRemainder(dividingBy: 60)
-        return String(format: "%dm %.0fs", minutes, seconds)
-    }
-}
+import VoiceInkCore
 
 class WaveformGenerator {
     private static let cache = NSCache<NSString, NSArray>()
@@ -154,12 +141,6 @@ class AudioPlayerManager: ObservableObject {
     }
 }
 
-private func formatTime(_ time: TimeInterval) -> String {
-    let minutes = Int(time) / 60
-    let seconds = Int(time) % 60
-    return String(format: "%d:%02d", minutes, seconds)
-}
-
 struct WaveformView: View {
     let samples: [Float]
     let currentTime: TimeInterval
@@ -199,7 +180,11 @@ struct WaveformView: View {
                     .padding(.horizontal, 2)
 
                     if isHovering {
-                        Text(formatTime(duration * Double(hoverLocation / geometry.size.width)))
+                        Text(
+                            VoiceInkDurationPresentation.minutesSeconds(
+                                duration * Double(hoverLocation / geometry.size.width)
+                            )
+                        )
                             .font(.system(size: 10, weight: .medium))
                             .monospacedDigit()
                             .foregroundColor(.white)
@@ -585,4 +570,3 @@ struct AudioPlayerView: View {
         }
     }
 }
-

@@ -22,5 +22,17 @@ final class DurationPresentationTests: XCTestCase {
     func testMinutesSecondsTruncatesFractionalSeconds() {
         XCTAssertEqual(VoiceInkDurationPresentation.minutesSeconds(65.9), "1:05")
     }
+
+    func testCompactElapsedUsesMillisecondsForSubsecondDurations() {
+        XCTAssertEqual(VoiceInkDurationPresentation.compactElapsed(0.125), "125ms")
+    }
+
+    func testCompactElapsedUsesOneDecimalSecondsUnderOneMinute() {
+        XCTAssertEqual(VoiceInkDurationPresentation.compactElapsed(12.34), "12.3s")
+    }
+
+    func testCompactElapsedUsesMinutesAndRoundedSecondsFromOneMinute() {
+        XCTAssertEqual(VoiceInkDurationPresentation.compactElapsed(125.6), "2m 6s")
+    }
 }
 #endif

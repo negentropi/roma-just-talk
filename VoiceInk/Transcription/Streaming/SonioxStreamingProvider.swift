@@ -25,9 +25,7 @@ final class SonioxStreamingProvider: StreamingTranscriptionProvider {
     }
 
     func connect(model: any TranscriptionModel, language: String?) async throws {
-        guard let apiKey = APIKeyManager.shared.getAPIKey(forProvider: "Soniox"), !apiKey.isEmpty else {
-            throw StreamingTranscriptionError.missingAPIKey
-        }
+        let apiKey = try apiKey(for: model)
 
         let vocabulary = getCustomDictionaryTerms()
 

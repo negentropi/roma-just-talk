@@ -58,3 +58,13 @@ protocol StreamingTranscriptionProvider: AnyObject {
     /// Stream of transcription events from the provider
     var transcriptionEvents: AsyncStream<StreamingTranscriptionEvent> { get }
 }
+
+extension StreamingTranscriptionProvider {
+    func apiKey(for model: any TranscriptionModel) throws -> String {
+        guard let apiKey = APIKeyManager.shared.getAPIKey(forProvider: model.provider.apiKeyProviderName),
+              !apiKey.isEmpty else {
+            throw StreamingTranscriptionError.missingAPIKey
+        }
+        return apiKey
+    }
+}

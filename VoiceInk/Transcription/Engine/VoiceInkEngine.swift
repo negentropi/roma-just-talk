@@ -148,9 +148,9 @@ class VoiceInkEngine: NSObject, ObservableObject {
                             let permanentURL = self.recordingsDirectory.appendingPathComponent(fileName)
                             self.recordedFile = permanentURL
 
-                            let pendingChunks = OSAllocatedUnfairLock(initialState: [Data]())
+                            let startupAudioRelay = RecordingStartupAudioRelay()
                             self.recorder.onAudioChunk = { data in
-                                pendingChunks.withLock { $0.append(data) }
+                                startupAudioRelay.handle(data)
                             }
                             self.rollingBufferPreloadCoordinator.prepareForRecordingStart()
 
@@ -197,7 +197,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                                 self.currentSession = preloaded.session
                                 self.recorder.onAudioChunk = { data in
                                     preloaded.audioChunkHandler(data)
-                                    pendingChunks.withLock { $0.append(data) }
+                                    startupAudioRelay.handle(data)
                                 }
                             }
 
@@ -207,13 +207,13 @@ class VoiceInkEngine: NSObject, ObservableObject {
                                    claim.matches(model: model, language: UserDefaults.standard.string(forKey: "SelectedLanguage")) {
                                     self.currentSession = claim.preloaded.session
                                     self.recorder.onAudioChunk = claim.preloaded.audioChunkHandler
-                                    pendingChunks.withLock { $0.removeAll() }
+                                    startupAudioRelay.clear()
                                 } else {
                                     if let claim = claimedPreload {
                                         claim.preloaded.session.cancel()
                                         self.currentSession = nil
                                         self.recorder.onAudioChunk = { data in
-                                            pendingChunks.withLock { $0.append(data) }
+                                            startupAudioRelay.handle(data)
                                         }
                                     }
                                     self.rollingBufferPreloadCoordinator.cancelUnclaimedPreload(reason: "recording-start-fallback")
@@ -221,10 +221,18 @@ class VoiceInkEngine: NSObject, ObservableObject {
                                        self.activeRecordingStartID == startID,
                                        model.supportsRecordedFileTranscription {
                                         self.stopRequestedDuringStart = false
-                                        self.currentSession = nil
-                                        self.recorder.onAudioChunk = nil
-                                        pendingChunks.withLock { $0.removeAll() }
-                                        self.logger.notice("toggleRecord: stopping startup recording before fallback streaming setup")
+                                        if let startupStopSession = await self.prepareStartupStopStreamingSession(
+                                            for: model,
+                                            audioRelay: startupAudioRelay
+                                        ) {
+                                            self.currentSession = startupStopSession
+                                            self.logger.notice("toggleRecord: stopping startup recording with streaming startup session")
+                                        } else {
+                                            self.currentSession = nil
+                                            self.recorder.onAudioChunk = nil
+                                            startupAudioRelay.clear()
+                                            self.logger.notice("toggleRecord: stopping startup recording before fallback streaming setup")
+                                        }
                                         await self.stopRecordingAndRunPipeline()
                                         return
                                     }
@@ -241,16 +249,11 @@ class VoiceInkEngine: NSObject, ObservableObject {
                                     let realCallback = try await session.prepare(model: model)
 
                                     if let realCallback {
+                                        startupAudioRelay.installSink(realCallback)
                                         self.recorder.onAudioChunk = realCallback
-                                        let buffered = pendingChunks.withLock { chunks -> [Data] in
-                                            let result = chunks
-                                            chunks.removeAll()
-                                            return result
-                                        }
-                                        for chunk in buffered { realCallback(chunk) }
                                     } else {
                                         self.recorder.onAudioChunk = nil
-                                        pendingChunks.withLock { $0.removeAll() }
+                                        startupAudioRelay.clear()
                                     }
                                 }
                             }
@@ -324,6 +327,35 @@ class VoiceInkEngine: NSObject, ObservableObject {
                     }
                 }
             }
+        }
+    }
+
+    private func prepareStartupStopStreamingSession(
+        for model: any TranscriptionModel,
+        audioRelay: RecordingStartupAudioRelay
+    ) async -> TranscriptionSession? {
+        let session = serviceRegistry.createSession(
+            for: model,
+            onPartialTranscript: { [weak self] partial in
+                Task { @MainActor in
+                    self?.partialTranscript = partial
+                }
+            }
+        )
+
+        do {
+            guard let callback = try await session.prepare(model: model) else {
+                session.cancel()
+                return nil
+            }
+
+            audioRelay.installSink(callback)
+            recorder.onAudioChunk = callback
+            return session
+        } catch {
+            session.cancel()
+            logger.error("Startup-stop streaming setup failed, falling back to batch: \(error.localizedDescription, privacy: .public)")
+            return nil
         }
     }
 

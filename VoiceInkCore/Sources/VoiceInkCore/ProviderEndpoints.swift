@@ -24,6 +24,10 @@ public enum VoiceInkProviderEndpoint: String, CaseIterable, Sendable {
         }
     }
 
+    public static var geminiNativeAPIBaseURL: URL {
+        URL(string: "https://generativelanguage.googleapis.com/v1beta")!
+    }
+
     public var chatCompletionsURL: URL? {
         switch self {
         case .groq, .openAI, .cerebras, .gemini:
@@ -75,5 +79,15 @@ public enum VoiceInkProviderEndpoint: String, CaseIterable, Sendable {
 
     public static func deepgramProjectsURL(from baseURL: URL) -> URL {
         baseURL.appendingPathComponent("v1/projects")
+    }
+
+    public static func geminiGenerateContentURL(from baseURL: URL, model: String) -> URL {
+        baseURL
+            .appendingPathComponent("models")
+            .appendingPathComponent("\(model):generateContent")
+    }
+
+    public static func geminiModelsURL(from baseURL: URL) -> URL {
+        baseURL.appendingPathComponent("models")
     }
 }

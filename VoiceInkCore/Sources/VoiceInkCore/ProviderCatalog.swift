@@ -8,6 +8,7 @@ public enum VoiceInkProviderModelUse: Sendable {
 public enum VoiceInkTranscriptionTransport: Sendable {
     case openAICompatible
     case deepgram
+    case geminiGenerateContent
     case localWhisper
 }
 
@@ -19,6 +20,7 @@ public enum VoiceInkTranscriptionServiceKind: Sendable {
 public enum VoiceInkAPIKeyVerificationTransport: Sendable, Equatable {
     case openAICompatibleModels
     case deepgramProjects
+    case geminiModels
 }
 
 public enum VoiceInkProviderAccessRequirement: Sendable {
@@ -103,6 +105,15 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
         }
     }
 
+    public var transcriptionAPIBaseURL: URL {
+        switch self {
+        case .gemini:
+            return VoiceInkProviderEndpoint.geminiNativeAPIBaseURL
+        case .groq, .openAI, .deepgram, .cerebras, .localWhisper, .voiceInk:
+            return apiBaseURL
+        }
+    }
+
     public var consoleURL: URL {
         switch self {
         case .groq:
@@ -126,16 +137,18 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
         switch self {
         case .deepgram:
             return .deepgram
+        case .gemini:
+            return .geminiGenerateContent
         case .localWhisper:
             return .localWhisper
-        case .groq, .openAI, .cerebras, .gemini, .voiceInk:
+        case .groq, .openAI, .cerebras, .voiceInk:
             return .openAICompatible
         }
     }
 
     public var transcriptionServiceKind: VoiceInkTranscriptionServiceKind {
         switch transcriptionTransport {
-        case .openAICompatible, .deepgram:
+        case .openAICompatible, .deepgram, .geminiGenerateContent:
             return .remote
         case .localWhisper:
             return .localWhisper
@@ -172,7 +185,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return .userAPIKey(
                 account: VoiceInkProviderAPIKeyAccount.gemini,
                 verificationStateKey: "geminiKeyVerified",
-                verificationTransport: .openAICompatibleModels
+                verificationTransport: .geminiModels
             )
         case .localWhisper:
             return .localWhisperModel

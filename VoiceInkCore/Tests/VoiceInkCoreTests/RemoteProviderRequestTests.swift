@@ -308,5 +308,91 @@ final class RemoteProviderRequestTests: XCTestCase {
             ""
         )
     }
+
+    func testGeminiTranscriptionRequestBuilderUsesGenerateContentEndpointAndBody() throws {
+        let audioData = Data("WAVDATA".utf8)
+        let request = try VoiceInkGeminiRequestBuilder.makeTranscriptionRequest(
+            baseURL: VoiceInkProviderEndpoint.geminiNativeAPIBaseURL,
+            apiKey: "gemini-key",
+            model: "gemini-2.5-flash",
+            audioData: audioData,
+            timeout: 60
+        )
+
+        XCTAssertEqual(request.httpMethod, "POST")
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Content-Type"), "application/json")
+        XCTAssertEqual(request.value(forHTTPHeaderField: "x-goog-api-key"), "gemini-key")
+        XCTAssertEqual(
+            request.url?.absoluteString,
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
+        )
+        XCTAssertEqual(request.timeoutInterval, 60)
+
+        let body = try XCTUnwrap(request.httpBody)
+        let json = try XCTUnwrap(JSONSerialization.jsonObject(with: body) as? [String: Any])
+        let contents = try XCTUnwrap(json["contents"] as? [[String: Any]])
+        let parts = try XCTUnwrap(contents.first?["parts"] as? [[String: Any]])
+        XCTAssertEqual(parts.first?["text"] as? String, VoiceInkGeminiTranscriptionCodec.defaultPrompt)
+
+        let inlineData = try XCTUnwrap(parts.dropFirst().first?["inlineData"] as? [String: Any])
+        XCTAssertEqual(inlineData["mimeType"] as? String, "audio/wav")
+        XCTAssertEqual(inlineData["data"] as? String, audioData.base64EncodedString())
+    }
+
+    func testGeminiModelsRequestBuilderUsesNativeModelsEndpoint() throws {
+        let request = VoiceInkGeminiRequestBuilder.makeModelsRequest(
+            baseURL: VoiceInkProviderEndpoint.geminiNativeAPIBaseURL,
+            apiKey: "gemini-key",
+            timeout: 10
+        )
+
+        XCTAssertEqual(request.url?.absoluteString, "https://generativelanguage.googleapis.com/v1beta/models")
+        XCTAssertEqual(request.value(forHTTPHeaderField: "x-goog-api-key"), "gemini-key")
+        XCTAssertEqual(request.timeoutInterval, 10)
+    }
+
+    func testGeminiClientRejectsBlankAPIKeyWithoutNetwork() async throws {
+        let result = await VoiceInkGeminiTranscriptionClient().verifyAPIKeyDetailed(
+            baseURL: VoiceInkProviderEndpoint.geminiNativeAPIBaseURL,
+            apiKey: " \n\t "
+        )
+
+        XCTAssertEqual(
+            result,
+            VoiceInkAPIKeyVerificationResult(
+                isValid: false,
+                errorMessage: "API key is missing or empty."
+            )
+        )
+    }
+
+    func testGeminiTranscriptionCodecReturnsTrimmedFirstPartOrEmptyString() throws {
+        let response = """
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "text": "  gemini text\\n"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+        """
+
+        XCTAssertEqual(
+            try VoiceInkGeminiTranscriptionCodec.transcript(from: Data(response.utf8)),
+            "gemini text"
+        )
+
+        let emptyResponse = #"{"candidates":[]}"#
+        XCTAssertEqual(
+            try VoiceInkGeminiTranscriptionCodec.transcript(from: Data(emptyResponse.utf8)),
+            ""
+        )
+    }
 }
 #endif

@@ -16,17 +16,20 @@ public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionServ
     private let apiBaseURL: URL
     private let openAICompatibleClient: VoiceInkOpenAICompatibleTranscriptionClient
     private let deepgramClient: VoiceInkDeepgramTranscriptionClient
+    private let geminiClient: VoiceInkGeminiTranscriptionClient
 
     public init(
         provider: VoiceInkProviderKind,
         openAICompatibleClient: VoiceInkOpenAICompatibleTranscriptionClient = VoiceInkOpenAICompatibleTranscriptionClient(),
-        deepgramClient: VoiceInkDeepgramTranscriptionClient = VoiceInkDeepgramTranscriptionClient()
+        deepgramClient: VoiceInkDeepgramTranscriptionClient = VoiceInkDeepgramTranscriptionClient(),
+        geminiClient: VoiceInkGeminiTranscriptionClient = VoiceInkGeminiTranscriptionClient()
     ) {
         self.init(
             transport: provider.transcriptionTransport,
-            apiBaseURL: provider.apiBaseURL,
+            apiBaseURL: provider.transcriptionAPIBaseURL,
             openAICompatibleClient: openAICompatibleClient,
-            deepgramClient: deepgramClient
+            deepgramClient: deepgramClient,
+            geminiClient: geminiClient
         )
     }
 
@@ -34,12 +37,14 @@ public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionServ
         transport: VoiceInkTranscriptionTransport,
         apiBaseURL: URL,
         openAICompatibleClient: VoiceInkOpenAICompatibleTranscriptionClient = VoiceInkOpenAICompatibleTranscriptionClient(),
-        deepgramClient: VoiceInkDeepgramTranscriptionClient = VoiceInkDeepgramTranscriptionClient()
+        deepgramClient: VoiceInkDeepgramTranscriptionClient = VoiceInkDeepgramTranscriptionClient(),
+        geminiClient: VoiceInkGeminiTranscriptionClient = VoiceInkGeminiTranscriptionClient()
     ) {
         self.transport = transport
         self.apiBaseURL = apiBaseURL
         self.openAICompatibleClient = openAICompatibleClient
         self.deepgramClient = deepgramClient
+        self.geminiClient = geminiClient
     }
 
     public func transcribeAudioFile(
@@ -69,6 +74,13 @@ public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionServ
                 audioData: audioData,
                 language: language
             )
+        case .geminiGenerateContent:
+            return try await geminiClient.transcribeAudioData(
+                baseURL: apiBaseURL,
+                apiKey: apiKey,
+                model: model,
+                audioData: audioData
+            )
         case .localWhisper:
             throw URLError(.unsupportedURL)
         }
@@ -83,6 +95,11 @@ public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionServ
             )
         case .deepgram:
             return await deepgramClient.verifyAPIKey(
+                baseURL: apiBaseURL,
+                apiKey: apiKey
+            )
+        case .geminiGenerateContent:
+            return await geminiClient.verifyAPIKey(
                 baseURL: apiBaseURL,
                 apiKey: apiKey
             )

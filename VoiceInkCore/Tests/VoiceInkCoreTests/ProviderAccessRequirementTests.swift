@@ -14,7 +14,7 @@ final class ProviderAccessRequirementTests: XCTestCase {
             .openAI: (VoiceInkProviderAPIKeyAccount.openAI, "openAIKeyVerified", .openAICompatibleModels),
             .deepgram: (VoiceInkProviderAPIKeyAccount.deepgram, "deepgramKeyVerified", .deepgramProjects),
             .cerebras: (VoiceInkProviderAPIKeyAccount.cerebras, "cerebrasKeyVerified", .openAICompatibleModels),
-            .gemini: (VoiceInkProviderAPIKeyAccount.gemini, "geminiKeyVerified", .openAICompatibleModels)
+            .gemini: (VoiceInkProviderAPIKeyAccount.gemini, "geminiKeyVerified", .geminiModels)
         ]
 
         for (provider, policy) in expected {
@@ -68,6 +68,18 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertEqual(VoiceInkProviderKind.gemini.transcriptionServiceKind, .remote)
         XCTAssertEqual(VoiceInkProviderKind.voiceInk.transcriptionServiceKind, .remote)
         XCTAssertEqual(VoiceInkProviderKind.localWhisper.transcriptionServiceKind, .localWhisper)
+    }
+
+    func testGeminiUsesNativeTranscriptionEndpointButOpenAICompatiblePostProcessingEndpoint() {
+        XCTAssertEqual(VoiceInkProviderKind.gemini.transcriptionTransport, .geminiGenerateContent)
+        XCTAssertEqual(
+            VoiceInkProviderKind.gemini.transcriptionAPIBaseURL.absoluteString,
+            "https://generativelanguage.googleapis.com/v1beta"
+        )
+        XCTAssertEqual(
+            VoiceInkProviderKind.gemini.postProcessingChatCompletionsURL?.absoluteString,
+            "https://generativelanguage.googleapis.com/v1beta/openai/v1/chat/completions"
+        )
     }
 
     func testProviderReadinessFollowsProviderAccessPolicy() {

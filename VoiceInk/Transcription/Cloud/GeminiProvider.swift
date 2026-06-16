@@ -1,10 +1,10 @@
 import Foundation
 import SwiftData
-import LLMkit
 import VoiceInkCore
 
 struct GeminiProvider: CloudProvider {
     let modelProvider: ModelProvider = .gemini
+    private let transcriptionClient = VoiceInkGeminiTranscriptionClient()
 
     var models: [CloudModel] {
         VoiceInkTranscriptionModelCatalog
@@ -13,16 +13,40 @@ struct GeminiProvider: CloudProvider {
     }
 
     func transcribe(audioData: Data, fileName: String, apiKey: String, model: String, language: String?, prompt: String?, customVocabulary: [String]) async throws -> String {
-        return try await GeminiTranscriptionClient.transcribe(
-            audioData: audioData,
-            apiKey: apiKey,
-            model: model
-        )
+        guard !apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw CloudTranscriptionError.missingAPIKey
+        }
+
+        do {
+            let text = try await transcriptionClient.transcribeAudioData(
+                baseURL: VoiceInkProviderEndpoint.geminiNativeAPIBaseURL,
+                apiKey: apiKey,
+                model: model,
+                audioData: audioData,
+                errorDomain: "GeminiAPI",
+                timeout: 60
+            )
+            guard !text.isEmpty else {
+                throw CloudTranscriptionError.noTranscriptionReturned
+            }
+            return text
+        } catch let error as CloudTranscriptionError {
+            throw error
+        } catch let error as NSError where error.domain == "GeminiAPI" {
+            throw CloudTranscriptionError.apiRequestFailed(
+                statusCode: error.code,
+                message: error.userInfo[NSLocalizedDescriptionKey] as? String ?? error.localizedDescription
+            )
+        }
     }
 
     func makeStreamingProvider(modelContext: ModelContext) -> (any StreamingTranscriptionProvider)? { nil }
 
     func verifyAPIKey(_ key: String) async -> (isValid: Bool, errorMessage: String?) {
-        return await GeminiTranscriptionClient.verifyAPIKey(key)
+        let result = await transcriptionClient.verifyAPIKeyDetailed(
+            baseURL: VoiceInkProviderEndpoint.geminiNativeAPIBaseURL,
+            apiKey: key
+        )
+        return (result.isValid, result.errorMessage)
     }
 }

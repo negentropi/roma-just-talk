@@ -26,6 +26,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - transcription and AI model catalogs
 - remote transcription provider dispatch for iOS retry transcription
 - mode runtime configuration and selected-mode repair
+- mode provider-selection repair and draft saveability rules
 - transcript status and presentation helpers
 - stored audio-file path resolution
 - duration presentation

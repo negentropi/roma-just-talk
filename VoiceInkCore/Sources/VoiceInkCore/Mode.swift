@@ -83,6 +83,24 @@ public struct Mode: Identifiable, Codable {
         )
     }
 
+    public mutating func repairProviderSelection(
+        availableTranscriptionProviders: [VoiceInkProviderKind],
+        availablePostProcessingProviders: [VoiceInkProviderKind]
+    ) {
+        if !availableTranscriptionProviders.contains(transcriptionProvider),
+           let provider = availableTranscriptionProviders.first {
+            transcriptionProvider = provider
+            transcriptionModel = provider.selectedModel(transcriptionModel, for: .transcription)
+        }
+
+        if isPostProcessingEnabled,
+           !availablePostProcessingProviders.contains(postProcessingProvider),
+           let provider = availablePostProcessingProviders.first {
+            postProcessingProvider = provider
+            postProcessingModel = provider.selectedModel(postProcessingModel, for: .postProcessing)
+        }
+    }
+
     public static func defaultLocalWhisper(name: String = "Default") -> Mode {
         Mode(
             name: name,
@@ -99,9 +117,20 @@ public struct Mode: Identifiable, Codable {
     public static func isSaveableDraft(
         name: String,
         promptTemplateType: VoiceInkPostProcessingTemplateType,
-        customPrompt: String
+        customPrompt: String,
+        transcriptionProviderAvailable: Bool = true,
+        postProcessingProviderAvailable: Bool = true,
+        isPostProcessingEnabled: Bool = false
     ) -> Bool {
         guard !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return false
+        }
+
+        guard transcriptionProviderAvailable else {
+            return false
+        }
+
+        guard !isPostProcessingEnabled || postProcessingProviderAvailable else {
             return false
         }
 

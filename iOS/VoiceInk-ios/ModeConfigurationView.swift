@@ -35,6 +35,17 @@ struct ModeConfigurationView: View {
             settings.isKeyVerified(for: provider)
         }
     }
+
+    private var canSave: Bool {
+        Mode.isSaveableDraft(
+            name: mode.name,
+            promptTemplateType: selectedTemplateType,
+            customPrompt: customPromptText,
+            transcriptionProviderAvailable: availableTranscriptionProviders.contains(mode.transcriptionProvider),
+            postProcessingProviderAvailable: availablePostProcessingProviders.contains(mode.postProcessingProvider),
+            isPostProcessingEnabled: mode.isPostProcessingEnabled
+        )
+    }
     
     var body: some View {
         Form {
@@ -117,12 +128,18 @@ struct ModeConfigurationView: View {
                     onSave(mode)
                     dismiss()
                 }
-                .disabled(!Mode.isSaveableDraft(
-                    name: mode.name,
-                    promptTemplateType: selectedTemplateType,
-                    customPrompt: customPromptText
-                ))
+                .disabled(!canSave)
             }
+        }
+        .onAppear(perform: repairUnavailableProviderSelections)
+        .onChange(of: availableTranscriptionProviders) { _, _ in
+            repairUnavailableProviderSelections()
+        }
+        .onChange(of: availablePostProcessingProviders) { _, _ in
+            repairUnavailableProviderSelections()
+        }
+        .onChange(of: mode.isPostProcessingEnabled) { _, _ in
+            repairUnavailableProviderSelections()
         }
         .onChange(of: mode.transcriptionProvider) { _, _ in
             mode.transcriptionModel = mode.transcriptionProvider.selectedModel(
@@ -136,6 +153,13 @@ struct ModeConfigurationView: View {
                 for: .postProcessing
             )
         }
+    }
+
+    private func repairUnavailableProviderSelections() {
+        mode.repairProviderSelection(
+            availableTranscriptionProviders: availableTranscriptionProviders,
+            availablePostProcessingProviders: availablePostProcessingProviders
+        )
     }
 }
 

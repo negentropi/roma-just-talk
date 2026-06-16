@@ -43,6 +43,45 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
         XCTAssertEqual(mode.transcriptionModel, "")
     }
 
+    func testModeRepairReplacesUnavailableProvidersWithFirstAvailableProvider() {
+        var mode = Mode(
+            name: "Legacy",
+            transcriptionProvider: .voiceInk,
+            transcriptionModel: "whisper-large-v3",
+            isPostProcessingEnabled: true,
+            postProcessingProvider: .voiceInk,
+            postProcessingModel: "openai/gpt-oss-120b"
+        )
+
+        mode.repairProviderSelection(
+            availableTranscriptionProviders: [.localWhisper],
+            availablePostProcessingProviders: [.groq]
+        )
+
+        XCTAssertEqual(mode.transcriptionProvider, .localWhisper)
+        XCTAssertEqual(mode.transcriptionModel, VoiceInkTranscriptionModelCatalog.localBaseModel)
+        XCTAssertEqual(mode.postProcessingProvider, .groq)
+        XCTAssertEqual(mode.postProcessingModel, VoiceInkAIModelCatalog.defaultModel(for: .groq))
+    }
+
+    func testModeRepairLeavesUnavailablePostProcessingProviderWhenDisabled() {
+        var mode = Mode(
+            name: "Legacy",
+            transcriptionProvider: .groq,
+            transcriptionModel: VoiceInkProviderKind.groq.defaultModel(for: .transcription),
+            isPostProcessingEnabled: false,
+            postProcessingProvider: .voiceInk,
+            postProcessingModel: ""
+        )
+
+        mode.repairProviderSelection(
+            availableTranscriptionProviders: [.groq],
+            availablePostProcessingProviders: [.gemini]
+        )
+
+        XCTAssertEqual(mode.postProcessingProvider, .voiceInk)
+    }
+
     func testRuntimeConfigurationUsesSelectedModeWhenAvailable() {
         let firstMode = Mode.defaultLocalWhisper(name: "Local")
         let selectedMode = Mode(
@@ -137,6 +176,29 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
             name: "Summary",
             promptTemplateType: .summary,
             customPrompt: ""
+        ))
+    }
+
+    func testModeDraftValidationRequiresAvailableProviderSelection() {
+        XCTAssertFalse(Mode.isSaveableDraft(
+            name: "Unavailable",
+            promptTemplateType: .summary,
+            customPrompt: "",
+            transcriptionProviderAvailable: false
+        ))
+        XCTAssertFalse(Mode.isSaveableDraft(
+            name: "Unavailable post-processing",
+            promptTemplateType: .summary,
+            customPrompt: "",
+            postProcessingProviderAvailable: false,
+            isPostProcessingEnabled: true
+        ))
+        XCTAssertTrue(Mode.isSaveableDraft(
+            name: "Disabled post-processing",
+            promptTemplateType: .summary,
+            customPrompt: "",
+            postProcessingProviderAvailable: false,
+            isPostProcessingEnabled: false
         ))
     }
 }

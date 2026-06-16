@@ -24,6 +24,54 @@ final class ProviderModelSelectionTests: XCTestCase {
         )
     }
 
+    func testPostProcessingDefaultModelUsesCatalogDefaultForCoreAIProviders() {
+        XCTAssertEqual(
+            VoiceInkProviderKind.groq.postProcessingDefaultModel,
+            VoiceInkAIModelCatalog.defaultModel(for: .groq)
+        )
+        XCTAssertEqual(
+            VoiceInkProviderKind.openAI.postProcessingDefaultModel,
+            VoiceInkAIModelCatalog.defaultModel(for: .openAI)
+        )
+        XCTAssertEqual(
+            VoiceInkProviderKind.cerebras.postProcessingDefaultModel,
+            VoiceInkAIModelCatalog.defaultModel(for: .cerebras)
+        )
+        XCTAssertEqual(
+            VoiceInkProviderKind.gemini.postProcessingDefaultModel,
+            VoiceInkAIModelCatalog.defaultModel(for: .gemini)
+        )
+    }
+
+    func testPostProcessingModelListUsesCatalogModelsForCoreAIProviders() {
+        XCTAssertEqual(
+            VoiceInkProviderKind.groq.postProcessingModels,
+            VoiceInkAIModelCatalog.availableModels(for: .groq)
+        )
+        XCTAssertEqual(
+            VoiceInkProviderKind.gemini.postProcessingModels,
+            VoiceInkAIModelCatalog.availableModels(for: .gemini)
+        )
+    }
+
+    func testPostProcessingModelSelectionUsesFixedModelWhenProviderHasOne() {
+        XCTAssertEqual(
+            VoiceInkProviderKind.voiceInk.postProcessingDefaultModel,
+            VoiceInkAIModelCatalog.voiceInkPostProcessingModel
+        )
+        XCTAssertEqual(
+            VoiceInkProviderKind.voiceInk.postProcessingModels,
+            [VoiceInkAIModelCatalog.voiceInkPostProcessingModel]
+        )
+    }
+
+    func testPostProcessingModelsAreNilForNonPostProcessingProviders() {
+        XCTAssertNil(VoiceInkProviderKind.deepgram.postProcessingDefaultModel)
+        XCTAssertNil(VoiceInkProviderKind.deepgram.postProcessingModels)
+        XCTAssertNil(VoiceInkProviderKind.localWhisper.postProcessingDefaultModel)
+        XCTAssertNil(VoiceInkProviderKind.localWhisper.postProcessingModels)
+    }
+
     func testSelectedModelReturnsEmptyStringWhenUseHasNoModels() {
         XCTAssertEqual(
             VoiceInkProviderKind.cerebras.selectedModel("anything", for: .transcription),

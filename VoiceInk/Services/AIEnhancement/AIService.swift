@@ -52,8 +52,8 @@ enum AIProvider: String, CaseIterable {
     }
     
     var defaultModel: String {
-        if let provider = coreAIModelProvider {
-            return VoiceInkAIModelCatalog.defaultModel(for: provider)
+        if let coreDefaultModel = coreProviderKind?.postProcessingDefaultModel {
+            return coreDefaultModel
         }
 
         switch self {
@@ -85,8 +85,8 @@ enum AIProvider: String, CaseIterable {
     }
     
     var availableModels: [String] {
-        if let provider = coreAIModelProvider {
-            return VoiceInkAIModelCatalog.availableModels(for: provider)
+        if let coreModels = coreProviderKind?.postProcessingModels {
+            return coreModels
         }
 
         switch self {
@@ -143,10 +143,6 @@ enum AIProvider: String, CaseIterable {
         default:
             return nil
         }
-    }
-
-    var coreAIModelProvider: VoiceInkAIModelProvider? {
-        coreProviderKind?.aiModelProvider
     }
     
     var requiresAPIKey: Bool {

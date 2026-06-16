@@ -32,6 +32,10 @@ public enum VoiceInkProviderEndpoint: String, CaseIterable, Sendable {
         URL(string: "https://api.mistral.ai")!
     }
 
+    public static var elevenLabsAPIBaseURL: URL {
+        URL(string: "https://api.elevenlabs.io")!
+    }
+
     public var chatCompletionsURL: URL? {
         switch self {
         case .groq, .openAI, .cerebras, .gemini:
@@ -101,5 +105,13 @@ public enum VoiceInkProviderEndpoint: String, CaseIterable, Sendable {
 
     public static func mistralModelsURL(from baseURL: URL) -> URL {
         baseURL.appendingPathComponent("v1/models")
+    }
+
+    public static func elevenLabsSpeechToTextURL(from baseURL: URL) -> URL {
+        baseURL.appendingPathComponent("v1/speech-to-text")
+    }
+
+    public static func elevenLabsUserURL(from baseURL: URL) -> URL {
+        baseURL.appendingPathComponent("v1/user")
     }
 }

@@ -21,40 +21,14 @@ public enum VoiceInkMistralTranscriptionCodec {
         model: String,
         boundary: String
     ) -> Data {
-        let crlf = "\r\n"
-        var body = Data()
-
-        appendField("model", model, boundary: boundary, crlf: crlf, to: &body)
-
-        append("--\(boundary)\(crlf)", to: &body)
-        append("Content-Disposition: form-data; name=\"file\"; filename=\"\(fileName)\"\(crlf)", to: &body)
-        append("Content-Type: audio/wav\(crlf)\(crlf)", to: &body)
-        body.append(audioData)
-        append(crlf, to: &body)
-
-        append("--\(boundary)--\(crlf)", to: &body)
-        return body
+        var form = VoiceInkMultipartFormData(boundary: boundary)
+        form.addField(name: "model", value: model)
+        form.addFile(name: "file", fileName: fileName, mimeType: "audio/wav", fileData: audioData)
+        return form.data
     }
 
     public static func transcript(from data: Data) throws -> String {
         try JSONDecoder().decode(VoiceInkMistralTranscriptionResponse.self, from: data).text
-    }
-
-    private static func appendField(
-        _ name: String,
-        _ value: String,
-        boundary: String,
-        crlf: String,
-        to body: inout Data
-    ) {
-        append("--\(boundary)\(crlf)", to: &body)
-        append("Content-Disposition: form-data; name=\"\(name)\"\(crlf)\(crlf)", to: &body)
-        append(value, to: &body)
-        append(crlf, to: &body)
-    }
-
-    private static func append(_ string: String, to body: inout Data) {
-        body.append(Data(string.utf8))
     }
 }
 
@@ -77,7 +51,10 @@ public enum VoiceInkMistralRequestBuilder {
 
         var request = URLRequest(url: VoiceInkProviderEndpoint.mistralAudioTranscriptionsURL(from: baseURL))
         request.httpMethod = "POST"
-        request.setValue(VoiceInkMistralTranscriptionCodec.multipartContentType(boundary: boundary), forHTTPHeaderField: "Content-Type")
+        request.setValue(
+            VoiceInkMistralTranscriptionCodec.multipartContentType(boundary: boundary),
+            forHTTPHeaderField: "Content-Type"
+        )
         request.setValue(apiKey, forHTTPHeaderField: "x-api-key")
         if let timeout {
             request.timeoutInterval = timeout

@@ -465,5 +465,77 @@ final class RemoteProviderRequestTests: XCTestCase {
             ""
         )
     }
+
+    func testElevenLabsTranscriptionRequestBuilderUsesMultipartAudioRequest() throws {
+        let audioData = Data("WAVDATA".utf8)
+        let preparedRequest = VoiceInkElevenLabsRequestBuilder.makeTranscriptionRequest(
+            baseURL: VoiceInkProviderEndpoint.elevenLabsAPIBaseURL,
+            apiKey: "eleven-key",
+            model: "scribe_v2",
+            audioData: audioData,
+            fileName: "sample.wav",
+            language: "en",
+            boundary: "Boundary-test",
+            timeout: 30
+        )
+
+        XCTAssertEqual(preparedRequest.request.url?.absoluteString, "https://api.elevenlabs.io/v1/speech-to-text")
+        XCTAssertEqual(preparedRequest.request.httpMethod, "POST")
+        XCTAssertEqual(preparedRequest.request.value(forHTTPHeaderField: "xi-api-key"), "eleven-key")
+        XCTAssertEqual(preparedRequest.request.value(forHTTPHeaderField: "Accept"), "application/json")
+        XCTAssertEqual(
+            preparedRequest.request.value(forHTTPHeaderField: "Content-Type"),
+            "multipart/form-data; boundary=Boundary-test"
+        )
+        XCTAssertEqual(preparedRequest.request.timeoutInterval, 30)
+
+        let body = try XCTUnwrap(String(data: preparedRequest.body, encoding: .utf8))
+        XCTAssertTrue(body.contains("Content-Disposition: form-data; name=\"file\"; filename=\"sample.wav\""))
+        XCTAssertTrue(body.contains("Content-Type: audio/wav"))
+        XCTAssertTrue(body.contains("WAVDATA"))
+        XCTAssertTrue(body.contains("Content-Disposition: form-data; name=\"model_id\""))
+        XCTAssertTrue(body.contains("scribe_v2"))
+        XCTAssertTrue(body.contains("Content-Disposition: form-data; name=\"temperature\""))
+        XCTAssertTrue(body.contains("0.0"))
+        XCTAssertTrue(body.contains("Content-Disposition: form-data; name=\"tag_audio_events\""))
+        XCTAssertTrue(body.contains("false"))
+        XCTAssertTrue(body.contains("Content-Disposition: form-data; name=\"language_code\""))
+        XCTAssertTrue(body.contains("en"))
+        XCTAssertTrue(body.contains("--Boundary-test--"))
+    }
+
+    func testElevenLabsUserRequestBuilderUsesUserEndpoint() throws {
+        let request = VoiceInkElevenLabsRequestBuilder.makeUserRequest(
+            baseURL: VoiceInkProviderEndpoint.elevenLabsAPIBaseURL,
+            apiKey: "eleven-key",
+            timeout: 10
+        )
+
+        XCTAssertEqual(request.url?.absoluteString, "https://api.elevenlabs.io/v1/user")
+        XCTAssertEqual(request.value(forHTTPHeaderField: "xi-api-key"), "eleven-key")
+        XCTAssertEqual(request.timeoutInterval, 10)
+    }
+
+    func testElevenLabsClientRejectsBlankAPIKeyWithoutNetwork() async throws {
+        let result = await VoiceInkElevenLabsTranscriptionClient().verifyAPIKeyDetailed(
+            baseURL: VoiceInkProviderEndpoint.elevenLabsAPIBaseURL,
+            apiKey: " \n\t "
+        )
+
+        XCTAssertEqual(
+            result,
+            VoiceInkAPIKeyVerificationResult(
+                isValid: false,
+                errorMessage: "API key is missing or empty."
+            )
+        )
+    }
+
+    func testElevenLabsTranscriptionCodecReturnsText() throws {
+        XCTAssertEqual(
+            try VoiceInkElevenLabsTranscriptionCodec.transcript(from: Data(#"{"text":"eleven text"}"#.utf8)),
+            "eleven text"
+        )
+    }
 }
 #endif

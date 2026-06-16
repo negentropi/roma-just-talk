@@ -602,7 +602,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
     private func cancelCurrentSession() {
         currentSession?.cancel()
         currentSession = nil
-        rollingBufferPreloadCoordinator.settingsDidChange()
+        rollingBufferPreloadCoordinator.cancelUnclaimedPreload(reason: "engine-session-cancel")
     }
 
     private func finishRecorderSession() async {

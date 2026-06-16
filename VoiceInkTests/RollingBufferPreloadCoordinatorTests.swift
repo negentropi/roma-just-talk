@@ -184,6 +184,139 @@ struct RollingBufferPreloadCoordinatorTests {
     }
 
     @MainActor
+    @Test func startWarmsDetectorWhenPreloadIsEligible() async {
+        let model = streamingModel()
+        let session = FakeTranscriptionSession()
+        let detectorLoadCount = LockedCounter()
+
+        await withStandardRollingDefaults(for: model) { defaults in
+            setPreloadDefaults(defaults, model: model, preRunFinalization: true)
+        } run: {
+            let coordinator = makeCoordinator(
+                model: model,
+                session: session,
+                detectorProvider: {
+                    detectorLoadCount.increment()
+                    return FakeSpeechDetector(containsSpeech: true)
+                }
+            )
+
+            coordinator.start()
+
+            #expect(await eventually { detectorLoadCount.value == 1 })
+            #expect(session.chunks.snapshot().isEmpty)
+        }
+    }
+
+    @MainActor
+    @Test func startDoesNotWarmDetectorWhenPreloadIsOff() async {
+        let model = streamingModel()
+        let session = FakeTranscriptionSession()
+        let detectorLoadCount = LockedCounter()
+
+        await withStandardRollingDefaults(for: model) { defaults in
+            setPreloadDefaults(defaults, model: model, preRunFinalization: true)
+            defaults.set(RollingBufferPreloadMode.off.rawValue, forKey: RollingBufferPreloadSettings.modeKey)
+        } run: {
+            let coordinator = makeCoordinator(
+                model: model,
+                session: session,
+                detectorProvider: {
+                    detectorLoadCount.increment()
+                    return FakeSpeechDetector(containsSpeech: true)
+                }
+            )
+
+            coordinator.start()
+
+            #expect(!(await eventually { detectorLoadCount.value > 0 }))
+            #expect(session.chunks.snapshot().isEmpty)
+        }
+    }
+
+    @MainActor
+    @Test func startDoesNotWarmDetectorWhenFinalizationOptOutDisablesPreRun() async {
+        let model = streamingModel()
+        let session = FakeTranscriptionSession()
+        let detectorLoadCount = LockedCounter()
+
+        await withStandardRollingDefaults(for: model) { defaults in
+            setPreloadDefaults(defaults, model: model, preRunFinalization: false)
+        } run: {
+            let coordinator = makeCoordinator(
+                model: model,
+                session: session,
+                detectorProvider: {
+                    detectorLoadCount.increment()
+                    return FakeSpeechDetector(containsSpeech: true)
+                }
+            )
+
+            coordinator.start()
+
+            #expect(!(await eventually { detectorLoadCount.value > 0 }))
+            #expect(session.chunks.snapshot().isEmpty)
+        }
+    }
+
+    @MainActor
+    @Test func startDoesNotWarmDetectorWhenAutoCloudOptOutBlocksPreload() async {
+        let model = streamingModel(provider: .deepgram)
+        let session = FakeTranscriptionSession()
+        let detectorLoadCount = LockedCounter()
+
+        await withStandardRollingDefaults(for: model) { defaults in
+            setPreloadDefaults(defaults, model: model, preRunFinalization: true)
+            defaults.set(RollingBufferPreloadMode.auto.rawValue, forKey: RollingBufferPreloadSettings.modeKey)
+            defaults.set(true, forKey: RollingBufferPreloadSettings.autoDisableCloudModelsKey)
+        } run: {
+            let coordinator = makeCoordinator(
+                model: model,
+                session: session,
+                detectorProvider: {
+                    detectorLoadCount.increment()
+                    return FakeSpeechDetector(containsSpeech: true)
+                }
+            )
+
+            coordinator.start()
+
+            #expect(!(await eventually { detectorLoadCount.value > 0 }))
+            #expect(session.chunks.snapshot().isEmpty)
+        }
+    }
+
+    @MainActor
+    @Test func settingsChangeWarmsDetectorAfterPreloadBecomesEligible() async {
+        let model = streamingModel()
+        let session = FakeTranscriptionSession()
+        let detectorLoadCount = LockedCounter()
+
+        await withStandardRollingDefaults(for: model) { defaults in
+            setPreloadDefaults(defaults, model: model, preRunFinalization: true)
+            defaults.set(RollingBufferPreloadMode.off.rawValue, forKey: RollingBufferPreloadSettings.modeKey)
+        } run: {
+            let coordinator = makeCoordinator(
+                model: model,
+                session: session,
+                detectorProvider: {
+                    detectorLoadCount.increment()
+                    return FakeSpeechDetector(containsSpeech: true)
+                }
+            )
+
+            coordinator.start()
+            #expect(!(await eventually { detectorLoadCount.value > 0 }))
+
+            UserDefaults.standard.set(RollingBufferPreloadMode.on.rawValue, forKey: RollingBufferPreloadSettings.modeKey)
+            coordinator.settingsDidChange()
+
+            #expect(await eventually { detectorLoadCount.value == 1 })
+            #expect(session.chunks.snapshot().isEmpty)
+        }
+    }
+
+    @MainActor
     @Test func leadInBufferKeepsLatestBytesWhenSingleChunkExceedsDuration() async {
         let model = streamingModel()
         let session = FakeTranscriptionSession()
@@ -605,5 +738,15 @@ struct RollingBufferPreloadCoordinatorTests {
         }
 
         await run()
+    }
+
+    private func eventually(_ predicate: () -> Bool) async -> Bool {
+        for _ in 0..<20 {
+            if predicate() {
+                return true
+            }
+            try? await Task.sleep(nanoseconds: 5_000_000)
+        }
+        return predicate()
     }
 }

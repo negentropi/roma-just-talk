@@ -199,6 +199,7 @@ final class RollingBufferPreloadCoordinator {
                 await self?.processRollingChunk(chunk)
             }
         }
+        prewarmDetectorIfEligible()
     }
 
     func processRollingChunkForTesting(_ chunk: Data) async {
@@ -275,6 +276,7 @@ final class RollingBufferPreloadCoordinator {
         detector = nil
         detectorLoadAttempted = false
         resetPreloadState(cancelSession: true, keepLeadIn: false)
+        prewarmDetectorIfEligible()
     }
 
     private func processRollingChunk(_ chunk: Data) async {
@@ -412,16 +414,41 @@ final class RollingBufferPreloadCoordinator {
             return loaded
         }
 
-        let detectorProvider = detectorProvider
-        let task = Task {
-            await detectorProvider()
-        }
-        detectorLoadTask = task
+        let task = beginDetectorLoad()
         let loaded = await task.value
         detectorLoadTask = nil
         detectorLoadAttempted = true
         detector = loaded
         return loaded
+    }
+
+    private func prewarmDetectorIfEligible() {
+        guard detector == nil,
+              detectorLoadTask == nil,
+              !detectorLoadAttempted,
+              let currentModel = currentModelProvider(),
+              currentPlan(
+                for: currentModel,
+                language: currentLanguageProvider(),
+                configuration: configuration
+              ) != nil else {
+            return
+        }
+
+        _ = beginDetectorLoad()
+    }
+
+    private func beginDetectorLoad() -> Task<(any SpeechActivityDetecting)?, Never> {
+        if let detectorLoadTask {
+            return detectorLoadTask
+        }
+
+        let detectorProvider = detectorProvider
+        let task = Task {
+            await detectorProvider()
+        }
+        detectorLoadTask = task
+        return task
     }
 
     private func startPreload(with plan: Plan) async {

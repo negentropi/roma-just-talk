@@ -18,6 +18,7 @@
 - Removed a fixed post-STT wait before trigger-word AI enhancement starts.
 - Removed fixed sleeps between simulated paste key events so completed text reaches the target app sooner.
 - Kept warmed local STT resources after successful transcription so the next recording and rolling-buffer preload avoid an immediate teardown/reload cycle.
+- Warmed the rolling-buffer VAD model before first speech when preload is eligible, so the first VAD trigger can start STT without paying model-load delay.
 - Let preload-only quick releases commit an already-ready rolling-buffer STT session directly, without opening and stopping a new recorder session first.
 - Reduced the shortcut duplicate-press guard from 500ms to 80ms so valid back-to-back dictations are not ignored after the app is ready again.
 - Skipped fallback streaming setup on immediate startup-stop recordings when the selected model can transcribe the saved WAV directly.

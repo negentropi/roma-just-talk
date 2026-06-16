@@ -45,6 +45,7 @@ class TranscriptionPipeline {
     ///   - shouldCancel: Returns true if the user requested cancellation.
     ///   - onCancel: Called when cancellation is detected to cancel active session state.
     ///   - onDismiss: Called as soon as paste is initiated to dismiss the recorder panel.
+    ///   - deferHistoryInsertUntilSave: Inserts the history record only at the final save boundary.
     func run(
         transcription: Transcription,
         audioURL: URL,
@@ -55,16 +56,24 @@ class TranscriptionPipeline {
         onCancel: @escaping () async -> Void,
         onDismiss: @escaping () async -> Void,
         audioFileReadyTask: Task<Void, Error>? = nil,
-        latencyTrace: TranscriptionLatencyTrace? = nil
+        latencyTrace: TranscriptionLatencyTrace? = nil,
+        deferHistoryInsertUntilSave: Bool = false
     ) async {
         var finalPastedText: String?
         var promptDetectionResult: PromptDetectionService.PromptDetectionResult?
         var didInsertSessionMetric = false
         var didResolveAudioFileReadiness = false
         var audioFileIsReady = audioFileReadyTask == nil
+        var shouldInsertHistoryRecordBeforeSave = deferHistoryInsertUntilSave
 
         if let latencyTrace {
             logger.notice("Latency trace pipeline started operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
+        }
+
+        func insertHistoryRecordBeforeSaveIfNeeded() {
+            guard shouldInsertHistoryRecordBeforeSave else { return }
+            modelContext.insert(transcription)
+            shouldInsertHistoryRecordBeforeSave = false
         }
 
         func waitForAudioFileReadyIfNeeded() async -> Bool {
@@ -128,6 +137,7 @@ class TranscriptionPipeline {
             )
 
             do {
+                insertHistoryRecordBeforeSaveIfNeeded()
                 try modelContext.save()
                 NotificationCenter.default.post(name: .transcriptionCreated, object: transcription)
             } catch {
@@ -233,6 +243,8 @@ class TranscriptionPipeline {
         }
 
         func saveTranscriptionAndPostCompletion() {
+            insertHistoryRecordBeforeSaveIfNeeded()
+
             if transcription.transcriptionStatus == TranscriptionStatus.completed.rawValue {
                 do {
                     didInsertSessionMetric = try SessionMetricRecorder.recordRecorderSession(

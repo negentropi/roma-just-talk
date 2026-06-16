@@ -397,7 +397,6 @@ class VoiceInkEngine: NSObject, ObservableObject {
                 duration: 0,
                 transcriptionStatus: .pending
             )
-            modelContext.insert(transcription)
 
             recordedFile = permanentURL
             currentSession = claimedPreload.session
@@ -411,7 +410,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
                 on: transcription,
                 audioURL: permanentURL,
                 audioFileReadyTask: audioFileReadyTask,
-                latencyTrace: latencyTrace
+                latencyTrace: latencyTrace,
+                deferHistoryInsertUntilSave: true
             )
             return true
         } catch {
@@ -445,9 +445,13 @@ class VoiceInkEngine: NSObject, ObservableObject {
         on transcription: Transcription,
         audioURL: URL,
         audioFileReadyTask: Task<Void, Error>? = nil,
-        latencyTrace: TranscriptionLatencyTrace? = nil
+        latencyTrace: TranscriptionLatencyTrace? = nil,
+        deferHistoryInsertUntilSave: Bool = false
     ) async {
         guard let model = transcriptionModelManager.currentTranscriptionModel else {
+            if deferHistoryInsertUntilSave {
+                modelContext.insert(transcription)
+            }
             transcription.text = "Transcription Failed: No model selected"
             transcription.transcriptionStatus = TranscriptionStatus.failed.rawValue
             try? modelContext.save()
@@ -482,7 +486,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
                 await self.recorderUIManager?.dismissMiniRecorder()
             },
             audioFileReadyTask: audioFileReadyTask,
-            latencyTrace: latencyTrace
+            latencyTrace: latencyTrace,
+            deferHistoryInsertUntilSave: deferHistoryInsertUntilSave
         )
 
         let didFinishActivePipeline = activePipelineTranscriptionID == transcriptionID

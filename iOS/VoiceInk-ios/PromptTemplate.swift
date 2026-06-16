@@ -1,14 +1,12 @@
 import Foundation
 import VoiceInkCore
 
-typealias PromptTemplateType = VoiceInkPostProcessingTemplateType
-
 struct PromptTemplate: Identifiable, Codable {
     let id = UUID()
-    let type: PromptTemplateType
+    let type: VoiceInkPostProcessingTemplateType
     let customPrompt: String // Only used when type is .custom
     
-    init(type: PromptTemplateType, customPrompt: String = "") {
+    init(type: VoiceInkPostProcessingTemplateType, customPrompt: String = "") {
         self.type = type
         self.customPrompt = customPrompt
     }

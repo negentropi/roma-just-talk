@@ -1,8 +1,6 @@
 import Foundation
 import VoiceInkCore
 
-typealias OAChatMessage = VoiceInkOpenAICompatibleChatMessage
-
 struct OpenAICompatibleClient {
     func verifyAPIKey(baseURL: URL, apiKey: String) async -> Bool {
         var request = URLRequest(url: VoiceInkProviderEndpoint.openAICompatibleModelsURL(from: baseURL))
@@ -14,7 +12,7 @@ struct OpenAICompatibleClient {
         } catch { return false }
     }
 
-    func chatCompletion(baseURL: URL, apiKey: String, model: String, messages: [OAChatMessage], temperature: Double? = 0.2) async throws -> String {
+    func chatCompletion(baseURL: URL, apiKey: String, model: String, messages: [VoiceInkOpenAICompatibleChatMessage], temperature: Double? = 0.2) async throws -> String {
         var request = URLRequest(url: VoiceInkProviderEndpoint.openAICompatibleChatCompletionsURL(from: baseURL))
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")

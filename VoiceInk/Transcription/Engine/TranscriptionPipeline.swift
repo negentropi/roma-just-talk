@@ -71,7 +71,6 @@ class TranscriptionPipeline {
     ) async {
         var finalPastedText: String?
         var promptDetectionResult: PromptDetectionService.PromptDetectionResult?
-        var didInsertSessionMetric = false
         var didResolveAudioFileReadiness = false
         var audioFileIsReady = audioFileReadyTask == nil
         var shouldInsertHistoryRecordBeforeSave = deferHistoryInsertUntilSave
@@ -255,10 +254,29 @@ class TranscriptionPipeline {
             transcription.transcriptionStatus = TranscriptionStatus.failed.rawValue
         }
 
+        func recordSessionMetricAndNotifyIfNeeded(modelDisplayName: String?) {
+            do {
+                let didInsertSessionMetric = try SessionMetricRecorder.recordRecorderSession(
+                    transcription: transcription,
+                    modelDisplayName: modelDisplayName,
+                    in: modelContext
+                )
+                guard didInsertSessionMetric else { return }
+
+                try modelContext.save()
+                NotificationCenter.default.post(name: .sessionMetricsDidChange, object: nil)
+            } catch {
+                logger.error("Failed to record session metric: \(error.localizedDescription, privacy: .public)")
+            }
+        }
+
         func saveTranscriptionAndPostCompletion() {
             insertHistoryRecordBeforeSaveIfNeeded()
 
-            if transcription.transcriptionStatus == TranscriptionStatus.completed.rawValue {
+            let shouldRecordSessionMetric = transcription.transcriptionStatus == TranscriptionStatus.completed.rawValue
+            let shouldDeferSessionMetric = shouldRecordSessionMetric && latencyTrace?.isRollingPreloadQuickRelease == true
+            let didInsertSessionMetric: Bool
+            if shouldRecordSessionMetric, !shouldDeferSessionMetric {
                 do {
                     didInsertSessionMetric = try SessionMetricRecorder.recordRecorderSession(
                         transcription: transcription,
@@ -267,7 +285,10 @@ class TranscriptionPipeline {
                     )
                 } catch {
                     logger.error("Failed to record session metric: \(error.localizedDescription, privacy: .public)")
+                    didInsertSessionMetric = false
                 }
+            } else {
+                didInsertSessionMetric = false
             }
 
             do {
@@ -279,6 +300,13 @@ class TranscriptionPipeline {
                 NotificationCenter.default.post(name: .transcriptionCompleted, object: transcription)
             } catch {
                 logger.error("Failed to save transcription: \(error.localizedDescription, privacy: .public)")
+            }
+
+            if shouldDeferSessionMetric {
+                let modelDisplayName = model.displayName
+                Task { @MainActor in
+                    recordSessionMetricAndNotifyIfNeeded(modelDisplayName: modelDisplayName)
+                }
             }
         }
 

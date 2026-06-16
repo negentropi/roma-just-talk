@@ -38,6 +38,7 @@
 - Pre-read clipboard restore context on preload-only Special shortcut key-down so restore-enabled quick releases avoid copying pasteboard data immediately before paste.
 - Started quick-release rolling-buffer WAV writes immediately after claiming buffered audio so file I/O overlaps Power Mode resolution instead of running wholly after key-up validation.
 - Used the claimed rolling-buffer PCM byte count for quick-release history duration, avoiding a post-paste AVFoundation metadata read.
+- Deferred quick-release session metric recording until after the rolling-preload pipeline returns, so the app can leave the busy path before noncritical metric I/O.
 - Skipped browser URL lookup during automatic Power Mode selection when no enabled URL rules exist, removing an avoidable pre-pipeline quick-release delay.
 - Reduced the shortcut duplicate-press guard from 500ms to 80ms so valid back-to-back dictations are not ignored after the app is ready again.
 - Skipped fallback streaming setup on immediate startup-stop recordings when the selected model can transcribe the saved WAV directly.

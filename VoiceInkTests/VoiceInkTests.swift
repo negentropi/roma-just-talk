@@ -41,6 +41,34 @@ struct VoiceInkTests {
         #expect(VoiceInkEngine.durationForMono16kPCMData(Data()) == 0)
     }
 
+    @Test @MainActor func sessionMetricRecorderAcceptsSnapshotModelName() throws {
+        let container = try makeSessionMetricContainer()
+        let context = container.mainContext
+        let transcription = Transcription(
+            text: "quick release wins",
+            duration: 2,
+            transcriptionDuration: 0.5,
+            transcriptionStatus: .completed
+        )
+        context.insert(transcription)
+        try context.save()
+
+        let didInsertMetric = try SessionMetricRecorder.recordRecorderSession(
+            transcription: transcription,
+            modelDisplayName: "Snapshot Model",
+            in: context,
+            timestamp: Date(timeIntervalSince1970: 0)
+        )
+        try context.save()
+
+        let metrics = try context.fetch(FetchDescriptor<SessionMetric>())
+        #expect(didInsertMetric)
+        #expect(metrics.count == 1)
+        #expect(metrics.first?.transcriptionModelName == "Snapshot Model")
+        #expect(metrics.first?.wordCount == 3)
+        #expect(metrics.first?.speedFactor == 4.0)
+    }
+
     @Test func contextualCapitalizationLowercasesTitlecaseTextAfterMidSentencePrefix() async throws {
         let result = ContextualCapitalizationFormatter.format(
             "Model output",
@@ -1420,6 +1448,12 @@ struct VoiceInkTests {
 
     private func makeWordReplacementContainer() throws -> ModelContainer {
         let schema = Schema([WordReplacement.self])
+        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+        return try ModelContainer(for: schema, configurations: [configuration])
+    }
+
+    private func makeSessionMetricContainer() throws -> ModelContainer {
+        let schema = Schema([Transcription.self, SessionMetric.self])
         let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
         return try ModelContainer(for: schema, configurations: [configuration])
     }

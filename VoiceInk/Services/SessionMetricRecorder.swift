@@ -13,6 +13,21 @@ enum SessionMetricRecorder {
         in modelContext: ModelContext,
         timestamp: Date = Date()
     ) throws -> Bool {
+        try recordRecorderSession(
+            transcription: transcription,
+            modelDisplayName: model?.displayName,
+            in: modelContext,
+            timestamp: timestamp
+        )
+    }
+
+    @discardableResult
+    static func recordRecorderSession(
+        transcription: Transcription,
+        modelDisplayName: String?,
+        in modelContext: ModelContext,
+        timestamp: Date = Date()
+    ) throws -> Bool {
         guard transcription.transcriptionStatus == TranscriptionStatus.completed.rawValue else {
             return false
         }
@@ -44,7 +59,7 @@ enum SessionMetricRecorder {
             source: source,
             wordCount: wordCount,
             audioDuration: audioDuration,
-            transcriptionModelName: transcription.transcriptionModelName ?? model?.displayName,
+            transcriptionModelName: transcription.transcriptionModelName ?? modelDisplayName,
             transcriptionDuration: transcriptionDuration,
             speedFactor: speedFactor,
             powerModeName: transcription.powerModeName,

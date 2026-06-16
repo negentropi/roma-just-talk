@@ -42,11 +42,4 @@ struct GeminiProvider: CloudProvider {
 
     func makeStreamingProvider(modelContext: ModelContext) -> (any StreamingTranscriptionProvider)? { nil }
 
-    func verifyAPIKey(_ key: String) async -> (isValid: Bool, errorMessage: String?) {
-        let result = await transcriptionClient.verifyAPIKeyDetailed(
-            baseURL: VoiceInkProviderEndpoint.geminiNativeAPIBaseURL,
-            apiKey: key
-        )
-        return (result.isValid, result.errorMessage)
-    }
 }

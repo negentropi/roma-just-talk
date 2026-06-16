@@ -40,8 +40,20 @@ extension ModelProvider {
             return .groq
         case .deepgram:
             return .deepgram
+        case .elevenLabs:
+            return .elevenLabs
+        case .mistral:
+            return .mistral
         case .gemini:
             return .gemini
+        case .soniox:
+            return .soniox
+        case .speechmatics:
+            return .speechmatics
+        case .assemblyAI:
+            return .assemblyAI
+        case .xai:
+            return .xai
         default:
             return nil
         }

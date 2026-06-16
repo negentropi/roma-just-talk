@@ -43,11 +43,4 @@ struct ElevenLabsProvider: CloudProvider {
         ElevenLabsStreamingProvider()
     }
 
-    func verifyAPIKey(_ key: String) async -> (isValid: Bool, errorMessage: String?) {
-        let result = await transcriptionClient.verifyAPIKeyDetailed(
-            baseURL: VoiceInkProviderEndpoint.elevenLabsAPIBaseURL,
-            apiKey: key
-        )
-        return (result.isValid, result.errorMessage)
-    }
 }

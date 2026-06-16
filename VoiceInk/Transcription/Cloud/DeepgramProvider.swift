@@ -47,11 +47,4 @@ struct DeepgramProvider: CloudProvider {
         DeepgramStreamingProvider(modelContext: modelContext)
     }
 
-    func verifyAPIKey(_ key: String) async -> (isValid: Bool, errorMessage: String?) {
-        let result = await transcriptionClient.verifyAPIKeyDetailed(
-            baseURL: VoiceInkProviderEndpoint.deepgram.apiBaseURL,
-            apiKey: key
-        )
-        return (result.isValid, result.errorMessage)
-    }
 }

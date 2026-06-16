@@ -42,11 +42,4 @@ struct MistralProvider: CloudProvider {
         MistralStreamingProvider()
     }
 
-    func verifyAPIKey(_ key: String) async -> (isValid: Bool, errorMessage: String?) {
-        let result = await transcriptionClient.verifyAPIKeyDetailed(
-            baseURL: VoiceInkProviderEndpoint.mistralAPIBaseURL,
-            apiKey: key
-        )
-        return (result.isValid, result.errorMessage)
-    }
 }

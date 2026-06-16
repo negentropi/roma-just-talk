@@ -51,6 +51,7 @@ Current macOS consumers of shared remote transport:
 - AssemblyAI batch transcription uses `VoiceInkAssemblyAITranscriptionClient`.
 - Custom OpenAI-compatible batch transcription uses `VoiceInkOpenAICompatibleTranscriptionClient`.
 - Cartesia API-key verification uses `VoiceInkCartesiaClient`; Cartesia transcription remains streaming-only in platform shell code.
+- MacOS cloud-provider API-key verification uses `CloudProvider` default verification backed by `VoiceInkProviderAPIKeyVerifier`; Cartesia stays on `VoiceInkCartesiaClient` because it is streaming-only and not an iOS `VoiceInkProviderKind`.
 
 Current iOS consumers of shared remote transport:
 

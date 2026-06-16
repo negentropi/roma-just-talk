@@ -16,6 +16,10 @@ protocol CloudProvider {
 }
 
 extension CloudProvider {
+    private static var apiKeyVerifier: VoiceInkProviderAPIKeyVerifier {
+        VoiceInkProviderAPIKeyVerifier()
+    }
+
     var languageCodes: [String]? {
         modelProvider.coreTranscriptionModelProvider?.languageCodes
     }
@@ -30,6 +34,15 @@ extension CloudProvider {
     /// Providers that support batch transcription override this with their real implementation.
     func transcribe(audioData: Data, fileName: String, apiKey: String, model: String, language: String?, prompt: String?, customVocabulary: [String]) async throws -> String {
         throw CloudTranscriptionError.unsupportedProvider
+    }
+
+    func verifyAPIKey(_ key: String) async -> (isValid: Bool, errorMessage: String?) {
+        guard let provider = modelProvider.coreProviderKind else {
+            return (false, "Unsupported provider")
+        }
+
+        let result = await Self.apiKeyVerifier.verifyAPIKeyDetailed(key, for: provider)
+        return (result.isValid, result.errorMessage)
     }
 }
 

@@ -136,7 +136,7 @@
             <a href="index.html" class="back-link">← Back to VoiceInk</a>
             
             <h1>Privacy Policy for VoiceInk</h1>
-            <p class="last-updated"><em>Last updated: January 2025</em></p>
+            <p class="last-updated"><em>Last updated: June 2026</em></p>
 
             <h2>Overview</h2>
             <p>VoiceInk is a voice-to-text transcription app that helps you capture your thoughts by converting speech to text. This privacy policy explains how we handle your data when you use our app.</p>
@@ -151,16 +151,16 @@
                 <li><strong>Retention:</strong> You can delete individual recordings at any time by swiping in the notes list</li>
             </ul>
 
-            <h3>Default Service Data Processing</h3>
+            <h3>Cloud Service Data Processing</h3>
             <ul>
-                <li><strong>VoiceInk Default Service:</strong> When using our default transcription service (powered by Groq), we collect and process your audio data using our API keys</li>
-                <li><strong>Data Sharing:</strong> Audio files are sent to Groq's servers for processing and may be temporarily stored there according to their privacy policy</li>
-                <li><strong>Purpose:</strong> This allows you to use transcription features immediately without setup</li>
+                <li><strong>Cloud providers:</strong> If you choose a cloud transcription or post-processing provider, audio or text is sent directly to that provider using your API key</li>
+                <li><strong>Data Sharing:</strong> Cloud providers may process and temporarily store submitted data according to their privacy policies</li>
+                <li><strong>Purpose:</strong> This allows you to use third-party transcription and text post-processing services you configure</li>
             </ul>
 
-            <h3>API Keys for Custom Services</h3>
+            <h3>API Keys for Cloud Services</h3>
             <ul>
-                <li><strong>What we collect:</strong> If you choose to use other cloud services (Groq, Deepgram, Cerebras, Gemini), you must provide your own API keys</li>
+                <li><strong>What we collect:</strong> If you choose to use cloud services, you must provide your own API keys for the selected providers</li>
                 <li><strong>How we use it:</strong> API keys are used exclusively to authenticate with your chosen cloud services</li>
                 <li><strong>Storage:</strong> API keys are stored locally on your device</li>
                 <li><strong>Purpose:</strong> These keys enable the app to use third-party cloud services for transcription and text post-processing</li>
@@ -170,23 +170,22 @@
 
             <p>VoiceInk offers multiple processing options:</p>
 
-            <h3>Default Service (No Setup Required)</h3>
-            <div class="highlight">
-                <p><strong>VoiceInk Default:</strong> Powered by Groq - works immediately without any API key setup. We manage the API keys and handle data processing on your behalf.</p>
-            </div>
-            <ul>
-                <li><strong>Data Processing:</strong> Your data is processed according to <a href="https://groq.com/privacy-policy/" target="_blank">Groq's Privacy Policy</a></li>
-            </ul>
-
-            <h3>Custom Cloud Services (Require Your API Keys)</h3>
-            <p>VoiceInk integrates with additional third-party cloud services. <strong>For these services, you must provide your own API keys:</strong></p>
+            <h3>Cloud Services (Require Your API Keys)</h3>
+            <p>VoiceInk integrates with third-party cloud services. <strong>For these services, you must provide your own API keys:</strong></p>
 
             <h4>Cloud Services</h4>
             <ul>
-                <li><strong>Groq:</strong> Speech-to-text transcription (separate from default service)</li>
+                <li><strong>Groq:</strong> Speech-to-text transcription and text post-processing</li>
+                <li><strong>OpenAI:</strong> Speech-to-text transcription and text post-processing</li>
                 <li><strong>Deepgram:</strong> Speech-to-text transcription</li>
+                <li><strong>Gemini:</strong> Speech-to-text transcription and text post-processing</li>
+                <li><strong>Mistral:</strong> Speech-to-text transcription</li>
+                <li><strong>ElevenLabs:</strong> Speech-to-text transcription</li>
+                <li><strong>Soniox:</strong> Speech-to-text transcription</li>
+                <li><strong>Speechmatics:</strong> Speech-to-text transcription</li>
+                <li><strong>AssemblyAI:</strong> Speech-to-text transcription</li>
+                <li><strong>xAI:</strong> Speech-to-text transcription</li>
                 <li><strong>Cerebras:</strong> Text post-processing</li>
-                <li><strong>Google Gemini:</strong> Text post-processing</li>
             </ul>
 
             <h4>Local Processing</h4>
@@ -195,19 +194,14 @@
             </ul>
 
             <h3>Data Sharing</h3>
-            <p><strong>For Default Service:</strong></p>
-            <ul>
-                <li>Audio files are sent to Groq's servers for processing</li>
-                <li>We manage the connection using our API keys</li>
-            </ul>
-
-            <p><strong>For Custom Cloud Services:</strong></p>
+            <p><strong>For Cloud Services:</strong></p>
             <ul>
                 <li>Audio files are sent to your chosen transcription service using your API keys</li>
                 <li>Text content may be sent to your chosen AI service for post-processing</li>
-                <li>Each service has its own privacy policy - please review them:
+                <li>Each service has its own privacy policy. Common policy links include:
                     <ul>
                         <li><a href="https://groq.com/privacy-policy/" target="_blank">Groq Privacy Policy</a></li>
+                        <li><a href="https://openai.com/policies/privacy-policy" target="_blank">OpenAI Privacy Policy</a></li>
                         <li><a href="https://deepgram.com/privacy/" target="_blank">Deepgram Privacy Policy</a></li>
                         <li><a href="https://cerebras.ai/privacy-policy/" target="_blank">Cerebras Privacy Policy</a></li>
                         <li><a href="https://policies.google.com/privacy" target="_blank">Google Privacy Policy</a></li>
@@ -219,9 +213,8 @@
 
             <h3>Processing Options</h3>
             <ul>
-                <li><strong>Default Service:</strong> Works immediately without any setup (powered by Groq)</li>
                 <li><strong>Local Processing:</strong> Choose Whisper for complete privacy - all data stays on your device</li>
-                <li><strong>Custom Cloud Services:</strong> Use your own API keys with other providers</li>
+                <li><strong>Cloud Services:</strong> Use your own API keys with third-party providers</li>
             </ul>
 
             <h3>Data Control</h3>
@@ -233,8 +226,7 @@
 
             <h2>Data Security</h2>
             <ul>
-                <li><strong>Default Service:</strong> We manage secure connections to Groq's servers using our API keys</li>
-                <li><strong>Custom Services:</strong> Data processing occurs through your own API keys with third-party cloud services</li>
+                <li><strong>Cloud Services:</strong> Data processing occurs through your own API keys with third-party cloud services</li>
                 <li><strong>Local Processing:</strong> All data stays on your device and never leaves</li>
                 <li>We prioritize your privacy and only process data necessary for transcription functionality</li>
             </ul>

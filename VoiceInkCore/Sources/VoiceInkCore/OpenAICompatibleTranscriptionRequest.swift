@@ -18,6 +18,32 @@ public struct VoiceInkPreparedOpenAICompatibleTranscriptionRequest {
 
 public enum VoiceInkOpenAICompatibleTranscriptionRequestBuilder {
     public static func make(
+        baseURL: URL,
+        apiKey: String,
+        audioData: Data,
+        fileName: String,
+        model: String,
+        boundary: String = "Boundary-\(UUID().uuidString)",
+        language: String? = nil,
+        prompt: String? = nil,
+        responseFormat: String? = nil,
+        temperature: String? = nil
+    ) -> VoiceInkPreparedOpenAICompatibleTranscriptionRequest {
+        make(
+            url: VoiceInkProviderEndpoint.openAICompatibleAudioTranscriptionsURL(from: baseURL),
+            apiKey: apiKey,
+            audioData: audioData,
+            fileName: fileName,
+            model: model,
+            boundary: boundary,
+            language: language,
+            prompt: prompt,
+            responseFormat: responseFormat,
+            temperature: temperature
+        )
+    }
+
+    public static func make(
         url: URL,
         apiKey: String,
         audioData: Data,

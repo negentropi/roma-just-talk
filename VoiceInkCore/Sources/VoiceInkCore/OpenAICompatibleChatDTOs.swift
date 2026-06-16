@@ -61,3 +61,24 @@ public enum VoiceInkOpenAICompatibleChatCodec {
         return response.choices.first?.message.content ?? ""
     }
 }
+
+public enum VoiceInkOpenAICompatibleChatRequestBuilder {
+    public static func make(
+        baseURL: URL,
+        apiKey: String,
+        model: String,
+        messages: [VoiceInkOpenAICompatibleChatMessage],
+        temperature: Double?
+    ) throws -> URLRequest {
+        var request = URLRequest(url: VoiceInkProviderEndpoint.openAICompatibleChatCompletionsURL(from: baseURL))
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+        request.httpBody = try VoiceInkOpenAICompatibleChatCodec.requestBody(
+            model: model,
+            messages: messages,
+            temperature: temperature
+        )
+        return request
+    }
+}

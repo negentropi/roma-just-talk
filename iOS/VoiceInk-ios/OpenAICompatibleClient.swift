@@ -3,8 +3,7 @@ import VoiceInkCore
 
 struct OpenAICompatibleClient {
     func verifyAPIKey(baseURL: URL, apiKey: String) async -> Bool {
-        var request = URLRequest(url: VoiceInkProviderEndpoint.openAICompatibleModelsURL(from: baseURL))
-        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+        let request = VoiceInkOpenAICompatibleModelsRequestBuilder.make(baseURL: baseURL, apiKey: apiKey)
         do {
             let (_, response) = try await URLSession.shared.data(for: request)
             guard let http = response as? HTTPURLResponse else { return false }
@@ -13,11 +12,9 @@ struct OpenAICompatibleClient {
     }
 
     func chatCompletion(baseURL: URL, apiKey: String, model: String, messages: [VoiceInkOpenAICompatibleChatMessage], temperature: Double? = 0.2) async throws -> String {
-        var request = URLRequest(url: VoiceInkProviderEndpoint.openAICompatibleChatCompletionsURL(from: baseURL))
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
-        request.httpBody = try VoiceInkOpenAICompatibleChatCodec.requestBody(
+        let request = try VoiceInkOpenAICompatibleChatRequestBuilder.make(
+            baseURL: baseURL,
+            apiKey: apiKey,
             model: model,
             messages: messages,
             temperature: temperature

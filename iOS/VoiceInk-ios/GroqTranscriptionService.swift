@@ -14,15 +14,9 @@ struct GroqTranscriptionService: TranscriptionService {
     // OpenAI-compatible APIs. Caller supplies baseURL and model.
 
     func transcribeAudioFile(apiBaseURL: URL, apiKey: String, model: String, fileURL: URL, language: String? = nil) async throws -> String {
-        let components = URLComponents(
-            url: VoiceInkProviderEndpoint.openAICompatibleAudioTranscriptionsURL(from: apiBaseURL),
-            resolvingAgainstBaseURL: false
-        )!
-        guard let url = components.url else { throw URLError(.badURL) }
-
         let fileData = try Data(contentsOf: fileURL)
         let preparedRequest = VoiceInkOpenAICompatibleTranscriptionRequestBuilder.make(
-            url: url,
+            baseURL: apiBaseURL,
             apiKey: apiKey,
             audioData: fileData,
             fileName: fileURL.lastPathComponent,
@@ -49,9 +43,7 @@ struct GroqTranscriptionService: TranscriptionService {
     }
 
     func verifyAPIKey(apiBaseURL: URL, _ apiKey: String) async -> Bool {
-        // Hit a lightweight endpoint (models listing) to verify
-        var request = URLRequest(url: VoiceInkProviderEndpoint.openAICompatibleModelsURL(from: apiBaseURL))
-        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+        let request = VoiceInkOpenAICompatibleModelsRequestBuilder.make(baseURL: apiBaseURL, apiKey: apiKey)
         do {
             let (_, response) = try await URLSession.shared.data(for: request)
             guard let http = response as? HTTPURLResponse else { return false }

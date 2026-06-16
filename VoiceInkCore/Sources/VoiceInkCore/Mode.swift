@@ -100,6 +100,22 @@ public struct Mode: Identifiable, Codable {
             promptTemplate: VoiceInkPostProcessingPromptTemplate(type: .summary)
         )
     }
+
+    public static func isSaveableDraft(
+        name: String,
+        promptTemplateType: VoiceInkPostProcessingTemplateType,
+        customPrompt: String
+    ) -> Bool {
+        guard !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return false
+        }
+
+        if promptTemplateType == .custom {
+            return !customPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        }
+
+        return true
+    }
 }
 
 public extension Collection where Element == Mode {

@@ -117,8 +117,11 @@ struct ModeConfigurationView: View {
                     onSave(mode)
                     dismiss()
                 }
-                .disabled(mode.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || 
-                         (selectedTemplateType == .custom && customPromptText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty))
+                .disabled(!Mode.isSaveableDraft(
+                    name: mode.name,
+                    promptTemplateType: selectedTemplateType,
+                    customPrompt: customPromptText
+                ))
             }
         }
         .onChange(of: mode.transcriptionProvider) { _, _ in

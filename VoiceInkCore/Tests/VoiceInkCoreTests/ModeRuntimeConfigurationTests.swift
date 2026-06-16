@@ -77,5 +77,39 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
         XCTAssertNil([Mode]().repairedSelectedModeId(UUID()))
         XCTAssertNil([Mode]().repairedSelectedModeId(nil))
     }
+
+    func testModeDraftValidationRequiresName() {
+        XCTAssertFalse(Mode.isSaveableDraft(
+            name: "",
+            promptTemplateType: .summary,
+            customPrompt: ""
+        ))
+        XCTAssertFalse(Mode.isSaveableDraft(
+            name: "   \n",
+            promptTemplateType: .summary,
+            customPrompt: ""
+        ))
+    }
+
+    func testModeDraftValidationRequiresCustomPromptOnlyForCustomTemplates() {
+        XCTAssertFalse(Mode.isSaveableDraft(
+            name: "Custom",
+            promptTemplateType: .custom,
+            customPrompt: "   "
+        ))
+        XCTAssertTrue(Mode.isSaveableDraft(
+            name: "Custom",
+            promptTemplateType: .custom,
+            customPrompt: "Clean this transcript."
+        ))
+    }
+
+    func testModeDraftValidationAllowsPredefinedTemplatesWithoutCustomPrompt() {
+        XCTAssertTrue(Mode.isSaveableDraft(
+            name: "Summary",
+            promptTemplateType: .summary,
+            customPrompt: ""
+        ))
+    }
 }
 #endif

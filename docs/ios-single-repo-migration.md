@@ -32,6 +32,10 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - PCM16 sample conversion
 - OpenAI-compatible and Deepgram remote transcription request/client helpers
 
+Current macOS consumers of shared remote transport:
+
+- Groq batch transcription uses `VoiceInkOpenAICompatibleTranscriptionClient`.
+
 Platform shells still own UI, OS permissions, audio capture, paste/keyboard behavior, keychain adapters, local model download storage, SwiftData models, and macOS-only orchestration.
 
 ## Sibling Clone Status

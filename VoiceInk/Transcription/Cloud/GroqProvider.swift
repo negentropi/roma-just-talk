@@ -1,10 +1,10 @@
 import Foundation
 import SwiftData
-import LLMkit
 import VoiceInkCore
 
 struct GroqProvider: CloudProvider {
     let modelProvider: ModelProvider = .groq
+    private let transcriptionClient = VoiceInkOpenAICompatibleTranscriptionClient()
 
     var models: [CloudModel] {
         VoiceInkTranscriptionModelCatalog
@@ -13,23 +13,46 @@ struct GroqProvider: CloudProvider {
     }
 
     func transcribe(audioData: Data, fileName: String, apiKey: String, model: String, language: String?, prompt: String?, customVocabulary: [String]) async throws -> String {
-        return try await OpenAITranscriptionClient.transcribe(
-            baseURL: VoiceInkProviderEndpoint.groq.apiBaseURL,
-            audioData: audioData,
-            fileName: fileName,
-            apiKey: apiKey,
-            model: model,
-            language: language,
-            prompt: prompt
-        )
+        guard !apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw CloudTranscriptionError.missingAPIKey
+        }
+
+        do {
+            let text = try await transcriptionClient.transcribeAudioData(
+                baseURL: VoiceInkProviderEndpoint.groq.apiBaseURL,
+                apiKey: apiKey,
+                model: model,
+                audioData: audioData,
+                fileName: fileName,
+                language: language,
+                prompt: prompt,
+                responseFormat: "json",
+                temperature: "0",
+                errorDomain: "GroqAPI",
+                timeout: 60,
+                maxRetries: 2
+            )
+            guard !text.isEmpty else {
+                throw CloudTranscriptionError.noTranscriptionReturned
+            }
+            return text
+        } catch let error as CloudTranscriptionError {
+            throw error
+        } catch let error as NSError where error.domain == "GroqAPI" {
+            throw CloudTranscriptionError.apiRequestFailed(
+                statusCode: error.code,
+                message: error.userInfo[NSLocalizedDescriptionKey] as? String ?? error.localizedDescription
+            )
+        }
     }
 
     func makeStreamingProvider(modelContext: ModelContext) -> (any StreamingTranscriptionProvider)? { nil }
 
     func verifyAPIKey(_ key: String) async -> (isValid: Bool, errorMessage: String?) {
-        return await OpenAITranscriptionClient.verifyAPIKey(
+        let result = await transcriptionClient.verifyAPIKeyDetailed(
             baseURL: VoiceInkProviderEndpoint.groq.apiBaseURL,
             apiKey: key
         )
+        return (result.isValid, result.errorMessage)
     }
 }

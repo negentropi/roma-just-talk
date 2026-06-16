@@ -85,6 +85,29 @@ final class RemoteProviderRequestTests: XCTestCase {
         XCTAssertTrue(body.contains("--Boundary-test--"))
     }
 
+    func testOpenAICompatibleTranscriptionRequestBuilderIncludesOptionalFields() throws {
+        let preparedRequest = VoiceInkOpenAICompatibleTranscriptionRequestBuilder.make(
+            baseURL: try XCTUnwrap(URL(string: "https://api.groq.com/openai")),
+            apiKey: "stt-key",
+            audioData: Data("WAVDATA".utf8),
+            fileName: "sample.wav",
+            model: "whisper-large-v3",
+            boundary: "Boundary-test",
+            language: "en",
+            prompt: "spell project names correctly",
+            responseFormat: "json",
+            temperature: "0"
+        )
+
+        let body = try XCTUnwrap(String(data: preparedRequest.body, encoding: .utf8))
+        XCTAssertTrue(body.contains("Content-Disposition: form-data; name=\"prompt\""))
+        XCTAssertTrue(body.contains("spell project names correctly"))
+        XCTAssertTrue(body.contains("Content-Disposition: form-data; name=\"response_format\""))
+        XCTAssertTrue(body.contains("json"))
+        XCTAssertTrue(body.contains("Content-Disposition: form-data; name=\"temperature\""))
+        XCTAssertTrue(body.contains("0"))
+    }
+
     func testOpenAICompatibleTranscriptionCodecReturnsTextWhenPresent() throws {
         let response = VoiceInkOpenAICompatibleTranscriptionResponse(
             text: "transcribed text",
@@ -99,6 +122,33 @@ final class RemoteProviderRequestTests: XCTestCase {
         XCTAssertNil(
             try VoiceInkOpenAICompatibleTranscriptionCodec.textIfPresent(
                 from: JSONEncoder().encode(VoiceInkOpenAICompatibleTranscriptionResponse(text: nil))
+            )
+        )
+    }
+
+    func testOpenAICompatibleModelsRequestBuilderCanSetTimeout() throws {
+        let request = VoiceInkOpenAICompatibleModelsRequestBuilder.make(
+            baseURL: try XCTUnwrap(URL(string: "https://api.groq.com/openai")),
+            apiKey: "stt-key",
+            timeout: 10
+        )
+
+        XCTAssertEqual(request.url?.absoluteString, "https://api.groq.com/openai/v1/models")
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer stt-key")
+        XCTAssertEqual(request.timeoutInterval, 10)
+    }
+
+    func testOpenAICompatibleClientRejectsBlankAPIKeyWithoutNetwork() async throws {
+        let result = await VoiceInkOpenAICompatibleClient().verifyAPIKeyDetailed(
+            baseURL: try XCTUnwrap(URL(string: "https://api.groq.com/openai")),
+            apiKey: " \n\t "
+        )
+
+        XCTAssertEqual(
+            result,
+            VoiceInkAPIKeyVerificationResult(
+                isValid: false,
+                errorMessage: "API key is missing or empty."
             )
         )
     }

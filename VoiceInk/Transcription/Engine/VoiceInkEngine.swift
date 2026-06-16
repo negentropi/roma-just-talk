@@ -353,7 +353,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
 
     func commitReadyRollingBufferPreload(powerModeId: UUID? = nil) async -> Bool {
         let latencyTrace = TranscriptionLatencyTrace(
-            operation: "rolling-preload-quick-release",
+            operation: TranscriptionLatencyTrace.rollingPreloadQuickReleaseOperation,
             startedAt: Date()
         )
 
@@ -361,7 +361,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
             discardPreparedQuickReleaseContext()
             RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
                 strategy: .unavailable,
-                reason: "state-\(recordingState)"
+                reason: "state-\(recordingState)",
+                elapsedSeconds: latencyTrace.elapsed
             )
             logger.notice("Latency trace preload commit unavailable operation=\(latencyTrace.operation, privacy: .public) reason=state elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
             return false
@@ -371,7 +372,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
             discardPreparedQuickReleaseContext()
             RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
                 strategy: .unavailable,
-                reason: "no-model"
+                reason: "no-model",
+                elapsedSeconds: latencyTrace.elapsed
             )
             logger.notice("Latency trace preload commit unavailable operation=\(latencyTrace.operation, privacy: .public) reason=no-model elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
             return false
@@ -390,7 +392,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
             discardPreparedQuickReleaseContext()
             RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
                 strategy: .unavailable,
-                reason: "no-claim-nonbatch-model"
+                reason: "no-claim-nonbatch-model",
+                elapsedSeconds: latencyTrace.elapsed
             )
             logger.notice("Latency trace preload commit unavailable operation=\(latencyTrace.operation, privacy: .public) reason=no-claim-nonbatch-model elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
             return false
@@ -400,7 +403,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
             discardPreparedQuickReleaseContext()
             RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
                 strategy: .unavailable,
-                reason: "no-claim"
+                reason: "no-claim",
+                elapsedSeconds: latencyTrace.elapsed
             )
             logger.notice("Latency trace preload commit unavailable operation=\(latencyTrace.operation, privacy: .public) reason=no-claim elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
             return false
@@ -439,7 +443,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
             RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
                 strategy: .invalidated,
                 reason: "model-or-language-changed",
-                audioBytes: claimedPreload.audioData.count
+                audioBytes: claimedPreload.audioData.count,
+                elapsedSeconds: latencyTrace.elapsed
             )
             return false
         }
@@ -459,7 +464,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
             logger.notice("Latency trace deferred audio write started operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s bytes=\(audioData.count, privacy: .public)")
             RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
                 strategy: .readyPreload,
-                audioBytes: audioData.count
+                audioBytes: audioData.count,
+                elapsedSeconds: latencyTrace.elapsed
             )
 
             let transcription = makeRecordingTranscription(
@@ -493,7 +499,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
             RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
                 strategy: .failed,
                 reason: "ready-preload-error",
-                audioBytes: claimedPreload.audioData.count
+                audioBytes: claimedPreload.audioData.count,
+                elapsedSeconds: latencyTrace.elapsed
             )
             logger.error("commitReadyRollingBufferPreload failed: \(error.localizedDescription, privacy: .public)")
             return false
@@ -519,7 +526,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
             RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
                 strategy: .invalidated,
                 reason: "model-or-language-changed",
-                audioBytes: audioSnapshot.audioData.count
+                audioBytes: audioSnapshot.audioData.count,
+                elapsedSeconds: latencyTrace.elapsed
             )
             return false
         }
@@ -534,7 +542,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
             logger.notice("Latency trace buffered audio file ready operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s bytes=\(audioData.count, privacy: .public)")
             RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
                 strategy: .bufferedAudioSnapshot,
-                audioBytes: audioData.count
+                audioBytes: audioData.count,
+                elapsedSeconds: latencyTrace.elapsed
             )
 
             let transcription = makeRecordingTranscription(
@@ -566,7 +575,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
             RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
                 strategy: .failed,
                 reason: "buffered-audio-error",
-                audioBytes: audioSnapshot.audioData.count
+                audioBytes: audioSnapshot.audioData.count,
+                elapsedSeconds: latencyTrace.elapsed
             )
             logger.error("commitBufferedRollingAudioSnapshot failed: \(error.localizedDescription, privacy: .public)")
             return false

@@ -3,11 +3,17 @@ import SwiftData
 import os
 
 struct TranscriptionLatencyTrace: Sendable {
+    static let rollingPreloadQuickReleaseOperation = "rolling-preload-quick-release"
+
     let operation: String
     let startedAt: Date
 
     var elapsed: TimeInterval {
         Date().timeIntervalSince(startedAt)
+    }
+
+    var isRollingPreloadQuickRelease: Bool {
+        operation == Self.rollingPreloadQuickReleaseOperation
     }
 }
 
@@ -166,6 +172,7 @@ class TranscriptionPipeline {
             let transcriptionDuration = Date().timeIntervalSince(transcriptionStart)
             if let latencyTrace {
                 logger.notice("Latency trace transcription ready operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s transcriptionElapsed=\(transcriptionDuration, format: .fixed(precision: 3), privacy: .public)s chars=\(text.count, privacy: .public)")
+                recordRollingPreloadTiming(latencyTrace, stage: .transcriptionReady)
             }
 
             if shouldCancel() { await finishCanceledTranscription(); return }
@@ -310,6 +317,7 @@ class TranscriptionPipeline {
             let pastedText = textToPaste + (appendSpace ? " " : "")
             if let latencyTrace {
                 logger.notice("Latency trace paste starting operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s chars=\(pastedText.count, privacy: .public)")
+                recordRollingPreloadTiming(latencyTrace, stage: .pasteStarting)
             }
             let pasteContext: CursorPaster.PreparedPasteContext? = if let preparedPasteContext {
                 await preparedPasteContext.value
@@ -319,6 +327,7 @@ class TranscriptionPipeline {
             _ = await CursorPaster.startPasteAtCursor(pastedText, preparedContext: pasteContext).value
             if let latencyTrace {
                 logger.notice("Latency trace paste completed operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s chars=\(pastedText.count, privacy: .public)")
+                recordRollingPreloadTiming(latencyTrace, stage: .pasteCompleted)
             }
             let autoSendKey = PowerModeManager.shared.currentActiveConfiguration?.autoSendKey
             SoundManager.shared.playStopSound()
@@ -345,6 +354,18 @@ class TranscriptionPipeline {
         saveTranscriptionAndPostCompletion()
         if let latencyTrace {
             logger.notice("Latency trace pipeline saved operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
+            recordRollingPreloadTiming(latencyTrace, stage: .saved)
         }
+    }
+
+    private func recordRollingPreloadTiming(
+        _ latencyTrace: TranscriptionLatencyTrace,
+        stage: RollingBufferQuickReleaseTimingStage
+    ) {
+        guard latencyTrace.isRollingPreloadQuickRelease else { return }
+        RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseTiming(
+            stage: stage,
+            elapsedSeconds: latencyTrace.elapsed
+        )
     }
 }

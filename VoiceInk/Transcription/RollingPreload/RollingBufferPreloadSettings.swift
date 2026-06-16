@@ -217,11 +217,23 @@ enum RollingBufferQuickReleaseClaimStrategy: String {
     }
 }
 
+enum RollingBufferQuickReleaseTimingStage {
+    case transcriptionReady
+    case pasteStarting
+    case pasteCompleted
+    case saved
+}
+
 struct RollingBufferQuickReleaseClaimSnapshot: Equatable {
     let strategy: RollingBufferQuickReleaseClaimStrategy
     let reason: String?
     let audioBytes: Int
-    let updatedAt: Date?
+    var updatedAt: Date?
+    var claimElapsedSeconds: TimeInterval?
+    var transcriptionReadySeconds: TimeInterval?
+    var pasteStartingSeconds: TimeInterval?
+    var pasteCompletedSeconds: TimeInterval?
+    var savedSeconds: TimeInterval?
 
     var displaySummary: String {
         guard updatedAt != nil else { return "None" }
@@ -233,12 +245,52 @@ struct RollingBufferQuickReleaseClaimSnapshot: Equatable {
         if audioBytes > 0 {
             parts.append(ByteCountFormatter.string(fromByteCount: Int64(audioBytes), countStyle: .file))
         }
+        if let pasteCompletedSeconds {
+            parts.append("paste \(Self.formatSeconds(pasteCompletedSeconds))")
+        } else if let pasteStartingSeconds {
+            parts.append("paste-start \(Self.formatSeconds(pasteStartingSeconds))")
+        } else if let transcriptionReadySeconds {
+            parts.append("transcribed \(Self.formatSeconds(transcriptionReadySeconds))")
+        } else if let claimElapsedSeconds {
+            parts.append("claim \(Self.formatSeconds(claimElapsedSeconds))")
+        }
         return parts.joined(separator: " - ")
     }
 
     var exportSummary: String {
         guard let updatedAt else { return displaySummary }
-        return "\(displaySummary) at \(updatedAt.formatted(date: .numeric, time: .standard))"
+        let timingParts = [
+            timingPart("claim", claimElapsedSeconds),
+            timingPart("transcription", transcriptionReadySeconds),
+            timingPart("paste-start", pasteStartingSeconds),
+            timingPart("paste-complete", pasteCompletedSeconds),
+            timingPart("saved", savedSeconds)
+        ].compactMap { $0 }
+        let timingSummary = timingParts.isEmpty ? "" : " | \(timingParts.joined(separator: ", "))"
+        return "\(displaySummary) at \(updatedAt.formatted(date: .numeric, time: .standard))\(timingSummary)"
+    }
+
+    mutating func recordTiming(stage: RollingBufferQuickReleaseTimingStage, elapsedSeconds: TimeInterval, at date: Date) {
+        updatedAt = date
+        switch stage {
+        case .transcriptionReady:
+            transcriptionReadySeconds = elapsedSeconds
+        case .pasteStarting:
+            pasteStartingSeconds = elapsedSeconds
+        case .pasteCompleted:
+            pasteCompletedSeconds = elapsedSeconds
+        case .saved:
+            savedSeconds = elapsedSeconds
+        }
+    }
+
+    private static func timingPart(_ label: String, _ seconds: TimeInterval?) -> String? {
+        guard let seconds else { return nil }
+        return "\(label)=\(formatSeconds(seconds))"
+    }
+
+    private static func formatSeconds(_ seconds: TimeInterval) -> String {
+        String(format: "%.3fs", seconds)
     }
 }
 
@@ -250,13 +302,19 @@ final class RollingBufferPreloadRuntimeDiagnostics {
         strategy: .none,
         reason: nil,
         audioBytes: 0,
-        updatedAt: nil
+        updatedAt: nil,
+        claimElapsedSeconds: nil,
+        transcriptionReadySeconds: nil,
+        pasteStartingSeconds: nil,
+        pasteCompletedSeconds: nil,
+        savedSeconds: nil
     )
 
     func recordQuickReleaseClaim(
         strategy: RollingBufferQuickReleaseClaimStrategy,
         reason: String? = nil,
         audioBytes: Int = 0,
+        elapsedSeconds: TimeInterval? = nil,
         at updatedAt: Date = Date()
     ) {
         lock.lock()
@@ -265,8 +323,24 @@ final class RollingBufferPreloadRuntimeDiagnostics {
             strategy: strategy,
             reason: reason,
             audioBytes: audioBytes,
-            updatedAt: updatedAt
+            updatedAt: updatedAt,
+            claimElapsedSeconds: elapsedSeconds,
+            transcriptionReadySeconds: nil,
+            pasteStartingSeconds: nil,
+            pasteCompletedSeconds: nil,
+            savedSeconds: nil
         )
+    }
+
+    func recordQuickReleaseTiming(
+        stage: RollingBufferQuickReleaseTimingStage,
+        elapsedSeconds: TimeInterval,
+        at updatedAt: Date = Date()
+    ) {
+        lock.lock()
+        defer { lock.unlock() }
+        guard snapshot.updatedAt != nil else { return }
+        snapshot.recordTiming(stage: stage, elapsedSeconds: elapsedSeconds, at: updatedAt)
     }
 
     func currentQuickReleaseClaim() -> RollingBufferQuickReleaseClaimSnapshot {

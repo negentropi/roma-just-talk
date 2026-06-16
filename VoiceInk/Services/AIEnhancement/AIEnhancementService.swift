@@ -3,6 +3,7 @@ import SwiftData
 import AppKit
 import os
 import LLMkit
+import VoiceInkCore
 
 enum EnhancementPrompt {
     case transcriptionEnhancement
@@ -233,7 +234,7 @@ class AIEnhancementService: ObservableObject {
                     systemPrompt: systemMessage,
                     timeout: baseTimeout
                 )
-                return AIEnhancementOutputFilter.filter(result)
+                return VoiceInkAIEnhancementOutputFilter.filter(result)
             } catch {
                 if let localError = error as? LocalAIError {
                     switch localError {
@@ -251,7 +252,7 @@ class AIEnhancementService: ObservableObject {
         if aiService.selectedProvider == .localCLI {
             do {
                 let result = try await aiService.enhanceWithLocalCLI(systemPrompt: systemMessage, userPrompt: formattedText)
-                return AIEnhancementOutputFilter.filter(result)
+                return VoiceInkAIEnhancementOutputFilter.filter(result)
             } catch {
                 if let localError = error as? LocalCLIError {
                     throw EnhancementError.customError(localError.errorDescription ?? "An unknown Local CLI error occurred.")
@@ -299,7 +300,7 @@ class AIEnhancementService: ObservableObject {
                     timeout: baseTimeout
                 )
             }
-            return AIEnhancementOutputFilter.filter(result.trimmingCharacters(in: .whitespacesAndNewlines))
+            return VoiceInkAIEnhancementOutputFilter.filter(result.trimmingCharacters(in: .whitespacesAndNewlines))
         } catch let error as LLMKitError {
             throw mapLLMKitError(error)
         } catch let error as EnhancementError {

@@ -192,6 +192,15 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
         allCases.filter(\.requiresUserAPIKey)
     }
 
+    public static func availableProviders(
+        for use: VoiceInkProviderModelUse,
+        isProviderReady: (VoiceInkProviderKind) -> Bool
+    ) -> [VoiceInkProviderKind] {
+        allCases.filter { provider in
+            provider.supportsModelUse(use) && isProviderReady(provider)
+        }
+    }
+
     public var apiKeyVerificationTransport: VoiceInkAPIKeyVerificationTransport? {
         guard case let .userAPIKey(_, _, verificationTransport) = accessRequirement else {
             return nil

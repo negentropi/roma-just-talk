@@ -50,5 +50,30 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertNil(VoiceInkProviderKind.voiceInk.apiKeyVerificationStateKey)
         XCTAssertNil(VoiceInkProviderKind.voiceInk.apiKeyVerificationTransport)
     }
+
+    func testAvailableProvidersFiltersByModelUseAndReadiness() {
+        let readyProviders: Set<VoiceInkProviderKind> = [.groq, .deepgram, .localWhisper, .voiceInk]
+
+        XCTAssertEqual(
+            VoiceInkProviderKind.availableProviders(for: .transcription) { readyProviders.contains($0) },
+            [.groq, .deepgram, .localWhisper, .voiceInk]
+        )
+
+        XCTAssertEqual(
+            VoiceInkProviderKind.availableProviders(for: .postProcessing) { readyProviders.contains($0) },
+            [.groq, .voiceInk]
+        )
+    }
+
+    func testAvailableProvidersReturnsEmptyWhenNoProviderIsReady() {
+        XCTAssertEqual(
+            VoiceInkProviderKind.availableProviders(for: .transcription) { _ in false },
+            []
+        )
+        XCTAssertEqual(
+            VoiceInkProviderKind.availableProviders(for: .postProcessing) { _ in false },
+            []
+        )
+    }
 }
 #endif

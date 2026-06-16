@@ -18,7 +18,7 @@ struct TranscriptionRunResult {
 }
 
 class TranscriptionRetryService {
-    private let postProcessor = LLMPostProcessor()
+    private let postProcessor = VoiceInkPostProcessingClient()
     
     static let shared = TranscriptionRetryService()
     

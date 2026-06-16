@@ -1,10 +1,19 @@
 import Foundation
-import VoiceInkCore
 
-struct LLMPostProcessor {
-    private let client = VoiceInkOpenAICompatibleClient()
+public struct VoiceInkPostProcessingClient: Sendable {
+    private let client: VoiceInkOpenAICompatibleClient
 
-    func postProcessTranscript(provider: VoiceInkProviderKind, apiKey: String, model: String, prompt: String, transcript: String) async throws -> String {
+    public init(client: VoiceInkOpenAICompatibleClient = VoiceInkOpenAICompatibleClient()) {
+        self.client = client
+    }
+
+    public func postProcessTranscript(
+        provider: VoiceInkProviderKind,
+        apiKey: String,
+        model: String,
+        prompt: String,
+        transcript: String
+    ) async throws -> String {
         guard let request = VoiceInkPostProcessingRequest(prompt: prompt, transcript: transcript) else {
             return transcript
         }
@@ -16,6 +25,7 @@ struct LLMPostProcessor {
             messages: request.messages,
             temperature: request.temperature
         )
+
         return VoiceInkPostProcessingRequest.finalizedTranscript(
             from: result,
             fallbackTranscript: transcript

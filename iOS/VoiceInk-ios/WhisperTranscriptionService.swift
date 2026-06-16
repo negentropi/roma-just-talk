@@ -109,9 +109,9 @@ extension WhisperTranscriptionService {
     func transcribeAudioFile(_ fileURL: URL) async throws -> String {
         // Use dummy values for parameters that don't apply to local transcription
         return try await transcribeAudioFile(
-            apiBaseURL: URL(string: "http://localhost")!,
+            apiBaseURL: VoiceInkProviderKind.localWhisper.apiBaseURL,
             apiKey: "local",
-            model: "base.en",
+            model: VoiceInkTranscriptionModelCatalog.localBaseModel,
             fileURL: fileURL,
             language: "en"
         )

@@ -258,7 +258,7 @@ class TranscriptionPipeline {
                 }
             }
 
-            transcription.transcriptionStatus = VoiceInkTranscriptionStatus.completed.rawValue
+            transcription.transcriptionState = .completed
         } catch {
             let errorDescription = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
 
@@ -274,7 +274,7 @@ class TranscriptionPipeline {
             }
 
             transcription.text = "Transcription Failed: \(errorDescription)"
-            transcription.transcriptionStatus = VoiceInkTranscriptionStatus.failed.rawValue
+            transcription.transcriptionState = .failed
         }
 
         func recordSessionMetricAndNotifyIfNeeded(modelDisplayName: String?) {
@@ -296,7 +296,7 @@ class TranscriptionPipeline {
         func saveTranscriptionAndPostCompletion() {
             insertHistoryRecordBeforeSaveIfNeeded()
 
-            let shouldRecordSessionMetric = transcription.transcriptionStatus == VoiceInkTranscriptionStatus.completed.rawValue
+            let shouldRecordSessionMetric = transcription.transcriptionState == .completed
             let shouldDeferSessionMetric = shouldRecordSessionMetric && latencyTrace?.isRollingPreloadQuickRelease == true
             let didInsertSessionMetric: Bool
             if shouldRecordSessionMetric, !shouldDeferSessionMetric {
@@ -366,7 +366,7 @@ class TranscriptionPipeline {
             SoundManager.shared.playStopSound()
             await restorePromptDetectionSettingsAndDismiss()
         } else if var textToPaste = finalPastedText,
-           transcription.transcriptionStatus == VoiceInkTranscriptionStatus.completed.rawValue {
+           transcription.transcriptionState == .completed {
             let shouldLowercase = UserDefaults.standard.bool(forKey: "LowercaseTranscription")
             if !shouldLowercase,
                ContextualCapitalizationFormatter.needsCursorContext(textToPaste) {
@@ -418,7 +418,7 @@ class TranscriptionPipeline {
             await restorePromptDetectionSettingsAndDismiss()
         }
 
-        if transcription.transcriptionStatus == VoiceInkTranscriptionStatus.completed.rawValue,
+        if transcription.transcriptionState == .completed,
            transcription.duration <= 0 {
             let audioFileReady = await waitForAudioFileReadyIfNeeded()
             if audioFileReady {

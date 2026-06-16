@@ -796,7 +796,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                 modelContext.insert(transcription)
             }
             transcription.text = "Transcription Failed: No model selected"
-            transcription.transcriptionStatus = VoiceInkTranscriptionStatus.failed.rawValue
+            transcription.transcriptionState = .failed
             try? modelContext.save()
             recordingState = .idle
             return

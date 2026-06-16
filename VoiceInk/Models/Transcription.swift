@@ -61,7 +61,7 @@ final class Transcription {
     ) {
         text = Self.canceledTranscriptionText
         enhancedText = nil
-        transcriptionStatus = VoiceInkTranscriptionStatus.canceled.rawValue
+        transcriptionState = .canceled
         if let duration {
             self.duration = duration
         }
@@ -74,6 +74,16 @@ final class Transcription {
         promptName = nil
         aiRequestSystemMessage = nil
         aiRequestUserMessage = nil
+    }
+
+    var transcriptionState: VoiceInkTranscriptionStatus? {
+        get {
+            guard let transcriptionStatus else { return nil }
+            return VoiceInkTranscriptionStatus(rawValue: transcriptionStatus)
+        }
+        set {
+            transcriptionStatus = newValue?.rawValue
+        }
     }
 
     func resolvedAudioFileURL(relativeTo recordingsDirectory: URL? = nil) -> URL? {

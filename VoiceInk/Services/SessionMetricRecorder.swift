@@ -29,7 +29,7 @@ enum SessionMetricRecorder {
         in modelContext: ModelContext,
         timestamp: Date = Date()
     ) throws -> Bool {
-        guard transcription.transcriptionStatus == VoiceInkTranscriptionStatus.completed.rawValue else {
+        guard transcription.transcriptionState == .completed else {
             return false
         }
 

@@ -328,8 +328,8 @@ class TranscriptionPipeline {
             return {
                 saveTranscriptionAndPostCompletion()
                 if let trace {
-                    logger.notice("Latency trace deferred pipeline saved operation=\(trace.operation, privacy: .public) elapsed=\(trace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
-                    recordRollingPreloadTiming(trace, stage: .saved)
+                    self.logger.notice("Latency trace deferred pipeline saved operation=\(trace.operation, privacy: .public) elapsed=\(trace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
+                    self.recordRollingPreloadTiming(trace, stage: .saved)
                 }
             }
         }

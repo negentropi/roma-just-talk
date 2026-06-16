@@ -54,6 +54,10 @@ final class RecordingManager: ObservableObject {
     var isRecording: Bool {
         recordingState == .recording
     }
+
+    var currentAudioLevels: [CGFloat] {
+        recorder.levelsHistory
+    }
     
     // MARK: - Initialization
     init() {

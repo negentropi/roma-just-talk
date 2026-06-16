@@ -24,6 +24,9 @@ struct RecordingSheetView: View {
             }
             .padding(.top, 8)
 
+            AudioVisualizerView(levels: recordingManager.currentAudioLevels)
+                .padding(.vertical, 4)
+
             // Mode Picker
             VStack(spacing: 8) {
                 Text("Mode")

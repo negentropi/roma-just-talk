@@ -26,10 +26,6 @@ final class AppSettings: ObservableObject {
         return modes.first { $0.id == selectedModeId }
     }
 
-    private var activeMode: Mode? {
-        modes.activeMode(selectedModeId: selectedModeId)
-    }
-
     @Published private var apiKeysByProvider: [VoiceInkProviderKind: String]
     @Published private var verifiedAPIKeyProviders: Set<VoiceInkProviderKind>
     
@@ -133,59 +129,9 @@ final class AppSettings: ObservableObject {
     }
     
     // MARK: - Mode-based Settings
-    
-    /// Get the effective transcription provider (from selected mode or first mode)
-    var effectiveTranscriptionProvider: VoiceInkProviderKind {
-        if let activeMode {
-            return activeMode.transcriptionProvider
-        } else {
-            return .groq // Default fallback
-        }
-    }
-    
-    /// Get the effective transcription model (from selected mode or first mode)
-    var effectiveTranscriptionModel: String {
-        if let activeMode {
-            return activeMode.effectiveTranscriptionModel
-        } else {
-            return VoiceInkTranscriptionModelCatalog.voiceInkTranscriptionModel
-        }
-    }
-    
-    /// Get the effective post-processing provider (from selected mode or first mode)
-    var effectivePostProcessingProvider: VoiceInkProviderKind {
-        if let activeMode {
-            return activeMode.postProcessingProvider
-        } else {
-            return .groq // Default fallback
-        }
-    }
-    
-    /// Get the effective post-processing model (from selected mode or first mode)
-    var effectivePostProcessingModel: String {
-        if let activeMode {
-            return activeMode.effectivePostProcessingModel
-        } else {
-            return effectivePostProcessingProvider.fixedModel(for: .postProcessing) ?? VoiceInkAIModelCatalog.firstAvailableModel(for: .groq) // Default fallback
-        }
-    }
-    
-    /// Get the effective custom prompt (from selected mode or first mode)
-    var effectiveCustomPrompt: String {
-        if let activeMode {
-            return activeMode.effectivePrompt
-        } else {
-            return "" // Default fallback
-        }
-    }
-    
-    /// Get whether post-processing is enabled (from selected mode or first mode)
-    var effectiveIsPostProcessingEnabled: Bool {
-        if let activeMode {
-            return activeMode.isPostProcessingEnabled
-        } else {
-            return false // Default fallback
-        }
+
+    var effectiveModeConfiguration: VoiceInkModeRuntimeConfiguration {
+        modes.runtimeConfiguration(selectedModeId: selectedModeId)
     }
 
     private func saveAPIKey(_ key: String, forKey account: String) {

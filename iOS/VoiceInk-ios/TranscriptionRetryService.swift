@@ -26,9 +26,10 @@ class TranscriptionRetryService {
 
     func transcribe(fileURL: URL) async throws -> TranscriptionRunResult {
         let settings = AppSettings.shared
-        let provider = await settings.effectiveTranscriptionProvider
+        let modeConfiguration = await settings.effectiveModeConfiguration
+        let provider = modeConfiguration.transcriptionProvider
         let apiKey = await settings.apiKey(for: provider)
-        let model = await settings.effectiveTranscriptionModel
+        let model = modeConfiguration.transcriptionModel
 
         guard !apiKey.isEmpty else {
             throw TranscriptionError.noApiKey
@@ -43,19 +44,18 @@ class TranscriptionRetryService {
         )
 
         let cleanedText = VoiceInkTranscriptTextNormalizer.normalizeParagraphSpacing(rawText)
-        let postProcessingEnabled = await settings.effectiveIsPostProcessingEnabled
-        let aiEnhancementModelName = postProcessingEnabled ? await settings.effectivePostProcessingModel : nil
+        let aiEnhancementModelName = modeConfiguration.isPostProcessingEnabled ? modeConfiguration.postProcessingModel : nil
 
         var finalText = cleanedText
         var postProcessingError: String? = nil
         var postProcessingSucceeded = false
 
-        if postProcessingEnabled {
-            let ppPrompt = await settings.effectiveCustomPrompt
+        if modeConfiguration.isPostProcessingEnabled {
+            let ppPrompt = modeConfiguration.prompt
             if !ppPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                let llmProvider = await settings.effectivePostProcessingProvider
+                let llmProvider = modeConfiguration.postProcessingProvider
                 let llmKey = await settings.apiKey(for: llmProvider)
-                let llmModel = await settings.effectivePostProcessingModel
+                let llmModel = modeConfiguration.postProcessingModel
                 if !llmKey.isEmpty {
                     do {
                         finalText = try await postProcessor.postProcessTranscript(

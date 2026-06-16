@@ -1,5 +1,24 @@
 import Foundation
 
+public struct VoiceInkModeRuntimeConfiguration: Equatable, Sendable {
+    public let transcriptionProvider: VoiceInkProviderKind
+    public let transcriptionModel: String
+    public let postProcessingProvider: VoiceInkProviderKind
+    public let postProcessingModel: String
+    public let prompt: String
+    public let isPostProcessingEnabled: Bool
+
+    public static let fallback = VoiceInkModeRuntimeConfiguration(
+        transcriptionProvider: .groq,
+        transcriptionModel: VoiceInkTranscriptionModelCatalog.voiceInkTranscriptionModel,
+        postProcessingProvider: .groq,
+        postProcessingModel: VoiceInkProviderKind.groq.fixedModel(for: .postProcessing)
+            ?? VoiceInkAIModelCatalog.firstAvailableModel(for: .groq),
+        prompt: "",
+        isPostProcessingEnabled: false
+    )
+}
+
 public struct Mode: Identifiable, Codable {
     public let id: UUID
     public var name: String
@@ -59,6 +78,17 @@ public struct Mode: Identifiable, Codable {
         postProcessingProvider.fixedModel(for: .postProcessing) ?? postProcessingModel
     }
 
+    public var runtimeConfiguration: VoiceInkModeRuntimeConfiguration {
+        VoiceInkModeRuntimeConfiguration(
+            transcriptionProvider: transcriptionProvider,
+            transcriptionModel: effectiveTranscriptionModel,
+            postProcessingProvider: postProcessingProvider,
+            postProcessingModel: effectivePostProcessingModel,
+            prompt: effectivePrompt,
+            isPostProcessingEnabled: isPostProcessingEnabled
+        )
+    }
+
     public static func defaultLocalWhisper(name: String = "Default") -> Mode {
         Mode(
             name: name,
@@ -80,5 +110,9 @@ public extension Collection where Element == Mode {
         }
 
         return first
+    }
+
+    func runtimeConfiguration(selectedModeId: UUID?) -> VoiceInkModeRuntimeConfiguration {
+        activeMode(selectedModeId: selectedModeId)?.runtimeConfiguration ?? .fallback
     }
 }

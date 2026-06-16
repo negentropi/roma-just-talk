@@ -71,7 +71,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
 
         let appSupportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("com.prakashjoshipax.VoiceInk")
-        self.recordingsDirectory = appSupportDirectory.appendingPathComponent("Recordings")
+        self.recordingsDirectory = appSupportDirectory.appendingPathComponent(VoiceInkStoredAudioFile.recordingsDirectoryName)
 
         let serviceRegistry = TranscriptionServiceRegistry(
             modelProvider: whisperModelManager,

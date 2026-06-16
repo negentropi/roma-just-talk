@@ -3,6 +3,7 @@ import SwiftUI
 import AVFoundation
 import SwiftData
 import os
+import VoiceInkCore
 
 @MainActor
 class AudioTranscriptionManager: ObservableObject {
@@ -142,7 +143,7 @@ class AudioTranscriptionManager: ObservableObject {
 
             let recordingsDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
                 .appendingPathComponent("com.prakashjoshipax.VoiceInk")
-                .appendingPathComponent("Recordings")
+                .appendingPathComponent(VoiceInkStoredAudioFile.recordingsDirectoryName)
 
             let fileName = "transcribed_\(UUID().uuidString).wav"
             let permanentURL = recordingsDirectory.appendingPathComponent(fileName)

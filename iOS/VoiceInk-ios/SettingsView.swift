@@ -109,7 +109,7 @@ struct SettingsView: View {
 
         // 2) Delete audio files directory
         let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        let recordingsDir = documentsURL.appendingPathComponent("Recordings")
+        let recordingsDir = documentsURL.appendingPathComponent(VoiceInkStoredAudioFile.recordingsDirectoryName)
         if FileManager.default.fileExists(atPath: recordingsDir.path) {
             try? FileManager.default.removeItem(at: recordingsDir)
         }

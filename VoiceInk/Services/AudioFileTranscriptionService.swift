@@ -3,6 +3,7 @@ import SwiftUI
 import AVFoundation
 import SwiftData
 import os
+import VoiceInkCore
 
 @MainActor
 class AudioTranscriptionService: ObservableObject {
@@ -67,7 +68,7 @@ class AudioTranscriptionService: ObservableObject {
             let duration = CMTimeGetSeconds(try await audioAsset.load(.duration))
             let recordingsDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
                 .appendingPathComponent("com.prakashjoshipax.VoiceInk")
-                .appendingPathComponent("Recordings")
+                .appendingPathComponent(VoiceInkStoredAudioFile.recordingsDirectoryName)
             
             let fileName = "retranscribed_\(UUID().uuidString).wav"
             let permanentURL = recordingsDirectory.appendingPathComponent(fileName)

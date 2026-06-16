@@ -3,6 +3,10 @@ import XCTest
 @testable import VoiceInkCore
 
 final class StoredAudioFileTests: XCTestCase {
+    func testRecordingsDirectoryNameMatchesExistingStoragePath() {
+        XCTAssertEqual(VoiceInkStoredAudioFile.recordingsDirectoryName, "Recordings")
+    }
+
     func testResolvesFileURLString() {
         let fileURL = URL(fileURLWithPath: "/tmp/voiceink-recording.m4a")
 

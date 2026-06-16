@@ -94,7 +94,8 @@ final class AudioRecorder: NSObject, ObservableObject {
     }
 
     static func recordingsDirectory() -> URL {
-        let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("Recordings")
+        let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent(VoiceInkStoredAudioFile.recordingsDirectoryName)
         if !FileManager.default.fileExists(atPath: dir.path) {
             try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         }

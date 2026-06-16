@@ -42,6 +42,6 @@ final class Transcription {
 
     private static var recordingsDirectory: URL {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("Recordings")
+            .appendingPathComponent(VoiceInkStoredAudioFile.recordingsDirectoryName)
     }
 }

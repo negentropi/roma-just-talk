@@ -1,6 +1,8 @@
 import Foundation
 
 public enum VoiceInkStoredAudioFile {
+    public static let recordingsDirectoryName = "Recordings"
+
     public static func resolvedURL(
         for storedValue: String?,
         relativeTo recordingsDirectory: URL? = nil

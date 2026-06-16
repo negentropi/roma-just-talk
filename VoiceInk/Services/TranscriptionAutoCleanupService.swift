@@ -1,6 +1,7 @@
 import Foundation
 import SwiftData
 import OSLog
+import VoiceInkCore
 
 class TranscriptionAutoCleanupService {
     static let shared = TranscriptionAutoCleanupService()
@@ -16,7 +17,7 @@ class TranscriptionAutoCleanupService {
     private var recordingsDirectory: URL {
         FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("com.prakashjoshipax.VoiceInk")
-            .appendingPathComponent("Recordings")
+            .appendingPathComponent(VoiceInkStoredAudioFile.recordingsDirectoryName)
     }
 
     private init() {}

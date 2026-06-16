@@ -44,11 +44,39 @@ class TranscriptionPipeline {
         onStateChange: @escaping (RecordingState) -> Void,
         shouldCancel: () -> Bool,
         onCancel: @escaping () async -> Void,
-        onDismiss: @escaping () async -> Void
+        onDismiss: @escaping () async -> Void,
+        audioFileReadyTask: Task<Void, Error>? = nil
     ) async {
         var finalPastedText: String?
         var promptDetectionResult: PromptDetectionService.PromptDetectionResult?
         var didInsertSessionMetric = false
+        var didResolveAudioFileReadiness = false
+        var audioFileIsReady = audioFileReadyTask == nil
+
+        func waitForAudioFileReadyIfNeeded() async -> Bool {
+            guard !didResolveAudioFileReadiness else {
+                return audioFileIsReady
+            }
+
+            didResolveAudioFileReadiness = true
+            guard let audioFileReadyTask else {
+                audioFileIsReady = true
+                return true
+            }
+
+            let waitStart = Date()
+            do {
+                try await audioFileReadyTask.value
+                audioFileIsReady = true
+                logger.notice("Deferred audio file ready elapsed=\(Date().timeIntervalSince(waitStart), format: .fixed(precision: 3), privacy: .public)s")
+            } catch {
+                audioFileIsReady = false
+                transcription.audioFileURL = nil
+                logger.error("Deferred audio file write failed: \(error.localizedDescription, privacy: .public)")
+            }
+
+            return audioFileIsReady
+        }
 
         func restorePromptDetectionSettingsIfNeeded() async {
             if let result = promptDetectionResult,
@@ -72,7 +100,8 @@ class TranscriptionPipeline {
             if transcription.duration > 0 {
                 canceledDuration = nil
             } else {
-                let duration = await AudioFileMetadata.duration(for: audioURL)
+                let audioFileReady = await waitForAudioFileReadyIfNeeded()
+                let duration = audioFileReady ? await AudioFileMetadata.duration(for: audioURL) : 0
                 canceledDuration = duration > 0 ? duration : nil
             }
 
@@ -253,7 +282,10 @@ class TranscriptionPipeline {
 
         if transcription.transcriptionStatus == TranscriptionStatus.completed.rawValue,
            transcription.duration <= 0 {
-            transcription.duration = await AudioFileMetadata.duration(for: audioURL)
+            let audioFileReady = await waitForAudioFileReadyIfNeeded()
+            if audioFileReady {
+                transcription.duration = await AudioFileMetadata.duration(for: audioURL)
+            }
         }
 
         saveTranscriptionAndPostCompletion()

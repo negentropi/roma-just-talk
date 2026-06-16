@@ -54,6 +54,7 @@ final class StreamingTranscriptionSession: TranscriptionSession {
     private var streamingFailed = false
     private var startupTask: Task<Void, Never>?
     private var startupTaskID: UUID?
+    private var fallbackAudioReadyTask: Task<Void, Error>?
     private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "StreamingTranscriptionSession")
 
     init(streamingService: StreamingTranscriptionService, fallbackService: TranscriptionService) {
@@ -105,6 +106,10 @@ final class StreamingTranscriptionSession: TranscriptionSession {
         return callback
     }
 
+    func setFallbackAudioReadyTask(_ task: Task<Void, Error>) {
+        fallbackAudioReadyTask = task
+    }
+
     func transcribe(audioURL: URL) async throws -> String {
         guard let model = model else {
             throw VoiceInkEngineError.transcriptionFailed
@@ -130,6 +135,14 @@ final class StreamingTranscriptionSession: TranscriptionSession {
             }
         } else {
             streamingService.cancel()
+        }
+
+        if let fallbackAudioReadyTask {
+            let waitStart = Date()
+            logger.notice("Waiting for deferred audio file before batch fallback")
+            try await fallbackAudioReadyTask.value
+            self.fallbackAudioReadyTask = nil
+            logger.notice("Deferred audio file ready for batch fallback elapsed=\(Date().timeIntervalSince(waitStart), format: .fixed(precision: 3), privacy: .public)s")
         }
 
         let fallbackStart = Date()

@@ -364,7 +364,15 @@ class VoiceInkEngine: NSObject, ObservableObject {
         do {
             let fileName = "\(UUID().uuidString).wav"
             let permanentURL = recordingsDirectory.appendingPathComponent(fileName)
-            try PCM16WAVFileWriter.writeMono16k(claimedPreload.audioData, to: permanentURL)
+            let audioData = claimedPreload.audioData
+            let audioFileReadyTask = Task.detached(priority: .utility) {
+                try PCM16WAVFileWriter.writeMono16k(audioData, to: permanentURL)
+            }
+            if let streamingSession = claimedPreload.session as? StreamingTranscriptionSession {
+                streamingSession.setFallbackAudioReadyTask(audioFileReadyTask)
+            } else {
+                try await audioFileReadyTask.value
+            }
 
             let transcription = makeRecordingTranscription(
                 for: permanentURL,
@@ -382,7 +390,11 @@ class VoiceInkEngine: NSObject, ObservableObject {
             partialTranscript = ""
             recordingState = .transcribing
 
-            await runPipeline(on: transcription, audioURL: permanentURL)
+            await runPipeline(
+                on: transcription,
+                audioURL: permanentURL,
+                audioFileReadyTask: audioFileReadyTask
+            )
             return true
         } catch {
             claimedPreload.session.cancel()
@@ -411,7 +423,11 @@ class VoiceInkEngine: NSObject, ObservableObject {
 
     // MARK: - Pipeline Dispatch
 
-    private func runPipeline(on transcription: Transcription, audioURL: URL) async {
+    private func runPipeline(
+        on transcription: Transcription,
+        audioURL: URL,
+        audioFileReadyTask: Task<Void, Error>? = nil
+    ) async {
         guard let model = transcriptionModelManager.currentTranscriptionModel else {
             transcription.text = "Transcription Failed: No model selected"
             transcription.transcriptionStatus = TranscriptionStatus.failed.rawValue
@@ -445,7 +461,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
             onDismiss: { [weak self] in
                 guard let self, self.activePipelineTranscriptionID == transcriptionID else { return }
                 await self.recorderUIManager?.dismissMiniRecorder()
-            }
+            },
+            audioFileReadyTask: audioFileReadyTask
         )
 
         let didFinishActivePipeline = activePipelineTranscriptionID == transcriptionID

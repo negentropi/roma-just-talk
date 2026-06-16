@@ -689,7 +689,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
         let transcriptionID = transcription.id
         activePipelineTranscriptionID = transcriptionID
 
-        await pipeline.run(
+        let deferredPipelineWork = await pipeline.run(
             transcription: transcription,
             audioURL: audioURL,
             model: model,
@@ -717,6 +717,10 @@ class VoiceInkEngine: NSObject, ObservableObject {
             preparedCursorTextContext: preparedCursorTextContext,
             preparedPasteContext: preparedPasteContext
         )
+        recordRollingPreloadTiming(latencyTrace, stage: .pipelineReturned)
+        if let latencyTrace, latencyTrace.isRollingPreloadQuickRelease {
+            logger.notice("Latency trace pipeline returned operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
+        }
 
         let didFinishActivePipeline = activePipelineTranscriptionID == transcriptionID
         if didFinishActivePipeline {
@@ -735,6 +739,29 @@ class VoiceInkEngine: NSObject, ObservableObject {
             (recordingState == .transcribing || recordingState == .enhancing || recordingState == .busy) {
             recordingState = .idle
         }
+        if didFinishActivePipeline {
+            recordRollingPreloadTiming(latencyTrace, stage: .idle)
+            if let latencyTrace, latencyTrace.isRollingPreloadQuickRelease {
+                logger.notice("Latency trace engine idle operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
+            }
+        }
+
+        if let deferredPipelineWork {
+            Task { @MainActor in
+                deferredPipelineWork()
+            }
+        }
+    }
+
+    private func recordRollingPreloadTiming(
+        _ latencyTrace: TranscriptionLatencyTrace?,
+        stage: RollingBufferQuickReleaseTimingStage
+    ) {
+        guard let latencyTrace, latencyTrace.isRollingPreloadQuickRelease else { return }
+        RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseTiming(
+            stage: stage,
+            elapsedSeconds: latencyTrace.elapsed
+        )
     }
 
     // MARK: - Cancellation

@@ -136,6 +136,16 @@ struct RollingBufferPreloadPolicyTests {
             elapsedSeconds: 0.222,
             at: Date(timeIntervalSince1970: 2)
         )
+        diagnostics.recordQuickReleaseTiming(
+            stage: .pipelineReturned,
+            elapsedSeconds: 0.333,
+            at: Date(timeIntervalSince1970: 3)
+        )
+        diagnostics.recordQuickReleaseTiming(
+            stage: .idle,
+            elapsedSeconds: 0.444,
+            at: Date(timeIntervalSince1970: 4)
+        )
 
         let claim = diagnostics.currentQuickReleaseClaim()
         #expect(claim.strategy == .bufferedAudioSnapshot)
@@ -144,10 +154,15 @@ struct RollingBufferPreloadPolicyTests {
         #expect(claim.claimElapsedSeconds == 0.012)
         #expect(claim.transcriptionReadySeconds == 0.111)
         #expect(claim.pasteCompletedSeconds == 0.222)
+        #expect(claim.pipelineReturnedSeconds == 0.333)
+        #expect(claim.idleSeconds == 0.444)
         #expect(claim.displaySummary.contains("Buffered Audio Snapshot"))
         #expect(claim.displaySummary.contains("test"))
         #expect(claim.displaySummary.contains("paste 0.222s"))
+        #expect(claim.displaySummary.contains("idle 0.444s"))
         #expect(claim.exportSummary.contains("transcription=0.111s"))
+        #expect(claim.exportSummary.contains("returned=0.333s"))
+        #expect(claim.exportSummary.contains("idle=0.444s"))
         #expect(claim.exportSummary.contains(claim.displaySummary))
     }
 

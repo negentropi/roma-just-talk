@@ -2,6 +2,8 @@ import Foundation
 import SwiftData
 import os
 
+typealias TranscriptionPipelineDeferredWork = @MainActor () -> Void
+
 struct TranscriptionLatencyTrace: Sendable {
     static let rollingPreloadQuickReleaseOperation = "rolling-preload-quick-release"
 
@@ -68,7 +70,7 @@ class TranscriptionPipeline {
         deferHistoryInsertUntilSave: Bool = false,
         preparedCursorTextContext: Task<String?, Never>? = nil,
         preparedPasteContext: Task<CursorPaster.PreparedPasteContext?, Never>? = nil
-    ) async {
+    ) async -> TranscriptionPipelineDeferredWork? {
         var finalPastedText: String?
         var promptDetectionResult: PromptDetectionService.PromptDetectionResult?
         var didResolveAudioFileReadiness = false
@@ -156,7 +158,7 @@ class TranscriptionPipeline {
 
         if shouldCancel() {
             await finishCanceledTranscription()
-            return
+            return nil
         }
 
         do {
@@ -174,7 +176,7 @@ class TranscriptionPipeline {
                 recordRollingPreloadTiming(latencyTrace, stage: .transcriptionReady)
             }
 
-            if shouldCancel() { await finishCanceledTranscription(); return }
+            if shouldCancel() { await finishCanceledTranscription(); return nil }
 
             text = text.trimmingCharacters(in: .whitespacesAndNewlines)
 
@@ -207,7 +209,7 @@ class TranscriptionPipeline {
                enhancementService.isEnhancementEnabled,
                enhancementService.isConfigured,
                !shouldSkipEnhancement {
-                if shouldCancel() { await finishCanceledTranscription(); return }
+                if shouldCancel() { await finishCanceledTranscription(); return nil }
 
                 onStateChange(.enhancing)
                 let textForAI = promptDetectionResult?.processedText ?? text
@@ -231,7 +233,7 @@ class TranscriptionPipeline {
                             type: .warning
                         )
                     }
-                    if shouldCancel() { await finishCanceledTranscription(); return }
+                    if shouldCancel() { await finishCanceledTranscription(); return nil }
                 }
             }
 
@@ -291,8 +293,10 @@ class TranscriptionPipeline {
                 didInsertSessionMetric = false
             }
 
+            var didSaveTranscription = false
             do {
                 try modelContext.save()
+                didSaveTranscription = true
                 if didInsertSessionMetric {
                     NotificationCenter.default.post(name: .sessionMetricsDidChange, object: nil)
                 }
@@ -302,7 +306,7 @@ class TranscriptionPipeline {
                 logger.error("Failed to save transcription: \(error.localizedDescription, privacy: .public)")
             }
 
-            if shouldDeferSessionMetric {
+            if shouldDeferSessionMetric, didSaveTranscription {
                 let modelDisplayName = model.displayName
                 Task { @MainActor in
                     recordSessionMetricAndNotifyIfNeeded(modelDisplayName: modelDisplayName)
@@ -310,9 +314,29 @@ class TranscriptionPipeline {
             }
         }
 
+        func deferredSaveTranscriptionAndPostCompletion() -> TranscriptionPipelineDeferredWork? {
+            guard latencyTrace?.isRollingPreloadQuickRelease == true else {
+                saveTranscriptionAndPostCompletion()
+                if let latencyTrace {
+                    logger.notice("Latency trace pipeline saved operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
+                    recordRollingPreloadTiming(latencyTrace, stage: .saved)
+                }
+                return nil
+            }
+
+            let trace = latencyTrace
+            return {
+                saveTranscriptionAndPostCompletion()
+                if let trace {
+                    logger.notice("Latency trace deferred pipeline saved operation=\(trace.operation, privacy: .public) elapsed=\(trace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
+                    recordRollingPreloadTiming(trace, stage: .saved)
+                }
+            }
+        }
+
         if shouldCancel() {
             await finishCanceledTranscription()
-            return
+            return nil
         }
 
         if SpecialShortcutEmptyTranscriptionFallback.consumeIfNeeded(for: transcription, modelContext: modelContext) {
@@ -379,11 +403,7 @@ class TranscriptionPipeline {
             }
         }
 
-        saveTranscriptionAndPostCompletion()
-        if let latencyTrace {
-            logger.notice("Latency trace pipeline saved operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
-            recordRollingPreloadTiming(latencyTrace, stage: .saved)
-        }
+        return deferredSaveTranscriptionAndPostCompletion()
     }
 
     private func recordRollingPreloadTiming(

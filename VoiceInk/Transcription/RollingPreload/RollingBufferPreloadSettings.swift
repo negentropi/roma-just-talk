@@ -221,6 +221,8 @@ enum RollingBufferQuickReleaseTimingStage {
     case transcriptionReady
     case pasteStarting
     case pasteCompleted
+    case pipelineReturned
+    case idle
     case saved
 }
 
@@ -233,6 +235,8 @@ struct RollingBufferQuickReleaseClaimSnapshot: Equatable {
     var transcriptionReadySeconds: TimeInterval?
     var pasteStartingSeconds: TimeInterval?
     var pasteCompletedSeconds: TimeInterval?
+    var pipelineReturnedSeconds: TimeInterval?
+    var idleSeconds: TimeInterval?
     var savedSeconds: TimeInterval?
 
     var displaySummary: String {
@@ -254,6 +258,11 @@ struct RollingBufferQuickReleaseClaimSnapshot: Equatable {
         } else if let claimElapsedSeconds {
             parts.append("claim \(Self.formatSeconds(claimElapsedSeconds))")
         }
+        if let idleSeconds {
+            parts.append("idle \(Self.formatSeconds(idleSeconds))")
+        } else if let pipelineReturnedSeconds {
+            parts.append("returned \(Self.formatSeconds(pipelineReturnedSeconds))")
+        }
         return parts.joined(separator: " - ")
     }
 
@@ -264,6 +273,8 @@ struct RollingBufferQuickReleaseClaimSnapshot: Equatable {
             Self.timingPart("transcription", transcriptionReadySeconds),
             Self.timingPart("paste-start", pasteStartingSeconds),
             Self.timingPart("paste-complete", pasteCompletedSeconds),
+            Self.timingPart("returned", pipelineReturnedSeconds),
+            Self.timingPart("idle", idleSeconds),
             Self.timingPart("saved", savedSeconds)
         ].compactMap { $0 }
         let timingSummary = timingParts.isEmpty ? "" : " | \(timingParts.joined(separator: ", "))"
@@ -279,6 +290,10 @@ struct RollingBufferQuickReleaseClaimSnapshot: Equatable {
             pasteStartingSeconds = elapsedSeconds
         case .pasteCompleted:
             pasteCompletedSeconds = elapsedSeconds
+        case .pipelineReturned:
+            pipelineReturnedSeconds = elapsedSeconds
+        case .idle:
+            idleSeconds = elapsedSeconds
         case .saved:
             savedSeconds = elapsedSeconds
         }
@@ -307,6 +322,8 @@ final class RollingBufferPreloadRuntimeDiagnostics {
         transcriptionReadySeconds: nil,
         pasteStartingSeconds: nil,
         pasteCompletedSeconds: nil,
+        pipelineReturnedSeconds: nil,
+        idleSeconds: nil,
         savedSeconds: nil
     )
 
@@ -328,6 +345,8 @@ final class RollingBufferPreloadRuntimeDiagnostics {
             transcriptionReadySeconds: nil,
             pasteStartingSeconds: nil,
             pasteCompletedSeconds: nil,
+            pipelineReturnedSeconds: nil,
+            idleSeconds: nil,
             savedSeconds: nil
         )
     }

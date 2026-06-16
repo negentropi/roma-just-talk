@@ -224,7 +224,7 @@ final class RollingBufferPreloadCoordinator {
               currentLanguage == selectedLanguage,
               configuration.preRunFinalization else {
             if currentSession != nil || state == .starting || state == .active {
-                resetPreloadState(cancelSession: true, keepLeadIn: false)
+                resetPreloadState(cancelSession: true, keepLeadIn: true)
             }
             return nil
         }

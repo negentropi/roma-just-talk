@@ -568,6 +568,35 @@ struct RollingBufferPreloadCoordinatorTests {
     }
 
     @MainActor
+    @Test func invalidPreloadKeepsLeadInForBufferedAudioSnapshotFallback() async {
+        let model = streamingModel()
+        let session = FakeTranscriptionSession()
+        var selectedLanguage = "en"
+
+        await withStandardRollingDefaults(for: model) { defaults in
+            setPreloadDefaults(defaults, model: model, preRunFinalization: true)
+        } run: {
+            let coordinator = makeCoordinator(
+                model: model,
+                session: session,
+                currentLanguageProvider: { selectedLanguage }
+            )
+            let chunk = Data(repeating: 4, count: 8_000)
+
+            await coordinator.processRollingChunkForTesting(chunk)
+            selectedLanguage = "de"
+
+            let claimed = await coordinator.claimPreloadedSession(for: model)
+            let snapshot = coordinator.claimBufferedAudioSnapshot()
+
+            #expect(claimed == nil)
+            #expect(session.cancelCount == 1)
+            #expect(snapshot?.audioData == chunk)
+            #expect(snapshot?.language == "de")
+        }
+    }
+
+    @MainActor
     @Test func fallbackCancelStopsUnclaimedPreload() async {
         let model = streamingModel()
         let session = FakeTranscriptionSession()

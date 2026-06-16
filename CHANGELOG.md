@@ -19,6 +19,7 @@
 - Removed fixed sleeps between simulated paste key events so completed text reaches the target app sooner.
 - Kept warmed local STT resources after successful transcription so the next recording and rolling-buffer preload avoid an immediate teardown/reload cycle.
 - Let preload-only quick releases commit an already-ready rolling-buffer STT session directly, without opening and stopping a new recorder session first.
+- Reduced the shortcut duplicate-press guard from 500ms to 80ms so valid back-to-back dictations are not ignored after the app is ready again.
 - Skipped fallback streaming setup on immediate startup-stop recordings when the selected model can transcribe the saved WAV directly.
 - Included rolling buffer preload mode, per-model opt-outs, Auto policy, duration, finalization, and VAD model settings in settings backup/import.
 - Made the pre-run finalization opt-out also skip rolling-buffer STT pre-run work instead of warming an unusable session.

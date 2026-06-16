@@ -174,6 +174,52 @@ struct VoiceInkTests {
         #expect(!sessionActive)
     }
 
+    @Test @MainActor func shortcutCooldownAllowsFastBackToBackPressAfterDuplicateGuard() async throws {
+        var sessionActive = false
+        var toggleCount = 0
+
+        let handler = RecordingShortcutModeHandler(
+            logger: Logger(subsystem: "VoiceInkTests", category: "RecordingShortcutModeHandler"),
+            canHandleShortcutAction: { true },
+            isRecorderVisible: { sessionActive },
+            recordingState: { sessionActive ? .recording : .idle },
+            toggleMiniRecorder: { _ in
+                toggleCount += 1
+                sessionActive.toggle()
+            },
+            cancelRecording: {}
+        )
+
+        await handler.handleKeyDown(
+            action: .primaryRecording,
+            eventTime: 1,
+            mode: .pushToTalk
+        )
+        await handler.handleKeyUp(
+            action: .primaryRecording,
+            eventTime: 1.1,
+            mode: .pushToTalk
+        )
+
+        await handler.handleKeyDown(
+            action: .primaryRecording,
+            eventTime: 1.2,
+            mode: .pushToTalk
+        )
+        #expect(toggleCount == 2)
+
+        try await Task.sleep(nanoseconds: 100_000_000)
+
+        await handler.handleKeyDown(
+            action: .primaryRecording,
+            eventTime: 1.3,
+            mode: .pushToTalk
+        )
+
+        #expect(toggleCount == 3)
+        #expect(sessionActive)
+    }
+
     @Test @MainActor func specialModeStopsWhenNoOtherKeyWasReleased() async throws {
         var sessionActive = false
         var toggleCount = 0

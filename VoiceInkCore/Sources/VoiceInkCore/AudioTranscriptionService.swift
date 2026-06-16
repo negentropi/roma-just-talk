@@ -1,7 +1,6 @@
 import Foundation
-import VoiceInkCore
 
-protocol TranscriptionService {
+public protocol VoiceInkAudioTranscriptionService {
     func transcribeAudioFile(
         apiBaseURL: URL,
         apiKey: String,
@@ -13,16 +12,22 @@ protocol TranscriptionService {
     func verifyAPIKey(apiBaseURL: URL, _ apiKey: String) async -> Bool
 }
 
-struct RemoteTranscriptionService: TranscriptionService {
+public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionService, Sendable {
     private let transport: VoiceInkTranscriptionTransport
-    private let openAICompatibleClient = VoiceInkOpenAICompatibleTranscriptionClient()
-    private let deepgramClient = VoiceInkDeepgramTranscriptionClient()
+    private let openAICompatibleClient: VoiceInkOpenAICompatibleTranscriptionClient
+    private let deepgramClient: VoiceInkDeepgramTranscriptionClient
 
-    init(transport: VoiceInkTranscriptionTransport) {
+    public init(
+        transport: VoiceInkTranscriptionTransport,
+        openAICompatibleClient: VoiceInkOpenAICompatibleTranscriptionClient = VoiceInkOpenAICompatibleTranscriptionClient(),
+        deepgramClient: VoiceInkDeepgramTranscriptionClient = VoiceInkDeepgramTranscriptionClient()
+    ) {
         self.transport = transport
+        self.openAICompatibleClient = openAICompatibleClient
+        self.deepgramClient = deepgramClient
     }
 
-    func transcribeAudioFile(
+    public func transcribeAudioFile(
         apiBaseURL: URL,
         apiKey: String,
         model: String,
@@ -55,7 +60,7 @@ struct RemoteTranscriptionService: TranscriptionService {
         }
     }
 
-    func verifyAPIKey(apiBaseURL: URL, _ apiKey: String) async -> Bool {
+    public func verifyAPIKey(apiBaseURL: URL, _ apiKey: String) async -> Bool {
         switch transport {
         case .openAICompatible:
             return await openAICompatibleClient.verifyAPIKey(

@@ -28,7 +28,7 @@ enum WhisperTranscriptionError: Error {
     }
 }
 
-struct WhisperTranscriptionService: TranscriptionService {
+struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
     
     /// Transcribe audio file using local Whisper model
     func transcribeAudioFile(

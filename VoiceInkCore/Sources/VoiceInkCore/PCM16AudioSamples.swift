@@ -1,7 +1,10 @@
 import Foundation
 
 public enum VoiceInkPCM16Audio {
-    public static let mono16kSampleRate: Double = 16_000
+    public static let mono16kSampleRateHz = 16_000
+    public static let mono16kSampleRate = Double(mono16kSampleRateHz)
+    public static let monoChannelCount = 1
+    public static let bitsPerSample = 16
     public static let bytesPerSample = MemoryLayout<Int16>.size
     public static let wavHeaderByteCount = 44
 
@@ -38,14 +41,14 @@ public enum VoiceInkPCM16Audio {
     }
 
     public static func sampleCount(forMono16kDuration seconds: Double) -> Int {
-        Int((seconds * mono16kSampleRate).rounded())
+        Int((seconds * Double(mono16kSampleRateHz)).rounded())
     }
 
     public static func byteCount(forMono16kDuration seconds: Double) -> Int {
-        Int((seconds * mono16kSampleRate * Double(bytesPerSample)).rounded())
+        Int((seconds * Double(mono16kSampleRateHz) * Double(bytesPerSample)).rounded())
     }
 
     public static func duration(forMono16kData data: Data) -> TimeInterval {
-        TimeInterval(sampleCount(inData: data)) / mono16kSampleRate
+        TimeInterval(sampleCount(inData: data)) / Double(mono16kSampleRateHz)
     }
 }

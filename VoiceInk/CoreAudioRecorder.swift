@@ -3,6 +3,7 @@ import CoreAudio
 import AudioToolbox
 import AVFoundation
 import os
+import VoiceInkCore
 
 final class PCMPreRollBuffer: @unchecked Sendable {
     private let lock = NSLock()
@@ -54,7 +55,7 @@ final class PCMPreRollBuffer: @unchecked Sendable {
 
         guard availableSamples > 0 else { return Data() }
 
-        let byteCount = availableSamples * MemoryLayout<Int16>.size
+        let byteCount = availableSamples * VoiceInkPCM16Audio.bytesPerSample
         let start = (writeIndex - availableSamples + capacity) % capacity
         let firstSampleCount = min(availableSamples, capacity - start)
         let secondSampleCount = availableSamples - firstSampleCount
@@ -63,7 +64,7 @@ final class PCMPreRollBuffer: @unchecked Sendable {
         data.withUnsafeMutableBytes { rawBuffer in
             guard let destination = rawBuffer.baseAddress else { return }
 
-            let firstByteCount = firstSampleCount * MemoryLayout<Int16>.size
+            let firstByteCount = firstSampleCount * VoiceInkPCM16Audio.bytesPerSample
             destination.copyMemory(
                 from: UnsafeRawPointer(samples.advanced(by: start)),
                 byteCount: firstByteCount
@@ -72,7 +73,7 @@ final class PCMPreRollBuffer: @unchecked Sendable {
             if secondSampleCount > 0 {
                 destination.advanced(by: firstByteCount).copyMemory(
                     from: UnsafeRawPointer(samples),
-                    byteCount: secondSampleCount * MemoryLayout<Int16>.size
+                    byteCount: secondSampleCount * VoiceInkPCM16Audio.bytesPerSample
                 )
             }
         }
@@ -142,14 +143,14 @@ enum PCM16WAVFileWriter {
         }
 
         var outputFormat = AudioStreamBasicDescription(
-            mSampleRate: 16_000,
+            mSampleRate: VoiceInkPCM16Audio.mono16kSampleRate,
             mFormatID: kAudioFormatLinearPCM,
             mFormatFlags: kAudioFormatFlagIsSignedInteger | kAudioFormatFlagIsPacked,
-            mBytesPerPacket: 2,
+            mBytesPerPacket: UInt32(VoiceInkPCM16Audio.bytesPerSample),
             mFramesPerPacket: 1,
-            mBytesPerFrame: 2,
-            mChannelsPerFrame: 1,
-            mBitsPerChannel: 16,
+            mBytesPerFrame: UInt32(VoiceInkPCM16Audio.bytesPerSample),
+            mChannelsPerFrame: UInt32(VoiceInkPCM16Audio.monoChannelCount),
+            mBitsPerChannel: UInt32(VoiceInkPCM16Audio.bitsPerSample),
             mReserved: 0
         )
 
@@ -178,15 +179,15 @@ enum PCM16WAVFileWriter {
             throw CoreAudioRecorderError.failedToSetFileFormat(status: status)
         }
 
-        guard data.count >= MemoryLayout<Int16>.size else { return }
-        let frameCount = UInt32(data.count / MemoryLayout<Int16>.size)
+        guard data.count >= VoiceInkPCM16Audio.bytesPerSample else { return }
+        let frameCount = UInt32(VoiceInkPCM16Audio.sampleCount(inData: data))
         var mutableData = data
         let writeStatus: OSStatus = mutableData.withUnsafeMutableBytes { rawBuffer in
             var outputBufferList = AudioBufferList(
                 mNumberBuffers: 1,
                 mBuffers: AudioBuffer(
-                    mNumberChannels: 1,
-                    mDataByteSize: frameCount * UInt32(MemoryLayout<Int16>.size),
+                    mNumberChannels: UInt32(VoiceInkPCM16Audio.monoChannelCount),
+                    mDataByteSize: frameCount * UInt32(VoiceInkPCM16Audio.bytesPerSample),
                     mData: rawBuffer.baseAddress
                 )
             )
@@ -214,12 +215,12 @@ final class CoreAudioRecorder: @unchecked Sendable {
     private var isRecording = false
     private var currentDeviceID: AudioDeviceID = 0
     private var recordingURL: URL?
-    private let preRollSampleRate = 16_000
+    private let preRollSampleRate = VoiceInkPCM16Audio.mono16kSampleRateHz
     private let preRollBuffer = PCMPreRollBuffer(
-        sampleRate: 16_000,
+        sampleRate: VoiceInkPCM16Audio.mono16kSampleRateHz,
         seconds: RollingBufferPreloadSettings.defaultBufferDurationSeconds
     )
-    private let preRollStreamingChunkBytes = 3_200
+    private let preRollStreamingChunkBytes = VoiceInkPCM16Audio.byteCount(forMono16kDuration: 0.1)
     private var preRollStreamingGate = PreRollStreamingEmissionGate()
 
     // Device format (what the hardware provides)
@@ -663,14 +664,14 @@ final class CoreAudioRecorder: @unchecked Sendable {
 
         // Configure output format: 16kHz, mono, PCM Int16
         outputFormat = AudioStreamBasicDescription(
-            mSampleRate: 16000.0,
+            mSampleRate: VoiceInkPCM16Audio.mono16kSampleRate,
             mFormatID: kAudioFormatLinearPCM,
             mFormatFlags: kAudioFormatFlagIsSignedInteger | kAudioFormatFlagIsPacked,
-            mBytesPerPacket: 2,
+            mBytesPerPacket: UInt32(VoiceInkPCM16Audio.bytesPerSample),
             mFramesPerPacket: 1,
-            mBytesPerFrame: 2,
-            mChannelsPerFrame: 1,
-            mBitsPerChannel: 16,
+            mBytesPerFrame: UInt32(VoiceInkPCM16Audio.bytesPerSample),
+            mChannelsPerFrame: UInt32(VoiceInkPCM16Audio.monoChannelCount),
+            mBitsPerChannel: UInt32(VoiceInkPCM16Audio.bitsPerSample),
             mReserved: 0
         )
 
@@ -982,8 +983,8 @@ final class CoreAudioRecorder: @unchecked Sendable {
         var outputBufferList = AudioBufferList(
             mNumberBuffers: 1,
             mBuffers: AudioBuffer(
-                mNumberChannels: 1,
-                mDataByteSize: outputFrameCount * 2,
+                mNumberChannels: UInt32(VoiceInkPCM16Audio.monoChannelCount),
+                mDataByteSize: outputFrameCount * UInt32(VoiceInkPCM16Audio.bytesPerSample),
                 mData: outputBuffer
             )
         )
@@ -1002,7 +1003,7 @@ final class CoreAudioRecorder: @unchecked Sendable {
             }
         }
         if isRecording, let onAudioChunk {
-            let byteCount = Int(outputFrameCount) * MemoryLayout<Int16>.size
+            let byteCount = Int(outputFrameCount) * VoiceInkPCM16Audio.bytesPerSample
             let data = Data(bytes: outputBuffer, count: byteCount)
             if preRollStreamingGate.queueLiveChunkIfNeeded(data) {
                 queuedForPreRollStreaming = true
@@ -1020,7 +1021,7 @@ final class CoreAudioRecorder: @unchecked Sendable {
             }
             rollingAudioChunkHandler?(audioChunkData)
         } else if let rollingAudioChunkHandler {
-            let byteCount = Int(outputFrameCount) * MemoryLayout<Int16>.size
+            let byteCount = Int(outputFrameCount) * VoiceInkPCM16Audio.bytesPerSample
             let data = Data(bytes: outputBuffer, count: byteCount)
             rollingAudioChunkHandler(data)
         }
@@ -1033,16 +1034,16 @@ final class CoreAudioRecorder: @unchecked Sendable {
 
     private func writePCMDataToFile(_ data: Data) throws {
         guard let file = audioFile else { return }
-        guard data.count >= MemoryLayout<Int16>.size else { return }
+        guard data.count >= VoiceInkPCM16Audio.bytesPerSample else { return }
 
-        let frameCount = UInt32(data.count / MemoryLayout<Int16>.size)
+        let frameCount = UInt32(VoiceInkPCM16Audio.sampleCount(inData: data))
         var mutableData = data
         let writeStatus: OSStatus = mutableData.withUnsafeMutableBytes { rawBuffer in
             var outputBufferList = AudioBufferList(
                 mNumberBuffers: 1,
                 mBuffers: AudioBuffer(
-                    mNumberChannels: 1,
-                    mDataByteSize: frameCount * UInt32(MemoryLayout<Int16>.size),
+                    mNumberChannels: UInt32(VoiceInkPCM16Audio.monoChannelCount),
+                    mDataByteSize: frameCount * UInt32(VoiceInkPCM16Audio.bytesPerSample),
                     mData: rawBuffer.baseAddress
                 )
             )
@@ -1061,7 +1062,7 @@ final class CoreAudioRecorder: @unchecked Sendable {
         var offset = 0
         while offset < data.count {
             var length = min(preRollStreamingChunkBytes, data.count - offset)
-            if length % MemoryLayout<Int16>.size != 0 {
+            if length % VoiceInkPCM16Audio.bytesPerSample != 0 {
                 length -= 1
             }
             guard length > 0 else { break }

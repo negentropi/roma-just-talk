@@ -1,4 +1,5 @@
 import SwiftUI
+import VoiceInkCore
 
 struct RecordingSheetView: View {
     @ObservedObject var recordingManager: RecordingManager

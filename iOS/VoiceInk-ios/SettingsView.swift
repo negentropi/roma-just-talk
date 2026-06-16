@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import VoiceInkCore
 
 struct SettingsView: View {
     @StateObject private var settings = AppSettings.shared
@@ -169,4 +170,3 @@ private struct ModeRowView: View {
         .padding(.vertical, 4)
     }
 }
-

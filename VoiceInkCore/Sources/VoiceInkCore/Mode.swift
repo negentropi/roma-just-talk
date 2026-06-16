@@ -1,27 +1,26 @@
 import Foundation
-import VoiceInkCore
 
-struct Mode: Identifiable, Codable {
-    let id: UUID
-    var name: String
-    
-    // Transcription settings
-    var transcriptionProvider: VoiceInkProviderKind
-    var transcriptionModel: String
-    
-    // Post-processing settings
-    var isPostProcessingEnabled: Bool
-    var postProcessingProvider: VoiceInkProviderKind
-    var postProcessingModel: String
-    var promptTemplate: VoiceInkPostProcessingPromptTemplate
-    
-    init(name: String, 
-         transcriptionProvider: VoiceInkProviderKind = .groq,
-         transcriptionModel: String? = nil,
-         isPostProcessingEnabled: Bool = false,
-         postProcessingProvider: VoiceInkProviderKind = .groq,
-         postProcessingModel: String? = nil,
-         promptTemplate: VoiceInkPostProcessingPromptTemplate? = nil) {
+public struct Mode: Identifiable, Codable {
+    public let id: UUID
+    public var name: String
+
+    public var transcriptionProvider: VoiceInkProviderKind
+    public var transcriptionModel: String
+
+    public var isPostProcessingEnabled: Bool
+    public var postProcessingProvider: VoiceInkProviderKind
+    public var postProcessingModel: String
+    public var promptTemplate: VoiceInkPostProcessingPromptTemplate
+
+    public init(
+        name: String,
+        transcriptionProvider: VoiceInkProviderKind = .groq,
+        transcriptionModel: String? = nil,
+        isPostProcessingEnabled: Bool = false,
+        postProcessingProvider: VoiceInkProviderKind = .groq,
+        postProcessingModel: String? = nil,
+        promptTemplate: VoiceInkPostProcessingPromptTemplate? = nil
+    ) {
         self.id = UUID()
         self.name = name
         self.transcriptionProvider = transcriptionProvider
@@ -37,12 +36,11 @@ struct Mode: Identifiable, Codable {
             ?? VoiceInkAIModelCatalog.firstAvailableModel(for: .groq)
         self.promptTemplate = promptTemplate ?? VoiceInkPostProcessingPromptTemplate(type: .summary)
     }
-    
-    /// Legacy support for custom prompts - creates a custom template
+
     @available(*, deprecated, message: "Use promptTemplate instead")
-    var customPrompt: String {
+    public var customPrompt: String {
         get {
-            return promptTemplate.type == .custom ? promptTemplate.customPrompt : ""
+            promptTemplate.type == .custom ? promptTemplate.customPrompt : ""
         }
         set {
             if !newValue.isEmpty {
@@ -50,9 +48,8 @@ struct Mode: Identifiable, Codable {
             }
         }
     }
-    
-    /// Returns the effective prompt to use for post-processing
-    var effectivePrompt: String {
-        return promptTemplate.effectivePrompt
+
+    public var effectivePrompt: String {
+        promptTemplate.effectivePrompt
     }
 }

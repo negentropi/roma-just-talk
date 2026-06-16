@@ -1,4 +1,5 @@
 import Foundation
+import VoiceInkCore
 
 // Enum to differentiate between model providers
 enum ModelProvider: String, Codable, Hashable, CaseIterable {
@@ -210,7 +211,7 @@ struct WhisperModel: TranscriptionModel {
     let provider: ModelProvider = .whisper
 
     var downloadURL: String {
-        "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/\(filename)"
+        VoiceInkWhisperModelFiles.downloadURLString(forFilename: filename)
     }
 
     var filename: String {

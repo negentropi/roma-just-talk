@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import VoiceInkCore
 
 enum ModelDownloadError: Error {
     case invalidURL
@@ -31,14 +32,16 @@ struct WhisperModel: Identifiable, Codable {
         FileManager.default.fileExists(atPath: fileURL.path)
     }
     
+    private static let baseModelSpec = VoiceInkWhisperModelFiles.baseModel
+
     // Base model for initial implementation
     static let baseModel = WhisperModel(
-        name: "base",
-        displayName: "Whisper Base Model",
-        downloadURL: "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin",
-        filename: "ggml-base.bin",
-        size: "142 MB",
-        description: "Multilingual model with good balance of speed and accuracy"
+        name: baseModelSpec.modelName,
+        displayName: baseModelSpec.displayName,
+        downloadURL: baseModelSpec.downloadURLString,
+        filename: baseModelSpec.filename,
+        size: baseModelSpec.size,
+        description: baseModelSpec.description
     )
     
     // Future models can be added here

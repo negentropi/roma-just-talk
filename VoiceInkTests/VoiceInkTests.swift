@@ -7,6 +7,7 @@
 
 import Testing
 import Foundation
+import SwiftData
 import Carbon.HIToolbox
 import os
 @testable import VoiceInk
@@ -88,6 +89,49 @@ struct VoiceInkTests {
         #expect(APIKeyManager.resolveAPIKeyReference("${ELEVENLABS_API_KEY}", environment: environment) == "test-key")
         #expect(APIKeyManager.resolveAPIKeyReference("literal-key", environment: environment) == "literal-key")
         #expect(APIKeyManager.resolveAPIKeyReference("$MISSING", environment: environment) == nil)
+    }
+
+    @Test @MainActor func wordReplacementServiceUsesWarmedCacheUntilInvalidated() throws {
+        let container = try makeWordReplacementContainer()
+        let context = container.mainContext
+        let service = WordReplacementService.shared
+        service.invalidateCache()
+        defer { service.invalidateCache() }
+
+        context.insert(WordReplacement(originalText: "voice ink", replacementText: "roma"))
+        try context.save()
+
+        service.warmCache(using: context)
+        #expect(service.applyReplacements(to: "voice ink", using: context) == "roma")
+
+        context.insert(WordReplacement(originalText: "quick release", replacementText: "instant paste"))
+        try context.save()
+
+        #expect(service.applyReplacements(to: "quick release", using: context) == "quick release")
+
+        service.invalidateCache()
+        #expect(service.applyReplacements(to: "quick release", using: context) == "instant paste")
+    }
+
+    @Test @MainActor func dictionaryWordReplacementSaveInvalidatesWarmedCache() throws {
+        let container = try makeWordReplacementContainer()
+        let context = container.mainContext
+        let service = WordReplacementService.shared
+        service.invalidateCache()
+        defer { service.invalidateCache() }
+
+        service.warmCache(using: context)
+        #expect(service.applyReplacements(to: "voice ink", using: context) == "voice ink")
+
+        let error = DictionaryService.addWordReplacement(
+            original: "voice ink",
+            replacement: "roma",
+            existing: [],
+            context: context
+        )
+
+        #expect(error == nil)
+        #expect(service.applyReplacements(to: "voice ink", using: context) == "roma")
     }
 
     @Test @MainActor func noneRecorderStyleStartsSessionWithoutShowingRecorderWindow() async throws {
@@ -1205,4 +1249,9 @@ struct VoiceInkTests {
         #expect(recordingState == .transcribing)
     }
 
+    private func makeWordReplacementContainer() throws -> ModelContainer {
+        let schema = Schema([WordReplacement.self])
+        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+        return try ModelContainer(for: schema, configurations: [configuration])
+    }
 }

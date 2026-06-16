@@ -330,6 +330,9 @@ enum BackupImporter {
 
         do {
             try modelContext.save()
+            if insertedReplacements > 0 {
+                WordReplacementService.shared.invalidateCache()
+            }
             print("Successfully imported \(insertedWords) vocabulary words and \(insertedReplacements) word replacements to SwiftData.")
             if skippedInvalidReplacements > 0 {
                 print("Skipped \(skippedInvalidReplacements) invalid word replacements from the imported file.")

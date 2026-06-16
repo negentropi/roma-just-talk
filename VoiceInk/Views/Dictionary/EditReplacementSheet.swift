@@ -162,6 +162,7 @@ struct EditReplacementSheet: View {
 
         do {
             try modelContext.save()
+            WordReplacementService.shared.invalidateCache()
             dismiss()
         } catch {
             alertMessage = "Failed to save changes: \(error.localizedDescription)"

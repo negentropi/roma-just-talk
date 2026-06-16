@@ -88,6 +88,7 @@ enum DictionaryService {
         context.insert(entry)
         do {
             try context.save()
+            WordReplacementService.shared.invalidateCache()
             return nil
         } catch {
             context.delete(entry)

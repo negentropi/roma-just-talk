@@ -203,6 +203,7 @@ struct WordReplacementView: View {
 
         do {
             try modelContext.save()
+            WordReplacementService.shared.invalidateCache()
         } catch {
             // Rollback the delete to restore UI consistency
             modelContext.rollback()
@@ -358,4 +359,4 @@ struct ReplacementRow: View {
         .padding(.vertical, 8)
         .padding(.horizontal, 4)
     }
-} 
+}

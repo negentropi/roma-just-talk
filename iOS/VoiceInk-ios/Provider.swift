@@ -12,6 +12,10 @@ enum Provider: String, CaseIterable, Codable, Identifiable {
 
     var id: String { rawValue }
 
+    var displayName: String {
+        coreKind.displayName
+    }
+
     var coreKind: VoiceInkProviderKind {
         switch self {
         case .groq:

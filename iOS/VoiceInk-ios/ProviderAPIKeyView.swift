@@ -18,9 +18,9 @@ struct ProviderAPIKeyView: View {
 
     var body: some View {
         Form {
-            Section(header: Text("\(provider.rawValue) API Key")) {
+            Section(header: Text("\(provider.displayName) API Key")) {
                 if editingKey {
-                    SecureField("\(provider.rawValue) API Key", text: $tempKey)
+                    SecureField("\(provider.displayName) API Key", text: $tempKey)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                     HStack {
@@ -65,7 +65,7 @@ struct ProviderAPIKeyView: View {
                 Link(destination: provider.consoleURL) {
                     HStack {
                         Image(systemName: "link")
-                        Text("\(provider.rawValue) API Console")
+                        Text("\(provider.displayName) API Console")
                         Spacer()
                         Image(systemName: "arrow.up.right.square")
                             .foregroundStyle(.secondary)
@@ -73,7 +73,7 @@ struct ProviderAPIKeyView: View {
                 }
             }
         }
-        .navigationTitle(provider.rawValue)
+        .navigationTitle(provider.displayName)
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             tempKey = currentAPIKey()

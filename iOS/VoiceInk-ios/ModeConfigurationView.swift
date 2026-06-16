@@ -46,7 +46,7 @@ struct ModeConfigurationView: View {
             Section(header: Text("Transcription")) {
                 Picker("Provider", selection: $mode.transcriptionProvider) {
                     ForEach(availableTranscriptionProviders) { provider in
-                        Text(provider.rawValue).tag(provider)
+                        Text(provider.displayName).tag(provider)
                     }
                 }
                 
@@ -73,7 +73,7 @@ struct ModeConfigurationView: View {
                 if mode.isPostProcessingEnabled {
                     Picker("Provider", selection: $mode.postProcessingProvider) {
                         ForEach(availablePostProcessingProviders) { provider in
-                            Text(provider.rawValue).tag(provider)
+                            Text(provider.displayName).tag(provider)
                         }
                     }
                     

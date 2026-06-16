@@ -25,6 +25,25 @@ public enum VoiceInkProviderKind: String, CaseIterable, Sendable {
     case localWhisper
     case voiceInk
 
+    public var displayName: String {
+        switch self {
+        case .groq:
+            return "Groq"
+        case .openAI:
+            return "OpenAI"
+        case .deepgram:
+            return "Deepgram"
+        case .cerebras:
+            return "Cerebras"
+        case .gemini:
+            return "Gemini"
+        case .localWhisper:
+            return "Local (Whisper)"
+        case .voiceInk:
+            return "VoiceInk"
+        }
+    }
+
     public var apiBaseURL: URL {
         switch self {
         case .groq:

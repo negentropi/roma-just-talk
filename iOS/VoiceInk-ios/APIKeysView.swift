@@ -8,7 +8,7 @@ struct APIKeysView: View {
             ForEach(Provider.allCases.filter(\.requiresUserAPIKey)) { provider in
                 NavigationLink(destination: ProviderAPIKeyView(provider: provider)) {
                     HStack {
-                        Text(provider.rawValue)
+                        Text(provider.displayName)
                         Spacer()
                         if settings.isKeyVerified(for: provider) {
                             Image(systemName: "checkmark.seal.fill")

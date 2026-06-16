@@ -1,9 +1,10 @@
 import Foundation
+import VoiceInkCore
 
-struct OAChatMessage: Codable { let role: String; let content: String }
-struct OAChatRequest: Codable { let model: String; let messages: [OAChatMessage]; let temperature: Double? }
-struct OAChatChoice: Codable { let message: OAChatMessage }
-struct OAChatResponse: Codable { let choices: [OAChatChoice] }
+typealias OAChatMessage = VoiceInkOpenAICompatibleChatMessage
+typealias OAChatRequest = VoiceInkOpenAICompatibleChatRequest
+typealias OAChatChoice = VoiceInkOpenAICompatibleChatChoice
+typealias OAChatResponse = VoiceInkOpenAICompatibleChatResponse
 
 struct OpenAICompatibleClient {
     func verifyAPIKey(baseURL: URL, apiKey: String) async -> Bool {
@@ -35,5 +36,4 @@ struct OpenAICompatibleClient {
         return decoded.choices.first?.message.content ?? ""
     }
 }
-
 

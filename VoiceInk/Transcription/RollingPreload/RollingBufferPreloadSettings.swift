@@ -260,11 +260,11 @@ struct RollingBufferQuickReleaseClaimSnapshot: Equatable {
     var exportSummary: String {
         guard let updatedAt else { return displaySummary }
         let timingParts = [
-            timingPart("claim", claimElapsedSeconds),
-            timingPart("transcription", transcriptionReadySeconds),
-            timingPart("paste-start", pasteStartingSeconds),
-            timingPart("paste-complete", pasteCompletedSeconds),
-            timingPart("saved", savedSeconds)
+            Self.timingPart("claim", claimElapsedSeconds),
+            Self.timingPart("transcription", transcriptionReadySeconds),
+            Self.timingPart("paste-start", pasteStartingSeconds),
+            Self.timingPart("paste-complete", pasteCompletedSeconds),
+            Self.timingPart("saved", savedSeconds)
         ].compactMap { $0 }
         let timingSummary = timingParts.isEmpty ? "" : " | \(timingParts.joined(separator: ", "))"
         return "\(displaySummary) at \(updatedAt.formatted(date: .numeric, time: .standard))\(timingSummary)"

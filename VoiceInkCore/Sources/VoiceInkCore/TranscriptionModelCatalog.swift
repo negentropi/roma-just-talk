@@ -1,6 +1,7 @@
 public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
     case groq
     case openAI
+    case assemblyAI
     case cartesia
     case deepgram
     case elevenLabs
@@ -14,6 +15,8 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
 
     public var languageCodes: [String]? {
         switch self {
+        case .assemblyAI:
+            return ["en", "es", "de", "fr", "pt", "it"]
         case .cartesia:
             return [
                 "af", "am", "ar", "as", "az", "ba", "be", "bg", "bn", "bo",
@@ -82,7 +85,7 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
 
     public var includesAutoDetect: Bool {
         switch self {
-        case .deepgram, .elevenLabs, .mistral, .soniox, .speechmatics, .xai:
+        case .assemblyAI, .deepgram, .elevenLabs, .mistral, .soniox, .speechmatics, .xai:
             return true
         case .cartesia, .groq, .openAI, .gemini, .local, .voiceInk:
             return false
@@ -124,7 +127,7 @@ public enum VoiceInkTranscriptionModelCatalog {
 
     public static func modelNames(for provider: VoiceInkTranscriptionModelProvider) -> [String] {
         switch provider {
-        case .cartesia, .groq, .deepgram, .elevenLabs, .mistral, .gemini, .soniox, .speechmatics, .xai:
+        case .assemblyAI, .cartesia, .groq, .deepgram, .elevenLabs, .mistral, .gemini, .soniox, .speechmatics, .xai:
             return cloudModels(for: provider).map(\.name)
         case .openAI:
             return [
@@ -141,6 +144,27 @@ public enum VoiceInkTranscriptionModelCatalog {
 
     public static func cloudModels(for provider: VoiceInkTranscriptionModelProvider) -> [VoiceInkCloudTranscriptionModelSpec] {
         switch provider {
+        case .assemblyAI:
+            return [
+                VoiceInkCloudTranscriptionModelSpec(
+                    name: "universal-3-pro",
+                    displayName: "Universal-3 Pro (AssemblyAI)",
+                    description: "Highest-accuracy multilingual transcription with realtime support.",
+                    speed: 0.94,
+                    accuracy: 0.98,
+                    isMultilingual: true,
+                    supportsStreaming: true
+                ),
+                VoiceInkCloudTranscriptionModelSpec(
+                    name: "universal-streaming",
+                    displayName: "Universal-2 (AssemblyAI)",
+                    description: "Balanced multilingual transcription with auto-detect.",
+                    speed: 0.96,
+                    accuracy: 0.92,
+                    isMultilingual: true,
+                    supportsStreaming: true
+                )
+            ]
         case .cartesia:
             return [
                 VoiceInkCloudTranscriptionModelSpec(

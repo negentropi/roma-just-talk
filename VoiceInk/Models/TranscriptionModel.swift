@@ -63,6 +63,8 @@ extension ModelProvider {
             return .soniox
         case .speechmatics:
             return .speechmatics
+        case .assemblyAI:
+            return .assemblyAI
         case .xai:
             return .xai
         case .cartesia:

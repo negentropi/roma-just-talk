@@ -83,6 +83,16 @@ final class TranscriptionModelCatalogTests: XCTestCase {
         XCTAssertTrue(models.first?.supportsStreaming == true)
     }
 
+    func testAssemblyAILanguageCapabilityAndModelsAreSharedProviderMetadata() {
+        XCTAssertEqual(VoiceInkTranscriptionModelProvider.assemblyAI.languageCodes, ["en", "es", "de", "fr", "pt", "it"])
+        XCTAssertTrue(VoiceInkTranscriptionModelProvider.assemblyAI.includesAutoDetect)
+
+        let models = VoiceInkTranscriptionModelCatalog.cloudModels(for: .assemblyAI)
+        XCTAssertEqual(models.map(\.name), ["universal-3-pro", "universal-streaming"])
+        XCTAssertEqual(models.map(\.displayName), ["Universal-3 Pro (AssemblyAI)", "Universal-2 (AssemblyAI)"])
+        XCTAssertEqual(models.map(\.supportsStreaming), [true, true])
+    }
+
     func testOpenAICompatibleProvidersUseAllLanguagesWithoutAutoDetectFlag() {
         XCTAssertNil(VoiceInkTranscriptionModelProvider.groq.languageCodes)
         XCTAssertFalse(VoiceInkTranscriptionModelProvider.groq.includesAutoDetect)

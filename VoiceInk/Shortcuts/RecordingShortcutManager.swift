@@ -190,8 +190,11 @@ class RecordingShortcutManager: ObservableObject {
             toggleMiniRecorder: { powerModeId in
                 await recorderUIManager.toggleMiniRecorder(powerModeId: powerModeId)
             },
-            preparePowerModeConfiguration: { powerModeId in
-                engine.preparePowerModeConfiguration(powerModeId: powerModeId)
+            prepareQuickReleaseContext: { powerModeId in
+                engine.prepareQuickReleaseContext(powerModeId: powerModeId)
+            },
+            discardQuickReleaseContext: {
+                engine.discardPreparedQuickReleaseContext()
             },
             commitReadyRollingBufferPreload: { powerModeId in
                 await engine.commitReadyRollingBufferPreload(powerModeId: powerModeId)
@@ -531,7 +534,8 @@ final class RecordingShortcutModeHandler {
     private let isRecorderVisible: @MainActor () -> Bool
     private let recordingState: @MainActor () -> RecordingState
     private let toggleMiniRecorder: @MainActor (UUID?) async -> Void
-    private let preparePowerModeConfiguration: @MainActor (UUID?) -> Void
+    private let prepareQuickReleaseContext: @MainActor (UUID?) -> Void
+    private let discardQuickReleaseContext: @MainActor () -> Void
     private let commitReadyRollingBufferPreload: @MainActor (UUID?) async -> Bool
     private let cancelRecording: @MainActor () async -> Void
 
@@ -554,7 +558,8 @@ final class RecordingShortcutModeHandler {
         isRecorderVisible: @escaping @MainActor () -> Bool,
         recordingState: @escaping @MainActor () -> RecordingState,
         toggleMiniRecorder: @escaping @MainActor (UUID?) async -> Void,
-        preparePowerModeConfiguration: @escaping @MainActor (UUID?) -> Void = { _ in },
+        prepareQuickReleaseContext: @escaping @MainActor (UUID?) -> Void = { _ in },
+        discardQuickReleaseContext: @escaping @MainActor () -> Void = {},
         commitReadyRollingBufferPreload: @escaping @MainActor (UUID?) async -> Bool = { _ in false },
         cancelRecording: @escaping @MainActor () async -> Void
     ) {
@@ -563,12 +568,14 @@ final class RecordingShortcutModeHandler {
         self.isRecorderVisible = isRecorderVisible
         self.recordingState = recordingState
         self.toggleMiniRecorder = toggleMiniRecorder
-        self.preparePowerModeConfiguration = preparePowerModeConfiguration
+        self.prepareQuickReleaseContext = prepareQuickReleaseContext
+        self.discardQuickReleaseContext = discardQuickReleaseContext
         self.commitReadyRollingBufferPreload = commitReadyRollingBufferPreload
         self.cancelRecording = cancelRecording
     }
 
     func reset() {
+        discardQuickReleaseContext()
         isShortcutPressed = false
         shortcutPressStartTime = nil
         isHandsFreeRecording = false
@@ -609,7 +616,7 @@ final class RecordingShortcutModeHandler {
                 await startRecordingIfNeeded(mode: mode, powerModeId: powerModeId)
             case .preloadOnly:
                 if canHandleShortcutAction(), !isRecorderVisible() {
-                    preparePowerModeConfiguration(powerModeId)
+                    prepareQuickReleaseContext(powerModeId)
                 }
                 logger.notice("handleShortcutKeyDown: preloading special shortcut without starting recording")
             }
@@ -658,6 +665,9 @@ final class RecordingShortcutModeHandler {
                 (!isPreloadOnly && !hasTypingEvidence && pressDuration < minimumSpecialNoEvidencePressDuration)
 
             if hasTypingEvidence || shouldFailClosed {
+                if isPreloadOnly {
+                    discardQuickReleaseContext()
+                }
                 logger.notice("handleShortcutKeyUp: cancelling special shortcut; unsafe key evidence")
                 if isRecorderVisible() {
                     await cancelRecording()
@@ -732,11 +742,15 @@ final class RecordingShortcutModeHandler {
     }
 
     private func commitPreloadedSpecialShortcut(powerModeId: UUID?) async {
-        guard canHandleShortcutAction() else { return }
+        guard canHandleShortcutAction() else {
+            discardQuickReleaseContext()
+            return
+        }
         if await commitReadyRollingBufferPreload(powerModeId) {
             return
         }
 
+        discardQuickReleaseContext()
         await toggleMiniRecorder(powerModeId)
 
         let deadline = Date().addingTimeInterval(1.5)

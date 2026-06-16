@@ -15,9 +15,10 @@ struct RollingBufferPreloadClaim {
     }
 }
 
-private struct PreparedPowerModeConfiguration {
+private struct PreparedQuickReleaseContext {
     let powerModeId: UUID?
-    let task: Task<PowerModeConfig?, Never>
+    let powerModeTask: Task<PowerModeConfig?, Never>
+    let cursorContextTask: Task<String?, Never>
 
     func matches(powerModeId: UUID?) -> Bool {
         self.powerModeId == powerModeId
@@ -49,7 +50,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
     private let rollingBufferPreloadCoordinator: RollingBufferPreloadCoordinator
     let enhancementService: AIEnhancementService?
     private let pipeline: TranscriptionPipeline
-    private var preparedPowerModeConfiguration: PreparedPowerModeConfiguration?
+    private var preparedQuickReleaseContext: PreparedQuickReleaseContext?
 
     let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "VoiceInkEngine")
 
@@ -356,19 +357,19 @@ class VoiceInkEngine: NSObject, ObservableObject {
         )
 
         guard recordingState == .idle else {
-            discardPreparedPowerModeConfiguration()
+            discardPreparedQuickReleaseContext()
             logger.notice("Latency trace preload commit unavailable operation=\(latencyTrace.operation, privacy: .public) reason=state elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
             return false
         }
 
         guard let model = transcriptionModelManager.currentTranscriptionModel else {
-            discardPreparedPowerModeConfiguration()
+            discardPreparedQuickReleaseContext()
             logger.notice("Latency trace preload commit unavailable operation=\(latencyTrace.operation, privacy: .public) reason=no-model elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
             return false
         }
 
         guard let claimedPreload = await rollingBufferPreloadCoordinator.claimPreloadedSession(for: model) else {
-            discardPreparedPowerModeConfiguration()
+            discardPreparedQuickReleaseContext()
             logger.notice("Latency trace preload commit unavailable operation=\(latencyTrace.operation, privacy: .public) reason=no-claim elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
             return false
         }
@@ -380,7 +381,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
             language: claimedPreload.language
         )
 
-        await applyPowerModeConfiguration(powerModeId: powerModeId)
+        let preparedContext = takePreparedQuickReleaseContext(powerModeId: powerModeId)
+        await applyPowerModeConfiguration(powerModeId: powerModeId, preparedContext: preparedContext)
         logger.notice("Latency trace active window ready operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
 
         guard let currentModel = transcriptionModelManager.currentTranscriptionModel,
@@ -424,7 +426,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
                 audioURL: permanentURL,
                 audioFileReadyTask: audioFileReadyTask,
                 latencyTrace: latencyTrace,
-                deferHistoryInsertUntilSave: true
+                deferHistoryInsertUntilSave: true,
+                preparedCursorTextContext: preparedContext?.cursorContextTask
             )
             return true
         } catch {
@@ -435,29 +438,44 @@ class VoiceInkEngine: NSObject, ObservableObject {
         }
     }
 
-    func preparePowerModeConfiguration(powerModeId: UUID? = nil) {
-        preparedPowerModeConfiguration = PreparedPowerModeConfiguration(
+    func prepareQuickReleaseContext(powerModeId: UUID? = nil) {
+        preparedQuickReleaseContext = PreparedQuickReleaseContext(
             powerModeId: powerModeId,
-            task: Task { @MainActor in
-                await ActiveWindowService.shared.resolveConfiguration(powerModeId: powerModeId)
+            powerModeTask: Task { @MainActor in
+                await ActiveWindowService.shared.resolveConfiguration(
+                    powerModeId: powerModeId,
+                    updateCurrentApplication: false
+                )
+            },
+            cursorContextTask: Task { @MainActor in
+                CursorTextContextReader.textBeforeCursor()
             }
         )
     }
 
-    private func discardPreparedPowerModeConfiguration() {
-        preparedPowerModeConfiguration = nil
+    func discardPreparedQuickReleaseContext() {
+        preparedQuickReleaseContext = nil
     }
 
-    private func applyPowerModeConfiguration(powerModeId: UUID?) async {
-        if let preparedPowerModeConfiguration,
-           preparedPowerModeConfiguration.matches(powerModeId: powerModeId) {
-            let config = await preparedPowerModeConfiguration.task.value
-            self.preparedPowerModeConfiguration = nil
+    private func takePreparedQuickReleaseContext(powerModeId: UUID?) -> PreparedQuickReleaseContext? {
+        defer { preparedQuickReleaseContext = nil }
+        guard let preparedQuickReleaseContext,
+              preparedQuickReleaseContext.matches(powerModeId: powerModeId) else {
+            return nil
+        }
+        return preparedQuickReleaseContext
+    }
+
+    private func applyPowerModeConfiguration(
+        powerModeId: UUID?,
+        preparedContext: PreparedQuickReleaseContext?
+    ) async {
+        if let preparedContext {
+            let config = await preparedContext.powerModeTask.value
             await ActiveWindowService.shared.applyResolvedConfiguration(config)
             return
         }
 
-        preparedPowerModeConfiguration = nil
         await ActiveWindowService.shared.applyConfiguration(powerModeId: powerModeId)
     }
 
@@ -485,7 +503,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
         audioURL: URL,
         audioFileReadyTask: Task<Void, Error>? = nil,
         latencyTrace: TranscriptionLatencyTrace? = nil,
-        deferHistoryInsertUntilSave: Bool = false
+        deferHistoryInsertUntilSave: Bool = false,
+        preparedCursorTextContext: Task<String?, Never>? = nil
     ) async {
         guard let model = transcriptionModelManager.currentTranscriptionModel else {
             if deferHistoryInsertUntilSave {
@@ -526,7 +545,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
             },
             audioFileReadyTask: audioFileReadyTask,
             latencyTrace: latencyTrace,
-            deferHistoryInsertUntilSave: deferHistoryInsertUntilSave
+            deferHistoryInsertUntilSave: deferHistoryInsertUntilSave,
+            preparedCursorTextContext: preparedCursorTextContext
         )
 
         let didFinishActivePipeline = activePipelineTranscriptionID == transcriptionID

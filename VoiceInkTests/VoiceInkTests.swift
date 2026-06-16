@@ -1216,7 +1216,8 @@ struct VoiceInkTests {
         var sessionActive = false
         var toggleCount = 0
         var directCommitCount = 0
-        var preparePowerModeCount = 0
+        var prepareQuickReleaseCount = 0
+        var discardQuickReleaseCount = 0
 
         let handler = RecordingShortcutModeHandler(
             logger: Logger(subsystem: "VoiceInkTests", category: "RecordingShortcutModeHandler"),
@@ -1233,8 +1234,11 @@ struct VoiceInkTests {
                     sessionActive = true
                 }
             },
-            preparePowerModeConfiguration: { _ in
-                preparePowerModeCount += 1
+            prepareQuickReleaseContext: { _ in
+                prepareQuickReleaseCount += 1
+            },
+            discardQuickReleaseContext: {
+                discardQuickReleaseCount += 1
             },
             commitReadyRollingBufferPreload: { _ in
                 directCommitCount += 1
@@ -1262,7 +1266,7 @@ struct VoiceInkTests {
 
         #expect(toggleCount == 0)
         #expect(recordingState == .idle)
-        #expect(preparePowerModeCount == 1)
+        #expect(prepareQuickReleaseCount == 1)
 
         await handler.handleKeyUp(
             action: .primaryRecording,
@@ -1274,7 +1278,8 @@ struct VoiceInkTests {
 
         #expect(directCommitCount == 1)
         #expect(toggleCount == 0)
-        #expect(preparePowerModeCount == 1)
+        #expect(prepareQuickReleaseCount == 1)
+        #expect(discardQuickReleaseCount == 0)
         #expect(recordingState == .transcribing)
     }
 
@@ -1283,7 +1288,8 @@ struct VoiceInkTests {
         var sessionActive = false
         var toggleCount = 0
         var directCommitCount = 0
-        var preparePowerModeCount = 0
+        var prepareQuickReleaseCount = 0
+        var discardQuickReleaseCount = 0
 
         let handler = RecordingShortcutModeHandler(
             logger: Logger(subsystem: "VoiceInkTests", category: "RecordingShortcutModeHandler"),
@@ -1300,8 +1306,11 @@ struct VoiceInkTests {
                     sessionActive = true
                 }
             },
-            preparePowerModeConfiguration: { _ in
-                preparePowerModeCount += 1
+            prepareQuickReleaseContext: { _ in
+                prepareQuickReleaseCount += 1
+            },
+            discardQuickReleaseContext: {
+                discardQuickReleaseCount += 1
             },
             commitReadyRollingBufferPreload: { _ in
                 directCommitCount += 1
@@ -1336,8 +1345,71 @@ struct VoiceInkTests {
 
         #expect(directCommitCount == 1)
         #expect(toggleCount == 2)
-        #expect(preparePowerModeCount == 1)
+        #expect(prepareQuickReleaseCount == 1)
+        #expect(discardQuickReleaseCount == 1)
         #expect(recordingState == .transcribing)
+    }
+
+    @Test @MainActor func specialModePreloadOnlyDiscardsPreparedContextOnUnsafeEvidence() async throws {
+        var recordingState = RecordingState.idle
+        var sessionActive = false
+        var toggleCount = 0
+        var directCommitCount = 0
+        var prepareQuickReleaseCount = 0
+        var discardQuickReleaseCount = 0
+
+        let handler = RecordingShortcutModeHandler(
+            logger: Logger(subsystem: "VoiceInkTests", category: "RecordingShortcutModeHandler"),
+            canHandleShortcutAction: { true },
+            isRecorderVisible: { sessionActive },
+            recordingState: { recordingState },
+            toggleMiniRecorder: { _ in
+                toggleCount += 1
+                sessionActive = true
+                recordingState = .recording
+            },
+            prepareQuickReleaseContext: { _ in
+                prepareQuickReleaseCount += 1
+            },
+            discardQuickReleaseContext: {
+                discardQuickReleaseCount += 1
+            },
+            commitReadyRollingBufferPreload: { _ in
+                directCommitCount += 1
+                return true
+            },
+            cancelRecording: {
+                recordingState = .idle
+                sessionActive = false
+            }
+        )
+
+        let specialOptions = SpecialShortcutOptions(
+            keyDownBehavior: .preloadOnly,
+            allowsKeyDownOnlyTrigger: true,
+            pasteLastTranscriptOnEmptyTap: true
+        )
+
+        await handler.handleKeyDown(
+            action: .primaryRecording,
+            eventTime: 1,
+            mode: .special,
+            specialOptions: specialOptions
+        )
+
+        await handler.handleKeyUp(
+            action: .primaryRecording,
+            eventTime: 1.2,
+            mode: .special,
+            context: ShortcutPressContext(didPressOtherKeyDuringPress: true),
+            specialOptions: specialOptions
+        )
+
+        #expect(prepareQuickReleaseCount == 1)
+        #expect(discardQuickReleaseCount == 1)
+        #expect(directCommitCount == 0)
+        #expect(toggleCount == 0)
+        #expect(recordingState == .idle)
     }
 
     private func makeWordReplacementContainer() throws -> ModelContainer {

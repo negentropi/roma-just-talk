@@ -46,6 +46,7 @@ class TranscriptionPipeline {
     ///   - onCancel: Called when cancellation is detected to cancel active session state.
     ///   - onDismiss: Called as soon as paste is initiated to dismiss the recorder panel.
     ///   - deferHistoryInsertUntilSave: Inserts the history record only at the final save boundary.
+    ///   - preparedCursorTextContext: Pre-read cursor text context for quick-release paste capitalization.
     func run(
         transcription: Transcription,
         audioURL: URL,
@@ -57,7 +58,8 @@ class TranscriptionPipeline {
         onDismiss: @escaping () async -> Void,
         audioFileReadyTask: Task<Void, Error>? = nil,
         latencyTrace: TranscriptionLatencyTrace? = nil,
-        deferHistoryInsertUntilSave: Bool = false
+        deferHistoryInsertUntilSave: Bool = false,
+        preparedCursorTextContext: Task<String?, Never>? = nil
     ) async {
         var finalPastedText: String?
         var promptDetectionResult: PromptDetectionService.PromptDetectionResult?
@@ -284,9 +286,14 @@ class TranscriptionPipeline {
             let shouldLowercase = UserDefaults.standard.bool(forKey: "LowercaseTranscription")
             if !shouldLowercase,
                ContextualCapitalizationFormatter.needsCursorContext(textToPaste) {
+                let beforeCursor = if let preparedCursorTextContext {
+                    await preparedCursorTextContext.value
+                } else {
+                    CursorTextContextReader.textBeforeCursor()
+                }
                 textToPaste = ContextualCapitalizationFormatter.format(
                     textToPaste,
-                    beforeCursor: CursorTextContextReader.textBeforeCursor()
+                    beforeCursor: beforeCursor
                 )
             }
 

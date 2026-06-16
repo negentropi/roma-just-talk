@@ -30,6 +30,7 @@
 - Added claim-to-paste latency tracing for rolling-preload quick releases so remaining delays can be measured from runtime logs.
 - Started Power Mode rule resolution on preload-only Special shortcut key-down, so quick releases avoid doing active-window and URL matching work after key-up.
 - Cached prompt trigger-word eligibility and skipped prompt detection in the common no-trigger case, reducing transcript-ready-to-paste work.
+- Pre-read cursor text context on preload-only Special shortcut key-down so contextual capitalization can avoid an Accessibility read immediately before quick-release paste.
 - Skipped browser URL lookup during automatic Power Mode selection when no enabled URL rules exist, removing an avoidable pre-pipeline quick-release delay.
 - Reduced the shortcut duplicate-press guard from 500ms to 80ms so valid back-to-back dictations are not ignored after the app is ready again.
 - Skipped fallback streaming setup on immediate startup-stop recordings when the selected model can transcribe the saved WAV directly.

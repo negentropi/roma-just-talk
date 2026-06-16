@@ -19,7 +19,10 @@ class ActiveWindowService: ObservableObject {
         self.enhancementService = enhancementService
     }
     
-    func resolveConfiguration(powerModeId: UUID? = nil) async -> PowerModeConfig? {
+    func resolveConfiguration(
+        powerModeId: UUID? = nil,
+        updateCurrentApplication: Bool = true
+    ) async -> PowerModeConfig? {
         let powerModeManager = PowerModeManager.shared
 
         if let powerModeId = powerModeId,
@@ -37,8 +40,10 @@ class ActiveWindowService: ObservableObject {
             return nil
         }
 
-        await MainActor.run {
-            currentApplication = frontmostApp
+        if updateCurrentApplication {
+            await MainActor.run {
+                currentApplication = frontmostApp
+            }
         }
 
         var configToApply: PowerModeConfig?

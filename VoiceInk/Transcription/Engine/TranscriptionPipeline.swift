@@ -311,7 +311,7 @@ class TranscriptionPipeline {
             if let latencyTrace {
                 logger.notice("Latency trace paste starting operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s chars=\(pastedText.count, privacy: .public)")
             }
-            let pasteContext = if let preparedPasteContext {
+            let pasteContext: CursorPaster.PreparedPasteContext? = if let preparedPasteContext {
                 await preparedPasteContext.value
             } else {
                 nil

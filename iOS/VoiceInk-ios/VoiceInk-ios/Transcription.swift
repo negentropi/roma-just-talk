@@ -1,11 +1,8 @@
 import Foundation
 import SwiftData
+import VoiceInkCore
 
-enum TranscriptionStatus: String, Codable, CaseIterable {
-    case pending = "pending"
-    case completed = "completed"
-    case failed = "failed"
-}
+typealias TranscriptionStatus = VoiceInkTranscriptionStatus
 
 @Model
 final class Transcription {

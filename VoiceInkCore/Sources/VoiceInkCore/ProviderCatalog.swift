@@ -28,22 +28,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
     public var id: String { rawValue }
 
     public var displayName: String {
-        switch self {
-        case .groq:
-            return "Groq"
-        case .openAI:
-            return "OpenAI"
-        case .deepgram:
-            return "Deepgram"
-        case .cerebras:
-            return "Cerebras"
-        case .gemini:
-            return "Gemini"
-        case .localWhisper:
-            return "Local (Whisper)"
-        case .voiceInk:
-            return "VoiceInk"
-        }
+        persistedValue
     }
 
     private var persistedValue: String {

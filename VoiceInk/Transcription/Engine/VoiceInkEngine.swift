@@ -137,9 +137,12 @@ class VoiceInkEngine: NSObject, ObservableObject {
             stopRequestedDuringStart = false
             partialTranscript = ""
 
-            requestRecordPermission { [self] granted in
+            await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+                requestRecordPermission { [self] granted in
                 if granted {
                     Task { @MainActor [self] in
+                        defer { continuation.resume() }
+
                         let startID = UUID()
                         self.activeRecordingStartID = startID
 
@@ -324,8 +327,10 @@ class VoiceInkEngine: NSObject, ObservableObject {
                     )
                     Task { @MainActor [self] in
                         await self.recorderUIManager?.dismissMiniRecorder()
+                        continuation.resume()
                     }
                 }
+            }
             }
         }
     }

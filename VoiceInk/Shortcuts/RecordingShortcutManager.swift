@@ -753,25 +753,12 @@ final class RecordingShortcutModeHandler {
         discardQuickReleaseContext()
         await toggleMiniRecorder(powerModeId)
 
-        let deadline = Date().addingTimeInterval(1.5)
-        while Date() < deadline {
-            switch recordingState() {
-            case .recording:
-                guard canHandleShortcutAction() else { return }
-                await toggleMiniRecorder(powerModeId)
-                return
-            case .starting:
-                guard canHandleShortcutAction() else { return }
-                await toggleMiniRecorder(powerModeId)
-                return
-            case .idle:
-                try? await Task.sleep(nanoseconds: 20_000_000)
-            case .transcribing, .enhancing, .busy:
-                return
-            }
+        switch recordingState() {
+        case .recording, .starting:
+            guard canHandleShortcutAction() else { return }
+            await toggleMiniRecorder(powerModeId)
+        case .idle, .transcribing, .enhancing, .busy:
+            return
         }
-
-        logger.error("handleShortcutKeyUp: timed out committing preloaded special shortcut")
-        await cancelRecording()
     }
 }

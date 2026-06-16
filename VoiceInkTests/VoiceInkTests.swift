@@ -1384,6 +1384,59 @@ struct VoiceInkTests {
         #expect(recordingState == .transcribing)
     }
 
+    @Test @MainActor func specialModePreloadOnlyFallbackDoesNotPollIdleRecorderStart() async throws {
+        var recordingState = RecordingState.idle
+        var sessionActive = false
+        var toggleCount = 0
+        var directCommitCount = 0
+        var cancelCount = 0
+
+        let handler = RecordingShortcutModeHandler(
+            logger: Logger(subsystem: "VoiceInkTests", category: "RecordingShortcutModeHandler"),
+            canHandleShortcutAction: { true },
+            isRecorderVisible: { sessionActive },
+            recordingState: { recordingState },
+            toggleMiniRecorder: { _ in
+                toggleCount += 1
+                recordingState = .idle
+                sessionActive = false
+            },
+            commitReadyRollingBufferPreload: { _ in
+                directCommitCount += 1
+                return false
+            },
+            cancelRecording: {
+                cancelCount += 1
+            }
+        )
+
+        let specialOptions = SpecialShortcutOptions(
+            keyDownBehavior: .preloadOnly,
+            allowsKeyDownOnlyTrigger: true,
+            pasteLastTranscriptOnEmptyTap: true
+        )
+
+        await handler.handleKeyDown(
+            action: .primaryRecording,
+            eventTime: 1,
+            mode: .special,
+            specialOptions: specialOptions
+        )
+
+        await handler.handleKeyUp(
+            action: .primaryRecording,
+            eventTime: 2,
+            mode: .special,
+            context: ShortcutPressContext(),
+            specialOptions: specialOptions
+        )
+
+        #expect(directCommitCount == 1)
+        #expect(toggleCount == 1)
+        #expect(cancelCount == 0)
+        #expect(recordingState == .idle)
+    }
+
     @Test @MainActor func specialModePreloadOnlyDiscardsPreparedContextOnUnsafeEvidence() async throws {
         var recordingState = RecordingState.idle
         var sessionActive = false

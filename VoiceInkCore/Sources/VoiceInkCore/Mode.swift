@@ -52,4 +52,24 @@ public struct Mode: Identifiable, Codable {
     public var effectivePrompt: String {
         promptTemplate.effectivePrompt
     }
+
+    public var effectiveTranscriptionModel: String {
+        transcriptionProvider.fixedModel(for: .transcription) ?? transcriptionModel
+    }
+
+    public var effectivePostProcessingModel: String {
+        postProcessingProvider.fixedModel(for: .postProcessing) ?? postProcessingModel
+    }
+
+    public static func defaultLocalWhisper(name: String = "Default") -> Mode {
+        Mode(
+            name: name,
+            transcriptionProvider: .localWhisper,
+            transcriptionModel: VoiceInkTranscriptionModelCatalog.localBaseModel,
+            isPostProcessingEnabled: false,
+            postProcessingProvider: .groq,
+            postProcessingModel: VoiceInkAIModelCatalog.firstAvailableModel(for: .groq),
+            promptTemplate: VoiceInkPostProcessingPromptTemplate(type: .summary)
+        )
+    }
 }

@@ -16,24 +16,11 @@ class DefaultModeManager {
         // Only create default mode if no modes exist
         guard settings.modes.isEmpty else { return }
         
-        let defaultMode = createDefaultMode()
+        let defaultMode = Mode.defaultLocalWhisper()
         settings.modes.append(defaultMode)
         settings.selectedModeId = defaultMode.id
         
         print("✅ Created default mode: \(defaultMode.name)")
-    }
-    
-    /// Creates the default mode with local whisper and no post-processing
-    private func createDefaultMode() -> Mode {
-        return Mode(
-            name: "Default",
-            transcriptionProvider: .localWhisper, // Local whisper
-            transcriptionModel: VoiceInkTranscriptionModelCatalog.localBaseModel, // Base model for speed
-            isPostProcessingEnabled: false, // No post-processing
-            postProcessingProvider: .groq, // Doesn't matter since disabled
-            postProcessingModel: VoiceInkAIModelCatalog.firstAvailableModel(for: .groq), // Doesn't matter since disabled
-            promptTemplate: VoiceInkPostProcessingPromptTemplate(type: .summary) // Default to summary template
-        )
     }
     
     /// Call this when user first opens the app or clicks "start using"

@@ -140,9 +140,9 @@ final class AppSettings: ObservableObject {
     /// Get the effective transcription model (from selected mode or first mode)
     var effectiveTranscriptionModel: String {
         if let selectedMode = selectedMode {
-            return selectedMode.transcriptionProvider.fixedModel(for: .transcription) ?? selectedMode.transcriptionModel
+            return selectedMode.effectiveTranscriptionModel
         } else if let firstMode = modes.first {
-            return firstMode.transcriptionProvider.fixedModel(for: .transcription) ?? firstMode.transcriptionModel
+            return firstMode.effectiveTranscriptionModel
         } else {
             return VoiceInkTranscriptionModelCatalog.voiceInkTranscriptionModel
         }
@@ -162,9 +162,9 @@ final class AppSettings: ObservableObject {
     /// Get the effective post-processing model (from selected mode or first mode)
     var effectivePostProcessingModel: String {
         if let selectedMode = selectedMode {
-            return selectedMode.postProcessingProvider.fixedModel(for: .postProcessing) ?? selectedMode.postProcessingModel
+            return selectedMode.effectivePostProcessingModel
         } else if let firstMode = modes.first {
-            return firstMode.postProcessingProvider.fixedModel(for: .postProcessing) ?? firstMode.postProcessingModel
+            return firstMode.effectivePostProcessingModel
         } else {
             return effectivePostProcessingProvider.fixedModel(for: .postProcessing) ?? VoiceInkAIModelCatalog.firstAvailableModel(for: .groq) // Default fallback
         }

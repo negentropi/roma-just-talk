@@ -4,7 +4,6 @@ import LLMkit
 
 struct AssemblyAIProvider: CloudProvider {
     let modelProvider: ModelProvider = .assemblyAI
-    let providerKey: String = "AssemblyAI"
     let languageCodes: [String]? = ["en", "es", "de", "fr", "pt", "it"]
     let includesAutoDetect: Bool = true
 

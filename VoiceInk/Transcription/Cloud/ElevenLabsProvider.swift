@@ -4,7 +4,6 @@ import LLMkit
 
 struct ElevenLabsProvider: CloudProvider {
     let modelProvider: ModelProvider = .elevenLabs
-    let providerKey: String = "ElevenLabs"
     let languageCodes: [String]? = [
         "af", "am", "ar", "as", "az", "be", "bg", "bn", "bs", "ca",
         "cs", "cy", "da", "de", "el", "en", "es", "et", "eu", "fa",

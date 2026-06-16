@@ -4,7 +4,6 @@ import LLMkit
 
 struct CartesiaProvider: CloudProvider {
     let modelProvider: ModelProvider = .cartesia
-    let providerKey: String = "Cartesia"
     let isStreamingOnly: Bool = true
     let languageCodes: [String]? = [
         "af", "am", "ar", "as", "az", "ba", "be", "bg", "bn", "bo",

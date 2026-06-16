@@ -4,7 +4,6 @@ import LLMkit
 
 struct XAIProvider: CloudProvider {
     let modelProvider: ModelProvider = .xai
-    let providerKey: String = "xAI"
     let languageCodes: [String]? = [
         "ar", "cs", "da", "nl", "en", "fil", "fr", "de", "hi", "id",
         "it", "ja", "ko", "mk", "ms", "fa", "pl", "pt", "ro", "ru",

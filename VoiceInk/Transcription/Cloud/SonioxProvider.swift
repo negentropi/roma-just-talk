@@ -4,7 +4,6 @@ import LLMkit
 
 struct SonioxProvider: CloudProvider {
     let modelProvider: ModelProvider = .soniox
-    let providerKey: String = "Soniox"
     let languageCodes: [String]? = [
         "af", "sq", "ar", "az", "eu", "be", "bn", "bs", "bg", "ca",
         "zh", "hr", "cs", "da", "nl", "en", "et", "fi", "fr", "gl",

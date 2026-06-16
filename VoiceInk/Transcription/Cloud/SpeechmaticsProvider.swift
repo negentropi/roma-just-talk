@@ -4,7 +4,6 @@ import LLMkit
 
 struct SpeechmaticsProvider: CloudProvider {
     let modelProvider: ModelProvider = .speechmatics
-    let providerKey: String = "Speechmatics"
     let languageCodes: [String]? = [
         "ar", "ba", "eu", "be", "bn", "bg", "yue", "ca", "hr", "cs", "da",
         "nl", "en", "et", "fi", "fr", "gl", "de", "el", "he", "hi",

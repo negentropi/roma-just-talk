@@ -5,7 +5,6 @@ import VoiceInkCore
 
 struct GeminiProvider: CloudProvider {
     let modelProvider: ModelProvider = .gemini
-    let providerKey: String = "Gemini"
     let languageCodes: [String]? = nil
     let includesAutoDetect: Bool = false
 

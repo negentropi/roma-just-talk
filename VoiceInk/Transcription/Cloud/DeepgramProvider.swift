@@ -5,7 +5,6 @@ import VoiceInkCore
 
 struct DeepgramProvider: CloudProvider {
     let modelProvider: ModelProvider = .deepgram
-    let providerKey: String = "Deepgram"
     let languageCodes: [String]? = [
         "ar", "be", "bg", "bn", "bs", "ca", "cs", "da", "de", "el",
         "en", "es", "et", "fa", "fi", "fr", "he", "hi", "hr", "hu",

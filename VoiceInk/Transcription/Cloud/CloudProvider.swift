@@ -16,6 +16,10 @@ protocol CloudProvider {
 }
 
 extension CloudProvider {
+    var providerKey: String {
+        modelProvider.apiKeyProviderName
+    }
+
     var isStreamingOnly: Bool { false }
 
     /// Streaming-only providers inherit this and get a clear error if batch is somehow attempted.

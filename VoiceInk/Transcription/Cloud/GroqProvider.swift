@@ -5,7 +5,6 @@ import VoiceInkCore
 
 struct GroqProvider: CloudProvider {
     let modelProvider: ModelProvider = .groq
-    let providerKey: String = "Groq"
     let languageCodes: [String]? = nil
     let includesAutoDetect: Bool = false
 

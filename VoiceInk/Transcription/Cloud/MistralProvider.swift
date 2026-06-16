@@ -4,7 +4,6 @@ import LLMkit
 
 struct MistralProvider: CloudProvider {
     let modelProvider: ModelProvider = .mistral
-    let providerKey: String = "Mistral"
     let languageCodes: [String]? = ["ar", "de", "en", "es", "fr", "hi", "it", "ja", "ko", "nl", "pt", "ru", "zh"]
     let includesAutoDetect: Bool = true
 

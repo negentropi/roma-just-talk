@@ -33,6 +33,25 @@ enum ModelProvider: String, Codable, Hashable, CaseIterable {
     }
 }
 
+extension ModelProvider {
+    var coreProviderKind: VoiceInkProviderKind? {
+        switch self {
+        case .groq:
+            return .groq
+        case .deepgram:
+            return .deepgram
+        case .gemini:
+            return .gemini
+        default:
+            return nil
+        }
+    }
+
+    var apiKeyProviderName: String {
+        coreProviderKind?.displayName ?? rawValue
+    }
+}
+
 // A unified protocol for any transcription model
 protocol TranscriptionModel: Identifiable, Hashable {
     var id: UUID { get }

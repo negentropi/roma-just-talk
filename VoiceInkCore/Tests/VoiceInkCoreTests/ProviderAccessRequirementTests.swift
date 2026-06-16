@@ -6,7 +6,7 @@ final class ProviderAccessRequirementTests: XCTestCase {
     func testUserAPIKeyProvidersExposeDerivedCredentialMetadata() {
         XCTAssertEqual(
             VoiceInkProviderKind.userAPIKeyProviders,
-            [.groq, .openAI, .deepgram, .cerebras, .gemini]
+            [.groq, .openAI, .deepgram, .cerebras, .gemini, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai]
         )
 
         let expected: [VoiceInkProviderKind: (account: String, verificationKey: String, transport: VoiceInkAPIKeyVerificationTransport)] = [
@@ -14,7 +14,13 @@ final class ProviderAccessRequirementTests: XCTestCase {
             .openAI: (VoiceInkProviderAPIKeyAccount.openAI, "openAIKeyVerified", .openAICompatibleModels),
             .deepgram: (VoiceInkProviderAPIKeyAccount.deepgram, "deepgramKeyVerified", .deepgramProjects),
             .cerebras: (VoiceInkProviderAPIKeyAccount.cerebras, "cerebrasKeyVerified", .openAICompatibleModels),
-            .gemini: (VoiceInkProviderAPIKeyAccount.gemini, "geminiKeyVerified", .geminiModels)
+            .gemini: (VoiceInkProviderAPIKeyAccount.gemini, "geminiKeyVerified", .geminiModels),
+            .mistral: (VoiceInkProviderAPIKeyAccount.mistral, "mistralKeyVerified", .mistralModels),
+            .elevenLabs: (VoiceInkProviderAPIKeyAccount.elevenLabs, "elevenLabsKeyVerified", .elevenLabsUser),
+            .soniox: (VoiceInkProviderAPIKeyAccount.soniox, "sonioxKeyVerified", .sonioxFiles),
+            .speechmatics: (VoiceInkProviderAPIKeyAccount.speechmatics, "speechmaticsKeyVerified", .speechmaticsJobs),
+            .assemblyAI: (VoiceInkProviderAPIKeyAccount.assemblyAI, "assemblyAIKeyVerified", .assemblyAITranscripts),
+            .xai: (VoiceInkProviderAPIKeyAccount.xAI, "xaiKeyVerified", .xaiAPIKey)
         ]
 
         for (provider, policy) in expected {
@@ -66,16 +72,37 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertEqual(VoiceInkProviderKind.deepgram.transcriptionServiceKind, .remote)
         XCTAssertEqual(VoiceInkProviderKind.cerebras.transcriptionServiceKind, .remote)
         XCTAssertEqual(VoiceInkProviderKind.gemini.transcriptionServiceKind, .remote)
+        XCTAssertEqual(VoiceInkProviderKind.mistral.transcriptionServiceKind, .remote)
+        XCTAssertEqual(VoiceInkProviderKind.elevenLabs.transcriptionServiceKind, .remote)
+        XCTAssertEqual(VoiceInkProviderKind.soniox.transcriptionServiceKind, .remote)
+        XCTAssertEqual(VoiceInkProviderKind.speechmatics.transcriptionServiceKind, .remote)
+        XCTAssertEqual(VoiceInkProviderKind.assemblyAI.transcriptionServiceKind, .remote)
+        XCTAssertEqual(VoiceInkProviderKind.xai.transcriptionServiceKind, .remote)
         XCTAssertEqual(VoiceInkProviderKind.voiceInk.transcriptionServiceKind, .remote)
         XCTAssertEqual(VoiceInkProviderKind.localWhisper.transcriptionServiceKind, .localWhisper)
     }
 
-    func testGeminiUsesNativeTranscriptionEndpointButOpenAICompatiblePostProcessingEndpoint() {
+    func testRemoteTranscriptionProvidersUseSharedTransportAndEndpoints() {
         XCTAssertEqual(VoiceInkProviderKind.gemini.transcriptionTransport, .geminiGenerateContent)
         XCTAssertEqual(
             VoiceInkProviderKind.gemini.transcriptionAPIBaseURL.absoluteString,
             "https://generativelanguage.googleapis.com/v1beta"
         )
+        XCTAssertEqual(VoiceInkProviderKind.mistral.transcriptionTransport, .mistral)
+        XCTAssertEqual(VoiceInkProviderKind.mistral.transcriptionAPIBaseURL.absoluteString, "https://api.mistral.ai")
+        XCTAssertEqual(VoiceInkProviderKind.elevenLabs.transcriptionTransport, .elevenLabs)
+        XCTAssertEqual(VoiceInkProviderKind.elevenLabs.transcriptionAPIBaseURL.absoluteString, "https://api.elevenlabs.io")
+        XCTAssertEqual(VoiceInkProviderKind.soniox.transcriptionTransport, .soniox)
+        XCTAssertEqual(VoiceInkProviderKind.soniox.transcriptionAPIBaseURL.absoluteString, "https://api.soniox.com/v1")
+        XCTAssertEqual(VoiceInkProviderKind.speechmatics.transcriptionTransport, .speechmatics)
+        XCTAssertEqual(VoiceInkProviderKind.speechmatics.transcriptionAPIBaseURL.absoluteString, "https://asr.api.speechmatics.com/v2")
+        XCTAssertEqual(VoiceInkProviderKind.assemblyAI.transcriptionTransport, .assemblyAI)
+        XCTAssertEqual(VoiceInkProviderKind.assemblyAI.transcriptionAPIBaseURL.absoluteString, "https://api.assemblyai.com")
+        XCTAssertEqual(VoiceInkProviderKind.xai.transcriptionTransport, .xai)
+        XCTAssertEqual(VoiceInkProviderKind.xai.transcriptionAPIBaseURL.absoluteString, "https://api.x.ai")
+    }
+
+    func testGeminiUsesNativeTranscriptionEndpointButOpenAICompatiblePostProcessingEndpoint() {
         XCTAssertEqual(
             VoiceInkProviderKind.gemini.postProcessingChatCompletionsURL?.absoluteString,
             "https://generativelanguage.googleapis.com/v1beta/openai/v1/chat/completions"
@@ -118,11 +145,11 @@ final class ProviderAccessRequirementTests: XCTestCase {
     }
 
     func testAvailableProvidersFiltersByModelUseAndReadiness() {
-        let readyProviders: Set<VoiceInkProviderKind> = [.groq, .deepgram, .localWhisper, .voiceInk]
+        let readyProviders: Set<VoiceInkProviderKind> = [.groq, .deepgram, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .localWhisper, .voiceInk]
 
         XCTAssertEqual(
             VoiceInkProviderKind.availableProviders(for: .transcription) { readyProviders.contains($0) },
-            [.groq, .deepgram, .localWhisper, .voiceInk]
+            [.groq, .deepgram, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .localWhisper, .voiceInk]
         )
 
         XCTAssertEqual(

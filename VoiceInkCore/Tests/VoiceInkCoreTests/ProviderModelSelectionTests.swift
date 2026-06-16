@@ -72,6 +72,18 @@ final class ProviderModelSelectionTests: XCTestCase {
     func testPostProcessingModelsAreNilForNonPostProcessingProviders() {
         XCTAssertNil(VoiceInkProviderKind.deepgram.postProcessingDefaultModel)
         XCTAssertNil(VoiceInkProviderKind.deepgram.postProcessingModels)
+        XCTAssertNil(VoiceInkProviderKind.mistral.postProcessingDefaultModel)
+        XCTAssertNil(VoiceInkProviderKind.mistral.postProcessingModels)
+        XCTAssertNil(VoiceInkProviderKind.elevenLabs.postProcessingDefaultModel)
+        XCTAssertNil(VoiceInkProviderKind.elevenLabs.postProcessingModels)
+        XCTAssertNil(VoiceInkProviderKind.soniox.postProcessingDefaultModel)
+        XCTAssertNil(VoiceInkProviderKind.soniox.postProcessingModels)
+        XCTAssertNil(VoiceInkProviderKind.speechmatics.postProcessingDefaultModel)
+        XCTAssertNil(VoiceInkProviderKind.speechmatics.postProcessingModels)
+        XCTAssertNil(VoiceInkProviderKind.assemblyAI.postProcessingDefaultModel)
+        XCTAssertNil(VoiceInkProviderKind.assemblyAI.postProcessingModels)
+        XCTAssertNil(VoiceInkProviderKind.xai.postProcessingDefaultModel)
+        XCTAssertNil(VoiceInkProviderKind.xai.postProcessingModels)
         XCTAssertNil(VoiceInkProviderKind.localWhisper.postProcessingDefaultModel)
         XCTAssertNil(VoiceInkProviderKind.localWhisper.postProcessingModels)
     }

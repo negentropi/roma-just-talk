@@ -9,6 +9,12 @@ public enum VoiceInkTranscriptionTransport: Sendable {
     case openAICompatible
     case deepgram
     case geminiGenerateContent
+    case mistral
+    case elevenLabs
+    case soniox
+    case speechmatics
+    case assemblyAI
+    case xai
     case localWhisper
 }
 
@@ -21,6 +27,12 @@ public enum VoiceInkAPIKeyVerificationTransport: Sendable, Equatable {
     case openAICompatibleModels
     case deepgramProjects
     case geminiModels
+    case mistralModels
+    case elevenLabsUser
+    case sonioxFiles
+    case speechmaticsJobs
+    case assemblyAITranscripts
+    case xaiAPIKey
 }
 
 public enum VoiceInkProviderAccessRequirement: Sendable {
@@ -35,6 +47,12 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
     case deepgram
     case cerebras
     case gemini
+    case mistral
+    case elevenLabs
+    case soniox
+    case speechmatics
+    case assemblyAI
+    case xai
     case localWhisper
     case voiceInk
 
@@ -56,6 +74,18 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return "Cerebras"
         case .gemini:
             return "Gemini"
+        case .mistral:
+            return "Mistral"
+        case .elevenLabs:
+            return "ElevenLabs"
+        case .soniox:
+            return "Soniox"
+        case .speechmatics:
+            return "Speechmatics"
+        case .assemblyAI:
+            return "AssemblyAI"
+        case .xai:
+            return "xAI"
         case .localWhisper:
             return "Local (Whisper)"
         case .voiceInk:
@@ -98,6 +128,18 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return VoiceInkProviderEndpoint.cerebras.apiBaseURL
         case .gemini:
             return VoiceInkProviderEndpoint.gemini.apiBaseURL
+        case .mistral:
+            return VoiceInkProviderEndpoint.mistralAPIBaseURL
+        case .elevenLabs:
+            return VoiceInkProviderEndpoint.elevenLabsAPIBaseURL
+        case .soniox:
+            return VoiceInkProviderEndpoint.sonioxAPIBaseURL
+        case .speechmatics:
+            return VoiceInkProviderEndpoint.speechmaticsAPIBaseURL
+        case .assemblyAI:
+            return VoiceInkProviderEndpoint.assemblyAIAPIBaseURL
+        case .xai:
+            return VoiceInkProviderEndpoint.xaiAPIBaseURL
         case .localWhisper:
             return URL(string: "http://localhost")!
         case .voiceInk:
@@ -109,7 +151,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
         switch self {
         case .gemini:
             return VoiceInkProviderEndpoint.geminiNativeAPIBaseURL
-        case .groq, .openAI, .deepgram, .cerebras, .localWhisper, .voiceInk:
+        case .groq, .openAI, .deepgram, .cerebras, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .localWhisper, .voiceInk:
             return apiBaseURL
         }
     }
@@ -126,6 +168,18 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return VoiceInkProviderEndpoint.cerebras.consoleURL
         case .gemini:
             return VoiceInkProviderEndpoint.gemini.consoleURL
+        case .mistral:
+            return URL(string: "https://console.mistral.ai/api-keys")!
+        case .elevenLabs:
+            return URL(string: "https://elevenlabs.io/speech-synthesis")!
+        case .soniox:
+            return URL(string: "https://console.soniox.com/")!
+        case .speechmatics:
+            return URL(string: "https://portal.speechmatics.com/manage-access/")!
+        case .assemblyAI:
+            return URL(string: "https://www.assemblyai.com/dashboard/api-keys")!
+        case .xai:
+            return URL(string: "https://console.x.ai/")!
         case .localWhisper:
             return URL(string: "https://github.com/ggerganov/whisper.cpp")!
         case .voiceInk:
@@ -139,6 +193,18 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return .deepgram
         case .gemini:
             return .geminiGenerateContent
+        case .mistral:
+            return .mistral
+        case .elevenLabs:
+            return .elevenLabs
+        case .soniox:
+            return .soniox
+        case .speechmatics:
+            return .speechmatics
+        case .assemblyAI:
+            return .assemblyAI
+        case .xai:
+            return .xai
         case .localWhisper:
             return .localWhisper
         case .groq, .openAI, .cerebras, .voiceInk:
@@ -148,7 +214,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
 
     public var transcriptionServiceKind: VoiceInkTranscriptionServiceKind {
         switch transcriptionTransport {
-        case .openAICompatible, .deepgram, .geminiGenerateContent:
+        case .openAICompatible, .deepgram, .geminiGenerateContent, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai:
             return .remote
         case .localWhisper:
             return .localWhisper
@@ -186,6 +252,42 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
                 account: VoiceInkProviderAPIKeyAccount.gemini,
                 verificationStateKey: "geminiKeyVerified",
                 verificationTransport: .geminiModels
+            )
+        case .mistral:
+            return .userAPIKey(
+                account: VoiceInkProviderAPIKeyAccount.mistral,
+                verificationStateKey: "mistralKeyVerified",
+                verificationTransport: .mistralModels
+            )
+        case .elevenLabs:
+            return .userAPIKey(
+                account: VoiceInkProviderAPIKeyAccount.elevenLabs,
+                verificationStateKey: "elevenLabsKeyVerified",
+                verificationTransport: .elevenLabsUser
+            )
+        case .soniox:
+            return .userAPIKey(
+                account: VoiceInkProviderAPIKeyAccount.soniox,
+                verificationStateKey: "sonioxKeyVerified",
+                verificationTransport: .sonioxFiles
+            )
+        case .speechmatics:
+            return .userAPIKey(
+                account: VoiceInkProviderAPIKeyAccount.speechmatics,
+                verificationStateKey: "speechmaticsKeyVerified",
+                verificationTransport: .speechmaticsJobs
+            )
+        case .assemblyAI:
+            return .userAPIKey(
+                account: VoiceInkProviderAPIKeyAccount.assemblyAI,
+                verificationStateKey: "assemblyAIKeyVerified",
+                verificationTransport: .assemblyAITranscripts
+            )
+        case .xai:
+            return .userAPIKey(
+                account: VoiceInkProviderAPIKeyAccount.xAI,
+                verificationStateKey: "xaiKeyVerified",
+                verificationTransport: .xaiAPIKey
             )
         case .localWhisper:
             return .localWhisperModel
@@ -275,6 +377,18 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return .deepgram
         case .gemini:
             return .gemini
+        case .mistral:
+            return .mistral
+        case .elevenLabs:
+            return .elevenLabs
+        case .soniox:
+            return .soniox
+        case .speechmatics:
+            return .speechmatics
+        case .assemblyAI:
+            return .assemblyAI
+        case .xai:
+            return .xai
         case .localWhisper:
             return .local
         case .voiceInk:
@@ -294,7 +408,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return .cerebras
         case .gemini:
             return .gemini
-        case .deepgram, .localWhisper, .voiceInk:
+        case .deepgram, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .localWhisper, .voiceInk:
             return nil
         }
     }

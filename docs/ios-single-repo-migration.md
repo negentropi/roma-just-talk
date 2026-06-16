@@ -24,6 +24,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - post-processing request construction and output filtering
 - provider catalog, provider endpoints, API key account names, and provider readiness policy
 - transcription and AI model catalogs
+- remote transcription provider dispatch for iOS retry transcription
 - mode runtime configuration and selected-mode repair
 - transcript status and presentation helpers
 - stored audio-file path resolution
@@ -48,6 +49,12 @@ Current macOS consumers of shared remote transport:
 - AssemblyAI batch transcription uses `VoiceInkAssemblyAITranscriptionClient`.
 - Custom OpenAI-compatible batch transcription uses `VoiceInkOpenAICompatibleTranscriptionClient`.
 - Cartesia API-key verification uses `VoiceInkCartesiaClient`; Cartesia transcription remains streaming-only in platform shell code.
+
+Current iOS consumers of shared remote transport:
+
+- `iOS/VoiceInk-ios/TranscriptionServiceFactory.swift` creates `VoiceInkRemoteTranscriptionService` for every remote `VoiceInkProviderKind`.
+- `VoiceInkRemoteTranscriptionService` dispatches Groq/OpenAI/Cerebras/VoiceInk, Deepgram, Gemini, Mistral, ElevenLabs, Soniox, Speechmatics, AssemblyAI, and xAI through shared core clients.
+- Cartesia remains absent from iOS transcription provider selection until an iOS streaming adapter exists; it is not a batch provider.
 
 Platform shells still own UI, OS permissions, audio capture, paste/keyboard behavior, keychain adapters, local model download storage, SwiftData models, and macOS-only orchestration.
 

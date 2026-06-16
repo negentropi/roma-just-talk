@@ -101,14 +101,20 @@ final class TranscriptionModelCatalogTests: XCTestCase {
     }
 
     func testProviderKindExposesTranscriptionLanguageCapabilityMetadata() {
-        XCTAssertEqual(
-            VoiceInkProviderKind.deepgram.transcriptionModelProvider?.languageCodes,
-            VoiceInkTranscriptionModelProvider.deepgram.languageCodes
-        )
-        XCTAssertEqual(
-            VoiceInkProviderKind.deepgram.transcriptionModelProvider?.includesAutoDetect,
-            VoiceInkTranscriptionModelProvider.deepgram.includesAutoDetect
-        )
+        let expected: [VoiceInkProviderKind: VoiceInkTranscriptionModelProvider] = [
+            .deepgram: .deepgram,
+            .mistral: .mistral,
+            .elevenLabs: .elevenLabs,
+            .soniox: .soniox,
+            .speechmatics: .speechmatics,
+            .assemblyAI: .assemblyAI,
+            .xai: .xai
+        ]
+
+        for (provider, modelProvider) in expected {
+            XCTAssertEqual(provider.transcriptionModelProvider?.languageCodes, modelProvider.languageCodes)
+            XCTAssertEqual(provider.transcriptionModelProvider?.includesAutoDetect, modelProvider.includesAutoDetect)
+        }
     }
 }
 #endif

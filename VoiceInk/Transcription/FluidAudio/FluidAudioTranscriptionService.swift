@@ -143,14 +143,10 @@ class FluidAudioTranscriptionService: TranscriptionService {
     private func readAudioSamples(from url: URL) throws -> [Float] {
         do {
             let data = try Data(contentsOf: url)
-            guard data.count > 44 else {
+            guard let samples = VoiceInkPCM16Audio.floatSamples(fromWAVData: data) else {
                 throw ASRError.invalidAudioData
             }
-
-            return VoiceInkPCM16Audio.floatSamples(
-                fromLittleEndianData: data,
-                startingAt: VoiceInkPCM16Audio.wavHeaderByteCount
-            )
+            return samples
         } catch {
             throw ASRError.invalidAudioData
         }

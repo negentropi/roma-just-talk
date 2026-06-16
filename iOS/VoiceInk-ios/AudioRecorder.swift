@@ -30,7 +30,7 @@ final class AudioRecorder: NSObject, ObservableObject {
         let settings: [String: Any] = [
             AVFormatIDKey: Int(kAudioFormatLinearPCM),
             AVSampleRateKey: VoiceInkPCM16Audio.mono16kSampleRate,
-            AVNumberOfChannelsKey: 1,
+            AVNumberOfChannelsKey: VoiceInkPCM16Audio.monoChannelCount,
             AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
         ]
 
@@ -103,4 +103,3 @@ final class AudioRecorder: NSObject, ObservableObject {
 }
 
 extension AudioRecorder: AVAudioRecorderDelegate {}
-

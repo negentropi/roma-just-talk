@@ -1,6 +1,5 @@
 import Foundation
 import SwiftData
-import LLMkit
 
 enum CloudTranscriptionError: Error, LocalizedError {
     case unsupportedProvider
@@ -76,8 +75,6 @@ class CloudTranscriptionService: TranscriptionService {
             )
         } catch let error as CloudTranscriptionError {
             throw error
-        } catch let error as LLMKitError {
-            throw mapLLMKitError(error)
         } catch {
             throw CloudTranscriptionError.networkError(error)
         }
@@ -169,23 +166,6 @@ class CloudTranscriptionService: TranscriptionService {
                 statusCode: error.code,
                 message: error.userInfo[NSLocalizedDescriptionKey] as? String ?? error.localizedDescription
             )
-        }
-    }
-
-    private func mapLLMKitError(_ error: LLMKitError) -> CloudTranscriptionError {
-        switch error {
-        case .missingAPIKey:
-            return .missingAPIKey
-        case .httpError(let statusCode, let message):
-            return .apiRequestFailed(statusCode: statusCode, message: message)
-        case .noResultReturned:
-            return .noTranscriptionReturned
-        case .encodingError:
-            return .dataEncodingError
-        case .networkError(let detail):
-            return .networkError(NSError(domain: "LLMkit", code: -1, userInfo: [NSLocalizedDescriptionKey: detail]))
-        case .invalidURL, .decodingError, .timeout:
-            return .networkError(error)
         }
     }
 }

@@ -2,33 +2,47 @@ import Foundation
 
 public protocol VoiceInkAudioTranscriptionService {
     func transcribeAudioFile(
-        apiBaseURL: URL,
         apiKey: String,
         model: String,
         fileURL: URL,
         language: String?
     ) async throws -> String
 
-    func verifyAPIKey(apiBaseURL: URL, _ apiKey: String) async -> Bool
+    func verifyAPIKey(_ apiKey: String) async -> Bool
 }
 
 public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionService, Sendable {
     private let transport: VoiceInkTranscriptionTransport
+    private let apiBaseURL: URL
     private let openAICompatibleClient: VoiceInkOpenAICompatibleTranscriptionClient
     private let deepgramClient: VoiceInkDeepgramTranscriptionClient
 
     public init(
+        provider: VoiceInkProviderKind,
+        openAICompatibleClient: VoiceInkOpenAICompatibleTranscriptionClient = VoiceInkOpenAICompatibleTranscriptionClient(),
+        deepgramClient: VoiceInkDeepgramTranscriptionClient = VoiceInkDeepgramTranscriptionClient()
+    ) {
+        self.init(
+            transport: provider.transcriptionTransport,
+            apiBaseURL: provider.apiBaseURL,
+            openAICompatibleClient: openAICompatibleClient,
+            deepgramClient: deepgramClient
+        )
+    }
+
+    public init(
         transport: VoiceInkTranscriptionTransport,
+        apiBaseURL: URL,
         openAICompatibleClient: VoiceInkOpenAICompatibleTranscriptionClient = VoiceInkOpenAICompatibleTranscriptionClient(),
         deepgramClient: VoiceInkDeepgramTranscriptionClient = VoiceInkDeepgramTranscriptionClient()
     ) {
         self.transport = transport
+        self.apiBaseURL = apiBaseURL
         self.openAICompatibleClient = openAICompatibleClient
         self.deepgramClient = deepgramClient
     }
 
     public func transcribeAudioFile(
-        apiBaseURL: URL,
         apiKey: String,
         model: String,
         fileURL: URL,
@@ -60,7 +74,7 @@ public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionServ
         }
     }
 
-    public func verifyAPIKey(apiBaseURL: URL, _ apiKey: String) async -> Bool {
+    public func verifyAPIKey(_ apiKey: String) async -> Bool {
         switch transport {
         case .openAICompatible:
             return await openAICompatibleClient.verifyAPIKey(

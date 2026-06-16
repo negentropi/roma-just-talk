@@ -32,7 +32,6 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
     
     /// Transcribe audio file using local Whisper model
     func transcribeAudioFile(
-        apiBaseURL: URL,
         apiKey: String,
         model: String,
         fileURL: URL,
@@ -95,7 +94,7 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
     }
     
     /// Verify API key (not applicable for local transcription, always returns true if model is available)
-    func verifyAPIKey(apiBaseURL: URL, _ apiKey: String) async -> Bool {
+    func verifyAPIKey(_ apiKey: String) async -> Bool {
         let modelManager = LocalModelManager.shared
         return await modelManager.hasAvailableModel
     }
@@ -109,7 +108,6 @@ extension WhisperTranscriptionService {
     func transcribeAudioFile(_ fileURL: URL) async throws -> String {
         // Use dummy values for parameters that don't apply to local transcription
         return try await transcribeAudioFile(
-            apiBaseURL: VoiceInkProviderKind.localWhisper.apiBaseURL,
             apiKey: "local",
             model: VoiceInkTranscriptionModelCatalog.localBaseModel,
             fileURL: fileURL,

@@ -115,7 +115,7 @@ struct ProviderAPIKeyView: View {
 
         return await TranscriptionServiceFactory
             .service(for: provider)
-            .verifyAPIKey(apiBaseURL: provider.apiBaseURL, key)
+            .verifyAPIKey(key)
     }
 
     private func obfuscatedKey() -> String? {

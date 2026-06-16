@@ -10,7 +10,7 @@ struct TranscriptionServiceFactory {
         switch provider.transcriptionTransport {
         case .deepgram, .openAICompatible:
             return VoiceInkRemoteTranscriptionService(
-                transport: provider.transcriptionTransport
+                provider: provider
             )
         case .localWhisper:
             return WhisperTranscriptionService()

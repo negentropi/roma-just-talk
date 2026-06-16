@@ -61,6 +61,14 @@ enum Provider: String, CaseIterable, Codable, Identifiable {
         coreKind.apiKeyVerificationTransport
     }
 
+    func fixedModel(for type: ModelType) -> String? {
+        coreKind.fixedModel(for: type.coreModelUse)
+    }
+
+    func supportsModelUse(_ type: ModelType) -> Bool {
+        coreKind.supportsModelUse(type.coreModelUse)
+    }
+
     func models(for type: ModelType) -> [String] {
         coreKind.models(for: type.coreModelUse)
     }

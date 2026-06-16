@@ -106,6 +106,21 @@ public enum VoiceInkProviderKind: String, CaseIterable, Sendable {
         }
     }
 
+    public func fixedModel(for use: VoiceInkProviderModelUse) -> String? {
+        switch (self, use) {
+        case (.voiceInk, .transcription):
+            return VoiceInkTranscriptionModelCatalog.voiceInkTranscriptionModel
+        case (.voiceInk, .postProcessing):
+            return VoiceInkAIModelCatalog.voiceInkPostProcessingModel
+        default:
+            return nil
+        }
+    }
+
+    public func supportsModelUse(_ use: VoiceInkProviderModelUse) -> Bool {
+        fixedModel(for: use) != nil || !models(for: use).isEmpty
+    }
+
     public func models(for use: VoiceInkProviderModelUse) -> [String] {
         switch (self, use) {
         case (.groq, .transcription):

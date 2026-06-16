@@ -203,9 +203,9 @@ final class AppSettings: ObservableObject {
     /// Get the effective transcription model (from selected mode or first mode)
     var effectiveTranscriptionModel: String {
         if let selectedMode = selectedMode {
-            return selectedMode.transcriptionProvider == .voiceink ? VoiceInkTranscriptionModelCatalog.voiceInkTranscriptionModel : selectedMode.transcriptionModel
+            return selectedMode.transcriptionProvider.fixedModel(for: .transcription) ?? selectedMode.transcriptionModel
         } else if let firstMode = modes.first {
-            return firstMode.transcriptionProvider == .voiceink ? VoiceInkTranscriptionModelCatalog.voiceInkTranscriptionModel : firstMode.transcriptionModel
+            return firstMode.transcriptionProvider.fixedModel(for: .transcription) ?? firstMode.transcriptionModel
         } else {
             return VoiceInkTranscriptionModelCatalog.voiceInkTranscriptionModel
         }
@@ -225,11 +225,11 @@ final class AppSettings: ObservableObject {
     /// Get the effective post-processing model (from selected mode or first mode)
     var effectivePostProcessingModel: String {
         if let selectedMode = selectedMode {
-            return selectedMode.postProcessingProvider == .voiceink ? VoiceInkAIModelCatalog.voiceInkPostProcessingModel : selectedMode.postProcessingModel
+            return selectedMode.postProcessingProvider.fixedModel(for: .postProcessing) ?? selectedMode.postProcessingModel
         } else if let firstMode = modes.first {
-            return firstMode.postProcessingProvider == .voiceink ? VoiceInkAIModelCatalog.voiceInkPostProcessingModel : firstMode.postProcessingModel
+            return firstMode.postProcessingProvider.fixedModel(for: .postProcessing) ?? firstMode.postProcessingModel
         } else {
-            return effectivePostProcessingProvider == .voiceink ? VoiceInkAIModelCatalog.voiceInkPostProcessingModel : VoiceInkAIModelCatalog.firstAvailableModel(for: .groq) // Default fallback
+            return effectivePostProcessingProvider.fixedModel(for: .postProcessing) ?? VoiceInkAIModelCatalog.firstAvailableModel(for: .groq) // Default fallback
         }
     }
     

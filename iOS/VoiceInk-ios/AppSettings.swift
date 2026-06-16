@@ -26,6 +26,10 @@ final class AppSettings: ObservableObject {
         return modes.first { $0.id == selectedModeId }
     }
 
+    private var activeMode: Mode? {
+        modes.activeMode(selectedModeId: selectedModeId)
+    }
+
     @Published private var apiKeysByProvider: [VoiceInkProviderKind: String]
     @Published private var verifiedAPIKeyProviders: Set<VoiceInkProviderKind>
     
@@ -128,10 +132,8 @@ final class AppSettings: ObservableObject {
     
     /// Get the effective transcription provider (from selected mode or first mode)
     var effectiveTranscriptionProvider: VoiceInkProviderKind {
-        if let selectedMode = selectedMode {
-            return selectedMode.transcriptionProvider
-        } else if let firstMode = modes.first {
-            return firstMode.transcriptionProvider
+        if let activeMode {
+            return activeMode.transcriptionProvider
         } else {
             return .groq // Default fallback
         }
@@ -139,10 +141,8 @@ final class AppSettings: ObservableObject {
     
     /// Get the effective transcription model (from selected mode or first mode)
     var effectiveTranscriptionModel: String {
-        if let selectedMode = selectedMode {
-            return selectedMode.effectiveTranscriptionModel
-        } else if let firstMode = modes.first {
-            return firstMode.effectiveTranscriptionModel
+        if let activeMode {
+            return activeMode.effectiveTranscriptionModel
         } else {
             return VoiceInkTranscriptionModelCatalog.voiceInkTranscriptionModel
         }
@@ -150,10 +150,8 @@ final class AppSettings: ObservableObject {
     
     /// Get the effective post-processing provider (from selected mode or first mode)
     var effectivePostProcessingProvider: VoiceInkProviderKind {
-        if let selectedMode = selectedMode {
-            return selectedMode.postProcessingProvider
-        } else if let firstMode = modes.first {
-            return firstMode.postProcessingProvider
+        if let activeMode {
+            return activeMode.postProcessingProvider
         } else {
             return .groq // Default fallback
         }
@@ -161,10 +159,8 @@ final class AppSettings: ObservableObject {
     
     /// Get the effective post-processing model (from selected mode or first mode)
     var effectivePostProcessingModel: String {
-        if let selectedMode = selectedMode {
-            return selectedMode.effectivePostProcessingModel
-        } else if let firstMode = modes.first {
-            return firstMode.effectivePostProcessingModel
+        if let activeMode {
+            return activeMode.effectivePostProcessingModel
         } else {
             return effectivePostProcessingProvider.fixedModel(for: .postProcessing) ?? VoiceInkAIModelCatalog.firstAvailableModel(for: .groq) // Default fallback
         }
@@ -172,10 +168,8 @@ final class AppSettings: ObservableObject {
     
     /// Get the effective custom prompt (from selected mode or first mode)
     var effectiveCustomPrompt: String {
-        if let selectedMode = selectedMode {
-            return selectedMode.effectivePrompt
-        } else if let firstMode = modes.first {
-            return firstMode.effectivePrompt
+        if let activeMode {
+            return activeMode.effectivePrompt
         } else {
             return "" // Default fallback
         }
@@ -183,10 +177,8 @@ final class AppSettings: ObservableObject {
     
     /// Get whether post-processing is enabled (from selected mode or first mode)
     var effectiveIsPostProcessingEnabled: Bool {
-        if let selectedMode = selectedMode {
-            return selectedMode.isPostProcessingEnabled
-        } else if let firstMode = modes.first {
-            return firstMode.isPostProcessingEnabled
+        if let activeMode {
+            return activeMode.isPostProcessingEnabled
         } else {
             return false // Default fallback
         }

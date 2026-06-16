@@ -73,3 +73,14 @@ public struct Mode: Identifiable, Codable {
         )
     }
 }
+
+public extension Collection where Element == Mode {
+    func activeMode(selectedModeId: UUID?) -> Mode? {
+        if let selectedModeId,
+           let selectedMode = first(where: { $0.id == selectedModeId }) {
+            return selectedMode
+        }
+
+        return first
+    }
+}

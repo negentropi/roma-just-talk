@@ -40,6 +40,10 @@ public enum VoiceInkProviderEndpoint: String, CaseIterable, Sendable {
         URL(string: "https://api.x.ai")!
     }
 
+    public static var sonioxAPIBaseURL: URL {
+        URL(string: "https://api.soniox.com/v1")!
+    }
+
     public var chatCompletionsURL: URL? {
         switch self {
         case .groq, .openAI, .cerebras, .gemini:
@@ -125,5 +129,21 @@ public enum VoiceInkProviderEndpoint: String, CaseIterable, Sendable {
 
     public static func xaiAPIKeyURL(from baseURL: URL) -> URL {
         baseURL.appendingPathComponent("v1/api-key")
+    }
+
+    public static func sonioxFilesURL(from baseURL: URL) -> URL {
+        baseURL.appendingPathComponent("files")
+    }
+
+    public static func sonioxTranscriptionsURL(from baseURL: URL) -> URL {
+        baseURL.appendingPathComponent("transcriptions")
+    }
+
+    public static func sonioxTranscriptionURL(from baseURL: URL, id: String) -> URL {
+        sonioxTranscriptionsURL(from: baseURL).appendingPathComponent(id)
+    }
+
+    public static func sonioxTranscriptURL(from baseURL: URL, id: String) -> URL {
+        sonioxTranscriptionURL(from: baseURL, id: id).appendingPathComponent("transcript")
     }
 }

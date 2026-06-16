@@ -622,5 +622,147 @@ final class RemoteProviderRequestTests: XCTestCase {
             "xai text"
         )
     }
+
+    func testSonioxUploadFileRequestBuilderUsesFilesEndpointAndMultipartBody() throws {
+        let preparedRequest = VoiceInkSonioxRequestBuilder.makeUploadFileRequest(
+            baseURL: VoiceInkProviderEndpoint.sonioxAPIBaseURL,
+            apiKey: "soniox-key",
+            audioData: Data("WAVDATA".utf8),
+            fileName: "sample.wav",
+            boundary: "Boundary-test",
+            timeout: 30
+        )
+
+        XCTAssertEqual(preparedRequest.request.url?.absoluteString, "https://api.soniox.com/v1/files")
+        XCTAssertEqual(preparedRequest.request.httpMethod, "POST")
+        XCTAssertEqual(preparedRequest.request.value(forHTTPHeaderField: "Authorization"), "Bearer soniox-key")
+        XCTAssertEqual(
+            preparedRequest.request.value(forHTTPHeaderField: "Content-Type"),
+            "multipart/form-data; boundary=Boundary-test"
+        )
+        XCTAssertEqual(preparedRequest.request.timeoutInterval, 30)
+
+        let body = try XCTUnwrap(String(data: preparedRequest.body, encoding: .utf8))
+        XCTAssertTrue(body.contains("Content-Disposition: form-data; name=\"file\"; filename=\"sample.wav\""))
+        XCTAssertTrue(body.contains("Content-Type: audio/wav"))
+        XCTAssertTrue(body.contains("WAVDATA"))
+        XCTAssertTrue(body.contains("--Boundary-test--"))
+    }
+
+    func testSonioxCreateTranscriptionRequestBuilderUsesLanguageAndContextPayload() throws {
+        let request = try VoiceInkSonioxRequestBuilder.makeCreateTranscriptionRequest(
+            baseURL: VoiceInkProviderEndpoint.sonioxAPIBaseURL,
+            apiKey: "soniox-key",
+            fileID: "file-123",
+            model: "stt-async-v4",
+            language: "en",
+            customVocabulary: ["Roma", "Felix"],
+            timeout: 30
+        )
+
+        XCTAssertEqual(request.url?.absoluteString, "https://api.soniox.com/v1/transcriptions")
+        XCTAssertEqual(request.httpMethod, "POST")
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer soniox-key")
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Content-Type"), "application/json")
+        XCTAssertEqual(request.timeoutInterval, 30)
+
+        let body = try XCTUnwrap(request.httpBody)
+        let json = try XCTUnwrap(JSONSerialization.jsonObject(with: body) as? [String: Any])
+        XCTAssertEqual(json["file_id"] as? String, "file-123")
+        XCTAssertEqual(json["model"] as? String, "stt-async-v4")
+        XCTAssertEqual(json["enable_speaker_diarization"] as? Bool, false)
+        XCTAssertEqual(json["enable_language_identification"] as? Bool, true)
+        XCTAssertEqual(json["language_hints_strict"] as? Bool, true)
+        XCTAssertEqual(json["language_hints"] as? [String], ["en"])
+        let context = try XCTUnwrap(json["context"] as? [String: Any])
+        XCTAssertEqual(context["terms"] as? [String], ["Roma", "Felix"])
+    }
+
+    func testSonioxCreateTranscriptionRequestBuilderEnablesLanguageIdentificationWithoutHints() throws {
+        let request = try VoiceInkSonioxRequestBuilder.makeCreateTranscriptionRequest(
+            baseURL: VoiceInkProviderEndpoint.sonioxAPIBaseURL,
+            apiKey: "soniox-key",
+            fileID: "file-123",
+            model: "stt-async-v4"
+        )
+
+        let body = try XCTUnwrap(request.httpBody)
+        let json = try XCTUnwrap(JSONSerialization.jsonObject(with: body) as? [String: Any])
+        XCTAssertEqual(json["enable_language_identification"] as? Bool, true)
+        XCTAssertNil(json["language_hints"])
+        XCTAssertNil(json["language_hints_strict"])
+        XCTAssertNil(json["context"])
+    }
+
+    func testSonioxStatusTranscriptAndVerificationRequestBuilders() throws {
+        let status = VoiceInkSonioxRequestBuilder.makeTranscriptionStatusRequest(
+            baseURL: VoiceInkProviderEndpoint.sonioxAPIBaseURL,
+            apiKey: "soniox-key",
+            id: "tx-123",
+            timeout: 30
+        )
+        XCTAssertEqual(status.url?.absoluteString, "https://api.soniox.com/v1/transcriptions/tx-123")
+        XCTAssertEqual(status.httpMethod, "GET")
+        XCTAssertEqual(status.value(forHTTPHeaderField: "Authorization"), "Bearer soniox-key")
+        XCTAssertEqual(status.timeoutInterval, 30)
+
+        let transcript = VoiceInkSonioxRequestBuilder.makeTranscriptRequest(
+            baseURL: VoiceInkProviderEndpoint.sonioxAPIBaseURL,
+            apiKey: "soniox-key",
+            id: "tx-123",
+            timeout: 30
+        )
+        XCTAssertEqual(transcript.url?.absoluteString, "https://api.soniox.com/v1/transcriptions/tx-123/transcript")
+        XCTAssertEqual(transcript.value(forHTTPHeaderField: "Authorization"), "Bearer soniox-key")
+
+        let files = VoiceInkSonioxRequestBuilder.makeFilesRequest(
+            baseURL: VoiceInkProviderEndpoint.sonioxAPIBaseURL,
+            apiKey: "soniox-key",
+            timeout: 10
+        )
+        XCTAssertEqual(files.url?.absoluteString, "https://api.soniox.com/v1/files")
+        XCTAssertEqual(files.httpMethod, "GET")
+        XCTAssertEqual(files.value(forHTTPHeaderField: "Authorization"), "Bearer soniox-key")
+        XCTAssertEqual(files.value(forHTTPHeaderField: "Accept"), "application/json")
+        XCTAssertEqual(files.timeoutInterval, 10)
+    }
+
+    func testSonioxClientRejectsBlankAPIKeyWithoutNetwork() async throws {
+        let result = await VoiceInkSonioxTranscriptionClient().verifyAPIKeyDetailed(
+            baseURL: VoiceInkProviderEndpoint.sonioxAPIBaseURL,
+            apiKey: " \n\t "
+        )
+
+        XCTAssertEqual(
+            result,
+            VoiceInkAPIKeyVerificationResult(
+                isValid: false,
+                errorMessage: "API key is missing or empty."
+            )
+        )
+    }
+
+    func testSonioxTranscriptionCodecReturnsIdsStatusAndTranscript() throws {
+        XCTAssertEqual(
+            try VoiceInkSonioxTranscriptionCodec.uploadedFileID(from: Data(#"{"id":"file-123"}"#.utf8)),
+            "file-123"
+        )
+        XCTAssertEqual(
+            try VoiceInkSonioxTranscriptionCodec.createdTranscriptionID(from: Data(#"{"id":"tx-123"}"#.utf8)),
+            "tx-123"
+        )
+        XCTAssertEqual(
+            try VoiceInkSonioxTranscriptionCodec.status(from: Data(#"{"status":"completed"}"#.utf8)),
+            "completed"
+        )
+        XCTAssertEqual(
+            VoiceInkSonioxTranscriptionCodec.transcript(from: Data(#"{"text":"soniox text"}"#.utf8)),
+            "soniox text"
+        )
+        XCTAssertEqual(
+            VoiceInkSonioxTranscriptionCodec.transcript(from: Data("plain soniox text".utf8)),
+            "plain soniox text"
+        )
+    }
 }
 #endif

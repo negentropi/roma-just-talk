@@ -24,7 +24,7 @@ public struct VoiceInkElevenLabsTranscriptionClient: Sendable {
             timeout: timeout
         )
 
-        let (data, response) = try await VoiceInkRetriedUpload.upload(
+        let (data, response) = try await VoiceInkRetriedRequest.upload(
             request: preparedRequest.request,
             body: preparedRequest.body,
             timeout: timeout,

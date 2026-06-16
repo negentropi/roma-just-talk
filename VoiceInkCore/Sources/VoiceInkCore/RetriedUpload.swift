@@ -1,7 +1,23 @@
 import Foundation
 
-enum VoiceInkRetriedUpload {
+enum VoiceInkRetriedRequest {
     private static let retryableStatusCodes: Set<Int> = [429, 500, 502, 503, 504]
+
+    static func data(
+        for request: URLRequest,
+        timeout: TimeInterval,
+        maxRetries: Int,
+        errorDomain: String
+    ) async throws -> (Data, URLResponse) {
+        try await perform(
+            request: request,
+            timeout: timeout,
+            maxRetries: maxRetries,
+            errorDomain: errorDomain
+        ) { session, request in
+            try await session.data(for: request)
+        }
+    }
 
     static func upload(
         request: URLRequest,
@@ -9,6 +25,23 @@ enum VoiceInkRetriedUpload {
         timeout: TimeInterval,
         maxRetries: Int,
         errorDomain: String
+    ) async throws -> (Data, URLResponse) {
+        try await perform(
+            request: request,
+            timeout: timeout,
+            maxRetries: maxRetries,
+            errorDomain: errorDomain
+        ) { session, request in
+            try await session.upload(for: request, from: body)
+        }
+    }
+
+    private static func perform(
+        request: URLRequest,
+        timeout: TimeInterval,
+        maxRetries: Int,
+        errorDomain: String,
+        operation: (URLSession, URLRequest) async throws -> (Data, URLResponse)
     ) async throws -> (Data, URLResponse) {
         let attempts = max(maxRetries, 0)
         var request = request
@@ -30,7 +63,7 @@ enum VoiceInkRetriedUpload {
             defer { session.finishTasksAndInvalidate() }
 
             do {
-                let (data, response) = try await session.upload(for: request, from: body)
+                let (data, response) = try await operation(session, request)
                 if let http = response as? HTTPURLResponse,
                    retryableStatusCodes.contains(http.statusCode),
                    attempt < attempts {

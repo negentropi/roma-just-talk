@@ -30,7 +30,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - duration presentation
 - Whisper and VAD model file metadata
 - PCM16 sample conversion
-- OpenAI-compatible, Deepgram, Gemini, Mistral, ElevenLabs, and xAI remote transcription request/client helpers
+- OpenAI-compatible, Deepgram, Gemini, Mistral, ElevenLabs, xAI, and Soniox remote transcription request/client helpers
 - shared multipart form-data construction for remote transcription clients
 - shared retried upload helper for multipart remote transcription clients
 
@@ -42,6 +42,7 @@ Current macOS consumers of shared remote transport:
 - Mistral batch transcription uses `VoiceInkMistralTranscriptionClient`.
 - ElevenLabs batch transcription uses `VoiceInkElevenLabsTranscriptionClient`.
 - xAI batch transcription uses `VoiceInkXAITranscriptionClient`.
+- Soniox batch transcription uses `VoiceInkSonioxTranscriptionClient`.
 - Custom OpenAI-compatible batch transcription uses `VoiceInkOpenAICompatibleTranscriptionClient`.
 
 Platform shells still own UI, OS permissions, audio capture, paste/keyboard behavior, keychain adapters, local model download storage, SwiftData models, and macOS-only orchestration.

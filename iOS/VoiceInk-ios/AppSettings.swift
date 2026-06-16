@@ -49,12 +49,12 @@ final class AppSettings: ObservableObject {
         
 
         self.apiKeysByProvider = Dictionary(
-            uniqueKeysWithValues: Self.userAPIKeyProviders.map { provider in
+            uniqueKeysWithValues: VoiceInkProviderKind.userAPIKeyProviders.map { provider in
                 (provider, Self.loadAPIKey(for: provider))
             }
         )
         self.verifiedAPIKeyProviders = Set(
-            Self.userAPIKeyProviders.filter { Self.loadKeyVerified(for: $0) }
+            VoiceInkProviderKind.userAPIKeyProviders.filter { Self.loadKeyVerified(for: $0) }
         )
         
         // Load audio session timeout (default: 90 seconds)
@@ -192,10 +192,6 @@ final class AppSettings: ObservableObject {
         }
     }
 
-    private static var userAPIKeyProviders: [VoiceInkProviderKind] {
-        VoiceInkProviderKind.userAPIKeyProviders
-    }
-    
     private func saveAPIKey(_ key: String, forKey account: String) {
         guard let data = key.data(using: .utf8) else { return }
         let status = KeychainService.save(key: account, data: data)
@@ -253,7 +249,7 @@ final class AppSettings: ObservableObject {
 
         // Clear verification flags
         verifiedAPIKeyProviders = []
-        Self.userAPIKeyProviders.forEach(Self.clearKeyVerified)
+        VoiceInkProviderKind.userAPIKeyProviders.forEach(Self.clearKeyVerified)
         
         // Reset audio session timeout to default
         audioSessionTimeoutSeconds = 90
@@ -261,6 +257,6 @@ final class AppSettings: ObservableObject {
 
         // Clear API keys from memory and Keychain
         apiKeysByProvider = [:]
-        Self.userAPIKeyProviders.forEach(Self.deleteAPIKey)
+        VoiceInkProviderKind.userAPIKeyProviders.forEach(Self.deleteAPIKey)
     }
 }

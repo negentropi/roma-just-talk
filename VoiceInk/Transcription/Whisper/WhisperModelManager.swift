@@ -3,6 +3,7 @@ import os
 import Zip
 import SwiftUI
 import Atomics
+import VoiceInkCore
 
 // MARK: - WhisperModelFile
 
@@ -14,23 +15,20 @@ struct WhisperModelFile: Identifiable {
     var isCoreMLDownloaded: Bool { coreMLEncoderURL != nil }
 
     var downloadURL: String {
-        "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/\(filename)"
+        VoiceInkWhisperModelFiles.downloadURLString(forModelName: name)
     }
 
     var filename: String {
-        "\(name).bin"
+        VoiceInkWhisperModelFiles.filename(forModelName: name)
     }
 
     // Core ML related properties
     var coreMLZipDownloadURL: String? {
-        // Only non-quantized models have Core ML versions
-        guard !name.contains("q5") && !name.contains("q8") else { return nil }
-        return "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/\(name)-encoder.mlmodelc.zip"
+        VoiceInkWhisperModelFiles.coreMLZipDownloadURLString(forModelName: name)
     }
 
     var coreMLEncoderDirectoryName: String? {
-        guard coreMLZipDownloadURL != nil else { return nil }
-        return "\(name)-encoder.mlmodelc"
+        VoiceInkWhisperModelFiles.coreMLEncoderDirectoryName(forModelName: name)
     }
 }
 
@@ -233,14 +231,20 @@ class WhisperModelManager: ObservableObject {
         let progressKeyCoreML = model.name + "_coreml"
         let coreMLData = try await downloadFileWithProgress(from: url, progressKey: progressKeyCoreML)
 
-        let coreMLZipPath = modelsDirectory.appendingPathComponent("\(model.name)-encoder.mlmodelc.zip")
+        guard let coreMLZipFilename = VoiceInkWhisperModelFiles.coreMLZipFilename(forModelName: model.name) else {
+            return model
+        }
+        let coreMLZipPath = modelsDirectory.appendingPathComponent(coreMLZipFilename)
         try coreMLData.write(to: coreMLZipPath)
 
         return try await unzipAndSetupCoreMLModel(for: model, zipPath: coreMLZipPath, progressKey: progressKeyCoreML)
     }
 
     private func unzipAndSetupCoreMLModel(for model: WhisperModelFile, zipPath: URL, progressKey: String) async throws -> WhisperModelFile {
-        let coreMLDestination = modelsDirectory.appendingPathComponent("\(model.name)-encoder.mlmodelc")
+        guard let coreMLDirectoryName = VoiceInkWhisperModelFiles.coreMLEncoderDirectoryName(forModelName: model.name) else {
+            throw VoiceInkEngineError.unzipFailed
+        }
+        let coreMLDestination = modelsDirectory.appendingPathComponent(coreMLDirectoryName)
 
         try? FileManager.default.removeItem(at: coreMLDestination)
         try await unzipCoreMLFile(zipPath, to: modelsDirectory)
@@ -284,7 +288,7 @@ class WhisperModelManager: ObservableObject {
     }
 
     private func shouldWarmup(_ model: WhisperModel) -> Bool {
-        !model.name.contains("q5") && !model.name.contains("q8")
+        VoiceInkWhisperModelFiles.supportsCoreML(forModelName: model.name)
     }
 
     private func handleModelDownloadError(_ model: WhisperModel, _ error: Error) {
@@ -298,8 +302,8 @@ class WhisperModelManager: ObservableObject {
 
             if let coreMLURL = model.coreMLEncoderURL {
                 try? FileManager.default.removeItem(at: coreMLURL)
-            } else {
-                let coreMLDir = modelsDirectory.appendingPathComponent("\(model.name)-encoder.mlmodelc")
+            } else if let coreMLDirectoryName = VoiceInkWhisperModelFiles.coreMLEncoderDirectoryName(forModelName: model.name) {
+                let coreMLDir = modelsDirectory.appendingPathComponent(coreMLDirectoryName)
                 if FileManager.default.fileExists(atPath: coreMLDir.path) {
                     try? FileManager.default.removeItem(at: coreMLDir)
                 }

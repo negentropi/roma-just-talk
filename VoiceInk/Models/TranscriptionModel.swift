@@ -215,7 +215,7 @@ struct WhisperModel: TranscriptionModel {
     }
 
     var filename: String {
-        "\(name).bin"
+        VoiceInkWhisperModelFiles.filename(forModelName: name)
     }
 
     var isMultilingualModel: Bool {

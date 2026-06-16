@@ -1,4 +1,5 @@
 import Foundation
+import VoiceInkCore
 
 enum PunctuationCleanupMode: String, Codable, CaseIterable, Identifiable {
     case keep = "keep"
@@ -84,9 +85,7 @@ struct TranscriptionOutputFilter {
             }
         }
 
-        // Clean whitespace
-        filteredText = filteredText.replacingOccurrences(of: #"\s{2,}"#, with: " ", options: .regularExpression)
-        filteredText = filteredText.trimmingCharacters(in: .whitespacesAndNewlines)
+        filteredText = VoiceInkTranscriptTextNormalizer.collapseWhitespaceRunsAndTrim(filteredText)
 
         return filteredText
     }
@@ -156,14 +155,6 @@ struct TranscriptionOutputFilter {
             return String(scalar)
         }
 
-        return normalizeWhitespace(cleanedScalars.joined())
-    }
-
-    private static func normalizeWhitespace(_ text: String) -> String {
-        text
-            .replacingOccurrences(of: #"[^\S\r\n]{2,}"#, with: " ", options: .regularExpression)
-            .replacingOccurrences(of: #"[ \t]+\n"#, with: "\n", options: .regularExpression)
-            .replacingOccurrences(of: #"\n[ \t]+"#, with: "\n", options: .regularExpression)
-            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return VoiceInkTranscriptTextNormalizer.normalizeInlineWhitespaceAndTrim(cleanedScalars.joined())
     }
 } 

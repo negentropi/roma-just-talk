@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import VoiceInkCore
 
 class TranscriptionRetryService {
     private let postProcessor = LLMPostProcessor()
@@ -40,11 +41,7 @@ class TranscriptionRetryService {
             language: nil
         )
         
-        // Clean up transcription
-        let cleanedText = rawText
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-            .replacingOccurrences(of: "\n\n+", with: "\n\n", options: .regularExpression)
-            .replacingOccurrences(of: "[ \t]+", with: " ", options: .regularExpression)
+        let cleanedText = VoiceInkTranscriptTextNormalizer.normalizeParagraphSpacing(rawText)
         
         var finalText = cleanedText
         

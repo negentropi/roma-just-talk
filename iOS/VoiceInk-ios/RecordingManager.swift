@@ -3,6 +3,7 @@ import SwiftData
 import AVFoundation
 import Combine
 import UIKit
+import VoiceInkCore
 
 extension Notification.Name {
     static let stopRecordingFromKeyboard = Notification.Name("stopRecordingFromKeyboard")
@@ -242,11 +243,7 @@ final class RecordingManager: ObservableObject {
                 let service = TranscriptionServiceFactory.service(for: provider)
                 let rawText = try await service.transcribeAudioFile(apiBaseURL: provider.baseURL, apiKey: apiKey, model: model, fileURL: fileURL, language: nil)
                 
-                // Clean up transcription
-                let cleanedText = rawText
-                    .trimmingCharacters(in: .whitespacesAndNewlines)
-                    .replacingOccurrences(of: "\n\n+", with: "\n\n", options: .regularExpression)
-                    .replacingOccurrences(of: "[ \t]+", with: " ", options: .regularExpression)
+                let cleanedText = VoiceInkTranscriptTextNormalizer.normalizeParagraphSpacing(rawText)
                 
                 var finalText = cleanedText
                 var enhancedText: String? = nil

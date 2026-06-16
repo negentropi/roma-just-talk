@@ -160,6 +160,10 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
         apiKeyAccount != nil
     }
 
+    public static var userAPIKeyProviders: [VoiceInkProviderKind] {
+        allCases.filter(\.requiresUserAPIKey)
+    }
+
     public var apiKeyVerificationTransport: VoiceInkAPIKeyVerificationTransport? {
         switch self {
         case .deepgram:

@@ -193,7 +193,7 @@ final class AppSettings: ObservableObject {
     }
 
     private static var userAPIKeyProviders: [VoiceInkProviderKind] {
-        VoiceInkProviderKind.allCases.filter(\.requiresUserAPIKey)
+        VoiceInkProviderKind.userAPIKeyProviders
     }
     
     private func saveAPIKey(_ key: String, forKey account: String) {

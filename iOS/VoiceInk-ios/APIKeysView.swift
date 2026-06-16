@@ -6,7 +6,7 @@ struct APIKeysView: View {
     
     var body: some View {
         List {
-            ForEach(VoiceInkProviderKind.allCases.filter(\.requiresUserAPIKey)) { provider in
+            ForEach(VoiceInkProviderKind.userAPIKeyProviders) { provider in
                 NavigationLink(destination: ProviderAPIKeyView(provider: provider)) {
                     HStack {
                         Text(provider.displayName)

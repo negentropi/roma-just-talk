@@ -16,14 +16,20 @@ enum ModelDownloadError: Error {
 
 struct WhisperModel: Identifiable, Codable {
     let id = UUID()
-    let name: String
-    let displayName: String
-    let filename: String
-    let size: String
-    let description: String
+    private let spec: VoiceInkWhisperModelFileSpec
+
+    var name: String { spec.modelName }
+    var displayName: String { spec.displayName }
+    var filename: String { spec.filename }
+    var size: String { spec.size }
+    var description: String { spec.description }
+
+    init(spec: VoiceInkWhisperModelFileSpec) {
+        self.spec = spec
+    }
 
     var downloadURL: URL {
-        VoiceInkWhisperModelFiles.downloadURL(forFilename: filename)
+        spec.downloadURL
     }
     
     var fileURL: URL {
@@ -34,19 +40,9 @@ struct WhisperModel: Identifiable, Codable {
         FileManager.default.fileExists(atPath: fileURL.path)
     }
     
-    private static let baseModelSpec = VoiceInkWhisperModelFiles.baseModel
+    static let baseModel = WhisperModel(spec: VoiceInkWhisperModelFiles.baseModel)
 
-    // Base model for initial implementation
-    static let baseModel = WhisperModel(
-        name: baseModelSpec.modelName,
-        displayName: baseModelSpec.displayName,
-        filename: baseModelSpec.filename,
-        size: baseModelSpec.size,
-        description: baseModelSpec.description
-    )
-    
-    // Future models can be added here
-    static let availableModels = [baseModel]
+    static let availableModels = VoiceInkWhisperModelFiles.bootstrapModels.map(WhisperModel.init(spec:))
 }
 
 @MainActor

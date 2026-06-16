@@ -1,11 +1,13 @@
 import Foundation
 
-public struct VoiceInkWhisperModelFileSpec: Equatable, Sendable {
+public struct VoiceInkWhisperModelFileSpec: Codable, Equatable, Identifiable, Sendable {
     public let modelName: String
     public let displayName: String
     public let filename: String
     public let size: String
     public let description: String
+
+    public var id: String { modelName }
 
     public init(
         modelName: String,
@@ -40,6 +42,8 @@ public enum VoiceInkWhisperModelFiles {
         size: "142 MB",
         description: "Multilingual model with good balance of speed and accuracy"
     )
+
+    public static let bootstrapModels = [baseModel]
 
     public static func downloadURL(forFilename filename: String) -> URL {
         URL(string: "https://huggingface.co/ggerganov/whisper.cpp/resolve/main")!

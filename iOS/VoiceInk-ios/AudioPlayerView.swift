@@ -1,4 +1,5 @@
 import SwiftUI
+import VoiceInkCore
 
 struct AudioPlayerView: View {
     let audioFilePath: String
@@ -21,7 +22,7 @@ struct AudioPlayerView: View {
                             .foregroundStyle(.tertiary)
                         Image(systemName: "waveform")
                             .foregroundStyle(.secondary)
-                        Text(timeString(duration))
+                        Text(VoiceInkDurationPresentation.minutesSeconds(duration))
                             .font(.caption.monospacedDigit())
                             .foregroundStyle(.secondary)
                     }
@@ -97,13 +98,13 @@ struct AudioPlayerView: View {
                         
                         // Time display
                         HStack {
-                            Text(timeString(player.currentTime))
+                            Text(VoiceInkDurationPresentation.minutesSeconds(player.currentTime))
                                 .font(.caption.monospacedDigit())
                                 .foregroundStyle(.primary)
                             
                             Spacer()
                             
-                            Text(timeString(player.duration))
+                            Text(VoiceInkDurationPresentation.minutesSeconds(player.duration))
                                 .font(.caption.monospacedDigit())
                                 .foregroundStyle(.secondary)
                         }
@@ -123,13 +124,6 @@ struct AudioPlayerView: View {
         }
     }
     
-    private func timeString(_ seconds: Double) -> String {
-        let s = Int(seconds)
-        let m = s / 60
-        let r = s % 60
-        return String(format: "%d:%02d", m, r)
-    }
-
     private func relativeTimestamp(from date: Date) -> String {
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .short

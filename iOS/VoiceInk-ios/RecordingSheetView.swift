@@ -14,7 +14,10 @@ struct RecordingSheetView: View {
                 Button("Cancel", action: onCancel)
                     .font(.body)
                 Spacer()
-                Text(timeString(recordingManager.currentDuration))
+                Text(VoiceInkDurationPresentation.minutesSeconds(
+                    recordingManager.currentDuration,
+                    padMinutesToTwoDigits: true
+                ))
                     .font(.title2.monospacedDigit())
                     .fontWeight(.semibold)
                     .foregroundStyle(.primary)
@@ -57,12 +60,6 @@ struct RecordingSheetView: View {
         .padding(.vertical, 12)
     }
     
-    private func timeString(_ seconds: Double) -> String {
-        let s = Int(seconds)
-        let m = s / 60
-        let r = s % 60
-        return String(format: "%02d:%02d", m, r)
-    }
 }
 
 #Preview {

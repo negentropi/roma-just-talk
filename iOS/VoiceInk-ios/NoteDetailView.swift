@@ -149,13 +149,6 @@ struct NoteDetailView: View {
         }
     }
     
-    private func timeString(_ seconds: Double) -> String {
-        let s = Int(seconds)
-        let m = s / 60
-        let r = s % 60
-        return String(format: "%02d:%02d", m, r)
-    }
-    
     private var relativeTimestamp: String {
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .short

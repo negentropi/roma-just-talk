@@ -467,8 +467,8 @@ final class RollingBufferPreloadCoordinator {
         }
     }
 
-    private func waitForStartingPreload(maxWaitNanoseconds: UInt64 = Self.startingPreloadClaimWaitNanoseconds) async {
-        var remaining = maxWaitNanoseconds
+    private func waitForStartingPreload() async {
+        var remaining = Self.startingPreloadClaimWaitNanoseconds
         while state == .starting, remaining > 0 {
             let sleepNanoseconds = min(10_000_000, remaining)
             try? await Task.sleep(nanoseconds: sleepNanoseconds)

@@ -5,50 +5,17 @@
 import Foundation
 import VoiceInkCore
 
-struct DeepgramTranscriptionResponse: Decodable {
-    let results: DeepgramResults
-}
-
-struct DeepgramResults: Decodable {
-    let channels: [DeepgramChannel]
-}
-
-struct DeepgramChannel: Decodable {
-    let alternatives: [DeepgramAlternative]
-}
-
-struct DeepgramAlternative: Decodable {
-    let transcript: String
-}
-
 struct DeepgramTranscriptionService: TranscriptionService {
     
     func transcribeAudioFile(apiBaseURL: URL, apiKey: String, model: String, fileURL: URL, language: String? = nil) async throws -> String {
-        // Build query parameters
-        var queryItems: [URLQueryItem] = [
-            URLQueryItem(name: "model", value: model),
-            URLQueryItem(name: "smart_format", value: "true"),
-            URLQueryItem(name: "punctuate", value: "true"),
-            URLQueryItem(name: "diarize", value: "false")
-        ]
-        
-        if let language = language {
-            queryItems.append(URLQueryItem(name: "language", value: language))
-        }
-        
-        var components = URLComponents(url: VoiceInkProviderEndpoint.deepgramListenURL(from: apiBaseURL), resolvingAgainstBaseURL: false)!
-        components.queryItems = queryItems
-        
-        guard let url = components.url else { throw URLError(.badURL) }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("Token \(apiKey)", forHTTPHeaderField: "Authorization")
-        request.setValue("audio/wav", forHTTPHeaderField: "Content-Type")
-        
-        // Read audio file data
         let audioData = try Data(contentsOf: fileURL)
-        request.httpBody = audioData
+        let request = try VoiceInkDeepgramRequestBuilder.makeTranscriptionRequest(
+            baseURL: apiBaseURL,
+            apiKey: apiKey,
+            model: model,
+            audioData: audioData,
+            language: language
+        )
         
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
@@ -58,14 +25,11 @@ struct DeepgramTranscriptionService: TranscriptionService {
             throw NSError(domain: "DeepgramAPI", code: http.statusCode, userInfo: [NSLocalizedDescriptionKey: errorText])
         }
         
-        let decoded = try JSONDecoder().decode(DeepgramTranscriptionResponse.self, from: data)
-        return decoded.results.channels.first?.alternatives.first?.transcript ?? ""
+        return try VoiceInkDeepgramTranscriptionCodec.transcript(from: data)
     }
     
     func verifyAPIKey(apiBaseURL: URL, _ apiKey: String) async -> Bool {
-        // Use the projects endpoint to verify the API key
-        var request = URLRequest(url: VoiceInkProviderEndpoint.deepgramProjectsURL(from: apiBaseURL))
-        request.setValue("Token \(apiKey)", forHTTPHeaderField: "Authorization")
+        let request = VoiceInkDeepgramRequestBuilder.makeProjectsRequest(baseURL: apiBaseURL, apiKey: apiKey)
         
         do {
             let (_, response) = try await URLSession.shared.data(for: request)

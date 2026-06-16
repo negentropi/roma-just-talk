@@ -1,0 +1,174 @@
+import Darwin
+import Foundation
+
+struct VoiceInkCoreCheck {
+    let name: String
+    let run: () async throws -> Void
+}
+
+@main
+struct VoiceInkCoreCheckRunner {
+    static func main() async {
+        let checks: [VoiceInkCoreCheck] = [
+            VoiceInkCoreCheck(name: "DurationPresentationTests.testMinutesSecondsUsesUnpaddedMinutesByDefault", run: { DurationPresentationTests().testMinutesSecondsUsesUnpaddedMinutesByDefault() }),
+            VoiceInkCoreCheck(name: "DurationPresentationTests.testMinutesSecondsCanPadMinutesToTwoDigits", run: { DurationPresentationTests().testMinutesSecondsCanPadMinutesToTwoDigits() }),
+            VoiceInkCoreCheck(name: "DurationPresentationTests.testMinutesSecondsTruncatesFractionalSeconds", run: { DurationPresentationTests().testMinutesSecondsTruncatesFractionalSeconds() }),
+            VoiceInkCoreCheck(name: "DurationPresentationTests.testCompactElapsedUsesMillisecondsForSubsecondDurations", run: { DurationPresentationTests().testCompactElapsedUsesMillisecondsForSubsecondDurations() }),
+            VoiceInkCoreCheck(name: "DurationPresentationTests.testCompactElapsedUsesOneDecimalSecondsUnderOneMinute", run: { DurationPresentationTests().testCompactElapsedUsesOneDecimalSecondsUnderOneMinute() }),
+            VoiceInkCoreCheck(name: "DurationPresentationTests.testCompactElapsedUsesMinutesAndRoundedSecondsFromOneMinute", run: { DurationPresentationTests().testCompactElapsedUsesMinutesAndRoundedSecondsFromOneMinute() }),
+            VoiceInkCoreCheck(name: "ModeRuntimeConfigurationTests.testEmptyModeCollectionUsesDefaultLocalWhisperFallbackConfiguration", run: { ModeRuntimeConfigurationTests().testEmptyModeCollectionUsesDefaultLocalWhisperFallbackConfiguration() }),
+            VoiceInkCoreCheck(name: "ModeRuntimeConfigurationTests.testFallbackConfigurationMatchesDefaultLocalWhisperMode", run: { ModeRuntimeConfigurationTests().testFallbackConfigurationMatchesDefaultLocalWhisperMode() }),
+            VoiceInkCoreCheck(name: "ModeRuntimeConfigurationTests.testDefaultModeUsesSharedPostProcessingDefaultPolicy", run: { ModeRuntimeConfigurationTests().testDefaultModeUsesSharedPostProcessingDefaultPolicy() }),
+            VoiceInkCoreCheck(name: "ModeRuntimeConfigurationTests.testDefaultLocalWhisperUsesSharedPostProcessingDefaultPolicy", run: { ModeRuntimeConfigurationTests().testDefaultLocalWhisperUsesSharedPostProcessingDefaultPolicy() }),
+            VoiceInkCoreCheck(name: "ModeRuntimeConfigurationTests.testUnsupportedTranscriptionProviderDoesNotReceiveFakeFallbackModel", run: { ModeRuntimeConfigurationTests().testUnsupportedTranscriptionProviderDoesNotReceiveFakeFallbackModel() }),
+            VoiceInkCoreCheck(name: "ModeRuntimeConfigurationTests.testModeRepairReplacesUnavailableProvidersWithFirstAvailableProvider", run: { ModeRuntimeConfigurationTests().testModeRepairReplacesUnavailableProvidersWithFirstAvailableProvider() }),
+            VoiceInkCoreCheck(name: "ModeRuntimeConfigurationTests.testModeRepairLeavesUnavailablePostProcessingProviderWhenDisabled", run: { ModeRuntimeConfigurationTests().testModeRepairLeavesUnavailablePostProcessingProviderWhenDisabled() }),
+            VoiceInkCoreCheck(name: "ModeRuntimeConfigurationTests.testRuntimeConfigurationUsesSelectedModeWhenAvailable", run: { ModeRuntimeConfigurationTests().testRuntimeConfigurationUsesSelectedModeWhenAvailable() }),
+            VoiceInkCoreCheck(name: "ModeRuntimeConfigurationTests.testRuntimeConfigurationFallsBackToFirstModeWhenSelectionIsMissing", run: { ModeRuntimeConfigurationTests().testRuntimeConfigurationFallsBackToFirstModeWhenSelectionIsMissing() }),
+            VoiceInkCoreCheck(name: "ModeRuntimeConfigurationTests.testRepairedSelectedModeIdPreservesExistingSelection", run: { ModeRuntimeConfigurationTests().testRepairedSelectedModeIdPreservesExistingSelection() }),
+            VoiceInkCoreCheck(name: "ModeRuntimeConfigurationTests.testRepairedSelectedModeIdFallsBackToFirstModeForMissingSelection", run: { ModeRuntimeConfigurationTests().testRepairedSelectedModeIdFallsBackToFirstModeForMissingSelection() }),
+            VoiceInkCoreCheck(name: "ModeRuntimeConfigurationTests.testRepairedSelectedModeIdReturnsNilForEmptyModes", run: { ModeRuntimeConfigurationTests().testRepairedSelectedModeIdReturnsNilForEmptyModes() }),
+            VoiceInkCoreCheck(name: "ModeRuntimeConfigurationTests.testModeDraftValidationRequiresName", run: { ModeRuntimeConfigurationTests().testModeDraftValidationRequiresName() }),
+            VoiceInkCoreCheck(name: "ModeRuntimeConfigurationTests.testModeDraftValidationRequiresCustomPromptOnlyForCustomTemplates", run: { ModeRuntimeConfigurationTests().testModeDraftValidationRequiresCustomPromptOnlyForCustomTemplates() }),
+            VoiceInkCoreCheck(name: "ModeRuntimeConfigurationTests.testModeDraftValidationAllowsPredefinedTemplatesWithoutCustomPrompt", run: { ModeRuntimeConfigurationTests().testModeDraftValidationAllowsPredefinedTemplatesWithoutCustomPrompt() }),
+            VoiceInkCoreCheck(name: "ModeRuntimeConfigurationTests.testModeDraftValidationRequiresAvailableProviderSelection", run: { ModeRuntimeConfigurationTests().testModeDraftValidationRequiresAvailableProviderSelection() }),
+            VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testFloatSamplesDecodeLittleEndianPCM16Data", run: { PCM16AudioSamplesTests().testFloatSamplesDecodeLittleEndianPCM16Data() }),
+            VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testFloatSamplesCanStartAfterWAVHeader", run: { PCM16AudioSamplesTests().testFloatSamplesCanStartAfterWAVHeader() }),
+            VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testFloatSamplesRejectTooSmallWAVData", run: { PCM16AudioSamplesTests().testFloatSamplesRejectTooSmallWAVData() }),
+            VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testDurationAndByteCountUseMono16kPCM16Format", run: { PCM16AudioSamplesTests().testDurationAndByteCountUseMono16kPCM16Format() }),
+            VoiceInkCoreCheck(name: "PostProcessingRequestTests.testBlankPromptReturnsNilRequest", run: { PostProcessingRequestTests().testBlankPromptReturnsNilRequest() }),
+            VoiceInkCoreCheck(name: "PostProcessingRequestTests.testRequestBuildsLegacyIOSPostProcessingMessages", run: { try PostProcessingRequestTests().testRequestBuildsLegacyIOSPostProcessingMessages() }),
+            VoiceInkCoreCheck(name: "PostProcessingRequestTests.testFinalizedTranscriptFallsBackWhenResponseIsEmptyAfterFiltering", run: { PostProcessingRequestTests().testFinalizedTranscriptFallsBackWhenResponseIsEmptyAfterFiltering() }),
+            VoiceInkCoreCheck(name: "PostProcessingRequestTests.testFinalizedTranscriptStripsReasoningTags", run: { PostProcessingRequestTests().testFinalizedTranscriptStripsReasoningTags() }),
+            VoiceInkCoreCheck(name: "ProviderAPIKeyVerifierTests.testVerifierRejectsBlankKeysForEveryUserAPIKeyProviderWithoutNetwork", run: { await ProviderAPIKeyVerifierTests().testVerifierRejectsBlankKeysForEveryUserAPIKeyProviderWithoutNetwork() }),
+            VoiceInkCoreCheck(name: "ProviderAPIKeyVerifierTests.testVerifierRejectsProvidersWithoutVerificationTransport", run: { await ProviderAPIKeyVerifierTests().testVerifierRejectsProvidersWithoutVerificationTransport() }),
+            VoiceInkCoreCheck(name: "ProviderAccessRequirementTests.testUserAPIKeyProvidersExposeDerivedCredentialMetadata", run: { ProviderAccessRequirementTests().testUserAPIKeyProvidersExposeDerivedCredentialMetadata() }),
+            VoiceInkCoreCheck(name: "ProviderAccessRequirementTests.testNonUserKeyProvidersKeepTheirAccessPolicy", run: { ProviderAccessRequirementTests().testNonUserKeyProvidersKeepTheirAccessPolicy() }),
+            VoiceInkCoreCheck(name: "ProviderAccessRequirementTests.testRuntimeAPIKeyFollowsProviderAccessPolicy", run: { ProviderAccessRequirementTests().testRuntimeAPIKeyFollowsProviderAccessPolicy() }),
+            VoiceInkCoreCheck(name: "ProviderAccessRequirementTests.testTranscriptionServiceKindGroupsProvidersByRequiredAdapter", run: { ProviderAccessRequirementTests().testTranscriptionServiceKindGroupsProvidersByRequiredAdapter() }),
+            VoiceInkCoreCheck(name: "ProviderAccessRequirementTests.testRemoteTranscriptionProvidersUseSharedTransportAndEndpoints", run: { ProviderAccessRequirementTests().testRemoteTranscriptionProvidersUseSharedTransportAndEndpoints() }),
+            VoiceInkCoreCheck(name: "ProviderAccessRequirementTests.testGeminiUsesNativeTranscriptionEndpointButOpenAICompatiblePostProcessingEndpoint", run: { ProviderAccessRequirementTests().testGeminiUsesNativeTranscriptionEndpointButOpenAICompatiblePostProcessingEndpoint() }),
+            VoiceInkCoreCheck(name: "ProviderAccessRequirementTests.testProviderReadinessFollowsProviderAccessPolicy", run: { ProviderAccessRequirementTests().testProviderReadinessFollowsProviderAccessPolicy() }),
+            VoiceInkCoreCheck(name: "ProviderAccessRequirementTests.testAvailableProvidersFiltersByModelUseAndReadiness", run: { ProviderAccessRequirementTests().testAvailableProvidersFiltersByModelUseAndReadiness() }),
+            VoiceInkCoreCheck(name: "ProviderAccessRequirementTests.testBundledVoiceInkProviderIsNotSelectableUntilAnAdapterExists", run: { ProviderAccessRequirementTests().testBundledVoiceInkProviderIsNotSelectableUntilAnAdapterExists() }),
+            VoiceInkCoreCheck(name: "ProviderAccessRequirementTests.testAvailableProvidersReturnsEmptyWhenNoProviderIsReady", run: { ProviderAccessRequirementTests().testAvailableProvidersReturnsEmptyWhenNoProviderIsReady() }),
+            VoiceInkCoreCheck(name: "ProviderEndpointTests.testConsoleURLsMatchMacOSProviderSettings", run: { ProviderEndpointTests().testConsoleURLsMatchMacOSProviderSettings() }),
+            VoiceInkCoreCheck(name: "ProviderEndpointTests.testPostProcessingChatCompletionsURLsOnlyExistForPostProcessingProviders", run: { ProviderEndpointTests().testPostProcessingChatCompletionsURLsOnlyExistForPostProcessingProviders() }),
+            VoiceInkCoreCheck(name: "ProviderModelSelectionTests.testBundledVoiceInkProviderHasNoSelectableModelsUntilAnAdapterExists", run: { ProviderModelSelectionTests().testBundledVoiceInkProviderHasNoSelectableModelsUntilAnAdapterExists() }),
+            VoiceInkCoreCheck(name: "ProviderModelSelectionTests.testSelectedModelPreservesAvailableCurrentModel", run: { ProviderModelSelectionTests().testSelectedModelPreservesAvailableCurrentModel() }),
+            VoiceInkCoreCheck(name: "ProviderModelSelectionTests.testSelectedModelFallsBackToProviderDefaultWhenCurrentModelIsUnavailable", run: { ProviderModelSelectionTests().testSelectedModelFallsBackToProviderDefaultWhenCurrentModelIsUnavailable() }),
+            VoiceInkCoreCheck(name: "ProviderModelSelectionTests.testPostProcessingDefaultModelUsesCatalogDefaultForCoreAIProviders", run: { ProviderModelSelectionTests().testPostProcessingDefaultModelUsesCatalogDefaultForCoreAIProviders() }),
+            VoiceInkCoreCheck(name: "ProviderModelSelectionTests.testPostProcessingModelListUsesCatalogModelsForCoreAIProviders", run: { ProviderModelSelectionTests().testPostProcessingModelListUsesCatalogModelsForCoreAIProviders() }),
+            VoiceInkCoreCheck(name: "ProviderModelSelectionTests.testPostProcessingModelsAreNilForNonPostProcessingProviders", run: { ProviderModelSelectionTests().testPostProcessingModelsAreNilForNonPostProcessingProviders() }),
+            VoiceInkCoreCheck(name: "ProviderModelSelectionTests.testSelectedModelReturnsEmptyStringWhenUseHasNoModels", run: { ProviderModelSelectionTests().testSelectedModelReturnsEmptyStringWhenUseHasNoModels() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testChatRequestBuilderUsesOpenAICompatibleEndpointAndBody", run: { try RemoteProviderRequestTests().testChatRequestBuilderUsesOpenAICompatibleEndpointAndBody() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testChatCodecReturnsFirstMessageContentOrEmptyString", run: { try RemoteProviderRequestTests().testChatCodecReturnsFirstMessageContentOrEmptyString() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testOpenAICompatibleTranscriptionRequestBuilderUsesMultipartAudioRequest", run: { try RemoteProviderRequestTests().testOpenAICompatibleTranscriptionRequestBuilderUsesMultipartAudioRequest() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testOpenAICompatibleTranscriptionRequestBuilderIncludesOptionalFields", run: { try RemoteProviderRequestTests().testOpenAICompatibleTranscriptionRequestBuilderIncludesOptionalFields() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testOpenAICompatibleTranscriptionRequestBuilderUsesDirectURLForCustomEndpoints", run: { try RemoteProviderRequestTests().testOpenAICompatibleTranscriptionRequestBuilderUsesDirectURLForCustomEndpoints() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testOpenAICompatibleTranscriptionCodecReturnsTextWhenPresent", run: { try RemoteProviderRequestTests().testOpenAICompatibleTranscriptionCodecReturnsTextWhenPresent() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testOpenAICompatibleTranscriptionCodecCanDisablePlainTextFallback", run: { try RemoteProviderRequestTests().testOpenAICompatibleTranscriptionCodecCanDisablePlainTextFallback() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testOpenAICompatibleModelsRequestBuilderCanSetTimeout", run: { try RemoteProviderRequestTests().testOpenAICompatibleModelsRequestBuilderCanSetTimeout() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testOpenAICompatibleClientRejectsBlankAPIKeyWithoutNetwork", run: { try await RemoteProviderRequestTests().testOpenAICompatibleClientRejectsBlankAPIKeyWithoutNetwork() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testDeepgramTranscriptionRequestBuilderUsesListenEndpointAndBody", run: { try RemoteProviderRequestTests().testDeepgramTranscriptionRequestBuilderUsesListenEndpointAndBody() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testDeepgramTranscriptionRequestBuilderCanMatchMacOSLLMkitOptions", run: { try RemoteProviderRequestTests().testDeepgramTranscriptionRequestBuilderCanMatchMacOSLLMkitOptions() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testDeepgramProjectsRequestBuilderUsesProjectsEndpoint", run: { try RemoteProviderRequestTests().testDeepgramProjectsRequestBuilderUsesProjectsEndpoint() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testDeepgramClientRejectsBlankAPIKeyWithoutNetwork", run: { try await RemoteProviderRequestTests().testDeepgramClientRejectsBlankAPIKeyWithoutNetwork() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testDeepgramTranscriptionCodecReturnsFirstTranscriptOrEmptyString", run: { try RemoteProviderRequestTests().testDeepgramTranscriptionCodecReturnsFirstTranscriptOrEmptyString() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testGeminiTranscriptionRequestBuilderUsesGenerateContentEndpointAndBody", run: { try RemoteProviderRequestTests().testGeminiTranscriptionRequestBuilderUsesGenerateContentEndpointAndBody() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testGeminiModelsRequestBuilderUsesNativeModelsEndpoint", run: { try RemoteProviderRequestTests().testGeminiModelsRequestBuilderUsesNativeModelsEndpoint() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testGeminiClientRejectsBlankAPIKeyWithoutNetwork", run: { try await RemoteProviderRequestTests().testGeminiClientRejectsBlankAPIKeyWithoutNetwork() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testGeminiTranscriptionCodecReturnsTrimmedFirstPartOrEmptyString", run: { try RemoteProviderRequestTests().testGeminiTranscriptionCodecReturnsTrimmedFirstPartOrEmptyString() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testMistralTranscriptionRequestBuilderUsesMultipartAudioRequest", run: { try RemoteProviderRequestTests().testMistralTranscriptionRequestBuilderUsesMultipartAudioRequest() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testMistralModelsRequestBuilderUsesModelsEndpoint", run: { try RemoteProviderRequestTests().testMistralModelsRequestBuilderUsesModelsEndpoint() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testMistralClientRejectsBlankAPIKeyWithoutNetwork", run: { try await RemoteProviderRequestTests().testMistralClientRejectsBlankAPIKeyWithoutNetwork() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testMistralTranscriptionCodecReturnsTextIncludingEmptyString", run: { try RemoteProviderRequestTests().testMistralTranscriptionCodecReturnsTextIncludingEmptyString() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testElevenLabsTranscriptionRequestBuilderUsesMultipartAudioRequest", run: { try RemoteProviderRequestTests().testElevenLabsTranscriptionRequestBuilderUsesMultipartAudioRequest() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testElevenLabsUserRequestBuilderUsesUserEndpoint", run: { try RemoteProviderRequestTests().testElevenLabsUserRequestBuilderUsesUserEndpoint() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testElevenLabsClientRejectsBlankAPIKeyWithoutNetwork", run: { try await RemoteProviderRequestTests().testElevenLabsClientRejectsBlankAPIKeyWithoutNetwork() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testElevenLabsTranscriptionCodecReturnsText", run: { try RemoteProviderRequestTests().testElevenLabsTranscriptionCodecReturnsText() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testXAITranscriptionRequestBuilderUsesMultipartAudioRequestWithFileLast", run: { try RemoteProviderRequestTests().testXAITranscriptionRequestBuilderUsesMultipartAudioRequestWithFileLast() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testXAITranscriptionRequestBuilderSkipsLanguageAndFormatForAutoDetect", run: { try RemoteProviderRequestTests().testXAITranscriptionRequestBuilderSkipsLanguageAndFormatForAutoDetect() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testXAIAPIKeyRequestBuilderUsesAPIKeyEndpoint", run: { try RemoteProviderRequestTests().testXAIAPIKeyRequestBuilderUsesAPIKeyEndpoint() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testXAIClientRejectsBlankAPIKeyWithoutNetwork", run: { try await RemoteProviderRequestTests().testXAIClientRejectsBlankAPIKeyWithoutNetwork() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testXAITranscriptionCodecReturnsText", run: { try RemoteProviderRequestTests().testXAITranscriptionCodecReturnsText() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testSonioxUploadFileRequestBuilderUsesFilesEndpointAndMultipartBody", run: { try RemoteProviderRequestTests().testSonioxUploadFileRequestBuilderUsesFilesEndpointAndMultipartBody() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testSonioxCreateTranscriptionRequestBuilderUsesLanguageAndContextPayload", run: { try RemoteProviderRequestTests().testSonioxCreateTranscriptionRequestBuilderUsesLanguageAndContextPayload() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testSonioxCreateTranscriptionRequestBuilderEnablesLanguageIdentificationWithoutHints", run: { try RemoteProviderRequestTests().testSonioxCreateTranscriptionRequestBuilderEnablesLanguageIdentificationWithoutHints() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testSonioxStatusTranscriptAndVerificationRequestBuilders", run: { try RemoteProviderRequestTests().testSonioxStatusTranscriptAndVerificationRequestBuilders() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testSonioxClientRejectsBlankAPIKeyWithoutNetwork", run: { try await RemoteProviderRequestTests().testSonioxClientRejectsBlankAPIKeyWithoutNetwork() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testSonioxTranscriptionCodecReturnsIdsStatusAndTranscript", run: { try RemoteProviderRequestTests().testSonioxTranscriptionCodecReturnsIdsStatusAndTranscript() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testSpeechmaticsSubmitJobRequestBuilderUsesJobsEndpointAndMultipartBody", run: { try RemoteProviderRequestTests().testSpeechmaticsSubmitJobRequestBuilderUsesJobsEndpointAndMultipartBody() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testSpeechmaticsSubmitJobRequestBuilderDefaultsAutoLanguage", run: { try RemoteProviderRequestTests().testSpeechmaticsSubmitJobRequestBuilderDefaultsAutoLanguage() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testSpeechmaticsStatusTranscriptAndVerificationRequestBuilders", run: { try RemoteProviderRequestTests().testSpeechmaticsStatusTranscriptAndVerificationRequestBuilders() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testSpeechmaticsClientRejectsBlankAPIKeyWithoutNetwork", run: { try await RemoteProviderRequestTests().testSpeechmaticsClientRejectsBlankAPIKeyWithoutNetwork() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testSpeechmaticsTranscriptionCodecReturnsIdStatusLanguageAndTranscript", run: { try RemoteProviderRequestTests().testSpeechmaticsTranscriptionCodecReturnsIdStatusLanguageAndTranscript() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testAssemblyAIUploadAudioRequestBuilderUsesUploadEndpointAndAudioBody", run: { try RemoteProviderRequestTests().testAssemblyAIUploadAudioRequestBuilderUsesUploadEndpointAndAudioBody() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testAssemblyAICreateTranscriptRequestBuilderUsesModelLanguagePromptAndKeyterms", run: { try RemoteProviderRequestTests().testAssemblyAICreateTranscriptRequestBuilderUsesModelLanguagePromptAndKeyterms() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testAssemblyAICreateTranscriptRequestBuilderUsesAutoDetectionAndKeytermsPrompt", run: { try RemoteProviderRequestTests().testAssemblyAICreateTranscriptRequestBuilderUsesAutoDetectionAndKeytermsPrompt() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testAssemblyAIStatusAndVerificationRequestBuilders", run: { try RemoteProviderRequestTests().testAssemblyAIStatusAndVerificationRequestBuilders() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testAssemblyAIClientRejectsBlankAPIKeyWithoutNetwork", run: { try await RemoteProviderRequestTests().testAssemblyAIClientRejectsBlankAPIKeyWithoutNetwork() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testAssemblyAITranscriptionCodecReturnsUploadIDAndTranscriptStatus", run: { try RemoteProviderRequestTests().testAssemblyAITranscriptionCodecReturnsUploadIDAndTranscriptStatus() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testCartesiaVoicesRequestBuilderUsesVersionedVoicesEndpoint", run: { try RemoteProviderRequestTests().testCartesiaVoicesRequestBuilderUsesVersionedVoicesEndpoint() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testCartesiaClientRejectsBlankAPIKeyWithoutNetwork", run: { try await RemoteProviderRequestTests().testCartesiaClientRejectsBlankAPIKeyWithoutNetwork() }),
+            VoiceInkCoreCheck(name: "SecretPresentationTests.testObfuscatedAPIKeyReturnsNilForEmptyOrWhitespaceOnlyKeys", run: { SecretPresentationTests().testObfuscatedAPIKeyReturnsNilForEmptyOrWhitespaceOnlyKeys() }),
+            VoiceInkCoreCheck(name: "SecretPresentationTests.testObfuscatedAPIKeyMasksShortKeysCompletely", run: { SecretPresentationTests().testObfuscatedAPIKeyMasksShortKeysCompletely() }),
+            VoiceInkCoreCheck(name: "SecretPresentationTests.testObfuscatedAPIKeyShowsPrefixAndSuffixForLongKeys", run: { SecretPresentationTests().testObfuscatedAPIKeyShowsPrefixAndSuffixForLongKeys() }),
+            VoiceInkCoreCheck(name: "SecretPresentationTests.testObfuscatedAPIKeyTrimsWhitespaceBeforeMasking", run: { SecretPresentationTests().testObfuscatedAPIKeyTrimsWhitespaceBeforeMasking() }),
+            VoiceInkCoreCheck(name: "SecretPresentationTests.testObfuscatedAPIKeyPreservesCurrentSevenCharacterEdgeCase", run: { SecretPresentationTests().testObfuscatedAPIKeyPreservesCurrentSevenCharacterEdgeCase() }),
+            VoiceInkCoreCheck(name: "StoredAudioFileTests.testRecordingsDirectoryNameMatchesExistingStoragePath", run: { StoredAudioFileTests().testRecordingsDirectoryNameMatchesExistingStoragePath() }),
+            VoiceInkCoreCheck(name: "StoredAudioFileTests.testResolvesFileURLString", run: { StoredAudioFileTests().testResolvesFileURLString() }),
+            VoiceInkCoreCheck(name: "StoredAudioFileTests.testResolvesAbsolutePath", run: { StoredAudioFileTests().testResolvesAbsolutePath() }),
+            VoiceInkCoreCheck(name: "StoredAudioFileTests.testResolvesRelativeFilenameAgainstRecordingsDirectory", run: { StoredAudioFileTests().testResolvesRelativeFilenameAgainstRecordingsDirectory() }),
+            VoiceInkCoreCheck(name: "StoredAudioFileTests.testRejectsBlankAndRelativeValueWithoutDirectory", run: { StoredAudioFileTests().testRejectsBlankAndRelativeValueWithoutDirectory() }),
+            VoiceInkCoreCheck(name: "TranscriptPresentationTests.testMatchesSearchReturnsTrueForEmptyQuery", run: { TranscriptPresentationTests().testMatchesSearchReturnsTrueForEmptyQuery() }),
+            VoiceInkCoreCheck(name: "TranscriptPresentationTests.testMatchesSearchChecksRawTextCaseInsensitively", run: { TranscriptPresentationTests().testMatchesSearchChecksRawTextCaseInsensitively() }),
+            VoiceInkCoreCheck(name: "TranscriptPresentationTests.testMatchesSearchChecksEnhancedTextCaseInsensitively", run: { TranscriptPresentationTests().testMatchesSearchChecksEnhancedTextCaseInsensitively() }),
+            VoiceInkCoreCheck(name: "TranscriptPresentationTests.testMatchesSearchReturnsFalseWhenQueryIsAbsent", run: { TranscriptPresentationTests().testMatchesSearchReturnsFalseWhenQueryIsAbsent() }),
+            VoiceInkCoreCheck(name: "TranscriptPresentationTests.testStatusTitleReturnsRetryStateTitles", run: { TranscriptPresentationTests().testStatusTitleReturnsRetryStateTitles() }),
+            VoiceInkCoreCheck(name: "TranscriptPresentationTests.testStatusTitleReturnsNilForNonRetryStates", run: { TranscriptPresentationTests().testStatusTitleReturnsNilForNonRetryStates() }),
+            VoiceInkCoreCheck(name: "TranscriptPresentationTests.testStatusBadgeTextReturnsRetryStateLabels", run: { TranscriptPresentationTests().testStatusBadgeTextReturnsRetryStateLabels() }),
+            VoiceInkCoreCheck(name: "TranscriptPresentationTests.testStatusBadgeTextReturnsNilForNonRetryStates", run: { TranscriptPresentationTests().testStatusBadgeTextReturnsNilForNonRetryStates() }),
+            VoiceInkCoreCheck(name: "TranscriptionModelCatalogTests.testDeepgramLanguageCapabilityIsSharedProviderMetadata", run: { TranscriptionModelCatalogTests().testDeepgramLanguageCapabilityIsSharedProviderMetadata() }),
+            VoiceInkCoreCheck(name: "TranscriptionModelCatalogTests.testMistralLanguageCapabilityAndModelAreSharedProviderMetadata", run: { TranscriptionModelCatalogTests().testMistralLanguageCapabilityAndModelAreSharedProviderMetadata() }),
+            VoiceInkCoreCheck(name: "TranscriptionModelCatalogTests.testSonioxLanguageCapabilityAndModelAreSharedProviderMetadata", run: { TranscriptionModelCatalogTests().testSonioxLanguageCapabilityAndModelAreSharedProviderMetadata() }),
+            VoiceInkCoreCheck(name: "TranscriptionModelCatalogTests.testSpeechmaticsLanguageCapabilityAndModelAreSharedProviderMetadata", run: { TranscriptionModelCatalogTests().testSpeechmaticsLanguageCapabilityAndModelAreSharedProviderMetadata() }),
+            VoiceInkCoreCheck(name: "TranscriptionModelCatalogTests.testElevenLabsLanguageCapabilityAndModelsAreSharedProviderMetadata", run: { TranscriptionModelCatalogTests().testElevenLabsLanguageCapabilityAndModelsAreSharedProviderMetadata() }),
+            VoiceInkCoreCheck(name: "TranscriptionModelCatalogTests.testXAILanguageCapabilityAndModelAreSharedProviderMetadata", run: { TranscriptionModelCatalogTests().testXAILanguageCapabilityAndModelAreSharedProviderMetadata() }),
+            VoiceInkCoreCheck(name: "TranscriptionModelCatalogTests.testCartesiaLanguageCapabilityAndModelAreSharedProviderMetadata", run: { TranscriptionModelCatalogTests().testCartesiaLanguageCapabilityAndModelAreSharedProviderMetadata() }),
+            VoiceInkCoreCheck(name: "TranscriptionModelCatalogTests.testAssemblyAILanguageCapabilityAndModelsAreSharedProviderMetadata", run: { TranscriptionModelCatalogTests().testAssemblyAILanguageCapabilityAndModelsAreSharedProviderMetadata() }),
+            VoiceInkCoreCheck(name: "TranscriptionModelCatalogTests.testOpenAICompatibleProvidersUseAllLanguagesWithoutAutoDetectFlag", run: { TranscriptionModelCatalogTests().testOpenAICompatibleProvidersUseAllLanguagesWithoutAutoDetectFlag() }),
+            VoiceInkCoreCheck(name: "TranscriptionModelCatalogTests.testProviderKindExposesTranscriptionLanguageCapabilityMetadata", run: { TranscriptionModelCatalogTests().testProviderKindExposesTranscriptionLanguageCapabilityMetadata() }),
+            VoiceInkCoreCheck(name: "TranscriptionRunProcessorTests.testTranscribeNormalizesTextAndSkipsPostProcessingWhenDisabled", run: { try await TranscriptionRunProcessorTests().testTranscribeNormalizesTextAndSkipsPostProcessingWhenDisabled() }),
+            VoiceInkCoreCheck(name: "TranscriptionRunProcessorTests.testTranscribeRunsPostProcessingWhenEnabledWithPromptAndKey", run: { try await TranscriptionRunProcessorTests().testTranscribeRunsPostProcessingWhenEnabledWithPromptAndKey() }),
+            VoiceInkCoreCheck(name: "TranscriptionRunProcessorTests.testEnhancedTextIsNilWhenSuccessfulPostProcessingReturnsCleanedText", run: { try await TranscriptionRunProcessorTests().testEnhancedTextIsNilWhenSuccessfulPostProcessingReturnsCleanedText() }),
+            VoiceInkCoreCheck(name: "TranscriptionRunProcessorTests.testTranscribeKeepsCleanedTextWhenPostProcessingFails", run: { try await TranscriptionRunProcessorTests().testTranscribeKeepsCleanedTextWhenPostProcessingFails() }),
+            VoiceInkCoreCheck(name: "TranscriptionRunProcessorTests.testTranscribeThrowsWhenTranscriptionAPIKeyIsMissing", run: { await TranscriptionRunProcessorTests().testTranscribeThrowsWhenTranscriptionAPIKeyIsMissing() }),
+            VoiceInkCoreCheck(name: "VADModelFilesTests.testSileroFilenameUsesSharedResourceNameAndExtension", run: { VADModelFilesTests().testSileroFilenameUsesSharedResourceNameAndExtension() }),
+            VoiceInkCoreCheck(name: "WhisperModelFilesTests.testBootstrapModelsContainBaseModelSpec", run: { WhisperModelFilesTests().testBootstrapModelsContainBaseModelSpec() }),
+            VoiceInkCoreCheck(name: "WhisperModelFilesTests.testDownloadableModelsMatchMacOSLocalWhisperCatalog", run: { WhisperModelFilesTests().testDownloadableModelsMatchMacOSLocalWhisperCatalog() }),
+        ]
+
+        for check in checks {
+            let failuresBefore = VoiceInkCoreTestRecorder.failureCount
+            do {
+                try await check.run()
+            } catch {
+                XCTFail("Unexpected thrown error in \(check.name): \(error)")
+            }
+
+            if VoiceInkCoreTestRecorder.failureCount == failuresBefore {
+                print("PASS \(check.name)")
+            } else {
+                print("FAIL \(check.name)")
+            }
+        }
+
+        if VoiceInkCoreTestRecorder.failureCount > 0 {
+            print("\nVoiceInkCoreChecks failed:\n\(VoiceInkCoreTestRecorder.failureSummary)")
+            exit(1)
+        }
+
+        print("Executed \(checks.count) VoiceInkCore checks.")
+    }
+}

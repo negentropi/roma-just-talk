@@ -1,5 +1,4 @@
-#if canImport(XCTest)
-import XCTest
+import Foundation
 @testable import VoiceInkCore
 
 final class PostProcessingRequestTests: XCTestCase {
@@ -67,4 +66,3 @@ final class PostProcessingRequestTests: XCTestCase {
         )
     }
 }
-#endif

@@ -1,5 +1,4 @@
-#if canImport(XCTest)
-import XCTest
+import Foundation
 @testable import VoiceInkCore
 
 final class VADModelFilesTests: XCTestCase {
@@ -9,4 +8,3 @@ final class VADModelFilesTests: XCTestCase {
         XCTAssertEqual(VoiceInkVADModelFiles.sileroFilename, "ggml-silero-v5.1.2.bin")
     }
 }
-#endif

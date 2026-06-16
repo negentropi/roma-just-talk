@@ -1,5 +1,4 @@
-#if canImport(XCTest)
-import XCTest
+import Foundation
 @testable import VoiceInkCore
 
 final class DurationPresentationTests: XCTestCase {
@@ -35,4 +34,3 @@ final class DurationPresentationTests: XCTestCase {
         XCTAssertEqual(VoiceInkDurationPresentation.compactElapsed(125.6), "2m 6s")
     }
 }
-#endif

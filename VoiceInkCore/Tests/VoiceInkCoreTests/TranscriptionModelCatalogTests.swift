@@ -1,5 +1,4 @@
-#if canImport(XCTest)
-import XCTest
+import Foundation
 @testable import VoiceInkCore
 
 final class TranscriptionModelCatalogTests: XCTestCase {
@@ -117,4 +116,3 @@ final class TranscriptionModelCatalogTests: XCTestCase {
         }
     }
 }
-#endif

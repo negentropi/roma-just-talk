@@ -1,5 +1,4 @@
-#if canImport(XCTest)
-import XCTest
+import Foundation
 @testable import VoiceInkCore
 
 final class WhisperModelFilesTests: XCTestCase {
@@ -31,4 +30,3 @@ final class WhisperModelFilesTests: XCTestCase {
         XCTAssertEqual(quantizedTurbo?.ramUsage, 1.0)
     }
 }
-#endif

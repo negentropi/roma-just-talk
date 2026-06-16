@@ -1,6 +1,4 @@
-#if canImport(XCTest)
 import Foundation
-import XCTest
 @testable import VoiceInkCore
 
 final class RemoteProviderRequestTests: XCTestCase {
@@ -134,19 +132,15 @@ final class RemoteProviderRequestTests: XCTestCase {
     }
 
     func testOpenAICompatibleTranscriptionCodecReturnsTextWhenPresent() throws {
-        let response = VoiceInkOpenAICompatibleTranscriptionResponse(
-            text: "transcribed text",
-            language: "en",
-            duration: 1.2
-        )
-
         XCTAssertEqual(
-            try VoiceInkOpenAICompatibleTranscriptionCodec.textIfPresent(from: JSONEncoder().encode(response)),
+            try VoiceInkOpenAICompatibleTranscriptionCodec.textIfPresent(
+                from: Data(#"{"text":"transcribed text","language":"en","duration":1.2}"#.utf8)
+            ),
             "transcribed text"
         )
         XCTAssertNil(
             try VoiceInkOpenAICompatibleTranscriptionCodec.textIfPresent(
-                from: JSONEncoder().encode(VoiceInkOpenAICompatibleTranscriptionResponse(text: nil))
+                from: Data(#"{"text":null}"#.utf8)
             )
         )
     }
@@ -1052,4 +1046,3 @@ final class RemoteProviderRequestTests: XCTestCase {
         )
     }
 }
-#endif

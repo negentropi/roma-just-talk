@@ -1,5 +1,4 @@
-#if canImport(XCTest)
-import XCTest
+import Foundation
 @testable import VoiceInkCore
 
 final class TranscriptPresentationTests: XCTestCase {
@@ -75,4 +74,3 @@ final class TranscriptPresentationTests: XCTestCase {
         XCTAssertNil(VoiceInkTranscriptPresentation.statusBadgeText(for: .canceled))
     }
 }
-#endif

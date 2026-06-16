@@ -12,15 +12,20 @@ let package = Package(
         .library(
             name: "VoiceInkCore",
             targets: ["VoiceInkCore"]
+        ),
+        .executable(
+            name: "VoiceInkCoreChecks",
+            targets: ["VoiceInkCoreChecks"]
         )
     ],
     targets: [
         .target(
             name: "VoiceInkCore"
         ),
-        .testTarget(
-            name: "VoiceInkCoreTests",
-            dependencies: ["VoiceInkCore"]
+        .executableTarget(
+            name: "VoiceInkCoreChecks",
+            dependencies: ["VoiceInkCore"],
+            path: "Tests/VoiceInkCoreTests"
         )
     ]
 )

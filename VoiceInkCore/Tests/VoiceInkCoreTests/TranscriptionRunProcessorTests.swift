@@ -1,6 +1,4 @@
-#if canImport(XCTest)
 import Foundation
-import XCTest
 @testable import VoiceInkCore
 
 final class TranscriptionRunProcessorTests: XCTestCase {
@@ -152,4 +150,3 @@ private struct StubLocalizedError: LocalizedError {
         message
     }
 }
-#endif

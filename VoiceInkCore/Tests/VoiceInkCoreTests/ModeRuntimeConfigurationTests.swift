@@ -1,5 +1,4 @@
-#if canImport(XCTest)
-import XCTest
+import Foundation
 @testable import VoiceInkCore
 
 final class ModeRuntimeConfigurationTests: XCTestCase {
@@ -11,7 +10,7 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
         XCTAssertEqual(configuration.transcriptionModel, VoiceInkTranscriptionModelCatalog.localBaseModel)
         XCTAssertEqual(configuration.postProcessingProvider, .groq)
         XCTAssertEqual(configuration.postProcessingModel, VoiceInkAIModelCatalog.defaultModel(for: .groq))
-        XCTAssertEqual(configuration.prompt, "")
+        XCTAssertEqual(configuration.prompt, Mode.defaultLocalWhisper().effectivePrompt)
         XCTAssertFalse(configuration.isPostProcessingEnabled)
     }
 
@@ -202,4 +201,3 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
         ))
     }
 }
-#endif

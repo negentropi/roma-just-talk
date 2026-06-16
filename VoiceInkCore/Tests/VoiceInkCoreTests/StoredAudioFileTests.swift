@@ -1,5 +1,4 @@
-#if canImport(XCTest)
-import XCTest
+import Foundation
 @testable import VoiceInkCore
 
 final class StoredAudioFileTests: XCTestCase {
@@ -39,4 +38,3 @@ final class StoredAudioFileTests: XCTestCase {
         XCTAssertNil(VoiceInkStoredAudioFile.resolvedURL(for: "voiceink-recording.m4a"))
     }
 }
-#endif

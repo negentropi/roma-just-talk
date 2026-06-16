@@ -1,5 +1,4 @@
-#if canImport(XCTest)
-import XCTest
+import Foundation
 @testable import VoiceInkCore
 
 final class PCM16AudioSamplesTests: XCTestCase {
@@ -52,4 +51,3 @@ final class PCM16AudioSamplesTests: XCTestCase {
         return data
     }
 }
-#endif

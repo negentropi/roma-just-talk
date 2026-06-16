@@ -1,5 +1,4 @@
-#if canImport(XCTest)
-import XCTest
+import Foundation
 @testable import VoiceInkCore
 
 final class ProviderEndpointTests: XCTestCase {
@@ -45,4 +44,3 @@ final class ProviderEndpointTests: XCTestCase {
         XCTAssertNil(VoiceInkProviderKind.voiceInk.postProcessingChatCompletionsURL)
     }
 }
-#endif

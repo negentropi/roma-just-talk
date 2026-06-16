@@ -1,5 +1,4 @@
-#if canImport(XCTest)
-import XCTest
+import Foundation
 @testable import VoiceInkCore
 
 final class SecretPresentationTests: XCTestCase {
@@ -33,4 +32,3 @@ final class SecretPresentationTests: XCTestCase {
         )
     }
 }
-#endif

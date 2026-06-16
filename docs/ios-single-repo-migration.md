@@ -86,11 +86,11 @@ Before treating `../VoiceInk-iOS` as obsolete, verify current state from `VoiceI
 
 1. `VoiceInk.xcworkspace` includes `iOS/VoiceInk-ios.xcodeproj`.
 2. macOS and iOS projects both resolve `VoiceInkCore` from inside `VoiceInk/`.
-3. `VoiceInkCore` tests pass.
+3. `swift run VoiceInkCoreChecks` passes from `VoiceInkCore/`.
 4. macOS Swift sources parse or build.
 5. iOS app, keyboard, unit-test, and UI-test Swift sources parse or build.
 6. `plutil -lint` passes for both project files and iOS plists/entitlements.
 7. `xmllint --noout` passes for workspace and shared scheme XML.
 8. A real Xcode toolchain is selected and both app targets build.
 
-Current local blocker: this machine selects `/Library/Developer/CommandLineTools`, so `xcrun -find xcodebuild` cannot find `xcodebuild`. Use the static gates above until Xcode is selected.
+Current local blocker: this machine selects `/Library/Developer/CommandLineTools`, so `xcrun -find xcodebuild` cannot find `xcodebuild`. That toolchain also cannot import XCTest or Swift Testing, so `swift test` is not a real execution gate here; use `swift run VoiceInkCoreChecks` plus the static gates above until Xcode is selected.

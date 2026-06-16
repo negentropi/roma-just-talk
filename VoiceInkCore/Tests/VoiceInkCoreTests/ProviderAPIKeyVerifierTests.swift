@@ -1,5 +1,4 @@
-#if canImport(XCTest)
-import XCTest
+import Foundation
 @testable import VoiceInkCore
 
 final class ProviderAPIKeyVerifierTests: XCTestCase {
@@ -42,4 +41,3 @@ final class ProviderAPIKeyVerifierTests: XCTestCase {
         )
     }
 }
-#endif

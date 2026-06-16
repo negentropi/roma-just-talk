@@ -1,5 +1,4 @@
-#if canImport(XCTest)
-import XCTest
+import Foundation
 @testable import VoiceInkCore
 
 final class ProviderModelSelectionTests: XCTestCase {
@@ -90,4 +89,3 @@ final class ProviderModelSelectionTests: XCTestCase {
         )
     }
 }
-#endif

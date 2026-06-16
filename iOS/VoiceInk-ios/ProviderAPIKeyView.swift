@@ -9,7 +9,7 @@ struct ProviderAPIKeyView: View {
     @State private var verifyResult: Bool? = nil
     @State private var editingKey: Bool = true
 
-    private let deepgramService = DeepgramTranscriptionService()
+    private let deepgramClient = VoiceInkDeepgramTranscriptionClient()
     private let openAIClient = VoiceInkOpenAICompatibleClient()
     
     private var isKeyVerified: Bool {
@@ -102,7 +102,7 @@ struct ProviderAPIKeyView: View {
             let ok: Bool
             switch provider.apiKeyVerificationTransport {
             case .deepgramProjects:
-                ok = await deepgramService.verifyAPIKey(apiBaseURL: provider.baseURL, keyToVerify)
+                ok = await deepgramClient.verifyAPIKey(baseURL: provider.baseURL, apiKey: keyToVerify)
             case .openAICompatibleModels:
                 ok = await openAIClient.verifyAPIKey(baseURL: provider.baseURL, apiKey: keyToVerify)
             case nil:

@@ -44,6 +44,10 @@ public enum VoiceInkProviderEndpoint: String, CaseIterable, Sendable {
         URL(string: "https://api.soniox.com/v1")!
     }
 
+    public static var speechmaticsAPIBaseURL: URL {
+        URL(string: "https://asr.api.speechmatics.com/v2")!
+    }
+
     public var chatCompletionsURL: URL? {
         switch self {
         case .groq, .openAI, .cerebras, .gemini:
@@ -145,5 +149,20 @@ public enum VoiceInkProviderEndpoint: String, CaseIterable, Sendable {
 
     public static func sonioxTranscriptURL(from baseURL: URL, id: String) -> URL {
         sonioxTranscriptionURL(from: baseURL, id: id).appendingPathComponent("transcript")
+    }
+
+    public static func speechmaticsJobsURL(from baseURL: URL) -> URL {
+        baseURL.appendingPathComponent("jobs")
+    }
+
+    public static func speechmaticsJobURL(from baseURL: URL, id: String) -> URL {
+        speechmaticsJobsURL(from: baseURL).appendingPathComponent(id)
+    }
+
+    public static func speechmaticsTranscriptURL(from baseURL: URL, id: String) -> URL {
+        let url = speechmaticsJobURL(from: baseURL, id: id).appendingPathComponent("transcript")
+        var components = URLComponents(url: url, resolvingAgainstBaseURL: false)!
+        components.queryItems = [URLQueryItem(name: "format", value: "txt")]
+        return components.url!
     }
 }

@@ -764,5 +764,135 @@ final class RemoteProviderRequestTests: XCTestCase {
             "plain soniox text"
         )
     }
+
+    func testSpeechmaticsSubmitJobRequestBuilderUsesJobsEndpointAndMultipartBody() throws {
+        let preparedRequest = try VoiceInkSpeechmaticsRequestBuilder.makeSubmitJobRequest(
+            baseURL: VoiceInkProviderEndpoint.speechmaticsAPIBaseURL,
+            apiKey: "speechmatics-key",
+            audioData: Data("WAVDATA".utf8),
+            fileName: "sample.wav",
+            language: "zh",
+            operatingPoint: "enhanced",
+            customVocabulary: ["Roma", "Felix"],
+            boundary: "Boundary-test",
+            timeout: 30
+        )
+
+        XCTAssertEqual(preparedRequest.request.url?.absoluteString, "https://asr.api.speechmatics.com/v2/jobs")
+        XCTAssertEqual(preparedRequest.request.httpMethod, "POST")
+        XCTAssertEqual(preparedRequest.request.value(forHTTPHeaderField: "Authorization"), "Bearer speechmatics-key")
+        XCTAssertEqual(
+            preparedRequest.request.value(forHTTPHeaderField: "Content-Type"),
+            "multipart/form-data; boundary=Boundary-test"
+        )
+        XCTAssertEqual(preparedRequest.request.timeoutInterval, 30)
+
+        let body = try XCTUnwrap(String(data: preparedRequest.body, encoding: .utf8))
+        XCTAssertTrue(body.contains("Content-Disposition: form-data; name=\"config\""))
+        XCTAssertTrue(body.contains(#""type":"transcription""#))
+        XCTAssertTrue(body.contains(#""language":"cmn""#))
+        XCTAssertTrue(body.contains(#""operating_point":"enhanced""#))
+        XCTAssertTrue(body.contains(#""additional_vocab""#))
+        XCTAssertTrue(body.contains(#""content":"Roma""#))
+        XCTAssertTrue(body.contains(#""content":"Felix""#))
+        XCTAssertTrue(body.contains("Content-Disposition: form-data; name=\"data_file\"; filename=\"sample.wav\""))
+        XCTAssertTrue(body.contains("Content-Type: audio/wav"))
+        XCTAssertTrue(body.contains("WAVDATA"))
+        XCTAssertTrue(body.contains("--Boundary-test--"))
+    }
+
+    func testSpeechmaticsSubmitJobRequestBuilderDefaultsAutoLanguage() throws {
+        let preparedRequest = try VoiceInkSpeechmaticsRequestBuilder.makeSubmitJobRequest(
+            baseURL: VoiceInkProviderEndpoint.speechmaticsAPIBaseURL,
+            apiKey: "speechmatics-key",
+            audioData: Data("WAVDATA".utf8),
+            fileName: "sample.wav",
+            language: nil,
+            boundary: "Boundary-test"
+        )
+
+        let body = try XCTUnwrap(String(data: preparedRequest.body, encoding: .utf8))
+        XCTAssertTrue(body.contains(#""language":"auto""#))
+        XCTAssertFalse(body.contains(#""additional_vocab""#))
+    }
+
+    func testSpeechmaticsStatusTranscriptAndVerificationRequestBuilders() throws {
+        let status = VoiceInkSpeechmaticsRequestBuilder.makeJobStatusRequest(
+            baseURL: VoiceInkProviderEndpoint.speechmaticsAPIBaseURL,
+            apiKey: "speechmatics-key",
+            id: "job-123",
+            timeout: 30
+        )
+        XCTAssertEqual(status.url?.absoluteString, "https://asr.api.speechmatics.com/v2/jobs/job-123")
+        XCTAssertEqual(status.httpMethod, "GET")
+        XCTAssertEqual(status.value(forHTTPHeaderField: "Authorization"), "Bearer speechmatics-key")
+        XCTAssertEqual(status.timeoutInterval, 30)
+
+        let transcript = VoiceInkSpeechmaticsRequestBuilder.makeTranscriptRequest(
+            baseURL: VoiceInkProviderEndpoint.speechmaticsAPIBaseURL,
+            apiKey: "speechmatics-key",
+            id: "job-123",
+            timeout: 30
+        )
+        XCTAssertEqual(
+            transcript.url?.absoluteString,
+            "https://asr.api.speechmatics.com/v2/jobs/job-123/transcript?format=txt"
+        )
+        XCTAssertEqual(transcript.httpMethod, "GET")
+        XCTAssertEqual(transcript.value(forHTTPHeaderField: "Authorization"), "Bearer speechmatics-key")
+        XCTAssertEqual(transcript.timeoutInterval, 30)
+
+        let jobs = VoiceInkSpeechmaticsRequestBuilder.makeJobsRequest(
+            baseURL: VoiceInkProviderEndpoint.speechmaticsAPIBaseURL,
+            apiKey: "speechmatics-key",
+            timeout: 10
+        )
+        XCTAssertEqual(jobs.url?.absoluteString, "https://asr.api.speechmatics.com/v2/jobs")
+        XCTAssertEqual(jobs.httpMethod, "GET")
+        XCTAssertEqual(jobs.value(forHTTPHeaderField: "Authorization"), "Bearer speechmatics-key")
+        XCTAssertEqual(jobs.timeoutInterval, 10)
+    }
+
+    func testSpeechmaticsClientRejectsBlankAPIKeyWithoutNetwork() async throws {
+        let result = await VoiceInkSpeechmaticsTranscriptionClient().verifyAPIKeyDetailed(
+            baseURL: VoiceInkProviderEndpoint.speechmaticsAPIBaseURL,
+            apiKey: " \n\t "
+        )
+
+        XCTAssertEqual(
+            result,
+            VoiceInkAPIKeyVerificationResult(
+                isValid: false,
+                errorMessage: "API key is missing or empty."
+            )
+        )
+    }
+
+    func testSpeechmaticsTranscriptionCodecReturnsIdStatusLanguageAndTranscript() throws {
+        XCTAssertEqual(
+            try VoiceInkSpeechmaticsTranscriptionCodec.submittedJobID(from: Data(#"{"id":"job-123"}"#.utf8)),
+            "job-123"
+        )
+        XCTAssertEqual(
+            try VoiceInkSpeechmaticsTranscriptionCodec.jobStatus(from: Data(#"{"job":{"status":"done"}}"#.utf8)),
+            "done"
+        )
+        XCTAssertEqual(
+            VoiceInkSpeechmaticsTranscriptionCodec.speechmaticsLanguage(from: nil),
+            "auto"
+        )
+        XCTAssertEqual(
+            VoiceInkSpeechmaticsTranscriptionCodec.speechmaticsLanguage(from: "auto"),
+            "auto"
+        )
+        XCTAssertEqual(
+            VoiceInkSpeechmaticsTranscriptionCodec.speechmaticsLanguage(from: "zh"),
+            "cmn"
+        )
+        XCTAssertEqual(
+            VoiceInkSpeechmaticsTranscriptionCodec.transcript(from: Data("speechmatics text".utf8)),
+            "speechmatics text"
+        )
+    }
 }
 #endif

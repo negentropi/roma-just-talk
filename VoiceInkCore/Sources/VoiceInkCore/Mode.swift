@@ -8,15 +8,9 @@ public struct VoiceInkModeRuntimeConfiguration: Equatable, Sendable {
     public let prompt: String
     public let isPostProcessingEnabled: Bool
 
-    public static let fallback = VoiceInkModeRuntimeConfiguration(
-        transcriptionProvider: .groq,
-        transcriptionModel: VoiceInkTranscriptionModelCatalog.voiceInkTranscriptionModel,
-        postProcessingProvider: .groq,
-        postProcessingModel: VoiceInkProviderKind.groq.defaultModel(for: .postProcessing)
-            ?? VoiceInkAIModelCatalog.defaultModel(for: .groq),
-        prompt: "",
-        isPostProcessingEnabled: false
-    )
+    public static var fallback: VoiceInkModeRuntimeConfiguration {
+        Mode.defaultLocalWhisper().runtimeConfiguration
+    }
 }
 
 public struct Mode: Identifiable, Codable {

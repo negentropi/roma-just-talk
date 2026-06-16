@@ -3,16 +3,20 @@ import XCTest
 @testable import VoiceInkCore
 
 final class ModeRuntimeConfigurationTests: XCTestCase {
-    func testEmptyModeCollectionUsesExistingFallbackConfiguration() {
+    func testEmptyModeCollectionUsesDefaultLocalWhisperFallbackConfiguration() {
         let configuration = [Mode]().runtimeConfiguration(selectedModeId: nil)
 
         XCTAssertEqual(configuration, .fallback)
-        XCTAssertEqual(configuration.transcriptionProvider, .groq)
-        XCTAssertEqual(configuration.transcriptionModel, VoiceInkTranscriptionModelCatalog.voiceInkTranscriptionModel)
+        XCTAssertEqual(configuration.transcriptionProvider, .localWhisper)
+        XCTAssertEqual(configuration.transcriptionModel, VoiceInkTranscriptionModelCatalog.localBaseModel)
         XCTAssertEqual(configuration.postProcessingProvider, .groq)
         XCTAssertEqual(configuration.postProcessingModel, VoiceInkAIModelCatalog.defaultModel(for: .groq))
         XCTAssertEqual(configuration.prompt, "")
         XCTAssertFalse(configuration.isPostProcessingEnabled)
+    }
+
+    func testFallbackConfigurationMatchesDefaultLocalWhisperMode() {
+        XCTAssertEqual(VoiceInkModeRuntimeConfiguration.fallback, Mode.defaultLocalWhisper().runtimeConfiguration)
     }
 
     func testDefaultModeUsesSharedPostProcessingDefaultPolicy() {

@@ -3,15 +3,16 @@
 //
 
 import Foundation
+import VoiceInkCore
 
 struct TranscriptionServiceFactory {
     static func service(for provider: Provider) -> TranscriptionService {
-        switch provider {
+        switch provider.coreKind.transcriptionTransport {
         case .deepgram:
             return DeepgramTranscriptionService()
-        case .groq, .openai, .cerebras, .gemini, .voiceink:
+        case .openAICompatible:
             return GroqTranscriptionService()
-        case .local:
+        case .localWhisper:
             return WhisperTranscriptionService()
         }
     }

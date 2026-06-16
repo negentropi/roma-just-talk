@@ -132,6 +132,11 @@ struct RollingBufferPreloadPolicyTests {
             at: Date(timeIntervalSince1970: 1)
         )
         diagnostics.recordQuickReleaseTiming(
+            stage: .activeWindowReady,
+            elapsedSeconds: 0.144,
+            at: Date(timeIntervalSince1970: 1.5)
+        )
+        diagnostics.recordQuickReleaseTiming(
             stage: .pasteCompleted,
             elapsedSeconds: 0.222,
             at: Date(timeIntervalSince1970: 2)
@@ -158,6 +163,7 @@ struct RollingBufferPreloadPolicyTests {
         #expect(claim.audioBytes == 1_024)
         #expect(claim.claimElapsedSeconds == 0.012)
         #expect(claim.transcriptionReadySeconds == 0.111)
+        #expect(claim.activeWindowReadySeconds == 0.144)
         #expect(claim.pasteCompletedSeconds == 0.222)
         #expect(claim.pipelineReturnedSeconds == 0.333)
         #expect(claim.idleSeconds == 0.444)
@@ -167,6 +173,7 @@ struct RollingBufferPreloadPolicyTests {
         #expect(claim.displaySummary.contains("paste 0.222s"))
         #expect(claim.displaySummary.contains("idle 0.444s"))
         #expect(claim.exportSummary.contains("transcription=0.111s"))
+        #expect(claim.exportSummary.contains("active-window=0.144s"))
         #expect(claim.exportSummary.contains("returned=0.333s"))
         #expect(claim.exportSummary.contains("idle=0.444s"))
         #expect(claim.exportSummary.contains("session-finished=0.555s"))

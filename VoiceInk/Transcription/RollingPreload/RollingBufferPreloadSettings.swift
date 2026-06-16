@@ -219,6 +219,7 @@ enum RollingBufferQuickReleaseClaimStrategy: String {
 
 enum RollingBufferQuickReleaseTimingStage {
     case transcriptionReady
+    case activeWindowReady
     case pasteStarting
     case pasteCompleted
     case pipelineReturned
@@ -234,6 +235,7 @@ struct RollingBufferQuickReleaseClaimSnapshot: Equatable {
     var updatedAt: Date?
     var claimElapsedSeconds: TimeInterval?
     var transcriptionReadySeconds: TimeInterval?
+    var activeWindowReadySeconds: TimeInterval?
     var pasteStartingSeconds: TimeInterval?
     var pasteCompletedSeconds: TimeInterval?
     var pipelineReturnedSeconds: TimeInterval?
@@ -255,6 +257,8 @@ struct RollingBufferQuickReleaseClaimSnapshot: Equatable {
             parts.append("paste \(Self.formatSeconds(pasteCompletedSeconds))")
         } else if let pasteStartingSeconds {
             parts.append("paste-start \(Self.formatSeconds(pasteStartingSeconds))")
+        } else if let activeWindowReadySeconds {
+            parts.append("window \(Self.formatSeconds(activeWindowReadySeconds))")
         } else if let transcriptionReadySeconds {
             parts.append("transcribed \(Self.formatSeconds(transcriptionReadySeconds))")
         } else if let claimElapsedSeconds {
@@ -273,6 +277,7 @@ struct RollingBufferQuickReleaseClaimSnapshot: Equatable {
         let timingParts = [
             Self.timingPart("claim", claimElapsedSeconds),
             Self.timingPart("transcription", transcriptionReadySeconds),
+            Self.timingPart("active-window", activeWindowReadySeconds),
             Self.timingPart("paste-start", pasteStartingSeconds),
             Self.timingPart("paste-complete", pasteCompletedSeconds),
             Self.timingPart("returned", pipelineReturnedSeconds),
@@ -289,6 +294,8 @@ struct RollingBufferQuickReleaseClaimSnapshot: Equatable {
         switch stage {
         case .transcriptionReady:
             transcriptionReadySeconds = elapsedSeconds
+        case .activeWindowReady:
+            activeWindowReadySeconds = elapsedSeconds
         case .pasteStarting:
             pasteStartingSeconds = elapsedSeconds
         case .pasteCompleted:
@@ -325,6 +332,7 @@ final class RollingBufferPreloadRuntimeDiagnostics {
         updatedAt: nil,
         claimElapsedSeconds: nil,
         transcriptionReadySeconds: nil,
+        activeWindowReadySeconds: nil,
         pasteStartingSeconds: nil,
         pasteCompletedSeconds: nil,
         pipelineReturnedSeconds: nil,
@@ -349,6 +357,7 @@ final class RollingBufferPreloadRuntimeDiagnostics {
             updatedAt: updatedAt,
             claimElapsedSeconds: elapsedSeconds,
             transcriptionReadySeconds: nil,
+            activeWindowReadySeconds: nil,
             pasteStartingSeconds: nil,
             pasteCompletedSeconds: nil,
             pipelineReturnedSeconds: nil,

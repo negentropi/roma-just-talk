@@ -20,6 +20,7 @@
 - Released the recorder file lock before forwarding queued live chunks after pre-roll streaming emission, reducing audio-thread blocking risk during startup handoff.
 - Shortened the post-commit wait for local FluidAudio streaming finalization while preserving the longer cloud streaming wait.
 - Moved the rolling-buffer VAD model picker into Rolling Buffer settings and clarified active-recording streaming text so buffer preload is not presented as generic live transcription.
+- Overlapped rolling-preload quick-release active-window Power Mode application with STT finalization, so ready preloads no longer wait on window rule resolution before stopping the pre-run session.
 - Removed a fixed post-STT wait before trigger-word AI enhancement starts.
 - Removed fixed sleeps between simulated paste key events so completed text reaches the target app sooner.
 - Kept warmed local STT resources after successful transcription so the next recording and rolling-buffer preload avoid an immediate teardown/reload cycle.

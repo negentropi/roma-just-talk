@@ -440,8 +440,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
         logger.notice("Latency trace deferred audio write scheduled operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s bytes=\(audioData.count, privacy: .public)")
 
         let preparedContext = takePreparedQuickReleaseContext(powerModeId: powerModeId)
-        await applyPowerModeConfiguration(powerModeId: powerModeId, preparedContext: preparedContext)
-        logger.notice("Latency trace active window ready operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
+        let powerModeApplyTask = startPowerModeConfigurationApply(powerModeId: powerModeId, preparedContext: preparedContext)
+        logger.notice("Latency trace active window apply scheduled operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
 
         guard let currentModel = transcriptionModelManager.currentTranscriptionModel,
               claim.matches(model: currentModel, language: UserDefaults.standard.string(forKey: "SelectedLanguage")) else {
@@ -491,6 +491,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                 audioFileReadyTask: audioFileReadyTask,
                 latencyTrace: latencyTrace,
                 deferHistoryInsertUntilSave: true,
+                powerModeApplyTask: powerModeApplyTask,
                 preparedCursorTextContext: preparedContext?.cursorContextTask,
                 preparedPasteContext: preparedContext?.pasteContextTask
             )
@@ -526,8 +527,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
         logger.notice("Latency trace buffered audio file write scheduled operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s bytes=\(audioData.count, privacy: .public)")
 
         let preparedContext = takePreparedQuickReleaseContext(powerModeId: powerModeId)
-        await applyPowerModeConfiguration(powerModeId: powerModeId, preparedContext: preparedContext)
-        logger.notice("Latency trace active window ready operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
+        let powerModeApplyTask = startPowerModeConfigurationApply(powerModeId: powerModeId, preparedContext: preparedContext)
+        logger.notice("Latency trace active window apply scheduled operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
 
         guard let currentModel = transcriptionModelManager.currentTranscriptionModel,
               currentModel.name == model.name,
@@ -572,6 +573,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                 audioURL: permanentURL,
                 latencyTrace: latencyTrace,
                 deferHistoryInsertUntilSave: true,
+                powerModeApplyTask: powerModeApplyTask,
                 preparedCursorTextContext: preparedContext?.cursorContextTask,
                 preparedPasteContext: preparedContext?.pasteContextTask
             )
@@ -646,6 +648,15 @@ class VoiceInkEngine: NSObject, ObservableObject {
         await ActiveWindowService.shared.applyConfiguration(powerModeId: powerModeId)
     }
 
+    private func startPowerModeConfigurationApply(
+        powerModeId: UUID?,
+        preparedContext: PreparedQuickReleaseContext?
+    ) -> Task<Void, Never> {
+        Task { @MainActor in
+            await applyPowerModeConfiguration(powerModeId: powerModeId, preparedContext: preparedContext)
+        }
+    }
+
     private func requestRecordPermission(response: @escaping (Bool) -> Void) {
         switch AVCaptureDevice.authorizationStatus(for: .audio) {
         case .authorized:
@@ -671,6 +682,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
         audioFileReadyTask: Task<Void, Error>? = nil,
         latencyTrace: TranscriptionLatencyTrace? = nil,
         deferHistoryInsertUntilSave: Bool = false,
+        powerModeApplyTask: Task<Void, Never>? = nil,
         preparedCursorTextContext: Task<String?, Never>? = nil,
         preparedPasteContext: Task<CursorPaster.PreparedPasteContext?, Never>? = nil
     ) async {
@@ -714,6 +726,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
             audioFileReadyTask: audioFileReadyTask,
             latencyTrace: latencyTrace,
             deferHistoryInsertUntilSave: deferHistoryInsertUntilSave,
+            powerModeApplyTask: powerModeApplyTask,
             preparedCursorTextContext: preparedCursorTextContext,
             preparedPasteContext: preparedPasteContext
         )

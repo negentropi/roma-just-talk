@@ -54,6 +54,7 @@ class TranscriptionPipeline {
     ///   - onCancel: Called when cancellation is detected to cancel active session state.
     ///   - onDismiss: Called as soon as paste is initiated to dismiss the recorder panel.
     ///   - deferHistoryInsertUntilSave: Inserts the history record only at the final save boundary.
+    ///   - powerModeApplyTask: Applies active-window Power Mode config before paste while STT can run first.
     ///   - preparedCursorTextContext: Pre-read cursor text context for quick-release paste capitalization.
     ///   - preparedPasteContext: Pre-read clipboard context for quick-release clipboard restore.
     func run(
@@ -68,6 +69,7 @@ class TranscriptionPipeline {
         audioFileReadyTask: Task<Void, Error>? = nil,
         latencyTrace: TranscriptionLatencyTrace? = nil,
         deferHistoryInsertUntilSave: Bool = false,
+        powerModeApplyTask: Task<Void, Never>? = nil,
         preparedCursorTextContext: Task<String?, Never>? = nil,
         preparedPasteContext: Task<CursorPaster.PreparedPasteContext?, Never>? = nil
     ) async -> TranscriptionPipelineDeferredWork? {
@@ -76,6 +78,7 @@ class TranscriptionPipeline {
         var didResolveAudioFileReadiness = false
         var audioFileIsReady = audioFileReadyTask == nil
         var shouldInsertHistoryRecordBeforeSave = deferHistoryInsertUntilSave
+        var didResolvePowerModeApply = false
 
         if let latencyTrace {
             logger.notice("Latency trace pipeline started operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
@@ -120,6 +123,23 @@ class TranscriptionPipeline {
                let enhancementService,
                result.shouldEnableAI {
                 await promptDetectionService.restoreOriginalSettings(result, to: enhancementService)
+            }
+        }
+
+        func waitForPowerModeApplyIfNeeded() async {
+            guard !didResolvePowerModeApply else { return }
+            didResolvePowerModeApply = true
+            guard let powerModeApplyTask else { return }
+
+            let waitStart = Date()
+            if let latencyTrace {
+                logger.notice("Latency trace waiting for active-window config operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
+            }
+            await powerModeApplyTask.value
+            logger.notice("Power Mode active-window config ready elapsed=\(Date().timeIntervalSince(waitStart), format: .fixed(precision: 3), privacy: .public)s")
+            if let latencyTrace {
+                logger.notice("Latency trace active-window config ready operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
+                recordRollingPreloadTiming(latencyTrace, stage: .activeWindowReady)
             }
         }
 
@@ -338,6 +358,8 @@ class TranscriptionPipeline {
             await finishCanceledTranscription()
             return nil
         }
+
+        await waitForPowerModeApplyIfNeeded()
 
         if SpecialShortcutEmptyTranscriptionFallback.consumeIfNeeded(for: transcription, modelContext: modelContext) {
             SoundManager.shared.playStopSound()

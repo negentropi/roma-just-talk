@@ -19,26 +19,22 @@ class ActiveWindowService: ObservableObject {
         self.enhancementService = enhancementService
     }
     
-    func applyConfiguration(powerModeId: UUID? = nil) async {
+    func resolveConfiguration(powerModeId: UUID? = nil) async -> PowerModeConfig? {
         let powerModeManager = PowerModeManager.shared
 
         if let powerModeId = powerModeId,
            let config = powerModeManager.getConfiguration(with: powerModeId) {
-            await MainActor.run {
-                powerModeManager.setActiveConfiguration(config)
-            }
-            await PowerModeSessionManager.shared.beginSession(with: config)
-            return
+            return config
         }
 
         let configurations = powerModeManager.configurations
         guard configurations.hasEnabledAutomaticRules else {
-            return
+            return nil
         }
 
         guard let frontmostApp = NSWorkspace.shared.frontmostApplication,
               let bundleIdentifier = frontmostApp.bundleIdentifier else {
-            return
+            return nil
         }
 
         await MainActor.run {
@@ -67,11 +63,21 @@ class ActiveWindowService: ObservableObject {
             configToApply = powerModeManager.getDefaultConfiguration()
         }
 
-        if let config = configToApply {
-            await MainActor.run {
-                powerModeManager.setActiveConfiguration(config)
-            }
-            await PowerModeSessionManager.shared.beginSession(with: config)
-        }
+        return configToApply
     }
-} 
+
+    func applyResolvedConfiguration(_ config: PowerModeConfig?) async {
+        guard let config else { return }
+
+        let powerModeManager = PowerModeManager.shared
+        await MainActor.run {
+            powerModeManager.setActiveConfiguration(config)
+        }
+        await PowerModeSessionManager.shared.beginSession(with: config)
+    }
+
+    func applyConfiguration(powerModeId: UUID? = nil) async {
+        let config = await resolveConfiguration(powerModeId: powerModeId)
+        await applyResolvedConfiguration(config)
+    }
+}

@@ -1136,6 +1136,7 @@ struct VoiceInkTests {
         var sessionActive = false
         var toggleCount = 0
         var directCommitCount = 0
+        var preparePowerModeCount = 0
 
         let handler = RecordingShortcutModeHandler(
             logger: Logger(subsystem: "VoiceInkTests", category: "RecordingShortcutModeHandler"),
@@ -1151,6 +1152,9 @@ struct VoiceInkTests {
                     recordingState = .transcribing
                     sessionActive = true
                 }
+            },
+            preparePowerModeConfiguration: { _ in
+                preparePowerModeCount += 1
             },
             commitReadyRollingBufferPreload: { _ in
                 directCommitCount += 1
@@ -1178,6 +1182,7 @@ struct VoiceInkTests {
 
         #expect(toggleCount == 0)
         #expect(recordingState == .idle)
+        #expect(preparePowerModeCount == 1)
 
         await handler.handleKeyUp(
             action: .primaryRecording,
@@ -1189,6 +1194,7 @@ struct VoiceInkTests {
 
         #expect(directCommitCount == 1)
         #expect(toggleCount == 0)
+        #expect(preparePowerModeCount == 1)
         #expect(recordingState == .transcribing)
     }
 
@@ -1197,6 +1203,7 @@ struct VoiceInkTests {
         var sessionActive = false
         var toggleCount = 0
         var directCommitCount = 0
+        var preparePowerModeCount = 0
 
         let handler = RecordingShortcutModeHandler(
             logger: Logger(subsystem: "VoiceInkTests", category: "RecordingShortcutModeHandler"),
@@ -1212,6 +1219,9 @@ struct VoiceInkTests {
                     recordingState = .transcribing
                     sessionActive = true
                 }
+            },
+            preparePowerModeConfiguration: { _ in
+                preparePowerModeCount += 1
             },
             commitReadyRollingBufferPreload: { _ in
                 directCommitCount += 1
@@ -1246,6 +1256,7 @@ struct VoiceInkTests {
 
         #expect(directCommitCount == 1)
         #expect(toggleCount == 2)
+        #expect(preparePowerModeCount == 1)
         #expect(recordingState == .transcribing)
     }
 

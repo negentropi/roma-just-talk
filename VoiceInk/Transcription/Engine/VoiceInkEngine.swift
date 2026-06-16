@@ -15,6 +15,15 @@ struct RollingBufferPreloadClaim {
     }
 }
 
+private struct PreparedPowerModeConfiguration {
+    let powerModeId: UUID?
+    let task: Task<PowerModeConfig?, Never>
+
+    func matches(powerModeId: UUID?) -> Bool {
+        self.powerModeId == powerModeId
+    }
+}
+
 @MainActor
 class VoiceInkEngine: NSObject, ObservableObject {
     @Published var recordingState: RecordingState = .idle
@@ -40,6 +49,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
     private let rollingBufferPreloadCoordinator: RollingBufferPreloadCoordinator
     let enhancementService: AIEnhancementService?
     private let pipeline: TranscriptionPipeline
+    private var preparedPowerModeConfiguration: PreparedPowerModeConfiguration?
 
     let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "VoiceInkEngine")
 
@@ -346,16 +356,19 @@ class VoiceInkEngine: NSObject, ObservableObject {
         )
 
         guard recordingState == .idle else {
+            discardPreparedPowerModeConfiguration()
             logger.notice("Latency trace preload commit unavailable operation=\(latencyTrace.operation, privacy: .public) reason=state elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
             return false
         }
 
         guard let model = transcriptionModelManager.currentTranscriptionModel else {
+            discardPreparedPowerModeConfiguration()
             logger.notice("Latency trace preload commit unavailable operation=\(latencyTrace.operation, privacy: .public) reason=no-model elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
             return false
         }
 
         guard let claimedPreload = await rollingBufferPreloadCoordinator.claimPreloadedSession(for: model) else {
+            discardPreparedPowerModeConfiguration()
             logger.notice("Latency trace preload commit unavailable operation=\(latencyTrace.operation, privacy: .public) reason=no-claim elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
             return false
         }
@@ -367,7 +380,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
             language: claimedPreload.language
         )
 
-        await ActiveWindowService.shared.applyConfiguration(powerModeId: powerModeId)
+        await applyPowerModeConfiguration(powerModeId: powerModeId)
         logger.notice("Latency trace active window ready operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
 
         guard let currentModel = transcriptionModelManager.currentTranscriptionModel,
@@ -420,6 +433,32 @@ class VoiceInkEngine: NSObject, ObservableObject {
             logger.error("commitReadyRollingBufferPreload failed: \(error.localizedDescription, privacy: .public)")
             return false
         }
+    }
+
+    func preparePowerModeConfiguration(powerModeId: UUID? = nil) {
+        preparedPowerModeConfiguration = PreparedPowerModeConfiguration(
+            powerModeId: powerModeId,
+            task: Task { @MainActor in
+                await ActiveWindowService.shared.resolveConfiguration(powerModeId: powerModeId)
+            }
+        )
+    }
+
+    private func discardPreparedPowerModeConfiguration() {
+        preparedPowerModeConfiguration = nil
+    }
+
+    private func applyPowerModeConfiguration(powerModeId: UUID?) async {
+        if let preparedPowerModeConfiguration,
+           preparedPowerModeConfiguration.matches(powerModeId: powerModeId) {
+            let config = await preparedPowerModeConfiguration.task.value
+            self.preparedPowerModeConfiguration = nil
+            await ActiveWindowService.shared.applyResolvedConfiguration(config)
+            return
+        }
+
+        preparedPowerModeConfiguration = nil
+        await ActiveWindowService.shared.applyConfiguration(powerModeId: powerModeId)
     }
 
     private func requestRecordPermission(response: @escaping (Bool) -> Void) {

@@ -190,6 +190,9 @@ class RecordingShortcutManager: ObservableObject {
             toggleMiniRecorder: { powerModeId in
                 await recorderUIManager.toggleMiniRecorder(powerModeId: powerModeId)
             },
+            preparePowerModeConfiguration: { powerModeId in
+                engine.preparePowerModeConfiguration(powerModeId: powerModeId)
+            },
             commitReadyRollingBufferPreload: { powerModeId in
                 await engine.commitReadyRollingBufferPreload(powerModeId: powerModeId)
             },
@@ -528,6 +531,7 @@ final class RecordingShortcutModeHandler {
     private let isRecorderVisible: @MainActor () -> Bool
     private let recordingState: @MainActor () -> RecordingState
     private let toggleMiniRecorder: @MainActor (UUID?) async -> Void
+    private let preparePowerModeConfiguration: @MainActor (UUID?) -> Void
     private let commitReadyRollingBufferPreload: @MainActor (UUID?) async -> Bool
     private let cancelRecording: @MainActor () async -> Void
 
@@ -550,6 +554,7 @@ final class RecordingShortcutModeHandler {
         isRecorderVisible: @escaping @MainActor () -> Bool,
         recordingState: @escaping @MainActor () -> RecordingState,
         toggleMiniRecorder: @escaping @MainActor (UUID?) async -> Void,
+        preparePowerModeConfiguration: @escaping @MainActor (UUID?) -> Void = { _ in },
         commitReadyRollingBufferPreload: @escaping @MainActor (UUID?) async -> Bool = { _ in false },
         cancelRecording: @escaping @MainActor () async -> Void
     ) {
@@ -558,6 +563,7 @@ final class RecordingShortcutModeHandler {
         self.isRecorderVisible = isRecorderVisible
         self.recordingState = recordingState
         self.toggleMiniRecorder = toggleMiniRecorder
+        self.preparePowerModeConfiguration = preparePowerModeConfiguration
         self.commitReadyRollingBufferPreload = commitReadyRollingBufferPreload
         self.cancelRecording = cancelRecording
     }
@@ -602,6 +608,9 @@ final class RecordingShortcutModeHandler {
             case .startRecording:
                 await startRecordingIfNeeded(mode: mode, powerModeId: powerModeId)
             case .preloadOnly:
+                if canHandleShortcutAction(), !isRecorderVisible() {
+                    preparePowerModeConfiguration(powerModeId)
+                }
                 logger.notice("handleShortcutKeyDown: preloading special shortcut without starting recording")
             }
 

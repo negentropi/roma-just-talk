@@ -28,6 +28,7 @@
 - Warmed and cached word replacement rules outside the dictation hot path so quick-release paste no longer repeats the SwiftData lookup before every cursor paste.
 - Deferred quick-release rolling-preload WAV writing until after cached stream finalization can start, while still waiting for the file before batch fallback or history metadata needs it.
 - Added claim-to-paste latency tracing for rolling-preload quick releases so remaining delays can be measured from runtime logs.
+- Started Power Mode rule resolution on preload-only Special shortcut key-down, so quick releases avoid doing active-window and URL matching work after key-up.
 - Skipped browser URL lookup during automatic Power Mode selection when no enabled URL rules exist, removing an avoidable pre-pipeline quick-release delay.
 - Reduced the shortcut duplicate-press guard from 500ms to 80ms so valid back-to-back dictations are not ignored after the app is ready again.
 - Skipped fallback streaming setup on immediate startup-stop recordings when the selected model can transcribe the saved WAV directly.

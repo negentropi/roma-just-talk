@@ -44,27 +44,15 @@ enum Provider: String, CaseIterable, Codable, Identifiable {
     func models(for type: ModelType) -> [String] {
         switch (self, type) {
         case (.groq, .transcription):
-            return [
-                "whisper-large-v3",
-                "whisper-large-v3-turbo",
-                "whisper-medium",
-                "whisper-small"
-            ]
+            return VoiceInkTranscriptionModelCatalog.modelNames(for: .groq)
         case (.groq, .postProcessing):
             return VoiceInkAIModelCatalog.availableModels(for: .groq)
         case (.openai, .transcription):
-            return [
-                "whisper-1",
-                "gpt-4o-transcribe",
-                "gpt-4o-mini-transcribe"
-            ]
+            return VoiceInkTranscriptionModelCatalog.modelNames(for: .openAI)
         case (.openai, .postProcessing):
             return VoiceInkAIModelCatalog.availableModels(for: .openAI)
         case (.deepgram, .transcription):
-            return [
-                "nova-2",
-                "nova-3"
-            ]
+            return VoiceInkTranscriptionModelCatalog.modelNames(for: .deepgram)
         case (.deepgram, .postProcessing):
             return []
         case (.cerebras, .transcription):
@@ -76,15 +64,13 @@ enum Provider: String, CaseIterable, Codable, Identifiable {
         case (.gemini, .postProcessing):
             return VoiceInkAIModelCatalog.availableModels(for: .gemini)
         case (.local, .transcription):
-            return [
-                "base"
-            ]
+            return VoiceInkTranscriptionModelCatalog.modelNames(for: .local)
         case (.local, .postProcessing):
             return [] // Local transcription doesn't support post-processing
         case (.voiceink, .transcription):
             return [] // Hardcoded: whisper-large-v3 (no user selection)
         case (.voiceink, .postProcessing):
-            return [] // Hardcoded: gpt-oss-120b (no user selection)
+            return [] // Hardcoded: openai/gpt-oss-120b (no user selection)
         }
     }
 }

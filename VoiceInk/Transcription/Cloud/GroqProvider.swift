@@ -1,6 +1,7 @@
 import Foundation
 import SwiftData
 import LLMkit
+import VoiceInkCore
 
 struct GroqProvider: CloudProvider {
     let modelProvider: ModelProvider = .groq
@@ -8,22 +9,15 @@ struct GroqProvider: CloudProvider {
     let languageCodes: [String]? = nil
     let includesAutoDetect: Bool = false
 
-    var models: [CloudModel] {[
-        CloudModel(
-            name: "whisper-large-v3-turbo",
-            displayName: "Whisper Large v3 Turbo (Groq)",
-            description: "Whisper Large v3 Turbo model with Groq's lightning-speed inference",
-            provider: .groq,
-            speed: 0.65,
-            accuracy: 0.95,
-            isMultilingual: true,
-            supportedLanguages: LanguageDictionary.forProvider(isMultilingual: true, provider: .groq)
-        )
-    ]}
+    var models: [CloudModel] {
+        VoiceInkTranscriptionModelCatalog
+            .cloudModels(for: .groq)
+            .map { $0.makeCloudModel(provider: .groq) }
+    }
 
     func transcribe(audioData: Data, fileName: String, apiKey: String, model: String, language: String?, prompt: String?, customVocabulary: [String]) async throws -> String {
         return try await OpenAITranscriptionClient.transcribe(
-            baseURL: URL(string: "https://api.groq.com/openai")!,
+            baseURL: VoiceInkProviderEndpoint.groq.apiBaseURL,
             audioData: audioData,
             fileName: fileName,
             apiKey: apiKey,
@@ -37,7 +31,7 @@ struct GroqProvider: CloudProvider {
 
     func verifyAPIKey(_ key: String) async -> (isValid: Bool, errorMessage: String?) {
         return await OpenAITranscriptionClient.verifyAPIKey(
-            baseURL: URL(string: "https://api.groq.com/openai")!,
+            baseURL: VoiceInkProviderEndpoint.groq.apiBaseURL,
             apiKey: key
         )
     }

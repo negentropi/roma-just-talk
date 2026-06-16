@@ -69,7 +69,7 @@ struct ModeConfigurationView: View {
                     HStack {
                         Text("Model")
                         Spacer()
-                        Text("whisper-large-v3")
+                        Text(settings.voiceInkTranscriptionModel())
                             .foregroundColor(.secondary)
                     }
                 }
@@ -96,7 +96,7 @@ struct ModeConfigurationView: View {
                         HStack {
                             Text("Model")
                             Spacer()
-                            Text("gpt-oss-120b")
+                            Text(settings.voiceInkPostProcessingModel())
                                 .foregroundColor(.secondary)
                         }
                     }

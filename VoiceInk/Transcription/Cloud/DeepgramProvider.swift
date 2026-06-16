@@ -1,6 +1,7 @@
 import Foundation
 import SwiftData
 import LLMkit
+import VoiceInkCore
 
 struct DeepgramProvider: CloudProvider {
     let modelProvider: ModelProvider = .deepgram
@@ -14,30 +15,11 @@ struct DeepgramProvider: CloudProvider {
     ]
     let includesAutoDetect: Bool = true
 
-    var models: [CloudModel] {[
-        CloudModel(
-            name: "nova-3",
-            displayName: "Nova 3 (Deepgram)",
-            description: "Deepgram's latest Nova 3 model for fast, accurate transcription",
-            provider: .deepgram,
-            speed: 0.99,
-            accuracy: 0.96,
-            isMultilingual: true,
-            supportsStreaming: true,
-            supportedLanguages: LanguageDictionary.forProvider(isMultilingual: true, provider: .deepgram)
-        ),
-        CloudModel(
-            name: "nova-3-medical",
-            displayName: "Nova 3 Medical (Deepgram)",
-            description: "Specialized medical transcription model optimized for clinical environments",
-            provider: .deepgram,
-            speed: 0.99,
-            accuracy: 0.96,
-            isMultilingual: false,
-            supportsStreaming: true,
-            supportedLanguages: LanguageDictionary.forProvider(isMultilingual: false, provider: .deepgram)
-        )
-    ]}
+    var models: [CloudModel] {
+        VoiceInkTranscriptionModelCatalog
+            .cloudModels(for: .deepgram)
+            .map { $0.makeCloudModel(provider: .deepgram) }
+    }
 
     func transcribe(audioData: Data, fileName: String, apiKey: String, model: String, language: String?, prompt: String?, customVocabulary: [String]) async throws -> String {
         return try await DeepgramClient.transcribe(

@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import VoiceInkCore
 
 @MainActor
 final class AppSettings: ObservableObject {
@@ -206,7 +207,7 @@ final class AppSettings: ObservableObject {
         } else if let firstMode = modes.first {
             return firstMode.transcriptionProvider == .voiceink ? voiceInkTranscriptionModel() : firstMode.transcriptionModel
         } else {
-            return effectiveTranscriptionProvider == .voiceink ? voiceInkTranscriptionModel() : "whisper-large-v3" // Default fallback
+            return effectiveTranscriptionProvider == .voiceink ? voiceInkTranscriptionModel() : VoiceInkTranscriptionModelCatalog.voiceInkTranscriptionModel // Default fallback
         }
     }
     
@@ -228,7 +229,7 @@ final class AppSettings: ObservableObject {
         } else if let firstMode = modes.first {
             return firstMode.postProcessingProvider == .voiceink ? voiceInkPostProcessingModel() : firstMode.postProcessingModel
         } else {
-            return effectivePostProcessingProvider == .voiceink ? voiceInkPostProcessingModel() : "llama-3.1-8b-instant" // Default fallback
+            return effectivePostProcessingProvider == .voiceink ? voiceInkPostProcessingModel() : VoiceInkAIModelCatalog.firstAvailableModel(for: .groq) // Default fallback
         }
     }
     
@@ -258,12 +259,12 @@ final class AppSettings: ObservableObject {
     
     /// Get the hardcoded transcription model for VoiceInk
     func voiceInkTranscriptionModel() -> String {
-        return "whisper-large-v3"
+        return VoiceInkTranscriptionModelCatalog.voiceInkTranscriptionModel
     }
     
     /// Get the hardcoded post-processing model for VoiceInk
     func voiceInkPostProcessingModel() -> String {
-        return "openai/gpt-oss-120b"
+        return VoiceInkAIModelCatalog.defaultModel(for: .groq)
     }
 
     private func saveAPIKey(_ key: String, forKey account: String) {
@@ -320,5 +321,3 @@ final class AppSettings: ObservableObject {
         _ = KeychainService.delete(key: "geminiAPIKey")
     }
 }
-
-

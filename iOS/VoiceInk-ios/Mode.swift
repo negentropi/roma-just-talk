@@ -1,4 +1,5 @@
 import Foundation
+import VoiceInkCore
 
 struct Mode: Identifiable, Codable {
     let id: UUID
@@ -24,10 +25,10 @@ struct Mode: Identifiable, Codable {
         self.id = UUID()
         self.name = name
         self.transcriptionProvider = transcriptionProvider
-        self.transcriptionModel = transcriptionModel ?? transcriptionProvider.models(for: .transcription).first ?? "whisper-large-v3"
+        self.transcriptionModel = transcriptionModel ?? transcriptionProvider.models(for: .transcription).first ?? VoiceInkTranscriptionModelCatalog.voiceInkTranscriptionModel
         self.isPostProcessingEnabled = isPostProcessingEnabled
         self.postProcessingProvider = postProcessingProvider
-        self.postProcessingModel = postProcessingModel ?? postProcessingProvider.models(for: .postProcessing).first ?? "llama-3.1-8b-instant"
+        self.postProcessingModel = postProcessingModel ?? postProcessingProvider.models(for: .postProcessing).first ?? VoiceInkAIModelCatalog.firstAvailableModel(for: .groq)
         self.promptTemplate = promptTemplate ?? PromptTemplate(type: .summary)
     }
     

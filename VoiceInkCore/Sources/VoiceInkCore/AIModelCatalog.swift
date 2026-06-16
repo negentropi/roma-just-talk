@@ -19,6 +19,10 @@ public enum VoiceInkAIModelCatalog {
         }
     }
 
+    public static func firstAvailableModel(for provider: VoiceInkAIModelProvider) -> String {
+        availableModels(for: provider).first ?? defaultModel(for: provider)
+    }
+
     public static func availableModels(for provider: VoiceInkAIModelProvider) -> [String] {
         switch provider {
         case .cerebras:

@@ -1,4 +1,5 @@
 import Foundation
+import VoiceInkCore
 
 /// Manages the creation and setup of default modes for first-time users
 class DefaultModeManager {
@@ -27,10 +28,10 @@ class DefaultModeManager {
         return Mode(
             name: "Default",
             transcriptionProvider: .local, // Local whisper
-            transcriptionModel: "base", // Base model for speed
+            transcriptionModel: VoiceInkTranscriptionModelCatalog.localBaseModel, // Base model for speed
             isPostProcessingEnabled: false, // No post-processing
             postProcessingProvider: .groq, // Doesn't matter since disabled
-            postProcessingModel: "llama-3.1-8b-instant", // Doesn't matter since disabled
+            postProcessingModel: VoiceInkAIModelCatalog.firstAvailableModel(for: .groq), // Doesn't matter since disabled
             promptTemplate: PromptTemplate(type: .summary) // Default to summary template
         )
     }

@@ -230,7 +230,7 @@ final class RecordingManager: ObservableObject {
                 // Update the existing note on main thread
                 await MainActor.run {
                     note.text = result.cleanedText
-                    note.enhancedText = result.postProcessingSucceeded ? result.finalText : nil
+                    note.enhancedText = result.enhancedText
                     note.transcriptionModelName = result.transcriptionModelName
                     note.aiEnhancementModelName = result.aiEnhancementModelName
                     note.transcriptionStatus = .completed

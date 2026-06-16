@@ -54,6 +54,25 @@ final class TranscriptionRunProcessorTests: XCTestCase {
         XCTAssertTrue(result.postProcessingSucceeded)
     }
 
+    func testEnhancedTextIsNilWhenSuccessfulPostProcessingReturnsCleanedText() async throws {
+        let processor = VoiceInkTranscriptionRunProcessor { job in
+            job.transcript
+        }
+
+        let result = try await processor.transcribe(
+            fileURL: URL(fileURLWithPath: "/tmp/audio.wav"),
+            configuration: configuration(isPostProcessingEnabled: true),
+            apiKeyProvider: { _ in "key" },
+            transcriptionServiceProvider: { _ in
+                StubTranscriptionService(text: "raw text")
+            }
+        )
+
+        XCTAssertEqual(result.finalText, "raw text")
+        XCTAssertNil(result.enhancedText)
+        XCTAssertTrue(result.postProcessingSucceeded)
+    }
+
     func testTranscribeKeepsCleanedTextWhenPostProcessingFails() async throws {
         let processor = VoiceInkTranscriptionRunProcessor { _ in
             throw StubLocalizedError(message: "provider down")

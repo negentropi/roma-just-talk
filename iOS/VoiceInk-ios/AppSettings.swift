@@ -30,23 +30,23 @@ final class AppSettings: ObservableObject {
 
     // Separate API keys per provider
     @Published var groqAPIKey: String {
-        didSet { saveAPIKey(groqAPIKey, forKey: "groqAPIKey") }
+        didSet { saveAPIKey(groqAPIKey, forKey: VoiceInkProviderAPIKeyAccount.groq) }
     }
 
     @Published var openAIAPIKey: String {
-        didSet { saveAPIKey(openAIAPIKey, forKey: "openAIAPIKey") }
+        didSet { saveAPIKey(openAIAPIKey, forKey: VoiceInkProviderAPIKeyAccount.openAI) }
     }
 
     @Published var deepgramAPIKey: String {
-        didSet { saveAPIKey(deepgramAPIKey, forKey: "deepgramAPIKey") }
+        didSet { saveAPIKey(deepgramAPIKey, forKey: VoiceInkProviderAPIKeyAccount.deepgram) }
     }
 
     @Published var cerebrasAPIKey: String {
-        didSet { saveAPIKey(cerebrasAPIKey, forKey: "cerebrasAPIKey") }
+        didSet { saveAPIKey(cerebrasAPIKey, forKey: VoiceInkProviderAPIKeyAccount.cerebras) }
     }
 
     @Published var geminiAPIKey: String {
-        didSet { saveAPIKey(geminiAPIKey, forKey: "geminiAPIKey") }
+        didSet { saveAPIKey(geminiAPIKey, forKey: VoiceInkProviderAPIKeyAccount.gemini) }
     }
     
     // Track verification status per provider
@@ -89,11 +89,11 @@ final class AppSettings: ObservableObject {
         }
         
 
-        self.groqAPIKey = AppSettings.loadAPIKey(forKey: "groqAPIKey")
-        self.openAIAPIKey = AppSettings.loadAPIKey(forKey: "openAIAPIKey")
-        self.deepgramAPIKey = AppSettings.loadAPIKey(forKey: "deepgramAPIKey")
-        self.cerebrasAPIKey = AppSettings.loadAPIKey(forKey: "cerebrasAPIKey")
-        self.geminiAPIKey = AppSettings.loadAPIKey(forKey: "geminiAPIKey")
+        self.groqAPIKey = AppSettings.loadAPIKey(forKey: VoiceInkProviderAPIKeyAccount.groq)
+        self.openAIAPIKey = AppSettings.loadAPIKey(forKey: VoiceInkProviderAPIKeyAccount.openAI)
+        self.deepgramAPIKey = AppSettings.loadAPIKey(forKey: VoiceInkProviderAPIKeyAccount.deepgram)
+        self.cerebrasAPIKey = AppSettings.loadAPIKey(forKey: VoiceInkProviderAPIKeyAccount.cerebras)
+        self.geminiAPIKey = AppSettings.loadAPIKey(forKey: VoiceInkProviderAPIKeyAccount.gemini)
         self.groqKeyVerified = UserDefaults.standard.bool(forKey: "groqKeyVerified")
         self.openAIKeyVerified = UserDefaults.standard.bool(forKey: "openAIKeyVerified")
         self.deepgramKeyVerified = UserDefaults.standard.bool(forKey: "deepgramKeyVerified")
@@ -314,10 +314,10 @@ final class AppSettings: ObservableObject {
         deepgramAPIKey = ""
         cerebrasAPIKey = ""
         geminiAPIKey = ""
-        _ = KeychainService.delete(key: "groqAPIKey")
-        _ = KeychainService.delete(key: "openAIAPIKey")
-        _ = KeychainService.delete(key: "deepgramAPIKey")
-        _ = KeychainService.delete(key: "cerebrasAPIKey")
-        _ = KeychainService.delete(key: "geminiAPIKey")
+        _ = KeychainService.delete(key: VoiceInkProviderAPIKeyAccount.groq)
+        _ = KeychainService.delete(key: VoiceInkProviderAPIKeyAccount.openAI)
+        _ = KeychainService.delete(key: VoiceInkProviderAPIKeyAccount.deepgram)
+        _ = KeychainService.delete(key: VoiceInkProviderAPIKeyAccount.cerebras)
+        _ = KeychainService.delete(key: VoiceInkProviderAPIKeyAccount.gemini)
     }
 }

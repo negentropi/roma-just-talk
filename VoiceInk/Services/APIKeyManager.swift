@@ -1,5 +1,6 @@
 import Foundation
 import os
+import VoiceInkCore
 
 /// Manages API keys using secure Keychain storage.
 final class APIKeyManager {
@@ -7,24 +8,6 @@ final class APIKeyManager {
 
     private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "APIKeyManager")
     private let keychain = KeychainService.shared
-
-    /// Provider to Keychain identifier mapping (iOS compatible for iCloud sync).
-    private static let providerToKeychainKey: [String: String] = [
-        "groq": "groqAPIKey",
-        "deepgram": "deepgramAPIKey",
-        "cerebras": "cerebrasAPIKey",
-        "gemini": "geminiAPIKey",
-        "mistral": "mistralAPIKey",
-        "elevenlabs": "elevenLabsAPIKey",
-        "soniox": "sonioxAPIKey",
-        "speechmatics": "speechmaticsAPIKey",
-        "assemblyai": "assemblyAIAPIKey",
-        "xai": "xaiAPIKey",
-        "cartesia": "cartesiaAPIKey",
-        "openai": "openAIAPIKey",
-        "anthropic": "anthropicAPIKey",
-        "openrouter": "openRouterAPIKey"
-    ]
 
     private static let providerToEnvironmentKey: [String: String] = [
         "elevenlabs": "ELEVENLABS_API_KEY"
@@ -143,11 +126,7 @@ final class APIKeyManager {
 
     /// Returns Keychain identifier for a provider (case-insensitive).
     private func keychainIdentifier(forProvider provider: String) -> String {
-        let lowercased = provider.lowercased()
-        if let mapped = Self.providerToKeychainKey[lowercased] {
-            return mapped
-        }
-        return "\(lowercased)APIKey"
+        VoiceInkProviderAPIKeyAccount.accountIdentifier(forProviderName: provider)
     }
 
     /// Generates Keychain identifier for custom model API key.

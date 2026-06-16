@@ -28,6 +28,10 @@ public enum VoiceInkProviderEndpoint: String, CaseIterable, Sendable {
         URL(string: "https://generativelanguage.googleapis.com/v1beta")!
     }
 
+    public static var mistralAPIBaseURL: URL {
+        URL(string: "https://api.mistral.ai")!
+    }
+
     public var chatCompletionsURL: URL? {
         switch self {
         case .groq, .openAI, .cerebras, .gemini:
@@ -89,5 +93,13 @@ public enum VoiceInkProviderEndpoint: String, CaseIterable, Sendable {
 
     public static func geminiModelsURL(from baseURL: URL) -> URL {
         baseURL.appendingPathComponent("models")
+    }
+
+    public static func mistralAudioTranscriptionsURL(from baseURL: URL) -> URL {
+        baseURL.appendingPathComponent("v1/audio/transcriptions")
+    }
+
+    public static func mistralModelsURL(from baseURL: URL) -> URL {
+        baseURL.appendingPathComponent("v1/models")
     }
 }

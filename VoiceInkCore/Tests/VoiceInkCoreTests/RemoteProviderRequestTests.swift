@@ -394,5 +394,76 @@ final class RemoteProviderRequestTests: XCTestCase {
             ""
         )
     }
+
+    func testMistralTranscriptionRequestBuilderUsesMultipartAudioRequest() throws {
+        let audioData = Data("WAVDATA".utf8)
+        let preparedRequest = VoiceInkMistralRequestBuilder.makeTranscriptionRequest(
+            baseURL: VoiceInkProviderEndpoint.mistralAPIBaseURL,
+            apiKey: "mistral-key",
+            model: "voxtral-mini-latest",
+            audioData: audioData,
+            fileName: "sample.wav",
+            boundary: "Boundary-test",
+            timeout: 30
+        )
+
+        XCTAssertEqual(
+            preparedRequest.request.url?.absoluteString,
+            "https://api.mistral.ai/v1/audio/transcriptions"
+        )
+        XCTAssertEqual(preparedRequest.request.httpMethod, "POST")
+        XCTAssertEqual(preparedRequest.request.value(forHTTPHeaderField: "x-api-key"), "mistral-key")
+        XCTAssertEqual(
+            preparedRequest.request.value(forHTTPHeaderField: "Content-Type"),
+            "multipart/form-data; boundary=Boundary-test"
+        )
+        XCTAssertEqual(preparedRequest.request.timeoutInterval, 30)
+
+        let body = try XCTUnwrap(String(data: preparedRequest.body, encoding: .utf8))
+        XCTAssertTrue(body.contains("Content-Disposition: form-data; name=\"model\""))
+        XCTAssertTrue(body.contains("voxtral-mini-latest"))
+        XCTAssertTrue(body.contains("Content-Disposition: form-data; name=\"file\"; filename=\"sample.wav\""))
+        XCTAssertTrue(body.contains("Content-Type: audio/wav"))
+        XCTAssertTrue(body.contains("WAVDATA"))
+        XCTAssertTrue(body.contains("--Boundary-test--"))
+    }
+
+    func testMistralModelsRequestBuilderUsesModelsEndpoint() throws {
+        let request = VoiceInkMistralRequestBuilder.makeModelsRequest(
+            baseURL: VoiceInkProviderEndpoint.mistralAPIBaseURL,
+            apiKey: "mistral-key",
+            timeout: 10
+        )
+
+        XCTAssertEqual(request.url?.absoluteString, "https://api.mistral.ai/v1/models")
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer mistral-key")
+        XCTAssertEqual(request.timeoutInterval, 10)
+    }
+
+    func testMistralClientRejectsBlankAPIKeyWithoutNetwork() async throws {
+        let result = await VoiceInkMistralTranscriptionClient().verifyAPIKeyDetailed(
+            baseURL: VoiceInkProviderEndpoint.mistralAPIBaseURL,
+            apiKey: " \n\t "
+        )
+
+        XCTAssertEqual(
+            result,
+            VoiceInkAPIKeyVerificationResult(
+                isValid: false,
+                errorMessage: "API key is missing or empty."
+            )
+        )
+    }
+
+    func testMistralTranscriptionCodecReturnsTextIncludingEmptyString() throws {
+        XCTAssertEqual(
+            try VoiceInkMistralTranscriptionCodec.transcript(from: Data(#"{"text":"mistral text"}"#.utf8)),
+            "mistral text"
+        )
+        XCTAssertEqual(
+            try VoiceInkMistralTranscriptionCodec.transcript(from: Data(#"{"text":""}"#.utf8)),
+            ""
+        )
+    }
 }
 #endif

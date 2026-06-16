@@ -20,13 +20,17 @@ final class ProviderModelSelectionTests: XCTestCase {
     func testSelectedModelFallsBackToProviderDefaultWhenCurrentModelIsUnavailable() {
         XCTAssertEqual(
             VoiceInkProviderKind.gemini.selectedModel("old-gemini-model", for: .postProcessing),
-            VoiceInkAIModelCatalog.firstAvailableModel(for: .gemini)
+            VoiceInkAIModelCatalog.defaultModel(for: .gemini)
         )
     }
 
     func testPostProcessingDefaultModelUsesCatalogDefaultForCoreAIProviders() {
         XCTAssertEqual(
             VoiceInkProviderKind.groq.postProcessingDefaultModel,
+            VoiceInkAIModelCatalog.defaultModel(for: .groq)
+        )
+        XCTAssertEqual(
+            VoiceInkProviderKind.groq.defaultModel(for: .postProcessing),
             VoiceInkAIModelCatalog.defaultModel(for: .groq)
         )
         XCTAssertEqual(

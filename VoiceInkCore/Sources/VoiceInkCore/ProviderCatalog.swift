@@ -331,7 +331,12 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
     }
 
     public func defaultModel(for use: VoiceInkProviderModelUse) -> String? {
-        fixedModel(for: use) ?? models(for: use).first
+        switch use {
+        case .transcription:
+            fixedModel(for: use) ?? models(for: use).first
+        case .postProcessing:
+            postProcessingDefaultModel
+        }
     }
 
     public func selectedModel(_ currentModel: String, for use: VoiceInkProviderModelUse) -> String {
@@ -353,8 +358,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             guard let provider = transcriptionModelProvider else { return [] }
             return VoiceInkTranscriptionModelCatalog.modelNames(for: provider)
         case .postProcessing:
-            guard let provider = aiModelProvider else { return [] }
-            return VoiceInkAIModelCatalog.availableModels(for: provider)
+            return postProcessingModels ?? []
         }
     }
 }

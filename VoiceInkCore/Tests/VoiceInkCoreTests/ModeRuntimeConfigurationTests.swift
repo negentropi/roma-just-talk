@@ -10,9 +10,26 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
         XCTAssertEqual(configuration.transcriptionProvider, .groq)
         XCTAssertEqual(configuration.transcriptionModel, VoiceInkTranscriptionModelCatalog.voiceInkTranscriptionModel)
         XCTAssertEqual(configuration.postProcessingProvider, .groq)
-        XCTAssertEqual(configuration.postProcessingModel, VoiceInkAIModelCatalog.firstAvailableModel(for: .groq))
+        XCTAssertEqual(configuration.postProcessingModel, VoiceInkAIModelCatalog.defaultModel(for: .groq))
         XCTAssertEqual(configuration.prompt, "")
         XCTAssertFalse(configuration.isPostProcessingEnabled)
+    }
+
+    func testDefaultModeUsesSharedPostProcessingDefaultPolicy() {
+        let mode = Mode(name: "Default")
+
+        XCTAssertEqual(mode.postProcessingProvider, .groq)
+        XCTAssertEqual(mode.postProcessingModel, VoiceInkAIModelCatalog.defaultModel(for: .groq))
+    }
+
+    func testDefaultLocalWhisperUsesSharedPostProcessingDefaultPolicy() {
+        let mode = Mode.defaultLocalWhisper()
+
+        XCTAssertEqual(mode.transcriptionProvider, .localWhisper)
+        XCTAssertEqual(mode.transcriptionModel, VoiceInkTranscriptionModelCatalog.localBaseModel)
+        XCTAssertEqual(mode.postProcessingProvider, .groq)
+        XCTAssertEqual(mode.postProcessingModel, VoiceInkAIModelCatalog.defaultModel(for: .groq))
+        XCTAssertFalse(mode.isPostProcessingEnabled)
     }
 
     func testRuntimeConfigurationUsesSelectedModeWhenAvailable() {

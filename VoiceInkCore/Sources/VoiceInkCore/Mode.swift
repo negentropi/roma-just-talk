@@ -12,8 +12,8 @@ public struct VoiceInkModeRuntimeConfiguration: Equatable, Sendable {
         transcriptionProvider: .groq,
         transcriptionModel: VoiceInkTranscriptionModelCatalog.voiceInkTranscriptionModel,
         postProcessingProvider: .groq,
-        postProcessingModel: VoiceInkProviderKind.groq.fixedModel(for: .postProcessing)
-            ?? VoiceInkAIModelCatalog.firstAvailableModel(for: .groq),
+        postProcessingModel: VoiceInkProviderKind.groq.defaultModel(for: .postProcessing)
+            ?? VoiceInkAIModelCatalog.defaultModel(for: .groq),
         prompt: "",
         isPostProcessingEnabled: false
     )
@@ -50,7 +50,7 @@ public struct Mode: Identifiable, Codable {
         self.postProcessingProvider = postProcessingProvider
         self.postProcessingModel = postProcessingModel
             ?? postProcessingProvider.defaultModel(for: .postProcessing)
-            ?? VoiceInkAIModelCatalog.firstAvailableModel(for: .groq)
+            ?? VoiceInkAIModelCatalog.defaultModel(for: .groq)
         self.promptTemplate = promptTemplate ?? VoiceInkPostProcessingPromptTemplate(type: .summary)
     }
 
@@ -96,7 +96,8 @@ public struct Mode: Identifiable, Codable {
             transcriptionModel: VoiceInkTranscriptionModelCatalog.localBaseModel,
             isPostProcessingEnabled: false,
             postProcessingProvider: .groq,
-            postProcessingModel: VoiceInkAIModelCatalog.firstAvailableModel(for: .groq),
+            postProcessingModel: VoiceInkProviderKind.groq.defaultModel(for: .postProcessing)
+                ?? VoiceInkAIModelCatalog.defaultModel(for: .groq),
             promptTemplate: VoiceInkPostProcessingPromptTemplate(type: .summary)
         )
     }

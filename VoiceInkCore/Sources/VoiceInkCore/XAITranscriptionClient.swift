@@ -1,24 +1,26 @@
 import Foundation
 
-public struct VoiceInkMistralTranscriptionClient: Sendable {
+public struct VoiceInkXAITranscriptionClient: Sendable {
     public init() {}
 
     public func transcribeAudioData(
         baseURL: URL,
         apiKey: String,
-        model: String,
         audioData: Data,
         fileName: String = "audio.wav",
-        errorDomain: String = "MistralAPI",
-        timeout: TimeInterval = 30,
+        language: String? = nil,
+        format: Bool = false,
+        errorDomain: String = "XAIAPI",
+        timeout: TimeInterval = 60,
         maxRetries: Int = 2
     ) async throws -> String {
-        let preparedRequest = VoiceInkMistralRequestBuilder.makeTranscriptionRequest(
+        let preparedRequest = VoiceInkXAIRequestBuilder.makeTranscriptionRequest(
             baseURL: baseURL,
             apiKey: apiKey,
-            model: model,
             audioData: audioData,
             fileName: fileName,
+            language: language,
+            format: format,
             timeout: timeout
         )
 
@@ -42,7 +44,7 @@ public struct VoiceInkMistralTranscriptionClient: Sendable {
             )
         }
 
-        return try VoiceInkMistralTranscriptionCodec.transcript(from: data)
+        return try VoiceInkXAITranscriptionCodec.transcript(from: data)
     }
 
     public func verifyAPIKey(baseURL: URL, apiKey: String) async -> Bool {
@@ -61,7 +63,7 @@ public struct VoiceInkMistralTranscriptionClient: Sendable {
             )
         }
 
-        let request = VoiceInkMistralRequestBuilder.makeModelsRequest(
+        let request = VoiceInkXAIRequestBuilder.makeAPIKeyRequest(
             baseURL: baseURL,
             apiKey: apiKey,
             timeout: timeout
@@ -89,5 +91,4 @@ public struct VoiceInkMistralTranscriptionClient: Sendable {
             )
         }
     }
-
 }

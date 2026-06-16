@@ -537,5 +537,90 @@ final class RemoteProviderRequestTests: XCTestCase {
             "eleven text"
         )
     }
+
+    func testXAITranscriptionRequestBuilderUsesMultipartAudioRequestWithFileLast() throws {
+        let audioData = Data("WAVDATA".utf8)
+        let preparedRequest = VoiceInkXAIRequestBuilder.makeTranscriptionRequest(
+            baseURL: VoiceInkProviderEndpoint.xaiAPIBaseURL,
+            apiKey: "xai-key",
+            audioData: audioData,
+            fileName: "sample.wav",
+            language: "en",
+            format: true,
+            boundary: "Boundary-test",
+            timeout: 60
+        )
+
+        XCTAssertEqual(preparedRequest.request.url?.absoluteString, "https://api.x.ai/v1/stt")
+        XCTAssertEqual(preparedRequest.request.httpMethod, "POST")
+        XCTAssertEqual(preparedRequest.request.value(forHTTPHeaderField: "Authorization"), "Bearer xai-key")
+        XCTAssertEqual(preparedRequest.request.value(forHTTPHeaderField: "Accept"), "application/json")
+        XCTAssertEqual(
+            preparedRequest.request.value(forHTTPHeaderField: "Content-Type"),
+            "multipart/form-data; boundary=Boundary-test"
+        )
+        XCTAssertEqual(preparedRequest.request.timeoutInterval, 60)
+
+        let body = try XCTUnwrap(String(data: preparedRequest.body, encoding: .utf8))
+        let languageIndex = try XCTUnwrap(body.range(of: "name=\"language\"")?.lowerBound)
+        let formatIndex = try XCTUnwrap(body.range(of: "name=\"format\"")?.lowerBound)
+        let fileIndex = try XCTUnwrap(body.range(of: "name=\"file\"; filename=\"sample.wav\"")?.lowerBound)
+        XCTAssertLessThan(languageIndex, fileIndex)
+        XCTAssertLessThan(formatIndex, fileIndex)
+        XCTAssertTrue(body.contains("Content-Type: audio/wav"))
+        XCTAssertTrue(body.contains("WAVDATA"))
+        XCTAssertTrue(body.contains("--Boundary-test--"))
+    }
+
+    func testXAITranscriptionRequestBuilderSkipsLanguageAndFormatForAutoDetect() throws {
+        let preparedRequest = VoiceInkXAIRequestBuilder.makeTranscriptionRequest(
+            baseURL: VoiceInkProviderEndpoint.xaiAPIBaseURL,
+            apiKey: "xai-key",
+            audioData: Data("WAVDATA".utf8),
+            fileName: "sample.wav",
+            language: "auto",
+            format: true,
+            boundary: "Boundary-test"
+        )
+
+        let body = try XCTUnwrap(String(data: preparedRequest.body, encoding: .utf8))
+        XCTAssertFalse(body.contains("name=\"language\""))
+        XCTAssertFalse(body.contains("name=\"format\""))
+        XCTAssertTrue(body.contains("name=\"file\"; filename=\"sample.wav\""))
+    }
+
+    func testXAIAPIKeyRequestBuilderUsesAPIKeyEndpoint() throws {
+        let request = VoiceInkXAIRequestBuilder.makeAPIKeyRequest(
+            baseURL: VoiceInkProviderEndpoint.xaiAPIBaseURL,
+            apiKey: "xai-key",
+            timeout: 10
+        )
+
+        XCTAssertEqual(request.url?.absoluteString, "https://api.x.ai/v1/api-key")
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer xai-key")
+        XCTAssertEqual(request.timeoutInterval, 10)
+    }
+
+    func testXAIClientRejectsBlankAPIKeyWithoutNetwork() async throws {
+        let result = await VoiceInkXAITranscriptionClient().verifyAPIKeyDetailed(
+            baseURL: VoiceInkProviderEndpoint.xaiAPIBaseURL,
+            apiKey: " \n\t "
+        )
+
+        XCTAssertEqual(
+            result,
+            VoiceInkAPIKeyVerificationResult(
+                isValid: false,
+                errorMessage: "API key is missing or empty."
+            )
+        )
+    }
+
+    func testXAITranscriptionCodecReturnsText() throws {
+        XCTAssertEqual(
+            try VoiceInkXAITranscriptionCodec.transcript(from: Data(#"{"text":"xai text"}"#.utf8)),
+            "xai text"
+        )
+    }
 }
 #endif

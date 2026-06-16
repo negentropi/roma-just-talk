@@ -36,6 +36,10 @@ public enum VoiceInkProviderEndpoint: String, CaseIterable, Sendable {
         URL(string: "https://api.elevenlabs.io")!
     }
 
+    public static var xaiAPIBaseURL: URL {
+        URL(string: "https://api.x.ai")!
+    }
+
     public var chatCompletionsURL: URL? {
         switch self {
         case .groq, .openAI, .cerebras, .gemini:
@@ -113,5 +117,13 @@ public enum VoiceInkProviderEndpoint: String, CaseIterable, Sendable {
 
     public static func elevenLabsUserURL(from baseURL: URL) -> URL {
         baseURL.appendingPathComponent("v1/user")
+    }
+
+    public static func xaiSpeechToTextURL(from baseURL: URL) -> URL {
+        baseURL.appendingPathComponent("v1/stt")
+    }
+
+    public static func xaiAPIKeyURL(from baseURL: URL) -> URL {
+        baseURL.appendingPathComponent("v1/api-key")
     }
 }

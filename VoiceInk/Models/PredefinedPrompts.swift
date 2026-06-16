@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI    // Import to ensure we have access to SwiftUI types if needed
+import VoiceInkCore
 
 enum PredefinedPrompts {
     private static let predefinedPromptsKey = "PredefinedPrompts"
@@ -28,7 +29,7 @@ enum PredefinedPrompts {
             CustomPrompt(
                 id: assistantPromptId,
                 title: "Assistant",
-                promptText: AIPrompts.assistantMode,
+                promptText: VoiceInkAIPrompts.assistantMode,
                 icon: "bubble.left.and.bubble.right.fill",
                 description: "AI assistant that provides direct answers to queries",
                 isPredefined: true,

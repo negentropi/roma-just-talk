@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import VoiceInkCore
 
 typealias PromptIcon = String
 
@@ -127,7 +128,7 @@ struct CustomPrompt: Identifiable, Codable, Equatable {
     
     var finalPromptText: String {
         if useSystemInstructions {
-            return String(format: AIPrompts.customPromptTemplate, self.promptText)
+            return String(format: VoiceInkAIPrompts.customPromptTemplate, self.promptText)
         } else {
             return self.promptText
         }

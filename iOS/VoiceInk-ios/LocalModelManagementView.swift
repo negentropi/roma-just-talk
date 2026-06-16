@@ -128,11 +128,7 @@ struct ModelRowView: View {
     
     private func downloadModel() {
         Task {
-            do {
-                try await modelManager.downloadModel(model)
-            } catch {
-                print("Download failed: \(error)")
-            }
+            await modelManager.downloadModel(model)
         }
     }
     

@@ -239,12 +239,8 @@ struct ModelDownloadOnboardingView: View {
     
     private func downloadModel() {
         Task {
-            do {
-                hasStartedDownload = true
-                try await modelManager.downloadModel(baseModel)
-            } catch {
-                print("Download failed: \(error)")
-            }
+            hasStartedDownload = true
+            await modelManager.downloadModel(baseModel)
         }
     }
 }

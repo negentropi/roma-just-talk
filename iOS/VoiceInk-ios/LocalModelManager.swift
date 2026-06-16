@@ -9,29 +9,10 @@ import Foundation
 import Combine
 import VoiceInkCore
 
-enum ModelDownloadError: Error {
-    case downloadFailed
-    case fileSystemError
-}
+typealias WhisperModel = VoiceInkWhisperModelFileSpec
 
-struct WhisperModel: Identifiable, Codable {
-    private let spec: VoiceInkWhisperModelFileSpec
-
-    var id: String { spec.id }
-    var name: String { spec.modelName }
-    var displayName: String { spec.displayName }
-    var filename: String { spec.filename }
-    var size: String { spec.size }
-    var description: String { spec.description }
-
-    init(spec: VoiceInkWhisperModelFileSpec) {
-        self.spec = spec
-    }
-
-    var downloadURL: URL {
-        spec.downloadURL
-    }
-    
+extension VoiceInkWhisperModelFileSpec {
+    var name: String { modelName }
     var fileURL: URL {
         LocalModelManager.modelsDirectory.appendingPathComponent(filename)
     }
@@ -40,9 +21,9 @@ struct WhisperModel: Identifiable, Codable {
         FileManager.default.fileExists(atPath: fileURL.path)
     }
     
-    static let baseModel = WhisperModel(spec: VoiceInkWhisperModelFiles.baseModel)
+    static let baseModel = VoiceInkWhisperModelFiles.baseModel
 
-    static let availableModels = VoiceInkWhisperModelFiles.bootstrapModels.map(WhisperModel.init(spec:))
+    static let availableModels = VoiceInkWhisperModelFiles.bootstrapModels
 }
 
 @MainActor
@@ -77,7 +58,7 @@ class LocalModelManager: ObservableObject {
     }
     
     /// Download a specific model
-    func downloadModel(_ model: WhisperModel) async throws {
+    func downloadModel(_ model: WhisperModel) async {
         guard !isDownloading[model.id, default: false] else {
             print("LocalModelManager: Model \(model.name) is already being downloaded")
             return
@@ -89,34 +70,27 @@ class LocalModelManager: ObservableObject {
         downloadProgress[model.id] = 0.0
         downloadError = nil
         
-        do {
-            let downloadTask = URLSession.shared.downloadTask(with: model.downloadURL) { [weak self] temporaryURL, response, error in
-                Task { @MainActor in
-                    self?.handleDownloadCompletion(
-                        for: model,
-                        temporaryURL: temporaryURL,
-                        response: response,
-                        error: error
-                    )
-                }
+        let downloadTask = URLSession.shared.downloadTask(with: model.downloadURL) { [weak self] temporaryURL, response, error in
+            Task { @MainActor in
+                self?.handleDownloadCompletion(
+                    for: model,
+                    temporaryURL: temporaryURL,
+                    response: response,
+                    error: error
+                )
             }
-            
-            // Track progress
-            let progressObservation = downloadTask.progress.observe(\.fractionCompleted) { [weak self] progress, _ in
-                Task { @MainActor in
-                    self?.downloadProgress[model.id] = progress.fractionCompleted
-                }
-            }
-            
-            downloadTasks[model.id] = downloadTask
-            progressObservations[model.id] = progressObservation
-            downloadTask.resume()
-            
-        } catch {
-            isDownloading[model.id] = false
-            downloadError = "Download failed: \(error.localizedDescription)"
-            throw ModelDownloadError.downloadFailed
         }
+
+        // Track progress
+        let progressObservation = downloadTask.progress.observe(\.fractionCompleted) { [weak self] progress, _ in
+            Task { @MainActor in
+                self?.downloadProgress[model.id] = progress.fractionCompleted
+            }
+        }
+
+        downloadTasks[model.id] = downloadTask
+        progressObservations[model.id] = progressObservation
+        downloadTask.resume()
     }
     
     private func handleDownloadCompletion(

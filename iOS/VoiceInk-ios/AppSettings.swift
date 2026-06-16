@@ -30,23 +30,23 @@ final class AppSettings: ObservableObject {
 
     // Separate API keys per provider
     @Published var groqAPIKey: String {
-        didSet { saveAPIKey(groqAPIKey, forKey: VoiceInkProviderAPIKeyAccount.groq) }
+        didSet { saveAPIKey(groqAPIKey, for: .groq) }
     }
 
     @Published var openAIAPIKey: String {
-        didSet { saveAPIKey(openAIAPIKey, forKey: VoiceInkProviderAPIKeyAccount.openAI) }
+        didSet { saveAPIKey(openAIAPIKey, for: .openai) }
     }
 
     @Published var deepgramAPIKey: String {
-        didSet { saveAPIKey(deepgramAPIKey, forKey: VoiceInkProviderAPIKeyAccount.deepgram) }
+        didSet { saveAPIKey(deepgramAPIKey, for: .deepgram) }
     }
 
     @Published var cerebrasAPIKey: String {
-        didSet { saveAPIKey(cerebrasAPIKey, forKey: VoiceInkProviderAPIKeyAccount.cerebras) }
+        didSet { saveAPIKey(cerebrasAPIKey, for: .cerebras) }
     }
 
     @Published var geminiAPIKey: String {
-        didSet { saveAPIKey(geminiAPIKey, forKey: VoiceInkProviderAPIKeyAccount.gemini) }
+        didSet { saveAPIKey(geminiAPIKey, for: .gemini) }
     }
     
     // Track verification status per provider
@@ -89,11 +89,11 @@ final class AppSettings: ObservableObject {
         }
         
 
-        self.groqAPIKey = AppSettings.loadAPIKey(forKey: VoiceInkProviderAPIKeyAccount.groq)
-        self.openAIAPIKey = AppSettings.loadAPIKey(forKey: VoiceInkProviderAPIKeyAccount.openAI)
-        self.deepgramAPIKey = AppSettings.loadAPIKey(forKey: VoiceInkProviderAPIKeyAccount.deepgram)
-        self.cerebrasAPIKey = AppSettings.loadAPIKey(forKey: VoiceInkProviderAPIKeyAccount.cerebras)
-        self.geminiAPIKey = AppSettings.loadAPIKey(forKey: VoiceInkProviderAPIKeyAccount.gemini)
+        self.groqAPIKey = AppSettings.loadAPIKey(for: .groq)
+        self.openAIAPIKey = AppSettings.loadAPIKey(for: .openai)
+        self.deepgramAPIKey = AppSettings.loadAPIKey(for: .deepgram)
+        self.cerebrasAPIKey = AppSettings.loadAPIKey(for: .cerebras)
+        self.geminiAPIKey = AppSettings.loadAPIKey(for: .gemini)
         self.groqKeyVerified = UserDefaults.standard.bool(forKey: "groqKeyVerified")
         self.openAIKeyVerified = UserDefaults.standard.bool(forKey: "openAIKeyVerified")
         self.deepgramKeyVerified = UserDefaults.standard.bool(forKey: "deepgramKeyVerified")
@@ -262,12 +262,27 @@ final class AppSettings: ObservableObject {
             print("Error saving API key to keychain: \(status)")
         }
     }
+
+    private func saveAPIKey(_ key: String, for provider: Provider) {
+        guard let account = provider.apiKeyAccount else { return }
+        saveAPIKey(key, forKey: account)
+    }
     
     private static func loadAPIKey(forKey account: String) -> String {
         if let data = KeychainService.load(key: account), let key = String(data: data, encoding: .utf8) {
             return key
         }
         return ""
+    }
+
+    private static func loadAPIKey(for provider: Provider) -> String {
+        guard let account = provider.apiKeyAccount else { return "" }
+        return loadAPIKey(forKey: account)
+    }
+
+    private static func deleteAPIKey(for provider: Provider) {
+        guard let account = provider.apiKeyAccount else { return }
+        _ = KeychainService.delete(key: account)
     }
 
     // MARK: - Debug Reset
@@ -302,10 +317,10 @@ final class AppSettings: ObservableObject {
         deepgramAPIKey = ""
         cerebrasAPIKey = ""
         geminiAPIKey = ""
-        _ = KeychainService.delete(key: VoiceInkProviderAPIKeyAccount.groq)
-        _ = KeychainService.delete(key: VoiceInkProviderAPIKeyAccount.openAI)
-        _ = KeychainService.delete(key: VoiceInkProviderAPIKeyAccount.deepgram)
-        _ = KeychainService.delete(key: VoiceInkProviderAPIKeyAccount.cerebras)
-        _ = KeychainService.delete(key: VoiceInkProviderAPIKeyAccount.gemini)
+        Self.deleteAPIKey(for: .groq)
+        Self.deleteAPIKey(for: .openai)
+        Self.deleteAPIKey(for: .deepgram)
+        Self.deleteAPIKey(for: .cerebras)
+        Self.deleteAPIKey(for: .gemini)
     }
 }

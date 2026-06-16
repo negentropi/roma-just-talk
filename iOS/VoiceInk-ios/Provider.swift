@@ -43,6 +43,10 @@ enum Provider: String, CaseIterable, Codable, Identifiable {
         coreKind.requiresUserAPIKey
     }
 
+    var apiKeyAccount: String? {
+        coreKind.apiKeyAccount
+    }
+
     var apiKeyVerificationTransport: VoiceInkAPIKeyVerificationTransport? {
         coreKind.apiKeyVerificationTransport
     }

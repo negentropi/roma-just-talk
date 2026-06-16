@@ -20,6 +20,7 @@
 - Removed fixed sleeps between simulated paste key events so completed text reaches the target app sooner.
 - Kept warmed local STT resources after successful transcription so the next recording and rolling-buffer preload avoid an immediate teardown/reload cycle.
 - Warmed the rolling-buffer VAD model before first speech when preload is eligible, so the first VAD trigger can start STT without paying model-load delay.
+- Broadcast the restored startup transcription model so rolling-buffer preload can warm immediately after launch instead of waiting for a later settings change.
 - Let preload-only quick releases commit an already-ready rolling-buffer STT session directly, without opening and stopping a new recorder session first.
 - Deferred quick-release rolling-preload WAV writing until after cached stream finalization can start, while still waiting for the file before batch fallback or history metadata needs it.
 - Added claim-to-paste latency tracing for rolling-preload quick releases so remaining delays can be measured from runtime logs.

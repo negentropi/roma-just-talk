@@ -77,6 +77,7 @@ class TranscriptionModelManager: ObservableObject {
 
             currentTranscriptionModel = savedModel
             ensureSelectedLanguageIsSupported(by: savedModel)
+            notifyCurrentModelDidChange(savedModel)
         }
     }
 
@@ -100,6 +101,10 @@ class TranscriptionModelManager: ObservableObject {
             whisperModelManager?.isModelLoaded = true
         }
 
+        notifyCurrentModelDidChange(model)
+    }
+
+    private func notifyCurrentModelDidChange(_ model: any TranscriptionModel) {
         NotificationCenter.default.post(name: .didChangeModel, object: nil, userInfo: ["modelName": model.name])
         NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
     }

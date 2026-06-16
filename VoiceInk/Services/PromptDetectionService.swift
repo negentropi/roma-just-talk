@@ -57,10 +57,6 @@ class PromptDetectionService {
                 }
             }
         }
-        
-        if result.shouldEnableAI {
-            try? await Task.sleep(nanoseconds: 50_000_000)
-        }
     }
     
     func restoreOriginalSettings(_ result: PromptDetectionResult, to enhancementService: AIEnhancementService) async {

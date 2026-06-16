@@ -17,7 +17,6 @@ class CursorPaster {
         }
     }
 
-    private static let pasteShortcutEventDelay: TimeInterval = 0.01
     private static let minimumClipboardRestoreDelay: TimeInterval = 0.25
 
     static func pasteAtCursor(_ text: String) {
@@ -194,11 +193,8 @@ class CursorPaster {
         vUp.flags     = .maskCommand
 
         cmdDown.post(tap: .cghidEventTap)
-        await wait(pasteShortcutEventDelay)
         vDown.post(tap: .cghidEventTap)
-        await wait(pasteShortcutEventDelay)
         vUp.post(tap: .cghidEventTap)
-        await wait(pasteShortcutEventDelay)
         cmdUp.post(tap: .cghidEventTap)
 
         return .commandPosted

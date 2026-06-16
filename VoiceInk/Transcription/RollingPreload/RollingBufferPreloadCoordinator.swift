@@ -1,5 +1,6 @@
 import Foundation
 import os
+import VoiceInkCore
 
 struct RollingBufferPreloadedSession {
     let session: TranscriptionSession
@@ -577,6 +578,6 @@ final class RollingBufferPreloadCoordinator {
     }
 
     private static func bytes(forDuration seconds: Double) -> Int {
-        Int((seconds * 16_000 * Double(MemoryLayout<Int16>.size)).rounded())
+        VoiceInkPCM16Audio.byteCount(forMono16kDuration: seconds)
     }
 }

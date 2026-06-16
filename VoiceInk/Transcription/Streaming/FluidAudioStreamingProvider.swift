@@ -1,6 +1,7 @@
 import FluidAudio
 import Foundation
 import os
+import VoiceInkCore
 
 /// Agreement-based on-device streaming transcription using FluidAudio ASR.
 final class FluidAudioStreamingProvider: StreamingTranscriptionProvider {
@@ -13,7 +14,7 @@ final class FluidAudioStreamingProvider: StreamingTranscriptionProvider {
 
     private var audioBuffer: [Float] = []
     private let bufferLock = NSLock()
-    private let sampleRate: Double = 16000.0
+    private let sampleRate = VoiceInkPCM16Audio.mono16kSampleRate
     // Samples trimmed from buffer front; subtract from absolute indices for buffer-relative access.
     private var trimmedSampleCount: Int = 0
 
@@ -38,7 +39,9 @@ final class FluidAudioStreamingProvider: StreamingTranscriptionProvider {
         self.fluidAudioService = fluidAudioService
         self.config = config
         self.agreementEngine = WordAgreementEngine(config: config)
-        self.maxCachedFinalizationLagSamples = Int((config.cachedFinalizationMaxLagSeconds * 16_000.0).rounded())
+        self.maxCachedFinalizationLagSamples = VoiceInkPCM16Audio.sampleCount(
+            forMono16kDuration: config.cachedFinalizationMaxLagSeconds
+        )
 
         var continuation: AsyncStream<StreamingTranscriptionEvent>.Continuation!
         transcriptionEvents = AsyncStream { continuation = $0 }
@@ -76,7 +79,7 @@ final class FluidAudioStreamingProvider: StreamingTranscriptionProvider {
     }
 
     func sendAudioChunk(_ data: Data) async throws {
-        let samples = Self.convertToFloat32(data)
+        let samples = VoiceInkPCM16Audio.floatSamples(fromLittleEndianData: data)
         let shouldRunImmediatePass: Bool
         bufferLock.lock()
         audioBuffer.append(contentsOf: samples)
@@ -193,7 +196,7 @@ final class FluidAudioStreamingProvider: StreamingTranscriptionProvider {
 
         // Pad with 1s trailing silence for punctuation capture
         let maxSingleChunkSamples = 240_000
-        let trailingSilenceSamples = 16_000
+        let trailingSilenceSamples = VoiceInkPCM16Audio.sampleCount(forMono16kDuration: 1)
         if audioSlice.count + trailingSilenceSamples <= maxSingleChunkSamples {
             audioSlice += [Float](repeating: 0, count: trailingSilenceSamples)
         }
@@ -275,7 +278,7 @@ final class FluidAudioStreamingProvider: StreamingTranscriptionProvider {
 
         guard samples.count >= minimumAudioSamples else { return nil }
 
-        let trailingSilenceSamples = 16_000
+        let trailingSilenceSamples = VoiceInkPCM16Audio.sampleCount(forMono16kDuration: 1)
         let maxSingleChunkSamples = 240_000
         if samples.count + trailingSilenceSamples <= maxSingleChunkSamples {
             samples += [Float](repeating: 0, count: trailingSilenceSamples)
@@ -312,19 +315,5 @@ final class FluidAudioStreamingProvider: StreamingTranscriptionProvider {
         }
 
         return cachedText
-    }
-
-    // MARK: - Audio Conversion
-
-    private static func convertToFloat32(_ data: Data) -> [Float] {
-        let sampleCount = data.count / MemoryLayout<Int16>.size
-        var samples = [Float](repeating: 0, count: sampleCount)
-        data.withUnsafeBytes { rawPtr in
-            let int16Ptr = rawPtr.bindMemory(to: Int16.self)
-            for i in 0..<sampleCount {
-                samples[i] = Float(int16Ptr[i]) / 32767.0
-            }
-        }
-        return samples
     }
 }

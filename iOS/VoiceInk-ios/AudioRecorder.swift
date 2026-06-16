@@ -6,6 +6,7 @@
 import Foundation
 import Combine
 import AVFoundation
+import VoiceInkCore
 
 @MainActor
 final class AudioRecorder: NSObject, ObservableObject {
@@ -28,7 +29,7 @@ final class AudioRecorder: NSObject, ObservableObject {
         // Whisper-compatible format: 16kHz mono WAV
         let settings: [String: Any] = [
             AVFormatIDKey: Int(kAudioFormatLinearPCM),
-            AVSampleRateKey: 16000.0,
+            AVSampleRateKey: VoiceInkPCM16Audio.mono16kSampleRate,
             AVNumberOfChannelsKey: 1,
             AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
         ]
@@ -102,5 +103,4 @@ final class AudioRecorder: NSObject, ObservableObject {
 }
 
 extension AudioRecorder: AVAudioRecorderDelegate {}
-
 

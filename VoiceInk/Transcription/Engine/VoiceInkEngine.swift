@@ -4,6 +4,7 @@ import AVFoundation
 import SwiftData
 import AppKit
 import os
+import VoiceInkCore
 
 struct RollingBufferPreloadClaim {
     let preloaded: RollingBufferPreloadedSession
@@ -705,7 +706,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
     }
 
     static func durationForMono16kPCMData(_ audioData: Data) -> TimeInterval {
-        TimeInterval(audioData.count / MemoryLayout<Int16>.size) / 16_000
+        VoiceInkPCM16Audio.duration(forMono16kData: audioData)
     }
 
     func prepareQuickReleaseContext(powerModeId: UUID? = nil) {

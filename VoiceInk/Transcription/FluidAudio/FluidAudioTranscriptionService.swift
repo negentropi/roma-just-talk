@@ -97,7 +97,7 @@ class FluidAudioTranscriptionService: TranscriptionService {
         )
         let audioSamples = try readAudioSamples(from: audioURL)
 
-        let durationSeconds = Double(audioSamples.count) / 16000.0
+        let durationSeconds = Double(audioSamples.count) / VoiceInkPCM16Audio.mono16kSampleRate
         let isVADEnabled = UserDefaults.standard.bool(forKey: "IsVADEnabled")
 
         var speechAudio = audioSamples
@@ -124,7 +124,7 @@ class FluidAudioTranscriptionService: TranscriptionService {
         }
 
         // Pad with 1s of silence to capture final punctuation at sequence boundary
-        let trailingSilenceSamples = 16_000
+        let trailingSilenceSamples = VoiceInkPCM16Audio.sampleCount(forMono16kDuration: 1)
         let maxSingleChunkSamples = 240_000
         if speechAudio.count + trailingSilenceSamples <= maxSingleChunkSamples {
             speechAudio += [Float](repeating: 0, count: trailingSilenceSamples)

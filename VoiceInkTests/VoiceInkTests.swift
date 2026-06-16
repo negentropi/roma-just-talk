@@ -1037,10 +1037,11 @@ struct VoiceInkTests {
         #expect(!sessionActive)
     }
 
-    @Test @MainActor func specialModePreloadOnlyStartsAndStopsOnKeyUp() async throws {
+    @Test @MainActor func specialModePreloadOnlyCommitsReadyPreloadWithoutStartingRecorder() async throws {
         var recordingState = RecordingState.idle
         var sessionActive = false
         var toggleCount = 0
+        var directCommitCount = 0
 
         let handler = RecordingShortcutModeHandler(
             logger: Logger(subsystem: "VoiceInkTests", category: "RecordingShortcutModeHandler"),
@@ -1056,6 +1057,11 @@ struct VoiceInkTests {
                     recordingState = .transcribing
                     sessionActive = true
                 }
+            },
+            commitReadyRollingBufferPreload: { _ in
+                directCommitCount += 1
+                recordingState = .transcribing
+                return true
             },
             cancelRecording: {
                 recordingState = .idle
@@ -1087,6 +1093,64 @@ struct VoiceInkTests {
             specialOptions: specialOptions
         )
 
+        #expect(directCommitCount == 1)
+        #expect(toggleCount == 0)
+        #expect(recordingState == .transcribing)
+    }
+
+    @Test @MainActor func specialModePreloadOnlyFallsBackToRecorderWhenNoPreloadIsReady() async throws {
+        var recordingState = RecordingState.idle
+        var sessionActive = false
+        var toggleCount = 0
+        var directCommitCount = 0
+
+        let handler = RecordingShortcutModeHandler(
+            logger: Logger(subsystem: "VoiceInkTests", category: "RecordingShortcutModeHandler"),
+            canHandleShortcutAction: { true },
+            isRecorderVisible: { sessionActive },
+            recordingState: { recordingState },
+            toggleMiniRecorder: { _ in
+                toggleCount += 1
+                if recordingState == .idle {
+                    recordingState = .recording
+                    sessionActive = true
+                } else {
+                    recordingState = .transcribing
+                    sessionActive = true
+                }
+            },
+            commitReadyRollingBufferPreload: { _ in
+                directCommitCount += 1
+                return false
+            },
+            cancelRecording: {
+                recordingState = .idle
+                sessionActive = false
+            }
+        )
+
+        let specialOptions = SpecialShortcutOptions(
+            keyDownBehavior: .preloadOnly,
+            allowsKeyDownOnlyTrigger: true,
+            pasteLastTranscriptOnEmptyTap: true
+        )
+
+        await handler.handleKeyDown(
+            action: .primaryRecording,
+            eventTime: 1,
+            mode: .special,
+            specialOptions: specialOptions
+        )
+
+        await handler.handleKeyUp(
+            action: .primaryRecording,
+            eventTime: 2,
+            mode: .special,
+            context: ShortcutPressContext(),
+            specialOptions: specialOptions
+        )
+
+        #expect(directCommitCount == 1)
         #expect(toggleCount == 2)
         #expect(recordingState == .transcribing)
     }

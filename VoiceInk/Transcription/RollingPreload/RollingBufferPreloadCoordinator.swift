@@ -5,6 +5,7 @@ struct RollingBufferPreloadedSession {
     let session: TranscriptionSession
     let audioChunkHandler: (Data) -> Void
     let language: String?
+    let audioData: Data
 }
 
 private final class RollingBufferChunkSource: @unchecked Sendable {
@@ -232,6 +233,10 @@ final class RollingBufferPreloadCoordinator {
             return nil
         }
 
+        let audioData = leadInBuffer.snapshot().reduce(into: Data()) { result, chunk in
+            result.append(chunk)
+        }
+
         state = .claimed
         currentSession = nil
         currentCallback = nil
@@ -242,7 +247,12 @@ final class RollingBufferPreloadCoordinator {
         let triggerElapsed = speechDetectedAt.map { Date().timeIntervalSince($0) } ?? -1
         let startupElapsed = preloadStartedAt.map { Date().timeIntervalSince($0) } ?? -1
         logger.notice("Claimed rolling preload session model=\(model.displayName, privacy: .public) triggerElapsed=\(triggerElapsed, format: .fixed(precision: 3), privacy: .public)s startupElapsed=\(startupElapsed, format: .fixed(precision: 3), privacy: .public)s preloadedChunks=\(self.preloadedChunks, privacy: .public) preloadedBytes=\(self.preloadedBytes, privacy: .public)")
-        return RollingBufferPreloadedSession(session: session, audioChunkHandler: callback, language: selectedLanguage)
+        return RollingBufferPreloadedSession(
+            session: session,
+            audioChunkHandler: callback,
+            language: selectedLanguage,
+            audioData: audioData
+        )
     }
 
     func cancelUnclaimedPreload(reason: String) {

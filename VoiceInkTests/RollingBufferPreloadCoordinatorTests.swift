@@ -173,6 +173,7 @@ struct RollingBufferPreloadCoordinatorTests {
 
             let claimed = await coordinator.claimPreloadedSession(for: model)
             #expect(claimed != nil)
+            #expect(claimed?.audioData.count == 8_000)
             #expect(session.preparedModelName == model.name)
             #expect(session.chunks.snapshot().map(\.count) == [8_000])
 

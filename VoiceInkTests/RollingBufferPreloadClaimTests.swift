@@ -54,7 +54,8 @@ struct RollingBufferPreloadClaimTests {
             preloaded: RollingBufferPreloadedSession(
                 session: ClaimTestSession(),
                 audioChunkHandler: { _ in },
-                language: language
+                language: language,
+                audioData: Data()
             ),
             modelName: modelName,
             language: language

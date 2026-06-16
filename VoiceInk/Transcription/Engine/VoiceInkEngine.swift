@@ -339,6 +339,59 @@ class VoiceInkEngine: NSObject, ObservableObject {
         }
     }
 
+    func commitReadyRollingBufferPreload(powerModeId: UUID? = nil) async -> Bool {
+        guard recordingState == .idle,
+              let model = transcriptionModelManager.currentTranscriptionModel,
+              let claimedPreload = await rollingBufferPreloadCoordinator.claimPreloadedSession(for: model) else {
+            return false
+        }
+
+        let claim = RollingBufferPreloadClaim(
+            preloaded: claimedPreload,
+            modelName: model.name,
+            language: claimedPreload.language
+        )
+
+        await ActiveWindowService.shared.applyConfiguration(powerModeId: powerModeId)
+
+        guard let currentModel = transcriptionModelManager.currentTranscriptionModel,
+              claim.matches(model: currentModel, language: UserDefaults.standard.string(forKey: "SelectedLanguage")) else {
+            claimedPreload.session.cancel()
+            rollingBufferPreloadCoordinator.recordingSessionDidFinish()
+            return false
+        }
+
+        do {
+            let fileName = "\(UUID().uuidString).wav"
+            let permanentURL = recordingsDirectory.appendingPathComponent(fileName)
+            try PCM16WAVFileWriter.writeMono16k(claimedPreload.audioData, to: permanentURL)
+
+            let transcription = makeRecordingTranscription(
+                for: permanentURL,
+                text: "",
+                duration: 0,
+                transcriptionStatus: .pending
+            )
+            modelContext.insert(transcription)
+
+            recordedFile = permanentURL
+            currentSession = claimedPreload.session
+            activeRecordingStartID = nil
+            stopRequestedDuringStart = false
+            shouldCancelRecording = false
+            partialTranscript = ""
+            recordingState = .transcribing
+
+            await runPipeline(on: transcription, audioURL: permanentURL)
+            return true
+        } catch {
+            claimedPreload.session.cancel()
+            rollingBufferPreloadCoordinator.recordingSessionDidFinish()
+            logger.error("commitReadyRollingBufferPreload failed: \(error.localizedDescription, privacy: .public)")
+            return false
+        }
+    }
+
     private func requestRecordPermission(response: @escaping (Bool) -> Void) {
         switch AVCaptureDevice.authorizationStatus(for: .audio) {
         case .authorized:

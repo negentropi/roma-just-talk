@@ -135,6 +135,70 @@ struct PreRollStreamingEmissionGate {
     }
 }
 
+enum PCM16WAVFileWriter {
+    static func writeMono16k(_ data: Data, to url: URL) throws {
+        if FileManager.default.fileExists(atPath: url.path) {
+            try FileManager.default.removeItem(at: url)
+        }
+
+        var outputFormat = AudioStreamBasicDescription(
+            mSampleRate: 16_000,
+            mFormatID: kAudioFormatLinearPCM,
+            mFormatFlags: kAudioFormatFlagIsSignedInteger | kAudioFormatFlagIsPacked,
+            mBytesPerPacket: 2,
+            mFramesPerPacket: 1,
+            mBytesPerFrame: 2,
+            mChannelsPerFrame: 1,
+            mBitsPerChannel: 16,
+            mReserved: 0
+        )
+
+        var fileRef: ExtAudioFileRef?
+        var status = ExtAudioFileCreateWithURL(
+            url as CFURL,
+            kAudioFileWAVEType,
+            &outputFormat,
+            nil,
+            AudioFileFlags.eraseFile.rawValue,
+            &fileRef
+        )
+        guard status == noErr, let fileRef else {
+            throw CoreAudioRecorderError.failedToCreateFile(status: status)
+        }
+
+        defer { ExtAudioFileDispose(fileRef) }
+
+        status = ExtAudioFileSetProperty(
+            fileRef,
+            kExtAudioFileProperty_ClientDataFormat,
+            UInt32(MemoryLayout<AudioStreamBasicDescription>.size),
+            &outputFormat
+        )
+        guard status == noErr else {
+            throw CoreAudioRecorderError.failedToSetFileFormat(status: status)
+        }
+
+        guard data.count >= MemoryLayout<Int16>.size else { return }
+        let frameCount = UInt32(data.count / MemoryLayout<Int16>.size)
+        var mutableData = data
+        let writeStatus: OSStatus = mutableData.withUnsafeMutableBytes { rawBuffer in
+            var outputBufferList = AudioBufferList(
+                mNumberBuffers: 1,
+                mBuffers: AudioBuffer(
+                    mNumberChannels: 1,
+                    mDataByteSize: frameCount * UInt32(MemoryLayout<Int16>.size),
+                    mData: rawBuffer.baseAddress
+                )
+            )
+            return ExtAudioFileWrite(fileRef, frameCount, &outputBufferList)
+        }
+
+        guard writeStatus == noErr else {
+            throw CoreAudioRecorderError.failedToWriteFile(status: writeStatus)
+        }
+    }
+}
+
 // MARK: - Core Audio Recorder (AUHAL-based, does not change system default device)
 final class CoreAudioRecorder: @unchecked Sendable {
 

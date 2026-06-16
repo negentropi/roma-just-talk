@@ -1,5 +1,6 @@
 import Foundation
 import OSLog
+import VoiceInkCore
 
 class VADModelManager {
     static let shared = VADModelManager()
@@ -8,7 +9,10 @@ class VADModelManager {
     private init() {}
 
     func getModelPath() async -> String? {
-        guard let modelURL = Bundle.main.url(forResource: "ggml-silero-v5.1.2", withExtension: "bin") else {
+        guard let modelURL = Bundle.main.url(
+            forResource: VoiceInkVADModelFiles.sileroResourceName,
+            withExtension: VoiceInkVADModelFiles.sileroFileExtension
+        ) else {
             logger.error("VAD model not found in bundle resources")
             return nil
         }

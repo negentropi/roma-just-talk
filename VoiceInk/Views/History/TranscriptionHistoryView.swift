@@ -411,9 +411,8 @@ struct TranscriptionHistoryView: View {
     }
 
     private func performDeletion(for transcription: Transcription) {
-        if let urlString = transcription.audioFileURL,
-           let url = URL(string: urlString),
-           FileManager.default.fileExists(atPath: url.path) {
+        if let url = transcription.resolvedAudioFileURL(),
+           transcription.hasStoredAudioFile() {
             do {
                 try FileManager.default.removeItem(at: url)
             } catch {

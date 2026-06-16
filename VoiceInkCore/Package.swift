@@ -17,6 +17,10 @@ let package = Package(
     targets: [
         .target(
             name: "VoiceInkCore"
+        ),
+        .testTarget(
+            name: "VoiceInkCoreTests",
+            dependencies: ["VoiceInkCore"]
         )
     ]
 )

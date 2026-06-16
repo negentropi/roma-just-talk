@@ -5,12 +5,7 @@ struct TranscriptionDetailView: View {
     var onInfoTap: (() -> Void)?
 
     private var hasAudioFile: Bool {
-        if let urlString = transcription.audioFileURL,
-           let url = URL(string: urlString),
-           FileManager.default.fileExists(atPath: url.path) {
-            return true
-        }
-        return false
+        transcription.hasStoredAudioFile()
     }
 
     var body: some View {
@@ -34,8 +29,7 @@ struct TranscriptionDetailView: View {
                 .padding(16)
             }
 
-            if hasAudioFile, let urlString = transcription.audioFileURL,
-               let url = URL(string: urlString) {
+            if hasAudioFile, let url = transcription.resolvedAudioFileURL() {
                 VStack(spacing: 0) {
                     Divider()
 

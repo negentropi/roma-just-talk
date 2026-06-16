@@ -35,19 +35,18 @@ final class Transcription {
     var needsTranscription: Bool {
         return transcriptionStatus.needsTranscription
     }
+
+    var resolvedAudioFileURL: URL? {
+        VoiceInkStoredAudioFile.resolvedURL(for: audioFileURL, relativeTo: Self.recordingsDirectory)
+    }
     
     /// Get the full path to the audio file
     var fullAudioPath: String? {
-        guard let audioFileURL = audioFileURL, !audioFileURL.isEmpty else { return nil }
-        
-        // If already a full path, use it
-        if audioFileURL.hasPrefix("/") {
-            return audioFileURL
-        }
-        
-        // Otherwise, it's a filename - build the full path
-        let recordingsDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        resolvedAudioFileURL?.path
+    }
+
+    private static var recordingsDirectory: URL {
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("Recordings")
-        return recordingsDir.appendingPathComponent(audioFileURL).path
     }
 }

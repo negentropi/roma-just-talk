@@ -69,8 +69,7 @@ class TranscriptionAutoCleanupService {
             return
         }
 
-        if let urlString = transcription.audioFileURL,
-           let url = URL(string: urlString) {
+        if let url = transcription.resolvedAudioFileURL(relativeTo: recordingsDirectory) {
             do {
                 try FileManager.default.removeItem(at: url)
             } catch {
@@ -111,9 +110,8 @@ class TranscriptionAutoCleanupService {
             let items = try backgroundContext.fetch(descriptor)
             var deletedCount = 0
             for transcription in items {
-                if let urlString = transcription.audioFileURL,
-                   let url = URL(string: urlString),
-                   FileManager.default.fileExists(atPath: url.path) {
+                if let url = transcription.resolvedAudioFileURL(relativeTo: recordingsDirectory),
+                   transcription.hasStoredAudioFile(relativeTo: recordingsDirectory) {
                     try? FileManager.default.removeItem(at: url)
                 }
                 backgroundContext.delete(transcription)
@@ -147,9 +145,7 @@ class TranscriptionAutoCleanupService {
 
             let transcriptions = try backgroundContext.fetch(descriptor)
             let referencedFiles = Set(transcriptions.compactMap { transcription -> String? in
-                guard let urlString = transcription.audioFileURL,
-                      let url = URL(string: urlString) else { return nil }
-                return url.lastPathComponent
+                transcription.resolvedAudioFileURL(relativeTo: recordingsDirectory)?.lastPathComponent
             })
 
             guard FileManager.default.fileExists(atPath: recordingsDirectory.path) else { return }

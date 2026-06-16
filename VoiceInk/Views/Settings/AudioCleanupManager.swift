@@ -67,9 +67,8 @@ class AudioCleanupManager {
                 var eligibleTranscriptions: [Transcription] = []
 
                 for transcription in transcriptions {
-                    if let urlString = transcription.audioFileURL,
-                       let url = URL(string: urlString),
-                       FileManager.default.fileExists(atPath: url.path) {
+                    if let url = transcription.resolvedAudioFileURL(),
+                       transcription.hasStoredAudioFile() {
                         if let attributes = try? FileManager.default.attributesOfItem(atPath: url.path),
                            let fileSize = attributes[.size] as? Int64 {
                             totalSize += fileSize
@@ -116,9 +115,8 @@ class AudioCleanupManager {
                 var deletedCount = 0
 
                 for transcription in transcriptions {
-                    if let urlString = transcription.audioFileURL,
-                       let url = URL(string: urlString),
-                       FileManager.default.fileExists(atPath: url.path) {
+                    if let url = transcription.resolvedAudioFileURL(),
+                       transcription.hasStoredAudioFile() {
                         do {
                             try FileManager.default.removeItem(at: url)
                             transcription.audioFileURL = nil
@@ -152,9 +150,8 @@ class AudioCleanupManager {
                 var errorCount = 0
 
                 for transcription in transcriptions {
-                    if let urlString = transcription.audioFileURL,
-                       let url = URL(string: urlString),
-                       FileManager.default.fileExists(atPath: url.path) {
+                    if let url = transcription.resolvedAudioFileURL(),
+                       transcription.hasStoredAudioFile() {
                         do {
                             try FileManager.default.removeItem(at: url)
                             transcription.audioFileURL = nil

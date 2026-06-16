@@ -313,21 +313,10 @@ struct ReadyOnboardingView: View {
     
     @MainActor
     private func completeOnboarding() {
-        ensureDefaultModeExists()
-        UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
+        AppSettings.shared.completeFirstTimeSetup()
         withAnimation(.easeInOut(duration: 0.5)) {
             isOnboardingComplete = true
         }
-    }
-
-    @MainActor
-    private func ensureDefaultModeExists() {
-        let settings = AppSettings.shared
-        guard settings.modes.isEmpty else { return }
-
-        let defaultMode = Mode.defaultLocalWhisper()
-        settings.modes.append(defaultMode)
-        settings.selectedModeId = defaultMode.id
     }
 }
 

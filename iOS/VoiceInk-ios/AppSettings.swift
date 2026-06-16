@@ -134,6 +134,22 @@ final class AppSettings: ObservableObject {
         modes.runtimeConfiguration(selectedModeId: selectedModeId)
     }
 
+    func ensureDefaultModeExists() {
+        guard modes.isEmpty else {
+            repairSelectedModeId()
+            return
+        }
+
+        let defaultMode = Mode.defaultLocalWhisper()
+        modes = [defaultMode]
+        selectedModeId = defaultMode.id
+    }
+
+    func completeFirstTimeSetup() {
+        ensureDefaultModeExists()
+        UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
+    }
+
     private func saveAPIKey(_ key: String, forKey account: String) {
         guard let data = key.data(using: .utf8) else { return }
         let status = KeychainService.save(key: account, data: data)

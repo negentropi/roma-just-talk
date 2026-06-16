@@ -1,15 +1,15 @@
-# Privacy Policy for VoiceInk
+# Privacy Policy for roma just talk
 
 *Last updated: June 2026*
 
 ## Overview
 
-VoiceInk is a voice-to-text transcription app that helps you capture your thoughts by converting speech to text. This privacy policy explains how we handle your data when you use our app.
+roma just talk is a voice-to-text transcription app that helps you capture your thoughts by converting speech to text. This privacy policy explains how we handle your data when you use our app.
 
 ## Data Collection and Usage
 
 ### Audio Data
-- **What we collect**: VoiceInk records audio when you press the record button
+- **What we collect**: roma just talk records audio when you press the record button
 - **How we use it**: Audio is used solely for transcription purposes
 - **Storage**: Audio files are stored locally on your device and may be sent to third-party cloud services based on your chosen settings
 - **Retention**: You can delete individual recordings at any time by swiping in the notes list
@@ -27,10 +27,10 @@ VoiceInk is a voice-to-text transcription app that helps you capture your though
 
 ## Third-Party Services
 
-VoiceInk offers multiple processing options:
+roma just talk offers multiple processing options:
 
 ### Cloud Services (Require Your API Keys)
-VoiceInk integrates with third-party cloud services. **For these services, you must provide your own API keys:**
+roma just talk integrates with third-party cloud services. **For these services, you must provide your own API keys:**
 
 #### Cloud Services
 - **Groq**: Speech-to-text transcription and text post-processing
@@ -78,7 +78,7 @@ VoiceInk integrates with third-party cloud services. **For these services, you m
 
 ## Children's Privacy
 
-VoiceInk is not intended for children under 13. We do not knowingly collect personal information from children under 13.
+roma just talk is not intended for children under 13. We do not knowingly collect personal information from children under 13.
 
 ## Changes to This Policy
 
@@ -86,7 +86,7 @@ We may update this privacy policy from time to time. We will notify you of any c
 
 ## Contact Us
 
-If you have questions about this privacy policy, please contact us at: prakashjoshipax@gmail.com
+If you have questions about this privacy policy, please contact us at: happyfumd@icloud.com
 
 ## Your Rights
 

@@ -263,7 +263,7 @@ class KeyboardViewController: KeyboardInputViewController {
         let appImage = UIImage(systemName: "app", withConfiguration: appConfig)
         
         recordButton.setImage(appImage, for: .normal)
-        recordButton.setTitle(" Open VoiceInk", for: .normal)
+        recordButton.setTitle(" Open roma just talk", for: .normal)
         recordButton.backgroundColor = UIColor.systemOrange
         recordButton.setTitleColor(.white, for: .normal)
         recordButton.tintColor = .white

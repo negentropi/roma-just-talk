@@ -35,7 +35,7 @@ struct NotesListView: View {
     var body: some View {
         NavigationStack {
             content
-                .navigationTitle("VoiceInk")
+                .navigationTitle("roma just talk")
                 .navigationBarTitleDisplayMode(.large)
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
@@ -192,4 +192,3 @@ struct NotesListView: View {
         .modelContainer(for: [Transcription.self])
         .environmentObject(RecordingManager())
 }
-

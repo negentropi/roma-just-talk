@@ -4,6 +4,7 @@ import VoiceInkCore
 struct ProviderAPIKeyView: View {
     let provider: VoiceInkProviderKind
     @StateObject private var settings = AppSettings.shared
+    private let apiKeyVerifier = VoiceInkProviderAPIKeyVerifier()
     @State private var tempKey: String = ""
     @State private var isVerifying: Bool = false
     @State private var verifyResult: Bool? = nil
@@ -113,9 +114,7 @@ struct ProviderAPIKeyView: View {
             return false
         }
 
-        return await TranscriptionServiceFactory
-            .service(for: provider)
-            .verifyAPIKey(key)
+        return await apiKeyVerifier.verifyAPIKey(key, for: provider)
     }
 
     private func obfuscatedKey() -> String? {

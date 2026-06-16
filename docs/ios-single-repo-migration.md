@@ -23,6 +23,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - prompt templates and prompt text
 - post-processing request construction and output filtering
 - provider catalog, provider endpoints, API key account names, and provider readiness policy
+- provider API-key verification dispatch
 - transcription and AI model catalogs
 - remote transcription provider dispatch for iOS retry transcription
 - mode runtime configuration and selected-mode repair
@@ -55,6 +56,7 @@ Current iOS consumers of shared remote transport:
 
 - `iOS/VoiceInk-ios/TranscriptionServiceFactory.swift` creates `VoiceInkRemoteTranscriptionService` for every remote `VoiceInkProviderKind`.
 - `VoiceInkRemoteTranscriptionService` dispatches Groq/OpenAI/Cerebras, Deepgram, Gemini, Mistral, ElevenLabs, Soniox, Speechmatics, AssemblyAI, and xAI through shared core clients.
+- `iOS/VoiceInk-ios/ProviderAPIKeyView.swift` verifies provider keys through `VoiceInkProviderAPIKeyVerifier`.
 - Cartesia remains absent from iOS transcription provider selection until an iOS streaming adapter exists; it is not a batch provider.
 - The bundled `VoiceInk` provider case remains decodable, but is hidden from iOS transcription and post-processing selection until a real no-key/bundled-service adapter exists. The sibling clone marked it always available while returning an empty API key, so porting that path would preserve a broken no-key mode.
 

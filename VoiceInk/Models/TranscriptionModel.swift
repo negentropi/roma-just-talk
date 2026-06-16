@@ -240,6 +240,17 @@ struct WhisperModel: TranscriptionModel {
     var isMultilingualModel: Bool {
         supportedLanguages.count > 1
     }
+
+    init(spec: VoiceInkWhisperModelFileSpec) {
+        self.name = spec.modelName
+        self.displayName = spec.displayName
+        self.size = spec.size
+        self.supportedLanguages = LanguageDictionary.forProvider(isMultilingual: spec.isMultilingual, provider: .whisper)
+        self.description = spec.description
+        self.speed = spec.speed
+        self.accuracy = spec.accuracy
+        self.ramUsage = spec.ramUsage
+    }
 } 
 
 // User-imported local models 

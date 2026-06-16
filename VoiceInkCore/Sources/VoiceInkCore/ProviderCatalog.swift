@@ -91,6 +91,23 @@ public enum VoiceInkProviderKind: String, CaseIterable, Sendable {
         }
     }
 
+    public var apiKeyVerificationStateKey: String? {
+        switch self {
+        case .groq:
+            return "groqKeyVerified"
+        case .openAI:
+            return "openAIKeyVerified"
+        case .deepgram:
+            return "deepgramKeyVerified"
+        case .cerebras:
+            return "cerebrasKeyVerified"
+        case .gemini:
+            return "geminiKeyVerified"
+        case .localWhisper, .voiceInk:
+            return nil
+        }
+    }
+
     public var requiresUserAPIKey: Bool {
         apiKeyAccount != nil
     }

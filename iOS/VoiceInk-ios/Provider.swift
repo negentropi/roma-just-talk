@@ -51,6 +51,10 @@ enum Provider: String, CaseIterable, Codable, Identifiable {
         coreKind.apiKeyVerificationTransport
     }
 
+    var apiKeyVerificationStateKey: String? {
+        coreKind.apiKeyVerificationStateKey
+    }
+
     func fixedModel(for use: VoiceInkProviderModelUse) -> String? {
         coreKind.fixedModel(for: use)
     }

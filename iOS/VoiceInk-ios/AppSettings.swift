@@ -51,23 +51,23 @@ final class AppSettings: ObservableObject {
     
     // Track verification status per provider
     @Published var groqKeyVerified: Bool {
-        didSet { UserDefaults.standard.set(groqKeyVerified, forKey: "groqKeyVerified") }
+        didSet { saveKeyVerified(groqKeyVerified, for: .groq) }
     }
     
     @Published var openAIKeyVerified: Bool {
-        didSet { UserDefaults.standard.set(openAIKeyVerified, forKey: "openAIKeyVerified") }
+        didSet { saveKeyVerified(openAIKeyVerified, for: .openai) }
     }
 
     @Published var deepgramKeyVerified: Bool {
-        didSet { UserDefaults.standard.set(deepgramKeyVerified, forKey: "deepgramKeyVerified") }
+        didSet { saveKeyVerified(deepgramKeyVerified, for: .deepgram) }
     }
 
     @Published var cerebrasKeyVerified: Bool {
-        didSet { UserDefaults.standard.set(cerebrasKeyVerified, forKey: "cerebrasKeyVerified") }
+        didSet { saveKeyVerified(cerebrasKeyVerified, for: .cerebras) }
     }
 
     @Published var geminiKeyVerified: Bool {
-        didSet { UserDefaults.standard.set(geminiKeyVerified, forKey: "geminiKeyVerified") }
+        didSet { saveKeyVerified(geminiKeyVerified, for: .gemini) }
     }
     
     // Audio session timeout configuration
@@ -94,11 +94,11 @@ final class AppSettings: ObservableObject {
         self.deepgramAPIKey = AppSettings.loadAPIKey(for: .deepgram)
         self.cerebrasAPIKey = AppSettings.loadAPIKey(for: .cerebras)
         self.geminiAPIKey = AppSettings.loadAPIKey(for: .gemini)
-        self.groqKeyVerified = UserDefaults.standard.bool(forKey: "groqKeyVerified")
-        self.openAIKeyVerified = UserDefaults.standard.bool(forKey: "openAIKeyVerified")
-        self.deepgramKeyVerified = UserDefaults.standard.bool(forKey: "deepgramKeyVerified")
-        self.cerebrasKeyVerified = UserDefaults.standard.bool(forKey: "cerebrasKeyVerified")
-        self.geminiKeyVerified = UserDefaults.standard.bool(forKey: "geminiKeyVerified")
+        self.groqKeyVerified = Self.loadKeyVerified(for: .groq)
+        self.openAIKeyVerified = Self.loadKeyVerified(for: .openai)
+        self.deepgramKeyVerified = Self.loadKeyVerified(for: .deepgram)
+        self.cerebrasKeyVerified = Self.loadKeyVerified(for: .cerebras)
+        self.geminiKeyVerified = Self.loadKeyVerified(for: .gemini)
         
         // Load audio session timeout (default: 90 seconds)
         self.audioSessionTimeoutSeconds = UserDefaults.standard.object(forKey: "audioSessionTimeoutSeconds") as? Int ?? 90
@@ -285,6 +285,21 @@ final class AppSettings: ObservableObject {
         _ = KeychainService.delete(key: account)
     }
 
+    private func saveKeyVerified(_ verified: Bool, for provider: Provider) {
+        guard let key = provider.apiKeyVerificationStateKey else { return }
+        UserDefaults.standard.set(verified, forKey: key)
+    }
+
+    private static func loadKeyVerified(for provider: Provider) -> Bool {
+        guard let key = provider.apiKeyVerificationStateKey else { return false }
+        return UserDefaults.standard.bool(forKey: key)
+    }
+
+    private static func clearKeyVerified(for provider: Provider) {
+        guard let key = provider.apiKeyVerificationStateKey else { return }
+        UserDefaults.standard.removeObject(forKey: key)
+    }
+
     // MARK: - Debug Reset
     /// Remove all persisted preferences, API keys, and modes.
     func resetAll() {
@@ -301,11 +316,11 @@ final class AppSettings: ObservableObject {
         deepgramKeyVerified = false
         cerebrasKeyVerified = false
         geminiKeyVerified = false
-        UserDefaults.standard.removeObject(forKey: "groqKeyVerified")
-        UserDefaults.standard.removeObject(forKey: "openAIKeyVerified")
-        UserDefaults.standard.removeObject(forKey: "deepgramKeyVerified")
-        UserDefaults.standard.removeObject(forKey: "cerebrasKeyVerified")
-        UserDefaults.standard.removeObject(forKey: "geminiKeyVerified")
+        Self.clearKeyVerified(for: .groq)
+        Self.clearKeyVerified(for: .openai)
+        Self.clearKeyVerified(for: .deepgram)
+        Self.clearKeyVerified(for: .cerebras)
+        Self.clearKeyVerified(for: .gemini)
         
         // Reset audio session timeout to default
         audioSessionTimeoutSeconds = 90

@@ -1,5 +1,7 @@
 # Changelog
 
+## v1.95 - Unreleased
+
 ## v1.94 - 2026-06-16
 
 - Replaced the misaligned silence-filter path with rolling buffer preload controls that use local VAD to pre-run supported STT before capture finalization, independent from final/batch transcription VAD.

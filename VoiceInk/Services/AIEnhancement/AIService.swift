@@ -56,17 +56,13 @@ enum AIProvider: String, CaseIterable {
     }
     
     var defaultModel: String {
+        if let coreAIModelProvider {
+            return VoiceInkAIModelCatalog.defaultModel(for: coreAIModelProvider)
+        }
+
         switch self {
-        case .cerebras:
-            return VoiceInkAIModelCatalog.defaultModel(for: .cerebras)
-        case .groq:
-            return VoiceInkAIModelCatalog.defaultModel(for: .groq)
-        case .gemini:
-            return VoiceInkAIModelCatalog.defaultModel(for: .gemini)
         case .anthropic:
             return "claude-sonnet-4-6"
-        case .openAI:
-            return VoiceInkAIModelCatalog.defaultModel(for: .openAI)
         case .mistral:
             return "mistral-large-latest"
         case .elevenLabs:
@@ -87,17 +83,17 @@ enum AIProvider: String, CaseIterable {
             return UserDefaults.standard.string(forKey: "customProviderModel") ?? ""
         case .openRouter:
             return "openai/gpt-oss-120b"
+        case .cerebras, .groq, .gemini, .openAI:
+            preconditionFailure("Core-backed providers should return from VoiceInkAIModelCatalog")
         }
     }
     
     var availableModels: [String] {
+        if let coreAIModelProvider {
+            return VoiceInkAIModelCatalog.availableModels(for: coreAIModelProvider)
+        }
+
         switch self {
-        case .cerebras:
-            return VoiceInkAIModelCatalog.availableModels(for: .cerebras)
-        case .groq:
-            return VoiceInkAIModelCatalog.availableModels(for: .groq)
-        case .gemini:
-            return VoiceInkAIModelCatalog.availableModels(for: .gemini)
         case .anthropic:
             return [
                 "claude-opus-4-7",
@@ -107,8 +103,6 @@ enum AIProvider: String, CaseIterable {
                 "claude-sonnet-4-5",
                 "claude-haiku-4-5"
             ]
-        case .openAI:
-            return VoiceInkAIModelCatalog.availableModels(for: .openAI)
         case .mistral:
             return [
                 "mistral-large-latest",
@@ -133,6 +127,8 @@ enum AIProvider: String, CaseIterable {
             return []
         case .openRouter:
             return []
+        case .cerebras, .groq, .gemini, .openAI:
+            preconditionFailure("Core-backed providers should return from VoiceInkAIModelCatalog")
         }
     }
 

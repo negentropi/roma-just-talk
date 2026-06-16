@@ -714,7 +714,7 @@ struct RollingBufferPreloadCoordinatorTests {
     }
 
     @MainActor
-    @Test func powerStateIsNotPolledForNonSpeechVadWindows() async {
+    @Test func powerStateIsCachedBeforeVadWindows() async {
         let model = streamingModel()
         let session = FakeTranscriptionSession()
         let powerStateProvider = CountingPowerStateProvider(
@@ -735,15 +735,16 @@ struct RollingBufferPreloadCoordinatorTests {
             await coordinator.processRollingChunkForTesting(Data(repeating: 1, count: 8_000))
             await coordinator.processRollingChunkForTesting(Data(repeating: 1, count: 8_000))
 
-            #expect(powerStateProvider.callCount == 0)
+            #expect(powerStateProvider.callCount == 1)
             #expect(session.chunks.snapshot().isEmpty)
         }
     }
 
     @MainActor
-    @Test func lowBatteryAutoPolicyIsEvaluatedAfterSpeechDetection() async {
+    @Test func lowBatteryAutoPolicyBlocksBeforeDetectorWork() async {
         let model = streamingModel()
         let session = FakeTranscriptionSession()
+        let detectorLoadCount = LockedCounter()
         let powerStateProvider = CountingPowerStateProvider(
             state: RollingBufferPowerState(isOnBattery: true, batteryLevelPercent: 10)
         )
@@ -758,12 +759,17 @@ struct RollingBufferPreloadCoordinatorTests {
                 model: model,
                 session: session,
                 powerStateProvider: powerStateProvider,
-                detector: FakeSpeechDetector(containsSpeech: true)
+                detectorProvider: {
+                    detectorLoadCount.increment()
+                    return FakeSpeechDetector(containsSpeech: true)
+                }
             )
 
             await coordinator.processRollingChunkForTesting(Data(repeating: 1, count: 8_000))
 
             #expect(powerStateProvider.callCount == 1)
+            #expect(detectorLoadCount.value == 0)
+            #expect(session.preparedModelName == nil)
             #expect(session.chunks.snapshot().isEmpty)
         }
     }

@@ -354,11 +354,6 @@ final class RollingBufferPreloadCoordinator {
             return
         }
 
-        guard allowsPreloadAfterSpeech(for: plan.model, configuration: configuration) else {
-            logger.notice("Skipping rolling preload after VAD trigger because Auto policy currently disallows it")
-            return
-        }
-
         speechDetectedAt = Date()
         logger.notice("Rolling preload VAD trigger model=\(plan.model.displayName, privacy: .public) leadInChunks=\(self.leadInBuffer.count, privacy: .public) leadInBytes=\(self.leadInBuffer.bytes, privacy: .public) observedChunks=\(self.observedChunks, privacy: .public) observedBytes=\(self.observedBytes, privacy: .public) vadWindows=\(self.vadWindowsChecked, privacy: .public)")
         await startPreload(with: plan)
@@ -385,32 +380,47 @@ final class RollingBufferPreloadCoordinator {
             return cachePlan(nil, for: model.name, language: language, now: now)
         }
 
-        if configuration.mode == .auto,
-           configuration.autoDisablesCloudModels,
-           model.provider.isCloudTranscriptionProvider {
+        if !allowsPreloadBeforeDetector(
+            for: model,
+            configuration: configuration,
+            perModelEnabled: perModelEnabled
+        ) {
             return cachePlan(nil, for: model.name, language: language, now: now)
         }
 
         return cachePlan(Plan(model: model, language: language), for: model.name, language: language, now: now)
     }
 
-    private func allowsPreloadAfterSpeech(
+    private func allowsPreloadBeforeDetector(
         for model: any TranscriptionModel,
-        configuration: RollingBufferPreloadConfiguration
+        configuration: RollingBufferPreloadConfiguration,
+        perModelEnabled: Bool
     ) -> Bool {
-        guard configuration.mode == .auto,
-              configuration.autoDisablesLowBatteryLocalModels,
-              model.provider.isLocalTranscriptionProvider else {
+        guard model.supportsStreaming, perModelEnabled else { return false }
+
+        switch configuration.mode {
+        case .on:
+            return true
+        case .off:
+            return false
+        case .auto:
+            if configuration.autoDisablesCloudModels, model.provider.isCloudTranscriptionProvider {
+                return false
+            }
+
+            if configuration.autoDisablesLowBatteryLocalModels,
+               model.provider.isLocalTranscriptionProvider {
+                return RollingBufferPreloadPolicy(
+                    configuration: configuration,
+                    powerState: powerStateProvider.currentPowerState()
+                ).allowsPreload(
+                    for: model,
+                    perModelEnabled: perModelEnabled
+                )
+            }
+
             return true
         }
-
-        return RollingBufferPreloadPolicy(
-            configuration: configuration,
-            powerState: powerStateProvider.currentPowerState()
-        ).allowsPreload(
-            for: model,
-            perModelEnabled: true
-        )
     }
 
     private func cachePlan(_ plan: Plan?, for modelName: String, language: String?, now: Date) -> Plan? {

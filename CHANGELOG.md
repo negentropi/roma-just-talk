@@ -12,7 +12,7 @@
 - Removed the fixed pre-paste delay after verified clipboard writes so completed text posts to the cursor sooner.
 - Skipped cursor-context Accessibility reads when capitalization logic can prove the output text cannot change.
 - Reduced the fixed autosend wait after paste from 500ms to 120ms while keeping a short guard before Return is posted.
-- Moved Auto low-battery checks for rolling buffer preload to after local VAD detects speech, keeping silence cheaper and battery decisions current at preload start.
+- Blocked Auto low-battery local rolling-buffer preload before loading or running the local VAD, so the low-battery opt-out now fully disables buffer pre-run work.
 - Claimed ready rolling-preload sessions before Power Mode configuration work so quick releases do not wait on model/session setup when the preloaded model and language still match.
 - Tightened cached rolling-preload finalization so quick releases avoid pasting stale partial hypotheses when the local ASR pass is behind the live buffer.
 - Let preload-only Special shortcut quick releases commit the rolling buffer instead of being canceled as short no-evidence presses.

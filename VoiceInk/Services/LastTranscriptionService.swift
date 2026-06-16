@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import VoiceInkCore
 
 class LastTranscriptionService: ObservableObject {
     
@@ -21,11 +22,11 @@ class LastTranscriptionService: ObservableObject {
     }
 
     private static func isPasteable(_ transcription: Transcription) -> Bool {
-        let text = transcription.text.trimmingCharacters(in: .whitespacesAndNewlines)
-        let status = transcription.transcriptionStatus
-        return !text.isEmpty &&
-            text != Transcription.canceledTranscriptionText &&
-            (status == nil || status == TranscriptionStatus.completed.rawValue)
+        VoiceInkTranscriptPresentation.isPasteable(
+            rawText: transcription.text,
+            statusRawValue: transcription.transcriptionStatus,
+            canceledText: Transcription.canceledTranscriptionText
+        )
     }
     
     static func copyLastTranscription(from modelContext: ModelContext) {
@@ -39,14 +40,10 @@ class LastTranscriptionService: ObservableObject {
             return
         }
         
-        // Prefer enhanced text; fallback to original text
-        let textToCopy: String = {
-            if let enhancedText = lastTranscription.enhancedText, !enhancedText.isEmpty {
-                return enhancedText
-            } else {
-                return lastTranscription.text
-            }
-        }()
+        let textToCopy = VoiceInkTranscriptPresentation.preferredText(
+            rawText: lastTranscription.text,
+            enhancedText: lastTranscription.enhancedText
+        ) ?? lastTranscription.text
         
         let success = ClipboardManager.copyToClipboard(textToCopy)
         
@@ -94,14 +91,10 @@ class LastTranscriptionService: ObservableObject {
             return
         }
         
-        // Prefer enhanced text; if unavailable, fallback to original text (which may contain an error message)
-        let textToPaste: String = {
-            if let enhancedText = lastTranscription.enhancedText, !enhancedText.isEmpty {
-                return enhancedText
-            } else {
-                return lastTranscription.text
-            }
-        }()
+        let textToPaste = VoiceInkTranscriptPresentation.preferredText(
+            rawText: lastTranscription.text,
+            enhancedText: lastTranscription.enhancedText
+        ) ?? lastTranscription.text
 
         Task { @MainActor in
             CursorPaster.pasteAtCursor(textForCursorPaste(textToPaste))
@@ -153,7 +146,10 @@ class LastTranscriptionService: ObservableObject {
             do {
                 let newTranscription = try await transcriptionService.retranscribeAudio(from: audioURL, using: currentModel)
 
-                let textToCopy = newTranscription.enhancedText?.isEmpty == false ? newTranscription.enhancedText! : newTranscription.text
+                let textToCopy = VoiceInkTranscriptPresentation.preferredText(
+                    rawText: newTranscription.text,
+                    enhancedText: newTranscription.enhancedText
+                ) ?? newTranscription.text
                 ClipboardManager.copyToClipboard(textToCopy)
 
                 NotificationManager.shared.showNotification(

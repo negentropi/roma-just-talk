@@ -35,7 +35,7 @@ final class Transcription {
     }
     
     var needsTranscription: Bool {
-        return transcriptionStatus == .pending || transcriptionStatus == .failed
+        return transcriptionStatus.needsTranscription
     }
     
     /// Get the full path to the audio file

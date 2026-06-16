@@ -1,4 +1,5 @@
 import SwiftUI
+import VoiceInkCore
 
 struct NoteRowView: View {
     let note: Transcription
@@ -57,21 +58,15 @@ struct NoteRowView: View {
 
     
     private var transcriptText: String {
-        switch note.transcriptionStatus {
-        case .pending:
-            return "New transcription"
-        case .failed:
-            return "Transcription failed - tap to retry"
-        case .completed:
-            // Prioritize enhanced text (post-processed result) over original text
-            if let enhancedText = note.enhancedText, !enhancedText.isEmpty {
-                return enhancedText
-            } else if !note.text.isEmpty {
-                return note.text
-            } else {
-                return "No audible content detected."
-            }
-        }
+        VoiceInkTranscriptPresentation.displayText(
+            status: note.transcriptionStatus,
+            rawText: note.text,
+            enhancedText: note.enhancedText,
+            pendingText: "New transcription",
+            failedText: "Transcription failed - tap to retry",
+            canceledText: "Transcription canceled",
+            emptyCompletedText: "No audible content detected."
+        )
     }
 
     private var relativeTimestamp: String {
@@ -87,6 +82,5 @@ struct NoteRowView: View {
         return String(format: "%02d:%02d", m, r)
     }
 }
-
 
 

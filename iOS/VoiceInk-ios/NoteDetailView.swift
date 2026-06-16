@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import VoiceInkCore
 
 struct NoteDetailView: View {
     @Environment(\.dismiss) private var dismiss
@@ -73,14 +74,10 @@ struct NoteDetailView: View {
     }
     
     private var displayedTranscriptText: String {
-        // Backend logic: Show post-processed result if available, otherwise show original
-        if let enhancedText = note.enhancedText, !enhancedText.isEmpty {
-            return enhancedText
-        } else if !note.text.isEmpty {
-            return note.text
-        } else {
-            return "No content available."
-        }
+        VoiceInkTranscriptPresentation.preferredText(
+            rawText: note.text,
+            enhancedText: note.enhancedText
+        ) ?? "No content available."
     }
     
     private var hasAudioFile: Bool {
@@ -256,5 +253,4 @@ struct NoteDetailView: View {
     
 
 }
-
 

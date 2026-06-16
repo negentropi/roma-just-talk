@@ -39,11 +39,6 @@ final class Transcription {
     var resolvedAudioFileURL: URL? {
         VoiceInkStoredAudioFile.resolvedURL(for: audioFileURL, relativeTo: Self.recordingsDirectory)
     }
-    
-    /// Get the full path to the audio file
-    var fullAudioPath: String? {
-        resolvedAudioFileURL?.path
-    }
 
     private static var recordingsDirectory: URL {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]

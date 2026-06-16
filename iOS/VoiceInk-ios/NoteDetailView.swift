@@ -81,8 +81,8 @@ struct NoteDetailView: View {
     }
     
     private var hasAudioFile: Bool {
-        guard let audioPath = note.fullAudioPath,
-              FileManager.default.fileExists(atPath: audioPath) else {
+        guard let audioURL = note.resolvedAudioFileURL,
+              FileManager.default.fileExists(atPath: audioURL.path) else {
             return false
         }
         return true
@@ -92,9 +92,9 @@ struct NoteDetailView: View {
     
     private var bottomAudioPlayer: some View {
         VStack(spacing: 0) {
-            if let audioPath = note.fullAudioPath,
-               FileManager.default.fileExists(atPath: audioPath) {
-                AudioPlayerView(audioFilePath: audioPath, duration: note.duration, timestamp: note.timestamp)
+            if let audioURL = note.resolvedAudioFileURL,
+               FileManager.default.fileExists(atPath: audioURL.path) {
+                AudioPlayerView(audioFilePath: audioURL.path, duration: note.duration, timestamp: note.timestamp)
             } else if note.audioFileURL != nil && !note.audioFileURL!.isEmpty {
                 // Modern error state - file missing
                 HStack(spacing: 12) {
@@ -253,4 +253,3 @@ struct NoteDetailView: View {
     
 
 }
-

@@ -154,7 +154,7 @@ final class RecordingManager: ObservableObject {
         coordinator.updateRecordingState(false)
         
         // Start background transcription
-        transcribeInBackground(note: note, audioFileName: audioFileName, modelContext: modelContext)
+        transcribeInBackground(note: note, modelContext: modelContext)
     }
     
     func cancelRecording() {
@@ -209,7 +209,14 @@ final class RecordingManager: ObservableObject {
     }
     
     // MARK: - Transcription
-    private func transcribeInBackground(note: Transcription, audioFileName: String, modelContext: ModelContext) {
+    private func transcribeInBackground(note: Transcription, modelContext: ModelContext) {
+        guard let fileURL = note.resolvedAudioFileURL else {
+            note.transcriptionStatus = .failed
+            note.transcriptionError = TranscriptionError.audioFileNotFound.localizedDescription
+            try? modelContext.save()
+            return
+        }
+
         Task {
             defer { 
                 // Clean up recorder state
@@ -218,10 +225,6 @@ final class RecordingManager: ObservableObject {
             }
 
             do {
-                // Resolve the relative path to absolute path for transcription
-                let recordingsDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-                    .appendingPathComponent("Recordings")
-                let fileURL = recordingsDir.appendingPathComponent(audioFileName)
                 let result = try await TranscriptionRetryService.shared.transcribe(fileURL: fileURL)
                 
                 // Update the existing note on main thread

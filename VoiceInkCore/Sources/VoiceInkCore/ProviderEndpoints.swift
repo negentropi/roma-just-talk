@@ -49,11 +49,11 @@ public enum VoiceInkProviderEndpoint: String, CaseIterable, Sendable {
         case .openAI:
             return URL(string: "https://platform.openai.com/api-keys")!
         case .deepgram:
-            return URL(string: "https://console.deepgram.com/project/keys")!
+            return URL(string: "https://console.deepgram.com/api-keys")!
         case .cerebras:
-            return URL(string: "https://cloud.cerebras.ai/platform")!
+            return URL(string: "https://cloud.cerebras.ai/")!
         case .gemini:
-            return URL(string: "https://aistudio.google.com/app/apikey")!
+            return URL(string: "https://makersuite.google.com/app/apikey")!
         }
     }
 

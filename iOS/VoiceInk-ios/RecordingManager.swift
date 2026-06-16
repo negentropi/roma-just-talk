@@ -45,7 +45,6 @@ final class RecordingManager: ObservableObject {
     @Published var currentDuration: Double = 0
     
     private let recorder = AudioRecorder()
-    private let postProcessor = LLMPostProcessor()
     private let settings = AppSettings.shared
     private var durationTimer: Timer?
 
@@ -155,7 +154,7 @@ final class RecordingManager: ObservableObject {
         coordinator.updateRecordingState(false)
         
         // Start background transcription
-        transcribeInBackground(note: note, audioFileName: audioFileName, recordingDuration: recordingDuration, modelContext: modelContext)
+        transcribeInBackground(note: note, audioFileName: audioFileName, modelContext: modelContext)
     }
     
     func cancelRecording() {
@@ -210,72 +209,29 @@ final class RecordingManager: ObservableObject {
     }
     
     // MARK: - Transcription
-    private func transcribeInBackground(note: Transcription, audioFileName: String, recordingDuration: Double, modelContext: ModelContext) {
+    private func transcribeInBackground(note: Transcription, audioFileName: String, modelContext: ModelContext) {
         Task {
             defer { 
                 // Clean up recorder state
                 recorder.currentRecordingURL = nil
                 recorder.currentDuration = 0
             }
-            
-            let settings = AppSettings.shared
-            
-            // Use effective settings from selected mode
-            let provider = settings.effectiveTranscriptionProvider
-            let apiKey = settings.apiKey(for: provider)
-            let model = settings.effectiveTranscriptionModel
-            
-            // If no API key, update note with error
-            guard !apiKey.isEmpty else {
-                await MainActor.run {
-                    note.transcriptionStatus = .failed
-                    note.transcriptionError = "No API key configured"
-                    try? modelContext.save()
-                }
-                return
-            }
-            
+
             do {
                 // Resolve the relative path to absolute path for transcription
                 let recordingsDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
                     .appendingPathComponent("Recordings")
                 let fileURL = recordingsDir.appendingPathComponent(audioFileName)
-                let service = TranscriptionServiceFactory.service(for: provider)
-                let rawText = try await service.transcribeAudioFile(apiBaseURL: provider.apiBaseURL, apiKey: apiKey, model: model, fileURL: fileURL, language: nil)
-                
-                let cleanedText = VoiceInkTranscriptTextNormalizer.normalizeParagraphSpacing(rawText)
-                
-                var finalText = cleanedText
-                var enhancedText: String? = nil
-                var postProcessingError: String? = nil
-                
-                // Optional post-processing
-                if settings.effectiveIsPostProcessingEnabled {
-                    let ppPrompt = settings.effectiveCustomPrompt
-                    if !ppPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                        let llmProvider = settings.effectivePostProcessingProvider
-                        let llmKey = settings.apiKey(for: llmProvider)
-                        let llmModel = settings.effectivePostProcessingModel
-                        if !llmKey.isEmpty {
-                            do {
-                                finalText = try await postProcessor.postProcessTranscript(provider: llmProvider, apiKey: llmKey, model: llmModel, prompt: ppPrompt, transcript: cleanedText)
-                                enhancedText = finalText
-                            } catch {
-                                postProcessingError = "Post-processing failed: \(error.localizedDescription)"
-                                finalText = cleanedText
-                            }
-                        }
-                    }
-                }
+                let result = try await TranscriptionRetryService.shared.transcribe(fileURL: fileURL)
                 
                 // Update the existing note on main thread
                 await MainActor.run {
-                    note.text = cleanedText
-                    note.enhancedText = enhancedText
-                    note.transcriptionModelName = model
-                    note.aiEnhancementModelName = settings.effectiveIsPostProcessingEnabled ? settings.effectivePostProcessingModel : nil
+                    note.text = result.cleanedText
+                    note.enhancedText = result.postProcessingSucceeded ? result.finalText : nil
+                    note.transcriptionModelName = result.transcriptionModelName
+                    note.aiEnhancementModelName = result.aiEnhancementModelName
                     note.transcriptionStatus = .completed
-                    note.transcriptionError = postProcessingError
+                    note.transcriptionError = result.postProcessingError
                     try? modelContext.save()
                 }
                 

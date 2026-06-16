@@ -11,7 +11,6 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
     case speechmatics
     case xai
     case local
-    case voiceInk
 
     public var languageCodes: [String]? {
         switch self {
@@ -78,7 +77,7 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
                 "nl", "no", "pl", "pt", "ro", "ru", "sk", "sl", "sr", "sv",
                 "ta", "te", "th", "tl", "tr", "uk", "ur", "vi", "zh"
             ]
-        case .groq, .openAI, .gemini, .local, .voiceInk:
+        case .groq, .openAI, .gemini, .local:
             return nil
         }
     }
@@ -87,7 +86,7 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
         switch self {
         case .assemblyAI, .deepgram, .elevenLabs, .mistral, .soniox, .speechmatics, .xai:
             return true
-        case .cartesia, .groq, .openAI, .gemini, .local, .voiceInk:
+        case .cartesia, .groq, .openAI, .gemini, .local:
             return false
         }
     }
@@ -122,7 +121,6 @@ public struct VoiceInkCloudTranscriptionModelSpec: Equatable, Sendable {
 }
 
 public enum VoiceInkTranscriptionModelCatalog {
-    public static let voiceInkTranscriptionModel = "whisper-large-v3"
     public static let localBaseModel = "base"
 
     public static func modelNames(for provider: VoiceInkTranscriptionModelProvider) -> [String] {
@@ -137,8 +135,6 @@ public enum VoiceInkTranscriptionModelCatalog {
             ]
         case .local:
             return [localBaseModel]
-        case .voiceInk:
-            return []
         }
     }
 
@@ -312,7 +308,7 @@ public enum VoiceInkTranscriptionModelCatalog {
                     supportsStreaming: true
                 )
             ]
-        case .openAI, .local, .voiceInk:
+        case .openAI, .local:
             return []
         }
     }

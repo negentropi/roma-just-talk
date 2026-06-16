@@ -39,7 +39,7 @@ public struct Mode: Identifiable, Codable {
         self.transcriptionProvider = transcriptionProvider
         self.transcriptionModel = transcriptionModel
             ?? transcriptionProvider.defaultModel(for: .transcription)
-            ?? VoiceInkTranscriptionModelCatalog.voiceInkTranscriptionModel
+            ?? ""
         self.isPostProcessingEnabled = isPostProcessingEnabled
         self.postProcessingProvider = postProcessingProvider
         self.postProcessingModel = postProcessingModel

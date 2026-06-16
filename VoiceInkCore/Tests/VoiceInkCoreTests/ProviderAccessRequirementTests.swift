@@ -78,7 +78,6 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertEqual(VoiceInkProviderKind.speechmatics.transcriptionServiceKind, .remote)
         XCTAssertEqual(VoiceInkProviderKind.assemblyAI.transcriptionServiceKind, .remote)
         XCTAssertEqual(VoiceInkProviderKind.xai.transcriptionServiceKind, .remote)
-        XCTAssertEqual(VoiceInkProviderKind.voiceInk.transcriptionServiceKind, .remote)
         XCTAssertEqual(VoiceInkProviderKind.localWhisper.transcriptionServiceKind, .localWhisper)
     }
 
@@ -149,12 +148,30 @@ final class ProviderAccessRequirementTests: XCTestCase {
 
         XCTAssertEqual(
             VoiceInkProviderKind.availableProviders(for: .transcription) { readyProviders.contains($0) },
-            [.groq, .deepgram, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .localWhisper, .voiceInk]
+            [.groq, .deepgram, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .localWhisper]
         )
 
         XCTAssertEqual(
             VoiceInkProviderKind.availableProviders(for: .postProcessing) { readyProviders.contains($0) },
-            [.groq, .voiceInk]
+            [.groq]
+        )
+    }
+
+    func testBundledVoiceInkProviderIsNotSelectableUntilAnAdapterExists() {
+        XCTAssertTrue(VoiceInkProviderKind.voiceInk.isReady(
+            userAPIKey: "",
+            userAPIKeyVerified: false,
+            localWhisperModelAvailable: false
+        ))
+        XCTAssertFalse(VoiceInkProviderKind.voiceInk.supportsModelUse(.transcription))
+        XCTAssertFalse(VoiceInkProviderKind.voiceInk.supportsModelUse(.postProcessing))
+        XCTAssertEqual(
+            VoiceInkProviderKind.availableProviders(for: .transcription) { $0 == .voiceInk },
+            []
+        )
+        XCTAssertEqual(
+            VoiceInkProviderKind.availableProviders(for: .postProcessing) { $0 == .voiceInk },
+            []
         )
     }
 

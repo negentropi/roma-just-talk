@@ -143,7 +143,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
         case .localWhisper:
             return URL(string: "http://localhost")!
         case .voiceInk:
-            return VoiceInkProviderEndpoint.voiceInkBackend.apiBaseURL
+            return VoiceInkProviderEndpoint.groq.apiBaseURL
         }
     }
 
@@ -392,7 +392,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
         case .localWhisper:
             return .local
         case .voiceInk:
-            return .voiceInk
+            return nil
         case .cerebras:
             return nil
         }
@@ -442,15 +442,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
         return VoiceInkAIModelCatalog.availableModels(for: provider)
     }
 
-    public func fixedModel(for use: VoiceInkProviderModelUse) -> String? {
-        switch (self, use) {
-        case (.voiceInk, .transcription):
-            return VoiceInkTranscriptionModelCatalog.voiceInkTranscriptionModel
-        case (.voiceInk, .postProcessing):
-            return VoiceInkAIModelCatalog.voiceInkPostProcessingModel
-        default:
-            return nil
-        }
+    public func fixedModel(for _: VoiceInkProviderModelUse) -> String? {
+        nil
     }
 
     public func supportsModelUse(_ use: VoiceInkProviderModelUse) -> Bool {

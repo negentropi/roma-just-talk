@@ -34,11 +34,6 @@ final class ProviderEndpointTests: XCTestCase {
             VoiceInkProviderKind.gemini.postProcessingChatCompletionsURL?.absoluteString,
             "https://generativelanguage.googleapis.com/v1beta/openai/v1/chat/completions"
         )
-        XCTAssertEqual(
-            VoiceInkProviderKind.voiceInk.postProcessingChatCompletionsURL?.absoluteString,
-            "https://api.groq.com/openai/v1/chat/completions"
-        )
-
         XCTAssertNil(VoiceInkProviderKind.deepgram.postProcessingChatCompletionsURL)
         XCTAssertNil(VoiceInkProviderKind.mistral.postProcessingChatCompletionsURL)
         XCTAssertNil(VoiceInkProviderKind.elevenLabs.postProcessingChatCompletionsURL)
@@ -47,6 +42,7 @@ final class ProviderEndpointTests: XCTestCase {
         XCTAssertNil(VoiceInkProviderKind.assemblyAI.postProcessingChatCompletionsURL)
         XCTAssertNil(VoiceInkProviderKind.xai.postProcessingChatCompletionsURL)
         XCTAssertNil(VoiceInkProviderKind.localWhisper.postProcessingChatCompletionsURL)
+        XCTAssertNil(VoiceInkProviderKind.voiceInk.postProcessingChatCompletionsURL)
     }
 }
 #endif

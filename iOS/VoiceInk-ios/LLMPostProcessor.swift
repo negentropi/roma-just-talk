@@ -1,4 +1,5 @@
 import Foundation
+import VoiceInkCore
 
 struct LLMPostProcessor {
     private let client = OpenAICompatibleClient()
@@ -13,8 +14,8 @@ struct LLMPostProcessor {
         ]
         
         let result = try await client.chatCompletion(baseURL: provider.baseURL, apiKey: apiKey, model: model, messages: messages, temperature: 0.2)
-        return result.isEmpty ? transcript : result
+        let filteredResult = VoiceInkAIEnhancementOutputFilter.filter(result)
+        return filteredResult.isEmpty ? transcript : filteredResult
     }
 }
-
 

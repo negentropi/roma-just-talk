@@ -21,19 +21,8 @@ enum AIProvider: String, CaseIterable {
     
     
     var baseURL: String {
-        if let coreProviderKind {
-            switch coreProviderKind.transcriptionTransport {
-            case .openAICompatible:
-                return VoiceInkProviderEndpoint
-                    .openAICompatibleChatCompletionsURL(from: coreProviderKind.apiBaseURL)
-                    .absoluteString
-            case .deepgram:
-                return VoiceInkProviderEndpoint
-                    .deepgramListenURL(from: coreProviderKind.apiBaseURL)
-                    .absoluteString
-            case .localWhisper:
-                preconditionFailure("Local Whisper is not an AI enhancement provider")
-            }
+        if let corePostProcessingURL = coreProviderKind?.postProcessingChatCompletionsURL {
+            return corePostProcessingURL.absoluteString
         }
 
         switch self {

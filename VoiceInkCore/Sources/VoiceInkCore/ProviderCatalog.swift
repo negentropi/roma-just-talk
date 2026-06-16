@@ -286,6 +286,13 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
         }
     }
 
+    public var postProcessingChatCompletionsURL: URL? {
+        guard supportsModelUse(.postProcessing) else {
+            return nil
+        }
+        return VoiceInkProviderEndpoint.openAICompatibleChatCompletionsURL(from: apiBaseURL)
+    }
+
     public func fixedModel(for use: VoiceInkProviderModelUse) -> String? {
         switch (self, use) {
         case (.voiceInk, .transcription):

@@ -69,7 +69,7 @@ class CursorPaster {
     ) async -> PasteResult {
         let pasteboard = NSPasteboard.general
         let shouldRestoreClipboard = UserDefaults.standard.bool(forKey: "restoreClipboardAfterPaste")
-        let savedContents = if shouldRestoreClipboard {
+        let savedContents: ClipboardSnapshot = if shouldRestoreClipboard {
             if let preparedContext,
                preparedContext.changeCount == pasteboard.changeCount {
                 preparedContext.savedContents

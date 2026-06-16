@@ -26,6 +26,7 @@ private final class ClaimTestSession: TranscriptionSession {
     func cancel() {}
 }
 
+@MainActor
 struct RollingBufferPreloadClaimTests {
     @Test func claimMatchesSameModelAndLanguage() async {
         let claim = makeClaim(modelName: "same-model", language: "en")

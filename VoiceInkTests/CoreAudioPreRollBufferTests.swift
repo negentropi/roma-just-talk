@@ -62,7 +62,9 @@ struct CoreAudioPreRollBufferTests {
         defer { try? FileManager.default.removeItem(at: url) }
 
         let values: [Int16] = [0, 1_000, -1_000, 0]
-        let data = values.withUnsafeBytes { Data($0) }
+        let data = values.withUnsafeBytes { rawBuffer in
+            Data(bytes: rawBuffer.baseAddress!, count: rawBuffer.count)
+        }
 
         try PCM16WAVFileWriter.writeMono16k(data, to: url)
 

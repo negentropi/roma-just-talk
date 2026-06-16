@@ -4,9 +4,14 @@ import Carbon
 import os
 
 class CursorPaster {
-    private typealias ClipboardItemSnapshot = [(NSPasteboard.PasteboardType, Data)]
-    private typealias ClipboardSnapshot = [ClipboardItemSnapshot]
+    fileprivate typealias ClipboardItemSnapshot = [(NSPasteboard.PasteboardType, Data)]
+    fileprivate typealias ClipboardSnapshot = [ClipboardItemSnapshot]
     private static let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "CursorPaster")
+
+    struct PreparedPasteContext {
+        fileprivate let changeCount: Int
+        fileprivate let savedContents: ClipboardSnapshot
+    }
 
     enum PasteResult: Equatable {
         case commandPosted
@@ -30,9 +35,12 @@ class CursorPaster {
 
     @MainActor
     @discardableResult
-    static func startPasteAtCursor(_ text: String) -> Task<PasteResult, Never> {
+    static func startPasteAtCursor(
+        _ text: String,
+        preparedContext: PreparedPasteContext? = nil
+    ) -> Task<PasteResult, Never> {
         Task { @MainActor in
-            await performPasteSession(text)
+            await performPasteSession(text, preparedContext: preparedContext)
         }
     }
 
@@ -42,10 +50,35 @@ class CursorPaster {
     }
 
     @MainActor
-    private static func performPasteSession(_ text: String) async -> PasteResult {
+    static func preparePasteContext() -> PreparedPasteContext? {
+        guard UserDefaults.standard.bool(forKey: "restoreClipboardAfterPaste") else {
+            return nil
+        }
+
+        let pasteboard = NSPasteboard.general
+        return PreparedPasteContext(
+            changeCount: pasteboard.changeCount,
+            savedContents: snapshotClipboard(from: pasteboard)
+        )
+    }
+
+    @MainActor
+    private static func performPasteSession(
+        _ text: String,
+        preparedContext: PreparedPasteContext? = nil
+    ) async -> PasteResult {
         let pasteboard = NSPasteboard.general
         let shouldRestoreClipboard = UserDefaults.standard.bool(forKey: "restoreClipboardAfterPaste")
-        let savedContents = shouldRestoreClipboard ? snapshotClipboard(from: pasteboard) : []
+        let savedContents = if shouldRestoreClipboard {
+            if let preparedContext,
+               preparedContext.changeCount == pasteboard.changeCount {
+                preparedContext.savedContents
+            } else {
+                snapshotClipboard(from: pasteboard)
+            }
+        } else {
+            []
+        }
         let sessionID = UUID().uuidString
 
         guard ClipboardManager.setClipboard(

@@ -19,6 +19,7 @@ private struct PreparedQuickReleaseContext {
     let powerModeId: UUID?
     let powerModeTask: Task<PowerModeConfig?, Never>
     let cursorContextTask: Task<String?, Never>
+    let pasteContextTask: Task<CursorPaster.PreparedPasteContext?, Never>
 
     func matches(powerModeId: UUID?) -> Bool {
         self.powerModeId == powerModeId
@@ -427,7 +428,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
                 audioFileReadyTask: audioFileReadyTask,
                 latencyTrace: latencyTrace,
                 deferHistoryInsertUntilSave: true,
-                preparedCursorTextContext: preparedContext?.cursorContextTask
+                preparedCursorTextContext: preparedContext?.cursorContextTask,
+                preparedPasteContext: preparedContext?.pasteContextTask
             )
             return true
         } catch {
@@ -449,6 +451,9 @@ class VoiceInkEngine: NSObject, ObservableObject {
             },
             cursorContextTask: Task { @MainActor in
                 CursorTextContextReader.textBeforeCursor()
+            },
+            pasteContextTask: Task { @MainActor in
+                CursorPaster.preparePasteContext()
             }
         )
     }
@@ -504,7 +509,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
         audioFileReadyTask: Task<Void, Error>? = nil,
         latencyTrace: TranscriptionLatencyTrace? = nil,
         deferHistoryInsertUntilSave: Bool = false,
-        preparedCursorTextContext: Task<String?, Never>? = nil
+        preparedCursorTextContext: Task<String?, Never>? = nil,
+        preparedPasteContext: Task<CursorPaster.PreparedPasteContext?, Never>? = nil
     ) async {
         guard let model = transcriptionModelManager.currentTranscriptionModel else {
             if deferHistoryInsertUntilSave {
@@ -546,7 +552,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
             audioFileReadyTask: audioFileReadyTask,
             latencyTrace: latencyTrace,
             deferHistoryInsertUntilSave: deferHistoryInsertUntilSave,
-            preparedCursorTextContext: preparedCursorTextContext
+            preparedCursorTextContext: preparedCursorTextContext,
+            preparedPasteContext: preparedPasteContext
         )
 
         let didFinishActivePipeline = activePipelineTranscriptionID == transcriptionID

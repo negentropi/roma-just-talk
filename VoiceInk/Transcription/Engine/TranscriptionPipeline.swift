@@ -47,6 +47,7 @@ class TranscriptionPipeline {
     ///   - onDismiss: Called as soon as paste is initiated to dismiss the recorder panel.
     ///   - deferHistoryInsertUntilSave: Inserts the history record only at the final save boundary.
     ///   - preparedCursorTextContext: Pre-read cursor text context for quick-release paste capitalization.
+    ///   - preparedPasteContext: Pre-read clipboard context for quick-release clipboard restore.
     func run(
         transcription: Transcription,
         audioURL: URL,
@@ -59,7 +60,8 @@ class TranscriptionPipeline {
         audioFileReadyTask: Task<Void, Error>? = nil,
         latencyTrace: TranscriptionLatencyTrace? = nil,
         deferHistoryInsertUntilSave: Bool = false,
-        preparedCursorTextContext: Task<String?, Never>? = nil
+        preparedCursorTextContext: Task<String?, Never>? = nil,
+        preparedPasteContext: Task<CursorPaster.PreparedPasteContext?, Never>? = nil
     ) async {
         var finalPastedText: String?
         var promptDetectionResult: PromptDetectionService.PromptDetectionResult?
@@ -309,7 +311,12 @@ class TranscriptionPipeline {
             if let latencyTrace {
                 logger.notice("Latency trace paste starting operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s chars=\(pastedText.count, privacy: .public)")
             }
-            _ = await CursorPaster.startPasteAtCursor(pastedText).value
+            let pasteContext = if let preparedPasteContext {
+                await preparedPasteContext.value
+            } else {
+                nil
+            }
+            _ = await CursorPaster.startPasteAtCursor(pastedText, preparedContext: pasteContext).value
             if let latencyTrace {
                 logger.notice("Latency trace paste completed operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s chars=\(pastedText.count, privacy: .public)")
             }

@@ -106,8 +106,6 @@ final class RecordingManager: ObservableObject {
         // Update coordinator state
         coordinator.updateRecordingState(true)
         
-        settings.selectedModeId = settings.modes.repairedSelectedModeId(settings.selectedModeId)
-        
         do {
             try recorder.startRecording()
             startDurationTimer()

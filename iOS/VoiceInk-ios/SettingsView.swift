@@ -89,7 +89,6 @@ struct SettingsView: View {
     
     private func deleteMode(at offsets: IndexSet) {
         settings.modes.remove(atOffsets: offsets)
-        settings.selectedModeId = settings.modes.repairedSelectedModeId(settings.selectedModeId)
     }
 
     #if DEBUG

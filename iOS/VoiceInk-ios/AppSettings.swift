@@ -8,7 +8,10 @@ final class AppSettings: ObservableObject {
 
     // Modes system
     @Published var modes: [Mode] {
-        didSet { saveModes() }
+        didSet {
+            saveModes()
+            repairSelectedModeId()
+        }
     }
     
     @Published var selectedModeId: UUID? {
@@ -22,8 +25,7 @@ final class AppSettings: ObservableObject {
     }
     
     var selectedMode: Mode? {
-        guard let selectedModeId = selectedModeId else { return nil }
-        return modes.first { $0.id == selectedModeId }
+        modes.activeMode(selectedModeId: selectedModeId)
     }
 
     @Published private var apiKeysByProvider: [VoiceInkProviderKind: String]
@@ -60,6 +62,7 @@ final class AppSettings: ObservableObject {
         // Load audio session timeout (default: 90 seconds)
         self.audioSessionTimeoutSeconds = UserDefaults.standard.object(forKey: "audioSessionTimeoutSeconds") as? Int ?? 90
 
+        repairSelectedModeId()
     }
 
     func apiKey(for provider: VoiceInkProviderKind) -> String {
@@ -116,6 +119,13 @@ final class AppSettings: ObservableObject {
             return []
         }
         return modes
+    }
+
+    private func repairSelectedModeId() {
+        let repairedModeId = modes.repairedSelectedModeId(selectedModeId)
+        if selectedModeId != repairedModeId {
+            selectedModeId = repairedModeId
+        }
     }
     
     // MARK: - Mode-based Settings

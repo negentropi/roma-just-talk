@@ -35,6 +35,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 Current macOS consumers of shared remote transport:
 
 - Groq batch transcription uses `VoiceInkOpenAICompatibleTranscriptionClient`.
+- Deepgram batch transcription uses `VoiceInkDeepgramTranscriptionClient`.
 
 Platform shells still own UI, OS permissions, audio capture, paste/keyboard behavior, keychain adapters, local model download storage, SwiftData models, and macOS-only orchestration.
 

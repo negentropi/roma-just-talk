@@ -13,17 +13,34 @@ public enum VoiceInkDeepgramRequestBuilder {
         apiKey: String,
         model: String,
         audioData: Data,
-        language: String? = nil
+        language: String? = nil,
+        smartFormat: Bool = true,
+        punctuate: Bool = true,
+        paragraphs: Bool? = nil,
+        diarize: Bool? = false,
+        customVocabulary: [String] = [],
+        timeout: TimeInterval? = nil
     ) throws -> URLRequest {
         var queryItems: [URLQueryItem] = [
             URLQueryItem(name: "model", value: model),
-            URLQueryItem(name: "smart_format", value: "true"),
-            URLQueryItem(name: "punctuate", value: "true"),
-            URLQueryItem(name: "diarize", value: "false")
+            URLQueryItem(name: "smart_format", value: smartFormat ? "true" : "false"),
+            URLQueryItem(name: "punctuate", value: punctuate ? "true" : "false")
         ]
+
+        if let paragraphs {
+            queryItems.append(URLQueryItem(name: "paragraphs", value: paragraphs ? "true" : "false"))
+        }
+
+        if let diarize {
+            queryItems.append(URLQueryItem(name: "diarize", value: diarize ? "true" : "false"))
+        }
 
         if let language, !language.isEmpty {
             queryItems.append(URLQueryItem(name: "language", value: language))
+        }
+
+        for term in customVocabulary where !term.isEmpty {
+            queryItems.append(URLQueryItem(name: "keyterm", value: term))
         }
 
         var components = URLComponents(
@@ -39,12 +56,22 @@ public enum VoiceInkDeepgramRequestBuilder {
         request.setValue("Token \(apiKey)", forHTTPHeaderField: "Authorization")
         request.setValue("audio/wav", forHTTPHeaderField: "Content-Type")
         request.httpBody = audioData
+        if let timeout {
+            request.timeoutInterval = timeout
+        }
         return request
     }
 
-    public static func makeProjectsRequest(baseURL: URL, apiKey: String) -> URLRequest {
+    public static func makeProjectsRequest(
+        baseURL: URL,
+        apiKey: String,
+        timeout: TimeInterval? = nil
+    ) -> URLRequest {
         var request = URLRequest(url: VoiceInkProviderEndpoint.deepgramProjectsURL(from: baseURL))
         request.setValue("Token \(apiKey)", forHTTPHeaderField: "Authorization")
+        if let timeout {
+            request.timeoutInterval = timeout
+        }
         return request
     }
 }

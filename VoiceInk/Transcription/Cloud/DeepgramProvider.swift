@@ -1,10 +1,10 @@
 import Foundation
 import SwiftData
-import LLMkit
 import VoiceInkCore
 
 struct DeepgramProvider: CloudProvider {
     let modelProvider: ModelProvider = .deepgram
+    private let transcriptionClient = VoiceInkDeepgramTranscriptionClient()
 
     var models: [CloudModel] {
         VoiceInkTranscriptionModelCatalog
@@ -13,12 +13,34 @@ struct DeepgramProvider: CloudProvider {
     }
 
     func transcribe(audioData: Data, fileName: String, apiKey: String, model: String, language: String?, prompt: String?, customVocabulary: [String]) async throws -> String {
-        return try await DeepgramClient.transcribe(
-            audioData: audioData,
-            apiKey: apiKey,
-            model: model,
-            language: language
-        )
+        guard !apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw CloudTranscriptionError.missingAPIKey
+        }
+
+        do {
+            let text = try await transcriptionClient.transcribeAudioData(
+                baseURL: VoiceInkProviderEndpoint.deepgram.apiBaseURL,
+                apiKey: apiKey,
+                model: model,
+                audioData: audioData,
+                language: language,
+                paragraphs: true,
+                diarize: nil,
+                errorDomain: "DeepgramAPI",
+                timeout: 30
+            )
+            guard !text.isEmpty else {
+                throw CloudTranscriptionError.noTranscriptionReturned
+            }
+            return text
+        } catch let error as CloudTranscriptionError {
+            throw error
+        } catch let error as NSError where error.domain == "DeepgramAPI" {
+            throw CloudTranscriptionError.apiRequestFailed(
+                statusCode: error.code,
+                message: error.userInfo[NSLocalizedDescriptionKey] as? String ?? error.localizedDescription
+            )
+        }
     }
 
     func makeStreamingProvider(modelContext: ModelContext) -> (any StreamingTranscriptionProvider)? {
@@ -26,6 +48,10 @@ struct DeepgramProvider: CloudProvider {
     }
 
     func verifyAPIKey(_ key: String) async -> (isValid: Bool, errorMessage: String?) {
-        return await DeepgramClient.verifyAPIKey(key)
+        let result = await transcriptionClient.verifyAPIKeyDetailed(
+            baseURL: VoiceInkProviderEndpoint.deepgram.apiBaseURL,
+            apiKey: key
+        )
+        return (result.isValid, result.errorMessage)
     }
 }

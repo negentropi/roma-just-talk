@@ -182,14 +182,58 @@ final class RemoteProviderRequestTests: XCTestCase {
         XCTAssertEqual(query["language"], "en-US")
     }
 
+    func testDeepgramTranscriptionRequestBuilderCanMatchMacOSLLMkitOptions() throws {
+        let request = try VoiceInkDeepgramRequestBuilder.makeTranscriptionRequest(
+            baseURL: try XCTUnwrap(URL(string: "https://api.deepgram.com")),
+            apiKey: "deepgram-key",
+            model: "nova-3",
+            audioData: Data("WAVDATA".utf8),
+            language: "en-US",
+            paragraphs: true,
+            diarize: nil,
+            customVocabulary: ["Roma", "", "Felix"],
+            timeout: 30
+        )
+
+        let queryItems = try XCTUnwrap(
+            URLComponents(url: try XCTUnwrap(request.url), resolvingAgainstBaseURL: false)?.queryItems
+        )
+        let query = Dictionary(uniqueKeysWithValues: queryItems.filter { $0.name != "keyterm" }.map { ($0.name, $0.value) })
+        XCTAssertEqual(query["model"], "nova-3")
+        XCTAssertEqual(query["smart_format"], "true")
+        XCTAssertEqual(query["punctuate"], "true")
+        XCTAssertEqual(query["paragraphs"], "true")
+        XCTAssertNil(query["diarize"])
+        XCTAssertEqual(query["language"], "en-US")
+        XCTAssertEqual(queryItems.filter { $0.name == "keyterm" }.map(\.value), ["Roma", "Felix"])
+        XCTAssertEqual(request.timeoutInterval, 30)
+    }
+
     func testDeepgramProjectsRequestBuilderUsesProjectsEndpoint() throws {
         let request = VoiceInkDeepgramRequestBuilder.makeProjectsRequest(
             baseURL: try XCTUnwrap(URL(string: "https://api.deepgram.com")),
-            apiKey: "deepgram-key"
+            apiKey: "deepgram-key",
+            timeout: 10
         )
 
         XCTAssertEqual(request.url?.absoluteString, "https://api.deepgram.com/v1/projects")
         XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Token deepgram-key")
+        XCTAssertEqual(request.timeoutInterval, 10)
+    }
+
+    func testDeepgramClientRejectsBlankAPIKeyWithoutNetwork() async throws {
+        let result = await VoiceInkDeepgramTranscriptionClient().verifyAPIKeyDetailed(
+            baseURL: try XCTUnwrap(URL(string: "https://api.deepgram.com")),
+            apiKey: " \n\t "
+        )
+
+        XCTAssertEqual(
+            result,
+            VoiceInkAPIKeyVerificationResult(
+                isValid: false,
+                errorMessage: "API key is missing or empty."
+            )
+        )
     }
 
     func testDeepgramTranscriptionCodecReturnsFirstTranscriptOrEmptyString() throws {

@@ -473,7 +473,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
             let transcription = makeRecordingTranscription(
                 for: permanentURL,
                 text: "",
-                duration: 0,
+                duration: Self.durationForMono16kPCMData(audioData),
                 transcriptionStatus: .pending
             )
 
@@ -555,7 +555,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
             let transcription = makeRecordingTranscription(
                 for: permanentURL,
                 text: "",
-                duration: 0,
+                duration: Self.durationForMono16kPCMData(audioData),
                 transcriptionStatus: .pending
             )
 
@@ -596,6 +596,10 @@ class VoiceInkEngine: NSObject, ObservableObject {
             _ = try? await audioFileReadyTask.value
             try? FileManager.default.removeItem(at: url)
         }
+    }
+
+    static func durationForMono16kPCMData(_ audioData: Data) -> TimeInterval {
+        TimeInterval(audioData.count / MemoryLayout<Int16>.size) / 16_000
     }
 
     func prepareQuickReleaseContext(powerModeId: UUID? = nil) {

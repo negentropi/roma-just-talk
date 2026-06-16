@@ -15,9 +15,9 @@ enum ModelDownloadError: Error {
 }
 
 struct WhisperModel: Identifiable, Codable {
-    let id = UUID()
     private let spec: VoiceInkWhisperModelFileSpec
 
+    var id: String { spec.id }
     var name: String { spec.modelName }
     var displayName: String { spec.displayName }
     var filename: String { spec.filename }
@@ -47,12 +47,12 @@ struct WhisperModel: Identifiable, Codable {
 
 @MainActor
 class LocalModelManager: ObservableObject {
-    @Published var downloadProgress: [UUID: Double] = [:]
-    @Published var isDownloading: [UUID: Bool] = [:]
+    @Published var downloadProgress: [String: Double] = [:]
+    @Published var isDownloading: [String: Bool] = [:]
     @Published var downloadError: String?
     
-    private var downloadTasks: [UUID: URLSessionDownloadTask] = [:]
-    private var progressObservations: [UUID: NSKeyValueObservation] = [:]
+    private var downloadTasks: [String: URLSessionDownloadTask] = [:]
+    private var progressObservations: [String: NSKeyValueObservation] = [:]
     
     static let shared = LocalModelManager()
     

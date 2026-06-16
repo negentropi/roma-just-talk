@@ -48,6 +48,10 @@ public enum VoiceInkProviderEndpoint: String, CaseIterable, Sendable {
         URL(string: "https://asr.api.speechmatics.com/v2")!
     }
 
+    public static var assemblyAIAPIBaseURL: URL {
+        URL(string: "https://api.assemblyai.com")!
+    }
+
     public var chatCompletionsURL: URL? {
         switch self {
         case .groq, .openAI, .cerebras, .gemini:
@@ -164,5 +168,17 @@ public enum VoiceInkProviderEndpoint: String, CaseIterable, Sendable {
         var components = URLComponents(url: url, resolvingAgainstBaseURL: false)!
         components.queryItems = [URLQueryItem(name: "format", value: "txt")]
         return components.url!
+    }
+
+    public static func assemblyAIUploadURL(from baseURL: URL) -> URL {
+        baseURL.appendingPathComponent("v2/upload")
+    }
+
+    public static func assemblyAITranscriptsURL(from baseURL: URL) -> URL {
+        baseURL.appendingPathComponent("v2/transcript")
+    }
+
+    public static func assemblyAITranscriptURL(from baseURL: URL, id: String) -> URL {
+        assemblyAITranscriptsURL(from: baseURL).appendingPathComponent(id)
     }
 }

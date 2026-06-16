@@ -894,5 +894,134 @@ final class RemoteProviderRequestTests: XCTestCase {
             "speechmatics text"
         )
     }
+
+    func testAssemblyAIUploadAudioRequestBuilderUsesUploadEndpointAndAudioBody() throws {
+        let preparedRequest = VoiceInkAssemblyAIRequestBuilder.makeUploadAudioRequest(
+            baseURL: VoiceInkProviderEndpoint.assemblyAIAPIBaseURL,
+            apiKey: "assembly-key",
+            audioData: Data("WAVDATA".utf8),
+            timeout: 30
+        )
+
+        XCTAssertEqual(preparedRequest.request.url?.absoluteString, "https://api.assemblyai.com/v2/upload")
+        XCTAssertEqual(preparedRequest.request.httpMethod, "POST")
+        XCTAssertEqual(preparedRequest.request.value(forHTTPHeaderField: "Authorization"), "assembly-key")
+        XCTAssertEqual(preparedRequest.request.value(forHTTPHeaderField: "Content-Type"), "application/octet-stream")
+        XCTAssertEqual(preparedRequest.request.timeoutInterval, 30)
+        XCTAssertEqual(preparedRequest.body, Data("WAVDATA".utf8))
+    }
+
+    func testAssemblyAICreateTranscriptRequestBuilderUsesModelLanguagePromptAndKeyterms() throws {
+        let request = try VoiceInkAssemblyAIRequestBuilder.makeCreateTranscriptRequest(
+            baseURL: VoiceInkProviderEndpoint.assemblyAIAPIBaseURL,
+            apiKey: "assembly-key",
+            audioURL: "https://cdn.example.test/audio.wav",
+            model: "universal-3-pro",
+            language: "en",
+            prompt: "  spell project names  ",
+            customVocabulary: [" Roma ", "Felix", "roma", "", "one two three four five six seven"],
+            timeout: 30
+        )
+
+        XCTAssertEqual(request.url?.absoluteString, "https://api.assemblyai.com/v2/transcript")
+        XCTAssertEqual(request.httpMethod, "POST")
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "assembly-key")
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Content-Type"), "application/json")
+        XCTAssertEqual(request.timeoutInterval, 30)
+
+        let body = try XCTUnwrap(request.httpBody)
+        let json = try XCTUnwrap(JSONSerialization.jsonObject(with: body) as? [String: Any])
+        XCTAssertEqual(json["audio_url"] as? String, "https://cdn.example.test/audio.wav")
+        XCTAssertEqual(json["speech_models"] as? [String], ["universal-3-pro", "universal-2"])
+        XCTAssertEqual(json["punctuate"] as? Bool, true)
+        XCTAssertEqual(json["format_text"] as? Bool, true)
+        XCTAssertEqual(json["language_code"] as? String, "en")
+        XCTAssertNil(json["language_detection"])
+        XCTAssertEqual(
+            json["prompt"] as? String,
+            "spell project names\n\nBoost these terms when they appear in the audio: Roma, Felix."
+        )
+        XCTAssertNil(json["keyterms_prompt"])
+    }
+
+    func testAssemblyAICreateTranscriptRequestBuilderUsesAutoDetectionAndKeytermsPrompt() throws {
+        let request = try VoiceInkAssemblyAIRequestBuilder.makeCreateTranscriptRequest(
+            baseURL: VoiceInkProviderEndpoint.assemblyAIAPIBaseURL,
+            apiKey: "assembly-key",
+            audioURL: "https://cdn.example.test/audio.wav",
+            model: "universal-streaming",
+            language: nil,
+            customVocabulary: ["Roma", "Felix"]
+        )
+
+        let body = try XCTUnwrap(request.httpBody)
+        let json = try XCTUnwrap(JSONSerialization.jsonObject(with: body) as? [String: Any])
+        XCTAssertEqual(json["speech_models"] as? [String], ["universal-2"])
+        XCTAssertEqual(json["language_detection"] as? Bool, true)
+        XCTAssertNil(json["language_code"])
+        XCTAssertEqual(json["keyterms_prompt"] as? [String], ["Roma", "Felix"])
+        XCTAssertNil(json["prompt"])
+    }
+
+    func testAssemblyAIStatusAndVerificationRequestBuilders() throws {
+        let status = VoiceInkAssemblyAIRequestBuilder.makeTranscriptStatusRequest(
+            baseURL: VoiceInkProviderEndpoint.assemblyAIAPIBaseURL,
+            apiKey: "assembly-key",
+            id: "tx-123",
+            timeout: 30
+        )
+        XCTAssertEqual(status.url?.absoluteString, "https://api.assemblyai.com/v2/transcript/tx-123")
+        XCTAssertEqual(status.httpMethod, "GET")
+        XCTAssertEqual(status.value(forHTTPHeaderField: "Authorization"), "assembly-key")
+        XCTAssertEqual(status.timeoutInterval, 30)
+
+        let transcripts = VoiceInkAssemblyAIRequestBuilder.makeTranscriptsRequest(
+            baseURL: VoiceInkProviderEndpoint.assemblyAIAPIBaseURL,
+            apiKey: "assembly-key",
+            timeout: 10
+        )
+        XCTAssertEqual(transcripts.url?.absoluteString, "https://api.assemblyai.com/v2/transcript")
+        XCTAssertEqual(transcripts.httpMethod, "GET")
+        XCTAssertEqual(transcripts.value(forHTTPHeaderField: "Authorization"), "assembly-key")
+        XCTAssertEqual(transcripts.timeoutInterval, 10)
+    }
+
+    func testAssemblyAIClientRejectsBlankAPIKeyWithoutNetwork() async throws {
+        let result = await VoiceInkAssemblyAITranscriptionClient().verifyAPIKeyDetailed(
+            baseURL: VoiceInkProviderEndpoint.assemblyAIAPIBaseURL,
+            apiKey: " \n\t "
+        )
+
+        XCTAssertEqual(
+            result,
+            VoiceInkAPIKeyVerificationResult(
+                isValid: false,
+                errorMessage: "API key is missing or empty."
+            )
+        )
+    }
+
+    func testAssemblyAITranscriptionCodecReturnsUploadIDAndTranscriptStatus() throws {
+        XCTAssertEqual(
+            try VoiceInkAssemblyAITranscriptionCodec.uploadedAudioURL(
+                from: Data(#"{"upload_url":"https://cdn.example.test/audio.wav"}"#.utf8)
+            ),
+            "https://cdn.example.test/audio.wav"
+        )
+        XCTAssertEqual(
+            try VoiceInkAssemblyAITranscriptionCodec.createdTranscriptID(from: Data(#"{"id":"tx-123"}"#.utf8)),
+            "tx-123"
+        )
+        XCTAssertEqual(
+            try VoiceInkAssemblyAITranscriptionCodec.transcriptStatus(
+                from: Data(#"{"status":"completed","text":"assembly text","error":null}"#.utf8)
+            ),
+            VoiceInkAssemblyAITranscriptStatus(
+                status: "completed",
+                text: "assembly text",
+                error: nil
+            )
+        )
+    }
 }
 #endif

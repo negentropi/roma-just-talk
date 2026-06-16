@@ -51,6 +51,47 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertNil(VoiceInkProviderKind.voiceInk.apiKeyVerificationTransport)
     }
 
+    func testRuntimeAPIKeyFollowsProviderAccessPolicy() {
+        XCTAssertEqual(VoiceInkProviderKind.groq.runtimeAPIKey(userAPIKey: "groq-key"), "groq-key")
+        XCTAssertEqual(VoiceInkProviderKind.localWhisper.runtimeAPIKey(userAPIKey: ""), "local")
+        XCTAssertEqual(VoiceInkProviderKind.voiceInk.runtimeAPIKey(userAPIKey: "ignored"), "")
+    }
+
+    func testProviderReadinessFollowsProviderAccessPolicy() {
+        XCTAssertTrue(VoiceInkProviderKind.groq.isReady(
+            userAPIKey: "groq-key",
+            userAPIKeyVerified: true,
+            localWhisperModelAvailable: false
+        ))
+        XCTAssertFalse(VoiceInkProviderKind.groq.isReady(
+            userAPIKey: "",
+            userAPIKeyVerified: true,
+            localWhisperModelAvailable: true
+        ))
+        XCTAssertFalse(VoiceInkProviderKind.groq.isReady(
+            userAPIKey: "groq-key",
+            userAPIKeyVerified: false,
+            localWhisperModelAvailable: true
+        ))
+
+        XCTAssertTrue(VoiceInkProviderKind.localWhisper.isReady(
+            userAPIKey: "",
+            userAPIKeyVerified: false,
+            localWhisperModelAvailable: true
+        ))
+        XCTAssertFalse(VoiceInkProviderKind.localWhisper.isReady(
+            userAPIKey: "",
+            userAPIKeyVerified: true,
+            localWhisperModelAvailable: false
+        ))
+
+        XCTAssertTrue(VoiceInkProviderKind.voiceInk.isReady(
+            userAPIKey: "",
+            userAPIKeyVerified: false,
+            localWhisperModelAvailable: false
+        ))
+    }
+
     func testAvailableProvidersFiltersByModelUseAndReadiness() {
         let readyProviders: Set<VoiceInkProviderKind> = [.groq, .deepgram, .localWhisper, .voiceInk]
 

@@ -63,18 +63,11 @@ final class AppSettings: ObservableObject {
     }
 
     func apiKey(for provider: VoiceInkProviderKind) -> String {
-        switch provider.accessRequirement {
-        case .userAPIKey:
-            return apiKeysByProvider[provider] ?? ""
-        case .localWhisperModel:
-            return "local"
-        case .bundledService:
-            return ""
-        }
+        provider.runtimeAPIKey(userAPIKey: apiKeysByProvider[provider] ?? "")
     }
 
     func setAPIKey(_ key: String, for provider: VoiceInkProviderKind) {
-        guard case .userAPIKey = provider.accessRequirement else {
+        guard provider.requiresUserAPIKey else {
             return
         }
 
@@ -88,18 +81,15 @@ final class AppSettings: ObservableObject {
     }
     
     func isKeyVerified(for provider: VoiceInkProviderKind) -> Bool {
-        switch provider.accessRequirement {
-        case .userAPIKey:
-            return verifiedAPIKeyProviders.contains(provider) && !apiKey(for: provider).isEmpty
-        case .localWhisperModel:
-            return LocalModelManager.shared.hasAvailableModel
-        case .bundledService:
-            return true
-        }
+        provider.isReady(
+            userAPIKey: apiKeysByProvider[provider] ?? "",
+            userAPIKeyVerified: verifiedAPIKeyProviders.contains(provider),
+            localWhisperModelAvailable: LocalModelManager.shared.hasAvailableModel
+        )
     }
     
     func setKeyVerified(_ verified: Bool, for provider: VoiceInkProviderKind) {
-        guard case .userAPIKey = provider.accessRequirement else {
+        guard provider.requiresUserAPIKey else {
             return
         }
 

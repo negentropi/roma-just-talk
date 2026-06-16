@@ -188,6 +188,32 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
         return true
     }
 
+    public func runtimeAPIKey(userAPIKey: String) -> String {
+        switch accessRequirement {
+        case .userAPIKey:
+            return userAPIKey
+        case .localWhisperModel:
+            return "local"
+        case .bundledService:
+            return ""
+        }
+    }
+
+    public func isReady(
+        userAPIKey: String,
+        userAPIKeyVerified: Bool,
+        localWhisperModelAvailable: Bool
+    ) -> Bool {
+        switch accessRequirement {
+        case .userAPIKey:
+            return userAPIKeyVerified && !userAPIKey.isEmpty
+        case .localWhisperModel:
+            return localWhisperModelAvailable
+        case .bundledService:
+            return true
+        }
+    }
+
     public static var userAPIKeyProviders: [VoiceInkProviderKind] {
         allCases.filter(\.requiresUserAPIKey)
     }

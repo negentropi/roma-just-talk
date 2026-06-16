@@ -1,14 +1,15 @@
 import SwiftUI
+import VoiceInkCore
 
 struct PredefinedPromptsView: View {
-    let onSelect: (TemplatePrompt) -> Void
+    let onSelect: (VoiceInkTemplatePrompt) -> Void
     
     private let columns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 18), count: 2)
     
     var body: some View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: 16) {
-                ForEach(PromptTemplates.all, id: \.title) { template in
+                ForEach(VoiceInkPromptTemplates.macTemplates, id: \.title) { template in
                     PredefinedTemplateButton(prompt: template) {
                         onSelect(template)
                     }
@@ -22,7 +23,7 @@ struct PredefinedPromptsView: View {
 }
 
 struct PredefinedTemplateButton: View {
-    let prompt: TemplatePrompt
+    let prompt: VoiceInkTemplatePrompt
     let action: () -> Void
     
     var body: some View {

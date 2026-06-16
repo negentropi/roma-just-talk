@@ -19,7 +19,7 @@ enum PredefinedPrompts {
             CustomPrompt(
                 id: defaultPromptId,
                 title: "Default",
-                promptText: PromptTemplates.all.first { $0.title == "System Default" }?.promptText ?? "",
+                promptText: VoiceInkPromptTemplates.macTemplate(named: "System Default")?.promptText ?? "",
                 icon: "checkmark.seal.fill",
                 description: "Default mode to improved clarity and accuracy of the transcription",
                 isPredefined: true,

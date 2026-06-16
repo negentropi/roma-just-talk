@@ -1,4 +1,5 @@
 import SwiftUI
+import VoiceInkCore
 
 struct PromptEditorView: View {
     enum Mode {
@@ -222,7 +223,7 @@ struct PromptEditorView: View {
             if case .add = mode {
                 Section {
                     Menu {
-                        ForEach(PromptTemplates.all, id: \.title) { template in
+                        ForEach(VoiceInkPromptTemplates.macTemplates, id: \.title) { template in
                             Button {
                                 title = template.title
                                 promptText = template.promptText

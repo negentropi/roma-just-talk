@@ -141,4 +141,32 @@ struct SettingsView: View {
     NavigationStack { SettingsView() }
 }
 
+private struct ModeRowView: View {
+    let mode: Mode
+
+    var body: some View {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(mode.name)
+                    .font(.headline)
+                    .foregroundStyle(.primary)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Transcription: \(mode.transcriptionModel)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
+                    if mode.isPostProcessingEnabled {
+                        Text("Post-processing: \(mode.postProcessingModel)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+
+            Spacer()
+        }
+        .padding(.vertical, 4)
+    }
+}
 

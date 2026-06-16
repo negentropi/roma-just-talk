@@ -10,7 +10,7 @@ struct ProviderAPIKeyView: View {
     @State private var editingKey: Bool = true
 
     private let deepgramService = DeepgramTranscriptionService()
-    private let openAIClient = OpenAICompatibleClient()
+    private let openAIClient = VoiceInkOpenAICompatibleClient()
     
     private var isKeyVerified: Bool {
         settings.isKeyVerified(for: provider)

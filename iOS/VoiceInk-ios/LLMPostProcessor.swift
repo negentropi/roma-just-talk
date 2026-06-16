@@ -2,7 +2,7 @@ import Foundation
 import VoiceInkCore
 
 struct LLMPostProcessor {
-    private let client = OpenAICompatibleClient()
+    private let client = VoiceInkOpenAICompatibleClient()
 
     func postProcessTranscript(provider: Provider, apiKey: String, model: String, prompt: String, transcript: String) async throws -> String {
         guard let request = VoiceInkPostProcessingRequest(prompt: prompt, transcript: transcript) else {

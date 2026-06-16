@@ -1,32 +1,16 @@
 import Foundation
 import SwiftData
 import LLMkit
+import VoiceInkCore
 
 struct SonioxProvider: CloudProvider {
     let modelProvider: ModelProvider = .soniox
-    let languageCodes: [String]? = [
-        "af", "sq", "ar", "az", "eu", "be", "bn", "bs", "bg", "ca",
-        "zh", "hr", "cs", "da", "nl", "en", "et", "fi", "fr", "gl",
-        "de", "el", "gu", "he", "hi", "hu", "id", "it", "ja", "kn",
-        "kk", "ko", "lv", "lt", "mk", "ms", "ml", "mr", "no", "fa",
-        "pl", "pt", "pa", "ro", "ru", "sr", "sk", "sl", "es", "sw",
-        "sv", "tl", "ta", "te", "th", "tr", "uk", "ur", "vi", "cy"
-    ]
-    let includesAutoDetect: Bool = true
 
-    var models: [CloudModel] {[
-        CloudModel(
-            name: "stt-async-v4",
-            displayName: "Soniox V4",
-            description: "Soniox transcription model v4 with human-parity accuracy",
-            provider: .soniox,
-            speed: 0.99,
-            accuracy: 0.98,
-            isMultilingual: true,
-            supportsStreaming: true,
-            supportedLanguages: LanguageDictionary.forProvider(isMultilingual: true, provider: .soniox)
-        )
-    ]}
+    var models: [CloudModel] {
+        VoiceInkTranscriptionModelCatalog
+            .cloudModels(for: .soniox)
+            .map { $0.makeCloudModel(provider: .soniox) }
+    }
 
     func transcribe(audioData: Data, fileName: String, apiKey: String, model: String, language: String?, prompt: String?, customVocabulary: [String]) async throws -> String {
         return try await SonioxClient.transcribe(

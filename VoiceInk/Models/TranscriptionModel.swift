@@ -57,6 +57,8 @@ extension ModelProvider {
             return .mistral
         case .gemini:
             return .gemini
+        case .soniox:
+            return .soniox
         default:
             return nil
         }

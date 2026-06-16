@@ -4,11 +4,21 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
     case deepgram
     case mistral
     case gemini
+    case soniox
     case local
     case voiceInk
 
     public var languageCodes: [String]? {
         switch self {
+        case .soniox:
+            return [
+                "af", "sq", "ar", "az", "eu", "be", "bn", "bs", "bg", "ca",
+                "zh", "hr", "cs", "da", "nl", "en", "et", "fi", "fr", "gl",
+                "de", "el", "gu", "he", "hi", "hu", "id", "it", "ja", "kn",
+                "kk", "ko", "lv", "lt", "mk", "ms", "ml", "mr", "no", "fa",
+                "pl", "pt", "pa", "ro", "ru", "sr", "sk", "sl", "es", "sw",
+                "sv", "tl", "ta", "te", "th", "tr", "uk", "ur", "vi", "cy"
+            ]
         case .mistral:
             return ["ar", "de", "en", "es", "fr", "hi", "it", "ja", "ko", "nl", "pt", "ru", "zh"]
         case .deepgram:
@@ -26,7 +36,7 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
 
     public var includesAutoDetect: Bool {
         switch self {
-        case .deepgram, .mistral:
+        case .deepgram, .mistral, .soniox:
             return true
         case .groq, .openAI, .gemini, .local, .voiceInk:
             return false
@@ -68,7 +78,7 @@ public enum VoiceInkTranscriptionModelCatalog {
 
     public static func modelNames(for provider: VoiceInkTranscriptionModelProvider) -> [String] {
         switch provider {
-        case .groq, .deepgram, .mistral, .gemini:
+        case .groq, .deepgram, .mistral, .gemini, .soniox:
             return cloudModels(for: provider).map(\.name)
         case .openAI:
             return [
@@ -162,6 +172,18 @@ public enum VoiceInkTranscriptionModelCatalog {
                     speed: 0.92,
                     accuracy: 0.95,
                     isMultilingual: true
+                )
+            ]
+        case .soniox:
+            return [
+                VoiceInkCloudTranscriptionModelSpec(
+                    name: "stt-async-v4",
+                    displayName: "Soniox V4",
+                    description: "Soniox transcription model v4 with human-parity accuracy",
+                    speed: 0.99,
+                    accuracy: 0.98,
+                    isMultilingual: true,
+                    supportsStreaming: true
                 )
             ]
         case .openAI, .local, .voiceInk:

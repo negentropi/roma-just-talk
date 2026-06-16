@@ -23,6 +23,18 @@ final class TranscriptionModelCatalogTests: XCTestCase {
         XCTAssertTrue(models.first?.supportsStreaming == true)
     }
 
+    func testSonioxLanguageCapabilityAndModelAreSharedProviderMetadata() {
+        XCTAssertEqual(VoiceInkTranscriptionModelProvider.soniox.languageCodes?.first, "af")
+        XCTAssertEqual(VoiceInkTranscriptionModelProvider.soniox.languageCodes?.last, "cy")
+        XCTAssertTrue(VoiceInkTranscriptionModelProvider.soniox.languageCodes?.contains("en") == true)
+        XCTAssertTrue(VoiceInkTranscriptionModelProvider.soniox.includesAutoDetect)
+
+        let models = VoiceInkTranscriptionModelCatalog.cloudModels(for: .soniox)
+        XCTAssertEqual(models.map(\.name), ["stt-async-v4"])
+        XCTAssertEqual(models.first?.displayName, "Soniox V4")
+        XCTAssertTrue(models.first?.supportsStreaming == true)
+    }
+
     func testOpenAICompatibleProvidersUseAllLanguagesWithoutAutoDetectFlag() {
         XCTAssertNil(VoiceInkTranscriptionModelProvider.groq.languageCodes)
         XCTAssertFalse(VoiceInkTranscriptionModelProvider.groq.includesAutoDetect)

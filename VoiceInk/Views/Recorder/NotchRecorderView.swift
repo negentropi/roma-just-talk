@@ -14,14 +14,14 @@ struct NotchRecorderView<S: RecorderStateProvider & ObservableObject>: View {
     private enum DisplayState: Equatable {
         case collapsed
         case active
-        case liveText
+        case transcriptPreview
     }
 
     private var displayState: DisplayState {
         switch stateProvider.recordingState {
         case .recording:
-            let shouldShowLive = showLiveTextPreview && !stateProvider.partialTranscript.isEmpty
-            return shouldShowLive ? .liveText : .active
+            let shouldShowPreview = showLiveTextPreview && !stateProvider.partialTranscript.isEmpty
+            return shouldShowPreview ? .transcriptPreview : .active
         case .transcribing, .enhancing:
             return .active
         default:
@@ -61,7 +61,7 @@ struct NotchRecorderView<S: RecorderStateProvider & ObservableObject>: View {
         switch displayState {
         case .collapsed: return notchWidth
         case .active:    return notchWidth + recordingSideExpansion * 2
-        case .liveText:  return notchWidth + transcriptSideExpansion * 2
+        case .transcriptPreview:  return notchWidth + transcriptSideExpansion * 2
         }
     }
 
@@ -69,12 +69,12 @@ struct NotchRecorderView<S: RecorderStateProvider & ObservableObject>: View {
         switch displayState {
         case .collapsed: return 0
         case .active:    return mainRowHeight
-        case .liveText:  return mainRowHeight + transcriptPanelHeight
+        case .transcriptPreview:  return mainRowHeight + transcriptPanelHeight
         }
     }
 
     private var sideExpansion: CGFloat {
-        displayState == .liveText ? transcriptSideExpansion : recordingSideExpansion
+        displayState == .transcriptPreview ? transcriptSideExpansion : recordingSideExpansion
     }
 
     // MARK: - Animation
@@ -102,14 +102,14 @@ struct NotchRecorderView<S: RecorderStateProvider & ObservableObject>: View {
     private var pill: some View {
         VStack(spacing: 0) {
             mainRow
-            liveTextPanel
+            transcriptPreviewPanel
         }
         .frame(width: pillWidth, height: pillHeight)
         .background(Color.black)
         .clipShape(
             NotchShape(
-                topCornerRadius: displayState == .liveText ? 12 : 8,
-                bottomCornerRadius: displayState == .liveText ? 22 : 16
+                topCornerRadius: displayState == .transcriptPreview ? 12 : 8,
+                bottomCornerRadius: displayState == .transcriptPreview ? 22 : 16
             )
         )
     }
@@ -125,7 +125,7 @@ struct NotchRecorderView<S: RecorderStateProvider & ObservableObject>: View {
                 RecorderPowerModeButton(activePopover: $activePopover, buttonSize: 20, padding: EdgeInsets())
                 Spacer(minLength: 0)
             }
-            .padding(.leading, displayState == .liveText ? 18 : 14)
+            .padding(.leading, displayState == .transcriptPreview ? 18 : 14)
             .frame(width: sideExpansion)
             .frame(maxWidth: .infinity, alignment: .leading)
             .opacity(displayState != .collapsed ? 1 : 0)
@@ -142,7 +142,7 @@ struct NotchRecorderView<S: RecorderStateProvider & ObservableObject>: View {
                     menuBarHeight: notchHeight
                 )
             }
-            .padding(.trailing, displayState == .liveText ? 18 : 14)
+            .padding(.trailing, displayState == .transcriptPreview ? 18 : 14)
             .frame(width: sideExpansion)
             .frame(maxWidth: .infinity, alignment: .trailing)
             .opacity(displayState != .collapsed ? 1 : 0)
@@ -154,17 +154,17 @@ struct NotchRecorderView<S: RecorderStateProvider & ObservableObject>: View {
         .frame(height: mainRowHeight)
     }
 
-    // MARK: - Live Text Panel
+    // MARK: - Transcript Preview Panel
 
-    private var liveTextPanel: some View {
+    private var transcriptPreviewPanel: some View {
         VStack(spacing: 0) {
-            if displayState == .liveText {
+            if displayState == .transcriptPreview {
                 Divider().background(Color.white.opacity(0.15))
-                LiveTranscriptView(text: stateProvider.partialTranscript)
+                TranscriptPreviewView(text: stateProvider.partialTranscript)
                     .padding(.horizontal, 8)
             }
         }
-        .frame(height: displayState == .liveText ? transcriptPanelHeight : 0)
+        .frame(height: displayState == .transcriptPreview ? transcriptPanelHeight : 0)
         .clipped()
     }
 }

@@ -17,8 +17,7 @@ struct MiniRecorderView<S: RecorderStateProvider & ObservableObject>: View {
     private let compactCornerRadius: CGFloat = 20
     private let expandedCornerRadius: CGFloat = 14
 
-    // true when live transcript is streaming in during recording
-    private var hasLiveTranscript: Bool {
+    private var hasTranscriptPreview: Bool {
         showLiveTextPreview
             && stateProvider.recordingState == .recording
             && !stateProvider.partialTranscript.isEmpty
@@ -54,8 +53,8 @@ struct MiniRecorderView<S: RecorderStateProvider & ObservableObject>: View {
 
     private var transcriptSection: some View {
         VStack(spacing: 0) {
-            if hasLiveTranscript {
-                LiveTranscriptView(text: stateProvider.partialTranscript)
+            if hasTranscriptPreview {
+                TranscriptPreviewView(text: stateProvider.partialTranscript)
                 Divider().background(Color.white.opacity(0.15))
             }
         }
@@ -67,10 +66,10 @@ struct MiniRecorderView<S: RecorderStateProvider & ObservableObject>: View {
                 transcriptSection
                 controlBar
             }
-            .frame(width: hasLiveTranscript ? expandedWidth : compactWidth)
+            .frame(width: hasTranscriptPreview ? expandedWidth : compactWidth)
             .background(Color.black)
-            .clipShape(RoundedRectangle(cornerRadius: hasLiveTranscript ? expandedCornerRadius : compactCornerRadius, style: .continuous))
-            .animation(.easeInOut(duration: 0.3), value: hasLiveTranscript)
+            .clipShape(RoundedRectangle(cornerRadius: hasTranscriptPreview ? expandedCornerRadius : compactCornerRadius, style: .continuous))
+            .animation(.easeInOut(duration: 0.3), value: hasTranscriptPreview)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
         }
     }

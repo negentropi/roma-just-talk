@@ -263,9 +263,9 @@ struct RecorderPowerModeButton: View {
     }
 }
 
-// MARK: - Live Transcript View
+// MARK: - Transcript Preview View
 
-struct LiveTranscriptView: View {
+struct TranscriptPreviewView: View {
     let text: String
 
     var body: some View {

@@ -137,7 +137,7 @@ struct ModelSettingsView: View {
 
                 Toggle(isOn: $showLiveTextPreview) {
                     HStack(spacing: 4) {
-                        Text("Show Live Text Preview")
+                        Text("Show Transcript Preview")
                         InfoTip("Displays provisional text from streaming or rolling-buffer preload when available.")
                     }
                 }

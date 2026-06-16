@@ -6,6 +6,7 @@
 - Made the fresh Special shortcut default preload-only so quick releases can commit the rolling-buffer pre-run path without opening a recorder first.
 - Added configurable rolling buffer duration with decimal seconds support.
 - Renamed model-card transcription mode controls to "Streaming" so they stay separate from rolling buffer preload.
+- Renamed the provisional transcript UI toggle to "Show Transcript Preview" so it no longer reads like a separate live-transcription feature.
 - Moved recorder audio-duration metadata work after paste so completed text reaches the cursor sooner.
 - Deferred the recorder history save until after transcription work starts so quick releases do not wait on SwiftData I/O before STT.
 - Removed the fixed pre-paste delay after verified clipboard writes so completed text posts to the cursor sooner.

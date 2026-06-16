@@ -723,8 +723,11 @@ class VoiceInkEngine: NSObject, ObservableObject {
         }
 
         let didFinishActivePipeline = activePipelineTranscriptionID == transcriptionID
+        let shouldDeferRecorderSessionFinish = latencyTrace?.isRollingPreloadQuickRelease == true
         if didFinishActivePipeline {
-            await finishRecorderSession()
+            if !shouldDeferRecorderSessionFinish {
+                await finishRecorderSession()
+            }
             // Keep successful local STT resources warm for the next recording/preload.
             // Cancellation, reset, and Power Mode model changes still release them.
             activePipelineTranscriptionID = nil
@@ -743,6 +746,16 @@ class VoiceInkEngine: NSObject, ObservableObject {
             recordRollingPreloadTiming(latencyTrace, stage: .idle)
             if let latencyTrace, latencyTrace.isRollingPreloadQuickRelease {
                 logger.notice("Latency trace engine idle operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
+            }
+        }
+
+        if didFinishActivePipeline, shouldDeferRecorderSessionFinish {
+            Task { @MainActor in
+                await self.finishRecorderSession()
+                self.recordRollingPreloadTiming(latencyTrace, stage: .sessionFinished)
+                if let latencyTrace, latencyTrace.isRollingPreloadQuickRelease {
+                    self.logger.notice("Latency trace recorder session finished operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
+                }
             }
         }
 

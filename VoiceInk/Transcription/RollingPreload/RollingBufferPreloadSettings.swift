@@ -223,6 +223,7 @@ enum RollingBufferQuickReleaseTimingStage {
     case pasteCompleted
     case pipelineReturned
     case idle
+    case sessionFinished
     case saved
 }
 
@@ -237,6 +238,7 @@ struct RollingBufferQuickReleaseClaimSnapshot: Equatable {
     var pasteCompletedSeconds: TimeInterval?
     var pipelineReturnedSeconds: TimeInterval?
     var idleSeconds: TimeInterval?
+    var sessionFinishedSeconds: TimeInterval?
     var savedSeconds: TimeInterval?
 
     var displaySummary: String {
@@ -275,6 +277,7 @@ struct RollingBufferQuickReleaseClaimSnapshot: Equatable {
             Self.timingPart("paste-complete", pasteCompletedSeconds),
             Self.timingPart("returned", pipelineReturnedSeconds),
             Self.timingPart("idle", idleSeconds),
+            Self.timingPart("session-finished", sessionFinishedSeconds),
             Self.timingPart("saved", savedSeconds)
         ].compactMap { $0 }
         let timingSummary = timingParts.isEmpty ? "" : " | \(timingParts.joined(separator: ", "))"
@@ -294,6 +297,8 @@ struct RollingBufferQuickReleaseClaimSnapshot: Equatable {
             pipelineReturnedSeconds = elapsedSeconds
         case .idle:
             idleSeconds = elapsedSeconds
+        case .sessionFinished:
+            sessionFinishedSeconds = elapsedSeconds
         case .saved:
             savedSeconds = elapsedSeconds
         }
@@ -324,6 +329,7 @@ final class RollingBufferPreloadRuntimeDiagnostics {
         pasteCompletedSeconds: nil,
         pipelineReturnedSeconds: nil,
         idleSeconds: nil,
+        sessionFinishedSeconds: nil,
         savedSeconds: nil
     )
 
@@ -347,6 +353,7 @@ final class RollingBufferPreloadRuntimeDiagnostics {
             pasteCompletedSeconds: nil,
             pipelineReturnedSeconds: nil,
             idleSeconds: nil,
+            sessionFinishedSeconds: nil,
             savedSeconds: nil
         )
     }

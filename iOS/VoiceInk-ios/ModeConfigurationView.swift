@@ -122,24 +122,16 @@ struct ModeConfigurationView: View {
             }
         }
         .onChange(of: mode.transcriptionProvider) { _, _ in
-            if let fixedModel = mode.transcriptionProvider.fixedModel(for: .transcription) {
-                mode.transcriptionModel = fixedModel
-            } else {
-                let availableModels = mode.transcriptionProvider.models(for: .transcription)
-                if !availableModels.contains(mode.transcriptionModel) {
-                    mode.transcriptionModel = mode.transcriptionProvider.defaultModel(for: .transcription) ?? ""
-                }
-            }
+            mode.transcriptionModel = mode.transcriptionProvider.selectedModel(
+                mode.transcriptionModel,
+                for: .transcription
+            )
         }
         .onChange(of: mode.postProcessingProvider) { _, _ in
-            if let fixedModel = mode.postProcessingProvider.fixedModel(for: .postProcessing) {
-                mode.postProcessingModel = fixedModel
-            } else {
-                let availableModels = mode.postProcessingProvider.models(for: .postProcessing)
-                if !availableModels.contains(mode.postProcessingModel) {
-                    mode.postProcessingModel = mode.postProcessingProvider.defaultModel(for: .postProcessing) ?? ""
-                }
-            }
+            mode.postProcessingModel = mode.postProcessingProvider.selectedModel(
+                mode.postProcessingModel,
+                for: .postProcessing
+            )
         }
     }
 }

@@ -252,6 +252,19 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
         fixedModel(for: use) ?? models(for: use).first
     }
 
+    public func selectedModel(_ currentModel: String, for use: VoiceInkProviderModelUse) -> String {
+        if let fixedModel = fixedModel(for: use) {
+            return fixedModel
+        }
+
+        let availableModels = models(for: use)
+        if availableModels.contains(currentModel) {
+            return currentModel
+        }
+
+        return defaultModel(for: use) ?? ""
+    }
+
     public func models(for use: VoiceInkProviderModelUse) -> [String] {
         switch use {
         case .transcription:

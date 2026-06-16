@@ -431,6 +431,13 @@ class VoiceInkEngine: NSObject, ObservableObject {
             modelName: model.name,
             language: claimedPreload.language
         )
+        let fileName = "\(UUID().uuidString).wav"
+        let permanentURL = recordingsDirectory.appendingPathComponent(fileName)
+        let audioData = claimedPreload.audioData
+        let audioFileReadyTask = Task.detached(priority: .utility) {
+            try PCM16WAVFileWriter.writeMono16k(audioData, to: permanentURL)
+        }
+        logger.notice("Latency trace deferred audio write scheduled operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s bytes=\(audioData.count, privacy: .public)")
 
         let preparedContext = takePreparedQuickReleaseContext(powerModeId: powerModeId)
         await applyPowerModeConfiguration(powerModeId: powerModeId, preparedContext: preparedContext)
@@ -440,6 +447,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
               claim.matches(model: currentModel, language: UserDefaults.standard.string(forKey: "SelectedLanguage")) else {
             claimedPreload.session.cancel()
             rollingBufferPreloadCoordinator.recordingSessionDidFinish()
+            discardDeferredAudioFile(audioFileReadyTask, at: permanentURL)
             RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
                 strategy: .invalidated,
                 reason: "model-or-language-changed",
@@ -450,18 +458,12 @@ class VoiceInkEngine: NSObject, ObservableObject {
         }
 
         do {
-            let fileName = "\(UUID().uuidString).wav"
-            let permanentURL = recordingsDirectory.appendingPathComponent(fileName)
-            let audioData = claimedPreload.audioData
-            let audioFileReadyTask = Task.detached(priority: .utility) {
-                try PCM16WAVFileWriter.writeMono16k(audioData, to: permanentURL)
-            }
             if let streamingSession = claimedPreload.session as? StreamingTranscriptionSession {
                 streamingSession.setFallbackAudioReadyTask(audioFileReadyTask)
             } else {
                 try await audioFileReadyTask.value
             }
-            logger.notice("Latency trace deferred audio write started operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s bytes=\(audioData.count, privacy: .public)")
+            logger.notice("Latency trace deferred audio write attached operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s bytes=\(audioData.count, privacy: .public)")
             RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
                 strategy: .readyPreload,
                 audioBytes: audioData.count,
@@ -496,6 +498,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
         } catch {
             claimedPreload.session.cancel()
             rollingBufferPreloadCoordinator.recordingSessionDidFinish()
+            discardDeferredAudioFile(audioFileReadyTask, at: permanentURL)
             RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
                 strategy: .failed,
                 reason: "ready-preload-error",
@@ -514,6 +517,13 @@ class VoiceInkEngine: NSObject, ObservableObject {
         latencyTrace: TranscriptionLatencyTrace
     ) async -> Bool {
         logger.notice("Latency trace buffered audio claimed operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s bytes=\(audioSnapshot.audioData.count, privacy: .public)")
+        let fileName = "\(UUID().uuidString).wav"
+        let permanentURL = recordingsDirectory.appendingPathComponent(fileName)
+        let audioData = audioSnapshot.audioData
+        let audioFileReadyTask = Task.detached(priority: .utility) {
+            try PCM16WAVFileWriter.writeMono16k(audioData, to: permanentURL)
+        }
+        logger.notice("Latency trace buffered audio file write scheduled operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s bytes=\(audioData.count, privacy: .public)")
 
         let preparedContext = takePreparedQuickReleaseContext(powerModeId: powerModeId)
         await applyPowerModeConfiguration(powerModeId: powerModeId, preparedContext: preparedContext)
@@ -523,6 +533,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
               currentModel.name == model.name,
               audioSnapshot.language == UserDefaults.standard.string(forKey: "SelectedLanguage") else {
             rollingBufferPreloadCoordinator.recordingSessionDidFinish()
+            discardDeferredAudioFile(audioFileReadyTask, at: permanentURL)
             RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
                 strategy: .invalidated,
                 reason: "model-or-language-changed",
@@ -533,12 +544,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
         }
 
         do {
-            let fileName = "\(UUID().uuidString).wav"
-            let permanentURL = recordingsDirectory.appendingPathComponent(fileName)
-            let audioData = audioSnapshot.audioData
-            try await Task.detached(priority: .utility) {
-                try PCM16WAVFileWriter.writeMono16k(audioData, to: permanentURL)
-            }.value
+            try await audioFileReadyTask.value
             logger.notice("Latency trace buffered audio file ready operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s bytes=\(audioData.count, privacy: .public)")
             RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
                 strategy: .bufferedAudioSnapshot,
@@ -572,6 +578,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
             return true
         } catch {
             rollingBufferPreloadCoordinator.recordingSessionDidFinish()
+            discardDeferredAudioFile(audioFileReadyTask, at: permanentURL)
             RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
                 strategy: .failed,
                 reason: "buffered-audio-error",
@@ -580,6 +587,14 @@ class VoiceInkEngine: NSObject, ObservableObject {
             )
             logger.error("commitBufferedRollingAudioSnapshot failed: \(error.localizedDescription, privacy: .public)")
             return false
+        }
+    }
+
+    private func discardDeferredAudioFile(_ audioFileReadyTask: Task<Void, Error>, at url: URL) {
+        audioFileReadyTask.cancel()
+        Task.detached(priority: .utility) {
+            _ = try? await audioFileReadyTask.value
+            try? FileManager.default.removeItem(at: url)
         }
     }
 

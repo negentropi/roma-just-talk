@@ -36,6 +36,7 @@
 - Cached prompt trigger-word eligibility and skipped prompt detection in the common no-trigger case, reducing transcript-ready-to-paste work.
 - Pre-read cursor text context on preload-only Special shortcut key-down so contextual capitalization can avoid an Accessibility read immediately before quick-release paste.
 - Pre-read clipboard restore context on preload-only Special shortcut key-down so restore-enabled quick releases avoid copying pasteboard data immediately before paste.
+- Started quick-release rolling-buffer WAV writes immediately after claiming buffered audio so file I/O overlaps Power Mode resolution instead of running wholly after key-up validation.
 - Skipped browser URL lookup during automatic Power Mode selection when no enabled URL rules exist, removing an avoidable pre-pipeline quick-release delay.
 - Reduced the shortcut duplicate-press guard from 500ms to 80ms so valid back-to-back dictations are not ignored after the app is ready again.
 - Skipped fallback streaming setup on immediate startup-stop recordings when the selected model can transcribe the saved WAV directly.

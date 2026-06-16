@@ -1075,10 +1075,11 @@ final class CoreAudioRecorder: @unchecked Sendable {
         fileAccessLock.lock()
         let queuedLiveChunks = preRollStreamingGate.finish()
         let audioChunkHandler = onAudioChunk
+        fileAccessLock.unlock()
+
         for chunk in queuedLiveChunks {
             audioChunkHandler?(chunk)
         }
-        fileAccessLock.unlock()
     }
 
     // MARK: - Device Info Logging

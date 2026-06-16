@@ -17,6 +17,7 @@
 - Tightened cached rolling-preload finalization so quick releases avoid pasting stale partial hypotheses when the local ASR pass is behind the live buffer.
 - Let preload-only Special shortcut quick releases commit the rolling buffer instead of being canceled as short no-evidence presses.
 - Preserved pre-roll-first streaming order without holding the recorder file lock through the whole pre-roll emission.
+- Released the recorder file lock before forwarding queued live chunks after pre-roll streaming emission, reducing audio-thread blocking risk during startup handoff.
 - Removed a fixed post-STT wait before trigger-word AI enhancement starts.
 - Removed fixed sleeps between simulated paste key events so completed text reaches the target app sooner.
 - Kept warmed local STT resources after successful transcription so the next recording and rolling-buffer preload avoid an immediate teardown/reload cycle.

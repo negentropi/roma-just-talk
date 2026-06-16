@@ -135,6 +135,21 @@ enum AIProvider: String, CaseIterable {
             return []
         }
     }
+
+    var coreAIModelProvider: VoiceInkAIModelProvider? {
+        switch self {
+        case .cerebras:
+            return .cerebras
+        case .groq:
+            return .groq
+        case .gemini:
+            return .gemini
+        case .openAI:
+            return .openAI
+        default:
+            return nil
+        }
+    }
     
     var requiresAPIKey: Bool {
         switch self {

@@ -57,6 +57,7 @@
 - Made the pre-run finalization opt-out also skip rolling-buffer STT pre-run work instead of warming an unusable session.
 - Preserved the exact latest rolling-buffer preload audio when incoming chunks exceed or cross the configured duration boundary.
 - Canceled warm rolling-preload sessions when the selected transcription language changes before the shortcut claims them.
+- Woke quick-release claims as soon as rolling-preload startup resolves instead of polling until the next 10ms tick.
 
 ## v1.93 - 2026-06-15
 

@@ -1,20 +1,6 @@
 import Foundation
 import VoiceInkCore
 
-enum ModelType {
-    case transcription
-    case postProcessing
-
-    var coreModelUse: VoiceInkProviderModelUse {
-        switch self {
-        case .transcription:
-            return .transcription
-        case .postProcessing:
-            return .postProcessing
-        }
-    }
-}
-
 enum Provider: String, CaseIterable, Codable, Identifiable {
     case groq = "Groq"
     case openai = "OpenAI"
@@ -61,15 +47,15 @@ enum Provider: String, CaseIterable, Codable, Identifiable {
         coreKind.apiKeyVerificationTransport
     }
 
-    func fixedModel(for type: ModelType) -> String? {
-        coreKind.fixedModel(for: type.coreModelUse)
+    func fixedModel(for use: VoiceInkProviderModelUse) -> String? {
+        coreKind.fixedModel(for: use)
     }
 
-    func supportsModelUse(_ type: ModelType) -> Bool {
-        coreKind.supportsModelUse(type.coreModelUse)
+    func supportsModelUse(_ use: VoiceInkProviderModelUse) -> Bool {
+        coreKind.supportsModelUse(use)
     }
 
-    func models(for type: ModelType) -> [String] {
-        coreKind.models(for: type.coreModelUse)
+    func models(for use: VoiceInkProviderModelUse) -> [String] {
+        coreKind.models(for: use)
     }
 }

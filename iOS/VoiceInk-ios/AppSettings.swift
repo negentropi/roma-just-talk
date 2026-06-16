@@ -26,49 +26,8 @@ final class AppSettings: ObservableObject {
         return modes.first { $0.id == selectedModeId }
     }
 
-
-
-    // Separate API keys per provider
-    @Published var groqAPIKey: String {
-        didSet { saveAPIKey(groqAPIKey, for: .groq) }
-    }
-
-    @Published var openAIAPIKey: String {
-        didSet { saveAPIKey(openAIAPIKey, for: .openAI) }
-    }
-
-    @Published var deepgramAPIKey: String {
-        didSet { saveAPIKey(deepgramAPIKey, for: .deepgram) }
-    }
-
-    @Published var cerebrasAPIKey: String {
-        didSet { saveAPIKey(cerebrasAPIKey, for: .cerebras) }
-    }
-
-    @Published var geminiAPIKey: String {
-        didSet { saveAPIKey(geminiAPIKey, for: .gemini) }
-    }
-    
-    // Track verification status per provider
-    @Published var groqKeyVerified: Bool {
-        didSet { saveKeyVerified(groqKeyVerified, for: .groq) }
-    }
-    
-    @Published var openAIKeyVerified: Bool {
-        didSet { saveKeyVerified(openAIKeyVerified, for: .openAI) }
-    }
-
-    @Published var deepgramKeyVerified: Bool {
-        didSet { saveKeyVerified(deepgramKeyVerified, for: .deepgram) }
-    }
-
-    @Published var cerebrasKeyVerified: Bool {
-        didSet { saveKeyVerified(cerebrasKeyVerified, for: .cerebras) }
-    }
-
-    @Published var geminiKeyVerified: Bool {
-        didSet { saveKeyVerified(geminiKeyVerified, for: .gemini) }
-    }
+    @Published private var apiKeysByProvider: [VoiceInkProviderKind: String]
+    @Published private var verifiedAPIKeyProviders: Set<VoiceInkProviderKind>
     
     // Audio session timeout configuration
     @Published var audioSessionTimeoutSeconds: Int {
@@ -89,16 +48,14 @@ final class AppSettings: ObservableObject {
         }
         
 
-        self.groqAPIKey = AppSettings.loadAPIKey(for: .groq)
-        self.openAIAPIKey = AppSettings.loadAPIKey(for: .openAI)
-        self.deepgramAPIKey = AppSettings.loadAPIKey(for: .deepgram)
-        self.cerebrasAPIKey = AppSettings.loadAPIKey(for: .cerebras)
-        self.geminiAPIKey = AppSettings.loadAPIKey(for: .gemini)
-        self.groqKeyVerified = Self.loadKeyVerified(for: .groq)
-        self.openAIKeyVerified = Self.loadKeyVerified(for: .openAI)
-        self.deepgramKeyVerified = Self.loadKeyVerified(for: .deepgram)
-        self.cerebrasKeyVerified = Self.loadKeyVerified(for: .cerebras)
-        self.geminiKeyVerified = Self.loadKeyVerified(for: .gemini)
+        self.apiKeysByProvider = Dictionary(
+            uniqueKeysWithValues: Self.userAPIKeyProviders.map { provider in
+                (provider, Self.loadAPIKey(for: provider))
+            }
+        )
+        self.verifiedAPIKeyProviders = Set(
+            Self.userAPIKeyProviders.filter { Self.loadKeyVerified(for: $0) }
+        )
         
         // Load audio session timeout (default: 90 seconds)
         self.audioSessionTimeoutSeconds = UserDefaults.standard.object(forKey: "audioSessionTimeoutSeconds") as? Int ?? 90
@@ -106,68 +63,48 @@ final class AppSettings: ObservableObject {
     }
 
     func apiKey(for provider: VoiceInkProviderKind) -> String {
-        switch provider { 
-        case .groq: return groqAPIKey
-        case .openAI: return openAIAPIKey
-        case .deepgram: return deepgramAPIKey
-        case .cerebras: return cerebrasAPIKey
-        case .gemini: return geminiAPIKey
+        switch provider {
+        case .groq, .openAI, .deepgram, .cerebras, .gemini:
+            return apiKeysByProvider[provider] ?? ""
         case .localWhisper: return "local" // Local transcription doesn't need an API key
         case .voiceInk: return "" // TODO: Replace with actual VoiceInk API key
         }
     }
 
     func setAPIKey(_ key: String, for provider: VoiceInkProviderKind) {
-        switch provider { 
-        case .groq: 
-            groqAPIKey = key
-            // Reset verification status when key changes
-            if groqAPIKey != key { groqKeyVerified = false }
-        case .openAI:
-            openAIAPIKey = key
-            // Reset verification status when key changes
-            if openAIAPIKey != key { openAIKeyVerified = false }
-        case .deepgram:
-            deepgramAPIKey = key
-            // Reset verification status when key changes
-            if deepgramAPIKey != key { deepgramKeyVerified = false }
-        case .cerebras:
-            cerebrasAPIKey = key
-            // Reset verification status when key changes
-            if cerebrasAPIKey != key { cerebrasKeyVerified = false }
-        case .gemini:
-            geminiAPIKey = key
-            // Reset verification status when key changes
-            if geminiAPIKey != key { geminiKeyVerified = false }
-        case .localWhisper:
-            break // Local provider doesn't use API keys
-        case .voiceInk:
-            break // VoiceInk uses hardcoded API key
+        guard provider.requiresUserAPIKey else {
+            return
+        }
+
+        let oldKey = apiKeysByProvider[provider] ?? ""
+        apiKeysByProvider[provider] = key
+        saveAPIKey(key, for: provider)
+
+        if oldKey != key {
+            setKeyVerified(false, for: provider)
         }
     }
     
     func isKeyVerified(for provider: VoiceInkProviderKind) -> Bool {
         switch provider {
-        case .groq: return groqKeyVerified && !groqAPIKey.isEmpty
-        case .openAI: return openAIKeyVerified && !openAIAPIKey.isEmpty
-        case .deepgram: return deepgramKeyVerified && !deepgramAPIKey.isEmpty
-        case .cerebras: return cerebrasKeyVerified && !cerebrasAPIKey.isEmpty
-        case .gemini: return geminiKeyVerified && !geminiAPIKey.isEmpty
+        case .groq, .openAI, .deepgram, .cerebras, .gemini:
+            return verifiedAPIKeyProviders.contains(provider) && !apiKey(for: provider).isEmpty
         case .localWhisper: return LocalModelManager.shared.hasAvailableModel
         case .voiceInk: return true // VoiceInk uses hardcoded API key, always verified
         }
     }
     
     func setKeyVerified(_ verified: Bool, for provider: VoiceInkProviderKind) {
-        switch provider {
-        case .groq: groqKeyVerified = verified
-        case .openAI: openAIKeyVerified = verified
-        case .deepgram: deepgramKeyVerified = verified
-        case .cerebras: cerebrasKeyVerified = verified
-        case .gemini: geminiKeyVerified = verified
-        case .localWhisper: break // Local model status is handled by LocalModelManager
-        case .voiceInk: break // VoiceInk uses hardcoded API key, no verification needed
+        guard provider.requiresUserAPIKey else {
+            return
         }
+
+        if verified {
+            verifiedAPIKeyProviders.insert(provider)
+        } else {
+            verifiedAPIKeyProviders.remove(provider)
+        }
+        saveKeyVerified(verified, for: provider)
     }
 
 
@@ -254,6 +191,10 @@ final class AppSettings: ObservableObject {
             return false // Default fallback
         }
     }
+
+    private static var userAPIKeyProviders: [VoiceInkProviderKind] {
+        VoiceInkProviderKind.allCases.filter(\.requiresUserAPIKey)
+    }
     
     private func saveAPIKey(_ key: String, forKey account: String) {
         guard let data = key.data(using: .utf8) else { return }
@@ -311,31 +252,15 @@ final class AppSettings: ObservableObject {
         UserDefaults.standard.removeObject(forKey: "hasCompletedOnboarding")
 
         // Clear verification flags
-        groqKeyVerified = false
-        openAIKeyVerified = false
-        deepgramKeyVerified = false
-        cerebrasKeyVerified = false
-        geminiKeyVerified = false
-        Self.clearKeyVerified(for: .groq)
-        Self.clearKeyVerified(for: .openAI)
-        Self.clearKeyVerified(for: .deepgram)
-        Self.clearKeyVerified(for: .cerebras)
-        Self.clearKeyVerified(for: .gemini)
+        verifiedAPIKeyProviders = []
+        Self.userAPIKeyProviders.forEach(Self.clearKeyVerified)
         
         // Reset audio session timeout to default
         audioSessionTimeoutSeconds = 90
         UserDefaults.standard.removeObject(forKey: "audioSessionTimeoutSeconds")
 
         // Clear API keys from memory and Keychain
-        groqAPIKey = ""
-        openAIAPIKey = ""
-        deepgramAPIKey = ""
-        cerebrasAPIKey = ""
-        geminiAPIKey = ""
-        Self.deleteAPIKey(for: .groq)
-        Self.deleteAPIKey(for: .openAI)
-        Self.deleteAPIKey(for: .deepgram)
-        Self.deleteAPIKey(for: .cerebras)
-        Self.deleteAPIKey(for: .gemini)
+        apiKeysByProvider = [:]
+        Self.userAPIKeyProviders.forEach(Self.deleteAPIKey)
     }
 }

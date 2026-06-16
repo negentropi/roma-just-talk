@@ -18,4 +18,9 @@ struct TranscriptionModelCapabilityTests {
         #expect(CapabilityTestModel(name: "cloud-batch", displayName: "Cloud Batch", provider: .deepgram).supportsRecordedFileTranscription)
         #expect(!CapabilityTestModel(name: "streaming-only", displayName: "Streaming Only", provider: .cartesia).supportsRecordedFileTranscription)
     }
+
+    @Test func localFluidAudioUsesShortFinalCommitTimeout() {
+        #expect(StreamingFinalCommitTimeout.nanoseconds(for: .fluidAudio) == 1_000_000_000)
+        #expect(StreamingFinalCommitTimeout.nanoseconds(for: .deepgram) == 10_000_000_000)
+    }
 }

@@ -88,6 +88,7 @@ class StreamingTranscriptionService {
     private let modelContext: ModelContext
     private let fluidAudioService: FluidAudioTranscriptionService?
     private let fluidAudioStreamingConfig: AgreementConfig?
+    private let finalCommitTimeoutNanoseconds: UInt64
     private var onPartialTranscript: ((String) -> Void)?
     private let metrics = StreamingMetrics()
     private var stopStartedAt: Date?
@@ -98,11 +99,13 @@ class StreamingTranscriptionService {
         modelContext: ModelContext,
         fluidAudioService: FluidAudioTranscriptionService? = nil,
         fluidAudioStreamingConfig: AgreementConfig? = nil,
+        finalCommitTimeoutNanoseconds: UInt64 = StreamingFinalCommitTimeout.cloudNanoseconds,
         onPartialTranscript: ((String) -> Void)? = nil
     ) {
         self.modelContext = modelContext
         self.fluidAudioService = fluidAudioService
         self.fluidAudioStreamingConfig = fluidAudioStreamingConfig
+        self.finalCommitTimeoutNanoseconds = finalCommitTimeoutNanoseconds
         self.onPartialTranscript = onPartialTranscript
     }
 
@@ -334,7 +337,7 @@ class StreamingTranscriptionService {
         }
     }
 
-    /// Waits for the server to acknowledge our explicit commit, with a 10-second timeout.
+    /// Waits for the provider to acknowledge our explicit commit.
     private func waitForFinalCommit(signalStream: AsyncStream<Void>) async -> String {
         // Race: wait for commit acknowledgment vs timeout
         let receivedInTime = await withTaskGroup(of: Bool.self) { group in
@@ -346,7 +349,7 @@ class StreamingTranscriptionService {
             }
 
             group.addTask {
-                try? await Task.sleep(nanoseconds: 10_000_000_000) // 10 seconds
+                try? await Task.sleep(nanoseconds: self.finalCommitTimeoutNanoseconds)
                 return false
             }
 

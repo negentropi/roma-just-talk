@@ -32,6 +32,15 @@ enum StreamingTranscriptionError: LocalizedError {
     }
 }
 
+enum StreamingFinalCommitTimeout {
+    static let cloudNanoseconds: UInt64 = 10_000_000_000
+    static let localFluidAudioNanoseconds: UInt64 = 1_000_000_000
+
+    static func nanoseconds(for provider: ModelProvider) -> UInt64 {
+        provider == .fluidAudio ? localFluidAudioNanoseconds : cloudNanoseconds
+    }
+}
+
 /// Protocol for streaming transcription providers.
 protocol StreamingTranscriptionProvider: AnyObject {
     /// Connect to the streaming transcription endpoint

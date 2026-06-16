@@ -11,6 +11,11 @@ public enum VoiceInkTranscriptionTransport: Sendable {
     case localWhisper
 }
 
+public enum VoiceInkAPIKeyVerificationTransport: Sendable {
+    case openAICompatibleModels
+    case deepgramProjects
+}
+
 public enum VoiceInkProviderKind: String, CaseIterable, Sendable {
     case groq
     case openAI
@@ -66,6 +71,38 @@ public enum VoiceInkProviderKind: String, CaseIterable, Sendable {
             return .localWhisper
         case .groq, .openAI, .cerebras, .gemini, .voiceInk:
             return .openAICompatible
+        }
+    }
+
+    public var apiKeyAccount: String? {
+        switch self {
+        case .groq:
+            return VoiceInkProviderAPIKeyAccount.groq
+        case .openAI:
+            return VoiceInkProviderAPIKeyAccount.openAI
+        case .deepgram:
+            return VoiceInkProviderAPIKeyAccount.deepgram
+        case .cerebras:
+            return VoiceInkProviderAPIKeyAccount.cerebras
+        case .gemini:
+            return VoiceInkProviderAPIKeyAccount.gemini
+        case .localWhisper, .voiceInk:
+            return nil
+        }
+    }
+
+    public var requiresUserAPIKey: Bool {
+        apiKeyAccount != nil
+    }
+
+    public var apiKeyVerificationTransport: VoiceInkAPIKeyVerificationTransport? {
+        switch self {
+        case .deepgram:
+            return .deepgramProjects
+        case .groq, .openAI, .cerebras, .gemini:
+            return .openAICompatibleModels
+        case .localWhisper, .voiceInk:
+            return nil
         }
     }
 

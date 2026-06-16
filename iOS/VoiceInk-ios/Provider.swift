@@ -53,6 +53,14 @@ enum Provider: String, CaseIterable, Codable, Identifiable {
         coreKind.consoleURL
     }
 
+    var requiresUserAPIKey: Bool {
+        coreKind.requiresUserAPIKey
+    }
+
+    var apiKeyVerificationTransport: VoiceInkAPIKeyVerificationTransport? {
+        coreKind.apiKeyVerificationTransport
+    }
+
     func models(for type: ModelType) -> [String] {
         coreKind.models(for: type.coreModelUse)
     }

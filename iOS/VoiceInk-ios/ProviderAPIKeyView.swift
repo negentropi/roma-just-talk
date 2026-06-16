@@ -1,4 +1,5 @@
 import SwiftUI
+import VoiceInkCore
 
 struct ProviderAPIKeyView: View {
     let provider: Provider
@@ -8,7 +9,6 @@ struct ProviderAPIKeyView: View {
     @State private var verifyResult: Bool? = nil
     @State private var editingKey: Bool = true
 
-    private let groqService = GroqTranscriptionService()
     private let deepgramService = DeepgramTranscriptionService()
     private let openAIClient = OpenAICompatibleClient()
     
@@ -100,13 +100,13 @@ struct ProviderAPIKeyView: View {
             let keyToVerify = entered.isEmpty ? currentAPIKey() : entered
             
             let ok: Bool
-            switch provider {
-            case .deepgram:
+            switch provider.apiKeyVerificationTransport {
+            case .deepgramProjects:
                 ok = await deepgramService.verifyAPIKey(apiBaseURL: provider.baseURL, keyToVerify)
-            case .gemini, .openai, .cerebras:
+            case .openAICompatibleModels:
                 ok = await openAIClient.verifyAPIKey(baseURL: provider.baseURL, apiKey: keyToVerify)
-            default:
-                ok = await groqService.verifyAPIKey(apiBaseURL: provider.baseURL, keyToVerify)
+            case nil:
+                ok = false
             }
             
             verifyResult = ok

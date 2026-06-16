@@ -32,7 +32,7 @@ class DefaultModeManager {
             isPostProcessingEnabled: false, // No post-processing
             postProcessingProvider: .groq, // Doesn't matter since disabled
             postProcessingModel: VoiceInkAIModelCatalog.firstAvailableModel(for: .groq), // Doesn't matter since disabled
-            promptTemplate: PromptTemplate(type: .summary) // Default to summary template
+            promptTemplate: VoiceInkPostProcessingPromptTemplate(type: .summary) // Default to summary template
         )
     }
     

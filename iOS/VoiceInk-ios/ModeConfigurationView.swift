@@ -113,7 +113,7 @@ struct ModeConfigurationView: View {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Save") {
                     // Update the mode's prompt template before saving
-                    mode.promptTemplate = PromptTemplate(type: selectedTemplateType, customPrompt: customPromptText)
+                    mode.promptTemplate = VoiceInkPostProcessingPromptTemplate(type: selectedTemplateType, customPrompt: customPromptText)
                     onSave(mode)
                     dismiss()
                 }

@@ -13,7 +13,7 @@ struct Mode: Identifiable, Codable {
     var isPostProcessingEnabled: Bool
     var postProcessingProvider: Provider
     var postProcessingModel: String
-    var promptTemplate: PromptTemplate
+    var promptTemplate: VoiceInkPostProcessingPromptTemplate
     
     init(name: String, 
          transcriptionProvider: Provider = .groq,
@@ -21,7 +21,7 @@ struct Mode: Identifiable, Codable {
          isPostProcessingEnabled: Bool = false,
          postProcessingProvider: Provider = .groq,
          postProcessingModel: String? = nil,
-         promptTemplate: PromptTemplate? = nil) {
+         promptTemplate: VoiceInkPostProcessingPromptTemplate? = nil) {
         self.id = UUID()
         self.name = name
         self.transcriptionProvider = transcriptionProvider
@@ -35,7 +35,7 @@ struct Mode: Identifiable, Codable {
             ?? postProcessingProvider.fixedModel(for: .postProcessing)
             ?? postProcessingProvider.models(for: .postProcessing).first
             ?? VoiceInkAIModelCatalog.firstAvailableModel(for: .groq)
-        self.promptTemplate = promptTemplate ?? PromptTemplate(type: .summary)
+        self.promptTemplate = promptTemplate ?? VoiceInkPostProcessingPromptTemplate(type: .summary)
     }
     
     /// Legacy support for custom prompts - creates a custom template
@@ -46,7 +46,7 @@ struct Mode: Identifiable, Codable {
         }
         set {
             if !newValue.isEmpty {
-                promptTemplate = PromptTemplate(type: .custom, customPrompt: newValue)
+                promptTemplate = VoiceInkPostProcessingPromptTemplate(type: .custom, customPrompt: newValue)
             }
         }
     }

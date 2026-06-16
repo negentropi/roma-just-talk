@@ -115,4 +115,13 @@ public extension Collection where Element == Mode {
     func runtimeConfiguration(selectedModeId: UUID?) -> VoiceInkModeRuntimeConfiguration {
         activeMode(selectedModeId: selectedModeId)?.runtimeConfiguration ?? .fallback
     }
+
+    func repairedSelectedModeId(_ selectedModeId: UUID?) -> UUID? {
+        guard let selectedModeId,
+              contains(where: { $0.id == selectedModeId }) else {
+            return first?.id
+        }
+
+        return selectedModeId
+    }
 }

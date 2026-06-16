@@ -106,10 +106,7 @@ final class RecordingManager: ObservableObject {
         // Update coordinator state
         coordinator.updateRecordingState(true)
         
-        // Auto-select first mode if none is selected
-        if settings.selectedModeId == nil && !settings.modes.isEmpty {
-            settings.selectedModeId = settings.modes.first?.id
-        }
+        settings.selectedModeId = settings.modes.repairedSelectedModeId(settings.selectedModeId)
         
         do {
             try recorder.startRecording()

@@ -48,5 +48,34 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
 
         XCTAssertEqual(configuration, firstMode.runtimeConfiguration)
     }
+
+    func testRepairedSelectedModeIdPreservesExistingSelection() {
+        let firstMode = Mode.defaultLocalWhisper(name: "Local")
+        let secondMode = Mode(name: "Cloud")
+
+        XCTAssertEqual(
+            [firstMode, secondMode].repairedSelectedModeId(secondMode.id),
+            secondMode.id
+        )
+    }
+
+    func testRepairedSelectedModeIdFallsBackToFirstModeForMissingSelection() {
+        let firstMode = Mode.defaultLocalWhisper(name: "Local")
+        let secondMode = Mode(name: "Cloud")
+
+        XCTAssertEqual(
+            [firstMode, secondMode].repairedSelectedModeId(UUID()),
+            firstMode.id
+        )
+        XCTAssertEqual(
+            [firstMode, secondMode].repairedSelectedModeId(nil),
+            firstMode.id
+        )
+    }
+
+    func testRepairedSelectedModeIdReturnsNilForEmptyModes() {
+        XCTAssertNil([Mode]().repairedSelectedModeId(UUID()))
+        XCTAssertNil([Mode]().repairedSelectedModeId(nil))
+    }
 }
 #endif

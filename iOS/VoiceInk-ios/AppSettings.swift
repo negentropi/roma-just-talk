@@ -203,11 +203,11 @@ final class AppSettings: ObservableObject {
     /// Get the effective transcription model (from selected mode or first mode)
     var effectiveTranscriptionModel: String {
         if let selectedMode = selectedMode {
-            return selectedMode.transcriptionProvider == .voiceink ? voiceInkTranscriptionModel() : selectedMode.transcriptionModel
+            return selectedMode.transcriptionProvider == .voiceink ? VoiceInkTranscriptionModelCatalog.voiceInkTranscriptionModel : selectedMode.transcriptionModel
         } else if let firstMode = modes.first {
-            return firstMode.transcriptionProvider == .voiceink ? voiceInkTranscriptionModel() : firstMode.transcriptionModel
+            return firstMode.transcriptionProvider == .voiceink ? VoiceInkTranscriptionModelCatalog.voiceInkTranscriptionModel : firstMode.transcriptionModel
         } else {
-            return effectiveTranscriptionProvider == .voiceink ? voiceInkTranscriptionModel() : VoiceInkTranscriptionModelCatalog.voiceInkTranscriptionModel // Default fallback
+            return VoiceInkTranscriptionModelCatalog.voiceInkTranscriptionModel
         }
     }
     
@@ -225,11 +225,11 @@ final class AppSettings: ObservableObject {
     /// Get the effective post-processing model (from selected mode or first mode)
     var effectivePostProcessingModel: String {
         if let selectedMode = selectedMode {
-            return selectedMode.postProcessingProvider == .voiceink ? voiceInkPostProcessingModel() : selectedMode.postProcessingModel
+            return selectedMode.postProcessingProvider == .voiceink ? VoiceInkAIModelCatalog.voiceInkPostProcessingModel : selectedMode.postProcessingModel
         } else if let firstMode = modes.first {
-            return firstMode.postProcessingProvider == .voiceink ? voiceInkPostProcessingModel() : firstMode.postProcessingModel
+            return firstMode.postProcessingProvider == .voiceink ? VoiceInkAIModelCatalog.voiceInkPostProcessingModel : firstMode.postProcessingModel
         } else {
-            return effectivePostProcessingProvider == .voiceink ? voiceInkPostProcessingModel() : VoiceInkAIModelCatalog.firstAvailableModel(for: .groq) // Default fallback
+            return effectivePostProcessingProvider == .voiceink ? VoiceInkAIModelCatalog.voiceInkPostProcessingModel : VoiceInkAIModelCatalog.firstAvailableModel(for: .groq) // Default fallback
         }
     }
     
@@ -255,18 +255,6 @@ final class AppSettings: ObservableObject {
         }
     }
     
-    // MARK: - VoiceInk Hardcoded Models
-    
-    /// Get the hardcoded transcription model for VoiceInk
-    func voiceInkTranscriptionModel() -> String {
-        return VoiceInkTranscriptionModelCatalog.voiceInkTranscriptionModel
-    }
-    
-    /// Get the hardcoded post-processing model for VoiceInk
-    func voiceInkPostProcessingModel() -> String {
-        return VoiceInkAIModelCatalog.voiceInkPostProcessingModel
-    }
-
     private func saveAPIKey(_ key: String, forKey account: String) {
         guard let data = key.data(using: .utf8) else { return }
         let status = KeychainService.save(key: account, data: data)

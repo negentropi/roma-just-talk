@@ -70,7 +70,7 @@ struct ModeConfigurationView: View {
                     HStack {
                         Text("Model")
                         Spacer()
-                        Text(settings.voiceInkTranscriptionModel())
+                        Text(VoiceInkTranscriptionModelCatalog.voiceInkTranscriptionModel)
                             .foregroundColor(.secondary)
                     }
                 }
@@ -97,7 +97,7 @@ struct ModeConfigurationView: View {
                         HStack {
                             Text("Model")
                             Spacer()
-                            Text(settings.voiceInkPostProcessingModel())
+                            Text(VoiceInkAIModelCatalog.voiceInkPostProcessingModel)
                                 .foregroundColor(.secondary)
                         }
                     }
@@ -134,7 +134,7 @@ struct ModeConfigurationView: View {
         .onChange(of: mode.transcriptionProvider) { _, _ in
             // Update model when provider changes
             if mode.transcriptionProvider == .voiceink {
-                mode.transcriptionModel = settings.voiceInkTranscriptionModel()
+                mode.transcriptionModel = VoiceInkTranscriptionModelCatalog.voiceInkTranscriptionModel
             } else {
                 let availableModels = mode.transcriptionProvider.models(for: .transcription)
                 if !availableModels.contains(mode.transcriptionModel) {
@@ -145,7 +145,7 @@ struct ModeConfigurationView: View {
         .onChange(of: mode.postProcessingProvider) { _, _ in
             // Update model when provider changes
             if mode.postProcessingProvider == .voiceink {
-                mode.postProcessingModel = settings.voiceInkPostProcessingModel()
+                mode.postProcessingModel = VoiceInkAIModelCatalog.voiceInkPostProcessingModel
             } else {
                 let availableModels = mode.postProcessingProvider.models(for: .postProcessing)
                 if !availableModels.contains(mode.postProcessingModel) {

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import VoiceInkCore
 
 enum WhisperTranscriptionError: Error {
     case noModelAvailable
@@ -60,7 +61,11 @@ struct WhisperTranscriptionService: TranscriptionService {
         // Process audio file (expecting WAV format from recorder)
         let audioSamples: [Float]
         do {
-            audioSamples = try decodeWaveFile(fileURL)
+            let data = try Data(contentsOf: fileURL)
+            guard let samples = VoiceInkPCM16Audio.floatSamples(fromWAVData: data) else {
+                throw NSError(domain: "WhisperTranscriptionService", code: 1, userInfo: [NSLocalizedDescriptionKey: "Invalid WAV file - too small"])
+            }
+            audioSamples = samples
             print("WhisperTranscriptionService: Processed \(audioSamples.count) audio samples")
         } catch {
             print("WhisperTranscriptionService: Audio processing failed: \(error)")

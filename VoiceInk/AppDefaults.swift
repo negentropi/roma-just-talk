@@ -35,7 +35,7 @@ enum AppDefaults {
             VoiceInkUserDefaultsKey.removeFillerWords: true,
             PunctuationCleanupMode.legacyRemovePunctuationKey: false,
             VoiceInkUserDefaultsKey.lowercaseTranscription: false,
-            "SelectedLanguage": "en",
+            VoiceInkUserDefaultsKey.selectedTranscriptionLanguage: "en",
             "AppendTrailingSpace": true,
             "showLiveTextPreview": false,
             RollingBufferPreloadSettings.modeKey: RollingBufferPreloadSettings.defaultMode.rawValue,

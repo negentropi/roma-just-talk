@@ -1,6 +1,7 @@
 import Foundation
 import AppKit
 import AVFoundation
+import VoiceInkCore
 
 class SystemInfoService {
     static let shared = SystemInfoService()
@@ -268,7 +269,7 @@ class SystemInfoService {
     }
 
     private func getCurrentLanguage() -> String {
-        return UserDefaults.standard.string(forKey: "SelectedLanguage") ?? "en"
+        return UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage) ?? "en"
     }
 
 }

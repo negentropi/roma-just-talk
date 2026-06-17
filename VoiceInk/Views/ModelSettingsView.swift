@@ -3,7 +3,7 @@ import VoiceInkCore
 
 struct ModelSettingsView: View {
     @ObservedObject var whisperPrompt: WhisperPrompt
-    @AppStorage("SelectedLanguage") private var selectedLanguage: String = "en"
+    @AppStorage(VoiceInkUserDefaultsKey.selectedTranscriptionLanguage) private var selectedLanguage: String = "en"
     @AppStorage("IsTextFormattingEnabled") private var isTextFormattingEnabled = true
     @AppStorage(PunctuationCleanupMode.userDefaultsKey) private var punctuationCleanupModeRaw = PunctuationCleanupMode.current().rawValue
     @AppStorage(VoiceInkUserDefaultsKey.lowercaseTranscription) private var lowercaseTranscription = false

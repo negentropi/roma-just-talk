@@ -56,7 +56,7 @@ class PowerModeSessionManager {
                 selectedPromptId: enhancementService.selectedPromptId?.uuidString,
                 selectedAIProvider: enhancementService.getAIService()?.selectedProvider.rawValue,
                 selectedAIModel: enhancementService.getAIService()?.currentModel,
-                selectedLanguage: UserDefaults.standard.string(forKey: "SelectedLanguage"),
+                selectedLanguage: UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage),
                 transcriptionModelName: stateProvider.currentTranscriptionModel?.name,
                 isTextFormattingEnabled: UserDefaults.standard.bool(forKey: "IsTextFormattingEnabled"),
                 punctuationCleanupMode: punctuationCleanupMode,
@@ -110,7 +110,7 @@ class PowerModeSessionManager {
             selectedPromptId: enhancementService.selectedPromptId?.uuidString,
             selectedAIProvider: enhancementService.getAIService()?.selectedProvider.rawValue,
             selectedAIModel: enhancementService.getAIService()?.currentModel,
-            selectedLanguage: UserDefaults.standard.string(forKey: "SelectedLanguage"),
+            selectedLanguage: UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage),
             transcriptionModelName: stateProvider.currentTranscriptionModel?.name,
             isTextFormattingEnabled: UserDefaults.standard.bool(forKey: "IsTextFormattingEnabled"),
             punctuationCleanupMode: punctuationCleanupMode,
@@ -209,13 +209,13 @@ class PowerModeSessionManager {
 
     private func applyCompatibleLanguage(_ language: String, preferredModelName: String?) {
         guard let model = model(named: preferredModelName) ?? stateProvider?.currentTranscriptionModel else {
-            UserDefaults.standard.set(language, forKey: "SelectedLanguage")
+            UserDefaults.standard.set(language, forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
             NotificationCenter.default.post(name: .languageDidChange, object: nil)
             return
         }
 
         let compatibleLanguage = TranscriptionLanguageSupport.validLanguageOrFallback(language, for: model)
-        UserDefaults.standard.set(compatibleLanguage, forKey: "SelectedLanguage")
+        UserDefaults.standard.set(compatibleLanguage, forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
         NotificationCenter.default.post(name: .languageDidChange, object: nil)
     }
 

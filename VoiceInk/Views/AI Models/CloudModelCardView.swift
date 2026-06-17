@@ -1,6 +1,7 @@
 import SwiftUI
 import AppKit
 import LLMkit
+import VoiceInkCore
 
 // MARK: - Cloud Model Card View
 struct CloudModelCardView: View {
@@ -9,7 +10,7 @@ struct CloudModelCardView: View {
     var setDefaultAction: () -> Void
 
     @EnvironmentObject private var transcriptionModelManager: TranscriptionModelManager
-    @AppStorage("SelectedLanguage") private var selectedLanguage: String = "en"
+    @AppStorage(VoiceInkUserDefaultsKey.selectedTranscriptionLanguage) private var selectedLanguage: String = "en"
     @State private var isExpanded = false
     @State private var apiKey = ""
     @State private var streamingEnabled: Bool

@@ -208,7 +208,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                             if self.recordingState == .recording,
                                let model = self.transcriptionModelManager.currentTranscriptionModel {
                                 if let claim = claimedPreload,
-                                   claim.matches(model: model, language: UserDefaults.standard.string(forKey: "SelectedLanguage")) {
+                                   claim.matches(model: model, language: UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)) {
                                     self.currentSession = claim.preloaded.session
                                     self.recorder.onAudioChunk = claim.preloaded.audioChunkHandler
                                     startupAudioRelay.clear()
@@ -487,7 +487,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
         logger.notice("Latency trace active window apply scheduled operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
 
         guard let currentModel = transcriptionModelManager.currentTranscriptionModel,
-              claim.matches(model: currentModel, language: UserDefaults.standard.string(forKey: "SelectedLanguage")) else {
+              claim.matches(model: currentModel, language: UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)) else {
             claimedPreload.session.cancel()
             rollingBufferPreloadCoordinator.recordingSessionDidFinish()
             discardDeferredAudioFile(audioFileReadyTask, at: permanentURL)
@@ -575,7 +575,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
 
         guard let currentModel = transcriptionModelManager.currentTranscriptionModel,
               currentModel.name == model.name,
-              audioSnapshot.language == UserDefaults.standard.string(forKey: "SelectedLanguage") else {
+              audioSnapshot.language == UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage) else {
             rollingBufferPreloadCoordinator.recordingSessionDidFinish()
             discardDeferredAudioFile(audioFileReadyTask, at: permanentURL)
             RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(

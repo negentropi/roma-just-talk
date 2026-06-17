@@ -186,32 +186,6 @@ final class AIProviderCatalogTests: XCTestCase {
         )
     }
 
-    func testMacOSAIEnhancementProviderVerificationTransportIsShared() {
-        let expectedTransports: [VoiceInkAIEnhancementProviderKind: VoiceInkAIEnhancementAPIKeyVerificationTransport?] = [
-            .anthropic: .anthropicMessages,
-            .assemblyAI: .assemblyAITranscripts,
-            .cerebras: .openAICompatibleModels,
-            .custom: .openAICompatibleModels,
-            .deepgram: .deepgramProjects,
-            .elevenLabs: .elevenLabsUser,
-            .gemini: .geminiModels,
-            .groq: .openAICompatibleModels,
-            .localCLI: nil,
-            .mistral: .mistralModels,
-            .ollama: nil,
-            .openAI: .openAICompatibleModels,
-            .openRouter: .openRouterModels,
-            .soniox: .sonioxFiles,
-            .speechmatics: .speechmaticsJobs
-        ]
-
-        XCTAssertEqual(VoiceInkAIEnhancementProviderKind.allCases.count, expectedTransports.count)
-
-        for (provider, transport) in expectedTransports {
-            XCTAssertEqual(provider.apiKeyVerificationTransport, transport)
-        }
-    }
-
     func testMacOSAIEnhancementProviderVerificationRoutesAreShared() {
         let expectedRoutes: [VoiceInkAIEnhancementProviderKind: VoiceInkAIEnhancementAPIKeyVerificationRoute?] = [
             .anthropic: .anthropicMessages,

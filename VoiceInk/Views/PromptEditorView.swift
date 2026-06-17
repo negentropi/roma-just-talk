@@ -312,13 +312,11 @@ struct TriggerWordsEditor: View {
     }
     
     private func addTriggerWord() {
-        let trimmedWord = newTriggerWord.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedWord.isEmpty else { return }
-        
-        let lowerCaseWord = trimmedWord.lowercased()
-        guard !triggerWords.contains(where: { $0.lowercased() == lowerCaseWord }) else { return }
-        
-        triggerWords.append(trimmedWord)
+        guard let updatedWords = VoiceInkPromptTriggerPolicy.addingTriggerWord(newTriggerWord, to: triggerWords) else {
+            return
+        }
+
+        triggerWords = updatedWords
         newTriggerWord = ""
     }
 }

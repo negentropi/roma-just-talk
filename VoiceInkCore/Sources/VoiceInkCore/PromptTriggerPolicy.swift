@@ -1,0 +1,155 @@
+import Foundation
+
+public struct VoiceInkPromptTrigger: Equatable, Sendable {
+    public let promptId: UUID
+    public let triggerWords: [String]
+
+    public init(promptId: UUID, triggerWords: [String]) {
+        self.promptId = promptId
+        self.triggerWords = triggerWords
+    }
+}
+
+public struct VoiceInkPromptTriggerMatch: Equatable, Sendable {
+    public let promptId: UUID
+    public let triggerWord: String
+    public let processedText: String
+
+    public init(promptId: UUID, triggerWord: String, processedText: String) {
+        self.promptId = promptId
+        self.triggerWord = triggerWord
+        self.processedText = processedText
+    }
+}
+
+public enum VoiceInkPromptTriggerPolicy {
+    public static func addingTriggerWord(_ word: String, to existingWords: [String]) -> [String]? {
+        let trimmedWord = word.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedWord.isEmpty else { return nil }
+
+        let lowerCaseWord = trimmedWord.lowercased()
+        guard !existingWords.contains(where: { $0.lowercased() == lowerCaseWord }) else { return nil }
+
+        return existingWords + [trimmedWord]
+    }
+
+    public static func detect(in text: String, triggers: [VoiceInkPromptTrigger]) -> VoiceInkPromptTriggerMatch? {
+        for prompt in triggers {
+            guard let result = detectAndStripTriggerWord(from: text, triggerWords: prompt.triggerWords) else {
+                continue
+            }
+
+            return VoiceInkPromptTriggerMatch(
+                promptId: prompt.promptId,
+                triggerWord: result.triggerWord,
+                processedText: result.processedText
+            )
+        }
+
+        return nil
+    }
+
+    public static func detectAndStripTriggerWord(
+        from text: String,
+        triggerWords: [String]
+    ) -> (triggerWord: String, processedText: String)? {
+        let sortedTriggerWords = triggerWords
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+            .sorted { $0.count > $1.count }
+
+        for triggerWord in sortedTriggerWords {
+            if let afterTrailing = stripTrailingTriggerWord(from: text, triggerWord: triggerWord) {
+                if let afterBoth = stripLeadingTriggerWord(from: afterTrailing, triggerWord: triggerWord) {
+                    return (triggerWord, afterBoth)
+                }
+                return (triggerWord, afterTrailing)
+            }
+        }
+
+        for triggerWord in sortedTriggerWords {
+            if let afterLeading = stripLeadingTriggerWord(from: text, triggerWord: triggerWord) {
+                if let afterBoth = stripTrailingTriggerWord(from: afterLeading, triggerWord: triggerWord) {
+                    return (triggerWord, afterBoth)
+                }
+                return (triggerWord, afterLeading)
+            }
+        }
+
+        return nil
+    }
+
+    private static func stripLeadingTriggerWord(from text: String, triggerWord: String) -> String? {
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        let lowerText = trimmedText.lowercased()
+        let lowerTrigger = triggerWord.lowercased()
+
+        guard lowerText.hasPrefix(lowerTrigger) else { return nil }
+
+        let triggerEndIndex = trimmedText.index(trimmedText.startIndex, offsetBy: triggerWord.count)
+
+        if triggerEndIndex < trimmedText.endIndex {
+            let charAfterTrigger = trimmedText[triggerEndIndex]
+            if charAfterTrigger.isLetter || charAfterTrigger.isNumber {
+                return nil
+            }
+        }
+
+        if triggerEndIndex >= trimmedText.endIndex {
+            return ""
+        }
+
+        var remainingText = String(trimmedText[triggerEndIndex...])
+
+        remainingText = remainingText.replacingOccurrences(
+            of: "^[,\\.!\\?;:\\s]+",
+            with: "",
+            options: .regularExpression
+        )
+
+        remainingText = remainingText.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if !remainingText.isEmpty {
+            remainingText = remainingText.prefix(1).uppercased() + remainingText.dropFirst()
+        }
+
+        return remainingText
+    }
+
+    private static func stripTrailingTriggerWord(from text: String, triggerWord: String) -> String? {
+        var trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        let punctuationSet = CharacterSet(charactersIn: ",.!?;:")
+        while let scalar = trimmedText.unicodeScalars.last, punctuationSet.contains(scalar) {
+            trimmedText.removeLast()
+        }
+
+        let lowerText = trimmedText.lowercased()
+        let lowerTrigger = triggerWord.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard lowerText.hasSuffix(lowerTrigger) else { return nil }
+
+        let triggerStartIndex = trimmedText.index(trimmedText.endIndex, offsetBy: -triggerWord.count)
+        if triggerStartIndex > trimmedText.startIndex {
+            let charBeforeTrigger = trimmedText[trimmedText.index(before: triggerStartIndex)]
+            if charBeforeTrigger.isLetter || charBeforeTrigger.isNumber {
+                return nil
+            }
+        }
+
+        var remainingText = String(trimmedText[..<triggerStartIndex])
+
+        remainingText = remainingText.replacingOccurrences(
+            of: "[,\\.!\\?;:\\s]+$",
+            with: "",
+            options: .regularExpression
+        )
+        remainingText = remainingText.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if !remainingText.isEmpty {
+            remainingText = remainingText.prefix(1).uppercased() + remainingText.dropFirst()
+        }
+
+        return remainingText
+    }
+}

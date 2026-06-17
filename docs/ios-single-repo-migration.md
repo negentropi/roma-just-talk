@@ -42,6 +42,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - vocabulary, word-replacement, backup dictionary insert, and word-replacement edit planning; platform shells still own dictionary storage and persistence errors
 - custom vocabulary term normalization for transcription providers; platform shells still own dictionary storage
 - custom cloud transcription model generated-name and draft validation policy; platform shells still own keychain and preferences storage
+- prompt trigger-word detection and trigger-word editing policy; platform shells still own prompt persistence and enhancement state
 - stored audio-file path resolution, existing-file lookup, recordings directory, and file URL construction
 - duration presentation
 - relative timestamp presentation

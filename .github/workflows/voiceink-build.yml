@@ -14,7 +14,7 @@ on:
 
 jobs:
   build:
-    name: Build local macOS app
+    name: Build release macOS app
     runs-on: macos-26
     timeout-minutes: 60
 
@@ -28,10 +28,10 @@ jobs:
           xcodebuild -version
           swift --version
 
-      - name: Build local app
-        run: make local
+      - name: Build release app
+        run: make local CONFIGURATION=Release
 
-      - name: Build unit tests
+      - name: Build Debug unit tests
         timeout-minutes: 15
         run: |
           xcodebuild build-for-testing \
@@ -48,6 +48,15 @@ jobs:
             CODE_SIGN_ENTITLEMENTS="$PWD/VoiceInk/VoiceInk.local.entitlements" \
             SWIFT_ACTIVE_COMPILATION_CONDITIONS='$(inherited) LOCAL_BUILD' \
             -only-testing:VoiceInkTests
+
+      - name: Reject debug-only release payload
+        run: |
+          APP="$HOME/Applications/roma just talk.app"
+          if [ -e "$APP/Contents/MacOS/roma just talk.debug.dylib" ] || [ -e "$APP/Contents/MacOS/__preview.dylib" ]; then
+            echo "Release artifact contains debug-only binaries:"
+            ls -la "$APP/Contents/MacOS"
+            exit 1
+          fi
 
       - name: Package app
         run: ditto -c -k --keepParent "$HOME/Applications/roma just talk.app" "roma just talk.app.zip"

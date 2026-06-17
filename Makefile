@@ -4,6 +4,7 @@ WHISPER_CPP_DIR := $(DEPS_DIR)/whisper.cpp
 FRAMEWORK_PATH := $(WHISPER_CPP_DIR)/build-apple/whisper.xcframework
 LOCAL_DERIVED_DATA := $(CURDIR)/.local-build
 LOCAL_APP_DEST := $(HOME)/Applications/roma just talk.app
+CONFIGURATION ?= Debug
 
 .PHONY: all clean whisper setup build local check healthcheck help dev run
 
@@ -47,9 +48,9 @@ build: setup
 
 # Build for local use without Apple Developer certificate
 local: check setup
-	@echo "Building roma just talk for local use (no Apple Developer certificate required)..."
+	@echo "Building roma just talk ($(CONFIGURATION)) for local use (no Apple Developer certificate required)..."
 	@rm -rf "$(LOCAL_DERIVED_DATA)"
-	xcodebuild -project VoiceInk.xcodeproj -scheme VoiceInk -configuration Debug \
+	xcodebuild -project VoiceInk.xcodeproj -scheme VoiceInk -configuration "$(CONFIGURATION)" \
 		-derivedDataPath "$(LOCAL_DERIVED_DATA)" \
 		-xcconfig LocalBuild.xcconfig \
 		CODE_SIGN_IDENTITY="-" \
@@ -59,7 +60,7 @@ local: check setup
 		CODE_SIGN_ENTITLEMENTS="$(CURDIR)/VoiceInk/VoiceInk.local.entitlements" \
 		SWIFT_ACTIVE_COMPILATION_CONDITIONS='$$(inherited) LOCAL_BUILD' \
 		build
-	@APP_PATH="$(LOCAL_DERIVED_DATA)/Build/Products/Debug/roma just talk.app" && \
+	@APP_PATH="$(LOCAL_DERIVED_DATA)/Build/Products/$(CONFIGURATION)/roma just talk.app" && \
 	if [ -d "$$APP_PATH" ]; then \
 		echo "Copying roma just talk.app to $(LOCAL_APP_DEST)..."; \
 		mkdir -p "$$(dirname "$(LOCAL_APP_DEST)")"; \
@@ -109,7 +110,7 @@ help:
 	@echo "  whisper            Clone and build whisper.cpp XCFramework"
 	@echo "  setup              Copy whisper XCFramework to VoiceInk project"
 	@echo "  build              Build the VoiceInk Xcode project"
-	@echo "  local              Build for local use (no Apple Developer certificate needed)"
+	@echo "  local              Build for local use (Debug default; use CONFIGURATION=Release for packaging)"
 	@echo "  run                Launch the built VoiceInk app"
 	@echo "  dev                Build and run the app (for development)"
 	@echo "  all                Run full build process (default)"

@@ -1,6 +1,6 @@
 // LocalBuild.xcconfig
 // Build configuration for local/unsigned builds (no Apple Developer certificate required).
-// Used by `make local` — does NOT affect Debug or Release configurations.
+// Used by `make local`; pass CONFIGURATION=Release for release packaging.
 
 // Ad-hoc signing (works without a developer account)
 CODE_SIGN_IDENTITY = -

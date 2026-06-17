@@ -226,12 +226,12 @@ private struct ModeRowView: View {
                     .foregroundStyle(.primary)
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Transcription: \(mode.transcriptionModel)")
+                    Text("Transcription: \(mode.effectiveTranscriptionModel)")
                         .font(.caption)
                         .foregroundStyle(.secondary)
 
                     if mode.isPostProcessingEnabled {
-                        Text("Post-processing: \(mode.postProcessingModel)")
+                        Text("Post-processing: \(mode.effectivePostProcessingModel)")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }

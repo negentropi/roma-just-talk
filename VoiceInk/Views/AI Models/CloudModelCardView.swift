@@ -36,6 +36,10 @@ struct CloudModelCardView: View {
     private var isConfigured: Bool {
         return APIKeyManager.shared.hasAPIKey(forProvider: model.provider.apiKeyProviderName)
     }
+
+    private var hasDraftAPIKey: Bool {
+        VoiceInkProviderCredential.nonBlank(apiKey) != nil
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -261,7 +265,7 @@ struct CloudModelCardView: View {
                     )
                 }
                 .buttonStyle(.plain)
-                .disabled(apiKey.isEmpty || isVerifying)
+                .disabled(!hasDraftAPIKey || isVerifying)
             }
             
             if verificationStatus == .failure {
@@ -301,7 +305,7 @@ struct CloudModelCardView: View {
     }
     
     private func verifyAPIKey() {
-        guard !apiKey.isEmpty else { return }
+        guard hasDraftAPIKey else { return }
 
         isVerifying = true
         verificationStatus = .verifying

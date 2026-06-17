@@ -16,6 +16,10 @@ struct APIKeyManagementView: View {
     @State private var localCLICommandTemplate: String = ""
     @State private var localCLITimeoutSeconds: Double = LocalCLIService.defaultTimeoutSeconds
     @State private var isSyncingLocalCLIState = false
+
+    private var hasDraftAPIKey: Bool {
+        VoiceInkProviderCredential.nonBlank(apiKey) != nil
+    }
     
     var body: some View {
         Section("AI Provider Integration") {
@@ -256,7 +260,7 @@ struct APIKeyManagementView: View {
                                 apiKey = ""
                             }
                         }
-                        .disabled(aiService.customBaseURL.isEmpty || aiService.customModel.isEmpty || apiKey.isEmpty)
+                        .disabled(aiService.customBaseURL.isEmpty || aiService.customModel.isEmpty || !hasDraftAPIKey)
                     }
                     
                 } else {
@@ -311,7 +315,7 @@ struct APIKeyManagementView: View {
                                     Text("Verify and Save")
                                 }
                             }
-                            .disabled(apiKey.isEmpty)
+                            .disabled(!hasDraftAPIKey)
                         }
                     }
                 }

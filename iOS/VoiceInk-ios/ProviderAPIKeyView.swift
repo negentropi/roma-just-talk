@@ -14,6 +14,14 @@ struct ProviderAPIKeyView: View {
         settings.isKeyVerified(for: provider)
     }
 
+    private var hasEnteredAPIKey: Bool {
+        VoiceInkProviderCredential.nonBlank(tempKey) != nil
+    }
+
+    private var canVerifyAPIKey: Bool {
+        hasEnteredAPIKey || VoiceInkProviderCredential.nonBlank(settings.apiKey(for: provider)) != nil
+    }
+
     var body: some View {
         Form {
             Section(header: Text("\(provider.displayName) API Key")) {
@@ -25,7 +33,7 @@ struct ProviderAPIKeyView: View {
                         Button(action: saveKey) {
                             Label("Save", systemImage: "checkmark.circle.fill")
                         }
-                        .disabled(tempKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        .disabled(!hasEnteredAPIKey)
                         Spacer()
                         if isVerifying {
                             ProgressView().progressViewStyle(.circular)
@@ -33,7 +41,7 @@ struct ProviderAPIKeyView: View {
                             Button(action: verifyKey) {
                                 Label("Verify", systemImage: "checkmark.seal")
                             }
-                            .disabled(tempKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && settings.apiKey(for: provider).isEmpty)
+                            .disabled(!canVerifyAPIKey)
                         }
                     }
                 } else {

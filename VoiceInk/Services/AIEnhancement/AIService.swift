@@ -21,32 +21,18 @@ enum AIProvider: String, CaseIterable {
     
     
     var baseURL: String {
-        if let corePostProcessingURL = coreProviderKind?.postProcessingChatCompletionsURL {
+        if let corePostProcessingURL = coreAIModelProvider?.postProcessingRequestURL {
             return corePostProcessingURL.absoluteString
         }
 
         switch self {
-        case .anthropic:
-            return "https://api.anthropic.com/v1/messages"
-        case .openRouter:
-            return "https://openrouter.ai/api/v1/chat/completions"
-        case .mistral:
-            return "https://api.mistral.ai/v1/chat/completions"
-        case .elevenLabs:
-            return "https://api.elevenlabs.io/v1/speech-to-text"
-        case .soniox:
-            return "https://api.soniox.com/v1"
-        case .speechmatics:
-            return "https://asr.api.speechmatics.com/v2"
-        case .assemblyAI:
-            return "https://api.assemblyai.com/v2/transcript"
         case .ollama:
             return UserDefaults.standard.string(forKey: "ollamaBaseURL") ?? "http://localhost:11434"
         case .localCLI:
             return ""
         case .custom:
             return UserDefaults.standard.string(forKey: "customProviderBaseURL") ?? ""
-        case .cerebras, .groq, .gemini, .openAI, .deepgram:
+        case .anthropic, .assemblyAI, .cerebras, .deepgram, .elevenLabs, .groq, .gemini, .mistral, .openAI, .openRouter, .soniox, .speechmatics:
             preconditionFailure("Core-backed providers should return from VoiceInkProviderEndpoint")
         }
     }
@@ -114,6 +100,10 @@ enum AIProvider: String, CaseIterable {
         case .ollama, .localCLI, .custom:
             return nil
         }
+    }
+
+    var apiKeyConsoleURL: URL? {
+        coreAIModelProvider?.apiKeyConsoleURL
     }
 
     var coreProviderKind: VoiceInkProviderKind? {

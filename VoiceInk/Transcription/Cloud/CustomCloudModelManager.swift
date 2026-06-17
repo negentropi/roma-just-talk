@@ -61,15 +61,9 @@ class CustomCloudModelManager: ObservableObject {
     
     // MARK: - Validation
     
-    func validateModel(name: String, displayName: String, apiEndpoint: String, apiKey: String, modelName: String, excludingId: UUID? = nil) -> [String] {
+    func validateModel(_ draft: VoiceInkCustomCloudModelDraft, excludingId: UUID? = nil) -> [String] {
         VoiceInkCustomCloudModelPolicy.validationErrors(
-            for: VoiceInkCustomCloudModelDraft(
-                name: name,
-                displayName: displayName,
-                apiEndpoint: apiEndpoint,
-                apiKey: apiKey,
-                modelName: modelName
-            ),
+            for: draft,
             existingModels: customModels.map { VoiceInkCustomCloudModelIdentity(id: $0.id, name: $0.name) },
             excludingId: excludingId
         )

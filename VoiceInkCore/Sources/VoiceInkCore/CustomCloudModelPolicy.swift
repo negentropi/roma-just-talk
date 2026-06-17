@@ -37,6 +37,29 @@ public enum VoiceInkCustomCloudModelPolicy {
         displayName.lowercased().replacingOccurrences(of: " ", with: "-")
     }
 
+    public static func normalizedDraft(
+        displayName: String,
+        apiEndpoint: String,
+        apiKey: String,
+        modelName: String
+    ) -> VoiceInkCustomCloudModelDraft {
+        let trimmedDisplayName = displayName.trimmingCharacters(in: .whitespacesAndNewlines)
+        return VoiceInkCustomCloudModelDraft(
+            name: generatedName(fromDisplayName: trimmedDisplayName),
+            displayName: trimmedDisplayName,
+            apiEndpoint: apiEndpoint.trimmingCharacters(in: .whitespacesAndNewlines),
+            apiKey: apiKey.trimmingCharacters(in: .whitespacesAndNewlines),
+            modelName: modelName.trimmingCharacters(in: .whitespacesAndNewlines)
+        )
+    }
+
+    public static func hasRequiredFields(_ draft: VoiceInkCustomCloudModelDraft) -> Bool {
+        !draft.displayName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+        !draft.apiEndpoint.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+        !draft.apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+        !draft.modelName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
     public static func validationErrors(
         for draft: VoiceInkCustomCloudModelDraft,
         existingModels: [VoiceInkCustomCloudModelIdentity],

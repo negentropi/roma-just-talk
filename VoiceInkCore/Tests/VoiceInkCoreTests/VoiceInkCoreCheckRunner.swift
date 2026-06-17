@@ -48,6 +48,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "ContextualCapitalizationFormatterTests.testSkipsCursorContextWhenTextCannotChange", run: { ContextualCapitalizationFormatterTests().testSkipsCursorContextWhenTextCannotChange() }),
             VoiceInkCoreCheck(name: "ContextualCapitalizationFormatterTests.testReadsCursorContextWhenTextCanChange", run: { ContextualCapitalizationFormatterTests().testReadsCursorContextWhenTextCanChange() }),
             VoiceInkCoreCheck(name: "CustomCloudModelPolicyTests.testGeneratedNamePreservesExistingLowercaseSpaceReplacementPolicy", run: { CustomCloudModelPolicyTests().testGeneratedNamePreservesExistingLowercaseSpaceReplacementPolicy() }),
+            VoiceInkCoreCheck(name: "CustomCloudModelPolicyTests.testNormalizedDraftPreservesCurrentMacOSFormPreparation", run: { CustomCloudModelPolicyTests().testNormalizedDraftPreservesCurrentMacOSFormPreparation() }),
+            VoiceInkCoreCheck(name: "CustomCloudModelPolicyTests.testRequiredFieldPolicyMatchesMacOSButtonEnablement", run: { CustomCloudModelPolicyTests().testRequiredFieldPolicyMatchesMacOSButtonEnablement() }),
             VoiceInkCoreCheck(name: "CustomCloudModelPolicyTests.testValidationReturnsExistingMacOSErrorsInOrder", run: { CustomCloudModelPolicyTests().testValidationReturnsExistingMacOSErrorsInOrder() }),
             VoiceInkCoreCheck(name: "CustomCloudModelPolicyTests.testValidationRejectsDuplicateNameUnlessEditingSameModel", run: { CustomCloudModelPolicyTests().testValidationRejectsDuplicateNameUnlessEditingSameModel() }),
             VoiceInkCoreCheck(name: "CustomPromptTests.testCustomPromptDefaultsMatchExistingMacOSPromptRecord", run: { CustomPromptTests().testCustomPromptDefaultsMatchExistingMacOSPromptRecord() }),

@@ -186,10 +186,16 @@ struct AddCustomModelCardView: View {
     }
     
     private var isFormValid: Bool {
-        !displayName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
-        !apiEndpoint.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
-        !apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
-        !modelName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        VoiceInkCustomCloudModelPolicy.hasRequiredFields(currentDraft)
+    }
+
+    private var currentDraft: VoiceInkCustomCloudModelDraft {
+        VoiceInkCustomCloudModelPolicy.normalizedDraft(
+            displayName: displayName,
+            apiEndpoint: apiEndpoint,
+            apiKey: apiKey,
+            modelName: modelName
+        )
     }
     
     private func clearForm() {
@@ -201,19 +207,10 @@ struct AddCustomModelCardView: View {
     }
     
     private func addModel() {
-        let trimmedDisplayName = displayName.trimmingCharacters(in: .whitespacesAndNewlines)
-        let trimmedApiEndpoint = apiEndpoint.trimmingCharacters(in: .whitespacesAndNewlines)
-        let trimmedApiKey = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
-        let trimmedModelName = modelName.trimmingCharacters(in: .whitespacesAndNewlines)
-        
-        let generatedName = VoiceInkCustomCloudModelPolicy.generatedName(fromDisplayName: trimmedDisplayName)
-        
+        let draft = currentDraft
+
         validationErrors = customModelManager.validateModel(
-            name: generatedName,
-            displayName: trimmedDisplayName,
-            apiEndpoint: trimmedApiEndpoint,
-            apiKey: trimmedApiKey,
-            modelName: trimmedModelName,
+            draft,
             excludingId: editingModel?.id
         )
         
@@ -228,15 +225,15 @@ struct AddCustomModelCardView: View {
             if let editing = editingModel {
                 let updatedModel = CustomCloudModel(
                     id: editing.id,
-                    name: generatedName,
-                    displayName: trimmedDisplayName,
+                    name: draft.name,
+                    displayName: draft.displayName,
                     description: "Custom transcription model",
-                    apiEndpoint: trimmedApiEndpoint,
-                    modelName: trimmedModelName,
+                    apiEndpoint: draft.apiEndpoint,
+                    modelName: draft.modelName,
                     isMultilingual: isMultilingual
                 )
                 
-                if APIKeyManager.shared.saveCustomModelAPIKey(trimmedApiKey, forModelId: editing.id) {
+                if APIKeyManager.shared.saveCustomModelAPIKey(draft.apiKey, forModelId: editing.id) {
                     customModelManager.updateCustomModel(updatedModel)
                 } else {
                     validationErrors = ["Failed to securely save API Key to Keychain. Please check your system settings or try again."]
@@ -246,15 +243,15 @@ struct AddCustomModelCardView: View {
                 }
             } else {
                 let customModel = CustomCloudModel(
-                    name: generatedName,
-                    displayName: trimmedDisplayName,
+                    name: draft.name,
+                    displayName: draft.displayName,
                     description: "Custom transcription model",
-                    apiEndpoint: trimmedApiEndpoint,
-                    modelName: trimmedModelName,
+                    apiEndpoint: draft.apiEndpoint,
+                    modelName: draft.modelName,
                     isMultilingual: isMultilingual
                 )
                 
-                if APIKeyManager.shared.saveCustomModelAPIKey(trimmedApiKey, forModelId: customModel.id) {
+                if APIKeyManager.shared.saveCustomModelAPIKey(draft.apiKey, forModelId: customModel.id) {
                     customModelManager.addCustomModel(customModel)
                 } else {
                     validationErrors = ["Failed to securely save API Key to Keychain. Please check your system settings or try again."]

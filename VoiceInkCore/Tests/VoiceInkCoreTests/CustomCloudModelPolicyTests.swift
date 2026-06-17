@@ -9,6 +9,50 @@ final class CustomCloudModelPolicyTests: XCTestCase {
         )
     }
 
+    func testNormalizedDraftPreservesCurrentMacOSFormPreparation() {
+        let draft = VoiceInkCustomCloudModelPolicy.normalizedDraft(
+            displayName: " My Custom Model ",
+            apiEndpoint: " https://api.example.com/v1/audio/transcriptions ",
+            apiKey: " key ",
+            modelName: " whisper-1 "
+        )
+
+        XCTAssertEqual(
+            draft,
+            VoiceInkCustomCloudModelDraft(
+                name: "my-custom-model",
+                displayName: "My Custom Model",
+                apiEndpoint: "https://api.example.com/v1/audio/transcriptions",
+                apiKey: "key",
+                modelName: "whisper-1"
+            )
+        )
+    }
+
+    func testRequiredFieldPolicyMatchesMacOSButtonEnablement() {
+        XCTAssertFalse(
+            VoiceInkCustomCloudModelPolicy.hasRequiredFields(
+                VoiceInkCustomCloudModelPolicy.normalizedDraft(
+                    displayName: " ",
+                    apiEndpoint: "https://api.example.com/v1/audio/transcriptions",
+                    apiKey: "key",
+                    modelName: "whisper-1"
+                )
+            )
+        )
+
+        XCTAssertTrue(
+            VoiceInkCustomCloudModelPolicy.hasRequiredFields(
+                VoiceInkCustomCloudModelPolicy.normalizedDraft(
+                    displayName: "Custom",
+                    apiEndpoint: "not a url",
+                    apiKey: "key",
+                    modelName: "whisper-1"
+                )
+            )
+        )
+    }
+
     func testValidationReturnsExistingMacOSErrorsInOrder() {
         let errors = VoiceInkCustomCloudModelPolicy.validationErrors(
             for: VoiceInkCustomCloudModelDraft(

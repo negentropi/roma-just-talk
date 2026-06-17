@@ -46,7 +46,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - shared UserDefaults key names, including cleanup preferences, plus iOS mode persistence helpers
 - onboarding completion, iOS audio-session timeout, and filler-word list reset preference storage; platform shells still own first-run flow, audio-session lifecycle, and settings UI bindings
 - current transcription model preference loading/saving/clearing; platform shells still own model availability, download/runtime state, and legacy key cleanup
-- transcript status and presentation helpers
+- transcript status, presentation helpers, and localized standard transcript search semantics
 - local transcription/model/missing-audio error vocabulary shared by macOS local Whisper and iOS local retry transcription
 - raw transcription output filtering for hallucination tags/brackets, optional filler words, default filler-word vocabulary, and filler-word list editing policy; iOS settings now use the same list editing policy in their platform shell
 - transcription cleanup preference loading/saving/reset storage, raw-output filtering, and paragraph-formatting/punctuation/lowercase/filler-word cleanup policy
@@ -131,6 +131,7 @@ Current macOS consumers of shared remote transport:
 - macOS and iOS local Whisper model directory creation, download URL/file path lookup, Core ML support checks, and model deletion delegate to `VoiceInkWhisperModelFiles`; platform shells still own download progress, UI, and runtime model state.
 - macOS and iOS local Whisper and macOS rolling preload resolve the Silero VAD bundle resource directly through `VoiceInkVADModelFiles`; the old shell-only VAD model manager adapters were removed.
 - macOS history/import row summaries and iOS note detail display use `VoiceInkTranscriptPresentation.preferredText` for the enhanced-text-first transcript display rule.
+- `VoiceInkTranscriptPresentation.matchesSearch` mirrors macOS history predicate search semantics, keeping iOS note filtering accent-insensitive through shared core while macOS SwiftData predicates keep their local query shape.
 - macOS `FillerWordManager`, iOS `AppSettings`, and cleanup configuration load and save filler-word lists through `VoiceInkFillerWordPreference`; platform shells still own settings UI and toggle state.
 - iOS app launch and first-time setup read/write/reset onboarding completion through `VoiceInkOnboardingPreference`; the onboarding views and recording-after-onboarding flow stay in the iOS shell.
 - iOS `AppSettings` reads/writes/resets audio-session timeout through `VoiceInkAudioSessionTimeoutPreference`; `AudioSessionManager` and timeout UI stay in the iOS shell.
@@ -195,4 +196,4 @@ Before treating `../VoiceInk-iOS` as obsolete, verify current state from `VoiceI
 7. `xmllint --noout` passes for workspace and shared scheme XML.
 8. A real Xcode toolchain is selected and both app targets build.
 
-Current local blocker: Xcode is selected from `/Volumes/agi-agirity-ssd/Applications/Xcode.app/Contents/Developer`, and `xcodebuild -list -workspace VoiceInk.xcworkspace -disableAutomaticPackageResolution` works after adding the workspace-level `Package.resolved`. Full target builds are still environment-blocked: macOS `VoiceInk` needs `/Users/atalphalnmomhappyhouse/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework`, and iOS `VoiceInk-ios` needs the iOS 26.2 platform installed. Until both are present, use `swift run VoiceInkCoreChecks` plus the static parse/lint gates above for local proof.
+Current local blocker: `xcode-select -p` points to `/Library/Developer/CommandLineTools`, and the previously used external Xcode volume is not mounted. Full target builds are still environment-blocked until a real Xcode is selected; macOS `VoiceInk` also needs `/Users/atalphalnmomhappyhouse/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework`, and iOS `VoiceInk-ios` needs the iOS 26.2 platform installed. Until those are present, use `swift run VoiceInkCoreChecks` plus the static parse/lint gates above for local proof.

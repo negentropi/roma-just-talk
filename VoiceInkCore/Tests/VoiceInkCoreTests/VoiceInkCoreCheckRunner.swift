@@ -306,6 +306,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "TranscriptPresentationTests.testMatchesSearchReturnsTrueForEmptyQuery", run: { TranscriptPresentationTests().testMatchesSearchReturnsTrueForEmptyQuery() }),
             VoiceInkCoreCheck(name: "TranscriptPresentationTests.testMatchesSearchChecksRawTextCaseInsensitively", run: { TranscriptPresentationTests().testMatchesSearchChecksRawTextCaseInsensitively() }),
             VoiceInkCoreCheck(name: "TranscriptPresentationTests.testMatchesSearchChecksEnhancedTextCaseInsensitively", run: { TranscriptPresentationTests().testMatchesSearchChecksEnhancedTextCaseInsensitively() }),
+            VoiceInkCoreCheck(name: "TranscriptPresentationTests.testMatchesSearchUsesMacOSStandardSearchSemantics", run: { TranscriptPresentationTests().testMatchesSearchUsesMacOSStandardSearchSemantics() }),
             VoiceInkCoreCheck(name: "TranscriptPresentationTests.testMatchesSearchReturnsFalseWhenQueryIsAbsent", run: { TranscriptPresentationTests().testMatchesSearchReturnsFalseWhenQueryIsAbsent() }),
             VoiceInkCoreCheck(name: "TranscriptPresentationTests.testStatusTitleReturnsRetryStateTitles", run: { TranscriptPresentationTests().testStatusTitleReturnsRetryStateTitles() }),
             VoiceInkCoreCheck(name: "TranscriptPresentationTests.testStatusTitleReturnsNilForNonRetryStates", run: { TranscriptPresentationTests().testStatusTitleReturnsNilForNonRetryStates() }),

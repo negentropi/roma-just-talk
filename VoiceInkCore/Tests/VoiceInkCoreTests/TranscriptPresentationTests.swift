@@ -61,6 +61,23 @@ final class TranscriptPresentationTests: XCTestCase {
         )
     }
 
+    func testMatchesSearchUsesMacOSStandardSearchSemantics() {
+        XCTAssertTrue(
+            VoiceInkTranscriptPresentation.matchesSearch(
+                rawText: "Cafe notes",
+                enhancedText: nil,
+                query: "café"
+            )
+        )
+        XCTAssertTrue(
+            VoiceInkTranscriptPresentation.matchesSearch(
+                rawText: "raw",
+                enhancedText: "Review the résumé",
+                query: "resume"
+            )
+        )
+    }
+
     func testMatchesSearchReturnsFalseWhenQueryIsAbsent() {
         XCTAssertFalse(
             VoiceInkTranscriptPresentation.matchesSearch(

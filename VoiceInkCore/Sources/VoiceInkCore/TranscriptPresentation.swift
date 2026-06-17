@@ -22,8 +22,8 @@ public enum VoiceInkTranscriptPresentation {
             return true
         }
 
-        return rawText.localizedCaseInsensitiveContains(query) ||
-            (enhancedText?.localizedCaseInsensitiveContains(query) ?? false)
+        return rawText.localizedStandardContains(query) ||
+            (enhancedText?.localizedStandardContains(query) ?? false)
     }
 
     public static func displayText(

@@ -46,8 +46,27 @@ public enum VoiceInkOpenAICompatibleChatCodec {
     public static func requestBody(
         model: String,
         messages: [VoiceInkOpenAICompatibleChatMessage],
-        temperature: Double?
+        temperature: Double?,
+        reasoningEffort: String? = nil,
+        extraBodyParameters: [String: Any]? = nil
     ) throws -> Data {
+        if reasoningEffort != nil || extraBodyParameters?.isEmpty == false {
+            var body: [String: Any] = [
+                "model": model,
+                "messages": messages.map { ["role": $0.role, "content": $0.content] }
+            ]
+            if let temperature {
+                body["temperature"] = temperature
+            }
+            if let reasoningEffort {
+                body["reasoning_effort"] = reasoningEffort
+            }
+            extraBodyParameters?.forEach { key, value in
+                body[key] = value
+            }
+            return try JSONSerialization.data(withJSONObject: body)
+        }
+
         let request = VoiceInkOpenAICompatibleChatRequest(
             model: model,
             messages: messages,
@@ -68,7 +87,9 @@ public enum VoiceInkOpenAICompatibleChatRequestBuilder {
         apiKey: String,
         model: String,
         messages: [VoiceInkOpenAICompatibleChatMessage],
-        temperature: Double?
+        temperature: Double?,
+        reasoningEffort: String? = nil,
+        extraBodyParameters: [String: Any]? = nil
     ) throws -> URLRequest {
         var request = URLRequest(url: VoiceInkProviderEndpoint.openAICompatibleChatCompletionsURL(from: baseURL))
         request.httpMethod = "POST"
@@ -77,7 +98,9 @@ public enum VoiceInkOpenAICompatibleChatRequestBuilder {
         request.httpBody = try VoiceInkOpenAICompatibleChatCodec.requestBody(
             model: model,
             messages: messages,
-            temperature: temperature
+            temperature: temperature,
+            reasoningEffort: reasoningEffort,
+            extraBodyParameters: extraBodyParameters
         )
         return request
     }

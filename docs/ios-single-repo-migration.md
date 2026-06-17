@@ -29,6 +29,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - provider API-key verification dispatch
 - provider API-key verification flag storage
 - API-key environment-reference resolution
+- AI reasoning temperature, effort, and provider-specific hidden-reasoning request parameters for OpenAI-compatible post-processing
 - transcription and AI model catalogs
 - remote transcription provider dispatch for iOS retry transcription
 - mode runtime configuration and selected-mode repair
@@ -84,6 +85,7 @@ Current macOS consumers of shared remote transport:
 - macOS recording, audio-file transcription, and retry transcription use `VoiceInkTranscriptionCleanupConfiguration` directly for shared raw-output filtering and cleanup preferences.
 - macOS model definitions read supported language sets through a thin `ModelProvider` adapter backed by `VoiceInkLanguageCatalog`; the old `LanguageDictionary` wrapper is gone.
 - macOS metrics dashboard duration copy uses `VoiceInkDurationPresentation`, removing the last dashboard-local duration formatter.
+- iOS retry post-processing inherits `VoiceInkAIReasoningConfig` through `VoiceInkPostProcessingClient`, aligning OpenAI-compatible reasoning controls with macOS enhancement requests.
 
 Current iOS consumers of shared remote transport:
 

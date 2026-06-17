@@ -1,0 +1,33 @@
+import Foundation
+@testable import VoiceInkCore
+
+final class AIReasoningConfigTests: XCTestCase {
+    func testTemperatureUsesRequiredGPT5Temperature() {
+        XCTAssertEqual(VoiceInkAIReasoningConfig.temperature(forModelName: "gpt-5.4"), 1)
+        XCTAssertEqual(
+            VoiceInkAIReasoningConfig.temperature(forModelName: "llama-3.3-70b-versatile", defaultTemperature: 0.2),
+            0.2
+        )
+    }
+
+    func testReasoningEffortMatchesProviderModelPolicy() {
+        XCTAssertEqual(VoiceInkAIReasoningConfig.reasoningEffort(for: .gemini, modelName: "gemini-2.5-flash"), "none")
+        XCTAssertEqual(VoiceInkAIReasoningConfig.reasoningEffort(for: .gemini, modelName: "gemini-3.1-pro-preview"), "low")
+        XCTAssertEqual(VoiceInkAIReasoningConfig.reasoningEffort(for: .openAI, modelName: "gpt-5.4"), "none")
+        XCTAssertEqual(VoiceInkAIReasoningConfig.reasoningEffort(for: .cerebras, modelName: "gpt-oss-120b"), "low")
+        XCTAssertEqual(VoiceInkAIReasoningConfig.reasoningEffort(for: .groq, modelName: "qwen/qwen3-32b"), "none")
+        XCTAssertNil(VoiceInkAIReasoningConfig.reasoningEffort(for: .groq, modelName: "llama-3.3-70b-versatile"))
+    }
+
+    func testExtraBodyParametersMatchProviderModelPolicy() {
+        XCTAssertEqual(
+            VoiceInkAIReasoningConfig.extraBodyParameters(for: .cerebras, modelName: "gpt-oss-120b")?["reasoning_format"] as? String,
+            "hidden"
+        )
+        XCTAssertEqual(
+            VoiceInkAIReasoningConfig.extraBodyParameters(for: .groq, modelName: "openai/gpt-oss-120b")?["include_reasoning"] as? Bool,
+            false
+        )
+        XCTAssertNil(VoiceInkAIReasoningConfig.extraBodyParameters(for: .openAI, modelName: "gpt-5.4"))
+    }
+}

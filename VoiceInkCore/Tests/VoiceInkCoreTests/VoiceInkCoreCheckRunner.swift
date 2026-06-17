@@ -10,6 +10,9 @@ struct VoiceInkCoreCheck {
 struct VoiceInkCoreCheckRunner {
     static func main() async {
         let checks: [VoiceInkCoreCheck] = [
+            VoiceInkCoreCheck(name: "AIReasoningConfigTests.testTemperatureUsesRequiredGPT5Temperature", run: { AIReasoningConfigTests().testTemperatureUsesRequiredGPT5Temperature() }),
+            VoiceInkCoreCheck(name: "AIReasoningConfigTests.testReasoningEffortMatchesProviderModelPolicy", run: { AIReasoningConfigTests().testReasoningEffortMatchesProviderModelPolicy() }),
+            VoiceInkCoreCheck(name: "AIReasoningConfigTests.testExtraBodyParametersMatchProviderModelPolicy", run: { AIReasoningConfigTests().testExtraBodyParametersMatchProviderModelPolicy() }),
             VoiceInkCoreCheck(name: "APIKeyReferenceTests.testResolvedValueReturnsTrimmedLiteralKeys", run: { APIKeyReferenceTests().testResolvedValueReturnsTrimmedLiteralKeys() }),
             VoiceInkCoreCheck(name: "APIKeyReferenceTests.testResolvedValueResolvesDollarEnvironmentReference", run: { APIKeyReferenceTests().testResolvedValueResolvesDollarEnvironmentReference() }),
             VoiceInkCoreCheck(name: "APIKeyReferenceTests.testResolvedValueResolvesBracedEnvironmentReference", run: { APIKeyReferenceTests().testResolvedValueResolvesBracedEnvironmentReference() }),
@@ -136,6 +139,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "ProviderModelSelectionTests.testPostProcessingModelsAreNilForNonPostProcessingProviders", run: { ProviderModelSelectionTests().testPostProcessingModelsAreNilForNonPostProcessingProviders() }),
             VoiceInkCoreCheck(name: "ProviderModelSelectionTests.testSelectedModelReturnsEmptyStringWhenUseHasNoModels", run: { ProviderModelSelectionTests().testSelectedModelReturnsEmptyStringWhenUseHasNoModels() }),
             VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testChatRequestBuilderUsesOpenAICompatibleEndpointAndBody", run: { try RemoteProviderRequestTests().testChatRequestBuilderUsesOpenAICompatibleEndpointAndBody() }),
+            VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testChatRequestBuilderIncludesReasoningAndExtraBodyParameters", run: { try RemoteProviderRequestTests().testChatRequestBuilderIncludesReasoningAndExtraBodyParameters() }),
             VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testChatCodecReturnsFirstMessageContentOrEmptyString", run: { try RemoteProviderRequestTests().testChatCodecReturnsFirstMessageContentOrEmptyString() }),
             VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testOpenAICompatibleTranscriptionRequestBuilderUsesMultipartAudioRequest", run: { try RemoteProviderRequestTests().testOpenAICompatibleTranscriptionRequestBuilderUsesMultipartAudioRequest() }),
             VoiceInkCoreCheck(name: "RemoteProviderRequestTests.testOpenAICompatibleTranscriptionRequestBuilderIncludesOptionalFields", run: { try RemoteProviderRequestTests().testOpenAICompatibleTranscriptionRequestBuilderIncludesOptionalFields() }),

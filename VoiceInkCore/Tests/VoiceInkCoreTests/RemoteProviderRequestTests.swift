@@ -29,6 +29,28 @@ final class RemoteProviderRequestTests: XCTestCase {
         XCTAssertEqual(body.temperature, 0.2)
     }
 
+    func testChatRequestBuilderIncludesReasoningAndExtraBodyParameters() throws {
+        let request = try VoiceInkOpenAICompatibleChatRequestBuilder.make(
+            baseURL: try XCTUnwrap(URL(string: "https://api.groq.com/openai")),
+            apiKey: "llm-key",
+            model: "openai/gpt-oss-120b",
+            messages: [
+                VoiceInkOpenAICompatibleChatMessage(role: "user", content: "User")
+            ],
+            temperature: 1,
+            reasoningEffort: "low",
+            extraBodyParameters: ["include_reasoning": false]
+        )
+
+        let body = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: try XCTUnwrap(request.httpBody)) as? [String: Any]
+        )
+        XCTAssertEqual(body["model"] as? String, "openai/gpt-oss-120b")
+        XCTAssertEqual(body["temperature"] as? Double, 1)
+        XCTAssertEqual(body["reasoning_effort"] as? String, "low")
+        XCTAssertEqual(body["include_reasoning"] as? Bool, false)
+    }
+
     func testChatCodecReturnsFirstMessageContentOrEmptyString() throws {
         let response = VoiceInkOpenAICompatibleChatResponse(
             choices: [

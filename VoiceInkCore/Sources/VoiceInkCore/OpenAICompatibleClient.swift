@@ -64,14 +64,18 @@ public struct VoiceInkOpenAICompatibleClient: Sendable {
         apiKey: String,
         model: String,
         messages: [VoiceInkOpenAICompatibleChatMessage],
-        temperature: Double? = VoiceInkPostProcessingRequest.defaultTemperature
+        temperature: Double? = VoiceInkPostProcessingRequest.defaultTemperature,
+        reasoningEffort: String? = nil,
+        extraBodyParameters: [String: Any]? = nil
     ) async throws -> String {
         let request = try VoiceInkOpenAICompatibleChatRequestBuilder.make(
             baseURL: baseURL,
             apiKey: apiKey,
             model: model,
             messages: messages,
-            temperature: temperature
+            temperature: temperature,
+            reasoningEffort: reasoningEffort,
+            extraBodyParameters: extraBodyParameters
         )
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse else {

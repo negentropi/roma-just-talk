@@ -17,13 +17,21 @@ public struct VoiceInkPostProcessingClient: Sendable {
         guard let request = VoiceInkPostProcessingRequest(prompt: prompt, transcript: transcript) else {
             return transcript
         }
+        let aiProvider = provider.aiModelProvider
+        let temperature = VoiceInkAIReasoningConfig.temperature(forModelName: model, defaultTemperature: request.temperature)
 
         let result = try await client.chatCompletion(
             baseURL: provider.apiBaseURL,
             apiKey: apiKey,
             model: model,
             messages: request.messages,
-            temperature: request.temperature
+            temperature: temperature,
+            reasoningEffort: aiProvider.flatMap {
+                VoiceInkAIReasoningConfig.reasoningEffort(for: $0, modelName: model)
+            },
+            extraBodyParameters: aiProvider.flatMap {
+                VoiceInkAIReasoningConfig.extraBodyParameters(for: $0, modelName: model)
+            }
         )
 
         return VoiceInkPostProcessingRequest.finalizedTranscript(

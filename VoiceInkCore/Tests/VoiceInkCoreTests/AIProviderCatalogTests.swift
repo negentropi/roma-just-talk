@@ -68,6 +68,73 @@ final class AIProviderCatalogTests: XCTestCase {
         XCTAssertFalse(VoiceInkAIEnhancementProviderKind.speechmatics.isSelectableForTextEnhancement)
     }
 
+    func testMacOSAIEnhancementModelSelectionPreservesAvailableSelections() {
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.groq.selectedTextEnhancementModel(
+                "llama-3.3-70b-versatile",
+                availableModels: VoiceInkAIModelCatalog.availableModels(for: .groq),
+                defaultModel: VoiceInkAIModelCatalog.defaultModel(for: .groq)
+            ),
+            "llama-3.3-70b-versatile"
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.openRouter.selectedTextEnhancementModel(
+                "anthropic/claude-sonnet",
+                availableModels: ["anthropic/claude-sonnet"],
+                defaultModel: VoiceInkAIModelCatalog.defaultModel(for: .openRouter)
+            ),
+            "anthropic/claude-sonnet"
+        )
+    }
+
+    func testMacOSAIEnhancementModelSelectionFallsBackForBlankAndUnavailableSelections() {
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.groq.selectedTextEnhancementModel(
+                "",
+                availableModels: VoiceInkAIModelCatalog.availableModels(for: .groq),
+                defaultModel: VoiceInkAIModelCatalog.defaultModel(for: .groq)
+            ),
+            VoiceInkAIModelCatalog.defaultModel(for: .groq)
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.groq.selectedTextEnhancementModel(
+                "stale-model",
+                availableModels: VoiceInkAIModelCatalog.availableModels(for: .groq),
+                defaultModel: VoiceInkAIModelCatalog.defaultModel(for: .groq)
+            ),
+            VoiceInkAIModelCatalog.defaultModel(for: .groq)
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.localCLI.selectedTextEnhancementModel(
+                "custom-cli-model",
+                availableModels: [],
+                defaultModel: "local-cli"
+            ),
+            "local-cli"
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.custom.selectedTextEnhancementModel(
+                "saved-custom-selection",
+                availableModels: [],
+                defaultModel: "custom-model"
+            ),
+            "custom-model"
+        )
+    }
+
+    func testMacOSAIEnhancementModelSelectionKeepsUnavailableOllamaModel() {
+        XCTAssertTrue(VoiceInkAIEnhancementProviderKind.ollama.preservesUnavailableSelectedTextEnhancementModel)
+        XCTAssertFalse(VoiceInkAIEnhancementProviderKind.groq.preservesUnavailableSelectedTextEnhancementModel)
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.ollama.selectedTextEnhancementModel(
+                "local-llama",
+                availableModels: [],
+                defaultModel: "mistral"
+            ),
+            "local-llama"
+        )
+    }
+
     func testMacOSAIEnhancementProviderVerificationTransportIsShared() {
         let expectedTransports: [VoiceInkAIEnhancementProviderKind: VoiceInkAIEnhancementAPIKeyVerificationTransport?] = [
             .anthropic: .anthropicMessages,

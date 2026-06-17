@@ -83,6 +83,27 @@ public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
         allCases.filter(\.isSelectableForTextEnhancement)
     }
 
+    public var preservesUnavailableSelectedTextEnhancementModel: Bool {
+        self == .ollama
+    }
+
+    public func selectedTextEnhancementModel(
+        _ selectedModel: String?,
+        availableModels: [String],
+        defaultModel: String
+    ) -> String {
+        guard let selectedModel,
+              !selectedModel.isEmpty else {
+            return defaultModel
+        }
+
+        if preservesUnavailableSelectedTextEnhancementModel || availableModels.contains(selectedModel) {
+            return selectedModel
+        }
+
+        return defaultModel
+    }
+
     public var apiKeyVerificationTransport: VoiceInkAIEnhancementAPIKeyVerificationTransport? {
         switch self {
         case .anthropic:

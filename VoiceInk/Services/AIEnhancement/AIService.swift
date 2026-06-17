@@ -128,12 +128,11 @@ class AIService: ObservableObject {
     }
     
     var currentModel: String {
-        if let selectedModel = selectedModels[selectedProvider],
-           !selectedModel.isEmpty,
-           (selectedProvider == .ollama && !selectedModel.isEmpty) || availableModels.contains(selectedModel) {
-            return selectedModel
-        }
-        return selectedProvider.defaultModel
+        selectedProvider.selectedTextEnhancementModel(
+            selectedModels[selectedProvider],
+            availableModels: availableModels,
+            defaultModel: selectedProvider.defaultModel
+        )
     }
     
     var availableModels: [String] {

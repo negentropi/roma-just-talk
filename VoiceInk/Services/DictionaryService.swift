@@ -1,4 +1,5 @@
 import SwiftData
+import VoiceInkCore
 
 enum DictionaryService {
 
@@ -12,29 +13,21 @@ enum DictionaryService {
         existing: [VocabularyWord],
         context: ModelContext
     ) -> String? {
-        let parts = input
-            .split(separator: ",")
-            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .filter { !$0.isEmpty }
+        let plan = VoiceInkDictionaryPolicy.vocabularyInsertPlan(
+            input: input,
+            existingWords: existing.map(\.word)
+        )
 
-        guard !parts.isEmpty else { return nil }
-
-        if parts.count == 1, let word = parts.first {
-            if existing.contains(where: { $0.word.lowercased() == word.lowercased() }) {
-                return "'\(word)' is already in the vocabulary"
-            }
-            return insertVocabularyWord(word, context: context)
+        if let errorMessage = plan.errorMessage {
+            return errorMessage
         }
 
-        var addedWords = Set(existing.map { $0.word.lowercased() })
+        guard plan.shouldInsert else { return nil }
+
         var errors = [String]()
-        for word in parts {
-            let lower = word.lowercased()
-            if !addedWords.contains(lower) {
-                if let error = insertVocabularyWord(word, context: context) {
-                    errors.append(error)
-                }
-                addedWords.insert(lower)
+        for word in plan.wordsToInsert {
+            if let error = insertVocabularyWord(word, context: context) {
+                errors.append(error)
             }
         }
         return errors.isEmpty ? nil : errors.joined(separator: "; ")
@@ -64,27 +57,19 @@ enum DictionaryService {
         existing: [WordReplacement],
         context: ModelContext
     ) -> String? {
-        let tokens = original
-            .split(separator: ",")
-            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .filter { !$0.isEmpty }
+        let plan = VoiceInkDictionaryPolicy.wordReplacementInsertPlan(
+            original: original,
+            replacement: replacement,
+            existingOriginalTexts: existing.map(\.originalText)
+        )
 
-        guard !tokens.isEmpty, !replacement.isEmpty else { return nil }
-
-        for existingEntry in existing {
-            let existingTokens = existingEntry.originalText
-                .split(separator: ",")
-                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }
-                .filter { !$0.isEmpty }
-
-            for token in tokens {
-                if existingTokens.contains(token.lowercased()) {
-                    return "'\(token)' already exists in word replacements"
-                }
-            }
+        if let errorMessage = plan.errorMessage {
+            return errorMessage
         }
 
-        let entry = WordReplacement(originalText: original, replacementText: replacement)
+        guard plan.shouldInsert else { return nil }
+
+        let entry = WordReplacement(originalText: plan.originalText, replacementText: plan.replacementText)
         context.insert(entry)
         do {
             try context.save()

@@ -59,7 +59,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - prompt trigger-word detection, trigger-word editing policy, and prompt-trigger AI-enhancement detection result construction; platform shells still own prompt persistence and enhancement state mutation
 - AI-enhancement custom prompt record shape, Codable compatibility, and final-prompt wrapping; macOS still owns SwiftUI prompt rendering and prompt-store orchestration
 - predefined-prompt repair/merge policy and trigger-detectable prompt filtering; macOS still owns when the prompt store is loaded and saved
-- AI-enhancement custom prompt array and selected-prompt persistence helpers; platform shells still own notifications and UI state updates
+- AI-enhancement custom prompt array mutation, selected-prompt repair, and selected-prompt persistence helpers; platform shells still own notifications and UI state updates
 - selected-prompt repair and base prompt-text selection for AI enhancement; platform shells still own context capture and request execution
 - AI-enhancement prompt-store and context-toggle storage keys; macOS still owns persistence timing, notifications, and UI orchestration
 - transcription language catalog, provider language filtering, AssemblyAI realtime/batch language policy, selected-language fallback policy, language-option ordering, selected-language preference loading, selected-language request normalization, and the shared selected-language defaults key; platform shells still own selected-language storage/UI and runtime streaming-mode state
@@ -105,6 +105,7 @@ Current macOS consumers of shared remote transport:
 - macOS custom prompt final text delegates to `VoiceInkAIPrompts.finalPromptText`, so the system-instruction wrapper stays shared.
 - macOS `CustomPrompt` is now a shell typealias for `VoiceInkCustomPrompt`, keeping the SwiftUI prompt-grid adapter in the macOS shell while moving the prompt record and Codable compatibility into `VoiceInkCore`.
 - macOS predefined-prompt initialization now delegates to `VoiceInkCustomPromptPolicy`, and the old shell-only `PredefinedPrompts` adapter was removed.
+- macOS custom prompt add/update/delete selection behavior delegates to `VoiceInkCustomPromptPolicy`; macOS `AIEnhancementService` still owns persistence timing, notifications, and SwiftUI state.
 - macOS custom prompt loading, saving, and selected-prompt persistence now use `VoiceInkCustomPromptStorage`.
 - macOS AI-enhancement prompt selection delegates selected-prompt repair and base prompt text to `VoiceInkCustomPromptPolicy`; macOS still appends selected-text, clipboard, screen-capture, and vocabulary context before executing provider requests.
 - macOS prompt-trigger detection delegates result construction to `VoiceInkPromptDetectionPolicy`; macOS `PromptDetectionService` still adapts `AIEnhancementService` state and restores shell settings after enhancement.

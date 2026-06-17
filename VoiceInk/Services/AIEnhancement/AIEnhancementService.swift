@@ -416,23 +416,33 @@ class AIEnhancementService: ObservableObject {
 
     func addPrompt(title: String, promptText: String, icon: PromptIcon = "doc.text.fill", description: String? = nil, triggerWords: [String] = [], useSystemInstructions: Bool = true) {
         let newPrompt = CustomPrompt(title: title, promptText: promptText, icon: icon, description: description, isPredefined: false, triggerWords: triggerWords, useSystemInstructions: useSystemInstructions)
-        customPrompts.append(newPrompt)
-        if customPrompts.count == 1 {
-            selectedPromptId = newPrompt.id
-        }
+        applyPromptStoreState(
+            VoiceInkCustomPromptPolicy.addingPrompt(
+                newPrompt,
+                to: customPrompts,
+                selectedPromptId: selectedPromptId
+            )
+        )
     }
 
     func updatePrompt(_ prompt: CustomPrompt) {
-        if let index = customPrompts.firstIndex(where: { $0.id == prompt.id }) {
-            customPrompts[index] = prompt
-        }
+        applyPromptStoreState(
+            VoiceInkCustomPromptPolicy.updatingPrompt(
+                prompt,
+                in: customPrompts,
+                selectedPromptId: selectedPromptId
+            )
+        )
     }
 
     func deletePrompt(_ prompt: CustomPrompt) {
-        customPrompts.removeAll { $0.id == prompt.id }
-        if selectedPromptId == prompt.id {
-            selectedPromptId = allPrompts.first?.id
-        }
+        applyPromptStoreState(
+            VoiceInkCustomPromptPolicy.deletingPrompt(
+                prompt,
+                from: customPrompts,
+                selectedPromptId: selectedPromptId
+            )
+        )
     }
 
     func setActivePrompt(_ prompt: CustomPrompt) {
@@ -441,6 +451,15 @@ class AIEnhancementService: ObservableObject {
 
     private func refreshPromptDetectionCache() {
         promptDetectionPrompts = VoiceInkCustomPromptPolicy.triggerDetectablePrompts(from: customPrompts)
+    }
+
+    private func applyPromptStoreState(_ state: VoiceInkCustomPromptStoreState) {
+        if customPrompts != state.prompts {
+            customPrompts = state.prompts
+        }
+        if selectedPromptId != state.selectedPromptId {
+            selectedPromptId = state.selectedPromptId
+        }
     }
 }
 

@@ -130,6 +130,96 @@ final class CustomPromptTests: XCTestCase {
         )
     }
 
+    func testCustomPromptPolicyAddingPromptSelectsOnlyFirstPrompt() {
+        let firstId = UUID(uuidString: "00000000-0000-0000-0000-000000000201")!
+        let secondId = UUID(uuidString: "00000000-0000-0000-0000-000000000202")!
+        let firstPrompt = VoiceInkCustomPrompt(id: firstId, title: "First", promptText: "First prompt")
+        let secondPrompt = VoiceInkCustomPrompt(id: secondId, title: "Second", promptText: "Second prompt")
+
+        let firstState = VoiceInkCustomPromptPolicy.addingPrompt(
+            firstPrompt,
+            to: [],
+            selectedPromptId: nil
+        )
+        XCTAssertEqual(firstState.prompts.map(\.id), [firstId])
+        XCTAssertEqual(firstState.selectedPromptId, firstId)
+
+        let secondState = VoiceInkCustomPromptPolicy.addingPrompt(
+            secondPrompt,
+            to: firstState.prompts,
+            selectedPromptId: firstState.selectedPromptId
+        )
+        XCTAssertEqual(secondState.prompts.map(\.id), [firstId, secondId])
+        XCTAssertEqual(secondState.selectedPromptId, firstId)
+    }
+
+    func testCustomPromptPolicyUpdatingPromptReplacesMatchingPromptOnly() {
+        let firstId = UUID(uuidString: "00000000-0000-0000-0000-000000000203")!
+        let secondId = UUID(uuidString: "00000000-0000-0000-0000-000000000204")!
+        let selectedId = secondId
+        let firstPrompt = VoiceInkCustomPrompt(id: firstId, title: "First", promptText: "First prompt")
+        let secondPrompt = VoiceInkCustomPrompt(id: secondId, title: "Second", promptText: "Second prompt")
+        let updatedSecondPrompt = VoiceInkCustomPrompt(
+            id: secondId,
+            title: "Updated",
+            promptText: "Updated prompt"
+        )
+
+        let updatedState = VoiceInkCustomPromptPolicy.updatingPrompt(
+            updatedSecondPrompt,
+            in: [firstPrompt, secondPrompt],
+            selectedPromptId: selectedId
+        )
+
+        XCTAssertEqual(updatedState.prompts.map(\.title), ["First", "Updated"])
+        XCTAssertEqual(updatedState.selectedPromptId, selectedId)
+
+        let missingPrompt = VoiceInkCustomPrompt(
+            id: UUID(uuidString: "00000000-0000-0000-0000-000000000205")!,
+            title: "Missing",
+            promptText: "Missing prompt"
+        )
+        let missingState = VoiceInkCustomPromptPolicy.updatingPrompt(
+            missingPrompt,
+            in: [firstPrompt, secondPrompt],
+            selectedPromptId: selectedId
+        )
+
+        XCTAssertEqual(missingState.prompts, [firstPrompt, secondPrompt])
+        XCTAssertEqual(missingState.selectedPromptId, selectedId)
+    }
+
+    func testCustomPromptPolicyDeletingPromptRepairsSelectionWhenNeeded() {
+        let firstId = UUID(uuidString: "00000000-0000-0000-0000-000000000206")!
+        let secondId = UUID(uuidString: "00000000-0000-0000-0000-000000000207")!
+        let firstPrompt = VoiceInkCustomPrompt(id: firstId, title: "First", promptText: "First prompt")
+        let secondPrompt = VoiceInkCustomPrompt(id: secondId, title: "Second", promptText: "Second prompt")
+
+        let selectedDeletedState = VoiceInkCustomPromptPolicy.deletingPrompt(
+            firstPrompt,
+            from: [firstPrompt, secondPrompt],
+            selectedPromptId: firstId
+        )
+        XCTAssertEqual(selectedDeletedState.prompts.map(\.id), [secondId])
+        XCTAssertEqual(selectedDeletedState.selectedPromptId, secondId)
+
+        let unselectedDeletedState = VoiceInkCustomPromptPolicy.deletingPrompt(
+            firstPrompt,
+            from: [firstPrompt, secondPrompt],
+            selectedPromptId: secondId
+        )
+        XCTAssertEqual(unselectedDeletedState.prompts.map(\.id), [secondId])
+        XCTAssertEqual(unselectedDeletedState.selectedPromptId, secondId)
+
+        let lastSelectedDeletedState = VoiceInkCustomPromptPolicy.deletingPrompt(
+            firstPrompt,
+            from: [firstPrompt],
+            selectedPromptId: firstId
+        )
+        XCTAssertTrue(lastSelectedDeletedState.prompts.isEmpty)
+        XCTAssertNil(lastSelectedDeletedState.selectedPromptId)
+    }
+
     func testCustomPromptPolicyRepairsSelectedPromptOnlyWhenEnhancementIsEnabled() {
         let firstId = UUID(uuidString: "00000000-0000-0000-0000-000000000101")!
         let validId = UUID(uuidString: "00000000-0000-0000-0000-000000000102")!

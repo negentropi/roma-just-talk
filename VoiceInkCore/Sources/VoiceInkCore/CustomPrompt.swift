@@ -73,7 +73,50 @@ public struct VoiceInkCustomPrompt: Identifiable, Codable, Equatable, Sendable {
     }
 }
 
+public struct VoiceInkCustomPromptStoreState: Equatable, Sendable {
+    public let prompts: [VoiceInkCustomPrompt]
+    public let selectedPromptId: UUID?
+
+    public init(prompts: [VoiceInkCustomPrompt], selectedPromptId: UUID?) {
+        self.prompts = prompts
+        self.selectedPromptId = selectedPromptId
+    }
+}
+
 public enum VoiceInkCustomPromptPolicy {
+    public static func addingPrompt(
+        _ prompt: VoiceInkCustomPrompt,
+        to prompts: [VoiceInkCustomPrompt],
+        selectedPromptId: UUID?
+    ) -> VoiceInkCustomPromptStoreState {
+        let updatedPrompts = prompts + [prompt]
+        let updatedSelectedPromptId = updatedPrompts.count == 1 ? prompt.id : selectedPromptId
+        return VoiceInkCustomPromptStoreState(prompts: updatedPrompts, selectedPromptId: updatedSelectedPromptId)
+    }
+
+    public static func updatingPrompt(
+        _ prompt: VoiceInkCustomPrompt,
+        in prompts: [VoiceInkCustomPrompt],
+        selectedPromptId: UUID?
+    ) -> VoiceInkCustomPromptStoreState {
+        var updatedPrompts = prompts
+        if let index = updatedPrompts.firstIndex(where: { $0.id == prompt.id }) {
+            updatedPrompts[index] = prompt
+        }
+
+        return VoiceInkCustomPromptStoreState(prompts: updatedPrompts, selectedPromptId: selectedPromptId)
+    }
+
+    public static func deletingPrompt(
+        _ prompt: VoiceInkCustomPrompt,
+        from prompts: [VoiceInkCustomPrompt],
+        selectedPromptId: UUID?
+    ) -> VoiceInkCustomPromptStoreState {
+        let updatedPrompts = prompts.filter { $0.id != prompt.id }
+        let updatedSelectedPromptId = selectedPromptId == prompt.id ? updatedPrompts.first?.id : selectedPromptId
+        return VoiceInkCustomPromptStoreState(prompts: updatedPrompts, selectedPromptId: updatedSelectedPromptId)
+    }
+
     public static func repairedSelectedPromptId(
         _ selectedPromptId: UUID?,
         isEnhancementEnabled: Bool,

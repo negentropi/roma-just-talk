@@ -12,7 +12,6 @@ import VoiceInkCore
 final class AudioRecorder: NSObject, ObservableObject {
     @Published var isRecording: Bool = false
     @Published var currentRecordingURL: URL?
-    @Published var currentDuration: TimeInterval = 0
     @Published var levelsHistory: [CGFloat] = [] // normalized 0...1
 
     private var audioRecorder: AVAudioRecorder?
@@ -47,13 +46,11 @@ final class AudioRecorder: NSObject, ObservableObject {
 
         currentRecordingURL = url
         isRecording = true
-        currentDuration = 0
 
         meterTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
             Task { @MainActor in
                 guard let self else { return }
                 self.audioRecorder?.updateMeters()
-                self.currentDuration += 0.1
 
                 if let power = self.audioRecorder?.averagePower(forChannel: 0) {
                     // Convert dB (-160..0) to 0..1
@@ -89,7 +86,6 @@ final class AudioRecorder: NSObject, ObservableObject {
             try? FileManager.default.removeItem(at: url)
         }
         currentRecordingURL = nil
-        currentDuration = 0
         
         // Schedule session deactivation after discard as well
         sessionManager.scheduleDeactivation()

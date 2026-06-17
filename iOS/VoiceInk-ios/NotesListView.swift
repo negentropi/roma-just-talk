@@ -2,15 +2,6 @@ import SwiftUI
 import SwiftData
 import VoiceInkCore
 
-struct StaticButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
-            .opacity(1.0) // Always full opacity
-            .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
-    }
-}
-
 struct NotesListView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: [SortDescriptor(\Transcription.timestamp, order: .reverse)]) private var notes: [Transcription]
@@ -66,12 +57,6 @@ struct NotesListView: View {
                             message: Text("To record audio, please grant microphone access in Settings."),
                             primaryButton: .default(Text("Settings"), action: recordingManager.openSettings),
                             secondaryButton: .cancel()
-                        )
-                    case .busy:
-                        return Alert(
-                            title: Text("Microphone In Use"),
-                            message: Text("Another app is using the microphone. Please try again."),
-                            dismissButton: .default(Text("OK"))
                         )
                     case .generic(let error):
                         let nsError = error as NSError

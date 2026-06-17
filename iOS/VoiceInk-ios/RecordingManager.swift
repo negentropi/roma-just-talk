@@ -20,13 +20,11 @@ private enum MicrophonePermissionStatus {
 
 enum ActiveRecordingAlert: Identifiable {
     case permissionDenied
-    case busy
     case generic(Error)
     
     var id: String {
         switch self {
         case .permissionDenied: return "permissionDenied"
-        case .busy: return "busy"
         case .generic(let error): return "generic-\(error.localizedDescription)"
         }
     }
@@ -213,7 +211,6 @@ final class RecordingManager: ObservableObject {
             defer { 
                 // Clean up recorder state
                 recorder.currentRecordingURL = nil
-                recorder.currentDuration = 0
             }
 
             do {

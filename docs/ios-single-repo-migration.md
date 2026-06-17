@@ -35,7 +35,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - transcript status and presentation helpers
 - local transcription/model/missing-audio error vocabulary shared by macOS local Whisper and iOS local retry transcription
 - raw transcription output filtering for hallucination tags/brackets, optional filler words, default filler-word vocabulary, and filler-word list editing policy
-- transcription cleanup preferences and punctuation/lowercase cleanup policy
+- transcription cleanup preference loading and punctuation/lowercase cleanup policy
 - cursor-aware transcript capitalization policy; platform shells only supply cursor text and paste targets
 - NaturalLanguage word-count policy for metrics and short-enhancement skip decisions
 - short post-processing skip policy and storage defaults for brief transcripts; platform shells still own UI controls and whether to apply the policy

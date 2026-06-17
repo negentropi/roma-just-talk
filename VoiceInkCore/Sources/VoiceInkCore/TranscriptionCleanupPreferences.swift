@@ -48,6 +48,13 @@ public enum PunctuationCleanupMode: String, Codable, CaseIterable, Identifiable,
 public struct VoiceInkTranscriptionCleanupConfiguration: Equatable, Sendable {
     public static let disabled = VoiceInkTranscriptionCleanupConfiguration()
 
+    public static func current(in defaults: UserDefaults = .standard) -> VoiceInkTranscriptionCleanupConfiguration {
+        VoiceInkTranscriptionCleanupConfiguration(
+            punctuationMode: PunctuationCleanupMode.current(in: defaults),
+            shouldLowercase: defaults.bool(forKey: VoiceInkUserDefaultsKey.lowercaseTranscription)
+        )
+    }
+
     public let punctuationMode: PunctuationCleanupMode
     public let shouldLowercase: Bool
 

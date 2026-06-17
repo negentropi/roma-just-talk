@@ -10,10 +10,12 @@ struct TranscriptionOutputFilter {
     }
 
     static func applyUserCleanupPreferences(_ text: String) -> String {
-        let punctuationMode = PunctuationCleanupMode.current()
-        let shouldLowercase = UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.lowercaseTranscription)
-
-        return applyCleanupPreferences(text, punctuationMode: punctuationMode, shouldLowercase: shouldLowercase)
+        let cleanupConfiguration = VoiceInkTranscriptionCleanupConfiguration.current()
+        return applyCleanupPreferences(
+            text,
+            punctuationMode: cleanupConfiguration.punctuationMode,
+            shouldLowercase: cleanupConfiguration.shouldLowercase
+        )
     }
 
     static func applyCleanupPreferences(_ text: String, punctuationMode: PunctuationCleanupMode, shouldLowercase: Bool) -> String {

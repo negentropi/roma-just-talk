@@ -33,6 +33,21 @@ final class TranscriptionCleanupPreferencesTests: XCTestCase {
         XCTAssertFalse(VoiceInkTranscriptionCleanupConfiguration.disabled.shouldLowercase)
     }
 
+    func testCurrentCleanupConfigurationReadsSharedDefaults() {
+        withIsolatedDefaults { defaults in
+            PunctuationCleanupMode.setCurrent(.removeTrailingPeriod, in: defaults)
+            defaults.set(true, forKey: VoiceInkUserDefaultsKey.lowercaseTranscription)
+
+            XCTAssertEqual(
+                VoiceInkTranscriptionCleanupConfiguration.current(in: defaults),
+                VoiceInkTranscriptionCleanupConfiguration(
+                    punctuationMode: .removeTrailingPeriod,
+                    shouldLowercase: true
+                )
+            )
+        }
+    }
+
     func testRemoveTrailingPeriodPreservesEllipsisAndTrailingWhitespace() {
         XCTAssertEqual(
             VoiceInkTranscriptionCleanupPreferences.removeTrailingPeriod(from: "Ship it.  "),

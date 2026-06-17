@@ -24,7 +24,13 @@ struct AudioFileRow: View {
         if isExpanded {
             return displayText
         }
-        return item.transcription?.enhancedText ?? item.transcription?.text ?? ""
+        guard let transcription = item.transcription else {
+            return ""
+        }
+        return VoiceInkTranscriptPresentation.preferredText(
+            rawText: transcription.text,
+            enhancedText: transcription.enhancedText
+        ) ?? ""
     }
 
     var body: some View {

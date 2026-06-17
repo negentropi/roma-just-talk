@@ -21,9 +21,6 @@ extension VoiceInkWhisperModelFileSpec {
         FileManager.default.fileExists(atPath: fileURL.path)
     }
     
-    static let baseModel = VoiceInkWhisperModelFiles.baseModel
-
-    static let availableModels = VoiceInkWhisperModelFiles.bootstrapModels
 }
 
 @MainActor
@@ -177,18 +174,18 @@ class LocalModelManager: ObservableObject {
     
     /// Get the path to the downloaded base model, if available
     var baseModelPath: String? {
-        let model = WhisperModel.baseModel
+        let model = VoiceInkWhisperModelFiles.baseModel
         return model.isDownloaded ? model.fileURL.path : nil
     }
     
     /// Check if any model is available for transcription
     var hasAvailableModel: Bool {
-        WhisperModel.availableModels.contains { $0.isDownloaded }
+        VoiceInkWhisperModelFiles.bootstrapModels.contains { $0.isDownloaded }
     }
     
     /// Get the first available model for transcription
     var firstAvailableModel: WhisperModel? {
-        WhisperModel.availableModels.first { $0.isDownloaded }
+        VoiceInkWhisperModelFiles.bootstrapModels.first { $0.isDownloaded }
     }
     
     /// Get disk usage information for models

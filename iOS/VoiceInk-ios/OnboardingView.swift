@@ -107,7 +107,7 @@ struct ModelDownloadOnboardingView: View {
     @State private var showError = false
     @State private var showDownloadConfirmation = false
     
-    var baseModel = WhisperModel.baseModel
+    var baseModel = VoiceInkWhisperModelFiles.baseModel
     
     var body: some View {
         VStack(spacing: 0) {

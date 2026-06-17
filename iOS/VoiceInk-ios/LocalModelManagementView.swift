@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Combine
+import VoiceInkCore
 
 struct LocalModelManagementView: View {
     @StateObject private var modelManager = LocalModelManager.shared
@@ -15,7 +16,7 @@ struct LocalModelManagementView: View {
     
     var body: some View {
         List {
-            ForEach(WhisperModel.availableModels) { model in
+            ForEach(VoiceInkWhisperModelFiles.bootstrapModels) { model in
                 ModelRowView(model: model, modelManager: modelManager)
             }
         }

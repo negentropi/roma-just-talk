@@ -28,6 +28,15 @@ final class StoredAudioFileTests: XCTestCase {
         XCTAssertEqual(directory.lastPathComponent, "Recordings")
     }
 
+    func testFileURLBuildsUnderRecordingsDirectory() {
+        let recordingsDirectory = URL(fileURLWithPath: "/tmp/VoiceInk/Recordings", isDirectory: true)
+
+        XCTAssertEqual(
+            VoiceInkStoredAudioFile.fileURL(forFilename: "recording.wav", in: recordingsDirectory).path,
+            "/tmp/VoiceInk/Recordings/recording.wav"
+        )
+    }
+
     func testResolvesFileURLString() {
         let fileURL = URL(fileURLWithPath: "/tmp/voiceink-recording.m4a")
 

@@ -119,6 +119,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "StoredAudioFileTests.testRecordingsDirectoryNameMatchesExistingStoragePath", run: { StoredAudioFileTests().testRecordingsDirectoryNameMatchesExistingStoragePath() }),
             VoiceInkCoreCheck(name: "StoredAudioFileTests.testRecordingsDirectoryBuildsUnderBaseDirectory", run: { StoredAudioFileTests().testRecordingsDirectoryBuildsUnderBaseDirectory() }),
             VoiceInkCoreCheck(name: "StoredAudioFileTests.testCreateRecordingsDirectoryCreatesDirectoryUnderBaseDirectory", run: { try StoredAudioFileTests().testCreateRecordingsDirectoryCreatesDirectoryUnderBaseDirectory() }),
+            VoiceInkCoreCheck(name: "StoredAudioFileTests.testFileURLBuildsUnderRecordingsDirectory", run: { StoredAudioFileTests().testFileURLBuildsUnderRecordingsDirectory() }),
             VoiceInkCoreCheck(name: "StoredAudioFileTests.testResolvesFileURLString", run: { StoredAudioFileTests().testResolvesFileURLString() }),
             VoiceInkCoreCheck(name: "StoredAudioFileTests.testResolvesAbsolutePath", run: { StoredAudioFileTests().testResolvesAbsolutePath() }),
             VoiceInkCoreCheck(name: "StoredAudioFileTests.testResolvesRelativeFilenameAgainstRecordingsDirectory", run: { StoredAudioFileTests().testResolvesRelativeFilenameAgainstRecordingsDirectory() }),

@@ -146,7 +146,10 @@ class VoiceInkEngine: NSObject, ObservableObject {
 
                         do {
                             let fileName = "\(UUID().uuidString).wav"
-                            let permanentURL = self.recordingsDirectory.appendingPathComponent(fileName)
+                            let permanentURL = VoiceInkStoredAudioFile.fileURL(
+                                forFilename: fileName,
+                                in: self.recordingsDirectory
+                            )
                             self.recordedFile = permanentURL
 
                             let startupAudioRelay = RecordingStartupAudioRelay()
@@ -472,7 +475,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
             language: claimedPreload.language
         )
         let fileName = "\(UUID().uuidString).wav"
-        let permanentURL = recordingsDirectory.appendingPathComponent(fileName)
+        let permanentURL = VoiceInkStoredAudioFile.fileURL(forFilename: fileName, in: recordingsDirectory)
         let audioData = claimedPreload.audioData
         let audioFileReadyTask = Task.detached(priority: .utility) {
             try PCM16WAVFileWriter.writeMono16k(audioData, to: permanentURL)
@@ -559,7 +562,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
     ) async -> Bool {
         logger.notice("Latency trace buffered audio claimed operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s bytes=\(audioSnapshot.audioData.count, privacy: .public)")
         let fileName = "\(UUID().uuidString).wav"
-        let permanentURL = recordingsDirectory.appendingPathComponent(fileName)
+        let permanentURL = VoiceInkStoredAudioFile.fileURL(forFilename: fileName, in: recordingsDirectory)
         let audioData = audioSnapshot.audioData
         let audioFileReadyTask = Task.detached(priority: .utility) {
             try PCM16WAVFileWriter.writeMono16k(audioData, to: permanentURL)

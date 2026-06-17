@@ -146,7 +146,7 @@ class AudioTranscriptionManager: ObservableObject {
             let recordingsDirectory = try VoiceInkStoredAudioFile.createRecordingsDirectory(in: appSupportDirectory)
 
             let fileName = "transcribed_\(UUID().uuidString).wav"
-            let permanentURL = recordingsDirectory.appendingPathComponent(fileName)
+            let permanentURL = VoiceInkStoredAudioFile.fileURL(forFilename: fileName, in: recordingsDirectory)
 
             try audioProcessor.saveSamplesAsWav(samples: samples, to: permanentURL)
             try Task.checkCancellation()

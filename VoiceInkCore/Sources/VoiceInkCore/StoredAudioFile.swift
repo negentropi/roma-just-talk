@@ -16,6 +16,10 @@ public enum VoiceInkStoredAudioFile {
         return directory
     }
 
+    public static func fileURL(forFilename filename: String, in recordingsDirectory: URL) -> URL {
+        recordingsDirectory.appendingPathComponent(filename)
+    }
+
     public static func resolvedURL(
         for storedValue: String?,
         relativeTo recordingsDirectory: URL? = nil
@@ -37,7 +41,7 @@ public enum VoiceInkStoredAudioFile {
         guard let recordingsDirectory else {
             return nil
         }
-        return recordingsDirectory.appendingPathComponent(storedValue)
+        return fileURL(forFilename: storedValue, in: recordingsDirectory)
     }
 
     public static func resolvedPath(

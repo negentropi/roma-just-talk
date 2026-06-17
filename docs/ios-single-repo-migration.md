@@ -33,7 +33,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - local transcription/model/missing-audio error vocabulary shared by macOS local Whisper and iOS local retry transcription
 - raw transcription output filtering for hallucination tags/brackets and optional filler words
 - transcription cleanup preferences and punctuation/lowercase cleanup policy
-- stored audio-file path resolution and recordings directory construction
+- stored audio-file path resolution plus recordings directory and file URL construction
 - duration presentation
 - Whisper and VAD model file metadata, including platform-base Whisper model directory and model/sidecar file construction
 - local Whisper runtime defaults for thread count, transcription temperature, and VAD thresholds

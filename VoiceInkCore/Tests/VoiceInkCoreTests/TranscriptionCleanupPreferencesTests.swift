@@ -28,6 +28,16 @@ final class TranscriptionCleanupPreferencesTests: XCTestCase {
         }
     }
 
+    func testClearCurrentRemovesModeAndDisablesLegacyFlag() {
+        withIsolatedDefaults { defaults in
+            PunctuationCleanupMode.setCurrent(.removeAll, in: defaults)
+            PunctuationCleanupMode.clearCurrent(in: defaults)
+
+            XCTAssertNil(defaults.string(forKey: PunctuationCleanupMode.userDefaultsKey))
+            XCTAssertFalse(defaults.bool(forKey: PunctuationCleanupMode.legacyRemovePunctuationKey))
+        }
+    }
+
     func testCleanupConfigurationDefaultsToCurrentNoOpPolicy() {
         XCTAssertEqual(VoiceInkTranscriptionCleanupConfiguration.disabled.punctuationMode, .keep)
         XCTAssertFalse(VoiceInkTranscriptionCleanupConfiguration.disabled.shouldFormatParagraphs)
@@ -69,6 +79,36 @@ final class TranscriptionCleanupPreferencesTests: XCTestCase {
                     fillerWords: VoiceInkFillerWords.defaultWords
                 )
             )
+        }
+    }
+
+    func testCleanupPreferenceStorageRoundTripsTextPreferences() {
+        withIsolatedDefaults { defaults in
+            XCTAssertTrue(VoiceInkTranscriptionCleanupPreferenceStorage.isTextFormattingEnabled(from: defaults))
+            XCTAssertFalse(VoiceInkTranscriptionCleanupPreferenceStorage.shouldLowercase(from: defaults))
+            XCTAssertTrue(VoiceInkTranscriptionCleanupPreferenceStorage.shouldRemoveFillerWords(from: defaults))
+
+            VoiceInkTranscriptionCleanupPreferenceStorage.saveTextFormattingEnabled(false, to: defaults)
+            VoiceInkTranscriptionCleanupPreferenceStorage.saveLowercaseTranscription(true, to: defaults)
+            VoiceInkTranscriptionCleanupPreferenceStorage.saveRemoveFillerWords(false, to: defaults)
+
+            XCTAssertFalse(VoiceInkTranscriptionCleanupPreferenceStorage.isTextFormattingEnabled(from: defaults))
+            XCTAssertTrue(VoiceInkTranscriptionCleanupPreferenceStorage.shouldLowercase(from: defaults))
+            XCTAssertFalse(VoiceInkTranscriptionCleanupPreferenceStorage.shouldRemoveFillerWords(from: defaults))
+        }
+    }
+
+    func testCleanupPreferenceStorageClearRestoresSharedDefaults() {
+        withIsolatedDefaults { defaults in
+            VoiceInkTranscriptionCleanupPreferenceStorage.saveTextFormattingEnabled(false, to: defaults)
+            VoiceInkTranscriptionCleanupPreferenceStorage.saveLowercaseTranscription(true, to: defaults)
+            VoiceInkTranscriptionCleanupPreferenceStorage.saveRemoveFillerWords(false, to: defaults)
+
+            VoiceInkTranscriptionCleanupPreferenceStorage.clearTextPreferences(from: defaults)
+
+            XCTAssertTrue(VoiceInkTranscriptionCleanupPreferenceStorage.isTextFormattingEnabled(from: defaults))
+            XCTAssertFalse(VoiceInkTranscriptionCleanupPreferenceStorage.shouldLowercase(from: defaults))
+            XCTAssertTrue(VoiceInkTranscriptionCleanupPreferenceStorage.shouldRemoveFillerWords(from: defaults))
         }
     }
 

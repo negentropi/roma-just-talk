@@ -109,8 +109,6 @@ class ImportExportService {
     private let keyIsAudioCleanupEnabled = "IsAudioCleanupEnabled"
     private let keyAudioRetentionPeriod = "AudioRetentionPeriod"
 
-    private let keyIsTextFormattingEnabled = VoiceInkUserDefaultsKey.isTextFormattingEnabled
-
     private init() {
         if let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String {
             self.currentSettingsVersion = version
@@ -183,10 +181,10 @@ class ImportExportService {
             isSystemMuteEnabled: mediaController.isSystemMuteEnabled,
             isPauseMediaEnabled: playbackController.isPauseMediaEnabled,
             audioResumptionDelay: mediaController.audioResumptionDelay,
-            isTextFormattingEnabled: UserDefaults.standard.bool(forKey: keyIsTextFormattingEnabled),
+            isTextFormattingEnabled: VoiceInkTranscriptionCleanupPreferenceStorage.isTextFormattingEnabled(),
             punctuationCleanupMode: punctuationCleanupMode,
             removePunctuation: punctuationCleanupMode == .removeAll,
-            lowercaseTranscription: UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.lowercaseTranscription),
+            lowercaseTranscription: VoiceInkTranscriptionCleanupPreferenceStorage.shouldLowercase(),
             isExperimentalFeaturesEnabled: UserDefaults.standard.bool(forKey: "isExperimentalFeaturesEnabled"),
             restoreClipboardAfterPaste: UserDefaults.standard.bool(forKey: "restoreClipboardAfterPaste"),
             clipboardRestoreDelay: UserDefaults.standard.double(forKey: "clipboardRestoreDelay"),

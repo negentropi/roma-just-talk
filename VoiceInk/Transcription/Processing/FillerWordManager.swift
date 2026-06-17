@@ -4,8 +4,6 @@ import VoiceInkCore
 class FillerWordManager: ObservableObject {
     static let shared = FillerWordManager()
 
-    private let removeFillerWordsKey = VoiceInkUserDefaultsKey.removeFillerWords
-
     @Published var fillerWords: [String] {
         didSet {
             VoiceInkFillerWordPreference.saveWords(fillerWords)
@@ -13,7 +11,7 @@ class FillerWordManager: ObservableObject {
     }
 
     var isEnabled: Bool {
-        UserDefaults.standard.bool(forKey: removeFillerWordsKey)
+        VoiceInkTranscriptionCleanupPreferenceStorage.shouldRemoveFillerWords()
     }
 
     private init() {

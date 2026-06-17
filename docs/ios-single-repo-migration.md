@@ -46,7 +46,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - transcript status and presentation helpers
 - local transcription/model/missing-audio error vocabulary shared by macOS local Whisper and iOS local retry transcription
 - raw transcription output filtering for hallucination tags/brackets, optional filler words, default filler-word vocabulary, and filler-word list editing policy; iOS settings now use the same list editing policy in their platform shell
-- transcription cleanup preference loading, raw-output filtering, and paragraph-formatting/punctuation/lowercase/filler-word cleanup policy
+- transcription cleanup preference loading/saving/reset storage, raw-output filtering, and paragraph-formatting/punctuation/lowercase/filler-word cleanup policy
 - filler-word list storage defaults and saving
 - cursor-aware transcript capitalization policy; platform shells only supply cursor text and paste targets
 - NaturalLanguage word-count policy for metrics and short-enhancement skip decisions
@@ -124,6 +124,7 @@ Current macOS consumers of shared remote transport:
 - macOS history/import row summaries and iOS note detail display use `VoiceInkTranscriptPresentation.preferredText` for the enhanced-text-first transcript display rule.
 - macOS `FillerWordManager`, iOS `AppSettings`, and cleanup configuration load and save filler-word lists through `VoiceInkFillerWordPreference`; platform shells still own settings UI and toggle state.
 - macOS transcription services, Power Mode, rolling preload, and iOS `AppSettings` read/write/clear selected transcription language through `VoiceInkTranscriptionLanguagePreference`; platform shells still own settings UI and language-change notifications.
+- macOS paste/pipeline, Power Mode, backup import/export, `FillerWordManager`, and iOS `AppSettings` read/write/reset cleanup toggles through `VoiceInkTranscriptionCleanupPreferenceStorage`; SwiftUI setting controls still bind directly through `@AppStorage`.
 - iOS retry post-processing inherits `VoiceInkAIReasoningConfig` through `VoiceInkPostProcessingClient`, aligning OpenAI-compatible reasoning controls with macOS enhancement requests.
 
 Current iOS consumers of shared remote transport:

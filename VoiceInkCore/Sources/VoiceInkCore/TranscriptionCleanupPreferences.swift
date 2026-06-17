@@ -35,6 +35,11 @@ public enum PunctuationCleanupMode: String, Codable, CaseIterable, Identifiable,
         defaults.set(mode == .removeAll, forKey: legacyRemovePunctuationKey)
     }
 
+    public static func clearCurrent(in defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: userDefaultsKey)
+        defaults.set(false, forKey: legacyRemovePunctuationKey)
+    }
+
     public static func migrateLegacyUserDefaultIfNeeded(in defaults: UserDefaults = .standard) {
         if let rawValue = defaults.string(forKey: userDefaultsKey),
            PunctuationCleanupMode(rawValue: rawValue) != nil {
@@ -45,20 +50,50 @@ public enum PunctuationCleanupMode: String, Codable, CaseIterable, Identifiable,
     }
 }
 
+public enum VoiceInkTranscriptionCleanupPreferenceStorage {
+    public static func isTextFormattingEnabled(from defaults: UserDefaults = .standard) -> Bool {
+        defaults.object(forKey: VoiceInkUserDefaultsKey.isTextFormattingEnabled) as? Bool
+            ?? VoiceInkPreferenceDefault.isTextFormattingEnabled
+    }
+
+    public static func saveTextFormattingEnabled(_ enabled: Bool, to defaults: UserDefaults = .standard) {
+        defaults.set(enabled, forKey: VoiceInkUserDefaultsKey.isTextFormattingEnabled)
+    }
+
+    public static func shouldLowercase(from defaults: UserDefaults = .standard) -> Bool {
+        defaults.object(forKey: VoiceInkUserDefaultsKey.lowercaseTranscription) as? Bool
+            ?? VoiceInkPreferenceDefault.lowercaseTranscription
+    }
+
+    public static func saveLowercaseTranscription(_ enabled: Bool, to defaults: UserDefaults = .standard) {
+        defaults.set(enabled, forKey: VoiceInkUserDefaultsKey.lowercaseTranscription)
+    }
+
+    public static func shouldRemoveFillerWords(from defaults: UserDefaults = .standard) -> Bool {
+        defaults.object(forKey: VoiceInkUserDefaultsKey.removeFillerWords) as? Bool
+            ?? VoiceInkPreferenceDefault.removeFillerWords
+    }
+
+    public static func saveRemoveFillerWords(_ enabled: Bool, to defaults: UserDefaults = .standard) {
+        defaults.set(enabled, forKey: VoiceInkUserDefaultsKey.removeFillerWords)
+    }
+
+    public static func clearTextPreferences(from defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.isTextFormattingEnabled)
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.lowercaseTranscription)
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.removeFillerWords)
+    }
+}
+
 public struct VoiceInkTranscriptionCleanupConfiguration: Equatable, Sendable {
     public static let disabled = VoiceInkTranscriptionCleanupConfiguration()
 
     public static func current(in defaults: UserDefaults = .standard) -> VoiceInkTranscriptionCleanupConfiguration {
-        let shouldRemoveFillerWords = defaults.object(forKey: VoiceInkUserDefaultsKey.removeFillerWords) as? Bool
-            ?? VoiceInkPreferenceDefault.removeFillerWords
-
         return VoiceInkTranscriptionCleanupConfiguration(
             punctuationMode: PunctuationCleanupMode.current(in: defaults),
-            shouldFormatParagraphs: defaults.object(forKey: VoiceInkUserDefaultsKey.isTextFormattingEnabled) as? Bool
-                ?? VoiceInkPreferenceDefault.isTextFormattingEnabled,
-            shouldLowercase: defaults.object(forKey: VoiceInkUserDefaultsKey.lowercaseTranscription) as? Bool
-                ?? VoiceInkPreferenceDefault.lowercaseTranscription,
-            shouldRemoveFillerWords: shouldRemoveFillerWords,
+            shouldFormatParagraphs: VoiceInkTranscriptionCleanupPreferenceStorage.isTextFormattingEnabled(from: defaults),
+            shouldLowercase: VoiceInkTranscriptionCleanupPreferenceStorage.shouldLowercase(from: defaults),
+            shouldRemoveFillerWords: VoiceInkTranscriptionCleanupPreferenceStorage.shouldRemoveFillerWords(from: defaults),
             fillerWords: VoiceInkFillerWordPreference.words(from: defaults)
         )
     }

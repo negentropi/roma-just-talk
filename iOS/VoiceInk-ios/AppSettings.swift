@@ -39,15 +39,15 @@ final class AppSettings: ObservableObject {
     }
 
     @Published var isTextFormattingEnabled: Bool {
-        didSet { UserDefaults.standard.set(isTextFormattingEnabled, forKey: VoiceInkUserDefaultsKey.isTextFormattingEnabled) }
+        didSet { VoiceInkTranscriptionCleanupPreferenceStorage.saveTextFormattingEnabled(isTextFormattingEnabled) }
     }
 
     @Published var lowercaseTranscription: Bool {
-        didSet { UserDefaults.standard.set(lowercaseTranscription, forKey: VoiceInkUserDefaultsKey.lowercaseTranscription) }
+        didSet { VoiceInkTranscriptionCleanupPreferenceStorage.saveLowercaseTranscription(lowercaseTranscription) }
     }
 
     @Published var removeFillerWords: Bool {
-        didSet { UserDefaults.standard.set(removeFillerWords, forKey: VoiceInkUserDefaultsKey.removeFillerWords) }
+        didSet { VoiceInkTranscriptionCleanupPreferenceStorage.saveRemoveFillerWords(removeFillerWords) }
     }
 
     @Published var fillerWords: [String] {
@@ -80,12 +80,9 @@ final class AppSettings: ObservableObject {
             ?? VoiceInkPreferenceDefault.audioSessionTimeoutSeconds
         PunctuationCleanupMode.migrateLegacyUserDefaultIfNeeded()
         self.punctuationCleanupMode = PunctuationCleanupMode.current()
-        self.isTextFormattingEnabled = UserDefaults.standard.object(forKey: VoiceInkUserDefaultsKey.isTextFormattingEnabled) as? Bool
-            ?? VoiceInkPreferenceDefault.isTextFormattingEnabled
-        self.lowercaseTranscription = UserDefaults.standard.object(forKey: VoiceInkUserDefaultsKey.lowercaseTranscription) as? Bool
-            ?? VoiceInkPreferenceDefault.lowercaseTranscription
-        self.removeFillerWords = UserDefaults.standard.object(forKey: VoiceInkUserDefaultsKey.removeFillerWords) as? Bool
-            ?? VoiceInkPreferenceDefault.removeFillerWords
+        self.isTextFormattingEnabled = VoiceInkTranscriptionCleanupPreferenceStorage.isTextFormattingEnabled()
+        self.lowercaseTranscription = VoiceInkTranscriptionCleanupPreferenceStorage.shouldLowercase()
+        self.removeFillerWords = VoiceInkTranscriptionCleanupPreferenceStorage.shouldRemoveFillerWords()
         self.fillerWords = VoiceInkFillerWordPreference.words()
         self.selectedTranscriptionLanguage = VoiceInkTranscriptionLanguagePreference.selectedLanguage()
 
@@ -274,11 +271,8 @@ final class AppSettings: ObservableObject {
         lowercaseTranscription = VoiceInkPreferenceDefault.lowercaseTranscription
         removeFillerWords = VoiceInkPreferenceDefault.removeFillerWords
         fillerWords = VoiceInkFillerWords.defaultWords
-        UserDefaults.standard.removeObject(forKey: PunctuationCleanupMode.userDefaultsKey)
-        UserDefaults.standard.set(false, forKey: PunctuationCleanupMode.legacyRemovePunctuationKey)
-        UserDefaults.standard.removeObject(forKey: VoiceInkUserDefaultsKey.isTextFormattingEnabled)
-        UserDefaults.standard.removeObject(forKey: VoiceInkUserDefaultsKey.lowercaseTranscription)
-        UserDefaults.standard.removeObject(forKey: VoiceInkUserDefaultsKey.removeFillerWords)
+        PunctuationCleanupMode.clearCurrent()
+        VoiceInkTranscriptionCleanupPreferenceStorage.clearTextPreferences()
         UserDefaults.standard.removeObject(forKey: VoiceInkUserDefaultsKey.fillerWords)
         selectedTranscriptionLanguage = VoiceInkLanguageCatalog.autoDetectCode
         VoiceInkTranscriptionLanguagePreference.clearSelectedLanguage()

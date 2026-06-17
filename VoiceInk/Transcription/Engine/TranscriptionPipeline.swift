@@ -373,7 +373,7 @@ class TranscriptionPipeline {
             await restorePromptDetectionSettingsAndDismiss()
         } else if var textToPaste = finalPastedText,
            transcription.transcriptionState == .completed {
-            let shouldLowercase = UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.lowercaseTranscription)
+            let shouldLowercase = VoiceInkTranscriptionCleanupPreferenceStorage.shouldLowercase()
             if !shouldLowercase,
                VoiceInkContextualCapitalizationFormatter.needsCursorContext(textToPaste) {
                 let beforeCursor = if let preparedCursorTextContext {

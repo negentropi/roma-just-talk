@@ -367,7 +367,7 @@ class TranscriptionPipeline {
             await restorePromptDetectionSettingsAndDismiss()
         } else if var textToPaste = finalPastedText,
            transcription.transcriptionState == .completed {
-            let shouldLowercase = UserDefaults.standard.bool(forKey: "LowercaseTranscription")
+            let shouldLowercase = UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.lowercaseTranscription)
             if !shouldLowercase,
                ContextualCapitalizationFormatter.needsCursorContext(textToPaste) {
                 let beforeCursor = if let preparedCursorTextContext {

@@ -2,8 +2,6 @@ import Foundation
 import VoiceInkCore
 
 struct TranscriptionOutputFilter {
-    private static let lowercaseTranscriptionKey = "LowercaseTranscription"
-
     static func filter(_ text: String) -> String {
         VoiceInkTranscriptionOutputFilter.filter(
             text,
@@ -13,7 +11,7 @@ struct TranscriptionOutputFilter {
 
     static func applyUserCleanupPreferences(_ text: String) -> String {
         let punctuationMode = PunctuationCleanupMode.current()
-        let shouldLowercase = UserDefaults.standard.bool(forKey: lowercaseTranscriptionKey)
+        let shouldLowercase = UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.lowercaseTranscription)
 
         return applyCleanupPreferences(text, punctuationMode: punctuationMode, shouldLowercase: shouldLowercase)
     }

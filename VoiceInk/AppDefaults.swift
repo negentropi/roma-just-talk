@@ -12,7 +12,7 @@ enum AppDefaults {
     static var registeredDefaults: [String: Any] {
         [
             // Onboarding & General
-            "hasCompletedOnboarding": false,
+            VoiceInkUserDefaultsKey.hasCompletedOnboarding: false,
             "enableAnnouncements": true,
 
             // Clipboard
@@ -33,8 +33,8 @@ enum AppDefaults {
             "IsTextFormattingEnabled": true,
             "IsVADEnabled": true,
             "RemoveFillerWords": true,
-            "RemovePunctuation": false,
-            "LowercaseTranscription": false,
+            PunctuationCleanupMode.legacyRemovePunctuationKey: false,
+            VoiceInkUserDefaultsKey.lowercaseTranscription: false,
             "SelectedLanguage": "en",
             "AppendTrailingSpace": true,
             "showLiveTextPreview": false,
@@ -80,7 +80,7 @@ enum AppDefaults {
 
     static func registerDefaults() {
         let defaults = UserDefaults.standard
-        let shouldEnableLaunchAtLoginByDefault = defaults.object(forKey: "hasCompletedOnboarding") == nil
+        let shouldEnableLaunchAtLoginByDefault = defaults.object(forKey: VoiceInkUserDefaultsKey.hasCompletedOnboarding) == nil
             && defaults.object(forKey: "DidApplyLaunchAtLoginDefault") == nil
 
         defaults.register(defaults: registeredDefaults)

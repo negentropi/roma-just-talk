@@ -3,6 +3,7 @@ import Cocoa
 import Carbon.HIToolbox
 import LaunchAtLogin
 import AVFoundation
+import VoiceInkCore
 
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
@@ -16,7 +17,7 @@ struct SettingsView: View {
     @ObservedObject private var soundManager = SoundManager.shared
     @ObservedObject private var mediaController = MediaController.shared
     @ObservedObject private var playbackController = PlaybackController.shared
-    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = true
+    @AppStorage(VoiceInkUserDefaultsKey.hasCompletedOnboarding) private var hasCompletedOnboarding = true
     @AppStorage("enableAnnouncements") private var enableAnnouncements = true
     @AppStorage("restoreClipboardAfterPaste") private var restoreClipboardAfterPaste = true
     @AppStorage("clipboardRestoreDelay") private var clipboardRestoreDelay = 2.0

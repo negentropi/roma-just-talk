@@ -61,7 +61,7 @@ class PowerModeSessionManager {
                 isTextFormattingEnabled: UserDefaults.standard.bool(forKey: "IsTextFormattingEnabled"),
                 punctuationCleanupMode: punctuationCleanupMode,
                 removePunctuation: punctuationCleanupMode == .removeAll,
-                lowercaseTranscription: UserDefaults.standard.bool(forKey: "LowercaseTranscription")
+                lowercaseTranscription: UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.lowercaseTranscription)
             )
 
             let newSession = PowerModeSession(
@@ -115,7 +115,7 @@ class PowerModeSessionManager {
             isTextFormattingEnabled: UserDefaults.standard.bool(forKey: "IsTextFormattingEnabled"),
             punctuationCleanupMode: punctuationCleanupMode,
             removePunctuation: punctuationCleanupMode == .removeAll,
-            lowercaseTranscription: UserDefaults.standard.bool(forKey: "LowercaseTranscription")
+            lowercaseTranscription: UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.lowercaseTranscription)
         )
 
         session.originalState = updatedState
@@ -147,7 +147,7 @@ class PowerModeSessionManager {
 
             UserDefaults.standard.set(config.isTextFormattingEnabled, forKey: "IsTextFormattingEnabled")
             PunctuationCleanupMode.setCurrent(config.punctuationCleanupMode)
-            UserDefaults.standard.set(config.lowercaseTranscription, forKey: "LowercaseTranscription")
+            UserDefaults.standard.set(config.lowercaseTranscription, forKey: VoiceInkUserDefaultsKey.lowercaseTranscription)
         }
 
         if let modelName = config.selectedTranscriptionModelName,
@@ -192,7 +192,7 @@ class PowerModeSessionManager {
                 PunctuationCleanupMode.setCurrent(removePunctuation ? .removeAll : .keep)
             }
             if let lowercaseTranscription = state.lowercaseTranscription {
-                UserDefaults.standard.set(lowercaseTranscription, forKey: "LowercaseTranscription")
+                UserDefaults.standard.set(lowercaseTranscription, forKey: VoiceInkUserDefaultsKey.lowercaseTranscription)
             }
         }
 

@@ -29,6 +29,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - remote transcription provider dispatch for iOS retry transcription
 - mode runtime configuration and selected-mode repair
 - mode provider-selection repair and draft saveability rules
+- shared UserDefaults key names plus iOS mode persistence helpers
 - transcript status and presentation helpers
 - local transcription/model/missing-audio error vocabulary shared by macOS local Whisper and iOS local retry transcription
 - raw transcription output filtering for hallucination tags/brackets and optional filler words

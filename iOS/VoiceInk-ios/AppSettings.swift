@@ -5,24 +5,17 @@ import VoiceInkCore
 @MainActor
 final class AppSettings: ObservableObject {
     static let shared = AppSettings()
-    private static let lowercaseTranscriptionKey = "LowercaseTranscription"
 
     // Modes system
     @Published var modes: [Mode] {
         didSet {
-            saveModes()
+            VoiceInkModeStorage.saveModes(modes)
             repairSelectedModeId()
         }
     }
     
     @Published var selectedModeId: UUID? {
-        didSet { 
-            if let id = selectedModeId {
-                UserDefaults.standard.set(id.uuidString, forKey: "selectedModeId")
-            } else {
-                UserDefaults.standard.removeObject(forKey: "selectedModeId")
-            }
-        }
+        didSet { VoiceInkModeStorage.saveSelectedModeId(selectedModeId) }
     }
     
     var selectedMode: Mode? {
@@ -34,7 +27,7 @@ final class AppSettings: ObservableObject {
     
     // Audio session timeout configuration
     @Published var audioSessionTimeoutSeconds: Int {
-        didSet { UserDefaults.standard.set(audioSessionTimeoutSeconds, forKey: "audioSessionTimeoutSeconds") }
+        didSet { UserDefaults.standard.set(audioSessionTimeoutSeconds, forKey: VoiceInkUserDefaultsKey.audioSessionTimeoutSeconds) }
     }
 
     @Published var punctuationCleanupMode: PunctuationCleanupMode {
@@ -42,20 +35,15 @@ final class AppSettings: ObservableObject {
     }
 
     @Published var lowercaseTranscription: Bool {
-        didSet { UserDefaults.standard.set(lowercaseTranscription, forKey: Self.lowercaseTranscriptionKey) }
+        didSet { UserDefaults.standard.set(lowercaseTranscription, forKey: VoiceInkUserDefaultsKey.lowercaseTranscription) }
     }
 
     private init() {
         // Load modes
-        self.modes = Self.loadModes()
+        self.modes = VoiceInkModeStorage.loadModes()
         
         // Load selected mode
-        if let selectedModeIdString = UserDefaults.standard.string(forKey: "selectedModeId"),
-           let selectedModeId = UUID(uuidString: selectedModeIdString) {
-            self.selectedModeId = selectedModeId
-        } else {
-            self.selectedModeId = nil
-        }
+        self.selectedModeId = VoiceInkModeStorage.loadSelectedModeId()
         
 
         self.apiKeysByProvider = Dictionary(
@@ -68,10 +56,11 @@ final class AppSettings: ObservableObject {
         )
         
         // Load audio session timeout (default: 90 seconds)
-        self.audioSessionTimeoutSeconds = UserDefaults.standard.object(forKey: "audioSessionTimeoutSeconds") as? Int ?? 90
+        self.audioSessionTimeoutSeconds = UserDefaults.standard.object(forKey: VoiceInkUserDefaultsKey.audioSessionTimeoutSeconds) as? Int
+            ?? VoiceInkPreferenceDefault.audioSessionTimeoutSeconds
         PunctuationCleanupMode.migrateLegacyUserDefaultIfNeeded()
         self.punctuationCleanupMode = PunctuationCleanupMode.current()
-        self.lowercaseTranscription = UserDefaults.standard.bool(forKey: Self.lowercaseTranscriptionKey)
+        self.lowercaseTranscription = UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.lowercaseTranscription)
 
         repairSelectedModeId()
     }
@@ -118,20 +107,6 @@ final class AppSettings: ObservableObject {
 
     // MARK: - Modes Management
     
-    private func saveModes() {
-        if let data = try? JSONEncoder().encode(modes) {
-            UserDefaults.standard.set(data, forKey: "modes")
-        }
-    }
-    
-    private static func loadModes() -> [Mode] {
-        guard let data = UserDefaults.standard.data(forKey: "modes"),
-              let modes = try? JSONDecoder().decode([Mode].self, from: data) else {
-            return []
-        }
-        return modes
-    }
-
     private func repairSelectedModeId() {
         let repairedModeId = modes.repairedSelectedModeId(selectedModeId)
         if selectedModeId != repairedModeId {
@@ -165,7 +140,7 @@ final class AppSettings: ObservableObject {
 
     func completeFirstTimeSetup() {
         ensureDefaultModeExists()
-        UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
+        UserDefaults.standard.set(true, forKey: VoiceInkUserDefaultsKey.hasCompletedOnboarding)
     }
 
     private func saveAPIKey(_ key: String, forKey account: String) {
@@ -219,24 +194,23 @@ final class AppSettings: ObservableObject {
         // Clear modes and selection
         modes = []
         selectedModeId = nil
-        UserDefaults.standard.removeObject(forKey: "modes")
-        UserDefaults.standard.removeObject(forKey: "selectedModeId")
-        UserDefaults.standard.removeObject(forKey: "hasCompletedOnboarding")
+        VoiceInkModeStorage.clear()
+        UserDefaults.standard.removeObject(forKey: VoiceInkUserDefaultsKey.hasCompletedOnboarding)
 
         // Clear verification flags
         verifiedAPIKeyProviders = []
         VoiceInkProviderKind.userAPIKeyProviders.forEach(Self.clearKeyVerified)
         
         // Reset audio session timeout to default
-        audioSessionTimeoutSeconds = 90
-        UserDefaults.standard.removeObject(forKey: "audioSessionTimeoutSeconds")
+        audioSessionTimeoutSeconds = VoiceInkPreferenceDefault.audioSessionTimeoutSeconds
+        UserDefaults.standard.removeObject(forKey: VoiceInkUserDefaultsKey.audioSessionTimeoutSeconds)
 
         // Reset transcription cleanup preferences
         punctuationCleanupMode = .keep
         lowercaseTranscription = false
         UserDefaults.standard.removeObject(forKey: PunctuationCleanupMode.userDefaultsKey)
         UserDefaults.standard.set(false, forKey: PunctuationCleanupMode.legacyRemovePunctuationKey)
-        UserDefaults.standard.removeObject(forKey: Self.lowercaseTranscriptionKey)
+        UserDefaults.standard.removeObject(forKey: VoiceInkUserDefaultsKey.lowercaseTranscription)
 
         // Clear API keys from memory and Keychain
         apiKeysByProvider = [:]

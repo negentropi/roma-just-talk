@@ -103,7 +103,7 @@ class LastTranscriptionService: ObservableObject {
 
     @MainActor
     private static func textForCursorPaste(_ text: String) -> String {
-        guard !UserDefaults.standard.bool(forKey: "LowercaseTranscription") else {
+        guard !UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.lowercaseTranscription) else {
             return text
         }
 

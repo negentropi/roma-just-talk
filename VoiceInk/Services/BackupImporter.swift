@@ -21,7 +21,6 @@ enum BackupImporter {
     private static let keyAudioRetentionPeriod = "AudioRetentionPeriod"
 
     private static let keyIsTextFormattingEnabled = "IsTextFormattingEnabled"
-    private static let keyLowercaseTranscription = "LowercaseTranscription"
 
     @MainActor
     static func apply(_ backup: BackupFile, categories: Set<BackupCategory>, enhancementService: AIEnhancementService, recordingShortcutManager: RecordingShortcutManager, menuBarManager: MenuBarManager, mediaController: MediaController, playbackController: PlaybackController, soundManager: SoundManager, recorderUIManager: RecorderUIManager, modelContext: ModelContext, transcriptionModelManager: TranscriptionModelManager) throws {
@@ -204,7 +203,7 @@ enum BackupImporter {
             PunctuationCleanupMode.setCurrent(removePunctuation ? .removeAll : .keep)
         }
         if let lowercaseTranscription = general.lowercaseTranscription {
-            UserDefaults.standard.set(lowercaseTranscription, forKey: keyLowercaseTranscription)
+            UserDefaults.standard.set(lowercaseTranscription, forKey: VoiceInkUserDefaultsKey.lowercaseTranscription)
         }
         if let restoreClipboard = general.restoreClipboardAfterPaste {
             UserDefaults.standard.set(restoreClipboard, forKey: "restoreClipboardAfterPaste")

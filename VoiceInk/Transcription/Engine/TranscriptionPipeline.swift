@@ -222,13 +222,9 @@ class TranscriptionPipeline {
                 await promptDetectionService.applyDetectionResult(detectionResult, to: enhancementService)
             }
 
-            let skipConfiguration = VoiceInkPostProcessingSkipConfiguration(
-                isEnabled: UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.skipShortEnhancement),
-                wordThreshold: UserDefaults.standard.integer(forKey: VoiceInkUserDefaultsKey.shortEnhancementWordThreshold)
-            )
             let shouldSkipEnhancement = VoiceInkPostProcessingSkipPolicy.shouldSkipPostProcessing(
                 transcript: text,
-                configuration: skipConfiguration,
+                configuration: VoiceInkPostProcessingSkipConfiguration.current(),
                 promptTriggerForcesPostProcessing: promptDetectionResult?.shouldEnableAI == true
             )
 

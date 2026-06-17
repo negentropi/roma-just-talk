@@ -161,6 +161,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PredefinedPromptTests.testPromptOrderKeepsDefaultBeforeAssistant", run: { PredefinedPromptTests().testPromptOrderKeepsDefaultBeforeAssistant() }),
             VoiceInkCoreCheck(name: "PredefinedPromptTests.testDefaultPromptUsesSystemDefaultTemplateAndSystemInstructions", run: { try PredefinedPromptTests().testDefaultPromptUsesSystemDefaultTemplateAndSystemInstructions() }),
             VoiceInkCoreCheck(name: "PredefinedPromptTests.testAssistantPromptUsesAssistantModeWithoutSystemInstructions", run: { try PredefinedPromptTests().testAssistantPromptUsesAssistantModeWithoutSystemInstructions() }),
+            VoiceInkCoreCheck(name: "PostProcessingSkipPolicyTests.testCurrentConfigurationUsesSharedDefaultsWhenUnset", run: { PostProcessingSkipPolicyTests().testCurrentConfigurationUsesSharedDefaultsWhenUnset() }),
+            VoiceInkCoreCheck(name: "PostProcessingSkipPolicyTests.testCurrentConfigurationReadsSharedStorageKeys", run: { PostProcessingSkipPolicyTests().testCurrentConfigurationReadsSharedStorageKeys() }),
             VoiceInkCoreCheck(name: "PostProcessingSkipPolicyTests.testDisabledPolicyNeverSkipsPostProcessing", run: { PostProcessingSkipPolicyTests().testDisabledPolicyNeverSkipsPostProcessing() }),
             VoiceInkCoreCheck(name: "PostProcessingSkipPolicyTests.testEnabledPolicySkipsAtOrBelowThreshold", run: { PostProcessingSkipPolicyTests().testEnabledPolicySkipsAtOrBelowThreshold() }),
             VoiceInkCoreCheck(name: "PostProcessingSkipPolicyTests.testEnabledPolicyKeepsPostProcessingAboveThreshold", run: { PostProcessingSkipPolicyTests().testEnabledPolicyKeepsPostProcessingAboveThreshold() }),

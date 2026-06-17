@@ -2,6 +2,30 @@ import Foundation
 @testable import VoiceInkCore
 
 final class PostProcessingSkipPolicyTests: XCTestCase {
+    func testCurrentConfigurationUsesSharedDefaultsWhenUnset() {
+        withIsolatedDefaults { defaults in
+            XCTAssertEqual(
+                VoiceInkPostProcessingSkipConfiguration.current(in: defaults),
+                VoiceInkPostProcessingSkipConfiguration(
+                    isEnabled: VoiceInkPreferenceDefault.skipShortEnhancement,
+                    wordThreshold: VoiceInkPreferenceDefault.shortEnhancementWordThreshold
+                )
+            )
+        }
+    }
+
+    func testCurrentConfigurationReadsSharedStorageKeys() {
+        withIsolatedDefaults { defaults in
+            defaults.set(false, forKey: VoiceInkUserDefaultsKey.skipShortEnhancement)
+            defaults.set(7, forKey: VoiceInkUserDefaultsKey.shortEnhancementWordThreshold)
+
+            XCTAssertEqual(
+                VoiceInkPostProcessingSkipConfiguration.current(in: defaults),
+                VoiceInkPostProcessingSkipConfiguration(isEnabled: false, wordThreshold: 7)
+            )
+        }
+    }
+
     func testDisabledPolicyNeverSkipsPostProcessing() {
         let configuration = VoiceInkPostProcessingSkipConfiguration(
             isEnabled: false,
@@ -69,5 +93,13 @@ final class PostProcessingSkipPolicyTests: XCTestCase {
             configuration: configuration,
             promptTriggerForcesPostProcessing: false
         ))
+    }
+
+    private func withIsolatedDefaults(_ run: (UserDefaults) -> Void) {
+        let suiteName = "VoiceInkCore.PostProcessingSkipPolicyTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defaults.removePersistentDomain(forName: suiteName)
+        run(defaults)
+        defaults.removePersistentDomain(forName: suiteName)
     }
 }

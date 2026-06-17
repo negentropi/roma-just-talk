@@ -1,6 +1,15 @@
 import Foundation
 
 public struct VoiceInkPostProcessingSkipConfiguration: Equatable, Sendable {
+    public static func current(in defaults: UserDefaults = .standard) -> VoiceInkPostProcessingSkipConfiguration {
+        VoiceInkPostProcessingSkipConfiguration(
+            isEnabled: defaults.object(forKey: VoiceInkUserDefaultsKey.skipShortEnhancement) as? Bool
+                ?? VoiceInkPreferenceDefault.skipShortEnhancement,
+            wordThreshold: defaults.object(forKey: VoiceInkUserDefaultsKey.shortEnhancementWordThreshold) as? Int
+                ?? VoiceInkPreferenceDefault.shortEnhancementWordThreshold
+        )
+    }
+
     public let isEnabled: Bool
     public let wordThreshold: Int
 

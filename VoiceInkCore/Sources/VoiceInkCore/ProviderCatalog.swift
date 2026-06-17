@@ -23,7 +23,7 @@ public enum VoiceInkTranscriptionServiceKind: Sendable {
     case localWhisper
 }
 
-public enum VoiceInkRemoteTranscriptionEmptyTextPolicy: Sendable, Equatable {
+public enum VoiceInkTranscriptionEmptyTextPolicy: Sendable, Equatable {
     case allow
     case rejectEmpty
     case rejectWhitespace
@@ -248,7 +248,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
         }
     }
 
-    public var remoteTranscriptionEmptyTextPolicy: VoiceInkRemoteTranscriptionEmptyTextPolicy {
+    public var transcriptionEmptyTextPolicy: VoiceInkTranscriptionEmptyTextPolicy {
         switch self {
         case .groq, .deepgram, .gemini:
             return .rejectEmpty

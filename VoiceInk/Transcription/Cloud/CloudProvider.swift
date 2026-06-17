@@ -112,7 +112,7 @@ extension CloudProvider {
                     customVocabulary: customVocabulary
                 )
             )
-            guard provider.remoteTranscriptionEmptyTextPolicy.accepts(text) else {
+            guard provider.transcriptionEmptyTextPolicy.accepts(text) else {
                 throw CloudTranscriptionError.noTranscriptionReturned
             }
             return text

@@ -67,7 +67,7 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
             await context.releaseResources()
             print("WhisperTranscriptionService: Whisper context resources released.")
             print("WhisperTranscriptionService: Transcription completed successfully")
-            return transcription.isEmpty ? "No audio detected." : transcription
+            return transcription
         } else {
             // Clean up resources before throwing error
             await context.releaseResources()

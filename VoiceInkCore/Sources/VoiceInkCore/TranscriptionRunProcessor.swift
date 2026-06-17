@@ -112,7 +112,7 @@ public struct VoiceInkTranscriptionRunProcessor {
             language: VoiceInkTranscriptionLanguageSupport.requestLanguage(transcriptionLanguage)
         )
 
-        guard provider.remoteTranscriptionEmptyTextPolicy.accepts(rawText) else {
+        guard provider.transcriptionEmptyTextPolicy.accepts(rawText) else {
             throw VoiceInkTranscriptionRunError.noTranscriptionReturned
         }
 

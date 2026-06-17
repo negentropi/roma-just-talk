@@ -290,6 +290,33 @@ final class TranscriptionRunProcessorTests: XCTestCase {
         }
     }
 
+    func testTranscribeAllowsEmptyLocalWhisperTranscriptionUsingProviderPolicy() async throws {
+        let processor = VoiceInkTranscriptionRunProcessor { _ in
+            XCTFail("Post-processing should not run")
+            return "unexpected"
+        }
+
+        let result = try await processor.transcribe(
+            fileURL: URL(fileURLWithPath: "/tmp/audio.wav"),
+            configuration: VoiceInkModeRuntimeConfiguration(
+                transcriptionProvider: .localWhisper,
+                transcriptionModel: "ggml-base.en.bin",
+                postProcessingProvider: .gemini,
+                postProcessingModel: "gemini-2.5-flash",
+                prompt: "Clean this",
+                isPostProcessingEnabled: false
+            ),
+            apiKeyProvider: { provider in provider.runtimeAPIKey(userAPIKey: "") },
+            transcriptionServiceProvider: { _ in
+                StubTranscriptionService(text: "")
+            }
+        )
+
+        XCTAssertEqual(result.cleanedText, "")
+        XCTAssertEqual(result.finalText, "")
+        XCTAssertNil(result.enhancedText)
+    }
+
     func testTranscribeSkipsPostProcessingWhenPostProcessingAPIKeyIsWhitespace() async throws {
         let processor = VoiceInkTranscriptionRunProcessor { _ in
             XCTFail("Post-processing should not run")

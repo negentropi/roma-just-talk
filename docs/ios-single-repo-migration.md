@@ -26,7 +26,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - custom prompt system-instruction wrapping
 - transcription prompt preference loading/saving, selected-language local Whisper prompt fallback, and nonblank request prompts for remote/realtime providers
 - post-processing request construction and output filtering
-- provider catalog, provider endpoints, API key account names, and provider readiness policy
+- provider catalog, provider endpoints, API key account names, provider readiness policy, and remote empty-response policy
 - provider API-key fallback environment-variable names
 - provider credential nonblank validation for runtime API-key checks
 - provider API-key verification dispatch, including stored-key reference/fallback resolution before verification
@@ -89,7 +89,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 
 Current macOS consumers of shared remote transport:
 
-- macOS batch cloud transcription uses `CloudProvider` default dispatch into `VoiceInkRemoteTranscriptionService` for Groq, Deepgram, Gemini, Mistral, ElevenLabs, xAI, Soniox, Speechmatics, and AssemblyAI; provider modules keep only identity and streaming adapters.
+- macOS batch cloud transcription uses `CloudProvider` default dispatch into `VoiceInkRemoteTranscriptionService` for Groq, Deepgram, Gemini, Mistral, ElevenLabs, xAI, Soniox, Speechmatics, and AssemblyAI; provider modules keep only identity and streaming adapters, and empty-response policy now comes from `VoiceInkProviderKind`.
 - `VoiceInkRemoteTranscriptionService` preserves macOS provider-specific batch options such as Groq JSON/temperature/retry settings, Deepgram paragraph/timeout settings, and vocabulary/prompt forwarding for providers that already used them.
 - Custom OpenAI-compatible batch transcription uses `VoiceInkOpenAICompatibleTranscriptionClient`.
 - Cartesia API-key verification uses `VoiceInkProviderAPIKeyVerifier` through `VoiceInkTranscriptionModelProvider`; Cartesia transcription remains streaming-only in platform shell code.

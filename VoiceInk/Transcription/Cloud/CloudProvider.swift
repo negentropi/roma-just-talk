@@ -16,17 +16,6 @@ protocol CloudProvider {
 }
 
 extension CloudProvider {
-    private var emptyTextPolicy: CloudTranscriptionEmptyTextPolicy {
-        switch modelProvider {
-        case .groq, .deepgram, .gemini:
-            return .rejectEmpty
-        case .assemblyAI, .soniox, .speechmatics:
-            return .rejectWhitespace
-        default:
-            return .allow
-        }
-    }
-
     private var apiErrorDomain: String? {
         switch modelProvider {
         case .groq:
@@ -123,7 +112,10 @@ extension CloudProvider {
                     customVocabulary: customVocabulary
                 )
             )
-            return try emptyTextPolicy.validated(text)
+            guard provider.remoteTranscriptionEmptyTextPolicy.accepts(text) else {
+                throw CloudTranscriptionError.noTranscriptionReturned
+            }
+            return text
         } catch let error as CloudTranscriptionError {
             throw error
         } catch let error as NSError
@@ -161,28 +153,5 @@ enum CloudProviderRegistry {
 
     static func provider(for modelProvider: ModelProvider) -> (any CloudProvider)? {
         allProviders.first { $0.modelProvider == modelProvider }
-    }
-}
-
-private enum CloudTranscriptionEmptyTextPolicy {
-    case allow
-    case rejectEmpty
-    case rejectWhitespace
-
-    func validated(_ text: String) throws -> String {
-        switch self {
-        case .allow:
-            return text
-        case .rejectEmpty:
-            guard !text.isEmpty else {
-                throw CloudTranscriptionError.noTranscriptionReturned
-            }
-            return text
-        case .rejectWhitespace:
-            guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-                throw CloudTranscriptionError.noTranscriptionReturned
-            }
-            return text
-        }
     }
 }

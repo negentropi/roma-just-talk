@@ -106,6 +106,22 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertEqual(VoiceInkProviderKind.localWhisper.transcriptionServiceKind, .localWhisper)
     }
 
+    func testRemoteTranscriptionEmptyTextPolicyPreservesMacOSPolicy() {
+        XCTAssertEqual(VoiceInkProviderKind.groq.remoteTranscriptionEmptyTextPolicy, .rejectEmpty)
+        XCTAssertEqual(VoiceInkProviderKind.deepgram.remoteTranscriptionEmptyTextPolicy, .rejectEmpty)
+        XCTAssertEqual(VoiceInkProviderKind.gemini.remoteTranscriptionEmptyTextPolicy, .rejectEmpty)
+        XCTAssertTrue(VoiceInkProviderKind.groq.remoteTranscriptionEmptyTextPolicy.accepts(" \n\t "))
+        XCTAssertFalse(VoiceInkProviderKind.groq.remoteTranscriptionEmptyTextPolicy.accepts(""))
+
+        XCTAssertEqual(VoiceInkProviderKind.soniox.remoteTranscriptionEmptyTextPolicy, .rejectWhitespace)
+        XCTAssertEqual(VoiceInkProviderKind.speechmatics.remoteTranscriptionEmptyTextPolicy, .rejectWhitespace)
+        XCTAssertEqual(VoiceInkProviderKind.assemblyAI.remoteTranscriptionEmptyTextPolicy, .rejectWhitespace)
+        XCTAssertFalse(VoiceInkProviderKind.soniox.remoteTranscriptionEmptyTextPolicy.accepts(" \n\t "))
+
+        XCTAssertEqual(VoiceInkProviderKind.mistral.remoteTranscriptionEmptyTextPolicy, .allow)
+        XCTAssertTrue(VoiceInkProviderKind.mistral.remoteTranscriptionEmptyTextPolicy.accepts(""))
+    }
+
     func testRemoteTranscriptionProvidersUseSharedTransportAndEndpoints() {
         XCTAssertEqual(VoiceInkProviderKind.gemini.transcriptionTransport, .geminiGenerateContent)
         XCTAssertEqual(

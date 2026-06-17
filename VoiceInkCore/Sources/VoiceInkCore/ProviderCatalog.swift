@@ -23,6 +23,23 @@ public enum VoiceInkTranscriptionServiceKind: Sendable {
     case localWhisper
 }
 
+public enum VoiceInkRemoteTranscriptionEmptyTextPolicy: Sendable, Equatable {
+    case allow
+    case rejectEmpty
+    case rejectWhitespace
+
+    public func accepts(_ text: String) -> Bool {
+        switch self {
+        case .allow:
+            return true
+        case .rejectEmpty:
+            return !text.isEmpty
+        case .rejectWhitespace:
+            return !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        }
+    }
+}
+
 public enum VoiceInkAPIKeyVerificationTransport: Sendable, Equatable {
     case openAICompatibleModels
     case deepgramProjects
@@ -228,6 +245,17 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return .remote
         case .localWhisper:
             return .localWhisper
+        }
+    }
+
+    public var remoteTranscriptionEmptyTextPolicy: VoiceInkRemoteTranscriptionEmptyTextPolicy {
+        switch self {
+        case .groq, .deepgram, .gemini:
+            return .rejectEmpty
+        case .soniox, .speechmatics, .assemblyAI:
+            return .rejectWhitespace
+        case .openAI, .cerebras, .mistral, .elevenLabs, .xai, .localWhisper, .voiceInk:
+            return .allow
         }
     }
 

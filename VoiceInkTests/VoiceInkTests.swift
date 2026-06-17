@@ -1056,6 +1056,58 @@ struct VoiceInkTests {
         #expect(contexts == [ShortcutPressContext(didPressOtherKeyDuringPress: true, didReleaseOtherKeyDuringPress: true)])
     }
 
+    @Test @MainActor func shortcutRecorderCancelRestoresStoredShortcut() throws {
+        let action = ShortcutAction.powerMode(UUID())
+        let originalShortcut = Shortcut.key(keyCode: UInt16(kVK_F13), modifierFlags: [])
+
+        try withTemporaryShortcutStorage(for: action) {
+            ShortcutStore.setShortcut(originalShortcut, for: action)
+
+            let recorder = ShortcutRecorderModel()
+            recorder.start(action: action, onCapture: { _ in })
+
+            #expect(ShortcutStore.shortcut(for: action) == nil)
+            #expect(ShortcutStore.isShortcutCleared(for: action))
+
+            recorder.cancel()
+
+            #expect(ShortcutStore.shortcut(for: action) == originalShortcut)
+            #expect(!ShortcutStore.isShortcutCleared(for: action))
+        }
+    }
+
+    @Test @MainActor func shortcutRecorderCancelRestoresDefaultShortcutState() throws {
+        let action = ShortcutAction.powerMode(UUID())
+
+        try withTemporaryShortcutStorage(for: action) {
+            let recorder = ShortcutRecorderModel()
+            recorder.start(action: action, onCapture: { _ in })
+
+            #expect(ShortcutStore.rawShortcut(for: action) == nil)
+            #expect(ShortcutStore.isShortcutCleared(for: action))
+
+            recorder.cancel()
+
+            #expect(ShortcutStore.rawShortcut(for: action) == nil)
+            #expect(!ShortcutStore.isShortcutCleared(for: action))
+        }
+    }
+
+    @Test @MainActor func shortcutRecorderCancelPreservesClearedShortcutState() throws {
+        let action = ShortcutAction.powerMode(UUID())
+
+        try withTemporaryShortcutStorage(for: action) {
+            ShortcutStore.setShortcut(nil, for: action)
+
+            let recorder = ShortcutRecorderModel()
+            recorder.start(action: action, onCapture: { _ in })
+            recorder.cancel()
+
+            #expect(ShortcutStore.rawShortcut(for: action) == nil)
+            #expect(ShortcutStore.isShortcutCleared(for: action))
+        }
+    }
+
     private func makeWordReplacementContainer() throws -> ModelContainer {
         let schema = Schema([WordReplacement.self])
         let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
@@ -1066,5 +1118,11 @@ struct VoiceInkTests {
         let schema = Schema([Transcription.self, SessionMetric.self])
         let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
         return try ModelContainer(for: schema, configurations: [configuration])
+    }
+
+    private func withTemporaryShortcutStorage(for action: ShortcutAction, _ body: () throws -> Void) throws {
+        ShortcutStore.removeShortcutStorage(for: action)
+        defer { ShortcutStore.removeShortcutStorage(for: action) }
+        try body()
     }
 }

@@ -32,8 +32,13 @@ struct ShortcutRecorder: View {
                         name: Self.shortcutRecordingDidStart,
                         object: recorderID
                     )
-                    clearShortcutBeforeRecording()
-                    recorder.start(action: action) { newShortcut in
+                    recorder.start(
+                        action: action,
+                        onShortcutStorageChanged: {
+                            shortcut = ShortcutStore.shortcut(for: action)
+                            onShortcutChanged()
+                        }
+                    ) { newShortcut in
                         shortcut = newShortcut
                         onShortcutChanged()
                     }
@@ -76,12 +81,6 @@ struct ShortcutRecorder: View {
         }
 
         return shortcut ?? defaultShortcut
-    }
-
-    private func clearShortcutBeforeRecording() {
-        ShortcutStore.setShortcut(nil, for: action)
-        shortcut = nil
-        onShortcutChanged()
     }
 
     private static let shortcutRecordingDidStart = Notification.Name("ShortcutRecorderRecordingDidStart")
@@ -166,7 +165,9 @@ final class ShortcutRecorderModel: ObservableObject {
 
     private var localMonitor: Any?
     private var onCapture: ((Shortcut) -> Void)?
+    private var onShortcutStorageChanged: (() -> Void)?
     private var activeAction: ShortcutAction?
+    private var shortcutStateBeforeRecording: ShortcutStore.StoredState?
     private var pendingModifierShortcut: Shortcut?
     private var peakModifierFlags: NSEvent.ModifierFlags = []
 
@@ -174,17 +175,26 @@ final class ShortcutRecorderModel: ObservableObject {
         removeRecordingMonitor()
     }
 
-    func start(action: ShortcutAction, onCapture: @escaping (Shortcut) -> Void) {
+    func start(
+        action: ShortcutAction,
+        onShortcutStorageChanged: @escaping () -> Void = {},
+        onCapture: @escaping (Shortcut) -> Void
+    ) {
         cancel()
 
         activeAction = action
+        shortcutStateBeforeRecording = ShortcutStore.storedState(for: action)
+        self.onShortcutStorageChanged = onShortcutStorageChanged
         self.onCapture = onCapture
         isRecording = true
         previewShortcut = nil
+        ShortcutStore.setShortcut(nil, for: action)
+        onShortcutStorageChanged()
         installRecordingMonitor()
     }
 
     func cancel() {
+        restoreShortcutStateBeforeRecording()
         removeRecordingMonitor()
         resetRecordingState()
     }
@@ -202,6 +212,7 @@ final class ShortcutRecorderModel: ObservableObject {
         }
 
         let capture = onCapture
+        shortcutStateBeforeRecording = nil
         removeRecordingMonitor()
         resetRecordingState()
 
@@ -213,9 +224,22 @@ final class ShortcutRecorderModel: ObservableObject {
         isRecording = false
         previewShortcut = nil
         onCapture = nil
+        onShortcutStorageChanged = nil
         activeAction = nil
+        shortcutStateBeforeRecording = nil
         pendingModifierShortcut = nil
         peakModifierFlags = []
+    }
+
+    private func restoreShortcutStateBeforeRecording() {
+        guard let activeAction,
+              let shortcutStateBeforeRecording else {
+            return
+        }
+
+        ShortcutStore.restoreStoredState(shortcutStateBeforeRecording, for: activeAction)
+        onShortcutStorageChanged?()
+        self.shortcutStateBeforeRecording = nil
     }
 
     private func showErrorNotification(_ title: String) {

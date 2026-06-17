@@ -3,6 +3,11 @@ import Foundation
 enum ShortcutStore {
     static let shortcutDidChange = Notification.Name("ShortcutStoreShortcutDidChange")
 
+    struct StoredState {
+        fileprivate let shortcutData: Data?
+        fileprivate let clearedValue: Bool?
+    }
+
     static func rawShortcut(for action: ShortcutAction) -> Shortcut? {
         shortcutData(for: action)
             .flatMap { try? JSONDecoder().decode(Shortcut.self, from: $0) }
@@ -57,6 +62,38 @@ enum ShortcutStore {
         UserDefaults.standard.removeObject(forKey: clearedUserDefaultsKey(for: action))
         ShortcutMigration.removeLegacyCustomRecordingShortcut(for: action)
         ShortcutMigration.removeLegacyKeyboardShortcut(for: action)
+        NotificationCenter.default.post(
+            name: shortcutDidChange,
+            object: action
+        )
+    }
+
+    static func storedState(for action: ShortcutAction) -> StoredState {
+        StoredState(
+            shortcutData: shortcutData(for: action),
+            clearedValue: UserDefaults.standard.object(forKey: clearedUserDefaultsKey(for: action)) == nil
+                ? nil
+                : UserDefaults.standard.bool(forKey: clearedUserDefaultsKey(for: action))
+        )
+    }
+
+    static func restoreStoredState(_ state: StoredState, for action: ShortcutAction) {
+        guard action.isStored else {
+            return
+        }
+
+        if let shortcutData = state.shortcutData {
+            UserDefaults.standard.set(shortcutData, forKey: action.userDefaultsKey)
+        } else {
+            UserDefaults.standard.removeObject(forKey: action.userDefaultsKey)
+        }
+
+        if let clearedValue = state.clearedValue {
+            UserDefaults.standard.set(clearedValue, forKey: clearedUserDefaultsKey(for: action))
+        } else {
+            UserDefaults.standard.removeObject(forKey: clearedUserDefaultsKey(for: action))
+        }
+
         NotificationCenter.default.post(
             name: shortcutDidChange,
             object: action

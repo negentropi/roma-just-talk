@@ -6,7 +6,7 @@ typealias AIProvider = VoiceInkAIEnhancementProviderKind
 
 extension AIProvider {
     var baseURL: String {
-        if let corePostProcessingURL = coreAIModelProvider?.postProcessingRequestURL {
+        if let corePostProcessingURL = aiModelProvider?.postProcessingRequestURL {
             return corePostProcessingURL.absoluteString
         }
 
@@ -23,7 +23,7 @@ extension AIProvider {
     }
     
     var defaultModel: String {
-        if let provider = coreAIModelProvider {
+        if let provider = aiModelProvider {
             return VoiceInkAIModelCatalog.defaultModel(for: provider)
         }
 
@@ -40,7 +40,7 @@ extension AIProvider {
     }
     
     var availableModels: [String] {
-        if let provider = coreAIModelProvider {
+        if let provider = aiModelProvider {
             return VoiceInkAIModelCatalog.availableModels(for: provider)
         }
 
@@ -56,17 +56,6 @@ extension AIProvider {
         }
     }
 
-    var coreAIModelProvider: VoiceInkAIModelProvider? {
-        aiModelProvider
-    }
-
-    var apiKeyConsoleURL: URL? {
-        coreAIModelProvider?.apiKeyConsoleURL
-    }
-
-    var requiresAPIKey: Bool {
-        requiresUserAPIKey
-    }
 }
 
 class AIService: ObservableObject {
@@ -88,7 +77,7 @@ class AIService: ObservableObject {
                 selectedProvider.rawValue,
                 to: userDefaults
             )
-            if selectedProvider.requiresAPIKey {
+            if selectedProvider.requiresUserAPIKey {
                 if let savedKey = APIKeyManager.shared.getAPIKey(forProvider: selectedProvider.rawValue) {
                     self.apiKey = savedKey
                     self.isAPIKeyValid = true
@@ -164,7 +153,7 @@ class AIService: ObservableObject {
             from: userDefaults
         )
 
-        if selectedProvider.requiresAPIKey {
+        if selectedProvider.requiresUserAPIKey {
             if let savedKey = APIKeyManager.shared.getAPIKey(forProvider: selectedProvider.rawValue) {
                 self.apiKey = savedKey
                 self.isAPIKeyValid = true
@@ -215,7 +204,7 @@ class AIService: ObservableObject {
     }
     
     func saveAPIKey(_ key: String, completion: @escaping (Bool, String?) -> Void) {
-        guard selectedProvider.requiresAPIKey else {
+        guard selectedProvider.requiresUserAPIKey else {
             completion(true, nil)
             return
         }
@@ -242,7 +231,7 @@ class AIService: ObservableObject {
     }
     
     func verifyAPIKey(_ key: String, completion: @escaping (Bool, String?) -> Void) {
-        guard selectedProvider.requiresAPIKey else {
+        guard selectedProvider.requiresUserAPIKey else {
             completion(true, nil)
             return
         }
@@ -292,7 +281,7 @@ class AIService: ObservableObject {
     }
     
     func clearAPIKey() {
-        guard selectedProvider.requiresAPIKey else { return }
+        guard selectedProvider.requiresUserAPIKey else { return }
 
         apiKey = ""
         isAPIKeyValid = false

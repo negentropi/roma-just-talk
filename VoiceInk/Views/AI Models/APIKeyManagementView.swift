@@ -359,6 +359,6 @@ struct APIKeyManagementView: View {
     }
     
     private func getAPIKeyURL() -> URL? {
-        aiService.selectedProvider.apiKeyConsoleURL
+        aiService.selectedProvider.aiModelProvider?.apiKeyConsoleURL
     }
 }

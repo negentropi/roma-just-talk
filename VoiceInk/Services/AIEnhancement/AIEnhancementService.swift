@@ -241,7 +241,7 @@ class AIEnhancementService: ObservableObject {
                     throw EnhancementError.customError("\(aiService.selectedProvider.rawValue) has an invalid API endpoint URL. Please update it in AI settings.")
                 }
                 let temperature = VoiceInkAIReasoningConfig.temperature(forModelName: aiService.currentModel)
-                let coreProvider = aiService.selectedProvider.coreAIModelProvider
+                let coreProvider = aiService.selectedProvider.aiModelProvider
                 let reasoningEffort = coreProvider.flatMap {
                     VoiceInkAIReasoningConfig.reasoningEffort(for: $0, modelName: aiService.currentModel)
                 }

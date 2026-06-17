@@ -7,12 +7,6 @@ struct CartesiaProvider: CloudProvider {
     let isStreamingOnly: Bool = true
     private let cartesiaClient = VoiceInkCartesiaClient()
 
-    var models: [CloudModel] {
-        VoiceInkTranscriptionModelCatalog
-            .cloudModels(for: .cartesia)
-            .map { $0.makeCloudModel(provider: .cartesia) }
-    }
-
     func makeStreamingProvider(modelContext: ModelContext) -> (any StreamingTranscriptionProvider)? {
         CartesiaStreamingProvider(modelContext: modelContext)
     }

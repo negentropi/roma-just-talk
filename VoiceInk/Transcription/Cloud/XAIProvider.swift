@@ -6,12 +6,6 @@ struct XAIProvider: CloudProvider {
     let modelProvider: ModelProvider = .xai
     private let transcriptionClient = VoiceInkXAITranscriptionClient()
 
-    var models: [CloudModel] {
-        VoiceInkTranscriptionModelCatalog
-            .cloudModels(for: .xai)
-            .map { $0.makeCloudModel(provider: .xai) }
-    }
-
     func transcribe(audioData: Data, fileName: String, apiKey: String, model: String, language: String?, prompt: String?, customVocabulary: [String]) async throws -> String {
         do {
             return try await transcriptionClient.transcribeAudioData(

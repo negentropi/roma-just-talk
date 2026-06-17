@@ -6,12 +6,6 @@ struct AssemblyAIProvider: CloudProvider {
     let modelProvider: ModelProvider = .assemblyAI
     private let transcriptionClient = VoiceInkAssemblyAITranscriptionClient()
 
-    var models: [CloudModel] {
-        VoiceInkTranscriptionModelCatalog
-            .cloudModels(for: .assemblyAI)
-            .map { $0.makeCloudModel(provider: .assemblyAI) }
-    }
-
     func transcribe(audioData: Data, fileName: String, apiKey: String, model: String, language: String?, prompt: String?, customVocabulary: [String]) async throws -> String {
         do {
             let text = try await transcriptionClient.transcribeAudioData(

@@ -6,12 +6,6 @@ struct GroqProvider: CloudProvider {
     let modelProvider: ModelProvider = .groq
     private let transcriptionClient = VoiceInkOpenAICompatibleTranscriptionClient()
 
-    var models: [CloudModel] {
-        VoiceInkTranscriptionModelCatalog
-            .cloudModels(for: .groq)
-            .map { $0.makeCloudModel(provider: .groq) }
-    }
-
     func transcribe(audioData: Data, fileName: String, apiKey: String, model: String, language: String?, prompt: String?, customVocabulary: [String]) async throws -> String {
         do {
             let text = try await transcriptionClient.transcribeAudioData(

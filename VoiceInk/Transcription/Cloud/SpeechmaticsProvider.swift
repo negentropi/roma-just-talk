@@ -6,12 +6,6 @@ struct SpeechmaticsProvider: CloudProvider {
     let modelProvider: ModelProvider = .speechmatics
     private let transcriptionClient = VoiceInkSpeechmaticsTranscriptionClient()
 
-    var models: [CloudModel] {
-        VoiceInkTranscriptionModelCatalog
-            .cloudModels(for: .speechmatics)
-            .map { $0.makeCloudModel(provider: .speechmatics) }
-    }
-
     func transcribe(audioData: Data, fileName: String, apiKey: String, model: String, language: String?, prompt: String?, customVocabulary: [String]) async throws -> String {
         do {
             let text = try await transcriptionClient.transcribeAudioData(

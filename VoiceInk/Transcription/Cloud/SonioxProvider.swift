@@ -6,12 +6,6 @@ struct SonioxProvider: CloudProvider {
     let modelProvider: ModelProvider = .soniox
     private let transcriptionClient = VoiceInkSonioxTranscriptionClient()
 
-    var models: [CloudModel] {
-        VoiceInkTranscriptionModelCatalog
-            .cloudModels(for: .soniox)
-            .map { $0.makeCloudModel(provider: .soniox) }
-    }
-
     func transcribe(audioData: Data, fileName: String, apiKey: String, model: String, language: String?, prompt: String?, customVocabulary: [String]) async throws -> String {
         do {
             let text = try await transcriptionClient.transcribeAudioData(

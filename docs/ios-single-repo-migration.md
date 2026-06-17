@@ -79,6 +79,7 @@ Current macOS consumers of shared remote transport:
 - macOS local Whisper and cloud transcription normalize selected request language through `VoiceInkTranscriptionLanguagePreference`.
 - macOS local Whisper, cloud transcription, and AssemblyAI streaming read transcription prompts through `VoiceInkTranscriptionPromptPreference`.
 - macOS batch cloud and streaming transcription use `VoiceInkProviderCredential` for runtime API-key presence checks before entering provider adapters.
+- macOS cloud-provider model lists are supplied by the `CloudProvider` default adapter over `VoiceInkTranscriptionModelCatalog`, so provider modules only own transport and streaming differences.
 - macOS language pickers use `VoiceInkLanguageCatalog.sortedOptions` so language presentation order stays shared with iOS.
 - macOS recording, audio-file transcription, and retry transcription use `VoiceInkTranscriptionCleanupConfiguration` directly for shared raw-output filtering and cleanup preferences.
 - macOS model definitions read supported language sets through a thin `ModelProvider` adapter backed by `VoiceInkLanguageCatalog`; the old `LanguageDictionary` wrapper is gone.

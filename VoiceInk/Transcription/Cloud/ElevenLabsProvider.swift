@@ -6,12 +6,6 @@ struct ElevenLabsProvider: CloudProvider {
     let modelProvider: ModelProvider = .elevenLabs
     private let transcriptionClient = VoiceInkElevenLabsTranscriptionClient()
 
-    var models: [CloudModel] {
-        VoiceInkTranscriptionModelCatalog
-            .cloudModels(for: .elevenLabs)
-            .map { $0.makeCloudModel(provider: .elevenLabs) }
-    }
-
     func transcribe(audioData: Data, fileName: String, apiKey: String, model: String, language: String?, prompt: String?, customVocabulary: [String]) async throws -> String {
         do {
             return try await transcriptionClient.transcribeAudioData(

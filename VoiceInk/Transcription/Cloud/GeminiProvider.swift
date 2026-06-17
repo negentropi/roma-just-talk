@@ -6,12 +6,6 @@ struct GeminiProvider: CloudProvider {
     let modelProvider: ModelProvider = .gemini
     private let transcriptionClient = VoiceInkGeminiTranscriptionClient()
 
-    var models: [CloudModel] {
-        VoiceInkTranscriptionModelCatalog
-            .cloudModels(for: .gemini)
-            .map { $0.makeCloudModel(provider: .gemini) }
-    }
-
     func transcribe(audioData: Data, fileName: String, apiKey: String, model: String, language: String?, prompt: String?, customVocabulary: [String]) async throws -> String {
         do {
             let text = try await transcriptionClient.transcribeAudioData(

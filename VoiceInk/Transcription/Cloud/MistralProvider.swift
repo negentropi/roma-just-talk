@@ -6,12 +6,6 @@ struct MistralProvider: CloudProvider {
     let modelProvider: ModelProvider = .mistral
     private let transcriptionClient = VoiceInkMistralTranscriptionClient()
 
-    var models: [CloudModel] {
-        VoiceInkTranscriptionModelCatalog
-            .cloudModels(for: .mistral)
-            .map { $0.makeCloudModel(provider: .mistral) }
-    }
-
     func transcribe(audioData: Data, fileName: String, apiKey: String, model: String, language: String?, prompt: String?, customVocabulary: [String]) async throws -> String {
         do {
             return try await transcriptionClient.transcribeAudioData(

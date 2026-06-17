@@ -6,12 +6,6 @@ struct DeepgramProvider: CloudProvider {
     let modelProvider: ModelProvider = .deepgram
     private let transcriptionClient = VoiceInkDeepgramTranscriptionClient()
 
-    var models: [CloudModel] {
-        VoiceInkTranscriptionModelCatalog
-            .cloudModels(for: .deepgram)
-            .map { $0.makeCloudModel(provider: .deepgram) }
-    }
-
     func transcribe(audioData: Data, fileName: String, apiKey: String, model: String, language: String?, prompt: String?, customVocabulary: [String]) async throws -> String {
         do {
             let text = try await transcriptionClient.transcribeAudioData(

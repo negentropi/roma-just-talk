@@ -24,6 +24,16 @@ extension CloudProvider {
         modelProvider.coreTranscriptionModelProvider?.languageCodes
     }
 
+    var models: [CloudModel] {
+        guard let provider = modelProvider.coreTranscriptionModelProvider else {
+            return []
+        }
+
+        return VoiceInkTranscriptionModelCatalog
+            .cloudModels(for: provider)
+            .map { $0.makeCloudModel(provider: modelProvider) }
+    }
+
     var includesAutoDetect: Bool {
         modelProvider.coreTranscriptionModelProvider?.includesAutoDetect ?? false
     }

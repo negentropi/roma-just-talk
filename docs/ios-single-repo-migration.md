@@ -58,6 +58,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - custom cloud transcription model generated-name and draft validation policy; platform shells still own keychain and preferences storage
 - prompt trigger-word detection and trigger-word editing policy; platform shells still own prompt persistence and enhancement state
 - transcription language catalog, provider language filtering, AssemblyAI realtime/batch language policy, selected-language fallback policy, language-option ordering, selected-language preference loading, selected-language request normalization, and the shared selected-language defaults key; platform shells still own selected-language storage/UI and runtime streaming-mode state
+- local Whisper language seed prompts and custom language-prompt storage key; platform shells still own prompt editing UI and when prompts are persisted
 - stored audio-file path resolution, existing-file lookup, recordings directory, and file URL construction
 - duration presentation
 - relative timestamp presentation
@@ -112,7 +113,7 @@ Current iOS consumers of shared remote transport:
 - `iOS/VoiceInk-ios/AppSettings.swift` loads retry transcription cleanup configuration through `VoiceInkTranscriptionCleanupConfiguration.current()`, aligning iOS cleanup with macOS defaults while keeping settings UI/storage in the iOS shell.
 - `iOS/VoiceInk-ios/AppSettings.swift` passes the shared paragraph-formatting preference into `VoiceInkTranscriptionRunProcessor`, so iOS retry transcription uses the same `VoiceInkTranscriptParagraphFormatter` policy as macOS.
 - `iOS/VoiceInk-ios/TranscriptionRetryService.swift` passes the iOS selected transcription language through `VoiceInkTranscriptionRunProcessor`, which normalizes auto-detect before remote/local transcription adapters receive it.
-- `iOS/VoiceInk-ios/WhisperTranscriptionService.swift` passes the shared local Whisper prompt preference into the iOS whisper.cpp wrapper.
+- `iOS/VoiceInk-ios/WhisperTranscriptionService.swift` passes the shared local Whisper prompt preference into the iOS whisper.cpp wrapper, falling back to `VoiceInkLocalWhisperPromptCatalog` so iOS inherits the macOS language seed prompts when no explicit prompt is stored.
 - `iOS/VoiceInk-ios/ProviderAPIKeyView.swift` verifies provider keys through `VoiceInkProviderAPIKeyVerifier`.
 - `iOS/VoiceInk-ios/SettingsView.swift` uses `VoiceInkLanguageCatalog.sortedOptions` for the same selected-language option ordering used by macOS.
 - `iOS/VoiceInk-ios/WhisperTranscriptionService.swift` throws `VoiceInkEngineError` from `VoiceInkCore` instead of owning a separate iOS-only local Whisper error enum.

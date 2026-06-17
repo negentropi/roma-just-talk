@@ -58,7 +58,9 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
         let success = await context.fullTranscribe(
             samples: audioSamples,
             language: VoiceInkTranscriptionLanguageSupport.requestLanguage(language),
-            prompt: VoiceInkTranscriptionPromptPreference.localWhisperPrompt()
+            prompt: VoiceInkTranscriptionPromptPreference.localWhisperPrompt(
+                fallback: VoiceInkLocalWhisperPromptCatalog.promptForSelectedLanguage()
+            )
         )
         
         if success {

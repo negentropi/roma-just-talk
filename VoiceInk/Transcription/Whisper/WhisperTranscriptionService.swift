@@ -56,7 +56,9 @@ class WhisperTranscriptionService: TranscriptionService {
         let data = try readAudioSamples(audioURL)
 
         // Set prompt
-        let currentPrompt = VoiceInkTranscriptionPromptPreference.localWhisperPrompt()
+        let currentPrompt = VoiceInkTranscriptionPromptPreference.localWhisperPrompt(
+            fallback: VoiceInkLocalWhisperPromptCatalog.promptForSelectedLanguage()
+        )
         await whisperContext.setPrompt(currentPrompt)
 
         // Transcribe

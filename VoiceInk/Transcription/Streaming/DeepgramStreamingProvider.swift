@@ -1,6 +1,7 @@
 import Foundation
 import SwiftData
 import LLMkit
+import VoiceInkCore
 
 /// Deepgram streaming provider wrapping `LLMkit.DeepgramStreamingClient`.
 final class DeepgramStreamingProvider: StreamingTranscriptionProvider {
@@ -91,18 +92,7 @@ final class DeepgramStreamingProvider: StreamingTranscriptionProvider {
         guard let vocabularyWords = try? modelContext.fetch(descriptor) else {
             return []
         }
-        var seen = Set<String>()
-        var unique: [String] = []
-        for word in vocabularyWords {
-            let trimmed = word.word.trimmingCharacters(in: .whitespacesAndNewlines)
-            guard !trimmed.isEmpty else { continue }
-            let key = trimmed.lowercased()
-            if !seen.contains(key) {
-                seen.insert(key)
-                unique.append(trimmed)
-            }
-        }
-        return Array(unique.prefix(50))
+        return VoiceInkCustomVocabularyTerms.normalized(vocabularyWords.map(\.word), limit: 50)
     }
 
     private func mapError(_ error: Error) -> Error {

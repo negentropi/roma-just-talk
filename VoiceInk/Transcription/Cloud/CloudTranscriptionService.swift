@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import VoiceInkCore
 
 enum CloudTranscriptionError: Error, LocalizedError {
     case unsupportedProvider
@@ -111,18 +112,7 @@ class CloudTranscriptionService: TranscriptionService {
         guard let vocabularyWords = try? modelContext.fetch(descriptor) else {
             return []
         }
-        var seen = Set<String>()
-        var unique: [String] = []
-        for word in vocabularyWords {
-            let trimmed = word.word.trimmingCharacters(in: .whitespacesAndNewlines)
-            guard !trimmed.isEmpty else { continue }
-            let key = trimmed.lowercased()
-            if !seen.contains(key) {
-                seen.insert(key)
-                unique.append(trimmed)
-            }
-        }
-        return unique
+        return VoiceInkCustomVocabularyTerms.normalized(vocabularyWords.map(\.word))
     }
 
     private func transcribeCustomModel(

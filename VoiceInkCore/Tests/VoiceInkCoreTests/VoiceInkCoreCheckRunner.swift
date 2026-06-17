@@ -20,6 +20,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "ContextualCapitalizationFormatterTests.testPreservesAcronymsAfterMidSentencePrefix", run: { ContextualCapitalizationFormatterTests().testPreservesAcronymsAfterMidSentencePrefix() }),
             VoiceInkCoreCheck(name: "ContextualCapitalizationFormatterTests.testSkipsCursorContextWhenTextCannotChange", run: { ContextualCapitalizationFormatterTests().testSkipsCursorContextWhenTextCannotChange() }),
             VoiceInkCoreCheck(name: "ContextualCapitalizationFormatterTests.testReadsCursorContextWhenTextCanChange", run: { ContextualCapitalizationFormatterTests().testReadsCursorContextWhenTextCanChange() }),
+            VoiceInkCoreCheck(name: "CustomVocabularyTermsTests.testNormalizedTermsTrimDropBlankAndDeduplicateCaseInsensitively", run: { CustomVocabularyTermsTests().testNormalizedTermsTrimDropBlankAndDeduplicateCaseInsensitively() }),
+            VoiceInkCoreCheck(name: "CustomVocabularyTermsTests.testNormalizedTermsApplyOptionalLimitAfterFiltering", run: { CustomVocabularyTermsTests().testNormalizedTermsApplyOptionalLimitAfterFiltering() }),
             VoiceInkCoreCheck(name: "DatePresentationTests.testRelativeTimestampUsesShortRelativeStyle", run: { DatePresentationTests().testRelativeTimestampUsesShortRelativeStyle() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testVocabularyPlanReturnsNoOpForBlankInput", run: { DictionaryPolicyTests().testVocabularyPlanReturnsNoOpForBlankInput() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testVocabularyPlanRejectsSingleDuplicateWithExistingMessage", run: { DictionaryPolicyTests().testVocabularyPlanRejectsSingleDuplicateWithExistingMessage() }),

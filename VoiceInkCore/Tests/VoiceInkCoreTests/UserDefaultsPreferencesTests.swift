@@ -128,6 +128,22 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testTranscriptionPromptPreferenceUsesSelectedLanguagePromptFallback() {
+        withIsolatedDefaults { defaults in
+            VoiceInkTranscriptionLanguagePreference.saveSelectedLanguage("ja", to: defaults)
+            XCTAssertEqual(
+                VoiceInkTranscriptionPromptPreference.localWhisperPromptForSelectedLanguage(from: defaults),
+                VoiceInkLocalWhisperPromptCatalog.defaultPrompt(for: "ja")
+            )
+
+            VoiceInkTranscriptionPromptPreference.savePrompt(" custom prompt ", to: defaults)
+            XCTAssertEqual(
+                VoiceInkTranscriptionPromptPreference.localWhisperPromptForSelectedLanguage(from: defaults),
+                " custom prompt "
+            )
+        }
+    }
+
     func testTranscriptionPromptPreferenceDropsBlankRequestPrompts() {
         XCTAssertNil(VoiceInkTranscriptionPromptPreference.requestPrompt(nil))
         XCTAssertNil(VoiceInkTranscriptionPromptPreference.requestPrompt(""))

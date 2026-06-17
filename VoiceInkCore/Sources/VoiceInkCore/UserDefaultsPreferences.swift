@@ -92,6 +92,15 @@ public enum VoiceInkTranscriptionPromptPreference {
         storedPrompt(from: defaults) ?? fallback
     }
 
+    public static func localWhisperPromptForSelectedLanguage(
+        from defaults: UserDefaults = .standard
+    ) -> String {
+        localWhisperPrompt(
+            from: defaults,
+            fallback: VoiceInkLocalWhisperPromptCatalog.promptForSelectedLanguage(from: defaults)
+        )
+    }
+
     public static func requestPrompt(from defaults: UserDefaults = .standard) -> String? {
         requestPrompt(storedPrompt(from: defaults))
     }

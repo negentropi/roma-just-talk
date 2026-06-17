@@ -91,7 +91,9 @@ Platform shells still own UI, OS permissions, audio capture, paste/keyboard beha
 
 ## Sibling Clone Status
 
-The remaining Swift files present in `../VoiceInk-iOS` but not in `VoiceInk/iOS` are old clone-side sources:
+The remaining Swift files present in `../VoiceInk-iOS` but not in `VoiceInk/iOS` are old clone-side sources, except where noted:
+
+- `AppGroupCoordinator.swift`: moved into `iOS/Shared/AppGroupCoordinator.swift`; start-recording requests now use `iOS/Shared/VoiceInkAppDeepLink.swift`, while shared App Group/Darwin notification state still handles stop requests and keyboard recording-state feedback.
 
 - `DeepgramTranscriptionService.swift`: replaced by `VoiceInkCore` Deepgram request/client helpers and `VoiceInkRemoteTranscriptionService`.
 - `GroqTranscriptionService.swift`: replaced by `VoiceInkCore` OpenAI-compatible request/client helpers and `VoiceInkRemoteTranscriptionService`.

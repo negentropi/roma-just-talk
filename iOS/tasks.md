@@ -48,7 +48,7 @@ This document outlines the steps to integrate Keyboard Kit into the VoiceInk app
         1. Writing a "start recording" signal to a shared `UserDefaults` instance associated with your App Group.
         2. Posting Darwin notifications for immediate communication between keyboard and main app.
     - ✅ **COMPLETED**: Modern 2025 iOS-native implementation created with hybrid App Groups + Darwin Notifications approach
-    - ⏳ **NEXT**: Add this file to both the main app target and keyboard extension target in Xcode's "Target Membership" inspector.
+    - ✅ **COMPLETED**: `iOS/Shared/AppGroupCoordinator.swift` is wired into both the main app target and keyboard extension target.
     - When the user taps the Record button, the keyboard will:
         1. Set a flag (e.g., `shouldStartRecording = true`) in the shared `UserDefaults`.
         2. Post a Darwin notification (e.g., `com.prakashjoshipax.VoiceInk.startRecording`) to immediately notify the main app.

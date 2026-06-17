@@ -69,26 +69,7 @@ final class APIKeyManager {
     }
 
     static func resolveAPIKeyReference(_ key: String, environment: [String: String] = ProcessInfo.processInfo.environment) -> String? {
-        let trimmed = key.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return nil }
-
-        let variableName: String
-        if trimmed.hasPrefix("${"), trimmed.hasSuffix("}") {
-            variableName = String(trimmed.dropFirst(2).dropLast())
-        } else if trimmed.hasPrefix("$") {
-            variableName = String(trimmed.dropFirst())
-        } else {
-            return trimmed
-        }
-
-        guard !variableName.isEmpty,
-              variableName.range(of: #"^[A-Za-z_][A-Za-z0-9_]*$"#, options: .regularExpression) != nil,
-              let value = environment[variableName],
-              !value.isEmpty else {
-            return nil
-        }
-
-        return value
+        VoiceInkAPIKeyReference.resolvedValue(key, environment: environment)
     }
 
     // MARK: - Custom Model API Keys

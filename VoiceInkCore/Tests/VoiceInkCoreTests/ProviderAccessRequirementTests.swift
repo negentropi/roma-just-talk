@@ -39,6 +39,18 @@ final class ProviderAccessRequirementTests: XCTestCase {
         }
     }
 
+    func testProviderEnvironmentFallbacksPreserveMacOSPolicy() {
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyAccount.fallbackEnvironmentKey(forProviderName: "ElevenLabs"),
+            "ELEVENLABS_API_KEY"
+        )
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyAccount.fallbackEnvironmentKey(forProviderName: "elevenlabs"),
+            "ELEVENLABS_API_KEY"
+        )
+        XCTAssertNil(VoiceInkProviderAPIKeyAccount.fallbackEnvironmentKey(forProviderName: "Groq"))
+    }
+
     func testNonUserKeyProvidersKeepTheirAccessPolicy() {
         guard case .localWhisperModel = VoiceInkProviderKind.localWhisper.accessRequirement else {
             return XCTFail("Local Whisper should use local model availability")

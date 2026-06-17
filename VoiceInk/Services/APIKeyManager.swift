@@ -9,10 +9,6 @@ final class APIKeyManager {
     private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "APIKeyManager")
     private let keychain = KeychainService.shared
 
-    private static let providerToEnvironmentKey: [String: String] = [
-        "elevenlabs": "ELEVENLABS_API_KEY"
-    ]
-
     private init() {}
 
     // MARK: - Standard Provider API Keys
@@ -37,8 +33,7 @@ final class APIKeyManager {
             return apiKey
         }
 
-        let lowercased = provider.lowercased()
-        if let environmentKey = Self.providerToEnvironmentKey[lowercased],
+        if let environmentKey = VoiceInkProviderAPIKeyAccount.fallbackEnvironmentKey(forProviderName: provider),
            let value = ProcessInfo.processInfo.environment[environmentKey],
            let apiKey = VoiceInkProviderCredential.nonBlank(value) {
             return apiKey

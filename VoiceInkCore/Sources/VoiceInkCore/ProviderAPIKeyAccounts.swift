@@ -19,6 +19,10 @@ public enum VoiceInkProviderAPIKeyAccount {
         return knownAccountsByProviderName[normalizedProvider] ?? "\(normalizedProvider)APIKey"
     }
 
+    public static func fallbackEnvironmentKey(forProviderName provider: String) -> String? {
+        fallbackEnvironmentKeysByProviderName[normalized(provider)]
+    }
+
     private static let knownAccountsByProviderName: [String: String] = [
         "groq": groq,
         "deepgram": deepgram,
@@ -34,6 +38,10 @@ public enum VoiceInkProviderAPIKeyAccount {
         "openai": openAI,
         "anthropic": anthropic,
         "openrouter": openRouter
+    ]
+
+    private static let fallbackEnvironmentKeysByProviderName: [String: String] = [
+        "elevenlabs": "ELEVENLABS_API_KEY"
     ]
 
     private static func normalized(_ provider: String) -> String {

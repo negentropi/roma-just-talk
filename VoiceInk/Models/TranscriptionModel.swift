@@ -134,6 +134,14 @@ struct NativeAppleModel: TranscriptionModel {
     let provider: ModelProvider = .nativeApple
     let isMultilingualModel: Bool
     let supportedLanguages: [String: String]
+
+    init(spec: VoiceInkNativeAppleTranscriptionModelSpec) {
+        self.name = spec.name
+        self.displayName = spec.displayName
+        self.description = spec.description
+        self.isMultilingualModel = spec.isMultilingual
+        self.supportedLanguages = spec.supportedLanguages
+    }
 }
 
 // A new struct for FluidAudio models
@@ -163,6 +171,20 @@ struct FluidAudioModel: TranscriptionModel {
         self.ramUsage = ramUsage
         self.supportsStreaming = supportsStreaming
         self.supportedLanguages = supportedLanguages
+    }
+
+    init(spec: VoiceInkFluidAudioTranscriptionModelSpec) {
+        self.init(
+            name: spec.name,
+            displayName: spec.displayName,
+            description: spec.description,
+            size: spec.size,
+            speed: spec.speed,
+            accuracy: spec.accuracy,
+            ramUsage: spec.ramUsage,
+            supportsStreaming: spec.supportsStreaming,
+            supportedLanguages: spec.supportedLanguages
+        )
     }
 }
 

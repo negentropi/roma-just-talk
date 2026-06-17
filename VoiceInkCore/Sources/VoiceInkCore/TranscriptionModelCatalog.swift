@@ -120,8 +120,109 @@ public struct VoiceInkCloudTranscriptionModelSpec: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkNativeAppleTranscriptionModelSpec: Equatable, Sendable {
+    public let name: String
+    public let displayName: String
+    public let description: String
+    public let isMultilingual: Bool
+
+    public var supportedLanguages: [String: String] {
+        Self.supportedLanguages(isMultilingual: isMultilingual)
+    }
+
+    public init(
+        name: String,
+        displayName: String,
+        description: String,
+        isMultilingual: Bool
+    ) {
+        self.name = name
+        self.displayName = displayName
+        self.description = description
+        self.isMultilingual = isMultilingual
+    }
+
+    public static func supportedLanguages(isMultilingual: Bool) -> [String: String] {
+        isMultilingual ? VoiceInkLanguageCatalog.nativeApple : VoiceInkLanguageCatalog.englishOnly
+    }
+}
+
+public struct VoiceInkFluidAudioTranscriptionModelSpec: Equatable, Sendable {
+    public let name: String
+    public let displayName: String
+    public let description: String
+    public let size: String
+    public let speed: Double
+    public let accuracy: Double
+    public let ramUsage: Double
+    public let isMultilingual: Bool
+    public let supportsStreaming: Bool
+
+    public var supportedLanguages: [String: String] {
+        Self.supportedLanguages(isMultilingual: isMultilingual)
+    }
+
+    public init(
+        name: String,
+        displayName: String,
+        description: String,
+        size: String,
+        speed: Double,
+        accuracy: Double,
+        ramUsage: Double,
+        isMultilingual: Bool,
+        supportsStreaming: Bool
+    ) {
+        self.name = name
+        self.displayName = displayName
+        self.description = description
+        self.size = size
+        self.speed = speed
+        self.accuracy = accuracy
+        self.ramUsage = ramUsage
+        self.isMultilingual = isMultilingual
+        self.supportsStreaming = supportsStreaming
+    }
+
+    public static func supportedLanguages(isMultilingual: Bool) -> [String: String] {
+        VoiceInkLanguageCatalog.fluidAudioLanguages(isMultilingual: isMultilingual)
+    }
+}
+
 public enum VoiceInkTranscriptionModelCatalog {
     public static let localBaseModel = "base"
+
+    public static let nativeAppleModel = VoiceInkNativeAppleTranscriptionModelSpec(
+        name: "apple-speech",
+        displayName: "Apple Speech",
+        description: "Uses the native Apple Speech framework for transcription. Requires macOS 26",
+        isMultilingual: true
+    )
+
+    public static let fluidAudioModels = [
+        VoiceInkFluidAudioTranscriptionModelSpec(
+            name: "parakeet-tdt-0.6b-v2",
+            displayName: "Parakeet V2",
+            description: "NVIDIA's Parakeet V2 model optimized for lightning-fast English-only transcription",
+            size: "474 MB",
+            speed: 0.99,
+            accuracy: 0.94,
+            ramUsage: 0.8,
+            isMultilingual: false,
+            supportsStreaming: true
+        ),
+        VoiceInkFluidAudioTranscriptionModelSpec(
+            name: "parakeet-tdt-0.6b-v3",
+            displayName: "Parakeet V3",
+            description: "Parakeet V3 with English and 25 European language support",
+            size: "494 MB",
+            speed: 0.99,
+            accuracy: 0.94,
+            ramUsage: 0.8,
+            isMultilingual: true,
+            supportsStreaming: true
+        )
+    ]
 
     public static func modelNames(for provider: VoiceInkTranscriptionModelProvider) -> [String] {
         switch provider {

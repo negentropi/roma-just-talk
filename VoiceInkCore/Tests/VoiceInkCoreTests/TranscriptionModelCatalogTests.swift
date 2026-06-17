@@ -2,6 +2,29 @@ import Foundation
 @testable import VoiceInkCore
 
 final class TranscriptionModelCatalogTests: XCTestCase {
+    func testNativeAppleModelMetadataIsShared() {
+        let model = VoiceInkTranscriptionModelCatalog.nativeAppleModel
+
+        XCTAssertEqual(model.name, "apple-speech")
+        XCTAssertEqual(model.displayName, "Apple Speech")
+        XCTAssertEqual(model.description, "Uses the native Apple Speech framework for transcription. Requires macOS 26")
+        XCTAssertTrue(model.isMultilingual)
+        XCTAssertEqual(model.supportedLanguages["en-US"], "English (United States)")
+        XCTAssertNil(model.supportedLanguages["en"])
+    }
+
+    func testFluidAudioModelMetadataIsShared() {
+        let models = VoiceInkTranscriptionModelCatalog.fluidAudioModels
+
+        XCTAssertEqual(models.map(\.name), ["parakeet-tdt-0.6b-v2", "parakeet-tdt-0.6b-v3"])
+        XCTAssertEqual(models.map(\.displayName), ["Parakeet V2", "Parakeet V3"])
+        XCTAssertEqual(models.map(\.size), ["474 MB", "494 MB"])
+        XCTAssertEqual(models.map(\.supportsStreaming), [true, true])
+        XCTAssertEqual(models.map(\.isMultilingual), [false, true])
+        XCTAssertEqual(models.first?.supportedLanguages, ["en": "English"])
+        XCTAssertEqual(models.last?.supportedLanguages["fr"], "French")
+    }
+
     func testDeepgramLanguageCapabilityIsSharedProviderMetadata() {
         XCTAssertEqual(VoiceInkTranscriptionModelProvider.deepgram.languageCodes?.first, "ar")
         XCTAssertEqual(VoiceInkTranscriptionModelProvider.deepgram.languageCodes?.last, "zh")

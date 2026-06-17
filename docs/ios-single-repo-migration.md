@@ -34,6 +34,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - API-key environment-reference resolution
 - AI reasoning temperature, effort, and provider-specific hidden-reasoning request parameters for OpenAI-compatible post-processing
 - transcription and AI model catalogs
+- Native Apple and FluidAudio local transcription model metadata; platform shells still own availability, download, and runtime adapters
 - remote transcription provider dispatch for iOS retry transcription
 - mode runtime configuration and selected-mode repair
 - mode provider-selection repair and draft saveability rules
@@ -85,6 +86,7 @@ Current macOS consumers of shared remote transport:
 - macOS batch cloud and streaming transcription use `VoiceInkProviderCredential` for runtime API-key presence checks before entering provider adapters.
 - macOS API-key lookup reads fallback environment-variable names from `VoiceInkProviderAPIKeyAccount`; Keychain access remains in the macOS shell.
 - macOS cloud-provider model lists are supplied by the `CloudProvider` default adapter over `VoiceInkTranscriptionModelCatalog`, so provider modules only own transport and streaming differences.
+- macOS Native Apple and Parakeet model structs adapt `VoiceInkTranscriptionModelCatalog` local model specs; macOS still owns OS availability and FluidAudio download/runtime code.
 - macOS language pickers use `VoiceInkLanguageCatalog.sortedOptions` so language presentation order stays shared with iOS.
 - macOS recording, audio-file transcription, and retry transcription use `VoiceInkTranscriptionCleanupConfiguration` directly for shared raw-output filtering and cleanup preferences.
 - macOS model definitions read supported language sets through a thin `ModelProvider` adapter backed by `VoiceInkLanguageCatalog`; the old `LanguageDictionary` wrapper is gone.

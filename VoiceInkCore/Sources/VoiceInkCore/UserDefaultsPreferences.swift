@@ -130,6 +130,10 @@ public enum VoiceInkTranscriptionPromptPreference {
     public static func savePrompt(_ prompt: String, to defaults: UserDefaults = .standard) {
         defaults.set(prompt, forKey: VoiceInkUserDefaultsKey.transcriptionPrompt)
     }
+
+    public static func clearPrompt(from defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.transcriptionPrompt)
+    }
 }
 
 public enum VoiceInkTranscriptionLanguagePreference {
@@ -232,6 +236,16 @@ public enum VoiceInkAIEnhancementProviderPreference {
         guard !model.isEmpty else { return }
         defaults.set(model, forKey: VoiceInkUserDefaultsKey.selectedAIProviderModel(providerRawValue))
     }
+
+    public static func clear(
+        from defaults: UserDefaults = .standard,
+        providers: [VoiceInkAIEnhancementProviderKind] = VoiceInkAIEnhancementProviderKind.allCases
+    ) {
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.selectedAIProvider)
+        providers.forEach {
+            defaults.removeObject(forKey: VoiceInkUserDefaultsKey.selectedAIProviderModel($0.rawValue))
+        }
+    }
 }
 
 public enum VoiceInkDynamicAIProviderPreference {
@@ -286,6 +300,14 @@ public enum VoiceInkDynamicAIProviderPreference {
     public static func saveOpenRouterModels(_ models: [String], to defaults: UserDefaults = .standard) {
         defaults.set(models, forKey: VoiceInkUserDefaultsKey.openRouterModels)
     }
+
+    public static func clear(from defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.ollamaBaseURL)
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.ollamaSelectedModel)
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.customProviderBaseURL)
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.customProviderModel)
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.openRouterModels)
+    }
 }
 
 public enum VoiceInkFillerWordPreference {
@@ -313,6 +335,11 @@ public enum VoiceInkAIEnhancementRequestPreference {
     public static func shouldRetryOnTimeout(from defaults: UserDefaults = .standard) -> Bool {
         defaults.object(forKey: VoiceInkUserDefaultsKey.enhancementRetryOnTimeout) as? Bool
             ?? VoiceInkPreferenceDefault.enhancementRetryOnTimeout
+    }
+
+    public static func clear(from defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.enhancementTimeoutSeconds)
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.enhancementRetryOnTimeout)
     }
 }
 
@@ -362,6 +389,11 @@ public enum VoiceInkTranscriptionAutoCleanupPreference {
     public static func saveRetentionMinutes(_ minutes: Int, to defaults: UserDefaults = .standard) {
         defaults.set(minutes, forKey: VoiceInkUserDefaultsKey.transcriptionRetentionMinutes)
     }
+
+    public static func clear(from defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.isTranscriptionCleanupEnabled)
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.transcriptionRetentionMinutes)
+    }
 }
 
 public enum VoiceInkSharedPreferenceReset {
@@ -374,10 +406,17 @@ public enum VoiceInkSharedPreferenceReset {
         VoiceInkProviderAPIKeyVerificationState.clearAll(from: providers, in: defaults)
         VoiceInkAudioSessionTimeoutPreference.clear(from: defaults)
         VoiceInkVADPreference.clear(from: defaults)
+        VoiceInkTranscriptionPromptPreference.clearPrompt(from: defaults)
         PunctuationCleanupMode.clearCurrent(in: defaults)
         VoiceInkTranscriptionCleanupPreferenceStorage.clearTextPreferences(from: defaults)
         VoiceInkFillerWordPreference.clearWords(from: defaults)
         VoiceInkTranscriptionLanguagePreference.clearSelectedLanguage(from: defaults)
+        VoiceInkCurrentTranscriptionModelPreference.clearModelName(from: defaults)
+        VoiceInkAIEnhancementProviderPreference.clear(from: defaults)
+        VoiceInkDynamicAIProviderPreference.clear(from: defaults)
+        VoiceInkAIEnhancementRequestPreference.clear(from: defaults)
+        VoiceInkTranscriptionAutoCleanupPreference.clear(from: defaults)
+        VoiceInkCustomPromptStorage.clear(from: defaults)
     }
 }
 

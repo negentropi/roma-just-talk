@@ -534,6 +534,22 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             VoiceInkTranscriptionCleanupPreferenceStorage.saveRemoveFillerWords(false, to: defaults)
             VoiceInkFillerWordPreference.saveWords(["um", "like"], to: defaults)
             VoiceInkTranscriptionLanguagePreference.saveSelectedLanguage("fr", to: defaults)
+            VoiceInkTranscriptionPromptPreference.savePrompt("custom prompt", to: defaults)
+            VoiceInkCurrentTranscriptionModelPreference.saveModelName("nova-3", to: defaults)
+            VoiceInkAIEnhancementProviderPreference.saveSelectedProviderRawValue("OpenRouter", to: defaults)
+            VoiceInkAIEnhancementProviderPreference.saveSelectedModel("openai/gpt-oss-120b", for: "OpenRouter", to: defaults)
+            VoiceInkDynamicAIProviderPreference.saveOllamaBaseURL("http://example.local:11434", to: defaults)
+            VoiceInkDynamicAIProviderPreference.saveOllamaSelectedModel("mistral", to: defaults)
+            VoiceInkDynamicAIProviderPreference.saveCustomProviderBaseURL("https://api.example.com/v1", to: defaults)
+            VoiceInkDynamicAIProviderPreference.saveCustomProviderModel("custom-model", to: defaults)
+            VoiceInkDynamicAIProviderPreference.saveOpenRouterModels(["openai/gpt-oss-120b"], to: defaults)
+            defaults.set(15, forKey: VoiceInkUserDefaultsKey.enhancementTimeoutSeconds)
+            defaults.set(false, forKey: VoiceInkUserDefaultsKey.enhancementRetryOnTimeout)
+            VoiceInkTranscriptionAutoCleanupPreference.saveIsEnabled(true, to: defaults)
+            VoiceInkTranscriptionAutoCleanupPreference.saveRetentionMinutes(15, to: defaults)
+            let customPrompt = VoiceInkCustomPrompt(title: "Custom", promptText: "Clean this")
+            VoiceInkCustomPromptStorage.savePrompts([customPrompt], to: defaults)
+            VoiceInkCustomPromptStorage.saveSelectedPromptId(customPrompt.id, to: defaults)
 
             VoiceInkSharedPreferenceReset.clearCoreUserSettings(from: defaults, providers: [.groq])
 
@@ -567,6 +583,35 @@ final class UserDefaultsPreferencesTests: XCTestCase {
                 VoiceInkTranscriptionLanguagePreference.selectedLanguage(from: defaults),
                 VoiceInkLanguageCatalog.autoDetectCode
             )
+            XCTAssertNil(VoiceInkTranscriptionPromptPreference.storedPrompt(from: defaults))
+            XCTAssertNil(VoiceInkCurrentTranscriptionModelPreference.modelName(from: defaults))
+            XCTAssertNil(VoiceInkAIEnhancementProviderPreference.selectedProviderRawValue(from: defaults))
+            XCTAssertNil(VoiceInkAIEnhancementProviderPreference.selectedModel(for: "OpenRouter", from: defaults))
+            XCTAssertEqual(
+                VoiceInkDynamicAIProviderPreference.ollamaBaseURL(from: defaults),
+                VoiceInkPreferenceDefault.ollamaBaseURL
+            )
+            XCTAssertEqual(
+                VoiceInkDynamicAIProviderPreference.ollamaSelectedModel(from: defaults, fallback: "llama2"),
+                "llama2"
+            )
+            XCTAssertEqual(VoiceInkDynamicAIProviderPreference.customProviderBaseURL(from: defaults), "")
+            XCTAssertEqual(VoiceInkDynamicAIProviderPreference.customProviderModel(from: defaults), "")
+            XCTAssertEqual(VoiceInkDynamicAIProviderPreference.openRouterModels(from: defaults), [])
+            XCTAssertEqual(
+                VoiceInkAIEnhancementRequestPreference.timeoutSeconds(from: defaults),
+                TimeInterval(VoiceInkPreferenceDefault.enhancementTimeoutSeconds)
+            )
+            XCTAssertTrue(VoiceInkAIEnhancementRequestPreference.shouldRetryOnTimeout(from: defaults))
+            XCTAssertEqual(
+                VoiceInkTranscriptionAutoCleanupPreference.current(from: defaults),
+                VoiceInkTranscriptionAutoCleanupConfiguration(
+                    isEnabled: false,
+                    retentionMinutes: VoiceInkPreferenceDefault.transcriptionRetentionMinutes
+                )
+            )
+            XCTAssertTrue(VoiceInkCustomPromptStorage.loadPrompts(from: defaults).isEmpty)
+            XCTAssertNil(VoiceInkCustomPromptStorage.loadSelectedPromptId(from: defaults))
         }
     }
 

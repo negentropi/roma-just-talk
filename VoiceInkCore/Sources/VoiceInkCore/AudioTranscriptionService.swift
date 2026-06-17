@@ -7,8 +7,6 @@ public protocol VoiceInkAudioTranscriptionService {
         fileURL: URL,
         language: String?
     ) async throws -> String
-
-    func verifyAPIKey(_ apiKey: String) async -> Bool
 }
 
 public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionService, Sendable {
@@ -167,55 +165,4 @@ public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionServ
         }
     }
 
-    public func verifyAPIKey(_ apiKey: String) async -> Bool {
-        switch transport {
-        case .openAICompatible:
-            return await openAICompatibleClient.verifyAPIKey(
-                baseURL: apiBaseURL,
-                apiKey: apiKey
-            )
-        case .deepgram:
-            return await deepgramClient.verifyAPIKey(
-                baseURL: apiBaseURL,
-                apiKey: apiKey
-            )
-        case .geminiGenerateContent:
-            return await geminiClient.verifyAPIKey(
-                baseURL: apiBaseURL,
-                apiKey: apiKey
-            )
-        case .mistral:
-            return await mistralClient.verifyAPIKey(
-                baseURL: apiBaseURL,
-                apiKey: apiKey
-            )
-        case .elevenLabs:
-            return await elevenLabsClient.verifyAPIKey(
-                baseURL: apiBaseURL,
-                apiKey: apiKey
-            )
-        case .soniox:
-            return await sonioxClient.verifyAPIKey(
-                baseURL: apiBaseURL,
-                apiKey: apiKey
-            )
-        case .speechmatics:
-            return await speechmaticsClient.verifyAPIKey(
-                baseURL: apiBaseURL,
-                apiKey: apiKey
-            )
-        case .assemblyAI:
-            return await assemblyAIClient.verifyAPIKey(
-                baseURL: apiBaseURL,
-                apiKey: apiKey
-            )
-        case .xai:
-            return await xaiClient.verifyAPIKey(
-                baseURL: apiBaseURL,
-                apiKey: apiKey
-            )
-        case .localWhisper:
-            return false
-        }
-    }
 }

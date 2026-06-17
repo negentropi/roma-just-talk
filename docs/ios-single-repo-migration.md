@@ -148,6 +148,7 @@ Current iOS consumers of shared remote transport:
 
 - `iOS/VoiceInk-ios/TranscriptionServiceFactory.swift` creates `VoiceInkRemoteTranscriptionService` for every remote `VoiceInkProviderKind`.
 - `VoiceInkRemoteTranscriptionService` dispatches Groq/OpenAI/Cerebras, Deepgram, Gemini, Mistral, ElevenLabs, Soniox, Speechmatics, AssemblyAI, and xAI through shared core clients.
+- `VoiceInkAudioTranscriptionService` is transcription-only; API-key verification is kept in `VoiceInkProviderAPIKeyVerifier` so retry transcription adapters do not expose a dead verification interface.
 - `iOS/VoiceInk-ios/TranscriptionRetryService.swift` routes iOS transcription through `VoiceInkTranscriptionRunProcessor`, including shared output filtering and cleanup preferences from `AppSettings`.
 - `iOS/VoiceInk-ios/AppSettings.swift` and `VoiceInkTranscriptionRunProcessor` use the shared provider credential policy so whitespace-only provider keys fail as missing before provider transport runs.
 - `iOS/VoiceInk-ios/AppSettings.swift` loads retry transcription cleanup configuration through `VoiceInkTranscriptionCleanupConfiguration.current()`, aligning iOS cleanup with macOS defaults while keeping settings UI/storage in the iOS shell.
@@ -173,6 +174,7 @@ The remaining Swift files present in `../VoiceInk-iOS` but not in `VoiceInk/iOS`
 - `OpenAICompatibleClient.swift`: replaced by `VoiceInkCore` chat DTOs/request builder/client.
 - `LLMPostProcessor.swift`: replaced by `VoiceInkPostProcessingRequest`, `VoiceInkPostProcessingClient`, and `VoiceInkTranscriptionRunProcessor`.
 - `RiffWaveUtils.swift`: replaced by `VoiceInkPCM16AudioSamples`.
+- `VADModelManager.swift`: replaced by direct `VoiceInkVADModelFiles.sileroPath()` calls from the macOS/iOS Whisper shells and macOS rolling preload.
 - `DefaultModeManager.swift`: replaced by `AppSettings.ensureDefaultModeExists()` plus `Mode.defaultLocalWhisper()`.
 - `Mode.swift`, `PromptTemplate.swift`, `Provider.swift`: replaced by `VoiceInkCore` mode, prompt-template, and provider catalog modules.
 - `ModeSelectionView.swift`, `ModesView.swift`: obsolete iOS UI experiments; current in-repo iOS mode UI is `iOS/VoiceInk-ios/ModeConfigurationView.swift`.

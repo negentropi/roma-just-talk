@@ -311,9 +311,6 @@ private struct StubTranscriptionService: VoiceInkAudioTranscriptionService {
         text
     }
 
-    func verifyAPIKey(_ apiKey: String) async -> Bool {
-        true
-    }
 }
 
 private final class CapturingTranscriptionService: VoiceInkAudioTranscriptionService {
@@ -334,9 +331,6 @@ private final class CapturingTranscriptionService: VoiceInkAudioTranscriptionSer
         return text
     }
 
-    func verifyAPIKey(_ apiKey: String) async -> Bool {
-        true
-    }
 }
 
 private struct StubLocalizedError: LocalizedError {

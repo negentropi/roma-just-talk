@@ -79,9 +79,4 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
         }
     }
     
-    /// Verify API key (not applicable for local transcription, always returns true if model is available)
-    func verifyAPIKey(_ apiKey: String) async -> Bool {
-        let modelManager = LocalModelManager.shared
-        return await modelManager.hasAvailableModel
-    }
 }

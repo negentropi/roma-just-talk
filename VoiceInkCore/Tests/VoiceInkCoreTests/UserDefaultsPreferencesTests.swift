@@ -16,6 +16,8 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkUserDefaultsKey.transcriptionRetentionMinutes, "TranscriptionRetentionMinutes")
         XCTAssertEqual(VoiceInkUserDefaultsKey.skipShortEnhancement, "SkipShortEnhancement")
         XCTAssertEqual(VoiceInkUserDefaultsKey.shortEnhancementWordThreshold, "ShortEnhancementWordThreshold")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.enhancementTimeoutSeconds, "EnhancementTimeoutSeconds")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.enhancementRetryOnTimeout, "EnhancementRetryOnTimeout")
         XCTAssertEqual(VoiceInkUserDefaultsKey.audioSessionTimeoutSeconds, "audioSessionTimeoutSeconds")
     }
 
@@ -30,6 +32,11 @@ final class UserDefaultsPreferencesTests: XCTestCase {
     func testSharedPreferenceDefaultsPreserveExistingShortEnhancementPolicy() {
         XCTAssertEqual(VoiceInkPreferenceDefault.skipShortEnhancement, true)
         XCTAssertEqual(VoiceInkPreferenceDefault.shortEnhancementWordThreshold, 3)
+    }
+
+    func testSharedPreferenceDefaultsPreserveExistingEnhancementTimeoutPolicy() {
+        XCTAssertEqual(VoiceInkPreferenceDefault.enhancementTimeoutSeconds, 7)
+        XCTAssertEqual(VoiceInkPreferenceDefault.enhancementRetryOnTimeout, true)
     }
 
     func testModeStorageRoundTripsModesAndSelectedModeId() {

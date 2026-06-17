@@ -14,6 +14,8 @@ public enum VoiceInkUserDefaultsKey {
     public static let transcriptionRetentionMinutes = "TranscriptionRetentionMinutes"
     public static let skipShortEnhancement = "SkipShortEnhancement"
     public static let shortEnhancementWordThreshold = "ShortEnhancementWordThreshold"
+    public static let enhancementTimeoutSeconds = "EnhancementTimeoutSeconds"
+    public static let enhancementRetryOnTimeout = "EnhancementRetryOnTimeout"
     public static let audioSessionTimeoutSeconds = "audioSessionTimeoutSeconds"
 }
 
@@ -22,6 +24,8 @@ public enum VoiceInkPreferenceDefault {
     public static let transcriptionRetentionMinutes = 24 * 60
     public static let skipShortEnhancement = true
     public static let shortEnhancementWordThreshold = 3
+    public static let enhancementTimeoutSeconds = 7
+    public static let enhancementRetryOnTimeout = true
 }
 
 public enum VoiceInkModeStorage {

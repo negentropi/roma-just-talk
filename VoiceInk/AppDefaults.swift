@@ -70,8 +70,8 @@ enum AppDefaults {
             // Enhancement
             VoiceInkUserDefaultsKey.skipShortEnhancement: VoiceInkPreferenceDefault.skipShortEnhancement,
             VoiceInkUserDefaultsKey.shortEnhancementWordThreshold: VoiceInkPreferenceDefault.shortEnhancementWordThreshold,
-            "EnhancementTimeoutSeconds": 7,
-            "EnhancementRetryOnTimeout": true,
+            VoiceInkUserDefaultsKey.enhancementTimeoutSeconds: VoiceInkPreferenceDefault.enhancementTimeoutSeconds,
+            VoiceInkUserDefaultsKey.enhancementRetryOnTimeout: VoiceInkPreferenceDefault.enhancementRetryOnTimeout,
 
             // Model
             "PrewarmModelOnWake": true,

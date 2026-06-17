@@ -7,8 +7,10 @@ struct EnhancementSettingsPanel: View {
     private var isSkipShortEnhancementEnabled = VoiceInkPreferenceDefault.skipShortEnhancement
     @AppStorage(VoiceInkUserDefaultsKey.shortEnhancementWordThreshold)
     private var shortEnhancementWordThreshold = VoiceInkPreferenceDefault.shortEnhancementWordThreshold
-    @AppStorage("EnhancementTimeoutSeconds") private var enhancementTimeoutSeconds = 7
-    @AppStorage("EnhancementRetryOnTimeout") private var retryOnTimeout = true
+    @AppStorage(VoiceInkUserDefaultsKey.enhancementTimeoutSeconds)
+    private var enhancementTimeoutSeconds = VoiceInkPreferenceDefault.enhancementTimeoutSeconds
+    @AppStorage(VoiceInkUserDefaultsKey.enhancementRetryOnTimeout)
+    private var retryOnTimeout = VoiceInkPreferenceDefault.enhancementRetryOnTimeout
     @State private var isShortEnhancementExpanded = false
     @State private var isHandlingToggleChange = false
 

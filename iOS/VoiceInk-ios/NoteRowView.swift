@@ -74,9 +74,7 @@ struct NoteRowView: View {
     }
 
     private var relativeTimestamp: String {
-        let formatter = RelativeDateTimeFormatter()
-        formatter.unitsStyle = .short
-        return formatter.localizedString(for: note.timestamp, relativeTo: Date())
+        VoiceInkDatePresentation.relativeTimestamp(note.timestamp)
     }
 
 }

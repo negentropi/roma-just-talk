@@ -10,6 +10,7 @@ struct VoiceInkCoreCheck {
 struct VoiceInkCoreCheckRunner {
     static func main() async {
         let checks: [VoiceInkCoreCheck] = [
+            VoiceInkCoreCheck(name: "DatePresentationTests.testRelativeTimestampUsesShortRelativeStyle", run: { DatePresentationTests().testRelativeTimestampUsesShortRelativeStyle() }),
             VoiceInkCoreCheck(name: "DurationPresentationTests.testMinutesSecondsUsesUnpaddedMinutesByDefault", run: { DurationPresentationTests().testMinutesSecondsUsesUnpaddedMinutesByDefault() }),
             VoiceInkCoreCheck(name: "DurationPresentationTests.testMinutesSecondsCanPadMinutesToTwoDigits", run: { DurationPresentationTests().testMinutesSecondsCanPadMinutesToTwoDigits() }),
             VoiceInkCoreCheck(name: "DurationPresentationTests.testMinutesSecondsTruncatesFractionalSeconds", run: { DurationPresentationTests().testMinutesSecondsTruncatesFractionalSeconds() }),

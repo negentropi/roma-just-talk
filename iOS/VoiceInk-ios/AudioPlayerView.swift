@@ -13,7 +13,7 @@ struct AudioPlayerView: View {
                 HStack(spacing: 8) {
                     Image(systemName: "calendar")
                         .foregroundStyle(.secondary)
-                    Text(relativeTimestamp(from: ts))
+                    Text(VoiceInkDatePresentation.relativeTimestamp(ts))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     if duration > 0 {
@@ -122,12 +122,6 @@ struct AudioPlayerView: View {
         .onDisappear {
             player.stop()
         }
-    }
-    
-    private func relativeTimestamp(from date: Date) -> String {
-        let formatter = RelativeDateTimeFormatter()
-        formatter.unitsStyle = .short
-        return formatter.localizedString(for: date, relativeTo: Date())
     }
 }
 

@@ -6,6 +6,8 @@ public enum VoiceInkPCM16Audio {
     public static let monoChannelCount = 1
     public static let bitsPerSample = 16
     public static let bytesPerSample = MemoryLayout<Int16>.size
+    public static let isBigEndian = false
+    public static let isFloatingPoint = false
     public static let wavHeaderByteCount = 44
 
     public static func floatSamples(fromLittleEndianData data: Data, startingAt startByteOffset: Int = 0) -> [Float] {

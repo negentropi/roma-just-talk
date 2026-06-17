@@ -30,6 +30,9 @@ final class AudioRecorder: NSObject, ObservableObject {
             AVFormatIDKey: Int(kAudioFormatLinearPCM),
             AVSampleRateKey: VoiceInkPCM16Audio.mono16kSampleRate,
             AVNumberOfChannelsKey: VoiceInkPCM16Audio.monoChannelCount,
+            AVLinearPCMBitDepthKey: VoiceInkPCM16Audio.bitsPerSample,
+            AVLinearPCMIsBigEndianKey: VoiceInkPCM16Audio.isBigEndian,
+            AVLinearPCMIsFloatKey: VoiceInkPCM16Audio.isFloatingPoint,
             AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
         ]
 

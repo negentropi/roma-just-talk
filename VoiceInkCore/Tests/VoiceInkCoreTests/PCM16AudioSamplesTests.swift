@@ -34,6 +34,13 @@ final class PCM16AudioSamplesTests: XCTestCase {
     }
 
     func testDurationAndByteCountUseMono16kPCM16Format() {
+        XCTAssertEqual(VoiceInkPCM16Audio.mono16kSampleRateHz, 16_000)
+        XCTAssertEqual(VoiceInkPCM16Audio.mono16kSampleRate, 16_000.0)
+        XCTAssertEqual(VoiceInkPCM16Audio.monoChannelCount, 1)
+        XCTAssertEqual(VoiceInkPCM16Audio.bitsPerSample, 16)
+        XCTAssertEqual(VoiceInkPCM16Audio.bytesPerSample, 2)
+        XCTAssertFalse(VoiceInkPCM16Audio.isBigEndian)
+        XCTAssertFalse(VoiceInkPCM16Audio.isFloatingPoint)
         XCTAssertEqual(VoiceInkPCM16Audio.byteCount(forMono16kDuration: 0.1), 3_200)
         XCTAssertEqual(VoiceInkPCM16Audio.sampleCount(forMono16kDuration: 0.1), 1_600)
 

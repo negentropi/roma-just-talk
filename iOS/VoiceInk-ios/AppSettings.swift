@@ -253,16 +253,12 @@ final class AppSettings: ObservableObject {
         // Clear modes and selection
         modes = []
         selectedModeId = nil
-        VoiceInkModeStorage.clear()
-        VoiceInkOnboardingPreference.clear()
 
         // Clear verification flags
         verifiedAPIKeyProviders = []
-        VoiceInkProviderAPIKeyVerificationState.clearAll()
         
         // Reset audio session timeout to default
         audioSessionTimeoutSeconds = VoiceInkPreferenceDefault.audioSessionTimeoutSeconds
-        VoiceInkAudioSessionTimeoutPreference.clear()
 
         // Reset transcription cleanup preferences
         punctuationCleanupMode = .keep
@@ -270,11 +266,8 @@ final class AppSettings: ObservableObject {
         lowercaseTranscription = VoiceInkPreferenceDefault.lowercaseTranscription
         removeFillerWords = VoiceInkPreferenceDefault.removeFillerWords
         fillerWords = VoiceInkFillerWords.defaultWords
-        PunctuationCleanupMode.clearCurrent()
-        VoiceInkTranscriptionCleanupPreferenceStorage.clearTextPreferences()
-        VoiceInkFillerWordPreference.clearWords()
         selectedTranscriptionLanguage = VoiceInkLanguageCatalog.autoDetectCode
-        VoiceInkTranscriptionLanguagePreference.clearSelectedLanguage()
+        VoiceInkSharedPreferenceReset.clearCoreUserSettings()
 
         // Clear API keys from memory and Keychain
         apiKeysByProvider = [:]

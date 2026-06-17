@@ -476,6 +476,52 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(configuration.cutoffDate(from: referenceDate), Date(timeIntervalSince1970: 1_800))
     }
 
+    func testSharedPreferenceResetClearsCoreUserSettings() {
+        withIsolatedDefaults { defaults in
+            let mode = Mode.defaultLocalWhisper()
+            VoiceInkModeStorage.saveModes([mode], to: defaults)
+            VoiceInkModeStorage.saveSelectedModeId(mode.id, to: defaults)
+            VoiceInkOnboardingPreference.saveHasCompletedOnboarding(to: defaults)
+            VoiceInkProviderAPIKeyVerificationState.setVerified(true, for: .groq, in: defaults)
+            VoiceInkAudioSessionTimeoutPreference.saveTimeoutSeconds(120, to: defaults)
+            PunctuationCleanupMode.setCurrent(.removeAll, in: defaults)
+            VoiceInkTranscriptionCleanupPreferenceStorage.saveTextFormattingEnabled(false, to: defaults)
+            VoiceInkTranscriptionCleanupPreferenceStorage.saveLowercaseTranscription(true, to: defaults)
+            VoiceInkTranscriptionCleanupPreferenceStorage.saveRemoveFillerWords(false, to: defaults)
+            VoiceInkFillerWordPreference.saveWords(["um", "like"], to: defaults)
+            VoiceInkTranscriptionLanguagePreference.saveSelectedLanguage("fr", to: defaults)
+
+            VoiceInkSharedPreferenceReset.clearCoreUserSettings(from: defaults, providers: [.groq])
+
+            XCTAssertTrue(VoiceInkModeStorage.loadModes(from: defaults).isEmpty)
+            XCTAssertNil(VoiceInkModeStorage.loadSelectedModeId(from: defaults))
+            XCTAssertFalse(VoiceInkOnboardingPreference.hasCompletedOnboarding(from: defaults))
+            XCTAssertFalse(VoiceInkProviderAPIKeyVerificationState.isVerified(.groq, in: defaults))
+            XCTAssertEqual(
+                VoiceInkAudioSessionTimeoutPreference.timeoutSeconds(from: defaults),
+                VoiceInkPreferenceDefault.audioSessionTimeoutSeconds
+            )
+            XCTAssertEqual(PunctuationCleanupMode.current(in: defaults), .keep)
+            XCTAssertEqual(
+                VoiceInkTranscriptionCleanupPreferenceStorage.isTextFormattingEnabled(from: defaults),
+                VoiceInkPreferenceDefault.isTextFormattingEnabled
+            )
+            XCTAssertEqual(
+                VoiceInkTranscriptionCleanupPreferenceStorage.shouldLowercase(from: defaults),
+                VoiceInkPreferenceDefault.lowercaseTranscription
+            )
+            XCTAssertEqual(
+                VoiceInkTranscriptionCleanupPreferenceStorage.shouldRemoveFillerWords(from: defaults),
+                VoiceInkPreferenceDefault.removeFillerWords
+            )
+            XCTAssertEqual(VoiceInkFillerWordPreference.words(from: defaults), VoiceInkFillerWords.defaultWords)
+            XCTAssertEqual(
+                VoiceInkTranscriptionLanguagePreference.selectedLanguage(from: defaults),
+                VoiceInkLanguageCatalog.autoDetectCode
+            )
+        }
+    }
+
     func testModeStorageRoundTripsModesAndSelectedModeId() {
         withIsolatedDefaults { defaults in
             let localMode = Mode.defaultLocalWhisper(name: "Local")

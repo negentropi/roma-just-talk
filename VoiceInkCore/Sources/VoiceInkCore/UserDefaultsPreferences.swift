@@ -338,6 +338,22 @@ public enum VoiceInkTranscriptionAutoCleanupPreference {
     }
 }
 
+public enum VoiceInkSharedPreferenceReset {
+    public static func clearCoreUserSettings(
+        from defaults: UserDefaults = .standard,
+        providers: [VoiceInkProviderKind] = VoiceInkProviderKind.userAPIKeyProviders
+    ) {
+        VoiceInkModeStorage.clear(from: defaults)
+        VoiceInkOnboardingPreference.clear(from: defaults)
+        VoiceInkProviderAPIKeyVerificationState.clearAll(from: providers, in: defaults)
+        VoiceInkAudioSessionTimeoutPreference.clear(from: defaults)
+        PunctuationCleanupMode.clearCurrent(in: defaults)
+        VoiceInkTranscriptionCleanupPreferenceStorage.clearTextPreferences(from: defaults)
+        VoiceInkFillerWordPreference.clearWords(from: defaults)
+        VoiceInkTranscriptionLanguagePreference.clearSelectedLanguage(from: defaults)
+    }
+}
+
 public enum VoiceInkModeStorage {
     public static func saveModes(
         _ modes: [Mode],

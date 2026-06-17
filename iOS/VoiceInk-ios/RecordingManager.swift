@@ -204,8 +204,7 @@ final class RecordingManager: ObservableObject {
     // MARK: - Transcription
     private func transcribeInBackground(note: Transcription, modelContext: ModelContext) {
         guard let fileURL = note.existingAudioFileURL() else {
-            note.transcriptionStatus = .failed
-            note.transcriptionError = VoiceInkEngineError.audioFileNotFound.localizedDescription
+            note.markTranscriptionFailed(VoiceInkEngineError.audioFileNotFound.localizedDescription)
             try? modelContext.save()
             return
         }
@@ -222,20 +221,14 @@ final class RecordingManager: ObservableObject {
                 
                 // Update the existing note on main thread
                 await MainActor.run {
-                    note.text = result.cleanedText
-                    note.enhancedText = result.enhancedText
-                    note.transcriptionModelName = result.transcriptionModelName
-                    note.aiEnhancementModelName = result.aiEnhancementModelName
-                    note.transcriptionStatus = .completed
-                    note.transcriptionError = result.postProcessingError
+                    note.applyCompletedRunResult(result)
                     try? modelContext.save()
                 }
                 
             } catch {
                 // Update note with error on main thread
                 await MainActor.run {
-                    note.transcriptionStatus = .failed
-                    note.transcriptionError = error.localizedDescription
+                    note.markTranscriptionFailed(error.localizedDescription)
                     try? modelContext.save()
                 }
             }

@@ -48,6 +48,20 @@ final class Transcription {
         existingAudioFileURL(fileManager: fileManager) != nil
     }
 
+    func applyCompletedRunResult(_ result: VoiceInkTranscriptionRunResult) {
+        text = result.cleanedText
+        enhancedText = result.enhancedText
+        transcriptionModelName = result.transcriptionModelName
+        aiEnhancementModelName = result.aiEnhancementModelName
+        transcriptionStatus = .completed
+        transcriptionError = result.postProcessingError
+    }
+
+    func markTranscriptionFailed(_ errorDescription: String) {
+        transcriptionStatus = .failed
+        transcriptionError = errorDescription
+    }
+
     private static var recordingsDirectory: URL {
         let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         return VoiceInkStoredAudioFile.recordingsDirectory(in: documentsDirectory)

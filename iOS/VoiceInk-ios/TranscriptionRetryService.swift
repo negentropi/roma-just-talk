@@ -44,12 +44,7 @@ class TranscriptionRetryService {
         let result = try await transcribe(fileURL: fileURL)
         
         // Update note
-        note.text = result.cleanedText
-        note.enhancedText = result.enhancedText
-        note.transcriptionModelName = result.transcriptionModelName
-        note.aiEnhancementModelName = result.aiEnhancementModelName
-        note.transcriptionStatus = .completed
-        note.transcriptionError = result.postProcessingError
+        note.applyCompletedRunResult(result)
         
         return result.finalText
     }

@@ -142,6 +142,38 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
         XCTAssertTrue(configuration.isPostProcessingEnabled)
     }
 
+    func testRuntimeConfigurationRepairsStaleModelSelections() {
+        let mode = Mode(
+            name: "Cloud",
+            transcriptionProvider: .deepgram,
+            transcriptionModel: "stale-transcription-model",
+            isPostProcessingEnabled: true,
+            postProcessingProvider: .gemini,
+            postProcessingModel: "stale-post-processing-model"
+        )
+
+        let configuration = mode.runtimeConfiguration
+
+        XCTAssertEqual(configuration.transcriptionModel, VoiceInkProviderKind.deepgram.defaultModel(for: .transcription))
+        XCTAssertEqual(configuration.postProcessingModel, VoiceInkProviderKind.gemini.defaultModel(for: .postProcessing))
+    }
+
+    func testModeRepairUpdatesStaleModelSelections() {
+        var mode = Mode(
+            name: "Cloud",
+            transcriptionProvider: .deepgram,
+            transcriptionModel: "stale-transcription-model",
+            isPostProcessingEnabled: true,
+            postProcessingProvider: .gemini,
+            postProcessingModel: "stale-post-processing-model"
+        )
+
+        mode.repairModelSelection()
+
+        XCTAssertEqual(mode.transcriptionModel, VoiceInkProviderKind.deepgram.defaultModel(for: .transcription))
+        XCTAssertEqual(mode.postProcessingModel, VoiceInkProviderKind.gemini.defaultModel(for: .postProcessing))
+    }
+
     func testRuntimeConfigurationFallsBackToFirstModeWhenSelectionIsMissing() {
         let firstMode = Mode.defaultLocalWhisper(name: "Local")
         let secondMode = Mode(name: "Cloud")

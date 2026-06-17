@@ -65,11 +65,11 @@ public struct Mode: Identifiable, Codable {
     }
 
     public var effectiveTranscriptionModel: String {
-        transcriptionProvider.fixedModel(for: .transcription) ?? transcriptionModel
+        transcriptionProvider.selectedModel(transcriptionModel, for: .transcription)
     }
 
     public var effectivePostProcessingModel: String {
-        postProcessingProvider.fixedModel(for: .postProcessing) ?? postProcessingModel
+        postProcessingProvider.selectedModel(postProcessingModel, for: .postProcessing)
     }
 
     public mutating func selectTranscriptionProvider(_ provider: VoiceInkProviderKind) {
@@ -80,6 +80,11 @@ public struct Mode: Identifiable, Codable {
     public mutating func selectPostProcessingProvider(_ provider: VoiceInkProviderKind) {
         postProcessingProvider = provider
         postProcessingModel = provider.selectedModel(postProcessingModel, for: .postProcessing)
+    }
+
+    public mutating func repairModelSelection() {
+        transcriptionModel = effectiveTranscriptionModel
+        postProcessingModel = effectivePostProcessingModel
     }
 
     public var runtimeConfiguration: VoiceInkModeRuntimeConfiguration {
@@ -107,6 +112,8 @@ public struct Mode: Identifiable, Codable {
            let provider = availablePostProcessingProviders.first {
             selectPostProcessingProvider(provider)
         }
+
+        repairModelSelection()
     }
 
     public static func defaultLocalWhisper(name: String = "Default") -> Mode {

@@ -96,7 +96,11 @@ final class AppSettings: ObservableObject {
     }
 
     func apiKey(for provider: VoiceInkProviderKind) -> String {
-        provider.runtimeAPIKeyIfAvailable(userAPIKey: apiKeysByProvider[provider] ?? "") ?? ""
+        runtimeAPIKey(for: provider) ?? ""
+    }
+
+    func storedAPIKey(for provider: VoiceInkProviderKind) -> String {
+        apiKeysByProvider[provider] ?? ""
     }
 
     func setAPIKey(_ key: String, for provider: VoiceInkProviderKind) {
@@ -115,7 +119,7 @@ final class AppSettings: ObservableObject {
     
     func isKeyVerified(for provider: VoiceInkProviderKind) -> Bool {
         provider.isReady(
-            userAPIKey: apiKeysByProvider[provider] ?? "",
+            userAPIKey: runtimeAPIKey(for: provider) ?? "",
             userAPIKeyVerified: verifiedAPIKeyProviders.contains(provider),
             localWhisperModelAvailable: LocalModelManager.shared.hasAvailableModel
         )
@@ -236,6 +240,17 @@ final class AppSettings: ObservableObject {
     private static func deleteAPIKey(for provider: VoiceInkProviderKind) {
         guard let account = provider.apiKeyAccount else { return }
         _ = KeychainService.delete(key: account)
+    }
+
+    private func runtimeAPIKey(for provider: VoiceInkProviderKind) -> String? {
+        guard provider.requiresUserAPIKey else {
+            return provider.runtimeAPIKeyIfAvailable(userAPIKey: "")
+        }
+
+        return VoiceInkProviderAPIKeyLookup.usableAPIKey(
+            storedKey: apiKeysByProvider[provider],
+            providerName: provider.displayName
+        )
     }
 
     // MARK: - Debug Reset

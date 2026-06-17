@@ -31,7 +31,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - provider credential nonblank validation for runtime API-key checks
 - provider API-key verification dispatch
 - provider API-key verification flag storage
-- API-key environment-reference resolution
+- API-key environment-reference resolution and provider runtime-key lookup/fallback policy
 - AI reasoning temperature, effort, and provider-specific hidden-reasoning request parameters for OpenAI-compatible post-processing
 - AI-enhancement provider identity, persisted-name parsing, API-key requirement, text-enhancement selectability, connected-provider selection policy, storage keys, model-selection key naming, and mapping to shared model providers; platform shells still own storage and execution
 - AI-enhancement API-key verification transport metadata; macOS still owns concrete verification clients
@@ -118,6 +118,7 @@ Current macOS consumers of shared remote transport:
 - macOS AI-enhancement API-key verification dispatch reads `VoiceInkAIEnhancementProviderKind.apiKeyVerificationTransport`; macOS still owns the LLMkit and provider-specific verifier calls.
 - macOS AI-enhancement provider model defaults and static model lists come from `VoiceInkAIModelCatalog`; macOS still owns provider UI, API-key storage, dynamic OpenRouter fetches, Ollama, Local CLI, and Custom provider settings.
 - macOS AI-enhancement request endpoint and API-key console URLs come from the shared `VoiceInkAIModelProvider` catalog; macOS still owns Anthropic/OpenAI-compatible transport selection and provider-specific verification adapters.
+- macOS and iOS provider API-key lookup delegates stored-key reference resolution and provider environment fallback policy to `VoiceInkProviderAPIKeyLookup`; platform shells still own Keychain storage and UI editing state.
 - iOS retry post-processing inherits `VoiceInkAIReasoningConfig` through `VoiceInkPostProcessingClient`, aligning OpenAI-compatible reasoning controls with macOS enhancement requests.
 
 Current iOS consumers of shared remote transport:

@@ -27,19 +27,10 @@ final class APIKeyManager {
     /// Retrieves an API key for a provider.
     func getAPIKey(forProvider provider: String) -> String? {
         let keyIdentifier = keychainIdentifier(forProvider: provider)
-        if let storedKey = keychain.getString(forKey: keyIdentifier),
-           let resolvedKey = Self.resolveAPIKeyReference(storedKey),
-           let apiKey = VoiceInkProviderCredential.nonBlank(resolvedKey) {
-            return apiKey
-        }
-
-        if let environmentKey = VoiceInkProviderAPIKeyAccount.fallbackEnvironmentKey(forProviderName: provider),
-           let value = ProcessInfo.processInfo.environment[environmentKey],
-           let apiKey = VoiceInkProviderCredential.nonBlank(value) {
-            return apiKey
-        }
-
-        return nil
+        return VoiceInkProviderAPIKeyLookup.usableAPIKey(
+            storedKey: keychain.getString(forKey: keyIdentifier),
+            providerName: provider
+        )
     }
 
     /// Retrieves the literal stored API key, preserving references like "$ELEVENLABS_API_KEY" for the UI.

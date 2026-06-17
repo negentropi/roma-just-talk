@@ -29,3 +29,25 @@ public enum VoiceInkAPIKeyReference {
         return resolvedValue
     }
 }
+
+public enum VoiceInkProviderAPIKeyLookup {
+    public static func usableAPIKey(
+        storedKey: String?,
+        providerName: String,
+        environment: [String: String] = ProcessInfo.processInfo.environment
+    ) -> String? {
+        if let storedKey,
+           let resolvedKey = VoiceInkAPIKeyReference.resolvedValue(storedKey, environment: environment),
+           let apiKey = VoiceInkProviderCredential.nonBlank(resolvedKey) {
+            return apiKey
+        }
+
+        guard let environmentKey = VoiceInkProviderAPIKeyAccount.fallbackEnvironmentKey(forProviderName: providerName),
+              let value = environment[environmentKey],
+              let apiKey = VoiceInkProviderCredential.nonBlank(value) else {
+            return nil
+        }
+
+        return apiKey
+    }
+}

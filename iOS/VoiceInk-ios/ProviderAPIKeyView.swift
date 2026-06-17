@@ -33,7 +33,7 @@ struct ProviderAPIKeyView: View {
                             Button(action: verifyKey) {
                                 Label("Verify", systemImage: "checkmark.seal")
                             }
-                            .disabled(tempKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && currentAPIKey().isEmpty)
+                            .disabled(tempKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && settings.apiKey(for: provider).isEmpty)
                         }
                     }
                 } else {
@@ -84,7 +84,7 @@ struct ProviderAPIKeyView: View {
     }
 
     private func currentAPIKey() -> String {
-        settings.apiKey(for: provider)
+        settings.storedAPIKey(for: provider)
     }
 
     private func saveKey() {
@@ -95,7 +95,7 @@ struct ProviderAPIKeyView: View {
         Task {
             isVerifying = true
             let entered = tempKey.trimmingCharacters(in: .whitespacesAndNewlines)
-            let keyToVerify = entered.isEmpty ? currentAPIKey() : entered
+            let keyToVerify = entered.isEmpty ? settings.apiKey(for: provider) : entered
             
             let ok = await verifiedAPIKey(keyToVerify)
             
@@ -114,7 +114,14 @@ struct ProviderAPIKeyView: View {
             return false
         }
 
-        return await apiKeyVerifier.verifyAPIKey(key, for: provider)
+        guard let resolvedKey = VoiceInkProviderAPIKeyLookup.usableAPIKey(
+            storedKey: key,
+            providerName: provider.displayName
+        ) else {
+            return false
+        }
+
+        return await apiKeyVerifier.verifyAPIKey(resolvedKey, for: provider)
     }
 
     private func obfuscatedKey() -> String? {

@@ -3,6 +3,19 @@ import Foundation
 public enum VoiceInkStoredAudioFile {
     public static let recordingsDirectoryName = "Recordings"
 
+    public static func recordingsDirectory(in baseDirectory: URL) -> URL {
+        baseDirectory.appendingPathComponent(recordingsDirectoryName, isDirectory: true)
+    }
+
+    public static func createRecordingsDirectory(
+        in baseDirectory: URL,
+        fileManager: FileManager = .default
+    ) throws -> URL {
+        let directory = recordingsDirectory(in: baseDirectory)
+        try fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
+        return directory
+    }
+
     public static func resolvedURL(
         for storedValue: String?,
         relativeTo recordingsDirectory: URL? = nil

@@ -6,6 +6,28 @@ final class StoredAudioFileTests: XCTestCase {
         XCTAssertEqual(VoiceInkStoredAudioFile.recordingsDirectoryName, "Recordings")
     }
 
+    func testRecordingsDirectoryBuildsUnderBaseDirectory() {
+        let baseDirectory = URL(fileURLWithPath: "/tmp/VoiceInk", isDirectory: true)
+
+        XCTAssertEqual(
+            VoiceInkStoredAudioFile.recordingsDirectory(in: baseDirectory).path,
+            "/tmp/VoiceInk/Recordings"
+        )
+    }
+
+    func testCreateRecordingsDirectoryCreatesDirectoryUnderBaseDirectory() throws {
+        let baseDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.StoredAudioFileTests.\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: baseDirectory) }
+
+        let directory = try VoiceInkStoredAudioFile.createRecordingsDirectory(in: baseDirectory)
+
+        var isDirectory: ObjCBool = false
+        XCTAssertTrue(FileManager.default.fileExists(atPath: directory.path, isDirectory: &isDirectory))
+        XCTAssertTrue(isDirectory.boolValue)
+        XCTAssertEqual(directory.lastPathComponent, "Recordings")
+    }
+
     func testResolvesFileURLString() {
         let fileURL = URL(fileURLWithPath: "/tmp/voiceink-recording.m4a")
 

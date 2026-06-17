@@ -31,7 +31,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - transcript status and presentation helpers
 - raw transcription output filtering for hallucination tags/brackets and optional filler words
 - transcription cleanup preferences and punctuation/lowercase cleanup policy
-- stored audio-file path resolution
+- stored audio-file path resolution and recordings directory construction
 - duration presentation
 - Whisper and VAD model file metadata
 - VAD bundle resource lookup

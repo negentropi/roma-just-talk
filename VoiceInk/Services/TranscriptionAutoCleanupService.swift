@@ -15,9 +15,9 @@ class TranscriptionAutoCleanupService {
     private let defaultRetentionMinutes: Int = 24 * 60
 
     private var recordingsDirectory: URL {
-        FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        let appSupportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("com.prakashjoshipax.VoiceInk")
-            .appendingPathComponent(VoiceInkStoredAudioFile.recordingsDirectoryName)
+        return VoiceInkStoredAudioFile.recordingsDirectory(in: appSupportDirectory)
     }
 
     private init() {}

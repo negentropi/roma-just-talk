@@ -88,6 +88,7 @@ public struct VoiceInkTranscriptionRunProcessor {
     public func transcribe(
         fileURL: URL,
         configuration: VoiceInkModeRuntimeConfiguration,
+        cleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration = .disabled,
         apiKeyProvider: APIKeyProvider,
         transcriptionServiceProvider: TranscriptionServiceProvider
     ) async throws -> VoiceInkTranscriptionRunResult {
@@ -111,7 +112,12 @@ public struct VoiceInkTranscriptionRunProcessor {
             rawText,
             whitespacePolicy: .preserveParagraphs
         )
-        let cleanedText = VoiceInkTranscriptTextNormalizer.normalizeParagraphSpacing(filteredText)
+        let normalizedText = VoiceInkTranscriptTextNormalizer.normalizeParagraphSpacing(filteredText)
+        let cleanedText = VoiceInkTranscriptionCleanupPreferences.apply(
+            normalizedText,
+            punctuationMode: cleanupConfiguration.punctuationMode,
+            shouldLowercase: cleanupConfiguration.shouldLowercase
+        )
         let aiEnhancementModelName = configuration.isPostProcessingEnabled ? configuration.postProcessingModel : nil
 
         var finalText = cleanedText

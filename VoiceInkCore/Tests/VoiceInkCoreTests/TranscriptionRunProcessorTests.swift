@@ -45,6 +45,30 @@ final class TranscriptionRunProcessorTests: XCTestCase {
         XCTAssertTrue(result.postProcessingSucceeded)
     }
 
+    func testTranscribeAppliesCleanupPreferencesBeforePostProcessing() async throws {
+        let processor = VoiceInkTranscriptionRunProcessor { job in
+            XCTAssertEqual(job.transcript, "hello world")
+            return job.transcript
+        }
+
+        let result = try await processor.transcribe(
+            fileURL: URL(fileURLWithPath: "/tmp/audio.wav"),
+            configuration: configuration(isPostProcessingEnabled: true),
+            cleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration(
+                punctuationMode: .removeAll,
+                shouldLowercase: true
+            ),
+            apiKeyProvider: { _ in "key" },
+            transcriptionServiceProvider: { _ in
+                StubTranscriptionService(text: "Hello, WORLD.")
+            }
+        )
+
+        XCTAssertEqual(result.cleanedText, "hello world")
+        XCTAssertEqual(result.finalText, "hello world")
+        XCTAssertTrue(result.postProcessingSucceeded)
+    }
+
     func testTranscribeRunsPostProcessingWhenEnabledWithPromptAndKey() async throws {
         let processor = VoiceInkTranscriptionRunProcessor { job in
             XCTAssertEqual(job.provider, .gemini)

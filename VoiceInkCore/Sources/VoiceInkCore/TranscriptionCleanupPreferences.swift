@@ -45,6 +45,21 @@ public enum PunctuationCleanupMode: String, Codable, CaseIterable, Identifiable,
     }
 }
 
+public struct VoiceInkTranscriptionCleanupConfiguration: Equatable, Sendable {
+    public static let disabled = VoiceInkTranscriptionCleanupConfiguration()
+
+    public let punctuationMode: PunctuationCleanupMode
+    public let shouldLowercase: Bool
+
+    public init(
+        punctuationMode: PunctuationCleanupMode = .keep,
+        shouldLowercase: Bool = false
+    ) {
+        self.punctuationMode = punctuationMode
+        self.shouldLowercase = shouldLowercase
+    }
+}
+
 public enum VoiceInkTranscriptionCleanupPreferences {
     private static let apostropheLikeCharacters = CharacterSet(charactersIn: "'’‘ʼ＇")
 

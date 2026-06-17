@@ -5,6 +5,7 @@ import VoiceInkCore
 @MainActor
 final class AppSettings: ObservableObject {
     static let shared = AppSettings()
+    private static let lowercaseTranscriptionKey = "LowercaseTranscription"
 
     // Modes system
     @Published var modes: [Mode] {
@@ -36,6 +37,13 @@ final class AppSettings: ObservableObject {
         didSet { UserDefaults.standard.set(audioSessionTimeoutSeconds, forKey: "audioSessionTimeoutSeconds") }
     }
 
+    @Published var punctuationCleanupMode: PunctuationCleanupMode {
+        didSet { PunctuationCleanupMode.setCurrent(punctuationCleanupMode) }
+    }
+
+    @Published var lowercaseTranscription: Bool {
+        didSet { UserDefaults.standard.set(lowercaseTranscription, forKey: Self.lowercaseTranscriptionKey) }
+    }
 
     private init() {
         // Load modes
@@ -61,6 +69,9 @@ final class AppSettings: ObservableObject {
         
         // Load audio session timeout (default: 90 seconds)
         self.audioSessionTimeoutSeconds = UserDefaults.standard.object(forKey: "audioSessionTimeoutSeconds") as? Int ?? 90
+        PunctuationCleanupMode.migrateLegacyUserDefaultIfNeeded()
+        self.punctuationCleanupMode = PunctuationCleanupMode.current()
+        self.lowercaseTranscription = UserDefaults.standard.bool(forKey: Self.lowercaseTranscriptionKey)
 
         repairSelectedModeId()
     }
@@ -132,6 +143,13 @@ final class AppSettings: ObservableObject {
 
     var effectiveModeConfiguration: VoiceInkModeRuntimeConfiguration {
         modes.runtimeConfiguration(selectedModeId: selectedModeId)
+    }
+
+    var transcriptionCleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration {
+        VoiceInkTranscriptionCleanupConfiguration(
+            punctuationMode: punctuationCleanupMode,
+            shouldLowercase: lowercaseTranscription
+        )
     }
 
     func ensureDefaultModeExists() {
@@ -212,6 +230,13 @@ final class AppSettings: ObservableObject {
         // Reset audio session timeout to default
         audioSessionTimeoutSeconds = 90
         UserDefaults.standard.removeObject(forKey: "audioSessionTimeoutSeconds")
+
+        // Reset transcription cleanup preferences
+        punctuationCleanupMode = .keep
+        lowercaseTranscription = false
+        UserDefaults.standard.removeObject(forKey: PunctuationCleanupMode.userDefaultsKey)
+        UserDefaults.standard.set(false, forKey: PunctuationCleanupMode.legacyRemovePunctuationKey)
+        UserDefaults.standard.removeObject(forKey: Self.lowercaseTranscriptionKey)
 
         // Clear API keys from memory and Keychain
         apiKeysByProvider = [:]

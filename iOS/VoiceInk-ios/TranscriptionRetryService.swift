@@ -18,10 +18,12 @@ class TranscriptionRetryService {
     func transcribe(fileURL: URL) async throws -> VoiceInkTranscriptionRunResult {
         let settings = AppSettings.shared
         let modeConfiguration = await settings.effectiveModeConfiguration
+        let cleanupConfiguration = await settings.transcriptionCleanupConfiguration
 
         return try await runProcessor.transcribe(
             fileURL: fileURL,
             configuration: modeConfiguration,
+            cleanupConfiguration: cleanupConfiguration,
             apiKeyProvider: { provider in
                 await settings.apiKey(for: provider)
             },

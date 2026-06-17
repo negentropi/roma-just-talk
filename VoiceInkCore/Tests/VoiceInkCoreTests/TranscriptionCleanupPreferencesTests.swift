@@ -28,6 +28,11 @@ final class TranscriptionCleanupPreferencesTests: XCTestCase {
         }
     }
 
+    func testCleanupConfigurationDefaultsToCurrentNoOpPolicy() {
+        XCTAssertEqual(VoiceInkTranscriptionCleanupConfiguration.disabled.punctuationMode, .keep)
+        XCTAssertFalse(VoiceInkTranscriptionCleanupConfiguration.disabled.shouldLowercase)
+    }
+
     func testRemoveTrailingPeriodPreservesEllipsisAndTrailingWhitespace() {
         XCTAssertEqual(
             VoiceInkTranscriptionCleanupPreferences.removeTrailingPeriod(from: "Ship it.  "),

@@ -47,6 +47,16 @@ struct SettingsView: View {
                     Text("Manage Cloud Models")
                 }
             }
+
+            Section(header: Text("Transcription Cleanup")) {
+                Picker("Punctuation", selection: $settings.punctuationCleanupMode) {
+                    ForEach(PunctuationCleanupMode.allCases) { mode in
+                        Text(mode.displayName).tag(mode)
+                    }
+                }
+
+                Toggle("Lowercase Transcription", isOn: $settings.lowercaseTranscription)
+            }
             
             Section(header: Text("Audio Settings")) {
                 VStack(alignment: .leading, spacing: 8) {

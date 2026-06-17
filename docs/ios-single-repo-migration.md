@@ -183,4 +183,4 @@ Before treating `../VoiceInk-iOS` as obsolete, verify current state from `VoiceI
 7. `xmllint --noout` passes for workspace and shared scheme XML.
 8. A real Xcode toolchain is selected and both app targets build.
 
-Current local blocker: this machine selects `/Library/Developer/CommandLineTools`, so `xcrun -find xcodebuild` cannot find `xcodebuild`. That toolchain also cannot import XCTest or Swift Testing, so `swift test` is not a real execution gate here; use `swift run VoiceInkCoreChecks` plus the static gates above until Xcode is selected.
+Current local blocker: Xcode is selected from `/Volumes/agi-agirity-ssd/Applications/Xcode.app/Contents/Developer`, and `xcodebuild -list -workspace VoiceInk.xcworkspace -disableAutomaticPackageResolution` works after adding the workspace-level `Package.resolved`. Full target builds are still environment-blocked: macOS `VoiceInk` needs `/Users/atalphalnmomhappyhouse/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework`, and iOS `VoiceInk-ios` needs the iOS 26.2 platform installed. Until both are present, use `swift run VoiceInkCoreChecks` plus the static parse/lint gates above for local proof.

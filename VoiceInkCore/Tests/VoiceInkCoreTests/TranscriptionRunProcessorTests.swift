@@ -267,6 +267,29 @@ final class TranscriptionRunProcessorTests: XCTestCase {
         }
     }
 
+    func testTranscribeRejectsEmptyRemoteTranscriptionUsingProviderPolicy() async {
+        let processor = VoiceInkTranscriptionRunProcessor { _ in
+            XCTFail("Post-processing should not run")
+            return "unexpected"
+        }
+
+        do {
+            _ = try await processor.transcribe(
+                fileURL: URL(fileURLWithPath: "/tmp/audio.wav"),
+                configuration: configuration(isPostProcessingEnabled: false),
+                apiKeyProvider: { _ in "stt-key" },
+                transcriptionServiceProvider: { _ in
+                    StubTranscriptionService(text: "")
+                }
+            )
+            XCTFail("Expected empty transcription error")
+        } catch let error as VoiceInkTranscriptionRunError {
+            XCTAssertEqual(error, .noTranscriptionReturned)
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
     func testTranscribeSkipsPostProcessingWhenPostProcessingAPIKeyIsWhitespace() async throws {
         let processor = VoiceInkTranscriptionRunProcessor { _ in
             XCTFail("Post-processing should not run")

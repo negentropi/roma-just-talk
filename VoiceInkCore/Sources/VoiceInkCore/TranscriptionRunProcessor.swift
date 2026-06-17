@@ -31,11 +31,14 @@ public struct VoiceInkTranscriptionRunResult: Equatable, Sendable {
 
 public enum VoiceInkTranscriptionRunError: LocalizedError, Equatable {
     case noAPIKey
+    case noTranscriptionReturned
 
     public var errorDescription: String? {
         switch self {
         case .noAPIKey:
             return "No API key configured"
+        case .noTranscriptionReturned:
+            return "The API returned an empty or invalid response."
         }
     }
 }
@@ -108,6 +111,10 @@ public struct VoiceInkTranscriptionRunProcessor {
             fileURL: fileURL,
             language: VoiceInkTranscriptionLanguageSupport.requestLanguage(transcriptionLanguage)
         )
+
+        guard provider.remoteTranscriptionEmptyTextPolicy.accepts(rawText) else {
+            throw VoiceInkTranscriptionRunError.noTranscriptionReturned
+        }
 
         let filteredText = cleanupConfiguration.filterRawOutput(
             rawText,

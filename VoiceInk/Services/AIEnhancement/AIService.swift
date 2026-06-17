@@ -84,7 +84,10 @@ class AIService: ObservableObject {
     }
     @Published var selectedProvider: AIProvider {
         didSet {
-            userDefaults.set(selectedProvider.rawValue, forKey: VoiceInkUserDefaultsKey.selectedAIProvider)
+            VoiceInkAIEnhancementProviderPreference.saveSelectedProviderRawValue(
+                selectedProvider.rawValue,
+                to: userDefaults
+            )
             if selectedProvider.requiresAPIKey {
                 if let savedKey = APIKeyManager.shared.getAPIKey(forProvider: selectedProvider.rawValue) {
                     self.apiKey = savedKey
@@ -156,15 +159,10 @@ class AIService: ObservableObject {
     }
     
     init() {
-        if let savedProvider = userDefaults.string(forKey: VoiceInkUserDefaultsKey.selectedAIProvider),
-           let provider = AIProvider(storedValue: savedProvider) {
-            if savedProvider != provider.rawValue {
-                userDefaults.set(provider.rawValue, forKey: VoiceInkUserDefaultsKey.selectedAIProvider)
-            }
-            self.selectedProvider = provider
-        } else {
-            self.selectedProvider = .gemini
-        }
+        self.selectedProvider = VoiceInkAIEnhancementProviderPreference.selectedProvider(
+            default: .gemini,
+            from: userDefaults
+        )
 
         if selectedProvider.requiresAPIKey {
             if let savedKey = APIKeyManager.shared.getAPIKey(forProvider: selectedProvider.rawValue) {
@@ -181,8 +179,10 @@ class AIService: ObservableObject {
     
     private func loadSavedModelSelections() {
         for provider in AIProvider.allCases {
-            let key = VoiceInkUserDefaultsKey.selectedAIProviderModel(provider.rawValue)
-            if let savedModel = userDefaults.string(forKey: key), !savedModel.isEmpty {
+            if let savedModel = VoiceInkAIEnhancementProviderPreference.selectedModel(
+                for: provider.rawValue,
+                from: userDefaults
+            ) {
                 selectedModels[provider] = savedModel
             }
         }
@@ -202,8 +202,11 @@ class AIService: ObservableObject {
         guard !model.isEmpty else { return }
         
         selectedModels[selectedProvider] = model
-        let key = VoiceInkUserDefaultsKey.selectedAIProviderModel(selectedProvider.rawValue)
-        userDefaults.set(model, forKey: key)
+        VoiceInkAIEnhancementProviderPreference.saveSelectedModel(
+            model,
+            for: selectedProvider.rawValue,
+            to: userDefaults
+        )
         
         if selectedProvider == .ollama {
             updateSelectedOllamaModel(model)

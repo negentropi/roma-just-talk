@@ -124,6 +124,50 @@ public enum VoiceInkCurrentTranscriptionModelPreference {
     }
 }
 
+public enum VoiceInkAIEnhancementProviderPreference {
+    public static func selectedProviderRawValue(from defaults: UserDefaults = .standard) -> String? {
+        defaults.string(forKey: VoiceInkUserDefaultsKey.selectedAIProvider)
+    }
+
+    public static func saveSelectedProviderRawValue(_ rawValue: String, to defaults: UserDefaults = .standard) {
+        defaults.set(rawValue, forKey: VoiceInkUserDefaultsKey.selectedAIProvider)
+    }
+
+    public static func selectedProvider(
+        default defaultProvider: VoiceInkAIEnhancementProviderKind = .gemini,
+        from defaults: UserDefaults = .standard
+    ) -> VoiceInkAIEnhancementProviderKind {
+        guard let storedProvider = selectedProviderRawValue(from: defaults),
+              let provider = VoiceInkAIEnhancementProviderKind(storedValue: storedProvider)
+        else {
+            return defaultProvider
+        }
+
+        if storedProvider != provider.rawValue {
+            saveSelectedProviderRawValue(provider.rawValue, to: defaults)
+        }
+
+        return provider
+    }
+
+    public static func selectedModel(
+        for providerRawValue: String,
+        from defaults: UserDefaults = .standard
+    ) -> String? {
+        let savedModel = defaults.string(forKey: VoiceInkUserDefaultsKey.selectedAIProviderModel(providerRawValue))
+        return savedModel?.isEmpty == false ? savedModel : nil
+    }
+
+    public static func saveSelectedModel(
+        _ model: String,
+        for providerRawValue: String,
+        to defaults: UserDefaults = .standard
+    ) {
+        guard !model.isEmpty else { return }
+        defaults.set(model, forKey: VoiceInkUserDefaultsKey.selectedAIProviderModel(providerRawValue))
+    }
+}
+
 public enum VoiceInkFillerWordPreference {
     public static func words(from defaults: UserDefaults = .standard) -> [String] {
         defaults.stringArray(forKey: VoiceInkUserDefaultsKey.fillerWords) ?? VoiceInkFillerWords.defaultWords

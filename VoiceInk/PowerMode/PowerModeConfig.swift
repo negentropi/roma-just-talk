@@ -61,7 +61,7 @@ struct PowerModeConfig: Codable, Identifiable, Equatable {
         self.selectedPrompt = selectedPrompt
         self.useScreenCapture = useScreenCapture
         self.autoSendKey = autoSendKey
-        self.selectedAIProvider = selectedAIProvider ?? UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.selectedAIProvider)
+        self.selectedAIProvider = selectedAIProvider ?? VoiceInkAIEnhancementProviderPreference.selectedProviderRawValue()
         self.selectedAIModel = selectedAIModel
         self.selectedTranscriptionModelName = selectedTranscriptionModelName ?? VoiceInkCurrentTranscriptionModelPreference.modelName()
         self.selectedLanguage = selectedLanguage ?? VoiceInkTranscriptionLanguagePreference.selectedLanguage(fallback: "en")

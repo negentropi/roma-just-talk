@@ -193,6 +193,59 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testAIEnhancementProviderPreferenceUsesDefaultWhenMissing() {
+        withIsolatedDefaults { defaults in
+            XCTAssertNil(VoiceInkAIEnhancementProviderPreference.selectedProviderRawValue(from: defaults))
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderPreference.selectedProvider(default: .gemini, from: defaults),
+                .gemini
+            )
+        }
+    }
+
+    func testAIEnhancementProviderPreferenceRepairsLegacyStoredProvider() {
+        withIsolatedDefaults { defaults in
+            defaults.set("GROQ", forKey: VoiceInkUserDefaultsKey.selectedAIProvider)
+
+            XCTAssertEqual(VoiceInkAIEnhancementProviderPreference.selectedProvider(from: defaults), .groq)
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderPreference.selectedProviderRawValue(from: defaults),
+                VoiceInkAIEnhancementProviderKind.groq.rawValue
+            )
+        }
+    }
+
+    func testAIEnhancementProviderPreferenceRoundTripsRawProvider() {
+        withIsolatedDefaults { defaults in
+            VoiceInkAIEnhancementProviderPreference.saveSelectedProviderRawValue("OpenRouter", to: defaults)
+
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderPreference.selectedProviderRawValue(from: defaults),
+                "OpenRouter"
+            )
+            XCTAssertEqual(VoiceInkAIEnhancementProviderPreference.selectedProvider(from: defaults), .openRouter)
+        }
+    }
+
+    func testAIEnhancementProviderPreferenceRoundTripsSelectedModel() {
+        withIsolatedDefaults { defaults in
+            XCTAssertNil(
+                VoiceInkAIEnhancementProviderPreference.selectedModel(for: "Groq", from: defaults)
+            )
+
+            VoiceInkAIEnhancementProviderPreference.saveSelectedModel(
+                "llama-3.3-70b-versatile",
+                for: "Groq",
+                to: defaults
+            )
+
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderPreference.selectedModel(for: "Groq", from: defaults),
+                "llama-3.3-70b-versatile"
+            )
+        }
+    }
+
     func testFillerWordPreferenceUsesDefaultWordsWhenMissing() {
         withIsolatedDefaults { defaults in
             XCTAssertEqual(

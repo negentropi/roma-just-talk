@@ -41,6 +41,16 @@ public enum VoiceInkProviderAccessRequirement: Sendable {
     case bundledService
 }
 
+public enum VoiceInkProviderCredential {
+    public static func nonBlank(_ key: String?) -> String? {
+        guard let key,
+              !key.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return nil
+        }
+        return key
+    }
+}
+
 public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, Sendable {
     case groq
     case openAI
@@ -328,6 +338,10 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
         }
     }
 
+    public func runtimeAPIKeyIfAvailable(userAPIKey: String) -> String? {
+        VoiceInkProviderCredential.nonBlank(runtimeAPIKey(userAPIKey: userAPIKey))
+    }
+
     public func isReady(
         userAPIKey: String,
         userAPIKeyVerified: Bool,
@@ -335,7 +349,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
     ) -> Bool {
         switch accessRequirement {
         case .userAPIKey:
-            return userAPIKeyVerified && !userAPIKey.isEmpty
+            return userAPIKeyVerified && VoiceInkProviderCredential.nonBlank(userAPIKey) != nil
         case .localWhisperModel:
             return localWhisperModelAvailable
         case .bundledService:

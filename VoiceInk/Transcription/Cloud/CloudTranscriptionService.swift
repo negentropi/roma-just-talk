@@ -91,7 +91,9 @@ class CloudTranscriptionService: TranscriptionService {
     }
 
     private func requireAPIKey(forProvider provider: String) throws -> String {
-        guard let apiKey = APIKeyManager.shared.getAPIKey(forProvider: provider), !apiKey.isEmpty else {
+        guard let apiKey = VoiceInkProviderCredential.nonBlank(
+            APIKeyManager.shared.getAPIKey(forProvider: provider)
+        ) else {
             throw CloudTranscriptionError.missingAPIKey
         }
         return apiKey

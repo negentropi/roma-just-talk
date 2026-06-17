@@ -32,12 +32,14 @@ final class APIKeyReferenceTests: XCTestCase {
     func testResolvedValueRejectsMissingBlankAndInvalidReferences() {
         let environment = [
             "EMPTY_KEY": "",
+            "WHITESPACE_KEY": " \n\t ",
             "VALID_KEY": "test-key"
         ]
 
         XCTAssertNil(VoiceInkAPIKeyReference.resolvedValue(" \n\t ", environment: environment))
         XCTAssertNil(VoiceInkAPIKeyReference.resolvedValue("$MISSING", environment: environment))
         XCTAssertNil(VoiceInkAPIKeyReference.resolvedValue("$EMPTY_KEY", environment: environment))
+        XCTAssertNil(VoiceInkAPIKeyReference.resolvedValue("$WHITESPACE_KEY", environment: environment))
         XCTAssertNil(VoiceInkAPIKeyReference.resolvedValue("$1INVALID", environment: environment))
         XCTAssertNil(VoiceInkAPIKeyReference.resolvedValue("${}", environment: environment))
     }

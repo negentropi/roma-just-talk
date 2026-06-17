@@ -22,7 +22,7 @@ public enum VoiceInkAPIKeyReference {
         guard !variableName.isEmpty,
               variableName.range(of: #"^[A-Za-z_][A-Za-z0-9_]*$"#, options: .regularExpression) != nil,
               let resolvedValue = environment[variableName],
-              !resolvedValue.isEmpty else {
+              VoiceInkProviderCredential.nonBlank(resolvedValue) != nil else {
             return nil
         }
 

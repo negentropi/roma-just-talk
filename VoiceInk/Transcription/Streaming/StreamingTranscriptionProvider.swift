@@ -61,8 +61,9 @@ protocol StreamingTranscriptionProvider: AnyObject {
 
 extension StreamingTranscriptionProvider {
     func apiKey(for model: any TranscriptionModel) throws -> String {
-        guard let apiKey = APIKeyManager.shared.getAPIKey(forProvider: model.provider.apiKeyProviderName),
-              !apiKey.isEmpty else {
+        guard let apiKey = VoiceInkProviderCredential.nonBlank(
+            APIKeyManager.shared.getAPIKey(forProvider: model.provider.apiKeyProviderName)
+        ) else {
             throw StreamingTranscriptionError.missingAPIKey
         }
         return apiKey

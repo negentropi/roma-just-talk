@@ -96,7 +96,7 @@ final class AppSettings: ObservableObject {
     }
 
     func apiKey(for provider: VoiceInkProviderKind) -> String {
-        provider.runtimeAPIKey(userAPIKey: apiKeysByProvider[provider] ?? "")
+        provider.runtimeAPIKeyIfAvailable(userAPIKey: apiKeysByProvider[provider] ?? "") ?? ""
     }
 
     func setAPIKey(_ key: String, for provider: VoiceInkProviderKind) {

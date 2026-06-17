@@ -245,6 +245,48 @@ final class TranscriptionRunProcessorTests: XCTestCase {
         }
     }
 
+    func testTranscribeThrowsWhenTranscriptionAPIKeyIsWhitespace() async {
+        let processor = VoiceInkTranscriptionRunProcessor { _ in
+            "unexpected"
+        }
+
+        do {
+            _ = try await processor.transcribe(
+                fileURL: URL(fileURLWithPath: "/tmp/audio.wav"),
+                configuration: configuration(isPostProcessingEnabled: false),
+                apiKeyProvider: { _ in " \n\t " },
+                transcriptionServiceProvider: { _ in
+                    StubTranscriptionService(text: "raw text")
+                }
+            )
+            XCTFail("Expected missing API key error")
+        } catch let error as VoiceInkTranscriptionRunError {
+            XCTAssertEqual(error, .noAPIKey)
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
+    func testTranscribeSkipsPostProcessingWhenPostProcessingAPIKeyIsWhitespace() async throws {
+        let processor = VoiceInkTranscriptionRunProcessor { _ in
+            XCTFail("Post-processing should not run")
+            return "unexpected"
+        }
+
+        let result = try await processor.transcribe(
+            fileURL: URL(fileURLWithPath: "/tmp/audio.wav"),
+            configuration: configuration(isPostProcessingEnabled: true),
+            apiKeyProvider: { provider in provider == .gemini ? " \n\t " : "stt-key" },
+            transcriptionServiceProvider: { _ in
+                StubTranscriptionService(text: "raw text")
+            }
+        )
+
+        XCTAssertEqual(result.cleanedText, "raw text")
+        XCTAssertEqual(result.finalText, "raw text")
+        XCTAssertFalse(result.postProcessingSucceeded)
+    }
+
     private func configuration(isPostProcessingEnabled: Bool) -> VoiceInkModeRuntimeConfiguration {
         VoiceInkModeRuntimeConfiguration(
             transcriptionProvider: .groq,

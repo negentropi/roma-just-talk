@@ -65,6 +65,20 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertEqual(VoiceInkProviderKind.voiceInk.runtimeAPIKey(userAPIKey: "ignored"), "")
     }
 
+    func testProviderCredentialRejectsBlankKeysWithoutNormalizingUsableKeys() {
+        XCTAssertNil(VoiceInkProviderCredential.nonBlank(nil))
+        XCTAssertNil(VoiceInkProviderCredential.nonBlank(""))
+        XCTAssertNil(VoiceInkProviderCredential.nonBlank(" \n\t "))
+        XCTAssertEqual(VoiceInkProviderCredential.nonBlank(" key-with-space "), " key-with-space ")
+    }
+
+    func testRuntimeAPIKeyIfAvailableFollowsProviderAccessPolicyAndBlankRules() {
+        XCTAssertEqual(VoiceInkProviderKind.groq.runtimeAPIKeyIfAvailable(userAPIKey: "groq-key"), "groq-key")
+        XCTAssertNil(VoiceInkProviderKind.groq.runtimeAPIKeyIfAvailable(userAPIKey: " \n "))
+        XCTAssertEqual(VoiceInkProviderKind.localWhisper.runtimeAPIKeyIfAvailable(userAPIKey: ""), "local")
+        XCTAssertNil(VoiceInkProviderKind.voiceInk.runtimeAPIKeyIfAvailable(userAPIKey: "ignored"))
+    }
+
     func testTranscriptionServiceKindGroupsProvidersByRequiredAdapter() {
         XCTAssertEqual(VoiceInkProviderKind.groq.transcriptionServiceKind, .remote)
         XCTAssertEqual(VoiceInkProviderKind.openAI.transcriptionServiceKind, .remote)
@@ -115,6 +129,11 @@ final class ProviderAccessRequirementTests: XCTestCase {
         ))
         XCTAssertFalse(VoiceInkProviderKind.groq.isReady(
             userAPIKey: "",
+            userAPIKeyVerified: true,
+            localWhisperModelAvailable: true
+        ))
+        XCTAssertFalse(VoiceInkProviderKind.groq.isReady(
+            userAPIKey: " \n ",
             userAPIKeyVerified: true,
             localWhisperModelAvailable: true
         ))

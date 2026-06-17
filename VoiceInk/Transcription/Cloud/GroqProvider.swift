@@ -13,10 +13,6 @@ struct GroqProvider: CloudProvider {
     }
 
     func transcribe(audioData: Data, fileName: String, apiKey: String, model: String, language: String?, prompt: String?, customVocabulary: [String]) async throws -> String {
-        guard !apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            throw CloudTranscriptionError.missingAPIKey
-        }
-
         do {
             let text = try await transcriptionClient.transcribeAudioData(
                 baseURL: VoiceInkProviderEndpoint.groq.apiBaseURL,

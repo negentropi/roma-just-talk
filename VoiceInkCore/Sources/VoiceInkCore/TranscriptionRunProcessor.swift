@@ -97,13 +97,13 @@ public struct VoiceInkTranscriptionRunProcessor {
         let apiKey = await apiKeyProvider(provider)
         let model = configuration.transcriptionModel
 
-        guard !apiKey.isEmpty else {
+        guard let usableAPIKey = VoiceInkProviderCredential.nonBlank(apiKey) else {
             throw VoiceInkTranscriptionRunError.noAPIKey
         }
 
         let transcriptionService = transcriptionServiceProvider(provider)
         let rawText = try await transcriptionService.transcribeAudioFile(
-            apiKey: apiKey,
+            apiKey: usableAPIKey,
             model: model,
             fileURL: fileURL,
             language: VoiceInkTranscriptionLanguageSupport.requestLanguage(transcriptionLanguage)
@@ -136,11 +136,11 @@ public struct VoiceInkTranscriptionRunProcessor {
                 let llmKey = await apiKeyProvider(llmProvider)
                 let llmModel = configuration.postProcessingModel
 
-                if !llmKey.isEmpty {
+                if let usableLLMKey = VoiceInkProviderCredential.nonBlank(llmKey) {
                     do {
                         finalText = try await postProcessor(VoiceInkPostProcessingJob(
                             provider: llmProvider,
-                            apiKey: llmKey,
+                            apiKey: usableLLMKey,
                             model: llmModel,
                             prompt: prompt,
                             transcript: cleanedText

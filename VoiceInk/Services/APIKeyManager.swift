@@ -32,15 +32,16 @@ final class APIKeyManager {
     func getAPIKey(forProvider provider: String) -> String? {
         let keyIdentifier = keychainIdentifier(forProvider: provider)
         if let storedKey = keychain.getString(forKey: keyIdentifier),
-           let resolvedKey = Self.resolveAPIKeyReference(storedKey) {
-            return resolvedKey
+           let resolvedKey = Self.resolveAPIKeyReference(storedKey),
+           let apiKey = VoiceInkProviderCredential.nonBlank(resolvedKey) {
+            return apiKey
         }
 
         let lowercased = provider.lowercased()
         if let environmentKey = Self.providerToEnvironmentKey[lowercased],
            let value = ProcessInfo.processInfo.environment[environmentKey],
-           !value.isEmpty {
-            return value
+           let apiKey = VoiceInkProviderCredential.nonBlank(value) {
+            return apiKey
         }
 
         return nil
@@ -65,7 +66,7 @@ final class APIKeyManager {
 
     /// Checks if an API key exists for a provider.
     func hasAPIKey(forProvider provider: String) -> Bool {
-        return getAPIKey(forProvider: provider) != nil
+        getAPIKey(forProvider: provider) != nil
     }
 
     static func resolveAPIKeyReference(_ key: String, environment: [String: String] = ProcessInfo.processInfo.environment) -> String? {

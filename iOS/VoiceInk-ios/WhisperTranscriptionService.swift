@@ -8,26 +8,6 @@
 import Foundation
 import VoiceInkCore
 
-enum WhisperTranscriptionError: Error {
-    case noModelAvailable
-    case modelLoadFailed
-    case audioProcessingFailed
-    case transcriptionFailed
-    
-    var localizedDescription: String {
-        switch self {
-        case .noModelAvailable:
-            return "No local Whisper model is available. Please download a model first."
-        case .modelLoadFailed:
-            return "Failed to load the Whisper model."
-        case .audioProcessingFailed:
-            return "Failed to process audio file for transcription."
-        case .transcriptionFailed:
-            return "Whisper transcription failed."
-        }
-    }
-}
-
 struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
     
     /// Transcribe audio file using local Whisper model
@@ -43,7 +23,7 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
         // Get available model
         let modelManager = LocalModelManager.shared
         guard let modelPath = await modelManager.baseModelPath else {
-            throw WhisperTranscriptionError.noModelAvailable
+            throw VoiceInkEngineError.localModelUnavailable
         }
         
         print("WhisperTranscriptionService: Using model at \(modelPath)")
@@ -54,7 +34,7 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
             context = try await WhisperContext.createContext(path: modelPath)
         } catch {
             print("WhisperTranscriptionService: Failed to load model: \(error)")
-            throw WhisperTranscriptionError.modelLoadFailed
+            throw VoiceInkEngineError.localModelLoadFailed
         }
         
         // Process audio file (expecting WAV format from recorder)
@@ -71,7 +51,7 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
             // Clean up resources before throwing
             await context.releaseResources()
             print("WhisperTranscriptionService: Whisper context resources released.")
-            throw WhisperTranscriptionError.audioProcessingFailed
+            throw VoiceInkEngineError.audioProcessingFailed
         }
         
         // Perform transcription
@@ -89,7 +69,7 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
             await context.releaseResources()
             print("WhisperTranscriptionService: Whisper context resources released.")
             print("WhisperTranscriptionService: Transcription failed")
-            throw WhisperTranscriptionError.transcriptionFailed
+            throw VoiceInkEngineError.whisperTranscriptionFailed
         }
     }
     

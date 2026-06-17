@@ -1,4 +1,5 @@
 import Foundation
+import VoiceInkCore
 #if canImport(whisper)
 import whisper
 #else

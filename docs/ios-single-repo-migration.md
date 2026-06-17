@@ -30,6 +30,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - mode runtime configuration and selected-mode repair
 - mode provider-selection repair and draft saveability rules
 - transcript status and presentation helpers
+- local transcription/model error vocabulary shared by macOS local Whisper and iOS local retry transcription
 - raw transcription output filtering for hallucination tags/brackets and optional filler words
 - transcription cleanup preferences and punctuation/lowercase cleanup policy
 - stored audio-file path resolution and recordings directory construction
@@ -56,6 +57,7 @@ Current macOS consumers of shared remote transport:
 - Custom OpenAI-compatible batch transcription uses `VoiceInkOpenAICompatibleTranscriptionClient`.
 - Cartesia API-key verification uses `VoiceInkCartesiaClient`; Cartesia transcription remains streaming-only in platform shell code.
 - MacOS cloud-provider API-key verification uses `CloudProvider` default verification backed by `VoiceInkProviderAPIKeyVerifier`; Cartesia stays on `VoiceInkCartesiaClient` because it is streaming-only and not an iOS `VoiceInkProviderKind`.
+- macOS local Whisper/model loading throws `VoiceInkEngineError` from `VoiceInkCore`; macOS error descriptions are covered by `VoiceInkEngineErrorTests`.
 
 Current iOS consumers of shared remote transport:
 
@@ -63,6 +65,7 @@ Current iOS consumers of shared remote transport:
 - `VoiceInkRemoteTranscriptionService` dispatches Groq/OpenAI/Cerebras, Deepgram, Gemini, Mistral, ElevenLabs, Soniox, Speechmatics, AssemblyAI, and xAI through shared core clients.
 - `iOS/VoiceInk-ios/TranscriptionRetryService.swift` routes iOS transcription through `VoiceInkTranscriptionRunProcessor`, including shared output filtering and cleanup preferences from `AppSettings`.
 - `iOS/VoiceInk-ios/ProviderAPIKeyView.swift` verifies provider keys through `VoiceInkProviderAPIKeyVerifier`.
+- `iOS/VoiceInk-ios/WhisperTranscriptionService.swift` throws `VoiceInkEngineError` from `VoiceInkCore` instead of owning a separate iOS-only local Whisper error enum.
 - Cartesia remains absent from iOS transcription provider selection until an iOS streaming adapter exists; it is not a batch provider.
 - The bundled `VoiceInk` provider case remains decodable, but is hidden from iOS transcription and post-processing selection until a real no-key/bundled-service adapter exists. The sibling clone marked it always available while returning an empty API key, so porting that path would preserve a broken no-key mode.
 

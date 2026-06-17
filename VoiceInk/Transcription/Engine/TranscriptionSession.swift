@@ -1,5 +1,6 @@
 import Foundation
 import os
+import VoiceInkCore
 
 /// Encapsulates a single recording-to-transcription lifecycle (streaming or file-based).
 @MainActor

@@ -38,6 +38,10 @@ final class AppSettings: ObservableObject {
         didSet { PunctuationCleanupMode.setCurrent(punctuationCleanupMode) }
     }
 
+    @Published var isTextFormattingEnabled: Bool {
+        didSet { UserDefaults.standard.set(isTextFormattingEnabled, forKey: VoiceInkUserDefaultsKey.isTextFormattingEnabled) }
+    }
+
     @Published var lowercaseTranscription: Bool {
         didSet { UserDefaults.standard.set(lowercaseTranscription, forKey: VoiceInkUserDefaultsKey.lowercaseTranscription) }
     }
@@ -76,6 +80,8 @@ final class AppSettings: ObservableObject {
             ?? VoiceInkPreferenceDefault.audioSessionTimeoutSeconds
         PunctuationCleanupMode.migrateLegacyUserDefaultIfNeeded()
         self.punctuationCleanupMode = PunctuationCleanupMode.current()
+        self.isTextFormattingEnabled = UserDefaults.standard.object(forKey: VoiceInkUserDefaultsKey.isTextFormattingEnabled) as? Bool
+            ?? VoiceInkPreferenceDefault.isTextFormattingEnabled
         self.lowercaseTranscription = UserDefaults.standard.object(forKey: VoiceInkUserDefaultsKey.lowercaseTranscription) as? Bool
             ?? VoiceInkPreferenceDefault.lowercaseTranscription
         self.removeFillerWords = UserDefaults.standard.object(forKey: VoiceInkUserDefaultsKey.removeFillerWords) as? Bool
@@ -147,6 +153,7 @@ final class AppSettings: ObservableObject {
     var transcriptionCleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration {
         VoiceInkTranscriptionCleanupConfiguration(
             punctuationMode: punctuationCleanupMode,
+            shouldFormatParagraphs: isTextFormattingEnabled,
             shouldLowercase: lowercaseTranscription,
             shouldRemoveFillerWords: removeFillerWords,
             fillerWords: fillerWords
@@ -256,11 +263,13 @@ final class AppSettings: ObservableObject {
 
         // Reset transcription cleanup preferences
         punctuationCleanupMode = .keep
+        isTextFormattingEnabled = VoiceInkPreferenceDefault.isTextFormattingEnabled
         lowercaseTranscription = VoiceInkPreferenceDefault.lowercaseTranscription
         removeFillerWords = VoiceInkPreferenceDefault.removeFillerWords
         fillerWords = VoiceInkFillerWords.defaultWords
         UserDefaults.standard.removeObject(forKey: PunctuationCleanupMode.userDefaultsKey)
         UserDefaults.standard.set(false, forKey: PunctuationCleanupMode.legacyRemovePunctuationKey)
+        UserDefaults.standard.removeObject(forKey: VoiceInkUserDefaultsKey.isTextFormattingEnabled)
         UserDefaults.standard.removeObject(forKey: VoiceInkUserDefaultsKey.lowercaseTranscription)
         UserDefaults.standard.removeObject(forKey: VoiceInkUserDefaultsKey.removeFillerWords)
         UserDefaults.standard.removeObject(forKey: VoiceInkUserDefaultsKey.fillerWords)

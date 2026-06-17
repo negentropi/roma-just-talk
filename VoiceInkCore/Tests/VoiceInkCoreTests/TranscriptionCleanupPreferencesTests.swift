@@ -30,6 +30,7 @@ final class TranscriptionCleanupPreferencesTests: XCTestCase {
 
     func testCleanupConfigurationDefaultsToCurrentNoOpPolicy() {
         XCTAssertEqual(VoiceInkTranscriptionCleanupConfiguration.disabled.punctuationMode, .keep)
+        XCTAssertFalse(VoiceInkTranscriptionCleanupConfiguration.disabled.shouldFormatParagraphs)
         XCTAssertFalse(VoiceInkTranscriptionCleanupConfiguration.disabled.shouldLowercase)
         XCTAssertFalse(VoiceInkTranscriptionCleanupConfiguration.disabled.shouldRemoveFillerWords)
         XCTAssertEqual(VoiceInkTranscriptionCleanupConfiguration.disabled.fillerWords, VoiceInkFillerWords.defaultWords)
@@ -38,6 +39,7 @@ final class TranscriptionCleanupPreferencesTests: XCTestCase {
     func testCurrentCleanupConfigurationReadsSharedDefaults() {
         withIsolatedDefaults { defaults in
             PunctuationCleanupMode.setCurrent(.removeTrailingPeriod, in: defaults)
+            defaults.set(true, forKey: VoiceInkUserDefaultsKey.isTextFormattingEnabled)
             defaults.set(true, forKey: VoiceInkUserDefaultsKey.lowercaseTranscription)
             defaults.set(true, forKey: VoiceInkUserDefaultsKey.removeFillerWords)
             defaults.set(["um", "like"], forKey: VoiceInkUserDefaultsKey.fillerWords)
@@ -46,6 +48,7 @@ final class TranscriptionCleanupPreferencesTests: XCTestCase {
                 VoiceInkTranscriptionCleanupConfiguration.current(in: defaults),
                 VoiceInkTranscriptionCleanupConfiguration(
                     punctuationMode: .removeTrailingPeriod,
+                    shouldFormatParagraphs: true,
                     shouldLowercase: true,
                     shouldRemoveFillerWords: true,
                     fillerWords: ["um", "like"]
@@ -60,6 +63,7 @@ final class TranscriptionCleanupPreferencesTests: XCTestCase {
                 VoiceInkTranscriptionCleanupConfiguration.current(in: defaults),
                 VoiceInkTranscriptionCleanupConfiguration(
                     punctuationMode: .keep,
+                    shouldFormatParagraphs: VoiceInkPreferenceDefault.isTextFormattingEnabled,
                     shouldLowercase: VoiceInkPreferenceDefault.lowercaseTranscription,
                     shouldRemoveFillerWords: VoiceInkPreferenceDefault.removeFillerWords,
                     fillerWords: VoiceInkFillerWords.defaultWords

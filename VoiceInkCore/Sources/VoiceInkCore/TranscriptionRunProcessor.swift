@@ -115,8 +115,11 @@ public struct VoiceInkTranscriptionRunProcessor {
             whitespacePolicy: .preserveParagraphs
         )
         let normalizedText = VoiceInkTranscriptTextNormalizer.normalizeParagraphSpacing(filteredText)
+        let formattedText = cleanupConfiguration.shouldFormatParagraphs
+            ? VoiceInkTranscriptParagraphFormatter.format(normalizedText)
+            : normalizedText
         let cleanedText = VoiceInkTranscriptionCleanupPreferences.apply(
-            normalizedText,
+            formattedText,
             punctuationMode: cleanupConfiguration.punctuationMode,
             shouldLowercase: cleanupConfiguration.shouldLowercase
         )

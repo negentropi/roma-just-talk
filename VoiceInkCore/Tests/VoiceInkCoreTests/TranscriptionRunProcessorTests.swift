@@ -93,6 +93,33 @@ final class TranscriptionRunProcessorTests: XCTestCase {
         XCTAssertTrue(result.postProcessingSucceeded)
     }
 
+    func testTranscribeAppliesParagraphFormattingBeforePostProcessing() async throws {
+        let sentence = "This sentence has many ordinary English words that should count clearly in tokenizer."
+        let input = Array(repeating: sentence, count: 5).joined(separator: " ")
+        let firstParagraph = Array(repeating: sentence, count: 4).joined(separator: " ")
+        let expected = "\(firstParagraph)\n\n\(sentence)"
+        let processor = VoiceInkTranscriptionRunProcessor { job in
+            XCTAssertEqual(job.transcript, expected)
+            return job.transcript
+        }
+
+        let result = try await processor.transcribe(
+            fileURL: URL(fileURLWithPath: "/tmp/audio.wav"),
+            configuration: configuration(isPostProcessingEnabled: true),
+            cleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration(
+                shouldFormatParagraphs: true
+            ),
+            apiKeyProvider: { _ in "key" },
+            transcriptionServiceProvider: { _ in
+                StubTranscriptionService(text: input)
+            }
+        )
+
+        XCTAssertEqual(result.cleanedText, expected)
+        XCTAssertEqual(result.finalText, expected)
+        XCTAssertTrue(result.postProcessingSucceeded)
+    }
+
     func testTranscribePassesSelectedLanguageToTranscriptionService() async throws {
         let service = CapturingTranscriptionService(text: "bonjour")
         let processor = VoiceInkTranscriptionRunProcessor { _ in

@@ -54,6 +54,8 @@ public struct VoiceInkTranscriptionCleanupConfiguration: Equatable, Sendable {
 
         return VoiceInkTranscriptionCleanupConfiguration(
             punctuationMode: PunctuationCleanupMode.current(in: defaults),
+            shouldFormatParagraphs: defaults.object(forKey: VoiceInkUserDefaultsKey.isTextFormattingEnabled) as? Bool
+                ?? VoiceInkPreferenceDefault.isTextFormattingEnabled,
             shouldLowercase: defaults.object(forKey: VoiceInkUserDefaultsKey.lowercaseTranscription) as? Bool
                 ?? VoiceInkPreferenceDefault.lowercaseTranscription,
             shouldRemoveFillerWords: shouldRemoveFillerWords,
@@ -63,6 +65,7 @@ public struct VoiceInkTranscriptionCleanupConfiguration: Equatable, Sendable {
     }
 
     public let punctuationMode: PunctuationCleanupMode
+    public let shouldFormatParagraphs: Bool
     public let shouldLowercase: Bool
     public let shouldRemoveFillerWords: Bool
     public let fillerWords: [String]
@@ -73,11 +76,13 @@ public struct VoiceInkTranscriptionCleanupConfiguration: Equatable, Sendable {
 
     public init(
         punctuationMode: PunctuationCleanupMode = .keep,
+        shouldFormatParagraphs: Bool = false,
         shouldLowercase: Bool = false,
         shouldRemoveFillerWords: Bool = false,
         fillerWords: [String] = VoiceInkFillerWords.defaultWords
     ) {
         self.punctuationMode = punctuationMode
+        self.shouldFormatParagraphs = shouldFormatParagraphs
         self.shouldLowercase = shouldLowercase
         self.shouldRemoveFillerWords = shouldRemoveFillerWords
         self.fillerWords = fillerWords

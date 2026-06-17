@@ -22,6 +22,64 @@ public struct VoiceInkPromptTriggerMatch: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkPromptDetectionResult: Equatable, Sendable {
+    public let shouldEnableAI: Bool
+    public let selectedPromptId: UUID?
+    public let processedText: String
+    public let detectedTriggerWord: String?
+    public let originalEnhancementState: Bool
+    public let originalPromptId: UUID?
+
+    public init(
+        shouldEnableAI: Bool,
+        selectedPromptId: UUID?,
+        processedText: String,
+        detectedTriggerWord: String?,
+        originalEnhancementState: Bool,
+        originalPromptId: UUID?
+    ) {
+        self.shouldEnableAI = shouldEnableAI
+        self.selectedPromptId = selectedPromptId
+        self.processedText = processedText
+        self.detectedTriggerWord = detectedTriggerWord
+        self.originalEnhancementState = originalEnhancementState
+        self.originalPromptId = originalPromptId
+    }
+}
+
+public enum VoiceInkPromptDetectionPolicy {
+    public static func analyzeText(
+        _ text: String,
+        prompts: [VoiceInkCustomPrompt],
+        isEnhancementEnabled: Bool,
+        selectedPromptId: UUID?
+    ) -> VoiceInkPromptDetectionResult {
+        let triggers = VoiceInkCustomPromptPolicy.triggerDetectablePrompts(from: prompts).map {
+            VoiceInkPromptTrigger(promptId: $0.id, triggerWords: $0.triggerWords)
+        }
+
+        if let match = VoiceInkPromptTriggerPolicy.detect(in: text, triggers: triggers) {
+            return VoiceInkPromptDetectionResult(
+                shouldEnableAI: true,
+                selectedPromptId: match.promptId,
+                processedText: match.processedText,
+                detectedTriggerWord: match.triggerWord,
+                originalEnhancementState: isEnhancementEnabled,
+                originalPromptId: selectedPromptId
+            )
+        }
+
+        return VoiceInkPromptDetectionResult(
+            shouldEnableAI: false,
+            selectedPromptId: nil,
+            processedText: text,
+            detectedTriggerWord: nil,
+            originalEnhancementState: isEnhancementEnabled,
+            originalPromptId: selectedPromptId
+        )
+    }
+}
+
 public enum VoiceInkPromptTriggerPolicy {
     public static func addingTriggerWord(_ word: String, to existingWords: [String]) -> [String]? {
         let trimmedWord = word.trimmingCharacters(in: .whitespacesAndNewlines)

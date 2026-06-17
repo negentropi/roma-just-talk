@@ -2,6 +2,76 @@ import Foundation
 @testable import VoiceInkCore
 
 final class PromptTriggerPolicyTests: XCTestCase {
+    func testPromptDetectionPolicyReturnsNoMatchResultWithOriginalState() {
+        let originalPromptId = UUID()
+        let prompt = VoiceInkCustomPrompt(
+            title: "Email",
+            promptText: "Write an email.",
+            triggerWords: ["email"]
+        )
+
+        let result = VoiceInkPromptDetectionPolicy.analyzeText(
+            "please write this normally",
+            prompts: [prompt],
+            isEnhancementEnabled: true,
+            selectedPromptId: originalPromptId
+        )
+
+        XCTAssertFalse(result.shouldEnableAI)
+        XCTAssertNil(result.selectedPromptId)
+        XCTAssertEqual(result.processedText, "please write this normally")
+        XCTAssertNil(result.detectedTriggerWord)
+        XCTAssertTrue(result.originalEnhancementState)
+        XCTAssertEqual(result.originalPromptId, originalPromptId)
+    }
+
+    func testPromptDetectionPolicyBuildsDetectedEnhancementResult() {
+        let originalPromptId = UUID()
+        let emailPromptId = UUID()
+        let emailPrompt = VoiceInkCustomPrompt(
+            id: emailPromptId,
+            title: "Email",
+            promptText: "Write an email.",
+            triggerWords: ["email"]
+        )
+
+        let result = VoiceInkPromptDetectionPolicy.analyzeText(
+            "email, send a follow up",
+            prompts: [emailPrompt],
+            isEnhancementEnabled: false,
+            selectedPromptId: originalPromptId
+        )
+
+        XCTAssertTrue(result.shouldEnableAI)
+        XCTAssertEqual(result.selectedPromptId, emailPromptId)
+        XCTAssertEqual(result.processedText, "Send a follow up")
+        XCTAssertEqual(result.detectedTriggerWord, "email")
+        XCTAssertFalse(result.originalEnhancementState)
+        XCTAssertEqual(result.originalPromptId, originalPromptId)
+    }
+
+    func testPromptDetectionPolicyIgnoresPromptsWithoutTriggerWords() {
+        let prompt = VoiceInkCustomPrompt(
+            title: "Blank",
+            promptText: "No trigger.",
+            triggerWords: [" ", "\n"]
+        )
+
+        let result = VoiceInkPromptDetectionPolicy.analyzeText(
+            "blank, should not match",
+            prompts: [prompt],
+            isEnhancementEnabled: false,
+            selectedPromptId: nil
+        )
+
+        XCTAssertFalse(result.shouldEnableAI)
+        XCTAssertNil(result.selectedPromptId)
+        XCTAssertEqual(result.processedText, "blank, should not match")
+        XCTAssertNil(result.detectedTriggerWord)
+        XCTAssertFalse(result.originalEnhancementState)
+        XCTAssertNil(result.originalPromptId)
+    }
+
     func testAddingTriggerWordTrimsAndRejectsBlankAndCaseInsensitiveDuplicate() {
         XCTAssertEqual(
             VoiceInkPromptTriggerPolicy.addingTriggerWord("  Roma  ", to: ["Dictate"]),

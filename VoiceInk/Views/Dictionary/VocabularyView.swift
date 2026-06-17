@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import VoiceInkCore
 
 enum VocabularySortMode: String {
     case wordAsc = "wordAsc"
@@ -39,7 +40,7 @@ struct VocabularyView: View {
     }
 
     private var shouldShowAddButton: Bool {
-        !newWord.isEmpty
+        !VoiceInkDictionaryPolicy.tokens(from: newWord).isEmpty
     }
 
     var body: some View {
@@ -70,7 +71,7 @@ struct VocabularyView: View {
                             .font(.system(size: 16, weight: .semibold))
                     }
                     .buttonStyle(.borderless)
-                    .disabled(newWord.isEmpty)
+                    .disabled(!shouldShowAddButton)
                     .help("Add word")
                 }
             }

@@ -149,12 +149,6 @@ struct NoteDetailView: View {
         }
     }
     
-    private var relativeTimestamp: String {
-        let formatter = RelativeDateTimeFormatter()
-        formatter.unitsStyle = .short
-        return formatter.localizedString(for: note.timestamp, relativeTo: Date())
-    }
-    
     private var transcriptionStatusView: some View {
         VStack(spacing: 12) {
             HStack {

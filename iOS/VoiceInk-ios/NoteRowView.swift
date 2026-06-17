@@ -3,9 +3,6 @@ import VoiceInkCore
 
 struct NoteRowView: View {
     let note: Transcription
-    // Callbacks removed since star/share are gone
-    let onToggleStar: () -> Void = {}
-    let onToggleShare: () -> Void = {}
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {

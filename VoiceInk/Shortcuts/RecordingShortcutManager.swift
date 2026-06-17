@@ -2,27 +2,11 @@ import Foundation
 import AppKit
 import os
 
-enum SpecialShortcutKeyDownBehavior: String, CaseIterable {
-    case startRecording = "startRecording"
-    case preloadOnly = "preloadOnly"
-
-    var displayName: String {
-        switch self {
-        case .startRecording: return "Start Recording"
-        case .preloadOnly: return "Preload Only"
-        }
-    }
-}
-
 struct SpecialShortcutOptions: Equatable {
-    var keyDownBehavior: SpecialShortcutKeyDownBehavior = .preloadOnly
-    var allowsKeyDownOnlyTrigger = true
     var pasteLastTranscriptOnEmptyTap = true
 }
 
 enum SpecialShortcutSettings {
-    static let keyDownBehaviorKey = "specialShortcutKeyDownBehavior"
-    static let allowsKeyDownOnlyTriggerKey = "specialShortcutAllowsKeyDownOnlyTrigger"
     static let pasteLastTranscriptOnEmptyTapKey = "specialShortcutPasteLastTranscriptOnEmptyTap"
 }
 
@@ -66,18 +50,6 @@ class RecordingShortcutManager: ObservableObject {
     @Published var middleClickActivationDelay: Int {
         didSet {
             UserDefaults.standard.set(middleClickActivationDelay, forKey: "middleClickActivationDelay")
-        }
-    }
-    @Published var specialShortcutKeyDownBehavior: SpecialShortcutKeyDownBehavior {
-        didSet {
-            UserDefaults.standard.set(specialShortcutKeyDownBehavior.rawValue, forKey: SpecialShortcutSettings.keyDownBehaviorKey)
-            specialOptionsSource.options = specialOptions
-        }
-    }
-    @Published var specialShortcutAllowsKeyDownOnlyTrigger: Bool {
-        didSet {
-            UserDefaults.standard.set(specialShortcutAllowsKeyDownOnlyTrigger, forKey: SpecialShortcutSettings.allowsKeyDownOnlyTriggerKey)
-            specialOptionsSource.options = specialOptions
         }
     }
     @Published var specialShortcutPasteLastTranscriptOnEmptyTap: Bool {
@@ -166,13 +138,7 @@ class RecordingShortcutManager: ObservableObject {
 
         self.isMiddleClickToggleEnabled = UserDefaults.standard.bool(forKey: "isMiddleClickToggleEnabled")
         self.middleClickActivationDelay = UserDefaults.standard.integer(forKey: "middleClickActivationDelay")
-        let specialKeyDownBehaviorRawValue = UserDefaults.standard.string(forKey: SpecialShortcutSettings.keyDownBehaviorKey)
-        let specialKeyDownBehavior = specialKeyDownBehaviorRawValue
-            .flatMap(SpecialShortcutKeyDownBehavior.init(rawValue:)) ?? .preloadOnly
-        let specialAllowsKeyDownOnlyTrigger = UserDefaults.standard.bool(forKey: SpecialShortcutSettings.allowsKeyDownOnlyTriggerKey)
         let specialPasteLastTranscriptOnEmptyTap = UserDefaults.standard.bool(forKey: SpecialShortcutSettings.pasteLastTranscriptOnEmptyTapKey)
-        self.specialShortcutKeyDownBehavior = specialKeyDownBehavior
-        self.specialShortcutAllowsKeyDownOnlyTrigger = specialAllowsKeyDownOnlyTrigger
         self.specialShortcutPasteLastTranscriptOnEmptyTap = specialPasteLastTranscriptOnEmptyTap
 
         let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "RecordingShortcutManager")
@@ -209,8 +175,6 @@ class RecordingShortcutManager: ObservableObject {
         )
         let specialOptionsSource = RecordingShortcutSpecialOptionsSource(
             options: SpecialShortcutOptions(
-                keyDownBehavior: specialKeyDownBehavior,
-                allowsKeyDownOnlyTrigger: specialAllowsKeyDownOnlyTrigger,
                 pasteLastTranscriptOnEmptyTap: specialPasteLastTranscriptOnEmptyTap
             )
         )
@@ -438,8 +402,6 @@ class RecordingShortcutManager: ObservableObject {
 
     private var specialOptions: SpecialShortcutOptions {
         SpecialShortcutOptions(
-            keyDownBehavior: specialShortcutKeyDownBehavior,
-            allowsKeyDownOnlyTrigger: specialShortcutAllowsKeyDownOnlyTrigger,
             pasteLastTranscriptOnEmptyTap: specialShortcutPasteLastTranscriptOnEmptyTap
         )
     }
@@ -550,7 +512,6 @@ final class RecordingShortcutModeHandler {
 
     private let shortcutPressCooldown: TimeInterval = 0.08
     private let hybridPressThreshold: TimeInterval = 0.5
-    private let minimumSpecialNoEvidencePressDuration: TimeInterval = 0.5
 
     init(
         logger: Logger,
@@ -611,15 +572,10 @@ final class RecordingShortcutModeHandler {
 
         switch mode {
         case .special:
-            switch specialOptions.keyDownBehavior {
-            case .startRecording:
-                await startRecordingIfNeeded(mode: mode, powerModeId: powerModeId)
-            case .preloadOnly:
-                if canHandleShortcutAction(), !isRecorderVisible() {
-                    prepareQuickReleaseContext(powerModeId)
-                }
-                logger.notice("handleShortcutKeyDown: preloading special shortcut without starting recording")
+            if canHandleShortcutAction(), !isRecorderVisible() {
+                prepareQuickReleaseContext(powerModeId)
             }
+            logger.notice("handleShortcutKeyDown: preloading special shortcut without starting recording")
 
         case .pushToTalk:
             await startRecordingIfNeeded(mode: mode, powerModeId: powerModeId)
@@ -659,19 +615,11 @@ final class RecordingShortcutModeHandler {
             let pressDuration = shortcutPressStartTime.map { eventTime - $0 } ?? 0
             let options = activeSpecialOptions
             let hasTypingEvidence = context.didPressOtherKeyDuringPress || context.didReleaseOtherKeyDuringPress
-            let isPreloadOnly = options.keyDownBehavior == .preloadOnly
-            let shouldFailClosed =
-                !context.hasReliableKeyEvidence ||
-                (!isPreloadOnly && !hasTypingEvidence && pressDuration < minimumSpecialNoEvidencePressDuration)
+            let shouldFailClosed = !context.hasReliableKeyEvidence
 
             if hasTypingEvidence || shouldFailClosed {
-                if isPreloadOnly {
-                    discardQuickReleaseContext()
-                }
-                logger.notice("handleShortcutKeyUp: cancelling special shortcut; unsafe key evidence")
-                if isRecorderVisible() {
-                    await cancelRecording()
-                }
+                discardQuickReleaseContext()
+                logger.notice("handleShortcutKeyUp: discarding special shortcut; unsafe key evidence")
             } else if isRecorderVisible() {
                 guard canHandleShortcutAction() else { return }
                 if options.pasteLastTranscriptOnEmptyTap,
@@ -680,7 +628,7 @@ final class RecordingShortcutModeHandler {
                 }
                 logger.notice("handleShortcutKeyUp: stopping recording (special shortcut, duration=\(pressDuration, privacy: .public)s)")
                 await toggleMiniRecorder(powerModeId)
-            } else if isPreloadOnly {
+            } else {
                 if options.pasteLastTranscriptOnEmptyTap,
                    SpecialShortcutEmptyTranscriptionFallback.shouldFallback(pressDuration: pressDuration) {
                     SpecialShortcutEmptyTranscriptionFallback.scheduleFallback()
@@ -751,27 +699,5 @@ final class RecordingShortcutModeHandler {
         }
 
         discardQuickReleaseContext()
-        await toggleMiniRecorder(powerModeId)
-
-        let deadline = Date().addingTimeInterval(1.5)
-        while Date() < deadline {
-            switch recordingState() {
-            case .recording:
-                guard canHandleShortcutAction() else { return }
-                await toggleMiniRecorder(powerModeId)
-                return
-            case .starting:
-                guard canHandleShortcutAction() else { return }
-                await toggleMiniRecorder(powerModeId)
-                return
-            case .idle:
-                try? await Task.sleep(nanoseconds: 20_000_000)
-            case .transcribing, .enhancing, .busy:
-                return
-            }
-        }
-
-        logger.error("handleShortcutKeyUp: timed out committing preloaded special shortcut")
-        await cancelRecording()
     }
 }

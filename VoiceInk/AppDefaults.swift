@@ -63,8 +63,6 @@ enum AppDefaults {
             // Shortcuts
             "isMiddleClickToggleEnabled": false,
             "middleClickActivationDelay": 200,
-            SpecialShortcutSettings.keyDownBehaviorKey: SpecialShortcutKeyDownBehavior.preloadOnly.rawValue,
-            SpecialShortcutSettings.allowsKeyDownOnlyTriggerKey: true,
             SpecialShortcutSettings.pasteLastTranscriptOnEmptyTapKey: true,
 
             // Enhancement

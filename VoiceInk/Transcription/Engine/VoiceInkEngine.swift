@@ -138,9 +138,12 @@ class VoiceInkEngine: NSObject, ObservableObject {
             stopRequestedDuringStart = false
             partialTranscript = ""
 
-            requestRecordPermission { [self] granted in
+            await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+                requestRecordPermission { [self] granted in
                 if granted {
                     Task { @MainActor [self] in
+                        defer { continuation.resume() }
+
                         let startID = UUID()
                         self.activeRecordingStartID = startID
 
@@ -194,11 +197,6 @@ class VoiceInkEngine: NSObject, ObservableObject {
                                     modelName: model.name,
                                     language: preloaded.language
                                 )
-                                self.currentSession = preloaded.session
-                                self.recorder.onAudioChunk = { data in
-                                    preloaded.audioChunkHandler(data)
-                                    startupAudioRelay.handle(data)
-                                }
                             }
 
                             if self.recordingState == .recording,
@@ -206,8 +204,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
                                 if let claim = claimedPreload,
                                    claim.matches(model: model, language: VoiceInkTranscriptionLanguagePreference.storedLanguage()) {
                                     self.currentSession = claim.preloaded.session
+                                    startupAudioRelay.installSink(claim.preloaded.audioChunkHandler)
                                     self.recorder.onAudioChunk = claim.preloaded.audioChunkHandler
-                                    startupAudioRelay.clear()
                                 } else {
                                     if let claim = claimedPreload {
                                         claim.preloaded.session.cancel()
@@ -324,8 +322,10 @@ class VoiceInkEngine: NSObject, ObservableObject {
                     )
                     Task { @MainActor [self] in
                         await self.recorderUIManager?.dismissMiniRecorder()
+                        continuation.resume()
                     }
                 }
+            }
             }
         }
     }

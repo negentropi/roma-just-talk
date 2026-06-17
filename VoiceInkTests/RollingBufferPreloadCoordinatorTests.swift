@@ -52,6 +52,24 @@ private struct FakeSpeechDetector: SpeechActivityDetecting {
     }
 }
 
+private final class SequenceSpeechDetector: SpeechActivityDetecting, @unchecked Sendable {
+    private let lock = NSLock()
+    private var responses: [Bool]
+    private let defaultResponse: Bool
+
+    init(responses: [Bool], defaultResponse: Bool = false) {
+        self.responses = responses
+        self.defaultResponse = defaultResponse
+    }
+
+    func containsSpeech(inPCM16LEData data: Data) -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        guard !responses.isEmpty else { return defaultResponse }
+        return responses.removeFirst()
+    }
+}
+
 private final class LockedDataChunks: @unchecked Sendable {
     private let lock = NSLock()
     private var values: [Data] = []
@@ -614,6 +632,35 @@ struct RollingBufferPreloadCoordinatorTests {
             #expect(session.cancelCount == 1)
             let claimed = await coordinator.claimPreloadedSession(for: model)
             #expect(claimed == nil)
+        }
+    }
+
+    @MainActor
+    @Test func activePreloadCancelsAfterSustainedSilenceWithoutClaim() async {
+        let model = streamingModel()
+        let session = FakeTranscriptionSession()
+        let detector = SequenceSpeechDetector(
+            responses: [true, false, false, false, false],
+            defaultResponse: false
+        )
+
+        await withStandardRollingDefaults(for: model) { defaults in
+            setPreloadDefaults(defaults, model: model, preRunFinalization: true)
+        } run: {
+            let coordinator = makeCoordinator(model: model, session: session, detector: detector)
+
+            await coordinator.processRollingChunkForTesting(Data(repeating: 1, count: 8_000))
+            #expect(session.cancelCount == 0)
+            #expect(session.chunks.snapshot().map(\.count) == [8_000])
+
+            for _ in 0..<4 {
+                await coordinator.processRollingChunkForTesting(Data(repeating: 0, count: 8_000))
+            }
+
+            #expect(session.cancelCount == 1)
+            let claimed = await coordinator.claimPreloadedSession(for: model)
+            #expect(claimed == nil)
+            #expect(coordinator.claimBufferedAudioSnapshot()?.audioData.isEmpty == false)
         }
     }
 

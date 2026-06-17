@@ -1,8 +1,18 @@
 # Changelog
 
-## v1.94 - Unreleased
+## v1.96 - Unreleased
 
 - Stripped Codex follow-up JSON payloads from Local CLI enhancement output so transcript cleanup cannot paste assistant metadata into the target app.
+- Reworked Special shortcuts so Shift-down only arms the rolling-buffer commit path; Shift+typing, secure-input, and other unreliable key evidence now discard without starting audio, canceling, saving history, or writing recorder files.
+- Removed the unsafe Special Key Down and Special Flex settings that could start recording before the app knew whether the Shift press was just normal typing.
+
+## v1.95 - 2026-06-17
+
+- Fixed Special `startRecording` modifier-only shortcuts so unreliable key-up evidence and short clean presses no longer cancel after recording has already started.
+- Canceled unclaimed rolling-buffer preload sessions after sustained silence or a short stale-session cap, preventing local STT from running for minutes after brief ambient speech.
+
+## v1.94 - 2026-06-16
+
 - Shared selected-language option ordering between macOS language pickers and the imported iOS settings path.
 - Shared provider credential presence checks between macOS cloud/streaming transcription and the imported iOS transcription path, so whitespace-only API keys are treated as missing consistently.
 - Shared selected-language request normalization between macOS local Whisper/cloud transcription and the imported iOS transcription path.
@@ -42,6 +52,8 @@
 - Let preload-only quick releases fall back to the current rolling-buffer audio snapshot directly, avoiding a recorder open/stop cycle when no pre-run session is claimable and the model supports saved-WAV transcription.
 - Let local streaming models transcribe buffered rolling-audio snapshots immediately while the WAV writes in parallel for fallback/history, instead of waiting for the file before STT starts.
 - Let very short active recordings that stop during startup replay their captured pre-roll/live PCM into the streaming session before falling back to batch transcription.
+- Removed the preload-miss shortcut polling timeout by awaiting recorder startup before the immediate stop handoff.
+- Replayed active-recording startup chunks into claimed rolling-preload sessions instead of dropping audio captured during the handoff.
 - Preserved rolling-buffer audio for direct snapshot fallback when an existing pre-run session is canceled by a model, language, or finalization-policy mismatch.
 - Preserved rolling audio collected while a preload-only quick release finalizes, so the next rolling preload does not restart from an empty lead-in after paste.
 - Deferred quick-release rolling-preload history insertion until the post-paste save boundary, removing avoidable SwiftData work before the cursor paste starts.
@@ -66,6 +78,7 @@
 - Made the pre-run finalization opt-out also skip rolling-buffer STT pre-run work instead of warming an unusable session.
 - Preserved the exact latest rolling-buffer preload audio when incoming chunks exceed or cross the configured duration boundary.
 - Canceled warm rolling-preload sessions when the selected transcription language changes before the shortcut claims them.
+- Woke quick-release claims as soon as rolling-preload startup resolves instead of polling until the next 10ms tick.
 
 ## v1.93 - 2026-06-15
 

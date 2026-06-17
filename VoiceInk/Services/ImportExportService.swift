@@ -165,8 +165,6 @@ class ImportExportService {
             secondaryRecordingShortcutRawValue: recordingShortcutManager.secondaryRecordingShortcut.rawValue,
             primaryRecordingShortcutModeRawValue: recordingShortcutManager.primaryRecordingShortcutMode.rawValue,
             secondaryRecordingShortcutModeRawValue: recordingShortcutManager.secondaryRecordingShortcutMode.rawValue,
-            specialShortcutKeyDownBehaviorRawValue: recordingShortcutManager.specialShortcutKeyDownBehavior.rawValue,
-            specialShortcutAllowsKeyDownOnlyTrigger: recordingShortcutManager.specialShortcutAllowsKeyDownOnlyTrigger,
             specialShortcutPasteLastTranscriptOnEmptyTap: recordingShortcutManager.specialShortcutPasteLastTranscriptOnEmptyTap,
             isMiddleClickToggleEnabled: recordingShortcutManager.isMiddleClickToggleEnabled,
             middleClickActivationDelay: recordingShortcutManager.middleClickActivationDelay,

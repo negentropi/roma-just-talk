@@ -94,6 +94,8 @@ final class RollingBufferPreloadCoordinator {
     typealias DetectorProvider = @Sendable () async -> (any SpeechActivityDetecting)?
     typealias SessionFactory = @MainActor (any TranscriptionModel, @escaping (String) -> Void) -> TranscriptionSession
     static let startingPreloadClaimWaitNanoseconds: UInt64 = 150_000_000
+    static let unclaimedPreloadSilenceSeconds = 1.0
+    static let unclaimedPreloadGraceSeconds = 2.0
 
     private enum State {
         case idle
@@ -138,7 +140,9 @@ final class RollingBufferPreloadCoordinator {
     private var observedBytes = 0
     private var preloadedChunks = 0
     private var preloadedBytes = 0
+    private var activeSilenceBytes = 0
     private var vadWindowsChecked = 0
+    private var startingPreloadWaiters: [CheckedContinuation<Void, Never>] = []
 
     private let vadWindowBytes = 8_000 // 250 ms at 16 kHz, 16-bit mono.
     private let planRefreshInterval: TimeInterval = 30
@@ -325,6 +329,12 @@ final class RollingBufferPreloadCoordinator {
         }
 
         if state == .active {
+            if !recordingInProgress,
+               let staleReason = staleUnclaimedPreloadReason(afterAdding: chunk) {
+                logger.notice("Canceling stale unclaimed rolling preload reason=\(staleReason, privacy: .public) preloadedChunks=\(self.preloadedChunks, privacy: .public) preloadedBytes=\(self.preloadedBytes, privacy: .public) bufferDuration=\(self.configuration.bufferDurationSeconds, format: .fixed(precision: 2), privacy: .public)s")
+                resetPreloadState(cancelSession: true, keepLeadIn: true)
+                return
+            }
             currentCallback?(chunk)
             preloadedChunks += 1
             preloadedBytes += chunk.count
@@ -424,6 +434,29 @@ final class RollingBufferPreloadCoordinator {
         }
     }
 
+    private func staleUnclaimedPreloadReason(afterAdding chunk: Data) -> String? {
+        vadWindow.append(chunk)
+        if vadWindow.count >= vadWindowBytes {
+            let window = vadWindow
+            vadWindow.removeAll(keepingCapacity: true)
+            if detector?.containsSpeech(inPCM16LEData: window) == true {
+                activeSilenceBytes = 0
+            } else if detector != nil {
+                activeSilenceBytes += window.count
+            }
+        }
+
+        if activeSilenceBytes >= Self.bytes(forDuration: Self.unclaimedPreloadSilenceSeconds) {
+            return "silence"
+        }
+
+        if preloadedBytes >= Self.bytes(forDuration: configuration.bufferDurationSeconds + Self.unclaimedPreloadGraceSeconds) {
+            return "max-duration"
+        }
+
+        return nil
+    }
+
     private func cachePlan(_ plan: Plan?, for modelName: String, language: String?, now: Date) -> Plan? {
         cachedPlan = plan
         cachedPlanModelName = modelName
@@ -509,6 +542,7 @@ final class RollingBufferPreloadCoordinator {
                 state = .idle
                 currentModelName = nil
                 currentLanguage = nil
+                resumeStartingPreloadWaiters()
                 return
             }
 
@@ -516,6 +550,7 @@ final class RollingBufferPreloadCoordinator {
                   currentModelName == plan.model.name,
                   currentLanguage == plan.language else {
                 session.cancel()
+                resumeStartingPreloadWaiters()
                 return
             }
 
@@ -528,6 +563,7 @@ final class RollingBufferPreloadCoordinator {
                 preloadedBytes += chunk.count
             }
             state = .active
+            resumeStartingPreloadWaiters()
             let startupElapsed = preloadStartedAt.map { Date().timeIntervalSince($0) } ?? -1
             logger.notice("Started rolling preload model=\(plan.model.displayName, privacy: .public) startupElapsed=\(startupElapsed, format: .fixed(precision: 3), privacy: .public)s leadInChunks=\(bufferedChunks.count, privacy: .public) leadInBytes=\(bufferedChunks.reduce(0) { $0 + $1.count }, privacy: .public)")
         } catch {
@@ -538,11 +574,34 @@ final class RollingBufferPreloadCoordinator {
     }
 
     private func waitForStartingPreload() async {
-        var remaining = Self.startingPreloadClaimWaitNanoseconds
-        while state == .starting, remaining > 0 {
-            let sleepNanoseconds = min(10_000_000, remaining)
-            try? await Task.sleep(nanoseconds: sleepNanoseconds)
-            remaining -= sleepNanoseconds
+        guard state == .starting else { return }
+
+        let timeoutTask = Task { @MainActor [weak self] in
+            do {
+                try await Task.sleep(nanoseconds: Self.startingPreloadClaimWaitNanoseconds)
+            } catch {
+                return
+            }
+            guard !Task.isCancelled else { return }
+            self?.resumeStartingPreloadWaiters()
+        }
+
+        await withCheckedContinuation { continuation in
+            if state == .starting {
+                startingPreloadWaiters.append(continuation)
+            } else {
+                continuation.resume()
+            }
+        }
+        timeoutTask.cancel()
+    }
+
+    private func resumeStartingPreloadWaiters() {
+        guard !startingPreloadWaiters.isEmpty else { return }
+        let waiters = startingPreloadWaiters
+        startingPreloadWaiters.removeAll(keepingCapacity: true)
+        for waiter in waiters {
+            waiter.resume()
         }
     }
 
@@ -560,6 +619,7 @@ final class RollingBufferPreloadCoordinator {
         observedBytes = 0
         preloadedChunks = 0
         preloadedBytes = 0
+        activeSilenceBytes = 0
         vadWindowsChecked = 0
         vadWindow.removeAll(keepingCapacity: true)
         if !keepLeadIn {
@@ -568,6 +628,7 @@ final class RollingBufferPreloadCoordinator {
         if state != .claimed {
             state = .idle
         }
+        resumeStartingPreloadWaiters()
     }
 
     private func invalidateCachedPlan() {

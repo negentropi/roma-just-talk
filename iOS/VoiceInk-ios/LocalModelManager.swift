@@ -145,7 +145,7 @@ class LocalModelManager: ObservableObject {
         }
         
         do {
-            try FileManager.default.removeItem(at: model.fileURL(in: Self.modelsDirectory))
+            try model.deleteDownloadedFiles(in: Self.modelsDirectory)
             print("LocalModelManager: Successfully deleted model \(model.modelName)")
             
             // Trigger UI update

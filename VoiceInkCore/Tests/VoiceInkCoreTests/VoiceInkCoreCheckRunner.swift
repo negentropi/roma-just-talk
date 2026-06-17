@@ -370,6 +370,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testCreateModelsDirectoryCreatesDirectoryUnderPlatformBaseDirectory", run: { try WhisperModelFilesTests().testCreateModelsDirectoryCreatesDirectoryUnderPlatformBaseDirectory() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testModelFileURLBuildsUnderModelsDirectory", run: { WhisperModelFilesTests().testModelFileURLBuildsUnderModelsDirectory() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testModelDownloadStateChecksSharedFileURL", run: { try WhisperModelFilesTests().testModelDownloadStateChecksSharedFileURL() }),
+            VoiceInkCoreCheck(name: "WhisperModelFilesTests.testDeleteModelFilesRemovesMainModelAndCoreMLSidecar", run: { try WhisperModelFilesTests().testDeleteModelFilesRemovesMainModelAndCoreMLSidecar() }),
+            VoiceInkCoreCheck(name: "WhisperModelFilesTests.testDeleteDownloadedFilesUsesModelSpecURL", run: { try WhisperModelFilesTests().testDeleteDownloadedFilesUsesModelSpecURL() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testCoreMLSidecarURLsUseSharedModelNaming", run: { WhisperModelFilesTests().testCoreMLSidecarURLsUseSharedModelNaming() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testModelFileFilterMatchesExistingBinOnlyPolicy", run: { WhisperModelFilesTests().testModelFileFilterMatchesExistingBinOnlyPolicy() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testDownloadableModelsMatchMacOSLocalWhisperCatalog", run: { WhisperModelFilesTests().testDownloadableModelsMatchMacOSLocalWhisperCatalog() }),

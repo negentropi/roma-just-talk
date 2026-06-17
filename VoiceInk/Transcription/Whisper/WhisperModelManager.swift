@@ -300,18 +300,12 @@ class WhisperModelManager: ObservableObject {
 
     func deleteModel(_ model: WhisperModelFile) async {
         do {
-            try FileManager.default.removeItem(at: model.url)
-
-            if let coreMLURL = model.coreMLEncoderURL {
-                try? FileManager.default.removeItem(at: coreMLURL)
-            } else if let coreMLDir = VoiceInkWhisperModelFiles.coreMLEncoderDirectoryURL(
+            try VoiceInkWhisperModelFiles.deleteModelFiles(
                 forModelName: model.name,
+                modelFileURL: model.url,
+                coreMLEncoderURL: model.coreMLEncoderURL,
                 in: modelsDirectory
-            ) {
-                if FileManager.default.fileExists(atPath: coreMLDir.path) {
-                    try? FileManager.default.removeItem(at: coreMLDir)
-                }
-            }
+            )
 
             availableModels.removeAll { $0.id == model.id }
 
@@ -333,7 +327,12 @@ class WhisperModelManager: ObservableObject {
     func clearDownloadedModels() async {
         for model in availableModels {
             do {
-                try FileManager.default.removeItem(at: model.url)
+                try VoiceInkWhisperModelFiles.deleteModelFiles(
+                    forModelName: model.name,
+                    modelFileURL: model.url,
+                    coreMLEncoderURL: model.coreMLEncoderURL,
+                    in: modelsDirectory
+                )
             } catch {
                 logError("Error deleting model during cleanup", error)
             }

@@ -50,6 +50,18 @@ public struct VoiceInkWhisperModelFileSpec: Codable, Equatable, Identifiable, Se
     public func isDownloaded(in modelsDirectory: URL, fileManager: FileManager = .default) -> Bool {
         fileManager.fileExists(atPath: fileURL(in: modelsDirectory).path)
     }
+
+    public func deleteDownloadedFiles(
+        in modelsDirectory: URL,
+        fileManager: FileManager = .default
+    ) throws {
+        try VoiceInkWhisperModelFiles.deleteModelFiles(
+            forModelName: modelName,
+            modelFileURL: fileURL(in: modelsDirectory),
+            in: modelsDirectory,
+            fileManager: fileManager
+        )
+    }
 }
 
 public enum VoiceInkWhisperModelFiles {
@@ -238,5 +250,24 @@ public enum VoiceInkWhisperModelFiles {
     public static func coreMLEncoderDirectoryURL(forModelName modelName: String, in modelsDirectory: URL) -> URL? {
         guard let directoryName = coreMLEncoderDirectoryName(forModelName: modelName) else { return nil }
         return modelsDirectory.appendingPathComponent(directoryName)
+    }
+
+    public static func deleteModelFiles(
+        forModelName modelName: String,
+        modelFileURL: URL,
+        coreMLEncoderURL: URL? = nil,
+        in modelsDirectory: URL,
+        fileManager: FileManager = .default
+    ) throws {
+        try fileManager.removeItem(at: modelFileURL)
+
+        if let coreMLEncoderURL {
+            try? fileManager.removeItem(at: coreMLEncoderURL)
+            return
+        }
+
+        if let coreMLDirectory = coreMLEncoderDirectoryURL(forModelName: modelName, in: modelsDirectory) {
+            try? fileManager.removeItem(at: coreMLDirectory)
+        }
     }
 }

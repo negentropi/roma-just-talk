@@ -57,6 +57,45 @@ final class WhisperModelFilesTests: XCTestCase {
         XCTAssertTrue(model.isDownloaded(in: modelsDirectory))
     }
 
+    func testDeleteModelFilesRemovesMainModelAndCoreMLSidecar() throws {
+        let baseDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.WhisperModelFilesTests.\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: baseDirectory) }
+
+        let modelsDirectory = try VoiceInkWhisperModelFiles.createModelsDirectory(in: baseDirectory)
+        let modelURL = VoiceInkWhisperModelFiles.fileURL(forModelName: "ggml-base", in: modelsDirectory)
+        let coreMLDirectory = try XCTUnwrap(
+            VoiceInkWhisperModelFiles.coreMLEncoderDirectoryURL(forModelName: "ggml-base", in: modelsDirectory)
+        )
+
+        try Data().write(to: modelURL)
+        try FileManager.default.createDirectory(at: coreMLDirectory, withIntermediateDirectories: true)
+
+        try VoiceInkWhisperModelFiles.deleteModelFiles(
+            forModelName: "ggml-base",
+            modelFileURL: modelURL,
+            in: modelsDirectory
+        )
+
+        XCTAssertFalse(FileManager.default.fileExists(atPath: modelURL.path))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: coreMLDirectory.path))
+    }
+
+    func testDeleteDownloadedFilesUsesModelSpecURL() throws {
+        let baseDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.WhisperModelFilesTests.\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: baseDirectory) }
+
+        let modelsDirectory = try VoiceInkWhisperModelFiles.createModelsDirectory(in: baseDirectory)
+        let model = VoiceInkWhisperModelFiles.baseModel
+
+        try Data().write(to: model.fileURL(in: modelsDirectory))
+
+        try model.deleteDownloadedFiles(in: modelsDirectory)
+
+        XCTAssertFalse(model.isDownloaded(in: modelsDirectory))
+    }
+
     func testCoreMLSidecarURLsUseSharedModelNaming() {
         let modelsDirectory = URL(fileURLWithPath: "/tmp/VoiceInk/WhisperModels", isDirectory: true)
 

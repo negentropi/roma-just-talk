@@ -114,6 +114,14 @@ public struct Mode: Identifiable, Codable {
         )
     }
 
+    public static func defaultModesAndSelection(name: String = "Default") -> (
+        modes: [Mode],
+        selectedModeId: UUID
+    ) {
+        let defaultMode = defaultLocalWhisper(name: name)
+        return ([defaultMode], defaultMode.id)
+    }
+
     public static func isSaveableDraft(
         name: String,
         promptTemplateType: VoiceInkPostProcessingTemplateType,

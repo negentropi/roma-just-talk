@@ -189,9 +189,9 @@ final class AppSettings: ObservableObject {
             return
         }
 
-        let defaultMode = Mode.defaultLocalWhisper()
-        modes = [defaultMode]
-        selectedModeId = defaultMode.id
+        let defaultSelection = Mode.defaultModesAndSelection()
+        modes = defaultSelection.modes
+        selectedModeId = defaultSelection.selectedModeId
     }
 
     func completeFirstTimeSetup() {

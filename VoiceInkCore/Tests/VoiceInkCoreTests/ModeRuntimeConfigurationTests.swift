@@ -35,6 +35,15 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
         XCTAssertFalse(mode.isPostProcessingEnabled)
     }
 
+    func testDefaultModesAndSelectionSelectsSeededLocalMode() {
+        let defaultSelection = Mode.defaultModesAndSelection()
+
+        XCTAssertEqual(defaultSelection.modes.count, 1)
+        XCTAssertEqual(defaultSelection.modes.first?.id, defaultSelection.selectedModeId)
+        XCTAssertEqual(defaultSelection.modes.first?.transcriptionProvider, .localWhisper)
+        XCTAssertEqual(defaultSelection.modes.first?.transcriptionModel, VoiceInkTranscriptionModelCatalog.localBaseModel)
+    }
+
     func testUnsupportedTranscriptionProviderDoesNotReceiveFakeFallbackModel() {
         let mode = Mode(name: "Unsupported", transcriptionProvider: .cerebras)
 

@@ -41,7 +41,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - transcription and AI model catalogs
 - Native Apple and FluidAudio local transcription model metadata; platform shells still own availability, download, and runtime adapters
 - remote transcription provider dispatch for iOS retry transcription
-- mode runtime configuration, selected-mode repair, mode-based transcription language availability, and selected-language repair
+- mode runtime configuration, default local mode selection, selected-mode repair, mode-based transcription language availability, and selected-language repair
 - mode provider-selection repair and draft saveability rules
 - shared UserDefaults key names, including cleanup preferences, plus iOS mode persistence helpers
 - onboarding completion, iOS audio-session timeout, and filler-word list reset preference storage; platform shells still own first-run flow, audio-session lifecycle, and settings UI bindings
@@ -178,7 +178,7 @@ The remaining Swift files present in `../VoiceInk-iOS` but not in `VoiceInk/iOS`
 - `LLMPostProcessor.swift`: replaced by `VoiceInkPostProcessingRequest`, `VoiceInkPostProcessingClient`, and `VoiceInkTranscriptionRunProcessor`.
 - `RiffWaveUtils.swift`: replaced by `VoiceInkPCM16AudioSamples`.
 - `VADModelManager.swift`: replaced by direct `VoiceInkVADModelFiles.sileroPath()` calls from the macOS/iOS Whisper shells and macOS rolling preload.
-- `DefaultModeManager.swift`: replaced by `AppSettings.ensureDefaultModeExists()` plus `Mode.defaultLocalWhisper()`.
+- `DefaultModeManager.swift`: replaced by `AppSettings.ensureDefaultModeExists()` plus `Mode.defaultModesAndSelection()`.
 - `Mode.swift`, `PromptTemplate.swift`, `Provider.swift`: replaced by `VoiceInkCore` mode, prompt-template, and provider catalog modules.
 - `ModeSelectionView.swift`, `ModesView.swift`: obsolete iOS UI experiments; current in-repo iOS mode UI is `iOS/VoiceInk-ios/ModeConfigurationView.swift`.
 - `Item.swift`: unused SwiftData template sample.

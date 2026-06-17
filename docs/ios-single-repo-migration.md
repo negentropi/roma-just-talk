@@ -43,6 +43,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - mode runtime configuration and selected-mode repair
 - mode provider-selection repair and draft saveability rules
 - shared UserDefaults key names, including cleanup preferences, plus iOS mode persistence helpers
+- onboarding completion, iOS audio-session timeout, and filler-word list reset preference storage; platform shells still own first-run flow, audio-session lifecycle, and settings UI bindings
 - current transcription model preference loading/saving/clearing; platform shells still own model availability, download/runtime state, and legacy key cleanup
 - transcript status and presentation helpers
 - local transcription/model/missing-audio error vocabulary shared by macOS local Whisper and iOS local retry transcription
@@ -127,6 +128,9 @@ Current macOS consumers of shared remote transport:
 - macOS and iOS recording audio filename construction delegates live recording, imported transcription, retranscription, and timestamped iOS recording naming to `VoiceInkStoredAudioFile`; platform shells still own directory choice and actual audio capture/copy/write work.
 - macOS history/import row summaries and iOS note detail display use `VoiceInkTranscriptPresentation.preferredText` for the enhanced-text-first transcript display rule.
 - macOS `FillerWordManager`, iOS `AppSettings`, and cleanup configuration load and save filler-word lists through `VoiceInkFillerWordPreference`; platform shells still own settings UI and toggle state.
+- iOS app launch and first-time setup read/write/reset onboarding completion through `VoiceInkOnboardingPreference`; the onboarding views and recording-after-onboarding flow stay in the iOS shell.
+- iOS `AppSettings` reads/writes/resets audio-session timeout through `VoiceInkAudioSessionTimeoutPreference`; `AudioSessionManager` and timeout UI stay in the iOS shell.
+- iOS `AppSettings.resetAll()` clears stored filler-word overrides through `VoiceInkFillerWordPreference`, preserving the existing default-word fallback.
 - macOS transcription services, Power Mode, rolling preload, and iOS `AppSettings` read/write/clear selected transcription language through `VoiceInkTranscriptionLanguagePreference`; platform shells still own settings UI and language-change notifications.
 - macOS paste/pipeline, Power Mode, backup import/export, `FillerWordManager`, and iOS `AppSettings` read/write/reset cleanup toggles through `VoiceInkTranscriptionCleanupPreferenceStorage`; SwiftUI setting controls still bind directly through `@AppStorage`.
 - macOS `TranscriptionPipeline` reads short post-processing skip settings through `VoiceInkPostProcessingSkipConfiguration.current()` before applying `VoiceInkPostProcessingSkipPolicy`; platform shells still own the enhancement UI and the decision point.

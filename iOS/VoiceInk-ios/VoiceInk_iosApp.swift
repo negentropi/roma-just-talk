@@ -11,7 +11,7 @@ import VoiceInkCore
 
 @main
 struct VoiceInk_iosApp: App {
-    @State private var hasCompletedOnboarding = UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.hasCompletedOnboarding)
+    @State private var hasCompletedOnboarding = VoiceInkOnboardingPreference.hasCompletedOnboarding()
     @State private var shouldStartRecordingAfterOnboarding = false
     @StateObject private var recordingManager = RecordingManager()
     

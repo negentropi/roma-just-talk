@@ -31,7 +31,7 @@ final class AppSettings: ObservableObject {
     
     // Audio session timeout configuration
     @Published var audioSessionTimeoutSeconds: Int {
-        didSet { UserDefaults.standard.set(audioSessionTimeoutSeconds, forKey: VoiceInkUserDefaultsKey.audioSessionTimeoutSeconds) }
+        didSet { VoiceInkAudioSessionTimeoutPreference.saveTimeoutSeconds(audioSessionTimeoutSeconds) }
     }
 
     @Published var punctuationCleanupMode: PunctuationCleanupMode {
@@ -76,8 +76,7 @@ final class AppSettings: ObservableObject {
         self.verifiedAPIKeyProviders = VoiceInkProviderAPIKeyVerificationState.verifiedProviders()
         
         // Load audio session timeout (default: 90 seconds)
-        self.audioSessionTimeoutSeconds = UserDefaults.standard.object(forKey: VoiceInkUserDefaultsKey.audioSessionTimeoutSeconds) as? Int
-            ?? VoiceInkPreferenceDefault.audioSessionTimeoutSeconds
+        self.audioSessionTimeoutSeconds = VoiceInkAudioSessionTimeoutPreference.timeoutSeconds()
         PunctuationCleanupMode.migrateLegacyUserDefaultIfNeeded()
         self.punctuationCleanupMode = PunctuationCleanupMode.current()
         self.isTextFormattingEnabled = VoiceInkTranscriptionCleanupPreferenceStorage.isTextFormattingEnabled()
@@ -204,7 +203,7 @@ final class AppSettings: ObservableObject {
 
     func completeFirstTimeSetup() {
         ensureDefaultModeExists()
-        UserDefaults.standard.set(true, forKey: VoiceInkUserDefaultsKey.hasCompletedOnboarding)
+        VoiceInkOnboardingPreference.saveHasCompletedOnboarding()
     }
 
     private func saveAPIKey(_ key: String, forKey account: String) {
@@ -255,7 +254,7 @@ final class AppSettings: ObservableObject {
         modes = []
         selectedModeId = nil
         VoiceInkModeStorage.clear()
-        UserDefaults.standard.removeObject(forKey: VoiceInkUserDefaultsKey.hasCompletedOnboarding)
+        VoiceInkOnboardingPreference.clear()
 
         // Clear verification flags
         verifiedAPIKeyProviders = []
@@ -263,7 +262,7 @@ final class AppSettings: ObservableObject {
         
         // Reset audio session timeout to default
         audioSessionTimeoutSeconds = VoiceInkPreferenceDefault.audioSessionTimeoutSeconds
-        UserDefaults.standard.removeObject(forKey: VoiceInkUserDefaultsKey.audioSessionTimeoutSeconds)
+        VoiceInkAudioSessionTimeoutPreference.clear()
 
         // Reset transcription cleanup preferences
         punctuationCleanupMode = .keep
@@ -273,7 +272,7 @@ final class AppSettings: ObservableObject {
         fillerWords = VoiceInkFillerWords.defaultWords
         PunctuationCleanupMode.clearCurrent()
         VoiceInkTranscriptionCleanupPreferenceStorage.clearTextPreferences()
-        UserDefaults.standard.removeObject(forKey: VoiceInkUserDefaultsKey.fillerWords)
+        VoiceInkFillerWordPreference.clearWords()
         selectedTranscriptionLanguage = VoiceInkLanguageCatalog.autoDetectCode
         VoiceInkTranscriptionLanguagePreference.clearSelectedLanguage()
 

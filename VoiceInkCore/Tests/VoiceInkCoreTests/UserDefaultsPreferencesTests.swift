@@ -69,6 +69,44 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkPreferenceDefault.ollamaBaseURL, "http://localhost:11434")
     }
 
+    func testOnboardingPreferenceUsesFalseWhenMissing() {
+        withIsolatedDefaults { defaults in
+            XCTAssertFalse(VoiceInkOnboardingPreference.hasCompletedOnboarding(from: defaults))
+        }
+    }
+
+    func testOnboardingPreferenceSavesAndClearsCompletionState() {
+        withIsolatedDefaults { defaults in
+            VoiceInkOnboardingPreference.saveHasCompletedOnboarding(true, to: defaults)
+            XCTAssertTrue(VoiceInkOnboardingPreference.hasCompletedOnboarding(from: defaults))
+
+            VoiceInkOnboardingPreference.clear(from: defaults)
+            XCTAssertFalse(VoiceInkOnboardingPreference.hasCompletedOnboarding(from: defaults))
+        }
+    }
+
+    func testAudioSessionTimeoutPreferenceUsesExistingDefaultWhenMissing() {
+        withIsolatedDefaults { defaults in
+            XCTAssertEqual(
+                VoiceInkAudioSessionTimeoutPreference.timeoutSeconds(from: defaults),
+                VoiceInkPreferenceDefault.audioSessionTimeoutSeconds
+            )
+        }
+    }
+
+    func testAudioSessionTimeoutPreferenceSavesAndClearsTimeout() {
+        withIsolatedDefaults { defaults in
+            VoiceInkAudioSessionTimeoutPreference.saveTimeoutSeconds(120, to: defaults)
+            XCTAssertEqual(VoiceInkAudioSessionTimeoutPreference.timeoutSeconds(from: defaults), 120)
+
+            VoiceInkAudioSessionTimeoutPreference.clear(from: defaults)
+            XCTAssertEqual(
+                VoiceInkAudioSessionTimeoutPreference.timeoutSeconds(from: defaults),
+                VoiceInkPreferenceDefault.audioSessionTimeoutSeconds
+            )
+        }
+    }
+
     func testTranscriptionPromptPreferenceUsesFallbackOnlyWhenLocalWhisperPromptIsMissing() {
         withIsolatedDefaults { defaults in
             XCTAssertEqual(
@@ -275,6 +313,18 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             XCTAssertEqual(
                 VoiceInkFillerWordPreference.words(from: defaults),
                 ["um", "like"]
+            )
+        }
+    }
+
+    func testFillerWordPreferenceClearsSavedWords() {
+        withIsolatedDefaults { defaults in
+            VoiceInkFillerWordPreference.saveWords(["um", "like"], to: defaults)
+            VoiceInkFillerWordPreference.clearWords(from: defaults)
+
+            XCTAssertEqual(
+                VoiceInkFillerWordPreference.words(from: defaults),
+                VoiceInkFillerWords.defaultWords
             )
         }
     }

@@ -48,6 +48,38 @@ public enum VoiceInkPreferenceDefault {
     public static let ollamaBaseURL = "http://localhost:11434"
 }
 
+public enum VoiceInkOnboardingPreference {
+    public static func hasCompletedOnboarding(from defaults: UserDefaults = .standard) -> Bool {
+        defaults.bool(forKey: VoiceInkUserDefaultsKey.hasCompletedOnboarding)
+    }
+
+    public static func saveHasCompletedOnboarding(
+        _ completed: Bool = true,
+        to defaults: UserDefaults = .standard
+    ) {
+        defaults.set(completed, forKey: VoiceInkUserDefaultsKey.hasCompletedOnboarding)
+    }
+
+    public static func clear(from defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.hasCompletedOnboarding)
+    }
+}
+
+public enum VoiceInkAudioSessionTimeoutPreference {
+    public static func timeoutSeconds(from defaults: UserDefaults = .standard) -> Int {
+        defaults.object(forKey: VoiceInkUserDefaultsKey.audioSessionTimeoutSeconds) as? Int
+            ?? VoiceInkPreferenceDefault.audioSessionTimeoutSeconds
+    }
+
+    public static func saveTimeoutSeconds(_ seconds: Int, to defaults: UserDefaults = .standard) {
+        defaults.set(seconds, forKey: VoiceInkUserDefaultsKey.audioSessionTimeoutSeconds)
+    }
+
+    public static func clear(from defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.audioSessionTimeoutSeconds)
+    }
+}
+
 public enum VoiceInkTranscriptionPromptPreference {
     public static func storedPrompt(from defaults: UserDefaults = .standard) -> String? {
         defaults.string(forKey: VoiceInkUserDefaultsKey.transcriptionPrompt)
@@ -183,6 +215,10 @@ public enum VoiceInkFillerWordPreference {
 
     public static func saveWords(_ words: [String], to defaults: UserDefaults = .standard) {
         defaults.set(words, forKey: VoiceInkUserDefaultsKey.fillerWords)
+    }
+
+    public static func clearWords(from defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.fillerWords)
     }
 }
 

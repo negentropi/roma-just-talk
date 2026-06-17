@@ -12,6 +12,35 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
     case xai
     case local
 
+    public var providerKind: VoiceInkProviderKind? {
+        switch self {
+        case .groq:
+            return .groq
+        case .openAI:
+            return .openAI
+        case .assemblyAI:
+            return .assemblyAI
+        case .deepgram:
+            return .deepgram
+        case .elevenLabs:
+            return .elevenLabs
+        case .mistral:
+            return .mistral
+        case .gemini:
+            return .gemini
+        case .soniox:
+            return .soniox
+        case .speechmatics:
+            return .speechmatics
+        case .xai:
+            return .xai
+        case .local:
+            return .localWhisper
+        case .cartesia:
+            return nil
+        }
+    }
+
     public var languageCodes: [String]? {
         switch self {
         case .assemblyAI:

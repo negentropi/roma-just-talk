@@ -47,7 +47,7 @@ extension CloudProvider {
     }
 
     func verifyAPIKey(_ key: String) async -> (isValid: Bool, errorMessage: String?) {
-        guard let provider = modelProvider.coreProviderKind else {
+        guard let provider = modelProvider.coreTranscriptionModelProvider else {
             return (false, "Unsupported provider")
         }
 

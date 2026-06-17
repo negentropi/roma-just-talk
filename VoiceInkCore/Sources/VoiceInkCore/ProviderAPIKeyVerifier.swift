@@ -10,6 +10,7 @@ public struct VoiceInkProviderAPIKeyVerifier: Sendable {
     private let speechmaticsClient: VoiceInkSpeechmaticsTranscriptionClient
     private let assemblyAIClient: VoiceInkAssemblyAITranscriptionClient
     private let xaiClient: VoiceInkXAITranscriptionClient
+    private let cartesiaClient: VoiceInkCartesiaClient
 
     public init(
         openAICompatibleClient: VoiceInkOpenAICompatibleClient = VoiceInkOpenAICompatibleClient(),
@@ -20,7 +21,8 @@ public struct VoiceInkProviderAPIKeyVerifier: Sendable {
         sonioxClient: VoiceInkSonioxTranscriptionClient = VoiceInkSonioxTranscriptionClient(),
         speechmaticsClient: VoiceInkSpeechmaticsTranscriptionClient = VoiceInkSpeechmaticsTranscriptionClient(),
         assemblyAIClient: VoiceInkAssemblyAITranscriptionClient = VoiceInkAssemblyAITranscriptionClient(),
-        xaiClient: VoiceInkXAITranscriptionClient = VoiceInkXAITranscriptionClient()
+        xaiClient: VoiceInkXAITranscriptionClient = VoiceInkXAITranscriptionClient(),
+        cartesiaClient: VoiceInkCartesiaClient = VoiceInkCartesiaClient()
     ) {
         self.openAICompatibleClient = openAICompatibleClient
         self.deepgramClient = deepgramClient
@@ -31,6 +33,7 @@ public struct VoiceInkProviderAPIKeyVerifier: Sendable {
         self.speechmaticsClient = speechmaticsClient
         self.assemblyAIClient = assemblyAIClient
         self.xaiClient = xaiClient
+        self.cartesiaClient = cartesiaClient
     }
 
     public func verifyAPIKey(_ apiKey: String, for provider: VoiceInkProviderKind) async -> Bool {
@@ -95,5 +98,26 @@ public struct VoiceInkProviderAPIKeyVerifier: Sendable {
                 apiKey: apiKey
             )
         }
+    }
+
+    public func verifyAPIKeyDetailed(
+        _ apiKey: String,
+        for transcriptionProvider: VoiceInkTranscriptionModelProvider
+    ) async -> VoiceInkAPIKeyVerificationResult {
+        if transcriptionProvider == .cartesia {
+            return await cartesiaClient.verifyAPIKeyDetailed(
+                baseURL: VoiceInkProviderEndpoint.cartesiaAPIBaseURL,
+                apiKey: apiKey
+            )
+        }
+
+        guard let provider = transcriptionProvider.providerKind else {
+            return VoiceInkAPIKeyVerificationResult(
+                isValid: false,
+                errorMessage: "\(transcriptionProvider.rawValue) does not support API key verification."
+            )
+        }
+
+        return await verifyAPIKeyDetailed(apiKey, for: provider)
     }
 }

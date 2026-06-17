@@ -40,4 +40,35 @@ final class ProviderAPIKeyVerifierTests: XCTestCase {
             )
         )
     }
+
+    func testVerifierRoutesTranscriptionModelProvidersWithoutNetworkForBlankKeys() async {
+        let verifier = VoiceInkProviderAPIKeyVerifier()
+
+        for provider in VoiceInkTranscriptionModelProvider.allCases where provider != .local {
+            let result = await verifier.verifyAPIKeyDetailed(" \n\t ", for: provider)
+
+            XCTAssertEqual(
+                result,
+                VoiceInkAPIKeyVerificationResult(
+                    isValid: false,
+                    errorMessage: "API key is missing or empty."
+                ),
+                "\(provider.rawValue) should route through shared model-provider verification"
+            )
+        }
+    }
+
+    func testVerifierRejectsLocalTranscriptionModelProviderWithoutVerificationTransport() async {
+        let verifier = VoiceInkProviderAPIKeyVerifier()
+
+        let result = await verifier.verifyAPIKeyDetailed("key", for: VoiceInkTranscriptionModelProvider.local)
+
+        XCTAssertEqual(
+            result,
+            VoiceInkAPIKeyVerificationResult(
+                isValid: false,
+                errorMessage: "Local (Whisper) does not support API key verification."
+            )
+        )
+    }
 }

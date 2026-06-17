@@ -12,9 +12,6 @@ extension Notification.Name {
 enum RecordingState: Equatable {
     case idle
     case recording
-    case processing
-    case completed(String)
-    case error(String)
 }
 
 private enum MicrophonePermissionStatus {
@@ -41,14 +38,12 @@ final class RecordingManager: ObservableObject {
     @Published var animate = false
     @Published var isRecordingSheetPresented = false
     @Published var activeRecordingAlert: ActiveRecordingAlert?
-    @Published var currentRecordingNote: Transcription?
     @Published var currentDuration: Double = 0
     
     private let recorder = AudioRecorder()
     private let settings = AppSettings.shared
     private var durationTimer: Timer?
 
-    private let sessionManager = AudioSessionManager.shared
     private let coordinator = AppGroupCoordinator.shared
     
     var isRecording: Bool {
@@ -146,7 +141,6 @@ final class RecordingManager: ObservableObject {
         // Reset UI state immediately so user can continue using the app
         recordingState = .idle
         animate = false
-        currentRecordingNote = note
         isRecordingSheetPresented = false
         
         // Update coordinator state

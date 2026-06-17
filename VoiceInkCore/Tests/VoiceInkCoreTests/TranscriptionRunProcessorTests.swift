@@ -25,6 +25,26 @@ final class TranscriptionRunProcessorTests: XCTestCase {
         XCTAssertFalse(result.postProcessingSucceeded)
     }
 
+    func testTranscribeFiltersRawOutputBeforePostProcessing() async throws {
+        let processor = VoiceInkTranscriptionRunProcessor { job in
+            XCTAssertEqual(job.transcript, "hello\n\nworld")
+            return job.transcript
+        }
+
+        let result = try await processor.transcribe(
+            fileURL: URL(fileURLWithPath: "/tmp/audio.wav"),
+            configuration: configuration(isPostProcessingEnabled: true),
+            apiKeyProvider: { _ in "key" },
+            transcriptionServiceProvider: { _ in
+                StubTranscriptionService(text: "<noise>discard</noise>hello [music]\n\n\nworld")
+            }
+        )
+
+        XCTAssertEqual(result.cleanedText, "hello\n\nworld")
+        XCTAssertEqual(result.finalText, "hello\n\nworld")
+        XCTAssertTrue(result.postProcessingSucceeded)
+    }
+
     func testTranscribeRunsPostProcessingWhenEnabledWithPromptAndKey() async throws {
         let processor = VoiceInkTranscriptionRunProcessor { job in
             XCTAssertEqual(job.provider, .gemini)

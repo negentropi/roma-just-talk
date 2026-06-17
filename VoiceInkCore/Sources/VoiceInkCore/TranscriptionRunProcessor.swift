@@ -107,7 +107,11 @@ public struct VoiceInkTranscriptionRunProcessor {
             language: nil
         )
 
-        let cleanedText = VoiceInkTranscriptTextNormalizer.normalizeParagraphSpacing(rawText)
+        let filteredText = VoiceInkTranscriptionOutputFilter.filter(
+            rawText,
+            whitespacePolicy: .preserveParagraphs
+        )
+        let cleanedText = VoiceInkTranscriptTextNormalizer.normalizeParagraphSpacing(filteredText)
         let aiEnhancementModelName = configuration.isPostProcessingEnabled ? configuration.postProcessingModel : nil
 
         var finalText = cleanedText

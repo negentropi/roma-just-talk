@@ -269,7 +269,7 @@ class SystemInfoService {
     }
 
     private func getCurrentLanguage() -> String {
-        return UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage) ?? "en"
+        return VoiceInkTranscriptionLanguagePreference.selectedLanguage(fallback: "en")
     }
 
 }

@@ -64,7 +64,7 @@ struct PowerModeConfig: Codable, Identifiable, Equatable {
         self.selectedAIProvider = selectedAIProvider ?? UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.selectedAIProvider)
         self.selectedAIModel = selectedAIModel
         self.selectedTranscriptionModelName = selectedTranscriptionModelName ?? UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.currentTranscriptionModel)
-        self.selectedLanguage = selectedLanguage ?? UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage) ?? "en"
+        self.selectedLanguage = selectedLanguage ?? VoiceInkTranscriptionLanguagePreference.selectedLanguage(fallback: "en")
         self.isTextFormattingEnabled = isTextFormattingEnabled
         self.punctuationCleanupMode = punctuationCleanupMode
         self.lowercaseTranscription = lowercaseTranscription

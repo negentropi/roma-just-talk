@@ -123,19 +123,51 @@ final class UserDefaultsPreferencesTests: XCTestCase {
 
     func testTranscriptionLanguagePreferencePreservesRawSelectedLanguage() {
         withIsolatedDefaults { defaults in
-            defaults.set("auto", forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
+            VoiceInkTranscriptionLanguagePreference.saveSelectedLanguage("auto", to: defaults)
             XCTAssertEqual(
                 VoiceInkTranscriptionLanguagePreference.selectedLanguage(from: defaults),
                 "auto"
             )
             XCTAssertNil(VoiceInkTranscriptionLanguagePreference.requestLanguage(from: defaults))
 
-            defaults.set(" fr ", forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
+            VoiceInkTranscriptionLanguagePreference.saveSelectedLanguage(" fr ", to: defaults)
             XCTAssertEqual(
                 VoiceInkTranscriptionLanguagePreference.selectedLanguage(from: defaults),
                 " fr "
             )
             XCTAssertEqual(VoiceInkTranscriptionLanguagePreference.requestLanguage(from: defaults), "fr")
+        }
+    }
+
+    func testTranscriptionLanguagePreferenceExposesStoredLanguageWhenPresent() {
+        withIsolatedDefaults { defaults in
+            XCTAssertNil(VoiceInkTranscriptionLanguagePreference.storedLanguage(from: defaults))
+
+            VoiceInkTranscriptionLanguagePreference.saveSelectedLanguage("de", to: defaults)
+
+            XCTAssertEqual(VoiceInkTranscriptionLanguagePreference.storedLanguage(from: defaults), "de")
+        }
+    }
+
+    func testTranscriptionLanguagePreferenceSavesCompatibleLanguage() {
+        withIsolatedDefaults { defaults in
+            let savedLanguage = VoiceInkTranscriptionLanguagePreference.saveCompatibleLanguage(
+                "fr",
+                languages: VoiceInkLanguageCatalog.englishOnly,
+                to: defaults
+            )
+
+            XCTAssertEqual(savedLanguage, "en")
+            XCTAssertEqual(VoiceInkTranscriptionLanguagePreference.selectedLanguage(from: defaults), "en")
+        }
+    }
+
+    func testTranscriptionLanguagePreferenceClearsSelection() {
+        withIsolatedDefaults { defaults in
+            VoiceInkTranscriptionLanguagePreference.saveSelectedLanguage("fr", to: defaults)
+            VoiceInkTranscriptionLanguagePreference.clearSelectedLanguage(from: defaults)
+
+            XCTAssertNil(VoiceInkTranscriptionLanguagePreference.storedLanguage(from: defaults))
         }
     }
 

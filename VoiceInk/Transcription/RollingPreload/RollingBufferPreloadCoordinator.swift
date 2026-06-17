@@ -155,7 +155,7 @@ final class RollingBufferPreloadCoordinator {
             transcriptionModelManager?.currentTranscriptionModel
         }
         self.currentLanguageProvider = {
-            UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
+            VoiceInkTranscriptionLanguagePreference.storedLanguage()
         }
         self.detectorProvider = detectorProvider
         self.sessionFactory = { model, partialTranscriptHandler in
@@ -174,7 +174,7 @@ final class RollingBufferPreloadCoordinator {
     init(
         currentModelProvider: @escaping CurrentModelProvider,
         currentLanguageProvider: @escaping CurrentLanguageProvider = {
-            UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
+            VoiceInkTranscriptionLanguagePreference.storedLanguage()
         },
         powerStateProvider: any RollingBufferPowerStateProviding,
         detectorProvider: @escaping DetectorProvider,

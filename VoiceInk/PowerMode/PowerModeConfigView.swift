@@ -65,7 +65,7 @@ struct ConfigurationView: View {
 
     private func useCompatibleLanguage(for model: any TranscriptionModel) {
         selectedLanguage = TranscriptionLanguageSupport.validLanguageOrFallback(
-            selectedLanguage ?? UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage),
+            selectedLanguage ?? VoiceInkTranscriptionLanguagePreference.storedLanguage(),
             for: model
         )
     }
@@ -322,7 +322,7 @@ struct ConfigurationView: View {
                               let modelInfo = transcriptionModelManager.allAvailableModels.first(where: { $0.name == selectedModel }),
                               modelInfo.isMultilingualModel {
                         let languageBinding = Binding<String?>(
-                            get: { selectedLanguage ?? UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage) ?? "auto" },
+                            get: { selectedLanguage ?? VoiceInkTranscriptionLanguagePreference.selectedLanguage(fallback: "auto") },
                             set: { selectedLanguage = $0 }
                         )
 

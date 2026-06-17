@@ -92,7 +92,7 @@ class FluidAudioTranscriptionService: TranscriptionService {
         }
 
         let languageHint = Self.languageHint(
-            from: UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage),
+            from: VoiceInkTranscriptionLanguagePreference.storedLanguage(),
             model: model
         )
         let audioSamples = try readAudioSamples(from: audioURL)

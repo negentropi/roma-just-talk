@@ -56,7 +56,7 @@ final class AppSettings: ObservableObject {
 
     @Published var selectedTranscriptionLanguage: String {
         didSet {
-            UserDefaults.standard.set(selectedTranscriptionLanguage, forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
+            VoiceInkTranscriptionLanguagePreference.saveSelectedLanguage(selectedTranscriptionLanguage)
         }
     }
 
@@ -87,8 +87,7 @@ final class AppSettings: ObservableObject {
         self.removeFillerWords = UserDefaults.standard.object(forKey: VoiceInkUserDefaultsKey.removeFillerWords) as? Bool
             ?? VoiceInkPreferenceDefault.removeFillerWords
         self.fillerWords = VoiceInkFillerWordPreference.words()
-        self.selectedTranscriptionLanguage = UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
-            ?? VoiceInkLanguageCatalog.autoDetectCode
+        self.selectedTranscriptionLanguage = VoiceInkTranscriptionLanguagePreference.selectedLanguage()
 
         repairSelectedModeId()
         repairSelectedTranscriptionLanguage()
@@ -282,7 +281,7 @@ final class AppSettings: ObservableObject {
         UserDefaults.standard.removeObject(forKey: VoiceInkUserDefaultsKey.removeFillerWords)
         UserDefaults.standard.removeObject(forKey: VoiceInkUserDefaultsKey.fillerWords)
         selectedTranscriptionLanguage = VoiceInkLanguageCatalog.autoDetectCode
-        UserDefaults.standard.removeObject(forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
+        VoiceInkTranscriptionLanguagePreference.clearSelectedLanguage()
 
         // Clear API keys from memory and Keychain
         apiKeysByProvider = [:]

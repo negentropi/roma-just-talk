@@ -67,11 +67,42 @@ public enum VoiceInkTranscriptionPromptPreference {
 }
 
 public enum VoiceInkTranscriptionLanguagePreference {
+    public static func storedLanguage(from defaults: UserDefaults = .standard) -> String? {
+        defaults.string(forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
+    }
+
     public static func selectedLanguage(
         from defaults: UserDefaults = .standard,
         fallback: String = VoiceInkLanguageCatalog.autoDetectCode
     ) -> String {
-        defaults.string(forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage) ?? fallback
+        storedLanguage(from: defaults) ?? fallback
+    }
+
+    public static func saveSelectedLanguage(
+        _ language: String,
+        to defaults: UserDefaults = .standard
+    ) {
+        defaults.set(language, forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
+    }
+
+    @discardableResult
+    public static func saveCompatibleLanguage(
+        _ language: String?,
+        languages: [String: String],
+        to defaults: UserDefaults = .standard,
+        prefersNativeAppleEnglish: Bool = false
+    ) -> String {
+        let compatibleLanguage = VoiceInkTranscriptionLanguageSupport.validLanguageOrFallback(
+            language,
+            languages: languages,
+            prefersNativeAppleEnglish: prefersNativeAppleEnglish
+        )
+        saveSelectedLanguage(compatibleLanguage, to: defaults)
+        return compatibleLanguage
+    }
+
+    public static func clearSelectedLanguage(from defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
     }
 
     public static func requestLanguage(from defaults: UserDefaults = .standard) -> String? {

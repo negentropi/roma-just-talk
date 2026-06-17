@@ -1,0 +1,85 @@
+import Foundation
+
+public protocol VoiceInkDashboardMetricRecord {
+    var dashboardWordCount: Int { get }
+    var dashboardAudioDuration: TimeInterval { get }
+}
+
+public struct VoiceInkDashboardMetricsSummary: Equatable, Sendable {
+    public var totalCount: Int
+    public var totalWords: Int
+    public var totalDuration: TimeInterval
+
+    public init(
+        totalCount: Int = 0,
+        totalWords: Int = 0,
+        totalDuration: TimeInterval = 0
+    ) {
+        self.totalCount = totalCount
+        self.totalWords = totalWords
+        self.totalDuration = totalDuration
+    }
+}
+
+public struct VoiceInkDashboardMetricsAccumulator: Equatable, Sendable {
+    public private(set) var totalWords: Int
+    public private(set) var totalDuration: TimeInterval
+
+    public init(totalWords: Int = 0, totalDuration: TimeInterval = 0) {
+        self.totalWords = totalWords
+        self.totalDuration = totalDuration
+    }
+
+    public mutating func add(_ record: some VoiceInkDashboardMetricRecord) {
+        totalWords += record.dashboardWordCount
+        totalDuration += record.dashboardAudioDuration
+    }
+
+    public func summary(totalCount: Int) -> VoiceInkDashboardMetricsSummary {
+        VoiceInkDashboardMetricsSummary(
+            totalCount: totalCount,
+            totalWords: totalWords,
+            totalDuration: totalDuration
+        )
+    }
+}
+
+public struct VoiceInkDashboardMetrics: Equatable, Sendable {
+    public let summary: VoiceInkDashboardMetricsSummary
+    public let averageTypingWordsPerMinute: Double
+    public let keystrokesPerWord: Double
+
+    public init(
+        summary: VoiceInkDashboardMetricsSummary,
+        averageTypingWordsPerMinute: Double = 35,
+        keystrokesPerWord: Double = 5
+    ) {
+        self.summary = summary
+        self.averageTypingWordsPerMinute = averageTypingWordsPerMinute
+        self.keystrokesPerWord = keystrokesPerWord
+    }
+
+    public var estimatedTypingTime: TimeInterval {
+        guard averageTypingWordsPerMinute > 0 else {
+            return 0
+        }
+
+        return Double(summary.totalWords) / averageTypingWordsPerMinute * 60
+    }
+
+    public var timeSaved: TimeInterval {
+        max(estimatedTypingTime - summary.totalDuration, 0)
+    }
+
+    public var averageWordsPerMinute: Double {
+        guard summary.totalDuration > 0 else {
+            return 0
+        }
+
+        return Double(summary.totalWords) / (summary.totalDuration / 60)
+    }
+
+    public var totalKeystrokesSaved: Int {
+        Int(Double(summary.totalWords) * keystrokesPerWord)
+    }
+}

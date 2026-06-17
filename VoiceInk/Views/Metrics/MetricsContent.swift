@@ -4,27 +4,21 @@ import Foundation
 import os
 import VoiceInkCore
 
-private struct DashboardMetricsSummary: Equatable, Sendable {
-    var totalCount: Int = 0
-    var totalWords: Int = 0
-    var totalDuration: TimeInterval = 0
-}
-
 private final class DashboardMetricsCache: @unchecked Sendable {
     static let shared = DashboardMetricsCache()
 
     private let lock = NSLock()
-    private var summary: DashboardMetricsSummary?
+    private var summary: VoiceInkDashboardMetricsSummary?
 
     private init() {}
 
-    func currentSummary() -> DashboardMetricsSummary? {
+    func currentSummary() -> VoiceInkDashboardMetricsSummary? {
         lock.lock()
         defer { lock.unlock() }
         return summary
     }
 
-    func update(_ summary: DashboardMetricsSummary) {
+    func update(_ summary: VoiceInkDashboardMetricsSummary) {
         lock.lock()
         self.summary = summary
         lock.unlock()
@@ -32,7 +26,7 @@ private final class DashboardMetricsCache: @unchecked Sendable {
 }
 
 private enum DashboardMetricsLoader {
-    static func load(from modelContainer: ModelContainer) async throws -> DashboardMetricsSummary {
+    static func load(from modelContainer: ModelContainer) async throws -> VoiceInkDashboardMetricsSummary {
         let task = Task.detached(priority: .utility) {
             try Task.checkCancellation()
 
@@ -44,21 +38,15 @@ private enum DashboardMetricsLoader {
             var descriptor = FetchDescriptor<SessionMetric>()
             descriptor.propertiesToFetch = [\.wordCount, \.audioDuration]
 
-            var words = 0
-            var duration: TimeInterval = 0
+            var accumulator = VoiceInkDashboardMetricsAccumulator()
 
             try backgroundContext.enumerate(descriptor) { metric in
-                words += metric.wordCount
-                duration += metric.audioDuration
+                accumulator.add(metric)
             }
 
             try Task.checkCancellation()
 
-            return DashboardMetricsSummary(
-                totalCount: count,
-                totalWords: words,
-                totalDuration: duration
-            )
+            return accumulator.summary(totalCount: count)
         }
 
         return try await withTaskCancellationHandler {
@@ -423,23 +411,24 @@ struct MetricsContent: View {
     
     // MARK: - Computed Metrics
 
-    private var estimatedTypingTime: TimeInterval {
-        let averageTypingSpeed: Double = 35 // words per minute
-        let estimatedTypingTimeInMinutes = Double(totalWords) / averageTypingSpeed
-        return estimatedTypingTimeInMinutes * 60
+    private var dashboardMetrics: VoiceInkDashboardMetrics {
+        VoiceInkDashboardMetrics(summary: VoiceInkDashboardMetricsSummary(
+            totalCount: totalCount,
+            totalWords: totalWords,
+            totalDuration: totalDuration
+        ))
     }
 
     private var timeSaved: TimeInterval {
-        max(estimatedTypingTime - totalDuration, 0)
+        dashboardMetrics.timeSaved
     }
 
     private var averageWordsPerMinute: Double {
-        guard totalDuration > 0 else { return 0 }
-        return Double(totalWords) / (totalDuration / 60.0)
+        dashboardMetrics.averageWordsPerMinute
     }
 
     private var totalKeystrokesSaved: Int {
-        Int(Double(totalWords) * 5.0)
+        dashboardMetrics.totalKeystrokesSaved
     }
     
 }

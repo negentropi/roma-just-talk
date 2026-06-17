@@ -3,7 +3,7 @@ import SwiftData
 import VoiceInkCore
 
 @Model
-final class SessionMetric: VoiceInkPerformanceRecord {
+final class SessionMetric: VoiceInkPerformanceRecord, VoiceInkDashboardMetricRecord {
     var id: UUID = UUID()
     var transcriptionId: UUID = UUID()
     var timestamp: Date = Date()
@@ -52,4 +52,6 @@ extension SessionMetric {
     var performanceEnhancementModelName: String? { aiEnhancementModelName }
     var performanceEnhancementDuration: TimeInterval? { enhancementDuration }
     var performanceEnhancedText: String? { nil }
+    var dashboardWordCount: Int { wordCount }
+    var dashboardAudioDuration: TimeInterval { audioDuration }
 }

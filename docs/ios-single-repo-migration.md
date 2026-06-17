@@ -7,6 +7,7 @@
 - macOS app: `VoiceInk.xcodeproj`
 - iOS app and keyboard targets: `iOS/VoiceInk-ios.xcodeproj`
 - iOS app/keyboard shared shell code: `iOS/Shared/`
+- iOS unit/UI test target sources: `iOS/VoiceInk-iosTests/`, `iOS/VoiceInk-iosUITests/`
 - shared Swift package: `VoiceInkCore/`
 - workspace entry for both app projects: `VoiceInk.xcworkspace`
 

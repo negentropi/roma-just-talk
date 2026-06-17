@@ -1,4 +1,5 @@
 import SwiftUI
+import VoiceInkCore
 
 struct AddCustomModelCardView: View {
     @ObservedObject var customModelManager: CustomCloudModelManager
@@ -205,8 +206,7 @@ struct AddCustomModelCardView: View {
         let trimmedApiKey = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
         let trimmedModelName = modelName.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        // Generate a name from display name (lowercase, no spaces)
-        let generatedName = trimmedDisplayName.lowercased().replacingOccurrences(of: " ", with: "-")
+        let generatedName = VoiceInkCustomCloudModelPolicy.generatedName(fromDisplayName: trimmedDisplayName)
         
         validationErrors = customModelManager.validateModel(
             name: generatedName,
@@ -297,4 +297,4 @@ struct FormField: View {
             }
         }
     }
-} 
+}

@@ -1,5 +1,6 @@
 import Foundation
 import os
+import VoiceInkCore
 
 class CustomCloudModelManager: ObservableObject {
     static let shared = CustomCloudModelManager()
@@ -60,76 +61,17 @@ class CustomCloudModelManager: ObservableObject {
     
     // MARK: - Validation
     
-    func validateModel(name: String, displayName: String, apiEndpoint: String, apiKey: String, modelName: String) -> [String] {
-        var errors: [String] = []
-        
-        if name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            errors.append("Name cannot be empty")
-        }
-        
-        if displayName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            errors.append("Display name cannot be empty")
-        }
-        
-        if apiEndpoint.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            errors.append("API endpoint cannot be empty")
-        } else if !isValidURL(apiEndpoint) {
-            errors.append("API endpoint must be a valid URL")
-        }
-        
-        if apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            errors.append("API key cannot be empty")
-        }
-        
-        if modelName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            errors.append("Model name cannot be empty")
-        }
-        
-        // Check for duplicate names
-        if customModels.contains(where: { $0.name == name }) {
-            errors.append("A model with this name already exists")
-        }
-        
-        return errors
-    }
-    
     func validateModel(name: String, displayName: String, apiEndpoint: String, apiKey: String, modelName: String, excludingId: UUID? = nil) -> [String] {
-        var errors: [String] = []
-        
-        if name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            errors.append("Name cannot be empty")
-        }
-        
-        if displayName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            errors.append("Display name cannot be empty")
-        }
-        
-        if apiEndpoint.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            errors.append("API endpoint cannot be empty")
-        } else if !isValidURL(apiEndpoint) {
-            errors.append("API endpoint must be a valid URL")
-        }
-        
-        if apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            errors.append("API key cannot be empty")
-        }
-        
-        if modelName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            errors.append("Model name cannot be empty")
-        }
-        
-        // Check for duplicate names, excluding the specified ID
-        if customModels.contains(where: { $0.name == name && $0.id != excludingId }) {
-            errors.append("A model with this name already exists")
-        }
-        
-        return errors
-    }
-    
-    private func isValidURL(_ string: String) -> Bool {
-        if let url = URL(string: string) {
-            return url.scheme != nil && url.host != nil
-        }
-        return false
+        VoiceInkCustomCloudModelPolicy.validationErrors(
+            for: VoiceInkCustomCloudModelDraft(
+                name: name,
+                displayName: displayName,
+                apiEndpoint: apiEndpoint,
+                apiKey: apiKey,
+                modelName: modelName
+            ),
+            existingModels: customModels.map { VoiceInkCustomCloudModelIdentity(id: $0.id, name: $0.name) },
+            excludingId: excludingId
+        )
     }
 } 

@@ -57,3 +57,58 @@ public enum VoiceInkAIPrompts {
         return String(format: customPromptTemplate, promptText)
     }
 }
+
+public struct VoiceInkAIEnhancementPromptContext: Equatable, Sendable {
+    public let selectedText: String?
+    public let clipboardText: String?
+    public let currentWindowText: String?
+    public let customVocabulary: String
+
+    public init(
+        selectedText: String? = nil,
+        clipboardText: String? = nil,
+        currentWindowText: String? = nil,
+        customVocabulary: String = ""
+    ) {
+        self.selectedText = selectedText
+        self.clipboardText = clipboardText
+        self.currentWindowText = currentWindowText
+        self.customVocabulary = customVocabulary
+    }
+}
+
+public enum VoiceInkAIEnhancementPromptBuilder {
+    public static func systemMessage(
+        basePrompt: String,
+        context: VoiceInkAIEnhancementPromptContext = VoiceInkAIEnhancementPromptContext()
+    ) -> String {
+        basePrompt
+            + taggedSection("CURRENTLY_SELECTED_TEXT", text: context.selectedText)
+            + taggedSection("CLIPBOARD_CONTEXT", text: context.clipboardText)
+            + taggedSection("CURRENT_WINDOW_CONTEXT", text: context.currentWindowText)
+            + customVocabularySection(context.customVocabulary)
+    }
+
+    private static func taggedSection(_ tag: String, text: String?) -> String {
+        guard let text, !text.isEmpty else {
+            return ""
+        }
+
+        return "\n\n<\(tag)>\n\(text)\n</\(tag)>"
+    }
+
+    private static func customVocabularySection(_ customVocabulary: String) -> String {
+        guard !customVocabulary.isEmpty else {
+            return ""
+        }
+
+        return """
+
+
+        The following are important vocabulary words, proper nouns, and technical terms. When these words or similar-sounding words appear in the <TRANSCRIPT>, ensure they are spelled EXACTLY as shown below:
+        <CUSTOM_VOCABULARY>
+        \(customVocabulary)
+        </CUSTOM_VOCABULARY>
+        """
+    }
+}

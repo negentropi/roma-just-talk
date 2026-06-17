@@ -19,4 +19,56 @@ final class AIPromptsTests: XCTestCase {
         XCTAssertTrue(finalPrompt.contains("[FINAL WARNING]"))
         XCTAssertTrue(finalPrompt.contains("OUTPUT ONLY THE CLEANED UP TEXT"))
     }
+
+    func testEnhancementPromptBuilderAppendsContextSectionsInMacOSOrder() {
+        let systemMessage = VoiceInkAIEnhancementPromptBuilder.systemMessage(
+            basePrompt: "Clean this transcript.",
+            context: VoiceInkAIEnhancementPromptContext(
+                selectedText: "selected text",
+                clipboardText: "clipboard text",
+                currentWindowText: "window text",
+                customVocabulary: "Roma\nFelix"
+            )
+        )
+
+        XCTAssertEqual(
+            systemMessage,
+            """
+            Clean this transcript.
+
+            <CURRENTLY_SELECTED_TEXT>
+            selected text
+            </CURRENTLY_SELECTED_TEXT>
+
+            <CLIPBOARD_CONTEXT>
+            clipboard text
+            </CLIPBOARD_CONTEXT>
+
+            <CURRENT_WINDOW_CONTEXT>
+            window text
+            </CURRENT_WINDOW_CONTEXT>
+
+            The following are important vocabulary words, proper nouns, and technical terms. When these words or similar-sounding words appear in the <TRANSCRIPT>, ensure they are spelled EXACTLY as shown below:
+            <CUSTOM_VOCABULARY>
+            Roma
+            Felix
+            </CUSTOM_VOCABULARY>
+            """
+        )
+    }
+
+    func testEnhancementPromptBuilderSkipsMissingAndEmptyContextSections() {
+        XCTAssertEqual(
+            VoiceInkAIEnhancementPromptBuilder.systemMessage(
+                basePrompt: "Clean this transcript.",
+                context: VoiceInkAIEnhancementPromptContext(
+                    selectedText: "",
+                    clipboardText: nil,
+                    currentWindowText: "",
+                    customVocabulary: ""
+                )
+            ),
+            "Clean this transcript."
+        )
+    }
 }

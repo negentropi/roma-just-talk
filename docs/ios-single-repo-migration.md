@@ -63,6 +63,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - custom vocabulary term normalization for transcription providers; platform shells still own dictionary storage
 - custom cloud transcription model generated-name and draft validation policy; platform shells still own keychain and preferences storage
 - prompt trigger-word detection, trigger-word editing policy, and prompt-trigger AI-enhancement detection result construction; platform shells still own prompt persistence and enhancement state mutation
+- AI-enhancement prompt context assembly for selected text, clipboard, current-window text, and custom vocabulary tags; platform shells still own OS access, capture, and vocabulary storage
 - AI-enhancement custom prompt record shape, Codable compatibility, and final-prompt wrapping; macOS still owns SwiftUI prompt rendering and prompt-store orchestration
 - predefined-prompt repair/merge policy and trigger-detectable prompt filtering; macOS still owns when the prompt store is loaded and saved
 - AI-enhancement custom prompt array mutation, selected-prompt repair, and selected-prompt persistence helpers; platform shells still own notifications and UI state updates
@@ -136,6 +137,7 @@ Current macOS consumers of shared remote transport:
 - macOS `AIEnhancementService` reads request timeout and retry-on-timeout through `VoiceInkAIEnhancementRequestPreference`; SwiftUI setting controls still bind directly through `@AppStorage`.
 - macOS `TranscriptionModelManager`, `PowerModeConfig`, `SystemInfoService`, and `StreamingKeysMigration` use `VoiceInkCurrentTranscriptionModelPreference` for the selected transcription model; the legacy `"CurrentModel"` cleanup remains macOS shell migration code.
 - macOS `AIService`, `PowerModeConfig`, `PowerModeConfigView`, and `SystemInfoService` use `VoiceInkAIEnhancementProviderPreference` for selected AI provider/model storage; macOS still owns API-key lookup, Ollama/OpenRouter dynamic state, and provider execution.
+- macOS `AIEnhancementService` delegates selected-text, clipboard, current-window, and custom-vocabulary tag assembly to `VoiceInkAIEnhancementPromptBuilder`; macOS still owns Accessibility, pasteboard, screen capture, and SwiftData vocabulary collection.
 - macOS `TranscriptionAutoCleanupService`, `ImportExportService`, `BackupImporter`, `SystemInfoService`, and app startup read/write transcription auto-cleanup preferences through `VoiceInkTranscriptionAutoCleanupPreference`; settings UI still binds directly through `@AppStorage`.
 - iOS retry post-processing inherits `VoiceInkAIReasoningConfig` through `VoiceInkPostProcessingClient`, aligning OpenAI-compatible reasoning controls with macOS enhancement requests.
 

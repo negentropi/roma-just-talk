@@ -149,57 +149,26 @@ class AIEnhancementService: ObservableObject {
     }
 
     private func getSystemMessage(for mode: EnhancementPrompt) async -> String {
-        let selectedTextContext: String
-        if AXIsProcessTrusted() {
-            if let selectedText = await SelectedTextService.fetchSelectedText(), !selectedText.isEmpty {
-                selectedTextContext = "\n\n<CURRENTLY_SELECTED_TEXT>\n\(selectedText)\n</CURRENTLY_SELECTED_TEXT>"
-            } else {
-                selectedTextContext = ""
-            }
-        } else {
-            selectedTextContext = ""
-        }
-
-        let clipboardContext = if useClipboardContext,
-                              let clipboardText = lastCapturedClipboard,
-                              !clipboardText.isEmpty {
-            "\n\n<CLIPBOARD_CONTEXT>\n\(clipboardText)\n</CLIPBOARD_CONTEXT>"
-        } else {
-            ""
-        }
-
-        let screenCaptureContext = if useScreenCaptureContext,
-                                   let capturedText = screenCaptureService.lastCapturedText,
-                                   !capturedText.isEmpty {
-            "\n\n<CURRENT_WINDOW_CONTEXT>\n\(capturedText)\n</CURRENT_WINDOW_CONTEXT>"
-        } else {
-            ""
-        }
-
-        let customVocabulary = customVocabularyService.getCustomVocabulary(from: modelContext)
-
-        let allContextSections = selectedTextContext + clipboardContext + screenCaptureContext
-
-        let customVocabularySection = if !customVocabulary.isEmpty {
-            """
-
-
-            The following are important vocabulary words, proper nouns, and technical terms. When these words or similar-sounding words appear in the <TRANSCRIPT>, ensure they are spelled EXACTLY as shown below:
-            <CUSTOM_VOCABULARY>
-            \(customVocabulary)
-            </CUSTOM_VOCABULARY>
-            """
-        } else {
-            ""
-        }
-
-        let finalContextSection = allContextSections + customVocabularySection
-
         let promptText = VoiceInkCustomPromptPolicy.basePromptText(
             activePrompt: activePrompt,
             prompts: allPrompts
         )
-        return promptText + finalContextSection
+        return VoiceInkAIEnhancementPromptBuilder.systemMessage(
+            basePrompt: promptText,
+            context: VoiceInkAIEnhancementPromptContext(
+                selectedText: await selectedTextContext(),
+                clipboardText: useClipboardContext ? lastCapturedClipboard : nil,
+                currentWindowText: useScreenCaptureContext ? screenCaptureService.lastCapturedText : nil,
+                customVocabulary: customVocabularyService.getCustomVocabulary(from: modelContext)
+            )
+        )
+    }
+
+    private func selectedTextContext() async -> String? {
+        guard AXIsProcessTrusted() else {
+            return nil
+        }
+        return await SelectedTextService.fetchSelectedText()
     }
 
     private func makeRequest(text: String, mode: EnhancementPrompt) async throws -> String {

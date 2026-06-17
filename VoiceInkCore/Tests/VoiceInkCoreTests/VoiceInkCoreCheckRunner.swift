@@ -12,6 +12,8 @@ struct VoiceInkCoreCheckRunner {
         let checks: [VoiceInkCoreCheck] = [
             VoiceInkCoreCheck(name: "AIPromptsTests.testFinalPromptTextReturnsRawPromptWithoutSystemInstructions", run: { AIPromptsTests().testFinalPromptTextReturnsRawPromptWithoutSystemInstructions() }),
             VoiceInkCoreCheck(name: "AIPromptsTests.testFinalPromptTextWrapsPromptWithSystemInstructions", run: { AIPromptsTests().testFinalPromptTextWrapsPromptWithSystemInstructions() }),
+            VoiceInkCoreCheck(name: "AIPromptsTests.testEnhancementPromptBuilderAppendsContextSectionsInMacOSOrder", run: { AIPromptsTests().testEnhancementPromptBuilderAppendsContextSectionsInMacOSOrder() }),
+            VoiceInkCoreCheck(name: "AIPromptsTests.testEnhancementPromptBuilderSkipsMissingAndEmptyContextSections", run: { AIPromptsTests().testEnhancementPromptBuilderSkipsMissingAndEmptyContextSections() }),
             VoiceInkCoreCheck(name: "AIReasoningConfigTests.testTemperatureUsesRequiredGPT5Temperature", run: { AIReasoningConfigTests().testTemperatureUsesRequiredGPT5Temperature() }),
             VoiceInkCoreCheck(name: "AIReasoningConfigTests.testReasoningEffortMatchesProviderModelPolicy", run: { AIReasoningConfigTests().testReasoningEffortMatchesProviderModelPolicy() }),
             VoiceInkCoreCheck(name: "AIReasoningConfigTests.testExtraBodyParametersMatchProviderModelPolicy", run: { AIReasoningConfigTests().testExtraBodyParametersMatchProviderModelPolicy() }),

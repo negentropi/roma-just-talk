@@ -71,10 +71,11 @@ struct TranscriptionInfoPanel: View {
                 )
             }
 
-            if let powerModeValue = powerModeDisplay(
+            let powerModeValue = VoiceInkPowerModePresentation.displayName(
                 name: transcription.powerModeName,
                 emoji: transcription.powerModeEmoji
-            ) {
+            )
+            if !powerModeValue.isEmpty {
                 metadataRow(
                     icon: "bolt.fill",
                     label: "Power Mode",
@@ -157,21 +158,6 @@ struct TranscriptionInfoPanel: View {
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundColor(.primary)
                 .lineLimit(1)
-        }
-    }
-
-    private func powerModeDisplay(name: String?, emoji: String?) -> String? {
-        guard name != nil || emoji != nil else { return nil }
-
-        switch (emoji?.trimmingCharacters(in: .whitespacesAndNewlines), name?.trimmingCharacters(in: .whitespacesAndNewlines)) {
-        case let (.some(emojiValue), .some(nameValue)) where !emojiValue.isEmpty && !nameValue.isEmpty:
-            return "\(emojiValue) \(nameValue)"
-        case let (.some(emojiValue), _) where !emojiValue.isEmpty:
-            return emojiValue
-        case let (_, .some(nameValue)) where !nameValue.isEmpty:
-            return nameValue
-        default:
-            return nil
         }
     }
 }

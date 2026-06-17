@@ -53,7 +53,12 @@ public enum VoiceInkTranscriptionCSVExporter {
                 escapeCSVString(record.enhancementModel ?? ""),
                 escapeCSVString(record.promptName ?? ""),
                 escapeCSVString(record.transcriptionModel ?? ""),
-                escapeCSVString(powerModeDisplay(name: record.powerModeName, emoji: record.powerModeEmoji)),
+                escapeCSVString(
+                    VoiceInkPowerModePresentation.displayName(
+                        name: record.powerModeName,
+                        emoji: record.powerModeEmoji
+                    )
+                ),
                 "\(record.enhancementTime ?? 0)",
                 "\(record.transcriptionTime ?? 0)",
                 record.timestamp.ISO8601Format(),
@@ -75,16 +80,4 @@ public enum VoiceInkTranscriptionCSVExporter {
         return escapedString
     }
 
-    public static func powerModeDisplay(name: String?, emoji: String?) -> String {
-        switch (emoji?.trimmingCharacters(in: .whitespacesAndNewlines), name?.trimmingCharacters(in: .whitespacesAndNewlines)) {
-        case let (.some(emojiValue), .some(nameValue)) where !emojiValue.isEmpty && !nameValue.isEmpty:
-            return "\(emojiValue) \(nameValue)"
-        case let (.some(emojiValue), _) where !emojiValue.isEmpty:
-            return emojiValue
-        case let (_, .some(nameValue)) where !nameValue.isEmpty:
-            return nameValue
-        default:
-            return ""
-        }
-    }
 }

@@ -43,10 +43,17 @@ final class TranscriptionCSVExportTests: XCTestCase {
         XCTAssertEqual(VoiceInkTranscriptionCSVExporter.escapeCSVString("he said \"yes\""), "he said \"\"yes\"\"")
     }
 
-    func testPowerModeDisplayTrimsAndCombinesEmojiAndName() {
-        XCTAssertEqual(VoiceInkTranscriptionCSVExporter.powerModeDisplay(name: " Writing ", emoji: " W "), "W Writing")
-        XCTAssertEqual(VoiceInkTranscriptionCSVExporter.powerModeDisplay(name: nil, emoji: " W "), "W")
-        XCTAssertEqual(VoiceInkTranscriptionCSVExporter.powerModeDisplay(name: " Writing ", emoji: nil), "Writing")
-        XCTAssertEqual(VoiceInkTranscriptionCSVExporter.powerModeDisplay(name: " ", emoji: " "), "")
+    func testCSVStringUsesSharedPowerModeDisplayName() {
+        let csv = VoiceInkTranscriptionCSVExporter.csvString(for: [
+            VoiceInkTranscriptionCSVRecord(
+                originalText: "raw",
+                powerModeName: " Writing ",
+                powerModeEmoji: " W ",
+                timestamp: Date(timeIntervalSince1970: 0),
+                duration: 0
+            )
+        ])
+
+        XCTAssertTrue(csv.contains("W Writing"))
     }
 }

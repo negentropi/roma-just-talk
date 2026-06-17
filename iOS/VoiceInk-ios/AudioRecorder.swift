@@ -55,8 +55,7 @@ final class AudioRecorder: NSObject, ObservableObject {
                 self.audioRecorder?.updateMeters()
 
                 if let power = self.audioRecorder?.averagePower(forChannel: 0) {
-                    // Convert dB (-160..0) to 0..1
-                    let normalized = max(0, min(1, (power + 60) / 60))
+                    let normalized = VoiceInkAudioMeterLevel.normalizedLevel(forDecibels: power)
                     self.levelsHistory.append(CGFloat(normalized))
                     if self.levelsHistory.count > 40 { self.levelsHistory.removeFirst(self.levelsHistory.count - 40) }
                 }

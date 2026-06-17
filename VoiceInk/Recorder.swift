@@ -2,6 +2,7 @@ import Foundation
 import AVFoundation
 import CoreAudio
 import os
+import VoiceInkCore
 
 @MainActor
 class Recorder: NSObject, ObservableObject {
@@ -279,32 +280,13 @@ class Recorder: NSObject, ObservableObject {
         let averagePower = recorder.averagePower
         let peakPower = recorder.peakPower
 
-        // Normalize values
-        let minVisibleDb: Float = -60.0
-        let maxVisibleDb: Float = 0.0
-
-        let normalizedAverage: Float
-        if averagePower < minVisibleDb {
-            normalizedAverage = 0.0
-        } else if averagePower >= maxVisibleDb {
-            normalizedAverage = 1.0
-        } else {
-            normalizedAverage = (averagePower - minVisibleDb) / (maxVisibleDb - minVisibleDb)
-        }
-
-        let normalizedPeak: Float
-        if peakPower < minVisibleDb {
-            normalizedPeak = 0.0
-        } else if peakPower >= maxVisibleDb {
-            normalizedPeak = 1.0
-        } else {
-            normalizedPeak = (peakPower - minVisibleDb) / (maxVisibleDb - minVisibleDb)
-        }
+        let normalizedAverage = VoiceInkAudioMeterLevel.normalizedLevel(forDecibels: averagePower)
+        let normalizedPeak = VoiceInkAudioMeterLevel.normalizedLevel(forDecibels: peakPower)
 
         // Apply EMA smoothing with thread-safe access
         smoothedValuesLock.lock()
-        smoothedAverage = smoothedAverage * 0.6 + normalizedAverage * 0.4
-        smoothedPeak = smoothedPeak * 0.6 + normalizedPeak * 0.4
+        smoothedAverage = VoiceInkAudioMeterLevel.smoothedLevel(previous: smoothedAverage, current: normalizedAverage)
+        smoothedPeak = VoiceInkAudioMeterLevel.smoothedLevel(previous: smoothedPeak, current: normalizedPeak)
         let newAudioMeter = AudioMeter(averagePower: Double(smoothedAverage), peakPower: Double(smoothedPeak))
         smoothedValuesLock.unlock()
 

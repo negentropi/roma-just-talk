@@ -86,6 +86,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - local Whisper runtime defaults and runtime configuration for request-language normalization, prompt, thread count, transcription temperature, VAD enablement, VAD model path eligibility, and VAD thresholds
 - VAD bundle resource lookup
 - PCM16 sample conversion and mono 16 kHz transcription-audio format constants, including bit depth, endian, and integer/float sample policy
+- audio-meter decibel normalization and smoothing math; platform shells still own capture, timers, and visualizer rendering
 - OpenAI-compatible, Deepgram, Gemini, Mistral, ElevenLabs, xAI, Soniox, Speechmatics, and AssemblyAI remote transcription request/client helpers
 - shared remote transcription provider dispatch plus batch request option defaults for provider-specific prompt, vocabulary, timeout, retry, and formatting parameters
 - Cartesia API-key verification request/client helper
@@ -173,6 +174,7 @@ Current iOS consumers of shared remote transport:
 - `iOS/VoiceInk-ios/WhisperTranscriptionService.swift` resolves the selected mode's local Whisper model path through `VoiceInkWhisperModelFiles`, preserving today's base-model behavior while keeping future local model selection on the shared runtime-model contract.
 - `iOS/VoiceInk-ios/LibWhisper.swift` reads `VoiceInkWhisperRuntimeConfiguration` to assemble language, prompt, thread count, temperature, and VAD settings before adapting them into whisper.cpp, so missing settings use the shared macOS default while keeping iOS whisper.cpp execution in the iOS shell.
 - `iOS/VoiceInk-ios/AudioRecorder.swift` maps AVFoundation recorder settings from `VoiceInkPCM16Audio`, so iOS live recording uses the same 16 kHz mono, 16-bit little-endian integer format contract as macOS local transcription while keeping capture/session lifecycle in the iOS shell.
+- macOS `Recorder` and iOS `AudioRecorder` normalize audio-meter decibels through `VoiceInkAudioMeterLevel`; macOS still owns smoothing state/timer delivery, and iOS still owns the visible level history.
 - `iOS/VoiceInk-ios/VoiceInk-ios/Transcription.swift` supplies its Documents/Recordings directory through `VoiceInkStoredAudioRecord`, so iOS note detail, retry transcription, and deletion share the same record-level audio-file behavior as macOS.
 - `iOS/VoiceInk-ios/ProviderAPIKeyView.swift` verifies stored provider keys through `VoiceInkProviderAPIKeyVerifier`, and both macOS/iOS provider-key screens use `VoiceInkProviderCredential.nonBlank` for draft-key submit enablement, so shared core owns blank-key policy before transport verification.
 - `iOS/VoiceInk-ios/AppSettings.swift` and `ModeConfigurationView.swift` delegate active-mode transcription language availability, provider-change model repair, and selected-language repair to the shared `Mode` policy; `SettingsView` keeps only the SwiftUI option rendering.

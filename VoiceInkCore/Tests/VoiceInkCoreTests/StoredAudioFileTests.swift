@@ -166,4 +166,59 @@ final class StoredAudioFileTests: XCTestCase {
 
         XCTAssertNil(deletedURL)
     }
+
+    func testStoredAudioRecordUsesDefaultRecordingsDirectory() {
+        let recordingsDirectory = URL(fileURLWithPath: "/tmp/VoiceInk/Recordings", isDirectory: true)
+        let record = StubStoredAudioRecord(
+            audioFileURL: "voiceink-recording.m4a",
+            storedAudioRecordingsDirectory: recordingsDirectory
+        )
+
+        XCTAssertEqual(
+            record.resolvedAudioFileURL()?.path,
+            "/tmp/VoiceInk/Recordings/voiceink-recording.m4a"
+        )
+    }
+
+    func testStoredAudioRecordAllowsExplicitRecordingsDirectoryOverride() {
+        let defaultDirectory = URL(fileURLWithPath: "/tmp/default/Recordings", isDirectory: true)
+        let overrideDirectory = URL(fileURLWithPath: "/tmp/override/Recordings", isDirectory: true)
+        let record = StubStoredAudioRecord(
+            audioFileURL: "voiceink-recording.m4a",
+            storedAudioRecordingsDirectory: defaultDirectory
+        )
+
+        XCTAssertEqual(
+            record.resolvedAudioFileURL(relativeTo: overrideDirectory)?.path,
+            "/tmp/override/Recordings/voiceink-recording.m4a"
+        )
+    }
+
+    func testStoredAudioRecordDeleteUsesResolvedRecordFile() throws {
+        let baseDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.StoredAudioFileTests.\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: baseDirectory) }
+
+        let recordingsDirectory = try VoiceInkStoredAudioFile.createRecordingsDirectory(in: baseDirectory)
+        let fileURL = VoiceInkStoredAudioFile.fileURL(forFilename: "voiceink-recording.m4a", in: recordingsDirectory)
+        try Data().write(to: fileURL)
+        let record = StubStoredAudioRecord(
+            audioFileURL: "voiceink-recording.m4a",
+            storedAudioRecordingsDirectory: recordingsDirectory
+        )
+
+        XCTAssertTrue(record.hasStoredAudioFile())
+        XCTAssertEqual(try record.deleteExistingAudioFile()?.path, fileURL.path)
+        XCTAssertFalse(record.hasStoredAudioFile())
+    }
+}
+
+private final class StubStoredAudioRecord: VoiceInkStoredAudioRecord {
+    var audioFileURL: String?
+    let storedAudioRecordingsDirectory: URL?
+
+    init(audioFileURL: String?, storedAudioRecordingsDirectory: URL?) {
+        self.audioFileURL = audioFileURL
+        self.storedAudioRecordingsDirectory = storedAudioRecordingsDirectory
+    }
 }

@@ -3,7 +3,7 @@ import SwiftData
 import VoiceInkCore
 
 @Model
-final class Transcription: VoiceInkMutableTranscriptionRecord {
+final class Transcription: VoiceInkMutableTranscriptionRecord, VoiceInkStoredAudioRecord {
     var id: UUID
     var text: String
     var enhancedText: String?
@@ -32,29 +32,8 @@ final class Transcription: VoiceInkMutableTranscriptionRecord {
         self.transcriptionError = transcriptionError
     }
     
-    var resolvedAudioFileURL: URL? {
-        VoiceInkStoredAudioFile.resolvedURL(for: audioFileURL, relativeTo: Self.recordingsDirectory)
-    }
-
-    func existingAudioFileURL(fileManager: FileManager = .default) -> URL? {
-        VoiceInkStoredAudioFile.existingURL(
-            for: audioFileURL,
-            relativeTo: Self.recordingsDirectory,
-            fileManager: fileManager
-        )
-    }
-
-    func hasStoredAudioFile(fileManager: FileManager = .default) -> Bool {
-        existingAudioFileURL(fileManager: fileManager) != nil
-    }
-
-    @discardableResult
-    func deleteExistingAudioFile(fileManager: FileManager = .default) throws -> URL? {
-        try VoiceInkStoredAudioFile.deleteExistingFile(
-            for: audioFileURL,
-            relativeTo: Self.recordingsDirectory,
-            fileManager: fileManager
-        )
+    var storedAudioRecordingsDirectory: URL? {
+        Self.recordingsDirectory
     }
 
     private static var recordingsDirectory: URL {

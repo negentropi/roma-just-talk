@@ -129,3 +129,51 @@ public enum VoiceInkStoredAudioFile {
         return trimmed.isEmpty ? nil : trimmed
     }
 }
+
+public protocol VoiceInkStoredAudioRecord: AnyObject {
+    var audioFileURL: String? { get set }
+    var storedAudioRecordingsDirectory: URL? { get }
+}
+
+public extension VoiceInkStoredAudioRecord {
+    var storedAudioRecordingsDirectory: URL? {
+        nil
+    }
+
+    func resolvedAudioFileURL(relativeTo recordingsDirectory: URL? = nil) -> URL? {
+        VoiceInkStoredAudioFile.resolvedURL(
+            for: audioFileURL,
+            relativeTo: recordingsDirectory ?? storedAudioRecordingsDirectory
+        )
+    }
+
+    func existingAudioFileURL(
+        relativeTo recordingsDirectory: URL? = nil,
+        fileManager: FileManager = .default
+    ) -> URL? {
+        VoiceInkStoredAudioFile.existingURL(
+            for: audioFileURL,
+            relativeTo: recordingsDirectory ?? storedAudioRecordingsDirectory,
+            fileManager: fileManager
+        )
+    }
+
+    func hasStoredAudioFile(
+        relativeTo recordingsDirectory: URL? = nil,
+        fileManager: FileManager = .default
+    ) -> Bool {
+        existingAudioFileURL(relativeTo: recordingsDirectory, fileManager: fileManager) != nil
+    }
+
+    @discardableResult
+    func deleteExistingAudioFile(
+        relativeTo recordingsDirectory: URL? = nil,
+        fileManager: FileManager = .default
+    ) throws -> URL? {
+        try VoiceInkStoredAudioFile.deleteExistingFile(
+            for: audioFileURL,
+            relativeTo: recordingsDirectory ?? storedAudioRecordingsDirectory,
+            fileManager: fileManager
+        )
+    }
+}

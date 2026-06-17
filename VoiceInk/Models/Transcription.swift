@@ -3,7 +3,7 @@ import SwiftData
 import VoiceInkCore
 
 @Model
-final class Transcription {
+final class Transcription: VoiceInkStoredAudioRecord {
     static let canceledTranscriptionText = "The transcription was canceled."
 
     var id: UUID
@@ -86,37 +86,4 @@ final class Transcription {
         }
     }
 
-    func resolvedAudioFileURL(relativeTo recordingsDirectory: URL? = nil) -> URL? {
-        VoiceInkStoredAudioFile.resolvedURL(for: audioFileURL, relativeTo: recordingsDirectory)
-    }
-
-    func existingAudioFileURL(
-        relativeTo recordingsDirectory: URL? = nil,
-        fileManager: FileManager = .default
-    ) -> URL? {
-        VoiceInkStoredAudioFile.existingURL(
-            for: audioFileURL,
-            relativeTo: recordingsDirectory,
-            fileManager: fileManager
-        )
-    }
-
-    func hasStoredAudioFile(
-        relativeTo recordingsDirectory: URL? = nil,
-        fileManager: FileManager = .default
-    ) -> Bool {
-        existingAudioFileURL(relativeTo: recordingsDirectory, fileManager: fileManager) != nil
-    }
-
-    @discardableResult
-    func deleteExistingAudioFile(
-        relativeTo recordingsDirectory: URL? = nil,
-        fileManager: FileManager = .default
-    ) throws -> URL? {
-        try VoiceInkStoredAudioFile.deleteExistingFile(
-            for: audioFileURL,
-            relativeTo: recordingsDirectory,
-            fileManager: fileManager
-        )
-    }
 }

@@ -171,11 +171,9 @@ enum SpecialShortcutEmptyTranscriptionFallback {
     }
 
     private static var pendingFallback: PendingFallback?
-    private static let emptyTapThreshold: TimeInterval = 0.32
-    private static let fallbackLifetime: TimeInterval = 30
 
     static func shouldFallback(pressDuration: TimeInterval) -> Bool {
-        pressDuration < emptyTapThreshold
+        VoiceInkSpecialShortcutEmptyFallbackPolicy.shouldScheduleFallback(pressDuration: pressDuration)
     }
 
     static func scheduleFallback() {
@@ -193,11 +191,12 @@ enum SpecialShortcutEmptyTranscriptionFallback {
 
         self.pendingFallback = nil
 
-        guard Date().timeIntervalSince(pendingFallback.createdAt) <= fallbackLifetime,
-              transcription.transcriptionState == .completed,
-              transcription.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
-              transcription.enhancedText?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty != false
-        else {
+        guard VoiceInkSpecialShortcutEmptyFallbackPolicy.shouldConsumeFallback(
+            createdAt: pendingFallback.createdAt,
+            transcriptionStatus: transcription.transcriptionState,
+            rawText: transcription.text,
+            enhancedText: transcription.enhancedText
+        ) else {
             return false
         }
 

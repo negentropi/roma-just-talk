@@ -440,7 +440,11 @@ public enum VoiceInkModeStorage {
             return []
         }
 
-        return modes
+        return modes.map { mode in
+            var repairedMode = mode
+            repairedMode.repairModelSelection()
+            return repairedMode
+        }
     }
 
     public static func saveSelectedModeId(_ selectedModeId: UUID?, to defaults: UserDefaults = .standard) {

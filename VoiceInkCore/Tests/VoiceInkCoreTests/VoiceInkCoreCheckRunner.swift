@@ -184,6 +184,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "UserDefaultsPreferencesTests.testTranscriptionAutoCleanupConfigurationBuildsCutoffDate", run: { UserDefaultsPreferencesTests().testTranscriptionAutoCleanupConfigurationBuildsCutoffDate() }),
             VoiceInkCoreCheck(name: "UserDefaultsPreferencesTests.testSharedPreferenceResetClearsCoreUserSettings", run: { UserDefaultsPreferencesTests().testSharedPreferenceResetClearsCoreUserSettings() }),
             VoiceInkCoreCheck(name: "UserDefaultsPreferencesTests.testModeStorageRoundTripsModesAndSelectedModeId", run: { UserDefaultsPreferencesTests().testModeStorageRoundTripsModesAndSelectedModeId() }),
+            VoiceInkCoreCheck(name: "UserDefaultsPreferencesTests.testModeStorageRepairsStaleModelSelectionsOnLoad", run: { UserDefaultsPreferencesTests().testModeStorageRepairsStaleModelSelectionsOnLoad() }),
             VoiceInkCoreCheck(name: "UserDefaultsPreferencesTests.testModeStorageFallsBackToEmptyModesForMissingOrInvalidData", run: { UserDefaultsPreferencesTests().testModeStorageFallsBackToEmptyModesForMissingOrInvalidData() }),
             VoiceInkCoreCheck(name: "UserDefaultsPreferencesTests.testModeStorageClearRemovesModesAndSelectedModeId", run: { UserDefaultsPreferencesTests().testModeStorageClearRemovesModesAndSelectedModeId() }),
             VoiceInkCoreCheck(name: "UserDefaultsPreferencesTests.testCustomPromptStorageRoundTripsPromptsAndSelectedPromptId", run: { UserDefaultsPreferencesTests().testCustomPromptStorageRoundTripsPromptsAndSelectedPromptId() }),

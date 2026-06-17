@@ -634,6 +634,27 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testModeStorageRepairsStaleModelSelectionsOnLoad() {
+        withIsolatedDefaults { defaults in
+            let staleMode = Mode(
+                name: "Cloud",
+                transcriptionProvider: .deepgram,
+                transcriptionModel: "stale-transcription-model",
+                isPostProcessingEnabled: true,
+                postProcessingProvider: .gemini,
+                postProcessingModel: "stale-post-processing-model"
+            )
+
+            VoiceInkModeStorage.saveModes([staleMode], to: defaults)
+
+            let loadedMode = VoiceInkModeStorage.loadModes(from: defaults).first
+
+            XCTAssertEqual(loadedMode?.id, staleMode.id)
+            XCTAssertEqual(loadedMode?.transcriptionModel, VoiceInkProviderKind.deepgram.defaultModel(for: .transcription))
+            XCTAssertEqual(loadedMode?.postProcessingModel, VoiceInkProviderKind.gemini.defaultModel(for: .postProcessing))
+        }
+    }
+
     func testModeStorageFallsBackToEmptyModesForMissingOrInvalidData() {
         withIsolatedDefaults { defaults in
             XCTAssertTrue(VoiceInkModeStorage.loadModes(from: defaults).isEmpty)

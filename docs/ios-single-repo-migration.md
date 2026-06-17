@@ -43,7 +43,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - remote transcription provider dispatch for iOS retry transcription
 - mode runtime configuration, default local mode selection, provider-change and stale model repair, selected-mode repair, mode-based transcription language availability, and selected-language repair
 - mode provider-selection repair and draft saveability rules
-- shared UserDefaults key names, including cleanup preferences, plus iOS mode persistence helpers
+- shared UserDefaults key names, including cleanup preferences, plus iOS mode persistence helpers with stale model repair on load
 - onboarding completion, iOS audio-session timeout, and core-owned user preference reset storage; platform shells still own first-run flow, audio-session lifecycle, keychain clearing, file deletion, and settings UI bindings
 - current transcription model preference loading/saving/clearing; platform shells still own model availability, download/runtime state, and legacy key cleanup
 - transcript status, presentation helpers, and localized standard transcript search semantics
@@ -165,6 +165,7 @@ Current iOS consumers of shared remote transport:
 - `iOS/VoiceInk-ios/ProviderAPIKeyView.swift` verifies stored provider keys through `VoiceInkProviderAPIKeyVerifier`, so shared core owns reference/fallback resolution before transport verification.
 - `iOS/VoiceInk-ios/AppSettings.swift` and `ModeConfigurationView.swift` delegate active-mode transcription language availability, provider-change model repair, and selected-language repair to the shared `Mode` policy; `SettingsView` keeps only the SwiftUI option rendering.
 - `VoiceInkTranscriptionRunProcessor` callers receive runtime mode configurations with stale transcription and post-processing model IDs repaired by `Mode`, so persisted iOS mode records cannot bypass the shared provider model-selection policy.
+- `VoiceInkModeStorage.loadModes()` repairs stale transcription and post-processing model IDs before `AppSettings` exposes loaded modes to iOS UI or retry transcription.
 - `iOS/VoiceInk-ios/TranscriptionRetryService.swift` passes the selected transcription language and local Whisper prompt into `VoiceInkTranscriptionRunProcessor`, so runtime transcription input is explicit and the iOS local Whisper adapter does not read app preferences directly.
 - `iOS/VoiceInk-ios/WhisperTranscriptionService.swift` throws `VoiceInkEngineError` from `VoiceInkCore` instead of owning a separate iOS-only local Whisper error enum.
 - Cartesia remains absent from iOS transcription provider selection until an iOS streaming adapter exists; it is not a batch provider.

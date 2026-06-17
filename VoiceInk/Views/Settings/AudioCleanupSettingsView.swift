@@ -1,12 +1,13 @@
 import SwiftUI
 import SwiftData
+import VoiceInkCore
 
 struct AudioCleanupSettingsView: View {
     @Environment(\.modelContext) private var modelContext
 
     // Audio cleanup settings
-    @AppStorage("IsTranscriptionCleanupEnabled") private var isTranscriptionCleanupEnabled = false
-    @AppStorage("TranscriptionRetentionMinutes") private var transcriptionRetentionMinutes = 24 * 60
+    @AppStorage(VoiceInkUserDefaultsKey.isTranscriptionCleanupEnabled) private var isTranscriptionCleanupEnabled = false
+    @AppStorage(VoiceInkUserDefaultsKey.transcriptionRetentionMinutes) private var transcriptionRetentionMinutes = VoiceInkPreferenceDefault.transcriptionRetentionMinutes
     @AppStorage("IsAudioCleanupEnabled") private var isAudioCleanupEnabled = false
     @AppStorage("AudioRetentionPeriod") private var audioRetentionPeriod = 7
     @State private var isPerformingCleanup = false

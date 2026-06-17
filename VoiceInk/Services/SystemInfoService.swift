@@ -68,8 +68,8 @@ class SystemInfoService {
         Persist Configured Preferences: \(UserDefaults.standard.bool(forKey: "powerModePersistConfig"))
 
         DATA CLEANUP SETTINGS:
-        Auto-Delete Transcriptions: \(UserDefaults.standard.bool(forKey: "IsTranscriptionCleanupEnabled"))
-        Transcription Retention: \(UserDefaults.standard.integer(forKey: "TranscriptionRetentionMinutes")) minutes
+        Auto-Delete Transcriptions: \(UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.isTranscriptionCleanupEnabled))
+        Transcription Retention: \(UserDefaults.standard.integer(forKey: VoiceInkUserDefaultsKey.transcriptionRetentionMinutes)) minutes
         Auto-Delete Audio Files: \(UserDefaults.standard.bool(forKey: "IsAudioCleanupEnabled"))
         Audio Retention Period: \(UserDefaults.standard.integer(forKey: "AudioRetentionPeriod")) days
 

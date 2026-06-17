@@ -8,11 +8,14 @@ public enum VoiceInkUserDefaultsKey {
     public static let modes = "modes"
     public static let selectedModeId = "selectedModeId"
     public static let selectedTranscriptionLanguage = "SelectedLanguage"
+    public static let isTranscriptionCleanupEnabled = "IsTranscriptionCleanupEnabled"
+    public static let transcriptionRetentionMinutes = "TranscriptionRetentionMinutes"
     public static let audioSessionTimeoutSeconds = "audioSessionTimeoutSeconds"
 }
 
 public enum VoiceInkPreferenceDefault {
     public static let audioSessionTimeoutSeconds = 90
+    public static let transcriptionRetentionMinutes = 24 * 60
 }
 
 public enum VoiceInkModeStorage {

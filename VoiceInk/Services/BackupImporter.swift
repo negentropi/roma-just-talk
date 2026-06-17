@@ -16,8 +16,6 @@ enum BackupImportError: LocalizedError {
 
 enum BackupImporter {
     private static let keyIsAudioCleanupEnabled = "IsAudioCleanupEnabled"
-    private static let keyIsTranscriptionCleanupEnabled = "IsTranscriptionCleanupEnabled"
-    private static let keyTranscriptionRetentionMinutes = "TranscriptionRetentionMinutes"
     private static let keyAudioRetentionPeriod = "AudioRetentionPeriod"
 
     private static let keyIsTextFormattingEnabled = "IsTextFormattingEnabled"
@@ -164,10 +162,10 @@ enum BackupImporter {
         }
 
         if let transcriptionCleanup = general.isTranscriptionCleanupEnabled {
-            UserDefaults.standard.set(transcriptionCleanup, forKey: keyIsTranscriptionCleanupEnabled)
+            UserDefaults.standard.set(transcriptionCleanup, forKey: VoiceInkUserDefaultsKey.isTranscriptionCleanupEnabled)
         }
         if let transcriptionMinutes = general.transcriptionRetentionMinutes {
-            UserDefaults.standard.set(transcriptionMinutes, forKey: keyTranscriptionRetentionMinutes)
+            UserDefaults.standard.set(transcriptionMinutes, forKey: VoiceInkUserDefaultsKey.transcriptionRetentionMinutes)
         }
         if let audioCleanup = general.isAudioCleanupEnabled {
             UserDefaults.standard.set(audioCleanup, forKey: keyIsAudioCleanupEnabled)

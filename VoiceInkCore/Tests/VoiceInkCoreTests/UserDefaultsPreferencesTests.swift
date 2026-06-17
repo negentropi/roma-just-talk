@@ -10,11 +10,17 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkUserDefaultsKey.modes, "modes")
         XCTAssertEqual(VoiceInkUserDefaultsKey.selectedModeId, "selectedModeId")
         XCTAssertEqual(VoiceInkUserDefaultsKey.selectedTranscriptionLanguage, "SelectedLanguage")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.isTranscriptionCleanupEnabled, "IsTranscriptionCleanupEnabled")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.transcriptionRetentionMinutes, "TranscriptionRetentionMinutes")
         XCTAssertEqual(VoiceInkUserDefaultsKey.audioSessionTimeoutSeconds, "audioSessionTimeoutSeconds")
     }
 
     func testSharedPreferenceDefaultsPreserveExistingIOSAudioSessionTimeout() {
         XCTAssertEqual(VoiceInkPreferenceDefault.audioSessionTimeoutSeconds, 90)
+    }
+
+    func testSharedPreferenceDefaultsPreserveExistingCleanupRetention() {
+        XCTAssertEqual(VoiceInkPreferenceDefault.transcriptionRetentionMinutes, 24 * 60)
     }
 
     func testModeStorageRoundTripsModesAndSelectedModeId() {

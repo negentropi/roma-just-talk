@@ -49,8 +49,8 @@ enum AppDefaults {
             "CurrentTranscriptionModel": "parakeet-tdt-0.6b-v2",
 
             // Cleanup
-            "IsTranscriptionCleanupEnabled": false,
-            "TranscriptionRetentionMinutes": 1440,
+            VoiceInkUserDefaultsKey.isTranscriptionCleanupEnabled: false,
+            VoiceInkUserDefaultsKey.transcriptionRetentionMinutes: VoiceInkPreferenceDefault.transcriptionRetentionMinutes,
             "IsAudioCleanupEnabled": false,
             "AudioRetentionPeriod": 7,
 

@@ -22,10 +22,6 @@ final class AppSettings: ObservableObject {
         }
     }
     
-    var selectedMode: Mode? {
-        modes.activeMode(selectedModeId: selectedModeId)
-    }
-
     @Published private var apiKeysByProvider: [VoiceInkProviderKind: String]
     @Published private var verifiedAPIKeyProviders: Set<VoiceInkProviderKind>
     
@@ -168,10 +164,7 @@ final class AppSettings: ObservableObject {
     }
 
     var availableTranscriptionLanguages: [String: String] {
-        guard let provider = selectedMode?.transcriptionProvider else {
-            return VoiceInkLanguageCatalog.whisperLanguages()
-        }
-        return VoiceInkLanguageCatalog.languages(for: provider)
+        modes.transcriptionLanguages(selectedModeId: selectedModeId)
     }
 
     func setSelectedTranscriptionLanguage(_ language: String) {
@@ -180,9 +173,9 @@ final class AppSettings: ObservableObject {
     }
 
     func repairSelectedTranscriptionLanguage() {
-        let compatibleLanguage = VoiceInkTranscriptionLanguageSupport.validLanguageOrFallback(
+        let compatibleLanguage = modes.repairedSelectedTranscriptionLanguage(
             selectedTranscriptionLanguage,
-            languages: availableTranscriptionLanguages
+            selectedModeId: selectedModeId
         )
 
         if selectedTranscriptionLanguage != compatibleLanguage {

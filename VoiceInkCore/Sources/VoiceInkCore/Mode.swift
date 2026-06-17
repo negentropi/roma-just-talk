@@ -156,6 +156,24 @@ public extension Collection where Element == Mode {
         activeMode(selectedModeId: selectedModeId)?.runtimeConfiguration ?? .fallback
     }
 
+    func transcriptionLanguages(selectedModeId: UUID?) -> [String: String] {
+        guard let provider = activeMode(selectedModeId: selectedModeId)?.transcriptionProvider else {
+            return VoiceInkLanguageCatalog.whisperLanguages()
+        }
+
+        return VoiceInkLanguageCatalog.languages(for: provider)
+    }
+
+    func repairedSelectedTranscriptionLanguage(
+        _ language: String?,
+        selectedModeId: UUID?
+    ) -> String {
+        VoiceInkTranscriptionLanguageSupport.validLanguageOrFallback(
+            language,
+            languages: transcriptionLanguages(selectedModeId: selectedModeId)
+        )
+    }
+
     func repairedSelectedModeId(_ selectedModeId: UUID?) -> UUID? {
         guard let selectedModeId,
               contains(where: { $0.id == selectedModeId }) else {

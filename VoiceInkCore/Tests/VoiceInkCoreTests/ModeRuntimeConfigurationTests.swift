@@ -115,6 +115,36 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
         XCTAssertEqual(configuration, firstMode.runtimeConfiguration)
     }
 
+    func testTranscriptionLanguagesUseWhisperFallbackWhenNoModeExists() {
+        XCTAssertEqual(
+            [Mode]().transcriptionLanguages(selectedModeId: nil),
+            VoiceInkLanguageCatalog.whisperLanguages()
+        )
+    }
+
+    func testTranscriptionLanguagesUseActiveModeProvider() {
+        let localMode = Mode.defaultLocalWhisper(name: "Local")
+        let cloudMode = Mode(name: "Speechmatics", transcriptionProvider: .speechmatics)
+
+        XCTAssertEqual(
+            [localMode, cloudMode].transcriptionLanguages(selectedModeId: cloudMode.id),
+            VoiceInkLanguageCatalog.languages(for: VoiceInkProviderKind.speechmatics)
+        )
+    }
+
+    func testSelectedTranscriptionLanguageRepairUsesActiveModeLanguages() {
+        let localMode = Mode.defaultLocalWhisper(name: "Local")
+        let cloudMode = Mode(name: "xAI", transcriptionProvider: .xai)
+
+        XCTAssertEqual(
+            [localMode, cloudMode].repairedSelectedTranscriptionLanguage(
+                "zh",
+                selectedModeId: cloudMode.id
+            ),
+            VoiceInkLanguageCatalog.autoDetectCode
+        )
+    }
+
     func testRepairedSelectedModeIdPreservesExistingSelection() {
         let firstMode = Mode.defaultLocalWhisper(name: "Local")
         let secondMode = Mode(name: "Cloud")

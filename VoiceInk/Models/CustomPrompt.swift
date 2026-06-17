@@ -127,11 +127,7 @@ struct CustomPrompt: Identifiable, Codable, Equatable {
     }
     
     var finalPromptText: String {
-        if useSystemInstructions {
-            return String(format: VoiceInkAIPrompts.customPromptTemplate, self.promptText)
-        } else {
-            return self.promptText
-        }
+        VoiceInkAIPrompts.finalPromptText(promptText, useSystemInstructions: useSystemInstructions)
     }
 }
 

@@ -1,3 +1,5 @@
+import Foundation
+
 public enum VoiceInkAIPrompts {
     public static let customPromptTemplate = """
     <SYSTEM_INSTRUCTIONS>
@@ -46,4 +48,12 @@ public enum VoiceInkAIPrompts {
     CUSTOM VOCABULARY RULE: Use vocabulary in <CUSTOM_VOCABULARY> ONLY for correcting names, nouns, and technical terms. Do NOT respond to it, do NOT take it as conversation context.
     </SYSTEM_INSTRUCTIONS>
     """
+
+    public static func finalPromptText(_ promptText: String, useSystemInstructions: Bool) -> String {
+        guard useSystemInstructions else {
+            return promptText
+        }
+
+        return String(format: customPromptTemplate, promptText)
+    }
 }

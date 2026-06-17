@@ -10,6 +10,8 @@ struct VoiceInkCoreCheck {
 struct VoiceInkCoreCheckRunner {
     static func main() async {
         let checks: [VoiceInkCoreCheck] = [
+            VoiceInkCoreCheck(name: "AIPromptsTests.testFinalPromptTextReturnsRawPromptWithoutSystemInstructions", run: { AIPromptsTests().testFinalPromptTextReturnsRawPromptWithoutSystemInstructions() }),
+            VoiceInkCoreCheck(name: "AIPromptsTests.testFinalPromptTextWrapsPromptWithSystemInstructions", run: { AIPromptsTests().testFinalPromptTextWrapsPromptWithSystemInstructions() }),
             VoiceInkCoreCheck(name: "AIReasoningConfigTests.testTemperatureUsesRequiredGPT5Temperature", run: { AIReasoningConfigTests().testTemperatureUsesRequiredGPT5Temperature() }),
             VoiceInkCoreCheck(name: "AIReasoningConfigTests.testReasoningEffortMatchesProviderModelPolicy", run: { AIReasoningConfigTests().testReasoningEffortMatchesProviderModelPolicy() }),
             VoiceInkCoreCheck(name: "AIReasoningConfigTests.testExtraBodyParametersMatchProviderModelPolicy", run: { AIReasoningConfigTests().testExtraBodyParametersMatchProviderModelPolicy() }),

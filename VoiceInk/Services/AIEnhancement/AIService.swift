@@ -161,12 +161,11 @@ class AIService: ObservableObject {
     }
     
     init() {
-        if userDefaults.string(forKey: VoiceInkUserDefaultsKey.selectedAIProvider) == "GROQ" {
-            userDefaults.set("Groq", forKey: VoiceInkUserDefaultsKey.selectedAIProvider)
-        }
-
         if let savedProvider = userDefaults.string(forKey: VoiceInkUserDefaultsKey.selectedAIProvider),
-           let provider = AIProvider(rawValue: savedProvider) {
+           let provider = AIProvider(storedValue: savedProvider) {
+            if savedProvider != provider.rawValue {
+                userDefaults.set(provider.rawValue, forKey: VoiceInkUserDefaultsKey.selectedAIProvider)
+            }
             self.selectedProvider = provider
         } else {
             self.selectedProvider = .gemini

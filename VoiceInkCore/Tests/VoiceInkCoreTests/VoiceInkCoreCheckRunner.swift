@@ -20,6 +20,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AIModelCatalogTests.testMacOSAIEnhancementProviderModelListsAreShared", run: { AIModelCatalogTests().testMacOSAIEnhancementProviderModelListsAreShared() }),
             VoiceInkCoreCheck(name: "AIModelCatalogTests.testOpenRouterKeepsDynamicModelListWithSharedDefault", run: { AIModelCatalogTests().testOpenRouterKeepsDynamicModelListWithSharedDefault() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementProviderIdentityIsShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementProviderIdentityIsShared() }),
+            VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementProviderStoredValueParsingIsShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementProviderStoredValueParsingIsShared() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementProviderMapsToSharedModelProvider", run: { AIProviderCatalogTests().testMacOSAIEnhancementProviderMapsToSharedModelProvider() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementProviderAPIKeyRequirementIsShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementProviderAPIKeyRequirementIsShared() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementSelectableTextProvidersAreShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementSelectableTextProvidersAreShared() }),

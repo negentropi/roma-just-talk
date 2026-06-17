@@ -30,6 +30,28 @@ public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
     case localCLI = "Local CLI"
     case custom = "Custom"
 
+    public init?(storedValue: String) {
+        guard let provider = Self.provider(forStoredValue: storedValue) else {
+            return nil
+        }
+        self = provider
+    }
+
+    private static func provider(forStoredValue value: String) -> Self? {
+        allCases.first { provider in
+            provider.rawValue == value || provider.legacyStoredValues.contains(value)
+        }
+    }
+
+    private var legacyStoredValues: [String] {
+        switch self {
+        case .groq:
+            return ["GROQ"]
+        case .anthropic, .assemblyAI, .cerebras, .custom, .deepgram, .elevenLabs, .gemini, .localCLI, .mistral, .ollama, .openAI, .openRouter, .soniox, .speechmatics:
+            return []
+        }
+    }
+
     public var aiModelProvider: VoiceInkAIModelProvider? {
         switch self {
         case .anthropic:

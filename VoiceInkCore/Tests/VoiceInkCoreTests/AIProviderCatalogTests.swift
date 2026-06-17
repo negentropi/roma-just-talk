@@ -27,6 +27,15 @@ final class AIProviderCatalogTests: XCTestCase {
         XCTAssertEqual(VoiceInkAIEnhancementProviderKind(rawValue: "Local CLI"), .localCLI)
     }
 
+    func testMacOSAIEnhancementProviderStoredValueParsingIsShared() {
+        for provider in VoiceInkAIEnhancementProviderKind.allCases {
+            XCTAssertEqual(VoiceInkAIEnhancementProviderKind(storedValue: provider.rawValue), provider)
+        }
+
+        XCTAssertEqual(VoiceInkAIEnhancementProviderKind(storedValue: "GROQ"), .groq)
+        XCTAssertNil(VoiceInkAIEnhancementProviderKind(storedValue: "MissingProvider"))
+    }
+
     func testMacOSAIEnhancementProviderMapsToSharedModelProvider() {
         XCTAssertEqual(VoiceInkAIEnhancementProviderKind.anthropic.aiModelProvider, .anthropic)
         XCTAssertEqual(VoiceInkAIEnhancementProviderKind.cerebras.aiModelProvider, .cerebras)

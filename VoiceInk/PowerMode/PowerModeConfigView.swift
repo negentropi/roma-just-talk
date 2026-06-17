@@ -412,7 +412,7 @@ struct ConfigurationView: View {
                     let providerBinding = Binding<AIProvider>(
                         get: {
                             if let providerName = selectedAIProvider,
-                               let provider = AIProvider(rawValue: providerName) {
+                               let provider = AIProvider(storedValue: providerName) {
                                 return provider
                             }
                             return aiService.selectedProvider
@@ -437,14 +437,14 @@ struct ConfigurationView: View {
                                 }
                             }
                             .onChange(of: selectedAIProvider) { _, newValue in
-                                if let provider = newValue.flatMap({ AIProvider(rawValue: $0) }) {
+                                if let provider = newValue.flatMap({ AIProvider(storedValue: $0) }) {
                                     selectedAIModel = provider.defaultModel
                                 }
                             }
                         }
 
                         let providerName = selectedAIProvider ?? aiService.selectedProvider.rawValue
-                        if let provider = AIProvider(rawValue: providerName),
+                        if let provider = AIProvider(storedValue: providerName),
                            provider != .custom {
                             let models = aiService.availableModels(for: provider)
                             if models.isEmpty {

@@ -254,26 +254,22 @@ class AIService: ObservableObject {
 
         Task {
             let result: (isValid: Bool, errorMessage: String?)
-            guard let transport = selectedProvider.apiKeyVerificationTransport else {
+            guard let route = selectedProvider.apiKeyVerificationRoute else {
                 DispatchQueue.main.async {
                     completion(false, "\(self.selectedProvider.rawValue) does not support API key verification.")
                 }
                 return
             }
 
-            switch transport {
+            switch route {
+            case .sharedProvider(let provider):
+                let verification = await VoiceInkProviderAPIKeyVerifier().verifyAPIKeyDetailed(
+                    resolvedKey,
+                    for: provider
+                )
+                result = (verification.isValid, verification.errorMessage)
             case .anthropicMessages:
                 result = await AnthropicLLMClient.verifyAPIKey(resolvedKey)
-            case .assemblyAITranscripts:
-                result = await AssemblyAIClient.verifyAPIKey(resolvedKey)
-            case .deepgramProjects:
-                result = await DeepgramClient.verifyAPIKey(resolvedKey)
-            case .elevenLabsUser:
-                result = await ElevenLabsClient.verifyAPIKey(resolvedKey)
-            case .geminiModels:
-                result = await GeminiTranscriptionClient.verifyAPIKey(resolvedKey)
-            case .mistralModels:
-                result = await MistralTranscriptionClient.verifyAPIKey(resolvedKey)
             case .openAICompatibleModels:
                 guard let baseURL = URL(string: selectedProvider.baseURL) else {
                     DispatchQueue.main.async {
@@ -288,10 +284,6 @@ class AIService: ObservableObject {
                 )
             case .openRouterModels:
                 result = await OpenRouterClient.verifyAPIKey(resolvedKey, model: currentModel)
-            case .sonioxFiles:
-                result = await SonioxClient.verifyAPIKey(resolvedKey)
-            case .speechmaticsJobs:
-                result = await SpeechmaticsClient.verifyAPIKey(resolvedKey)
             }
             DispatchQueue.main.async {
                 completion(result.isValid, result.errorMessage)

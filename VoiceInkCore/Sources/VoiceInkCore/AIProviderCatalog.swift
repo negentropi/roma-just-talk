@@ -13,6 +13,13 @@ public enum VoiceInkAIEnhancementAPIKeyVerificationTransport: Sendable, Equatabl
     case openRouterModels
 }
 
+public enum VoiceInkAIEnhancementAPIKeyVerificationRoute: Sendable, Equatable {
+    case sharedProvider(VoiceInkProviderKind)
+    case anthropicMessages
+    case openAICompatibleModels
+    case openRouterModels
+}
+
 public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
     case cerebras = "Cerebras"
     case groq = "Groq"
@@ -179,6 +186,33 @@ public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
             return .sonioxFiles
         case .speechmatics:
             return .speechmaticsJobs
+        case .ollama, .localCLI:
+            return nil
+        }
+    }
+
+    public var apiKeyVerificationRoute: VoiceInkAIEnhancementAPIKeyVerificationRoute? {
+        switch self {
+        case .assemblyAI:
+            return .sharedProvider(.assemblyAI)
+        case .deepgram:
+            return .sharedProvider(.deepgram)
+        case .elevenLabs:
+            return .sharedProvider(.elevenLabs)
+        case .gemini:
+            return .sharedProvider(.gemini)
+        case .mistral:
+            return .sharedProvider(.mistral)
+        case .soniox:
+            return .sharedProvider(.soniox)
+        case .speechmatics:
+            return .sharedProvider(.speechmatics)
+        case .anthropic:
+            return .anthropicMessages
+        case .cerebras, .custom, .groq, .openAI:
+            return .openAICompatibleModels
+        case .openRouter:
+            return .openRouterModels
         case .ollama, .localCLI:
             return nil
         }

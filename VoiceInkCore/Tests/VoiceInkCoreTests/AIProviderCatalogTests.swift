@@ -212,6 +212,32 @@ final class AIProviderCatalogTests: XCTestCase {
         }
     }
 
+    func testMacOSAIEnhancementProviderVerificationRoutesAreShared() {
+        let expectedRoutes: [VoiceInkAIEnhancementProviderKind: VoiceInkAIEnhancementAPIKeyVerificationRoute?] = [
+            .anthropic: .anthropicMessages,
+            .assemblyAI: .sharedProvider(.assemblyAI),
+            .cerebras: .openAICompatibleModels,
+            .custom: .openAICompatibleModels,
+            .deepgram: .sharedProvider(.deepgram),
+            .elevenLabs: .sharedProvider(.elevenLabs),
+            .gemini: .sharedProvider(.gemini),
+            .groq: .openAICompatibleModels,
+            .localCLI: nil,
+            .mistral: .sharedProvider(.mistral),
+            .ollama: nil,
+            .openAI: .openAICompatibleModels,
+            .openRouter: .openRouterModels,
+            .soniox: .sharedProvider(.soniox),
+            .speechmatics: .sharedProvider(.speechmatics)
+        ]
+
+        XCTAssertEqual(VoiceInkAIEnhancementProviderKind.allCases.count, expectedRoutes.count)
+
+        for (provider, route) in expectedRoutes {
+            XCTAssertEqual(provider.apiKeyVerificationRoute, route)
+        }
+    }
+
     func testMacOSAIEnhancementRequestURLsAreShared() {
         let expectedURLs: [VoiceInkAIModelProvider: String?] = [
             .anthropic: "https://api.anthropic.com/v1/messages",

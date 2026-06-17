@@ -83,15 +83,6 @@ final class AudioSessionManager: ObservableObject {
         print("🕒 Audio session deactivation scheduled in \(timeoutSeconds) seconds")
     }
     
-    /// Extends the timeout period (called when new recording starts)
-    func extendTimeout() {
-        guard isSessionActive else { return }
-        
-        // Cancel current timer and reschedule
-        scheduleDeactivation()
-        print("⏰ Audio session timeout extended")
-    }
-    
     /// Immediately deactivates the session
     func deactivateSession() {
         cancelScheduledDeactivation()
@@ -108,58 +99,11 @@ final class AudioSessionManager: ObservableObject {
         }
     }
     
-    /// Force immediate deactivation (for app backgrounding, etc.)
-    func forceDeactivate() {
-        cancelScheduledDeactivation()
-        
-        do {
-            try AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
-            isSessionActive = false
-            timeoutRemaining = 0
-            print("🛑 Audio session force deactivated")
-        } catch {
-            print("⚠️ Failed to force deactivate audio session: \(error.localizedDescription)")
-        }
-    }
-    
     // MARK: - Private Methods
     
     private func cancelScheduledDeactivation() {
         deactivationTimer?.invalidate()
         deactivationTimer = nil
         timeoutRemaining = 0
-    }
-    
-    // MARK: - Debug Helpers
-    
-    var debugInfo: [String: Any] {
-        return [
-            "isSessionActive": isSessionActive,
-            "timeoutRemaining": timeoutRemaining,
-            "hasScheduledDeactivation": deactivationTimer != nil,
-            "configuredTimeout": settings.audioSessionTimeoutSeconds
-        ]
-    }
-}
-
-// MARK: - App Lifecycle Integration
-
-extension AudioSessionManager {
-    
-    /// Call when app enters background
-    func handleAppDidEnterBackground() {
-        // Optionally force deactivate when app backgrounds
-        // This depends on whether you want background recording capability
-        print("📱 App entered background - audio session state: \(isSessionActive)")
-    }
-    
-    /// Call when app becomes active
-    func handleAppDidBecomeActive() {
-        print("📱 App became active - audio session state: \(isSessionActive)")
-    }
-    
-    /// Call when app will terminate
-    func handleAppWillTerminate() {
-        forceDeactivate()
     }
 }

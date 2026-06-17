@@ -102,6 +102,24 @@ public enum VoiceInkStoredAudioFile {
         existingURL(for: storedValue, relativeTo: recordingsDirectory, fileManager: fileManager) != nil
     }
 
+    @discardableResult
+    public static func deleteExistingFile(
+        for storedValue: String?,
+        relativeTo recordingsDirectory: URL? = nil,
+        fileManager: FileManager = .default
+    ) throws -> URL? {
+        guard let url = existingURL(
+            for: storedValue,
+            relativeTo: recordingsDirectory,
+            fileManager: fileManager
+        ) else {
+            return nil
+        }
+
+        try fileManager.removeItem(at: url)
+        return url
+    }
+
     private static func cleanedStoredValue(_ value: String?) -> String? {
         guard let value else {
             return nil

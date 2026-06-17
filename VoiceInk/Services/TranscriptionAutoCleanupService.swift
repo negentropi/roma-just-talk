@@ -103,9 +103,7 @@ class TranscriptionAutoCleanupService {
             let items = try backgroundContext.fetch(descriptor)
             var deletedCount = 0
             for transcription in items {
-                if let url = transcription.existingAudioFileURL(relativeTo: recordingsDirectory) {
-                    try? FileManager.default.removeItem(at: url)
-                }
+                try? transcription.deleteExistingAudioFile(relativeTo: recordingsDirectory)
                 backgroundContext.delete(transcription)
                 deletedCount += 1
             }

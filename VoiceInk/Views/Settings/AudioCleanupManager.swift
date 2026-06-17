@@ -114,14 +114,13 @@ class AudioCleanupManager {
                 var deletedCount = 0
 
                 for transcription in transcriptions {
-                    if let url = transcription.existingAudioFileURL() {
-                        do {
-                            try FileManager.default.removeItem(at: url)
+                    do {
+                        if try transcription.deleteExistingAudioFile() != nil {
                             transcription.audioFileURL = nil
                             deletedCount += 1
-                        } catch {
-                            // Skip this file - don't update audioFileURL if deletion failed
                         }
+                    } catch {
+                        // Skip this file - don't update audioFileURL if deletion failed
                     }
                 }
 
@@ -148,14 +147,13 @@ class AudioCleanupManager {
                 var errorCount = 0
 
                 for transcription in transcriptions {
-                    if let url = transcription.existingAudioFileURL() {
-                        do {
-                            try FileManager.default.removeItem(at: url)
+                    do {
+                        if try transcription.deleteExistingAudioFile() != nil {
                             transcription.audioFileURL = nil
                             deletedCount += 1
-                        } catch {
-                            errorCount += 1
                         }
+                    } catch {
+                        errorCount += 1
                     }
                 }
 

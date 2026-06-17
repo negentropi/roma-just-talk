@@ -137,4 +137,33 @@ final class StoredAudioFileTests: XCTestCase {
             fileURL.path
         )
     }
+
+    func testDeleteExistingFileRemovesResolvedFileAndReturnsURL() throws {
+        let baseDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.StoredAudioFileTests.\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: baseDirectory) }
+
+        let recordingsDirectory = try VoiceInkStoredAudioFile.createRecordingsDirectory(in: baseDirectory)
+        let fileURL = VoiceInkStoredAudioFile.fileURL(forFilename: "voiceink-recording.m4a", in: recordingsDirectory)
+        try Data().write(to: fileURL)
+
+        let deletedURL = try VoiceInkStoredAudioFile.deleteExistingFile(
+            for: "voiceink-recording.m4a",
+            relativeTo: recordingsDirectory
+        )
+
+        XCTAssertEqual(deletedURL?.path, fileURL.path)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: fileURL.path))
+    }
+
+    func testDeleteExistingFileReturnsNilForMissingFile() throws {
+        let recordingsDirectory = URL(fileURLWithPath: "/tmp/Recordings", isDirectory: true)
+
+        let deletedURL = try VoiceInkStoredAudioFile.deleteExistingFile(
+            for: "missing-recording.m4a",
+            relativeTo: recordingsDirectory
+        )
+
+        XCTAssertNil(deletedURL)
+    }
 }

@@ -48,6 +48,15 @@ final class Transcription: VoiceInkMutableTranscriptionRecord {
         existingAudioFileURL(fileManager: fileManager) != nil
     }
 
+    @discardableResult
+    func deleteExistingAudioFile(fileManager: FileManager = .default) throws -> URL? {
+        try VoiceInkStoredAudioFile.deleteExistingFile(
+            for: audioFileURL,
+            relativeTo: Self.recordingsDirectory,
+            fileManager: fileManager
+        )
+    }
+
     private static var recordingsDirectory: URL {
         let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         return VoiceInkStoredAudioFile.recordingsDirectory(in: documentsDirectory)

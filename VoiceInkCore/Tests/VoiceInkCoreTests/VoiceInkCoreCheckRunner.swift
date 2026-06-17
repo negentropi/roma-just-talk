@@ -304,6 +304,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "StoredAudioFileTests.testRejectsBlankAndRelativeValueWithoutDirectory", run: { StoredAudioFileTests().testRejectsBlankAndRelativeValueWithoutDirectory() }),
             VoiceInkCoreCheck(name: "StoredAudioFileTests.testExistingURLReturnsNilForMissingFile", run: { StoredAudioFileTests().testExistingURLReturnsNilForMissingFile() }),
             VoiceInkCoreCheck(name: "StoredAudioFileTests.testExistingURLReturnsResolvedFileWhenItExists", run: { try StoredAudioFileTests().testExistingURLReturnsResolvedFileWhenItExists() }),
+            VoiceInkCoreCheck(name: "StoredAudioFileTests.testDeleteExistingFileRemovesResolvedFileAndReturnsURL", run: { try StoredAudioFileTests().testDeleteExistingFileRemovesResolvedFileAndReturnsURL() }),
+            VoiceInkCoreCheck(name: "StoredAudioFileTests.testDeleteExistingFileReturnsNilForMissingFile", run: { try StoredAudioFileTests().testDeleteExistingFileReturnsNilForMissingFile() }),
             VoiceInkCoreCheck(name: "SupportedMediaTests.testSupportedFileExtensionsPreserveMacOSImportPolicy", run: { SupportedMediaTests().testSupportedFileExtensionsPreserveMacOSImportPolicy() }),
             VoiceInkCoreCheck(name: "SupportedMediaTests.testSupportedFileExtensionLookupIsCaseInsensitive", run: { SupportedMediaTests().testSupportedFileExtensionLookupIsCaseInsensitive() }),
             VoiceInkCoreCheck(name: "SupportedMediaTests.testSupportedURLAcceptsKnownExtensions", run: { SupportedMediaTests().testSupportedURLAcceptsKnownExtensions() }),

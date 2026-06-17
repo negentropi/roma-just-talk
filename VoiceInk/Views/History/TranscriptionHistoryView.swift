@@ -411,12 +411,10 @@ struct TranscriptionHistoryView: View {
     }
 
     private func performDeletion(for transcription: Transcription) {
-        if let url = transcription.existingAudioFileURL() {
-            do {
-                try FileManager.default.removeItem(at: url)
-            } catch {
-                print("Error deleting audio file: \(error.localizedDescription)")
-            }
+        do {
+            try transcription.deleteExistingAudioFile()
+        } catch {
+            print("Error deleting audio file: \(error.localizedDescription)")
         }
 
         if selectedTranscription == transcription {

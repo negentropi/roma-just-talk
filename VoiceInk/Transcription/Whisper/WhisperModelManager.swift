@@ -26,10 +26,6 @@ struct WhisperModelFile: Identifiable {
     var coreMLZipDownloadURL: String? {
         VoiceInkWhisperModelFiles.coreMLZipDownloadURLString(forModelName: name)
     }
-
-    var coreMLEncoderDirectoryName: String? {
-        VoiceInkWhisperModelFiles.coreMLEncoderDirectoryName(forModelName: name)
-    }
 }
 
 // MARK: - Private download task delegate
@@ -91,7 +87,7 @@ class WhisperModelManager: ObservableObject {
         do {
             let fileURLs = try FileManager.default.contentsOfDirectory(at: modelsDirectory, includingPropertiesForKeys: nil)
             availableModels = fileURLs.compactMap { url in
-                guard url.pathExtension == "bin" else { return nil }
+                guard VoiceInkWhisperModelFiles.isModelFile(url) else { return nil }
                 return WhisperModelFile(name: url.deletingPathExtension().lastPathComponent, url: url)
             }
         } catch {
@@ -221,7 +217,7 @@ class WhisperModelManager: ObservableObject {
         let progressKeyMain = model.name + "_main"
         let data = try await downloadFileWithProgress(from: url, progressKey: progressKeyMain)
 
-        let destinationURL = modelsDirectory.appendingPathComponent(model.filename)
+        let destinationURL = VoiceInkWhisperModelFiles.fileURL(forFilename: model.filename, in: modelsDirectory)
         try data.write(to: destinationURL)
 
         return WhisperModelFile(name: model.name, url: destinationURL)
@@ -231,20 +227,24 @@ class WhisperModelManager: ObservableObject {
         let progressKeyCoreML = model.name + "_coreml"
         let coreMLData = try await downloadFileWithProgress(from: url, progressKey: progressKeyCoreML)
 
-        guard let coreMLZipFilename = VoiceInkWhisperModelFiles.coreMLZipFilename(forModelName: model.name) else {
+        guard let coreMLZipPath = VoiceInkWhisperModelFiles.coreMLZipFileURL(
+            forModelName: model.name,
+            in: modelsDirectory
+        ) else {
             return model
         }
-        let coreMLZipPath = modelsDirectory.appendingPathComponent(coreMLZipFilename)
         try coreMLData.write(to: coreMLZipPath)
 
         return try await unzipAndSetupCoreMLModel(for: model, zipPath: coreMLZipPath, progressKey: progressKeyCoreML)
     }
 
     private func unzipAndSetupCoreMLModel(for model: WhisperModelFile, zipPath: URL, progressKey: String) async throws -> WhisperModelFile {
-        guard let coreMLDirectoryName = VoiceInkWhisperModelFiles.coreMLEncoderDirectoryName(forModelName: model.name) else {
+        guard let coreMLDestination = VoiceInkWhisperModelFiles.coreMLEncoderDirectoryURL(
+            forModelName: model.name,
+            in: modelsDirectory
+        ) else {
             throw VoiceInkEngineError.unzipFailed
         }
-        let coreMLDestination = modelsDirectory.appendingPathComponent(coreMLDirectoryName)
 
         try? FileManager.default.removeItem(at: coreMLDestination)
         try await unzipCoreMLFile(zipPath, to: modelsDirectory)
@@ -302,8 +302,10 @@ class WhisperModelManager: ObservableObject {
 
             if let coreMLURL = model.coreMLEncoderURL {
                 try? FileManager.default.removeItem(at: coreMLURL)
-            } else if let coreMLDirectoryName = VoiceInkWhisperModelFiles.coreMLEncoderDirectoryName(forModelName: model.name) {
-                let coreMLDir = modelsDirectory.appendingPathComponent(coreMLDirectoryName)
+            } else if let coreMLDir = VoiceInkWhisperModelFiles.coreMLEncoderDirectoryURL(
+                forModelName: model.name,
+                in: modelsDirectory
+            ) {
                 if FileManager.default.fileExists(atPath: coreMLDir.path) {
                     try? FileManager.default.removeItem(at: coreMLDir)
                 }
@@ -355,7 +357,7 @@ class WhisperModelManager: ObservableObject {
         guard sourceURL.pathExtension.lowercased() == "bin" else { return }
 
         let baseName = sourceURL.deletingPathExtension().lastPathComponent
-        let destinationURL = modelsDirectory.appendingPathComponent("\(baseName).bin")
+        let destinationURL = VoiceInkWhisperModelFiles.fileURL(forModelName: baseName, in: modelsDirectory)
 
         if FileManager.default.fileExists(atPath: destinationURL.path) {
             await NotificationManager.shared.showNotification(

@@ -30,6 +30,41 @@ final class WhisperModelFilesTests: XCTestCase {
         XCTAssertEqual(directory.lastPathComponent, "WhisperModels")
     }
 
+    func testModelFileURLBuildsUnderModelsDirectory() {
+        let modelsDirectory = URL(fileURLWithPath: "/tmp/VoiceInk/WhisperModels", isDirectory: true)
+
+        XCTAssertEqual(
+            VoiceInkWhisperModelFiles.fileURL(forModelName: "ggml-base", in: modelsDirectory).path,
+            "/tmp/VoiceInk/WhisperModels/ggml-base.bin"
+        )
+        XCTAssertEqual(
+            VoiceInkWhisperModelFiles.baseModel.fileURL(in: modelsDirectory).path,
+            "/tmp/VoiceInk/WhisperModels/ggml-base.bin"
+        )
+    }
+
+    func testCoreMLSidecarURLsUseSharedModelNaming() {
+        let modelsDirectory = URL(fileURLWithPath: "/tmp/VoiceInk/WhisperModels", isDirectory: true)
+
+        XCTAssertEqual(
+            VoiceInkWhisperModelFiles.coreMLZipFileURL(forModelName: "ggml-base", in: modelsDirectory)?.path,
+            "/tmp/VoiceInk/WhisperModels/ggml-base-encoder.mlmodelc.zip"
+        )
+        XCTAssertEqual(
+            VoiceInkWhisperModelFiles.coreMLEncoderDirectoryURL(forModelName: "ggml-base", in: modelsDirectory)?.path,
+            "/tmp/VoiceInk/WhisperModels/ggml-base-encoder.mlmodelc"
+        )
+        XCTAssertNil(
+            VoiceInkWhisperModelFiles.coreMLZipFileURL(forModelName: "ggml-large-v3-turbo-q5_0", in: modelsDirectory)
+        )
+    }
+
+    func testModelFileFilterMatchesExistingBinOnlyPolicy() {
+        XCTAssertTrue(VoiceInkWhisperModelFiles.isModelFile(URL(fileURLWithPath: "/tmp/ggml-base.bin")))
+        XCTAssertFalse(VoiceInkWhisperModelFiles.isModelFile(URL(fileURLWithPath: "/tmp/ggml-base.BIN")))
+        XCTAssertFalse(VoiceInkWhisperModelFiles.isModelFile(URL(fileURLWithPath: "/tmp/ggml-base.txt")))
+    }
+
     func testDownloadableModelsMatchMacOSLocalWhisperCatalog() {
         XCTAssertEqual(
             VoiceInkWhisperModelFiles.downloadableModels.map(\.modelName),

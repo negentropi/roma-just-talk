@@ -42,6 +42,10 @@ public struct VoiceInkWhisperModelFileSpec: Codable, Equatable, Identifiable, Se
     public var downloadURLString: String {
         downloadURL.absoluteString
     }
+
+    public func fileURL(in modelsDirectory: URL) -> URL {
+        VoiceInkWhisperModelFiles.fileURL(forFilename: filename, in: modelsDirectory)
+    }
 }
 
 public enum VoiceInkWhisperModelFiles {
@@ -179,6 +183,18 @@ public enum VoiceInkWhisperModelFiles {
         "\(modelName).bin"
     }
 
+    public static func isModelFile(_ url: URL) -> Bool {
+        url.pathExtension == "bin"
+    }
+
+    public static func fileURL(forFilename filename: String, in modelsDirectory: URL) -> URL {
+        modelsDirectory.appendingPathComponent(filename)
+    }
+
+    public static func fileURL(forModelName modelName: String, in modelsDirectory: URL) -> URL {
+        fileURL(forFilename: filename(forModelName: modelName), in: modelsDirectory)
+    }
+
     public static func downloadURL(forModelName modelName: String) -> URL {
         downloadURL(forFilename: filename(forModelName: modelName))
     }
@@ -196,6 +212,11 @@ public enum VoiceInkWhisperModelFiles {
         return "\(modelName)-encoder.mlmodelc.zip"
     }
 
+    public static func coreMLZipFileURL(forModelName modelName: String, in modelsDirectory: URL) -> URL? {
+        guard let filename = coreMLZipFilename(forModelName: modelName) else { return nil }
+        return fileURL(forFilename: filename, in: modelsDirectory)
+    }
+
     public static func coreMLZipDownloadURL(forModelName modelName: String) -> URL? {
         guard let filename = coreMLZipFilename(forModelName: modelName) else { return nil }
         return downloadURL(forFilename: filename)
@@ -208,5 +229,10 @@ public enum VoiceInkWhisperModelFiles {
     public static func coreMLEncoderDirectoryName(forModelName modelName: String) -> String? {
         guard supportsCoreML(forModelName: modelName) else { return nil }
         return "\(modelName)-encoder.mlmodelc"
+    }
+
+    public static func coreMLEncoderDirectoryURL(forModelName modelName: String, in modelsDirectory: URL) -> URL? {
+        guard let directoryName = coreMLEncoderDirectoryName(forModelName: modelName) else { return nil }
+        return modelsDirectory.appendingPathComponent(directoryName)
     }
 }

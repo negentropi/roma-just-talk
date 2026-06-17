@@ -14,7 +14,7 @@ typealias WhisperModel = VoiceInkWhisperModelFileSpec
 extension VoiceInkWhisperModelFileSpec {
     var name: String { modelName }
     var fileURL: URL {
-        LocalModelManager.modelsDirectory.appendingPathComponent(filename)
+        fileURL(in: LocalModelManager.modelsDirectory)
     }
     
     var isDownloaded: Bool {
@@ -201,7 +201,7 @@ class LocalModelManager: ObservableObject {
             let contents = try FileManager.default.contentsOfDirectory(at: modelsDir, includingPropertiesForKeys: [.fileSizeKey])
             
             for fileURL in contents {
-                if fileURL.pathExtension == "bin" {
+                if VoiceInkWhisperModelFiles.isModelFile(fileURL) {
                     modelCount += 1
                     if let resourceValues = try? fileURL.resourceValues(forKeys: [.fileSizeKey]),
                        let fileSize = resourceValues.fileSize {

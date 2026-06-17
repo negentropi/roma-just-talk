@@ -167,6 +167,9 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testBootstrapModelsContainBaseModelSpec", run: { WhisperModelFilesTests().testBootstrapModelsContainBaseModelSpec() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testModelsDirectoryBuildsUnderPlatformBaseDirectory", run: { try WhisperModelFilesTests().testModelsDirectoryBuildsUnderPlatformBaseDirectory() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testCreateModelsDirectoryCreatesDirectoryUnderPlatformBaseDirectory", run: { try WhisperModelFilesTests().testCreateModelsDirectoryCreatesDirectoryUnderPlatformBaseDirectory() }),
+            VoiceInkCoreCheck(name: "WhisperModelFilesTests.testModelFileURLBuildsUnderModelsDirectory", run: { WhisperModelFilesTests().testModelFileURLBuildsUnderModelsDirectory() }),
+            VoiceInkCoreCheck(name: "WhisperModelFilesTests.testCoreMLSidecarURLsUseSharedModelNaming", run: { WhisperModelFilesTests().testCoreMLSidecarURLsUseSharedModelNaming() }),
+            VoiceInkCoreCheck(name: "WhisperModelFilesTests.testModelFileFilterMatchesExistingBinOnlyPolicy", run: { WhisperModelFilesTests().testModelFileFilterMatchesExistingBinOnlyPolicy() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testDownloadableModelsMatchMacOSLocalWhisperCatalog", run: { WhisperModelFilesTests().testDownloadableModelsMatchMacOSLocalWhisperCatalog() }),
         ]
 

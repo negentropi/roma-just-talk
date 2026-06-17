@@ -159,7 +159,8 @@ public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionServ
             model: model,
             audioData: audioData,
             fileName: fileURL.lastPathComponent,
-            language: language
+            language: language,
+            options: VoiceInkRemoteTranscriptionOptions(prompt: prompt)
         )
     }
 

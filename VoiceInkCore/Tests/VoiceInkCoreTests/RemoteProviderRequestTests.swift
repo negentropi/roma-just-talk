@@ -261,6 +261,44 @@ final class RemoteProviderRequestTests: XCTestCase {
         XCTAssertNil(gemini.openAICompatibleResponseFormat)
     }
 
+    func testRemoteTranscriptionServicePassesFilePromptToTranscriptionRequest() async throws {
+        let audioURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.RemoteProviderRequestTests.\(UUID().uuidString).wav")
+        try Data("WAVDATA".utf8).write(to: audioURL)
+        defer { try? FileManager.default.removeItem(at: audioURL) }
+
+        var capturedBody = ""
+        RemoteProviderRequestCapturingURLProtocol.requestHandler = { request in
+            capturedBody = RemoteProviderRequestCapturingURLProtocol.bodyString(from: request)
+            let response = try XCTUnwrap(HTTPURLResponse(
+                url: try XCTUnwrap(request.url),
+                statusCode: 200,
+                httpVersion: nil,
+                headerFields: nil
+            ))
+            return (response, Data(#"{"text":"transcribed"}"#.utf8))
+        }
+
+        URLProtocol.registerClass(RemoteProviderRequestCapturingURLProtocol.self)
+        defer {
+            URLProtocol.unregisterClass(RemoteProviderRequestCapturingURLProtocol.self)
+            RemoteProviderRequestCapturingURLProtocol.requestHandler = nil
+        }
+
+        let service = VoiceInkRemoteTranscriptionService(provider: .groq)
+        let text = try await service.transcribeAudioFile(
+            apiKey: "stt-key",
+            model: "whisper-large-v3",
+            fileURL: audioURL,
+            language: "en",
+            prompt: "spell Roma correctly"
+        )
+
+        XCTAssertEqual(text, "transcribed")
+        XCTAssertTrue(capturedBody.contains("Content-Disposition: form-data; name=\"prompt\""))
+        XCTAssertTrue(capturedBody.contains("spell Roma correctly"))
+    }
+
     func testDeepgramTranscriptionRequestBuilderUsesListenEndpointAndBody() throws {
         let audioData = Data("WAVDATA".utf8)
         let request = try VoiceInkDeepgramRequestBuilder.makeTranscriptionRequest(
@@ -1115,4 +1153,56 @@ final class RemoteProviderRequestTests: XCTestCase {
             )
         )
     }
+}
+
+private final class RemoteProviderRequestCapturingURLProtocol: URLProtocol {
+    static var requestHandler: ((URLRequest) throws -> (HTTPURLResponse, Data))?
+
+    override class func canInit(with request: URLRequest) -> Bool { true }
+
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+
+    static func bodyString(from request: URLRequest) -> String {
+        if let body = request.httpBody {
+            return String(data: body, encoding: .utf8) ?? ""
+        }
+        guard let stream = request.httpBodyStream else { return "" }
+
+        stream.open()
+        defer { stream.close() }
+
+        var data = Data()
+        let bufferSize = 4096
+        let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
+        defer { buffer.deallocate() }
+
+        while stream.hasBytesAvailable {
+            let count = stream.read(buffer, maxLength: bufferSize)
+            if count > 0 {
+                data.append(buffer, count: count)
+            } else {
+                break
+            }
+        }
+
+        return String(data: data, encoding: .utf8) ?? ""
+    }
+
+    override func startLoading() {
+        guard let requestHandler = Self.requestHandler else {
+            client?.urlProtocol(self, didFailWithError: URLError(.badURL))
+            return
+        }
+
+        do {
+            let (response, data) = try requestHandler(request)
+            client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+            client?.urlProtocol(self, didLoad: data)
+            client?.urlProtocolDidFinishLoading(self)
+        } catch {
+            client?.urlProtocol(self, didFailWithError: error)
+        }
+    }
+
+    override func stopLoading() {}
 }

@@ -8,6 +8,7 @@
 - Preserved existing shortcut settings when shortcut recording is canceled, rejected, interrupted by another recorder, or dismissed before a replacement is captured.
 - Built CI release artifacts with the Release configuration and blocked debug-only binaries from packaged app uploads.
 - Moved macOS batch cloud transcription provider wiring onto the shared remote transcription dispatcher used by the imported iOS retry path, preserving provider-specific prompt, vocabulary, timeout, retry, and empty-output behavior.
+- Forwarded imported iOS retry transcription prompts through the shared remote transcription file path instead of dropping them before provider request construction.
 - Aligned imported iOS note search with macOS history search so accent-insensitive transcript matches now come from shared core.
 - Stripped Codex follow-up JSON payloads from Local CLI enhancement output so transcript cleanup cannot paste assistant metadata into the target app.
 - Reworked Special shortcuts so Shift-down only arms the rolling-buffer commit path; Shift+typing, secure-input, and other unreliable key evidence now discard without starting audio, canceling, saving history, or writing recorder files.

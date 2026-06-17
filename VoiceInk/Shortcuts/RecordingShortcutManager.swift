@@ -661,7 +661,7 @@ final class RecordingShortcutModeHandler {
             let hasTypingEvidence = context.didPressOtherKeyDuringPress || context.didReleaseOtherKeyDuringPress
             let isPreloadOnly = options.keyDownBehavior == .preloadOnly
             let shouldFailClosed =
-                !context.hasReliableKeyEvidence ||
+                (isPreloadOnly && !context.hasReliableKeyEvidence) ||
                 (!isPreloadOnly && !hasTypingEvidence && pressDuration < minimumSpecialNoEvidencePressDuration)
 
             if hasTypingEvidence || shouldFailClosed {

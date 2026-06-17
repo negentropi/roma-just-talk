@@ -2,6 +2,9 @@
 
 ## v1.95 - Unreleased
 
+- Fixed Special `startRecording` modifier-only shortcuts so unreliable key-up evidence no longer cancels a clean long press after recording has already started.
+- Canceled unclaimed rolling-buffer preload sessions after sustained silence or a short stale-session cap, preventing local STT from running for minutes after brief ambient speech.
+
 ## v1.94 - 2026-06-16
 
 - Replaced the misaligned silence-filter path with rolling buffer preload controls that use local VAD to pre-run supported STT before capture finalization, independent from final/batch transcription VAD.

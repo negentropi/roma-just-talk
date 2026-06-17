@@ -506,6 +506,63 @@ struct VoiceInkTests {
         #expect(!sessionActive)
     }
 
+    @Test @MainActor func specialModeStartRecordingStopsOnUnreliableEvidenceWithoutTyping() async throws {
+        SpecialShortcutEmptyTranscriptionFallback.resetForTesting()
+        defer { SpecialShortcutEmptyTranscriptionFallback.resetForTesting() }
+
+        var recordingState = RecordingState.idle
+        var sessionActive = false
+        var toggleCount = 0
+        var cancelCount = 0
+
+        let handler = RecordingShortcutModeHandler(
+            logger: Logger(subsystem: "VoiceInkTests", category: "RecordingShortcutModeHandler"),
+            canHandleShortcutAction: { true },
+            isRecorderVisible: { sessionActive },
+            recordingState: { recordingState },
+            toggleMiniRecorder: { _ in
+                toggleCount += 1
+                if recordingState == .idle {
+                    recordingState = .recording
+                    sessionActive = true
+                } else {
+                    recordingState = .transcribing
+                    sessionActive = true
+                }
+            },
+            cancelRecording: {
+                cancelCount += 1
+                recordingState = .idle
+                sessionActive = false
+            }
+        )
+
+        let specialOptions = SpecialShortcutOptions(
+            keyDownBehavior: .startRecording,
+            allowsKeyDownOnlyTrigger: true,
+            pasteLastTranscriptOnEmptyTap: true
+        )
+
+        await handler.handleKeyDown(
+            action: .primaryRecording,
+            eventTime: 1,
+            mode: .special,
+            specialOptions: specialOptions
+        )
+
+        await handler.handleKeyUp(
+            action: .primaryRecording,
+            eventTime: 1.6,
+            mode: .special,
+            context: ShortcutPressContext(hasReliableKeyEvidence: false),
+            specialOptions: specialOptions
+        )
+
+        #expect(toggleCount == 2)
+        #expect(cancelCount == 0)
+        #expect(recordingState == .transcribing)
+    }
+
     @Test @MainActor func specialModeCancelsShortNoEvidencePresses() async throws {
         SpecialShortcutEmptyTranscriptionFallback.resetForTesting()
         defer { SpecialShortcutEmptyTranscriptionFallback.resetForTesting() }

@@ -81,6 +81,10 @@ public enum VoiceInkPromptDetectionPolicy {
 }
 
 public enum VoiceInkPromptTriggerPolicy {
+    public static func hasTriggerWordDraft(_ word: String) -> Bool {
+        !word.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
     public static func addingTriggerWord(_ word: String, to existingWords: [String]) -> [String]? {
         let trimmedWord = word.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedWord.isEmpty else { return nil }

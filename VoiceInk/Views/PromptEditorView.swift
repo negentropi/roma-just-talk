@@ -291,7 +291,7 @@ struct TriggerWordsEditor: View {
                         .font(.system(size: 18))
                 }
                 .buttonStyle(.plain)
-                .disabled(newTriggerWord.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                .disabled(!VoiceInkPromptTriggerPolicy.hasTriggerWordDraft(newTriggerWord))
             }
 
             if !triggerWords.isEmpty {

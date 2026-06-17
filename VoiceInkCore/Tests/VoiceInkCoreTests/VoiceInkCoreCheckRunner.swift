@@ -223,6 +223,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PromptTriggerPolicyTests.testPromptDetectionPolicyBuildsDetectedEnhancementResult", run: { PromptTriggerPolicyTests().testPromptDetectionPolicyBuildsDetectedEnhancementResult() }),
             VoiceInkCoreCheck(name: "PromptTriggerPolicyTests.testPromptDetectionPolicyIgnoresPromptsWithoutTriggerWords", run: { PromptTriggerPolicyTests().testPromptDetectionPolicyIgnoresPromptsWithoutTriggerWords() }),
             VoiceInkCoreCheck(name: "PromptTriggerPolicyTests.testAddingTriggerWordTrimsAndRejectsBlankAndCaseInsensitiveDuplicate", run: { PromptTriggerPolicyTests().testAddingTriggerWordTrimsAndRejectsBlankAndCaseInsensitiveDuplicate() }),
+            VoiceInkCoreCheck(name: "PromptTriggerPolicyTests.testTriggerWordDraftUsesSharedBlankPolicy", run: { PromptTriggerPolicyTests().testTriggerWordDraftUsesSharedBlankPolicy() }),
             VoiceInkCoreCheck(name: "PromptTriggerPolicyTests.testDetectStripsLeadingTriggerAndCapitalizesRemainingText", run: { try PromptTriggerPolicyTests().testDetectStripsLeadingTriggerAndCapitalizesRemainingText() }),
             VoiceInkCoreCheck(name: "PromptTriggerPolicyTests.testDetectStripsTrailingTriggerBeforeLeadingAndKeepsPromptOrder", run: { try PromptTriggerPolicyTests().testDetectStripsTrailingTriggerBeforeLeadingAndKeepsPromptOrder() }),
             VoiceInkCoreCheck(name: "PromptTriggerPolicyTests.testDetectUsesLongestTriggerAndRejectsWordPrefix", run: { try PromptTriggerPolicyTests().testDetectUsesLongestTriggerAndRejectsWordPrefix() }),

@@ -81,6 +81,11 @@ final class PromptTriggerPolicyTests: XCTestCase {
         XCTAssertNil(VoiceInkPromptTriggerPolicy.addingTriggerWord("dictate", to: ["Dictate"]))
     }
 
+    func testTriggerWordDraftUsesSharedBlankPolicy() {
+        XCTAssertFalse(VoiceInkPromptTriggerPolicy.hasTriggerWordDraft(" \n\t "))
+        XCTAssertTrue(VoiceInkPromptTriggerPolicy.hasTriggerWordDraft("  Roma  "))
+    }
+
     func testDetectStripsLeadingTriggerAndCapitalizesRemainingText() throws {
         let promptId = UUID()
         let match = try XCTUnwrap(

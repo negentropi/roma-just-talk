@@ -63,7 +63,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - vocabulary, word-replacement, backup dictionary insert, word-replacement edit planning, and dictionary draft submit rules; platform shells still own dictionary storage and persistence errors
 - custom vocabulary term normalization for transcription providers; platform shells still own dictionary storage
 - custom cloud transcription model draft normalization, generated-name, required-field, and validation policy; platform shells still own keychain and preferences storage
-- prompt trigger-word detection, trigger-word editing policy, and prompt-trigger AI-enhancement detection result construction; platform shells still own prompt persistence and enhancement state mutation
+- prompt trigger-word detection, trigger-word draft validation/editing policy, and prompt-trigger AI-enhancement detection result construction; platform shells still own prompt persistence and enhancement state mutation
 - AI-enhancement prompt context assembly for selected text, clipboard, current-window text, and custom vocabulary tags; platform shells still own OS access, capture, and vocabulary storage
 - AI-enhancement custom prompt record shape, Codable compatibility, and final-prompt wrapping; macOS still owns SwiftUI prompt rendering and prompt-store orchestration
 - predefined-prompt repair/merge policy and trigger-detectable prompt filtering; macOS still owns when the prompt store is loaded and saved

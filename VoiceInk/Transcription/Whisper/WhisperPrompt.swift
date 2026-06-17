@@ -4,7 +4,7 @@ import VoiceInkCore
 
 @MainActor
 class WhisperPrompt: ObservableObject {
-    @Published var transcriptionPrompt: String = UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.transcriptionPrompt) ?? ""
+    @Published var transcriptionPrompt: String = VoiceInkTranscriptionPromptPreference.storedPrompt() ?? ""
 
     // Store user-customized prompts
     private var customPrompts: [String: String] = [:]
@@ -50,7 +50,7 @@ class WhisperPrompt: ObservableObject {
         let prompt = basePrompt.isEmpty ? "" : basePrompt
         
         transcriptionPrompt = prompt
-        UserDefaults.standard.set(prompt, forKey: VoiceInkUserDefaultsKey.transcriptionPrompt)
+        VoiceInkTranscriptionPromptPreference.savePrompt(prompt)
         UserDefaults.standard.synchronize() // Force immediate synchronization
         
         // Notify that the prompt has changed

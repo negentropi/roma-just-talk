@@ -49,20 +49,28 @@ public enum VoiceInkPreferenceDefault {
 }
 
 public enum VoiceInkTranscriptionPromptPreference {
+    public static func storedPrompt(from defaults: UserDefaults = .standard) -> String? {
+        defaults.string(forKey: VoiceInkUserDefaultsKey.transcriptionPrompt)
+    }
+
     public static func localWhisperPrompt(
         from defaults: UserDefaults = .standard,
         fallback: String = ""
     ) -> String {
-        defaults.string(forKey: VoiceInkUserDefaultsKey.transcriptionPrompt) ?? fallback
+        storedPrompt(from: defaults) ?? fallback
     }
 
     public static func requestPrompt(from defaults: UserDefaults = .standard) -> String? {
-        requestPrompt(defaults.string(forKey: VoiceInkUserDefaultsKey.transcriptionPrompt))
+        requestPrompt(storedPrompt(from: defaults))
     }
 
     public static func requestPrompt(_ prompt: String?) -> String? {
         guard let prompt else { return nil }
         return prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : prompt
+    }
+
+    public static func savePrompt(_ prompt: String, to defaults: UserDefaults = .standard) {
+        defaults.set(prompt, forKey: VoiceInkUserDefaultsKey.transcriptionPrompt)
     }
 }
 

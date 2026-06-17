@@ -76,13 +76,13 @@ final class UserDefaultsPreferencesTests: XCTestCase {
                 "Language prompt"
             )
 
-            defaults.set("", forKey: VoiceInkUserDefaultsKey.transcriptionPrompt)
+            VoiceInkTranscriptionPromptPreference.savePrompt("", to: defaults)
             XCTAssertEqual(
                 VoiceInkTranscriptionPromptPreference.localWhisperPrompt(from: defaults, fallback: "Language prompt"),
                 ""
             )
 
-            defaults.set(" spell Roma correctly ", forKey: VoiceInkUserDefaultsKey.transcriptionPrompt)
+            VoiceInkTranscriptionPromptPreference.savePrompt(" spell Roma correctly ", to: defaults)
             XCTAssertEqual(
                 VoiceInkTranscriptionPromptPreference.localWhisperPrompt(from: defaults, fallback: "Language prompt"),
                 " spell Roma correctly "
@@ -100,14 +100,27 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         withIsolatedDefaults { defaults in
             XCTAssertNil(VoiceInkTranscriptionPromptPreference.requestPrompt(from: defaults))
 
-            defaults.set(" keep product names ", forKey: VoiceInkUserDefaultsKey.transcriptionPrompt)
+            VoiceInkTranscriptionPromptPreference.savePrompt(" keep product names ", to: defaults)
             XCTAssertEqual(
                 VoiceInkTranscriptionPromptPreference.requestPrompt(from: defaults),
                 " keep product names "
             )
 
-            defaults.set(" \n ", forKey: VoiceInkUserDefaultsKey.transcriptionPrompt)
+            VoiceInkTranscriptionPromptPreference.savePrompt(" \n ", to: defaults)
             XCTAssertNil(VoiceInkTranscriptionPromptPreference.requestPrompt(from: defaults))
+        }
+    }
+
+    func testTranscriptionPromptPreferenceRoundTripsStoredPrompt() {
+        withIsolatedDefaults { defaults in
+            XCTAssertNil(VoiceInkTranscriptionPromptPreference.storedPrompt(from: defaults))
+
+            VoiceInkTranscriptionPromptPreference.savePrompt("keep Roma spelling", to: defaults)
+
+            XCTAssertEqual(
+                VoiceInkTranscriptionPromptPreference.storedPrompt(from: defaults),
+                "keep Roma spelling"
+            )
         }
     }
 

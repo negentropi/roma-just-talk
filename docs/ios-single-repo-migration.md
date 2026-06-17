@@ -24,7 +24,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - prompt templates and prompt text
 - predefined prompt IDs, labels, prompt text, icons, descriptions, and system-instruction flags
 - custom prompt system-instruction wrapping
-- transcription prompt preference loading for local Whisper and nonblank request prompts for remote/realtime providers
+- transcription prompt preference loading/saving for local Whisper and nonblank request prompts for remote/realtime providers
 - post-processing request construction and output filtering
 - provider catalog, provider endpoints, API key account names, and provider readiness policy
 - provider API-key fallback environment-variable names
@@ -95,7 +95,7 @@ Current macOS consumers of shared remote transport:
 - MacOS cloud-provider API-key verification uses `CloudProvider` default verification backed by `VoiceInkProviderAPIKeyVerifier`; Cartesia stays on `VoiceInkCartesiaClient` because it is streaming-only and not an iOS `VoiceInkProviderKind`.
 - macOS local Whisper/model loading throws `VoiceInkEngineError` from `VoiceInkCore`; macOS error descriptions are covered by `VoiceInkEngineErrorTests`.
 - macOS local Whisper and cloud transcription normalize selected request language through `VoiceInkTranscriptionLanguagePreference`.
-- macOS local Whisper, cloud transcription, and AssemblyAI streaming read transcription prompts through `VoiceInkTranscriptionPromptPreference`.
+- macOS local Whisper, cloud transcription, AssemblyAI streaming, and `WhisperPrompt` read/write transcription prompts through `VoiceInkTranscriptionPromptPreference`.
 - macOS batch cloud and streaming transcription use `VoiceInkProviderCredential` for runtime API-key presence checks before entering provider adapters.
 - macOS API-key lookup reads fallback environment-variable names from `VoiceInkProviderAPIKeyAccount`; Keychain access remains in the macOS shell.
 - macOS cloud-provider model lists are supplied by the `CloudProvider` default adapter over `VoiceInkTranscriptionModelCatalog`, so provider modules only own transport and streaming differences.

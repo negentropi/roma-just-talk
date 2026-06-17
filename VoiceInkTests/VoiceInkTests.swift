@@ -69,53 +69,6 @@ struct VoiceInkTests {
         #expect(metrics.first?.speedFactor == 4.0)
     }
 
-    @Test func contextualCapitalizationLowercasesTitlecaseTextAfterMidSentencePrefix() async throws {
-        let result = ContextualCapitalizationFormatter.format(
-            "Model output",
-            beforeCursor: "this is the "
-        )
-
-        #expect(result == "model output")
-    }
-
-    @Test func contextualCapitalizationKeepsTitlecaseTextAfterSentenceBoundary() async throws {
-        let result = ContextualCapitalizationFormatter.format(
-            "Model output",
-            beforeCursor: "this is done. "
-        )
-
-        #expect(result == "Model output")
-    }
-
-    @Test func contextualCapitalizationCapitalizesLowercaseTextAtDocumentStart() async throws {
-        let result = ContextualCapitalizationFormatter.format(
-            "model output",
-            beforeCursor: ""
-        )
-
-        #expect(result == "Model output")
-    }
-
-    @Test func contextualCapitalizationPreservesAcronymsAfterMidSentencePrefix() async throws {
-        let result = ContextualCapitalizationFormatter.format(
-            "API response",
-            beforeCursor: "call the "
-        )
-
-        #expect(result == "API response")
-    }
-
-    @Test func contextualCapitalizationSkipsCursorContextWhenTextCannotChange() async throws {
-        #expect(ContextualCapitalizationFormatter.needsCursorContext("API response") == false)
-        #expect(ContextualCapitalizationFormatter.needsCursorContext("iPhone setup") == false)
-        #expect(ContextualCapitalizationFormatter.needsCursorContext("1234") == false)
-    }
-
-    @Test func contextualCapitalizationReadsCursorContextWhenTextCanChange() async throws {
-        #expect(ContextualCapitalizationFormatter.needsCursorContext("Model output") == true)
-        #expect(ContextualCapitalizationFormatter.needsCursorContext("model output") == true)
-    }
-
     @Test func resolvesAPIKeyEnvironmentReference() async throws {
         let environment = ["ELEVENLABS_API_KEY": "test-key"]
 

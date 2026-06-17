@@ -1,7 +1,7 @@
 import Foundation
 
-enum ContextualCapitalizationFormatter {
-    static func needsCursorContext(_ text: String) -> Bool {
+public enum VoiceInkContextualCapitalizationFormatter {
+    public static func needsCursorContext(_ text: String) -> Bool {
         guard let firstCasedRange = firstCasedCharacterRange(in: text) else {
             return false
         }
@@ -13,7 +13,7 @@ enum ContextualCapitalizationFormatter {
             shouldLowercaseFirstCasedCharacter(in: firstWord)
     }
 
-    static func format(_ text: String, beforeCursor: String?) -> String {
+    public static func format(_ text: String, beforeCursor: String?) -> String {
         guard let beforeCursor,
               let firstCasedRange = firstCasedCharacterRange(in: text) else {
             return text

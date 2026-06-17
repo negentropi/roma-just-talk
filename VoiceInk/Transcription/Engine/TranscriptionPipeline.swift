@@ -369,13 +369,13 @@ class TranscriptionPipeline {
            transcription.transcriptionState == .completed {
             let shouldLowercase = UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.lowercaseTranscription)
             if !shouldLowercase,
-               ContextualCapitalizationFormatter.needsCursorContext(textToPaste) {
+               VoiceInkContextualCapitalizationFormatter.needsCursorContext(textToPaste) {
                 let beforeCursor = if let preparedCursorTextContext {
                     await preparedCursorTextContext.value
                 } else {
                     CursorTextContextReader.textBeforeCursor()
                 }
-                textToPaste = ContextualCapitalizationFormatter.format(
+                textToPaste = VoiceInkContextualCapitalizationFormatter.format(
                     textToPaste,
                     beforeCursor: beforeCursor
                 )

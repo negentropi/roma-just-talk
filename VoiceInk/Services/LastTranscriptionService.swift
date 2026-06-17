@@ -107,11 +107,11 @@ class LastTranscriptionService: ObservableObject {
             return text
         }
 
-        guard ContextualCapitalizationFormatter.needsCursorContext(text) else {
+        guard VoiceInkContextualCapitalizationFormatter.needsCursorContext(text) else {
             return text
         }
 
-        return ContextualCapitalizationFormatter.format(
+        return VoiceInkContextualCapitalizationFormatter.format(
             text,
             beforeCursor: CursorTextContextReader.textBeforeCursor()
         )

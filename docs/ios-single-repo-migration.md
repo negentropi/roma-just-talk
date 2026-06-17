@@ -29,7 +29,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - provider catalog, provider endpoints, API key account names, and provider readiness policy
 - provider API-key fallback environment-variable names
 - provider credential nonblank validation for runtime API-key checks
-- provider API-key verification dispatch
+- provider API-key verification dispatch, including stored-key reference/fallback resolution before verification
 - provider API-key verification flag storage
 - API-key environment-reference resolution and typed provider runtime-key lookup/fallback policy
 - AI reasoning temperature, effort, and provider-specific hidden-reasoning request parameters for OpenAI-compatible post-processing
@@ -158,7 +158,7 @@ Current iOS consumers of shared remote transport:
 - `iOS/VoiceInk-ios/AppSettings.swift` passes the shared paragraph-formatting preference into `VoiceInkTranscriptionRunProcessor`, so iOS retry transcription uses the same `VoiceInkTranscriptParagraphFormatter` policy as macOS.
 - `iOS/VoiceInk-ios/TranscriptionRetryService.swift` passes the iOS selected transcription language through `VoiceInkTranscriptionRunProcessor`, which normalizes auto-detect before remote/local transcription adapters receive it.
 - `iOS/VoiceInk-ios/WhisperTranscriptionService.swift` passes the shared selected-language local Whisper prompt helper into the iOS whisper.cpp wrapper, so iOS inherits the macOS language seed prompts when no explicit prompt is stored.
-- `iOS/VoiceInk-ios/ProviderAPIKeyView.swift` verifies provider keys through `VoiceInkProviderAPIKeyVerifier` after typed `VoiceInkProviderAPIKeyLookup` reference/fallback resolution.
+- `iOS/VoiceInk-ios/ProviderAPIKeyView.swift` verifies stored provider keys through `VoiceInkProviderAPIKeyVerifier`, so shared core owns reference/fallback resolution before transport verification.
 - `iOS/VoiceInk-ios/AppSettings.swift` and `ModeConfigurationView.swift` delegate active-mode transcription language availability, provider-change model repair, and selected-language repair to the shared `Mode` policy; `SettingsView` keeps only the SwiftUI option rendering.
 - `iOS/VoiceInk-ios/WhisperTranscriptionService.swift` throws `VoiceInkEngineError` from `VoiceInkCore` instead of owning a separate iOS-only local Whisper error enum.
 - Cartesia remains absent from iOS transcription provider selection until an iOS streaming adapter exists; it is not a batch provider.

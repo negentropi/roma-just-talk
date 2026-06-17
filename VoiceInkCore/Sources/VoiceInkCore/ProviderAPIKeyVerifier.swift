@@ -40,6 +40,41 @@ public struct VoiceInkProviderAPIKeyVerifier: Sendable {
         await verifyAPIKeyDetailed(apiKey, for: provider).isValid
     }
 
+    public func verifyStoredAPIKey(
+        _ storedKey: String?,
+        for provider: VoiceInkProviderKind,
+        environment: [String: String] = ProcessInfo.processInfo.environment
+    ) async -> Bool {
+        await verifyStoredAPIKeyDetailed(
+            storedKey,
+            for: provider,
+            environment: environment
+        ).isValid
+    }
+
+    public func verifyStoredAPIKeyDetailed(
+        _ storedKey: String?,
+        for provider: VoiceInkProviderKind,
+        environment: [String: String] = ProcessInfo.processInfo.environment
+    ) async -> VoiceInkAPIKeyVerificationResult {
+        guard provider.canVerifyAPIKey else {
+            return await verifyAPIKeyDetailed("", for: provider)
+        }
+
+        guard let apiKey = VoiceInkProviderAPIKeyLookup.usableAPIKey(
+            storedKey: storedKey,
+            provider: provider,
+            environment: environment
+        ) else {
+            return VoiceInkAPIKeyVerificationResult(
+                isValid: false,
+                errorMessage: "API key is missing or empty."
+            )
+        }
+
+        return await verifyAPIKeyDetailed(apiKey, for: provider)
+    }
+
     public func verifyAPIKeyDetailed(
         _ apiKey: String,
         for provider: VoiceInkProviderKind

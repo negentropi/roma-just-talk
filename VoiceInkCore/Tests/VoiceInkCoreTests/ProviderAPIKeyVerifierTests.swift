@@ -19,6 +19,26 @@ final class ProviderAPIKeyVerifierTests: XCTestCase {
         }
     }
 
+    func testStoredKeyVerifierRejectsMissingStoredOrEnvironmentKeyWithoutNetwork() async {
+        let verifier = VoiceInkProviderAPIKeyVerifier()
+
+        let result = await verifier.verifyStoredAPIKeyDetailed(
+            "$MISSING_GROQ_API_KEY",
+            for: .groq,
+            environment: [:]
+        )
+
+        XCTAssertEqual(
+            result,
+            VoiceInkAPIKeyVerificationResult(
+                isValid: false,
+                errorMessage: "API key is missing or empty."
+            )
+        )
+        let isValid = await verifier.verifyStoredAPIKey(nil, for: .groq, environment: [:])
+        XCTAssertFalse(isValid)
+    }
+
     func testVerifierRejectsProvidersWithoutVerificationTransport() async {
         let verifier = VoiceInkProviderAPIKeyVerifier()
 
@@ -37,6 +57,20 @@ final class ProviderAPIKeyVerifierTests: XCTestCase {
             VoiceInkAPIKeyVerificationResult(
                 isValid: false,
                 errorMessage: "VoiceInk does not support API key verification."
+            )
+        )
+    }
+
+    func testStoredKeyVerifierRejectsProvidersWithoutVerificationTransport() async {
+        let verifier = VoiceInkProviderAPIKeyVerifier()
+
+        let result = await verifier.verifyStoredAPIKeyDetailed("key", for: .localWhisper)
+
+        XCTAssertEqual(
+            result,
+            VoiceInkAPIKeyVerificationResult(
+                isValid: false,
+                errorMessage: "Local (Whisper) does not support API key verification."
             )
         )
     }

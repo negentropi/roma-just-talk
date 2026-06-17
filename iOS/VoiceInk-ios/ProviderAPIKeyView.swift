@@ -110,18 +110,7 @@ struct ProviderAPIKeyView: View {
     }
 
     private func verifiedAPIKey(_ key: String) async -> Bool {
-        guard provider.canVerifyAPIKey else {
-            return false
-        }
-
-        guard let resolvedKey = VoiceInkProviderAPIKeyLookup.usableAPIKey(
-            storedKey: key,
-            provider: provider
-        ) else {
-            return false
-        }
-
-        return await apiKeyVerifier.verifyAPIKey(resolvedKey, for: provider)
+        await apiKeyVerifier.verifyStoredAPIKey(key, for: provider)
     }
 
     private func obfuscatedKey() -> String? {

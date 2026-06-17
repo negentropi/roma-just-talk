@@ -162,6 +162,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "VADModelFilesTests.testSileroFilenameUsesSharedResourceNameAndExtension", run: { VADModelFilesTests().testSileroFilenameUsesSharedResourceNameAndExtension() }),
             VoiceInkCoreCheck(name: "VoiceInkEngineErrorTests.testMacOSErrorDescriptionsStayStable", run: { VoiceInkEngineErrorTests().testMacOSErrorDescriptionsStayStable() }),
             VoiceInkCoreCheck(name: "VoiceInkEngineErrorTests.testIOSLocalWhisperDescriptionsStayStable", run: { VoiceInkEngineErrorTests().testIOSLocalWhisperDescriptionsStayStable() }),
+            VoiceInkCoreCheck(name: "WhisperRuntimeDefaultsTests.testThreadCountKeepsExistingBounds", run: { WhisperRuntimeDefaultsTests().testThreadCountKeepsExistingBounds() }),
+            VoiceInkCoreCheck(name: "WhisperRuntimeDefaultsTests.testRuntimeConstantsMatchExistingWhisperWrappers", run: { WhisperRuntimeDefaultsTests().testRuntimeConstantsMatchExistingWhisperWrappers() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testBootstrapModelsContainBaseModelSpec", run: { WhisperModelFilesTests().testBootstrapModelsContainBaseModelSpec() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testDownloadableModelsMatchMacOSLocalWhisperCatalog", run: { WhisperModelFilesTests().testDownloadableModelsMatchMacOSLocalWhisperCatalog() }),
         ]

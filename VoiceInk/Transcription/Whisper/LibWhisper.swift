@@ -32,7 +32,6 @@ actor WhisperContext {
     func fullTranscribe(samples: [Float]) -> Bool {
         guard let context = context else { return false }
         
-        let maxThreads = max(1, min(8, cpuCount() - 2))
         var params = whisper_full_default_params(WHISPER_SAMPLING_GREEDY)
         
         // Read language directly from UserDefaults
@@ -62,11 +61,11 @@ actor WhisperContext {
         params.print_timestamps = true
         params.print_special = false
         params.translate = false
-        params.n_threads = Int32(maxThreads)
+        params.n_threads = VoiceInkWhisperRuntimeDefaults.threadCount()
         params.offset_ms = 0
         params.no_context = true
         params.single_segment = false
-        params.temperature = 0.2
+        params.temperature = VoiceInkWhisperRuntimeDefaults.transcriptionTemperature
 
         whisper_reset_timings(context)
         
@@ -77,12 +76,12 @@ actor WhisperContext {
             params.vad_model_path = (vadModelPath as NSString).utf8String
             
             var vadParams = whisper_vad_default_params()
-            vadParams.threshold = 0.50
-            vadParams.min_speech_duration_ms = 250
-            vadParams.min_silence_duration_ms = 100
-            vadParams.max_speech_duration_s = Float.greatestFiniteMagnitude
-            vadParams.speech_pad_ms = 30
-            vadParams.samples_overlap = 0.1
+            vadParams.threshold = VoiceInkWhisperRuntimeDefaults.vadThreshold
+            vadParams.min_speech_duration_ms = VoiceInkWhisperRuntimeDefaults.vadMinSpeechDurationMs
+            vadParams.min_silence_duration_ms = VoiceInkWhisperRuntimeDefaults.vadMinSilenceDurationMs
+            vadParams.max_speech_duration_s = VoiceInkWhisperRuntimeDefaults.vadMaxSpeechDurationSeconds
+            vadParams.speech_pad_ms = VoiceInkWhisperRuntimeDefaults.vadSpeechPadMs
+            vadParams.samples_overlap = VoiceInkWhisperRuntimeDefaults.vadSamplesOverlap
             params.vad_params = vadParams
         } else {
             params.vad = false
@@ -159,8 +158,4 @@ actor WhisperContext {
     func setPrompt(_ prompt: String?) {
         self.prompt = prompt
     }
-}
-
-fileprivate func cpuCount() -> Int {
-    ProcessInfo.processInfo.processorCount
 }

@@ -50,6 +50,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - current transcription model preference loading/saving/clearing; platform shells still own model availability, download/runtime state, and legacy key cleanup
 - transcript status, presentation helpers, and localized standard transcript search semantics
 - local transcription/model/missing-audio error vocabulary shared by macOS local Whisper and iOS local retry transcription
+- streaming word-agreement confirmation policy for stable partial transcription, including confidence gates, sentence-boundary confirmation, reset behavior, and rolling-preload configuration; platform shells still own provider token adapters, ASR runtime calls, audio buffering, and event delivery
 - raw transcription output filtering for hallucination tags/brackets, optional filler words, default filler-word vocabulary, and filler-word list editing policy; iOS settings now use the same list editing policy in their platform shell
 - transcription cleanup preference loading/saving/reset storage, raw-output filtering, and paragraph-formatting/punctuation/lowercase/filler-word cleanup policy
 - filler-word list storage defaults and saving
@@ -140,6 +141,7 @@ Current macOS consumers of shared remote transport:
 - macOS transcript details and CSV export delegate power-mode display formatting to `VoiceInkPowerModePresentation`.
 - macOS and iOS local Whisper model directory creation, local `.bin` listing, download URL/file path lookup, runtime selected-model file resolution, final downloaded-file installation, bootstrap-model availability, Core ML support checks, and model deletion delegate to `VoiceInkWhisperModelFiles`; platform shells still own download progress, UI, and runtime model state.
 - macOS and iOS local Whisper and macOS rolling preload resolve the Silero VAD bundle resource directly through `VoiceInkVADModelFiles`; the old shell-only VAD model manager adapters were removed.
+- macOS `FluidAudioStreamingProvider` runs stable partial-transcript confirmation through `WordAgreementEngine` in `VoiceInkCore`; `FluidAudioWordTimingAdapter` remains a macOS shell adapter because it imports the FluidAudio token type.
 - macOS history/import row summaries, macOS audio-file row action text, and iOS note detail display use `VoiceInkTranscriptPresentation.preferredText` for the enhanced-text-first transcript display rule.
 - `VoiceInkTranscriptPresentation.matchesSearch` mirrors macOS history predicate search semantics, keeping iOS note filtering accent-insensitive through shared core while macOS SwiftData predicates keep their local query shape.
 - macOS `FillerWordManager`, iOS `AppSettings`, and cleanup configuration load and save filler-word lists through `VoiceInkFillerWordPreference`; macOS and iOS setting surfaces use `VoiceInkFillerWords.normalizedWord` for add-button draft validation while platform shells still own settings UI and toggle state.

@@ -35,7 +35,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - duration presentation
 - Whisper and VAD model file metadata
 - VAD bundle resource lookup
-- PCM16 sample conversion
+- PCM16 sample conversion and mono 16 kHz transcription-audio constants
 - OpenAI-compatible, Deepgram, Gemini, Mistral, ElevenLabs, xAI, Soniox, Speechmatics, and AssemblyAI remote transcription request/client helpers
 - Cartesia API-key verification request/client helper
 - shared multipart form-data construction for remote transcription clients

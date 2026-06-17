@@ -1,16 +1,11 @@
 import Foundation
 import AVFoundation
 import os
+import VoiceInkCore
 
 class AudioProcessor {
     private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "AudioProcessor")
-    
-    struct AudioFormat {
-        static let targetSampleRate: Double = 16000.0
-        static let targetChannels: UInt32 = 1
-        static let targetBitDepth: UInt32 = 16
-    }
-    
+
     enum AudioProcessingError: LocalizedError {
         case invalidAudioFile
         case conversionFailed
@@ -46,8 +41,8 @@ class AudioProcessor {
         
         let outputFormat = AVAudioFormat(
             commonFormat: .pcmFormatFloat32,
-            sampleRate: AudioFormat.targetSampleRate,
-            channels: AudioFormat.targetChannels,
+            sampleRate: VoiceInkPCM16Audio.mono16kSampleRate,
+            channels: AVAudioChannelCount(VoiceInkPCM16Audio.monoChannelCount),
             interleaved: false
         )
         
@@ -70,7 +65,8 @@ class AudioProcessor {
             audioFile.framePosition = currentFrame
             try audioFile.read(into: inputBuffer, frameCount: framesToRead)
             
-            if sampleRate == AudioFormat.targetSampleRate && channels == AudioFormat.targetChannels {
+            if sampleRate == VoiceInkPCM16Audio.mono16kSampleRate
+                && channels == AVAudioChannelCount(VoiceInkPCM16Audio.monoChannelCount) {
                 let chunkSamples = convertToWhisperFormat(inputBuffer)
                 allSamples.append(contentsOf: chunkSamples)
             } else {
@@ -78,7 +74,7 @@ class AudioProcessor {
                     throw AudioProcessingError.conversionFailed
                 }
                 
-                let ratio = AudioFormat.targetSampleRate / sampleRate
+                let ratio = VoiceInkPCM16Audio.mono16kSampleRate / sampleRate
                 let outputFrameCount = AVAudioFrameCount(Double(inputBuffer.frameLength) * ratio)
                 
                 guard let outputBuffer = AVAudioPCMBuffer(pcmFormat: outputFormat, frameCapacity: outputFrameCount) else {
@@ -144,8 +140,8 @@ class AudioProcessor {
     func saveSamplesAsWav(samples: [Float], to url: URL) throws {
         let outputFormat = AVAudioFormat(
             commonFormat: .pcmFormatInt16,
-            sampleRate: AudioFormat.targetSampleRate,
-            channels: AudioFormat.targetChannels,
+            sampleRate: VoiceInkPCM16Audio.mono16kSampleRate,
+            channels: AVAudioChannelCount(VoiceInkPCM16Audio.monoChannelCount),
             interleaved: true
         )
 
@@ -183,4 +179,3 @@ class AudioProcessor {
         try audioFile.write(from: buffer)
     }
 } 
-

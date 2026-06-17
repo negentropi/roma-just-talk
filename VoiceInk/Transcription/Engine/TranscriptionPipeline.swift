@@ -190,7 +190,8 @@ class TranscriptionPipeline {
             } else {
                 text = try await serviceRegistry.transcribe(audioURL: audioURL, model: model)
             }
-            text = TranscriptionOutputFilter.filter(text)
+            let cleanupConfiguration = VoiceInkTranscriptionCleanupConfiguration.current()
+            text = cleanupConfiguration.filterRawOutput(text)
             let transcriptionDuration = Date().timeIntervalSince(transcriptionStart)
             if let latencyTrace {
                 logger.notice("Latency trace transcription ready operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s transcriptionElapsed=\(transcriptionDuration, format: .fixed(precision: 3), privacy: .public)s chars=\(text.count, privacy: .public)")
@@ -201,12 +202,12 @@ class TranscriptionPipeline {
 
             text = text.trimmingCharacters(in: .whitespacesAndNewlines)
 
-            if UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.isTextFormattingEnabled) {
+            if cleanupConfiguration.shouldFormatParagraphs {
                 text = VoiceInkTranscriptParagraphFormatter.format(text)
             }
 
             text = WordReplacementService.shared.applyReplacements(to: text, using: modelContext)
-            let cleanedText = TranscriptionOutputFilter.applyUserCleanupPreferences(text)
+            let cleanedText = cleanupConfiguration.applyTextPreferences(text)
 
             transcription.text = cleanedText
             transcription.transcriptionModelName = model.displayName

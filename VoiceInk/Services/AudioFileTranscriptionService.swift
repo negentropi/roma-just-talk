@@ -48,7 +48,8 @@ class AudioTranscriptionService: ObservableObject {
             let transcriptionStart = Date()
             var text = try await serviceRegistry.transcribe(audioURL: url, model: model)
             let transcriptionDuration = Date().timeIntervalSince(transcriptionStart)
-            text = TranscriptionOutputFilter.filter(text)
+            let cleanupConfiguration = VoiceInkTranscriptionCleanupConfiguration.current()
+            text = cleanupConfiguration.filterRawOutput(text)
             text = text.trimmingCharacters(in: .whitespacesAndNewlines)
 
             let powerModeManager = PowerModeManager.shared
@@ -56,13 +57,13 @@ class AudioTranscriptionService: ObservableObject {
             let powerModeName = (activePowerModeConfig?.isEnabled == true) ? activePowerModeConfig?.name : nil
             let powerModeEmoji = (activePowerModeConfig?.isEnabled == true) ? activePowerModeConfig?.emoji : nil
 
-            if UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.isTextFormattingEnabled) {
+            if cleanupConfiguration.shouldFormatParagraphs {
                 text = VoiceInkTranscriptParagraphFormatter.format(text)
             }
 
             text = WordReplacementService.shared.applyReplacements(to: text, using: modelContext)
             logger.notice("✅ Word replacements applied")
-            let cleanedText = TranscriptionOutputFilter.applyUserCleanupPreferences(text)
+            let cleanedText = cleanupConfiguration.applyTextPreferences(text)
 
             let audioAsset = AVURLAsset(url: url)
             let duration = CMTimeGetSeconds(try await audioAsset.load(.duration))

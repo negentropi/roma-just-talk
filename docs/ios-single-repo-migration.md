@@ -37,7 +37,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - transcript status and presentation helpers
 - local transcription/model/missing-audio error vocabulary shared by macOS local Whisper and iOS local retry transcription
 - raw transcription output filtering for hallucination tags/brackets, optional filler words, default filler-word vocabulary, and filler-word list editing policy; iOS settings now use the same list editing policy in their platform shell
-- transcription cleanup preference loading and paragraph-formatting/punctuation/lowercase/filler-word cleanup policy
+- transcription cleanup preference loading, raw-output filtering, and paragraph-formatting/punctuation/lowercase/filler-word cleanup policy
 - cursor-aware transcript capitalization policy; platform shells only supply cursor text and paste targets
 - NaturalLanguage word-count policy for metrics and short-enhancement skip decisions
 - short post-processing skip policy and storage defaults for brief transcripts; platform shells still own UI controls and whether to apply the policy
@@ -80,6 +80,7 @@ Current macOS consumers of shared remote transport:
 - macOS local Whisper, cloud transcription, and AssemblyAI streaming read transcription prompts through `VoiceInkTranscriptionPromptPreference`.
 - macOS batch cloud and streaming transcription use `VoiceInkProviderCredential` for runtime API-key presence checks before entering provider adapters.
 - macOS language pickers use `VoiceInkLanguageCatalog.sortedOptions` so language presentation order stays shared with iOS.
+- macOS recording, audio-file transcription, and retry transcription use `VoiceInkTranscriptionCleanupConfiguration` directly for shared raw-output filtering and cleanup preferences.
 
 Current iOS consumers of shared remote transport:
 

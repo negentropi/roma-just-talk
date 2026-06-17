@@ -109,19 +109,16 @@ public struct VoiceInkTranscriptionRunProcessor {
             language: VoiceInkTranscriptionLanguageSupport.requestLanguage(transcriptionLanguage)
         )
 
-        let filteredText = VoiceInkTranscriptionOutputFilter.filter(
+        let filteredText = cleanupConfiguration.filterRawOutput(
             rawText,
-            fillerWords: cleanupConfiguration.activeFillerWords,
             whitespacePolicy: .preserveParagraphs
         )
         let normalizedText = VoiceInkTranscriptTextNormalizer.normalizeParagraphSpacing(filteredText)
         let formattedText = cleanupConfiguration.shouldFormatParagraphs
             ? VoiceInkTranscriptParagraphFormatter.format(normalizedText)
             : normalizedText
-        let cleanedText = VoiceInkTranscriptionCleanupPreferences.apply(
+        let cleanedText = cleanupConfiguration.applyTextPreferences(
             formattedText,
-            punctuationMode: cleanupConfiguration.punctuationMode,
-            shouldLowercase: cleanupConfiguration.shouldLowercase
         )
         let aiEnhancementModelName = configuration.isPostProcessingEnabled ? configuration.postProcessingModel : nil
 

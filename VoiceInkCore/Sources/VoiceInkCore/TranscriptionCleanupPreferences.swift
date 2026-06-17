@@ -74,6 +74,25 @@ public struct VoiceInkTranscriptionCleanupConfiguration: Equatable, Sendable {
         shouldRemoveFillerWords ? fillerWords : []
     }
 
+    public func filterRawOutput(
+        _ text: String,
+        whitespacePolicy: VoiceInkTranscriptionOutputWhitespacePolicy = .collapseRuns
+    ) -> String {
+        VoiceInkTranscriptionOutputFilter.filter(
+            text,
+            fillerWords: activeFillerWords,
+            whitespacePolicy: whitespacePolicy
+        )
+    }
+
+    public func applyTextPreferences(_ text: String) -> String {
+        VoiceInkTranscriptionCleanupPreferences.apply(
+            text,
+            punctuationMode: punctuationMode,
+            shouldLowercase: shouldLowercase
+        )
+    }
+
     public init(
         punctuationMode: PunctuationCleanupMode = .keep,
         shouldFormatParagraphs: Bool = false,

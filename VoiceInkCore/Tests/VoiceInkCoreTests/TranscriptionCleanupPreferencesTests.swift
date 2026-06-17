@@ -101,6 +101,35 @@ final class TranscriptionCleanupPreferencesTests: XCTestCase {
         )
     }
 
+    func testCleanupConfigurationFiltersRawOutputUsingActiveFillerWords() {
+        let enabledConfiguration = VoiceInkTranscriptionCleanupConfiguration(
+            shouldRemoveFillerWords: true,
+            fillerWords: ["um", "like"]
+        )
+        XCTAssertEqual(
+            enabledConfiguration.filterRawOutput("Um, <noise>bad</noise> like ship [music] it."),
+            "ship it."
+        )
+
+        let disabledConfiguration = VoiceInkTranscriptionCleanupConfiguration(
+            shouldRemoveFillerWords: false,
+            fillerWords: ["um", "like"]
+        )
+        XCTAssertEqual(
+            disabledConfiguration.filterRawOutput("Um, like ship it."),
+            "Um, like ship it."
+        )
+    }
+
+    func testCleanupConfigurationAppliesTextPreferences() {
+        let configuration = VoiceInkTranscriptionCleanupConfiguration(
+            punctuationMode: .removeTrailingPeriod,
+            shouldLowercase: true
+        )
+
+        XCTAssertEqual(configuration.applyTextPreferences("SHIP IT."), "ship it")
+    }
+
     private func withIsolatedDefaults(_ run: (UserDefaults) -> Void) {
         let suiteName = "VoiceInkCore.TranscriptionCleanupPreferencesTests.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!

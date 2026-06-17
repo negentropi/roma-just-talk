@@ -197,6 +197,9 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testCoreMLSidecarURLsUseSharedModelNaming", run: { WhisperModelFilesTests().testCoreMLSidecarURLsUseSharedModelNaming() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testModelFileFilterMatchesExistingBinOnlyPolicy", run: { WhisperModelFilesTests().testModelFileFilterMatchesExistingBinOnlyPolicy() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testDownloadableModelsMatchMacOSLocalWhisperCatalog", run: { WhisperModelFilesTests().testDownloadableModelsMatchMacOSLocalWhisperCatalog() }),
+            VoiceInkCoreCheck(name: "WordCounterTests.testCountsNaturalLanguageWords", run: { WordCounterTests().testCountsNaturalLanguageWords() }),
+            VoiceInkCoreCheck(name: "WordCounterTests.testIgnoresWhitespaceOnlyText", run: { WordCounterTests().testIgnoresWhitespaceOnlyText() }),
+            VoiceInkCoreCheck(name: "WordCounterTests.testCountsWordsAcrossPunctuation", run: { WordCounterTests().testCountsWordsAcrossPunctuation() }),
         ]
 
         for check in checks {

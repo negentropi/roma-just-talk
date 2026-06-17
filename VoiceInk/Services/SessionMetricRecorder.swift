@@ -45,7 +45,7 @@ enum SessionMetricRecorder {
         }
 
         let textForCounting = finalTextForCounting(from: transcription)
-        let wordCount = WordCounter.count(in: textForCounting)
+        let wordCount = VoiceInkWordCounter.count(in: textForCounting)
         let audioDuration = max(transcription.duration, 0)
         let transcriptionDuration = transcription.transcriptionDuration.flatMap { $0 > 0 ? $0 : nil }
         let speedFactor = transcriptionDuration.flatMap { duration in

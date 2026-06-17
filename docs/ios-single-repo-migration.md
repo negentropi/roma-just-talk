@@ -36,6 +36,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - raw transcription output filtering for hallucination tags/brackets, optional filler words, default filler-word vocabulary, and filler-word list editing policy
 - transcription cleanup preferences and punctuation/lowercase cleanup policy
 - cursor-aware transcript capitalization policy; platform shells only supply cursor text and paste targets
+- NaturalLanguage word-count policy for metrics and short-enhancement skip decisions
 - stored audio-file path resolution, existing-file lookup, recordings directory, and file URL construction
 - duration presentation
 - relative timestamp presentation

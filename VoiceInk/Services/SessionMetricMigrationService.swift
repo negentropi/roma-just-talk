@@ -1,6 +1,7 @@
 import Foundation
 import SwiftData
 import OSLog
+import VoiceInkCore
 
 @MainActor
 final class SessionMetricMigrationService {
@@ -57,7 +58,7 @@ final class SessionMetricMigrationService {
                         transcriptionId: transcription.id,
                         timestamp: transcription.timestamp,
                         source: "recorder",
-                        wordCount: WordCounter.count(in: textForCounting),
+                        wordCount: VoiceInkWordCounter.count(in: textForCounting),
                         audioDuration: audioDuration,
                         transcriptionModelName: transcription.transcriptionModelName,
                         transcriptionDuration: transcriptionDuration,

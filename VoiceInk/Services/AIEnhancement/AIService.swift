@@ -115,7 +115,7 @@ class AIService: ObservableObject {
     @Published private var openRouterModels: [String] = []
     
     var connectedProviders: [AIProvider] {
-        AIProvider.allCases.filter { provider in
+        AIProvider.selectableTextEnhancementProviders.filter { provider in
             if provider == .ollama {
                 return ollamaService.isConnected
             } else if provider == .localCLI {

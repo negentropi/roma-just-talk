@@ -70,6 +70,19 @@ public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
         }
     }
 
+    public var isSelectableForTextEnhancement: Bool {
+        switch self {
+        case .assemblyAI, .deepgram, .elevenLabs, .soniox, .speechmatics:
+            return false
+        case .anthropic, .cerebras, .custom, .gemini, .groq, .localCLI, .mistral, .ollama, .openAI, .openRouter:
+            return true
+        }
+    }
+
+    public static var selectableTextEnhancementProviders: [Self] {
+        allCases.filter(\.isSelectableForTextEnhancement)
+    }
+
     public var apiKeyVerificationTransport: VoiceInkAIEnhancementAPIKeyVerificationTransport? {
         switch self {
         case .anthropic:

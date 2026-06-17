@@ -429,7 +429,7 @@ struct ConfigurationView: View {
                             }
                         } else {
                             Picker("AI Provider", selection: providerBinding) {
-                                ForEach(aiService.connectedProviders.filter { $0 != .elevenLabs && $0 != .deepgram }, id: \.self) { provider in
+                                ForEach(aiService.connectedProviders, id: \.self) { provider in
                                     Text(provider.rawValue).tag(provider)
                                 }
                             }

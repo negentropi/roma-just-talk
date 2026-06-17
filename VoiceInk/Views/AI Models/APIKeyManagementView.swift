@@ -21,7 +21,7 @@ struct APIKeyManagementView: View {
         Section("AI Provider Integration") {
             HStack {
                 Picker("Provider", selection: $aiService.selectedProvider) {
-                    ForEach(AIProvider.allCases.filter { $0 != .elevenLabs && $0 != .deepgram && $0 != .soniox && $0 != .speechmatics && $0 != .assemblyAI }, id: \.self) { provider in
+                    ForEach(AIProvider.selectableTextEnhancementProviders, id: \.self) { provider in
                         Text(provider.rawValue).tag(provider)
                     }
                 }

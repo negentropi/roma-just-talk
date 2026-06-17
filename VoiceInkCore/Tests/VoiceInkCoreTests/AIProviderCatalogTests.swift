@@ -45,6 +45,29 @@ final class AIProviderCatalogTests: XCTestCase {
         XCTAssertTrue(VoiceInkAIEnhancementProviderKind.anthropic.requiresUserAPIKey)
     }
 
+    func testMacOSAIEnhancementSelectableTextProvidersAreShared() {
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.selectableTextEnhancementProviders,
+            [
+                .cerebras,
+                .groq,
+                .gemini,
+                .anthropic,
+                .openAI,
+                .openRouter,
+                .mistral,
+                .ollama,
+                .localCLI,
+                .custom
+            ]
+        )
+        XCTAssertFalse(VoiceInkAIEnhancementProviderKind.assemblyAI.isSelectableForTextEnhancement)
+        XCTAssertFalse(VoiceInkAIEnhancementProviderKind.deepgram.isSelectableForTextEnhancement)
+        XCTAssertFalse(VoiceInkAIEnhancementProviderKind.elevenLabs.isSelectableForTextEnhancement)
+        XCTAssertFalse(VoiceInkAIEnhancementProviderKind.soniox.isSelectableForTextEnhancement)
+        XCTAssertFalse(VoiceInkAIEnhancementProviderKind.speechmatics.isSelectableForTextEnhancement)
+    }
+
     func testMacOSAIEnhancementProviderVerificationTransportIsShared() {
         let expectedTransports: [VoiceInkAIEnhancementProviderKind: VoiceInkAIEnhancementAPIKeyVerificationTransport?] = [
             .anthropic: .anthropicMessages,

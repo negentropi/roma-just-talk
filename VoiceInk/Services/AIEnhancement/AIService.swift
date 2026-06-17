@@ -52,79 +52,67 @@ enum AIProvider: String, CaseIterable {
     }
     
     var defaultModel: String {
-        if let coreDefaultModel = coreProviderKind?.postProcessingDefaultModel {
-            return coreDefaultModel
+        if let provider = coreAIModelProvider {
+            return VoiceInkAIModelCatalog.defaultModel(for: provider)
         }
 
         switch self {
-        case .anthropic:
-            return "claude-sonnet-4-6"
-        case .mistral:
-            return "mistral-large-latest"
-        case .elevenLabs:
-            return "scribe_v2"
-        case .deepgram:
-            return "whisper-1"
-        case .soniox:
-            return "stt-async-v4"
-        case .speechmatics:
-            return "speechmatics-enhanced"
-        case .assemblyAI:
-            return "universal-3-pro"
         case .ollama:
             return UserDefaults.standard.string(forKey: "ollamaSelectedModel") ?? "mistral"
         case .localCLI:
             return "local-cli"
         case .custom:
             return UserDefaults.standard.string(forKey: "customProviderModel") ?? ""
-        case .openRouter:
-            return "openai/gpt-oss-120b"
-        case .cerebras, .groq, .gemini, .openAI:
+        case .anthropic, .assemblyAI, .cerebras, .deepgram, .elevenLabs, .groq, .gemini, .mistral, .openAI, .openRouter, .soniox, .speechmatics:
             preconditionFailure("Core-backed providers should return from VoiceInkAIModelCatalog")
         }
     }
     
     var availableModels: [String] {
-        if let coreModels = coreProviderKind?.postProcessingModels {
-            return coreModels
+        if let provider = coreAIModelProvider {
+            return VoiceInkAIModelCatalog.availableModels(for: provider)
         }
 
         switch self {
-        case .anthropic:
-            return [
-                "claude-opus-4-7",
-                "claude-opus-4-6",
-                "claude-sonnet-4-6",
-                "claude-opus-4-5",
-                "claude-sonnet-4-5",
-                "claude-haiku-4-5"
-            ]
-        case .mistral:
-            return [
-                "mistral-large-latest",
-                "mistral-medium-latest",
-                "mistral-small-latest"
-            ]
-        case .elevenLabs:
-            return ["scribe_v1", "scribe_v2"]
-        case .deepgram:
-            return ["whisper-1"]
-        case .soniox:
-            return ["stt-async-v4"]
-        case .speechmatics:
-            return ["speechmatics-enhanced"]
-        case .assemblyAI:
-            return ["universal-3-pro"]
         case .ollama:
             return []
         case .localCLI:
             return []
         case .custom:
             return []
-        case .openRouter:
-            return []
-        case .cerebras, .groq, .gemini, .openAI:
+        case .anthropic, .assemblyAI, .cerebras, .deepgram, .elevenLabs, .groq, .gemini, .mistral, .openAI, .openRouter, .soniox, .speechmatics:
             preconditionFailure("Core-backed providers should return from VoiceInkAIModelCatalog")
+        }
+    }
+
+    var coreAIModelProvider: VoiceInkAIModelProvider? {
+        switch self {
+        case .anthropic:
+            return .anthropic
+        case .assemblyAI:
+            return .assemblyAI
+        case .cerebras:
+            return .cerebras
+        case .deepgram:
+            return .deepgram
+        case .elevenLabs:
+            return .elevenLabs
+        case .groq:
+            return .groq
+        case .gemini:
+            return .gemini
+        case .mistral:
+            return .mistral
+        case .openAI:
+            return .openAI
+        case .openRouter:
+            return .openRouter
+        case .soniox:
+            return .soniox
+        case .speechmatics:
+            return .speechmatics
+        case .ollama, .localCLI, .custom:
+            return nil
         }
     }
 

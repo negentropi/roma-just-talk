@@ -63,6 +63,8 @@ public enum VoiceInkAIReasoningConfig {
         case .groq:
             if groqGPTOSSMinimumReasoningModels.contains(modelName) { return "low" }
             if groqQwenReasoningModels.contains(modelName) { return "none" }
+        case .anthropic, .assemblyAI, .deepgram, .elevenLabs, .mistral, .openRouter, .soniox, .speechmatics:
+            break
         }
         return nil
     }

@@ -30,4 +30,23 @@ final class AIReasoningConfigTests: XCTestCase {
         )
         XCTAssertNil(VoiceInkAIReasoningConfig.extraBodyParameters(for: .openAI, modelName: "gpt-5.4"))
     }
+
+    func testMacOSExtraAIProvidersUseNoSharedReasoningOverrides() {
+        let providersWithoutOverrides: [VoiceInkAIModelProvider] = [
+            .anthropic,
+            .assemblyAI,
+            .deepgram,
+            .elevenLabs,
+            .mistral,
+            .openRouter,
+            .soniox,
+            .speechmatics
+        ]
+
+        for provider in providersWithoutOverrides {
+            let model = VoiceInkAIModelCatalog.defaultModel(for: provider)
+            XCTAssertNil(VoiceInkAIReasoningConfig.reasoningEffort(for: provider, modelName: model))
+            XCTAssertNil(VoiceInkAIReasoningConfig.extraBodyParameters(for: provider, modelName: model))
+        }
+    }
 }

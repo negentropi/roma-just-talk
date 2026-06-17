@@ -33,6 +33,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - provider API-key verification flag storage
 - API-key environment-reference resolution
 - AI reasoning temperature, effort, and provider-specific hidden-reasoning request parameters for OpenAI-compatible post-processing
+- AI-enhancement model defaults and static model lists for macOS AI providers; platform shells still own dynamic providers such as Ollama, OpenRouter fetching, Local CLI, and Custom
 - transcription and AI model catalogs
 - Native Apple and FluidAudio local transcription model metadata; platform shells still own availability, download, and runtime adapters
 - remote transcription provider dispatch for iOS retry transcription
@@ -93,6 +94,7 @@ Current macOS consumers of shared remote transport:
 - macOS metrics dashboard duration copy uses `VoiceInkDurationPresentation`, removing the last dashboard-local duration formatter.
 - macOS predefined prompt persistence adapts `VoiceInkPredefinedPrompts` into `CustomPrompt`, so stable prompt IDs and metadata live in shared core.
 - macOS custom prompt final text delegates to `VoiceInkAIPrompts.finalPromptText`, so the system-instruction wrapper stays shared.
+- macOS AI-enhancement provider model defaults and static model lists come from `VoiceInkAIModelCatalog`; macOS still owns provider UI, API-key storage, dynamic OpenRouter fetches, Ollama, Local CLI, and Custom provider settings.
 - iOS retry post-processing inherits `VoiceInkAIReasoningConfig` through `VoiceInkPostProcessingClient`, aligning OpenAI-compatible reasoning controls with macOS enhancement requests.
 
 Current iOS consumers of shared remote transport:

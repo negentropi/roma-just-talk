@@ -55,14 +55,13 @@ class WhisperTranscriptionService: TranscriptionService {
         // Read audio data
         let data = try readAudioSamples(audioURL)
 
-        // Set prompt
         let currentPrompt = VoiceInkTranscriptionPromptPreference.localWhisperPromptForSelectedLanguage()
-        await whisperContext.setPrompt(currentPrompt)
 
         // Transcribe
         let success = await whisperContext.fullTranscribe(
             samples: data,
-            language: VoiceInkTranscriptionLanguagePreference.requestLanguage()
+            language: VoiceInkTranscriptionLanguagePreference.requestLanguage(),
+            prompt: currentPrompt
         )
 
         guard success else {

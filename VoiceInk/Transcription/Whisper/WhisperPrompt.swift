@@ -51,8 +51,6 @@ class WhisperPrompt: ObservableObject {
         VoiceInkTranscriptionPromptPreference.savePrompt(prompt)
         UserDefaults.standard.synchronize() // Force immediate synchronization
         
-        // Notify that the prompt has changed
-        NotificationCenter.default.post(name: .promptDidChange, object: nil)
     }
     
     func getLanguagePrompt(for language: String) -> String {

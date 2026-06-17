@@ -995,12 +995,6 @@ class VoiceInkEngine: NSObject, ObservableObject {
         )
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(handlePromptChange),
-            name: .promptDidChange,
-            object: nil
-        )
-        NotificationCenter.default.addObserver(
-            self,
             selector: #selector(handleAppSettingsDidChange),
             name: .AppSettingsDidChange,
             object: nil
@@ -1015,17 +1009,6 @@ class VoiceInkEngine: NSObject, ObservableObject {
 
     @objc func handleLicenseStatusChanged() {
         pipeline.licenseViewModel = LicenseViewModel()
-    }
-
-    @objc func handlePromptChange() {
-        Task {
-            let currentPrompt = VoiceInkTranscriptionPromptPreference.localWhisperPrompt(
-                fallback: whisperModelManager.whisperPrompt.transcriptionPrompt
-            )
-            if let context = whisperModelManager.whisperContext {
-                await context.setPrompt(currentPrompt)
-            }
-        }
     }
 
     @objc func handleAppSettingsDidChange() {

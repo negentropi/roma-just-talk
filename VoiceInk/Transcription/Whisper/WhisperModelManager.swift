@@ -66,11 +66,6 @@ class WhisperModelManager: ObservableObject {
         do {
             whisperContext = try await WhisperContext.createContext(path: model.url.path)
 
-            let currentPrompt = VoiceInkTranscriptionPromptPreference.localWhisperPrompt(
-                fallback: whisperPrompt.transcriptionPrompt
-            )
-            await whisperContext?.setPrompt(currentPrompt)
-
             isModelLoaded = true
             loadedWhisperModel = model
         } catch {

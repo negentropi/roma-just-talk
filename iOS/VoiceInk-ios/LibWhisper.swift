@@ -36,38 +36,42 @@ actor WhisperContext {
         guard let context = context else { return false }
         
         var params = whisper_full_default_params(WHISPER_SAMPLING_GREEDY)
-        
-        let languageCString = language.map { Array($0.utf8CString) }
-        let promptCString = prompt.map { Array($0.utf8CString) }
+        let runtimeConfiguration = VoiceInkWhisperRuntimeConfiguration.current(
+            language: language,
+            prompt: prompt,
+            vadModelPath: vadModelPath
+        )
+        let languageCString = runtimeConfiguration.language.map { Array($0.utf8CString) }
+        let promptCString = runtimeConfiguration.prompt.map { Array($0.utf8CString) }
+        let vadModelPathCString = runtimeConfiguration.vad?.modelPath.utf8CString
         
         params.print_realtime = true
         params.print_progress = false
         params.print_timestamps = true
         params.print_special = false
         params.translate = false
-        params.n_threads = VoiceInkWhisperRuntimeDefaults.threadCount()
+        params.n_threads = runtimeConfiguration.threadCount
         params.offset_ms = 0
         params.no_context = true
         params.single_segment = false
-        params.temperature = VoiceInkWhisperRuntimeDefaults.transcriptionTemperature
+        params.temperature = runtimeConfiguration.temperature
 
         whisper_reset_timings(context)
         
-        // Configure VAD if enabled by shared preference and model is available.
-        if VoiceInkVADPreference.isEnabled(), let vadModelPath = self.vadModelPath {
+        if let vad = runtimeConfiguration.vad {
             params.vad = true
-            params.vad_model_path = (vadModelPath as NSString).utf8String
             
             var vadParams = whisper_vad_default_params()
-            vadParams.threshold = VoiceInkWhisperRuntimeDefaults.vadThreshold
-            vadParams.min_speech_duration_ms = VoiceInkWhisperRuntimeDefaults.vadMinSpeechDurationMs
-            vadParams.min_silence_duration_ms = VoiceInkWhisperRuntimeDefaults.vadMinSilenceDurationMs
-            vadParams.max_speech_duration_s = VoiceInkWhisperRuntimeDefaults.vadMaxSpeechDurationSeconds
-            vadParams.speech_pad_ms = VoiceInkWhisperRuntimeDefaults.vadSpeechPadMs
-            vadParams.samples_overlap = VoiceInkWhisperRuntimeDefaults.vadSamplesOverlap
+            vadParams.threshold = vad.threshold
+            vadParams.min_speech_duration_ms = vad.minSpeechDurationMs
+            vadParams.min_silence_duration_ms = vad.minSilenceDurationMs
+            vadParams.max_speech_duration_s = vad.maxSpeechDurationSeconds
+            vadParams.speech_pad_ms = vad.speechPadMs
+            vadParams.samples_overlap = vad.samplesOverlap
             params.vad_params = vadParams
         } else {
             params.vad = false
+            params.vad_model_path = nil
             logger.warning("VAD model path not found, VAD will be disabled.")
         }
         
@@ -94,14 +98,25 @@ actor WhisperContext {
             }
         }
 
-        if let languageCString {
-            languageCString.withUnsafeBufferPointer { languageBuffer in
-                params.language = languageBuffer.baseAddress
+        func runWithLanguage() {
+            if let languageCString {
+                languageCString.withUnsafeBufferPointer { languageBuffer in
+                    params.language = languageBuffer.baseAddress
+                    runWithPrompt()
+                }
+            } else {
+                params.language = nil
                 runWithPrompt()
             }
+        }
+
+        if let vadModelPathCString {
+            vadModelPathCString.withUnsafeBufferPointer { vadModelPathBuffer in
+                params.vad_model_path = vadModelPathBuffer.baseAddress
+                runWithLanguage()
+            }
         } else {
-            params.language = nil
-            runWithPrompt()
+            runWithLanguage()
         }
         
         return success

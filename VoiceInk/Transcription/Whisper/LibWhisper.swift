@@ -11,9 +11,6 @@ import os
 // Meet Whisper C++ constraint: Don't access from more than one thread at a time.
 actor WhisperContext {
     private var context: OpaquePointer?
-    private var languageCString: [CChar]?
-    private var prompt: String?
-    private var promptCString: [CChar]?
     private var vadModelPath: String?
     private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "WhisperContext")
 
@@ -29,72 +26,91 @@ actor WhisperContext {
         }
     }
 
-    func fullTranscribe(samples: [Float], language: String? = nil) -> Bool {
+    func fullTranscribe(samples: [Float], language: String? = nil, prompt: String? = nil) -> Bool {
         guard let context = context else { return false }
         
         var params = whisper_full_default_params(WHISPER_SAMPLING_GREEDY)
-        
-        if let language {
-            languageCString = Array(language.utf8CString)
-            params.language = languageCString?.withUnsafeBufferPointer { ptr in
-                ptr.baseAddress
-            }
-        } else {
-            languageCString = nil
-            params.language = nil
-        }
-        
-        if prompt != nil {
-            promptCString = Array(prompt!.utf8CString)
-            params.initial_prompt = promptCString?.withUnsafeBufferPointer { ptr in
-                ptr.baseAddress
-            }
-        } else {
-            promptCString = nil
-            params.initial_prompt = nil
-        }
+        let runtimeConfiguration = VoiceInkWhisperRuntimeConfiguration.current(
+            language: language,
+            prompt: prompt,
+            vadModelPath: vadModelPath
+        )
+        let languageCString = runtimeConfiguration.language.map { Array($0.utf8CString) }
+        let promptCString = runtimeConfiguration.prompt.map { Array($0.utf8CString) }
+        let vadModelPathCString = runtimeConfiguration.vad?.modelPath.utf8CString
         
         params.print_realtime = true
         params.print_progress = false
         params.print_timestamps = true
         params.print_special = false
         params.translate = false
-        params.n_threads = VoiceInkWhisperRuntimeDefaults.threadCount()
+        params.n_threads = runtimeConfiguration.threadCount
         params.offset_ms = 0
         params.no_context = true
         params.single_segment = false
-        params.temperature = VoiceInkWhisperRuntimeDefaults.transcriptionTemperature
+        params.temperature = runtimeConfiguration.temperature
 
         whisper_reset_timings(context)
         
-        // Configure VAD if enabled by user and model is available
-        let isVADEnabled = VoiceInkVADPreference.isEnabled()
-        if isVADEnabled, let vadModelPath = self.vadModelPath {
+        if let vad = runtimeConfiguration.vad {
             params.vad = true
-            params.vad_model_path = (vadModelPath as NSString).utf8String
             
             var vadParams = whisper_vad_default_params()
-            vadParams.threshold = VoiceInkWhisperRuntimeDefaults.vadThreshold
-            vadParams.min_speech_duration_ms = VoiceInkWhisperRuntimeDefaults.vadMinSpeechDurationMs
-            vadParams.min_silence_duration_ms = VoiceInkWhisperRuntimeDefaults.vadMinSilenceDurationMs
-            vadParams.max_speech_duration_s = VoiceInkWhisperRuntimeDefaults.vadMaxSpeechDurationSeconds
-            vadParams.speech_pad_ms = VoiceInkWhisperRuntimeDefaults.vadSpeechPadMs
-            vadParams.samples_overlap = VoiceInkWhisperRuntimeDefaults.vadSamplesOverlap
+            vadParams.threshold = vad.threshold
+            vadParams.min_speech_duration_ms = vad.minSpeechDurationMs
+            vadParams.min_silence_duration_ms = vad.minSilenceDurationMs
+            vadParams.max_speech_duration_s = vad.maxSpeechDurationSeconds
+            vadParams.speech_pad_ms = vad.speechPadMs
+            vadParams.samples_overlap = vad.samplesOverlap
             params.vad_params = vadParams
         } else {
             params.vad = false
+            params.vad_model_path = nil
         }
         
         var success = true
-        samples.withUnsafeBufferPointer { samplesBuffer in
-            if whisper_full(context, params, samplesBuffer.baseAddress, Int32(samplesBuffer.count)) != 0 {
-                logger.error("❌ Failed to run whisper_full. VAD enabled: \(params.vad, privacy: .public)")
-                success = false
+
+        func runWhisper() {
+            samples.withUnsafeBufferPointer { samplesBuffer in
+                if whisper_full(context, params, samplesBuffer.baseAddress, Int32(samplesBuffer.count)) != 0 {
+                    logger.error("❌ Failed to run whisper_full. VAD enabled: \(params.vad, privacy: .public)")
+                    success = false
+                }
             }
         }
-        
-        languageCString = nil
-        promptCString = nil
+
+        func runWithPrompt() {
+            if let promptCString {
+                promptCString.withUnsafeBufferPointer { promptBuffer in
+                    params.initial_prompt = promptBuffer.baseAddress
+                    runWhisper()
+                }
+            } else {
+                params.initial_prompt = nil
+                runWhisper()
+            }
+        }
+
+        func runWithLanguage() {
+            if let languageCString {
+                languageCString.withUnsafeBufferPointer { languageBuffer in
+                    params.language = languageBuffer.baseAddress
+                    runWithPrompt()
+                }
+            } else {
+                params.language = nil
+                runWithPrompt()
+            }
+        }
+
+        if let vadModelPathCString {
+            vadModelPathCString.withUnsafeBufferPointer { vadModelPathBuffer in
+                params.vad_model_path = vadModelPathBuffer.baseAddress
+                runWithLanguage()
+            }
+        } else {
+            runWithLanguage()
+        }
         
         return success
     }
@@ -150,10 +166,5 @@ actor WhisperContext {
             whisper_free(context)
             self.context = nil
         }
-        languageCString = nil
-    }
-
-    func setPrompt(_ prompt: String?) {
-        self.prompt = prompt
     }
 }

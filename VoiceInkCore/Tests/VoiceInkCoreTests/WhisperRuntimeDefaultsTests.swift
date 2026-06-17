@@ -1,3 +1,4 @@
+import Foundation
 @testable import VoiceInkCore
 
 final class WhisperRuntimeDefaultsTests: XCTestCase {
@@ -14,5 +15,63 @@ final class WhisperRuntimeDefaultsTests: XCTestCase {
         XCTAssertEqual(VoiceInkWhisperRuntimeDefaults.vadMinSilenceDurationMs, 100)
         XCTAssertEqual(VoiceInkWhisperRuntimeDefaults.vadSpeechPadMs, 30)
         XCTAssertEqual(VoiceInkWhisperRuntimeDefaults.vadSamplesOverlap, 0.1)
+    }
+
+    func testVADRuntimeConfigurationRequiresEnabledPreferenceAndModelPath() {
+        XCTAssertEqual(
+            VoiceInkWhisperVADRuntimeConfiguration.current(modelPath: "/tmp/vad.bin", isEnabled: true),
+            VoiceInkWhisperVADRuntimeConfiguration(modelPath: "/tmp/vad.bin")
+        )
+        XCTAssertNil(VoiceInkWhisperVADRuntimeConfiguration.current(modelPath: "/tmp/vad.bin", isEnabled: false))
+        XCTAssertNil(VoiceInkWhisperVADRuntimeConfiguration.current(modelPath: nil, isEnabled: true))
+        XCTAssertNil(VoiceInkWhisperVADRuntimeConfiguration.current(modelPath: "", isEnabled: true))
+    }
+
+    func testRuntimeConfigurationBuildsSharedWhisperInputs() {
+        withTemporaryDefaults { defaults in
+            VoiceInkVADPreference.saveIsEnabled(true, to: defaults)
+
+            let configuration = VoiceInkWhisperRuntimeConfiguration.current(
+                language: "ja",
+                prompt: "Use Japanese punctuation.",
+                vadModelPath: "/tmp/vad.bin",
+                defaults: defaults,
+                processorCount: 6
+            )
+
+            XCTAssertEqual(configuration.language, "ja")
+            XCTAssertEqual(configuration.prompt, "Use Japanese punctuation.")
+            XCTAssertEqual(configuration.threadCount, 4)
+            XCTAssertEqual(configuration.temperature, VoiceInkWhisperRuntimeDefaults.transcriptionTemperature)
+            XCTAssertEqual(configuration.vad?.modelPath, "/tmp/vad.bin")
+            XCTAssertEqual(configuration.vad?.threshold, VoiceInkWhisperRuntimeDefaults.vadThreshold)
+            XCTAssertEqual(configuration.vad?.minSpeechDurationMs, VoiceInkWhisperRuntimeDefaults.vadMinSpeechDurationMs)
+            XCTAssertEqual(configuration.vad?.minSilenceDurationMs, VoiceInkWhisperRuntimeDefaults.vadMinSilenceDurationMs)
+            XCTAssertEqual(configuration.vad?.maxSpeechDurationSeconds, VoiceInkWhisperRuntimeDefaults.vadMaxSpeechDurationSeconds)
+            XCTAssertEqual(configuration.vad?.speechPadMs, VoiceInkWhisperRuntimeDefaults.vadSpeechPadMs)
+            XCTAssertEqual(configuration.vad?.samplesOverlap, VoiceInkWhisperRuntimeDefaults.vadSamplesOverlap)
+        }
+    }
+
+    func testRuntimeConfigurationDisablesVADWhenPreferenceIsOff() {
+        withTemporaryDefaults { defaults in
+            VoiceInkVADPreference.saveIsEnabled(false, to: defaults)
+
+            let configuration = VoiceInkWhisperRuntimeConfiguration.current(
+                vadModelPath: "/tmp/vad.bin",
+                defaults: defaults
+            )
+
+            XCTAssertNil(configuration.vad)
+        }
+    }
+
+    private func withTemporaryDefaults(_ test: (UserDefaults) -> Void) {
+        let suiteName = "VoiceInkCore.WhisperRuntimeDefaultsTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer {
+            defaults.removePersistentDomain(forName: suiteName)
+        }
+        test(defaults)
     }
 }

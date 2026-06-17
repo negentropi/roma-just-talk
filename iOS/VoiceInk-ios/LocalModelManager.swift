@@ -154,14 +154,12 @@ class LocalModelManager: ObservableObject {
     
     /// Get the path to the downloaded base model, if available
     var baseModelPath: String? {
-        let model = VoiceInkWhisperModelFiles.baseModel
-        let modelsDirectory = Self.modelsDirectory
-        return model.isDownloaded(in: modelsDirectory) ? model.fileURL(in: modelsDirectory).path : nil
+        VoiceInkWhisperModelFiles.availableBootstrapModelFileURL(in: Self.modelsDirectory)?.path
     }
     
     /// Check if any model is available for transcription
     var hasAvailableModel: Bool {
-        VoiceInkWhisperModelFiles.bootstrapModels.contains { $0.isDownloaded(in: Self.modelsDirectory) }
+        VoiceInkWhisperModelFiles.availableBootstrapModelFileURL(in: Self.modelsDirectory) != nil
     }
     
 }

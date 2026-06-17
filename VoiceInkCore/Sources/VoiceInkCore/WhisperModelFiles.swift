@@ -91,6 +91,15 @@ public enum VoiceInkWhisperModelFiles {
 
     public static let bootstrapModels = [baseModel]
 
+    public static func availableBootstrapModelFileURL(
+        in modelsDirectory: URL,
+        fileManager: FileManager = .default
+    ) -> URL? {
+        bootstrapModels.first {
+            $0.isDownloaded(in: modelsDirectory, fileManager: fileManager)
+        }?.fileURL(in: modelsDirectory)
+    }
+
     public static let downloadableModels = [
         VoiceInkWhisperModelFileSpec(
             modelName: "ggml-tiny",

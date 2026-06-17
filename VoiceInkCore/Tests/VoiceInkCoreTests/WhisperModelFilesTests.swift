@@ -57,6 +57,24 @@ final class WhisperModelFilesTests: XCTestCase {
         XCTAssertTrue(model.isDownloaded(in: modelsDirectory))
     }
 
+    func testAvailableBootstrapModelFileURLUsesFirstDownloadedBootstrapModel() throws {
+        let baseDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.WhisperModelFilesTests.\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: baseDirectory) }
+
+        let modelsDirectory = try VoiceInkWhisperModelFiles.createModelsDirectory(in: baseDirectory)
+        let model = VoiceInkWhisperModelFiles.baseModel
+
+        XCTAssertNil(VoiceInkWhisperModelFiles.availableBootstrapModelFileURL(in: modelsDirectory))
+
+        try Data().write(to: model.fileURL(in: modelsDirectory))
+
+        XCTAssertEqual(
+            VoiceInkWhisperModelFiles.availableBootstrapModelFileURL(in: modelsDirectory),
+            model.fileURL(in: modelsDirectory)
+        )
+    }
+
     func testDeleteModelFilesRemovesMainModelAndCoreMLSidecar() throws {
         let baseDirectory = FileManager.default.temporaryDirectory
             .appendingPathComponent("VoiceInkCore.WhisperModelFilesTests.\(UUID().uuidString)", isDirectory: true)

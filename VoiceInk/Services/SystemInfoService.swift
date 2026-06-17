@@ -171,7 +171,7 @@ class SystemInfoService {
     }
 
     private func getAIEnhancementStatus() -> String {
-        let enhancementEnabled = UserDefaults.standard.bool(forKey: "isAIEnhancementEnabled")
+        let enhancementEnabled = UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.isAIEnhancementEnabled)
         return enhancementEnabled ? "Enabled" : "Disabled"
     }
 

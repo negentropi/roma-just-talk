@@ -16,7 +16,7 @@ class AIEnhancementService: ObservableObject {
 
     @Published var isEnhancementEnabled: Bool {
         didSet {
-            UserDefaults.standard.set(isEnhancementEnabled, forKey: "isAIEnhancementEnabled")
+            UserDefaults.standard.set(isEnhancementEnabled, forKey: VoiceInkUserDefaultsKey.isAIEnhancementEnabled)
             if isEnhancementEnabled && selectedPromptId == nil {
                 selectedPromptId = customPrompts.first?.id
             }
@@ -27,13 +27,13 @@ class AIEnhancementService: ObservableObject {
 
     @Published var useClipboardContext: Bool {
         didSet {
-            UserDefaults.standard.set(useClipboardContext, forKey: "useClipboardContext")
+            UserDefaults.standard.set(useClipboardContext, forKey: VoiceInkUserDefaultsKey.useClipboardContext)
         }
     }
 
     @Published var useScreenCaptureContext: Bool {
         didSet {
-            UserDefaults.standard.set(useScreenCaptureContext, forKey: "useScreenCaptureContext")
+            UserDefaults.standard.set(useScreenCaptureContext, forKey: VoiceInkUserDefaultsKey.useScreenCaptureContext)
             NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
         }
     }
@@ -41,7 +41,7 @@ class AIEnhancementService: ObservableObject {
     @Published var customPrompts: [CustomPrompt] {
         didSet {
             if let encoded = try? JSONEncoder().encode(customPrompts) {
-                UserDefaults.standard.set(encoded, forKey: "customPrompts")
+                UserDefaults.standard.set(encoded, forKey: VoiceInkUserDefaultsKey.customPrompts)
             }
             refreshPromptDetectionCache()
         }
@@ -49,7 +49,7 @@ class AIEnhancementService: ObservableObject {
 
     @Published var selectedPromptId: UUID? {
         didSet {
-            UserDefaults.standard.set(selectedPromptId?.uuidString, forKey: "selectedPromptId")
+            UserDefaults.standard.set(selectedPromptId?.uuidString, forKey: VoiceInkUserDefaultsKey.selectedPromptId)
             NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
             NotificationCenter.default.post(name: .promptSelectionChanged, object: nil)
         }
@@ -91,17 +91,17 @@ class AIEnhancementService: ObservableObject {
         self.screenCaptureService = ScreenCaptureService()
         self.customVocabularyService = CustomVocabularyService.shared
 
-        self.isEnhancementEnabled = UserDefaults.standard.bool(forKey: "isAIEnhancementEnabled")
-        self.useClipboardContext = UserDefaults.standard.bool(forKey: "useClipboardContext")
-        self.useScreenCaptureContext = UserDefaults.standard.bool(forKey: "useScreenCaptureContext")
-        if let savedPromptsData = UserDefaults.standard.data(forKey: "customPrompts"),
+        self.isEnhancementEnabled = UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.isAIEnhancementEnabled)
+        self.useClipboardContext = UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.useClipboardContext)
+        self.useScreenCaptureContext = UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.useScreenCaptureContext)
+        if let savedPromptsData = UserDefaults.standard.data(forKey: VoiceInkUserDefaultsKey.customPrompts),
            let decodedPrompts = try? JSONDecoder().decode([CustomPrompt].self, from: savedPromptsData) {
             self.customPrompts = decodedPrompts
         } else {
             self.customPrompts = []
         }
 
-        if let savedPromptId = UserDefaults.standard.string(forKey: "selectedPromptId") {
+        if let savedPromptId = UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.selectedPromptId) {
             self.selectedPromptId = UUID(uuidString: savedPromptId)
         }
 

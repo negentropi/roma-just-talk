@@ -44,28 +44,20 @@ enum SessionMetricRecorder {
             return false
         }
 
-        let textForCounting = finalTextForCounting(from: transcription)
-        let wordCount = VoiceInkWordCounter.count(in: textForCounting)
-        let audioDuration = max(transcription.duration, 0)
-        let transcriptionDuration = transcription.transcriptionDuration.flatMap { $0 > 0 ? $0 : nil }
-        let speedFactor = transcriptionDuration.flatMap { duration in
-            audioDuration > 0 ? audioDuration / duration : nil
-        }
-
-        let enhancementDuration = transcription.enhancementDuration.flatMap { $0 > 0 ? $0 : nil }
+        let metricValues = VoiceInkSessionMetricPolicy.values(for: transcription)
 
         let metric = SessionMetric(
             transcriptionId: transcription.id,
             timestamp: timestamp,
             source: source,
-            wordCount: wordCount,
-            audioDuration: audioDuration,
+            wordCount: metricValues.wordCount,
+            audioDuration: metricValues.audioDuration,
             transcriptionModelName: transcription.transcriptionModelName ?? modelDisplayName,
-            transcriptionDuration: transcriptionDuration,
-            speedFactor: speedFactor,
+            transcriptionDuration: metricValues.transcriptionDuration,
+            speedFactor: metricValues.speedFactor,
             powerModeName: transcription.powerModeName,
             aiEnhancementModelName: transcription.aiEnhancementModelName,
-            enhancementDuration: enhancementDuration
+            enhancementDuration: metricValues.enhancementDuration
         )
 
         modelContext.insert(metric)
@@ -73,13 +65,4 @@ enum SessionMetricRecorder {
         return true
     }
 
-    private static func finalTextForCounting(from transcription: Transcription) -> String {
-        if let enhancedText = transcription.enhancedText,
-           transcription.enhancementDuration != nil,
-           !enhancedText.isEmpty {
-            return enhancedText
-        }
-
-        return transcription.text
-    }
 }

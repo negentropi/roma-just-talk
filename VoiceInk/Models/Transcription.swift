@@ -3,7 +3,7 @@ import SwiftData
 import VoiceInkCore
 
 @Model
-final class Transcription: VoiceInkStoredAudioRecord {
+final class Transcription: VoiceInkStoredAudioRecord, VoiceInkSessionMetricSource {
     static let canceledTranscriptionText = "The transcription was canceled."
 
     var id: UUID

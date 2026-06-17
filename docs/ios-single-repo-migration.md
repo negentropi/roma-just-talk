@@ -55,6 +55,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - filler-word list storage defaults and saving
 - cursor-aware transcript capitalization policy; platform shells only supply cursor text and paste targets
 - NaturalLanguage word-count policy for metrics and short-enhancement skip decisions
+- session-metric calculation policy for enhanced-text word counting, non-positive duration cleanup, and transcription speed factor; platform shells still own SwiftData metric insertion and migration scheduling
 - short post-processing skip policy, stored skip configuration, and storage defaults for brief transcripts; platform shells still own UI controls and whether to apply the policy
 - AI-enhancement timeout/retry storage keys, defaults, and runtime preference reads; platform shells still own request execution, provider transport, logging, and UI controls
 - AI-enhancement selected-provider and per-provider selected-model preference storage, including legacy selected-provider repair; platform shells still own provider execution and dynamic model discovery
@@ -145,6 +146,7 @@ Current macOS consumers of shared remote transport:
 - macOS transcription services, Power Mode, rolling preload, and iOS `AppSettings` read/write/clear selected transcription language through `VoiceInkTranscriptionLanguagePreference`; platform shells still own settings UI and language-change notifications.
 - macOS paste/pipeline, Power Mode, backup import/export, `FillerWordManager`, and iOS `AppSettings` read/write/reset cleanup toggles through `VoiceInkTranscriptionCleanupPreferenceStorage`; SwiftUI setting controls still bind directly through `@AppStorage`.
 - macOS `TranscriptionPipeline` reads short post-processing skip settings through `VoiceInkPostProcessingSkipConfiguration.current()` before applying `VoiceInkPostProcessingSkipPolicy`; platform shells still own the enhancement UI and the decision point.
+- macOS `SessionMetricRecorder` and `SessionMetricMigrationService` calculate word count, positive durations, and speed factor through `VoiceInkSessionMetricPolicy`; macOS still owns duplicate-record checks, SwiftData insertion, migration scheduling, and metric notifications, while iOS records now conform to the same metric source interface for future stats.
 - macOS `AIEnhancementService` reads request timeout and retry-on-timeout through `VoiceInkAIEnhancementRequestPreference`; SwiftUI setting controls still bind directly through `@AppStorage`.
 - macOS `TranscriptionModelManager`, `PowerModeConfig`, `SystemInfoService`, and `StreamingKeysMigration` use `VoiceInkCurrentTranscriptionModelPreference` for the selected transcription model; the legacy `"CurrentModel"` cleanup remains macOS shell migration code.
 - macOS `AIService`, `PowerModeConfig`, `PowerModeConfigView`, and `SystemInfoService` use `VoiceInkAIEnhancementProviderPreference` for selected AI provider/model storage; macOS still owns API-key lookup, Ollama/OpenRouter dynamic state, and provider execution.

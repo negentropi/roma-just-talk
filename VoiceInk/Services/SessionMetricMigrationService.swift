@@ -41,31 +41,20 @@ final class SessionMetricMigrationService {
                 for transcription in transcriptions {
                     guard !existingIds.contains(transcription.id) else { continue }
 
-                    let enhancementDuration = transcription.enhancementDuration.flatMap { $0 > 0 ? $0 : nil }
-                    let audioDuration = max(transcription.duration, 0)
-                    let transcriptionDuration = transcription.transcriptionDuration.flatMap { $0 > 0 ? $0 : nil }
-                    let speedFactor = transcriptionDuration.flatMap { d in
-                        audioDuration > 0 ? audioDuration / d : nil
-                    }
-                    let textForCounting: String = {
-                        if let enhanced = transcription.enhancedText,
-                           transcription.enhancementDuration != nil,
-                           !enhanced.isEmpty { return enhanced }
-                        return transcription.text
-                    }()
+                    let metricValues = VoiceInkSessionMetricPolicy.values(for: transcription)
 
                     let metric = SessionMetric(
                         transcriptionId: transcription.id,
                         timestamp: transcription.timestamp,
                         source: "recorder",
-                        wordCount: VoiceInkWordCounter.count(in: textForCounting),
-                        audioDuration: audioDuration,
+                        wordCount: metricValues.wordCount,
+                        audioDuration: metricValues.audioDuration,
                         transcriptionModelName: transcription.transcriptionModelName,
-                        transcriptionDuration: transcriptionDuration,
-                        speedFactor: speedFactor,
+                        transcriptionDuration: metricValues.transcriptionDuration,
+                        speedFactor: metricValues.speedFactor,
                         powerModeName: transcription.powerModeName,
                         aiEnhancementModelName: transcription.aiEnhancementModelName,
-                        enhancementDuration: enhancementDuration
+                        enhancementDuration: metricValues.enhancementDuration
                     )
                     backgroundContext.insert(metric)
                     insertedCount += 1

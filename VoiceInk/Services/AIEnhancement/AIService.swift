@@ -115,16 +115,11 @@ class AIService: ObservableObject {
     @Published private var openRouterModels: [String] = []
     
     var connectedProviders: [AIProvider] {
-        AIProvider.selectableTextEnhancementProviders.filter { provider in
-            if provider == .ollama {
-                return ollamaService.isConnected
-            } else if provider == .localCLI {
-                return localCLIService.isConfigured
-            } else if provider.requiresAPIKey {
-                return APIKeyManager.shared.hasAPIKey(forProvider: provider.rawValue)
-            }
-            return false
-        }
+        AIProvider.connectedTextEnhancementProviders(
+            hasUserAPIKey: { APIKeyManager.shared.hasAPIKey(forProvider: $0.rawValue) },
+            isOllamaConnected: ollamaService.isConnected,
+            isLocalCLIConfigured: localCLIService.isConfigured
+        )
     }
     
     var currentModel: String {

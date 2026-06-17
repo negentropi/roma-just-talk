@@ -105,6 +105,37 @@ public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
         allCases.filter(\.isSelectableForTextEnhancement)
     }
 
+    public static func connectedTextEnhancementProviders(
+        hasUserAPIKey: (Self) -> Bool,
+        isOllamaConnected: Bool,
+        isLocalCLIConfigured: Bool
+    ) -> [Self] {
+        selectableTextEnhancementProviders.filter { provider in
+            provider.isConnectedForTextEnhancement(
+                hasUserAPIKey: { hasUserAPIKey(provider) },
+                isOllamaConnected: isOllamaConnected,
+                isLocalCLIConfigured: isLocalCLIConfigured
+            )
+        }
+    }
+
+    public func isConnectedForTextEnhancement(
+        hasUserAPIKey: () -> Bool,
+        isOllamaConnected: Bool,
+        isLocalCLIConfigured: Bool
+    ) -> Bool {
+        switch self {
+        case .ollama:
+            return isOllamaConnected
+        case .localCLI:
+            return isLocalCLIConfigured
+        case .anthropic, .cerebras, .custom, .gemini, .groq, .mistral, .openAI, .openRouter:
+            return hasUserAPIKey()
+        case .assemblyAI, .deepgram, .elevenLabs, .soniox, .speechmatics:
+            return false
+        }
+    }
+
     public var preservesUnavailableSelectedTextEnhancementModel: Bool {
         self == .ollama
     }

@@ -77,6 +77,48 @@ final class AIProviderCatalogTests: XCTestCase {
         XCTAssertFalse(VoiceInkAIEnhancementProviderKind.speechmatics.isSelectableForTextEnhancement)
     }
 
+    func testMacOSAIEnhancementConnectedProvidersUseSharedPolicy() {
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.connectedTextEnhancementProviders(
+                hasUserAPIKey: { _ in true },
+                isOllamaConnected: true,
+                isLocalCLIConfigured: true
+            ),
+            VoiceInkAIEnhancementProviderKind.selectableTextEnhancementProviders
+        )
+
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.connectedTextEnhancementProviders(
+                hasUserAPIKey: { [.groq, .custom].contains($0) },
+                isOllamaConnected: false,
+                isLocalCLIConfigured: false
+            ),
+            [.groq, .custom]
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.connectedTextEnhancementProviders(
+                hasUserAPIKey: { _ in false },
+                isOllamaConnected: true,
+                isLocalCLIConfigured: false
+            ),
+            [.ollama]
+        )
+        XCTAssertTrue(
+            VoiceInkAIEnhancementProviderKind.localCLI.isConnectedForTextEnhancement(
+                hasUserAPIKey: { false },
+                isOllamaConnected: false,
+                isLocalCLIConfigured: true
+            )
+        )
+        XCTAssertFalse(
+            VoiceInkAIEnhancementProviderKind.assemblyAI.isConnectedForTextEnhancement(
+                hasUserAPIKey: { true },
+                isOllamaConnected: true,
+                isLocalCLIConfigured: true
+            )
+        )
+    }
+
     func testMacOSAIEnhancementModelSelectionPreservesAvailableSelections() {
         XCTAssertEqual(
             VoiceInkAIEnhancementProviderKind.groq.selectedTextEnhancementModel(

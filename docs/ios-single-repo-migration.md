@@ -43,6 +43,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - mode runtime configuration and selected-mode repair
 - mode provider-selection repair and draft saveability rules
 - shared UserDefaults key names, including cleanup preferences, plus iOS mode persistence helpers
+- current transcription model preference loading/saving/clearing; platform shells still own model availability, download/runtime state, and legacy key cleanup
 - transcript status and presentation helpers
 - local transcription/model/missing-audio error vocabulary shared by macOS local Whisper and iOS local retry transcription
 - raw transcription output filtering for hallucination tags/brackets, optional filler words, default filler-word vocabulary, and filler-word list editing policy; iOS settings now use the same list editing policy in their platform shell
@@ -127,6 +128,7 @@ Current macOS consumers of shared remote transport:
 - macOS paste/pipeline, Power Mode, backup import/export, `FillerWordManager`, and iOS `AppSettings` read/write/reset cleanup toggles through `VoiceInkTranscriptionCleanupPreferenceStorage`; SwiftUI setting controls still bind directly through `@AppStorage`.
 - macOS `TranscriptionPipeline` reads short post-processing skip settings through `VoiceInkPostProcessingSkipConfiguration.current()` before applying `VoiceInkPostProcessingSkipPolicy`; platform shells still own the enhancement UI and the decision point.
 - macOS `AIEnhancementService` reads request timeout and retry-on-timeout through `VoiceInkAIEnhancementRequestPreference`; SwiftUI setting controls still bind directly through `@AppStorage`.
+- macOS `TranscriptionModelManager`, `PowerModeConfig`, `SystemInfoService`, and `StreamingKeysMigration` use `VoiceInkCurrentTranscriptionModelPreference` for the selected transcription model; the legacy `"CurrentModel"` cleanup remains macOS shell migration code.
 - iOS retry post-processing inherits `VoiceInkAIReasoningConfig` through `VoiceInkPostProcessingClient`, aligning OpenAI-compatible reasoning controls with macOS enhancement requests.
 
 Current iOS consumers of shared remote transport:

@@ -110,6 +110,20 @@ public enum VoiceInkTranscriptionLanguagePreference {
     }
 }
 
+public enum VoiceInkCurrentTranscriptionModelPreference {
+    public static func modelName(from defaults: UserDefaults = .standard) -> String? {
+        defaults.string(forKey: VoiceInkUserDefaultsKey.currentTranscriptionModel)
+    }
+
+    public static func saveModelName(_ modelName: String, to defaults: UserDefaults = .standard) {
+        defaults.set(modelName, forKey: VoiceInkUserDefaultsKey.currentTranscriptionModel)
+    }
+
+    public static func clearModelName(from defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.currentTranscriptionModel)
+    }
+}
+
 public enum VoiceInkFillerWordPreference {
     public static func words(from defaults: UserDefaults = .standard) -> [String] {
         defaults.stringArray(forKey: VoiceInkUserDefaultsKey.fillerWords) ?? VoiceInkFillerWords.defaultWords

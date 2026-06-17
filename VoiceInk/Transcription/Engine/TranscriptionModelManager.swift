@@ -68,10 +68,10 @@ class TranscriptionModelManager: ObservableObject {
     // MARK: - Model loading from UserDefaults
 
     func loadCurrentTranscriptionModel() {
-        if let savedModelName = UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.currentTranscriptionModel),
+        if let savedModelName = VoiceInkCurrentTranscriptionModelPreference.modelName(),
            let savedModel = allAvailableModels.first(where: { $0.name == savedModelName }) {
             guard isAvailableOnCurrentOS(savedModel) else {
-                UserDefaults.standard.removeObject(forKey: VoiceInkUserDefaultsKey.currentTranscriptionModel)
+                VoiceInkCurrentTranscriptionModelPreference.clearModelName()
                 currentTranscriptionModel = nil
                 return
             }
@@ -94,7 +94,7 @@ class TranscriptionModelManager: ObservableObject {
         }
 
         self.currentTranscriptionModel = model
-        UserDefaults.standard.set(model.name, forKey: VoiceInkUserDefaultsKey.currentTranscriptionModel)
+        VoiceInkCurrentTranscriptionModelPreference.saveModelName(model.name)
         ensureSelectedLanguageIsSupported(by: model)
 
         if model.provider != .whisper {
@@ -145,7 +145,7 @@ class TranscriptionModelManager: ObservableObject {
 
     func clearCurrentTranscriptionModel() {
         currentTranscriptionModel = nil
-        UserDefaults.standard.removeObject(forKey: VoiceInkUserDefaultsKey.currentTranscriptionModel)
+        VoiceInkCurrentTranscriptionModelPreference.clearModelName()
     }
 
     // MARK: - Handle model deletion callback
@@ -154,7 +154,7 @@ class TranscriptionModelManager: ObservableObject {
     func handleModelDeleted(_ modelName: String) {
         if currentTranscriptionModel?.name == modelName {
             currentTranscriptionModel = nil
-            UserDefaults.standard.removeObject(forKey: VoiceInkUserDefaultsKey.currentTranscriptionModel)
+            VoiceInkCurrentTranscriptionModelPreference.clearModelName()
             whisperModelManager?.loadedWhisperModel = nil
             whisperModelManager?.isModelLoaded = false
             UserDefaults.standard.removeObject(forKey: "CurrentModel")

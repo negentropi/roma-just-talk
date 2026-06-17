@@ -171,6 +171,28 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testCurrentTranscriptionModelPreferenceRoundTripsModelName() {
+        withIsolatedDefaults { defaults in
+            XCTAssertNil(VoiceInkCurrentTranscriptionModelPreference.modelName(from: defaults))
+
+            VoiceInkCurrentTranscriptionModelPreference.saveModelName("parakeet-tdt-0.6b-v2", to: defaults)
+
+            XCTAssertEqual(
+                VoiceInkCurrentTranscriptionModelPreference.modelName(from: defaults),
+                "parakeet-tdt-0.6b-v2"
+            )
+        }
+    }
+
+    func testCurrentTranscriptionModelPreferenceClearsModelName() {
+        withIsolatedDefaults { defaults in
+            VoiceInkCurrentTranscriptionModelPreference.saveModelName("nova-3", to: defaults)
+            VoiceInkCurrentTranscriptionModelPreference.clearModelName(from: defaults)
+
+            XCTAssertNil(VoiceInkCurrentTranscriptionModelPreference.modelName(from: defaults))
+        }
+    }
+
     func testFillerWordPreferenceUsesDefaultWordsWhenMissing() {
         withIsolatedDefaults { defaults in
             XCTAssertEqual(

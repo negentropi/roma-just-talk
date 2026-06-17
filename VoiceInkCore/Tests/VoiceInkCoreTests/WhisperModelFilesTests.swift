@@ -43,6 +43,20 @@ final class WhisperModelFilesTests: XCTestCase {
         )
     }
 
+    func testModelDownloadStateChecksSharedFileURL() throws {
+        let baseDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.WhisperModelFilesTests.\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: baseDirectory) }
+
+        let modelsDirectory = try VoiceInkWhisperModelFiles.createModelsDirectory(in: baseDirectory)
+        let model = VoiceInkWhisperModelFiles.baseModel
+
+        XCTAssertFalse(model.isDownloaded(in: modelsDirectory))
+
+        try Data().write(to: model.fileURL(in: modelsDirectory))
+        XCTAssertTrue(model.isDownloaded(in: modelsDirectory))
+    }
+
     func testCoreMLSidecarURLsUseSharedModelNaming() {
         let modelsDirectory = URL(fileURLWithPath: "/tmp/VoiceInk/WhisperModels", isDirectory: true)
 

@@ -46,6 +46,10 @@ public struct VoiceInkWhisperModelFileSpec: Codable, Equatable, Identifiable, Se
     public func fileURL(in modelsDirectory: URL) -> URL {
         VoiceInkWhisperModelFiles.fileURL(forFilename: filename, in: modelsDirectory)
     }
+
+    public func isDownloaded(in modelsDirectory: URL, fileManager: FileManager = .default) -> Bool {
+        fileManager.fileExists(atPath: fileURL(in: modelsDirectory).path)
+    }
 }
 
 public enum VoiceInkWhisperModelFiles {

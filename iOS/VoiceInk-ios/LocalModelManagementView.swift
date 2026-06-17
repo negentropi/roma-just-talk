@@ -58,7 +58,7 @@ struct ModelRowView: View {
                 Spacer()
                 
                 // Action button where size used to be
-                if model.isDownloaded {
+                if model.isDownloaded(in: LocalModelManager.modelsDirectory) {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundColor(.green)
                         .font(.title2)
@@ -100,7 +100,7 @@ struct ModelRowView: View {
             }
         }
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-            if model.isDownloaded {
+            if model.isDownloaded(in: LocalModelManager.modelsDirectory) {
                 Button("Delete") {
                     showingDeleteAlert = true
                 }

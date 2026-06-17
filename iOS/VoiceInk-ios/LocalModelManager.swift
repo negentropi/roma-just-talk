@@ -9,18 +9,6 @@ import Foundation
 import Combine
 import VoiceInkCore
 
-extension VoiceInkWhisperModelFileSpec {
-    var name: String { modelName }
-    var fileURL: URL {
-        fileURL(in: LocalModelManager.modelsDirectory)
-    }
-    
-    var isDownloaded: Bool {
-        FileManager.default.fileExists(atPath: fileURL.path)
-    }
-    
-}
-
 @MainActor
 class LocalModelManager: ObservableObject {
     @Published var downloadProgress: [String: Double] = [:]
@@ -55,11 +43,11 @@ class LocalModelManager: ObservableObject {
     /// Download a specific model
     func downloadModel(_ model: VoiceInkWhisperModelFileSpec) async {
         guard !isDownloading[model.id, default: false] else {
-            print("LocalModelManager: Model \(model.name) is already being downloaded")
+            print("LocalModelManager: Model \(model.modelName) is already being downloaded")
             return
         }
         
-        print("LocalModelManager: Starting download of \(model.name) from \(model.downloadURL.absoluteString)")
+        print("LocalModelManager: Starting download of \(model.modelName) from \(model.downloadURL.absoluteString)")
         
         isDownloading[model.id] = true
         downloadProgress[model.id] = 0.0
@@ -103,26 +91,26 @@ class LocalModelManager: ObservableObject {
         
         if let error = error {
             downloadError = "Download failed: \(error.localizedDescription)"
-            print("LocalModelManager: Download failed for \(model.name): \(error)")
+            print("LocalModelManager: Download failed for \(model.modelName): \(error)")
             return
         }
         
         guard let response = response as? HTTPURLResponse,
               (200...299).contains(response.statusCode) else {
             downloadError = "Server error during download"
-            print("LocalModelManager: Server error for \(model.name)")
+            print("LocalModelManager: Server error for \(model.modelName)")
             return
         }
         
         guard let temporaryURL = temporaryURL else {
             downloadError = "No file received"
-            print("LocalModelManager: No file received for \(model.name)")
+            print("LocalModelManager: No file received for \(model.modelName)")
             return
         }
         
         do {
             // Move file to final location
-            let finalURL = model.fileURL
+            let finalURL = model.fileURL(in: Self.modelsDirectory)
             
             // Remove existing file if it exists
             if FileManager.default.fileExists(atPath: finalURL.path) {
@@ -131,12 +119,12 @@ class LocalModelManager: ObservableObject {
             
             try FileManager.default.moveItem(at: temporaryURL, to: finalURL)
             
-            print("LocalModelManager: Successfully downloaded \(model.name) to \(finalURL.path)")
+            print("LocalModelManager: Successfully downloaded \(model.modelName) to \(finalURL.path)")
             downloadProgress[model.id] = 1.0
             
         } catch {
             downloadError = "Failed to save model: \(error.localizedDescription)"
-            print("LocalModelManager: Failed to save \(model.name): \(error)")
+            print("LocalModelManager: Failed to save \(model.modelName): \(error)")
         }
     }
     
@@ -151,21 +139,21 @@ class LocalModelManager: ObservableObject {
     
     /// Delete a downloaded model
     func deleteModel(_ model: VoiceInkWhisperModelFileSpec) throws {
-        guard model.isDownloaded else { 
-            print("LocalModelManager: Model \(model.name) is not downloaded")
+        guard model.isDownloaded(in: Self.modelsDirectory) else {
+            print("LocalModelManager: Model \(model.modelName) is not downloaded")
             return 
         }
         
         do {
-            try FileManager.default.removeItem(at: model.fileURL)
-            print("LocalModelManager: Successfully deleted model \(model.name)")
+            try FileManager.default.removeItem(at: model.fileURL(in: Self.modelsDirectory))
+            print("LocalModelManager: Successfully deleted model \(model.modelName)")
             
             // Trigger UI update
             DispatchQueue.main.async {
                 self.objectWillChange.send()
             }
         } catch {
-            print("LocalModelManager: Failed to delete model \(model.name): \(error)")
+            print("LocalModelManager: Failed to delete model \(model.modelName): \(error)")
             throw error
         }
     }
@@ -173,17 +161,18 @@ class LocalModelManager: ObservableObject {
     /// Get the path to the downloaded base model, if available
     var baseModelPath: String? {
         let model = VoiceInkWhisperModelFiles.baseModel
-        return model.isDownloaded ? model.fileURL.path : nil
+        let modelsDirectory = Self.modelsDirectory
+        return model.isDownloaded(in: modelsDirectory) ? model.fileURL(in: modelsDirectory).path : nil
     }
     
     /// Check if any model is available for transcription
     var hasAvailableModel: Bool {
-        VoiceInkWhisperModelFiles.bootstrapModels.contains { $0.isDownloaded }
+        VoiceInkWhisperModelFiles.bootstrapModels.contains { $0.isDownloaded(in: Self.modelsDirectory) }
     }
     
     /// Get the first available model for transcription
     var firstAvailableModel: VoiceInkWhisperModelFileSpec? {
-        VoiceInkWhisperModelFiles.bootstrapModels.first { $0.isDownloaded }
+        VoiceInkWhisperModelFiles.bootstrapModels.first { $0.isDownloaded(in: Self.modelsDirectory) }
     }
     
     /// Get disk usage information for models

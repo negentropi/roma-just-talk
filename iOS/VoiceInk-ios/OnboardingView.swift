@@ -149,7 +149,7 @@ struct ModelDownloadOnboardingView: View {
                         
                         Spacer()
                         
-                        if baseModel.isDownloaded {
+                        if baseModel.isDownloaded(in: LocalModelManager.modelsDirectory) {
                             Image(systemName: "checkmark.circle.fill")
                                 .foregroundColor(.green)
                                 .font(.title)
@@ -195,7 +195,7 @@ struct ModelDownloadOnboardingView: View {
                         .buttonStyle(OnboardingButtonStyle())
                         .disabled(true)
                     
-                } else if baseModel.isDownloaded {
+                } else if baseModel.isDownloaded(in: LocalModelManager.modelsDirectory) {
                     Button("Continue") {
                         withAnimation(.easeInOut(duration: 0.3)) {
                             currentStep = 2

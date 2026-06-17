@@ -1092,8 +1092,9 @@ class VoiceInkEngine: NSObject, ObservableObject {
 
     @objc func handlePromptChange() {
         Task {
-            let currentPrompt = UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.transcriptionPrompt)
-                ?? whisperModelManager.whisperPrompt.transcriptionPrompt
+            let currentPrompt = VoiceInkTranscriptionPromptPreference.localWhisperPrompt(
+                fallback: whisperModelManager.whisperPrompt.transcriptionPrompt
+            )
             if let context = whisperModelManager.whisperContext {
                 await context.setPrompt(currentPrompt)
             }

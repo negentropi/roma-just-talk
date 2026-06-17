@@ -32,6 +32,24 @@ public enum VoiceInkPreferenceDefault {
     public static let enhancementRetryOnTimeout = true
 }
 
+public enum VoiceInkTranscriptionPromptPreference {
+    public static func localWhisperPrompt(
+        from defaults: UserDefaults = .standard,
+        fallback: String = ""
+    ) -> String {
+        defaults.string(forKey: VoiceInkUserDefaultsKey.transcriptionPrompt) ?? fallback
+    }
+
+    public static func requestPrompt(from defaults: UserDefaults = .standard) -> String? {
+        requestPrompt(defaults.string(forKey: VoiceInkUserDefaultsKey.transcriptionPrompt))
+    }
+
+    public static func requestPrompt(_ prompt: String?) -> String? {
+        guard let prompt else { return nil }
+        return prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : prompt
+    }
+}
+
 public enum VoiceInkModeStorage {
     public static func saveModes(
         _ modes: [Mode],

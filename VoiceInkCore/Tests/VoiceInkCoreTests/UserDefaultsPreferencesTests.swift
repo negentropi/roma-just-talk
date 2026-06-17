@@ -49,6 +49,48 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkPreferenceDefault.enhancementRetryOnTimeout, true)
     }
 
+    func testTranscriptionPromptPreferenceUsesFallbackOnlyWhenLocalWhisperPromptIsMissing() {
+        withIsolatedDefaults { defaults in
+            XCTAssertEqual(
+                VoiceInkTranscriptionPromptPreference.localWhisperPrompt(from: defaults, fallback: "Language prompt"),
+                "Language prompt"
+            )
+
+            defaults.set("", forKey: VoiceInkUserDefaultsKey.transcriptionPrompt)
+            XCTAssertEqual(
+                VoiceInkTranscriptionPromptPreference.localWhisperPrompt(from: defaults, fallback: "Language prompt"),
+                ""
+            )
+
+            defaults.set(" spell Roma correctly ", forKey: VoiceInkUserDefaultsKey.transcriptionPrompt)
+            XCTAssertEqual(
+                VoiceInkTranscriptionPromptPreference.localWhisperPrompt(from: defaults, fallback: "Language prompt"),
+                " spell Roma correctly "
+            )
+        }
+    }
+
+    func testTranscriptionPromptPreferenceDropsBlankRequestPrompts() {
+        XCTAssertNil(VoiceInkTranscriptionPromptPreference.requestPrompt(nil))
+        XCTAssertNil(VoiceInkTranscriptionPromptPreference.requestPrompt(""))
+        XCTAssertNil(VoiceInkTranscriptionPromptPreference.requestPrompt(" \n\t "))
+    }
+
+    func testTranscriptionPromptPreferenceReadsRequestPromptFromSharedKey() {
+        withIsolatedDefaults { defaults in
+            XCTAssertNil(VoiceInkTranscriptionPromptPreference.requestPrompt(from: defaults))
+
+            defaults.set(" keep product names ", forKey: VoiceInkUserDefaultsKey.transcriptionPrompt)
+            XCTAssertEqual(
+                VoiceInkTranscriptionPromptPreference.requestPrompt(from: defaults),
+                " keep product names "
+            )
+
+            defaults.set(" \n ", forKey: VoiceInkUserDefaultsKey.transcriptionPrompt)
+            XCTAssertNil(VoiceInkTranscriptionPromptPreference.requestPrompt(from: defaults))
+        }
+    }
+
     func testModeStorageRoundTripsModesAndSelectedModeId() {
         withIsolatedDefaults { defaults in
             let localMode = Mode.defaultLocalWhisper(name: "Local")

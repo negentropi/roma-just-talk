@@ -22,6 +22,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 `VoiceInkCore` currently owns these cross-platform modules:
 
 - prompt templates and prompt text
+- transcription prompt preference loading for local Whisper and nonblank request prompts for remote/realtime providers
 - post-processing request construction and output filtering
 - provider catalog, provider endpoints, API key account names, and provider readiness policy
 - provider API-key verification dispatch
@@ -74,6 +75,7 @@ Current macOS consumers of shared remote transport:
 - Cartesia API-key verification uses `VoiceInkCartesiaClient`; Cartesia transcription remains streaming-only in platform shell code.
 - MacOS cloud-provider API-key verification uses `CloudProvider` default verification backed by `VoiceInkProviderAPIKeyVerifier`; Cartesia stays on `VoiceInkCartesiaClient` because it is streaming-only and not an iOS `VoiceInkProviderKind`.
 - macOS local Whisper/model loading throws `VoiceInkEngineError` from `VoiceInkCore`; macOS error descriptions are covered by `VoiceInkEngineErrorTests`.
+- macOS local Whisper, cloud transcription, and AssemblyAI streaming read transcription prompts through `VoiceInkTranscriptionPromptPreference`.
 
 Current iOS consumers of shared remote transport:
 
@@ -83,6 +85,7 @@ Current iOS consumers of shared remote transport:
 - `iOS/VoiceInk-ios/AppSettings.swift` passes the shared filler-word cleanup toggle and vocabulary into `VoiceInkTranscriptionRunProcessor`, aligning retry transcription cleanup with macOS defaults while keeping settings storage in the iOS shell.
 - `iOS/VoiceInk-ios/AppSettings.swift` passes the shared paragraph-formatting preference into `VoiceInkTranscriptionRunProcessor`, so iOS retry transcription uses the same `VoiceInkTranscriptParagraphFormatter` policy as macOS.
 - `iOS/VoiceInk-ios/TranscriptionRetryService.swift` passes the iOS selected transcription language through `VoiceInkTranscriptionRunProcessor`, which normalizes auto-detect before remote/local transcription adapters receive it.
+- `iOS/VoiceInk-ios/WhisperTranscriptionService.swift` passes the shared local Whisper prompt preference into the iOS whisper.cpp wrapper.
 - `iOS/VoiceInk-ios/ProviderAPIKeyView.swift` verifies provider keys through `VoiceInkProviderAPIKeyVerifier`.
 - `iOS/VoiceInk-ios/WhisperTranscriptionService.swift` throws `VoiceInkEngineError` from `VoiceInkCore` instead of owning a separate iOS-only local Whisper error enum.
 - Cartesia remains absent from iOS transcription provider selection until an iOS streaming adapter exists; it is not a batch provider.

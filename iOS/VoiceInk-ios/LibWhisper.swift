@@ -32,12 +32,13 @@ actor WhisperContext {
         }
     }
 
-    func fullTranscribe(samples: [Float], language: String?) -> Bool {
+    func fullTranscribe(samples: [Float], language: String?, prompt: String? = nil) -> Bool {
         guard let context = context else { return false }
         
         var params = whisper_full_default_params(WHISPER_SAMPLING_GREEDY)
         
         let languageCString = language.map { Array($0.utf8CString) }
+        let promptCString = prompt.map { Array($0.utf8CString) }
         
         params.print_realtime = true
         params.print_progress = false
@@ -81,14 +82,26 @@ actor WhisperContext {
             }
         }
 
+        func runWithPrompt() {
+            if let promptCString {
+                promptCString.withUnsafeBufferPointer { promptBuffer in
+                    params.initial_prompt = promptBuffer.baseAddress
+                    runWhisper()
+                }
+            } else {
+                params.initial_prompt = nil
+                runWhisper()
+            }
+        }
+
         if let languageCString {
             languageCString.withUnsafeBufferPointer { languageBuffer in
                 params.language = languageBuffer.baseAddress
-                runWhisper()
+                runWithPrompt()
             }
         } else {
             params.language = nil
-            runWhisper()
+            runWithPrompt()
         }
         
         return success

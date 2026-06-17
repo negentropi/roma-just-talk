@@ -2,6 +2,7 @@
 
 ## v1.94 - Unreleased
 
+- Aligned imported iOS local Whisper transcription with the shared transcription prompt preference used by macOS.
 - Aligned imported iOS retry transcription with the shared paragraph-formatting preference, so iOS can use the same core paragraph break policy as macOS.
 - Added iOS filler-word list editing backed by the shared cleanup policy, so imported iOS retry transcription can manage the same vocabulary shape used by macOS.
 - Aligned imported iOS retry transcription with shared filler-word cleanup defaults, so the integrated iOS app now uses the same core cleanup configuration as macOS for punctuation, lowercase, and filler words.

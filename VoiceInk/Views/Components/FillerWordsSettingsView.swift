@@ -72,7 +72,7 @@ struct FillerWordsSettingsView: View {
                         }
                         .buttonStyle(.borderless)
                         .accessibilityLabel("Add filler word")
-                        .disabled(newWord.trimmingCharacters(in: .whitespaces).isEmpty)
+                        .disabled(!canAddWord)
                     }
                     .padding(.vertical, 4)
 
@@ -98,13 +98,16 @@ struct FillerWordsSettingsView: View {
     }
 
     private func addWord() {
-        let trimmed = newWord.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return }
+        guard canAddWord else { return }
 
-        if fillerWordManager.addWord(trimmed) {
+        if fillerWordManager.addWord(newWord) {
             newWord = ""
         } else {
             showDuplicateAlert = true
         }
+    }
+
+    private var canAddWord: Bool {
+        VoiceInkFillerWords.normalizedWord(newWord) != nil
     }
 }

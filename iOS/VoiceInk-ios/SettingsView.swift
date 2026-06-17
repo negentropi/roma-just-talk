@@ -81,7 +81,7 @@ struct SettingsView: View {
                         Button(action: addFillerWord) {
                             Image(systemName: "plus.circle.fill")
                         }
-                        .disabled(newFillerWord.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        .disabled(!canAddFillerWord)
                     }
 
                     ForEach(settings.fillerWords, id: \.self) { word in
@@ -149,11 +149,14 @@ struct SettingsView: View {
         )
     }
 
-    private func addFillerWord() {
-        let word = newFillerWord.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !word.isEmpty else { return }
+    private var canAddFillerWord: Bool {
+        VoiceInkFillerWords.normalizedWord(newFillerWord) != nil
+    }
 
-        if settings.addFillerWord(word) {
+    private func addFillerWord() {
+        guard canAddFillerWord else { return }
+
+        if settings.addFillerWord(newFillerWord) {
             newFillerWord = ""
         } else {
             showDuplicateFillerWordAlert = true

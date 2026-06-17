@@ -2,6 +2,7 @@ import SwiftUI
 import SwiftData
 import Foundation
 import os
+import VoiceInkCore
 
 private struct DashboardMetricsSummary: Equatable, Sendable {
     var totalCount: Int = 0
@@ -379,7 +380,11 @@ struct MetricsContent: View {
     }
     
     private var formattedTimeSaved: String {
-        let formatted = Formatters.formattedDuration(timeSaved, style: .full, fallback: "Time savings coming soon")
+        let formatted = VoiceInkDurationPresentation.positiveDuration(
+            timeSaved,
+            style: .full,
+            fallback: "Time savings coming soon"
+        )
         return formatted
     }
     
@@ -446,21 +451,8 @@ private enum Formatters {
         return formatter
     }()
     
-    static let durationFormatter: DateComponentsFormatter = {
-        let formatter = DateComponentsFormatter()
-        formatter.maximumUnitCount = 2
-        return formatter
-    }()
-    
     static func formattedNumber(_ value: Int) -> String {
         return numberFormatter.string(from: NSNumber(value: value)) ?? "\(value)"
-    }
-    
-    static func formattedDuration(_ interval: TimeInterval, style: DateComponentsFormatter.UnitsStyle, fallback: String = "–") -> String {
-        guard interval > 0 else { return fallback }
-        durationFormatter.unitsStyle = style
-        durationFormatter.allowedUnits = interval >= 3600 ? [.hour, .minute] : [.minute, .second]
-        return durationFormatter.string(from: interval) ?? fallback
     }
 }
 

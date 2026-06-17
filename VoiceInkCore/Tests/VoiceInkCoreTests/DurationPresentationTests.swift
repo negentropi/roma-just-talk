@@ -28,6 +28,22 @@ final class DurationPresentationTests: XCTestCase {
         XCTAssertEqual(VoiceInkDurationPresentation.abbreviatedMinutesSeconds(125.6), "2m 5s")
     }
 
+    func testPositiveDurationReturnsFallbackForZeroOrNegativeDurations() {
+        XCTAssertEqual(
+            VoiceInkDurationPresentation.positiveDuration(0, style: .full, fallback: "Time savings coming soon"),
+            "Time savings coming soon"
+        )
+        XCTAssertEqual(VoiceInkDurationPresentation.positiveDuration(-1, style: .abbreviated), "–")
+    }
+
+    func testPositiveDurationUsesMinuteSecondUnitsBelowOneHour() {
+        XCTAssertEqual(VoiceInkDurationPresentation.positiveDuration(65, style: .abbreviated), "1m 5s")
+    }
+
+    func testPositiveDurationUsesHourMinuteUnitsFromOneHour() {
+        XCTAssertEqual(VoiceInkDurationPresentation.positiveDuration(3665, style: .abbreviated), "1h 1m")
+    }
+
     func testCompactElapsedUsesMillisecondsForSubsecondDurations() {
         XCTAssertEqual(VoiceInkDurationPresentation.compactElapsed(0.125), "125ms")
     }

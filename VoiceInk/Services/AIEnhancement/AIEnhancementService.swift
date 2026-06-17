@@ -40,16 +40,14 @@ class AIEnhancementService: ObservableObject {
 
     @Published var customPrompts: [CustomPrompt] {
         didSet {
-            if let encoded = try? JSONEncoder().encode(customPrompts) {
-                UserDefaults.standard.set(encoded, forKey: VoiceInkUserDefaultsKey.customPrompts)
-            }
+            VoiceInkCustomPromptStorage.savePrompts(customPrompts)
             refreshPromptDetectionCache()
         }
     }
 
     @Published var selectedPromptId: UUID? {
         didSet {
-            UserDefaults.standard.set(selectedPromptId?.uuidString, forKey: VoiceInkUserDefaultsKey.selectedPromptId)
+            VoiceInkCustomPromptStorage.saveSelectedPromptId(selectedPromptId)
             NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
             NotificationCenter.default.post(name: .promptSelectionChanged, object: nil)
         }
@@ -94,16 +92,8 @@ class AIEnhancementService: ObservableObject {
         self.isEnhancementEnabled = UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.isAIEnhancementEnabled)
         self.useClipboardContext = UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.useClipboardContext)
         self.useScreenCaptureContext = UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.useScreenCaptureContext)
-        if let savedPromptsData = UserDefaults.standard.data(forKey: VoiceInkUserDefaultsKey.customPrompts),
-           let decodedPrompts = try? JSONDecoder().decode([CustomPrompt].self, from: savedPromptsData) {
-            self.customPrompts = decodedPrompts
-        } else {
-            self.customPrompts = []
-        }
-
-        if let savedPromptId = UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.selectedPromptId) {
-            self.selectedPromptId = UUID(uuidString: savedPromptId)
-        }
+        self.customPrompts = VoiceInkCustomPromptStorage.loadPrompts()
+        self.selectedPromptId = VoiceInkCustomPromptStorage.loadSelectedPromptId()
 
         if isEnhancementEnabled && (selectedPromptId == nil || !allPrompts.contains(where: { $0.id == selectedPromptId })) {
             self.selectedPromptId = allPrompts.first?.id

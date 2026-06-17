@@ -180,6 +180,47 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testCustomPromptStorageRoundTripsPromptsAndSelectedPromptId() {
+        withIsolatedDefaults { defaults in
+            let customPrompt = VoiceInkCustomPrompt(
+                title: "Custom",
+                promptText: "Keep terms exact.",
+                triggerWords: ["terms"]
+            )
+            let assistantPrompt = VoiceInkCustomPrompt(predefinedPrompt: VoiceInkPredefinedPrompts.all[1])
+
+            VoiceInkCustomPromptStorage.savePrompts([customPrompt, assistantPrompt], to: defaults)
+            VoiceInkCustomPromptStorage.saveSelectedPromptId(assistantPrompt.id, to: defaults)
+
+            let loadedPrompts = VoiceInkCustomPromptStorage.loadPrompts(from: defaults)
+            XCTAssertEqual(loadedPrompts.map(\.id), [customPrompt.id, assistantPrompt.id])
+            XCTAssertEqual(loadedPrompts.map(\.title), ["Custom", "Assistant"])
+            XCTAssertEqual(VoiceInkCustomPromptStorage.loadSelectedPromptId(from: defaults), assistantPrompt.id)
+        }
+    }
+
+    func testCustomPromptStorageFallsBackToEmptyPromptsForMissingOrInvalidData() {
+        withIsolatedDefaults { defaults in
+            XCTAssertTrue(VoiceInkCustomPromptStorage.loadPrompts(from: defaults).isEmpty)
+
+            defaults.set(Data("bad".utf8), forKey: VoiceInkUserDefaultsKey.customPrompts)
+            XCTAssertTrue(VoiceInkCustomPromptStorage.loadPrompts(from: defaults).isEmpty)
+        }
+    }
+
+    func testCustomPromptStorageClearRemovesPromptsAndSelectedPromptId() {
+        withIsolatedDefaults { defaults in
+            let prompt = VoiceInkCustomPrompt(title: "Prompt", promptText: "Text")
+            VoiceInkCustomPromptStorage.savePrompts([prompt], to: defaults)
+            VoiceInkCustomPromptStorage.saveSelectedPromptId(prompt.id, to: defaults)
+
+            VoiceInkCustomPromptStorage.clear(from: defaults)
+
+            XCTAssertTrue(VoiceInkCustomPromptStorage.loadPrompts(from: defaults).isEmpty)
+            XCTAssertNil(VoiceInkCustomPromptStorage.loadSelectedPromptId(from: defaults))
+        }
+    }
+
     func testProviderAPIKeyVerificationStateUsesProviderKeys() {
         withIsolatedDefaults { defaults in
             VoiceInkProviderAPIKeyVerificationState.setVerified(true, for: .groq, in: defaults)

@@ -124,6 +124,51 @@ public enum VoiceInkModeStorage {
     }
 }
 
+public enum VoiceInkCustomPromptStorage {
+    public static func savePrompts(
+        _ prompts: [VoiceInkCustomPrompt],
+        to defaults: UserDefaults = .standard,
+        encoder: JSONEncoder = JSONEncoder()
+    ) {
+        if let data = try? encoder.encode(prompts) {
+            defaults.set(data, forKey: VoiceInkUserDefaultsKey.customPrompts)
+        }
+    }
+
+    public static func loadPrompts(
+        from defaults: UserDefaults = .standard,
+        decoder: JSONDecoder = JSONDecoder()
+    ) -> [VoiceInkCustomPrompt] {
+        guard let data = defaults.data(forKey: VoiceInkUserDefaultsKey.customPrompts),
+              let prompts = try? decoder.decode([VoiceInkCustomPrompt].self, from: data) else {
+            return []
+        }
+
+        return prompts
+    }
+
+    public static func saveSelectedPromptId(_ selectedPromptId: UUID?, to defaults: UserDefaults = .standard) {
+        if let selectedPromptId {
+            defaults.set(selectedPromptId.uuidString, forKey: VoiceInkUserDefaultsKey.selectedPromptId)
+        } else {
+            defaults.removeObject(forKey: VoiceInkUserDefaultsKey.selectedPromptId)
+        }
+    }
+
+    public static func loadSelectedPromptId(from defaults: UserDefaults = .standard) -> UUID? {
+        guard let idString = defaults.string(forKey: VoiceInkUserDefaultsKey.selectedPromptId) else {
+            return nil
+        }
+
+        return UUID(uuidString: idString)
+    }
+
+    public static func clear(from defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.customPrompts)
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.selectedPromptId)
+    }
+}
+
 public enum VoiceInkProviderAPIKeyVerificationState {
     public static func verifiedProviders(
         from providers: [VoiceInkProviderKind] = VoiceInkProviderKind.userAPIKeyProviders,

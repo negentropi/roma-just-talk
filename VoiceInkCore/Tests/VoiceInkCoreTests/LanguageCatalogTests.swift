@@ -120,6 +120,36 @@ final class LanguageCatalogTests: XCTestCase {
         )
     }
 
+    func testSortedLanguageOptionsPutAutoDetectFirstThenSortByDisplayName() {
+        XCTAssertEqual(
+            VoiceInkLanguageCatalog.sortedOptions([
+                "es": "Spanish",
+                "auto": "Auto-detect",
+                "de": "German",
+                "en": "English"
+            ]),
+            [
+                VoiceInkLanguageOption(code: "auto", name: "Auto-detect"),
+                VoiceInkLanguageOption(code: "en", name: "English"),
+                VoiceInkLanguageOption(code: "de", name: "German"),
+                VoiceInkLanguageOption(code: "es", name: "Spanish")
+            ]
+        )
+    }
+
+    func testSortedLanguageOptionsUseCodeForStableTies() {
+        XCTAssertEqual(
+            VoiceInkLanguageCatalog.sortedOptions([
+                "en_us": "English",
+                "en": "English"
+            ]),
+            [
+                VoiceInkLanguageOption(code: "en", name: "English"),
+                VoiceInkLanguageOption(code: "en_us", name: "English")
+            ]
+        )
+    }
+
     func testRequestLanguageStripsAutoAndBlankValues() {
         XCTAssertNil(VoiceInkTranscriptionLanguageSupport.requestLanguage(nil))
         XCTAssertNil(VoiceInkTranscriptionLanguageSupport.requestLanguage(""))

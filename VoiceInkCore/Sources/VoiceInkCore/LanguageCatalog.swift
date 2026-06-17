@@ -1,5 +1,17 @@
 import Foundation
 
+public struct VoiceInkLanguageOption: Identifiable, Equatable, Sendable {
+    public let code: String
+    public let name: String
+
+    public var id: String { code }
+
+    public init(code: String, name: String) {
+        self.code = code
+        self.name = name
+    }
+}
+
 public enum VoiceInkLanguageCatalog {
     public static let autoDetectCode = "auto"
     public static let autoDetectName = "Auto-detect"
@@ -233,6 +245,22 @@ public enum VoiceInkLanguageCatalog {
         }
         return languages(for: modelProvider)
     }
+
+    public static func sortedOptions(_ languages: [String: String]) -> [VoiceInkLanguageOption] {
+        languages
+            .map { VoiceInkLanguageOption(code: $0.key, name: $0.value) }
+            .sorted { lhs, rhs in
+                if lhs.code == autoDetectCode { return true }
+                if rhs.code == autoDetectCode { return false }
+
+                let nameOrder = lhs.name.localizedCaseInsensitiveCompare(rhs.name)
+                if nameOrder != .orderedSame {
+                    return nameOrder == .orderedAscending
+                }
+
+                return lhs.code.localizedCaseInsensitiveCompare(rhs.code) == .orderedAscending
+            }
+    }
 }
 
 public enum VoiceInkTranscriptionLanguageSupport {
@@ -279,9 +307,7 @@ public enum VoiceInkTranscriptionLanguageSupport {
             return "en"
         }
 
-        return languages.keys.sorted { lhs, rhs in
-            languages[lhs, default: lhs] < languages[rhs, default: rhs]
-        }.first ?? "en"
+        return VoiceInkLanguageCatalog.sortedOptions(languages).first?.code ?? "en"
     }
 
     public static func validLanguageOrFallback(

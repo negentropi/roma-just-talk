@@ -2,6 +2,7 @@
 
 ## v1.94 - Unreleased
 
+- Shared selected-language option ordering between macOS language pickers and the imported iOS settings path.
 - Shared provider credential presence checks between macOS cloud/streaming transcription and the imported iOS transcription path, so whitespace-only API keys are treated as missing consistently.
 - Shared selected-language request normalization between macOS local Whisper/cloud transcription and the imported iOS transcription path.
 - Aligned imported iOS local Whisper transcription with the shared transcription prompt preference used by macOS.

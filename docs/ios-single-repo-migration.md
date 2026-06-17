@@ -48,7 +48,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - custom vocabulary term normalization for transcription providers; platform shells still own dictionary storage
 - custom cloud transcription model generated-name and draft validation policy; platform shells still own keychain and preferences storage
 - prompt trigger-word detection and trigger-word editing policy; platform shells still own prompt persistence and enhancement state
-- transcription language catalog, provider language filtering, AssemblyAI realtime/batch language policy, selected-language fallback policy, selected-language preference loading, selected-language request normalization, and the shared selected-language defaults key; platform shells still own selected-language storage/UI and runtime streaming-mode state
+- transcription language catalog, provider language filtering, AssemblyAI realtime/batch language policy, selected-language fallback policy, language-option ordering, selected-language preference loading, selected-language request normalization, and the shared selected-language defaults key; platform shells still own selected-language storage/UI and runtime streaming-mode state
 - stored audio-file path resolution, existing-file lookup, recordings directory, and file URL construction
 - duration presentation
 - relative timestamp presentation
@@ -79,6 +79,7 @@ Current macOS consumers of shared remote transport:
 - macOS local Whisper and cloud transcription normalize selected request language through `VoiceInkTranscriptionLanguagePreference`.
 - macOS local Whisper, cloud transcription, and AssemblyAI streaming read transcription prompts through `VoiceInkTranscriptionPromptPreference`.
 - macOS batch cloud and streaming transcription use `VoiceInkProviderCredential` for runtime API-key presence checks before entering provider adapters.
+- macOS language pickers use `VoiceInkLanguageCatalog.sortedOptions` so language presentation order stays shared with iOS.
 
 Current iOS consumers of shared remote transport:
 
@@ -91,6 +92,7 @@ Current iOS consumers of shared remote transport:
 - `iOS/VoiceInk-ios/TranscriptionRetryService.swift` passes the iOS selected transcription language through `VoiceInkTranscriptionRunProcessor`, which normalizes auto-detect before remote/local transcription adapters receive it.
 - `iOS/VoiceInk-ios/WhisperTranscriptionService.swift` passes the shared local Whisper prompt preference into the iOS whisper.cpp wrapper.
 - `iOS/VoiceInk-ios/ProviderAPIKeyView.swift` verifies provider keys through `VoiceInkProviderAPIKeyVerifier`.
+- `iOS/VoiceInk-ios/SettingsView.swift` uses `VoiceInkLanguageCatalog.sortedOptions` for the same selected-language option ordering used by macOS.
 - `iOS/VoiceInk-ios/WhisperTranscriptionService.swift` throws `VoiceInkEngineError` from `VoiceInkCore` instead of owning a separate iOS-only local Whisper error enum.
 - Cartesia remains absent from iOS transcription provider selection until an iOS streaming adapter exists; it is not a batch provider.
 - The bundled `VoiceInk` provider case remains decodable, but is hidden from iOS transcription and post-processing selection until a real no-key/bundled-service adapter exists. The sibling clone marked it always available while returning an empty API key, so porting that path would preserve a broken no-key mode.

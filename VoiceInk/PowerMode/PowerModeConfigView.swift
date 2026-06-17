@@ -327,12 +327,8 @@ struct ConfigurationView: View {
                         )
 
                         Picker("Language", selection: languageBinding) {
-                            ForEach(availableLanguages(for: modelInfo).sorted(by: {
-                                if $0.key == "auto" { return true }
-                                if $1.key == "auto" { return false }
-                                return $0.value < $1.value
-                            }), id: \.key) { key, value in
-                                Text(value).tag(key as String?)
+                            ForEach(VoiceInkLanguageCatalog.sortedOptions(availableLanguages(for: modelInfo))) { option in
+                                Text(option.name).tag(option.code as String?)
                             }
                         }
                     } else if let selectedModel = effectiveModelName,

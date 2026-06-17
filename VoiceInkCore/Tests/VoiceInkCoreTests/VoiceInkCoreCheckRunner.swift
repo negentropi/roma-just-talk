@@ -53,6 +53,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "LanguageCatalogTests.testAssemblyAILanguagesPreserveRealtimeAndBatchPolicies", run: { LanguageCatalogTests().testAssemblyAILanguagesPreserveRealtimeAndBatchPolicies() }),
             VoiceInkCoreCheck(name: "LanguageCatalogTests.testValidLanguageOrFallbackPreservesMacOSFallbackOrder", run: { LanguageCatalogTests().testValidLanguageOrFallbackPreservesMacOSFallbackOrder() }),
             VoiceInkCoreCheck(name: "LanguageCatalogTests.testValidLanguageOrFallbackSupportsProviderKindLanguages", run: { LanguageCatalogTests().testValidLanguageOrFallbackSupportsProviderKindLanguages() }),
+            VoiceInkCoreCheck(name: "LanguageCatalogTests.testSortedLanguageOptionsPutAutoDetectFirstThenSortByDisplayName", run: { LanguageCatalogTests().testSortedLanguageOptionsPutAutoDetectFirstThenSortByDisplayName() }),
+            VoiceInkCoreCheck(name: "LanguageCatalogTests.testSortedLanguageOptionsUseCodeForStableTies", run: { LanguageCatalogTests().testSortedLanguageOptionsUseCodeForStableTies() }),
             VoiceInkCoreCheck(name: "LanguageCatalogTests.testRequestLanguageStripsAutoAndBlankValues", run: { LanguageCatalogTests().testRequestLanguageStripsAutoAndBlankValues() }),
             VoiceInkCoreCheck(name: "ModeRuntimeConfigurationTests.testEmptyModeCollectionUsesDefaultLocalWhisperFallbackConfiguration", run: { ModeRuntimeConfigurationTests().testEmptyModeCollectionUsesDefaultLocalWhisperFallbackConfiguration() }),
             VoiceInkCoreCheck(name: "ModeRuntimeConfigurationTests.testFallbackConfigurationMatchesDefaultLocalWhisperMode", run: { ModeRuntimeConfigurationTests().testFallbackConfigurationMatchesDefaultLocalWhisperMode() }),

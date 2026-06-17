@@ -52,8 +52,8 @@ struct SettingsView: View {
 
             Section(header: Text("Transcription Language")) {
                 Picker("Language", selection: selectedLanguageBinding) {
-                    ForEach(sortedTranscriptionLanguages, id: \.key) { language in
-                        Text(language.value).tag(language.key)
+                    ForEach(sortedTranscriptionLanguages) { language in
+                        Text(language.name).tag(language.code)
                     }
                 }
             }
@@ -138,12 +138,8 @@ struct SettingsView: View {
         }
     }
 
-    private var sortedTranscriptionLanguages: [(key: String, value: String)] {
-        settings.availableTranscriptionLanguages.sorted { lhs, rhs in
-            if lhs.key == VoiceInkLanguageCatalog.autoDetectCode { return true }
-            if rhs.key == VoiceInkLanguageCatalog.autoDetectCode { return false }
-            return lhs.value < rhs.value
-        }
+    private var sortedTranscriptionLanguages: [VoiceInkLanguageOption] {
+        VoiceInkLanguageCatalog.sortedOptions(settings.availableTranscriptionLanguages)
     }
 
     private var selectedLanguageBinding: Binding<String> {

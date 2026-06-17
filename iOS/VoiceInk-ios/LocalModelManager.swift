@@ -21,9 +21,7 @@ class LocalModelManager: ObservableObject {
     static let shared = LocalModelManager()
     
     nonisolated static var modelsDirectory: URL {
-        let documentsDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        return (try? VoiceInkWhisperModelFiles.createModelsDirectory(in: documentsDir))
-            ?? VoiceInkWhisperModelFiles.modelsDirectory(in: documentsDir)
+        VoiceInkIOSStorageDirectories.preparedModelsDirectory
     }
     
     private init() {

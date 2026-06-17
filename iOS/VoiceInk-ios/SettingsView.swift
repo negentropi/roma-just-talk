@@ -181,20 +181,19 @@ struct SettingsView: View {
         }
 
         // 2) Delete audio files directory
-        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        let recordingsDir = VoiceInkStoredAudioFile.recordingsDirectory(in: documentsDirectory)
+        let recordingsDir = VoiceInkIOSStorageDirectories.recordingsDirectory
         if FileManager.default.fileExists(atPath: recordingsDir.path) {
             try? FileManager.default.removeItem(at: recordingsDir)
         }
 
         // 3) Delete local model directory
-        let modelsDir = LocalModelManager.modelsDirectory
+        let modelsDir = VoiceInkIOSStorageDirectories.modelsDirectory
         if FileManager.default.fileExists(atPath: modelsDir.path) {
             try? FileManager.default.removeItem(at: modelsDir)
         }
 
         // 4) Clear caches and tmp contents (best-effort)
-        let cachesURL = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+        let cachesURL = VoiceInkIOSStorageDirectories.cachesDirectory
         if let cacheItems = try? FileManager.default.contentsOfDirectory(at: cachesURL, includingPropertiesForKeys: nil) {
             for url in cacheItems { try? FileManager.default.removeItem(at: url) }
         }

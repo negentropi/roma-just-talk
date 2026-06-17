@@ -178,6 +178,8 @@ Current iOS consumers of shared remote transport:
 
 Platform shells still own UI, OS permissions, audio capture, paste/keyboard behavior, keychain adapters, local model download storage, SwiftData models, and macOS-only orchestration. iOS-only shell code shared between the app and keyboard extension lives in `iOS/Shared/`, not `VoiceInkCore`; this currently includes App Group coordination and the keyboard-to-app deep-link contract.
 
+iOS app-local storage roots are kept in `iOS/VoiceInk-ios/VoiceInkIOSStorageDirectories.swift`: the iOS shell owns the Documents/Caches base directories, while `VoiceInkCore` still owns recordings/model subdirectory names and file policies.
+
 ## Sibling Clone Status
 
 The remaining Swift files present in `../VoiceInk-iOS` but not in `VoiceInk/iOS` are old clone-side sources, except where noted:
@@ -188,6 +190,7 @@ The remaining Swift files present in `../VoiceInk-iOS` but not in `VoiceInk/iOS`
 - `GroqTranscriptionService.swift`: replaced by `VoiceInkCore` OpenAI-compatible request/client helpers and `VoiceInkRemoteTranscriptionService`.
 - `OpenAICompatibleClient.swift`: replaced by `VoiceInkCore` chat DTOs/request builder/client.
 - `LLMPostProcessor.swift`: replaced by `VoiceInkPostProcessingRequest`, `VoiceInkPostProcessingClient`, and `VoiceInkTranscriptionRunProcessor`.
+- `TranscriptionServiceFactory.swift`: replaced by `VoiceInkTranscriptionRunProcessor` service-provider injection plus the iOS local Whisper adapter and shared `VoiceInkRemoteTranscriptionService`.
 - `RiffWaveUtils.swift`: replaced by `VoiceInkPCM16AudioSamples`.
 - `VADModelManager.swift`: replaced by direct `VoiceInkVADModelFiles.sileroPath()` calls from the macOS/iOS Whisper shells and macOS rolling preload.
 - `DefaultModeManager.swift`: replaced by `AppSettings.ensureDefaultModeExists()` plus `Mode.defaultModesAndSelection()`.

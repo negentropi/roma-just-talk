@@ -22,7 +22,9 @@ final class AudioRecorder: NSObject, ObservableObject {
         // Use session manager to activate audio session
         try sessionManager.activateSessionForRecording()
 
-        let url = VoiceInkStoredAudioFile.timestampedRecordingFileURL(in: Self.recordingsDirectory())
+        let url = VoiceInkStoredAudioFile.timestampedRecordingFileURL(
+            in: VoiceInkIOSStorageDirectories.preparedRecordingsDirectory
+        )
 
         // Whisper-compatible format: 16kHz mono WAV
         let settings: [String: Any] = [
@@ -89,12 +91,6 @@ final class AudioRecorder: NSObject, ObservableObject {
         
         // Schedule session deactivation after discard as well
         sessionManager.scheduleDeactivation()
-    }
-
-    static func recordingsDirectory() -> URL {
-        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        return (try? VoiceInkStoredAudioFile.createRecordingsDirectory(in: documentsDirectory))
-            ?? VoiceInkStoredAudioFile.recordingsDirectory(in: documentsDirectory)
     }
 }
 

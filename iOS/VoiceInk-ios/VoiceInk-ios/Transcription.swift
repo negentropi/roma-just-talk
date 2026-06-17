@@ -33,11 +33,6 @@ final class Transcription: VoiceInkMutableTranscriptionRecord, VoiceInkStoredAud
     }
     
     var storedAudioRecordingsDirectory: URL? {
-        Self.recordingsDirectory
-    }
-
-    private static var recordingsDirectory: URL {
-        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        return VoiceInkStoredAudioFile.recordingsDirectory(in: documentsDirectory)
+        VoiceInkIOSStorageDirectories.recordingsDirectory
     }
 }

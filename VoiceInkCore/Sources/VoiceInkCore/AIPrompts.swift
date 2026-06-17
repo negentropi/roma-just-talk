@@ -112,3 +112,13 @@ public enum VoiceInkAIEnhancementPromptBuilder {
         """
     }
 }
+
+public enum VoiceInkAIEnhancementVocabularyContext {
+    public static func formatted(from terms: [String]) -> String {
+        guard !terms.isEmpty else {
+            return ""
+        }
+
+        return "Important Vocabulary: \(terms.joined(separator: ", "))"
+    }
+}

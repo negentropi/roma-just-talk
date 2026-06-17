@@ -71,4 +71,18 @@ final class AIPromptsTests: XCTestCase {
             "Clean this transcript."
         )
     }
+
+    func testEnhancementVocabularyContextFormatsTermsInOrder() {
+        XCTAssertEqual(
+            VoiceInkAIEnhancementVocabularyContext.formatted(from: ["Roma", "Felix", "SwiftData"]),
+            "Important Vocabulary: Roma, Felix, SwiftData"
+        )
+    }
+
+    func testEnhancementVocabularyContextReturnsEmptyForNoTerms() {
+        XCTAssertEqual(
+            VoiceInkAIEnhancementVocabularyContext.formatted(from: []),
+            ""
+        )
+    }
 }

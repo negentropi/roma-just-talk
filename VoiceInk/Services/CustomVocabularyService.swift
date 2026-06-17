@@ -1,6 +1,6 @@
 import Foundation
-import SwiftUI
 import SwiftData
+import VoiceInkCore
 
 class CustomVocabularyService {
     static let shared = CustomVocabularyService()
@@ -12,8 +12,7 @@ class CustomVocabularyService {
             return ""
         }
 
-        let wordsText = customWords.joined(separator: ", ")
-        return "Important Vocabulary: \(wordsText)"
+        return VoiceInkAIEnhancementVocabularyContext.formatted(from: customWords)
     }
 
     private func getCustomVocabularyWords(from context: ModelContext) -> [String]? {

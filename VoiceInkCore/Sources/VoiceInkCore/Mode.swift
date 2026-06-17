@@ -148,6 +148,22 @@ public struct Mode: Identifiable, Codable {
 
         return true
     }
+
+    public func isSaveableDraft(
+        promptTemplateType: VoiceInkPostProcessingTemplateType,
+        customPrompt: String,
+        availableTranscriptionProviders: [VoiceInkProviderKind],
+        availablePostProcessingProviders: [VoiceInkProviderKind]
+    ) -> Bool {
+        Self.isSaveableDraft(
+            name: name,
+            promptTemplateType: promptTemplateType,
+            customPrompt: customPrompt,
+            transcriptionProviderAvailable: availableTranscriptionProviders.contains(transcriptionProvider),
+            postProcessingProviderAvailable: availablePostProcessingProviders.contains(postProcessingProvider),
+            isPostProcessingEnabled: isPostProcessingEnabled
+        )
+    }
 }
 
 public extension Collection where Element == Mode {

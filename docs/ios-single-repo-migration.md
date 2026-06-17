@@ -182,6 +182,7 @@ The remaining Swift files present in `../VoiceInk-iOS` but not in `VoiceInk/iOS`
 - `Mode.swift`, `PromptTemplate.swift`, `Provider.swift`: replaced by `VoiceInkCore` mode, prompt-template, and provider catalog modules.
 - `ModeSelectionView.swift`, `ModesView.swift`: obsolete iOS UI experiments; current in-repo iOS mode UI is `iOS/VoiceInk-ios/ModeConfigurationView.swift`.
 - `Item.swift`: unused SwiftData template sample.
+- `VoiceInk_iosTests.swift`, `VoiceInk_iosUITests.swift`, `VoiceInk_iosUITestsLaunchTests.swift`: stock Xcode template tests removed from the in-repo iOS target; shared behavior is covered in `VoiceInkCore/Tests`, and new app tests should be real migration/runtime coverage.
 
 Do not copy these files back into `VoiceInk/iOS`. If behavior from one appears missing, port it into `VoiceInkCore` or the appropriate platform shell with a focused test.
 

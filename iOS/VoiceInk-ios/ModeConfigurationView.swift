@@ -37,13 +37,11 @@ struct ModeConfigurationView: View {
     }
 
     private var canSave: Bool {
-        Mode.isSaveableDraft(
-            name: mode.name,
+        mode.isSaveableDraft(
             promptTemplateType: selectedTemplateType,
             customPrompt: customPromptText,
-            transcriptionProviderAvailable: availableTranscriptionProviders.contains(mode.transcriptionProvider),
-            postProcessingProviderAvailable: availablePostProcessingProviders.contains(mode.postProcessingProvider),
-            isPostProcessingEnabled: mode.isPostProcessingEnabled
+            availableTranscriptionProviders: availableTranscriptionProviders,
+            availablePostProcessingProviders: availablePostProcessingProviders
         )
     }
     

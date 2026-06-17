@@ -239,4 +239,32 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
             isPostProcessingEnabled: false
         ))
     }
+
+    func testModeDraftValidationUsesModeProviderSelections() {
+        let mode = Mode(
+            name: "Cloud",
+            transcriptionProvider: .deepgram,
+            isPostProcessingEnabled: true,
+            postProcessingProvider: .gemini
+        )
+
+        XCTAssertTrue(mode.isSaveableDraft(
+            promptTemplateType: .summary,
+            customPrompt: "",
+            availableTranscriptionProviders: [.deepgram],
+            availablePostProcessingProviders: [.gemini]
+        ))
+        XCTAssertFalse(mode.isSaveableDraft(
+            promptTemplateType: .summary,
+            customPrompt: "",
+            availableTranscriptionProviders: [.groq],
+            availablePostProcessingProviders: [.gemini]
+        ))
+        XCTAssertFalse(mode.isSaveableDraft(
+            promptTemplateType: .summary,
+            customPrompt: "",
+            availableTranscriptionProviders: [.deepgram],
+            availablePostProcessingProviders: [.groq]
+        ))
+    }
 }

@@ -10,7 +10,6 @@ final class AppGroupCoordinator {
     
     // UserDefaults keys for persistent state
     private enum UserDefaultsKeys {
-        static let shouldStopRecording = "shouldStopRecording"
         static let isRecording = "isRecording"
         static let lastRecordingTimestamp = "lastRecordingTimestamp"
     }
@@ -42,9 +41,6 @@ final class AppGroupCoordinator {
     /// Call this from the keyboard extension to request recording stop
     func requestStopRecording() {
         let timestamp = Date().timeIntervalSince1970
-        
-        // Set persistent flag
-        sharedDefaults?.set(true, forKey: UserDefaultsKeys.shouldStopRecording)
         sharedDefaults?.set(timestamp, forKey: UserDefaultsKeys.lastRecordingTimestamp)
         
         // Send immediate notification
@@ -79,19 +75,6 @@ final class AppGroupCoordinator {
         postDarwinNotification(NotificationNames.recordingStateChanged)
         
         print("📡 Updated recording state: \(isRecording)")
-    }
-    
-    /// Check and consume stop recording flag (returns true if should stop)
-    func checkAndConsumeStopRecordingFlag() -> Bool {
-        guard let defaults = sharedDefaults else { return false }
-        
-        let shouldStop = defaults.bool(forKey: UserDefaultsKeys.shouldStopRecording)
-        if shouldStop {
-            // Consume the flag
-            defaults.set(false, forKey: UserDefaultsKeys.shouldStopRecording)
-            return true
-        }
-        return false
     }
     
     // MARK: - Darwin Notifications (Real-time Communication)
@@ -138,25 +121,4 @@ final class AppGroupCoordinator {
         }
     }
     
-    // MARK: - Debug Helpers
-    
-    /// Clear all shared data (useful for debugging)
-    func clearAllSharedData() {
-        guard let defaults = sharedDefaults else { return }
-        defaults.removeObject(forKey: UserDefaultsKeys.shouldStopRecording)
-        defaults.removeObject(forKey: UserDefaultsKeys.isRecording)
-        defaults.removeObject(forKey: UserDefaultsKeys.lastRecordingTimestamp)
-    }
-    
-    /// Get debug info about current state
-    func getDebugInfo() -> [String: Any] {
-        guard let defaults = sharedDefaults else { return ["error": "No shared defaults"] }
-        
-        return [
-            "shouldStopRecording": defaults.bool(forKey: UserDefaultsKeys.shouldStopRecording),
-            "isRecording": defaults.bool(forKey: UserDefaultsKeys.isRecording),
-            "lastRecordingTimestamp": defaults.double(forKey: UserDefaultsKeys.lastRecordingTimestamp),
-            "appGroupIdentifier": appGroupIdentifier
-        ]
-    }
 }

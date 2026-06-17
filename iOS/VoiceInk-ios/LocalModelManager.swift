@@ -103,15 +103,11 @@ class LocalModelManager: ObservableObject {
         }
         
         do {
-            // Move file to final location
-            let finalURL = model.fileURL(in: Self.modelsDirectory)
-            
-            // Remove existing file if it exists
-            if FileManager.default.fileExists(atPath: finalURL.path) {
-                try FileManager.default.removeItem(at: finalURL)
-            }
-            
-            try FileManager.default.moveItem(at: temporaryURL, to: finalURL)
+            let finalURL = try VoiceInkWhisperModelFiles.installDownloadedModelFile(
+                model,
+                fromTemporaryFile: temporaryURL,
+                in: Self.modelsDirectory
+            )
             
             print("LocalModelManager: Successfully downloaded \(model.modelName) to \(finalURL.path)")
             downloadProgress[model.id] = 1.0

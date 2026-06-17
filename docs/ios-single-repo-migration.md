@@ -77,7 +77,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - power-mode display formatting for transcript metadata and exports
 - duration presentation
 - relative timestamp presentation
-- Whisper and VAD model file metadata, including platform-base Whisper model directory creation, model/sidecar file construction, downloaded-state detection, bootstrap-model availability, Core ML support policy, and model/sidecar deletion
+- Whisper and VAD model file metadata, including platform-base Whisper model directory creation, downloaded local-model file records, model/sidecar file construction, downloaded-state detection, bootstrap-model availability, Core ML support policy, final `.bin` install/replacement, and model/sidecar deletion
 - local Whisper runtime defaults for thread count, transcription temperature, VAD enablement, and VAD thresholds
 - VAD bundle resource lookup
 - PCM16 sample conversion and mono 16 kHz transcription-audio constants
@@ -130,7 +130,7 @@ Current macOS consumers of shared remote transport:
 - macOS open-file routing and audio-file transcription queue validation delegate supported audio/video file checks to `VoiceInkSupportedMedia`; platform shells still own open panels, drag/drop providers, and transcription queue state.
 - macOS CSV export delegates header, row formatting, and escaping to `VoiceInkTranscriptionCSVExporter`; macOS still owns `NSSavePanel` and mapping SwiftData `Transcription` records into export records.
 - macOS transcript details and CSV export delegate power-mode display formatting to `VoiceInkPowerModePresentation`.
-- macOS and iOS local Whisper model directory creation, download URL/file path lookup, bootstrap-model availability, Core ML support checks, and model deletion delegate to `VoiceInkWhisperModelFiles`; platform shells still own download progress, UI, and runtime model state.
+- macOS and iOS local Whisper model directory creation, local `.bin` listing, download URL/file path lookup, final downloaded-file installation, bootstrap-model availability, Core ML support checks, and model deletion delegate to `VoiceInkWhisperModelFiles`; platform shells still own download progress, UI, and runtime model state.
 - macOS and iOS local Whisper and macOS rolling preload resolve the Silero VAD bundle resource directly through `VoiceInkVADModelFiles`; the old shell-only VAD model manager adapters were removed.
 - macOS history/import row summaries and iOS note detail display use `VoiceInkTranscriptPresentation.preferredText` for the enhanced-text-first transcript display rule.
 - `VoiceInkTranscriptPresentation.matchesSearch` mirrors macOS history predicate search semantics, keeping iOS note filtering accent-insensitive through shared core while macOS SwiftData predicates keep their local query shape.

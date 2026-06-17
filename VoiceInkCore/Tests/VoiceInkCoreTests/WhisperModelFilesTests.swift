@@ -143,6 +143,72 @@ final class WhisperModelFilesTests: XCTestCase {
         XCTAssertFalse(VoiceInkWhisperModelFiles.isModelFile(URL(fileURLWithPath: "/tmp/ggml-base.txt")))
     }
 
+    func testLocalModelFileUsesExistingBinOnlyNamePolicy() throws {
+        let modelURL = URL(fileURLWithPath: "/tmp/VoiceInk/WhisperModels/ggml-base.bin")
+        let modelFile = try XCTUnwrap(VoiceInkWhisperModelFiles.localModelFile(from: modelURL))
+
+        XCTAssertEqual(modelFile.name, "ggml-base")
+        XCTAssertEqual(modelFile.url, modelURL)
+        XCTAssertFalse(modelFile.isCoreMLDownloaded)
+        XCTAssertNil(VoiceInkWhisperModelFiles.localModelFile(from: URL(fileURLWithPath: "/tmp/model.txt")))
+    }
+
+    func testLocalModelFilesReadsOnlyBinFilesFromDirectory() throws {
+        let baseDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.WhisperModelFilesTests.\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: baseDirectory) }
+
+        let modelsDirectory = try VoiceInkWhisperModelFiles.createModelsDirectory(in: baseDirectory)
+        try Data().write(to: modelsDirectory.appendingPathComponent("ggml-base.bin"))
+        try Data().write(to: modelsDirectory.appendingPathComponent("notes.txt"))
+        try Data().write(to: modelsDirectory.appendingPathComponent("GGML-UPPER.BIN"))
+
+        let modelFiles = try VoiceInkWhisperModelFiles.localModelFiles(in: modelsDirectory)
+
+        XCTAssertEqual(Set(modelFiles.map(\.name)), ["ggml-base"])
+    }
+
+    func testInstallDownloadedModelFileReplacesExistingModelFile() throws {
+        let baseDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.WhisperModelFilesTests.\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: baseDirectory) }
+
+        let modelsDirectory = try VoiceInkWhisperModelFiles.createModelsDirectory(in: baseDirectory)
+        let model = VoiceInkWhisperModelFiles.baseModel
+        let finalURL = model.fileURL(in: modelsDirectory)
+        let temporaryURL = baseDirectory.appendingPathComponent("download.tmp")
+
+        try Data("old".utf8).write(to: finalURL)
+        try Data("new".utf8).write(to: temporaryURL)
+
+        let installedURL = try VoiceInkWhisperModelFiles.installDownloadedModelFile(
+            model,
+            fromTemporaryFile: temporaryURL,
+            in: modelsDirectory
+        )
+
+        XCTAssertEqual(installedURL, finalURL)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: temporaryURL.path))
+        XCTAssertEqual(String(data: try Data(contentsOf: finalURL), encoding: .utf8), "new")
+    }
+
+    func testWriteDownloadedModelDataUsesSharedModelNameURL() throws {
+        let baseDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.WhisperModelFilesTests.\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: baseDirectory) }
+
+        let modelsDirectory = VoiceInkWhisperModelFiles.modelsDirectory(in: baseDirectory)
+
+        let writtenURL = try VoiceInkWhisperModelFiles.writeDownloadedModelData(
+            Data("model".utf8),
+            forModelName: "ggml-base",
+            in: modelsDirectory
+        )
+
+        XCTAssertEqual(writtenURL, VoiceInkWhisperModelFiles.fileURL(forModelName: "ggml-base", in: modelsDirectory))
+        XCTAssertEqual(String(data: try Data(contentsOf: writtenURL), encoding: .utf8), "model")
+    }
+
     func testDownloadableModelsMatchMacOSLocalWhisperCatalog() {
         XCTAssertEqual(
             VoiceInkWhisperModelFiles.downloadableModels.map(\.modelName),

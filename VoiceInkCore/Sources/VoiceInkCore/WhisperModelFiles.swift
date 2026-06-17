@@ -60,6 +60,29 @@ public struct VoiceInkWhisperModelFileSpec: Codable, Equatable, Identifiable, Se
     }
 }
 
+public struct VoiceInkWhisperLocalModelFile: Equatable, Identifiable, Sendable {
+    public let id: UUID
+    public let name: String
+    public let url: URL
+    public var coreMLEncoderURL: URL?
+
+    public var isCoreMLDownloaded: Bool {
+        coreMLEncoderURL != nil
+    }
+
+    public init(
+        id: UUID = UUID(),
+        name: String,
+        url: URL,
+        coreMLEncoderURL: URL? = nil
+    ) {
+        self.id = id
+        self.name = name
+        self.url = url
+        self.coreMLEncoderURL = coreMLEncoderURL
+    }
+}
+
 public enum VoiceInkWhisperModelFiles {
     public static let modelsDirectoryName = "WhisperModels"
 
@@ -204,6 +227,23 @@ public enum VoiceInkWhisperModelFiles {
         url.pathExtension == "bin"
     }
 
+    public static func localModelFile(from fileURL: URL) -> VoiceInkWhisperLocalModelFile? {
+        guard isModelFile(fileURL) else { return nil }
+        return VoiceInkWhisperLocalModelFile(
+            name: fileURL.deletingPathExtension().lastPathComponent,
+            url: fileURL
+        )
+    }
+
+    public static func localModelFiles(
+        in modelsDirectory: URL,
+        fileManager: FileManager = .default
+    ) throws -> [VoiceInkWhisperLocalModelFile] {
+        try fileManager
+            .contentsOfDirectory(at: modelsDirectory, includingPropertiesForKeys: nil)
+            .compactMap { localModelFile(from: $0) }
+    }
+
     public static func fileURL(forFilename filename: String, in modelsDirectory: URL) -> URL {
         modelsDirectory.appendingPathComponent(filename)
     }
@@ -214,6 +254,52 @@ public enum VoiceInkWhisperModelFiles {
 
     public static func downloadURL(forModelName modelName: String) -> URL {
         downloadURL(forFilename: filename(forModelName: modelName))
+    }
+
+    @discardableResult
+    public static func installDownloadedModelFile(
+        _ model: VoiceInkWhisperModelFileSpec,
+        fromTemporaryFile temporaryURL: URL,
+        in modelsDirectory: URL,
+        fileManager: FileManager = .default
+    ) throws -> URL {
+        try installDownloadedModelFile(
+            fromTemporaryFile: temporaryURL,
+            to: model.fileURL(in: modelsDirectory),
+            in: modelsDirectory,
+            fileManager: fileManager
+        )
+    }
+
+    @discardableResult
+    public static func installDownloadedModelFile(
+        fromTemporaryFile temporaryURL: URL,
+        to finalURL: URL,
+        in modelsDirectory: URL,
+        fileManager: FileManager = .default
+    ) throws -> URL {
+        try fileManager.createDirectory(at: modelsDirectory, withIntermediateDirectories: true)
+
+        if fileManager.fileExists(atPath: finalURL.path) {
+            try fileManager.removeItem(at: finalURL)
+        }
+
+        try fileManager.moveItem(at: temporaryURL, to: finalURL)
+        return finalURL
+    }
+
+    @discardableResult
+    public static func writeDownloadedModelData(
+        _ data: Data,
+        forModelName modelName: String,
+        in modelsDirectory: URL,
+        fileManager: FileManager = .default
+    ) throws -> URL {
+        try fileManager.createDirectory(at: modelsDirectory, withIntermediateDirectories: true)
+
+        let destinationURL = fileURL(forModelName: modelName, in: modelsDirectory)
+        try data.write(to: destinationURL)
+        return destinationURL
     }
 
     public static func supportsCoreML(forModelName modelName: String) -> Bool {

@@ -7,13 +7,7 @@ import VoiceInkCore
 
 // MARK: - WhisperModelFile
 
-struct WhisperModelFile: Identifiable {
-    let id = UUID()
-    let name: String
-    let url: URL
-    var coreMLEncoderURL: URL? // Path to the unzipped .mlmodelc directory
-    var isCoreMLDownloaded: Bool { coreMLEncoderURL != nil }
-}
+typealias WhisperModelFile = VoiceInkWhisperLocalModelFile
 
 // MARK: - WhisperModelManager
 
@@ -55,11 +49,7 @@ class WhisperModelManager: ObservableObject {
 
     func loadAvailableModels() {
         do {
-            let fileURLs = try FileManager.default.contentsOfDirectory(at: modelsDirectory, includingPropertiesForKeys: nil)
-            availableModels = fileURLs.compactMap { url in
-                guard VoiceInkWhisperModelFiles.isModelFile(url) else { return nil }
-                return WhisperModelFile(name: url.deletingPathExtension().lastPathComponent, url: url)
-            }
+            availableModels = try VoiceInkWhisperModelFiles.localModelFiles(in: modelsDirectory)
         } catch {
             logError("Error loading available models", error)
         }
@@ -190,8 +180,11 @@ class WhisperModelManager: ObservableObject {
         let progressKeyMain = model.name + "_main"
         let data = try await downloadFileWithProgress(from: url, progressKey: progressKeyMain)
 
-        let destinationURL = VoiceInkWhisperModelFiles.fileURL(forModelName: model.name, in: modelsDirectory)
-        try data.write(to: destinationURL)
+        let destinationURL = try VoiceInkWhisperModelFiles.writeDownloadedModelData(
+            data,
+            forModelName: model.name,
+            in: modelsDirectory
+        )
 
         return WhisperModelFile(name: model.name, url: destinationURL)
     }

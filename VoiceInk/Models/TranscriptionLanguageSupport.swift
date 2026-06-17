@@ -33,16 +33,13 @@ enum TranscriptionLanguageSupport {
     }
 }
 
-enum LanguageDictionary {
-    static let appleNative = VoiceInkLanguageCatalog.nativeApple
-    static let all = VoiceInkLanguageCatalog.all
-
-    static func forProvider(isMultilingual: Bool, provider: ModelProvider = .whisper) -> [String: String] {
+extension ModelProvider {
+    func supportedLanguages(isMultilingual: Bool) -> [String: String] {
         guard isMultilingual else {
             return VoiceInkLanguageCatalog.englishOnly
         }
 
-        switch provider {
+        switch self {
         case .whisper:
             return VoiceInkLanguageCatalog.whisperLanguages()
         case .nativeApple:
@@ -50,7 +47,7 @@ enum LanguageDictionary {
         case .fluidAudio:
             return VoiceInkLanguageCatalog.fluidAudioLanguages()
         default:
-            guard let coreProvider = provider.coreTranscriptionModelProvider else {
+            guard let coreProvider = coreTranscriptionModelProvider else {
                 return VoiceInkLanguageCatalog.all
             }
             return VoiceInkLanguageCatalog.languages(for: coreProvider)

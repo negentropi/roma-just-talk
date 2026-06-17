@@ -11,7 +11,7 @@ extension VoiceInkCloudTranscriptionModelSpec {
             accuracy: accuracy,
             isMultilingual: isMultilingual,
             supportsStreaming: supportsStreaming,
-            supportedLanguages: LanguageDictionary.forProvider(isMultilingual: isMultilingual, provider: provider)
+            supportedLanguages: provider.supportedLanguages(isMultilingual: isMultilingual)
         )
     }
 }

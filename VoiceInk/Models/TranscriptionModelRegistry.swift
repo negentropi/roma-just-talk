@@ -15,7 +15,7 @@ enum TranscriptionModelRegistry {
                 displayName: "Apple Speech",
                 description: "Uses the native Apple Speech framework for transcription. Requires macOS 26",
                 isMultilingualModel: true,
-                supportedLanguages: LanguageDictionary.forProvider(isMultilingual: true, provider: .nativeApple)
+                supportedLanguages: ModelProvider.nativeApple.supportedLanguages(isMultilingual: true)
             ),
 
             // Parakeet Models
@@ -28,7 +28,7 @@ enum TranscriptionModelRegistry {
                 accuracy: 0.94,
                 ramUsage: 0.8,
                 supportsStreaming: true,
-                supportedLanguages: LanguageDictionary.forProvider(isMultilingual: false, provider: .fluidAudio)
+                supportedLanguages: ModelProvider.fluidAudio.supportedLanguages(isMultilingual: false)
             ),
             FluidAudioModel(
                 name: "parakeet-tdt-0.6b-v3",
@@ -39,7 +39,7 @@ enum TranscriptionModelRegistry {
                 accuracy: 0.94,
                 ramUsage: 0.8,
                 supportsStreaming: true,
-                supportedLanguages: LanguageDictionary.forProvider(isMultilingual: true, provider: .fluidAudio)
+                supportedLanguages: ModelProvider.fluidAudio.supportedLanguages(isMultilingual: true)
             )
         ]
         let localModels = VoiceInkWhisperModelFiles.downloadableModels.map(WhisperModel.init(spec:))

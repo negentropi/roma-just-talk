@@ -39,7 +39,7 @@ class NativeAppleTranscriptionService: TranscriptionService {
     }
 
     private func languageDisplayName(for localeIdentifier: String) -> String {
-        LanguageDictionary.appleNative[localeIdentifier]
+        VoiceInkLanguageCatalog.nativeApple[localeIdentifier]
             ?? Locale.current.localizedString(forIdentifier: localeIdentifier)
             ?? localeIdentifier
     }

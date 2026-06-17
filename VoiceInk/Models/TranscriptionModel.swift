@@ -218,7 +218,7 @@ struct CustomCloudModel: TranscriptionModel, Codable {
         self.apiEndpoint = apiEndpoint
         self.modelName = modelName
         self.isMultilingualModel = isMultilingual
-        self.supportedLanguages = supportedLanguages ?? LanguageDictionary.forProvider(isMultilingual: isMultilingual)
+        self.supportedLanguages = supportedLanguages ?? ModelProvider.whisper.supportedLanguages(isMultilingual: isMultilingual)
     }
 
     /// Custom Codable to migrate legacy apiKey from JSON to Keychain.
@@ -284,7 +284,7 @@ struct WhisperModel: TranscriptionModel {
         self.name = spec.modelName
         self.displayName = spec.displayName
         self.size = spec.size
-        self.supportedLanguages = LanguageDictionary.forProvider(isMultilingual: spec.isMultilingual, provider: .whisper)
+        self.supportedLanguages = ModelProvider.whisper.supportedLanguages(isMultilingual: spec.isMultilingual)
         self.description = spec.description
         self.speed = spec.speed
         self.accuracy = spec.accuracy
@@ -307,6 +307,6 @@ struct ImportedWhisperModel: TranscriptionModel {
         self.displayName = fileBaseName
         self.description = "Imported local model"
         self.isMultilingualModel = true
-        self.supportedLanguages = LanguageDictionary.forProvider(isMultilingual: true, provider: .whisper)
+        self.supportedLanguages = ModelProvider.whisper.supportedLanguages(isMultilingual: true)
     }
 }

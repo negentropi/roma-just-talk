@@ -22,6 +22,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 `VoiceInkCore` currently owns these cross-platform modules:
 
 - prompt templates and prompt text
+- predefined prompt IDs, labels, prompt text, icons, descriptions, and system-instruction flags
 - transcription prompt preference loading for local Whisper and nonblank request prompts for remote/realtime providers
 - post-processing request construction and output filtering
 - provider catalog, provider endpoints, API key account names, and provider readiness policy
@@ -85,6 +86,7 @@ Current macOS consumers of shared remote transport:
 - macOS recording, audio-file transcription, and retry transcription use `VoiceInkTranscriptionCleanupConfiguration` directly for shared raw-output filtering and cleanup preferences.
 - macOS model definitions read supported language sets through a thin `ModelProvider` adapter backed by `VoiceInkLanguageCatalog`; the old `LanguageDictionary` wrapper is gone.
 - macOS metrics dashboard duration copy uses `VoiceInkDurationPresentation`, removing the last dashboard-local duration formatter.
+- macOS predefined prompt persistence adapts `VoiceInkPredefinedPrompts` into `CustomPrompt`, so stable prompt IDs and metadata live in shared core.
 - iOS retry post-processing inherits `VoiceInkAIReasoningConfig` through `VoiceInkPostProcessingClient`, aligning OpenAI-compatible reasoning controls with macOS enhancement requests.
 
 Current iOS consumers of shared remote transport:

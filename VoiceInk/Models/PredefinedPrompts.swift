@@ -1,38 +1,29 @@
 import Foundation
-import SwiftUI    // Import to ensure we have access to SwiftUI types if needed
 import VoiceInkCore
 
 enum PredefinedPrompts {
-    // Static UUIDs for predefined prompts
-    static let defaultPromptId = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
-    static let assistantPromptId = UUID(uuidString: "00000000-0000-0000-0000-000000000002")!
+    static let defaultPromptId = VoiceInkPredefinedPrompts.defaultPromptId
+    static let assistantPromptId = VoiceInkPredefinedPrompts.assistantPromptId
     
     static var all: [CustomPrompt] {
-        // Always return the latest predefined prompts from source code
         createDefaultPrompts()
     }
     
     static func createDefaultPrompts() -> [CustomPrompt] {
-        [
-            CustomPrompt(
-                id: defaultPromptId,
-                title: "Default",
-                promptText: VoiceInkPromptTemplates.macTemplate(named: "System Default")?.promptText ?? "",
-                icon: "checkmark.seal.fill",
-                description: "Default mode to improved clarity and accuracy of the transcription",
-                isPredefined: true,
-                useSystemInstructions: true
-            ),
-            
-            CustomPrompt(
-                id: assistantPromptId,
-                title: "Assistant",
-                promptText: VoiceInkAIPrompts.assistantMode,
-                icon: "bubble.left.and.bubble.right.fill",
-                description: "AI assistant that provides direct answers to queries",
-                isPredefined: true,
-                useSystemInstructions: false
-            )
-        ]
+        VoiceInkPredefinedPrompts.all.map(CustomPrompt.init(predefinedPrompt:))
+    }
+}
+
+private extension CustomPrompt {
+    init(predefinedPrompt: VoiceInkPredefinedPrompt) {
+        self.init(
+            id: predefinedPrompt.id,
+            title: predefinedPrompt.title,
+            promptText: predefinedPrompt.promptText,
+            icon: predefinedPrompt.icon,
+            description: predefinedPrompt.description,
+            isPredefined: true,
+            useSystemInstructions: predefinedPrompt.useSystemInstructions
+        )
     }
 }

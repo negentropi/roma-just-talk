@@ -1,5 +1,6 @@
 import Foundation
 import LaunchAtLogin
+import VoiceInkCore
 
 enum AppDefaults {
     enum Keys {

@@ -1,4 +1,5 @@
 import Foundation
+import VoiceInkCore
 
 enum BackupCategory: String, CaseIterable, Hashable {
     case general

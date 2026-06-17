@@ -29,6 +29,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - mode runtime configuration and selected-mode repair
 - mode provider-selection repair and draft saveability rules
 - transcript status and presentation helpers
+- transcription cleanup preferences and punctuation/lowercase cleanup policy
 - stored audio-file path resolution
 - duration presentation
 - Whisper and VAD model file metadata

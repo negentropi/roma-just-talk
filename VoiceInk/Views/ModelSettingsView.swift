@@ -1,4 +1,5 @@
 import SwiftUI
+import VoiceInkCore
 
 struct ModelSettingsView: View {
     @ObservedObject var whisperPrompt: WhisperPrompt

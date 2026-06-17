@@ -3,6 +3,7 @@ import AppKit
 import UniformTypeIdentifiers
 import LaunchAtLogin
 import SwiftData
+import VoiceInkCore
 
 private final class BackupOptions: NSObject {
     let view: NSView

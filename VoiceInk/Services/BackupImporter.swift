@@ -1,6 +1,7 @@
 import Foundation
 import LaunchAtLogin
 import SwiftData
+import VoiceInkCore
 
 enum BackupImportError: LocalizedError {
     case saveFailed(String, Error)

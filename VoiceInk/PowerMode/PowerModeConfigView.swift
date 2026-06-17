@@ -1,4 +1,5 @@
 import SwiftUI
+import VoiceInkCore
 
 struct ConfigurationView: View {
     let mode: ConfigurationMode

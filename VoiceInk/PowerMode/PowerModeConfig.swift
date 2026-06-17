@@ -1,4 +1,5 @@
 import Foundation
+import VoiceInkCore
 
 enum AutoSendKey: String, Codable, CaseIterable {
     case none = "none"

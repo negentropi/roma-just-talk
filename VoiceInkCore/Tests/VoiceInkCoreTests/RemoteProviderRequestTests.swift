@@ -213,6 +213,54 @@ final class RemoteProviderRequestTests: XCTestCase {
         )
     }
 
+    func testRemoteTranscriptionOptionsPreserveMacOSBatchProviderPolicies() {
+        let groq = VoiceInkRemoteTranscriptionOptions.batchDefaults(
+            for: .groq,
+            prompt: "spell Roma correctly",
+            customVocabulary: ["Roma"]
+        )
+        XCTAssertEqual(groq.prompt, "spell Roma correctly")
+        XCTAssertEqual(groq.openAICompatibleResponseFormat, "json")
+        XCTAssertEqual(groq.openAICompatibleTemperature, "0")
+        XCTAssertEqual(groq.openAICompatibleErrorDomain, "GroqAPI")
+        XCTAssertEqual(groq.openAICompatibleTimeout, 60)
+        XCTAssertEqual(groq.openAICompatibleMaxRetries, 2)
+
+        let deepgram = VoiceInkRemoteTranscriptionOptions.batchDefaults(for: .deepgram)
+        XCTAssertEqual(deepgram.deepgramParagraphs, true)
+        XCTAssertNil(deepgram.deepgramDiarize)
+        XCTAssertEqual(deepgram.deepgramTimeout, 30)
+
+        let soniox = VoiceInkRemoteTranscriptionOptions.batchDefaults(
+            for: .soniox,
+            customVocabulary: ["Roma", "Felix"]
+        )
+        XCTAssertEqual(soniox.customVocabulary, ["Roma", "Felix"])
+
+        let speechmatics = VoiceInkRemoteTranscriptionOptions.batchDefaults(
+            for: .speechmatics,
+            customVocabulary: ["Roma"]
+        )
+        XCTAssertEqual(speechmatics.customVocabulary, ["Roma"])
+
+        let assemblyAI = VoiceInkRemoteTranscriptionOptions.batchDefaults(
+            for: .assemblyAI,
+            prompt: "spell project names correctly",
+            customVocabulary: ["Roma"]
+        )
+        XCTAssertEqual(assemblyAI.prompt, "spell project names correctly")
+        XCTAssertEqual(assemblyAI.customVocabulary, ["Roma"])
+
+        let gemini = VoiceInkRemoteTranscriptionOptions.batchDefaults(
+            for: .gemini,
+            prompt: "ignored",
+            customVocabulary: ["ignored"]
+        )
+        XCTAssertNil(gemini.prompt)
+        XCTAssertTrue(gemini.customVocabulary.isEmpty)
+        XCTAssertNil(gemini.openAICompatibleResponseFormat)
+    }
+
     func testDeepgramTranscriptionRequestBuilderUsesListenEndpointAndBody() throws {
         let audioData = Data("WAVDATA".utf8)
         let request = try VoiceInkDeepgramRequestBuilder.makeTranscriptionRequest(

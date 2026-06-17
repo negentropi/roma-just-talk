@@ -45,32 +45,14 @@ extension CloudProvider {
         prompt: String?,
         customVocabulary: [String]
     ) -> VoiceInkRemoteTranscriptionOptions {
-        switch modelProvider {
-        case .groq:
-            return VoiceInkRemoteTranscriptionOptions(
-                prompt: prompt,
-                openAICompatibleResponseFormat: "json",
-                openAICompatibleTemperature: "0",
-                openAICompatibleErrorDomain: "GroqAPI",
-                openAICompatibleTimeout: 60,
-                openAICompatibleMaxRetries: 2
-            )
-        case .deepgram:
-            return VoiceInkRemoteTranscriptionOptions(
-                deepgramParagraphs: true,
-                deepgramDiarize: nil,
-                deepgramTimeout: 30
-            )
-        case .soniox, .speechmatics:
-            return VoiceInkRemoteTranscriptionOptions(customVocabulary: customVocabulary)
-        case .assemblyAI:
-            return VoiceInkRemoteTranscriptionOptions(
-                prompt: prompt,
-                customVocabulary: customVocabulary
-            )
-        default:
+        guard let provider = modelProvider.coreTranscriptionModelProvider else {
             return VoiceInkRemoteTranscriptionOptions()
         }
+        return VoiceInkRemoteTranscriptionOptions.batchDefaults(
+            for: provider,
+            prompt: prompt,
+            customVocabulary: customVocabulary
+        )
     }
 
     var languageCodes: [String]? {

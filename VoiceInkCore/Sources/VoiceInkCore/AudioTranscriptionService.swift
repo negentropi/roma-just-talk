@@ -45,6 +45,39 @@ public struct VoiceInkRemoteTranscriptionOptions: Equatable, Sendable {
         self.deepgramDiarize = deepgramDiarize
         self.deepgramTimeout = deepgramTimeout
     }
+
+    public static func batchDefaults(
+        for provider: VoiceInkTranscriptionModelProvider,
+        prompt: String? = nil,
+        customVocabulary: [String] = []
+    ) -> Self {
+        switch provider {
+        case .groq:
+            return Self(
+                prompt: prompt,
+                openAICompatibleResponseFormat: "json",
+                openAICompatibleTemperature: "0",
+                openAICompatibleErrorDomain: "GroqAPI",
+                openAICompatibleTimeout: 60,
+                openAICompatibleMaxRetries: 2
+            )
+        case .deepgram:
+            return Self(
+                deepgramParagraphs: true,
+                deepgramDiarize: nil,
+                deepgramTimeout: 30
+            )
+        case .soniox, .speechmatics:
+            return Self(customVocabulary: customVocabulary)
+        case .assemblyAI:
+            return Self(
+                prompt: prompt,
+                customVocabulary: customVocabulary
+            )
+        case .cartesia, .elevenLabs, .gemini, .mistral, .openAI, .xai, .local:
+            return Self()
+        }
+    }
 }
 
 public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionService, Sendable {

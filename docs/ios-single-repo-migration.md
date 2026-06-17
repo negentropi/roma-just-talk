@@ -83,7 +83,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - VAD bundle resource lookup
 - PCM16 sample conversion and mono 16 kHz transcription-audio format constants, including bit depth, endian, and integer/float sample policy
 - OpenAI-compatible, Deepgram, Gemini, Mistral, ElevenLabs, xAI, Soniox, Speechmatics, and AssemblyAI remote transcription request/client helpers
-- shared remote transcription provider dispatch plus request options for provider-specific prompt, vocabulary, timeout, retry, and formatting parameters
+- shared remote transcription provider dispatch plus batch request option defaults for provider-specific prompt, vocabulary, timeout, retry, and formatting parameters
 - Cartesia API-key verification request/client helper
 - shared multipart form-data construction for remote transcription clients
 - shared retried upload helper for multipart remote transcription clients
@@ -91,7 +91,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 Current macOS consumers of shared remote transport:
 
 - macOS batch cloud transcription uses `CloudProvider` default dispatch into `VoiceInkRemoteTranscriptionService` for Groq, Deepgram, Gemini, Mistral, ElevenLabs, xAI, Soniox, Speechmatics, and AssemblyAI; provider modules keep only identity and streaming adapters, and empty-response policy now comes from `VoiceInkProviderKind`.
-- `VoiceInkRemoteTranscriptionService` preserves macOS provider-specific batch options such as Groq JSON/temperature/retry settings, Deepgram paragraph/timeout settings, and vocabulary/prompt forwarding for providers that already used them.
+- `VoiceInkRemoteTranscriptionService` and `VoiceInkRemoteTranscriptionOptions.batchDefaults` preserve macOS provider-specific batch options such as Groq JSON/temperature/retry settings, Deepgram paragraph/timeout settings, and vocabulary/prompt forwarding for providers that already used them.
 - Custom OpenAI-compatible batch transcription uses `VoiceInkOpenAICompatibleTranscriptionClient`.
 - Cartesia API-key verification uses `VoiceInkProviderAPIKeyVerifier` through `VoiceInkTranscriptionModelProvider`; Cartesia transcription remains streaming-only in platform shell code.
 - MacOS cloud-provider API-key verification uses `CloudProvider` default verification backed by `VoiceInkProviderAPIKeyVerifier`; provider-specific streaming adapters still own transcription execution.

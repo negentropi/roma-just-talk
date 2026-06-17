@@ -116,7 +116,7 @@ class AIEnhancementService: ObservableObject {
             object: nil
         )
 
-        initializePredefinedPrompts()
+        customPrompts = VoiceInkCustomPromptPolicy.repairedPredefinedPrompts(in: customPrompts)
         refreshPromptDetectionCache()
     }
 
@@ -199,13 +199,13 @@ class AIEnhancementService: ObservableObject {
         let finalContextSection = allContextSections + customVocabularySection
 
         if let activePrompt = activePrompt {
-            if activePrompt.id == PredefinedPrompts.assistantPromptId {
+            if activePrompt.id == VoiceInkPredefinedPrompts.assistantPromptId {
                 return activePrompt.promptText + finalContextSection
             } else {
                 return activePrompt.finalPromptText + finalContextSection
             }
         } else {
-            let defaultPrompt = allPrompts.first(where: { $0.id == PredefinedPrompts.defaultPromptId }) ?? allPrompts.first!
+            let defaultPrompt = allPrompts.first(where: { $0.id == VoiceInkPredefinedPrompts.defaultPromptId }) ?? allPrompts.first!
             return defaultPrompt.finalPromptText + finalContextSection
         }
     }
@@ -450,33 +450,7 @@ class AIEnhancementService: ObservableObject {
     }
 
     private func refreshPromptDetectionCache() {
-        promptDetectionPrompts = customPrompts.filter { prompt in
-            prompt.triggerWords.contains { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
-        }
-    }
-
-    private func initializePredefinedPrompts() {
-        let predefinedTemplates = PredefinedPrompts.createDefaultPrompts()
-
-        for template in predefinedTemplates {
-            if let existingIndex = customPrompts.firstIndex(where: { $0.id == template.id }) {
-                var updatedPrompt = customPrompts[existingIndex]
-                updatedPrompt = CustomPrompt(
-                    id: updatedPrompt.id,
-                    title: template.title,
-                    promptText: template.promptText,
-                    isActive: updatedPrompt.isActive,
-                    icon: template.icon,
-                    description: template.description,
-                    isPredefined: true,
-                    triggerWords: updatedPrompt.triggerWords,
-                    useSystemInstructions: template.useSystemInstructions
-                )
-                customPrompts[existingIndex] = updatedPrompt
-            } else {
-                customPrompts.append(template)
-            }
-        }
+        promptDetectionPrompts = VoiceInkCustomPromptPolicy.triggerDetectablePrompts(from: customPrompts)
     }
 }
 

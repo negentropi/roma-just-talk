@@ -33,6 +33,24 @@ public struct VoiceInkCustomPrompt: Identifiable, Codable, Equatable, Sendable {
         self.useSystemInstructions = useSystemInstructions
     }
 
+    public init(
+        predefinedPrompt: VoiceInkPredefinedPrompt,
+        isActive: Bool = false,
+        triggerWords: [String] = []
+    ) {
+        self.init(
+            id: predefinedPrompt.id,
+            title: predefinedPrompt.title,
+            promptText: predefinedPrompt.promptText,
+            isActive: isActive,
+            icon: predefinedPrompt.icon,
+            description: predefinedPrompt.description,
+            isPredefined: true,
+            triggerWords: triggerWords,
+            useSystemInstructions: predefinedPrompt.useSystemInstructions
+        )
+    }
+
     enum CodingKeys: String, CodingKey {
         case id, title, promptText, isActive, icon, description, isPredefined, triggerWords, useSystemInstructions
     }
@@ -52,5 +70,42 @@ public struct VoiceInkCustomPrompt: Identifiable, Codable, Equatable, Sendable {
 
     public var finalPromptText: String {
         VoiceInkAIPrompts.finalPromptText(promptText, useSystemInstructions: useSystemInstructions)
+    }
+}
+
+public enum VoiceInkCustomPromptPolicy {
+    public static func repairedPredefinedPrompts(
+        in prompts: [VoiceInkCustomPrompt],
+        predefinedPrompts: [VoiceInkPredefinedPrompt] = VoiceInkPredefinedPrompts.all
+    ) -> [VoiceInkCustomPrompt] {
+        var repairedPrompts = prompts
+
+        for predefinedPrompt in predefinedPrompts {
+            let template = VoiceInkCustomPrompt(predefinedPrompt: predefinedPrompt)
+            if let existingIndex = repairedPrompts.firstIndex(where: { $0.id == template.id }) {
+                let existingPrompt = repairedPrompts[existingIndex]
+                repairedPrompts[existingIndex] = VoiceInkCustomPrompt(
+                    id: existingPrompt.id,
+                    title: template.title,
+                    promptText: template.promptText,
+                    isActive: existingPrompt.isActive,
+                    icon: template.icon,
+                    description: template.description,
+                    isPredefined: true,
+                    triggerWords: existingPrompt.triggerWords,
+                    useSystemInstructions: template.useSystemInstructions
+                )
+            } else {
+                repairedPrompts.append(template)
+            }
+        }
+
+        return repairedPrompts
+    }
+
+    public static func triggerDetectablePrompts(from prompts: [VoiceInkCustomPrompt]) -> [VoiceInkCustomPrompt] {
+        prompts.filter { prompt in
+            prompt.triggerWords.contains { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+        }
     }
 }

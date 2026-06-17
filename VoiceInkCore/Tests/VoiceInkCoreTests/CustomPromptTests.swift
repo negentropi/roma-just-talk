@@ -55,6 +55,81 @@ final class CustomPromptTests: XCTestCase {
         XCTAssertTrue(wrapped != "Improve clarity.")
     }
 
+    func testCustomPromptBuildsFromPredefinedPrompt() throws {
+        let predefined = try XCTUnwrap(
+            VoiceInkPredefinedPrompts.all.first { $0.id == VoiceInkPredefinedPrompts.assistantPromptId }
+        )
+
+        let prompt = VoiceInkCustomPrompt(predefinedPrompt: predefined)
+
+        XCTAssertEqual(prompt.id, predefined.id)
+        XCTAssertEqual(prompt.title, "Assistant")
+        XCTAssertEqual(prompt.promptText, VoiceInkAIPrompts.assistantMode)
+        XCTAssertEqual(prompt.icon, "bubble.left.and.bubble.right.fill")
+        XCTAssertEqual(prompt.description, "AI assistant that provides direct answers to queries")
+        XCTAssertTrue(prompt.isPredefined)
+        XCTAssertFalse(prompt.useSystemInstructions)
+        XCTAssertFalse(prompt.isActive)
+        XCTAssertTrue(prompt.triggerWords.isEmpty)
+    }
+
+    func testCustomPromptPolicyRepairsExistingPredefinedPromptMetadata() {
+        let staleDefaultPrompt = VoiceInkCustomPrompt(
+            id: VoiceInkPredefinedPrompts.defaultPromptId,
+            title: "Old default",
+            promptText: "Old prompt",
+            isActive: true,
+            icon: "old.icon",
+            description: "Old description",
+            isPredefined: false,
+            triggerWords: ["note"],
+            useSystemInstructions: false
+        )
+
+        let repaired = VoiceInkCustomPromptPolicy.repairedPredefinedPrompts(in: [staleDefaultPrompt])
+        let defaultPrompt = repaired[0]
+
+        XCTAssertEqual(defaultPrompt.id, VoiceInkPredefinedPrompts.defaultPromptId)
+        XCTAssertEqual(defaultPrompt.title, "Default")
+        XCTAssertEqual(defaultPrompt.icon, "checkmark.seal.fill")
+        XCTAssertTrue(defaultPrompt.isPredefined)
+        XCTAssertTrue(defaultPrompt.isActive)
+        XCTAssertEqual(defaultPrompt.triggerWords, ["note"])
+        XCTAssertTrue(defaultPrompt.useSystemInstructions)
+        XCTAssertEqual(repaired.map(\.id).last, VoiceInkPredefinedPrompts.assistantPromptId)
+    }
+
+    func testCustomPromptPolicyLeavesCustomPromptsInPlaceAndAppendsMissingPredefinedPrompts() {
+        let customPromptId = UUID(uuidString: "00000000-0000-0000-0000-0000000000ef")!
+        let customPrompt = VoiceInkCustomPrompt(
+            id: customPromptId,
+            title: "Custom",
+            promptText: "Custom text"
+        )
+
+        let repaired = VoiceInkCustomPromptPolicy.repairedPredefinedPrompts(in: [customPrompt])
+
+        XCTAssertEqual(
+            repaired.map(\.id),
+            [
+                customPromptId,
+                VoiceInkPredefinedPrompts.defaultPromptId,
+                VoiceInkPredefinedPrompts.assistantPromptId
+            ]
+        )
+        XCTAssertFalse(repaired[0].isPredefined)
+    }
+
+    func testCustomPromptPolicyReturnsOnlyPromptsWithNonblankTriggerWords() {
+        let blank = VoiceInkCustomPrompt(title: "Blank", promptText: "", triggerWords: [" ", "\n"])
+        let trigger = VoiceInkCustomPrompt(title: "Trigger", promptText: "", triggerWords: [" email "])
+
+        XCTAssertEqual(
+            VoiceInkCustomPromptPolicy.triggerDetectablePrompts(from: [blank, trigger]).map(\.title),
+            ["Trigger"]
+        )
+    }
+
     func testCustomPromptEncodingPreservesExistingMacOSKeys() throws {
         let prompt = VoiceInkCustomPrompt(
             id: UUID(uuidString: "00000000-0000-0000-0000-0000000000cd")!,

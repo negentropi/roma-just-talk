@@ -1,4 +1,5 @@
 import SwiftUI
+import VoiceInkCore
 
 // MARK: - Shared Popover State
 
@@ -161,7 +162,7 @@ struct RecorderPromptButton: View {
     var body: some View {
         RecorderToggleButton(
             isEnabled: enhancementService.isEnhancementEnabled,
-            icon: enhancementService.activePrompt?.icon ?? enhancementService.allPrompts.first(where: { $0.id == PredefinedPrompts.defaultPromptId })?.icon ?? "checkmark.seal.fill",
+            icon: enhancementService.activePrompt?.icon ?? enhancementService.allPrompts.first(where: { $0.id == VoiceInkPredefinedPrompts.defaultPromptId })?.icon ?? "checkmark.seal.fill",
             disabled: false
         ) {
             if enhancementService.isEnhancementEnabled {

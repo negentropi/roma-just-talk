@@ -60,7 +60,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - transcription auto-cleanup enabled/retention preference storage and cutoff-date policy; platform shells still own SwiftData deletion and settings UI bindings
 - NaturalLanguage transcript paragraph formatting policy plus text-formatting storage key/default; platform shells still own the setting UI and when formatting runs
 - word-replacement ordering and text application policy; platform shells still own dictionary storage
-- vocabulary, word-replacement, backup dictionary insert, word-replacement edit planning, and vocabulary draft tokenization; platform shells still own dictionary storage and persistence errors
+- vocabulary, word-replacement, backup dictionary insert, word-replacement edit planning, and dictionary draft submit rules; platform shells still own dictionary storage and persistence errors
 - custom vocabulary term normalization for transcription providers; platform shells still own dictionary storage
 - custom cloud transcription model generated-name and draft validation policy; platform shells still own keychain and preferences storage
 - prompt trigger-word detection, trigger-word editing policy, and prompt-trigger AI-enhancement detection result construction; platform shells still own prompt persistence and enhancement state mutation

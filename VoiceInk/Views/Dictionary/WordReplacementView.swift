@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import VoiceInkCore
 
 enum SortMode: String {
     case originalAsc = "originalAsc"
@@ -57,6 +58,13 @@ struct WordReplacementView: View {
     private var shouldShowAddButton: Bool {
         !originalWord.isEmpty || !replacementWord.isEmpty
     }
+
+    private var canAddReplacement: Bool {
+        VoiceInkDictionaryPolicy.canSaveWordReplacementDraft(
+            original: originalWord.trimmingCharacters(in: .whitespacesAndNewlines),
+            replacement: replacementWord.trimmingCharacters(in: .whitespacesAndNewlines)
+        )
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -101,7 +109,7 @@ struct WordReplacementView: View {
                             .font(.system(size: 16, weight: .semibold))
                     }
                     .buttonStyle(.borderless)
-                    .disabled(originalWord.isEmpty || replacementWord.isEmpty)
+                    .disabled(!canAddReplacement)
                     .help("Add word replacement")
                 }
             }

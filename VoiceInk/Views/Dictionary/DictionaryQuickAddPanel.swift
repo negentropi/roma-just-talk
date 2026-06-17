@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 import SwiftData
+import VoiceInkCore
 
 // MARK: - Manager
 
@@ -320,7 +321,7 @@ struct DictionaryQuickAddView: View {
 
     private func submitVocabulary() {
         let input = wordInput.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !input.isEmpty else { return }
+        guard VoiceInkDictionaryPolicy.hasVocabularyDraft(input) else { return }
         if let error = DictionaryService.addVocabularyWords(input, existing: Array(vocabularyWords), context: modelContext) {
             errorMessage = error
             return
@@ -331,7 +332,10 @@ struct DictionaryQuickAddView: View {
     private func submitReplacement() {
         let original = originalInput.trimmingCharacters(in: .whitespacesAndNewlines)
         let replacement = replacementInput.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !original.isEmpty, !replacement.isEmpty else { return }
+        guard VoiceInkDictionaryPolicy.canSaveWordReplacementDraft(
+            original: original,
+            replacement: replacement
+        ) else { return }
         if let error = DictionaryService.addWordReplacement(original: original, replacement: replacement, existing: Array(wordReplacements), context: modelContext) {
             errorMessage = error
             return

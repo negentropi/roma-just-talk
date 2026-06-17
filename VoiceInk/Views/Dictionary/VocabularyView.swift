@@ -40,7 +40,7 @@ struct VocabularyView: View {
     }
 
     private var shouldShowAddButton: Bool {
-        !VoiceInkDictionaryPolicy.tokens(from: newWord).isEmpty
+        VoiceInkDictionaryPolicy.hasVocabularyDraft(newWord)
     }
 
     var body: some View {

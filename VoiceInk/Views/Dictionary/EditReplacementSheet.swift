@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import VoiceInkCore
 
 // Edit existing word replacement entry
 struct EditReplacementSheet: View {
@@ -52,7 +53,7 @@ struct EditReplacementSheet: View {
             Button("Save") { saveChanges() }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.small)
-                .disabled(originalWord.isEmpty || replacementWord.isEmpty)
+                .disabled(!canSave)
                 .keyboardShortcut(.return, modifiers: [])
         }
         .padding(.horizontal)
@@ -120,11 +121,18 @@ struct EditReplacementSheet: View {
         }
     }
 
+    private var canSave: Bool {
+        VoiceInkDictionaryPolicy.canSaveWordReplacementDraft(
+            original: originalWord.trimmingCharacters(in: .whitespacesAndNewlines),
+            replacement: replacementWord
+        )
+    }
+
     // MARK: – Actions
     private func saveChanges() {
         let newOriginal = originalWord.trimmingCharacters(in: .whitespacesAndNewlines)
         let newReplacement = replacementWord
-        guard DictionaryService.canSaveWordReplacement(original: newOriginal, replacement: newReplacement) else {
+        guard canSave else {
             return
         }
 

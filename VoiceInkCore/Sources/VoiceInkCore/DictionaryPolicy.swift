@@ -20,6 +20,10 @@ public struct VoiceInkWordReplacementInsertPlan: Equatable, Sendable {
 }
 
 public enum VoiceInkDictionaryPolicy {
+    public static func hasVocabularyDraft(_ input: String) -> Bool {
+        !tokens(from: input).isEmpty
+    }
+
     public static func vocabularyInsertPlan(
         input: String,
         existingWords: [String]
@@ -93,6 +97,17 @@ public enum VoiceInkDictionaryPolicy {
             replacementText: replacement,
             errorMessage: nil
         )
+    }
+
+    public static func canSaveWordReplacementDraft(
+        original: String,
+        replacement: String
+    ) -> Bool {
+        wordReplacementInsertPlan(
+            original: original,
+            replacement: replacement,
+            existingOriginalTexts: []
+        ).shouldInsert
     }
 
     public static func tokens(from text: String) -> [String] {

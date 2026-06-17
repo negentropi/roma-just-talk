@@ -117,12 +117,4 @@ enum DictionaryService {
             return "Failed to save changes: \(error.localizedDescription)"
         }
     }
-
-    static func canSaveWordReplacement(original: String, replacement: String) -> Bool {
-        VoiceInkDictionaryPolicy.wordReplacementInsertPlan(
-            original: original,
-            replacement: replacement,
-            existingOriginalTexts: []
-        ).shouldInsert
-    }
 }

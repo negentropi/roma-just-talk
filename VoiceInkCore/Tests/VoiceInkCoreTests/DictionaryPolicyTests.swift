@@ -2,6 +2,11 @@ import Foundation
 @testable import VoiceInkCore
 
 final class DictionaryPolicyTests: XCTestCase {
+    func testVocabularyDraftUsesSharedTokenPolicy() {
+        XCTAssertFalse(VoiceInkDictionaryPolicy.hasVocabularyDraft(" , \n "))
+        XCTAssertTrue(VoiceInkDictionaryPolicy.hasVocabularyDraft("Voice Ink, "))
+    }
+
     func testVocabularyPlanReturnsNoOpForBlankInput() {
         let plan = VoiceInkDictionaryPolicy.vocabularyInsertPlan(
             input: " , \n ",
@@ -57,6 +62,27 @@ final class DictionaryPolicyTests: XCTestCase {
                 replacement: "",
                 existingOriginalTexts: []
             ).shouldInsert
+        )
+    }
+
+    func testWordReplacementDraftSaveabilityUsesInsertPlan() {
+        XCTAssertFalse(
+            VoiceInkDictionaryPolicy.canSaveWordReplacementDraft(
+                original: " , ",
+                replacement: "roma"
+            )
+        )
+        XCTAssertFalse(
+            VoiceInkDictionaryPolicy.canSaveWordReplacementDraft(
+                original: "voice ink",
+                replacement: ""
+            )
+        )
+        XCTAssertTrue(
+            VoiceInkDictionaryPolicy.canSaveWordReplacementDraft(
+                original: "voice ink",
+                replacement: "roma"
+            )
         )
     }
 

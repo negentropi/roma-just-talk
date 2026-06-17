@@ -50,6 +50,19 @@ public enum VoiceInkTranscriptionPromptPreference {
     }
 }
 
+public enum VoiceInkTranscriptionLanguagePreference {
+    public static func selectedLanguage(
+        from defaults: UserDefaults = .standard,
+        fallback: String = VoiceInkLanguageCatalog.autoDetectCode
+    ) -> String {
+        defaults.string(forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage) ?? fallback
+    }
+
+    public static func requestLanguage(from defaults: UserDefaults = .standard) -> String? {
+        VoiceInkTranscriptionLanguageSupport.requestLanguage(selectedLanguage(from: defaults))
+    }
+}
+
 public enum VoiceInkModeStorage {
     public static func saveModes(
         _ modes: [Mode],

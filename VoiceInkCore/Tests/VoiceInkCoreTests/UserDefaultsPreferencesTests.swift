@@ -91,6 +91,34 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testTranscriptionLanguagePreferenceUsesAutoDetectFallbackWhenMissing() {
+        withIsolatedDefaults { defaults in
+            XCTAssertEqual(
+                VoiceInkTranscriptionLanguagePreference.selectedLanguage(from: defaults),
+                VoiceInkLanguageCatalog.autoDetectCode
+            )
+            XCTAssertNil(VoiceInkTranscriptionLanguagePreference.requestLanguage(from: defaults))
+        }
+    }
+
+    func testTranscriptionLanguagePreferencePreservesRawSelectedLanguage() {
+        withIsolatedDefaults { defaults in
+            defaults.set("auto", forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
+            XCTAssertEqual(
+                VoiceInkTranscriptionLanguagePreference.selectedLanguage(from: defaults),
+                "auto"
+            )
+            XCTAssertNil(VoiceInkTranscriptionLanguagePreference.requestLanguage(from: defaults))
+
+            defaults.set(" fr ", forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
+            XCTAssertEqual(
+                VoiceInkTranscriptionLanguagePreference.selectedLanguage(from: defaults),
+                " fr "
+            )
+            XCTAssertEqual(VoiceInkTranscriptionLanguagePreference.requestLanguage(from: defaults), "fr")
+        }
+    }
+
     func testModeStorageRoundTripsModesAndSelectedModeId() {
         withIsolatedDefaults { defaults in
             let localMode = Mode.defaultLocalWhisper(name: "Local")

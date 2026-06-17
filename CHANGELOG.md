@@ -2,6 +2,7 @@
 
 ## v1.94 - Unreleased
 
+- Shared selected-language request normalization between macOS local Whisper/cloud transcription and the imported iOS transcription path.
 - Aligned imported iOS local Whisper transcription with the shared transcription prompt preference used by macOS.
 - Aligned imported iOS retry transcription with the shared paragraph-formatting preference, so iOS can use the same core paragraph break policy as macOS.
 - Added iOS filler-word list editing backed by the shared cleanup policy, so imported iOS retry transcription can manage the same vocabulary shape used by macOS.

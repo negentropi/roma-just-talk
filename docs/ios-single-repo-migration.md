@@ -47,7 +47,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - custom vocabulary term normalization for transcription providers; platform shells still own dictionary storage
 - custom cloud transcription model generated-name and draft validation policy; platform shells still own keychain and preferences storage
 - prompt trigger-word detection and trigger-word editing policy; platform shells still own prompt persistence and enhancement state
-- transcription language catalog, provider language filtering, AssemblyAI realtime/batch language policy, selected-language fallback policy, selected-language request normalization, and the shared selected-language defaults key; platform shells still own selected-language storage/UI and runtime streaming-mode state
+- transcription language catalog, provider language filtering, AssemblyAI realtime/batch language policy, selected-language fallback policy, selected-language preference loading, selected-language request normalization, and the shared selected-language defaults key; platform shells still own selected-language storage/UI and runtime streaming-mode state
 - stored audio-file path resolution, existing-file lookup, recordings directory, and file URL construction
 - duration presentation
 - relative timestamp presentation
@@ -75,6 +75,7 @@ Current macOS consumers of shared remote transport:
 - Cartesia API-key verification uses `VoiceInkCartesiaClient`; Cartesia transcription remains streaming-only in platform shell code.
 - MacOS cloud-provider API-key verification uses `CloudProvider` default verification backed by `VoiceInkProviderAPIKeyVerifier`; Cartesia stays on `VoiceInkCartesiaClient` because it is streaming-only and not an iOS `VoiceInkProviderKind`.
 - macOS local Whisper/model loading throws `VoiceInkEngineError` from `VoiceInkCore`; macOS error descriptions are covered by `VoiceInkEngineErrorTests`.
+- macOS local Whisper and cloud transcription normalize selected request language through `VoiceInkTranscriptionLanguagePreference`.
 - macOS local Whisper, cloud transcription, and AssemblyAI streaming read transcription prompts through `VoiceInkTranscriptionPromptPreference`.
 
 Current iOS consumers of shared remote transport:

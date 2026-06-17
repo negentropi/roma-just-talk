@@ -60,7 +60,10 @@ class WhisperTranscriptionService: TranscriptionService {
         await whisperContext.setPrompt(currentPrompt)
 
         // Transcribe
-        let success = await whisperContext.fullTranscribe(samples: data)
+        let success = await whisperContext.fullTranscribe(
+            samples: data,
+            language: VoiceInkTranscriptionLanguagePreference.requestLanguage()
+        )
 
         guard success else {
             logger.error("❌ Core transcription engine failed (whisper_full).")

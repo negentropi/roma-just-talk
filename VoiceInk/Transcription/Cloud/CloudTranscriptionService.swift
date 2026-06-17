@@ -98,8 +98,7 @@ class CloudTranscriptionService: TranscriptionService {
     }
 
     private func selectedLanguage() -> String? {
-        let lang = UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage) ?? "auto"
-        return (lang == "auto" || lang.isEmpty) ? nil : lang
+        VoiceInkTranscriptionLanguagePreference.requestLanguage()
     }
 
     private func transcriptionPrompt() -> String? {

@@ -56,7 +56,7 @@ class AudioTranscriptionService: ObservableObject {
             let powerModeName = (activePowerModeConfig?.isEnabled == true) ? activePowerModeConfig?.name : nil
             let powerModeEmoji = (activePowerModeConfig?.isEnabled == true) ? activePowerModeConfig?.emoji : nil
 
-            if UserDefaults.standard.bool(forKey: "IsTextFormattingEnabled") {
+            if UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.isTextFormattingEnabled) {
                 text = VoiceInkTranscriptParagraphFormatter.format(text)
             }
 

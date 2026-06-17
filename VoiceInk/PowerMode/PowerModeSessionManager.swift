@@ -58,7 +58,7 @@ class PowerModeSessionManager {
                 selectedAIModel: enhancementService.getAIService()?.currentModel,
                 selectedLanguage: UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage),
                 transcriptionModelName: stateProvider.currentTranscriptionModel?.name,
-                isTextFormattingEnabled: UserDefaults.standard.bool(forKey: "IsTextFormattingEnabled"),
+                isTextFormattingEnabled: UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.isTextFormattingEnabled),
                 punctuationCleanupMode: punctuationCleanupMode,
                 removePunctuation: punctuationCleanupMode == .removeAll,
                 lowercaseTranscription: UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.lowercaseTranscription)
@@ -112,7 +112,7 @@ class PowerModeSessionManager {
             selectedAIModel: enhancementService.getAIService()?.currentModel,
             selectedLanguage: UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage),
             transcriptionModelName: stateProvider.currentTranscriptionModel?.name,
-            isTextFormattingEnabled: UserDefaults.standard.bool(forKey: "IsTextFormattingEnabled"),
+            isTextFormattingEnabled: UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.isTextFormattingEnabled),
             punctuationCleanupMode: punctuationCleanupMode,
             removePunctuation: punctuationCleanupMode == .removeAll,
             lowercaseTranscription: UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.lowercaseTranscription)
@@ -145,7 +145,7 @@ class PowerModeSessionManager {
                 }
             }
 
-            UserDefaults.standard.set(config.isTextFormattingEnabled, forKey: "IsTextFormattingEnabled")
+            UserDefaults.standard.set(config.isTextFormattingEnabled, forKey: VoiceInkUserDefaultsKey.isTextFormattingEnabled)
             PunctuationCleanupMode.setCurrent(config.punctuationCleanupMode)
             UserDefaults.standard.set(config.lowercaseTranscription, forKey: VoiceInkUserDefaultsKey.lowercaseTranscription)
         }
@@ -184,7 +184,7 @@ class PowerModeSessionManager {
             }
 
             if let isTextFormattingEnabled = state.isTextFormattingEnabled {
-                UserDefaults.standard.set(isTextFormattingEnabled, forKey: "IsTextFormattingEnabled")
+                UserDefaults.standard.set(isTextFormattingEnabled, forKey: VoiceInkUserDefaultsKey.isTextFormattingEnabled)
             }
             if let punctuationCleanupMode = state.punctuationCleanupMode {
                 PunctuationCleanupMode.setCurrent(punctuationCleanupMode)

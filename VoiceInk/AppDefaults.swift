@@ -30,7 +30,7 @@ enum AppDefaults {
             CustomSoundManager.SoundType.stop.builtInSoundKey: CustomSoundManager.SoundType.stop.defaultBuiltInSound.rawValue,
 
             // Recording & Transcription
-            "IsTextFormattingEnabled": true,
+            VoiceInkUserDefaultsKey.isTextFormattingEnabled: VoiceInkPreferenceDefault.isTextFormattingEnabled,
             "IsVADEnabled": true,
             VoiceInkUserDefaultsKey.removeFillerWords: true,
             PunctuationCleanupMode.legacyRemovePunctuationKey: false,

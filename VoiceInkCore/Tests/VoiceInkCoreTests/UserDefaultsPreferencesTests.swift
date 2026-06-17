@@ -12,6 +12,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkUserDefaultsKey.selectedTranscriptionLanguage, "SelectedLanguage")
         XCTAssertEqual(VoiceInkUserDefaultsKey.currentTranscriptionModel, "CurrentTranscriptionModel")
         XCTAssertEqual(VoiceInkUserDefaultsKey.transcriptionPrompt, "TranscriptionPrompt")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.isTextFormattingEnabled, "IsTextFormattingEnabled")
         XCTAssertEqual(VoiceInkUserDefaultsKey.isTranscriptionCleanupEnabled, "IsTranscriptionCleanupEnabled")
         XCTAssertEqual(VoiceInkUserDefaultsKey.transcriptionRetentionMinutes, "TranscriptionRetentionMinutes")
         XCTAssertEqual(VoiceInkUserDefaultsKey.skipShortEnhancement, "SkipShortEnhancement")
@@ -23,6 +24,10 @@ final class UserDefaultsPreferencesTests: XCTestCase {
 
     func testSharedPreferenceDefaultsPreserveExistingIOSAudioSessionTimeout() {
         XCTAssertEqual(VoiceInkPreferenceDefault.audioSessionTimeoutSeconds, 90)
+    }
+
+    func testSharedPreferenceDefaultsPreserveExistingTextFormattingPolicy() {
+        XCTAssertEqual(VoiceInkPreferenceDefault.isTextFormattingEnabled, true)
     }
 
     func testSharedPreferenceDefaultsPreserveExistingCleanupRetention() {

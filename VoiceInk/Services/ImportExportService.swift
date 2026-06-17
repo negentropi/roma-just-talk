@@ -109,7 +109,7 @@ class ImportExportService {
     private let keyIsAudioCleanupEnabled = "IsAudioCleanupEnabled"
     private let keyAudioRetentionPeriod = "AudioRetentionPeriod"
 
-    private let keyIsTextFormattingEnabled = "IsTextFormattingEnabled"
+    private let keyIsTextFormattingEnabled = VoiceInkUserDefaultsKey.isTextFormattingEnabled
 
     private init() {
         if let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String {

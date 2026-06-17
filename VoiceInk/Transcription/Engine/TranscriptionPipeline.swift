@@ -201,7 +201,7 @@ class TranscriptionPipeline {
 
             text = text.trimmingCharacters(in: .whitespacesAndNewlines)
 
-            if UserDefaults.standard.bool(forKey: "IsTextFormattingEnabled") {
+            if UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.isTextFormattingEnabled) {
                 text = VoiceInkTranscriptParagraphFormatter.format(text)
             }
 

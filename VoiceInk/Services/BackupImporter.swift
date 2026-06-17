@@ -18,7 +18,7 @@ enum BackupImporter {
     private static let keyIsAudioCleanupEnabled = "IsAudioCleanupEnabled"
     private static let keyAudioRetentionPeriod = "AudioRetentionPeriod"
 
-    private static let keyIsTextFormattingEnabled = "IsTextFormattingEnabled"
+    private static let keyIsTextFormattingEnabled = VoiceInkUserDefaultsKey.isTextFormattingEnabled
 
     @MainActor
     static func apply(_ backup: BackupFile, categories: Set<BackupCategory>, enhancementService: AIEnhancementService, recordingShortcutManager: RecordingShortcutManager, menuBarManager: MenuBarManager, mediaController: MediaController, playbackController: PlaybackController, soundManager: SoundManager, recorderUIManager: RecorderUIManager, modelContext: ModelContext, transcriptionModelManager: TranscriptionModelManager) throws {

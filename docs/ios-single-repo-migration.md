@@ -40,7 +40,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - NaturalLanguage word-count policy for metrics and short-enhancement skip decisions
 - short post-processing skip policy and storage defaults for brief transcripts; platform shells still own UI controls and whether to apply the policy
 - AI-enhancement timeout/retry storage keys and defaults; platform shells still own request execution, provider transport, logging, and UI controls
-- NaturalLanguage transcript paragraph formatting policy for the macOS text-formatting preference
+- NaturalLanguage transcript paragraph formatting policy plus text-formatting storage key/default; platform shells still own the setting UI and when formatting runs
 - word-replacement ordering and text application policy; platform shells still own dictionary storage
 - vocabulary, word-replacement, backup dictionary insert, and word-replacement edit planning; platform shells still own dictionary storage and persistence errors
 - custom vocabulary term normalization for transcription providers; platform shells still own dictionary storage

@@ -10,6 +10,7 @@ public enum VoiceInkUserDefaultsKey {
     public static let selectedTranscriptionLanguage = "SelectedLanguage"
     public static let currentTranscriptionModel = "CurrentTranscriptionModel"
     public static let transcriptionPrompt = "TranscriptionPrompt"
+    public static let isTextFormattingEnabled = "IsTextFormattingEnabled"
     public static let isTranscriptionCleanupEnabled = "IsTranscriptionCleanupEnabled"
     public static let transcriptionRetentionMinutes = "TranscriptionRetentionMinutes"
     public static let skipShortEnhancement = "SkipShortEnhancement"
@@ -21,6 +22,7 @@ public enum VoiceInkUserDefaultsKey {
 
 public enum VoiceInkPreferenceDefault {
     public static let audioSessionTimeoutSeconds = 90
+    public static let isTextFormattingEnabled = true
     public static let transcriptionRetentionMinutes = 24 * 60
     public static let skipShortEnhancement = true
     public static let shortEnhancementWordThreshold = 3

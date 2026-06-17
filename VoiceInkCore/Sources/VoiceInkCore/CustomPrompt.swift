@@ -117,6 +117,13 @@ public enum VoiceInkCustomPromptPolicy {
         return VoiceInkCustomPromptStoreState(prompts: updatedPrompts, selectedPromptId: updatedSelectedPromptId)
     }
 
+    public static func selectedPromptIdAfterEnablingEnhancement(
+        _ selectedPromptId: UUID?,
+        prompts: [VoiceInkCustomPrompt]
+    ) -> UUID? {
+        selectedPromptId ?? prompts.first?.id
+    }
+
     public static func repairedSelectedPromptId(
         _ selectedPromptId: UUID?,
         isEnhancementEnabled: Bool,

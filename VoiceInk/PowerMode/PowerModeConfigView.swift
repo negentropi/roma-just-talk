@@ -401,7 +401,10 @@ struct ConfigurationView: View {
                                     selectedAIModel = aiService.currentModel
                                 }
                                 if selectedPromptId == nil {
-                                    selectedPromptId = enhancementService.allPrompts.first?.id
+                                    selectedPromptId = VoiceInkCustomPromptPolicy.selectedPromptIdAfterEnablingEnhancement(
+                                        selectedPromptId,
+                                        prompts: enhancementService.allPrompts
+                                    )
                                 }
                             }
                         }
@@ -556,7 +559,10 @@ struct ConfigurationView: View {
                 }
 
                 if isAIEnhancementEnabled && selectedPromptId == nil {
-                    selectedPromptId = enhancementService.allPrompts.first?.id
+                    selectedPromptId = VoiceInkCustomPromptPolicy.selectedPromptIdAfterEnablingEnhancement(
+                        selectedPromptId,
+                        prompts: enhancementService.allPrompts
+                    )
                 }
 
                 if let selectedModelName = effectiveModelName,

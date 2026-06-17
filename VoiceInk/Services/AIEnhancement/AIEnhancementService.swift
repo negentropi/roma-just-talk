@@ -18,7 +18,10 @@ class AIEnhancementService: ObservableObject {
         didSet {
             UserDefaults.standard.set(isEnhancementEnabled, forKey: VoiceInkUserDefaultsKey.isAIEnhancementEnabled)
             if isEnhancementEnabled && selectedPromptId == nil {
-                selectedPromptId = customPrompts.first?.id
+                selectedPromptId = VoiceInkCustomPromptPolicy.selectedPromptIdAfterEnablingEnhancement(
+                    selectedPromptId,
+                    prompts: customPrompts
+                )
             }
             NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
             NotificationCenter.default.post(name: .enhancementToggleChanged, object: nil)

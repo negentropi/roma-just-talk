@@ -220,6 +220,22 @@ final class CustomPromptTests: XCTestCase {
         XCTAssertNil(lastSelectedDeletedState.selectedPromptId)
     }
 
+    func testCustomPromptPolicySelectsFirstPromptOnlyWhenEnablingEnhancementWithoutSelection() {
+        let firstId = UUID(uuidString: "00000000-0000-0000-0000-000000000208")!
+        let staleId = UUID(uuidString: "00000000-0000-0000-0000-000000000209")!
+        let firstPrompt = VoiceInkCustomPrompt(id: firstId, title: "First", promptText: "First prompt")
+
+        XCTAssertEqual(
+            VoiceInkCustomPromptPolicy.selectedPromptIdAfterEnablingEnhancement(nil, prompts: [firstPrompt]),
+            firstId
+        )
+        XCTAssertEqual(
+            VoiceInkCustomPromptPolicy.selectedPromptIdAfterEnablingEnhancement(staleId, prompts: [firstPrompt]),
+            staleId
+        )
+        XCTAssertNil(VoiceInkCustomPromptPolicy.selectedPromptIdAfterEnablingEnhancement(nil, prompts: []))
+    }
+
     func testCustomPromptPolicyRepairsSelectedPromptOnlyWhenEnhancementIsEnabled() {
         let firstId = UUID(uuidString: "00000000-0000-0000-0000-000000000101")!
         let validId = UUID(uuidString: "00000000-0000-0000-0000-000000000102")!

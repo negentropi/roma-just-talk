@@ -155,6 +155,7 @@ Current iOS consumers of shared remote transport:
 
 - `iOS/VoiceInk-ios/TranscriptionRetryService.swift` creates `VoiceInkRemoteTranscriptionService` for remote providers and the iOS local Whisper adapter for `.localWhisper`.
 - `VoiceInkRemoteTranscriptionService` dispatches Groq/OpenAI/Cerebras, Deepgram, Gemini, Mistral, ElevenLabs, Soniox, Speechmatics, AssemblyAI, and xAI through shared core clients.
+- Provider-initialized `VoiceInkRemoteTranscriptionService.transcribeAudioFile` now derives file transcription options from the same `VoiceInkRemoteTranscriptionOptions.batchDefaults` policy used by macOS batch cloud transcription, while direct transport initialization keeps prompt-only custom behavior.
 - `VoiceInkAudioTranscriptionService` is transcription-only; API-key verification is kept in `VoiceInkProviderAPIKeyVerifier` so retry transcription adapters do not expose a dead verification interface.
 - `iOS/VoiceInk-ios/TranscriptionRetryService.swift` routes iOS transcription through `VoiceInkTranscriptionRunProcessor`, including shared output filtering, provider transcription empty-output policy, and cleanup preferences from `AppSettings`.
 - `iOS/VoiceInk-ios/AppSettings.swift` and `VoiceInkTranscriptionRunProcessor` use the shared provider credential policy so whitespace-only provider keys fail as missing before provider transport runs.

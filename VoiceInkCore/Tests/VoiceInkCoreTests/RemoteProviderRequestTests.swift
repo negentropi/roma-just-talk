@@ -226,6 +226,15 @@ final class RemoteProviderRequestTests: XCTestCase {
         XCTAssertEqual(groq.openAICompatibleTimeout, 60)
         XCTAssertEqual(groq.openAICompatibleMaxRetries, 2)
 
+        let openAI = VoiceInkRemoteTranscriptionOptions.batchDefaults(
+            for: .openAI,
+            prompt: "spell Roma correctly"
+        )
+        XCTAssertEqual(openAI.prompt, "spell Roma correctly")
+        XCTAssertNil(openAI.openAICompatibleResponseFormat)
+        XCTAssertNil(openAI.openAICompatibleTemperature)
+        XCTAssertNil(openAI.openAICompatibleTimeout)
+
         let deepgram = VoiceInkRemoteTranscriptionOptions.batchDefaults(for: .deepgram)
         XCTAssertEqual(deepgram.deepgramParagraphs, true)
         XCTAssertNil(deepgram.deepgramDiarize)
@@ -261,6 +270,32 @@ final class RemoteProviderRequestTests: XCTestCase {
         XCTAssertNil(gemini.openAICompatibleResponseFormat)
     }
 
+    func testRemoteTranscriptionServiceFileOptionsUseProviderBatchDefaults() throws {
+        let groq = VoiceInkRemoteTranscriptionService(provider: .groq)
+            .fileTranscriptionOptions(prompt: "spell Roma correctly")
+        XCTAssertEqual(groq.prompt, "spell Roma correctly")
+        XCTAssertEqual(groq.openAICompatibleResponseFormat, "json")
+        XCTAssertEqual(groq.openAICompatibleTemperature, "0")
+        XCTAssertEqual(groq.openAICompatibleTimeout, 60)
+        XCTAssertEqual(groq.openAICompatibleMaxRetries, 2)
+
+        let deepgram = VoiceInkRemoteTranscriptionService(provider: .deepgram)
+            .fileTranscriptionOptions(prompt: "ignored")
+        XCTAssertNil(deepgram.prompt)
+        XCTAssertEqual(deepgram.deepgramParagraphs, true)
+        XCTAssertNil(deepgram.deepgramDiarize)
+        XCTAssertEqual(deepgram.deepgramTimeout, 30)
+
+        let directTransport = VoiceInkRemoteTranscriptionService(
+            transport: .openAICompatible,
+            apiBaseURL: try XCTUnwrap(URL(string: "https://custom.example.test"))
+        )
+            .fileTranscriptionOptions(prompt: "custom prompt")
+        XCTAssertEqual(directTransport.prompt, "custom prompt")
+        XCTAssertNil(directTransport.openAICompatibleResponseFormat)
+        XCTAssertNil(directTransport.openAICompatibleTimeout)
+    }
+
     func testRemoteTranscriptionServicePassesFilePromptToTranscriptionRequest() async throws {
         let audioURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("VoiceInkCore.RemoteProviderRequestTests.\(UUID().uuidString).wav")
@@ -285,10 +320,10 @@ final class RemoteProviderRequestTests: XCTestCase {
             RemoteProviderRequestCapturingURLProtocol.requestHandler = nil
         }
 
-        let service = VoiceInkRemoteTranscriptionService(provider: .groq)
+        let service = VoiceInkRemoteTranscriptionService(provider: .openAI)
         let text = try await service.transcribeAudioFile(
             apiKey: "stt-key",
-            model: "whisper-large-v3",
+            model: "gpt-4o-transcribe",
             fileURL: audioURL,
             language: "en",
             prompt: "spell Roma correctly"

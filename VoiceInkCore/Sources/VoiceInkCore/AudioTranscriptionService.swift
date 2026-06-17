@@ -61,6 +61,8 @@ public struct VoiceInkRemoteTranscriptionOptions: Equatable, Sendable {
                 openAICompatibleTimeout: 60,
                 openAICompatibleMaxRetries: 2
             )
+        case .openAI:
+            return Self(prompt: prompt)
         case .deepgram:
             return Self(
                 deepgramParagraphs: true,
@@ -74,13 +76,30 @@ public struct VoiceInkRemoteTranscriptionOptions: Equatable, Sendable {
                 prompt: prompt,
                 customVocabulary: customVocabulary
             )
-        case .cartesia, .elevenLabs, .gemini, .mistral, .openAI, .xai, .local:
+        case .cartesia, .elevenLabs, .gemini, .mistral, .xai, .local:
             return Self()
         }
+    }
+
+    public static func batchDefaults(
+        forProviderKind provider: VoiceInkProviderKind,
+        prompt: String? = nil,
+        customVocabulary: [String] = []
+    ) -> Self {
+        guard let modelProvider = provider.transcriptionModelProvider else {
+            return provider.transcriptionTransport == .openAICompatible ? Self(prompt: prompt) : Self()
+        }
+
+        return batchDefaults(
+            for: modelProvider,
+            prompt: prompt,
+            customVocabulary: customVocabulary
+        )
     }
 }
 
 public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionService, Sendable {
+    private let provider: VoiceInkProviderKind?
     private let transport: VoiceInkTranscriptionTransport
     private let apiBaseURL: URL
     private let openAICompatibleClient: VoiceInkOpenAICompatibleTranscriptionClient
@@ -106,6 +125,7 @@ public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionServ
         xaiClient: VoiceInkXAITranscriptionClient = VoiceInkXAITranscriptionClient()
     ) {
         self.init(
+            provider: provider,
             transport: provider.transcriptionTransport,
             apiBaseURL: provider.transcriptionAPIBaseURL,
             openAICompatibleClient: openAICompatibleClient,
@@ -133,6 +153,37 @@ public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionServ
         assemblyAIClient: VoiceInkAssemblyAITranscriptionClient = VoiceInkAssemblyAITranscriptionClient(),
         xaiClient: VoiceInkXAITranscriptionClient = VoiceInkXAITranscriptionClient()
     ) {
+        self.init(
+            provider: nil,
+            transport: transport,
+            apiBaseURL: apiBaseURL,
+            openAICompatibleClient: openAICompatibleClient,
+            deepgramClient: deepgramClient,
+            geminiClient: geminiClient,
+            mistralClient: mistralClient,
+            elevenLabsClient: elevenLabsClient,
+            sonioxClient: sonioxClient,
+            speechmaticsClient: speechmaticsClient,
+            assemblyAIClient: assemblyAIClient,
+            xaiClient: xaiClient
+        )
+    }
+
+    init(
+        provider: VoiceInkProviderKind?,
+        transport: VoiceInkTranscriptionTransport,
+        apiBaseURL: URL,
+        openAICompatibleClient: VoiceInkOpenAICompatibleTranscriptionClient = VoiceInkOpenAICompatibleTranscriptionClient(),
+        deepgramClient: VoiceInkDeepgramTranscriptionClient = VoiceInkDeepgramTranscriptionClient(),
+        geminiClient: VoiceInkGeminiTranscriptionClient = VoiceInkGeminiTranscriptionClient(),
+        mistralClient: VoiceInkMistralTranscriptionClient = VoiceInkMistralTranscriptionClient(),
+        elevenLabsClient: VoiceInkElevenLabsTranscriptionClient = VoiceInkElevenLabsTranscriptionClient(),
+        sonioxClient: VoiceInkSonioxTranscriptionClient = VoiceInkSonioxTranscriptionClient(),
+        speechmaticsClient: VoiceInkSpeechmaticsTranscriptionClient = VoiceInkSpeechmaticsTranscriptionClient(),
+        assemblyAIClient: VoiceInkAssemblyAITranscriptionClient = VoiceInkAssemblyAITranscriptionClient(),
+        xaiClient: VoiceInkXAITranscriptionClient = VoiceInkXAITranscriptionClient()
+    ) {
+        self.provider = provider
         self.transport = transport
         self.apiBaseURL = apiBaseURL
         self.openAICompatibleClient = openAICompatibleClient
@@ -160,8 +211,16 @@ public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionServ
             audioData: audioData,
             fileName: fileURL.lastPathComponent,
             language: language,
-            options: VoiceInkRemoteTranscriptionOptions(prompt: prompt)
+            options: fileTranscriptionOptions(prompt: prompt)
         )
+    }
+
+    func fileTranscriptionOptions(prompt: String?) -> VoiceInkRemoteTranscriptionOptions {
+        guard let provider else {
+            return VoiceInkRemoteTranscriptionOptions(prompt: prompt)
+        }
+
+        return VoiceInkRemoteTranscriptionOptions.batchDefaults(forProviderKind: provider, prompt: prompt)
     }
 
     public func transcribeAudioData(

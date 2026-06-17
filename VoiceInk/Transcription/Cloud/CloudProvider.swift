@@ -45,11 +45,11 @@ extension CloudProvider {
         prompt: String?,
         customVocabulary: [String]
     ) -> VoiceInkRemoteTranscriptionOptions {
-        guard let provider = modelProvider.coreTranscriptionModelProvider else {
+        guard let provider = modelProvider.coreTranscriptionModelProvider?.providerKind else {
             return VoiceInkRemoteTranscriptionOptions()
         }
         return VoiceInkRemoteTranscriptionOptions.batchDefaults(
-            for: provider,
+            forProviderKind: provider,
             prompt: prompt,
             customVocabulary: customVocabulary
         )

@@ -80,4 +80,49 @@ enum DictionaryService {
             return "Failed to add replacement: \(error.localizedDescription)"
         }
     }
+
+    @discardableResult
+    static func updateWordReplacement(
+        _ entry: WordReplacement,
+        original: String,
+        replacement: String,
+        context: ModelContext
+    ) -> String? {
+        let descriptor = FetchDescriptor<WordReplacement>()
+        let existing = (try? context.fetch(descriptor)) ?? []
+        let existingOriginalTexts = existing
+            .filter { $0.id != entry.id }
+            .map(\.originalText)
+
+        let plan = VoiceInkDictionaryPolicy.wordReplacementInsertPlan(
+            original: original,
+            replacement: replacement,
+            existingOriginalTexts: existingOriginalTexts
+        )
+
+        if let errorMessage = plan.errorMessage {
+            return errorMessage
+        }
+
+        guard plan.shouldInsert else { return nil }
+
+        entry.originalText = plan.originalText
+        entry.replacementText = plan.replacementText
+
+        do {
+            try context.save()
+            WordReplacementService.shared.invalidateCache()
+            return nil
+        } catch {
+            return "Failed to save changes: \(error.localizedDescription)"
+        }
+    }
+
+    static func canSaveWordReplacement(original: String, replacement: String) -> Bool {
+        VoiceInkDictionaryPolicy.wordReplacementInsertPlan(
+            original: original,
+            replacement: replacement,
+            existingOriginalTexts: []
+        ).shouldInsert
+    }
 }

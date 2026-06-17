@@ -124,49 +124,21 @@ struct EditReplacementSheet: View {
     private func saveChanges() {
         let newOriginal = originalWord.trimmingCharacters(in: .whitespacesAndNewlines)
         let newReplacement = replacementWord
-        let tokens = newOriginal
-            .split(separator: ",")
-            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .filter { !$0.isEmpty }
-        guard !tokens.isEmpty, !newReplacement.isEmpty else { return }
-
-        // Check for duplicates (excluding current replacement)
-        let newTokensPairs = tokens.map { (original: $0, lowercased: $0.lowercased()) }
-
-        let descriptor = FetchDescriptor<WordReplacement>()
-        if let allReplacements = try? modelContext.fetch(descriptor) {
-            for existingReplacement in allReplacements {
-                // Skip checking against itself
-                if existingReplacement.id == replacement.id {
-                    continue
-                }
-
-                let existingTokens = existingReplacement.originalText
-                    .split(separator: ",")
-                    .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }
-                    .filter { !$0.isEmpty }
-
-                for tokenPair in newTokensPairs {
-                    if existingTokens.contains(tokenPair.lowercased) {
-                        alertMessage = "'\(tokenPair.original)' already exists in word replacements"
-                        showAlert = true
-                        return
-                    }
-                }
-            }
+        guard DictionaryService.canSaveWordReplacement(original: newOriginal, replacement: newReplacement) else {
+            return
         }
 
-        // Update the replacement
-        replacement.originalText = newOriginal
-        replacement.replacementText = newReplacement
-
-        do {
-            try modelContext.save()
-            WordReplacementService.shared.invalidateCache()
-            dismiss()
-        } catch {
-            alertMessage = "Failed to save changes: \(error.localizedDescription)"
+        if let error = DictionaryService.updateWordReplacement(
+            replacement,
+            original: newOriginal,
+            replacement: newReplacement,
+            context: modelContext
+        ) {
+            alertMessage = error
             showAlert = true
+            return
         }
+
+        dismiss()
     }
 }

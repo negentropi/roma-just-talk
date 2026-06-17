@@ -72,6 +72,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - transcription language catalog, provider language filtering, AssemblyAI realtime/batch language policy, selected-language fallback policy, language-option ordering, selected-language preference loading/saving/clearing, compatible selected-language persistence, selected-language request normalization, and the shared selected-language defaults key; platform shells still own selected-language UI and runtime streaming-mode state
 - local Whisper language seed prompts and custom language-prompt storage; platform shells still own prompt editing UI and when prompts are persisted
 - stored audio-file path resolution, existing-file lookup, recordings directory, file URL construction, and recording/import/retranscription filename policy
+- supported media extension and UTType import policy for audio/video files
 - duration presentation
 - relative timestamp presentation
 - Whisper and VAD model file metadata, including platform-base Whisper model directory creation, model/sidecar file construction, downloaded-state detection, Core ML support policy, and model/sidecar deletion
@@ -123,6 +124,7 @@ Current macOS consumers of shared remote transport:
 - macOS `AIService`, `OllamaService`, and `APIKeyManagementView` read/write dynamic Ollama, Custom provider, and OpenRouter model cache preferences through `VoiceInkDynamicAIProviderPreference`; macOS still owns the dynamic-provider clients and keeps the existing caller-specific Ollama fallback models.
 - macOS and iOS provider API-key lookup delegates stored-key reference resolution and provider environment fallback policy to `VoiceInkProviderAPIKeyLookup`; platform shells still own Keychain storage and UI editing state.
 - macOS and iOS recording audio filename construction delegates live recording, imported transcription, retranscription, and timestamped iOS recording naming to `VoiceInkStoredAudioFile`; platform shells still own directory choice and actual audio capture/copy/write work.
+- macOS open-file routing and audio-file transcription queue validation delegate supported audio/video file checks to `VoiceInkSupportedMedia`; platform shells still own open panels, drag/drop providers, and transcription queue state.
 - macOS and iOS local Whisper model directory creation, download URL/file path lookup, Core ML support checks, and model deletion delegate to `VoiceInkWhisperModelFiles`; platform shells still own download progress, UI, and runtime model state.
 - macOS and iOS local Whisper and macOS rolling preload resolve the Silero VAD bundle resource directly through `VoiceInkVADModelFiles`; the old shell-only VAD model manager adapters were removed.
 - macOS history/import row summaries and iOS note detail display use `VoiceInkTranscriptPresentation.preferredText` for the enhanced-text-first transcript display rule.

@@ -1,6 +1,6 @@
 import Cocoa
 import SwiftUI
-import UniformTypeIdentifiers
+import VoiceInkCore
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     weak var menuBarManager: MenuBarManager?
@@ -25,7 +25,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var pendingOpenFileURL: URL?
     
     func application(_ application: NSApplication, open urls: [URL]) {
-        guard let url = urls.first(where: { SupportedMedia.isSupported(url: $0) }) else {
+        guard let url = urls.first(where: { VoiceInkSupportedMedia.isSupported(url: $0) }) else {
             return
         }
         

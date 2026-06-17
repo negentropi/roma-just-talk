@@ -1,19 +1,23 @@
 import Foundation
 import UniformTypeIdentifiers
 
-struct SupportedMedia {
-    static let extensions: Set<String> = [
+public enum VoiceInkSupportedMedia {
+    public static let fileExtensions: Set<String> = [
         "wav", "mp3", "m4a", "aiff", "mp4", "mov", "aac", "flac", "caf",
         "amr", "ogg", "oga", "opus", "3gp"
     ]
 
-    static let contentTypes: [UTType] = [
+    public static let contentTypes: [UTType] = [
         .audio, .movie
     ]
 
-    static func isSupported(url: URL) -> Bool {
+    public static func isSupportedFileExtension(_ fileExtension: String) -> Bool {
+        fileExtensions.contains(fileExtension.lowercased())
+    }
+
+    public static func isSupported(url: URL) -> Bool {
         let fileExtension = url.pathExtension.lowercased()
-        if !fileExtension.isEmpty, extensions.contains(fileExtension) {
+        if !fileExtension.isEmpty, isSupportedFileExtension(fileExtension) {
             return true
         }
 
@@ -25,5 +29,3 @@ struct SupportedMedia {
         return false
     }
 }
-
-

@@ -30,7 +30,7 @@ class AudioTranscriptionManager: ObservableObject {
     func addToQueue(urls: [URL]) {
         for url in urls {
             guard FileManager.default.fileExists(atPath: url.path) else { continue }
-            guard SupportedMedia.isSupported(url: url) else { continue }
+            guard VoiceInkSupportedMedia.isSupported(url: url) else { continue }
 
             // Avoid adding the same file path twice if it's already pending/processing
             let path = url.standardizedFileURL.path

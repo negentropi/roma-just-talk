@@ -159,7 +159,7 @@ struct PerformanceAnalysisPanelView: View {
                     .font(.system(size: 12, weight: .semibold))
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
-                Text("\(modelStat.fileCount) transcripts")
+                Text("\(modelStat.sampleCount) transcripts")
                     .font(.system(size: 10))
                     .foregroundColor(.secondary)
             }
@@ -232,7 +232,7 @@ struct PerformanceAnalysisPanelView: View {
                     .font(.system(size: 12, weight: .semibold))
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
-                Text("\(modelStat.fileCount) transcripts")
+                Text("\(modelStat.sampleCount) transcripts")
                     .font(.system(size: 10))
                     .foregroundColor(.secondary)
             }

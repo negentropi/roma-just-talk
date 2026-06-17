@@ -90,31 +90,12 @@ private struct ModelPerformancePanelContent: View {
         }
     }
 
-    private var modelStats: [ModelPerformanceStat] {
-        var accumulators: [String: ModelPerformanceAccumulator] = [:]
-        for metric in metrics {
-            guard let name = metric.transcriptionModelName,
-                  let processingDuration = metric.transcriptionDuration,
-                  processingDuration > 0 else { continue }
-            accumulators[name, default: ModelPerformanceAccumulator()].add(
-                audioDuration: metric.audioDuration,
-                processingDuration: processingDuration
-            )
-        }
-        return accumulators.map { name, acc in acc.stat(named: name) }
-            .sorted { $0.avgProcessingTime < $1.avgProcessingTime }
+    private var modelStats: [VoiceInkPerformanceModelStat] {
+        VoiceInkPerformanceAnalyzer.transcriptionModelStats(from: metrics, requirePositiveDuration: true)
     }
 
-    private var enhancementStats: [EnhancementStat] {
-        var accumulators: [String: EnhancementAccumulator] = [:]
-        for metric in metrics {
-            guard let name = metric.aiEnhancementModelName,
-                  let duration = metric.enhancementDuration,
-                  duration > 0 else { continue }
-            accumulators[name, default: EnhancementAccumulator()].add(duration: duration)
-        }
-        return accumulators.map { name, acc in acc.stat(named: name) }
-            .sorted { $0.avgDuration < $1.avgDuration }
+    private var enhancementStats: [VoiceInkPerformanceModelStat] {
+        VoiceInkPerformanceAnalyzer.enhancementModelStats(from: metrics, requirePositiveDuration: true)
     }
 
     private let gridColumns = [
@@ -165,14 +146,14 @@ private struct ModelPerformancePanelContent: View {
         }
     }
 
-    private func modelTile(_ stat: ModelPerformanceStat) -> some View {
+    private func modelTile(_ stat: VoiceInkPerformanceModelStat) -> some View {
         VStack(spacing: 10) {
             VStack(spacing: 2) {
                 Text(stat.name)
                     .font(.system(size: 12, weight: .semibold))
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
-                Text("\(stat.sessionCount) sessions")
+                Text("\(stat.sampleCount) sessions")
                     .font(.system(size: 10))
                     .foregroundColor(.secondary)
             }
@@ -233,21 +214,21 @@ private struct ModelPerformancePanelContent: View {
         }
     }
 
-    private func enhancementTile(_ stat: EnhancementStat) -> some View {
+    private func enhancementTile(_ stat: VoiceInkPerformanceModelStat) -> some View {
         VStack(spacing: 10) {
             VStack(spacing: 2) {
                 Text(stat.name)
                     .font(.system(size: 12, weight: .semibold))
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
-                Text("\(stat.sessionCount) sessions")
+                Text("\(stat.sampleCount) sessions")
                     .font(.system(size: 10))
                     .foregroundColor(.secondary)
             }
             .frame(maxWidth: .infinity)
 
             VStack(spacing: 3) {
-                Text(String(format: "%.2fs", stat.avgDuration))
+                Text(String(format: "%.2fs", stat.avgProcessingTime))
                     .font(.system(size: 24, weight: .bold, design: .rounded))
                     .foregroundColor(.indigo)
                 Text("Avg. Enhancement Time")
@@ -270,67 +251,4 @@ private struct ModelPerformancePanelContent: View {
             .tracking(0.5)
     }
 
-}
-
-// MARK: - Data models
-
-struct ModelPerformanceStat: Identifiable {
-    var id: String { name }
-    let name: String
-    let sessionCount: Int
-    let totalProcessingTime: TimeInterval
-    let avgProcessingTime: TimeInterval
-    let avgAudioDuration: TimeInterval
-    let speedFactor: Double
-}
-
-struct ModelPerformanceAccumulator {
-    var sessionCount = 0
-    var totalProcessingTime: TimeInterval = 0
-    var totalAudioDuration: TimeInterval = 0
-
-    mutating func add(audioDuration: TimeInterval, processingDuration: TimeInterval) {
-        sessionCount += 1
-        totalProcessingTime += processingDuration
-        totalAudioDuration += audioDuration
-    }
-
-    func stat(named name: String) -> ModelPerformanceStat {
-        let safeCount = max(sessionCount, 1)
-        let speedFactor = totalProcessingTime > 0 ? totalAudioDuration / totalProcessingTime : 0
-        return ModelPerformanceStat(
-            name: name,
-            sessionCount: sessionCount,
-            totalProcessingTime: totalProcessingTime,
-            avgProcessingTime: totalProcessingTime / Double(safeCount),
-            avgAudioDuration: totalAudioDuration / Double(safeCount),
-            speedFactor: speedFactor
-        )
-    }
-}
-
-struct EnhancementStat: Identifiable {
-    var id: String { name }
-    let name: String
-    let sessionCount: Int
-    let avgDuration: TimeInterval
-}
-
-struct EnhancementAccumulator {
-    var sessionCount = 0
-    var totalDuration: TimeInterval = 0
-
-    mutating func add(duration: TimeInterval) {
-        sessionCount += 1
-        totalDuration += duration
-    }
-
-    func stat(named name: String) -> EnhancementStat {
-        let safeCount = max(sessionCount, 1)
-        return EnhancementStat(
-            name: name,
-            sessionCount: sessionCount,
-            avgDuration: totalDuration / Double(safeCount)
-        )
-    }
 }

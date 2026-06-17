@@ -9,89 +9,11 @@ enum PanelMode {
 }
 
 struct PerformanceAnalyzer {
-    struct AnalysisResult {
-        let totalTranscripts: Int
-        let totalWithTranscriptionData: Int
-        let totalAudioDuration: TimeInterval
-        let totalEnhancedFiles: Int
-        let transcriptionModels: [ModelStat]
-        let enhancementModels: [ModelStat]
-    }
-
-    struct ModelStat: Identifiable {
-        let id = UUID()
-        let name: String
-        let fileCount: Int
-        let totalProcessingTime: TimeInterval
-        let avgProcessingTime: TimeInterval
-        let avgAudioDuration: TimeInterval
-        let speedFactor: Double
-    }
+    typealias AnalysisResult = VoiceInkPerformanceAnalysis
+    typealias ModelStat = VoiceInkPerformanceModelStat
 
     static func analyze(transcriptions: [Transcription]) -> AnalysisResult {
-        let totalTranscripts = transcriptions.count
-        let totalWithTranscriptionData = transcriptions.filter { $0.transcriptionDuration != nil }.count
-        let totalAudioDuration = transcriptions.reduce(0) { $0 + $1.duration }
-        let totalEnhancedFiles = transcriptions.filter { $0.enhancedText != nil && $0.enhancementDuration != nil }.count
-
-        let transcriptionStats = processStats(
-            for: transcriptions,
-            modelNameKeyPath: \.transcriptionModelName,
-            durationKeyPath: \.transcriptionDuration,
-            audioDurationKeyPath: \.duration
-        )
-
-        let enhancementStats = processStats(
-            for: transcriptions,
-            modelNameKeyPath: \.aiEnhancementModelName,
-            durationKeyPath: \.enhancementDuration
-        )
-
-        return AnalysisResult(
-            totalTranscripts: totalTranscripts,
-            totalWithTranscriptionData: totalWithTranscriptionData,
-            totalAudioDuration: totalAudioDuration,
-            totalEnhancedFiles: totalEnhancedFiles,
-            transcriptionModels: transcriptionStats,
-            enhancementModels: enhancementStats
-        )
-    }
-
-    static func processStats(for transcriptions: [Transcription],
-                             modelNameKeyPath: KeyPath<Transcription, String?>,
-                             durationKeyPath: KeyPath<Transcription, TimeInterval?>,
-                             audioDurationKeyPath: KeyPath<Transcription, TimeInterval>? = nil) -> [ModelStat] {
-
-        let relevantTranscriptions = transcriptions.filter {
-            $0[keyPath: modelNameKeyPath] != nil && $0[keyPath: durationKeyPath] != nil
-        }
-
-        let groupedByModel = Dictionary(grouping: relevantTranscriptions) {
-            $0[keyPath: modelNameKeyPath] ?? "Unknown"
-        }
-
-        return groupedByModel.map { modelName, items in
-            let fileCount = items.count
-            let totalProcessingTime = items.reduce(0) { $0 + ($1[keyPath: durationKeyPath] ?? 0) }
-            let avgProcessingTime = totalProcessingTime / Double(fileCount)
-
-            let totalAudioDuration = items.reduce(0) { $0 + $1.duration }
-            let avgAudioDuration = totalAudioDuration / Double(fileCount)
-
-            var speedFactor = 0.0
-            if let audioDurationKeyPath = audioDurationKeyPath, totalProcessingTime > 0 {
-                speedFactor = totalAudioDuration / totalProcessingTime
-            }
-
-            return ModelStat(
-                name: modelName,
-                fileCount: fileCount,
-                totalProcessingTime: totalProcessingTime,
-                avgProcessingTime: avgProcessingTime,
-                avgAudioDuration: avgAudioDuration,
-                speedFactor: speedFactor
-            )
-        }.sorted { $0.avgProcessingTime < $1.avgProcessingTime }
+        VoiceInkPerformanceAnalyzer.analyze(records: transcriptions)
     }
 
     static func getMacModel() -> String {
@@ -327,7 +249,7 @@ struct TranscriptionModelCard: View {
 
                 Spacer()
                 
-                Text("\(modelStat.fileCount) transcripts")
+                Text("\(modelStat.sampleCount) transcripts")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
@@ -386,7 +308,7 @@ struct EnhancementModelCard: View {
 
                 Spacer()
                 
-                Text("\(modelStat.fileCount) transcripts")
+                Text("\(modelStat.sampleCount) transcripts")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }

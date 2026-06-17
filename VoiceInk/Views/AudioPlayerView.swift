@@ -388,7 +388,7 @@ struct AudioPlayerView: View {
             .padding(.horizontal, 10)
 
             HStack(spacing: 8) {
-                Text(formatTime(playerManager.currentTime))
+                Text(VoiceInkDurationPresentation.minutesSeconds(playerManager.currentTime))
                     .font(.system(size: 11, weight: .medium))
                     .monospacedDigit()
                     .foregroundColor(.secondary)
@@ -463,7 +463,7 @@ struct AudioPlayerView: View {
 
                 Spacer()
 
-                Text(formatTime(playerManager.duration))
+                Text(VoiceInkDurationPresentation.minutesSeconds(playerManager.duration))
                     .font(.system(size: 11, weight: .medium))
                     .monospacedDigit()
                     .foregroundColor(.secondary)

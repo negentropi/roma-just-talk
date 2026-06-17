@@ -165,6 +165,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "WhisperRuntimeDefaultsTests.testThreadCountKeepsExistingBounds", run: { WhisperRuntimeDefaultsTests().testThreadCountKeepsExistingBounds() }),
             VoiceInkCoreCheck(name: "WhisperRuntimeDefaultsTests.testRuntimeConstantsMatchExistingWhisperWrappers", run: { WhisperRuntimeDefaultsTests().testRuntimeConstantsMatchExistingWhisperWrappers() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testBootstrapModelsContainBaseModelSpec", run: { WhisperModelFilesTests().testBootstrapModelsContainBaseModelSpec() }),
+            VoiceInkCoreCheck(name: "WhisperModelFilesTests.testModelsDirectoryBuildsUnderPlatformBaseDirectory", run: { try WhisperModelFilesTests().testModelsDirectoryBuildsUnderPlatformBaseDirectory() }),
+            VoiceInkCoreCheck(name: "WhisperModelFilesTests.testCreateModelsDirectoryCreatesDirectoryUnderPlatformBaseDirectory", run: { try WhisperModelFilesTests().testCreateModelsDirectoryCreatesDirectoryUnderPlatformBaseDirectory() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testDownloadableModelsMatchMacOSLocalWhisperCatalog", run: { WhisperModelFilesTests().testDownloadableModelsMatchMacOSLocalWhisperCatalog() }),
         ]
 

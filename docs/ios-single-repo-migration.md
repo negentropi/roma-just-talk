@@ -35,7 +35,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - transcription cleanup preferences and punctuation/lowercase cleanup policy
 - stored audio-file path resolution and recordings directory construction
 - duration presentation
-- Whisper and VAD model file metadata
+- Whisper and VAD model file metadata, including platform-base Whisper model directory construction
 - local Whisper runtime defaults for thread count, transcription temperature, and VAD thresholds
 - VAD bundle resource lookup
 - PCM16 sample conversion and mono 16 kHz transcription-audio constants

@@ -107,7 +107,7 @@ struct VoiceInkApp: App {
         // 1. Create modelsDirectory URL
         let appSupportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("com.prakashjoshipax.VoiceInk")
-        let modelsDirectory = appSupportDirectory.appendingPathComponent(VoiceInkWhisperModelFiles.modelsDirectoryName)
+        let modelsDirectory = VoiceInkWhisperModelFiles.modelsDirectory(in: appSupportDirectory)
 
         // 2. Create model managers
         let whisperModelManager = WhisperModelManager(modelsDirectory: modelsDirectory)

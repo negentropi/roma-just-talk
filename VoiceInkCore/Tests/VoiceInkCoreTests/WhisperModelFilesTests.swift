@@ -8,6 +8,28 @@ final class WhisperModelFilesTests: XCTestCase {
         XCTAssertEqual(VoiceInkWhisperModelFiles.bootstrapModels.first?.filename, "ggml-base.bin")
     }
 
+    func testModelsDirectoryBuildsUnderPlatformBaseDirectory() throws {
+        let baseDirectory = URL(fileURLWithPath: "/tmp/VoiceInk", isDirectory: true)
+
+        XCTAssertEqual(
+            VoiceInkWhisperModelFiles.modelsDirectory(in: baseDirectory).path,
+            "/tmp/VoiceInk/WhisperModels"
+        )
+    }
+
+    func testCreateModelsDirectoryCreatesDirectoryUnderPlatformBaseDirectory() throws {
+        let baseDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.WhisperModelFilesTests.\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: baseDirectory) }
+
+        let directory = try VoiceInkWhisperModelFiles.createModelsDirectory(in: baseDirectory)
+
+        var isDirectory: ObjCBool = false
+        XCTAssertTrue(FileManager.default.fileExists(atPath: directory.path, isDirectory: &isDirectory))
+        XCTAssertTrue(isDirectory.boolValue)
+        XCTAssertEqual(directory.lastPathComponent, "WhisperModels")
+    }
+
     func testDownloadableModelsMatchMacOSLocalWhisperCatalog() {
         XCTAssertEqual(
             VoiceInkWhisperModelFiles.downloadableModels.map(\.modelName),

@@ -47,6 +47,20 @@ public struct VoiceInkWhisperModelFileSpec: Codable, Equatable, Identifiable, Se
 public enum VoiceInkWhisperModelFiles {
     public static let modelsDirectoryName = "WhisperModels"
 
+    public static func modelsDirectory(in baseDirectory: URL) -> URL {
+        baseDirectory.appendingPathComponent(modelsDirectoryName)
+    }
+
+    @discardableResult
+    public static func createModelsDirectory(
+        in baseDirectory: URL,
+        fileManager: FileManager = .default
+    ) throws -> URL {
+        let directory = modelsDirectory(in: baseDirectory)
+        try fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
+        return directory
+    }
+
     public static let baseModel = VoiceInkWhisperModelFileSpec(
         modelName: VoiceInkTranscriptionModelCatalog.localBaseModel,
         displayName: "Whisper Base Model",

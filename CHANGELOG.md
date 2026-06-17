@@ -2,6 +2,9 @@
 
 ## v1.96 - Unreleased
 
+- Reworked Special shortcuts so Shift-down only arms the rolling-buffer commit path; Shift+typing, secure-input, and other unreliable key evidence now discard without starting audio, canceling, saving history, or writing recorder files.
+- Removed the unsafe Special Key Down and Special Flex settings that could start recording before the app knew whether the Shift press was just normal typing.
+
 ## v1.95 - 2026-06-17
 
 - Fixed Special `startRecording` modifier-only shortcuts so unreliable key-up evidence and short clean presses no longer cancel after recording has already started.

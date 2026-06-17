@@ -137,13 +137,6 @@ enum BackupImporter {
            let secondaryMode = RecordingShortcutManager.Mode(rawValue: secondaryModeRawValue) {
             recordingShortcutManager.secondaryRecordingShortcutMode = secondaryMode
         }
-        if let keyDownBehaviorRawValue = general.specialShortcutKeyDownBehaviorRawValue,
-           let keyDownBehavior = SpecialShortcutKeyDownBehavior(rawValue: keyDownBehaviorRawValue) {
-            recordingShortcutManager.specialShortcutKeyDownBehavior = keyDownBehavior
-        }
-        if let allowsKeyDownOnlyTrigger = general.specialShortcutAllowsKeyDownOnlyTrigger {
-            recordingShortcutManager.specialShortcutAllowsKeyDownOnlyTrigger = allowsKeyDownOnlyTrigger
-        }
         if let pasteLastTranscriptOnEmptyTap = general.specialShortcutPasteLastTranscriptOnEmptyTap {
             recordingShortcutManager.specialShortcutPasteLastTranscriptOnEmptyTap = pasteLastTranscriptOnEmptyTap
         }

@@ -75,18 +75,6 @@ struct SettingsView: View {
                 }
 
                 if usesSpecialShortcutMode {
-                    LabeledContent("Special Key Down") {
-                        Picker("", selection: $recordingShortcutManager.specialShortcutKeyDownBehavior) {
-                            ForEach(SpecialShortcutKeyDownBehavior.allCases, id: \.self) { behavior in
-                                Text(behavior.displayName).tag(behavior)
-                            }
-                        }
-                        .labelsHidden()
-                        .fixedSize()
-                    }
-
-                    Toggle("Special Flex", isOn: $recordingShortcutManager.specialShortcutAllowsKeyDownOnlyTrigger)
-
                     Toggle("Empty Tap Pastes Last", isOn: $recordingShortcutManager.specialShortcutPasteLastTranscriptOnEmptyTap)
                 }
             } header: {

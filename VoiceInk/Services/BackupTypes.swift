@@ -80,8 +80,6 @@ struct GeneralBackup: Codable {
     let secondaryRecordingShortcutRawValue: String?
     let primaryRecordingShortcutModeRawValue: String?
     let secondaryRecordingShortcutModeRawValue: String?
-    let specialShortcutKeyDownBehaviorRawValue: String?
-    let specialShortcutAllowsKeyDownOnlyTrigger: Bool?
     let specialShortcutPasteLastTranscriptOnEmptyTap: Bool?
     let isMiddleClickToggleEnabled: Bool?
     let middleClickActivationDelay: Int?

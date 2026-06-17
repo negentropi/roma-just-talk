@@ -37,6 +37,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - transcription cleanup preferences and punctuation/lowercase cleanup policy
 - cursor-aware transcript capitalization policy; platform shells only supply cursor text and paste targets
 - NaturalLanguage word-count policy for metrics and short-enhancement skip decisions
+- NaturalLanguage transcript paragraph formatting policy for the macOS text-formatting preference
 - stored audio-file path resolution, existing-file lookup, recordings directory, and file URL construction
 - duration presentation
 - relative timestamp presentation

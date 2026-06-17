@@ -95,8 +95,13 @@ class AIEnhancementService: ObservableObject {
         self.customPrompts = VoiceInkCustomPromptStorage.loadPrompts()
         self.selectedPromptId = VoiceInkCustomPromptStorage.loadSelectedPromptId()
 
-        if isEnhancementEnabled && (selectedPromptId == nil || !allPrompts.contains(where: { $0.id == selectedPromptId })) {
-            self.selectedPromptId = allPrompts.first?.id
+        let repairedPromptId = VoiceInkCustomPromptPolicy.repairedSelectedPromptId(
+            selectedPromptId,
+            isEnhancementEnabled: isEnhancementEnabled,
+            prompts: allPrompts
+        )
+        if selectedPromptId != repairedPromptId {
+            self.selectedPromptId = repairedPromptId
         }
 
         NotificationCenter.default.addObserver(
@@ -188,16 +193,11 @@ class AIEnhancementService: ObservableObject {
 
         let finalContextSection = allContextSections + customVocabularySection
 
-        if let activePrompt = activePrompt {
-            if activePrompt.id == VoiceInkPredefinedPrompts.assistantPromptId {
-                return activePrompt.promptText + finalContextSection
-            } else {
-                return activePrompt.finalPromptText + finalContextSection
-            }
-        } else {
-            let defaultPrompt = allPrompts.first(where: { $0.id == VoiceInkPredefinedPrompts.defaultPromptId }) ?? allPrompts.first!
-            return defaultPrompt.finalPromptText + finalContextSection
-        }
+        let promptText = VoiceInkCustomPromptPolicy.basePromptText(
+            activePrompt: activePrompt,
+            prompts: allPrompts
+        )
+        return promptText + finalContextSection
     }
 
     private func makeRequest(text: String, mode: EnhancementPrompt) async throws -> String {

@@ -60,6 +60,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - AI-enhancement custom prompt record shape, Codable compatibility, and final-prompt wrapping; macOS still owns SwiftUI prompt rendering and prompt-store orchestration
 - predefined-prompt repair/merge policy and trigger-detectable prompt filtering; macOS still owns when the prompt store is loaded and saved
 - AI-enhancement custom prompt array and selected-prompt persistence helpers; platform shells still own notifications and UI state updates
+- selected-prompt repair and base prompt-text selection for AI enhancement; platform shells still own context capture and request execution
 - AI-enhancement prompt-store and context-toggle storage keys; macOS still owns persistence timing, notifications, and UI orchestration
 - transcription language catalog, provider language filtering, AssemblyAI realtime/batch language policy, selected-language fallback policy, language-option ordering, selected-language preference loading, selected-language request normalization, and the shared selected-language defaults key; platform shells still own selected-language storage/UI and runtime streaming-mode state
 - local Whisper language seed prompts and custom language-prompt storage key; platform shells still own prompt editing UI and when prompts are persisted
@@ -105,6 +106,7 @@ Current macOS consumers of shared remote transport:
 - macOS `CustomPrompt` is now a shell typealias for `VoiceInkCustomPrompt`, keeping the SwiftUI prompt-grid adapter in the macOS shell while moving the prompt record and Codable compatibility into `VoiceInkCore`.
 - macOS predefined-prompt initialization now delegates to `VoiceInkCustomPromptPolicy`, and the old shell-only `PredefinedPrompts` adapter was removed.
 - macOS custom prompt loading, saving, and selected-prompt persistence now use `VoiceInkCustomPromptStorage`.
+- macOS AI-enhancement prompt selection delegates selected-prompt repair and base prompt text to `VoiceInkCustomPromptPolicy`; macOS still appends selected-text, clipboard, screen-capture, and vocabulary context before executing provider requests.
 - macOS AI-enhancement prompt-store preferences now use `VoiceInkUserDefaultsKey`, preserving the same raw storage names while making future iOS prompt-store adoption share the same keys.
 - macOS AI-enhancement provider selection uses `VoiceInkAIEnhancementProviderKind` and `VoiceInkUserDefaultsKey` for persisted provider identity, selectable text-enhancement providers, model-selection keys, and API-key requirement; macOS keeps dynamic provider settings and execution adapters.
 - macOS AI-enhancement API-key verification dispatch reads `VoiceInkAIEnhancementProviderKind.apiKeyVerificationTransport`; macOS still owns the LLMkit and provider-specific verifier calls.

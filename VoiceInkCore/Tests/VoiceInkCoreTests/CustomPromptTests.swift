@@ -130,6 +130,89 @@ final class CustomPromptTests: XCTestCase {
         )
     }
 
+    func testCustomPromptPolicyRepairsSelectedPromptOnlyWhenEnhancementIsEnabled() {
+        let firstId = UUID(uuidString: "00000000-0000-0000-0000-000000000101")!
+        let validId = UUID(uuidString: "00000000-0000-0000-0000-000000000102")!
+        let staleId = UUID(uuidString: "00000000-0000-0000-0000-000000000103")!
+        let prompts = [
+            VoiceInkCustomPrompt(id: firstId, title: "First", promptText: "First prompt"),
+            VoiceInkCustomPrompt(id: validId, title: "Valid", promptText: "Valid prompt")
+        ]
+
+        XCTAssertNil(VoiceInkCustomPromptPolicy.repairedSelectedPromptId(nil, isEnhancementEnabled: false, prompts: prompts))
+        XCTAssertEqual(
+            VoiceInkCustomPromptPolicy.repairedSelectedPromptId(staleId, isEnhancementEnabled: false, prompts: prompts),
+            staleId
+        )
+        XCTAssertEqual(
+            VoiceInkCustomPromptPolicy.repairedSelectedPromptId(nil, isEnhancementEnabled: true, prompts: prompts),
+            firstId
+        )
+        XCTAssertEqual(
+            VoiceInkCustomPromptPolicy.repairedSelectedPromptId(staleId, isEnhancementEnabled: true, prompts: prompts),
+            firstId
+        )
+        XCTAssertEqual(
+            VoiceInkCustomPromptPolicy.repairedSelectedPromptId(validId, isEnhancementEnabled: true, prompts: prompts),
+            validId
+        )
+        XCTAssertNil(VoiceInkCustomPromptPolicy.repairedSelectedPromptId(nil, isEnhancementEnabled: true, prompts: []))
+    }
+
+    func testCustomPromptPolicyUsesAssistantPromptWithoutSystemInstructions() throws {
+        let predefined = try XCTUnwrap(
+            VoiceInkPredefinedPrompts.all.first { $0.id == VoiceInkPredefinedPrompts.assistantPromptId }
+        )
+        let assistantPrompt = VoiceInkCustomPrompt(predefinedPrompt: predefined)
+
+        XCTAssertEqual(
+            VoiceInkCustomPromptPolicy.basePromptText(activePrompt: assistantPrompt, prompts: [assistantPrompt]),
+            VoiceInkAIPrompts.assistantMode
+        )
+    }
+
+    func testCustomPromptPolicyWrapsNonAssistantActivePrompt() {
+        let activePrompt = VoiceInkCustomPrompt(
+            title: "Edit",
+            promptText: "Make the transcript concise.",
+            useSystemInstructions: true
+        )
+
+        let promptText = VoiceInkCustomPromptPolicy.basePromptText(
+            activePrompt: activePrompt,
+            prompts: [activePrompt]
+        )
+
+        XCTAssertEqual(promptText, activePrompt.finalPromptText)
+        XCTAssertTrue(promptText.contains("Make the transcript concise."))
+        XCTAssertTrue(promptText != activePrompt.promptText)
+    }
+
+    func testCustomPromptPolicyFallsBackToDefaultPromptText() throws {
+        let customPrompt = VoiceInkCustomPrompt(
+            title: "Custom",
+            promptText: "Use custom rules.",
+            useSystemInstructions: true
+        )
+        let predefined = try XCTUnwrap(
+            VoiceInkPredefinedPrompts.all.first { $0.id == VoiceInkPredefinedPrompts.defaultPromptId }
+        )
+        let defaultPrompt = VoiceInkCustomPrompt(predefinedPrompt: predefined)
+
+        XCTAssertEqual(
+            VoiceInkCustomPromptPolicy.basePromptText(
+                activePrompt: nil,
+                prompts: [customPrompt, defaultPrompt]
+            ),
+            defaultPrompt.finalPromptText
+        )
+        XCTAssertEqual(
+            VoiceInkCustomPromptPolicy.basePromptText(activePrompt: nil, prompts: [customPrompt]),
+            customPrompt.finalPromptText
+        )
+        XCTAssertEqual(VoiceInkCustomPromptPolicy.basePromptText(activePrompt: nil, prompts: []), "")
+    }
+
     func testCustomPromptEncodingPreservesExistingMacOSKeys() throws {
         let prompt = VoiceInkCustomPrompt(
             id: UUID(uuidString: "00000000-0000-0000-0000-0000000000cd")!,

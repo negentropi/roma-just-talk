@@ -74,6 +74,41 @@ public struct VoiceInkCustomPrompt: Identifiable, Codable, Equatable, Sendable {
 }
 
 public enum VoiceInkCustomPromptPolicy {
+    public static func repairedSelectedPromptId(
+        _ selectedPromptId: UUID?,
+        isEnhancementEnabled: Bool,
+        prompts: [VoiceInkCustomPrompt]
+    ) -> UUID? {
+        guard isEnhancementEnabled else {
+            return selectedPromptId
+        }
+
+        guard let selectedPromptId,
+              prompts.contains(where: { $0.id == selectedPromptId }) else {
+            return prompts.first?.id
+        }
+
+        return selectedPromptId
+    }
+
+    public static func basePromptText(
+        activePrompt: VoiceInkCustomPrompt?,
+        prompts: [VoiceInkCustomPrompt],
+        assistantPromptId: UUID = VoiceInkPredefinedPrompts.assistantPromptId,
+        defaultPromptId: UUID = VoiceInkPredefinedPrompts.defaultPromptId
+    ) -> String {
+        if let activePrompt {
+            if activePrompt.id == assistantPromptId {
+                return activePrompt.promptText
+            }
+
+            return activePrompt.finalPromptText
+        }
+
+        let defaultPrompt = prompts.first { $0.id == defaultPromptId } ?? prompts.first
+        return defaultPrompt?.finalPromptText ?? ""
+    }
+
     public static func repairedPredefinedPrompts(
         in prompts: [VoiceInkCustomPrompt],
         predefinedPrompts: [VoiceInkPredefinedPrompt] = VoiceInkPredefinedPrompts.all

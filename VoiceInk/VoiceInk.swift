@@ -315,7 +315,7 @@ struct VoiceInkApp: App {
                         }
 
                         // Start the automatic audio cleanup process only if transcript cleanup is not enabled
-                        if !UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.isTranscriptionCleanupEnabled) {
+                        if !VoiceInkTranscriptionAutoCleanupPreference.isEnabled() {
                             audioCleanupManager.startAutomaticCleanup(modelContext: container.mainContext)
                         }
 

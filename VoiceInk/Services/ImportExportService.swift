@@ -148,6 +148,7 @@ class ImportExportService {
         }
 
         let punctuationCleanupMode = PunctuationCleanupMode.current()
+        let transcriptionCleanup = VoiceInkTranscriptionAutoCleanupPreference.current()
         let rollingBufferConfiguration = RollingBufferPreloadSettings.configuration()
         let perModelPreloadSettings = exportPerModelRollingBufferPreloadSettings()
         let generalSettingsToExport = GeneralBackup(
@@ -172,8 +173,8 @@ class ImportExportService {
             launchAtLoginEnabled: LaunchAtLogin.isEnabled,
             isMenuBarOnly: menuBarManager.isMenuBarOnly,
             recorderType: recorderUIManager.recorderType,
-            isTranscriptionCleanupEnabled: UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.isTranscriptionCleanupEnabled),
-            transcriptionRetentionMinutes: UserDefaults.standard.integer(forKey: VoiceInkUserDefaultsKey.transcriptionRetentionMinutes),
+            isTranscriptionCleanupEnabled: transcriptionCleanup.isEnabled,
+            transcriptionRetentionMinutes: transcriptionCleanup.retentionMinutes,
             isAudioCleanupEnabled: UserDefaults.standard.bool(forKey: keyIsAudioCleanupEnabled),
             audioRetentionPeriod: UserDefaults.standard.integer(forKey: keyAudioRetentionPeriod),
 

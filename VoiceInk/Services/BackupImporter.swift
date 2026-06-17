@@ -160,10 +160,10 @@ enum BackupImporter {
         }
 
         if let transcriptionCleanup = general.isTranscriptionCleanupEnabled {
-            UserDefaults.standard.set(transcriptionCleanup, forKey: VoiceInkUserDefaultsKey.isTranscriptionCleanupEnabled)
+            VoiceInkTranscriptionAutoCleanupPreference.saveIsEnabled(transcriptionCleanup)
         }
         if let transcriptionMinutes = general.transcriptionRetentionMinutes {
-            UserDefaults.standard.set(transcriptionMinutes, forKey: VoiceInkUserDefaultsKey.transcriptionRetentionMinutes)
+            VoiceInkTranscriptionAutoCleanupPreference.saveRetentionMinutes(transcriptionMinutes)
         }
         if let audioCleanup = general.isAudioCleanupEnabled {
             UserDefaults.standard.set(audioCleanup, forKey: keyIsAudioCleanupEnabled)

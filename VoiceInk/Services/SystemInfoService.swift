@@ -9,6 +9,7 @@ class SystemInfoService {
     private init() {}
 
     func getSystemInfoString() -> String {
+        let transcriptionCleanup = VoiceInkTranscriptionAutoCleanupPreference.current()
         let info = """
         === VOICEINK SYSTEM INFORMATION ===
         Generated: \(Date().formatted(date: .long, time: .standard))
@@ -68,8 +69,8 @@ class SystemInfoService {
         Persist Configured Preferences: \(UserDefaults.standard.bool(forKey: "powerModePersistConfig"))
 
         DATA CLEANUP SETTINGS:
-        Auto-Delete Transcriptions: \(UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.isTranscriptionCleanupEnabled))
-        Transcription Retention: \(UserDefaults.standard.integer(forKey: VoiceInkUserDefaultsKey.transcriptionRetentionMinutes)) minutes
+        Auto-Delete Transcriptions: \(transcriptionCleanup.isEnabled)
+        Transcription Retention: \(transcriptionCleanup.retentionMinutes) minutes
         Auto-Delete Audio Files: \(UserDefaults.standard.bool(forKey: "IsAudioCleanupEnabled"))
         Audio Retention Period: \(UserDefaults.standard.integer(forKey: "AudioRetentionPeriod")) days
 

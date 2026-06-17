@@ -200,6 +200,54 @@ public enum VoiceInkAIEnhancementRequestPreference {
     }
 }
 
+public struct VoiceInkTranscriptionAutoCleanupConfiguration: Equatable, Sendable {
+    public let isEnabled: Bool
+    public let retentionMinutes: Int
+
+    public init(isEnabled: Bool, retentionMinutes: Int) {
+        self.isEnabled = isEnabled
+        self.retentionMinutes = retentionMinutes
+    }
+
+    public var effectiveRetentionMinutes: Int {
+        max(retentionMinutes, 0)
+    }
+
+    public var shouldDeleteCompletedTranscriptionImmediately: Bool {
+        retentionMinutes <= 0
+    }
+
+    public func cutoffDate(from referenceDate: Date = Date()) -> Date {
+        referenceDate.addingTimeInterval(TimeInterval(-effectiveRetentionMinutes * 60))
+    }
+}
+
+public enum VoiceInkTranscriptionAutoCleanupPreference {
+    public static func current(from defaults: UserDefaults = .standard) -> VoiceInkTranscriptionAutoCleanupConfiguration {
+        VoiceInkTranscriptionAutoCleanupConfiguration(
+            isEnabled: isEnabled(from: defaults),
+            retentionMinutes: retentionMinutes(from: defaults)
+        )
+    }
+
+    public static func isEnabled(from defaults: UserDefaults = .standard) -> Bool {
+        defaults.bool(forKey: VoiceInkUserDefaultsKey.isTranscriptionCleanupEnabled)
+    }
+
+    public static func saveIsEnabled(_ isEnabled: Bool, to defaults: UserDefaults = .standard) {
+        defaults.set(isEnabled, forKey: VoiceInkUserDefaultsKey.isTranscriptionCleanupEnabled)
+    }
+
+    public static func retentionMinutes(from defaults: UserDefaults = .standard) -> Int {
+        defaults.object(forKey: VoiceInkUserDefaultsKey.transcriptionRetentionMinutes) as? Int
+            ?? VoiceInkPreferenceDefault.transcriptionRetentionMinutes
+    }
+
+    public static func saveRetentionMinutes(_ minutes: Int, to defaults: UserDefaults = .standard) {
+        defaults.set(minutes, forKey: VoiceInkUserDefaultsKey.transcriptionRetentionMinutes)
+    }
+}
+
 public enum VoiceInkModeStorage {
     public static func saveModes(
         _ modes: [Mode],

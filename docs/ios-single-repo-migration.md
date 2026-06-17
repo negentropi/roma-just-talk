@@ -54,6 +54,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - short post-processing skip policy, stored skip configuration, and storage defaults for brief transcripts; platform shells still own UI controls and whether to apply the policy
 - AI-enhancement timeout/retry storage keys, defaults, and runtime preference reads; platform shells still own request execution, provider transport, logging, and UI controls
 - AI-enhancement selected-provider and per-provider selected-model preference storage, including legacy selected-provider repair; platform shells still own provider execution and dynamic model discovery
+- transcription auto-cleanup enabled/retention preference storage and cutoff-date policy; platform shells still own SwiftData deletion and settings UI bindings
 - NaturalLanguage transcript paragraph formatting policy plus text-formatting storage key/default; platform shells still own the setting UI and when formatting runs
 - word-replacement ordering and text application policy; platform shells still own dictionary storage
 - vocabulary, word-replacement, backup dictionary insert, and word-replacement edit planning; platform shells still own dictionary storage and persistence errors
@@ -132,6 +133,7 @@ Current macOS consumers of shared remote transport:
 - macOS `AIEnhancementService` reads request timeout and retry-on-timeout through `VoiceInkAIEnhancementRequestPreference`; SwiftUI setting controls still bind directly through `@AppStorage`.
 - macOS `TranscriptionModelManager`, `PowerModeConfig`, `SystemInfoService`, and `StreamingKeysMigration` use `VoiceInkCurrentTranscriptionModelPreference` for the selected transcription model; the legacy `"CurrentModel"` cleanup remains macOS shell migration code.
 - macOS `AIService`, `PowerModeConfig`, `PowerModeConfigView`, and `SystemInfoService` use `VoiceInkAIEnhancementProviderPreference` for selected AI provider/model storage; macOS still owns API-key lookup, Ollama/OpenRouter dynamic state, and provider execution.
+- macOS `TranscriptionAutoCleanupService`, `ImportExportService`, `BackupImporter`, `SystemInfoService`, and app startup read/write transcription auto-cleanup preferences through `VoiceInkTranscriptionAutoCleanupPreference`; settings UI still binds directly through `@AppStorage`.
 - iOS retry post-processing inherits `VoiceInkAIReasoningConfig` through `VoiceInkPostProcessingClient`, aligning OpenAI-compatible reasoning controls with macOS enhancement requests.
 
 Current iOS consumers of shared remote transport:

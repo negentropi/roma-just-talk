@@ -27,7 +27,7 @@ class TranscriptionAutoCleanupService {
             object: nil
         )
 
-        if UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.isTranscriptionCleanupEnabled) {
+        if VoiceInkTranscriptionAutoCleanupPreference.isEnabled() {
             Task { [weak self] in
                 guard let self = self, let modelContext = self.modelContext else { return }
                 await self.sweepOldTranscriptions(modelContext: modelContext)
@@ -45,11 +45,10 @@ class TranscriptionAutoCleanupService {
     }
 
     @objc private func handleTranscriptionCompleted(_ notification: Notification) {
-        let isEnabled = UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.isTranscriptionCleanupEnabled)
-        guard isEnabled else { return }
+        let cleanupConfiguration = VoiceInkTranscriptionAutoCleanupPreference.current()
+        guard cleanupConfiguration.isEnabled else { return }
 
-        let minutes = UserDefaults.standard.integer(forKey: VoiceInkUserDefaultsKey.transcriptionRetentionMinutes)
-        if minutes > 0 {
+        if !cleanupConfiguration.shouldDeleteCompletedTranscriptionImmediately {
             if let modelContext = self.modelContext {
                 Task { [weak self] in
                     guard let self = self else { return }
@@ -84,14 +83,12 @@ class TranscriptionAutoCleanupService {
     }
 
     private func sweepOldTranscriptions(modelContext: ModelContext) async {
-        guard UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.isTranscriptionCleanupEnabled) else {
+        let cleanupConfiguration = VoiceInkTranscriptionAutoCleanupPreference.current()
+        guard cleanupConfiguration.isEnabled else {
             return
         }
 
-        let retentionMinutes = UserDefaults.standard.integer(forKey: VoiceInkUserDefaultsKey.transcriptionRetentionMinutes)
-        let effectiveMinutes = max(retentionMinutes, 0)
-
-        let cutoffDate = Date().addingTimeInterval(TimeInterval(-effectiveMinutes * 60))
+        let cutoffDate = cleanupConfiguration.cutoffDate()
 
         let modelContainer = await MainActor.run { modelContext.container }
 
@@ -126,7 +123,7 @@ class TranscriptionAutoCleanupService {
 
     /// Deletes audio files in Recordings directory that have no corresponding Transcription record
     private func cleanupOrphanAudioFiles(modelContext: ModelContext) async {
-        guard UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.isTranscriptionCleanupEnabled) else {
+        guard VoiceInkTranscriptionAutoCleanupPreference.isEnabled() else {
             return
         }
 

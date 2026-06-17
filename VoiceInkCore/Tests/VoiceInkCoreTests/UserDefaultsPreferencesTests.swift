@@ -313,6 +313,52 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testTranscriptionAutoCleanupPreferenceUsesSharedDefaultsWhenUnset() {
+        withIsolatedDefaults { defaults in
+            let configuration = VoiceInkTranscriptionAutoCleanupPreference.current(from: defaults)
+
+            XCTAssertFalse(configuration.isEnabled)
+            XCTAssertEqual(configuration.retentionMinutes, VoiceInkPreferenceDefault.transcriptionRetentionMinutes)
+            XCTAssertEqual(configuration.effectiveRetentionMinutes, VoiceInkPreferenceDefault.transcriptionRetentionMinutes)
+            XCTAssertFalse(configuration.shouldDeleteCompletedTranscriptionImmediately)
+        }
+    }
+
+    func testTranscriptionAutoCleanupPreferenceReadsStoredValues() {
+        withIsolatedDefaults { defaults in
+            VoiceInkTranscriptionAutoCleanupPreference.saveIsEnabled(true, to: defaults)
+            VoiceInkTranscriptionAutoCleanupPreference.saveRetentionMinutes(15, to: defaults)
+
+            let configuration = VoiceInkTranscriptionAutoCleanupPreference.current(from: defaults)
+
+            XCTAssertTrue(configuration.isEnabled)
+            XCTAssertEqual(configuration.retentionMinutes, 15)
+            XCTAssertEqual(configuration.effectiveRetentionMinutes, 15)
+        }
+    }
+
+    func testTranscriptionAutoCleanupConfigurationClampsNegativeRetentionForCutoff() {
+        let configuration = VoiceInkTranscriptionAutoCleanupConfiguration(
+            isEnabled: true,
+            retentionMinutes: -5
+        )
+        let referenceDate = Date(timeIntervalSince1970: 1_000)
+
+        XCTAssertEqual(configuration.effectiveRetentionMinutes, 0)
+        XCTAssertTrue(configuration.shouldDeleteCompletedTranscriptionImmediately)
+        XCTAssertEqual(configuration.cutoffDate(from: referenceDate), referenceDate)
+    }
+
+    func testTranscriptionAutoCleanupConfigurationBuildsCutoffDate() {
+        let configuration = VoiceInkTranscriptionAutoCleanupConfiguration(
+            isEnabled: true,
+            retentionMinutes: 30
+        )
+        let referenceDate = Date(timeIntervalSince1970: 3_600)
+
+        XCTAssertEqual(configuration.cutoffDate(from: referenceDate), Date(timeIntervalSince1970: 1_800))
+    }
+
     func testModeStorageRoundTripsModesAndSelectedModeId() {
         withIsolatedDefaults { defaults in
             let localMode = Mode.defaultLocalWhisper(name: "Local")

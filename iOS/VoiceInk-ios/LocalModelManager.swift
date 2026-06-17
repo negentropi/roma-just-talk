@@ -9,8 +9,6 @@ import Foundation
 import Combine
 import VoiceInkCore
 
-typealias WhisperModel = VoiceInkWhisperModelFileSpec
-
 extension VoiceInkWhisperModelFileSpec {
     var name: String { modelName }
     var fileURL: URL {
@@ -55,7 +53,7 @@ class LocalModelManager: ObservableObject {
     }
     
     /// Download a specific model
-    func downloadModel(_ model: WhisperModel) async {
+    func downloadModel(_ model: VoiceInkWhisperModelFileSpec) async {
         guard !isDownloading[model.id, default: false] else {
             print("LocalModelManager: Model \(model.name) is already being downloaded")
             return
@@ -91,7 +89,7 @@ class LocalModelManager: ObservableObject {
     }
     
     private func handleDownloadCompletion(
-        for model: WhisperModel,
+        for model: VoiceInkWhisperModelFileSpec,
         temporaryURL: URL?,
         response: URLResponse?,
         error: Error?
@@ -143,7 +141,7 @@ class LocalModelManager: ObservableObject {
     }
     
     /// Cancel download for a specific model
-    func cancelDownload(for model: WhisperModel) {
+    func cancelDownload(for model: VoiceInkWhisperModelFileSpec) {
         downloadTasks[model.id]?.cancel()
         downloadTasks[model.id] = nil
         progressObservations[model.id] = nil
@@ -152,7 +150,7 @@ class LocalModelManager: ObservableObject {
     }
     
     /// Delete a downloaded model
-    func deleteModel(_ model: WhisperModel) throws {
+    func deleteModel(_ model: VoiceInkWhisperModelFileSpec) throws {
         guard model.isDownloaded else { 
             print("LocalModelManager: Model \(model.name) is not downloaded")
             return 
@@ -184,7 +182,7 @@ class LocalModelManager: ObservableObject {
     }
     
     /// Get the first available model for transcription
-    var firstAvailableModel: WhisperModel? {
+    var firstAvailableModel: VoiceInkWhisperModelFileSpec? {
         VoiceInkWhisperModelFiles.bootstrapModels.first { $0.isDownloaded }
     }
     

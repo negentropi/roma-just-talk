@@ -11,8 +11,6 @@ import VoiceInkCore
 
 struct LocalModelManagementView: View {
     @StateObject private var modelManager = LocalModelManager.shared
-    @State private var showingDownloadAlert = false
-    @State private var selectedModel: WhisperModel?
     
     var body: some View {
         List {
@@ -41,7 +39,7 @@ struct LocalModelManagementView: View {
 }
 
 struct ModelRowView: View {
-    let model: WhisperModel
+    let model: VoiceInkWhisperModelFileSpec
     @ObservedObject var modelManager: LocalModelManager
     @State private var showingDeleteAlert = false
     @State private var showingDownloadConfirmation = false

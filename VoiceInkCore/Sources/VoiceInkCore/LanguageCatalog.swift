@@ -205,6 +205,10 @@ public enum VoiceInkLanguageCatalog {
             return englishOnly
         }
 
+        if provider == .local {
+            return whisperLanguages()
+        }
+
         guard let codes = provider.languageCodes else {
             return all
         }
@@ -214,6 +218,20 @@ public enum VoiceInkLanguageCatalog {
             filtered[autoDetectCode] = autoDetectName
         }
         return filtered
+    }
+
+    public static func languages(
+        for provider: VoiceInkProviderKind,
+        isMultilingual: Bool = true
+    ) -> [String: String] {
+        guard isMultilingual else {
+            return englishOnly
+        }
+
+        guard let modelProvider = provider.transcriptionModelProvider else {
+            return all
+        }
+        return languages(for: modelProvider)
     }
 }
 
@@ -264,5 +282,29 @@ public enum VoiceInkTranscriptionLanguageSupport {
         return languages.keys.sorted { lhs, rhs in
             languages[lhs, default: lhs] < languages[rhs, default: rhs]
         }.first ?? "en"
+    }
+
+    public static func validLanguageOrFallback(
+        _ language: String?,
+        provider: VoiceInkProviderKind,
+        isMultilingual: Bool = true
+    ) -> String {
+        validLanguageOrFallback(
+            language,
+            languages: VoiceInkLanguageCatalog.languages(
+                for: provider,
+                isMultilingual: isMultilingual
+            )
+        )
+    }
+
+    public static func requestLanguage(_ language: String?) -> String? {
+        guard let language = language?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !language.isEmpty,
+              language != VoiceInkLanguageCatalog.autoDetectCode else {
+            return nil
+        }
+
+        return language
     }
 }

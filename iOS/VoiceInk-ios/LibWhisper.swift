@@ -32,12 +32,12 @@ actor WhisperContext {
         }
     }
 
-    func fullTranscribe(samples: [Float]) -> Bool {
+    func fullTranscribe(samples: [Float], language: String?) -> Bool {
         guard let context = context else { return false }
         
         var params = whisper_full_default_params(WHISPER_SAMPLING_GREEDY)
         
-        params.language = nil
+        let languageCString = language.map { Array($0.utf8CString) }
         
         params.print_realtime = true
         params.print_progress = false
@@ -71,11 +71,24 @@ actor WhisperContext {
         }
         
         var success = true
-        samples.withUnsafeBufferPointer { samplesBuffer in
-            if whisper_full(context, params, samplesBuffer.baseAddress, Int32(samplesBuffer.count)) != 0 {
-                logger.error("Failed to run whisper_full. VAD enabled: \(params.vad)")
-                success = false
+
+        func runWhisper() {
+            samples.withUnsafeBufferPointer { samplesBuffer in
+                if whisper_full(context, params, samplesBuffer.baseAddress, Int32(samplesBuffer.count)) != 0 {
+                    logger.error("Failed to run whisper_full. VAD enabled: \(params.vad)")
+                    success = false
+                }
             }
+        }
+
+        if let languageCString {
+            languageCString.withUnsafeBufferPointer { languageBuffer in
+                params.language = languageBuffer.baseAddress
+                runWhisper()
+            }
+        } else {
+            params.language = nil
+            runWhisper()
         }
         
         return success

@@ -9,6 +9,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkUserDefaultsKey.fillerWords, "FillerWords")
         XCTAssertEqual(VoiceInkUserDefaultsKey.modes, "modes")
         XCTAssertEqual(VoiceInkUserDefaultsKey.selectedModeId, "selectedModeId")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.selectedTranscriptionLanguage, "SelectedLanguage")
         XCTAssertEqual(VoiceInkUserDefaultsKey.audioSessionTimeoutSeconds, "audioSessionTimeoutSeconds")
     }
 

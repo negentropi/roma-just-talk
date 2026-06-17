@@ -55,7 +55,10 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
         }
         
         // Perform transcription
-        let success = await context.fullTranscribe(samples: audioSamples)
+        let success = await context.fullTranscribe(
+            samples: audioSamples,
+            language: VoiceInkTranscriptionLanguageSupport.requestLanguage(language)
+        )
         
         if success {
             let transcription = await context.getTranscription()

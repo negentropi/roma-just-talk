@@ -37,18 +37,26 @@ final class LanguageCatalogTests: XCTestCase {
     }
 
     func testProviderLanguagesPreserveCloudProviderPolicies() {
-        let groq = VoiceInkLanguageCatalog.languages(for: .groq)
+        let groq = VoiceInkLanguageCatalog.languages(for: VoiceInkTranscriptionModelProvider.groq)
         XCTAssertEqual(groq["auto"], "Auto-detect")
         XCTAssertEqual(groq["zu"], "Zulu")
 
-        let deepgram = VoiceInkLanguageCatalog.languages(for: .deepgram)
+        let deepgram = VoiceInkLanguageCatalog.languages(for: VoiceInkTranscriptionModelProvider.deepgram)
         XCTAssertEqual(deepgram["auto"], "Auto-detect")
         XCTAssertEqual(deepgram["ar"], "Arabic")
         XCTAssertNil(deepgram["zu"])
 
-        let cartesia = VoiceInkLanguageCatalog.languages(for: .cartesia)
+        let cartesia = VoiceInkLanguageCatalog.languages(for: VoiceInkTranscriptionModelProvider.cartesia)
         XCTAssertNil(cartesia["auto"])
         XCTAssertEqual(cartesia["zu"], "Zulu")
+    }
+
+    func testProviderKindLanguagesExposeLocalWhisperPolicy() {
+        let local = VoiceInkLanguageCatalog.languages(for: VoiceInkProviderKind.localWhisper)
+
+        XCTAssertEqual(local["auto"], "Auto-detect")
+        XCTAssertEqual(local["yue"], "Cantonese")
+        XCTAssertNil(local["zu"])
     }
 
     func testAssemblyAILanguagesPreserveRealtimeAndBatchPolicies() {
@@ -93,5 +101,30 @@ final class LanguageCatalogTests: XCTestCase {
             ),
             "aa"
         )
+    }
+
+    func testValidLanguageOrFallbackSupportsProviderKindLanguages() {
+        XCTAssertEqual(
+            VoiceInkTranscriptionLanguageSupport.validLanguageOrFallback(
+                "zu",
+                provider: .localWhisper
+            ),
+            "auto"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptionLanguageSupport.validLanguageOrFallback(
+                "zu",
+                provider: .elevenLabs
+            ),
+            "zu"
+        )
+    }
+
+    func testRequestLanguageStripsAutoAndBlankValues() {
+        XCTAssertNil(VoiceInkTranscriptionLanguageSupport.requestLanguage(nil))
+        XCTAssertNil(VoiceInkTranscriptionLanguageSupport.requestLanguage(""))
+        XCTAssertNil(VoiceInkTranscriptionLanguageSupport.requestLanguage("  "))
+        XCTAssertNil(VoiceInkTranscriptionLanguageSupport.requestLanguage("auto"))
+        XCTAssertEqual(VoiceInkTranscriptionLanguageSupport.requestLanguage(" fr "), "fr")
     }
 }

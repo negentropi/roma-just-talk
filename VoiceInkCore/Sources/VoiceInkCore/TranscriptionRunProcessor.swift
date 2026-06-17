@@ -89,6 +89,7 @@ public struct VoiceInkTranscriptionRunProcessor {
         fileURL: URL,
         configuration: VoiceInkModeRuntimeConfiguration,
         cleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration = .disabled,
+        transcriptionLanguage: String? = nil,
         apiKeyProvider: APIKeyProvider,
         transcriptionServiceProvider: TranscriptionServiceProvider
     ) async throws -> VoiceInkTranscriptionRunResult {
@@ -105,7 +106,7 @@ public struct VoiceInkTranscriptionRunProcessor {
             apiKey: apiKey,
             model: model,
             fileURL: fileURL,
-            language: nil
+            language: VoiceInkTranscriptionLanguageSupport.requestLanguage(transcriptionLanguage)
         )
 
         let filteredText = VoiceInkTranscriptionOutputFilter.filter(

@@ -2,6 +2,7 @@
 
 ## v1.94 - Unreleased
 
+- Added iOS transcription language selection backed by the shared language catalog, including local Whisper language hints and remote transcription request normalization.
 - Shared transcription model catalog metadata between macOS and the imported iOS app, aligning iOS Groq and Deepgram selectable transcription models with the macOS source of truth.
 - Aligned the imported iOS app's empty-mode fallback with its shared local Whisper default instead of falling back to a Groq API-key path.
 - Replaced the misaligned silence-filter path with rolling buffer preload controls that use local VAD to pre-run supported STT before capture finalization, independent from final/batch transcription VAD.

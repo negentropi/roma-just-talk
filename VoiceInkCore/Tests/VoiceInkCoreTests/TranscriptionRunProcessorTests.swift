@@ -69,6 +69,42 @@ final class TranscriptionRunProcessorTests: XCTestCase {
         XCTAssertTrue(result.postProcessingSucceeded)
     }
 
+    func testTranscribePassesSelectedLanguageToTranscriptionService() async throws {
+        let service = CapturingTranscriptionService(text: "bonjour")
+        let processor = VoiceInkTranscriptionRunProcessor { _ in
+            XCTFail("Post-processing should not run")
+            return "unexpected"
+        }
+
+        _ = try await processor.transcribe(
+            fileURL: URL(fileURLWithPath: "/tmp/audio.wav"),
+            configuration: configuration(isPostProcessingEnabled: false),
+            transcriptionLanguage: "fr",
+            apiKeyProvider: { _ in "key" },
+            transcriptionServiceProvider: { _ in service }
+        )
+
+        XCTAssertEqual(service.capturedLanguage, "fr")
+    }
+
+    func testTranscribeTreatsAutoLanguageAsDetection() async throws {
+        let service = CapturingTranscriptionService(text: "hello")
+        let processor = VoiceInkTranscriptionRunProcessor { _ in
+            XCTFail("Post-processing should not run")
+            return "unexpected"
+        }
+
+        _ = try await processor.transcribe(
+            fileURL: URL(fileURLWithPath: "/tmp/audio.wav"),
+            configuration: configuration(isPostProcessingEnabled: false),
+            transcriptionLanguage: "auto",
+            apiKeyProvider: { _ in "key" },
+            transcriptionServiceProvider: { _ in service }
+        )
+
+        XCTAssertNil(service.capturedLanguage)
+    }
+
     func testTranscribeRunsPostProcessingWhenEnabledWithPromptAndKey() async throws {
         let processor = VoiceInkTranscriptionRunProcessor { job in
             XCTAssertEqual(job.provider, .gemini)
@@ -180,6 +216,29 @@ private struct StubTranscriptionService: VoiceInkAudioTranscriptionService {
         language: String?
     ) async throws -> String {
         text
+    }
+
+    func verifyAPIKey(_ apiKey: String) async -> Bool {
+        true
+    }
+}
+
+private final class CapturingTranscriptionService: VoiceInkAudioTranscriptionService {
+    let text: String
+    private(set) var capturedLanguage: String?
+
+    init(text: String) {
+        self.text = text
+    }
+
+    func transcribeAudioFile(
+        apiKey: String,
+        model: String,
+        fileURL: URL,
+        language: String?
+    ) async throws -> String {
+        capturedLanguage = language
+        return text
     }
 
     func verifyAPIKey(_ apiKey: String) async -> Bool {

@@ -44,7 +44,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - custom vocabulary term normalization for transcription providers; platform shells still own dictionary storage
 - custom cloud transcription model generated-name and draft validation policy; platform shells still own keychain and preferences storage
 - prompt trigger-word detection and trigger-word editing policy; platform shells still own prompt persistence and enhancement state
-- transcription language catalog, provider language filtering, AssemblyAI realtime/batch language policy, and selected-language fallback policy; platform shells still own selected-language storage and runtime streaming-mode state
+- transcription language catalog, provider language filtering, AssemblyAI realtime/batch language policy, selected-language fallback policy, selected-language request normalization, and the shared selected-language defaults key; platform shells still own selected-language storage/UI and runtime streaming-mode state
 - stored audio-file path resolution, existing-file lookup, recordings directory, and file URL construction
 - duration presentation
 - relative timestamp presentation
@@ -78,6 +78,7 @@ Current iOS consumers of shared remote transport:
 - `iOS/VoiceInk-ios/TranscriptionServiceFactory.swift` creates `VoiceInkRemoteTranscriptionService` for every remote `VoiceInkProviderKind`.
 - `VoiceInkRemoteTranscriptionService` dispatches Groq/OpenAI/Cerebras, Deepgram, Gemini, Mistral, ElevenLabs, Soniox, Speechmatics, AssemblyAI, and xAI through shared core clients.
 - `iOS/VoiceInk-ios/TranscriptionRetryService.swift` routes iOS transcription through `VoiceInkTranscriptionRunProcessor`, including shared output filtering and cleanup preferences from `AppSettings`.
+- `iOS/VoiceInk-ios/TranscriptionRetryService.swift` passes the iOS selected transcription language through `VoiceInkTranscriptionRunProcessor`, which normalizes auto-detect before remote/local transcription adapters receive it.
 - `iOS/VoiceInk-ios/ProviderAPIKeyView.swift` verifies provider keys through `VoiceInkProviderAPIKeyVerifier`.
 - `iOS/VoiceInk-ios/WhisperTranscriptionService.swift` throws `VoiceInkEngineError` from `VoiceInkCore` instead of owning a separate iOS-only local Whisper error enum.
 - Cartesia remains absent from iOS transcription provider selection until an iOS streaming adapter exists; it is not a batch provider.

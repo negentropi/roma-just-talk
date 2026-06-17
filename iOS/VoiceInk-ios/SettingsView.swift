@@ -48,6 +48,14 @@ struct SettingsView: View {
                 }
             }
 
+            Section(header: Text("Transcription Language")) {
+                Picker("Language", selection: selectedLanguageBinding) {
+                    ForEach(sortedTranscriptionLanguages, id: \.key) { language in
+                        Text(language.value).tag(language.key)
+                    }
+                }
+            }
+
             Section(header: Text("Transcription Cleanup")) {
                 Picker("Punctuation", selection: $settings.punctuationCleanupMode) {
                     ForEach(PunctuationCleanupMode.allCases) { mode in
@@ -95,6 +103,24 @@ struct SettingsView: View {
             #endif
         }
         .navigationTitle("Settings")
+        .onAppear {
+            settings.repairSelectedTranscriptionLanguage()
+        }
+    }
+
+    private var sortedTranscriptionLanguages: [(key: String, value: String)] {
+        settings.availableTranscriptionLanguages.sorted { lhs, rhs in
+            if lhs.key == VoiceInkLanguageCatalog.autoDetectCode { return true }
+            if rhs.key == VoiceInkLanguageCatalog.autoDetectCode { return false }
+            return lhs.value < rhs.value
+        }
+    }
+
+    private var selectedLanguageBinding: Binding<String> {
+        Binding(
+            get: { settings.selectedTranscriptionLanguage },
+            set: { settings.setSelectedTranscriptionLanguage($0) }
+        )
     }
     
     private func deleteMode(at offsets: IndexSet) {

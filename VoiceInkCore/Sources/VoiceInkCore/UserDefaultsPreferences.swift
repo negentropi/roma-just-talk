@@ -7,6 +7,7 @@ public enum VoiceInkUserDefaultsKey {
     public static let fillerWords = "FillerWords"
     public static let modes = "modes"
     public static let selectedModeId = "selectedModeId"
+    public static let selectedTranscriptionLanguage = "SelectedLanguage"
     public static let audioSessionTimeoutSeconds = "audioSessionTimeoutSeconds"
 }
 

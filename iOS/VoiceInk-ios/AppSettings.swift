@@ -11,11 +11,15 @@ final class AppSettings: ObservableObject {
         didSet {
             VoiceInkModeStorage.saveModes(modes)
             repairSelectedModeId()
+            repairSelectedTranscriptionLanguage()
         }
     }
     
     @Published var selectedModeId: UUID? {
-        didSet { VoiceInkModeStorage.saveSelectedModeId(selectedModeId) }
+        didSet {
+            VoiceInkModeStorage.saveSelectedModeId(selectedModeId)
+            repairSelectedTranscriptionLanguage()
+        }
     }
     
     var selectedMode: Mode? {
@@ -36,6 +40,12 @@ final class AppSettings: ObservableObject {
 
     @Published var lowercaseTranscription: Bool {
         didSet { UserDefaults.standard.set(lowercaseTranscription, forKey: VoiceInkUserDefaultsKey.lowercaseTranscription) }
+    }
+
+    @Published var selectedTranscriptionLanguage: String {
+        didSet {
+            UserDefaults.standard.set(selectedTranscriptionLanguage, forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
+        }
     }
 
     private init() {
@@ -59,8 +69,11 @@ final class AppSettings: ObservableObject {
         PunctuationCleanupMode.migrateLegacyUserDefaultIfNeeded()
         self.punctuationCleanupMode = PunctuationCleanupMode.current()
         self.lowercaseTranscription = UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.lowercaseTranscription)
+        self.selectedTranscriptionLanguage = UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
+            ?? VoiceInkLanguageCatalog.autoDetectCode
 
         repairSelectedModeId()
+        repairSelectedTranscriptionLanguage()
     }
 
     func apiKey(for provider: VoiceInkProviderKind) -> String {
@@ -123,6 +136,29 @@ final class AppSettings: ObservableObject {
             punctuationMode: punctuationCleanupMode,
             shouldLowercase: lowercaseTranscription
         )
+    }
+
+    var availableTranscriptionLanguages: [String: String] {
+        guard let provider = selectedMode?.transcriptionProvider else {
+            return VoiceInkLanguageCatalog.whisperLanguages()
+        }
+        return VoiceInkLanguageCatalog.languages(for: provider)
+    }
+
+    func setSelectedTranscriptionLanguage(_ language: String) {
+        selectedTranscriptionLanguage = language
+        repairSelectedTranscriptionLanguage()
+    }
+
+    func repairSelectedTranscriptionLanguage() {
+        let compatibleLanguage = VoiceInkTranscriptionLanguageSupport.validLanguageOrFallback(
+            selectedTranscriptionLanguage,
+            languages: availableTranscriptionLanguages
+        )
+
+        if selectedTranscriptionLanguage != compatibleLanguage {
+            selectedTranscriptionLanguage = compatibleLanguage
+        }
     }
 
     func ensureDefaultModeExists() {
@@ -194,6 +230,8 @@ final class AppSettings: ObservableObject {
         UserDefaults.standard.removeObject(forKey: PunctuationCleanupMode.userDefaultsKey)
         UserDefaults.standard.set(false, forKey: PunctuationCleanupMode.legacyRemovePunctuationKey)
         UserDefaults.standard.removeObject(forKey: VoiceInkUserDefaultsKey.lowercaseTranscription)
+        selectedTranscriptionLanguage = VoiceInkLanguageCatalog.autoDetectCode
+        UserDefaults.standard.removeObject(forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
 
         // Clear API keys from memory and Keychain
         apiKeysByProvider = [:]

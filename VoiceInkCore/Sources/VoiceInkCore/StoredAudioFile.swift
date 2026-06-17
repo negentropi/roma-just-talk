@@ -51,15 +51,24 @@ public enum VoiceInkStoredAudioFile {
         resolvedURL(for: storedValue, relativeTo: recordingsDirectory)?.path
     }
 
+    public static func existingURL(
+        for storedValue: String?,
+        relativeTo recordingsDirectory: URL? = nil,
+        fileManager: FileManager = .default
+    ) -> URL? {
+        guard let url = resolvedURL(for: storedValue, relativeTo: recordingsDirectory),
+              fileManager.fileExists(atPath: url.path) else {
+            return nil
+        }
+        return url
+    }
+
     public static func fileExists(
         for storedValue: String?,
         relativeTo recordingsDirectory: URL? = nil,
         fileManager: FileManager = .default
     ) -> Bool {
-        guard let url = resolvedURL(for: storedValue, relativeTo: recordingsDirectory) else {
-            return false
-        }
-        return fileManager.fileExists(atPath: url.path)
+        existingURL(for: storedValue, relativeTo: recordingsDirectory, fileManager: fileManager) != nil
     }
 
     private static func cleanedStoredValue(_ value: String?) -> String? {

@@ -129,6 +129,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "StoredAudioFileTests.testResolvesAbsolutePath", run: { StoredAudioFileTests().testResolvesAbsolutePath() }),
             VoiceInkCoreCheck(name: "StoredAudioFileTests.testResolvesRelativeFilenameAgainstRecordingsDirectory", run: { StoredAudioFileTests().testResolvesRelativeFilenameAgainstRecordingsDirectory() }),
             VoiceInkCoreCheck(name: "StoredAudioFileTests.testRejectsBlankAndRelativeValueWithoutDirectory", run: { StoredAudioFileTests().testRejectsBlankAndRelativeValueWithoutDirectory() }),
+            VoiceInkCoreCheck(name: "StoredAudioFileTests.testExistingURLReturnsNilForMissingFile", run: { StoredAudioFileTests().testExistingURLReturnsNilForMissingFile() }),
+            VoiceInkCoreCheck(name: "StoredAudioFileTests.testExistingURLReturnsResolvedFileWhenItExists", run: { try StoredAudioFileTests().testExistingURLReturnsResolvedFileWhenItExists() }),
             VoiceInkCoreCheck(name: "TranscriptPresentationTests.testMatchesSearchReturnsTrueForEmptyQuery", run: { TranscriptPresentationTests().testMatchesSearchReturnsTrueForEmptyQuery() }),
             VoiceInkCoreCheck(name: "TranscriptPresentationTests.testMatchesSearchChecksRawTextCaseInsensitively", run: { TranscriptPresentationTests().testMatchesSearchChecksRawTextCaseInsensitively() }),
             VoiceInkCoreCheck(name: "TranscriptPresentationTests.testMatchesSearchChecksEnhancedTextCaseInsensitively", run: { TranscriptPresentationTests().testMatchesSearchChecksEnhancedTextCaseInsensitively() }),

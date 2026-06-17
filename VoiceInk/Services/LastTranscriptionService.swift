@@ -120,9 +120,7 @@ class LastTranscriptionService: ObservableObject {
     static func retryLastTranscription(from modelContext: ModelContext, transcriptionModelManager: TranscriptionModelManager, serviceRegistry: TranscriptionServiceRegistry, enhancementService: AIEnhancementService?) {
         Task { @MainActor in
             guard let lastTranscription = getLastTranscription(from: modelContext),
-                  let audioURLString = lastTranscription.audioFileURL,
-                  let audioURL = URL(string: audioURLString),
-                  FileManager.default.fileExists(atPath: audioURL.path) else {
+                  let audioURL = lastTranscription.existingAudioFileURL() else {
                 NotificationManager.shared.showNotification(
                     title: "Cannot retry: Audio file not found",
                     type: .error

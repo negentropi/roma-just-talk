@@ -414,8 +414,7 @@ struct InlineHistoryView: View {
     }
 
     private func performDeletion(for transcription: Transcription) {
-        if let url = transcription.resolvedAudioFileURL(),
-           transcription.hasStoredAudioFile() {
+        if let url = transcription.existingAudioFileURL() {
             do {
                 try FileManager.default.removeItem(at: url)
             } catch {
@@ -590,7 +589,7 @@ private struct HistoryCardRow: View {
                     .padding(8)
             }
 
-            if hasAudioFile, let url = transcription.resolvedAudioFileURL() {
+            if let url = transcription.existingAudioFileURL() {
                 Divider()
                 AudioPlayerView(url: url, transcription: transcription, onInfoTap: onShowInfo)
                 .padding(.vertical, 4)

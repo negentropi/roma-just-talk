@@ -35,8 +35,7 @@ class TranscriptionRetryService {
 
     /// Retries transcription for a given note using current app settings
     func retranscribe(note: Transcription) async throws -> String {
-        guard let fileURL = note.resolvedAudioFileURL,
-              FileManager.default.fileExists(atPath: fileURL.path) else {
+        guard let fileURL = note.existingAudioFileURL() else {
             throw VoiceInkEngineError.audioFileNotFound
         }
 

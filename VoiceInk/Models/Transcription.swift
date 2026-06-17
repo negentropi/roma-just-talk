@@ -90,14 +90,21 @@ final class Transcription {
         VoiceInkStoredAudioFile.resolvedURL(for: audioFileURL, relativeTo: recordingsDirectory)
     }
 
-    func hasStoredAudioFile(
+    func existingAudioFileURL(
         relativeTo recordingsDirectory: URL? = nil,
         fileManager: FileManager = .default
-    ) -> Bool {
-        VoiceInkStoredAudioFile.fileExists(
+    ) -> URL? {
+        VoiceInkStoredAudioFile.existingURL(
             for: audioFileURL,
             relativeTo: recordingsDirectory,
             fileManager: fileManager
         )
+    }
+
+    func hasStoredAudioFile(
+        relativeTo recordingsDirectory: URL? = nil,
+        fileManager: FileManager = .default
+    ) -> Bool {
+        existingAudioFileURL(relativeTo: recordingsDirectory, fileManager: fileManager) != nil
     }
 }

@@ -203,7 +203,7 @@ final class RecordingManager: ObservableObject {
     
     // MARK: - Transcription
     private func transcribeInBackground(note: Transcription, modelContext: ModelContext) {
-        guard let fileURL = note.resolvedAudioFileURL else {
+        guard let fileURL = note.existingAudioFileURL() else {
             note.transcriptionStatus = .failed
             note.transcriptionError = VoiceInkEngineError.audioFileNotFound.localizedDescription
             try? modelContext.save()

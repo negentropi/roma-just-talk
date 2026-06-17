@@ -81,21 +81,16 @@ struct NoteDetailView: View {
     }
     
     private var hasAudioFile: Bool {
-        guard let audioURL = note.resolvedAudioFileURL,
-              FileManager.default.fileExists(atPath: audioURL.path) else {
-            return false
-        }
-        return true
+        note.hasStoredAudioFile()
     }
 
     // Summary card removed per design feedback
     
     private var bottomAudioPlayer: some View {
         VStack(spacing: 0) {
-            if let audioURL = note.resolvedAudioFileURL,
-               FileManager.default.fileExists(atPath: audioURL.path) {
+            if let audioURL = note.existingAudioFileURL() {
                 AudioPlayerView(audioFilePath: audioURL.path, duration: note.duration, timestamp: note.timestamp)
-            } else if note.audioFileURL != nil && !note.audioFileURL!.isEmpty {
+            } else if let audioFileURL = note.audioFileURL, !audioFileURL.isEmpty {
                 // Modern error state - file missing
                 HStack(spacing: 12) {
                     Circle()

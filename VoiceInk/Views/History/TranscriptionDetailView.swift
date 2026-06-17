@@ -4,10 +4,6 @@ struct TranscriptionDetailView: View {
     let transcription: Transcription
     var onInfoTap: (() -> Void)?
 
-    private var hasAudioFile: Bool {
-        transcription.hasStoredAudioFile()
-    }
-
     var body: some View {
         VStack(spacing: 12) {
             ScrollView {
@@ -29,7 +25,7 @@ struct TranscriptionDetailView: View {
                 .padding(16)
             }
 
-            if hasAudioFile, let url = transcription.resolvedAudioFileURL() {
+            if let url = transcription.existingAudioFileURL() {
                 VStack(spacing: 0) {
                     Divider()
 

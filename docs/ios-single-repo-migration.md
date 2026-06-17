@@ -34,7 +34,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - API-key environment-reference resolution and provider runtime-key lookup/fallback policy
 - AI reasoning temperature, effort, and provider-specific hidden-reasoning request parameters for OpenAI-compatible post-processing
 - AI-enhancement provider identity, persisted-name parsing, API-key requirement, text-enhancement selectability, connected-provider selection policy, storage keys, model-selection key naming, and mapping to shared model providers; platform shells still own storage and execution
-- AI-enhancement API-key verification transport metadata; macOS still owns concrete verification clients
+- AI-enhancement API-key verification route metadata; native provider checks use shared verifier clients while macOS keeps model-specific Anthropic/OpenRouter/OpenAI-compatible verification
 - AI-enhancement model defaults, static model lists, and selected-model fallback policy for macOS AI providers; platform shells still own dynamic providers such as Ollama, OpenRouter fetching, Local CLI, and Custom
 - AI-enhancement provider request endpoints and API-key console URLs for macOS AI providers; platform shells still own provider UI and request execution
 - dynamic AI-provider preference storage for Ollama base URL/model, Custom provider base URL/model, and cached OpenRouter models; platform shells still own provider execution, network refresh, and UI state

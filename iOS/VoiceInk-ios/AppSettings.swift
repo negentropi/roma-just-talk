@@ -51,9 +51,7 @@ final class AppSettings: ObservableObject {
                 (provider, Self.loadAPIKey(for: provider))
             }
         )
-        self.verifiedAPIKeyProviders = Set(
-            VoiceInkProviderKind.userAPIKeyProviders.filter { Self.loadKeyVerified(for: $0) }
-        )
+        self.verifiedAPIKeyProviders = VoiceInkProviderAPIKeyVerificationState.verifiedProviders()
         
         // Load audio session timeout (default: 90 seconds)
         self.audioSessionTimeoutSeconds = UserDefaults.standard.object(forKey: VoiceInkUserDefaultsKey.audioSessionTimeoutSeconds) as? Int
@@ -101,7 +99,7 @@ final class AppSettings: ObservableObject {
         } else {
             verifiedAPIKeyProviders.remove(provider)
         }
-        saveKeyVerified(verified, for: provider)
+        VoiceInkProviderAPIKeyVerificationState.setVerified(verified, for: provider)
     }
 
 
@@ -173,21 +171,6 @@ final class AppSettings: ObservableObject {
         _ = KeychainService.delete(key: account)
     }
 
-    private func saveKeyVerified(_ verified: Bool, for provider: VoiceInkProviderKind) {
-        guard let key = provider.apiKeyVerificationStateKey else { return }
-        UserDefaults.standard.set(verified, forKey: key)
-    }
-
-    private static func loadKeyVerified(for provider: VoiceInkProviderKind) -> Bool {
-        guard let key = provider.apiKeyVerificationStateKey else { return false }
-        return UserDefaults.standard.bool(forKey: key)
-    }
-
-    private static func clearKeyVerified(for provider: VoiceInkProviderKind) {
-        guard let key = provider.apiKeyVerificationStateKey else { return }
-        UserDefaults.standard.removeObject(forKey: key)
-    }
-
     // MARK: - Debug Reset
     /// Remove all persisted preferences, API keys, and modes.
     func resetAll() {
@@ -199,7 +182,7 @@ final class AppSettings: ObservableObject {
 
         // Clear verification flags
         verifiedAPIKeyProviders = []
-        VoiceInkProviderKind.userAPIKeyProviders.forEach(Self.clearKeyVerified)
+        VoiceInkProviderAPIKeyVerificationState.clearAll()
         
         // Reset audio session timeout to default
         audioSessionTimeoutSeconds = VoiceInkPreferenceDefault.audioSessionTimeoutSeconds

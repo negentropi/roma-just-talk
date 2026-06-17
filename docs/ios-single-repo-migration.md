@@ -25,6 +25,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - post-processing request construction and output filtering
 - provider catalog, provider endpoints, API key account names, and provider readiness policy
 - provider API-key verification dispatch
+- provider API-key verification flag storage
 - API-key environment-reference resolution
 - transcription and AI model catalogs
 - remote transcription provider dispatch for iOS retry transcription

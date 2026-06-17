@@ -58,3 +58,53 @@ public enum VoiceInkModeStorage {
         defaults.removeObject(forKey: VoiceInkUserDefaultsKey.selectedModeId)
     }
 }
+
+public enum VoiceInkProviderAPIKeyVerificationState {
+    public static func verifiedProviders(
+        from providers: [VoiceInkProviderKind] = VoiceInkProviderKind.userAPIKeyProviders,
+        in defaults: UserDefaults = .standard
+    ) -> Set<VoiceInkProviderKind> {
+        Set(providers.filter { isVerified($0, in: defaults) })
+    }
+
+    public static func isVerified(
+        _ provider: VoiceInkProviderKind,
+        in defaults: UserDefaults = .standard
+    ) -> Bool {
+        guard let key = provider.apiKeyVerificationStateKey else {
+            return false
+        }
+
+        return defaults.bool(forKey: key)
+    }
+
+    public static func setVerified(
+        _ verified: Bool,
+        for provider: VoiceInkProviderKind,
+        in defaults: UserDefaults = .standard
+    ) {
+        guard let key = provider.apiKeyVerificationStateKey else {
+            return
+        }
+
+        defaults.set(verified, forKey: key)
+    }
+
+    public static func clear(
+        for provider: VoiceInkProviderKind,
+        in defaults: UserDefaults = .standard
+    ) {
+        guard let key = provider.apiKeyVerificationStateKey else {
+            return
+        }
+
+        defaults.removeObject(forKey: key)
+    }
+
+    public static func clearAll(
+        from providers: [VoiceInkProviderKind] = VoiceInkProviderKind.userAPIKeyProviders,
+        in defaults: UserDefaults = .standard
+    ) {
+        providers.forEach { clear(for: $0, in: defaults) }
+    }
+}

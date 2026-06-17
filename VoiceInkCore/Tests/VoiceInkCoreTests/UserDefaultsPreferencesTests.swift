@@ -57,6 +57,53 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testProviderAPIKeyVerificationStateUsesProviderKeys() {
+        withIsolatedDefaults { defaults in
+            VoiceInkProviderAPIKeyVerificationState.setVerified(true, for: .groq, in: defaults)
+
+            XCTAssertTrue(VoiceInkProviderAPIKeyVerificationState.isVerified(.groq, in: defaults))
+            XCTAssertEqual(defaults.object(forKey: "groqKeyVerified") as? Bool, true)
+        }
+    }
+
+    func testProviderAPIKeyVerificationStatePersistsFalseFlag() {
+        withIsolatedDefaults { defaults in
+            VoiceInkProviderAPIKeyVerificationState.setVerified(true, for: .deepgram, in: defaults)
+            VoiceInkProviderAPIKeyVerificationState.setVerified(false, for: .deepgram, in: defaults)
+
+            XCTAssertFalse(VoiceInkProviderAPIKeyVerificationState.isVerified(.deepgram, in: defaults))
+            XCTAssertEqual(defaults.object(forKey: "deepgramKeyVerified") as? Bool, false)
+        }
+    }
+
+    func testProviderAPIKeyVerificationStateFiltersVerifiedUserKeyProviders() {
+        withIsolatedDefaults { defaults in
+            VoiceInkProviderAPIKeyVerificationState.setVerified(true, for: .groq, in: defaults)
+            VoiceInkProviderAPIKeyVerificationState.setVerified(true, for: .voiceInk, in: defaults)
+
+            XCTAssertEqual(
+                VoiceInkProviderAPIKeyVerificationState.verifiedProviders(from: [.groq, .deepgram, .voiceInk], in: defaults),
+                [.groq]
+            )
+            XCTAssertFalse(VoiceInkProviderAPIKeyVerificationState.isVerified(.voiceInk, in: defaults))
+        }
+    }
+
+    func testProviderAPIKeyVerificationStateClearsSingleAndAllProviders() {
+        withIsolatedDefaults { defaults in
+            VoiceInkProviderAPIKeyVerificationState.setVerified(true, for: .groq, in: defaults)
+            VoiceInkProviderAPIKeyVerificationState.setVerified(true, for: .deepgram, in: defaults)
+            VoiceInkProviderAPIKeyVerificationState.clear(for: .groq, in: defaults)
+
+            XCTAssertNil(defaults.object(forKey: "groqKeyVerified"))
+            XCTAssertTrue(VoiceInkProviderAPIKeyVerificationState.isVerified(.deepgram, in: defaults))
+
+            VoiceInkProviderAPIKeyVerificationState.clearAll(from: [.groq, .deepgram], in: defaults)
+
+            XCTAssertNil(defaults.object(forKey: "deepgramKeyVerified"))
+        }
+    }
+
     private func withIsolatedDefaults(_ run: (UserDefaults) -> Void) {
         let suiteName = "VoiceInkCore.UserDefaultsPreferencesTests.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!

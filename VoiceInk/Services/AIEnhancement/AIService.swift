@@ -12,11 +12,11 @@ extension AIProvider {
 
         switch self {
         case .ollama:
-            return UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.ollamaBaseURL) ?? VoiceInkPreferenceDefault.ollamaBaseURL
+            return VoiceInkDynamicAIProviderPreference.ollamaBaseURL()
         case .localCLI:
             return ""
         case .custom:
-            return UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.customProviderBaseURL) ?? ""
+            return VoiceInkDynamicAIProviderPreference.customProviderBaseURL()
         case .anthropic, .assemblyAI, .cerebras, .deepgram, .elevenLabs, .groq, .gemini, .mistral, .openAI, .openRouter, .soniox, .speechmatics:
             preconditionFailure("Core-backed providers should return from VoiceInkProviderEndpoint")
         }
@@ -29,11 +29,11 @@ extension AIProvider {
 
         switch self {
         case .ollama:
-            return UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.ollamaSelectedModel) ?? "mistral"
+            return VoiceInkDynamicAIProviderPreference.ollamaSelectedModel(fallback: "mistral")
         case .localCLI:
             return "local-cli"
         case .custom:
-            return UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.customProviderModel) ?? ""
+            return VoiceInkDynamicAIProviderPreference.customProviderModel()
         case .anthropic, .assemblyAI, .cerebras, .deepgram, .elevenLabs, .groq, .gemini, .mistral, .openAI, .openRouter, .soniox, .speechmatics:
             preconditionFailure("Core-backed providers should return from VoiceInkAIModelCatalog")
         }
@@ -72,14 +72,14 @@ extension AIProvider {
 class AIService: ObservableObject {
     @Published var apiKey: String = ""
     @Published var isAPIKeyValid: Bool = false
-    @Published var customBaseURL: String = UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.customProviderBaseURL) ?? "" {
+    @Published var customBaseURL: String = VoiceInkDynamicAIProviderPreference.customProviderBaseURL() {
         didSet {
-            userDefaults.set(customBaseURL, forKey: VoiceInkUserDefaultsKey.customProviderBaseURL)
+            VoiceInkDynamicAIProviderPreference.saveCustomProviderBaseURL(customBaseURL, to: userDefaults)
         }
     }
-    @Published var customModel: String = UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.customProviderModel) ?? "" {
+    @Published var customModel: String = VoiceInkDynamicAIProviderPreference.customProviderModel() {
         didSet {
-            userDefaults.set(customModel, forKey: VoiceInkUserDefaultsKey.customProviderModel)
+            VoiceInkDynamicAIProviderPreference.saveCustomProviderModel(customModel, to: userDefaults)
         }
     }
     @Published var selectedProvider: AIProvider {
@@ -189,13 +189,11 @@ class AIService: ObservableObject {
     }
     
     private func loadSavedOpenRouterModels() {
-        if let savedModels = userDefaults.array(forKey: VoiceInkUserDefaultsKey.openRouterModels) as? [String] {
-            openRouterModels = savedModels
-        }
+        openRouterModels = VoiceInkDynamicAIProviderPreference.openRouterModels(from: userDefaults)
     }
     
     private func saveOpenRouterModels() {
-        userDefaults.set(openRouterModels, forKey: VoiceInkUserDefaultsKey.openRouterModels)
+        VoiceInkDynamicAIProviderPreference.saveOpenRouterModels(openRouterModels, to: userDefaults)
     }
     
     func selectModel(_ model: String) {
@@ -331,12 +329,10 @@ class AIService: ObservableObject {
     
     func updateOllamaBaseURL(_ newURL: String) {
         ollamaService.baseURL = newURL
-        userDefaults.set(newURL, forKey: VoiceInkUserDefaultsKey.ollamaBaseURL)
     }
     
     func updateSelectedOllamaModel(_ modelName: String) {
         ollamaService.selectedModel = modelName
-        userDefaults.set(modelName, forKey: VoiceInkUserDefaultsKey.ollamaSelectedModel)
     }
 
     func loadLocalCLITemplate(_ template: LocalCLITemplate) {

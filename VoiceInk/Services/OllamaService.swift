@@ -9,13 +9,13 @@ class OllamaService: ObservableObject {
     // MARK: - Published Properties
     @Published var baseURL: String {
         didSet {
-            UserDefaults.standard.set(baseURL, forKey: VoiceInkUserDefaultsKey.ollamaBaseURL)
+            VoiceInkDynamicAIProviderPreference.saveOllamaBaseURL(baseURL)
         }
     }
 
     @Published var selectedModel: String {
         didSet {
-            UserDefaults.standard.set(selectedModel, forKey: VoiceInkUserDefaultsKey.ollamaSelectedModel)
+            VoiceInkDynamicAIProviderPreference.saveOllamaSelectedModel(selectedModel)
         }
     }
 
@@ -26,8 +26,8 @@ class OllamaService: ObservableObject {
     private let defaultTemperature: Double = 0.3
 
     init() {
-        self.baseURL = UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.ollamaBaseURL) ?? Self.defaultBaseURL
-        self.selectedModel = UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.ollamaSelectedModel) ?? "llama2"
+        self.baseURL = VoiceInkDynamicAIProviderPreference.ollamaBaseURL(fallback: Self.defaultBaseURL)
+        self.selectedModel = VoiceInkDynamicAIProviderPreference.ollamaSelectedModel(fallback: "llama2")
     }
 
     private var baseURLValue: URL? {

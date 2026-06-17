@@ -208,6 +208,60 @@ public enum VoiceInkAIEnhancementProviderPreference {
     }
 }
 
+public enum VoiceInkDynamicAIProviderPreference {
+    public static func ollamaBaseURL(
+        from defaults: UserDefaults = .standard,
+        fallback: String = VoiceInkPreferenceDefault.ollamaBaseURL
+    ) -> String {
+        defaults.string(forKey: VoiceInkUserDefaultsKey.ollamaBaseURL) ?? fallback
+    }
+
+    public static func saveOllamaBaseURL(_ baseURL: String, to defaults: UserDefaults = .standard) {
+        defaults.set(baseURL, forKey: VoiceInkUserDefaultsKey.ollamaBaseURL)
+    }
+
+    public static func ollamaSelectedModel(
+        from defaults: UserDefaults = .standard,
+        fallback: String
+    ) -> String {
+        defaults.string(forKey: VoiceInkUserDefaultsKey.ollamaSelectedModel) ?? fallback
+    }
+
+    public static func saveOllamaSelectedModel(_ model: String, to defaults: UserDefaults = .standard) {
+        defaults.set(model, forKey: VoiceInkUserDefaultsKey.ollamaSelectedModel)
+    }
+
+    public static func customProviderBaseURL(
+        from defaults: UserDefaults = .standard,
+        fallback: String = ""
+    ) -> String {
+        defaults.string(forKey: VoiceInkUserDefaultsKey.customProviderBaseURL) ?? fallback
+    }
+
+    public static func saveCustomProviderBaseURL(_ baseURL: String, to defaults: UserDefaults = .standard) {
+        defaults.set(baseURL, forKey: VoiceInkUserDefaultsKey.customProviderBaseURL)
+    }
+
+    public static func customProviderModel(
+        from defaults: UserDefaults = .standard,
+        fallback: String = ""
+    ) -> String {
+        defaults.string(forKey: VoiceInkUserDefaultsKey.customProviderModel) ?? fallback
+    }
+
+    public static func saveCustomProviderModel(_ model: String, to defaults: UserDefaults = .standard) {
+        defaults.set(model, forKey: VoiceInkUserDefaultsKey.customProviderModel)
+    }
+
+    public static func openRouterModels(from defaults: UserDefaults = .standard) -> [String] {
+        defaults.stringArray(forKey: VoiceInkUserDefaultsKey.openRouterModels) ?? []
+    }
+
+    public static func saveOpenRouterModels(_ models: [String], to defaults: UserDefaults = .standard) {
+        defaults.set(models, forKey: VoiceInkUserDefaultsKey.openRouterModels)
+    }
+}
+
 public enum VoiceInkFillerWordPreference {
     public static func words(from defaults: UserDefaults = .standard) -> [String] {
         defaults.stringArray(forKey: VoiceInkUserDefaultsKey.fillerWords) ?? VoiceInkFillerWords.defaultWords

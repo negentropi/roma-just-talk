@@ -297,6 +297,73 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testDynamicAIProviderPreferenceReadsOllamaFallbacksAndSavedValues() {
+        withIsolatedDefaults { defaults in
+            XCTAssertEqual(
+                VoiceInkDynamicAIProviderPreference.ollamaBaseURL(from: defaults),
+                VoiceInkPreferenceDefault.ollamaBaseURL
+            )
+            XCTAssertEqual(
+                VoiceInkDynamicAIProviderPreference.ollamaSelectedModel(from: defaults, fallback: "llama2"),
+                "llama2"
+            )
+
+            VoiceInkDynamicAIProviderPreference.saveOllamaBaseURL("http://example.local:11434", to: defaults)
+            VoiceInkDynamicAIProviderPreference.saveOllamaSelectedModel("mistral", to: defaults)
+
+            XCTAssertEqual(
+                VoiceInkDynamicAIProviderPreference.ollamaBaseURL(from: defaults),
+                "http://example.local:11434"
+            )
+            XCTAssertEqual(
+                VoiceInkDynamicAIProviderPreference.ollamaSelectedModel(from: defaults, fallback: "llama2"),
+                "mistral"
+            )
+        }
+    }
+
+    func testDynamicAIProviderPreferencePreservesCallerSpecificOllamaModelFallbacks() {
+        withIsolatedDefaults { defaults in
+            XCTAssertEqual(
+                VoiceInkDynamicAIProviderPreference.ollamaSelectedModel(from: defaults, fallback: "llama2"),
+                "llama2"
+            )
+            XCTAssertEqual(
+                VoiceInkDynamicAIProviderPreference.ollamaSelectedModel(from: defaults, fallback: "mistral"),
+                "mistral"
+            )
+        }
+    }
+
+    func testDynamicAIProviderPreferenceRoundTripsCustomProviderSettings() {
+        withIsolatedDefaults { defaults in
+            XCTAssertEqual(VoiceInkDynamicAIProviderPreference.customProviderBaseURL(from: defaults), "")
+            XCTAssertEqual(VoiceInkDynamicAIProviderPreference.customProviderModel(from: defaults), "")
+
+            VoiceInkDynamicAIProviderPreference.saveCustomProviderBaseURL("https://api.example.com/v1", to: defaults)
+            VoiceInkDynamicAIProviderPreference.saveCustomProviderModel("custom-model", to: defaults)
+
+            XCTAssertEqual(
+                VoiceInkDynamicAIProviderPreference.customProviderBaseURL(from: defaults),
+                "https://api.example.com/v1"
+            )
+            XCTAssertEqual(VoiceInkDynamicAIProviderPreference.customProviderModel(from: defaults), "custom-model")
+        }
+    }
+
+    func testDynamicAIProviderPreferenceRoundTripsOpenRouterModels() {
+        withIsolatedDefaults { defaults in
+            XCTAssertEqual(VoiceInkDynamicAIProviderPreference.openRouterModels(from: defaults), [])
+
+            VoiceInkDynamicAIProviderPreference.saveOpenRouterModels(["openai/gpt-oss-120b", "z-ai/glm-4.5"], to: defaults)
+
+            XCTAssertEqual(
+                VoiceInkDynamicAIProviderPreference.openRouterModels(from: defaults),
+                ["openai/gpt-oss-120b", "z-ai/glm-4.5"]
+            )
+        }
+    }
+
     func testFillerWordPreferenceUsesDefaultWordsWhenMissing() {
         withIsolatedDefaults { defaults in
             XCTAssertEqual(

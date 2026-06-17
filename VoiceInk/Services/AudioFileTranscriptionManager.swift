@@ -157,16 +157,12 @@ class AudioTranscriptionManager: ObservableObject {
             let transcriptionDuration = Date().timeIntervalSince(transcriptionStart)
             let cleanupConfiguration = VoiceInkTranscriptionCleanupConfiguration.current()
             text = cleanupConfiguration.filterRawOutput(text)
-            text = text.trimmingCharacters(in: .whitespacesAndNewlines)
+            text = cleanupConfiguration.prepareFilteredTextForWordReplacement(text)
 
             let powerModeManager = PowerModeManager.shared
             let activePowerModeConfig = powerModeManager.currentActiveConfiguration
             let powerModeName = (activePowerModeConfig?.isEnabled == true) ? activePowerModeConfig?.name : nil
             let powerModeEmoji = (activePowerModeConfig?.isEnabled == true) ? activePowerModeConfig?.emoji : nil
-
-            if cleanupConfiguration.shouldFormatParagraphs {
-                text = VoiceInkTranscriptParagraphFormatter.format(text)
-            }
 
             text = WordReplacementService.shared.applyReplacements(to: text, using: modelContext)
             let cleanedText = cleanupConfiguration.applyTextPreferences(text)

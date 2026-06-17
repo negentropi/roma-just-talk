@@ -127,6 +127,13 @@ public struct VoiceInkTranscriptionCleanupConfiguration: Equatable, Sendable {
         )
     }
 
+    public func prepareFilteredTextForWordReplacement(_ filteredText: String) -> String {
+        let trimmedText = filteredText.trimmingCharacters(in: .whitespacesAndNewlines)
+        return shouldFormatParagraphs
+            ? VoiceInkTranscriptParagraphFormatter.format(trimmedText)
+            : trimmedText
+    }
+
     public init(
         punctuationMode: PunctuationCleanupMode = .keep,
         shouldFormatParagraphs: Bool = false,

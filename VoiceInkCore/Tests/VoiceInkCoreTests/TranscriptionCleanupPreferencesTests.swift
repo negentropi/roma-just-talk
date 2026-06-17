@@ -170,6 +170,28 @@ final class TranscriptionCleanupPreferencesTests: XCTestCase {
         XCTAssertEqual(configuration.applyTextPreferences("SHIP IT."), "ship it")
     }
 
+    func testCleanupConfigurationPreparesFilteredTextForWordReplacement() {
+        let configuration = VoiceInkTranscriptionCleanupConfiguration()
+
+        XCTAssertEqual(
+            configuration.prepareFilteredTextForWordReplacement(" \n Ship it. \t "),
+            "Ship it."
+        )
+    }
+
+    func testCleanupConfigurationFormatsPreparedFilteredTextWhenEnabled() {
+        let sentence = "This sentence has many ordinary English words that should count clearly in tokenizer."
+        let input = Array(repeating: sentence, count: 5).joined(separator: " ")
+        let firstParagraph = Array(repeating: sentence, count: 4).joined(separator: " ")
+        let expected = "\(firstParagraph)\n\n\(sentence)"
+        let configuration = VoiceInkTranscriptionCleanupConfiguration(shouldFormatParagraphs: true)
+
+        XCTAssertEqual(
+            configuration.prepareFilteredTextForWordReplacement(input),
+            expected
+        )
+    }
+
     private func withIsolatedDefaults(_ run: (UserDefaults) -> Void) {
         let suiteName = "VoiceInkCore.TranscriptionCleanupPreferencesTests.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!

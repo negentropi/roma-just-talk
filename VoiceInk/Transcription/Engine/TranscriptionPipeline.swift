@@ -200,11 +200,7 @@ class TranscriptionPipeline {
 
             if shouldCancel() { await finishCanceledTranscription(); return nil }
 
-            text = text.trimmingCharacters(in: .whitespacesAndNewlines)
-
-            if cleanupConfiguration.shouldFormatParagraphs {
-                text = VoiceInkTranscriptParagraphFormatter.format(text)
-            }
+            text = cleanupConfiguration.prepareFilteredTextForWordReplacement(text)
 
             text = WordReplacementService.shared.applyReplacements(to: text, using: modelContext)
             let cleanedText = cleanupConfiguration.applyTextPreferences(text)

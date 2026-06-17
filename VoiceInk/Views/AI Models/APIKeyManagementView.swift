@@ -137,7 +137,7 @@ struct APIKeyManagementView: View {
                             Spacer()
                             Button("Edit") { isEditingURL = true }
                             Button(action: {
-                                ollamaBaseURL = "http://localhost:11434"
+                                ollamaBaseURL = VoiceInkPreferenceDefault.ollamaBaseURL
                                 aiService.updateOllamaBaseURL(ollamaBaseURL)
                                 checkOllamaConnection()
                             }) {

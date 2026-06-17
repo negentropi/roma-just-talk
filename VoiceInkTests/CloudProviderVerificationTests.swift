@@ -17,7 +17,7 @@ struct CloudProviderVerificationTests {
         ]
 
         for (modelProvider, providerKind) in expectedMappings {
-            #expect(modelProvider.coreProviderKind == providerKind)
+            #expect(modelProvider.coreTranscriptionModelProvider?.providerKind == providerKind)
 
             let cloudProvider = try #require(CloudProviderRegistry.provider(for: modelProvider))
             let result = await cloudProvider.verifyAPIKey(" \n\t ")
@@ -28,7 +28,8 @@ struct CloudProviderVerificationTests {
     }
 
     @Test func cartesiaKeepsStreamingOnlyVerificationAdapter() async throws {
-        #expect(ModelProvider.cartesia.coreProviderKind == nil)
+        #expect(ModelProvider.cartesia.coreTranscriptionModelProvider == .cartesia)
+        #expect(ModelProvider.cartesia.coreTranscriptionModelProvider?.providerKind == nil)
 
         let cloudProvider = try #require(CloudProviderRegistry.provider(for: .cartesia))
         let result = await cloudProvider.verifyAPIKey(" \n\t ")

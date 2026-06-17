@@ -21,37 +21,8 @@ class KeyboardViewController: KeyboardInputViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupKeyboard()
-        setupRecordingStatusMonitoring()
-    }
-    
-    private func setupKeyboard() {
-        // Setup KeyboardKit with default configuration
-        setupKeyboardKit()
-        
-        // Add our custom record button at the top
         setupRecordButton()
-    }
-    
-    private func setupKeyboardKit() {
-        // KeyboardInputViewController automatically sets up the keyboard
-        // We can customize the keyboard appearance here if needed
-        
-        // Make the keyboard more compact
-        setupCompactKeyboard()
-    }
-    
-    private func setupCompactKeyboard() {
-        // Customize KeyboardKit's key styling to make keys more compact
-        // This requires working with KeyboardKit's styling system
-        
-        // Note: KeyboardKit's styling is complex and may require KeyboardKit Pro
-        // For now, we'll keep the default keyboard layout
-        // Individual key customization would require:
-        // 1. Custom KeyboardStyleProvider
-        // 2. Custom KeyboardLayoutProvider  
-        // 3. Overriding key button styles
-        
+        setupRecordingStatusMonitoring()
     }
     
     private func setupRecordButton() {
@@ -140,13 +111,7 @@ class KeyboardViewController: KeyboardInputViewController {
             DispatchQueue.main.async {
                 button.layer.cornerRadius = button.frame.height / 2
             }
-        } else {
-            // no-op
         }
-    }
-
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
     }
     
     override func viewDidLayoutSubviews() {

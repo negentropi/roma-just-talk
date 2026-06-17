@@ -236,7 +236,7 @@ final class AppSettings: ObservableObject {
 
         return VoiceInkProviderAPIKeyLookup.usableAPIKey(
             storedKey: apiKeysByProvider[provider],
-            providerName: provider.displayName
+            provider: provider
         )
     }
 

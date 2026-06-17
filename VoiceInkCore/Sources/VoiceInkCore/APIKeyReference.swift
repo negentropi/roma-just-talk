@@ -33,6 +33,18 @@ public enum VoiceInkAPIKeyReference {
 public enum VoiceInkProviderAPIKeyLookup {
     public static func usableAPIKey(
         storedKey: String?,
+        provider: VoiceInkProviderKind,
+        environment: [String: String] = ProcessInfo.processInfo.environment
+    ) -> String? {
+        usableAPIKey(
+            storedKey: storedKey,
+            providerName: provider.displayName,
+            environment: environment
+        )
+    }
+
+    public static func usableAPIKey(
+        storedKey: String?,
         providerName: String,
         environment: [String: String] = ProcessInfo.processInfo.environment
     ) -> String? {

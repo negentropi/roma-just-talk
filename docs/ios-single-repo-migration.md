@@ -31,7 +31,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - provider credential nonblank validation for runtime API-key checks
 - provider API-key verification dispatch
 - provider API-key verification flag storage
-- API-key environment-reference resolution and provider runtime-key lookup/fallback policy
+- API-key environment-reference resolution and typed provider runtime-key lookup/fallback policy
 - AI reasoning temperature, effort, and provider-specific hidden-reasoning request parameters for OpenAI-compatible post-processing
 - AI-enhancement provider identity, persisted-name parsing, API-key requirement, text-enhancement selectability, connected-provider selection policy, storage keys, model-selection key naming, and mapping to shared model providers; platform shells still own storage and execution
 - AI-enhancement API-key verification route metadata; native provider checks use shared verifier clients while macOS keeps model-specific Anthropic/OpenRouter/OpenAI-compatible verification
@@ -124,7 +124,7 @@ Current macOS consumers of shared remote transport:
 - macOS AI-enhancement provider model defaults and static model lists come from `VoiceInkAIModelCatalog`; macOS still owns provider UI, API-key storage, dynamic OpenRouter fetches, Ollama, Local CLI, and Custom provider settings.
 - macOS AI-enhancement request endpoint and API-key console URLs come from the shared `VoiceInkAIModelProvider` catalog; macOS still owns Anthropic/OpenAI-compatible transport selection and provider-specific verification adapters.
 - macOS `AIService`, `OllamaService`, and `APIKeyManagementView` read/write dynamic Ollama, Custom provider, and OpenRouter model cache preferences through `VoiceInkDynamicAIProviderPreference`; macOS still owns the dynamic-provider clients and keeps the existing caller-specific Ollama fallback models.
-- macOS and iOS provider API-key lookup delegates stored-key reference resolution and provider environment fallback policy to `VoiceInkProviderAPIKeyLookup`; platform shells still own Keychain storage and UI editing state.
+- macOS and iOS provider API-key lookup delegates stored-key reference resolution and provider environment fallback policy to `VoiceInkProviderAPIKeyLookup`; typed iOS provider callers use `VoiceInkProviderKind`, while dynamic macOS provider-name callers keep the string overload. Platform shells still own Keychain storage and UI editing state.
 - macOS and iOS recording audio filename construction delegates live recording, imported transcription, retranscription, and timestamped iOS recording naming to `VoiceInkStoredAudioFile`; platform shells still own directory choice and actual audio capture/copy/write work.
 - macOS open-file routing and audio-file transcription queue validation delegate supported audio/video file checks to `VoiceInkSupportedMedia`; platform shells still own open panels, drag/drop providers, and transcription queue state.
 - macOS CSV export delegates header, row formatting, and escaping to `VoiceInkTranscriptionCSVExporter`; macOS still owns `NSSavePanel` and mapping SwiftData `Transcription` records into export records.
@@ -158,7 +158,7 @@ Current iOS consumers of shared remote transport:
 - `iOS/VoiceInk-ios/AppSettings.swift` passes the shared paragraph-formatting preference into `VoiceInkTranscriptionRunProcessor`, so iOS retry transcription uses the same `VoiceInkTranscriptParagraphFormatter` policy as macOS.
 - `iOS/VoiceInk-ios/TranscriptionRetryService.swift` passes the iOS selected transcription language through `VoiceInkTranscriptionRunProcessor`, which normalizes auto-detect before remote/local transcription adapters receive it.
 - `iOS/VoiceInk-ios/WhisperTranscriptionService.swift` passes the shared selected-language local Whisper prompt helper into the iOS whisper.cpp wrapper, so iOS inherits the macOS language seed prompts when no explicit prompt is stored.
-- `iOS/VoiceInk-ios/ProviderAPIKeyView.swift` verifies provider keys through `VoiceInkProviderAPIKeyVerifier`.
+- `iOS/VoiceInk-ios/ProviderAPIKeyView.swift` verifies provider keys through `VoiceInkProviderAPIKeyVerifier` after typed `VoiceInkProviderAPIKeyLookup` reference/fallback resolution.
 - `iOS/VoiceInk-ios/AppSettings.swift` delegates active-mode transcription language availability and selected-language repair to the shared `Mode` collection policy; `SettingsView` keeps only the SwiftUI option rendering.
 - `iOS/VoiceInk-ios/WhisperTranscriptionService.swift` throws `VoiceInkEngineError` from `VoiceInkCore` instead of owning a separate iOS-only local Whisper error enum.
 - Cartesia remains absent from iOS transcription provider selection until an iOS streaming adapter exists; it is not a batch provider.

@@ -91,6 +91,28 @@ final class APIKeyReferenceTests: XCTestCase {
         )
     }
 
+    func testProviderAPIKeyLookupAcceptsTypedProviderKind() {
+        let environment = [
+            "ELEVENLABS_API_KEY": "fallback-key"
+        ]
+
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyLookup.usableAPIKey(
+                storedKey: nil,
+                provider: .elevenLabs,
+                environment: environment
+            ),
+            "fallback-key"
+        )
+        XCTAssertNil(
+            VoiceInkProviderAPIKeyLookup.usableAPIKey(
+                storedKey: nil,
+                provider: .groq,
+                environment: environment
+            )
+        )
+    }
+
     func testProviderAPIKeyLookupRejectsBlankAndProvidersWithoutEnvironmentFallback() {
         let environment = [
             "ELEVENLABS_API_KEY": "fallback-key"

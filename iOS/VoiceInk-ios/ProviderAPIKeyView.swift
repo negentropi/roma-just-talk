@@ -116,7 +116,7 @@ struct ProviderAPIKeyView: View {
 
         guard let resolvedKey = VoiceInkProviderAPIKeyLookup.usableAPIKey(
             storedKey: key,
-            providerName: provider.displayName
+            provider: provider
         ) else {
             return false
         }

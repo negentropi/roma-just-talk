@@ -57,6 +57,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - custom vocabulary term normalization for transcription providers; platform shells still own dictionary storage
 - custom cloud transcription model generated-name and draft validation policy; platform shells still own keychain and preferences storage
 - prompt trigger-word detection and trigger-word editing policy; platform shells still own prompt persistence and enhancement state
+- AI-enhancement custom prompt record shape, Codable compatibility, and final-prompt wrapping; macOS still owns SwiftUI prompt rendering and prompt-store orchestration
 - transcription language catalog, provider language filtering, AssemblyAI realtime/batch language policy, selected-language fallback policy, language-option ordering, selected-language preference loading, selected-language request normalization, and the shared selected-language defaults key; platform shells still own selected-language storage/UI and runtime streaming-mode state
 - local Whisper language seed prompts and custom language-prompt storage key; platform shells still own prompt editing UI and when prompts are persisted
 - stored audio-file path resolution, existing-file lookup, recordings directory, and file URL construction
@@ -98,6 +99,7 @@ Current macOS consumers of shared remote transport:
 - macOS metrics dashboard duration copy uses `VoiceInkDurationPresentation`, removing the last dashboard-local duration formatter.
 - macOS predefined prompt persistence adapts `VoiceInkPredefinedPrompts` into `CustomPrompt`, so stable prompt IDs and metadata live in shared core.
 - macOS custom prompt final text delegates to `VoiceInkAIPrompts.finalPromptText`, so the system-instruction wrapper stays shared.
+- macOS `CustomPrompt` is now a shell typealias for `VoiceInkCustomPrompt`, keeping the SwiftUI prompt-grid adapter in the macOS shell while moving the prompt record and Codable compatibility into `VoiceInkCore`.
 - macOS AI-enhancement provider selection uses `VoiceInkAIEnhancementProviderKind` and `VoiceInkUserDefaultsKey` for persisted provider identity, selectable text-enhancement providers, model-selection keys, and API-key requirement; macOS keeps dynamic provider settings and execution adapters.
 - macOS AI-enhancement API-key verification dispatch reads `VoiceInkAIEnhancementProviderKind.apiKeyVerificationTransport`; macOS still owns the LLMkit and provider-specific verifier calls.
 - macOS AI-enhancement provider model defaults and static model lists come from `VoiceInkAIModelCatalog`; macOS still owns provider UI, API-key storage, dynamic OpenRouter fetches, Ollama, Local CLI, and Custom provider settings.

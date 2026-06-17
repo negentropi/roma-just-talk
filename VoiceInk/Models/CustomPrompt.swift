@@ -3,6 +3,7 @@ import SwiftUI
 import VoiceInkCore
 
 typealias PromptIcon = String
+typealias CustomPrompt = VoiceInkCustomPrompt
 
 extension PromptIcon {
     static let allCases: [PromptIcon] = [
@@ -74,61 +75,6 @@ extension PromptIcon {
         "hand.raised.fill",
         "hand.thumbsup.fill"
     ]
-}
-
-struct CustomPrompt: Identifiable, Codable, Equatable {
-    let id: UUID
-    let title: String
-    let promptText: String
-    var isActive: Bool
-    let icon: PromptIcon
-    let description: String?
-    let isPredefined: Bool
-    let triggerWords: [String]
-    let useSystemInstructions: Bool
-    
-    init(
-        id: UUID = UUID(),
-        title: String,
-        promptText: String,
-        isActive: Bool = false,
-        icon: PromptIcon = "doc.text.fill",
-        description: String? = nil,
-        isPredefined: Bool = false,
-        triggerWords: [String] = [],
-        useSystemInstructions: Bool = true
-    ) {
-        self.id = id
-        self.title = title
-        self.promptText = promptText
-        self.isActive = isActive
-        self.icon = icon
-        self.description = description
-        self.isPredefined = isPredefined
-        self.triggerWords = triggerWords
-        self.useSystemInstructions = useSystemInstructions
-    }
-
-    enum CodingKeys: String, CodingKey {
-        case id, title, promptText, isActive, icon, description, isPredefined, triggerWords, useSystemInstructions
-    }
-
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = try container.decode(UUID.self, forKey: .id)
-        title = try container.decode(String.self, forKey: .title)
-        promptText = try container.decode(String.self, forKey: .promptText)
-        isActive = try container.decode(Bool.self, forKey: .isActive)
-        icon = try container.decode(PromptIcon.self, forKey: .icon)
-        description = try container.decodeIfPresent(String.self, forKey: .description)
-        isPredefined = try container.decode(Bool.self, forKey: .isPredefined)
-        triggerWords = try container.decode([String].self, forKey: .triggerWords)
-        useSystemInstructions = try container.decodeIfPresent(Bool.self, forKey: .useSystemInstructions) ?? true
-    }
-    
-    var finalPromptText: String {
-        VoiceInkAIPrompts.finalPromptText(promptText, useSystemInstructions: useSystemInstructions)
-    }
 }
 
 // MARK: - UI Extensions

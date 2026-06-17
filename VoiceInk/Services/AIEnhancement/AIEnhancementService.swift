@@ -77,8 +77,7 @@ class AIEnhancementService: ObservableObject {
     private let screenCaptureService: ScreenCaptureService
     private let customVocabularyService: CustomVocabularyService
     private var baseTimeout: TimeInterval {
-        let stored = UserDefaults.standard.integer(forKey: VoiceInkUserDefaultsKey.enhancementTimeoutSeconds)
-        return stored > 0 ? TimeInterval(stored) : VoiceInkPreferenceDefault.enhancementTimeoutSeconds
+        VoiceInkAIEnhancementRequestPreference.timeoutSeconds()
     }
     private let rateLimitInterval: TimeInterval = 1.0
     private var lastRequestTime: Date?
@@ -322,7 +321,7 @@ class AIEnhancementService: ObservableObject {
     }
 
     private var retryOnTimeout: Bool {
-        UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.enhancementRetryOnTimeout)
+        VoiceInkAIEnhancementRequestPreference.shouldRetryOnTimeout()
     }
 
     private func makeRequestWithRetry(text: String, mode: EnhancementPrompt, maxRetries: Int = 3, initialDelay: TimeInterval = 1.0) async throws -> String {

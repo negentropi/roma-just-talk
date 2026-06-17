@@ -120,6 +120,20 @@ public enum VoiceInkFillerWordPreference {
     }
 }
 
+public enum VoiceInkAIEnhancementRequestPreference {
+    public static func timeoutSeconds(from defaults: UserDefaults = .standard) -> TimeInterval {
+        let stored = defaults.integer(forKey: VoiceInkUserDefaultsKey.enhancementTimeoutSeconds)
+        return stored > 0
+            ? TimeInterval(stored)
+            : TimeInterval(VoiceInkPreferenceDefault.enhancementTimeoutSeconds)
+    }
+
+    public static func shouldRetryOnTimeout(from defaults: UserDefaults = .standard) -> Bool {
+        defaults.object(forKey: VoiceInkUserDefaultsKey.enhancementRetryOnTimeout) as? Bool
+            ?? VoiceInkPreferenceDefault.enhancementRetryOnTimeout
+    }
+}
+
 public enum VoiceInkModeStorage {
     public static func saveModes(
         _ modes: [Mode],

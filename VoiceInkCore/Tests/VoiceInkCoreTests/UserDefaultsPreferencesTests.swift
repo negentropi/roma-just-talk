@@ -191,6 +191,40 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testAIEnhancementRequestPreferenceUsesSharedDefaultsWhenUnset() {
+        withIsolatedDefaults { defaults in
+            XCTAssertEqual(
+                VoiceInkAIEnhancementRequestPreference.timeoutSeconds(from: defaults),
+                TimeInterval(VoiceInkPreferenceDefault.enhancementTimeoutSeconds)
+            )
+            XCTAssertEqual(
+                VoiceInkAIEnhancementRequestPreference.shouldRetryOnTimeout(from: defaults),
+                VoiceInkPreferenceDefault.enhancementRetryOnTimeout
+            )
+        }
+    }
+
+    func testAIEnhancementRequestPreferenceReadsStoredValues() {
+        withIsolatedDefaults { defaults in
+            defaults.set(15, forKey: VoiceInkUserDefaultsKey.enhancementTimeoutSeconds)
+            defaults.set(false, forKey: VoiceInkUserDefaultsKey.enhancementRetryOnTimeout)
+
+            XCTAssertEqual(VoiceInkAIEnhancementRequestPreference.timeoutSeconds(from: defaults), 15)
+            XCTAssertFalse(VoiceInkAIEnhancementRequestPreference.shouldRetryOnTimeout(from: defaults))
+        }
+    }
+
+    func testAIEnhancementRequestPreferenceFallsBackForNonPositiveTimeout() {
+        withIsolatedDefaults { defaults in
+            defaults.set(0, forKey: VoiceInkUserDefaultsKey.enhancementTimeoutSeconds)
+
+            XCTAssertEqual(
+                VoiceInkAIEnhancementRequestPreference.timeoutSeconds(from: defaults),
+                TimeInterval(VoiceInkPreferenceDefault.enhancementTimeoutSeconds)
+            )
+        }
+    }
+
     func testModeStorageRoundTripsModesAndSelectedModeId() {
         withIsolatedDefaults { defaults in
             let localMode = Mode.defaultLocalWhisper(name: "Local")

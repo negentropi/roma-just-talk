@@ -32,6 +32,16 @@ final class DictionaryPolicyTests: XCTestCase {
         XCTAssertNil(plan.errorMessage)
     }
 
+    func testVocabularyWordsToInsertTrimsAndSkipsExistingAndBatchDuplicates() {
+        XCTAssertEqual(
+            VoiceInkDictionaryPolicy.vocabularyWordsToInsert(
+                [" Voice Ink ", "Roma", "roma", " ", "Cursor"],
+                existingWords: ["voice ink"]
+            ),
+            ["Roma", "Cursor"]
+        )
+    }
+
     func testWordReplacementPlanReturnsNoOpForBlankOriginalOrReplacement() {
         XCTAssertFalse(
             VoiceInkDictionaryPolicy.wordReplacementInsertPlan(

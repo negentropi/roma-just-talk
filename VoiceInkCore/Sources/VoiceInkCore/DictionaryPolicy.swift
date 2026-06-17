@@ -38,17 +38,30 @@ public enum VoiceInkDictionaryPolicy {
             )
         }
 
-        var insertedKeys = existingKeys
+        let wordsToInsert = vocabularyWordsToInsert(words, existingWords: existingWords)
+
+        return VoiceInkVocabularyInsertPlan(wordsToInsert: wordsToInsert, errorMessage: nil)
+    }
+
+    public static func vocabularyWordsToInsert(
+        _ words: [String],
+        existingWords: [String]
+    ) -> [String] {
+        var insertedKeys = Set(existingWords.map { $0.lowercased() })
         var wordsToInsert = [String]()
 
         for word in words {
-            let key = word.lowercased()
+            let trimmed = word.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !trimmed.isEmpty else { continue }
+
+            let key = trimmed.lowercased()
             guard !insertedKeys.contains(key) else { continue }
-            wordsToInsert.append(word)
+
+            wordsToInsert.append(trimmed)
             insertedKeys.insert(key)
         }
 
-        return VoiceInkVocabularyInsertPlan(wordsToInsert: wordsToInsert, errorMessage: nil)
+        return wordsToInsert
     }
 
     public static func wordReplacementInsertPlan(

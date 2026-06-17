@@ -273,18 +273,15 @@ enum BackupImporter {
         if let words = backup.vocabularyWords {
             let descriptor = FetchDescriptor<VocabularyWord>()
             let existingWords = try modelContext.fetch(descriptor)
-            var existingWordsSet = Set(existingWords.map { $0.word.lowercased() })
 
-            for item in words {
-                let word = item.word.trimmingCharacters(in: .whitespacesAndNewlines)
-                guard !word.isEmpty else { continue }
+            let wordsToInsert = VoiceInkDictionaryPolicy.vocabularyWordsToInsert(
+                words.map(\.word),
+                existingWords: existingWords.map(\.word)
+            )
 
-                let lowercasedWord = word.lowercased()
-                if !existingWordsSet.contains(lowercasedWord) {
-                    modelContext.insert(VocabularyWord(word: word))
-                    existingWordsSet.insert(lowercasedWord)
-                    insertedWords += 1
-                }
+            for word in wordsToInsert {
+                modelContext.insert(VocabularyWord(word: word))
+                insertedWords += 1
             }
         } else {
             print("No vocabulary words found in the imported file. Existing items remain unchanged.")
@@ -293,28 +290,30 @@ enum BackupImporter {
         if let replacements = backup.wordReplacements {
             let descriptor = FetchDescriptor<WordReplacement>()
             let existingReplacements = try modelContext.fetch(descriptor)
-
-            var existingKeys = Set<String>()
-            for existing in existingReplacements {
-                existingKeys.formUnion(tokens(from: existing.originalText))
-            }
+            var existingOriginalTexts = existingReplacements.map(\.originalText)
 
             for (original, replacement) in replacements {
                 let trimmedOriginal = original.trimmingCharacters(in: .whitespacesAndNewlines)
                 let trimmedReplacement = replacement.trimmingCharacters(in: .whitespacesAndNewlines)
-                let importTokens = tokens(from: trimmedOriginal)
-                guard !importTokens.isEmpty, !trimmedReplacement.isEmpty else {
+
+                let plan = VoiceInkDictionaryPolicy.wordReplacementInsertPlan(
+                    original: trimmedOriginal,
+                    replacement: trimmedReplacement,
+                    existingOriginalTexts: existingOriginalTexts
+                )
+
+                if plan.errorMessage != nil {
+                    continue
+                }
+
+                guard plan.shouldInsert else {
                     skippedInvalidReplacements += 1
                     continue
                 }
 
-                let hasConflict = importTokens.contains { existingKeys.contains($0) }
-
-                if !hasConflict {
-                    modelContext.insert(WordReplacement(originalText: trimmedOriginal, replacementText: trimmedReplacement))
-                    existingKeys.formUnion(importTokens)
-                    insertedReplacements += 1
-                }
+                modelContext.insert(WordReplacement(originalText: plan.originalText, replacementText: plan.replacementText))
+                existingOriginalTexts.append(plan.originalText)
+                insertedReplacements += 1
             }
         } else {
             print("No word replacements found in the imported file. Existing replacements remain unchanged.")
@@ -357,10 +356,4 @@ enum BackupImporter {
         print("Successfully imported \(models.count) custom model definitions.")
     }
 
-    private static func tokens(from text: String) -> [String] {
-        text
-            .split(separator: ",")
-            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }
-            .filter { !$0.isEmpty }
-    }
 }

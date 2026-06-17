@@ -26,6 +26,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testVocabularyPlanReturnsNoOpForBlankInput", run: { DictionaryPolicyTests().testVocabularyPlanReturnsNoOpForBlankInput() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testVocabularyPlanRejectsSingleDuplicateWithExistingMessage", run: { DictionaryPolicyTests().testVocabularyPlanRejectsSingleDuplicateWithExistingMessage() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testVocabularyPlanSkipsDuplicatesForMultiAdd", run: { DictionaryPolicyTests().testVocabularyPlanSkipsDuplicatesForMultiAdd() }),
+            VoiceInkCoreCheck(name: "DictionaryPolicyTests.testVocabularyWordsToInsertTrimsAndSkipsExistingAndBatchDuplicates", run: { DictionaryPolicyTests().testVocabularyWordsToInsertTrimsAndSkipsExistingAndBatchDuplicates() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementPlanReturnsNoOpForBlankOriginalOrReplacement", run: { DictionaryPolicyTests().testWordReplacementPlanReturnsNoOpForBlankOriginalOrReplacement() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementPlanRejectsDuplicateTokenAcrossCommaGroups", run: { DictionaryPolicyTests().testWordReplacementPlanRejectsDuplicateTokenAcrossCommaGroups() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementPlanAllowsNewTokensAndPreservesOriginalInput", run: { DictionaryPolicyTests().testWordReplacementPlanAllowsNewTokensAndPreservesOriginalInput() }),

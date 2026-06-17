@@ -1,6 +1,7 @@
 import Foundation
 import SwiftData
 import os
+import VoiceInkCore
 
 /// Sendable source that bridges audio chunks from any thread into an AsyncStream.
 private final class AudioChunkSource: @unchecked Sendable {

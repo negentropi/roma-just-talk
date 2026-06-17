@@ -1,4 +1,5 @@
 import Foundation
+import VoiceInkCore
 
 /// Events emitted by a streaming transcription provider
 enum StreamingTranscriptionEvent {

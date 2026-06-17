@@ -2,6 +2,49 @@ import Foundation
 @testable import VoiceInkCore
 
 final class AIProviderCatalogTests: XCTestCase {
+    func testMacOSAIEnhancementProviderIdentityIsShared() {
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.allCases.map(\.rawValue),
+            [
+                "Cerebras",
+                "Groq",
+                "Gemini",
+                "Anthropic",
+                "OpenAI",
+                "OpenRouter",
+                "Mistral",
+                "ElevenLabs",
+                "Deepgram",
+                "Soniox",
+                "Speechmatics",
+                "AssemblyAI",
+                "Ollama",
+                "Local CLI",
+                "Custom"
+            ]
+        )
+        XCTAssertEqual(VoiceInkAIEnhancementProviderKind(rawValue: "OpenRouter"), .openRouter)
+        XCTAssertEqual(VoiceInkAIEnhancementProviderKind(rawValue: "Local CLI"), .localCLI)
+    }
+
+    func testMacOSAIEnhancementProviderMapsToSharedModelProvider() {
+        XCTAssertEqual(VoiceInkAIEnhancementProviderKind.anthropic.aiModelProvider, .anthropic)
+        XCTAssertEqual(VoiceInkAIEnhancementProviderKind.cerebras.aiModelProvider, .cerebras)
+        XCTAssertEqual(VoiceInkAIEnhancementProviderKind.deepgram.aiModelProvider, .deepgram)
+        XCTAssertEqual(VoiceInkAIEnhancementProviderKind.openRouter.aiModelProvider, .openRouter)
+        XCTAssertNil(VoiceInkAIEnhancementProviderKind.ollama.aiModelProvider)
+        XCTAssertNil(VoiceInkAIEnhancementProviderKind.localCLI.aiModelProvider)
+        XCTAssertNil(VoiceInkAIEnhancementProviderKind.custom.aiModelProvider)
+    }
+
+    func testMacOSAIEnhancementProviderAPIKeyRequirementIsShared() {
+        XCTAssertFalse(VoiceInkAIEnhancementProviderKind.ollama.requiresUserAPIKey)
+        XCTAssertFalse(VoiceInkAIEnhancementProviderKind.localCLI.requiresUserAPIKey)
+        XCTAssertTrue(VoiceInkAIEnhancementProviderKind.custom.requiresUserAPIKey)
+        XCTAssertTrue(VoiceInkAIEnhancementProviderKind.groq.requiresUserAPIKey)
+        XCTAssertTrue(VoiceInkAIEnhancementProviderKind.anthropic.requiresUserAPIKey)
+    }
+
     func testMacOSAIEnhancementRequestURLsAreShared() {
         let expectedURLs: [VoiceInkAIModelProvider: String?] = [
             .anthropic: "https://api.anthropic.com/v1/messages",

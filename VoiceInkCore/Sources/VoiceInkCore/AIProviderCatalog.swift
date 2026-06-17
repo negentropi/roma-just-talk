@@ -1,5 +1,63 @@
 import Foundation
 
+public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
+    case cerebras = "Cerebras"
+    case groq = "Groq"
+    case gemini = "Gemini"
+    case anthropic = "Anthropic"
+    case openAI = "OpenAI"
+    case openRouter = "OpenRouter"
+    case mistral = "Mistral"
+    case elevenLabs = "ElevenLabs"
+    case deepgram = "Deepgram"
+    case soniox = "Soniox"
+    case speechmatics = "Speechmatics"
+    case assemblyAI = "AssemblyAI"
+    case ollama = "Ollama"
+    case localCLI = "Local CLI"
+    case custom = "Custom"
+
+    public var aiModelProvider: VoiceInkAIModelProvider? {
+        switch self {
+        case .anthropic:
+            return .anthropic
+        case .assemblyAI:
+            return .assemblyAI
+        case .cerebras:
+            return .cerebras
+        case .deepgram:
+            return .deepgram
+        case .elevenLabs:
+            return .elevenLabs
+        case .groq:
+            return .groq
+        case .gemini:
+            return .gemini
+        case .mistral:
+            return .mistral
+        case .openAI:
+            return .openAI
+        case .openRouter:
+            return .openRouter
+        case .soniox:
+            return .soniox
+        case .speechmatics:
+            return .speechmatics
+        case .ollama, .localCLI, .custom:
+            return nil
+        }
+    }
+
+    public var requiresUserAPIKey: Bool {
+        switch self {
+        case .ollama, .localCLI:
+            return false
+        case .anthropic, .assemblyAI, .cerebras, .custom, .deepgram, .elevenLabs, .gemini, .groq, .mistral, .openAI, .openRouter, .soniox, .speechmatics:
+            return true
+        }
+    }
+}
+
 public extension VoiceInkAIModelProvider {
     var postProcessingRequestURL: URL? {
         switch self {

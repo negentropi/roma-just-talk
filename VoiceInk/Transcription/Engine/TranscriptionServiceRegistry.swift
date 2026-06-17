@@ -54,7 +54,9 @@ class TranscriptionServiceRegistry {
                 modelContext: modelContext,
                 fluidAudioService: model.provider == .fluidAudio ? fluidAudioTranscriptionService : nil,
                 fluidAudioStreamingConfig: forceStreaming && model.provider == .fluidAudio ? .rollingPreload : nil,
-                finalCommitTimeoutNanoseconds: StreamingFinalCommitTimeout.nanoseconds(for: model.provider),
+                finalCommitTimeoutNanoseconds: VoiceInkStreamingFinalCommitTimeout.nanoseconds(
+                    for: model.provider == .fluidAudio ? .localFluidAudio : .cloud
+                ),
                 onPartialTranscript: onPartialTranscript
             )
             let fallback = service(for: model.provider)

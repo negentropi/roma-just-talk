@@ -100,7 +100,7 @@ class StreamingTranscriptionService {
         modelContext: ModelContext,
         fluidAudioService: FluidAudioTranscriptionService? = nil,
         fluidAudioStreamingConfig: AgreementConfig? = nil,
-        finalCommitTimeoutNanoseconds: UInt64 = StreamingFinalCommitTimeout.cloudNanoseconds,
+        finalCommitTimeoutNanoseconds: UInt64 = VoiceInkStreamingFinalCommitTimeout.cloudNanoseconds,
         onPartialTranscript: ((String) -> Void)? = nil
     ) {
         self.modelContext = modelContext

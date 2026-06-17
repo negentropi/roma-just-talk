@@ -32,7 +32,12 @@ class TranscriptionRetryService {
                 await settings.apiKey(for: provider)
             },
             transcriptionServiceProvider: { provider in
-                TranscriptionServiceFactory.service(for: provider)
+                switch provider.transcriptionServiceKind {
+                case .remote:
+                    return VoiceInkRemoteTranscriptionService(provider: provider)
+                case .localWhisper:
+                    return WhisperTranscriptionService()
+                }
             }
         )
     }

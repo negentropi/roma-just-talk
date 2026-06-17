@@ -33,7 +33,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - shared UserDefaults key names plus iOS mode persistence helpers
 - transcript status and presentation helpers
 - local transcription/model/missing-audio error vocabulary shared by macOS local Whisper and iOS local retry transcription
-- raw transcription output filtering for hallucination tags/brackets and optional filler words
+- raw transcription output filtering for hallucination tags/brackets, optional filler words, and default filler-word vocabulary
 - transcription cleanup preferences and punctuation/lowercase cleanup policy
 - stored audio-file path resolution, existing-file lookup, recordings directory, and file URL construction
 - duration presentation

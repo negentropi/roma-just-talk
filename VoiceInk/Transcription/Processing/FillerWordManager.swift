@@ -1,12 +1,10 @@
 import Foundation
+import VoiceInkCore
 
 class FillerWordManager: ObservableObject {
     static let shared = FillerWordManager()
 
-    static let defaultFillerWords = [
-        "uh", "um", "uhm", "umm", "uhh", "uhhh",
-        "hmm", "hm", "mmm", "mm", "mh", "ehh"
-    ]
+    static let defaultFillerWords = VoiceInkTranscriptionOutputFilter.defaultFillerWords
 
     private let fillerWordsKey = "FillerWords"
     private let removeFillerWordsKey = "RemoveFillerWords"

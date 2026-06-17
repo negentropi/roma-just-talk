@@ -2,6 +2,13 @@ import Foundation
 @testable import VoiceInkCore
 
 final class TranscriptionOutputFilterTests: XCTestCase {
+    func testDefaultFillerWordsMatchMacOSCleanupDefaults() {
+        XCTAssertEqual(
+            VoiceInkTranscriptionOutputFilter.defaultFillerWords,
+            ["uh", "um", "uhm", "umm", "uhh", "uhhh", "hmm", "hm", "mmm", "mm", "mh", "ehh"]
+        )
+    }
+
     func testFilterRemovesTagBlocksAndBracketedHallucinations() {
         XCTAssertEqual(
             VoiceInkTranscriptionOutputFilter.filter("Hello [music] <noise>discard</noise> world"),

@@ -16,10 +16,6 @@ protocol CloudProvider {
 }
 
 extension CloudProvider {
-    private static var apiKeyVerifier: VoiceInkProviderAPIKeyVerifier {
-        VoiceInkProviderAPIKeyVerifier()
-    }
-
     private var emptyTextPolicy: CloudTranscriptionEmptyTextPolicy {
         switch modelProvider {
         case .groq, .deepgram, .gemini:
@@ -111,7 +107,7 @@ extension CloudProvider {
     /// Streaming-only providers inherit this and get a clear error if batch is somehow attempted.
     /// Batch providers share the core remote dispatch while this shell keeps SwiftData and streaming adapters.
     func transcribe(audioData: Data, fileName: String, apiKey: String, model: String, language: String?, prompt: String?, customVocabulary: [String]) async throws -> String {
-        guard let provider = modelProvider.coreProviderKind else {
+        guard let provider = modelProvider.coreTranscriptionModelProvider?.providerKind else {
             throw CloudTranscriptionError.unsupportedProvider
         }
 
@@ -144,7 +140,7 @@ extension CloudProvider {
             return (false, "Unsupported provider")
         }
 
-        let result = await Self.apiKeyVerifier.verifyAPIKeyDetailed(key, for: provider)
+        let result = await VoiceInkProviderAPIKeyVerifier().verifyAPIKeyDetailed(key, for: provider)
         return (result.isValid, result.errorMessage)
     }
 }

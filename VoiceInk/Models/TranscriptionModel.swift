@@ -34,10 +34,6 @@ enum ModelProvider: String, Codable, Hashable, CaseIterable {
 }
 
 extension ModelProvider {
-    var coreProviderKind: VoiceInkProviderKind? {
-        coreTranscriptionModelProvider?.providerKind
-    }
-
     var coreTranscriptionModelProvider: VoiceInkTranscriptionModelProvider? {
         switch self {
         case .groq:
@@ -66,7 +62,7 @@ extension ModelProvider {
     }
 
     var apiKeyProviderName: String {
-        coreProviderKind?.displayName ?? rawValue
+        coreTranscriptionModelProvider?.providerKind?.displayName ?? rawValue
     }
 }
 

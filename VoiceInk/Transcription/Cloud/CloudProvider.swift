@@ -91,7 +91,12 @@ extension CloudProvider {
         modelProvider.coreTranscriptionModelProvider?.includesAutoDetect ?? false
     }
 
-    var isStreamingOnly: Bool { false }
+    var isStreamingOnly: Bool {
+        guard let provider = modelProvider.coreTranscriptionModelProvider else {
+            return false
+        }
+        return !provider.supportsRecordedFileTranscription
+    }
 
     /// Streaming-only providers inherit this and get a clear error if batch is somehow attempted.
     /// Batch providers share the core remote dispatch while this shell keeps SwiftData and streaming adapters.

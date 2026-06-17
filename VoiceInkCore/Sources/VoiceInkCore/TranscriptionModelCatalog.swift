@@ -119,6 +119,15 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
             return false
         }
     }
+
+    public var supportsRecordedFileTranscription: Bool {
+        switch self {
+        case .cartesia:
+            return false
+        case .assemblyAI, .deepgram, .elevenLabs, .mistral, .soniox, .speechmatics, .xai, .groq, .openAI, .gemini, .local:
+            return true
+        }
+    }
 }
 
 public struct VoiceInkCloudTranscriptionModelSpec: Equatable, Sendable {

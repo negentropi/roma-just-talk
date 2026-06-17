@@ -98,11 +98,22 @@ final class TranscriptionModelCatalogTests: XCTestCase {
         XCTAssertEqual(VoiceInkTranscriptionModelProvider.cartesia.languageCodes?.last, "zu")
         XCTAssertTrue(VoiceInkTranscriptionModelProvider.cartesia.languageCodes?.contains("en") == true)
         XCTAssertFalse(VoiceInkTranscriptionModelProvider.cartesia.includesAutoDetect)
+        XCTAssertFalse(VoiceInkTranscriptionModelProvider.cartesia.supportsRecordedFileTranscription)
 
         let models = VoiceInkTranscriptionModelCatalog.cloudModels(for: .cartesia)
         XCTAssertEqual(models.map(\.name), ["ink-whisper"])
         XCTAssertEqual(models.first?.displayName, "Ink Whisper (Cartesia)")
         XCTAssertTrue(models.first?.supportsStreaming == true)
+    }
+
+    func testRecordedFileSupportIsSharedProviderCapability() {
+        let streamingOnlyProviders = VoiceInkTranscriptionModelProvider.allCases.filter {
+            !$0.supportsRecordedFileTranscription
+        }
+
+        XCTAssertEqual(streamingOnlyProviders, [.cartesia])
+        XCTAssertTrue(VoiceInkTranscriptionModelProvider.groq.supportsRecordedFileTranscription)
+        XCTAssertTrue(VoiceInkTranscriptionModelProvider.local.supportsRecordedFileTranscription)
     }
 
     func testAssemblyAILanguageCapabilityAndModelsAreSharedProviderMetadata() {

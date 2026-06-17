@@ -39,6 +39,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - AI-enhancement provider request endpoints and API-key console URLs for macOS AI providers; platform shells still own provider UI and request execution
 - dynamic AI-provider preference storage for Ollama base URL/model, Custom provider base URL/model, and cached OpenRouter models; platform shells still own provider execution, network refresh, and UI state
 - transcription and AI model catalogs
+- transcription provider recorded-file capability, including Cartesia as streaming-only
 - Native Apple and FluidAudio local transcription model metadata; platform shells still own availability, download, and runtime adapters
 - remote transcription provider dispatch for iOS retry transcription
 - mode runtime configuration, default local mode selection, provider-change and stale model repair, selected-mode repair, mode-based transcription language availability, and selected-language repair
@@ -102,6 +103,7 @@ Current macOS consumers of shared remote transport:
 - macOS batch cloud and streaming transcription use `VoiceInkProviderCredential` for runtime API-key presence checks before entering provider adapters.
 - macOS API-key lookup reads fallback environment-variable names from `VoiceInkProviderAPIKeyAccount`; Keychain access remains in the macOS shell.
 - macOS cloud-provider model lists are supplied by the `CloudProvider` default adapter over `VoiceInkTranscriptionModelCatalog`, so provider modules only own transport and streaming differences.
+- macOS cloud-provider recorded-file support is derived from `VoiceInkTranscriptionModelProvider.supportsRecordedFileTranscription`, so Cartesia remains streaming-only without a shell-only override.
 - macOS Native Apple and Parakeet model structs adapt `VoiceInkTranscriptionModelCatalog` local model specs; macOS still owns OS availability and FluidAudio download/runtime code.
 - macOS language pickers use `VoiceInkLanguageCatalog.sortedOptions` so language presentation order stays shared with iOS.
 - macOS recording, audio-file transcription, and retry transcription use `VoiceInkTranscriptionCleanupConfiguration` directly for shared raw-output filtering and cleanup preferences.

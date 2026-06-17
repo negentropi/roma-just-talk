@@ -54,6 +54,42 @@ final class LocalWhisperPromptCatalogTests: XCTestCase {
         }
     }
 
+    func testStoredCustomPromptsRoundTrip() {
+        withIsolatedDefaults { defaults in
+            XCTAssertEqual(VoiceInkLocalWhisperPromptCatalog.storedCustomPrompts(from: defaults), [:])
+
+            VoiceInkLocalWhisperPromptCatalog.saveCustomPrompts(
+                ["en": "Spell Roma Just Talk exactly."],
+                to: defaults
+            )
+
+            XCTAssertEqual(
+                VoiceInkLocalWhisperPromptCatalog.storedCustomPrompts(from: defaults),
+                ["en": "Spell Roma Just Talk exactly."]
+            )
+        }
+    }
+
+    func testPromptForSelectedLanguageUsesStoredCustomPromptsByDefault() {
+        withIsolatedDefaults { defaults in
+            defaults.set("en", forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
+            VoiceInkLocalWhisperPromptCatalog.saveCustomPrompts(
+                ["en": "Spell Roma Just Talk exactly."],
+                to: defaults
+            )
+
+            XCTAssertEqual(
+                VoiceInkLocalWhisperPromptCatalog.promptForSelectedLanguage(from: defaults),
+                "Spell Roma Just Talk exactly."
+            )
+
+            XCTAssertEqual(
+                VoiceInkLocalWhisperPromptCatalog.promptForSelectedLanguage(from: defaults, customPrompts: [:]),
+                "Hello, how are you doing? Nice to meet you."
+            )
+        }
+    }
+
     private func withIsolatedDefaults(_ run: (UserDefaults) -> Void) {
         let suiteName = "VoiceInkCore.LocalWhisperPromptCatalogTests.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!

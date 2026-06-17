@@ -31,13 +31,11 @@ class WhisperPrompt: ObservableObject {
     }
     
     private func loadCustomPrompts() {
-        if let savedPrompts = UserDefaults.standard.dictionary(forKey: VoiceInkLocalWhisperPromptCatalog.customLanguagePromptsKey) as? [String: String] {
-            customPrompts = savedPrompts
-        }
+        customPrompts = VoiceInkLocalWhisperPromptCatalog.storedCustomPrompts()
     }
     
     private func saveCustomPrompts() {
-        UserDefaults.standard.set(customPrompts, forKey: VoiceInkLocalWhisperPromptCatalog.customLanguagePromptsKey)
+        VoiceInkLocalWhisperPromptCatalog.saveCustomPrompts(customPrompts)
         UserDefaults.standard.synchronize() // Force immediate synchronization
     }
     

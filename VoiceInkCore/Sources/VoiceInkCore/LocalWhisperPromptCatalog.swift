@@ -5,11 +5,11 @@ public enum VoiceInkLocalWhisperPromptCatalog {
 
     public static func promptForSelectedLanguage(
         from defaults: UserDefaults = .standard,
-        customPrompts: [String: String] = [:],
+        customPrompts: [String: String]? = nil,
         fallbackLanguage: String = "en"
     ) -> String {
         let language = defaults.string(forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage) ?? fallbackLanguage
-        return prompt(for: language, customPrompts: customPrompts)
+        return prompt(for: language, customPrompts: customPrompts ?? storedCustomPrompts(from: defaults))
     }
 
     public static func prompt(for language: String, customPrompts: [String: String] = [:]) -> String {
@@ -18,6 +18,14 @@ public enum VoiceInkLocalWhisperPromptCatalog {
         }
 
         return defaultPrompt(for: language)
+    }
+
+    public static func storedCustomPrompts(from defaults: UserDefaults = .standard) -> [String: String] {
+        defaults.dictionary(forKey: customLanguagePromptsKey) as? [String: String] ?? [:]
+    }
+
+    public static func saveCustomPrompts(_ prompts: [String: String], to defaults: UserDefaults = .standard) {
+        defaults.set(prompts, forKey: customLanguagePromptsKey)
     }
 
     public static func defaultPrompt(for language: String) -> String {

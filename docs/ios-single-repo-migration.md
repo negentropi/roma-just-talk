@@ -66,7 +66,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - selected-prompt repair, enable-time prompt fallback, and base prompt-text selection for AI enhancement; platform shells still own context capture and request execution
 - AI-enhancement prompt-store and context-toggle storage keys; macOS still owns persistence timing, notifications, and UI orchestration
 - transcription language catalog, provider language filtering, AssemblyAI realtime/batch language policy, selected-language fallback policy, language-option ordering, selected-language preference loading/saving/clearing, compatible selected-language persistence, selected-language request normalization, and the shared selected-language defaults key; platform shells still own selected-language UI and runtime streaming-mode state
-- local Whisper language seed prompts and custom language-prompt storage key; platform shells still own prompt editing UI and when prompts are persisted
+- local Whisper language seed prompts and custom language-prompt storage; platform shells still own prompt editing UI and when prompts are persisted
 - stored audio-file path resolution, existing-file lookup, recordings directory, file URL construction, and recording/import/retranscription filename policy
 - duration presentation
 - relative timestamp presentation
@@ -96,6 +96,7 @@ Current macOS consumers of shared remote transport:
 - macOS local Whisper/model loading throws `VoiceInkEngineError` from `VoiceInkCore`; macOS error descriptions are covered by `VoiceInkEngineErrorTests`.
 - macOS local Whisper and cloud transcription normalize selected request language through `VoiceInkTranscriptionLanguagePreference`.
 - macOS local Whisper, cloud transcription, AssemblyAI streaming, and `WhisperPrompt` read/write transcription prompts through `VoiceInkTranscriptionPromptPreference`.
+- macOS `WhisperPrompt` loads/saves custom local-Whisper language prompts through `VoiceInkLocalWhisperPromptCatalog`; macOS and iOS local Whisper fallback prompts now read stored custom prompts through the shared catalog.
 - macOS batch cloud and streaming transcription use `VoiceInkProviderCredential` for runtime API-key presence checks before entering provider adapters.
 - macOS API-key lookup reads fallback environment-variable names from `VoiceInkProviderAPIKeyAccount`; Keychain access remains in the macOS shell.
 - macOS cloud-provider model lists are supplied by the `CloudProvider` default adapter over `VoiceInkTranscriptionModelCatalog`, so provider modules only own transport and streaming differences.

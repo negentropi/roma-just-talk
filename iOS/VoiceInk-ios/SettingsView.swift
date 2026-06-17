@@ -4,6 +4,8 @@ import VoiceInkCore
 
 struct SettingsView: View {
     @StateObject private var settings = AppSettings.shared
+    @State private var newFillerWord = ""
+    @State private var showDuplicateFillerWordAlert = false
     
     var body: some View {
         List {
@@ -66,6 +68,25 @@ struct SettingsView: View {
                 Toggle("Lowercase Transcription", isOn: $settings.lowercaseTranscription)
 
                 Toggle("Remove Filler Words", isOn: $settings.removeFillerWords)
+
+                if settings.removeFillerWords {
+                    HStack {
+                        TextField("Add filler word", text: $newFillerWord)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                            .onSubmit(addFillerWord)
+
+                        Button(action: addFillerWord) {
+                            Image(systemName: "plus.circle.fill")
+                        }
+                        .disabled(newFillerWord.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    }
+
+                    ForEach(settings.fillerWords, id: \.self) { word in
+                        Text(word)
+                    }
+                    .onDelete(perform: settings.removeFillerWords)
+                }
             }
             
             Section(header: Text("Audio Settings")) {
@@ -108,6 +129,11 @@ struct SettingsView: View {
         .onAppear {
             settings.repairSelectedTranscriptionLanguage()
         }
+        .alert("Duplicate Word", isPresented: $showDuplicateFillerWordAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("This filler word is already in the list.")
+        }
     }
 
     private var sortedTranscriptionLanguages: [(key: String, value: String)] {
@@ -123,6 +149,17 @@ struct SettingsView: View {
             get: { settings.selectedTranscriptionLanguage },
             set: { settings.setSelectedTranscriptionLanguage($0) }
         )
+    }
+
+    private func addFillerWord() {
+        let word = newFillerWord.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !word.isEmpty else { return }
+
+        if settings.addFillerWord(word) {
+            newFillerWord = ""
+        } else {
+            showDuplicateFillerWordAlert = true
+        }
     }
     
     private func deleteMode(at offsets: IndexSet) {

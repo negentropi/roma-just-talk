@@ -153,6 +153,21 @@ final class AppSettings: ObservableObject {
         )
     }
 
+    func addFillerWord(_ word: String) -> Bool {
+        guard let updatedWords = VoiceInkFillerWords.adding(word, to: fillerWords) else {
+            return false
+        }
+
+        fillerWords = updatedWords
+        return true
+    }
+
+    func removeFillerWords(at offsets: IndexSet) {
+        for index in offsets.sorted(by: >) {
+            fillerWords.remove(at: index)
+        }
+    }
+
     var availableTranscriptionLanguages: [String: String] {
         guard let provider = selectedMode?.transcriptionProvider else {
             return VoiceInkLanguageCatalog.whisperLanguages()

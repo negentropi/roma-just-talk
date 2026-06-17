@@ -2,6 +2,35 @@ import Foundation
 @testable import VoiceInkCore
 
 final class TranscriptPresentationTests: XCTestCase {
+    func testPreferredTextUsesEnhancedTextWhenPresent() {
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.preferredText(
+                rawText: "raw transcript",
+                enhancedText: "enhanced transcript"
+            ),
+            "enhanced transcript"
+        )
+    }
+
+    func testPreferredTextFallsBackToRawTextWhenEnhancedTextIsEmpty() {
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.preferredText(
+                rawText: "raw transcript",
+                enhancedText: ""
+            ),
+            "raw transcript"
+        )
+    }
+
+    func testPreferredTextReturnsNilWhenAllTextIsEmpty() {
+        XCTAssertNil(
+            VoiceInkTranscriptPresentation.preferredText(
+                rawText: "",
+                enhancedText: nil
+            )
+        )
+    }
+
     func testMatchesSearchReturnsTrueForEmptyQuery() {
         XCTAssertTrue(
             VoiceInkTranscriptPresentation.matchesSearch(

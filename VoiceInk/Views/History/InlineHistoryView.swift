@@ -523,7 +523,12 @@ private struct HistoryCardRow: View {
                         .foregroundColor(.secondary)
 
                     if !isExpanded {
-                        Text(transcription.enhancedText ?? transcription.text)
+                        Text(
+                            VoiceInkTranscriptPresentation.preferredText(
+                                rawText: transcription.text,
+                                enhancedText: transcription.enhancedText
+                            ) ?? transcription.text
+                        )
                             .font(.system(size: 13))
                             .lineLimit(2)
                             .foregroundColor(.primary)

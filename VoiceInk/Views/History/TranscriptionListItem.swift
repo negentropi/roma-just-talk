@@ -36,7 +36,12 @@ struct TranscriptionListItem: View {
                     }
                 }
 
-                Text(transcription.enhancedText ?? transcription.text)
+                Text(
+                    VoiceInkTranscriptPresentation.preferredText(
+                        rawText: transcription.text,
+                        enhancedText: transcription.enhancedText
+                    ) ?? transcription.text
+                )
                     .font(.system(size: 12, weight: .regular))
                     .lineLimit(2)
                     .foregroundColor(.primary)

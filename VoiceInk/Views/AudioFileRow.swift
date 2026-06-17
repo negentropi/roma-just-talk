@@ -102,7 +102,12 @@ struct AudioFileRow: View {
                 .truncationMode(.middle)
 
             if !isExpanded, let transcription = item.transcription {
-                Text(transcription.enhancedText ?? transcription.text)
+                Text(
+                    VoiceInkTranscriptPresentation.preferredText(
+                        rawText: transcription.text,
+                        enhancedText: transcription.enhancedText
+                    ) ?? transcription.text
+                )
                     .foregroundColor(.secondary)
                     .lineLimit(1)
             }

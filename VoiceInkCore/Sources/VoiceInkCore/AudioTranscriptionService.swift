@@ -5,7 +5,8 @@ public protocol VoiceInkAudioTranscriptionService {
         apiKey: String,
         model: String,
         fileURL: URL,
-        language: String?
+        language: String?,
+        prompt: String?
     ) async throws -> String
 }
 
@@ -116,7 +117,8 @@ public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionServ
         apiKey: String,
         model: String,
         fileURL: URL,
-        language: String? = nil
+        language: String? = nil,
+        prompt: String? = nil
     ) async throws -> String {
         let audioData = try Data(contentsOf: fileURL)
         return try await transcribeAudioData(

@@ -93,6 +93,7 @@ public struct VoiceInkTranscriptionRunProcessor {
         configuration: VoiceInkModeRuntimeConfiguration,
         cleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration = .disabled,
         transcriptionLanguage: String? = nil,
+        transcriptionPrompt: String? = nil,
         apiKeyProvider: APIKeyProvider,
         transcriptionServiceProvider: TranscriptionServiceProvider
     ) async throws -> VoiceInkTranscriptionRunResult {
@@ -109,7 +110,8 @@ public struct VoiceInkTranscriptionRunProcessor {
             apiKey: usableAPIKey,
             model: model,
             fileURL: fileURL,
-            language: VoiceInkTranscriptionLanguageSupport.requestLanguage(transcriptionLanguage)
+            language: VoiceInkTranscriptionLanguageSupport.requestLanguage(transcriptionLanguage),
+            prompt: transcriptionPrompt
         )
 
         guard provider.transcriptionEmptyTextPolicy.accepts(rawText) else {

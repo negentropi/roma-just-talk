@@ -20,12 +20,14 @@ class TranscriptionRetryService {
         let modeConfiguration = await settings.effectiveModeConfiguration
         let cleanupConfiguration = await settings.transcriptionCleanupConfiguration
         let transcriptionLanguage = await settings.selectedTranscriptionLanguage
+        let transcriptionPrompt = await settings.localWhisperPrompt
 
         return try await runProcessor.transcribe(
             fileURL: fileURL,
             configuration: modeConfiguration,
             cleanupConfiguration: cleanupConfiguration,
             transcriptionLanguage: transcriptionLanguage,
+            transcriptionPrompt: transcriptionPrompt,
             apiKeyProvider: { provider in
                 await settings.apiKey(for: provider)
             },

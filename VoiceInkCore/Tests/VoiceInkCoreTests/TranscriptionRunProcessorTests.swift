@@ -138,6 +138,24 @@ final class TranscriptionRunProcessorTests: XCTestCase {
         XCTAssertEqual(service.capturedLanguage, "fr")
     }
 
+    func testTranscribePassesTranscriptionPromptToTranscriptionService() async throws {
+        let service = CapturingTranscriptionService(text: "roma")
+        let processor = VoiceInkTranscriptionRunProcessor { _ in
+            XCTFail("Post-processing should not run")
+            return "unexpected"
+        }
+
+        _ = try await processor.transcribe(
+            fileURL: URL(fileURLWithPath: "/tmp/audio.wav"),
+            configuration: configuration(isPostProcessingEnabled: false),
+            transcriptionPrompt: "spell Roma as Roma",
+            apiKeyProvider: { _ in "key" },
+            transcriptionServiceProvider: { _ in service }
+        )
+
+        XCTAssertEqual(service.capturedPrompt, "spell Roma as Roma")
+    }
+
     func testTranscribeTreatsAutoLanguageAsDetection() async throws {
         let service = CapturingTranscriptionService(text: "hello")
         let processor = VoiceInkTranscriptionRunProcessor { _ in
@@ -356,7 +374,8 @@ private struct StubTranscriptionService: VoiceInkAudioTranscriptionService {
         apiKey: String,
         model: String,
         fileURL: URL,
-        language: String?
+        language: String?,
+        prompt: String?
     ) async throws -> String {
         text
     }
@@ -366,6 +385,7 @@ private struct StubTranscriptionService: VoiceInkAudioTranscriptionService {
 private final class CapturingTranscriptionService: VoiceInkAudioTranscriptionService {
     let text: String
     private(set) var capturedLanguage: String?
+    private(set) var capturedPrompt: String?
 
     init(text: String) {
         self.text = text
@@ -375,9 +395,11 @@ private final class CapturingTranscriptionService: VoiceInkAudioTranscriptionSer
         apiKey: String,
         model: String,
         fileURL: URL,
-        language: String?
+        language: String?,
+        prompt: String?
     ) async throws -> String {
         capturedLanguage = language
+        capturedPrompt = prompt
         return text
     }
 

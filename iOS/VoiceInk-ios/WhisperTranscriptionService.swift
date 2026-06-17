@@ -15,7 +15,8 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
         apiKey: String,
         model: String,
         fileURL: URL,
-        language: String? = nil
+        language: String? = nil,
+        prompt: String? = nil
     ) async throws -> String {
         
         print("WhisperTranscriptionService: Starting local transcription")
@@ -58,7 +59,7 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
         let success = await context.fullTranscribe(
             samples: audioSamples,
             language: VoiceInkTranscriptionLanguageSupport.requestLanguage(language),
-            prompt: VoiceInkTranscriptionPromptPreference.localWhisperPromptForSelectedLanguage()
+            prompt: prompt ?? ""
         )
         
         if success {

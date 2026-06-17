@@ -148,6 +148,10 @@ final class AppSettings: ObservableObject {
         VoiceInkTranscriptionCleanupConfiguration.current()
     }
 
+    var localWhisperPrompt: String {
+        VoiceInkTranscriptionPromptPreference.localWhisperPromptForSelectedLanguage()
+    }
+
     func addFillerWord(_ word: String) -> Bool {
         guard let updatedWords = VoiceInkFillerWords.adding(word, to: fillerWords) else {
             return false

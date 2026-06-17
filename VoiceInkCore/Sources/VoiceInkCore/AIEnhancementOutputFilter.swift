@@ -6,7 +6,9 @@ public enum VoiceInkAIEnhancementOutputFilter {
         let patterns = [
             #"(?s)<thinking>(.*?)</thinking>"#,
             #"(?s)<think>(.*?)</think>"#,
-            #"(?s)<reasoning>(.*?)</reasoning>"#
+            #"(?s)<reasoning>(.*?)</reasoning>"#,
+            #"(?s)\s*```json\s*\{.*?"codex_follow_up"\s*:\s*true.*?\}\s*```\s*$"#,
+            #"(?s)\s*\{\s*"codex_follow_up"\s*:\s*true.*\}\s*$"#
         ]
 
         for pattern in patterns {

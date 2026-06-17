@@ -2,6 +2,7 @@
 
 ## v1.94 - Unreleased
 
+- Stripped Codex follow-up JSON payloads from Local CLI enhancement output so transcript cleanup cannot paste assistant metadata into the target app.
 - Shared selected-language option ordering between macOS language pickers and the imported iOS settings path.
 - Shared provider credential presence checks between macOS cloud/streaming transcription and the imported iOS transcription path, so whitespace-only API keys are treated as missing consistently.
 - Shared selected-language request normalization between macOS local Whisper/cloud transcription and the imported iOS transcription path.

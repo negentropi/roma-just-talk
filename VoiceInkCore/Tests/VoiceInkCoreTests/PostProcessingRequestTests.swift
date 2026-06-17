@@ -65,4 +65,30 @@ final class PostProcessingRequestTests: XCTestCase {
             "Clean text"
         )
     }
+
+    func testFinalizedTranscriptStripsCodexFollowUpPayload() {
+        let response = """
+        Regards.
+
+        ```json
+        {
+          "codex_follow_up": true,
+          "title": "Follow-up",
+          "items": [
+            {
+              "prompt": "Clean up another short transcript"
+            }
+          ]
+        }
+        ```
+        """
+
+        XCTAssertEqual(
+            VoiceInkPostProcessingRequest.finalizedTranscript(
+                from: response,
+                fallbackTranscript: "raw text"
+            ),
+            "Regards."
+        )
+    }
 }

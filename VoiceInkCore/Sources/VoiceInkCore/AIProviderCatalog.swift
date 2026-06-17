@@ -1,5 +1,18 @@
 import Foundation
 
+public enum VoiceInkAIEnhancementAPIKeyVerificationTransport: Sendable, Equatable {
+    case anthropicMessages
+    case openAICompatibleModels
+    case geminiModels
+    case elevenLabsUser
+    case deepgramProjects
+    case mistralModels
+    case sonioxFiles
+    case speechmaticsJobs
+    case assemblyAITranscripts
+    case openRouterModels
+}
+
 public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
     case cerebras = "Cerebras"
     case groq = "Groq"
@@ -54,6 +67,33 @@ public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
             return false
         case .anthropic, .assemblyAI, .cerebras, .custom, .deepgram, .elevenLabs, .gemini, .groq, .mistral, .openAI, .openRouter, .soniox, .speechmatics:
             return true
+        }
+    }
+
+    public var apiKeyVerificationTransport: VoiceInkAIEnhancementAPIKeyVerificationTransport? {
+        switch self {
+        case .anthropic:
+            return .anthropicMessages
+        case .assemblyAI:
+            return .assemblyAITranscripts
+        case .cerebras, .custom, .groq, .openAI:
+            return .openAICompatibleModels
+        case .deepgram:
+            return .deepgramProjects
+        case .elevenLabs:
+            return .elevenLabsUser
+        case .gemini:
+            return .geminiModels
+        case .mistral:
+            return .mistralModels
+        case .openRouter:
+            return .openRouterModels
+        case .soniox:
+            return .sonioxFiles
+        case .speechmatics:
+            return .speechmaticsJobs
+        case .ollama, .localCLI:
+            return nil
         }
     }
 }

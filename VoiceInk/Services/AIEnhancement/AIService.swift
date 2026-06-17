@@ -260,26 +260,27 @@ class AIService: ObservableObject {
 
         Task {
             let result: (isValid: Bool, errorMessage: String?)
-            switch selectedProvider {
-            case .anthropic:
+            guard let transport = selectedProvider.apiKeyVerificationTransport else {
+                DispatchQueue.main.async {
+                    completion(false, "\(self.selectedProvider.rawValue) does not support API key verification.")
+                }
+                return
+            }
+
+            switch transport {
+            case .anthropicMessages:
                 result = await AnthropicLLMClient.verifyAPIKey(resolvedKey)
-            case .elevenLabs:
-                result = await ElevenLabsClient.verifyAPIKey(resolvedKey)
-            case .deepgram:
-                result = await DeepgramClient.verifyAPIKey(resolvedKey)
-            case .mistral:
-                result = await MistralTranscriptionClient.verifyAPIKey(resolvedKey)
-            case .soniox:
-                result = await SonioxClient.verifyAPIKey(resolvedKey)
-            case .speechmatics:
-                result = await SpeechmaticsClient.verifyAPIKey(resolvedKey)
-            case .assemblyAI:
+            case .assemblyAITranscripts:
                 result = await AssemblyAIClient.verifyAPIKey(resolvedKey)
-            case .openRouter:
-                result = await OpenRouterClient.verifyAPIKey(resolvedKey, model: currentModel)
-            case .gemini:
+            case .deepgramProjects:
+                result = await DeepgramClient.verifyAPIKey(resolvedKey)
+            case .elevenLabsUser:
+                result = await ElevenLabsClient.verifyAPIKey(resolvedKey)
+            case .geminiModels:
                 result = await GeminiTranscriptionClient.verifyAPIKey(resolvedKey)
-            default:
+            case .mistralModels:
+                result = await MistralTranscriptionClient.verifyAPIKey(resolvedKey)
+            case .openAICompatibleModels:
                 guard let baseURL = URL(string: selectedProvider.baseURL) else {
                     DispatchQueue.main.async {
                         completion(false, "Invalid or missing base URL configuration")
@@ -291,6 +292,12 @@ class AIService: ObservableObject {
                     apiKey: resolvedKey,
                     model: currentModel
                 )
+            case .openRouterModels:
+                result = await OpenRouterClient.verifyAPIKey(resolvedKey, model: currentModel)
+            case .sonioxFiles:
+                result = await SonioxClient.verifyAPIKey(resolvedKey)
+            case .speechmaticsJobs:
+                result = await SpeechmaticsClient.verifyAPIKey(resolvedKey)
             }
             DispatchQueue.main.async {
                 completion(result.isValid, result.errorMessage)

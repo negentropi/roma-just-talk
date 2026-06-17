@@ -550,7 +550,6 @@ final class RecordingShortcutModeHandler {
 
     private let shortcutPressCooldown: TimeInterval = 0.08
     private let hybridPressThreshold: TimeInterval = 0.5
-    private let minimumSpecialNoEvidencePressDuration: TimeInterval = 0.5
 
     init(
         logger: Logger,
@@ -660,9 +659,7 @@ final class RecordingShortcutModeHandler {
             let options = activeSpecialOptions
             let hasTypingEvidence = context.didPressOtherKeyDuringPress || context.didReleaseOtherKeyDuringPress
             let isPreloadOnly = options.keyDownBehavior == .preloadOnly
-            let shouldFailClosed =
-                (isPreloadOnly && !context.hasReliableKeyEvidence) ||
-                (!isPreloadOnly && !hasTypingEvidence && pressDuration < minimumSpecialNoEvidencePressDuration)
+            let shouldFailClosed = isPreloadOnly && !context.hasReliableKeyEvidence
 
             if hasTypingEvidence || shouldFailClosed {
                 if isPreloadOnly {

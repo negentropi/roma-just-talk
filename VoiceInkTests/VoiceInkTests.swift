@@ -563,10 +563,11 @@ struct VoiceInkTests {
         #expect(recordingState == .transcribing)
     }
 
-    @Test @MainActor func specialModeCancelsShortNoEvidencePresses() async throws {
+    @Test @MainActor func specialModeStartRecordingStopsShortNoEvidencePresses() async throws {
         SpecialShortcutEmptyTranscriptionFallback.resetForTesting()
         defer { SpecialShortcutEmptyTranscriptionFallback.resetForTesting() }
 
+        var recordingState = RecordingState.idle
         var sessionActive = false
         var toggleCount = 0
         var cancelCount = 0
@@ -575,13 +576,20 @@ struct VoiceInkTests {
             logger: Logger(subsystem: "VoiceInkTests", category: "RecordingShortcutModeHandler"),
             canHandleShortcutAction: { true },
             isRecorderVisible: { sessionActive },
-            recordingState: { sessionActive ? .recording : .idle },
+            recordingState: { recordingState },
             toggleMiniRecorder: { _ in
                 toggleCount += 1
-                sessionActive.toggle()
+                if recordingState == .idle {
+                    recordingState = .recording
+                    sessionActive = true
+                } else {
+                    recordingState = .transcribing
+                    sessionActive = true
+                }
             },
             cancelRecording: {
                 cancelCount += 1
+                recordingState = .idle
                 sessionActive = false
             }
         )
@@ -606,9 +614,9 @@ struct VoiceInkTests {
             specialOptions: specialOptions
         )
 
-        #expect(toggleCount == 1)
-        #expect(cancelCount == 1)
-        #expect(!sessionActive)
+        #expect(toggleCount == 2)
+        #expect(cancelCount == 0)
+        #expect(recordingState == .transcribing)
     }
 
     @Test @MainActor func specialModePreloadOnlyLongPressCommits() async throws {

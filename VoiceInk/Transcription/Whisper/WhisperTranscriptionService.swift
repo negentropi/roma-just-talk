@@ -60,7 +60,7 @@ class WhisperTranscriptionService: TranscriptionService {
         // Transcribe
         let success = await whisperContext.fullTranscribe(
             samples: data,
-            language: VoiceInkTranscriptionLanguagePreference.requestLanguage(),
+            language: VoiceInkTranscriptionLanguagePreference.selectedLanguage(),
             prompt: currentPrompt
         )
 

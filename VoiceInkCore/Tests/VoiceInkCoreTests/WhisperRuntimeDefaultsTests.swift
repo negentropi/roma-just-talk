@@ -53,6 +53,16 @@ final class WhisperRuntimeDefaultsTests: XCTestCase {
         }
     }
 
+    func testRuntimeConfigurationNormalizesWhisperRequestLanguage() {
+        XCTAssertEqual(
+            VoiceInkWhisperRuntimeConfiguration.current(language: " fr ").language,
+            "fr"
+        )
+        XCTAssertNil(VoiceInkWhisperRuntimeConfiguration.current(language: "auto").language)
+        XCTAssertNil(VoiceInkWhisperRuntimeConfiguration.current(language: "  ").language)
+        XCTAssertNil(VoiceInkWhisperRuntimeConfiguration.current(language: nil).language)
+    }
+
     func testRuntimeConfigurationDisablesVADWhenPreferenceIsOff() {
         withTemporaryDefaults { defaults in
             VoiceInkVADPreference.saveIsEnabled(false, to: defaults)

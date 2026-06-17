@@ -82,7 +82,7 @@ public struct VoiceInkWhisperRuntimeConfiguration: Equatable, Sendable {
         processorCount: Int = ProcessInfo.processInfo.processorCount
     ) -> VoiceInkWhisperRuntimeConfiguration {
         VoiceInkWhisperRuntimeConfiguration(
-            language: language,
+            language: VoiceInkTranscriptionLanguageSupport.requestLanguage(language),
             prompt: prompt,
             threadCount: VoiceInkWhisperRuntimeDefaults.threadCount(processorCount: processorCount),
             temperature: VoiceInkWhisperRuntimeDefaults.transcriptionTemperature,

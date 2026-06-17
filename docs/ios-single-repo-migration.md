@@ -78,7 +78,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - duration presentation
 - relative timestamp presentation
 - Whisper and VAD model file metadata, including platform-base Whisper model directory creation, downloaded local-model file records, runtime model-name to downloaded-file resolution, model/sidecar file construction, downloaded-state detection, bootstrap-model availability, Core ML support policy, final `.bin` install/replacement, and model/sidecar deletion
-- local Whisper runtime defaults and runtime configuration for language, prompt, thread count, transcription temperature, VAD enablement, VAD model path eligibility, and VAD thresholds
+- local Whisper runtime defaults and runtime configuration for request-language normalization, prompt, thread count, transcription temperature, VAD enablement, VAD model path eligibility, and VAD thresholds
 - VAD bundle resource lookup
 - PCM16 sample conversion and mono 16 kHz transcription-audio format constants, including bit depth, endian, and integer/float sample policy
 - OpenAI-compatible, Deepgram, Gemini, Mistral, ElevenLabs, xAI, Soniox, Speechmatics, and AssemblyAI remote transcription request/client helpers

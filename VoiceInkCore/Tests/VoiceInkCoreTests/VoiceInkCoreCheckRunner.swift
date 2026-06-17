@@ -406,6 +406,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "WhisperRuntimeDefaultsTests.testRuntimeConstantsMatchExistingWhisperWrappers", run: { WhisperRuntimeDefaultsTests().testRuntimeConstantsMatchExistingWhisperWrappers() }),
             VoiceInkCoreCheck(name: "WhisperRuntimeDefaultsTests.testVADRuntimeConfigurationRequiresEnabledPreferenceAndModelPath", run: { WhisperRuntimeDefaultsTests().testVADRuntimeConfigurationRequiresEnabledPreferenceAndModelPath() }),
             VoiceInkCoreCheck(name: "WhisperRuntimeDefaultsTests.testRuntimeConfigurationBuildsSharedWhisperInputs", run: { WhisperRuntimeDefaultsTests().testRuntimeConfigurationBuildsSharedWhisperInputs() }),
+            VoiceInkCoreCheck(name: "WhisperRuntimeDefaultsTests.testRuntimeConfigurationNormalizesWhisperRequestLanguage", run: { WhisperRuntimeDefaultsTests().testRuntimeConfigurationNormalizesWhisperRequestLanguage() }),
             VoiceInkCoreCheck(name: "WhisperRuntimeDefaultsTests.testRuntimeConfigurationDisablesVADWhenPreferenceIsOff", run: { WhisperRuntimeDefaultsTests().testRuntimeConfigurationDisablesVADWhenPreferenceIsOff() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testBootstrapModelsContainBaseModelSpec", run: { WhisperModelFilesTests().testBootstrapModelsContainBaseModelSpec() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testModelsDirectoryBuildsUnderPlatformBaseDirectory", run: { try WhisperModelFilesTests().testModelsDirectoryBuildsUnderPlatformBaseDirectory() }),

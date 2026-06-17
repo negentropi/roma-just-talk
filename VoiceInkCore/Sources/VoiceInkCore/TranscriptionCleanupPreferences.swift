@@ -59,8 +59,7 @@ public struct VoiceInkTranscriptionCleanupConfiguration: Equatable, Sendable {
             shouldLowercase: defaults.object(forKey: VoiceInkUserDefaultsKey.lowercaseTranscription) as? Bool
                 ?? VoiceInkPreferenceDefault.lowercaseTranscription,
             shouldRemoveFillerWords: shouldRemoveFillerWords,
-            fillerWords: defaults.stringArray(forKey: VoiceInkUserDefaultsKey.fillerWords)
-                ?? VoiceInkFillerWords.defaultWords
+            fillerWords: VoiceInkFillerWordPreference.words(from: defaults)
         )
     }
 

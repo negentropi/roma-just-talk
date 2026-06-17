@@ -4,14 +4,11 @@ import VoiceInkCore
 class FillerWordManager: ObservableObject {
     static let shared = FillerWordManager()
 
-    static let defaultFillerWords = VoiceInkFillerWords.defaultWords
-
-    private let fillerWordsKey = VoiceInkUserDefaultsKey.fillerWords
     private let removeFillerWordsKey = VoiceInkUserDefaultsKey.removeFillerWords
 
     @Published var fillerWords: [String] {
         didSet {
-            UserDefaults.standard.set(fillerWords, forKey: fillerWordsKey)
+            VoiceInkFillerWordPreference.saveWords(fillerWords)
         }
     }
 
@@ -20,11 +17,7 @@ class FillerWordManager: ObservableObject {
     }
 
     private init() {
-        if let saved = UserDefaults.standard.stringArray(forKey: fillerWordsKey) {
-            self.fillerWords = saved
-        } else {
-            self.fillerWords = Self.defaultFillerWords
-        }
+        self.fillerWords = VoiceInkFillerWordPreference.words()
     }
 
     func addWord(_ word: String) -> Bool {

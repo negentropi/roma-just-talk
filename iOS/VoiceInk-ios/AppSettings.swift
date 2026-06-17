@@ -51,7 +51,7 @@ final class AppSettings: ObservableObject {
     }
 
     @Published var fillerWords: [String] {
-        didSet { UserDefaults.standard.set(fillerWords, forKey: VoiceInkUserDefaultsKey.fillerWords) }
+        didSet { VoiceInkFillerWordPreference.saveWords(fillerWords) }
     }
 
     @Published var selectedTranscriptionLanguage: String {
@@ -86,8 +86,7 @@ final class AppSettings: ObservableObject {
             ?? VoiceInkPreferenceDefault.lowercaseTranscription
         self.removeFillerWords = UserDefaults.standard.object(forKey: VoiceInkUserDefaultsKey.removeFillerWords) as? Bool
             ?? VoiceInkPreferenceDefault.removeFillerWords
-        self.fillerWords = UserDefaults.standard.stringArray(forKey: VoiceInkUserDefaultsKey.fillerWords)
-            ?? VoiceInkFillerWords.defaultWords
+        self.fillerWords = VoiceInkFillerWordPreference.words()
         self.selectedTranscriptionLanguage = UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
             ?? VoiceInkLanguageCatalog.autoDetectCode
 

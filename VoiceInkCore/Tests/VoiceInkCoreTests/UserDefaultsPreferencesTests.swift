@@ -139,6 +139,26 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testFillerWordPreferenceUsesDefaultWordsWhenMissing() {
+        withIsolatedDefaults { defaults in
+            XCTAssertEqual(
+                VoiceInkFillerWordPreference.words(from: defaults),
+                VoiceInkFillerWords.defaultWords
+            )
+        }
+    }
+
+    func testFillerWordPreferenceRoundTripsSavedWords() {
+        withIsolatedDefaults { defaults in
+            VoiceInkFillerWordPreference.saveWords(["um", "like"], to: defaults)
+
+            XCTAssertEqual(
+                VoiceInkFillerWordPreference.words(from: defaults),
+                ["um", "like"]
+            )
+        }
+    }
+
     func testModeStorageRoundTripsModesAndSelectedModeId() {
         withIsolatedDefaults { defaults in
             let localMode = Mode.defaultLocalWhisper(name: "Local")

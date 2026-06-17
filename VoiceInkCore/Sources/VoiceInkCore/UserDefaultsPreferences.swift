@@ -79,6 +79,16 @@ public enum VoiceInkTranscriptionLanguagePreference {
     }
 }
 
+public enum VoiceInkFillerWordPreference {
+    public static func words(from defaults: UserDefaults = .standard) -> [String] {
+        defaults.stringArray(forKey: VoiceInkUserDefaultsKey.fillerWords) ?? VoiceInkFillerWords.defaultWords
+    }
+
+    public static func saveWords(_ words: [String], to defaults: UserDefaults = .standard) {
+        defaults.set(words, forKey: VoiceInkUserDefaultsKey.fillerWords)
+    }
+}
+
 public enum VoiceInkModeStorage {
     public static func saveModes(
         _ modes: [Mode],

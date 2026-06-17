@@ -38,6 +38,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - transcription cleanup preferences and punctuation/lowercase cleanup policy
 - cursor-aware transcript capitalization policy; platform shells only supply cursor text and paste targets
 - NaturalLanguage word-count policy for metrics and short-enhancement skip decisions
+- short post-processing skip policy and storage defaults for brief transcripts; platform shells still own UI controls and whether to apply the policy
 - NaturalLanguage transcript paragraph formatting policy for the macOS text-formatting preference
 - word-replacement ordering and text application policy; platform shells still own dictionary storage
 - vocabulary, word-replacement, backup dictionary insert, and word-replacement edit planning; platform shells still own dictionary storage and persistence errors

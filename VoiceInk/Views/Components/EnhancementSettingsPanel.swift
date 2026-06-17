@@ -1,9 +1,12 @@
 import SwiftUI
+import VoiceInkCore
 
 struct EnhancementSettingsPanel: View {
     @EnvironmentObject private var enhancementService: AIEnhancementService
-    @AppStorage("SkipShortEnhancement") private var isSkipShortEnhancementEnabled = true
-    @AppStorage("ShortEnhancementWordThreshold") private var shortEnhancementWordThreshold = 3
+    @AppStorage(VoiceInkUserDefaultsKey.skipShortEnhancement)
+    private var isSkipShortEnhancementEnabled = VoiceInkPreferenceDefault.skipShortEnhancement
+    @AppStorage(VoiceInkUserDefaultsKey.shortEnhancementWordThreshold)
+    private var shortEnhancementWordThreshold = VoiceInkPreferenceDefault.shortEnhancementWordThreshold
     @AppStorage("EnhancementTimeoutSeconds") private var enhancementTimeoutSeconds = 7
     @AppStorage("EnhancementRetryOnTimeout") private var retryOnTimeout = true
     @State private var isShortEnhancementExpanded = false

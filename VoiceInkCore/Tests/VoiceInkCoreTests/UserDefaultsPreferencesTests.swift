@@ -14,6 +14,8 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkUserDefaultsKey.transcriptionPrompt, "TranscriptionPrompt")
         XCTAssertEqual(VoiceInkUserDefaultsKey.isTranscriptionCleanupEnabled, "IsTranscriptionCleanupEnabled")
         XCTAssertEqual(VoiceInkUserDefaultsKey.transcriptionRetentionMinutes, "TranscriptionRetentionMinutes")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.skipShortEnhancement, "SkipShortEnhancement")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.shortEnhancementWordThreshold, "ShortEnhancementWordThreshold")
         XCTAssertEqual(VoiceInkUserDefaultsKey.audioSessionTimeoutSeconds, "audioSessionTimeoutSeconds")
     }
 
@@ -23,6 +25,11 @@ final class UserDefaultsPreferencesTests: XCTestCase {
 
     func testSharedPreferenceDefaultsPreserveExistingCleanupRetention() {
         XCTAssertEqual(VoiceInkPreferenceDefault.transcriptionRetentionMinutes, 24 * 60)
+    }
+
+    func testSharedPreferenceDefaultsPreserveExistingShortEnhancementPolicy() {
+        XCTAssertEqual(VoiceInkPreferenceDefault.skipShortEnhancement, true)
+        XCTAssertEqual(VoiceInkPreferenceDefault.shortEnhancementWordThreshold, 3)
     }
 
     func testModeStorageRoundTripsModesAndSelectedModeId() {

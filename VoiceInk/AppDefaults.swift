@@ -68,8 +68,8 @@ enum AppDefaults {
             SpecialShortcutSettings.pasteLastTranscriptOnEmptyTapKey: true,
 
             // Enhancement
-            "SkipShortEnhancement": true,
-            "ShortEnhancementWordThreshold": 3,
+            VoiceInkUserDefaultsKey.skipShortEnhancement: VoiceInkPreferenceDefault.skipShortEnhancement,
+            VoiceInkUserDefaultsKey.shortEnhancementWordThreshold: VoiceInkPreferenceDefault.shortEnhancementWordThreshold,
             "EnhancementTimeoutSeconds": 7,
             "EnhancementRetryOnTimeout": true,
 

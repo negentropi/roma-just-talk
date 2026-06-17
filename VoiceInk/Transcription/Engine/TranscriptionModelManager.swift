@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 import os
+import VoiceInkCore
 
 @MainActor
 class TranscriptionModelManager: ObservableObject {
@@ -67,10 +68,10 @@ class TranscriptionModelManager: ObservableObject {
     // MARK: - Model loading from UserDefaults
 
     func loadCurrentTranscriptionModel() {
-        if let savedModelName = UserDefaults.standard.string(forKey: "CurrentTranscriptionModel"),
+        if let savedModelName = UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.currentTranscriptionModel),
            let savedModel = allAvailableModels.first(where: { $0.name == savedModelName }) {
             guard isAvailableOnCurrentOS(savedModel) else {
-                UserDefaults.standard.removeObject(forKey: "CurrentTranscriptionModel")
+                UserDefaults.standard.removeObject(forKey: VoiceInkUserDefaultsKey.currentTranscriptionModel)
                 currentTranscriptionModel = nil
                 return
             }
@@ -93,7 +94,7 @@ class TranscriptionModelManager: ObservableObject {
         }
 
         self.currentTranscriptionModel = model
-        UserDefaults.standard.set(model.name, forKey: "CurrentTranscriptionModel")
+        UserDefaults.standard.set(model.name, forKey: VoiceInkUserDefaultsKey.currentTranscriptionModel)
         ensureSelectedLanguageIsSupported(by: model)
 
         if model.provider != .whisper {
@@ -144,7 +145,7 @@ class TranscriptionModelManager: ObservableObject {
 
     func clearCurrentTranscriptionModel() {
         currentTranscriptionModel = nil
-        UserDefaults.standard.removeObject(forKey: "CurrentTranscriptionModel")
+        UserDefaults.standard.removeObject(forKey: VoiceInkUserDefaultsKey.currentTranscriptionModel)
     }
 
     // MARK: - Handle model deletion callback
@@ -153,7 +154,7 @@ class TranscriptionModelManager: ObservableObject {
     func handleModelDeleted(_ modelName: String) {
         if currentTranscriptionModel?.name == modelName {
             currentTranscriptionModel = nil
-            UserDefaults.standard.removeObject(forKey: "CurrentTranscriptionModel")
+            UserDefaults.standard.removeObject(forKey: VoiceInkUserDefaultsKey.currentTranscriptionModel)
             whisperModelManager?.loadedWhisperModel = nil
             whisperModelManager?.isModelLoaded = false
             UserDefaults.standard.removeObject(forKey: "CurrentModel")

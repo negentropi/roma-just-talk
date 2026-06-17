@@ -161,7 +161,7 @@ class SystemInfoService {
     }
 
     private func getCurrentTranscriptionModel() -> String {
-        if let modelName = UserDefaults.standard.string(forKey: "CurrentTranscriptionModel") {
+        if let modelName = UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.currentTranscriptionModel) {
             if let model = TranscriptionModelRegistry.models.first(where: { $0.name == modelName }) {
                 return model.displayName
             }
@@ -204,7 +204,7 @@ class SystemInfoService {
             powerDescription = "External Power"
         }
 
-        let currentModelName = UserDefaults.standard.string(forKey: "CurrentTranscriptionModel")
+        let currentModelName = UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.currentTranscriptionModel)
         let currentModelPreloadEnabled: String
         if let currentModelName {
             let key = RollingBufferPreloadSettings.perModelPreloadEnabledKey(forModelName: currentModelName)

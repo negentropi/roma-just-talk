@@ -46,7 +46,7 @@ enum AppDefaults {
             RollingBufferPreloadSettings.preRunFinalizationKey: RollingBufferPreloadSettings.defaultPreRunFinalization,
             RollingBufferVADSettings.modelKey: RollingBufferVADSettings.sileroModelName,
             "RecorderType": "none",
-            "CurrentTranscriptionModel": "parakeet-tdt-0.6b-v2",
+            VoiceInkUserDefaultsKey.currentTranscriptionModel: "parakeet-tdt-0.6b-v2",
 
             // Cleanup
             VoiceInkUserDefaultsKey.isTranscriptionCleanupEnabled: false,

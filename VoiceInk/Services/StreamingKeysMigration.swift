@@ -1,4 +1,5 @@
 import Foundation
+import VoiceInkCore
 
 // Safe to delete once all users have updated past this version.
 enum StreamingKeysMigration {
@@ -28,9 +29,9 @@ enum StreamingKeysMigration {
             "voxtral-mini-transcribe-realtime-2602": "voxtral-mini-latest",
         ]
 
-        if let savedModel = defaults.string(forKey: "CurrentTranscriptionModel"),
+        if let savedModel = defaults.string(forKey: VoiceInkUserDefaultsKey.currentTranscriptionModel),
            let replacement = removedModelMappings[savedModel] {
-            defaults.set(replacement, forKey: "CurrentTranscriptionModel")
+            defaults.set(replacement, forKey: VoiceInkUserDefaultsKey.currentTranscriptionModel)
         }
 
         // Remap selectedTranscriptionModelName inside each stored PowerModeConfig.

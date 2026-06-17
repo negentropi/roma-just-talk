@@ -103,7 +103,7 @@ class CloudTranscriptionService: TranscriptionService {
     }
 
     private func transcriptionPrompt() -> String? {
-        let prompt = UserDefaults.standard.string(forKey: "TranscriptionPrompt") ?? ""
+        let prompt = UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.transcriptionPrompt) ?? ""
         return prompt.isEmpty ? nil : prompt
     }
 

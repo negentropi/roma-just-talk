@@ -53,8 +53,8 @@ actor WhisperContext {
 
         whisper_reset_timings(context)
         
-        // Configure VAD
-        if let vadModelPath = self.vadModelPath {
+        // Configure VAD if enabled by shared preference and model is available.
+        if VoiceInkVADPreference.isEnabled(), let vadModelPath = self.vadModelPath {
             params.vad = true
             params.vad_model_path = (vadModelPath as NSString).utf8String
             

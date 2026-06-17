@@ -11,6 +11,7 @@ public enum VoiceInkUserDefaultsKey {
     public static let currentTranscriptionModel = "CurrentTranscriptionModel"
     public static let transcriptionPrompt = "TranscriptionPrompt"
     public static let isTextFormattingEnabled = "IsTextFormattingEnabled"
+    public static let isVADEnabled = "IsVADEnabled"
     public static let isTranscriptionCleanupEnabled = "IsTranscriptionCleanupEnabled"
     public static let transcriptionRetentionMinutes = "TranscriptionRetentionMinutes"
     public static let skipShortEnhancement = "SkipShortEnhancement"
@@ -38,6 +39,7 @@ public enum VoiceInkUserDefaultsKey {
 public enum VoiceInkPreferenceDefault {
     public static let audioSessionTimeoutSeconds = 90
     public static let isTextFormattingEnabled = true
+    public static let isVADEnabled = true
     public static let lowercaseTranscription = false
     public static let removeFillerWords = true
     public static let transcriptionRetentionMinutes = 24 * 60
@@ -77,6 +79,21 @@ public enum VoiceInkAudioSessionTimeoutPreference {
 
     public static func clear(from defaults: UserDefaults = .standard) {
         defaults.removeObject(forKey: VoiceInkUserDefaultsKey.audioSessionTimeoutSeconds)
+    }
+}
+
+public enum VoiceInkVADPreference {
+    public static func isEnabled(from defaults: UserDefaults = .standard) -> Bool {
+        defaults.object(forKey: VoiceInkUserDefaultsKey.isVADEnabled) as? Bool
+            ?? VoiceInkPreferenceDefault.isVADEnabled
+    }
+
+    public static func saveIsEnabled(_ enabled: Bool, to defaults: UserDefaults = .standard) {
+        defaults.set(enabled, forKey: VoiceInkUserDefaultsKey.isVADEnabled)
+    }
+
+    public static func clear(from defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.isVADEnabled)
     }
 }
 
@@ -356,6 +373,7 @@ public enum VoiceInkSharedPreferenceReset {
         VoiceInkOnboardingPreference.clear(from: defaults)
         VoiceInkProviderAPIKeyVerificationState.clearAll(from: providers, in: defaults)
         VoiceInkAudioSessionTimeoutPreference.clear(from: defaults)
+        VoiceInkVADPreference.clear(from: defaults)
         PunctuationCleanupMode.clearCurrent(in: defaults)
         VoiceInkTranscriptionCleanupPreferenceStorage.clearTextPreferences(from: defaults)
         VoiceInkFillerWordPreference.clearWords(from: defaults)

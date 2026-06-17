@@ -31,7 +31,7 @@ enum AppDefaults {
 
             // Recording & Transcription
             VoiceInkUserDefaultsKey.isTextFormattingEnabled: VoiceInkPreferenceDefault.isTextFormattingEnabled,
-            "IsVADEnabled": true,
+            VoiceInkUserDefaultsKey.isVADEnabled: VoiceInkPreferenceDefault.isVADEnabled,
             VoiceInkUserDefaultsKey.removeFillerWords: VoiceInkPreferenceDefault.removeFillerWords,
             PunctuationCleanupMode.legacyRemovePunctuationKey: false,
             VoiceInkUserDefaultsKey.lowercaseTranscription: VoiceInkPreferenceDefault.lowercaseTranscription,

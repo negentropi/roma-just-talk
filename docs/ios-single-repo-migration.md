@@ -78,7 +78,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - duration presentation
 - relative timestamp presentation
 - Whisper and VAD model file metadata, including platform-base Whisper model directory creation, model/sidecar file construction, downloaded-state detection, bootstrap-model availability, Core ML support policy, and model/sidecar deletion
-- local Whisper runtime defaults for thread count, transcription temperature, and VAD thresholds
+- local Whisper runtime defaults for thread count, transcription temperature, VAD enablement, and VAD thresholds
 - VAD bundle resource lookup
 - PCM16 sample conversion and mono 16 kHz transcription-audio constants
 - OpenAI-compatible, Deepgram, Gemini, Mistral, ElevenLabs, xAI, Soniox, Speechmatics, and AssemblyAI remote transcription request/client helpers
@@ -97,6 +97,7 @@ Current macOS consumers of shared remote transport:
 - macOS local Whisper/model loading throws `VoiceInkEngineError` from `VoiceInkCore`; macOS error descriptions are covered by `VoiceInkEngineErrorTests`.
 - macOS local Whisper and cloud transcription normalize selected request language through `VoiceInkTranscriptionLanguagePreference`.
 - macOS local Whisper, cloud transcription, AssemblyAI streaming, and `WhisperPrompt` read/write transcription prompts through `VoiceInkTranscriptionPromptPreference`; local Whisper transcription uses the shared selected-language prompt fallback helper.
+- macOS local Whisper and FluidAudio VAD gating reads `VoiceInkVADPreference`, preserving the existing `IsVADEnabled` storage key while sharing the default and lookup policy with iOS.
 - macOS `WhisperPrompt` loads/saves custom local-Whisper language prompts through `VoiceInkLocalWhisperPromptCatalog`; macOS and iOS local Whisper fallback prompts now read stored custom prompts through the shared catalog.
 - macOS batch cloud and streaming transcription use `VoiceInkProviderCredential` for runtime API-key presence checks before entering provider adapters.
 - macOS API-key lookup reads fallback environment-variable names from `VoiceInkProviderAPIKeyAccount`; Keychain access remains in the macOS shell.
@@ -158,6 +159,7 @@ Current iOS consumers of shared remote transport:
 - `iOS/VoiceInk-ios/AppSettings.swift` passes the shared paragraph-formatting preference into `VoiceInkTranscriptionRunProcessor`, so iOS retry transcription uses the same `VoiceInkTranscriptParagraphFormatter` policy as macOS.
 - `iOS/VoiceInk-ios/TranscriptionRetryService.swift` passes the iOS selected transcription language through `VoiceInkTranscriptionRunProcessor`, which normalizes auto-detect before remote/local transcription adapters receive it.
 - `iOS/VoiceInk-ios/WhisperTranscriptionService.swift` passes the shared selected-language local Whisper prompt helper into the iOS whisper.cpp wrapper and returns empty local transcripts unchanged, so iOS inherits the macOS language seed prompts and the shared local empty-output policy.
+- `iOS/VoiceInk-ios/LibWhisper.swift` gates local Whisper VAD through `VoiceInkVADPreference`, so missing settings use the shared macOS default while keeping iOS whisper.cpp execution in the iOS shell.
 - `iOS/VoiceInk-ios/ProviderAPIKeyView.swift` verifies stored provider keys through `VoiceInkProviderAPIKeyVerifier`, so shared core owns reference/fallback resolution before transport verification.
 - `iOS/VoiceInk-ios/AppSettings.swift` and `ModeConfigurationView.swift` delegate active-mode transcription language availability, provider-change model repair, and selected-language repair to the shared `Mode` policy; `SettingsView` keeps only the SwiftUI option rendering.
 - `iOS/VoiceInk-ios/WhisperTranscriptionService.swift` throws `VoiceInkEngineError` from `VoiceInkCore` instead of owning a separate iOS-only local Whisper error enum.

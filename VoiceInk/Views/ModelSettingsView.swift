@@ -8,7 +8,7 @@ struct ModelSettingsView: View {
     private var isTextFormattingEnabled = VoiceInkPreferenceDefault.isTextFormattingEnabled
     @AppStorage(PunctuationCleanupMode.userDefaultsKey) private var punctuationCleanupModeRaw = PunctuationCleanupMode.current().rawValue
     @AppStorage(VoiceInkUserDefaultsKey.lowercaseTranscription) private var lowercaseTranscription = false
-    @AppStorage("IsVADEnabled") private var isVADEnabled = true
+    @AppStorage(VoiceInkUserDefaultsKey.isVADEnabled) private var isVADEnabled = VoiceInkPreferenceDefault.isVADEnabled
     @AppStorage("AppendTrailingSpace") private var appendTrailingSpace = true
     @AppStorage("PrewarmModelOnWake") private var prewarmModelOnWake = true
     @AppStorage("showLiveTextPreview") private var showLiveTextPreview = false

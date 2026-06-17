@@ -13,6 +13,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkUserDefaultsKey.currentTranscriptionModel, "CurrentTranscriptionModel")
         XCTAssertEqual(VoiceInkUserDefaultsKey.transcriptionPrompt, "TranscriptionPrompt")
         XCTAssertEqual(VoiceInkUserDefaultsKey.isTextFormattingEnabled, "IsTextFormattingEnabled")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.isVADEnabled, "IsVADEnabled")
         XCTAssertEqual(VoiceInkUserDefaultsKey.isTranscriptionCleanupEnabled, "IsTranscriptionCleanupEnabled")
         XCTAssertEqual(VoiceInkUserDefaultsKey.transcriptionRetentionMinutes, "TranscriptionRetentionMinutes")
         XCTAssertEqual(VoiceInkUserDefaultsKey.skipShortEnhancement, "SkipShortEnhancement")
@@ -44,6 +45,10 @@ final class UserDefaultsPreferencesTests: XCTestCase {
 
     func testSharedPreferenceDefaultsPreserveExistingTextFormattingPolicy() {
         XCTAssertEqual(VoiceInkPreferenceDefault.isTextFormattingEnabled, true)
+    }
+
+    func testSharedPreferenceDefaultsPreserveExistingVADPolicy() {
+        XCTAssertEqual(VoiceInkPreferenceDefault.isVADEnabled, true)
     }
 
     func testSharedPreferenceDefaultsPreserveExistingTranscriptionCleanupPolicy() {
@@ -103,6 +108,28 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             XCTAssertEqual(
                 VoiceInkAudioSessionTimeoutPreference.timeoutSeconds(from: defaults),
                 VoiceInkPreferenceDefault.audioSessionTimeoutSeconds
+            )
+        }
+    }
+
+    func testVADPreferenceUsesSharedDefaultWhenMissing() {
+        withIsolatedDefaults { defaults in
+            XCTAssertEqual(
+                VoiceInkVADPreference.isEnabled(from: defaults),
+                VoiceInkPreferenceDefault.isVADEnabled
+            )
+        }
+    }
+
+    func testVADPreferenceSavesAndClearsEnabledState() {
+        withIsolatedDefaults { defaults in
+            VoiceInkVADPreference.saveIsEnabled(false, to: defaults)
+            XCTAssertFalse(VoiceInkVADPreference.isEnabled(from: defaults))
+
+            VoiceInkVADPreference.clear(from: defaults)
+            XCTAssertEqual(
+                VoiceInkVADPreference.isEnabled(from: defaults),
+                VoiceInkPreferenceDefault.isVADEnabled
             )
         }
     }
@@ -500,6 +527,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             VoiceInkOnboardingPreference.saveHasCompletedOnboarding(to: defaults)
             VoiceInkProviderAPIKeyVerificationState.setVerified(true, for: .groq, in: defaults)
             VoiceInkAudioSessionTimeoutPreference.saveTimeoutSeconds(120, to: defaults)
+            VoiceInkVADPreference.saveIsEnabled(false, to: defaults)
             PunctuationCleanupMode.setCurrent(.removeAll, in: defaults)
             VoiceInkTranscriptionCleanupPreferenceStorage.saveTextFormattingEnabled(false, to: defaults)
             VoiceInkTranscriptionCleanupPreferenceStorage.saveLowercaseTranscription(true, to: defaults)
@@ -516,6 +544,10 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             XCTAssertEqual(
                 VoiceInkAudioSessionTimeoutPreference.timeoutSeconds(from: defaults),
                 VoiceInkPreferenceDefault.audioSessionTimeoutSeconds
+            )
+            XCTAssertEqual(
+                VoiceInkVADPreference.isEnabled(from: defaults),
+                VoiceInkPreferenceDefault.isVADEnabled
             )
             XCTAssertEqual(PunctuationCleanupMode.current(in: defaults), .keep)
             XCTAssertEqual(

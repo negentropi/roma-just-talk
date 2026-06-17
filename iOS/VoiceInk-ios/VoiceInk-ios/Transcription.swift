@@ -3,7 +3,7 @@ import SwiftData
 import VoiceInkCore
 
 @Model
-final class Transcription {
+final class Transcription: VoiceInkMutableTranscriptionRecord {
     var id: UUID
     var text: String
     var enhancedText: String?
@@ -46,20 +46,6 @@ final class Transcription {
 
     func hasStoredAudioFile(fileManager: FileManager = .default) -> Bool {
         existingAudioFileURL(fileManager: fileManager) != nil
-    }
-
-    func applyCompletedRunResult(_ result: VoiceInkTranscriptionRunResult) {
-        text = result.cleanedText
-        enhancedText = result.enhancedText
-        transcriptionModelName = result.transcriptionModelName
-        aiEnhancementModelName = result.aiEnhancementModelName
-        transcriptionStatus = .completed
-        transcriptionError = result.postProcessingError
-    }
-
-    func markTranscriptionFailed(_ errorDescription: String) {
-        transcriptionStatus = .failed
-        transcriptionError = errorDescription
     }
 
     private static var recordingsDirectory: URL {

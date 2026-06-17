@@ -176,15 +176,15 @@ class SystemInfoService {
     }
 
     private func getAIProvider() -> String {
-        if let providerRaw = UserDefaults.standard.string(forKey: "selectedAIProvider") {
+        if let providerRaw = UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.selectedAIProvider) {
             return providerRaw
         }
         return "None selected"
     }
 
     private func getAIModel() -> String {
-        if let providerRaw = UserDefaults.standard.string(forKey: "selectedAIProvider") {
-            let modelKey = "\(providerRaw)SelectedModel"
+        if let providerRaw = UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.selectedAIProvider) {
+            let modelKey = VoiceInkUserDefaultsKey.selectedAIProviderModel(providerRaw)
             if let savedModel = UserDefaults.standard.string(forKey: modelKey), !savedModel.isEmpty {
                 return savedModel
             }

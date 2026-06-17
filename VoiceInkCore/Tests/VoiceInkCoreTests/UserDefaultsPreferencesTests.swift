@@ -20,6 +20,17 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkUserDefaultsKey.enhancementTimeoutSeconds, "EnhancementTimeoutSeconds")
         XCTAssertEqual(VoiceInkUserDefaultsKey.enhancementRetryOnTimeout, "EnhancementRetryOnTimeout")
         XCTAssertEqual(VoiceInkUserDefaultsKey.audioSessionTimeoutSeconds, "audioSessionTimeoutSeconds")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.selectedAIProvider, "selectedAIProvider")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.openRouterModels, "openRouterModels")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.ollamaBaseURL, "ollamaBaseURL")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.ollamaSelectedModel, "ollamaSelectedModel")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.customProviderBaseURL, "customProviderBaseURL")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.customProviderModel, "customProviderModel")
+    }
+
+    func testAIProviderModelSelectionKeyPreservesExistingProviderRawValuePattern() {
+        XCTAssertEqual(VoiceInkUserDefaultsKey.selectedAIProviderModel("Groq"), "GroqSelectedModel")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.selectedAIProviderModel("Local CLI"), "Local CLISelectedModel")
     }
 
     func testSharedPreferenceDefaultsPreserveExistingIOSAudioSessionTimeout() {
@@ -47,6 +58,10 @@ final class UserDefaultsPreferencesTests: XCTestCase {
     func testSharedPreferenceDefaultsPreserveExistingEnhancementTimeoutPolicy() {
         XCTAssertEqual(VoiceInkPreferenceDefault.enhancementTimeoutSeconds, 7)
         XCTAssertEqual(VoiceInkPreferenceDefault.enhancementRetryOnTimeout, true)
+    }
+
+    func testSharedPreferenceDefaultsPreserveExistingOllamaBaseURL() {
+        XCTAssertEqual(VoiceInkPreferenceDefault.ollamaBaseURL, "http://localhost:11434")
     }
 
     func testTranscriptionPromptPreferenceUsesFallbackOnlyWhenLocalWhisperPromptIsMissing() {

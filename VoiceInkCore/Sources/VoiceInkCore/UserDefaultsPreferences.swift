@@ -18,6 +18,16 @@ public enum VoiceInkUserDefaultsKey {
     public static let enhancementTimeoutSeconds = "EnhancementTimeoutSeconds"
     public static let enhancementRetryOnTimeout = "EnhancementRetryOnTimeout"
     public static let audioSessionTimeoutSeconds = "audioSessionTimeoutSeconds"
+    public static let selectedAIProvider = "selectedAIProvider"
+    public static let openRouterModels = "openRouterModels"
+    public static let ollamaBaseURL = "ollamaBaseURL"
+    public static let ollamaSelectedModel = "ollamaSelectedModel"
+    public static let customProviderBaseURL = "customProviderBaseURL"
+    public static let customProviderModel = "customProviderModel"
+
+    public static func selectedAIProviderModel(_ providerRawValue: String) -> String {
+        "\(providerRawValue)SelectedModel"
+    }
 }
 
 public enum VoiceInkPreferenceDefault {
@@ -30,6 +40,7 @@ public enum VoiceInkPreferenceDefault {
     public static let shortEnhancementWordThreshold = 3
     public static let enhancementTimeoutSeconds = 7
     public static let enhancementRetryOnTimeout = true
+    public static let ollamaBaseURL = "http://localhost:11434"
 }
 
 public enum VoiceInkTranscriptionPromptPreference {

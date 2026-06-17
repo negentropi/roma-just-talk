@@ -33,7 +33,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - provider API-key verification flag storage
 - API-key environment-reference resolution
 - AI reasoning temperature, effort, and provider-specific hidden-reasoning request parameters for OpenAI-compatible post-processing
-- AI-enhancement provider identity, persisted names, API-key requirement, and mapping to shared model providers; platform shells still own storage and execution
+- AI-enhancement provider identity, persisted names, API-key requirement, storage keys, model-selection key naming, and mapping to shared model providers; platform shells still own storage and execution
 - AI-enhancement API-key verification transport metadata; macOS still owns concrete verification clients
 - AI-enhancement model defaults and static model lists for macOS AI providers; platform shells still own dynamic providers such as Ollama, OpenRouter fetching, Local CLI, and Custom
 - AI-enhancement provider request endpoints and API-key console URLs for macOS AI providers; platform shells still own provider UI and request execution
@@ -97,7 +97,7 @@ Current macOS consumers of shared remote transport:
 - macOS metrics dashboard duration copy uses `VoiceInkDurationPresentation`, removing the last dashboard-local duration formatter.
 - macOS predefined prompt persistence adapts `VoiceInkPredefinedPrompts` into `CustomPrompt`, so stable prompt IDs and metadata live in shared core.
 - macOS custom prompt final text delegates to `VoiceInkAIPrompts.finalPromptText`, so the system-instruction wrapper stays shared.
-- macOS AI-enhancement provider selection uses `VoiceInkAIEnhancementProviderKind` for persisted provider identity and API-key requirement; macOS keeps dynamic provider settings and execution adapters.
+- macOS AI-enhancement provider selection uses `VoiceInkAIEnhancementProviderKind` and `VoiceInkUserDefaultsKey` for persisted provider identity, model-selection keys, and API-key requirement; macOS keeps dynamic provider settings and execution adapters.
 - macOS AI-enhancement API-key verification dispatch reads `VoiceInkAIEnhancementProviderKind.apiKeyVerificationTransport`; macOS still owns the LLMkit and provider-specific verifier calls.
 - macOS AI-enhancement provider model defaults and static model lists come from `VoiceInkAIModelCatalog`; macOS still owns provider UI, API-key storage, dynamic OpenRouter fetches, Ollama, Local CLI, and Custom provider settings.
 - macOS AI-enhancement request endpoint and API-key console URLs come from the shared `VoiceInkAIModelProvider` catalog; macOS still owns Anthropic/OpenAI-compatible transport selection and provider-specific verification adapters.

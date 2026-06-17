@@ -92,7 +92,7 @@ struct ConfigurationView: View {
             _autoSendKey = State(initialValue: .none)
             _isDefault = State(initialValue: false)
             // Use UserDefaults directly since EnvironmentObjects aren't available in init
-            _selectedAIProvider = State(initialValue: UserDefaults.standard.string(forKey: "selectedAIProvider"))
+            _selectedAIProvider = State(initialValue: UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.selectedAIProvider))
             _selectedAIModel = State(initialValue: nil)
             _isTranscriptFormattingExpanded = State(initialValue: false)
         case .edit(let config):

@@ -1,20 +1,21 @@
 import Foundation
 import SwiftUI
 import LLMkit
+import VoiceInkCore
 
 class OllamaService: ObservableObject {
-    static let defaultBaseURL = "http://localhost:11434"
+    static let defaultBaseURL = VoiceInkPreferenceDefault.ollamaBaseURL
 
     // MARK: - Published Properties
     @Published var baseURL: String {
         didSet {
-            UserDefaults.standard.set(baseURL, forKey: "ollamaBaseURL")
+            UserDefaults.standard.set(baseURL, forKey: VoiceInkUserDefaultsKey.ollamaBaseURL)
         }
     }
 
     @Published var selectedModel: String {
         didSet {
-            UserDefaults.standard.set(selectedModel, forKey: "ollamaSelectedModel")
+            UserDefaults.standard.set(selectedModel, forKey: VoiceInkUserDefaultsKey.ollamaSelectedModel)
         }
     }
 
@@ -25,8 +26,8 @@ class OllamaService: ObservableObject {
     private let defaultTemperature: Double = 0.3
 
     init() {
-        self.baseURL = UserDefaults.standard.string(forKey: "ollamaBaseURL") ?? Self.defaultBaseURL
-        self.selectedModel = UserDefaults.standard.string(forKey: "ollamaSelectedModel") ?? "llama2"
+        self.baseURL = UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.ollamaBaseURL) ?? Self.defaultBaseURL
+        self.selectedModel = UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.ollamaSelectedModel) ?? "llama2"
     }
 
     private var baseURLValue: URL? {

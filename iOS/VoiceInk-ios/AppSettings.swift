@@ -151,13 +151,7 @@ final class AppSettings: ObservableObject {
     }
 
     var transcriptionCleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration {
-        VoiceInkTranscriptionCleanupConfiguration(
-            punctuationMode: punctuationCleanupMode,
-            shouldFormatParagraphs: isTextFormattingEnabled,
-            shouldLowercase: lowercaseTranscription,
-            shouldRemoveFillerWords: removeFillerWords,
-            fillerWords: fillerWords
-        )
+        VoiceInkTranscriptionCleanupConfiguration.current()
     }
 
     func addFillerWord(_ word: String) -> Bool {

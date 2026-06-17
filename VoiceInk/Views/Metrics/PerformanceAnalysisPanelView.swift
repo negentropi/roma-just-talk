@@ -1,4 +1,5 @@
 import SwiftUI
+import VoiceInkCore
 
 /// Compact panel-optimized performance analysis view for sliding panels and sidebars.
 struct PerformanceAnalysisPanelView: View {
@@ -180,7 +181,7 @@ struct PerformanceAnalysisPanelView: View {
             // Secondary metrics
             HStack(spacing: 0) {
                 VStack(spacing: 2) {
-                    Text(formatDuration(modelStat.avgAudioDuration))
+                    Text(VoiceInkDurationPresentation.abbreviatedMinutesSeconds(modelStat.avgAudioDuration))
                         .font(.system(size: 11, weight: .semibold, design: .monospaced))
                         .foregroundColor(.indigo)
                     Text("Avg. Audio")
@@ -262,10 +263,4 @@ struct PerformanceAnalysisPanelView: View {
             .tracking(0.5)
     }
 
-    private func formatDuration(_ duration: TimeInterval) -> String {
-        let formatter = DateComponentsFormatter()
-        formatter.allowedUnits = [.minute, .second]
-        formatter.unitsStyle = .abbreviated
-        return formatter.string(from: duration) ?? "0s"
-    }
 }

@@ -12,6 +12,16 @@ public enum VoiceInkDurationPresentation {
         return String(format: format, minutes, seconds)
     }
 
+    public static func abbreviatedMinutesSeconds(
+        _ duration: TimeInterval,
+        fallback: String = "0s"
+    ) -> String {
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.minute, .second]
+        formatter.unitsStyle = .abbreviated
+        return formatter.string(from: duration) ?? fallback
+    }
+
     public static func compactElapsed(_ duration: TimeInterval) -> String {
         if duration < 1 {
             return String(format: "%.0fms", duration * 1000)

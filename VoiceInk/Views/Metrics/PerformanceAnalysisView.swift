@@ -1,4 +1,5 @@
 import SwiftUI
+import VoiceInkCore
 
 // MARK: - Shared Analysis Logic
 
@@ -239,12 +240,6 @@ struct PerformanceAnalysisView: View {
         }
     }
     
-    private func formatDuration(_ duration: TimeInterval) -> String {
-        let formatter = DateComponentsFormatter()
-        formatter.allowedUnits = [.minute, .second]
-        formatter.unitsStyle = .abbreviated
-        return formatter.string(from: duration) ?? "0s"
-    }
 }
 
 // MARK: - Subviews
@@ -357,7 +352,7 @@ struct TranscriptionModelCard: View {
                 HStack {
                     MetricDisplay(
                         title: "Avg. Audio",
-                        value: formatDuration(modelStat.avgAudioDuration),
+                        value: VoiceInkDurationPresentation.abbreviatedMinutesSeconds(modelStat.avgAudioDuration),
                         color: .indigo
                     )
                     Spacer()
@@ -374,12 +369,6 @@ struct TranscriptionModelCard: View {
         .cornerRadius(12)
     }
     
-    private func formatDuration(_ duration: TimeInterval) -> String {
-        let formatter = DateComponentsFormatter()
-        formatter.allowedUnits = [.minute, .second]
-        formatter.unitsStyle = .abbreviated
-        return formatter.string(from: duration) ?? "0s"
-    }
 }
 
 struct EnhancementModelCard: View {

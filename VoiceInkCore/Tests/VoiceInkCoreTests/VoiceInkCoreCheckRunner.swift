@@ -13,6 +13,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "DurationPresentationTests.testMinutesSecondsUsesUnpaddedMinutesByDefault", run: { DurationPresentationTests().testMinutesSecondsUsesUnpaddedMinutesByDefault() }),
             VoiceInkCoreCheck(name: "DurationPresentationTests.testMinutesSecondsCanPadMinutesToTwoDigits", run: { DurationPresentationTests().testMinutesSecondsCanPadMinutesToTwoDigits() }),
             VoiceInkCoreCheck(name: "DurationPresentationTests.testMinutesSecondsTruncatesFractionalSeconds", run: { DurationPresentationTests().testMinutesSecondsTruncatesFractionalSeconds() }),
+            VoiceInkCoreCheck(name: "DurationPresentationTests.testAbbreviatedMinutesSecondsMatchesMetricsFormatting", run: { DurationPresentationTests().testAbbreviatedMinutesSecondsMatchesMetricsFormatting() }),
             VoiceInkCoreCheck(name: "DurationPresentationTests.testCompactElapsedUsesMillisecondsForSubsecondDurations", run: { DurationPresentationTests().testCompactElapsedUsesMillisecondsForSubsecondDurations() }),
             VoiceInkCoreCheck(name: "DurationPresentationTests.testCompactElapsedUsesOneDecimalSecondsUnderOneMinute", run: { DurationPresentationTests().testCompactElapsedUsesOneDecimalSecondsUnderOneMinute() }),
             VoiceInkCoreCheck(name: "DurationPresentationTests.testCompactElapsedUsesMinutesAndRoundedSecondsFromOneMinute", run: { DurationPresentationTests().testCompactElapsedUsesMinutesAndRoundedSecondsFromOneMinute() }),

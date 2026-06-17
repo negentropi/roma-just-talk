@@ -116,7 +116,7 @@ struct AudioFileRow: View {
                 }
 
                 if transcription.duration > 0 {
-                    Text(formatDuration(transcription.duration))
+                    Text(VoiceInkDurationPresentation.minutesSeconds(transcription.duration))
                         .font(.caption.weight(.medium))
                         .foregroundColor(.secondary)
                 }
@@ -211,9 +211,4 @@ struct AudioFileRow: View {
         }
     }
 
-    // MARK: - Helpers
-
-    private func formatDuration(_ duration: TimeInterval) -> String {
-        VoiceInkDurationPresentation.minutesSeconds(duration)
-    }
 }

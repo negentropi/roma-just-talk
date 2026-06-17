@@ -22,6 +22,12 @@ final class DurationPresentationTests: XCTestCase {
         XCTAssertEqual(VoiceInkDurationPresentation.minutesSeconds(65.9), "1:05")
     }
 
+    func testAbbreviatedMinutesSecondsMatchesMetricsFormatting() {
+        XCTAssertEqual(VoiceInkDurationPresentation.abbreviatedMinutesSeconds(0), "0s")
+        XCTAssertEqual(VoiceInkDurationPresentation.abbreviatedMinutesSeconds(65), "1m 5s")
+        XCTAssertEqual(VoiceInkDurationPresentation.abbreviatedMinutesSeconds(125.6), "2m 5s")
+    }
+
     func testCompactElapsedUsesMillisecondsForSubsecondDurations() {
         XCTAssertEqual(VoiceInkDurationPresentation.compactElapsed(0.125), "125ms")
     }

@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import VoiceInkCore
 
 // MARK: - Time filter
 
@@ -190,7 +191,7 @@ private struct ModelPerformancePanelContent: View {
 
             HStack(spacing: 0) {
                 VStack(spacing: 2) {
-                    Text(formatDuration(stat.avgAudioDuration))
+                    Text(VoiceInkDurationPresentation.abbreviatedMinutesSeconds(stat.avgAudioDuration))
                         .font(.system(size: 11, weight: .semibold, design: .monospaced))
                         .foregroundColor(.indigo)
                     Text("Avg. Audio")
@@ -269,12 +270,6 @@ private struct ModelPerformancePanelContent: View {
             .tracking(0.5)
     }
 
-    private func formatDuration(_ duration: TimeInterval) -> String {
-        let formatter = DateComponentsFormatter()
-        formatter.allowedUnits = [.minute, .second]
-        formatter.unitsStyle = .abbreviated
-        return formatter.string(from: duration) ?? "0s"
-    }
 }
 
 // MARK: - Data models

@@ -144,7 +144,7 @@ public struct VoiceInkTranscriptionRunProcessor {
                         ))
                         postProcessingSucceeded = true
                     } catch {
-                        postProcessingError = "Post-processing failed: \(error.localizedDescription)"
+                        postProcessingError = "Post-processing failed: \(VoiceInkErrorDescription.text(for: error))"
                         finalText = cleanedText
                     }
                 }

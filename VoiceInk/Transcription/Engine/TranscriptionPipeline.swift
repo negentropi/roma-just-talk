@@ -247,7 +247,7 @@ class TranscriptionPipeline {
                     transcription.aiRequestUserMessage = enhancementService.lastUserMessageSent
                     finalPastedText = enhancedText
                 } catch {
-                    let errorDescription = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+                    let errorDescription = VoiceInkErrorDescription.text(for: error)
                     transcription.enhancedText = "Enhancement failed: \(errorDescription)"
                     let shortReason = String(errorDescription.prefix(80))
                     await MainActor.run {
@@ -262,7 +262,7 @@ class TranscriptionPipeline {
 
             transcription.transcriptionState = .completed
         } catch {
-            let errorDescription = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+            let errorDescription = VoiceInkErrorDescription.text(for: error)
 
             if let nativeAppleError = error as? NativeAppleTranscriptionService.ServiceError,
                case .assetDownloadRequired = nativeAppleError {

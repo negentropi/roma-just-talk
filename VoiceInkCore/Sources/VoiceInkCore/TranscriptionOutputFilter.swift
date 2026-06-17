@@ -6,10 +6,7 @@ public enum VoiceInkTranscriptionOutputWhitespacePolicy: Sendable {
 }
 
 public enum VoiceInkTranscriptionOutputFilter {
-    public static let defaultFillerWords = [
-        "uh", "um", "uhm", "umm", "uhh", "uhhh",
-        "hmm", "hm", "mmm", "mm", "mh", "ehh"
-    ]
+    public static let defaultFillerWords = VoiceInkFillerWords.defaultWords
 
     private static let hallucinationPatterns = [
         #"\[.*?\]"#,

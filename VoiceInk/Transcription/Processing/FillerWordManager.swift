@@ -4,7 +4,7 @@ import VoiceInkCore
 class FillerWordManager: ObservableObject {
     static let shared = FillerWordManager()
 
-    static let defaultFillerWords = VoiceInkTranscriptionOutputFilter.defaultFillerWords
+    static let defaultFillerWords = VoiceInkFillerWords.defaultWords
 
     private let fillerWordsKey = VoiceInkUserDefaultsKey.fillerWords
     private let removeFillerWordsKey = VoiceInkUserDefaultsKey.removeFillerWords
@@ -28,15 +28,16 @@ class FillerWordManager: ObservableObject {
     }
 
     func addWord(_ word: String) -> Bool {
-        let normalized = word.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        guard !normalized.isEmpty else { return false }
-        guard !fillerWords.contains(where: { $0.lowercased() == normalized }) else { return false }
-        fillerWords.append(normalized)
+        guard let updatedWords = VoiceInkFillerWords.adding(word, to: fillerWords) else {
+            return false
+        }
+
+        fillerWords = updatedWords
         return true
     }
 
     func removeWord(_ word: String) {
-        fillerWords.removeAll { $0.lowercased() == word.lowercased() }
+        fillerWords = VoiceInkFillerWords.removing(word, from: fillerWords)
     }
 
 }

@@ -5,7 +5,7 @@ final class TranscriptionOutputFilterTests: XCTestCase {
     func testDefaultFillerWordsMatchMacOSCleanupDefaults() {
         XCTAssertEqual(
             VoiceInkTranscriptionOutputFilter.defaultFillerWords,
-            ["uh", "um", "uhm", "umm", "uhh", "uhhh", "hmm", "hm", "mmm", "mm", "mh", "ehh"]
+            VoiceInkFillerWords.defaultWords
         )
     }
 

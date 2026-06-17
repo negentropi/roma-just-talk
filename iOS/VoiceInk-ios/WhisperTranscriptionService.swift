@@ -79,37 +79,3 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
         return await modelManager.hasAvailableModel
     }
 }
-
-// MARK: - Convenience Extensions
-
-extension WhisperTranscriptionService {
-    
-    /// Transcribe audio with simplified parameters for local use
-    func transcribeAudioFile(_ fileURL: URL) async throws -> String {
-        // Use dummy values for parameters that don't apply to local transcription
-        return try await transcribeAudioFile(
-            apiKey: "local",
-            model: VoiceInkTranscriptionModelCatalog.localBaseModel,
-            fileURL: fileURL,
-            language: "en"
-        )
-    }
-    
-    /// Check if local transcription is available
-    @MainActor
-    static var isAvailable: Bool {
-        LocalModelManager.shared.hasAvailableModel
-    }
-    
-    /// Get status information for UI display
-    @MainActor
-    static func getStatusInfo() -> (isAvailable: Bool, modelInfo: String?) {
-        let modelManager = LocalModelManager.shared
-        
-        if let model = modelManager.firstAvailableModel {
-            return (true, "\(model.displayName) (\(model.size))")
-        } else {
-            return (false, "No model downloaded")
-        }
-    }
-}

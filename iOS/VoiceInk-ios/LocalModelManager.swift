@@ -170,9 +170,4 @@ class LocalModelManager: ObservableObject {
         VoiceInkWhisperModelFiles.bootstrapModels.contains { $0.isDownloaded(in: Self.modelsDirectory) }
     }
     
-    /// Get the first available model for transcription
-    var firstAvailableModel: VoiceInkWhisperModelFileSpec? {
-        VoiceInkWhisperModelFiles.bootstrapModels.first { $0.isDownloaded(in: Self.modelsDirectory) }
-    }
-    
 }

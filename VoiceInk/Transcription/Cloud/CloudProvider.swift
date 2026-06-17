@@ -20,6 +20,74 @@ extension CloudProvider {
         VoiceInkProviderAPIKeyVerifier()
     }
 
+    private var emptyTextPolicy: CloudTranscriptionEmptyTextPolicy {
+        switch modelProvider {
+        case .groq, .deepgram, .gemini:
+            return .rejectEmpty
+        case .assemblyAI, .soniox, .speechmatics:
+            return .rejectWhitespace
+        default:
+            return .allow
+        }
+    }
+
+    private var apiErrorDomain: String? {
+        switch modelProvider {
+        case .groq:
+            return "GroqAPI"
+        case .deepgram:
+            return "DeepgramAPI"
+        case .gemini:
+            return "GeminiAPI"
+        case .mistral:
+            return "MistralAPI"
+        case .elevenLabs:
+            return "ElevenLabsAPI"
+        case .soniox:
+            return "SonioxAPI"
+        case .speechmatics:
+            return "SpeechmaticsAPI"
+        case .assemblyAI:
+            return "AssemblyAIAPI"
+        case .xai:
+            return "XAIAPI"
+        default:
+            return nil
+        }
+    }
+
+    private func remoteTranscriptionOptions(
+        prompt: String?,
+        customVocabulary: [String]
+    ) -> VoiceInkRemoteTranscriptionOptions {
+        switch modelProvider {
+        case .groq:
+            return VoiceInkRemoteTranscriptionOptions(
+                prompt: prompt,
+                openAICompatibleResponseFormat: "json",
+                openAICompatibleTemperature: "0",
+                openAICompatibleErrorDomain: "GroqAPI",
+                openAICompatibleTimeout: 60,
+                openAICompatibleMaxRetries: 2
+            )
+        case .deepgram:
+            return VoiceInkRemoteTranscriptionOptions(
+                deepgramParagraphs: true,
+                deepgramDiarize: nil,
+                deepgramTimeout: 30
+            )
+        case .soniox, .speechmatics:
+            return VoiceInkRemoteTranscriptionOptions(customVocabulary: customVocabulary)
+        case .assemblyAI:
+            return VoiceInkRemoteTranscriptionOptions(
+                prompt: prompt,
+                customVocabulary: customVocabulary
+            )
+        default:
+            return VoiceInkRemoteTranscriptionOptions()
+        }
+    }
+
     var languageCodes: [String]? {
         modelProvider.coreTranscriptionModelProvider?.languageCodes
     }
@@ -41,9 +109,34 @@ extension CloudProvider {
     var isStreamingOnly: Bool { false }
 
     /// Streaming-only providers inherit this and get a clear error if batch is somehow attempted.
-    /// Providers that support batch transcription override this with their real implementation.
+    /// Batch providers share the core remote dispatch while this shell keeps SwiftData and streaming adapters.
     func transcribe(audioData: Data, fileName: String, apiKey: String, model: String, language: String?, prompt: String?, customVocabulary: [String]) async throws -> String {
-        throw CloudTranscriptionError.unsupportedProvider
+        guard let provider = modelProvider.coreProviderKind else {
+            throw CloudTranscriptionError.unsupportedProvider
+        }
+
+        do {
+            let text = try await VoiceInkRemoteTranscriptionService(provider: provider).transcribeAudioData(
+                apiKey: apiKey,
+                model: model,
+                audioData: audioData,
+                fileName: fileName,
+                language: language,
+                options: remoteTranscriptionOptions(
+                    prompt: prompt,
+                    customVocabulary: customVocabulary
+                )
+            )
+            return try emptyTextPolicy.validated(text)
+        } catch let error as CloudTranscriptionError {
+            throw error
+        } catch let error as NSError
+            where apiErrorDomain == error.domain && (100...599).contains(error.code) {
+            throw CloudTranscriptionError.apiRequestFailed(
+                statusCode: error.code,
+                message: error.userInfo[NSLocalizedDescriptionKey] as? String ?? error.localizedDescription
+            )
+        }
     }
 
     func verifyAPIKey(_ key: String) async -> (isValid: Bool, errorMessage: String?) {
@@ -72,5 +165,28 @@ enum CloudProviderRegistry {
 
     static func provider(for modelProvider: ModelProvider) -> (any CloudProvider)? {
         allProviders.first { $0.modelProvider == modelProvider }
+    }
+}
+
+private enum CloudTranscriptionEmptyTextPolicy {
+    case allow
+    case rejectEmpty
+    case rejectWhitespace
+
+    func validated(_ text: String) throws -> String {
+        switch self {
+        case .allow:
+            return text
+        case .rejectEmpty:
+            guard !text.isEmpty else {
+                throw CloudTranscriptionError.noTranscriptionReturned
+            }
+            return text
+        case .rejectWhitespace:
+            guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                throw CloudTranscriptionError.noTranscriptionReturned
+            }
+            return text
+        }
     }
 }

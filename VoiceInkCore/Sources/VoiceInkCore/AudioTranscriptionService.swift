@@ -9,6 +9,43 @@ public protocol VoiceInkAudioTranscriptionService {
     ) async throws -> String
 }
 
+public struct VoiceInkRemoteTranscriptionOptions: Equatable, Sendable {
+    public let prompt: String?
+    public let customVocabulary: [String]
+    public let openAICompatibleResponseFormat: String?
+    public let openAICompatibleTemperature: String?
+    public let openAICompatibleErrorDomain: String
+    public let openAICompatibleTimeout: TimeInterval?
+    public let openAICompatibleMaxRetries: Int
+    public let deepgramParagraphs: Bool?
+    public let deepgramDiarize: Bool?
+    public let deepgramTimeout: TimeInterval?
+
+    public init(
+        prompt: String? = nil,
+        customVocabulary: [String] = [],
+        openAICompatibleResponseFormat: String? = nil,
+        openAICompatibleTemperature: String? = nil,
+        openAICompatibleErrorDomain: String = "GroqAPI",
+        openAICompatibleTimeout: TimeInterval? = nil,
+        openAICompatibleMaxRetries: Int = 0,
+        deepgramParagraphs: Bool? = nil,
+        deepgramDiarize: Bool? = false,
+        deepgramTimeout: TimeInterval? = nil
+    ) {
+        self.prompt = prompt
+        self.customVocabulary = customVocabulary
+        self.openAICompatibleResponseFormat = openAICompatibleResponseFormat
+        self.openAICompatibleTemperature = openAICompatibleTemperature
+        self.openAICompatibleErrorDomain = openAICompatibleErrorDomain
+        self.openAICompatibleTimeout = openAICompatibleTimeout
+        self.openAICompatibleMaxRetries = openAICompatibleMaxRetries
+        self.deepgramParagraphs = deepgramParagraphs
+        self.deepgramDiarize = deepgramDiarize
+        self.deepgramTimeout = deepgramTimeout
+    }
+}
+
 public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionService, Sendable {
     private let transport: VoiceInkTranscriptionTransport
     private let apiBaseURL: URL
@@ -82,7 +119,23 @@ public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionServ
         language: String? = nil
     ) async throws -> String {
         let audioData = try Data(contentsOf: fileURL)
+        return try await transcribeAudioData(
+            apiKey: apiKey,
+            model: model,
+            audioData: audioData,
+            fileName: fileURL.lastPathComponent,
+            language: language
+        )
+    }
 
+    public func transcribeAudioData(
+        apiKey: String,
+        model: String,
+        audioData: Data,
+        fileName: String,
+        language: String? = nil,
+        options: VoiceInkRemoteTranscriptionOptions = VoiceInkRemoteTranscriptionOptions()
+    ) async throws -> String {
         switch transport {
         case .openAICompatible:
             return try await openAICompatibleClient.transcribeAudioData(
@@ -90,9 +143,14 @@ public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionServ
                 apiKey: apiKey,
                 model: model,
                 audioData: audioData,
-                fileName: fileURL.lastPathComponent,
+                fileName: fileName,
                 language: language,
-                errorDomain: "GroqAPI"
+                prompt: options.prompt,
+                responseFormat: options.openAICompatibleResponseFormat,
+                temperature: options.openAICompatibleTemperature,
+                errorDomain: options.openAICompatibleErrorDomain,
+                timeout: options.openAICompatibleTimeout,
+                maxRetries: options.openAICompatibleMaxRetries
             )
         case .deepgram:
             return try await deepgramClient.transcribeAudioData(
@@ -100,14 +158,18 @@ public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionServ
                 apiKey: apiKey,
                 model: model,
                 audioData: audioData,
-                language: language
+                language: language,
+                paragraphs: options.deepgramParagraphs,
+                diarize: options.deepgramDiarize,
+                timeout: options.deepgramTimeout
             )
         case .geminiGenerateContent:
             return try await geminiClient.transcribeAudioData(
                 baseURL: apiBaseURL,
                 apiKey: apiKey,
                 model: model,
-                audioData: audioData
+                audioData: audioData,
+                timeout: 60
             )
         case .mistral:
             return try await mistralClient.transcribeAudioData(
@@ -115,7 +177,10 @@ public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionServ
                 apiKey: apiKey,
                 model: model,
                 audioData: audioData,
-                fileName: fileURL.lastPathComponent
+                fileName: fileName,
+                errorDomain: "MistralAPI",
+                timeout: 30,
+                maxRetries: 2
             )
         case .elevenLabs:
             return try await elevenLabsClient.transcribeAudioData(
@@ -123,8 +188,10 @@ public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionServ
                 apiKey: apiKey,
                 model: model,
                 audioData: audioData,
-                fileName: fileURL.lastPathComponent,
-                language: language
+                fileName: fileName,
+                language: language,
+                timeout: 30,
+                maxRetries: 2
             )
         case .soniox:
             return try await sonioxClient.transcribeAudioData(
@@ -132,16 +199,18 @@ public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionServ
                 apiKey: apiKey,
                 model: model,
                 audioData: audioData,
-                fileName: fileURL.lastPathComponent,
-                language: language
+                fileName: fileName,
+                language: language,
+                customVocabulary: options.customVocabulary
             )
         case .speechmatics:
             return try await speechmaticsClient.transcribeAudioData(
                 baseURL: apiBaseURL,
                 apiKey: apiKey,
                 audioData: audioData,
-                fileName: fileURL.lastPathComponent,
-                language: language
+                fileName: fileName,
+                language: language,
+                customVocabulary: options.customVocabulary
             )
         case .assemblyAI:
             return try await assemblyAIClient.transcribeAudioData(
@@ -149,16 +218,22 @@ public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionServ
                 apiKey: apiKey,
                 model: model,
                 audioData: audioData,
-                language: language
+                language: language,
+                prompt: options.prompt,
+                customVocabulary: options.customVocabulary,
+                errorDomain: "AssemblyAIAPI"
             )
         case .xai:
             return try await xaiClient.transcribeAudioData(
                 baseURL: apiBaseURL,
                 apiKey: apiKey,
                 audioData: audioData,
-                fileName: fileURL.lastPathComponent,
+                fileName: fileName,
                 language: language,
-                format: true
+                format: true,
+                errorDomain: "XAIAPI",
+                timeout: 60,
+                maxRetries: 2
             )
         case .localWhisper:
             throw URLError(.unsupportedURL)

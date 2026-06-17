@@ -22,14 +22,8 @@ class LocalModelManager: ObservableObject {
     
     nonisolated static var modelsDirectory: URL {
         let documentsDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        let modelsDir = VoiceInkWhisperModelFiles.modelsDirectory(in: documentsDir)
-        
-        // Create directory if it doesn't exist
-        if !FileManager.default.fileExists(atPath: modelsDir.path) {
-            try? VoiceInkWhisperModelFiles.createModelsDirectory(in: documentsDir)
-        }
-        
-        return modelsDir
+        return (try? VoiceInkWhisperModelFiles.createModelsDirectory(in: documentsDir))
+            ?? VoiceInkWhisperModelFiles.modelsDirectory(in: documentsDir)
     }
     
     private init() {

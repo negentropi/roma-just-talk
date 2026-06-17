@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import VoiceInkCore
 
 @MainActor
 final class WhisperModelWarmupCoordinator: ObservableObject {
@@ -14,7 +15,7 @@ final class WhisperModelWarmupCoordinator: ObservableObject {
     }
 
     func scheduleWarmup(for model: WhisperModel, whisperModelManager: WhisperModelManager) {
-        guard shouldWarmup(modelName: model.name),
+        guard VoiceInkWhisperModelFiles.supportsCoreML(forModelName: model.name),
               !warmingModels.contains(model.name) else {
             return
         }
@@ -60,9 +61,5 @@ final class WhisperModelWarmupCoordinator: ObservableObject {
         }
 
         return nil
-    }
-
-    private func shouldWarmup(modelName: String) -> Bool {
-        !modelName.contains("q5") && !modelName.contains("q8")
     }
 }

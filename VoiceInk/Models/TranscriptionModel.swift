@@ -269,14 +269,6 @@ struct WhisperModel: TranscriptionModel {
     let ramUsage: Double
     let provider: ModelProvider = .whisper
 
-    var downloadURL: String {
-        VoiceInkWhisperModelFiles.downloadURLString(forFilename: filename)
-    }
-
-    var filename: String {
-        VoiceInkWhisperModelFiles.filename(forModelName: name)
-    }
-
     var isMultilingualModel: Bool {
         supportedLanguages.count > 1
     }

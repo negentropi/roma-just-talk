@@ -39,10 +39,6 @@ public struct VoiceInkWhisperModelFileSpec: Codable, Equatable, Identifiable, Se
         VoiceInkWhisperModelFiles.downloadURL(forFilename: filename)
     }
 
-    public var downloadURLString: String {
-        downloadURL.absoluteString
-    }
-
     public func fileURL(in modelsDirectory: URL) -> URL {
         VoiceInkWhisperModelFiles.fileURL(forFilename: filename, in: modelsDirectory)
     }
@@ -191,10 +187,6 @@ public enum VoiceInkWhisperModelFiles {
             .appendingPathComponent(filename)
     }
 
-    public static func downloadURLString(forFilename filename: String) -> String {
-        downloadURL(forFilename: filename).absoluteString
-    }
-
     public static func filename(forModelName modelName: String) -> String {
         "\(modelName).bin"
     }
@@ -215,10 +207,6 @@ public enum VoiceInkWhisperModelFiles {
         downloadURL(forFilename: filename(forModelName: modelName))
     }
 
-    public static func downloadURLString(forModelName modelName: String) -> String {
-        downloadURL(forModelName: modelName).absoluteString
-    }
-
     public static func supportsCoreML(forModelName modelName: String) -> Bool {
         !modelName.contains("q5") && !modelName.contains("q8")
     }
@@ -236,10 +224,6 @@ public enum VoiceInkWhisperModelFiles {
     public static func coreMLZipDownloadURL(forModelName modelName: String) -> URL? {
         guard let filename = coreMLZipFilename(forModelName: modelName) else { return nil }
         return downloadURL(forFilename: filename)
-    }
-
-    public static func coreMLZipDownloadURLString(forModelName modelName: String) -> String? {
-        coreMLZipDownloadURL(forModelName: modelName)?.absoluteString
     }
 
     public static func coreMLEncoderDirectoryName(forModelName modelName: String) -> String? {

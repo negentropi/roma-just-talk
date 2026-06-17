@@ -112,6 +112,13 @@ final class WhisperModelFilesTests: XCTestCase {
         )
     }
 
+    func testCoreMLSupportPolicyExcludesQuantizedModels() {
+        XCTAssertTrue(VoiceInkWhisperModelFiles.supportsCoreML(forModelName: "ggml-base"))
+        XCTAssertTrue(VoiceInkWhisperModelFiles.supportsCoreML(forModelName: "ggml-large-v3-turbo"))
+        XCTAssertFalse(VoiceInkWhisperModelFiles.supportsCoreML(forModelName: "ggml-large-v3-turbo-q5_0"))
+        XCTAssertFalse(VoiceInkWhisperModelFiles.supportsCoreML(forModelName: "ggml-large-v3-turbo-q8_0"))
+    }
+
     func testModelFileFilterMatchesExistingBinOnlyPolicy() {
         XCTAssertTrue(VoiceInkWhisperModelFiles.isModelFile(URL(fileURLWithPath: "/tmp/ggml-base.bin")))
         XCTAssertFalse(VoiceInkWhisperModelFiles.isModelFile(URL(fileURLWithPath: "/tmp/ggml-base.BIN")))

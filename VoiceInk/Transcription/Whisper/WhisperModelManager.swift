@@ -13,36 +13,6 @@ struct WhisperModelFile: Identifiable {
     let url: URL
     var coreMLEncoderURL: URL? // Path to the unzipped .mlmodelc directory
     var isCoreMLDownloaded: Bool { coreMLEncoderURL != nil }
-
-    var downloadURL: String {
-        VoiceInkWhisperModelFiles.downloadURLString(forModelName: name)
-    }
-
-    var filename: String {
-        VoiceInkWhisperModelFiles.filename(forModelName: name)
-    }
-
-    // Core ML related properties
-    var coreMLZipDownloadURL: String? {
-        VoiceInkWhisperModelFiles.coreMLZipDownloadURLString(forModelName: name)
-    }
-}
-
-// MARK: - Private download task delegate
-
-private class TaskDelegate: NSObject, URLSessionTaskDelegate {
-    private let continuation: CheckedContinuation<Void, Never>
-    private let finished = ManagedAtomic(false)
-
-    init(_ continuation: CheckedContinuation<Void, Never>) {
-        self.continuation = continuation
-    }
-
-    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        if finished.exchange(true, ordering: .acquiring) == false {
-            continuation.resume()
-        }
-    }
 }
 
 // MARK: - WhisperModelManager
@@ -189,16 +159,17 @@ class WhisperModelManager: ObservableObject {
     }
 
     func downloadModel(_ model: WhisperModel) async {
-        guard let url = URL(string: model.downloadURL) else { return }
-        await performModelDownload(model, url)
+        await performModelDownload(
+            model,
+            VoiceInkWhisperModelFiles.downloadURL(forModelName: model.name)
+        )
     }
 
     private func performModelDownload(_ model: WhisperModel, _ url: URL) async {
         do {
             var whisperModel = try await downloadMainModel(model, from: url)
 
-            if let coreMLZipURL = whisperModel.coreMLZipDownloadURL,
-               let coreMLURL = URL(string: coreMLZipURL) {
+            if let coreMLURL = VoiceInkWhisperModelFiles.coreMLZipDownloadURL(forModelName: whisperModel.name) {
                 whisperModel = try await downloadAndSetupCoreMLModel(for: whisperModel, from: coreMLURL)
             }
 
@@ -207,7 +178,7 @@ class WhisperModelManager: ObservableObject {
 
             onModelsChanged?()
 
-            if shouldWarmup(model) {
+            if VoiceInkWhisperModelFiles.supportsCoreML(forModelName: model.name) {
                 WhisperModelWarmupCoordinator.shared.scheduleWarmup(for: model, whisperModelManager: self)
             }
         } catch {
@@ -219,7 +190,7 @@ class WhisperModelManager: ObservableObject {
         let progressKeyMain = model.name + "_main"
         let data = try await downloadFileWithProgress(from: url, progressKey: progressKeyMain)
 
-        let destinationURL = VoiceInkWhisperModelFiles.fileURL(forFilename: model.filename, in: modelsDirectory)
+        let destinationURL = VoiceInkWhisperModelFiles.fileURL(forModelName: model.name, in: modelsDirectory)
         try data.write(to: destinationURL)
 
         return WhisperModelFile(name: model.name, url: destinationURL)
@@ -287,10 +258,6 @@ class WhisperModelManager: ObservableObject {
         self.downloadProgress.removeValue(forKey: progressKey)
 
         return model
-    }
-
-    private func shouldWarmup(_ model: WhisperModel) -> Bool {
-        VoiceInkWhisperModelFiles.supportsCoreML(forModelName: model.name)
     }
 
     private func handleModelDownloadError(_ model: WhisperModel, _ error: Error) {
@@ -422,7 +389,7 @@ struct DownloadProgressView: View {
     }
 
     private var supportsCoreML: Bool {
-        !modelName.contains("q5") && !modelName.contains("q8")
+        VoiceInkWhisperModelFiles.supportsCoreML(forModelName: modelName)
     }
 
     private var totalProgress: Double {

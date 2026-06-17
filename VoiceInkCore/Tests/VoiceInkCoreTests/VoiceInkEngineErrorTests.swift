@@ -41,5 +41,9 @@ final class VoiceInkEngineErrorTests: XCTestCase {
             VoiceInkEngineError.whisperTranscriptionFailed.errorDescription,
             "Whisper transcription failed."
         )
+        XCTAssertEqual(
+            VoiceInkEngineError.audioFileNotFound.errorDescription,
+            "Audio file not found"
+        )
     }
 }

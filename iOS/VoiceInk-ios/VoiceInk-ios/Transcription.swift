@@ -32,10 +32,6 @@ final class Transcription {
         self.transcriptionError = transcriptionError
     }
     
-    var needsTranscription: Bool {
-        return transcriptionStatus.needsTranscription
-    }
-
     var resolvedAudioFileURL: URL? {
         VoiceInkStoredAudioFile.resolvedURL(for: audioFileURL, relativeTo: Self.recordingsDirectory)
     }

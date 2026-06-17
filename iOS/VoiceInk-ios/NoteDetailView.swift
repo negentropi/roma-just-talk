@@ -17,7 +17,7 @@ struct NoteDetailView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
                         // Transcription status and retry button
-                        if note.needsTranscription {
+                        if note.transcriptionStatus.needsTranscription {
                             transcriptionStatusView
                         }
 

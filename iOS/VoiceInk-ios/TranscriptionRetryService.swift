@@ -37,7 +37,7 @@ class TranscriptionRetryService {
     func retranscribe(note: Transcription) async throws -> String {
         guard let fileURL = note.resolvedAudioFileURL,
               FileManager.default.fileExists(atPath: fileURL.path) else {
-            throw TranscriptionError.audioFileNotFound
+            throw VoiceInkEngineError.audioFileNotFound
         }
 
         let result = try await transcribe(fileURL: fileURL)
@@ -51,16 +51,5 @@ class TranscriptionRetryService {
         note.transcriptionError = result.postProcessingError
         
         return result.finalText
-    }
-}
-
-enum TranscriptionError: LocalizedError {
-    case audioFileNotFound
-    
-    var errorDescription: String? {
-        switch self {
-        case .audioFileNotFound:
-            return "Audio file not found"
-        }
     }
 }

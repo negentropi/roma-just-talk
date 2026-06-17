@@ -64,7 +64,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - AI-enhancement prompt-store and context-toggle storage keys; macOS still owns persistence timing, notifications, and UI orchestration
 - transcription language catalog, provider language filtering, AssemblyAI realtime/batch language policy, selected-language fallback policy, language-option ordering, selected-language preference loading, selected-language request normalization, and the shared selected-language defaults key; platform shells still own selected-language storage/UI and runtime streaming-mode state
 - local Whisper language seed prompts and custom language-prompt storage key; platform shells still own prompt editing UI and when prompts are persisted
-- stored audio-file path resolution, existing-file lookup, recordings directory, and file URL construction
+- stored audio-file path resolution, existing-file lookup, recordings directory, file URL construction, and recording/import/retranscription filename policy
 - duration presentation
 - relative timestamp presentation
 - Whisper and VAD model file metadata, including platform-base Whisper model directory, model/sidecar file construction, and downloaded-state detection
@@ -119,6 +119,7 @@ Current macOS consumers of shared remote transport:
 - macOS AI-enhancement provider model defaults and static model lists come from `VoiceInkAIModelCatalog`; macOS still owns provider UI, API-key storage, dynamic OpenRouter fetches, Ollama, Local CLI, and Custom provider settings.
 - macOS AI-enhancement request endpoint and API-key console URLs come from the shared `VoiceInkAIModelProvider` catalog; macOS still owns Anthropic/OpenAI-compatible transport selection and provider-specific verification adapters.
 - macOS and iOS provider API-key lookup delegates stored-key reference resolution and provider environment fallback policy to `VoiceInkProviderAPIKeyLookup`; platform shells still own Keychain storage and UI editing state.
+- macOS and iOS recording audio filename construction delegates live recording, imported transcription, retranscription, and timestamped iOS recording naming to `VoiceInkStoredAudioFile`; platform shells still own directory choice and actual audio capture/copy/write work.
 - iOS retry post-processing inherits `VoiceInkAIReasoningConfig` through `VoiceInkPostProcessingClient`, aligning OpenAI-compatible reasoning controls with macOS enhancement requests.
 
 Current iOS consumers of shared remote transport:

@@ -23,8 +23,7 @@ final class AudioRecorder: NSObject, ObservableObject {
         // Use session manager to activate audio session
         try sessionManager.activateSessionForRecording()
 
-        let filename = "recording_\(Int(Date().timeIntervalSince1970)).wav"
-        let url = VoiceInkStoredAudioFile.fileURL(forFilename: filename, in: Self.recordingsDirectory())
+        let url = VoiceInkStoredAudioFile.timestampedRecordingFileURL(in: Self.recordingsDirectory())
 
         // Whisper-compatible format: 16kHz mono WAV
         let settings: [String: Any] = [

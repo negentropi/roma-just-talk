@@ -20,6 +20,37 @@ public enum VoiceInkStoredAudioFile {
         recordingsDirectory.appendingPathComponent(filename)
     }
 
+    public static func recordingFileURL(
+        in recordingsDirectory: URL,
+        id: UUID = UUID()
+    ) -> URL {
+        fileURL(forFilename: "\(id.uuidString).wav", in: recordingsDirectory)
+    }
+
+    public static func timestampedRecordingFileURL(
+        in recordingsDirectory: URL,
+        date: Date = Date()
+    ) -> URL {
+        fileURL(
+            forFilename: "recording_\(Int(date.timeIntervalSince1970)).wav",
+            in: recordingsDirectory
+        )
+    }
+
+    public static func importedTranscriptionFileURL(
+        in recordingsDirectory: URL,
+        id: UUID = UUID()
+    ) -> URL {
+        fileURL(forFilename: "transcribed_\(id.uuidString).wav", in: recordingsDirectory)
+    }
+
+    public static func retranscriptionFileURL(
+        in recordingsDirectory: URL,
+        id: UUID = UUID()
+    ) -> URL {
+        fileURL(forFilename: "retranscribed_\(id.uuidString).wav", in: recordingsDirectory)
+    }
+
     public static func resolvedURL(
         for storedValue: String?,
         relativeTo recordingsDirectory: URL? = nil

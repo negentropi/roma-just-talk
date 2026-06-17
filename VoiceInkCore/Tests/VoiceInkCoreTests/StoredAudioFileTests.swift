@@ -37,6 +37,46 @@ final class StoredAudioFileTests: XCTestCase {
         )
     }
 
+    func testRecordingFileURLUsesMacOSUUIDWAVName() {
+        let recordingsDirectory = URL(fileURLWithPath: "/tmp/VoiceInk/Recordings", isDirectory: true)
+        let id = UUID(uuidString: "00000000-0000-0000-0000-000000000123")!
+
+        XCTAssertEqual(
+            VoiceInkStoredAudioFile.recordingFileURL(in: recordingsDirectory, id: id).lastPathComponent,
+            "00000000-0000-0000-0000-000000000123.wav"
+        )
+    }
+
+    func testTimestampedRecordingFileURLPreservesIOSName() {
+        let recordingsDirectory = URL(fileURLWithPath: "/tmp/VoiceInk/Recordings", isDirectory: true)
+        let date = Date(timeIntervalSince1970: 1_234.9)
+
+        XCTAssertEqual(
+            VoiceInkStoredAudioFile.timestampedRecordingFileURL(in: recordingsDirectory, date: date).lastPathComponent,
+            "recording_1234.wav"
+        )
+    }
+
+    func testImportedTranscriptionFileURLPreservesMacOSName() {
+        let recordingsDirectory = URL(fileURLWithPath: "/tmp/VoiceInk/Recordings", isDirectory: true)
+        let id = UUID(uuidString: "00000000-0000-0000-0000-000000000456")!
+
+        XCTAssertEqual(
+            VoiceInkStoredAudioFile.importedTranscriptionFileURL(in: recordingsDirectory, id: id).lastPathComponent,
+            "transcribed_00000000-0000-0000-0000-000000000456.wav"
+        )
+    }
+
+    func testRetranscriptionFileURLPreservesMacOSName() {
+        let recordingsDirectory = URL(fileURLWithPath: "/tmp/VoiceInk/Recordings", isDirectory: true)
+        let id = UUID(uuidString: "00000000-0000-0000-0000-000000000789")!
+
+        XCTAssertEqual(
+            VoiceInkStoredAudioFile.retranscriptionFileURL(in: recordingsDirectory, id: id).lastPathComponent,
+            "retranscribed_00000000-0000-0000-0000-000000000789.wav"
+        )
+    }
+
     func testResolvesFileURLString() {
         let fileURL = URL(fileURLWithPath: "/tmp/voiceink-recording.m4a")
 

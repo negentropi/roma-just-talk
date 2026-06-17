@@ -71,8 +71,7 @@ class AudioTranscriptionService: ObservableObject {
                 .appendingPathComponent("com.prakashjoshipax.VoiceInk")
             let recordingsDirectory = try VoiceInkStoredAudioFile.createRecordingsDirectory(in: appSupportDirectory)
             
-            let fileName = "retranscribed_\(UUID().uuidString).wav"
-            let permanentURL = VoiceInkStoredAudioFile.fileURL(forFilename: fileName, in: recordingsDirectory)
+            let permanentURL = VoiceInkStoredAudioFile.retranscriptionFileURL(in: recordingsDirectory)
             
             do {
                 try FileManager.default.copyItem(at: url, to: permanentURL)

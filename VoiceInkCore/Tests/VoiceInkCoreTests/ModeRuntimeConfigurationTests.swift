@@ -51,6 +51,33 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
         XCTAssertEqual(mode.transcriptionModel, "")
     }
 
+    func testSelectingTranscriptionProviderRepairsModelThroughSharedPolicy() {
+        var mode = Mode(
+            name: "Draft",
+            transcriptionProvider: .groq,
+            transcriptionModel: "whisper-large-v3"
+        )
+
+        mode.selectTranscriptionProvider(.localWhisper)
+
+        XCTAssertEqual(mode.transcriptionProvider, .localWhisper)
+        XCTAssertEqual(mode.transcriptionModel, VoiceInkTranscriptionModelCatalog.localBaseModel)
+    }
+
+    func testSelectingPostProcessingProviderRepairsModelThroughSharedPolicy() {
+        var mode = Mode(
+            name: "Draft",
+            isPostProcessingEnabled: true,
+            postProcessingProvider: .gemini,
+            postProcessingModel: "old-gemini-model"
+        )
+
+        mode.selectPostProcessingProvider(.groq)
+
+        XCTAssertEqual(mode.postProcessingProvider, .groq)
+        XCTAssertEqual(mode.postProcessingModel, VoiceInkAIModelCatalog.defaultModel(for: .groq))
+    }
+
     func testModeRepairReplacesUnavailableProvidersWithFirstAvailableProvider() {
         var mode = Mode(
             name: "Legacy",

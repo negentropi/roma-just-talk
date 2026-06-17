@@ -41,7 +41,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - transcription and AI model catalogs
 - Native Apple and FluidAudio local transcription model metadata; platform shells still own availability, download, and runtime adapters
 - remote transcription provider dispatch for iOS retry transcription
-- mode runtime configuration, default local mode selection, selected-mode repair, mode-based transcription language availability, and selected-language repair
+- mode runtime configuration, default local mode selection, provider-change model repair, selected-mode repair, mode-based transcription language availability, and selected-language repair
 - mode provider-selection repair and draft saveability rules
 - shared UserDefaults key names, including cleanup preferences, plus iOS mode persistence helpers
 - onboarding completion, iOS audio-session timeout, and filler-word list reset preference storage; platform shells still own first-run flow, audio-session lifecycle, and settings UI bindings
@@ -159,7 +159,7 @@ Current iOS consumers of shared remote transport:
 - `iOS/VoiceInk-ios/TranscriptionRetryService.swift` passes the iOS selected transcription language through `VoiceInkTranscriptionRunProcessor`, which normalizes auto-detect before remote/local transcription adapters receive it.
 - `iOS/VoiceInk-ios/WhisperTranscriptionService.swift` passes the shared selected-language local Whisper prompt helper into the iOS whisper.cpp wrapper, so iOS inherits the macOS language seed prompts when no explicit prompt is stored.
 - `iOS/VoiceInk-ios/ProviderAPIKeyView.swift` verifies provider keys through `VoiceInkProviderAPIKeyVerifier` after typed `VoiceInkProviderAPIKeyLookup` reference/fallback resolution.
-- `iOS/VoiceInk-ios/AppSettings.swift` delegates active-mode transcription language availability and selected-language repair to the shared `Mode` collection policy; `SettingsView` keeps only the SwiftUI option rendering.
+- `iOS/VoiceInk-ios/AppSettings.swift` and `ModeConfigurationView.swift` delegate active-mode transcription language availability, provider-change model repair, and selected-language repair to the shared `Mode` policy; `SettingsView` keeps only the SwiftUI option rendering.
 - `iOS/VoiceInk-ios/WhisperTranscriptionService.swift` throws `VoiceInkEngineError` from `VoiceInkCore` instead of owning a separate iOS-only local Whisper error enum.
 - Cartesia remains absent from iOS transcription provider selection until an iOS streaming adapter exists; it is not a batch provider.
 - The bundled `VoiceInk` provider case remains decodable, but is hidden from iOS transcription and post-processing selection until a real no-key/bundled-service adapter exists. The sibling clone marked it always available while returning an empty API key, so porting that path would preserve a broken no-key mode.

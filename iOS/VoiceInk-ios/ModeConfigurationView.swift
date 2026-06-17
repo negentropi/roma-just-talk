@@ -140,16 +140,10 @@ struct ModeConfigurationView: View {
             repairUnavailableProviderSelections()
         }
         .onChange(of: mode.transcriptionProvider) { _, _ in
-            mode.transcriptionModel = mode.transcriptionProvider.selectedModel(
-                mode.transcriptionModel,
-                for: .transcription
-            )
+            mode.selectTranscriptionProvider(mode.transcriptionProvider)
         }
         .onChange(of: mode.postProcessingProvider) { _, _ in
-            mode.postProcessingModel = mode.postProcessingProvider.selectedModel(
-                mode.postProcessingModel,
-                for: .postProcessing
-            )
+            mode.selectPostProcessingProvider(mode.postProcessingProvider)
         }
     }
 

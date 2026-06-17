@@ -72,6 +72,16 @@ public struct Mode: Identifiable, Codable {
         postProcessingProvider.fixedModel(for: .postProcessing) ?? postProcessingModel
     }
 
+    public mutating func selectTranscriptionProvider(_ provider: VoiceInkProviderKind) {
+        transcriptionProvider = provider
+        transcriptionModel = provider.selectedModel(transcriptionModel, for: .transcription)
+    }
+
+    public mutating func selectPostProcessingProvider(_ provider: VoiceInkProviderKind) {
+        postProcessingProvider = provider
+        postProcessingModel = provider.selectedModel(postProcessingModel, for: .postProcessing)
+    }
+
     public var runtimeConfiguration: VoiceInkModeRuntimeConfiguration {
         VoiceInkModeRuntimeConfiguration(
             transcriptionProvider: transcriptionProvider,
@@ -89,15 +99,13 @@ public struct Mode: Identifiable, Codable {
     ) {
         if !availableTranscriptionProviders.contains(transcriptionProvider),
            let provider = availableTranscriptionProviders.first {
-            transcriptionProvider = provider
-            transcriptionModel = provider.selectedModel(transcriptionModel, for: .transcription)
+            selectTranscriptionProvider(provider)
         }
 
         if isPostProcessingEnabled,
            !availablePostProcessingProviders.contains(postProcessingProvider),
            let provider = availablePostProcessingProviders.first {
-            postProcessingProvider = provider
-            postProcessingModel = provider.selectedModel(postProcessingModel, for: .postProcessing)
+            selectPostProcessingProvider(provider)
         }
     }
 

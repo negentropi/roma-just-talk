@@ -75,6 +75,42 @@ final class WhisperModelFilesTests: XCTestCase {
         )
     }
 
+    func testRuntimeModelFileURLMapsLocalBaseModelToBootstrapFilename() {
+        let modelsDirectory = URL(fileURLWithPath: "/tmp/VoiceInk/WhisperModels", isDirectory: true)
+
+        XCTAssertEqual(
+            VoiceInkWhisperModelFiles.fileURL(
+                forRuntimeModelName: VoiceInkTranscriptionModelCatalog.localBaseModel,
+                in: modelsDirectory
+            ).path,
+            "/tmp/VoiceInk/WhisperModels/ggml-base.bin"
+        )
+    }
+
+    func testAvailableModelFileURLUsesRuntimeModelName() throws {
+        let baseDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.WhisperModelFilesTests.\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: baseDirectory) }
+
+        let modelsDirectory = try VoiceInkWhisperModelFiles.createModelsDirectory(in: baseDirectory)
+        let baseURL = VoiceInkWhisperModelFiles.baseModel.fileURL(in: modelsDirectory)
+
+        XCTAssertNil(VoiceInkWhisperModelFiles.availableModelFileURL(
+            forRuntimeModelName: VoiceInkTranscriptionModelCatalog.localBaseModel,
+            in: modelsDirectory
+        ))
+
+        try Data().write(to: baseURL)
+
+        XCTAssertEqual(
+            VoiceInkWhisperModelFiles.availableModelFileURL(
+                forRuntimeModelName: VoiceInkTranscriptionModelCatalog.localBaseModel,
+                in: modelsDirectory
+            ),
+            baseURL
+        )
+    }
+
     func testDeleteModelFilesRemovesMainModelAndCoreMLSidecar() throws {
         let baseDirectory = FileManager.default.temporaryDirectory
             .appendingPathComponent("VoiceInkCore.WhisperModelFilesTests.\(UUID().uuidString)", isDirectory: true)

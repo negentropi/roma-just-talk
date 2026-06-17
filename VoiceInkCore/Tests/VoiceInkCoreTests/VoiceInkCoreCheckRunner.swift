@@ -406,6 +406,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testModelFileURLBuildsUnderModelsDirectory", run: { WhisperModelFilesTests().testModelFileURLBuildsUnderModelsDirectory() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testModelDownloadStateChecksSharedFileURL", run: { try WhisperModelFilesTests().testModelDownloadStateChecksSharedFileURL() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testAvailableBootstrapModelFileURLUsesFirstDownloadedBootstrapModel", run: { try WhisperModelFilesTests().testAvailableBootstrapModelFileURLUsesFirstDownloadedBootstrapModel() }),
+            VoiceInkCoreCheck(name: "WhisperModelFilesTests.testRuntimeModelFileURLMapsLocalBaseModelToBootstrapFilename", run: { WhisperModelFilesTests().testRuntimeModelFileURLMapsLocalBaseModelToBootstrapFilename() }),
+            VoiceInkCoreCheck(name: "WhisperModelFilesTests.testAvailableModelFileURLUsesRuntimeModelName", run: { try WhisperModelFilesTests().testAvailableModelFileURLUsesRuntimeModelName() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testDeleteModelFilesRemovesMainModelAndCoreMLSidecar", run: { try WhisperModelFilesTests().testDeleteModelFilesRemovesMainModelAndCoreMLSidecar() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testDeleteDownloadedFilesUsesModelSpecURL", run: { try WhisperModelFilesTests().testDeleteDownloadedFilesUsesModelSpecURL() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testCoreMLSidecarURLsUseSharedModelNaming", run: { WhisperModelFilesTests().testCoreMLSidecarURLsUseSharedModelNaming() }),

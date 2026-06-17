@@ -77,7 +77,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - power-mode display formatting for transcript metadata and exports
 - duration presentation
 - relative timestamp presentation
-- Whisper and VAD model file metadata, including platform-base Whisper model directory creation, downloaded local-model file records, model/sidecar file construction, downloaded-state detection, bootstrap-model availability, Core ML support policy, final `.bin` install/replacement, and model/sidecar deletion
+- Whisper and VAD model file metadata, including platform-base Whisper model directory creation, downloaded local-model file records, runtime model-name to downloaded-file resolution, model/sidecar file construction, downloaded-state detection, bootstrap-model availability, Core ML support policy, final `.bin` install/replacement, and model/sidecar deletion
 - local Whisper runtime defaults for thread count, transcription temperature, VAD enablement, and VAD thresholds
 - VAD bundle resource lookup
 - PCM16 sample conversion and mono 16 kHz transcription-audio format constants, including bit depth, endian, and integer/float sample policy
@@ -130,7 +130,7 @@ Current macOS consumers of shared remote transport:
 - macOS open-file routing and audio-file transcription queue validation delegate supported audio/video file checks to `VoiceInkSupportedMedia`; platform shells still own open panels, drag/drop providers, and transcription queue state.
 - macOS CSV export delegates header, row formatting, and escaping to `VoiceInkTranscriptionCSVExporter`; macOS still owns `NSSavePanel` and mapping SwiftData `Transcription` records into export records.
 - macOS transcript details and CSV export delegate power-mode display formatting to `VoiceInkPowerModePresentation`.
-- macOS and iOS local Whisper model directory creation, local `.bin` listing, download URL/file path lookup, final downloaded-file installation, bootstrap-model availability, Core ML support checks, and model deletion delegate to `VoiceInkWhisperModelFiles`; platform shells still own download progress, UI, and runtime model state.
+- macOS and iOS local Whisper model directory creation, local `.bin` listing, download URL/file path lookup, runtime selected-model file resolution, final downloaded-file installation, bootstrap-model availability, Core ML support checks, and model deletion delegate to `VoiceInkWhisperModelFiles`; platform shells still own download progress, UI, and runtime model state.
 - macOS and iOS local Whisper and macOS rolling preload resolve the Silero VAD bundle resource directly through `VoiceInkVADModelFiles`; the old shell-only VAD model manager adapters were removed.
 - macOS history/import row summaries and iOS note detail display use `VoiceInkTranscriptPresentation.preferredText` for the enhanced-text-first transcript display rule.
 - `VoiceInkTranscriptPresentation.matchesSearch` mirrors macOS history predicate search semantics, keeping iOS note filtering accent-insensitive through shared core while macOS SwiftData predicates keep their local query shape.
@@ -159,6 +159,7 @@ Current iOS consumers of shared remote transport:
 - `iOS/VoiceInk-ios/AppSettings.swift` passes the shared paragraph-formatting preference into `VoiceInkTranscriptionRunProcessor`, so iOS retry transcription uses the same `VoiceInkTranscriptParagraphFormatter` policy as macOS.
 - `iOS/VoiceInk-ios/TranscriptionRetryService.swift` passes the iOS selected transcription language through `VoiceInkTranscriptionRunProcessor`, which normalizes auto-detect before remote/local transcription adapters receive it.
 - `iOS/VoiceInk-ios/WhisperTranscriptionService.swift` passes the shared selected-language local Whisper prompt helper into the iOS whisper.cpp wrapper and returns empty local transcripts unchanged, so iOS inherits the macOS language seed prompts and the shared local empty-output policy.
+- `iOS/VoiceInk-ios/WhisperTranscriptionService.swift` resolves the selected mode's local Whisper model path through `VoiceInkWhisperModelFiles`, preserving today's base-model behavior while keeping future local model selection on the shared runtime-model contract.
 - `iOS/VoiceInk-ios/LibWhisper.swift` gates local Whisper VAD through `VoiceInkVADPreference`, so missing settings use the shared macOS default while keeping iOS whisper.cpp execution in the iOS shell.
 - `iOS/VoiceInk-ios/AudioRecorder.swift` maps AVFoundation recorder settings from `VoiceInkPCM16Audio`, so iOS live recording uses the same 16 kHz mono, 16-bit little-endian integer format contract as macOS local transcription while keeping capture/session lifecycle in the iOS shell.
 - `iOS/VoiceInk-ios/ProviderAPIKeyView.swift` verifies stored provider keys through `VoiceInkProviderAPIKeyVerifier`, so shared core owns reference/fallback resolution before transport verification.

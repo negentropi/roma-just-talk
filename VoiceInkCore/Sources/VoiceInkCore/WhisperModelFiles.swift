@@ -118,9 +118,11 @@ public enum VoiceInkWhisperModelFiles {
         in modelsDirectory: URL,
         fileManager: FileManager = .default
     ) -> URL? {
-        bootstrapModels.first {
-            $0.isDownloaded(in: modelsDirectory, fileManager: fileManager)
-        }?.fileURL(in: modelsDirectory)
+        availableModelFileURL(
+            forRuntimeModelName: VoiceInkTranscriptionModelCatalog.localBaseModel,
+            in: modelsDirectory,
+            fileManager: fileManager
+        )
     }
 
     public static let downloadableModels = [
@@ -250,6 +252,26 @@ public enum VoiceInkWhisperModelFiles {
 
     public static func fileURL(forModelName modelName: String, in modelsDirectory: URL) -> URL {
         fileURL(forFilename: filename(forModelName: modelName), in: modelsDirectory)
+    }
+
+    public static func fileURL(
+        forRuntimeModelName modelName: String,
+        in modelsDirectory: URL
+    ) -> URL {
+        let normalizedName = modelName.trimmingCharacters(in: .whitespacesAndNewlines)
+        if normalizedName == VoiceInkTranscriptionModelCatalog.localBaseModel {
+            return baseModel.fileURL(in: modelsDirectory)
+        }
+        return fileURL(forModelName: normalizedName, in: modelsDirectory)
+    }
+
+    public static func availableModelFileURL(
+        forRuntimeModelName modelName: String,
+        in modelsDirectory: URL,
+        fileManager: FileManager = .default
+    ) -> URL? {
+        let url = fileURL(forRuntimeModelName: modelName, in: modelsDirectory)
+        return fileManager.fileExists(atPath: url.path) ? url : nil
     }
 
     public static func downloadURL(forModelName modelName: String) -> URL {

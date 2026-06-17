@@ -22,7 +22,7 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
         
         // Get available model
         let modelManager = LocalModelManager.shared
-        guard let modelPath = await modelManager.baseModelPath else {
+        guard let modelPath = await modelManager.modelPath(for: model) else {
             throw VoiceInkEngineError.localModelUnavailable
         }
         

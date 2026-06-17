@@ -150,7 +150,14 @@ class LocalModelManager: ObservableObject {
     
     /// Get the path to the downloaded base model, if available
     var baseModelPath: String? {
-        VoiceInkWhisperModelFiles.availableBootstrapModelFileURL(in: Self.modelsDirectory)?.path
+        modelPath(for: VoiceInkTranscriptionModelCatalog.localBaseModel)
+    }
+
+    func modelPath(for runtimeModelName: String) -> String? {
+        VoiceInkWhisperModelFiles.availableModelFileURL(
+            forRuntimeModelName: runtimeModelName,
+            in: Self.modelsDirectory
+        )?.path
     }
     
     /// Check if any model is available for transcription

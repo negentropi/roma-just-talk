@@ -1,5 +1,7 @@
 # Changelog
 
+## v1.96 - Unreleased
+
 ## v1.95 - 2026-06-17
 
 - Fixed Special `startRecording` modifier-only shortcuts so unreliable key-up evidence and short clean presses no longer cancel after recording has already started.

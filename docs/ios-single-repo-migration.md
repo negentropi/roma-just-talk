@@ -35,7 +35,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - transcript status and presentation helpers
 - local transcription/model/missing-audio error vocabulary shared by macOS local Whisper and iOS local retry transcription
 - raw transcription output filtering for hallucination tags/brackets, optional filler words, default filler-word vocabulary, and filler-word list editing policy
-- transcription cleanup preference loading and punctuation/lowercase cleanup policy
+- transcription cleanup preference loading and punctuation/lowercase/filler-word cleanup policy
 - cursor-aware transcript capitalization policy; platform shells only supply cursor text and paste targets
 - NaturalLanguage word-count policy for metrics and short-enhancement skip decisions
 - short post-processing skip policy and storage defaults for brief transcripts; platform shells still own UI controls and whether to apply the policy
@@ -80,6 +80,7 @@ Current iOS consumers of shared remote transport:
 - `iOS/VoiceInk-ios/TranscriptionServiceFactory.swift` creates `VoiceInkRemoteTranscriptionService` for every remote `VoiceInkProviderKind`.
 - `VoiceInkRemoteTranscriptionService` dispatches Groq/OpenAI/Cerebras, Deepgram, Gemini, Mistral, ElevenLabs, Soniox, Speechmatics, AssemblyAI, and xAI through shared core clients.
 - `iOS/VoiceInk-ios/TranscriptionRetryService.swift` routes iOS transcription through `VoiceInkTranscriptionRunProcessor`, including shared output filtering and cleanup preferences from `AppSettings`.
+- `iOS/VoiceInk-ios/AppSettings.swift` passes the shared filler-word cleanup toggle and vocabulary into `VoiceInkTranscriptionRunProcessor`, aligning retry transcription cleanup with macOS defaults while keeping settings storage in the iOS shell.
 - `iOS/VoiceInk-ios/TranscriptionRetryService.swift` passes the iOS selected transcription language through `VoiceInkTranscriptionRunProcessor`, which normalizes auto-detect before remote/local transcription adapters receive it.
 - `iOS/VoiceInk-ios/ProviderAPIKeyView.swift` verifies provider keys through `VoiceInkProviderAPIKeyVerifier`.
 - `iOS/VoiceInk-ios/WhisperTranscriptionService.swift` throws `VoiceInkEngineError` from `VoiceInkCore` instead of owning a separate iOS-only local Whisper error enum.

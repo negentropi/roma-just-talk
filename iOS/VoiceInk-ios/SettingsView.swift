@@ -64,6 +64,8 @@ struct SettingsView: View {
                 }
 
                 Toggle("Lowercase Transcription", isOn: $settings.lowercaseTranscription)
+
+                Toggle("Remove Filler Words", isOn: $settings.removeFillerWords)
             }
             
             Section(header: Text("Audio Settings")) {

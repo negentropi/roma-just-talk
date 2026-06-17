@@ -30,6 +30,11 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkPreferenceDefault.isTextFormattingEnabled, true)
     }
 
+    func testSharedPreferenceDefaultsPreserveExistingTranscriptionCleanupPolicy() {
+        XCTAssertEqual(VoiceInkPreferenceDefault.lowercaseTranscription, false)
+        XCTAssertEqual(VoiceInkPreferenceDefault.removeFillerWords, true)
+    }
+
     func testSharedPreferenceDefaultsPreserveExistingCleanupRetention() {
         XCTAssertEqual(VoiceInkPreferenceDefault.transcriptionRetentionMinutes, 24 * 60)
     }

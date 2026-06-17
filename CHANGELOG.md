@@ -2,6 +2,7 @@
 
 ## v1.94 - Unreleased
 
+- Aligned imported iOS retry transcription with shared filler-word cleanup defaults, so the integrated iOS app now uses the same core cleanup configuration as macOS for punctuation, lowercase, and filler words.
 - Added iOS transcription language selection backed by the shared language catalog, including local Whisper language hints and remote transcription request normalization.
 - Shared transcription model catalog metadata between macOS and the imported iOS app, aligning iOS Groq and Deepgram selectable transcription models with the macOS source of truth.
 - Aligned the imported iOS app's empty-mode fallback with its shared local Whisper default instead of falling back to a Groq API-key path.

@@ -31,18 +31,38 @@ final class TranscriptionCleanupPreferencesTests: XCTestCase {
     func testCleanupConfigurationDefaultsToCurrentNoOpPolicy() {
         XCTAssertEqual(VoiceInkTranscriptionCleanupConfiguration.disabled.punctuationMode, .keep)
         XCTAssertFalse(VoiceInkTranscriptionCleanupConfiguration.disabled.shouldLowercase)
+        XCTAssertFalse(VoiceInkTranscriptionCleanupConfiguration.disabled.shouldRemoveFillerWords)
+        XCTAssertEqual(VoiceInkTranscriptionCleanupConfiguration.disabled.fillerWords, VoiceInkFillerWords.defaultWords)
     }
 
     func testCurrentCleanupConfigurationReadsSharedDefaults() {
         withIsolatedDefaults { defaults in
             PunctuationCleanupMode.setCurrent(.removeTrailingPeriod, in: defaults)
             defaults.set(true, forKey: VoiceInkUserDefaultsKey.lowercaseTranscription)
+            defaults.set(true, forKey: VoiceInkUserDefaultsKey.removeFillerWords)
+            defaults.set(["um", "like"], forKey: VoiceInkUserDefaultsKey.fillerWords)
 
             XCTAssertEqual(
                 VoiceInkTranscriptionCleanupConfiguration.current(in: defaults),
                 VoiceInkTranscriptionCleanupConfiguration(
                     punctuationMode: .removeTrailingPeriod,
-                    shouldLowercase: true
+                    shouldLowercase: true,
+                    shouldRemoveFillerWords: true,
+                    fillerWords: ["um", "like"]
+                )
+            )
+        }
+    }
+
+    func testCurrentCleanupConfigurationUsesSharedDefaultsWhenUnset() {
+        withIsolatedDefaults { defaults in
+            XCTAssertEqual(
+                VoiceInkTranscriptionCleanupConfiguration.current(in: defaults),
+                VoiceInkTranscriptionCleanupConfiguration(
+                    punctuationMode: .keep,
+                    shouldLowercase: VoiceInkPreferenceDefault.lowercaseTranscription,
+                    shouldRemoveFillerWords: VoiceInkPreferenceDefault.removeFillerWords,
+                    fillerWords: VoiceInkFillerWords.defaultWords
                 )
             )
         }

@@ -42,6 +42,14 @@ final class AppSettings: ObservableObject {
         didSet { UserDefaults.standard.set(lowercaseTranscription, forKey: VoiceInkUserDefaultsKey.lowercaseTranscription) }
     }
 
+    @Published var removeFillerWords: Bool {
+        didSet { UserDefaults.standard.set(removeFillerWords, forKey: VoiceInkUserDefaultsKey.removeFillerWords) }
+    }
+
+    @Published var fillerWords: [String] {
+        didSet { UserDefaults.standard.set(fillerWords, forKey: VoiceInkUserDefaultsKey.fillerWords) }
+    }
+
     @Published var selectedTranscriptionLanguage: String {
         didSet {
             UserDefaults.standard.set(selectedTranscriptionLanguage, forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
@@ -68,7 +76,12 @@ final class AppSettings: ObservableObject {
             ?? VoiceInkPreferenceDefault.audioSessionTimeoutSeconds
         PunctuationCleanupMode.migrateLegacyUserDefaultIfNeeded()
         self.punctuationCleanupMode = PunctuationCleanupMode.current()
-        self.lowercaseTranscription = UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.lowercaseTranscription)
+        self.lowercaseTranscription = UserDefaults.standard.object(forKey: VoiceInkUserDefaultsKey.lowercaseTranscription) as? Bool
+            ?? VoiceInkPreferenceDefault.lowercaseTranscription
+        self.removeFillerWords = UserDefaults.standard.object(forKey: VoiceInkUserDefaultsKey.removeFillerWords) as? Bool
+            ?? VoiceInkPreferenceDefault.removeFillerWords
+        self.fillerWords = UserDefaults.standard.stringArray(forKey: VoiceInkUserDefaultsKey.fillerWords)
+            ?? VoiceInkFillerWords.defaultWords
         self.selectedTranscriptionLanguage = UserDefaults.standard.string(forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
             ?? VoiceInkLanguageCatalog.autoDetectCode
 
@@ -134,7 +147,9 @@ final class AppSettings: ObservableObject {
     var transcriptionCleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration {
         VoiceInkTranscriptionCleanupConfiguration(
             punctuationMode: punctuationCleanupMode,
-            shouldLowercase: lowercaseTranscription
+            shouldLowercase: lowercaseTranscription,
+            shouldRemoveFillerWords: removeFillerWords,
+            fillerWords: fillerWords
         )
     }
 
@@ -226,10 +241,14 @@ final class AppSettings: ObservableObject {
 
         // Reset transcription cleanup preferences
         punctuationCleanupMode = .keep
-        lowercaseTranscription = false
+        lowercaseTranscription = VoiceInkPreferenceDefault.lowercaseTranscription
+        removeFillerWords = VoiceInkPreferenceDefault.removeFillerWords
+        fillerWords = VoiceInkFillerWords.defaultWords
         UserDefaults.standard.removeObject(forKey: PunctuationCleanupMode.userDefaultsKey)
         UserDefaults.standard.set(false, forKey: PunctuationCleanupMode.legacyRemovePunctuationKey)
         UserDefaults.standard.removeObject(forKey: VoiceInkUserDefaultsKey.lowercaseTranscription)
+        UserDefaults.standard.removeObject(forKey: VoiceInkUserDefaultsKey.removeFillerWords)
+        UserDefaults.standard.removeObject(forKey: VoiceInkUserDefaultsKey.fillerWords)
         selectedTranscriptionLanguage = VoiceInkLanguageCatalog.autoDetectCode
         UserDefaults.standard.removeObject(forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
 

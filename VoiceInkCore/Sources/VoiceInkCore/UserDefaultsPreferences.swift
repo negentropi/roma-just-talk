@@ -23,6 +23,8 @@ public enum VoiceInkUserDefaultsKey {
 public enum VoiceInkPreferenceDefault {
     public static let audioSessionTimeoutSeconds = 90
     public static let isTextFormattingEnabled = true
+    public static let lowercaseTranscription = false
+    public static let removeFillerWords = true
     public static let transcriptionRetentionMinutes = 24 * 60
     public static let skipShortEnhancement = true
     public static let shortEnhancementWordThreshold = 3

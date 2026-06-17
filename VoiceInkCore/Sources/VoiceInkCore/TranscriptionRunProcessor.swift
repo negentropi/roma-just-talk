@@ -111,6 +111,7 @@ public struct VoiceInkTranscriptionRunProcessor {
 
         let filteredText = VoiceInkTranscriptionOutputFilter.filter(
             rawText,
+            fillerWords: cleanupConfiguration.activeFillerWords,
             whitespacePolicy: .preserveParagraphs
         )
         let normalizedText = VoiceInkTranscriptTextNormalizer.normalizeParagraphSpacing(filteredText)

@@ -39,7 +39,8 @@ struct FillerWordChip: View {
 }
 
 struct FillerWordsSettingsView: View {
-    @AppStorage(VoiceInkUserDefaultsKey.removeFillerWords) private var removeFillerWords = true
+    @AppStorage(VoiceInkUserDefaultsKey.removeFillerWords)
+    private var removeFillerWords = VoiceInkPreferenceDefault.removeFillerWords
     @StateObject private var fillerWordManager = FillerWordManager.shared
     @State private var newWord = ""
     @State private var showDuplicateAlert = false

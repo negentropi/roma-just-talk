@@ -49,21 +49,38 @@ public struct VoiceInkTranscriptionCleanupConfiguration: Equatable, Sendable {
     public static let disabled = VoiceInkTranscriptionCleanupConfiguration()
 
     public static func current(in defaults: UserDefaults = .standard) -> VoiceInkTranscriptionCleanupConfiguration {
-        VoiceInkTranscriptionCleanupConfiguration(
+        let shouldRemoveFillerWords = defaults.object(forKey: VoiceInkUserDefaultsKey.removeFillerWords) as? Bool
+            ?? VoiceInkPreferenceDefault.removeFillerWords
+
+        return VoiceInkTranscriptionCleanupConfiguration(
             punctuationMode: PunctuationCleanupMode.current(in: defaults),
-            shouldLowercase: defaults.bool(forKey: VoiceInkUserDefaultsKey.lowercaseTranscription)
+            shouldLowercase: defaults.object(forKey: VoiceInkUserDefaultsKey.lowercaseTranscription) as? Bool
+                ?? VoiceInkPreferenceDefault.lowercaseTranscription,
+            shouldRemoveFillerWords: shouldRemoveFillerWords,
+            fillerWords: defaults.stringArray(forKey: VoiceInkUserDefaultsKey.fillerWords)
+                ?? VoiceInkFillerWords.defaultWords
         )
     }
 
     public let punctuationMode: PunctuationCleanupMode
     public let shouldLowercase: Bool
+    public let shouldRemoveFillerWords: Bool
+    public let fillerWords: [String]
+
+    public var activeFillerWords: [String] {
+        shouldRemoveFillerWords ? fillerWords : []
+    }
 
     public init(
         punctuationMode: PunctuationCleanupMode = .keep,
-        shouldLowercase: Bool = false
+        shouldLowercase: Bool = false,
+        shouldRemoveFillerWords: Bool = false,
+        fillerWords: [String] = VoiceInkFillerWords.defaultWords
     ) {
         self.punctuationMode = punctuationMode
         self.shouldLowercase = shouldLowercase
+        self.shouldRemoveFillerWords = shouldRemoveFillerWords
+        self.fillerWords = fillerWords
     }
 }
 

@@ -5,6 +5,8 @@ final class UserDefaultsPreferencesTests: XCTestCase {
     func testSharedPreferenceKeysPreserveExistingStorageNames() {
         XCTAssertEqual(VoiceInkUserDefaultsKey.hasCompletedOnboarding, "hasCompletedOnboarding")
         XCTAssertEqual(VoiceInkUserDefaultsKey.lowercaseTranscription, "LowercaseTranscription")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.removeFillerWords, "RemoveFillerWords")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.fillerWords, "FillerWords")
         XCTAssertEqual(VoiceInkUserDefaultsKey.modes, "modes")
         XCTAssertEqual(VoiceInkUserDefaultsKey.selectedModeId, "selectedModeId")
         XCTAssertEqual(VoiceInkUserDefaultsKey.audioSessionTimeoutSeconds, "audioSessionTimeoutSeconds")

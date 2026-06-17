@@ -1,4 +1,5 @@
 import SwiftUI
+import VoiceInkCore
 
 struct FillerWordChip: View {
     let word: String
@@ -38,7 +39,7 @@ struct FillerWordChip: View {
 }
 
 struct FillerWordsSettingsView: View {
-    @AppStorage("RemoveFillerWords") private var removeFillerWords = true
+    @AppStorage(VoiceInkUserDefaultsKey.removeFillerWords) private var removeFillerWords = true
     @StateObject private var fillerWordManager = FillerWordManager.shared
     @State private var newWord = ""
     @State private var showDuplicateAlert = false

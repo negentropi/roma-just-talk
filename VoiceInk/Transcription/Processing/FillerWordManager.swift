@@ -6,8 +6,8 @@ class FillerWordManager: ObservableObject {
 
     static let defaultFillerWords = VoiceInkTranscriptionOutputFilter.defaultFillerWords
 
-    private let fillerWordsKey = "FillerWords"
-    private let removeFillerWordsKey = "RemoveFillerWords"
+    private let fillerWordsKey = VoiceInkUserDefaultsKey.fillerWords
+    private let removeFillerWordsKey = VoiceInkUserDefaultsKey.removeFillerWords
 
     @Published var fillerWords: [String] {
         didSet {

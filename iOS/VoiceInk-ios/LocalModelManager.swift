@@ -175,28 +175,4 @@ class LocalModelManager: ObservableObject {
         VoiceInkWhisperModelFiles.bootstrapModels.first { $0.isDownloaded(in: Self.modelsDirectory) }
     }
     
-    /// Get disk usage information for models
-    func getModelsDiskUsage() -> (totalSize: Int64, modelCount: Int) {
-        let modelsDir = Self.modelsDirectory
-        var totalSize: Int64 = 0
-        var modelCount = 0
-        
-        do {
-            let contents = try FileManager.default.contentsOfDirectory(at: modelsDir, includingPropertiesForKeys: [.fileSizeKey])
-            
-            for fileURL in contents {
-                if VoiceInkWhisperModelFiles.isModelFile(fileURL) {
-                    modelCount += 1
-                    if let resourceValues = try? fileURL.resourceValues(forKeys: [.fileSizeKey]),
-                       let fileSize = resourceValues.fileSize {
-                        totalSize += Int64(fileSize)
-                    }
-                }
-            }
-        } catch {
-            print("LocalModelManager: Error calculating disk usage: \(error)")
-        }
-        
-        return (totalSize, modelCount)
-    }
 }

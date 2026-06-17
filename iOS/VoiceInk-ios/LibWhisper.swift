@@ -125,7 +125,7 @@ actor WhisperContext {
         }.value
         
         // Load VAD model from bundle resources
-        let vadModelPath = VADModelManager.shared.getModelPath()
+        let vadModelPath = VoiceInkVADModelFiles.sileroPath()
         await whisperContext.setVADModelPath(vadModelPath)
         
         return whisperContext

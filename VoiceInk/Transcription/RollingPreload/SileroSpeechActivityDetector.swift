@@ -19,7 +19,7 @@ final class SileroSpeechActivityDetector: SpeechActivityDetecting, @unchecked Se
 
     static func makeDefault() async -> SileroSpeechActivityDetector? {
         guard RollingBufferVADSettings.usesSilero(),
-              let modelPath = await VADModelManager.shared.getModelPath() else {
+              let modelPath = VoiceInkVADModelFiles.sileroPath() else {
             return nil
         }
 

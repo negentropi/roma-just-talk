@@ -129,6 +129,7 @@ Current macOS consumers of shared remote transport:
 - macOS and iOS provider API-key lookup delegates stored-key reference resolution and provider environment fallback policy to `VoiceInkProviderAPIKeyLookup`; platform shells still own Keychain storage and UI editing state.
 - macOS and iOS recording audio filename construction delegates live recording, imported transcription, retranscription, and timestamped iOS recording naming to `VoiceInkStoredAudioFile`; platform shells still own directory choice and actual audio capture/copy/write work.
 - macOS and iOS local Whisper model deletion delegates primary `.bin` removal and optional Core ML encoder sidecar cleanup to `VoiceInkWhisperModelFiles`; platform shells still own download progress, UI, and runtime model state.
+- macOS and iOS local Whisper and macOS rolling preload resolve the Silero VAD bundle resource directly through `VoiceInkVADModelFiles`; the old shell-only VAD model manager adapters were removed.
 - macOS history/import row summaries and iOS note detail display use `VoiceInkTranscriptPresentation.preferredText` for the enhanced-text-first transcript display rule.
 - macOS `FillerWordManager`, iOS `AppSettings`, and cleanup configuration load and save filler-word lists through `VoiceInkFillerWordPreference`; platform shells still own settings UI and toggle state.
 - iOS app launch and first-time setup read/write/reset onboarding completion through `VoiceInkOnboardingPreference`; the onboarding views and recording-after-onboarding flow stay in the iOS shell.

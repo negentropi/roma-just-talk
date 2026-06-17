@@ -200,21 +200,17 @@ class KeyboardViewController: KeyboardInputViewController {
         // The correct approach is to simply open the main app and let user record there
         
         // Try multiple approaches to open the main app
-        if let url = URL(string: "voiceink://record") {
-            // Method 1: Try extensionContext.open (primary method)
-            extensionContext?.open(url) { success in
-                if success {
-                    print("✅ Opened main app via extensionContext")
-                } else {
-                    print("❌ extensionContext.open failed, trying alternative methods")
-                    DispatchQueue.main.async {
-                        self.tryAlternativeURLOpening(url)
-                    }
+        let url = VoiceInkAppDeepLink.record.url
+        // Method 1: Try extensionContext.open (primary method)
+        extensionContext?.open(url) { success in
+            if success {
+                print("✅ Opened main app via extensionContext")
+            } else {
+                print("❌ extensionContext.open failed, trying alternative methods")
+                DispatchQueue.main.async {
+                    self.tryAlternativeURLOpening(url)
                 }
             }
-        } else {
-            // Fallback: Show message to user
-            showUserMessage()
         }
     }
     

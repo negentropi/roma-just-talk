@@ -11,6 +11,7 @@ import SwiftData
 @main
 struct VoiceInk_iosApp: App {
     @State private var hasCompletedOnboarding = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
+    @State private var shouldStartRecordingAfterOnboarding = false
     @StateObject private var recordingManager = RecordingManager()
     
     init() {
@@ -41,10 +42,18 @@ struct VoiceInk_iosApp: App {
                     .onOpenURL { url in
                         handleURL(url)
                     }
+                    .onAppear {
+                        startPendingRecordingIfNeeded()
+                    }
             } else {
                 OnboardingView(isOnboardingComplete: $hasCompletedOnboarding)
                     .onOpenURL { url in
                         handleURL(url)
+                    }
+                    .onChange(of: hasCompletedOnboarding) { _, completed in
+                        if completed {
+                            startPendingRecordingIfNeeded()
+                        }
                     }
             }
         }
@@ -52,18 +61,35 @@ struct VoiceInk_iosApp: App {
     }
     
     private func handleURL(_ url: URL) {
-        guard url.scheme == "voiceink" else { return }
-        
-        switch url.host {
-        case "record":
+        guard let deepLink = VoiceInkAppDeepLink(url: url) else { return }
+
+        switch deepLink {
+        case .record:
             print("🔗 URL scheme triggered: open app for recording")
-            // Automatically start recording flow when opened from keyboard
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                self.recordingManager.startRecordingFlow()
-            }
-            print("📱 App opened via keyboard extension - starting recording")
-        default:
-            break
+            requestRecordingFromDeepLink()
+            print("📱 App opened via keyboard extension - recording requested")
+        }
+    }
+
+    private func requestRecordingFromDeepLink() {
+        guard hasCompletedOnboarding else {
+            shouldStartRecordingAfterOnboarding = true
+            return
+        }
+
+        startRecordingAfterLaunchDelay()
+    }
+
+    private func startPendingRecordingIfNeeded() {
+        guard shouldStartRecordingAfterOnboarding else { return }
+        shouldStartRecordingAfterOnboarding = false
+        startRecordingAfterLaunchDelay()
+    }
+
+    private func startRecordingAfterLaunchDelay() {
+        // Allow the opened scene to settle before presenting recording permission/UI.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.recordingManager.startRecordingFlow()
         }
     }
 }

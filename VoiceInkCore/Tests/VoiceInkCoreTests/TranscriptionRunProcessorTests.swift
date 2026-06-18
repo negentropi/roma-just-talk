@@ -241,6 +241,11 @@ final class TranscriptionRunProcessorTests: XCTestCase {
         XCTAssertEqual(result.finalText, "enhanced text")
         XCTAssertEqual(result.enhancedText, "enhanced text")
         XCTAssertEqual(result.aiEnhancementModelName, "gemini-2.5-flash")
+        XCTAssertEqual(result.postProcessingResult?.text, "enhanced text")
+        XCTAssertEqual(result.postProcessingResult?.modelName, "gemini-2.5-flash")
+        XCTAssertNil(result.postProcessingResult?.promptName)
+        XCTAssertNil(result.postProcessingResult?.requestSystemMessage)
+        XCTAssertNil(result.postProcessingResult?.requestUserMessage)
         XCTAssertNil(result.postProcessingError)
         XCTAssertTrue(result.postProcessingSucceeded)
     }
@@ -262,6 +267,7 @@ final class TranscriptionRunProcessorTests: XCTestCase {
 
         XCTAssertEqual(result.transcriptionDuration, 2)
         XCTAssertEqual(result.enhancementDuration, 3)
+        XCTAssertEqual(result.postProcessingResult?.duration, 3)
         XCTAssertTrue(result.postProcessingSucceeded)
     }
 
@@ -333,6 +339,7 @@ final class TranscriptionRunProcessorTests: XCTestCase {
 
         XCTAssertEqual(result.finalText, "raw text")
         XCTAssertNil(result.enhancedText)
+        XCTAssertEqual(result.postProcessingResult?.text, "raw text")
         XCTAssertTrue(result.postProcessingSucceeded)
     }
 
@@ -353,6 +360,8 @@ final class TranscriptionRunProcessorTests: XCTestCase {
         XCTAssertEqual(result.cleanedText, "raw text")
         XCTAssertEqual(result.finalText, "raw text")
         XCTAssertNil(result.enhancedText)
+        XCTAssertEqual(result.aiEnhancementModelName, "gemini-2.5-flash")
+        XCTAssertNil(result.postProcessingResult)
         XCTAssertEqual(result.postProcessingError, "Post-processing failed: provider down")
         XCTAssertFalse(result.postProcessingSucceeded)
     }

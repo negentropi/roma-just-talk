@@ -7,6 +7,7 @@ public struct VoiceInkTranscriptionRunResult: Equatable, Sendable {
     public let aiEnhancementModelName: String?
     public let transcriptionDuration: TimeInterval?
     public let enhancementDuration: TimeInterval?
+    public let postProcessingResult: VoiceInkAIEnhancementResult?
     public let postProcessingError: String?
     public let postProcessingSucceeded: Bool
 
@@ -21,6 +22,7 @@ public struct VoiceInkTranscriptionRunResult: Equatable, Sendable {
         aiEnhancementModelName: String?,
         transcriptionDuration: TimeInterval? = nil,
         enhancementDuration: TimeInterval? = nil,
+        postProcessingResult: VoiceInkAIEnhancementResult? = nil,
         postProcessingError: String?,
         postProcessingSucceeded: Bool
     ) {
@@ -30,6 +32,7 @@ public struct VoiceInkTranscriptionRunResult: Equatable, Sendable {
         self.aiEnhancementModelName = aiEnhancementModelName
         self.transcriptionDuration = transcriptionDuration
         self.enhancementDuration = enhancementDuration
+        self.postProcessingResult = postProcessingResult
         self.postProcessingError = postProcessingError
         self.postProcessingSucceeded = postProcessingSucceeded
     }
@@ -159,7 +162,7 @@ public struct VoiceInkTranscriptionRunProcessor {
             : nil
 
         var finalText = cleanedText
-        var enhancementDuration: TimeInterval? = nil
+        var postProcessingResult: VoiceInkAIEnhancementResult? = nil
         var postProcessingError: String? = nil
         var postProcessingSucceeded = false
 
@@ -173,14 +176,23 @@ public struct VoiceInkTranscriptionRunProcessor {
                 if let usableLLMKey = VoiceInkProviderCredential.nonBlank(llmKey) {
                     do {
                         let enhancementStart = currentDate()
-                        finalText = try await postProcessor(VoiceInkPostProcessingJob(
+                        let enhancedText = try await postProcessor(VoiceInkPostProcessingJob(
                             provider: llmProvider,
                             apiKey: usableLLMKey,
                             model: llmModel,
                             prompt: prompt,
                             transcript: cleanedText
                         ))
-                        enhancementDuration = currentDate().timeIntervalSince(enhancementStart)
+                        let enhancementDuration = currentDate().timeIntervalSince(enhancementStart)
+                        postProcessingResult = VoiceInkAIEnhancementResult(
+                            text: enhancedText,
+                            duration: enhancementDuration,
+                            modelName: llmModel,
+                            promptName: nil,
+                            requestSystemMessage: nil,
+                            requestUserMessage: nil
+                        )
+                        finalText = enhancedText
                         postProcessingSucceeded = true
                     } catch {
                         postProcessingError = VoiceInkPostProcessingFailurePresentation.postProcessingFailureText(
@@ -198,7 +210,8 @@ public struct VoiceInkTranscriptionRunProcessor {
             transcriptionModelName: model,
             aiEnhancementModelName: aiEnhancementModelName,
             transcriptionDuration: transcriptionDuration,
-            enhancementDuration: enhancementDuration,
+            enhancementDuration: postProcessingResult?.duration,
+            postProcessingResult: postProcessingResult,
             postProcessingError: postProcessingError,
             postProcessingSucceeded: postProcessingSucceeded
         )

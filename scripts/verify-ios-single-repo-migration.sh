@@ -402,6 +402,21 @@ require_pattern \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
 require_pattern \
+  "shared transcription run result carries post-processing enhancement result" \
+  'postProcessingResult: VoiceInkAIEnhancementResult\?' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift
+
+require_pattern \
+  "shared transcription run processor builds post-processing enhancement result" \
+  'postProcessingResult = VoiceInkAIEnhancementResult' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift
+
+require_pattern \
+  "shared transcription run tests keep failed post-processing result absent" \
+  'XCTAssertNil\(result\.postProcessingResult\)' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunProcessorTests.swift
+
+require_pattern \
   "macOS recorder enhancement stores request metadata from shared result" \
   'enhancement\.requestSystemMessage' \
   VoiceInk/Transcription/Engine/TranscriptionPipeline.swift

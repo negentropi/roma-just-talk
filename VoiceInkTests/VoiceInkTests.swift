@@ -1045,7 +1045,7 @@ struct VoiceInkTests {
             eventTime: 4
         )
 
-        try await Task.sleep(nanoseconds: 10_000_000)
+        #expect(await eventually { contexts.count == 1 })
         #expect(contexts == [ShortcutPressContext(didPressOtherKeyDuringPress: true, didReleaseOtherKeyDuringPress: true)])
     }
 
@@ -1085,7 +1085,7 @@ struct VoiceInkTests {
             eventTime: 4
         )
 
-        try await Task.sleep(nanoseconds: 10_000_000)
+        #expect(await eventually { contexts.count == 1 })
         #expect(contexts == [ShortcutPressContext(didPressOtherKeyDuringPress: true, didReleaseOtherKeyDuringPress: true)])
     }
 
@@ -1165,5 +1165,15 @@ struct VoiceInkTests {
         } else {
             UserDefaults.standard.removeObject(forKey: key)
         }
+    }
+
+    private func eventually(_ predicate: () -> Bool) async -> Bool {
+        for _ in 0..<20 {
+            if predicate() {
+                return true
+            }
+            try? await Task.sleep(nanoseconds: 5_000_000)
+        }
+        return predicate()
     }
 }

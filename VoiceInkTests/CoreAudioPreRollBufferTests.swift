@@ -3,6 +3,7 @@ import AVFoundation
 import Testing
 @testable import VoiceInk
 
+@Suite(.serialized)
 struct CoreAudioPreRollBufferTests {
     @Test func snapshotKeepsChronologicalOrderAfterWrap() {
         let buffer = PCMPreRollBuffer(sampleRate: 4, seconds: 1.0)

@@ -1,6 +1,7 @@
 import Testing
 @testable import VoiceInk
 
+@Suite(.serialized)
 struct PowerModeConfigTests {
     @Test func automaticRuleDetectionIgnoresDisabledRules() {
         let disabledURL = powerModeConfig(

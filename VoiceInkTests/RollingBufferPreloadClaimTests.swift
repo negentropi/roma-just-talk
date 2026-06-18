@@ -27,6 +27,7 @@ private final class ClaimTestSession: TranscriptionSession {
 }
 
 @MainActor
+@Suite(.serialized)
 struct RollingBufferPreloadClaimTests {
     @Test func claimMatchesSameModelAndLanguage() async {
         let claim = makeClaim(modelName: "same-model", language: "en")

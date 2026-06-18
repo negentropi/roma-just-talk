@@ -12,6 +12,7 @@ private struct CapabilityTestModel: TranscriptionModel {
     let supportedLanguages: [String: String] = [:]
 }
 
+@Suite(.serialized)
 struct TranscriptionModelCapabilityTests {
     @Test func recordedFileTranscriptionIsUnavailableOnlyForStreamingOnlyProviders() {
         #expect(CapabilityTestModel(name: "local", displayName: "Local", provider: .fluidAudio).supportsRecordedFileTranscription)

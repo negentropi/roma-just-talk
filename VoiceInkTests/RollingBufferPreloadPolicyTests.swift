@@ -13,6 +13,7 @@ private struct TestTranscriptionModel: TranscriptionModel {
     let supportedLanguages: [String: String] = [:]
 }
 
+@Suite(.serialized)
 struct RollingBufferPreloadPolicyTests {
     @Test func defaultsUseAutoWithCloudRuleOffAndLowBatteryRuleOnAtFortyPercent() {
         let defaults = temporaryDefaults()

@@ -1,6 +1,7 @@
 import Testing
 @testable import VoiceInk
 
+@Suite(.serialized)
 struct WordAgreementEngineTests {
     @Test func rollingPreloadCachedFinalizationRequiresFreshHypothesis() {
         let config = AgreementConfig.rollingPreload

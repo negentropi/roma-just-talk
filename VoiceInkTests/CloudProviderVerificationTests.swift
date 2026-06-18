@@ -2,6 +2,7 @@ import Testing
 import VoiceInkCore
 @testable import VoiceInk
 
+@Suite(.serialized)
 struct CloudProviderVerificationTests {
     @Test func coreBackedCloudProvidersShareCoreAPIKeyVerifier() async throws {
         let expectedMappings: [(ModelProvider, VoiceInkProviderKind)] = [

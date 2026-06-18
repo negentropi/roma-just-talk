@@ -19,6 +19,7 @@ private final class LockedRelayChunks: @unchecked Sendable {
     }
 }
 
+@Suite(.serialized)
 struct RecordingStartupAudioRelayTests {
     @Test func installSinkReplaysBufferedChunksAndForwardsLaterChunks() {
         let relay = RecordingStartupAudioRelay()

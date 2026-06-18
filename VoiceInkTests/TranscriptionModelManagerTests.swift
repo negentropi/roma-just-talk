@@ -17,6 +17,7 @@ private final class ModelChangeNotificationRecorder: NSObject {
     }
 }
 
+@Suite(.serialized)
 struct TranscriptionModelManagerTests {
     @Test @MainActor func loadingSavedCurrentModelBroadcastsModelAndSettingsChange() {
         let oldModelName = UserDefaults.standard.string(forKey: "CurrentTranscriptionModel")

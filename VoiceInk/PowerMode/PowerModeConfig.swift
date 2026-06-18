@@ -212,7 +212,7 @@ class PowerModeManager: ObservableObject {
     @Published var configurations: [PowerModeConfig] = []
     @Published var activeConfiguration: PowerModeConfig?
 
-    private let configKey = "powerModeConfigurationsV2"
+    private let configKey = VoiceInkUserDefaultsKey.powerModeConfigurations
     private let activeConfigIdKey = "activeConfigurationId"
 
     private init() {

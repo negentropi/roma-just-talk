@@ -26,6 +26,7 @@ public enum VoiceInkUserDefaultsKey {
     public static let useScreenCaptureContext = "useScreenCaptureContext"
     public static let customPrompts = "customPrompts"
     public static let selectedPromptId = "selectedPromptId"
+    public static let powerModeConfigurations = "powerModeConfigurationsV2"
     public static let selectedAIProvider = "selectedAIProvider"
     public static let openRouterModels = "openRouterModels"
     public static let ollamaBaseURL = "ollamaBaseURL"

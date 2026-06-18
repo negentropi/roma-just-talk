@@ -28,6 +28,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkUserDefaultsKey.useScreenCaptureContext, "useScreenCaptureContext")
         XCTAssertEqual(VoiceInkUserDefaultsKey.customPrompts, "customPrompts")
         XCTAssertEqual(VoiceInkUserDefaultsKey.selectedPromptId, "selectedPromptId")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.powerModeConfigurations, "powerModeConfigurationsV2")
         XCTAssertEqual(VoiceInkUserDefaultsKey.selectedAIProvider, "selectedAIProvider")
         XCTAssertEqual(VoiceInkUserDefaultsKey.openRouterModels, "openRouterModels")
         XCTAssertEqual(VoiceInkUserDefaultsKey.ollamaBaseURL, "ollamaBaseURL")

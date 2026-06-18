@@ -57,6 +57,51 @@ final class VoiceInkIOSTests: XCTestCase {
         )
     }
 
+    func testTranscriptionFeedsSharedPerformanceAnalyzer() throws {
+        let note = Transcription(
+            text: "raw",
+            duration: 12,
+            enhancedText: "enhanced",
+            transcriptionModelName: "fast-local",
+            aiEnhancementModelName: "cleaner",
+            transcriptionDuration: 3,
+            enhancementDuration: 2
+        )
+
+        let analysis = VoiceInkPerformanceAnalyzer.analyze(records: [note])
+
+        XCTAssertEqual(analysis.totalTranscripts, 1)
+        XCTAssertEqual(analysis.totalWithTranscriptionData, 1)
+        XCTAssertEqual(analysis.totalAudioDuration, 12)
+        XCTAssertEqual(analysis.totalEnhancedFiles, 1)
+        XCTAssertEqual(
+            analysis.transcriptionModels,
+            [
+                VoiceInkPerformanceModelStat(
+                    name: "fast-local",
+                    sampleCount: 1,
+                    totalProcessingTime: 3,
+                    avgProcessingTime: 3,
+                    avgAudioDuration: 12,
+                    speedFactor: 4
+                )
+            ]
+        )
+        XCTAssertEqual(
+            analysis.enhancementModels,
+            [
+                VoiceInkPerformanceModelStat(
+                    name: "cleaner",
+                    sampleCount: 1,
+                    totalProcessingTime: 2,
+                    avgProcessingTime: 2,
+                    avgAudioDuration: 12,
+                    speedFactor: 6
+                )
+            ]
+        )
+    }
+
     func testRetryServiceMarksNoteFailedWhenRetranscriptionFails() async throws {
         let audioFileURL = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString)

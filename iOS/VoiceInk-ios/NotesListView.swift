@@ -113,6 +113,11 @@ struct NotesListView: View {
                 Text(dashboardSummaryText)
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
+                if let performanceSummaryText {
+                    Text(performanceSummaryText)
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                }
             }
             Spacer()
             Text("\(filteredNotes.count)")
@@ -132,6 +137,17 @@ struct NotesListView: View {
     private var dashboardSummaryText: String {
         let summary = dashboardSummary
         return "\(summary.totalWords) words - \(VoiceInkDurationPresentation.minutesSeconds(summary.totalDuration)) audio"
+    }
+
+    private var performanceSummaryText: String? {
+        guard let fastestModel = VoiceInkPerformanceAnalyzer.transcriptionModelStats(
+            from: filteredNotes,
+            requirePositiveDuration: true
+        ).first else {
+            return nil
+        }
+
+        return "\(fastestModel.name) \(String(format: "%.1fx", fastestModel.speedFactor)) realtime"
     }
 
     private var emptyState: some View {

@@ -948,6 +948,26 @@ reject_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests
 
 require_pattern \
+  "iOS note-list dashboard summary uses shared metrics accumulator" \
+  'VoiceInkDashboardMetricsAccumulator' \
+  iOS/VoiceInk-ios/NotesListView.swift
+
+reject_pattern \
+  "iOS note-list avoids shell-only dashboard metric math" \
+  'VoiceInkWordCounter|VoiceInkSessionMetricPolicy|dashboardWordCount|dashboardAudioDuration|reduce\(' \
+  iOS/VoiceInk-ios/NotesListView.swift
+
+require_pattern \
+  "iOS note-list fastest-model summary uses shared performance analyzer" \
+  'VoiceInkPerformanceAnalyzer\.transcriptionModelStats' \
+  iOS/VoiceInk-ios/NotesListView.swift
+
+reject_pattern \
+  "iOS note-list avoids shell-only performance grouping" \
+  'Dictionary\(grouping:|avgProcessingTime|speedFactor =|totalProcessingTime|performanceTranscriptionDuration' \
+  iOS/VoiceInk-ios/NotesListView.swift
+
+require_pattern \
   "workspace includes iOS project" \
   'location = "group:iOS/VoiceInk-ios.xcodeproj"' \
   VoiceInk.xcworkspace/contents.xcworkspacedata

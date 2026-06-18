@@ -322,6 +322,7 @@ scripts/verify-ios-single-repo-migration.sh --full-build
 21. macOS AI-enhancement diagnostics/context toggles and first-run onboarding storage checks stay routed through shared `VoiceInkCore` preference Modules.
 22. macOS and iOS filler-word insertion stays routed through `VoiceInkFillerWords.insertPlan`, with duplicate copy out of platform views.
 23. macOS Native Apple language-display fallback stays routed through `VoiceInkLanguageCatalog.nativeAppleDisplayName`.
-24. A real Xcode toolchain is selected and both app targets build.
+24. iOS note-list dashboard and fastest-model summaries stay routed through `VoiceInkDashboardMetricsAccumulator` and `VoiceInkPerformanceAnalyzer`.
+25. A real Xcode toolchain is selected and both app targets build.
 
 Current local blocker: `xcode-select -p` points to `/Library/Developer/CommandLineTools`, and the previously used external Xcode volume is not mounted. Full target builds are still environment-blocked until a real Xcode is selected; macOS `VoiceInk` also needs `/Users/atalphalnmomhappyhouse/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework`, and iOS `VoiceInk-ios` needs the iOS 26.2 platform installed. Until those are present, use `swift run VoiceInkCoreChecks` plus the static parse/lint gates above for local proof.

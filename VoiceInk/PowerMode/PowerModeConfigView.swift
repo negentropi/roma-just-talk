@@ -23,7 +23,7 @@ struct ConfigurationView: View {
     @State private var lowercaseTranscription = false
     @State private var installedApps: [(url: URL, name: String, bundleId: String, icon: NSImage)] = []
     @State private var searchText = ""
-    @State private var validationErrors: [PowerModeValidationError] = []
+    @State private var validationErrors: [VoiceInkPowerModeValidationError] = []
     @State private var showValidationAlert = false
     @State private var selectedAIProvider: String?
     @State private var selectedAIModel: String?

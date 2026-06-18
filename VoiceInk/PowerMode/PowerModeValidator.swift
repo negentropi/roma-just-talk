@@ -2,8 +2,6 @@ import Foundation
 import SwiftUI
 import VoiceInkCore
 
-typealias PowerModeValidationError = VoiceInkPowerModeValidationError
-
 struct PowerModeValidator {
     private let powerModeManager: PowerModeManager
     
@@ -11,7 +9,7 @@ struct PowerModeValidator {
         self.powerModeManager = powerModeManager
     }
     
-    func validateForSave(config: PowerModeConfig, mode: ConfigurationMode) -> [PowerModeValidationError] {
+    func validateForSave(config: PowerModeConfig, mode: ConfigurationMode) -> [VoiceInkPowerModeValidationError] {
         VoiceInkPowerModePolicy.validateForSave(
             candidate: config.powerModePolicyRule,
             mode: mode.powerModeSaveMode,
@@ -33,7 +31,7 @@ private extension ConfigurationMode {
 
 extension View {
     func powerModeValidationAlert(
-        errors: [PowerModeValidationError],
+        errors: [VoiceInkPowerModeValidationError],
         isPresented: Binding<Bool>
     ) -> some View {
         self.alert(

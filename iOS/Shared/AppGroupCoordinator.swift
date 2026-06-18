@@ -5,21 +5,6 @@ import Foundation
 final class AppGroupCoordinator {
     static let shared = AppGroupCoordinator()
     
-    // MARK: - Constants
-    private let appGroupIdentifier = "group.com.prakashjoshipax.VoiceInk"
-    
-    // UserDefaults keys for persistent state
-    private enum UserDefaultsKeys {
-        static let isRecording = "isRecording"
-        static let lastRecordingTimestamp = "lastRecordingTimestamp"
-    }
-    
-    // Darwin notification names for real-time communication
-    private enum NotificationNames {
-        static let stopRecording = "com.prakashjoshipax.VoiceInk.stopRecording"
-        static let recordingStateChanged = "com.prakashjoshipax.VoiceInk.recordingStateChanged"
-    }
-    
     // MARK: - Properties
     private let sharedDefaults: UserDefaults?
     private let notificationCenter = CFNotificationCenterGetDarwinNotifyCenter()
@@ -28,7 +13,7 @@ final class AppGroupCoordinator {
     
     // MARK: - Initialization
     private init() {
-        sharedDefaults = UserDefaults(suiteName: appGroupIdentifier)
+        sharedDefaults = VoiceInkAppGroupRecordingBridge.sharedDefaults()
         setupNotificationObservers()
     }
     
@@ -40,39 +25,31 @@ final class AppGroupCoordinator {
     
     /// Call this from the keyboard extension to request recording stop
     func requestStopRecording() {
-        let timestamp = Date().timeIntervalSince1970
-        sharedDefaults?.set(timestamp, forKey: UserDefaultsKeys.lastRecordingTimestamp)
+        VoiceInkAppGroupRecordingBridge.markStopRequested(in: sharedDefaults)
         
         // Send immediate notification
-        postDarwinNotification(NotificationNames.stopRecording)
+        postDarwinNotification(VoiceInkAppGroupRecordingBridge.NotificationName.stopRecording)
     }
     
     /// Get current recording state (for keyboard UI updates)
     var isRecording: Bool {
-        let storedState = sharedDefaults?.bool(forKey: UserDefaultsKeys.isRecording) ?? false
-        let timestamp = sharedDefaults?.double(forKey: UserDefaultsKeys.lastRecordingTimestamp) ?? 0
-        let currentTime = Date().timeIntervalSince1970
-        
-        // If the stored state is more than 30 seconds old, consider it stale
-        if storedState && (currentTime - timestamp) > 30 {
+        let state = VoiceInkAppGroupRecordingBridge.recordingState(in: sharedDefaults)
+        if state.shouldClearStaleState {
             print("⚠️ Recording state appears stale, clearing it")
             updateRecordingState(false)
-            return false
         }
-        
-        return storedState
+
+        return state.isRecording
     }
     
     // MARK: - Public Interface for Main App
     
     /// Call this from the main app to update recording state
     func updateRecordingState(_ isRecording: Bool) {
-        sharedDefaults?.set(isRecording, forKey: UserDefaultsKeys.isRecording)
-        // Update timestamp whenever state changes
-        sharedDefaults?.set(Date().timeIntervalSince1970, forKey: UserDefaultsKeys.lastRecordingTimestamp)
+        VoiceInkAppGroupRecordingBridge.writeRecordingState(isRecording, to: sharedDefaults)
         
         // Notify keyboard of state change
-        postDarwinNotification(NotificationNames.recordingStateChanged)
+        postDarwinNotification(VoiceInkAppGroupRecordingBridge.NotificationName.recordingStateChanged)
         
         print("📡 Updated recording state: \(isRecording)")
     }
@@ -91,7 +68,7 @@ final class AppGroupCoordinator {
                 let coordinator = Unmanaged<AppGroupCoordinator>.fromOpaque(observer).takeUnretainedValue()
                 coordinator.handleStopRecordingNotification()
             },
-            NotificationNames.stopRecording as CFString,
+            VoiceInkAppGroupRecordingBridge.NotificationName.stopRecording as CFString,
             nil,
             .deliverImmediately
         )

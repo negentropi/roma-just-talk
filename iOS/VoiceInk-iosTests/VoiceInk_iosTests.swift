@@ -61,4 +61,55 @@ final class VoiceInkIOSTests: XCTestCase {
             XCTAssertEqual(note.transcriptionError, VoiceInkEngineError.transcriptionFailed.errorDescription)
         }
     }
+
+    func testAppGroupRecordingBridgeKeepsFreshRecordingState() throws {
+        let defaults = try makeIsolatedDefaults()
+        let timestamp = Date(timeIntervalSince1970: 100)
+
+        VoiceInkAppGroupRecordingBridge.writeRecordingState(true, to: defaults, now: timestamp)
+        let state = VoiceInkAppGroupRecordingBridge.recordingState(
+            in: defaults,
+            now: timestamp.addingTimeInterval(VoiceInkAppGroupRecordingBridge.staleRecordingInterval)
+        )
+
+        XCTAssertEqual(state, VoiceInkAppGroupRecordingState(isRecording: true, shouldClearStaleState: false))
+    }
+
+    func testAppGroupRecordingBridgeMarksStaleRecordingStateForClearing() throws {
+        let defaults = try makeIsolatedDefaults()
+        let timestamp = Date(timeIntervalSince1970: 100)
+
+        VoiceInkAppGroupRecordingBridge.writeRecordingState(true, to: defaults, now: timestamp)
+        let state = VoiceInkAppGroupRecordingBridge.recordingState(
+            in: defaults,
+            now: timestamp.addingTimeInterval(VoiceInkAppGroupRecordingBridge.staleRecordingInterval + 1)
+        )
+
+        XCTAssertEqual(state, VoiceInkAppGroupRecordingState(isRecording: false, shouldClearStaleState: true))
+    }
+
+    func testAppGroupRecordingBridgeStopRequestRefreshesTimestampWithoutChangingRecordingFlag() throws {
+        let defaults = try makeIsolatedDefaults()
+        let recordingStart = Date(timeIntervalSince1970: 100)
+        let stopRequest = Date(timeIntervalSince1970: 110)
+
+        VoiceInkAppGroupRecordingBridge.writeRecordingState(true, to: defaults, now: recordingStart)
+        VoiceInkAppGroupRecordingBridge.markStopRequested(in: defaults, now: stopRequest)
+
+        XCTAssertTrue(defaults.bool(forKey: VoiceInkAppGroupRecordingBridge.UserDefaultsKey.isRecording))
+        XCTAssertEqual(
+            defaults.double(forKey: VoiceInkAppGroupRecordingBridge.UserDefaultsKey.lastRecordingTimestamp),
+            stopRequest.timeIntervalSince1970
+        )
+    }
+
+    private func makeIsolatedDefaults() throws -> UserDefaults {
+        let suiteName = "VoiceInkIOSTests-\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+        defaults.removePersistentDomain(forName: suiteName)
+        addTeardownBlock {
+            defaults.removePersistentDomain(forName: suiteName)
+        }
+        return defaults
+    }
 }

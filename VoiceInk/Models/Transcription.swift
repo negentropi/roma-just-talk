@@ -4,7 +4,7 @@ import VoiceInkCore
 
 @Model
 final class Transcription: VoiceInkStoredAudioRecord, VoiceInkSessionMetricSource, VoiceInkPerformanceRecord {
-    static let canceledTranscriptionText = "The transcription was canceled."
+    static let canceledTranscriptionText = VoiceInkTranscriptPresentation.canceledTranscriptionText
 
     var id: UUID
     var text: String

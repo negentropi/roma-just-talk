@@ -7,6 +7,13 @@ public extension VoiceInkTranscriptionStatus {
 }
 
 public enum VoiceInkTranscriptPresentation {
+    public static let pendingDisplayText = "New transcription"
+    public static let failedDisplayText = "Transcription failed - tap to retry"
+    public static let canceledDisplayText = "Transcription canceled"
+    public static let emptyCompletedDisplayText = "No audible content detected."
+    public static let emptyPreferredText = "No content available."
+    public static let canceledTranscriptionText = "The transcription was canceled."
+
     public static func preferredText(rawText: String, enhancedText: String?) -> String? {
         if let enhancedText, !enhancedText.isEmpty {
             return enhancedText
@@ -17,6 +24,10 @@ public enum VoiceInkTranscriptPresentation {
         return nil
     }
 
+    public static func preferredTextOrEmptyContent(rawText: String, enhancedText: String?) -> String {
+        preferredText(rawText: rawText, enhancedText: enhancedText) ?? emptyPreferredText
+    }
+
     public static func matchesSearch(rawText: String, enhancedText: String?, query: String) -> Bool {
         guard !query.isEmpty else {
             return true
@@ -24,6 +35,22 @@ public enum VoiceInkTranscriptPresentation {
 
         return rawText.localizedStandardContains(query) ||
             (enhancedText?.localizedStandardContains(query) ?? false)
+    }
+
+    public static func displayText(
+        status: VoiceInkTranscriptionStatus,
+        rawText: String,
+        enhancedText: String?
+    ) -> String {
+        displayText(
+            status: status,
+            rawText: rawText,
+            enhancedText: enhancedText,
+            pendingText: pendingDisplayText,
+            failedText: failedDisplayText,
+            canceledText: canceledDisplayText,
+            emptyCompletedText: emptyCompletedDisplayText
+        )
     }
 
     public static func displayText(
@@ -67,6 +94,17 @@ public enum VoiceInkTranscriptPresentation {
         case .completed, .canceled:
             return nil
         }
+    }
+
+    public static func isPasteable(
+        rawText: String,
+        statusRawValue: String?
+    ) -> Bool {
+        isPasteable(
+            rawText: rawText,
+            statusRawValue: statusRawValue,
+            canceledText: canceledTranscriptionText
+        )
     }
 
     public static func isPasteable(

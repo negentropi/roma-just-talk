@@ -24,8 +24,7 @@ class LastTranscriptionService: ObservableObject {
     private static func isPasteable(_ transcription: Transcription) -> Bool {
         VoiceInkTranscriptPresentation.isPasteable(
             rawText: transcription.text,
-            statusRawValue: transcription.transcriptionStatus,
-            canceledText: Transcription.canceledTranscriptionText
+            statusRawValue: transcription.transcriptionStatus
         )
     }
     

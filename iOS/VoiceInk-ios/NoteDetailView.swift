@@ -74,10 +74,10 @@ struct NoteDetailView: View {
     }
     
     private var displayedTranscriptText: String {
-        VoiceInkTranscriptPresentation.preferredText(
+        VoiceInkTranscriptPresentation.preferredTextOrEmptyContent(
             rawText: note.text,
             enhancedText: note.enhancedText
-        ) ?? "No content available."
+        )
     }
     
     private var shouldShowAudioSection: Bool {

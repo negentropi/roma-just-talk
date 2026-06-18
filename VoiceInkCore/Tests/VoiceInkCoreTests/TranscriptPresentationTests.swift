@@ -31,6 +31,16 @@ final class TranscriptPresentationTests: XCTestCase {
         )
     }
 
+    func testPreferredTextOrEmptyContentUsesSharedFallback() {
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.preferredTextOrEmptyContent(
+                rawText: "",
+                enhancedText: nil
+            ),
+            "No content available."
+        )
+    }
+
     func testMatchesSearchReturnsTrueForEmptyQuery() {
         XCTAssertTrue(
             VoiceInkTranscriptPresentation.matchesSearch(
@@ -88,6 +98,56 @@ final class TranscriptPresentationTests: XCTestCase {
         )
     }
 
+    func testDefaultDisplayTextUsesSharedFallbacks() {
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.displayText(
+                status: .pending,
+                rawText: "",
+                enhancedText: nil
+            ),
+            "New transcription"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.displayText(
+                status: .failed,
+                rawText: "",
+                enhancedText: nil
+            ),
+            "Transcription failed - tap to retry"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.displayText(
+                status: .canceled,
+                rawText: "",
+                enhancedText: nil
+            ),
+            "Transcription canceled"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.displayText(
+                status: .completed,
+                rawText: "",
+                enhancedText: nil
+            ),
+            "No audible content detected."
+        )
+    }
+
+    func testCustomDisplayTextStillAllowsShellFallbacks() {
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.displayText(
+                status: .pending,
+                rawText: "",
+                enhancedText: nil,
+                pendingText: "Queued",
+                failedText: "Broken",
+                canceledText: "Stopped",
+                emptyCompletedText: "Empty"
+            ),
+            "Queued"
+        )
+    }
+
     func testStatusTitleReturnsRetryStateTitles() {
         XCTAssertEqual(
             VoiceInkTranscriptPresentation.statusTitle(for: .pending),
@@ -118,5 +178,14 @@ final class TranscriptPresentationTests: XCTestCase {
     func testStatusBadgeTextReturnsNilForNonRetryStates() {
         XCTAssertNil(VoiceInkTranscriptPresentation.statusBadgeText(for: .completed))
         XCTAssertNil(VoiceInkTranscriptPresentation.statusBadgeText(for: .canceled))
+    }
+
+    func testDefaultPasteEligibilityRejectsCanceledTranscriptionText() {
+        XCTAssertFalse(
+            VoiceInkTranscriptPresentation.isPasteable(
+                rawText: VoiceInkTranscriptPresentation.canceledTranscriptionText,
+                statusRawValue: VoiceInkTranscriptionStatus.completed.rawValue
+            )
+        )
     }
 }

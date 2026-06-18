@@ -61,11 +61,7 @@ struct NoteRowView: View {
         VoiceInkTranscriptPresentation.displayText(
             status: note.transcriptionStatus,
             rawText: note.text,
-            enhancedText: note.enhancedText,
-            pendingText: "New transcription",
-            failedText: "Transcription failed - tap to retry",
-            canceledText: "Transcription canceled",
-            emptyCompletedText: "No audible content detected."
+            enhancedText: note.enhancedText
         )
     }
 

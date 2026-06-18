@@ -49,7 +49,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - shared UserDefaults key names, including cleanup preferences, plus iOS mode persistence helpers with stale model repair on load
 - onboarding completion, iOS audio-session timeout, and core-owned user preference reset storage; platform shells still own first-run flow, audio-session lifecycle, keychain clearing, file deletion, and settings UI bindings
 - current transcription model preference loading/saving/clearing; platform shells still own model availability, download/runtime state, and legacy key cleanup
-- transcript status, presentation helpers, and localized standard transcript search semantics
+- transcript status, default transcript fallback copy, canceled-transcript paste eligibility, presentation helpers, and localized standard transcript search semantics
 - local transcription/model/missing-audio error vocabulary shared by macOS local Whisper and iOS local retry transcription
 - streaming word-agreement confirmation policy for stable partial transcription, including confidence gates, sentence-boundary confirmation, reset behavior, and rolling-preload configuration; platform shells still own provider token adapters, ASR runtime calls, audio buffering, and event delivery
 - streaming final-commit timeout policy for cloud providers versus local FluidAudio finalization; platform shells still map runtime provider identity to the shared timeout source
@@ -171,8 +171,9 @@ Current macOS consumers of shared remote transport:
 - macOS special shortcut empty-tap fallback delegates short-press and empty-completed-transcript eligibility to `VoiceInkSpecialShortcutEmptyFallbackPolicy`; `LastTranscriptionService` still owns SwiftData lookup and cursor paste.
 - macOS special shortcut key-up handling delegates unsafe key-evidence discard decisions to `VoiceInkSpecialShortcutKeyEvidencePolicy`; `ShortcutMonitor` still owns macOS keyboard event collection and `ShortcutPressContext` is now a shell alias over `VoiceInkShortcutPressContext`.
 - macOS `RecordingState` and `RecorderUIToggleAction` are shell aliases over `VoiceInkRecordingState` and `VoiceInkRecorderUIToggleAction`; `RecordingShortcutManager`, `RecorderUIManager`, and rolling preload use shared state gates while macOS owns recorder UI/window execution.
-- macOS history/import row summaries, macOS audio-file row action text, and iOS note detail display use `VoiceInkTranscriptPresentation.preferredText` for the enhanced-text-first transcript display rule.
+- macOS history/import row summaries, macOS audio-file row action text, and iOS note detail display use `VoiceInkTranscriptPresentation` for the enhanced-text-first transcript display rule and shared empty-content fallback copy.
 - `VoiceInkTranscriptPresentation.matchesSearch` mirrors macOS history predicate search semantics, keeping iOS note filtering accent-insensitive through shared core while macOS SwiftData predicates keep their local query shape.
+- macOS last-transcription paste eligibility and iOS note-row status text use `VoiceInkTranscriptPresentation` defaults for canceled/empty/pending/failed transcript presentation; platform shells still own colors, icons, retry controls, and paste execution.
 - macOS `FillerWordManager`, iOS `AppSettings`, and cleanup configuration load and save filler-word lists through `VoiceInkFillerWordPreference`; macOS and iOS setting surfaces use `VoiceInkFillerWords.normalizedWord` for add-button draft validation while platform shells still own settings UI and toggle state.
 - iOS app launch and first-time setup read/write/reset onboarding completion through `VoiceInkOnboardingPreference`; the onboarding views and recording-after-onboarding flow stay in the iOS shell.
 - iOS `AppSettings` reads/writes/resets audio-session timeout through `VoiceInkAudioSessionTimeoutPreference`; `AudioSessionManager` and timeout UI stay in the iOS shell.

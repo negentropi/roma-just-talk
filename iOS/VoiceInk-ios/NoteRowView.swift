@@ -40,7 +40,7 @@ struct NoteRowView: View {
 
                 Spacer(minLength: 0)
 
-                if let statusPresentation, statusPresentation.isProcessing {
+                if let statusPresentation, statusPresentation.shouldShowInlineProgress {
                     HStack(spacing: 6) {
                         ProgressView()
                             .scaleEffect(0.7)
@@ -48,18 +48,33 @@ struct NoteRowView: View {
                             .font(.caption)
                     }
                     .foregroundStyle(.secondary)
-                } else if let statusPresentation, statusPresentation.isFailure {
+                } else if let statusPresentation, statusPresentation.shouldShowBadge {
                     Text(statusPresentation.badgeText)
                         .font(.caption.weight(.semibold))
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(statusPresentation.tone.badgeColor)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
-                        .background(Color.orange.opacity(0.12))
+                        .background(statusPresentation.tone.badgeBackgroundColor)
                         .clipShape(Capsule())
                 }
             }
         }
         .padding(.vertical, 6)
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+private extension VoiceInkTranscriptStatusPresentation.Tone {
+    var badgeColor: Color {
+        switch self {
+        case .processing:
+            return .secondary
+        case .failure:
+            return .orange
+        }
+    }
+
+    var badgeBackgroundColor: Color {
+        badgeColor.opacity(0.12)
     }
 }

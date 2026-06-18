@@ -12,6 +12,11 @@ public struct VoiceInkTranscriptStatusPresentation: Equatable, Sendable {
         case failed
     }
 
+    public enum Tone: Equatable, Sendable {
+        case processing
+        case failure
+    }
+
     public let kind: Kind
     public let title: String
     public let badgeText: String
@@ -21,6 +26,32 @@ public struct VoiceInkTranscriptStatusPresentation: Equatable, Sendable {
     }
 
     public var isFailure: Bool {
+        kind == .failed
+    }
+
+    public var tone: Tone {
+        switch kind {
+        case .processing:
+            return .processing
+        case .failed:
+            return .failure
+        }
+    }
+
+    public var panelSystemImageName: String {
+        switch kind {
+        case .processing:
+            return "clock.fill"
+        case .failed:
+            return "exclamationmark.triangle.fill"
+        }
+    }
+
+    public var shouldShowInlineProgress: Bool {
+        kind == .processing
+    }
+
+    public var shouldShowBadge: Bool {
         kind == .failed
     }
 

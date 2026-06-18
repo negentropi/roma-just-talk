@@ -56,7 +56,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - array-backed preference list deletion policy for platform settings surfaces
 - onboarding completion, iOS audio-session timeout, and core-owned user preference reset storage; platform shells still own first-run flow, audio-session lifecycle, keychain clearing, file deletion, and settings UI bindings
 - current transcription model preference loading/saving/clearing; platform shells still own model availability, download/runtime state, and legacy key cleanup
-- transcript status, default transcript fallback copy, status-panel and row-badge presentation, canceled-transcript paste eligibility, presentation helpers, and localized standard transcript search semantics
+- transcript status, default transcript fallback copy, status-panel and row-badge presentation, status symbol/tone metadata, canceled-transcript paste eligibility, presentation helpers, and localized standard transcript search semantics
 - failed-transcript stored text formatting for macOS recorder failures
 - error-description presentation fallback for shared record and shell failure text
 - local transcription/model/missing-audio error vocabulary shared by macOS local Whisper and iOS local retry transcription
@@ -198,7 +198,7 @@ Current macOS consumers of shared remote transport:
 - macOS recorder failure records use `VoiceInkTranscriptPresentation.failedTranscriptText` for the existing `Transcription Failed: ...` stored text prefix.
 - macOS canceled recorder records use `VoiceInkTranscriptPresentation.canceledTranscriptionText` directly; the old shell alias on `Transcription` stays deleted.
 - `VoiceInkTranscriptPresentation.matchesSearch` mirrors macOS history predicate search semantics, keeping iOS note filtering accent-insensitive through shared core while macOS SwiftData predicates keep their local query shape.
-- macOS last-transcription paste eligibility and iOS note-row/detail status presentation use `VoiceInkTranscriptPresentation` defaults for canceled/empty/pending/failed transcript presentation, status panel visibility, completed-content visibility, and row badge state; platform shells still own colors, icons, retry controls, and paste execution.
+- macOS last-transcription paste eligibility and iOS note-row/detail status presentation use `VoiceInkTranscriptPresentation` defaults for canceled/empty/pending/failed transcript presentation, status panel visibility, completed-content visibility, status symbol/tone metadata, inline progress visibility, and row badge state; platform shells still own color mapping, retry controls, and paste execution.
 - macOS `FillerWordManager`, iOS `AppSettings`, and cleanup configuration load and save filler-word lists through `VoiceInkFillerWordPreference`; macOS and iOS setting surfaces use `VoiceInkFillerWords.hasDraft` for add-button draft validation and route filler-word insertion/duplicate alerts through `VoiceInkFillerWords.insertPlan`/`VoiceInkDictionaryAlertPresentation` while platform shells still own settings UI and toggle state.
 - iOS app launch and first-time setup read/write/reset onboarding completion through `VoiceInkOnboardingPreference`; the onboarding views and recording-after-onboarding flow stay in the iOS shell.
 - iOS `AppSettings` reads/writes/resets audio-session timeout through `VoiceInkAudioSessionTimeoutPreference`; that shared preference Module also owns timeout range, step, display text, and immediate-deactivation policy, while `AudioSessionManager` and timeout UI stay in the iOS shell.

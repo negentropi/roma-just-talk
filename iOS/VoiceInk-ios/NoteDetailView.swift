@@ -35,7 +35,7 @@ struct NoteDetailView: View {
                     .padding()
                 }
                 .scrollIndicators(.hidden)
-                
+
                 // Bottom audio player (web-form style)
                 if shouldShowAudioSection {
                     bottomAudioPlayer
@@ -132,59 +132,62 @@ struct NoteDetailView: View {
         .padding(.vertical, 16)
     }
     
+    @ViewBuilder
     private var transcriptionStatusView: some View {
-        VStack(spacing: 12) {
-            HStack {
-                Image(systemName: statusPresentation?.isFailure == true ? "exclamationmark.triangle.fill" : "clock.fill")
-                    .foregroundStyle(statusPresentation?.isFailure == true ? .red : .orange)
-                
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(statusPresentation?.title ?? "")
-                        .font(.subheadline.weight(.medium))
-                    if let error = note.transcriptionError, !error.isEmpty {
-                        Text(error)
-                            .font(.callout)
-                            .textSelection(.enabled)
-                            .foregroundStyle(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                }
-                
-                Spacer()
-            }
-            
-            // Mode selection for re-transcription
-            if !isRetranscribing {
-                VoiceInkModeSelectionControlView(
-                    modes: settings.modes,
-                    selectedModeId: $settings.selectedModeId
-                )
-            }
-            
-            if isRetranscribing {
+        if let statusPresentation {
+            VStack(spacing: 12) {
                 HStack {
-                    ProgressView()
-                        .scaleEffect(0.8)
-                    Text("Retranscribing...")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                    Image(systemName: statusPresentation.panelSystemImageName)
+                        .foregroundStyle(statusPresentation.tone.statusColor)
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(statusPresentation.title)
+                            .font(.subheadline.weight(.medium))
+                        if let error = note.transcriptionError, !error.isEmpty {
+                            Text(error)
+                                .font(.callout)
+                                .textSelection(.enabled)
+                                .foregroundStyle(.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+
+                    Spacer()
                 }
-            } else {
-                Button {
-                    retranscribe()
-                } label: {
-                    Label("Retry Transcription", systemImage: "arrow.clockwise")
-                        .fontWeight(.semibold)
-                        .frame(maxWidth: .infinity)
+
+                // Mode selection for re-transcription
+                if !isRetranscribing {
+                    VoiceInkModeSelectionControlView(
+                        modes: settings.modes,
+                        selectedModeId: $settings.selectedModeId
+                    )
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(.blue)
-                .controlSize(.regular)
+
+                if isRetranscribing {
+                    HStack {
+                        ProgressView()
+                            .scaleEffect(0.8)
+                        Text("Retranscribing...")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                } else {
+                    Button {
+                        retranscribe()
+                    } label: {
+                        Label("Retry Transcription", systemImage: "arrow.clockwise")
+                            .fontWeight(.semibold)
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.blue)
+                    .controlSize(.regular)
+                }
             }
+            .padding()
+            .background(Color(.secondarySystemGroupedBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 16))
         }
-        .padding()
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
     private func retranscribe() {
@@ -211,4 +214,15 @@ struct NoteDetailView: View {
     }
     
 
+}
+
+private extension VoiceInkTranscriptStatusPresentation.Tone {
+    var statusColor: Color {
+        switch self {
+        case .processing:
+            return .orange
+        case .failure:
+            return .red
+        }
+    }
 }

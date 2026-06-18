@@ -164,7 +164,7 @@ class StreamingTranscriptionService {
     /// Stops streaming, commits remaining audio, and returns the final transcribed text.
     func stopAndGetFinalText() async throws -> String {
         guard let provider = provider, state == .streaming else {
-            throw StreamingTranscriptionError.notConnected
+            throw VoiceInkStreamingTranscriptionError.notConnected
         }
 
         state = .committing

@@ -2,9 +2,6 @@ import Foundation
 import LLMkit
 import VoiceInkCore
 
-typealias StreamingTranscriptionEvent = VoiceInkStreamingTranscriptionEvent
-typealias StreamingTranscriptionError = VoiceInkStreamingTranscriptionError
-
 /// Protocol for streaming transcription providers.
 protocol StreamingTranscriptionProvider: AnyObject {
     /// Connect to the streaming transcription endpoint
@@ -20,7 +17,7 @@ protocol StreamingTranscriptionProvider: AnyObject {
     func disconnect() async
 
     /// Stream of transcription events from the provider
-    var transcriptionEvents: AsyncStream<StreamingTranscriptionEvent> { get }
+    var transcriptionEvents: AsyncStream<VoiceInkStreamingTranscriptionEvent> { get }
 }
 
 extension StreamingTranscriptionProvider {
@@ -28,7 +25,7 @@ extension StreamingTranscriptionProvider {
         guard let apiKey = VoiceInkProviderCredential.nonBlank(
             APIKeyManager.shared.getAPIKey(forProvider: model.provider.apiKeyProviderName)
         ) else {
-            throw StreamingTranscriptionError.missingAPIKey
+            throw VoiceInkStreamingTranscriptionError.missingAPIKey
         }
         return apiKey
     }
@@ -41,27 +38,27 @@ extension StreamingTranscriptionProvider {
 
         switch llmError {
         case .missingAPIKey:
-            return StreamingTranscriptionError.missingAPIKey
+            return VoiceInkStreamingTranscriptionError.missingAPIKey
         case .httpError(_, let message):
-            return StreamingTranscriptionError.serverError(message)
+            return VoiceInkStreamingTranscriptionError.serverError(message)
         case .networkError(let detail):
-            return StreamingTranscriptionError.connectionFailed(detail)
+            return VoiceInkStreamingTranscriptionError.connectionFailed(detail)
         case .timeout where treatsTimeoutAsStreamingTimeout:
-            return StreamingTranscriptionError.timeout
+            return VoiceInkStreamingTranscriptionError.timeout
         default:
-            return StreamingTranscriptionError.serverError(
-                llmError.localizedDescription ?? StreamingTranscriptionError.unknownServerErrorMessage
+            return VoiceInkStreamingTranscriptionError.serverError(
+                llmError.localizedDescription ?? VoiceInkStreamingTranscriptionError.unknownServerErrorMessage
             )
         }
     }
 
     func forwardLLMKitStreamingEvents(
         from client: any LLMKitStreamingEventSource,
-        to continuation: AsyncStream<StreamingTranscriptionEvent>.Continuation?
+        to continuation: AsyncStream<VoiceInkStreamingTranscriptionEvent>.Continuation?
     ) -> Task<Void, Never> {
         Task {
             for await event in client.transcriptionEvents {
-                continuation?.yield(StreamingTranscriptionEvent(llmKitEvent: event))
+                continuation?.yield(VoiceInkStreamingTranscriptionEvent(llmKitEvent: event))
             }
         }
     }
@@ -90,7 +87,7 @@ private extension VoiceInkStreamingTranscriptionEvent {
         case .committed(let text):
             self = .committed(text: text)
         case .error(let message):
-            self = .error(StreamingTranscriptionError.serverError(message))
+            self = .error(VoiceInkStreamingTranscriptionError.serverError(message))
         }
     }
 }

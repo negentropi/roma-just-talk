@@ -7,15 +7,15 @@ import VoiceInkCore
 final class SpeechmaticsStreamingProvider: StreamingTranscriptionProvider {
 
     private let client = LLMkit.SpeechmaticsStreamingClient()
-    private var eventsContinuation: AsyncStream<StreamingTranscriptionEvent>.Continuation?
+    private var eventsContinuation: AsyncStream<VoiceInkStreamingTranscriptionEvent>.Continuation?
     private var forwardingTask: Task<Void, Never>?
     private let modelContext: ModelContext
 
-    private(set) var transcriptionEvents: AsyncStream<StreamingTranscriptionEvent>
+    private(set) var transcriptionEvents: AsyncStream<VoiceInkStreamingTranscriptionEvent>
 
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
-        var continuation: AsyncStream<StreamingTranscriptionEvent>.Continuation!
+        var continuation: AsyncStream<VoiceInkStreamingTranscriptionEvent>.Continuation!
         transcriptionEvents = AsyncStream { continuation = $0 }
         eventsContinuation = continuation
     }

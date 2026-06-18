@@ -1,17 +1,18 @@
 import Foundation
 import LLMkit
+import VoiceInkCore
 
 /// ElevenLabs streaming provider wrapping `LLMkit.ElevenLabsStreamingClient`.
 final class ElevenLabsStreamingProvider: StreamingTranscriptionProvider {
 
     private let client = LLMkit.ElevenLabsStreamingClient()
-    private var eventsContinuation: AsyncStream<StreamingTranscriptionEvent>.Continuation?
+    private var eventsContinuation: AsyncStream<VoiceInkStreamingTranscriptionEvent>.Continuation?
     private var forwardingTask: Task<Void, Never>?
 
-    private(set) var transcriptionEvents: AsyncStream<StreamingTranscriptionEvent>
+    private(set) var transcriptionEvents: AsyncStream<VoiceInkStreamingTranscriptionEvent>
 
     init() {
-        var continuation: AsyncStream<StreamingTranscriptionEvent>.Continuation!
+        var continuation: AsyncStream<VoiceInkStreamingTranscriptionEvent>.Continuation!
         transcriptionEvents = AsyncStream { continuation = $0 }
         eventsContinuation = continuation
     }

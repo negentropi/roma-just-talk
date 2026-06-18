@@ -87,8 +87,7 @@ class LocalModelManager: ObservableObject {
             return
         }
         
-        guard let response = response as? HTTPURLResponse,
-              (200...299).contains(response.statusCode) else {
+        guard VoiceInkWhisperModelDownloadResponsePolicy.isSuccessfulResponse(response) else {
             downloadError = "Server error during download"
             print("LocalModelManager: Server error for \(model.modelName)")
             return

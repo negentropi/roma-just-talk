@@ -352,6 +352,12 @@ require_pattern \
   'VoiceInkPCM16Audio\.floatSamples\(fromWAVFileAt:' \
   iOS/VoiceInk-ios/WhisperTranscriptionService.swift
 
+reject_pattern \
+  "macOS and iOS model downloads use shared HTTP response policy" \
+  '200\.\.\.299' \
+  VoiceInk/Transcription/Whisper/WhisperModelManager.swift \
+  iOS/VoiceInk-ios/LocalModelManager.swift
+
 require_pattern \
   "iOS app launch registers shared default values" \
   'VoiceInkDefaultSettings\.iOS\.registerUserDefaults\(\)' \

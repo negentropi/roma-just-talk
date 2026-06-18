@@ -83,6 +83,20 @@ public struct VoiceInkWhisperLocalModelFile: Equatable, Identifiable, Sendable {
     }
 }
 
+public enum VoiceInkWhisperModelDownloadResponsePolicy {
+    public static func isSuccessfulStatusCode(_ statusCode: Int) -> Bool {
+        (200...299).contains(statusCode)
+    }
+
+    public static func isSuccessfulResponse(_ response: URLResponse?) -> Bool {
+        guard let response = response as? HTTPURLResponse else {
+            return false
+        }
+
+        return isSuccessfulStatusCode(response.statusCode)
+    }
+}
+
 public enum VoiceInkWhisperModelFiles {
     public static let modelsDirectoryName = "WhisperModels"
 

@@ -89,8 +89,7 @@ class WhisperModelManager: ObservableObject {
                     return
                 }
 
-                guard let httpResponse = response as? HTTPURLResponse,
-                      (200...299).contains(httpResponse.statusCode),
+                guard VoiceInkWhisperModelDownloadResponsePolicy.isSuccessfulResponse(response),
                       let tempURL = tempURL else {
                     finishOnce(.failure(URLError(.badServerResponse)))
                     return

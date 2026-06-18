@@ -601,6 +601,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testLocalModelFilesReadsOnlyBinFilesFromDirectory", run: { try WhisperModelFilesTests().testLocalModelFilesReadsOnlyBinFilesFromDirectory() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testInstallDownloadedModelFileReplacesExistingModelFile", run: { try WhisperModelFilesTests().testInstallDownloadedModelFileReplacesExistingModelFile() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testWriteDownloadedModelDataUsesSharedModelNameURL", run: { try WhisperModelFilesTests().testWriteDownloadedModelDataUsesSharedModelNameURL() }),
+            VoiceInkCoreCheck(name: "WhisperModelFilesTests.testDownloadResponsePolicyPreservesHTTPStatusSuccessRange", run: { WhisperModelFilesTests().testDownloadResponsePolicyPreservesHTTPStatusSuccessRange() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testDownloadableModelsMatchMacOSLocalWhisperCatalog", run: { WhisperModelFilesTests().testDownloadableModelsMatchMacOSLocalWhisperCatalog() }),
             VoiceInkCoreCheck(name: "WordAgreementEngineTests.testTimedWordNormalizesCaseHyphenAndPunctuationForAgreement", run: { WordAgreementEngineTests().testTimedWordNormalizesCaseHyphenAndPunctuationForAgreement() }),
             VoiceInkCoreCheck(name: "WordAgreementEngineTests.testFirstPassReturnsHypothesisWithoutConfirmation", run: { WordAgreementEngineTests().testFirstPassReturnsHypothesisWithoutConfirmation() }),

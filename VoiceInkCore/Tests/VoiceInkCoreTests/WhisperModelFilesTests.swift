@@ -245,6 +245,26 @@ final class WhisperModelFilesTests: XCTestCase {
         XCTAssertEqual(String(data: try Data(contentsOf: writtenURL), encoding: .utf8), "model")
     }
 
+    func testDownloadResponsePolicyPreservesHTTPStatusSuccessRange() {
+        let url = URL(string: "https://example.com/ggml-base.bin")!
+        func response(statusCode: Int) -> HTTPURLResponse {
+            HTTPURLResponse(
+                url: url,
+                statusCode: statusCode,
+                httpVersion: nil,
+                headerFields: nil
+            )!
+        }
+
+        XCTAssertFalse(VoiceInkWhisperModelDownloadResponsePolicy.isSuccessfulStatusCode(199))
+        XCTAssertTrue(VoiceInkWhisperModelDownloadResponsePolicy.isSuccessfulStatusCode(200))
+        XCTAssertTrue(VoiceInkWhisperModelDownloadResponsePolicy.isSuccessfulStatusCode(299))
+        XCTAssertFalse(VoiceInkWhisperModelDownloadResponsePolicy.isSuccessfulStatusCode(300))
+        XCTAssertTrue(VoiceInkWhisperModelDownloadResponsePolicy.isSuccessfulResponse(response(statusCode: 204)))
+        XCTAssertFalse(VoiceInkWhisperModelDownloadResponsePolicy.isSuccessfulResponse(response(statusCode: 404)))
+        XCTAssertFalse(VoiceInkWhisperModelDownloadResponsePolicy.isSuccessfulResponse(nil))
+    }
+
     func testDownloadableModelsMatchMacOSLocalWhisperCatalog() {
         XCTAssertEqual(
             VoiceInkWhisperModelFiles.downloadableModels.map(\.modelName),

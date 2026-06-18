@@ -503,7 +503,7 @@ private struct HistoryCardRow: View {
     }
 
     private var hasAudioFile: Bool {
-        transcription.hasStoredAudioFile()
+        transcription.storedAudioAvailability().existingURL != nil
     }
 
     var body: some View {
@@ -593,7 +593,7 @@ private struct HistoryCardRow: View {
                     .padding(8)
             }
 
-            if let url = transcription.existingAudioFileURL() {
+            if let url = transcription.storedAudioAvailability().existingURL {
                 Divider()
                 AudioPlayerView(url: url, transcription: transcription, onInfoTap: onShowInfo)
                 .padding(.vertical, 4)

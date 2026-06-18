@@ -1,4 +1,5 @@
 import SwiftUI
+import VoiceInkCore
 
 struct TranscriptionDetailView: View {
     let transcription: Transcription
@@ -25,7 +26,7 @@ struct TranscriptionDetailView: View {
                 .padding(16)
             }
 
-            if let url = transcription.existingAudioFileURL() {
+            if let url = transcription.storedAudioAvailability().existingURL {
                 VStack(spacing: 0) {
                     Divider()
 

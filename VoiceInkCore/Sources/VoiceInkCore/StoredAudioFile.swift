@@ -1,5 +1,47 @@
 import Foundation
 
+public enum VoiceInkStoredAudioAvailability: Equatable, Sendable {
+    case available(URL)
+    case missingFile(URL)
+    case missingPath
+
+    public var existingURL: URL? {
+        guard case let .available(url) = self else {
+            return nil
+        }
+        return url
+    }
+
+    public func shouldShowAudioSection(duration: TimeInterval) -> Bool {
+        switch self {
+        case .available, .missingFile:
+            return true
+        case .missingPath:
+            return duration > 0
+        }
+    }
+
+    public var unavailableTitle: String? {
+        switch self {
+        case .available:
+            return nil
+        case .missingFile, .missingPath:
+            return "Audio Unavailable"
+        }
+    }
+
+    public var unavailableDetail: String? {
+        switch self {
+        case .available:
+            return nil
+        case .missingFile:
+            return "File not found"
+        case .missingPath:
+            return "Path missing"
+        }
+    }
+}
+
 public enum VoiceInkStoredAudioFile {
     public static let recordingsDirectoryName = "Recordings"
 
@@ -94,6 +136,20 @@ public enum VoiceInkStoredAudioFile {
         return url
     }
 
+    public static func availability(
+        for storedValue: String?,
+        relativeTo recordingsDirectory: URL? = nil,
+        fileManager: FileManager = .default
+    ) -> VoiceInkStoredAudioAvailability {
+        guard let url = resolvedURL(for: storedValue, relativeTo: recordingsDirectory) else {
+            return .missingPath
+        }
+
+        return fileManager.fileExists(atPath: url.path)
+            ? .available(url)
+            : .missingFile(url)
+    }
+
     public static func fileExists(
         for storedValue: String?,
         relativeTo recordingsDirectory: URL? = nil,
@@ -163,6 +219,17 @@ public extension VoiceInkStoredAudioRecord {
         fileManager: FileManager = .default
     ) -> Bool {
         existingAudioFileURL(relativeTo: recordingsDirectory, fileManager: fileManager) != nil
+    }
+
+    func storedAudioAvailability(
+        relativeTo recordingsDirectory: URL? = nil,
+        fileManager: FileManager = .default
+    ) -> VoiceInkStoredAudioAvailability {
+        VoiceInkStoredAudioFile.availability(
+            for: audioFileURL,
+            relativeTo: recordingsDirectory ?? storedAudioRecordingsDirectory,
+            fileManager: fileManager
+        )
     }
 
     @discardableResult

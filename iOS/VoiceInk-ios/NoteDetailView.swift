@@ -27,7 +27,7 @@ struct NoteDetailView: View {
                         }
                         
                         // Add bottom padding to account for audio player
-                        if hasAudioFile {
+                        if shouldShowAudioSection {
                             Color.clear
                                 .frame(height: 100)
                         }
@@ -37,7 +37,7 @@ struct NoteDetailView: View {
                 .scrollIndicators(.hidden)
                 
                 // Bottom audio player (web-form style)
-                if hasAudioFile {
+                if shouldShowAudioSection {
                     bottomAudioPlayer
                         .background(.ultraThinMaterial)
                         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
@@ -80,68 +80,51 @@ struct NoteDetailView: View {
         ) ?? "No content available."
     }
     
-    private var hasAudioFile: Bool {
-        note.hasStoredAudioFile()
+    private var shouldShowAudioSection: Bool {
+        audioAvailability.shouldShowAudioSection(duration: note.duration)
+    }
+
+    private var audioAvailability: VoiceInkStoredAudioAvailability {
+        note.storedAudioAvailability()
     }
 
     // Summary card removed per design feedback
     
     private var bottomAudioPlayer: some View {
         VStack(spacing: 0) {
-            if let audioURL = note.existingAudioFileURL() {
+            if let audioURL = audioAvailability.existingURL {
                 AudioPlayerView(audioFilePath: audioURL.path, duration: note.duration, timestamp: note.timestamp)
-            } else if let audioFileURL = note.audioFileURL, !audioFileURL.isEmpty {
-                // Modern error state - file missing
-                HStack(spacing: 12) {
-                    Circle()
-                        .fill(.orange.opacity(0.2))
-                        .frame(width: 40, height: 40)
-                        .overlay(
-                            Image(systemName: "exclamationmark")
-                                .font(.system(size: 16, weight: .semibold))
-                                .foregroundStyle(.orange)
-                        )
-                    
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Audio Unavailable")
-                            .font(.subheadline.weight(.medium))
-                            .foregroundStyle(.primary)
-                        Text("File not found")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    
-                    Spacer()
-                }
-                .padding(.horizontal, 20)
-                .padding(.vertical, 16)
-            } else if note.duration > 0 {
-                // Modern error state - path missing
-                HStack(spacing: 12) {
-                    Circle()
-                        .fill(.orange.opacity(0.2))
-                        .frame(width: 40, height: 40)
-                        .overlay(
-                            Image(systemName: "exclamationmark")
-                                .font(.system(size: 16, weight: .semibold))
-                                .foregroundStyle(.orange)
-                        )
-                    
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Audio Unavailable")
-                            .font(.subheadline.weight(.medium))
-                            .foregroundStyle(.primary)
-                        Text("Path missing")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    
-                    Spacer()
-                }
-                .padding(.horizontal, 20)
-                .padding(.vertical, 16)
+            } else if let title = audioAvailability.unavailableTitle,
+                      let detail = audioAvailability.unavailableDetail {
+                audioUnavailableView(title: title, detail: detail)
             }
         }
+    }
+
+    private func audioUnavailableView(title: String, detail: String) -> some View {
+        HStack(spacing: 12) {
+            Circle()
+                .fill(.orange.opacity(0.2))
+                .frame(width: 40, height: 40)
+                .overlay(
+                    Image(systemName: "exclamationmark")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(.orange)
+                )
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(.primary)
+                Text(detail)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 16)
     }
     
     private var transcriptionStatusView: some View {

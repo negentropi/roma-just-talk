@@ -138,6 +138,58 @@ final class StoredAudioFileTests: XCTestCase {
         )
     }
 
+    func testAvailabilityReturnsMissingPathForBlankOrUnresolvableStoredValue() {
+        XCTAssertEqual(VoiceInkStoredAudioFile.availability(for: "  "), .missingPath)
+        XCTAssertEqual(VoiceInkStoredAudioFile.availability(for: "voiceink-recording.m4a"), .missingPath)
+    }
+
+    func testAvailabilityReturnsMissingFileForResolvedMissingFile() {
+        let recordingsDirectory = URL(fileURLWithPath: "/tmp/Recordings", isDirectory: true)
+        let expectedURL = VoiceInkStoredAudioFile.fileURL(forFilename: "missing-recording.m4a", in: recordingsDirectory)
+
+        XCTAssertEqual(
+            VoiceInkStoredAudioFile.availability(
+                for: "missing-recording.m4a",
+                relativeTo: recordingsDirectory
+            ),
+            .missingFile(expectedURL)
+        )
+    }
+
+    func testAvailabilityReturnsAvailableResolvedFileWhenItExists() throws {
+        let baseDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.StoredAudioFileTests.\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: baseDirectory) }
+
+        let recordingsDirectory = try VoiceInkStoredAudioFile.createRecordingsDirectory(in: baseDirectory)
+        let fileURL = VoiceInkStoredAudioFile.fileURL(forFilename: "voiceink-recording.m4a", in: recordingsDirectory)
+        try Data().write(to: fileURL)
+
+        XCTAssertEqual(
+            VoiceInkStoredAudioFile.availability(
+                for: "voiceink-recording.m4a",
+                relativeTo: recordingsDirectory
+            ),
+            .available(fileURL)
+        )
+    }
+
+    func testAvailabilityPresentationKeepsExistingIOSMissingAudioText() {
+        XCTAssertEqual(VoiceInkStoredAudioAvailability.available(URL(fileURLWithPath: "/tmp/a.wav")).unavailableTitle, nil)
+        XCTAssertEqual(VoiceInkStoredAudioAvailability.available(URL(fileURLWithPath: "/tmp/a.wav")).unavailableDetail, nil)
+        XCTAssertEqual(VoiceInkStoredAudioAvailability.missingFile(URL(fileURLWithPath: "/tmp/missing.wav")).unavailableTitle, "Audio Unavailable")
+        XCTAssertEqual(VoiceInkStoredAudioAvailability.missingFile(URL(fileURLWithPath: "/tmp/missing.wav")).unavailableDetail, "File not found")
+        XCTAssertEqual(VoiceInkStoredAudioAvailability.missingPath.unavailableTitle, "Audio Unavailable")
+        XCTAssertEqual(VoiceInkStoredAudioAvailability.missingPath.unavailableDetail, "Path missing")
+    }
+
+    func testAvailabilityAudioSectionVisibilityPreservesMissingAudioIntent() {
+        XCTAssertTrue(VoiceInkStoredAudioAvailability.available(URL(fileURLWithPath: "/tmp/a.wav")).shouldShowAudioSection(duration: 0))
+        XCTAssertTrue(VoiceInkStoredAudioAvailability.missingFile(URL(fileURLWithPath: "/tmp/missing.wav")).shouldShowAudioSection(duration: 0))
+        XCTAssertTrue(VoiceInkStoredAudioAvailability.missingPath.shouldShowAudioSection(duration: 1))
+        XCTAssertFalse(VoiceInkStoredAudioAvailability.missingPath.shouldShowAudioSection(duration: 0))
+    }
+
     func testDeleteExistingFileRemovesResolvedFileAndReturnsURL() throws {
         let baseDirectory = FileManager.default.temporaryDirectory
             .appendingPathComponent("VoiceInkCore.StoredAudioFileTests.\(UUID().uuidString)", isDirectory: true)
@@ -208,6 +260,7 @@ final class StoredAudioFileTests: XCTestCase {
         )
 
         XCTAssertTrue(record.hasStoredAudioFile())
+        XCTAssertEqual(record.storedAudioAvailability(), .available(fileURL))
         XCTAssertEqual(try record.deleteExistingAudioFile()?.path, fileURL.path)
         XCTAssertFalse(record.hasStoredAudioFile())
     }

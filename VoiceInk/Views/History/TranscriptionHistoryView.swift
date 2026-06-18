@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import VoiceInkCore
 
 struct TranscriptionHistoryView: View {
     @Environment(\.modelContext) private var modelContext

@@ -266,13 +266,32 @@ public enum VoiceInkPCM16Audio {
         return sample / Float32(channelCount)
     }
 
-    private static func littleEndianPCM16Data(fromWAVData data: Data) -> Data? {
+    public static func littleEndianPCM16Data(fromWAVData data: Data) -> Data? {
         if let dataChunkRange = wavDataChunkRange(in: data) {
             return data.subdata(in: dataChunkRange)
         }
 
         guard !isRIFFWAVData(data), data.count > wavHeaderByteCount else { return nil }
         return Data(data.dropFirst(wavHeaderByteCount))
+    }
+
+    public static func wavData(fromLittleEndianPCM16Data pcmData: Data) -> Data {
+        var wavData = Data()
+        appendASCII("RIFF", to: &wavData)
+        appendUInt32LE(UInt32(36 + pcmData.count), to: &wavData)
+        appendASCII("WAVE", to: &wavData)
+        appendASCII("fmt ", to: &wavData)
+        appendUInt32LE(16, to: &wavData)
+        appendUInt16LE(1, to: &wavData)
+        appendUInt16LE(UInt16(monoChannelCount), to: &wavData)
+        appendUInt32LE(UInt32(mono16kSampleRateHz), to: &wavData)
+        appendUInt32LE(UInt32(mono16kSampleRateHz * monoChannelCount * bytesPerSample), to: &wavData)
+        appendUInt16LE(UInt16(monoChannelCount * bytesPerSample), to: &wavData)
+        appendUInt16LE(UInt16(bitsPerSample), to: &wavData)
+        appendASCII("data", to: &wavData)
+        appendUInt32LE(UInt32(pcmData.count), to: &wavData)
+        wavData.append(pcmData)
+        return wavData
     }
 
     private static func wavDataChunkRange(in data: Data) -> Range<Int>? {
@@ -330,6 +349,24 @@ public enum VoiceInkPCM16Audio {
             | (UInt32(bytes[offset + 1]) << 8)
             | (UInt32(bytes[offset + 2]) << 16)
             | (UInt32(bytes[offset + 3]) << 24)
+    }
+
+    private static func appendASCII(_ string: String, to data: inout Data) {
+        data.append(contentsOf: string.utf8)
+    }
+
+    private static func appendUInt16LE(_ value: UInt16, to data: inout Data) {
+        let littleEndian = value.littleEndian
+        data.append(UInt8(truncatingIfNeeded: littleEndian))
+        data.append(UInt8(truncatingIfNeeded: littleEndian >> 8))
+    }
+
+    private static func appendUInt32LE(_ value: UInt32, to data: inout Data) {
+        let littleEndian = value.littleEndian
+        data.append(UInt8(truncatingIfNeeded: littleEndian))
+        data.append(UInt8(truncatingIfNeeded: littleEndian >> 8))
+        data.append(UInt8(truncatingIfNeeded: littleEndian >> 16))
+        data.append(UInt8(truncatingIfNeeded: littleEndian >> 24))
     }
 
     private static func pcm16SampleFromScaledFloat(_ sample: Float32) -> Int16 {

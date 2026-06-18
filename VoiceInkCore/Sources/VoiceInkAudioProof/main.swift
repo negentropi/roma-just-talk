@@ -103,12 +103,10 @@ enum VoiceInkAudioProof {
 
     private static func analyze(_ inputURL: URL, options: AudioProofOptions) throws {
         let inputData = try Data(contentsOf: inputURL)
-        guard inputData.count > VoiceInkPCM16Audio.wavHeaderByteCount else {
+        guard let rawPCMData = VoiceInkPCM16Audio.littleEndianPCM16Data(fromWAVData: inputData) else {
             throw AudioProofError.invalidWAV(inputURL.path)
         }
 
-        let header = inputData.prefix(VoiceInkPCM16Audio.wavHeaderByteCount)
-        let rawPCMData = Data(inputData.dropFirst(VoiceInkPCM16Audio.wavHeaderByteCount))
         let rawMetrics = metrics(forLittleEndianPCM16Data: rawPCMData)
         printRow(
             variant: "raw",
@@ -124,7 +122,7 @@ enum VoiceInkAudioProof {
                 variant: variant
             )
             let variantURL = outputURL(for: inputURL, suffix: variant.rawValue, options: options)
-            try writeWAV(header: header, pcmData: variantPCMData, to: variantURL)
+            try writeWAV(pcmData: variantPCMData, to: variantURL)
             levelCandidates.append((variant.rawValue, variantPCMData))
             printRow(
                 variant: variant.rawValue,
@@ -146,7 +144,7 @@ enum VoiceInkAudioProof {
                 ? "leveled"
                 : candidate.variant + ".leveled"
             let leveledURL = outputURL(for: inputURL, suffix: suffix, options: options)
-            try writeWAV(header: header, pcmData: leveledPCMData, to: leveledURL)
+            try writeWAV(pcmData: leveledPCMData, to: leveledURL)
             printRow(
                 variant: suffix,
                 path: inputURL.path,
@@ -165,9 +163,8 @@ enum VoiceInkAudioProof {
             .appendingPathComponent(inputURL.deletingPathExtension().lastPathComponent + "." + suffix + ".wav")
     }
 
-    private static func writeWAV(header: Data.SubSequence, pcmData: Data, to url: URL) throws {
-        var wavData = Data(header)
-        wavData.append(pcmData)
+    private static func writeWAV(pcmData: Data, to url: URL) throws {
+        let wavData = VoiceInkPCM16Audio.wavData(fromLittleEndianPCM16Data: pcmData)
         try wavData.write(to: url, options: .atomic)
     }
 

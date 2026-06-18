@@ -38,6 +38,26 @@ final class PCM16AudioSamplesTests: XCTestCase {
         ])
     }
 
+    func testLittleEndianPCM16DataReadsPCMDataChunkAfterExtraWAVChunk() {
+        let data = wavDataWithExtraChunk(samples: [-2_000, 2_000])
+
+        XCTAssertEqual(
+            VoiceInkPCM16Audio.littleEndianPCM16Data(fromWAVData: data),
+            pcm16Data(samples: [-2_000, 2_000])
+        )
+    }
+
+    func testWAVDataWritesCanonicalMono16kPCM16DataChunk() {
+        let pcmData = pcm16Data(samples: [-2_000, 2_000])
+        let wavData = VoiceInkPCM16Audio.wavData(fromLittleEndianPCM16Data: pcmData)
+
+        XCTAssertEqual(VoiceInkPCM16Audio.littleEndianPCM16Data(fromWAVData: wavData), pcmData)
+        XCTAssertEqual(VoiceInkPCM16Audio.floatSamples(fromWAVData: wavData), [
+            Float(-2_000) / 32_767.0,
+            Float(2_000) / 32_767.0
+        ])
+    }
+
     func testFloatSamplesRejectTooSmallWAVData() {
         let data = Data(repeating: 0, count: VoiceInkPCM16Audio.wavHeaderByteCount)
 

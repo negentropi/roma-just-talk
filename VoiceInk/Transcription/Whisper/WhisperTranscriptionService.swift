@@ -83,10 +83,6 @@ class WhisperTranscriptionService: TranscriptionService {
     }
 
     private func readAudioSamples(_ url: URL) throws -> [Float] {
-        let data = try Data(contentsOf: url)
-        return VoiceInkPCM16Audio.floatSamples(
-            fromLittleEndianData: data,
-            startingAt: VoiceInkPCM16Audio.wavHeaderByteCount
-        )
+        try VoiceInkPCM16Audio.floatSamples(fromWAVFileAt: url) ?? []
     }
 }

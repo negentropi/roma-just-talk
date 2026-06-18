@@ -229,6 +229,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testFloatSamplesDecodeLittleEndianPCM16Data", run: { PCM16AudioSamplesTests().testFloatSamplesDecodeLittleEndianPCM16Data() }),
             VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testFloatSamplesCanStartAfterWAVHeader", run: { PCM16AudioSamplesTests().testFloatSamplesCanStartAfterWAVHeader() }),
             VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testFloatSamplesRejectTooSmallWAVData", run: { PCM16AudioSamplesTests().testFloatSamplesRejectTooSmallWAVData() }),
+            VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testFloatSamplesCanReadWAVFileURL", run: { try PCM16AudioSamplesTests().testFloatSamplesCanReadWAVFileURL() }),
+            VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testFloatSamplesRejectTooSmallWAVFileURL", run: { try PCM16AudioSamplesTests().testFloatSamplesRejectTooSmallWAVFileURL() }),
             VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testNormalizedMonoFloatSamplesPreserveSingleChannelNormalization", run: { PCM16AudioSamplesTests().testNormalizedMonoFloatSamplesPreserveSingleChannelNormalization() }),
             VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testNormalizedMonoFloatSamplesAverageChannelsBeforeNormalizing", run: { PCM16AudioSamplesTests().testNormalizedMonoFloatSamplesAverageChannelsBeforeNormalizing() }),
             VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testNormalizedMonoFloatSamplesKeepSilenceAtZero", run: { PCM16AudioSamplesTests().testNormalizedMonoFloatSamplesKeepSilenceAtZero() }),

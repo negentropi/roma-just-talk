@@ -142,8 +142,7 @@ class FluidAudioTranscriptionService: TranscriptionService {
 
     private func readAudioSamples(from url: URL) throws -> [Float] {
         do {
-            let data = try Data(contentsOf: url)
-            guard let samples = VoiceInkPCM16Audio.floatSamples(fromWAVData: data) else {
+            guard let samples = try VoiceInkPCM16Audio.floatSamples(fromWAVFileAt: url) else {
                 throw ASRError.invalidAudioData
             }
             return samples

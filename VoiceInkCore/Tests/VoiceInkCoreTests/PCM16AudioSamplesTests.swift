@@ -33,6 +33,37 @@ final class PCM16AudioSamplesTests: XCTestCase {
         XCTAssertNil(VoiceInkPCM16Audio.floatSamples(fromWAVData: data))
     }
 
+    func testFloatSamplesCanReadWAVFileURL() throws {
+        let baseDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: baseDirectory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: baseDirectory) }
+
+        let fileURL = baseDirectory.appendingPathComponent("recording.wav")
+        var data = Data(repeating: 0, count: VoiceInkPCM16Audio.wavHeaderByteCount)
+        data.append(pcm16Data(samples: [-2_000, 2_000]))
+        try data.write(to: fileURL)
+
+        let samples = try VoiceInkPCM16Audio.floatSamples(fromWAVFileAt: fileURL)
+
+        XCTAssertEqual(samples, [
+            Float(-2_000) / 32_767.0,
+            Float(2_000) / 32_767.0
+        ])
+    }
+
+    func testFloatSamplesRejectTooSmallWAVFileURL() throws {
+        let baseDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: baseDirectory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: baseDirectory) }
+
+        let fileURL = baseDirectory.appendingPathComponent("empty.wav")
+        try Data(repeating: 0, count: VoiceInkPCM16Audio.wavHeaderByteCount).write(to: fileURL)
+
+        XCTAssertNil(try VoiceInkPCM16Audio.floatSamples(fromWAVFileAt: fileURL))
+    }
+
     func testNormalizedMonoFloatSamplesPreserveSingleChannelNormalization() {
         let input: [Float] = [-0.25, 0.5, 1.0]
 

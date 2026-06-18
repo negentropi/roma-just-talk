@@ -38,6 +38,10 @@ public enum VoiceInkPCM16Audio {
         return floatSamples(fromLittleEndianData: data, startingAt: wavHeaderByteCount)
     }
 
+    public static func floatSamples(fromWAVFileAt url: URL) throws -> [Float]? {
+        try floatSamples(fromWAVData: Data(contentsOf: url))
+    }
+
     public static func normalizedMonoFloatSamples(
         channelCount: Int,
         frameLength: Int,

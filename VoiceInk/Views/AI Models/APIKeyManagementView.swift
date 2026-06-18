@@ -279,7 +279,7 @@ struct APIKeyManagementView: View {
                             .textFieldStyle(.roundedBorder)
 
                         HStack {
-                            if let url = getAPIKeyURL() {
+                            if let url = aiService.selectedProvider.apiKeyConsoleURL {
                                 Link(destination: url) {
                                     HStack {
                                         Image(systemName: "key.fill")
@@ -362,7 +362,4 @@ struct APIKeyManagementView: View {
         }
     }
     
-    private func getAPIKeyURL() -> URL? {
-        aiService.selectedProvider.aiModelProvider?.apiKeyConsoleURL
-    }
 }

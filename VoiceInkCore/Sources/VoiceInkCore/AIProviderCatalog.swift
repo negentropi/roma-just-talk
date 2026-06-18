@@ -177,6 +177,10 @@ public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
             return nil
         }
     }
+
+    public var apiKeyConsoleURL: URL? {
+        aiModelProvider?.apiKeyConsoleURL
+    }
 }
 
 public extension VoiceInkAIModelProvider {

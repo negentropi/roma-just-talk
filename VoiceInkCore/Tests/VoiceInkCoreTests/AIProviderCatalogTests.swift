@@ -257,4 +257,18 @@ final class AIProviderCatalogTests: XCTestCase {
             XCTAssertEqual(provider.apiKeyConsoleURL.absoluteString, expectedURL)
         }
     }
+
+    func testAIEnhancementProvidersExposeOptionalConsoleURLs() {
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.groq.apiKeyConsoleURL?.absoluteString,
+            "https://console.groq.com/keys"
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.openRouter.apiKeyConsoleURL?.absoluteString,
+            "https://openrouter.ai/keys"
+        )
+        XCTAssertNil(VoiceInkAIEnhancementProviderKind.custom.apiKeyConsoleURL)
+        XCTAssertNil(VoiceInkAIEnhancementProviderKind.ollama.apiKeyConsoleURL)
+        XCTAssertNil(VoiceInkAIEnhancementProviderKind.localCLI.apiKeyConsoleURL)
+    }
 }

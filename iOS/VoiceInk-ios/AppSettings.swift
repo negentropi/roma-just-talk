@@ -324,28 +324,22 @@ final class AppSettings: ObservableObject {
     // MARK: - Debug Reset
     /// Remove all persisted preferences, API keys, and modes.
     func resetAll() {
-        let defaults = VoiceInkDefaultSettings.iOS
+        let resetState = VoiceInkDefaultSettings.iOS.appSettingsResetState
 
-        // Clear modes and selection
-        modes = []
-        selectedModeId = nil
+        modes = resetState.modes
+        selectedModeId = resetState.selectedModeId
+        apiKeyState = resetState.apiKeyState
+        audioSessionTimeoutSeconds = resetState.audioSessionTimeoutSeconds
 
-        // Clear verification flags
-        apiKeyState = VoiceInkProviderAPIKeyState()
-        
-        // Reset audio session timeout to default
-        audioSessionTimeoutSeconds = defaults.audioSessionTimeoutSeconds
-
-        // Reset transcription cleanup preferences
-        let cleanupSettings = defaults.transcriptionCleanupSettings
+        let cleanupSettings = resetState.transcriptionCleanupSettings
         punctuationCleanupMode = cleanupSettings.punctuationMode
         isTextFormattingEnabled = cleanupSettings.isTextFormattingEnabled
         lowercaseTranscription = cleanupSettings.lowercaseTranscription
         removeFillerWords = cleanupSettings.removeFillerWords
-        fillerWords = defaults.fillerWords
-        wordReplacements = []
-        customVocabularyTerms = []
-        selectedTranscriptionLanguage = defaults.selectedTranscriptionLanguage
+        fillerWords = resetState.fillerWords
+        wordReplacements = resetState.wordReplacements
+        customVocabularyTerms = resetState.customVocabularyTerms
+        selectedTranscriptionLanguage = resetState.selectedTranscriptionLanguage
         VoiceInkSharedPreferenceReset.clearCoreUserSettings()
 
         // Clear API keys from memory and Keychain

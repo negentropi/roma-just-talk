@@ -168,6 +168,56 @@ public struct VoiceInkDefaultSettings: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkAppSettingsResetState {
+    public let modes: [Mode]
+    public let selectedModeId: UUID?
+    public let apiKeyState: VoiceInkProviderAPIKeyState
+    public let audioSessionTimeoutSeconds: Int
+    public let transcriptionCleanupSettings: VoiceInkTranscriptionCleanupSettings
+    public let fillerWords: [String]
+    public let wordReplacements: [VoiceInkWordReplacementRule]
+    public let customVocabularyTerms: [String]
+    public let selectedTranscriptionLanguage: String
+
+    public init(
+        modes: [Mode],
+        selectedModeId: UUID?,
+        apiKeyState: VoiceInkProviderAPIKeyState,
+        audioSessionTimeoutSeconds: Int,
+        transcriptionCleanupSettings: VoiceInkTranscriptionCleanupSettings,
+        fillerWords: [String],
+        wordReplacements: [VoiceInkWordReplacementRule],
+        customVocabularyTerms: [String],
+        selectedTranscriptionLanguage: String
+    ) {
+        self.modes = modes
+        self.selectedModeId = selectedModeId
+        self.apiKeyState = apiKeyState
+        self.audioSessionTimeoutSeconds = audioSessionTimeoutSeconds
+        self.transcriptionCleanupSettings = transcriptionCleanupSettings
+        self.fillerWords = fillerWords
+        self.wordReplacements = wordReplacements
+        self.customVocabularyTerms = customVocabularyTerms
+        self.selectedTranscriptionLanguage = selectedTranscriptionLanguage
+    }
+}
+
+public extension VoiceInkDefaultSettings {
+    var appSettingsResetState: VoiceInkAppSettingsResetState {
+        VoiceInkAppSettingsResetState(
+            modes: [],
+            selectedModeId: nil,
+            apiKeyState: VoiceInkProviderAPIKeyState(),
+            audioSessionTimeoutSeconds: audioSessionTimeoutSeconds,
+            transcriptionCleanupSettings: transcriptionCleanupSettings,
+            fillerWords: fillerWords,
+            wordReplacements: [],
+            customVocabularyTerms: [],
+            selectedTranscriptionLanguage: selectedTranscriptionLanguage
+        )
+    }
+}
+
 public enum VoiceInkOnboardingPreference {
     public static func hasStoredCompletionState(from defaults: UserDefaults = .standard) -> Bool {
         defaults.object(forKey: VoiceInkUserDefaultsKey.hasCompletedOnboarding) != nil

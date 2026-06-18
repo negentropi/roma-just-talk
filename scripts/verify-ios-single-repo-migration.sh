@@ -886,6 +886,21 @@ require_pattern \
   iOS/VoiceInk-ios/VoiceInk_iosApp.swift
 
 require_pattern \
+  "shared app settings reset state lives in VoiceInkCore" \
+  'VoiceInkAppSettingsResetState|appSettingsResetState' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "iOS app settings reset consumes shared reset state" \
+  'VoiceInkDefaultSettings\.iOS\.appSettingsResetState' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+reject_pattern \
+  "iOS app settings reset avoids shell-only reset state assembly" \
+  'let +defaults += +VoiceInkDefaultSettings\.iOS|modes += +\[\]|selectedModeId += +nil|apiKeyState += +VoiceInkProviderAPIKeyState\(\)|wordReplacements += +\[\]|customVocabularyTerms += +\[\]' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+require_pattern \
   "macOS app launch registers shared macOS default values" \
   'VoiceInkDefaultSettings\.macOS\.registeredUserDefaults' \
   VoiceInk/AppDefaults.swift

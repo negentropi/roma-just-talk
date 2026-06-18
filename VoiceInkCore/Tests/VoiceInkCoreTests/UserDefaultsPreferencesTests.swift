@@ -95,6 +95,38 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(defaults.selectedTranscriptionLanguage, VoiceInkLanguageCatalog.autoDetectCode)
     }
 
+    func testDefaultSettingsBuildSharedAppSettingsResetState() {
+        let defaults = VoiceInkDefaultSettings(
+            audioSessionTimeoutSeconds: 12,
+            punctuationCleanupMode: .removeTrailingPeriod,
+            isTextFormattingEnabled: false,
+            lowercaseTranscription: true,
+            removeFillerWords: false,
+            fillerWords: ["um"],
+            selectedTranscriptionLanguage: "de"
+        )
+
+        let resetState = defaults.appSettingsResetState
+
+        XCTAssertTrue(resetState.modes.isEmpty)
+        XCTAssertNil(resetState.selectedModeId)
+        XCTAssertEqual(resetState.apiKeyState, VoiceInkProviderAPIKeyState())
+        XCTAssertEqual(resetState.audioSessionTimeoutSeconds, 12)
+        XCTAssertEqual(
+            resetState.transcriptionCleanupSettings,
+            VoiceInkTranscriptionCleanupSettings(
+                punctuationMode: .removeTrailingPeriod,
+                isTextFormattingEnabled: false,
+                lowercaseTranscription: true,
+                removeFillerWords: false
+            )
+        )
+        XCTAssertEqual(resetState.fillerWords, ["um"])
+        XCTAssertEqual(resetState.wordReplacements, [])
+        XCTAssertEqual(resetState.customVocabularyTerms, [])
+        XCTAssertEqual(resetState.selectedTranscriptionLanguage, "de")
+    }
+
     func testDefaultSettingsPreserveMacOSSelectedLanguageDefault() {
         let defaults = VoiceInkDefaultSettings.macOS
         let registeredDefaults = defaults.registeredUserDefaults()

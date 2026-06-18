@@ -105,20 +105,12 @@ struct GeneralBackup: Codable {
     let rollingBufferPreloadEnabledByModel: [String: Bool]?
 }
 
-struct WordBackup: Codable {
-    let word: String
-
-    init(word: String) {
-        self.word = word
-    }
-}
-
 struct BackupFile: Codable {
     let version: String
     let customPrompts: [VoiceInkCustomPrompt]
     let powerModeConfigs: [PowerModeConfig]
     let powerModeShortcuts: [String: ShortcutBackup]?
-    let vocabularyWords: [WordBackup]?
+    let vocabularyWords: [VoiceInkVocabularyWordBackup]?
     let wordReplacements: [String: String]?
     let generalSettings: GeneralBackup?
     let customEmojis: [String]?
@@ -128,7 +120,7 @@ struct BackupFile: Codable {
         case version, customPrompts, powerModeConfigs, powerModeShortcuts, vocabularyWords, wordReplacements, generalSettings, customEmojis, customCloudModels
     }
 
-    init(version: String, customPrompts: [VoiceInkCustomPrompt], powerModeConfigs: [PowerModeConfig], powerModeShortcuts: [String: ShortcutBackup]?, vocabularyWords: [WordBackup]?, wordReplacements: [String: String]?, generalSettings: GeneralBackup?, customEmojis: [String]?, customCloudModels: [VoiceInkCustomCloudModelBackup]?) {
+    init(version: String, customPrompts: [VoiceInkCustomPrompt], powerModeConfigs: [PowerModeConfig], powerModeShortcuts: [String: ShortcutBackup]?, vocabularyWords: [VoiceInkVocabularyWordBackup]?, wordReplacements: [String: String]?, generalSettings: GeneralBackup?, customEmojis: [String]?, customCloudModels: [VoiceInkCustomCloudModelBackup]?) {
         self.version = version
         self.customPrompts = customPrompts
         self.powerModeConfigs = powerModeConfigs
@@ -146,7 +138,7 @@ struct BackupFile: Codable {
         customPrompts = try container.decodeIfPresent([VoiceInkCustomPrompt].self, forKey: .customPrompts) ?? []
         powerModeConfigs = try container.decodeIfPresent([PowerModeConfig].self, forKey: .powerModeConfigs) ?? []
         powerModeShortcuts = try container.decodeIfPresent([String: ShortcutBackup].self, forKey: .powerModeShortcuts)
-        vocabularyWords = try container.decodeIfPresent([WordBackup].self, forKey: .vocabularyWords)
+        vocabularyWords = try container.decodeIfPresent([VoiceInkVocabularyWordBackup].self, forKey: .vocabularyWords)
         wordReplacements = try container.decodeIfPresent([String: String].self, forKey: .wordReplacements)
         generalSettings = try container.decodeIfPresent(GeneralBackup.self, forKey: .generalSettings)
         customEmojis = try container.decodeIfPresent([String].self, forKey: .customEmojis)

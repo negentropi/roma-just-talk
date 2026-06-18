@@ -235,7 +235,7 @@ enum BackupImporter {
             let existingWords = try modelContext.fetch(descriptor)
 
             let wordsToInsert = VoiceInkDictionaryPolicy.vocabularyWordsToInsert(
-                words.map(\.word),
+                from: words,
                 existingWords: existingWords.map(\.word)
             )
 

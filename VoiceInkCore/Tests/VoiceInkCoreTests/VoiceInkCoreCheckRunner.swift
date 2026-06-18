@@ -124,6 +124,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testVocabularyPlanRejectsSingleDuplicateWithExistingMessage", run: { DictionaryPolicyTests().testVocabularyPlanRejectsSingleDuplicateWithExistingMessage() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testVocabularyPlanSkipsDuplicatesForMultiAdd", run: { DictionaryPolicyTests().testVocabularyPlanSkipsDuplicatesForMultiAdd() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testVocabularyWordsToInsertTrimsAndSkipsExistingAndBatchDuplicates", run: { DictionaryPolicyTests().testVocabularyWordsToInsertTrimsAndSkipsExistingAndBatchDuplicates() }),
+            VoiceInkCoreCheck(name: "DictionaryPolicyTests.testVocabularyBackupRecordsPreserveExistingJSONShape", run: { try DictionaryPolicyTests().testVocabularyBackupRecordsPreserveExistingJSONShape() }),
+            VoiceInkCoreCheck(name: "DictionaryPolicyTests.testVocabularyBackupImportUsesSharedTrimAndDuplicatePolicy", run: { DictionaryPolicyTests().testVocabularyBackupImportUsesSharedTrimAndDuplicatePolicy() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementPlanReturnsNoOpForBlankOriginalOrReplacement", run: { DictionaryPolicyTests().testWordReplacementPlanReturnsNoOpForBlankOriginalOrReplacement() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementDraftSaveabilityUsesInsertPlan", run: { DictionaryPolicyTests().testWordReplacementDraftSaveabilityUsesInsertPlan() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementPlanRejectsDuplicateTokenAcrossCommaGroups", run: { DictionaryPolicyTests().testWordReplacementPlanRejectsDuplicateTokenAcrossCommaGroups() }),

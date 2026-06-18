@@ -19,6 +19,14 @@ public struct VoiceInkWordReplacementInsertPlan: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkVocabularyWordBackup: Codable, Equatable, Sendable {
+    public let word: String
+
+    public init(word: String) {
+        self.word = word
+    }
+}
+
 public enum VoiceInkDictionaryPolicy {
     public static func hasVocabularyDraft(_ input: String) -> Bool {
         !tokens(from: input).isEmpty
@@ -66,6 +74,20 @@ public enum VoiceInkDictionaryPolicy {
         }
 
         return wordsToInsert
+    }
+
+    public static func vocabularyBackupRecords(from words: [String]) -> [VoiceInkVocabularyWordBackup] {
+        words.map { VoiceInkVocabularyWordBackup(word: $0) }
+    }
+
+    public static func vocabularyWordsToInsert(
+        from backupRecords: [VoiceInkVocabularyWordBackup],
+        existingWords: [String]
+    ) -> [String] {
+        vocabularyWordsToInsert(
+            backupRecords.map(\.word),
+            existingWords: existingWords
+        )
     }
 
     public static func wordReplacementInsertPlan(

@@ -47,6 +47,39 @@ final class DictionaryPolicyTests: XCTestCase {
         )
     }
 
+    func testVocabularyBackupRecordsPreserveExistingJSONShape() throws {
+        let records = VoiceInkDictionaryPolicy.vocabularyBackupRecords(from: ["Roma", "VoiceInk"])
+        let data = try JSONEncoder().encode(records)
+        let json = try XCTUnwrap(String(data: data, encoding: .utf8))
+
+        XCTAssertTrue(json.contains("\"word\":\"Roma\""))
+        XCTAssertTrue(json.contains("\"word\":\"VoiceInk\""))
+        XCTAssertEqual(
+            try JSONDecoder().decode([VoiceInkVocabularyWordBackup].self, from: data),
+            [
+                VoiceInkVocabularyWordBackup(word: "Roma"),
+                VoiceInkVocabularyWordBackup(word: "VoiceInk")
+            ]
+        )
+    }
+
+    func testVocabularyBackupImportUsesSharedTrimAndDuplicatePolicy() {
+        let records = [
+            VoiceInkVocabularyWordBackup(word: " Roma "),
+            VoiceInkVocabularyWordBackup(word: "roma"),
+            VoiceInkVocabularyWordBackup(word: " "),
+            VoiceInkVocabularyWordBackup(word: "Cursor")
+        ]
+
+        XCTAssertEqual(
+            VoiceInkDictionaryPolicy.vocabularyWordsToInsert(
+                from: records,
+                existingWords: ["voice ink"]
+            ),
+            ["Roma", "Cursor"]
+        )
+    }
+
     func testWordReplacementPlanReturnsNoOpForBlankOriginalOrReplacement() {
         XCTAssertFalse(
             VoiceInkDictionaryPolicy.wordReplacementInsertPlan(

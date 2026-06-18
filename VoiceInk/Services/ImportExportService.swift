@@ -131,10 +131,10 @@ class ImportExportService {
         let customModels = CustomCloudModelManager.shared.customModels.map { VoiceInkCustomCloudModelBackup(model: $0) }
 
         // Fetch vocabulary words from SwiftData
-        var exportedDictionaryItems: [WordBackup]? = nil
+        var exportedDictionaryItems: [VoiceInkVocabularyWordBackup]? = nil
         let vocabularyDescriptor = FetchDescriptor<VocabularyWord>()
         if let items = try? modelContext.fetch(vocabularyDescriptor), !items.isEmpty {
-            exportedDictionaryItems = items.map { WordBackup(word: $0.word) }
+            exportedDictionaryItems = VoiceInkDictionaryPolicy.vocabularyBackupRecords(from: items.map(\.word))
         }
 
         // Fetch word replacements from SwiftData

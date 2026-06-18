@@ -5,11 +5,6 @@ import os
 import LLMkit
 import VoiceInkCore
 
-enum EnhancementPrompt {
-    case transcriptionEnhancement
-    case aiAssistant
-}
-
 @MainActor
 class AIEnhancementService: ObservableObject {
     private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "AIEnhancementService")
@@ -148,7 +143,7 @@ class AIEnhancementService: ObservableObject {
         lastRequestTime = Date()
     }
 
-    private func getSystemMessage(for mode: EnhancementPrompt) async -> String {
+    private func getSystemMessage() async -> String {
         let promptText = VoiceInkCustomPromptPolicy.basePromptText(
             activePrompt: activePrompt,
             prompts: allPrompts
@@ -171,7 +166,7 @@ class AIEnhancementService: ObservableObject {
         return await SelectedTextService.fetchSelectedText()
     }
 
-    private func makeRequest(text: String, mode: EnhancementPrompt) async throws -> String {
+    private func makeRequest(text: String) async throws -> String {
         guard isConfigured else {
             throw VoiceInkAIEnhancementError.notConfigured
         }
@@ -181,7 +176,7 @@ class AIEnhancementService: ObservableObject {
         }
 
         let formattedText = VoiceInkAIRequestPrompts.taggedTranscript(text)
-        let systemMessage = await getSystemMessage(for: mode)
+        let systemMessage = await getSystemMessage()
 
         await MainActor.run {
             self.lastSystemMessageSent = systemMessage
@@ -291,7 +286,7 @@ class AIEnhancementService: ObservableObject {
         VoiceInkAIEnhancementRequestPreference.shouldRetryOnTimeout()
     }
 
-    private func makeRequestWithRetry(text: String, mode: EnhancementPrompt, maxRetries: Int = 3, initialDelay: TimeInterval = 1.0) async throws -> String {
+    private func makeRequestWithRetry(text: String, maxRetries: Int = 3, initialDelay: TimeInterval = 1.0) async throws -> String {
         var retryState = VoiceInkAIEnhancementRetryState(
             maxAttempts: maxRetries,
             initialDelay: initialDelay,
@@ -300,7 +295,7 @@ class AIEnhancementService: ObservableObject {
 
         while true {
             do {
-                return try await makeRequest(text: text, mode: mode)
+                return try await makeRequest(text: text)
             } catch let error as VoiceInkAIEnhancementError {
                 try await handleRetryDecision(
                     retryState.recordFailure(error),
@@ -362,11 +357,10 @@ class AIEnhancementService: ObservableObject {
 
     func enhance(_ text: String) async throws -> (String, TimeInterval, String?) {
         let startTime = Date()
-        let enhancementPrompt: EnhancementPrompt = .transcriptionEnhancement
         let promptName = activePrompt?.title
 
         do {
-            let result = try await makeRequestWithRetry(text: text, mode: enhancementPrompt)
+            let result = try await makeRequestWithRetry(text: text)
             let endTime = Date()
             let duration = endTime.timeIntervalSince(startTime)
             return (result, duration, promptName)

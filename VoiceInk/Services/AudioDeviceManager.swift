@@ -16,6 +16,12 @@ enum AudioInputMode: String, CaseIterable {
 }
 
 class AudioDeviceManager: ObservableObject {
+    private enum UserDefaultsKey {
+        static let audioInputMode = "audioInputMode"
+        static let selectedAudioDeviceUID = "selectedAudioDeviceUID"
+        static let prioritizedDevices = "prioritizedDevices"
+    }
+
     private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "AudioDeviceManager")
     @Published var availableDevices: [(id: AudioDeviceID, uid: String, name: String)] = []
     @Published var selectedDeviceID: AudioDeviceID?
@@ -29,7 +35,7 @@ class AudioDeviceManager: ObservableObject {
     init() {
         loadPrioritizedDevices()
 
-        if let savedMode = UserDefaults.standard.audioInputModeRawValue,
+        if let savedMode = UserDefaults.standard.string(forKey: UserDefaultsKey.audioInputMode),
            let mode = AudioInputMode(rawValue: savedMode) {
             inputMode = mode
         } else {
@@ -81,12 +87,12 @@ class AudioDeviceManager: ObservableObject {
         case .prioritized:
             selectHighestPriorityAvailableDevice()
         case .custom:
-            if let savedUID = UserDefaults.standard.selectedAudioDeviceUID {
+            if let savedUID = UserDefaults.standard.string(forKey: UserDefaultsKey.selectedAudioDeviceUID) {
                 if let device = availableDevices.first(where: { $0.uid == savedUID }) {
                     selectedDeviceID = device.id
                 } else {
                     logger.warning("🎙️ Saved device UID \(savedUID, privacy: .public) is no longer available")
-                    UserDefaults.standard.removeObject(forKey: UserDefaults.Keys.selectedAudioDeviceUID)
+                    UserDefaults.standard.removeObject(forKey: UserDefaultsKey.selectedAudioDeviceUID)
                     fallbackToDefaultDevice()
                 }
             } else {
@@ -239,7 +245,7 @@ class AudioDeviceManager: ObservableObject {
             let uid = deviceToSelect.uid
             DispatchQueue.main.async {
                 self.selectedDeviceID = id
-                UserDefaults.standard.selectedAudioDeviceUID = uid
+                UserDefaults.standard.set(uid, forKey: UserDefaultsKey.selectedAudioDeviceUID)
                 self.notifyDeviceChange()
             }
         } else {
@@ -254,8 +260,8 @@ class AudioDeviceManager: ObservableObject {
             DispatchQueue.main.async {
                 self.inputMode = .custom
                 self.selectedDeviceID = id
-                UserDefaults.standard.audioInputModeRawValue = AudioInputMode.custom.rawValue
-                UserDefaults.standard.selectedAudioDeviceUID = uid
+                UserDefaults.standard.set(AudioInputMode.custom.rawValue, forKey: UserDefaultsKey.audioInputMode)
+                UserDefaults.standard.set(uid, forKey: UserDefaultsKey.selectedAudioDeviceUID)
                 self.notifyDeviceChange()
             }
         } else {
@@ -266,7 +272,7 @@ class AudioDeviceManager: ObservableObject {
 
     func selectInputMode(_ mode: AudioInputMode) {
         inputMode = mode
-        UserDefaults.standard.audioInputModeRawValue = mode.rawValue
+        UserDefaults.standard.set(mode.rawValue, forKey: UserDefaultsKey.audioInputMode)
 
         switch mode {
         case .systemDefault:
@@ -307,7 +313,7 @@ class AudioDeviceManager: ObservableObject {
     }
     
     private func loadPrioritizedDevices() {
-        if let data = UserDefaults.standard.prioritizedDevicesData,
+        if let data = UserDefaults.standard.data(forKey: UserDefaultsKey.prioritizedDevices),
            let devices = try? JSONDecoder().decode([PrioritizedDevice].self, from: data) {
             prioritizedDevices = devices
         }
@@ -315,7 +321,7 @@ class AudioDeviceManager: ObservableObject {
     
     func savePrioritizedDevices() {
         if let data = try? JSONEncoder().encode(prioritizedDevices) {
-            UserDefaults.standard.prioritizedDevicesData = data
+            UserDefaults.standard.set(data, forKey: UserDefaultsKey.prioritizedDevices)
         }
     }
     

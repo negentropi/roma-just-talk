@@ -3,7 +3,7 @@ import AppKit
 
 struct DashboardPromotionsSection: View {
     let licenseState: LicenseViewModel.LicenseState
-    @State private var isAffiliatePromotionDismissed: Bool = UserDefaults.standard.affiliatePromotionDismissed
+    @AppStorage("VoiceInkAffiliatePromotionDismissed") private var isAffiliatePromotionDismissed = false
 
     private var shouldShowUpgradePromotion: Bool {
         switch licenseState {
@@ -81,7 +81,6 @@ struct DashboardPromotionsSection: View {
         withAnimation(.easeInOut(duration: 0.3)) {
             isAffiliatePromotionDismissed = true
         }
-        UserDefaults.standard.affiliatePromotionDismissed = true
     }
 }
 

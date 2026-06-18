@@ -126,11 +126,7 @@ class SystemInfoService {
     }
 
     private func getAudioInputMode() -> String {
-        if let mode = UserDefaults.standard.audioInputModeRawValue,
-           let audioMode = AudioInputMode(rawValue: mode) {
-            return audioMode.rawValue
-        }
-        return "Custom Device"
+        AudioDeviceManager.shared.inputMode.rawValue
     }
 
     private func getCurrentAudioDevice() -> String {

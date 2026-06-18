@@ -366,11 +366,9 @@ class VoiceInkEngine: NSObject, ObservableObject {
 
         if let recordedFile {
             if !shouldCancelRecording {
-                let transcription = makeRecordingTranscription(
+                let transcription = makePendingRecordingTranscription(
                     for: recordedFile,
-                    text: "",
-                    duration: 0,
-                    transcriptionStatus: .pending
+                    duration: 0
                 )
                 modelContext.insert(transcription)
 
@@ -506,11 +504,9 @@ class VoiceInkEngine: NSObject, ObservableObject {
                 elapsedSeconds: latencyTrace.elapsed
             )
 
-            let transcription = makeRecordingTranscription(
+            let transcription = makePendingRecordingTranscription(
                 for: permanentURL,
-                text: "",
-                duration: VoiceInkPCM16Audio.duration(forMono16kData: audioData),
-                transcriptionStatus: .pending
+                duration: VoiceInkPCM16Audio.duration(forMono16kData: audioData)
             )
 
             recordedFile = permanentURL
@@ -588,11 +584,9 @@ class VoiceInkEngine: NSObject, ObservableObject {
                 elapsedSeconds: latencyTrace.elapsed
             )
 
-            let transcription = makeRecordingTranscription(
+            let transcription = makePendingRecordingTranscription(
                 for: permanentURL,
-                text: "",
-                duration: VoiceInkPCM16Audio.duration(forMono16kData: audioData),
-                transcriptionStatus: .pending
+                duration: VoiceInkPCM16Audio.duration(forMono16kData: audioData)
             )
 
             recordedFile = permanentURL
@@ -897,11 +891,9 @@ class VoiceInkEngine: NSObject, ObservableObject {
         else { return }
 
         let duration = await AudioFileMetadata.duration(for: recordedFile)
-        let transcription = makeRecordingTranscription(
+        let transcription = makeCanceledRecordingTranscription(
             for: recordedFile,
-            text: VoiceInkTranscriptPresentation.canceledTranscriptionText,
-            duration: duration,
-            transcriptionStatus: .canceled
+            duration: duration
         )
 
         modelContext.insert(transcription)
@@ -914,22 +906,34 @@ class VoiceInkEngine: NSObject, ObservableObject {
         }
     }
 
-    private func makeRecordingTranscription(
+    private func makePendingRecordingTranscription(
         for audioURL: URL,
-        text: String,
-        duration: TimeInterval,
-        transcriptionStatus: VoiceInkTranscriptionStatus
+        duration: TimeInterval
     ) -> Transcription {
         let powerModeMetadata = currentPowerModeMetadata()
 
-        let draft = VoiceInkRecordingTranscriptionDraft(
-            text: text,
+        let draft = VoiceInkRecordingTranscriptionDraft.pending(
             duration: duration,
             audioFileURL: audioURL.absoluteString,
             transcriptionModelName: transcriptionModelManager.currentTranscriptionModel?.displayName,
             powerModeName: powerModeMetadata.name,
-            powerModeEmoji: powerModeMetadata.emoji,
-            transcriptionStatus: transcriptionStatus
+            powerModeEmoji: powerModeMetadata.emoji
+        )
+        return Transcription(recordingDraft: draft)
+    }
+
+    private func makeCanceledRecordingTranscription(
+        for audioURL: URL,
+        duration: TimeInterval
+    ) -> Transcription {
+        let powerModeMetadata = currentPowerModeMetadata()
+
+        let draft = VoiceInkRecordingTranscriptionDraft.canceled(
+            duration: duration,
+            audioFileURL: audioURL.absoluteString,
+            transcriptionModelName: transcriptionModelManager.currentTranscriptionModel?.displayName,
+            powerModeName: powerModeMetadata.name,
+            powerModeEmoji: powerModeMetadata.emoji
         )
         return Transcription(recordingDraft: draft)
     }

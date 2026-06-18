@@ -455,8 +455,23 @@ require_pattern \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift
 
 require_pattern \
+  "macOS live recording builds shared pending recording draft" \
+  'VoiceInkRecordingTranscriptionDraft\.pending' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+
+require_pattern \
+  "macOS canceled recording builds shared canceled recording draft" \
+  'VoiceInkRecordingTranscriptionDraft\.canceled' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+
+require_pattern \
   "macOS recording rows insert through shared recording draft" \
   'Transcription\(recordingDraft: draft\)' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+
+reject_pattern \
+  "macOS recording rows avoid shell-only pending/canceled draft construction" \
+  'text: VoiceInkTranscriptPresentation\.canceledTranscriptionText|transcriptionStatus: +\.(pending|canceled)' \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift
 
 require_pattern \
@@ -1517,8 +1532,8 @@ reject_pattern \
   VoiceInk/Services/LastTranscriptionService.swift
 
 require_pattern \
-  "macOS engine canceled recording uses shared canceled text" \
-  'VoiceInkTranscriptPresentation\.canceledTranscriptionText' \
+  "macOS engine canceled recording uses shared canceled draft factory" \
+  'VoiceInkRecordingTranscriptionDraft\.canceled' \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift
 
 reject_pattern \

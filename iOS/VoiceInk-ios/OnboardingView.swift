@@ -173,7 +173,7 @@ struct ModelDownloadOnboardingView: View {
                     if baseModelDownloadState.progress.isActive {
                         VStack(alignment: .leading, spacing: 6) {
                             HStack {
-                                Text("Downloading...")
+                                Text(baseModelDownloadState.progress.compactStatusText)
                                     .font(.caption)
                                     .foregroundColor(.accentColor)
                                 Spacer()
@@ -198,7 +198,7 @@ struct ModelDownloadOnboardingView: View {
             // Bottom Action Buttons
             VStack(spacing: 16) {
                 if baseModelDownloadState.isDownloading {
-                    Button("Downloading...") {}
+                    Button(baseModelDownloadState.progress.compactStatusText) {}
                         .buttonStyle(OnboardingButtonStyle())
                         .disabled(true)
                     

@@ -274,16 +274,16 @@ final class WhisperModelFilesTests: XCTestCase {
 
         XCTAssertTrue(progress.isActive)
         XCTAssertEqual(progress.fraction, 0.428, accuracy: 0.000001)
+        XCTAssertEqual(progress.compactStatusText, "Downloading...")
         XCTAssertEqual(progress.percentText, "42%")
         XCTAssertEqual(progress.phaseText, "Downloading ggml-base Model")
-        XCTAssertEqual(
-            VoiceInkWhisperModelDownloadProgress.simple(
-                modelName: "ggml-base",
-                isDownloading: false,
-                progress: 0.5
-            ).phase,
-            .idle
+        let idleProgress = VoiceInkWhisperModelDownloadProgress.simple(
+            modelName: "ggml-base",
+            isDownloading: false,
+            progress: 0.5
         )
+        XCTAssertEqual(idleProgress.phase, .idle)
+        XCTAssertEqual(idleProgress.compactStatusText, "")
     }
 
     func testSimpleDownloadStateCombinesIOSDownloadedAndProgressState() throws {

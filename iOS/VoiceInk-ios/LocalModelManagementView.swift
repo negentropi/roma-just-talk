@@ -94,7 +94,7 @@ struct ModelRowView: View {
             if downloadState.progress.isActive {
                 VStack(alignment: .leading, spacing: 6) {
                     HStack {
-                        Text("Downloading...")
+                        Text(downloadState.progress.compactStatusText)
                             .font(.caption)
                             .foregroundColor(.blue)
                         Spacer()

@@ -639,6 +639,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
 
 require_pattern \
+  "shared Whisper compact download status text lives in VoiceInkCore" \
+  'compactStatusText' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+
+require_pattern \
   "macOS Whisper downloads use shared progress keys" \
   'VoiceInkWhisperModelDownloadProgress\.(mainProgressKey|coreMLProgressKey)' \
   VoiceInk/Transcription/Whisper/WhisperModelManager.swift
@@ -661,6 +666,11 @@ require_pattern \
 require_pattern \
   "iOS local model management uses shared download prompt copy" \
   'VoiceInkWhisperModelDownloadProgress\.downloadConfirmationMessage' \
+  iOS/VoiceInk-ios/LocalModelManagementView.swift
+
+require_pattern \
+  "iOS local model management uses shared compact download status text" \
+  '\.progress\.compactStatusText' \
   iOS/VoiceInk-ios/LocalModelManagementView.swift
 
 require_pattern \
@@ -693,6 +703,11 @@ require_pattern \
   'VoiceInkWhisperModelDownloadProgress\.(downloadConfirmationMessage|downloadActionTitle)' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
+require_pattern \
+  "iOS onboarding uses shared compact download status text" \
+  '\.progress\.compactStatusText' \
+  iOS/VoiceInk-ios/OnboardingView.swift
+
 reject_pattern \
   "iOS model download views avoid shell-only downloaded/progress state assembly" \
   'model\.isDownloaded\(in:|modelManager\.isDownloading\[[^]]+\] == true|modelManager\.downloadProgress\[[^]]+\]' \
@@ -710,6 +725,12 @@ reject_pattern \
 reject_pattern \
   "iOS model download views avoid duplicate prompt copy" \
   'To enable offline transcription, a .* model needs to be downloaded|Download Model \(' \
+  iOS/VoiceInk-ios/LocalModelManagementView.swift \
+  iOS/VoiceInk-ios/OnboardingView.swift
+
+reject_pattern \
+  "iOS model download views avoid duplicate compact status copy" \
+  'Downloading\.\.\.' \
   iOS/VoiceInk-ios/LocalModelManagementView.swift \
   iOS/VoiceInk-ios/OnboardingView.swift
 

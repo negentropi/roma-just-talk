@@ -116,9 +116,15 @@ public struct VoiceInkWhisperModelDownloadProgress: Equatable, Sendable {
         "\(Int(fraction * 100))%"
     }
 
+    public var compactStatusText: String {
+        isActive ? Self.compactDownloadingStatusText : ""
+    }
+
     public var phaseText: String {
         phase.displayText
     }
+
+    public static let compactDownloadingStatusText = "Downloading..."
 
     public static func simple(
         modelName: String,

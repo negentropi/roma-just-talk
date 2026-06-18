@@ -5,6 +5,8 @@ public struct VoiceInkTranscriptionRunResult: Equatable, Sendable {
     public let finalText: String
     public let transcriptionModelName: String
     public let aiEnhancementModelName: String?
+    public let transcriptionDuration: TimeInterval?
+    public let enhancementDuration: TimeInterval?
     public let postProcessingError: String?
     public let postProcessingSucceeded: Bool
 
@@ -17,6 +19,8 @@ public struct VoiceInkTranscriptionRunResult: Equatable, Sendable {
         finalText: String,
         transcriptionModelName: String,
         aiEnhancementModelName: String?,
+        transcriptionDuration: TimeInterval? = nil,
+        enhancementDuration: TimeInterval? = nil,
         postProcessingError: String?,
         postProcessingSucceeded: Bool
     ) {
@@ -24,6 +28,8 @@ public struct VoiceInkTranscriptionRunResult: Equatable, Sendable {
         self.finalText = finalText
         self.transcriptionModelName = transcriptionModelName
         self.aiEnhancementModelName = aiEnhancementModelName
+        self.transcriptionDuration = transcriptionDuration
+        self.enhancementDuration = enhancementDuration
         self.postProcessingError = postProcessingError
         self.postProcessingSucceeded = postProcessingSucceeded
     }
@@ -71,12 +77,23 @@ public struct VoiceInkTranscriptionRunProcessor {
     public typealias PostProcessor = (VoiceInkPostProcessingJob) async throws -> String
 
     private let postProcessor: PostProcessor
+    private let currentDate: () -> Date
 
     public init(postProcessor: @escaping PostProcessor) {
+        self.currentDate = Date.init
         self.postProcessor = postProcessor
     }
 
-    public init(postProcessingClient: VoiceInkPostProcessingClient = VoiceInkPostProcessingClient()) {
+    public init(currentDate: @escaping () -> Date, postProcessor: @escaping PostProcessor) {
+        self.currentDate = currentDate
+        self.postProcessor = postProcessor
+    }
+
+    public init(
+        postProcessingClient: VoiceInkPostProcessingClient = VoiceInkPostProcessingClient(),
+        currentDate: @escaping () -> Date = Date.init
+    ) {
+        self.currentDate = currentDate
         self.postProcessor = { job in
             try await postProcessingClient.postProcessTranscript(
                 provider: job.provider,
@@ -108,6 +125,7 @@ public struct VoiceInkTranscriptionRunProcessor {
         }
 
         let transcriptionService = transcriptionServiceProvider(provider)
+        let transcriptionStart = currentDate()
         let rawText = try await transcriptionService.transcribeAudioFile(
             apiKey: usableAPIKey,
             model: model,
@@ -115,6 +133,7 @@ public struct VoiceInkTranscriptionRunProcessor {
             language: VoiceInkTranscriptionLanguageSupport.requestLanguage(transcriptionLanguage),
             prompt: transcriptionPrompt
         )
+        let transcriptionDuration = currentDate().timeIntervalSince(transcriptionStart)
 
         guard provider.transcriptionEmptyTextPolicy.accepts(rawText) else {
             throw VoiceInkTranscriptionRunError.noTranscriptionReturned
@@ -143,6 +162,7 @@ public struct VoiceInkTranscriptionRunProcessor {
             : nil
 
         var finalText = cleanedText
+        var enhancementDuration: TimeInterval? = nil
         var postProcessingError: String? = nil
         var postProcessingSucceeded = false
 
@@ -155,6 +175,7 @@ public struct VoiceInkTranscriptionRunProcessor {
 
                 if let usableLLMKey = VoiceInkProviderCredential.nonBlank(llmKey) {
                     do {
+                        let enhancementStart = currentDate()
                         finalText = try await postProcessor(VoiceInkPostProcessingJob(
                             provider: llmProvider,
                             apiKey: usableLLMKey,
@@ -162,6 +183,7 @@ public struct VoiceInkTranscriptionRunProcessor {
                             prompt: prompt,
                             transcript: cleanedText
                         ))
+                        enhancementDuration = currentDate().timeIntervalSince(enhancementStart)
                         postProcessingSucceeded = true
                     } catch {
                         postProcessingError = VoiceInkPostProcessingFailurePresentation.postProcessingFailureText(
@@ -178,6 +200,8 @@ public struct VoiceInkTranscriptionRunProcessor {
             finalText: finalText,
             transcriptionModelName: model,
             aiEnhancementModelName: aiEnhancementModelName,
+            transcriptionDuration: transcriptionDuration,
+            enhancementDuration: enhancementDuration,
             postProcessingError: postProcessingError,
             postProcessingSucceeded: postProcessingSucceeded
         )

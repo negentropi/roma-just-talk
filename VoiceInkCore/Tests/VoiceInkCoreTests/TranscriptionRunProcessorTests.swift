@@ -201,6 +201,26 @@ final class TranscriptionRunProcessorTests: XCTestCase {
         XCTAssertTrue(result.postProcessingSucceeded)
     }
 
+    func testTranscribeRecordsTranscriptionAndEnhancementDurations() async throws {
+        let dateSource = SteppingDateSource(offsets: [0, 2, 5, 8])
+        let processor = VoiceInkTranscriptionRunProcessor(currentDate: dateSource.now) { _ in
+            "enhanced text"
+        }
+
+        let result = try await processor.transcribe(
+            fileURL: URL(fileURLWithPath: "/tmp/audio.wav"),
+            configuration: configuration(isPostProcessingEnabled: true),
+            apiKeyProvider: { provider in provider == .gemini ? "llm-key" : "stt-key" },
+            transcriptionServiceProvider: { _ in
+                StubTranscriptionService(text: "raw text")
+            }
+        )
+
+        XCTAssertEqual(result.transcriptionDuration, 2)
+        XCTAssertEqual(result.enhancementDuration, 3)
+        XCTAssertTrue(result.postProcessingSucceeded)
+    }
+
     func testTranscribeSkipsPostProcessingForShortTranscriptWhenPolicyEnabled() async throws {
         let processor = VoiceInkTranscriptionRunProcessor { _ in
             XCTFail("Post-processing should not run")
@@ -432,6 +452,21 @@ private struct StubTranscriptionService: VoiceInkAudioTranscriptionService {
         text
     }
 
+}
+
+private final class SteppingDateSource {
+    private let baseDate = Date(timeIntervalSince1970: 1_000)
+    private let offsets: [TimeInterval]
+    private var index = 0
+
+    init(offsets: [TimeInterval]) {
+        self.offsets = offsets
+    }
+
+    func now() -> Date {
+        defer { index += 1 }
+        return baseDate.addingTimeInterval(offsets[min(index, offsets.count - 1)])
+    }
 }
 
 private final class CapturingTranscriptionService: VoiceInkAudioTranscriptionService {

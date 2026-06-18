@@ -1,8 +1,12 @@
+import Foundation
+
 public protocol VoiceInkMutableTranscriptionRecord: AnyObject {
     var text: String { get set }
     var enhancedText: String? { get set }
     var transcriptionModelName: String? { get set }
     var aiEnhancementModelName: String? { get set }
+    var transcriptionDuration: TimeInterval? { get set }
+    var enhancementDuration: TimeInterval? { get set }
     var transcriptionStatus: VoiceInkTranscriptionStatus { get set }
     var transcriptionError: String? { get set }
 }
@@ -13,6 +17,8 @@ public extension VoiceInkMutableTranscriptionRecord {
         enhancedText = result.enhancedText
         transcriptionModelName = result.transcriptionModelName
         aiEnhancementModelName = result.aiEnhancementModelName
+        transcriptionDuration = result.transcriptionDuration
+        enhancementDuration = result.enhancementDuration
         transcriptionStatus = .completed
         transcriptionError = result.postProcessingError
     }

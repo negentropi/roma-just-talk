@@ -88,6 +88,9 @@ git_root="$(git rev-parse --show-toplevel)"
 [[ ! -d ../Tests/VoiceInkCoreTests ]] || fail "parent-level ../Tests/VoiceInkCoreTests exists; shared core tests must live inside VoiceInk/"
 
 section "iOS ported assets and resources"
+require_file iOS/Shared/AppGroupCoordinator.swift
+require_file iOS/Shared/VoiceInkAppDeepLink.swift
+require_file iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
 require_file iOS/VoiceInk-ios/PrivacyInfo.xcprivacy
 require_file iOS/VoiceInk-ios/Resources/ggml-silero-v5.1.2.bin
 require_file iOS/VoiceInk-ios/Assets.xcassets/AppIcon.appiconset/Contents.json

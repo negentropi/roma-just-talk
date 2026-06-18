@@ -276,8 +276,9 @@ scripts/verify-ios-single-repo-migration.sh --full-build
 6. iOS app, keyboard, unit-test, and UI-test Swift sources parse or build.
 7. `plutil -lint` passes for both project files and iOS plists/entitlements.
 8. `xmllint --noout` passes for workspace and shared scheme XML.
-9. iOS non-Swift app artifacts are present: privacy manifest, app icon catalog files, and bundled Silero VAD resource.
-10. Obsolete clone-side Swift duplicates remain absent from `iOS/VoiceInk-ios/`.
-11. A real Xcode toolchain is selected and both app targets build.
+9. iOS shared shell files are present under `iOS/Shared/`: `AppGroupCoordinator.swift`, `VoiceInkAppDeepLink.swift`, and `VoiceInkAppGroupRecordingBridge.swift`.
+10. iOS non-Swift app artifacts are present: privacy manifest, app icon catalog files, and bundled Silero VAD resource.
+11. Obsolete clone-side Swift duplicates remain absent from `iOS/VoiceInk-ios/`.
+12. A real Xcode toolchain is selected and both app targets build.
 
 Current local blocker: `xcode-select -p` points to `/Library/Developer/CommandLineTools`, and the previously used external Xcode volume is not mounted. Full target builds are still environment-blocked until a real Xcode is selected; macOS `VoiceInk` also needs `/Users/atalphalnmomhappyhouse/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework`, and iOS `VoiceInk-ios` needs the iOS 26.2 platform installed. Until those are present, use `swift run VoiceInkCoreChecks` plus the static parse/lint gates above for local proof.

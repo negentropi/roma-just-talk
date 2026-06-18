@@ -929,55 +929,28 @@ final class CoreAudioRecorder: @unchecked Sendable {
         guard let inputData = inputBuffer.mBuffers.mData else { return }
         let inputSamples = inputData.assumingMemoryBound(to: Float32.self)
 
-        // Calculate output frame count after sample rate conversion
-        let ratio = outputSampleRate / inputSampleRate
-        let outputFrameCount = UInt32(Double(frameCount) * ratio)
+        let outputSampleCount = VoiceInkPCM16Audio.convertedMonoPCM16SampleCount(
+            frameCount: Int(frameCount),
+            inputSampleRate: inputSampleRate,
+            outputSampleRate: outputSampleRate
+        )
 
-        guard outputFrameCount > 0,
+        guard outputSampleCount > 0,
               let outputBuffer = conversionBuffer,
-              outputFrameCount <= conversionBufferSize else { return }
+              outputSampleCount <= conversionBufferSize else { return }
 
-        // Convert Float32 multi-channel → Int16 mono (with sample rate conversion if needed)
-        if inputSampleRate == outputSampleRate {
-            // Direct conversion, just format change and channel mixing
-            for i in 0..<Int(frameCount) {
-                var sample: Float32 = 0
-                // Mix all channels to mono
-                for ch in 0..<Int(inputChannels) {
-                    sample += inputSamples[i * Int(inputChannels) + ch]
-                }
-                sample /= Float32(inputChannels)
+        let writtenSampleCount = VoiceInkPCM16Audio.writeMonoPCM16Samples(
+            fromInterleavedFloat32Samples: inputSamples,
+            frameCount: Int(frameCount),
+            channelCount: Int(inputChannels),
+            inputSampleRate: inputSampleRate,
+            outputSampleRate: outputSampleRate,
+            to: outputBuffer,
+            outputCapacity: conversionBufferSize
+        )
+        guard writtenSampleCount > 0 else { return }
 
-                // Convert to Int16 with clipping
-                let scaled = sample * 32767.0
-                let clipped = max(-32768.0, min(32767.0, scaled))
-                outputBuffer[i] = Int16(clipped)
-            }
-        } else {
-            // Sample rate conversion needed - use linear interpolation
-            for i in 0..<Int(outputFrameCount) {
-                let inputIndex = Double(i) / ratio
-                let inputIndexInt = Int(inputIndex)
-                let frac = Float32(inputIndex - Double(inputIndexInt))
-
-                var sample: Float32 = 0
-                let idx1 = min(inputIndexInt, Int(frameCount) - 1)
-                let idx2 = min(inputIndexInt + 1, Int(frameCount) - 1)
-
-                // Mix channels and interpolate
-                for ch in 0..<Int(inputChannels) {
-                    let s1 = inputSamples[idx1 * Int(inputChannels) + ch]
-                    let s2 = inputSamples[idx2 * Int(inputChannels) + ch]
-                    sample += s1 + frac * (s2 - s1)
-                }
-                sample /= Float32(inputChannels)
-
-                // Convert to Int16
-                let scaled = sample * 32767.0
-                let clipped = max(-32768.0, min(32767.0, scaled))
-                outputBuffer[i] = Int16(clipped)
-            }
-        }
+        let outputFrameCount = UInt32(writtenSampleCount)
 
         // Write to file
         var outputBufferList = AudioBufferList(

@@ -98,6 +98,80 @@ final class PCM16AudioSamplesTests: XCTestCase {
         XCTAssertEqual(VoiceInkPCM16Audio.pcm16Samples(fromFloatSamples: []), [])
     }
 
+    func testConvertedMonoPCM16SampleCountUsesExistingTruncatedResamplePolicy() {
+        XCTAssertEqual(
+            VoiceInkPCM16Audio.convertedMonoPCM16SampleCount(
+                frameCount: 3,
+                inputSampleRate: 48_000,
+                outputSampleRate: 16_000
+            ),
+            1
+        )
+        XCTAssertEqual(
+            VoiceInkPCM16Audio.convertedMonoPCM16SampleCount(
+                frameCount: 3,
+                inputSampleRate: 16_000,
+                outputSampleRate: 16_000
+            ),
+            3
+        )
+        XCTAssertEqual(
+            VoiceInkPCM16Audio.convertedMonoPCM16SampleCount(
+                frameCount: 3,
+                inputSampleRate: 0,
+                outputSampleRate: 16_000
+            ),
+            0
+        )
+    }
+
+    func testWriteMonoPCM16SamplesAveragesInterleavedChannelsWithoutResampling() {
+        let result = writeMonoPCM16Samples(
+            input: [
+                0.5, -0.5,
+                1.0, 1.0,
+                -2.0, -2.0
+            ],
+            frameCount: 3,
+            channelCount: 2,
+            inputSampleRate: 16_000,
+            outputSampleRate: 16_000,
+            outputCapacity: 3
+        )
+
+        XCTAssertEqual(result.written, 3)
+        XCTAssertEqual(result.output, [0, 32_767, -32_768])
+    }
+
+    func testWriteMonoPCM16SamplesLinearlyResamplesInterleavedChannels() {
+        let result = writeMonoPCM16Samples(
+            input: [0.0, 1.0, 0.0],
+            frameCount: 3,
+            channelCount: 1,
+            inputSampleRate: 2,
+            outputSampleRate: 4,
+            outputCapacity: 6
+        )
+
+        XCTAssertEqual(result.written, 6)
+        XCTAssertEqual(result.output, [0, 16_383, 32_767, 16_383, 0, 0])
+    }
+
+    func testWriteMonoPCM16SamplesRejectsInsufficientCapacityAndInvalidInput() {
+        let result = writeMonoPCM16Samples(
+            input: [0.0, 1.0, 0.0],
+            frameCount: 3,
+            channelCount: 1,
+            inputSampleRate: 2,
+            outputSampleRate: 4,
+            outputCapacity: 2,
+            fillValue: 123
+        )
+
+        XCTAssertEqual(result.written, 0)
+        XCTAssertEqual(result.output, [123, 123])
+    }
+
     func testDurationAndByteCountUseMono16kPCM16Format() {
         XCTAssertEqual(VoiceInkPCM16Audio.mono16kSampleRateHz, 16_000)
         XCTAssertEqual(VoiceInkPCM16Audio.mono16kSampleRate, 16_000.0)
@@ -121,5 +195,31 @@ final class PCM16AudioSamplesTests: XCTestCase {
             data.append(UInt8(truncatingIfNeeded: littleEndian >> 8))
         }
         return data
+    }
+
+    private func writeMonoPCM16Samples(
+        input: [Float32],
+        frameCount: Int,
+        channelCount: Int,
+        inputSampleRate: Double,
+        outputSampleRate: Double,
+        outputCapacity: Int,
+        fillValue: Int16 = 0
+    ) -> (written: Int, output: [Int16]) {
+        var output = Array(repeating: fillValue, count: outputCapacity)
+        let written = input.withUnsafeBufferPointer { inputBuffer in
+            output.withUnsafeMutableBufferPointer { outputBuffer in
+                VoiceInkPCM16Audio.writeMonoPCM16Samples(
+                    fromInterleavedFloat32Samples: inputBuffer.baseAddress!,
+                    frameCount: frameCount,
+                    channelCount: channelCount,
+                    inputSampleRate: inputSampleRate,
+                    outputSampleRate: outputSampleRate,
+                    to: outputBuffer.baseAddress!,
+                    outputCapacity: outputBuffer.count
+                )
+            }
+        }
+        return (written, output)
     }
 }

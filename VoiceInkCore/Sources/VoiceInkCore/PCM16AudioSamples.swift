@@ -76,6 +76,73 @@ public enum VoiceInkPCM16Audio {
         }
     }
 
+    public static func convertedMonoPCM16SampleCount(
+        frameCount: Int,
+        inputSampleRate: Double,
+        outputSampleRate: Double = mono16kSampleRate
+    ) -> Int {
+        guard frameCount > 0, inputSampleRate > 0, outputSampleRate > 0 else { return 0 }
+        let ratio = outputSampleRate / inputSampleRate
+        guard ratio.isFinite, ratio > 0 else { return 0 }
+        return Int(Double(frameCount) * ratio)
+    }
+
+    /// `inputSamples` must contain at least `frameCount * channelCount` interleaved samples.
+    public static func writeMonoPCM16Samples(
+        fromInterleavedFloat32Samples inputSamples: UnsafePointer<Float32>,
+        frameCount: Int,
+        channelCount: Int,
+        inputSampleRate: Double,
+        outputSampleRate: Double = mono16kSampleRate,
+        to outputSamples: UnsafeMutablePointer<Int16>,
+        outputCapacity: Int
+    ) -> Int {
+        guard frameCount > 0, channelCount > 0, inputSampleRate > 0, outputSampleRate > 0 else {
+            return 0
+        }
+
+        let ratio = outputSampleRate / inputSampleRate
+        guard ratio.isFinite, ratio > 0 else { return 0 }
+
+        let outputFrameCount = convertedMonoPCM16SampleCount(
+            frameCount: frameCount,
+            inputSampleRate: inputSampleRate,
+            outputSampleRate: outputSampleRate
+        )
+        guard outputFrameCount > 0, outputFrameCount <= outputCapacity else { return 0 }
+
+        if inputSampleRate == outputSampleRate {
+            for frame in 0..<frameCount {
+                let sample = averagedInterleavedSample(
+                    inputSamples,
+                    frame: frame,
+                    channelCount: channelCount
+                )
+                outputSamples[frame] = pcm16SampleFromScaledFloat(sample)
+            }
+        } else {
+            for outputFrame in 0..<outputFrameCount {
+                let inputIndex = Double(outputFrame) / ratio
+                let inputIndexInt = Int(inputIndex)
+                let fraction = Float32(inputIndex - Double(inputIndexInt))
+                let firstFrame = min(inputIndexInt, frameCount - 1)
+                let secondFrame = min(inputIndexInt + 1, frameCount - 1)
+                var sample: Float32 = 0
+
+                for channel in 0..<channelCount {
+                    let firstSample = inputSamples[firstFrame * channelCount + channel]
+                    let secondSample = inputSamples[secondFrame * channelCount + channel]
+                    sample += firstSample + fraction * (secondSample - firstSample)
+                }
+                sample /= Float32(channelCount)
+
+                outputSamples[outputFrame] = pcm16SampleFromScaledFloat(sample)
+            }
+        }
+
+        return outputFrameCount
+    }
+
     public static func sampleCount(inData data: Data) -> Int {
         data.count / bytesPerSample
     }
@@ -90,5 +157,23 @@ public enum VoiceInkPCM16Audio {
 
     public static func duration(forMono16kData data: Data) -> TimeInterval {
         TimeInterval(sampleCount(inData: data)) / Double(mono16kSampleRateHz)
+    }
+
+    private static func averagedInterleavedSample(
+        _ inputSamples: UnsafePointer<Float32>,
+        frame: Int,
+        channelCount: Int
+    ) -> Float32 {
+        var sample: Float32 = 0
+        for channel in 0..<channelCount {
+            sample += inputSamples[frame * channelCount + channel]
+        }
+        return sample / Float32(channelCount)
+    }
+
+    private static func pcm16SampleFromScaledFloat(_ sample: Float32) -> Int16 {
+        let scaled = sample * 32767.0
+        let clipped = max(-32768.0, min(32767.0, scaled))
+        return Int16(clipped)
     }
 }

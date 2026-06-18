@@ -97,7 +97,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - Whisper and VAD model file metadata, including platform-base Whisper model directory creation, downloaded local-model file records, runtime model-name to downloaded-file resolution, model/sidecar file construction, downloaded-state detection, bootstrap-model availability, Core ML support policy, final `.bin` install/replacement, and model/sidecar deletion
 - local Whisper runtime defaults and runtime configuration for request-language normalization, prompt, thread count, transcription temperature, VAD enablement, VAD model path eligibility, and VAD thresholds
 - VAD bundle resource lookup
-- PCM16 sample conversion, mono 16 kHz transcription-audio format constants, normalized mono sample mixing for Whisper input, and float-to-PCM16 output sample conversion, including bit depth, endian, and integer/float sample policy
+- PCM16 sample conversion, mono 16 kHz transcription-audio format constants, normalized mono sample mixing for Whisper input, float-to-PCM16 output sample conversion, and interleaved Float32 live-capture conversion to mono PCM16 with optional linear resampling, including bit depth, endian, and integer/float sample policy
 - audio-meter decibel normalization and smoothing math; platform shells still own capture, timers, and visualizer rendering
 - OpenAI-compatible, Deepgram, Gemini, Mistral, ElevenLabs, xAI, Soniox, Speechmatics, and AssemblyAI remote transcription request/client helpers
 - shared remote transcription provider dispatch plus batch request option defaults for provider-specific prompt, vocabulary, timeout, retry, and formatting parameters
@@ -118,6 +118,7 @@ Current macOS consumers of shared remote transport:
 - macOS local Whisper reads `VoiceInkWhisperRuntimeConfiguration` to assemble language, prompt, thread count, temperature, and VAD settings before adapting them into whisper.cpp; FluidAudio VAD gating still reads `VoiceInkVADPreference`, preserving the existing `IsVADEnabled` storage key while sharing the default and lookup policy with iOS.
 - macOS `WhisperPrompt` loads/saves custom local-Whisper language prompts through `VoiceInkLocalWhisperPromptCatalog`; macOS and iOS local Whisper fallback prompts now read stored custom prompts through the shared catalog.
 - macOS `AudioProcessor` delegates AVAudioFile channel averaging and normalization for Whisper samples plus float-to-PCM16 WAV sample conversion to `VoiceInkPCM16Audio`; macOS still owns AVAudioFile reading, sample-rate conversion, and WAV writing.
+- macOS `CoreAudioRecorder` delegates interleaved Float32 device-sample mixing, optional linear resampling, and PCM16 clipping to `VoiceInkPCM16Audio`; macOS still owns CoreAudio buffers, pre-roll buffering, file writes, and live chunk delivery.
 - macOS batch cloud and streaming transcription use `VoiceInkProviderCredential` for runtime API-key presence checks before entering provider adapters.
 - macOS API-key lookup reads fallback environment-variable names from `VoiceInkProviderAPIKeyAccount`; Keychain access remains in the macOS shell.
 - macOS cloud-provider model lists are supplied by the `CloudProvider` default adapter over `VoiceInkTranscriptionModelCatalog`, so provider modules only own transport and streaming differences.

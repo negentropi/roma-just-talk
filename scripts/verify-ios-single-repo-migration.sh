@@ -178,7 +178,7 @@ fi
 
 reject_pattern \
   "VoiceInkCore stays platform-neutral" \
-  '^import (AppKit|UIKit|SwiftUI|SwiftData|AVFoundation|CoreAudio|AudioToolbox|ApplicationServices|Carbon|IOKit|FluidAudio|KeyboardKit|LLMKit|LLMkit|WhisperKit)$' \
+  '^import (AppKit|UIKit|SwiftUI|SwiftData|AVFoundation|CoreAudio|AudioToolbox|ApplicationServices|Carbon|IOKit|FluidAudio|KeyboardKit|LLMKit|LLMkit|WhisperKit|whisper)$' \
   VoiceInkCore/Sources/VoiceInkCore \
   VoiceInkCore/Tests/VoiceInkCoreTests
 

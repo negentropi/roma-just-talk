@@ -389,6 +389,32 @@ require_pattern \
   'settings\.availableProviders\(for: \.postProcessing\)' \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
+reject_pattern \
+  "macOS model cards use shared per-model preload preference API" \
+  'perModelPreloadEnabledKey|UserDefaults\.standard\.object\(forKey: preload|UserDefaults\.standard\.set\([^)]*forKey: preload' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift \
+  VoiceInk/Views/AI\ Models/FluidAudioModelCardView.swift
+
+require_pattern \
+  "macOS cloud model card reads shared per-model preload preference" \
+  'VoiceInkRollingBufferPreloadSettings\.perModelPreloadEnabled\(forModelName: model\.name\)' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift
+
+require_pattern \
+  "macOS cloud model card saves shared per-model preload preference" \
+  'VoiceInkRollingBufferPreloadSettings\.savePerModelPreloadEnabled\(newValue, forModelName: model\.name\)' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift
+
+require_pattern \
+  "macOS FluidAudio model card reads shared per-model preload preference" \
+  'VoiceInkRollingBufferPreloadSettings\.perModelPreloadEnabled\(forModelName: model\.name\)' \
+  VoiceInk/Views/AI\ Models/FluidAudioModelCardView.swift
+
+require_pattern \
+  "macOS FluidAudio model card saves shared per-model preload preference" \
+  'VoiceInkRollingBufferPreloadSettings\.savePerModelPreloadEnabled\(newValue, forModelName: model\.name\)' \
+  VoiceInk/Views/AI\ Models/FluidAudioModelCardView.swift
+
 require_pattern \
   "iOS app launch registers shared default values" \
   'VoiceInkDefaultSettings\.iOS\.registerUserDefaults\(\)' \

@@ -21,8 +21,7 @@ struct CloudModelCardView: View {
         self.isCurrent = isCurrent
         self.setDefaultAction = setDefaultAction
         _streamingEnabled = State(initialValue: VoiceInkTranscriptionStreamingPreference.isEnabled(forModelName: model.name))
-        let preloadKey = VoiceInkRollingBufferPreloadSettings.perModelPreloadEnabledKey(forModelName: model.name)
-        _preloadEnabled = State(initialValue: UserDefaults.standard.object(forKey: preloadKey) as? Bool ?? true)
+        _preloadEnabled = State(initialValue: VoiceInkRollingBufferPreloadSettings.perModelPreloadEnabled(forModelName: model.name))
     }
     @State private var isVerifying = false
     @State private var verificationStatus: VerificationStatus = .none
@@ -111,7 +110,7 @@ struct CloudModelCardView: View {
                 .font(.system(size: 11, weight: .medium))
                 .foregroundColor(Color(.secondaryLabelColor))
                 .onChange(of: preloadEnabled) { _, newValue in
-                    UserDefaults.standard.set(newValue, forKey: preloadDefaultsKey)
+                    VoiceInkRollingBufferPreloadSettings.savePerModelPreloadEnabled(newValue, forModelName: model.name)
                     NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
                 }
                 .help(preloadEnabled ? "Rolling buffer can pre-run this model when global policy allows it" : "Rolling buffer preload disabled for this model")
@@ -285,10 +284,6 @@ struct CloudModelCardView: View {
         }
     }
     
-    private var preloadDefaultsKey: String {
-        VoiceInkRollingBufferPreloadSettings.perModelPreloadEnabledKey(forModelName: model.name)
-    }
-
     private func loadSavedAPIKey() {
         if let savedKey = APIKeyManager.shared.getStoredAPIKey(forProvider: model.provider.apiKeyProviderName) {
             apiKey = savedKey

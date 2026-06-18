@@ -17,6 +17,7 @@ final class RollingBufferPreloadPolicyTests: XCTestCase {
         XCTAssertEqual(VoiceInkRollingBufferPreloadSettings.defaultLowBatteryThresholdPercent, 40)
         XCTAssertEqual(VoiceInkRollingBufferPreloadSettings.defaultBufferDurationSeconds, 3.0)
         XCTAssertTrue(VoiceInkRollingBufferPreloadSettings.defaultPreRunFinalization)
+        XCTAssertTrue(VoiceInkRollingBufferPreloadSettings.defaultPerModelPreloadEnabled)
     }
 
     func testConfigurationReadsAndClampsStoredValues() {
@@ -46,9 +47,24 @@ final class RollingBufferPreloadPolicyTests: XCTestCase {
                 in: defaults
             ))
 
-            defaults.set(false, forKey: VoiceInkRollingBufferPreloadSettings.perModelPreloadEnabledKey(forModelName: "parakeet"))
+            VoiceInkRollingBufferPreloadSettings.savePerModelPreloadEnabled(
+                false,
+                forModelName: "parakeet",
+                in: defaults
+            )
 
             XCTAssertFalse(VoiceInkRollingBufferPreloadSettings.perModelPreloadEnabled(
+                forModelName: "parakeet",
+                in: defaults
+            ))
+
+            VoiceInkRollingBufferPreloadSettings.savePerModelPreloadEnabled(
+                true,
+                forModelName: "parakeet",
+                in: defaults
+            )
+
+            XCTAssertTrue(VoiceInkRollingBufferPreloadSettings.perModelPreloadEnabled(
                 forModelName: "parakeet",
                 in: defaults
             ))

@@ -15,12 +15,7 @@ struct FluidAudioModelCardView: View {
         _fluidAudioModelManager = ObservedObject(wrappedValue: fluidAudioModelManager)
         _transcriptionModelManager = ObservedObject(wrappedValue: transcriptionModelManager)
         _streamingEnabled = State(initialValue: VoiceInkTranscriptionStreamingPreference.isEnabled(forModelName: model.name))
-        let preloadKey = VoiceInkRollingBufferPreloadSettings.perModelPreloadEnabledKey(forModelName: model.name)
-        _preloadEnabled = State(initialValue: UserDefaults.standard.object(forKey: preloadKey) as? Bool ?? true)
-    }
-
-    private var preloadDefaultsKey: String {
-        VoiceInkRollingBufferPreloadSettings.perModelPreloadEnabledKey(forModelName: model.name)
+        _preloadEnabled = State(initialValue: VoiceInkRollingBufferPreloadSettings.perModelPreloadEnabled(forModelName: model.name))
     }
 
     var isCurrent: Bool {
@@ -74,7 +69,7 @@ struct FluidAudioModelCardView: View {
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(Color(.secondaryLabelColor))
                     .onChange(of: preloadEnabled) { _, newValue in
-                        UserDefaults.standard.set(newValue, forKey: preloadDefaultsKey)
+                        VoiceInkRollingBufferPreloadSettings.savePerModelPreloadEnabled(newValue, forModelName: model.name)
                         NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
                     }
                     .help(preloadEnabled ? "Rolling buffer can pre-run this model" : "Rolling buffer preload disabled for this model")

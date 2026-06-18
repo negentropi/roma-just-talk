@@ -86,6 +86,7 @@ public enum VoiceInkRollingBufferPreloadSettings {
     public static let defaultLowBatteryThresholdPercent = 40
     public static let defaultBufferDurationSeconds = 3.0
     public static let defaultPreRunFinalization = true
+    public static let defaultPerModelPreloadEnabled = true
 
     public static func configuration(in defaults: UserDefaults = .standard) -> VoiceInkRollingBufferPreloadConfiguration {
         let mode = defaults.string(forKey: modeKey)
@@ -116,7 +117,15 @@ public enum VoiceInkRollingBufferPreloadSettings {
         forModelName modelName: String,
         in defaults: UserDefaults = .standard
     ) -> Bool {
-        defaults.object(forKey: perModelPreloadEnabledKey(forModelName: modelName)) as? Bool ?? true
+        defaults.object(forKey: perModelPreloadEnabledKey(forModelName: modelName)) as? Bool ?? defaultPerModelPreloadEnabled
+    }
+
+    public static func savePerModelPreloadEnabled(
+        _ enabled: Bool,
+        forModelName modelName: String,
+        in defaults: UserDefaults = .standard
+    ) {
+        defaults.set(enabled, forKey: perModelPreloadEnabledKey(forModelName: modelName))
     }
 
     public static func perModelPreloadEnabledKey(forModelName modelName: String) -> String {

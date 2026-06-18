@@ -103,8 +103,6 @@ struct WelcomeOnboardingView: View {
 struct ModelDownloadOnboardingView: View {
     @Binding var currentStep: Int
     @StateObject private var modelManager = LocalModelManager.shared
-    @State private var hasStartedDownload = false
-    @State private var showError = false
     @State private var showDownloadConfirmation = false
     
     var baseModel = VoiceInkWhisperModelFiles.baseModel
@@ -227,10 +225,14 @@ struct ModelDownloadOnboardingView: View {
             .padding(.bottom, 50)
         }
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
-        .alert("Download Error", isPresented: $showError) {
-            Button("OK") { showError = false }
-        } message: {
-            Text(modelManager.downloadError ?? "An unknown error occurred.")
+        .alert(item: $modelManager.downloadError) { alert in
+            Alert(
+                title: Text(alert.title),
+                message: Text(alert.message),
+                dismissButton: .default(Text(alert.primaryButtonTitle)) {
+                    modelManager.downloadError = nil
+                }
+            )
         }
         .alert("Download Model", isPresented: $showDownloadConfirmation) {
             Button("Download") {
@@ -240,16 +242,10 @@ struct ModelDownloadOnboardingView: View {
         } message: {
             Text(VoiceInkWhisperModelDownloadProgress.downloadConfirmationMessage(for: baseModel))
         }
-        .onChange(of: modelManager.downloadError) { error in
-            if error != nil {
-                showError = true
-            }
-        }
     }
     
     private func downloadModel() {
         Task {
-            hasStartedDownload = true
             await modelManager.downloadModel(baseModel)
         }
     }

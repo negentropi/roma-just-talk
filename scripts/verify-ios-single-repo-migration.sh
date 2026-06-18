@@ -634,6 +634,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
 
 require_pattern \
+  "shared Whisper model operation alert presentation lives in VoiceInkCore" \
+  'VoiceInkWhisperModelOperationAlertPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+
+require_pattern \
   "macOS Whisper downloads use shared progress keys" \
   'VoiceInkWhisperModelDownloadProgress\.(mainProgressKey|coreMLProgressKey)' \
   VoiceInk/Transcription/Whisper/WhisperModelManager.swift
@@ -657,6 +662,26 @@ require_pattern \
   "iOS local model management uses shared download prompt copy" \
   'VoiceInkWhisperModelDownloadProgress\.downloadConfirmationMessage' \
   iOS/VoiceInk-ios/LocalModelManagementView.swift
+
+require_pattern \
+  "iOS local model manager uses shared operation alert presentation" \
+  'VoiceInkWhisperModelOperationAlertPresentation|\.(downloadFailed|serverErrorDuringDownload|noFileReceived|saveFailed)' \
+  iOS/VoiceInk-ios/LocalModelManager.swift
+
+require_pattern \
+  "iOS local model deletion uses shared operation alert presentation" \
+  '\.deleteFailed' \
+  iOS/VoiceInk-ios/LocalModelManagementView.swift
+
+require_pattern \
+  "iOS local model views render shared operation alert presentation" \
+  'alert\(item: +\$modelManager\.downloadError' \
+  iOS/VoiceInk-ios/LocalModelManagementView.swift
+
+require_pattern \
+  "iOS onboarding renders shared operation alert presentation" \
+  'alert\(item: +\$modelManager\.downloadError' \
+  iOS/VoiceInk-ios/OnboardingView.swift
 
 require_pattern \
   "iOS onboarding uses shared download state" \
@@ -685,6 +710,13 @@ reject_pattern \
 reject_pattern \
   "iOS model download views avoid duplicate prompt copy" \
   'To enable offline transcription, a .* model needs to be downloaded|Download Model \(' \
+  iOS/VoiceInk-ios/LocalModelManagementView.swift \
+  iOS/VoiceInk-ios/OnboardingView.swift
+
+reject_pattern \
+  "iOS local model shell avoids duplicate operation alert copy" \
+  'Download Error|Download failed:|Server error during download|No file received|Failed to save model:|Failed to delete model:|An unknown error occurred\.' \
+  iOS/VoiceInk-ios/LocalModelManager.swift \
   iOS/VoiceInk-ios/LocalModelManagementView.swift \
   iOS/VoiceInk-ios/OnboardingView.swift
 

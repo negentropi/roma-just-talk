@@ -13,7 +13,7 @@ import VoiceInkCore
 class LocalModelManager: ObservableObject {
     @Published var downloadProgress: [String: Double] = [:]
     @Published var isDownloading: [String: Bool] = [:]
-    @Published var downloadError: String?
+    @Published var downloadError: VoiceInkWhisperModelOperationAlertPresentation?
     
     private var downloadTasks: [String: URLSessionDownloadTask] = [:]
     private var progressObservations: [String: NSKeyValueObservation] = [:]
@@ -82,20 +82,20 @@ class LocalModelManager: ObservableObject {
         }
         
         if let error = error {
-            downloadError = "Download failed: \(error.localizedDescription)"
+            downloadError = .downloadFailed(for: error)
             print("LocalModelManager: Download failed for \(model.modelName): \(error)")
             return
         }
         
         guard VoiceInkWhisperModelDownloadResponsePolicy.isSuccessfulResponse(response) else {
-            downloadError = "Server error during download"
+            downloadError = .serverErrorDuringDownload
             print("LocalModelManager: Server error for \(model.modelName)")
             return
         }
         
         guard let temporaryURL = temporaryURL else {
-            downloadError = "No file received"
-            print("LocalModelManager: No file received for \(model.modelName)")
+            downloadError = .noFileReceived
+            print("LocalModelManager: Missing downloaded file for \(model.modelName)")
             return
         }
         
@@ -110,7 +110,7 @@ class LocalModelManager: ObservableObject {
             downloadProgress[model.id] = 1.0
             
         } catch {
-            downloadError = "Failed to save model: \(error.localizedDescription)"
+            downloadError = .saveFailed(for: error)
             print("LocalModelManager: Failed to save \(model.modelName): \(error)")
         }
     }

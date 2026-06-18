@@ -373,6 +373,46 @@ final class WhisperModelFilesTests: XCTestCase {
         )
     }
 
+    func testModelOperationAlertPreservesIOSDownloadFailureCopy() {
+        let alert = VoiceInkWhisperModelOperationAlertPresentation.downloadFailed(
+            localizedDescription: "The request timed out."
+        )
+
+        XCTAssertEqual(alert.id, "downloadFailed-The request timed out.")
+        XCTAssertEqual(alert.title, "Download Error")
+        XCTAssertEqual(alert.message, "Download failed: The request timed out.")
+        XCTAssertEqual(alert.primaryButtonTitle, "OK")
+    }
+
+    func testModelOperationAlertPreservesIOSServerAndMissingFileCopy() {
+        XCTAssertEqual(
+            VoiceInkWhisperModelOperationAlertPresentation.serverErrorDuringDownload.message,
+            "Server error during download"
+        )
+        XCTAssertEqual(
+            VoiceInkWhisperModelOperationAlertPresentation.noFileReceived.message,
+            "No file received"
+        )
+        XCTAssertEqual(
+            VoiceInkWhisperModelOperationAlertPresentation.unknownDownloadFailure.message,
+            "An unknown error occurred."
+        )
+    }
+
+    func testModelOperationAlertPreservesIOSSaveAndDeleteFailureCopy() {
+        let saveAlert = VoiceInkWhisperModelOperationAlertPresentation.saveFailed(
+            localizedDescription: "Permission denied"
+        )
+        let deleteAlert = VoiceInkWhisperModelOperationAlertPresentation.deleteFailed(
+            localizedDescription: "File is locked"
+        )
+
+        XCTAssertEqual(saveAlert.title, "Download Error")
+        XCTAssertEqual(saveAlert.message, "Failed to save model: Permission denied")
+        XCTAssertEqual(deleteAlert.title, "Download Error")
+        XCTAssertEqual(deleteAlert.message, "Failed to delete model: File is locked")
+    }
+
     func testDownloadableModelsMatchMacOSLocalWhisperCatalog() {
         XCTAssertEqual(
             VoiceInkWhisperModelFiles.downloadableModels.map(\.modelName),

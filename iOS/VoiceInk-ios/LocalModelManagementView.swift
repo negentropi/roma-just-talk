@@ -24,14 +24,14 @@ struct LocalModelManagementView: View {
             // Refresh model status
             modelManager.objectWillChange.send()
         }
-        .alert("Download Error", isPresented: .constant(modelManager.downloadError != nil)) {
-            Button("OK") {
-                modelManager.downloadError = nil
-            }
-        } message: {
-            if let error = modelManager.downloadError {
-                Text(error)
-            }
+        .alert(item: $modelManager.downloadError) { alert in
+            Alert(
+                title: Text(alert.title),
+                message: Text(alert.message),
+                dismissButton: .default(Text(alert.primaryButtonTitle)) {
+                    modelManager.downloadError = nil
+                }
+            )
         }
     }
     
@@ -149,7 +149,7 @@ struct ModelRowView: View {
             }
         } catch {
             print("Delete failed: \(error)")
-            modelManager.downloadError = "Failed to delete model: \(error.localizedDescription)"
+            modelManager.downloadError = .deleteFailed(for: error)
         }
     }
 }

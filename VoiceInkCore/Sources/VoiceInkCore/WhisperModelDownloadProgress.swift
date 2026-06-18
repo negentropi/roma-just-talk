@@ -1,5 +1,84 @@
 import Foundation
 
+public struct VoiceInkWhisperModelOperationAlertPresentation: Equatable, Identifiable, Sendable {
+    public let id: String
+    public let title: String
+    public let message: String
+    public let primaryButtonTitle: String
+
+    public init(
+        id: String,
+        title: String = "Download Error",
+        message: String,
+        primaryButtonTitle: String = "OK"
+    ) {
+        self.id = id
+        self.title = title
+        self.message = message
+        self.primaryButtonTitle = primaryButtonTitle
+    }
+
+    public static var unknownDownloadFailure: VoiceInkWhisperModelOperationAlertPresentation {
+        VoiceInkWhisperModelOperationAlertPresentation(
+            id: "unknownDownloadFailure",
+            message: "An unknown error occurred."
+        )
+    }
+
+    public static func downloadFailed(
+        localizedDescription: String
+    ) -> VoiceInkWhisperModelOperationAlertPresentation {
+        VoiceInkWhisperModelOperationAlertPresentation(
+            id: "downloadFailed-\(localizedDescription)",
+            message: "Download failed: \(localizedDescription)"
+        )
+    }
+
+    public static func downloadFailed(for error: Error) -> VoiceInkWhisperModelOperationAlertPresentation {
+        downloadFailed(localizedDescription: error.localizedDescription)
+    }
+
+    public static var serverErrorDuringDownload: VoiceInkWhisperModelOperationAlertPresentation {
+        VoiceInkWhisperModelOperationAlertPresentation(
+            id: "serverErrorDuringDownload",
+            message: "Server error during download"
+        )
+    }
+
+    public static var noFileReceived: VoiceInkWhisperModelOperationAlertPresentation {
+        VoiceInkWhisperModelOperationAlertPresentation(
+            id: "noFileReceived",
+            message: "No file received"
+        )
+    }
+
+    public static func saveFailed(
+        localizedDescription: String
+    ) -> VoiceInkWhisperModelOperationAlertPresentation {
+        VoiceInkWhisperModelOperationAlertPresentation(
+            id: "saveFailed-\(localizedDescription)",
+            message: "Failed to save model: \(localizedDescription)"
+        )
+    }
+
+    public static func saveFailed(for error: Error) -> VoiceInkWhisperModelOperationAlertPresentation {
+        saveFailed(localizedDescription: error.localizedDescription)
+    }
+
+    public static func deleteFailed(
+        localizedDescription: String
+    ) -> VoiceInkWhisperModelOperationAlertPresentation {
+        VoiceInkWhisperModelOperationAlertPresentation(
+            id: "deleteFailed-\(localizedDescription)",
+            message: "Failed to delete model: \(localizedDescription)"
+        )
+    }
+
+    public static func deleteFailed(for error: Error) -> VoiceInkWhisperModelOperationAlertPresentation {
+        deleteFailed(localizedDescription: error.localizedDescription)
+    }
+}
+
 public enum VoiceInkWhisperModelDownloadPhase: Equatable, Sendable {
     case idle
     case downloadingMainModel(modelName: String)

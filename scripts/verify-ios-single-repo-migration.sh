@@ -68,6 +68,17 @@ require_pattern() {
   fi
 }
 
+reject_pattern() {
+  local description="$1"
+  local pattern="$2"
+  shift 2
+
+  section "$description"
+  if rg -n "$pattern" "$@"; then
+    fail "$description"
+  fi
+}
+
 require_command fd
 require_command rg
 require_command git
@@ -117,6 +128,12 @@ for file in \
   VADModelManager.swift; do
   reject_file "iOS/VoiceInk-ios/$file"
 done
+
+reject_pattern \
+  "VoiceInkCore stays platform-neutral" \
+  '^import (AppKit|UIKit|SwiftUI|SwiftData|AVFoundation|CoreAudio|AudioToolbox|ApplicationServices|Carbon|IOKit|FluidAudio|KeyboardKit|LLMKit|LLMkit|WhisperKit)$' \
+  VoiceInkCore/Sources/VoiceInkCore \
+  VoiceInkCore/Tests/VoiceInkCoreTests
 
 require_pattern \
   "workspace includes iOS project" \

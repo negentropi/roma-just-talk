@@ -244,11 +244,14 @@ class TranscriptionPipeline {
                     finalPastedText = enhancedText
                 } catch {
                     let errorDescription = VoiceInkErrorDescription.text(for: error)
-                    transcription.enhancedText = "Enhancement failed: \(errorDescription)"
-                    let shortReason = String(errorDescription.prefix(80))
+                    transcription.enhancedText = VoiceInkPostProcessingFailurePresentation.enhancementFailureText(
+                        reason: errorDescription
+                    )
                     await MainActor.run {
                         NotificationManager.shared.showNotification(
-                            title: "Enhancement failed: \(shortReason)",
+                            title: VoiceInkPostProcessingFailurePresentation.enhancementFailureNotificationTitle(
+                                reason: errorDescription
+                            ),
                             type: .warning
                         )
                     }

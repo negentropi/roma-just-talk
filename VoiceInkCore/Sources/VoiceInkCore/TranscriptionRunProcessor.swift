@@ -153,7 +153,9 @@ public struct VoiceInkTranscriptionRunProcessor {
                         ))
                         postProcessingSucceeded = true
                     } catch {
-                        postProcessingError = "Post-processing failed: \(VoiceInkErrorDescription.text(for: error))"
+                        postProcessingError = VoiceInkPostProcessingFailurePresentation.postProcessingFailureText(
+                            reason: VoiceInkErrorDescription.text(for: error)
+                        )
                         finalText = cleanedText
                     }
                 }

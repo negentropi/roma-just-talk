@@ -193,11 +193,14 @@ class AudioTranscriptionManager: ObservableObject {
                         powerModeEmoji: powerModeEmoji
                     )
                 } catch {
-                    logger.error("Enhancement failed: \(error.localizedDescription, privacy: .public)")
+                    let errorDescription = error.localizedDescription
+                    logger.error("Enhancement failed: \(errorDescription, privacy: .public)")
                     transcription = Transcription(
                         text: cleanedText,
                         duration: duration,
-                        enhancedText: "Enhancement failed: \(error.localizedDescription)",
+                        enhancedText: VoiceInkPostProcessingFailurePresentation.enhancementFailureText(
+                            reason: errorDescription
+                        ),
                         audioFileURL: permanentURL.absoluteString,
                         transcriptionModelName: currentModel.displayName,
                         promptName: nil,

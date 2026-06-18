@@ -110,15 +110,7 @@ class AudioTranscriptionService {
                         powerModeEmoji: powerModeEmoji,
                         enhancementResult: enhancement
                     ))
-                    modelContext.insert(newTranscription)
-                    do {
-                        try modelContext.save()
-                        NotificationCenter.default.post(name: .transcriptionCreated, object: newTranscription)
-                        NotificationCenter.default.post(name: .transcriptionCompleted, object: newTranscription)
-                    } catch {
-                        logger.error("❌ Failed to save transcription: \(error.localizedDescription, privacy: .public)")
-                    }
-
+                    saveCompletedTranscription(newTranscription)
                     return newTranscription
                 } catch {
                     let newTranscription = Transcription(completedDraft: VoiceInkCompletedTranscriptionDraft(
@@ -132,15 +124,7 @@ class AudioTranscriptionService {
                         enhancementFailureReason: VoiceInkErrorDescription.text(for: error),
                         enhancementFailurePolicy: .omitEnhancedText
                     ))
-                    modelContext.insert(newTranscription)
-                    do {
-                        try modelContext.save()
-                        NotificationCenter.default.post(name: .transcriptionCreated, object: newTranscription)
-                        NotificationCenter.default.post(name: .transcriptionCompleted, object: newTranscription)
-                    } catch {
-                        logger.error("❌ Failed to save transcription: \(error.localizedDescription, privacy: .public)")
-                    }
-
+                    saveCompletedTranscription(newTranscription)
                     return newTranscription
                 }
             } else {
@@ -153,20 +137,23 @@ class AudioTranscriptionService {
                     powerModeName: powerModeName,
                     powerModeEmoji: powerModeEmoji
                 ))
-                modelContext.insert(newTranscription)
-                do {
-                    try modelContext.save()
-                    NotificationCenter.default.post(name: .transcriptionCreated, object: newTranscription)
-                    NotificationCenter.default.post(name: .transcriptionCompleted, object: newTranscription)
-                } catch {
-                    logger.error("❌ Failed to save transcription: \(error.localizedDescription, privacy: .public)")
-                }
-
+                saveCompletedTranscription(newTranscription)
                 return newTranscription
             }
         } catch {
             logger.error("❌ Transcription failed: \(error.localizedDescription, privacy: .public)")
             throw error
+        }
+    }
+
+    private func saveCompletedTranscription(_ transcription: Transcription) {
+        modelContext.insert(transcription)
+        do {
+            try modelContext.save()
+            NotificationCenter.default.post(name: .transcriptionCreated, object: transcription)
+            NotificationCenter.default.post(name: .transcriptionCompleted, object: transcription)
+        } catch {
+            logger.error("❌ Failed to save transcription: \(error.localizedDescription, privacy: .public)")
         }
     }
 }

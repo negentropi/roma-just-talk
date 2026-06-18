@@ -358,6 +358,21 @@ reject_pattern \
   VoiceInk/Transcription/Whisper/WhisperModelManager.swift \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
+reject_pattern \
+  "iOS mode provider availability comes from shared provider-key state" \
+  'VoiceInkProviderKind\.availableProviders' \
+  iOS/VoiceInk-ios/ModeConfigurationView.swift
+
+require_pattern \
+  "iOS mode transcription provider list uses settings adapter" \
+  'settings\.availableProviders\(for: \.transcription\)' \
+  iOS/VoiceInk-ios/ModeConfigurationView.swift
+
+require_pattern \
+  "iOS mode post-processing provider list uses settings adapter" \
+  'settings\.availableProviders\(for: \.postProcessing\)' \
+  iOS/VoiceInk-ios/ModeConfigurationView.swift
+
 require_pattern \
   "iOS app launch registers shared default values" \
   'VoiceInkDefaultSettings\.iOS\.registerUserDefaults\(\)' \

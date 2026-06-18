@@ -24,16 +24,12 @@ struct ModeConfigurationView: View {
     
     /// Available transcription providers (those with valid API keys or downloaded local models)
     private var availableTranscriptionProviders: [VoiceInkProviderKind] {
-        VoiceInkProviderKind.availableProviders(for: .transcription) { provider in
-            settings.isKeyVerified(for: provider)
-        }
+        settings.availableProviders(for: .transcription)
     }
     
     /// Available post-processing providers (those with valid API keys)
     private var availablePostProcessingProviders: [VoiceInkProviderKind] {
-        VoiceInkProviderKind.availableProviders(for: .postProcessing) { provider in
-            settings.isKeyVerified(for: provider)
-        }
+        settings.availableProviders(for: .postProcessing)
     }
 
     private var canSave: Bool {

@@ -145,6 +145,35 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertTrue(state.isReady(for: .voiceInk, localWhisperModelAvailable: false))
     }
 
+    func testProviderAPIKeyStateBuildsAvailableProvidersForModelUse() {
+        let state = VoiceInkProviderAPIKeyState(
+            storedKeysByProvider: [
+                .groq: "groq-key",
+                .deepgram: "deepgram-key",
+                .mistral: "mistral-key",
+                .elevenLabs: "elevenlabs-key",
+                .soniox: "soniox-key",
+                .speechmatics: "speechmatics-key",
+                .assemblyAI: "assemblyai-key",
+                .xai: "xai-key"
+            ],
+            verifiedProviders: [.groq, .deepgram, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai]
+        )
+
+        XCTAssertEqual(
+            state.availableProviders(for: .transcription, localWhisperModelAvailable: true),
+            [.groq, .deepgram, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .localWhisper]
+        )
+        XCTAssertEqual(
+            state.availableProviders(for: .transcription, localWhisperModelAvailable: false),
+            [.groq, .deepgram, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai]
+        )
+        XCTAssertEqual(
+            state.availableProviders(for: .postProcessing, localWhisperModelAvailable: true),
+            [.groq]
+        )
+    }
+
     func testProviderAPIKeyStateResetVerificationWhenStoredKeyChanges() {
         var state = VoiceInkProviderAPIKeyState(
             storedKeysByProvider: [.groq: "old-key"],

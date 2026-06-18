@@ -38,6 +38,18 @@ public struct VoiceInkProviderAPIKeyState: Equatable, Sendable {
         )
     }
 
+    public func availableProviders(
+        for use: VoiceInkProviderModelUse,
+        localWhisperModelAvailable: Bool
+    ) -> [VoiceInkProviderKind] {
+        VoiceInkProviderKind.availableProviders(for: use) { provider in
+            isReady(
+                for: provider,
+                localWhisperModelAvailable: localWhisperModelAvailable
+            )
+        }
+    }
+
     @discardableResult
     public mutating func setStoredAPIKey(
         _ key: String,

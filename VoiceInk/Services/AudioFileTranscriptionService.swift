@@ -92,10 +92,24 @@ class AudioTranscriptionService: ObservableObject {
                 enhancementService.applyPromptDetectionResult(detectionResult)
             }
 
+            defer {
+                if let result = promptDetectionResult,
+                   result.shouldEnableAI {
+                    enhancementService?.restorePromptDetectionSettings(result)
+                }
+            }
+
+            let shouldSkipEnhancement = VoiceInkPostProcessingSkipPolicy.shouldSkipPostProcessing(
+                transcript: text,
+                configuration: VoiceInkPostProcessingSkipConfiguration.current(),
+                promptTriggerForcesPostProcessing: promptDetectionResult?.shouldEnableAI == true
+            )
+
             // Apply AI enhancement if enabled
             if let enhancementService = enhancementService,
                enhancementService.isEnhancementEnabled,
-               enhancementService.isConfigured {
+               enhancementService.isConfigured,
+               !shouldSkipEnhancement {
                 do {
                     let textForAI = promptDetectionResult?.processedText ?? text
                     let (enhancedText, enhancementDuration, promptName) = try await enhancementService.enhance(textForAI)
@@ -122,12 +136,6 @@ class AudioTranscriptionService: ObservableObject {
                         NotificationCenter.default.post(name: .transcriptionCompleted, object: newTranscription)
                     } catch {
                         logger.error("❌ Failed to save transcription: \(error.localizedDescription, privacy: .public)")
-                    }
-
-                    // Restore original prompt settings if AI was temporarily enabled
-                    if let result = promptDetectionResult,
-                       result.shouldEnableAI {
-                        enhancementService.restorePromptDetectionSettings(result)
                     }
 
                     await MainActor.run {

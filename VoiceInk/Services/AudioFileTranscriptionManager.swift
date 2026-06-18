@@ -170,12 +170,19 @@ class AudioTranscriptionManager: ObservableObject {
             let cleanedText = preparedText.cleanedText
             try Task.checkCancellation()
 
+            let shouldSkipEnhancement = VoiceInkPostProcessingSkipPolicy.shouldSkipPostProcessing(
+                transcript: text,
+                configuration: VoiceInkPostProcessingSkipConfiguration.current(),
+                promptTriggerForcesPostProcessing: false
+            )
+
             // Handle enhancement if enabled
             var transcription: Transcription
 
             if let enhancementService = engine.enhancementService,
                enhancementService.isEnhancementEnabled,
-               enhancementService.isConfigured {
+               enhancementService.isConfigured,
+               !shouldSkipEnhancement {
                 item.status = .processing(phase: .enhancing)
                 do {
                     let (enhancedText, enhancementDuration, promptName) = try await enhancementService.enhance(text)

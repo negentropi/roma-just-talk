@@ -47,6 +47,40 @@ final class DictionaryPolicyTests: XCTestCase {
         )
     }
 
+    func testDictionarySettingsPresentationPreservesIOSCopy() {
+        let presentation = VoiceInkDictionarySettingsPresentation.iOS
+
+        XCTAssertEqual(presentation.sectionTitle, "Dictionary")
+        XCTAssertNil(presentation.vocabularyHelpText)
+        XCTAssertEqual(presentation.vocabularyPlaceholder, "Vocabulary term")
+        XCTAssertNil(presentation.addVocabularyButtonHelp)
+        XCTAssertNil(presentation.wordReplacementHelpText)
+        XCTAssertEqual(presentation.originalTextPlaceholder, "Original text")
+        XCTAssertEqual(presentation.replacementTextPlaceholder, "Replacement text")
+        XCTAssertEqual(presentation.addReplacementButtonTitle, "Add Replacement")
+        XCTAssertNil(presentation.addReplacementButtonHelp)
+    }
+
+    func testDictionarySettingsPresentationPreservesMacOSCopy() {
+        let presentation = VoiceInkDictionarySettingsPresentation.macOS
+
+        XCTAssertEqual(presentation.sectionTitle, "Dictionary Settings")
+        XCTAssertEqual(
+            presentation.vocabularyHelpText,
+            "Add words to help VoiceInk recognize them properly. (Requires AI enhancement)"
+        )
+        XCTAssertEqual(presentation.vocabularyPlaceholder, "Add word to vocabulary")
+        XCTAssertEqual(presentation.addVocabularyButtonHelp, "Add word")
+        XCTAssertEqual(
+            presentation.wordReplacementHelpText,
+            "Define word replacements to automatically replace specific words or phrases"
+        )
+        XCTAssertEqual(presentation.originalTextPlaceholder, "Original text (use commas for multiple)")
+        XCTAssertEqual(presentation.replacementTextPlaceholder, "Replacement text")
+        XCTAssertEqual(presentation.addReplacementButtonTitle, "Add Replacement")
+        XCTAssertEqual(presentation.addReplacementButtonHelp, "Add word replacement")
+    }
+
     func testVocabularyDraftUsesSharedTokenPolicy() {
         XCTAssertFalse(VoiceInkDictionaryPolicy.hasVocabularyDraft(" , \n "))
         XCTAssertTrue(VoiceInkDictionaryPolicy.hasVocabularyDraft("Voice Ink, "))

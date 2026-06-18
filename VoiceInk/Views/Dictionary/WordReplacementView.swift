@@ -23,6 +23,7 @@ struct WordReplacementView: View {
     @State private var originalWord = ""
     @State private var replacementWord = ""
     @State private var showInfoPopover = false
+    private let dictionaryPresentation = VoiceInkDictionarySettingsPresentation.macOS
 
     init() {
         if let savedSort = UserDefaults.standard.string(forKey: "wordReplacementSortMode"),
@@ -67,26 +68,28 @@ struct WordReplacementView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            GroupBox {
-                Label {
-                    Text("Define word replacements to automatically replace specific words or phrases")
-                        .font(.system(size: 12))
-                        .foregroundColor(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                } icon: {
-                    Button(action: { showInfoPopover.toggle() }) {
-                        Image(systemName: "info.circle.fill")
-                            .foregroundColor(.blue)
-                    }
-                    .buttonStyle(.plain)
-                    .popover(isPresented: $showInfoPopover) {
-                        WordReplacementInfoPopover()
+            if let helpText = dictionaryPresentation.wordReplacementHelpText {
+                GroupBox {
+                    Label {
+                        Text(helpText)
+                            .font(.system(size: 12))
+                            .foregroundColor(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    } icon: {
+                        Button(action: { showInfoPopover.toggle() }) {
+                            Image(systemName: "info.circle.fill")
+                                .foregroundColor(.blue)
+                        }
+                        .buttonStyle(.plain)
+                        .popover(isPresented: $showInfoPopover) {
+                            WordReplacementInfoPopover()
+                        }
                     }
                 }
             }
 
             HStack(spacing: 8) {
-                TextField("Original text (use commas for multiple)", text: $originalWord)
+                TextField(dictionaryPresentation.originalTextPlaceholder, text: $originalWord)
                     .textFieldStyle(.roundedBorder)
                     .font(.system(size: 13))
 
@@ -95,7 +98,7 @@ struct WordReplacementView: View {
                     .font(.system(size: 10))
                     .frame(width: 10)
 
-                TextField("Replacement text", text: $replacementWord)
+                TextField(dictionaryPresentation.replacementTextPlaceholder, text: $replacementWord)
                     .textFieldStyle(.roundedBorder)
                     .font(.system(size: 13))
                     .onSubmit { addReplacement() }
@@ -109,7 +112,7 @@ struct WordReplacementView: View {
                     }
                     .buttonStyle(.borderless)
                     .disabled(!canAddReplacement)
-                    .help("Add word replacement")
+                    .help(dictionaryPresentation.addReplacementButtonHelp ?? "")
                 }
             }
             .animation(.easeInOut(duration: 0.2), value: shouldShowAddButton)

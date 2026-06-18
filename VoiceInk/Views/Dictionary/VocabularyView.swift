@@ -13,6 +13,7 @@ struct VocabularyView: View {
     @State private var newWord = ""
     @State private var alertPresentation: VoiceInkDictionaryAlertPresentation?
     @State private var sortMode: VocabularySortMode = .wordAsc
+    private let dictionaryPresentation = VoiceInkDictionarySettingsPresentation.macOS
 
     init() {
         if let savedSort = UserDefaults.standard.string(forKey: "vocabularySortMode"),
@@ -41,20 +42,22 @@ struct VocabularyView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            GroupBox {
-                Label {
-                    Text("Add words to help VoiceInk recognize them properly. (Requires AI enhancement)")
-                        .font(.system(size: 12))
-                        .foregroundColor(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                } icon: {
-                    Image(systemName: "info.circle.fill")
-                        .foregroundColor(.blue)
+            if let helpText = dictionaryPresentation.vocabularyHelpText {
+                GroupBox {
+                    Label {
+                        Text(helpText)
+                            .font(.system(size: 12))
+                            .foregroundColor(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    } icon: {
+                        Image(systemName: "info.circle.fill")
+                            .foregroundColor(.blue)
+                    }
                 }
             }
 
             HStack(spacing: 8) {
-                TextField("Add word to vocabulary", text: $newWord)
+                TextField(dictionaryPresentation.vocabularyPlaceholder, text: $newWord)
                     .textFieldStyle(.roundedBorder)
                     .font(.system(size: 13))
                     .onSubmit { addWords() }
@@ -68,7 +71,7 @@ struct VocabularyView: View {
                     }
                     .buttonStyle(.borderless)
                     .disabled(!shouldShowAddButton)
-                    .help("Add word")
+                    .help(dictionaryPresentation.addVocabularyButtonHelp ?? "")
                 }
             }
             .animation(.easeInOut(duration: 0.2), value: shouldShowAddButton)

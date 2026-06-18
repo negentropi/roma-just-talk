@@ -962,8 +962,18 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
 
 require_pattern \
+  "shared dictionary settings presentation lives in VoiceInkCore" \
+  'VoiceInkDictionarySettingsPresentation|vocabularyPlaceholder|wordReplacementHelpText' \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+require_pattern \
   "iOS settings uses shared dictionary alert presentation" \
   'VoiceInkDictionaryAlertPresentation|dictionaryAlert|\.duplicateFillerWord|\.vocabulary|\.wordReplacement' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+require_pattern \
+  "iOS settings uses shared dictionary settings presentation" \
+  'VoiceInkDictionarySettingsPresentation\.iOS|dictionaryPresentation' \
   iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \
@@ -977,8 +987,18 @@ require_pattern \
   VoiceInk/Views/Dictionary/VocabularyView.swift
 
 require_pattern \
+  "macOS vocabulary view uses shared dictionary settings presentation" \
+  'VoiceInkDictionarySettingsPresentation\.macOS|dictionaryPresentation' \
+  VoiceInk/Views/Dictionary/VocabularyView.swift
+
+require_pattern \
   "macOS word-replacement view uses shared dictionary alert presentation" \
   'VoiceInkDictionaryAlertPresentation|\.wordReplacement|failedToRemoveWordReplacement' \
+  VoiceInk/Views/Dictionary/WordReplacementView.swift
+
+require_pattern \
+  "macOS word-replacement view uses shared dictionary settings presentation" \
+  'VoiceInkDictionarySettingsPresentation\.macOS|dictionaryPresentation' \
   VoiceInk/Views/Dictionary/WordReplacementView.swift
 
 require_pattern \
@@ -1008,6 +1028,17 @@ reject_pattern \
   VoiceInk/Views/ModelSettingsView.swift \
   VoiceInk/Views/Components/FillerWordsSettingsView.swift \
   VoiceInk/PowerMode/PowerModeConfigView.swift
+
+reject_pattern \
+  "iOS dictionary settings avoid shell-only presentation copy" \
+  '"(Dictionary|Vocabulary term|Original text|Replacement text|Add Replacement)"' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+reject_pattern \
+  "macOS dictionary form views avoid shell-only presentation copy" \
+  '"(Add words to help VoiceInk recognize them properly\. \(Requires AI enhancement\)|Add word to vocabulary|Add word|Define word replacements to automatically replace specific words or phrases|Original text \(use commas for multiple\)|Replacement text|Add word replacement)"' \
+  VoiceInk/Views/Dictionary/VocabularyView.swift \
+  VoiceInk/Views/Dictionary/WordReplacementView.swift
 
 reject_pattern \
   "platform dictionary surfaces avoid duplicate alert titles and persistence failure copy" \

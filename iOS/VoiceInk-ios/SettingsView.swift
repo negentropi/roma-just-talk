@@ -10,6 +10,7 @@ struct SettingsView: View {
     @State private var newReplacementText = ""
     @State private var dictionaryAlert: VoiceInkDictionaryAlertPresentation?
     private let cleanupPresentation = VoiceInkTranscriptionCleanupPresentation.iOS
+    private let dictionaryPresentation = VoiceInkDictionarySettingsPresentation.iOS
     private let audioTimeoutPresentation = VoiceInkAudioSessionTimeoutPreference.settingsPresentation
     
     var body: some View {
@@ -94,9 +95,9 @@ struct SettingsView: View {
                 }
             }
 
-            Section(header: Text("Dictionary")) {
+            Section(header: Text(dictionaryPresentation.sectionTitle)) {
                 HStack {
-                    TextField("Vocabulary term", text: $newCustomVocabularyTerm)
+                    TextField(dictionaryPresentation.vocabularyPlaceholder, text: $newCustomVocabularyTerm)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                         .onSubmit(addCustomVocabularyTerm)
@@ -112,18 +113,18 @@ struct SettingsView: View {
                 }
                 .onDelete(perform: settings.removeCustomVocabularyTerms)
 
-                TextField("Original text", text: $newReplacementOriginal)
+                TextField(dictionaryPresentation.originalTextPlaceholder, text: $newReplacementOriginal)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
                     .onSubmit(addWordReplacement)
 
-                TextField("Replacement text", text: $newReplacementText)
+                TextField(dictionaryPresentation.replacementTextPlaceholder, text: $newReplacementText)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
                     .onSubmit(addWordReplacement)
 
                 Button(action: addWordReplacement) {
-                    Label("Add Replacement", systemImage: "plus.circle.fill")
+                    Label(dictionaryPresentation.addReplacementButtonTitle, systemImage: "plus.circle.fill")
                 }
                 .disabled(!canAddWordReplacement)
 

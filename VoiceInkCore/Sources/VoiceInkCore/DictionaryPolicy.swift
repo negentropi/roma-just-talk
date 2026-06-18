@@ -106,6 +106,42 @@ public struct VoiceInkDictionaryAlertPresentation: Equatable, Identifiable, Send
     }
 }
 
+public struct VoiceInkDictionarySettingsPresentation: Equatable, Sendable {
+    public let sectionTitle: String
+    public let vocabularyHelpText: String?
+    public let vocabularyPlaceholder: String
+    public let addVocabularyButtonHelp: String?
+    public let wordReplacementHelpText: String?
+    public let originalTextPlaceholder: String
+    public let replacementTextPlaceholder: String
+    public let addReplacementButtonTitle: String
+    public let addReplacementButtonHelp: String?
+
+    public static let iOS = VoiceInkDictionarySettingsPresentation(
+        sectionTitle: "Dictionary",
+        vocabularyHelpText: nil,
+        vocabularyPlaceholder: "Vocabulary term",
+        addVocabularyButtonHelp: nil,
+        wordReplacementHelpText: nil,
+        originalTextPlaceholder: "Original text",
+        replacementTextPlaceholder: "Replacement text",
+        addReplacementButtonTitle: "Add Replacement",
+        addReplacementButtonHelp: nil
+    )
+
+    public static let macOS = VoiceInkDictionarySettingsPresentation(
+        sectionTitle: "Dictionary Settings",
+        vocabularyHelpText: "Add words to help VoiceInk recognize them properly. (Requires AI enhancement)",
+        vocabularyPlaceholder: "Add word to vocabulary",
+        addVocabularyButtonHelp: "Add word",
+        wordReplacementHelpText: "Define word replacements to automatically replace specific words or phrases",
+        originalTextPlaceholder: "Original text (use commas for multiple)",
+        replacementTextPlaceholder: "Replacement text",
+        addReplacementButtonTitle: "Add Replacement",
+        addReplacementButtonHelp: "Add word replacement"
+    )
+}
+
 public enum VoiceInkDictionaryPolicy {
     public static func hasVocabularyDraft(_ input: String) -> Bool {
         !tokens(from: input).isEmpty

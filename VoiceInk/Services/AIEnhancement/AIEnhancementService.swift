@@ -294,59 +294,73 @@ class AIEnhancementService: ObservableObject {
     }
 
     private func makeRequestWithRetry(text: String, mode: EnhancementPrompt, maxRetries: Int = 3, initialDelay: TimeInterval = 1.0) async throws -> String {
-        var retries = 0
-        var currentDelay = initialDelay
+        var retryState = VoiceInkAIEnhancementRetryState(
+            maxAttempts: maxRetries,
+            initialDelay: initialDelay,
+            retryOnTimeout: retryOnTimeout
+        )
 
-        while retries < maxRetries {
+        while true {
             do {
                 return try await makeRequest(text: text, mode: mode)
             } catch let error as VoiceInkAIEnhancementError {
-                switch error {
-                case .networkError, .serverError, .rateLimitExceeded:
-                    retries += 1
-                    if retries < maxRetries {
-                        logger.warning("Request failed, retrying in \(currentDelay, privacy: .public)s... (Attempt \(retries, privacy: .public)/\(maxRetries, privacy: .public))")
-                        try await Task.sleep(nanoseconds: UInt64(currentDelay * 1_000_000_000))
-                        currentDelay *= 2
-                    } else {
-                        logger.error("Request failed after \(maxRetries, privacy: .public) retries.")
-                        throw error
-                    }
-                case .timeout:
-                    if retryOnTimeout {
-                        retries += 1
-                        if retries < maxRetries {
-                            logger.warning("Request timed out, retrying immediately... (Attempt \(retries, privacy: .public)/\(maxRetries, privacy: .public))")
-                        } else {
-                            logger.error("Request timed out after \(maxRetries, privacy: .public) retries.")
-                            throw error
-                        }
-                    } else {
-                        logger.error("Request timed out, failing immediately (retry disabled).")
-                        throw error
-                    }
-                default:
-                    throw error
-                }
+                try await handleRetryDecision(
+                    retryState.recordFailure(error),
+                    state: retryState
+                )
             } catch {
                 let nsError = error as NSError
                 if nsError.domain == NSURLErrorDomain && [NSURLErrorNotConnectedToInternet, NSURLErrorTimedOut, NSURLErrorNetworkConnectionLost].contains(nsError.code) {
-                    retries += 1
-                    if retries < maxRetries {
-                        logger.warning("Request failed with network error, retrying in \(currentDelay, privacy: .public)s... (Attempt \(retries, privacy: .public)/\(maxRetries, privacy: .public))")
-                        try await Task.sleep(nanoseconds: UInt64(currentDelay * 1_000_000_000))
-                        currentDelay *= 2
-                    } else {
-                        logger.error("Request failed after \(maxRetries, privacy: .public) retries with network error.")
-                        throw VoiceInkAIEnhancementError.networkError
-                    }
+                    try await handleRetryDecision(
+                        retryState.recordTransportNetworkFailure(),
+                        state: retryState,
+                        transportNetworkFailure: true
+                    )
                 } else {
                     throw error
                 }
             }
         }
+    }
 
-        throw VoiceInkAIEnhancementError.enhancementFailed
+    private func handleRetryDecision(
+        _ decision: VoiceInkAIEnhancementRetryDecision,
+        state: VoiceInkAIEnhancementRetryState,
+        transportNetworkFailure: Bool = false
+    ) async throws {
+        switch decision {
+        case .retryAfterDelay(let delay):
+            logger.warning("Request failed, retrying in \(delay, privacy: .public)s... (Attempt \(state.failedAttempts, privacy: .public)/\(state.maxAttempts, privacy: .public))")
+            try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+        case .retryImmediately:
+            logger.warning("Request timed out, retrying immediately... (Attempt \(state.failedAttempts, privacy: .public)/\(state.maxAttempts, privacy: .public))")
+        case .fail(let error):
+            logRetryFailure(
+                error,
+                attempts: state.maxAttempts,
+                transportNetworkFailure: transportNetworkFailure
+            )
+            throw error
+        }
+    }
+
+    private func logRetryFailure(
+        _ error: VoiceInkAIEnhancementError,
+        attempts: Int,
+        transportNetworkFailure: Bool
+    ) {
+        switch error {
+        case .timeout where retryOnTimeout:
+            logger.error("Request timed out after \(attempts, privacy: .public) retries.")
+        case .timeout:
+            logger.error("Request timed out, failing immediately (retry disabled).")
+        case .networkError where transportNetworkFailure:
+            logger.error("Request failed after \(attempts, privacy: .public) retries with network error.")
+        case .networkError, .serverError, .rateLimitExceeded:
+            logger.error("Request failed after \(attempts, privacy: .public) retries.")
+        default:
+            break
+        }
     }
 
     func enhance(_ text: String) async throws -> (String, TimeInterval, String?) {

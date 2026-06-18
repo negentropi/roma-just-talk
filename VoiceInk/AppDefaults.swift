@@ -10,9 +10,14 @@ enum AppDefaults {
     static let showMenuBarIconDefault = false
 
     static var registeredDefaults: [String: Any] {
-        [
+        var defaults = VoiceInkDefaultSettings(
+            selectedTranscriptionLanguage: "en"
+        ).registeredUserDefaults(
+            currentTranscriptionModel: "parakeet-tdt-0.6b-v2"
+        )
+
+        defaults.merge([
             // Onboarding & General
-            VoiceInkUserDefaultsKey.hasCompletedOnboarding: false,
             "enableAnnouncements": true,
 
             // Clipboard
@@ -30,12 +35,6 @@ enum AppDefaults {
             CustomSoundManager.SoundType.stop.builtInSoundKey: CustomSoundManager.SoundType.stop.defaultBuiltInSound.rawValue,
 
             // Recording & Transcription
-            VoiceInkUserDefaultsKey.isTextFormattingEnabled: VoiceInkPreferenceDefault.isTextFormattingEnabled,
-            VoiceInkUserDefaultsKey.isVADEnabled: VoiceInkPreferenceDefault.isVADEnabled,
-            VoiceInkUserDefaultsKey.removeFillerWords: VoiceInkPreferenceDefault.removeFillerWords,
-            PunctuationCleanupMode.legacyRemovePunctuationKey: false,
-            VoiceInkUserDefaultsKey.lowercaseTranscription: VoiceInkPreferenceDefault.lowercaseTranscription,
-            VoiceInkUserDefaultsKey.selectedTranscriptionLanguage: "en",
             "AppendTrailingSpace": true,
             "showLiveTextPreview": false,
             RollingBufferPreloadSettings.modeKey: RollingBufferPreloadSettings.defaultMode.rawValue,
@@ -46,13 +45,6 @@ enum AppDefaults {
             RollingBufferPreloadSettings.preRunFinalizationKey: RollingBufferPreloadSettings.defaultPreRunFinalization,
             RollingBufferVADSettings.modelKey: RollingBufferVADSettings.sileroModelName,
             "RecorderType": "none",
-            VoiceInkUserDefaultsKey.currentTranscriptionModel: "parakeet-tdt-0.6b-v2",
-
-            // Cleanup
-            VoiceInkUserDefaultsKey.isTranscriptionCleanupEnabled: false,
-            VoiceInkUserDefaultsKey.transcriptionRetentionMinutes: VoiceInkPreferenceDefault.transcriptionRetentionMinutes,
-            VoiceInkUserDefaultsKey.isAudioCleanupEnabled: false,
-            VoiceInkUserDefaultsKey.audioRetentionPeriodDays: VoiceInkPreferenceDefault.audioRetentionDays,
 
             // UI & Behavior
             "IsMenuBarOnly": true,
@@ -65,15 +57,11 @@ enum AppDefaults {
             "middleClickActivationDelay": 200,
             SpecialShortcutSettings.pasteLastTranscriptOnEmptyTapKey: true,
 
-            // Enhancement
-            VoiceInkUserDefaultsKey.skipShortEnhancement: VoiceInkPreferenceDefault.skipShortEnhancement,
-            VoiceInkUserDefaultsKey.shortEnhancementWordThreshold: VoiceInkPreferenceDefault.shortEnhancementWordThreshold,
-            VoiceInkUserDefaultsKey.enhancementTimeoutSeconds: VoiceInkPreferenceDefault.enhancementTimeoutSeconds,
-            VoiceInkUserDefaultsKey.enhancementRetryOnTimeout: VoiceInkPreferenceDefault.enhancementRetryOnTimeout,
-
             // Model
             "PrewarmModelOnWake": true,
-        ]
+        ], uniquingKeysWith: { _, platformValue in platformValue })
+
+        return defaults
     }
 
     static func registerDefaults() {

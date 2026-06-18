@@ -54,6 +54,92 @@ public enum VoiceInkPreferenceDefault {
     public static let ollamaBaseURL = "http://localhost:11434"
 }
 
+public struct VoiceInkDefaultSettings: Equatable, Sendable {
+    public let audioSessionTimeoutSeconds: Int
+    public let punctuationCleanupMode: PunctuationCleanupMode
+    public let isTextFormattingEnabled: Bool
+    public let isVADEnabled: Bool
+    public let lowercaseTranscription: Bool
+    public let removeFillerWords: Bool
+    public let fillerWords: [String]
+    public let selectedTranscriptionLanguage: String
+    public let isTranscriptionCleanupEnabled: Bool
+    public let transcriptionRetentionMinutes: Int
+    public let isAudioCleanupEnabled: Bool
+    public let audioRetentionDays: Int
+    public let skipShortEnhancement: Bool
+    public let shortEnhancementWordThreshold: Int
+    public let enhancementTimeoutSeconds: Int
+    public let enhancementRetryOnTimeout: Bool
+
+    public init(
+        audioSessionTimeoutSeconds: Int = VoiceInkPreferenceDefault.audioSessionTimeoutSeconds,
+        punctuationCleanupMode: PunctuationCleanupMode = .keep,
+        isTextFormattingEnabled: Bool = VoiceInkPreferenceDefault.isTextFormattingEnabled,
+        isVADEnabled: Bool = VoiceInkPreferenceDefault.isVADEnabled,
+        lowercaseTranscription: Bool = VoiceInkPreferenceDefault.lowercaseTranscription,
+        removeFillerWords: Bool = VoiceInkPreferenceDefault.removeFillerWords,
+        fillerWords: [String] = VoiceInkFillerWords.defaultWords,
+        selectedTranscriptionLanguage: String = VoiceInkLanguageCatalog.autoDetectCode,
+        isTranscriptionCleanupEnabled: Bool = false,
+        transcriptionRetentionMinutes: Int = VoiceInkPreferenceDefault.transcriptionRetentionMinutes,
+        isAudioCleanupEnabled: Bool = false,
+        audioRetentionDays: Int = VoiceInkPreferenceDefault.audioRetentionDays,
+        skipShortEnhancement: Bool = VoiceInkPreferenceDefault.skipShortEnhancement,
+        shortEnhancementWordThreshold: Int = VoiceInkPreferenceDefault.shortEnhancementWordThreshold,
+        enhancementTimeoutSeconds: Int = VoiceInkPreferenceDefault.enhancementTimeoutSeconds,
+        enhancementRetryOnTimeout: Bool = VoiceInkPreferenceDefault.enhancementRetryOnTimeout
+    ) {
+        self.audioSessionTimeoutSeconds = audioSessionTimeoutSeconds
+        self.punctuationCleanupMode = punctuationCleanupMode
+        self.isTextFormattingEnabled = isTextFormattingEnabled
+        self.isVADEnabled = isVADEnabled
+        self.lowercaseTranscription = lowercaseTranscription
+        self.removeFillerWords = removeFillerWords
+        self.fillerWords = fillerWords
+        self.selectedTranscriptionLanguage = selectedTranscriptionLanguage
+        self.isTranscriptionCleanupEnabled = isTranscriptionCleanupEnabled
+        self.transcriptionRetentionMinutes = transcriptionRetentionMinutes
+        self.isAudioCleanupEnabled = isAudioCleanupEnabled
+        self.audioRetentionDays = audioRetentionDays
+        self.skipShortEnhancement = skipShortEnhancement
+        self.shortEnhancementWordThreshold = shortEnhancementWordThreshold
+        self.enhancementTimeoutSeconds = enhancementTimeoutSeconds
+        self.enhancementRetryOnTimeout = enhancementRetryOnTimeout
+    }
+
+    public static let iOS = VoiceInkDefaultSettings()
+
+    public func registeredUserDefaults(
+        hasCompletedOnboarding: Bool = false,
+        currentTranscriptionModel: String? = nil
+    ) -> [String: Any] {
+        var defaults: [String: Any] = [
+            VoiceInkUserDefaultsKey.hasCompletedOnboarding: hasCompletedOnboarding,
+            VoiceInkUserDefaultsKey.isTextFormattingEnabled: isTextFormattingEnabled,
+            VoiceInkUserDefaultsKey.isVADEnabled: isVADEnabled,
+            VoiceInkUserDefaultsKey.removeFillerWords: removeFillerWords,
+            PunctuationCleanupMode.legacyRemovePunctuationKey: punctuationCleanupMode == .removeAll,
+            VoiceInkUserDefaultsKey.lowercaseTranscription: lowercaseTranscription,
+            VoiceInkUserDefaultsKey.selectedTranscriptionLanguage: selectedTranscriptionLanguage,
+            VoiceInkUserDefaultsKey.isTranscriptionCleanupEnabled: isTranscriptionCleanupEnabled,
+            VoiceInkUserDefaultsKey.transcriptionRetentionMinutes: transcriptionRetentionMinutes,
+            VoiceInkUserDefaultsKey.isAudioCleanupEnabled: isAudioCleanupEnabled,
+            VoiceInkUserDefaultsKey.audioRetentionPeriodDays: audioRetentionDays,
+            VoiceInkUserDefaultsKey.skipShortEnhancement: skipShortEnhancement,
+            VoiceInkUserDefaultsKey.shortEnhancementWordThreshold: shortEnhancementWordThreshold,
+            VoiceInkUserDefaultsKey.enhancementTimeoutSeconds: enhancementTimeoutSeconds,
+            VoiceInkUserDefaultsKey.enhancementRetryOnTimeout: enhancementRetryOnTimeout
+        ]
+
+        if let currentTranscriptionModel {
+            defaults[VoiceInkUserDefaultsKey.currentTranscriptionModel] = currentTranscriptionModel
+        }
+
+        return defaults
+    }
+}
+
 public enum VoiceInkOnboardingPreference {
     public static func hasCompletedOnboarding(from defaults: UserDefaults = .standard) -> Bool {
         defaults.bool(forKey: VoiceInkUserDefaultsKey.hasCompletedOnboarding)

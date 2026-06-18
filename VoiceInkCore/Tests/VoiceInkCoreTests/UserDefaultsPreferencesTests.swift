@@ -78,6 +78,98 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkPreferenceDefault.ollamaBaseURL, "http://localhost:11434")
     }
 
+    func testDefaultSettingsPreserveIOSResetState() {
+        let defaults = VoiceInkDefaultSettings.iOS
+
+        XCTAssertEqual(defaults.audioSessionTimeoutSeconds, VoiceInkPreferenceDefault.audioSessionTimeoutSeconds)
+        XCTAssertEqual(defaults.punctuationCleanupMode, .keep)
+        XCTAssertEqual(defaults.isTextFormattingEnabled, VoiceInkPreferenceDefault.isTextFormattingEnabled)
+        XCTAssertEqual(defaults.isVADEnabled, VoiceInkPreferenceDefault.isVADEnabled)
+        XCTAssertEqual(defaults.lowercaseTranscription, VoiceInkPreferenceDefault.lowercaseTranscription)
+        XCTAssertEqual(defaults.removeFillerWords, VoiceInkPreferenceDefault.removeFillerWords)
+        XCTAssertEqual(defaults.fillerWords, VoiceInkFillerWords.defaultWords)
+        XCTAssertEqual(defaults.selectedTranscriptionLanguage, VoiceInkLanguageCatalog.autoDetectCode)
+    }
+
+    func testDefaultSettingsBuildRegisteredUserDefaultsForPlatformSelections() {
+        let registeredDefaults = VoiceInkDefaultSettings(
+            selectedTranscriptionLanguage: "en"
+        ).registeredUserDefaults(
+            currentTranscriptionModel: "parakeet-tdt-0.6b-v2"
+        )
+
+        XCTAssertEqual(registeredDefaults[VoiceInkUserDefaultsKey.hasCompletedOnboarding] as? Bool, false)
+        XCTAssertEqual(
+            registeredDefaults[VoiceInkUserDefaultsKey.isTextFormattingEnabled] as? Bool,
+            VoiceInkPreferenceDefault.isTextFormattingEnabled
+        )
+        XCTAssertEqual(
+            registeredDefaults[VoiceInkUserDefaultsKey.isVADEnabled] as? Bool,
+            VoiceInkPreferenceDefault.isVADEnabled
+        )
+        XCTAssertEqual(
+            registeredDefaults[VoiceInkUserDefaultsKey.removeFillerWords] as? Bool,
+            VoiceInkPreferenceDefault.removeFillerWords
+        )
+        XCTAssertEqual(registeredDefaults[PunctuationCleanupMode.legacyRemovePunctuationKey] as? Bool, false)
+        XCTAssertEqual(
+            registeredDefaults[VoiceInkUserDefaultsKey.lowercaseTranscription] as? Bool,
+            VoiceInkPreferenceDefault.lowercaseTranscription
+        )
+        XCTAssertEqual(registeredDefaults[VoiceInkUserDefaultsKey.selectedTranscriptionLanguage] as? String, "en")
+        XCTAssertEqual(
+            registeredDefaults[VoiceInkUserDefaultsKey.currentTranscriptionModel] as? String,
+            "parakeet-tdt-0.6b-v2"
+        )
+        XCTAssertEqual(registeredDefaults[VoiceInkUserDefaultsKey.isTranscriptionCleanupEnabled] as? Bool, false)
+        XCTAssertEqual(
+            registeredDefaults[VoiceInkUserDefaultsKey.transcriptionRetentionMinutes] as? Int,
+            VoiceInkPreferenceDefault.transcriptionRetentionMinutes
+        )
+        XCTAssertEqual(registeredDefaults[VoiceInkUserDefaultsKey.isAudioCleanupEnabled] as? Bool, false)
+        XCTAssertEqual(
+            registeredDefaults[VoiceInkUserDefaultsKey.audioRetentionPeriodDays] as? Int,
+            VoiceInkPreferenceDefault.audioRetentionDays
+        )
+        XCTAssertEqual(
+            registeredDefaults[VoiceInkUserDefaultsKey.skipShortEnhancement] as? Bool,
+            VoiceInkPreferenceDefault.skipShortEnhancement
+        )
+        XCTAssertEqual(
+            registeredDefaults[VoiceInkUserDefaultsKey.shortEnhancementWordThreshold] as? Int,
+            VoiceInkPreferenceDefault.shortEnhancementWordThreshold
+        )
+        XCTAssertEqual(
+            registeredDefaults[VoiceInkUserDefaultsKey.enhancementTimeoutSeconds] as? Int,
+            VoiceInkPreferenceDefault.enhancementTimeoutSeconds
+        )
+        XCTAssertEqual(
+            registeredDefaults[VoiceInkUserDefaultsKey.enhancementRetryOnTimeout] as? Bool,
+            VoiceInkPreferenceDefault.enhancementRetryOnTimeout
+        )
+
+        let iOSRegisteredDefaults = VoiceInkDefaultSettings.iOS.registeredUserDefaults()
+        XCTAssertNil(iOSRegisteredDefaults[VoiceInkUserDefaultsKey.currentTranscriptionModel])
+        XCTAssertEqual(
+            iOSRegisteredDefaults[VoiceInkUserDefaultsKey.selectedTranscriptionLanguage] as? String,
+            VoiceInkLanguageCatalog.autoDetectCode
+        )
+
+        let completedRemovePunctuationDefaults = VoiceInkDefaultSettings(
+            punctuationCleanupMode: .removeAll
+        ).registeredUserDefaults(
+            hasCompletedOnboarding: true
+        )
+        XCTAssertEqual(
+            completedRemovePunctuationDefaults[VoiceInkUserDefaultsKey.hasCompletedOnboarding] as? Bool,
+            true
+        )
+        XCTAssertEqual(
+            completedRemovePunctuationDefaults[PunctuationCleanupMode.legacyRemovePunctuationKey] as? Bool,
+            true
+        )
+    }
+
     func testOnboardingPreferenceUsesFalseWhenMissing() {
         withIsolatedDefaults { defaults in
             XCTAssertFalse(VoiceInkOnboardingPreference.hasCompletedOnboarding(from: defaults))

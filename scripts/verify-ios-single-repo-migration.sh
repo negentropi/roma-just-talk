@@ -488,6 +488,16 @@ require_pattern \
   'VoiceInkDefaultSettings\.macOS\.registeredUserDefaults' \
   VoiceInk/AppDefaults.swift
 
+require_pattern \
+  "macOS Ollama service uses shared default base URL" \
+  'VoiceInkPreferenceDefault\.ollamaBaseURL' \
+  VoiceInk/Services/OllamaService.swift
+
+reject_pattern \
+  "macOS Ollama default base URL shim stays deleted" \
+  'defaultBaseURL' \
+  VoiceInk/Services/OllamaService.swift
+
 reject_pattern \
   "macOS app launch avoids hard-coded selected-language defaults" \
   'selectedTranscriptionLanguage: "en"' \

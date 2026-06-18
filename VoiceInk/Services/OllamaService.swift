@@ -4,8 +4,6 @@ import LLMkit
 import VoiceInkCore
 
 class OllamaService: ObservableObject {
-    static let defaultBaseURL = VoiceInkPreferenceDefault.ollamaBaseURL
-
     // MARK: - Published Properties
     @Published var baseURL: String {
         didSet {
@@ -26,7 +24,9 @@ class OllamaService: ObservableObject {
     private let defaultTemperature: Double = 0.3
 
     init() {
-        self.baseURL = VoiceInkDynamicAIProviderPreference.ollamaBaseURL(fallback: Self.defaultBaseURL)
+        self.baseURL = VoiceInkDynamicAIProviderPreference.ollamaBaseURL(
+            fallback: VoiceInkPreferenceDefault.ollamaBaseURL
+        )
         self.selectedModel = VoiceInkDynamicAIProviderPreference.ollamaSelectedModel(fallback: "llama2")
     }
 

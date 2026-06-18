@@ -159,6 +159,26 @@ public enum VoiceInkPCM16Audio {
         TimeInterval(sampleCount(inData: data)) / Double(mono16kSampleRateHz)
     }
 
+    public static func monoPCM16Chunks(from data: Data, maxByteCount: Int) -> [Data] {
+        guard !data.isEmpty, maxByteCount >= bytesPerSample else { return [] }
+
+        let chunkByteCount = maxByteCount - (maxByteCount % bytesPerSample)
+        guard chunkByteCount > 0 else { return [] }
+
+        var chunks: [Data] = []
+        var offset = 0
+        while offset < data.count {
+            let remainingByteCount = data.count - offset
+            let length = min(chunkByteCount, remainingByteCount)
+            guard length >= bytesPerSample else { break }
+
+            chunks.append(data.subdata(in: offset..<(offset + length)))
+            offset += length
+        }
+
+        return chunks
+    }
+
     private static func averagedInterleavedSample(
         _ inputSamples: UnsafePointer<Float32>,
         frame: Int,

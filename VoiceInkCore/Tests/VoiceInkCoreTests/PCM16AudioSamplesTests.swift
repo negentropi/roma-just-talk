@@ -187,6 +187,45 @@ final class PCM16AudioSamplesTests: XCTestCase {
         XCTAssertEqual(VoiceInkPCM16Audio.duration(forMono16kData: oneSecond), 1)
     }
 
+    func testMonoPCM16ChunksSplitDataOnSampleAlignedByteCounts() {
+        let data = Data([0, 1, 2, 3, 4, 5, 6, 7])
+
+        let chunks = VoiceInkPCM16Audio.monoPCM16Chunks(from: data, maxByteCount: 4)
+
+        XCTAssertEqual(chunks, [
+            Data([0, 1, 2, 3]),
+            Data([4, 5, 6, 7])
+        ])
+    }
+
+    func testMonoPCM16ChunksDropTrailingPartialSample() {
+        let data = Data([0, 1, 2, 3, 4])
+
+        let chunks = VoiceInkPCM16Audio.monoPCM16Chunks(from: data, maxByteCount: 4)
+
+        XCTAssertEqual(chunks, [Data([0, 1, 2, 3])])
+    }
+
+    func testMonoPCM16ChunksAlignOddChunkSizeToSampleBoundary() {
+        let data = Data([0, 1, 2, 3, 4, 5])
+
+        let chunks = VoiceInkPCM16Audio.monoPCM16Chunks(from: data, maxByteCount: 3)
+
+        XCTAssertEqual(chunks, [
+            Data([0, 1]),
+            Data([2, 3]),
+            Data([4, 5])
+        ])
+    }
+
+    func testMonoPCM16ChunksRejectEmptyDataAndTooSmallChunkSize() {
+        XCTAssertEqual(VoiceInkPCM16Audio.monoPCM16Chunks(from: Data(), maxByteCount: 4), [])
+        XCTAssertEqual(
+            VoiceInkPCM16Audio.monoPCM16Chunks(from: Data([0, 1, 2, 3]), maxByteCount: 1),
+            []
+        )
+    }
+
     private func pcm16Data(samples: [Int16]) -> Data {
         var data = Data()
         for sample in samples {

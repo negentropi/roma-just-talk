@@ -29,6 +29,8 @@ private struct PreparedQuickReleaseContext {
 
 @MainActor
 class VoiceInkEngine: NSObject, ObservableObject {
+    private static let bufferedSnapshotStreamingChunkBytes = VoiceInkPCM16Audio.byteCount(forMono16kDuration: 0.1)
+
     @Published var recordingState: RecordingState = .idle
     @Published var shouldCancelRecording = false
     var partialTranscript: String = ""
@@ -624,6 +626,58 @@ class VoiceInkEngine: NSObject, ObservableObject {
             )
             logger.error("commitBufferedRollingAudioSnapshot failed: \(error.localizedDescription, privacy: .public)")
             return false
+        }
+    }
+
+    private func makeBufferedSnapshotStreamingSessionIfAvailable(
+        for model: any TranscriptionModel,
+        audioData: Data,
+        audioFileReadyTask: Task<Void, Error>,
+        latencyTrace: TranscriptionLatencyTrace
+    ) async -> TranscriptionSession? {
+        guard model.provider.isLocalTranscriptionProvider,
+              model.supportsStreaming else {
+            return nil
+        }
+
+        let session = serviceRegistry.createSession(
+            for: model,
+            onPartialTranscript: { [weak self] partial in
+                Task { @MainActor in
+                    self?.partialTranscript = partial
+                }
+            },
+            forceStreaming: true
+        )
+        let callback: ((Data) -> Void)?
+        do {
+            callback = try await session.prepare(model: model)
+        } catch {
+            logger.error("Buffered snapshot streaming prepare failed, falling back to batch: \(error.localizedDescription, privacy: .public)")
+            session.cancel()
+            return nil
+        }
+
+        guard let callback else {
+            session.cancel()
+            return nil
+        }
+
+        if let streamingSession = session as? StreamingTranscriptionSession {
+            streamingSession.setFallbackAudioReadyTask(audioFileReadyTask)
+        }
+
+        emitBufferedSnapshotAudio(audioData, to: callback)
+        logger.notice("Latency trace buffered audio streaming session fed operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s bytes=\(audioData.count, privacy: .public)")
+        return session
+    }
+
+    private func emitBufferedSnapshotAudio(_ audioData: Data, to callback: (Data) -> Void) {
+        for chunk in VoiceInkPCM16Audio.monoPCM16Chunks(
+            from: audioData,
+            maxByteCount: Self.bufferedSnapshotStreamingChunkBytes
+        ) {
+            callback(chunk)
         }
     }
 

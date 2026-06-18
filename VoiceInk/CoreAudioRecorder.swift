@@ -1032,16 +1032,8 @@ final class CoreAudioRecorder: @unchecked Sendable {
     private func emitPreRollDataToStreaming(_ data: Data) {
         guard let onAudioChunk else { return }
 
-        var offset = 0
-        while offset < data.count {
-            var length = min(preRollStreamingChunkBytes, data.count - offset)
-            if length % VoiceInkPCM16Audio.bytesPerSample != 0 {
-                length -= 1
-            }
-            guard length > 0 else { break }
-
-            onAudioChunk(data.subdata(in: offset..<(offset + length)))
-            offset += length
+        for chunk in VoiceInkPCM16Audio.monoPCM16Chunks(from: data, maxByteCount: preRollStreamingChunkBytes) {
+            onAudioChunk(chunk)
         }
     }
 

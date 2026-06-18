@@ -125,6 +125,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "FillerWordsTests.testAddingRejectsBlankAndCaseInsensitiveDuplicateWords", run: { FillerWordsTests().testAddingRejectsBlankAndCaseInsensitiveDuplicateWords() }),
             VoiceInkCoreCheck(name: "FillerWordsTests.testRemovingDropsWordsCaseInsensitively", run: { FillerWordsTests().testRemovingDropsWordsCaseInsensitively() }),
             VoiceInkCoreCheck(name: "FillerWordsTests.testRemovingAtOffsetsMatchesIOSListDeletion", run: { FillerWordsTests().testRemovingAtOffsetsMatchesIOSListDeletion() }),
+            VoiceInkCoreCheck(name: "PreferenceListTests.testRemovingAtOffsetsPreservesRemainingOrder", run: { PreferenceListTests().testRemovingAtOffsetsPreservesRemainingOrder() }),
+            VoiceInkCoreCheck(name: "PreferenceListTests.testRemovingAtOffsetsIgnoresOutOfRangeIndexes", run: { PreferenceListTests().testRemovingAtOffsetsIgnoresOutOfRangeIndexes() }),
             VoiceInkCoreCheck(name: "LanguageCatalogTests.testLanguageCatalogPreservesSharedNames", run: { LanguageCatalogTests().testLanguageCatalogPreservesSharedNames() }),
             VoiceInkCoreCheck(name: "LanguageCatalogTests.testWhisperLanguagesPreserveMacOSWhisperSet", run: { LanguageCatalogTests().testWhisperLanguagesPreserveMacOSWhisperSet() }),
             VoiceInkCoreCheck(name: "LanguageCatalogTests.testNativeAppleLanguagesUseBCP47Identifiers", run: { LanguageCatalogTests().testNativeAppleLanguagesUseBCP47Identifiers() }),

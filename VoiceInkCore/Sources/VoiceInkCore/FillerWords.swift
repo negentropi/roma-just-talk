@@ -29,10 +29,6 @@ public enum VoiceInkFillerWords {
     }
 
     public static func removing(at offsets: IndexSet, from words: [String]) -> [String] {
-        var updatedWords = words
-        for index in offsets.sorted(by: >) {
-            updatedWords.remove(at: index)
-        }
-        return updatedWords
+        VoiceInkPreferenceList.removing(at: offsets, from: words)
     }
 }

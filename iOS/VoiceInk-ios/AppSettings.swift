@@ -201,9 +201,7 @@ final class AppSettings: ObservableObject {
     }
 
     func removeWordReplacements(at offsets: IndexSet) {
-        wordReplacements = wordReplacements.enumerated().compactMap { index, rule in
-            offsets.contains(index) ? nil : rule
-        }
+        wordReplacements = VoiceInkPreferenceList.removing(at: offsets, from: wordReplacements)
     }
 
     var runtimeWordReplacementRules: [VoiceInkWordReplacementRule] {
@@ -230,9 +228,7 @@ final class AppSettings: ObservableObject {
     }
 
     func removeCustomVocabularyTerms(at offsets: IndexSet) {
-        customVocabularyTerms = customVocabularyTerms.enumerated().compactMap { index, term in
-            offsets.contains(index) ? nil : term
-        }
+        customVocabularyTerms = VoiceInkPreferenceList.removing(at: offsets, from: customVocabularyTerms)
     }
 
     var runtimeCustomVocabularyTerms: [String] {

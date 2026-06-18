@@ -1,14 +1,11 @@
 import Foundation
-import SwiftUI
 import AVFoundation
 import SwiftData
 import os
 import VoiceInkCore
 
 @MainActor
-class AudioTranscriptionService: ObservableObject {
-    @Published var isTranscribing = false
-
+class AudioTranscriptionService {
     private let modelContext: ModelContext
     private let enhancementService: AIEnhancementService?
     private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "AudioTranscriptionService")
@@ -29,10 +26,6 @@ class AudioTranscriptionService: ObservableObject {
     func retranscribeAudio(from url: URL, using model: any TranscriptionModel) async throws -> Transcription {
         guard FileManager.default.fileExists(atPath: url.path) else {
             throw VoiceInkEngineError.audioFileNotFound
-        }
-        
-        await MainActor.run {
-            isTranscribing = true
         }
         
         do {
@@ -66,7 +59,6 @@ class AudioTranscriptionService: ObservableObject {
                 try FileManager.default.copyItem(at: url, to: permanentURL)
             } catch {
                 logger.error("❌ Failed to create permanent copy of audio: \(error.localizedDescription, privacy: .public)")
-                isTranscribing = false
                 throw error
             }
             
@@ -130,10 +122,6 @@ class AudioTranscriptionService: ObservableObject {
                         logger.error("❌ Failed to save transcription: \(error.localizedDescription, privacy: .public)")
                     }
 
-                    await MainActor.run {
-                        isTranscribing = false
-                    }
-
                     return newTranscription
                 } catch {
                     let newTranscription = Transcription(
@@ -154,10 +142,6 @@ class AudioTranscriptionService: ObservableObject {
                         NotificationCenter.default.post(name: .transcriptionCompleted, object: newTranscription)
                     } catch {
                         logger.error("❌ Failed to save transcription: \(error.localizedDescription, privacy: .public)")
-                    }
-
-                    await MainActor.run {
-                        isTranscribing = false
                     }
 
                     return newTranscription
@@ -183,15 +167,10 @@ class AudioTranscriptionService: ObservableObject {
                     logger.error("❌ Failed to save transcription: \(error.localizedDescription, privacy: .public)")
                 }
 
-                await MainActor.run {
-                    isTranscribing = false
-                }
-
                 return newTranscription
             }
         } catch {
             logger.error("❌ Transcription failed: \(error.localizedDescription, privacy: .public)")
-            isTranscribing = false
             throw error
         }
     }

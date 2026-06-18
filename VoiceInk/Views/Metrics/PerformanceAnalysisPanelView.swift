@@ -5,7 +5,7 @@ import VoiceInkCore
 struct PerformanceAnalysisPanelView: View {
     let transcriptions: [Transcription]
     let onClose: () -> Void
-    private let analysis: PerformanceAnalyzer.AnalysisResult
+    private let analysis: VoiceInkPerformanceAnalysis
 
     init(transcriptions: [Transcription], onClose: @escaping () -> Void) {
         self.transcriptions = transcriptions
@@ -151,7 +151,7 @@ struct PerformanceAnalysisPanelView: View {
         }
     }
 
-    private func transcriptionModelTile(_ modelStat: PerformanceAnalyzer.ModelStat) -> some View {
+    private func transcriptionModelTile(_ modelStat: VoiceInkPerformanceModelStat) -> some View {
         VStack(spacing: 10) {
             // Model name + count
             VStack(spacing: 2) {
@@ -224,7 +224,7 @@ struct PerformanceAnalysisPanelView: View {
         }
     }
 
-    private func enhancementModelTile(_ modelStat: PerformanceAnalyzer.ModelStat) -> some View {
+    private func enhancementModelTile(_ modelStat: VoiceInkPerformanceModelStat) -> some View {
         VStack(spacing: 10) {
             // Model name + count
             VStack(spacing: 2) {

@@ -620,14 +620,14 @@ final class RecordingShortcutModeHandler {
             } else if isRecorderVisible() {
                 guard canHandleShortcutAction() else { return }
                 if options.pasteLastTranscriptOnEmptyTap,
-                   SpecialShortcutEmptyTranscriptionFallback.shouldFallback(pressDuration: pressDuration) {
+                   VoiceInkSpecialShortcutEmptyFallbackPolicy.shouldScheduleFallback(pressDuration: pressDuration) {
                     SpecialShortcutEmptyTranscriptionFallback.scheduleFallback()
                 }
                 logger.notice("handleShortcutKeyUp: stopping recording (special shortcut, duration=\(pressDuration, privacy: .public)s)")
                 await toggleMiniRecorder(powerModeId)
             } else {
                 if options.pasteLastTranscriptOnEmptyTap,
-                   SpecialShortcutEmptyTranscriptionFallback.shouldFallback(pressDuration: pressDuration) {
+                   VoiceInkSpecialShortcutEmptyFallbackPolicy.shouldScheduleFallback(pressDuration: pressDuration) {
                     SpecialShortcutEmptyTranscriptionFallback.scheduleFallback()
                 }
                 logger.notice("handleShortcutKeyUp: committing preloaded special shortcut")

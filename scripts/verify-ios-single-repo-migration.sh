@@ -535,6 +535,11 @@ require_pattern \
   'VoiceInkTranscriptPresentation\.canceledTranscriptionText' \
   VoiceInk/Models/Transcription.swift
 
+reject_pattern \
+  "macOS last-transcription shell avoids shared policy pass-through wrappers" \
+  'private static func +isPasteable\(|static func +shouldFallback\(' \
+  VoiceInk/Services/LastTranscriptionService.swift
+
 require_pattern \
   "macOS engine canceled recording uses shared canceled text" \
   'VoiceInkTranscriptPresentation\.canceledTranscriptionText' \

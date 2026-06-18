@@ -13,19 +13,15 @@ class LastTranscriptionService: ObservableObject {
         do {
             let transcriptions = try modelContext.fetch(descriptor)
             return transcriptions.first { transcription in
-                transcription.id != excludedID && isPasteable(transcription)
+                transcription.id != excludedID && VoiceInkTranscriptPresentation.isPasteable(
+                    rawText: transcription.text,
+                    statusRawValue: transcription.transcriptionStatus
+                )
             }
         } catch {
             print("Error fetching last transcription: \(error)")
             return nil
         }
-    }
-
-    private static func isPasteable(_ transcription: Transcription) -> Bool {
-        VoiceInkTranscriptPresentation.isPasteable(
-            rawText: transcription.text,
-            statusRawValue: transcription.transcriptionStatus
-        )
     }
     
     static func copyLastTranscription(from modelContext: ModelContext) {
@@ -171,10 +167,6 @@ enum SpecialShortcutEmptyTranscriptionFallback {
     }
 
     private static var pendingFallback: PendingFallback?
-
-    static func shouldFallback(pressDuration: TimeInterval) -> Bool {
-        VoiceInkSpecialShortcutEmptyFallbackPolicy.shouldScheduleFallback(pressDuration: pressDuration)
-    }
 
     static func scheduleFallback() {
         pendingFallback = PendingFallback(createdAt: Date())

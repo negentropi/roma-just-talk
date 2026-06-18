@@ -130,7 +130,7 @@ Current macOS consumers of shared remote transport:
 - macOS pre-roll streaming and buffered-snapshot streaming split mono PCM16 data through `VoiceInkPCM16Audio.monoPCM16Chunks`; macOS still owns streaming sessions, callbacks, and quick-release orchestration.
 - macOS batch cloud and streaming transcription use `VoiceInkProviderCredential` for runtime API-key presence checks before entering provider adapters.
 - macOS API-key lookup reads fallback environment-variable names from `VoiceInkProviderAPIKeyAccount`; Keychain access remains in the macOS shell.
-- macOS cloud-provider model lists are supplied by the `CloudProvider` default adapter over `VoiceInkTranscriptionModelCatalog`, so the macOS shell only owns streaming factories and platform storage context.
+- macOS cloud-provider model lists are supplied by the `CloudProvider` default adapter over `VoiceInkTranscriptionModelCatalog`; the old standalone cloud-model adapter file is folded into `CloudProvider`, so the macOS shell only owns streaming factories and platform storage context.
 - macOS cloud-provider recorded-file support is derived from `VoiceInkTranscriptionModelProvider.supportsRecordedFileTranscription`, so Cartesia remains streaming-only without a shell-only override.
 - macOS Native Apple and Parakeet model structs adapt `VoiceInkTranscriptionModelCatalog` local model specs; macOS still owns OS availability and FluidAudio download/runtime code.
 - macOS language pickers use `VoiceInkLanguageCatalog.sortedOptions` so language presentation order stays shared with iOS.

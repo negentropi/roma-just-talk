@@ -301,6 +301,46 @@ reject_pattern \
   iOS/VoiceInk-ios/RecordingManager.swift
 
 require_pattern \
+  "shared recording transcription draft lives in VoiceInkCore" \
+  'VoiceInkRecordingTranscriptionDraft' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingTranscriptionDraft.swift
+
+require_pattern \
+  "macOS Transcription adapts shared recording draft" \
+  'init\(recordingDraft draft: VoiceInkRecordingTranscriptionDraft\)' \
+  VoiceInk/Models/Transcription.swift
+
+require_pattern \
+  "iOS Transcription adapts shared recording draft" \
+  'init\(recordingDraft draft: VoiceInkRecordingTranscriptionDraft\)' \
+  iOS/VoiceInk-ios/VoiceInk-ios/Transcription.swift
+
+require_pattern \
+  "macOS recording rows build shared recording draft" \
+  'VoiceInkRecordingTranscriptionDraft' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+
+require_pattern \
+  "macOS recording rows insert through shared recording draft" \
+  'Transcription\(recordingDraft: draft\)' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+
+require_pattern \
+  "iOS live recording builds shared pending recording draft" \
+  'VoiceInkRecordingTranscriptionDraft\.pending' \
+  iOS/VoiceInk-ios/RecordingManager.swift
+
+require_pattern \
+  "iOS live recording inserts through shared recording draft" \
+  'Transcription\(recordingDraft: draft\)' \
+  iOS/VoiceInk-ios/RecordingManager.swift
+
+reject_pattern \
+  "iOS live recording avoids shell-only pending note construction" \
+  'transcriptionStatus: +\.pending' \
+  iOS/VoiceInk-ios/RecordingManager.swift
+
+require_pattern \
   "iOS live recording uses shared stored-audio filename policy" \
   'VoiceInkStoredAudioFile\.timestampedRecordingFileURL' \
   iOS/VoiceInk-ios/AudioRecorder.swift

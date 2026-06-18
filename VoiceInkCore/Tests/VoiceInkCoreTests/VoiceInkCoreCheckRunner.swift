@@ -29,6 +29,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "CompletedTranscriptionDraftTests.testDraftStoresSuccessfulEnhancementMetadata", run: { CompletedTranscriptionDraftTests().testDraftStoresSuccessfulEnhancementMetadata() }),
             VoiceInkCoreCheck(name: "CompletedTranscriptionDraftTests.testFailurePolicyCanStoreSharedFailureTextAndClearEnhancementMetadata", run: { CompletedTranscriptionDraftTests().testFailurePolicyCanStoreSharedFailureTextAndClearEnhancementMetadata() }),
             VoiceInkCoreCheck(name: "CompletedTranscriptionDraftTests.testFailurePolicyCanOmitEnhancedText", run: { CompletedTranscriptionDraftTests().testFailurePolicyCanOmitEnhancedText() }),
+            VoiceInkCoreCheck(name: "CompletedTranscriptionDraftTests.testRecordingPendingDraftBuildsSharedPendingRow", run: { CompletedTranscriptionDraftTests().testRecordingPendingDraftBuildsSharedPendingRow() }),
+            VoiceInkCoreCheck(name: "CompletedTranscriptionDraftTests.testRecordingCanceledDraftUsesSharedCanceledText", run: { CompletedTranscriptionDraftTests().testRecordingCanceledDraftUsesSharedCanceledText() }),
             VoiceInkCoreCheck(name: "AIEnhancementRetryPolicyTests.testBackoffFailuresRetryUntilAttemptLimit", run: { AIEnhancementRetryPolicyTests().testBackoffFailuresRetryUntilAttemptLimit() }),
             VoiceInkCoreCheck(name: "AIEnhancementRetryPolicyTests.testTimeoutRetriesImmediatelyWhenEnabled", run: { AIEnhancementRetryPolicyTests().testTimeoutRetriesImmediatelyWhenEnabled() }),
             VoiceInkCoreCheck(name: "AIEnhancementRetryPolicyTests.testTimeoutFailsImmediatelyWhenDisabled", run: { AIEnhancementRetryPolicyTests().testTimeoutFailsImmediatelyWhenDisabled() }),

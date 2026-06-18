@@ -31,6 +31,16 @@ final class Transcription: VoiceInkMutableTranscriptionRecord, VoiceInkStoredAud
         self.transcriptionStatus = transcriptionStatus
         self.transcriptionError = transcriptionError
     }
+
+    convenience init(recordingDraft draft: VoiceInkRecordingTranscriptionDraft) {
+        self.init(
+            text: draft.text,
+            duration: draft.duration,
+            audioFileURL: draft.audioFileURL,
+            transcriptionModelName: draft.transcriptionModelName,
+            transcriptionStatus: draft.transcriptionStatus
+        )
+    }
     
     var storedAudioRecordingsDirectory: URL? {
         VoiceInkIOSStorageDirectories.recordingsDirectory

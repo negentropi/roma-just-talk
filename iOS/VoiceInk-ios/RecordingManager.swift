@@ -121,13 +121,11 @@ final class RecordingManager: ObservableObject {
         let audioFileName = fileURL.lastPathComponent
         let recordingDuration = currentDuration
         
-        // IMMEDIATELY create and insert the note with pending status
-        let note = Transcription(
-            text: "",
+        let draft = VoiceInkRecordingTranscriptionDraft.pending(
             duration: recordingDuration,
-            audioFileURL: audioFileName,
-            transcriptionStatus: .pending
+            audioFileURL: audioFileName
         )
+        let note = Transcription(recordingDraft: draft)
         modelContext.insert(note)
         try? modelContext.save()
         

@@ -72,6 +72,18 @@ final class Transcription: VoiceInkStoredAudioRecord, VoiceInkSessionMetricSourc
         )
     }
 
+    convenience init(recordingDraft draft: VoiceInkRecordingTranscriptionDraft) {
+        self.init(
+            text: draft.text,
+            duration: draft.duration,
+            audioFileURL: draft.audioFileURL,
+            transcriptionModelName: draft.transcriptionModelName,
+            powerModeName: draft.powerModeName,
+            powerModeEmoji: draft.powerModeEmoji,
+            transcriptionStatus: draft.transcriptionStatus
+        )
+    }
+
     func markAsCanceledTranscription(
         duration: TimeInterval? = nil,
         modelName: String? = nil

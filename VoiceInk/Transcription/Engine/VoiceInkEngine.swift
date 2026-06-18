@@ -922,7 +922,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
     ) -> Transcription {
         let powerModeMetadata = currentPowerModeMetadata()
 
-        return Transcription(
+        let draft = VoiceInkRecordingTranscriptionDraft(
             text: text,
             duration: duration,
             audioFileURL: audioURL.absoluteString,
@@ -931,6 +931,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
             powerModeEmoji: powerModeMetadata.emoji,
             transcriptionStatus: transcriptionStatus
         )
+        return Transcription(recordingDraft: draft)
     }
 
     private func currentPowerModeMetadata() -> (name: String?, emoji: String?) {

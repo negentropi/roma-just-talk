@@ -77,4 +77,38 @@ final class CompletedTranscriptionDraftTests: XCTestCase {
         XCTAssertNil(draft.aiRequestUserMessage)
         XCTAssertEqual(draft.transcriptionStatus, .completed)
     }
+
+    func testRecordingPendingDraftBuildsSharedPendingRow() {
+        let draft = VoiceInkRecordingTranscriptionDraft.pending(
+            duration: 4.25,
+            audioFileURL: "recording.wav",
+            transcriptionModelName: "Base",
+            powerModeName: "Focus",
+            powerModeEmoji: "F"
+        )
+
+        XCTAssertEqual(draft.text, "")
+        XCTAssertEqual(draft.duration, 4.25)
+        XCTAssertEqual(draft.audioFileURL, "recording.wav")
+        XCTAssertEqual(draft.transcriptionModelName, "Base")
+        XCTAssertEqual(draft.powerModeName, "Focus")
+        XCTAssertEqual(draft.powerModeEmoji, "F")
+        XCTAssertEqual(draft.transcriptionStatus, .pending)
+    }
+
+    func testRecordingCanceledDraftUsesSharedCanceledText() {
+        let draft = VoiceInkRecordingTranscriptionDraft.canceled(
+            duration: 1.5,
+            audioFileURL: "file:///recording.wav",
+            transcriptionModelName: "Parakeet"
+        )
+
+        XCTAssertEqual(draft.text, VoiceInkTranscriptPresentation.canceledTranscriptionText)
+        XCTAssertEqual(draft.duration, 1.5)
+        XCTAssertEqual(draft.audioFileURL, "file:///recording.wav")
+        XCTAssertEqual(draft.transcriptionModelName, "Parakeet")
+        XCTAssertNil(draft.powerModeName)
+        XCTAssertNil(draft.powerModeEmoji)
+        XCTAssertEqual(draft.transcriptionStatus, .canceled)
+    }
 }

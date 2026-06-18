@@ -306,6 +306,26 @@ require_pattern \
   iOS/VoiceInk-ios/AudioRecorder.swift
 
 require_pattern \
+  "iOS note detail uses shared stored-audio availability presentation" \
+  'storedAudioAvailability\(\)|shouldShowAudioSection|unavailableTitle|unavailableDetail' \
+  iOS/VoiceInk-ios/NoteDetailView.swift
+
+reject_pattern \
+  "iOS note detail avoids shell-only stored-audio path checks" \
+  'VoiceInkStoredAudioFile\.(availability|existingURL|fileExists)|FileManager|audioFileURL' \
+  iOS/VoiceInk-ios/NoteDetailView.swift
+
+require_pattern \
+  "iOS note deletion uses shared stored-audio record delete helper" \
+  'deleteExistingAudioFile\(\)' \
+  iOS/VoiceInk-ios/NotesListView.swift
+
+reject_pattern \
+  "iOS note deletion avoids shell-only stored-audio file deletion" \
+  'FileManager|removeItem|audioFileURL' \
+  iOS/VoiceInk-ios/NotesListView.swift
+
+require_pattern \
   "shared stored-audio record owns delete-and-clear policy" \
   'deleteExistingAudioFileAndClearReference' \
   VoiceInkCore/Sources/VoiceInkCore/StoredAudioFile.swift

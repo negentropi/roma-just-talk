@@ -9,13 +9,22 @@ import Foundation
 import VoiceInkCore
 
 class TranscriptionRetryService {
+    typealias TranscribeFile = (URL) async throws -> VoiceInkTranscriptionRunResult
+
     private let runProcessor = VoiceInkTranscriptionRunProcessor()
+    private let transcribeFileOverride: TranscribeFile?
     
     static let shared = TranscriptionRetryService()
     
-    private init() {}
+    init(transcribeFileOverride: TranscribeFile? = nil) {
+        self.transcribeFileOverride = transcribeFileOverride
+    }
 
     func transcribe(fileURL: URL) async throws -> VoiceInkTranscriptionRunResult {
+        if let transcribeFileOverride {
+            return try await transcribeFileOverride(fileURL)
+        }
+
         let settings = AppSettings.shared
         let modeConfiguration = await settings.effectiveModeConfiguration
         let cleanupConfiguration = await settings.transcriptionCleanupConfiguration
@@ -44,15 +53,17 @@ class TranscriptionRetryService {
 
     /// Retries transcription for a given note using current app settings
     func retranscribe(note: Transcription) async throws -> String {
-        guard let fileURL = note.existingAudioFileURL() else {
-            throw VoiceInkEngineError.audioFileNotFound
-        }
+        do {
+            guard let fileURL = note.existingAudioFileURL() else {
+                throw VoiceInkEngineError.audioFileNotFound
+            }
 
-        let result = try await transcribe(fileURL: fileURL)
-        
-        // Update note
-        note.applyCompletedRunResult(result)
-        
-        return result.finalText
+            let result = try await transcribe(fileURL: fileURL)
+            note.applyCompletedRunResult(result)
+            return result.finalText
+        } catch {
+            note.markTranscriptionFailed(VoiceInkErrorDescription.text(for: error))
+            throw error
+        }
     }
 }

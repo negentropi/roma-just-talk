@@ -205,10 +205,10 @@ struct NoteDetailView: View {
             
             do {
                 _ = try await TranscriptionRetryService.shared.retranscribe(note: note)
-                try? modelContext.save() // Save the updated note
             } catch {
-                // Error handling is already done in the service
+                // Failure state is already applied by the retry adapter.
             }
+            try? modelContext.save()
         }
     }
     

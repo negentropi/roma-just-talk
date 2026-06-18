@@ -35,8 +35,7 @@ class AudioTranscriptionService {
             let cleanupConfiguration = VoiceInkTranscriptionCleanupConfiguration.current()
             text = cleanupConfiguration.filterRawOutput(text)
 
-            let powerModeManager = PowerModeManager.shared
-            let activePowerModeConfig = powerModeManager.currentActiveConfiguration
+            let activePowerModeConfig = PowerModeManager.shared.activeConfiguration
             let powerModeName = (activePowerModeConfig?.isEnabled == true) ? activePowerModeConfig?.name : nil
             let powerModeEmoji = (activePowerModeConfig?.isEnabled == true) ? activePowerModeConfig?.emoji : nil
 

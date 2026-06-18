@@ -934,7 +934,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
     }
 
     private func currentPowerModeMetadata() -> (name: String?, emoji: String?) {
-        guard let powerMode = PowerModeManager.shared.currentActiveConfiguration,
+        guard let powerMode = PowerModeManager.shared.activeConfiguration,
               powerMode.isEnabled else {
             return (nil, nil)
         }

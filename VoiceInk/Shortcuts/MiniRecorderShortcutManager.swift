@@ -1,6 +1,7 @@
 import Foundation
 import AppKit
 import Carbon.HIToolbox
+import VoiceInkCore
 
 @MainActor
 class MiniRecorderShortcutManager: ObservableObject {
@@ -56,7 +57,7 @@ class MiniRecorderShortcutManager: ObservableObject {
 
     private var canUsePowerModeShortcuts: Bool {
         UserDefaults.standard.bool(forKey: "powerModeUIFlag") &&
-            !PowerModeManager.shared.enabledConfigurations.isEmpty
+            !PowerModeManager.shared.configurations.enabledPowerModeConfigurations.isEmpty
     }
 
     private func resetEscapeState() {
@@ -170,7 +171,7 @@ class MiniRecorderShortcutManager: ObservableObject {
         guard canUsePowerModeShortcuts else { return }
 
         let powerModeManager = PowerModeManager.shared
-        let availableConfigurations = powerModeManager.enabledConfigurations
+        let availableConfigurations = powerModeManager.configurations.enabledPowerModeConfigurations
 
         guard index < availableConfigurations.count else { return }
 

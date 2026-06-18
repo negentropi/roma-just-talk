@@ -1,4 +1,5 @@
 import Foundation
+import VoiceInkCore
 
 enum ShortcutAction: Hashable {
     case primaryRecording
@@ -80,7 +81,7 @@ enum ShortcutAction: Hashable {
         case .toggleEnhancement:
             return "Toggle Enhancement"
         case .powerMode(let id):
-            if let config = PowerModeManager.shared.getConfiguration(with: id) {
+            if let config = PowerModeManager.shared.configurations.powerModeConfiguration(with: id) {
                 return "\(config.name) Power Mode"
             }
 

@@ -37,10 +37,6 @@ class PowerModeManager: ObservableObject {
         postShortcutAvailabilityChangeIfNeeded(previousEnabledConfigIds: previousEnabledConfigIds)
     }
 
-    func getConfiguration(with id: UUID) -> PowerModeConfig? {
-        return configurations.powerModeConfiguration(with: id)
-    }
-
     func updateConfiguration(_ config: PowerModeConfig) {
         let previousEnabledConfigIds = enabledConfigurationIds
         if configurations.updatePowerModeConfiguration(config) {
@@ -54,10 +50,6 @@ class PowerModeManager: ObservableObject {
         saveConfigurations()
     }
 
-    func hasDefaultConfiguration() -> Bool {
-        return configurations.hasPowerModeDefaultConfiguration
-    }
-    
     func setAsDefault(configId: UUID, skipSave: Bool = false) {
         configurations.setPowerModeDefaultConfiguration(id: configId)
 
@@ -82,10 +74,6 @@ class PowerModeManager: ObservableObject {
         }
     }
     
-    var enabledConfigurations: [PowerModeConfig] {
-        configurations.enabledPowerModeConfigurations
-    }
-
     private var enabledConfigurationIds: Set<UUID> {
         configurations.enabledPowerModeConfigurationIds
     }
@@ -122,25 +110,9 @@ class PowerModeManager: ObservableObject {
         }
     }
 
-    func cleanURL(_ url: String) -> String {
-        VoiceInkPowerModePolicy.normalizedWebsiteURL(url)
-    }
-
     func setActiveConfiguration(_ config: PowerModeConfig?) {
         activeConfiguration = config
         VoiceInkPowerModeConfigurationPreference.saveActiveConfigurationId(config?.id)
         self.objectWillChange.send()
     }
-
-    var currentActiveConfiguration: PowerModeConfig? {
-        return activeConfiguration
-    }
-
-    func getAllAvailableConfigurations() -> [PowerModeConfig] {
-        return configurations
-    }
-
-    func isEmojiInUse(_ emoji: String) -> Bool {
-        return configurations.containsPowerModeEmoji(emoji)
-    }
-} 
+}

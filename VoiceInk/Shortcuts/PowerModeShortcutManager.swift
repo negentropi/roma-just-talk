@@ -1,4 +1,5 @@
 import Foundation
+import VoiceInkCore
 
 @MainActor
 class PowerModeShortcutManager {
@@ -66,7 +67,7 @@ class PowerModeShortcutManager {
             return
         }
 
-        let shortcuts = PowerModeManager.shared.enabledConfigurations.reduce(into: [ShortcutAction: Shortcut]()) { result, config in
+        let shortcuts = PowerModeManager.shared.configurations.enabledPowerModeConfigurations.reduce(into: [ShortcutAction: Shortcut]()) { result, config in
             let action = ShortcutAction.powerMode(config.id)
             if let shortcut = ShortcutStore.shortcut(for: action) {
                 result[action] = shortcut
@@ -121,7 +122,7 @@ class PowerModeShortcutManager {
 
     private func powerModeId(for action: ShortcutAction) -> UUID? {
         guard case .powerMode(let powerModeId) = action,
-              let config = PowerModeManager.shared.getConfiguration(with: powerModeId),
+              let config = PowerModeManager.shared.configurations.powerModeConfiguration(with: powerModeId),
               config.isEnabled,
               ShortcutStore.shortcut(for: .powerMode(config.id)) != nil else {
             return nil

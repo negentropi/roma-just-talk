@@ -1,4 +1,5 @@
 import SwiftUI
+import VoiceInkCore
 
 struct EmojiPickerView: View {
     @StateObject private var emojiManager = EmojiManager.shared
@@ -135,7 +136,7 @@ struct EmojiPickerView: View {
     private func attemptToRemoveCustomEmoji(_ emojiToRemove: String) {
         guard emojiManager.isCustomEmoji(emojiToRemove) else { return }
 
-        if PowerModeManager.shared.isEmojiInUse(emojiToRemove) {
+        if PowerModeManager.shared.configurations.containsPowerModeEmoji(emojiToRemove) {
             emojiForAlert = emojiToRemove
             showingEmojiInUseAlert = true
         } else {
@@ -233,5 +234,3 @@ struct EmojiPickerView_Previews: PreviewProvider {
     }
 }
 #endif
-
- 

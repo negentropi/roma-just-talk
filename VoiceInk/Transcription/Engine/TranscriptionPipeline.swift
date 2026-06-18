@@ -407,7 +407,7 @@ class TranscriptionPipeline {
                 logger.notice("Latency trace paste completed operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s chars=\(pastedText.count, privacy: .public)")
                 recordRollingPreloadTiming(latencyTrace, stage: .pasteCompleted)
             }
-            let autoSendKey = PowerModeManager.shared.currentActiveConfiguration?.autoSendKey
+            let autoSendKey = PowerModeManager.shared.activeConfiguration?.autoSendKey
             SoundManager.shared.playStopSound()
             await restorePromptDetectionSettingsAndDismiss {
                 if let autoSendKey, autoSendKey.isEnabled {

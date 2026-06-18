@@ -976,6 +976,21 @@ reject_pattern \
   VoiceInk/PowerMode/PowerModeConfig.swift
 
 reject_pattern \
+  "macOS Power Mode manager avoids shell-only shared policy pass-through helpers" \
+  'func +(getConfiguration|hasDefaultConfiguration|cleanURL|getAllAvailableConfigurations|isEmojiInUse)\(|var +(enabledConfigurations|currentActiveConfiguration)\b' \
+  VoiceInk/PowerMode/PowerModeConfig.swift
+
+require_pattern \
+  "macOS Power Mode form calls shared URL normalization directly" \
+  'VoiceInkPowerModePolicy\.normalizedWebsiteURL' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+require_pattern \
+  "macOS Power Mode shortcuts call shared enabled-list policy directly" \
+  'configurations\.enabledPowerModeConfigurations' \
+  VoiceInk/Shortcuts/PowerModeShortcutManager.swift
+
+reject_pattern \
   "macOS active-window adapter avoids shell-only Power Mode resolution policy" \
   'getConfigurationForURL|getConfigurationForApp|getDefaultConfiguration|configToApply' \
   VoiceInk/PowerMode/ActiveWindowService.swift

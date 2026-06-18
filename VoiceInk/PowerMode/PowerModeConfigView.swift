@@ -96,7 +96,7 @@ struct ConfigurationView: View {
             _isTranscriptFormattingExpanded = State(initialValue: false)
         case .edit(let config):
             // Fetch latest version in case config was modified elsewhere
-            let latestConfig = powerModeManager.getConfiguration(with: config.id) ?? config
+            let latestConfig = powerModeManager.configurations.powerModeConfiguration(with: config.id) ?? config
             _powerModeConfigId = State(initialValue: latestConfig.id)
             _isAIEnhancementEnabled = State(initialValue: latestConfig.isAIEnhancementEnabled)
             _selectedPromptId = State(initialValue: latestConfig.selectedPrompt.flatMap { UUID(uuidString: $0) })
@@ -616,7 +616,7 @@ struct ConfigurationView: View {
 
     private func addWebsite() {
         guard !newWebsiteURL.isEmpty else { return }
-        let cleanedURL = powerModeManager.cleanURL(newWebsiteURL)
+        let cleanedURL = VoiceInkPowerModePolicy.normalizedWebsiteURL(newWebsiteURL)
         websiteConfigs.append(VoiceInkPowerModeURLConfig(url: cleanedURL))
         newWebsiteURL = ""
     }

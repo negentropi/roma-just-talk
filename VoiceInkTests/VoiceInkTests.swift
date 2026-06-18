@@ -13,6 +13,7 @@ import Carbon.HIToolbox
 import os
 @testable import VoiceInk
 
+@Suite(.serialized)
 struct VoiceInkTests {
 
     @Test func freshDefaultsHideMenuBarIcon() async throws {

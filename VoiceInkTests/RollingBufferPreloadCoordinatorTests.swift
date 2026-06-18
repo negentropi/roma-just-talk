@@ -171,6 +171,7 @@ private final class DelayedFakeTranscriptionSession: TranscriptionSession {
     }
 }
 
+@Suite(.serialized)
 struct RollingBufferPreloadCoordinatorTests {
     @MainActor
     @Test func startingPreloadClaimWaitStaysUnderQuickReleaseBudget() {

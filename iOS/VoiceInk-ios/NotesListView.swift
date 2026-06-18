@@ -7,7 +7,7 @@ struct NotesListView: View {
     @Query(sort: [SortDescriptor(\Transcription.timestamp, order: .reverse)]) private var notes: [Transcription]
 
     @State private var searchText: String = ""
-    @State private var showingNoModesAlert: Bool = false
+    @State private var recordingStartAlert: VoiceInkRecordingAlertPresentation?
     @EnvironmentObject private var recordingManager: RecordingManager
     @StateObject private var settings = AppSettings.shared
 
@@ -50,29 +50,10 @@ struct NotesListView: View {
                     .interactiveDismissDisabled(true)
                 }
                 .alert(item: $recordingManager.activeRecordingAlert) { alertType in
-                    switch alertType {
-                    case .permissionDenied:
-                        return Alert(
-                            title: Text("Microphone Access Denied"),
-                            message: Text("To record audio, please grant microphone access in Settings."),
-                            primaryButton: .default(Text("Settings"), action: recordingManager.openSettings),
-                            secondaryButton: .cancel()
-                        )
-                    case .generic(let error):
-                        let nsError = error as NSError
-                        if nsError.domain == NSOSStatusErrorDomain && nsError.code == 561017449 { // '!act' error
-                             return Alert(
-                                title: Text("Microphone In Use"),
-                                message: Text("Another app is using the microphone. Please try again."),
-                                dismissButton: .default(Text("OK"))
-                            )
-                        }
-                        return Alert(
-                            title: Text("Recording Failed"),
-                            message: Text("Could not start recording: \(error.localizedDescription)"),
-                            dismissButton: .default(Text("OK"))
-                        )
-                    }
+                    alert(for: alertType)
+                }
+                .alert(item: $recordingStartAlert) { alertType in
+                    alert(for: alertType)
                 }
                 .onReceive(NotificationCenter.default.publisher(for: .stopRecordingFromKeyboard)) { _ in
                     if recordingManager.isRecording {
@@ -156,8 +137,10 @@ struct NotesListView: View {
 
     private var unifiedRecordingComponent: some View {
         Button(action: {
-            if AppSettings.shared.modes.isEmpty {
-                showingNoModesAlert = true
+            if let alert = VoiceInkRecordingAlertPresentation.noModesAvailableIfNeeded(
+                modeCount: settings.modes.count
+            ) {
+                recordingStartAlert = alert
             } else {
                 recordingManager.startRecordingFlow()
             }
@@ -172,14 +155,29 @@ struct NotesListView: View {
         .controlSize(.large)
         .padding(.horizontal, 32)
         .padding(.bottom, 12)
-        .alert("No Modes Found", isPresented: $showingNoModesAlert) {
-            Button("OK", role: .cancel) { }
-        } message: {
-            Text("Please create a new mode in Settings before recording.")
-        }
     }
 
     // MARK: - Helper Functions
+    private func alert(for presentation: VoiceInkRecordingAlertPresentation) -> Alert {
+        switch presentation.action {
+        case .openSettings:
+            return Alert(
+                title: Text(presentation.title),
+                message: Text(presentation.message),
+                primaryButton: .default(
+                    Text(presentation.primaryButtonTitle),
+                    action: recordingManager.openSettings
+                ),
+                secondaryButton: .cancel(Text(presentation.secondaryButtonTitle ?? "Cancel"))
+            )
+        case .dismiss:
+            return Alert(
+                title: Text(presentation.title),
+                message: Text(presentation.message),
+                dismissButton: .default(Text(presentation.primaryButtonTitle))
+            )
+        }
+    }
     
     private func deleteItems(offsets: IndexSet) {
         withAnimation {

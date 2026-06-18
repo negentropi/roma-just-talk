@@ -12,25 +12,13 @@ extension Notification.Name {
 private enum MicrophonePermissionStatus {
     case granted, denied, undetermined
 }
-
-enum ActiveRecordingAlert: Identifiable {
-    case permissionDenied
-    case generic(Error)
-    
-    var id: String {
-        switch self {
-        case .permissionDenied: return "permissionDenied"
-        case .generic(let error): return "generic-\(error.localizedDescription)"
-        }
-    }
-}
  
 @MainActor
 final class RecordingManager: ObservableObject {
     @Published var recordingState: VoiceInkRecordingState = .idle
     @Published var animate = false
     @Published var isRecordingSheetPresented = false
-    @Published var activeRecordingAlert: ActiveRecordingAlert?
+    @Published var activeRecordingAlert: VoiceInkRecordingAlertPresentation?
     @Published var currentDuration: Double = 0
     
     private let recorder = AudioRecorder()
@@ -79,13 +67,13 @@ final class RecordingManager: ObservableObject {
         case .granted:
             proceedToStartRecording()
         case .denied:
-            activeRecordingAlert = .permissionDenied
+            activeRecordingAlert = VoiceInkRecordingAlertPresentation.microphonePermissionDenied
         case .undetermined:
             requestPermission { [weak self] granted in
                 if granted {
                     self?.proceedToStartRecording()
                 } else {
-                    self?.activeRecordingAlert = .permissionDenied
+                    self?.activeRecordingAlert = VoiceInkRecordingAlertPresentation.microphonePermissionDenied
                 }
             }
         }
@@ -103,7 +91,7 @@ final class RecordingManager: ObservableObject {
             startDurationTimer()
             isRecordingSheetPresented = true
         } catch {
-            activeRecordingAlert = .generic(error)
+            activeRecordingAlert = VoiceInkRecordingAlertPresentation.recordingStartFailure(for: error)
             recordingState = .idle
             animate = false
             // Update coordinator state on error

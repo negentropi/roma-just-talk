@@ -315,6 +315,42 @@ require_pattern \
   'recordingState\.isActivelyRecording' \
   iOS/VoiceInk-ios/RecordingManager.swift
 
+require_pattern \
+  "shared recording alert presentation lives in VoiceInkCore" \
+  'VoiceInkRecordingAlertPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "shared recording alert presentation owns iOS microphone-busy OSStatus" \
+  'microphoneInUseOSStatusCode' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "shared recording alert presentation maps OSStatus domain" \
+  'NSOSStatusErrorDomain' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "iOS recording manager uses shared permission-denied alert presentation" \
+  'VoiceInkRecordingAlertPresentation\.microphonePermissionDenied' \
+  iOS/VoiceInk-ios/RecordingManager.swift
+
+require_pattern \
+  "iOS recording manager uses shared recording-failure alert presentation" \
+  'VoiceInkRecordingAlertPresentation\.recordingStartFailure' \
+  iOS/VoiceInk-ios/RecordingManager.swift
+
+require_pattern \
+  "iOS recording start gate uses shared no-mode presentation" \
+  'VoiceInkRecordingAlertPresentation\.noModesAvailableIfNeeded' \
+  iOS/VoiceInk-ios/NotesListView.swift
+
+reject_pattern \
+  "iOS recording views avoid shell-only recording alert copy and OSStatus mapping" \
+  'ActiveRecordingAlert|Microphone Access Denied|Microphone In Use|Recording Failed|No Modes Found|Please create a new mode in Settings before recording|Could not start recording:|561017449|NSOSStatusErrorDomain' \
+  iOS/VoiceInk-ios/RecordingManager.swift \
+  iOS/VoiceInk-ios/NotesListView.swift
+
 reject_pattern \
   "recording behavior avoids raw active-state equality" \
   'recordingState == \.recording' \

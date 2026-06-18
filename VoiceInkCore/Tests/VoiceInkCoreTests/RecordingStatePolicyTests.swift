@@ -68,4 +68,55 @@ final class RecordingStatePolicyTests: XCTestCase {
             )
         )
     }
+
+    func testRecordingAlertPresentationPreservesIOSNoModeGateCopy() {
+        XCTAssertNil(VoiceInkRecordingAlertPresentation.noModesAvailableIfNeeded(modeCount: 1))
+
+        let alert = VoiceInkRecordingAlertPresentation.noModesAvailableIfNeeded(modeCount: 0)
+        XCTAssertEqual(alert?.id, "noModesAvailable")
+        XCTAssertEqual(alert?.title, "No Modes Found")
+        XCTAssertEqual(alert?.message, "Please create a new mode in Settings before recording.")
+        XCTAssertEqual(alert?.primaryButtonTitle, "OK")
+        XCTAssertNil(alert?.secondaryButtonTitle)
+        XCTAssertEqual(alert?.action, .dismiss)
+    }
+
+    func testRecordingAlertPresentationPreservesIOSPermissionDeniedCopy() {
+        let alert = VoiceInkRecordingAlertPresentation.microphonePermissionDenied
+
+        XCTAssertEqual(alert.id, "microphonePermissionDenied")
+        XCTAssertEqual(alert.title, "Microphone Access Denied")
+        XCTAssertEqual(alert.message, "To record audio, please grant microphone access in Settings.")
+        XCTAssertEqual(alert.primaryButtonTitle, "Settings")
+        XCTAssertEqual(alert.secondaryButtonTitle, "Cancel")
+        XCTAssertEqual(alert.action, .openSettings)
+    }
+
+    func testRecordingStartFailureMapsIOSMicrophoneBusyOSStatus() {
+        let alert = VoiceInkRecordingAlertPresentation.recordingStartFailure(
+            domain: NSOSStatusErrorDomain,
+            code: VoiceInkRecordingAlertPresentation.microphoneInUseOSStatusCode,
+            localizedDescription: "The operation couldn’t be completed."
+        )
+
+        XCTAssertEqual(alert.id, "microphoneInUse")
+        XCTAssertEqual(alert.title, "Microphone In Use")
+        XCTAssertEqual(alert.message, "Another app is using the microphone. Please try again.")
+        XCTAssertEqual(alert.primaryButtonTitle, "OK")
+        XCTAssertEqual(alert.action, .dismiss)
+    }
+
+    func testRecordingStartFailurePreservesGenericFailureCopy() {
+        let alert = VoiceInkRecordingAlertPresentation.recordingStartFailure(
+            domain: "example",
+            code: 42,
+            localizedDescription: "Hardware unavailable"
+        )
+
+        XCTAssertEqual(alert.id, "recordingFailed-Hardware unavailable")
+        XCTAssertEqual(alert.title, "Recording Failed")
+        XCTAssertEqual(alert.message, "Could not start recording: Hardware unavailable")
+        XCTAssertEqual(alert.primaryButtonTitle, "OK")
+        XCTAssertEqual(alert.action, .dismiss)
+    }
 }

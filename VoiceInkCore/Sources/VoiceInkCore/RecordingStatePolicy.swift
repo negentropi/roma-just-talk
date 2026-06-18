@@ -15,6 +15,98 @@ public enum VoiceInkRecorderUIToggleAction: Equatable, Sendable {
     case dismissRecorder
 }
 
+public struct VoiceInkRecordingAlertPresentation: Equatable, Identifiable, Sendable {
+    public enum Action: Equatable, Sendable {
+        case dismiss
+        case openSettings
+    }
+
+    public static let microphoneInUseOSStatusCode = 561017449
+
+    public let id: String
+    public let title: String
+    public let message: String
+    public let primaryButtonTitle: String
+    public let secondaryButtonTitle: String?
+    public let action: Action
+
+    public init(
+        id: String,
+        title: String,
+        message: String,
+        primaryButtonTitle: String = "OK",
+        secondaryButtonTitle: String? = nil,
+        action: Action = .dismiss
+    ) {
+        self.id = id
+        self.title = title
+        self.message = message
+        self.primaryButtonTitle = primaryButtonTitle
+        self.secondaryButtonTitle = secondaryButtonTitle
+        self.action = action
+    }
+
+    public static var noModesAvailable: VoiceInkRecordingAlertPresentation {
+        VoiceInkRecordingAlertPresentation(
+            id: "noModesAvailable",
+            title: "No Modes Found",
+            message: "Please create a new mode in Settings before recording."
+        )
+    }
+
+    public static func noModesAvailableIfNeeded(modeCount: Int) -> VoiceInkRecordingAlertPresentation? {
+        modeCount <= 0 ? noModesAvailable : nil
+    }
+
+    public static var microphonePermissionDenied: VoiceInkRecordingAlertPresentation {
+        VoiceInkRecordingAlertPresentation(
+            id: "microphonePermissionDenied",
+            title: "Microphone Access Denied",
+            message: "To record audio, please grant microphone access in Settings.",
+            primaryButtonTitle: "Settings",
+            secondaryButtonTitle: "Cancel",
+            action: .openSettings
+        )
+    }
+
+    public static var microphoneInUse: VoiceInkRecordingAlertPresentation {
+        VoiceInkRecordingAlertPresentation(
+            id: "microphoneInUse",
+            title: "Microphone In Use",
+            message: "Another app is using the microphone. Please try again."
+        )
+    }
+
+    public static func recordingFailed(localizedDescription: String) -> VoiceInkRecordingAlertPresentation {
+        VoiceInkRecordingAlertPresentation(
+            id: "recordingFailed-\(localizedDescription)",
+            title: "Recording Failed",
+            message: "Could not start recording: \(localizedDescription)"
+        )
+    }
+
+    public static func recordingStartFailure(
+        domain: String,
+        code: Int,
+        localizedDescription: String
+    ) -> VoiceInkRecordingAlertPresentation {
+        if domain == NSOSStatusErrorDomain && code == microphoneInUseOSStatusCode {
+            return microphoneInUse
+        }
+
+        return recordingFailed(localizedDescription: localizedDescription)
+    }
+
+    public static func recordingStartFailure(for error: Error) -> VoiceInkRecordingAlertPresentation {
+        let nsError = error as NSError
+        return recordingStartFailure(
+            domain: nsError.domain,
+            code: nsError.code,
+            localizedDescription: error.localizedDescription
+        )
+    }
+}
+
 public extension VoiceInkRecordingState {
     var isActivelyRecording: Bool {
         self == .recording

@@ -1,4 +1,5 @@
 import Foundation
+import LLMkit
 import VoiceInkCore
 
 /// Events emitted by a streaming transcription provider
@@ -9,29 +10,7 @@ enum StreamingTranscriptionEvent {
     case error(Error)
 }
 
-/// Errors specific to streaming transcription
-enum StreamingTranscriptionError: LocalizedError {
-    case missingAPIKey
-    case connectionFailed(String)
-    case timeout
-    case serverError(String)
-    case notConnected
-
-    var errorDescription: String? {
-        switch self {
-        case .missingAPIKey:
-            return "API key not configured for streaming transcription"
-        case .connectionFailed(let message):
-            return "Streaming connection failed: \(message)"
-        case .timeout:
-            return "Streaming transcription timed out waiting for final result"
-        case .serverError(let message):
-            return "Streaming server error: \(message)"
-        case .notConnected:
-            return "Not connected to streaming transcription service"
-        }
-    }
-}
+typealias StreamingTranscriptionError = VoiceInkStreamingTranscriptionError
 
 /// Protocol for streaming transcription providers.
 protocol StreamingTranscriptionProvider: AnyObject {
@@ -59,5 +38,27 @@ extension StreamingTranscriptionProvider {
             throw StreamingTranscriptionError.missingAPIKey
         }
         return apiKey
+    }
+
+    func mapStreamingError(
+        _ error: Error,
+        treatsTimeoutAsStreamingTimeout: Bool = false
+    ) -> Error {
+        guard let llmError = error as? LLMKitError else { return error }
+
+        switch llmError {
+        case .missingAPIKey:
+            return StreamingTranscriptionError.missingAPIKey
+        case .httpError(_, let message):
+            return StreamingTranscriptionError.serverError(message)
+        case .networkError(let detail):
+            return StreamingTranscriptionError.connectionFailed(detail)
+        case .timeout where treatsTimeoutAsStreamingTimeout:
+            return StreamingTranscriptionError.timeout
+        default:
+            return StreamingTranscriptionError.serverError(
+                llmError.localizedDescription ?? StreamingTranscriptionError.unknownServerErrorMessage
+            )
+        }
     }
 }

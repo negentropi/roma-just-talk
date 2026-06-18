@@ -32,7 +32,7 @@ final class XAIStreamingProvider: StreamingTranscriptionProvider {
         } catch {
             forwardingTask?.cancel()
             forwardingTask = nil
-            throw mapError(error)
+            throw mapStreamingError(error)
         }
     }
 
@@ -40,7 +40,7 @@ final class XAIStreamingProvider: StreamingTranscriptionProvider {
         do {
             try await client.sendAudioChunk(data)
         } catch {
-            throw mapError(error)
+            throw mapStreamingError(error)
         }
     }
 
@@ -48,7 +48,7 @@ final class XAIStreamingProvider: StreamingTranscriptionProvider {
         do {
             try await client.commit()
         } catch {
-            throw mapError(error)
+            throw mapStreamingError(error)
         }
     }
 
@@ -79,17 +79,4 @@ final class XAIStreamingProvider: StreamingTranscriptionProvider {
         }
     }
 
-    private func mapError(_ error: Error) -> Error {
-        guard let llmError = error as? LLMKitError else { return error }
-        switch llmError {
-        case .missingAPIKey:
-            return StreamingTranscriptionError.missingAPIKey
-        case .httpError(_, let message):
-            return StreamingTranscriptionError.serverError(message)
-        case .networkError(let detail):
-            return StreamingTranscriptionError.connectionFailed(detail)
-        default:
-            return StreamingTranscriptionError.serverError(llmError.localizedDescription ?? "Unknown error")
-        }
-    }
 }

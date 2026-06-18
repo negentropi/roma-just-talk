@@ -52,6 +52,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - local transcription/model/missing-audio error vocabulary shared by macOS local Whisper and iOS local retry transcription
 - streaming word-agreement confirmation policy for stable partial transcription, including confidence gates, sentence-boundary confirmation, reset behavior, and rolling-preload configuration; platform shells still own provider token adapters, ASR runtime calls, audio buffering, and event delivery
 - streaming final-commit timeout policy for cloud providers versus local FluidAudio finalization; platform shells still map runtime provider identity to the shared timeout source
+- streaming transcription error vocabulary and user-facing descriptions; macOS still maps `LLMkit` transport errors into the shared streaming taxonomy
 - per-model transcription streaming preference key/default/read/write policy and streaming eligibility for unsupported, streaming-only, and batch-capable streaming models; platform shells still own provider runtime adapters and settings UI
 - rolling-buffer preload settings, per-model preload key/default policy, configuration normalization, power-state model, and preload allow/deny policy for global mode, per-model opt-out, cloud auto-disable, and low-battery local-model guards; macOS still owns IOKit power probing, rolling audio buffers, VAD, runtime diagnostics, and model/provider adapters
 - special-shortcut empty-tap fallback policy for press-duration threshold, pending fallback lifetime, completed-state checks, and empty raw/enhanced transcript eligibility; macOS still owns pending fallback state and cursor paste
@@ -151,6 +152,7 @@ Current macOS consumers of shared remote transport:
 - macOS and iOS local Whisper and macOS rolling preload resolve the Silero VAD bundle resource directly through `VoiceInkVADModelFiles`; the old shell-only VAD model manager adapters were removed.
 - macOS `FluidAudioStreamingProvider` runs stable partial-transcript confirmation through `WordAgreementEngine` in `VoiceInkCore`; `FluidAudioWordTimingAdapter` remains a macOS shell adapter because it imports the FluidAudio token type.
 - macOS streaming sessions choose final-commit wait time through `VoiceInkStreamingFinalCommitTimeout`, preserving the shorter local FluidAudio finalization path and the longer cloud-provider timeout.
+- macOS cloud streaming providers use `VoiceInkStreamingTranscriptionError` for shared streaming error descriptions; `StreamingTranscriptionProvider` keeps the macOS `LLMkit` adapter and deletes provider-local duplicate error mappers.
 - macOS `TranscriptionServiceRegistry`, `TranscriptionLanguageSupport`, streaming model-card toggles, and streaming-key migration use `VoiceInkTranscriptionStreamingPreference`; macOS still adapts `TranscriptionModel` and `CloudProvider` into the shared streaming preference snapshot.
 - macOS rolling-buffer preload settings, backup import/export, app defaults, settings UI, diagnostics, and coordinator preload gates use `VoiceInkRollingBufferPreloadSettings` and `VoiceInkRollingBufferPreloadPolicy` through shell aliases; macOS still owns IOKit power-state reads, VAD startup, rolling audio buffers, and quick-release diagnostics storage.
 - macOS special shortcut empty-tap fallback delegates short-press and empty-completed-transcript eligibility to `VoiceInkSpecialShortcutEmptyFallbackPolicy`; `LastTranscriptionService` still owns SwiftData lookup and cursor paste.
@@ -225,7 +227,7 @@ The remaining Swift files present in `../VoiceInk-iOS` but not in `VoiceInk/iOS`
 - `Mode.swift`, `PromptTemplate.swift`, `Provider.swift`: replaced by `VoiceInkCore` mode, prompt-template, and provider catalog modules.
 - `ModeSelectionView.swift`, `ModesView.swift`: obsolete iOS UI experiments; current in-repo iOS mode UI is `iOS/VoiceInk-ios/ModeConfigurationView.swift`.
 - `Item.swift`: unused SwiftData template sample.
-- `VoiceInk_iosTests.swift`, `VoiceInk_iosUITests.swift`, `VoiceInk_iosUITestsLaunchTests.swift`: stock Xcode template tests removed from the in-repo iOS target; shared behavior is covered in `VoiceInkCore/Tests`, and new app tests should be real migration/runtime coverage.
+- `VoiceInk_iosTests.swift`, `VoiceInk_iosUITests.swift`, `VoiceInk_iosUITestsLaunchTests.swift`: kept in the in-repo iOS target as real migration/runtime smoke coverage; the old stock-template assertions from the sibling clone should not be copied back.
 
 Do not copy these files back into `VoiceInk/iOS`. If behavior from one appears missing, port it into `VoiceInkCore` or the appropriate platform shell with a focused test.
 

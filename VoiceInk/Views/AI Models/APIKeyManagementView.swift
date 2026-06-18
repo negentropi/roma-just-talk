@@ -20,6 +20,10 @@ struct APIKeyManagementView: View {
     private var hasDraftAPIKey: Bool {
         VoiceInkProviderCredential.nonBlank(apiKey) != nil
     }
+
+    private var obfuscatedSelectedAPIKey: String {
+        VoiceInkSecretPresentation.obfuscatedAPIKey(aiService.apiKey) ?? "••••••••"
+    }
     
     var body: some View {
         Section("AI Provider Integration") {
@@ -268,7 +272,7 @@ struct APIKeyManagementView: View {
                         HStack {
                             Text("API Key")
                             Spacer()
-                            Text("••••••••")
+                            Text(obfuscatedSelectedAPIKey)
                                 .foregroundColor(.secondary)
                             Button("Remove", role: .destructive) {
                                 aiService.clearAPIKey()

@@ -36,6 +36,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - provider API-key verification dispatch, including stored-key reference/fallback resolution before verification
 - provider API-key verification flag storage
 - provider API-key state policy for stored-key lookup, runtime-key resolution, verification reset on key changes, and readiness calculation; platform shells still own Keychain storage and UI editing state
+- API-key display obfuscation policy; platform shells still own where stored keys are read and rendered
 - API-key environment-reference resolution and typed provider runtime-key lookup/fallback policy
 - AI reasoning temperature, effort, and provider-specific hidden-reasoning request parameters for OpenAI-compatible post-processing
 - AI-enhancement provider identity, persisted-name parsing, API-key requirement, text-enhancement selectability, connected-provider selection policy, storage keys, model-selection key naming, and mapping to shared model providers; platform shells still own storage and execution
@@ -157,6 +158,7 @@ Current macOS consumers of shared remote transport:
 - macOS AI-enhancement request endpoint and API-key console URLs come from the shared `VoiceInkAIModelProvider` and `VoiceInkAIEnhancementProviderKind` catalogs; macOS still owns Anthropic/OpenAI-compatible transport selection, provider-specific verification adapters, and SwiftUI rendering.
 - macOS `AIService`, `OllamaService`, and `APIKeyManagementView` read/write dynamic Ollama, Custom provider, and OpenRouter model cache preferences through `VoiceInkDynamicAIProviderPreference`; macOS still owns the dynamic-provider clients and keeps the existing caller-specific Ollama fallback models.
 - macOS and iOS provider API-key lookup delegates stored-key reference resolution and provider environment fallback policy to `VoiceInkProviderAPIKeyLookup`; typed iOS provider callers use `VoiceInkProviderKind`, while dynamic macOS provider-name callers keep the string overload. Platform shells still own Keychain storage and UI editing state.
+- macOS and iOS provider API-key screens use `VoiceInkSecretPresentation` for stored-key display obfuscation while keeping platform-specific key storage and verification flows.
 - macOS and iOS recording audio filename construction delegates live recording, imported transcription, retranscription, and timestamped iOS recording naming to `VoiceInkStoredAudioFile`; platform shells still own directory choice and actual audio capture/copy/write work.
 - macOS and iOS `Transcription` SwiftData models conform to `VoiceInkStoredAudioRecord`, so record-level audio URL resolution, availability checks, missing-audio fallback text, existence checks, and deletion use the same shared interface while each shell still supplies its recording directory.
 - macOS open-file routing and audio-file transcription queue validation delegate supported audio/video file checks to `VoiceInkSupportedMedia`; platform shells still own open panels, drag/drop providers, and transcription queue state.

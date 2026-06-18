@@ -530,6 +530,11 @@ reject_pattern \
   VoiceInk/Services/CustomVocabularyService.swift
 
 require_pattern \
+  "shared AI enhancement vocabulary context normalizes post-processing terms" \
+  'VoiceInkCustomVocabularyTerms\.normalized\(terms, for: \.postProcessingContext\)' \
+  VoiceInkCore/Sources/VoiceInkCore/AIPrompts.swift
+
+require_pattern \
   "shared run processor uses shared transcription run preparation" \
   'VoiceInkTranscriptionRunPreparation\.prepareRawText' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift

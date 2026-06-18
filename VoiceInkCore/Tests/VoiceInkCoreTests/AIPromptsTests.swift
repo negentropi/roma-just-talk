@@ -79,6 +79,13 @@ final class AIPromptsTests: XCTestCase {
         )
     }
 
+    func testEnhancementVocabularyContextNormalizesRawTermsForPostProcessing() {
+        XCTAssertEqual(
+            VoiceInkAIEnhancementVocabularyContext.formatted(from: [" Roma ", "", "roma", "Felix"]),
+            "Important Vocabulary: Roma, Felix"
+        )
+    }
+
     func testEnhancementVocabularyContextReturnsEmptyForNoTerms() {
         XCTAssertEqual(
             VoiceInkAIEnhancementVocabularyContext.formatted(from: []),

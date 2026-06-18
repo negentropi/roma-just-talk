@@ -568,6 +568,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "TranscriptPresentationTests.testStatusTitleReturnsNilForNonRetryStates", run: { TranscriptPresentationTests().testStatusTitleReturnsNilForNonRetryStates() }),
             VoiceInkCoreCheck(name: "TranscriptPresentationTests.testStatusBadgeTextReturnsRetryStateLabels", run: { TranscriptPresentationTests().testStatusBadgeTextReturnsRetryStateLabels() }),
             VoiceInkCoreCheck(name: "TranscriptPresentationTests.testStatusBadgeTextReturnsNilForNonRetryStates", run: { TranscriptPresentationTests().testStatusBadgeTextReturnsNilForNonRetryStates() }),
+            VoiceInkCoreCheck(name: "TranscriptPresentationTests.testStatusPresentationReturnsRetryStateMetadata", run: { TranscriptPresentationTests().testStatusPresentationReturnsRetryStateMetadata() }),
+            VoiceInkCoreCheck(name: "TranscriptPresentationTests.testStatusPresentationContentVisibilityMatchesTranscriptState", run: { TranscriptPresentationTests().testStatusPresentationContentVisibilityMatchesTranscriptState() }),
             VoiceInkCoreCheck(name: "TranscriptPresentationTests.testDefaultPasteEligibilityRejectsCanceledTranscriptionText", run: { TranscriptPresentationTests().testDefaultPasteEligibilityRejectsCanceledTranscriptionText() }),
             VoiceInkCoreCheck(name: "TranscriptFileExportTests.testSuggestedBaseFilenameUsesFallbackForBlankOrPunctuationOnlyText", run: { TranscriptFileExportTests().testSuggestedBaseFilenameUsesFallbackForBlankOrPunctuationOnlyText() }),
             VoiceInkCoreCheck(name: "TranscriptFileExportTests.testSuggestedBaseFilenamePreservesMacOSWordSelectionPolicy", run: { TranscriptFileExportTests().testSuggestedBaseFilenamePreservesMacOSWordSelectionPolicy() }),

@@ -6,6 +6,31 @@ public extension VoiceInkTranscriptionStatus {
     }
 }
 
+public struct VoiceInkTranscriptStatusPresentation: Equatable, Sendable {
+    public enum Kind: Equatable, Sendable {
+        case processing
+        case failed
+    }
+
+    public let kind: Kind
+    public let title: String
+    public let badgeText: String
+
+    public var isProcessing: Bool {
+        kind == .processing
+    }
+
+    public var isFailure: Bool {
+        kind == .failed
+    }
+
+    public init(kind: Kind, title: String, badgeText: String) {
+        self.kind = kind
+        self.title = title
+        self.badgeText = badgeText
+    }
+}
+
 public enum VoiceInkTranscriptPresentation {
     public static let pendingDisplayText = "New transcription"
     public static let failedDisplayText = "Transcription failed - tap to retry"
@@ -79,25 +104,40 @@ public enum VoiceInkTranscriptPresentation {
     }
 
     public static func statusTitle(for status: VoiceInkTranscriptionStatus) -> String? {
+        statusPresentation(for: status)?.title
+    }
+
+    public static func statusBadgeText(for status: VoiceInkTranscriptionStatus) -> String? {
+        statusPresentation(for: status)?.badgeText
+    }
+
+    public static func statusPresentation(
+        for status: VoiceInkTranscriptionStatus
+    ) -> VoiceInkTranscriptStatusPresentation? {
         switch status {
         case .pending:
-            return "Transcription Pending"
+            return VoiceInkTranscriptStatusPresentation(
+                kind: .processing,
+                title: "Transcription Pending",
+                badgeText: "Processing"
+            )
         case .failed:
-            return "Transcription Failed"
+            return VoiceInkTranscriptStatusPresentation(
+                kind: .failed,
+                title: "Transcription Failed",
+                badgeText: "Failed"
+            )
         case .completed, .canceled:
             return nil
         }
     }
 
-    public static func statusBadgeText(for status: VoiceInkTranscriptionStatus) -> String? {
-        switch status {
-        case .pending:
-            return "Processing"
-        case .failed:
-            return "Failed"
-        case .completed, .canceled:
-            return nil
-        }
+    public static func shouldShowStatusPanel(for status: VoiceInkTranscriptionStatus) -> Bool {
+        statusPresentation(for: status) != nil
+    }
+
+    public static func shouldShowCompletedContent(for status: VoiceInkTranscriptionStatus) -> Bool {
+        status == .completed
     }
 
     public static func isPasteable(

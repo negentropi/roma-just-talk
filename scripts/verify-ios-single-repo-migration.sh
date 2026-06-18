@@ -454,6 +454,47 @@ reject_pattern \
   iOS/VoiceInk-ios/NoteRowView.swift \
   iOS/VoiceInk-ios/NoteDetailView.swift
 
+require_pattern \
+  "shared transcript status presentation policy lives in VoiceInkCore" \
+  'VoiceInkTranscriptStatusPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+require_pattern \
+  "shared transcript status panel visibility lives in VoiceInkCore" \
+  'shouldShowStatusPanel' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+require_pattern \
+  "shared completed transcript content visibility lives in VoiceInkCore" \
+  'shouldShowCompletedContent' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+require_pattern \
+  "iOS note row uses shared transcript status presentation" \
+  'VoiceInkTranscriptPresentation\.statusPresentation' \
+  iOS/VoiceInk-ios/NoteRowView.swift
+
+require_pattern \
+  "iOS note detail uses shared transcript status presentation" \
+  'VoiceInkTranscriptPresentation\.statusPresentation' \
+  iOS/VoiceInk-ios/NoteDetailView.swift
+
+require_pattern \
+  "iOS note detail uses shared status panel visibility" \
+  'VoiceInkTranscriptPresentation\.shouldShowStatusPanel' \
+  iOS/VoiceInk-ios/NoteDetailView.swift
+
+require_pattern \
+  "iOS note detail uses shared completed transcript visibility" \
+  'VoiceInkTranscriptPresentation\.shouldShowCompletedContent' \
+  iOS/VoiceInk-ios/NoteDetailView.swift
+
+reject_pattern \
+  "iOS note views avoid shell-only transcript status branching" \
+  'note\.transcriptionStatus *[!=]= *\.(pending|failed|completed|canceled)|transcriptionStatus\.needsTranscription|VoiceInkTranscriptPresentation\.status(Title|BadgeText)' \
+  iOS/VoiceInk-ios/NoteRowView.swift \
+  iOS/VoiceInk-ios/NoteDetailView.swift
+
 reject_pattern \
   "iOS API-key view avoids shell-only stored-key presentation wrappers" \
   'private func +(currentAPIKey|obfuscatedKey)\(' \

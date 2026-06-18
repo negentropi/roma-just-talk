@@ -191,6 +191,34 @@ final class TranscriptPresentationTests: XCTestCase {
         XCTAssertNil(VoiceInkTranscriptPresentation.statusBadgeText(for: .canceled))
     }
 
+    func testStatusPresentationReturnsRetryStateMetadata() {
+        let pending = VoiceInkTranscriptPresentation.statusPresentation(for: .pending)
+        XCTAssertEqual(pending?.kind, .processing)
+        XCTAssertEqual(pending?.title, "Transcription Pending")
+        XCTAssertEqual(pending?.badgeText, "Processing")
+        XCTAssertTrue(pending?.isProcessing == true)
+        XCTAssertFalse(pending?.isFailure == true)
+
+        let failed = VoiceInkTranscriptPresentation.statusPresentation(for: .failed)
+        XCTAssertEqual(failed?.kind, .failed)
+        XCTAssertEqual(failed?.title, "Transcription Failed")
+        XCTAssertEqual(failed?.badgeText, "Failed")
+        XCTAssertFalse(failed?.isProcessing == true)
+        XCTAssertTrue(failed?.isFailure == true)
+    }
+
+    func testStatusPresentationContentVisibilityMatchesTranscriptState() {
+        XCTAssertTrue(VoiceInkTranscriptPresentation.shouldShowStatusPanel(for: .pending))
+        XCTAssertTrue(VoiceInkTranscriptPresentation.shouldShowStatusPanel(for: .failed))
+        XCTAssertFalse(VoiceInkTranscriptPresentation.shouldShowStatusPanel(for: .completed))
+        XCTAssertFalse(VoiceInkTranscriptPresentation.shouldShowStatusPanel(for: .canceled))
+
+        XCTAssertTrue(VoiceInkTranscriptPresentation.shouldShowCompletedContent(for: .completed))
+        XCTAssertFalse(VoiceInkTranscriptPresentation.shouldShowCompletedContent(for: .pending))
+        XCTAssertFalse(VoiceInkTranscriptPresentation.shouldShowCompletedContent(for: .failed))
+        XCTAssertFalse(VoiceInkTranscriptPresentation.shouldShowCompletedContent(for: .canceled))
+    }
+
     func testDefaultPasteEligibilityRejectsCanceledTranscriptionText() {
         XCTAssertFalse(
             VoiceInkTranscriptPresentation.isPasteable(

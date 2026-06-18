@@ -4,6 +4,10 @@ import VoiceInkCore
 struct NoteRowView: View {
     let note: Transcription
 
+    private var statusPresentation: VoiceInkTranscriptStatusPresentation? {
+        VoiceInkTranscriptPresentation.statusPresentation(for: note.transcriptionStatus)
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(VoiceInkTranscriptPresentation.displayText(
@@ -36,16 +40,16 @@ struct NoteRowView: View {
 
                 Spacer(minLength: 0)
 
-                if note.transcriptionStatus == .pending {
+                if let statusPresentation, statusPresentation.isProcessing {
                     HStack(spacing: 6) {
                         ProgressView()
                             .scaleEffect(0.7)
-                        Text(VoiceInkTranscriptPresentation.statusBadgeText(for: note.transcriptionStatus) ?? "")
+                        Text(statusPresentation.badgeText)
                             .font(.caption)
                     }
                     .foregroundStyle(.secondary)
-                } else if note.transcriptionStatus == .failed {
-                    Text(VoiceInkTranscriptPresentation.statusBadgeText(for: note.transcriptionStatus) ?? "")
+                } else if let statusPresentation, statusPresentation.isFailure {
+                    Text(statusPresentation.badgeText)
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.orange)
                         .padding(.horizontal, 8)

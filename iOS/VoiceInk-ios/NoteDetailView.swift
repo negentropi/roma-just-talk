@@ -17,12 +17,12 @@ struct NoteDetailView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
                         // Transcription status and retry button
-                        if note.transcriptionStatus.needsTranscription {
+                        if VoiceInkTranscriptPresentation.shouldShowStatusPanel(for: note.transcriptionStatus) {
                             transcriptionStatusView
                         }
 
                         // Transcript content
-                        if note.transcriptionStatus == .completed {
+                        if VoiceInkTranscriptPresentation.shouldShowCompletedContent(for: note.transcriptionStatus) {
                             transcriptContentView
                         }
                         
@@ -89,6 +89,10 @@ struct NoteDetailView: View {
         note.storedAudioAvailability()
     }
 
+    private var statusPresentation: VoiceInkTranscriptStatusPresentation? {
+        VoiceInkTranscriptPresentation.statusPresentation(for: note.transcriptionStatus)
+    }
+
     // Summary card removed per design feedback
     
     private var bottomAudioPlayer: some View {
@@ -131,11 +135,11 @@ struct NoteDetailView: View {
     private var transcriptionStatusView: some View {
         VStack(spacing: 12) {
             HStack {
-                Image(systemName: note.transcriptionStatus == .failed ? "exclamationmark.triangle.fill" : "clock.fill")
-                    .foregroundStyle(note.transcriptionStatus == .failed ? .red : .orange)
+                Image(systemName: statusPresentation?.isFailure == true ? "exclamationmark.triangle.fill" : "clock.fill")
+                    .foregroundStyle(statusPresentation?.isFailure == true ? .red : .orange)
                 
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(VoiceInkTranscriptPresentation.statusTitle(for: note.transcriptionStatus) ?? "")
+                    Text(statusPresentation?.title ?? "")
                         .font(.subheadline.weight(.medium))
                     if let error = note.transcriptionError, !error.isEmpty {
                         Text(error)

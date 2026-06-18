@@ -1,16 +1,4 @@
 import Foundation
+import VoiceInkCore
 
-enum RecordingState: Equatable {
-    case idle
-    case starting
-    case recording
-    case transcribing
-    case enhancing
-    case busy
-}
-
-extension RecordingState {
-    var acceptsRollingBufferPreloadPreview: Bool {
-        self == .idle || self == .recording
-    }
-}
+typealias RecordingState = VoiceInkRecordingState

@@ -1,12 +1,9 @@
 import Foundation
 import SwiftUI
 import os
+import VoiceInkCore
 
-enum RecorderUIToggleAction: Equatable {
-    case toggleRecord
-    case cancelRecording
-    case dismissRecorder
-}
+typealias RecorderUIToggleAction = VoiceInkRecorderUIToggleAction
 
 @MainActor
 class RecorderUIManager: ObservableObject {
@@ -112,22 +109,15 @@ class RecorderUIManager: ObservableObject {
     }
 
     func isActiveForRecordingShortcut(recordingState: RecordingState) -> Bool {
-        if recorderType == "none", recordingState == .idle {
-            return false
-        }
-
-        return isRecorderSessionActive
+        VoiceInkRecorderUISessionPolicy.isActiveForRecordingShortcut(
+            hasVisibleRecorderType: recorderType != "none",
+            recordingState: recordingState,
+            isRecorderSessionActive: isRecorderSessionActive
+        )
     }
 
     func activeSessionToggleAction(for recordingState: RecordingState) -> RecorderUIToggleAction {
-        switch recordingState {
-        case .recording, .starting:
-            return .toggleRecord
-        case .transcribing, .enhancing:
-            return .cancelRecording
-        case .idle, .busy:
-            return .dismissRecorder
-        }
+        recordingState.recorderUIToggleAction
     }
 
     func toggleMiniRecorder(powerModeId: UUID? = nil) async {

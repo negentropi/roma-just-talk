@@ -9,10 +9,7 @@ extension Notification.Name {
     static let stopRecordingFromKeyboard = Notification.Name("stopRecordingFromKeyboard")
 }
 
-enum RecordingState: Equatable {
-    case idle
-    case recording
-}
+typealias RecordingState = VoiceInkRecordingState
 
 private enum MicrophonePermissionStatus {
     case granted, denied, undetermined

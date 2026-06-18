@@ -1,6 +1,7 @@
 import Foundation
 import AppKit
 import os
+import VoiceInkCore
 
 struct SpecialShortcutOptions: Equatable {
     var pasteLastTranscriptOnEmptyTap = true
@@ -111,9 +112,7 @@ class RecordingShortcutManager: ObservableObject {
     }
 
     private static func canHandleShortcutAction(for recordingState: RecordingState) -> Bool {
-        recordingState != .transcribing &&
-        recordingState != .enhancing &&
-        recordingState != .busy
+        recordingState.acceptsRecordingShortcutAction
     }
 
     init(engine: VoiceInkEngine, recorderUIManager: RecorderUIManager) {

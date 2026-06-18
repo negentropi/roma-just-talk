@@ -416,6 +416,12 @@ require_pattern \
   'XCTAssertNil\(result\.postProcessingResult\)' \
   VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunProcessorTests.swift
 
+reject_pattern \
+  "shared transcription run success derives from post-processing result" \
+  'let postProcessingSucceeded|postProcessingSucceeded: Bool,|postProcessingSucceeded: (true|false)' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRecordTests.swift
+
 require_pattern \
   "macOS recorder enhancement stores request metadata from shared result" \
   'enhancement\.requestSystemMessage' \

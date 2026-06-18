@@ -11,8 +11,7 @@ final class TranscriptionRecordTests: XCTestCase {
             aiEnhancementModelName: "gemini-2.5-flash",
             transcriptionDuration: 3,
             enhancementDuration: 2,
-            postProcessingError: "Post-processing failed: timeout",
-            postProcessingSucceeded: false
+            postProcessingError: "Post-processing failed: timeout"
         )
 
         record.applyCompletedRunResult(result)
@@ -40,8 +39,7 @@ final class TranscriptionRecordTests: XCTestCase {
             aiEnhancementModelName: nil,
             transcriptionDuration: nil,
             enhancementDuration: nil,
-            postProcessingError: nil,
-            postProcessingSucceeded: false
+            postProcessingError: nil
         )
 
         record.applyCompletedRunResult(result)
@@ -96,8 +94,15 @@ final class TranscriptionRecordTests: XCTestCase {
                 aiEnhancementModelName: "gemini-2.5-flash",
                 transcriptionDuration: 3,
                 enhancementDuration: 2,
-                postProcessingError: nil,
-                postProcessingSucceeded: true
+                postProcessingResult: VoiceInkAIEnhancementResult(
+                    text: "enhanced",
+                    duration: 2,
+                    modelName: "gemini-2.5-flash",
+                    promptName: nil,
+                    requestSystemMessage: nil,
+                    requestUserMessage: nil
+                ),
+                postProcessingError: nil
             )
         }
 
@@ -127,8 +132,7 @@ final class TranscriptionRecordTests: XCTestCase {
                     finalText: "",
                     transcriptionModelName: "",
                     aiEnhancementModelName: nil,
-                    postProcessingError: nil,
-                    postProcessingSucceeded: false
+                    postProcessingError: nil
                 )
             }
             XCTFail("Expected missing audio to throw")

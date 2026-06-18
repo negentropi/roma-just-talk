@@ -9,10 +9,13 @@ public struct VoiceInkTranscriptionRunResult: Equatable, Sendable {
     public let enhancementDuration: TimeInterval?
     public let postProcessingResult: VoiceInkAIEnhancementResult?
     public let postProcessingError: String?
-    public let postProcessingSucceeded: Bool
 
     public var enhancedText: String? {
         finalText == cleanedText ? nil : finalText
+    }
+
+    public var postProcessingSucceeded: Bool {
+        postProcessingResult != nil
     }
 
     public init(
@@ -23,8 +26,7 @@ public struct VoiceInkTranscriptionRunResult: Equatable, Sendable {
         transcriptionDuration: TimeInterval? = nil,
         enhancementDuration: TimeInterval? = nil,
         postProcessingResult: VoiceInkAIEnhancementResult? = nil,
-        postProcessingError: String?,
-        postProcessingSucceeded: Bool
+        postProcessingError: String?
     ) {
         self.cleanedText = cleanedText
         self.finalText = finalText
@@ -34,7 +36,6 @@ public struct VoiceInkTranscriptionRunResult: Equatable, Sendable {
         self.enhancementDuration = enhancementDuration
         self.postProcessingResult = postProcessingResult
         self.postProcessingError = postProcessingError
-        self.postProcessingSucceeded = postProcessingSucceeded
     }
 }
 
@@ -164,7 +165,6 @@ public struct VoiceInkTranscriptionRunProcessor {
         var finalText = cleanedText
         var postProcessingResult: VoiceInkAIEnhancementResult? = nil
         var postProcessingError: String? = nil
-        var postProcessingSucceeded = false
 
         if configuration.isPostProcessingEnabled, !shouldSkipPostProcessing {
             let prompt = configuration.prompt
@@ -193,7 +193,6 @@ public struct VoiceInkTranscriptionRunProcessor {
                             requestUserMessage: nil
                         )
                         finalText = enhancedText
-                        postProcessingSucceeded = true
                     } catch {
                         postProcessingError = VoiceInkPostProcessingFailurePresentation.postProcessingFailureText(
                             reason: VoiceInkErrorDescription.text(for: error)
@@ -212,8 +211,7 @@ public struct VoiceInkTranscriptionRunProcessor {
             transcriptionDuration: transcriptionDuration,
             enhancementDuration: postProcessingResult?.duration,
             postProcessingResult: postProcessingResult,
-            postProcessingError: postProcessingError,
-            postProcessingSucceeded: postProcessingSucceeded
+            postProcessingError: postProcessingError
         )
     }
 }

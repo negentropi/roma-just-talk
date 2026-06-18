@@ -173,7 +173,7 @@ class AIEnhancementService: ObservableObject {
 
     private func makeRequest(text: String, mode: EnhancementPrompt) async throws -> String {
         guard isConfigured else {
-            throw EnhancementError.notConfigured
+            throw VoiceInkAIEnhancementError.notConfigured
         }
 
         guard !text.isEmpty else {
@@ -200,12 +200,12 @@ class AIEnhancementService: ObservableObject {
                 if let localError = error as? LocalAIError {
                     switch localError {
                     case .timeout:
-                        throw EnhancementError.timeout
+                        throw VoiceInkAIEnhancementError.timeout
                     default:
-                        throw EnhancementError.customError(localError.errorDescription ?? "An unknown Ollama error occurred.")
+                        throw VoiceInkAIEnhancementError.customError(localError.errorDescription ?? "An unknown Ollama error occurred.")
                     }
                 } else {
-                    throw EnhancementError.customError(error.localizedDescription)
+                    throw VoiceInkAIEnhancementError.customError(error.localizedDescription)
                 }
             }
         }
@@ -216,9 +216,9 @@ class AIEnhancementService: ObservableObject {
                 return VoiceInkAIEnhancementOutputFilter.filter(result)
             } catch {
                 if let localError = error as? LocalCLIError {
-                    throw EnhancementError.customError(localError.errorDescription ?? "An unknown Local CLI error occurred.")
+                    throw VoiceInkAIEnhancementError.customError(localError.errorDescription ?? "An unknown Local CLI error occurred.")
                 } else {
-                    throw EnhancementError.customError(error.localizedDescription)
+                    throw VoiceInkAIEnhancementError.customError(error.localizedDescription)
                 }
             }
         }
@@ -238,7 +238,7 @@ class AIEnhancementService: ObservableObject {
                 )
             default:
                 guard let baseURL = URL(string: aiService.selectedProvider.baseURL) else {
-                    throw EnhancementError.customError("\(aiService.selectedProvider.rawValue) has an invalid API endpoint URL. Please update it in AI settings.")
+                    throw VoiceInkAIEnhancementError.customError("\(aiService.selectedProvider.rawValue) has an invalid API endpoint URL. Please update it in AI settings.")
                 }
                 let temperature = VoiceInkAIReasoningConfig.temperature(forModelName: aiService.currentModel)
                 let coreProvider = aiService.selectedProvider.aiModelProvider
@@ -263,14 +263,14 @@ class AIEnhancementService: ObservableObject {
             return VoiceInkAIEnhancementOutputFilter.filter(result.trimmingCharacters(in: .whitespacesAndNewlines))
         } catch let error as LLMKitError {
             throw mapLLMKitError(error)
-        } catch let error as EnhancementError {
+        } catch let error as VoiceInkAIEnhancementError {
             throw error
         } catch {
-            throw EnhancementError.customError(error.localizedDescription)
+            throw VoiceInkAIEnhancementError.customError(error.localizedDescription)
         }
     }
 
-    private func mapLLMKitError(_ error: LLMKitError) -> EnhancementError {
+    private func mapLLMKitError(_ error: LLMKitError) -> VoiceInkAIEnhancementError {
         switch error {
         case .missingAPIKey:
             return .notConfigured
@@ -300,7 +300,7 @@ class AIEnhancementService: ObservableObject {
         while retries < maxRetries {
             do {
                 return try await makeRequest(text: text, mode: mode)
-            } catch let error as EnhancementError {
+            } catch let error as VoiceInkAIEnhancementError {
                 switch error {
                 case .networkError, .serverError, .rateLimitExceeded:
                     retries += 1
@@ -338,7 +338,7 @@ class AIEnhancementService: ObservableObject {
                         currentDelay *= 2
                     } else {
                         logger.error("Request failed after \(maxRetries, privacy: .public) retries with network error.")
-                        throw EnhancementError.networkError
+                        throw VoiceInkAIEnhancementError.networkError
                     }
                 } else {
                     throw error
@@ -346,7 +346,7 @@ class AIEnhancementService: ObservableObject {
             }
         }
 
-        throw EnhancementError.enhancementFailed
+        throw VoiceInkAIEnhancementError.enhancementFailed
     }
 
     func enhance(_ text: String) async throws -> (String, TimeInterval, String?) {
@@ -464,37 +464,6 @@ class AIEnhancementService: ObservableObject {
         }
         if selectedPromptId != state.selectedPromptId {
             selectedPromptId = state.selectedPromptId
-        }
-    }
-}
-
-enum EnhancementError: Error {
-    case notConfigured
-    case enhancementFailed
-    case networkError
-    case serverError
-    case rateLimitExceeded
-    case timeout
-    case customError(String)
-}
-
-extension EnhancementError: LocalizedError {
-    var errorDescription: String? {
-        switch self {
-        case .notConfigured:
-            return "AI provider not configured. Please check your API key."
-        case .enhancementFailed:
-            return "AI enhancement failed to process the text."
-        case .networkError:
-            return "Network connection failed. Check your internet."
-        case .serverError:
-            return "The AI provider's server encountered an error. Please try again later."
-        case .rateLimitExceeded:
-            return "Rate limit exceeded. Please try again later."
-        case .timeout:
-            return "Enhancement request timed out. Check your connection or increase the timeout duration."
-        case .customError(let message):
-            return message
         }
     }
 }

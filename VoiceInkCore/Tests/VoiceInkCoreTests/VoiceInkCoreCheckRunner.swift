@@ -20,6 +20,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AIReasoningConfigTests.testReasoningEffortMatchesProviderModelPolicy", run: { AIReasoningConfigTests().testReasoningEffortMatchesProviderModelPolicy() }),
             VoiceInkCoreCheck(name: "AIReasoningConfigTests.testExtraBodyParametersMatchProviderModelPolicy", run: { AIReasoningConfigTests().testExtraBodyParametersMatchProviderModelPolicy() }),
             VoiceInkCoreCheck(name: "AIReasoningConfigTests.testMacOSExtraAIProvidersUseNoSharedReasoningOverrides", run: { AIReasoningConfigTests().testMacOSExtraAIProvidersUseNoSharedReasoningOverrides() }),
+            VoiceInkCoreCheck(name: "AIEnhancementErrorTests.testErrorDescriptionsPreserveExistingMacOSMessages", run: { AIEnhancementErrorTests().testErrorDescriptionsPreserveExistingMacOSMessages() }),
             VoiceInkCoreCheck(name: "AIModelCatalogTests.testMacOSAIEnhancementProviderDefaultsAreShared", run: { AIModelCatalogTests().testMacOSAIEnhancementProviderDefaultsAreShared() }),
             VoiceInkCoreCheck(name: "AIModelCatalogTests.testMacOSAIEnhancementProviderModelListsAreShared", run: { AIModelCatalogTests().testMacOSAIEnhancementProviderModelListsAreShared() }),
             VoiceInkCoreCheck(name: "AIModelCatalogTests.testOpenRouterKeepsDynamicModelListWithSharedDefault", run: { AIModelCatalogTests().testOpenRouterKeepsDynamicModelListWithSharedDefault() }),

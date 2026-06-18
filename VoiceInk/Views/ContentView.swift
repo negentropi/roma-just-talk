@@ -184,7 +184,7 @@ struct ContentView: View {
         case .audioInput:
             AudioInputSettingsView()
         case .dictionary:
-            DictionarySettingsView(whisperPrompt: whisperModelManager.whisperPrompt)
+            DictionarySettingsView()
         case .powerMode:
             PowerModeView()
         case .settings:

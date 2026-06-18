@@ -10,15 +10,12 @@ enum VocabularySortMode: String {
 struct VocabularyView: View {
     @Query private var vocabularyWords: [VocabularyWord]
     @Environment(\.modelContext) private var modelContext
-    @ObservedObject var whisperPrompt: WhisperPrompt
     @State private var newWord = ""
     @State private var showAlert = false
     @State private var alertMessage = ""
     @State private var sortMode: VocabularySortMode = .wordAsc
 
-    init(whisperPrompt: WhisperPrompt) {
-        self.whisperPrompt = whisperPrompt
-
+    init() {
         if let savedSort = UserDefaults.standard.string(forKey: "vocabularySortMode"),
            let mode = VocabularySortMode(rawValue: savedSort) {
             _sortMode = State(initialValue: mode)

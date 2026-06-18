@@ -5,7 +5,6 @@ struct DictionarySettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var selectedSection: DictionarySection = .replacements
     @State private var isShowingSettings = false
-    let whisperPrompt: WhisperPrompt
     
     enum DictionarySection: String, CaseIterable {
         case replacements = "Word Replacements"
@@ -104,7 +103,7 @@ struct DictionarySettingsView: View {
         VStack(alignment: .leading, spacing: 20) {
             switch selectedSection {
             case .spellings:
-                VocabularyView(whisperPrompt: whisperPrompt)
+                VocabularyView()
                     .background(CardBackground(isSelected: false))
             case .replacements:
                 WordReplacementView()

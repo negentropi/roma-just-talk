@@ -851,8 +851,13 @@ require_pattern \
   VoiceInk/Views/ModelSettingsView.swift
 
 require_pattern \
-  "macOS local Whisper prompt uses shared macOS selected-language fallback" \
-  'VoiceInkTranscriptionLanguagePreference\.selectedMacOSLanguage\(\)' \
+  "shared local Whisper prompt catalog uses shared selected-language fallback" \
+  'VoiceInkTranscriptionLanguagePreference\.selectedLanguage\(' \
+  VoiceInkCore/Sources/VoiceInkCore/LocalWhisperPromptCatalog.swift
+
+require_pattern \
+  "macOS local Whisper prompt persists through shared prompt preference" \
+  'VoiceInkTranscriptionPromptPreference\.saveLocalWhisperPromptForSelectedLanguage\(\)' \
   VoiceInk/Transcription/Whisper/WhisperPrompt.swift
 
 require_pattern \

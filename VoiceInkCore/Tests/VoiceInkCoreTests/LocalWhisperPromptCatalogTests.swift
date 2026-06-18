@@ -70,6 +70,29 @@ final class LocalWhisperPromptCatalogTests: XCTestCase {
         }
     }
 
+    func testSaveCustomPromptUpdatesOneLanguageAndPreservesOthers() {
+        withIsolatedDefaults { defaults in
+            VoiceInkLocalWhisperPromptCatalog.saveCustomPrompts(
+                ["fr": "Use French punctuation."],
+                to: defaults
+            )
+
+            VoiceInkLocalWhisperPromptCatalog.saveCustomPrompt(
+                "Spell Roma Just Talk exactly.",
+                for: "en",
+                to: defaults
+            )
+
+            XCTAssertEqual(
+                VoiceInkLocalWhisperPromptCatalog.storedCustomPrompts(from: defaults),
+                [
+                    "en": "Spell Roma Just Talk exactly.",
+                    "fr": "Use French punctuation."
+                ]
+            )
+        }
+    }
+
     func testPromptForSelectedLanguageUsesStoredCustomPromptsByDefault() {
         withIsolatedDefaults { defaults in
             defaults.set("en", forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)

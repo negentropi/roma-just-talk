@@ -238,6 +238,21 @@ public enum VoiceInkTranscriptionPromptPreference {
         )
     }
 
+    @discardableResult
+    public static func saveLocalWhisperPromptForSelectedLanguage(
+        from defaults: UserDefaults = .standard,
+        customPrompts: [String: String]? = nil,
+        fallbackLanguage: String = VoiceInkDefaultSettings.macOS.selectedTranscriptionLanguage
+    ) -> String {
+        let prompt = VoiceInkLocalWhisperPromptCatalog.promptForSelectedLanguage(
+            from: defaults,
+            customPrompts: customPrompts,
+            fallbackLanguage: fallbackLanguage
+        )
+        savePrompt(prompt, to: defaults)
+        return prompt
+    }
+
     public static func requestPrompt(from defaults: UserDefaults = .standard) -> String? {
         requestPrompt(storedPrompt(from: defaults))
     }

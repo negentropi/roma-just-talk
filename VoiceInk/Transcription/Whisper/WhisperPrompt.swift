@@ -6,11 +6,7 @@ import VoiceInkCore
 class WhisperPrompt: ObservableObject {
     @Published var transcriptionPrompt: String = VoiceInkTranscriptionPromptPreference.storedPrompt() ?? ""
 
-    // Store user-customized prompts
-    private var customPrompts: [String: String] = [:]
-
     init() {
-        loadCustomPrompts()
         updateTranscriptionPrompt()
         
         // Setup notification observer
@@ -30,36 +26,21 @@ class WhisperPrompt: ObservableObject {
         updateTranscriptionPrompt()
     }
     
-    private func loadCustomPrompts() {
-        customPrompts = VoiceInkLocalWhisperPromptCatalog.storedCustomPrompts()
-    }
-    
-    private func saveCustomPrompts() {
-        VoiceInkLocalWhisperPromptCatalog.saveCustomPrompts(customPrompts)
-        UserDefaults.standard.synchronize() // Force immediate synchronization
-    }
-    
     func updateTranscriptionPrompt() {
-        // Get the currently selected language from UserDefaults
-        let selectedLanguage = VoiceInkTranscriptionLanguagePreference.selectedMacOSLanguage()
-        
-        // Get the prompt for the selected language (custom if available, otherwise default)
-        let basePrompt = getLanguagePrompt(for: selectedLanguage)
-        let prompt = basePrompt.isEmpty ? "" : basePrompt
-        
-        transcriptionPrompt = prompt
-        VoiceInkTranscriptionPromptPreference.savePrompt(prompt)
+        transcriptionPrompt = VoiceInkTranscriptionPromptPreference.saveLocalWhisperPromptForSelectedLanguage()
         UserDefaults.standard.synchronize() // Force immediate synchronization
-        
     }
     
     func getLanguagePrompt(for language: String) -> String {
-        VoiceInkLocalWhisperPromptCatalog.prompt(for: language, customPrompts: customPrompts)
+        VoiceInkLocalWhisperPromptCatalog.prompt(
+            for: language,
+            customPrompts: VoiceInkLocalWhisperPromptCatalog.storedCustomPrompts()
+        )
     }
     
     func setCustomPrompt(_ prompt: String, for language: String) {
-        customPrompts[language] = prompt
-        saveCustomPrompts()
+        VoiceInkLocalWhisperPromptCatalog.saveCustomPrompt(prompt, for: language)
+        UserDefaults.standard.synchronize() // Force immediate synchronization
         updateTranscriptionPrompt()
         
         // Force update the UI

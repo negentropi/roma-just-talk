@@ -342,6 +342,43 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testTranscriptionPromptPreferenceSavesSelectedLanguagePrompt() {
+        withIsolatedDefaults { defaults in
+            VoiceInkTranscriptionLanguagePreference.saveSelectedLanguage("ja", to: defaults)
+
+            let prompt = VoiceInkTranscriptionPromptPreference.saveLocalWhisperPromptForSelectedLanguage(
+                from: defaults
+            )
+
+            XCTAssertEqual(prompt, VoiceInkLocalWhisperPromptCatalog.defaultPrompt(for: "ja"))
+            XCTAssertEqual(
+                VoiceInkTranscriptionPromptPreference.storedPrompt(from: defaults),
+                VoiceInkLocalWhisperPromptCatalog.defaultPrompt(for: "ja")
+            )
+        }
+    }
+
+    func testTranscriptionPromptPreferenceSavesCustomPromptForSelectedLanguage() {
+        withIsolatedDefaults { defaults in
+            VoiceInkTranscriptionLanguagePreference.saveSelectedLanguage("en", to: defaults)
+            VoiceInkLocalWhisperPromptCatalog.saveCustomPrompt(
+                "Spell Roma Just Talk exactly.",
+                for: "en",
+                to: defaults
+            )
+
+            let prompt = VoiceInkTranscriptionPromptPreference.saveLocalWhisperPromptForSelectedLanguage(
+                from: defaults
+            )
+
+            XCTAssertEqual(prompt, "Spell Roma Just Talk exactly.")
+            XCTAssertEqual(
+                VoiceInkTranscriptionPromptPreference.storedPrompt(from: defaults),
+                "Spell Roma Just Talk exactly."
+            )
+        }
+    }
+
     func testTranscriptionPromptPreferenceDropsBlankRequestPrompts() {
         XCTAssertNil(VoiceInkTranscriptionPromptPreference.requestPrompt(nil))
         XCTAssertNil(VoiceInkTranscriptionPromptPreference.requestPrompt(""))

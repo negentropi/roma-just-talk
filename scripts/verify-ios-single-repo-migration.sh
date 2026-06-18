@@ -941,6 +941,16 @@ reject_pattern \
   VoiceInk/Services/BackupImporter.swift
 
 require_pattern \
+  "macOS backup export uses shared rolling-buffer per-model export policy" \
+  'VoiceInkRollingBufferPreloadSettings\.exportedPerModelPreloadEnabled\(\)' \
+  VoiceInk/Services/ImportExportService.swift
+
+reject_pattern \
+  "macOS backup export avoids shell-only rolling-buffer per-model key scan" \
+  'perModelEnabledKeyPrefix|dictionaryRepresentation\(\)|exportPerModelRollingBufferPreloadSettings|dropFirst\(prefix\.count\)' \
+  VoiceInk/Services/ImportExportService.swift
+
+require_pattern \
   "macOS Native Apple transcription uses shared source-compatible language fallback" \
   'VoiceInkTranscriptionLanguagePreference\.selectedLanguage\(source: \.nativeApple\)' \
   VoiceInk/Transcription/Native/NativeAppleTranscriptionService.swift

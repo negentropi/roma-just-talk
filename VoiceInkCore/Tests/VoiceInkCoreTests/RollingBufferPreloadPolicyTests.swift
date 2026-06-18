@@ -71,6 +71,32 @@ final class RollingBufferPreloadPolicyTests: XCTestCase {
         }
     }
 
+    func testExportedPerModelPreloadEnabledReadsOnlyStoredBooleanOverrides() {
+        withIsolatedDefaults { defaults in
+            VoiceInkRollingBufferPreloadSettings.savePerModelPreloadEnabled(
+                false,
+                forModelName: "parakeet",
+                in: defaults
+            )
+            VoiceInkRollingBufferPreloadSettings.savePerModelPreloadEnabled(
+                true,
+                forModelName: "fluid",
+                in: defaults
+            )
+            defaults.set("no", forKey: VoiceInkRollingBufferPreloadSettings.perModelPreloadEnabledKey(forModelName: "bad"))
+            defaults.set(true, forKey: VoiceInkRollingBufferPreloadSettings.perModelEnabledKeyPrefix)
+            defaults.set(false, forKey: "other-prefix-parakeet")
+
+            XCTAssertEqual(
+                VoiceInkRollingBufferPreloadSettings.exportedPerModelPreloadEnabled(from: defaults),
+                [
+                    "parakeet": false,
+                    "fluid": true
+                ]
+            )
+        }
+    }
+
     func testImportedSettingsSavePresentValuesAndClampRanges() {
         withIsolatedDefaults { defaults in
             let didSave = VoiceInkRollingBufferPreloadSettings.saveImportedSettings(

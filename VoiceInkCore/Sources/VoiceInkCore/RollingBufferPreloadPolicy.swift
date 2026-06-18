@@ -128,6 +128,21 @@ public enum VoiceInkRollingBufferPreloadSettings {
         defaults.set(enabled, forKey: perModelPreloadEnabledKey(forModelName: modelName))
     }
 
+    public static func exportedPerModelPreloadEnabled(
+        from defaults: UserDefaults = .standard
+    ) -> [String: Bool] {
+        defaults.dictionaryRepresentation().reduce(into: [:]) { result, entry in
+            guard entry.key.hasPrefix(perModelEnabledKeyPrefix),
+                  let enabled = entry.value as? Bool else {
+                return
+            }
+
+            let modelName = String(entry.key.dropFirst(perModelEnabledKeyPrefix.count))
+            guard !modelName.isEmpty else { return }
+            result[modelName] = enabled
+        }
+    }
+
     @discardableResult
     public static func saveImportedSettings(
         modeRawValue: String?,

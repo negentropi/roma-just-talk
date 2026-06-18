@@ -148,7 +148,7 @@ class ImportExportService {
         let transcriptionCleanup = VoiceInkTranscriptionAutoCleanupPreference.current()
         let audioCleanup = VoiceInkAudioCleanupPreference.current()
         let rollingBufferConfiguration = VoiceInkRollingBufferPreloadSettings.configuration()
-        let perModelPreloadSettings = exportPerModelRollingBufferPreloadSettings()
+        let perModelPreloadSettings = VoiceInkRollingBufferPreloadSettings.exportedPerModelPreloadEnabled()
         let generalSettingsToExport = GeneralBackup(
             primaryRecordingShortcut: ShortcutStore.shortcut(for: .primaryRecording).map(ShortcutBackup.init),
             secondaryRecordingShortcut: ShortcutStore.shortcut(for: .secondaryRecording).map(ShortcutBackup.init),
@@ -331,20 +331,6 @@ class ImportExportService {
 
     private func needsAPIKeyReminder(for categories: Set<BackupCategory>) -> Bool {
         !categories.isDisjoint(with: [.prompts, .powerMode, .customModels])
-    }
-
-    private func exportPerModelRollingBufferPreloadSettings() -> [String: Bool] {
-        let prefix = VoiceInkRollingBufferPreloadSettings.perModelEnabledKeyPrefix
-        return UserDefaults.standard.dictionaryRepresentation().reduce(into: [:]) { result, entry in
-            guard entry.key.hasPrefix(prefix),
-                  let enabled = entry.value as? Bool else {
-                return
-            }
-
-            let modelName = String(entry.key.dropFirst(prefix.count))
-            guard !modelName.isEmpty else { return }
-            result[modelName] = enabled
-        }
     }
 
     private func showAlert(title: String, message: String) {

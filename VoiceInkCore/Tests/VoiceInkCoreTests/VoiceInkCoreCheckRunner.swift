@@ -107,7 +107,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementPlanReturnsNoOpForBlankOriginalOrReplacement", run: { DictionaryPolicyTests().testWordReplacementPlanReturnsNoOpForBlankOriginalOrReplacement() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementDraftSaveabilityUsesInsertPlan", run: { DictionaryPolicyTests().testWordReplacementDraftSaveabilityUsesInsertPlan() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementPlanRejectsDuplicateTokenAcrossCommaGroups", run: { DictionaryPolicyTests().testWordReplacementPlanRejectsDuplicateTokenAcrossCommaGroups() }),
-            VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementPlanAllowsNewTokensAndPreservesOriginalInput", run: { DictionaryPolicyTests().testWordReplacementPlanAllowsNewTokensAndPreservesOriginalInput() }),
+            VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementPlanTrimsStoredOriginalAndReplacement", run: { DictionaryPolicyTests().testWordReplacementPlanTrimsStoredOriginalAndReplacement() }),
             VoiceInkCoreCheck(name: "ErrorDescriptionTests.testPrefersLocalizedErrorDescription", run: { ErrorDescriptionTests().testPrefersLocalizedErrorDescription() }),
             VoiceInkCoreCheck(name: "ErrorDescriptionTests.testFallsBackToLocalizedDescription", run: { ErrorDescriptionTests().testFallsBackToLocalizedDescription() }),
             VoiceInkCoreCheck(name: "DurationPresentationTests.testMinutesSecondsUsesUnpaddedMinutesByDefault", run: { DurationPresentationTests().testMinutesSecondsUsesUnpaddedMinutesByDefault() }),

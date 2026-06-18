@@ -73,11 +73,12 @@ public enum VoiceInkDictionaryPolicy {
         replacement: String,
         existingOriginalTexts: [String]
     ) -> VoiceInkWordReplacementInsertPlan {
-        let originalTokens = tokens(from: original)
+        let trimmedOriginal = original.trimmingCharacters(in: .whitespacesAndNewlines)
+        let originalTokens = tokens(from: trimmedOriginal)
         let trimmedReplacement = replacement.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !originalTokens.isEmpty, !trimmedReplacement.isEmpty else {
             return VoiceInkWordReplacementInsertPlan(
-                originalText: original,
+                originalText: trimmedOriginal,
                 replacementText: trimmedReplacement,
                 errorMessage: nil
             )
@@ -87,14 +88,14 @@ public enum VoiceInkDictionaryPolicy {
 
         for token in originalTokens where existingTokens.contains(token.lowercased()) {
             return VoiceInkWordReplacementInsertPlan(
-                originalText: original,
-                replacementText: replacement,
+                originalText: trimmedOriginal,
+                replacementText: trimmedReplacement,
                 errorMessage: "'\(token)' already exists in word replacements"
             )
         }
 
         return VoiceInkWordReplacementInsertPlan(
-            originalText: original,
+            originalText: trimmedOriginal,
             replacementText: trimmedReplacement,
             errorMessage: nil
         )

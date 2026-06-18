@@ -279,10 +279,8 @@ enum BackupImporter {
             var existingOriginalTexts = existingReplacements.map(\.originalText)
 
             for (original, replacement) in replacements {
-                let trimmedOriginal = original.trimmingCharacters(in: .whitespacesAndNewlines)
-
                 let plan = VoiceInkDictionaryPolicy.wordReplacementInsertPlan(
-                    original: trimmedOriginal,
+                    original: original,
                     replacement: replacement,
                     existingOriginalTexts: existingOriginalTexts
                 )

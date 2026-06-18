@@ -330,13 +330,11 @@ struct DictionaryQuickAddView: View {
     }
 
     private func submitReplacement() {
-        let original = originalInput.trimmingCharacters(in: .whitespacesAndNewlines)
-        let replacement = replacementInput
         guard VoiceInkDictionaryPolicy.canSaveWordReplacementDraft(
-            original: original,
-            replacement: replacement
+            original: originalInput,
+            replacement: replacementInput
         ) else { return }
-        if let error = DictionaryService.addWordReplacement(original: original, replacement: replacement, existing: Array(wordReplacements), context: modelContext) {
+        if let error = DictionaryService.addWordReplacement(original: originalInput, replacement: replacementInput, existing: Array(wordReplacements), context: modelContext) {
             errorMessage = error
             return
         }

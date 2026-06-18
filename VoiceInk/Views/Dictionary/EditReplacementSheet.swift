@@ -123,23 +123,21 @@ struct EditReplacementSheet: View {
 
     private var canSave: Bool {
         VoiceInkDictionaryPolicy.canSaveWordReplacementDraft(
-            original: originalWord.trimmingCharacters(in: .whitespacesAndNewlines),
+            original: originalWord,
             replacement: replacementWord
         )
     }
 
     // MARK: – Actions
     private func saveChanges() {
-        let newOriginal = originalWord.trimmingCharacters(in: .whitespacesAndNewlines)
-        let newReplacement = replacementWord
         guard canSave else {
             return
         }
 
         if let error = DictionaryService.updateWordReplacement(
             replacement,
-            original: newOriginal,
-            replacement: newReplacement,
+            original: originalWord,
+            replacement: replacementWord,
             context: modelContext
         ) {
             alertMessage = error

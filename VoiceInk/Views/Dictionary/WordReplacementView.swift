@@ -61,7 +61,7 @@ struct WordReplacementView: View {
 
     private var canAddReplacement: Bool {
         VoiceInkDictionaryPolicy.canSaveWordReplacementDraft(
-            original: originalWord.trimmingCharacters(in: .whitespacesAndNewlines),
+            original: originalWord,
             replacement: replacementWord
         )
     }
@@ -195,9 +195,7 @@ struct WordReplacementView: View {
     }
 
     private func addReplacement() {
-        let original = originalWord.trimmingCharacters(in: .whitespacesAndNewlines)
-        let replacement = replacementWord
-        if let error = DictionaryService.addWordReplacement(original: original, replacement: replacement, existing: Array(wordReplacements), context: modelContext) {
+        if let error = DictionaryService.addWordReplacement(original: originalWord, replacement: replacementWord, existing: Array(wordReplacements), context: modelContext) {
             alertMessage = error
             showAlert = true
             return

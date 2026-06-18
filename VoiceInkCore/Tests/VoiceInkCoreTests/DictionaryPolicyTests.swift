@@ -97,7 +97,7 @@ final class DictionaryPolicyTests: XCTestCase {
         XCTAssertEqual(plan.errorMessage, "'Voice Ink' already exists in word replacements")
     }
 
-    func testWordReplacementPlanAllowsNewTokensAndPreservesOriginalInput() {
+    func testWordReplacementPlanTrimsStoredOriginalAndReplacement() {
         let plan = VoiceInkDictionaryPolicy.wordReplacementInsertPlan(
             original: " Flow, Voice Ink ",
             replacement: " roma ",
@@ -105,7 +105,7 @@ final class DictionaryPolicyTests: XCTestCase {
         )
 
         XCTAssertTrue(plan.shouldInsert)
-        XCTAssertEqual(plan.originalText, " Flow, Voice Ink ")
+        XCTAssertEqual(plan.originalText, "Flow, Voice Ink")
         XCTAssertEqual(plan.replacementText, "roma")
         XCTAssertNil(plan.errorMessage)
     }

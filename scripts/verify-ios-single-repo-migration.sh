@@ -86,6 +86,21 @@ require_pattern() {
   fi
 }
 
+require_context_pattern_count_at_least() {
+  local description="$1"
+  local anchor="$2"
+  local pattern="$3"
+  local minimum_count="$4"
+  local file="$5"
+
+  section "$description"
+  local count
+  count="$(rg -A 20 "$anchor" "$file" | rg -c "$pattern" || true)"
+  if (( count < minimum_count )); then
+    fail "$description: expected at least $minimum_count matching build settings, got $count"
+  fi
+}
+
 reject_pattern() {
   local description="$1"
   local pattern="$2"
@@ -247,6 +262,13 @@ require_plist_value \
   CFBundleName \
   "roma just talk" \
   iOS/VoiceInk-ios/Info.plist
+
+require_context_pattern_count_at_least \
+  "iOS keyboard display name stays roma just talk" \
+  'INFOPLIST_FILE = VoiceInkKeyboard/Info.plist;' \
+  'INFOPLIST_KEY_CFBundleDisplayName = "roma just talk";' \
+  2 \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
 
 require_plist_value \
   "iOS record deep-link scheme stays voiceink" \

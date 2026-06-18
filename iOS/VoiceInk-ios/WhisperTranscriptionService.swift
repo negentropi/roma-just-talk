@@ -43,7 +43,7 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
         let audioSamples: [Float]
         do {
             guard let samples = try VoiceInkPCM16Audio.floatSamples(fromWAVFileAt: fileURL) else {
-                throw NSError(domain: "WhisperTranscriptionService", code: 1, userInfo: [NSLocalizedDescriptionKey: "Invalid WAV file - too small"])
+                throw VoiceInkEngineError.audioProcessingFailed
             }
             audioSamples = samples
             print("WhisperTranscriptionService: Processed \(audioSamples.count) audio samples")

@@ -353,6 +353,11 @@ require_pattern \
   iOS/VoiceInk-ios/WhisperTranscriptionService.swift
 
 reject_pattern \
+  "iOS local Whisper uses shared engine errors for audio processing failures" \
+  'NSError|Invalid WAV file - too small' \
+  iOS/VoiceInk-ios/WhisperTranscriptionService.swift
+
+reject_pattern \
   "macOS and iOS model downloads use shared HTTP response policy" \
   '200\.\.\.299' \
   VoiceInk/Transcription/Whisper/WhisperModelManager.swift \

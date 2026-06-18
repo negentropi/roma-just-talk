@@ -32,6 +32,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkUserDefaultsKey.selectedPromptId, "selectedPromptId")
         XCTAssertEqual(VoiceInkUserDefaultsKey.powerModeConfigurations, "powerModeConfigurationsV2")
         XCTAssertEqual(VoiceInkUserDefaultsKey.activePowerModeConfigurationId, "activeConfigurationId")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.activePowerModeSession, "powerModeActiveSession.v1")
         XCTAssertEqual(VoiceInkUserDefaultsKey.selectedAIProvider, "selectedAIProvider")
         XCTAssertEqual(VoiceInkUserDefaultsKey.openRouterModels, "openRouterModels")
         XCTAssertEqual(VoiceInkUserDefaultsKey.ollamaBaseURL, "ollamaBaseURL")
@@ -955,6 +956,17 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             )
             VoiceInkPowerModeConfigurationPreference.saveConfigurations([powerModeConfig], to: defaults)
             VoiceInkPowerModeConfigurationPreference.saveActiveConfigurationId(powerModeConfig.id, to: defaults)
+            try? VoiceInkPowerModeSessionPreference.saveActiveSession(
+                VoiceInkPowerModeSession(
+                    id: UUID(),
+                    startTime: Date(timeIntervalSince1970: 1_700_000_000),
+                    originalState: VoiceInkPowerModeApplicationState(
+                        isEnhancementEnabled: true,
+                        useScreenCaptureContext: false
+                    )
+                ),
+                to: defaults
+            )
 
             VoiceInkSharedPreferenceReset.clearCoreUserSettings(from: defaults, providers: [.groq])
 
@@ -1030,9 +1042,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             XCTAssertFalse(VoiceInkAIEnhancementContextPreference.useScreenCaptureContext(from: defaults))
             XCTAssertTrue(VoiceInkPowerModeConfigurationPreference.loadConfigurations(from: defaults).isEmpty)
             XCTAssertNil(VoiceInkPowerModeConfigurationPreference.loadActiveConfigurationId(from: defaults))
-
-            defaults.set("", forKey: VoiceInkUserDefaultsKey.activePowerModeConfigurationId)
-            XCTAssertNil(VoiceInkPowerModeConfigurationPreference.loadActiveConfigurationId(from: defaults))
+            XCTAssertNil(try? VoiceInkPowerModeSessionPreference.loadActiveSession(from: defaults))
         }
     }
 
@@ -1159,6 +1169,9 @@ final class UserDefaultsPreferencesTests: XCTestCase {
 
             XCTAssertTrue(VoiceInkPowerModeConfigurationPreference.loadConfigurations(from: defaults).isEmpty)
             XCTAssertNil(VoiceInkPowerModeConfigurationPreference.loadActiveConfigurationId(from: defaults))
+
+            defaults.set("", forKey: VoiceInkUserDefaultsKey.activePowerModeConfigurationId)
+            XCTAssertNil(VoiceInkPowerModeConfigurationPreference.loadActiveConfigurationId(from: defaults))
         }
     }
 
@@ -1178,6 +1191,76 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             XCTAssertNil(VoiceInkPowerModeConfigurationPreference.loadActiveConfigurationId(from: defaults))
             XCTAssertNil(defaults.object(forKey: VoiceInkUserDefaultsKey.powerModeConfigurations))
             XCTAssertNil(defaults.object(forKey: VoiceInkUserDefaultsKey.activePowerModeConfigurationId))
+        }
+    }
+
+    func testPowerModeSessionPreferenceRoundTripsActiveSession() throws {
+        let suiteName = "VoiceInkCore.UserDefaultsPreferencesTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defaults.removePersistentDomain(forName: suiteName)
+        defer {
+            defaults.removePersistentDomain(forName: suiteName)
+        }
+
+        let originalState = VoiceInkPowerModeApplicationState(
+            isEnhancementEnabled: true,
+            useScreenCaptureContext: false,
+            selectedPromptId: "prompt-id",
+            selectedAIProvider: "openai",
+            selectedAIModel: "gpt-4o",
+            selectedLanguage: "en",
+            transcriptionModelName: "ggml-base",
+            isTextFormattingEnabled: true,
+            punctuationCleanupMode: .removeAll,
+            removePunctuation: true,
+            lowercaseTranscription: false
+        )
+        let session = VoiceInkPowerModeSession(
+            id: UUID(),
+            startTime: Date(timeIntervalSince1970: 1_700_000_000),
+            originalState: originalState
+        )
+
+        try VoiceInkPowerModeSessionPreference.saveActiveSession(session, to: defaults)
+
+        let loadedSession = try VoiceInkPowerModeSessionPreference.loadActiveSession(from: defaults)
+        XCTAssertEqual(loadedSession?.id, session.id)
+        XCTAssertEqual(loadedSession?.startTime, session.startTime)
+        XCTAssertEqual(loadedSession?.originalState, originalState)
+        XCTAssertTrue(defaults.data(forKey: VoiceInkUserDefaultsKey.activePowerModeSession) != nil)
+    }
+
+    func testPowerModeSessionPreferenceThrowsForInvalidActiveSessionData() {
+        withIsolatedDefaults { defaults in
+            defaults.set(Data("bad".utf8), forKey: VoiceInkUserDefaultsKey.activePowerModeSession)
+
+            var didThrow = false
+            do {
+                _ = try VoiceInkPowerModeSessionPreference.loadActiveSession(from: defaults)
+            } catch {
+                didThrow = true
+            }
+
+            XCTAssertTrue(didThrow)
+        }
+    }
+
+    func testPowerModeSessionPreferenceClearRemovesActiveSession() {
+        withIsolatedDefaults { defaults in
+            let session = VoiceInkPowerModeSession(
+                id: UUID(),
+                startTime: Date(timeIntervalSince1970: 1_700_000_000),
+                originalState: VoiceInkPowerModeApplicationState(
+                    isEnhancementEnabled: false,
+                    useScreenCaptureContext: true
+                )
+            )
+            try? VoiceInkPowerModeSessionPreference.saveActiveSession(session, to: defaults)
+
+            VoiceInkPowerModeSessionPreference.clear(from: defaults)
+
+            XCTAssertNil(try? VoiceInkPowerModeSessionPreference.loadActiveSession(from: defaults))
+            XCTAssertNil(defaults.object(forKey: VoiceInkUserDefaultsKey.activePowerModeSession))
         }
     }
 

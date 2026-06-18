@@ -1020,14 +1020,29 @@ require_pattern \
   'struct VoiceInkPowerMode(ApplicationState|Session)' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
+require_pattern \
+  "shared Power Mode active-session persistence lives in VoiceInkCore" \
+  'VoiceInkPowerModeSessionPreference|activePowerModeSession' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
 reject_pattern \
   "macOS Power Mode avoids shell-only session snapshot records" \
   'struct +ApplicationState|struct +PowerModeSession' \
   VoiceInk/PowerMode/PowerModeSessionManager.swift
 
+reject_pattern \
+  "macOS Power Mode session manager avoids shell-only session persistence mechanics" \
+  'powerModeActiveSession|JSON(Encoder|Decoder)|UserDefaults\.standard|data\(forKey:|removeObject\(forKey:' \
+  VoiceInk/PowerMode/PowerModeSessionManager.swift
+
 require_pattern \
   "macOS Power Mode session manager consumes shared session snapshot records" \
   'VoiceInkPowerMode(ApplicationState|Session)' \
+  VoiceInk/PowerMode/PowerModeSessionManager.swift
+
+require_pattern \
+  "macOS Power Mode session manager consumes shared session persistence" \
+  'VoiceInkPowerModeSessionPreference\.(saveActiveSession|loadActiveSession|clear)' \
   VoiceInk/PowerMode/PowerModeSessionManager.swift
 
 require_pattern \

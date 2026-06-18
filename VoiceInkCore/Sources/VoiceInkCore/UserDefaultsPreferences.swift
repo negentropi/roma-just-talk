@@ -30,6 +30,7 @@ public enum VoiceInkUserDefaultsKey {
     public static let selectedPromptId = "selectedPromptId"
     public static let powerModeConfigurations = "powerModeConfigurationsV2"
     public static let activePowerModeConfigurationId = "activeConfigurationId"
+    public static let activePowerModeSession = "powerModeActiveSession.v1"
     public static let selectedAIProvider = "selectedAIProvider"
     public static let openRouterModels = "openRouterModels"
     public static let ollamaBaseURL = "ollamaBaseURL"
@@ -720,6 +721,7 @@ public enum VoiceInkSharedPreferenceReset {
         VoiceInkCustomPromptStorage.clear(from: defaults)
         VoiceInkAIEnhancementContextPreference.clear(from: defaults)
         VoiceInkPowerModeConfigurationPreference.clear(from: defaults)
+        VoiceInkPowerModeSessionPreference.clear(from: defaults)
     }
 }
 
@@ -817,6 +819,32 @@ public enum VoiceInkPowerModeConfigurationPreference {
     public static func clear(from defaults: UserDefaults = .standard) {
         defaults.removeObject(forKey: VoiceInkUserDefaultsKey.powerModeConfigurations)
         defaults.removeObject(forKey: VoiceInkUserDefaultsKey.activePowerModeConfigurationId)
+    }
+}
+
+public enum VoiceInkPowerModeSessionPreference {
+    public static func saveActiveSession(
+        _ session: VoiceInkPowerModeSession,
+        to defaults: UserDefaults = .standard,
+        encoder: JSONEncoder = JSONEncoder()
+    ) throws {
+        let data = try encoder.encode(session)
+        defaults.set(data, forKey: VoiceInkUserDefaultsKey.activePowerModeSession)
+    }
+
+    public static func loadActiveSession(
+        from defaults: UserDefaults = .standard,
+        decoder: JSONDecoder = JSONDecoder()
+    ) throws -> VoiceInkPowerModeSession? {
+        guard let data = defaults.data(forKey: VoiceInkUserDefaultsKey.activePowerModeSession) else {
+            return nil
+        }
+
+        return try decoder.decode(VoiceInkPowerModeSession.self, from: data)
+    }
+
+    public static func clear(from defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.activePowerModeSession)
     }
 }
 

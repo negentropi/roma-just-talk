@@ -5,7 +5,6 @@ import VoiceInkCore
 @MainActor
 class PowerModeSessionManager {
     static let shared = PowerModeSessionManager()
-    private let sessionKey = "powerModeActiveSession.v1"
     private var isApplyingPowerModeConfig = false
 
     private weak var stateProvider: (any PowerModeStateProvider)?
@@ -237,17 +236,15 @@ class PowerModeSessionManager {
 
     private func saveSession(_ session: VoiceInkPowerModeSession) {
         do {
-            let data = try JSONEncoder().encode(session)
-            UserDefaults.standard.set(data, forKey: sessionKey)
+            try VoiceInkPowerModeSessionPreference.saveActiveSession(session)
         } catch {
             print("Error saving Power Mode session: \(error)")
         }
     }
 
     private func loadSession() -> VoiceInkPowerModeSession? {
-        guard let data = UserDefaults.standard.data(forKey: sessionKey) else { return nil }
         do {
-            return try JSONDecoder().decode(VoiceInkPowerModeSession.self, from: data)
+            return try VoiceInkPowerModeSessionPreference.loadActiveSession()
         } catch {
             print("Error loading Power Mode session: \(error)")
             return nil
@@ -255,6 +252,6 @@ class PowerModeSessionManager {
     }
 
     private func clearSession() {
-        UserDefaults.standard.removeObject(forKey: sessionKey)
+        VoiceInkPowerModeSessionPreference.clear()
     }
 }

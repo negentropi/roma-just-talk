@@ -2,6 +2,35 @@ import Foundation
 import VoiceInkCore
 
 final class PowerModePolicyTests: XCTestCase {
+    func testAutoSendKeyPreservesStoredValuesPickerOrderAndLabels() {
+        XCTAssertEqual(
+            VoiceInkAutoSendKey.allCases,
+            [.none, .enter, .shiftEnter, .commandEnter]
+        )
+        XCTAssertEqual(VoiceInkAutoSendKey.none.rawValue, "none")
+        XCTAssertEqual(VoiceInkAutoSendKey.enter.rawValue, "enter")
+        XCTAssertEqual(VoiceInkAutoSendKey.shiftEnter.rawValue, "shiftEnter")
+        XCTAssertEqual(VoiceInkAutoSendKey.commandEnter.rawValue, "commandEnter")
+        XCTAssertEqual(VoiceInkAutoSendKey.none.displayName, "None")
+        XCTAssertEqual(VoiceInkAutoSendKey.enter.displayName, "Return (⏎)")
+        XCTAssertEqual(VoiceInkAutoSendKey.shiftEnter.displayName, "Shift + Return (⇧⏎)")
+        XCTAssertEqual(VoiceInkAutoSendKey.commandEnter.displayName, "Command + Return (⌘⏎)")
+    }
+
+    func testAutoSendKeyEnablementAndCodableShape() throws {
+        XCTAssertFalse(VoiceInkAutoSendKey.none.isEnabled)
+        XCTAssertTrue(VoiceInkAutoSendKey.enter.isEnabled)
+        XCTAssertTrue(VoiceInkAutoSendKey.shiftEnter.isEnabled)
+        XCTAssertTrue(VoiceInkAutoSendKey.commandEnter.isEnabled)
+
+        let data = try JSONEncoder().encode(VoiceInkAutoSendKey.commandEnter)
+        XCTAssertEqual(String(data: data, encoding: .utf8), "\"commandEnter\"")
+        XCTAssertEqual(
+            try JSONDecoder().decode(VoiceInkAutoSendKey.self, from: data),
+            .commandEnter
+        )
+    }
+
     func testNormalizedWebsiteURLPreservesExistingMacOSCleanURLPolicy() {
         XCTAssertEqual(
             VoiceInkPowerModePolicy.normalizedWebsiteURL(" HTTP://WWW.Example.COM/path "),

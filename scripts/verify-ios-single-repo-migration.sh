@@ -926,6 +926,25 @@ require_pattern \
   VoiceInk/PowerMode/PowerModeConfig.swift
 
 require_pattern \
+  "shared auto-send key state lives in VoiceInkCore" \
+  'enum VoiceInkAutoSendKey' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+reject_pattern \
+  "macOS Power Mode avoids shell-only auto-send key state" \
+  'enum +AutoSendKey|var +autoSendKey: +AutoSendKey|performAutoSend\(_ key: +AutoSendKey\)|ForEach\(AutoSendKey\.allCases' \
+  VoiceInk/PowerMode/PowerModeConfig.swift \
+  VoiceInk/PowerMode/PowerModeConfigView.swift \
+  VoiceInk/Paste/CursorPaster.swift
+
+require_pattern \
+  "macOS Power Mode consumes shared auto-send key state" \
+  'VoiceInkAutoSendKey' \
+  VoiceInk/PowerMode/PowerModeConfig.swift \
+  VoiceInk/PowerMode/PowerModeConfigView.swift \
+  VoiceInk/Paste/CursorPaster.swift
+
+require_pattern \
   "macOS diagnostics use shared macOS selected-language fallback" \
   'VoiceInkTranscriptionLanguagePreference\.selectedMacOSLanguage\(\)' \
   VoiceInk/Services/SystemInfoService.swift

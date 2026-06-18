@@ -1,26 +1,6 @@
 import Foundation
 import VoiceInkCore
 
-enum AutoSendKey: String, Codable, CaseIterable {
-    case none = "none"
-    case enter = "enter"
-    case shiftEnter = "shiftEnter"
-    case commandEnter = "commandEnter"
-
-    var displayName: String {
-        switch self {
-        case .none: return "None"
-        case .enter: return "Return (⏎)"
-        case .shiftEnter: return "Shift + Return (⇧⏎)"
-        case .commandEnter: return "Command + Return (⌘⏎)"
-        }
-    }
-
-    var isEnabled: Bool {
-        self != .none
-    }
-}
-
 struct PowerModeConfig: Codable, Identifiable, Equatable {
     var id: UUID
     var name: String
@@ -37,7 +17,7 @@ struct PowerModeConfig: Codable, Identifiable, Equatable {
     var useScreenCapture: Bool
     var selectedAIProvider: String?
     var selectedAIModel: String?
-    var autoSendKey: AutoSendKey = .none
+    var autoSendKey: VoiceInkAutoSendKey = .none
     var isEnabled: Bool = true
     var isDefault: Bool = false
         
@@ -51,7 +31,7 @@ struct PowerModeConfig: Codable, Identifiable, Equatable {
          urlConfigs: [URLConfig]? = nil, isAIEnhancementEnabled: Bool, selectedPrompt: String? = nil,
          selectedTranscriptionModelName: String? = nil, selectedLanguage: String? = nil, useScreenCapture: Bool = false,
          isTextFormattingEnabled: Bool = false, punctuationCleanupMode: PunctuationCleanupMode = .keep, lowercaseTranscription: Bool = false,
-         selectedAIProvider: String? = nil, selectedAIModel: String? = nil, autoSendKey: AutoSendKey = .none, isEnabled: Bool = true, isDefault: Bool = false) {
+         selectedAIProvider: String? = nil, selectedAIModel: String? = nil, autoSendKey: VoiceInkAutoSendKey = .none, isEnabled: Bool = true, isDefault: Bool = false) {
         self.id = id
         self.name = name
         self.emoji = emoji
@@ -95,7 +75,7 @@ struct PowerModeConfig: Codable, Identifiable, Equatable {
         selectedAIModel = try container.decodeIfPresent(String.self, forKey: .selectedAIModel)
         // Migrate from old isAutoSendEnabled bool to new autoSendKey enum
         if let rawValue = try container.decodeIfPresent(String.self, forKey: .autoSendKey),
-           let newKey = AutoSendKey(rawValue: rawValue) {
+           let newKey = VoiceInkAutoSendKey(rawValue: rawValue) {
             autoSendKey = newKey
         } else if let oldBool = try container.decodeIfPresent(Bool.self, forKey: .isAutoSendEnabled), oldBool {
             autoSendKey = .enter

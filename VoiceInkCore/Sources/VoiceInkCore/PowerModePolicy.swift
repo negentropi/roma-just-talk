@@ -43,6 +43,37 @@ public struct VoiceInkPowerModeRule: Identifiable, Equatable, Sendable {
     }
 }
 
+public enum VoiceInkAutoSendKey: String, Codable, CaseIterable, Sendable {
+    case none = "none"
+    case enter = "enter"
+    case shiftEnter = "shiftEnter"
+    case commandEnter = "commandEnter"
+
+    public static let allCases: [VoiceInkAutoSendKey] = [
+        .none,
+        .enter,
+        .shiftEnter,
+        .commandEnter
+    ]
+
+    public var displayName: String {
+        switch self {
+        case .none:
+            return "None"
+        case .enter:
+            return "Return (⏎)"
+        case .shiftEnter:
+            return "Shift + Return (⇧⏎)"
+        case .commandEnter:
+            return "Command + Return (⌘⏎)"
+        }
+    }
+
+    public var isEnabled: Bool {
+        self != .none
+    }
+}
+
 public enum VoiceInkPowerModeSaveMode: Equatable, Sendable {
     case add
     case edit(UUID)

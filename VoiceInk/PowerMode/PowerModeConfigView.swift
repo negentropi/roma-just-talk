@@ -31,7 +31,7 @@ struct ConfigurationView: View {
     @State private var websiteConfigs: [URLConfig] = []
     @State private var newWebsiteURL: String = ""
     @State private var useScreenCapture = false
-    @State private var autoSendKey: AutoSendKey = .none
+    @State private var autoSendKey: VoiceInkAutoSendKey = .none
     @State private var isDefault = false
     @State private var isShowingDeleteConfirmation = false
     @State private var powerModeConfigId: UUID = UUID()
@@ -504,7 +504,7 @@ struct ConfigurationView: View {
                     }
 
                     Picker(selection: $autoSendKey) {
-                        ForEach(AutoSendKey.allCases, id: \.self) { key in
+                        ForEach(VoiceInkAutoSendKey.allCases, id: \.self) { key in
                             Text(key.displayName).tag(key)
                         }
                     } label: {

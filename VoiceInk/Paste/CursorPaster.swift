@@ -2,6 +2,7 @@ import Foundation
 import AppKit
 import Carbon
 import os
+import VoiceInkCore
 
 class CursorPaster {
     fileprivate typealias ClipboardItemSnapshot = [(NSPasteboard.PasteboardType, Data)]
@@ -253,7 +254,7 @@ class CursorPaster {
 
     // MARK: - Auto Send Keys
 
-    static func performAutoSend(_ key: AutoSendKey) {
+    static func performAutoSend(_ key: VoiceInkAutoSendKey) {
         guard key.isEnabled else { return }
         guard AXIsProcessTrusted() else { return }
 

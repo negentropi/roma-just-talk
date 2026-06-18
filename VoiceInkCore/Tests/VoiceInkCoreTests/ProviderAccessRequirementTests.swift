@@ -174,6 +174,30 @@ final class ProviderAccessRequirementTests: XCTestCase {
         )
     }
 
+    func testProviderAPIKeyStateBuildsListRowPresentation() {
+        let state = VoiceInkProviderAPIKeyState(
+            storedKeysByProvider: [.groq: "groq-key"],
+            verifiedProviders: [.groq]
+        )
+
+        XCTAssertEqual(
+            state.listRowPresentation(for: .groq, localWhisperModelAvailable: false),
+            VoiceInkProviderAPIKeyListRowPresentation(
+                title: "Groq",
+                statusSystemImageName: "checkmark.seal.fill",
+                tone: .verified
+            )
+        )
+        XCTAssertEqual(
+            state.listRowPresentation(for: .deepgram, localWhisperModelAvailable: false),
+            VoiceInkProviderAPIKeyListRowPresentation(
+                title: "Deepgram",
+                statusSystemImageName: "exclamationmark.triangle.fill",
+                tone: .attention
+            )
+        )
+    }
+
     func testProviderAPIKeyStateResetVerificationWhenStoredKeyChanges() {
         var state = VoiceInkProviderAPIKeyState(
             storedKeysByProvider: [.groq: "old-key"],

@@ -8,16 +8,13 @@ struct APIKeysView: View {
         List {
             ForEach(VoiceInkProviderKind.userAPIKeyProviders) { provider in
                 NavigationLink(destination: ProviderAPIKeyView(provider: provider)) {
+                    let presentation = settings.apiKeyListRowPresentation(for: provider)
+
                     HStack {
-                        Text(provider.displayName)
+                        Text(presentation.title)
                         Spacer()
-                        if settings.isKeyVerified(for: provider) {
-                            Image(systemName: "checkmark.seal.fill")
-                                .foregroundStyle(.green)
-                        } else {
-                            Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundStyle(.orange)
-                        }
+                        Image(systemName: presentation.statusSystemImageName)
+                            .foregroundStyle(presentation.tone.statusColor)
                     }
                 }
             }
@@ -29,4 +26,15 @@ struct APIKeysView: View {
 
 #Preview {
     NavigationStack { APIKeysView() }
+}
+
+private extension VoiceInkProviderAPIKeyListRowTone {
+    var statusColor: Color {
+        switch self {
+        case .verified:
+            return .green
+        case .attention:
+            return .orange
+        }
+    }
 }

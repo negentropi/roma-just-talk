@@ -1,5 +1,16 @@
 import Foundation
 
+public enum VoiceInkProviderAPIKeyListRowTone: Equatable, Sendable {
+    case verified
+    case attention
+}
+
+public struct VoiceInkProviderAPIKeyListRowPresentation: Equatable, Sendable {
+    public let title: String
+    public let statusSystemImageName: String
+    public let tone: VoiceInkProviderAPIKeyListRowTone
+}
+
 public struct VoiceInkProviderAPIKeyState: Equatable, Sendable {
     private var storedKeysByProvider: [VoiceInkProviderKind: String]
     private var verifiedProviders: Set<VoiceInkProviderKind>
@@ -48,6 +59,24 @@ public struct VoiceInkProviderAPIKeyState: Equatable, Sendable {
                 localWhisperModelAvailable: localWhisperModelAvailable
             )
         }
+    }
+
+    public func listRowPresentation(
+        for provider: VoiceInkProviderKind,
+        localWhisperModelAvailable: Bool
+    ) -> VoiceInkProviderAPIKeyListRowPresentation {
+        let isReady = isReady(
+            for: provider,
+            localWhisperModelAvailable: localWhisperModelAvailable
+        )
+
+        return VoiceInkProviderAPIKeyListRowPresentation(
+            title: provider.displayName,
+            statusSystemImageName: isReady
+                ? "checkmark.seal.fill"
+                : "exclamationmark.triangle.fill",
+            tone: isReady ? .verified : .attention
+        )
     }
 
     @discardableResult

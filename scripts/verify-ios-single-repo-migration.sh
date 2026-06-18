@@ -607,10 +607,26 @@ require_pattern \
   'VoiceInkProviderAPIKeyVerificationProgress|verificationProgress|iOSVerifiedKeyFeedback|iOSResultFeedback' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
+require_pattern \
+  "shared provider API-key list row presentation lives in VoiceInkCore" \
+  'VoiceInkProviderAPIKeyListRowPresentation|listRowPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
+
+require_pattern \
+  "iOS API-key list uses shared row presentation" \
+  'apiKeyListRowPresentation' \
+  iOS/VoiceInk-ios/APIKeysView.swift \
+  iOS/VoiceInk-ios/AppSettings.swift
+
 reject_pattern \
   "iOS API-key view avoids shell-only verification state and copy" \
   '@State private var isVerifying|verifyResult|Key verified|Verification failed' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
+
+reject_pattern \
+  "iOS API-key list avoids shell-only provider readiness icons" \
+  'isKeyVerified|checkmark\.seal\.fill|exclamationmark\.triangle\.fill' \
+  iOS/VoiceInk-ios/APIKeysView.swift
 
 require_pattern \
   "macOS local Whisper uses shared runtime policy" \

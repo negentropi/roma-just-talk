@@ -128,6 +128,13 @@ final class AppSettings: ObservableObject {
         )
     }
 
+    func apiKeyListRowPresentation(for provider: VoiceInkProviderKind) -> VoiceInkProviderAPIKeyListRowPresentation {
+        apiKeyState.listRowPresentation(
+            for: provider,
+            localWhisperModelAvailable: LocalModelManager.shared.hasAvailableModel
+        )
+    }
+
     func availableProviders(for use: VoiceInkProviderModelUse) -> [VoiceInkProviderKind] {
         apiKeyState.availableProviders(
             for: use,

@@ -8,12 +8,7 @@ class CustomVocabularyService {
     private init() {}
 
     func getCustomVocabulary(from context: ModelContext) -> String {
-        let customWords = rawCustomVocabularyTerms(from: context)
-        guard !customWords.isEmpty else {
-            return ""
-        }
-
-        return VoiceInkAIEnhancementVocabularyContext.formatted(from: customWords)
+        VoiceInkAIEnhancementVocabularyContext.formatted(from: rawCustomVocabularyTerms(from: context))
     }
 
     func getCustomVocabularyTerms(from context: ModelContext, for use: VoiceInkCustomVocabularyUse) -> [String] {

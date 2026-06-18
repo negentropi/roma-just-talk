@@ -19,10 +19,6 @@ class WordReplacementService {
 
     func applyReplacements(to text: String, using context: ModelContext) -> String {
         let replacements = replacementRules(using: context)
-        guard !replacements.isEmpty else {
-            return text
-        }
-
         return VoiceInkWordReplacementEngine.apply(replacements, to: text)
     }
 

@@ -452,6 +452,12 @@ reject_pattern \
   VoiceInk/Transcription/Processing/WordReplacementService.swift
 
 reject_pattern \
+  "macOS dictionary adapters leave empty input behavior to shared modules" \
+  'guard !customWords\.isEmpty|guard !replacements\.isEmpty' \
+  VoiceInk/Services/CustomVocabularyService.swift \
+  VoiceInk/Transcription/Processing/WordReplacementService.swift
+
+reject_pattern \
   "iOS retry passes stored vocabulary into shared run processor" \
   'runtimeCustomVocabularyTerms' \
   iOS/VoiceInk-ios

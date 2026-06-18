@@ -643,6 +643,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "WordCounterTests.testCountsNaturalLanguageWords", run: { WordCounterTests().testCountsNaturalLanguageWords() }),
             VoiceInkCoreCheck(name: "WordCounterTests.testIgnoresWhitespaceOnlyText", run: { WordCounterTests().testIgnoresWhitespaceOnlyText() }),
             VoiceInkCoreCheck(name: "WordCounterTests.testCountsWordsAcrossPunctuation", run: { WordCounterTests().testCountsWordsAcrossPunctuation() }),
+            VoiceInkCoreCheck(name: "WordReplacementEngineTests.testApplyReturnsInputForNoRules", run: { WordReplacementEngineTests().testApplyReturnsInputForNoRules() }),
             VoiceInkCoreCheck(name: "WordReplacementEngineTests.testApplySortsRulesByLongerOriginalText", run: { WordReplacementEngineTests().testApplySortsRulesByLongerOriginalText() }),
             VoiceInkCoreCheck(name: "WordReplacementEngineTests.testApplyUsesCaseInsensitiveWordBoundariesForSpacedText", run: { WordReplacementEngineTests().testApplyUsesCaseInsensitiveWordBoundariesForSpacedText() }),
             VoiceInkCoreCheck(name: "WordReplacementEngineTests.testApplySortsCommaSeparatedVariantsByLength", run: { WordReplacementEngineTests().testApplySortsCommaSeparatedVariantsByLength() }),

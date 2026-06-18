@@ -2,6 +2,13 @@ import Foundation
 @testable import VoiceInkCore
 
 final class WordReplacementEngineTests: XCTestCase {
+    func testApplyReturnsInputForNoRules() {
+        XCTAssertEqual(
+            VoiceInkWordReplacementEngine.apply([], to: "Keep this text"),
+            "Keep this text"
+        )
+    }
+
     func testApplySortsRulesByLongerOriginalText() {
         let rules = [
             VoiceInkWordReplacementRule(originalText: "voice", replacementText: "v"),

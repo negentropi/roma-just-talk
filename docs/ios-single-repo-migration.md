@@ -251,7 +251,7 @@ iOS app-local storage roots are kept in `iOS/VoiceInk-ios/VoiceInkIOSStorageDire
 
 ## Sibling Clone Status
 
-The remaining Swift files present in `../VoiceInk-iOS` but not in `VoiceInk/iOS` are old clone-side sources, except where noted. `scripts/verify-ios-single-repo-migration.sh` now fails if any of these obsolete app-target duplicates are copied back under `iOS/VoiceInk-ios/`.
+The remaining Swift files present in `../VoiceInk-iOS/VoiceInk-ios` but not in `VoiceInk/iOS/VoiceInk-ios` are old clone-side sources, except where noted. `scripts/verify-ios-single-repo-migration.sh` now fails if any of these obsolete app-target duplicates are copied back under `iOS/VoiceInk-ios/`; the sibling keyboard, unit-test, and UI-test target folders must have no sibling-only Swift files.
 
 - `AppGroupCoordinator.swift`: moved into `iOS/Shared/AppGroupCoordinator.swift`; start-recording requests now use `iOS/Shared/VoiceInkAppDeepLink.swift`, while shared App Group/Darwin notification state still handles stop requests and keyboard recording-state feedback.
 
@@ -299,7 +299,7 @@ scripts/verify-ios-single-repo-migration.sh --full-build
 11. iOS shared shell files are present under `iOS/Shared/`: `AppGroupCoordinator.swift`, `VoiceInkAppDeepLink.swift`, and `VoiceInkAppGroupRecordingBridge.swift`.
 12. iOS non-Swift app artifacts are present: privacy manifest, app icon catalog files, and bundled Silero VAD resource.
 13. Obsolete clone-side Swift duplicates remain absent from `iOS/VoiceInk-ios/`.
-14. When `../VoiceInk-iOS` exists, every sibling-only Swift file under `VoiceInk-ios/` is one of the documented obsolete/replaced files above.
+14. When `../VoiceInk-iOS` exists, every sibling-only Swift file under `VoiceInk-ios/` is one of the documented obsolete/replaced files above, and the sibling keyboard/unit-test/UI-test target folders have no sibling-only Swift files.
 15. Legacy same-file clone shims remain absent from the in-repo iOS app and keyboard: `TranscriptionServiceFactory`, `LLMPostProcessor`, the old local `RecordingState`, raw `voiceink://record` URL construction, `Open VoiceInk` keyboard copy, and old `AppSettings` effective-provider/model accessors.
 16. A real Xcode toolchain is selected and both app targets build.
 

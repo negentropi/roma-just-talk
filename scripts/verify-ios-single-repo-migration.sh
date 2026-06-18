@@ -65,6 +65,46 @@ reject_file() {
   fi
 }
 
+relative_swift_file_list() {
+  local base="$1"
+  fd -e swift -t f . "$base" | while IFS= read -r file; do
+    printf '%s\n' "${file#"$base"/}"
+  done | sort
+}
+
+require_no_sibling_swift_extras() {
+  local description="$1"
+  local sibling_dir="$2"
+  local in_repo_dir="$3"
+
+  section "$description"
+  if [[ ! -d "$sibling_dir" ]]; then
+    printf 'No sibling %s checkout path; skipping optional clone-extra audit.\n' "$sibling_dir"
+    return
+  fi
+
+  local sibling_files
+  local in_repo_files
+  local extras
+  sibling_files="$(mktemp "${TMPDIR:-/tmp}/voiceink-sibling-swift.XXXXXX")"
+  in_repo_files="$(mktemp "${TMPDIR:-/tmp}/voiceink-in-repo-swift.XXXXXX")"
+  extras="$(mktemp "${TMPDIR:-/tmp}/voiceink-sibling-extras.XXXXXX")"
+
+  relative_swift_file_list "$sibling_dir" >"$sibling_files"
+  relative_swift_file_list "$in_repo_dir" >"$in_repo_files"
+  comm -23 "$sibling_files" "$in_repo_files" >"$extras"
+
+  if [[ -s "$extras" ]]; then
+    printf 'Sibling-only Swift files:\n' >&2
+    cat "$extras" >&2
+    rm -f "$sibling_files" "$in_repo_files" "$extras"
+    fail "$description"
+    return
+  fi
+
+  rm -f "$sibling_files" "$in_repo_files" "$extras"
+}
+
 run_required() {
   local description="$1"
   shift
@@ -172,8 +212,8 @@ if [[ -d ../VoiceInk-iOS/VoiceInk-ios ]]; then
   actual_sibling_extras="$(mktemp "${TMPDIR:-/tmp}/voiceink-actual-sibling-extras.XXXXXX")"
   expected_sibling_extras="$(mktemp "${TMPDIR:-/tmp}/voiceink-expected-sibling-extras.XXXXXX")"
 
-  fd -e swift -t f . ../VoiceInk-iOS/VoiceInk-ios | sed 's#^\.\./VoiceInk-iOS/VoiceInk-ios/##' | sort >"$sibling_ios_files"
-  fd -e swift -t f . iOS/VoiceInk-ios | sed 's#^iOS/VoiceInk-ios/##' | sort >"$in_repo_ios_files"
+  relative_swift_file_list ../VoiceInk-iOS/VoiceInk-ios >"$sibling_ios_files"
+  relative_swift_file_list iOS/VoiceInk-ios >"$in_repo_ios_files"
   comm -23 "$sibling_ios_files" "$in_repo_ios_files" >"$actual_sibling_extras"
   printf '%s\n' "${obsolete_ios_clone_files[@]}" | sort >"$expected_sibling_extras"
 
@@ -190,6 +230,21 @@ if [[ -d ../VoiceInk-iOS/VoiceInk-ios ]]; then
 else
   printf 'No sibling ../VoiceInk-iOS checkout; skipping optional clone-extra audit.\n'
 fi
+
+require_no_sibling_swift_extras \
+  "sibling iOS keyboard clone has no undocumented Swift extras" \
+  ../VoiceInk-iOS/VoiceInkKeyboard \
+  iOS/VoiceInkKeyboard
+
+require_no_sibling_swift_extras \
+  "sibling iOS unit-test clone has no undocumented Swift extras" \
+  ../VoiceInk-iOS/VoiceInk-iosTests \
+  iOS/VoiceInk-iosTests
+
+require_no_sibling_swift_extras \
+  "sibling iOS UI-test clone has no undocumented Swift extras" \
+  ../VoiceInk-iOS/VoiceInk-iosUITests \
+  iOS/VoiceInk-iosUITests
 
 reject_pattern \
   "VoiceInkCore stays platform-neutral" \

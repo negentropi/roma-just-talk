@@ -1,0 +1,68 @@
+import Foundation
+
+public enum VoiceInkEnhancementFailureDraftPolicy: Equatable, Sendable {
+    case omitEnhancedText
+    case storeFailureText
+}
+
+public struct VoiceInkCompletedTranscriptionDraft: Equatable, Sendable {
+    public let text: String
+    public let duration: TimeInterval
+    public let enhancedText: String?
+    public let audioFileURL: String?
+    public let transcriptionModelName: String?
+    public let aiEnhancementModelName: String?
+    public let promptName: String?
+    public let transcriptionDuration: TimeInterval?
+    public let enhancementDuration: TimeInterval?
+    public let aiRequestSystemMessage: String?
+    public let aiRequestUserMessage: String?
+    public let powerModeName: String?
+    public let powerModeEmoji: String?
+    public let transcriptionStatus: VoiceInkTranscriptionStatus
+
+    public init(
+        cleanedText: String,
+        duration: TimeInterval,
+        audioFileURL: String?,
+        transcriptionModelName: String?,
+        transcriptionDuration: TimeInterval?,
+        powerModeName: String? = nil,
+        powerModeEmoji: String? = nil,
+        enhancementResult: VoiceInkAIEnhancementResult? = nil,
+        enhancementFailureReason: String? = nil,
+        enhancementFailurePolicy: VoiceInkEnhancementFailureDraftPolicy = .omitEnhancedText
+    ) {
+        self.text = cleanedText
+        self.duration = duration
+        self.audioFileURL = audioFileURL
+        self.transcriptionModelName = transcriptionModelName
+        self.transcriptionDuration = transcriptionDuration
+        self.powerModeName = powerModeName
+        self.powerModeEmoji = powerModeEmoji
+        self.transcriptionStatus = .completed
+
+        if let enhancementResult {
+            self.enhancedText = enhancementResult.text
+            self.aiEnhancementModelName = enhancementResult.modelName
+            self.promptName = enhancementResult.promptName
+            self.enhancementDuration = enhancementResult.duration
+            self.aiRequestSystemMessage = enhancementResult.requestSystemMessage
+            self.aiRequestUserMessage = enhancementResult.requestUserMessage
+        } else {
+            switch enhancementFailurePolicy {
+            case .omitEnhancedText:
+                self.enhancedText = nil
+            case .storeFailureText:
+                self.enhancedText = enhancementFailureReason.map {
+                    VoiceInkPostProcessingFailurePresentation.enhancementFailureText(reason: $0)
+                }
+            }
+            self.aiEnhancementModelName = nil
+            self.promptName = nil
+            self.enhancementDuration = nil
+            self.aiRequestSystemMessage = nil
+            self.aiRequestUserMessage = nil
+        }
+    }
+}

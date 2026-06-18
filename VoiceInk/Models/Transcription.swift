@@ -53,6 +53,25 @@ final class Transcription: VoiceInkStoredAudioRecord, VoiceInkSessionMetricSourc
         self.transcriptionStatus = transcriptionStatus.rawValue
     }
 
+    convenience init(completedDraft draft: VoiceInkCompletedTranscriptionDraft) {
+        self.init(
+            text: draft.text,
+            duration: draft.duration,
+            enhancedText: draft.enhancedText,
+            audioFileURL: draft.audioFileURL,
+            transcriptionModelName: draft.transcriptionModelName,
+            aiEnhancementModelName: draft.aiEnhancementModelName,
+            promptName: draft.promptName,
+            transcriptionDuration: draft.transcriptionDuration,
+            enhancementDuration: draft.enhancementDuration,
+            aiRequestSystemMessage: draft.aiRequestSystemMessage,
+            aiRequestUserMessage: draft.aiRequestUserMessage,
+            powerModeName: draft.powerModeName,
+            powerModeEmoji: draft.powerModeEmoji,
+            transcriptionStatus: draft.transcriptionStatus
+        )
+    }
+
     func markAsCanceledTranscription(
         duration: TimeInterval? = nil,
         modelName: String? = nil

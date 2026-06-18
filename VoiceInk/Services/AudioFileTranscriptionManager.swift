@@ -188,52 +188,41 @@ class AudioTranscriptionManager: ObservableObject {
                 item.status = .processing(phase: .enhancing)
                 do {
                     let enhancement = try await enhancementService.enhance(text)
-                    transcription = Transcription(
-                        text: cleanedText,
+                    transcription = Transcription(completedDraft: VoiceInkCompletedTranscriptionDraft(
+                        cleanedText: cleanedText,
                         duration: duration,
-                        enhancedText: enhancement.text,
                         audioFileURL: permanentURL.absoluteString,
                         transcriptionModelName: currentModel.displayName,
-                        aiEnhancementModelName: enhancement.modelName,
-                        promptName: enhancement.promptName,
                         transcriptionDuration: transcriptionDuration,
-                        enhancementDuration: enhancement.duration,
-                        aiRequestSystemMessage: enhancement.requestSystemMessage,
-                        aiRequestUserMessage: enhancement.requestUserMessage,
                         powerModeName: powerModeName,
                         powerModeEmoji: powerModeEmoji,
-                        transcriptionStatus: .completed
-                    )
+                        enhancementResult: enhancement
+                    ))
                 } catch {
                     let errorDescription = VoiceInkErrorDescription.text(for: error)
                     logger.error("Enhancement failed: \(errorDescription, privacy: .public)")
-                    transcription = Transcription(
-                        text: cleanedText,
+                    transcription = Transcription(completedDraft: VoiceInkCompletedTranscriptionDraft(
+                        cleanedText: cleanedText,
                         duration: duration,
-                        enhancedText: VoiceInkPostProcessingFailurePresentation.enhancementFailureText(
-                            reason: errorDescription
-                        ),
                         audioFileURL: permanentURL.absoluteString,
                         transcriptionModelName: currentModel.displayName,
-                        promptName: nil,
                         transcriptionDuration: transcriptionDuration,
                         powerModeName: powerModeName,
                         powerModeEmoji: powerModeEmoji,
-                        transcriptionStatus: .completed
-                    )
+                        enhancementFailureReason: errorDescription,
+                        enhancementFailurePolicy: .storeFailureText
+                    ))
                 }
             } else {
-                transcription = Transcription(
-                    text: cleanedText,
+                transcription = Transcription(completedDraft: VoiceInkCompletedTranscriptionDraft(
+                    cleanedText: cleanedText,
                     duration: duration,
                     audioFileURL: permanentURL.absoluteString,
                     transcriptionModelName: currentModel.displayName,
-                    promptName: nil,
                     transcriptionDuration: transcriptionDuration,
                     powerModeName: powerModeName,
-                    powerModeEmoji: powerModeEmoji,
-                    transcriptionStatus: .completed
-                )
+                    powerModeEmoji: powerModeEmoji
+                ))
             }
 
             modelContext.insert(transcription)

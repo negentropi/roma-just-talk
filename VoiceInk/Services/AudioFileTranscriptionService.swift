@@ -100,22 +100,16 @@ class AudioTranscriptionService {
                 do {
                     let textForAI = promptDetectionResult?.processedText ?? text
                     let enhancement = try await enhancementService.enhance(textForAI)
-                    let newTranscription = Transcription(
-                        text: originalText,
+                    let newTranscription = Transcription(completedDraft: VoiceInkCompletedTranscriptionDraft(
+                        cleanedText: originalText,
                         duration: duration,
-                        enhancedText: enhancement.text,
                         audioFileURL: permanentURLString,
                         transcriptionModelName: model.displayName,
-                        aiEnhancementModelName: enhancement.modelName,
-                        promptName: enhancement.promptName,
                         transcriptionDuration: transcriptionDuration,
-                        enhancementDuration: enhancement.duration,
-                        aiRequestSystemMessage: enhancement.requestSystemMessage,
-                        aiRequestUserMessage: enhancement.requestUserMessage,
                         powerModeName: powerModeName,
                         powerModeEmoji: powerModeEmoji,
-                        transcriptionStatus: .completed
-                    )
+                        enhancementResult: enhancement
+                    ))
                     modelContext.insert(newTranscription)
                     do {
                         try modelContext.save()
@@ -127,17 +121,17 @@ class AudioTranscriptionService {
 
                     return newTranscription
                 } catch {
-                    let newTranscription = Transcription(
-                        text: originalText,
+                    let newTranscription = Transcription(completedDraft: VoiceInkCompletedTranscriptionDraft(
+                        cleanedText: originalText,
                         duration: duration,
                         audioFileURL: permanentURLString,
                         transcriptionModelName: model.displayName,
-                        promptName: nil,
                         transcriptionDuration: transcriptionDuration,
                         powerModeName: powerModeName,
                         powerModeEmoji: powerModeEmoji,
-                        transcriptionStatus: .completed
-                    )
+                        enhancementFailureReason: VoiceInkErrorDescription.text(for: error),
+                        enhancementFailurePolicy: .omitEnhancedText
+                    ))
                     modelContext.insert(newTranscription)
                     do {
                         try modelContext.save()
@@ -150,17 +144,15 @@ class AudioTranscriptionService {
                     return newTranscription
                 }
             } else {
-                let newTranscription = Transcription(
-                    text: originalText,
+                let newTranscription = Transcription(completedDraft: VoiceInkCompletedTranscriptionDraft(
+                    cleanedText: originalText,
                     duration: duration,
                     audioFileURL: permanentURLString,
                     transcriptionModelName: model.displayName,
-                    promptName: nil,
                     transcriptionDuration: transcriptionDuration,
                     powerModeName: powerModeName,
-                    powerModeEmoji: powerModeEmoji,
-                    transcriptionStatus: .completed
-                )
+                    powerModeEmoji: powerModeEmoji
+                ))
                 modelContext.insert(newTranscription)
                 do {
                     try modelContext.save()

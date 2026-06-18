@@ -581,6 +581,16 @@ require_pattern \
   'VoiceInkTranscriptionRunPreparation\.prepareFilteredText' \
   VoiceInk/Services/AudioFileTranscriptionService.swift
 
+require_pattern \
+  "macOS audio-file import builds completed records through shared draft" \
+  'VoiceInkCompletedTranscriptionDraft' \
+  VoiceInk/Services/AudioFileTranscriptionManager.swift
+
+require_pattern \
+  "macOS retry transcription builds completed records through shared draft" \
+  'VoiceInkCompletedTranscriptionDraft' \
+  VoiceInk/Services/AudioFileTranscriptionService.swift
+
 reject_pattern \
   "macOS transcription run callers use shared post-processing skip decision" \
   'VoiceInkPostProcessingSkipPolicy\.shouldSkipPostProcessing' \
@@ -682,13 +692,18 @@ require_pattern \
 
 require_pattern \
   "macOS audio-file import enhancement stores request metadata from shared result" \
-  'enhancement\.requestSystemMessage' \
+  'enhancementResult: enhancement' \
   VoiceInk/Services/AudioFileTranscriptionManager.swift
 
 require_pattern \
   "macOS retry enhancement stores request metadata from shared result" \
-  'enhancement\.requestSystemMessage' \
+  'enhancementResult: enhancement' \
   VoiceInk/Services/AudioFileTranscriptionService.swift
+
+require_pattern \
+  "shared completed transcription draft stores request metadata from shared result" \
+  'enhancementResult\.requestSystemMessage' \
+  VoiceInkCore/Sources/VoiceInkCore/CompletedTranscriptionDraft.swift
 
 require_pattern \
   "macOS re-enhance action stores request metadata from shared result" \

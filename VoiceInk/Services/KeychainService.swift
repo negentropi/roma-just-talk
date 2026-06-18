@@ -1,6 +1,7 @@
 import Foundation
 import Security
 import os
+import VoiceInkCore
 
 /// Securely stores and retrieves API keys using Keychain with iCloud sync.
 /// For local (unsigned) builds, uses UserDefaults instead since Keychain
@@ -9,7 +10,6 @@ final class KeychainService {
     static let shared = KeychainService()
 
     private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "KeychainService")
-    private let service = "com.prakashjoshipax.VoiceInk"
 
     #if LOCAL_BUILD
     private let defaults = UserDefaults.standard
@@ -40,10 +40,10 @@ final class KeychainService {
         // First, try to delete any existing item to avoid duplicates
         delete(forKey: key, syncable: syncable)
 
-        var query = baseQuery(forKey: key, syncable: syncable)
-        query[kSecValueData as String] = data
-
-        let status = SecItemAdd(query as CFDictionary, nil)
+        let status = SecItemAdd(
+            VoiceInkKeychainQuery.add(data: data, account: key, syncable: syncable) as CFDictionary,
+            nil
+        )
 
         if status == errSecSuccess {
             logger.info("Successfully saved keychain item for key: \(key, privacy: .public)")
@@ -68,12 +68,11 @@ final class KeychainService {
         #if LOCAL_BUILD
         return defaults.data(forKey: localPrefix + key)
         #else
-        var query = baseQuery(forKey: key, syncable: syncable)
-        query[kSecReturnData as String] = kCFBooleanTrue
-        query[kSecMatchLimit as String] = kSecMatchLimitOne
-
         var result: AnyObject?
-        let status = SecItemCopyMatching(query as CFDictionary, &result)
+        let status = SecItemCopyMatching(
+            VoiceInkKeychainQuery.copyData(account: key, syncable: syncable) as CFDictionary,
+            &result
+        )
 
         if status == errSecSuccess {
             return result as? Data
@@ -92,8 +91,9 @@ final class KeychainService {
         defaults.removeObject(forKey: localPrefix + key)
         return true
         #else
-        let query = baseQuery(forKey: key, syncable: syncable)
-        let status = SecItemDelete(query as CFDictionary)
+        let status = SecItemDelete(
+            VoiceInkKeychainQuery.base(account: key, syncable: syncable) as CFDictionary
+        )
 
         if status == errSecSuccess || status == errSecItemNotFound {
             if status == errSecSuccess {
@@ -112,31 +112,11 @@ final class KeychainService {
         #if LOCAL_BUILD
         return defaults.data(forKey: localPrefix + key) != nil
         #else
-        var query = baseQuery(forKey: key, syncable: syncable)
-        query[kSecReturnData as String] = kCFBooleanFalse
-
-        let status = SecItemCopyMatching(query as CFDictionary, nil)
+        let status = SecItemCopyMatching(
+            VoiceInkKeychainQuery.exists(account: key, syncable: syncable) as CFDictionary,
+            nil
+        )
         return status == errSecSuccess
         #endif
     }
-
-    // MARK: - Private Helpers
-
-    #if !LOCAL_BUILD
-    /// Creates base Keychain query dictionary.
-    private func baseQuery(forKey key: String, syncable: Bool) -> [String: Any] {
-        var query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: service,
-            kSecAttrAccount as String: key,
-            kSecUseDataProtectionKeychain as String: true
-        ]
-
-        if syncable {
-            query[kSecAttrSynchronizable as String] = kCFBooleanTrue
-        }
-
-        return query
-    }
-    #endif
 }

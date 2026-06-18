@@ -698,6 +698,27 @@ require_pattern \
   iOS/VoiceInk-ios/APIKeysView.swift \
   iOS/VoiceInk-ios/AppSettings.swift
 
+require_pattern \
+  "shared Keychain query policy lives in VoiceInkCore" \
+  'VoiceInkKeychainQuery' \
+  VoiceInkCore/Sources/VoiceInkCore/KeychainQuery.swift
+
+require_pattern \
+  "macOS Keychain adapter uses shared query policy" \
+  'VoiceInkKeychainQuery' \
+  VoiceInk/Services/KeychainService.swift
+
+require_pattern \
+  "iOS Keychain adapter uses shared query policy" \
+  'VoiceInkKeychainQuery' \
+  iOS/VoiceInk-ios/KeychainService.swift
+
+reject_pattern \
+  "platform Keychain adapters avoid duplicate service and syncability query policy" \
+  'kSecAttrService|kSecAttrSynchronizable|kSecUseDataProtectionKeychain|com\.prakashjoshipax\.VoiceInk' \
+  VoiceInk/Services/KeychainService.swift \
+  iOS/VoiceInk-ios/KeychainService.swift
+
 reject_pattern \
   "iOS API-key view avoids shell-only verification state and copy" \
   '@State private var isVerifying|verifyResult|Key verified|Verification failed' \

@@ -1,0 +1,45 @@
+import Foundation
+import Security
+@testable import VoiceInkCore
+
+final class KeychainQueryTests: XCTestCase {
+    func testBaseQueryPreservesSharedAppServiceAndAccount() {
+        let query = VoiceInkKeychainQuery.base(account: "groqAPIKey")
+
+        XCTAssertEqual(query[kSecClass as String] as? String, kSecClassGenericPassword as String)
+        XCTAssertEqual(query[kSecAttrService as String] as? String, "com.prakashjoshipax.VoiceInk")
+        XCTAssertEqual(query[kSecAttrAccount as String] as? String, "groqAPIKey")
+        XCTAssertEqual(booleanValue(query[kSecUseDataProtectionKeychain as String]), true)
+        XCTAssertEqual(booleanValue(query[kSecAttrSynchronizable as String]), true)
+    }
+
+    func testBaseQueryCanDisableSyncableForMacOSCallers() {
+        let query = VoiceInkKeychainQuery.base(account: "provider", syncable: false)
+
+        XCTAssertNil(query[kSecAttrSynchronizable as String])
+    }
+
+    func testAddQueryAddsValueData() {
+        let data = Data("secret".utf8)
+        let query = VoiceInkKeychainQuery.add(data: data, account: "provider")
+
+        XCTAssertEqual(query[kSecValueData as String] as? Data, data)
+    }
+
+    func testCopyDataQueryRequestsOneDataResult() {
+        let query = VoiceInkKeychainQuery.copyData(account: "provider")
+
+        XCTAssertEqual(booleanValue(query[kSecReturnData as String]), true)
+        XCTAssertEqual(query[kSecMatchLimit as String] as? String, kSecMatchLimitOne as String)
+    }
+
+    func testExistsQuerySuppressesDataReturn() {
+        let query = VoiceInkKeychainQuery.exists(account: "provider")
+
+        XCTAssertEqual(booleanValue(query[kSecReturnData as String]), false)
+    }
+
+    private func booleanValue(_ value: Any?) -> Bool? {
+        value as? Bool
+    }
+}

@@ -618,8 +618,18 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
 
 require_pattern \
+  "shared provider API-key form presentation lives in VoiceInkCore" \
+  'VoiceInkProviderAPIKeyFormPresentation|apiKeyFormPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
+
+require_pattern \
   "iOS API-key view uses shared verification progress presentation" \
   'VoiceInkProviderAPIKeyVerificationProgress|verificationProgress|iOSVerifiedKeyFeedback|iOSResultFeedback' \
+  iOS/VoiceInk-ios/ProviderAPIKeyView.swift
+
+require_pattern \
+  "iOS API-key view uses shared form presentation" \
+  'apiKeyFormPresentation|VoiceInkProviderAPIKeyFormPresentation' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 require_pattern \
@@ -636,6 +646,11 @@ require_pattern \
 reject_pattern \
   "iOS API-key view avoids shell-only verification state and copy" \
   '@State private var isVerifying|verifyResult|Key verified|Verification failed' \
+  iOS/VoiceInk-ios/ProviderAPIKeyView.swift
+
+reject_pattern \
+  "iOS API-key view avoids shell-only form presentation copy" \
+  '"([^"]*API Key[^"]*|[^"]*API Console[^"]*|Save|Verify|Change)"' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 reject_pattern \

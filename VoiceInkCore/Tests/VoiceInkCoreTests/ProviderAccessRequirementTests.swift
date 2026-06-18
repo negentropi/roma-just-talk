@@ -120,6 +120,19 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertNil(draft.keyToSaveAfterSuccessfulVerification)
     }
 
+    func testProviderAPIKeyFormPresentationBuildsProviderCopy() {
+        let presentation = VoiceInkProviderKind.deepgram.apiKeyFormPresentation
+
+        XCTAssertEqual(presentation.navigationTitle, "Deepgram")
+        XCTAssertEqual(presentation.apiKeySectionTitle, "Deepgram API Key")
+        XCTAssertEqual(presentation.apiKeyPlaceholder, "Deepgram API Key")
+        XCTAssertEqual(presentation.saveButtonTitle, "Save")
+        XCTAssertEqual(presentation.verifyButtonTitle, "Verify")
+        XCTAssertEqual(presentation.changeButtonTitle, "Change")
+        XCTAssertEqual(presentation.consoleSectionTitle, "Get API Key")
+        XCTAssertEqual(presentation.consoleLinkTitle, "Deepgram API Console")
+    }
+
     func testProviderAPIKeyStateResolvesStoredRuntimeKeysAndNonUserProviders() {
         let state = VoiceInkProviderAPIKeyState(
             storedKeysByProvider: [.groq: " groq-key "],

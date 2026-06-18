@@ -28,16 +28,22 @@ struct ProviderAPIKeyView: View {
         apiKeyDraft.canVerify
     }
 
+    private var formPresentation: VoiceInkProviderAPIKeyFormPresentation {
+        provider.apiKeyFormPresentation
+    }
+
     var body: some View {
+        let presentation = formPresentation
+
         Form {
-            Section(header: Text("\(provider.displayName) API Key")) {
+            Section(header: Text(presentation.apiKeySectionTitle)) {
                 if editingKey {
-                    SecureField("\(provider.displayName) API Key", text: $tempKey)
+                    SecureField(presentation.apiKeyPlaceholder, text: $tempKey)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                     HStack {
                         Button(action: saveKey) {
-                            Label("Save", systemImage: "checkmark.circle.fill")
+                            Label(presentation.saveButtonTitle, systemImage: "checkmark.circle.fill")
                         }
                         .disabled(!hasEnteredAPIKey)
                         Spacer()
@@ -45,7 +51,7 @@ struct ProviderAPIKeyView: View {
                             ProgressView().progressViewStyle(.circular)
                         } else {
                             Button(action: verifyKey) {
-                                Label("Verify", systemImage: "checkmark.seal")
+                                Label(presentation.verifyButtonTitle, systemImage: "checkmark.seal")
                             }
                             .disabled(!canVerifyAPIKey)
                         }
@@ -56,7 +62,7 @@ struct ProviderAPIKeyView: View {
                         Label(feedback.text, systemImage: feedback.systemImageName ?? "checkmark.seal.fill")
                             .foregroundStyle(color(for: feedback.tone))
                         Spacer()
-                        Button("Change") {
+                        Button(presentation.changeButtonTitle) {
                             editingKey = true
                             verificationProgress = .idle
                             tempKey = settings.storedAPIKey(for: provider)
@@ -75,11 +81,11 @@ struct ProviderAPIKeyView: View {
                 }
             }
             
-            Section(header: Text("Get API Key")) {
+            Section(header: Text(presentation.consoleSectionTitle)) {
                 Link(destination: provider.consoleURL) {
                     HStack {
                         Image(systemName: "link")
-                        Text("\(provider.displayName) API Console")
+                        Text(presentation.consoleLinkTitle)
                         Spacer()
                         Image(systemName: "arrow.up.right.square")
                             .foregroundStyle(.secondary)
@@ -87,7 +93,7 @@ struct ProviderAPIKeyView: View {
                 }
             }
         }
-        .navigationTitle(provider.displayName)
+        .navigationTitle(presentation.navigationTitle)
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             tempKey = settings.storedAPIKey(for: provider)

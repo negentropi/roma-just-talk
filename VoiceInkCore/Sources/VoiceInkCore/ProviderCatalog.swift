@@ -104,6 +104,31 @@ public struct VoiceInkProviderAPIKeyDraft: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkProviderAPIKeyFormPresentation: Equatable, Sendable {
+    public let navigationTitle: String
+    public let apiKeySectionTitle: String
+    public let apiKeyPlaceholder: String
+    public let saveButtonTitle: String
+    public let verifyButtonTitle: String
+    public let changeButtonTitle: String
+    public let consoleSectionTitle: String
+    public let consoleLinkTitle: String
+
+    public static func make(for provider: VoiceInkProviderKind) -> Self {
+        let displayName = provider.displayName
+        return VoiceInkProviderAPIKeyFormPresentation(
+            navigationTitle: displayName,
+            apiKeySectionTitle: "\(displayName) API Key",
+            apiKeyPlaceholder: "\(displayName) API Key",
+            saveButtonTitle: "Save",
+            verifyButtonTitle: "Verify",
+            changeButtonTitle: "Change",
+            consoleSectionTitle: "Get API Key",
+            consoleLinkTitle: "\(displayName) API Console"
+        )
+    }
+}
+
 public enum VoiceInkProviderAPIKeyVerificationTone: Equatable, Sendable {
     case success
     case failure
@@ -206,6 +231,10 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
     case voiceInk
 
     public var id: String { rawValue }
+
+    public var apiKeyFormPresentation: VoiceInkProviderAPIKeyFormPresentation {
+        VoiceInkProviderAPIKeyFormPresentation.make(for: self)
+    }
 
     public var displayName: String {
         persistedValue

@@ -10,7 +10,14 @@ final class TranscriptionRecordTests: XCTestCase {
             transcriptionModelName: "whisper-large-v3",
             aiEnhancementModelName: "gemini-2.5-flash",
             transcriptionDuration: 3,
-            enhancementDuration: 2,
+            postProcessingResult: VoiceInkAIEnhancementResult(
+                text: "enhanced",
+                duration: 2,
+                modelName: "gemini-2.5-flash",
+                promptName: nil,
+                requestSystemMessage: nil,
+                requestUserMessage: nil
+            ),
             postProcessingError: "Post-processing failed: timeout"
         )
 
@@ -38,7 +45,6 @@ final class TranscriptionRecordTests: XCTestCase {
             transcriptionModelName: "whisper-large-v3",
             aiEnhancementModelName: nil,
             transcriptionDuration: nil,
-            enhancementDuration: nil,
             postProcessingError: nil
         )
 
@@ -93,7 +99,6 @@ final class TranscriptionRecordTests: XCTestCase {
                 transcriptionModelName: "whisper-large-v3",
                 aiEnhancementModelName: "gemini-2.5-flash",
                 transcriptionDuration: 3,
-                enhancementDuration: 2,
                 postProcessingResult: VoiceInkAIEnhancementResult(
                     text: "enhanced",
                     duration: 2,

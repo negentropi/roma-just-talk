@@ -6,7 +6,6 @@ public struct VoiceInkTranscriptionRunResult: Equatable, Sendable {
     public let transcriptionModelName: String
     public let aiEnhancementModelName: String?
     public let transcriptionDuration: TimeInterval?
-    public let enhancementDuration: TimeInterval?
     public let postProcessingResult: VoiceInkAIEnhancementResult?
     public let postProcessingError: String?
 
@@ -18,13 +17,16 @@ public struct VoiceInkTranscriptionRunResult: Equatable, Sendable {
         postProcessingResult != nil
     }
 
+    public var enhancementDuration: TimeInterval? {
+        postProcessingResult?.duration
+    }
+
     public init(
         cleanedText: String,
         finalText: String,
         transcriptionModelName: String,
         aiEnhancementModelName: String?,
         transcriptionDuration: TimeInterval? = nil,
-        enhancementDuration: TimeInterval? = nil,
         postProcessingResult: VoiceInkAIEnhancementResult? = nil,
         postProcessingError: String?
     ) {
@@ -33,7 +35,6 @@ public struct VoiceInkTranscriptionRunResult: Equatable, Sendable {
         self.transcriptionModelName = transcriptionModelName
         self.aiEnhancementModelName = aiEnhancementModelName
         self.transcriptionDuration = transcriptionDuration
-        self.enhancementDuration = enhancementDuration
         self.postProcessingResult = postProcessingResult
         self.postProcessingError = postProcessingError
     }
@@ -209,7 +210,6 @@ public struct VoiceInkTranscriptionRunProcessor {
             transcriptionModelName: model,
             aiEnhancementModelName: aiEnhancementModelName,
             transcriptionDuration: transcriptionDuration,
-            enhancementDuration: postProcessingResult?.duration,
             postProcessingResult: postProcessingResult,
             postProcessingError: postProcessingError
         )

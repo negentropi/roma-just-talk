@@ -423,6 +423,16 @@ reject_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRecordTests.swift
 
 require_pattern \
+  "shared transcription run enhancement duration derives from post-processing result" \
+  'var enhancementDuration: TimeInterval\?' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift
+
+reject_pattern \
+  "shared transcription run does not store separate enhancement duration state" \
+  'public let enhancementDuration|enhancementDuration: TimeInterval\? =|enhancementDuration: postProcessingResult' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift
+
+require_pattern \
   "macOS recorder enhancement stores request metadata from shared result" \
   'enhancement\.requestSystemMessage' \
   VoiceInk/Transcription/Engine/TranscriptionPipeline.swift

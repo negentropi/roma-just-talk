@@ -290,6 +290,37 @@ public extension Array where Element == PowerModeConfig {
         return powerModeConfiguration(with: defaultRule.id)
     }
 
+    func resolvedPowerModeConfiguration(
+        explicitID: UUID? = nil,
+        websiteURL: String? = nil,
+        appBundleIdentifier: String? = nil
+    ) -> PowerModeConfig? {
+        if let explicitID,
+           let config = powerModeConfiguration(with: explicitID) {
+            return config
+        }
+
+        guard websiteURL != nil || appBundleIdentifier != nil else {
+            return nil
+        }
+
+        guard hasEnabledAutomaticRules else {
+            return nil
+        }
+
+        if let websiteURL,
+           let config = powerModeConfiguration(forWebsiteURL: websiteURL) {
+            return config
+        }
+
+        if let appBundleIdentifier,
+           let config = powerModeConfiguration(forAppBundleIdentifier: appBundleIdentifier) {
+            return config
+        }
+
+        return defaultPowerModeConfiguration
+    }
+
     func containsPowerModeEmoji(_ emoji: String) -> Bool {
         contains { $0.emoji == emoji }
     }

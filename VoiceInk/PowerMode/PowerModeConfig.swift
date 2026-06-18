@@ -54,18 +54,6 @@ class PowerModeManager: ObservableObject {
         saveConfigurations()
     }
 
-    func getConfigurationForURL(_ url: String) -> PowerModeConfig? {
-        configurations.powerModeConfiguration(forWebsiteURL: url)
-    }
-    
-    func getConfigurationForApp(_ bundleId: String) -> PowerModeConfig? {
-        configurations.powerModeConfiguration(forAppBundleIdentifier: bundleId)
-    }
-    
-    func getDefaultConfiguration() -> PowerModeConfig? {
-        configurations.defaultPowerModeConfiguration
-    }
-    
     func hasDefaultConfiguration() -> Bool {
         return configurations.hasPowerModeDefaultConfiguration
     }

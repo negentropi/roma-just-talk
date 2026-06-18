@@ -382,6 +382,54 @@ final class PowerModePolicyTests: XCTestCase {
         )
     }
 
+    func testResolvedPowerModeConfigurationPreservesAutomaticResolutionOrder() {
+        let explicitDisabled = config(name: "Explicit", emoji: "E", isEnabled: false)
+        let appConfig = config(
+            name: "App",
+            emoji: "A",
+            appConfigs: [VoiceInkPowerModeAppConfig(bundleIdentifier: "com.example.App", appName: "App")]
+        )
+        let defaultConfig = config(name: "Default", emoji: "D", isDefault: true)
+        let websiteConfig = config(
+            name: "Website",
+            emoji: "W",
+            urlConfigs: [VoiceInkPowerModeURLConfig(url: "example.com/docs")]
+        )
+        let configs = [explicitDisabled, appConfig, defaultConfig, websiteConfig]
+
+        XCTAssertEqual(
+            configs.resolvedPowerModeConfiguration(explicitID: explicitDisabled.id)?.id,
+            explicitDisabled.id
+        )
+        XCTAssertNil(configs.resolvedPowerModeConfiguration(explicitID: UUID()))
+        XCTAssertEqual(
+            configs.resolvedPowerModeConfiguration(
+                explicitID: UUID(),
+                appBundleIdentifier: "com.example.App"
+            )?.id,
+            appConfig.id
+        )
+        XCTAssertEqual(
+            configs.resolvedPowerModeConfiguration(
+                websiteURL: "https://www.example.com/docs/new",
+                appBundleIdentifier: "com.example.App"
+            )?.id,
+            websiteConfig.id
+        )
+        XCTAssertEqual(
+            configs.resolvedPowerModeConfiguration(appBundleIdentifier: "com.example.App")?.id,
+            appConfig.id
+        )
+        XCTAssertEqual(
+            configs.resolvedPowerModeConfiguration(appBundleIdentifier: "com.example.Other")?.id,
+            defaultConfig.id
+        )
+        XCTAssertNil(
+            [config(name: "Disabled", emoji: "X", isEnabled: false)]
+                .resolvedPowerModeConfiguration(appBundleIdentifier: "com.example.App")
+        )
+    }
+
     func testPowerModeConfigurationListMutationsPreserveManagerSemantics() throws {
         let firstID = UUID()
         let secondID = UUID()

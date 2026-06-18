@@ -25,13 +25,12 @@ class ActiveWindowService: ObservableObject {
         updateCurrentApplication: Bool = true
     ) async -> PowerModeConfig? {
         let powerModeManager = PowerModeManager.shared
+        let configurations = powerModeManager.configurations
 
-        if let powerModeId = powerModeId,
-           let config = powerModeManager.getConfiguration(with: powerModeId) {
+        if let config = configurations.resolvedPowerModeConfiguration(explicitID: powerModeId) {
             return config
         }
 
-        let configurations = powerModeManager.configurations
         guard configurations.hasEnabledAutomaticRules else {
             return nil
         }
@@ -47,29 +46,21 @@ class ActiveWindowService: ObservableObject {
             }
         }
 
-        var configToApply: PowerModeConfig?
+        var currentWebsiteURL: String?
 
         if configurations.hasEnabledURLRules,
            let browserType = BrowserType.allCases.first(where: { $0.bundleIdentifier == bundleIdentifier }) {
             do {
-                let currentURL = try await browserURLService.getCurrentURL(from: browserType)
-                if let config = powerModeManager.getConfigurationForURL(currentURL) {
-                    configToApply = config
-                }
+                currentWebsiteURL = try await browserURLService.getCurrentURL(from: browserType)
             } catch {
                 logger.error("❌ Failed to get URL from \(browserType.displayName, privacy: .public): \(error.localizedDescription, privacy: .public)")
             }
         }
 
-        if configToApply == nil {
-            configToApply = powerModeManager.getConfigurationForApp(bundleIdentifier)
-        }
-
-        if configToApply == nil {
-            configToApply = powerModeManager.getDefaultConfiguration()
-        }
-
-        return configToApply
+        return configurations.resolvedPowerModeConfiguration(
+            websiteURL: currentWebsiteURL,
+            appBundleIdentifier: bundleIdentifier
+        )
     }
 
     func applyResolvedConfiguration(_ config: PowerModeConfig?) async {

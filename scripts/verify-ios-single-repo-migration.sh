@@ -950,6 +950,11 @@ require_pattern \
   'enabledPowerModeConfigurationIds|appendPowerModeConfigurationIfMissing|movePowerModeConfigurations|setPowerModeDefaultConfiguration|addPowerModeAppConfig' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
+require_pattern \
+  "shared Power Mode automatic resolution policy lives in VoiceInkCore" \
+  'resolvedPowerModeConfiguration' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
 reject_pattern \
   "macOS Power Mode avoids shell-only config record and policy adapters" \
   'struct +PowerModeConfig|extension +Array +where +Element *== *PowerModeConfig|extension +PowerModeConfig' \
@@ -964,6 +969,21 @@ require_pattern \
   "macOS Power Mode manager consumes shared config list policy" \
   'appendPowerModeConfigurationIfMissing|movePowerModeConfigurations|powerModeConfiguration\(forWebsiteURL:|enabledPowerModeConfigurationIds|containsPowerModeEmoji' \
   VoiceInk/PowerMode/PowerModeConfig.swift
+
+reject_pattern \
+  "macOS Power Mode manager avoids shell-only URL app default resolution helpers" \
+  'getConfigurationFor(URL|App)|getDefaultConfiguration' \
+  VoiceInk/PowerMode/PowerModeConfig.swift
+
+reject_pattern \
+  "macOS active-window adapter avoids shell-only Power Mode resolution policy" \
+  'getConfigurationForURL|getConfigurationForApp|getDefaultConfiguration|configToApply' \
+  VoiceInk/PowerMode/ActiveWindowService.swift
+
+require_pattern \
+  "macOS active-window adapter consumes shared Power Mode resolution policy" \
+  'resolvedPowerModeConfiguration' \
+  VoiceInk/PowerMode/ActiveWindowService.swift
 
 reject_pattern \
   "macOS Power Mode popover avoids shell-only enabled config filtering" \

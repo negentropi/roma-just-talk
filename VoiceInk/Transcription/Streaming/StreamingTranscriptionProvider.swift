@@ -2,14 +2,7 @@ import Foundation
 import LLMkit
 import VoiceInkCore
 
-/// Events emitted by a streaming transcription provider
-enum StreamingTranscriptionEvent {
-    case sessionStarted
-    case partial(text: String)
-    case committed(text: String)
-    case error(Error)
-}
-
+typealias StreamingTranscriptionEvent = VoiceInkStreamingTranscriptionEvent
 typealias StreamingTranscriptionError = VoiceInkStreamingTranscriptionError
 
 /// Protocol for streaming transcription providers.
@@ -59,6 +52,45 @@ extension StreamingTranscriptionProvider {
             return StreamingTranscriptionError.serverError(
                 llmError.localizedDescription ?? StreamingTranscriptionError.unknownServerErrorMessage
             )
+        }
+    }
+
+    func forwardLLMKitStreamingEvents(
+        from client: any LLMKitStreamingEventSource,
+        to continuation: AsyncStream<StreamingTranscriptionEvent>.Continuation?
+    ) -> Task<Void, Never> {
+        Task {
+            for await event in client.transcriptionEvents {
+                continuation?.yield(StreamingTranscriptionEvent(llmKitEvent: event))
+            }
+        }
+    }
+}
+
+protocol LLMKitStreamingEventSource {
+    var transcriptionEvents: AsyncStream<LLMkit.StreamingTranscriptionEvent> { get }
+}
+
+extension LLMkit.AssemblyAIStreamingClient: LLMKitStreamingEventSource {}
+extension LLMkit.CartesiaStreamingClient: LLMKitStreamingEventSource {}
+extension LLMkit.DeepgramStreamingClient: LLMKitStreamingEventSource {}
+extension LLMkit.ElevenLabsStreamingClient: LLMKitStreamingEventSource {}
+extension LLMkit.MistralStreamingClient: LLMKitStreamingEventSource {}
+extension LLMkit.SonioxStreamingClient: LLMKitStreamingEventSource {}
+extension LLMkit.SpeechmaticsStreamingClient: LLMKitStreamingEventSource {}
+extension LLMkit.XAIStreamingClient: LLMKitStreamingEventSource {}
+
+private extension VoiceInkStreamingTranscriptionEvent {
+    init(llmKitEvent event: LLMkit.StreamingTranscriptionEvent) {
+        switch event {
+        case .sessionStarted:
+            self = .sessionStarted
+        case .partial(let text):
+            self = .partial(text: text)
+        case .committed(let text):
+            self = .committed(text: text)
+        case .error(let message):
+            self = .error(StreamingTranscriptionError.serverError(message))
         }
     }
 }

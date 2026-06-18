@@ -29,7 +29,7 @@ final class AssemblyAIStreamingProvider: StreamingTranscriptionProvider {
         let apiKey = try apiKey(for: model)
 
         forwardingTask?.cancel()
-        startEventForwarding()
+        forwardingTask = forwardLLMKitStreamingEvents(from: client, to: eventsContinuation)
 
         do {
             try await client.connect(
@@ -70,24 +70,6 @@ final class AssemblyAIStreamingProvider: StreamingTranscriptionProvider {
     }
 
     // MARK: - Private
-
-    private func startEventForwarding() {
-        forwardingTask = Task { [weak self] in
-            guard let self else { return }
-            for await event in self.client.transcriptionEvents {
-                switch event {
-                case .sessionStarted:
-                    self.eventsContinuation?.yield(.sessionStarted)
-                case .partial(let text):
-                    self.eventsContinuation?.yield(.partial(text: text))
-                case .committed(let text):
-                    self.eventsContinuation?.yield(.committed(text: text))
-                case .error(let message):
-                    self.eventsContinuation?.yield(.error(StreamingTranscriptionError.serverError(message)))
-                }
-            }
-        }
-    }
 
     private func transcriptionPrompt() -> String? {
         VoiceInkTranscriptionPromptPreference.requestPrompt()

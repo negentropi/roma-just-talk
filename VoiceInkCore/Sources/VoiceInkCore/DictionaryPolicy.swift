@@ -108,6 +108,11 @@ public struct VoiceInkDictionaryAlertPresentation: Equatable, Identifiable, Send
 
 public struct VoiceInkDictionarySettingsPresentation: Equatable, Sendable {
     public let sectionTitle: String
+    public let heroDescription: String?
+    public let sectionSelectorTitle: String?
+    public let settingsButtonHelp: String?
+    public let wordReplacementsSection: VoiceInkDictionarySettingsSectionPresentation
+    public let vocabularySection: VoiceInkDictionarySettingsSectionPresentation
     public let vocabularyHelpText: String?
     public let vocabularyPlaceholder: String
     public let addVocabularyButtonHelp: String?
@@ -116,9 +121,25 @@ public struct VoiceInkDictionarySettingsPresentation: Equatable, Sendable {
     public let replacementTextPlaceholder: String
     public let addReplacementButtonTitle: String
     public let addReplacementButtonHelp: String?
+    public let shortcutsSectionTitle: String?
+    public let quickAddShortcutTitle: String?
+    public let closeButtonHelp: String?
 
     public static let iOS = VoiceInkDictionarySettingsPresentation(
         sectionTitle: "Dictionary",
+        heroDescription: nil,
+        sectionSelectorTitle: nil,
+        settingsButtonHelp: nil,
+        wordReplacementsSection: VoiceInkDictionarySettingsSectionPresentation(
+            title: "Word Replacements",
+            description: "",
+            systemImageName: "arrow.2.squarepath"
+        ),
+        vocabularySection: VoiceInkDictionarySettingsSectionPresentation(
+            title: "Vocabulary",
+            description: "",
+            systemImageName: "character.book.closed.fill"
+        ),
         vocabularyHelpText: nil,
         vocabularyPlaceholder: "Vocabulary term",
         addVocabularyButtonHelp: nil,
@@ -126,11 +147,27 @@ public struct VoiceInkDictionarySettingsPresentation: Equatable, Sendable {
         originalTextPlaceholder: "Original text",
         replacementTextPlaceholder: "Replacement text",
         addReplacementButtonTitle: "Add Replacement",
-        addReplacementButtonHelp: nil
+        addReplacementButtonHelp: nil,
+        shortcutsSectionTitle: nil,
+        quickAddShortcutTitle: nil,
+        closeButtonHelp: nil
     )
 
     public static let macOS = VoiceInkDictionarySettingsPresentation(
         sectionTitle: "Dictionary Settings",
+        heroDescription: "Enhance VoiceInk's transcription accuracy by teaching it your vocabulary",
+        sectionSelectorTitle: "Select Section",
+        settingsButtonHelp: "Dictionary settings",
+        wordReplacementsSection: VoiceInkDictionarySettingsSectionPresentation(
+            title: "Word Replacements",
+            description: "Automatically replace specific words/phrases with custom formatted text ",
+            systemImageName: "arrow.2.squarepath"
+        ),
+        vocabularySection: VoiceInkDictionarySettingsSectionPresentation(
+            title: "Vocabulary",
+            description: "Add words to help VoiceInk recognize them properly",
+            systemImageName: "character.book.closed.fill"
+        ),
         vocabularyHelpText: "Add words to help VoiceInk recognize them properly. (Requires AI enhancement)",
         vocabularyPlaceholder: "Add word to vocabulary",
         addVocabularyButtonHelp: "Add word",
@@ -138,8 +175,27 @@ public struct VoiceInkDictionarySettingsPresentation: Equatable, Sendable {
         originalTextPlaceholder: "Original text (use commas for multiple)",
         replacementTextPlaceholder: "Replacement text",
         addReplacementButtonTitle: "Add Replacement",
-        addReplacementButtonHelp: "Add word replacement"
+        addReplacementButtonHelp: "Add word replacement",
+        shortcutsSectionTitle: "Shortcuts",
+        quickAddShortcutTitle: "Quick Add to Dictionary",
+        closeButtonHelp: "Close"
     )
+}
+
+public struct VoiceInkDictionarySettingsSectionPresentation: Equatable, Sendable {
+    public let title: String
+    public let description: String
+    public let systemImageName: String
+
+    public init(
+        title: String,
+        description: String,
+        systemImageName: String
+    ) {
+        self.title = title
+        self.description = description
+        self.systemImageName = systemImageName
+    }
 }
 
 public enum VoiceInkDictionaryPolicy {

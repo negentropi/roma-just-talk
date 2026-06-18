@@ -55,16 +55,46 @@ final class DictionaryPolicyTests: XCTestCase {
         XCTAssertEqual(presentation.vocabularyPlaceholder, "Vocabulary term")
         XCTAssertNil(presentation.addVocabularyButtonHelp)
         XCTAssertNil(presentation.wordReplacementHelpText)
+        XCTAssertEqual(presentation.wordReplacementsSection.title, "Word Replacements")
+        XCTAssertEqual(presentation.wordReplacementsSection.description, "")
+        XCTAssertEqual(presentation.wordReplacementsSection.systemImageName, "arrow.2.squarepath")
+        XCTAssertEqual(presentation.vocabularySection.title, "Vocabulary")
+        XCTAssertEqual(presentation.vocabularySection.description, "")
+        XCTAssertEqual(presentation.vocabularySection.systemImageName, "character.book.closed.fill")
         XCTAssertEqual(presentation.originalTextPlaceholder, "Original text")
         XCTAssertEqual(presentation.replacementTextPlaceholder, "Replacement text")
         XCTAssertEqual(presentation.addReplacementButtonTitle, "Add Replacement")
         XCTAssertNil(presentation.addReplacementButtonHelp)
+        XCTAssertNil(presentation.heroDescription)
+        XCTAssertNil(presentation.sectionSelectorTitle)
+        XCTAssertNil(presentation.settingsButtonHelp)
+        XCTAssertNil(presentation.shortcutsSectionTitle)
+        XCTAssertNil(presentation.quickAddShortcutTitle)
+        XCTAssertNil(presentation.closeButtonHelp)
     }
 
     func testDictionarySettingsPresentationPreservesMacOSCopy() {
         let presentation = VoiceInkDictionarySettingsPresentation.macOS
 
         XCTAssertEqual(presentation.sectionTitle, "Dictionary Settings")
+        XCTAssertEqual(
+            presentation.heroDescription,
+            "Enhance VoiceInk's transcription accuracy by teaching it your vocabulary"
+        )
+        XCTAssertEqual(presentation.sectionSelectorTitle, "Select Section")
+        XCTAssertEqual(presentation.settingsButtonHelp, "Dictionary settings")
+        XCTAssertEqual(presentation.wordReplacementsSection.title, "Word Replacements")
+        XCTAssertEqual(
+            presentation.wordReplacementsSection.description,
+            "Automatically replace specific words/phrases with custom formatted text "
+        )
+        XCTAssertEqual(presentation.wordReplacementsSection.systemImageName, "arrow.2.squarepath")
+        XCTAssertEqual(presentation.vocabularySection.title, "Vocabulary")
+        XCTAssertEqual(
+            presentation.vocabularySection.description,
+            "Add words to help VoiceInk recognize them properly"
+        )
+        XCTAssertEqual(presentation.vocabularySection.systemImageName, "character.book.closed.fill")
         XCTAssertEqual(
             presentation.vocabularyHelpText,
             "Add words to help VoiceInk recognize them properly. (Requires AI enhancement)"
@@ -79,6 +109,9 @@ final class DictionaryPolicyTests: XCTestCase {
         XCTAssertEqual(presentation.replacementTextPlaceholder, "Replacement text")
         XCTAssertEqual(presentation.addReplacementButtonTitle, "Add Replacement")
         XCTAssertEqual(presentation.addReplacementButtonHelp, "Add word replacement")
+        XCTAssertEqual(presentation.shortcutsSectionTitle, "Shortcuts")
+        XCTAssertEqual(presentation.quickAddShortcutTitle, "Quick Add to Dictionary")
+        XCTAssertEqual(presentation.closeButtonHelp, "Close")
     }
 
     func testVocabularyDraftUsesSharedTokenPolicy() {

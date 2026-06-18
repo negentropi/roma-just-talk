@@ -1,30 +1,23 @@
 import SwiftUI
 import SwiftData
+import VoiceInkCore
 
 struct DictionarySettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var selectedSection: DictionarySection = .replacements
     @State private var isShowingSettings = false
+    private let dictionaryPresentation = VoiceInkDictionarySettingsPresentation.macOS
     
-    enum DictionarySection: String, CaseIterable {
-        case replacements = "Word Replacements"
-        case spellings = "Vocabulary"
+    enum DictionarySection: CaseIterable {
+        case replacements
+        case spellings
         
-        var description: String {
+        var presentation: VoiceInkDictionarySettingsSectionPresentation {
             switch self {
             case .spellings:
-                return "Add words to help VoiceInk recognize them properly"
+                return VoiceInkDictionarySettingsPresentation.macOS.vocabularySection
             case .replacements:
-                return "Automatically replace specific words/phrases with custom formatted text "
-            }
-        }
-        
-        var icon: String {
-            switch self {
-            case .spellings:
-                return "character.book.closed.fill"
-            case .replacements:
-                return "arrow.2.squarepath"
+                return VoiceInkDictionarySettingsPresentation.macOS.wordReplacementsSection
             }
         }
     }
@@ -50,8 +43,8 @@ struct DictionarySettingsView: View {
     private var heroSection: some View {
         CompactHeroSection(
             icon: "brain.filled.head.profile",
-            title: "Dictionary Settings",
-            description: "Enhance VoiceInk's transcription accuracy by teaching it your vocabulary",
+            title: dictionaryPresentation.sectionTitle,
+            description: dictionaryPresentation.heroDescription ?? "",
             maxDescriptionWidth: 500
         )
     }
@@ -68,7 +61,7 @@ struct DictionarySettingsView: View {
     private var sectionSelector: some View {
         VStack(alignment: .leading, spacing: 20) {
             HStack {
-                Text("Select Section")
+                Text(dictionaryPresentation.sectionSelectorTitle ?? "")
                     .font(.title2)
                     .fontWeight(.semibold)
 
@@ -84,13 +77,13 @@ struct DictionarySettingsView: View {
                         .foregroundColor(isShowingSettings ? .accentColor : .secondary)
                 }
                 .buttonStyle(.plain)
-                .help("Dictionary settings")
+                .help(dictionaryPresentation.settingsButtonHelp ?? "")
             }
 
             HStack(spacing: 20) {
                 ForEach(DictionarySection.allCases, id: \.self) { section in
                     SectionCard(
-                        section: section,
+                        presentation: section.presentation,
                         isSelected: selectedSection == section,
                         action: { selectedSection = section }
                     )
@@ -114,23 +107,23 @@ struct DictionarySettingsView: View {
 }
 
 struct SectionCard: View {
-    let section: DictionarySettingsView.DictionarySection
+    let presentation: VoiceInkDictionarySettingsSectionPresentation
     let isSelected: Bool
     let action: () -> Void
     
     var body: some View {
         Button(action: action) {
             VStack(alignment: .leading, spacing: 12) {
-                Image(systemName: section.icon)
+                Image(systemName: presentation.systemImageName)
                     .font(.system(size: 28))
                     .symbolRenderingMode(.hierarchical)
                     .foregroundStyle(isSelected ? .blue : .secondary)
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(section.rawValue)
+                    Text(presentation.title)
                         .font(.headline)
                     
-                    Text(section.description)
+                    Text(presentation.description)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)

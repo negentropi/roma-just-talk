@@ -1,13 +1,15 @@
 import SwiftUI
+import VoiceInkCore
 
 struct DictionarySettingsPanel: View {
     let onDismiss: () -> Void
+    private let dictionaryPresentation = VoiceInkDictionarySettingsPresentation.macOS
 
     var body: some View {
         VStack(spacing: 0) {
             // Header
             HStack(spacing: 12) {
-                Text("Dictionary Settings")
+                Text(dictionaryPresentation.sectionTitle)
                     .font(.headline)
                     .fontWeight(.semibold)
                     .foregroundColor(.primary)
@@ -23,7 +25,7 @@ struct DictionarySettingsPanel: View {
                         .clipShape(Circle())
                 }
                 .buttonStyle(.plain)
-                .help("Close")
+                .help(dictionaryPresentation.closeButtonHelp ?? "")
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
@@ -35,12 +37,12 @@ struct DictionarySettingsPanel: View {
             // Content
             Form {
                 Section {
-                    LabeledContent("Quick Add to Dictionary") {
+                    LabeledContent(dictionaryPresentation.quickAddShortcutTitle ?? "") {
                         ShortcutRecorder(action: .quickAddToDictionary)
                             .controlSize(.small)
                     }
                 } header: {
-                    Text("Shortcuts")
+                    Text(dictionaryPresentation.shortcutsSectionTitle ?? "")
                 }
 
             }

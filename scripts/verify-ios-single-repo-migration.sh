@@ -1002,6 +1002,16 @@ require_pattern \
   VoiceInk/Views/Dictionary/WordReplacementView.swift
 
 require_pattern \
+  "macOS dictionary settings chrome uses shared dictionary settings presentation" \
+  'VoiceInkDictionarySettingsPresentation\.macOS|dictionaryPresentation|section\.presentation' \
+  VoiceInk/Views/Dictionary/DictionarySettingsView.swift
+
+require_pattern \
+  "macOS dictionary settings panel uses shared dictionary settings presentation" \
+  'VoiceInkDictionarySettingsPresentation\.macOS|dictionaryPresentation' \
+  VoiceInk/Views/Dictionary/DictionarySettingsPanel.swift
+
+require_pattern \
   "macOS edit replacement sheet uses shared dictionary alert presentation" \
   'VoiceInkDictionaryAlertPresentation|\.wordReplacement' \
   VoiceInk/Views/Dictionary/EditReplacementSheet.swift
@@ -1039,6 +1049,12 @@ reject_pattern \
   '"(Add words to help VoiceInk recognize them properly\. \(Requires AI enhancement\)|Add word to vocabulary|Add word|Define word replacements to automatically replace specific words or phrases|Original text \(use commas for multiple\)|Replacement text|Add word replacement)"' \
   VoiceInk/Views/Dictionary/VocabularyView.swift \
   VoiceInk/Views/Dictionary/WordReplacementView.swift
+
+reject_pattern \
+  "macOS dictionary settings chrome avoids shell-only presentation copy" \
+  '"(Word Replacements|Vocabulary|Add words to help VoiceInk recognize them properly|Automatically replace specific words/phrases with custom formatted text |Dictionary Settings|Enhance VoiceInk'\''s transcription accuracy by teaching it your vocabulary|Select Section|Dictionary settings|Quick Add to Dictionary|Shortcuts|Close)"' \
+  VoiceInk/Views/Dictionary/DictionarySettingsView.swift \
+  VoiceInk/Views/Dictionary/DictionarySettingsPanel.swift
 
 reject_pattern \
   "platform dictionary surfaces avoid duplicate alert titles and persistence failure copy" \

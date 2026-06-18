@@ -982,6 +982,16 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
 
 require_pattern \
+  "shared vocabulary list presentation lives in VoiceInkCore" \
+  'VoiceInkVocabularyListPresentation|wordsTitlePrefix|sortHelpText' \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+require_pattern \
+  "shared word-replacement list presentation lives in VoiceInkCore" \
+  'VoiceInkWordReplacementListPresentation|originalColumnTitle|editButtonHelp' \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+require_pattern \
   "iOS settings uses shared dictionary alert presentation" \
   'VoiceInkDictionaryAlertPresentation|dictionaryAlert|\.duplicateFillerWord|\.vocabulary|\.wordReplacement' \
   iOS/VoiceInk-ios/SettingsView.swift
@@ -1007,6 +1017,11 @@ require_pattern \
   VoiceInk/Views/Dictionary/VocabularyView.swift
 
 require_pattern \
+  "macOS vocabulary list uses shared list presentation" \
+  'VoiceInkVocabularyListPresentation\.macOS|listPresentation|wordsTitle\(count:' \
+  VoiceInk/Views/Dictionary/VocabularyView.swift
+
+require_pattern \
   "macOS word-replacement view uses shared dictionary alert presentation" \
   'VoiceInkDictionaryAlertPresentation|\.wordReplacement|failedToRemoveWordReplacement' \
   VoiceInk/Views/Dictionary/WordReplacementView.swift
@@ -1014,6 +1029,11 @@ require_pattern \
 require_pattern \
   "macOS word-replacement view uses shared dictionary settings presentation" \
   'VoiceInkDictionarySettingsPresentation\.macOS|dictionaryPresentation' \
+  VoiceInk/Views/Dictionary/WordReplacementView.swift
+
+require_pattern \
+  "macOS word-replacement list uses shared list presentation" \
+  'VoiceInkWordReplacementListPresentation\.macOS|listPresentation|editButtonHelp' \
   VoiceInk/Views/Dictionary/WordReplacementView.swift
 
 require_pattern \
@@ -1100,6 +1120,12 @@ reject_pattern \
   "macOS edit replacement sheet avoids shell-only presentation copy" \
   '"(Cancel|Edit Word Replacement|Save|Update the word or phrase that should be automatically replaced\.|Original Text|Required|Enter word or phrase to replace \(use commas for multiple\)|Replacement Text)"' \
   VoiceInk/Views/Dictionary/EditReplacementSheet.swift
+
+reject_pattern \
+  "macOS dictionary list views avoid shell-only presentation copy" \
+  '"(Vocabulary Words|Sort alphabetically|Remove word|Original|Replacement|Sort by original|Sort by replacement|Edit replacement|Remove replacement)"' \
+  VoiceInk/Views/Dictionary/VocabularyView.swift \
+  VoiceInk/Views/Dictionary/WordReplacementView.swift
 
 reject_pattern \
   "platform dictionary surfaces avoid duplicate alert titles and persistence failure copy" \

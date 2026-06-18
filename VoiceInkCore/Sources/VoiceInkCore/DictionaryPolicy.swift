@@ -299,6 +299,40 @@ public struct VoiceInkWordReplacementEditPresentation: Equatable, Sendable {
     )
 }
 
+public struct VoiceInkVocabularyListPresentation: Equatable, Sendable {
+    public let wordsTitlePrefix: String
+    public let sortHelpText: String
+    public let removeButtonHelp: String
+
+    public static let macOS = VoiceInkVocabularyListPresentation(
+        wordsTitlePrefix: "Vocabulary Words",
+        sortHelpText: "Sort alphabetically",
+        removeButtonHelp: "Remove word"
+    )
+
+    public func wordsTitle(count: Int) -> String {
+        "\(wordsTitlePrefix) (\(count))"
+    }
+}
+
+public struct VoiceInkWordReplacementListPresentation: Equatable, Sendable {
+    public let originalColumnTitle: String
+    public let replacementColumnTitle: String
+    public let sortOriginalHelpText: String
+    public let sortReplacementHelpText: String
+    public let editButtonHelp: String
+    public let removeButtonHelp: String
+
+    public static let macOS = VoiceInkWordReplacementListPresentation(
+        originalColumnTitle: "Original",
+        replacementColumnTitle: "Replacement",
+        sortOriginalHelpText: "Sort by original",
+        sortReplacementHelpText: "Sort by replacement",
+        editButtonHelp: "Edit replacement",
+        removeButtonHelp: "Remove replacement"
+    )
+}
+
 public enum VoiceInkDictionaryPolicy {
     public static func hasVocabularyDraft(_ input: String) -> Bool {
         !tokens(from: input).isEmpty

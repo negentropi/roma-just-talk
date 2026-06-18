@@ -24,6 +24,7 @@ struct WordReplacementView: View {
     @State private var replacementWord = ""
     @State private var showInfoPopover = false
     private let dictionaryPresentation = VoiceInkDictionarySettingsPresentation.macOS
+    private let listPresentation = VoiceInkWordReplacementListPresentation.macOS
 
     init() {
         if let savedSort = UserDefaults.standard.string(forKey: "wordReplacementSortMode"),
@@ -122,7 +123,7 @@ struct WordReplacementView: View {
                     HStack(spacing: 8) {
                         Button(action: { toggleSort(for: .original) }) {
                             HStack(spacing: 4) {
-                                Text("Original")
+                                Text(listPresentation.originalColumnTitle)
                                     .font(.system(size: 12, weight: .medium))
                                     .foregroundColor(.secondary)
 
@@ -135,7 +136,7 @@ struct WordReplacementView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                         }
                         .buttonStyle(.plain)
-                        .help("Sort by original")
+                        .help(listPresentation.sortOriginalHelpText)
 
                         Image(systemName: "arrow.right")
                             .foregroundColor(.secondary)
@@ -144,7 +145,7 @@ struct WordReplacementView: View {
 
                         Button(action: { toggleSort(for: .replacement) }) {
                             HStack(spacing: 4) {
-                                Text("Replacement")
+                                Text(listPresentation.replacementColumnTitle)
                                     .font(.system(size: 12, weight: .medium))
                                     .foregroundColor(.secondary)
 
@@ -157,7 +158,7 @@ struct WordReplacementView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                         }
                         .buttonStyle(.plain)
-                        .help("Sort by replacement")
+                        .help(listPresentation.sortReplacementHelpText)
                     }
                     .padding(.horizontal, 4)
                     .padding(.vertical, 8)
@@ -170,6 +171,8 @@ struct WordReplacementView: View {
                                 ReplacementRow(
                                     original: replacement.originalText,
                                     replacement: replacement.replacementText,
+                                    editButtonHelp: listPresentation.editButtonHelp,
+                                    removeButtonHelp: listPresentation.removeButtonHelp,
                                     onDelete: { removeReplacement(replacement) },
                                     onEdit: { editingReplacement = replacement }
                                 )
@@ -304,6 +307,8 @@ private struct WordReplacementInfoExampleRow: View {
 struct ReplacementRow: View {
     let original: String
     let replacement: String
+    let editButtonHelp: String
+    let removeButtonHelp: String
     let onDelete: () -> Void
     let onEdit: () -> Void
     @State private var isEditHovered = false
@@ -336,7 +341,7 @@ struct ReplacementRow: View {
                             .contentTransition(.symbolEffect(.replace))
                     }
                     .buttonStyle(.borderless)
-                    .help("Edit replacement")
+                    .help(editButtonHelp)
                     .onHover { hover in
                         withAnimation(.easeInOut(duration: 0.2)) {
                             isEditHovered = hover
@@ -350,7 +355,7 @@ struct ReplacementRow: View {
                             .contentTransition(.symbolEffect(.replace))
                     }
                     .buttonStyle(.borderless)
-                    .help("Remove replacement")
+                    .help(removeButtonHelp)
                     .onHover { hover in
                         withAnimation(.easeInOut(duration: 0.2)) {
                             isDeleteHovered = hover

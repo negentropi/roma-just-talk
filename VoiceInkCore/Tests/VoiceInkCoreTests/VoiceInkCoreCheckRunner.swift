@@ -131,6 +131,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testDictionaryQuickAddPresentationPreservesMacOSCopy", run: { DictionaryPolicyTests().testDictionaryQuickAddPresentationPreservesMacOSCopy() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementInfoPresentationPreservesMacOSCopy", run: { DictionaryPolicyTests().testWordReplacementInfoPresentationPreservesMacOSCopy() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementEditPresentationPreservesMacOSCopy", run: { DictionaryPolicyTests().testWordReplacementEditPresentationPreservesMacOSCopy() }),
+            VoiceInkCoreCheck(name: "DictionaryPolicyTests.testVocabularyListPresentationPreservesMacOSCopy", run: { DictionaryPolicyTests().testVocabularyListPresentationPreservesMacOSCopy() }),
+            VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementListPresentationPreservesMacOSCopy", run: { DictionaryPolicyTests().testWordReplacementListPresentationPreservesMacOSCopy() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testVocabularyDraftUsesSharedTokenPolicy", run: { DictionaryPolicyTests().testVocabularyDraftUsesSharedTokenPolicy() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testVocabularyPlanReturnsNoOpForBlankInput", run: { DictionaryPolicyTests().testVocabularyPlanReturnsNoOpForBlankInput() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testVocabularyPlanRejectsSingleDuplicateWithExistingMessage", run: { DictionaryPolicyTests().testVocabularyPlanRejectsSingleDuplicateWithExistingMessage() }),

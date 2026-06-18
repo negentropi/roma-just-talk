@@ -173,6 +173,26 @@ final class DictionaryPolicyTests: XCTestCase {
         XCTAssertEqual(presentation.replacementFieldTitle, "Replacement Text")
     }
 
+    func testVocabularyListPresentationPreservesMacOSCopy() {
+        let presentation = VoiceInkVocabularyListPresentation.macOS
+
+        XCTAssertEqual(presentation.wordsTitlePrefix, "Vocabulary Words")
+        XCTAssertEqual(presentation.wordsTitle(count: 3), "Vocabulary Words (3)")
+        XCTAssertEqual(presentation.sortHelpText, "Sort alphabetically")
+        XCTAssertEqual(presentation.removeButtonHelp, "Remove word")
+    }
+
+    func testWordReplacementListPresentationPreservesMacOSCopy() {
+        let presentation = VoiceInkWordReplacementListPresentation.macOS
+
+        XCTAssertEqual(presentation.originalColumnTitle, "Original")
+        XCTAssertEqual(presentation.replacementColumnTitle, "Replacement")
+        XCTAssertEqual(presentation.sortOriginalHelpText, "Sort by original")
+        XCTAssertEqual(presentation.sortReplacementHelpText, "Sort by replacement")
+        XCTAssertEqual(presentation.editButtonHelp, "Edit replacement")
+        XCTAssertEqual(presentation.removeButtonHelp, "Remove replacement")
+    }
+
     func testVocabularyDraftUsesSharedTokenPolicy() {
         XCTAssertFalse(VoiceInkDictionaryPolicy.hasVocabularyDraft(" , \n "))
         XCTAssertTrue(VoiceInkDictionaryPolicy.hasVocabularyDraft("Voice Ink, "))

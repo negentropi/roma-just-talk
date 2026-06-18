@@ -14,6 +14,7 @@ struct VocabularyView: View {
     @State private var alertPresentation: VoiceInkDictionaryAlertPresentation?
     @State private var sortMode: VocabularySortMode = .wordAsc
     private let dictionaryPresentation = VoiceInkDictionarySettingsPresentation.macOS
+    private let listPresentation = VoiceInkVocabularyListPresentation.macOS
 
     init() {
         if let savedSort = UserDefaults.standard.string(forKey: "vocabularySortMode"),
@@ -80,7 +81,7 @@ struct VocabularyView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     Button(action: toggleSort) {
                         HStack(spacing: 4) {
-                            Text("Vocabulary Words (\(vocabularyWords.count))")
+                            Text(listPresentation.wordsTitle(count: vocabularyWords.count))
                                 .font(.system(size: 12, weight: .medium))
                                 .foregroundColor(.secondary)
 
@@ -90,12 +91,15 @@ struct VocabularyView: View {
                         }
                     }
                     .buttonStyle(.plain)
-                    .help("Sort alphabetically")
+                    .help(listPresentation.sortHelpText)
 
                     ScrollView {
                         FlowLayout(spacing: 8) {
                             ForEach(sortedItems) { item in
-                                VocabularyWordView(item: item) {
+                                VocabularyWordView(
+                                    item: item,
+                                    removeButtonHelp: listPresentation.removeButtonHelp
+                                ) {
                                     removeWord(item)
                                 }
                             }
@@ -145,6 +149,7 @@ struct VocabularyView: View {
 
 struct VocabularyWordView: View {
     let item: VocabularyWord
+    let removeButtonHelp: String
     let onDelete: () -> Void
     @State private var isDeleteHovered = false
 
@@ -162,7 +167,7 @@ struct VocabularyWordView: View {
                     .contentTransition(.symbolEffect(.replace))
             }
             .buttonStyle(.borderless)
-            .help("Remove word")
+            .help(removeButtonHelp)
             .onHover { hover in
                 withAnimation(.easeInOut(duration: 0.2)) {
                     isDeleteHovered = hover

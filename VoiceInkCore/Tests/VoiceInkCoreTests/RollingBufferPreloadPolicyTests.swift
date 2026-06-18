@@ -71,6 +71,64 @@ final class RollingBufferPreloadPolicyTests: XCTestCase {
         }
     }
 
+    func testImportedSettingsSavePresentValuesAndClampRanges() {
+        withIsolatedDefaults { defaults in
+            let didSave = VoiceInkRollingBufferPreloadSettings.saveImportedSettings(
+                modeRawValue: "on",
+                autoDisablesCloudModels: true,
+                autoDisablesLowBatteryLocalModels: false,
+                lowBatteryThresholdPercent: 500,
+                bufferDurationSeconds: 99,
+                preRunFinalization: false,
+                perModelPreloadEnabled: [
+                    "parakeet": false,
+                    "": true
+                ],
+                to: defaults
+            )
+
+            XCTAssertTrue(didSave)
+            let configuration = VoiceInkRollingBufferPreloadSettings.configuration(in: defaults)
+            XCTAssertEqual(configuration.mode, .on)
+            XCTAssertTrue(configuration.autoDisablesCloudModels)
+            XCTAssertFalse(configuration.autoDisablesLowBatteryLocalModels)
+            XCTAssertEqual(configuration.lowBatteryThresholdPercent, 100)
+            XCTAssertEqual(configuration.bufferDurationSeconds, 30)
+            XCTAssertFalse(configuration.preRunFinalization)
+            XCTAssertFalse(VoiceInkRollingBufferPreloadSettings.perModelPreloadEnabled(
+                forModelName: "parakeet",
+                in: defaults
+            ))
+            XCTAssertTrue(VoiceInkRollingBufferPreloadSettings.perModelPreloadEnabled(
+                forModelName: "",
+                in: defaults
+            ))
+        }
+    }
+
+    func testImportedSettingsIgnoreInvalidAndMissingValues() {
+        withIsolatedDefaults { defaults in
+            defaults.set("off", forKey: VoiceInkRollingBufferPreloadSettings.modeKey)
+
+            let didSave = VoiceInkRollingBufferPreloadSettings.saveImportedSettings(
+                modeRawValue: "bad",
+                autoDisablesCloudModels: nil,
+                autoDisablesLowBatteryLocalModels: nil,
+                lowBatteryThresholdPercent: nil,
+                bufferDurationSeconds: nil,
+                preRunFinalization: nil,
+                perModelPreloadEnabled: nil,
+                to: defaults
+            )
+
+            XCTAssertFalse(didSave)
+            XCTAssertEqual(
+                VoiceInkRollingBufferPreloadSettings.configuration(in: defaults).mode,
+                .off
+            )
+        }
+    }
+
     func testPolicyRejectsNonStreamingAndPerModelDisabled() {
         let policy = VoiceInkRollingBufferPreloadPolicy(
             configuration: configuration(mode: .on),

@@ -931,6 +931,16 @@ reject_pattern \
   VoiceInk/Services/SystemInfoService.swift
 
 require_pattern \
+  "macOS backup import uses shared rolling-buffer import policy" \
+  'VoiceInkRollingBufferPreloadSettings\.saveImportedSettings\(' \
+  VoiceInk/Services/BackupImporter.swift
+
+reject_pattern \
+  "macOS backup import avoids shell-only rolling-buffer preload storage" \
+  'VoiceInkRollingBufferPreloadSettings\.(modeKey|autoDisableCloudModelsKey|autoDisableLowBatteryLocalModelsKey|lowBatteryThresholdPercentKey|bufferDurationSecondsKey|preRunFinalizationKey|perModelPreloadEnabledKey)|min\(max\(threshold|for \(modelName, enabled\) in perModelSettings' \
+  VoiceInk/Services/BackupImporter.swift
+
+require_pattern \
   "macOS Native Apple transcription uses shared source-compatible language fallback" \
   'VoiceInkTranscriptionLanguagePreference\.selectedLanguage\(source: \.nativeApple\)' \
   VoiceInk/Transcription/Native/NativeAppleTranscriptionService.swift

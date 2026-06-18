@@ -128,6 +128,54 @@ public enum VoiceInkRollingBufferPreloadSettings {
         defaults.set(enabled, forKey: perModelPreloadEnabledKey(forModelName: modelName))
     }
 
+    @discardableResult
+    public static func saveImportedSettings(
+        modeRawValue: String?,
+        autoDisablesCloudModels: Bool?,
+        autoDisablesLowBatteryLocalModels: Bool?,
+        lowBatteryThresholdPercent: Int?,
+        bufferDurationSeconds: Double?,
+        preRunFinalization: Bool?,
+        perModelPreloadEnabled: [String: Bool]?,
+        to defaults: UserDefaults = .standard
+    ) -> Bool {
+        var didSave = false
+
+        if let modeRawValue,
+           let mode = VoiceInkRollingBufferPreloadMode(rawValue: modeRawValue) {
+            defaults.set(mode.rawValue, forKey: modeKey)
+            didSave = true
+        }
+        if let autoDisablesCloudModels {
+            defaults.set(autoDisablesCloudModels, forKey: autoDisableCloudModelsKey)
+            didSave = true
+        }
+        if let autoDisablesLowBatteryLocalModels {
+            defaults.set(autoDisablesLowBatteryLocalModels, forKey: autoDisableLowBatteryLocalModelsKey)
+            didSave = true
+        }
+        if let lowBatteryThresholdPercent {
+            defaults.set(min(max(lowBatteryThresholdPercent, 1), 100), forKey: lowBatteryThresholdPercentKey)
+            didSave = true
+        }
+        if let bufferDurationSeconds {
+            defaults.set(min(max(bufferDurationSeconds, 0.25), 30.0), forKey: bufferDurationSecondsKey)
+            didSave = true
+        }
+        if let preRunFinalization {
+            defaults.set(preRunFinalization, forKey: preRunFinalizationKey)
+            didSave = true
+        }
+        if let perModelPreloadEnabled {
+            for (modelName, enabled) in perModelPreloadEnabled where !modelName.isEmpty {
+                savePerModelPreloadEnabled(enabled, forModelName: modelName, in: defaults)
+            }
+            didSave = didSave || !perModelPreloadEnabled.isEmpty
+        }
+
+        return didSave
+    }
+
     public static func perModelPreloadEnabledKey(forModelName modelName: String) -> String {
         "\(perModelEnabledKeyPrefix)\(modelName)"
     }

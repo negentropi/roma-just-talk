@@ -456,6 +456,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "RollingBufferPreloadPolicyTests.testSettingsPreserveExistingStorageKeysAndDefaults", run: { RollingBufferPreloadPolicyTests().testSettingsPreserveExistingStorageKeysAndDefaults() }),
             VoiceInkCoreCheck(name: "RollingBufferPreloadPolicyTests.testConfigurationReadsAndClampsStoredValues", run: { RollingBufferPreloadPolicyTests().testConfigurationReadsAndClampsStoredValues() }),
             VoiceInkCoreCheck(name: "RollingBufferPreloadPolicyTests.testPerModelPreloadDefaultsEnabledAndReadsStoredOverride", run: { RollingBufferPreloadPolicyTests().testPerModelPreloadDefaultsEnabledAndReadsStoredOverride() }),
+            VoiceInkCoreCheck(name: "RollingBufferPreloadPolicyTests.testImportedSettingsSavePresentValuesAndClampRanges", run: { RollingBufferPreloadPolicyTests().testImportedSettingsSavePresentValuesAndClampRanges() }),
+            VoiceInkCoreCheck(name: "RollingBufferPreloadPolicyTests.testImportedSettingsIgnoreInvalidAndMissingValues", run: { RollingBufferPreloadPolicyTests().testImportedSettingsIgnoreInvalidAndMissingValues() }),
             VoiceInkCoreCheck(name: "RollingBufferPreloadPolicyTests.testPolicyRejectsNonStreamingAndPerModelDisabled", run: { RollingBufferPreloadPolicyTests().testPolicyRejectsNonStreamingAndPerModelDisabled() }),
             VoiceInkCoreCheck(name: "RollingBufferPreloadPolicyTests.testPolicyHonorsModeOnAndOff", run: { RollingBufferPreloadPolicyTests().testPolicyHonorsModeOnAndOff() }),
             VoiceInkCoreCheck(name: "RollingBufferPreloadPolicyTests.testAutoPolicyCanDisableCloudModels", run: { RollingBufferPreloadPolicyTests().testAutoPolicyCanDisableCloudModels() }),

@@ -575,6 +575,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "WhisperRuntimeDefaultsTests.testThreadCountKeepsExistingBounds", run: { WhisperRuntimeDefaultsTests().testThreadCountKeepsExistingBounds() }),
             VoiceInkCoreCheck(name: "WhisperRuntimeDefaultsTests.testRuntimeConstantsMatchExistingWhisperWrappers", run: { WhisperRuntimeDefaultsTests().testRuntimeConstantsMatchExistingWhisperWrappers() }),
             VoiceInkCoreCheck(name: "WhisperRuntimeDefaultsTests.testVADRuntimeConfigurationRequiresEnabledPreferenceAndModelPath", run: { WhisperRuntimeDefaultsTests().testVADRuntimeConfigurationRequiresEnabledPreferenceAndModelPath() }),
+            VoiceInkCoreCheck(name: "WhisperRuntimeDefaultsTests.testRuntimeOptionsPreserveExistingWhisperCppFlags", run: { WhisperRuntimeDefaultsTests().testRuntimeOptionsPreserveExistingWhisperCppFlags() }),
             VoiceInkCoreCheck(name: "WhisperRuntimeDefaultsTests.testRuntimeConfigurationBuildsSharedWhisperInputs", run: { WhisperRuntimeDefaultsTests().testRuntimeConfigurationBuildsSharedWhisperInputs() }),
             VoiceInkCoreCheck(name: "WhisperRuntimeDefaultsTests.testRuntimeConfigurationNormalizesWhisperRequestLanguage", run: { WhisperRuntimeDefaultsTests().testRuntimeConfigurationNormalizesWhisperRequestLanguage() }),
             VoiceInkCoreCheck(name: "WhisperRuntimeDefaultsTests.testRuntimeConfigurationDisablesVADWhenPreferenceIsOff", run: { WhisperRuntimeDefaultsTests().testRuntimeConfigurationDisablesVADWhenPreferenceIsOff() }),

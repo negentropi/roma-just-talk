@@ -9,6 +9,14 @@ final class WhisperRuntimeDefaultsTests: XCTestCase {
     }
 
     func testRuntimeConstantsMatchExistingWhisperWrappers() {
+        XCTAssertTrue(VoiceInkWhisperRuntimeDefaults.printRealtime)
+        XCTAssertFalse(VoiceInkWhisperRuntimeDefaults.printProgress)
+        XCTAssertTrue(VoiceInkWhisperRuntimeDefaults.printTimestamps)
+        XCTAssertFalse(VoiceInkWhisperRuntimeDefaults.printSpecial)
+        XCTAssertFalse(VoiceInkWhisperRuntimeDefaults.translate)
+        XCTAssertEqual(VoiceInkWhisperRuntimeDefaults.offsetMilliseconds, 0)
+        XCTAssertTrue(VoiceInkWhisperRuntimeDefaults.noContext)
+        XCTAssertFalse(VoiceInkWhisperRuntimeDefaults.singleSegment)
         XCTAssertEqual(VoiceInkWhisperRuntimeDefaults.transcriptionTemperature, 0.2)
         XCTAssertEqual(VoiceInkWhisperRuntimeDefaults.vadThreshold, 0.50)
         XCTAssertEqual(VoiceInkWhisperRuntimeDefaults.vadMinSpeechDurationMs, 250)
@@ -27,6 +35,22 @@ final class WhisperRuntimeDefaultsTests: XCTestCase {
         XCTAssertNil(VoiceInkWhisperVADRuntimeConfiguration.current(modelPath: "", isEnabled: true))
     }
 
+    func testRuntimeOptionsPreserveExistingWhisperCppFlags() {
+        XCTAssertEqual(
+            VoiceInkWhisperRuntimeOptions(),
+            VoiceInkWhisperRuntimeOptions(
+                printRealtime: true,
+                printProgress: false,
+                printTimestamps: true,
+                printSpecial: false,
+                translate: false,
+                offsetMilliseconds: 0,
+                noContext: true,
+                singleSegment: false
+            )
+        )
+    }
+
     func testRuntimeConfigurationBuildsSharedWhisperInputs() {
         withTemporaryDefaults { defaults in
             VoiceInkVADPreference.saveIsEnabled(true, to: defaults)
@@ -41,6 +65,7 @@ final class WhisperRuntimeDefaultsTests: XCTestCase {
 
             XCTAssertEqual(configuration.language, "ja")
             XCTAssertEqual(configuration.prompt, "Use Japanese punctuation.")
+            XCTAssertEqual(configuration.options, VoiceInkWhisperRuntimeOptions())
             XCTAssertEqual(configuration.threadCount, 4)
             XCTAssertEqual(configuration.temperature, VoiceInkWhisperRuntimeDefaults.transcriptionTemperature)
             XCTAssertEqual(configuration.vad?.modelPath, "/tmp/vad.bin")

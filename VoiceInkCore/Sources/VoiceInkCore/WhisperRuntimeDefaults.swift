@@ -3,6 +3,14 @@ import Foundation
 public enum VoiceInkWhisperRuntimeDefaults {
     public static let maxThreadCount = 8
     public static let reservedProcessorCount = 2
+    public static let printRealtime = true
+    public static let printProgress = false
+    public static let printTimestamps = true
+    public static let printSpecial = false
+    public static let translate = false
+    public static let offsetMilliseconds: Int32 = 0
+    public static let noContext = true
+    public static let singleSegment = false
     public static let transcriptionTemperature: Float = 0.2
 
     public static let vadThreshold: Float = 0.50
@@ -14,6 +22,37 @@ public enum VoiceInkWhisperRuntimeDefaults {
 
     public static func threadCount(processorCount: Int = ProcessInfo.processInfo.processorCount) -> Int32 {
         Int32(max(1, min(maxThreadCount, processorCount - reservedProcessorCount)))
+    }
+}
+
+public struct VoiceInkWhisperRuntimeOptions: Equatable, Sendable {
+    public let printRealtime: Bool
+    public let printProgress: Bool
+    public let printTimestamps: Bool
+    public let printSpecial: Bool
+    public let translate: Bool
+    public let offsetMilliseconds: Int32
+    public let noContext: Bool
+    public let singleSegment: Bool
+
+    public init(
+        printRealtime: Bool = VoiceInkWhisperRuntimeDefaults.printRealtime,
+        printProgress: Bool = VoiceInkWhisperRuntimeDefaults.printProgress,
+        printTimestamps: Bool = VoiceInkWhisperRuntimeDefaults.printTimestamps,
+        printSpecial: Bool = VoiceInkWhisperRuntimeDefaults.printSpecial,
+        translate: Bool = VoiceInkWhisperRuntimeDefaults.translate,
+        offsetMilliseconds: Int32 = VoiceInkWhisperRuntimeDefaults.offsetMilliseconds,
+        noContext: Bool = VoiceInkWhisperRuntimeDefaults.noContext,
+        singleSegment: Bool = VoiceInkWhisperRuntimeDefaults.singleSegment
+    ) {
+        self.printRealtime = printRealtime
+        self.printProgress = printProgress
+        self.printTimestamps = printTimestamps
+        self.printSpecial = printSpecial
+        self.translate = translate
+        self.offsetMilliseconds = offsetMilliseconds
+        self.noContext = noContext
+        self.singleSegment = singleSegment
     }
 }
 
@@ -56,6 +95,7 @@ public struct VoiceInkWhisperVADRuntimeConfiguration: Equatable, Sendable {
 public struct VoiceInkWhisperRuntimeConfiguration: Equatable, Sendable {
     public let language: String?
     public let prompt: String?
+    public let options: VoiceInkWhisperRuntimeOptions
     public let threadCount: Int32
     public let temperature: Float
     public let vad: VoiceInkWhisperVADRuntimeConfiguration?
@@ -63,12 +103,14 @@ public struct VoiceInkWhisperRuntimeConfiguration: Equatable, Sendable {
     public init(
         language: String? = nil,
         prompt: String? = nil,
+        options: VoiceInkWhisperRuntimeOptions = VoiceInkWhisperRuntimeOptions(),
         threadCount: Int32 = VoiceInkWhisperRuntimeDefaults.threadCount(),
         temperature: Float = VoiceInkWhisperRuntimeDefaults.transcriptionTemperature,
         vad: VoiceInkWhisperVADRuntimeConfiguration? = nil
     ) {
         self.language = language
         self.prompt = prompt
+        self.options = options
         self.threadCount = threadCount
         self.temperature = temperature
         self.vad = vad

@@ -39,15 +39,15 @@ actor WhisperContext {
         let promptCString = runtimeConfiguration.prompt.map { Array($0.utf8CString) }
         let vadModelPathCString = runtimeConfiguration.vad?.modelPath.utf8CString
         
-        params.print_realtime = true
-        params.print_progress = false
-        params.print_timestamps = true
-        params.print_special = false
-        params.translate = false
+        params.print_realtime = runtimeConfiguration.options.printRealtime
+        params.print_progress = runtimeConfiguration.options.printProgress
+        params.print_timestamps = runtimeConfiguration.options.printTimestamps
+        params.print_special = runtimeConfiguration.options.printSpecial
+        params.translate = runtimeConfiguration.options.translate
         params.n_threads = runtimeConfiguration.threadCount
-        params.offset_ms = 0
-        params.no_context = true
-        params.single_segment = false
+        params.offset_ms = runtimeConfiguration.options.offsetMilliseconds
+        params.no_context = runtimeConfiguration.options.noContext
+        params.single_segment = runtimeConfiguration.options.singleSegment
         params.temperature = runtimeConfiguration.temperature
 
         whisper_reset_timings(context)

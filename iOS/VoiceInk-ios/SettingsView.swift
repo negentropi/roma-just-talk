@@ -5,7 +5,8 @@ import VoiceInkCore
 struct SettingsView: View {
     @StateObject private var settings = AppSettings.shared
     @State private var newFillerWord = ""
-    @State private var showDuplicateFillerWordAlert = false
+    @State private var fillerWordAlertMessage = ""
+    @State private var showFillerWordAlert = false
     @State private var newCustomVocabularyTerm = ""
     @State private var customVocabularyAlertMessage = ""
     @State private var showCustomVocabularyAlert = false
@@ -181,10 +182,10 @@ struct SettingsView: View {
         .onAppear {
             settings.repairSelectedTranscriptionLanguage()
         }
-        .alert("Duplicate Word", isPresented: $showDuplicateFillerWordAlert) {
+        .alert("Duplicate Word", isPresented: $showFillerWordAlert) {
             Button("OK", role: .cancel) {}
         } message: {
-            Text("This filler word is already in the list.")
+            Text(fillerWordAlertMessage)
         }
         .alert("Vocabulary", isPresented: $showCustomVocabularyAlert) {
             Button("OK", role: .cancel) {}
@@ -227,11 +228,13 @@ struct SettingsView: View {
     private func addFillerWord() {
         guard canAddFillerWord else { return }
 
-        if settings.addFillerWord(newFillerWord) {
-            newFillerWord = ""
-        } else {
-            showDuplicateFillerWordAlert = true
+        if let errorMessage = settings.addFillerWord(newFillerWord) {
+            fillerWordAlertMessage = errorMessage
+            showFillerWordAlert = true
+            return
         }
+
+        newFillerWord = ""
     }
 
     private func addCustomVocabularyTerm() {

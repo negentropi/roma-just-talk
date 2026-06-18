@@ -431,6 +431,27 @@ reject_pattern \
   iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \
+  "shared filler-word insert policy owns duplicate message" \
+  'duplicateWordMessage = "This filler word is already in the list\."' \
+  VoiceInkCore/Sources/VoiceInkCore/FillerWords.swift
+
+require_pattern \
+  "macOS filler-word insertion uses shared insert policy" \
+  'VoiceInkFillerWords\.insertPlan\(' \
+  VoiceInk/Transcription/Processing/FillerWordManager.swift
+
+require_pattern \
+  "iOS filler-word insertion uses shared insert policy" \
+  'VoiceInkFillerWords\.insertPlan\(' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+reject_pattern \
+  "filler-word duplicate copy stays out of platform views" \
+  'This filler word is already in the list\.' \
+  VoiceInk/Views/Components/FillerWordsSettingsView.swift \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+require_pattern \
   "shared word-replacement engine owns rule ordering" \
   'for rule in orderedRules\(rules\)' \
   VoiceInkCore/Sources/VoiceInkCore/WordReplacementEngine.swift

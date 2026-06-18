@@ -1,6 +1,22 @@
 import Foundation
 
+public struct VoiceInkFillerWordInsertPlan: Equatable, Sendable {
+    public let wordToInsert: String?
+    public let errorMessage: String?
+
+    public var shouldInsert: Bool {
+        wordToInsert != nil && errorMessage == nil
+    }
+
+    public init(wordToInsert: String?, errorMessage: String?) {
+        self.wordToInsert = wordToInsert
+        self.errorMessage = errorMessage
+    }
+}
+
 public enum VoiceInkFillerWords {
+    public static let duplicateWordMessage = "This filler word is already in the list."
+
     public static let defaultWords = [
         "uh", "um", "uhm", "umm", "uhh", "uhhh",
         "hmm", "hm", "mmm", "mm", "mh", "ehh"
@@ -15,16 +31,28 @@ public enum VoiceInkFillerWords {
         normalizedWord(word) != nil
     }
 
-    public static func adding(_ word: String, to words: [String]) -> [String]? {
+    public static func insertPlan(
+        _ word: String,
+        existingWords words: [String]
+    ) -> VoiceInkFillerWordInsertPlan {
         guard let normalized = normalizedWord(word) else {
-            return nil
+            return VoiceInkFillerWordInsertPlan(wordToInsert: nil, errorMessage: nil)
         }
 
         guard !words.contains(where: { $0.lowercased() == normalized }) else {
+            return VoiceInkFillerWordInsertPlan(wordToInsert: nil, errorMessage: duplicateWordMessage)
+        }
+
+        return VoiceInkFillerWordInsertPlan(wordToInsert: normalized, errorMessage: nil)
+    }
+
+    public static func adding(_ word: String, to words: [String]) -> [String]? {
+        let plan = insertPlan(word, existingWords: words)
+        guard plan.shouldInsert, let wordToInsert = plan.wordToInsert else {
             return nil
         }
 
-        return words + [normalized]
+        return words + [wordToInsert]
     }
 
     public static func removing(_ word: String, from words: [String]) -> [String] {

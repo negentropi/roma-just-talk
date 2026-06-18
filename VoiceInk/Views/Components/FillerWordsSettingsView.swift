@@ -43,7 +43,8 @@ struct FillerWordsSettingsView: View {
     private var removeFillerWords = VoiceInkPreferenceDefault.removeFillerWords
     @StateObject private var fillerWordManager = FillerWordManager.shared
     @State private var newWord = ""
-    @State private var showDuplicateAlert = false
+    @State private var alertMessage = ""
+    @State private var showAlert = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -90,21 +91,23 @@ struct FillerWordsSettingsView: View {
                 }
             }
         }
-        .alert("Duplicate Word", isPresented: $showDuplicateAlert) {
+        .alert("Duplicate Word", isPresented: $showAlert) {
             Button("OK", role: .cancel) {}
         } message: {
-            Text("This filler word is already in the list.")
+            Text(alertMessage)
         }
     }
 
     private func addWord() {
         guard canAddWord else { return }
 
-        if fillerWordManager.addWord(newWord) {
-            newWord = ""
-        } else {
-            showDuplicateAlert = true
+        if let errorMessage = fillerWordManager.addWord(newWord) {
+            alertMessage = errorMessage
+            showAlert = true
+            return
         }
+
+        newWord = ""
     }
 
     private var canAddWord: Bool {

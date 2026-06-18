@@ -185,13 +185,20 @@ final class AppSettings: ObservableObject {
         modes = VoiceInkPreferenceList.removing(at: offsets, from: modes)
     }
 
-    func addFillerWord(_ word: String) -> Bool {
-        guard let updatedWords = VoiceInkFillerWords.adding(word, to: fillerWords) else {
-            return false
+    @discardableResult
+    func addFillerWord(_ word: String) -> String? {
+        let plan = VoiceInkFillerWords.insertPlan(word, existingWords: fillerWords)
+
+        if let errorMessage = plan.errorMessage {
+            return errorMessage
         }
 
-        fillerWords = updatedWords
-        return true
+        guard let wordToInsert = plan.wordToInsert else {
+            return nil
+        }
+
+        fillerWords = fillerWords + [wordToInsert]
+        return nil
     }
 
     func removeFillerWords(at offsets: IndexSet) {

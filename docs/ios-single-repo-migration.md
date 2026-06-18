@@ -195,7 +195,7 @@ Current macOS consumers of shared remote transport:
 - macOS canceled recorder records use `VoiceInkTranscriptPresentation.canceledTranscriptionText` directly; the old shell alias on `Transcription` stays deleted.
 - `VoiceInkTranscriptPresentation.matchesSearch` mirrors macOS history predicate search semantics, keeping iOS note filtering accent-insensitive through shared core while macOS SwiftData predicates keep their local query shape.
 - macOS last-transcription paste eligibility and iOS note-row status text use `VoiceInkTranscriptPresentation` defaults for canceled/empty/pending/failed transcript presentation; platform shells still own colors, icons, retry controls, and paste execution.
-- macOS `FillerWordManager`, iOS `AppSettings`, and cleanup configuration load and save filler-word lists through `VoiceInkFillerWordPreference`; macOS and iOS setting surfaces use `VoiceInkFillerWords.hasDraft` for add-button draft validation while platform shells still own settings UI and toggle state.
+- macOS `FillerWordManager`, iOS `AppSettings`, and cleanup configuration load and save filler-word lists through `VoiceInkFillerWordPreference`; macOS and iOS setting surfaces use `VoiceInkFillerWords.hasDraft` for add-button draft validation and route filler-word insertion/duplicate alerts through `VoiceInkFillerWords.insertPlan` while platform shells still own settings UI and toggle state.
 - iOS app launch and first-time setup read/write/reset onboarding completion through `VoiceInkOnboardingPreference`; the onboarding views and recording-after-onboarding flow stay in the iOS shell.
 - iOS `AppSettings` reads/writes/resets audio-session timeout through `VoiceInkAudioSessionTimeoutPreference`; `AudioSessionManager` and timeout UI stay in the iOS shell.
 - iOS `AppSettings.resetAll()` restores in-memory reset values from `VoiceInkDefaultSettings.iOS` and clears persisted core settings through `VoiceInkSharedPreferenceReset`, including modes, onboarding, verification flags, transcription prompt/language/model settings, cleanup settings, AI-enhancement provider/model settings, dynamic provider caches, custom prompts, VAD, and filler-word overrides; the iOS shell still owns keychain and file deletion.
@@ -319,6 +319,7 @@ scripts/verify-ios-single-repo-migration.sh --full-build
 19. iOS live recording delegates timestamped filename construction and PCM16 recorder format constants to `VoiceInkStoredAudioFile` and `VoiceInkPCM16Audio`.
 20. macOS and iOS local Whisper wrappers both consume shared runtime, VAD resource, and PCM16 WAV sample policies.
 21. macOS AI-enhancement diagnostics/context toggles and first-run onboarding storage checks stay routed through shared `VoiceInkCore` preference Modules.
-22. A real Xcode toolchain is selected and both app targets build.
+22. macOS and iOS filler-word insertion stays routed through `VoiceInkFillerWords.insertPlan`, with duplicate copy out of platform views.
+23. A real Xcode toolchain is selected and both app targets build.
 
 Current local blocker: `xcode-select -p` points to `/Library/Developer/CommandLineTools`, and the previously used external Xcode volume is not mounted. Full target builds are still environment-blocked until a real Xcode is selected; macOS `VoiceInk` also needs `/Users/atalphalnmomhappyhouse/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework`, and iOS `VoiceInk-ios` needs the iOS 26.2 platform installed. Until those are present, use `swift run VoiceInkCoreChecks` plus the static parse/lint gates above for local proof.

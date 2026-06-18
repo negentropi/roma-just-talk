@@ -16,6 +16,30 @@ final class FillerWordsTests: XCTestCase {
         )
     }
 
+    func testInsertPlanNormalizesNewWords() {
+        XCTAssertEqual(
+            VoiceInkFillerWords.insertPlan("  LIKE  ", existingWords: ["um"]),
+            VoiceInkFillerWordInsertPlan(wordToInsert: "like", errorMessage: nil)
+        )
+    }
+
+    func testInsertPlanRejectsBlankDraftsWithoutAlert() {
+        XCTAssertEqual(
+            VoiceInkFillerWords.insertPlan("   ", existingWords: ["um"]),
+            VoiceInkFillerWordInsertPlan(wordToInsert: nil, errorMessage: nil)
+        )
+    }
+
+    func testInsertPlanRejectsCaseInsensitiveDuplicatesWithSharedMessage() {
+        XCTAssertEqual(
+            VoiceInkFillerWords.insertPlan("UM", existingWords: ["um"]),
+            VoiceInkFillerWordInsertPlan(
+                wordToInsert: nil,
+                errorMessage: "This filler word is already in the list."
+            )
+        )
+    }
+
     func testAddingRejectsBlankAndCaseInsensitiveDuplicateWords() {
         XCTAssertNil(VoiceInkFillerWords.adding("   ", to: ["um"]))
         XCTAssertNil(VoiceInkFillerWords.adding("UM", to: ["um"]))

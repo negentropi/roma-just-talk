@@ -18,13 +18,20 @@ class FillerWordManager: ObservableObject {
         self.fillerWords = VoiceInkFillerWordPreference.words()
     }
 
-    func addWord(_ word: String) -> Bool {
-        guard let updatedWords = VoiceInkFillerWords.adding(word, to: fillerWords) else {
-            return false
+    @discardableResult
+    func addWord(_ word: String) -> String? {
+        let plan = VoiceInkFillerWords.insertPlan(word, existingWords: fillerWords)
+
+        if let errorMessage = plan.errorMessage {
+            return errorMessage
         }
 
-        fillerWords = updatedWords
-        return true
+        guard let wordToInsert = plan.wordToInsert else {
+            return nil
+        }
+
+        fillerWords = fillerWords + [wordToInsert]
+        return nil
     }
 
     func removeWord(_ word: String) {

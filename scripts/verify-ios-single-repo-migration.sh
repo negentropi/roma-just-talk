@@ -991,6 +991,16 @@ require_pattern \
   VoiceInk/Shortcuts/PowerModeShortcutManager.swift
 
 reject_pattern \
+  "macOS Power Mode startup avoids shell-only enabled config checks" \
+  'configurations\.contains *\{ *\$0\.isEnabled *\}' \
+  VoiceInk/VoiceInk.swift
+
+require_pattern \
+  "macOS Power Mode startup calls shared enabled-list policy directly" \
+  'configurations\.enabledPowerModeConfigurations' \
+  VoiceInk/VoiceInk.swift
+
+reject_pattern \
   "macOS active-window adapter avoids shell-only Power Mode resolution policy" \
   'getConfigurationForURL|getConfigurationForApp|getDefaultConfiguration|configToApply' \
   VoiceInk/PowerMode/ActiveWindowService.swift

@@ -124,17 +124,12 @@ struct DictionaryQuickAddView: View {
     enum Mode: CaseIterable {
         case vocabulary, replacement
 
-        var label: String {
+        var modePresentation: VoiceInkDictionaryQuickAddModePresentation {
             switch self {
-            case .vocabulary: return "Vocabulary"
-            case .replacement: return "Word Replacement"
-            }
-        }
-
-        var icon: String {
-            switch self {
-            case .vocabulary: return "character.book.closed.fill"
-            case .replacement: return "arrow.2.squarepath"
+            case .vocabulary:
+                return VoiceInkDictionaryQuickAddPresentation.macOS.vocabularyMode
+            case .replacement:
+                return VoiceInkDictionaryQuickAddPresentation.macOS.replacementMode
             }
         }
 
@@ -158,6 +153,8 @@ struct DictionaryQuickAddView: View {
     @FocusState private var focusedField: Field?
 
     enum Field: Hashable { case word, original, replacement }
+
+    private let quickAddPresentation = VoiceInkDictionaryQuickAddPresentation.macOS
 
     let onDismiss: () -> Void
     let onResize: (CGFloat) -> Void
@@ -215,10 +212,11 @@ struct DictionaryQuickAddView: View {
                 Button {
                     withAnimation(.easeInOut(duration: 0.15)) { mode = m }
                 } label: {
+                    let modePresentation = m.modePresentation
                     HStack(spacing: 5) {
-                        Image(systemName: m.icon)
+                        Image(systemName: modePresentation.systemImageName)
                             .font(.system(size: 10, weight: .medium))
-                        Text(m.label)
+                        Text(modePresentation.title)
                             .font(.system(size: 12, weight: .medium))
                     }
                     .foregroundStyle(mode == m ? .primary : .secondary)
@@ -250,10 +248,14 @@ struct DictionaryQuickAddView: View {
 
     private var vocabularyInput: some View {
         HStack(spacing: 11) {
-            Image(systemName: "character.book.closed.fill")
+            Image(systemName: quickAddPresentation.vocabularyMode.systemImageName)
                 .font(.system(size: 14))
                 .foregroundStyle(.secondary)
-            TextField("", text: $wordInput, prompt: Text("e.g. Prakash, VoiceInk").foregroundColor(.secondary))
+            TextField(
+                "",
+                text: $wordInput,
+                prompt: Text(quickAddPresentation.vocabularyPlaceholder).foregroundColor(.secondary)
+            )
                 .textFieldStyle(.roundedBorder)
                 .font(.system(size: 14))
                 .focused($focusedField, equals: .word)
@@ -266,11 +268,15 @@ struct DictionaryQuickAddView: View {
     private var replacementInputView: some View {
         VStack(spacing: 8) {
             HStack(spacing: 10) {
-                Text("Replace")
+                Text(quickAddPresentation.originalLabel)
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(.secondary)
                     .frame(width: 56, alignment: .trailing)
-                TextField("", text: $originalInput, prompt: Text("e.g. my email, my mail").foregroundColor(.secondary))
+                TextField(
+                    "",
+                    text: $originalInput,
+                    prompt: Text(quickAddPresentation.originalPlaceholder).foregroundColor(.secondary)
+                )
                     .textFieldStyle(.roundedBorder)
                     .font(.system(size: 14))
                     .focused($focusedField, equals: .original)
@@ -278,11 +284,15 @@ struct DictionaryQuickAddView: View {
             }
 
             HStack(spacing: 10) {
-                Text("With")
+                Text(quickAddPresentation.replacementLabel)
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(.secondary)
                     .frame(width: 56, alignment: .trailing)
-                TextField("", text: $replacementInput, prompt: Text("e.g. support@tryvoiceink.com").foregroundColor(.secondary))
+                TextField(
+                    "",
+                    text: $replacementInput,
+                    prompt: Text(quickAddPresentation.replacementPlaceholder).foregroundColor(.secondary)
+                )
                     .textFieldStyle(.roundedBorder)
                     .font(.system(size: 14))
                     .focused($focusedField, equals: .replacement)
@@ -301,13 +311,13 @@ struct DictionaryQuickAddView: View {
             HStack(spacing: 14) {
                 HStack(spacing: 4) {
                     KeyHint("↵")
-                    Text("Add")
+                    Text(quickAddPresentation.submitHintTitle)
                         .font(.system(size: 11))
                         .foregroundStyle(.tertiary)
                 }
                 HStack(spacing: 4) {
                     KeyHint("esc")
-                    Text("Dismiss")
+                    Text(quickAddPresentation.dismissHintTitle)
                         .font(.system(size: 11))
                         .foregroundStyle(.tertiary)
                 }

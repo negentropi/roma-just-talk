@@ -198,6 +198,46 @@ public struct VoiceInkDictionarySettingsSectionPresentation: Equatable, Sendable
     }
 }
 
+public struct VoiceInkDictionaryQuickAddPresentation: Equatable, Sendable {
+    public let vocabularyMode: VoiceInkDictionaryQuickAddModePresentation
+    public let replacementMode: VoiceInkDictionaryQuickAddModePresentation
+    public let vocabularyPlaceholder: String
+    public let originalLabel: String
+    public let originalPlaceholder: String
+    public let replacementLabel: String
+    public let replacementPlaceholder: String
+    public let submitHintTitle: String
+    public let dismissHintTitle: String
+
+    public static let macOS = VoiceInkDictionaryQuickAddPresentation(
+        vocabularyMode: VoiceInkDictionaryQuickAddModePresentation(
+            title: "Vocabulary",
+            systemImageName: "character.book.closed.fill"
+        ),
+        replacementMode: VoiceInkDictionaryQuickAddModePresentation(
+            title: "Word Replacement",
+            systemImageName: "arrow.2.squarepath"
+        ),
+        vocabularyPlaceholder: "e.g. Prakash, VoiceInk",
+        originalLabel: "Replace",
+        originalPlaceholder: "e.g. my email, my mail",
+        replacementLabel: "With",
+        replacementPlaceholder: "e.g. support@tryvoiceink.com",
+        submitHintTitle: "Add",
+        dismissHintTitle: "Dismiss"
+    )
+}
+
+public struct VoiceInkDictionaryQuickAddModePresentation: Equatable, Sendable {
+    public let title: String
+    public let systemImageName: String
+
+    public init(title: String, systemImageName: String) {
+        self.title = title
+        self.systemImageName = systemImageName
+    }
+}
+
 public enum VoiceInkDictionaryPolicy {
     public static func hasVocabularyDraft(_ input: String) -> Bool {
         !tokens(from: input).isEmpty

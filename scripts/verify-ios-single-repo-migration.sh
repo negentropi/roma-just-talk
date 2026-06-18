@@ -967,6 +967,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
 
 require_pattern \
+  "shared dictionary quick-add presentation lives in VoiceInkCore" \
+  'VoiceInkDictionaryQuickAddPresentation|vocabularyPlaceholder|dismissHintTitle' \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+require_pattern \
   "iOS settings uses shared dictionary alert presentation" \
   'VoiceInkDictionaryAlertPresentation|dictionaryAlert|\.duplicateFillerWord|\.vocabulary|\.wordReplacement' \
   iOS/VoiceInk-ios/SettingsView.swift
@@ -1012,6 +1017,11 @@ require_pattern \
   VoiceInk/Views/Dictionary/DictionarySettingsPanel.swift
 
 require_pattern \
+  "macOS dictionary quick-add uses shared dictionary quick-add presentation" \
+  'VoiceInkDictionaryQuickAddPresentation\.macOS|quickAddPresentation|modePresentation' \
+  VoiceInk/Views/Dictionary/DictionaryQuickAddPanel.swift
+
+require_pattern \
   "macOS edit replacement sheet uses shared dictionary alert presentation" \
   'VoiceInkDictionaryAlertPresentation|\.wordReplacement' \
   VoiceInk/Views/Dictionary/EditReplacementSheet.swift
@@ -1055,6 +1065,11 @@ reject_pattern \
   '"(Word Replacements|Vocabulary|Add words to help VoiceInk recognize them properly|Automatically replace specific words/phrases with custom formatted text |Dictionary Settings|Enhance VoiceInk'\''s transcription accuracy by teaching it your vocabulary|Select Section|Dictionary settings|Quick Add to Dictionary|Shortcuts|Close)"' \
   VoiceInk/Views/Dictionary/DictionarySettingsView.swift \
   VoiceInk/Views/Dictionary/DictionarySettingsPanel.swift
+
+reject_pattern \
+  "macOS dictionary quick-add avoids shell-only presentation copy" \
+  '"(Vocabulary|Word Replacement|e\.g\. Prakash, VoiceInk|Replace|e\.g\. my email, my mail|With|e\.g\. support@tryvoiceink\.com|Add|Dismiss)"' \
+  VoiceInk/Views/Dictionary/DictionaryQuickAddPanel.swift
 
 reject_pattern \
   "platform dictionary surfaces avoid duplicate alert titles and persistence failure copy" \

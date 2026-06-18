@@ -128,6 +128,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testDictionaryPersistenceFailureMessagesPreservePlatformCopy", run: { DictionaryPolicyTests().testDictionaryPersistenceFailureMessagesPreservePlatformCopy() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testDictionarySettingsPresentationPreservesIOSCopy", run: { DictionaryPolicyTests().testDictionarySettingsPresentationPreservesIOSCopy() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testDictionarySettingsPresentationPreservesMacOSCopy", run: { DictionaryPolicyTests().testDictionarySettingsPresentationPreservesMacOSCopy() }),
+            VoiceInkCoreCheck(name: "DictionaryPolicyTests.testDictionaryQuickAddPresentationPreservesMacOSCopy", run: { DictionaryPolicyTests().testDictionaryQuickAddPresentationPreservesMacOSCopy() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testVocabularyDraftUsesSharedTokenPolicy", run: { DictionaryPolicyTests().testVocabularyDraftUsesSharedTokenPolicy() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testVocabularyPlanReturnsNoOpForBlankInput", run: { DictionaryPolicyTests().testVocabularyPlanReturnsNoOpForBlankInput() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testVocabularyPlanRejectsSingleDuplicateWithExistingMessage", run: { DictionaryPolicyTests().testVocabularyPlanRejectsSingleDuplicateWithExistingMessage() }),

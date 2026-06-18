@@ -114,6 +114,22 @@ final class DictionaryPolicyTests: XCTestCase {
         XCTAssertEqual(presentation.closeButtonHelp, "Close")
     }
 
+    func testDictionaryQuickAddPresentationPreservesMacOSCopy() {
+        let presentation = VoiceInkDictionaryQuickAddPresentation.macOS
+
+        XCTAssertEqual(presentation.vocabularyMode.title, "Vocabulary")
+        XCTAssertEqual(presentation.vocabularyMode.systemImageName, "character.book.closed.fill")
+        XCTAssertEqual(presentation.replacementMode.title, "Word Replacement")
+        XCTAssertEqual(presentation.replacementMode.systemImageName, "arrow.2.squarepath")
+        XCTAssertEqual(presentation.vocabularyPlaceholder, "e.g. Prakash, VoiceInk")
+        XCTAssertEqual(presentation.originalLabel, "Replace")
+        XCTAssertEqual(presentation.originalPlaceholder, "e.g. my email, my mail")
+        XCTAssertEqual(presentation.replacementLabel, "With")
+        XCTAssertEqual(presentation.replacementPlaceholder, "e.g. support@tryvoiceink.com")
+        XCTAssertEqual(presentation.submitHintTitle, "Add")
+        XCTAssertEqual(presentation.dismissHintTitle, "Dismiss")
+    }
+
     func testVocabularyDraftUsesSharedTokenPolicy() {
         XCTAssertFalse(VoiceInkDictionaryPolicy.hasVocabularyDraft(" , \n "))
         XCTAssertTrue(VoiceInkDictionaryPolicy.hasVocabularyDraft("Voice Ink, "))

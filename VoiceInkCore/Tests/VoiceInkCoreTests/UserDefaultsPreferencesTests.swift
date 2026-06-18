@@ -93,6 +93,21 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(defaults.selectedTranscriptionLanguage, VoiceInkLanguageCatalog.autoDetectCode)
     }
 
+    func testDefaultSettingsPreserveMacOSSelectedLanguageDefault() {
+        let defaults = VoiceInkDefaultSettings.macOS
+        let registeredDefaults = defaults.registeredUserDefaults()
+
+        XCTAssertEqual(
+            defaults.selectedTranscriptionLanguage,
+            VoiceInkPreferenceDefault.macOSSelectedTranscriptionLanguage
+        )
+        XCTAssertEqual(defaults.selectedTranscriptionLanguage, "en")
+        XCTAssertEqual(
+            registeredDefaults[VoiceInkUserDefaultsKey.selectedTranscriptionLanguage] as? String,
+            VoiceInkPreferenceDefault.macOSSelectedTranscriptionLanguage
+        )
+    }
+
     func testDefaultSettingsExposeTranscriptionCleanupSettings() {
         let defaults = VoiceInkDefaultSettings(
             punctuationCleanupMode: .removeTrailingPeriod,
@@ -113,9 +128,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
     }
 
     func testDefaultSettingsBuildRegisteredUserDefaultsForPlatformSelections() {
-        let registeredDefaults = VoiceInkDefaultSettings(
-            selectedTranscriptionLanguage: "en"
-        ).registeredUserDefaults(
+        let registeredDefaults = VoiceInkDefaultSettings.macOS.registeredUserDefaults(
             currentTranscriptionModel: "parakeet-tdt-0.6b-v2"
         )
 
@@ -137,7 +150,10 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             registeredDefaults[VoiceInkUserDefaultsKey.lowercaseTranscription] as? Bool,
             VoiceInkPreferenceDefault.lowercaseTranscription
         )
-        XCTAssertEqual(registeredDefaults[VoiceInkUserDefaultsKey.selectedTranscriptionLanguage] as? String, "en")
+        XCTAssertEqual(
+            registeredDefaults[VoiceInkUserDefaultsKey.selectedTranscriptionLanguage] as? String,
+            VoiceInkPreferenceDefault.macOSSelectedTranscriptionLanguage
+        )
         XCTAssertEqual(
             registeredDefaults[VoiceInkUserDefaultsKey.currentTranscriptionModel] as? String,
             "parakeet-tdt-0.6b-v2"
@@ -202,9 +218,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
 
         withIsolatedDefaults { defaults in
             defaults.set("fr", forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
-            VoiceInkDefaultSettings(
-                selectedTranscriptionLanguage: "en"
-            ).registerUserDefaults(
+            VoiceInkDefaultSettings.macOS.registerUserDefaults(
                 to: defaults,
                 currentTranscriptionModel: "parakeet-tdt-0.6b-v2"
             )

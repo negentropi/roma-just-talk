@@ -10,7 +10,8 @@ struct CloudModelCardView: View {
     var setDefaultAction: () -> Void
 
     @EnvironmentObject private var transcriptionModelManager: TranscriptionModelManager
-    @AppStorage(VoiceInkUserDefaultsKey.selectedTranscriptionLanguage) private var selectedLanguage: String = "en"
+    @AppStorage(VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
+    private var selectedLanguage = VoiceInkDefaultSettings.macOS.selectedTranscriptionLanguage
     @State private var isExpanded = false
     @State private var apiKey = ""
     @State private var streamingEnabled: Bool

@@ -10,9 +10,7 @@ enum AppDefaults {
     static let showMenuBarIconDefault = false
 
     static var registeredDefaults: [String: Any] {
-        var defaults = VoiceInkDefaultSettings(
-            selectedTranscriptionLanguage: "en"
-        ).registeredUserDefaults(
+        var defaults = VoiceInkDefaultSettings.macOS.registeredUserDefaults(
             currentTranscriptionModel: "parakeet-tdt-0.6b-v2"
         )
 

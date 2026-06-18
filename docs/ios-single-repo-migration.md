@@ -52,7 +52,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - mode runtime configuration, default local mode selection, provider-change and stale model repair, selected-mode repair, mode-based transcription language availability, and selected-language repair
 - mode provider-selection repair and draft saveability rules
 - shared UserDefaults key names, including cleanup preferences, plus iOS mode persistence helpers with stale model repair on load
-- shared preference default state and UserDefaults registration values for core-owned keys; platform shells still choose platform-specific defaults such as selected language/current model and register OS-specific keys
+- shared preference default state and UserDefaults registration values for core-owned keys, including platform-specific selected-language defaults; platform shells still choose current model and register OS-specific keys
 - array-backed preference list deletion policy for platform settings surfaces
 - onboarding completion, iOS audio-session timeout, and core-owned user preference reset storage; platform shells still own first-run flow, audio-session lifecycle, keychain clearing, file deletion, and settings UI bindings
 - current transcription model preference loading/saving/clearing; platform shells still own model availability, download/runtime state, and legacy key cleanup
@@ -184,7 +184,7 @@ Current macOS consumers of shared remote transport:
 - macOS special shortcut empty-tap fallback delegates short-press and empty-completed-transcript eligibility to `VoiceInkSpecialShortcutEmptyFallbackPolicy`; `LastTranscriptionService` still owns SwiftData lookup and cursor paste.
 - macOS special shortcut key-up handling delegates unsafe key-evidence discard decisions to `VoiceInkSpecialShortcutKeyEvidencePolicy`; `ShortcutMonitor` still owns macOS keyboard event collection and now passes `VoiceInkShortcutPressContext` directly.
 - macOS recorder state and UI toggle actions now use `VoiceInkRecordingState` and `VoiceInkRecorderUIToggleAction` directly; `RecordingShortcutManager`, `RecorderUIManager`, and rolling preload use shared state gates while macOS owns recorder UI/window execution.
-- macOS `AppDefaults` registers core-owned default values through `VoiceInkDefaultSettings`, while keeping macOS-specific defaults such as selected language, current model, Launch at Login, shortcuts, and UI behavior in the shell.
+- macOS `AppDefaults` registers core-owned default values through `VoiceInkDefaultSettings.macOS`, while keeping macOS-specific defaults such as current model, Launch at Login, shortcuts, and UI behavior in the shell.
 - iOS app launch registers core-owned default values through `VoiceInkDefaultSettings.iOS`, while the iOS shell keeps first-run flow, app-group recording state, keyboard deep links, keychain, and file deletion.
 - macOS history/import row summaries, macOS audio-file row action text, and iOS note detail display use `VoiceInkTranscriptPresentation` for the enhanced-text-first transcript display rule and shared empty-content fallback copy.
 - `VoiceInkTranscriptPresentation.matchesSearch` mirrors macOS history predicate search semantics, keeping iOS note filtering accent-insensitive through shared core while macOS SwiftData predicates keep their local query shape.

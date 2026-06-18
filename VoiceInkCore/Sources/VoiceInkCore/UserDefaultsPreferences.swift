@@ -54,6 +54,7 @@ public enum VoiceInkPreferenceDefault {
     public static let enhancementTimeoutSeconds = 7
     public static let enhancementRetryOnTimeout = true
     public static let ollamaBaseURL = "http://localhost:11434"
+    public static let macOSSelectedTranscriptionLanguage = "en"
 }
 
 public struct VoiceInkDefaultSettings: Equatable, Sendable {
@@ -111,6 +112,9 @@ public struct VoiceInkDefaultSettings: Equatable, Sendable {
     }
 
     public static let iOS = VoiceInkDefaultSettings()
+    public static let macOS = VoiceInkDefaultSettings(
+        selectedTranscriptionLanguage: VoiceInkPreferenceDefault.macOSSelectedTranscriptionLanguage
+    )
 
     public var transcriptionCleanupSettings: VoiceInkTranscriptionCleanupSettings {
         VoiceInkTranscriptionCleanupSettings(

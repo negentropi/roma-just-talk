@@ -425,6 +425,38 @@ require_pattern \
   'VoiceInkDefaultSettings\.iOS\.registerUserDefaults\(\)' \
   iOS/VoiceInk-ios/VoiceInk_iosApp.swift
 
+require_pattern \
+  "macOS app launch registers shared macOS default values" \
+  'VoiceInkDefaultSettings\.macOS\.registeredUserDefaults' \
+  VoiceInk/AppDefaults.swift
+
+reject_pattern \
+  "macOS app launch avoids hard-coded selected-language defaults" \
+  'selectedTranscriptionLanguage: "en"' \
+  VoiceInk/AppDefaults.swift
+
+require_pattern \
+  "macOS language selection view uses shared macOS language default" \
+  'VoiceInkDefaultSettings\.macOS\.selectedTranscriptionLanguage' \
+  VoiceInk/Views/AI\ Models/LanguageSelectionView.swift
+
+require_pattern \
+  "macOS cloud model card uses shared macOS language default" \
+  'VoiceInkDefaultSettings\.macOS\.selectedTranscriptionLanguage' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift
+
+require_pattern \
+  "macOS model settings uses shared macOS language default" \
+  'VoiceInkDefaultSettings\.macOS\.selectedTranscriptionLanguage' \
+  VoiceInk/Views/ModelSettingsView.swift
+
+reject_pattern \
+  "macOS selected-language AppStorage avoids hard-coded English defaults" \
+  'selectedLanguage(: String)? = "en"' \
+  VoiceInk/Views/AI\ Models/LanguageSelectionView.swift \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift \
+  VoiceInk/Views/ModelSettingsView.swift
+
 reject_pattern \
   "macOS and iOS transcriptions use shared performance session defaults" \
   'var performance(AudioDuration|TranscriptionDuration|EnhancementDuration|EnhancedText)' \

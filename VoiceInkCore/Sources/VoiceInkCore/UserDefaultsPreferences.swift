@@ -344,6 +344,29 @@ public enum VoiceInkAIEnhancementPreference {
     }
 }
 
+public enum VoiceInkAIEnhancementContextPreference {
+    public static func useClipboardContext(from defaults: UserDefaults = .standard) -> Bool {
+        defaults.bool(forKey: VoiceInkUserDefaultsKey.useClipboardContext)
+    }
+
+    public static func saveUseClipboardContext(_ isEnabled: Bool, to defaults: UserDefaults = .standard) {
+        defaults.set(isEnabled, forKey: VoiceInkUserDefaultsKey.useClipboardContext)
+    }
+
+    public static func useScreenCaptureContext(from defaults: UserDefaults = .standard) -> Bool {
+        defaults.bool(forKey: VoiceInkUserDefaultsKey.useScreenCaptureContext)
+    }
+
+    public static func saveUseScreenCaptureContext(_ isEnabled: Bool, to defaults: UserDefaults = .standard) {
+        defaults.set(isEnabled, forKey: VoiceInkUserDefaultsKey.useScreenCaptureContext)
+    }
+
+    public static func clear(from defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.useClipboardContext)
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.useScreenCaptureContext)
+    }
+}
+
 public enum VoiceInkAIEnhancementProviderPreference {
     public static func selectedProviderRawValue(from defaults: UserDefaults = .standard) -> String? {
         defaults.string(forKey: VoiceInkUserDefaultsKey.selectedAIProvider)
@@ -675,6 +698,7 @@ public enum VoiceInkSharedPreferenceReset {
         VoiceInkTranscriptionAutoCleanupPreference.clear(from: defaults)
         VoiceInkAudioCleanupPreference.clear(from: defaults)
         VoiceInkCustomPromptStorage.clear(from: defaults)
+        VoiceInkAIEnhancementContextPreference.clear(from: defaults)
     }
 }
 

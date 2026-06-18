@@ -25,13 +25,13 @@ class AIEnhancementService: ObservableObject {
 
     @Published var useClipboardContext: Bool {
         didSet {
-            UserDefaults.standard.set(useClipboardContext, forKey: VoiceInkUserDefaultsKey.useClipboardContext)
+            VoiceInkAIEnhancementContextPreference.saveUseClipboardContext(useClipboardContext)
         }
     }
 
     @Published var useScreenCaptureContext: Bool {
         didSet {
-            UserDefaults.standard.set(useScreenCaptureContext, forKey: VoiceInkUserDefaultsKey.useScreenCaptureContext)
+            VoiceInkAIEnhancementContextPreference.saveUseScreenCaptureContext(useScreenCaptureContext)
             NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
         }
     }
@@ -87,8 +87,8 @@ class AIEnhancementService: ObservableObject {
         self.customVocabularyService = CustomVocabularyService.shared
 
         self.isEnhancementEnabled = VoiceInkAIEnhancementPreference.isEnabled()
-        self.useClipboardContext = UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.useClipboardContext)
-        self.useScreenCaptureContext = UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.useScreenCaptureContext)
+        self.useClipboardContext = VoiceInkAIEnhancementContextPreference.useClipboardContext()
+        self.useScreenCaptureContext = VoiceInkAIEnhancementContextPreference.useScreenCaptureContext()
         self.customPrompts = VoiceInkCustomPromptStorage.loadPrompts()
         self.selectedPromptId = VoiceInkCustomPromptStorage.loadSelectedPromptId()
 

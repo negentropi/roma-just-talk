@@ -599,6 +599,24 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testAIEnhancementContextPreferenceRoundTripsAndClearsToggles() {
+        withIsolatedDefaults { defaults in
+            XCTAssertFalse(VoiceInkAIEnhancementContextPreference.useClipboardContext(from: defaults))
+            XCTAssertFalse(VoiceInkAIEnhancementContextPreference.useScreenCaptureContext(from: defaults))
+
+            VoiceInkAIEnhancementContextPreference.saveUseClipboardContext(true, to: defaults)
+            VoiceInkAIEnhancementContextPreference.saveUseScreenCaptureContext(true, to: defaults)
+
+            XCTAssertTrue(VoiceInkAIEnhancementContextPreference.useClipboardContext(from: defaults))
+            XCTAssertTrue(VoiceInkAIEnhancementContextPreference.useScreenCaptureContext(from: defaults))
+
+            VoiceInkAIEnhancementContextPreference.clear(from: defaults)
+
+            XCTAssertFalse(VoiceInkAIEnhancementContextPreference.useClipboardContext(from: defaults))
+            XCTAssertFalse(VoiceInkAIEnhancementContextPreference.useScreenCaptureContext(from: defaults))
+        }
+    }
+
     func testDynamicAIProviderPreferenceReadsOllamaFallbacksAndSavedValues() {
         withIsolatedDefaults { defaults in
             XCTAssertEqual(
@@ -887,6 +905,8 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             let customPrompt = VoiceInkCustomPrompt(title: "Custom", promptText: "Clean this")
             VoiceInkCustomPromptStorage.savePrompts([customPrompt], to: defaults)
             VoiceInkCustomPromptStorage.saveSelectedPromptId(customPrompt.id, to: defaults)
+            VoiceInkAIEnhancementContextPreference.saveUseClipboardContext(true, to: defaults)
+            VoiceInkAIEnhancementContextPreference.saveUseScreenCaptureContext(true, to: defaults)
 
             VoiceInkSharedPreferenceReset.clearCoreUserSettings(from: defaults, providers: [.groq])
 
@@ -958,6 +978,8 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             )
             XCTAssertTrue(VoiceInkCustomPromptStorage.loadPrompts(from: defaults).isEmpty)
             XCTAssertNil(VoiceInkCustomPromptStorage.loadSelectedPromptId(from: defaults))
+            XCTAssertFalse(VoiceInkAIEnhancementContextPreference.useClipboardContext(from: defaults))
+            XCTAssertFalse(VoiceInkAIEnhancementContextPreference.useScreenCaptureContext(from: defaults))
         }
     }
 

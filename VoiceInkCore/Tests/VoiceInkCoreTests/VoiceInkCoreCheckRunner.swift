@@ -104,6 +104,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "CustomPromptTests.testCustomPromptEncodingPreservesExistingMacOSKeys", run: { try CustomPromptTests().testCustomPromptEncodingPreservesExistingMacOSKeys() }),
             VoiceInkCoreCheck(name: "CustomVocabularyTermsTests.testNormalizedTermsTrimDropBlankAndDeduplicateCaseInsensitively", run: { CustomVocabularyTermsTests().testNormalizedTermsTrimDropBlankAndDeduplicateCaseInsensitively() }),
             VoiceInkCoreCheck(name: "CustomVocabularyTermsTests.testNormalizedTermsApplyOptionalLimitAfterFiltering", run: { CustomVocabularyTermsTests().testNormalizedTermsApplyOptionalLimitAfterFiltering() }),
+            VoiceInkCoreCheck(name: "CustomVocabularyTermsTests.testNormalizedTermsApplyDeepgramStreamingLimitFromSharedUsePolicy", run: { CustomVocabularyTermsTests().testNormalizedTermsApplyDeepgramStreamingLimitFromSharedUsePolicy() }),
+            VoiceInkCoreCheck(name: "CustomVocabularyTermsTests.testNormalizedTermsLeaveOtherUsesUnlimited", run: { CustomVocabularyTermsTests().testNormalizedTermsLeaveOtherUsesUnlimited() }),
             VoiceInkCoreCheck(name: "DashboardMetricsTests.testAccumulatorBuildsSummaryFromMetricRecords", run: { DashboardMetricsTests().testAccumulatorBuildsSummaryFromMetricRecords() }),
             VoiceInkCoreCheck(name: "DashboardMetricsTests.testMetricSourceRecordGetsDashboardValuesFromSessionMetricPolicy", run: { DashboardMetricsTests().testMetricSourceRecordGetsDashboardValuesFromSessionMetricPolicy() }),
             VoiceInkCoreCheck(name: "DashboardMetricsTests.testDerivedMetricsPreserveDashboardDefaults", run: { DashboardMetricsTests().testDerivedMetricsPreserveDashboardDefaults() }),

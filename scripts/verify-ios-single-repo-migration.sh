@@ -440,6 +440,16 @@ reject_pattern \
   VoiceInk/Transcription/Streaming/SpeechmaticsStreamingProvider.swift
 
 require_pattern \
+  "macOS Deepgram streaming uses shared vocabulary use policy" \
+  'VoiceInkCustomVocabularyUse\.streamingTranscription\(\.deepgram\)|\.streamingTranscription\(\.deepgram\)' \
+  VoiceInk/Transcription/Streaming/DeepgramStreamingProvider.swift
+
+reject_pattern \
+  "macOS Deepgram streaming avoids shell-only vocabulary term limit" \
+  'limit: 50|prefix\(50\)' \
+  VoiceInk/Transcription/Streaming/DeepgramStreamingProvider.swift
+
+require_pattern \
   "shared run processor uses shared transcription run preparation" \
   'VoiceInkTranscriptionRunPreparation\.prepareRawText' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift

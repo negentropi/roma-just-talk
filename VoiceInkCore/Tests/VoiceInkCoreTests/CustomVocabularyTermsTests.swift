@@ -25,4 +25,30 @@ final class CustomVocabularyTermsTests: XCTestCase {
             ["Roma", "Cursor"]
         )
     }
+
+    func testNormalizedTermsApplyDeepgramStreamingLimitFromSharedUsePolicy() {
+        let terms = (1...55).map { "term-\($0)" }
+
+        XCTAssertEqual(
+            VoiceInkCustomVocabularyTerms.normalized(terms, for: .streamingTranscription(.deepgram)),
+            Array(terms.prefix(50))
+        )
+    }
+
+    func testNormalizedTermsLeaveOtherUsesUnlimited() {
+        let terms = (1...55).map { "term-\($0)" }
+
+        XCTAssertEqual(
+            VoiceInkCustomVocabularyTerms.normalized(terms, for: .batchTranscription(.deepgram)),
+            terms
+        )
+        XCTAssertEqual(
+            VoiceInkCustomVocabularyTerms.normalized(terms, for: .streamingTranscription(.soniox)),
+            terms
+        )
+        XCTAssertEqual(
+            VoiceInkCustomVocabularyTerms.normalized(terms, for: .postProcessingContext),
+            terms
+        )
+    }
 }

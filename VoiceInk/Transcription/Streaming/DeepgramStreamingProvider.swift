@@ -28,7 +28,10 @@ final class DeepgramStreamingProvider: StreamingTranscriptionProvider {
     func connect(model: any TranscriptionModel, language: String?) async throws {
         let apiKey = try apiKey(for: model)
 
-        let vocabulary = CustomVocabularyService.shared.getCustomVocabularyTerms(from: modelContext, limit: 50)
+        let vocabulary = CustomVocabularyService.shared.getCustomVocabularyTerms(
+            from: modelContext,
+            for: .streamingTranscription(.deepgram)
+        )
 
         // Cancel any existing forwarding task before starting a new one
         forwardingTask?.cancel()

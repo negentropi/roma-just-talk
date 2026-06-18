@@ -22,4 +22,23 @@ public enum VoiceInkCustomVocabularyTerms {
 
         return unique
     }
+
+    public static func normalized(_ terms: [String], for use: VoiceInkCustomVocabularyUse) -> [String] {
+        normalized(terms, limit: use.termLimit)
+    }
+}
+
+public enum VoiceInkCustomVocabularyUse: Equatable, Sendable {
+    case batchTranscription(VoiceInkProviderKind)
+    case streamingTranscription(VoiceInkProviderKind)
+    case postProcessingContext
+
+    var termLimit: Int? {
+        switch self {
+        case .streamingTranscription(.deepgram):
+            return 50
+        case .batchTranscription, .streamingTranscription, .postProcessingContext:
+            return nil
+        }
+    }
 }

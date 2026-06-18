@@ -15,12 +15,20 @@ class CustomVocabularyService {
         return VoiceInkAIEnhancementVocabularyContext.formatted(from: customWords)
     }
 
-    func getCustomVocabularyTerms(from context: ModelContext, limit: Int? = nil) -> [String] {
+    func getCustomVocabularyTerms(from context: ModelContext) -> [String] {
         guard let customWords = getCustomVocabularyWords(from: context) else {
             return []
         }
 
-        return VoiceInkCustomVocabularyTerms.normalized(customWords, limit: limit)
+        return VoiceInkCustomVocabularyTerms.normalized(customWords)
+    }
+
+    func getCustomVocabularyTerms(from context: ModelContext, for use: VoiceInkCustomVocabularyUse) -> [String] {
+        guard let customWords = getCustomVocabularyWords(from: context) else {
+            return []
+        }
+
+        return VoiceInkCustomVocabularyTerms.normalized(customWords, for: use)
     }
 
     private func getCustomVocabularyWords(from context: ModelContext) -> [String]? {

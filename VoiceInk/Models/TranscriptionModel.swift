@@ -64,6 +64,29 @@ extension ModelProvider {
     var apiKeyProviderName: String {
         coreTranscriptionModelProvider?.providerKind?.displayName ?? rawValue
     }
+
+    fileprivate var transcriptionLanguageSource: VoiceInkTranscriptionLanguageSource {
+        switch self {
+        case .whisper:
+            return .whisper
+        case .nativeApple:
+            return .nativeApple
+        case .fluidAudio:
+            return .fluidAudio
+        default:
+            guard let coreProvider = coreTranscriptionModelProvider else {
+                return .all
+            }
+            return .provider(coreProvider)
+        }
+    }
+
+    func supportedLanguages(isMultilingual: Bool) -> [String: String] {
+        VoiceInkTranscriptionLanguageSupport.languages(
+            for: transcriptionLanguageSource,
+            isMultilingual: isMultilingual
+        )
+    }
 }
 
 // A unified protocol for any transcription model
@@ -104,6 +127,27 @@ extension TranscriptionModel {
             name: name,
             supportsStreaming: supportsStreaming,
             isStreamingOnly: CloudProviderRegistry.provider(for: provider)?.isStreamingOnly ?? false
+        )
+    }
+
+    var transcriptionLanguageOptions: [String: String] {
+        if provider == .assemblyAI {
+            return VoiceInkTranscriptionLanguageSupport.languages(
+                for: provider.transcriptionLanguageSource,
+                assemblyAIUsesRealtime: VoiceInkTranscriptionStreamingPreference.shouldUseStreaming(
+                    for: streamingPreferenceSnapshot
+                )
+            )
+        }
+
+        return supportedLanguages
+    }
+
+    func validTranscriptionLanguageOrFallback(_ language: String?) -> String {
+        VoiceInkTranscriptionLanguageSupport.validLanguageOrFallback(
+            language,
+            languages: transcriptionLanguageOptions,
+            prefersNativeAppleEnglish: provider == .nativeApple
         )
     }
 }

@@ -51,12 +51,12 @@ struct LanguageSelectionView: View {
         guard let currentModel = transcriptionModelManager.currentTranscriptionModel else {
             return ["en": "English"] // Default to English if no model found
         }
-        return TranscriptionLanguageSupport.languages(for: currentModel)
+        return currentModel.transcriptionLanguageOptions
     }
 
     private func useCompatibleLanguageForCurrentModel() {
         guard let currentModel = transcriptionModelManager.currentTranscriptionModel else { return }
-        updateLanguage(TranscriptionLanguageSupport.validLanguageOrFallback(selectedLanguage, for: currentModel))
+        updateLanguage(currentModel.validTranscriptionLanguageOrFallback(selectedLanguage))
     }
 
     // Get the display name of the current language

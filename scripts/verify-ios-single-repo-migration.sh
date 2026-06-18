@@ -199,6 +199,12 @@ reject_pattern \
   VoiceInk \
   iOS
 
+reject_pattern \
+  "removed macOS language support wrapper stays deleted" \
+  '\benum +TranscriptionLanguageSupport\b' \
+  VoiceInk \
+  iOS
+
 require_pattern \
   "workspace includes iOS project" \
   'location = "group:iOS/VoiceInk-ios.xcodeproj"' \

@@ -112,7 +112,7 @@ class TranscriptionModelManager: ObservableObject {
 
     private func ensureSelectedLanguageIsSupported(by model: any TranscriptionModel) {
         let currentLanguage = VoiceInkTranscriptionLanguagePreference.storedLanguage()
-        let compatibleLanguage = TranscriptionLanguageSupport.validLanguageOrFallback(currentLanguage, for: model)
+        let compatibleLanguage = model.validTranscriptionLanguageOrFallback(currentLanguage)
 
         if currentLanguage != compatibleLanguage {
             VoiceInkTranscriptionLanguagePreference.saveSelectedLanguage(compatibleLanguage)

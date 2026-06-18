@@ -60,13 +60,12 @@ struct ConfigurationView: View {
     }
 
     private func availableLanguages(for model: any TranscriptionModel) -> [String: String] {
-        TranscriptionLanguageSupport.languages(for: model)
+        model.transcriptionLanguageOptions
     }
 
     private func useCompatibleLanguage(for model: any TranscriptionModel) {
-        selectedLanguage = TranscriptionLanguageSupport.validLanguageOrFallback(
-            selectedLanguage ?? VoiceInkTranscriptionLanguagePreference.storedLanguage(),
-            for: model
+        selectedLanguage = model.validTranscriptionLanguageOrFallback(
+            selectedLanguage ?? VoiceInkTranscriptionLanguagePreference.storedLanguage()
         )
     }
 

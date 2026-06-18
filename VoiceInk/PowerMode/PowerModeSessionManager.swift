@@ -216,7 +216,7 @@ class PowerModeSessionManager {
 
         VoiceInkTranscriptionLanguagePreference.saveCompatibleLanguage(
             language,
-            languages: TranscriptionLanguageSupport.languages(for: model),
+            languages: model.transcriptionLanguageOptions,
             prefersNativeAppleEnglish: model.provider == .nativeApple
         )
         NotificationCenter.default.post(name: .languageDidChange, object: nil)

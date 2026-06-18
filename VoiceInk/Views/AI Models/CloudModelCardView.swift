@@ -123,7 +123,7 @@ struct CloudModelCardView: View {
             return
         }
 
-        let compatibleLanguage = TranscriptionLanguageSupport.validLanguageOrFallback(selectedLanguage, for: model)
+        let compatibleLanguage = model.validTranscriptionLanguageOrFallback(selectedLanguage)
         if selectedLanguage != compatibleLanguage {
             selectedLanguage = compatibleLanguage
             NotificationCenter.default.post(name: .languageDidChange, object: nil)

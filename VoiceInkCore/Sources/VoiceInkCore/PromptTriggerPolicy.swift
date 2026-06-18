@@ -47,6 +47,16 @@ public struct VoiceInkPromptDetectionResult: Equatable, Sendable {
     }
 }
 
+public extension VoiceInkPromptDetectionResult {
+    func restoredEnhancementState(current: Bool) -> Bool {
+        shouldEnableAI ? originalEnhancementState : current
+    }
+
+    func restoredPromptId(current: UUID?) -> UUID? {
+        shouldEnableAI ? originalPromptId : current
+    }
+}
+
 public enum VoiceInkPromptDetectionPolicy {
     public static func analyzeText(
         _ text: String,

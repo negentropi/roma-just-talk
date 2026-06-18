@@ -50,6 +50,37 @@ final class PromptTriggerPolicyTests: XCTestCase {
         XCTAssertEqual(result.originalPromptId, originalPromptId)
     }
 
+    func testDetectedPromptResultRestoresOriginalStateIncludingNilPrompt() {
+        let detectedPromptId = UUID()
+        let result = VoiceInkPromptDetectionResult(
+            shouldEnableAI: true,
+            selectedPromptId: detectedPromptId,
+            processedText: "send a follow up",
+            detectedTriggerWord: "email",
+            originalEnhancementState: false,
+            originalPromptId: nil
+        )
+
+        XCTAssertFalse(result.restoredEnhancementState(current: true))
+        XCTAssertNil(result.restoredPromptId(current: detectedPromptId))
+    }
+
+    func testNoMatchPromptResultKeepsCurrentStateWhenRestored() {
+        let currentPromptId = UUID()
+        let originalPromptId = UUID()
+        let result = VoiceInkPromptDetectionResult(
+            shouldEnableAI: false,
+            selectedPromptId: nil,
+            processedText: "plain text",
+            detectedTriggerWord: nil,
+            originalEnhancementState: false,
+            originalPromptId: originalPromptId
+        )
+
+        XCTAssertTrue(result.restoredEnhancementState(current: true))
+        XCTAssertEqual(result.restoredPromptId(current: currentPromptId), currentPromptId)
+    }
+
     func testPromptDetectionPolicyIgnoresPromptsWithoutTriggerWords() {
         let prompt = VoiceInkCustomPrompt(
             title: "Blank",

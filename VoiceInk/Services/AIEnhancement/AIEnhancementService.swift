@@ -443,11 +443,14 @@ class AIEnhancementService: ObservableObject {
     func restorePromptDetectionSettings(_ result: VoiceInkPromptDetectionResult) {
         guard result.shouldEnableAI else { return }
 
-        if isEnhancementEnabled != result.originalEnhancementState {
-            isEnhancementEnabled = result.originalEnhancementState
+        let restoredEnhancementState = result.restoredEnhancementState(current: isEnhancementEnabled)
+        if isEnhancementEnabled != restoredEnhancementState {
+            isEnhancementEnabled = restoredEnhancementState
         }
-        if let originalId = result.originalPromptId, selectedPromptId != originalId {
-            selectedPromptId = originalId
+
+        let restoredPromptId = result.restoredPromptId(current: selectedPromptId)
+        if selectedPromptId != restoredPromptId {
+            selectedPromptId = restoredPromptId
         }
     }
 

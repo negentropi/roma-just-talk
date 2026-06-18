@@ -323,6 +323,36 @@ require_pattern \
   iOS/VoiceInk-ios/AudioRecorder.swift
 
 require_pattern \
+  "macOS local Whisper uses shared runtime policy" \
+  'VoiceInkWhisperRuntimeConfiguration\.current' \
+  VoiceInk/Transcription/Whisper/LibWhisper.swift
+
+require_pattern \
+  "iOS local Whisper uses shared runtime policy" \
+  'VoiceInkWhisperRuntimeConfiguration\.current' \
+  iOS/VoiceInk-ios/LibWhisper.swift
+
+require_pattern \
+  "macOS local Whisper uses shared VAD resource policy" \
+  'VoiceInkVADModelFiles\.sileroPath' \
+  VoiceInk/Transcription/Whisper/LibWhisper.swift
+
+require_pattern \
+  "iOS local Whisper uses shared VAD resource policy" \
+  'VoiceInkVADModelFiles\.sileroPath' \
+  iOS/VoiceInk-ios/LibWhisper.swift
+
+require_pattern \
+  "macOS local Whisper reads samples through shared PCM16 policy" \
+  'VoiceInkPCM16Audio\.floatSamples\(fromWAVFileAt:' \
+  VoiceInk/Transcription/Whisper/WhisperTranscriptionService.swift
+
+require_pattern \
+  "iOS local Whisper reads samples through shared PCM16 policy" \
+  'VoiceInkPCM16Audio\.floatSamples\(fromWAVFileAt:' \
+  iOS/VoiceInk-ios/WhisperTranscriptionService.swift
+
+require_pattern \
   "workspace includes iOS project" \
   'location = "group:iOS/VoiceInk-ios.xcodeproj"' \
   VoiceInk.xcworkspace/contents.xcworkspacedata

@@ -251,6 +251,18 @@ Do not copy these files back into `VoiceInk/iOS`. If behavior from one appears m
 
 Before treating `../VoiceInk-iOS` as obsolete, verify current state from `VoiceInk/`:
 
+Run the bundled static verifier first:
+
+```bash
+scripts/verify-ios-single-repo-migration.sh
+```
+
+When real Xcode, app dependencies, and the iOS platform are installed, run the same verifier with app builds enabled:
+
+```bash
+scripts/verify-ios-single-repo-migration.sh --full-build
+```
+
 1. `VoiceInk.xcworkspace` includes `iOS/VoiceInk-ios.xcodeproj`.
 2. macOS and iOS projects both resolve `VoiceInkCore` from inside `VoiceInk/`.
 3. `swift run VoiceInkCoreChecks` passes from `VoiceInkCore/`.

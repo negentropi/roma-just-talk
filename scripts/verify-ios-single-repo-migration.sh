@@ -1,0 +1,155 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT"
+
+full_build=0
+if [[ "${1:-}" == "--full-build" ]]; then
+  full_build=1
+elif [[ $# -gt 0 ]]; then
+  echo "usage: $0 [--full-build]" >&2
+  exit 2
+fi
+
+failures=0
+warnings=0
+
+section() {
+  printf '\n==> %s\n' "$*"
+}
+
+fail() {
+  printf 'FAIL: %s\n' "$*" >&2
+  failures=$((failures + 1))
+}
+
+warn() {
+  printf 'WARN: %s\n' "$*" >&2
+  warnings=$((warnings + 1))
+}
+
+require_command() {
+  if ! command -v "$1" >/dev/null 2>&1; then
+    fail "missing command: $1"
+  fi
+}
+
+run_required() {
+  local description="$1"
+  shift
+
+  section "$description"
+  if ! "$@"; then
+    fail "$description"
+  fi
+}
+
+require_pattern() {
+  local description="$1"
+  local pattern="$2"
+  local file="$3"
+
+  section "$description"
+  if ! rg -q "$pattern" "$file"; then
+    fail "$description"
+  fi
+}
+
+require_command fd
+require_command rg
+require_command git
+require_command plutil
+require_command xmllint
+require_command xcrun
+require_command swift
+
+section "single-repo layout"
+[[ -d VoiceInk.xcodeproj ]] || fail "missing macOS VoiceInk.xcodeproj"
+[[ -d iOS/VoiceInk-ios.xcodeproj ]] || fail "missing in-repo iOS project"
+[[ -d VoiceInkCore ]] || fail "missing in-repo VoiceInkCore package"
+[[ ! -d ../VoiceInkCore ]] || fail "parent-level ../VoiceInkCore exists; shared core must live inside VoiceInk/"
+
+require_pattern \
+  "workspace includes iOS project" \
+  'location = "group:iOS/VoiceInk-ios.xcodeproj"' \
+  VoiceInk.xcworkspace/contents.xcworkspacedata
+
+require_pattern \
+  "macOS project resolves in-repo VoiceInkCore" \
+  'relativePath = VoiceInkCore;' \
+  VoiceInk.xcodeproj/project.pbxproj
+
+require_pattern \
+  "iOS project resolves in-repo VoiceInkCore from iOS/" \
+  'relativePath = ../VoiceInkCore;' \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
+
+run_required "git diff has no whitespace errors" git diff --check
+
+run_required "project/plist/entitlements lint" plutil -lint \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
+  VoiceInk/Info.plist \
+  VoiceInk/VoiceInk.entitlements \
+  VoiceInk/VoiceInk.local.entitlements \
+  iOS/VoiceInk-ios/Info.plist \
+  iOS/VoiceInk-ios/VoiceInk_ios.entitlements \
+  iOS/VoiceInkKeyboard/Info.plist \
+  iOS/VoiceInkKeyboard/VoiceInkKeyboard.entitlements
+
+run_required "workspace and scheme XML lint" xmllint --noout \
+  VoiceInk.xcworkspace/contents.xcworkspacedata \
+  VoiceInk.xcodeproj/xcshareddata/xcschemes/VoiceInk.xcscheme \
+  VoiceInk.xcworkspace/xcshareddata/xcschemes/VoiceInk-ios.xcscheme \
+  VoiceInk.xcodeproj/project.xcworkspace/contents.xcworkspacedata \
+  iOS/VoiceInk-ios.xcodeproj/project.xcworkspace/contents.xcworkspacedata
+
+run_required "VoiceInkCore sources typecheck" xcrun swiftc -emit-module \
+  -module-name VoiceInkCore \
+  -enable-testing \
+  -emit-module-path /tmp/VoiceInkCore.swiftmodule \
+  VoiceInkCore/Sources/VoiceInkCore/*.swift
+
+run_required "VoiceInkCore tests typecheck" xcrun swiftc -typecheck -I /tmp VoiceInkCore/Tests/VoiceInkCoreTests/*.swift
+
+run_required "VoiceInkCoreChecks" swift run --package-path VoiceInkCore VoiceInkCoreChecks
+
+run_required "macOS Swift sources parse" fd . VoiceInk -e swift -x xcrun swiftc -parse -I /tmp '{}'
+run_required "iOS Swift sources parse" fd . \
+  iOS/VoiceInk-ios \
+  iOS/Shared \
+  iOS/VoiceInkKeyboard \
+  iOS/VoiceInk-iosTests \
+  iOS/VoiceInk-iosUITests \
+  -e swift \
+  -x xcrun swiftc -parse -I /tmp '{}'
+
+section "toolchain report"
+xcode_path="$(xcode-select -p 2>/dev/null || true)"
+if [[ -z "$xcode_path" ]]; then
+  warn "xcode-select -p failed"
+else
+  printf 'xcode-select: %s\n' "$xcode_path"
+  if [[ "$xcode_path" == *CommandLineTools* ]]; then
+    warn "full app builds need real Xcode, not Command Line Tools"
+  fi
+fi
+
+if ! xcrun --sdk iphonesimulator --show-sdk-path >/dev/null 2>&1; then
+  warn "iphonesimulator SDK unavailable; iOS target build/test remains blocked"
+fi
+
+if (( full_build == 1 )); then
+  run_required "macOS app build" xcodebuild -workspace VoiceInk.xcworkspace -scheme VoiceInk -configuration Debug build
+  run_required "iOS app build" xcodebuild -workspace VoiceInk.xcworkspace -scheme VoiceInk-ios -destination "generic/platform=iOS Simulator" build
+else
+  warn "full app builds skipped; pass --full-build when real Xcode, app dependencies, and iOS platform are installed"
+fi
+
+if (( failures > 0 )); then
+  printf '\n%d required gate(s) failed; %d warning(s).\n' "$failures" "$warnings" >&2
+  exit 1
+fi
+
+printf '\nAll required single-repo migration gates passed; %d warning(s).\n' "$warnings"

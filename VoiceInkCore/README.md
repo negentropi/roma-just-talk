@@ -11,5 +11,6 @@ Initial boundary:
 The macOS app remains behavior source-of-truth. iOS imports this package only for shared logic once a slice has replacement proof.
 
 Verification:
-- Run `swift run VoiceInkCoreChecks`.
+- From the repo root, run `scripts/verify-ios-single-repo-migration.sh` for the shared-core plus macOS/iOS static gates.
+- For only the package checks, run `swift run VoiceInkCoreChecks`.
 - On the current Command Line Tools-only setup, `swift test` builds but cannot import XCTest or Swift Testing, so it does not execute the core checks.

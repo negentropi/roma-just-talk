@@ -76,17 +76,19 @@ final class PerformanceAnalysisTests: XCTestCase {
         XCTAssertEqual(stats[0].speedFactor, 0)
     }
 
-    func testModelStatFormatsSpeedFactorForSharedPresentation() {
+    func testModelStatFormatsSharedPresentationText() {
         let stat = VoiceInkPerformanceModelStat(
             name: "fast",
             sampleCount: 1,
             totalProcessingTime: 2,
-            avgProcessingTime: 2,
+            avgProcessingTime: 2.34,
             avgAudioDuration: 10,
             speedFactor: 5.04
         )
 
         XCTAssertEqual(stat.speedFactorText, "5.0x")
+        XCTAssertEqual(stat.avgProcessingTimeCompactText, "2.34s")
+        XCTAssertEqual(stat.avgProcessingTimeSpacedText, "2.34 s")
     }
 }
 

@@ -195,7 +195,7 @@ struct PerformanceAnalysisPanelView: View {
                     .frame(width: 1, height: 24)
 
                 VStack(spacing: 2) {
-                    Text(String(format: "%.2fs", modelStat.avgProcessingTime))
+                    Text(modelStat.avgProcessingTimeCompactText)
                         .font(.system(size: 11, weight: .semibold, design: .monospaced))
                         .foregroundColor(.teal)
                     Text("Avg. Processing")
@@ -240,7 +240,7 @@ struct PerformanceAnalysisPanelView: View {
 
             // Hero metric
             VStack(spacing: 3) {
-                Text(String(format: "%.2f s", modelStat.avgProcessingTime))
+                Text(modelStat.avgProcessingTimeSpacedText)
                     .font(.system(size: 24, weight: .bold, design: .rounded))
                     .foregroundColor(.indigo)
                 Text("Avg. Enhancement Time")

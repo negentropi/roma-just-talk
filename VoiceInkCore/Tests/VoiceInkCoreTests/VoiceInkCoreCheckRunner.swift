@@ -242,7 +242,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PerformanceAnalysisTests.testAnalyzeBuildsSummaryAndSortedModelStats", run: { PerformanceAnalysisTests().testAnalyzeBuildsSummaryAndSortedModelStats() }),
             VoiceInkCoreCheck(name: "PerformanceAnalysisTests.testStatsCanRequirePositiveDurationsForSessionMetricPanels", run: { PerformanceAnalysisTests().testStatsCanRequirePositiveDurationsForSessionMetricPanels() }),
             VoiceInkCoreCheck(name: "PerformanceAnalysisTests.testDefaultStatsPreserveHistoricalAnalyzerNilOnlyFiltering", run: { PerformanceAnalysisTests().testDefaultStatsPreserveHistoricalAnalyzerNilOnlyFiltering() }),
-            VoiceInkCoreCheck(name: "PerformanceAnalysisTests.testModelStatFormatsSpeedFactorForSharedPresentation", run: { PerformanceAnalysisTests().testModelStatFormatsSpeedFactorForSharedPresentation() }),
+            VoiceInkCoreCheck(name: "PerformanceAnalysisTests.testModelStatFormatsSharedPresentationText", run: { PerformanceAnalysisTests().testModelStatFormatsSharedPresentationText() }),
             VoiceInkCoreCheck(name: "PostProcessingRequestTests.testBlankPromptReturnsNilRequest", run: { PostProcessingRequestTests().testBlankPromptReturnsNilRequest() }),
             VoiceInkCoreCheck(name: "PostProcessingRequestTests.testRequestBuildsLegacyIOSPostProcessingMessages", run: { try PostProcessingRequestTests().testRequestBuildsLegacyIOSPostProcessingMessages() }),
             VoiceInkCoreCheck(name: "PostProcessingRequestTests.testFinalizedTranscriptFallsBackWhenResponseIsEmptyAfterFiltering", run: { PostProcessingRequestTests().testFinalizedTranscriptFallsBackWhenResponseIsEmptyAfterFiltering() }),

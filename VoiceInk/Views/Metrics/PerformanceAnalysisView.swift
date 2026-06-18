@@ -280,7 +280,7 @@ struct TranscriptionModelCard: View {
                     Spacer()
                     MetricDisplay(
                         title: "Avg. Process Time",
-                        value: String(format: "%.2f s", modelStat.avgProcessingTime),
+                        value: modelStat.avgProcessingTimeSpacedText,
                         color: .teal
                     )
                 }
@@ -316,7 +316,7 @@ struct EnhancementModelCard: View {
             Divider()
             
             VStack(alignment: .center) {
-                Text(String(format: "%.2f s", modelStat.avgProcessingTime))
+                Text(modelStat.avgProcessingTimeSpacedText)
                     .font(.system(size: 24, weight: .bold, design: .rounded))
                     .foregroundColor(.indigo)
                 Text("Avg. Enhancement Time")

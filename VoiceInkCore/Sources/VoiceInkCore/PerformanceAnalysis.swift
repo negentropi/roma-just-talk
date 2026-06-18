@@ -23,6 +23,12 @@ public struct VoiceInkPerformanceModelStat: Identifiable, Equatable, Sendable {
     public var speedFactorText: String {
         String(format: "%.1fx", speedFactor)
     }
+    public var avgProcessingTimeCompactText: String {
+        String(format: "%.2fs", avgProcessingTime)
+    }
+    public var avgProcessingTimeSpacedText: String {
+        String(format: "%.2f s", avgProcessingTime)
+    }
 
     public let name: String
     public let sampleCount: Int

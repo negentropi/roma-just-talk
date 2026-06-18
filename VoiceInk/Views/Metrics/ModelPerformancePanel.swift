@@ -186,7 +186,7 @@ private struct ModelPerformancePanelContent: View {
                     .frame(width: 1, height: 24)
 
                 VStack(spacing: 2) {
-                    Text(String(format: "%.2fs", stat.avgProcessingTime))
+                    Text(stat.avgProcessingTimeCompactText)
                         .font(.system(size: 11, weight: .semibold, design: .monospaced))
                         .foregroundColor(.teal)
                     Text("Avg. Processing")
@@ -228,7 +228,7 @@ private struct ModelPerformancePanelContent: View {
             .frame(maxWidth: .infinity)
 
             VStack(spacing: 3) {
-                Text(String(format: "%.2fs", stat.avgProcessingTime))
+                Text(stat.avgProcessingTimeCompactText)
                     .font(.system(size: 24, weight: .bold, design: .rounded))
                     .foregroundColor(.indigo)
                 Text("Avg. Enhancement Time")

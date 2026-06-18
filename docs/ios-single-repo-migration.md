@@ -114,7 +114,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 
 Current macOS consumers of shared remote transport:
 
-- macOS batch cloud transcription uses `CloudProvider` default dispatch into `VoiceInkRemoteTranscriptionService` for Groq, Deepgram, Gemini, Mistral, ElevenLabs, xAI, Soniox, Speechmatics, and AssemblyAI; provider modules keep only identity and streaming adapters, and empty-response policy now comes from `VoiceInkProviderKind`.
+- macOS batch cloud transcription uses `CloudProvider` default dispatch into `VoiceInkRemoteTranscriptionService` for Groq, Deepgram, Gemini, Mistral, ElevenLabs, xAI, Soniox, Speechmatics, and AssemblyAI; `CloudProviderRegistry` now maps shared provider identity to macOS streaming factories, and empty-response policy comes from `VoiceInkProviderKind`.
 - `VoiceInkRemoteTranscriptionService` and `VoiceInkRemoteTranscriptionOptions.batchDefaults` preserve macOS provider-specific batch options such as Groq JSON/temperature/retry settings, Deepgram paragraph/timeout settings, and vocabulary/prompt forwarding for providers that already used them.
 - Custom OpenAI-compatible batch transcription uses `VoiceInkOpenAICompatibleTranscriptionClient`.
 - Cartesia API-key verification uses `VoiceInkProviderAPIKeyVerifier` through `VoiceInkTranscriptionModelProvider`; Cartesia transcription remains streaming-only in platform shell code.
@@ -130,7 +130,7 @@ Current macOS consumers of shared remote transport:
 - macOS pre-roll streaming and buffered-snapshot streaming split mono PCM16 data through `VoiceInkPCM16Audio.monoPCM16Chunks`; macOS still owns streaming sessions, callbacks, and quick-release orchestration.
 - macOS batch cloud and streaming transcription use `VoiceInkProviderCredential` for runtime API-key presence checks before entering provider adapters.
 - macOS API-key lookup reads fallback environment-variable names from `VoiceInkProviderAPIKeyAccount`; Keychain access remains in the macOS shell.
-- macOS cloud-provider model lists are supplied by the `CloudProvider` default adapter over `VoiceInkTranscriptionModelCatalog`, so provider modules only own transport and streaming differences.
+- macOS cloud-provider model lists are supplied by the `CloudProvider` default adapter over `VoiceInkTranscriptionModelCatalog`, so the macOS shell only owns streaming factories and platform storage context.
 - macOS cloud-provider recorded-file support is derived from `VoiceInkTranscriptionModelProvider.supportsRecordedFileTranscription`, so Cartesia remains streaming-only without a shell-only override.
 - macOS Native Apple and Parakeet model structs adapt `VoiceInkTranscriptionModelCatalog` local model specs; macOS still owns OS availability and FluidAudio download/runtime code.
 - macOS language pickers use `VoiceInkLanguageCatalog.sortedOptions` so language presentation order stays shared with iOS.

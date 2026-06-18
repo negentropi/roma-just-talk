@@ -105,6 +105,24 @@ require_command xmllint
 require_command xcrun
 require_command swift
 
+obsolete_ios_clone_files=(
+  AppGroupCoordinator.swift
+  DeepgramTranscriptionService.swift
+  DefaultModeManager.swift
+  GroqTranscriptionService.swift
+  Item.swift
+  LLMPostProcessor.swift
+  Mode.swift
+  ModeSelectionView.swift
+  ModesView.swift
+  OpenAICompatibleClient.swift
+  PromptTemplate.swift
+  Provider.swift
+  RiffWaveUtils.swift
+  TranscriptionServiceFactory.swift
+  VADModelManager.swift
+)
+
 section "single-repo layout"
 git_root="$(git rev-parse --show-toplevel)"
 [[ "$git_root" == "$ROOT" ]] || fail "VoiceInk/ must be the git root; got $git_root"
@@ -128,24 +146,35 @@ for icon in 20.png 29.png 40.png 50.png 57.png 58.png 60.png 72.png 76.png 80.pn
 done
 
 section "obsolete iOS clone-side duplicates stay deleted"
-for file in \
-  AppGroupCoordinator.swift \
-  DeepgramTranscriptionService.swift \
-  DefaultModeManager.swift \
-  GroqTranscriptionService.swift \
-  Item.swift \
-  LLMPostProcessor.swift \
-  Mode.swift \
-  ModeSelectionView.swift \
-  ModesView.swift \
-  OpenAICompatibleClient.swift \
-  PromptTemplate.swift \
-  Provider.swift \
-  RiffWaveUtils.swift \
-  TranscriptionServiceFactory.swift \
-  VADModelManager.swift; do
+for file in "${obsolete_ios_clone_files[@]}"; do
   reject_file "iOS/VoiceInk-ios/$file"
 done
+
+section "sibling iOS clone extras are documented obsolete files"
+if [[ -d ../VoiceInk-iOS/VoiceInk-ios ]]; then
+  sibling_ios_files="$(mktemp "${TMPDIR:-/tmp}/voiceink-sibling-ios.XXXXXX")"
+  in_repo_ios_files="$(mktemp "${TMPDIR:-/tmp}/voiceink-in-repo-ios.XXXXXX")"
+  actual_sibling_extras="$(mktemp "${TMPDIR:-/tmp}/voiceink-actual-sibling-extras.XXXXXX")"
+  expected_sibling_extras="$(mktemp "${TMPDIR:-/tmp}/voiceink-expected-sibling-extras.XXXXXX")"
+
+  fd -e swift -t f . ../VoiceInk-iOS/VoiceInk-ios | sed 's#^\.\./VoiceInk-iOS/VoiceInk-ios/##' | sort >"$sibling_ios_files"
+  fd -e swift -t f . iOS/VoiceInk-ios | sed 's#^iOS/VoiceInk-ios/##' | sort >"$in_repo_ios_files"
+  comm -23 "$sibling_ios_files" "$in_repo_ios_files" >"$actual_sibling_extras"
+  printf '%s\n' "${obsolete_ios_clone_files[@]}" | sort >"$expected_sibling_extras"
+
+  if ! cmp -s "$actual_sibling_extras" "$expected_sibling_extras"; then
+    printf 'Expected sibling-only Swift files:\n' >&2
+    cat "$expected_sibling_extras" >&2
+    printf 'Actual sibling-only Swift files:\n' >&2
+    cat "$actual_sibling_extras" >&2
+    rm -f "$sibling_ios_files" "$in_repo_ios_files" "$actual_sibling_extras" "$expected_sibling_extras"
+    fail "sibling iOS clone has undocumented Swift extras"
+  fi
+
+  rm -f "$sibling_ios_files" "$in_repo_ios_files" "$actual_sibling_extras" "$expected_sibling_extras"
+else
+  printf 'No sibling ../VoiceInk-iOS checkout; skipping optional clone-extra audit.\n'
+fi
 
 reject_pattern \
   "VoiceInkCore stays platform-neutral" \

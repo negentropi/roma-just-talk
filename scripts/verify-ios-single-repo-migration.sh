@@ -41,6 +41,24 @@ require_file() {
   fi
 }
 
+require_plist_value() {
+  local description="$1"
+  local key="$2"
+  local expected="$3"
+  local file="$4"
+
+  section "$description"
+  local actual
+  if ! actual="$(plutil -extract "$key" raw -o - "$file" 2>/dev/null)"; then
+    fail "$description"
+    return
+  fi
+
+  if [[ "$actual" != "$expected" ]]; then
+    fail "$description: expected '$expected', got '$actual'"
+  fi
+}
+
 reject_file() {
   if [[ -e "$1" ]]; then
     fail "obsolete duplicate should stay deleted: $1"
@@ -149,6 +167,34 @@ require_pattern \
   "iOS project resolves in-repo VoiceInkCore from iOS/" \
   'relativePath = ../VoiceInkCore;' \
   iOS/VoiceInk-ios.xcodeproj/project.pbxproj
+
+require_pattern \
+  "macOS project product name stays roma just talk" \
+  'PRODUCT_NAME = "roma just talk";' \
+  VoiceInk.xcodeproj/project.pbxproj
+
+require_pattern \
+  "iOS project product name stays roma just talk" \
+  'PRODUCT_NAME = "roma just talk";' \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
+
+require_plist_value \
+  "iOS display name stays roma just talk" \
+  CFBundleDisplayName \
+  "roma just talk" \
+  iOS/VoiceInk-ios/Info.plist
+
+require_plist_value \
+  "iOS bundle name stays roma just talk" \
+  CFBundleName \
+  "roma just talk" \
+  iOS/VoiceInk-ios/Info.plist
+
+require_plist_value \
+  "iOS record deep-link scheme stays voiceink" \
+  CFBundleURLTypes.0.CFBundleURLSchemes.0 \
+  voiceink \
+  iOS/VoiceInk-ios/Info.plist
 
 run_required "git diff has no whitespace errors" git diff --check
 

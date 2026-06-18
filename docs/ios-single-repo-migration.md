@@ -273,14 +273,15 @@ scripts/verify-ios-single-repo-migration.sh --full-build
 2. macOS and iOS projects both resolve `VoiceInkCore` from inside `VoiceInk/`.
 3. `VoiceInk/` is the git root for this work, and the abandoned parent-level Swift package shape (`../VoiceInkCore`, `../Package.swift`, `../Sources/VoiceInkCore`, `../Tests/VoiceInkCoreTests`) remains absent.
 4. `VoiceInkCore` stays platform-neutral: no AppKit, UIKit, SwiftUI, SwiftData, AVFoundation, CoreAudio, IOKit, FluidAudio, KeyboardKit, LLMkit, or WhisperKit imports in shared sources or core checks.
-5. `swift run VoiceInkCoreChecks` passes from `VoiceInkCore/`.
-6. macOS Swift sources parse or build.
-7. iOS app, keyboard, unit-test, and UI-test Swift sources parse or build.
-8. `plutil -lint` passes for both project files and iOS plists/entitlements.
-9. `xmllint --noout` passes for workspace and shared scheme XML.
-10. iOS shared shell files are present under `iOS/Shared/`: `AppGroupCoordinator.swift`, `VoiceInkAppDeepLink.swift`, and `VoiceInkAppGroupRecordingBridge.swift`.
-11. iOS non-Swift app artifacts are present: privacy manifest, app icon catalog files, and bundled Silero VAD resource.
-12. Obsolete clone-side Swift duplicates remain absent from `iOS/VoiceInk-ios/`.
-13. A real Xcode toolchain is selected and both app targets build.
+5. macOS and iOS app product/display names stay `roma just talk`, and the iOS record deep-link scheme stays `voiceink`.
+6. `swift run VoiceInkCoreChecks` passes from `VoiceInkCore/`.
+7. macOS Swift sources parse or build.
+8. iOS app, keyboard, unit-test, and UI-test Swift sources parse or build.
+9. `plutil -lint` passes for both project files and iOS plists/entitlements.
+10. `xmllint --noout` passes for workspace and shared scheme XML.
+11. iOS shared shell files are present under `iOS/Shared/`: `AppGroupCoordinator.swift`, `VoiceInkAppDeepLink.swift`, and `VoiceInkAppGroupRecordingBridge.swift`.
+12. iOS non-Swift app artifacts are present: privacy manifest, app icon catalog files, and bundled Silero VAD resource.
+13. Obsolete clone-side Swift duplicates remain absent from `iOS/VoiceInk-ios/`.
+14. A real Xcode toolchain is selected and both app targets build.
 
 Current local blocker: `xcode-select -p` points to `/Library/Developer/CommandLineTools`, and the previously used external Xcode volume is not mounted. Full target builds are still environment-blocked until a real Xcode is selected; macOS `VoiceInk` also needs `/Users/atalphalnmomhappyhouse/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework`, and iOS `VoiceInk-ios` needs the iOS 26.2 platform installed. Until those are present, use `swift run VoiceInkCoreChecks` plus the static parse/lint gates above for local proof.

@@ -44,12 +44,4 @@ extension Transcription {
     var performanceEnhancementModelName: String? { aiEnhancementModelName }
     var performanceEnhancementDuration: TimeInterval? { enhancementDuration }
     var performanceEnhancedText: String? { enhancedText }
-
-    var dashboardWordCount: Int {
-        VoiceInkSessionMetricPolicy.values(for: self).wordCount
-    }
-
-    var dashboardAudioDuration: TimeInterval {
-        VoiceInkSessionMetricPolicy.values(for: self).audioDuration
-    }
 }

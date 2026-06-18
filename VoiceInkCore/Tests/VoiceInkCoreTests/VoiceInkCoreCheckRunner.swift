@@ -85,6 +85,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "CustomVocabularyTermsTests.testNormalizedTermsTrimDropBlankAndDeduplicateCaseInsensitively", run: { CustomVocabularyTermsTests().testNormalizedTermsTrimDropBlankAndDeduplicateCaseInsensitively() }),
             VoiceInkCoreCheck(name: "CustomVocabularyTermsTests.testNormalizedTermsApplyOptionalLimitAfterFiltering", run: { CustomVocabularyTermsTests().testNormalizedTermsApplyOptionalLimitAfterFiltering() }),
             VoiceInkCoreCheck(name: "DashboardMetricsTests.testAccumulatorBuildsSummaryFromMetricRecords", run: { DashboardMetricsTests().testAccumulatorBuildsSummaryFromMetricRecords() }),
+            VoiceInkCoreCheck(name: "DashboardMetricsTests.testMetricSourceRecordGetsDashboardValuesFromSessionMetricPolicy", run: { DashboardMetricsTests().testMetricSourceRecordGetsDashboardValuesFromSessionMetricPolicy() }),
             VoiceInkCoreCheck(name: "DashboardMetricsTests.testDerivedMetricsPreserveDashboardDefaults", run: { DashboardMetricsTests().testDerivedMetricsPreserveDashboardDefaults() }),
             VoiceInkCoreCheck(name: "DashboardMetricsTests.testTimeSavedAndAverageWordsPerMinuteHandleZeroAndOverTypingTime", run: { DashboardMetricsTests().testTimeSavedAndAverageWordsPerMinuteHandleZeroAndOverTypingTime() }),
             VoiceInkCoreCheck(name: "DashboardMetricsTests.testDerivedMetricsCanOverrideTypingAndKeystrokeAssumptions", run: { DashboardMetricsTests().testDerivedMetricsCanOverrideTypingAndKeystrokeAssumptions() }),

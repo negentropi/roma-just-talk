@@ -5,6 +5,16 @@ public protocol VoiceInkDashboardMetricRecord {
     var dashboardAudioDuration: TimeInterval { get }
 }
 
+public extension VoiceInkDashboardMetricRecord where Self: VoiceInkSessionMetricSource {
+    var dashboardWordCount: Int {
+        VoiceInkSessionMetricPolicy.values(for: self).wordCount
+    }
+
+    var dashboardAudioDuration: TimeInterval {
+        VoiceInkSessionMetricPolicy.values(for: self).audioDuration
+    }
+}
+
 public struct VoiceInkDashboardMetricsSummary: Equatable, Sendable {
     public var totalCount: Int
     public var totalWords: Int

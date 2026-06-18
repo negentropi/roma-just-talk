@@ -491,7 +491,7 @@ private struct HistoryCardRow: View {
     let onToggleCheck: () -> Void
     let onShowInfo: () -> Void
 
-    @State private var selectedTab: TranscriptionTab = .original
+    @State private var selectedTab: VoiceInkTranscriptTextVariant = .original
 
     private var displayText: String {
         switch selectedTab {
@@ -559,13 +559,13 @@ private struct HistoryCardRow: View {
             // Tabs
             if transcription.enhancedText != nil {
                 HStack(spacing: 4) {
-                    ForEach(TranscriptionTab.allCases, id: \.self) { tab in
+                    ForEach(VoiceInkTranscriptTextVariant.allCases, id: \.self) { tab in
                         Button {
                             withAnimation(.easeInOut(duration: 0.15)) {
                                 selectedTab = tab
                             }
                         } label: {
-                            Text(tab.rawValue)
+                            Text(tab.title)
                                 .font(.system(size: 11, weight: .medium))
                                 .foregroundColor(selectedTab == tab ? .primary : .secondary)
                                 .padding(.horizontal, 10)

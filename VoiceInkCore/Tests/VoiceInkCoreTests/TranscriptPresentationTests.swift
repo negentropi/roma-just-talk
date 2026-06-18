@@ -227,6 +227,19 @@ final class TranscriptPresentationTests: XCTestCase {
         XCTAssertFalse(VoiceInkTranscriptPresentation.shouldShowCompletedContent(for: .canceled))
     }
 
+    func testTranscriptTextVariantTitlesPreserveMacOSTabs() {
+        XCTAssertEqual(VoiceInkTranscriptTextVariant.original.title, "Original")
+        XCTAssertEqual(VoiceInkTranscriptTextVariant.enhanced.title, "Enhanced")
+        XCTAssertEqual(VoiceInkTranscriptTextVariant.allCases, [.original, .enhanced])
+    }
+
+    func testTranscriptDetailCopyPreservesIOSNoteDetailLabels() {
+        XCTAssertEqual(VoiceInkTranscriptPresentation.noteDetailNavigationTitle, "Note")
+        XCTAssertEqual(VoiceInkTranscriptPresentation.transcriptTitle, "Transcript")
+        XCTAssertEqual(VoiceInkTranscriptPresentation.retranscribingDisplayText, "Retranscribing...")
+        XCTAssertEqual(VoiceInkTranscriptPresentation.retryTranscriptionButtonTitle, "Retry Transcription")
+    }
+
     func testDefaultPasteEligibilityRejectsCanceledTranscriptionText() {
         XCTAssertFalse(
             VoiceInkTranscriptPresentation.isPasteable(

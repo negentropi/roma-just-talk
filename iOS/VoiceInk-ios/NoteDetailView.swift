@@ -46,7 +46,7 @@ struct NoteDetailView: View {
                 }
             }
         }
-        .navigationTitle("Note")
+        .navigationTitle(VoiceInkTranscriptPresentation.noteDetailNavigationTitle)
         .navigationBarTitleDisplayMode(.inline)
         .background(Color(.systemGroupedBackground))
     }
@@ -54,7 +54,7 @@ struct NoteDetailView: View {
     private var transcriptContentView: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("Transcript")
+                Text(VoiceInkTranscriptPresentation.transcriptTitle)
                     .font(.headline)
                 Spacer()
                 Button(action: {
@@ -167,7 +167,7 @@ struct NoteDetailView: View {
                     HStack {
                         ProgressView()
                             .scaleEffect(0.8)
-                        Text("Retranscribing...")
+                        Text(VoiceInkTranscriptPresentation.retranscribingDisplayText)
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
@@ -175,7 +175,7 @@ struct NoteDetailView: View {
                     Button {
                         retranscribe()
                     } label: {
-                        Label("Retry Transcription", systemImage: "arrow.clockwise")
+                        Label(VoiceInkTranscriptPresentation.retryTranscriptionButtonTitle, systemImage: "arrow.clockwise")
                             .fontWeight(.semibold)
                             .frame(maxWidth: .infinity)
                     }

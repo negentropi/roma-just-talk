@@ -567,6 +567,16 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
 
 require_pattern \
+  "shared transcript text variant presentation lives in VoiceInkCore" \
+  'VoiceInkTranscriptTextVariant|case original|case enhanced|var title' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+require_pattern \
+  "shared transcript detail presentation copy lives in VoiceInkCore" \
+  'noteDetailNavigationTitle|transcriptTitle|retranscribingDisplayText|retryTranscriptionButtonTitle' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+require_pattern \
   "iOS note row uses shared transcript status presentation" \
   'VoiceInkTranscriptPresentation\.statusPresentation' \
   iOS/VoiceInk-ios/NoteRowView.swift
@@ -596,11 +606,41 @@ require_pattern \
   'VoiceInkTranscriptPresentation\.shouldShowCompletedContent' \
   iOS/VoiceInk-ios/NoteDetailView.swift
 
+require_pattern \
+  "iOS note detail uses shared transcript detail presentation copy" \
+  'VoiceInkTranscriptPresentation\.(noteDetailNavigationTitle|transcriptTitle|retranscribingDisplayText|retryTranscriptionButtonTitle)' \
+  iOS/VoiceInk-ios/NoteDetailView.swift
+
+require_pattern \
+  "macOS transcription detail uses shared transcript text variant" \
+  'VoiceInkTranscriptTextVariant\.(original|enhanced)\.title' \
+  VoiceInk/Views/History/TranscriptionDetailView.swift
+
+require_pattern \
+  "macOS audio file row uses shared transcript text variant" \
+  'VoiceInkTranscriptTextVariant|tab\.title' \
+  VoiceInk/Views/AudioFileRow.swift
+
+require_pattern \
+  "macOS inline history uses shared transcript text variant" \
+  'VoiceInkTranscriptTextVariant|tab\.title' \
+  VoiceInk/Views/History/InlineHistoryView.swift
+
 reject_pattern \
   "iOS note views avoid shell-only transcript status branching" \
   'note\.transcriptionStatus *[!=]= *\.(pending|failed|completed|canceled)|transcriptionStatus\.needsTranscription|VoiceInkTranscriptPresentation\.status(Title|BadgeText)|statusPresentation\??\.is(Failure|Processing)' \
   iOS/VoiceInk-ios/NoteRowView.swift \
   iOS/VoiceInk-ios/NoteDetailView.swift
+
+reject_file VoiceInk/Views/TranscriptionResultView.swift
+
+reject_pattern \
+  "transcript detail views avoid shell-only presentation copy" \
+  '"(Note|Transcript|Retranscribing\.\.\.|Retry Transcription|Original|Enhanced)"' \
+  iOS/VoiceInk-ios/NoteDetailView.swift \
+  VoiceInk/Views/History/TranscriptionDetailView.swift \
+  VoiceInk/Views/AudioFileRow.swift \
+  VoiceInk/Views/History/InlineHistoryView.swift
 
 reject_pattern \
   "iOS API-key view avoids shell-only stored-key presentation wrappers" \

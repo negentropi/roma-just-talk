@@ -62,6 +62,20 @@ public struct VoiceInkTranscriptStatusPresentation: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkTranscriptTextVariant: String, CaseIterable, Sendable {
+    case original
+    case enhanced
+
+    public var title: String {
+        switch self {
+        case .original:
+            return "Original"
+        case .enhanced:
+            return "Enhanced"
+        }
+    }
+}
+
 public enum VoiceInkTranscriptPresentation {
     public static let pendingDisplayText = "New transcription"
     public static let failedDisplayText = "Transcription failed - tap to retry"
@@ -69,6 +83,10 @@ public enum VoiceInkTranscriptPresentation {
     public static let emptyCompletedDisplayText = "No audible content detected."
     public static let emptyPreferredText = "No content available."
     public static let canceledTranscriptionText = "The transcription was canceled."
+    public static let noteDetailNavigationTitle = "Note"
+    public static let transcriptTitle = "Transcript"
+    public static let retranscribingDisplayText = "Retranscribing..."
+    public static let retryTranscriptionButtonTitle = "Retry Transcription"
 
     public static func preferredText(rawText: String, enhancedText: String?) -> String? {
         if let enhancedText, !enhancedText.isEmpty {

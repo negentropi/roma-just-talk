@@ -8,7 +8,7 @@ struct AudioFileRow: View {
     let onRemove: () -> Void
     let onRetry: () -> Void
 
-    @State private var selectedTab: TranscriptionTab = .original
+    @State private var selectedTab: VoiceInkTranscriptTextVariant = .original
 
     private var displayText: String {
         switch selectedTab {
@@ -175,11 +175,11 @@ struct AudioFileRow: View {
         }
     }
 
-    private func tabButton(tab: TranscriptionTab) -> some View {
+    private func tabButton(tab: VoiceInkTranscriptTextVariant) -> some View {
         Button {
             selectedTab = tab
         } label: {
-            Text(tab.rawValue)
+            Text(tab.title)
                 .font(.subheadline.weight(selectedTab == tab ? .semibold : .regular))
                 .foregroundColor(selectedTab == tab ? .accentColor : .secondary)
                 .padding(.horizontal, 10)

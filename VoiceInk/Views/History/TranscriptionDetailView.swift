@@ -10,14 +10,14 @@ struct TranscriptionDetailView: View {
             ScrollView {
                 VStack(spacing: 16) {
                     MessageBubble(
-                        label: "Original",
+                        label: VoiceInkTranscriptTextVariant.original.title,
                         text: transcription.text,
                         isEnhanced: false
                     )
 
                     if let enhancedText = transcription.enhancedText {
                         MessageBubble(
-                            label: "Enhanced",
+                            label: VoiceInkTranscriptTextVariant.enhanced.title,
                             text: enhancedText,
                             isEnhanced: true
                         )

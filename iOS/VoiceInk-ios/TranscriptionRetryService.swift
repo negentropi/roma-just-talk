@@ -31,6 +31,7 @@ class TranscriptionRetryService {
         let transcriptionLanguage = await settings.selectedTranscriptionLanguage
         let transcriptionPrompt = await settings.localWhisperPrompt
         let wordReplacementRules = await settings.runtimeWordReplacementRules
+        let customVocabulary = await settings.runtimeCustomVocabularyTerms
 
         return try await runProcessor.transcribe(
             fileURL: fileURL,
@@ -42,6 +43,7 @@ class TranscriptionRetryService {
             postProcessingSkipConfiguration: VoiceInkPostProcessingSkipConfiguration.current(),
             transcriptionLanguage: transcriptionLanguage,
             transcriptionPrompt: transcriptionPrompt,
+            customVocabulary: customVocabulary,
             apiKeyProvider: { provider in
                 await settings.apiKey(for: provider)
             },

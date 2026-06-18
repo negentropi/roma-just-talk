@@ -150,6 +150,17 @@ final class VoiceInkIOSTests: XCTestCase {
         XCTAssertEqual(VoiceInkIOSWordReplacementPreference.rules(from: defaults), [])
     }
 
+    func testIOSCustomVocabularyPreferenceNormalizesTerms() throws {
+        let defaults = try makeIsolatedDefaults()
+
+        VoiceInkIOSCustomVocabularyPreference.save([" Roma ", "Felix", "roma", ""], to: defaults)
+
+        XCTAssertEqual(VoiceInkIOSCustomVocabularyPreference.terms(from: defaults), ["Roma", "Felix"])
+
+        VoiceInkIOSCustomVocabularyPreference.clear(from: defaults)
+        XCTAssertEqual(VoiceInkIOSCustomVocabularyPreference.terms(from: defaults), [])
+    }
+
     func testAppGroupRecordingBridgeKeepsFreshRecordingState() throws {
         let defaults = try makeIsolatedDefaults()
         let timestamp = Date(timeIntervalSince1970: 100)

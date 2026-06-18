@@ -16,7 +16,8 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
         model: String,
         fileURL: URL,
         language: String? = nil,
-        prompt: String? = nil
+        prompt: String? = nil,
+        customVocabulary: [String] = []
     ) async throws -> String {
         
         print("WhisperTranscriptionService: Starting local transcription")

@@ -54,6 +54,10 @@ final class AppSettings: ObservableObject {
         didSet { VoiceInkIOSWordReplacementPreference.save(wordReplacements) }
     }
 
+    @Published var customVocabularyTerms: [String] {
+        didSet { VoiceInkIOSCustomVocabularyPreference.save(customVocabularyTerms) }
+    }
+
     @Published var selectedTranscriptionLanguage: String {
         didSet {
             VoiceInkTranscriptionLanguagePreference.saveSelectedLanguage(selectedTranscriptionLanguage)
@@ -85,6 +89,7 @@ final class AppSettings: ObservableObject {
         self.removeFillerWords = cleanupSettings.removeFillerWords
         self.fillerWords = VoiceInkFillerWordPreference.words()
         self.wordReplacements = VoiceInkIOSWordReplacementPreference.rules()
+        self.customVocabularyTerms = VoiceInkIOSCustomVocabularyPreference.terms()
         self.selectedTranscriptionLanguage = VoiceInkTranscriptionLanguagePreference.selectedLanguage()
 
         repairSelectedModeId()
@@ -206,6 +211,35 @@ final class AppSettings: ObservableObject {
         VoiceInkWordReplacementEngine.sortedRules(wordReplacements)
     }
 
+    @discardableResult
+    func addCustomVocabularyTerms(_ input: String) -> String? {
+        let plan = VoiceInkDictionaryPolicy.vocabularyInsertPlan(
+            input: input,
+            existingWords: customVocabularyTerms
+        )
+
+        if let errorMessage = plan.errorMessage {
+            return errorMessage
+        }
+
+        guard plan.shouldInsert else {
+            return nil
+        }
+
+        customVocabularyTerms.append(contentsOf: plan.wordsToInsert)
+        return nil
+    }
+
+    func removeCustomVocabularyTerms(at offsets: IndexSet) {
+        customVocabularyTerms = customVocabularyTerms.enumerated().compactMap { index, term in
+            offsets.contains(index) ? nil : term
+        }
+    }
+
+    var runtimeCustomVocabularyTerms: [String] {
+        VoiceInkCustomVocabularyTerms.normalized(customVocabularyTerms)
+    }
+
     var availableTranscriptionLanguages: [String: String] {
         modes.transcriptionLanguages(selectedModeId: selectedModeId)
     }
@@ -306,9 +340,11 @@ final class AppSettings: ObservableObject {
         removeFillerWords = cleanupSettings.removeFillerWords
         fillerWords = defaults.fillerWords
         wordReplacements = []
+        customVocabularyTerms = []
         selectedTranscriptionLanguage = defaults.selectedTranscriptionLanguage
         VoiceInkSharedPreferenceReset.clearCoreUserSettings()
         VoiceInkIOSWordReplacementPreference.clear()
+        VoiceInkIOSCustomVocabularyPreference.clear()
 
         // Clear API keys from memory and Keychain
         apiKeysByProvider = [:]
@@ -333,6 +369,22 @@ enum VoiceInkIOSWordReplacementPreference {
         }
 
         defaults.set(data, forKey: key)
+    }
+
+    static func clear(from defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: key)
+    }
+}
+
+enum VoiceInkIOSCustomVocabularyPreference {
+    static let key = "voiceInkIOSCustomVocabularyTerms"
+
+    static func terms(from defaults: UserDefaults = .standard) -> [String] {
+        VoiceInkCustomVocabularyTerms.normalized(defaults.stringArray(forKey: key) ?? [])
+    }
+
+    static func save(_ terms: [String], to defaults: UserDefaults = .standard) {
+        defaults.set(VoiceInkCustomVocabularyTerms.normalized(terms), forKey: key)
     }
 
     static func clear(from defaults: UserDefaults = .standard) {

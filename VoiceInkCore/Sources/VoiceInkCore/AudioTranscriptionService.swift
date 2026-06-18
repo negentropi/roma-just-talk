@@ -6,7 +6,8 @@ public protocol VoiceInkAudioTranscriptionService {
         model: String,
         fileURL: URL,
         language: String?,
-        prompt: String?
+        prompt: String?,
+        customVocabulary: [String]
     ) async throws -> String
 }
 
@@ -202,7 +203,8 @@ public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionServ
         model: String,
         fileURL: URL,
         language: String? = nil,
-        prompt: String? = nil
+        prompt: String? = nil,
+        customVocabulary: [String] = []
     ) async throws -> String {
         let audioData = try Data(contentsOf: fileURL)
         return try await transcribeAudioData(
@@ -211,16 +213,29 @@ public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionServ
             audioData: audioData,
             fileName: fileURL.lastPathComponent,
             language: language,
-            options: fileTranscriptionOptions(prompt: prompt)
+            options: fileTranscriptionOptions(
+                prompt: prompt,
+                customVocabulary: customVocabulary
+            )
         )
     }
 
-    func fileTranscriptionOptions(prompt: String?) -> VoiceInkRemoteTranscriptionOptions {
+    func fileTranscriptionOptions(
+        prompt: String?,
+        customVocabulary: [String] = []
+    ) -> VoiceInkRemoteTranscriptionOptions {
         guard let provider else {
-            return VoiceInkRemoteTranscriptionOptions(prompt: prompt)
+            return VoiceInkRemoteTranscriptionOptions(
+                prompt: prompt,
+                customVocabulary: customVocabulary
+            )
         }
 
-        return VoiceInkRemoteTranscriptionOptions.batchDefaults(forProviderKind: provider, prompt: prompt)
+        return VoiceInkRemoteTranscriptionOptions.batchDefaults(
+            forProviderKind: provider,
+            prompt: prompt,
+            customVocabulary: customVocabulary
+        )
     }
 
     public func transcribeAudioData(

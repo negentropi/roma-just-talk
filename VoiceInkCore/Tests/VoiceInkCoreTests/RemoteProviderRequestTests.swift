@@ -286,12 +286,23 @@ final class RemoteProviderRequestTests: XCTestCase {
         XCTAssertNil(deepgram.deepgramDiarize)
         XCTAssertEqual(deepgram.deepgramTimeout, 30)
 
+        let soniox = VoiceInkRemoteTranscriptionService(provider: .soniox)
+            .fileTranscriptionOptions(
+                prompt: "ignored",
+                customVocabulary: ["Roma", "Felix"]
+            )
+        XCTAssertEqual(soniox.customVocabulary, ["Roma", "Felix"])
+
         let directTransport = VoiceInkRemoteTranscriptionService(
             transport: .openAICompatible,
             apiBaseURL: try XCTUnwrap(URL(string: "https://custom.example.test"))
         )
-            .fileTranscriptionOptions(prompt: "custom prompt")
+            .fileTranscriptionOptions(
+                prompt: "custom prompt",
+                customVocabulary: ["Roma"]
+            )
         XCTAssertEqual(directTransport.prompt, "custom prompt")
+        XCTAssertEqual(directTransport.customVocabulary, ["Roma"])
         XCTAssertNil(directTransport.openAICompatibleResponseFormat)
         XCTAssertNil(directTransport.openAICompatibleTimeout)
     }

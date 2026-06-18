@@ -114,6 +114,7 @@ public struct VoiceInkTranscriptionRunProcessor {
         promptTriggerForcesPostProcessing: Bool = false,
         transcriptionLanguage: String? = nil,
         transcriptionPrompt: String? = nil,
+        customVocabulary: [String] = [],
         apiKeyProvider: APIKeyProvider,
         transcriptionServiceProvider: TranscriptionServiceProvider
     ) async throws -> VoiceInkTranscriptionRunResult {
@@ -132,7 +133,8 @@ public struct VoiceInkTranscriptionRunProcessor {
             model: model,
             fileURL: fileURL,
             language: VoiceInkTranscriptionLanguageSupport.requestLanguage(transcriptionLanguage),
-            prompt: transcriptionPrompt
+            prompt: transcriptionPrompt,
+            customVocabulary: VoiceInkCustomVocabularyTerms.normalized(customVocabulary)
         )
         let transcriptionDuration = currentDate().timeIntervalSince(transcriptionStart)
 

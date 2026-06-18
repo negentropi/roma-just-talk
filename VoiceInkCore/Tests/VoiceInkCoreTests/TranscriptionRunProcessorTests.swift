@@ -182,6 +182,24 @@ final class TranscriptionRunProcessorTests: XCTestCase {
         XCTAssertEqual(service.capturedPrompt, "spell Roma as Roma")
     }
 
+    func testTranscribePassesNormalizedCustomVocabularyToTranscriptionService() async throws {
+        let service = CapturingTranscriptionService(text: "roma")
+        let processor = VoiceInkTranscriptionRunProcessor { _ in
+            XCTFail("Post-processing should not run")
+            return "unexpected"
+        }
+
+        _ = try await processor.transcribe(
+            fileURL: URL(fileURLWithPath: "/tmp/audio.wav"),
+            configuration: configuration(isPostProcessingEnabled: false),
+            customVocabulary: [" Roma ", "Felix", "roma", ""],
+            apiKeyProvider: { _ in "key" },
+            transcriptionServiceProvider: { _ in service }
+        )
+
+        XCTAssertEqual(service.capturedCustomVocabulary, ["Roma", "Felix"])
+    }
+
     func testTranscribeTreatsAutoLanguageAsDetection() async throws {
         let service = CapturingTranscriptionService(text: "hello")
         let processor = VoiceInkTranscriptionRunProcessor { _ in
@@ -473,7 +491,8 @@ private struct StubTranscriptionService: VoiceInkAudioTranscriptionService {
         model: String,
         fileURL: URL,
         language: String?,
-        prompt: String?
+        prompt: String?,
+        customVocabulary: [String]
     ) async throws -> String {
         text
     }
@@ -499,6 +518,7 @@ private final class CapturingTranscriptionService: VoiceInkAudioTranscriptionSer
     let text: String
     private(set) var capturedLanguage: String?
     private(set) var capturedPrompt: String?
+    private(set) var capturedCustomVocabulary: [String]?
 
     init(text: String) {
         self.text = text
@@ -509,10 +529,12 @@ private final class CapturingTranscriptionService: VoiceInkAudioTranscriptionSer
         model: String,
         fileURL: URL,
         language: String?,
-        prompt: String?
+        prompt: String?,
+        customVocabulary: [String]
     ) async throws -> String {
         capturedLanguage = language
         capturedPrompt = prompt
+        capturedCustomVocabulary = customVocabulary
         return text
     }
 

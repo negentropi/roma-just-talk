@@ -6,6 +6,9 @@ struct SettingsView: View {
     @StateObject private var settings = AppSettings.shared
     @State private var newFillerWord = ""
     @State private var showDuplicateFillerWordAlert = false
+    @State private var newCustomVocabularyTerm = ""
+    @State private var customVocabularyAlertMessage = ""
+    @State private var showCustomVocabularyAlert = false
     @State private var newReplacementOriginal = ""
     @State private var newReplacementText = ""
     @State private var wordReplacementAlertMessage = ""
@@ -93,6 +96,25 @@ struct SettingsView: View {
                     }
                     .onDelete(perform: settings.removeFillerWords)
                 }
+            }
+
+            Section(header: Text("Dictionary")) {
+                HStack {
+                    TextField("Vocabulary term", text: $newCustomVocabularyTerm)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .onSubmit(addCustomVocabularyTerm)
+
+                    Button(action: addCustomVocabularyTerm) {
+                        Image(systemName: "plus.circle.fill")
+                    }
+                    .disabled(!canAddCustomVocabularyTerm)
+                }
+
+                ForEach(settings.customVocabularyTerms, id: \.self) { term in
+                    Text(term)
+                }
+                .onDelete(perform: settings.removeCustomVocabularyTerms)
 
                 TextField("Original text", text: $newReplacementOriginal)
                     .textInputAutocapitalization(.never)
@@ -166,6 +188,11 @@ struct SettingsView: View {
         } message: {
             Text("This filler word is already in the list.")
         }
+        .alert("Vocabulary", isPresented: $showCustomVocabularyAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(customVocabularyAlertMessage)
+        }
         .alert("Word Replacement", isPresented: $showWordReplacementAlert) {
             Button("OK", role: .cancel) {}
         } message: {
@@ -188,6 +215,10 @@ struct SettingsView: View {
         VoiceInkFillerWords.normalizedWord(newFillerWord) != nil
     }
 
+    private var canAddCustomVocabularyTerm: Bool {
+        VoiceInkDictionaryPolicy.hasVocabularyDraft(newCustomVocabularyTerm)
+    }
+
     private var canAddWordReplacement: Bool {
         VoiceInkDictionaryPolicy.canSaveWordReplacementDraft(
             original: newReplacementOriginal.trimmingCharacters(in: .whitespacesAndNewlines),
@@ -203,6 +234,18 @@ struct SettingsView: View {
         } else {
             showDuplicateFillerWordAlert = true
         }
+    }
+
+    private func addCustomVocabularyTerm() {
+        guard canAddCustomVocabularyTerm else { return }
+
+        if let error = settings.addCustomVocabularyTerms(newCustomVocabularyTerm) {
+            customVocabularyAlertMessage = error
+            showCustomVocabularyAlert = true
+            return
+        }
+
+        newCustomVocabularyTerm = ""
     }
 
     private func addWordReplacement() {

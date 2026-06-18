@@ -192,7 +192,8 @@ class AudioTranscriptionManager: ObservableObject {
                         aiRequestSystemMessage: enhancementService.lastSystemMessageSent,
                         aiRequestUserMessage: enhancementService.lastUserMessageSent,
                         powerModeName: powerModeName,
-                        powerModeEmoji: powerModeEmoji
+                        powerModeEmoji: powerModeEmoji,
+                        transcriptionStatus: .completed
                     )
                 } catch {
                     let errorDescription = VoiceInkErrorDescription.text(for: error)
@@ -208,7 +209,8 @@ class AudioTranscriptionManager: ObservableObject {
                         promptName: nil,
                         transcriptionDuration: transcriptionDuration,
                         powerModeName: powerModeName,
-                        powerModeEmoji: powerModeEmoji
+                        powerModeEmoji: powerModeEmoji,
+                        transcriptionStatus: .completed
                     )
                 }
             } else {
@@ -220,7 +222,8 @@ class AudioTranscriptionManager: ObservableObject {
                     promptName: nil,
                     transcriptionDuration: transcriptionDuration,
                     powerModeName: powerModeName,
-                    powerModeEmoji: powerModeEmoji
+                    powerModeEmoji: powerModeEmoji,
+                    transcriptionStatus: .completed
                 )
             }
 

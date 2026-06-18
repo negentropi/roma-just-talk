@@ -130,6 +130,49 @@ final class DictionaryPolicyTests: XCTestCase {
         XCTAssertEqual(presentation.dismissHintTitle, "Dismiss")
     }
 
+    func testWordReplacementInfoPresentationPreservesMacOSCopy() {
+        let presentation = VoiceInkWordReplacementInfoPresentation.macOS
+
+        XCTAssertEqual(presentation.title, "How to use Word Replacements")
+        XCTAssertEqual(presentation.multipleOriginalsHelpText, "Separate multiple originals with commas:")
+        XCTAssertEqual(presentation.multipleOriginalsExampleText, "Voicing, Voice ink, Voiceing")
+        XCTAssertEqual(presentation.examplesTitle, "Examples")
+        XCTAssertEqual(presentation.originalLabel, "Original:")
+        XCTAssertEqual(presentation.replacementLabel, "Replacement:")
+        XCTAssertEqual(
+            presentation.examples,
+            [
+                VoiceInkWordReplacementExamplePresentation(
+                    originalText: "my website link",
+                    replacementText: "https://tryvoiceink.com"
+                ),
+                VoiceInkWordReplacementExamplePresentation(
+                    originalText: "Voicing, Voice ink",
+                    replacementText: "VoiceInk"
+                )
+            ]
+        )
+    }
+
+    func testWordReplacementEditPresentationPreservesMacOSCopy() {
+        let presentation = VoiceInkWordReplacementEditPresentation.macOS
+
+        XCTAssertEqual(presentation.cancelButtonTitle, "Cancel")
+        XCTAssertEqual(presentation.title, "Edit Word Replacement")
+        XCTAssertEqual(presentation.saveButtonTitle, "Save")
+        XCTAssertEqual(
+            presentation.descriptionText,
+            "Update the word or phrase that should be automatically replaced."
+        )
+        XCTAssertEqual(presentation.originalFieldTitle, "Original Text")
+        XCTAssertEqual(presentation.requiredText, "Required")
+        XCTAssertEqual(
+            presentation.originalPlaceholder,
+            "Enter word or phrase to replace (use commas for multiple)"
+        )
+        XCTAssertEqual(presentation.replacementFieldTitle, "Replacement Text")
+    }
+
     func testVocabularyDraftUsesSharedTokenPolicy() {
         XCTAssertFalse(VoiceInkDictionaryPolicy.hasVocabularyDraft(" , \n "))
         XCTAssertTrue(VoiceInkDictionaryPolicy.hasVocabularyDraft("Voice Ink, "))

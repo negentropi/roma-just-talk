@@ -226,17 +226,19 @@ struct WordReplacementView: View {
 }
 
 struct WordReplacementInfoPopover: View {
+    private let infoPresentation = VoiceInkWordReplacementInfoPresentation.macOS
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("How to use Word Replacements")
+            Text(infoPresentation.title)
                 .font(.headline)
 
             VStack(alignment: .leading, spacing: 8) {
-                Text("Separate multiple originals with commas:")
+                Text(infoPresentation.multipleOriginalsHelpText)
                     .font(.subheadline)
                     .foregroundColor(.secondary)
 
-                Text("Voicing, Voice ink, Voiceing")
+                Text(infoPresentation.multipleOriginalsExampleText)
                     .font(.callout)
                     .padding(8)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -246,66 +248,56 @@ struct WordReplacementInfoPopover: View {
 
             Divider()
 
-            Text("Examples")
+            Text(infoPresentation.examplesTitle)
                 .font(.subheadline)
                 .foregroundColor(.secondary)
 
             VStack(spacing: 12) {
-                HStack(spacing: 8) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Original:")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        Text("my website link")
-                            .font(.callout)
-                    }
-
-                    Image(systemName: "arrow.right")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Replacement:")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        Text("https://tryvoiceink.com")
-                            .font(.callout)
-                    }
+                ForEach(infoPresentation.examples, id: \.originalText) { example in
+                    WordReplacementInfoExampleRow(
+                        example: example,
+                        originalLabel: infoPresentation.originalLabel,
+                        replacementLabel: infoPresentation.replacementLabel
+                    )
                 }
-                .padding(10)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color(.textBackgroundColor))
-                .cornerRadius(6)
-
-                HStack(spacing: 8) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Original:")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        Text("Voicing, Voice ink")
-                            .font(.callout)
-                    }
-
-                    Image(systemName: "arrow.right")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Replacement:")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        Text("VoiceInk")
-                            .font(.callout)
-                    }
-                }
-                .padding(10)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color(.textBackgroundColor))
-                .cornerRadius(6)
             }
         }
         .padding()
         .frame(width: 380)
+    }
+}
+
+private struct WordReplacementInfoExampleRow: View {
+    let example: VoiceInkWordReplacementExamplePresentation
+    let originalLabel: String
+    let replacementLabel: String
+
+    var body: some View {
+        HStack(spacing: 8) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(originalLabel)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Text(example.originalText)
+                    .font(.callout)
+            }
+
+            Image(systemName: "arrow.right")
+                .font(.caption)
+                .foregroundColor(.secondary)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(replacementLabel)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Text(example.replacementText)
+                    .font(.callout)
+            }
+        }
+        .padding(10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.textBackgroundColor))
+        .cornerRadius(6)
     }
 }
 

@@ -238,6 +238,67 @@ public struct VoiceInkDictionaryQuickAddModePresentation: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkWordReplacementInfoPresentation: Equatable, Sendable {
+    public let title: String
+    public let multipleOriginalsHelpText: String
+    public let multipleOriginalsExampleText: String
+    public let examplesTitle: String
+    public let originalLabel: String
+    public let replacementLabel: String
+    public let examples: [VoiceInkWordReplacementExamplePresentation]
+
+    public static let macOS = VoiceInkWordReplacementInfoPresentation(
+        title: "How to use Word Replacements",
+        multipleOriginalsHelpText: "Separate multiple originals with commas:",
+        multipleOriginalsExampleText: "Voicing, Voice ink, Voiceing",
+        examplesTitle: "Examples",
+        originalLabel: "Original:",
+        replacementLabel: "Replacement:",
+        examples: [
+            VoiceInkWordReplacementExamplePresentation(
+                originalText: "my website link",
+                replacementText: "https://tryvoiceink.com"
+            ),
+            VoiceInkWordReplacementExamplePresentation(
+                originalText: "Voicing, Voice ink",
+                replacementText: "VoiceInk"
+            )
+        ]
+    )
+}
+
+public struct VoiceInkWordReplacementExamplePresentation: Equatable, Sendable {
+    public let originalText: String
+    public let replacementText: String
+
+    public init(originalText: String, replacementText: String) {
+        self.originalText = originalText
+        self.replacementText = replacementText
+    }
+}
+
+public struct VoiceInkWordReplacementEditPresentation: Equatable, Sendable {
+    public let cancelButtonTitle: String
+    public let title: String
+    public let saveButtonTitle: String
+    public let descriptionText: String
+    public let originalFieldTitle: String
+    public let requiredText: String
+    public let originalPlaceholder: String
+    public let replacementFieldTitle: String
+
+    public static let macOS = VoiceInkWordReplacementEditPresentation(
+        cancelButtonTitle: "Cancel",
+        title: "Edit Word Replacement",
+        saveButtonTitle: "Save",
+        descriptionText: "Update the word or phrase that should be automatically replaced.",
+        originalFieldTitle: "Original Text",
+        requiredText: "Required",
+        originalPlaceholder: "Enter word or phrase to replace (use commas for multiple)",
+        replacementFieldTitle: "Replacement Text"
+    )
+}
+
 public enum VoiceInkDictionaryPolicy {
     public static func hasVocabularyDraft(_ input: String) -> Bool {
         !tokens(from: input).isEmpty

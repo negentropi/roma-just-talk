@@ -972,6 +972,16 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
 
 require_pattern \
+  "shared word-replacement info presentation lives in VoiceInkCore" \
+  'VoiceInkWordReplacementInfoPresentation|multipleOriginalsHelpText|examplesTitle' \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+require_pattern \
+  "shared word-replacement edit presentation lives in VoiceInkCore" \
+  'VoiceInkWordReplacementEditPresentation|originalFieldTitle|replacementFieldTitle' \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+require_pattern \
   "iOS settings uses shared dictionary alert presentation" \
   'VoiceInkDictionaryAlertPresentation|dictionaryAlert|\.duplicateFillerWord|\.vocabulary|\.wordReplacement' \
   iOS/VoiceInk-ios/SettingsView.swift
@@ -1007,6 +1017,11 @@ require_pattern \
   VoiceInk/Views/Dictionary/WordReplacementView.swift
 
 require_pattern \
+  "macOS word-replacement info popover uses shared presentation" \
+  'VoiceInkWordReplacementInfoPresentation\.macOS|infoPresentation|WordReplacementInfoExampleRow' \
+  VoiceInk/Views/Dictionary/WordReplacementView.swift
+
+require_pattern \
   "macOS dictionary settings chrome uses shared dictionary settings presentation" \
   'VoiceInkDictionarySettingsPresentation\.macOS|dictionaryPresentation|section\.presentation' \
   VoiceInk/Views/Dictionary/DictionarySettingsView.swift
@@ -1024,6 +1039,11 @@ require_pattern \
 require_pattern \
   "macOS edit replacement sheet uses shared dictionary alert presentation" \
   'VoiceInkDictionaryAlertPresentation|\.wordReplacement' \
+  VoiceInk/Views/Dictionary/EditReplacementSheet.swift
+
+require_pattern \
+  "macOS edit replacement sheet uses shared edit presentation" \
+  'VoiceInkWordReplacementEditPresentation\.macOS|editPresentation' \
   VoiceInk/Views/Dictionary/EditReplacementSheet.swift
 
 require_pattern \
@@ -1070,6 +1090,16 @@ reject_pattern \
   "macOS dictionary quick-add avoids shell-only presentation copy" \
   '"(Vocabulary|Word Replacement|e\.g\. Prakash, VoiceInk|Replace|e\.g\. my email, my mail|With|e\.g\. support@tryvoiceink\.com|Add|Dismiss)"' \
   VoiceInk/Views/Dictionary/DictionaryQuickAddPanel.swift
+
+reject_pattern \
+  "macOS word-replacement info popover avoids shell-only presentation copy" \
+  '"(How to use Word Replacements|Separate multiple originals with commas:|Voicing, Voice ink, Voiceing|Examples|Original:|Replacement:|my website link|https://tryvoiceink\.com|Voicing, Voice ink|VoiceInk)"' \
+  VoiceInk/Views/Dictionary/WordReplacementView.swift
+
+reject_pattern \
+  "macOS edit replacement sheet avoids shell-only presentation copy" \
+  '"(Cancel|Edit Word Replacement|Save|Update the word or phrase that should be automatically replaced\.|Original Text|Required|Enter word or phrase to replace \(use commas for multiple\)|Replacement Text)"' \
+  VoiceInk/Views/Dictionary/EditReplacementSheet.swift
 
 reject_pattern \
   "platform dictionary surfaces avoid duplicate alert titles and persistence failure copy" \

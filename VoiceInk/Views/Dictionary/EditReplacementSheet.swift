@@ -12,6 +12,7 @@ struct EditReplacementSheet: View {
     @State private var originalWord: String
     @State private var replacementWord: String
     @State private var alertPresentation: VoiceInkDictionaryAlertPresentation?
+    private let editPresentation = VoiceInkWordReplacementEditPresentation.macOS
 
     // MARK: – Initialiser
     init(replacement: WordReplacement, modelContext: ModelContext) {
@@ -40,18 +41,18 @@ struct EditReplacementSheet: View {
     // MARK: – Subviews
     private var header: some View {
         HStack {
-            Button("Cancel", role: .cancel) { dismiss() }
+            Button(editPresentation.cancelButtonTitle, role: .cancel) { dismiss() }
                 .buttonStyle(.borderless)
                 .keyboardShortcut(.escape, modifiers: [])
 
             Spacer()
 
-            Text("Edit Word Replacement")
+            Text(editPresentation.title)
                 .font(.headline)
 
             Spacer()
 
-            Button("Save") { saveChanges() }
+            Button(editPresentation.saveButtonTitle) { saveChanges() }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.small)
                 .disabled(!canSave)
@@ -73,7 +74,7 @@ struct EditReplacementSheet: View {
     }
 
     private var descriptionSection: some View {
-        Text("Update the word or phrase that should be automatically replaced.")
+        Text(editPresentation.descriptionText)
             .font(.subheadline)
             .foregroundColor(.secondary)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -86,13 +87,13 @@ struct EditReplacementSheet: View {
             // Original Text Field
             VStack(alignment: .leading, spacing: 6) {
                 HStack {
-                    Text("Original Text")
+                    Text(editPresentation.originalFieldTitle)
                         .font(.headline)
-                    Text("Required")
+                    Text(editPresentation.requiredText)
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
-                TextField("Enter word or phrase to replace (use commas for multiple)", text: $originalWord)
+                TextField(editPresentation.originalPlaceholder, text: $originalWord)
                     .textFieldStyle(.roundedBorder)
                 
             }
@@ -101,9 +102,9 @@ struct EditReplacementSheet: View {
             // Replacement Text Field
             VStack(alignment: .leading, spacing: 6) {
                 HStack {
-                    Text("Replacement Text")
+                    Text(editPresentation.replacementFieldTitle)
                         .font(.headline)
-                    Text("Required")
+                    Text(editPresentation.requiredText)
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }

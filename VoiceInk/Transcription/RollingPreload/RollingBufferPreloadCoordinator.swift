@@ -36,57 +36,6 @@ private final class RollingBufferChunkSource: @unchecked Sendable {
     }
 }
 
-private struct RollingChunkBuffer {
-    private var chunks: [Data] = []
-    private var byteCount = 0
-    private var maxBytes: Int
-
-    init(maxBytes: Int) {
-        self.maxBytes = max(0, maxBytes)
-    }
-
-    mutating func updateMaxBytes(_ newMaxBytes: Int) {
-        maxBytes = max(0, newMaxBytes)
-        trimIfNeeded()
-    }
-
-    mutating func append(_ chunk: Data) {
-        guard !chunk.isEmpty, maxBytes > 0 else { return }
-        chunks.append(chunk)
-        byteCount += chunk.count
-        trimIfNeeded()
-    }
-
-    mutating func removeAll(keepingCapacity: Bool = true) {
-        chunks.removeAll(keepingCapacity: keepingCapacity)
-        byteCount = 0
-    }
-
-    func snapshot() -> [Data] {
-        chunks
-    }
-
-    var count: Int {
-        chunks.count
-    }
-
-    var bytes: Int {
-        byteCount
-    }
-
-    private mutating func trimIfNeeded() {
-        while byteCount > maxBytes, !chunks.isEmpty {
-            let overflow = byteCount - maxBytes
-            if overflow >= chunks[0].count {
-                byteCount -= chunks.removeFirst().count
-            } else {
-                chunks[0].removeFirst(overflow)
-                byteCount -= overflow
-            }
-        }
-    }
-}
-
 @MainActor
 final class RollingBufferPreloadCoordinator {
     typealias CurrentModelProvider = @MainActor () -> (any TranscriptionModel)?
@@ -128,7 +77,7 @@ final class RollingBufferPreloadCoordinator {
     private var cachedPlanExpiresAt = Date.distantPast
     private var state: State = .idle
     private var recordingInProgress = false
-    private var leadInBuffer: RollingChunkBuffer
+    private var leadInBuffer: VoiceInkRollingAudioBuffer
     private var vadWindow = Data()
     private var currentSession: TranscriptionSession?
     private var currentCallback: ((Data) -> Void)?
@@ -170,7 +119,7 @@ final class RollingBufferPreloadCoordinator {
             )
         }
         self.powerStateProvider = powerStateProvider
-        self.leadInBuffer = RollingChunkBuffer(
+        self.leadInBuffer = VoiceInkRollingAudioBuffer(
             maxBytes: Self.bytes(forDuration: RollingBufferPreloadSettings.defaultBufferDurationSeconds)
         )
     }
@@ -189,7 +138,7 @@ final class RollingBufferPreloadCoordinator {
         self.detectorProvider = detectorProvider
         self.sessionFactory = sessionFactory
         self.powerStateProvider = powerStateProvider
-        self.leadInBuffer = RollingChunkBuffer(
+        self.leadInBuffer = VoiceInkRollingAudioBuffer(
             maxBytes: Self.bytes(forDuration: RollingBufferPreloadSettings.defaultBufferDurationSeconds)
         )
     }
@@ -244,9 +193,7 @@ final class RollingBufferPreloadCoordinator {
             return nil
         }
 
-        let audioData = leadInBuffer.snapshot().reduce(into: Data()) { result, chunk in
-            result.append(chunk)
-        }
+        let audioData = leadInBuffer.dataSnapshot()
 
         state = .claimed
         currentSession = nil
@@ -267,9 +214,7 @@ final class RollingBufferPreloadCoordinator {
     }
 
     func claimBufferedAudioSnapshot() -> RollingBufferAudioSnapshot? {
-        let audioData = leadInBuffer.snapshot().reduce(into: Data()) { result, chunk in
-            result.append(chunk)
-        }
+        let audioData = leadInBuffer.dataSnapshot()
         guard !audioData.isEmpty else { return nil }
 
         let selectedLanguage = currentLanguageProvider()
@@ -538,7 +483,7 @@ final class RollingBufferPreloadCoordinator {
 
             currentSession = session
             currentCallback = callback
-            let bufferedChunks = leadInBuffer.snapshot()
+            let bufferedChunks = leadInBuffer.chunksSnapshot()
             for chunk in bufferedChunks {
                 callback(chunk)
                 preloadedChunks += 1

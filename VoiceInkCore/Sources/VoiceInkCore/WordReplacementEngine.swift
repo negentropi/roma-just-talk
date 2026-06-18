@@ -1,6 +1,6 @@
 import Foundation
 
-public struct VoiceInkWordReplacementRule: Equatable, Sendable {
+public struct VoiceInkWordReplacementRule: Codable, Equatable, Sendable {
     public let originalText: String
     public let replacementText: String
 

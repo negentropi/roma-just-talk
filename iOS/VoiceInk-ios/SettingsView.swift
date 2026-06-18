@@ -6,6 +6,10 @@ struct SettingsView: View {
     @StateObject private var settings = AppSettings.shared
     @State private var newFillerWord = ""
     @State private var showDuplicateFillerWordAlert = false
+    @State private var newReplacementOriginal = ""
+    @State private var newReplacementText = ""
+    @State private var wordReplacementAlertMessage = ""
+    @State private var showWordReplacementAlert = false
     
     var body: some View {
         List {
@@ -89,6 +93,32 @@ struct SettingsView: View {
                     }
                     .onDelete(perform: settings.removeFillerWords)
                 }
+
+                TextField("Original text", text: $newReplacementOriginal)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .onSubmit(addWordReplacement)
+
+                TextField("Replacement text", text: $newReplacementText)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .onSubmit(addWordReplacement)
+
+                Button(action: addWordReplacement) {
+                    Label("Add Replacement", systemImage: "plus.circle.fill")
+                }
+                .disabled(!canAddWordReplacement)
+
+                ForEach(Array(settings.wordReplacements.enumerated()), id: \.offset) { _, rule in
+                    HStack(spacing: 8) {
+                        Text(rule.originalText)
+                        Image(systemName: "arrow.right")
+                            .foregroundStyle(.secondary)
+                        Text(rule.replacementText)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .onDelete(perform: settings.removeWordReplacements)
             }
             
             Section(header: Text("Audio Settings")) {
@@ -136,6 +166,11 @@ struct SettingsView: View {
         } message: {
             Text("This filler word is already in the list.")
         }
+        .alert("Word Replacement", isPresented: $showWordReplacementAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(wordReplacementAlertMessage)
+        }
     }
 
     private var sortedTranscriptionLanguages: [VoiceInkLanguageOption] {
@@ -153,6 +188,13 @@ struct SettingsView: View {
         VoiceInkFillerWords.normalizedWord(newFillerWord) != nil
     }
 
+    private var canAddWordReplacement: Bool {
+        VoiceInkDictionaryPolicy.canSaveWordReplacementDraft(
+            original: newReplacementOriginal.trimmingCharacters(in: .whitespacesAndNewlines),
+            replacement: newReplacementText.trimmingCharacters(in: .whitespacesAndNewlines)
+        )
+    }
+
     private func addFillerWord() {
         guard canAddFillerWord else { return }
 
@@ -161,6 +203,22 @@ struct SettingsView: View {
         } else {
             showDuplicateFillerWordAlert = true
         }
+    }
+
+    private func addWordReplacement() {
+        guard canAddWordReplacement else { return }
+
+        if let error = settings.addWordReplacement(
+            original: newReplacementOriginal,
+            replacement: newReplacementText
+        ) {
+            wordReplacementAlertMessage = error
+            showWordReplacementAlert = true
+            return
+        }
+
+        newReplacementOriginal = ""
+        newReplacementText = ""
     }
     
     private func deleteMode(at offsets: IndexSet) {

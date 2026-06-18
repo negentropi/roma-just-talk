@@ -129,6 +129,27 @@ final class VoiceInkIOSTests: XCTestCase {
         }
     }
 
+    func testIOSWordReplacementPreferenceRoundTripsSharedRules() throws {
+        let defaults = try makeIsolatedDefaults()
+        let rules = [
+            VoiceInkWordReplacementRule(originalText: "roma", replacementText: "Roma Just Talk")
+        ]
+
+        VoiceInkIOSWordReplacementPreference.save(rules, to: defaults)
+
+        XCTAssertEqual(VoiceInkIOSWordReplacementPreference.rules(from: defaults), rules)
+
+        VoiceInkIOSWordReplacementPreference.clear(from: defaults)
+        XCTAssertEqual(VoiceInkIOSWordReplacementPreference.rules(from: defaults), [])
+    }
+
+    func testIOSWordReplacementPreferenceIgnoresInvalidStoredData() throws {
+        let defaults = try makeIsolatedDefaults()
+        defaults.set(Data([0]), forKey: VoiceInkIOSWordReplacementPreference.key)
+
+        XCTAssertEqual(VoiceInkIOSWordReplacementPreference.rules(from: defaults), [])
+    }
+
     func testAppGroupRecordingBridgeKeepsFreshRecordingState() throws {
         let defaults = try makeIsolatedDefaults()
         let timestamp = Date(timeIntervalSince1970: 100)

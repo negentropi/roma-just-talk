@@ -46,4 +46,15 @@ final class WordReplacementEngineTests: XCTestCase {
             "Tokyo都 and Tokyo"
         )
     }
+
+    func testRuleCodableRoundTripsIOSPreferenceShape() throws {
+        let rules = [
+            VoiceInkWordReplacementRule(originalText: "roma", replacementText: "Roma Just Talk")
+        ]
+
+        let data = try JSONEncoder().encode(rules)
+        let decoded = try JSONDecoder().decode([VoiceInkWordReplacementRule].self, from: data)
+
+        XCTAssertEqual(decoded, rules)
+    }
 }

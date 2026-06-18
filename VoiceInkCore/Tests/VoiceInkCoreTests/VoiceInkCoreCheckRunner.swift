@@ -578,6 +578,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "WordReplacementEngineTests.testApplyUsesCaseInsensitiveWordBoundariesForSpacedText", run: { WordReplacementEngineTests().testApplyUsesCaseInsensitiveWordBoundariesForSpacedText() }),
             VoiceInkCoreCheck(name: "WordReplacementEngineTests.testApplySortsCommaSeparatedVariantsByLength", run: { WordReplacementEngineTests().testApplySortsCommaSeparatedVariantsByLength() }),
             VoiceInkCoreCheck(name: "WordReplacementEngineTests.testApplyUsesSubstringReplacementForNonSpacedScripts", run: { WordReplacementEngineTests().testApplyUsesSubstringReplacementForNonSpacedScripts() }),
+            VoiceInkCoreCheck(name: "WordReplacementEngineTests.testRuleCodableRoundTripsIOSPreferenceShape", run: { try WordReplacementEngineTests().testRuleCodableRoundTripsIOSPreferenceShape() }),
         ]
 
         for check in checks {

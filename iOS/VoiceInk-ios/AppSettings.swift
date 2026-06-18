@@ -50,6 +50,10 @@ final class AppSettings: ObservableObject {
         didSet { VoiceInkFillerWordPreference.saveWords(fillerWords) }
     }
 
+    @Published var wordReplacements: [VoiceInkWordReplacementRule] {
+        didSet { VoiceInkIOSWordReplacementPreference.save(wordReplacements) }
+    }
+
     @Published var selectedTranscriptionLanguage: String {
         didSet {
             VoiceInkTranscriptionLanguagePreference.saveSelectedLanguage(selectedTranscriptionLanguage)
@@ -80,6 +84,7 @@ final class AppSettings: ObservableObject {
         self.lowercaseTranscription = cleanupSettings.lowercaseTranscription
         self.removeFillerWords = cleanupSettings.removeFillerWords
         self.fillerWords = VoiceInkFillerWordPreference.words()
+        self.wordReplacements = VoiceInkIOSWordReplacementPreference.rules()
         self.selectedTranscriptionLanguage = VoiceInkTranscriptionLanguagePreference.selectedLanguage()
 
         repairSelectedModeId()
@@ -164,6 +169,41 @@ final class AppSettings: ObservableObject {
 
     func removeFillerWords(at offsets: IndexSet) {
         fillerWords = VoiceInkFillerWords.removing(at: offsets, from: fillerWords)
+    }
+
+    @discardableResult
+    func addWordReplacement(original: String, replacement: String) -> String? {
+        let trimmedOriginal = original.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedReplacement = replacement.trimmingCharacters(in: .whitespacesAndNewlines)
+        let plan = VoiceInkDictionaryPolicy.wordReplacementInsertPlan(
+            original: trimmedOriginal,
+            replacement: trimmedReplacement,
+            existingOriginalTexts: wordReplacements.map(\.originalText)
+        )
+
+        if let errorMessage = plan.errorMessage {
+            return errorMessage
+        }
+
+        guard plan.shouldInsert else {
+            return nil
+        }
+
+        wordReplacements.append(VoiceInkWordReplacementRule(
+            originalText: plan.originalText,
+            replacementText: plan.replacementText
+        ))
+        return nil
+    }
+
+    func removeWordReplacements(at offsets: IndexSet) {
+        wordReplacements = wordReplacements.enumerated().compactMap { index, rule in
+            offsets.contains(index) ? nil : rule
+        }
+    }
+
+    var runtimeWordReplacementRules: [VoiceInkWordReplacementRule] {
+        VoiceInkWordReplacementEngine.sortedRules(wordReplacements)
     }
 
     var availableTranscriptionLanguages: [String: String] {
@@ -265,11 +305,37 @@ final class AppSettings: ObservableObject {
         lowercaseTranscription = cleanupSettings.lowercaseTranscription
         removeFillerWords = cleanupSettings.removeFillerWords
         fillerWords = defaults.fillerWords
+        wordReplacements = []
         selectedTranscriptionLanguage = defaults.selectedTranscriptionLanguage
         VoiceInkSharedPreferenceReset.clearCoreUserSettings()
+        VoiceInkIOSWordReplacementPreference.clear()
 
         // Clear API keys from memory and Keychain
         apiKeysByProvider = [:]
         VoiceInkProviderKind.userAPIKeyProviders.forEach(Self.deleteAPIKey)
+    }
+}
+
+enum VoiceInkIOSWordReplacementPreference {
+    static let key = "voiceInkIOSWordReplacements"
+
+    static func rules(from defaults: UserDefaults = .standard) -> [VoiceInkWordReplacementRule] {
+        guard let data = defaults.data(forKey: key) else {
+            return []
+        }
+
+        return (try? JSONDecoder().decode([VoiceInkWordReplacementRule].self, from: data)) ?? []
+    }
+
+    static func save(_ rules: [VoiceInkWordReplacementRule], to defaults: UserDefaults = .standard) {
+        guard let data = try? JSONEncoder().encode(rules) else {
+            return
+        }
+
+        defaults.set(data, forKey: key)
+    }
+
+    static func clear(from defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: key)
     }
 }

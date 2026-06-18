@@ -30,11 +30,15 @@ class TranscriptionRetryService {
         let cleanupConfiguration = await settings.transcriptionCleanupConfiguration
         let transcriptionLanguage = await settings.selectedTranscriptionLanguage
         let transcriptionPrompt = await settings.localWhisperPrompt
+        let wordReplacementRules = await settings.runtimeWordReplacementRules
 
         return try await runProcessor.transcribe(
             fileURL: fileURL,
             configuration: modeConfiguration,
             cleanupConfiguration: cleanupConfiguration,
+            applyingWordReplacements: { text in
+                VoiceInkWordReplacementEngine.apply(wordReplacementRules, to: text)
+            },
             postProcessingSkipConfiguration: VoiceInkPostProcessingSkipConfiguration.current(),
             transcriptionLanguage: transcriptionLanguage,
             transcriptionPrompt: transcriptionPrompt,

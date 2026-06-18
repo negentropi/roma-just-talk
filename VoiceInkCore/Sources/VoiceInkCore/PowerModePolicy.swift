@@ -1,5 +1,25 @@
 import Foundation
 
+public struct VoiceInkPowerModeAppConfig: Identifiable, Codable, Equatable, Sendable {
+    public let id: UUID
+    public var bundleIdentifier: String
+    public var appName: String
+
+    public init(id: UUID = UUID(), bundleIdentifier: String, appName: String) {
+        self.id = id
+        self.bundleIdentifier = bundleIdentifier
+        self.appName = appName
+    }
+
+    public static func == (lhs: VoiceInkPowerModeAppConfig, rhs: VoiceInkPowerModeAppConfig) -> Bool {
+        lhs.id == rhs.id
+    }
+
+    public var rule: VoiceInkPowerModeAppRule {
+        VoiceInkPowerModeAppRule(bundleIdentifier: bundleIdentifier, appName: appName)
+    }
+}
+
 public struct VoiceInkPowerModeAppRule: Equatable, Sendable {
     public let bundleIdentifier: String
     public let appName: String
@@ -7,6 +27,24 @@ public struct VoiceInkPowerModeAppRule: Equatable, Sendable {
     public init(bundleIdentifier: String, appName: String) {
         self.bundleIdentifier = bundleIdentifier
         self.appName = appName
+    }
+}
+
+public struct VoiceInkPowerModeURLConfig: Identifiable, Codable, Equatable, Sendable {
+    public let id: UUID
+    public var url: String
+
+    public init(id: UUID = UUID(), url: String) {
+        self.id = id
+        self.url = url
+    }
+
+    public static func == (lhs: VoiceInkPowerModeURLConfig, rhs: VoiceInkPowerModeURLConfig) -> Bool {
+        lhs.id == rhs.id
+    }
+
+    public var rule: VoiceInkPowerModeWebsiteRule {
+        VoiceInkPowerModeWebsiteRule(url: url)
     }
 }
 

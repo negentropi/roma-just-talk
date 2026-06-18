@@ -5,8 +5,8 @@ struct PowerModeConfig: Codable, Identifiable, Equatable {
     var id: UUID
     var name: String
     var emoji: String
-    var appConfigs: [AppConfig]?
-    var urlConfigs: [URLConfig]?
+    var appConfigs: [VoiceInkPowerModeAppConfig]?
+    var urlConfigs: [VoiceInkPowerModeURLConfig]?
     var isAIEnhancementEnabled: Bool
     var selectedPrompt: String?
     var selectedTranscriptionModelName: String?
@@ -27,8 +27,8 @@ struct PowerModeConfig: Codable, Identifiable, Equatable {
         case selectedTranscriptionModelName
     }
     
-    init(id: UUID = UUID(), name: String, emoji: String, appConfigs: [AppConfig]? = nil,
-         urlConfigs: [URLConfig]? = nil, isAIEnhancementEnabled: Bool, selectedPrompt: String? = nil,
+    init(id: UUID = UUID(), name: String, emoji: String, appConfigs: [VoiceInkPowerModeAppConfig]? = nil,
+         urlConfigs: [VoiceInkPowerModeURLConfig]? = nil, isAIEnhancementEnabled: Bool, selectedPrompt: String? = nil,
          selectedTranscriptionModelName: String? = nil, selectedLanguage: String? = nil, useScreenCapture: Bool = false,
          isTextFormattingEnabled: Bool = false, punctuationCleanupMode: PunctuationCleanupMode = .keep, lowercaseTranscription: Bool = false,
          selectedAIProvider: String? = nil, selectedAIModel: String? = nil, autoSendKey: VoiceInkAutoSendKey = .none, isEnabled: Bool = true, isDefault: Bool = false) {
@@ -57,8 +57,8 @@ struct PowerModeConfig: Codable, Identifiable, Equatable {
         id = try container.decode(UUID.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)
         emoji = try container.decode(String.self, forKey: .emoji)
-        appConfigs = try container.decodeIfPresent([AppConfig].self, forKey: .appConfigs)
-        urlConfigs = try container.decodeIfPresent([URLConfig].self, forKey: .urlConfigs)
+        appConfigs = try container.decodeIfPresent([VoiceInkPowerModeAppConfig].self, forKey: .appConfigs)
+        urlConfigs = try container.decodeIfPresent([VoiceInkPowerModeURLConfig].self, forKey: .urlConfigs)
         isAIEnhancementEnabled = try container.decode(Bool.self, forKey: .isAIEnhancementEnabled)
         selectedPrompt = try container.decodeIfPresent(String.self, forKey: .selectedPrompt)
         selectedLanguage = try container.decodeIfPresent(String.self, forKey: .selectedLanguage)
@@ -137,50 +137,13 @@ extension Array where Element == PowerModeConfig {
     }
 }
 
-struct AppConfig: Codable, Identifiable, Equatable {
-    let id: UUID
-    var bundleIdentifier: String
-    var appName: String
-    
-    init(id: UUID = UUID(), bundleIdentifier: String, appName: String) {
-        self.id = id
-        self.bundleIdentifier = bundleIdentifier
-        self.appName = appName
-    }
-    
-    static func == (lhs: AppConfig, rhs: AppConfig) -> Bool {
-        lhs.id == rhs.id
-    }
-}
-
-struct URLConfig: Codable, Identifiable, Equatable {
-    let id: UUID
-    var url: String
-    
-    init(id: UUID = UUID(), url: String) {
-        self.id = id
-        self.url = url
-    }
-    
-    static func == (lhs: URLConfig, rhs: URLConfig) -> Bool {
-        lhs.id == rhs.id
-    }
-}
-
 extension PowerModeConfig {
     var powerModePolicyRule: VoiceInkPowerModeRule {
         VoiceInkPowerModeRule(
             id: id,
             name: name,
-            appRules: (appConfigs ?? []).map { appConfig in
-                VoiceInkPowerModeAppRule(
-                    bundleIdentifier: appConfig.bundleIdentifier,
-                    appName: appConfig.appName
-                )
-            },
-            websiteRules: (urlConfigs ?? []).map { urlConfig in
-                VoiceInkPowerModeWebsiteRule(url: urlConfig.url)
-            },
+            appRules: (appConfigs ?? []).map(\.rule),
+            websiteRules: (urlConfigs ?? []).map(\.rule),
             isEnabled: isEnabled,
             isDefault: isDefault
         )
@@ -333,7 +296,7 @@ class PowerModeManager: ObservableObject {
         NotificationCenter.default.post(name: .powerModeShortcutAvailabilityDidChange, object: nil)
     }
 
-    func addAppConfig(_ appConfig: AppConfig, to config: PowerModeConfig) {
+    func addAppConfig(_ appConfig: VoiceInkPowerModeAppConfig, to config: PowerModeConfig) {
         if var updatedConfig = configurations.first(where: { $0.id == config.id }) {
             var configs = updatedConfig.appConfigs ?? []
             configs.append(appConfig)
@@ -342,14 +305,14 @@ class PowerModeManager: ObservableObject {
         }
     }
 
-    func removeAppConfig(_ appConfig: AppConfig, from config: PowerModeConfig) {
+    func removeAppConfig(_ appConfig: VoiceInkPowerModeAppConfig, from config: PowerModeConfig) {
         if var updatedConfig = configurations.first(where: { $0.id == config.id }) {
             updatedConfig.appConfigs?.removeAll(where: { $0.id == appConfig.id })
             updateConfiguration(updatedConfig)
         }
     }
 
-    func addURLConfig(_ urlConfig: URLConfig, to config: PowerModeConfig) {
+    func addURLConfig(_ urlConfig: VoiceInkPowerModeURLConfig, to config: PowerModeConfig) {
         if var updatedConfig = configurations.first(where: { $0.id == config.id }) {
             var configs = updatedConfig.urlConfigs ?? []
             configs.append(urlConfig)
@@ -358,7 +321,7 @@ class PowerModeManager: ObservableObject {
         }
     }
 
-    func removeURLConfig(_ urlConfig: URLConfig, from config: PowerModeConfig) {
+    func removeURLConfig(_ urlConfig: VoiceInkPowerModeURLConfig, from config: PowerModeConfig) {
         if var updatedConfig = configurations.first(where: { $0.id == config.id }) {
             updatedConfig.urlConfigs?.removeAll(where: { $0.id == urlConfig.id })
             updateConfiguration(updatedConfig)

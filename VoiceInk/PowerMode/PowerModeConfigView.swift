@@ -27,8 +27,8 @@ struct ConfigurationView: View {
     @State private var showValidationAlert = false
     @State private var selectedAIProvider: String?
     @State private var selectedAIModel: String?
-    @State private var selectedAppConfigs: [AppConfig] = []
-    @State private var websiteConfigs: [URLConfig] = []
+    @State private var selectedAppConfigs: [VoiceInkPowerModeAppConfig] = []
+    @State private var websiteConfigs: [VoiceInkPowerModeURLConfig] = []
     @State private var newWebsiteURL: String = ""
     @State private var useScreenCapture = false
     @State private var autoSendKey: VoiceInkAutoSendKey = .none
@@ -617,7 +617,7 @@ struct ConfigurationView: View {
     private func addWebsite() {
         guard !newWebsiteURL.isEmpty else { return }
         let cleanedURL = powerModeManager.cleanURL(newWebsiteURL)
-        websiteConfigs.append(URLConfig(url: cleanedURL))
+        websiteConfigs.append(VoiceInkPowerModeURLConfig(url: cleanedURL))
         newWebsiteURL = ""
     }
 

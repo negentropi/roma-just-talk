@@ -926,6 +926,39 @@ require_pattern \
   VoiceInk/PowerMode/PowerModeConfig.swift
 
 require_pattern \
+  "shared Power Mode trigger config records live in VoiceInkCore" \
+  'struct VoiceInkPowerMode(App|URL)Config' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+reject_pattern \
+  "macOS Power Mode avoids shell-only trigger config records" \
+  '\b(App|URL)Config\b' \
+  VoiceInk/PowerMode/PowerModeConfig.swift \
+  VoiceInk/PowerMode/PowerModeConfigView.swift \
+  VoiceInk/PowerMode/PowerModeViewComponents.swift \
+  VoiceInk/PowerMode/AppPicker.swift
+
+require_pattern \
+  "macOS Power Mode config consumes shared trigger config records" \
+  'VoiceInkPowerMode(App|URL)Config' \
+  VoiceInk/PowerMode/PowerModeConfig.swift
+
+require_pattern \
+  "macOS Power Mode form consumes shared trigger config records" \
+  'VoiceInkPowerMode(App|URL)Config' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+require_pattern \
+  "macOS Power Mode cards consume shared trigger config records" \
+  'VoiceInkPowerModeAppConfig' \
+  VoiceInk/PowerMode/PowerModeViewComponents.swift
+
+require_pattern \
+  "macOS app picker consumes shared trigger config records" \
+  'VoiceInkPowerModeAppConfig' \
+  VoiceInk/PowerMode/AppPicker.swift
+
+require_pattern \
   "shared auto-send key state lives in VoiceInkCore" \
   'enum VoiceInkAutoSendKey' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
@@ -938,10 +971,18 @@ reject_pattern \
   VoiceInk/Paste/CursorPaster.swift
 
 require_pattern \
-  "macOS Power Mode consumes shared auto-send key state" \
+  "macOS Power Mode config consumes shared auto-send key state" \
   'VoiceInkAutoSendKey' \
-  VoiceInk/PowerMode/PowerModeConfig.swift \
-  VoiceInk/PowerMode/PowerModeConfigView.swift \
+  VoiceInk/PowerMode/PowerModeConfig.swift
+
+require_pattern \
+  "macOS Power Mode form consumes shared auto-send key state" \
+  'VoiceInkAutoSendKey' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+require_pattern \
+  "macOS paste adapter consumes shared auto-send key state" \
+  'VoiceInkAutoSendKey' \
   VoiceInk/Paste/CursorPaster.swift
 
 require_pattern \

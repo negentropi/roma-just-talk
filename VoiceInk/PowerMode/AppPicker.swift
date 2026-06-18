@@ -1,8 +1,9 @@
 import SwiftUI
+import VoiceInkCore
 
 struct AppPickerPopover: View {
     let installedApps: [(url: URL, name: String, bundleId: String, icon: NSImage)]
-    @Binding var selectedAppConfigs: [AppConfig]
+    @Binding var selectedAppConfigs: [VoiceInkPowerModeAppConfig]
     @Binding var searchText: String
 
     var body: some View {
@@ -73,7 +74,7 @@ struct AppPickerPopover: View {
         if let index = selectedAppConfigs.firstIndex(where: { $0.bundleIdentifier == app.bundleId }) {
             selectedAppConfigs.remove(at: index)
         } else {
-            selectedAppConfigs.append(AppConfig(bundleIdentifier: app.bundleId, appName: app.name))
+            selectedAppConfigs.append(VoiceInkPowerModeAppConfig(bundleIdentifier: app.bundleId, appName: app.name))
         }
     }
 }

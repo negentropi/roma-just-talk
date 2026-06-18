@@ -2,6 +2,48 @@ import Foundation
 import VoiceInkCore
 
 final class PowerModePolicyTests: XCTestCase {
+    func testPowerModeTriggerConfigsPreserveStoredShapeAndIdEquality() throws {
+        let id = UUID()
+        let appConfig = VoiceInkPowerModeAppConfig(
+            id: id,
+            bundleIdentifier: "com.example.App",
+            appName: "Example"
+        )
+        let renamedAppConfig = VoiceInkPowerModeAppConfig(
+            id: id,
+            bundleIdentifier: "com.example.Other",
+            appName: "Other"
+        )
+        let urlConfig = VoiceInkPowerModeURLConfig(id: id, url: "example.com")
+        let renamedURLConfig = VoiceInkPowerModeURLConfig(id: id, url: "other.example.com")
+
+        XCTAssertEqual(appConfig, renamedAppConfig)
+        XCTAssertEqual(urlConfig, renamedURLConfig)
+
+        let appObject = try jsonObject(from: appConfig)
+        XCTAssertEqual(appObject["id"] as? String, id.uuidString)
+        XCTAssertEqual(appObject["bundleIdentifier"] as? String, "com.example.App")
+        XCTAssertEqual(appObject["appName"] as? String, "Example")
+
+        let urlObject = try jsonObject(from: urlConfig)
+        XCTAssertEqual(urlObject["id"] as? String, id.uuidString)
+        XCTAssertEqual(urlObject["url"] as? String, "example.com")
+    }
+
+    func testPowerModeTriggerConfigsAdaptToPolicyRules() {
+        XCTAssertEqual(
+            VoiceInkPowerModeAppConfig(
+                bundleIdentifier: "com.example.App",
+                appName: "Example"
+            ).rule,
+            VoiceInkPowerModeAppRule(bundleIdentifier: "com.example.App", appName: "Example")
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeURLConfig(url: "example.com").rule,
+            VoiceInkPowerModeWebsiteRule(url: "example.com")
+        )
+    }
+
     func testAutoSendKeyPreservesStoredValuesPickerOrderAndLabels() {
         XCTAssertEqual(
             VoiceInkAutoSendKey.allCases,
@@ -233,5 +275,10 @@ final class PowerModePolicyTests: XCTestCase {
             isEnabled: isEnabled,
             isDefault: isDefault
         )
+    }
+
+    private func jsonObject<T: Encodable>(from value: T) throws -> [String: Any] {
+        let data = try JSONEncoder().encode(value)
+        return try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
     }
 }

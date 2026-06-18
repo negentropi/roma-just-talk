@@ -124,9 +124,7 @@ struct AudioPlayerView: View {
             }
         }
         .onAppear {
-            if FileManager.default.fileExists(atPath: audioFilePath) {
-                player.loadAudio(from: audioFilePath)
-            }
+            player.loadAudio(from: audioFilePath)
         }
         .onDisappear {
             player.stop()

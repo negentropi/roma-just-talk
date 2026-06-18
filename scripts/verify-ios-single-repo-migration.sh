@@ -355,6 +355,11 @@ reject_pattern \
   'VoiceInkStoredAudioFile\.(availability|existingURL|fileExists)|FileManager|audioFileURL' \
   iOS/VoiceInk-ios/NoteDetailView.swift
 
+reject_pattern \
+  "iOS audio player consumes availability-gated paths" \
+  'FileManager\.default\.fileExists' \
+  iOS/VoiceInk-ios/AudioPlayerView.swift
+
 require_pattern \
   "iOS note deletion uses shared stored-audio record delete helper" \
   'deleteExistingAudioFile\(\)' \

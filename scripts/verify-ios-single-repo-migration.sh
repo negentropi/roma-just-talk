@@ -1698,6 +1698,26 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
+  "shared current-model preference remembers legacy macOS model key" \
+  'legacyModelNameKey += +"CurrentModel"' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared current-model preference clears legacy macOS model key" \
+  'removeObject\(forKey: legacyModelNameKey\)' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "macOS transcription model manager clears through shared current-model preference" \
+  'VoiceInkCurrentTranscriptionModelPreference\.clearModelName\(\)' \
+  VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
+
+reject_pattern \
+  "macOS transcription model manager avoids shell-only legacy model key cleanup" \
+  'removeObject\(forKey: +"CurrentModel"\)|"CurrentModel"' \
+  VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
+
+require_pattern \
   "shared audio-session timeout preference owns iOS timeout minimum" \
   'minimumSeconds = 0' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift

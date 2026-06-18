@@ -597,6 +597,16 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testCurrentTranscriptionModelPreferenceClearsLegacyModelName() {
+        withIsolatedDefaults { defaults in
+            defaults.set("legacy-base", forKey: VoiceInkCurrentTranscriptionModelPreference.legacyModelNameKey)
+
+            VoiceInkCurrentTranscriptionModelPreference.clearModelName(from: defaults)
+
+            XCTAssertNil(defaults.string(forKey: VoiceInkCurrentTranscriptionModelPreference.legacyModelNameKey))
+        }
+    }
+
     func testAIEnhancementProviderPreferenceUsesDefaultWhenMissing() {
         withIsolatedDefaults { defaults in
             XCTAssertNil(VoiceInkAIEnhancementProviderPreference.selectedProviderRawValue(from: defaults))

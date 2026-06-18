@@ -157,7 +157,6 @@ class TranscriptionModelManager: ObservableObject {
             VoiceInkCurrentTranscriptionModelPreference.clearModelName()
             whisperModelManager?.loadedWhisperModel = nil
             whisperModelManager?.isModelLoaded = false
-            UserDefaults.standard.removeObject(forKey: "CurrentModel")
         }
         refreshAllAvailableModels()
     }

@@ -418,6 +418,8 @@ public enum VoiceInkTranscriptionLanguagePreference {
 }
 
 public enum VoiceInkCurrentTranscriptionModelPreference {
+    static let legacyModelNameKey = "CurrentModel"
+
     public static func modelName(from defaults: UserDefaults = .standard) -> String? {
         defaults.string(forKey: VoiceInkUserDefaultsKey.currentTranscriptionModel)
     }
@@ -428,6 +430,7 @@ public enum VoiceInkCurrentTranscriptionModelPreference {
 
     public static func clearModelName(from defaults: UserDefaults = .standard) {
         defaults.removeObject(forKey: VoiceInkUserDefaultsKey.currentTranscriptionModel)
+        defaults.removeObject(forKey: legacyModelNameKey)
     }
 }
 

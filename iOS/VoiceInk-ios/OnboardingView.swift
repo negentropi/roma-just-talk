@@ -119,8 +119,14 @@ struct ModelDownloadOnboardingView: View {
     private var downloadConfirmation: VoiceInkWhisperModelOperationConfirmationPresentation {
         .download(for: baseModel)
     }
+
+    private var rowPresentation: VoiceInkWhisperModelDownloadRowPresentation {
+        baseModelDownloadState.rowPresentation(for: baseModel)
+    }
     
     var body: some View {
+        let presentation = rowPresentation
+
         VStack(spacing: 0) {
             Spacer()
             
@@ -151,42 +157,43 @@ struct ModelDownloadOnboardingView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(baseModel.displayName)
+                            Text(presentation.title)
                                 .font(.headline).fontWeight(.semibold)
-                            Text(baseModel.description)
+                            Text(presentation.subtitle)
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                         }
                         
                         Spacer()
                         
-                        if baseModelDownloadState.isDownloaded {
-                            Image(systemName: "checkmark.circle.fill")
+                        switch presentation.action {
+                        case .downloaded:
+                            Image(systemName: presentation.statusSystemImageName ?? "checkmark.circle.fill")
                                 .foregroundColor(.green)
                                 .font(.title)
-                        } else if baseModelDownloadState.isDownloading {
+                        case .downloading:
                             ProgressView()
                                 .progressViewStyle(CircularProgressViewStyle())
-                        } else {
-                            Image(systemName: "icloud.and.arrow.down")
+                        case .download:
+                            Image(systemName: presentation.statusSystemImageName ?? "icloud.and.arrow.down")
                                 .foregroundColor(.accentColor)
                                 .font(.title)
                         }
                     }
                     
-                    if baseModelDownloadState.progress.isActive {
+                    if presentation.shouldShowProgress {
                         VStack(alignment: .leading, spacing: 6) {
                             HStack {
-                                Text(baseModelDownloadState.progress.compactStatusText)
+                                Text(presentation.progress.compactStatusText)
                                     .font(.caption)
                                     .foregroundColor(.accentColor)
                                 Spacer()
-                                Text(baseModelDownloadState.progress.percentText)
+                                Text(presentation.progress.percentText)
                                     .font(.caption.monospacedDigit())
                                     .foregroundColor(.accentColor)
                             }
                             
-                            ProgressView(value: baseModelDownloadState.progress.fraction)
+                            ProgressView(value: presentation.progress.fraction)
                                 .progressViewStyle(LinearProgressViewStyle(tint: .accentColor))
                         }
                     }
@@ -201,25 +208,27 @@ struct ModelDownloadOnboardingView: View {
             
             // Bottom Action Buttons
             VStack(spacing: 16) {
-                if baseModelDownloadState.isDownloading {
-                    Button(baseModelDownloadState.progress.compactStatusText) {}
+                switch presentation.action {
+                case .downloading:
+                    Button(presentation.progress.compactStatusText) {}
                         .buttonStyle(OnboardingButtonStyle())
                         .disabled(true)
-                    
-                } else if baseModelDownloadState.isDownloaded {
+
+                case .downloaded:
                     Button("Continue") {
                         withAnimation(.easeInOut(duration: 0.3)) {
                             currentStep = 2
                         }
                     }
                     .buttonStyle(OnboardingButtonStyle())
-                } else {
+
+                case .download:
                     Button(action: {
                         showDownloadConfirmation = true
                     }) {
                         HStack(spacing: 8) {
                             Image(systemName: "arrow.down.circle.fill")
-                            Text(VoiceInkWhisperModelDownloadProgress.downloadActionTitle(for: baseModel))
+                            Text(presentation.downloadButtonTitle)
                         }
                     }
                     .buttonStyle(OnboardingButtonStyle())

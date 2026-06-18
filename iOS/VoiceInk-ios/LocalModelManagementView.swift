@@ -60,14 +60,20 @@ struct ModelRowView: View {
     private var deleteConfirmation: VoiceInkWhisperModelOperationConfirmationPresentation {
         .delete(for: model)
     }
+
+    private var rowPresentation: VoiceInkWhisperModelDownloadRowPresentation {
+        downloadState.rowPresentation(for: model)
+    }
     
     var body: some View {
+        let presentation = rowPresentation
+
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(model.displayName)
+                    Text(presentation.title)
                         .font(.headline)
-                    Text(model.description)
+                    Text(presentation.subtitle)
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -75,11 +81,12 @@ struct ModelRowView: View {
                 Spacer()
                 
                 // Action button where size used to be
-                if downloadState.isDownloaded {
-                    Image(systemName: "checkmark.circle.fill")
+                switch presentation.action {
+                case .downloaded:
+                    Image(systemName: presentation.statusSystemImageName ?? "checkmark.circle.fill")
                         .foregroundColor(.green)
                         .font(.title2)
-                } else if downloadState.isDownloading {
+                case .downloading:
                     Button(action: {
                         modelManager.cancelDownload(for: model)
                     }) {
@@ -87,11 +94,11 @@ struct ModelRowView: View {
                             .foregroundColor(.red)
                             .font(.title2)
                     }
-                } else {
+                case .download:
                     Button(action: {
                         showingDownloadConfirmation = true
                     }) {
-                        Image(systemName: "icloud.and.arrow.down")
+                        Image(systemName: presentation.statusSystemImageName ?? "icloud.and.arrow.down")
                             .foregroundColor(.blue)
                             .font(.title2)
                     }
@@ -99,25 +106,25 @@ struct ModelRowView: View {
             }
             
             // Progress indicator when downloading
-            if downloadState.progress.isActive {
+            if presentation.shouldShowProgress {
                 VStack(alignment: .leading, spacing: 6) {
                     HStack {
-                        Text(downloadState.progress.compactStatusText)
+                        Text(presentation.progress.compactStatusText)
                             .font(.caption)
                             .foregroundColor(.blue)
                         Spacer()
-                        Text(downloadState.progress.percentText)
+                        Text(presentation.progress.percentText)
                             .font(.caption)
                             .foregroundColor(.blue)
                     }
                     
-                    ProgressView(value: downloadState.progress.fraction)
+                    ProgressView(value: presentation.progress.fraction)
                         .progressViewStyle(LinearProgressViewStyle(tint: .blue))
                 }
             }
         }
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-            if downloadState.isDownloaded {
+            if presentation.action == .downloaded {
                 Button("Delete") {
                     showingDeleteAlert = true
                 }

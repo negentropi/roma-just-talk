@@ -709,6 +709,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testDownloadResponsePolicyPreservesHTTPStatusSuccessRange", run: { WhisperModelFilesTests().testDownloadResponsePolicyPreservesHTTPStatusSuccessRange() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadProgressFormatsIOSProgress", run: { WhisperModelFilesTests().testSimpleDownloadProgressFormatsIOSProgress() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadStateCombinesIOSDownloadedAndProgressState", run: { try WhisperModelFilesTests().testSimpleDownloadStateCombinesIOSDownloadedAndProgressState() }),
+            VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadStateBuildsSharedRowPresentation", run: { WhisperModelFilesTests().testSimpleDownloadStateBuildsSharedRowPresentation() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testMacOSDownloadProgressUsesMainAndCoreMLKeys", run: { WhisperModelFilesTests().testMacOSDownloadProgressUsesMainAndCoreMLKeys() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testMacOSDownloadProgressIgnoresCoreMLForQuantizedModels", run: { WhisperModelFilesTests().testMacOSDownloadProgressIgnoresCoreMLForQuantizedModels() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testModelDownloadCopyUsesSharedModelSize", run: { WhisperModelFilesTests().testModelDownloadCopyUsesSharedModelSize() }),

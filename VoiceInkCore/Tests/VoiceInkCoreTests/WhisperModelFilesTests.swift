@@ -318,6 +318,44 @@ final class WhisperModelFilesTests: XCTestCase {
         XCTAssertEqual(downloadedState.progress.phase, .idle)
     }
 
+    func testSimpleDownloadStateBuildsSharedRowPresentation() {
+        let model = VoiceInkWhisperModelFiles.baseModel
+        let downloadingState = VoiceInkWhisperModelDownloadState(
+            isDownloaded: false,
+            progress: .simple(modelName: model.modelName, isDownloading: true, progress: 0.25)
+        )
+
+        XCTAssertEqual(
+            downloadingState.rowPresentation(for: model),
+            VoiceInkWhisperModelDownloadRowPresentation(
+                title: model.displayName,
+                subtitle: model.description,
+                action: .downloading,
+                statusSystemImageName: nil,
+                downloadButtonTitle: VoiceInkWhisperModelDownloadProgress.downloadActionTitle(for: model),
+                progress: downloadingState.progress
+            )
+        )
+        XCTAssertTrue(downloadingState.rowPresentation(for: model).shouldShowProgress)
+
+        let downloadedState = VoiceInkWhisperModelDownloadState(isDownloaded: true, progress: .simple(
+            modelName: model.modelName,
+            isDownloading: false,
+            progress: nil
+        ))
+        XCTAssertEqual(downloadedState.rowPresentation(for: model).action, .downloaded)
+        XCTAssertEqual(downloadedState.rowPresentation(for: model).statusSystemImageName, "checkmark.circle.fill")
+
+        let idleState = VoiceInkWhisperModelDownloadState(isDownloaded: false, progress: .simple(
+            modelName: model.modelName,
+            isDownloading: false,
+            progress: nil
+        ))
+        XCTAssertEqual(idleState.rowPresentation(for: model).action, .download)
+        XCTAssertEqual(idleState.rowPresentation(for: model).statusSystemImageName, "icloud.and.arrow.down")
+        XCTAssertFalse(idleState.rowPresentation(for: model).shouldShowProgress)
+    }
+
     func testMacOSDownloadProgressUsesMainAndCoreMLKeys() {
         let startingProgress = VoiceInkWhisperModelDownloadProgress.macOS(
             modelName: "ggml-base",

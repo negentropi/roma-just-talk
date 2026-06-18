@@ -242,12 +242,58 @@ public struct VoiceInkWhisperModelDownloadProgress: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkWhisperModelDownloadRowAction: Equatable, Sendable {
+    case download
+    case downloading
+    case downloaded
+}
+
+public struct VoiceInkWhisperModelDownloadRowPresentation: Equatable, Sendable {
+    public let title: String
+    public let subtitle: String
+    public let action: VoiceInkWhisperModelDownloadRowAction
+    public let statusSystemImageName: String?
+    public let downloadButtonTitle: String
+    public let progress: VoiceInkWhisperModelDownloadProgress
+
+    public var shouldShowProgress: Bool {
+        progress.isActive
+    }
+}
+
 public struct VoiceInkWhisperModelDownloadState: Equatable, Sendable {
     public let isDownloaded: Bool
     public let progress: VoiceInkWhisperModelDownloadProgress
 
     public var isDownloading: Bool {
         progress.isActive
+    }
+
+    public func rowPresentation(
+        for model: VoiceInkWhisperModelFileSpec
+    ) -> VoiceInkWhisperModelDownloadRowPresentation {
+        let action: VoiceInkWhisperModelDownloadRowAction
+        let statusSystemImageName: String?
+
+        if isDownloaded {
+            action = .downloaded
+            statusSystemImageName = "checkmark.circle.fill"
+        } else if isDownloading {
+            action = .downloading
+            statusSystemImageName = nil
+        } else {
+            action = .download
+            statusSystemImageName = "icloud.and.arrow.down"
+        }
+
+        return VoiceInkWhisperModelDownloadRowPresentation(
+            title: model.displayName,
+            subtitle: model.description,
+            action: action,
+            statusSystemImageName: statusSystemImageName,
+            downloadButtonTitle: VoiceInkWhisperModelDownloadProgress.downloadActionTitle(for: model),
+            progress: progress
+        )
     }
 
     public init(

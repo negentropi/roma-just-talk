@@ -695,6 +695,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
 
 require_pattern \
+  "shared Whisper model download row presentation lives in VoiceInkCore" \
+  'VoiceInkWhisperModelDownloadRowPresentation|rowPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+
+require_pattern \
   "shared Whisper model operation alert presentation lives in VoiceInkCore" \
   'VoiceInkWhisperModelOperationAlertPresentation' \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
@@ -740,6 +745,11 @@ require_pattern \
   iOS/VoiceInk-ios/LocalModelManagementView.swift
 
 require_pattern \
+  "iOS local model management uses shared model row presentation" \
+  'rowPresentation' \
+  iOS/VoiceInk-ios/LocalModelManagementView.swift
+
+require_pattern \
   "iOS local model manager uses shared operation alert presentation" \
   'VoiceInkWhisperModelOperationAlertPresentation|\.(downloadFailed|serverErrorDuringDownload|noFileReceived|saveFailed)' \
   iOS/VoiceInk-ios/LocalModelManager.swift
@@ -774,9 +784,20 @@ require_pattern \
   '\.progress\.compactStatusText' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
+require_pattern \
+  "iOS onboarding uses shared model row presentation" \
+  'rowPresentation' \
+  iOS/VoiceInk-ios/OnboardingView.swift
+
 reject_pattern \
   "iOS model download views avoid shell-only downloaded/progress state assembly" \
   'model\.isDownloaded\(in:|modelManager\.isDownloading\[[^]]+\] == true|modelManager\.downloadProgress\[[^]]+\]' \
+  iOS/VoiceInk-ios/LocalModelManagementView.swift \
+  iOS/VoiceInk-ios/OnboardingView.swift
+
+reject_pattern \
+  "iOS model download views avoid raw download-state presentation branching" \
+  '(downloadState|baseModelDownloadState)\.(isDownloaded|isDownloading|progress\.isActive|progress\.compactStatusText|progress\.percentText|progress\.fraction)|VoiceInkWhisperModelDownloadProgress\.downloadActionTitle' \
   iOS/VoiceInk-ios/LocalModelManagementView.swift \
   iOS/VoiceInk-ios/OnboardingView.swift
 

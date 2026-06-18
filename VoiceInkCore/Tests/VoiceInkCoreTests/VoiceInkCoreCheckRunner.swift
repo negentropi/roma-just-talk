@@ -149,6 +149,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "LanguageCatalogTests.testLanguageCatalogPreservesSharedNames", run: { LanguageCatalogTests().testLanguageCatalogPreservesSharedNames() }),
             VoiceInkCoreCheck(name: "LanguageCatalogTests.testWhisperLanguagesPreserveMacOSWhisperSet", run: { LanguageCatalogTests().testWhisperLanguagesPreserveMacOSWhisperSet() }),
             VoiceInkCoreCheck(name: "LanguageCatalogTests.testNativeAppleLanguagesUseBCP47Identifiers", run: { LanguageCatalogTests().testNativeAppleLanguagesUseBCP47Identifiers() }),
+            VoiceInkCoreCheck(name: "LanguageCatalogTests.testNativeAppleDisplayNameUsesCatalogThenLocalizedFallback", run: { LanguageCatalogTests().testNativeAppleDisplayNameUsesCatalogThenLocalizedFallback() }),
             VoiceInkCoreCheck(name: "LanguageCatalogTests.testFluidAudioLanguagesPreserveParakeetPolicies", run: { LanguageCatalogTests().testFluidAudioLanguagesPreserveParakeetPolicies() }),
             VoiceInkCoreCheck(name: "LanguageCatalogTests.testProviderLanguagesPreserveCloudProviderPolicies", run: { LanguageCatalogTests().testProviderLanguagesPreserveCloudProviderPolicies() }),
             VoiceInkCoreCheck(name: "LanguageCatalogTests.testProviderKindLanguagesExposeLocalWhisperPolicy", run: { LanguageCatalogTests().testProviderKindLanguagesExposeLocalWhisperPolicy() }),

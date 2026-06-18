@@ -38,12 +38,6 @@ class NativeAppleTranscriptionService: TranscriptionService {
         }
     }
 
-    private func languageDisplayName(for localeIdentifier: String) -> String {
-        VoiceInkLanguageCatalog.nativeApple[localeIdentifier]
-            ?? Locale.current.localizedString(forIdentifier: localeIdentifier)
-            ?? localeIdentifier
-    }
-
     func transcribe(audioURL: URL, model: any TranscriptionModel) async throws -> String {
         guard model is NativeAppleModel else {
             throw ServiceError.invalidModel
@@ -72,7 +66,7 @@ class NativeAppleTranscriptionService: TranscriptionService {
         let isLocaleInstalled = installedIdentifiers.contains(locale.identifier(.bcp47))
         
         let selectedLocaleIdentifier = locale.identifier(.bcp47)
-        let displayName = languageDisplayName(for: selectedLocaleIdentifier)
+        let displayName = VoiceInkLanguageCatalog.nativeAppleDisplayName(for: selectedLocaleIdentifier)
 
         guard isLocaleSupported else {
             logger.error("Transcription failed: Locale '\(locale.identifier(.bcp47), privacy: .public)' is not supported by SpeechTranscriber.")

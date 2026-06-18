@@ -900,6 +900,16 @@ require_pattern \
   'VoiceInkTranscriptionLanguagePreference\.selectedLanguage\(source: \.nativeApple\)' \
   VoiceInk/Transcription/Native/NativeAppleTranscriptionService.swift
 
+require_pattern \
+  "macOS Native Apple transcription uses shared locale display fallback" \
+  'VoiceInkLanguageCatalog\.nativeAppleDisplayName' \
+  VoiceInk/Transcription/Native/NativeAppleTranscriptionService.swift
+
+reject_pattern \
+  "macOS Native Apple transcription avoids shell-only locale display fallback" \
+  'private func +languageDisplayName|VoiceInkLanguageCatalog\.nativeApple\[' \
+  VoiceInk/Transcription/Native/NativeAppleTranscriptionService.swift
+
 reject_pattern \
   "macOS selected-language callers avoid shell-only fallback literals" \
   'selectedLanguage\(fallback: "(en|auto|en-US)"\)|selectedLanguage = "(en|auto)"' \

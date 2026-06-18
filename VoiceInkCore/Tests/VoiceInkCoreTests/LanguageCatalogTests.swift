@@ -26,6 +26,23 @@ final class LanguageCatalogTests: XCTestCase {
         XCTAssertNil(VoiceInkLanguageCatalog.nativeApple["en"])
     }
 
+    func testNativeAppleDisplayNameUsesCatalogThenLocalizedFallback() {
+        let locale = Locale(identifier: "en_US_POSIX")
+
+        XCTAssertEqual(
+            VoiceInkLanguageCatalog.nativeAppleDisplayName(for: "en-US", locale: locale),
+            "English (United States)"
+        )
+        XCTAssertEqual(
+            VoiceInkLanguageCatalog.nativeAppleDisplayName(for: "es-AR", locale: locale),
+            "Spanish (Argentina)"
+        )
+        XCTAssertEqual(
+            VoiceInkLanguageCatalog.nativeAppleDisplayName(for: "zz-ZZ", locale: locale),
+            "zz-ZZ"
+        )
+    }
+
     func testFluidAudioLanguagesPreserveParakeetPolicies() {
         let languages = VoiceInkLanguageCatalog.fluidAudioLanguages()
 

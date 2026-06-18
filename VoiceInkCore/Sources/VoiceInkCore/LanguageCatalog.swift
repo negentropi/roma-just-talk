@@ -79,6 +79,15 @@ public enum VoiceInkLanguageCatalog {
         "zh-TW": "Chinese (Taiwan)"
     ]
 
+    public static func nativeAppleDisplayName(
+        for localeIdentifier: String,
+        locale: Locale = .current
+    ) -> String {
+        nativeApple[localeIdentifier]
+            ?? locale.localizedString(forIdentifier: localeIdentifier)
+            ?? localeIdentifier
+    }
+
     public static let all: [String: String] = [
         "auto": "Auto-detect",
         "af": "Afrikaans",

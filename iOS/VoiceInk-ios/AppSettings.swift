@@ -252,10 +252,6 @@ final class AppSettings: ObservableObject {
         customVocabularyTerms = VoiceInkPreferenceList.removing(at: offsets, from: customVocabularyTerms)
     }
 
-    var runtimeCustomVocabularyTerms: [String] {
-        VoiceInkCustomVocabularyTerms.normalized(customVocabularyTerms)
-    }
-
     var availableTranscriptionLanguages: [String: String] {
         modes.transcriptionLanguages(selectedModeId: selectedModeId)
     }

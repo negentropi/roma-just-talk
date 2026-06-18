@@ -431,6 +431,11 @@ reject_pattern \
   iOS/VoiceInk-ios/SettingsView.swift
 
 reject_pattern \
+  "iOS retry passes stored vocabulary into shared run processor" \
+  'runtimeCustomVocabularyTerms' \
+  iOS/VoiceInk-ios
+
+reject_pattern \
   "macOS transcription adapters avoid provider-local vocabulary and prompt wrappers" \
   'private func +(selectedLanguage|transcriptionPrompt|getCustom(Dictionary|Vocabulary)Terms)\(' \
   VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift \

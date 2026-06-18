@@ -154,8 +154,9 @@ class LastTranscriptionService: ObservableObject {
                     type: .success
                 )
             } catch {
+                let errorDescription = VoiceInkErrorDescription.text(for: error)
                 NotificationManager.shared.showNotification(
-                    title: "Retry failed: \(error.localizedDescription)",
+                    title: "Retry failed: \(errorDescription)",
                     type: .error
                 )
             }

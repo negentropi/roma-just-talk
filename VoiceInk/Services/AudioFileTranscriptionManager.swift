@@ -195,7 +195,7 @@ class AudioTranscriptionManager: ObservableObject {
                         powerModeEmoji: powerModeEmoji
                     )
                 } catch {
-                    let errorDescription = error.localizedDescription
+                    let errorDescription = VoiceInkErrorDescription.text(for: error)
                     logger.error("Enhancement failed: \(errorDescription, privacy: .public)")
                     transcription = Transcription(
                         text: cleanedText,
@@ -237,8 +237,9 @@ class AudioTranscriptionManager: ObservableObject {
             if Task.isCancelled || error is CancellationError {
                 item.status = .pending
             } else {
-                logger.error("Transcription error: \(error.localizedDescription, privacy: .public)")
-                item.status = .failed(message: error.localizedDescription)
+                let errorDescription = VoiceInkErrorDescription.text(for: error)
+                logger.error("Transcription error: \(errorDescription, privacy: .public)")
+                item.status = .failed(message: errorDescription)
             }
         }
 

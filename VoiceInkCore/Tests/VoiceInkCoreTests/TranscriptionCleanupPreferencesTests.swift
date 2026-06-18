@@ -112,6 +112,64 @@ final class TranscriptionCleanupPreferencesTests: XCTestCase {
         }
     }
 
+    func testCleanupSettingsReadCurrentTextPreferences() {
+        withIsolatedDefaults { defaults in
+            PunctuationCleanupMode.setCurrent(.removeTrailingPeriod, in: defaults)
+            VoiceInkTranscriptionCleanupPreferenceStorage.saveTextFormattingEnabled(false, to: defaults)
+            VoiceInkTranscriptionCleanupPreferenceStorage.saveLowercaseTranscription(true, to: defaults)
+            VoiceInkTranscriptionCleanupPreferenceStorage.saveRemoveFillerWords(false, to: defaults)
+
+            XCTAssertEqual(
+                VoiceInkTranscriptionCleanupSettings.current(in: defaults),
+                VoiceInkTranscriptionCleanupSettings(
+                    punctuationMode: .removeTrailingPeriod,
+                    isTextFormattingEnabled: false,
+                    lowercaseTranscription: true,
+                    removeFillerWords: false
+                )
+            )
+        }
+    }
+
+    func testCleanupSettingsSaveWritesTextPreferencesAndLegacyPunctuationFlag() {
+        withIsolatedDefaults { defaults in
+            let settings = VoiceInkTranscriptionCleanupSettings(
+                punctuationMode: .removeAll,
+                isTextFormattingEnabled: false,
+                lowercaseTranscription: true,
+                removeFillerWords: false
+            )
+
+            settings.save(to: defaults)
+
+            XCTAssertEqual(PunctuationCleanupMode.current(in: defaults), .removeAll)
+            XCTAssertTrue(defaults.bool(forKey: PunctuationCleanupMode.legacyRemovePunctuationKey))
+            XCTAssertFalse(VoiceInkTranscriptionCleanupPreferenceStorage.isTextFormattingEnabled(from: defaults))
+            XCTAssertTrue(VoiceInkTranscriptionCleanupPreferenceStorage.shouldLowercase(from: defaults))
+            XCTAssertFalse(VoiceInkTranscriptionCleanupPreferenceStorage.shouldRemoveFillerWords(from: defaults))
+        }
+    }
+
+    func testCleanupSettingsBuildRuntimeConfigurationWithSeparateFillerWords() {
+        let settings = VoiceInkTranscriptionCleanupSettings(
+            punctuationMode: .removeTrailingPeriod,
+            isTextFormattingEnabled: true,
+            lowercaseTranscription: true,
+            removeFillerWords: true
+        )
+
+        XCTAssertEqual(
+            settings.runtimeConfiguration(fillerWords: ["um", "like"]),
+            VoiceInkTranscriptionCleanupConfiguration(
+                punctuationMode: .removeTrailingPeriod,
+                shouldFormatParagraphs: true,
+                shouldLowercase: true,
+                shouldRemoveFillerWords: true,
+                fillerWords: ["um", "like"]
+            )
+        )
+    }
+
     func testRemoveTrailingPeriodPreservesEllipsisAndTrailingWhitespace() {
         XCTAssertEqual(
             VoiceInkTranscriptionCleanupPreferences.removeTrailingPeriod(from: "Ship it.  "),

@@ -144,7 +144,7 @@ class ImportExportService {
             exportedWordReplacements = Dictionary(replacements.map { ($0.originalText, $0.replacementText) }, uniquingKeysWith: { _, last in last })
         }
 
-        let punctuationCleanupMode = PunctuationCleanupMode.current()
+        let cleanupSettings = VoiceInkTranscriptionCleanupSettings.current()
         let transcriptionCleanup = VoiceInkTranscriptionAutoCleanupPreference.current()
         let audioCleanup = VoiceInkAudioCleanupPreference.current()
         let rollingBufferConfiguration = RollingBufferPreloadSettings.configuration()
@@ -178,10 +178,10 @@ class ImportExportService {
             isSystemMuteEnabled: mediaController.isSystemMuteEnabled,
             isPauseMediaEnabled: playbackController.isPauseMediaEnabled,
             audioResumptionDelay: mediaController.audioResumptionDelay,
-            isTextFormattingEnabled: VoiceInkTranscriptionCleanupPreferenceStorage.isTextFormattingEnabled(),
-            punctuationCleanupMode: punctuationCleanupMode,
-            removePunctuation: punctuationCleanupMode == .removeAll,
-            lowercaseTranscription: VoiceInkTranscriptionCleanupPreferenceStorage.shouldLowercase(),
+            isTextFormattingEnabled: cleanupSettings.isTextFormattingEnabled,
+            punctuationCleanupMode: cleanupSettings.punctuationMode,
+            removePunctuation: cleanupSettings.removesAllPunctuation,
+            lowercaseTranscription: cleanupSettings.lowercaseTranscription,
             isExperimentalFeaturesEnabled: UserDefaults.standard.bool(forKey: "isExperimentalFeaturesEnabled"),
             restoreClipboardAfterPaste: UserDefaults.standard.bool(forKey: "restoreClipboardAfterPaste"),
             clipboardRestoreDelay: UserDefaults.standard.double(forKey: "clipboardRestoreDelay"),

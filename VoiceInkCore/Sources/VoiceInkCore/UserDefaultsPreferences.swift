@@ -110,6 +110,15 @@ public struct VoiceInkDefaultSettings: Equatable, Sendable {
 
     public static let iOS = VoiceInkDefaultSettings()
 
+    public var transcriptionCleanupSettings: VoiceInkTranscriptionCleanupSettings {
+        VoiceInkTranscriptionCleanupSettings(
+            punctuationMode: punctuationCleanupMode,
+            isTextFormattingEnabled: isTextFormattingEnabled,
+            lowercaseTranscription: lowercaseTranscription,
+            removeFillerWords: removeFillerWords
+        )
+    }
+
     public func registeredUserDefaults(
         hasCompletedOnboarding: Bool = false,
         currentTranscriptionModel: String? = nil

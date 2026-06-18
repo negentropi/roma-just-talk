@@ -49,7 +49,7 @@ class PowerModeSessionManager {
 
         // Only capture baseline if NO session exists
         if loadSession() == nil {
-            let punctuationCleanupMode = PunctuationCleanupMode.current()
+            let cleanupSettings = VoiceInkTranscriptionCleanupSettings.current()
             let originalState = ApplicationState(
                 isEnhancementEnabled: enhancementService.isEnhancementEnabled,
                 useScreenCaptureContext: enhancementService.useScreenCaptureContext,
@@ -58,10 +58,10 @@ class PowerModeSessionManager {
                 selectedAIModel: enhancementService.getAIService()?.currentModel,
                 selectedLanguage: VoiceInkTranscriptionLanguagePreference.storedLanguage(),
                 transcriptionModelName: stateProvider.currentTranscriptionModel?.name,
-                isTextFormattingEnabled: VoiceInkTranscriptionCleanupPreferenceStorage.isTextFormattingEnabled(),
-                punctuationCleanupMode: punctuationCleanupMode,
-                removePunctuation: punctuationCleanupMode == .removeAll,
-                lowercaseTranscription: VoiceInkTranscriptionCleanupPreferenceStorage.shouldLowercase()
+                isTextFormattingEnabled: cleanupSettings.isTextFormattingEnabled,
+                punctuationCleanupMode: cleanupSettings.punctuationMode,
+                removePunctuation: cleanupSettings.removesAllPunctuation,
+                lowercaseTranscription: cleanupSettings.lowercaseTranscription
             )
 
             let newSession = PowerModeSession(
@@ -103,7 +103,7 @@ class PowerModeSessionManager {
               let stateProvider = stateProvider,
               let enhancementService = enhancementService else { return }
 
-        let punctuationCleanupMode = PunctuationCleanupMode.current()
+        let cleanupSettings = VoiceInkTranscriptionCleanupSettings.current()
         let updatedState = ApplicationState(
             isEnhancementEnabled: enhancementService.isEnhancementEnabled,
             useScreenCaptureContext: enhancementService.useScreenCaptureContext,
@@ -112,10 +112,10 @@ class PowerModeSessionManager {
             selectedAIModel: enhancementService.getAIService()?.currentModel,
             selectedLanguage: VoiceInkTranscriptionLanguagePreference.storedLanguage(),
             transcriptionModelName: stateProvider.currentTranscriptionModel?.name,
-            isTextFormattingEnabled: VoiceInkTranscriptionCleanupPreferenceStorage.isTextFormattingEnabled(),
-            punctuationCleanupMode: punctuationCleanupMode,
-            removePunctuation: punctuationCleanupMode == .removeAll,
-            lowercaseTranscription: VoiceInkTranscriptionCleanupPreferenceStorage.shouldLowercase()
+            isTextFormattingEnabled: cleanupSettings.isTextFormattingEnabled,
+            punctuationCleanupMode: cleanupSettings.punctuationMode,
+            removePunctuation: cleanupSettings.removesAllPunctuation,
+            lowercaseTranscription: cleanupSettings.lowercaseTranscription
         )
 
         session.originalState = updatedState

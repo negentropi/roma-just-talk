@@ -85,15 +85,62 @@ public enum VoiceInkTranscriptionCleanupPreferenceStorage {
     }
 }
 
+public struct VoiceInkTranscriptionCleanupSettings: Equatable, Sendable {
+    public let punctuationMode: PunctuationCleanupMode
+    public let isTextFormattingEnabled: Bool
+    public let lowercaseTranscription: Bool
+    public let removeFillerWords: Bool
+
+    public var removesAllPunctuation: Bool {
+        punctuationMode == .removeAll
+    }
+
+    public init(
+        punctuationMode: PunctuationCleanupMode = .keep,
+        isTextFormattingEnabled: Bool = VoiceInkPreferenceDefault.isTextFormattingEnabled,
+        lowercaseTranscription: Bool = VoiceInkPreferenceDefault.lowercaseTranscription,
+        removeFillerWords: Bool = VoiceInkPreferenceDefault.removeFillerWords
+    ) {
+        self.punctuationMode = punctuationMode
+        self.isTextFormattingEnabled = isTextFormattingEnabled
+        self.lowercaseTranscription = lowercaseTranscription
+        self.removeFillerWords = removeFillerWords
+    }
+
+    public static func current(in defaults: UserDefaults = .standard) -> VoiceInkTranscriptionCleanupSettings {
+        VoiceInkTranscriptionCleanupSettings(
+            punctuationMode: PunctuationCleanupMode.current(in: defaults),
+            isTextFormattingEnabled: VoiceInkTranscriptionCleanupPreferenceStorage.isTextFormattingEnabled(from: defaults),
+            lowercaseTranscription: VoiceInkTranscriptionCleanupPreferenceStorage.shouldLowercase(from: defaults),
+            removeFillerWords: VoiceInkTranscriptionCleanupPreferenceStorage.shouldRemoveFillerWords(from: defaults)
+        )
+    }
+
+    public func save(to defaults: UserDefaults = .standard) {
+        PunctuationCleanupMode.setCurrent(punctuationMode, in: defaults)
+        VoiceInkTranscriptionCleanupPreferenceStorage.saveTextFormattingEnabled(isTextFormattingEnabled, to: defaults)
+        VoiceInkTranscriptionCleanupPreferenceStorage.saveLowercaseTranscription(lowercaseTranscription, to: defaults)
+        VoiceInkTranscriptionCleanupPreferenceStorage.saveRemoveFillerWords(removeFillerWords, to: defaults)
+    }
+
+    public func runtimeConfiguration(
+        fillerWords: [String] = VoiceInkFillerWords.defaultWords
+    ) -> VoiceInkTranscriptionCleanupConfiguration {
+        VoiceInkTranscriptionCleanupConfiguration(
+            punctuationMode: punctuationMode,
+            shouldFormatParagraphs: isTextFormattingEnabled,
+            shouldLowercase: lowercaseTranscription,
+            shouldRemoveFillerWords: removeFillerWords,
+            fillerWords: fillerWords
+        )
+    }
+}
+
 public struct VoiceInkTranscriptionCleanupConfiguration: Equatable, Sendable {
     public static let disabled = VoiceInkTranscriptionCleanupConfiguration()
 
     public static func current(in defaults: UserDefaults = .standard) -> VoiceInkTranscriptionCleanupConfiguration {
-        return VoiceInkTranscriptionCleanupConfiguration(
-            punctuationMode: PunctuationCleanupMode.current(in: defaults),
-            shouldFormatParagraphs: VoiceInkTranscriptionCleanupPreferenceStorage.isTextFormattingEnabled(from: defaults),
-            shouldLowercase: VoiceInkTranscriptionCleanupPreferenceStorage.shouldLowercase(from: defaults),
-            shouldRemoveFillerWords: VoiceInkTranscriptionCleanupPreferenceStorage.shouldRemoveFillerWords(from: defaults),
+        VoiceInkTranscriptionCleanupSettings.current(in: defaults).runtimeConfiguration(
             fillerWords: VoiceInkFillerWordPreference.words(from: defaults)
         )
     }

@@ -91,6 +91,25 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(defaults.selectedTranscriptionLanguage, VoiceInkLanguageCatalog.autoDetectCode)
     }
 
+    func testDefaultSettingsExposeTranscriptionCleanupSettings() {
+        let defaults = VoiceInkDefaultSettings(
+            punctuationCleanupMode: .removeTrailingPeriod,
+            isTextFormattingEnabled: false,
+            lowercaseTranscription: true,
+            removeFillerWords: false
+        )
+
+        XCTAssertEqual(
+            defaults.transcriptionCleanupSettings,
+            VoiceInkTranscriptionCleanupSettings(
+                punctuationMode: .removeTrailingPeriod,
+                isTextFormattingEnabled: false,
+                lowercaseTranscription: true,
+                removeFillerWords: false
+            )
+        )
+    }
+
     func testDefaultSettingsBuildRegisteredUserDefaultsForPlatformSelections() {
         let registeredDefaults = VoiceInkDefaultSettings(
             selectedTranscriptionLanguage: "en"

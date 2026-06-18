@@ -74,10 +74,11 @@ final class AppSettings: ObservableObject {
         // Load audio session timeout (default: 90 seconds)
         self.audioSessionTimeoutSeconds = VoiceInkAudioSessionTimeoutPreference.timeoutSeconds()
         PunctuationCleanupMode.migrateLegacyUserDefaultIfNeeded()
-        self.punctuationCleanupMode = PunctuationCleanupMode.current()
-        self.isTextFormattingEnabled = VoiceInkTranscriptionCleanupPreferenceStorage.isTextFormattingEnabled()
-        self.lowercaseTranscription = VoiceInkTranscriptionCleanupPreferenceStorage.shouldLowercase()
-        self.removeFillerWords = VoiceInkTranscriptionCleanupPreferenceStorage.shouldRemoveFillerWords()
+        let cleanupSettings = VoiceInkTranscriptionCleanupSettings.current()
+        self.punctuationCleanupMode = cleanupSettings.punctuationMode
+        self.isTextFormattingEnabled = cleanupSettings.isTextFormattingEnabled
+        self.lowercaseTranscription = cleanupSettings.lowercaseTranscription
+        self.removeFillerWords = cleanupSettings.removeFillerWords
         self.fillerWords = VoiceInkFillerWordPreference.words()
         self.selectedTranscriptionLanguage = VoiceInkTranscriptionLanguagePreference.selectedLanguage()
 
@@ -260,10 +261,11 @@ final class AppSettings: ObservableObject {
         audioSessionTimeoutSeconds = defaults.audioSessionTimeoutSeconds
 
         // Reset transcription cleanup preferences
-        punctuationCleanupMode = defaults.punctuationCleanupMode
-        isTextFormattingEnabled = defaults.isTextFormattingEnabled
-        lowercaseTranscription = defaults.lowercaseTranscription
-        removeFillerWords = defaults.removeFillerWords
+        let cleanupSettings = defaults.transcriptionCleanupSettings
+        punctuationCleanupMode = cleanupSettings.punctuationMode
+        isTextFormattingEnabled = cleanupSettings.isTextFormattingEnabled
+        lowercaseTranscription = cleanupSettings.lowercaseTranscription
+        removeFillerWords = cleanupSettings.removeFillerWords
         fillerWords = defaults.fillerWords
         selectedTranscriptionLanguage = defaults.selectedTranscriptionLanguage
         VoiceInkSharedPreferenceReset.clearCoreUserSettings()

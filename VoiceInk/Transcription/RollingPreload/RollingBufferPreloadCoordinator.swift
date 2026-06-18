@@ -407,31 +407,13 @@ final class RollingBufferPreloadCoordinator {
         configuration: RollingBufferPreloadConfiguration,
         perModelEnabled: Bool
     ) -> Bool {
-        guard model.supportsStreaming, perModelEnabled else { return false }
-
-        switch configuration.mode {
-        case .on:
-            return true
-        case .off:
-            return false
-        case .auto:
-            if configuration.autoDisablesCloudModels, model.provider.isCloudTranscriptionProvider {
-                return false
-            }
-
-            if configuration.autoDisablesLowBatteryLocalModels,
-               model.provider.isLocalTranscriptionProvider {
-                return RollingBufferPreloadPolicy(
-                    configuration: configuration,
-                    powerState: powerStateProvider.currentPowerState()
-                ).allowsPreload(
-                    for: model,
-                    perModelEnabled: perModelEnabled
-                )
-            }
-
-            return true
-        }
+        RollingBufferPreloadPolicy(
+            configuration: configuration,
+            powerState: powerStateProvider.currentPowerState()
+        ).allowsPreload(
+            for: model.rollingBufferPreloadSnapshot,
+            perModelEnabled: perModelEnabled
+        )
     }
 
     private func staleUnclaimedPreloadReason(afterAdding chunk: Data) -> String? {

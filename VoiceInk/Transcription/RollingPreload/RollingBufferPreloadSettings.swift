@@ -1,81 +1,28 @@
 import Foundation
 import IOKit.ps
+import VoiceInkCore
 
-enum RollingBufferPreloadMode: String, CaseIterable, Identifiable {
-    case on
-    case off
-    case auto
+typealias RollingBufferPreloadMode = VoiceInkRollingBufferPreloadMode
+typealias RollingBufferPreloadConfiguration = VoiceInkRollingBufferPreloadConfiguration
+typealias RollingBufferPowerState = VoiceInkRollingBufferPowerState
+typealias RollingBufferPreloadPolicy = VoiceInkRollingBufferPreloadPolicy
+typealias RollingBufferPreloadSettings = VoiceInkRollingBufferPreloadSettings
 
-    var id: String { rawValue }
-
-    var displayName: String {
-        switch self {
-        case .on:
-            return "On"
-        case .off:
-            return "Off"
-        case .auto:
-            return "Auto"
-        }
+extension RollingBufferPreloadSettings {
+    static func perModelPreloadEnabled(
+        for model: any TranscriptionModel,
+        in defaults: UserDefaults = .standard
+    ) -> Bool {
+        perModelPreloadEnabled(forModelName: model.name, in: defaults)
     }
 }
 
-struct RollingBufferPreloadConfiguration: Equatable {
-    let mode: RollingBufferPreloadMode
-    let autoDisablesCloudModels: Bool
-    let autoDisablesLowBatteryLocalModels: Bool
-    let lowBatteryThresholdPercent: Int
-    let bufferDurationSeconds: Double
-    let preRunFinalization: Bool
-}
-
-enum RollingBufferPreloadSettings {
-    static let modeKey = "RollingBufferPreloadMode"
-    static let autoDisableCloudModelsKey = "RollingBufferPreloadAutoDisableCloudModels"
-    static let autoDisableLowBatteryLocalModelsKey = "RollingBufferPreloadAutoDisableLowBatteryLocalModels"
-    static let lowBatteryThresholdPercentKey = "RollingBufferPreloadLowBatteryThresholdPercent"
-    static let bufferDurationSecondsKey = "RollingBufferDurationSeconds"
-    static let preRunFinalizationKey = "RollingBufferPreloadFinalization"
-    static let perModelEnabledKeyPrefix = "rolling-buffer-preload-enabled-"
-
-    static let defaultMode: RollingBufferPreloadMode = .auto
-    static let defaultAutoDisablesCloudModels = false
-    static let defaultAutoDisablesLowBatteryLocalModels = true
-    static let defaultLowBatteryThresholdPercent = 40
-    static let defaultBufferDurationSeconds = 3.0
-    static let defaultPreRunFinalization = true
-
-    static func configuration(in defaults: UserDefaults = .standard) -> RollingBufferPreloadConfiguration {
-        let mode = defaults.string(forKey: modeKey)
-            .flatMap(RollingBufferPreloadMode.init(rawValue:))
-            ?? defaultMode
-        let cloudGuard = defaults.object(forKey: autoDisableCloudModelsKey) as? Bool
-            ?? defaultAutoDisablesCloudModels
-        let lowBatteryGuard = defaults.object(forKey: autoDisableLowBatteryLocalModelsKey) as? Bool
-            ?? defaultAutoDisablesLowBatteryLocalModels
-        let storedThreshold = defaults.object(forKey: lowBatteryThresholdPercentKey) as? Int
-            ?? defaultLowBatteryThresholdPercent
-        let duration = defaults.object(forKey: bufferDurationSecondsKey) as? Double
-            ?? defaultBufferDurationSeconds
-        let preRunFinalization = defaults.object(forKey: preRunFinalizationKey) as? Bool
-            ?? defaultPreRunFinalization
-
-        return RollingBufferPreloadConfiguration(
-            mode: mode,
-            autoDisablesCloudModels: cloudGuard,
-            autoDisablesLowBatteryLocalModels: lowBatteryGuard,
-            lowBatteryThresholdPercent: min(max(storedThreshold, 1), 100),
-            bufferDurationSeconds: min(max(duration, 0.25), 30.0),
-            preRunFinalization: preRunFinalization
+extension TranscriptionModel {
+    var rollingBufferPreloadSnapshot: VoiceInkRollingBufferPreloadModelSnapshot {
+        VoiceInkRollingBufferPreloadModelSnapshot(
+            supportsStreaming: supportsStreaming,
+            isCloudTranscriptionProvider: provider.isCloudTranscriptionProvider
         )
-    }
-
-    static func perModelPreloadEnabled(for model: any TranscriptionModel, in defaults: UserDefaults = .standard) -> Bool {
-        defaults.object(forKey: perModelPreloadEnabledKey(forModelName: model.name)) as? Bool ?? true
-    }
-
-    static func perModelPreloadEnabledKey(forModelName modelName: String) -> String {
-        "\(perModelEnabledKeyPrefix)\(modelName)"
     }
 }
 
@@ -90,11 +37,6 @@ enum RollingBufferVADSettings {
     static func usesSilero(in defaults: UserDefaults = .standard) -> Bool {
         selectedModel(in: defaults) == sileroModelName
     }
-}
-
-struct RollingBufferPowerState: Equatable, Sendable {
-    let isOnBattery: Bool
-    let batteryLevelPercent: Int?
 }
 
 protocol RollingBufferPowerStateProviding {
@@ -139,55 +81,6 @@ struct IOKitRollingBufferPowerStateProvider: RollingBufferPowerStateProviding {
             isOnBattery: hasBattery && isOnBattery,
             batteryLevelPercent: levels.min()
         )
-    }
-}
-
-struct RollingBufferPreloadPolicy {
-    let configuration: RollingBufferPreloadConfiguration
-    let powerState: RollingBufferPowerState
-
-    init(
-        configuration: RollingBufferPreloadConfiguration,
-        powerState: RollingBufferPowerState
-    ) {
-        self.configuration = configuration
-        self.powerState = powerState
-    }
-
-    init(defaults: UserDefaults = .standard, powerState: RollingBufferPowerState) {
-        self.init(
-            configuration: RollingBufferPreloadSettings.configuration(in: defaults),
-            powerState: powerState
-        )
-    }
-
-    func allowsPreload(
-        for model: any TranscriptionModel,
-        perModelEnabled: Bool
-    ) -> Bool {
-        guard model.supportsStreaming else { return false }
-        guard perModelEnabled else { return false }
-
-        switch configuration.mode {
-        case .on:
-            return true
-        case .off:
-            return false
-        case .auto:
-            if configuration.autoDisablesCloudModels, model.provider.isCloudTranscriptionProvider {
-                return false
-            }
-
-            if configuration.autoDisablesLowBatteryLocalModels,
-               model.provider.isLocalTranscriptionProvider,
-               powerState.isOnBattery,
-               let batteryLevel = powerState.batteryLevelPercent,
-               batteryLevel < configuration.lowBatteryThresholdPercent {
-                return false
-            }
-
-            return true
-        }
     }
 }
 

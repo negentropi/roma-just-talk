@@ -102,8 +102,8 @@ enum VoiceInkAudioProof {
         }
 
         let header = inputData.prefix(VoiceInkPCM16Audio.wavHeaderByteCount)
-        let pcmData = inputData.dropFirst(VoiceInkPCM16Audio.wavHeaderByteCount)
-        let rawMetrics = metrics(forLittleEndianPCM16Data: Data(pcmData))
+        let rawPCMData = Data(inputData.dropFirst(VoiceInkPCM16Audio.wavHeaderByteCount))
+        let rawMetrics = metrics(forLittleEndianPCM16Data: rawPCMData)
         printRow(
             variant: "raw",
             path: inputURL.path,
@@ -111,27 +111,58 @@ enum VoiceInkAudioProof {
             outputPath: ""
         )
 
-        let leveledPCMData = VoiceInkPCM16Audio.leveledLittleEndianData(
-            Data(pcmData),
-            targetPeak: options.targetPeak,
-            noiseFloorPeak: options.noiseFloorPeak,
-            maxGain: options.maxGain
-        )
+        var levelCandidates: [(variant: String, pcmData: Data)] = [("raw", rawPCMData)]
+        for variant in VoiceInkPCM16AudioProofVariant.allCases {
+            let variantPCMData = VoiceInkPCM16Audio.proofVariantLittleEndianData(
+                rawPCMData,
+                variant: variant
+            )
+            let variantURL = outputURL(for: inputURL, suffix: variant.rawValue, options: options)
+            try writeWAV(header: header, pcmData: variantPCMData, to: variantURL)
+            levelCandidates.append((variant.rawValue, variantPCMData))
+            printRow(
+                variant: variant.rawValue,
+                path: inputURL.path,
+                metrics: metrics(forLittleEndianPCM16Data: variantPCMData),
+                outputPath: variantURL.path
+            )
+        }
 
-        var leveledWAVData = Data(header)
-        leveledWAVData.append(leveledPCMData)
+        for candidate in levelCandidates {
+            let leveledPCMData = VoiceInkPCM16Audio.leveledLittleEndianData(
+                candidate.pcmData,
+                targetPeak: options.targetPeak,
+                noiseFloorPeak: options.noiseFloorPeak,
+                maxGain: options.maxGain
+            )
 
-        let leveledURL = options.outputDirectory
-            .appendingPathComponent(inputURL.deletingPathExtension().lastPathComponent + ".leveled.wav")
-        try leveledWAVData.write(to: leveledURL, options: .atomic)
+            let suffix = candidate.variant == "raw"
+                ? "leveled"
+                : candidate.variant + ".leveled"
+            let leveledURL = outputURL(for: inputURL, suffix: suffix, options: options)
+            try writeWAV(header: header, pcmData: leveledPCMData, to: leveledURL)
+            printRow(
+                variant: suffix,
+                path: inputURL.path,
+                metrics: metrics(forLittleEndianPCM16Data: leveledPCMData),
+                outputPath: leveledURL.path
+            )
+        }
+    }
 
-        let leveledMetrics = metrics(forLittleEndianPCM16Data: leveledPCMData)
-        printRow(
-            variant: "leveled",
-            path: inputURL.path,
-            metrics: leveledMetrics,
-            outputPath: leveledURL.path
-        )
+    private static func outputURL(
+        for inputURL: URL,
+        suffix: String,
+        options: AudioProofOptions
+    ) -> URL {
+        options.outputDirectory
+            .appendingPathComponent(inputURL.deletingPathExtension().lastPathComponent + "." + suffix + ".wav")
+    }
+
+    private static func writeWAV(header: Data.SubSequence, pcmData: Data, to url: URL) throws {
+        var wavData = Data(header)
+        wavData.append(pcmData)
+        try wavData.write(to: url, options: .atomic)
     }
 
     private static func metrics(forLittleEndianPCM16Data data: Data) -> AudioMetrics {

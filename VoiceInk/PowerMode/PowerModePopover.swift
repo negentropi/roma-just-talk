@@ -17,7 +17,7 @@ struct PowerModePopover: View {
                 .background(Color.white.opacity(0.1))
             
             ScrollView {
-                let enabledConfigs = powerModeManager.configurations.filter { $0.isEnabled }
+                let enabledConfigs = powerModeManager.configurations.enabledPowerModeConfigurations
                 VStack(alignment: .leading, spacing: 4) {
                     if enabledConfigs.isEmpty {
                         VStack(alignment: .center, spacing: 8) {

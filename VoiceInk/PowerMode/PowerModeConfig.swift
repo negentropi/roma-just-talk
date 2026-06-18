@@ -50,7 +50,7 @@ class PowerModeManager: ObservableObject {
     }
 
     func moveConfigurations(fromOffsets: IndexSet, toOffset: Int) {
-        configurations.move(fromOffsets: fromOffsets, toOffset: toOffset)
+        configurations.movePowerModeConfigurations(fromOffsets: fromOffsets, toOffset: toOffset)
         saveConfigurations()
     }
 

@@ -422,6 +422,11 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertFalse(configs.addPowerModeAppConfig(appConfig, toConfigurationID: UUID()))
         XCTAssertFalse(configs.addPowerModeURLConfig(urlConfig, toConfigurationID: UUID()))
 
+        configs.movePowerModeConfigurations(fromOffsets: IndexSet([0]), toOffset: 2)
+        XCTAssertEqual(configs.map(\.id), [secondID, firstID])
+        configs.movePowerModeConfigurations(fromOffsets: IndexSet([1, 99]), toOffset: 0)
+        XCTAssertEqual(configs.map(\.id), [firstID, secondID])
+
         XCTAssertTrue(configs.removePowerModeConfiguration(with: secondID))
         XCTAssertNil(configs.powerModeConfiguration(with: secondID))
         XCTAssertFalse(configs.removePowerModeConfiguration(with: secondID))

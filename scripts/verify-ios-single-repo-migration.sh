@@ -947,7 +947,7 @@ require_pattern \
 
 require_pattern \
   "shared Power Mode config list policy lives in VoiceInkCore" \
-  'enabledPowerModeConfigurationIds|appendPowerModeConfigurationIfMissing|setPowerModeDefaultConfiguration|addPowerModeAppConfig' \
+  'enabledPowerModeConfigurationIds|appendPowerModeConfigurationIfMissing|movePowerModeConfigurations|setPowerModeDefaultConfiguration|addPowerModeAppConfig' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 reject_pattern \
@@ -957,13 +957,23 @@ reject_pattern \
 
 reject_pattern \
   "macOS Power Mode manager avoids shell-only config list matching and mutation policy" \
-  'configurations\.first *\{|configurations\.contains *\{|configurations\.filter *\{|for +index +in +configurations\.indices|appConfigs\?\.removeAll|urlConfigs\?\.removeAll|configs\.append' \
+  'configurations\.first *\{|configurations\.contains *\{|configurations\.filter *\{|configurations\.move\(fromOffsets:|for +index +in +configurations\.indices|appConfigs\?\.removeAll|urlConfigs\?\.removeAll|configs\.append' \
   VoiceInk/PowerMode/PowerModeConfig.swift
 
 require_pattern \
   "macOS Power Mode manager consumes shared config list policy" \
-  'appendPowerModeConfigurationIfMissing|powerModeConfiguration\(forWebsiteURL:|enabledPowerModeConfigurationIds|containsPowerModeEmoji' \
+  'appendPowerModeConfigurationIfMissing|movePowerModeConfigurations|powerModeConfiguration\(forWebsiteURL:|enabledPowerModeConfigurationIds|containsPowerModeEmoji' \
   VoiceInk/PowerMode/PowerModeConfig.swift
+
+reject_pattern \
+  "macOS Power Mode popover avoids shell-only enabled config filtering" \
+  'configurations\.filter *\{ *\$0\.isEnabled *\}' \
+  VoiceInk/PowerMode/PowerModePopover.swift
+
+require_pattern \
+  "macOS Power Mode popover consumes shared enabled config list policy" \
+  'enabledPowerModeConfigurations' \
+  VoiceInk/PowerMode/PowerModePopover.swift
 
 require_pattern \
   "shared Power Mode trigger config records live in VoiceInkCore" \

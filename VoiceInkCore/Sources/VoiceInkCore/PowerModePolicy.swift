@@ -321,6 +321,22 @@ public extension Array where Element == PowerModeConfig {
         return count != originalCount
     }
 
+    mutating func movePowerModeConfigurations(fromOffsets offsets: IndexSet, toOffset: Int) {
+        let validOffsets = offsets
+            .filter { indices.contains($0) }
+            .sorted()
+        guard !validOffsets.isEmpty else { return }
+
+        let configurationsToMove = validOffsets.map { self[$0] }
+        for index in validOffsets.reversed() {
+            remove(at: index)
+        }
+
+        let removedBeforeDestination = validOffsets.filter { $0 < toOffset }.count
+        let insertionIndex = Swift.max(0, Swift.min(toOffset - removedBeforeDestination, count))
+        insert(contentsOf: configurationsToMove, at: insertionIndex)
+    }
+
     mutating func setPowerModeDefaultConfiguration(id configID: UUID) {
         for index in indices {
             self[index].isDefault = false

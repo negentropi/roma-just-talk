@@ -1256,6 +1256,21 @@ require_pattern \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
 require_pattern \
+  "shared provider model selection presentation lives in VoiceInkCore" \
+  'VoiceInkProviderModelSelectionPresentation|modelSelectionPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
+
+require_pattern \
+  "iOS mode model selection uses shared presentation adapter" \
+  'ProviderModelSelectionView|modelSelectionPresentation' \
+  iOS/VoiceInk-ios/ModeConfigurationView.swift
+
+reject_pattern \
+  "iOS mode model selection avoids duplicate provider model branching" \
+  'fixedModel\(for:|models\(for:' \
+  iOS/VoiceInk-ios/ModeConfigurationView.swift
+
+require_pattern \
   "iOS mode prompt-template editing uses shared mode state" \
   '\$mode\.promptTemplate\.' \
   iOS/VoiceInk-ios/ModeConfigurationView.swift

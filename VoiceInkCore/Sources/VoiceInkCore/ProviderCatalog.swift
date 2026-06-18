@@ -5,6 +5,11 @@ public enum VoiceInkProviderModelUse: Sendable {
     case postProcessing
 }
 
+public enum VoiceInkProviderModelSelectionPresentation: Equatable, Sendable {
+    case fixedModel(String)
+    case selectableModels([String])
+}
+
 public enum VoiceInkTranscriptionTransport: Sendable {
     case openAICompatible
     case deepgram
@@ -638,6 +643,14 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
         }
 
         return defaultModel(for: use) ?? ""
+    }
+
+    public func modelSelectionPresentation(for use: VoiceInkProviderModelUse) -> VoiceInkProviderModelSelectionPresentation {
+        if let fixedModel = fixedModel(for: use) {
+            return .fixedModel(fixedModel)
+        }
+
+        return .selectableModels(models(for: use))
     }
 
     public func models(for use: VoiceInkProviderModelUse) -> [String] {

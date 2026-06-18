@@ -48,21 +48,12 @@ struct ModeConfigurationView: View {
                         Text(provider.displayName).tag(provider)
                     }
                 }
-                
-                if let fixedModel = mode.transcriptionProvider.fixedModel(for: .transcription) {
-                    HStack {
-                        Text("Model")
-                        Spacer()
-                        Text(fixedModel)
-                            .foregroundColor(.secondary)
-                    }
-                } else {
-                    Picker("Model", selection: $mode.transcriptionModel) {
-                        ForEach(mode.transcriptionProvider.models(for: .transcription), id: \.self) { model in
-                            Text(model).tag(model)
-                        }
-                    }
-                }
+
+                ProviderModelSelectionView(
+                    provider: mode.transcriptionProvider,
+                    use: .transcription,
+                    selectedModel: $mode.transcriptionModel
+                )
             }
             
             Section(header: Text("Post-processing"), 
@@ -75,21 +66,12 @@ struct ModeConfigurationView: View {
                             Text(provider.displayName).tag(provider)
                         }
                     }
-                    
-                    if let fixedModel = mode.postProcessingProvider.fixedModel(for: .postProcessing) {
-                        HStack {
-                            Text("Model")
-                            Spacer()
-                            Text(fixedModel)
-                                .foregroundColor(.secondary)
-                        }
-                    } else {
-                        Picker("Model", selection: $mode.postProcessingModel) {
-                            ForEach(mode.postProcessingProvider.models(for: .postProcessing), id: \.self) { model in
-                                Text(model).tag(model)
-                            }
-                        }
-                    }
+
+                    ProviderModelSelectionView(
+                        provider: mode.postProcessingProvider,
+                        use: .postProcessing,
+                        selectedModel: $mode.postProcessingModel
+                    )
                     
                     // Prompt Template Selection
                     Picker("Prompt Template", selection: $mode.promptTemplate.type) {
@@ -140,6 +122,30 @@ struct ModeConfigurationView: View {
             availableTranscriptionProviders: availableTranscriptionProviders,
             availablePostProcessingProviders: availablePostProcessingProviders
         )
+    }
+}
+
+private struct ProviderModelSelectionView: View {
+    let provider: VoiceInkProviderKind
+    let use: VoiceInkProviderModelUse
+    @Binding var selectedModel: String
+
+    var body: some View {
+        switch provider.modelSelectionPresentation(for: use) {
+        case .fixedModel(let model):
+            HStack {
+                Text("Model")
+                Spacer()
+                Text(model)
+                    .foregroundColor(.secondary)
+            }
+        case .selectableModels(let models):
+            Picker("Model", selection: $selectedModel) {
+                ForEach(models, id: \.self) { model in
+                    Text(model).tag(model)
+                }
+            }
+        }
     }
 }
 

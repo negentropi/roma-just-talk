@@ -13,6 +13,31 @@ final class ProviderModelSelectionTests: XCTestCase {
         XCTAssertEqual(VoiceInkProviderKind.voiceInk.selectedModel("stale-model", for: .postProcessing), "")
     }
 
+    func testModelSelectionPresentationUsesTranscriptionModelList() {
+        XCTAssertEqual(
+            VoiceInkProviderKind.deepgram.modelSelectionPresentation(for: .transcription),
+            .selectableModels(VoiceInkProviderKind.deepgram.models(for: .transcription))
+        )
+    }
+
+    func testModelSelectionPresentationUsesPostProcessingModelList() {
+        XCTAssertEqual(
+            VoiceInkProviderKind.groq.modelSelectionPresentation(for: .postProcessing),
+            .selectableModels(VoiceInkAIModelCatalog.availableModels(for: .groq))
+        )
+    }
+
+    func testModelSelectionPresentationPreservesEmptyBundledProviderList() {
+        XCTAssertEqual(
+            VoiceInkProviderKind.voiceInk.modelSelectionPresentation(for: .transcription),
+            .selectableModels([])
+        )
+        XCTAssertEqual(
+            VoiceInkProviderKind.voiceInk.modelSelectionPresentation(for: .postProcessing),
+            .selectableModels([])
+        )
+    }
+
     func testSelectedModelPreservesAvailableCurrentModel() {
         XCTAssertEqual(
             VoiceInkProviderKind.deepgram.selectedModel("nova-3-medical", for: .transcription),

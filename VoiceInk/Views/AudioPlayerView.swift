@@ -110,8 +110,9 @@ class AudioPlayerManager: ObservableObject {
     }
     
     func seek(to time: TimeInterval) {
-        audioPlayer?.currentTime = time
-        currentTime = time
+        let clampedTime = VoiceInkAudioPlaybackTimeline.clampedTime(time, duration: duration)
+        audioPlayer?.currentTime = clampedTime
+        currentTime = clampedTime
     }
     
     private func startTimer() {

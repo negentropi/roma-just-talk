@@ -33,6 +33,14 @@ final class AudioPlaybackTimelineTests: XCTestCase {
         XCTAssertEqual(VoiceInkAudioPlaybackTimeline.time(atLocationX: 25, width: 100, duration: 0), 0)
     }
 
+    func testClampedTimeBoundsDirectSeekRequests() {
+        XCTAssertEqual(VoiceInkAudioPlaybackTimeline.clampedTime(-3, duration: 10), 0)
+        XCTAssertEqual(VoiceInkAudioPlaybackTimeline.clampedTime(4, duration: 10), 4)
+        XCTAssertEqual(VoiceInkAudioPlaybackTimeline.clampedTime(14, duration: 10), 10)
+        XCTAssertEqual(VoiceInkAudioPlaybackTimeline.clampedTime(4, duration: 0), 0)
+        XCTAssertEqual(VoiceInkAudioPlaybackTimeline.clampedTime(.infinity, duration: 10), 0)
+    }
+
     func testSampleProgressUsesStableWaveformPosition() {
         XCTAssertEqual(VoiceInkAudioPlaybackTimeline.sampleProgress(index: 0, sampleCount: 200), 0)
         XCTAssertEqual(VoiceInkAudioPlaybackTimeline.sampleProgress(index: 100, sampleCount: 200), 0.5)

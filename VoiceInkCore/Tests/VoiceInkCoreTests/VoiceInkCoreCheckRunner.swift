@@ -53,6 +53,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testLocationProgressClampsAgainstWidth", run: { AudioPlaybackTimelineTests().testLocationProgressClampsAgainstWidth() }),
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testLocationProgressReturnsZeroForInvalidWidth", run: { AudioPlaybackTimelineTests().testLocationProgressReturnsZeroForInvalidWidth() }),
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testTimeAtLocationUsesClampedLocationProgress", run: { AudioPlaybackTimelineTests().testTimeAtLocationUsesClampedLocationProgress() }),
+            VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testClampedTimeBoundsDirectSeekRequests", run: { AudioPlaybackTimelineTests().testClampedTimeBoundsDirectSeekRequests() }),
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testSampleProgressUsesStableWaveformPosition", run: { AudioPlaybackTimelineTests().testSampleProgressUsesStableWaveformPosition() }),
             VoiceInkCoreCheck(name: "ContextualCapitalizationFormatterTests.testLowercasesTitlecaseTextAfterMidSentencePrefix", run: { ContextualCapitalizationFormatterTests().testLowercasesTitlecaseTextAfterMidSentencePrefix() }),
             VoiceInkCoreCheck(name: "ContextualCapitalizationFormatterTests.testKeepsTitlecaseTextAfterSentenceBoundary", run: { ContextualCapitalizationFormatterTests().testKeepsTitlecaseTextAfterSentenceBoundary() }),

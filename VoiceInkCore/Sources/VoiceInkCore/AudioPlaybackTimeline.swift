@@ -35,6 +35,17 @@ public enum VoiceInkAudioPlaybackTimeline {
         return progress(locationX: locationX, width: width) * duration
     }
 
+    public static func clampedTime(
+        _ time: TimeInterval,
+        duration: TimeInterval
+    ) -> TimeInterval {
+        guard duration > 0, time.isFinite, duration.isFinite else {
+            return 0
+        }
+
+        return min(max(time, 0), duration)
+    }
+
     public static func sampleProgress(index: Int, sampleCount: Int) -> Double {
         guard sampleCount > 0 else {
             return 0

@@ -1,6 +1,7 @@
 import Foundation
 import AVFoundation
 import Combine
+import VoiceInkCore
 
 @MainActor
 final class AudioPlayer: ObservableObject {
@@ -59,8 +60,9 @@ final class AudioPlayer: ObservableObject {
     }
     
     func seek(to time: TimeInterval) {
-        audioPlayer?.currentTime = time
-        currentTime = time
+        let clampedTime = VoiceInkAudioPlaybackTimeline.clampedTime(time, duration: duration)
+        audioPlayer?.currentTime = clampedTime
+        currentTime = clampedTime
     }
     
     private func startTimer() {

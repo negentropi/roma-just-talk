@@ -356,6 +356,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/Mode.swift
 
 require_pattern \
+  "shared mode form presentation lives in VoiceInkCore" \
+  'VoiceInkModeFormPresentation|formPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/Mode.swift
+
+require_pattern \
   "iOS recording sheet uses shared mode selection presentation adapter" \
   'VoiceInkModeSelectionControlView' \
   iOS/VoiceInk-ios/RecordingSheetView.swift
@@ -375,6 +380,11 @@ require_pattern \
   'summaryPresentation' \
   iOS/VoiceInk-ios/SettingsView.swift
 
+require_pattern \
+  "iOS mode configuration uses shared form presentation" \
+  'formPresentation|VoiceInkModeFormPresentation' \
+  iOS/VoiceInk-ios/ModeConfigurationView.swift
+
 reject_pattern \
   "iOS mode selection views avoid shell-only mode-count picker branching" \
   'modes\.count > 1|settings\.modes\.count > 1|modes\.first|settings\.modes\.first|!settings\.modes\.isEmpty' \
@@ -385,6 +395,11 @@ reject_pattern \
   "iOS settings mode rows avoid shell-only model summary formatting" \
   'Transcription: |Post-processing: |effectiveTranscriptionModel|effectivePostProcessingModel' \
   iOS/VoiceInk-ios/SettingsView.swift
+
+reject_pattern \
+  "iOS mode configuration avoids shell-only form presentation copy" \
+  '"(Mode Details|Mode Name|Transcription|Post-processing|Enable Post-processing|Provider|Prompt Template|Custom Prompt|Edit Mode|New Mode|Save|Model)"|Configure how the raw transcription should be processed and refined\.' \
+  iOS/VoiceInk-ios/ModeConfigurationView.swift
 
 reject_pattern \
   "iOS recording views avoid shell-only recording alert copy and OSStatus mapping" \

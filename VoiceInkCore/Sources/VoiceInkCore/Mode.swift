@@ -25,6 +25,43 @@ public struct VoiceInkModeSummaryPresentation: Equatable, Sendable {
     public let postProcessingText: String?
 }
 
+public struct VoiceInkModeFormPresentation: Equatable, Sendable {
+    public let navigationTitle: String
+    public let modeDetailsSectionTitle: String
+    public let modeNamePlaceholder: String
+    public let transcriptionSectionTitle: String
+    public let postProcessingSectionTitle: String
+    public let postProcessingFooterText: String?
+    public let enablePostProcessingTitle: String
+    public let providerPickerTitle: String
+    public let promptTemplatePickerTitle: String
+    public let customPromptPlaceholder: String
+    public let modelFieldTitle: String
+    public let saveButtonTitle: String
+
+    public static func make(
+        isEditing: Bool,
+        isPostProcessingEnabled: Bool
+    ) -> Self {
+        VoiceInkModeFormPresentation(
+            navigationTitle: isEditing ? "Edit Mode" : "New Mode",
+            modeDetailsSectionTitle: "Mode Details",
+            modeNamePlaceholder: "Mode Name",
+            transcriptionSectionTitle: "Transcription",
+            postProcessingSectionTitle: "Post-processing",
+            postProcessingFooterText: isPostProcessingEnabled
+                ? "Configure how the raw transcription should be processed and refined."
+                : nil,
+            enablePostProcessingTitle: "Enable Post-processing",
+            providerPickerTitle: "Provider",
+            promptTemplatePickerTitle: "Prompt Template",
+            customPromptPlaceholder: "Custom Prompt",
+            modelFieldTitle: "Model",
+            saveButtonTitle: "Save"
+        )
+    }
+}
+
 public struct Mode: Identifiable, Codable {
     public let id: UUID
     public var name: String
@@ -79,6 +116,13 @@ public struct Mode: Identifiable, Codable {
             postProcessingText: isPostProcessingEnabled
                 ? "Post-processing: \(effectivePostProcessingModel)"
                 : nil
+        )
+    }
+
+    public func formPresentation(isEditing: Bool) -> VoiceInkModeFormPresentation {
+        VoiceInkModeFormPresentation.make(
+            isEditing: isEditing,
+            isPostProcessingEnabled: isPostProcessingEnabled
         )
     }
 

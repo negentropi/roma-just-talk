@@ -291,6 +291,35 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
         XCTAssertNil(mode.summaryPresentation.postProcessingText)
     }
 
+    func testModeFormPresentationBuildsNewModeCopy() {
+        let mode = Mode.defaultLocalWhisper(name: "Local")
+        let presentation = mode.formPresentation(isEditing: false)
+
+        XCTAssertEqual(presentation.navigationTitle, "New Mode")
+        XCTAssertEqual(presentation.modeDetailsSectionTitle, "Mode Details")
+        XCTAssertEqual(presentation.modeNamePlaceholder, "Mode Name")
+        XCTAssertEqual(presentation.transcriptionSectionTitle, "Transcription")
+        XCTAssertEqual(presentation.postProcessingSectionTitle, "Post-processing")
+        XCTAssertNil(presentation.postProcessingFooterText)
+        XCTAssertEqual(presentation.enablePostProcessingTitle, "Enable Post-processing")
+        XCTAssertEqual(presentation.providerPickerTitle, "Provider")
+        XCTAssertEqual(presentation.promptTemplatePickerTitle, "Prompt Template")
+        XCTAssertEqual(presentation.customPromptPlaceholder, "Custom Prompt")
+        XCTAssertEqual(presentation.modelFieldTitle, "Model")
+        XCTAssertEqual(presentation.saveButtonTitle, "Save")
+    }
+
+    func testModeFormPresentationBuildsEditPostProcessingCopy() {
+        let mode = Mode(name: "Clean", isPostProcessingEnabled: true)
+        let presentation = mode.formPresentation(isEditing: true)
+
+        XCTAssertEqual(presentation.navigationTitle, "Edit Mode")
+        XCTAssertEqual(
+            presentation.postProcessingFooterText,
+            "Configure how the raw transcription should be processed and refined."
+        )
+    }
+
     func testModeDraftValidationRequiresName() {
         XCTAssertFalse(Mode(name: "").isSaveableDraft(
             availableTranscriptionProviders: [.groq],

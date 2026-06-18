@@ -34,16 +34,22 @@ struct ModeConfigurationView: View {
             availablePostProcessingProviders: availablePostProcessingProviders
         )
     }
+
+    private var presentation: VoiceInkModeFormPresentation {
+        mode.formPresentation(isEditing: isEditing)
+    }
     
     var body: some View {
+        let formPresentation = presentation
+
         Form {
-            Section(header: Text("Mode Details")) {
-                TextField("Mode Name", text: $mode.name)
+            Section(header: Text(formPresentation.modeDetailsSectionTitle)) {
+                TextField(formPresentation.modeNamePlaceholder, text: $mode.name)
                     .textInputAutocapitalization(.words)
             }
             
-            Section(header: Text("Transcription")) {
-                Picker("Provider", selection: $mode.transcriptionProvider) {
+            Section(header: Text(formPresentation.transcriptionSectionTitle)) {
+                Picker(formPresentation.providerPickerTitle, selection: $mode.transcriptionProvider) {
                     ForEach(availableTranscriptionProviders) { provider in
                         Text(provider.displayName).tag(provider)
                     }
@@ -52,16 +58,19 @@ struct ModeConfigurationView: View {
                 ProviderModelSelectionView(
                     provider: mode.transcriptionProvider,
                     use: .transcription,
-                    selectedModel: $mode.transcriptionModel
+                    selectedModel: $mode.transcriptionModel,
+                    presentation: formPresentation
                 )
             }
             
-            Section(header: Text("Post-processing"), 
-                   footer: mode.isPostProcessingEnabled ? Text("Configure how the raw transcription should be processed and refined.") : nil) {
-                Toggle("Enable Post-processing", isOn: $mode.isPostProcessingEnabled)
+            Section(
+                header: Text(formPresentation.postProcessingSectionTitle),
+                footer: formPresentation.postProcessingFooterText.map { Text($0) }
+            ) {
+                Toggle(formPresentation.enablePostProcessingTitle, isOn: $mode.isPostProcessingEnabled)
                 
                 if mode.isPostProcessingEnabled {
-                    Picker("Provider", selection: $mode.postProcessingProvider) {
+                    Picker(formPresentation.providerPickerTitle, selection: $mode.postProcessingProvider) {
                         ForEach(availablePostProcessingProviders) { provider in
                             Text(provider.displayName).tag(provider)
                         }
@@ -70,11 +79,12 @@ struct ModeConfigurationView: View {
                     ProviderModelSelectionView(
                         provider: mode.postProcessingProvider,
                         use: .postProcessing,
-                        selectedModel: $mode.postProcessingModel
+                        selectedModel: $mode.postProcessingModel,
+                        presentation: formPresentation
                     )
                     
                     // Prompt Template Selection
-                    Picker("Prompt Template", selection: $mode.promptTemplate.type) {
+                    Picker(formPresentation.promptTemplatePickerTitle, selection: $mode.promptTemplate.type) {
                         ForEach(VoiceInkPostProcessingTemplateType.allCases, id: \.self) { templateType in
                             Text(templateType.displayName).tag(templateType)
                         }
@@ -82,17 +92,21 @@ struct ModeConfigurationView: View {
                     
                     // Show custom prompt field only when Custom is selected
                     if mode.promptTemplate.type == .custom {
-                        TextField("Custom Prompt", text: $mode.promptTemplate.customPrompt, axis: .vertical)
+                        TextField(
+                            formPresentation.customPromptPlaceholder,
+                            text: $mode.promptTemplate.customPrompt,
+                            axis: .vertical
+                        )
                             .lineLimit(4, reservesSpace: true)
                     }
                 }
             }
         }
-        .navigationTitle(isEditing ? "Edit Mode" : "New Mode")
+        .navigationTitle(formPresentation.navigationTitle)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
-                Button("Save") {
+                Button(formPresentation.saveButtonTitle) {
                     onSave(mode)
                     dismiss()
                 }
@@ -129,18 +143,19 @@ private struct ProviderModelSelectionView: View {
     let provider: VoiceInkProviderKind
     let use: VoiceInkProviderModelUse
     @Binding var selectedModel: String
+    let presentation: VoiceInkModeFormPresentation
 
     var body: some View {
         switch provider.modelSelectionPresentation(for: use) {
         case .fixedModel(let model):
             HStack {
-                Text("Model")
+                Text(presentation.modelFieldTitle)
                 Spacer()
                 Text(model)
                     .foregroundColor(.secondary)
             }
         case .selectableModels(let models):
-            Picker("Model", selection: $selectedModel) {
+            Picker(presentation.modelFieldTitle, selection: $selectedModel) {
                 ForEach(models, id: \.self) { model in
                     Text(model).tag(model)
                 }

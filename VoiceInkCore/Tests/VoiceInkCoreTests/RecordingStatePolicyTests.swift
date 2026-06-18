@@ -92,6 +92,13 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertEqual(alert.action, .openSettings)
     }
 
+    func testRecordingSheetPresentationPreservesIOSControlsCopy() {
+        let presentation = VoiceInkRecordingSheetPresentation.iOS
+
+        XCTAssertEqual(presentation.cancelButtonTitle, "Cancel")
+        XCTAssertEqual(presentation.stopButtonTitle, "Stop Recording")
+    }
+
     func testRecordingStartFailureMapsIOSMicrophoneBusyOSStatus() {
         let alert = VoiceInkRecordingAlertPresentation.recordingStartFailure(
             domain: NSOSStatusErrorDomain,

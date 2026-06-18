@@ -17,6 +17,8 @@ public enum VoiceInkModeSelectionPresentation: Equatable, Sendable {
     case hidden
     case singleModeName(String)
     case picker
+
+    public static let controlTitle = "Mode"
 }
 
 public struct VoiceInkModeSummaryPresentation: Equatable, Sendable {

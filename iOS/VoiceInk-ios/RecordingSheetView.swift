@@ -6,12 +6,13 @@ struct RecordingSheetView: View {
     @ObservedObject var settings: AppSettings
     let onCancel: () -> Void
     let onStop: () -> Void
+    private let recordingSheetPresentation = VoiceInkRecordingSheetPresentation.iOS
     
     var body: some View {
         VStack(spacing: 16) {
             // Header
             HStack {
-                Button("Cancel", action: onCancel)
+                Button(recordingSheetPresentation.cancelButtonTitle, action: onCancel)
                     .font(.body)
                 Spacer()
                 Text(VoiceInkDurationPresentation.minutesSeconds(
@@ -35,7 +36,7 @@ struct RecordingSheetView: View {
             
             // Stop Button - Matching main button style
             Button(action: onStop) {
-                Label("Stop Recording", systemImage: "stop.fill")
+                Label(recordingSheetPresentation.stopButtonTitle, systemImage: "stop.fill")
                     .fontWeight(.semibold)
                     .frame(maxWidth: .infinity)
             }
@@ -75,7 +76,7 @@ struct VoiceInkModeSelectionControlView: View {
         case .picker, .singleModeName(_):
             VStack(spacing: 8) {
                 if showsTitle {
-                    Text("Mode")
+                    Text(VoiceInkModeSelectionPresentation.controlTitle)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
@@ -91,7 +92,7 @@ struct VoiceInkModeSelectionControlView: View {
         case .hidden:
             EmptyView()
         case .picker:
-            Picker("Mode", selection: $selectedModeId) {
+            Picker(VoiceInkModeSelectionPresentation.controlTitle, selection: $selectedModeId) {
                 ForEach(modes) { mode in
                     Text(mode.name).tag(mode.id as UUID?)
                 }

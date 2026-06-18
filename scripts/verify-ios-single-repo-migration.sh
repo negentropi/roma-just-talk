@@ -347,8 +347,13 @@ require_pattern \
 
 require_pattern \
   "shared mode selection presentation lives in VoiceInkCore" \
-  'VoiceInkModeSelectionPresentation' \
+  'VoiceInkModeSelectionPresentation|controlTitle' \
   VoiceInkCore/Sources/VoiceInkCore/Mode.swift
+
+require_pattern \
+  "shared recording sheet presentation lives in VoiceInkCore" \
+  'VoiceInkRecordingSheetPresentation|cancelButtonTitle|stopButtonTitle' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
 require_pattern \
   "shared mode summary presentation lives in VoiceInkCore" \
@@ -363,6 +368,11 @@ require_pattern \
 require_pattern \
   "iOS recording sheet uses shared mode selection presentation adapter" \
   'VoiceInkModeSelectionControlView' \
+  iOS/VoiceInk-ios/RecordingSheetView.swift
+
+require_pattern \
+  "iOS recording sheet uses shared recording sheet presentation" \
+  'VoiceInkRecordingSheetPresentation\.iOS|recordingSheetPresentation' \
   iOS/VoiceInk-ios/RecordingSheetView.swift
 
 require_pattern \
@@ -390,6 +400,11 @@ reject_pattern \
   'modes\.count > 1|settings\.modes\.count > 1|modes\.first|settings\.modes\.first|!settings\.modes\.isEmpty' \
   iOS/VoiceInk-ios/RecordingSheetView.swift \
   iOS/VoiceInk-ios/NoteDetailView.swift
+
+reject_pattern \
+  "iOS recording sheet avoids shell-only recording controls copy" \
+  '"(Cancel|Stop Recording|Mode)"' \
+  iOS/VoiceInk-ios/RecordingSheetView.swift
 
 reject_pattern \
   "iOS settings mode rows avoid shell-only model summary formatting" \

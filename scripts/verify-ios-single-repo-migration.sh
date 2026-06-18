@@ -519,6 +519,17 @@ reject_pattern \
   VoiceInk/Transcription/Streaming/SpeechmaticsStreamingProvider.swift
 
 require_pattern \
+  "macOS cloud batch transcription passes raw vocabulary into shared batch options" \
+  'rawCustomVocabularyTerms\(from: modelContext\)' \
+  VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
+
+reject_pattern \
+  "macOS cloud batch transcription avoids pre-normalized vocabulary terms" \
+  'getCustomVocabularyTerms\(from: modelContext\)' \
+  VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift \
+  VoiceInk/Services/CustomVocabularyService.swift
+
+require_pattern \
   "shared run processor uses shared transcription run preparation" \
   'VoiceInkTranscriptionRunPreparation\.prepareRawText' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift

@@ -8,38 +8,26 @@ class CustomVocabularyService {
     private init() {}
 
     func getCustomVocabulary(from context: ModelContext) -> String {
-        guard let customWords = getCustomVocabularyWords(from: context), !customWords.isEmpty else {
+        let customWords = rawCustomVocabularyTerms(from: context)
+        guard !customWords.isEmpty else {
             return ""
         }
 
         return VoiceInkAIEnhancementVocabularyContext.formatted(from: customWords)
     }
 
-    func getCustomVocabularyTerms(from context: ModelContext) -> [String] {
-        guard let customWords = getCustomVocabularyWords(from: context) else {
-            return []
-        }
-
-        return VoiceInkCustomVocabularyTerms.normalized(customWords)
-    }
-
     func getCustomVocabularyTerms(from context: ModelContext, for use: VoiceInkCustomVocabularyUse) -> [String] {
-        guard let customWords = getCustomVocabularyWords(from: context) else {
-            return []
-        }
-
-        return VoiceInkCustomVocabularyTerms.normalized(customWords, for: use)
+        VoiceInkCustomVocabularyTerms.normalized(rawCustomVocabularyTerms(from: context), for: use)
     }
 
-    private func getCustomVocabularyWords(from context: ModelContext) -> [String]? {
+    func rawCustomVocabularyTerms(from context: ModelContext) -> [String] {
         let descriptor = FetchDescriptor<VocabularyWord>(sortBy: [SortDescriptor(\VocabularyWord.word)])
 
         do {
             let items = try context.fetch(descriptor)
-            let words = items.map { $0.word }
-            return words.isEmpty ? nil : words
+            return items.map { $0.word }
         } catch {
-            return nil
+            return []
         }
     }
 }

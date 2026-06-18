@@ -67,7 +67,7 @@ class CloudTranscriptionService: TranscriptionService {
                 model: model.name,
                 language: language,
                 prompt: prompt,
-                customVocabulary: CustomVocabularyService.shared.getCustomVocabularyTerms(from: modelContext)
+                customVocabulary: CustomVocabularyService.shared.rawCustomVocabularyTerms(from: modelContext)
             )
         } catch let error as CloudTranscriptionError {
             throw error

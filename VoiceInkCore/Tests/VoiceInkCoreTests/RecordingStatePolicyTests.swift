@@ -2,6 +2,15 @@ import Foundation
 @testable import VoiceInkCore
 
 final class RecordingStatePolicyTests: XCTestCase {
+    func testActiveRecordingPolicyOnlyAllowsRecordingState() {
+        XCTAssertFalse(VoiceInkRecordingState.idle.isActivelyRecording)
+        XCTAssertFalse(VoiceInkRecordingState.starting.isActivelyRecording)
+        XCTAssertTrue(VoiceInkRecordingState.recording.isActivelyRecording)
+        XCTAssertFalse(VoiceInkRecordingState.transcribing.isActivelyRecording)
+        XCTAssertFalse(VoiceInkRecordingState.enhancing.isActivelyRecording)
+        XCTAssertFalse(VoiceInkRecordingState.busy.isActivelyRecording)
+    }
+
     func testRollingBufferPreviewStatePolicyMatchesMacOSRecorderGate() {
         XCTAssertTrue(VoiceInkRecordingState.idle.acceptsRollingBufferPreloadPreview)
         XCTAssertTrue(VoiceInkRecordingState.recording.acceptsRollingBufferPreloadPreview)

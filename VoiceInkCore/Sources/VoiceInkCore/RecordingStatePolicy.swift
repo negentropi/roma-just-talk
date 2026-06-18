@@ -16,6 +16,10 @@ public enum VoiceInkRecorderUIToggleAction: Equatable, Sendable {
 }
 
 public extension VoiceInkRecordingState {
+    var isActivelyRecording: Bool {
+        self == .recording
+    }
+
     var acceptsRollingBufferPreloadPreview: Bool {
         self == .idle || self == .recording
     }

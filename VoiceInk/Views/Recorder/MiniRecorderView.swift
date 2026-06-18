@@ -19,7 +19,7 @@ struct MiniRecorderView<S: RecorderStateProvider & ObservableObject>: View {
 
     private var hasTranscriptPreview: Bool {
         showLiveTextPreview
-            && stateProvider.recordingState == .recording
+            && stateProvider.recordingState.isActivelyRecording
             && !stateProvider.partialTranscript.isEmpty
     }
 

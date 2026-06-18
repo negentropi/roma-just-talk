@@ -122,7 +122,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
             return
         }
 
-        if recordingState == .recording {
+        if recordingState.isActivelyRecording {
             await stopRecordingAndRunPipeline()
         } else {
             logger.notice("toggleRecord: entering start-recording branch")
@@ -197,7 +197,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                                 )
                             }
 
-                            if self.recordingState == .recording,
+                            if self.recordingState.isActivelyRecording,
                                let model = self.transcriptionModelManager.currentTranscriptionModel {
                                 if let claim = claimedPreload,
                                    claim.matches(model: model, language: VoiceInkTranscriptionLanguagePreference.storedLanguage()) {
@@ -256,7 +256,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
 
                             if self.stopRequestedDuringStart,
                                self.activeRecordingStartID == startID,
-                               self.recordingState == .recording {
+                               self.recordingState.isActivelyRecording {
                                 self.stopRequestedDuringStart = false
                                 self.logger.notice("toggleRecord: applying deferred stop after recording start")
                                 await self.stopRecordingAndRunPipeline()

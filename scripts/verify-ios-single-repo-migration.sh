@@ -295,6 +295,33 @@ reject_pattern \
   iOS/VoiceInk-ios \
   iOS/VoiceInkKeyboard
 
+require_pattern \
+  "shared recording state exposes active-recording predicate" \
+  'var +isActivelyRecording: +Bool' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "macOS recording engine uses shared active-recording predicate" \
+  'recordingState\.isActivelyRecording' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+
+require_pattern \
+  "macOS recorder preview uses shared active-recording predicate" \
+  'recordingState\.isActivelyRecording' \
+  VoiceInk/Views/Recorder/MiniRecorderView.swift
+
+require_pattern \
+  "iOS recording manager uses shared active-recording predicate" \
+  'recordingState\.isActivelyRecording' \
+  iOS/VoiceInk-ios/RecordingManager.swift
+
+reject_pattern \
+  "recording behavior avoids raw active-state equality" \
+  'recordingState == \.recording' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift \
+  VoiceInk/Views/Recorder/MiniRecorderView.swift \
+  iOS/VoiceInk-ios/RecordingManager.swift
+
 reject_pattern \
   "iOS recording background transcription uses shared record updates" \
   '\b(existingAudioFileURL|markTranscriptionFailed|applyCompletedRunResult)\b' \

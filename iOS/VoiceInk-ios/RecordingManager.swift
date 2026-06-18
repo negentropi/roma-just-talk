@@ -40,7 +40,7 @@ final class RecordingManager: ObservableObject {
     private let coordinator = AppGroupCoordinator.shared
     
     var isRecording: Bool {
-        recordingState == .recording
+        recordingState.isActivelyRecording
     }
 
     var currentAudioLevels: [Float] {

@@ -547,7 +547,7 @@ struct AudioPlayerView: View {
                 let (enhancedText, enhancementDuration, promptName) = try await enhancementService.enhance(transcription.text)
                 await MainActor.run {
                     transcription.enhancedText = enhancedText
-                    transcription.aiEnhancementModelName = enhancementService.getAIService()?.currentModel
+                    transcription.aiEnhancementModelName = enhancementService.getAIService().currentModel
                     transcription.promptName = promptName
                     transcription.enhancementDuration = enhancementDuration
                     transcription.aiRequestSystemMessage = enhancementService.lastSystemMessageSent

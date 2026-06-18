@@ -54,8 +54,8 @@ class PowerModeSessionManager {
                 isEnhancementEnabled: enhancementService.isEnhancementEnabled,
                 useScreenCaptureContext: enhancementService.useScreenCaptureContext,
                 selectedPromptId: enhancementService.selectedPromptId?.uuidString,
-                selectedAIProvider: enhancementService.getAIService()?.selectedProvider.rawValue,
-                selectedAIModel: enhancementService.getAIService()?.currentModel,
+                selectedAIProvider: enhancementService.getAIService().selectedProvider.rawValue,
+                selectedAIModel: enhancementService.getAIService().currentModel,
                 selectedLanguage: VoiceInkTranscriptionLanguagePreference.storedLanguage(),
                 transcriptionModelName: stateProvider.currentTranscriptionModel?.name,
                 isTextFormattingEnabled: cleanupSettings.isTextFormattingEnabled,
@@ -108,8 +108,8 @@ class PowerModeSessionManager {
             isEnhancementEnabled: enhancementService.isEnhancementEnabled,
             useScreenCaptureContext: enhancementService.useScreenCaptureContext,
             selectedPromptId: enhancementService.selectedPromptId?.uuidString,
-            selectedAIProvider: enhancementService.getAIService()?.selectedProvider.rawValue,
-            selectedAIModel: enhancementService.getAIService()?.currentModel,
+            selectedAIProvider: enhancementService.getAIService().selectedProvider.rawValue,
+            selectedAIModel: enhancementService.getAIService().currentModel,
             selectedLanguage: VoiceInkTranscriptionLanguagePreference.storedLanguage(),
             transcriptionModelName: stateProvider.currentTranscriptionModel?.name,
             isTextFormattingEnabled: cleanupSettings.isTextFormattingEnabled,
@@ -135,13 +135,12 @@ class PowerModeSessionManager {
                     enhancementService.selectedPromptId = uuid
                 }
 
-                if let aiService = enhancementService.getAIService() {
-                    if let providerName = config.selectedAIProvider, let provider = VoiceInkAIEnhancementProviderKind(storedValue: providerName) {
-                        aiService.selectedProvider = provider
-                    }
-                    if let model = config.selectedAIModel {
-                        aiService.selectModel(model)
-                    }
+                let aiService = enhancementService.getAIService()
+                if let providerName = config.selectedAIProvider, let provider = VoiceInkAIEnhancementProviderKind(storedValue: providerName) {
+                    aiService.selectedProvider = provider
+                }
+                if let model = config.selectedAIModel {
+                    aiService.selectModel(model)
                 }
             }
 
@@ -174,13 +173,12 @@ class PowerModeSessionManager {
             enhancementService.useScreenCaptureContext = state.useScreenCaptureContext
             enhancementService.selectedPromptId = state.selectedPromptId.flatMap(UUID.init)
 
-            if let aiService = enhancementService.getAIService() {
-                if let providerName = state.selectedAIProvider, let provider = VoiceInkAIEnhancementProviderKind(storedValue: providerName) {
-                    aiService.selectedProvider = provider
-                }
-                if let model = state.selectedAIModel {
-                    aiService.selectModel(model)
-                }
+            let aiService = enhancementService.getAIService()
+            if let providerName = state.selectedAIProvider, let provider = VoiceInkAIEnhancementProviderKind(storedValue: providerName) {
+                aiService.selectedProvider = provider
+            }
+            if let model = state.selectedAIModel {
+                aiService.selectModel(model)
             }
 
             if let isTextFormattingEnabled = state.isTextFormattingEnabled {

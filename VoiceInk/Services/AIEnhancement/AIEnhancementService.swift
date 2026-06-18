@@ -125,8 +125,8 @@ class AIEnhancementService: ObservableObject {
         }
     }
 
-    func getAIService() -> AIService? {
-        return aiService
+    func getAIService() -> AIService {
+        aiService
     }
 
     var isConfigured: Bool {
@@ -359,14 +359,10 @@ class AIEnhancementService: ObservableObject {
         let startTime = Date()
         let promptName = activePrompt?.title
 
-        do {
-            let result = try await makeRequestWithRetry(text: text)
-            let endTime = Date()
-            let duration = endTime.timeIntervalSince(startTime)
-            return (result, duration, promptName)
-        } catch {
-            throw error
-        }
+        let result = try await makeRequestWithRetry(text: text)
+        let endTime = Date()
+        let duration = endTime.timeIntervalSince(startTime)
+        return (result, duration, promptName)
     }
 
     func captureScreenContext() async {

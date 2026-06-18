@@ -47,9 +47,7 @@ final class SessionMetric: VoiceInkPerformanceRecord, VoiceInkDashboardMetricRec
 
 extension SessionMetric {
     var performanceAudioDuration: TimeInterval { audioDuration }
-    var performanceTranscriptionModelName: String? { transcriptionModelName }
     var performanceTranscriptionDuration: TimeInterval? { transcriptionDuration }
-    var performanceEnhancementModelName: String? { aiEnhancementModelName }
     var performanceEnhancementDuration: TimeInterval? { enhancementDuration }
     var performanceEnhancedText: String? { nil }
     var dashboardWordCount: Int { wordCount }

@@ -36,8 +36,3 @@ final class Transcription: VoiceInkMutableTranscriptionRecord, VoiceInkStoredAud
         VoiceInkIOSStorageDirectories.recordingsDirectory
     }
 }
-
-extension Transcription {
-    var performanceTranscriptionModelName: String? { transcriptionModelName }
-    var performanceEnhancementModelName: String? { aiEnhancementModelName }
-}

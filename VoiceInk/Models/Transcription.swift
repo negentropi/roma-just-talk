@@ -85,8 +85,3 @@ final class Transcription: VoiceInkStoredAudioRecord, VoiceInkSessionMetricSourc
     }
 
 }
-
-extension Transcription {
-    var performanceTranscriptionModelName: String? { transcriptionModelName }
-    var performanceEnhancementModelName: String? { aiEnhancementModelName }
-}

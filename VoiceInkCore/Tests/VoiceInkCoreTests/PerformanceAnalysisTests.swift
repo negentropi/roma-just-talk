@@ -8,7 +8,7 @@ final class PerformanceAnalysisTests: XCTestCase {
                 audioDuration: 10,
                 transcriptionModelName: "fast",
                 transcriptionDuration: 2,
-                enhancementModelName: "gpt",
+                aiEnhancementModelName: "gpt",
                 enhancementDuration: 1,
                 enhancedText: "enhanced"
             ),
@@ -16,7 +16,7 @@ final class PerformanceAnalysisTests: XCTestCase {
                 audioDuration: 20,
                 transcriptionModelName: "fast",
                 transcriptionDuration: 4,
-                enhancementModelName: "gpt",
+                aiEnhancementModelName: "gpt",
                 enhancementDuration: 3,
                 enhancedText: nil
             ),
@@ -24,7 +24,7 @@ final class PerformanceAnalysisTests: XCTestCase {
                 audioDuration: 20,
                 transcriptionModelName: "slow",
                 transcriptionDuration: 10,
-                enhancementModelName: nil,
+                aiEnhancementModelName: nil,
                 enhancementDuration: nil,
                 enhancedText: nil
             ),
@@ -32,7 +32,7 @@ final class PerformanceAnalysisTests: XCTestCase {
                 audioDuration: 5,
                 transcriptionModelName: nil,
                 transcriptionDuration: nil,
-                enhancementModelName: "gpt",
+                aiEnhancementModelName: "gpt",
                 enhancementDuration: nil,
                 enhancedText: "ignored without duration"
             )
@@ -99,15 +99,15 @@ final class PerformanceAnalysisTests: XCTestCase {
             transcriptionDuration: 3,
             enhancementDuration: 2,
             transcriptionModelName: "fast-local",
-            enhancementModelName: "cleaner"
+            aiEnhancementModelName: "cleaner"
         )
 
         XCTAssertEqual(record.performanceAudioDuration, 12)
         XCTAssertEqual(record.performanceTranscriptionDuration, 3)
         XCTAssertEqual(record.performanceEnhancementDuration, 2)
         XCTAssertEqual(record.performanceEnhancedText, "enhanced")
-        XCTAssertEqual(record.performanceTranscriptionModelName, "fast-local")
-        XCTAssertEqual(record.performanceEnhancementModelName, "cleaner")
+        XCTAssertEqual(record.transcriptionModelName, "fast-local")
+        XCTAssertEqual(record.aiEnhancementModelName, "cleaner")
     }
 }
 
@@ -115,7 +115,7 @@ private struct Record: VoiceInkPerformanceRecord {
     let audioDuration: TimeInterval
     let transcriptionModelName: String?
     let transcriptionDuration: TimeInterval?
-    let enhancementModelName: String?
+    let aiEnhancementModelName: String?
     let enhancementDuration: TimeInterval?
     let enhancedText: String?
 
@@ -123,22 +123,20 @@ private struct Record: VoiceInkPerformanceRecord {
         audioDuration: TimeInterval,
         transcriptionModelName: String? = nil,
         transcriptionDuration: TimeInterval? = nil,
-        enhancementModelName: String? = nil,
+        aiEnhancementModelName: String? = nil,
         enhancementDuration: TimeInterval? = nil,
         enhancedText: String? = nil
     ) {
         self.audioDuration = audioDuration
         self.transcriptionModelName = transcriptionModelName
         self.transcriptionDuration = transcriptionDuration
-        self.enhancementModelName = enhancementModelName
+        self.aiEnhancementModelName = aiEnhancementModelName
         self.enhancementDuration = enhancementDuration
         self.enhancedText = enhancedText
     }
 
     var performanceAudioDuration: TimeInterval { audioDuration }
-    var performanceTranscriptionModelName: String? { transcriptionModelName }
     var performanceTranscriptionDuration: TimeInterval? { transcriptionDuration }
-    var performanceEnhancementModelName: String? { enhancementModelName }
     var performanceEnhancementDuration: TimeInterval? { enhancementDuration }
     var performanceEnhancedText: String? { enhancedText }
 }
@@ -150,8 +148,5 @@ private struct SessionBackedRecord: VoiceInkPerformanceRecord, VoiceInkSessionMe
     let transcriptionDuration: TimeInterval?
     let enhancementDuration: TimeInterval?
     let transcriptionModelName: String?
-    let enhancementModelName: String?
-
-    var performanceTranscriptionModelName: String? { transcriptionModelName }
-    var performanceEnhancementModelName: String? { enhancementModelName }
+    let aiEnhancementModelName: String?
 }

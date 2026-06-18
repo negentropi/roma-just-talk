@@ -2,9 +2,9 @@ import Foundation
 
 public protocol VoiceInkPerformanceRecord {
     var performanceAudioDuration: TimeInterval { get }
-    var performanceTranscriptionModelName: String? { get }
+    var transcriptionModelName: String? { get }
     var performanceTranscriptionDuration: TimeInterval? { get }
-    var performanceEnhancementModelName: String? { get }
+    var aiEnhancementModelName: String? { get }
     var performanceEnhancementDuration: TimeInterval? { get }
     var performanceEnhancedText: String? { get }
 }
@@ -67,7 +67,7 @@ public enum VoiceInkPerformanceAnalyzer {
     ) -> [VoiceInkPerformanceModelStat] {
         modelStats(
             from: records,
-            name: \.performanceTranscriptionModelName,
+            name: \.transcriptionModelName,
             processingDuration: \.performanceTranscriptionDuration,
             requirePositiveDuration: requirePositiveDuration
         )
@@ -79,7 +79,7 @@ public enum VoiceInkPerformanceAnalyzer {
     ) -> [VoiceInkPerformanceModelStat] {
         modelStats(
             from: records,
-            name: \.performanceEnhancementModelName,
+            name: \.aiEnhancementModelName,
             processingDuration: \.performanceEnhancementDuration,
             requirePositiveDuration: requirePositiveDuration
         )

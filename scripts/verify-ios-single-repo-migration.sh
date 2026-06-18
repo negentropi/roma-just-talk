@@ -670,6 +670,14 @@ reject_pattern \
   VoiceInk/Views/Metrics/PerformanceAnalysisView.swift \
   VoiceInk/Views/Metrics/PerformanceAnalysisPanelView.swift
 
+reject_pattern \
+  "performance records avoid shell-only model-name aliases" \
+  'performance(Transcription|Enhancement)ModelName' \
+  VoiceInk \
+  iOS \
+  VoiceInkCore/Sources/VoiceInkCore \
+  VoiceInkCore/Tests/VoiceInkCoreTests
+
 require_pattern \
   "workspace includes iOS project" \
   'location = "group:iOS/VoiceInk-ios.xcodeproj"' \

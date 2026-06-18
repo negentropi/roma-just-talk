@@ -413,6 +413,21 @@ reject_pattern \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift
 
 require_pattern \
+  "macOS canceled transcription record uses shared canceled text" \
+  'VoiceInkTranscriptPresentation\.canceledTranscriptionText' \
+  VoiceInk/Models/Transcription.swift
+
+require_pattern \
+  "macOS engine canceled recording uses shared canceled text" \
+  'VoiceInkTranscriptPresentation\.canceledTranscriptionText' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+
+reject_pattern \
+  "macOS canceled transcription text shim stays deleted" \
+  'static let canceledTranscriptionText' \
+  VoiceInk/Models/Transcription.swift
+
+require_pattern \
   "macOS filler-word add button uses shared draft policy" \
   'VoiceInkFillerWords\.hasDraft\(newWord\)' \
   VoiceInk/Views/Components/FillerWordsSettingsView.swift

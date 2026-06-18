@@ -4,8 +4,6 @@ import VoiceInkCore
 
 @Model
 final class Transcription: VoiceInkStoredAudioRecord, VoiceInkSessionMetricSource, VoiceInkPerformanceRecord {
-    static let canceledTranscriptionText = VoiceInkTranscriptPresentation.canceledTranscriptionText
-
     var id: UUID
     var text: String
     var enhancedText: String?
@@ -59,7 +57,7 @@ final class Transcription: VoiceInkStoredAudioRecord, VoiceInkSessionMetricSourc
         duration: TimeInterval? = nil,
         modelName: String? = nil
     ) {
-        text = Self.canceledTranscriptionText
+        text = VoiceInkTranscriptPresentation.canceledTranscriptionText
         enhancedText = nil
         transcriptionState = .canceled
         if let duration {

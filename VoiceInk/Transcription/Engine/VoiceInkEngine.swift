@@ -957,7 +957,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
         let duration = await AudioFileMetadata.duration(for: recordedFile)
         let transcription = makeRecordingTranscription(
             for: recordedFile,
-            text: Transcription.canceledTranscriptionText,
+            text: VoiceInkTranscriptPresentation.canceledTranscriptionText,
             duration: duration,
             transcriptionStatus: .canceled
         )

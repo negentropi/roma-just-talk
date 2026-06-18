@@ -265,6 +265,82 @@ final class WhisperModelFilesTests: XCTestCase {
         XCTAssertFalse(VoiceInkWhisperModelDownloadResponsePolicy.isSuccessfulResponse(nil))
     }
 
+    func testSimpleDownloadProgressFormatsIOSProgress() {
+        let progress = VoiceInkWhisperModelDownloadProgress.simple(
+            modelName: "ggml-base",
+            isDownloading: true,
+            progress: 0.428
+        )
+
+        XCTAssertTrue(progress.isActive)
+        XCTAssertEqual(progress.fraction, 0.428, accuracy: 0.000001)
+        XCTAssertEqual(progress.percentText, "42%")
+        XCTAssertEqual(progress.phaseText, "Downloading ggml-base Model")
+        XCTAssertEqual(
+            VoiceInkWhisperModelDownloadProgress.simple(
+                modelName: "ggml-base",
+                isDownloading: false,
+                progress: 0.5
+            ).phase,
+            .idle
+        )
+    }
+
+    func testMacOSDownloadProgressUsesMainAndCoreMLKeys() {
+        let startingProgress = VoiceInkWhisperModelDownloadProgress.macOS(
+            modelName: "ggml-base",
+            downloadProgress: [
+                VoiceInkWhisperModelDownloadProgress.mainProgressKey(forModelName: "ggml-base"): 0
+            ]
+        )
+        let progress = VoiceInkWhisperModelDownloadProgress.macOS(
+            modelName: "ggml-base",
+            downloadProgress: [
+                VoiceInkWhisperModelDownloadProgress.mainProgressKey(forModelName: "ggml-base"): 1,
+                VoiceInkWhisperModelDownloadProgress.coreMLProgressKey(forModelName: "ggml-base"): 0.4
+            ]
+        )
+
+        XCTAssertTrue(VoiceInkWhisperModelDownloadProgress.isMacOSDownloading(
+            modelName: "ggml-base",
+            downloadProgress: [
+                VoiceInkWhisperModelDownloadProgress.mainProgressKey(forModelName: "ggml-base"): 1
+            ]
+        ))
+        XCTAssertTrue(startingProgress.isActive)
+        XCTAssertEqual(startingProgress.fraction, 0)
+        XCTAssertEqual(startingProgress.phaseText, "Downloading ggml-base Model")
+        XCTAssertEqual(progress.fraction, 0.7, accuracy: 0.000001)
+        XCTAssertEqual(progress.percentText, "70%")
+        XCTAssertEqual(progress.phaseText, "Downloading Core ML Model for ggml-base")
+    }
+
+    func testMacOSDownloadProgressIgnoresCoreMLForQuantizedModels() {
+        let progress = VoiceInkWhisperModelDownloadProgress.macOS(
+            modelName: "ggml-large-v3-turbo-q5_0",
+            downloadProgress: [
+                VoiceInkWhisperModelDownloadProgress.mainProgressKey(forModelName: "ggml-large-v3-turbo-q5_0"): 0.25,
+                VoiceInkWhisperModelDownloadProgress.coreMLProgressKey(forModelName: "ggml-large-v3-turbo-q5_0"): 1
+            ]
+        )
+
+        XCTAssertEqual(progress.fraction, 0.25, accuracy: 0.000001)
+        XCTAssertEqual(progress.phaseText, "Downloading ggml-large-v3-turbo-q5_0 Model")
+    }
+
+    func testModelDownloadCopyUsesSharedModelSize() {
+        let model = VoiceInkWhisperModelFiles.baseModel
+
+        XCTAssertEqual(
+            VoiceInkWhisperModelDownloadProgress.downloadActionTitle(for: model),
+            "Download Model (142 MB)"
+        )
+        XCTAssertEqual(
+            VoiceInkWhisperModelDownloadProgress.downloadConfirmationMessage(for: model),
+            "To enable offline transcription, a 142 MB model needs to be downloaded. This may incur data charges if you are not on Wi-Fi."
+        )
+    }
+
     func testDownloadableModelsMatchMacOSLocalWhisperCatalog() {
         XCTAssertEqual(
             VoiceInkWhisperModelFiles.downloadableModels.map(\.modelName),

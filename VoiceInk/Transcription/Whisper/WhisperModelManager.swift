@@ -154,7 +154,9 @@ class WhisperModelManager: ObservableObject {
             }
 
             availableModels.append(whisperModel)
-            self.downloadProgress.removeValue(forKey: model.name + "_main")
+            self.downloadProgress.removeValue(
+                forKey: VoiceInkWhisperModelDownloadProgress.mainProgressKey(forModelName: model.name)
+            )
 
             onModelsChanged?()
 
@@ -167,7 +169,7 @@ class WhisperModelManager: ObservableObject {
     }
 
     private func downloadMainModel(_ model: WhisperModel, from url: URL) async throws -> VoiceInkWhisperLocalModelFile {
-        let progressKeyMain = model.name + "_main"
+        let progressKeyMain = VoiceInkWhisperModelDownloadProgress.mainProgressKey(forModelName: model.name)
         let data = try await downloadFileWithProgress(from: url, progressKey: progressKeyMain)
 
         let destinationURL = try VoiceInkWhisperModelFiles.writeDownloadedModelData(
@@ -180,7 +182,7 @@ class WhisperModelManager: ObservableObject {
     }
 
     private func downloadAndSetupCoreMLModel(for model: VoiceInkWhisperLocalModelFile, from url: URL) async throws -> VoiceInkWhisperLocalModelFile {
-        let progressKeyCoreML = model.name + "_coreml"
+        let progressKeyCoreML = VoiceInkWhisperModelDownloadProgress.coreMLProgressKey(forModelName: model.name)
         let coreMLData = try await downloadFileWithProgress(from: url, progressKey: progressKeyCoreML)
 
         guard let coreMLZipPath = VoiceInkWhisperModelFiles.coreMLZipFileURL(
@@ -244,8 +246,12 @@ class WhisperModelManager: ObservableObject {
     }
 
     private func handleModelDownloadError(_ model: WhisperModel, _ error: Error) {
-        self.downloadProgress.removeValue(forKey: model.name + "_main")
-        self.downloadProgress.removeValue(forKey: model.name + "_coreml")
+        self.downloadProgress.removeValue(
+            forKey: VoiceInkWhisperModelDownloadProgress.mainProgressKey(forModelName: model.name)
+        )
+        self.downloadProgress.removeValue(
+            forKey: VoiceInkWhisperModelDownloadProgress.coreMLProgressKey(forModelName: model.name)
+        )
     }
 
     func deleteModel(_ model: VoiceInkWhisperLocalModelFile) async {
@@ -363,46 +369,23 @@ struct DownloadProgressView: View {
 
     @Environment(\.colorScheme) private var colorScheme
 
-    private var mainProgress: Double {
-        downloadProgress[modelName + "_main"] ?? 0
-    }
-
-    private var coreMLProgress: Double {
-        supportsCoreML ? (downloadProgress[modelName + "_coreml"] ?? 0) : 0
-    }
-
-    private var supportsCoreML: Bool {
-        VoiceInkWhisperModelFiles.supportsCoreML(forModelName: modelName)
-    }
-
-    private var totalProgress: Double {
-        if isOptimizing {
-            return 1
-        }
-
-        return supportsCoreML ? (mainProgress * 0.5) + (coreMLProgress * 0.5) : mainProgress
-    }
-
-    private var downloadPhase: String {
-        if isOptimizing {
-            return "Optimizing model for your device"
-        }
-
-        if supportsCoreML && downloadProgress[modelName + "_coreml"] != nil {
-            return "Downloading Core ML Model for \(modelName)"
-        }
-        return "Downloading \(modelName) Model"
+    private var progressPresentation: VoiceInkWhisperModelDownloadProgress {
+        VoiceInkWhisperModelDownloadProgress.macOS(
+            modelName: modelName,
+            downloadProgress: downloadProgress,
+            isOptimizing: isOptimizing
+        )
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text(downloadPhase)
+                Text(progressPresentation.phaseText)
                     .lineLimit(1)
 
                 Spacer()
 
-                Text("\(Int(totalProgress * 100))%")
+                Text(progressPresentation.percentText)
                     .fontDesign(.monospaced)
             }
                 .font(.system(size: 12, weight: .medium))
@@ -416,12 +399,12 @@ struct DownloadProgressView: View {
 
                     RoundedRectangle(cornerRadius: 4)
                         .fill(Color(.controlAccentColor))
-                        .frame(width: max(0, min(geometry.size.width * totalProgress, geometry.size.width)), height: 6)
+                        .frame(width: geometry.size.width * progressPresentation.fraction, height: 6)
                 }
             }
             .frame(height: 6)
         }
         .padding(.vertical, 4)
-        .animation(.smooth, value: totalProgress)
+        .animation(.smooth, value: progressPresentation.fraction)
     }
 }

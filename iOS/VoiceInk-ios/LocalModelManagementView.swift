@@ -43,6 +43,22 @@ struct ModelRowView: View {
     @ObservedObject var modelManager: LocalModelManager
     @State private var showingDeleteAlert = false
     @State private var showingDownloadConfirmation = false
+
+    private var isDownloaded: Bool {
+        model.isDownloaded(in: LocalModelManager.modelsDirectory)
+    }
+
+    private var isDownloading: Bool {
+        modelManager.isDownloading[model.id] == true
+    }
+
+    private var downloadProgress: VoiceInkWhisperModelDownloadProgress {
+        VoiceInkWhisperModelDownloadProgress.simple(
+            modelName: model.modelName,
+            isDownloading: isDownloading,
+            progress: modelManager.downloadProgress[model.id]
+        )
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -58,11 +74,11 @@ struct ModelRowView: View {
                 Spacer()
                 
                 // Action button where size used to be
-                if model.isDownloaded(in: LocalModelManager.modelsDirectory) {
+                if isDownloaded {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundColor(.green)
                         .font(.title2)
-                } else if modelManager.isDownloading[model.id] == true {
+                } else if isDownloading {
                     Button(action: {
                         modelManager.cancelDownload(for: model)
                     }) {
@@ -82,25 +98,25 @@ struct ModelRowView: View {
             }
             
             // Progress indicator when downloading
-            if modelManager.isDownloading[model.id] == true {
+            if downloadProgress.isActive {
                 VStack(alignment: .leading, spacing: 6) {
                     HStack {
                         Text("Downloading...")
                             .font(.caption)
                             .foregroundColor(.blue)
                         Spacer()
-                        Text("\(Int((modelManager.downloadProgress[model.id] ?? 0) * 100))%")
+                        Text(downloadProgress.percentText)
                             .font(.caption)
                             .foregroundColor(.blue)
                     }
                     
-                    ProgressView(value: modelManager.downloadProgress[model.id] ?? 0)
+                    ProgressView(value: downloadProgress.fraction)
                         .progressViewStyle(LinearProgressViewStyle(tint: .blue))
                 }
             }
         }
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-            if model.isDownloaded(in: LocalModelManager.modelsDirectory) {
+            if isDownloaded {
                 Button("Delete") {
                     showingDeleteAlert = true
                 }
@@ -121,7 +137,7 @@ struct ModelRowView: View {
             }
             Button("Cancel", role: .cancel) { }
         } message: {
-            Text("To enable offline transcription, a \(model.size) model needs to be downloaded. This may incur data charges if you are not on Wi-Fi.")
+            Text(VoiceInkWhisperModelDownloadProgress.downloadConfirmationMessage(for: model))
         }
     }
     

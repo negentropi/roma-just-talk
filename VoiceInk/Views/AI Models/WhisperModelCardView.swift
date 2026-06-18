@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import VoiceInkCore
 // MARK: - Local Model Card View
 struct WhisperModelCardView: View {
     let model: WhisperModel
@@ -14,8 +15,10 @@ struct WhisperModelCardView: View {
     var setDefaultAction: () -> Void
     var downloadAction: () -> Void
     private var isDownloading: Bool {
-        downloadProgress.keys.contains(model.name + "_main") || 
-        downloadProgress.keys.contains(model.name + "_coreml")
+        VoiceInkWhisperModelDownloadProgress.isMacOSDownloading(
+            modelName: model.name,
+            downloadProgress: downloadProgress
+        )
     }
     
     var body: some View {

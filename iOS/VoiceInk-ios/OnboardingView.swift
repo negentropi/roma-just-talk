@@ -108,6 +108,18 @@ struct ModelDownloadOnboardingView: View {
     @State private var showDownloadConfirmation = false
     
     var baseModel = VoiceInkWhisperModelFiles.baseModel
+
+    private var isBaseModelDownloaded: Bool {
+        baseModel.isDownloaded(in: LocalModelManager.modelsDirectory)
+    }
+
+    private var baseModelDownloadProgress: VoiceInkWhisperModelDownloadProgress {
+        VoiceInkWhisperModelDownloadProgress.simple(
+            modelName: baseModel.modelName,
+            isDownloading: modelManager.isDownloading[baseModel.id] == true,
+            progress: modelManager.downloadProgress[baseModel.id]
+        )
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -149,11 +161,11 @@ struct ModelDownloadOnboardingView: View {
                         
                         Spacer()
                         
-                        if baseModel.isDownloaded(in: LocalModelManager.modelsDirectory) {
+                        if isBaseModelDownloaded {
                             Image(systemName: "checkmark.circle.fill")
                                 .foregroundColor(.green)
                                 .font(.title)
-                        } else if modelManager.isDownloading[baseModel.id] == true {
+                        } else if baseModelDownloadProgress.isActive {
                             ProgressView()
                                 .progressViewStyle(CircularProgressViewStyle())
                         } else {
@@ -163,19 +175,19 @@ struct ModelDownloadOnboardingView: View {
                         }
                     }
                     
-                    if modelManager.isDownloading[baseModel.id] == true {
+                    if baseModelDownloadProgress.isActive {
                         VStack(alignment: .leading, spacing: 6) {
                             HStack {
                                 Text("Downloading...")
                                     .font(.caption)
                                     .foregroundColor(.accentColor)
                                 Spacer()
-                                Text("\(Int((modelManager.downloadProgress[baseModel.id] ?? 0) * 100))%")
+                                Text(baseModelDownloadProgress.percentText)
                                     .font(.caption.monospacedDigit())
                                     .foregroundColor(.accentColor)
                             }
                             
-                            ProgressView(value: modelManager.downloadProgress[baseModel.id] ?? 0)
+                            ProgressView(value: baseModelDownloadProgress.fraction)
                                 .progressViewStyle(LinearProgressViewStyle(tint: .accentColor))
                         }
                     }
@@ -190,12 +202,12 @@ struct ModelDownloadOnboardingView: View {
             
             // Bottom Action Buttons
             VStack(spacing: 16) {
-                if let isDownloading = modelManager.isDownloading[baseModel.id], isDownloading {
+                if baseModelDownloadProgress.isActive {
                     Button("Downloading...") {}
                         .buttonStyle(OnboardingButtonStyle())
                         .disabled(true)
                     
-                } else if baseModel.isDownloaded(in: LocalModelManager.modelsDirectory) {
+                } else if isBaseModelDownloaded {
                     Button("Continue") {
                         withAnimation(.easeInOut(duration: 0.3)) {
                             currentStep = 2
@@ -208,7 +220,7 @@ struct ModelDownloadOnboardingView: View {
                     }) {
                         HStack(spacing: 8) {
                             Image(systemName: "arrow.down.circle.fill")
-                            Text("Download Model (\(baseModel.size))")
+                            Text(VoiceInkWhisperModelDownloadProgress.downloadActionTitle(for: baseModel))
                         }
                     }
                     .buttonStyle(OnboardingButtonStyle())
@@ -229,7 +241,7 @@ struct ModelDownloadOnboardingView: View {
             }
             Button("Cancel", role: .cancel) { }
         } message: {
-            Text("To enable offline transcription, a \(baseModel.size) model needs to be downloaded. This may incur data charges if you are not on Wi-Fi.")
+            Text(VoiceInkWhisperModelDownloadProgress.downloadConfirmationMessage(for: baseModel))
         }
         .onChange(of: modelManager.downloadError) { error in
             if error != nil {

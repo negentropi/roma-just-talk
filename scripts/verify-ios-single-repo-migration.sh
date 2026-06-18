@@ -521,6 +521,50 @@ reject_pattern \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
 require_pattern \
+  "shared Whisper model download progress policy lives in VoiceInkCore" \
+  'VoiceInkWhisperModelDownloadProgress' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+
+require_pattern \
+  "macOS Whisper downloads use shared progress keys" \
+  'VoiceInkWhisperModelDownloadProgress\.(mainProgressKey|coreMLProgressKey)' \
+  VoiceInk/Transcription/Whisper/WhisperModelManager.swift
+
+require_pattern \
+  "macOS Whisper model card uses shared download-state predicate" \
+  'VoiceInkWhisperModelDownloadProgress\.isMacOSDownloading' \
+  VoiceInk/Views/AI\ Models/WhisperModelCardView.swift
+
+require_pattern \
+  "macOS Whisper download progress view uses shared progress presentation" \
+  'VoiceInkWhisperModelDownloadProgress\.macOS' \
+  VoiceInk/Transcription/Whisper/WhisperModelManager.swift
+
+require_pattern \
+  "iOS local model management uses shared download progress and prompt copy" \
+  'VoiceInkWhisperModelDownloadProgress\.(simple|downloadConfirmationMessage)' \
+  iOS/VoiceInk-ios/LocalModelManagementView.swift
+
+require_pattern \
+  "iOS onboarding uses shared download progress and prompt copy" \
+  'VoiceInkWhisperModelDownloadProgress\.(simple|downloadConfirmationMessage|downloadActionTitle)' \
+  iOS/VoiceInk-ios/OnboardingView.swift
+
+reject_pattern \
+  "platform model download progress avoids shell-only key math" \
+  '"_(main|coreml)"|modelName \+ "_|model\.name \+ "_|Int\(\(modelManager\.downloadProgress' \
+  VoiceInk/Transcription/Whisper/WhisperModelManager.swift \
+  VoiceInk/Views/AI\ Models/WhisperModelCardView.swift \
+  iOS/VoiceInk-ios/LocalModelManagementView.swift \
+  iOS/VoiceInk-ios/OnboardingView.swift
+
+reject_pattern \
+  "iOS model download views avoid duplicate prompt copy" \
+  'To enable offline transcription, a .* model needs to be downloaded|Download Model \(' \
+  iOS/VoiceInk-ios/LocalModelManagementView.swift \
+  iOS/VoiceInk-ios/OnboardingView.swift
+
+require_pattern \
   "macOS cloud API-key card uses shared draft policy" \
   'VoiceInkProviderAPIKeyDraft' \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift

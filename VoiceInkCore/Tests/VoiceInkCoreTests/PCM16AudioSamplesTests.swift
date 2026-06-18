@@ -166,22 +166,6 @@ final class PCM16AudioSamplesTests: XCTestCase {
         )
     }
 
-    func testProofVariantsDeriveLowVolumeAndNoisyCasesDeterministically() {
-        let data = pcm16Data(samples: [-1_000, 0, 1_000])
-
-        let lowVolume = VoiceInkPCM16Audio.proofVariantLittleEndianData(data, variant: .lowVolume)
-        let noisy = VoiceInkPCM16Audio.proofVariantLittleEndianData(data, variant: .noisy)
-        let lowVolumeNoisy = VoiceInkPCM16Audio.proofVariantLittleEndianData(data, variant: .lowVolumeNoisy)
-
-        XCTAssertEqual(pcm16Samples(from: lowVolume), [-250, 0, 250])
-        XCTAssertEqual(pcm16Samples(from: noisy), [-744, -256, 1_256])
-        XCTAssertEqual(pcm16Samples(from: lowVolumeNoisy), [6, -256, 506])
-        XCTAssertEqual(
-            VoiceInkPCM16Audio.proofVariantLittleEndianData(data, variant: .noisy),
-            noisy
-        )
-    }
-
     func testConvertedMonoPCM16SampleCountUsesExistingTruncatedResamplePolicy() {
         XCTAssertEqual(
             VoiceInkPCM16Audio.convertedMonoPCM16SampleCount(

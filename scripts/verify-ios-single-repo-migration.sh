@@ -1076,6 +1076,7 @@ run_required "VoiceInkCore sources typecheck" xcrun swiftc -emit-module \
 run_required "VoiceInkCore tests typecheck" xcrun swiftc -typecheck -I /tmp VoiceInkCore/Tests/VoiceInkCoreTests/*.swift
 
 run_required "VoiceInkCoreChecks" swift run --package-path VoiceInkCore VoiceInkCoreChecks
+run_required "VoiceInkAudioProof builds" swift run --package-path VoiceInkCore VoiceInkAudioProof --help
 
 run_required "macOS Swift sources parse" fd . VoiceInk -e swift -x xcrun swiftc -parse -I /tmp '{}'
 run_required "iOS Swift sources parse" fd . \

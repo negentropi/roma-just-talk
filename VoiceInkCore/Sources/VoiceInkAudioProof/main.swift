@@ -11,6 +11,12 @@ struct AudioProofOptions {
     var maxGain: Float = 16
 }
 
+private enum AudioProofVariant: String, CaseIterable {
+    case lowVolume = "low_volume"
+    case noisy
+    case lowVolumeNoisy = "low_volume_noisy"
+}
+
 struct AudioMetrics {
     let samples: Int
     let peak: Int
@@ -112,8 +118,8 @@ enum VoiceInkAudioProof {
         )
 
         var levelCandidates: [(variant: String, pcmData: Data)] = [("raw", rawPCMData)]
-        for variant in VoiceInkPCM16AudioProofVariant.allCases {
-            let variantPCMData = VoiceInkPCM16Audio.proofVariantLittleEndianData(
+        for variant in AudioProofVariant.allCases {
+            let variantPCMData = proofVariantLittleEndianData(
                 rawPCMData,
                 variant: variant
             )
@@ -163,6 +169,78 @@ enum VoiceInkAudioProof {
         var wavData = Data(header)
         wavData.append(pcmData)
         try wavData.write(to: url, options: .atomic)
+    }
+
+    private static func proofVariantLittleEndianData(
+        _ data: Data,
+        variant: AudioProofVariant
+    ) -> Data {
+        switch variant {
+        case .lowVolume:
+            return scaledLittleEndianData(data, gain: 0.25)
+        case .noisy:
+            return dataWithAlternatingNoise(data, amplitude: 256)
+        case .lowVolumeNoisy:
+            return dataWithAlternatingNoise(
+                scaledLittleEndianData(data, gain: 0.25),
+                amplitude: 256
+            )
+        }
+    }
+
+    private static func scaledLittleEndianData(_ data: Data, gain: Float) -> Data {
+        transformLittleEndianData(data) { sample, _ in
+            pcm16SampleFromScaledInt16(sample, gain: gain)
+        }
+    }
+
+    private static func dataWithAlternatingNoise(_ data: Data, amplitude: Int16) -> Data {
+        transformLittleEndianData(data) { sample, index in
+            let noise = index.isMultiple(of: 2) ? amplitude : -amplitude
+            let mixed = Int(sample) + Int(noise)
+            return Int16(max(Int(Int16.min), min(Int(Int16.max), mixed)))
+        }
+    }
+
+    private static func transformLittleEndianData(
+        _ data: Data,
+        transform: (_ sample: Int16, _ sampleIndex: Int) -> Int16
+    ) -> Data {
+        let sampleByteCount = data.count - (data.count % VoiceInkPCM16Audio.bytesPerSample)
+        guard sampleByteCount >= VoiceInkPCM16Audio.bytesPerSample else { return data }
+
+        var output = Data()
+        output.reserveCapacity(data.count)
+        data.withUnsafeBytes { rawBuffer in
+            guard let bytes = rawBuffer.bindMemory(to: UInt8.self).baseAddress else { return }
+
+            var sampleIndex = 0
+            for byteIndex in stride(from: 0, to: sampleByteCount, by: VoiceInkPCM16Audio.bytesPerSample) {
+                let sample = littleEndianPCM16Sample(bytes: bytes, byteIndex: byteIndex)
+                let transformed = transform(sample, sampleIndex)
+                let littleEndian = transformed.littleEndian
+                output.append(UInt8(truncatingIfNeeded: littleEndian))
+                output.append(UInt8(truncatingIfNeeded: littleEndian >> 8))
+                sampleIndex += 1
+            }
+        }
+
+        if sampleByteCount < data.count {
+            output.append(data.subdata(in: sampleByteCount..<data.count))
+        }
+
+        return output
+    }
+
+    private static func littleEndianPCM16Sample(bytes: UnsafePointer<UInt8>, byteIndex: Int) -> Int16 {
+        let rawValue = UInt16(bytes[byteIndex]) | (UInt16(bytes[byteIndex + 1]) << 8)
+        return Int16(bitPattern: rawValue)
+    }
+
+    private static func pcm16SampleFromScaledInt16(_ sample: Int16, gain: Float) -> Int16 {
+        let scaled = (Float(sample) * gain).rounded()
+        let clipped = max(-32768.0, min(32767.0, scaled))
+        return Int16(clipped)
     }
 
     private static func metrics(forLittleEndianPCM16Data data: Data) -> AudioMetrics {

@@ -1,11 +1,5 @@
 import Foundation
 
-public enum VoiceInkPCM16AudioProofVariant: String, CaseIterable, Sendable {
-    case lowVolume = "low_volume"
-    case noisy
-    case lowVolumeNoisy = "low_volume_noisy"
-}
-
 public enum VoiceInkPCM16Audio {
     public static let mono16kSampleRateHz = 16_000
     public static let mono16kSampleRate = Double(mono16kSampleRateHz)
@@ -125,23 +119,6 @@ public enum VoiceInkPCM16Audio {
         }
 
         return output
-    }
-
-    public static func proofVariantLittleEndianData(
-        _ data: Data,
-        variant: VoiceInkPCM16AudioProofVariant
-    ) -> Data {
-        switch variant {
-        case .lowVolume:
-            return scaledLittleEndianData(data, gain: 0.25)
-        case .noisy:
-            return dataWithAlternatingNoise(data, amplitude: 256)
-        case .lowVolumeNoisy:
-            return dataWithAlternatingNoise(
-                scaledLittleEndianData(data, gain: 0.25),
-                amplitude: 256
-            )
-        }
     }
 
     public static func convertedMonoPCM16SampleCount(
@@ -293,47 +270,4 @@ public enum VoiceInkPCM16Audio {
         return Int16(clipped)
     }
 
-    private static func scaledLittleEndianData(_ data: Data, gain: Float) -> Data {
-        transformLittleEndianData(data) { sample, _ in
-            pcm16SampleFromScaledInt16(sample, gain: gain)
-        }
-    }
-
-    private static func dataWithAlternatingNoise(_ data: Data, amplitude: Int16) -> Data {
-        transformLittleEndianData(data) { sample, index in
-            let noise = index.isMultiple(of: 2) ? amplitude : -amplitude
-            let mixed = Int(sample) + Int(noise)
-            return Int16(max(Int(Int16.min), min(Int(Int16.max), mixed)))
-        }
-    }
-
-    private static func transformLittleEndianData(
-        _ data: Data,
-        transform: (_ sample: Int16, _ sampleIndex: Int) -> Int16
-    ) -> Data {
-        let sampleByteCount = data.count - (data.count % bytesPerSample)
-        guard sampleByteCount >= bytesPerSample else { return data }
-
-        var output = Data()
-        output.reserveCapacity(data.count)
-        data.withUnsafeBytes { rawBuffer in
-            guard let bytes = rawBuffer.bindMemory(to: UInt8.self).baseAddress else { return }
-
-            var sampleIndex = 0
-            for byteIndex in stride(from: 0, to: sampleByteCount, by: bytesPerSample) {
-                let sample = littleEndianPCM16Sample(bytes: bytes, byteIndex: byteIndex)
-                let transformed = transform(sample, sampleIndex)
-                let littleEndian = transformed.littleEndian
-                output.append(UInt8(truncatingIfNeeded: littleEndian))
-                output.append(UInt8(truncatingIfNeeded: littleEndian >> 8))
-                sampleIndex += 1
-            }
-        }
-
-        if sampleByteCount < data.count {
-            output.append(data.subdata(in: sampleByteCount..<data.count))
-        }
-
-        return output
-    }
 }

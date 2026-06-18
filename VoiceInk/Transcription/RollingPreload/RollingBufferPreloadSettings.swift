@@ -2,13 +2,7 @@ import Foundation
 import IOKit.ps
 import VoiceInkCore
 
-typealias RollingBufferPreloadMode = VoiceInkRollingBufferPreloadMode
-typealias RollingBufferPreloadConfiguration = VoiceInkRollingBufferPreloadConfiguration
-typealias RollingBufferPowerState = VoiceInkRollingBufferPowerState
-typealias RollingBufferPreloadPolicy = VoiceInkRollingBufferPreloadPolicy
-typealias RollingBufferPreloadSettings = VoiceInkRollingBufferPreloadSettings
-
-extension RollingBufferPreloadSettings {
+extension VoiceInkRollingBufferPreloadSettings {
     static func perModelPreloadEnabled(
         for model: any TranscriptionModel,
         in defaults: UserDefaults = .standard
@@ -40,14 +34,14 @@ enum RollingBufferVADSettings {
 }
 
 protocol RollingBufferPowerStateProviding {
-    func currentPowerState() -> RollingBufferPowerState
+    func currentPowerState() -> VoiceInkRollingBufferPowerState
 }
 
 struct IOKitRollingBufferPowerStateProvider: RollingBufferPowerStateProviding {
-    func currentPowerState() -> RollingBufferPowerState {
+    func currentPowerState() -> VoiceInkRollingBufferPowerState {
         guard let info = IOPSCopyPowerSourcesInfo()?.takeRetainedValue(),
               let sources = IOPSCopyPowerSourcesList(info)?.takeRetainedValue() as? [CFTypeRef] else {
-            return RollingBufferPowerState(isOnBattery: false, batteryLevelPercent: nil)
+            return VoiceInkRollingBufferPowerState(isOnBattery: false, batteryLevelPercent: nil)
         }
 
         var hasBattery = false
@@ -77,7 +71,7 @@ struct IOKitRollingBufferPowerStateProvider: RollingBufferPowerStateProviding {
             }
         }
 
-        return RollingBufferPowerState(
+        return VoiceInkRollingBufferPowerState(
             isOnBattery: hasBattery && isOnBattery,
             batteryLevelPercent: levels.min()
         )

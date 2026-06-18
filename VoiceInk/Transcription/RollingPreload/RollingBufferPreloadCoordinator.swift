@@ -70,7 +70,7 @@ final class RollingBufferPreloadCoordinator {
     private var detector: (any SpeechActivityDetecting)?
     private var detectorLoadTask: Task<(any SpeechActivityDetecting)?, Never>?
     private var detectorLoadAttempted = false
-    private var configuration = RollingBufferPreloadSettings.configuration()
+    private var configuration = VoiceInkRollingBufferPreloadSettings.configuration()
     private var cachedPlan: Plan?
     private var cachedPlanModelName: String?
     private var cachedPlanLanguage: String?
@@ -120,7 +120,7 @@ final class RollingBufferPreloadCoordinator {
         }
         self.powerStateProvider = powerStateProvider
         self.leadInBuffer = VoiceInkRollingAudioBuffer(
-            maxBytes: Self.bytes(forDuration: RollingBufferPreloadSettings.defaultBufferDurationSeconds)
+            maxBytes: Self.bytes(forDuration: VoiceInkRollingBufferPreloadSettings.defaultBufferDurationSeconds)
         )
     }
 
@@ -139,7 +139,7 @@ final class RollingBufferPreloadCoordinator {
         self.sessionFactory = sessionFactory
         self.powerStateProvider = powerStateProvider
         self.leadInBuffer = VoiceInkRollingAudioBuffer(
-            maxBytes: Self.bytes(forDuration: RollingBufferPreloadSettings.defaultBufferDurationSeconds)
+            maxBytes: Self.bytes(forDuration: VoiceInkRollingBufferPreloadSettings.defaultBufferDurationSeconds)
         )
     }
 
@@ -241,7 +241,7 @@ final class RollingBufferPreloadCoordinator {
     }
 
     func settingsDidChange() {
-        configuration = RollingBufferPreloadSettings.configuration()
+        configuration = VoiceInkRollingBufferPreloadSettings.configuration()
         invalidateCachedPlan()
         detectorLoadTask?.cancel()
         detectorLoadTask = nil
@@ -318,7 +318,7 @@ final class RollingBufferPreloadCoordinator {
     private func currentPlan(
         for model: any TranscriptionModel,
         language: String?,
-        configuration: RollingBufferPreloadConfiguration
+        configuration: VoiceInkRollingBufferPreloadConfiguration
     ) -> Plan? {
         let now = Date()
         if cachedPlanModelName == model.name,
@@ -331,7 +331,7 @@ final class RollingBufferPreloadCoordinator {
             return cachePlan(nil, for: model.name, language: language, now: now)
         }
 
-        let perModelEnabled = RollingBufferPreloadSettings.perModelPreloadEnabled(for: model)
+        let perModelEnabled = VoiceInkRollingBufferPreloadSettings.perModelPreloadEnabled(for: model)
         guard perModelEnabled else {
             return cachePlan(nil, for: model.name, language: language, now: now)
         }
@@ -349,10 +349,10 @@ final class RollingBufferPreloadCoordinator {
 
     private func allowsPreloadBeforeDetector(
         for model: any TranscriptionModel,
-        configuration: RollingBufferPreloadConfiguration,
+        configuration: VoiceInkRollingBufferPreloadConfiguration,
         perModelEnabled: Bool
     ) -> Bool {
-        RollingBufferPreloadPolicy(
+        VoiceInkRollingBufferPreloadPolicy(
             configuration: configuration,
             powerState: powerStateProvider.currentPowerState()
         ).allowsPreload(

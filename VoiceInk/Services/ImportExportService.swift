@@ -147,7 +147,7 @@ class ImportExportService {
         let cleanupSettings = VoiceInkTranscriptionCleanupSettings.current()
         let transcriptionCleanup = VoiceInkTranscriptionAutoCleanupPreference.current()
         let audioCleanup = VoiceInkAudioCleanupPreference.current()
-        let rollingBufferConfiguration = RollingBufferPreloadSettings.configuration()
+        let rollingBufferConfiguration = VoiceInkRollingBufferPreloadSettings.configuration()
         let perModelPreloadSettings = exportPerModelRollingBufferPreloadSettings()
         let generalSettingsToExport = GeneralBackup(
             primaryRecordingShortcut: ShortcutStore.shortcut(for: .primaryRecording).map(ShortcutBackup.init),
@@ -334,7 +334,7 @@ class ImportExportService {
     }
 
     private func exportPerModelRollingBufferPreloadSettings() -> [String: Bool] {
-        let prefix = RollingBufferPreloadSettings.perModelEnabledKeyPrefix
+        let prefix = VoiceInkRollingBufferPreloadSettings.perModelEnabledKeyPrefix
         return UserDefaults.standard.dictionaryRepresentation().reduce(into: [:]) { result, entry in
             guard entry.key.hasPrefix(prefix),
                   let enabled = entry.value as? Bool else {

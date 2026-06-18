@@ -1,18 +1,19 @@
 import SwiftUI
+import VoiceInkCore
 
 struct RollingBufferPreloadSettingsControls: View {
-    @AppStorage(RollingBufferPreloadSettings.modeKey) private var modeRaw = RollingBufferPreloadSettings.defaultMode.rawValue
-    @AppStorage(RollingBufferPreloadSettings.autoDisableCloudModelsKey) private var autoDisableCloudModels = RollingBufferPreloadSettings.defaultAutoDisablesCloudModels
-    @AppStorage(RollingBufferPreloadSettings.autoDisableLowBatteryLocalModelsKey) private var autoDisableLowBatteryLocalModels = RollingBufferPreloadSettings.defaultAutoDisablesLowBatteryLocalModels
-    @AppStorage(RollingBufferPreloadSettings.lowBatteryThresholdPercentKey) private var lowBatteryThresholdPercent = RollingBufferPreloadSettings.defaultLowBatteryThresholdPercent
-    @AppStorage(RollingBufferPreloadSettings.bufferDurationSecondsKey) private var bufferDurationSeconds = RollingBufferPreloadSettings.defaultBufferDurationSeconds
-    @AppStorage(RollingBufferPreloadSettings.preRunFinalizationKey) private var preRunFinalization = RollingBufferPreloadSettings.defaultPreRunFinalization
+    @AppStorage(VoiceInkRollingBufferPreloadSettings.modeKey) private var modeRaw = VoiceInkRollingBufferPreloadSettings.defaultMode.rawValue
+    @AppStorage(VoiceInkRollingBufferPreloadSettings.autoDisableCloudModelsKey) private var autoDisableCloudModels = VoiceInkRollingBufferPreloadSettings.defaultAutoDisablesCloudModels
+    @AppStorage(VoiceInkRollingBufferPreloadSettings.autoDisableLowBatteryLocalModelsKey) private var autoDisableLowBatteryLocalModels = VoiceInkRollingBufferPreloadSettings.defaultAutoDisablesLowBatteryLocalModels
+    @AppStorage(VoiceInkRollingBufferPreloadSettings.lowBatteryThresholdPercentKey) private var lowBatteryThresholdPercent = VoiceInkRollingBufferPreloadSettings.defaultLowBatteryThresholdPercent
+    @AppStorage(VoiceInkRollingBufferPreloadSettings.bufferDurationSecondsKey) private var bufferDurationSeconds = VoiceInkRollingBufferPreloadSettings.defaultBufferDurationSeconds
+    @AppStorage(VoiceInkRollingBufferPreloadSettings.preRunFinalizationKey) private var preRunFinalization = VoiceInkRollingBufferPreloadSettings.defaultPreRunFinalization
     @AppStorage(RollingBufferVADSettings.modelKey) private var rollingBufferVADModel = RollingBufferVADSettings.sileroModelName
 
-    private var mode: Binding<RollingBufferPreloadMode> {
+    private var mode: Binding<VoiceInkRollingBufferPreloadMode> {
         Binding(
             get: {
-                RollingBufferPreloadMode(rawValue: modeRaw) ?? RollingBufferPreloadSettings.defaultMode
+                VoiceInkRollingBufferPreloadMode(rawValue: modeRaw) ?? VoiceInkRollingBufferPreloadSettings.defaultMode
             },
             set: { newMode in
                 modeRaw = newMode.rawValue
@@ -32,7 +33,7 @@ struct RollingBufferPreloadSettingsControls: View {
 
     var body: some View {
         Picker(selection: mode) {
-            ForEach(RollingBufferPreloadMode.allCases) { mode in
+            ForEach(VoiceInkRollingBufferPreloadMode.allCases) { mode in
                 Text(mode.displayName).tag(mode)
             }
         } label: {

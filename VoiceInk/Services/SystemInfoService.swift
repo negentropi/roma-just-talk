@@ -195,7 +195,7 @@ class SystemInfoService {
     }
 
     private func getRollingBufferPreloadInfo() -> String {
-        let configuration = RollingBufferPreloadSettings.configuration()
+        let configuration = VoiceInkRollingBufferPreloadSettings.configuration()
         let powerState = IOKitRollingBufferPowerStateProvider().currentPowerState()
         let runtimeClaim = RollingBufferPreloadRuntimeDiagnostics.shared.currentQuickReleaseClaim()
         let powerDescription: String
@@ -208,7 +208,7 @@ class SystemInfoService {
         let currentModelName = VoiceInkCurrentTranscriptionModelPreference.modelName()
         let currentModelPreloadEnabled: String
         if let currentModelName {
-            let key = RollingBufferPreloadSettings.perModelPreloadEnabledKey(forModelName: currentModelName)
+            let key = VoiceInkRollingBufferPreloadSettings.perModelPreloadEnabledKey(forModelName: currentModelName)
             let enabled = UserDefaults.standard.object(forKey: key) as? Bool ?? true
             currentModelPreloadEnabled = "\(enabled)"
         } else {

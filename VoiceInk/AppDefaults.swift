@@ -37,12 +37,12 @@ enum AppDefaults {
             // Recording & Transcription
             "AppendTrailingSpace": true,
             "showLiveTextPreview": false,
-            RollingBufferPreloadSettings.modeKey: RollingBufferPreloadSettings.defaultMode.rawValue,
-            RollingBufferPreloadSettings.autoDisableCloudModelsKey: RollingBufferPreloadSettings.defaultAutoDisablesCloudModels,
-            RollingBufferPreloadSettings.autoDisableLowBatteryLocalModelsKey: RollingBufferPreloadSettings.defaultAutoDisablesLowBatteryLocalModels,
-            RollingBufferPreloadSettings.lowBatteryThresholdPercentKey: RollingBufferPreloadSettings.defaultLowBatteryThresholdPercent,
-            RollingBufferPreloadSettings.bufferDurationSecondsKey: RollingBufferPreloadSettings.defaultBufferDurationSeconds,
-            RollingBufferPreloadSettings.preRunFinalizationKey: RollingBufferPreloadSettings.defaultPreRunFinalization,
+            VoiceInkRollingBufferPreloadSettings.modeKey: VoiceInkRollingBufferPreloadSettings.defaultMode.rawValue,
+            VoiceInkRollingBufferPreloadSettings.autoDisableCloudModelsKey: VoiceInkRollingBufferPreloadSettings.defaultAutoDisablesCloudModels,
+            VoiceInkRollingBufferPreloadSettings.autoDisableLowBatteryLocalModelsKey: VoiceInkRollingBufferPreloadSettings.defaultAutoDisablesLowBatteryLocalModels,
+            VoiceInkRollingBufferPreloadSettings.lowBatteryThresholdPercentKey: VoiceInkRollingBufferPreloadSettings.defaultLowBatteryThresholdPercent,
+            VoiceInkRollingBufferPreloadSettings.bufferDurationSecondsKey: VoiceInkRollingBufferPreloadSettings.defaultBufferDurationSeconds,
+            VoiceInkRollingBufferPreloadSettings.preRunFinalizationKey: VoiceInkRollingBufferPreloadSettings.defaultPreRunFinalization,
             RollingBufferVADSettings.modelKey: RollingBufferVADSettings.sileroModelName,
             "RecorderType": "none",
 

@@ -206,28 +206,28 @@ enum BackupImporter {
         var didImportRollingBufferSetting = false
 
         if let modeRawValue = general.rollingBufferPreloadModeRawValue,
-           RollingBufferPreloadMode(rawValue: modeRawValue) != nil {
-            UserDefaults.standard.set(modeRawValue, forKey: RollingBufferPreloadSettings.modeKey)
+           VoiceInkRollingBufferPreloadMode(rawValue: modeRawValue) != nil {
+            UserDefaults.standard.set(modeRawValue, forKey: VoiceInkRollingBufferPreloadSettings.modeKey)
             didImportRollingBufferSetting = true
         }
         if let autoDisableCloudModels = general.rollingBufferPreloadAutoDisableCloudModels {
-            UserDefaults.standard.set(autoDisableCloudModels, forKey: RollingBufferPreloadSettings.autoDisableCloudModelsKey)
+            UserDefaults.standard.set(autoDisableCloudModels, forKey: VoiceInkRollingBufferPreloadSettings.autoDisableCloudModelsKey)
             didImportRollingBufferSetting = true
         }
         if let autoDisableLowBatteryLocalModels = general.rollingBufferPreloadAutoDisableLowBatteryLocalModels {
-            UserDefaults.standard.set(autoDisableLowBatteryLocalModels, forKey: RollingBufferPreloadSettings.autoDisableLowBatteryLocalModelsKey)
+            UserDefaults.standard.set(autoDisableLowBatteryLocalModels, forKey: VoiceInkRollingBufferPreloadSettings.autoDisableLowBatteryLocalModelsKey)
             didImportRollingBufferSetting = true
         }
         if let threshold = general.rollingBufferPreloadLowBatteryThresholdPercent {
-            UserDefaults.standard.set(min(max(threshold, 1), 100), forKey: RollingBufferPreloadSettings.lowBatteryThresholdPercentKey)
+            UserDefaults.standard.set(min(max(threshold, 1), 100), forKey: VoiceInkRollingBufferPreloadSettings.lowBatteryThresholdPercentKey)
             didImportRollingBufferSetting = true
         }
         if let duration = general.rollingBufferDurationSeconds {
-            UserDefaults.standard.set(min(max(duration, 0.25), 30.0), forKey: RollingBufferPreloadSettings.bufferDurationSecondsKey)
+            UserDefaults.standard.set(min(max(duration, 0.25), 30.0), forKey: VoiceInkRollingBufferPreloadSettings.bufferDurationSecondsKey)
             didImportRollingBufferSetting = true
         }
         if let finalization = general.rollingBufferPreloadFinalization {
-            UserDefaults.standard.set(finalization, forKey: RollingBufferPreloadSettings.preRunFinalizationKey)
+            UserDefaults.standard.set(finalization, forKey: VoiceInkRollingBufferPreloadSettings.preRunFinalizationKey)
             didImportRollingBufferSetting = true
         }
         if let vadModel = general.rollingBufferVADModel,
@@ -239,7 +239,7 @@ enum BackupImporter {
             for (modelName, enabled) in perModelSettings where !modelName.isEmpty {
                 UserDefaults.standard.set(
                     enabled,
-                    forKey: RollingBufferPreloadSettings.perModelPreloadEnabledKey(forModelName: modelName)
+                    forKey: VoiceInkRollingBufferPreloadSettings.perModelPreloadEnabledKey(forModelName: modelName)
                 )
             }
             didImportRollingBufferSetting = didImportRollingBufferSetting || !perModelSettings.isEmpty

@@ -218,7 +218,7 @@ final class CoreAudioRecorder: @unchecked Sendable {
     private let preRollSampleRate = VoiceInkPCM16Audio.mono16kSampleRateHz
     private let preRollBuffer = PCMPreRollBuffer(
         sampleRate: VoiceInkPCM16Audio.mono16kSampleRateHz,
-        seconds: RollingBufferPreloadSettings.defaultBufferDurationSeconds
+        seconds: VoiceInkRollingBufferPreloadSettings.defaultBufferDurationSeconds
     )
     private let preRollStreamingChunkBytes = VoiceInkPCM16Audio.byteCount(forMono16kDuration: 0.1)
     private var preRollStreamingGate = PreRollStreamingEmissionGate()
@@ -1001,7 +1001,7 @@ final class CoreAudioRecorder: @unchecked Sendable {
     }
 
     func reloadPreRollBufferSettings() {
-        let duration = RollingBufferPreloadSettings.configuration().bufferDurationSeconds
+        let duration = VoiceInkRollingBufferPreloadSettings.configuration().bufferDurationSeconds
         preRollBuffer.resize(sampleRate: preRollSampleRate, seconds: duration)
     }
 

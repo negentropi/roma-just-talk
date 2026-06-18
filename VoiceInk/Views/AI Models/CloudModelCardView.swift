@@ -21,7 +21,7 @@ struct CloudModelCardView: View {
         self.isCurrent = isCurrent
         self.setDefaultAction = setDefaultAction
         _streamingEnabled = State(initialValue: VoiceInkTranscriptionStreamingPreference.isEnabled(forModelName: model.name))
-        let preloadKey = RollingBufferPreloadSettings.perModelPreloadEnabledKey(forModelName: model.name)
+        let preloadKey = VoiceInkRollingBufferPreloadSettings.perModelPreloadEnabledKey(forModelName: model.name)
         _preloadEnabled = State(initialValue: UserDefaults.standard.object(forKey: preloadKey) as? Bool ?? true)
     }
     @State private var isVerifying = false
@@ -286,7 +286,7 @@ struct CloudModelCardView: View {
     }
     
     private var preloadDefaultsKey: String {
-        RollingBufferPreloadSettings.perModelPreloadEnabledKey(forModelName: model.name)
+        VoiceInkRollingBufferPreloadSettings.perModelPreloadEnabledKey(forModelName: model.name)
     }
 
     private func loadSavedAPIKey() {

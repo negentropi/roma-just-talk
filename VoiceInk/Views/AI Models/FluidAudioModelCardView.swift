@@ -15,12 +15,12 @@ struct FluidAudioModelCardView: View {
         _fluidAudioModelManager = ObservedObject(wrappedValue: fluidAudioModelManager)
         _transcriptionModelManager = ObservedObject(wrappedValue: transcriptionModelManager)
         _streamingEnabled = State(initialValue: VoiceInkTranscriptionStreamingPreference.isEnabled(forModelName: model.name))
-        let preloadKey = RollingBufferPreloadSettings.perModelPreloadEnabledKey(forModelName: model.name)
+        let preloadKey = VoiceInkRollingBufferPreloadSettings.perModelPreloadEnabledKey(forModelName: model.name)
         _preloadEnabled = State(initialValue: UserDefaults.standard.object(forKey: preloadKey) as? Bool ?? true)
     }
 
     private var preloadDefaultsKey: String {
-        RollingBufferPreloadSettings.perModelPreloadEnabledKey(forModelName: model.name)
+        VoiceInkRollingBufferPreloadSettings.perModelPreloadEnabledKey(forModelName: model.name)
     }
 
     var isCurrent: Bool {

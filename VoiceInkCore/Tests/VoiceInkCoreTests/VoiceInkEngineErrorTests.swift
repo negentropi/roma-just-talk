@@ -45,5 +45,9 @@ final class VoiceInkEngineErrorTests: XCTestCase {
             VoiceInkEngineError.audioFileNotFound.errorDescription,
             "Audio file not found"
         )
+        XCTAssertEqual(
+            VoiceInkEngineError.noTranscriptionModelSelected.errorDescription,
+            "No transcription model selected"
+        )
     }
 }

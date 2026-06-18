@@ -122,7 +122,7 @@ class AudioTranscriptionManager: ObservableObject {
 
         do {
             guard let currentModel = engine.transcriptionModelManager.currentTranscriptionModel else {
-                throw TranscriptionError.noModelSelected
+                throw VoiceInkEngineError.noTranscriptionModelSelected
             }
 
             // Phase: Loading
@@ -254,16 +254,5 @@ class AudioTranscriptionManager: ObservableObject {
         }
 
         await serviceRegistry.cleanup()
-    }
-}
-
-enum TranscriptionError: Error, LocalizedError {
-    case noModelSelected
-
-    var errorDescription: String? {
-        switch self {
-        case .noModelSelected:
-            return "No transcription model selected"
-        }
     }
 }

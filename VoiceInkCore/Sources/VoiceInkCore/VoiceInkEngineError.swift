@@ -11,6 +11,7 @@ public enum VoiceInkEngineError: Error, Identifiable, Sendable {
     case audioProcessingFailed
     case whisperTranscriptionFailed
     case audioFileNotFound
+    case noTranscriptionModelSelected
 
     public var id: String { UUID().uuidString }
 }
@@ -38,6 +39,8 @@ extension VoiceInkEngineError: LocalizedError {
             return "Whisper transcription failed."
         case .audioFileNotFound:
             return "Audio file not found"
+        case .noTranscriptionModelSelected:
+            return "No transcription model selected"
         }
     }
 
@@ -63,6 +66,8 @@ extension VoiceInkEngineError: LocalizedError {
             return "Try recording again or switch to a different local model."
         case .audioFileNotFound:
             return "Keep the saved recording available before retrying transcription."
+        case .noTranscriptionModelSelected:
+            return "Select a transcription model before importing audio."
         }
     }
 }

@@ -330,9 +330,27 @@ public enum VoiceInkCurrentTranscriptionModelPreference {
     }
 }
 
+public enum VoiceInkAIEnhancementPreference {
+    public static func isEnabled(from defaults: UserDefaults = .standard) -> Bool {
+        defaults.bool(forKey: VoiceInkUserDefaultsKey.isAIEnhancementEnabled)
+    }
+
+    public static func saveIsEnabled(_ isEnabled: Bool, to defaults: UserDefaults = .standard) {
+        defaults.set(isEnabled, forKey: VoiceInkUserDefaultsKey.isAIEnhancementEnabled)
+    }
+
+    public static func statusDiagnosticDescription(from defaults: UserDefaults = .standard) -> String {
+        isEnabled(from: defaults) ? "Enabled" : "Disabled"
+    }
+}
+
 public enum VoiceInkAIEnhancementProviderPreference {
     public static func selectedProviderRawValue(from defaults: UserDefaults = .standard) -> String? {
         defaults.string(forKey: VoiceInkUserDefaultsKey.selectedAIProvider)
+    }
+
+    public static func selectedProviderDiagnosticDescription(from defaults: UserDefaults = .standard) -> String {
+        selectedProviderRawValue(from: defaults) ?? "None selected"
     }
 
     public static func saveSelectedProviderRawValue(_ rawValue: String, to defaults: UserDefaults = .standard) {
@@ -362,6 +380,14 @@ public enum VoiceInkAIEnhancementProviderPreference {
     ) -> String? {
         let savedModel = defaults.string(forKey: VoiceInkUserDefaultsKey.selectedAIProviderModel(providerRawValue))
         return savedModel?.isEmpty == false ? savedModel : nil
+    }
+
+    public static func selectedModelDiagnosticDescription(from defaults: UserDefaults = .standard) -> String {
+        guard let providerRawValue = selectedProviderRawValue(from: defaults) else {
+            return "None selected"
+        }
+
+        return selectedModel(for: providerRawValue, from: defaults) ?? "Default (\(providerRawValue))"
     }
 
     public static func saveSelectedModel(

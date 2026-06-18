@@ -43,9 +43,9 @@ class SystemInfoService {
         TRANSCRIPTION SETTINGS:
         Selected Model: \(getCurrentTranscriptionModel())
         Selected Language: \(getCurrentLanguage())
-        AI Enhancement: \(getAIEnhancementStatus())
-        AI Provider: \(getAIProvider())
-        AI Model: \(getAIModel())
+        AI Enhancement: \(VoiceInkAIEnhancementPreference.statusDiagnosticDescription())
+        AI Provider: \(VoiceInkAIEnhancementProviderPreference.selectedProviderDiagnosticDescription())
+        AI Model: \(VoiceInkAIEnhancementProviderPreference.selectedModelDiagnosticDescription())
 
         ROLLING BUFFER PRELOAD:
         \(getRollingBufferPreloadInfo())
@@ -166,28 +166,6 @@ class SystemInfoService {
             return modelName
         }
         return "No model selected"
-    }
-
-    private func getAIEnhancementStatus() -> String {
-        let enhancementEnabled = UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.isAIEnhancementEnabled)
-        return enhancementEnabled ? "Enabled" : "Disabled"
-    }
-
-    private func getAIProvider() -> String {
-        if let providerRaw = VoiceInkAIEnhancementProviderPreference.selectedProviderRawValue() {
-            return providerRaw
-        }
-        return "None selected"
-    }
-
-    private func getAIModel() -> String {
-        if let providerRaw = VoiceInkAIEnhancementProviderPreference.selectedProviderRawValue() {
-            if let savedModel = VoiceInkAIEnhancementProviderPreference.selectedModel(for: providerRaw) {
-                return savedModel
-            }
-            return "Default (\(providerRaw))"
-        }
-        return "None selected"
     }
 
     private func getRollingBufferPreloadInfo() -> String {

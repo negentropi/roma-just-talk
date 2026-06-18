@@ -11,7 +11,7 @@ class AIEnhancementService: ObservableObject {
 
     @Published var isEnhancementEnabled: Bool {
         didSet {
-            UserDefaults.standard.set(isEnhancementEnabled, forKey: VoiceInkUserDefaultsKey.isAIEnhancementEnabled)
+            VoiceInkAIEnhancementPreference.saveIsEnabled(isEnhancementEnabled)
             if isEnhancementEnabled && selectedPromptId == nil {
                 selectedPromptId = VoiceInkCustomPromptPolicy.selectedPromptIdAfterEnablingEnhancement(
                     selectedPromptId,
@@ -86,7 +86,7 @@ class AIEnhancementService: ObservableObject {
         self.screenCaptureService = ScreenCaptureService()
         self.customVocabularyService = CustomVocabularyService.shared
 
-        self.isEnhancementEnabled = UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.isAIEnhancementEnabled)
+        self.isEnhancementEnabled = VoiceInkAIEnhancementPreference.isEnabled()
         self.useClipboardContext = UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.useClipboardContext)
         self.useScreenCaptureContext = UserDefaults.standard.bool(forKey: VoiceInkUserDefaultsKey.useScreenCaptureContext)
         self.customPrompts = VoiceInkCustomPromptStorage.loadPrompts()

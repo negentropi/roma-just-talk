@@ -553,6 +553,52 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testAIEnhancementProviderPreferenceBuildsDiagnosticDescriptions() {
+        withIsolatedDefaults { defaults in
+            XCTAssertFalse(VoiceInkAIEnhancementPreference.isEnabled(from: defaults))
+            XCTAssertEqual(
+                VoiceInkAIEnhancementPreference.statusDiagnosticDescription(from: defaults),
+                "Disabled"
+            )
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderPreference.selectedProviderDiagnosticDescription(from: defaults),
+                "None selected"
+            )
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderPreference.selectedModelDiagnosticDescription(from: defaults),
+                "None selected"
+            )
+
+            VoiceInkAIEnhancementPreference.saveIsEnabled(true, to: defaults)
+            VoiceInkAIEnhancementProviderPreference.saveSelectedProviderRawValue("GROQ", to: defaults)
+
+            XCTAssertTrue(VoiceInkAIEnhancementPreference.isEnabled(from: defaults))
+            XCTAssertEqual(
+                VoiceInkAIEnhancementPreference.statusDiagnosticDescription(from: defaults),
+                "Enabled"
+            )
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderPreference.selectedProviderDiagnosticDescription(from: defaults),
+                "GROQ"
+            )
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderPreference.selectedModelDiagnosticDescription(from: defaults),
+                "Default (GROQ)"
+            )
+
+            VoiceInkAIEnhancementProviderPreference.saveSelectedModel(
+                "llama-3.3-70b-versatile",
+                for: "GROQ",
+                to: defaults
+            )
+
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderPreference.selectedModelDiagnosticDescription(from: defaults),
+                "llama-3.3-70b-versatile"
+            )
+        }
+    }
+
     func testDynamicAIProviderPreferenceReadsOllamaFallbacksAndSavedValues() {
         withIsolatedDefaults { defaults in
             XCTAssertEqual(

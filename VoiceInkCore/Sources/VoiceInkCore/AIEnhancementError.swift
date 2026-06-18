@@ -8,6 +8,16 @@ public enum VoiceInkAIEnhancementError: Error, Equatable, Sendable {
     case rateLimitExceeded
     case timeout
     case customError(String)
+
+    public static func httpError(statusCode: Int, message: String) -> VoiceInkAIEnhancementError {
+        if statusCode == 429 {
+            return .rateLimitExceeded
+        }
+        if (500...599).contains(statusCode) {
+            return .serverError
+        }
+        return .customError("HTTP \(statusCode): \(message)")
+    }
 }
 
 extension VoiceInkAIEnhancementError: LocalizedError {

@@ -21,6 +21,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AIReasoningConfigTests.testExtraBodyParametersMatchProviderModelPolicy", run: { AIReasoningConfigTests().testExtraBodyParametersMatchProviderModelPolicy() }),
             VoiceInkCoreCheck(name: "AIReasoningConfigTests.testMacOSExtraAIProvidersUseNoSharedReasoningOverrides", run: { AIReasoningConfigTests().testMacOSExtraAIProvidersUseNoSharedReasoningOverrides() }),
             VoiceInkCoreCheck(name: "AIEnhancementErrorTests.testErrorDescriptionsPreserveExistingMacOSMessages", run: { AIEnhancementErrorTests().testErrorDescriptionsPreserveExistingMacOSMessages() }),
+            VoiceInkCoreCheck(name: "AIEnhancementErrorTests.testHTTPErrorMappingPreservesMacOSRetryCategories", run: { AIEnhancementErrorTests().testHTTPErrorMappingPreservesMacOSRetryCategories() }),
             VoiceInkCoreCheck(name: "AIEnhancementRetryPolicyTests.testBackoffFailuresRetryUntilAttemptLimit", run: { AIEnhancementRetryPolicyTests().testBackoffFailuresRetryUntilAttemptLimit() }),
             VoiceInkCoreCheck(name: "AIEnhancementRetryPolicyTests.testTimeoutRetriesImmediatelyWhenEnabled", run: { AIEnhancementRetryPolicyTests().testTimeoutRetriesImmediatelyWhenEnabled() }),
             VoiceInkCoreCheck(name: "AIEnhancementRetryPolicyTests.testTimeoutFailsImmediatelyWhenDisabled", run: { AIEnhancementRetryPolicyTests().testTimeoutFailsImmediatelyWhenDisabled() }),

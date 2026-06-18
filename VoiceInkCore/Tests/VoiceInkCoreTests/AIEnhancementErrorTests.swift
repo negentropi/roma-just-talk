@@ -31,4 +31,23 @@ final class AIEnhancementErrorTests: XCTestCase {
             "provider down"
         )
     }
+
+    func testHTTPErrorMappingPreservesMacOSRetryCategories() {
+        XCTAssertEqual(
+            VoiceInkAIEnhancementError.httpError(statusCode: 429, message: "too many requests"),
+            .rateLimitExceeded
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementError.httpError(statusCode: 500, message: "bad gateway"),
+            .serverError
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementError.httpError(statusCode: 599, message: "edge timeout"),
+            .serverError
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementError.httpError(statusCode: 400, message: "bad request"),
+            .customError("HTTP 400: bad request")
+        )
+    }
 }

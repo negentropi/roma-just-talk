@@ -275,9 +275,7 @@ class AIEnhancementService: ObservableObject {
         case .missingAPIKey:
             return .notConfigured
         case .httpError(let statusCode, let message):
-            if statusCode == 429 { return .rateLimitExceeded }
-            if (500...599).contains(statusCode) { return .serverError }
-            return .customError("HTTP \(statusCode): \(message)")
+            return VoiceInkAIEnhancementError.httpError(statusCode: statusCode, message: message)
         case .noResultReturned:
             return .enhancementFailed
         case .networkError:

@@ -320,9 +320,8 @@ struct DictionaryQuickAddView: View {
     // MARK: - Actions
 
     private func submitVocabulary() {
-        let input = wordInput.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard VoiceInkDictionaryPolicy.hasVocabularyDraft(input) else { return }
-        if let error = DictionaryService.addVocabularyWords(input, existing: Array(vocabularyWords), context: modelContext) {
+        guard VoiceInkDictionaryPolicy.hasVocabularyDraft(wordInput) else { return }
+        if let error = DictionaryService.addVocabularyWords(wordInput, existing: Array(vocabularyWords), context: modelContext) {
             errorMessage = error
             return
         }

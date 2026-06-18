@@ -117,9 +117,8 @@ struct VocabularyView: View {
     }
     
     private func addWords() {
-        let input = newWord.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !input.isEmpty else { return }
-        if let error = DictionaryService.addVocabularyWords(input, existing: Array(vocabularyWords), context: modelContext) {
+        guard VoiceInkDictionaryPolicy.hasVocabularyDraft(newWord) else { return }
+        if let error = DictionaryService.addVocabularyWords(newWord, existing: Array(vocabularyWords), context: modelContext) {
             alertMessage = error
             showAlert = true
             return

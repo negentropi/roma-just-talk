@@ -432,6 +432,11 @@ reject_pattern \
   'private func +(currentAPIKey|obfuscatedKey)\(' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
+reject_pattern \
+  "iOS API-key view avoids shell-only verifier pass-through wrappers" \
+  'private func +verifiedAPIKey\(' \
+  iOS/VoiceInk-ios/ProviderAPIKeyView.swift
+
 require_pattern \
   "macOS local Whisper uses shared runtime policy" \
   'VoiceInkWhisperRuntimeConfiguration\.current' \

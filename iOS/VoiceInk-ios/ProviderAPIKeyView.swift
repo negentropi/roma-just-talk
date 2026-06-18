@@ -112,7 +112,7 @@ struct ProviderAPIKeyView: View {
                 return
             }
             
-            let ok = await verifiedAPIKey(keyToVerify)
+            let ok = await apiKeyVerifier.verifyStoredAPIKey(keyToVerify, for: provider)
             
             verifyResult = ok
             isVerifying = false
@@ -124,10 +124,6 @@ struct ProviderAPIKeyView: View {
                 editingKey = false
             }
         }
-    }
-
-    private func verifiedAPIKey(_ key: String) async -> Bool {
-        await apiKeyVerifier.verifyStoredAPIKey(key, for: provider)
     }
 
 }

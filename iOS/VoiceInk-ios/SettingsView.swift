@@ -147,7 +147,9 @@ struct SettingsView: View {
                     HStack {
                         Text("Session Timeout")
                         Spacer()
-                        Text("\(settings.audioSessionTimeoutSeconds)s")
+                        Text(VoiceInkAudioSessionTimeoutPreference.displayText(
+                            for: settings.audioSessionTimeoutSeconds
+                        ))
                             .foregroundStyle(.secondary)
                     }
                     
@@ -156,8 +158,10 @@ struct SettingsView: View {
                             get: { Double(settings.audioSessionTimeoutSeconds) },
                             set: { settings.audioSessionTimeoutSeconds = Int($0) }
                         ),
-                        in: 0...300,
-                        step: 15
+                        in: Double(VoiceInkAudioSessionTimeoutPreference.minimumSeconds)...Double(
+                            VoiceInkAudioSessionTimeoutPreference.maximumSeconds
+                        ),
+                        step: Double(VoiceInkAudioSessionTimeoutPreference.stepSeconds)
                     )
                     
                     Text("How long to keep the microphone session active after recording stops. Longer timeouts prevent 'session activation failed' errors when recording frequently, but may use more battery.")

@@ -9,6 +9,7 @@
 import Foundation
 import Combine
 import AVFoundation
+import VoiceInkCore
 
 @MainActor
 final class AudioSessionManager: ObservableObject {
@@ -57,12 +58,12 @@ final class AudioSessionManager: ObservableObject {
         let timeoutSeconds = settings.audioSessionTimeoutSeconds
         
         // If timeout is 0, deactivate immediately (legacy behavior)
-        guard timeoutSeconds > 0 else {
+        guard !VoiceInkAudioSessionTimeoutPreference.shouldDeactivateImmediately(timeoutSeconds) else {
             deactivateSession()
             return
         }
         
-        timeoutRemaining = TimeInterval(timeoutSeconds)
+        timeoutRemaining = VoiceInkAudioSessionTimeoutPreference.deactivationInterval(for: timeoutSeconds)
         
         // Create timer that updates every second and deactivates when done
         deactivationTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] timer in

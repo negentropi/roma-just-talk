@@ -941,6 +941,51 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
+  "shared audio-session timeout preference owns iOS timeout minimum" \
+  'minimumSeconds = 0' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared audio-session timeout preference owns iOS timeout maximum" \
+  'maximumSeconds = 300' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared audio-session timeout preference owns iOS timeout step" \
+  'stepSeconds = 15' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared audio-session timeout preference owns iOS scheduling policy" \
+  'shouldDeactivateImmediately|deactivationInterval' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "iOS audio settings use shared timeout display policy" \
+  'VoiceInkAudioSessionTimeoutPreference\.displayText' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+require_pattern \
+  "iOS audio settings use shared timeout range policy" \
+  'VoiceInkAudioSessionTimeoutPreference\.(minimumSeconds|maximumSeconds|stepSeconds)' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+reject_pattern \
+  "iOS audio settings avoid shell-only timeout range and display policy" \
+  '0\.\.\.300|step: 15|audioSessionTimeoutSeconds\)s' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+require_pattern \
+  "iOS audio-session manager uses shared timeout scheduling policy" \
+  'VoiceInkAudioSessionTimeoutPreference\.(shouldDeactivateImmediately|deactivationInterval)' \
+  iOS/VoiceInk-ios/AudioSessionManager.swift
+
+reject_pattern \
+  "iOS audio-session manager avoids shell-only timeout scheduling policy" \
+  'timeoutSeconds > 0|TimeInterval\(timeoutSeconds\)' \
+  iOS/VoiceInk-ios/AudioSessionManager.swift
+
+require_pattern \
   "iOS app settings reset consumes shared reset state" \
   'VoiceInkDefaultSettings\.iOS\.appSettingsResetState' \
   iOS/VoiceInk-ios/AppSettings.swift

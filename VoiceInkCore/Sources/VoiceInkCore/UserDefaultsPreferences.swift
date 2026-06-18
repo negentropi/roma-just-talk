@@ -240,9 +240,25 @@ public enum VoiceInkOnboardingPreference {
 }
 
 public enum VoiceInkAudioSessionTimeoutPreference {
+    public static let minimumSeconds = 0
+    public static let maximumSeconds = 300
+    public static let stepSeconds = 15
+
     public static func timeoutSeconds(from defaults: UserDefaults = .standard) -> Int {
         defaults.object(forKey: VoiceInkUserDefaultsKey.audioSessionTimeoutSeconds) as? Int
             ?? VoiceInkPreferenceDefault.audioSessionTimeoutSeconds
+    }
+
+    public static func displayText(for seconds: Int) -> String {
+        "\(seconds)s"
+    }
+
+    public static func shouldDeactivateImmediately(_ seconds: Int) -> Bool {
+        seconds <= 0
+    }
+
+    public static func deactivationInterval(for seconds: Int) -> TimeInterval {
+        TimeInterval(max(seconds, 0))
     }
 
     public static func saveTimeoutSeconds(_ seconds: Int, to defaults: UserDefaults = .standard) {

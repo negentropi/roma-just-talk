@@ -9,8 +9,6 @@ extension Notification.Name {
     static let stopRecordingFromKeyboard = Notification.Name("stopRecordingFromKeyboard")
 }
 
-typealias RecordingState = VoiceInkRecordingState
-
 private enum MicrophonePermissionStatus {
     case granted, denied, undetermined
 }
@@ -29,7 +27,7 @@ enum ActiveRecordingAlert: Identifiable {
  
 @MainActor
 final class RecordingManager: ObservableObject {
-    @Published var recordingState: RecordingState = .idle
+    @Published var recordingState: VoiceInkRecordingState = .idle
     @Published var animate = false
     @Published var isRecordingSheetPresented = false
     @Published var activeRecordingAlert: ActiveRecordingAlert?

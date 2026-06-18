@@ -163,7 +163,7 @@ private struct ModelPerformancePanelContent: View {
                 Text(stat.speedFactorText)
                     .font(.system(size: 24, weight: .bold, design: .rounded))
                     .foregroundColor(.mint)
-                Text(stat.speedFactor >= 1.0 ? "Faster than Real-time" : "Slower than Real-time")
+                Text(stat.realTimeComparisonText)
                     .font(.system(size: 10))
                     .foregroundColor(.secondary)
             }

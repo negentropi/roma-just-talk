@@ -78,7 +78,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - NaturalLanguage word-count policy for metrics and short-enhancement skip decisions
 - session-metric calculation policy for enhanced-text word counting, non-positive duration cleanup, and transcription speed factor; platform shells still own SwiftData metric insertion and migration scheduling
 - dashboard metrics summary and derived productivity math for time saved, words per minute, and keystrokes saved; platform shells still own metric queries, caching, and rendering
-- performance-analysis aggregation for transcription/enhancement model averages, speed factor, speed-factor display text, and average-processing-time display text; platform shells still own queries, filters, system information, and rendering
+- performance-analysis aggregation for transcription/enhancement model averages, speed factor, speed-factor/realtime display text, realtime comparison labels, and average-processing-time display text; platform shells still own queries, filters, system information, and rendering
 - short post-processing skip policy, stored skip configuration, and storage defaults for brief transcripts; platform shells still own UI controls and whether to apply the policy
 - AI-enhancement timeout/retry storage keys, defaults, and runtime preference reads; platform shells still own request execution, provider transport, logging, and UI controls
 - AI-enhancement enabled-state storage/diagnostics, selected-provider diagnostics, and per-provider selected-model preference storage, including legacy selected-provider repair; platform shells still own provider execution and dynamic model discovery

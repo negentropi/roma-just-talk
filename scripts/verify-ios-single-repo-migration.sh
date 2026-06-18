@@ -1323,6 +1323,18 @@ reject_pattern \
   iOS/VoiceInk-ios/NotesListView.swift
 
 require_pattern \
+  "shared performance stat owns realtime presentation text" \
+  'speedFactorRealtimeText|realTimeComparisonText' \
+  VoiceInkCore/Sources/VoiceInkCore/PerformanceAnalysis.swift
+
+reject_pattern \
+  "platform metric views avoid shell-only realtime presentation text" \
+  '"Faster than Real-time"|"Slower than Real-time"|speedFactor >= 1\.0|speedFactorText\) realtime' \
+  VoiceInk/Views/Metrics/ModelPerformancePanel.swift \
+  VoiceInk/Views/Metrics/PerformanceAnalysisPanelView.swift \
+  iOS/VoiceInk-ios/NotesListView.swift
+
+require_pattern \
   "workspace includes iOS project" \
   'location = "group:iOS/VoiceInk-ios.xcodeproj"' \
   VoiceInk.xcworkspace/contents.xcworkspacedata

@@ -30,6 +30,12 @@ public struct VoiceInkPerformanceModelStat: Identifiable, Equatable, Sendable {
     public var speedFactorText: String {
         String(format: "%.1fx", speedFactor)
     }
+    public var speedFactorRealtimeText: String {
+        "\(speedFactorText) realtime"
+    }
+    public var realTimeComparisonText: String {
+        speedFactor >= 1.0 ? "Faster than Real-time" : "Slower than Real-time"
+    }
     public var avgProcessingTimeCompactText: String {
         String(format: "%.2fs", avgProcessingTime)
     }

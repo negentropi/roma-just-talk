@@ -87,8 +87,21 @@ final class PerformanceAnalysisTests: XCTestCase {
         )
 
         XCTAssertEqual(stat.speedFactorText, "5.0x")
+        XCTAssertEqual(stat.speedFactorRealtimeText, "5.0x realtime")
+        XCTAssertEqual(stat.realTimeComparisonText, "Faster than Real-time")
         XCTAssertEqual(stat.avgProcessingTimeCompactText, "2.34s")
         XCTAssertEqual(stat.avgProcessingTimeSpacedText, "2.34 s")
+
+        let slowerStat = VoiceInkPerformanceModelStat(
+            name: "slow",
+            sampleCount: 1,
+            totalProcessingTime: 10,
+            avgProcessingTime: 10,
+            avgAudioDuration: 5,
+            speedFactor: 0.5
+        )
+
+        XCTAssertEqual(slowerStat.realTimeComparisonText, "Slower than Real-time")
     }
 
     func testSessionMetricSourceDefaultsPerformanceRecordFields() {

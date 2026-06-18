@@ -357,6 +357,12 @@ require_pattern \
   'VoiceInkDefaultSettings\.iOS\.registerUserDefaults\(\)' \
   iOS/VoiceInk-ios/VoiceInk_iosApp.swift
 
+reject_pattern \
+  "macOS and iOS transcriptions use shared performance session defaults" \
+  'var performance(AudioDuration|TranscriptionDuration|EnhancementDuration|EnhancedText)' \
+  VoiceInk/Models/Transcription.swift \
+  iOS/VoiceInk-ios/VoiceInk-ios/Transcription.swift
+
 require_pattern \
   "workspace includes iOS project" \
   'location = "group:iOS/VoiceInk-ios.xcodeproj"' \

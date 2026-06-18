@@ -9,6 +9,13 @@ public protocol VoiceInkPerformanceRecord {
     var performanceEnhancedText: String? { get }
 }
 
+public extension VoiceInkPerformanceRecord where Self: VoiceInkSessionMetricSource {
+    var performanceAudioDuration: TimeInterval { duration }
+    var performanceTranscriptionDuration: TimeInterval? { transcriptionDuration }
+    var performanceEnhancementDuration: TimeInterval? { enhancementDuration }
+    var performanceEnhancedText: String? { enhancedText }
+}
+
 public struct VoiceInkPerformanceAnalysis: Equatable, Sendable {
     public let totalTranscripts: Int
     public let totalWithTranscriptionData: Int

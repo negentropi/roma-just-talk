@@ -38,10 +38,6 @@ final class Transcription: VoiceInkMutableTranscriptionRecord, VoiceInkStoredAud
 }
 
 extension Transcription {
-    var performanceAudioDuration: TimeInterval { duration }
     var performanceTranscriptionModelName: String? { transcriptionModelName }
-    var performanceTranscriptionDuration: TimeInterval? { transcriptionDuration }
     var performanceEnhancementModelName: String? { aiEnhancementModelName }
-    var performanceEnhancementDuration: TimeInterval? { enhancementDuration }
-    var performanceEnhancedText: String? { enhancedText }
 }

@@ -90,6 +90,25 @@ final class PerformanceAnalysisTests: XCTestCase {
         XCTAssertEqual(stat.avgProcessingTimeCompactText, "2.34s")
         XCTAssertEqual(stat.avgProcessingTimeSpacedText, "2.34 s")
     }
+
+    func testSessionMetricSourceDefaultsPerformanceRecordFields() {
+        let record = SessionBackedRecord(
+            text: "raw",
+            enhancedText: "enhanced",
+            duration: 12,
+            transcriptionDuration: 3,
+            enhancementDuration: 2,
+            transcriptionModelName: "fast-local",
+            enhancementModelName: "cleaner"
+        )
+
+        XCTAssertEqual(record.performanceAudioDuration, 12)
+        XCTAssertEqual(record.performanceTranscriptionDuration, 3)
+        XCTAssertEqual(record.performanceEnhancementDuration, 2)
+        XCTAssertEqual(record.performanceEnhancedText, "enhanced")
+        XCTAssertEqual(record.performanceTranscriptionModelName, "fast-local")
+        XCTAssertEqual(record.performanceEnhancementModelName, "cleaner")
+    }
 }
 
 private struct Record: VoiceInkPerformanceRecord {
@@ -122,4 +141,17 @@ private struct Record: VoiceInkPerformanceRecord {
     var performanceEnhancementModelName: String? { enhancementModelName }
     var performanceEnhancementDuration: TimeInterval? { enhancementDuration }
     var performanceEnhancedText: String? { enhancedText }
+}
+
+private struct SessionBackedRecord: VoiceInkPerformanceRecord, VoiceInkSessionMetricSource {
+    let text: String
+    let enhancedText: String?
+    let duration: TimeInterval
+    let transcriptionDuration: TimeInterval?
+    let enhancementDuration: TimeInterval?
+    let transcriptionModelName: String?
+    let enhancementModelName: String?
+
+    var performanceTranscriptionModelName: String? { transcriptionModelName }
+    var performanceEnhancementModelName: String? { enhancementModelName }
 }

@@ -270,6 +270,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PerformanceAnalysisTests.testStatsCanRequirePositiveDurationsForSessionMetricPanels", run: { PerformanceAnalysisTests().testStatsCanRequirePositiveDurationsForSessionMetricPanels() }),
             VoiceInkCoreCheck(name: "PerformanceAnalysisTests.testDefaultStatsPreserveHistoricalAnalyzerNilOnlyFiltering", run: { PerformanceAnalysisTests().testDefaultStatsPreserveHistoricalAnalyzerNilOnlyFiltering() }),
             VoiceInkCoreCheck(name: "PerformanceAnalysisTests.testModelStatFormatsSharedPresentationText", run: { PerformanceAnalysisTests().testModelStatFormatsSharedPresentationText() }),
+            VoiceInkCoreCheck(name: "PerformanceAnalysisTests.testSessionMetricSourceDefaultsPerformanceRecordFields", run: { PerformanceAnalysisTests().testSessionMetricSourceDefaultsPerformanceRecordFields() }),
             VoiceInkCoreCheck(name: "PostProcessingRequestTests.testBlankPromptReturnsNilRequest", run: { PostProcessingRequestTests().testBlankPromptReturnsNilRequest() }),
             VoiceInkCoreCheck(name: "PostProcessingRequestTests.testRequestBuildsLegacyIOSPostProcessingMessages", run: { try PostProcessingRequestTests().testRequestBuildsLegacyIOSPostProcessingMessages() }),
             VoiceInkCoreCheck(name: "PostProcessingRequestTests.testFinalizedTranscriptFallsBackWhenResponseIsEmptyAfterFiltering", run: { PostProcessingRequestTests().testFinalizedTranscriptFallsBackWhenResponseIsEmptyAfterFiltering() }),

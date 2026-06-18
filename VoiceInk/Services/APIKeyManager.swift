@@ -55,10 +55,6 @@ final class APIKeyManager {
         getAPIKey(forProvider: provider) != nil
     }
 
-    static func resolveAPIKeyReference(_ key: String, environment: [String: String] = ProcessInfo.processInfo.environment) -> String? {
-        VoiceInkAPIKeyReference.resolvedValue(key, environment: environment)
-    }
-
     // MARK: - Custom Model API Keys
 
     /// Saves an API key for a custom model.
@@ -76,7 +72,7 @@ final class APIKeyManager {
     func getCustomModelAPIKey(forModelId modelId: UUID) -> String? {
         let keyIdentifier = customModelKeyIdentifier(for: modelId)
         guard let storedKey = keychain.getString(forKey: keyIdentifier) else { return nil }
-        return Self.resolveAPIKeyReference(storedKey)
+        return VoiceInkAPIKeyReference.resolvedValue(storedKey)
     }
 
     /// Deletes an API key for a custom model.

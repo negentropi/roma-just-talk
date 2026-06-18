@@ -301,7 +301,7 @@ struct CloudModelCardView: View {
         isVerifying = true
         verificationStatus = .verifying
         let key = apiKey
-        guard let resolvedKey = APIKeyManager.resolveAPIKeyReference(key) else {
+        guard let resolvedKey = VoiceInkAPIKeyReference.resolvedValue(key) else {
             isVerifying = false
             verificationStatus = .failure
             verificationError = "Environment variable is missing or empty"

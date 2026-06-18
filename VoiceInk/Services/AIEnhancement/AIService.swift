@@ -207,7 +207,7 @@ class AIService: ObservableObject {
             return
         }
 
-        guard let resolvedKey = APIKeyManager.resolveAPIKeyReference(key) else {
+        guard let resolvedKey = VoiceInkAPIKeyReference.resolvedValue(key) else {
             completion(false, "Environment variable is missing or empty")
             return
         }
@@ -234,7 +234,7 @@ class AIService: ObservableObject {
             return
         }
 
-        guard let resolvedKey = APIKeyManager.resolveAPIKeyReference(key) else {
+        guard let resolvedKey = VoiceInkAPIKeyReference.resolvedValue(key) else {
             completion(false, "Environment variable is missing or empty")
             return
         }

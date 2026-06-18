@@ -253,6 +253,12 @@ reject_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests
 
 reject_pattern \
+  "iOS App Group keyboard shell stays out of VoiceInkCore" \
+  '\b(VoiceInkAppGroup|VoiceInkAppDeepLink|AppGroupCoordinator|CFNotificationCenter|DarwinNotify)\b|voiceink://record|group\.com\.prakashjoshipax\.VoiceInk|com\.prakashjoshipax\.VoiceInk\.(stopRecording|recordingStateChanged)' \
+  VoiceInkCore/Sources/VoiceInkCore \
+  VoiceInkCore/Tests/VoiceInkCoreTests
+
+reject_pattern \
   "removed shared-type shell aliases stay deleted" \
   'typealias +(CustomPrompt|PromptIcon|RollingBufferPreloadMode|RollingBufferPreloadConfiguration|RollingBufferPowerState|RollingBufferPreloadPolicy|RollingBufferPreloadSettings|AIProvider|WhisperModelFile|RecordingState|RecorderAction|ShortcutPressContext|PowerModeValidationError|StreamingTranscriptionEvent|StreamingTranscriptionError)\b|PerformanceAnalyzer\.(AnalysisResult|ModelStat)' \
   VoiceInk \
@@ -335,6 +341,33 @@ require_plist_value \
   CFBundleURLTypes.0.CFBundleURLSchemes.0 \
   voiceink \
   iOS/VoiceInk-ios/Info.plist
+
+require_plist_value \
+  "iOS app App Group entitlement matches shared shell bridge" \
+  'com\.apple\.security\.application-groups.0' \
+  group.com.prakashjoshipax.VoiceInk \
+  iOS/VoiceInk-ios/VoiceInk_ios.entitlements
+
+require_plist_value \
+  "iOS keyboard App Group entitlement matches shared shell bridge" \
+  'com\.apple\.security\.application-groups.0' \
+  group.com.prakashjoshipax.VoiceInk \
+  iOS/VoiceInkKeyboard/VoiceInkKeyboard.entitlements
+
+require_pattern \
+  "iOS App Group bridge uses entitlement group" \
+  'static let appGroupIdentifier = "group\.com\.prakashjoshipax\.VoiceInk"' \
+  iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
+
+require_pattern \
+  "iOS App Group bridge owns stop-recording Darwin notification" \
+  'static let stopRecording = "com\.prakashjoshipax\.VoiceInk\.stopRecording"' \
+  iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
+
+require_pattern \
+  "iOS App Group bridge owns recording-state Darwin notification" \
+  'static let recordingStateChanged = "com\.prakashjoshipax\.VoiceInk\.recordingStateChanged"' \
+  iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
 
 run_required "git diff has no whitespace errors" git diff --check
 

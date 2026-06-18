@@ -420,6 +420,37 @@ class AIEnhancementService: ObservableObject {
         selectedPromptId = prompt.id
     }
 
+    func analyzePromptTrigger(in text: String) -> VoiceInkPromptDetectionResult {
+        VoiceInkPromptDetectionPolicy.analyzeText(
+            text,
+            prompts: promptDetectionPrompts,
+            isEnhancementEnabled: isEnhancementEnabled,
+            selectedPromptId: selectedPromptId
+        )
+    }
+
+    func applyPromptDetectionResult(_ result: VoiceInkPromptDetectionResult) {
+        guard result.shouldEnableAI else { return }
+
+        if !isEnhancementEnabled {
+            isEnhancementEnabled = true
+        }
+        if let promptId = result.selectedPromptId {
+            selectedPromptId = promptId
+        }
+    }
+
+    func restorePromptDetectionSettings(_ result: VoiceInkPromptDetectionResult) {
+        guard result.shouldEnableAI else { return }
+
+        if isEnhancementEnabled != result.originalEnhancementState {
+            isEnhancementEnabled = result.originalEnhancementState
+        }
+        if let originalId = result.originalPromptId, selectedPromptId != originalId {
+            selectedPromptId = originalId
+        }
+    }
+
     private func refreshPromptDetectionCache() {
         promptDetectionPrompts = VoiceInkCustomPromptPolicy.triggerDetectablePrompts(from: customPrompts)
     }

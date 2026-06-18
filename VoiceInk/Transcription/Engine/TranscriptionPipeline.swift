@@ -27,7 +27,6 @@ class TranscriptionPipeline {
     private let modelContext: ModelContext
     private let serviceRegistry: TranscriptionServiceRegistry
     private let enhancementService: AIEnhancementService?
-    private let promptDetectionService = PromptDetectionService()
     private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "TranscriptionPipeline")
     private static let autoSendAfterPasteDelayNanoseconds: UInt64 = 120_000_000
 
@@ -75,7 +74,7 @@ class TranscriptionPipeline {
         preparedPasteContext: Task<CursorPaster.PreparedPasteContext?, Never>? = nil
     ) async -> TranscriptionPipelineDeferredWork? {
         var finalPastedText: String?
-        var promptDetectionResult: PromptDetectionService.PromptDetectionResult?
+        var promptDetectionResult: VoiceInkPromptDetectionResult?
         var didResolveAudioFileReadiness = false
         var audioFileIsReady = audioFileReadyTask == nil
         var shouldInsertHistoryRecordBeforeSave = deferHistoryInsertUntilSave
@@ -121,9 +120,8 @@ class TranscriptionPipeline {
 
         func restorePromptDetectionSettingsIfNeeded() async {
             if let result = promptDetectionResult,
-               let enhancementService,
-               result.shouldEnableAI {
-                await promptDetectionService.restoreOriginalSettings(result, to: enhancementService)
+               let enhancementService {
+                enhancementService.restorePromptDetectionSettings(result)
             }
         }
 
@@ -214,9 +212,9 @@ class TranscriptionPipeline {
             if let enhancementService,
                enhancementService.isConfigured,
                enhancementService.hasPromptTriggerWords {
-                let detectionResult = promptDetectionService.analyzeText(text, with: enhancementService)
+                let detectionResult = enhancementService.analyzePromptTrigger(in: text)
                 promptDetectionResult = detectionResult
-                await promptDetectionService.applyDetectionResult(detectionResult, to: enhancementService)
+                enhancementService.applyPromptDetectionResult(detectionResult)
             }
 
             let shouldSkipEnhancement = VoiceInkPostProcessingSkipPolicy.shouldSkipPostProcessing(

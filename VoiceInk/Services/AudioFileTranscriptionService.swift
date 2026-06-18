@@ -12,7 +12,6 @@ class AudioTranscriptionService: ObservableObject {
 
     private let modelContext: ModelContext
     private let enhancementService: AIEnhancementService?
-    private let promptDetectionService = PromptDetectionService()
     private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "AudioTranscriptionService")
     private let serviceRegistry: TranscriptionServiceRegistry
 
@@ -83,14 +82,14 @@ class AudioTranscriptionService: ObservableObject {
 
             // Apply prompt detection for trigger words
             let originalText = cleanedText
-            var promptDetectionResult: PromptDetectionService.PromptDetectionResult? = nil
+            var promptDetectionResult: VoiceInkPromptDetectionResult? = nil
 
             if let enhancementService = enhancementService,
                enhancementService.isConfigured,
                enhancementService.hasPromptTriggerWords {
-                let detectionResult = await promptDetectionService.analyzeText(text, with: enhancementService)
+                let detectionResult = enhancementService.analyzePromptTrigger(in: text)
                 promptDetectionResult = detectionResult
-                await promptDetectionService.applyDetectionResult(detectionResult, to: enhancementService)
+                enhancementService.applyPromptDetectionResult(detectionResult)
             }
 
             // Apply AI enhancement if enabled
@@ -127,7 +126,7 @@ class AudioTranscriptionService: ObservableObject {
                     // Restore original prompt settings if AI was temporarily enabled
                     if let result = promptDetectionResult,
                        result.shouldEnableAI {
-                        await promptDetectionService.restoreOriginalSettings(result, to: enhancementService)
+                        enhancementService.restorePromptDetectionSettings(result)
                     }
 
                     await MainActor.run {

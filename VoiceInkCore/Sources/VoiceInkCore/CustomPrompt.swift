@@ -83,7 +83,65 @@ public struct VoiceInkCustomPromptStoreState: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkCustomPromptDraft: Equatable, Sendable {
+    public let title: String
+    public let promptText: String
+    public let icon: String
+    public let description: String
+    public let triggerWords: [String]
+    public let useSystemInstructions: Bool
+
+    public init(
+        title: String,
+        promptText: String,
+        icon: String,
+        description: String,
+        triggerWords: [String],
+        useSystemInstructions: Bool
+    ) {
+        self.title = title
+        self.promptText = promptText
+        self.icon = icon
+        self.description = description
+        self.triggerWords = triggerWords
+        self.useSystemInstructions = useSystemInstructions
+    }
+}
+
 public enum VoiceInkCustomPromptPolicy {
+    public static func isSaveableCustomPromptDraft(_ draft: VoiceInkCustomPromptDraft) -> Bool {
+        !draft.title.isEmpty && !draft.promptText.isEmpty
+    }
+
+    public static func customPrompt(from draft: VoiceInkCustomPromptDraft) -> VoiceInkCustomPrompt {
+        VoiceInkCustomPrompt(
+            title: draft.title,
+            promptText: draft.promptText,
+            icon: draft.icon,
+            description: customPromptDescription(draft.description),
+            isPredefined: false,
+            triggerWords: draft.triggerWords,
+            useSystemInstructions: draft.useSystemInstructions
+        )
+    }
+
+    public static func prompt(
+        _ prompt: VoiceInkCustomPrompt,
+        applying draft: VoiceInkCustomPromptDraft
+    ) -> VoiceInkCustomPrompt {
+        VoiceInkCustomPrompt(
+            id: prompt.id,
+            title: prompt.isPredefined ? prompt.title : draft.title,
+            promptText: prompt.isPredefined ? prompt.promptText : draft.promptText,
+            isActive: prompt.isActive,
+            icon: prompt.isPredefined ? prompt.icon : draft.icon,
+            description: prompt.isPredefined ? prompt.description : customPromptDescription(draft.description),
+            isPredefined: prompt.isPredefined,
+            triggerWords: draft.triggerWords,
+            useSystemInstructions: prompt.isPredefined ? prompt.useSystemInstructions : draft.useSystemInstructions
+        )
+    }
+
     public static func addingPrompt(
         _ prompt: VoiceInkCustomPrompt,
         to prompts: [VoiceInkCustomPrompt],
@@ -192,5 +250,9 @@ public enum VoiceInkCustomPromptPolicy {
         prompts.filter { prompt in
             prompt.triggerWords.contains { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
         }
+    }
+
+    private static func customPromptDescription(_ description: String) -> String? {
+        description.isEmpty ? nil : description
     }
 }

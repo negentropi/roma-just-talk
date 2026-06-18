@@ -36,6 +36,17 @@ struct PromptEditorView: View {
         }
         return false
     }
+
+    private var currentDraft: VoiceInkCustomPromptDraft {
+        VoiceInkCustomPromptDraft(
+            title: title,
+            promptText: promptText,
+            icon: selectedIcon,
+            description: description,
+            triggerWords: triggerWords,
+            useSystemInstructions: useSystemInstructions
+        )
+    }
     
     init(mode: Mode, onDismiss: (() -> Void)? = nil) {
         self.mode = mode
@@ -120,7 +131,7 @@ struct PromptEditorView: View {
                             .frame(minWidth: 100)
                     }
                     .buttonStyle(.borderedProminent)
-                    .disabled(isEditingPredefinedPrompt ? false : (title.isEmpty || promptText.isEmpty))
+                    .disabled(isEditingPredefinedPrompt ? false : !VoiceInkCustomPromptPolicy.isSaveableCustomPromptDraft(currentDraft))
                     .keyboardShortcut(.return, modifiers: .command)
                 }
                 .padding(.horizontal, 20)
@@ -247,27 +258,11 @@ struct PromptEditorView: View {
     private func save() {
         switch mode {
         case .add:
-            enhancementService.addPrompt(
-                title: title,
-                promptText: promptText,
-                icon: selectedIcon,
-                description: description.isEmpty ? nil : description,
-                triggerWords: triggerWords,
-                useSystemInstructions: useSystemInstructions
-            )
+            enhancementService.addPrompt(VoiceInkCustomPromptPolicy.customPrompt(from: currentDraft))
         case .edit(let prompt):
-            let updatedPrompt = VoiceInkCustomPrompt(
-                id: prompt.id,
-                title: prompt.isPredefined ? prompt.title : title,
-                promptText: prompt.isPredefined ? prompt.promptText : promptText,
-                isActive: prompt.isActive,
-                icon: prompt.isPredefined ? prompt.icon : selectedIcon,
-                description: prompt.isPredefined ? prompt.description : (description.isEmpty ? nil : description),
-                isPredefined: prompt.isPredefined,
-                triggerWords: triggerWords,
-                useSystemInstructions: useSystemInstructions
+            enhancementService.updatePrompt(
+                VoiceInkCustomPromptPolicy.prompt(prompt, applying: currentDraft)
             )
-            enhancementService.updatePrompt(updatedPrompt)
         }
     }
 }

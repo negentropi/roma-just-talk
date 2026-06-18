@@ -319,6 +319,138 @@ final class CustomPromptTests: XCTestCase {
         XCTAssertEqual(VoiceInkCustomPromptPolicy.basePromptText(activePrompt: nil, prompts: []), "")
     }
 
+    func testCustomPromptDraftSaveabilityPreservesMacOSEmptyStringRule() {
+        XCTAssertFalse(
+            VoiceInkCustomPromptPolicy.isSaveableCustomPromptDraft(
+                VoiceInkCustomPromptDraft(
+                    title: "",
+                    promptText: "Prompt",
+                    icon: "doc.text.fill",
+                    description: "",
+                    triggerWords: [],
+                    useSystemInstructions: true
+                )
+            )
+        )
+        XCTAssertFalse(
+            VoiceInkCustomPromptPolicy.isSaveableCustomPromptDraft(
+                VoiceInkCustomPromptDraft(
+                    title: "Title",
+                    promptText: "",
+                    icon: "doc.text.fill",
+                    description: "",
+                    triggerWords: [],
+                    useSystemInstructions: true
+                )
+            )
+        )
+        XCTAssertTrue(
+            VoiceInkCustomPromptPolicy.isSaveableCustomPromptDraft(
+                VoiceInkCustomPromptDraft(
+                    title: " ",
+                    promptText: " ",
+                    icon: "doc.text.fill",
+                    description: "",
+                    triggerWords: [],
+                    useSystemInstructions: true
+                )
+            )
+        )
+    }
+
+    func testCustomPromptPolicyBuildsNewPromptFromDraft() {
+        let prompt = VoiceInkCustomPromptPolicy.customPrompt(
+            from: VoiceInkCustomPromptDraft(
+                title: "Proofread",
+                promptText: "Fix grammar.",
+                icon: "pencil",
+                description: "",
+                triggerWords: ["proof"],
+                useSystemInstructions: false
+            )
+        )
+
+        XCTAssertEqual(prompt.title, "Proofread")
+        XCTAssertEqual(prompt.promptText, "Fix grammar.")
+        XCTAssertEqual(prompt.icon, "pencil")
+        XCTAssertNil(prompt.description)
+        XCTAssertFalse(prompt.isPredefined)
+        XCTAssertEqual(prompt.triggerWords, ["proof"])
+        XCTAssertFalse(prompt.useSystemInstructions)
+    }
+
+    func testCustomPromptPolicyAppliesDraftToCustomPrompt() {
+        let existing = VoiceInkCustomPrompt(
+            id: UUID(uuidString: "00000000-0000-0000-0000-000000000301")!,
+            title: "Old",
+            promptText: "Old prompt",
+            isActive: true,
+            icon: "old.icon",
+            description: "Old description",
+            isPredefined: false,
+            triggerWords: ["old"],
+            useSystemInstructions: true
+        )
+
+        let updated = VoiceInkCustomPromptPolicy.prompt(
+            existing,
+            applying: VoiceInkCustomPromptDraft(
+                title: "New",
+                promptText: "New prompt",
+                icon: "new.icon",
+                description: "",
+                triggerWords: ["new"],
+                useSystemInstructions: false
+            )
+        )
+
+        XCTAssertEqual(updated.id, existing.id)
+        XCTAssertEqual(updated.title, "New")
+        XCTAssertEqual(updated.promptText, "New prompt")
+        XCTAssertTrue(updated.isActive)
+        XCTAssertEqual(updated.icon, "new.icon")
+        XCTAssertNil(updated.description)
+        XCTAssertFalse(updated.isPredefined)
+        XCTAssertEqual(updated.triggerWords, ["new"])
+        XCTAssertFalse(updated.useSystemInstructions)
+    }
+
+    func testCustomPromptPolicyAppliesOnlyTriggerWordsToPredefinedPrompt() {
+        let existing = VoiceInkCustomPrompt(
+            id: VoiceInkPredefinedPrompts.defaultPromptId,
+            title: "Default",
+            promptText: "Template prompt",
+            isActive: true,
+            icon: "template.icon",
+            description: "Template description",
+            isPredefined: true,
+            triggerWords: ["old"],
+            useSystemInstructions: true
+        )
+
+        let updated = VoiceInkCustomPromptPolicy.prompt(
+            existing,
+            applying: VoiceInkCustomPromptDraft(
+                title: "Changed",
+                promptText: "Changed prompt",
+                icon: "changed.icon",
+                description: "",
+                triggerWords: ["new"],
+                useSystemInstructions: false
+            )
+        )
+
+        XCTAssertEqual(updated.id, existing.id)
+        XCTAssertEqual(updated.title, existing.title)
+        XCTAssertEqual(updated.promptText, existing.promptText)
+        XCTAssertTrue(updated.isActive)
+        XCTAssertEqual(updated.icon, existing.icon)
+        XCTAssertEqual(updated.description, existing.description)
+        XCTAssertTrue(updated.isPredefined)
+        XCTAssertEqual(updated.triggerWords, ["new"])
+        XCTAssertTrue(updated.useSystemInstructions)
+    }
+
     func testCustomPromptEncodingPreservesExistingMacOSKeys() throws {
         let prompt = VoiceInkCustomPrompt(
             id: UUID(uuidString: "00000000-0000-0000-0000-0000000000cd")!,

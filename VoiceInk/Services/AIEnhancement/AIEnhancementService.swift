@@ -386,11 +386,10 @@ class AIEnhancementService: ObservableObject {
         screenCaptureService.lastCapturedText = nil
     }
 
-    func addPrompt(title: String, promptText: String, icon: String = "doc.text.fill", description: String? = nil, triggerWords: [String] = [], useSystemInstructions: Bool = true) {
-        let newPrompt = VoiceInkCustomPrompt(title: title, promptText: promptText, icon: icon, description: description, isPredefined: false, triggerWords: triggerWords, useSystemInstructions: useSystemInstructions)
+    func addPrompt(_ prompt: VoiceInkCustomPrompt) {
         applyPromptStoreState(
             VoiceInkCustomPromptPolicy.addingPrompt(
-                newPrompt,
+                prompt,
                 to: customPrompts,
                 selectedPromptId: selectedPromptId
             )

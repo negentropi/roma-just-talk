@@ -145,7 +145,7 @@ Current macOS consumers of shared remote transport:
 - macOS custom prompt final text delegates to `VoiceInkAIPrompts.finalPromptText`, so the system-instruction wrapper stays shared.
 - macOS uses `VoiceInkCustomPrompt` directly, keeping the SwiftUI prompt-grid adapter in the macOS shell while moving the prompt record and Codable compatibility into `VoiceInkCore`.
 - macOS predefined-prompt initialization now delegates to `VoiceInkCustomPromptPolicy`, and the old shell-only `PredefinedPrompts` adapter was removed.
-- macOS custom prompt add/update/delete selection behavior delegates to `VoiceInkCustomPromptPolicy`; macOS `AIEnhancementService` still owns persistence timing, notifications, and SwiftUI state.
+- macOS custom prompt draft saveability, add/update record construction, and add/update/delete selection behavior delegate to `VoiceInkCustomPromptPolicy`; macOS `AIEnhancementService` still owns persistence timing, notifications, and SwiftUI state.
 - macOS custom prompt loading, saving, and selected-prompt persistence now use `VoiceInkCustomPromptStorage`.
 - macOS AI-enhancement prompt selection delegates selected-prompt repair and base prompt text to `VoiceInkCustomPromptPolicy`; macOS still appends selected-text, clipboard, screen-capture, and vocabulary context before executing provider requests.
 - macOS PowerMode AI-enhancement prompt setup delegates nil-selection fallback to `VoiceInkCustomPromptPolicy`; PowerMode still owns OS app/website detection, AI provider/model UI, active-session application, shortcuts, and config persistence.

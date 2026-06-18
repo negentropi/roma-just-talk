@@ -75,6 +75,19 @@ final class PerformanceAnalysisTests: XCTestCase {
         XCTAssertEqual(stats.map(\.name), ["zero"])
         XCTAssertEqual(stats[0].speedFactor, 0)
     }
+
+    func testModelStatFormatsSpeedFactorForSharedPresentation() {
+        let stat = VoiceInkPerformanceModelStat(
+            name: "fast",
+            sampleCount: 1,
+            totalProcessingTime: 2,
+            avgProcessingTime: 2,
+            avgAudioDuration: 10,
+            speedFactor: 5.04
+        )
+
+        XCTAssertEqual(stat.speedFactorText, "5.0x")
+    }
 }
 
 private struct Record: VoiceInkPerformanceRecord {

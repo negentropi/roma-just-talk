@@ -160,7 +160,7 @@ private struct ModelPerformancePanelContent: View {
             .frame(maxWidth: .infinity)
 
             VStack(spacing: 3) {
-                Text(String(format: "%.1fx", stat.speedFactor))
+                Text(stat.speedFactorText)
                     .font(.system(size: 24, weight: .bold, design: .rounded))
                     .foregroundColor(.mint)
                 Text(stat.speedFactor >= 1.0 ? "Faster than Real-time" : "Slower than Real-time")

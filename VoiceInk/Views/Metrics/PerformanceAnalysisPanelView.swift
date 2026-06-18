@@ -167,7 +167,7 @@ struct PerformanceAnalysisPanelView: View {
 
             // Hero metric
             VStack(spacing: 3) {
-                Text(String(format: "%.1fx", modelStat.speedFactor))
+                Text(modelStat.speedFactorText)
                     .font(.system(size: 24, weight: .bold, design: .rounded))
                     .foregroundColor(.mint)
                 Text("Faster than Real-time")

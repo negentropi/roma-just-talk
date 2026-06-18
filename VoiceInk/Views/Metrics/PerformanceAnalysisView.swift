@@ -259,7 +259,7 @@ struct TranscriptionModelCard: View {
             VStack(spacing: 16) {
                 // Main metric: Speed Factor
                 VStack {
-                    Text(String(format: "%.1fx", modelStat.speedFactor))
+                    Text(modelStat.speedFactorText)
                         .font(.system(size: 24, weight: .bold, design: .rounded))
                         .foregroundColor(.mint)
                     Text("Faster than Real-time")

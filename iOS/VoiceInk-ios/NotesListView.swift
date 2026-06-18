@@ -147,7 +147,7 @@ struct NotesListView: View {
             return nil
         }
 
-        return "\(fastestModel.name) \(String(format: "%.1fx", fastestModel.speedFactor)) realtime"
+        return "\(fastestModel.name) \(fastestModel.speedFactorText) realtime"
     }
 
     private var emptyState: some View {

@@ -20,6 +20,9 @@ public struct VoiceInkPerformanceAnalysis: Equatable, Sendable {
 
 public struct VoiceInkPerformanceModelStat: Identifiable, Equatable, Sendable {
     public var id: String { name }
+    public var speedFactorText: String {
+        String(format: "%.1fx", speedFactor)
+    }
 
     public let name: String
     public let sampleCount: Int

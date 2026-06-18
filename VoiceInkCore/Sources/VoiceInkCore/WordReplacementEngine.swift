@@ -11,10 +11,6 @@ public struct VoiceInkWordReplacementRule: Codable, Equatable, Sendable {
 }
 
 public enum VoiceInkWordReplacementEngine {
-    public static func sortedRules(_ rules: [VoiceInkWordReplacementRule]) -> [VoiceInkWordReplacementRule] {
-        rules.sorted { $0.originalText.count > $1.originalText.count }
-    }
-
     public static func apply(_ rules: [VoiceInkWordReplacementRule], to text: String) -> String {
         guard !rules.isEmpty else {
             return text
@@ -22,11 +18,15 @@ public enum VoiceInkWordReplacementEngine {
 
         var modifiedText = text
 
-        for rule in rules {
+        for rule in orderedRules(rules) {
             apply(rule, to: &modifiedText)
         }
 
         return modifiedText
+    }
+
+    private static func orderedRules(_ rules: [VoiceInkWordReplacementRule]) -> [VoiceInkWordReplacementRule] {
+        rules.sorted { $0.originalText.count > $1.originalText.count }
     }
 
     private static func apply(_ rule: VoiceInkWordReplacementRule, to modifiedText: inout String) {

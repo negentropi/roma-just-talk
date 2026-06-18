@@ -38,9 +38,8 @@ class WordReplacementService {
         let rules = (try? context.fetch(descriptor))?.map {
             VoiceInkWordReplacementRule(originalText: $0.originalText, replacementText: $0.replacementText)
         } ?? []
-        let sortedRules = VoiceInkWordReplacementEngine.sortedRules(rules)
 
-        cachedRules = sortedRules
-        return sortedRules
+        cachedRules = rules
+        return rules
     }
 }

@@ -2,15 +2,15 @@ import Foundation
 @testable import VoiceInkCore
 
 final class WordReplacementEngineTests: XCTestCase {
-    func testSortedRulesPreferLongerOriginalText() {
+    func testApplySortsRulesByLongerOriginalText() {
         let rules = [
             VoiceInkWordReplacementRule(originalText: "voice", replacementText: "v"),
             VoiceInkWordReplacementRule(originalText: "voice ink", replacementText: "roma")
         ]
 
         XCTAssertEqual(
-            VoiceInkWordReplacementEngine.sortedRules(rules).map(\.originalText),
-            ["voice ink", "voice"]
+            VoiceInkWordReplacementEngine.apply(rules, to: "voice ink and voice"),
+            "roma and v"
         )
     }
 

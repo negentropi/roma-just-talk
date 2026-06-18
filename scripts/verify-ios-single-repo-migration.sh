@@ -430,6 +430,27 @@ reject_pattern \
   VoiceInk/Views/Components/FillerWordsSettingsView.swift \
   iOS/VoiceInk-ios/SettingsView.swift
 
+require_pattern \
+  "shared word-replacement engine owns rule ordering" \
+  'for rule in orderedRules\(rules\)' \
+  VoiceInkCore/Sources/VoiceInkCore/WordReplacementEngine.swift
+
+reject_pattern \
+  "shared word-replacement engine does not expose shell ordering helper" \
+  'public static func sortedRules' \
+  VoiceInkCore/Sources/VoiceInkCore/WordReplacementEngine.swift
+
+reject_pattern \
+  "iOS retry passes stored word replacements into shared engine" \
+  'runtimeWordReplacementRules|VoiceInkWordReplacementEngine\.sortedRules' \
+  iOS/VoiceInk-ios/AppSettings.swift \
+  iOS/VoiceInk-ios/TranscriptionRetryService.swift
+
+reject_pattern \
+  "macOS word-replacement service leaves rule ordering to shared engine" \
+  'VoiceInkWordReplacementEngine\.sortedRules|let sortedRules' \
+  VoiceInk/Transcription/Processing/WordReplacementService.swift
+
 reject_pattern \
   "iOS retry passes stored vocabulary into shared run processor" \
   'runtimeCustomVocabularyTerms' \

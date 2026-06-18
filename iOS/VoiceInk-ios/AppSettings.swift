@@ -225,10 +225,6 @@ final class AppSettings: ObservableObject {
         wordReplacements = VoiceInkPreferenceList.removing(at: offsets, from: wordReplacements)
     }
 
-    var runtimeWordReplacementRules: [VoiceInkWordReplacementRule] {
-        VoiceInkWordReplacementEngine.sortedRules(wordReplacements)
-    }
-
     @discardableResult
     func addCustomVocabularyTerms(_ input: String) -> String? {
         let plan = VoiceInkDictionaryPolicy.vocabularyInsertPlan(

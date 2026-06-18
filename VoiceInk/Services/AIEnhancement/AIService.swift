@@ -207,12 +207,12 @@ class AIService: ObservableObject {
             return
         }
 
-        guard let resolvedKey = VoiceInkAPIKeyReference.resolvedValue(key) else {
+        guard let resolvedKey = resolvedAPIKey(from: key) else {
             completion(false, "Environment variable is missing or empty")
             return
         }
 
-        verifyAPIKey(key) { [weak self] isValid, errorMessage in
+        verifyResolvedAPIKey(resolvedKey) { [weak self] isValid, errorMessage in
             guard let self = self else { return }
             DispatchQueue.main.async {
                 if isValid {
@@ -234,11 +234,25 @@ class AIService: ObservableObject {
             return
         }
 
-        guard let resolvedKey = VoiceInkAPIKeyReference.resolvedValue(key) else {
+        guard let resolvedKey = resolvedAPIKey(from: key) else {
             completion(false, "Environment variable is missing or empty")
             return
         }
 
+        verifyResolvedAPIKey(resolvedKey, completion: completion)
+    }
+
+    private func resolvedAPIKey(from key: String) -> String? {
+        VoiceInkAIEnhancementAPIKeyDraft(
+            provider: selectedProvider,
+            enteredKey: key
+        ).resolvedVerificationCandidate()
+    }
+
+    private func verifyResolvedAPIKey(
+        _ resolvedKey: String,
+        completion: @escaping (Bool, String?) -> Void
+    ) {
         Task {
             let result: (isValid: Bool, errorMessage: String?)
             guard let route = selectedProvider.apiKeyVerificationRoute else {

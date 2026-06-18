@@ -7,6 +7,48 @@ public enum VoiceInkAIEnhancementAPIKeyVerificationRoute: Sendable, Equatable {
     case openRouterModels
 }
 
+public struct VoiceInkAIEnhancementAPIKeyDraft: Equatable, Sendable {
+    private let provider: VoiceInkAIEnhancementProviderKind
+    private let providerKeyDraft: VoiceInkProviderAPIKeyDraft
+
+    public init(
+        provider: VoiceInkAIEnhancementProviderKind,
+        enteredKey: String?,
+        storedRuntimeKey: String? = nil
+    ) {
+        self.provider = provider
+        self.providerKeyDraft = VoiceInkProviderAPIKeyDraft(
+            enteredKey: enteredKey,
+            storedRuntimeKey: storedRuntimeKey
+        )
+    }
+
+    public var hasEnteredKey: Bool {
+        providerKeyDraft.hasEnteredKey
+    }
+
+    public var canVerify: Bool {
+        provider.requiresUserAPIKey && providerKeyDraft.canVerify
+    }
+
+    public var keyToSaveAfterSuccessfulVerification: String? {
+        guard provider.requiresUserAPIKey else {
+            return nil
+        }
+        return providerKeyDraft.keyToSaveAfterSuccessfulVerification
+    }
+
+    public func resolvedVerificationCandidate(
+        environment: [String: String] = ProcessInfo.processInfo.environment
+    ) -> String? {
+        guard provider.requiresUserAPIKey,
+              let candidate = providerKeyDraft.verificationCandidate else {
+            return nil
+        }
+        return VoiceInkAPIKeyReference.resolvedValue(candidate, environment: environment)
+    }
+}
+
 public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
     case cerebras = "Cerebras"
     case groq = "Groq"

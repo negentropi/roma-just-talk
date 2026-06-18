@@ -467,6 +467,22 @@ reject_pattern \
   VoiceInk/Services/AudioFileTranscriptionService.swift
 
 require_pattern \
+  "macOS AI API-key view uses shared AI draft policy" \
+  'VoiceInkAIEnhancementAPIKeyDraft' \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+
+require_pattern \
+  "macOS AI service resolves keys through shared AI draft policy" \
+  'VoiceInkAIEnhancementAPIKeyDraft' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+reject_pattern \
+  "macOS AI API-key path avoids shell-only key-reference and blank-key policy" \
+  'VoiceInkAPIKeyReference\.resolvedValue|VoiceInkProviderCredential\.nonBlank\(apiKey\)' \
+  VoiceInk/Services/AIEnhancement/AIService.swift \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+
+require_pattern \
   "macOS AI enhancement service returns shared enhancement result" \
   'VoiceInkAIEnhancementResult' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift

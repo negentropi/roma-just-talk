@@ -54,6 +54,59 @@ final class AIProviderCatalogTests: XCTestCase {
         XCTAssertTrue(VoiceInkAIEnhancementProviderKind.anthropic.requiresUserAPIKey)
     }
 
+    func testMacOSAIEnhancementAPIKeyDraftUsesSharedBlankPolicy() {
+        let draft = VoiceInkAIEnhancementAPIKeyDraft(
+            provider: .groq,
+            enteredKey: " \n\t "
+        )
+
+        XCTAssertFalse(draft.hasEnteredKey)
+        XCTAssertFalse(draft.canVerify)
+        XCTAssertNil(draft.keyToSaveAfterSuccessfulVerification)
+        XCTAssertNil(draft.resolvedVerificationCandidate(environment: [:]))
+    }
+
+    func testMacOSAIEnhancementAPIKeyDraftResolvesEnvironmentReferences() {
+        let draft = VoiceInkAIEnhancementAPIKeyDraft(
+            provider: .groq,
+            enteredKey: " $GROQ_API_KEY "
+        )
+
+        XCTAssertTrue(draft.hasEnteredKey)
+        XCTAssertTrue(draft.canVerify)
+        XCTAssertEqual(draft.keyToSaveAfterSuccessfulVerification, "$GROQ_API_KEY")
+        XCTAssertEqual(
+            draft.resolvedVerificationCandidate(environment: ["GROQ_API_KEY": "resolved-key"]),
+            "resolved-key"
+        )
+    }
+
+    func testMacOSAIEnhancementAPIKeyDraftFallsBackToStoredRuntimeKey() {
+        let draft = VoiceInkAIEnhancementAPIKeyDraft(
+            provider: .groq,
+            enteredKey: " \n\t ",
+            storedRuntimeKey: "stored-key"
+        )
+
+        XCTAssertFalse(draft.hasEnteredKey)
+        XCTAssertTrue(draft.canVerify)
+        XCTAssertNil(draft.keyToSaveAfterSuccessfulVerification)
+        XCTAssertEqual(draft.resolvedVerificationCandidate(environment: [:]), "stored-key")
+    }
+
+    func testMacOSAIEnhancementAPIKeyDraftRejectsNoKeyProviders() {
+        let draft = VoiceInkAIEnhancementAPIKeyDraft(
+            provider: .ollama,
+            enteredKey: "entered-key",
+            storedRuntimeKey: "stored-key"
+        )
+
+        XCTAssertTrue(draft.hasEnteredKey)
+        XCTAssertFalse(draft.canVerify)
+        XCTAssertNil(draft.keyToSaveAfterSuccessfulVerification)
+        XCTAssertNil(draft.resolvedVerificationCandidate(environment: [:]))
+    }
+
     func testMacOSAIEnhancementSelectableTextProvidersAreShared() {
         XCTAssertEqual(
             VoiceInkAIEnhancementProviderKind.selectableTextEnhancementProviders,

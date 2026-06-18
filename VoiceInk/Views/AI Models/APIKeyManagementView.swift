@@ -17,8 +17,15 @@ struct APIKeyManagementView: View {
     @State private var localCLITimeoutSeconds: Double = LocalCLIService.defaultTimeoutSeconds
     @State private var isSyncingLocalCLIState = false
 
+    private var apiKeyDraft: VoiceInkAIEnhancementAPIKeyDraft {
+        VoiceInkAIEnhancementAPIKeyDraft(
+            provider: aiService.selectedProvider,
+            enteredKey: apiKey
+        )
+    }
+
     private var hasDraftAPIKey: Bool {
-        VoiceInkProviderCredential.nonBlank(apiKey) != nil
+        apiKeyDraft.hasEnteredKey
     }
 
     private var obfuscatedSelectedAPIKey: String {

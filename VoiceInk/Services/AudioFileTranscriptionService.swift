@@ -8,19 +8,11 @@ import VoiceInkCore
 @MainActor
 class AudioTranscriptionService: ObservableObject {
     @Published var isTranscribing = false
-    @Published var currentError: TranscriptionError?
 
     private let modelContext: ModelContext
     private let enhancementService: AIEnhancementService?
     private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "AudioTranscriptionService")
     private let serviceRegistry: TranscriptionServiceRegistry
-
-    enum TranscriptionError: Error {
-        case noAudioFile
-        case transcriptionFailed
-        case modelNotLoaded
-        case invalidAudioFormat
-    }
 
     init(modelContext: ModelContext, engine: VoiceInkEngine) {
         self.modelContext = modelContext
@@ -36,7 +28,7 @@ class AudioTranscriptionService: ObservableObject {
     
     func retranscribeAudio(from url: URL, using model: any TranscriptionModel) async throws -> Transcription {
         guard FileManager.default.fileExists(atPath: url.path) else {
-            throw TranscriptionError.noAudioFile
+            throw VoiceInkEngineError.audioFileNotFound
         }
         
         await MainActor.run {
@@ -185,6 +177,7 @@ class AudioTranscriptionService: ObservableObject {
                 modelContext.insert(newTranscription)
                 do {
                     try modelContext.save()
+                    NotificationCenter.default.post(name: .transcriptionCreated, object: newTranscription)
                     NotificationCenter.default.post(name: .transcriptionCompleted, object: newTranscription)
                 } catch {
                     logger.error("❌ Failed to save transcription: \(error.localizedDescription, privacy: .public)")
@@ -198,7 +191,6 @@ class AudioTranscriptionService: ObservableObject {
             }
         } catch {
             logger.error("❌ Transcription failed: \(error.localizedDescription, privacy: .public)")
-            currentError = .transcriptionFailed
             isTranscribing = false
             throw error
         }

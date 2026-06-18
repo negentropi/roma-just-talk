@@ -200,10 +200,11 @@ class TranscriptionPipeline {
 
             if shouldCancel() { await finishCanceledTranscription(); return nil }
 
-            text = cleanupConfiguration.prepareFilteredTextForWordReplacement(text)
-
-            text = WordReplacementService.shared.applyReplacements(to: text, using: modelContext)
-            let cleanedText = cleanupConfiguration.applyTextPreferences(text)
+            let preparedText = cleanupConfiguration.prepareFilteredText(text) { text in
+                WordReplacementService.shared.applyReplacements(to: text, using: modelContext)
+            }
+            text = preparedText.wordReplacedText
+            let cleanedText = preparedText.cleanedText
 
             transcription.text = cleanedText
             transcription.transcriptionModelName = model.displayName

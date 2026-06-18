@@ -237,6 +237,34 @@ final class TranscriptionCleanupPreferencesTests: XCTestCase {
         )
     }
 
+    func testCleanupConfigurationPreparedTextAppliesWordReplacementBeforeTextPreferences() {
+        let configuration = VoiceInkTranscriptionCleanupConfiguration(
+            punctuationMode: .removeAll,
+            shouldLowercase: true
+        )
+
+        let preparedText = configuration.prepareFilteredText("Ship, Roma.") { text in
+            text.replacingOccurrences(of: "Roma", with: "Just Talk")
+        }
+
+        XCTAssertEqual(preparedText.textForWordReplacement, "Ship, Roma.")
+        XCTAssertEqual(preparedText.wordReplacedText, "Ship, Just Talk.")
+        XCTAssertEqual(preparedText.cleanedText, "ship just talk")
+    }
+
+    func testCleanupConfigurationPreparedTextCanNormalizeParagraphSpacingBeforeFormatting() {
+        let configuration = VoiceInkTranscriptionCleanupConfiguration()
+
+        let preparedText = configuration.prepareFilteredText(
+            " hello\n\n\nworld ",
+            normalizeParagraphSpacingBeforeFormatting: true
+        )
+
+        XCTAssertEqual(preparedText.textForWordReplacement, "hello\n\nworld")
+        XCTAssertEqual(preparedText.wordReplacedText, "hello\n\nworld")
+        XCTAssertEqual(preparedText.cleanedText, "hello\n\nworld")
+    }
+
     func testCleanupConfigurationFormatsPreparedFilteredTextWhenEnabled() {
         let sentence = "This sentence has many ordinary English words that should count clearly in tokenizer."
         let input = Array(repeating: sentence, count: 5).joined(separator: " ")

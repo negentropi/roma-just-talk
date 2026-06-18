@@ -50,16 +50,18 @@ class AudioTranscriptionService: ObservableObject {
             let transcriptionDuration = Date().timeIntervalSince(transcriptionStart)
             let cleanupConfiguration = VoiceInkTranscriptionCleanupConfiguration.current()
             text = cleanupConfiguration.filterRawOutput(text)
-            text = cleanupConfiguration.prepareFilteredTextForWordReplacement(text)
 
             let powerModeManager = PowerModeManager.shared
             let activePowerModeConfig = powerModeManager.currentActiveConfiguration
             let powerModeName = (activePowerModeConfig?.isEnabled == true) ? activePowerModeConfig?.name : nil
             let powerModeEmoji = (activePowerModeConfig?.isEnabled == true) ? activePowerModeConfig?.emoji : nil
 
-            text = WordReplacementService.shared.applyReplacements(to: text, using: modelContext)
+            let preparedText = cleanupConfiguration.prepareFilteredText(text) { text in
+                WordReplacementService.shared.applyReplacements(to: text, using: modelContext)
+            }
+            text = preparedText.wordReplacedText
             logger.notice("✅ Word replacements applied")
-            let cleanedText = cleanupConfiguration.applyTextPreferences(text)
+            let cleanedText = preparedText.cleanedText
 
             let audioAsset = AVURLAsset(url: url)
             let duration = CMTimeGetSeconds(try await audioAsset.load(.duration))

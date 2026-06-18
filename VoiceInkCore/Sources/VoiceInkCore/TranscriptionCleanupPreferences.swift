@@ -155,6 +155,29 @@ public struct VoiceInkTranscriptionCleanupConfiguration: Equatable, Sendable {
         shouldRemoveFillerWords ? fillerWords : []
     }
 
+    public func prepareFilteredText(
+        _ filteredText: String,
+        normalizeParagraphSpacingBeforeFormatting: Bool = false,
+        applyingWordReplacements wordReplacement: (String) -> String = { $0 }
+    ) -> VoiceInkPreparedTranscriptionText {
+        let textForWordReplacement: String
+        if normalizeParagraphSpacingBeforeFormatting {
+            let normalizedText = VoiceInkTranscriptTextNormalizer.normalizeParagraphSpacing(filteredText)
+            textForWordReplacement = shouldFormatParagraphs
+                ? VoiceInkTranscriptParagraphFormatter.format(normalizedText)
+                : normalizedText
+        } else {
+            textForWordReplacement = prepareFilteredTextForWordReplacement(filteredText)
+        }
+
+        let wordReplacedText = wordReplacement(textForWordReplacement)
+        return VoiceInkPreparedTranscriptionText(
+            textForWordReplacement: textForWordReplacement,
+            wordReplacedText: wordReplacedText,
+            cleanedText: applyTextPreferences(wordReplacedText)
+        )
+    }
+
     public func filterRawOutput(
         _ text: String,
         whitespacePolicy: VoiceInkTranscriptionOutputWhitespacePolicy = .collapseRuns
@@ -193,6 +216,22 @@ public struct VoiceInkTranscriptionCleanupConfiguration: Equatable, Sendable {
         self.shouldLowercase = shouldLowercase
         self.shouldRemoveFillerWords = shouldRemoveFillerWords
         self.fillerWords = fillerWords
+    }
+}
+
+public struct VoiceInkPreparedTranscriptionText: Equatable, Sendable {
+    public let textForWordReplacement: String
+    public let wordReplacedText: String
+    public let cleanedText: String
+
+    public init(
+        textForWordReplacement: String,
+        wordReplacedText: String,
+        cleanedText: String
+    ) {
+        self.textForWordReplacement = textForWordReplacement
+        self.wordReplacedText = wordReplacedText
+        self.cleanedText = cleanedText
     }
 }
 

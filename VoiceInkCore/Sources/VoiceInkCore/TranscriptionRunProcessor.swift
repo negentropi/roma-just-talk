@@ -143,13 +143,11 @@ public struct VoiceInkTranscriptionRunProcessor {
             rawText,
             whitespacePolicy: .preserveParagraphs
         )
-        let normalizedText = VoiceInkTranscriptTextNormalizer.normalizeParagraphSpacing(filteredText)
-        let formattedText = cleanupConfiguration.shouldFormatParagraphs
-            ? VoiceInkTranscriptParagraphFormatter.format(normalizedText)
-            : normalizedText
-        let cleanedText = cleanupConfiguration.applyTextPreferences(
-            formattedText,
+        let preparedText = cleanupConfiguration.prepareFilteredText(
+            filteredText,
+            normalizeParagraphSpacingBeforeFormatting: true
         )
+        let cleanedText = preparedText.cleanedText
         let shouldSkipPostProcessing = postProcessingSkipConfiguration.map {
             VoiceInkPostProcessingSkipPolicy.shouldSkipPostProcessing(
                 transcript: cleanedText,

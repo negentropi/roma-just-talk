@@ -306,6 +306,21 @@ require_pattern \
   iOS/VoiceInk-ios/AudioRecorder.swift
 
 require_pattern \
+  "shared stored-audio record owns delete-and-clear policy" \
+  'deleteExistingAudioFileAndClearReference' \
+  VoiceInkCore/Sources/VoiceInkCore/StoredAudioFile.swift
+
+require_pattern \
+  "macOS audio cleanup clears audio references through shared helper" \
+  'deleteExistingAudioFileAndClearReference\(\)' \
+  VoiceInk/Views/Settings/AudioCleanupManager.swift
+
+reject_pattern \
+  "macOS audio cleanup avoids shell-only delete-and-clear sequence" \
+  'audioFileURL = nil' \
+  VoiceInk/Views/Settings/AudioCleanupManager.swift
+
+require_pattern \
   "iOS live recording uses shared PCM16 sample-rate policy" \
   'AVSampleRateKey: VoiceInkPCM16Audio\.mono16kSampleRate' \
   iOS/VoiceInk-ios/AudioRecorder.swift

@@ -100,8 +100,7 @@ class AudioCleanupManager {
 
                 for transcription in transcriptions {
                     do {
-                        if try transcription.deleteExistingAudioFile() != nil {
-                            transcription.audioFileURL = nil
+                        if try transcription.deleteExistingAudioFileAndClearReference() != nil {
                             deletedCount += 1
                         }
                     } catch {
@@ -133,8 +132,7 @@ class AudioCleanupManager {
 
                 for transcription in transcriptions {
                     do {
-                        if try transcription.deleteExistingAudioFile() != nil {
-                            transcription.audioFileURL = nil
+                        if try transcription.deleteExistingAudioFileAndClearReference() != nil {
                             deletedCount += 1
                         }
                     } catch {

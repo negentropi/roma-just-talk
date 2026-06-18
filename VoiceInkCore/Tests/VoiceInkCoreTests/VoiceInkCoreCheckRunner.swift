@@ -515,6 +515,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "StoredAudioFileTests.testStoredAudioRecordUsesDefaultRecordingsDirectory", run: { StoredAudioFileTests().testStoredAudioRecordUsesDefaultRecordingsDirectory() }),
             VoiceInkCoreCheck(name: "StoredAudioFileTests.testStoredAudioRecordAllowsExplicitRecordingsDirectoryOverride", run: { StoredAudioFileTests().testStoredAudioRecordAllowsExplicitRecordingsDirectoryOverride() }),
             VoiceInkCoreCheck(name: "StoredAudioFileTests.testStoredAudioRecordDeleteUsesResolvedRecordFile", run: { try StoredAudioFileTests().testStoredAudioRecordDeleteUsesResolvedRecordFile() }),
+            VoiceInkCoreCheck(name: "StoredAudioFileTests.testStoredAudioRecordDeleteAndClearOnlyClearsReferenceWhenFileWasDeleted", run: { try StoredAudioFileTests().testStoredAudioRecordDeleteAndClearOnlyClearsReferenceWhenFileWasDeleted() }),
             VoiceInkCoreCheck(name: "SupportedMediaTests.testSupportedFileExtensionsPreserveMacOSImportPolicy", run: { SupportedMediaTests().testSupportedFileExtensionsPreserveMacOSImportPolicy() }),
             VoiceInkCoreCheck(name: "SupportedMediaTests.testSupportedFileExtensionLookupIsCaseInsensitive", run: { SupportedMediaTests().testSupportedFileExtensionLookupIsCaseInsensitive() }),
             VoiceInkCoreCheck(name: "SupportedMediaTests.testSupportedURLAcceptsKnownExtensions", run: { SupportedMediaTests().testSupportedURLAcceptsKnownExtensions() }),

@@ -243,4 +243,20 @@ public extension VoiceInkStoredAudioRecord {
             fileManager: fileManager
         )
     }
+
+    @discardableResult
+    func deleteExistingAudioFileAndClearReference(
+        relativeTo recordingsDirectory: URL? = nil,
+        fileManager: FileManager = .default
+    ) throws -> URL? {
+        guard let deletedURL = try deleteExistingAudioFile(
+            relativeTo: recordingsDirectory,
+            fileManager: fileManager
+        ) else {
+            return nil
+        }
+
+        audioFileURL = nil
+        return deletedURL
+    }
 }

@@ -28,6 +28,10 @@ public enum VoiceInkTranscriptPresentation {
         preferredText(rawText: rawText, enhancedText: enhancedText) ?? emptyPreferredText
     }
 
+    public static func failedTranscriptText(reason: String) -> String {
+        "Transcription Failed: \(reason)"
+    }
+
     public static func matchesSearch(rawText: String, enhancedText: String?, query: String) -> Bool {
         guard !query.isEmpty else {
             return true

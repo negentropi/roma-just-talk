@@ -57,6 +57,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - onboarding completion, iOS audio-session timeout, and core-owned user preference reset storage; platform shells still own first-run flow, audio-session lifecycle, keychain clearing, file deletion, and settings UI bindings
 - current transcription model preference loading/saving/clearing; platform shells still own model availability, download/runtime state, and legacy key cleanup
 - transcript status, default transcript fallback copy, canceled-transcript paste eligibility, presentation helpers, and localized standard transcript search semantics
+- failed-transcript stored text formatting for macOS recorder failures
 - error-description presentation fallback for shared record and shell failure text
 - local transcription/model/missing-audio error vocabulary shared by macOS local Whisper and iOS local retry transcription
 - streaming word-agreement confirmation policy for stable partial transcription, including confidence gates, sentence-boundary confirmation, reset behavior, and rolling-preload configuration; platform shells still own provider token adapters, ASR runtime calls, audio buffering, and event delivery
@@ -189,6 +190,7 @@ Current macOS consumers of shared remote transport:
 - macOS `AppDefaults` registers core-owned default values through `VoiceInkDefaultSettings.macOS`, while keeping macOS-specific defaults such as current model, Launch at Login, shortcuts, and UI behavior in the shell.
 - iOS app launch registers core-owned default values through `VoiceInkDefaultSettings.iOS`, while the iOS shell keeps first-run flow, app-group recording state, keyboard deep links, keychain, and file deletion.
 - macOS history/import row summaries, macOS audio-file row action text, and iOS note detail display use `VoiceInkTranscriptPresentation` for the enhanced-text-first transcript display rule and shared empty-content fallback copy.
+- macOS recorder failure records use `VoiceInkTranscriptPresentation.failedTranscriptText` for the existing `Transcription Failed: ...` stored text prefix.
 - `VoiceInkTranscriptPresentation.matchesSearch` mirrors macOS history predicate search semantics, keeping iOS note filtering accent-insensitive through shared core while macOS SwiftData predicates keep their local query shape.
 - macOS last-transcription paste eligibility and iOS note-row status text use `VoiceInkTranscriptPresentation` defaults for canceled/empty/pending/failed transcript presentation; platform shells still own colors, icons, retry controls, and paste execution.
 - macOS `FillerWordManager`, iOS `AppSettings`, and cleanup configuration load and save filler-word lists through `VoiceInkFillerWordPreference`; macOS and iOS setting surfaces use `VoiceInkFillerWords.hasDraft` for add-button draft validation while platform shells still own settings UI and toggle state.

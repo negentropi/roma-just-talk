@@ -397,6 +397,22 @@ reject_pattern \
   VoiceInk/Services/AudioFileTranscriptionService.swift
 
 require_pattern \
+  "macOS transcription pipeline uses shared failed transcript text" \
+  'VoiceInkTranscriptPresentation\.failedTranscriptText' \
+  VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
+
+require_pattern \
+  "macOS engine uses shared failed transcript text" \
+  'VoiceInkTranscriptPresentation\.failedTranscriptText' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+
+reject_pattern \
+  "macOS recorder failure text prefix stays in shared presentation policy" \
+  'Transcription Failed:' \
+  VoiceInk/Transcription/Engine/TranscriptionPipeline.swift \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+
+require_pattern \
   "macOS filler-word add button uses shared draft policy" \
   'VoiceInkFillerWords\.hasDraft\(newWord\)' \
   VoiceInk/Views/Components/FillerWordsSettingsView.swift

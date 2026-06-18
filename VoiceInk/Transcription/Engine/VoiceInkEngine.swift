@@ -779,7 +779,9 @@ class VoiceInkEngine: NSObject, ObservableObject {
             if deferHistoryInsertUntilSave {
                 modelContext.insert(transcription)
             }
-            transcription.text = "Transcription Failed: No model selected"
+            transcription.text = VoiceInkTranscriptPresentation.failedTranscriptText(
+                reason: "No model selected"
+            )
             transcription.transcriptionState = .failed
             try? modelContext.save()
             recordingState = .idle

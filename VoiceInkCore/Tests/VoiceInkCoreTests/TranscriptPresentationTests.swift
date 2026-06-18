@@ -41,6 +41,17 @@ final class TranscriptPresentationTests: XCTestCase {
         )
     }
 
+    func testFailedTranscriptTextPreservesMacOSFailurePrefix() {
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.failedTranscriptText(reason: "No model selected"),
+            "Transcription Failed: No model selected"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.failedTranscriptText(reason: "Audio file not found"),
+            "Transcription Failed: Audio file not found"
+        )
+    }
+
     func testMatchesSearchReturnsTrueForEmptyQuery() {
         XCTAssertTrue(
             VoiceInkTranscriptPresentation.matchesSearch(

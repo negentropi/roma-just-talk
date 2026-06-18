@@ -276,7 +276,7 @@ class TranscriptionPipeline {
                 }
             }
 
-            transcription.text = "Transcription Failed: \(errorDescription)"
+            transcription.text = VoiceInkTranscriptPresentation.failedTranscriptText(reason: errorDescription)
             transcription.transcriptionState = .failed
         }
 

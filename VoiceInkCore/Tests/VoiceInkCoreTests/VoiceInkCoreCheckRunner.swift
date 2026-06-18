@@ -486,6 +486,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "TranscriptPresentationTests.testPreferredTextFallsBackToRawTextWhenEnhancedTextIsEmpty", run: { TranscriptPresentationTests().testPreferredTextFallsBackToRawTextWhenEnhancedTextIsEmpty() }),
             VoiceInkCoreCheck(name: "TranscriptPresentationTests.testPreferredTextReturnsNilWhenAllTextIsEmpty", run: { TranscriptPresentationTests().testPreferredTextReturnsNilWhenAllTextIsEmpty() }),
             VoiceInkCoreCheck(name: "TranscriptPresentationTests.testPreferredTextOrEmptyContentUsesSharedFallback", run: { TranscriptPresentationTests().testPreferredTextOrEmptyContentUsesSharedFallback() }),
+            VoiceInkCoreCheck(name: "TranscriptPresentationTests.testFailedTranscriptTextPreservesMacOSFailurePrefix", run: { TranscriptPresentationTests().testFailedTranscriptTextPreservesMacOSFailurePrefix() }),
             VoiceInkCoreCheck(name: "TranscriptPresentationTests.testMatchesSearchReturnsTrueForEmptyQuery", run: { TranscriptPresentationTests().testMatchesSearchReturnsTrueForEmptyQuery() }),
             VoiceInkCoreCheck(name: "TranscriptPresentationTests.testMatchesSearchChecksRawTextCaseInsensitively", run: { TranscriptPresentationTests().testMatchesSearchChecksRawTextCaseInsensitively() }),
             VoiceInkCoreCheck(name: "TranscriptPresentationTests.testMatchesSearchChecksEnhancedTextCaseInsensitively", run: { TranscriptPresentationTests().testMatchesSearchChecksEnhancedTextCaseInsensitively() }),

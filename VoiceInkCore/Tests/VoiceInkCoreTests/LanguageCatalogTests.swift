@@ -71,6 +71,52 @@ final class LanguageCatalogTests: XCTestCase {
         XCTAssertEqual(batch["de_ch"], "Swiss German")
     }
 
+    func testTranscriptionLanguageSourceRoutesMacOSModelProviderPolicies() {
+        let whisper = VoiceInkTranscriptionLanguageSupport.languages(for: .whisper)
+        XCTAssertEqual(whisper["auto"], "Auto-detect")
+        XCTAssertEqual(whisper["yue"], "Cantonese")
+        XCTAssertNil(whisper["zu"])
+
+        let nativeApple = VoiceInkTranscriptionLanguageSupport.languages(for: .nativeApple)
+        XCTAssertEqual(nativeApple["en-US"], "English (United States)")
+        XCTAssertNil(nativeApple["auto"])
+
+        let fluidAudio = VoiceInkTranscriptionLanguageSupport.languages(for: .fluidAudio)
+        XCTAssertEqual(fluidAudio["auto"], "Auto-detect")
+        XCTAssertEqual(fluidAudio["bg"], "Bulgarian")
+        XCTAssertNil(fluidAudio["ja"])
+
+        let deepgram = VoiceInkTranscriptionLanguageSupport.languages(for: .provider(.deepgram))
+        XCTAssertEqual(deepgram["auto"], "Auto-detect")
+        XCTAssertEqual(deepgram["ar"], "Arabic")
+        XCTAssertNil(deepgram["zu"])
+
+        let all = VoiceInkTranscriptionLanguageSupport.languages(for: .all)
+        XCTAssertEqual(all["auto"], "Auto-detect")
+        XCTAssertEqual(all["zu"], "Zulu")
+
+        XCTAssertEqual(
+            VoiceInkTranscriptionLanguageSupport.languages(for: .nativeApple, isMultilingual: false),
+            ["en": "English"]
+        )
+    }
+
+    func testTranscriptionLanguageSourceRoutesAssemblyAIRealtimePolicy() {
+        let realtime = VoiceInkTranscriptionLanguageSupport.languages(
+            for: .provider(.assemblyAI),
+            assemblyAIUsesRealtime: true
+        )
+        XCTAssertEqual(realtime["auto"], "Auto-detect")
+        XCTAssertNil(realtime["en_uk"])
+
+        let batch = VoiceInkTranscriptionLanguageSupport.languages(
+            for: .provider(.assemblyAI),
+            assemblyAIUsesRealtime: false
+        )
+        XCTAssertEqual(batch["auto"], "Auto-detect")
+        XCTAssertEqual(batch["en_uk"], "British English")
+    }
+
     func testValidLanguageOrFallbackPreservesMacOSFallbackOrder() {
         XCTAssertEqual(
             VoiceInkTranscriptionLanguageSupport.validLanguageOrFallback(
@@ -117,6 +163,32 @@ final class LanguageCatalogTests: XCTestCase {
                 provider: .elevenLabs
             ),
             "zu"
+        )
+    }
+
+    func testValidLanguageOrFallbackSupportsLanguageSourcePolicy() {
+        XCTAssertEqual(
+            VoiceInkTranscriptionLanguageSupport.validLanguageOrFallback(
+                "bad",
+                source: .nativeApple
+            ),
+            "en-US"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptionLanguageSupport.validLanguageOrFallback(
+                "en_uk",
+                source: .provider(.assemblyAI),
+                assemblyAIUsesRealtime: true
+            ),
+            "auto"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptionLanguageSupport.validLanguageOrFallback(
+                "en_uk",
+                source: .provider(.assemblyAI),
+                assemblyAIUsesRealtime: false
+            ),
+            "en_uk"
         )
     }
 

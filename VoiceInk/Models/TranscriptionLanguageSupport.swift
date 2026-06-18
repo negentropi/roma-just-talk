@@ -4,8 +4,9 @@ import VoiceInkCore
 enum TranscriptionLanguageSupport {
     static func languages(for model: any TranscriptionModel) -> [String: String] {
         if model.provider == .assemblyAI {
-            return VoiceInkTranscriptionLanguageSupport.assemblyAILanguages(
-                usesRealtime: assemblyAIUsesRealtime(for: model)
+            return VoiceInkTranscriptionLanguageSupport.languages(
+                for: .provider(.assemblyAI),
+                assemblyAIUsesRealtime: assemblyAIUsesRealtime(for: model)
             )
         }
 
@@ -35,22 +36,25 @@ enum TranscriptionLanguageSupport {
 
 extension ModelProvider {
     func supportedLanguages(isMultilingual: Bool) -> [String: String] {
-        guard isMultilingual else {
-            return VoiceInkLanguageCatalog.englishOnly
-        }
+        VoiceInkTranscriptionLanguageSupport.languages(
+            for: transcriptionLanguageSource,
+            isMultilingual: isMultilingual
+        )
+    }
 
+    private var transcriptionLanguageSource: VoiceInkTranscriptionLanguageSource {
         switch self {
         case .whisper:
-            return VoiceInkLanguageCatalog.whisperLanguages()
+            return .whisper
         case .nativeApple:
-            return VoiceInkLanguageCatalog.nativeApple
+            return .nativeApple
         case .fluidAudio:
-            return VoiceInkLanguageCatalog.fluidAudioLanguages()
+            return .fluidAudio
         default:
             guard let coreProvider = coreTranscriptionModelProvider else {
-                return VoiceInkLanguageCatalog.all
+                return .all
             }
-            return VoiceInkLanguageCatalog.languages(for: coreProvider)
+            return .provider(coreProvider)
         }
     }
 }

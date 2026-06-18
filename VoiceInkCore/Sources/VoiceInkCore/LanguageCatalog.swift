@@ -12,6 +12,14 @@ public struct VoiceInkLanguageOption: Identifiable, Equatable, Sendable {
     }
 }
 
+public enum VoiceInkTranscriptionLanguageSource: Equatable, Sendable {
+    case whisper
+    case nativeApple
+    case fluidAudio
+    case provider(VoiceInkTranscriptionModelProvider)
+    case all
+}
+
 public enum VoiceInkLanguageCatalog {
     public static let autoDetectCode = "auto"
     public static let autoDetectName = "Auto-detect"
@@ -286,6 +294,31 @@ public enum VoiceInkTranscriptionLanguageSupport {
         return filtered
     }
 
+    public static func languages(
+        for source: VoiceInkTranscriptionLanguageSource,
+        isMultilingual: Bool = true,
+        assemblyAIUsesRealtime: Bool = false
+    ) -> [String: String] {
+        guard isMultilingual else {
+            return VoiceInkLanguageCatalog.englishOnly
+        }
+
+        switch source {
+        case .whisper:
+            return VoiceInkLanguageCatalog.whisperLanguages()
+        case .nativeApple:
+            return VoiceInkLanguageCatalog.nativeApple
+        case .fluidAudio:
+            return VoiceInkLanguageCatalog.fluidAudioLanguages()
+        case .provider(.assemblyAI):
+            return assemblyAILanguages(usesRealtime: assemblyAIUsesRealtime)
+        case .provider(let provider):
+            return VoiceInkLanguageCatalog.languages(for: provider)
+        case .all:
+            return VoiceInkLanguageCatalog.all
+        }
+    }
+
     public static func validLanguageOrFallback(
         _ language: String?,
         languages: [String: String],
@@ -308,6 +341,23 @@ public enum VoiceInkTranscriptionLanguageSupport {
         }
 
         return VoiceInkLanguageCatalog.sortedOptions(languages).first?.code ?? "en"
+    }
+
+    public static func validLanguageOrFallback(
+        _ language: String?,
+        source: VoiceInkTranscriptionLanguageSource,
+        isMultilingual: Bool = true,
+        assemblyAIUsesRealtime: Bool = false
+    ) -> String {
+        validLanguageOrFallback(
+            language,
+            languages: languages(
+                for: source,
+                isMultilingual: isMultilingual,
+                assemblyAIUsesRealtime: assemblyAIUsesRealtime
+            ),
+            prefersNativeAppleEnglish: source == .nativeApple
+        )
     }
 
     public static func validLanguageOrFallback(

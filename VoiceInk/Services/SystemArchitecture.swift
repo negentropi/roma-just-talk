@@ -9,14 +9,6 @@ enum SystemArchitecture {
         #endif
     }
 
-    static var isAppleSilicon: Bool {
-        #if arch(arm64)
-        return true
-        #else
-        return false
-        #endif
-    }
-
     static var current: String {
         #if arch(arm64)
         return "Apple Silicon (ARM64)"

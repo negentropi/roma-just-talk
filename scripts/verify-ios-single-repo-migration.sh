@@ -798,10 +798,55 @@ require_pattern \
   'VoiceInkFillerWords\.insertPlan\(' \
   iOS/VoiceInk-ios/AppSettings.swift
 
+require_pattern \
+  "shared dictionary alert presentation lives in VoiceInkCore" \
+  'VoiceInkDictionaryAlertPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+require_pattern \
+  "iOS settings uses shared dictionary alert presentation" \
+  'VoiceInkDictionaryAlertPresentation|dictionaryAlert|\.duplicateFillerWord|\.vocabulary|\.wordReplacement' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+require_pattern \
+  "macOS filler-word settings uses shared dictionary alert presentation" \
+  'VoiceInkDictionaryAlertPresentation|\.duplicateFillerWord' \
+  VoiceInk/Views/Components/FillerWordsSettingsView.swift
+
+require_pattern \
+  "macOS vocabulary view uses shared dictionary alert presentation" \
+  'VoiceInkDictionaryAlertPresentation|\.vocabulary|failedToRemoveVocabularyWord' \
+  VoiceInk/Views/Dictionary/VocabularyView.swift
+
+require_pattern \
+  "macOS word-replacement view uses shared dictionary alert presentation" \
+  'VoiceInkDictionaryAlertPresentation|\.wordReplacement|failedToRemoveWordReplacement' \
+  VoiceInk/Views/Dictionary/WordReplacementView.swift
+
+require_pattern \
+  "macOS edit replacement sheet uses shared dictionary alert presentation" \
+  'VoiceInkDictionaryAlertPresentation|\.wordReplacement' \
+  VoiceInk/Views/Dictionary/EditReplacementSheet.swift
+
+require_pattern \
+  "macOS dictionary persistence failures use shared dictionary alert copy" \
+  'VoiceInkDictionaryAlertPresentation\.(failedToAddVocabularyWord|failedToAddWordReplacement|failedToSaveWordReplacementChanges)' \
+  VoiceInk/Services/DictionaryService.swift
+
 reject_pattern \
   "filler-word duplicate copy stays out of platform views" \
   'This filler word is already in the list\.' \
   VoiceInk/Views/Components/FillerWordsSettingsView.swift \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+reject_pattern \
+  "platform dictionary surfaces avoid duplicate alert titles and persistence failure copy" \
+  '\.alert\("Duplicate Word"|\.alert\("Vocabulary"|\.alert\("Word Replacement"|Failed to add '\''|Failed to add replacement|Failed to save changes|Failed to remove word|Failed to remove replacement' \
+  VoiceInk/Services/DictionaryService.swift \
+  VoiceInk/Views/Components/FillerWordsSettingsView.swift \
+  VoiceInk/Views/Dictionary/VocabularyView.swift \
+  VoiceInk/Views/Dictionary/WordReplacementView.swift \
+  VoiceInk/Views/Dictionary/EditReplacementSheet.swift \
   iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \

@@ -40,6 +40,72 @@ public struct VoiceInkVocabularyWordBackup: Codable, Equatable, Sendable {
     }
 }
 
+public struct VoiceInkDictionaryAlertPresentation: Equatable, Identifiable, Sendable {
+    public let id: String
+    public let title: String
+    public let message: String
+    public let primaryButtonTitle: String
+
+    public init(
+        id: String,
+        title: String,
+        message: String,
+        primaryButtonTitle: String = "OK"
+    ) {
+        self.id = id
+        self.title = title
+        self.message = message
+        self.primaryButtonTitle = primaryButtonTitle
+    }
+
+    public static func duplicateFillerWord(message: String) -> VoiceInkDictionaryAlertPresentation {
+        VoiceInkDictionaryAlertPresentation(
+            id: "duplicateFillerWord-\(message)",
+            title: "Duplicate Word",
+            message: message
+        )
+    }
+
+    public static func vocabulary(message: String) -> VoiceInkDictionaryAlertPresentation {
+        VoiceInkDictionaryAlertPresentation(
+            id: "vocabulary-\(message)",
+            title: "Vocabulary",
+            message: message
+        )
+    }
+
+    public static func wordReplacement(message: String) -> VoiceInkDictionaryAlertPresentation {
+        VoiceInkDictionaryAlertPresentation(
+            id: "wordReplacement-\(message)",
+            title: "Word Replacement",
+            message: message
+        )
+    }
+
+    public static func failedToAddVocabularyWord(
+        _ word: String,
+        localizedDescription: String
+    ) -> String {
+        "Failed to add '\(word)': \(localizedDescription)"
+    }
+
+    public static func failedToAddWordReplacement(localizedDescription: String) -> String {
+        "Failed to add replacement: \(localizedDescription)"
+    }
+
+    public static func failedToSaveWordReplacementChanges(localizedDescription: String) -> String {
+        "Failed to save changes: \(localizedDescription)"
+    }
+
+    public static func failedToRemoveVocabularyWord(localizedDescription: String) -> String {
+        "Failed to remove word: \(localizedDescription)"
+    }
+
+    public static func failedToRemoveWordReplacement(localizedDescription: String) -> String {
+        "Failed to remove replacement: \(localizedDescription)"
+    }
+}
+
 public enum VoiceInkDictionaryPolicy {
     public static func hasVocabularyDraft(_ input: String) -> Bool {
         !tokens(from: input).isEmpty

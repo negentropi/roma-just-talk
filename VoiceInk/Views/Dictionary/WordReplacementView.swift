@@ -17,9 +17,8 @@ enum SortColumn {
 struct WordReplacementView: View {
     @Query private var wordReplacements: [WordReplacement]
     @Environment(\.modelContext) private var modelContext
-    @State private var showAlert = false
     @State private var editingReplacement: WordReplacement? = nil
-    @State private var alertMessage = ""
+    @State private var alertPresentation: VoiceInkDictionaryAlertPresentation?
     @State private var sortMode: SortMode = .originalAsc
     @State private var originalWord = ""
     @State private var replacementWord = ""
@@ -187,17 +186,18 @@ struct WordReplacementView: View {
         .sheet(item: $editingReplacement) { replacement in
             EditReplacementSheet(replacement: replacement, modelContext: modelContext)
         }
-        .alert("Word Replacement", isPresented: $showAlert) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text(alertMessage)
+        .alert(item: $alertPresentation) { alert in
+            Alert(
+                title: Text(alert.title),
+                message: Text(alert.message),
+                dismissButton: .cancel(Text(alert.primaryButtonTitle))
+            )
         }
     }
 
     private func addReplacement() {
         if let error = DictionaryService.addWordReplacement(original: originalWord, replacement: replacementWord, existing: Array(wordReplacements), context: modelContext) {
-            alertMessage = error
-            showAlert = true
+            alertPresentation = .wordReplacement(message: error)
             return
         }
         originalWord = ""
@@ -213,8 +213,11 @@ struct WordReplacementView: View {
         } catch {
             // Rollback the delete to restore UI consistency
             modelContext.rollback()
-            alertMessage = "Failed to remove replacement: \(error.localizedDescription)"
-            showAlert = true
+            alertPresentation = .wordReplacement(
+                message: VoiceInkDictionaryAlertPresentation.failedToRemoveWordReplacement(
+                    localizedDescription: error.localizedDescription
+                )
+            )
         }
     }
 }

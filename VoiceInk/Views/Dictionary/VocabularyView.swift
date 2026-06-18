@@ -11,8 +11,7 @@ struct VocabularyView: View {
     @Query private var vocabularyWords: [VocabularyWord]
     @Environment(\.modelContext) private var modelContext
     @State private var newWord = ""
-    @State private var showAlert = false
-    @State private var alertMessage = ""
+    @State private var alertPresentation: VoiceInkDictionaryAlertPresentation?
     @State private var sortMode: VocabularySortMode = .wordAsc
 
     init() {
@@ -106,18 +105,19 @@ struct VocabularyView: View {
             }
         }
         .padding()
-        .alert("Vocabulary", isPresented: $showAlert) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text(alertMessage)
+        .alert(item: $alertPresentation) { alert in
+            Alert(
+                title: Text(alert.title),
+                message: Text(alert.message),
+                dismissButton: .cancel(Text(alert.primaryButtonTitle))
+            )
         }
     }
     
     private func addWords() {
         guard VoiceInkDictionaryPolicy.hasVocabularyDraft(newWord) else { return }
         if let error = DictionaryService.addVocabularyWords(newWord, existing: Array(vocabularyWords), context: modelContext) {
-            alertMessage = error
-            showAlert = true
+            alertPresentation = .vocabulary(message: error)
             return
         }
         newWord = ""
@@ -131,8 +131,11 @@ struct VocabularyView: View {
         } catch {
             // Rollback the delete to restore UI consistency
             modelContext.rollback()
-            alertMessage = "Failed to remove word: \(error.localizedDescription)"
-            showAlert = true
+            alertPresentation = .vocabulary(
+                message: VoiceInkDictionaryAlertPresentation.failedToRemoveVocabularyWord(
+                    localizedDescription: error.localizedDescription
+                )
+            )
         }
     }
 }

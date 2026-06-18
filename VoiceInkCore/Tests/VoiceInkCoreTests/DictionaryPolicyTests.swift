@@ -2,6 +2,51 @@ import Foundation
 @testable import VoiceInkCore
 
 final class DictionaryPolicyTests: XCTestCase {
+    func testDictionaryAlertPresentationPreservesPlatformTitles() {
+        XCTAssertEqual(
+            VoiceInkDictionaryAlertPresentation.duplicateFillerWord(message: "This filler word is already in the list.").title,
+            "Duplicate Word"
+        )
+        XCTAssertEqual(
+            VoiceInkDictionaryAlertPresentation.vocabulary(message: "'Roma' is already in the vocabulary").title,
+            "Vocabulary"
+        )
+        XCTAssertEqual(
+            VoiceInkDictionaryAlertPresentation.wordReplacement(message: "'roma' already exists in word replacements").title,
+            "Word Replacement"
+        )
+        XCTAssertEqual(
+            VoiceInkDictionaryAlertPresentation.wordReplacement(message: "Nope").primaryButtonTitle,
+            "OK"
+        )
+    }
+
+    func testDictionaryPersistenceFailureMessagesPreservePlatformCopy() {
+        XCTAssertEqual(
+            VoiceInkDictionaryAlertPresentation.failedToAddVocabularyWord(
+                "Roma",
+                localizedDescription: "Disk full"
+            ),
+            "Failed to add 'Roma': Disk full"
+        )
+        XCTAssertEqual(
+            VoiceInkDictionaryAlertPresentation.failedToAddWordReplacement(localizedDescription: "Disk full"),
+            "Failed to add replacement: Disk full"
+        )
+        XCTAssertEqual(
+            VoiceInkDictionaryAlertPresentation.failedToSaveWordReplacementChanges(localizedDescription: "Denied"),
+            "Failed to save changes: Denied"
+        )
+        XCTAssertEqual(
+            VoiceInkDictionaryAlertPresentation.failedToRemoveVocabularyWord(localizedDescription: "Missing"),
+            "Failed to remove word: Missing"
+        )
+        XCTAssertEqual(
+            VoiceInkDictionaryAlertPresentation.failedToRemoveWordReplacement(localizedDescription: "Missing"),
+            "Failed to remove replacement: Missing"
+        )
+    }
+
     func testVocabularyDraftUsesSharedTokenPolicy() {
         XCTAssertFalse(VoiceInkDictionaryPolicy.hasVocabularyDraft(" , \n "))
         XCTAssertTrue(VoiceInkDictionaryPolicy.hasVocabularyDraft("Voice Ink, "))

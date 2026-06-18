@@ -5,15 +5,10 @@ import VoiceInkCore
 struct SettingsView: View {
     @StateObject private var settings = AppSettings.shared
     @State private var newFillerWord = ""
-    @State private var fillerWordAlertMessage = ""
-    @State private var showFillerWordAlert = false
     @State private var newCustomVocabularyTerm = ""
-    @State private var customVocabularyAlertMessage = ""
-    @State private var showCustomVocabularyAlert = false
     @State private var newReplacementOriginal = ""
     @State private var newReplacementText = ""
-    @State private var wordReplacementAlertMessage = ""
-    @State private var showWordReplacementAlert = false
+    @State private var dictionaryAlert: VoiceInkDictionaryAlertPresentation?
     
     var body: some View {
         List {
@@ -186,20 +181,12 @@ struct SettingsView: View {
         .onAppear {
             settings.repairSelectedTranscriptionLanguage()
         }
-        .alert("Duplicate Word", isPresented: $showFillerWordAlert) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text(fillerWordAlertMessage)
-        }
-        .alert("Vocabulary", isPresented: $showCustomVocabularyAlert) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text(customVocabularyAlertMessage)
-        }
-        .alert("Word Replacement", isPresented: $showWordReplacementAlert) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text(wordReplacementAlertMessage)
+        .alert(item: $dictionaryAlert) { alert in
+            Alert(
+                title: Text(alert.title),
+                message: Text(alert.message),
+                dismissButton: .cancel(Text(alert.primaryButtonTitle))
+            )
         }
     }
 
@@ -233,8 +220,7 @@ struct SettingsView: View {
         guard canAddFillerWord else { return }
 
         if let errorMessage = settings.addFillerWord(newFillerWord) {
-            fillerWordAlertMessage = errorMessage
-            showFillerWordAlert = true
+            dictionaryAlert = .duplicateFillerWord(message: errorMessage)
             return
         }
 
@@ -245,8 +231,7 @@ struct SettingsView: View {
         guard canAddCustomVocabularyTerm else { return }
 
         if let error = settings.addCustomVocabularyTerms(newCustomVocabularyTerm) {
-            customVocabularyAlertMessage = error
-            showCustomVocabularyAlert = true
+            dictionaryAlert = .vocabulary(message: error)
             return
         }
 
@@ -260,8 +245,7 @@ struct SettingsView: View {
             original: newReplacementOriginal,
             replacement: newReplacementText
         ) {
-            wordReplacementAlertMessage = error
-            showWordReplacementAlert = true
+            dictionaryAlert = .wordReplacement(message: error)
             return
         }
 

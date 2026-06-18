@@ -42,7 +42,10 @@ enum DictionaryService {
             return nil
         } catch {
             context.delete(entry)
-            return "Failed to add '\(word)': \(error.localizedDescription)"
+            return VoiceInkDictionaryAlertPresentation.failedToAddVocabularyWord(
+                word,
+                localizedDescription: error.localizedDescription
+            )
         }
     }
 
@@ -77,7 +80,9 @@ enum DictionaryService {
             return nil
         } catch {
             context.delete(entry)
-            return "Failed to add replacement: \(error.localizedDescription)"
+            return VoiceInkDictionaryAlertPresentation.failedToAddWordReplacement(
+                localizedDescription: error.localizedDescription
+            )
         }
     }
 
@@ -114,7 +119,9 @@ enum DictionaryService {
             WordReplacementService.shared.invalidateCache()
             return nil
         } catch {
-            return "Failed to save changes: \(error.localizedDescription)"
+            return VoiceInkDictionaryAlertPresentation.failedToSaveWordReplacementChanges(
+                localizedDescription: error.localizedDescription
+            )
         }
     }
 }

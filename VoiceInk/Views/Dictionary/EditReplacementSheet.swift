@@ -11,8 +11,7 @@ struct EditReplacementSheet: View {
 
     @State private var originalWord: String
     @State private var replacementWord: String
-    @State private var showAlert = false
-    @State private var alertMessage = ""
+    @State private var alertPresentation: VoiceInkDictionaryAlertPresentation?
 
     // MARK: – Initialiser
     init(replacement: WordReplacement, modelContext: ModelContext) {
@@ -29,10 +28,12 @@ struct EditReplacementSheet: View {
             formContent
         }
         .frame(width: 460, height: 560)
-        .alert("Word Replacement", isPresented: $showAlert) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text(alertMessage)
+        .alert(item: $alertPresentation) { alert in
+            Alert(
+                title: Text(alert.title),
+                message: Text(alert.message),
+                dismissButton: .cancel(Text(alert.primaryButtonTitle))
+            )
         }
     }
 
@@ -140,8 +141,7 @@ struct EditReplacementSheet: View {
             replacement: replacementWord,
             context: modelContext
         ) {
-            alertMessage = error
-            showAlert = true
+            alertPresentation = .wordReplacement(message: error)
             return
         }
 

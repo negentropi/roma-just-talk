@@ -293,6 +293,36 @@ reject_pattern \
   iOS/VoiceInk-ios/RecordingManager.swift
 
 require_pattern \
+  "iOS live recording uses shared stored-audio filename policy" \
+  'VoiceInkStoredAudioFile\.timestampedRecordingFileURL' \
+  iOS/VoiceInk-ios/AudioRecorder.swift
+
+require_pattern \
+  "iOS live recording uses shared PCM16 sample-rate policy" \
+  'AVSampleRateKey: VoiceInkPCM16Audio\.mono16kSampleRate' \
+  iOS/VoiceInk-ios/AudioRecorder.swift
+
+require_pattern \
+  "iOS live recording uses shared PCM16 channel policy" \
+  'AVNumberOfChannelsKey: VoiceInkPCM16Audio\.monoChannelCount' \
+  iOS/VoiceInk-ios/AudioRecorder.swift
+
+require_pattern \
+  "iOS live recording uses shared PCM16 bit-depth policy" \
+  'AVLinearPCMBitDepthKey: VoiceInkPCM16Audio\.bitsPerSample' \
+  iOS/VoiceInk-ios/AudioRecorder.swift
+
+require_pattern \
+  "iOS live recording uses shared PCM16 endian policy" \
+  'AVLinearPCMIsBigEndianKey: VoiceInkPCM16Audio\.isBigEndian' \
+  iOS/VoiceInk-ios/AudioRecorder.swift
+
+require_pattern \
+  "iOS live recording uses shared PCM16 sample-type policy" \
+  'AVLinearPCMIsFloatKey: VoiceInkPCM16Audio\.isFloatingPoint' \
+  iOS/VoiceInk-ios/AudioRecorder.swift
+
+require_pattern \
   "workspace includes iOS project" \
   'location = "group:iOS/VoiceInk-ios.xcodeproj"' \
   VoiceInk.xcworkspace/contents.xcworkspacedata

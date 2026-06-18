@@ -305,6 +305,7 @@ scripts/verify-ios-single-repo-migration.sh --full-build
 16. When `../VoiceInk-iOS` exists, every sibling-only Swift file under `VoiceInk-ios/` is one of the documented obsolete/replaced files above, and the sibling keyboard/unit-test/UI-test target folders have no sibling-only Swift files.
 17. Legacy same-file clone shims remain absent from the in-repo iOS app and keyboard: `TranscriptionServiceFactory`, `LLMPostProcessor`, the old local `RecordingState`, raw `voiceink://record` URL construction, `Open VoiceInk` keyboard copy, and old `AppSettings` effective-provider/model accessors.
 18. iOS recording background transcription delegates stored-audio completion/failure updates to `VoiceInkMutableTranscriptionRecord.retranscribeStoredAudio` instead of duplicating record-state writes in `RecordingManager`.
-19. A real Xcode toolchain is selected and both app targets build.
+19. iOS live recording delegates timestamped filename construction and PCM16 recorder format constants to `VoiceInkStoredAudioFile` and `VoiceInkPCM16Audio`.
+20. A real Xcode toolchain is selected and both app targets build.
 
 Current local blocker: `xcode-select -p` points to `/Library/Developer/CommandLineTools`, and the previously used external Xcode volume is not mounted. Full target builds are still environment-blocked until a real Xcode is selected; macOS `VoiceInk` also needs `/Users/atalphalnmomhappyhouse/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework`, and iOS `VoiceInk-ios` needs the iOS 26.2 platform installed. Until those are present, use `swift run VoiceInkCoreChecks` plus the static parse/lint gates above for local proof.

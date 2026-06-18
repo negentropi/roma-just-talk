@@ -318,6 +318,7 @@ scripts/verify-ios-single-repo-migration.sh --full-build
 18. iOS recording background transcription delegates stored-audio completion/failure updates to `VoiceInkMutableTranscriptionRecord.retranscribeStoredAudio` instead of duplicating record-state writes in `RecordingManager`.
 19. iOS live recording delegates timestamped filename construction and PCM16 recorder format constants to `VoiceInkStoredAudioFile` and `VoiceInkPCM16Audio`.
 20. macOS and iOS local Whisper wrappers both consume shared runtime, VAD resource, and PCM16 WAV sample policies.
-21. A real Xcode toolchain is selected and both app targets build.
+21. macOS AI-enhancement diagnostics/context toggles and first-run onboarding storage checks stay routed through shared `VoiceInkCore` preference Modules.
+22. A real Xcode toolchain is selected and both app targets build.
 
 Current local blocker: `xcode-select -p` points to `/Library/Developer/CommandLineTools`, and the previously used external Xcode volume is not mounted. Full target builds are still environment-blocked until a real Xcode is selected; macOS `VoiceInk` also needs `/Users/atalphalnmomhappyhouse/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework`, and iOS `VoiceInk-ios` needs the iOS 26.2 platform installed. Until those are present, use `swift run VoiceInkCoreChecks` plus the static parse/lint gates above for local proof.

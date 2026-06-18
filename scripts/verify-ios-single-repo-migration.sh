@@ -599,6 +599,31 @@ require_pattern \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
 require_pattern \
+  "macOS AI enhancement service saves enabled state through shared preference" \
+  'VoiceInkAIEnhancementPreference\.saveIsEnabled' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+require_pattern \
+  "macOS AI enhancement service loads enabled state through shared preference" \
+  'VoiceInkAIEnhancementPreference\.isEnabled\(\)' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+require_pattern \
+  "macOS AI enhancement service saves context toggles through shared preference" \
+  'VoiceInkAIEnhancementContextPreference\.saveUse(Clipboard|ScreenCapture)Context' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+require_pattern \
+  "macOS AI enhancement service loads context toggles through shared preference" \
+  'VoiceInkAIEnhancementContextPreference\.use(Clipboard|ScreenCapture)Context\(\)' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+reject_pattern \
+  "macOS AI enhancement service avoids raw shared preference keys" \
+  'VoiceInkUserDefaultsKey\.(isAIEnhancementEnabled|useClipboardContext|useScreenCaptureContext)' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+require_pattern \
   "shared transcription run result carries post-processing enhancement result" \
   'postProcessingResult: VoiceInkAIEnhancementResult\?' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift
@@ -765,6 +790,16 @@ require_pattern \
   VoiceInk/AppDefaults.swift
 
 require_pattern \
+  "macOS app launch uses shared onboarding completion storage state" \
+  'VoiceInkOnboardingPreference\.hasStoredCompletionState' \
+  VoiceInk/AppDefaults.swift
+
+reject_pattern \
+  "macOS app launch avoids raw onboarding completion storage checks" \
+  'VoiceInkUserDefaultsKey\.hasCompletedOnboarding|object\(forKey: +"hasCompletedOnboarding"\)' \
+  VoiceInk/AppDefaults.swift
+
+require_pattern \
   "macOS Ollama service uses shared default base URL" \
   'VoiceInkPreferenceDefault\.ollamaBaseURL' \
   VoiceInk/Services/OllamaService.swift
@@ -807,6 +842,26 @@ require_pattern \
 require_pattern \
   "macOS diagnostics use shared macOS selected-language fallback" \
   'VoiceInkTranscriptionLanguagePreference\.selectedMacOSLanguage\(\)' \
+  VoiceInk/Services/SystemInfoService.swift
+
+require_pattern \
+  "macOS diagnostics use shared AI enhancement status presentation" \
+  'VoiceInkAIEnhancementPreference\.statusDiagnosticDescription\(\)' \
+  VoiceInk/Services/SystemInfoService.swift
+
+require_pattern \
+  "macOS diagnostics use shared AI provider presentation" \
+  'VoiceInkAIEnhancementProviderPreference\.selectedProviderDiagnosticDescription\(\)' \
+  VoiceInk/Services/SystemInfoService.swift
+
+require_pattern \
+  "macOS diagnostics use shared AI model presentation" \
+  'VoiceInkAIEnhancementProviderPreference\.selectedModelDiagnosticDescription\(\)' \
+  VoiceInk/Services/SystemInfoService.swift
+
+reject_pattern \
+  "macOS diagnostics avoid shell-only AI preference presentation" \
+  'getAI(EnhancementStatus|Provider|Model)|VoiceInkUserDefaultsKey\.isAIEnhancementEnabled|selectedProviderRawValue\(\)|selectedModel\(for:' \
   VoiceInk/Services/SystemInfoService.swift
 
 require_pattern \

@@ -222,6 +222,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testNormalizedMonoFloatSamplesPreserveSingleChannelNormalization", run: { PCM16AudioSamplesTests().testNormalizedMonoFloatSamplesPreserveSingleChannelNormalization() }),
             VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testNormalizedMonoFloatSamplesAverageChannelsBeforeNormalizing", run: { PCM16AudioSamplesTests().testNormalizedMonoFloatSamplesAverageChannelsBeforeNormalizing() }),
             VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testNormalizedMonoFloatSamplesKeepSilenceAtZero", run: { PCM16AudioSamplesTests().testNormalizedMonoFloatSamplesKeepSilenceAtZero() }),
+            VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testPCM16SamplesClampAndScaleFloatSamples", run: { PCM16AudioSamplesTests().testPCM16SamplesClampAndScaleFloatSamples() }),
+            VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testPCM16SamplesReturnEmptyForEmptyInput", run: { PCM16AudioSamplesTests().testPCM16SamplesReturnEmptyForEmptyInput() }),
             VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testDurationAndByteCountUseMono16kPCM16Format", run: { PCM16AudioSamplesTests().testDurationAndByteCountUseMono16kPCM16Format() }),
             VoiceInkCoreCheck(name: "PerformanceAnalysisTests.testAnalyzeBuildsSummaryAndSortedModelStats", run: { PerformanceAnalysisTests().testAnalyzeBuildsSummaryAndSortedModelStats() }),
             VoiceInkCoreCheck(name: "PerformanceAnalysisTests.testStatsCanRequirePositiveDurationsForSessionMetricPanels", run: { PerformanceAnalysisTests().testStatsCanRequirePositiveDurationsForSessionMetricPanels() }),

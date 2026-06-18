@@ -78,6 +78,26 @@ final class PCM16AudioSamplesTests: XCTestCase {
         )
     }
 
+    func testPCM16SamplesClampAndScaleFloatSamples() {
+        let samples = VoiceInkPCM16Audio.pcm16Samples(
+            fromFloatSamples: [-2.0, -1.0, -0.5, 0.0, 0.5, 1.0, 2.0]
+        )
+
+        XCTAssertEqual(samples, [
+            Int16(-32_767),
+            Int16(-32_767),
+            Int16(-16_383),
+            Int16(0),
+            Int16(16_383),
+            Int16(32_767),
+            Int16(32_767)
+        ])
+    }
+
+    func testPCM16SamplesReturnEmptyForEmptyInput() {
+        XCTAssertEqual(VoiceInkPCM16Audio.pcm16Samples(fromFloatSamples: []), [])
+    }
+
     func testDurationAndByteCountUseMono16kPCM16Format() {
         XCTAssertEqual(VoiceInkPCM16Audio.mono16kSampleRateHz, 16_000)
         XCTAssertEqual(VoiceInkPCM16Audio.mono16kSampleRate, 16_000.0)

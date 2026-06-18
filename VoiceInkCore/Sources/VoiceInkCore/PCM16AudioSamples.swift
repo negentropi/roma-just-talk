@@ -69,6 +69,13 @@ public enum VoiceInkPCM16Audio {
         return samples
     }
 
+    public static func pcm16Samples(fromFloatSamples samples: [Float]) -> [Int16] {
+        samples.map { sample in
+            let clipped = max(-1.0, min(1.0, sample))
+            return Int16(clipped * Float(Int16.max))
+        }
+    }
+
     public static func sampleCount(inData data: Data) -> Int {
         data.count / bytesPerSample
     }

@@ -141,8 +141,7 @@ class AudioProcessor {
             throw AudioProcessingError.conversionFailed
         }
         
-        // Convert float samples to int16
-        let int16Samples = samples.map { max(-1.0, min(1.0, $0)) * Float(Int16.max) }.map { Int16($0) }
+        let int16Samples = VoiceInkPCM16Audio.pcm16Samples(fromFloatSamples: samples)
 
         // Copy samples to buffer
         int16Samples.withUnsafeBufferPointer { int16Buffer in

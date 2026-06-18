@@ -64,7 +64,7 @@ struct PowerModeConfig: Codable, Identifiable, Equatable {
         self.selectedAIProvider = selectedAIProvider ?? VoiceInkAIEnhancementProviderPreference.selectedProviderRawValue()
         self.selectedAIModel = selectedAIModel
         self.selectedTranscriptionModelName = selectedTranscriptionModelName ?? VoiceInkCurrentTranscriptionModelPreference.modelName()
-        self.selectedLanguage = selectedLanguage ?? VoiceInkTranscriptionLanguagePreference.selectedLanguage(fallback: "en")
+        self.selectedLanguage = selectedLanguage ?? VoiceInkTranscriptionLanguagePreference.selectedMacOSLanguage()
         self.isTextFormattingEnabled = isTextFormattingEnabled
         self.punctuationCleanupMode = punctuationCleanupMode
         self.lowercaseTranscription = lowercaseTranscription

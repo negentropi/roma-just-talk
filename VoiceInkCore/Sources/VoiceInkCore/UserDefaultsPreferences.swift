@@ -264,6 +264,27 @@ public enum VoiceInkTranscriptionLanguagePreference {
         storedLanguage(from: defaults) ?? fallback
     }
 
+    public static func selectedMacOSLanguage(from defaults: UserDefaults = .standard) -> String {
+        selectedLanguage(
+            from: defaults,
+            fallback: VoiceInkDefaultSettings.macOS.selectedTranscriptionLanguage
+        )
+    }
+
+    public static func selectedLanguage(
+        source: VoiceInkTranscriptionLanguageSource,
+        from defaults: UserDefaults = .standard,
+        isMultilingual: Bool = true,
+        assemblyAIUsesRealtime: Bool = false
+    ) -> String {
+        VoiceInkTranscriptionLanguageSupport.validLanguageOrFallback(
+            storedLanguage(from: defaults),
+            source: source,
+            isMultilingual: isMultilingual,
+            assemblyAIUsesRealtime: assemblyAIUsesRealtime
+        )
+    }
+
     public static func saveSelectedLanguage(
         _ language: String,
         to defaults: UserDefaults = .standard

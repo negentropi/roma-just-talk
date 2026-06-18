@@ -136,7 +136,7 @@ class StreamingTranscriptionService {
         let provider = createProvider(for: model)
         self.provider = provider
 
-        let selectedLanguage = VoiceInkTranscriptionLanguagePreference.selectedLanguage(fallback: "auto")
+        let selectedLanguage = VoiceInkTranscriptionLanguagePreference.selectedLanguage()
         logger.notice("Streaming start requested model=\(model.displayName, privacy: .public) language=\(selectedLanguage, privacy: .public)")
 
         try await provider.connect(model: model, language: selectedLanguage)

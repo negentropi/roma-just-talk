@@ -301,7 +301,7 @@ struct ConfigurationView: View {
                             if let modelName = newModelName ?? transcriptionModelManager.currentTranscriptionModel?.name,
                                let model = transcriptionModelManager.allAvailableModels.first(where: { $0.name == modelName }) {
                                 if model.provider == .gemini {
-                                    selectedLanguage = "auto"
+                                    selectedLanguage = VoiceInkLanguageCatalog.autoDetectCode
                                 } else {
                                     useCompatibleLanguage(for: model)
                                 }
@@ -315,13 +315,13 @@ struct ConfigurationView: View {
                                 .foregroundColor(.secondary)
                         }
                         .onAppear {
-                            selectedLanguage = "auto"
+                            selectedLanguage = VoiceInkLanguageCatalog.autoDetectCode
                         }
                     } else if let selectedModel = effectiveModelName,
                               let modelInfo = transcriptionModelManager.allAvailableModels.first(where: { $0.name == selectedModel }),
                               modelInfo.isMultilingualModel {
                         let languageBinding = Binding<String?>(
-                            get: { selectedLanguage ?? VoiceInkTranscriptionLanguagePreference.selectedLanguage(fallback: "auto") },
+                            get: { selectedLanguage ?? VoiceInkTranscriptionLanguagePreference.selectedLanguage() },
                             set: { selectedLanguage = $0 }
                         )
 
@@ -336,7 +336,7 @@ struct ConfigurationView: View {
                         EmptyView()
                             .onAppear {
                                 if selectedLanguage == nil {
-                                    selectedLanguage = "en"
+                                    selectedLanguage = VoiceInkDefaultSettings.macOS.selectedTranscriptionLanguage
                                 }
                             }
                     }

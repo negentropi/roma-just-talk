@@ -41,7 +41,7 @@ class WhisperPrompt: ObservableObject {
     
     func updateTranscriptionPrompt() {
         // Get the currently selected language from UserDefaults
-        let selectedLanguage = VoiceInkTranscriptionLanguagePreference.selectedLanguage(fallback: "en")
+        let selectedLanguage = VoiceInkTranscriptionLanguagePreference.selectedMacOSLanguage()
         
         // Get the prompt for the selected language (custom if available, otherwise default)
         let basePrompt = getLanguagePrompt(for: selectedLanguage)

@@ -683,6 +683,36 @@ require_pattern \
   'VoiceInkDefaultSettings\.macOS\.selectedTranscriptionLanguage' \
   VoiceInk/Views/ModelSettingsView.swift
 
+require_pattern \
+  "macOS local Whisper prompt uses shared macOS selected-language fallback" \
+  'VoiceInkTranscriptionLanguagePreference\.selectedMacOSLanguage\(\)' \
+  VoiceInk/Transcription/Whisper/WhisperPrompt.swift
+
+require_pattern \
+  "macOS Power Mode config uses shared macOS selected-language fallback" \
+  'VoiceInkTranscriptionLanguagePreference\.selectedMacOSLanguage\(\)' \
+  VoiceInk/PowerMode/PowerModeConfig.swift
+
+require_pattern \
+  "macOS diagnostics use shared macOS selected-language fallback" \
+  'VoiceInkTranscriptionLanguagePreference\.selectedMacOSLanguage\(\)' \
+  VoiceInk/Services/SystemInfoService.swift
+
+require_pattern \
+  "macOS Native Apple transcription uses shared source-compatible language fallback" \
+  'VoiceInkTranscriptionLanguagePreference\.selectedLanguage\(source: \.nativeApple\)' \
+  VoiceInk/Transcription/Native/NativeAppleTranscriptionService.swift
+
+reject_pattern \
+  "macOS selected-language callers avoid shell-only fallback literals" \
+  'selectedLanguage\(fallback: "(en|auto|en-US)"\)|selectedLanguage = "(en|auto)"' \
+  VoiceInk/Transcription/Native/NativeAppleTranscriptionService.swift \
+  VoiceInk/Transcription/Streaming/StreamingTranscriptionService.swift \
+  VoiceInk/Transcription/Whisper/WhisperPrompt.swift \
+  VoiceInk/Services/SystemInfoService.swift \
+  VoiceInk/PowerMode/PowerModeConfig.swift \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
 reject_pattern \
   "macOS selected-language AppStorage avoids hard-coded English defaults" \
   'selectedLanguage(: String)? = "en"' \

@@ -61,7 +61,7 @@ class NativeAppleTranscriptionService: TranscriptionService {
         let audioDuration = Double(audioFile.length) / audioFile.processingFormat.sampleRate
         
         // Apple Speech stores and consumes actual BCP-47 locale identifiers directly.
-        let selectedLanguage = VoiceInkTranscriptionLanguagePreference.selectedLanguage(fallback: "en-US")
+        let selectedLanguage = VoiceInkTranscriptionLanguagePreference.selectedLanguage(source: .nativeApple)
         let locale = Locale(identifier: selectedLanguage)
 
         let supportedLocales = await SpeechTranscriber.supportedLocales

@@ -266,7 +266,7 @@ class SystemInfoService {
     }
 
     private func getCurrentLanguage() -> String {
-        return VoiceInkTranscriptionLanguagePreference.selectedLanguage(fallback: "en")
+        return VoiceInkTranscriptionLanguagePreference.selectedMacOSLanguage()
     }
 
 }

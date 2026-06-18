@@ -383,6 +383,51 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testTranscriptionLanguagePreferenceUsesMacOSFallbackWhenRequested() {
+        withIsolatedDefaults { defaults in
+            XCTAssertEqual(
+                VoiceInkTranscriptionLanguagePreference.selectedMacOSLanguage(from: defaults),
+                VoiceInkDefaultSettings.macOS.selectedTranscriptionLanguage
+            )
+
+            VoiceInkTranscriptionLanguagePreference.saveSelectedLanguage("fr", to: defaults)
+            XCTAssertEqual(
+                VoiceInkTranscriptionLanguagePreference.selectedMacOSLanguage(from: defaults),
+                "fr"
+            )
+        }
+    }
+
+    func testTranscriptionLanguagePreferenceSelectsCompatibleLanguageForSource() {
+        withIsolatedDefaults { defaults in
+            XCTAssertEqual(
+                VoiceInkTranscriptionLanguagePreference.selectedLanguage(
+                    source: .nativeApple,
+                    from: defaults
+                ),
+                "en-US"
+            )
+
+            VoiceInkTranscriptionLanguagePreference.saveSelectedLanguage("auto", to: defaults)
+            XCTAssertEqual(
+                VoiceInkTranscriptionLanguagePreference.selectedLanguage(
+                    source: .nativeApple,
+                    from: defaults
+                ),
+                "en-US"
+            )
+
+            VoiceInkTranscriptionLanguagePreference.saveSelectedLanguage("fr-FR", to: defaults)
+            XCTAssertEqual(
+                VoiceInkTranscriptionLanguagePreference.selectedLanguage(
+                    source: .nativeApple,
+                    from: defaults
+                ),
+                "fr-FR"
+            )
+        }
+    }
+
     func testTranscriptionLanguagePreferencePreservesRawSelectedLanguage() {
         withIsolatedDefaults { defaults in
             VoiceInkTranscriptionLanguagePreference.saveSelectedLanguage("auto", to: defaults)

@@ -12,7 +12,7 @@ import VoiceInkCore
 final class AudioRecorder: NSObject, ObservableObject {
     @Published var isRecording: Bool = false
     @Published var currentRecordingURL: URL?
-    @Published var levelsHistory: [CGFloat] = [] // normalized 0...1
+    @Published var levelsHistory: [Float] = [] // normalized 0...1
 
     private var audioRecorder: AVAudioRecorder?
     private var meterTimer: Timer?
@@ -56,8 +56,10 @@ final class AudioRecorder: NSObject, ObservableObject {
 
                 if let power = self.audioRecorder?.averagePower(forChannel: 0) {
                     let normalized = VoiceInkAudioMeterLevel.normalizedLevel(forDecibels: power)
-                    self.levelsHistory.append(CGFloat(normalized))
-                    if self.levelsHistory.count > 40 { self.levelsHistory.removeFirst(self.levelsHistory.count - 40) }
+                    self.levelsHistory = VoiceInkAudioMeterLevel.boundedHistory(
+                        appending: normalized,
+                        to: self.levelsHistory
+                    )
                 }
             }
         }

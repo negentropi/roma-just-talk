@@ -34,4 +34,21 @@ final class AudioMeterLevelTests: XCTestCase {
             accuracy: 0.0001
         )
     }
+
+    func testBoundedHistoryKeepsMostRecentLevels() {
+        let history = VoiceInkAudioMeterLevel.boundedHistory(
+            appending: 4,
+            to: [1, 2, 3],
+            limit: 3
+        )
+
+        XCTAssertEqual(history, [2, 3, 4])
+    }
+
+    func testBoundedHistoryRejectsNonPositiveLimit() {
+        XCTAssertEqual(
+            VoiceInkAudioMeterLevel.boundedHistory(appending: 1, to: [0], limit: 0),
+            []
+        )
+    }
 }

@@ -1,7 +1,8 @@
 import SwiftUI
+import VoiceInkCore
 
 struct AudioVisualizerView: View {
-    let levels: [CGFloat]
+    let levels: [Float]
 
     private let barCount = 8
     private let barSpacing: CGFloat = 3
@@ -36,7 +37,7 @@ struct AudioVisualizerView: View {
         let span = max(1, min(levels.count, barCount))
         let step = max(1, levels.count / span)
         let sourceIndex = max(0, levels.count - 1 - index * step)
-        let level = max(0, min(1, levels[sourceIndex]))
+        let level = CGFloat(max(0, min(1, levels[sourceIndex])))
         let minHeight: CGFloat = 4
 
         return minHeight + (size.height - minHeight) * level
@@ -44,6 +45,8 @@ struct AudioVisualizerView: View {
 }
 
 #Preview {
-    AudioVisualizerView(levels: (0..<40).map { _ in .random(in: 0.05...0.7) })
+    AudioVisualizerView(
+        levels: (0..<VoiceInkAudioMeterLevel.defaultLevelHistoryLimit).map { _ in .random(in: 0.05...0.7) }
+    )
         .padding()
 }

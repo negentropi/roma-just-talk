@@ -323,6 +323,17 @@ require_pattern \
   iOS/VoiceInk-ios/AudioRecorder.swift
 
 require_pattern \
+  "iOS live recording uses shared audio-meter history policy" \
+  'VoiceInkAudioMeterLevel\.boundedHistory' \
+  iOS/VoiceInk-ios/AudioRecorder.swift
+
+reject_pattern \
+  "iOS live recording avoids shell-only audio-meter history limit" \
+  'levelsHistory\.count >|removeFirst\(self\.levelsHistory\.count -|0\.\.<40' \
+  iOS/VoiceInk-ios/AudioRecorder.swift \
+  iOS/VoiceInk-ios/AudioVisualizerView.swift
+
+require_pattern \
   "macOS local Whisper uses shared runtime policy" \
   'VoiceInkWhisperRuntimeConfiguration\.current' \
   VoiceInk/Transcription/Whisper/LibWhisper.swift

@@ -43,9 +43,41 @@ class PolarService {
         let status: String
     }
     
-    // Generate a unique device identifier using shared logic
     private func getDeviceIdentifier() -> String {
-        return Obfuscator.getDeviceIdentifier()
+        if let serialNumber = getMacSerialNumber() {
+            return serialNumber
+        }
+
+        let defaults = UserDefaults.standard
+        if let storedId = defaults.string(forKey: "VoiceInkDeviceIdentifier") {
+            return storedId
+        }
+
+        let newId = UUID().uuidString
+        defaults.set(newId, forKey: "VoiceInkDeviceIdentifier")
+        return newId
+    }
+
+    private func getMacSerialNumber() -> String? {
+        let platformExpert = IOServiceGetMatchingService(
+            kIOMainPortDefault,
+            IOServiceMatching("IOPlatformExpertDevice")
+        )
+        if platformExpert == 0 { return nil }
+
+        defer { IOObjectRelease(platformExpert) }
+
+        if let serialNumber = IORegistryEntryCreateCFProperty(
+            platformExpert,
+            "IOPlatformSerialNumber" as CFString,
+            kCFAllocatorDefault,
+            0
+        ) {
+            return (serialNumber.takeRetainedValue() as? String)?
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+
+        return nil
     }
     
     // Check if a license key requires activation

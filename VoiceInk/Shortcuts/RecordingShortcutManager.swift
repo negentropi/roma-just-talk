@@ -613,10 +613,8 @@ final class RecordingShortcutModeHandler {
         case .special:
             let pressDuration = shortcutPressStartTime.map { eventTime - $0 } ?? 0
             let options = activeSpecialOptions
-            let hasTypingEvidence = context.didPressOtherKeyDuringPress || context.didReleaseOtherKeyDuringPress
-            let shouldFailClosed = !context.hasReliableKeyEvidence
 
-            if hasTypingEvidence || shouldFailClosed {
+            if VoiceInkSpecialShortcutKeyEvidencePolicy.shouldDiscardShortcut(for: context) {
                 discardQuickReleaseContext()
                 logger.notice("handleShortcutKeyUp: discarding special shortcut; unsafe key evidence")
             } else if isRecorderVisible() {

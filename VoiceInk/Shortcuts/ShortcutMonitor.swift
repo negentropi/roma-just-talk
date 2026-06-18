@@ -4,6 +4,7 @@ import Carbon.HIToolbox
 import CoreGraphics
 import Foundation
 import os
+import VoiceInkCore
 
 private let systemDefinedCGEventTypeRawValue = UInt32(NSEvent.EventType.systemDefined.rawValue)
 
@@ -76,11 +77,7 @@ enum KeyboardState {
     }
 }
 
-struct ShortcutPressContext: Equatable {
-    var didPressOtherKeyDuringPress = false
-    var didReleaseOtherKeyDuringPress = false
-    var hasReliableKeyEvidence = true
-}
+typealias ShortcutPressContext = VoiceInkShortcutPressContext
 
 final class ShortcutMonitor {
     enum EventKind {

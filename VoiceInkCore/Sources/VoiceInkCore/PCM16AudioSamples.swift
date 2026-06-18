@@ -9,6 +9,7 @@ public enum VoiceInkPCM16Audio {
     public static let isBigEndian = false
     public static let isFloatingPoint = false
     public static let wavHeaderByteCount = 44
+    private static let minimumSpeechLikeCrestFactor: Float = 6.0
 
     public static func floatSamples(fromLittleEndianData data: Data, startingAt startByteOffset: Int = 0) -> [Float] {
         guard startByteOffset >= 0 else { return [] }
@@ -124,8 +125,13 @@ public enum VoiceInkPCM16Audio {
             return data
         }
 
-        let peak = pcm16Peak(inLittleEndianData: data, byteCount: sampleByteCount)
+        let metrics = pcm16PeakAndRMS(inLittleEndianData: data, byteCount: sampleByteCount)
+        let peak = metrics.peak
         guard peak > 0, peak >= Int(noiseFloorPeak), peak < Int(targetPeak) else { return data }
+        guard metrics.rms > 0,
+              Float(peak) / metrics.rms >= minimumSpeechLikeCrestFactor else {
+            return data
+        }
 
         let gain = min(Float(targetPeak) / Float(peak), maxGain)
         guard gain > 1 else { return data }
@@ -375,16 +381,22 @@ public enum VoiceInkPCM16Audio {
         return Int16(clipped)
     }
 
-    private static func pcm16Peak(inLittleEndianData data: Data, byteCount: Int) -> Int {
+    private static func pcm16PeakAndRMS(inLittleEndianData data: Data, byteCount: Int) -> (peak: Int, rms: Float) {
         data.withUnsafeBytes { rawBuffer in
-            guard let bytes = rawBuffer.bindMemory(to: UInt8.self).baseAddress else { return 0 }
+            guard let bytes = rawBuffer.bindMemory(to: UInt8.self).baseAddress else { return (0, 0) }
 
             var peak = 0
+            var sumSquares = Double(0)
+            var sampleCount = 0
             for byteIndex in stride(from: 0, to: byteCount, by: bytesPerSample) {
                 let sample = littleEndianPCM16Sample(bytes: bytes, byteIndex: byteIndex)
-                peak = max(peak, pcm16Magnitude(sample))
+                let magnitude = pcm16Magnitude(sample)
+                peak = max(peak, magnitude)
+                sumSquares += Double(sample) * Double(sample)
+                sampleCount += 1
             }
-            return peak
+            guard sampleCount > 0 else { return (0, 0) }
+            return (peak, Float(sqrt(sumSquares / Double(sampleCount))))
         }
     }
 

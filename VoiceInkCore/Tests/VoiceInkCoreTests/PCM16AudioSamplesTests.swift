@@ -96,19 +96,22 @@ final class PCM16AudioSamplesTests: XCTestCase {
     }
 
     func testLeveledFloatSamplesFromWAVDataBoostsQuietSpeechTowardTargetPeak() {
+        let input = sparseSamples([
+            20: -100,
+            50: -50,
+            90: 50,
+            120: 100
+        ])
+        let expected = input.map { Int16(Int($0) * 10) }
+
         let samples = VoiceInkPCM16Audio.leveledFloatSamples(
-            fromWAVData: wavData(samples: [-100, -50, 50, 100]),
+            fromWAVData: wavData(samples: input),
             targetPeak: 1_000,
             noiseFloorPeak: 10,
             maxGain: 20
         )
 
-        XCTAssertEqual(samples, [
-            Float(-1_000) / 32_767.0,
-            Float(-500) / 32_767.0,
-            Float(500) / 32_767.0,
-            Float(1_000) / 32_767.0
-        ])
+        XCTAssertEqual(samples, expected.map { Float($0) / 32_767.0 })
     }
 
     func testLeveledFloatSamplesFromWAVDataLeavesNoiseFloorUnchanged() {
@@ -135,14 +138,17 @@ final class PCM16AudioSamplesTests: XCTestCase {
     }
 
     func testWhisperAudioSamplesUseSharedLevelingDefaultsForWAVData() {
+        let input = sparseSamples([
+            30: -1_000,
+            100: 1_000
+        ])
+        let expected = input.map { Int16(Int($0) * 12) }
+
         let samples = VoiceInkWhisperAudioSamples.floatSamples(
-            fromWAVData: wavData(samples: [-1_000, 1_000])
+            fromWAVData: wavData(samples: input)
         )
 
-        XCTAssertEqual(samples, [
-            Float(-12_000) / 32_767.0,
-            Float(12_000) / 32_767.0
-        ])
+        XCTAssertEqual(samples, expected.map { Float($0) / 32_767.0 })
     }
 
     func testWhisperAudioSamplesCanReadWAVFileURL() throws {
@@ -152,14 +158,16 @@ final class PCM16AudioSamplesTests: XCTestCase {
         defer { try? FileManager.default.removeItem(at: baseDirectory) }
 
         let fileURL = baseDirectory.appendingPathComponent("recording.wav")
-        try wavData(samples: [-1_000, 1_000]).write(to: fileURL)
+        let input = sparseSamples([
+            30: -1_000,
+            100: 1_000
+        ])
+        let expected = input.map { Int16(Int($0) * 12) }
+        try wavData(samples: input).write(to: fileURL)
 
         let samples = try VoiceInkWhisperAudioSamples.floatSamples(fromWAVFileAt: fileURL)
 
-        XCTAssertEqual(samples, [
-            Float(-12_000) / 32_767.0,
-            Float(12_000) / 32_767.0
-        ])
+        XCTAssertEqual(samples, expected.map { Float($0) / 32_767.0 })
     }
 
     func testNormalizedMonoFloatSamplesPreserveSingleChannelNormalization() {
@@ -228,7 +236,14 @@ final class PCM16AudioSamplesTests: XCTestCase {
     }
 
     func testLeveledLittleEndianDataBoostsQuietSpeechTowardTargetPeak() {
-        let data = pcm16Data(samples: [-100, -50, 50, 100])
+        let input = sparseSamples([
+            20: -100,
+            50: -50,
+            90: 50,
+            120: 100
+        ])
+        let expected = input.map { Int16(Int($0) * 10) }
+        let data = pcm16Data(samples: input)
 
         let leveled = VoiceInkPCM16Audio.leveledLittleEndianData(
             data,
@@ -237,7 +252,7 @@ final class PCM16AudioSamplesTests: XCTestCase {
             maxGain: 20
         )
 
-        XCTAssertEqual(pcm16Samples(from: leveled), [-1_000, -500, 500, 1_000])
+        XCTAssertEqual(pcm16Samples(from: leveled), expected)
     }
 
     func testLeveledLittleEndianDataLeavesSilenceAndNoiseFloorUnchanged() {
@@ -262,6 +277,20 @@ final class PCM16AudioSamplesTests: XCTestCase {
             ),
             noiseFloor
         )
+    }
+
+    func testLeveledLittleEndianDataLeavesContinuousNoiseLikeAudioUnchanged() {
+        let noiseSamples = Array(repeating: [Int16(-64), Int16(64)], count: 64).flatMap { $0 }
+        let noise = pcm16Data(samples: noiseSamples)
+
+        let leveled = VoiceInkPCM16Audio.leveledLittleEndianData(
+            noise,
+            targetPeak: 1_000,
+            noiseFloorPeak: 10,
+            maxGain: 20
+        )
+
+        XCTAssertEqual(leveled, noise)
     }
 
     func testConvertedMonoPCM16SampleCountUsesExistingTruncatedResamplePolicy() {
@@ -421,6 +450,14 @@ final class PCM16AudioSamplesTests: XCTestCase {
         var data = Data(repeating: 0, count: VoiceInkPCM16Audio.wavHeaderByteCount)
         data.append(pcm16Data(samples: samples))
         return data
+    }
+
+    private func sparseSamples(_ samplesByIndex: [Int: Int16], count: Int = 160) -> [Int16] {
+        var samples = Array(repeating: Int16(0), count: count)
+        for (index, sample) in samplesByIndex {
+            samples[index] = sample
+        }
+        return samples
     }
 
     private func wavDataWithExtraChunk(samples: [Int16]) -> Data {

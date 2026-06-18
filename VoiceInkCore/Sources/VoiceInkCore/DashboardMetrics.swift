@@ -93,3 +93,35 @@ public struct VoiceInkDashboardMetrics: Equatable, Sendable {
         Int(Double(summary.totalWords) * keystrokesPerWord)
     }
 }
+
+public struct VoiceInkNoteListSummaryPresentation: Equatable, Sendable {
+    public let summary: VoiceInkDashboardMetricsSummary
+    public let dashboardText: String
+    public let fastestModelText: String?
+
+    public init(
+        summary: VoiceInkDashboardMetricsSummary,
+        fastestModel: VoiceInkPerformanceModelStat? = nil
+    ) {
+        self.summary = summary
+        self.dashboardText = "\(summary.totalWords) words - \(VoiceInkDurationPresentation.minutesSeconds(summary.totalDuration)) audio"
+        self.fastestModelText = fastestModel.map { "\($0.name) \($0.speedFactorRealtimeText)" }
+    }
+
+    public static func make<Record>(
+        from records: [Record]
+    ) -> VoiceInkNoteListSummaryPresentation where Record: VoiceInkDashboardMetricRecord, Record: VoiceInkPerformanceRecord {
+        var accumulator = VoiceInkDashboardMetricsAccumulator()
+        for record in records {
+            accumulator.add(record)
+        }
+
+        return VoiceInkNoteListSummaryPresentation(
+            summary: accumulator.summary(totalCount: records.count),
+            fastestModel: VoiceInkPerformanceAnalyzer.transcriptionModelStats(
+                from: records,
+                requirePositiveDuration: true
+            ).first
+        )
+    }
+}

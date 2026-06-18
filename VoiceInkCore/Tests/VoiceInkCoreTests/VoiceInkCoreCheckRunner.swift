@@ -120,6 +120,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "DashboardMetricsTests.testDerivedMetricsPreserveDashboardDefaults", run: { DashboardMetricsTests().testDerivedMetricsPreserveDashboardDefaults() }),
             VoiceInkCoreCheck(name: "DashboardMetricsTests.testTimeSavedAndAverageWordsPerMinuteHandleZeroAndOverTypingTime", run: { DashboardMetricsTests().testTimeSavedAndAverageWordsPerMinuteHandleZeroAndOverTypingTime() }),
             VoiceInkCoreCheck(name: "DashboardMetricsTests.testDerivedMetricsCanOverrideTypingAndKeystrokeAssumptions", run: { DashboardMetricsTests().testDerivedMetricsCanOverrideTypingAndKeystrokeAssumptions() }),
+            VoiceInkCoreCheck(name: "DashboardMetricsTests.testNoteListSummaryPresentationBuildsIOSHeaderText", run: { DashboardMetricsTests().testNoteListSummaryPresentationBuildsIOSHeaderText() }),
+            VoiceInkCoreCheck(name: "DashboardMetricsTests.testNoteListSummaryPresentationOmitsFastestModelWhenNoTimedModelExists", run: { DashboardMetricsTests().testNoteListSummaryPresentationOmitsFastestModelWhenNoTimedModelExists() }),
             VoiceInkCoreCheck(name: "DatePresentationTests.testRelativeTimestampUsesShortRelativeStyle", run: { DatePresentationTests().testRelativeTimestampUsesShortRelativeStyle() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testVocabularyDraftUsesSharedTokenPolicy", run: { DictionaryPolicyTests().testVocabularyDraftUsesSharedTokenPolicy() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testVocabularyPlanReturnsNoOpForBlankInput", run: { DictionaryPolicyTests().testVocabularyPlanReturnsNoOpForBlankInput() }),

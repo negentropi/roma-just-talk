@@ -1524,23 +1524,33 @@ reject_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests
 
 require_pattern \
-  "iOS note-list dashboard summary uses shared metrics accumulator" \
+  "shared note-list summary presentation lives in VoiceInkCore" \
+  'VoiceInkNoteListSummaryPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift
+
+require_pattern \
+  "shared note-list summary uses shared metrics accumulator" \
   'VoiceInkDashboardMetricsAccumulator' \
+  VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift
+
+require_pattern \
+  "iOS note-list uses shared summary presentation" \
+  'VoiceInkNoteListSummaryPresentation\.make' \
   iOS/VoiceInk-ios/NotesListView.swift
 
 reject_pattern \
   "iOS note-list avoids shell-only dashboard metric math" \
-  'VoiceInkWordCounter|VoiceInkSessionMetricPolicy|dashboardWordCount|dashboardAudioDuration|reduce\(' \
+  'VoiceInkWordCounter|VoiceInkSessionMetricPolicy|VoiceInkDashboardMetricsAccumulator|dashboardWordCount|dashboardAudioDuration|summary\.totalWords|summary\.totalDuration|words -|reduce\(' \
   iOS/VoiceInk-ios/NotesListView.swift
 
 require_pattern \
-  "iOS note-list fastest-model summary uses shared performance analyzer" \
+  "shared note-list fastest-model summary uses shared performance analyzer" \
   'VoiceInkPerformanceAnalyzer\.transcriptionModelStats' \
-  iOS/VoiceInk-ios/NotesListView.swift
+  VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift
 
 reject_pattern \
   "iOS note-list avoids shell-only performance grouping" \
-  'Dictionary\(grouping:|avgProcessingTime|speedFactor =|totalProcessingTime|performanceTranscriptionDuration' \
+  'VoiceInkPerformanceAnalyzer|Dictionary\(grouping:|avgProcessingTime|speedFactor =|totalProcessingTime|performanceTranscriptionDuration|speedFactorRealtimeText' \
   iOS/VoiceInk-ios/NotesListView.swift
 
 require_pattern \

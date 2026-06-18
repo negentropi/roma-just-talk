@@ -105,49 +105,31 @@ struct NotesListView: View {
     }
 
     private var sectionHeader: some View {
+        let summaryPresentation = noteListSummaryPresentation
+
         HStack {
             VStack(alignment: .leading, spacing: 2) {
                 Text("Recent")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-                Text(dashboardSummaryText)
+                Text(summaryPresentation.dashboardText)
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
-                if let performanceSummaryText {
+                if let performanceSummaryText = summaryPresentation.fastestModelText {
                     Text(performanceSummaryText)
                         .font(.caption2)
                         .foregroundStyle(.tertiary)
                 }
             }
             Spacer()
-            Text("\(filteredNotes.count)")
+            Text("\(summaryPresentation.summary.totalCount)")
                 .font(.caption)
                 .foregroundStyle(.tertiary)
         }
     }
 
-    private var dashboardSummary: VoiceInkDashboardMetricsSummary {
-        var accumulator = VoiceInkDashboardMetricsAccumulator()
-        for note in filteredNotes {
-            accumulator.add(note)
-        }
-        return accumulator.summary(totalCount: filteredNotes.count)
-    }
-
-    private var dashboardSummaryText: String {
-        let summary = dashboardSummary
-        return "\(summary.totalWords) words - \(VoiceInkDurationPresentation.minutesSeconds(summary.totalDuration)) audio"
-    }
-
-    private var performanceSummaryText: String? {
-        guard let fastestModel = VoiceInkPerformanceAnalyzer.transcriptionModelStats(
-            from: filteredNotes,
-            requirePositiveDuration: true
-        ).first else {
-            return nil
-        }
-
-        return "\(fastestModel.name) \(fastestModel.speedFactorRealtimeText)"
+    private var noteListSummaryPresentation: VoiceInkNoteListSummaryPresentation {
+        VoiceInkNoteListSummaryPresentation.make(from: filteredNotes)
     }
 
     private var emptyState: some View {

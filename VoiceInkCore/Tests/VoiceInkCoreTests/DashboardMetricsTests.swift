@@ -80,6 +80,56 @@ final class DashboardMetricsTests: XCTestCase {
         XCTAssertEqual(metrics.timeSaved, 60)
         XCTAssertEqual(metrics.totalKeystrokesSaved, 400)
     }
+
+    func testNoteListSummaryPresentationBuildsIOSHeaderText() {
+        let presentation = VoiceInkNoteListSummaryPresentation.make(from: [
+            NoteListRecord(
+                wordCount: 120,
+                audioDuration: 60,
+                transcriptionModelName: "slow",
+                transcriptionDuration: 10
+            ),
+            NoteListRecord(
+                wordCount: 80,
+                audioDuration: 30,
+                transcriptionModelName: "fast",
+                transcriptionDuration: 3
+            ),
+            NoteListRecord(
+                wordCount: 10,
+                audioDuration: 5,
+                transcriptionModelName: nil,
+                transcriptionDuration: nil
+            )
+        ])
+
+        XCTAssertEqual(
+            presentation.summary,
+            VoiceInkDashboardMetricsSummary(totalCount: 3, totalWords: 210, totalDuration: 95)
+        )
+        XCTAssertEqual(presentation.dashboardText, "210 words - 1:35 audio")
+        XCTAssertEqual(presentation.fastestModelText, "fast 10.0x realtime")
+    }
+
+    func testNoteListSummaryPresentationOmitsFastestModelWhenNoTimedModelExists() {
+        let presentation = VoiceInkNoteListSummaryPresentation.make(from: [
+            NoteListRecord(
+                wordCount: 5,
+                audioDuration: 12,
+                transcriptionModelName: "zero",
+                transcriptionDuration: 0
+            ),
+            NoteListRecord(
+                wordCount: 7,
+                audioDuration: 18,
+                transcriptionModelName: nil,
+                transcriptionDuration: nil
+            )
+        ])
+
+        XCTAssertEqual(presentation.dashboardText, "12 words - 0:30 audio")
+        XCTAssertNil(presentation.fastestModelText)
+    }
 }
 
 private struct Record: VoiceInkDashboardMetricRecord {
@@ -96,4 +146,19 @@ private struct SourceRecord: VoiceInkDashboardMetricRecord, VoiceInkSessionMetri
     let duration: TimeInterval
     let transcriptionDuration: TimeInterval?
     let enhancementDuration: TimeInterval?
+}
+
+private struct NoteListRecord: VoiceInkDashboardMetricRecord, VoiceInkPerformanceRecord {
+    let wordCount: Int
+    let audioDuration: TimeInterval
+    let transcriptionModelName: String?
+    let transcriptionDuration: TimeInterval?
+
+    var dashboardWordCount: Int { wordCount }
+    var dashboardAudioDuration: TimeInterval { audioDuration }
+    var performanceAudioDuration: TimeInterval { audioDuration }
+    var performanceTranscriptionDuration: TimeInterval? { transcriptionDuration }
+    let aiEnhancementModelName: String? = nil
+    let performanceEnhancementDuration: TimeInterval? = nil
+    let performanceEnhancedText: String? = nil
 }

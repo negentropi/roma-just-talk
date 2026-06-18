@@ -568,6 +568,16 @@ reject_pattern \
   VoiceInk/Services/AudioFileTranscriptionService.swift
 
 require_pattern \
+  "macOS session creation uses shared streaming preference directly" \
+  'VoiceInkTranscriptionStreamingPreference\.shouldUseStreaming\(for: model\.streamingPreferenceSnapshot\)' \
+  VoiceInk/Transcription/Engine/TranscriptionServiceRegistry.swift
+
+reject_pattern \
+  "macOS session creation avoids shell-only streaming support wrapper" \
+  'private func supportsStreaming\(model:' \
+  VoiceInk/Transcription/Engine/TranscriptionServiceRegistry.swift
+
+require_pattern \
   "macOS AI API-key view uses shared AI draft policy" \
   'VoiceInkAIEnhancementAPIKeyDraft' \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift

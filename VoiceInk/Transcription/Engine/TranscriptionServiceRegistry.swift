@@ -50,7 +50,11 @@ class TranscriptionServiceRegistry {
         onPartialTranscript: ((String) -> Void)? = nil,
         forceStreaming: Bool = false
     ) -> TranscriptionSession {
-        if forceStreaming ? model.supportsStreaming : supportsStreaming(model: model) {
+        let shouldUseStreaming = forceStreaming
+            ? model.supportsStreaming
+            : VoiceInkTranscriptionStreamingPreference.shouldUseStreaming(for: model.streamingPreferenceSnapshot)
+
+        if shouldUseStreaming {
             let streamingService = StreamingTranscriptionService(
                 modelContext: modelContext,
                 fluidAudioService: model.provider == .fluidAudio ? fluidAudioTranscriptionService : nil,
@@ -65,11 +69,6 @@ class TranscriptionServiceRegistry {
         } else {
             return FileTranscriptionSession(service: service(for: model.provider))
         }
-    }
-
-    /// Whether the given model supports streaming transcription
-    private func supportsStreaming(model: any TranscriptionModel) -> Bool {
-        VoiceInkTranscriptionStreamingPreference.shouldUseStreaming(for: model.streamingPreferenceSnapshot)
     }
 
     func cleanup() async {

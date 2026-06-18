@@ -210,7 +210,7 @@ struct SettingsView: View {
     }
 
     private var canAddFillerWord: Bool {
-        VoiceInkFillerWords.normalizedWord(newFillerWord) != nil
+        VoiceInkFillerWords.hasDraft(newFillerWord)
     }
 
     private var canAddCustomVocabularyTerm: Bool {

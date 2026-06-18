@@ -359,6 +359,22 @@ reject_pattern \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
 reject_pattern \
+  "macOS and iOS filler-word settings use shared draft policy" \
+  'VoiceInkFillerWords\.normalizedWord' \
+  VoiceInk/Views/Components/FillerWordsSettingsView.swift \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+require_pattern \
+  "macOS filler-word add button uses shared draft policy" \
+  'VoiceInkFillerWords\.hasDraft\(newWord\)' \
+  VoiceInk/Views/Components/FillerWordsSettingsView.swift
+
+require_pattern \
+  "iOS filler-word add button uses shared draft policy" \
+  'VoiceInkFillerWords\.hasDraft\(newFillerWord\)' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+reject_pattern \
   "iOS mode provider availability comes from shared provider-key state" \
   'VoiceInkProviderKind\.availableProviders' \
   iOS/VoiceInk-ios/ModeConfigurationView.swift

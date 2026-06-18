@@ -108,6 +108,6 @@ struct FillerWordsSettingsView: View {
     }
 
     private var canAddWord: Bool {
-        VoiceInkFillerWords.normalizedWord(newWord) != nil
+        VoiceInkFillerWords.hasDraft(newWord)
     }
 }

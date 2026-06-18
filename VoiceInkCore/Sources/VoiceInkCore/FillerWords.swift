@@ -11,6 +11,10 @@ public enum VoiceInkFillerWords {
         return normalized.isEmpty ? nil : normalized
     }
 
+    public static func hasDraft(_ word: String) -> Bool {
+        normalizedWord(word) != nil
+    }
+
     public static func adding(_ word: String, to words: [String]) -> [String]? {
         guard let normalized = normalizedWord(word) else {
             return nil

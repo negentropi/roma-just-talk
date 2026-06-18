@@ -21,6 +21,11 @@ final class FillerWordsTests: XCTestCase {
         XCTAssertNil(VoiceInkFillerWords.adding("UM", to: ["um"]))
     }
 
+    func testDraftAvailabilityUsesSharedNormalization() {
+        XCTAssertFalse(VoiceInkFillerWords.hasDraft(" \n\t "))
+        XCTAssertTrue(VoiceInkFillerWords.hasDraft(" LIKE "))
+    }
+
     func testRemovingDropsWordsCaseInsensitively() {
         XCTAssertEqual(
             VoiceInkFillerWords.removing("UM", from: ["uh", "um", "like"]),

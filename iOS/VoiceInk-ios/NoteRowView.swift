@@ -6,7 +6,11 @@ struct NoteRowView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(transcriptText)
+            Text(VoiceInkTranscriptPresentation.displayText(
+                status: note.transcriptionStatus,
+                rawText: note.text,
+                enhancedText: note.enhancedText
+            ))
                 .font(.body)
                 .foregroundStyle(.primary)
                 .lineSpacing(2)
@@ -14,7 +18,7 @@ struct NoteRowView: View {
                 .multilineTextAlignment(.leading)
 
             HStack(spacing: 8) {
-                Text(relativeTimestamp)
+                Text(VoiceInkDatePresentation.relativeTimestamp(note.timestamp))
                     .font(.caption)
                     .foregroundStyle(.secondary)
 
@@ -36,12 +40,12 @@ struct NoteRowView: View {
                     HStack(spacing: 6) {
                         ProgressView()
                             .scaleEffect(0.7)
-                        Text(statusBadgeText)
+                        Text(VoiceInkTranscriptPresentation.statusBadgeText(for: note.transcriptionStatus) ?? "")
                             .font(.caption)
                     }
                     .foregroundStyle(.secondary)
                 } else if note.transcriptionStatus == .failed {
-                    Text(statusBadgeText)
+                    Text(VoiceInkTranscriptPresentation.statusBadgeText(for: note.transcriptionStatus) ?? "")
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.orange)
                         .padding(.horizontal, 8)
@@ -54,23 +58,4 @@ struct NoteRowView: View {
         .padding(.vertical, 6)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
-    
-
-    
-    private var transcriptText: String {
-        VoiceInkTranscriptPresentation.displayText(
-            status: note.transcriptionStatus,
-            rawText: note.text,
-            enhancedText: note.enhancedText
-        )
-    }
-
-    private var statusBadgeText: String {
-        VoiceInkTranscriptPresentation.statusBadgeText(for: note.transcriptionStatus) ?? ""
-    }
-
-    private var relativeTimestamp: String {
-        VoiceInkDatePresentation.relativeTimestamp(note.timestamp)
-    }
-
 }

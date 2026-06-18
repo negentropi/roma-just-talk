@@ -57,27 +57,28 @@ struct NoteDetailView: View {
                 Text("Transcript")
                     .font(.headline)
                 Spacer()
-                Button(action: { copyToClipboard(displayedTranscriptText) }) {
+                Button(action: {
+                    copyToClipboard(VoiceInkTranscriptPresentation.preferredTextOrEmptyContent(
+                        rawText: note.text,
+                        enhancedText: note.enhancedText
+                    ))
+                }) {
                     Image(systemName: "doc.on.doc")
                         .font(.system(size: 16))
                         .foregroundStyle(.blue)
                 }
             }
             
-            Text(displayedTranscriptText)
+            Text(VoiceInkTranscriptPresentation.preferredTextOrEmptyContent(
+                rawText: note.text,
+                enhancedText: note.enhancedText
+            ))
                 .font(.body)
                 .textSelection(.enabled)
                 .padding()
                 .background(Color(.secondarySystemGroupedBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 16))
         }
-    }
-    
-    private var displayedTranscriptText: String {
-        VoiceInkTranscriptPresentation.preferredTextOrEmptyContent(
-            rawText: note.text,
-            enhancedText: note.enhancedText
-        )
     }
     
     private var shouldShowAudioSection: Bool {
@@ -134,7 +135,7 @@ struct NoteDetailView: View {
                     .foregroundStyle(note.transcriptionStatus == .failed ? .red : .orange)
                 
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(transcriptionStatusTitle)
+                    Text(VoiceInkTranscriptPresentation.statusTitle(for: note.transcriptionStatus) ?? "")
                         .font(.subheadline.weight(.medium))
                     if let error = note.transcriptionError, !error.isEmpty {
                         Text(error)
@@ -193,10 +194,6 @@ struct NoteDetailView: View {
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
-    private var transcriptionStatusTitle: String {
-        VoiceInkTranscriptPresentation.statusTitle(for: note.transcriptionStatus) ?? ""
-    }
-    
     private func retranscribe() {
         isRetranscribing = true
         

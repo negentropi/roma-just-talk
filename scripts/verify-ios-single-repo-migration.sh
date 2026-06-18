@@ -341,6 +341,12 @@ reject_pattern \
   iOS/VoiceInk-ios/AudioRecorder.swift \
   iOS/VoiceInk-ios/AudioVisualizerView.swift
 
+reject_pattern \
+  "iOS note views avoid shell-only transcript presentation wrappers" \
+  'private var +(transcriptText|statusBadgeText|relativeTimestamp|displayedTranscriptText|transcriptionStatusTitle) *:' \
+  iOS/VoiceInk-ios/NoteRowView.swift \
+  iOS/VoiceInk-ios/NoteDetailView.swift
+
 require_pattern \
   "macOS local Whisper uses shared runtime policy" \
   'VoiceInkWhisperRuntimeConfiguration\.current' \

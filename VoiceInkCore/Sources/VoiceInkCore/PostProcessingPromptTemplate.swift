@@ -2,8 +2,8 @@ import Foundation
 
 public struct VoiceInkPostProcessingPromptTemplate: Identifiable, Codable, Sendable {
     public let id = UUID()
-    public let type: VoiceInkPostProcessingTemplateType
-    public let customPrompt: String
+    public var type: VoiceInkPostProcessingTemplateType
+    public var customPrompt: String
 
     private enum CodingKeys: String, CodingKey {
         case type

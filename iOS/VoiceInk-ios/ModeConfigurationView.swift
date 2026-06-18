@@ -7,8 +7,6 @@ struct ModeConfigurationView: View {
     
     @State private var mode: Mode
     @State private var isEditing: Bool
-    @State private var selectedTemplateType: VoiceInkPostProcessingTemplateType
-    @State private var customPromptText: String
     
     let onSave: (Mode) -> Void
     
@@ -18,8 +16,6 @@ struct ModeConfigurationView: View {
         self.isEditing = mode != nil
         let initialMode = mode ?? Mode(name: "")
         self._mode = State(initialValue: initialMode)
-        self._selectedTemplateType = State(initialValue: initialMode.promptTemplate.type)
-        self._customPromptText = State(initialValue: initialMode.promptTemplate.customPrompt)
     }
     
     /// Available transcription providers (those with valid API keys or downloaded local models)
@@ -34,8 +30,6 @@ struct ModeConfigurationView: View {
 
     private var canSave: Bool {
         mode.isSaveableDraft(
-            promptTemplateType: selectedTemplateType,
-            customPrompt: customPromptText,
             availableTranscriptionProviders: availableTranscriptionProviders,
             availablePostProcessingProviders: availablePostProcessingProviders
         )
@@ -98,15 +92,15 @@ struct ModeConfigurationView: View {
                     }
                     
                     // Prompt Template Selection
-                    Picker("Prompt Template", selection: $selectedTemplateType) {
+                    Picker("Prompt Template", selection: $mode.promptTemplate.type) {
                         ForEach(VoiceInkPostProcessingTemplateType.allCases, id: \.self) { templateType in
                             Text(templateType.displayName).tag(templateType)
                         }
                     }
                     
                     // Show custom prompt field only when Custom is selected
-                    if selectedTemplateType == .custom {
-                        TextField("Custom Prompt", text: $customPromptText, axis: .vertical)
+                    if mode.promptTemplate.type == .custom {
+                        TextField("Custom Prompt", text: $mode.promptTemplate.customPrompt, axis: .vertical)
                             .lineLimit(4, reservesSpace: true)
                     }
                 }
@@ -117,8 +111,6 @@ struct ModeConfigurationView: View {
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Save") {
-                    // Update the mode's prompt template before saving
-                    mode.promptTemplate = VoiceInkPostProcessingPromptTemplate(type: selectedTemplateType, customPrompt: customPromptText)
                     onSave(mode)
                     dismiss()
                 }

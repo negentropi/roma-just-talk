@@ -125,47 +125,27 @@ public struct Mode: Identifiable, Codable {
         return ([defaultMode], defaultMode.id)
     }
 
-    public static func isSaveableDraft(
-        name: String,
-        promptTemplateType: VoiceInkPostProcessingTemplateType,
-        customPrompt: String,
-        transcriptionProviderAvailable: Bool = true,
-        postProcessingProviderAvailable: Bool = true,
-        isPostProcessingEnabled: Bool = false
+    public func isSaveableDraft(
+        availableTranscriptionProviders: [VoiceInkProviderKind],
+        availablePostProcessingProviders: [VoiceInkProviderKind]
     ) -> Bool {
         guard !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             return false
         }
 
-        guard transcriptionProviderAvailable else {
+        guard availableTranscriptionProviders.contains(transcriptionProvider) else {
             return false
         }
 
-        guard !isPostProcessingEnabled || postProcessingProviderAvailable else {
+        guard !isPostProcessingEnabled || availablePostProcessingProviders.contains(postProcessingProvider) else {
             return false
         }
 
-        if promptTemplateType == .custom {
-            return !customPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        if promptTemplate.type == .custom {
+            return !promptTemplate.customPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         }
 
         return true
-    }
-
-    public func isSaveableDraft(
-        promptTemplateType: VoiceInkPostProcessingTemplateType,
-        customPrompt: String,
-        availableTranscriptionProviders: [VoiceInkProviderKind],
-        availablePostProcessingProviders: [VoiceInkProviderKind]
-    ) -> Bool {
-        Self.isSaveableDraft(
-            name: name,
-            promptTemplateType: promptTemplateType,
-            customPrompt: customPrompt,
-            transcriptionProviderAvailable: availableTranscriptionProviders.contains(transcriptionProvider),
-            postProcessingProviderAvailable: availablePostProcessingProviders.contains(postProcessingProvider),
-            isPostProcessingEnabled: isPostProcessingEnabled
-        )
     }
 }
 

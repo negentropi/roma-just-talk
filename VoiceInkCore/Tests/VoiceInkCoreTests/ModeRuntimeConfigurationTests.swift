@@ -243,59 +243,53 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
     }
 
     func testModeDraftValidationRequiresName() {
-        XCTAssertFalse(Mode.isSaveableDraft(
-            name: "",
-            promptTemplateType: .summary,
-            customPrompt: ""
+        XCTAssertFalse(Mode(name: "").isSaveableDraft(
+            availableTranscriptionProviders: [.groq],
+            availablePostProcessingProviders: [.groq]
         ))
-        XCTAssertFalse(Mode.isSaveableDraft(
-            name: "   \n",
-            promptTemplateType: .summary,
-            customPrompt: ""
+        XCTAssertFalse(Mode(name: "   \n").isSaveableDraft(
+            availableTranscriptionProviders: [.groq],
+            availablePostProcessingProviders: [.groq]
         ))
     }
 
     func testModeDraftValidationRequiresCustomPromptOnlyForCustomTemplates() {
-        XCTAssertFalse(Mode.isSaveableDraft(
-            name: "Custom",
-            promptTemplateType: .custom,
-            customPrompt: "   "
+        var mode = Mode(name: "Custom")
+        mode.promptTemplate.type = .custom
+        mode.promptTemplate.customPrompt = "   "
+
+        XCTAssertFalse(mode.isSaveableDraft(
+            availableTranscriptionProviders: [.groq],
+            availablePostProcessingProviders: [.groq]
         ))
-        XCTAssertTrue(Mode.isSaveableDraft(
-            name: "Custom",
-            promptTemplateType: .custom,
-            customPrompt: "Clean this transcript."
+
+        mode.promptTemplate.customPrompt = "Clean this transcript."
+
+        XCTAssertTrue(mode.isSaveableDraft(
+            availableTranscriptionProviders: [.groq],
+            availablePostProcessingProviders: [.groq]
         ))
     }
 
     func testModeDraftValidationAllowsPredefinedTemplatesWithoutCustomPrompt() {
-        XCTAssertTrue(Mode.isSaveableDraft(
-            name: "Summary",
-            promptTemplateType: .summary,
-            customPrompt: ""
+        XCTAssertTrue(Mode(name: "Summary").isSaveableDraft(
+            availableTranscriptionProviders: [.groq],
+            availablePostProcessingProviders: [.groq]
         ))
     }
 
     func testModeDraftValidationRequiresAvailableProviderSelection() {
-        XCTAssertFalse(Mode.isSaveableDraft(
-            name: "Unavailable",
-            promptTemplateType: .summary,
-            customPrompt: "",
-            transcriptionProviderAvailable: false
+        XCTAssertFalse(Mode(name: "Unavailable").isSaveableDraft(
+            availableTranscriptionProviders: [.localWhisper],
+            availablePostProcessingProviders: [.groq]
         ))
-        XCTAssertFalse(Mode.isSaveableDraft(
-            name: "Unavailable post-processing",
-            promptTemplateType: .summary,
-            customPrompt: "",
-            postProcessingProviderAvailable: false,
-            isPostProcessingEnabled: true
+        XCTAssertFalse(Mode(name: "Unavailable post-processing", isPostProcessingEnabled: true).isSaveableDraft(
+            availableTranscriptionProviders: [.groq],
+            availablePostProcessingProviders: [.gemini]
         ))
-        XCTAssertTrue(Mode.isSaveableDraft(
-            name: "Disabled post-processing",
-            promptTemplateType: .summary,
-            customPrompt: "",
-            postProcessingProviderAvailable: false,
-            isPostProcessingEnabled: false
+        XCTAssertTrue(Mode(name: "Disabled post-processing", isPostProcessingEnabled: false).isSaveableDraft(
+            availableTranscriptionProviders: [.groq],
+            availablePostProcessingProviders: [.gemini]
         ))
     }
 
@@ -308,20 +302,14 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
         )
 
         XCTAssertTrue(mode.isSaveableDraft(
-            promptTemplateType: .summary,
-            customPrompt: "",
             availableTranscriptionProviders: [.deepgram],
             availablePostProcessingProviders: [.gemini]
         ))
         XCTAssertFalse(mode.isSaveableDraft(
-            promptTemplateType: .summary,
-            customPrompt: "",
             availableTranscriptionProviders: [.groq],
             availablePostProcessingProviders: [.gemini]
         ))
         XCTAssertFalse(mode.isSaveableDraft(
-            promptTemplateType: .summary,
-            customPrompt: "",
             availableTranscriptionProviders: [.deepgram],
             availablePostProcessingProviders: [.groq]
         ))

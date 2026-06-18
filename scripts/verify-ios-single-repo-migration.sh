@@ -516,6 +516,16 @@ require_pattern \
   'settings\.availableProviders\(for: \.postProcessing\)' \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
+require_pattern \
+  "iOS mode prompt-template editing uses shared mode state" \
+  '\$mode\.promptTemplate\.' \
+  iOS/VoiceInk-ios/ModeConfigurationView.swift
+
+reject_pattern \
+  "iOS mode prompt-template editing avoids duplicate shell draft state" \
+  'selectedTemplateType|customPromptText|mode\.promptTemplate = VoiceInkPostProcessingPromptTemplate' \
+  iOS/VoiceInk-ios/ModeConfigurationView.swift
+
 reject_pattern \
   "macOS model cards use shared per-model preload preference API" \
   'perModelPreloadEnabledKey|UserDefaults\.standard\.object\(forKey: preload|UserDefaults\.standard\.set\([^)]*forKey: preload' \

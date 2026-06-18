@@ -162,6 +162,22 @@ final class AppSettings: ObservableObject {
         VoiceInkTranscriptionPromptPreference.localWhisperPromptForSelectedLanguage()
     }
 
+    func addMode(_ mode: Mode) {
+        modes.append(mode)
+    }
+
+    func updateMode(_ updatedMode: Mode, replacing modeId: UUID) {
+        guard let index = modes.firstIndex(where: { $0.id == modeId }) else {
+            return
+        }
+
+        modes[index] = updatedMode
+    }
+
+    func removeModes(at offsets: IndexSet) {
+        modes = VoiceInkPreferenceList.removing(at: offsets, from: modes)
+    }
+
     func addFillerWord(_ word: String) -> Bool {
         guard let updatedWords = VoiceInkFillerWords.adding(word, to: fillerWords) else {
             return false

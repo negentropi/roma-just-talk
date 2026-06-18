@@ -22,9 +22,7 @@ struct SettingsView: View {
                         mode: mode,
                         settings: settings
                     ) { updatedMode in
-                        if let index = settings.modes.firstIndex(where: { $0.id == mode.id }) {
-                            settings.modes[index] = updatedMode
-                        }
+                        settings.updateMode(updatedMode, replacing: mode.id)
                     }) {
                         ModeRowView(mode: mode)
                     }
@@ -34,7 +32,7 @@ struct SettingsView: View {
                 NavigationLink(destination: ModeConfigurationView(
                     settings: settings
                 ) { newMode in
-                    settings.modes.append(newMode)
+                    settings.addMode(newMode)
                 }) {
                     HStack {
                         Image(systemName: "plus.circle.fill")
@@ -265,7 +263,7 @@ struct SettingsView: View {
     }
     
     private func deleteMode(at offsets: IndexSet) {
-        settings.modes.remove(atOffsets: offsets)
+        settings.removeModes(at: offsets)
     }
 
     #if DEBUG

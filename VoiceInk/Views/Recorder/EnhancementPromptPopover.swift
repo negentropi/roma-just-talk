@@ -1,9 +1,10 @@
 import SwiftUI
+import VoiceInkCore
 
 // Enhancement Prompt Popover for recorder views
 struct EnhancementPromptPopover: View {
     @EnvironmentObject var enhancementService: AIEnhancementService
-    @State private var selectedPrompt: CustomPrompt?
+    @State private var selectedPrompt: VoiceInkCustomPrompt?
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -61,7 +62,7 @@ struct EnhancementPromptPopover: View {
 
 // Row view for each enhancement prompt in the popover
 struct EnhancementPromptRow: View {
-    let prompt: CustomPrompt
+    let prompt: VoiceInkCustomPrompt
     let isSelected: Bool
     let isDisabled: Bool
     let action: () -> Void
@@ -95,4 +96,4 @@ struct EnhancementPromptRow: View {
         .background(isSelected ? Color.white.opacity(0.1) : Color.clear)
         .cornerRadius(4)
     }
-} 
+}

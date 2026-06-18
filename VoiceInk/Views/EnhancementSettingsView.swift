@@ -1,11 +1,12 @@
 import SwiftUI
 import UniformTypeIdentifiers
+import VoiceInkCore
 
 struct EnhancementSettingsView: View {
     @EnvironmentObject private var enhancementService: AIEnhancementService
     @State private var isEditingPrompt = false
     @State private var isShowingSettings = false
-    @State private var selectedPromptForEdit: CustomPrompt?
+    @State private var selectedPromptForEdit: VoiceInkCustomPrompt?
     @State private var panelID = UUID()
 
     private let panelWidth: CGFloat = 400
@@ -152,11 +153,11 @@ private struct ReorderablePromptGrid: View {
     @EnvironmentObject private var enhancementService: AIEnhancementService
 
     let selectedPromptId: UUID?
-    let onPromptSelected: (CustomPrompt) -> Void
-    let onEditPrompt: ((CustomPrompt) -> Void)?
-    let onDeletePrompt: ((CustomPrompt) -> Void)?
+    let onPromptSelected: (VoiceInkCustomPrompt) -> Void
+    let onEditPrompt: ((VoiceInkCustomPrompt) -> Void)?
+    let onDeletePrompt: ((VoiceInkCustomPrompt) -> Void)?
 
-    @State private var draggingItem: CustomPrompt?
+    @State private var draggingItem: VoiceInkCustomPrompt?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -228,9 +229,9 @@ private struct ReorderablePromptGrid: View {
 
 // MARK: - Drop Delegate
 private struct PromptDropDelegate: DropDelegate {
-    let item: CustomPrompt
-    @Binding var prompts: [CustomPrompt]
-    @Binding var draggingItem: CustomPrompt?
+    let item: VoiceInkCustomPrompt
+    @Binding var prompts: [VoiceInkCustomPrompt]
+    @Binding var draggingItem: VoiceInkCustomPrompt?
 
     func dropEntered(info: DropInfo) {
         guard let draggingItem = draggingItem, draggingItem != item else { return }

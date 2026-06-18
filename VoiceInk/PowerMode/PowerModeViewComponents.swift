@@ -1,4 +1,5 @@
 import SwiftUI
+import VoiceInkCore
 
 struct VoiceInkButton: View {
     let title: String
@@ -99,7 +100,7 @@ struct ConfigurationRow: View {
     
     private let maxAppIconsToShow = 5
     
-    private var selectedPrompt: CustomPrompt? {
+    private var selectedPrompt: VoiceInkCustomPrompt? {
         guard let promptId = config.selectedPrompt,
               let uuid = UUID(uuidString: promptId) else { return nil }
         return enhancementService.allPrompts.first { $0.id == uuid }

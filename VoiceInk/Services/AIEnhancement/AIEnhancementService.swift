@@ -41,7 +41,7 @@ class AIEnhancementService: ObservableObject {
         }
     }
 
-    @Published var customPrompts: [CustomPrompt] {
+    @Published var customPrompts: [VoiceInkCustomPrompt] {
         didSet {
             VoiceInkCustomPromptStorage.savePrompts(customPrompts)
             refreshPromptDetectionCache()
@@ -59,15 +59,15 @@ class AIEnhancementService: ObservableObject {
     @Published var lastSystemMessageSent: String?
     @Published var lastUserMessageSent: String?
 
-    var activePrompt: CustomPrompt? {
+    var activePrompt: VoiceInkCustomPrompt? {
         allPrompts.first { $0.id == selectedPromptId }
     }
 
-    var allPrompts: [CustomPrompt] {
+    var allPrompts: [VoiceInkCustomPrompt] {
         return customPrompts
     }
 
-    private(set) var promptDetectionPrompts: [CustomPrompt] = []
+    private(set) var promptDetectionPrompts: [VoiceInkCustomPrompt] = []
 
     var hasPromptTriggerWords: Bool {
         !promptDetectionPrompts.isEmpty
@@ -386,7 +386,7 @@ class AIEnhancementService: ObservableObject {
     }
 
     func addPrompt(title: String, promptText: String, icon: PromptIcon = "doc.text.fill", description: String? = nil, triggerWords: [String] = [], useSystemInstructions: Bool = true) {
-        let newPrompt = CustomPrompt(title: title, promptText: promptText, icon: icon, description: description, isPredefined: false, triggerWords: triggerWords, useSystemInstructions: useSystemInstructions)
+        let newPrompt = VoiceInkCustomPrompt(title: title, promptText: promptText, icon: icon, description: description, isPredefined: false, triggerWords: triggerWords, useSystemInstructions: useSystemInstructions)
         applyPromptStoreState(
             VoiceInkCustomPromptPolicy.addingPrompt(
                 newPrompt,
@@ -396,7 +396,7 @@ class AIEnhancementService: ObservableObject {
         )
     }
 
-    func updatePrompt(_ prompt: CustomPrompt) {
+    func updatePrompt(_ prompt: VoiceInkCustomPrompt) {
         applyPromptStoreState(
             VoiceInkCustomPromptPolicy.updatingPrompt(
                 prompt,
@@ -406,7 +406,7 @@ class AIEnhancementService: ObservableObject {
         )
     }
 
-    func deletePrompt(_ prompt: CustomPrompt) {
+    func deletePrompt(_ prompt: VoiceInkCustomPrompt) {
         applyPromptStoreState(
             VoiceInkCustomPromptPolicy.deletingPrompt(
                 prompt,
@@ -416,7 +416,7 @@ class AIEnhancementService: ObservableObject {
         )
     }
 
-    func setActivePrompt(_ prompt: CustomPrompt) {
+    func setActivePrompt(_ prompt: VoiceInkCustomPrompt) {
         selectedPromptId = prompt.id
     }
 

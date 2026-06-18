@@ -4,7 +4,7 @@ import VoiceInkCore
 struct PromptEditorView: View {
     enum Mode {
         case add
-        case edit(CustomPrompt)
+        case edit(VoiceInkCustomPrompt)
         
         static func == (lhs: Mode, rhs: Mode) -> Bool {
             switch (lhs, rhs) {
@@ -256,7 +256,7 @@ struct PromptEditorView: View {
                 useSystemInstructions: useSystemInstructions
             )
         case .edit(let prompt):
-            let updatedPrompt = CustomPrompt(
+            let updatedPrompt = VoiceInkCustomPrompt(
                 id: prompt.id,
                 title: prompt.isPredefined ? prompt.title : title,
                 promptText: prompt.isPredefined ? prompt.promptText : promptText,

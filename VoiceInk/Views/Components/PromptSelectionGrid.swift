@@ -1,22 +1,23 @@
 import SwiftUI
+import VoiceInkCore
 
 /// A reusable grid component for selecting prompts with a plus button to add new ones
 struct PromptSelectionGrid: View {
     @EnvironmentObject private var enhancementService: AIEnhancementService
     
-    let prompts: [CustomPrompt]
+    let prompts: [VoiceInkCustomPrompt]
     let selectedPromptId: UUID?
-    let onPromptSelected: (CustomPrompt) -> Void
-    let onEditPrompt: ((CustomPrompt) -> Void)?
-    let onDeletePrompt: ((CustomPrompt) -> Void)?
+    let onPromptSelected: (VoiceInkCustomPrompt) -> Void
+    let onEditPrompt: ((VoiceInkCustomPrompt) -> Void)?
+    let onDeletePrompt: ((VoiceInkCustomPrompt) -> Void)?
     let onAddNewPrompt: (() -> Void)?
     
     init(
-        prompts: [CustomPrompt],
+        prompts: [VoiceInkCustomPrompt],
         selectedPromptId: UUID?,
-        onPromptSelected: @escaping (CustomPrompt) -> Void,
-        onEditPrompt: ((CustomPrompt) -> Void)? = nil,
-        onDeletePrompt: ((CustomPrompt) -> Void)? = nil,
+        onPromptSelected: @escaping (VoiceInkCustomPrompt) -> Void,
+        onEditPrompt: ((VoiceInkCustomPrompt) -> Void)? = nil,
+        onDeletePrompt: ((VoiceInkCustomPrompt) -> Void)? = nil,
         onAddNewPrompt: (() -> Void)? = nil
     ) {
         self.prompts = prompts
@@ -55,7 +56,7 @@ struct PromptSelectionGrid: View {
                     }
                     
                     if let onAddNewPrompt = onAddNewPrompt {
-                        CustomPrompt.addNewButton {
+                        VoiceInkCustomPrompt.addNewButton {
                             onAddNewPrompt()
                         }
                         .help("Add new prompt")

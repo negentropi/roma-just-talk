@@ -3,7 +3,6 @@ import SwiftUI
 import VoiceInkCore
 
 typealias PromptIcon = String
-typealias CustomPrompt = VoiceInkCustomPrompt
 
 extension PromptIcon {
     static let allCases: [PromptIcon] = [
@@ -78,8 +77,8 @@ extension PromptIcon {
 }
 
 // MARK: - UI Extensions
-extension CustomPrompt {
-    func promptIcon(isSelected: Bool, onTap: @escaping () -> Void, onEdit: ((CustomPrompt) -> Void)? = nil, onDelete: ((CustomPrompt) -> Void)? = nil) -> some View {
+extension VoiceInkCustomPrompt {
+    func promptIcon(isSelected: Bool, onTap: @escaping () -> Void, onEdit: ((VoiceInkCustomPrompt) -> Void)? = nil, onDelete: ((VoiceInkCustomPrompt) -> Void)? = nil) -> some View {
         VStack(spacing: 8) {
             ZStack {
                 // Dynamic background with blur effect

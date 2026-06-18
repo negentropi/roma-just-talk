@@ -2,10 +2,8 @@ import Foundation
 import SwiftUI
 import VoiceInkCore
 
-typealias PromptIcon = String
-
-extension PromptIcon {
-    static let allCases: [PromptIcon] = [
+enum PromptIcons {
+    static let allCases: [String] = [
         // Document & Text
         "doc.text.fill",
         "textbox",

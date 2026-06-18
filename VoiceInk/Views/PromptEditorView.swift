@@ -24,7 +24,7 @@ struct PromptEditorView: View {
     var onDismiss: (() -> Void)?
     @State private var title: String
     @State private var promptText: String
-    @State private var selectedIcon: PromptIcon
+    @State private var selectedIcon: String
     @State private var description: String
     @State private var triggerWords: [String]
     @State private var useSystemInstructions: Bool
@@ -406,7 +406,7 @@ struct TagLayout: Layout {
 
 // MARK: - Icon Picker
 struct IconPickerPopover: View {
-    @Binding var selectedIcon: PromptIcon
+    @Binding var selectedIcon: String
     @Binding var isPresented: Bool
     
     var body: some View {
@@ -416,7 +416,7 @@ struct IconPickerPopover: View {
         
         ScrollView {
             LazyVGrid(columns: columns, spacing: 14) {
-                ForEach(PromptIcon.allCases, id: \.self) { icon in
+                ForEach(PromptIcons.allCases, id: \.self) { icon in
                     Button(action: {
                         withAnimation(.spring(response: 0.2, dampingFraction: 0.7)) {
                             selectedIcon = icon

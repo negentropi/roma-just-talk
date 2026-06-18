@@ -193,6 +193,12 @@ reject_pattern \
   'public var customPrompt' \
   VoiceInkCore/Sources/VoiceInkCore/Mode.swift
 
+reject_pattern \
+  "removed macOS streaming migration wrapper stays deleted" \
+  'enum StreamingKeysMigration' \
+  VoiceInk \
+  iOS
+
 require_pattern \
   "workspace includes iOS project" \
   'location = "group:iOS/VoiceInk-ios.xcodeproj"' \

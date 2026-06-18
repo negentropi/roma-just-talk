@@ -134,7 +134,7 @@ struct VoiceInkApp: App {
 
         // 6. Initialize model state
         // Migration and refreshAllAvailableModels must run before loadCurrentTranscriptionModel so renamed keys are remapped and imported models are present when restoring the saved selection.
-        StreamingKeysMigration.run()
+        VoiceInkStreamingKeysMigration.run()
         whisperModelManager.createModelsDirectoryIfNeeded()
         whisperModelManager.loadAvailableModels()
         transcriptionModelManager.refreshAllAvailableModels()

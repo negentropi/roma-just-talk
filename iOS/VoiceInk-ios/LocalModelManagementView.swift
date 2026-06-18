@@ -44,19 +44,12 @@ struct ModelRowView: View {
     @State private var showingDeleteAlert = false
     @State private var showingDownloadConfirmation = false
 
-    private var isDownloaded: Bool {
-        model.isDownloaded(in: LocalModelManager.modelsDirectory)
-    }
-
-    private var isDownloading: Bool {
-        modelManager.isDownloading[model.id] == true
-    }
-
-    private var downloadProgress: VoiceInkWhisperModelDownloadProgress {
-        VoiceInkWhisperModelDownloadProgress.simple(
-            modelName: model.modelName,
-            isDownloading: isDownloading,
-            progress: modelManager.downloadProgress[model.id]
+    private var downloadState: VoiceInkWhisperModelDownloadState {
+        VoiceInkWhisperModelDownloadState.simple(
+            model: model,
+            modelsDirectory: LocalModelManager.modelsDirectory,
+            isDownloadingByModelID: modelManager.isDownloading,
+            downloadProgressByModelID: modelManager.downloadProgress
         )
     }
     
@@ -74,11 +67,11 @@ struct ModelRowView: View {
                 Spacer()
                 
                 // Action button where size used to be
-                if isDownloaded {
+                if downloadState.isDownloaded {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundColor(.green)
                         .font(.title2)
-                } else if isDownloading {
+                } else if downloadState.isDownloading {
                     Button(action: {
                         modelManager.cancelDownload(for: model)
                     }) {
@@ -98,25 +91,25 @@ struct ModelRowView: View {
             }
             
             // Progress indicator when downloading
-            if downloadProgress.isActive {
+            if downloadState.progress.isActive {
                 VStack(alignment: .leading, spacing: 6) {
                     HStack {
                         Text("Downloading...")
                             .font(.caption)
                             .foregroundColor(.blue)
                         Spacer()
-                        Text(downloadProgress.percentText)
+                        Text(downloadState.progress.percentText)
                             .font(.caption)
                             .foregroundColor(.blue)
                     }
                     
-                    ProgressView(value: downloadProgress.fraction)
+                    ProgressView(value: downloadState.progress.fraction)
                         .progressViewStyle(LinearProgressViewStyle(tint: .blue))
                 }
             }
         }
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-            if isDownloaded {
+            if downloadState.isDownloaded {
                 Button("Delete") {
                     showingDeleteAlert = true
                 }

@@ -522,7 +522,12 @@ reject_pattern \
 
 require_pattern \
   "shared Whisper model download progress policy lives in VoiceInkCore" \
-  'VoiceInkWhisperModelDownloadProgress' \
+  'VoiceInkWhisperModelDownloadProgress|VoiceInkWhisperModelDownloadState' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+
+require_pattern \
+  "shared Whisper model download state policy lives in VoiceInkCore" \
+  'VoiceInkWhisperModelDownloadState' \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
 
 require_pattern \
@@ -541,13 +546,29 @@ require_pattern \
   VoiceInk/Transcription/Whisper/WhisperModelManager.swift
 
 require_pattern \
-  "iOS local model management uses shared download progress and prompt copy" \
-  'VoiceInkWhisperModelDownloadProgress\.(simple|downloadConfirmationMessage)' \
+  "iOS local model management uses shared download state" \
+  'VoiceInkWhisperModelDownloadState\.simple' \
   iOS/VoiceInk-ios/LocalModelManagementView.swift
 
 require_pattern \
-  "iOS onboarding uses shared download progress and prompt copy" \
-  'VoiceInkWhisperModelDownloadProgress\.(simple|downloadConfirmationMessage|downloadActionTitle)' \
+  "iOS local model management uses shared download prompt copy" \
+  'VoiceInkWhisperModelDownloadProgress\.downloadConfirmationMessage' \
+  iOS/VoiceInk-ios/LocalModelManagementView.swift
+
+require_pattern \
+  "iOS onboarding uses shared download state" \
+  'VoiceInkWhisperModelDownloadState\.simple' \
+  iOS/VoiceInk-ios/OnboardingView.swift
+
+require_pattern \
+  "iOS onboarding uses shared download prompt copy" \
+  'VoiceInkWhisperModelDownloadProgress\.(downloadConfirmationMessage|downloadActionTitle)' \
+  iOS/VoiceInk-ios/OnboardingView.swift
+
+reject_pattern \
+  "iOS model download views avoid shell-only downloaded/progress state assembly" \
+  'model\.isDownloaded\(in:|modelManager\.isDownloading\[[^]]+\] == true|modelManager\.downloadProgress\[[^]]+\]' \
+  iOS/VoiceInk-ios/LocalModelManagementView.swift \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 reject_pattern \

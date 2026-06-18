@@ -109,15 +109,12 @@ struct ModelDownloadOnboardingView: View {
     
     var baseModel = VoiceInkWhisperModelFiles.baseModel
 
-    private var isBaseModelDownloaded: Bool {
-        baseModel.isDownloaded(in: LocalModelManager.modelsDirectory)
-    }
-
-    private var baseModelDownloadProgress: VoiceInkWhisperModelDownloadProgress {
-        VoiceInkWhisperModelDownloadProgress.simple(
-            modelName: baseModel.modelName,
-            isDownloading: modelManager.isDownloading[baseModel.id] == true,
-            progress: modelManager.downloadProgress[baseModel.id]
+    private var baseModelDownloadState: VoiceInkWhisperModelDownloadState {
+        VoiceInkWhisperModelDownloadState.simple(
+            model: baseModel,
+            modelsDirectory: LocalModelManager.modelsDirectory,
+            isDownloadingByModelID: modelManager.isDownloading,
+            downloadProgressByModelID: modelManager.downloadProgress
         )
     }
     
@@ -161,11 +158,11 @@ struct ModelDownloadOnboardingView: View {
                         
                         Spacer()
                         
-                        if isBaseModelDownloaded {
+                        if baseModelDownloadState.isDownloaded {
                             Image(systemName: "checkmark.circle.fill")
                                 .foregroundColor(.green)
                                 .font(.title)
-                        } else if baseModelDownloadProgress.isActive {
+                        } else if baseModelDownloadState.isDownloading {
                             ProgressView()
                                 .progressViewStyle(CircularProgressViewStyle())
                         } else {
@@ -175,19 +172,19 @@ struct ModelDownloadOnboardingView: View {
                         }
                     }
                     
-                    if baseModelDownloadProgress.isActive {
+                    if baseModelDownloadState.progress.isActive {
                         VStack(alignment: .leading, spacing: 6) {
                             HStack {
                                 Text("Downloading...")
                                     .font(.caption)
                                     .foregroundColor(.accentColor)
                                 Spacer()
-                                Text(baseModelDownloadProgress.percentText)
+                                Text(baseModelDownloadState.progress.percentText)
                                     .font(.caption.monospacedDigit())
                                     .foregroundColor(.accentColor)
                             }
                             
-                            ProgressView(value: baseModelDownloadProgress.fraction)
+                            ProgressView(value: baseModelDownloadState.progress.fraction)
                                 .progressViewStyle(LinearProgressViewStyle(tint: .accentColor))
                         }
                     }
@@ -202,12 +199,12 @@ struct ModelDownloadOnboardingView: View {
             
             // Bottom Action Buttons
             VStack(spacing: 16) {
-                if baseModelDownloadProgress.isActive {
+                if baseModelDownloadState.isDownloading {
                     Button("Downloading...") {}
                         .buttonStyle(OnboardingButtonStyle())
                         .disabled(true)
                     
-                } else if isBaseModelDownloaded {
+                } else if baseModelDownloadState.isDownloaded {
                     Button("Continue") {
                         withAnimation(.easeInOut(duration: 0.3)) {
                             currentStep = 2

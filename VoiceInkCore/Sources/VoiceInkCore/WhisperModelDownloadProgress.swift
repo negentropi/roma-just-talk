@@ -116,3 +116,38 @@ public struct VoiceInkWhisperModelDownloadProgress: Equatable, Sendable {
         min(max(value, 0), 1)
     }
 }
+
+public struct VoiceInkWhisperModelDownloadState: Equatable, Sendable {
+    public let isDownloaded: Bool
+    public let progress: VoiceInkWhisperModelDownloadProgress
+
+    public var isDownloading: Bool {
+        progress.isActive
+    }
+
+    public init(
+        isDownloaded: Bool,
+        progress: VoiceInkWhisperModelDownloadProgress
+    ) {
+        self.isDownloaded = isDownloaded
+        self.progress = progress
+    }
+
+    public static func simple(
+        model: VoiceInkWhisperModelFileSpec,
+        modelsDirectory: URL,
+        isDownloadingByModelID: [String: Bool],
+        downloadProgressByModelID: [String: Double],
+        fileManager: FileManager = .default
+    ) -> VoiceInkWhisperModelDownloadState {
+        let isDownloading = isDownloadingByModelID[model.id] == true
+        return VoiceInkWhisperModelDownloadState(
+            isDownloaded: model.isDownloaded(in: modelsDirectory, fileManager: fileManager),
+            progress: VoiceInkWhisperModelDownloadProgress.simple(
+                modelName: model.modelName,
+                isDownloading: isDownloading,
+                progress: downloadProgressByModelID[model.id]
+            )
+        )
+    }
+}

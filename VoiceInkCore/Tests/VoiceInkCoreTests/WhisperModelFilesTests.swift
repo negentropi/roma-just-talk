@@ -286,6 +286,38 @@ final class WhisperModelFilesTests: XCTestCase {
         )
     }
 
+    func testSimpleDownloadStateCombinesIOSDownloadedAndProgressState() throws {
+        let baseDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.WhisperModelDownloadStateTests.\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: baseDirectory) }
+
+        let modelsDirectory = try VoiceInkWhisperModelFiles.createModelsDirectory(in: baseDirectory)
+        let model = VoiceInkWhisperModelFiles.baseModel
+
+        let missingState = VoiceInkWhisperModelDownloadState.simple(
+            model: model,
+            modelsDirectory: modelsDirectory,
+            isDownloadingByModelID: [model.id: true],
+            downloadProgressByModelID: [model.id: 0.5]
+        )
+
+        XCTAssertFalse(missingState.isDownloaded)
+        XCTAssertTrue(missingState.isDownloading)
+        XCTAssertEqual(missingState.progress.fraction, 0.5)
+
+        try Data().write(to: model.fileURL(in: modelsDirectory))
+        let downloadedState = VoiceInkWhisperModelDownloadState.simple(
+            model: model,
+            modelsDirectory: modelsDirectory,
+            isDownloadingByModelID: [:],
+            downloadProgressByModelID: [model.id: 0.5]
+        )
+
+        XCTAssertTrue(downloadedState.isDownloaded)
+        XCTAssertFalse(downloadedState.isDownloading)
+        XCTAssertEqual(downloadedState.progress.phase, .idle)
+    }
+
     func testMacOSDownloadProgressUsesMainAndCoreMLKeys() {
         let startingProgress = VoiceInkWhisperModelDownloadProgress.macOS(
             modelName: "ggml-base",

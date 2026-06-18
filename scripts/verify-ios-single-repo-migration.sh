@@ -439,6 +439,26 @@ reject_pattern \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift \
   VoiceInk/Transcription/Cloud/CloudProvider.swift
 
+require_pattern \
+  "shared custom cloud model backup record owns export/import shape" \
+  'struct VoiceInkCustomCloudModelBackup' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
+
+require_pattern \
+  "macOS backup file uses shared custom cloud model backup record" \
+  'VoiceInkCustomCloudModelBackup' \
+  VoiceInk/Services/BackupTypes.swift
+
+require_pattern \
+  "macOS custom model export adapts to shared backup record" \
+  'VoiceInkCustomCloudModelBackup\(model: \$0\)' \
+  VoiceInk/Services/ImportExportService.swift
+
+reject_pattern \
+  "macOS backup types avoid shell-only custom model backup policy" \
+  'struct +CustomModelBackup|apiEndpoint\.trimmingCharacters|modelName\.trimmingCharacters|if let apiKey, !apiKey\.isEmpty' \
+  VoiceInk/Services/BackupTypes.swift
+
 reject_pattern \
   "macOS and iOS filler-word settings use shared draft policy" \
   'VoiceInkFillerWords\.normalizedWord' \

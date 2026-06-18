@@ -300,7 +300,7 @@ enum BackupImporter {
     }
 
     @MainActor
-    private static func importCustomModels(_ models: [CustomModelBackup]?, transcriptionModelManager: TranscriptionModelManager) {
+    private static func importCustomModels(_ models: [VoiceInkCustomCloudModelBackup]?, transcriptionModelManager: TranscriptionModelManager) {
         guard let models else {
             print("No custom models found in the imported file.")
             return

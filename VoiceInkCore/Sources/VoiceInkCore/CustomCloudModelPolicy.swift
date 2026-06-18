@@ -32,6 +32,55 @@ public struct VoiceInkCustomCloudModelIdentity: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkCustomCloudModelBackup: Codable, Equatable, Sendable {
+    public let id: UUID
+    public let name: String
+    public let displayName: String
+    public let description: String
+    public let apiEndpoint: String
+    public let modelName: String
+    public let isMultilingualModel: Bool
+    public let supportedLanguages: [String: String]
+    public let apiKey: String?
+
+    public init(
+        id: UUID,
+        name: String,
+        displayName: String,
+        description: String,
+        apiEndpoint: String,
+        modelName: String,
+        isMultilingualModel: Bool,
+        supportedLanguages: [String: String],
+        apiKey: String?
+    ) {
+        self.id = id
+        self.name = name
+        self.displayName = displayName
+        self.description = description
+        self.apiEndpoint = apiEndpoint
+        self.modelName = modelName
+        self.isMultilingualModel = isMultilingualModel
+        self.supportedLanguages = supportedLanguages
+        self.apiKey = apiKey
+    }
+
+    public var normalizedAPIEndpointForImport: String {
+        apiEndpoint.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    public var normalizedModelNameForImport: String {
+        modelName.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    public var apiKeyForImport: String? {
+        guard let apiKey, !apiKey.isEmpty else {
+            return nil
+        }
+        return apiKey
+    }
+}
+
 public enum VoiceInkCustomCloudModelPolicy {
     public static func generatedName(fromDisplayName displayName: String) -> String {
         displayName.lowercased().replacingOccurrences(of: " ", with: "-")

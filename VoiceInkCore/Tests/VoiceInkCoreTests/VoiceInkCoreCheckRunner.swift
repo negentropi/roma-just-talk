@@ -86,6 +86,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "CustomCloudModelPolicyTests.testRequiredFieldPolicyMatchesMacOSButtonEnablement", run: { CustomCloudModelPolicyTests().testRequiredFieldPolicyMatchesMacOSButtonEnablement() }),
             VoiceInkCoreCheck(name: "CustomCloudModelPolicyTests.testValidationReturnsExistingMacOSErrorsInOrder", run: { CustomCloudModelPolicyTests().testValidationReturnsExistingMacOSErrorsInOrder() }),
             VoiceInkCoreCheck(name: "CustomCloudModelPolicyTests.testValidationRejectsDuplicateNameUnlessEditingSameModel", run: { CustomCloudModelPolicyTests().testValidationRejectsDuplicateNameUnlessEditingSameModel() }),
+            VoiceInkCoreCheck(name: "CustomCloudModelPolicyTests.testBackupRecordPreservesExistingCodableShapeAndImportNormalization", run: { try CustomCloudModelPolicyTests().testBackupRecordPreservesExistingCodableShapeAndImportNormalization() }),
+            VoiceInkCoreCheck(name: "CustomCloudModelPolicyTests.testBackupRecordSkipsOnlyMissingOrEmptyAPIKeyOnImport", run: { CustomCloudModelPolicyTests().testBackupRecordSkipsOnlyMissingOrEmptyAPIKeyOnImport() }),
             VoiceInkCoreCheck(name: "CustomPromptTests.testCustomPromptDefaultsMatchExistingMacOSPromptRecord", run: { CustomPromptTests().testCustomPromptDefaultsMatchExistingMacOSPromptRecord() }),
             VoiceInkCoreCheck(name: "CustomPromptTests.testCustomPromptDecodesMissingUseSystemInstructionsAsTrue", run: { try CustomPromptTests().testCustomPromptDecodesMissingUseSystemInstructionsAsTrue() }),
             VoiceInkCoreCheck(name: "CustomPromptTests.testCustomPromptFinalPromptTextRespectsSystemInstructionFlag", run: { CustomPromptTests().testCustomPromptFinalPromptTextRespectsSystemInstructionFlag() }),

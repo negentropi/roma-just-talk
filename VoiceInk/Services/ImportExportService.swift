@@ -128,7 +128,7 @@ class ImportExportService {
         })
 
         // Export custom models
-        let customModels = CustomCloudModelManager.shared.customModels.map { CustomModelBackup(model: $0) }
+        let customModels = CustomCloudModelManager.shared.customModels.map { VoiceInkCustomCloudModelBackup(model: $0) }
 
         // Fetch vocabulary words from SwiftData
         var exportedDictionaryItems: [WordBackup]? = nil

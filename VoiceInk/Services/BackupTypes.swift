@@ -24,27 +24,19 @@ enum BackupCategory: String, CaseIterable, Hashable {
     }
 }
 
-struct CustomModelBackup: Codable {
-    let id: UUID
-    let name: String
-    let displayName: String
-    let description: String
-    let apiEndpoint: String
-    let modelName: String
-    let isMultilingualModel: Bool
-    let supportedLanguages: [String: String]
-    let apiKey: String?
-
+extension VoiceInkCustomCloudModelBackup {
     init(model: CustomCloudModel) {
-        self.id = model.id
-        self.name = model.name
-        self.displayName = model.displayName
-        self.description = model.description
-        self.apiEndpoint = model.apiEndpoint
-        self.modelName = model.modelName
-        self.isMultilingualModel = model.isMultilingualModel
-        self.supportedLanguages = model.supportedLanguages
-        self.apiKey = nil
+        self.init(
+            id: model.id,
+            name: model.name,
+            displayName: model.displayName,
+            description: model.description,
+            apiEndpoint: model.apiEndpoint,
+            modelName: model.modelName,
+            isMultilingualModel: model.isMultilingualModel,
+            supportedLanguages: model.supportedLanguages,
+            apiKey: nil
+        )
     }
 
     func makeModel() -> CustomCloudModel {
@@ -53,13 +45,13 @@ struct CustomModelBackup: Codable {
             name: name,
             displayName: displayName,
             description: description,
-            apiEndpoint: apiEndpoint.trimmingCharacters(in: .whitespacesAndNewlines),
-            modelName: modelName.trimmingCharacters(in: .whitespacesAndNewlines),
+            apiEndpoint: normalizedAPIEndpointForImport,
+            modelName: normalizedModelNameForImport,
             isMultilingual: isMultilingualModel,
             supportedLanguages: supportedLanguages
         )
 
-        if let apiKey, !apiKey.isEmpty {
+        if let apiKey = apiKeyForImport {
             APIKeyManager.shared.saveCustomModelAPIKey(apiKey, forModelId: id)
         }
 
@@ -130,13 +122,13 @@ struct BackupFile: Codable {
     let wordReplacements: [String: String]?
     let generalSettings: GeneralBackup?
     let customEmojis: [String]?
-    let customCloudModels: [CustomModelBackup]?
+    let customCloudModels: [VoiceInkCustomCloudModelBackup]?
 
     private enum CodingKeys: String, CodingKey {
         case version, customPrompts, powerModeConfigs, powerModeShortcuts, vocabularyWords, wordReplacements, generalSettings, customEmojis, customCloudModels
     }
 
-    init(version: String, customPrompts: [VoiceInkCustomPrompt], powerModeConfigs: [PowerModeConfig], powerModeShortcuts: [String: ShortcutBackup]?, vocabularyWords: [WordBackup]?, wordReplacements: [String: String]?, generalSettings: GeneralBackup?, customEmojis: [String]?, customCloudModels: [CustomModelBackup]?) {
+    init(version: String, customPrompts: [VoiceInkCustomPrompt], powerModeConfigs: [PowerModeConfig], powerModeShortcuts: [String: ShortcutBackup]?, vocabularyWords: [WordBackup]?, wordReplacements: [String: String]?, generalSettings: GeneralBackup?, customEmojis: [String]?, customCloudModels: [VoiceInkCustomCloudModelBackup]?) {
         self.version = version
         self.customPrompts = customPrompts
         self.powerModeConfigs = powerModeConfigs
@@ -158,6 +150,6 @@ struct BackupFile: Codable {
         wordReplacements = try container.decodeIfPresent([String: String].self, forKey: .wordReplacements)
         generalSettings = try container.decodeIfPresent(GeneralBackup.self, forKey: .generalSettings)
         customEmojis = try container.decodeIfPresent([String].self, forKey: .customEmojis)
-        customCloudModels = try container.decodeIfPresent([CustomModelBackup].self, forKey: .customCloudModels)
+        customCloudModels = try container.decodeIfPresent([VoiceInkCustomCloudModelBackup].self, forKey: .customCloudModels)
     }
 }

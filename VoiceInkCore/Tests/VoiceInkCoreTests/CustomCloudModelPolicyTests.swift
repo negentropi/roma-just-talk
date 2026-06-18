@@ -104,4 +104,53 @@ final class CustomCloudModelPolicyTests: XCTestCase {
             []
         )
     }
+
+    func testBackupRecordPreservesExistingCodableShapeAndImportNormalization() throws {
+        let id = UUID(uuidString: "E31E4D7A-437B-4BD3-A4B5-9624F38F3BBE")!
+        let backup = VoiceInkCustomCloudModelBackup(
+            id: id,
+            name: "custom",
+            displayName: "Custom",
+            description: "Transcribes audio",
+            apiEndpoint: " https://api.example.com/v1/audio/transcriptions ",
+            modelName: " whisper-1 ",
+            isMultilingualModel: true,
+            supportedLanguages: ["en": "English"],
+            apiKey: " "
+        )
+
+        XCTAssertEqual(backup.normalizedAPIEndpointForImport, "https://api.example.com/v1/audio/transcriptions")
+        XCTAssertEqual(backup.normalizedModelNameForImport, "whisper-1")
+        XCTAssertEqual(backup.apiKeyForImport, Optional(" "))
+
+        let data = try JSONEncoder().encode(backup)
+        let decoded = try JSONDecoder().decode(VoiceInkCustomCloudModelBackup.self, from: data)
+        XCTAssertEqual(decoded, backup)
+    }
+
+    func testBackupRecordSkipsOnlyMissingOrEmptyAPIKeyOnImport() {
+        XCTAssertNil(VoiceInkCustomCloudModelBackup(
+            id: UUID(),
+            name: "custom",
+            displayName: "Custom",
+            description: "",
+            apiEndpoint: "",
+            modelName: "",
+            isMultilingualModel: false,
+            supportedLanguages: [:],
+            apiKey: nil
+        ).apiKeyForImport)
+
+        XCTAssertNil(VoiceInkCustomCloudModelBackup(
+            id: UUID(),
+            name: "custom",
+            displayName: "Custom",
+            description: "",
+            apiEndpoint: "",
+            modelName: "",
+            isMultilingualModel: false,
+            supportedLanguages: [:],
+            apiKey: ""
+        ).apiKeyForImport)
+    }
 }

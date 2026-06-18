@@ -9,9 +9,7 @@ class AudioProcessor {
     enum AudioProcessingError: LocalizedError {
         case invalidAudioFile
         case conversionFailed
-        case exportFailed
         case unsupportedFormat
-        case sampleExtractionFailed
         
         var errorDescription: String? {
             switch self {
@@ -19,12 +17,8 @@ class AudioProcessor {
                 return "The audio file is invalid or corrupted"
             case .conversionFailed:
                 return "Failed to convert the audio format"
-            case .exportFailed:
-                return "Failed to export the processed audio"
             case .unsupportedFormat:
                 return "The audio format is not supported"
-            case .sampleExtractionFailed:
-                return "Failed to extract audio samples"
             }
         }
     }

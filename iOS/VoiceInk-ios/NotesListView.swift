@@ -106,14 +106,32 @@ struct NotesListView: View {
 
     private var sectionHeader: some View {
         HStack {
-            Text("Recent")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Recent")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                Text(dashboardSummaryText)
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+            }
             Spacer()
             Text("\(filteredNotes.count)")
                 .font(.caption)
                 .foregroundStyle(.tertiary)
         }
+    }
+
+    private var dashboardSummary: VoiceInkDashboardMetricsSummary {
+        var accumulator = VoiceInkDashboardMetricsAccumulator()
+        for note in filteredNotes {
+            accumulator.add(note)
+        }
+        return accumulator.summary(totalCount: filteredNotes.count)
+    }
+
+    private var dashboardSummaryText: String {
+        let summary = dashboardSummary
+        return "\(summary.totalWords) words - \(VoiceInkDurationPresentation.minutesSeconds(summary.totalDuration)) audio"
     }
 
     private var emptyState: some View {

@@ -35,6 +35,28 @@ final class VoiceInkIOSTests: XCTestCase {
         XCTAssertFalse(mode.isPostProcessingEnabled)
     }
 
+    func testTranscriptionFeedsSharedDashboardMetrics() throws {
+        let note = Transcription(
+            text: "raw words ignored",
+            duration: 5,
+            enhancedText: "enhanced words count here",
+            transcriptionDuration: 2,
+            enhancementDuration: 1
+        )
+
+        var accumulator = VoiceInkDashboardMetricsAccumulator()
+        accumulator.add(note)
+
+        XCTAssertEqual(
+            accumulator.summary(totalCount: 1),
+            VoiceInkDashboardMetricsSummary(
+                totalCount: 1,
+                totalWords: 4,
+                totalDuration: 5
+            )
+        )
+    }
+
     func testRetryServiceMarksNoteFailedWhenRetranscriptionFails() async throws {
         let audioFileURL = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString)

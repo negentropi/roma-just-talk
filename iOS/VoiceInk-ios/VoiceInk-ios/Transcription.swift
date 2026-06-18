@@ -3,7 +3,7 @@ import SwiftData
 import VoiceInkCore
 
 @Model
-final class Transcription: VoiceInkMutableTranscriptionRecord, VoiceInkStoredAudioRecord, VoiceInkSessionMetricSource, VoiceInkPerformanceRecord {
+final class Transcription: VoiceInkMutableTranscriptionRecord, VoiceInkStoredAudioRecord, VoiceInkSessionMetricSource, VoiceInkPerformanceRecord, VoiceInkDashboardMetricRecord {
     var id: UUID
     var text: String
     var enhancedText: String?
@@ -44,4 +44,12 @@ extension Transcription {
     var performanceEnhancementModelName: String? { aiEnhancementModelName }
     var performanceEnhancementDuration: TimeInterval? { enhancementDuration }
     var performanceEnhancedText: String? { enhancedText }
+
+    var dashboardWordCount: Int {
+        VoiceInkSessionMetricPolicy.values(for: self).wordCount
+    }
+
+    var dashboardAudioDuration: TimeInterval {
+        VoiceInkSessionMetricPolicy.values(for: self).audioDuration
+    }
 }

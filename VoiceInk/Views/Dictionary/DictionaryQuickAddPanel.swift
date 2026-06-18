@@ -331,7 +331,7 @@ struct DictionaryQuickAddView: View {
 
     private func submitReplacement() {
         let original = originalInput.trimmingCharacters(in: .whitespacesAndNewlines)
-        let replacement = replacementInput.trimmingCharacters(in: .whitespacesAndNewlines)
+        let replacement = replacementInput
         guard VoiceInkDictionaryPolicy.canSaveWordReplacementDraft(
             original: original,
             replacement: replacement

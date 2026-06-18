@@ -67,6 +67,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - AI-enhancement timeout/retry storage keys, defaults, and runtime preference reads; platform shells still own request execution, provider transport, logging, and UI controls
 - AI-enhancement selected-provider and per-provider selected-model preference storage, including legacy selected-provider repair; platform shells still own provider execution and dynamic model discovery
 - transcription auto-cleanup enabled/retention preference storage and cutoff-date policy; platform shells still own SwiftData deletion and settings UI bindings
+- audio-file auto-cleanup enabled/retention preference storage and cutoff-date policy; platform shells still own SwiftData queries, file deletion, timers, and settings UI bindings
 - NaturalLanguage transcript paragraph formatting policy plus text-formatting storage key/default; platform shells still own the setting UI and when formatting runs
 - word-replacement ordering and text application policy; platform shells still own dictionary storage
 - vocabulary, word-replacement, backup dictionary insert, word-replacement edit planning, and dictionary draft submit rules; platform shells still own dictionary storage and persistence errors
@@ -169,6 +170,7 @@ Current macOS consumers of shared remote transport:
 - macOS `AIService`, `PowerModeConfig`, `PowerModeConfigView`, and `SystemInfoService` use `VoiceInkAIEnhancementProviderPreference` for selected AI provider/model storage; macOS still owns API-key lookup, Ollama/OpenRouter dynamic state, and provider execution.
 - macOS `AIEnhancementService` delegates selected-text, clipboard, current-window, custom-vocabulary prompt text, and custom-vocabulary tag assembly to `VoiceInkAIEnhancementPromptBuilder`/`VoiceInkAIEnhancementVocabularyContext`; macOS still owns Accessibility, pasteboard, screen capture, and SwiftData vocabulary collection.
 - macOS `TranscriptionAutoCleanupService`, `ImportExportService`, `BackupImporter`, `SystemInfoService`, and app startup read/write transcription auto-cleanup preferences through `VoiceInkTranscriptionAutoCleanupPreference`; settings UI still binds directly through `@AppStorage`.
+- macOS `AudioCleanupManager`, audio cleanup settings, backup import/export, app defaults, and system diagnostics read/write audio-file cleanup preferences through `VoiceInkAudioCleanupPreference`; macOS still owns transcript queries, file deletion, cleanup timers, and the UI.
 - iOS retry post-processing inherits `VoiceInkAIReasoningConfig` through `VoiceInkPostProcessingClient`, aligning OpenAI-compatible reasoning controls with macOS enhancement requests.
 
 Current iOS consumers of shared remote transport:

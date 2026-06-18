@@ -16,6 +16,8 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkUserDefaultsKey.isVADEnabled, "IsVADEnabled")
         XCTAssertEqual(VoiceInkUserDefaultsKey.isTranscriptionCleanupEnabled, "IsTranscriptionCleanupEnabled")
         XCTAssertEqual(VoiceInkUserDefaultsKey.transcriptionRetentionMinutes, "TranscriptionRetentionMinutes")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.isAudioCleanupEnabled, "IsAudioCleanupEnabled")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.audioRetentionPeriodDays, "AudioRetentionPeriod")
         XCTAssertEqual(VoiceInkUserDefaultsKey.skipShortEnhancement, "SkipShortEnhancement")
         XCTAssertEqual(VoiceInkUserDefaultsKey.shortEnhancementWordThreshold, "ShortEnhancementWordThreshold")
         XCTAssertEqual(VoiceInkUserDefaultsKey.enhancementTimeoutSeconds, "EnhancementTimeoutSeconds")
@@ -58,6 +60,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
 
     func testSharedPreferenceDefaultsPreserveExistingCleanupRetention() {
         XCTAssertEqual(VoiceInkPreferenceDefault.transcriptionRetentionMinutes, 24 * 60)
+        XCTAssertEqual(VoiceInkPreferenceDefault.audioRetentionDays, 7)
     }
 
     func testSharedPreferenceDefaultsPreserveExistingShortEnhancementPolicy() {
@@ -519,6 +522,44 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(configuration.cutoffDate(from: referenceDate), Date(timeIntervalSince1970: 1_800))
     }
 
+    func testAudioCleanupPreferenceUsesSharedDefaultsWhenUnset() {
+        withIsolatedDefaults { defaults in
+            let configuration = VoiceInkAudioCleanupPreference.current(from: defaults)
+
+            XCTAssertFalse(configuration.isEnabled)
+            XCTAssertEqual(configuration.retentionDays, VoiceInkPreferenceDefault.audioRetentionDays)
+            XCTAssertEqual(configuration.effectiveRetentionDays, VoiceInkPreferenceDefault.audioRetentionDays)
+        }
+    }
+
+    func testAudioCleanupPreferenceReadsStoredValues() {
+        withIsolatedDefaults { defaults in
+            VoiceInkAudioCleanupPreference.saveIsEnabled(true, to: defaults)
+            VoiceInkAudioCleanupPreference.saveRetentionDays(14, to: defaults)
+
+            let configuration = VoiceInkAudioCleanupPreference.current(from: defaults)
+
+            XCTAssertTrue(configuration.isEnabled)
+            XCTAssertEqual(configuration.retentionDays, 14)
+            XCTAssertEqual(configuration.effectiveRetentionDays, 14)
+        }
+    }
+
+    func testAudioCleanupConfigurationBuildsDayCutoffDate() {
+        let configuration = VoiceInkAudioCleanupConfiguration(isEnabled: true, retentionDays: 7)
+        let referenceDate = Date(timeIntervalSince1970: 7 * 86_400)
+
+        XCTAssertEqual(configuration.cutoffDate(from: referenceDate), Date(timeIntervalSince1970: 0))
+    }
+
+    func testAudioCleanupConfigurationClampsNegativeRetentionForCutoff() {
+        let configuration = VoiceInkAudioCleanupConfiguration(isEnabled: true, retentionDays: -1)
+        let referenceDate = Date(timeIntervalSince1970: 1_000)
+
+        XCTAssertEqual(configuration.effectiveRetentionDays, 0)
+        XCTAssertEqual(configuration.cutoffDate(from: referenceDate), referenceDate)
+    }
+
     func testSharedPreferenceResetClearsCoreUserSettings() {
         withIsolatedDefaults { defaults in
             let mode = Mode.defaultLocalWhisper()
@@ -547,6 +588,8 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             defaults.set(false, forKey: VoiceInkUserDefaultsKey.enhancementRetryOnTimeout)
             VoiceInkTranscriptionAutoCleanupPreference.saveIsEnabled(true, to: defaults)
             VoiceInkTranscriptionAutoCleanupPreference.saveRetentionMinutes(15, to: defaults)
+            VoiceInkAudioCleanupPreference.saveIsEnabled(true, to: defaults)
+            VoiceInkAudioCleanupPreference.saveRetentionDays(30, to: defaults)
             let customPrompt = VoiceInkCustomPrompt(title: "Custom", promptText: "Clean this")
             VoiceInkCustomPromptStorage.savePrompts([customPrompt], to: defaults)
             VoiceInkCustomPromptStorage.saveSelectedPromptId(customPrompt.id, to: defaults)
@@ -608,6 +651,13 @@ final class UserDefaultsPreferencesTests: XCTestCase {
                 VoiceInkTranscriptionAutoCleanupConfiguration(
                     isEnabled: false,
                     retentionMinutes: VoiceInkPreferenceDefault.transcriptionRetentionMinutes
+                )
+            )
+            XCTAssertEqual(
+                VoiceInkAudioCleanupPreference.current(from: defaults),
+                VoiceInkAudioCleanupConfiguration(
+                    isEnabled: false,
+                    retentionDays: VoiceInkPreferenceDefault.audioRetentionDays
                 )
             )
             XCTAssertTrue(VoiceInkCustomPromptStorage.loadPrompts(from: defaults).isEmpty)

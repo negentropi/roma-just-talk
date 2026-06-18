@@ -51,8 +51,8 @@ enum AppDefaults {
             // Cleanup
             VoiceInkUserDefaultsKey.isTranscriptionCleanupEnabled: false,
             VoiceInkUserDefaultsKey.transcriptionRetentionMinutes: VoiceInkPreferenceDefault.transcriptionRetentionMinutes,
-            "IsAudioCleanupEnabled": false,
-            "AudioRetentionPeriod": 7,
+            VoiceInkUserDefaultsKey.isAudioCleanupEnabled: false,
+            VoiceInkUserDefaultsKey.audioRetentionPeriodDays: VoiceInkPreferenceDefault.audioRetentionDays,
 
             // UI & Behavior
             "IsMenuBarOnly": true,

@@ -14,6 +14,8 @@ public enum VoiceInkUserDefaultsKey {
     public static let isVADEnabled = "IsVADEnabled"
     public static let isTranscriptionCleanupEnabled = "IsTranscriptionCleanupEnabled"
     public static let transcriptionRetentionMinutes = "TranscriptionRetentionMinutes"
+    public static let isAudioCleanupEnabled = "IsAudioCleanupEnabled"
+    public static let audioRetentionPeriodDays = "AudioRetentionPeriod"
     public static let skipShortEnhancement = "SkipShortEnhancement"
     public static let shortEnhancementWordThreshold = "ShortEnhancementWordThreshold"
     public static let enhancementTimeoutSeconds = "EnhancementTimeoutSeconds"
@@ -43,6 +45,7 @@ public enum VoiceInkPreferenceDefault {
     public static let lowercaseTranscription = false
     public static let removeFillerWords = true
     public static let transcriptionRetentionMinutes = 24 * 60
+    public static let audioRetentionDays = 7
     public static let skipShortEnhancement = true
     public static let shortEnhancementWordThreshold = 3
     public static let enhancementTimeoutSeconds = 7
@@ -396,6 +399,58 @@ public enum VoiceInkTranscriptionAutoCleanupPreference {
     }
 }
 
+public struct VoiceInkAudioCleanupConfiguration: Equatable, Sendable {
+    public let isEnabled: Bool
+    public let retentionDays: Int
+
+    public init(isEnabled: Bool, retentionDays: Int) {
+        self.isEnabled = isEnabled
+        self.retentionDays = retentionDays
+    }
+
+    public var effectiveRetentionDays: Int {
+        max(retentionDays, 0)
+    }
+
+    public func cutoffDate(
+        from referenceDate: Date = Date(),
+        calendar: Calendar = .current
+    ) -> Date {
+        calendar.date(byAdding: .day, value: -effectiveRetentionDays, to: referenceDate) ?? referenceDate
+    }
+}
+
+public enum VoiceInkAudioCleanupPreference {
+    public static func current(from defaults: UserDefaults = .standard) -> VoiceInkAudioCleanupConfiguration {
+        VoiceInkAudioCleanupConfiguration(
+            isEnabled: isEnabled(from: defaults),
+            retentionDays: retentionDays(from: defaults)
+        )
+    }
+
+    public static func isEnabled(from defaults: UserDefaults = .standard) -> Bool {
+        defaults.bool(forKey: VoiceInkUserDefaultsKey.isAudioCleanupEnabled)
+    }
+
+    public static func saveIsEnabled(_ isEnabled: Bool, to defaults: UserDefaults = .standard) {
+        defaults.set(isEnabled, forKey: VoiceInkUserDefaultsKey.isAudioCleanupEnabled)
+    }
+
+    public static func retentionDays(from defaults: UserDefaults = .standard) -> Int {
+        defaults.object(forKey: VoiceInkUserDefaultsKey.audioRetentionPeriodDays) as? Int
+            ?? VoiceInkPreferenceDefault.audioRetentionDays
+    }
+
+    public static func saveRetentionDays(_ days: Int, to defaults: UserDefaults = .standard) {
+        defaults.set(days, forKey: VoiceInkUserDefaultsKey.audioRetentionPeriodDays)
+    }
+
+    public static func clear(from defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.isAudioCleanupEnabled)
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.audioRetentionPeriodDays)
+    }
+}
+
 public enum VoiceInkSharedPreferenceReset {
     public static func clearCoreUserSettings(
         from defaults: UserDefaults = .standard,
@@ -416,6 +471,7 @@ public enum VoiceInkSharedPreferenceReset {
         VoiceInkDynamicAIProviderPreference.clear(from: defaults)
         VoiceInkAIEnhancementRequestPreference.clear(from: defaults)
         VoiceInkTranscriptionAutoCleanupPreference.clear(from: defaults)
+        VoiceInkAudioCleanupPreference.clear(from: defaults)
         VoiceInkCustomPromptStorage.clear(from: defaults)
     }
 }

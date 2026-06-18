@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import VoiceInkCore
 
 /// A utility class that manages automatic cleanup of audio files while preserving transcript data
 class AudioCleanupManager {
@@ -7,8 +8,6 @@ class AudioCleanupManager {
 
     private var cleanupTimer: Timer?
     
-    // Default cleanup settings
-    private let defaultRetentionDays = 7
     private let cleanupCheckInterval: TimeInterval = 86400 // Check once per day (in seconds)
     
     private init() {}
@@ -39,14 +38,8 @@ class AudioCleanupManager {
     
     /// Get information about the files that would be cleaned up
     func getCleanupInfo(modelContext: ModelContext) async -> (fileCount: Int, totalSize: Int64, transcriptions: [Transcription]) {
-        // Get retention period from UserDefaults
-        let effectiveRetentionDays = UserDefaults.standard.integer(forKey: "AudioRetentionPeriod")
-
-        // Calculate the cutoff date
-        let calendar = Calendar.current
-        guard let cutoffDate = calendar.date(byAdding: .day, value: -effectiveRetentionDays, to: Date()) else {
-            return (0, 0, [])
-        }
+        let cleanupConfiguration = VoiceInkAudioCleanupPreference.current()
+        let cutoffDate = cleanupConfiguration.cutoffDate()
 
         do {
             // Execute SwiftData operations on the main thread
@@ -86,18 +79,10 @@ class AudioCleanupManager {
     
     /// Perform the cleanup operation
     private func performCleanup(modelContext: ModelContext) async {
-        // Get retention period from UserDefaults
-        let effectiveRetentionDays = UserDefaults.standard.integer(forKey: "AudioRetentionPeriod")
+        let cleanupConfiguration = VoiceInkAudioCleanupPreference.current()
+        guard cleanupConfiguration.isEnabled else { return }
 
-        // Check if automatic cleanup is enabled
-        let isCleanupEnabled = UserDefaults.standard.bool(forKey: "IsAudioCleanupEnabled")
-        guard isCleanupEnabled else { return }
-
-        // Calculate the cutoff date
-        let calendar = Calendar.current
-        guard let cutoffDate = calendar.date(byAdding: .day, value: -effectiveRetentionDays, to: Date()) else {
-            return
-        }
+        let cutoffDate = cleanupConfiguration.cutoffDate()
 
         do {
             // Execute SwiftData operations on the main thread

@@ -106,9 +106,6 @@ class ImportExportService {
     static let shared = ImportExportService()
     private let currentSettingsVersion: String
 
-    private let keyIsAudioCleanupEnabled = "IsAudioCleanupEnabled"
-    private let keyAudioRetentionPeriod = "AudioRetentionPeriod"
-
     private init() {
         if let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String {
             self.currentSettingsVersion = version
@@ -149,6 +146,7 @@ class ImportExportService {
 
         let punctuationCleanupMode = PunctuationCleanupMode.current()
         let transcriptionCleanup = VoiceInkTranscriptionAutoCleanupPreference.current()
+        let audioCleanup = VoiceInkAudioCleanupPreference.current()
         let rollingBufferConfiguration = RollingBufferPreloadSettings.configuration()
         let perModelPreloadSettings = exportPerModelRollingBufferPreloadSettings()
         let generalSettingsToExport = GeneralBackup(
@@ -173,8 +171,8 @@ class ImportExportService {
             recorderType: recorderUIManager.recorderType,
             isTranscriptionCleanupEnabled: transcriptionCleanup.isEnabled,
             transcriptionRetentionMinutes: transcriptionCleanup.retentionMinutes,
-            isAudioCleanupEnabled: UserDefaults.standard.bool(forKey: keyIsAudioCleanupEnabled),
-            audioRetentionPeriod: UserDefaults.standard.integer(forKey: keyAudioRetentionPeriod),
+            isAudioCleanupEnabled: audioCleanup.isEnabled,
+            audioRetentionPeriod: audioCleanup.retentionDays,
 
             isSoundFeedbackEnabled: soundManager.isEnabled,
             isSystemMuteEnabled: mediaController.isSystemMuteEnabled,

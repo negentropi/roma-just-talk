@@ -8,8 +8,8 @@ struct AudioCleanupSettingsView: View {
     // Audio cleanup settings
     @AppStorage(VoiceInkUserDefaultsKey.isTranscriptionCleanupEnabled) private var isTranscriptionCleanupEnabled = false
     @AppStorage(VoiceInkUserDefaultsKey.transcriptionRetentionMinutes) private var transcriptionRetentionMinutes = VoiceInkPreferenceDefault.transcriptionRetentionMinutes
-    @AppStorage("IsAudioCleanupEnabled") private var isAudioCleanupEnabled = false
-    @AppStorage("AudioRetentionPeriod") private var audioRetentionPeriod = 7
+    @AppStorage(VoiceInkUserDefaultsKey.isAudioCleanupEnabled) private var isAudioCleanupEnabled = false
+    @AppStorage(VoiceInkUserDefaultsKey.audioRetentionPeriodDays) private var audioRetentionPeriod = VoiceInkPreferenceDefault.audioRetentionDays
     @State private var isPerformingCleanup = false
     @State private var isShowingConfirmation = false
     @State private var cleanupInfo: (fileCount: Int, totalSize: Int64, transcriptions: [Transcription]) = (0, 0, [])

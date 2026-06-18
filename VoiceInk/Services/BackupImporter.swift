@@ -15,9 +15,6 @@ enum BackupImportError: LocalizedError {
 }
 
 enum BackupImporter {
-    private static let keyIsAudioCleanupEnabled = "IsAudioCleanupEnabled"
-    private static let keyAudioRetentionPeriod = "AudioRetentionPeriod"
-
     @MainActor
     static func apply(_ backup: BackupFile, categories: Set<BackupCategory>, enhancementService: AIEnhancementService, recordingShortcutManager: RecordingShortcutManager, menuBarManager: MenuBarManager, mediaController: MediaController, playbackController: PlaybackController, soundManager: SoundManager, recorderUIManager: RecorderUIManager, modelContext: ModelContext, transcriptionModelManager: TranscriptionModelManager) throws {
         if categories.contains(.dictionary) {
@@ -159,10 +156,10 @@ enum BackupImporter {
             VoiceInkTranscriptionAutoCleanupPreference.saveRetentionMinutes(transcriptionMinutes)
         }
         if let audioCleanup = general.isAudioCleanupEnabled {
-            UserDefaults.standard.set(audioCleanup, forKey: keyIsAudioCleanupEnabled)
+            VoiceInkAudioCleanupPreference.saveIsEnabled(audioCleanup)
         }
         if let audioRetention = general.audioRetentionPeriod {
-            UserDefaults.standard.set(audioRetention, forKey: keyAudioRetentionPeriod)
+            VoiceInkAudioCleanupPreference.saveRetentionDays(audioRetention)
         }
 
         if let soundFeedback = general.isSoundFeedbackEnabled {

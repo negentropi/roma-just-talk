@@ -60,7 +60,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - transcript status, default transcript fallback copy, status-panel and row-badge presentation, status symbol/tone metadata, canceled-transcript paste eligibility, presentation helpers, and localized standard transcript search semantics
 - failed-transcript stored text formatting for macOS recorder failures
 - error-description presentation fallback for shared record and shell failure text
-- local transcription/model/missing-audio error vocabulary shared by macOS local Whisper and iOS local retry transcription
+- local transcription/model/missing-audio error vocabulary shared by macOS local Whisper, macOS retry/retranscribe surfaces, and iOS local retry transcription
 - streaming word-agreement confirmation policy for stable partial transcription, including confidence gates, sentence-boundary confirmation, reset behavior, and rolling-preload configuration; platform shells still own provider token adapters, ASR runtime calls, audio buffering, and event delivery
 - streaming final-commit timeout policy for cloud providers versus local FluidAudio finalization; platform shells still map runtime provider identity to the shared timeout source
 - streaming transcription event vocabulary for session, partial, committed, and error events; platform shells still adapt provider-specific event streams
@@ -226,7 +226,7 @@ Current macOS consumers of shared remote transport:
 - macOS recorded-file cloud transcription passes raw SwiftData vocabulary terms into shared remote batch options, and streaming adapters fetch use-specific normalized terms through `CustomVocabularyService`; `VoiceInkCustomVocabularyUse` owns provider/use-specific support and term-limit code.
 - macOS prompt-trigger restoration uses `VoiceInkPromptDetectionResult` state helpers, so temporary trigger-selected prompts restore the original selected prompt even when the original selection was nil.
 - macOS recorder and audio-file transcription enhancement failures use `VoiceInkPostProcessingFailurePresentation` for stored failure text and notification title truncation while preserving their current error-description source.
-- macOS audio-file transcription retry and failure surfaces now use `VoiceInkErrorDescription`, matching iOS record failure text and shared run-processor failures while keeping shell ownership of notifications and queue state.
+- macOS audio-file transcription retry, last-transcription retry, audio-player retranscribe, and failure surfaces now use `VoiceInkErrorDescription`/`VoiceInkEngineError`, matching iOS record failure text and shared run-processor failures while keeping shell ownership of notifications and queue state.
 - macOS audio-file import/retranscription uses `VoiceInkEngineError` for no-model-selected and missing-stored-audio failures, and no longer keeps unused shell-only observable transcription state.
 - macOS audio-file import and retranscription records now persist the shared `.completed` transcription status explicitly, matching the recorder pipeline and iOS shared record updater while keeping SwiftData model storage in the macOS shell.
 - macOS audio-file import and retranscription use `VoiceInkPostProcessingSkipPolicy`, matching the recorder pipeline and iOS run processor short-transcript skip behavior while preserving macOS prompt-trigger override on retry.

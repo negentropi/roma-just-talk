@@ -1532,6 +1532,27 @@ reject_pattern \
   VoiceInk/Services/LastTranscriptionService.swift
 
 require_pattern \
+  "macOS last-transcription retry uses shared missing-audio error vocabulary" \
+  'VoiceInkEngineError\.audioFileNotFound' \
+  VoiceInk/Services/LastTranscriptionService.swift
+
+require_pattern \
+  "macOS last-transcription retry uses shared no-model error vocabulary" \
+  'VoiceInkEngineError\.noTranscriptionModelSelected' \
+  VoiceInk/Services/LastTranscriptionService.swift
+
+require_pattern \
+  "macOS audio player retranscribe uses shared no-model error vocabulary" \
+  'VoiceInkEngineError\.noTranscriptionModelSelected' \
+  VoiceInk/Views/AudioPlayerView.swift
+
+reject_pattern \
+  "macOS retry surfaces avoid shell-only no-model and missing-audio text" \
+  'Cannot retry: Audio file not found|No transcription model selected' \
+  VoiceInk/Services/LastTranscriptionService.swift \
+  VoiceInk/Views/AudioPlayerView.swift
+
+require_pattern \
   "macOS engine canceled recording uses shared canceled draft factory" \
   'VoiceInkRecordingTranscriptionDraft\.canceled' \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift

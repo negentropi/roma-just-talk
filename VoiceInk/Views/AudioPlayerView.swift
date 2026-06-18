@@ -561,7 +561,9 @@ struct AudioPlayerView: View {
 
     private func retranscribeAudio() {
         guard let currentTranscriptionModel = engine.transcriptionModelManager.currentTranscriptionModel else {
-            showTemporaryBanner(.retranscribeError("No transcription model selected"))
+            showTemporaryBanner(.retranscribeError(
+                VoiceInkErrorDescription.text(for: VoiceInkEngineError.noTranscriptionModelSelected)
+            ))
             return
         }
 

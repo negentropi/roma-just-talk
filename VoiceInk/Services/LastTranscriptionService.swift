@@ -117,7 +117,7 @@ class LastTranscriptionService: ObservableObject {
             guard let lastTranscription = getLastTranscription(from: modelContext),
                   let audioURL = lastTranscription.existingAudioFileURL() else {
                 NotificationManager.shared.showNotification(
-                    title: "Cannot retry: Audio file not found",
+                    title: "Cannot retry: \(VoiceInkErrorDescription.text(for: VoiceInkEngineError.audioFileNotFound))",
                     type: .error
                 )
                 return
@@ -125,7 +125,7 @@ class LastTranscriptionService: ObservableObject {
 
             guard let currentModel = transcriptionModelManager.currentTranscriptionModel else {
                 NotificationManager.shared.showNotification(
-                    title: "No transcription model selected",
+                    title: VoiceInkErrorDescription.text(for: VoiceInkEngineError.noTranscriptionModelSelected),
                     type: .error
                 )
                 return

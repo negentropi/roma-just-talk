@@ -126,7 +126,7 @@ struct AudioFileRow: View {
                     SaveIconButton(textToSave: actionText)
                 }
 
-                if transcription.duration > 0 {
+                if VoiceInkDurationPresentation.shouldShowPositiveDuration(transcription.duration) {
                     Text(VoiceInkDurationPresentation.minutesSeconds(transcription.duration))
                         .font(.caption.weight(.medium))
                         .foregroundColor(.secondary)

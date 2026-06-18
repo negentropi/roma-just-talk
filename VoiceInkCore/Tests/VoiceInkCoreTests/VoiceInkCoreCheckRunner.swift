@@ -135,6 +135,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementBackupImportPlanPreservesMacOSImportSemantics", run: { DictionaryPolicyTests().testWordReplacementBackupImportPlanPreservesMacOSImportSemantics() }),
             VoiceInkCoreCheck(name: "ErrorDescriptionTests.testPrefersLocalizedErrorDescription", run: { ErrorDescriptionTests().testPrefersLocalizedErrorDescription() }),
             VoiceInkCoreCheck(name: "ErrorDescriptionTests.testFallsBackToLocalizedDescription", run: { ErrorDescriptionTests().testFallsBackToLocalizedDescription() }),
+            VoiceInkCoreCheck(name: "DurationPresentationTests.testPositiveDurationVisibilityOnlyAllowsPositiveDurations", run: { DurationPresentationTests().testPositiveDurationVisibilityOnlyAllowsPositiveDurations() }),
             VoiceInkCoreCheck(name: "DurationPresentationTests.testMinutesSecondsUsesUnpaddedMinutesByDefault", run: { DurationPresentationTests().testMinutesSecondsUsesUnpaddedMinutesByDefault() }),
             VoiceInkCoreCheck(name: "DurationPresentationTests.testMinutesSecondsCanPadMinutesToTwoDigits", run: { DurationPresentationTests().testMinutesSecondsCanPadMinutesToTwoDigits() }),
             VoiceInkCoreCheck(name: "DurationPresentationTests.testMinutesSecondsTruncatesFractionalSeconds", run: { DurationPresentationTests().testMinutesSecondsTruncatesFractionalSeconds() }),

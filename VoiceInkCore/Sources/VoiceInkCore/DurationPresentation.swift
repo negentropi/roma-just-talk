@@ -1,6 +1,10 @@
 import Foundation
 
 public enum VoiceInkDurationPresentation {
+    public static func shouldShowPositiveDuration(_ duration: TimeInterval) -> Bool {
+        duration > 0
+    }
+
     public static func minutesSeconds(
         _ duration: TimeInterval,
         padMinutesToTwoDigits: Bool = false

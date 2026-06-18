@@ -941,6 +941,39 @@ reject_pattern \
   VoiceInk/Models/Transcription.swift
 
 require_pattern \
+  "shared duration presentation owns positive-duration visibility" \
+  'shouldShowPositiveDuration' \
+  VoiceInkCore/Sources/VoiceInkCore/DurationPresentation.swift
+
+require_pattern \
+  "iOS audio duration UI uses shared positive-duration visibility" \
+  'VoiceInkDurationPresentation\.shouldShowPositiveDuration' \
+  iOS/VoiceInk-ios/AudioPlayerView.swift
+
+require_pattern \
+  "iOS note row duration UI uses shared positive-duration visibility" \
+  'VoiceInkDurationPresentation\.shouldShowPositiveDuration' \
+  iOS/VoiceInk-ios/NoteRowView.swift
+
+require_pattern \
+  "macOS audio-file duration UI uses shared positive-duration visibility" \
+  'VoiceInkDurationPresentation\.shouldShowPositiveDuration' \
+  VoiceInk/Views/AudioFileRow.swift
+
+require_pattern \
+  "macOS history duration UI uses shared positive-duration visibility" \
+  'VoiceInkDurationPresentation\.shouldShowPositiveDuration' \
+  VoiceInk/Views/History/TranscriptionListItem.swift
+
+reject_pattern \
+  "platform duration UI avoids shell-only positive-duration checks" \
+  'duration > 0' \
+  iOS/VoiceInk-ios/AudioPlayerView.swift \
+  iOS/VoiceInk-ios/NoteRowView.swift \
+  VoiceInk/Views/AudioFileRow.swift \
+  VoiceInk/Views/History/TranscriptionListItem.swift
+
+require_pattern \
   "macOS filler-word add button uses shared draft policy" \
   'VoiceInkFillerWords\.hasDraft\(newWord\)' \
   VoiceInk/Views/Components/FillerWordsSettingsView.swift

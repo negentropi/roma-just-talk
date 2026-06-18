@@ -23,7 +23,7 @@ struct TranscriptionListItem: View {
                         .font(.system(size: 11, weight: .medium))
                         .foregroundColor(.secondary)
                     Spacer()
-                    if transcription.duration > 0 {
+                    if VoiceInkDurationPresentation.shouldShowPositiveDuration(transcription.duration) {
                         Text(VoiceInkDurationPresentation.compactElapsed(transcription.duration))
                             .font(.system(size: 10, weight: .medium))
                             .padding(.horizontal, 6)

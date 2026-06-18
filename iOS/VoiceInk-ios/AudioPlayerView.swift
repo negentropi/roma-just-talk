@@ -16,7 +16,7 @@ struct AudioPlayerView: View {
                     Text(VoiceInkDatePresentation.relativeTimestamp(ts))
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    if duration > 0 {
+                    if VoiceInkDurationPresentation.shouldShowPositiveDuration(duration) {
                         Text("•")
                             .font(.caption)
                             .foregroundStyle(.tertiary)

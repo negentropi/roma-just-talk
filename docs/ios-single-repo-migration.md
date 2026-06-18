@@ -105,7 +105,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - transcription CSV header, row formatting, and CSV escaping; platform shells still own save panels and record-source mapping
 - power-mode display formatting for transcript metadata and exports
 - power-mode stored config Codable shape, legacy key decoding, UserDefaults config and active-config-id persistence, trigger-to-rule adaptation, config-list lookup/mutation/reordering, enabled-list selection, app/website/default matching, website URL normalization, save validation, auto-send key stored value/display/enablement state, active-session snapshot Codable shape with cleanup legacy decoding, and active-session UserDefaults persistence; macOS still owns OS app/website detection, SwiftUI editing/alerts, active-session application/restoration, shortcuts, auto-send key execution, and config/session persistence timing
-- duration presentation
+- duration presentation, including positive-duration display visibility
 - relative timestamp presentation
 - Whisper and VAD model file metadata, including platform-base Whisper model directory creation, downloaded local-model file records, runtime model-name to downloaded-file resolution, model/sidecar file construction, downloaded-state detection, bootstrap-model availability, Core ML support policy, final `.bin` install/replacement, model/sidecar deletion, and accepted HTTP download status policy
 - local Whisper runtime defaults and runtime configuration for request-language normalization, prompt, whisper.cpp runtime flags, thread count, transcription temperature, VAD enablement, VAD model path eligibility, VAD thresholds, and raw segment concatenation
@@ -179,6 +179,7 @@ Current macOS consumers of shared remote transport:
 - macOS transcript details and CSV export delegate power-mode display formatting to `VoiceInkPowerModePresentation`.
 - macOS and iOS local Whisper model directory creation, local `.bin` listing, download URL/file path lookup, runtime selected-model file resolution, final downloaded-file installation, bootstrap-model availability, Core ML support checks, model deletion, download progress keys/math, percent text, and download prompt copy delegate to `VoiceInkWhisperModelFiles`/`VoiceInkWhisperModelDownloadProgress`; macOS uses `VoiceInkWhisperLocalModelFile` directly while platform shells still own URLSession task state, UI, and runtime model state.
 - macOS waveform playback and iOS note audio playback use `VoiceInkAudioPlaybackTimeline` for clamped progress and seek math; platform shells still own `AVAudioPlayer`, hover/drag gestures, and rendering.
+- macOS history/audio-file rows and iOS note/audio rows use `VoiceInkDurationPresentation.shouldShowPositiveDuration` before rendering duration copy; platform shells still own layout, icons, and final formatting placement.
 - macOS and iOS local Whisper and macOS rolling preload resolve the Silero VAD bundle resource directly through `VoiceInkVADModelFiles`; the old shell-only VAD model manager adapters were removed.
 - macOS `FluidAudioStreamingProvider` runs stable partial-transcript confirmation through `WordAgreementEngine` in `VoiceInkCore`; `FluidAudioWordTimingAdapter` remains a macOS shell adapter because it imports the FluidAudio token type.
 - macOS streaming sessions choose final-commit wait time through `VoiceInkStreamingFinalCommitTimeout`, preserving the shorter local FluidAudio finalization path and the longer cloud-provider timeout.
@@ -331,6 +332,7 @@ scripts/verify-ios-single-repo-migration.sh --full-build
 23. macOS and iOS filler-word insertion stays routed through `VoiceInkFillerWords.insertPlan`, with duplicate copy out of platform views.
 24. macOS Native Apple language-display fallback stays routed through `VoiceInkLanguageCatalog.nativeAppleDisplayName`.
 25. iOS note-list dashboard and fastest-model summaries stay routed through `VoiceInkDashboardMetricsAccumulator` and `VoiceInkPerformanceAnalyzer`.
-26. A real Xcode toolchain is selected and both app targets build.
+26. macOS and iOS duration rows stay routed through `VoiceInkDurationPresentation.shouldShowPositiveDuration`.
+27. A real Xcode toolchain is selected and both app targets build.
 
 Current local blocker: `xcode-select -p` points to `/Library/Developer/CommandLineTools`, and the previously used external Xcode volume is not mounted. Full target builds are still environment-blocked until a real Xcode is selected; macOS `VoiceInk` also needs `/Users/atalphalnmomhappyhouse/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework`, and iOS `VoiceInk-ios` needs the iOS 26.2 platform installed. Until those are present, use `swift run VoiceInkCoreChecks` plus the static parse/lint gates above for local proof.

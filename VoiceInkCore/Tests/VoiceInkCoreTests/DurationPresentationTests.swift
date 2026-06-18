@@ -2,6 +2,12 @@ import Foundation
 @testable import VoiceInkCore
 
 final class DurationPresentationTests: XCTestCase {
+    func testPositiveDurationVisibilityOnlyAllowsPositiveDurations() {
+        XCTAssertFalse(VoiceInkDurationPresentation.shouldShowPositiveDuration(-1))
+        XCTAssertFalse(VoiceInkDurationPresentation.shouldShowPositiveDuration(0))
+        XCTAssertTrue(VoiceInkDurationPresentation.shouldShowPositiveDuration(0.1))
+    }
+
     func testMinutesSecondsUsesUnpaddedMinutesByDefault() {
         XCTAssertEqual(VoiceInkDurationPresentation.minutesSeconds(5), "0:05")
         XCTAssertEqual(VoiceInkDurationPresentation.minutesSeconds(65), "1:05")

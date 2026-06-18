@@ -204,8 +204,7 @@ class SystemInfoService {
         let currentModelName = VoiceInkCurrentTranscriptionModelPreference.modelName()
         let currentModelPreloadEnabled: String
         if let currentModelName {
-            let key = VoiceInkRollingBufferPreloadSettings.perModelPreloadEnabledKey(forModelName: currentModelName)
-            let enabled = UserDefaults.standard.object(forKey: key) as? Bool ?? true
+            let enabled = VoiceInkRollingBufferPreloadSettings.perModelPreloadEnabled(forModelName: currentModelName)
             currentModelPreloadEnabled = "\(enabled)"
         } else {
             currentModelPreloadEnabled = "No model selected"

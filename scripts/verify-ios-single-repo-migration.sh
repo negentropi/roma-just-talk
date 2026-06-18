@@ -810,6 +810,16 @@ require_pattern \
   VoiceInk/Services/SystemInfoService.swift
 
 require_pattern \
+  "macOS diagnostics use shared rolling-buffer per-model preference" \
+  'VoiceInkRollingBufferPreloadSettings\.perModelPreloadEnabled\(forModelName: currentModelName\)' \
+  VoiceInk/Services/SystemInfoService.swift
+
+reject_pattern \
+  "macOS diagnostics avoid shell-only rolling-buffer per-model default lookup" \
+  'perModelPreloadEnabledKey\(forModelName: currentModelName\)|object\(forKey: key\) as\? Bool \?\? true' \
+  VoiceInk/Services/SystemInfoService.swift
+
+require_pattern \
   "macOS Native Apple transcription uses shared source-compatible language fallback" \
   'VoiceInkTranscriptionLanguagePreference\.selectedLanguage\(source: \.nativeApple\)' \
   VoiceInk/Transcription/Native/NativeAppleTranscriptionService.swift

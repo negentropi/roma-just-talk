@@ -80,6 +80,47 @@ public enum VoiceInkPCM16Audio {
         }
     }
 
+    public static func leveledLittleEndianData(
+        _ data: Data,
+        targetPeak: Int16,
+        noiseFloorPeak: Int16,
+        maxGain: Float
+    ) -> Data {
+        let sampleByteCount = data.count - (data.count % bytesPerSample)
+        guard sampleByteCount >= bytesPerSample,
+              targetPeak > 0,
+              noiseFloorPeak >= 0,
+              maxGain > 1 else {
+            return data
+        }
+
+        let peak = pcm16Peak(inLittleEndianData: data, byteCount: sampleByteCount)
+        guard peak > 0, peak >= Int(noiseFloorPeak), peak < Int(targetPeak) else { return data }
+
+        let gain = min(Float(targetPeak) / Float(peak), maxGain)
+        guard gain > 1 else { return data }
+
+        var output = Data()
+        output.reserveCapacity(data.count)
+        data.withUnsafeBytes { rawBuffer in
+            guard let bytes = rawBuffer.bindMemory(to: UInt8.self).baseAddress else { return }
+
+            for byteIndex in stride(from: 0, to: sampleByteCount, by: bytesPerSample) {
+                let sample = littleEndianPCM16Sample(bytes: bytes, byteIndex: byteIndex)
+                let leveledSample = pcm16SampleFromScaledInt16(sample, gain: gain)
+                let littleEndian = leveledSample.littleEndian
+                output.append(UInt8(truncatingIfNeeded: littleEndian))
+                output.append(UInt8(truncatingIfNeeded: littleEndian >> 8))
+            }
+        }
+
+        if sampleByteCount < data.count {
+            output.append(data.subdata(in: sampleByteCount..<data.count))
+        }
+
+        return output
+    }
+
     public static func convertedMonoPCM16SampleCount(
         frameCount: Int,
         inputSampleRate: Double,
@@ -197,6 +238,34 @@ public enum VoiceInkPCM16Audio {
 
     private static func pcm16SampleFromScaledFloat(_ sample: Float32) -> Int16 {
         let scaled = sample * 32767.0
+        let clipped = max(-32768.0, min(32767.0, scaled))
+        return Int16(clipped)
+    }
+
+    private static func pcm16Peak(inLittleEndianData data: Data, byteCount: Int) -> Int {
+        data.withUnsafeBytes { rawBuffer in
+            guard let bytes = rawBuffer.bindMemory(to: UInt8.self).baseAddress else { return 0 }
+
+            var peak = 0
+            for byteIndex in stride(from: 0, to: byteCount, by: bytesPerSample) {
+                let sample = littleEndianPCM16Sample(bytes: bytes, byteIndex: byteIndex)
+                peak = max(peak, pcm16Magnitude(sample))
+            }
+            return peak
+        }
+    }
+
+    private static func littleEndianPCM16Sample(bytes: UnsafePointer<UInt8>, byteIndex: Int) -> Int16 {
+        let rawValue = UInt16(bytes[byteIndex]) | (UInt16(bytes[byteIndex + 1]) << 8)
+        return Int16(bitPattern: rawValue)
+    }
+
+    private static func pcm16Magnitude(_ sample: Int16) -> Int {
+        sample == Int16.min ? Int(Int16.max) + 1 : abs(Int(sample))
+    }
+
+    private static func pcm16SampleFromScaledInt16(_ sample: Int16, gain: Float) -> Int16 {
+        let scaled = (Float(sample) * gain).rounded()
         let clipped = max(-32768.0, min(32767.0, scaled))
         return Int16(clipped)
     }

@@ -16,11 +16,19 @@ let package = Package(
         .executable(
             name: "VoiceInkCoreChecks",
             targets: ["VoiceInkCoreChecks"]
+        ),
+        .executable(
+            name: "VoiceInkAudioProof",
+            targets: ["VoiceInkAudioProof"]
         )
     ],
     targets: [
         .target(
             name: "VoiceInkCore"
+        ),
+        .executableTarget(
+            name: "VoiceInkAudioProof",
+            dependencies: ["VoiceInkCore"]
         ),
         .executableTarget(
             name: "VoiceInkCoreChecks",

@@ -129,6 +129,43 @@ final class PCM16AudioSamplesTests: XCTestCase {
         XCTAssertEqual(VoiceInkPCM16Audio.pcm16Samples(fromFloatSamples: []), [])
     }
 
+    func testLeveledLittleEndianDataBoostsQuietSpeechTowardTargetPeak() {
+        let data = pcm16Data(samples: [-100, -50, 50, 100])
+
+        let leveled = VoiceInkPCM16Audio.leveledLittleEndianData(
+            data,
+            targetPeak: 1_000,
+            noiseFloorPeak: 10,
+            maxGain: 20
+        )
+
+        XCTAssertEqual(pcm16Samples(from: leveled), [-1_000, -500, 500, 1_000])
+    }
+
+    func testLeveledLittleEndianDataLeavesSilenceAndNoiseFloorUnchanged() {
+        let silence = pcm16Data(samples: [0, 0, 0])
+        let noiseFloor = pcm16Data(samples: [-4, 0, 4])
+
+        XCTAssertEqual(
+            VoiceInkPCM16Audio.leveledLittleEndianData(
+                silence,
+                targetPeak: 1_000,
+                noiseFloorPeak: 10,
+                maxGain: 20
+            ),
+            silence
+        )
+        XCTAssertEqual(
+            VoiceInkPCM16Audio.leveledLittleEndianData(
+                noiseFloor,
+                targetPeak: 1_000,
+                noiseFloorPeak: 10,
+                maxGain: 20
+            ),
+            noiseFloor
+        )
+    }
+
     func testConvertedMonoPCM16SampleCountUsesExistingTruncatedResamplePolicy() {
         XCTAssertEqual(
             VoiceInkPCM16Audio.convertedMonoPCM16SampleCount(
@@ -265,6 +302,21 @@ final class PCM16AudioSamplesTests: XCTestCase {
             data.append(UInt8(truncatingIfNeeded: littleEndian >> 8))
         }
         return data
+    }
+
+    private func pcm16Samples(from data: Data) -> [Int16] {
+        var samples: [Int16] = []
+        samples.reserveCapacity(data.count / VoiceInkPCM16Audio.bytesPerSample)
+
+        data.withUnsafeBytes { rawBuffer in
+            guard let bytes = rawBuffer.bindMemory(to: UInt8.self).baseAddress else { return }
+            for byteIndex in stride(from: 0, to: data.count - 1, by: VoiceInkPCM16Audio.bytesPerSample) {
+                let rawValue = UInt16(bytes[byteIndex]) | (UInt16(bytes[byteIndex + 1]) << 8)
+                samples.append(Int16(bitPattern: rawValue))
+            }
+        }
+
+        return samples
     }
 
     private func writeMonoPCM16Samples(

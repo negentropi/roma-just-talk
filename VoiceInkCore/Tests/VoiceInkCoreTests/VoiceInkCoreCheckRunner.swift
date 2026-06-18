@@ -282,6 +282,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testWriteMonoPCM16SamplesAveragesInterleavedChannelsWithoutResampling", run: { PCM16AudioSamplesTests().testWriteMonoPCM16SamplesAveragesInterleavedChannelsWithoutResampling() }),
             VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testWriteMonoPCM16SamplesLinearlyResamplesInterleavedChannels", run: { PCM16AudioSamplesTests().testWriteMonoPCM16SamplesLinearlyResamplesInterleavedChannels() }),
             VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testWriteMonoPCM16SamplesRejectsInsufficientCapacityAndInvalidInput", run: { PCM16AudioSamplesTests().testWriteMonoPCM16SamplesRejectsInsufficientCapacityAndInvalidInput() }),
+            VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testLeveledLittleEndianDataBoostsQuietSpeechTowardTargetPeak", run: { PCM16AudioSamplesTests().testLeveledLittleEndianDataBoostsQuietSpeechTowardTargetPeak() }),
+            VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testLeveledLittleEndianDataLeavesSilenceAndNoiseFloorUnchanged", run: { PCM16AudioSamplesTests().testLeveledLittleEndianDataLeavesSilenceAndNoiseFloorUnchanged() }),
             VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testDurationAndByteCountUseMono16kPCM16Format", run: { PCM16AudioSamplesTests().testDurationAndByteCountUseMono16kPCM16Format() }),
             VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testMonoPCM16ChunksSplitDataOnSampleAlignedByteCounts", run: { PCM16AudioSamplesTests().testMonoPCM16ChunksSplitDataOnSampleAlignedByteCounts() }),
             VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testMonoPCM16ChunksDropTrailingPartialSample", run: { PCM16AudioSamplesTests().testMonoPCM16ChunksDropTrailingPartialSample() }),

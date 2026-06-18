@@ -49,6 +49,7 @@ final class DashboardMetricsTests: XCTestCase {
         XCTAssertEqual(metrics.estimatedTypingTime, 120)
         XCTAssertEqual(metrics.timeSaved, 60)
         XCTAssertEqual(metrics.averageWordsPerMinute, 70)
+        XCTAssertEqual(metrics.averageWordsPerMinuteDisplayText, "70.0")
         XCTAssertEqual(metrics.totalKeystrokesSaved, 350)
     }
 
@@ -59,6 +60,7 @@ final class DashboardMetricsTests: XCTestCase {
             totalDuration: 0
         ))
         XCTAssertEqual(zeroDuration.averageWordsPerMinute, 0)
+        XCTAssertNil(zeroDuration.averageWordsPerMinuteDisplayText)
         XCTAssertEqual(zeroDuration.timeSaved, 120)
 
         let slowerThanTyping = VoiceInkDashboardMetrics(summary: VoiceInkDashboardMetricsSummary(
@@ -79,6 +81,16 @@ final class DashboardMetricsTests: XCTestCase {
         XCTAssertEqual(metrics.estimatedTypingTime, 120)
         XCTAssertEqual(metrics.timeSaved, 60)
         XCTAssertEqual(metrics.totalKeystrokesSaved, 400)
+    }
+
+    func testAverageWordsPerMinuteDisplayTextRoundsToOneDecimalPlace() {
+        let metrics = VoiceInkDashboardMetrics(summary: VoiceInkDashboardMetricsSummary(
+            totalCount: 1,
+            totalWords: 10,
+            totalDuration: 12
+        ))
+
+        XCTAssertEqual(metrics.averageWordsPerMinuteDisplayText, "50.0")
     }
 
     func testNoteListSummaryPresentationBuildsIOSHeaderText() {

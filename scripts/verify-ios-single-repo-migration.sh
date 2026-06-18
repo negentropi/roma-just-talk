@@ -2185,6 +2185,21 @@ require_pattern \
   'VoiceInkPerformanceAnalyzer\.transcriptionModelStats' \
   VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift
 
+require_pattern \
+  "shared dashboard metrics owns average WPM display text" \
+  'averageWordsPerMinuteDisplayText' \
+  VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift
+
+require_pattern \
+  "macOS dashboard uses shared average WPM display text" \
+  'dashboardMetrics\.averageWordsPerMinuteDisplayText' \
+  VoiceInk/Views/Metrics/MetricsContent.swift
+
+reject_pattern \
+  "macOS dashboard avoids shell-only average WPM formatting" \
+  'averageWordsPerMinute > 0|String\(format: +"%\.1f", averageWordsPerMinute\)|private var averageWordsPerMinute' \
+  VoiceInk/Views/Metrics/MetricsContent.swift
+
 reject_pattern \
   "iOS note-list avoids shell-only performance grouping" \
   'VoiceInkPerformanceAnalyzer|Dictionary\(grouping:|avgProcessingTime|speedFactor =|totalProcessingTime|performanceTranscriptionDuration|speedFactorRealtimeText' \

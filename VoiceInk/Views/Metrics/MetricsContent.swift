@@ -330,9 +330,7 @@ struct MetricsContent: View {
             MetricCard(
                 icon: "speedometer",
                 title: "Words Per Minute",
-                value: hasLoadedMetricsSnapshot && averageWordsPerMinute > 0
-                    ? String(format: "%.1f", averageWordsPerMinute)
-                    : "–",
+                value: hasLoadedMetricsSnapshot ? dashboardMetrics.averageWordsPerMinuteDisplayText ?? "–" : "–",
                 detail: "dictation pace",
                 color: metricAccent
             )
@@ -421,10 +419,6 @@ struct MetricsContent: View {
 
     private var timeSaved: TimeInterval {
         dashboardMetrics.timeSaved
-    }
-
-    private var averageWordsPerMinute: Double {
-        dashboardMetrics.averageWordsPerMinute
     }
 
     private var totalKeystrokesSaved: Int {

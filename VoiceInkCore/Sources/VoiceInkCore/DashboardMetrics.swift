@@ -89,6 +89,14 @@ public struct VoiceInkDashboardMetrics: Equatable, Sendable {
         return Double(summary.totalWords) / (summary.totalDuration / 60)
     }
 
+    public var averageWordsPerMinuteDisplayText: String? {
+        guard averageWordsPerMinute > 0 else {
+            return nil
+        }
+
+        return String(format: "%.1f", averageWordsPerMinute)
+    }
+
     public var totalKeystrokesSaved: Int {
         Int(Double(summary.totalWords) * keystrokesPerWord)
     }

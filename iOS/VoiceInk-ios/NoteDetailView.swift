@@ -154,22 +154,11 @@ struct NoteDetailView: View {
             }
             
             // Mode selection for re-transcription
-            if !settings.modes.isEmpty && !isRetranscribing {
-                VStack(spacing: 8) {
-                    if settings.modes.count > 1 {
-                        Picker("Mode", selection: $settings.selectedModeId) {
-                            ForEach(settings.modes) { mode in
-                                Text(mode.name).tag(mode.id as UUID?)
-                            }
-                        }
-                        .pickerStyle(.wheel)
-                        .frame(height: 80)
-                    } else if let singleMode = settings.modes.first {
-                        Text(singleMode.name)
-                            .font(.title2.bold())
-                            .foregroundStyle(.primary)
-                    }
-                }
+            if !isRetranscribing {
+                VoiceInkModeSelectionControlView(
+                    modes: settings.modes,
+                    selectedModeId: $settings.selectedModeId
+                )
             }
             
             if isRetranscribing {

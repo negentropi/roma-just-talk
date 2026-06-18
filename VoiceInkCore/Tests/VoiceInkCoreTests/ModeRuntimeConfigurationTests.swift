@@ -242,6 +242,23 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
         XCTAssertNil([Mode]().repairedSelectedModeId(nil))
     }
 
+    func testModeSelectionPresentationHidesEmptyModeLists() {
+        XCTAssertEqual([Mode]().modeSelectionPresentation, .hidden)
+    }
+
+    func testModeSelectionPresentationShowsSingleModeName() {
+        let mode = Mode.defaultLocalWhisper(name: "Local")
+
+        XCTAssertEqual([mode].modeSelectionPresentation, .singleModeName("Local"))
+    }
+
+    func testModeSelectionPresentationUsesPickerForMultipleModes() {
+        let local = Mode.defaultLocalWhisper(name: "Local")
+        let cloud = Mode(name: "Cloud")
+
+        XCTAssertEqual([local, cloud].modeSelectionPresentation, .picker)
+    }
+
     func testModeDraftValidationRequiresName() {
         XCTAssertFalse(Mode(name: "").isSaveableDraft(
             availableTranscriptionProviders: [.groq],

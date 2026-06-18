@@ -345,6 +345,32 @@ require_pattern \
   'VoiceInkRecordingAlertPresentation\.noModesAvailableIfNeeded' \
   iOS/VoiceInk-ios/NotesListView.swift
 
+require_pattern \
+  "shared mode selection presentation lives in VoiceInkCore" \
+  'VoiceInkModeSelectionPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/Mode.swift
+
+require_pattern \
+  "iOS recording sheet uses shared mode selection presentation adapter" \
+  'VoiceInkModeSelectionControlView' \
+  iOS/VoiceInk-ios/RecordingSheetView.swift
+
+require_pattern \
+  "iOS retry status uses shared mode selection presentation adapter" \
+  'VoiceInkModeSelectionControlView' \
+  iOS/VoiceInk-ios/NoteDetailView.swift
+
+require_pattern \
+  "iOS mode selection adapter delegates picker-vs-label policy to shared core" \
+  'modeSelectionPresentation' \
+  iOS/VoiceInk-ios/RecordingSheetView.swift
+
+reject_pattern \
+  "iOS mode selection views avoid shell-only mode-count picker branching" \
+  'modes\.count > 1|settings\.modes\.count > 1|modes\.first|settings\.modes\.first|!settings\.modes\.isEmpty' \
+  iOS/VoiceInk-ios/RecordingSheetView.swift \
+  iOS/VoiceInk-ios/NoteDetailView.swift
+
 reject_pattern \
   "iOS recording views avoid shell-only recording alert copy and OSStatus mapping" \
   'ActiveRecordingAlert|Microphone Access Denied|Microphone In Use|Recording Failed|No Modes Found|Please create a new mode in Settings before recording|Could not start recording:|561017449|NSOSStatusErrorDomain' \

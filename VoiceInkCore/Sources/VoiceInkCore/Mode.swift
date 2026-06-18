@@ -13,6 +13,12 @@ public struct VoiceInkModeRuntimeConfiguration: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkModeSelectionPresentation: Equatable, Sendable {
+    case hidden
+    case singleModeName(String)
+    case picker
+}
+
 public struct Mode: Identifiable, Codable {
     public let id: UUID
     public var name: String
@@ -188,5 +194,17 @@ public extension Collection where Element == Mode {
         }
 
         return selectedModeId
+    }
+
+    var modeSelectionPresentation: VoiceInkModeSelectionPresentation {
+        if count > 1 {
+            return .picker
+        }
+
+        guard let mode = first else {
+            return .hidden
+        }
+
+        return .singleModeName(mode.name)
     }
 }

@@ -49,7 +49,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - transcription provider recorded-file capability, including Cartesia as streaming-only
 - Native Apple and FluidAudio local transcription model metadata; platform shells still own availability, download, and runtime adapters
 - remote transcription provider dispatch for iOS retry transcription
-- mode runtime configuration, default local mode selection, provider-change and stale model repair, selected-mode repair, mode-based transcription language availability, and selected-language repair
+- mode runtime configuration, default local mode selection, provider-change and stale model repair, selected-mode repair, mode-based transcription language availability, selected-language repair, and mode selection presentation for picker-vs-single-label UI
 - mode provider-selection repair and draft saveability rules
 - shared UserDefaults key names, including cleanup preferences, plus iOS mode persistence helpers with stale model repair on load
 - shared preference default state, app-settings reset state, and UserDefaults registration values for core-owned keys, including platform-specific selected-language defaults; platform shells still choose current model and register OS-specific keys
@@ -255,7 +255,7 @@ Current iOS consumers of shared remote transport:
 - `iOS/VoiceInk-ios/LibWhisper.swift` reads `VoiceInkWhisperRuntimeConfiguration` to assemble language, prompt, whisper.cpp runtime flags, thread count, temperature, and VAD settings before adapting them into whisper.cpp, and now uses `VoiceInkWhisperTranscriptSegments` for raw segment concatenation instead of trimming in the adapter. Cleanup still happens through `VoiceInkTranscriptionRunProcessor`, matching the shared macOS-order output pipeline while keeping iOS whisper.cpp execution in the iOS shell.
 - `iOS/VoiceInk-ios/AudioRecorder.swift` maps AVFoundation recorder settings from `VoiceInkPCM16Audio`, so iOS live recording uses the same 16 kHz mono, 16-bit little-endian integer format contract as macOS local transcription while keeping capture/session lifecycle in the iOS shell.
 - macOS `Recorder` and iOS `AudioRecorder` normalize audio-meter decibels through `VoiceInkAudioMeterLevel`; macOS still owns smoothing state/timer delivery, while iOS bounds visible level history through the same shared audio-meter policy.
-- iOS `RecordingManager` uses `VoiceInkRecordingState`, shared active-recording predicate, and `VoiceInkRecordingAlertPresentation` for no-mode, microphone-permission, microphone-busy, and generic recording-failure alert content while preserving iOS-specific permission requests, settings opening, sheet, App Group, and audio-session behavior in the shell.
+- iOS `RecordingManager` uses `VoiceInkRecordingState`, shared active-recording predicate, and `VoiceInkRecordingAlertPresentation` for no-mode, microphone-permission, microphone-busy, and generic recording-failure alert content while preserving iOS-specific permission requests, settings opening, sheet, App Group, and audio-session behavior in the shell. `RecordingSheetView` and retry status mode selection use `VoiceInkModeSelectionPresentation` through an iOS SwiftUI adapter, so picker-vs-single-label policy stays shared while rendering stays in the shell.
 - `iOS/VoiceInk-ios/VoiceInk-ios/Transcription.swift` supplies its Documents/Recordings directory through `VoiceInkStoredAudioRecord`, so iOS note detail, retry transcription, and deletion share the same record-level audio-file behavior as macOS.
 - `iOS/VoiceInk-ios/ProviderAPIKeyView.swift` verifies stored provider keys through `VoiceInkProviderAPIKeyVerifier` and delegates draft-key verification/save-after-verify policy to `VoiceInkProviderAPIKeyDraft`; `iOS/VoiceInk-ios/AppSettings.swift` delegates stored/runtime key state, readiness, verification reset-on-change behavior, and mode provider availability lists to `VoiceInkProviderAPIKeyState`. macOS provider-key screens use shared draft-key policy for submit enablement, so shared core owns blank-key policy before transport verification without changing platform key-storage behavior.
 - `iOS/VoiceInk-ios/AppSettings.swift` and `ModeConfigurationView.swift` delegate active-mode transcription language availability, provider-change model repair, selected-language repair, mode-list deletion, prompt-template draft state, and mode saveability to shared core policy; `SettingsView` keeps only the SwiftUI option rendering.
@@ -327,12 +327,13 @@ scripts/verify-ios-single-repo-migration.sh --full-build
 18. iOS recording background transcription delegates stored-audio completion/failure updates to `VoiceInkMutableTranscriptionRecord.retranscribeStoredAudio` instead of duplicating record-state writes in `RecordingManager`.
 19. iOS live recording delegates timestamped filename construction and PCM16 recorder format constants to `VoiceInkStoredAudioFile` and `VoiceInkPCM16Audio`.
 20. iOS note detail and list deletion route stored-audio availability and deletion through `VoiceInkStoredAudioRecord`/`VoiceInkStoredAudioAvailability`.
-21. macOS and iOS local Whisper wrappers both consume shared runtime, VAD resource, and PCM16 WAV sample policies.
-22. macOS AI-enhancement diagnostics/context toggles and first-run onboarding storage checks stay routed through shared `VoiceInkCore` preference Modules.
-23. macOS and iOS filler-word insertion stays routed through `VoiceInkFillerWords.insertPlan`, with duplicate copy out of platform views.
-24. macOS Native Apple language-display fallback stays routed through `VoiceInkLanguageCatalog.nativeAppleDisplayName`.
-25. iOS note-list dashboard and fastest-model summaries stay routed through `VoiceInkNoteListSummaryPresentation`.
-26. macOS and iOS duration-dependent UI stays routed through `VoiceInkDurationPresentation.shouldShowPositiveDuration`.
-27. A real Xcode toolchain is selected and both app targets build.
+21. iOS recording/retry mode selection routes picker-vs-single-label presentation through `VoiceInkModeSelectionPresentation`.
+22. macOS and iOS local Whisper wrappers both consume shared runtime, VAD resource, and PCM16 WAV sample policies.
+23. macOS AI-enhancement diagnostics/context toggles and first-run onboarding storage checks stay routed through shared `VoiceInkCore` preference Modules.
+24. macOS and iOS filler-word insertion stays routed through `VoiceInkFillerWords.insertPlan`, with duplicate copy out of platform views.
+25. macOS Native Apple language-display fallback stays routed through `VoiceInkLanguageCatalog.nativeAppleDisplayName`.
+26. iOS note-list dashboard and fastest-model summaries stay routed through `VoiceInkNoteListSummaryPresentation`.
+27. macOS and iOS duration-dependent UI stays routed through `VoiceInkDurationPresentation.shouldShowPositiveDuration`.
+28. A real Xcode toolchain is selected and both app targets build.
 
 Current local blocker: `xcode-select -p` points to `/Library/Developer/CommandLineTools`, and the previously used external Xcode volume is not mounted. Full target builds are still environment-blocked until a real Xcode is selected; macOS `VoiceInk` also needs `/Users/atalphalnmomhappyhouse/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework`, and iOS `VoiceInk-ios` needs the iOS 26.2 platform installed. Until those are present, use `swift run VoiceInkCoreChecks` plus the static parse/lint gates above for local proof.

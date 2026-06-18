@@ -303,11 +303,11 @@ struct TranscriptPreviewView: View {
 // MARK: - Recorder Status Display
 
 struct RecorderStatusDisplay: View {
-    let currentState: RecordingState
+    let currentState: VoiceInkRecordingState
     let audioMeter: AudioMeter
     let menuBarHeight: CGFloat?
 
-    init(currentState: RecordingState, audioMeter: AudioMeter, menuBarHeight: CGFloat? = nil) {
+    init(currentState: VoiceInkRecordingState, audioMeter: AudioMeter, menuBarHeight: CGFloat? = nil) {
         self.currentState = currentState
         self.audioMeter = audioMeter
         self.menuBarHeight = menuBarHeight

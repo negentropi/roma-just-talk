@@ -108,7 +108,7 @@ class RecorderUIManager: ObservableObject {
         }
     }
 
-    func isActiveForRecordingShortcut(recordingState: RecordingState) -> Bool {
+    func isActiveForRecordingShortcut(recordingState: VoiceInkRecordingState) -> Bool {
         VoiceInkRecorderUISessionPolicy.isActiveForRecordingShortcut(
             hasVisibleRecorderType: recorderType != "none",
             recordingState: recordingState,
@@ -116,7 +116,7 @@ class RecorderUIManager: ObservableObject {
         )
     }
 
-    func activeSessionToggleAction(for recordingState: RecordingState) -> RecorderUIToggleAction {
+    func activeSessionToggleAction(for recordingState: VoiceInkRecordingState) -> RecorderUIToggleAction {
         recordingState.recorderUIToggleAction
     }
 

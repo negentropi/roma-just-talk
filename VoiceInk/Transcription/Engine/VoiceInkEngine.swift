@@ -31,7 +31,7 @@ private struct PreparedQuickReleaseContext {
 class VoiceInkEngine: NSObject, ObservableObject {
     private static let bufferedSnapshotStreamingChunkBytes = VoiceInkPCM16Audio.byteCount(forMono16kDuration: 0.1)
 
-    @Published var recordingState: RecordingState = .idle
+    @Published var recordingState: VoiceInkRecordingState = .idle
     @Published var shouldCancelRecording = false
     var partialTranscript: String = ""
     var currentSession: TranscriptionSession?

@@ -111,7 +111,7 @@ class RecordingShortcutManager: ObservableObject {
         }
     }
 
-    private static func canHandleShortcutAction(for recordingState: RecordingState) -> Bool {
+    private static func canHandleShortcutAction(for recordingState: VoiceInkRecordingState) -> Bool {
         recordingState.acceptsRecordingShortcutAction
     }
 
@@ -493,7 +493,7 @@ final class RecordingShortcutModeHandler {
     private let logger: Logger
     private let canHandleShortcutAction: @MainActor () -> Bool
     private let isRecorderVisible: @MainActor () -> Bool
-    private let recordingState: @MainActor () -> RecordingState
+    private let recordingState: @MainActor () -> VoiceInkRecordingState
     private let toggleMiniRecorder: @MainActor (UUID?) async -> Void
     private let prepareQuickReleaseContext: @MainActor (UUID?) -> Void
     private let discardQuickReleaseContext: @MainActor () -> Void
@@ -516,7 +516,7 @@ final class RecordingShortcutModeHandler {
         logger: Logger,
         canHandleShortcutAction: @escaping @MainActor () -> Bool,
         isRecorderVisible: @escaping @MainActor () -> Bool,
-        recordingState: @escaping @MainActor () -> RecordingState,
+        recordingState: @escaping @MainActor () -> VoiceInkRecordingState,
         toggleMiniRecorder: @escaping @MainActor (UUID?) async -> Void,
         prepareQuickReleaseContext: @escaping @MainActor (UUID?) -> Void = { _ in },
         discardQuickReleaseContext: @escaping @MainActor () -> Void = {},

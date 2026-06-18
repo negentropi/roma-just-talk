@@ -68,6 +68,37 @@ public enum VoiceInkProviderCredential {
     }
 }
 
+public struct VoiceInkProviderAPIKeyDraft: Equatable, Sendable {
+    private let enteredKey: String?
+    private let storedRuntimeKey: String?
+
+    public init(enteredKey: String?, storedRuntimeKey: String?) {
+        self.enteredKey = enteredKey
+        self.storedRuntimeKey = storedRuntimeKey
+    }
+
+    public var hasEnteredKey: Bool {
+        enteredKeyForVerification != nil
+    }
+
+    public var canVerify: Bool {
+        verificationCandidate != nil
+    }
+
+    public var verificationCandidate: String? {
+        enteredKeyForVerification ?? VoiceInkProviderCredential.nonBlank(storedRuntimeKey)
+    }
+
+    public var keyToSaveAfterSuccessfulVerification: String? {
+        enteredKeyForVerification
+    }
+
+    private var enteredKeyForVerification: String? {
+        let trimmed = enteredKey?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return trimmed.isEmpty ? nil : trimmed
+    }
+}
+
 public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, Sendable {
     case groq
     case openAI

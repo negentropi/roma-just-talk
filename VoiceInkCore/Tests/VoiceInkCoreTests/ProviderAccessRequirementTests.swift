@@ -84,6 +84,42 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertEqual(VoiceInkProviderCredential.nonBlank(" key-with-space "), " key-with-space ")
     }
 
+    func testProviderAPIKeyDraftUsesTrimmedEnteredKeyBeforeStoredRuntimeKey() {
+        let draft = VoiceInkProviderAPIKeyDraft(
+            enteredKey: " entered-key \n",
+            storedRuntimeKey: "stored-key"
+        )
+
+        XCTAssertTrue(draft.hasEnteredKey)
+        XCTAssertTrue(draft.canVerify)
+        XCTAssertEqual(draft.verificationCandidate, "entered-key")
+        XCTAssertEqual(draft.keyToSaveAfterSuccessfulVerification, "entered-key")
+    }
+
+    func testProviderAPIKeyDraftFallsBackToStoredRuntimeKeyForBlankDraft() {
+        let draft = VoiceInkProviderAPIKeyDraft(
+            enteredKey: " \n\t ",
+            storedRuntimeKey: " stored-runtime-key "
+        )
+
+        XCTAssertFalse(draft.hasEnteredKey)
+        XCTAssertTrue(draft.canVerify)
+        XCTAssertEqual(draft.verificationCandidate, " stored-runtime-key ")
+        XCTAssertNil(draft.keyToSaveAfterSuccessfulVerification)
+    }
+
+    func testProviderAPIKeyDraftRejectsBlankDraftAndBlankStoredRuntimeKey() {
+        let draft = VoiceInkProviderAPIKeyDraft(
+            enteredKey: " \n\t ",
+            storedRuntimeKey: "\n"
+        )
+
+        XCTAssertFalse(draft.hasEnteredKey)
+        XCTAssertFalse(draft.canVerify)
+        XCTAssertNil(draft.verificationCandidate)
+        XCTAssertNil(draft.keyToSaveAfterSuccessfulVerification)
+    }
+
     func testRuntimeAPIKeyIfAvailableFollowsProviderAccessPolicyAndBlankRules() {
         XCTAssertEqual(VoiceInkProviderKind.groq.runtimeAPIKeyIfAvailable(userAPIKey: "groq-key"), "groq-key")
         XCTAssertNil(VoiceInkProviderKind.groq.runtimeAPIKeyIfAvailable(userAPIKey: " \n "))

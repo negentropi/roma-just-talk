@@ -14,12 +14,19 @@ struct ProviderAPIKeyView: View {
         settings.isKeyVerified(for: provider)
     }
 
+    private var apiKeyDraft: VoiceInkProviderAPIKeyDraft {
+        VoiceInkProviderAPIKeyDraft(
+            enteredKey: tempKey,
+            storedRuntimeKey: settings.apiKey(for: provider)
+        )
+    }
+
     private var hasEnteredAPIKey: Bool {
-        VoiceInkProviderCredential.nonBlank(tempKey) != nil
+        apiKeyDraft.hasEnteredKey
     }
 
     private var canVerifyAPIKey: Bool {
-        hasEnteredAPIKey || VoiceInkProviderCredential.nonBlank(settings.apiKey(for: provider)) != nil
+        apiKeyDraft.canVerify
     }
 
     var body: some View {
@@ -102,15 +109,21 @@ struct ProviderAPIKeyView: View {
     private func verifyKey() {
         Task {
             isVerifying = true
-            let entered = tempKey.trimmingCharacters(in: .whitespacesAndNewlines)
-            let keyToVerify = entered.isEmpty ? settings.apiKey(for: provider) : entered
+            let draft = apiKeyDraft
+            guard let keyToVerify = draft.verificationCandidate else {
+                verifyResult = false
+                isVerifying = false
+                return
+            }
             
             let ok = await verifiedAPIKey(keyToVerify)
             
             verifyResult = ok
             isVerifying = false
             if ok {
-                if !entered.isEmpty { settings.setAPIKey(entered, for: provider) }
+                if let keyToSave = draft.keyToSaveAfterSuccessfulVerification {
+                    settings.setAPIKey(keyToSave, for: provider)
+                }
                 settings.setKeyVerified(true, for: provider)
                 editingKey = false
             }

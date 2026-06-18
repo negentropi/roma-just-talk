@@ -5,19 +5,15 @@ import SwiftUI
 import Atomics
 import VoiceInkCore
 
-// MARK: - WhisperModelFile
-
-typealias WhisperModelFile = VoiceInkWhisperLocalModelFile
-
 // MARK: - WhisperModelManager
 
 @MainActor
 class WhisperModelManager: ObservableObject {
-    @Published var availableModels: [WhisperModelFile] = []
+    @Published var availableModels: [VoiceInkWhisperLocalModelFile] = []
     @Published var downloadProgress: [String: Double] = [:]
     @Published var whisperContext: WhisperContext?
     @Published var isModelLoaded = false
-    @Published var loadedWhisperModel: WhisperModelFile?
+    @Published var loadedWhisperModel: VoiceInkWhisperLocalModelFile?
     @Published var isModelLoading = false
 
     let modelsDirectory: URL
@@ -57,7 +53,7 @@ class WhisperModelManager: ObservableObject {
 
     // MARK: - Model Loading
 
-    func loadModel(_ model: WhisperModelFile) async throws {
+    func loadModel(_ model: VoiceInkWhisperLocalModelFile) async throws {
         guard whisperContext == nil else { return }
 
         isModelLoading = true
@@ -171,7 +167,7 @@ class WhisperModelManager: ObservableObject {
         }
     }
 
-    private func downloadMainModel(_ model: WhisperModel, from url: URL) async throws -> WhisperModelFile {
+    private func downloadMainModel(_ model: WhisperModel, from url: URL) async throws -> VoiceInkWhisperLocalModelFile {
         let progressKeyMain = model.name + "_main"
         let data = try await downloadFileWithProgress(from: url, progressKey: progressKeyMain)
 
@@ -181,10 +177,10 @@ class WhisperModelManager: ObservableObject {
             in: modelsDirectory
         )
 
-        return WhisperModelFile(name: model.name, url: destinationURL)
+        return VoiceInkWhisperLocalModelFile(name: model.name, url: destinationURL)
     }
 
-    private func downloadAndSetupCoreMLModel(for model: WhisperModelFile, from url: URL) async throws -> WhisperModelFile {
+    private func downloadAndSetupCoreMLModel(for model: VoiceInkWhisperLocalModelFile, from url: URL) async throws -> VoiceInkWhisperLocalModelFile {
         let progressKeyCoreML = model.name + "_coreml"
         let coreMLData = try await downloadFileWithProgress(from: url, progressKey: progressKeyCoreML)
 
@@ -199,7 +195,7 @@ class WhisperModelManager: ObservableObject {
         return try await unzipAndSetupCoreMLModel(for: model, zipPath: coreMLZipPath, progressKey: progressKeyCoreML)
     }
 
-    private func unzipAndSetupCoreMLModel(for model: WhisperModelFile, zipPath: URL, progressKey: String) async throws -> WhisperModelFile {
+    private func unzipAndSetupCoreMLModel(for model: VoiceInkWhisperLocalModelFile, zipPath: URL, progressKey: String) async throws -> VoiceInkWhisperLocalModelFile {
         guard let coreMLDestination = VoiceInkWhisperModelFiles.coreMLEncoderDirectoryURL(
             forModelName: model.name,
             in: modelsDirectory
@@ -232,7 +228,7 @@ class WhisperModelManager: ObservableObject {
         }
     }
 
-    private func verifyAndCleanupCoreMLFiles(_ model: WhisperModelFile, _ destination: URL, _ zipPath: URL, _ progressKey: String) throws -> WhisperModelFile {
+    private func verifyAndCleanupCoreMLFiles(_ model: VoiceInkWhisperLocalModelFile, _ destination: URL, _ zipPath: URL, _ progressKey: String) throws -> VoiceInkWhisperLocalModelFile {
         var model = model
 
         var isDirectory: ObjCBool = false
@@ -253,7 +249,7 @@ class WhisperModelManager: ObservableObject {
         self.downloadProgress.removeValue(forKey: model.name + "_coreml")
     }
 
-    func deleteModel(_ model: WhisperModelFile) async {
+    func deleteModel(_ model: VoiceInkWhisperLocalModelFile) async {
         do {
             try VoiceInkWhisperModelFiles.deleteModelFiles(
                 forModelName: model.name,
@@ -328,7 +324,7 @@ class WhisperModelManager: ObservableObject {
             try FileManager.default.createDirectory(at: modelsDirectory, withIntermediateDirectories: true)
             try FileManager.default.copyItem(at: sourceURL, to: destinationURL)
 
-            let newWhisperModel = WhisperModelFile(name: baseName, url: destinationURL)
+            let newWhisperModel = VoiceInkWhisperLocalModelFile(name: baseName, url: destinationURL)
             availableModels.append(newWhisperModel)
 
             onModelsChanged?()

@@ -1,4 +1,5 @@
 import Foundation
+import VoiceInkCore
 
 /// Protocol that VoiceInkEngine conforms to for power mode session management.
 @MainActor
@@ -8,7 +9,7 @@ protocol PowerModeStateProvider: AnyObject {
 
     func setDefaultTranscriptionModel(_ model: any TranscriptionModel)
     func cleanupModelResources() async
-    func loadModel(_ model: WhisperModelFile) async throws
+    func loadModel(_ model: VoiceInkWhisperLocalModelFile) async throws
 
-    var availableModels: [WhisperModelFile] { get }
+    var availableModels: [VoiceInkWhisperLocalModelFile] { get }
 }

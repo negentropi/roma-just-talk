@@ -1,4 +1,5 @@
 import Foundation
+import VoiceInkCore
 
 // MARK: - RecorderStateProvider
 
@@ -15,7 +16,7 @@ extension VoiceInkEngine: PowerModeStateProvider {
         transcriptionModelManager.allAvailableModels
     }
 
-    var availableModels: [WhisperModelFile] {
+    var availableModels: [VoiceInkWhisperLocalModelFile] {
         whisperModelManager.availableModels
     }
 
@@ -27,7 +28,7 @@ extension VoiceInkEngine: PowerModeStateProvider {
         await cleanupResources()
     }
 
-    func loadModel(_ model: WhisperModelFile) async throws {
+    func loadModel(_ model: VoiceInkWhisperLocalModelFile) async throws {
         try await whisperModelManager.loadModel(model)
     }
 }

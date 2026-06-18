@@ -220,7 +220,7 @@ struct SettingsView: View {
     private var canAddWordReplacement: Bool {
         VoiceInkDictionaryPolicy.canSaveWordReplacementDraft(
             original: newReplacementOriginal.trimmingCharacters(in: .whitespacesAndNewlines),
-            replacement: newReplacementText.trimmingCharacters(in: .whitespacesAndNewlines)
+            replacement: newReplacementText
         )
     }
 

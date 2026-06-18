@@ -74,10 +74,11 @@ public enum VoiceInkDictionaryPolicy {
         existingOriginalTexts: [String]
     ) -> VoiceInkWordReplacementInsertPlan {
         let originalTokens = tokens(from: original)
-        guard !originalTokens.isEmpty, !replacement.isEmpty else {
+        let trimmedReplacement = replacement.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !originalTokens.isEmpty, !trimmedReplacement.isEmpty else {
             return VoiceInkWordReplacementInsertPlan(
                 originalText: original,
-                replacementText: replacement,
+                replacementText: trimmedReplacement,
                 errorMessage: nil
             )
         }
@@ -94,7 +95,7 @@ public enum VoiceInkDictionaryPolicy {
 
         return VoiceInkWordReplacementInsertPlan(
             originalText: original,
-            replacementText: replacement,
+            replacementText: trimmedReplacement,
             errorMessage: nil
         )
     }

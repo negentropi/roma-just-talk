@@ -194,10 +194,9 @@ final class AppSettings: ObservableObject {
     @discardableResult
     func addWordReplacement(original: String, replacement: String) -> String? {
         let trimmedOriginal = original.trimmingCharacters(in: .whitespacesAndNewlines)
-        let trimmedReplacement = replacement.trimmingCharacters(in: .whitespacesAndNewlines)
         let plan = VoiceInkDictionaryPolicy.wordReplacementInsertPlan(
             original: trimmedOriginal,
-            replacement: trimmedReplacement,
+            replacement: replacement,
             existingOriginalTexts: wordReplacements.map(\.originalText)
         )
 

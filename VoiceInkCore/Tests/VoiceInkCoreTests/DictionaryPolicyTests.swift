@@ -59,7 +59,7 @@ final class DictionaryPolicyTests: XCTestCase {
         XCTAssertFalse(
             VoiceInkDictionaryPolicy.wordReplacementInsertPlan(
                 original: "voice ink",
-                replacement: "",
+                replacement: " \n ",
                 existingOriginalTexts: []
             ).shouldInsert
         )
@@ -100,7 +100,7 @@ final class DictionaryPolicyTests: XCTestCase {
     func testWordReplacementPlanAllowsNewTokensAndPreservesOriginalInput() {
         let plan = VoiceInkDictionaryPolicy.wordReplacementInsertPlan(
             original: " Flow, Voice Ink ",
-            replacement: "roma",
+            replacement: " roma ",
             existingOriginalTexts: ["quick release"]
         )
 

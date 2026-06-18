@@ -201,6 +201,58 @@ final class TranscriptionRunProcessorTests: XCTestCase {
         XCTAssertTrue(result.postProcessingSucceeded)
     }
 
+    func testTranscribeSkipsPostProcessingForShortTranscriptWhenPolicyEnabled() async throws {
+        let processor = VoiceInkTranscriptionRunProcessor { _ in
+            XCTFail("Post-processing should not run")
+            return "unexpected"
+        }
+
+        let result = try await processor.transcribe(
+            fileURL: URL(fileURLWithPath: "/tmp/audio.wav"),
+            configuration: configuration(isPostProcessingEnabled: true),
+            postProcessingSkipConfiguration: VoiceInkPostProcessingSkipConfiguration(
+                isEnabled: true,
+                wordThreshold: 3
+            ),
+            apiKeyProvider: { provider in provider == .gemini ? "llm-key" : "stt-key" },
+            transcriptionServiceProvider: { _ in
+                StubTranscriptionService(text: "yes thank you")
+            }
+        )
+
+        XCTAssertEqual(result.cleanedText, "yes thank you")
+        XCTAssertEqual(result.finalText, "yes thank you")
+        XCTAssertNil(result.enhancedText)
+        XCTAssertNil(result.aiEnhancementModelName)
+        XCTAssertNil(result.postProcessingError)
+        XCTAssertFalse(result.postProcessingSucceeded)
+    }
+
+    func testTranscribeRunsPostProcessingForShortTranscriptWhenPromptTriggerForcesIt() async throws {
+        let processor = VoiceInkTranscriptionRunProcessor { job in
+            XCTAssertEqual(job.transcript, "yes thank you")
+            return "enhanced short text"
+        }
+
+        let result = try await processor.transcribe(
+            fileURL: URL(fileURLWithPath: "/tmp/audio.wav"),
+            configuration: configuration(isPostProcessingEnabled: true),
+            postProcessingSkipConfiguration: VoiceInkPostProcessingSkipConfiguration(
+                isEnabled: true,
+                wordThreshold: 3
+            ),
+            promptTriggerForcesPostProcessing: true,
+            apiKeyProvider: { provider in provider == .gemini ? "llm-key" : "stt-key" },
+            transcriptionServiceProvider: { _ in
+                StubTranscriptionService(text: "yes thank you")
+            }
+        )
+
+        XCTAssertEqual(result.finalText, "enhanced short text")
+        XCTAssertEqual(result.aiEnhancementModelName, "gemini-2.5-flash")
+        XCTAssertTrue(result.postProcessingSucceeded)
+    }
+
     func testEnhancedTextIsNilWhenSuccessfulPostProcessingReturnsCleanedText() async throws {
         let processor = VoiceInkTranscriptionRunProcessor { job in
             job.transcript

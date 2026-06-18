@@ -35,6 +35,7 @@ class TranscriptionRetryService {
             fileURL: fileURL,
             configuration: modeConfiguration,
             cleanupConfiguration: cleanupConfiguration,
+            postProcessingSkipConfiguration: VoiceInkPostProcessingSkipConfiguration.current(),
             transcriptionLanguage: transcriptionLanguage,
             transcriptionPrompt: transcriptionPrompt,
             apiKeyProvider: { provider in

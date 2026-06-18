@@ -92,6 +92,8 @@ public struct VoiceInkTranscriptionRunProcessor {
         fileURL: URL,
         configuration: VoiceInkModeRuntimeConfiguration,
         cleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration = .disabled,
+        postProcessingSkipConfiguration: VoiceInkPostProcessingSkipConfiguration? = nil,
+        promptTriggerForcesPostProcessing: Bool = false,
         transcriptionLanguage: String? = nil,
         transcriptionPrompt: String? = nil,
         apiKeyProvider: APIKeyProvider,
@@ -129,13 +131,22 @@ public struct VoiceInkTranscriptionRunProcessor {
         let cleanedText = cleanupConfiguration.applyTextPreferences(
             formattedText,
         )
-        let aiEnhancementModelName = configuration.isPostProcessingEnabled ? configuration.postProcessingModel : nil
+        let shouldSkipPostProcessing = postProcessingSkipConfiguration.map {
+            VoiceInkPostProcessingSkipPolicy.shouldSkipPostProcessing(
+                transcript: cleanedText,
+                configuration: $0,
+                promptTriggerForcesPostProcessing: promptTriggerForcesPostProcessing
+            )
+        } ?? false
+        let aiEnhancementModelName = configuration.isPostProcessingEnabled && !shouldSkipPostProcessing
+            ? configuration.postProcessingModel
+            : nil
 
         var finalText = cleanedText
         var postProcessingError: String? = nil
         var postProcessingSucceeded = false
 
-        if configuration.isPostProcessingEnabled {
+        if configuration.isPostProcessingEnabled, !shouldSkipPostProcessing {
             let prompt = configuration.prompt
             if !prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 let llmProvider = configuration.postProcessingProvider

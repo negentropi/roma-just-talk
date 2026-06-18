@@ -38,6 +38,37 @@ public enum VoiceInkPCM16Audio {
         return floatSamples(fromLittleEndianData: data, startingAt: wavHeaderByteCount)
     }
 
+    public static func normalizedMonoFloatSamples(
+        channelCount: Int,
+        frameLength: Int,
+        sampleAt: (_ channel: Int, _ frame: Int) -> Float
+    ) -> [Float] {
+        guard channelCount > 0, frameLength > 0 else { return [] }
+
+        var samples = Array(repeating: Float(0), count: frameLength)
+
+        if channelCount == 1 {
+            for frame in 0..<frameLength {
+                samples[frame] = sampleAt(0, frame)
+            }
+        } else {
+            for frame in 0..<frameLength {
+                var sum: Float = 0
+                for channel in 0..<channelCount {
+                    sum += sampleAt(channel, frame)
+                }
+                samples[frame] = sum / Float(channelCount)
+            }
+        }
+
+        let maxSample = samples.map(abs).max() ?? 1
+        if maxSample > 0 {
+            samples = samples.map { $0 / maxSample }
+        }
+
+        return samples
+    }
+
     public static func sampleCount(inData data: Data) -> Int {
         data.count / bytesPerSample
     }

@@ -33,6 +33,51 @@ final class PCM16AudioSamplesTests: XCTestCase {
         XCTAssertNil(VoiceInkPCM16Audio.floatSamples(fromWAVData: data))
     }
 
+    func testNormalizedMonoFloatSamplesPreserveSingleChannelNormalization() {
+        let input: [Float] = [-0.25, 0.5, 1.0]
+
+        let samples = VoiceInkPCM16Audio.normalizedMonoFloatSamples(
+            channelCount: 1,
+            frameLength: input.count,
+            sampleAt: { _, frame in input[frame] }
+        )
+
+        XCTAssertEqual(samples, [-0.25, 0.5, 1.0])
+    }
+
+    func testNormalizedMonoFloatSamplesAverageChannelsBeforeNormalizing() {
+        let channels: [[Float]] = [
+            [0.0, 0.5, 1.0],
+            [0.0, 1.0, -1.0]
+        ]
+
+        let samples = VoiceInkPCM16Audio.normalizedMonoFloatSamples(
+            channelCount: channels.count,
+            frameLength: channels[0].count,
+            sampleAt: { channel, frame in channels[channel][frame] }
+        )
+
+        XCTAssertEqual(samples, [0.0, 1.0, 0.0])
+    }
+
+    func testNormalizedMonoFloatSamplesKeepSilenceAtZero() {
+        let samples = VoiceInkPCM16Audio.normalizedMonoFloatSamples(
+            channelCount: 2,
+            frameLength: 3,
+            sampleAt: { _, _ in 0.0 }
+        )
+
+        XCTAssertEqual(samples, [0.0, 0.0, 0.0])
+        XCTAssertEqual(
+            VoiceInkPCM16Audio.normalizedMonoFloatSamples(
+                channelCount: 0,
+                frameLength: 3,
+                sampleAt: { _, _ in 1.0 }
+            ),
+            []
+        )
+    }
+
     func testDurationAndByteCountUseMono16kPCM16Format() {
         XCTAssertEqual(VoiceInkPCM16Audio.mono16kSampleRateHz, 16_000)
         XCTAssertEqual(VoiceInkPCM16Audio.mono16kSampleRate, 16_000.0)

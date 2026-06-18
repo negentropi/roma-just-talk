@@ -113,29 +113,12 @@ class AudioProcessor {
         guard let channelData = buffer.floatChannelData else {
             return []
         }
-        
-        let channelCount = Int(buffer.format.channelCount)
-        let frameLength = Int(buffer.frameLength)
-        var samples = Array(repeating: Float(0), count: frameLength)
-        
-        if channelCount == 1 {
-            samples = Array(UnsafeBufferPointer(start: channelData[0], count: frameLength))
-        } else {
-            for frame in 0..<frameLength {
-                var sum: Float = 0
-                for channel in 0..<channelCount {
-                    sum += channelData[channel][frame]
-                }
-                samples[frame] = sum / Float(channelCount)
-            }
-        }
-        
-        let maxSample = samples.map(abs).max() ?? 1
-        if maxSample > 0 {
-            samples = samples.map { $0 / maxSample }
-        }
-        
-        return samples
+
+        return VoiceInkPCM16Audio.normalizedMonoFloatSamples(
+            channelCount: Int(buffer.format.channelCount),
+            frameLength: Int(buffer.frameLength),
+            sampleAt: { channel, frame in channelData[channel][frame] }
+        )
     }
     func saveSamplesAsWav(samples: [Float], to url: URL) throws {
         let outputFormat = AVAudioFormat(

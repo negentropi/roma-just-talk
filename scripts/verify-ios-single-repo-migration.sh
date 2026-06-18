@@ -35,6 +35,12 @@ require_command() {
   fi
 }
 
+require_file() {
+  if [[ ! -f "$1" ]]; then
+    fail "missing file: $1"
+  fi
+}
+
 run_required() {
   local description="$1"
   shift
@@ -70,6 +76,14 @@ section "single-repo layout"
 [[ -d VoiceInkCore ]] || fail "missing in-repo VoiceInkCore package"
 [[ ! -d ../VoiceInkCore ]] || fail "parent-level ../VoiceInkCore exists; shared core must live inside VoiceInk/"
 
+section "iOS ported assets and resources"
+require_file iOS/VoiceInk-ios/PrivacyInfo.xcprivacy
+require_file iOS/VoiceInk-ios/Resources/ggml-silero-v5.1.2.bin
+require_file iOS/VoiceInk-ios/Assets.xcassets/AppIcon.appiconset/Contents.json
+for icon in 20.png 29.png 40.png 50.png 57.png 58.png 60.png 72.png 76.png 80.png 87.png 100.png 114.png 120.png 144.png 152.png 167.png 180.png 1024.png; do
+  require_file "iOS/VoiceInk-ios/Assets.xcassets/AppIcon.appiconset/$icon"
+done
+
 require_pattern \
   "workspace includes iOS project" \
   'location = "group:iOS/VoiceInk-ios.xcodeproj"' \
@@ -94,9 +108,12 @@ run_required "project/plist/entitlements lint" plutil -lint \
   VoiceInk/VoiceInk.entitlements \
   VoiceInk/VoiceInk.local.entitlements \
   iOS/VoiceInk-ios/Info.plist \
+  iOS/VoiceInk-ios/PrivacyInfo.xcprivacy \
   iOS/VoiceInk-ios/VoiceInk_ios.entitlements \
   iOS/VoiceInkKeyboard/Info.plist \
   iOS/VoiceInkKeyboard/VoiceInkKeyboard.entitlements
+
+run_required "iOS app icon JSON lint" plutil -convert xml1 -o /tmp/VoiceInkAppIconContents.plist iOS/VoiceInk-ios/Assets.xcassets/AppIcon.appiconset/Contents.json
 
 run_required "workspace and scheme XML lint" xmllint --noout \
   VoiceInk.xcworkspace/contents.xcworkspacedata \

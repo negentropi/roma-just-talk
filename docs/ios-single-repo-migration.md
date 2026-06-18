@@ -8,6 +8,7 @@
 - iOS app and keyboard targets: `iOS/VoiceInk-ios.xcodeproj`
 - iOS app/keyboard shared shell code: `iOS/Shared/`
 - iOS unit/UI test target sources: `iOS/VoiceInk-iosTests/`, `iOS/VoiceInk-iosUITests/`
+- iOS non-Swift app artifacts: `iOS/VoiceInk-ios/PrivacyInfo.xcprivacy`, `iOS/VoiceInk-ios/Assets.xcassets/`, and `iOS/VoiceInk-ios/Resources/ggml-silero-v5.1.2.bin`
 - shared Swift package: `VoiceInkCore/`
 - workspace entry for both app projects: `VoiceInk.xcworkspace`
 
@@ -270,6 +271,7 @@ scripts/verify-ios-single-repo-migration.sh --full-build
 5. iOS app, keyboard, unit-test, and UI-test Swift sources parse or build.
 6. `plutil -lint` passes for both project files and iOS plists/entitlements.
 7. `xmllint --noout` passes for workspace and shared scheme XML.
-8. A real Xcode toolchain is selected and both app targets build.
+8. iOS non-Swift app artifacts are present: privacy manifest, app icon catalog files, and bundled Silero VAD resource.
+9. A real Xcode toolchain is selected and both app targets build.
 
 Current local blocker: `xcode-select -p` points to `/Library/Developer/CommandLineTools`, and the previously used external Xcode volume is not mounted. Full target builds are still environment-blocked until a real Xcode is selected; macOS `VoiceInk` also needs `/Users/atalphalnmomhappyhouse/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework`, and iOS `VoiceInk-ios` needs the iOS 26.2 platform installed. Until those are present, use `swift run VoiceInkCoreChecks` plus the static parse/lint gates above for local proof.

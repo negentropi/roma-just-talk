@@ -73,9 +73,75 @@ final class TranscriptionRecordTests: XCTestCase {
         XCTAssertEqual(record.transcriptionStatus, .failed)
         XCTAssertEqual(record.transcriptionError, "Audio file not found")
     }
+
+    func testRetranscribeStoredAudioAppliesCompletedResult() async throws {
+        let recordingsDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.TranscriptionRecordTests.\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: recordingsDirectory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: recordingsDirectory) }
+
+        let audioURL = recordingsDirectory.appendingPathComponent("recording.wav")
+        try Data("audio".utf8).write(to: audioURL)
+
+        let record = StubStoredTranscriptionRecord(
+            audioFileURL: audioURL.lastPathComponent,
+            storedAudioRecordingsDirectory: recordingsDirectory
+        )
+        let returnedText = try await record.retranscribeStoredAudio { fileURL in
+            XCTAssertEqual(fileURL, audioURL)
+            return VoiceInkTranscriptionRunResult(
+                cleanedText: "clean",
+                finalText: "enhanced",
+                transcriptionModelName: "whisper-large-v3",
+                aiEnhancementModelName: "gemini-2.5-flash",
+                transcriptionDuration: 3,
+                enhancementDuration: 2,
+                postProcessingError: nil,
+                postProcessingSucceeded: true
+            )
+        }
+
+        XCTAssertEqual(returnedText, "enhanced")
+        XCTAssertEqual(record.text, "clean")
+        XCTAssertEqual(record.enhancedText, "enhanced")
+        XCTAssertEqual(record.transcriptionModelName, "whisper-large-v3")
+        XCTAssertEqual(record.aiEnhancementModelName, "gemini-2.5-flash")
+        XCTAssertEqual(record.transcriptionDuration, 3)
+        XCTAssertEqual(record.enhancementDuration, 2)
+        XCTAssertEqual(record.transcriptionStatus, .completed)
+        XCTAssertNil(record.transcriptionError)
+    }
+
+    func testRetranscribeStoredAudioMarksMissingAudioFailure() async throws {
+        let recordingsDirectory = URL(fileURLWithPath: "/tmp/VoiceInkCore/missing-recording", isDirectory: true)
+        let record = StubStoredTranscriptionRecord(
+            audioFileURL: "missing.wav",
+            storedAudioRecordingsDirectory: recordingsDirectory
+        )
+
+        do {
+            _ = try await record.retranscribeStoredAudio { _ in
+                XCTFail("Missing audio should not run transcription")
+                return VoiceInkTranscriptionRunResult(
+                    cleanedText: "",
+                    finalText: "",
+                    transcriptionModelName: "",
+                    aiEnhancementModelName: nil,
+                    postProcessingError: nil,
+                    postProcessingSucceeded: false
+                )
+            }
+            XCTFail("Expected missing audio to throw")
+        } catch VoiceInkEngineError.audioFileNotFound {
+            XCTAssertEqual(record.transcriptionStatus, .failed)
+            XCTAssertEqual(record.transcriptionError, "Audio file not found")
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
 }
 
-private final class StubMutableTranscriptionRecord: VoiceInkMutableTranscriptionRecord {
+private class StubMutableTranscriptionRecord: VoiceInkMutableTranscriptionRecord {
     var text: String
     var enhancedText: String?
     var transcriptionModelName: String?
@@ -103,5 +169,19 @@ private final class StubMutableTranscriptionRecord: VoiceInkMutableTranscription
         self.enhancementDuration = enhancementDuration
         self.transcriptionStatus = transcriptionStatus
         self.transcriptionError = transcriptionError
+    }
+}
+
+private final class StubStoredTranscriptionRecord: StubMutableTranscriptionRecord, VoiceInkStoredAudioRecord {
+    var audioFileURL: String?
+    let storedAudioRecordingsDirectory: URL?
+
+    init(
+        audioFileURL: String?,
+        storedAudioRecordingsDirectory: URL?
+    ) {
+        self.audioFileURL = audioFileURL
+        self.storedAudioRecordingsDirectory = storedAudioRecordingsDirectory
+        super.init()
     }
 }

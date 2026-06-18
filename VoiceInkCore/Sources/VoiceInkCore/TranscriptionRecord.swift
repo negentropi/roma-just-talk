@@ -28,3 +28,27 @@ public extension VoiceInkMutableTranscriptionRecord {
         transcriptionError = errorDescription
     }
 }
+
+public extension VoiceInkMutableTranscriptionRecord where Self: VoiceInkStoredAudioRecord {
+    @discardableResult
+    func retranscribeStoredAudio(
+        relativeTo recordingsDirectory: URL? = nil,
+        fileManager: FileManager = .default,
+        transcribe: (URL) async throws -> VoiceInkTranscriptionRunResult
+    ) async throws -> String {
+        guard let fileURL = existingAudioFileURL(relativeTo: recordingsDirectory, fileManager: fileManager) else {
+            let error = VoiceInkEngineError.audioFileNotFound
+            markTranscriptionFailed(VoiceInkErrorDescription.text(for: error))
+            throw error
+        }
+
+        do {
+            let result = try await transcribe(fileURL)
+            applyCompletedRunResult(result)
+            return result.finalText
+        } catch {
+            markTranscriptionFailed(VoiceInkErrorDescription.text(for: error))
+            throw error
+        }
+    }
+}

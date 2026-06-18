@@ -239,10 +239,23 @@ public enum VoiceInkOnboardingPreference {
     }
 }
 
+public struct VoiceInkAudioSessionTimeoutPresentation: Equatable, Sendable {
+    public let sectionTitle: String
+    public let timeoutTitle: String
+    public let detailText: String
+
+    public static let iOS = VoiceInkAudioSessionTimeoutPresentation(
+        sectionTitle: "Audio Settings",
+        timeoutTitle: "Session Timeout",
+        detailText: "How long to keep the microphone session active after recording stops. Longer timeouts prevent 'session activation failed' errors when recording frequently, but may use more battery."
+    )
+}
+
 public enum VoiceInkAudioSessionTimeoutPreference {
     public static let minimumSeconds = 0
     public static let maximumSeconds = 300
     public static let stepSeconds = 15
+    public static let settingsPresentation = VoiceInkAudioSessionTimeoutPresentation.iOS
 
     public static func timeoutSeconds(from defaults: UserDefaults = .standard) -> Int {
         defaults.object(forKey: VoiceInkUserDefaultsKey.audioSessionTimeoutSeconds) as? Int

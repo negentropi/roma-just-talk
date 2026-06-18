@@ -329,6 +329,17 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkAudioSessionTimeoutPreference.deactivationInterval(for: -1), 0)
     }
 
+    func testAudioSessionTimeoutPresentationPreservesIOSSettingsCopy() {
+        let presentation = VoiceInkAudioSessionTimeoutPreference.settingsPresentation
+
+        XCTAssertEqual(presentation.sectionTitle, "Audio Settings")
+        XCTAssertEqual(presentation.timeoutTitle, "Session Timeout")
+        XCTAssertEqual(
+            presentation.detailText,
+            "How long to keep the microphone session active after recording stops. Longer timeouts prevent 'session activation failed' errors when recording frequently, but may use more battery."
+        )
+    }
+
     func testVADPreferenceUsesSharedDefaultWhenMissing() {
         withIsolatedDefaults { defaults in
             XCTAssertEqual(

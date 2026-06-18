@@ -10,6 +10,7 @@ struct SettingsView: View {
     @State private var newReplacementText = ""
     @State private var dictionaryAlert: VoiceInkDictionaryAlertPresentation?
     private let cleanupPresentation = VoiceInkTranscriptionCleanupPresentation.iOS
+    private let audioTimeoutPresentation = VoiceInkAudioSessionTimeoutPreference.settingsPresentation
     
     var body: some View {
         List {
@@ -138,10 +139,10 @@ struct SettingsView: View {
                 .onDelete(perform: settings.removeWordReplacements)
             }
             
-            Section(header: Text("Audio Settings")) {
+            Section(header: Text(audioTimeoutPresentation.sectionTitle)) {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
-                        Text("Session Timeout")
+                        Text(audioTimeoutPresentation.timeoutTitle)
                         Spacer()
                         Text(VoiceInkAudioSessionTimeoutPreference.displayText(
                             for: settings.audioSessionTimeoutSeconds
@@ -160,7 +161,7 @@ struct SettingsView: View {
                         step: Double(VoiceInkAudioSessionTimeoutPreference.stepSeconds)
                     )
                     
-                    Text("How long to keep the microphone session active after recording stops. Longer timeouts prevent 'session activation failed' errors when recording frequently, but may use more battery.")
+                    Text(audioTimeoutPresentation.detailText)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)

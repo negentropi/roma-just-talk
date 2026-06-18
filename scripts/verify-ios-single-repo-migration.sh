@@ -1482,6 +1482,16 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
+  "shared audio-session timeout presentation lives in VoiceInkCore" \
+  'VoiceInkAudioSessionTimeoutPresentation|settingsPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "iOS audio settings use shared timeout presentation" \
+  'audioTimeoutPresentation|settingsPresentation' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+require_pattern \
   "iOS audio settings use shared timeout display policy" \
   'VoiceInkAudioSessionTimeoutPreference\.displayText' \
   iOS/VoiceInk-ios/SettingsView.swift
@@ -1494,6 +1504,11 @@ require_pattern \
 reject_pattern \
   "iOS audio settings avoid shell-only timeout range and display policy" \
   '0\.\.\.300|step: 15|audioSessionTimeoutSeconds\)s' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+reject_pattern \
+  "iOS audio settings avoid shell-only timeout presentation copy" \
+  '"(Audio Settings|Session Timeout|How long to keep the microphone session active after recording stops\\. Longer timeouts prevent '\''session activation failed'\'' errors when recording frequently, but may use more battery\\.)"' \
   iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \

@@ -64,7 +64,7 @@ enum AppDefaults {
 
     static func registerDefaults() {
         let defaults = UserDefaults.standard
-        let shouldEnableLaunchAtLoginByDefault = defaults.object(forKey: VoiceInkUserDefaultsKey.hasCompletedOnboarding) == nil
+        let shouldEnableLaunchAtLoginByDefault = !VoiceInkOnboardingPreference.hasStoredCompletionState(from: defaults)
             && defaults.object(forKey: "DidApplyLaunchAtLoginDefault") == nil
 
         defaults.register(defaults: registeredDefaults)

@@ -167,6 +167,10 @@ public struct VoiceInkDefaultSettings: Equatable, Sendable {
 }
 
 public enum VoiceInkOnboardingPreference {
+    public static func hasStoredCompletionState(from defaults: UserDefaults = .standard) -> Bool {
+        defaults.object(forKey: VoiceInkUserDefaultsKey.hasCompletedOnboarding) != nil
+    }
+
     public static func hasCompletedOnboarding(from defaults: UserDefaults = .standard) -> Bool {
         defaults.bool(forKey: VoiceInkUserDefaultsKey.hasCompletedOnboarding)
     }

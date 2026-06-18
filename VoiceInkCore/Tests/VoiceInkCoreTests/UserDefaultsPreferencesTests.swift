@@ -244,6 +244,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
 
     func testOnboardingPreferenceUsesFalseWhenMissing() {
         withIsolatedDefaults { defaults in
+            XCTAssertFalse(VoiceInkOnboardingPreference.hasStoredCompletionState(from: defaults))
             XCTAssertFalse(VoiceInkOnboardingPreference.hasCompletedOnboarding(from: defaults))
         }
     }
@@ -251,9 +252,11 @@ final class UserDefaultsPreferencesTests: XCTestCase {
     func testOnboardingPreferenceSavesAndClearsCompletionState() {
         withIsolatedDefaults { defaults in
             VoiceInkOnboardingPreference.saveHasCompletedOnboarding(true, to: defaults)
+            XCTAssertTrue(VoiceInkOnboardingPreference.hasStoredCompletionState(from: defaults))
             XCTAssertTrue(VoiceInkOnboardingPreference.hasCompletedOnboarding(from: defaults))
 
             VoiceInkOnboardingPreference.clear(from: defaults)
+            XCTAssertFalse(VoiceInkOnboardingPreference.hasStoredCompletionState(from: defaults))
             XCTAssertFalse(VoiceInkOnboardingPreference.hasCompletedOnboarding(from: defaults))
         }
     }

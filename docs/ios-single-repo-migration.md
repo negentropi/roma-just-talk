@@ -101,6 +101,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - VAD bundle resource lookup
 - PCM16 sample conversion, mono 16 kHz transcription-audio format constants, normalized mono sample mixing for Whisper input, float-to-PCM16 output sample conversion, interleaved Float32 live-capture conversion to mono PCM16 with optional linear resampling, and sample-aligned PCM16 data chunking, including bit depth, endian, and integer/float sample policy
 - audio-meter decibel normalization and smoothing math; platform shells still own capture, timers, and visualizer rendering
+- audio playback timeline progress, waveform sample progress, and clamped seek-time math; platform shells still own `AVAudioPlayer`, gestures, hover state, and playback UI
 - OpenAI-compatible, Deepgram, Gemini, Mistral, ElevenLabs, xAI, Soniox, Speechmatics, and AssemblyAI remote transcription request/client helpers
 - shared remote transcription provider dispatch plus batch request option defaults for provider-specific prompt, vocabulary, timeout, retry, and formatting parameters
 - Cartesia API-key verification request/client helper
@@ -157,6 +158,7 @@ Current macOS consumers of shared remote transport:
 - macOS CSV export delegates header, row formatting, and escaping to `VoiceInkTranscriptionCSVExporter`; macOS still owns `NSSavePanel` and mapping SwiftData `Transcription` records into export records.
 - macOS transcript details and CSV export delegate power-mode display formatting to `VoiceInkPowerModePresentation`.
 - macOS and iOS local Whisper model directory creation, local `.bin` listing, download URL/file path lookup, runtime selected-model file resolution, final downloaded-file installation, bootstrap-model availability, Core ML support checks, and model deletion delegate to `VoiceInkWhisperModelFiles`; platform shells still own download progress, UI, and runtime model state.
+- macOS waveform playback and iOS note audio playback use `VoiceInkAudioPlaybackTimeline` for clamped progress and seek math; platform shells still own `AVAudioPlayer`, hover/drag gestures, and rendering.
 - macOS and iOS local Whisper and macOS rolling preload resolve the Silero VAD bundle resource directly through `VoiceInkVADModelFiles`; the old shell-only VAD model manager adapters were removed.
 - macOS `FluidAudioStreamingProvider` runs stable partial-transcript confirmation through `WordAgreementEngine` in `VoiceInkCore`; `FluidAudioWordTimingAdapter` remains a macOS shell adapter because it imports the FluidAudio token type.
 - macOS streaming sessions choose final-commit wait time through `VoiceInkStreamingFinalCommitTimeout`, preserving the shorter local FluidAudio finalization path and the longer cloud-provider timeout.

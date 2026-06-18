@@ -82,19 +82,28 @@ struct AudioPlayerView: View {
                                 // Progress
                                 RoundedRectangle(cornerRadius: 2)
                                     .fill(.blue)
-                                    .frame(width: geometry.size.width * CGFloat(player.currentTime / max(player.duration, 1)), height: 4)
+                                    .frame(
+                                        width: geometry.size.width * CGFloat(VoiceInkAudioPlaybackTimeline.progress(
+                                            currentTime: player.currentTime,
+                                            duration: player.duration
+                                        )),
+                                        height: 4
+                                    )
                             }
+                            .contentShape(Rectangle())
+                            .gesture(
+                                DragGesture(minimumDistance: 0)
+                                    .onChanged { value in
+                                        let seekTime = VoiceInkAudioPlaybackTimeline.time(
+                                            atLocationX: Double(value.location.x),
+                                            width: Double(geometry.size.width),
+                                            duration: player.duration
+                                        )
+                                        player.seek(to: seekTime)
+                                    }
+                            )
                         }
                         .frame(height: 4)
-                        .contentShape(Rectangle())
-                        .gesture(
-                            DragGesture(minimumDistance: 0)
-                                .onChanged { value in
-                                    let progress = value.location.x / max(value.startLocation.x, 1)
-                                    let seekTime = progress * player.duration
-                                    player.seek(to: max(0, min(seekTime, player.duration)))
-                                }
-                        )
                         
                         // Time display
                         HStack {

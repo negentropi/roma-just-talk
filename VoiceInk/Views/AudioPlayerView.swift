@@ -152,6 +152,15 @@ struct WaveformView: View {
 
     var body: some View {
         GeometryReader { geometry in
+            let playbackProgress = VoiceInkAudioPlaybackTimeline.progress(
+                currentTime: currentTime,
+                duration: duration
+            )
+            let hoverProgress = VoiceInkAudioPlaybackTimeline.progress(
+                locationX: Double(hoverLocation),
+                width: Double(geometry.size.width)
+            )
+
             ZStack(alignment: .leading) {
                 if isLoading {
                     HStack {
@@ -167,11 +176,14 @@ struct WaveformView: View {
                         ForEach(0..<samples.count, id: \.self) { index in
                             WaveformBar(
                                 sample: samples[index],
-                                isPlayed: CGFloat(index) / CGFloat(samples.count) <= CGFloat(currentTime / duration),
+                                isPlayed: VoiceInkAudioPlaybackTimeline.sampleProgress(
+                                    index: index,
+                                    sampleCount: samples.count
+                                ) <= playbackProgress,
                                 totalBars: samples.count,
                                 geometryWidth: geometry.size.width,
                                 isHovering: isHovering,
-                                hoverProgress: hoverLocation / geometry.size.width
+                                hoverProgress: CGFloat(hoverProgress)
                             )
                         }
                     }
@@ -182,7 +194,11 @@ struct WaveformView: View {
                     if isHovering {
                         Text(
                             VoiceInkDurationPresentation.minutesSeconds(
-                                duration * Double(hoverLocation / geometry.size.width)
+                                VoiceInkAudioPlaybackTimeline.time(
+                                    atLocationX: Double(hoverLocation),
+                                    width: Double(geometry.size.width),
+                                    duration: duration
+                                )
                             )
                         )
                             .font(.system(size: 10, weight: .medium))
@@ -208,7 +224,11 @@ struct WaveformView: View {
                     .onChanged { value in
                         if !isLoading {
                             hoverLocation = value.location.x
-                            onSeek(Double(value.location.x / geometry.size.width) * duration)
+                            onSeek(VoiceInkAudioPlaybackTimeline.time(
+                                atLocationX: Double(value.location.x),
+                                width: Double(geometry.size.width),
+                                duration: duration
+                            ))
                         }
                     }
             )

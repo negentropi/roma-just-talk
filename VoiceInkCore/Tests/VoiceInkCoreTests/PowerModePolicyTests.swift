@@ -140,6 +140,101 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertFalse(config.isDefault)
     }
 
+    func testPowerModeApplicationStatePreservesStoredShapeAndCleanupKeys() throws {
+        let state = VoiceInkPowerModeApplicationState(
+            isEnhancementEnabled: true,
+            useScreenCaptureContext: true,
+            selectedPromptId: "prompt-id",
+            selectedAIProvider: "openai",
+            selectedAIModel: "gpt-4o",
+            selectedLanguage: "en",
+            transcriptionModelName: "ggml-base",
+            isTextFormattingEnabled: true,
+            punctuationCleanupMode: .removeTrailingPeriod,
+            removePunctuation: false,
+            lowercaseTranscription: true
+        )
+
+        let object = try jsonObject(from: state)
+
+        XCTAssertEqual(object["isEnhancementEnabled"] as? Bool, true)
+        XCTAssertEqual(object["useScreenCaptureContext"] as? Bool, true)
+        XCTAssertEqual(object["selectedPromptId"] as? String, "prompt-id")
+        XCTAssertEqual(object["selectedAIProvider"] as? String, "openai")
+        XCTAssertEqual(object["selectedAIModel"] as? String, "gpt-4o")
+        XCTAssertEqual(object["selectedLanguage"] as? String, "en")
+        XCTAssertEqual(object["transcriptionModelName"] as? String, "ggml-base")
+        XCTAssertEqual(object["isTextFormattingEnabled"] as? Bool, true)
+        XCTAssertEqual(object["punctuationCleanupMode"] as? String, PunctuationCleanupMode.removeTrailingPeriod.rawValue)
+        XCTAssertEqual(object["removePunctuation"] as? Bool, false)
+        XCTAssertEqual(object["lowercaseTranscription"] as? Bool, true)
+        XCTAssertEqual(
+            try JSONDecoder().decode(VoiceInkPowerModeApplicationState.self, from: JSONEncoder().encode(state)),
+            state
+        )
+    }
+
+    func testPowerModeApplicationStateDecodesLegacyRemovePunctuation() throws {
+        let data = Data("""
+        {
+          "isEnhancementEnabled": false,
+          "useScreenCaptureContext": true,
+          "removePunctuation": true
+        }
+        """.utf8)
+
+        let state = try JSONDecoder().decode(VoiceInkPowerModeApplicationState.self, from: data)
+
+        XCTAssertFalse(state.isEnhancementEnabled)
+        XCTAssertTrue(state.useScreenCaptureContext)
+        XCTAssertNil(state.selectedPromptId)
+        XCTAssertNil(state.selectedAIProvider)
+        XCTAssertNil(state.selectedAIModel)
+        XCTAssertNil(state.selectedLanguage)
+        XCTAssertNil(state.transcriptionModelName)
+        XCTAssertNil(state.isTextFormattingEnabled)
+        XCTAssertEqual(state.punctuationCleanupMode, .removeAll)
+        XCTAssertEqual(state.removePunctuation, true)
+        XCTAssertNil(state.lowercaseTranscription)
+    }
+
+    func testPowerModeSessionPreservesStoredShapeAndOriginalState() throws {
+        let id = UUID()
+        let startTime = Date(timeIntervalSince1970: 1_700_000_000)
+        let originalState = VoiceInkPowerModeApplicationState(
+            isEnhancementEnabled: true,
+            useScreenCaptureContext: false,
+            selectedPromptId: "prompt-id",
+            selectedAIProvider: "anthropic",
+            selectedAIModel: "claude",
+            selectedLanguage: "auto",
+            transcriptionModelName: "ggml-small",
+            isTextFormattingEnabled: false,
+            punctuationCleanupMode: .keep,
+            removePunctuation: false,
+            lowercaseTranscription: false
+        )
+        let session = VoiceInkPowerModeSession(
+            id: id,
+            startTime: startTime,
+            originalState: originalState
+        )
+
+        let object = try jsonObject(from: session)
+        let originalStateObject = try XCTUnwrap(object["originalState"] as? [String: Any])
+        let encodedStartTime = try XCTUnwrap(object["startTime"] as? Double)
+
+        XCTAssertEqual(object["id"] as? String, id.uuidString)
+        XCTAssertEqual(encodedStartTime, startTime.timeIntervalSinceReferenceDate, accuracy: 0.001)
+        XCTAssertEqual(originalStateObject["selectedPromptId"] as? String, "prompt-id")
+        XCTAssertEqual(originalStateObject["punctuationCleanupMode"] as? String, PunctuationCleanupMode.keep.rawValue)
+
+        let decoded = try JSONDecoder().decode(VoiceInkPowerModeSession.self, from: JSONEncoder().encode(session))
+        XCTAssertEqual(decoded.id, id)
+        XCTAssertEqual(decoded.startTime.timeIntervalSinceReferenceDate, startTime.timeIntervalSinceReferenceDate, accuracy: 0.001)
+        XCTAssertEqual(decoded.originalState, originalState)
+    }
+
     func testAutoSendKeyPreservesStoredValuesPickerOrderAndLabels() {
         XCTAssertEqual(
             VoiceInkAutoSendKey.allCases,

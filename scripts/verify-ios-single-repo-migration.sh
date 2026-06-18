@@ -986,6 +986,21 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
+  "shared Power Mode session snapshot records live in VoiceInkCore" \
+  'struct VoiceInkPowerMode(ApplicationState|Session)' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+reject_pattern \
+  "macOS Power Mode avoids shell-only session snapshot records" \
+  'struct +ApplicationState|struct +PowerModeSession' \
+  VoiceInk/PowerMode/PowerModeSessionManager.swift
+
+require_pattern \
+  "macOS Power Mode session manager consumes shared session snapshot records" \
+  'VoiceInkPowerMode(ApplicationState|Session)' \
+  VoiceInk/PowerMode/PowerModeSessionManager.swift
+
+require_pattern \
   "macOS Power Mode form consumes shared auto-send key state" \
   'VoiceInkAutoSendKey' \
   VoiceInk/PowerMode/PowerModeConfigView.swift

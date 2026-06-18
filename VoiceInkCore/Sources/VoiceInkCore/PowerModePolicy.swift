@@ -135,6 +135,106 @@ public struct PowerModeConfig: Codable, Identifiable, Equatable, Sendable {
     }
 }
 
+public struct VoiceInkPowerModeApplicationState: Codable, Equatable, Sendable {
+    public var isEnhancementEnabled: Bool
+    public var useScreenCaptureContext: Bool
+    public var selectedPromptId: String?
+    public var selectedAIProvider: String?
+    public var selectedAIModel: String?
+    public var selectedLanguage: String?
+    public var transcriptionModelName: String?
+    public var isTextFormattingEnabled: Bool?
+    public var punctuationCleanupMode: PunctuationCleanupMode?
+    public var removePunctuation: Bool?
+    public var lowercaseTranscription: Bool?
+
+    private enum CodingKeys: String, CodingKey {
+        case isEnhancementEnabled
+        case useScreenCaptureContext
+        case selectedPromptId
+        case selectedAIProvider
+        case selectedAIModel
+        case selectedLanguage
+        case transcriptionModelName
+        case isTextFormattingEnabled
+        case punctuationCleanupMode
+        case removePunctuation
+        case lowercaseTranscription
+    }
+
+    public init(
+        isEnhancementEnabled: Bool,
+        useScreenCaptureContext: Bool,
+        selectedPromptId: String? = nil,
+        selectedAIProvider: String? = nil,
+        selectedAIModel: String? = nil,
+        selectedLanguage: String? = nil,
+        transcriptionModelName: String? = nil,
+        isTextFormattingEnabled: Bool? = nil,
+        punctuationCleanupMode: PunctuationCleanupMode? = nil,
+        removePunctuation: Bool? = nil,
+        lowercaseTranscription: Bool? = nil
+    ) {
+        self.isEnhancementEnabled = isEnhancementEnabled
+        self.useScreenCaptureContext = useScreenCaptureContext
+        self.selectedPromptId = selectedPromptId
+        self.selectedAIProvider = selectedAIProvider
+        self.selectedAIModel = selectedAIModel
+        self.selectedLanguage = selectedLanguage
+        self.transcriptionModelName = transcriptionModelName
+        self.isTextFormattingEnabled = isTextFormattingEnabled
+        self.punctuationCleanupMode = punctuationCleanupMode
+        self.removePunctuation = removePunctuation
+        self.lowercaseTranscription = lowercaseTranscription
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        isEnhancementEnabled = try container.decode(Bool.self, forKey: .isEnhancementEnabled)
+        useScreenCaptureContext = try container.decode(Bool.self, forKey: .useScreenCaptureContext)
+        selectedPromptId = try container.decodeIfPresent(String.self, forKey: .selectedPromptId)
+        selectedAIProvider = try container.decodeIfPresent(String.self, forKey: .selectedAIProvider)
+        selectedAIModel = try container.decodeIfPresent(String.self, forKey: .selectedAIModel)
+        selectedLanguage = try container.decodeIfPresent(String.self, forKey: .selectedLanguage)
+        transcriptionModelName = try container.decodeIfPresent(String.self, forKey: .transcriptionModelName)
+        isTextFormattingEnabled = try container.decodeIfPresent(Bool.self, forKey: .isTextFormattingEnabled)
+        removePunctuation = try container.decodeIfPresent(Bool.self, forKey: .removePunctuation)
+        if let mode = try container.decodeIfPresent(PunctuationCleanupMode.self, forKey: .punctuationCleanupMode) {
+            punctuationCleanupMode = mode
+        } else {
+            punctuationCleanupMode = removePunctuation.map { $0 ? .removeAll : .keep }
+        }
+        lowercaseTranscription = try container.decodeIfPresent(Bool.self, forKey: .lowercaseTranscription)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(isEnhancementEnabled, forKey: .isEnhancementEnabled)
+        try container.encode(useScreenCaptureContext, forKey: .useScreenCaptureContext)
+        try container.encodeIfPresent(selectedPromptId, forKey: .selectedPromptId)
+        try container.encodeIfPresent(selectedAIProvider, forKey: .selectedAIProvider)
+        try container.encodeIfPresent(selectedAIModel, forKey: .selectedAIModel)
+        try container.encodeIfPresent(selectedLanguage, forKey: .selectedLanguage)
+        try container.encodeIfPresent(transcriptionModelName, forKey: .transcriptionModelName)
+        try container.encodeIfPresent(isTextFormattingEnabled, forKey: .isTextFormattingEnabled)
+        try container.encodeIfPresent(punctuationCleanupMode, forKey: .punctuationCleanupMode)
+        try container.encodeIfPresent(removePunctuation, forKey: .removePunctuation)
+        try container.encodeIfPresent(lowercaseTranscription, forKey: .lowercaseTranscription)
+    }
+}
+
+public struct VoiceInkPowerModeSession: Codable, Equatable, Sendable {
+    public let id: UUID
+    public let startTime: Date
+    public var originalState: VoiceInkPowerModeApplicationState
+
+    public init(id: UUID, startTime: Date, originalState: VoiceInkPowerModeApplicationState) {
+        self.id = id
+        self.startTime = startTime
+        self.originalState = originalState
+    }
+}
+
 public extension Array where Element == PowerModeConfig {
     var powerModePolicyRules: [VoiceInkPowerModeRule] {
         map(\.powerModePolicyRule)

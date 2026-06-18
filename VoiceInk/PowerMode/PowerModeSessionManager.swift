@@ -2,26 +2,6 @@ import Foundation
 import AppKit
 import VoiceInkCore
 
-struct ApplicationState: Codable {
-    var isEnhancementEnabled: Bool
-    var useScreenCaptureContext: Bool
-    var selectedPromptId: String?
-    var selectedAIProvider: String?
-    var selectedAIModel: String?
-    var selectedLanguage: String?
-    var transcriptionModelName: String?
-    var isTextFormattingEnabled: Bool?
-    var punctuationCleanupMode: PunctuationCleanupMode?
-    var removePunctuation: Bool?
-    var lowercaseTranscription: Bool?
-}
-
-struct PowerModeSession: Codable {
-    let id: UUID
-    let startTime: Date
-    var originalState: ApplicationState
-}
-
 @MainActor
 class PowerModeSessionManager {
     static let shared = PowerModeSessionManager()
@@ -50,7 +30,7 @@ class PowerModeSessionManager {
         // Only capture baseline if NO session exists
         if loadSession() == nil {
             let cleanupSettings = VoiceInkTranscriptionCleanupSettings.current()
-            let originalState = ApplicationState(
+            let originalState = VoiceInkPowerModeApplicationState(
                 isEnhancementEnabled: enhancementService.isEnhancementEnabled,
                 useScreenCaptureContext: enhancementService.useScreenCaptureContext,
                 selectedPromptId: enhancementService.selectedPromptId?.uuidString,
@@ -64,7 +44,7 @@ class PowerModeSessionManager {
                 lowercaseTranscription: cleanupSettings.lowercaseTranscription
             )
 
-            let newSession = PowerModeSession(
+            let newSession = VoiceInkPowerModeSession(
                 id: UUID(),
                 startTime: Date(),
                 originalState: originalState
@@ -104,7 +84,7 @@ class PowerModeSessionManager {
               let enhancementService = enhancementService else { return }
 
         let cleanupSettings = VoiceInkTranscriptionCleanupSettings.current()
-        let updatedState = ApplicationState(
+        let updatedState = VoiceInkPowerModeApplicationState(
             isEnhancementEnabled: enhancementService.isEnhancementEnabled,
             useScreenCaptureContext: enhancementService.useScreenCaptureContext,
             selectedPromptId: enhancementService.selectedPromptId?.uuidString,
@@ -164,7 +144,7 @@ class PowerModeSessionManager {
         }
     }
 
-    private func restoreState(_ state: ApplicationState) async {
+    private func restoreState(_ state: VoiceInkPowerModeApplicationState) async {
         guard let enhancementService = enhancementService,
               let stateProvider = stateProvider else { return }
 
@@ -255,7 +235,7 @@ class PowerModeSessionManager {
         }
     }
 
-    private func saveSession(_ session: PowerModeSession) {
+    private func saveSession(_ session: VoiceInkPowerModeSession) {
         do {
             let data = try JSONEncoder().encode(session)
             UserDefaults.standard.set(data, forKey: sessionKey)
@@ -264,10 +244,10 @@ class PowerModeSessionManager {
         }
     }
 
-    private func loadSession() -> PowerModeSession? {
+    private func loadSession() -> VoiceInkPowerModeSession? {
         guard let data = UserDefaults.standard.data(forKey: sessionKey) else { return nil }
         do {
-            return try JSONDecoder().decode(PowerModeSession.self, from: data)
+            return try JSONDecoder().decode(VoiceInkPowerModeSession.self, from: data)
         } catch {
             print("Error loading Power Mode session: \(error)")
             return nil

@@ -120,6 +120,32 @@ final class TranscriptionRunProcessorTests: XCTestCase {
         XCTAssertTrue(result.postProcessingSucceeded)
     }
 
+    func testTranscribeAppliesWordReplacementBeforePostProcessing() async throws {
+        let processor = VoiceInkTranscriptionRunProcessor { job in
+            XCTAssertEqual(job.transcript, "hello Roma Just Talk")
+            return job.transcript
+        }
+        let rules = [
+            VoiceInkWordReplacementRule(originalText: "roma", replacementText: "Roma Just Talk")
+        ]
+
+        let result = try await processor.transcribe(
+            fileURL: URL(fileURLWithPath: "/tmp/audio.wav"),
+            configuration: configuration(isPostProcessingEnabled: true),
+            applyingWordReplacements: { text in
+                VoiceInkWordReplacementEngine.apply(rules, to: text)
+            },
+            apiKeyProvider: { _ in "key" },
+            transcriptionServiceProvider: { _ in
+                StubTranscriptionService(text: "hello roma")
+            }
+        )
+
+        XCTAssertEqual(result.cleanedText, "hello Roma Just Talk")
+        XCTAssertEqual(result.finalText, "hello Roma Just Talk")
+        XCTAssertTrue(result.postProcessingSucceeded)
+    }
+
     func testTranscribePassesSelectedLanguageToTranscriptionService() async throws {
         let service = CapturingTranscriptionService(text: "bonjour")
         let processor = VoiceInkTranscriptionRunProcessor { _ in

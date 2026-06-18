@@ -109,6 +109,7 @@ public struct VoiceInkTranscriptionRunProcessor {
         fileURL: URL,
         configuration: VoiceInkModeRuntimeConfiguration,
         cleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration = .disabled,
+        applyingWordReplacements wordReplacement: (String) -> String = { $0 },
         postProcessingSkipConfiguration: VoiceInkPostProcessingSkipConfiguration? = nil,
         promptTriggerForcesPostProcessing: Bool = false,
         transcriptionLanguage: String? = nil,
@@ -145,7 +146,8 @@ public struct VoiceInkTranscriptionRunProcessor {
         )
         let preparedText = cleanupConfiguration.prepareFilteredText(
             filteredText,
-            normalizeParagraphSpacingBeforeFormatting: true
+            normalizeParagraphSpacingBeforeFormatting: true,
+            applyingWordReplacements: wordReplacement
         )
         let cleanedText = preparedText.cleanedText
         let shouldSkipPostProcessing = postProcessingSkipConfiguration.map {

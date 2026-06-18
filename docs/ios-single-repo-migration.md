@@ -229,7 +229,7 @@ iOS app-local storage roots are kept in `iOS/VoiceInk-ios/VoiceInkIOSStorageDire
 
 ## Sibling Clone Status
 
-The remaining Swift files present in `../VoiceInk-iOS` but not in `VoiceInk/iOS` are old clone-side sources, except where noted:
+The remaining Swift files present in `../VoiceInk-iOS` but not in `VoiceInk/iOS` are old clone-side sources, except where noted. `scripts/verify-ios-single-repo-migration.sh` now fails if any of these obsolete app-target duplicates are copied back under `iOS/VoiceInk-ios/`.
 
 - `AppGroupCoordinator.swift`: moved into `iOS/Shared/AppGroupCoordinator.swift`; start-recording requests now use `iOS/Shared/VoiceInkAppDeepLink.swift`, while shared App Group/Darwin notification state still handles stop requests and keyboard recording-state feedback.
 
@@ -272,6 +272,7 @@ scripts/verify-ios-single-repo-migration.sh --full-build
 6. `plutil -lint` passes for both project files and iOS plists/entitlements.
 7. `xmllint --noout` passes for workspace and shared scheme XML.
 8. iOS non-Swift app artifacts are present: privacy manifest, app icon catalog files, and bundled Silero VAD resource.
-9. A real Xcode toolchain is selected and both app targets build.
+9. Obsolete clone-side Swift duplicates remain absent from `iOS/VoiceInk-ios/`.
+10. A real Xcode toolchain is selected and both app targets build.
 
 Current local blocker: `xcode-select -p` points to `/Library/Developer/CommandLineTools`, and the previously used external Xcode volume is not mounted. Full target builds are still environment-blocked until a real Xcode is selected; macOS `VoiceInk` also needs `/Users/atalphalnmomhappyhouse/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework`, and iOS `VoiceInk-ios` needs the iOS 26.2 platform installed. Until those are present, use `swift run VoiceInkCoreChecks` plus the static parse/lint gates above for local proof.

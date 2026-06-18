@@ -41,6 +41,12 @@ require_file() {
   fi
 }
 
+reject_file() {
+  if [[ -e "$1" ]]; then
+    fail "obsolete duplicate should stay deleted: $1"
+  fi
+}
+
 run_required() {
   local description="$1"
   shift
@@ -82,6 +88,26 @@ require_file iOS/VoiceInk-ios/Resources/ggml-silero-v5.1.2.bin
 require_file iOS/VoiceInk-ios/Assets.xcassets/AppIcon.appiconset/Contents.json
 for icon in 20.png 29.png 40.png 50.png 57.png 58.png 60.png 72.png 76.png 80.png 87.png 100.png 114.png 120.png 144.png 152.png 167.png 180.png 1024.png; do
   require_file "iOS/VoiceInk-ios/Assets.xcassets/AppIcon.appiconset/$icon"
+done
+
+section "obsolete iOS clone-side duplicates stay deleted"
+for file in \
+  AppGroupCoordinator.swift \
+  DeepgramTranscriptionService.swift \
+  DefaultModeManager.swift \
+  GroqTranscriptionService.swift \
+  Item.swift \
+  LLMPostProcessor.swift \
+  Mode.swift \
+  ModeSelectionView.swift \
+  ModesView.swift \
+  OpenAICompatibleClient.swift \
+  PromptTemplate.swift \
+  Provider.swift \
+  RiffWaveUtils.swift \
+  TranscriptionServiceFactory.swift \
+  VADModelManager.swift; do
+  reject_file "iOS/VoiceInk-ios/$file"
 done
 
 require_pattern \

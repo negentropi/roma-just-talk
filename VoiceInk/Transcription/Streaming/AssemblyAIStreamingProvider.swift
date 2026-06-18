@@ -36,8 +36,8 @@ final class AssemblyAIStreamingProvider: StreamingTranscriptionProvider {
                 apiKey: apiKey,
                 model: model.name,
                 language: language,
-                prompt: transcriptionPrompt(),
-                customVocabulary: getCustomDictionaryTerms()
+                prompt: VoiceInkTranscriptionPromptPreference.requestPrompt(),
+                customVocabulary: CustomVocabularyService.shared.getCustomVocabularyTerms(from: modelContext)
             )
         } catch {
             forwardingTask?.cancel()
@@ -67,20 +67,6 @@ final class AssemblyAIStreamingProvider: StreamingTranscriptionProvider {
         forwardingTask = nil
         await client.disconnect()
         eventsContinuation?.finish()
-    }
-
-    // MARK: - Private
-
-    private func transcriptionPrompt() -> String? {
-        VoiceInkTranscriptionPromptPreference.requestPrompt()
-    }
-
-    private func getCustomDictionaryTerms() -> [String] {
-        let descriptor = FetchDescriptor<VocabularyWord>(sortBy: [SortDescriptor(\.word)])
-        guard let vocabularyWords = try? modelContext.fetch(descriptor) else {
-            return []
-        }
-        return VoiceInkCustomVocabularyTerms.normalized(vocabularyWords.map(\.word))
     }
 
 }

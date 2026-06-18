@@ -28,7 +28,7 @@ final class SonioxStreamingProvider: StreamingTranscriptionProvider {
     func connect(model: any TranscriptionModel, language: String?) async throws {
         let apiKey = try apiKey(for: model)
 
-        let vocabulary = getCustomDictionaryTerms()
+        let vocabulary = CustomVocabularyService.shared.getCustomVocabularyTerms(from: modelContext)
 
         // Cancel any existing forwarding task before starting a new one
         forwardingTask?.cancel()
@@ -65,16 +65,6 @@ final class SonioxStreamingProvider: StreamingTranscriptionProvider {
         forwardingTask = nil
         await client.disconnect()
         eventsContinuation?.finish()
-    }
-
-    // MARK: - Private
-
-    private func getCustomDictionaryTerms() -> [String] {
-        let descriptor = FetchDescriptor<VocabularyWord>(sortBy: [SortDescriptor(\.word)])
-        guard let vocabularyWords = try? modelContext.fetch(descriptor) else {
-            return []
-        }
-        return VoiceInkCustomVocabularyTerms.normalized(vocabularyWords.map(\.word))
     }
 
 }

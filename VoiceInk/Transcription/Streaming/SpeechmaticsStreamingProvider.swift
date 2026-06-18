@@ -28,7 +28,7 @@ final class SpeechmaticsStreamingProvider: StreamingTranscriptionProvider {
     func connect(model: any TranscriptionModel, language: String?) async throws {
         let apiKey = try apiKey(for: model)
 
-        let vocabulary = getCustomVocabularyTerms()
+        let vocabulary = CustomVocabularyService.shared.getCustomVocabularyTerms(from: modelContext)
 
         // Cancel any existing forwarding task before starting a new one
         forwardingTask?.cancel()
@@ -66,16 +66,6 @@ final class SpeechmaticsStreamingProvider: StreamingTranscriptionProvider {
         forwardingTask = nil
         await client.disconnect()
         eventsContinuation?.finish()
-    }
-
-    // MARK: - Private
-
-    private func getCustomVocabularyTerms() -> [String] {
-        let descriptor = FetchDescriptor<VocabularyWord>(sortBy: [SortDescriptor(\.word)])
-        guard let vocabularyWords = try? modelContext.fetch(descriptor) else {
-            return []
-        }
-        return VoiceInkCustomVocabularyTerms.normalized(vocabularyWords.map(\.word))
     }
 
 }

@@ -39,7 +39,8 @@ class CloudTranscriptionService: TranscriptionService {
     func transcribe(audioURL: URL, model: any TranscriptionModel) async throws -> String {
         let audioData = try loadAudioData(from: audioURL)
         let fileName = audioURL.lastPathComponent
-        let language = selectedLanguage()
+        let language = VoiceInkTranscriptionLanguagePreference.requestLanguage()
+        let prompt = VoiceInkTranscriptionPromptPreference.requestPrompt()
 
         do {
             if model.provider == .custom {
@@ -51,7 +52,7 @@ class CloudTranscriptionService: TranscriptionService {
                     fileName: fileName,
                     model: customModel,
                     language: language,
-                    prompt: transcriptionPrompt()
+                    prompt: prompt
                 )
             }
 
@@ -65,8 +66,8 @@ class CloudTranscriptionService: TranscriptionService {
                 apiKey: apiKey,
                 model: model.name,
                 language: language,
-                prompt: transcriptionPrompt(),
-                customVocabulary: getCustomDictionaryTerms()
+                prompt: prompt,
+                customVocabulary: CustomVocabularyService.shared.getCustomVocabularyTerms(from: modelContext)
             )
         } catch let error as CloudTranscriptionError {
             throw error
@@ -91,22 +92,6 @@ class CloudTranscriptionService: TranscriptionService {
             throw CloudTranscriptionError.missingAPIKey
         }
         return apiKey
-    }
-
-    private func selectedLanguage() -> String? {
-        VoiceInkTranscriptionLanguagePreference.requestLanguage()
-    }
-
-    private func transcriptionPrompt() -> String? {
-        VoiceInkTranscriptionPromptPreference.requestPrompt()
-    }
-
-    private func getCustomDictionaryTerms() -> [String] {
-        let descriptor = FetchDescriptor<VocabularyWord>(sortBy: [SortDescriptor(\.word)])
-        guard let vocabularyWords = try? modelContext.fetch(descriptor) else {
-            return []
-        }
-        return VoiceInkCustomVocabularyTerms.normalized(vocabularyWords.map(\.word))
     }
 
     private func transcribeCustomModel(

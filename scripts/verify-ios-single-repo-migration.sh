@@ -414,6 +414,15 @@ reject_pattern \
   VoiceInk/Views/Components/FillerWordsSettingsView.swift \
   iOS/VoiceInk-ios/SettingsView.swift
 
+reject_pattern \
+  "macOS transcription adapters avoid provider-local vocabulary and prompt wrappers" \
+  'private func +(selectedLanguage|transcriptionPrompt|getCustom(Dictionary|Vocabulary)Terms)\(' \
+  VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift \
+  VoiceInk/Transcription/Streaming/AssemblyAIStreamingProvider.swift \
+  VoiceInk/Transcription/Streaming/SonioxStreamingProvider.swift \
+  VoiceInk/Transcription/Streaming/DeepgramStreamingProvider.swift \
+  VoiceInk/Transcription/Streaming/SpeechmaticsStreamingProvider.swift
+
 require_pattern \
   "shared run processor uses shared transcription run preparation" \
   'VoiceInkTranscriptionRunPreparation\.prepareRawText' \

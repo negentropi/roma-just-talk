@@ -15,6 +15,14 @@ class CustomVocabularyService {
         return VoiceInkAIEnhancementVocabularyContext.formatted(from: customWords)
     }
 
+    func getCustomVocabularyTerms(from context: ModelContext, limit: Int? = nil) -> [String] {
+        guard let customWords = getCustomVocabularyWords(from: context) else {
+            return []
+        }
+
+        return VoiceInkCustomVocabularyTerms.normalized(customWords, limit: limit)
+    }
+
     private func getCustomVocabularyWords(from context: ModelContext) -> [String]? {
         let descriptor = FetchDescriptor<VocabularyWord>(sortBy: [SortDescriptor(\VocabularyWord.word)])
 

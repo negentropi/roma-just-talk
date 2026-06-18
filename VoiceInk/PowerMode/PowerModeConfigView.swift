@@ -723,8 +723,11 @@ struct ConfigurationView: View {
 
     private func saveConfiguration() {
         let config = getConfigForForm()
-        let validator = PowerModeValidator(powerModeManager: powerModeManager)
-        validationErrors = validator.validateForSave(config: config, mode: mode)
+        validationErrors = VoiceInkPowerModePolicy.validateForSave(
+            candidate: config.powerModePolicyRule,
+            mode: mode.powerModeSaveMode,
+            existing: powerModeManager.configurations.powerModePolicyRules
+        )
 
         if !validationErrors.isEmpty {
             showValidationAlert = true
@@ -752,5 +755,38 @@ struct ConfigurationView: View {
         }
 
         ShortcutStore.removeShortcutStorage(for: .powerMode(powerModeConfigId))
+    }
+}
+
+private extension ConfigurationMode {
+    var powerModeSaveMode: VoiceInkPowerModeSaveMode {
+        switch self {
+        case .add:
+            return .add
+        case .edit(let config):
+            return .edit(config.id)
+        }
+    }
+}
+
+extension View {
+    func powerModeValidationAlert(
+        errors: [VoiceInkPowerModeValidationError],
+        isPresented: Binding<Bool>
+    ) -> some View {
+        self.alert(
+            "Cannot Save Power Mode",
+            isPresented: isPresented,
+            actions: {
+                Button("OK", role: .cancel) {}
+            },
+            message: {
+                if let firstError = errors.first {
+                    Text(firstError.localizedDescription)
+                } else {
+                    Text("Please fix the validation errors before saving.")
+                }
+            }
+        )
     }
 }

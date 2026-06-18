@@ -55,7 +55,11 @@ class Recorder: NSObject, ObservableObject {
             }
         }
 
-        audioDeviceChangeObserver = AudioDeviceConfiguration.createDeviceChangeObserver { [weak self] in
+        audioDeviceChangeObserver = NotificationCenter.default.addObserver(
+            forName: NSNotification.Name("AudioDeviceChanged"),
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
             Task { @MainActor in
                 await self?.handleAudioDeviceChanged()
             }

@@ -144,20 +144,16 @@ struct PowerModeConfig: Codable, Identifiable, Equatable {
 }
 
 extension Array where Element == PowerModeConfig {
+    var powerModePolicyRules: [VoiceInkPowerModeRule] {
+        map(\.powerModePolicyRule)
+    }
+
     var hasEnabledAutomaticRules: Bool {
-        contains { config in
-            config.isEnabled && (
-                config.isDefault ||
-                !(config.appConfigs?.isEmpty ?? true) ||
-                !(config.urlConfigs?.isEmpty ?? true)
-            )
-        }
+        VoiceInkPowerModePolicy.hasEnabledAutomaticRules(in: powerModePolicyRules)
     }
 
     var hasEnabledURLRules: Bool {
-        contains { config in
-            config.isEnabled && !(config.urlConfigs?.isEmpty ?? true)
-        }
+        VoiceInkPowerModePolicy.hasEnabledWebsiteRules(in: powerModePolicyRules)
     }
 }
 
@@ -188,6 +184,26 @@ struct URLConfig: Codable, Identifiable, Equatable {
     
     static func == (lhs: URLConfig, rhs: URLConfig) -> Bool {
         lhs.id == rhs.id
+    }
+}
+
+extension PowerModeConfig {
+    var powerModePolicyRule: VoiceInkPowerModeRule {
+        VoiceInkPowerModeRule(
+            id: id,
+            name: name,
+            appRules: (appConfigs ?? []).map { appConfig in
+                VoiceInkPowerModeAppRule(
+                    bundleIdentifier: appConfig.bundleIdentifier,
+                    appName: appConfig.appName
+                )
+            },
+            websiteRules: (urlConfigs ?? []).map { urlConfig in
+                VoiceInkPowerModeWebsiteRule(url: urlConfig.url)
+            },
+            isEnabled: isEnabled,
+            isDefault: isDefault
+        )
     }
 }
 
@@ -260,35 +276,29 @@ class PowerModeManager: ObservableObject {
     }
 
     func getConfigurationForURL(_ url: String) -> PowerModeConfig? {
-        let cleanedURL = cleanURL(url)
-        
-        for config in configurations.filter({ $0.isEnabled }) {
-            if let urlConfigs = config.urlConfigs {
-                for urlConfig in urlConfigs {
-                    let configURL = cleanURL(urlConfig.url)
-                    
-                    if cleanedURL.contains(configURL) {
-                        return config
-                    }
-                }
-            }
-        }
-        return nil
+        guard let matchingRule = VoiceInkPowerModePolicy.matchingRule(
+            forWebsiteURL: url,
+            in: configurations.powerModePolicyRules
+        ) else { return nil }
+
+        return configurations.first { $0.id == matchingRule.id }
     }
     
     func getConfigurationForApp(_ bundleId: String) -> PowerModeConfig? {
-        for config in configurations.filter({ $0.isEnabled }) {
-            if let appConfigs = config.appConfigs {
-                if appConfigs.contains(where: { $0.bundleIdentifier == bundleId }) {
-                    return config
-                }
-            }
-        }
-        return nil
+        guard let matchingRule = VoiceInkPowerModePolicy.matchingRule(
+            forAppBundleIdentifier: bundleId,
+            in: configurations.powerModePolicyRules
+        ) else { return nil }
+
+        return configurations.first { $0.id == matchingRule.id }
     }
     
     func getDefaultConfiguration() -> PowerModeConfig? {
-        return configurations.first { $0.isEnabled && $0.isDefault }
+        guard let defaultRule = VoiceInkPowerModePolicy.defaultRule(
+            in: configurations.powerModePolicyRules
+        ) else { return nil }
+
+        return configurations.first { $0.id == defaultRule.id }
     }
     
     func hasDefaultConfiguration() -> Bool {
@@ -376,11 +386,7 @@ class PowerModeManager: ObservableObject {
     }
 
     func cleanURL(_ url: String) -> String {
-        return url.lowercased()
-            .replacingOccurrences(of: "https://", with: "")
-            .replacingOccurrences(of: "http://", with: "")
-            .replacingOccurrences(of: "www.", with: "")
-            .trimmingCharacters(in: .whitespacesAndNewlines)
+        VoiceInkPowerModePolicy.normalizedWebsiteURL(url)
     }
 
     func setActiveConfiguration(_ config: PowerModeConfig?) {

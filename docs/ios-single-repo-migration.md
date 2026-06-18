@@ -92,6 +92,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - supported media extension and UTType import policy for audio/video files
 - transcription CSV header, row formatting, and CSV escaping; platform shells still own save panels and record-source mapping
 - power-mode display formatting for transcript metadata and exports
+- power-mode app/website/default matching, website URL normalization, and save validation; macOS still owns OS app/website detection, SwiftUI editing/alerts, active-session application, shortcuts, and config persistence
 - duration presentation
 - relative timestamp presentation
 - Whisper and VAD model file metadata, including platform-base Whisper model directory creation, downloaded local-model file records, runtime model-name to downloaded-file resolution, model/sidecar file construction, downloaded-state detection, bootstrap-model availability, Core ML support policy, final `.bin` install/replacement, and model/sidecar deletion
@@ -136,7 +137,8 @@ Current macOS consumers of shared remote transport:
 - macOS custom prompt add/update/delete selection behavior delegates to `VoiceInkCustomPromptPolicy`; macOS `AIEnhancementService` still owns persistence timing, notifications, and SwiftUI state.
 - macOS custom prompt loading, saving, and selected-prompt persistence now use `VoiceInkCustomPromptStorage`.
 - macOS AI-enhancement prompt selection delegates selected-prompt repair and base prompt text to `VoiceInkCustomPromptPolicy`; macOS still appends selected-text, clipboard, screen-capture, and vocabulary context before executing provider requests.
-- macOS PowerMode AI-enhancement prompt setup delegates nil-selection fallback to `VoiceInkCustomPromptPolicy`; PowerMode still owns app/website matching, AI provider/model UI, and config persistence.
+- macOS PowerMode AI-enhancement prompt setup delegates nil-selection fallback to `VoiceInkCustomPromptPolicy`; PowerMode still owns OS app/website detection, AI provider/model UI, active-session application, shortcuts, and config persistence.
+- macOS `PowerModeManager` and `PowerModeValidator` delegate URL normalization, app/website/default matching, enabled-rule checks, and save validation to `VoiceInkPowerModePolicy`; macOS keeps the stored `PowerModeConfig` shape as the shell adapter.
 - macOS prompt-trigger detection delegates result construction to `VoiceInkPromptDetectionPolicy`; macOS `PromptDetectionService` still adapts `AIEnhancementService` state and restores shell settings after enhancement.
 - macOS AI-enhancement prompt-store preferences now use `VoiceInkUserDefaultsKey`, preserving the same raw storage names while making future iOS prompt-store adoption share the same keys.
 - macOS AI-enhancement provider selection uses `VoiceInkAIEnhancementProviderKind` and `VoiceInkUserDefaultsKey` for persisted provider identity, selectable text-enhancement providers, model-selection keys, and API-key requirement; macOS keeps dynamic provider settings and execution adapters.

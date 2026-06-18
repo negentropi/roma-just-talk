@@ -245,6 +245,8 @@ struct APIKeyManagementView: View {
                         HStack {
                             Text("API Key Set")
                             Spacer()
+                            Text(obfuscatedSelectedAPIKey)
+                                .foregroundColor(.secondary)
                             Button("Remove Key", role: .destructive) {
                                 aiService.clearAPIKey()
                             }

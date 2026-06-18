@@ -188,6 +188,7 @@ final class StoredAudioFileTests: XCTestCase {
         XCTAssertTrue(VoiceInkStoredAudioAvailability.missingFile(URL(fileURLWithPath: "/tmp/missing.wav")).shouldShowAudioSection(duration: 0))
         XCTAssertTrue(VoiceInkStoredAudioAvailability.missingPath.shouldShowAudioSection(duration: 1))
         XCTAssertFalse(VoiceInkStoredAudioAvailability.missingPath.shouldShowAudioSection(duration: 0))
+        XCTAssertFalse(VoiceInkStoredAudioAvailability.missingPath.shouldShowAudioSection(duration: -1))
     }
 
     func testDeleteExistingFileRemovesResolvedFileAndReturnsURL() throws {

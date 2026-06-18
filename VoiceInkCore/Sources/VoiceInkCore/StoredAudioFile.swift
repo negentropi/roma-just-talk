@@ -17,7 +17,7 @@ public enum VoiceInkStoredAudioAvailability: Equatable, Sendable {
         case .available, .missingFile:
             return true
         case .missingPath:
-            return duration > 0
+            return VoiceInkDurationPresentation.shouldShowPositiveDuration(duration)
         }
     }
 

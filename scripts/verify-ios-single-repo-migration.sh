@@ -946,6 +946,16 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/DurationPresentation.swift
 
 require_pattern \
+  "shared stored-audio presentation uses shared positive-duration visibility" \
+  'VoiceInkDurationPresentation\.shouldShowPositiveDuration' \
+  VoiceInkCore/Sources/VoiceInkCore/StoredAudioFile.swift
+
+reject_pattern \
+  "shared stored-audio presentation avoids duplicate positive-duration checks" \
+  'duration > 0' \
+  VoiceInkCore/Sources/VoiceInkCore/StoredAudioFile.swift
+
+require_pattern \
   "iOS audio duration UI uses shared positive-duration visibility" \
   'VoiceInkDurationPresentation\.shouldShowPositiveDuration' \
   iOS/VoiceInk-ios/AudioPlayerView.swift

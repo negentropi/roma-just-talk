@@ -99,19 +99,19 @@ class AudioTranscriptionService {
                !shouldSkipEnhancement {
                 do {
                     let textForAI = promptDetectionResult?.processedText ?? text
-                    let (enhancedText, enhancementDuration, promptName) = try await enhancementService.enhance(textForAI)
+                    let enhancement = try await enhancementService.enhance(textForAI)
                     let newTranscription = Transcription(
                         text: originalText,
                         duration: duration,
-                        enhancedText: enhancedText,
+                        enhancedText: enhancement.text,
                         audioFileURL: permanentURLString,
                         transcriptionModelName: model.displayName,
-                        aiEnhancementModelName: enhancementService.getAIService().currentModel,
-                        promptName: promptName,
+                        aiEnhancementModelName: enhancement.modelName,
+                        promptName: enhancement.promptName,
                         transcriptionDuration: transcriptionDuration,
-                        enhancementDuration: enhancementDuration,
-                        aiRequestSystemMessage: enhancementService.lastSystemMessageSent,
-                        aiRequestUserMessage: enhancementService.lastUserMessageSent,
+                        enhancementDuration: enhancement.duration,
+                        aiRequestSystemMessage: enhancement.requestSystemMessage,
+                        aiRequestUserMessage: enhancement.requestUserMessage,
                         powerModeName: powerModeName,
                         powerModeEmoji: powerModeEmoji,
                         transcriptionStatus: .completed

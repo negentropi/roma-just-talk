@@ -24,6 +24,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AIEnhancementErrorTests.testHTTPErrorMappingPreservesMacOSRetryCategories", run: { AIEnhancementErrorTests().testHTTPErrorMappingPreservesMacOSRetryCategories() }),
             VoiceInkCoreCheck(name: "AIEnhancementErrorTests.testTransportNetworkErrorMapsRetryableFoundationErrors", run: { AIEnhancementErrorTests().testTransportNetworkErrorMapsRetryableFoundationErrors() }),
             VoiceInkCoreCheck(name: "AIEnhancementErrorTests.testTransportNetworkErrorRejectsNonRetryableFoundationErrors", run: { AIEnhancementErrorTests().testTransportNetworkErrorRejectsNonRetryableFoundationErrors() }),
+            VoiceInkCoreCheck(name: "AIEnhancementResultTests.testResultCarriesMacOSPostProcessingMetadata", run: { AIEnhancementResultTests().testResultCarriesMacOSPostProcessingMetadata() }),
             VoiceInkCoreCheck(name: "AIEnhancementRetryPolicyTests.testBackoffFailuresRetryUntilAttemptLimit", run: { AIEnhancementRetryPolicyTests().testBackoffFailuresRetryUntilAttemptLimit() }),
             VoiceInkCoreCheck(name: "AIEnhancementRetryPolicyTests.testTimeoutRetriesImmediatelyWhenEnabled", run: { AIEnhancementRetryPolicyTests().testTimeoutRetriesImmediatelyWhenEnabled() }),
             VoiceInkCoreCheck(name: "AIEnhancementRetryPolicyTests.testTimeoutFailsImmediatelyWhenDisabled", run: { AIEnhancementRetryPolicyTests().testTimeoutFailsImmediatelyWhenDisabled() }),

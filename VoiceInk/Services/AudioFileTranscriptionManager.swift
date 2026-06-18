@@ -187,19 +187,19 @@ class AudioTranscriptionManager: ObservableObject {
                !shouldSkipEnhancement {
                 item.status = .processing(phase: .enhancing)
                 do {
-                    let (enhancedText, enhancementDuration, promptName) = try await enhancementService.enhance(text)
+                    let enhancement = try await enhancementService.enhance(text)
                     transcription = Transcription(
                         text: cleanedText,
                         duration: duration,
-                        enhancedText: enhancedText,
+                        enhancedText: enhancement.text,
                         audioFileURL: permanentURL.absoluteString,
                         transcriptionModelName: currentModel.displayName,
-                        aiEnhancementModelName: enhancementService.getAIService().currentModel,
-                        promptName: promptName,
+                        aiEnhancementModelName: enhancement.modelName,
+                        promptName: enhancement.promptName,
                         transcriptionDuration: transcriptionDuration,
-                        enhancementDuration: enhancementDuration,
-                        aiRequestSystemMessage: enhancementService.lastSystemMessageSent,
-                        aiRequestUserMessage: enhancementService.lastUserMessageSent,
+                        enhancementDuration: enhancement.duration,
+                        aiRequestSystemMessage: enhancement.requestSystemMessage,
+                        aiRequestUserMessage: enhancement.requestUserMessage,
                         powerModeName: powerModeName,
                         powerModeEmoji: powerModeEmoji,
                         transcriptionStatus: .completed

@@ -236,14 +236,14 @@ class TranscriptionPipeline {
                 let textForAI = promptDetectionResult?.processedText ?? text
 
                 do {
-                    let (enhancedText, enhancementDuration, promptName) = try await enhancementService.enhance(textForAI)
-                    transcription.enhancedText = enhancedText
-                    transcription.aiEnhancementModelName = enhancementService.getAIService().currentModel
-                    transcription.promptName = promptName
-                    transcription.enhancementDuration = enhancementDuration
-                    transcription.aiRequestSystemMessage = enhancementService.lastSystemMessageSent
-                    transcription.aiRequestUserMessage = enhancementService.lastUserMessageSent
-                    finalPastedText = enhancedText
+                    let enhancement = try await enhancementService.enhance(textForAI)
+                    transcription.enhancedText = enhancement.text
+                    transcription.aiEnhancementModelName = enhancement.modelName
+                    transcription.promptName = enhancement.promptName
+                    transcription.enhancementDuration = enhancement.duration
+                    transcription.aiRequestSystemMessage = enhancement.requestSystemMessage
+                    transcription.aiRequestUserMessage = enhancement.requestUserMessage
+                    finalPastedText = enhancement.text
                 } catch {
                     let errorDescription = VoiceInkErrorDescription.text(for: error)
                     transcription.enhancedText = VoiceInkPostProcessingFailurePresentation.enhancementFailureText(

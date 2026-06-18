@@ -397,6 +397,39 @@ reject_pattern \
   VoiceInk/Services/AudioFileTranscriptionService.swift
 
 require_pattern \
+  "macOS AI enhancement service returns shared enhancement result" \
+  'VoiceInkAIEnhancementResult' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+require_pattern \
+  "macOS recorder enhancement stores request metadata from shared result" \
+  'enhancement\.requestSystemMessage' \
+  VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
+
+require_pattern \
+  "macOS audio-file import enhancement stores request metadata from shared result" \
+  'enhancement\.requestSystemMessage' \
+  VoiceInk/Services/AudioFileTranscriptionManager.swift
+
+require_pattern \
+  "macOS retry enhancement stores request metadata from shared result" \
+  'enhancement\.requestSystemMessage' \
+  VoiceInk/Services/AudioFileTranscriptionService.swift
+
+require_pattern \
+  "macOS re-enhance action stores request metadata from shared result" \
+  'enhancement\.requestSystemMessage' \
+  VoiceInk/Views/AudioPlayerView.swift
+
+reject_pattern \
+  "macOS enhancement callers avoid tuple metadata and mutable service side reads" \
+  'let \(enhancedText, enhancementDuration, promptName\)|lastSystemMessageSent|lastUserMessageSent|getAIService\(\)\.currentModel' \
+  VoiceInk/Transcription/Engine/TranscriptionPipeline.swift \
+  VoiceInk/Services/AudioFileTranscriptionManager.swift \
+  VoiceInk/Services/AudioFileTranscriptionService.swift \
+  VoiceInk/Views/AudioPlayerView.swift
+
+require_pattern \
   "macOS transcription pipeline uses shared failed transcript text" \
   'VoiceInkTranscriptPresentation\.failedTranscriptText' \
   VoiceInk/Transcription/Engine/TranscriptionPipeline.swift

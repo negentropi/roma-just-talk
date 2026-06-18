@@ -355,14 +355,21 @@ class AIEnhancementService: ObservableObject {
         }
     }
 
-    func enhance(_ text: String) async throws -> (String, TimeInterval, String?) {
+    func enhance(_ text: String) async throws -> VoiceInkAIEnhancementResult {
         let startTime = Date()
         let promptName = activePrompt?.title
 
         let result = try await makeRequestWithRetry(text: text)
         let endTime = Date()
         let duration = endTime.timeIntervalSince(startTime)
-        return (result, duration, promptName)
+        return VoiceInkAIEnhancementResult(
+            text: result,
+            duration: duration,
+            modelName: aiService.currentModel,
+            promptName: promptName,
+            requestSystemMessage: lastSystemMessageSent,
+            requestUserMessage: lastUserMessageSent
+        )
     }
 
     func captureScreenContext() async {

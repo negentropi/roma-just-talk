@@ -347,6 +347,11 @@ reject_pattern \
   iOS/VoiceInk-ios/NoteRowView.swift \
   iOS/VoiceInk-ios/NoteDetailView.swift
 
+reject_pattern \
+  "iOS API-key view avoids shell-only stored-key presentation wrappers" \
+  'private func +(currentAPIKey|obfuscatedKey)\(' \
+  iOS/VoiceInk-ios/ProviderAPIKeyView.swift
+
 require_pattern \
   "macOS local Whisper uses shared runtime policy" \
   'VoiceInkWhisperRuntimeConfiguration\.current' \

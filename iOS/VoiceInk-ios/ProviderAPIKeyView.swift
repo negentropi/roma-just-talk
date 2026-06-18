@@ -58,11 +58,11 @@ struct ProviderAPIKeyView: View {
                         Button("Change") {
                             editingKey = true
                             verifyResult = nil
-                            tempKey = currentAPIKey()
+                            tempKey = settings.storedAPIKey(for: provider)
                             settings.setKeyVerified(false, for: provider)
                         }
                     }
-                    if let existing = obfuscatedKey() {
+                    if let existing = VoiceInkSecretPresentation.obfuscatedAPIKey(settings.storedAPIKey(for: provider)) {
                         Text(existing).font(.caption).foregroundStyle(.secondary)
                     }
                 }
@@ -89,17 +89,13 @@ struct ProviderAPIKeyView: View {
         .navigationTitle(provider.displayName)
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            tempKey = currentAPIKey()
+            tempKey = settings.storedAPIKey(for: provider)
             editingKey = !isKeyVerified
             verifyResult = nil
         }
         .onChange(of: tempKey) { _, _ in
             verifyResult = nil
         }
-    }
-
-    private func currentAPIKey() -> String {
-        settings.storedAPIKey(for: provider)
     }
 
     private func saveKey() {
@@ -134,9 +130,6 @@ struct ProviderAPIKeyView: View {
         await apiKeyVerifier.verifyStoredAPIKey(key, for: provider)
     }
 
-    private func obfuscatedKey() -> String? {
-        VoiceInkSecretPresentation.obfuscatedAPIKey(currentAPIKey())
-    }
 }
 
 #Preview {

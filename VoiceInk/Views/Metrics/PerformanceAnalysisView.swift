@@ -9,10 +9,7 @@ enum PanelMode {
 }
 
 struct PerformanceAnalyzer {
-    typealias AnalysisResult = VoiceInkPerformanceAnalysis
-    typealias ModelStat = VoiceInkPerformanceModelStat
-
-    static func analyze(transcriptions: [Transcription]) -> AnalysisResult {
+    static func analyze(transcriptions: [Transcription]) -> VoiceInkPerformanceAnalysis {
         VoiceInkPerformanceAnalyzer.analyze(records: transcriptions)
     }
 
@@ -43,7 +40,7 @@ struct PerformanceAnalyzer {
 struct PerformanceAnalysisView: View {
     @Environment(\.dismiss) private var dismiss
     let transcriptions: [Transcription]
-    private let analysis: PerformanceAnalyzer.AnalysisResult
+    private let analysis: VoiceInkPerformanceAnalysis
 
     private let columns: [GridItem] = [
         GridItem(.adaptive(minimum: 250), spacing: 16)
@@ -235,7 +232,7 @@ struct SystemInfoCard: View {
 }
 
 struct TranscriptionModelCard: View {
-    let modelStat: PerformanceAnalyzer.ModelStat
+    let modelStat: VoiceInkPerformanceModelStat
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -294,7 +291,7 @@ struct TranscriptionModelCard: View {
 }
 
 struct EnhancementModelCard: View {
-    let modelStat: PerformanceAnalyzer.ModelStat
+    let modelStat: VoiceInkPerformanceModelStat
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {

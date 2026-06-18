@@ -373,6 +373,23 @@ final class WhisperModelFilesTests: XCTestCase {
         )
     }
 
+    func testModelOperationConfirmationPreservesIOSDownloadAndDeleteCopy() {
+        let model = VoiceInkWhisperModelFiles.baseModel
+        let download = VoiceInkWhisperModelOperationConfirmationPresentation.download(for: model)
+        let delete = VoiceInkWhisperModelOperationConfirmationPresentation.delete(for: model)
+
+        XCTAssertEqual(download.id, "download-base")
+        XCTAssertEqual(download.title, "Download Model")
+        XCTAssertEqual(download.message, "To enable offline transcription, a 142 MB model needs to be downloaded. This may incur data charges if you are not on Wi-Fi.")
+        XCTAssertEqual(download.primaryButtonTitle, "Download")
+        XCTAssertEqual(download.cancelButtonTitle, "Cancel")
+        XCTAssertEqual(delete.id, "delete-base")
+        XCTAssertEqual(delete.title, "Delete Model")
+        XCTAssertEqual(delete.message, "Delete Whisper Base Model? This will remove the model from your device.")
+        XCTAssertEqual(delete.primaryButtonTitle, "Delete")
+        XCTAssertEqual(delete.cancelButtonTitle, "Cancel")
+    }
+
     func testModelOperationAlertPreservesIOSDownloadFailureCopy() {
         let alert = VoiceInkWhisperModelOperationAlertPresentation.downloadFailed(
             localizedDescription: "The request timed out."

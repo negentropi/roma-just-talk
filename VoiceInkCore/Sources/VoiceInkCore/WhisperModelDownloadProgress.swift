@@ -79,6 +79,46 @@ public struct VoiceInkWhisperModelOperationAlertPresentation: Equatable, Identif
     }
 }
 
+public struct VoiceInkWhisperModelOperationConfirmationPresentation: Equatable, Identifiable, Sendable {
+    public let id: String
+    public let title: String
+    public let message: String
+    public let primaryButtonTitle: String
+    public let cancelButtonTitle: String
+
+    public init(
+        id: String,
+        title: String,
+        message: String,
+        primaryButtonTitle: String,
+        cancelButtonTitle: String = "Cancel"
+    ) {
+        self.id = id
+        self.title = title
+        self.message = message
+        self.primaryButtonTitle = primaryButtonTitle
+        self.cancelButtonTitle = cancelButtonTitle
+    }
+
+    public static func download(for model: VoiceInkWhisperModelFileSpec) -> Self {
+        VoiceInkWhisperModelOperationConfirmationPresentation(
+            id: "download-\(model.id)",
+            title: "Download Model",
+            message: "To enable offline transcription, a \(model.size) model needs to be downloaded. This may incur data charges if you are not on Wi-Fi.",
+            primaryButtonTitle: "Download"
+        )
+    }
+
+    public static func delete(for model: VoiceInkWhisperModelFileSpec) -> Self {
+        VoiceInkWhisperModelOperationConfirmationPresentation(
+            id: "delete-\(model.id)",
+            title: "Delete Model",
+            message: "Delete \(model.displayName)? This will remove the model from your device.",
+            primaryButtonTitle: "Delete"
+        )
+    }
+}
+
 public enum VoiceInkWhisperModelDownloadPhase: Equatable, Sendable {
     case idle
     case downloadingMainModel(modelName: String)
@@ -194,7 +234,7 @@ public struct VoiceInkWhisperModelDownloadProgress: Equatable, Sendable {
     }
 
     public static func downloadConfirmationMessage(for model: VoiceInkWhisperModelFileSpec) -> String {
-        "To enable offline transcription, a \(model.size) model needs to be downloaded. This may incur data charges if you are not on Wi-Fi."
+        VoiceInkWhisperModelOperationConfirmationPresentation.download(for: model).message
     }
 
     private static func clampedFraction(_ value: Double) -> Double {

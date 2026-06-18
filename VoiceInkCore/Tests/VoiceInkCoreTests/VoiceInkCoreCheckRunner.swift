@@ -709,6 +709,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testMacOSDownloadProgressUsesMainAndCoreMLKeys", run: { WhisperModelFilesTests().testMacOSDownloadProgressUsesMainAndCoreMLKeys() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testMacOSDownloadProgressIgnoresCoreMLForQuantizedModels", run: { WhisperModelFilesTests().testMacOSDownloadProgressIgnoresCoreMLForQuantizedModels() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testModelDownloadCopyUsesSharedModelSize", run: { WhisperModelFilesTests().testModelDownloadCopyUsesSharedModelSize() }),
+            VoiceInkCoreCheck(name: "WhisperModelFilesTests.testModelOperationConfirmationPreservesIOSDownloadAndDeleteCopy", run: { WhisperModelFilesTests().testModelOperationConfirmationPreservesIOSDownloadAndDeleteCopy() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testModelOperationAlertPreservesIOSDownloadFailureCopy", run: { WhisperModelFilesTests().testModelOperationAlertPreservesIOSDownloadFailureCopy() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testModelOperationAlertPreservesIOSServerAndMissingFileCopy", run: { WhisperModelFilesTests().testModelOperationAlertPreservesIOSServerAndMissingFileCopy() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testModelOperationAlertPreservesIOSSaveAndDeleteFailureCopy", run: { WhisperModelFilesTests().testModelOperationAlertPreservesIOSSaveAndDeleteFailureCopy() }),

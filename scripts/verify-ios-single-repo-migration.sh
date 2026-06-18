@@ -654,6 +654,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
 
 require_pattern \
+  "shared Whisper model operation confirmation presentation lives in VoiceInkCore" \
+  'VoiceInkWhisperModelOperationConfirmationPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+
+require_pattern \
   "shared Whisper compact download status text lives in VoiceInkCore" \
   'compactStatusText' \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
@@ -679,8 +684,8 @@ require_pattern \
   iOS/VoiceInk-ios/LocalModelManagementView.swift
 
 require_pattern \
-  "iOS local model management uses shared download prompt copy" \
-  'VoiceInkWhisperModelDownloadProgress\.downloadConfirmationMessage' \
+  "iOS local model management uses shared operation confirmation presentation" \
+  'VoiceInkWhisperModelOperationConfirmationPresentation|downloadConfirmation|deleteConfirmation' \
   iOS/VoiceInk-ios/LocalModelManagementView.swift
 
 require_pattern \
@@ -714,8 +719,8 @@ require_pattern \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 require_pattern \
-  "iOS onboarding uses shared download prompt copy" \
-  'VoiceInkWhisperModelDownloadProgress\.(downloadConfirmationMessage|downloadActionTitle)' \
+  "iOS onboarding uses shared operation confirmation presentation" \
+  'VoiceInkWhisperModelOperationConfirmationPresentation|downloadConfirmation' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 require_pattern \
@@ -740,6 +745,12 @@ reject_pattern \
 reject_pattern \
   "iOS model download views avoid duplicate prompt copy" \
   'To enable offline transcription, a .* model needs to be downloaded|Download Model \(' \
+  iOS/VoiceInk-ios/LocalModelManagementView.swift \
+  iOS/VoiceInk-ios/OnboardingView.swift
+
+reject_pattern \
+  "iOS local model views avoid duplicate operation confirmation copy" \
+  '\.alert\("Download Model"|\.alert\("Delete Model"|This will remove the model from your device|Button\("Download"\)|Button\("Cancel"' \
   iOS/VoiceInk-ios/LocalModelManagementView.swift \
   iOS/VoiceInk-ios/OnboardingView.swift
 

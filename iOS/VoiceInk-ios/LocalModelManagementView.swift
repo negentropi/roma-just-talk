@@ -52,6 +52,14 @@ struct ModelRowView: View {
             downloadProgressByModelID: modelManager.downloadProgress
         )
     }
+
+    private var downloadConfirmation: VoiceInkWhisperModelOperationConfirmationPresentation {
+        .download(for: model)
+    }
+
+    private var deleteConfirmation: VoiceInkWhisperModelOperationConfirmationPresentation {
+        .delete(for: model)
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -116,21 +124,21 @@ struct ModelRowView: View {
                 .tint(.red)
             }
         }
-        .alert("Delete Model", isPresented: $showingDeleteAlert) {
-            Button("Delete", role: .destructive) {
+        .alert(deleteConfirmation.title, isPresented: $showingDeleteAlert) {
+            Button(deleteConfirmation.primaryButtonTitle, role: .destructive) {
                 deleteModel()
             }
-            Button("Cancel", role: .cancel) { }
+            Button(deleteConfirmation.cancelButtonTitle, role: .cancel) { }
         } message: {
-            Text("Delete \(model.displayName)? This will remove the model from your device.")
+            Text(deleteConfirmation.message)
         }
-        .alert("Download Model", isPresented: $showingDownloadConfirmation) {
-            Button("Download") {
+        .alert(downloadConfirmation.title, isPresented: $showingDownloadConfirmation) {
+            Button(downloadConfirmation.primaryButtonTitle) {
                 downloadModel()
             }
-            Button("Cancel", role: .cancel) { }
+            Button(downloadConfirmation.cancelButtonTitle, role: .cancel) { }
         } message: {
-            Text(VoiceInkWhisperModelDownloadProgress.downloadConfirmationMessage(for: model))
+            Text(downloadConfirmation.message)
         }
     }
     

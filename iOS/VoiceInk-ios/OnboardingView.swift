@@ -115,6 +115,10 @@ struct ModelDownloadOnboardingView: View {
             downloadProgressByModelID: modelManager.downloadProgress
         )
     }
+
+    private var downloadConfirmation: VoiceInkWhisperModelOperationConfirmationPresentation {
+        .download(for: baseModel)
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -234,13 +238,13 @@ struct ModelDownloadOnboardingView: View {
                 }
             )
         }
-        .alert("Download Model", isPresented: $showDownloadConfirmation) {
-            Button("Download") {
+        .alert(downloadConfirmation.title, isPresented: $showDownloadConfirmation) {
+            Button(downloadConfirmation.primaryButtonTitle) {
                 downloadModel()
             }
-            Button("Cancel", role: .cancel) { }
+            Button(downloadConfirmation.cancelButtonTitle, role: .cancel) { }
         } message: {
-            Text(VoiceInkWhisperModelDownloadProgress.downloadConfirmationMessage(for: baseModel))
+            Text(downloadConfirmation.message)
         }
     }
     

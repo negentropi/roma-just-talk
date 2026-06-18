@@ -20,8 +20,7 @@ struct CloudModelCardView: View {
         self.model = model
         self.isCurrent = isCurrent
         self.setDefaultAction = setDefaultAction
-        let key = "streaming-enabled-\(model.name)"
-        _streamingEnabled = State(initialValue: UserDefaults.standard.object(forKey: key) as? Bool ?? true)
+        _streamingEnabled = State(initialValue: VoiceInkTranscriptionStreamingPreference.isEnabled(forModelName: model.name))
         let preloadKey = RollingBufferPreloadSettings.perModelPreloadEnabledKey(forModelName: model.name)
         _preloadEnabled = State(initialValue: UserDefaults.standard.object(forKey: preloadKey) as? Bool ?? true)
     }
@@ -99,7 +98,7 @@ struct CloudModelCardView: View {
                 .disabled(isStreamingOnly)
                 .onChange(of: streamingEnabled) { _, newValue in
                     if !isStreamingOnly {
-                        UserDefaults.standard.set(newValue, forKey: streamingDefaultsKey)
+                        VoiceInkTranscriptionStreamingPreference.saveIsEnabled(newValue, forModelName: model.name)
                         ensureCurrentModelLanguageIsStillValid()
                         NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
                     }
@@ -286,10 +285,6 @@ struct CloudModelCardView: View {
         }
     }
     
-    private var streamingDefaultsKey: String {
-        "streaming-enabled-\(model.name)"
-    }
-
     private var preloadDefaultsKey: String {
         RollingBufferPreloadSettings.perModelPreloadEnabledKey(forModelName: model.name)
     }

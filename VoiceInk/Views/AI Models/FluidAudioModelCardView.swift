@@ -1,6 +1,7 @@
 import SwiftUI
 import Combine
 import AppKit
+import VoiceInkCore
 
 struct FluidAudioModelCardView: View {
     let model: FluidAudioModel
@@ -13,14 +14,9 @@ struct FluidAudioModelCardView: View {
         self.model = model
         _fluidAudioModelManager = ObservedObject(wrappedValue: fluidAudioModelManager)
         _transcriptionModelManager = ObservedObject(wrappedValue: transcriptionModelManager)
-        let key = "streaming-enabled-\(model.name)"
-        _streamingEnabled = State(initialValue: UserDefaults.standard.object(forKey: key) as? Bool ?? true)
+        _streamingEnabled = State(initialValue: VoiceInkTranscriptionStreamingPreference.isEnabled(forModelName: model.name))
         let preloadKey = RollingBufferPreloadSettings.perModelPreloadEnabledKey(forModelName: model.name)
         _preloadEnabled = State(initialValue: UserDefaults.standard.object(forKey: preloadKey) as? Bool ?? true)
-    }
-
-    private var streamingDefaultsKey: String {
-        "streaming-enabled-\(model.name)"
     }
 
     private var preloadDefaultsKey: String {
@@ -68,7 +64,7 @@ struct FluidAudioModelCardView: View {
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(Color(.secondaryLabelColor))
                     .onChange(of: streamingEnabled) { _, newValue in
-                        UserDefaults.standard.set(newValue, forKey: streamingDefaultsKey)
+                        VoiceInkTranscriptionStreamingPreference.saveIsEnabled(newValue, forModelName: model.name)
                     }
                     .help(streamingEnabled ? "Streams active-recording audio; click to use saved-file batch mode" : "Saved-file batch mode; click to stream active-recording audio")
 

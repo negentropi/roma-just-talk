@@ -98,6 +98,14 @@ extension TranscriptionModel {
         }
         return !cloudProvider.isStreamingOnly
     }
+
+    var streamingPreferenceSnapshot: VoiceInkTranscriptionStreamingModelSnapshot {
+        VoiceInkTranscriptionStreamingModelSnapshot(
+            name: name,
+            supportsStreaming: supportsStreaming,
+            isStreamingOnly: CloudProviderRegistry.provider(for: provider)?.isStreamingOnly ?? false
+        )
+    }
 }
 
 // A new struct for Apple's native models

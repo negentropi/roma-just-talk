@@ -22,15 +22,8 @@ enum TranscriptionLanguageSupport {
     }
 
     private static func assemblyAIUsesRealtime(for model: any TranscriptionModel) -> Bool {
-        guard model.provider == .assemblyAI, model.supportsStreaming else {
-            return false
-        }
-
-        if let cloudProvider = CloudProviderRegistry.provider(for: model.provider), cloudProvider.isStreamingOnly {
-            return true
-        }
-
-        return UserDefaults.standard.object(forKey: "streaming-enabled-\(model.name)") as? Bool ?? true
+        model.provider == .assemblyAI &&
+            VoiceInkTranscriptionStreamingPreference.shouldUseStreaming(for: model.streamingPreferenceSnapshot)
     }
 }
 

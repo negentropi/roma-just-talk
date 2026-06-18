@@ -9,8 +9,8 @@ enum StreamingKeysMigration {
 
         let legacyStreamingMappings: [(old: String, new: [String])] = [
             ("parakeet-streaming-enabled", [
-                "streaming-enabled-parakeet-tdt-0.6b-v2",
-                "streaming-enabled-parakeet-tdt-0.6b-v3",
+                VoiceInkTranscriptionStreamingPreference.key(forModelName: "parakeet-tdt-0.6b-v2"),
+                VoiceInkTranscriptionStreamingPreference.key(forModelName: "parakeet-tdt-0.6b-v3"),
             ]),
         ]
 

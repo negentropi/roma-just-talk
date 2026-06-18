@@ -114,6 +114,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "FillerWordsTests.testAddingNormalizesAndAppendsNewWord", run: { FillerWordsTests().testAddingNormalizesAndAppendsNewWord() }),
             VoiceInkCoreCheck(name: "FillerWordsTests.testAddingRejectsBlankAndCaseInsensitiveDuplicateWords", run: { FillerWordsTests().testAddingRejectsBlankAndCaseInsensitiveDuplicateWords() }),
             VoiceInkCoreCheck(name: "FillerWordsTests.testRemovingDropsWordsCaseInsensitively", run: { FillerWordsTests().testRemovingDropsWordsCaseInsensitively() }),
+            VoiceInkCoreCheck(name: "FillerWordsTests.testRemovingAtOffsetsMatchesIOSListDeletion", run: { FillerWordsTests().testRemovingAtOffsetsMatchesIOSListDeletion() }),
             VoiceInkCoreCheck(name: "LanguageCatalogTests.testLanguageCatalogPreservesSharedNames", run: { LanguageCatalogTests().testLanguageCatalogPreservesSharedNames() }),
             VoiceInkCoreCheck(name: "LanguageCatalogTests.testWhisperLanguagesPreserveMacOSWhisperSet", run: { LanguageCatalogTests().testWhisperLanguagesPreserveMacOSWhisperSet() }),
             VoiceInkCoreCheck(name: "LanguageCatalogTests.testNativeAppleLanguagesUseBCP47Identifiers", run: { LanguageCatalogTests().testNativeAppleLanguagesUseBCP47Identifiers() }),

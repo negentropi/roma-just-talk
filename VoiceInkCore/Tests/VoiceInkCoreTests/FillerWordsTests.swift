@@ -27,4 +27,11 @@ final class FillerWordsTests: XCTestCase {
             ["uh", "like"]
         )
     }
+
+    func testRemovingAtOffsetsMatchesIOSListDeletion() {
+        XCTAssertEqual(
+            VoiceInkFillerWords.removing(at: IndexSet([1, 3]), from: ["uh", "um", "like", "hmm"]),
+            ["uh", "like"]
+        )
+    }
 }

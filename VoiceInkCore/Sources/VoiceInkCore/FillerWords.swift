@@ -27,4 +27,12 @@ public enum VoiceInkFillerWords {
         let removalKey = word.lowercased()
         return words.filter { $0.lowercased() != removalKey }
     }
+
+    public static func removing(at offsets: IndexSet, from words: [String]) -> [String] {
+        var updatedWords = words
+        for index in offsets.sorted(by: >) {
+            updatedWords.remove(at: index)
+        }
+        return updatedWords
+    }
 }

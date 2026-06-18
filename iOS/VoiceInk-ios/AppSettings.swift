@@ -163,9 +163,7 @@ final class AppSettings: ObservableObject {
     }
 
     func removeFillerWords(at offsets: IndexSet) {
-        for index in offsets.sorted(by: >) {
-            fillerWords.remove(at: index)
-        }
+        fillerWords = VoiceInkFillerWords.removing(at: offsets, from: fillerWords)
     }
 
     var availableTranscriptionLanguages: [String: String] {

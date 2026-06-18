@@ -3,8 +3,6 @@ import SwiftUI
 import os
 import VoiceInkCore
 
-typealias RecorderUIToggleAction = VoiceInkRecorderUIToggleAction
-
 @MainActor
 class RecorderUIManager: ObservableObject {
     @Published var miniRecorderError: String?
@@ -116,7 +114,7 @@ class RecorderUIManager: ObservableObject {
         )
     }
 
-    func activeSessionToggleAction(for recordingState: VoiceInkRecordingState) -> RecorderUIToggleAction {
+    func activeSessionToggleAction(for recordingState: VoiceInkRecordingState) -> VoiceInkRecorderUIToggleAction {
         recordingState.recorderUIToggleAction
     }
 

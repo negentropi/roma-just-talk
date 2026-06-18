@@ -408,6 +408,22 @@ reject_pattern \
   VoiceInk/Transcription/Whisper/WhisperModelManager.swift \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
+require_pattern \
+  "macOS cloud API-key card uses shared draft policy" \
+  'VoiceInkProviderAPIKeyDraft' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift
+
+require_pattern \
+  "macOS cloud API-key card uses shared stored-key verifier" \
+  'verifyStoredAPIKeyDetailed\(keyToVerify, for: provider\)' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift
+
+reject_pattern \
+  "macOS cloud API-key card avoids shell-only stored-key resolution" \
+  'VoiceInkAPIKeyReference\.resolvedValue|func +verifyAPIKey\(_ key: String\)|cloudProvider\.verifyAPIKey' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift \
+  VoiceInk/Transcription/Cloud/CloudProvider.swift
+
 reject_pattern \
   "macOS and iOS filler-word settings use shared draft policy" \
   'VoiceInkFillerWords\.normalizedWord' \

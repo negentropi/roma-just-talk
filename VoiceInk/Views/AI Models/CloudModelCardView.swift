@@ -27,6 +27,7 @@ struct CloudModelCardView: View {
     @State private var isVerifying = false
     @State private var verificationStatus: VerificationStatus = .none
     @State private var verificationError: String? = nil
+    private let apiKeyVerifier = VoiceInkProviderAPIKeyVerifier()
     
     enum VerificationStatus {
         case none, verifying, success, failure
@@ -36,8 +37,15 @@ struct CloudModelCardView: View {
         return APIKeyManager.shared.hasAPIKey(forProvider: model.provider.apiKeyProviderName)
     }
 
-    private var hasDraftAPIKey: Bool {
-        VoiceInkProviderCredential.nonBlank(apiKey) != nil
+    private var apiKeyDraft: VoiceInkProviderAPIKeyDraft {
+        VoiceInkProviderAPIKeyDraft(
+            enteredKey: apiKey,
+            storedRuntimeKey: APIKeyManager.shared.getAPIKey(forProvider: model.provider.apiKeyProviderName)
+        )
+    }
+
+    private var canVerifyAPIKey: Bool {
+        apiKeyDraft.canVerify
     }
     
     var body: some View {
@@ -264,7 +272,7 @@ struct CloudModelCardView: View {
                     )
                 }
                 .buttonStyle(.plain)
-                .disabled(!hasDraftAPIKey || isVerifying)
+                .disabled(!canVerifyAPIKey || isVerifying)
             }
             
             if verificationStatus == .failure {
@@ -296,19 +304,12 @@ struct CloudModelCardView: View {
     }
     
     private func verifyAPIKey() {
-        guard hasDraftAPIKey else { return }
+        let draft = apiKeyDraft
+        guard let keyToVerify = draft.verificationCandidate else { return }
 
         isVerifying = true
         verificationStatus = .verifying
-        let key = apiKey
-        guard let resolvedKey = VoiceInkAPIKeyReference.resolvedValue(key) else {
-            isVerifying = false
-            verificationStatus = .failure
-            verificationError = "Environment variable is missing or empty"
-            return
-        }
-
-        guard let cloudProvider = CloudProviderRegistry.provider(for: model.provider) else {
+        guard let provider = model.provider.coreTranscriptionModelProvider else {
             isVerifying = false
             verificationStatus = .failure
             verificationError = "Unsupported provider"
@@ -316,14 +317,16 @@ struct CloudModelCardView: View {
         }
 
         Task {
-            let result = await cloudProvider.verifyAPIKey(resolvedKey)
+            let result = await apiKeyVerifier.verifyStoredAPIKeyDetailed(keyToVerify, for: provider)
 
             await MainActor.run {
                 isVerifying = false
                 if result.isValid {
                     verificationStatus = .success
                     verificationError = nil
-                    APIKeyManager.shared.saveAPIKey(key, forProvider: model.provider.apiKeyProviderName)
+                    if let keyToSave = draft.keyToSaveAfterSuccessfulVerification {
+                        APIKeyManager.shared.saveAPIKey(keyToSave, forProvider: model.provider.apiKeyProviderName)
+                    }
                     transcriptionModelManager.refreshAllAvailableModels()
                     withAnimation(.easeInOut(duration: 0.3)) {
                         isExpanded = false

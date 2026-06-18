@@ -24,7 +24,7 @@ final class ProviderAPIKeyVerifierTests: XCTestCase {
 
         let result = await verifier.verifyStoredAPIKeyDetailed(
             "$MISSING_GROQ_API_KEY",
-            for: .groq,
+            for: VoiceInkProviderKind.groq,
             environment: [:]
         )
 
@@ -92,10 +92,42 @@ final class ProviderAPIKeyVerifierTests: XCTestCase {
         }
     }
 
+    func testStoredKeyVerifierRejectsMissingTranscriptionModelProviderKeyWithoutNetwork() async {
+        let verifier = VoiceInkProviderAPIKeyVerifier()
+
+        let result = await verifier.verifyStoredAPIKeyDetailed(
+            "$MISSING_CARTESIA_API_KEY",
+            for: .cartesia,
+            environment: [:]
+        )
+
+        XCTAssertEqual(
+            result,
+            VoiceInkAPIKeyVerificationResult(
+                isValid: false,
+                errorMessage: "API key is missing or empty."
+            )
+        )
+    }
+
     func testVerifierRejectsLocalTranscriptionModelProviderWithoutVerificationTransport() async {
         let verifier = VoiceInkProviderAPIKeyVerifier()
 
         let result = await verifier.verifyAPIKeyDetailed("key", for: VoiceInkTranscriptionModelProvider.local)
+
+        XCTAssertEqual(
+            result,
+            VoiceInkAPIKeyVerificationResult(
+                isValid: false,
+                errorMessage: "Local (Whisper) does not support API key verification."
+            )
+        )
+    }
+
+    func testStoredKeyVerifierRejectsLocalTranscriptionModelProviderWithoutVerificationTransport() async {
+        let verifier = VoiceInkProviderAPIKeyVerifier()
+
+        let result = await verifier.verifyStoredAPIKeyDetailed("key", for: VoiceInkTranscriptionModelProvider.local)
 
         XCTAssertEqual(
             result,

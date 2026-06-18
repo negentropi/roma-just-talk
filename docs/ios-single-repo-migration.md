@@ -125,7 +125,7 @@ Current macOS consumers of shared remote transport:
 - `VoiceInkRemoteTranscriptionService` and `VoiceInkRemoteTranscriptionOptions.batchDefaults` preserve macOS provider-specific batch options such as Groq JSON/temperature/retry settings, Deepgram paragraph/timeout settings, and vocabulary/prompt forwarding for providers that already used them.
 - Custom OpenAI-compatible batch transcription uses `VoiceInkOpenAICompatibleTranscriptionClient`.
 - Cartesia API-key verification uses `VoiceInkProviderAPIKeyVerifier` through `VoiceInkTranscriptionModelProvider`; Cartesia transcription remains streaming-only in platform shell code.
-- MacOS cloud-provider API-key verification uses `CloudProvider` default verification backed by `VoiceInkProviderAPIKeyVerifier`; provider-specific streaming adapters still own transcription execution.
+- MacOS cloud-provider API-key verification uses `VoiceInkProviderAPIKeyDraft` and stored-key verification through `VoiceInkProviderAPIKeyVerifier`, including transcription-model providers such as Cartesia; provider-specific streaming adapters still own transcription execution.
 - macOS local Whisper/model loading throws `VoiceInkEngineError` from `VoiceInkCore`; macOS error descriptions are covered by `VoiceInkEngineErrorTests`.
 - macOS local Whisper and cloud transcription normalize selected request language through `VoiceInkTranscriptionLanguagePreference`.
 - macOS local Whisper, cloud transcription, AssemblyAI streaming, and `WhisperPrompt` read/write transcription prompts through `VoiceInkTranscriptionPromptPreference`; local Whisper transcription uses the shared selected-language prompt fallback helper.

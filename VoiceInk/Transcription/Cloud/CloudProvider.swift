@@ -12,7 +12,6 @@ protocol CloudProvider {
 
     func transcribe(audioData: Data, fileName: String, apiKey: String, model: String, language: String?, prompt: String?, customVocabulary: [String]) async throws -> String
     func makeStreamingProvider(modelContext: ModelContext) -> (any StreamingTranscriptionProvider)?
-    func verifyAPIKey(_ key: String) async -> (isValid: Bool, errorMessage: String?)
 }
 
 struct CoreCloudProvider: CloudProvider {
@@ -147,14 +146,6 @@ extension CloudProvider {
         }
     }
 
-    func verifyAPIKey(_ key: String) async -> (isValid: Bool, errorMessage: String?) {
-        guard let provider = modelProvider.coreTranscriptionModelProvider else {
-            return (false, "Unsupported provider")
-        }
-
-        let result = await VoiceInkProviderAPIKeyVerifier().verifyAPIKeyDetailed(key, for: provider)
-        return (result.isValid, result.errorMessage)
-    }
 }
 
 enum CloudProviderRegistry {

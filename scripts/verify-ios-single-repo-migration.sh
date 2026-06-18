@@ -931,6 +931,21 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
+  "shared Power Mode configuration persistence lives in VoiceInkCore" \
+  'VoiceInkPowerModeConfigurationPreference|activePowerModeConfigurationId' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+reject_pattern \
+  "macOS Power Mode manager avoids shell-only config persistence mechanics" \
+  'VoiceInkUserDefaultsKey\.powerModeConfigurations|activeConfigurationId|JSON(Encoder|Decoder)|data\(forKey:' \
+  VoiceInk/PowerMode/PowerModeConfig.swift
+
+require_pattern \
+  "macOS Power Mode manager consumes shared configuration persistence" \
+  'VoiceInkPowerModeConfigurationPreference\.(loadConfigurations|saveConfigurations|loadActiveConfigurationId|saveActiveConfigurationId)' \
+  VoiceInk/PowerMode/PowerModeConfig.swift
+
+require_pattern \
   "shared Power Mode config list policy lives in VoiceInkCore" \
   'enabledPowerModeConfigurationIds|appendPowerModeConfigurationIfMissing|setPowerModeDefaultConfiguration|addPowerModeAppConfig' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift

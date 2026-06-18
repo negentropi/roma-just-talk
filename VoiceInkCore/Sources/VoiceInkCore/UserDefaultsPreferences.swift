@@ -29,6 +29,7 @@ public enum VoiceInkUserDefaultsKey {
     public static let customPrompts = "customPrompts"
     public static let selectedPromptId = "selectedPromptId"
     public static let powerModeConfigurations = "powerModeConfigurationsV2"
+    public static let activePowerModeConfigurationId = "activeConfigurationId"
     public static let selectedAIProvider = "selectedAIProvider"
     public static let openRouterModels = "openRouterModels"
     public static let ollamaBaseURL = "ollamaBaseURL"
@@ -718,6 +719,7 @@ public enum VoiceInkSharedPreferenceReset {
         VoiceInkAudioCleanupPreference.clear(from: defaults)
         VoiceInkCustomPromptStorage.clear(from: defaults)
         VoiceInkAIEnhancementContextPreference.clear(from: defaults)
+        VoiceInkPowerModeConfigurationPreference.clear(from: defaults)
     }
 }
 
@@ -767,6 +769,54 @@ public enum VoiceInkModeStorage {
     public static func clear(from defaults: UserDefaults = .standard) {
         defaults.removeObject(forKey: VoiceInkUserDefaultsKey.modes)
         defaults.removeObject(forKey: VoiceInkUserDefaultsKey.selectedModeId)
+    }
+}
+
+public enum VoiceInkPowerModeConfigurationPreference {
+    public static func saveConfigurations(
+        _ configurations: [PowerModeConfig],
+        to defaults: UserDefaults = .standard,
+        encoder: JSONEncoder = JSONEncoder()
+    ) {
+        if let data = try? encoder.encode(configurations) {
+            defaults.set(data, forKey: VoiceInkUserDefaultsKey.powerModeConfigurations)
+        }
+    }
+
+    public static func loadConfigurations(
+        from defaults: UserDefaults = .standard,
+        decoder: JSONDecoder = JSONDecoder()
+    ) -> [PowerModeConfig] {
+        guard let data = defaults.data(forKey: VoiceInkUserDefaultsKey.powerModeConfigurations),
+              let configurations = try? decoder.decode([PowerModeConfig].self, from: data) else {
+            return []
+        }
+
+        return configurations
+    }
+
+    public static func saveActiveConfigurationId(
+        _ id: UUID?,
+        to defaults: UserDefaults = .standard
+    ) {
+        if let id {
+            defaults.set(id.uuidString, forKey: VoiceInkUserDefaultsKey.activePowerModeConfigurationId)
+        } else {
+            defaults.removeObject(forKey: VoiceInkUserDefaultsKey.activePowerModeConfigurationId)
+        }
+    }
+
+    public static func loadActiveConfigurationId(from defaults: UserDefaults = .standard) -> UUID? {
+        guard let idString = defaults.string(forKey: VoiceInkUserDefaultsKey.activePowerModeConfigurationId) else {
+            return nil
+        }
+
+        return UUID(uuidString: idString)
+    }
+
+    public static func clear(from defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.powerModeConfigurations)
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.activePowerModeConfigurationId)
     }
 }
 

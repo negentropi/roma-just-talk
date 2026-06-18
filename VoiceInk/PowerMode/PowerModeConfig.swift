@@ -6,31 +6,18 @@ class PowerModeManager: ObservableObject {
     @Published var configurations: [PowerModeConfig] = []
     @Published var activeConfiguration: PowerModeConfig?
 
-    private let configKey = VoiceInkUserDefaultsKey.powerModeConfigurations
-    private let activeConfigIdKey = "activeConfigurationId"
-
     private init() {
-        loadConfigurations()
+        configurations = VoiceInkPowerModeConfigurationPreference.loadConfigurations()
 
-        if let activeConfigIdString = UserDefaults.standard.string(forKey: activeConfigIdKey),
-           let activeConfigId = UUID(uuidString: activeConfigIdString) {
+        if let activeConfigId = VoiceInkPowerModeConfigurationPreference.loadActiveConfigurationId() {
             activeConfiguration = configurations.powerModeConfiguration(with: activeConfigId)
         } else {
             activeConfiguration = nil
         }
     }
 
-    private func loadConfigurations() {
-        if let data = UserDefaults.standard.data(forKey: configKey),
-           let configs = try? JSONDecoder().decode([PowerModeConfig].self, from: data) {
-            configurations = configs
-        }
-    }
-
     func saveConfigurations() {
-        if let data = try? JSONEncoder().encode(configurations) {
-            UserDefaults.standard.set(data, forKey: configKey)
-        }
+        VoiceInkPowerModeConfigurationPreference.saveConfigurations(configurations)
         NotificationCenter.default.post(name: .powerModeConfigurationsDidChange, object: nil)
     }
 
@@ -153,7 +140,7 @@ class PowerModeManager: ObservableObject {
 
     func setActiveConfiguration(_ config: PowerModeConfig?) {
         activeConfiguration = config
-        UserDefaults.standard.set(config?.id.uuidString, forKey: activeConfigIdKey)
+        VoiceInkPowerModeConfigurationPreference.saveActiveConfigurationId(config?.id)
         self.objectWillChange.send()
     }
 

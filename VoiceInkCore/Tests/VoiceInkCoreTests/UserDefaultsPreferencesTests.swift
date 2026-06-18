@@ -31,6 +31,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkUserDefaultsKey.customPrompts, "customPrompts")
         XCTAssertEqual(VoiceInkUserDefaultsKey.selectedPromptId, "selectedPromptId")
         XCTAssertEqual(VoiceInkUserDefaultsKey.powerModeConfigurations, "powerModeConfigurationsV2")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.activePowerModeConfigurationId, "activeConfigurationId")
         XCTAssertEqual(VoiceInkUserDefaultsKey.selectedAIProvider, "selectedAIProvider")
         XCTAssertEqual(VoiceInkUserDefaultsKey.openRouterModels, "openRouterModels")
         XCTAssertEqual(VoiceInkUserDefaultsKey.ollamaBaseURL, "ollamaBaseURL")
@@ -947,6 +948,13 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             VoiceInkCustomPromptStorage.saveSelectedPromptId(customPrompt.id, to: defaults)
             VoiceInkAIEnhancementContextPreference.saveUseClipboardContext(true, to: defaults)
             VoiceInkAIEnhancementContextPreference.saveUseScreenCaptureContext(true, to: defaults)
+            let powerModeConfig = PowerModeConfig(
+                name: "Writing",
+                emoji: "W",
+                isAIEnhancementEnabled: false
+            )
+            VoiceInkPowerModeConfigurationPreference.saveConfigurations([powerModeConfig], to: defaults)
+            VoiceInkPowerModeConfigurationPreference.saveActiveConfigurationId(powerModeConfig.id, to: defaults)
 
             VoiceInkSharedPreferenceReset.clearCoreUserSettings(from: defaults, providers: [.groq])
 
@@ -1020,6 +1028,11 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             XCTAssertNil(VoiceInkCustomPromptStorage.loadSelectedPromptId(from: defaults))
             XCTAssertFalse(VoiceInkAIEnhancementContextPreference.useClipboardContext(from: defaults))
             XCTAssertFalse(VoiceInkAIEnhancementContextPreference.useScreenCaptureContext(from: defaults))
+            XCTAssertTrue(VoiceInkPowerModeConfigurationPreference.loadConfigurations(from: defaults).isEmpty)
+            XCTAssertNil(VoiceInkPowerModeConfigurationPreference.loadActiveConfigurationId(from: defaults))
+
+            defaults.set("", forKey: VoiceInkUserDefaultsKey.activePowerModeConfigurationId)
+            XCTAssertNil(VoiceInkPowerModeConfigurationPreference.loadActiveConfigurationId(from: defaults))
         }
     }
 
@@ -1082,6 +1095,89 @@ final class UserDefaultsPreferencesTests: XCTestCase {
 
             XCTAssertTrue(VoiceInkModeStorage.loadModes(from: defaults).isEmpty)
             XCTAssertNil(VoiceInkModeStorage.loadSelectedModeId(from: defaults))
+        }
+    }
+
+    func testPowerModeConfigurationPreferenceRoundTripsConfigurationsAndActiveConfigurationId() {
+        withIsolatedDefaults { defaults in
+            let firstConfig = PowerModeConfig(
+                name: "Writing",
+                emoji: "W",
+                appConfigs: [
+                    VoiceInkPowerModeAppConfig(bundleIdentifier: "com.example.App", appName: "Example")
+                ],
+                urlConfigs: [
+                    VoiceInkPowerModeURLConfig(url: "example.com")
+                ],
+                isAIEnhancementEnabled: true,
+                selectedPrompt: "prompt-id",
+                selectedTranscriptionModelName: "ggml-base",
+                selectedLanguage: "en",
+                useScreenCapture: true,
+                isTextFormattingEnabled: true,
+                punctuationCleanupMode: .removeTrailingPeriod,
+                lowercaseTranscription: true,
+                selectedAIProvider: "openai",
+                selectedAIModel: "gpt-4o",
+                autoSendKey: .commandEnter,
+                isDefault: true
+            )
+            let secondConfig = PowerModeConfig(
+                name: "Notes",
+                emoji: "N",
+                isAIEnhancementEnabled: false
+            )
+
+            VoiceInkPowerModeConfigurationPreference.saveConfigurations([firstConfig, secondConfig], to: defaults)
+            VoiceInkPowerModeConfigurationPreference.saveActiveConfigurationId(secondConfig.id, to: defaults)
+
+            let loadedConfigs = VoiceInkPowerModeConfigurationPreference.loadConfigurations(from: defaults)
+            XCTAssertEqual(loadedConfigs.map(\.id), [firstConfig.id, secondConfig.id])
+            XCTAssertEqual(loadedConfigs.map(\.name), ["Writing", "Notes"])
+            XCTAssertEqual(loadedConfigs.first?.appConfigs?.first?.bundleIdentifier, "com.example.App")
+            XCTAssertEqual(loadedConfigs.first?.urlConfigs?.first?.url, "example.com")
+            XCTAssertEqual(loadedConfigs.first?.autoSendKey, .commandEnter)
+            XCTAssertEqual(
+                VoiceInkPowerModeConfigurationPreference.loadActiveConfigurationId(from: defaults),
+                secondConfig.id
+            )
+            XCTAssertTrue(defaults.data(forKey: VoiceInkUserDefaultsKey.powerModeConfigurations) != nil)
+            XCTAssertEqual(
+                defaults.string(forKey: VoiceInkUserDefaultsKey.activePowerModeConfigurationId),
+                secondConfig.id.uuidString
+            )
+        }
+    }
+
+    func testPowerModeConfigurationPreferenceFallsBackForMissingInvalidAndBlankActiveId() {
+        withIsolatedDefaults { defaults in
+            XCTAssertTrue(VoiceInkPowerModeConfigurationPreference.loadConfigurations(from: defaults).isEmpty)
+            XCTAssertNil(VoiceInkPowerModeConfigurationPreference.loadActiveConfigurationId(from: defaults))
+
+            defaults.set(Data("bad".utf8), forKey: VoiceInkUserDefaultsKey.powerModeConfigurations)
+            defaults.set("not-a-uuid", forKey: VoiceInkUserDefaultsKey.activePowerModeConfigurationId)
+
+            XCTAssertTrue(VoiceInkPowerModeConfigurationPreference.loadConfigurations(from: defaults).isEmpty)
+            XCTAssertNil(VoiceInkPowerModeConfigurationPreference.loadActiveConfigurationId(from: defaults))
+        }
+    }
+
+    func testPowerModeConfigurationPreferenceClearRemovesConfigurationsAndActiveConfigurationId() {
+        withIsolatedDefaults { defaults in
+            let config = PowerModeConfig(
+                name: "Writing",
+                emoji: "W",
+                isAIEnhancementEnabled: false
+            )
+            VoiceInkPowerModeConfigurationPreference.saveConfigurations([config], to: defaults)
+            VoiceInkPowerModeConfigurationPreference.saveActiveConfigurationId(config.id, to: defaults)
+
+            VoiceInkPowerModeConfigurationPreference.clear(from: defaults)
+
+            XCTAssertTrue(VoiceInkPowerModeConfigurationPreference.loadConfigurations(from: defaults).isEmpty)
+            XCTAssertNil(VoiceInkPowerModeConfigurationPreference.loadActiveConfigurationId(from: defaults))
+            XCTAssertNil(defaults.object(forKey: VoiceInkUserDefaultsKey.powerModeConfigurations))
+            XCTAssertNil(defaults.object(forKey: VoiceInkUserDefaultsKey.activePowerModeConfigurationId))
         }
     }
 

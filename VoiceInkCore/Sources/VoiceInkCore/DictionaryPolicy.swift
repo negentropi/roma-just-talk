@@ -19,6 +19,19 @@ public struct VoiceInkWordReplacementInsertPlan: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkWordReplacementBackupImportPlan: Equatable, Sendable {
+    public let rulesToInsert: [VoiceInkWordReplacementRule]
+    public let skippedInvalidReplacementCount: Int
+
+    public init(
+        rulesToInsert: [VoiceInkWordReplacementRule],
+        skippedInvalidReplacementCount: Int
+    ) {
+        self.rulesToInsert = rulesToInsert
+        self.skippedInvalidReplacementCount = skippedInvalidReplacementCount
+    }
+}
+
 public struct VoiceInkVocabularyWordBackup: Codable, Equatable, Sendable {
     public let word: String
 
@@ -87,6 +100,45 @@ public enum VoiceInkDictionaryPolicy {
         vocabularyWordsToInsert(
             backupRecords.map(\.word),
             existingWords: existingWords
+        )
+    }
+
+    public static func wordReplacementBackupImportPlan(
+        from backupReplacements: [String: String],
+        existingOriginalTexts: [String]
+    ) -> VoiceInkWordReplacementBackupImportPlan {
+        var existingOriginalTexts = existingOriginalTexts
+        var rulesToInsert = [VoiceInkWordReplacementRule]()
+        var skippedInvalidReplacementCount = 0
+
+        for (original, replacement) in backupReplacements {
+            let plan = wordReplacementInsertPlan(
+                original: original,
+                replacement: replacement,
+                existingOriginalTexts: existingOriginalTexts
+            )
+
+            if plan.errorMessage != nil {
+                continue
+            }
+
+            guard plan.shouldInsert else {
+                skippedInvalidReplacementCount += 1
+                continue
+            }
+
+            rulesToInsert.append(
+                VoiceInkWordReplacementRule(
+                    originalText: plan.originalText,
+                    replacementText: plan.replacementText
+                )
+            )
+            existingOriginalTexts.append(plan.originalText)
+        }
+
+        return VoiceInkWordReplacementBackupImportPlan(
+            rulesToInsert: rulesToInsert,
+            skippedInvalidReplacementCount: skippedInvalidReplacementCount
         )
     }
 

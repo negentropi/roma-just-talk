@@ -142,4 +142,22 @@ final class DictionaryPolicyTests: XCTestCase {
         XCTAssertEqual(plan.replacementText, "roma")
         XCTAssertNil(plan.errorMessage)
     }
+
+    func testWordReplacementBackupImportPlanPreservesMacOSImportSemantics() {
+        let plan = VoiceInkDictionaryPolicy.wordReplacementBackupImportPlan(
+            from: [
+                " Flow, Voice Ink ": " roma ",
+                "quick release": "duplicate",
+                "blank replacement": " \n ",
+                " , ": "ignored"
+            ],
+            existingOriginalTexts: ["quick release"]
+        )
+
+        XCTAssertEqual(
+            plan.rulesToInsert,
+            [VoiceInkWordReplacementRule(originalText: "Flow, Voice Ink", replacementText: "roma")]
+        )
+        XCTAssertEqual(plan.skippedInvalidReplacementCount, 2)
+    }
 }

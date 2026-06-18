@@ -250,28 +250,16 @@ enum BackupImporter {
         if let replacements = backup.wordReplacements {
             let descriptor = FetchDescriptor<WordReplacement>()
             let existingReplacements = try modelContext.fetch(descriptor)
-            var existingOriginalTexts = existingReplacements.map(\.originalText)
+            let importPlan = VoiceInkDictionaryPolicy.wordReplacementBackupImportPlan(
+                from: replacements,
+                existingOriginalTexts: existingReplacements.map(\.originalText)
+            )
 
-            for (original, replacement) in replacements {
-                let plan = VoiceInkDictionaryPolicy.wordReplacementInsertPlan(
-                    original: original,
-                    replacement: replacement,
-                    existingOriginalTexts: existingOriginalTexts
-                )
-
-                if plan.errorMessage != nil {
-                    continue
-                }
-
-                guard plan.shouldInsert else {
-                    skippedInvalidReplacements += 1
-                    continue
-                }
-
-                modelContext.insert(WordReplacement(originalText: plan.originalText, replacementText: plan.replacementText))
-                existingOriginalTexts.append(plan.originalText)
-                insertedReplacements += 1
+            for rule in importPlan.rulesToInsert {
+                modelContext.insert(WordReplacement(originalText: rule.originalText, replacementText: rule.replacementText))
             }
+            insertedReplacements = importPlan.rulesToInsert.count
+            skippedInvalidReplacements = importPlan.skippedInvalidReplacementCount
         } else {
             print("No word replacements found in the imported file. Existing replacements remain unchanged.")
         }

@@ -513,6 +513,16 @@ reject_pattern \
   VoiceInk/Services/CustomVocabularyService.swift \
   VoiceInk/Transcription/Processing/WordReplacementService.swift
 
+require_pattern \
+  "macOS backup import uses shared word-replacement import plan" \
+  'VoiceInkDictionaryPolicy\.wordReplacementBackupImportPlan\(' \
+  VoiceInk/Services/BackupImporter.swift
+
+reject_pattern \
+  "macOS backup import avoids shell-only word-replacement import planning" \
+  'for \(original, replacement\) in replacements|VoiceInkDictionaryPolicy\.wordReplacementInsertPlan\(|plan\.errorMessage|plan\.shouldInsert|existingOriginalTexts\.append' \
+  VoiceInk/Services/BackupImporter.swift
+
 reject_pattern \
   "iOS retry passes stored vocabulary into shared run processor" \
   'runtimeCustomVocabularyTerms' \

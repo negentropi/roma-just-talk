@@ -52,6 +52,10 @@ public struct VoiceInkRemoteTranscriptionOptions: Equatable, Sendable {
         prompt: String? = nil,
         customVocabulary: [String] = []
     ) -> Self {
+        let normalizedCustomVocabulary = provider.providerKind.map {
+            VoiceInkCustomVocabularyTerms.normalized(customVocabulary, for: .batchTranscription($0))
+        } ?? []
+
         switch provider {
         case .groq:
             return Self(
@@ -71,11 +75,11 @@ public struct VoiceInkRemoteTranscriptionOptions: Equatable, Sendable {
                 deepgramTimeout: 30
             )
         case .soniox, .speechmatics:
-            return Self(customVocabulary: customVocabulary)
+            return Self(customVocabulary: normalizedCustomVocabulary)
         case .assemblyAI:
             return Self(
                 prompt: prompt,
-                customVocabulary: customVocabulary
+                customVocabulary: normalizedCustomVocabulary
             )
         case .cartesia, .elevenLabs, .gemini, .mistral, .xai, .local:
             return Self()

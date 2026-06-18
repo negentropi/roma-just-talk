@@ -239,10 +239,11 @@ final class RemoteProviderRequestTests: XCTestCase {
         XCTAssertEqual(deepgram.deepgramParagraphs, true)
         XCTAssertNil(deepgram.deepgramDiarize)
         XCTAssertEqual(deepgram.deepgramTimeout, 30)
+        XCTAssertTrue(deepgram.customVocabulary.isEmpty)
 
         let soniox = VoiceInkRemoteTranscriptionOptions.batchDefaults(
             for: .soniox,
-            customVocabulary: ["Roma", "Felix"]
+            customVocabulary: [" Roma ", "Felix", "roma", ""]
         )
         XCTAssertEqual(soniox.customVocabulary, ["Roma", "Felix"])
 
@@ -289,7 +290,7 @@ final class RemoteProviderRequestTests: XCTestCase {
         let soniox = VoiceInkRemoteTranscriptionService(provider: .soniox)
             .fileTranscriptionOptions(
                 prompt: "ignored",
-                customVocabulary: ["Roma", "Felix"]
+                customVocabulary: [" Roma ", "Felix", "roma", ""]
             )
         XCTAssertEqual(soniox.customVocabulary, ["Roma", "Felix"])
 

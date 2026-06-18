@@ -191,13 +191,31 @@ final class TranscriptionRunProcessorTests: XCTestCase {
 
         _ = try await processor.transcribe(
             fileURL: URL(fileURLWithPath: "/tmp/audio.wav"),
-            configuration: configuration(isPostProcessingEnabled: false),
+            configuration: configuration(transcriptionProvider: .assemblyAI, isPostProcessingEnabled: false),
             customVocabulary: [" Roma ", "Felix", "roma", ""],
             apiKeyProvider: { _ in "key" },
             transcriptionServiceProvider: { _ in service }
         )
 
         XCTAssertEqual(service.capturedCustomVocabulary, ["Roma", "Felix"])
+    }
+
+    func testTranscribeDropsCustomVocabularyForUnsupportedProvider() async throws {
+        let service = CapturingTranscriptionService(text: "roma")
+        let processor = VoiceInkTranscriptionRunProcessor { _ in
+            XCTFail("Post-processing should not run")
+            return "unexpected"
+        }
+
+        _ = try await processor.transcribe(
+            fileURL: URL(fileURLWithPath: "/tmp/audio.wav"),
+            configuration: configuration(transcriptionProvider: .groq, isPostProcessingEnabled: false),
+            customVocabulary: [" Roma ", "Felix"],
+            apiKeyProvider: { _ in "key" },
+            transcriptionServiceProvider: { _ in service }
+        )
+
+        XCTAssertEqual(service.capturedCustomVocabulary, [])
     }
 
     func testTranscribeTreatsAutoLanguageAsDetection() async throws {
@@ -480,9 +498,12 @@ final class TranscriptionRunProcessorTests: XCTestCase {
         XCTAssertFalse(result.postProcessingSucceeded)
     }
 
-    private func configuration(isPostProcessingEnabled: Bool) -> VoiceInkModeRuntimeConfiguration {
+    private func configuration(
+        transcriptionProvider: VoiceInkProviderKind = .groq,
+        isPostProcessingEnabled: Bool
+    ) -> VoiceInkModeRuntimeConfiguration {
         VoiceInkModeRuntimeConfiguration(
-            transcriptionProvider: .groq,
+            transcriptionProvider: transcriptionProvider,
             transcriptionModel: "whisper-large-v3",
             postProcessingProvider: .gemini,
             postProcessingModel: "gemini-2.5-flash",

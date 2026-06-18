@@ -24,7 +24,8 @@ public enum VoiceInkCustomVocabularyTerms {
     }
 
     public static func normalized(_ terms: [String], for use: VoiceInkCustomVocabularyUse) -> [String] {
-        normalized(terms, limit: use.termLimit)
+        guard use.acceptsTerms else { return [] }
+        return normalized(terms, limit: use.termLimit)
     }
 }
 
@@ -32,6 +33,22 @@ public enum VoiceInkCustomVocabularyUse: Equatable, Sendable {
     case batchTranscription(VoiceInkProviderKind)
     case streamingTranscription(VoiceInkProviderKind)
     case postProcessingContext
+
+    fileprivate var acceptsTerms: Bool {
+        switch self {
+        case .batchTranscription(.soniox),
+             .batchTranscription(.speechmatics),
+             .batchTranscription(.assemblyAI),
+             .streamingTranscription(.deepgram),
+             .streamingTranscription(.soniox),
+             .streamingTranscription(.speechmatics),
+             .streamingTranscription(.assemblyAI),
+             .postProcessingContext:
+            return true
+        case .batchTranscription, .streamingTranscription:
+            return false
+        }
+    }
 
     var termLimit: Int? {
         switch self {

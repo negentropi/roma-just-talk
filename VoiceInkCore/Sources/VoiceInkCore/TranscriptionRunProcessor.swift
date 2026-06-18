@@ -139,7 +139,10 @@ public struct VoiceInkTranscriptionRunProcessor {
             fileURL: fileURL,
             language: VoiceInkTranscriptionLanguageSupport.requestLanguage(transcriptionLanguage),
             prompt: transcriptionPrompt,
-            customVocabulary: VoiceInkCustomVocabularyTerms.normalized(customVocabulary)
+            customVocabulary: VoiceInkCustomVocabularyTerms.normalized(
+                customVocabulary,
+                for: .batchTranscription(provider)
+            )
         )
         let transcriptionDuration = currentDate().timeIntervalSince(transcriptionStart)
 

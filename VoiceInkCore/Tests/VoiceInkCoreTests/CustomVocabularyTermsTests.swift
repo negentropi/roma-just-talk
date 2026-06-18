@@ -35,11 +35,11 @@ final class CustomVocabularyTermsTests: XCTestCase {
         )
     }
 
-    func testNormalizedTermsLeaveOtherUsesUnlimited() {
+    func testNormalizedTermsKeepTermsForSupportedUses() {
         let terms = (1...55).map { "term-\($0)" }
 
         XCTAssertEqual(
-            VoiceInkCustomVocabularyTerms.normalized(terms, for: .batchTranscription(.deepgram)),
+            VoiceInkCustomVocabularyTerms.normalized(terms, for: .batchTranscription(.soniox)),
             terms
         )
         XCTAssertEqual(
@@ -49,6 +49,23 @@ final class CustomVocabularyTermsTests: XCTestCase {
         XCTAssertEqual(
             VoiceInkCustomVocabularyTerms.normalized(terms, for: .postProcessingContext),
             terms
+        )
+    }
+
+    func testNormalizedTermsDropTermsForUnsupportedTranscriptionUses() {
+        let terms = ["Roma", "Felix"]
+
+        XCTAssertEqual(
+            VoiceInkCustomVocabularyTerms.normalized(terms, for: .batchTranscription(.groq)),
+            []
+        )
+        XCTAssertEqual(
+            VoiceInkCustomVocabularyTerms.normalized(terms, for: .batchTranscription(.deepgram)),
+            []
+        )
+        XCTAssertEqual(
+            VoiceInkCustomVocabularyTerms.normalized(terms, for: .streamingTranscription(.mistral)),
+            []
         )
     }
 }

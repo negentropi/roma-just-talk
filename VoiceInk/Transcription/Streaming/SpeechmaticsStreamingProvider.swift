@@ -28,7 +28,10 @@ final class SpeechmaticsStreamingProvider: StreamingTranscriptionProvider {
     func connect(model: any TranscriptionModel, language: String?) async throws {
         let apiKey = try apiKey(for: model)
 
-        let vocabulary = CustomVocabularyService.shared.getCustomVocabularyTerms(from: modelContext)
+        let vocabulary = CustomVocabularyService.shared.getCustomVocabularyTerms(
+            from: modelContext,
+            for: .streamingTranscription(.speechmatics)
+        )
 
         // Cancel any existing forwarding task before starting a new one
         forwardingTask?.cancel()

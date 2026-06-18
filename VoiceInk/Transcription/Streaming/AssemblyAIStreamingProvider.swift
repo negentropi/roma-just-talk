@@ -37,7 +37,10 @@ final class AssemblyAIStreamingProvider: StreamingTranscriptionProvider {
                 model: model.name,
                 language: language,
                 prompt: VoiceInkTranscriptionPromptPreference.requestPrompt(),
-                customVocabulary: CustomVocabularyService.shared.getCustomVocabularyTerms(from: modelContext)
+                customVocabulary: CustomVocabularyService.shared.getCustomVocabularyTerms(
+                    from: modelContext,
+                    for: .streamingTranscription(.assemblyAI)
+                )
             )
         } catch {
             forwardingTask?.cancel()

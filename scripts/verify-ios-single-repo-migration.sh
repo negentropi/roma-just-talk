@@ -444,10 +444,33 @@ require_pattern \
   'VoiceInkCustomVocabularyUse\.streamingTranscription\(\.deepgram\)|\.streamingTranscription\(\.deepgram\)' \
   VoiceInk/Transcription/Streaming/DeepgramStreamingProvider.swift
 
+require_pattern \
+  "macOS Soniox streaming uses shared vocabulary use policy" \
+  'VoiceInkCustomVocabularyUse\.streamingTranscription\(\.soniox\)|\.streamingTranscription\(\.soniox\)' \
+  VoiceInk/Transcription/Streaming/SonioxStreamingProvider.swift
+
+require_pattern \
+  "macOS Speechmatics streaming uses shared vocabulary use policy" \
+  'VoiceInkCustomVocabularyUse\.streamingTranscription\(\.speechmatics\)|\.streamingTranscription\(\.speechmatics\)' \
+  VoiceInk/Transcription/Streaming/SpeechmaticsStreamingProvider.swift
+
+require_pattern \
+  "macOS AssemblyAI streaming uses shared vocabulary use policy" \
+  'VoiceInkCustomVocabularyUse\.streamingTranscription\(\.assemblyAI\)|\.streamingTranscription\(\.assemblyAI\)' \
+  VoiceInk/Transcription/Streaming/AssemblyAIStreamingProvider.swift
+
 reject_pattern \
   "macOS Deepgram streaming avoids shell-only vocabulary term limit" \
   'limit: 50|prefix\(50\)' \
   VoiceInk/Transcription/Streaming/DeepgramStreamingProvider.swift
+
+reject_pattern \
+  "macOS streaming adapters avoid unnamed custom-vocabulary use" \
+  'getCustomVocabularyTerms\(from: modelContext\)' \
+  VoiceInk/Transcription/Streaming/AssemblyAIStreamingProvider.swift \
+  VoiceInk/Transcription/Streaming/SonioxStreamingProvider.swift \
+  VoiceInk/Transcription/Streaming/DeepgramStreamingProvider.swift \
+  VoiceInk/Transcription/Streaming/SpeechmaticsStreamingProvider.swift
 
 require_pattern \
   "shared run processor uses shared transcription run preparation" \

@@ -28,7 +28,10 @@ final class SonioxStreamingProvider: StreamingTranscriptionProvider {
     func connect(model: any TranscriptionModel, language: String?) async throws {
         let apiKey = try apiKey(for: model)
 
-        let vocabulary = CustomVocabularyService.shared.getCustomVocabularyTerms(from: modelContext)
+        let vocabulary = CustomVocabularyService.shared.getCustomVocabularyTerms(
+            from: modelContext,
+            for: .streamingTranscription(.soniox)
+        )
 
         // Cancel any existing forwarding task before starting a new one
         forwardingTask?.cancel()

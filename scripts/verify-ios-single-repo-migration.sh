@@ -281,6 +281,11 @@ reject_pattern \
   iOS/VoiceInk-ios \
   iOS/VoiceInkKeyboard
 
+reject_pattern \
+  "iOS recording background transcription uses shared record updates" \
+  '\b(existingAudioFileURL|markTranscriptionFailed|applyCompletedRunResult)\b' \
+  iOS/VoiceInk-ios/RecordingManager.swift
+
 require_pattern \
   "workspace includes iOS project" \
   'location = "group:iOS/VoiceInk-ios.xcodeproj"' \

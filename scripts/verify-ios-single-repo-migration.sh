@@ -205,6 +205,12 @@ reject_pattern \
   VoiceInk \
   iOS
 
+reject_pattern \
+  "obsolete iOS clone runtime shims stay deleted" \
+  '\b(TranscriptionServiceFactory|LLMPostProcessor|currentRecordingNote|effectiveTranscriptionProvider|effectivePostProcessingProvider|effectiveCustomPrompt|effectiveIsPostProcessingEnabled)\b|\bvar +effective(TranscriptionModel|PostProcessingModel)\b|\bsettings\.effective(TranscriptionModel|PostProcessingModel)\b|\bawait +settings\.effective(TranscriptionModel|PostProcessingModel)\b|\benum +RecordingState\b|URL\(string: +"voiceink://record"\)|Open VoiceInk|static +func +recordingsDirectory\b' \
+  iOS/VoiceInk-ios \
+  iOS/VoiceInkKeyboard
+
 require_pattern \
   "workspace includes iOS project" \
   'location = "group:iOS/VoiceInk-ios.xcodeproj"' \

@@ -1,5 +1,6 @@
 import SwiftUI
 import UniformTypeIdentifiers
+import VoiceInkCore
 
 struct SaveIconButton: View {
     let textToSave: String
@@ -28,13 +29,13 @@ struct SaveIconButton: View {
     private func saveFile(as contentType: UTType, extension fileExtension: String) {
         let panel = NSSavePanel()
         panel.allowedContentTypes = [contentType]
-        panel.nameFieldStringValue = "\(generateFileName()).\(fileExtension)"
+        panel.nameFieldStringValue = "\(VoiceInkTranscriptFileExport.suggestedBaseFilename(for: textToSave)).\(fileExtension)"
         panel.title = "Save Transcription"
 
         if panel.runModal() == .OK {
             guard let url = panel.url else { return }
             do {
-                let content = fileExtension == "md" ? formatAsMarkdown(textToSave) : textToSave
+                let content = fileExtension == "md" ? markdownContent() : textToSave
                 try content.write(to: url, atomically: true, encoding: .utf8)
                 withAnimation { saved = true }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
@@ -46,35 +47,8 @@ struct SaveIconButton: View {
         }
     }
 
-    private func generateFileName() -> String {
-        let cleanedText = textToSave
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-            .replacingOccurrences(of: "\n", with: " ")
-            .replacingOccurrences(of: "\r", with: " ")
-
-        let words = cleanedText.components(separatedBy: .whitespaces).filter { !$0.isEmpty }
-        let wordCount = min(words.count, words.count <= 3 ? words.count : (words.count <= 6 ? 6 : 8))
-        let selectedWords = Array(words.prefix(wordCount))
-
-        if selectedWords.isEmpty { return "transcription" }
-
-        let fileName = selectedWords.joined(separator: "-")
-            .lowercased()
-            .replacingOccurrences(of: "[^a-z0-9\\-]", with: "", options: .regularExpression)
-            .replacingOccurrences(of: "--+", with: "-", options: .regularExpression)
-            .trimmingCharacters(in: CharacterSet(charactersIn: "-"))
-
-        return fileName.isEmpty ? "transcription" : String(fileName.prefix(50))
-    }
-
-    private func formatAsMarkdown(_ text: String) -> String {
+    private func markdownContent() -> String {
         let timestamp = DateFormatter.localizedString(from: Date(), dateStyle: .medium, timeStyle: .short)
-        return """
-        # Transcription
-
-        **Date:** \(timestamp)
-
-        \(text)
-        """
+        return VoiceInkTranscriptFileExport.markdownContent(for: textToSave, timestamp: timestamp)
     }
 }

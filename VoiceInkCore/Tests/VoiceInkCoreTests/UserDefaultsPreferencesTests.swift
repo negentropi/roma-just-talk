@@ -7,6 +7,8 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkUserDefaultsKey.lowercaseTranscription, "LowercaseTranscription")
         XCTAssertEqual(VoiceInkUserDefaultsKey.removeFillerWords, "RemoveFillerWords")
         XCTAssertEqual(VoiceInkUserDefaultsKey.fillerWords, "FillerWords")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.wordReplacements, "voiceInkIOSWordReplacements")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.customVocabularyTerms, "voiceInkIOSCustomVocabularyTerms")
         XCTAssertEqual(VoiceInkUserDefaultsKey.modes, "modes")
         XCTAssertEqual(VoiceInkUserDefaultsKey.selectedModeId, "selectedModeId")
         XCTAssertEqual(VoiceInkUserDefaultsKey.selectedTranscriptionLanguage, "SelectedLanguage")
@@ -554,6 +556,40 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testWordReplacementPreferenceRoundTripsSharedRules() {
+        withIsolatedDefaults { defaults in
+            let rules = [
+                VoiceInkWordReplacementRule(originalText: "roma", replacementText: "Roma Just Talk")
+            ]
+
+            VoiceInkWordReplacementPreference.saveRules(rules, to: defaults)
+
+            XCTAssertEqual(VoiceInkWordReplacementPreference.rules(from: defaults), rules)
+
+            VoiceInkWordReplacementPreference.clearRules(from: defaults)
+            XCTAssertEqual(VoiceInkWordReplacementPreference.rules(from: defaults), [])
+        }
+    }
+
+    func testWordReplacementPreferenceIgnoresInvalidStoredData() {
+        withIsolatedDefaults { defaults in
+            defaults.set(Data([0]), forKey: VoiceInkUserDefaultsKey.wordReplacements)
+
+            XCTAssertEqual(VoiceInkWordReplacementPreference.rules(from: defaults), [])
+        }
+    }
+
+    func testCustomVocabularyPreferenceNormalizesTerms() {
+        withIsolatedDefaults { defaults in
+            VoiceInkCustomVocabularyPreference.saveTerms([" Roma ", "Felix", "roma", ""], to: defaults)
+
+            XCTAssertEqual(VoiceInkCustomVocabularyPreference.terms(from: defaults), ["Roma", "Felix"])
+
+            VoiceInkCustomVocabularyPreference.clearTerms(from: defaults)
+            XCTAssertEqual(VoiceInkCustomVocabularyPreference.terms(from: defaults), [])
+        }
+    }
+
     func testAIEnhancementRequestPreferenceUsesSharedDefaultsWhenUnset() {
         withIsolatedDefaults { defaults in
             XCTAssertEqual(
@@ -686,6 +722,10 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             VoiceInkTranscriptionCleanupPreferenceStorage.saveLowercaseTranscription(true, to: defaults)
             VoiceInkTranscriptionCleanupPreferenceStorage.saveRemoveFillerWords(false, to: defaults)
             VoiceInkFillerWordPreference.saveWords(["um", "like"], to: defaults)
+            VoiceInkWordReplacementPreference.saveRules([
+                VoiceInkWordReplacementRule(originalText: "roma", replacementText: "Roma Just Talk")
+            ], to: defaults)
+            VoiceInkCustomVocabularyPreference.saveTerms(["Roma", "Felix"], to: defaults)
             VoiceInkTranscriptionLanguagePreference.saveSelectedLanguage("fr", to: defaults)
             VoiceInkTranscriptionPromptPreference.savePrompt("custom prompt", to: defaults)
             VoiceInkCurrentTranscriptionModelPreference.saveModelName("nova-3", to: defaults)
@@ -734,6 +774,8 @@ final class UserDefaultsPreferencesTests: XCTestCase {
                 VoiceInkPreferenceDefault.removeFillerWords
             )
             XCTAssertEqual(VoiceInkFillerWordPreference.words(from: defaults), VoiceInkFillerWords.defaultWords)
+            XCTAssertEqual(VoiceInkWordReplacementPreference.rules(from: defaults), [])
+            XCTAssertEqual(VoiceInkCustomVocabularyPreference.terms(from: defaults), [])
             XCTAssertEqual(
                 VoiceInkTranscriptionLanguagePreference.selectedLanguage(from: defaults),
                 VoiceInkLanguageCatalog.autoDetectCode

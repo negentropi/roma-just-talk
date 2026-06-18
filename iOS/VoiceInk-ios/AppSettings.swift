@@ -51,11 +51,11 @@ final class AppSettings: ObservableObject {
     }
 
     @Published var wordReplacements: [VoiceInkWordReplacementRule] {
-        didSet { VoiceInkIOSWordReplacementPreference.save(wordReplacements) }
+        didSet { VoiceInkWordReplacementPreference.saveRules(wordReplacements) }
     }
 
     @Published var customVocabularyTerms: [String] {
-        didSet { VoiceInkIOSCustomVocabularyPreference.save(customVocabularyTerms) }
+        didSet { VoiceInkCustomVocabularyPreference.saveTerms(customVocabularyTerms) }
     }
 
     @Published var selectedTranscriptionLanguage: String {
@@ -88,8 +88,8 @@ final class AppSettings: ObservableObject {
         self.lowercaseTranscription = cleanupSettings.lowercaseTranscription
         self.removeFillerWords = cleanupSettings.removeFillerWords
         self.fillerWords = VoiceInkFillerWordPreference.words()
-        self.wordReplacements = VoiceInkIOSWordReplacementPreference.rules()
-        self.customVocabularyTerms = VoiceInkIOSCustomVocabularyPreference.terms()
+        self.wordReplacements = VoiceInkWordReplacementPreference.rules()
+        self.customVocabularyTerms = VoiceInkCustomVocabularyPreference.terms()
         self.selectedTranscriptionLanguage = VoiceInkTranscriptionLanguagePreference.selectedLanguage()
 
         repairSelectedModeId()
@@ -343,51 +343,9 @@ final class AppSettings: ObservableObject {
         customVocabularyTerms = []
         selectedTranscriptionLanguage = defaults.selectedTranscriptionLanguage
         VoiceInkSharedPreferenceReset.clearCoreUserSettings()
-        VoiceInkIOSWordReplacementPreference.clear()
-        VoiceInkIOSCustomVocabularyPreference.clear()
 
         // Clear API keys from memory and Keychain
         apiKeysByProvider = [:]
         VoiceInkProviderKind.userAPIKeyProviders.forEach(Self.deleteAPIKey)
-    }
-}
-
-enum VoiceInkIOSWordReplacementPreference {
-    static let key = "voiceInkIOSWordReplacements"
-
-    static func rules(from defaults: UserDefaults = .standard) -> [VoiceInkWordReplacementRule] {
-        guard let data = defaults.data(forKey: key) else {
-            return []
-        }
-
-        return (try? JSONDecoder().decode([VoiceInkWordReplacementRule].self, from: data)) ?? []
-    }
-
-    static func save(_ rules: [VoiceInkWordReplacementRule], to defaults: UserDefaults = .standard) {
-        guard let data = try? JSONEncoder().encode(rules) else {
-            return
-        }
-
-        defaults.set(data, forKey: key)
-    }
-
-    static func clear(from defaults: UserDefaults = .standard) {
-        defaults.removeObject(forKey: key)
-    }
-}
-
-enum VoiceInkIOSCustomVocabularyPreference {
-    static let key = "voiceInkIOSCustomVocabularyTerms"
-
-    static func terms(from defaults: UserDefaults = .standard) -> [String] {
-        VoiceInkCustomVocabularyTerms.normalized(defaults.stringArray(forKey: key) ?? [])
-    }
-
-    static func save(_ terms: [String], to defaults: UserDefaults = .standard) {
-        defaults.set(VoiceInkCustomVocabularyTerms.normalized(terms), forKey: key)
-    }
-
-    static func clear(from defaults: UserDefaults = .standard) {
-        defaults.removeObject(forKey: key)
     }
 }

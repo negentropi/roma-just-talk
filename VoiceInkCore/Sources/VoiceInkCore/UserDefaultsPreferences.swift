@@ -5,6 +5,8 @@ public enum VoiceInkUserDefaultsKey {
     public static let lowercaseTranscription = "LowercaseTranscription"
     public static let removeFillerWords = "RemoveFillerWords"
     public static let fillerWords = "FillerWords"
+    public static let wordReplacements = "voiceInkIOSWordReplacements"
+    public static let customVocabularyTerms = "voiceInkIOSCustomVocabularyTerms"
     public static let modes = "modes"
     public static let selectedModeId = "selectedModeId"
     public static let selectedTranscriptionLanguage = "SelectedLanguage"
@@ -423,6 +425,47 @@ public enum VoiceInkFillerWordPreference {
     }
 }
 
+public enum VoiceInkWordReplacementPreference {
+    public static func rules(from defaults: UserDefaults = .standard) -> [VoiceInkWordReplacementRule] {
+        guard let data = defaults.data(forKey: VoiceInkUserDefaultsKey.wordReplacements) else {
+            return []
+        }
+
+        return (try? JSONDecoder().decode([VoiceInkWordReplacementRule].self, from: data)) ?? []
+    }
+
+    public static func saveRules(_ rules: [VoiceInkWordReplacementRule], to defaults: UserDefaults = .standard) {
+        guard let data = try? JSONEncoder().encode(rules) else {
+            return
+        }
+
+        defaults.set(data, forKey: VoiceInkUserDefaultsKey.wordReplacements)
+    }
+
+    public static func clearRules(from defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.wordReplacements)
+    }
+}
+
+public enum VoiceInkCustomVocabularyPreference {
+    public static func terms(from defaults: UserDefaults = .standard) -> [String] {
+        VoiceInkCustomVocabularyTerms.normalized(
+            defaults.stringArray(forKey: VoiceInkUserDefaultsKey.customVocabularyTerms) ?? []
+        )
+    }
+
+    public static func saveTerms(_ terms: [String], to defaults: UserDefaults = .standard) {
+        defaults.set(
+            VoiceInkCustomVocabularyTerms.normalized(terms),
+            forKey: VoiceInkUserDefaultsKey.customVocabularyTerms
+        )
+    }
+
+    public static func clearTerms(from defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.customVocabularyTerms)
+    }
+}
+
 public enum VoiceInkAIEnhancementRequestPreference {
     public static func timeoutSeconds(from defaults: UserDefaults = .standard) -> TimeInterval {
         let stored = defaults.integer(forKey: VoiceInkUserDefaultsKey.enhancementTimeoutSeconds)
@@ -561,6 +604,8 @@ public enum VoiceInkSharedPreferenceReset {
         PunctuationCleanupMode.clearCurrent(in: defaults)
         VoiceInkTranscriptionCleanupPreferenceStorage.clearTextPreferences(from: defaults)
         VoiceInkFillerWordPreference.clearWords(from: defaults)
+        VoiceInkWordReplacementPreference.clearRules(from: defaults)
+        VoiceInkCustomVocabularyPreference.clearTerms(from: defaults)
         VoiceInkTranscriptionLanguagePreference.clearSelectedLanguage(from: defaults)
         VoiceInkCurrentTranscriptionModelPreference.clearModelName(from: defaults)
         VoiceInkAIEnhancementProviderPreference.clear(from: defaults)

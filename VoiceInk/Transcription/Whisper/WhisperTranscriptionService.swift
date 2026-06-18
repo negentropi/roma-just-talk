@@ -52,7 +52,7 @@ class WhisperTranscriptionService: TranscriptionService {
             throw VoiceInkEngineError.modelLoadFailed
         }
 
-        let data = try VoiceInkPCM16Audio.floatSamples(fromWAVFileAt: audioURL) ?? []
+        let data = try VoiceInkWhisperAudioSamples.floatSamples(fromWAVFileAt: audioURL) ?? []
 
         let currentPrompt = VoiceInkTranscriptionPromptPreference.localWhisperPromptForSelectedLanguage()
 

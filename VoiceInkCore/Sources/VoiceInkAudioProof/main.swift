@@ -6,9 +6,9 @@ struct AudioProofOptions {
     var inputURLs: [URL] = []
     var outputDirectory: URL = FileManager.default.temporaryDirectory
         .appendingPathComponent("voiceink-audio-proof", isDirectory: true)
-    var targetPeak: Int16 = 12_000
-    var noiseFloorPeak: Int16 = 32
-    var maxGain: Float = 16
+    var targetPeak: Int16 = VoiceInkWhisperRuntimeDefaults.audioLevelingTargetPeak
+    var noiseFloorPeak: Int16 = VoiceInkWhisperRuntimeDefaults.audioLevelingNoiseFloorPeak
+    var maxGain: Float = VoiceInkWhisperRuntimeDefaults.audioLevelingMaxGain
 }
 
 private enum AudioProofVariant: String, CaseIterable {
@@ -286,9 +286,9 @@ enum VoiceInkAudioProof {
 
         Options:
           --output-dir <path>    Directory for derived WAV variants.
-          --target-peak <int>    PCM16 peak target for the leveled variant. Default: 12000.
-          --noise-floor <int>    PCM16 peak below which audio is left unchanged. Default: 32.
-          --max-gain <float>     Maximum boost multiplier. Default: 16.
+          --target-peak <int>    PCM16 peak target for the leveled variant. Default: \(VoiceInkWhisperRuntimeDefaults.audioLevelingTargetPeak).
+          --noise-floor <int>    PCM16 peak below which audio is left unchanged. Default: \(VoiceInkWhisperRuntimeDefaults.audioLevelingNoiseFloorPeak).
+          --max-gain <float>     Maximum boost multiplier. Default: \(VoiceInkWhisperRuntimeDefaults.audioLevelingMaxGain).
         """)
     }
 }

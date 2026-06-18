@@ -64,6 +64,73 @@ final class PCM16AudioSamplesTests: XCTestCase {
         XCTAssertNil(try VoiceInkPCM16Audio.floatSamples(fromWAVFileAt: fileURL))
     }
 
+    func testLeveledFloatSamplesFromWAVDataBoostsQuietSpeechTowardTargetPeak() {
+        let samples = VoiceInkPCM16Audio.leveledFloatSamples(
+            fromWAVData: wavData(samples: [-100, -50, 50, 100]),
+            targetPeak: 1_000,
+            noiseFloorPeak: 10,
+            maxGain: 20
+        )
+
+        XCTAssertEqual(samples, [
+            Float(-1_000) / 32_767.0,
+            Float(-500) / 32_767.0,
+            Float(500) / 32_767.0,
+            Float(1_000) / 32_767.0
+        ])
+    }
+
+    func testLeveledFloatSamplesFromWAVDataLeavesNoiseFloorUnchanged() {
+        let samples = VoiceInkPCM16Audio.leveledFloatSamples(
+            fromWAVData: wavData(samples: [-4, 0, 4]),
+            targetPeak: 1_000,
+            noiseFloorPeak: 10,
+            maxGain: 20
+        )
+
+        XCTAssertEqual(samples, [
+            Float(-4) / 32_767.0,
+            0,
+            Float(4) / 32_767.0
+        ])
+        XCTAssertNil(
+            VoiceInkPCM16Audio.leveledFloatSamples(
+                fromWAVData: Data(repeating: 0, count: VoiceInkPCM16Audio.wavHeaderByteCount),
+                targetPeak: 1_000,
+                noiseFloorPeak: 10,
+                maxGain: 20
+            )
+        )
+    }
+
+    func testWhisperAudioSamplesUseSharedLevelingDefaultsForWAVData() {
+        let samples = VoiceInkWhisperAudioSamples.floatSamples(
+            fromWAVData: wavData(samples: [-1_000, 1_000])
+        )
+
+        XCTAssertEqual(samples, [
+            Float(-12_000) / 32_767.0,
+            Float(12_000) / 32_767.0
+        ])
+    }
+
+    func testWhisperAudioSamplesCanReadWAVFileURL() throws {
+        let baseDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: baseDirectory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: baseDirectory) }
+
+        let fileURL = baseDirectory.appendingPathComponent("recording.wav")
+        try wavData(samples: [-1_000, 1_000]).write(to: fileURL)
+
+        let samples = try VoiceInkWhisperAudioSamples.floatSamples(fromWAVFileAt: fileURL)
+
+        XCTAssertEqual(samples, [
+            Float(-12_000) / 32_767.0,
+            Float(12_000) / 32_767.0
+        ])
+    }
+
     func testNormalizedMonoFloatSamplesPreserveSingleChannelNormalization() {
         let input: [Float] = [-0.25, 0.5, 1.0]
 
@@ -317,6 +384,12 @@ final class PCM16AudioSamplesTests: XCTestCase {
         }
 
         return samples
+    }
+
+    private func wavData(samples: [Int16]) -> Data {
+        var data = Data(repeating: 0, count: VoiceInkPCM16Audio.wavHeaderByteCount)
+        data.append(pcm16Data(samples: samples))
+        return data
     }
 
     private func writeMonoPCM16Samples(

@@ -12,6 +12,9 @@ public enum VoiceInkWhisperRuntimeDefaults {
     public static let noContext = true
     public static let singleSegment = false
     public static let transcriptionTemperature: Float = 0.2
+    public static let audioLevelingTargetPeak: Int16 = 12_000
+    public static let audioLevelingNoiseFloorPeak: Int16 = 32
+    public static let audioLevelingMaxGain: Float = 16
 
     public static let vadThreshold: Float = 0.50
     public static let vadMinSpeechDurationMs: Int32 = 250

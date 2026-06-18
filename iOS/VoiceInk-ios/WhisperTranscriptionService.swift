@@ -42,7 +42,7 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
         // Process audio file (expecting WAV format from recorder)
         let audioSamples: [Float]
         do {
-            guard let samples = try VoiceInkPCM16Audio.floatSamples(fromWAVFileAt: fileURL) else {
+            guard let samples = try VoiceInkWhisperAudioSamples.floatSamples(fromWAVFileAt: fileURL) else {
                 throw VoiceInkEngineError.audioProcessingFailed
             }
             audioSamples = samples

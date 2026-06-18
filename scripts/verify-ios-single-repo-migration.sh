@@ -373,8 +373,8 @@ require_pattern \
   iOS/VoiceInk-ios/LibWhisper.swift
 
 require_pattern \
-  "macOS local Whisper reads samples through shared PCM16 policy" \
-  'VoiceInkPCM16Audio\.floatSamples\(fromWAVFileAt:' \
+  "macOS local Whisper reads samples through shared Whisper audio policy" \
+  'VoiceInkWhisperAudioSamples\.floatSamples\(fromWAVFileAt:' \
   VoiceInk/Transcription/Whisper/WhisperTranscriptionService.swift
 
 reject_pattern \
@@ -383,8 +383,8 @@ reject_pattern \
   VoiceInk/Transcription/Whisper/WhisperTranscriptionService.swift
 
 require_pattern \
-  "iOS local Whisper reads samples through shared PCM16 policy" \
-  'VoiceInkPCM16Audio\.floatSamples\(fromWAVFileAt:' \
+  "iOS local Whisper reads samples through shared Whisper audio policy" \
+  'VoiceInkWhisperAudioSamples\.floatSamples\(fromWAVFileAt:' \
   iOS/VoiceInk-ios/WhisperTranscriptionService.swift
 
 reject_pattern \

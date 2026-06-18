@@ -42,6 +42,37 @@ public enum VoiceInkPCM16Audio {
         try floatSamples(fromWAVData: Data(contentsOf: url))
     }
 
+    static func leveledFloatSamples(
+        fromWAVData data: Data,
+        targetPeak: Int16,
+        noiseFloorPeak: Int16,
+        maxGain: Float
+    ) -> [Float]? {
+        guard data.count > wavHeaderByteCount else { return nil }
+        let pcmData = Data(data.dropFirst(wavHeaderByteCount))
+        let leveledData = leveledLittleEndianData(
+            pcmData,
+            targetPeak: targetPeak,
+            noiseFloorPeak: noiseFloorPeak,
+            maxGain: maxGain
+        )
+        return floatSamples(fromLittleEndianData: leveledData)
+    }
+
+    static func leveledFloatSamples(
+        fromWAVFileAt url: URL,
+        targetPeak: Int16,
+        noiseFloorPeak: Int16,
+        maxGain: Float
+    ) throws -> [Float]? {
+        try leveledFloatSamples(
+            fromWAVData: Data(contentsOf: url),
+            targetPeak: targetPeak,
+            noiseFloorPeak: noiseFloorPeak,
+            maxGain: maxGain
+        )
+    }
+
     public static func normalizedMonoFloatSamples(
         channelCount: Int,
         frameLength: Int,

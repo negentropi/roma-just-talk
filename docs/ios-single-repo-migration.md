@@ -29,7 +29,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - transcription prompt preference loading/saving, selected-language local Whisper prompt fallback, and nonblank request prompts for remote/realtime providers
 - post-processing request construction and output filtering
 - post-processing/enhancement failure presentation text and enhancement notification title truncation
-- AI-enhancement error vocabulary, user-facing descriptions, HTTP status classification, and retry/backoff decision policy; platform shells still own provider transport, provider-specific error mapping, sleep timing, and logging
+- AI-enhancement error vocabulary, user-facing descriptions, HTTP status classification, Foundation transport-network classification, and retry/backoff decision policy; platform shells still own provider transport, provider-specific error mapping, sleep timing, and logging
 - provider catalog, provider endpoints, API key account names, provider readiness/selectability policy, and transcription empty-output policy
 - provider API-key fallback environment-variable names
 - provider credential nonblank validation for runtime API-key checks
@@ -158,7 +158,7 @@ Current macOS consumers of shared remote transport:
 - macOS AI-enhancement API-key verification dispatch reads `VoiceInkAIEnhancementProviderKind.apiKeyVerificationRoute`; native provider checks route through `VoiceInkProviderAPIKeyVerifier`, while Anthropic, OpenRouter, OpenAI-compatible, and Custom keep macOS LLMkit model-specific verification.
 - macOS AI-enhancement provider model defaults and static model lists come from `VoiceInkAIModelCatalog`; macOS still owns provider UI, API-key storage, dynamic OpenRouter fetches, Ollama, Local CLI, and Custom provider settings.
 - macOS AI-enhancement request endpoint and API-key console URLs come from the shared `VoiceInkAIModelProvider` and `VoiceInkAIEnhancementProviderKind` catalogs; macOS still owns Anthropic/OpenAI-compatible transport selection, provider-specific verification adapters, and SwiftUI rendering.
-- macOS AI-enhancement failures throw `VoiceInkAIEnhancementError`, classify HTTP status failures through core, and route retry decisions through `VoiceInkAIEnhancementRetryState` from `VoiceInkCore`; macOS still owns LLMkit/Ollama/Local CLI error mapping, sleep timing, and logging.
+- macOS AI-enhancement failures throw `VoiceInkAIEnhancementError`, classify HTTP status and retryable Foundation transport-network failures through core, and route retry decisions through `VoiceInkAIEnhancementRetryState` from `VoiceInkCore`; macOS still owns LLMkit/Ollama/Local CLI error mapping, sleep timing, and logging.
 - macOS `AIService`, `OllamaService`, and `APIKeyManagementView` read/write dynamic Ollama, Custom provider, and OpenRouter model cache preferences through `VoiceInkDynamicAIProviderPreference`; macOS still owns the dynamic-provider clients and keeps the existing caller-specific Ollama fallback models.
 - macOS and iOS provider API-key lookup delegates stored-key reference resolution and provider environment fallback policy to `VoiceInkProviderAPIKeyLookup`; typed iOS provider callers use `VoiceInkProviderKind`, while dynamic macOS provider-name callers keep the string overload. Platform shells still own Keychain storage and UI editing state.
 - macOS and iOS provider API-key screens use `VoiceInkSecretPresentation` for stored-key display obfuscation while keeping platform-specific key storage and verification flows.

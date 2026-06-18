@@ -307,8 +307,7 @@ class AIEnhancementService: ObservableObject {
                     state: retryState
                 )
             } catch {
-                let nsError = error as NSError
-                if nsError.domain == NSURLErrorDomain && [NSURLErrorNotConnectedToInternet, NSURLErrorTimedOut, NSURLErrorNetworkConnectionLost].contains(nsError.code) {
+                if VoiceInkAIEnhancementError.transportNetworkError(for: error) == .networkError {
                     try await handleRetryDecision(
                         retryState.recordTransportNetworkFailure(),
                         state: retryState,

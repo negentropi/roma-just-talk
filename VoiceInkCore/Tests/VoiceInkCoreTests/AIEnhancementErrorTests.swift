@@ -1,3 +1,4 @@
+import Foundation
 @testable import VoiceInkCore
 
 final class AIEnhancementErrorTests: XCTestCase {
@@ -49,5 +50,30 @@ final class AIEnhancementErrorTests: XCTestCase {
             VoiceInkAIEnhancementError.httpError(statusCode: 400, message: "bad request"),
             .customError("HTTP 400: bad request")
         )
+    }
+
+    func testTransportNetworkErrorMapsRetryableFoundationErrors() {
+        let retryableCodes = [
+            NSURLErrorNotConnectedToInternet,
+            NSURLErrorTimedOut,
+            NSURLErrorNetworkConnectionLost
+        ]
+
+        for code in retryableCodes {
+            let error = NSError(domain: NSURLErrorDomain, code: code)
+            XCTAssertEqual(
+                VoiceInkAIEnhancementError.transportNetworkError(for: error),
+                .networkError
+            )
+        }
+    }
+
+    func testTransportNetworkErrorRejectsNonRetryableFoundationErrors() {
+        XCTAssertNil(VoiceInkAIEnhancementError.transportNetworkError(
+            for: NSError(domain: NSURLErrorDomain, code: NSURLErrorCancelled)
+        ))
+        XCTAssertNil(VoiceInkAIEnhancementError.transportNetworkError(
+            for: NSError(domain: "VoiceInk", code: NSURLErrorTimedOut)
+        ))
     }
 }

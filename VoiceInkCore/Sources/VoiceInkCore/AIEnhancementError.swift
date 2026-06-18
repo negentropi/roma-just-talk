@@ -18,6 +18,21 @@ public enum VoiceInkAIEnhancementError: Error, Equatable, Sendable {
         }
         return .customError("HTTP \(statusCode): \(message)")
     }
+
+    public static func transportNetworkError(for error: Error) -> VoiceInkAIEnhancementError? {
+        let nsError = error as NSError
+        guard nsError.domain == NSURLErrorDomain else {
+            return nil
+        }
+
+        let retryableNetworkCodes: Set<Int> = [
+            NSURLErrorNotConnectedToInternet,
+            NSURLErrorTimedOut,
+            NSURLErrorNetworkConnectionLost
+        ]
+
+        return retryableNetworkCodes.contains(nsError.code) ? .networkError : nil
+    }
 }
 
 extension VoiceInkAIEnhancementError: LocalizedError {

@@ -273,6 +273,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "UserDefaultsPreferencesTests.testProviderAPIKeyVerificationStateClearsSingleAndAllProviders", run: { UserDefaultsPreferencesTests().testProviderAPIKeyVerificationStateClearsSingleAndAllProviders() }),
             VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testFloatSamplesDecodeLittleEndianPCM16Data", run: { PCM16AudioSamplesTests().testFloatSamplesDecodeLittleEndianPCM16Data() }),
             VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testFloatSamplesCanStartAfterWAVHeader", run: { PCM16AudioSamplesTests().testFloatSamplesCanStartAfterWAVHeader() }),
+            VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testFloatSamplesReadPCMDataChunkAfterExtraWAVChunk", run: { PCM16AudioSamplesTests().testFloatSamplesReadPCMDataChunkAfterExtraWAVChunk() }),
             VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testFloatSamplesRejectTooSmallWAVData", run: { PCM16AudioSamplesTests().testFloatSamplesRejectTooSmallWAVData() }),
             VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testFloatSamplesCanReadWAVFileURL", run: { try PCM16AudioSamplesTests().testFloatSamplesCanReadWAVFileURL() }),
             VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testFloatSamplesRejectTooSmallWAVFileURL", run: { try PCM16AudioSamplesTests().testFloatSamplesRejectTooSmallWAVFileURL() }),

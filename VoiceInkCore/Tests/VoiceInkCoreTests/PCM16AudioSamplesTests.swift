@@ -27,6 +27,17 @@ final class PCM16AudioSamplesTests: XCTestCase {
         ])
     }
 
+    func testFloatSamplesReadPCMDataChunkAfterExtraWAVChunk() {
+        let data = wavDataWithExtraChunk(samples: [-2_000, 2_000])
+
+        let samples = VoiceInkPCM16Audio.floatSamples(fromWAVData: data)
+
+        XCTAssertEqual(samples, [
+            Float(-2_000) / 32_767.0,
+            Float(2_000) / 32_767.0
+        ])
+    }
+
     func testFloatSamplesRejectTooSmallWAVData() {
         let data = Data(repeating: 0, count: VoiceInkPCM16Audio.wavHeaderByteCount)
 
@@ -390,6 +401,50 @@ final class PCM16AudioSamplesTests: XCTestCase {
         var data = Data(repeating: 0, count: VoiceInkPCM16Audio.wavHeaderByteCount)
         data.append(pcm16Data(samples: samples))
         return data
+    }
+
+    private func wavDataWithExtraChunk(samples: [Int16]) -> Data {
+        let pcmData = pcm16Data(samples: samples)
+        var data = Data()
+        appendASCII("RIFF", to: &data)
+        appendUInt32LE(UInt32(4 + 24 + 10 + 8 + pcmData.count), to: &data)
+        appendASCII("WAVE", to: &data)
+
+        appendASCII("fmt ", to: &data)
+        appendUInt32LE(16, to: &data)
+        appendUInt16LE(1, to: &data)
+        appendUInt16LE(UInt16(VoiceInkPCM16Audio.monoChannelCount), to: &data)
+        appendUInt32LE(UInt32(VoiceInkPCM16Audio.mono16kSampleRateHz), to: &data)
+        appendUInt32LE(UInt32(VoiceInkPCM16Audio.mono16kSampleRateHz * VoiceInkPCM16Audio.bytesPerSample), to: &data)
+        appendUInt16LE(UInt16(VoiceInkPCM16Audio.bytesPerSample), to: &data)
+        appendUInt16LE(UInt16(VoiceInkPCM16Audio.bitsPerSample), to: &data)
+
+        appendASCII("JUNK", to: &data)
+        appendUInt32LE(2, to: &data)
+        data.append(contentsOf: [0x12, 0x34])
+
+        appendASCII("data", to: &data)
+        appendUInt32LE(UInt32(pcmData.count), to: &data)
+        data.append(pcmData)
+        return data
+    }
+
+    private func appendASCII(_ string: String, to data: inout Data) {
+        data.append(contentsOf: string.utf8)
+    }
+
+    private func appendUInt16LE(_ value: UInt16, to data: inout Data) {
+        let littleEndian = value.littleEndian
+        data.append(UInt8(truncatingIfNeeded: littleEndian))
+        data.append(UInt8(truncatingIfNeeded: littleEndian >> 8))
+    }
+
+    private func appendUInt32LE(_ value: UInt32, to data: inout Data) {
+        let littleEndian = value.littleEndian
+        data.append(UInt8(truncatingIfNeeded: littleEndian))
+        data.append(UInt8(truncatingIfNeeded: littleEndian >> 8))
+        data.append(UInt8(truncatingIfNeeded: littleEndian >> 16))
+        data.append(UInt8(truncatingIfNeeded: littleEndian >> 24))
     }
 
     private func writeMonoPCM16Samples(

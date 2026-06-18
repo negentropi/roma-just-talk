@@ -34,8 +34,8 @@ public enum VoiceInkPCM16Audio {
     }
 
     public static func floatSamples(fromWAVData data: Data) -> [Float]? {
-        guard data.count > wavHeaderByteCount else { return nil }
-        return floatSamples(fromLittleEndianData: data, startingAt: wavHeaderByteCount)
+        guard let pcmData = littleEndianPCM16Data(fromWAVData: data) else { return nil }
+        return floatSamples(fromLittleEndianData: pcmData)
     }
 
     public static func floatSamples(fromWAVFileAt url: URL) throws -> [Float]? {
@@ -48,8 +48,7 @@ public enum VoiceInkPCM16Audio {
         noiseFloorPeak: Int16,
         maxGain: Float
     ) -> [Float]? {
-        guard data.count > wavHeaderByteCount else { return nil }
-        let pcmData = Data(data.dropFirst(wavHeaderByteCount))
+        guard let pcmData = littleEndianPCM16Data(fromWAVData: data) else { return nil }
         let leveledData = leveledLittleEndianData(
             pcmData,
             targetPeak: targetPeak,
@@ -265,6 +264,72 @@ public enum VoiceInkPCM16Audio {
             sample += inputSamples[frame * channelCount + channel]
         }
         return sample / Float32(channelCount)
+    }
+
+    private static func littleEndianPCM16Data(fromWAVData data: Data) -> Data? {
+        if let dataChunkRange = wavDataChunkRange(in: data) {
+            return data.subdata(in: dataChunkRange)
+        }
+
+        guard !isRIFFWAVData(data), data.count > wavHeaderByteCount else { return nil }
+        return Data(data.dropFirst(wavHeaderByteCount))
+    }
+
+    private static func wavDataChunkRange(in data: Data) -> Range<Int>? {
+        guard data.count >= 12 else { return nil }
+
+        return data.withUnsafeBytes { rawBuffer in
+            guard let bytes = rawBuffer.bindMemory(to: UInt8.self).baseAddress,
+                  matchesASCII("RIFF", bytes: bytes, at: 0),
+                  matchesASCII("WAVE", bytes: bytes, at: 8) else {
+                return nil
+            }
+
+            var offset = 12
+            while offset + 8 <= data.count {
+                let chunkSize = Int(littleEndianUInt32(bytes: bytes, at: offset + 4))
+                let chunkDataStart = offset + 8
+                let chunkDataEnd = chunkDataStart + chunkSize
+                guard chunkDataEnd <= data.count else { return nil }
+
+                if matchesASCII("data", bytes: bytes, at: offset) {
+                    return chunkDataStart..<chunkDataEnd
+                }
+
+                offset = chunkDataEnd + (chunkSize.isMultiple(of: 2) ? 0 : 1)
+            }
+
+            return nil
+        }
+    }
+
+    private static func isRIFFWAVData(_ data: Data) -> Bool {
+        guard data.count >= 12 else { return false }
+
+        return data.withUnsafeBytes { rawBuffer in
+            guard let bytes = rawBuffer.bindMemory(to: UInt8.self).baseAddress else { return false }
+            return matchesASCII("RIFF", bytes: bytes, at: 0)
+                && matchesASCII("WAVE", bytes: bytes, at: 8)
+        }
+    }
+
+    private static func matchesASCII(
+        _ value: StaticString,
+        bytes: UnsafePointer<UInt8>,
+        at offset: Int
+    ) -> Bool {
+        let expected = value.utf8Start
+        for index in 0..<value.utf8CodeUnitCount {
+            guard bytes[offset + index] == expected[index] else { return false }
+        }
+        return true
+    }
+
+    private static func littleEndianUInt32(bytes: UnsafePointer<UInt8>, at offset: Int) -> UInt32 {
+        UInt32(bytes[offset])
+            | (UInt32(bytes[offset + 1]) << 8)
+            | (UInt32(bytes[offset + 2]) << 16)
+            | (UInt32(bytes[offset + 3]) << 24)
     }
 
     private static func pcm16SampleFromScaledFloat(_ sample: Float32) -> Int16 {

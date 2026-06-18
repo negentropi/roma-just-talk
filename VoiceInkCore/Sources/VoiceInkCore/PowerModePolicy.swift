@@ -240,12 +240,161 @@ public extension Array where Element == PowerModeConfig {
         map(\.powerModePolicyRule)
     }
 
+    var enabledPowerModeConfigurations: [PowerModeConfig] {
+        filter(\.isEnabled)
+    }
+
+    var enabledPowerModeConfigurationIds: Set<UUID> {
+        Set(enabledPowerModeConfigurations.map(\.id))
+    }
+
+    var hasPowerModeDefaultConfiguration: Bool {
+        contains { $0.isDefault }
+    }
+
     var hasEnabledAutomaticRules: Bool {
         VoiceInkPowerModePolicy.hasEnabledAutomaticRules(in: powerModePolicyRules)
     }
 
     var hasEnabledURLRules: Bool {
         VoiceInkPowerModePolicy.hasEnabledWebsiteRules(in: powerModePolicyRules)
+    }
+
+    func powerModeConfiguration(with id: UUID) -> PowerModeConfig? {
+        first { $0.id == id }
+    }
+
+    func powerModeConfiguration(forWebsiteURL url: String) -> PowerModeConfig? {
+        guard let matchingRule = VoiceInkPowerModePolicy.matchingRule(
+            forWebsiteURL: url,
+            in: powerModePolicyRules
+        ) else { return nil }
+
+        return powerModeConfiguration(with: matchingRule.id)
+    }
+
+    func powerModeConfiguration(forAppBundleIdentifier bundleIdentifier: String) -> PowerModeConfig? {
+        guard let matchingRule = VoiceInkPowerModePolicy.matchingRule(
+            forAppBundleIdentifier: bundleIdentifier,
+            in: powerModePolicyRules
+        ) else { return nil }
+
+        return powerModeConfiguration(with: matchingRule.id)
+    }
+
+    var defaultPowerModeConfiguration: PowerModeConfig? {
+        guard let defaultRule = VoiceInkPowerModePolicy.defaultRule(
+            in: powerModePolicyRules
+        ) else { return nil }
+
+        return powerModeConfiguration(with: defaultRule.id)
+    }
+
+    func containsPowerModeEmoji(_ emoji: String) -> Bool {
+        contains { $0.emoji == emoji }
+    }
+
+    @discardableResult
+    mutating func appendPowerModeConfigurationIfMissing(_ config: PowerModeConfig) -> Bool {
+        guard powerModeConfiguration(with: config.id) == nil else {
+            return false
+        }
+
+        append(config)
+        return true
+    }
+
+    @discardableResult
+    mutating func updatePowerModeConfiguration(_ config: PowerModeConfig) -> Bool {
+        guard let index = firstIndex(where: { $0.id == config.id }) else {
+            return false
+        }
+
+        self[index] = config
+        return true
+    }
+
+    @discardableResult
+    mutating func removePowerModeConfiguration(with id: UUID) -> Bool {
+        let originalCount = count
+        removeAll { $0.id == id }
+        return count != originalCount
+    }
+
+    mutating func setPowerModeDefaultConfiguration(id configID: UUID) {
+        for index in indices {
+            self[index].isDefault = false
+        }
+
+        if let index = firstIndex(where: { $0.id == configID }) {
+            self[index].isDefault = true
+        }
+    }
+
+    @discardableResult
+    mutating func setPowerModeConfiguration(id configID: UUID, isEnabled: Bool) -> Bool {
+        guard let index = firstIndex(where: { $0.id == configID }) else {
+            return false
+        }
+
+        self[index].isEnabled = isEnabled
+        return true
+    }
+
+    @discardableResult
+    mutating func addPowerModeAppConfig(
+        _ appConfig: VoiceInkPowerModeAppConfig,
+        toConfigurationID configID: UUID
+    ) -> Bool {
+        guard let index = firstIndex(where: { $0.id == configID }) else {
+            return false
+        }
+
+        var configs = self[index].appConfigs ?? []
+        configs.append(appConfig)
+        self[index].appConfigs = configs
+        return true
+    }
+
+    @discardableResult
+    mutating func removePowerModeAppConfig(
+        id appConfigID: UUID,
+        fromConfigurationID configID: UUID
+    ) -> Bool {
+        guard let index = firstIndex(where: { $0.id == configID }) else {
+            return false
+        }
+
+        self[index].appConfigs?.removeAll { $0.id == appConfigID }
+        return true
+    }
+
+    @discardableResult
+    mutating func addPowerModeURLConfig(
+        _ urlConfig: VoiceInkPowerModeURLConfig,
+        toConfigurationID configID: UUID
+    ) -> Bool {
+        guard let index = firstIndex(where: { $0.id == configID }) else {
+            return false
+        }
+
+        var configs = self[index].urlConfigs ?? []
+        configs.append(urlConfig)
+        self[index].urlConfigs = configs
+        return true
+    }
+
+    @discardableResult
+    mutating func removePowerModeURLConfig(
+        id urlConfigID: UUID,
+        fromConfigurationID configID: UUID
+    ) -> Bool {
+        guard let index = firstIndex(where: { $0.id == configID }) else {
+            return false
+        }
+
+        self[index].urlConfigs?.removeAll { $0.id == urlConfigID }
+        return true
     }
 }
 

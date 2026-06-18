@@ -14,7 +14,7 @@ class PowerModeManager: ObservableObject {
 
         if let activeConfigIdString = UserDefaults.standard.string(forKey: activeConfigIdKey),
            let activeConfigId = UUID(uuidString: activeConfigIdString) {
-            activeConfiguration = configurations.first { $0.id == activeConfigId }
+            activeConfiguration = configurations.powerModeConfiguration(with: activeConfigId)
         } else {
             activeConfiguration = nil
         }
@@ -35,9 +35,8 @@ class PowerModeManager: ObservableObject {
     }
 
     func addConfiguration(_ config: PowerModeConfig) {
-        if !configurations.contains(where: { $0.id == config.id }) {
-            let previousEnabledConfigIds = enabledConfigurationIds
-            configurations.append(config)
+        let previousEnabledConfigIds = enabledConfigurationIds
+        if configurations.appendPowerModeConfigurationIfMissing(config) {
             saveConfigurations()
             postShortcutAvailabilityChangeIfNeeded(previousEnabledConfigIds: previousEnabledConfigIds)
         }
@@ -46,19 +45,18 @@ class PowerModeManager: ObservableObject {
     func removeConfiguration(with id: UUID) {
         let previousEnabledConfigIds = enabledConfigurationIds
         ShortcutStore.removeShortcutStorage(for: .powerMode(id))
-        configurations.removeAll { $0.id == id }
+        configurations.removePowerModeConfiguration(with: id)
         saveConfigurations()
         postShortcutAvailabilityChangeIfNeeded(previousEnabledConfigIds: previousEnabledConfigIds)
     }
 
     func getConfiguration(with id: UUID) -> PowerModeConfig? {
-        return configurations.first { $0.id == id }
+        return configurations.powerModeConfiguration(with: id)
     }
 
     func updateConfiguration(_ config: PowerModeConfig) {
-        if let index = configurations.firstIndex(where: { $0.id == config.id }) {
-            let previousEnabledConfigIds = enabledConfigurationIds
-            configurations[index] = config
+        let previousEnabledConfigIds = enabledConfigurationIds
+        if configurations.updatePowerModeConfiguration(config) {
             saveConfigurations()
             postShortcutAvailabilityChangeIfNeeded(previousEnabledConfigIds: previousEnabledConfigIds)
         }
@@ -70,43 +68,23 @@ class PowerModeManager: ObservableObject {
     }
 
     func getConfigurationForURL(_ url: String) -> PowerModeConfig? {
-        guard let matchingRule = VoiceInkPowerModePolicy.matchingRule(
-            forWebsiteURL: url,
-            in: configurations.powerModePolicyRules
-        ) else { return nil }
-
-        return configurations.first { $0.id == matchingRule.id }
+        configurations.powerModeConfiguration(forWebsiteURL: url)
     }
     
     func getConfigurationForApp(_ bundleId: String) -> PowerModeConfig? {
-        guard let matchingRule = VoiceInkPowerModePolicy.matchingRule(
-            forAppBundleIdentifier: bundleId,
-            in: configurations.powerModePolicyRules
-        ) else { return nil }
-
-        return configurations.first { $0.id == matchingRule.id }
+        configurations.powerModeConfiguration(forAppBundleIdentifier: bundleId)
     }
     
     func getDefaultConfiguration() -> PowerModeConfig? {
-        guard let defaultRule = VoiceInkPowerModePolicy.defaultRule(
-            in: configurations.powerModePolicyRules
-        ) else { return nil }
-
-        return configurations.first { $0.id == defaultRule.id }
+        configurations.defaultPowerModeConfiguration
     }
     
     func hasDefaultConfiguration() -> Bool {
-        return configurations.contains { $0.isDefault }
+        return configurations.hasPowerModeDefaultConfiguration
     }
     
     func setAsDefault(configId: UUID, skipSave: Bool = false) {
-        for index in configurations.indices {
-            configurations[index].isDefault = false
-        }
-
-        if let index = configurations.firstIndex(where: { $0.id == configId }) {
-            configurations[index].isDefault = true
-        }
+        configurations.setPowerModeDefaultConfiguration(id: configId)
 
         if !skipSave {
             saveConfigurations()
@@ -114,29 +92,27 @@ class PowerModeManager: ObservableObject {
     }
     
     func enableConfiguration(with id: UUID) {
-        if let index = configurations.firstIndex(where: { $0.id == id }) {
-            let previousEnabledConfigIds = enabledConfigurationIds
-            configurations[index].isEnabled = true
+        let previousEnabledConfigIds = enabledConfigurationIds
+        if configurations.setPowerModeConfiguration(id: id, isEnabled: true) {
             saveConfigurations()
             postShortcutAvailabilityChangeIfNeeded(previousEnabledConfigIds: previousEnabledConfigIds)
         }
     }
     
     func disableConfiguration(with id: UUID) {
-        if let index = configurations.firstIndex(where: { $0.id == id }) {
-            let previousEnabledConfigIds = enabledConfigurationIds
-            configurations[index].isEnabled = false
+        let previousEnabledConfigIds = enabledConfigurationIds
+        if configurations.setPowerModeConfiguration(id: id, isEnabled: false) {
             saveConfigurations()
             postShortcutAvailabilityChangeIfNeeded(previousEnabledConfigIds: previousEnabledConfigIds)
         }
     }
     
     var enabledConfigurations: [PowerModeConfig] {
-        return configurations.filter { $0.isEnabled }
+        configurations.enabledPowerModeConfigurations
     }
 
     private var enabledConfigurationIds: Set<UUID> {
-        Set(enabledConfigurations.map(\.id))
+        configurations.enabledPowerModeConfigurationIds
     }
 
     private func postShortcutAvailabilityChangeIfNeeded(previousEnabledConfigIds: Set<UUID>) {
@@ -148,34 +124,26 @@ class PowerModeManager: ObservableObject {
     }
 
     func addAppConfig(_ appConfig: VoiceInkPowerModeAppConfig, to config: PowerModeConfig) {
-        if var updatedConfig = configurations.first(where: { $0.id == config.id }) {
-            var configs = updatedConfig.appConfigs ?? []
-            configs.append(appConfig)
-            updatedConfig.appConfigs = configs
-            updateConfiguration(updatedConfig)
+        if configurations.addPowerModeAppConfig(appConfig, toConfigurationID: config.id) {
+            saveConfigurations()
         }
     }
 
     func removeAppConfig(_ appConfig: VoiceInkPowerModeAppConfig, from config: PowerModeConfig) {
-        if var updatedConfig = configurations.first(where: { $0.id == config.id }) {
-            updatedConfig.appConfigs?.removeAll(where: { $0.id == appConfig.id })
-            updateConfiguration(updatedConfig)
+        if configurations.removePowerModeAppConfig(id: appConfig.id, fromConfigurationID: config.id) {
+            saveConfigurations()
         }
     }
 
     func addURLConfig(_ urlConfig: VoiceInkPowerModeURLConfig, to config: PowerModeConfig) {
-        if var updatedConfig = configurations.first(where: { $0.id == config.id }) {
-            var configs = updatedConfig.urlConfigs ?? []
-            configs.append(urlConfig)
-            updatedConfig.urlConfigs = configs
-            updateConfiguration(updatedConfig)
+        if configurations.addPowerModeURLConfig(urlConfig, toConfigurationID: config.id) {
+            saveConfigurations()
         }
     }
 
     func removeURLConfig(_ urlConfig: VoiceInkPowerModeURLConfig, from config: PowerModeConfig) {
-        if var updatedConfig = configurations.first(where: { $0.id == config.id }) {
-            updatedConfig.urlConfigs?.removeAll(where: { $0.id == urlConfig.id })
-            updateConfiguration(updatedConfig)
+        if configurations.removePowerModeURLConfig(id: urlConfig.id, fromConfigurationID: config.id) {
+            saveConfigurations()
         }
     }
 
@@ -198,6 +166,6 @@ class PowerModeManager: ObservableObject {
     }
 
     func isEmojiInUse(_ emoji: String) -> Bool {
-        return configurations.contains { $0.emoji == emoji }
+        return configurations.containsPowerModeEmoji(emoji)
     }
 } 

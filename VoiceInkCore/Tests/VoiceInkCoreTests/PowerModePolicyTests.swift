@@ -351,6 +351,82 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertEqual(VoiceInkPowerModePolicy.defaultRule(in: [disabledDefault, enabledDefault])?.id, enabledDefault.id)
     }
 
+    func testPowerModeConfigurationListQueriesUseSharedRulePolicy() {
+        let disabledDefault = config(name: "Disabled", emoji: "D", isEnabled: false, isDefault: true)
+        let websiteConfig = config(
+            name: "Website",
+            emoji: "W",
+            urlConfigs: [VoiceInkPowerModeURLConfig(url: "example.com/docs")]
+        )
+        let appConfig = config(
+            name: "App",
+            emoji: "A",
+            appConfigs: [VoiceInkPowerModeAppConfig(bundleIdentifier: "com.example.App", appName: "App")]
+        )
+        let configs = [disabledDefault, websiteConfig, appConfig]
+
+        XCTAssertEqual(configs.powerModeConfiguration(with: appConfig.id)?.id, appConfig.id)
+        XCTAssertEqual(configs.enabledPowerModeConfigurations.map(\.id), [websiteConfig.id, appConfig.id])
+        XCTAssertEqual(configs.enabledPowerModeConfigurationIds, Set([websiteConfig.id, appConfig.id]))
+        XCTAssertTrue(configs.hasPowerModeDefaultConfiguration)
+        XCTAssertNil(configs.defaultPowerModeConfiguration)
+        XCTAssertTrue(configs.containsPowerModeEmoji("D"))
+        XCTAssertFalse(configs.containsPowerModeEmoji("Z"))
+        XCTAssertEqual(
+            configs.powerModeConfiguration(forWebsiteURL: "https://www.example.com/docs/new")?.id,
+            websiteConfig.id
+        )
+        XCTAssertEqual(
+            configs.powerModeConfiguration(forAppBundleIdentifier: "com.example.App")?.id,
+            appConfig.id
+        )
+    }
+
+    func testPowerModeConfigurationListMutationsPreserveManagerSemantics() throws {
+        let firstID = UUID()
+        let secondID = UUID()
+        var configs = [config(id: firstID, name: "First", emoji: "F")]
+
+        XCTAssertFalse(configs.appendPowerModeConfigurationIfMissing(config(id: firstID, name: "Duplicate", emoji: "D")))
+        XCTAssertEqual(configs.map(\.id), [firstID])
+        XCTAssertTrue(configs.appendPowerModeConfigurationIfMissing(config(id: secondID, name: "Second", emoji: "S")))
+        XCTAssertEqual(configs.map(\.id), [firstID, secondID])
+
+        var updatedSecond = config(id: secondID, name: "Updated", emoji: "U")
+        updatedSecond.isEnabled = false
+        XCTAssertTrue(configs.updatePowerModeConfiguration(updatedSecond))
+        XCTAssertEqual(configs.powerModeConfiguration(with: secondID)?.name, "Updated")
+        XCTAssertEqual(configs.enabledPowerModeConfigurationIds, Set([firstID]))
+        XCTAssertFalse(configs.updatePowerModeConfiguration(config(name: "Missing", emoji: "M")))
+
+        configs.setPowerModeDefaultConfiguration(id: secondID)
+        XCTAssertFalse(try XCTUnwrap(configs.powerModeConfiguration(with: firstID)).isDefault)
+        XCTAssertTrue(try XCTUnwrap(configs.powerModeConfiguration(with: secondID)).isDefault)
+        configs.setPowerModeDefaultConfiguration(id: UUID())
+        XCTAssertFalse(configs.contains { $0.isDefault })
+
+        XCTAssertTrue(configs.setPowerModeConfiguration(id: secondID, isEnabled: true))
+        XCTAssertEqual(configs.enabledPowerModeConfigurationIds, Set([firstID, secondID]))
+        XCTAssertFalse(configs.setPowerModeConfiguration(id: UUID(), isEnabled: false))
+
+        let appConfig = VoiceInkPowerModeAppConfig(bundleIdentifier: "com.example.App", appName: "App")
+        let urlConfig = VoiceInkPowerModeURLConfig(url: "example.com")
+        XCTAssertTrue(configs.addPowerModeAppConfig(appConfig, toConfigurationID: firstID))
+        XCTAssertEqual(configs.powerModeConfiguration(with: firstID)?.appConfigs?.map(\.id), [appConfig.id])
+        XCTAssertTrue(configs.removePowerModeAppConfig(id: appConfig.id, fromConfigurationID: firstID))
+        XCTAssertEqual(configs.powerModeConfiguration(with: firstID)?.appConfigs?.map(\.id) ?? [], [])
+        XCTAssertTrue(configs.addPowerModeURLConfig(urlConfig, toConfigurationID: firstID))
+        XCTAssertEqual(configs.powerModeConfiguration(with: firstID)?.urlConfigs?.map(\.id), [urlConfig.id])
+        XCTAssertTrue(configs.removePowerModeURLConfig(id: urlConfig.id, fromConfigurationID: firstID))
+        XCTAssertEqual(configs.powerModeConfiguration(with: firstID)?.urlConfigs?.map(\.id) ?? [], [])
+        XCTAssertFalse(configs.addPowerModeAppConfig(appConfig, toConfigurationID: UUID()))
+        XCTAssertFalse(configs.addPowerModeURLConfig(urlConfig, toConfigurationID: UUID()))
+
+        XCTAssertTrue(configs.removePowerModeConfiguration(with: secondID))
+        XCTAssertNil(configs.powerModeConfiguration(with: secondID))
+        XCTAssertFalse(configs.removePowerModeConfiguration(with: secondID))
+    }
+
     func testValidationRejectsBlankAndDuplicateNameWithoutNormalizingName() {
         let existing = rule(name: "Writing")
         let blankCandidate = rule(name: " ")
@@ -447,6 +523,27 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertEqual(
             VoiceInkPowerModeValidationError.duplicateWebsiteTrigger("example.com", "Writing").localizedDescription,
             "The website 'example.com' is already configured in the 'Writing' power mode."
+        )
+    }
+
+    private func config(
+        id: UUID = UUID(),
+        name: String,
+        emoji: String,
+        appConfigs: [VoiceInkPowerModeAppConfig]? = nil,
+        urlConfigs: [VoiceInkPowerModeURLConfig]? = nil,
+        isEnabled: Bool = true,
+        isDefault: Bool = false
+    ) -> PowerModeConfig {
+        PowerModeConfig(
+            id: id,
+            name: name,
+            emoji: emoji,
+            appConfigs: appConfigs,
+            urlConfigs: urlConfigs,
+            isAIEnhancementEnabled: false,
+            isEnabled: isEnabled,
+            isDefault: isDefault
         )
     }
 

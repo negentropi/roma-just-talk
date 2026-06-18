@@ -337,6 +337,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testMatchingWebsiteRulePreservesEmptyRuleURLRejection", run: { PowerModePolicyTests().testMatchingWebsiteRulePreservesEmptyRuleURLRejection() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testMatchingAppRuleUsesExactEnabledBundleIdentifier", run: { PowerModePolicyTests().testMatchingAppRuleUsesExactEnabledBundleIdentifier() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testDefaultAndRulePresenceRequireEnabledRules", run: { PowerModePolicyTests().testDefaultAndRulePresenceRequireEnabledRules() }),
+            VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeConfigurationListQueriesUseSharedRulePolicy", run: { PowerModePolicyTests().testPowerModeConfigurationListQueriesUseSharedRulePolicy() }),
+            VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeConfigurationListMutationsPreserveManagerSemantics", run: { try PowerModePolicyTests().testPowerModeConfigurationListMutationsPreserveManagerSemantics() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testValidationRejectsBlankAndDuplicateNameWithoutNormalizingName", run: { PowerModePolicyTests().testValidationRejectsBlankAndDuplicateNameWithoutNormalizingName() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testValidationSkipsEditedRuleAndReportsDuplicateTriggers", run: { PowerModePolicyTests().testValidationSkipsEditedRuleAndReportsDuplicateTriggers() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testValidationComparesWebsiteDuplicatesByRawStoredURL", run: { PowerModePolicyTests().testValidationComparesWebsiteDuplicatesByRawStoredURL() }),

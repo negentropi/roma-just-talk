@@ -930,9 +930,24 @@ require_pattern \
   'struct PowerModeConfig' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
+require_pattern \
+  "shared Power Mode config list policy lives in VoiceInkCore" \
+  'enabledPowerModeConfigurationIds|appendPowerModeConfigurationIfMissing|setPowerModeDefaultConfiguration|addPowerModeAppConfig' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
 reject_pattern \
   "macOS Power Mode avoids shell-only config record and policy adapters" \
   'struct +PowerModeConfig|extension +Array +where +Element *== *PowerModeConfig|extension +PowerModeConfig' \
+  VoiceInk/PowerMode/PowerModeConfig.swift
+
+reject_pattern \
+  "macOS Power Mode manager avoids shell-only config list matching and mutation policy" \
+  'configurations\.first *\{|configurations\.contains *\{|configurations\.filter *\{|for +index +in +configurations\.indices|appConfigs\?\.removeAll|urlConfigs\?\.removeAll|configs\.append' \
+  VoiceInk/PowerMode/PowerModeConfig.swift
+
+require_pattern \
+  "macOS Power Mode manager consumes shared config list policy" \
+  'appendPowerModeConfigurationIfMissing|powerModeConfiguration\(forWebsiteURL:|enabledPowerModeConfigurationIds|containsPowerModeEmoji' \
   VoiceInk/PowerMode/PowerModeConfig.swift
 
 require_pattern \

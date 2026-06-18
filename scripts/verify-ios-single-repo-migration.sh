@@ -353,6 +353,11 @@ require_pattern \
   iOS/VoiceInk-ios/WhisperTranscriptionService.swift
 
 require_pattern \
+  "iOS app launch registers shared default values" \
+  'VoiceInkDefaultSettings\.iOS\.registerUserDefaults\(\)' \
+  iOS/VoiceInk-ios/VoiceInk_iosApp.swift
+
+require_pattern \
   "workspace includes iOS project" \
   'location = "group:iOS/VoiceInk-ios.xcodeproj"' \
   VoiceInk.xcworkspace/contents.xcworkspacedata

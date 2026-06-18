@@ -16,6 +16,8 @@ struct VoiceInk_iosApp: App {
     @StateObject private var recordingManager = RecordingManager()
     
     init() {
+        VoiceInkDefaultSettings.iOS.registerUserDefaults()
+
         // Clear any stale recording state on app launch
         AppGroupCoordinator.shared.updateRecordingState(false)
         print("🧹 Cleared stale recording state on app launch")

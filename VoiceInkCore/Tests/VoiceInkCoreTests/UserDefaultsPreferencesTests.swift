@@ -191,6 +191,43 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         )
     }
 
+    func testDefaultSettingsRegisterUserDefaultsForPlatformSelections() {
+        let previousRegistrationDomain = UserDefaults.standard.volatileDomain(forName: UserDefaults.registrationDomain)
+        defer {
+            UserDefaults.standard.setVolatileDomain(
+                previousRegistrationDomain,
+                forName: UserDefaults.registrationDomain
+            )
+        }
+
+        withIsolatedDefaults { defaults in
+            defaults.set("fr", forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
+            VoiceInkDefaultSettings(
+                selectedTranscriptionLanguage: "en"
+            ).registerUserDefaults(
+                to: defaults,
+                currentTranscriptionModel: "parakeet-tdt-0.6b-v2"
+            )
+
+            XCTAssertEqual(
+                defaults.object(forKey: VoiceInkUserDefaultsKey.hasCompletedOnboarding) as? Bool,
+                false
+            )
+            XCTAssertEqual(
+                defaults.string(forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage),
+                "fr"
+            )
+            XCTAssertEqual(
+                defaults.string(forKey: VoiceInkUserDefaultsKey.currentTranscriptionModel),
+                "parakeet-tdt-0.6b-v2"
+            )
+            XCTAssertEqual(
+                defaults.object(forKey: VoiceInkUserDefaultsKey.transcriptionRetentionMinutes) as? Int,
+                VoiceInkPreferenceDefault.transcriptionRetentionMinutes
+            )
+        }
+    }
+
     func testOnboardingPreferenceUsesFalseWhenMissing() {
         withIsolatedDefaults { defaults in
             XCTAssertFalse(VoiceInkOnboardingPreference.hasCompletedOnboarding(from: defaults))

@@ -149,6 +149,17 @@ public struct VoiceInkDefaultSettings: Equatable, Sendable {
 
         return defaults
     }
+
+    public func registerUserDefaults(
+        to defaults: UserDefaults = .standard,
+        hasCompletedOnboarding: Bool = false,
+        currentTranscriptionModel: String? = nil
+    ) {
+        defaults.register(defaults: registeredUserDefaults(
+            hasCompletedOnboarding: hasCompletedOnboarding,
+            currentTranscriptionModel: currentTranscriptionModel
+        ))
+    }
 }
 
 public enum VoiceInkOnboardingPreference {

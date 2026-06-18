@@ -48,18 +48,6 @@ public struct Mode: Identifiable, Codable {
         self.promptTemplate = promptTemplate ?? VoiceInkPostProcessingPromptTemplate(type: .summary)
     }
 
-    @available(*, deprecated, message: "Use promptTemplate instead")
-    public var customPrompt: String {
-        get {
-            promptTemplate.type == .custom ? promptTemplate.customPrompt : ""
-        }
-        set {
-            if !newValue.isEmpty {
-                promptTemplate = VoiceInkPostProcessingPromptTemplate(type: .custom, customPrompt: newValue)
-            }
-        }
-    }
-
     public var effectivePrompt: String {
         promptTemplate.effectivePrompt
     }

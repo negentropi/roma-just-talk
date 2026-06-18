@@ -188,6 +188,11 @@ reject_pattern \
   VoiceInk \
   iOS
 
+reject_pattern \
+  "removed mode custom-prompt shim stays deleted" \
+  'public var customPrompt' \
+  VoiceInkCore/Sources/VoiceInkCore/Mode.swift
+
 require_pattern \
   "workspace includes iOS project" \
   'location = "group:iOS/VoiceInk-ios.xcodeproj"' \

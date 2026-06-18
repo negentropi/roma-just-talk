@@ -10,6 +10,7 @@ on:
       - "LocalBuild.xcconfig"
       - "Makefile"
       - "VoiceInk/**"
+      - "VoiceInkTests/**"
       - "VoiceInk.xcodeproj/**"
 
 jobs:
@@ -31,10 +32,10 @@ jobs:
       - name: Build release app
         run: make local CONFIGURATION=Release
 
-      - name: Build Debug unit tests
+      - name: Run Debug unit tests
         timeout-minutes: 15
         run: |
-          xcodebuild build-for-testing \
+          xcodebuild test \
             -project VoiceInk.xcodeproj \
             -scheme VoiceInk \
             -configuration Debug \

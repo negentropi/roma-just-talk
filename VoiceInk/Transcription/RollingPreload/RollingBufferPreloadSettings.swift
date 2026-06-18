@@ -191,6 +191,17 @@ struct RollingBufferPreloadPolicy {
     }
 }
 
+enum RollingBufferBufferedSnapshotTranscriptionStrategy {
+    case recordedFile
+    case unavailable
+}
+
+enum RollingBufferBufferedSnapshotTranscriptionPolicy {
+    static func strategy(for model: any TranscriptionModel) -> RollingBufferBufferedSnapshotTranscriptionStrategy {
+        model.supportsRecordedFileTranscription ? .recordedFile : .unavailable
+    }
+}
+
 enum RollingBufferQuickReleaseClaimStrategy: String {
     case none
     case readyPreload

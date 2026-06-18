@@ -29,8 +29,6 @@ private struct PreparedQuickReleaseContext {
 
 @MainActor
 class VoiceInkEngine: NSObject, ObservableObject {
-    private static let bufferedSnapshotStreamingChunkBytes = 3_200
-
     @Published var recordingState: RecordingState = .idle
     @Published var shouldCancelRecording = false
     var partialTranscript: String = ""
@@ -427,7 +425,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
             )
         }
 
-        guard model.supportsRecordedFileTranscription else {
+        guard RollingBufferBufferedSnapshotTranscriptionPolicy.strategy(for: model) == .recordedFile else {
             discardPreparedQuickReleaseContext()
             RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
                 strategy: .unavailable,
@@ -582,16 +580,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
         }
 
         do {
-            let bufferedSnapshotSession = await makeBufferedSnapshotStreamingSessionIfAvailable(
-                for: model,
-                audioData: audioData,
-                audioFileReadyTask: audioFileReadyTask,
-                latencyTrace: latencyTrace
-            )
-            if bufferedSnapshotSession == nil {
-                try await audioFileReadyTask.value
-                logger.notice("Latency trace buffered audio file ready operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s bytes=\(audioData.count, privacy: .public)")
-            }
+            try await audioFileReadyTask.value
+            logger.notice("Latency trace buffered audio file ready operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s bytes=\(audioData.count, privacy: .public)")
             RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
                 strategy: .bufferedAudioSnapshot,
                 audioBytes: audioData.count,
@@ -606,7 +596,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
             )
 
             recordedFile = permanentURL
-            currentSession = bufferedSnapshotSession
+            currentSession = nil
             activeRecordingStartID = nil
             stopRequestedDuringStart = false
             shouldCancelRecording = false
@@ -634,63 +624,6 @@ class VoiceInkEngine: NSObject, ObservableObject {
             )
             logger.error("commitBufferedRollingAudioSnapshot failed: \(error.localizedDescription, privacy: .public)")
             return false
-        }
-    }
-
-    private func makeBufferedSnapshotStreamingSessionIfAvailable(
-        for model: any TranscriptionModel,
-        audioData: Data,
-        audioFileReadyTask: Task<Void, Error>,
-        latencyTrace: TranscriptionLatencyTrace
-    ) async -> TranscriptionSession? {
-        guard model.provider.isLocalTranscriptionProvider,
-              model.supportsStreaming else {
-            return nil
-        }
-
-        let session = serviceRegistry.createSession(
-            for: model,
-            onPartialTranscript: { [weak self] partial in
-                Task { @MainActor in
-                    self?.partialTranscript = partial
-                }
-            },
-            forceStreaming: true
-        )
-        let callback: ((Data) -> Void)?
-        do {
-            callback = try await session.prepare(model: model)
-        } catch {
-            logger.error("Buffered snapshot streaming prepare failed, falling back to batch: \(error.localizedDescription, privacy: .public)")
-            session.cancel()
-            return nil
-        }
-
-        guard let callback else {
-            session.cancel()
-            return nil
-        }
-
-        if let streamingSession = session as? StreamingTranscriptionSession {
-            streamingSession.setFallbackAudioReadyTask(audioFileReadyTask)
-        }
-
-        emitBufferedSnapshotAudio(audioData, to: callback)
-        logger.notice("Latency trace buffered audio streaming session fed operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s bytes=\(audioData.count, privacy: .public)")
-        return session
-    }
-
-    private func emitBufferedSnapshotAudio(_ audioData: Data, to callback: (Data) -> Void) {
-        var offset = 0
-        while offset < audioData.count {
-            var length = min(Self.bufferedSnapshotStreamingChunkBytes, audioData.count - offset)
-            if length % MemoryLayout<Int16>.size != 0 {
-                length -= 1
-            }
-            guard length > 0 else { break }
-
-            callback(audioData.subdata(in: offset..<(offset + length)))
-            offset += length
         }
     }
 

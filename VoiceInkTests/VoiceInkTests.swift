@@ -8,6 +8,7 @@
 import Testing
 import Foundation
 import SwiftData
+import AppKit
 import Carbon.HIToolbox
 import os
 @testable import VoiceInk
@@ -33,6 +34,37 @@ struct VoiceInkTests {
         #expect(VoiceInkEngine.durationForMono16kPCMData(Data(count: 32_000)) == 1.0)
         #expect(VoiceInkEngine.durationForMono16kPCMData(Data(count: 16_000)) == 0.5)
         #expect(VoiceInkEngine.durationForMono16kPCMData(Data()) == 0)
+    }
+
+    @Test @MainActor func failedPasteCommandDoesNotRestoreOverTranscriptClipboard() async throws {
+        let defaults = UserDefaults.standard
+        let restoreValue = defaults.object(forKey: "restoreClipboardAfterPaste")
+        let restoreDelayValue = defaults.object(forKey: "clipboardRestoreDelay")
+        let pasteboard = NSPasteboard.general
+        let originalClipboard = pasteboard.string(forType: .string)
+        defer {
+            CursorPaster.configurePasteCommandPosterForTesting()
+            restoreDefault(restoreValue, forKey: "restoreClipboardAfterPaste")
+            restoreDefault(restoreDelayValue, forKey: "clipboardRestoreDelay")
+            pasteboard.clearContents()
+            if let originalClipboard {
+                pasteboard.setString(originalClipboard, forType: .string)
+            }
+        }
+
+        defaults.set(true, forKey: "restoreClipboardAfterPaste")
+        defaults.set(0.01, forKey: "clipboardRestoreDelay")
+        pasteboard.clearContents()
+        pasteboard.setString("previous clipboard", forType: .string)
+        CursorPaster.configurePasteCommandPosterForTesting {
+            .commandNotPosted
+        }
+
+        let result = await CursorPaster.pasteAtCursorAndWaitUntilPosted("dictated text")
+        try await Task.sleep(nanoseconds: 350_000_000)
+
+        #expect(result == .commandNotPosted)
+        #expect(pasteboard.string(forType: .string) == "dictated text")
     }
 
     @Test @MainActor func sessionMetricRecorderAcceptsSnapshotModelName() throws {
@@ -1124,5 +1156,13 @@ struct VoiceInkTests {
         ShortcutStore.removeShortcutStorage(for: action)
         defer { ShortcutStore.removeShortcutStorage(for: action) }
         try body()
+    }
+
+    private func restoreDefault(_ value: Any?, forKey key: String) {
+        if let value {
+            UserDefaults.standard.set(value, forKey: key)
+        } else {
+            UserDefaults.standard.removeObject(forKey: key)
+        }
     }
 }

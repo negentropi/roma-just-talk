@@ -114,6 +114,16 @@ struct RollingBufferPreloadPolicyTests {
             .allowsPreload(for: model, perModelEnabled: true))
     }
 
+    @Test func bufferedSnapshotsUseRecordedFileTranscriptionEvenForLocalStreamingModels() {
+        let localStreamingModel = streamingModel(provider: .fluidAudio)
+        let cloudBatchModel = streamingModel(provider: .deepgram)
+        let streamingOnlyModel = streamingModel(provider: .cartesia)
+
+        #expect(RollingBufferBufferedSnapshotTranscriptionPolicy.strategy(for: localStreamingModel) == .recordedFile)
+        #expect(RollingBufferBufferedSnapshotTranscriptionPolicy.strategy(for: cloudBatchModel) == .recordedFile)
+        #expect(RollingBufferBufferedSnapshotTranscriptionPolicy.strategy(for: streamingOnlyModel) == .unavailable)
+    }
+
     @Test func runtimeDiagnosticsKeepLatestQuickReleaseClaim() {
         let diagnostics = RollingBufferPreloadRuntimeDiagnostics()
 

@@ -7,6 +7,7 @@ class CursorPaster {
     fileprivate typealias ClipboardItemSnapshot = [(NSPasteboard.PasteboardType, Data)]
     fileprivate typealias ClipboardSnapshot = [ClipboardItemSnapshot]
     private static let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "CursorPaster")
+    @MainActor private static var pasteCommandPosterForTesting: (() async -> PasteResult)?
 
     struct PreparedPasteContext {
         fileprivate let changeCount: Int
@@ -31,6 +32,11 @@ class CursorPaster {
             }
             _ = await pasteTask.value
         }
+    }
+
+    @MainActor
+    static func configurePasteCommandPosterForTesting(_ poster: (() async -> PasteResult)? = nil) {
+        pasteCommandPosterForTesting = poster
     }
 
     @MainActor
@@ -91,13 +97,15 @@ class CursorPaster {
         }
 
         let pasteResult = await postPasteCommand()
-        if shouldRestoreClipboard {
+        if shouldRestoreClipboard, pasteResult.didPostPasteCommand {
             scheduleClipboardRestore(
                 savedContents,
                 expectedText: text,
                 sessionID: sessionID,
                 on: pasteboard
             )
+        } else if shouldRestoreClipboard {
+            logger.notice("Skipping clipboard restore because paste command was not posted")
         }
 
         return pasteResult
@@ -116,6 +124,10 @@ class CursorPaster {
 
     @MainActor
     private static func postPasteCommand() async -> PasteResult {
+        if let pasteCommandPosterForTesting {
+            return await pasteCommandPosterForTesting()
+        }
+
         if PasteMethod.current() == .appleScript {
             return pasteUsingAppleScript() ? .commandPosted : .commandNotPosted
         } else {

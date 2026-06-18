@@ -213,6 +213,8 @@ final class ProviderAccessRequirementTests: XCTestCase {
         ))
         XCTAssertFalse(VoiceInkProviderKind.voiceInk.supportsModelUse(.transcription))
         XCTAssertFalse(VoiceInkProviderKind.voiceInk.supportsModelUse(.postProcessing))
+        XCTAssertFalse(VoiceInkProviderKind.voiceInk.isSelectable(for: .transcription))
+        XCTAssertFalse(VoiceInkProviderKind.voiceInk.isSelectable(for: .postProcessing))
         XCTAssertEqual(
             VoiceInkProviderKind.availableProviders(for: .transcription) { $0 == .voiceInk },
             []
@@ -221,6 +223,15 @@ final class ProviderAccessRequirementTests: XCTestCase {
             VoiceInkProviderKind.availableProviders(for: .postProcessing) { $0 == .voiceInk },
             []
         )
+    }
+
+    func testProviderSelectabilityKeepsReadinessAndModelSupportSeparate() {
+        XCTAssertTrue(VoiceInkProviderKind.groq.isSelectable(for: .transcription))
+        XCTAssertTrue(VoiceInkProviderKind.groq.isSelectable(for: .postProcessing))
+        XCTAssertTrue(VoiceInkProviderKind.localWhisper.isSelectable(for: .transcription))
+        XCTAssertFalse(VoiceInkProviderKind.localWhisper.isSelectable(for: .postProcessing))
+        XCTAssertFalse(VoiceInkProviderKind.voiceInk.isSelectable(for: .transcription))
+        XCTAssertFalse(VoiceInkProviderKind.voiceInk.isSelectable(for: .postProcessing))
     }
 
     func testAvailableProvidersReturnsEmptyWhenNoProviderIsReady() {

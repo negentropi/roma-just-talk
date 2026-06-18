@@ -29,7 +29,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - transcription prompt preference loading/saving, selected-language local Whisper prompt fallback, and nonblank request prompts for remote/realtime providers
 - post-processing request construction and output filtering
 - post-processing/enhancement failure presentation text and enhancement notification title truncation
-- provider catalog, provider endpoints, API key account names, provider readiness policy, and transcription empty-output policy
+- provider catalog, provider endpoints, API key account names, provider readiness/selectability policy, and transcription empty-output policy
 - provider API-key fallback environment-variable names
 - provider credential nonblank validation for runtime API-key checks
 - provider API-key verification dispatch, including stored-key reference/fallback resolution before verification
@@ -225,7 +225,7 @@ Current iOS consumers of shared remote transport:
 - `iOS/VoiceInk-ios/TranscriptionRetryService.swift` passes the selected transcription language and local Whisper prompt into `VoiceInkTranscriptionRunProcessor`, so runtime transcription input is explicit and the iOS local Whisper adapter does not read app preferences directly.
 - `iOS/VoiceInk-ios/WhisperTranscriptionService.swift` throws `VoiceInkEngineError` from `VoiceInkCore` instead of owning a separate iOS-only local Whisper error enum.
 - Cartesia remains absent from iOS transcription provider selection until an iOS streaming adapter exists; it is not a batch provider.
-- The bundled `VoiceInk` provider case remains decodable, but is hidden from iOS transcription and post-processing selection until a real no-key/bundled-service adapter exists. The sibling clone marked it always available while returning an empty API key, so porting that path would preserve a broken no-key mode.
+- The bundled `VoiceInk` provider case remains decodable and ready as a bundled service, but shared provider selectability keeps it hidden from iOS transcription and post-processing selection until a real no-key/bundled-service adapter exists. The sibling clone marked it always available while returning an empty API key, so porting that path would preserve a broken no-key mode.
 
 Platform shells still own UI, OS permissions, audio capture, paste/keyboard behavior, keychain adapters, local model download storage, SwiftData models, and macOS-only orchestration. iOS-only shell code shared between the app and keyboard extension lives in `iOS/Shared/`, not `VoiceInkCore`; this currently includes App Group recording-state keys, stale-recording expiry policy, Darwin notification names, and the keyboard-to-app deep-link contract.
 

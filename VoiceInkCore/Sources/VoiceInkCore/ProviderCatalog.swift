@@ -394,7 +394,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
         isProviderReady: (VoiceInkProviderKind) -> Bool
     ) -> [VoiceInkProviderKind] {
         allCases.filter { provider in
-            provider.supportsModelUse(use) && isProviderReady(provider)
+            provider.isSelectable(for: use) && isProviderReady(provider)
         }
     }
 
@@ -490,6 +490,15 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
 
     public func supportsModelUse(_ use: VoiceInkProviderModelUse) -> Bool {
         fixedModel(for: use) != nil || !models(for: use).isEmpty
+    }
+
+    public func isSelectable(for use: VoiceInkProviderModelUse) -> Bool {
+        switch accessRequirement {
+        case .bundledService:
+            return false
+        case .userAPIKey, .localWhisperModel:
+            return supportsModelUse(use)
+        }
     }
 
     public func defaultModel(for use: VoiceInkProviderModelUse) -> String? {

@@ -77,10 +77,15 @@ require_command xcrun
 require_command swift
 
 section "single-repo layout"
+git_root="$(git rev-parse --show-toplevel)"
+[[ "$git_root" == "$ROOT" ]] || fail "VoiceInk/ must be the git root; got $git_root"
 [[ -d VoiceInk.xcodeproj ]] || fail "missing macOS VoiceInk.xcodeproj"
 [[ -d iOS/VoiceInk-ios.xcodeproj ]] || fail "missing in-repo iOS project"
 [[ -d VoiceInkCore ]] || fail "missing in-repo VoiceInkCore package"
 [[ ! -d ../VoiceInkCore ]] || fail "parent-level ../VoiceInkCore exists; shared core must live inside VoiceInk/"
+[[ ! -f ../Package.swift ]] || fail "parent-level ../Package.swift exists; shared core must live inside VoiceInk/"
+[[ ! -d ../Sources/VoiceInkCore ]] || fail "parent-level ../Sources/VoiceInkCore exists; shared core must live inside VoiceInk/"
+[[ ! -d ../Tests/VoiceInkCoreTests ]] || fail "parent-level ../Tests/VoiceInkCoreTests exists; shared core tests must live inside VoiceInk/"
 
 section "iOS ported assets and resources"
 require_file iOS/VoiceInk-ios/PrivacyInfo.xcprivacy

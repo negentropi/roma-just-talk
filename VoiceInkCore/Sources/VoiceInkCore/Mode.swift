@@ -19,6 +19,12 @@ public enum VoiceInkModeSelectionPresentation: Equatable, Sendable {
     case picker
 }
 
+public struct VoiceInkModeSummaryPresentation: Equatable, Sendable {
+    public let title: String
+    public let transcriptionText: String
+    public let postProcessingText: String?
+}
+
 public struct Mode: Identifiable, Codable {
     public let id: UUID
     public var name: String
@@ -64,6 +70,16 @@ public struct Mode: Identifiable, Codable {
 
     public var effectivePostProcessingModel: String {
         postProcessingProvider.selectedModel(postProcessingModel, for: .postProcessing)
+    }
+
+    public var summaryPresentation: VoiceInkModeSummaryPresentation {
+        VoiceInkModeSummaryPresentation(
+            title: name,
+            transcriptionText: "Transcription: \(effectiveTranscriptionModel)",
+            postProcessingText: isPostProcessingEnabled
+                ? "Post-processing: \(effectivePostProcessingModel)"
+                : nil
+        )
     }
 
     public mutating func selectTranscriptionProvider(_ provider: VoiceInkProviderKind) {

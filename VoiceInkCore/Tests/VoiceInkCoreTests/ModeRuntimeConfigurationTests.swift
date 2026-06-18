@@ -259,6 +259,38 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
         XCTAssertEqual([local, cloud].modeSelectionPresentation, .picker)
     }
 
+    func testModeSummaryPresentationUsesEffectiveModelNames() {
+        let mode = Mode(
+            name: "Cloud",
+            transcriptionProvider: .deepgram,
+            transcriptionModel: "stale-transcription-model",
+            isPostProcessingEnabled: true,
+            postProcessingProvider: .gemini,
+            postProcessingModel: "stale-post-processing-model"
+        )
+
+        XCTAssertEqual(mode.summaryPresentation.title, "Cloud")
+        XCTAssertEqual(
+            mode.summaryPresentation.transcriptionText,
+            "Transcription: \(VoiceInkProviderKind.deepgram.defaultModel(for: .transcription) ?? "")"
+        )
+        XCTAssertEqual(
+            mode.summaryPresentation.postProcessingText,
+            "Post-processing: \(VoiceInkProviderKind.gemini.defaultModel(for: .postProcessing) ?? "")"
+        )
+    }
+
+    func testModeSummaryPresentationHidesDisabledPostProcessing() {
+        let mode = Mode.defaultLocalWhisper(name: "Local")
+
+        XCTAssertEqual(mode.summaryPresentation.title, "Local")
+        XCTAssertEqual(
+            mode.summaryPresentation.transcriptionText,
+            "Transcription: \(VoiceInkTranscriptionModelCatalog.localBaseModel)"
+        )
+        XCTAssertNil(mode.summaryPresentation.postProcessingText)
+    }
+
     func testModeDraftValidationRequiresName() {
         XCTAssertFalse(Mode(name: "").isSaveableDraft(
             availableTranscriptionProviders: [.groq],

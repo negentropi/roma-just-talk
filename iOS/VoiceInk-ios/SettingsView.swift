@@ -311,19 +311,21 @@ private struct ModeRowView: View {
     let mode: Mode
 
     var body: some View {
+        let presentation = mode.summaryPresentation
+
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 6) {
-                Text(mode.name)
+                Text(presentation.title)
                     .font(.headline)
                     .foregroundStyle(.primary)
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Transcription: \(mode.effectiveTranscriptionModel)")
+                    Text(presentation.transcriptionText)
                         .font(.caption)
                         .foregroundStyle(.secondary)
 
-                    if mode.isPostProcessingEnabled {
-                        Text("Post-processing: \(mode.effectivePostProcessingModel)")
+                    if let postProcessingText = presentation.postProcessingText {
+                        Text(postProcessingText)
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }

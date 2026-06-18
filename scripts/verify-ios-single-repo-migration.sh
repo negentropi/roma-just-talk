@@ -351,6 +351,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/Mode.swift
 
 require_pattern \
+  "shared mode summary presentation lives in VoiceInkCore" \
+  'VoiceInkModeSummaryPresentation|summaryPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/Mode.swift
+
+require_pattern \
   "iOS recording sheet uses shared mode selection presentation adapter" \
   'VoiceInkModeSelectionControlView' \
   iOS/VoiceInk-ios/RecordingSheetView.swift
@@ -365,11 +370,21 @@ require_pattern \
   'modeSelectionPresentation' \
   iOS/VoiceInk-ios/RecordingSheetView.swift
 
+require_pattern \
+  "iOS settings mode rows use shared summary presentation" \
+  'summaryPresentation' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
 reject_pattern \
   "iOS mode selection views avoid shell-only mode-count picker branching" \
   'modes\.count > 1|settings\.modes\.count > 1|modes\.first|settings\.modes\.first|!settings\.modes\.isEmpty' \
   iOS/VoiceInk-ios/RecordingSheetView.swift \
   iOS/VoiceInk-ios/NoteDetailView.swift
+
+reject_pattern \
+  "iOS settings mode rows avoid shell-only model summary formatting" \
+  'Transcription: |Post-processing: |effectiveTranscriptionModel|effectivePostProcessingModel' \
+  iOS/VoiceInk-ios/SettingsView.swift
 
 reject_pattern \
   "iOS recording views avoid shell-only recording alert copy and OSStatus mapping" \

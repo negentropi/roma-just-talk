@@ -664,6 +664,12 @@ reject_pattern \
   VoiceInk/Models/Transcription.swift \
   iOS/VoiceInk-ios/VoiceInk-ios/Transcription.swift
 
+reject_pattern \
+  "macOS metrics avoid shell-only shared performance analysis wrapper" \
+  '(^|[^A-Za-z0-9_])PerformanceAnalyzer\.analyze|static func +analyze\(transcriptions:' \
+  VoiceInk/Views/Metrics/PerformanceAnalysisView.swift \
+  VoiceInk/Views/Metrics/PerformanceAnalysisPanelView.swift
+
 require_pattern \
   "workspace includes iOS project" \
   'location = "group:iOS/VoiceInk-ios.xcodeproj"' \

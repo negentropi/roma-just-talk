@@ -9,10 +9,6 @@ enum PanelMode {
 }
 
 struct PerformanceAnalyzer {
-    static func analyze(transcriptions: [Transcription]) -> VoiceInkPerformanceAnalysis {
-        VoiceInkPerformanceAnalyzer.analyze(records: transcriptions)
-    }
-
     static func getMacModel() -> String {
         var size = 0
         sysctlbyname("hw.model", nil, &size, nil, 0)

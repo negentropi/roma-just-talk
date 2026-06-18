@@ -10,7 +10,7 @@ struct PerformanceAnalysisPanelView: View {
     init(transcriptions: [Transcription], onClose: @escaping () -> Void) {
         self.transcriptions = transcriptions
         self.onClose = onClose
-        self.analysis = PerformanceAnalyzer.analyze(transcriptions: transcriptions)
+        self.analysis = VoiceInkPerformanceAnalyzer.analyze(records: transcriptions)
     }
 
     var body: some View {

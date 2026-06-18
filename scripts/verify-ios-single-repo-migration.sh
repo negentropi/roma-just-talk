@@ -358,6 +358,11 @@ require_pattern \
   'VoiceInkPCM16Audio\.floatSamples\(fromWAVFileAt:' \
   VoiceInk/Transcription/Whisper/WhisperTranscriptionService.swift
 
+reject_pattern \
+  "macOS local Whisper avoids shell-only PCM16 sample wrapper" \
+  'private +func +readAudioSamples\(' \
+  VoiceInk/Transcription/Whisper/WhisperTranscriptionService.swift
+
 require_pattern \
   "iOS local Whisper reads samples through shared PCM16 policy" \
   'VoiceInkPCM16Audio\.floatSamples\(fromWAVFileAt:' \
@@ -367,6 +372,16 @@ reject_pattern \
   "iOS local Whisper uses shared engine errors for audio processing failures" \
   'NSError|Invalid WAV file - too small' \
   iOS/VoiceInk-ios/WhisperTranscriptionService.swift
+
+require_pattern \
+  "macOS quick-release duration uses shared PCM16 policy" \
+  'VoiceInkPCM16Audio\.duration\(forMono16kData:' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+
+reject_pattern \
+  "macOS quick-release avoids shell-only PCM16 duration wrapper" \
+  'durationForMono16kPCMData' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift
 
 reject_pattern \
   "macOS and iOS model downloads use shared HTTP response policy" \

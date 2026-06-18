@@ -142,23 +142,18 @@ public struct VoiceInkTranscriptionRunProcessor {
             throw VoiceInkTranscriptionRunError.noTranscriptionReturned
         }
 
-        let filteredText = cleanupConfiguration.filterRawOutput(
+        let preparedRunText = VoiceInkTranscriptionRunPreparation.prepareRawText(
             rawText,
-            whitespacePolicy: .preserveParagraphs
-        )
-        let preparedText = cleanupConfiguration.prepareFilteredText(
-            filteredText,
+            cleanupConfiguration: cleanupConfiguration,
+            whitespacePolicy: .preserveParagraphs,
             normalizeParagraphSpacingBeforeFormatting: true,
             applyingWordReplacements: wordReplacement
         )
-        let cleanedText = preparedText.cleanedText
-        let shouldSkipPostProcessing = postProcessingSkipConfiguration.map {
-            VoiceInkPostProcessingSkipPolicy.shouldSkipPostProcessing(
-                transcript: cleanedText,
-                configuration: $0,
-                promptTriggerForcesPostProcessing: promptTriggerForcesPostProcessing
-            )
-        } ?? false
+        let cleanedText = preparedRunText.cleanedText
+        let shouldSkipPostProcessing = preparedRunText.shouldSkipPostProcessing(
+            configuration: postProcessingSkipConfiguration,
+            promptTriggerForcesPostProcessing: promptTriggerForcesPostProcessing
+        )
         let aiEnhancementModelName = configuration.isPostProcessingEnabled && !shouldSkipPostProcessing
             ? configuration.postProcessingModel
             : nil

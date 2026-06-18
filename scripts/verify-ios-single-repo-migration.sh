@@ -370,6 +370,33 @@ reject_pattern \
   iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \
+  "shared run processor uses shared transcription run preparation" \
+  'VoiceInkTranscriptionRunPreparation\.prepareRawText' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift
+
+require_pattern \
+  "macOS live recording uses shared transcription run preparation" \
+  'VoiceInkTranscriptionRunPreparation\.prepareFilteredText' \
+  VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
+
+require_pattern \
+  "macOS audio-file import uses shared transcription run preparation" \
+  'VoiceInkTranscriptionRunPreparation\.prepareFilteredText' \
+  VoiceInk/Services/AudioFileTranscriptionManager.swift
+
+require_pattern \
+  "macOS retry transcription uses shared transcription run preparation" \
+  'VoiceInkTranscriptionRunPreparation\.prepareFilteredText' \
+  VoiceInk/Services/AudioFileTranscriptionService.swift
+
+reject_pattern \
+  "macOS transcription run callers use shared post-processing skip decision" \
+  'VoiceInkPostProcessingSkipPolicy\.shouldSkipPostProcessing' \
+  VoiceInk/Transcription/Engine/TranscriptionPipeline.swift \
+  VoiceInk/Services/AudioFileTranscriptionManager.swift \
+  VoiceInk/Services/AudioFileTranscriptionService.swift
+
+require_pattern \
   "macOS filler-word add button uses shared draft policy" \
   'VoiceInkFillerWords\.hasDraft\(newWord\)' \
   VoiceInk/Views/Components/FillerWordsSettingsView.swift

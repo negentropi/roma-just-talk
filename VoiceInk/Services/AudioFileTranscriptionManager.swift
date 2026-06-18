@@ -163,17 +163,19 @@ class AudioTranscriptionManager: ObservableObject {
             let powerModeName = (activePowerModeConfig?.isEnabled == true) ? activePowerModeConfig?.name : nil
             let powerModeEmoji = (activePowerModeConfig?.isEnabled == true) ? activePowerModeConfig?.emoji : nil
 
-            let preparedText = cleanupConfiguration.prepareFilteredText(text) { text in
+            let preparedRunText = VoiceInkTranscriptionRunPreparation.prepareFilteredText(
+                text,
+                cleanupConfiguration: cleanupConfiguration
+            ) { text in
                 WordReplacementService.shared.applyReplacements(to: text, using: modelContext)
             }
-            text = preparedText.wordReplacedText
-            let cleanedText = preparedText.cleanedText
+            text = preparedRunText.wordReplacedText
+            let cleanedText = preparedRunText.cleanedText
             try Task.checkCancellation()
 
-            let shouldSkipEnhancement = VoiceInkPostProcessingSkipPolicy.shouldSkipPostProcessing(
-                transcript: text,
+            let shouldSkipEnhancement = preparedRunText.shouldSkipPostProcessing(
                 configuration: VoiceInkPostProcessingSkipConfiguration.current(),
-                promptTriggerForcesPostProcessing: false
+                transcriptRole: .wordReplacedText
             )
 
             // Handle enhancement if enabled

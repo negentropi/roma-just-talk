@@ -40,12 +40,15 @@ class AudioTranscriptionService {
             let powerModeName = (activePowerModeConfig?.isEnabled == true) ? activePowerModeConfig?.name : nil
             let powerModeEmoji = (activePowerModeConfig?.isEnabled == true) ? activePowerModeConfig?.emoji : nil
 
-            let preparedText = cleanupConfiguration.prepareFilteredText(text) { text in
+            let preparedRunText = VoiceInkTranscriptionRunPreparation.prepareFilteredText(
+                text,
+                cleanupConfiguration: cleanupConfiguration
+            ) { text in
                 WordReplacementService.shared.applyReplacements(to: text, using: modelContext)
             }
-            text = preparedText.wordReplacedText
+            text = preparedRunText.wordReplacedText
             logger.notice("✅ Word replacements applied")
-            let cleanedText = preparedText.cleanedText
+            let cleanedText = preparedRunText.cleanedText
 
             let audioAsset = AVURLAsset(url: url)
             let duration = CMTimeGetSeconds(try await audioAsset.load(.duration))
@@ -83,10 +86,10 @@ class AudioTranscriptionService {
                 }
             }
 
-            let shouldSkipEnhancement = VoiceInkPostProcessingSkipPolicy.shouldSkipPostProcessing(
-                transcript: text,
+            let shouldSkipEnhancement = preparedRunText.shouldSkipPostProcessing(
                 configuration: VoiceInkPostProcessingSkipConfiguration.current(),
-                promptTriggerForcesPostProcessing: promptDetectionResult?.shouldEnableAI == true
+                promptTriggerForcesPostProcessing: promptDetectionResult?.shouldEnableAI == true,
+                transcriptRole: .wordReplacedText
             )
 
             // Apply AI enhancement if enabled

@@ -198,11 +198,14 @@ class TranscriptionPipeline {
 
             if shouldCancel() { await finishCanceledTranscription(); return nil }
 
-            let preparedText = cleanupConfiguration.prepareFilteredText(text) { text in
+            let preparedRunText = VoiceInkTranscriptionRunPreparation.prepareFilteredText(
+                text,
+                cleanupConfiguration: cleanupConfiguration
+            ) { text in
                 WordReplacementService.shared.applyReplacements(to: text, using: modelContext)
             }
-            text = preparedText.wordReplacedText
-            let cleanedText = preparedText.cleanedText
+            text = preparedRunText.wordReplacedText
+            let cleanedText = preparedRunText.cleanedText
 
             transcription.text = cleanedText
             transcription.transcriptionModelName = model.displayName
@@ -217,10 +220,10 @@ class TranscriptionPipeline {
                 enhancementService.applyPromptDetectionResult(detectionResult)
             }
 
-            let shouldSkipEnhancement = VoiceInkPostProcessingSkipPolicy.shouldSkipPostProcessing(
-                transcript: text,
+            let shouldSkipEnhancement = preparedRunText.shouldSkipPostProcessing(
                 configuration: VoiceInkPostProcessingSkipConfiguration.current(),
-                promptTriggerForcesPostProcessing: promptDetectionResult?.shouldEnableAI == true
+                promptTriggerForcesPostProcessing: promptDetectionResult?.shouldEnableAI == true,
+                transcriptRole: .wordReplacedText
             )
 
             if let enhancementService,

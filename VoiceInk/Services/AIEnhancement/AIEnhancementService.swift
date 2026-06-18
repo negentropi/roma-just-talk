@@ -470,7 +470,6 @@ class AIEnhancementService: ObservableObject {
 
 enum EnhancementError: Error {
     case notConfigured
-    case invalidResponse
     case enhancementFailed
     case networkError
     case serverError
@@ -484,8 +483,6 @@ extension EnhancementError: LocalizedError {
         switch self {
         case .notConfigured:
             return "AI provider not configured. Please check your API key."
-        case .invalidResponse:
-            return "Invalid response from AI provider."
         case .enhancementFailed:
             return "AI enhancement failed to process the text."
         case .networkError:

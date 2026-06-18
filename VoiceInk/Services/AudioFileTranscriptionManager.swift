@@ -259,14 +259,11 @@ class AudioTranscriptionManager: ObservableObject {
 
 enum TranscriptionError: Error, LocalizedError {
     case noModelSelected
-    case transcriptionCancelled
 
     var errorDescription: String? {
         switch self {
         case .noModelSelected:
             return "No transcription model selected"
-        case .transcriptionCancelled:
-            return "Transcription was cancelled"
         }
     }
 }

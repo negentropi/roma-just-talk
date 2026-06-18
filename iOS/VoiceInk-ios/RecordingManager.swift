@@ -196,12 +196,6 @@ final class RecordingManager: ObservableObject {
     
     // MARK: - Transcription
     private func transcribeInBackground(note: Transcription, modelContext: ModelContext) {
-        guard let fileURL = note.existingAudioFileURL() else {
-            note.markTranscriptionFailed(VoiceInkErrorDescription.text(for: VoiceInkEngineError.audioFileNotFound))
-            try? modelContext.save()
-            return
-        }
-
         Task {
             defer { 
                 // Clean up recorder state
@@ -209,20 +203,15 @@ final class RecordingManager: ObservableObject {
             }
 
             do {
-                let result = try await TranscriptionRetryService.shared.transcribe(fileURL: fileURL)
-                
-                // Update the existing note on main thread
-                await MainActor.run {
-                    note.applyCompletedRunResult(result)
-                    try? modelContext.save()
+                _ = try await note.retranscribeStoredAudio { fileURL in
+                    try await TranscriptionRetryService.shared.transcribe(fileURL: fileURL)
                 }
-                
             } catch {
-                // Update note with error on main thread
-                await MainActor.run {
-                    note.markTranscriptionFailed(VoiceInkErrorDescription.text(for: error))
-                    try? modelContext.save()
-                }
+                // Failure state is already applied by the shared record helper.
+            }
+
+            await MainActor.run {
+                try? modelContext.save()
             }
         }
     }

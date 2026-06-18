@@ -2,9 +2,7 @@ import Foundation
 import LLMkit
 import VoiceInkCore
 
-typealias AIProvider = VoiceInkAIEnhancementProviderKind
-
-extension AIProvider {
+extension VoiceInkAIEnhancementProviderKind {
     var baseURL: String {
         if let corePostProcessingURL = aiModelProvider?.postProcessingRequestURL {
             return corePostProcessingURL.absoluteString
@@ -71,7 +69,7 @@ class AIService: ObservableObject {
             VoiceInkDynamicAIProviderPreference.saveCustomProviderModel(customModel, to: userDefaults)
         }
     }
-    @Published var selectedProvider: AIProvider {
+    @Published var selectedProvider: VoiceInkAIEnhancementProviderKind {
         didSet {
             VoiceInkAIEnhancementProviderPreference.saveSelectedProviderRawValue(
                 selectedProvider.rawValue,
@@ -99,15 +97,15 @@ class AIService: ObservableObject {
         }
     }
     
-    @Published private var selectedModels: [AIProvider: String] = [:]
+    @Published private var selectedModels: [VoiceInkAIEnhancementProviderKind: String] = [:]
     private let userDefaults = UserDefaults.standard
     private lazy var ollamaService = OllamaService()
     private lazy var localCLIService = LocalCLIService()
     
     @Published private var openRouterModels: [String] = []
     
-    var connectedProviders: [AIProvider] {
-        AIProvider.connectedTextEnhancementProviders(
+    var connectedProviders: [VoiceInkAIEnhancementProviderKind] {
+        VoiceInkAIEnhancementProviderKind.connectedTextEnhancementProviders(
             hasUserAPIKey: { APIKeyManager.shared.hasAPIKey(forProvider: $0.rawValue) },
             isOllamaConnected: ollamaService.isConnected,
             isLocalCLIConfigured: localCLIService.isConfigured
@@ -138,7 +136,7 @@ class AIService: ObservableObject {
         localCLIService.timeoutSeconds
     }
 
-    func availableModels(for provider: AIProvider) -> [String] {
+    func availableModels(for provider: VoiceInkAIEnhancementProviderKind) -> [String] {
         if provider == .ollama {
             return ollamaService.availableModels.map { $0.name }
         } else if provider == .openRouter {
@@ -167,7 +165,7 @@ class AIService: ObservableObject {
     }
     
     private func loadSavedModelSelections() {
-        for provider in AIProvider.allCases {
+        for provider in VoiceInkAIEnhancementProviderKind.allCases {
             if let savedModel = VoiceInkAIEnhancementProviderPreference.selectedModel(
                 for: provider.rawValue,
                 from: userDefaults

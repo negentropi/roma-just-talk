@@ -136,7 +136,7 @@ class PowerModeSessionManager {
                 }
 
                 if let aiService = enhancementService.getAIService() {
-                    if let providerName = config.selectedAIProvider, let provider = AIProvider(storedValue: providerName) {
+                    if let providerName = config.selectedAIProvider, let provider = VoiceInkAIEnhancementProviderKind(storedValue: providerName) {
                         aiService.selectedProvider = provider
                     }
                     if let model = config.selectedAIModel {
@@ -175,7 +175,7 @@ class PowerModeSessionManager {
             enhancementService.selectedPromptId = state.selectedPromptId.flatMap(UUID.init)
 
             if let aiService = enhancementService.getAIService() {
-                if let providerName = state.selectedAIProvider, let provider = AIProvider(storedValue: providerName) {
+                if let providerName = state.selectedAIProvider, let provider = VoiceInkAIEnhancementProviderKind(storedValue: providerName) {
                     aiService.selectedProvider = provider
                 }
                 if let model = state.selectedAIModel {

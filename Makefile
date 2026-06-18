@@ -4,9 +4,15 @@ WHISPER_CPP_DIR := $(DEPS_DIR)/whisper.cpp
 FRAMEWORK_PATH := $(WHISPER_CPP_DIR)/build-apple/whisper.xcframework
 LOCAL_DERIVED_DATA := $(CURDIR)/.local-build
 LOCAL_APP_DEST := $(HOME)/Applications/roma just talk.app
+LATENCY_HARNESS := $(LOCAL_DERIVED_DATA)/Tools/VisibleTextLatencyHarness
+LATENCY_HARNESS_SOURCE := Tools/VisibleTextLatencyHarness/VisibleTextLatencyHarness.swift
 CONFIGURATION ?= Debug
+LATENCY_EXPECTED ?=
+LATENCY_SAMPLES ?= 5
+LATENCY_TRIGGER ?= left-shift
+LATENCY_THRESHOLD_MS ?= 440
 
-.PHONY: all clean whisper setup build local check healthcheck help dev run
+.PHONY: all clean whisper setup build local check healthcheck help dev run latency-harness-build latency-harness-run
 
 # Default target
 all: check build
@@ -23,6 +29,25 @@ check:
 	@echo "Prerequisites OK"
 
 healthcheck: check
+
+latency-harness-build:
+	@mkdir -p "$(dir $(LATENCY_HARNESS))"
+	swiftc "$(LATENCY_HARNESS_SOURCE)" \
+		-framework AppKit \
+		-framework ApplicationServices \
+		-o "$(LATENCY_HARNESS)"
+
+latency-harness-run: latency-harness-build
+	@if [ -z "$(LATENCY_EXPECTED)" ]; then \
+		echo "Set LATENCY_EXPECTED to a unique transcript marker."; \
+		echo "Example: make latency-harness-run LATENCY_EXPECTED='roma latency marker'"; \
+		exit 2; \
+	fi
+	"$(LATENCY_HARNESS)" \
+		--expected "$(LATENCY_EXPECTED)" \
+		--samples "$(LATENCY_SAMPLES)" \
+		--trigger "$(LATENCY_TRIGGER)" \
+		--threshold-ms "$(LATENCY_THRESHOLD_MS)"
 
 # Build process
 whisper:
@@ -114,5 +139,7 @@ help:
 	@echo "  run                Launch the built VoiceInk app"
 	@echo "  dev                Build and run the app (for development)"
 	@echo "  all                Run full build process (default)"
+	@echo "  latency-harness-build  Compile real visible-text latency harness"
+	@echo "  latency-harness-run    Run opt-in real app latency samples; set LATENCY_EXPECTED"
 	@echo "  clean              Remove build artifacts"
 	@echo "  help               Show this help message"

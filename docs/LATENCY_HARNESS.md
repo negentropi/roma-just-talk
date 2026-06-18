@@ -1,0 +1,69 @@
+# Visible Text Latency Harness
+
+This harness measures the real delay from the observed Roma hotkey release to the
+expected transcript becoming visible in the currently focused macOS text field.
+It is intentionally separate from normal CI because it needs a logged-in GUI
+session, Accessibility permission for the terminal, a running Roma build, and a
+real target app such as TextEdit, Notes, Safari, Slack, or Zed.
+
+## Build
+
+```bash
+make latency-harness-build
+```
+
+The binary is written to `.local-build/Tools/VisibleTextLatencyHarness`.
+
+## Run
+
+1. Grant Accessibility permission to the terminal app you run the harness from.
+2. Start the Roma build being tested.
+3. Focus a text field in the target app.
+4. Use a unique phrase for `LATENCY_EXPECTED`, then dictate that exact phrase.
+
+```bash
+make latency-harness-run LATENCY_EXPECTED="roma latency marker" LATENCY_SAMPLES=10
+```
+
+Default trigger is `left-shift`, matching the common modifier-only shortcut.
+Override it when testing another shortcut:
+
+```bash
+make latency-harness-run \
+  LATENCY_EXPECTED="roma latency marker" \
+  LATENCY_TRIGGER=right-command \
+  LATENCY_SAMPLES=10
+```
+
+Supported triggers:
+
+- `left-shift`
+- `right-shift`
+- `left-command`
+- `right-command`
+- `left-option`
+- `right-option`
+- `left-control`
+- `right-control`
+- `key-code:<number>`
+- `any-key-up`
+
+## Pass Criteria
+
+The harness fails when any sample does not make the expected text visible before
+the timeout, or when p95 visible-text latency exceeds `440ms`. Samples at or
+below `220ms` are labeled `BEST`.
+
+If the expected text reaches the clipboard but not the focused text field before
+timeout, the result is classified as a paste-target failure.
+
+## JSON Output
+
+For machine-readable reports:
+
+```bash
+.local-build/Tools/VisibleTextLatencyHarness \
+  --expected "roma latency marker" \
+  --samples 10 \
+  --json-output /tmp/roma-visible-latency.json
+```

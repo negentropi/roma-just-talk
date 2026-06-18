@@ -2,6 +2,7 @@
 
 ## v1.96 - Unreleased
 
+- Added an opt-in visible-text latency harness for measuring real hotkey-release-to-target-text timing in everyday macOS apps.
 - Kept the dictated text on the clipboard when the paste command cannot be posted, so failed target-app pastes do not immediately restore over the transcript.
 - Kept buffered-snapshot quick releases on the recorded-file transcription path instead of starting a fresh streaming session after key-up, removing a measured post-key-up startup wait before text can paste.
 - Preserved existing shortcut settings when shortcut recording is canceled, rejected, interrupted by another recorder, or dismissed before a replacement is captured.

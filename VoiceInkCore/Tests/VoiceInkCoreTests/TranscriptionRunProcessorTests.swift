@@ -182,6 +182,24 @@ final class TranscriptionRunProcessorTests: XCTestCase {
         XCTAssertEqual(service.capturedPrompt, "spell Roma as Roma")
     }
 
+    func testTranscribeDropsTranscriptionPromptForUnsupportedProvider() async throws {
+        let service = CapturingTranscriptionService(text: "roma")
+        let processor = VoiceInkTranscriptionRunProcessor { _ in
+            XCTFail("Post-processing should not run")
+            return "unexpected"
+        }
+
+        _ = try await processor.transcribe(
+            fileURL: URL(fileURLWithPath: "/tmp/audio.wav"),
+            configuration: configuration(transcriptionProvider: .deepgram, isPostProcessingEnabled: false),
+            transcriptionPrompt: "ignored",
+            apiKeyProvider: { _ in "key" },
+            transcriptionServiceProvider: { _ in service }
+        )
+
+        XCTAssertNil(service.capturedPrompt)
+    }
+
     func testTranscribePassesNormalizedCustomVocabularyToTranscriptionService() async throws {
         let service = CapturingTranscriptionService(text: "roma")
         let processor = VoiceInkTranscriptionRunProcessor { _ in

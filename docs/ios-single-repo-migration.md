@@ -26,7 +26,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - prompt templates and prompt text
 - predefined prompt IDs, labels, prompt text, icons, descriptions, and system-instruction flags
 - custom prompt system-instruction wrapping
-- transcription prompt preference loading/saving, selected-language local Whisper prompt fallback, and nonblank request prompts for remote/realtime providers
+- transcription prompt preference loading/saving, selected-language local Whisper prompt fallback, and provider/use-specific request prompts for recorded-file, streaming, local, and direct transcription
 - post-processing request construction and output filtering
 - post-processing/enhancement failure presentation text and enhancement notification title truncation
 - AI-enhancement error vocabulary, user-facing descriptions, HTTP status classification, Foundation transport-network classification, and retry/backoff decision policy; platform shells still own provider transport, provider-specific error mapping, sleep timing, and logging
@@ -114,7 +114,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - audio-meter decibel normalization, smoothing math, and bounded visualizer history; platform shells still own capture, timers, and visualizer rendering
 - audio playback timeline progress, waveform sample progress, and clamped seek-time math; platform shells still own `AVAudioPlayer`, gestures, hover state, and playback UI
 - OpenAI-compatible, Deepgram, Gemini, Mistral, ElevenLabs, xAI, Soniox, Speechmatics, and AssemblyAI remote transcription request/client helpers
-- shared remote transcription provider dispatch plus batch request option defaults for provider-specific prompt, vocabulary, timeout, retry, and formatting parameters
+- shared remote transcription provider dispatch plus batch request option defaults for provider/use-specific prompt, vocabulary, timeout, retry, and formatting parameters
 - Cartesia API-key verification request/client helper
 - shared multipart form-data construction for remote transcription clients
 - shared retried upload helper for multipart remote transcription clients
@@ -122,7 +122,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 Current macOS consumers of shared remote transport:
 
 - macOS batch cloud transcription uses `CloudProvider` default dispatch into `VoiceInkRemoteTranscriptionService` for Groq, Deepgram, Gemini, Mistral, ElevenLabs, xAI, Soniox, Speechmatics, and AssemblyAI; `CloudProviderRegistry` now maps shared provider identity to macOS streaming factories, and empty-response policy comes from `VoiceInkProviderKind`.
-- `VoiceInkRemoteTranscriptionService` and `VoiceInkRemoteTranscriptionOptions.batchDefaults` preserve macOS provider-specific batch options such as Groq JSON/temperature/retry settings, Deepgram paragraph/timeout settings, and vocabulary/prompt forwarding for providers that already used them.
+- `VoiceInkRemoteTranscriptionService` and `VoiceInkRemoteTranscriptionOptions.batchDefaults` preserve macOS provider-specific batch options such as Groq JSON/temperature/retry settings, Deepgram paragraph/timeout settings, and prompt/vocabulary forwarding for providers that already used them.
 - Custom OpenAI-compatible batch transcription uses `VoiceInkOpenAICompatibleTranscriptionClient`.
 - Cartesia API-key verification uses `VoiceInkProviderAPIKeyVerifier` through `VoiceInkTranscriptionModelProvider`; Cartesia transcription remains streaming-only in platform shell code.
 - MacOS cloud-provider API-key verification uses `VoiceInkProviderAPIKeyDraft` and stored-key verification through `VoiceInkProviderAPIKeyVerifier`, including transcription-model providers such as Cartesia; provider-specific streaming adapters still own transcription execution.

@@ -440,6 +440,26 @@ reject_pattern \
   VoiceInk/Transcription/Streaming/SpeechmaticsStreamingProvider.swift
 
 require_pattern \
+  "shared remote transcription options use shared prompt use policy" \
+  'VoiceInkTranscriptionPromptUse\.recordedFileTranscription' \
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
+
+require_pattern \
+  "shared run processor uses shared prompt use policy" \
+  'VoiceInkTranscriptionPromptUse\.recordedFileTranscription' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift
+
+require_pattern \
+  "macOS AssemblyAI streaming uses shared prompt use policy" \
+  'VoiceInkTranscriptionPromptUse\.streamingTranscription\(\.assemblyAI\)' \
+  VoiceInk/Transcription/Streaming/AssemblyAIStreamingProvider.swift
+
+reject_pattern \
+  "macOS AssemblyAI streaming avoids raw request-prompt forwarding" \
+  'prompt: VoiceInkTranscriptionPromptPreference\.requestPrompt\(\)' \
+  VoiceInk/Transcription/Streaming/AssemblyAIStreamingProvider.swift
+
+require_pattern \
   "macOS Deepgram streaming uses shared vocabulary use policy" \
   'VoiceInkCustomVocabularyUse\.streamingTranscription\(\.deepgram\)|\.streamingTranscription\(\.deepgram\)' \
   VoiceInk/Transcription/Streaming/DeepgramStreamingProvider.swift

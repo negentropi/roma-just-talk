@@ -138,7 +138,7 @@ public struct VoiceInkTranscriptionRunProcessor {
             model: model,
             fileURL: fileURL,
             language: VoiceInkTranscriptionLanguageSupport.requestLanguage(transcriptionLanguage),
-            prompt: transcriptionPrompt,
+            prompt: VoiceInkTranscriptionPromptUse.recordedFileTranscription(provider).requestPrompt(transcriptionPrompt),
             customVocabulary: VoiceInkCustomVocabularyTerms.normalized(
                 customVocabulary,
                 for: .batchTranscription(provider)

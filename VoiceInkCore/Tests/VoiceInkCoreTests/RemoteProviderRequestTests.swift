@@ -235,7 +235,11 @@ final class RemoteProviderRequestTests: XCTestCase {
         XCTAssertNil(openAI.openAICompatibleTemperature)
         XCTAssertNil(openAI.openAICompatibleTimeout)
 
-        let deepgram = VoiceInkRemoteTranscriptionOptions.batchDefaults(for: .deepgram)
+        let deepgram = VoiceInkRemoteTranscriptionOptions.batchDefaults(
+            for: .deepgram,
+            prompt: "ignored"
+        )
+        XCTAssertNil(deepgram.prompt)
         XCTAssertEqual(deepgram.deepgramParagraphs, true)
         XCTAssertNil(deepgram.deepgramDiarize)
         XCTAssertEqual(deepgram.deepgramTimeout, 30)

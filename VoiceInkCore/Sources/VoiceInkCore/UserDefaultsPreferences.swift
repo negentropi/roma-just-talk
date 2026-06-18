@@ -239,8 +239,7 @@ public enum VoiceInkTranscriptionPromptPreference {
     }
 
     public static func requestPrompt(_ prompt: String?) -> String? {
-        guard let prompt else { return nil }
-        return prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : prompt
+        VoiceInkTranscriptionPromptUse.nonBlankRequestPrompt(prompt)
     }
 
     public static func savePrompt(_ prompt: String, to defaults: UserDefaults = .standard) {

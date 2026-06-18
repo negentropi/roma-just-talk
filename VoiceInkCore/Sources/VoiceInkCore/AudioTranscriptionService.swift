@@ -52,6 +52,9 @@ public struct VoiceInkRemoteTranscriptionOptions: Equatable, Sendable {
         prompt: String? = nil,
         customVocabulary: [String] = []
     ) -> Self {
+        let requestPrompt = provider.providerKind.map {
+            VoiceInkTranscriptionPromptUse.recordedFileTranscription($0).requestPrompt(prompt)
+        } ?? nil
         let normalizedCustomVocabulary = provider.providerKind.map {
             VoiceInkCustomVocabularyTerms.normalized(customVocabulary, for: .batchTranscription($0))
         } ?? []
@@ -59,7 +62,7 @@ public struct VoiceInkRemoteTranscriptionOptions: Equatable, Sendable {
         switch provider {
         case .groq:
             return Self(
-                prompt: prompt,
+                prompt: requestPrompt,
                 openAICompatibleResponseFormat: "json",
                 openAICompatibleTemperature: "0",
                 openAICompatibleErrorDomain: "GroqAPI",
@@ -67,7 +70,7 @@ public struct VoiceInkRemoteTranscriptionOptions: Equatable, Sendable {
                 openAICompatibleMaxRetries: 2
             )
         case .openAI:
-            return Self(prompt: prompt)
+            return Self(prompt: requestPrompt)
         case .deepgram:
             return Self(
                 deepgramParagraphs: true,
@@ -78,7 +81,7 @@ public struct VoiceInkRemoteTranscriptionOptions: Equatable, Sendable {
             return Self(customVocabulary: normalizedCustomVocabulary)
         case .assemblyAI:
             return Self(
-                prompt: prompt,
+                prompt: requestPrompt,
                 customVocabulary: normalizedCustomVocabulary
             )
         case .cartesia, .elevenLabs, .gemini, .mistral, .xai, .local:
@@ -91,13 +94,14 @@ public struct VoiceInkRemoteTranscriptionOptions: Equatable, Sendable {
         prompt: String? = nil,
         customVocabulary: [String] = []
     ) -> Self {
+        let requestPrompt = VoiceInkTranscriptionPromptUse.recordedFileTranscription(provider).requestPrompt(prompt)
         guard let modelProvider = provider.transcriptionModelProvider else {
-            return provider.transcriptionTransport == .openAICompatible ? Self(prompt: prompt) : Self()
+            return requestPrompt.map { Self(prompt: $0) } ?? Self()
         }
 
         return batchDefaults(
             for: modelProvider,
-            prompt: prompt,
+            prompt: requestPrompt,
             customVocabulary: customVocabulary
         )
     }
@@ -230,7 +234,7 @@ public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionServ
     ) -> VoiceInkRemoteTranscriptionOptions {
         guard let provider else {
             return VoiceInkRemoteTranscriptionOptions(
-                prompt: prompt,
+                prompt: VoiceInkTranscriptionPromptUse.directTranscription.requestPrompt(prompt),
                 customVocabulary: customVocabulary
             )
         }

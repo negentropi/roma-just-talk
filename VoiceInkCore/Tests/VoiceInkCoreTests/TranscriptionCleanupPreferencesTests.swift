@@ -8,6 +8,45 @@ final class TranscriptionCleanupPreferencesTests: XCTestCase {
         XCTAssertEqual(PunctuationCleanupMode.removeTrailingPeriod.displayName, "Remove trailing period")
     }
 
+    func testCleanupPresentationPreservesIOSSettingsCopy() {
+        let presentation = VoiceInkTranscriptionCleanupPresentation.iOS
+
+        XCTAssertEqual(presentation.sectionTitle, "Transcription Cleanup")
+        XCTAssertEqual(presentation.paragraphBreaksToggleTitle, "Paragraph Breaks")
+        XCTAssertNil(presentation.paragraphBreaksHelpText)
+        XCTAssertEqual(presentation.punctuationPickerTitle, "Punctuation")
+        XCTAssertNil(presentation.punctuationHelpText)
+        XCTAssertEqual(presentation.lowercaseToggleTitle, "Lowercase Transcription")
+        XCTAssertNil(presentation.lowercaseHelpText)
+        XCTAssertEqual(presentation.removeFillerWordsToggleTitle, "Remove Filler Words")
+        XCTAssertNil(presentation.removeFillerWordsHelpText)
+        XCTAssertEqual(presentation.addFillerWordPlaceholder, "Add filler word")
+    }
+
+    func testCleanupPresentationPreservesMacOSSettingsCopy() {
+        let presentation = VoiceInkTranscriptionCleanupPresentation.macOS
+
+        XCTAssertEqual(presentation.sectionTitle, "Transcript Formatting")
+        XCTAssertEqual(presentation.paragraphBreaksToggleTitle, "Paragraph breaks")
+        XCTAssertEqual(
+            presentation.paragraphBreaksHelpText,
+            "Apply intelligent text formatting to break large block of text into paragraphs."
+        )
+        XCTAssertEqual(presentation.punctuationPickerTitle, "Punctuation")
+        XCTAssertEqual(
+            presentation.punctuationHelpText,
+            "Keep preserves punctuation as transcribed. Remove all strips punctuation marks from the transcribed text. Remove trailing period only removes a final period from the transcribed text."
+        )
+        XCTAssertEqual(presentation.lowercaseToggleTitle, "Lowercase output")
+        XCTAssertEqual(presentation.lowercaseHelpText, "Convert transcription output to lowercase.")
+        XCTAssertEqual(presentation.removeFillerWordsToggleTitle, "Remove filler words")
+        XCTAssertEqual(
+            presentation.removeFillerWordsHelpText,
+            "Automatically remove filler words like 'uh', 'um', 'hmm' from transcriptions."
+        )
+        XCTAssertEqual(presentation.addFillerWordPlaceholder, "Add filler word")
+    }
+
     func testCurrentFallsBackToLegacyRemovePunctuationFlag() {
         withIsolatedDefaults { defaults in
             defaults.set(true, forKey: PunctuationCleanupMode.legacyRemovePunctuationKey)

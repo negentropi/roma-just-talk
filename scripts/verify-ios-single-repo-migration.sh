@@ -932,6 +932,31 @@ require_pattern \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \
+  "shared transcription cleanup presentation lives in VoiceInkCore" \
+  'VoiceInkTranscriptionCleanupPresentation|paragraphBreaksToggleTitle|addFillerWordPlaceholder' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionCleanupPreferences.swift
+
+require_pattern \
+  "iOS transcription cleanup settings use shared presentation" \
+  'VoiceInkTranscriptionCleanupPresentation\.iOS|cleanupPresentation' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+require_pattern \
+  "macOS model settings use shared transcription cleanup presentation" \
+  'VoiceInkTranscriptionCleanupPresentation\.macOS|cleanupPresentation' \
+  VoiceInk/Views/ModelSettingsView.swift
+
+require_pattern \
+  "macOS filler-word settings use shared transcription cleanup presentation" \
+  'VoiceInkTranscriptionCleanupPresentation\.macOS|cleanupPresentation' \
+  VoiceInk/Views/Components/FillerWordsSettingsView.swift
+
+require_pattern \
+  "macOS Power Mode settings use shared transcription cleanup presentation" \
+  'VoiceInkTranscriptionCleanupPresentation\.macOS|cleanupPresentation' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+require_pattern \
   "shared dictionary alert presentation lives in VoiceInkCore" \
   'VoiceInkDictionaryAlertPresentation' \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
@@ -971,6 +996,18 @@ reject_pattern \
   'This filler word is already in the list\.' \
   VoiceInk/Views/Components/FillerWordsSettingsView.swift \
   iOS/VoiceInk-ios/SettingsView.swift
+
+reject_pattern \
+  "iOS transcription cleanup settings avoid shell-only presentation copy" \
+  '"(Transcription Cleanup|Punctuation|Paragraph Breaks|Lowercase Transcription|Remove Filler Words|Add filler word)"' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+reject_pattern \
+  "macOS transcription cleanup settings avoid shell-only presentation copy" \
+  '"(Transcript Formatting|Paragraph breaks|Lowercase output|Remove filler words|Add filler word|Apply intelligent text formatting to break large block of text into paragraphs\.|Keep preserves punctuation as transcribed\. Remove all strips punctuation marks from the transcribed text\. Remove trailing period only removes a final period from the transcribed text\.|Convert transcription output to lowercase\.|Automatically remove filler words like '\''uh'\'', '\''um'\'', '\''hmm'\'' from transcriptions\.)"' \
+  VoiceInk/Views/ModelSettingsView.swift \
+  VoiceInk/Views/Components/FillerWordsSettingsView.swift \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
 
 reject_pattern \
   "platform dictionary surfaces avoid duplicate alert titles and persistence failure copy" \

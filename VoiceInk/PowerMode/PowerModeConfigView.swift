@@ -37,6 +37,7 @@ struct ConfigurationView: View {
     @State private var powerModeConfigId: UUID = UUID()
     @State private var isTranscriptFormattingExpanded = false
     @State private var didSaveConfiguration = false
+    private let cleanupPresentation = VoiceInkTranscriptionCleanupPresentation.macOS
 
     private var effectiveModelName: String? {
         selectedTranscriptionModelName ?? transcriptionModelManager.currentTranscriptionModel?.name
@@ -346,7 +347,7 @@ struct ConfigurationView: View {
                         }
                     } label: {
                         HStack {
-                            Text("Transcript Formatting")
+                            Text(cleanupPresentation.sectionTitle)
                             Spacer()
                             Image(systemName: "chevron.right")
                                 .font(.system(size: 11, weight: .semibold))
@@ -361,8 +362,10 @@ struct ConfigurationView: View {
                         VStack(alignment: .leading, spacing: 10) {
                             Toggle(isOn: $isTextFormattingEnabled) {
                                 HStack(spacing: 4) {
-                                    Text("Paragraph breaks")
-                                    InfoTip("Apply intelligent text formatting to break large block of text into paragraphs.")
+                                    Text(cleanupPresentation.paragraphBreaksToggleTitle)
+                                    if let helpText = cleanupPresentation.paragraphBreaksHelpText {
+                                        InfoTip(helpText)
+                                    }
                                 }
                             }
 
@@ -372,16 +375,20 @@ struct ConfigurationView: View {
                                 }
                             } label: {
                                 HStack(spacing: 4) {
-                                    Text("Punctuation")
-                                    InfoTip("Keep preserves punctuation as transcribed. Remove all strips punctuation marks from the transcribed text. Remove trailing period only removes a final period from the transcribed text.")
+                                    Text(cleanupPresentation.punctuationPickerTitle)
+                                    if let helpText = cleanupPresentation.punctuationHelpText {
+                                        InfoTip(helpText)
+                                    }
                                 }
                             }
                             .pickerStyle(.menu)
 
                             Toggle(isOn: $lowercaseTranscription) {
                                 HStack(spacing: 4) {
-                                    Text("Lowercase output")
-                                    InfoTip("Convert transcription output to lowercase.")
+                                    Text(cleanupPresentation.lowercaseToggleTitle)
+                                    if let helpText = cleanupPresentation.lowercaseHelpText {
+                                        InfoTip(helpText)
+                                    }
                                 }
                             }
                         }

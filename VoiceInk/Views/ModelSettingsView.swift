@@ -15,6 +15,7 @@ struct ModelSettingsView: View {
     @AppStorage("showLiveTextPreview") private var showLiveTextPreview = false
     @State private var customPrompt: String = ""
     @State private var isEditing: Bool = false
+    private let cleanupPresentation = VoiceInkTranscriptionCleanupPresentation.macOS
 
     private var punctuationCleanupMode: Binding<PunctuationCleanupMode> {
         Binding(
@@ -68,8 +69,10 @@ struct ModelSettingsView: View {
             Section {
                 Toggle(isOn: $isTextFormattingEnabled) {
                     HStack(spacing: 4) {
-                        Text("Paragraph breaks")
-                        InfoTip("Apply intelligent text formatting to break large block of text into paragraphs.")
+                        Text(cleanupPresentation.paragraphBreaksToggleTitle)
+                        if let helpText = cleanupPresentation.paragraphBreaksHelpText {
+                            InfoTip(helpText)
+                        }
                     }
                 }
                 .toggleStyle(.switch)
@@ -80,23 +83,27 @@ struct ModelSettingsView: View {
                     }
                 } label: {
                     HStack(spacing: 4) {
-                        Text("Punctuation")
-                        InfoTip("Keep preserves punctuation as transcribed. Remove all strips punctuation marks from the transcribed text. Remove trailing period only removes a final period from the transcribed text.")
+                        Text(cleanupPresentation.punctuationPickerTitle)
+                        if let helpText = cleanupPresentation.punctuationHelpText {
+                            InfoTip(helpText)
+                        }
                     }
                 }
                 .pickerStyle(.menu)
 
                 Toggle(isOn: $lowercaseTranscription) {
                     HStack(spacing: 4) {
-                        Text("Lowercase output")
-                        InfoTip("Convert transcription output to lowercase.")
+                        Text(cleanupPresentation.lowercaseToggleTitle)
+                        if let helpText = cleanupPresentation.lowercaseHelpText {
+                            InfoTip(helpText)
+                        }
                     }
                 }
                 .toggleStyle(.switch)
 
                 FillerWordsSettingsView()
             } header: {
-                Text("Transcript Formatting")
+                Text(cleanupPresentation.sectionTitle)
             }
 
             Section {

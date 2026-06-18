@@ -44,12 +44,15 @@ struct FillerWordsSettingsView: View {
     @StateObject private var fillerWordManager = FillerWordManager.shared
     @State private var newWord = ""
     @State private var alertPresentation: VoiceInkDictionaryAlertPresentation?
+    private let cleanupPresentation = VoiceInkTranscriptionCleanupPresentation.macOS
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text("Remove filler words")
-                InfoTip("Automatically remove filler words like 'uh', 'um', 'hmm' from transcriptions.")
+                Text(cleanupPresentation.removeFillerWordsToggleTitle)
+                if let helpText = cleanupPresentation.removeFillerWordsHelpText {
+                    InfoTip(helpText)
+                }
                 Spacer()
                 Toggle("", isOn: $removeFillerWords)
                     .toggleStyle(.switch)
@@ -59,9 +62,9 @@ struct FillerWordsSettingsView: View {
             if removeFillerWords {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack(spacing: 8) {
-                        TextField("Add filler word", text: $newWord)
+                        TextField(cleanupPresentation.addFillerWordPlaceholder, text: $newWord)
                             .textFieldStyle(.roundedBorder)
-                            .accessibilityLabel("Add filler word")
+                            .accessibilityLabel(cleanupPresentation.addFillerWordPlaceholder)
                             .onSubmit { addWord() }
 
                         Button(action: addWord) {
@@ -71,7 +74,7 @@ struct FillerWordsSettingsView: View {
                                 .font(.system(size: 16, weight: .semibold))
                         }
                         .buttonStyle(.borderless)
-                        .accessibilityLabel("Add filler word")
+                        .accessibilityLabel(cleanupPresentation.addFillerWordPlaceholder)
                         .disabled(!canAddWord)
                     }
                     .padding(.vertical, 4)

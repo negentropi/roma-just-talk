@@ -9,6 +9,7 @@ struct SettingsView: View {
     @State private var newReplacementOriginal = ""
     @State private var newReplacementText = ""
     @State private var dictionaryAlert: VoiceInkDictionaryAlertPresentation?
+    private let cleanupPresentation = VoiceInkTranscriptionCleanupPresentation.iOS
     
     var body: some View {
         List {
@@ -59,22 +60,22 @@ struct SettingsView: View {
                 }
             }
 
-            Section(header: Text("Transcription Cleanup")) {
-                Picker("Punctuation", selection: $settings.punctuationCleanupMode) {
+            Section(header: Text(cleanupPresentation.sectionTitle)) {
+                Picker(cleanupPresentation.punctuationPickerTitle, selection: $settings.punctuationCleanupMode) {
                     ForEach(PunctuationCleanupMode.allCases) { mode in
                         Text(mode.displayName).tag(mode)
                     }
                 }
 
-                Toggle("Paragraph Breaks", isOn: $settings.isTextFormattingEnabled)
+                Toggle(cleanupPresentation.paragraphBreaksToggleTitle, isOn: $settings.isTextFormattingEnabled)
 
-                Toggle("Lowercase Transcription", isOn: $settings.lowercaseTranscription)
+                Toggle(cleanupPresentation.lowercaseToggleTitle, isOn: $settings.lowercaseTranscription)
 
-                Toggle("Remove Filler Words", isOn: $settings.removeFillerWords)
+                Toggle(cleanupPresentation.removeFillerWordsToggleTitle, isOn: $settings.removeFillerWords)
 
                 if settings.removeFillerWords {
                     HStack {
-                        TextField("Add filler word", text: $newFillerWord)
+                        TextField(cleanupPresentation.addFillerWordPlaceholder, text: $newFillerWord)
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled()
                             .onSubmit(addFillerWord)

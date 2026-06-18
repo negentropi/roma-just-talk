@@ -136,6 +136,45 @@ public struct VoiceInkTranscriptionCleanupSettings: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkTranscriptionCleanupPresentation: Equatable, Sendable {
+    public let sectionTitle: String
+    public let paragraphBreaksToggleTitle: String
+    public let paragraphBreaksHelpText: String?
+    public let punctuationPickerTitle: String
+    public let punctuationHelpText: String?
+    public let lowercaseToggleTitle: String
+    public let lowercaseHelpText: String?
+    public let removeFillerWordsToggleTitle: String
+    public let removeFillerWordsHelpText: String?
+    public let addFillerWordPlaceholder: String
+
+    public static let iOS = VoiceInkTranscriptionCleanupPresentation(
+        sectionTitle: "Transcription Cleanup",
+        paragraphBreaksToggleTitle: "Paragraph Breaks",
+        paragraphBreaksHelpText: nil,
+        punctuationPickerTitle: "Punctuation",
+        punctuationHelpText: nil,
+        lowercaseToggleTitle: "Lowercase Transcription",
+        lowercaseHelpText: nil,
+        removeFillerWordsToggleTitle: "Remove Filler Words",
+        removeFillerWordsHelpText: nil,
+        addFillerWordPlaceholder: "Add filler word"
+    )
+
+    public static let macOS = VoiceInkTranscriptionCleanupPresentation(
+        sectionTitle: "Transcript Formatting",
+        paragraphBreaksToggleTitle: "Paragraph breaks",
+        paragraphBreaksHelpText: "Apply intelligent text formatting to break large block of text into paragraphs.",
+        punctuationPickerTitle: "Punctuation",
+        punctuationHelpText: "Keep preserves punctuation as transcribed. Remove all strips punctuation marks from the transcribed text. Remove trailing period only removes a final period from the transcribed text.",
+        lowercaseToggleTitle: "Lowercase output",
+        lowercaseHelpText: "Convert transcription output to lowercase.",
+        removeFillerWordsToggleTitle: "Remove filler words",
+        removeFillerWordsHelpText: "Automatically remove filler words like 'uh', 'um', 'hmm' from transcriptions.",
+        addFillerWordPlaceholder: "Add filler word"
+    )
+}
+
 public struct VoiceInkTranscriptionCleanupConfiguration: Equatable, Sendable {
     public static let disabled = VoiceInkTranscriptionCleanupConfiguration()
 

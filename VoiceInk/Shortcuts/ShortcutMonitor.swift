@@ -77,8 +77,6 @@ enum KeyboardState {
     }
 }
 
-typealias ShortcutPressContext = VoiceInkShortcutPressContext
-
 final class ShortcutMonitor {
     enum EventKind {
         case keyDown
@@ -109,13 +107,13 @@ final class ShortcutMonitor {
         var isDown = false
         var pressedAt: TimeInterval?
         var isInterrupted = false
-        var pressContext = ShortcutPressContext()
+        var pressContext = VoiceInkShortcutPressContext()
     }
 
     private var shortcuts: [ShortcutAction: ShortcutState] = [:]
     private var interruptibleActions: Set<ShortcutAction> = []
     private var onKeyDown: ((ShortcutAction, TimeInterval) -> Void)?
-    private var onKeyUp: ((ShortcutAction, TimeInterval, ShortcutPressContext) -> Void)?
+    private var onKeyUp: ((ShortcutAction, TimeInterval, VoiceInkShortcutPressContext) -> Void)?
     private var onShortcutInterrupted: ((ShortcutAction, TimeInterval) -> Void)?
     private var eventTap: CFMachPort?
     private var eventTapRunLoopSource: CFRunLoopSource?
@@ -145,7 +143,7 @@ final class ShortcutMonitor {
         interruptibleActions: Set<ShortcutAction> = [],
         tracksKeyUpEvidence: Bool = false,
         onKeyDown: @escaping (ShortcutAction, TimeInterval) -> Void,
-        onKeyUp: @escaping (ShortcutAction, TimeInterval, ShortcutPressContext) -> Void,
+        onKeyUp: @escaping (ShortcutAction, TimeInterval, VoiceInkShortcutPressContext) -> Void,
         onShortcutInterrupted: ((ShortcutAction, TimeInterval) -> Void)? = nil
     ) -> Bool {
         stop()
@@ -399,7 +397,7 @@ final class ShortcutMonitor {
                 state.isDown = false
                 state.pressedAt = nil
                 state.isInterrupted = false
-                state.pressContext = ShortcutPressContext()
+                state.pressContext = VoiceInkShortcutPressContext()
                 shortcuts[action] = state
                 dispatchKeyUp(for: action, eventTime: eventTime, context: context)
             }
@@ -483,7 +481,7 @@ final class ShortcutMonitor {
                 state.isDown = true
                 state.pressedAt = eventTime
                 state.isInterrupted = false
-                state.pressContext = ShortcutPressContext()
+                state.pressContext = VoiceInkShortcutPressContext()
                 shortcuts[action] = state
                 shouldSuppress = true
                 dispatchKeyDown(for: action, eventTime: eventTime)
@@ -492,7 +490,7 @@ final class ShortcutMonitor {
                 state.isDown = false
                 state.pressedAt = nil
                 state.isInterrupted = false
-                state.pressContext = ShortcutPressContext()
+                state.pressContext = VoiceInkShortcutPressContext()
                 shortcuts[action] = state
                 shouldSuppress = true
                 dispatchKeyUp(for: action, eventTime: eventTime, context: context)
@@ -652,7 +650,7 @@ final class ShortcutMonitor {
                 state.isDown = false
                 state.pressedAt = nil
                 state.isInterrupted = false
-                state.pressContext = ShortcutPressContext()
+                state.pressContext = VoiceInkShortcutPressContext()
                 shortcuts[action] = state
                 dispatchKeyUp(for: action, eventTime: eventTime, context: context)
             }
@@ -664,7 +662,7 @@ final class ShortcutMonitor {
             state.isDown = true
             state.pressedAt = eventTime
             state.isInterrupted = false
-            state.pressContext = ShortcutPressContext()
+            state.pressContext = VoiceInkShortcutPressContext()
             shortcuts[action] = state
             dispatchKeyDown(for: action, eventTime: eventTime)
         }
@@ -699,7 +697,7 @@ final class ShortcutMonitor {
         }
     }
 
-    private func dispatchKeyUp(for action: ShortcutAction, eventTime: TimeInterval, context: ShortcutPressContext) {
+    private func dispatchKeyUp(for action: ShortcutAction, eventTime: TimeInterval, context: VoiceInkShortcutPressContext) {
         logger.notice("dispatchKeyUp: action=\(action.storageName, privacy: .public)")
         DispatchQueue.main.async { [onKeyUp] in
             onKeyUp?(action, eventTime, context)
@@ -799,7 +797,7 @@ extension ShortcutMonitor {
         interruptibleActions: Set<ShortcutAction> = [],
         handlesModifierOnlyShortcutsInEventTap: Bool = false,
         onKeyDown: @escaping (ShortcutAction, TimeInterval) -> Void,
-        onKeyUp: @escaping (ShortcutAction, TimeInterval, ShortcutPressContext) -> Void,
+        onKeyUp: @escaping (ShortcutAction, TimeInterval, VoiceInkShortcutPressContext) -> Void,
         onShortcutInterrupted: ((ShortcutAction, TimeInterval) -> Void)? = nil
     ) {
         stop()

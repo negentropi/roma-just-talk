@@ -600,7 +600,7 @@ final class RecordingShortcutModeHandler {
         action: ShortcutAction,
         eventTime: TimeInterval,
         mode: RecordingShortcutManager.Mode,
-        context: ShortcutPressContext = ShortcutPressContext(),
+        context: VoiceInkShortcutPressContext = VoiceInkShortcutPressContext(),
         specialOptions: SpecialShortcutOptions = SpecialShortcutOptions(),
         powerModeId: UUID? = nil
     ) async {

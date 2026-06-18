@@ -47,4 +47,39 @@ final class AudioPlaybackTimelineTests: XCTestCase {
         XCTAssertEqual(VoiceInkAudioPlaybackTimeline.sampleProgress(index: 250, sampleCount: 200), 1)
         XCTAssertEqual(VoiceInkAudioPlaybackTimeline.sampleProgress(index: 1, sampleCount: 0), 0)
     }
+
+    func testPlaybackRateRestoresExistingPositiveMacOSValues() {
+        XCTAssertEqual(VoiceInkAudioPlaybackRate.restoredRate(0), 1.0)
+        XCTAssertEqual(VoiceInkAudioPlaybackRate.restoredRate(-1), 1.0)
+        XCTAssertEqual(VoiceInkAudioPlaybackRate.restoredRate(1.25), 1.25)
+    }
+
+    func testPlaybackRateCyclesThroughExistingMacOSOrder() {
+        XCTAssertEqual(VoiceInkAudioPlaybackRate.next(after: 1.0), 1.5)
+        XCTAssertEqual(VoiceInkAudioPlaybackRate.next(after: 1.5), 2.0)
+        XCTAssertEqual(VoiceInkAudioPlaybackRate.next(after: 2.0), 1.0)
+        XCTAssertEqual(VoiceInkAudioPlaybackRate.next(after: 1.25), 1.0)
+    }
+
+    func testPlaybackRateLabelsPreserveExistingMacOSPresentation() {
+        XCTAssertEqual(VoiceInkAudioPlaybackRate.label(for: 1.0), "1×")
+        XCTAssertEqual(VoiceInkAudioPlaybackRate.label(for: 1.5), "1.5×")
+        XCTAssertEqual(VoiceInkAudioPlaybackRate.label(for: 2.0), "2×")
+        XCTAssertEqual(VoiceInkAudioPlaybackRate.label(for: 1.25), "2×")
+    }
+
+    func testPlaybackRatePreferenceUsesSharedStorageKey() {
+        let suiteName = "VoiceInkAudioPlaybackRateTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        XCTAssertEqual(VoiceInkAudioPlaybackRate.current(from: defaults), 1.0)
+
+        VoiceInkAudioPlaybackRate.save(1.5, to: defaults)
+        XCTAssertEqual(defaults.float(forKey: VoiceInkUserDefaultsKey.audioPlaybackRate), 1.5)
+        XCTAssertEqual(VoiceInkAudioPlaybackRate.current(from: defaults), 1.5)
+
+        VoiceInkAudioPlaybackRate.clear(from: defaults)
+        XCTAssertEqual(VoiceInkAudioPlaybackRate.current(from: defaults), 1.0)
+    }
 }

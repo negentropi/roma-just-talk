@@ -9,6 +9,9 @@ final class AudioPlayer: ObservableObject {
     @Published var currentTime: TimeInterval = 0
     @Published var duration: TimeInterval = 0
     @Published var isLoading: Bool = false
+    @Published var playbackRate: Float = VoiceInkAudioPlaybackRate.current() {
+        didSet { VoiceInkAudioPlaybackRate.save(playbackRate) }
+    }
     
     private var audioPlayer: AVAudioPlayer?
     private var timer: Timer?
@@ -20,6 +23,7 @@ final class AudioPlayer: ObservableObject {
         
         do {
             audioPlayer = try AVAudioPlayer(contentsOf: url)
+            audioPlayer?.enableRate = true
             audioPlayer?.prepareToPlay()
             duration = audioPlayer?.duration ?? 0
             currentTime = 0
@@ -36,7 +40,8 @@ final class AudioPlayer: ObservableObject {
         do {
             try AVAudioSession.sharedInstance().setCategory(.playback)
             try AVAudioSession.sharedInstance().setActive(true)
-            
+
+            player.rate = playbackRate
             player.play()
             isPlaying = true
             startTimer()
@@ -63,6 +68,11 @@ final class AudioPlayer: ObservableObject {
         let clampedTime = VoiceInkAudioPlaybackTimeline.clampedTime(time, duration: duration)
         audioPlayer?.currentTime = clampedTime
         currentTime = clampedTime
+    }
+
+    func cyclePlaybackRate() {
+        playbackRate = VoiceInkAudioPlaybackRate.next(after: playbackRate)
+        audioPlayer?.rate = playbackRate
     }
     
     private func startTimer() {

@@ -60,11 +60,8 @@ class AudioPlayerManager: ObservableObject {
     @Published var duration: TimeInterval = 0
     @Published var waveformSamples: [Float] = []
     @Published var isLoadingWaveform = false
-    @Published var playbackRate: Float = {
-        let saved = UserDefaults.standard.float(forKey: "audioPlaybackRate")
-        return saved > 0 ? saved : 1.0
-    }() {
-        didSet { UserDefaults.standard.set(playbackRate, forKey: "audioPlaybackRate") }
+    @Published var playbackRate: Float = VoiceInkAudioPlaybackRate.current() {
+        didSet { VoiceInkAudioPlaybackRate.save(playbackRate) }
     }
     
     func loadAudio(from url: URL) {
@@ -95,11 +92,7 @@ class AudioPlayerManager: ObservableObject {
     }
 
     func cyclePlaybackRate() {
-        switch playbackRate {
-        case 1.0:  playbackRate = 1.5
-        case 1.5:  playbackRate = 2.0
-        default:   playbackRate = 1.0
-        }
+        playbackRate = VoiceInkAudioPlaybackRate.next(after: playbackRate)
         audioPlayer?.rate = playbackRate
     }
     
@@ -422,16 +415,16 @@ struct AudioPlayerView: View {
 
                     Button(action: { playerManager.cyclePlaybackRate() }) {
                         Circle()
-                            .fill(Color.primary.opacity(playerManager.playbackRate == 1.0 ? 0.06 : 0.14))
+                            .fill(Color.primary.opacity(VoiceInkAudioPlaybackRate.isDefault(playerManager.playbackRate) ? 0.06 : 0.14))
                             .frame(width: 32, height: 32)
                             .overlay(
-                                Text(playerManager.playbackRate == 1.0 ? "1×" : playerManager.playbackRate == 1.5 ? "1.5×" : "2×")
+                                Text(VoiceInkAudioPlaybackRate.label(for: playerManager.playbackRate))
                                     .font(.system(size: 11, weight: .semibold))
                                     .foregroundStyle(.primary)
                             )
                     }
                     .buttonStyle(.plain)
-                    .help("Playback speed")
+                    .help(VoiceInkAudioPlaybackRate.controlTitle)
 
                     CircleIconButton(
                         icon: enhancementService.activePrompt?.icon ?? "sparkles",

@@ -18,6 +18,7 @@ public enum VoiceInkUserDefaultsKey {
     public static let transcriptionRetentionMinutes = "TranscriptionRetentionMinutes"
     public static let isAudioCleanupEnabled = "IsAudioCleanupEnabled"
     public static let audioRetentionPeriodDays = "AudioRetentionPeriod"
+    public static let audioPlaybackRate = "audioPlaybackRate"
     public static let skipShortEnhancement = "SkipShortEnhancement"
     public static let shortEnhancementWordThreshold = "ShortEnhancementWordThreshold"
     public static let enhancementTimeoutSeconds = "EnhancementTimeoutSeconds"
@@ -797,6 +798,7 @@ public enum VoiceInkSharedPreferenceReset {
         VoiceInkAIEnhancementRequestPreference.clear(from: defaults)
         VoiceInkTranscriptionAutoCleanupPreference.clear(from: defaults)
         VoiceInkAudioCleanupPreference.clear(from: defaults)
+        VoiceInkAudioPlaybackRate.clear(from: defaults)
         VoiceInkCustomPromptStorage.clear(from: defaults)
         VoiceInkAIEnhancementContextPreference.clear(from: defaults)
         VoiceInkPowerModeConfigurationPreference.clear(from: defaults)

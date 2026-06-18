@@ -1531,6 +1531,33 @@ require_pattern \
   iOS/VoiceInk-ios/NoteRowView.swift
 
 require_pattern \
+  "shared playback-rate policy lives in VoiceInkCore" \
+  'VoiceInkAudioPlaybackRate' \
+  VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
+
+require_pattern \
+  "macOS audio player uses shared playback-rate policy" \
+  'VoiceInkAudioPlaybackRate' \
+  VoiceInk/Views/AudioPlayerView.swift
+
+require_pattern \
+  "iOS audio player shell uses shared playback-rate policy" \
+  'VoiceInkAudioPlaybackRate' \
+  iOS/VoiceInk-ios/AudioPlayer.swift
+
+require_pattern \
+  "iOS audio player view uses shared playback-rate policy" \
+  'VoiceInkAudioPlaybackRate' \
+  iOS/VoiceInk-ios/AudioPlayerView.swift
+
+reject_pattern \
+  "platform audio players avoid raw playback-rate storage key and labels" \
+  '"audioPlaybackRate"|"1×"|"1\.5×"|"2×"' \
+  VoiceInk/Views/AudioPlayerView.swift \
+  iOS/VoiceInk-ios/AudioPlayer.swift \
+  iOS/VoiceInk-ios/AudioPlayerView.swift
+
+require_pattern \
   "macOS audio-file duration UI uses shared positive-duration visibility" \
   'VoiceInkDurationPresentation\.shouldShowPositiveDuration' \
   VoiceInk/Views/AudioFileRow.swift

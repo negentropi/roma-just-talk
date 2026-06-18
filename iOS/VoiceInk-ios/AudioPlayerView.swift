@@ -68,6 +68,22 @@ struct AudioPlayerView: View {
                             )
                     }
                     .buttonStyle(.plain)
+
+                    Button(action: {
+                        player.cyclePlaybackRate()
+                    }) {
+                        Circle()
+                            .fill(Color(.tertiarySystemFill))
+                            .frame(width: 44, height: 44)
+                            .overlay(
+                                Text(VoiceInkAudioPlaybackRate.label(for: player.playbackRate))
+                                    .font(.caption.weight(.semibold))
+                                    .monospacedDigit()
+                                    .foregroundStyle(.primary)
+                            )
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(VoiceInkAudioPlaybackRate.controlTitle)
                     
                     // Progress and time
                     VStack(spacing: 8) {

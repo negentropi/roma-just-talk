@@ -568,6 +568,21 @@ reject_pattern \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 require_pattern \
+  "shared provider API-key verification progress presentation lives in VoiceInkCore" \
+  'VoiceInkProviderAPIKeyVerificationProgress|macOSVerifyButtonTitle|iOSResultFeedback' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
+
+require_pattern \
+  "iOS API-key view uses shared verification progress presentation" \
+  'VoiceInkProviderAPIKeyVerificationProgress|verificationProgress|iOSVerifiedKeyFeedback|iOSResultFeedback' \
+  iOS/VoiceInk-ios/ProviderAPIKeyView.swift
+
+reject_pattern \
+  "iOS API-key view avoids shell-only verification state and copy" \
+  '@State private var isVerifying|verifyResult|Key verified|Verification failed' \
+  iOS/VoiceInk-ios/ProviderAPIKeyView.swift
+
+require_pattern \
   "macOS local Whisper uses shared runtime policy" \
   'VoiceInkWhisperRuntimeConfiguration\.current' \
   VoiceInk/Transcription/Whisper/LibWhisper.swift
@@ -747,8 +762,18 @@ require_pattern \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
 require_pattern \
+  "macOS cloud API-key card uses shared verification progress presentation" \
+  'VoiceInkProviderAPIKeyVerificationProgress|verificationProgress|macOSVerifyButtonTitle|macOSInlineFeedback' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift
+
+require_pattern \
   "macOS cloud API-key card uses shared stored-key verifier" \
   'verifyStoredAPIKeyDetailed\(keyToVerify, for: provider\)' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift
+
+reject_pattern \
+  "macOS cloud API-key card avoids shell-only verification status and copy" \
+  'enum +VerificationStatus|verificationStatus|verificationError|Verifying\.\.\.|Verification failed|API key verified successfully!|Unsupported provider' \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
 reject_pattern \

@@ -6,8 +6,7 @@ struct ProviderAPIKeyView: View {
     @StateObject private var settings = AppSettings.shared
     private let apiKeyVerifier = VoiceInkProviderAPIKeyVerifier()
     @State private var tempKey: String = ""
-    @State private var isVerifying: Bool = false
-    @State private var verifyResult: Bool? = nil
+    @State private var verificationProgress: VoiceInkProviderAPIKeyVerificationProgress = .idle
     @State private var editingKey: Bool = true
 
     private var isKeyVerified: Bool {
@@ -42,7 +41,7 @@ struct ProviderAPIKeyView: View {
                         }
                         .disabled(!hasEnteredAPIKey)
                         Spacer()
-                        if isVerifying {
+                        if verificationProgress.isVerifying {
                             ProgressView().progressViewStyle(.circular)
                         } else {
                             Button(action: verifyKey) {
@@ -53,11 +52,13 @@ struct ProviderAPIKeyView: View {
                     }
                 } else {
                     HStack {
-                        Label("Key verified", systemImage: "checkmark.seal.fill").foregroundStyle(.green)
+                        let feedback = VoiceInkProviderAPIKeyVerificationProgress.iOSVerifiedKeyFeedback
+                        Label(feedback.text, systemImage: feedback.systemImageName ?? "checkmark.seal.fill")
+                            .foregroundStyle(color(for: feedback.tone))
                         Spacer()
                         Button("Change") {
                             editingKey = true
-                            verifyResult = nil
+                            verificationProgress = .idle
                             tempKey = settings.storedAPIKey(for: provider)
                             settings.setKeyVerified(false, for: provider)
                         }
@@ -68,9 +69,9 @@ struct ProviderAPIKeyView: View {
                 }
 
                 // Only show verification result when actively verifying and not already verified
-                if let verifyResult = verifyResult, !isKeyVerified {
-                    Label(verifyResult ? "Key verified" : "Verification failed", systemImage: verifyResult ? "checkmark.seal.fill" : "xmark.seal")
-                        .foregroundStyle(verifyResult ? .green : .red)
+                if let feedback = verificationProgress.iOSResultFeedback, !isKeyVerified {
+                    Label(feedback.text, systemImage: feedback.systemImageName ?? "info.circle")
+                        .foregroundStyle(color(for: feedback.tone))
                 }
             }
             
@@ -91,10 +92,10 @@ struct ProviderAPIKeyView: View {
         .onAppear {
             tempKey = settings.storedAPIKey(for: provider)
             editingKey = !isKeyVerified
-            verifyResult = nil
+            verificationProgress = .idle
         }
         .onChange(of: tempKey) { _, _ in
-            verifyResult = nil
+            verificationProgress = .idle
         }
     }
 
@@ -104,18 +105,16 @@ struct ProviderAPIKeyView: View {
 
     private func verifyKey() {
         Task {
-            isVerifying = true
+            verificationProgress = .verifying
             let draft = apiKeyDraft
             guard let keyToVerify = draft.verificationCandidate else {
-                verifyResult = false
-                isVerifying = false
+                verificationProgress = .failure(message: nil)
                 return
             }
             
             let ok = await apiKeyVerifier.verifyStoredAPIKey(keyToVerify, for: provider)
             
-            verifyResult = ok
-            isVerifying = false
+            verificationProgress = ok ? .success : .failure(message: nil)
             if ok {
                 if let keyToSave = draft.keyToSaveAfterSuccessfulVerification {
                     settings.setAPIKey(keyToSave, for: provider)
@@ -126,6 +125,14 @@ struct ProviderAPIKeyView: View {
         }
     }
 
+    private func color(for tone: VoiceInkProviderAPIKeyVerificationTone) -> Color {
+        switch tone {
+        case .success:
+            return .green
+        case .failure:
+            return .red
+        }
+    }
 }
 
 #Preview {

@@ -24,13 +24,11 @@ struct CloudModelCardView: View {
         _streamingEnabled = State(initialValue: VoiceInkTranscriptionStreamingPreference.isEnabled(forModelName: model.name))
         _preloadEnabled = State(initialValue: VoiceInkRollingBufferPreloadSettings.perModelPreloadEnabled(forModelName: model.name))
     }
-    @State private var isVerifying = false
-    @State private var verificationStatus: VerificationStatus = .none
-    @State private var verificationError: String? = nil
+    @State private var verificationProgress: VoiceInkProviderAPIKeyVerificationProgress = .idle
     private let apiKeyVerifier = VoiceInkProviderAPIKeyVerifier()
-    
-    enum VerificationStatus {
-        case none, verifying, success, failure
+
+    private var isVerifying: Bool {
+        verificationProgress.isVerifying
     }
     
     private var isConfigured: Bool {
@@ -257,10 +255,10 @@ struct CloudModelCardView: View {
                                 .scaleEffect(0.7)
                                 .frame(width: 12, height: 12)
                         } else {
-                            Image(systemName: verificationStatus == .success ? "checkmark" : "checkmark.shield")
+                            Image(systemName: verificationProgress.macOSVerifyButtonSystemImageName)
                                 .font(.system(size: 12, weight: .medium))
                         }
-                        Text(isVerifying ? "Verifying..." : "Verify")
+                        Text(verificationProgress.macOSVerifyButtonTitle)
                             .font(.system(size: 12, weight: .medium))
                     }
                     .foregroundColor(.white)
@@ -268,27 +266,17 @@ struct CloudModelCardView: View {
                     .padding(.vertical, 6)
                     .background(
                         Capsule()
-                            .fill(verificationStatus == .success ? Color(.systemGreen) : Color(.controlAccentColor))
+                            .fill(verificationProgress.isSuccess ? Color(.systemGreen) : Color(.controlAccentColor))
                     )
                 }
                 .buttonStyle(.plain)
                 .disabled(!canVerifyAPIKey || isVerifying)
             }
             
-            if verificationStatus == .failure {
-                if let error = verificationError {
-                    Text(error)
-                        .font(.caption)
-                        .foregroundColor(Color(.systemRed))
-                } else {
-                    Text("Verification failed")
-                        .font(.caption)
-                        .foregroundColor(Color(.systemRed))
-                }
-            } else if verificationStatus == .success {
-                Text("API key verified successfully!")
+            if let feedback = verificationProgress.macOSInlineFeedback {
+                Text(feedback.text)
                     .font(.caption)
-                    .foregroundColor(Color(.systemGreen))
+                    .foregroundColor(color(for: feedback.tone))
             }
         }
     }
@@ -299,7 +287,7 @@ struct CloudModelCardView: View {
         }
 
         if APIKeyManager.shared.hasAPIKey(forProvider: model.provider.apiKeyProviderName) {
-            verificationStatus = .success
+            verificationProgress = .success
         }
     }
     
@@ -307,12 +295,9 @@ struct CloudModelCardView: View {
         let draft = apiKeyDraft
         guard let keyToVerify = draft.verificationCandidate else { return }
 
-        isVerifying = true
-        verificationStatus = .verifying
+        verificationProgress = .verifying
         guard let provider = model.provider.coreTranscriptionModelProvider else {
-            isVerifying = false
-            verificationStatus = .failure
-            verificationError = "Unsupported provider"
+            verificationProgress = .unsupportedProviderFailure
             return
         }
 
@@ -320,10 +305,8 @@ struct CloudModelCardView: View {
             let result = await apiKeyVerifier.verifyStoredAPIKeyDetailed(keyToVerify, for: provider)
 
             await MainActor.run {
-                isVerifying = false
                 if result.isValid {
-                    verificationStatus = .success
-                    verificationError = nil
+                    verificationProgress = .success
                     if let keyToSave = draft.keyToSaveAfterSuccessfulVerification {
                         APIKeyManager.shared.saveAPIKey(keyToSave, forProvider: model.provider.apiKeyProviderName)
                     }
@@ -332,8 +315,7 @@ struct CloudModelCardView: View {
                         isExpanded = false
                     }
                 } else {
-                    verificationStatus = .failure
-                    verificationError = result.errorMessage
+                    verificationProgress = .failure(message: result.errorMessage)
                 }
             }
         }
@@ -342,8 +324,7 @@ struct CloudModelCardView: View {
     private func clearAPIKey() {
         APIKeyManager.shared.deleteAPIKey(forProvider: model.provider.apiKeyProviderName)
         apiKey = ""
-        verificationStatus = .none
-        verificationError = nil
+        verificationProgress = .idle
 
         if isCurrent {
             transcriptionModelManager.clearCurrentTranscriptionModel()
@@ -353,6 +334,15 @@ struct CloudModelCardView: View {
 
         withAnimation(.easeInOut(duration: 0.3)) {
             isExpanded = false
+        }
+    }
+
+    private func color(for tone: VoiceInkProviderAPIKeyVerificationTone) -> Color {
+        switch tone {
+        case .success:
+            return Color(.systemGreen)
+        case .failure:
+            return Color(.systemRed)
         }
     }
 }

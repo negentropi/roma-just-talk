@@ -54,6 +54,64 @@ final class AIProviderCatalogTests: XCTestCase {
         XCTAssertTrue(VoiceInkAIEnhancementProviderKind.anthropic.requiresUserAPIKey)
     }
 
+    func testProviderAPIKeyVerificationProgressPresentsSharedFeedback() {
+        XCTAssertTrue(VoiceInkProviderAPIKeyVerificationProgress.verifying.isVerifying)
+        XCTAssertFalse(VoiceInkProviderAPIKeyVerificationProgress.idle.isVerifying)
+        XCTAssertTrue(VoiceInkProviderAPIKeyVerificationProgress.success.isSuccess)
+
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyVerificationProgress.verifying.macOSVerifyButtonTitle,
+            "Verifying..."
+        )
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyVerificationProgress.success.macOSVerifyButtonTitle,
+            "Verify"
+        )
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyVerificationProgress.success.macOSVerifyButtonSystemImageName,
+            "checkmark"
+        )
+
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyVerificationProgress.success.macOSInlineFeedback,
+            VoiceInkProviderAPIKeyVerificationFeedback(
+                text: "API key verified successfully!",
+                tone: .success
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyVerificationProgress.failure(message: nil).macOSInlineFeedback,
+            VoiceInkProviderAPIKeyVerificationFeedback(
+                text: "Verification failed",
+                tone: .failure
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyVerificationProgress.unsupportedProviderFailure.macOSInlineFeedback?.text,
+            "Unsupported provider"
+        )
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyVerificationProgress.iOSVerifiedKeyFeedback,
+            VoiceInkProviderAPIKeyVerificationFeedback(
+                text: "Key verified",
+                systemImageName: "checkmark.seal.fill",
+                tone: .success
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyVerificationProgress.success.iOSResultFeedback,
+            VoiceInkProviderAPIKeyVerificationProgress.iOSVerifiedKeyFeedback
+        )
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyVerificationProgress.failure(message: "bad").iOSResultFeedback,
+            VoiceInkProviderAPIKeyVerificationFeedback(
+                text: "Verification failed",
+                systemImageName: "xmark.seal",
+                tone: .failure
+            )
+        )
+    }
+
     func testMacOSAIEnhancementAPIKeyDraftUsesSharedBlankPolicy() {
         let draft = VoiceInkAIEnhancementAPIKeyDraft(
             provider: .groq,

@@ -99,6 +99,92 @@ public struct VoiceInkProviderAPIKeyDraft: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkProviderAPIKeyVerificationTone: Equatable, Sendable {
+    case success
+    case failure
+}
+
+public struct VoiceInkProviderAPIKeyVerificationFeedback: Equatable, Sendable {
+    public let text: String
+    public let systemImageName: String?
+    public let tone: VoiceInkProviderAPIKeyVerificationTone
+
+    public init(
+        text: String,
+        systemImageName: String? = nil,
+        tone: VoiceInkProviderAPIKeyVerificationTone
+    ) {
+        self.text = text
+        self.systemImageName = systemImageName
+        self.tone = tone
+    }
+}
+
+public enum VoiceInkProviderAPIKeyVerificationProgress: Equatable, Sendable {
+    case idle
+    case verifying
+    case success
+    case failure(message: String?)
+
+    public static let unsupportedProviderFailure: VoiceInkProviderAPIKeyVerificationProgress = .failure(
+        message: "Unsupported provider"
+    )
+
+    public var isVerifying: Bool {
+        self == .verifying
+    }
+
+    public var isSuccess: Bool {
+        self == .success
+    }
+
+    public var macOSVerifyButtonTitle: String {
+        isVerifying ? "Verifying..." : "Verify"
+    }
+
+    public var macOSVerifyButtonSystemImageName: String {
+        isSuccess ? "checkmark" : "checkmark.shield"
+    }
+
+    public var macOSInlineFeedback: VoiceInkProviderAPIKeyVerificationFeedback? {
+        switch self {
+        case .idle, .verifying:
+            return nil
+        case .success:
+            return VoiceInkProviderAPIKeyVerificationFeedback(
+                text: "API key verified successfully!",
+                tone: .success
+            )
+        case .failure(let message):
+            return VoiceInkProviderAPIKeyVerificationFeedback(
+                text: message ?? "Verification failed",
+                tone: .failure
+            )
+        }
+    }
+
+    public var iOSResultFeedback: VoiceInkProviderAPIKeyVerificationFeedback? {
+        switch self {
+        case .idle, .verifying:
+            return nil
+        case .success:
+            return Self.iOSVerifiedKeyFeedback
+        case .failure:
+            return VoiceInkProviderAPIKeyVerificationFeedback(
+                text: "Verification failed",
+                systemImageName: "xmark.seal",
+                tone: .failure
+            )
+        }
+    }
+
+    public static let iOSVerifiedKeyFeedback = VoiceInkProviderAPIKeyVerificationFeedback(
+        text: "Key verified",
+        systemImageName: "checkmark.seal.fill",
+        tone: .success
+    )
+}
+
 public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, Sendable {
     case groq
     case openAI

@@ -1,4 +1,5 @@
 import SwiftUI
+import VoiceInkCore
 
 struct PowerModePopover: View {
     @ObservedObject var powerModeManager = PowerModeManager.shared

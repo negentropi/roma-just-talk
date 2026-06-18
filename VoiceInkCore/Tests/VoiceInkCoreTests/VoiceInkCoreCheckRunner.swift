@@ -325,6 +325,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PowerModePresentationTests.testDisplayNameTrimsAndCombinesEmojiAndName", run: { PowerModePresentationTests().testDisplayNameTrimsAndCombinesEmojiAndName() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeTriggerConfigsPreserveStoredShapeAndIdEquality", run: { try PowerModePolicyTests().testPowerModeTriggerConfigsPreserveStoredShapeAndIdEquality() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeTriggerConfigsAdaptToPolicyRules", run: { PowerModePolicyTests().testPowerModeTriggerConfigsAdaptToPolicyRules() }),
+            VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeConfigPreservesStoredShapeEqualityAndRuleAdapter", run: { try PowerModePolicyTests().testPowerModeConfigPreservesStoredShapeEqualityAndRuleAdapter() }),
+            VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeConfigDecodesLegacyStoredKeys", run: { try PowerModePolicyTests().testPowerModeConfigDecodesLegacyStoredKeys() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testAutoSendKeyPreservesStoredValuesPickerOrderAndLabels", run: { PowerModePolicyTests().testAutoSendKeyPreservesStoredValuesPickerOrderAndLabels() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testAutoSendKeyEnablementAndCodableShape", run: { try PowerModePolicyTests().testAutoSendKeyEnablementAndCodableShape() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testNormalizedWebsiteURLPreservesExistingMacOSCleanURLPolicy", run: { PowerModePolicyTests().testNormalizedWebsiteURLPreservesExistingMacOSCleanURLPolicy() }),

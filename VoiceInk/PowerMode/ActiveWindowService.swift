@@ -1,6 +1,7 @@
 import Foundation
 import AppKit
 import os
+import VoiceInkCore
 
 class ActiveWindowService: ObservableObject {
     static let shared = ActiveWindowService()

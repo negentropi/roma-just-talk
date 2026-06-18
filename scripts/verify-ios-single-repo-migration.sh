@@ -921,8 +921,18 @@ require_pattern \
   VoiceInk/Transcription/Whisper/WhisperPrompt.swift
 
 require_pattern \
-  "macOS Power Mode config uses shared macOS selected-language fallback" \
+  "shared Power Mode config uses shared macOS selected-language fallback" \
   'VoiceInkTranscriptionLanguagePreference\.selectedMacOSLanguage\(\)' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode config record lives in VoiceInkCore" \
+  'struct PowerModeConfig' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+reject_pattern \
+  "macOS Power Mode avoids shell-only config record and policy adapters" \
+  'struct +PowerModeConfig|extension +Array +where +Element *== *PowerModeConfig|extension +PowerModeConfig' \
   VoiceInk/PowerMode/PowerModeConfig.swift
 
 require_pattern \
@@ -971,9 +981,9 @@ reject_pattern \
   VoiceInk/Paste/CursorPaster.swift
 
 require_pattern \
-  "macOS Power Mode config consumes shared auto-send key state" \
+  "shared Power Mode config owns shared auto-send key state" \
   'VoiceInkAutoSendKey' \
-  VoiceInk/PowerMode/PowerModeConfig.swift
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
   "macOS Power Mode form consumes shared auto-send key state" \

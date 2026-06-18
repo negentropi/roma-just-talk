@@ -1,5 +1,167 @@
 import Foundation
 
+public struct PowerModeConfig: Codable, Identifiable, Equatable, Sendable {
+    public var id: UUID
+    public var name: String
+    public var emoji: String
+    public var appConfigs: [VoiceInkPowerModeAppConfig]?
+    public var urlConfigs: [VoiceInkPowerModeURLConfig]?
+    public var isAIEnhancementEnabled: Bool
+    public var selectedPrompt: String?
+    public var selectedTranscriptionModelName: String?
+    public var selectedLanguage: String?
+    public var isTextFormattingEnabled: Bool
+    public var punctuationCleanupMode: PunctuationCleanupMode
+    public var lowercaseTranscription: Bool
+    public var useScreenCapture: Bool
+    public var selectedAIProvider: String?
+    public var selectedAIModel: String?
+    public var autoSendKey: VoiceInkAutoSendKey
+    public var isEnabled: Bool
+    public var isDefault: Bool
+
+    private enum CodingKeys: String, CodingKey {
+        case id, name, emoji, appConfigs, urlConfigs, isAIEnhancementEnabled, selectedPrompt, selectedLanguage, isTextFormattingEnabled, punctuationCleanupMode, removePunctuation, lowercaseTranscription, useScreenCapture, selectedAIProvider, selectedAIModel, isAutoSendEnabled, autoSendKey, isEnabled, isDefault
+        case selectedWhisperModel
+        case selectedTranscriptionModelName
+    }
+
+    public init(
+        id: UUID = UUID(),
+        name: String,
+        emoji: String,
+        appConfigs: [VoiceInkPowerModeAppConfig]? = nil,
+        urlConfigs: [VoiceInkPowerModeURLConfig]? = nil,
+        isAIEnhancementEnabled: Bool,
+        selectedPrompt: String? = nil,
+        selectedTranscriptionModelName: String? = nil,
+        selectedLanguage: String? = nil,
+        useScreenCapture: Bool = false,
+        isTextFormattingEnabled: Bool = false,
+        punctuationCleanupMode: PunctuationCleanupMode = .keep,
+        lowercaseTranscription: Bool = false,
+        selectedAIProvider: String? = nil,
+        selectedAIModel: String? = nil,
+        autoSendKey: VoiceInkAutoSendKey = .none,
+        isEnabled: Bool = true,
+        isDefault: Bool = false
+    ) {
+        self.id = id
+        self.name = name
+        self.emoji = emoji
+        self.appConfigs = appConfigs
+        self.urlConfigs = urlConfigs
+        self.isAIEnhancementEnabled = isAIEnhancementEnabled
+        self.selectedPrompt = selectedPrompt
+        self.useScreenCapture = useScreenCapture
+        self.autoSendKey = autoSendKey
+        self.selectedAIProvider = selectedAIProvider ?? VoiceInkAIEnhancementProviderPreference.selectedProviderRawValue()
+        self.selectedAIModel = selectedAIModel
+        self.selectedTranscriptionModelName = selectedTranscriptionModelName ?? VoiceInkCurrentTranscriptionModelPreference.modelName()
+        self.selectedLanguage = selectedLanguage ?? VoiceInkTranscriptionLanguagePreference.selectedMacOSLanguage()
+        self.isTextFormattingEnabled = isTextFormattingEnabled
+        self.punctuationCleanupMode = punctuationCleanupMode
+        self.lowercaseTranscription = lowercaseTranscription
+        self.isEnabled = isEnabled
+        self.isDefault = isDefault
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        emoji = try container.decode(String.self, forKey: .emoji)
+        appConfigs = try container.decodeIfPresent([VoiceInkPowerModeAppConfig].self, forKey: .appConfigs)
+        urlConfigs = try container.decodeIfPresent([VoiceInkPowerModeURLConfig].self, forKey: .urlConfigs)
+        isAIEnhancementEnabled = try container.decode(Bool.self, forKey: .isAIEnhancementEnabled)
+        selectedPrompt = try container.decodeIfPresent(String.self, forKey: .selectedPrompt)
+        selectedLanguage = try container.decodeIfPresent(String.self, forKey: .selectedLanguage)
+        isTextFormattingEnabled = try container.decodeIfPresent(Bool.self, forKey: .isTextFormattingEnabled) ?? false
+        if let mode = try container.decodeIfPresent(PunctuationCleanupMode.self, forKey: .punctuationCleanupMode) {
+            punctuationCleanupMode = mode
+        } else {
+            let removePunctuation = try container.decodeIfPresent(Bool.self, forKey: .removePunctuation) ?? false
+            punctuationCleanupMode = removePunctuation ? .removeAll : .keep
+        }
+        lowercaseTranscription = try container.decodeIfPresent(Bool.self, forKey: .lowercaseTranscription) ?? false
+        useScreenCapture = try container.decode(Bool.self, forKey: .useScreenCapture)
+        selectedAIProvider = try container.decodeIfPresent(String.self, forKey: .selectedAIProvider)
+        selectedAIModel = try container.decodeIfPresent(String.self, forKey: .selectedAIModel)
+        if let rawValue = try container.decodeIfPresent(String.self, forKey: .autoSendKey),
+           let newKey = VoiceInkAutoSendKey(rawValue: rawValue) {
+            autoSendKey = newKey
+        } else if let oldBool = try container.decodeIfPresent(Bool.self, forKey: .isAutoSendEnabled), oldBool {
+            autoSendKey = .enter
+        } else {
+            autoSendKey = .none
+        }
+        isEnabled = try container.decodeIfPresent(Bool.self, forKey: .isEnabled) ?? true
+        isDefault = try container.decodeIfPresent(Bool.self, forKey: .isDefault) ?? false
+
+        if let newModelName = try container.decodeIfPresent(String.self, forKey: .selectedTranscriptionModelName) {
+            selectedTranscriptionModelName = newModelName
+        } else if let oldModelName = try container.decodeIfPresent(String.self, forKey: .selectedWhisperModel) {
+            selectedTranscriptionModelName = oldModelName
+        } else {
+            selectedTranscriptionModelName = nil
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(name, forKey: .name)
+        try container.encode(emoji, forKey: .emoji)
+        try container.encodeIfPresent(appConfigs, forKey: .appConfigs)
+        try container.encodeIfPresent(urlConfigs, forKey: .urlConfigs)
+        try container.encode(isAIEnhancementEnabled, forKey: .isAIEnhancementEnabled)
+        try container.encodeIfPresent(selectedPrompt, forKey: .selectedPrompt)
+        try container.encodeIfPresent(selectedLanguage, forKey: .selectedLanguage)
+        try container.encode(isTextFormattingEnabled, forKey: .isTextFormattingEnabled)
+        try container.encode(punctuationCleanupMode, forKey: .punctuationCleanupMode)
+        try container.encode(punctuationCleanupMode == .removeAll, forKey: .removePunctuation)
+        try container.encode(lowercaseTranscription, forKey: .lowercaseTranscription)
+        try container.encode(useScreenCapture, forKey: .useScreenCapture)
+        try container.encodeIfPresent(selectedAIProvider, forKey: .selectedAIProvider)
+        try container.encodeIfPresent(selectedAIModel, forKey: .selectedAIModel)
+        try container.encode(autoSendKey, forKey: .autoSendKey)
+        try container.encodeIfPresent(selectedTranscriptionModelName, forKey: .selectedTranscriptionModelName)
+        try container.encode(isEnabled, forKey: .isEnabled)
+        try container.encode(isDefault, forKey: .isDefault)
+    }
+
+    public static func == (lhs: PowerModeConfig, rhs: PowerModeConfig) -> Bool {
+        lhs.id == rhs.id
+    }
+}
+
+public extension Array where Element == PowerModeConfig {
+    var powerModePolicyRules: [VoiceInkPowerModeRule] {
+        map(\.powerModePolicyRule)
+    }
+
+    var hasEnabledAutomaticRules: Bool {
+        VoiceInkPowerModePolicy.hasEnabledAutomaticRules(in: powerModePolicyRules)
+    }
+
+    var hasEnabledURLRules: Bool {
+        VoiceInkPowerModePolicy.hasEnabledWebsiteRules(in: powerModePolicyRules)
+    }
+}
+
+public extension PowerModeConfig {
+    var powerModePolicyRule: VoiceInkPowerModeRule {
+        VoiceInkPowerModeRule(
+            id: id,
+            name: name,
+            appRules: (appConfigs ?? []).map(\.rule),
+            websiteRules: (urlConfigs ?? []).map(\.rule),
+            isEnabled: isEnabled,
+            isDefault: isDefault
+        )
+    }
+}
+
 public struct VoiceInkPowerModeAppConfig: Identifiable, Codable, Equatable, Sendable {
     public let id: UUID
     public var bundleIdentifier: String

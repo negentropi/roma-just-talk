@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import VoiceInkCore
 
 extension View {
     func placeholder<Content: View>(

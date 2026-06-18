@@ -44,6 +44,102 @@ final class PowerModePolicyTests: XCTestCase {
         )
     }
 
+    func testPowerModeConfigPreservesStoredShapeEqualityAndRuleAdapter() throws {
+        let id = UUID()
+        let config = PowerModeConfig(
+            id: id,
+            name: "Writing",
+            emoji: "W",
+            appConfigs: [
+                VoiceInkPowerModeAppConfig(
+                    bundleIdentifier: "com.example.App",
+                    appName: "Example"
+                )
+            ],
+            urlConfigs: [
+                VoiceInkPowerModeURLConfig(url: "example.com")
+            ],
+            isAIEnhancementEnabled: true,
+            selectedPrompt: "prompt-id",
+            selectedTranscriptionModelName: "ggml-base",
+            selectedLanguage: "en",
+            useScreenCapture: true,
+            isTextFormattingEnabled: true,
+            punctuationCleanupMode: .removeAll,
+            lowercaseTranscription: true,
+            selectedAIProvider: "openai",
+            selectedAIModel: "gpt-4o",
+            autoSendKey: .commandEnter,
+            isEnabled: true,
+            isDefault: true
+        )
+        let sameIDConfig = PowerModeConfig(
+            id: id,
+            name: "Other",
+            emoji: "O",
+            isAIEnhancementEnabled: false
+        )
+
+        XCTAssertEqual(config, sameIDConfig)
+
+        let object = try jsonObject(from: config)
+        XCTAssertEqual(object["id"] as? String, id.uuidString)
+        XCTAssertEqual(object["name"] as? String, "Writing")
+        XCTAssertEqual(object["emoji"] as? String, "W")
+        XCTAssertEqual(object["selectedPrompt"] as? String, "prompt-id")
+        XCTAssertEqual(object["selectedTranscriptionModelName"] as? String, "ggml-base")
+        XCTAssertEqual(object["selectedLanguage"] as? String, "en")
+        XCTAssertEqual(object["punctuationCleanupMode"] as? String, PunctuationCleanupMode.removeAll.rawValue)
+        XCTAssertEqual(object["removePunctuation"] as? Bool, true)
+        XCTAssertEqual(object["autoSendKey"] as? String, VoiceInkAutoSendKey.commandEnter.rawValue)
+
+        let rule = config.powerModePolicyRule
+        XCTAssertEqual(rule.id, id)
+        XCTAssertEqual(rule.name, "Writing")
+        XCTAssertEqual(
+            rule.appRules,
+            [VoiceInkPowerModeAppRule(bundleIdentifier: "com.example.App", appName: "Example")]
+        )
+        XCTAssertEqual(rule.websiteRules, [VoiceInkPowerModeWebsiteRule(url: "example.com")])
+        XCTAssertTrue(rule.isEnabled)
+        XCTAssertTrue(rule.isDefault)
+    }
+
+    func testPowerModeConfigDecodesLegacyStoredKeys() throws {
+        let id = UUID()
+        let data = Data("""
+        {
+          "id": "\(id.uuidString)",
+          "name": "Legacy",
+          "emoji": "L",
+          "appConfigs": [],
+          "urlConfigs": [],
+          "isAIEnhancementEnabled": false,
+          "useScreenCapture": false,
+          "isTextFormattingEnabled": true,
+          "removePunctuation": true,
+          "lowercaseTranscription": true,
+          "isAutoSendEnabled": true,
+          "selectedWhisperModel": "ggml-base.en"
+        }
+        """.utf8)
+
+        let config = try JSONDecoder().decode(PowerModeConfig.self, from: data)
+
+        XCTAssertEqual(config.id, id)
+        XCTAssertEqual(config.name, "Legacy")
+        XCTAssertEqual(config.emoji, "L")
+        XCTAssertEqual(config.appConfigs, [])
+        XCTAssertEqual(config.urlConfigs, [])
+        XCTAssertEqual(config.punctuationCleanupMode, .removeAll)
+        XCTAssertTrue(config.isTextFormattingEnabled)
+        XCTAssertTrue(config.lowercaseTranscription)
+        XCTAssertEqual(config.autoSendKey, .enter)
+        XCTAssertEqual(config.selectedTranscriptionModelName, "ggml-base.en")
+        XCTAssertTrue(config.isEnabled)
+        XCTAssertFalse(config.isDefault)
+    }
+
     func testAutoSendKeyPreservesStoredValuesPickerOrderAndLabels() {
         XCTAssertEqual(
             VoiceInkAutoSendKey.allCases,

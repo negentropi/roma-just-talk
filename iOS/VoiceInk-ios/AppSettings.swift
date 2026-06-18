@@ -22,8 +22,7 @@ final class AppSettings: ObservableObject {
         }
     }
     
-    @Published private var apiKeysByProvider: [VoiceInkProviderKind: String]
-    @Published private var verifiedAPIKeyProviders: Set<VoiceInkProviderKind>
+    @Published private var apiKeyState: VoiceInkProviderAPIKeyState
     
     // Audio session timeout configuration
     @Published var audioSessionTimeoutSeconds: Int {
@@ -72,12 +71,15 @@ final class AppSettings: ObservableObject {
         self.selectedModeId = VoiceInkModeStorage.loadSelectedModeId()
         
 
-        self.apiKeysByProvider = Dictionary(
+        let storedAPIKeys = Dictionary(
             uniqueKeysWithValues: VoiceInkProviderKind.userAPIKeyProviders.map { provider in
                 (provider, Self.loadAPIKey(for: provider))
             }
         )
-        self.verifiedAPIKeyProviders = VoiceInkProviderAPIKeyVerificationState.verifiedProviders()
+        self.apiKeyState = VoiceInkProviderAPIKeyState(
+            storedKeysByProvider: storedAPIKeys,
+            verifiedProviders: VoiceInkProviderAPIKeyVerificationState.verifiedProviders()
+        )
         
         // Load audio session timeout (default: 90 seconds)
         self.audioSessionTimeoutSeconds = VoiceInkAudioSessionTimeoutPreference.timeoutSeconds()
@@ -97,11 +99,11 @@ final class AppSettings: ObservableObject {
     }
 
     func apiKey(for provider: VoiceInkProviderKind) -> String {
-        runtimeAPIKey(for: provider) ?? ""
+        apiKeyState.runtimeAPIKey(for: provider) ?? ""
     }
 
     func storedAPIKey(for provider: VoiceInkProviderKind) -> String {
-        apiKeysByProvider[provider] ?? ""
+        apiKeyState.storedAPIKey(for: provider)
     }
 
     func setAPIKey(_ key: String, for provider: VoiceInkProviderKind) {
@@ -109,33 +111,30 @@ final class AppSettings: ObservableObject {
             return
         }
 
-        let oldKey = apiKeysByProvider[provider] ?? ""
-        apiKeysByProvider[provider] = key
+        var updatedState = apiKeyState
+        let didResetVerification = updatedState.setStoredAPIKey(key, for: provider)
+        apiKeyState = updatedState
         saveAPIKey(key, for: provider)
 
-        if oldKey != key {
-            setKeyVerified(false, for: provider)
+        if didResetVerification {
+            VoiceInkProviderAPIKeyVerificationState.setVerified(false, for: provider)
         }
     }
     
     func isKeyVerified(for provider: VoiceInkProviderKind) -> Bool {
-        provider.isReady(
-            userAPIKey: runtimeAPIKey(for: provider) ?? "",
-            userAPIKeyVerified: verifiedAPIKeyProviders.contains(provider),
+        apiKeyState.isReady(
+            for: provider,
             localWhisperModelAvailable: LocalModelManager.shared.hasAvailableModel
         )
     }
     
     func setKeyVerified(_ verified: Bool, for provider: VoiceInkProviderKind) {
-        guard provider.requiresUserAPIKey else {
+        var updatedState = apiKeyState
+        guard updatedState.setVerified(verified, for: provider) else {
             return
         }
 
-        if verified {
-            verifiedAPIKeyProviders.insert(provider)
-        } else {
-            verifiedAPIKeyProviders.remove(provider)
-        }
+        apiKeyState = updatedState
         VoiceInkProviderAPIKeyVerificationState.setVerified(verified, for: provider)
     }
 
@@ -306,17 +305,6 @@ final class AppSettings: ObservableObject {
         _ = KeychainService.delete(key: account)
     }
 
-    private func runtimeAPIKey(for provider: VoiceInkProviderKind) -> String? {
-        guard provider.requiresUserAPIKey else {
-            return provider.runtimeAPIKeyIfAvailable(userAPIKey: "")
-        }
-
-        return VoiceInkProviderAPIKeyLookup.usableAPIKey(
-            storedKey: apiKeysByProvider[provider],
-            provider: provider
-        )
-    }
-
     // MARK: - Debug Reset
     /// Remove all persisted preferences, API keys, and modes.
     func resetAll() {
@@ -327,7 +315,7 @@ final class AppSettings: ObservableObject {
         selectedModeId = nil
 
         // Clear verification flags
-        verifiedAPIKeyProviders = []
+        apiKeyState = VoiceInkProviderAPIKeyState()
         
         // Reset audio session timeout to default
         audioSessionTimeoutSeconds = defaults.audioSessionTimeoutSeconds
@@ -345,7 +333,6 @@ final class AppSettings: ObservableObject {
         VoiceInkSharedPreferenceReset.clearCoreUserSettings()
 
         // Clear API keys from memory and Keychain
-        apiKeysByProvider = [:]
         VoiceInkProviderKind.userAPIKeyProviders.forEach(Self.deleteAPIKey)
     }
 }

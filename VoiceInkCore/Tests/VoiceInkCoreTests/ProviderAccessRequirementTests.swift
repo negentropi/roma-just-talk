@@ -120,6 +120,53 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertNil(draft.keyToSaveAfterSuccessfulVerification)
     }
 
+    func testProviderAPIKeyStateResolvesStoredRuntimeKeysAndNonUserProviders() {
+        let state = VoiceInkProviderAPIKeyState(
+            storedKeysByProvider: [.groq: " groq-key "],
+            verifiedProviders: [.groq]
+        )
+
+        XCTAssertEqual(state.storedAPIKey(for: .groq), " groq-key ")
+        XCTAssertEqual(state.runtimeAPIKey(for: .groq), "groq-key")
+        XCTAssertEqual(state.runtimeAPIKey(for: .localWhisper), "local")
+        XCTAssertNil(state.runtimeAPIKey(for: .voiceInk))
+    }
+
+    func testProviderAPIKeyStateReadinessUsesVerificationAndLocalModelState() {
+        let state = VoiceInkProviderAPIKeyState(
+            storedKeysByProvider: [.groq: "groq-key"],
+            verifiedProviders: [.groq]
+        )
+
+        XCTAssertTrue(state.isReady(for: .groq, localWhisperModelAvailable: false))
+        XCTAssertFalse(state.isReady(for: .deepgram, localWhisperModelAvailable: false))
+        XCTAssertTrue(state.isReady(for: .localWhisper, localWhisperModelAvailable: true))
+        XCTAssertFalse(state.isReady(for: .localWhisper, localWhisperModelAvailable: false))
+        XCTAssertTrue(state.isReady(for: .voiceInk, localWhisperModelAvailable: false))
+    }
+
+    func testProviderAPIKeyStateResetVerificationWhenStoredKeyChanges() {
+        var state = VoiceInkProviderAPIKeyState(
+            storedKeysByProvider: [.groq: "old-key"],
+            verifiedProviders: [.groq]
+        )
+
+        XCTAssertFalse(state.setStoredAPIKey("old-key", for: .groq))
+        XCTAssertTrue(state.isReady(for: .groq, localWhisperModelAvailable: false))
+
+        XCTAssertTrue(state.setStoredAPIKey("new-key", for: .groq))
+        XCTAssertEqual(state.storedAPIKey(for: .groq), "new-key")
+        XCTAssertFalse(state.isReady(for: .groq, localWhisperModelAvailable: false))
+    }
+
+    func testProviderAPIKeyStateVerificationIgnoresNonUserKeyProviders() {
+        var state = VoiceInkProviderAPIKeyState()
+
+        XCTAssertFalse(state.setVerified(true, for: .localWhisper))
+        XCTAssertFalse(state.setStoredAPIKey("ignored", for: .voiceInk))
+        XCTAssertEqual(state.storedAPIKey(for: .voiceInk), "")
+    }
+
     func testRuntimeAPIKeyIfAvailableFollowsProviderAccessPolicyAndBlankRules() {
         XCTAssertEqual(VoiceInkProviderKind.groq.runtimeAPIKeyIfAvailable(userAPIKey: "groq-key"), "groq-key")
         XCTAssertNil(VoiceInkProviderKind.groq.runtimeAPIKeyIfAvailable(userAPIKey: " \n "))

@@ -97,6 +97,19 @@ final class OnboardingPresentationTests: XCTestCase {
         XCTAssertEqual(presentation.placeholderText, "Click here and start speaking...")
     }
 
+    func testMacOSResetOnboardingSettingsAlertPresentationPreservesCopy() {
+        let presentation = VoiceInkMacOSOnboardingPresentation.resetSettingsAlert
+
+        XCTAssertEqual(presentation.buttonTitle, "Reset Onboarding")
+        XCTAssertEqual(presentation.alertTitle, "Reset Onboarding")
+        XCTAssertEqual(presentation.cancelButtonTitle, "Cancel")
+        XCTAssertEqual(presentation.confirmButtonTitle, "Reset")
+        XCTAssertEqual(
+            presentation.message,
+            "You'll see the introduction screens again the next time you launch the app."
+        )
+    }
+
     func testIOSReadyOnboardingPresentationPreservesCopyAndStepOrder() {
         let presentation = VoiceInkIOSOnboardingPresentation.ready
 

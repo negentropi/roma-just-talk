@@ -1652,6 +1652,26 @@ reject_pattern \
   VoiceInk/Views/Onboarding/OnboardingTutorialView.swift
 
 require_pattern \
+  "shared macOS reset-onboarding settings presentation lives in VoiceInkCore" \
+  'VoiceInkMacOSResetOnboardingPresentation|resetSettingsAlert|confirmButtonTitle|message' \
+  VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift
+
+require_pattern \
+  "macOS settings reset onboarding uses shared presentation" \
+  'VoiceInkMacOSOnboardingPresentation\.resetSettingsAlert|resetOnboardingPresentation\.(buttonTitle|alertTitle|cancelButtonTitle|confirmButtonTitle|message)' \
+  VoiceInk/Views/Settings/SettingsView.swift
+
+reject_pattern \
+  "macOS settings reset onboarding avoids shell-only alert copy" \
+  '"Reset Onboarding"|"You'\''ll see the introduction screens again the next time you launch the app\."' \
+  VoiceInk/Views/Settings/SettingsView.swift
+
+require_pattern \
+  "migration checklist tracks shared macOS reset onboarding alert presentation" \
+  'macOS reset-onboarding settings alert presentation|VoiceInkMacOSOnboardingPresentation\.resetSettingsAlert' \
+  docs/ios-single-repo-migration.md
+
+require_pattern \
   "shared macOS onboarding permission presentation lives in VoiceInkCore" \
   'VoiceInkMacOSOnboardingPermissionPresentation|VoiceInkMacOSOnboardingPermissionKind|relaunchRequiredMessage|canSkipWhenNotGranted|buttonTitle' \
   VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift

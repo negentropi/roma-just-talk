@@ -144,6 +144,28 @@ public struct VoiceInkMacOSOnboardingTutorialPresentation: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkMacOSResetOnboardingPresentation: Equatable, Sendable {
+    public let buttonTitle: String
+    public let alertTitle: String
+    public let cancelButtonTitle: String
+    public let confirmButtonTitle: String
+    public let message: String
+
+    public init(
+        buttonTitle: String,
+        alertTitle: String,
+        cancelButtonTitle: String,
+        confirmButtonTitle: String,
+        message: String
+    ) {
+        self.buttonTitle = buttonTitle
+        self.alertTitle = alertTitle
+        self.cancelButtonTitle = cancelButtonTitle
+        self.confirmButtonTitle = confirmButtonTitle
+        self.message = message
+    }
+}
+
 public struct VoiceInkOnboardingReadyPresentation: Equatable, Sendable {
     public let iconSystemName: String
     public let title: String
@@ -193,6 +215,14 @@ public enum VoiceInkMacOSOnboardingPresentation {
         skipButtonTitle: "Skip for now",
         placeholderIconSystemName: "wand.and.stars",
         placeholderText: "Click here and start speaking..."
+    )
+
+    public static let resetSettingsAlert = VoiceInkMacOSResetOnboardingPresentation(
+        buttonTitle: "Reset Onboarding",
+        alertTitle: "Reset Onboarding",
+        cancelButtonTitle: "Cancel",
+        confirmButtonTitle: "Reset",
+        message: "You'll see the introduction screens again the next time you launch the app."
     )
 }
 

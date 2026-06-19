@@ -31,6 +31,7 @@ struct SettingsView: View {
     @State private var isMiddleClickExpanded = false
     @State private var isSoundFeedbackExpanded = false
     @State private var isRestoreClipboardExpanded = false
+    private static let resetOnboardingPresentation = VoiceInkMacOSOnboardingPresentation.resetSettingsAlert
 
     var body: some View {
         Form {
@@ -271,7 +272,7 @@ struct SettingsView: View {
                     }
                     .disabled(!updaterViewModel.canCheckForUpdates)
 
-                    Button("Reset Onboarding") {
+                    Button(Self.resetOnboardingPresentation.buttonTitle) {
                         showResetOnboardingAlert = true
                     }
                 }
@@ -332,15 +333,15 @@ struct SettingsView: View {
         .formStyle(.grouped)
         .scrollContentBackground(.hidden)
         .background(Color(NSColor.controlBackgroundColor))
-        .alert("Reset Onboarding", isPresented: $showResetOnboardingAlert) {
-            Button("Cancel", role: .cancel) { }
-            Button("Reset", role: .destructive) {
+        .alert(Self.resetOnboardingPresentation.alertTitle, isPresented: $showResetOnboardingAlert) {
+            Button(Self.resetOnboardingPresentation.cancelButtonTitle, role: .cancel) { }
+            Button(Self.resetOnboardingPresentation.confirmButtonTitle, role: .destructive) {
                 DispatchQueue.main.async {
                     hasCompletedOnboarding = false
                 }
             }
         } message: {
-            Text("You'll see the introduction screens again the next time you launch the app.")
+            Text(Self.resetOnboardingPresentation.message)
         }
     }
 

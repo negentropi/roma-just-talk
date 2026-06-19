@@ -12,6 +12,9 @@ class TranscriptionRetryService {
     typealias TranscribeFile = (URL) async throws -> VoiceInkTranscriptionRunResult
 
     private let runProcessor = VoiceInkTranscriptionRunProcessor()
+    private let transcriptionServiceFactory = VoiceInkAudioTranscriptionServiceFactory {
+        WhisperTranscriptionService()
+    }
     private let transcribeFileOverride: TranscribeFile?
     
     static let shared = TranscriptionRetryService()
@@ -48,12 +51,7 @@ class TranscriptionRetryService {
                 await settings.apiKey(for: provider)
             },
             transcriptionServiceProvider: { provider in
-                switch provider.transcriptionServiceKind {
-                case .remote:
-                    return VoiceInkRemoteTranscriptionService(provider: provider)
-                case .localWhisper:
-                    return WhisperTranscriptionService()
-                }
+                transcriptionServiceFactory.service(for: provider)
             }
         )
     }

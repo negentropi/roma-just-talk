@@ -11,6 +11,31 @@ public protocol VoiceInkAudioTranscriptionService {
     ) async throws -> String
 }
 
+public struct VoiceInkAudioTranscriptionServiceFactory {
+    public typealias RemoteServiceFactory = (VoiceInkProviderKind) -> any VoiceInkAudioTranscriptionService
+    public typealias LocalWhisperServiceFactory = () -> any VoiceInkAudioTranscriptionService
+
+    private let remoteServiceFactory: RemoteServiceFactory
+    private let localWhisperServiceFactory: LocalWhisperServiceFactory
+
+    public init(
+        localWhisperServiceFactory: @escaping LocalWhisperServiceFactory,
+        remoteServiceFactory: @escaping RemoteServiceFactory = { VoiceInkRemoteTranscriptionService(provider: $0) }
+    ) {
+        self.localWhisperServiceFactory = localWhisperServiceFactory
+        self.remoteServiceFactory = remoteServiceFactory
+    }
+
+    public func service(for provider: VoiceInkProviderKind) -> any VoiceInkAudioTranscriptionService {
+        switch provider.transcriptionServiceKind {
+        case .remote:
+            return remoteServiceFactory(provider)
+        case .localWhisper:
+            return localWhisperServiceFactory()
+        }
+    }
+}
+
 public struct VoiceInkRemoteTranscriptionOptions: Equatable, Sendable {
     public let prompt: String?
     public let customVocabulary: [String]

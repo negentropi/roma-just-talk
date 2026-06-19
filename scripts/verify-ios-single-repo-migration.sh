@@ -1447,6 +1447,21 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
 
 require_pattern \
+  "shared audio transcription service factory owns provider dispatch" \
+  'VoiceInkAudioTranscriptionServiceFactory' \
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
+
+require_pattern \
+  "iOS retry transcription uses shared audio transcription service factory" \
+  'VoiceInkAudioTranscriptionServiceFactory' \
+  iOS/VoiceInk-ios/TranscriptionRetryService.swift
+
+reject_pattern \
+  "iOS retry transcription avoids shell-only provider dispatch" \
+  'transcriptionServiceKind|VoiceInkRemoteTranscriptionService\(provider:' \
+  iOS/VoiceInk-ios/TranscriptionRetryService.swift
+
+require_pattern \
   "shared run processor uses shared prompt use policy" \
   'VoiceInkTranscriptionPromptUse\.recordedFileTranscription' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift

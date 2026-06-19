@@ -946,7 +946,7 @@ final class CoreAudioRecorder: @unchecked Sendable {
             inputSampleRate: inputSampleRate,
             outputSampleRate: outputSampleRate,
             to: outputBuffer,
-            outputCapacity: conversionBufferSize
+            outputCapacity: Int(conversionBufferSize)
         )
         guard writtenSampleCount > 0 else { return }
 

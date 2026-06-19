@@ -772,7 +772,7 @@ extension View {
     ) -> some View {
         let presentation = VoiceInkPowerModePresentation.validationAlert(errors: errors)
 
-        self.alert(
+        return self.alert(
             presentation.title,
             isPresented: isPresented,
             actions: {

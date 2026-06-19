@@ -249,7 +249,7 @@ struct InlineHistoryView: View {
             searchText: searchText
         )
 
-        VStack(spacing: 12) {
+        return VStack(spacing: 12) {
             Spacer()
             Image(systemName: presentation.systemImageName)
                 .font(.system(size: 40))

@@ -37,6 +37,13 @@ public struct VoiceInkAudioTranscriptionServiceFactory {
 }
 
 public struct VoiceInkRemoteTranscriptionOptions: Equatable, Sendable {
+    public static var defaultOpenAICompatibleErrorDomain: String {
+        guard let apiErrorDomain = VoiceInkTranscriptionModelProvider.groq.apiErrorDomain else {
+            preconditionFailure("Groq provider metadata must define an API error domain")
+        }
+        return apiErrorDomain
+    }
+
     public let prompt: String?
     public let customVocabulary: [String]
     public let openAICompatibleResponseFormat: String?
@@ -53,7 +60,7 @@ public struct VoiceInkRemoteTranscriptionOptions: Equatable, Sendable {
         customVocabulary: [String] = [],
         openAICompatibleResponseFormat: String? = nil,
         openAICompatibleTemperature: String? = nil,
-        openAICompatibleErrorDomain: String = "GroqAPI",
+        openAICompatibleErrorDomain: String = VoiceInkRemoteTranscriptionOptions.defaultOpenAICompatibleErrorDomain,
         openAICompatibleTimeout: TimeInterval? = nil,
         openAICompatibleMaxRetries: Int = 0,
         deepgramParagraphs: Bool? = nil,
@@ -90,7 +97,7 @@ public struct VoiceInkRemoteTranscriptionOptions: Equatable, Sendable {
                 prompt: requestPrompt,
                 openAICompatibleResponseFormat: "json",
                 openAICompatibleTemperature: "0",
-                openAICompatibleErrorDomain: "GroqAPI",
+                openAICompatibleErrorDomain: Self.defaultOpenAICompatibleErrorDomain,
                 openAICompatibleTimeout: 60,
                 openAICompatibleMaxRetries: 2
             )
@@ -271,6 +278,14 @@ public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionServ
         )
     }
 
+    func providerAPIErrorDomain(defaultingTo defaultProvider: VoiceInkTranscriptionModelProvider) -> String {
+        guard provider?.transcriptionTransport == transport,
+              let providerErrorDomain = provider?.transcriptionModelProvider?.apiErrorDomain else {
+            return defaultProvider.apiErrorDomain ?? VoiceInkRemoteTranscriptionOptions.defaultOpenAICompatibleErrorDomain
+        }
+        return providerErrorDomain
+    }
+
     public func transcribeAudioData(
         apiKey: String,
         model: String,
@@ -321,7 +336,7 @@ public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionServ
                 model: model,
                 audioData: audioData,
                 fileName: fileName,
-                errorDomain: "MistralAPI",
+                errorDomain: providerAPIErrorDomain(defaultingTo: .mistral),
                 timeout: 30,
                 maxRetries: 2
             )
@@ -364,7 +379,7 @@ public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionServ
                 language: language,
                 prompt: options.prompt,
                 customVocabulary: options.customVocabulary,
-                errorDomain: "AssemblyAIAPI"
+                errorDomain: providerAPIErrorDomain(defaultingTo: .assemblyAI)
             )
         case .xai:
             return try await xaiClient.transcribeAudioData(
@@ -374,7 +389,7 @@ public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionServ
                 fileName: fileName,
                 language: language,
                 format: true,
-                errorDomain: "XAIAPI",
+                errorDomain: providerAPIErrorDomain(defaultingTo: .xai),
                 timeout: 60,
                 maxRetries: 2
             )

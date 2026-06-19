@@ -1387,6 +1387,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift
 
 require_pattern \
+  "shared remote transcription service uses provider API error-domain metadata" \
+  'defaultOpenAICompatibleErrorDomain|providerAPIErrorDomain\(defaultingTo:' \
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
+
+require_pattern \
   "macOS cloud provider uses shared API error-domain mapping" \
   'coreTranscriptionModelProvider\?\.apiErrorDomain' \
   VoiceInk/Transcription/Cloud/CloudProvider.swift
@@ -1395,6 +1400,11 @@ reject_pattern \
   "macOS cloud provider avoids shell-only API error-domain mapping" \
   '"(GroqAPI|DeepgramAPI|GeminiAPI|MistralAPI|ElevenLabsAPI|SonioxAPI|SpeechmaticsAPI|AssemblyAIAPI|XAIAPI)"' \
   VoiceInk/Transcription/Cloud/CloudProvider.swift
+
+reject_pattern \
+  "shared remote transcription service avoids provider API error-domain literals" \
+  '"(MistralAPI|AssemblyAIAPI|XAIAPI)"' \
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
 
 require_pattern \
   "shared custom cloud model backup record owns export/import shape" \

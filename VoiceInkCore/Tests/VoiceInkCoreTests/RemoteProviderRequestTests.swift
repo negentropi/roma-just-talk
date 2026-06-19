@@ -312,6 +312,31 @@ final class RemoteProviderRequestTests: XCTestCase {
         XCTAssertNil(directTransport.openAICompatibleTimeout)
     }
 
+    func testRemoteTranscriptionServiceUsesSharedProviderErrorDomainsForProviderTransports() throws {
+        let providers: [(VoiceInkProviderKind, VoiceInkTranscriptionModelProvider)] = [
+            (.mistral, .mistral),
+            (.assemblyAI, .assemblyAI),
+            (.xai, .xai)
+        ]
+
+        for (provider, modelProvider) in providers {
+            XCTAssertEqual(
+                VoiceInkRemoteTranscriptionService(provider: provider)
+                    .providerAPIErrorDomain(defaultingTo: modelProvider),
+                try XCTUnwrap(provider.transcriptionModelProvider?.apiErrorDomain)
+            )
+        }
+
+        let directMistral = VoiceInkRemoteTranscriptionService(
+            transport: .mistral,
+            apiBaseURL: try XCTUnwrap(URL(string: "https://api.mistral.ai"))
+        )
+        XCTAssertEqual(
+            directMistral.providerAPIErrorDomain(defaultingTo: .mistral),
+            VoiceInkTranscriptionModelProvider.mistral.apiErrorDomain
+        )
+    }
+
     func testRemoteTranscriptionServicePassesFilePromptToTranscriptionRequest() async throws {
         let audioURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("VoiceInkCore.RemoteProviderRequestTests.\(UUID().uuidString).wav")

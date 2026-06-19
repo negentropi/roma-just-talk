@@ -192,7 +192,7 @@ class SystemInfoService {
         Mode: \(configuration.mode.displayName)
         Pre-run Finalization: \(configuration.preRunFinalization)
         Buffer Duration: \(configuration.bufferDurationSeconds)s
-        Rolling VAD Model: \(RollingBufferVADSettings.selectedModel())
+        Rolling VAD Model: \(VoiceInkRollingBufferVADSettings.selectedModel())
         Auto Disable Cloud Models: \(configuration.autoDisablesCloudModels)
         Auto Disable Local Models on Low Battery: \(configuration.autoDisablesLowBatteryLocalModels)
         Low Battery Threshold: \(configuration.lowBatteryThresholdPercent)%

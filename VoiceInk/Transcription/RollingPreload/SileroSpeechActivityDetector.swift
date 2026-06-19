@@ -18,7 +18,7 @@ final class SileroSpeechActivityDetector: SpeechActivityDetecting, @unchecked Se
     private var context: OpaquePointer?
 
     static func makeDefault() async -> SileroSpeechActivityDetector? {
-        guard RollingBufferVADSettings.usesSilero(),
+        guard VoiceInkRollingBufferVADSettings.usesSilero(),
               let modelPath = VoiceInkVADModelFiles.sileroPath() else {
             return nil
         }

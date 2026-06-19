@@ -30,7 +30,7 @@ enum AppDefaults {
             VoiceInkRollingBufferPreloadSettings.lowBatteryThresholdPercentKey: VoiceInkRollingBufferPreloadSettings.defaultLowBatteryThresholdPercent,
             VoiceInkRollingBufferPreloadSettings.bufferDurationSecondsKey: VoiceInkRollingBufferPreloadSettings.defaultBufferDurationSeconds,
             VoiceInkRollingBufferPreloadSettings.preRunFinalizationKey: VoiceInkRollingBufferPreloadSettings.defaultPreRunFinalization,
-            RollingBufferVADSettings.modelKey: RollingBufferVADSettings.sileroModelName,
+            VoiceInkRollingBufferVADSettings.modelKey: VoiceInkRollingBufferVADSettings.sileroModelName,
             "RecorderType": "none",
 
             // UI & Behavior

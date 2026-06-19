@@ -4601,6 +4601,26 @@ require_pattern \
   'VoiceInkRollingBufferPreloadSettings\.perModelPreloadEnabled\(forModelName: currentModelName\)' \
   VoiceInk/Services/SystemInfoService.swift
 
+require_pattern \
+  "shared rolling-buffer VAD model settings live in VoiceInkCore" \
+  'VoiceInkRollingBufferVADModel|VoiceInkRollingBufferVADSettings|modelKey = "RollingBufferVADModel"|sileroModelName|saveImportedModel' \
+  VoiceInkCore/Sources/VoiceInkCore/RollingBufferPreloadPolicy.swift
+
+require_pattern \
+  "macOS defaults register shared rolling-buffer VAD model default" \
+  'VoiceInkRollingBufferVADSettings\.(modelKey|sileroModelName)' \
+  VoiceInk/AppDefaults.swift
+
+require_pattern \
+  "macOS rolling-buffer settings use shared VAD model catalog" \
+  'VoiceInkRollingBufferVADSettings\.(modelKey|defaultModel)|VoiceInkRollingBufferVADModel\.allCases' \
+  VoiceInk/Views/Settings/RollingBufferPreloadSettingsControls.swift
+
+require_pattern \
+  "macOS rolling VAD detector uses shared selected-model policy" \
+  'VoiceInkRollingBufferVADSettings\.usesSilero\(\)' \
+  VoiceInk/Transcription/RollingPreload/SileroSpeechActivityDetector.swift
+
 reject_pattern \
   "macOS diagnostics avoid shell-only rolling-buffer per-model default lookup" \
   'perModelPreloadEnabledKey\(forModelName: currentModelName\)|object\(forKey: key\) as\? Bool \?\? true' \
@@ -4611,9 +4631,19 @@ require_pattern \
   'VoiceInkRollingBufferPreloadSettings\.saveImportedSettings\(' \
   VoiceInk/Services/BackupImporter.swift
 
+require_pattern \
+  "macOS backup import uses shared rolling-buffer VAD model import policy" \
+  'VoiceInkRollingBufferVADSettings\.saveImportedModel' \
+  VoiceInk/Services/BackupImporter.swift
+
 reject_pattern \
   "macOS backup import avoids shell-only rolling-buffer preload storage" \
   'VoiceInkRollingBufferPreloadSettings\.(modeKey|autoDisableCloudModelsKey|autoDisableLowBatteryLocalModelsKey|lowBatteryThresholdPercentKey|bufferDurationSecondsKey|preRunFinalizationKey|perModelPreloadEnabledKey)|min\(max\(threshold|for \(modelName, enabled\) in perModelSettings' \
+  VoiceInk/Services/BackupImporter.swift
+
+reject_pattern \
+  "macOS backup import avoids shell-only rolling-buffer VAD model policy" \
+  '\bRollingBufferVADSettings\b|vadModel ==|UserDefaults\.standard\.set\(vadModel' \
   VoiceInk/Services/BackupImporter.swift
 
 require_pattern \
@@ -4621,10 +4651,22 @@ require_pattern \
   'VoiceInkRollingBufferPreloadSettings\.exportedPerModelPreloadEnabled\(\)' \
   VoiceInk/Services/ImportExportService.swift
 
+require_pattern \
+  "macOS backup export uses shared rolling-buffer VAD selected model" \
+  'VoiceInkRollingBufferVADSettings\.selectedModel\(\)' \
+  VoiceInk/Services/ImportExportService.swift
+
 reject_pattern \
   "macOS backup export avoids shell-only rolling-buffer per-model key scan" \
   'perModelEnabledKeyPrefix|dictionaryRepresentation\(\)|exportPerModelRollingBufferPreloadSettings|dropFirst\(prefix\.count\)' \
   VoiceInk/Services/ImportExportService.swift
+
+reject_pattern \
+  "macOS rolling-buffer shell avoids local VAD model settings policy" \
+  'enum +RollingBufferVADSettings|\bRollingBufferVADSettings\b|Text\("Silero"\)' \
+  VoiceInk/Transcription/RollingPreload/RollingBufferPreloadSettings.swift \
+  VoiceInk/Views/Settings/RollingBufferPreloadSettingsControls.swift \
+  VoiceInk/Transcription/RollingPreload/SileroSpeechActivityDetector.swift
 
 require_pattern \
   "macOS Native Apple transcription uses shared source-compatible language fallback" \

@@ -20,6 +20,36 @@ final class RollingBufferPreloadPolicyTests: XCTestCase {
         XCTAssertTrue(VoiceInkRollingBufferPreloadSettings.defaultPerModelPreloadEnabled)
     }
 
+    func testVADModelSettingsPreserveExistingStorageAndSileroIdentity() {
+        XCTAssertEqual(VoiceInkRollingBufferVADSettings.modelKey, "RollingBufferVADModel")
+        XCTAssertEqual(VoiceInkRollingBufferVADSettings.defaultModel, .silero)
+        XCTAssertEqual(VoiceInkRollingBufferVADSettings.sileroModelName, "silero")
+        XCTAssertEqual(VoiceInkRollingBufferVADModel.allCases, [.silero])
+        XCTAssertEqual(VoiceInkRollingBufferVADModel.silero.rawValue, "silero")
+        XCTAssertEqual(VoiceInkRollingBufferVADModel.silero.displayName, "Silero")
+    }
+
+    func testVADModelSettingsReadSaveAndImportRawValues() {
+        withIsolatedDefaults { defaults in
+            XCTAssertEqual(VoiceInkRollingBufferVADSettings.selectedModel(in: defaults), "silero")
+            XCTAssertTrue(VoiceInkRollingBufferVADSettings.usesSilero(in: defaults))
+
+            defaults.set("future-vad", forKey: VoiceInkRollingBufferVADSettings.modelKey)
+            XCTAssertEqual(VoiceInkRollingBufferVADSettings.selectedModel(in: defaults), "future-vad")
+            XCTAssertFalse(VoiceInkRollingBufferVADSettings.usesSilero(in: defaults))
+
+            VoiceInkRollingBufferVADSettings.saveSelectedModel(.silero, to: defaults)
+            XCTAssertEqual(VoiceInkRollingBufferVADSettings.selectedModel(in: defaults), "silero")
+            XCTAssertTrue(VoiceInkRollingBufferVADSettings.usesSilero(in: defaults))
+
+            defaults.set("future-vad", forKey: VoiceInkRollingBufferVADSettings.modelKey)
+            XCTAssertFalse(VoiceInkRollingBufferVADSettings.saveImportedModel(rawValue: "bad", to: defaults))
+            XCTAssertEqual(VoiceInkRollingBufferVADSettings.selectedModel(in: defaults), "future-vad")
+            XCTAssertTrue(VoiceInkRollingBufferVADSettings.saveImportedModel(rawValue: "silero", to: defaults))
+            XCTAssertEqual(VoiceInkRollingBufferVADSettings.selectedModel(in: defaults), "silero")
+        }
+    }
+
     func testConfigurationReadsAndClampsStoredValues() {
         withIsolatedDefaults { defaults in
             defaults.set("on", forKey: VoiceInkRollingBufferPreloadSettings.modeKey)

@@ -213,9 +213,7 @@ enum BackupImporter {
             perModelPreloadEnabled: general.rollingBufferPreloadEnabledByModel
         )
 
-        if let vadModel = general.rollingBufferVADModel,
-           vadModel == RollingBufferVADSettings.sileroModelName {
-            UserDefaults.standard.set(vadModel, forKey: RollingBufferVADSettings.modelKey)
+        if VoiceInkRollingBufferVADSettings.saveImportedModel(rawValue: general.rollingBufferVADModel) {
             didImportRollingBufferSetting = true
         }
 

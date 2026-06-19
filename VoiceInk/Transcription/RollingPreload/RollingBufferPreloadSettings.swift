@@ -20,19 +20,6 @@ extension TranscriptionModel {
     }
 }
 
-enum RollingBufferVADSettings {
-    static let modelKey = "RollingBufferVADModel"
-    static let sileroModelName = "silero"
-
-    static func selectedModel(in defaults: UserDefaults = .standard) -> String {
-        defaults.string(forKey: modelKey) ?? sileroModelName
-    }
-
-    static func usesSilero(in defaults: UserDefaults = .standard) -> Bool {
-        selectedModel(in: defaults) == sileroModelName
-    }
-}
-
 protocol RollingBufferPowerStateProviding {
     func currentPowerState() -> VoiceInkRollingBufferPowerState
 }

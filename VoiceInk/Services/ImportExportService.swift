@@ -191,7 +191,7 @@ class ImportExportService {
             rollingBufferPreloadLowBatteryThresholdPercent: rollingBufferConfiguration.lowBatteryThresholdPercent,
             rollingBufferDurationSeconds: rollingBufferConfiguration.bufferDurationSeconds,
             rollingBufferPreloadFinalization: rollingBufferConfiguration.preRunFinalization,
-            rollingBufferVADModel: RollingBufferVADSettings.selectedModel(),
+            rollingBufferVADModel: VoiceInkRollingBufferVADSettings.selectedModel(),
             rollingBufferPreloadEnabledByModel: perModelPreloadSettings.isEmpty ? nil : perModelPreloadSettings
         )
 

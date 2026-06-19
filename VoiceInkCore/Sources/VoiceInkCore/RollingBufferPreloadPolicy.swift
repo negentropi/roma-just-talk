@@ -196,6 +196,55 @@ public enum VoiceInkRollingBufferPreloadSettings {
     }
 }
 
+public enum VoiceInkRollingBufferVADModel: String, CaseIterable, Identifiable, Sendable {
+    case silero
+
+    public var id: String { rawValue }
+
+    public var displayName: String {
+        switch self {
+        case .silero:
+            return "Silero"
+        }
+    }
+}
+
+public enum VoiceInkRollingBufferVADSettings {
+    public static let modelKey = "RollingBufferVADModel"
+    public static let defaultModel: VoiceInkRollingBufferVADModel = .silero
+    public static let sileroModelName = VoiceInkRollingBufferVADModel.silero.rawValue
+
+    public static func selectedModel(in defaults: UserDefaults = .standard) -> String {
+        defaults.string(forKey: modelKey) ?? defaultModel.rawValue
+    }
+
+    public static func usesSilero(in defaults: UserDefaults = .standard) -> Bool {
+        selectedModel(in: defaults) == sileroModelName
+    }
+
+    public static func saveSelectedModel(
+        _ model: VoiceInkRollingBufferVADModel,
+        to defaults: UserDefaults = .standard
+    ) {
+        defaults.set(model.rawValue, forKey: modelKey)
+    }
+
+    @discardableResult
+    public static func saveImportedModel(
+        rawValue: String?,
+        to defaults: UserDefaults = .standard
+    ) -> Bool {
+        guard let rawValue,
+              let model = VoiceInkRollingBufferVADModel(rawValue: rawValue)
+        else {
+            return false
+        }
+
+        saveSelectedModel(model, to: defaults)
+        return true
+    }
+}
+
 public struct VoiceInkRollingBufferPreloadPolicy {
     public let configuration: VoiceInkRollingBufferPreloadConfiguration
     public let powerState: VoiceInkRollingBufferPowerState

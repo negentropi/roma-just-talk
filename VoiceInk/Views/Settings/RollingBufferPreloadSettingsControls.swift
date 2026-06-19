@@ -8,7 +8,8 @@ struct RollingBufferPreloadSettingsControls: View {
     @AppStorage(VoiceInkRollingBufferPreloadSettings.lowBatteryThresholdPercentKey) private var lowBatteryThresholdPercent = VoiceInkRollingBufferPreloadSettings.defaultLowBatteryThresholdPercent
     @AppStorage(VoiceInkRollingBufferPreloadSettings.bufferDurationSecondsKey) private var bufferDurationSeconds = VoiceInkRollingBufferPreloadSettings.defaultBufferDurationSeconds
     @AppStorage(VoiceInkRollingBufferPreloadSettings.preRunFinalizationKey) private var preRunFinalization = VoiceInkRollingBufferPreloadSettings.defaultPreRunFinalization
-    @AppStorage(RollingBufferVADSettings.modelKey) private var rollingBufferVADModel = RollingBufferVADSettings.sileroModelName
+    @AppStorage(VoiceInkRollingBufferVADSettings.modelKey)
+    private var rollingBufferVADModel = VoiceInkRollingBufferVADSettings.defaultModel.rawValue
 
     private var mode: Binding<VoiceInkRollingBufferPreloadMode> {
         Binding(
@@ -68,7 +69,9 @@ struct RollingBufferPreloadSettingsControls: View {
         .onChange(of: preRunFinalization) { _, _ in notifySettingsChanged() }
 
         Picker(selection: $rollingBufferVADModel) {
-            Text("Silero").tag(RollingBufferVADSettings.sileroModelName)
+            ForEach(VoiceInkRollingBufferVADModel.allCases) { model in
+                Text(model.displayName).tag(model.rawValue)
+            }
         } label: {
             HStack(spacing: 4) {
                 Text("Buffer VAD Model")

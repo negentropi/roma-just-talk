@@ -941,7 +941,7 @@ struct VoiceInkTests {
             modifierFlags: [.shift],
             eventTime: 2
         )
-        try await Task.sleep(nanoseconds: 10_000_000)
+        #expect(await eventually { contextUpdates.count == 1 })
         #expect(contextUpdates == [VoiceInkShortcutPressContext(didPressOtherKeyDuringPress: true, didReleaseOtherKeyDuringPress: false)])
 
         monitor.handleModifierOnlyFlagsChangedForTesting(
@@ -950,7 +950,7 @@ struct VoiceInkTests {
             eventTime: 3
         )
 
-        try await Task.sleep(nanoseconds: 10_000_000)
+        #expect(await eventually { contexts.count == 1 })
         #expect(contexts == [VoiceInkShortcutPressContext(didPressOtherKeyDuringPress: true, didReleaseOtherKeyDuringPress: false)])
     }
 
@@ -987,7 +987,7 @@ struct VoiceInkTests {
             eventTime: 3
         )
 
-        try await Task.sleep(nanoseconds: 10_000_000)
+        #expect(await eventually { keyDownCount == 1 && contexts.count == 1 })
         #expect(keyDownCount == 1)
         #expect(contexts == [VoiceInkShortcutPressContext(didPressOtherKeyDuringPress: true, didReleaseOtherKeyDuringPress: false)])
     }
@@ -1020,7 +1020,7 @@ struct VoiceInkTests {
             eventTime: 3
         )
 
-        try await Task.sleep(nanoseconds: 10_000_000)
+        #expect(await eventually { contexts.count == 1 })
         #expect(contexts == [VoiceInkShortcutPressContext(didPressOtherKeyDuringPress: true, didReleaseOtherKeyDuringPress: false)])
     }
 
@@ -1059,7 +1059,7 @@ struct VoiceInkTests {
             eventTime: 2
         )
 
-        try await Task.sleep(nanoseconds: 10_000_000)
+        #expect(await eventually { contexts.count == 1 })
         #expect(contexts == [VoiceInkShortcutPressContext(hasReliableKeyEvidence: false)])
     }
 
@@ -1098,7 +1098,7 @@ struct VoiceInkTests {
             eventTime: 2
         )
 
-        try await Task.sleep(nanoseconds: 10_000_000)
+        #expect(await eventually { contexts.count == 1 })
         #expect(contexts == [VoiceInkShortcutPressContext(didPressOtherKeyDuringPress: true)])
     }
 
@@ -1141,8 +1141,7 @@ struct VoiceInkTests {
             eventTime: 1
         )
 
-        try await Task.sleep(nanoseconds: 10_000_000)
-        #expect(keyDownCount == 0)
+        #expect(!(await eventually { keyDownCount > 0 }))
     }
 
     @Test func modifierOnlyShortcutMarksOtherKeyUpAsTyping() async throws {

@@ -19,16 +19,12 @@ struct AudioFileRow: View {
 
     /// Text for copy/save — matches visible content regardless of expansion state.
     private var actionText: String {
-        if isExpanded {
-            return displayText
-        }
-        guard let transcription = item.transcription else {
-            return ""
-        }
-        return VoiceInkTranscriptPresentation.preferredText(
-            rawText: transcription.text,
-            enhancedText: transcription.enhancedText
-        ) ?? ""
+        VoiceInkTranscriptPresentation.transcriptActionText(
+            selectedVariant: selectedTab,
+            isExpanded: isExpanded,
+            rawText: item.transcription?.text ?? "",
+            enhancedText: item.transcription?.enhancedText
+        )
     }
 
     var body: some View {

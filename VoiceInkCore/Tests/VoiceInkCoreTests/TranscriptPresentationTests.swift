@@ -41,6 +41,60 @@ final class TranscriptPresentationTests: XCTestCase {
         )
     }
 
+    func testTranscriptActionTextUsesPreferredTextWhenCollapsed() {
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.transcriptActionText(
+                selectedVariant: .original,
+                isExpanded: false,
+                rawText: "raw transcript",
+                enhancedText: "enhanced transcript"
+            ),
+            "enhanced transcript"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.transcriptActionText(
+                selectedVariant: .enhanced,
+                isExpanded: false,
+                rawText: "raw transcript",
+                enhancedText: nil
+            ),
+            "raw transcript"
+        )
+    }
+
+    func testTranscriptActionTextUsesSelectedVariantWhenExpanded() {
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.transcriptActionText(
+                selectedVariant: .original,
+                isExpanded: true,
+                rawText: "raw transcript",
+                enhancedText: "enhanced transcript"
+            ),
+            "raw transcript"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.transcriptActionText(
+                selectedVariant: .enhanced,
+                isExpanded: true,
+                rawText: "raw transcript",
+                enhancedText: "enhanced transcript"
+            ),
+            "enhanced transcript"
+        )
+    }
+
+    func testTranscriptActionTextReturnsEmptyForMissingText() {
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.transcriptActionText(
+                selectedVariant: .enhanced,
+                isExpanded: false,
+                rawText: "",
+                enhancedText: nil
+            ),
+            ""
+        )
+    }
+
     func testFailedTranscriptTextPreservesMacOSFailurePrefix() {
         XCTAssertEqual(
             VoiceInkTranscriptPresentation.failedTranscriptText(reason: "No model selected"),

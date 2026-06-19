@@ -654,6 +654,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
 
 require_pattern \
+  "shared transcript action text policy lives in VoiceInkCore" \
+  'transcriptActionText' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+require_pattern \
   "shared transcript detail presentation copy lives in VoiceInkCore" \
   'noteDetailNavigationTitle|transcriptTitle|retranscribingDisplayText|retryTranscriptionButtonTitle' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
@@ -704,9 +709,19 @@ require_pattern \
   VoiceInk/Views/AudioFileRow.swift
 
 require_pattern \
+  "macOS audio file row uses shared transcript action text policy" \
+  'VoiceInkTranscriptPresentation\.transcriptActionText' \
+  VoiceInk/Views/AudioFileRow.swift
+
+require_pattern \
   "macOS inline history uses shared transcript text variant" \
   'VoiceInkTranscriptTextVariant|tab\.title|selectedTab\.displayText|VoiceInkTranscriptTextVariant\.shouldShowTabs' \
   VoiceInk/Views/History/InlineHistoryView.swift
+
+reject_pattern \
+  "macOS audio file row avoids shell-owned transcript action text policy" \
+  'return displayText|guard let transcription = item\.transcription' \
+  VoiceInk/Views/AudioFileRow.swift
 
 reject_pattern \
   "macOS transcript variant views avoid shell-owned variant selection rules" \

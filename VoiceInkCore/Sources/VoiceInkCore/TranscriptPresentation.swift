@@ -115,6 +115,18 @@ public enum VoiceInkTranscriptPresentation {
         preferredText(rawText: rawText, enhancedText: enhancedText) ?? emptyPreferredText
     }
 
+    public static func transcriptActionText(
+        selectedVariant: VoiceInkTranscriptTextVariant,
+        isExpanded: Bool,
+        rawText: String,
+        enhancedText: String?
+    ) -> String {
+        if isExpanded {
+            return selectedVariant.displayText(rawText: rawText, enhancedText: enhancedText)
+        }
+        return preferredText(rawText: rawText, enhancedText: enhancedText) ?? ""
+    }
+
     public static func failedTranscriptText(reason: String) -> String {
         "Transcription Failed: \(reason)"
     }

@@ -2231,6 +2231,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
 
 require_pattern \
+  "macOS Power Mode model section display uses shared AI settings surface policy" \
+  'textEnhancementSettingsSurface' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+require_pattern \
   "shared AI enhancement request URL selection lives in VoiceInkCore" \
   'textEnhancementRequestURLString|textEnhancementRequestURL|invalidTextEnhancementRequestURLMessage|postProcessingRequestURL' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
@@ -2333,6 +2338,11 @@ reject_pattern \
   "macOS AI settings avoid duplicate provider settings-surface policy" \
   'selectedProvider (==|!=) \.(ollama|localCLI|custom)' \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+
+reject_pattern \
+  "macOS Power Mode avoids duplicate Custom model-section policy" \
+  'provider != \.custom' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
 
 reject_pattern \
   "macOS AI service avoids duplicate refresh model-selection policy" \

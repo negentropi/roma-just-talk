@@ -2210,6 +2210,11 @@ require_pattern \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 require_pattern \
+  "macOS AI service dynamic-provider orchestration uses shared classification policy" \
+  'textEnhancementModelCatalogSource|textEnhancementSettingsSurface' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+require_pattern \
   "macOS AI settings model-source display uses shared policy" \
   'supportsUserInitiatedTextEnhancementModelRefresh|textEnhancementModelCatalogSource' \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
@@ -2325,6 +2330,11 @@ reject_pattern \
 reject_pattern \
   "macOS AI service avoids duplicate available-model source policy" \
   'provider == \.(ollama|openRouter)|return +openRouterModels|return +provider\.staticTextEnhancementModels' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+reject_pattern \
+  "macOS AI service avoids duplicate dynamic-provider classification policy" \
+  'selectedProvider == \.(ollama|localCLI)' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 reject_pattern \

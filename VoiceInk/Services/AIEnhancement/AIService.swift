@@ -22,7 +22,7 @@ class AIService: ObservableObject {
                 to: userDefaults
             )
             applyCredentialStateForSelectedProvider()
-            if selectedProvider == .ollama {
+            if selectedProvider.textEnhancementModelCatalogSource == .ollamaRuntime {
                 Task {
                     await ollamaService.checkConnection()
                     await ollamaService.refreshModels()
@@ -132,7 +132,7 @@ class AIService: ObservableObject {
             to: userDefaults
         )
         
-        if selectedProvider == .ollama {
+        if selectedProvider.textEnhancementModelCatalogSource == .ollamaRuntime {
             updateSelectedOllamaModel(model)
         }
         
@@ -287,7 +287,7 @@ class AIService: ObservableObject {
     }
 
     private func refreshLocalCLIConfigurationState() {
-        if selectedProvider == .localCLI {
+        if selectedProvider.textEnhancementSettingsSurface == .localCLI {
             applyCredentialStateForSelectedProvider()
         }
         objectWillChange.send()

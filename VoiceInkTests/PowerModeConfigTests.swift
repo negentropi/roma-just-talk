@@ -1,11 +1,12 @@
 import Testing
+import VoiceInkCore
 @testable import VoiceInk
 
 @Suite(.serialized)
 struct PowerModeConfigTests {
     @Test func automaticRuleDetectionIgnoresDisabledRules() {
         let disabledURL = powerModeConfig(
-            urlConfigs: [URLConfig(url: "example.com")],
+            urlConfigs: [VoiceInkPowerModeURLConfig(url: "example.com")],
             isEnabled: false
         )
 
@@ -15,10 +16,10 @@ struct PowerModeConfigTests {
 
     @Test func automaticRuleDetectionSeparatesURLRulesFromAppAndDefaultRules() {
         let appRule = powerModeConfig(
-            appConfigs: [AppConfig(bundleIdentifier: "com.apple.TextEdit", appName: "TextEdit")]
+            appConfigs: [VoiceInkPowerModeAppConfig(bundleIdentifier: "com.apple.TextEdit", appName: "TextEdit")]
         )
         let defaultRule = powerModeConfig(isDefault: true)
-        let urlRule = powerModeConfig(urlConfigs: [URLConfig(url: "example.com")])
+        let urlRule = powerModeConfig(urlConfigs: [VoiceInkPowerModeURLConfig(url: "example.com")])
 
         #expect([appRule].hasEnabledAutomaticRules)
         #expect(![appRule].hasEnabledURLRules)
@@ -29,8 +30,8 @@ struct PowerModeConfigTests {
     }
 
     private func powerModeConfig(
-        appConfigs: [AppConfig]? = nil,
-        urlConfigs: [URLConfig]? = nil,
+        appConfigs: [VoiceInkPowerModeAppConfig]? = nil,
+        urlConfigs: [VoiceInkPowerModeURLConfig]? = nil,
         isEnabled: Bool = true,
         isDefault: Bool = false
     ) -> PowerModeConfig {

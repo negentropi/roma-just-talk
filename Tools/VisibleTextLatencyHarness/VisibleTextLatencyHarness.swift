@@ -43,6 +43,18 @@ private enum Trigger: Equatable {
         }
     }
 
+    func matchesPress(type: CGEventType, event: CGEvent) -> Bool {
+        let eventKeyCode = UInt16(event.getIntegerValueField(.keyboardEventKeycode))
+        switch self {
+        case .anyKeyUp:
+            return type == .keyDown || isModifierPress(type: type, event: event)
+        case .keyCode(let keyCode):
+            return type == .keyDown && eventKeyCode == keyCode
+        case .modifier(_, let keyCode, let flag):
+            return type == .flagsChanged && eventKeyCode == keyCode && event.flags.contains(flag)
+        }
+    }
+
     private func isModifierRelease(type: CGEventType, event: CGEvent) -> Bool {
         guard type == .flagsChanged else { return false }
         let keyCode = UInt16(event.getIntegerValueField(.keyboardEventKeycode))
@@ -55,6 +67,23 @@ private enum Trigger: Equatable {
             return !event.flags.contains(.maskAlternate)
         case 59, 62:
             return !event.flags.contains(.maskControl)
+        default:
+            return false
+        }
+    }
+
+    private func isModifierPress(type: CGEventType, event: CGEvent) -> Bool {
+        guard type == .flagsChanged else { return false }
+        let keyCode = UInt16(event.getIntegerValueField(.keyboardEventKeycode))
+        switch keyCode {
+        case 54, 55:
+            return event.flags.contains(.maskCommand)
+        case 56, 60:
+            return event.flags.contains(.maskShift)
+        case 58, 61:
+            return event.flags.contains(.maskAlternate)
+        case 59, 62:
+            return event.flags.contains(.maskControl)
         default:
             return false
         }
@@ -95,6 +124,7 @@ private struct SampleResult: Encodable {
     let status: String
     let latencyMs: Double?
     let baselineOccurrenceCount: Int
+    let baselineCapturedBeforeRelease: Bool
     let visibleOccurrenceCount: Int
     let focusedTextSource: String
     let focusedTextRole: String?
@@ -119,19 +149,32 @@ private struct HarnessReport: Encodable {
 
 private final class KeyReleaseWaiter {
     private let trigger: Trigger
+    private let snapshotProvider: () -> FocusedTextReader.Snapshot
     private var releaseTime: DispatchTime?
+    private(set) var preReleaseSnapshot: FocusedTextReader.Snapshot?
+    private static let eventMask =
+        (1 << CGEventType.keyDown.rawValue) |
+        (1 << CGEventType.keyUp.rawValue) |
+        (1 << CGEventType.flagsChanged.rawValue)
 
-    init(trigger: Trigger) {
+    init(
+        trigger: Trigger,
+        snapshotProvider: @escaping () -> FocusedTextReader.Snapshot = FocusedTextReader.snapshot
+    ) {
         self.trigger = trigger
+        self.snapshotProvider = snapshotProvider
+    }
+
+    static func eventMaskContains(_ type: CGEventType) -> Bool {
+        (eventMask & (1 << type.rawValue)) != 0
     }
 
     func wait(timeoutMs: Double) -> DispatchTime? {
-        let eventMask = (1 << CGEventType.keyUp.rawValue) | (1 << CGEventType.flagsChanged.rawValue)
         guard let eventTap = CGEvent.tapCreate(
             tap: .cgSessionEventTap,
             place: .headInsertEventTap,
             options: .listenOnly,
-            eventsOfInterest: CGEventMask(eventMask),
+            eventsOfInterest: CGEventMask(Self.eventMask),
             callback: eventTapCallback,
             userInfo: Unmanaged.passUnretained(self).toOpaque()
         ) else {
@@ -156,6 +199,9 @@ private final class KeyReleaseWaiter {
     }
 
     fileprivate func handle(type: CGEventType, event: CGEvent) {
+        if preReleaseSnapshot == nil, trigger.matchesPress(type: type, event: event) {
+            preReleaseSnapshot = snapshotProvider()
+        }
         guard releaseTime == nil, trigger.matchesRelease(type: type, event: event) else { return }
         releaseTime = .now()
     }
@@ -418,6 +464,75 @@ private func status(for latencyMs: Double?, thresholdMs: Double, bestMs: Double)
     return "slow"
 }
 
+private struct SelfTestFailure: Error, CustomStringConvertible {
+    let description: String
+}
+
+private func require(_ condition: @autoclosure () -> Bool, _ message: String) throws {
+    if !condition() {
+        throw SelfTestFailure(description: message)
+    }
+}
+
+private func syntheticKeyboardEvent(keyCode: UInt16, flags: CGEventFlags) throws -> CGEvent {
+    guard let event = CGEvent(
+        keyboardEventSource: nil,
+        virtualKey: CGKeyCode(keyCode),
+        keyDown: true
+    ) else {
+        throw SelfTestFailure(description: "Could not create synthetic keyboard event.")
+    }
+    event.flags = flags
+    return event
+}
+
+private func runSelfTests() throws {
+    let shiftDown = try syntheticKeyboardEvent(keyCode: 56, flags: .maskShift)
+    let shiftUp = try syntheticKeyboardEvent(keyCode: 56, flags: [])
+    try require(Trigger.leftShift.matchesPress(type: .flagsChanged, event: shiftDown), "left-shift press was not recognized.")
+    try require(Trigger.leftShift.matchesRelease(type: .flagsChanged, event: shiftUp), "left-shift release was not recognized.")
+
+    var snapshotCount = 0
+    let modifierWaiter = KeyReleaseWaiter(trigger: .leftShift) {
+        snapshotCount += 1
+        return FocusedTextReader.Snapshot(
+            text: "existing target text",
+            source: "self-test",
+            role: nil,
+            error: nil
+        )
+    }
+    modifierWaiter.handle(type: .flagsChanged, event: shiftDown)
+    try require(snapshotCount == 1, "modifier press did not capture a pre-release snapshot.")
+    try require(modifierWaiter.preReleaseSnapshot?.text == "existing target text", "modifier snapshot text was not retained.")
+    modifierWaiter.handle(type: .flagsChanged, event: shiftUp)
+    try require(snapshotCount == 1, "modifier release captured an extra snapshot.")
+
+    let keyDown = try syntheticKeyboardEvent(keyCode: 1, flags: [])
+    let keyUp = try syntheticKeyboardEvent(keyCode: 1, flags: [])
+    let keyCodeTrigger = Trigger.keyCode(1)
+    try require(KeyReleaseWaiter.eventMaskContains(.keyDown), "event tap does not listen for key-down baseline events.")
+    try require(keyCodeTrigger.matchesPress(type: .keyDown, event: keyDown), "key-code press was not recognized.")
+    try require(keyCodeTrigger.matchesRelease(type: .keyUp, event: keyUp), "key-code release was not recognized.")
+
+    var keyCodeSnapshotCount = 0
+    let keyCodeWaiter = KeyReleaseWaiter(trigger: keyCodeTrigger) {
+        keyCodeSnapshotCount += 1
+        return FocusedTextReader.Snapshot(
+            text: "key-code target text",
+            source: "self-test",
+            role: nil,
+            error: nil
+        )
+    }
+    keyCodeWaiter.handle(type: .keyDown, event: keyDown)
+    keyCodeWaiter.handle(type: .keyUp, event: keyUp)
+    try require(keyCodeSnapshotCount == 1, "key-code trigger did not capture exactly one pre-release snapshot.")
+    try require(keyCodeWaiter.preReleaseSnapshot?.text == "key-code target text", "key-code snapshot text was not retained.")
+
+    print("VisibleTextLatencyHarness self-test passed.")
+}
+
 private func runHarness(config: HarnessConfig) -> HarnessReport {
     let expectedText = config.expectedText!
     var sampleResults: [SampleResult] = []
@@ -441,6 +556,7 @@ private func runHarness(config: HarnessConfig) -> HarnessReport {
                 status: "no-trigger",
                 latencyMs: nil,
                 baselineOccurrenceCount: visibleOccurrenceCount,
+                baselineCapturedBeforeRelease: false,
                 visibleOccurrenceCount: visibleOccurrenceCount,
                 focusedTextSource: snapshot.source,
                 focusedTextRole: snapshot.role,
@@ -451,12 +567,15 @@ private func runHarness(config: HarnessConfig) -> HarnessReport {
             continue
         }
 
-        let baselineSnapshot = FocusedTextReader.snapshot()
+        let baselineCapturedBeforeRelease = waiter.preReleaseSnapshot != nil
+        let baselineSnapshot = waiter.preReleaseSnapshot ?? FocusedTextReader.snapshot()
         let baselineOccurrenceCount = occurrenceCount(of: expectedText, in: baselineSnapshot.text)
         if baselineOccurrenceCount > 0 {
-            print("Focused text already contains \(baselineOccurrenceCount) occurrence(s) at release; waiting for a new occurrence.")
+            let timing = baselineCapturedBeforeRelease ? "before release" : "at release"
+            print("Focused text already contains \(baselineOccurrenceCount) occurrence(s) \(timing); waiting for a new occurrence.")
         } else if let error = baselineSnapshot.error {
-            print("Focused text unreadable at release: \(error)")
+            let timing = baselineCapturedBeforeRelease ? "before release" : "at release"
+            print("Focused text unreadable \(timing): \(error)")
         }
         let observation = waitForVisibleText(
             expectedText: expectedText,
@@ -483,6 +602,7 @@ private func runHarness(config: HarnessConfig) -> HarnessReport {
             status: sampleStatus,
             latencyMs: latencyMs,
             baselineOccurrenceCount: baselineOccurrenceCount,
+            baselineCapturedBeforeRelease: baselineCapturedBeforeRelease,
             visibleOccurrenceCount: visibleOccurrenceCount,
             focusedTextSource: finalSnapshot.source,
             focusedTextRole: finalSnapshot.role,
@@ -568,6 +688,11 @@ private func printUsageAndExit(_ code: Int32) -> Never {
 }
 
 do {
+    if CommandLine.arguments.contains("--self-test") {
+        try runSelfTests()
+        exit(0)
+    }
+
     let config = try parseArguments(CommandLine.arguments)
     guard AccessibilityTrust.isGranted(prompt: true) else {
         fputs("Accessibility is not granted for this process. Grant the Terminal/iTerm app or the VisibleTextLatencyHarness helper app, then restart it.\n", stderr)

@@ -25,6 +25,10 @@ with the stable bundle ID `com.happyf.roma-just-talk.VisibleTextLatencyHarness`
 and local ad-hoc signing. Grant this helper app in System Settings when Codex or
 another nonstandard launcher cannot be attributed cleanly by macOS.
 
+Build the helper before granting Accessibility. After the grant, use
+`latency-harness-app-run` without rebuilding so macOS keeps attributing the run
+to the same helper app identity.
+
 ## Run
 
 1. Grant Accessibility permission to the normal terminal app you run the CLI
@@ -40,6 +44,8 @@ make latency-harness-run LATENCY_EXPECTED="roma latency marker" LATENCY_SAMPLES=
 Use the helper app when TCC should grant the harness itself instead of the shell:
 
 ```bash
+make latency-harness-app
+# Grant .local-build/Tools/VisibleTextLatencyHarness.app in System Settings.
 make latency-harness-app-run LATENCY_EXPECTED="roma latency marker" LATENCY_SAMPLES=10
 ```
 
@@ -72,11 +78,12 @@ The harness fails when any sample does not make the expected text visible before
 the timeout, or when p95 visible-text latency exceeds `440ms`. Samples at or
 below `220ms` are labeled `BEST`.
 
-Each sample records the focused text field's existing marker count at hotkey
-release and only passes when that count increases. This prevents repeated
-samples from passing on marker text left by an earlier run, while still allowing
-you to launch the harness first and then focus the target app before triggering
-Roma.
+Each sample records the focused text field's existing marker count when the
+hotkey press is observed, before release, and only passes when that count
+increases after release. This prevents repeated samples from passing on marker
+text left by an earlier run without missing very fast insertions. If no matching
+press is observed, the sample falls back to a release-time baseline and reports
+that fallback in JSON with `baselineCapturedBeforeRelease: false`.
 
 If the expected text reaches the clipboard but not the focused text field before
 timeout, the result is classified as `clipboard-only`.

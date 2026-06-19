@@ -33,6 +33,9 @@ jobs:
       - name: Compile visible text latency harness helper
         run: make latency-harness-app
 
+      - name: Verify latency helper run target
+        run: make latency-harness-check
+
       - name: Build release app
         run: make local CONFIGURATION=Release
 

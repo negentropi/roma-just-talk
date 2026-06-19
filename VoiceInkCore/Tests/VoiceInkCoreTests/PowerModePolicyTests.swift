@@ -275,6 +275,26 @@ final class PowerModePolicyTests: XCTestCase {
         )
     }
 
+    func testWebsiteConfigForFormInputReturnsNilForRawEmptyInput() {
+        XCTAssertNil(VoiceInkPowerModePolicy.websiteConfigForFormInput(""))
+    }
+
+    func testWebsiteConfigForFormInputNormalizesNonEmptyInput() throws {
+        let config = try XCTUnwrap(
+            VoiceInkPowerModePolicy.websiteConfigForFormInput(" HTTPS://WWW.Example.COM/docs ")
+        )
+
+        XCTAssertEqual(config.url, "example.com/docs")
+    }
+
+    func testWebsiteConfigForFormInputPreservesWhitespaceOnlyMacOSBehavior() throws {
+        let config = try XCTUnwrap(
+            VoiceInkPowerModePolicy.websiteConfigForFormInput("   ")
+        )
+
+        XCTAssertEqual(config.url, "")
+    }
+
     func testMatchingWebsiteRuleUsesEnabledOrderAndSubstringPolicy() {
         let disabled = rule(
             name: "Disabled",

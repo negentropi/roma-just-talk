@@ -627,9 +627,8 @@ struct ConfigurationView: View {
     // MARK: - Actions
 
     private func addWebsite() {
-        guard !newWebsiteURL.isEmpty else { return }
-        let cleanedURL = VoiceInkPowerModePolicy.normalizedWebsiteURL(newWebsiteURL)
-        websiteConfigs.append(VoiceInkPowerModeURLConfig(url: cleanedURL))
+        guard let websiteConfig = VoiceInkPowerModePolicy.websiteConfigForFormInput(newWebsiteURL) else { return }
+        websiteConfigs.append(websiteConfig)
         newWebsiteURL = ""
     }
 

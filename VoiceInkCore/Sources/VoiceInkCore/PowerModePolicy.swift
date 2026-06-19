@@ -671,6 +671,11 @@ public enum VoiceInkPowerModePolicy {
             .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
+    public static func websiteConfigForFormInput(_ input: String) -> VoiceInkPowerModeURLConfig? {
+        guard !input.isEmpty else { return nil }
+        return VoiceInkPowerModeURLConfig(url: normalizedWebsiteURL(input))
+    }
+
     public static func hasEnabledAutomaticRules(in rules: [VoiceInkPowerModeRule]) -> Bool {
         rules.contains { rule in
             rule.isEnabled && (

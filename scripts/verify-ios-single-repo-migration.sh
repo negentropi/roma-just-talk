@@ -2120,8 +2120,18 @@ reject_pattern \
   VoiceInk/PowerMode/PowerModeConfig.swift
 
 require_pattern \
-  "macOS Power Mode form calls shared URL normalization directly" \
-  'VoiceInkPowerModePolicy\.normalizedWebsiteURL' \
+  "shared Power Mode website form config construction lives in VoiceInkCore" \
+  'websiteConfigForFormInput|VoiceInkPowerModeURLConfig\(url: normalizedWebsiteURL\(input\)\)' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "macOS Power Mode form consumes shared website form config policy" \
+  'VoiceInkPowerModePolicy\.websiteConfigForFormInput' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+reject_pattern \
+  "macOS Power Mode form avoids shell-only website config construction" \
+  'normalizedWebsiteURL\(newWebsiteURL\)|VoiceInkPowerModeURLConfig\(url:' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
 require_pattern \

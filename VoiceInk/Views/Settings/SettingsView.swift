@@ -31,6 +31,7 @@ struct SettingsView: View {
     @State private var isMiddleClickExpanded = false
     @State private var isSoundFeedbackExpanded = false
     @State private var isRestoreClipboardExpanded = false
+    private static let recordingFeedbackPresentation = VoiceInkRecordingFeedbackPreference.macOSSettingsPresentation
     private static let pasteSettingsPresentation = VoiceInkPastePreference.macOSSettingsPresentation
     private static let resetOnboardingPresentation = VoiceInkMacOSOnboardingPresentation.resetSettingsAlert
 
@@ -157,30 +158,27 @@ struct SettingsView: View {
             }
 
             // MARK: - Recording Feedback
-            Section("Recording Feedback") {
+            Section(Self.recordingFeedbackPresentation.sectionTitle) {
                 // Sound Feedback
                 ExpandableSettingsRow(
                     isExpanded: $isSoundFeedbackExpanded,
                     isEnabled: $soundManager.isEnabled,
-                    label: "Sound Feedback"
+                    label: Self.recordingFeedbackPresentation.soundFeedbackLabel
                 ) {
                     CustomSoundSettingsView()
                 }
 
-                Picker("Mute Audio While Recording", selection: $mediaController.systemMuteMode) {
+                Picker(Self.recordingFeedbackPresentation.systemMuteModeLabel, selection: $mediaController.systemMuteMode) {
                     ForEach(VoiceInkSystemMuteMode.allCases) { mode in
                         Text(mode.displayName).tag(mode)
                     }
                 }
 
                 if mediaController.systemMuteMode != .never {
-                    Picker("Audio Resume Delay", selection: $mediaController.audioResumptionDelay) {
-                        Text("0s").tag(0.0)
-                        Text("1s").tag(1.0)
-                        Text("2s").tag(2.0)
-                        Text("3s").tag(3.0)
-                        Text("4s").tag(4.0)
-                        Text("5s").tag(5.0)
+                    Picker(Self.recordingFeedbackPresentation.audioResumptionDelayLabel, selection: $mediaController.audioResumptionDelay) {
+                        ForEach(Self.recordingFeedbackPresentation.audioResumptionDelayOptions) { option in
+                            Text(option.label).tag(option.value)
+                        }
                     }
                 }
 

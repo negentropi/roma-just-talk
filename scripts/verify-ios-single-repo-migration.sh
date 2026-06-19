@@ -3112,6 +3112,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
 
 require_pattern \
+  "shared macOS recording feedback settings presentation lives in VoiceInkCore" \
+  'VoiceInkMacOSRecordingFeedbackSettingsPresentation|VoiceInkRecordingFeedbackDelayOption|macOSSettingsPresentation|audioResumptionDelayOptions' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+
+require_pattern \
   "shared recording feedback preference owns macOS storage keys" \
   'systemMuteModeKey = "systemMuteMode"|isPauseMediaEnabledKey = "isPauseMediaEnabled"|isSoundFeedbackEnabledKey = "isSoundFeedbackEnabled"' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
@@ -3151,6 +3156,11 @@ require_pattern \
   'VoiceInkSystemMuteMode\.allCases' \
   VoiceInk/Views/Settings/SettingsView.swift
 
+require_pattern \
+  "macOS settings uses shared recording feedback settings presentation" \
+  'VoiceInkRecordingFeedbackPreference\.macOSSettingsPresentation|recordingFeedbackPresentation\.(sectionTitle|soundFeedbackLabel|systemMuteModeLabel|audioResumptionDelayLabel|audioResumptionDelayOptions)' \
+  VoiceInk/Views/Settings/SettingsView.swift
+
 reject_pattern \
   "macOS recording feedback shells avoid raw preference keys and shell-only mute enum" \
   '"(systemMuteMode|isSystemMuteEnabled|audioResumptionDelay|isPauseMediaEnabled|isSoundFeedbackEnabled)"|enum +SystemMuteMode|(^|[^[:alnum:]_])SystemMuteMode\.' \
@@ -3161,9 +3171,14 @@ reject_pattern \
   VoiceInk/Services/SystemInfoService.swift \
   VoiceInk/Views/Settings/SettingsView.swift
 
+reject_pattern \
+  "macOS settings avoids shell-only recording feedback settings presentation copy" \
+  '"(Recording Feedback|Sound Feedback|Mute Audio While Recording|Audio Resume Delay)"' \
+  VoiceInk/Views/Settings/SettingsView.swift
+
 require_pattern \
   "migration checklist tracks shared recording feedback preference gate" \
-  'macOS recording feedback preferences route through `VoiceInkSystemMuteMode`/`VoiceInkRecordingFeedbackPreference`' \
+  'macOS recording feedback preferences route through `VoiceInkSystemMuteMode`/`VoiceInkRecordingFeedbackPreference`, including settings labels/options' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

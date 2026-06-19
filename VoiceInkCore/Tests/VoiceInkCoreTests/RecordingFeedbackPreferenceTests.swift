@@ -39,6 +39,26 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
         )
     }
 
+    func testMacOSRecordingFeedbackSettingsPresentationPreservesCopyAndDelayOptions() {
+        let presentation = VoiceInkRecordingFeedbackPreference.macOSSettingsPresentation
+
+        XCTAssertEqual(presentation.sectionTitle, "Recording Feedback")
+        XCTAssertEqual(presentation.soundFeedbackLabel, "Sound Feedback")
+        XCTAssertEqual(presentation.systemMuteModeLabel, "Mute Audio While Recording")
+        XCTAssertEqual(presentation.audioResumptionDelayLabel, "Audio Resume Delay")
+        XCTAssertEqual(
+            presentation.audioResumptionDelayOptions,
+            [
+                VoiceInkRecordingFeedbackDelayOption(label: "0s", value: 0.0),
+                VoiceInkRecordingFeedbackDelayOption(label: "1s", value: 1.0),
+                VoiceInkRecordingFeedbackDelayOption(label: "2s", value: 2.0),
+                VoiceInkRecordingFeedbackDelayOption(label: "3s", value: 3.0),
+                VoiceInkRecordingFeedbackDelayOption(label: "4s", value: 4.0),
+                VoiceInkRecordingFeedbackDelayOption(label: "5s", value: 5.0)
+            ]
+        )
+    }
+
     func testSystemMuteModeUsesModernValueBeforeLegacyFlag() {
         withTemporaryDefaults { defaults in
             defaults.set(VoiceInkSystemMuteMode.never.rawValue, forKey: VoiceInkRecordingFeedbackPreference.systemMuteModeKey)

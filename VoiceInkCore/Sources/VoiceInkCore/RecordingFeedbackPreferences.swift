@@ -19,6 +19,40 @@ public enum VoiceInkSystemMuteMode: String, CaseIterable, Identifiable, Sendable
     }
 }
 
+public struct VoiceInkRecordingFeedbackDelayOption: Identifiable, Equatable, Sendable {
+    public let label: String
+    public let value: TimeInterval
+
+    public var id: TimeInterval { value }
+
+    public init(label: String, value: TimeInterval) {
+        self.label = label
+        self.value = value
+    }
+}
+
+public struct VoiceInkMacOSRecordingFeedbackSettingsPresentation: Equatable, Sendable {
+    public let sectionTitle: String
+    public let soundFeedbackLabel: String
+    public let systemMuteModeLabel: String
+    public let audioResumptionDelayLabel: String
+    public let audioResumptionDelayOptions: [VoiceInkRecordingFeedbackDelayOption]
+
+    public init(
+        sectionTitle: String,
+        soundFeedbackLabel: String,
+        systemMuteModeLabel: String,
+        audioResumptionDelayLabel: String,
+        audioResumptionDelayOptions: [VoiceInkRecordingFeedbackDelayOption]
+    ) {
+        self.sectionTitle = sectionTitle
+        self.soundFeedbackLabel = soundFeedbackLabel
+        self.systemMuteModeLabel = systemMuteModeLabel
+        self.audioResumptionDelayLabel = audioResumptionDelayLabel
+        self.audioResumptionDelayOptions = audioResumptionDelayOptions
+    }
+}
+
 public enum VoiceInkRecordingFeedbackPreference {
     public static let systemMuteModeKey = "systemMuteMode"
     public static let legacyIsSystemMuteEnabledKey = "isSystemMuteEnabled"
@@ -40,6 +74,21 @@ public enum VoiceInkRecordingFeedbackPreference {
             isSoundFeedbackEnabledKey: defaultIsSoundFeedbackEnabled
         ]
     }
+
+    public static let macOSSettingsPresentation = VoiceInkMacOSRecordingFeedbackSettingsPresentation(
+        sectionTitle: "Recording Feedback",
+        soundFeedbackLabel: "Sound Feedback",
+        systemMuteModeLabel: "Mute Audio While Recording",
+        audioResumptionDelayLabel: "Audio Resume Delay",
+        audioResumptionDelayOptions: [
+            VoiceInkRecordingFeedbackDelayOption(label: "0s", value: 0.0),
+            VoiceInkRecordingFeedbackDelayOption(label: "1s", value: 1.0),
+            VoiceInkRecordingFeedbackDelayOption(label: "2s", value: 2.0),
+            VoiceInkRecordingFeedbackDelayOption(label: "3s", value: 3.0),
+            VoiceInkRecordingFeedbackDelayOption(label: "4s", value: 4.0),
+            VoiceInkRecordingFeedbackDelayOption(label: "5s", value: 5.0)
+        ]
+    )
 
     public static func systemMuteMode(from defaults: UserDefaults = .standard) -> VoiceInkSystemMuteMode {
         if let rawValue = defaults.string(forKey: systemMuteModeKey),

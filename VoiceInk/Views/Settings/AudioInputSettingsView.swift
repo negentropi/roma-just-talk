@@ -1,4 +1,5 @@
 import SwiftUI
+import VoiceInkCore
 
 struct AudioInputSettingsView: View {
     @ObservedObject var audioDeviceManager = AudioDeviceManager.shared
@@ -182,13 +183,13 @@ struct AudioInputSettingsView: View {
     
     private var prioritizedDevicesList: some View {
         VStack(spacing: 12) {
-            ForEach(audioDeviceManager.prioritizedDevices.sorted(by: { $0.priority < $1.priority })) { device in
+            ForEach(VoiceInkAudioInputPriorityPolicy.sortedDevices(audioDeviceManager.prioritizedDevices)) { device in
                 devicePriorityCard(for: device)
             }
         }
     }
     
-    private func devicePriorityCard(for prioritizedDevice: PrioritizedDevice) -> some View {
+    private func devicePriorityCard(for prioritizedDevice: VoiceInkAudioInputPriorityDevice) -> some View {
         let device = audioDeviceManager.availableDevices.first(where: { $0.uid == prioritizedDevice.id })
         return DevicePriorityCard(
             name: prioritizedDevice.name,
@@ -233,30 +234,23 @@ struct AudioInputSettingsView: View {
         }
     }
     
-    private func moveDeviceUp(_ device: PrioritizedDevice) {
-        guard device.priority > 0,
-              let currentIndex = audioDeviceManager.prioritizedDevices.firstIndex(where: { $0.id == device.id })
-        else { return }
-        
-        var devices = audioDeviceManager.prioritizedDevices
-        devices.swapAt(currentIndex, currentIndex - 1)
-        updatePriorities(devices)
+    private func moveDeviceUp(_ device: VoiceInkAudioInputPriorityDevice) {
+        let updatedDevices = VoiceInkAudioInputPriorityPolicy.moveDevice(
+            id: device.id,
+            direction: .up,
+            in: audioDeviceManager.prioritizedDevices
+        )
+        guard updatedDevices != audioDeviceManager.prioritizedDevices else { return }
+        audioDeviceManager.updatePriorities(devices: updatedDevices)
     }
     
-    private func moveDeviceDown(_ device: PrioritizedDevice) {
-        guard device.priority < audioDeviceManager.prioritizedDevices.count - 1,
-              let currentIndex = audioDeviceManager.prioritizedDevices.firstIndex(where: { $0.id == device.id })
-        else { return }
-        
-        var devices = audioDeviceManager.prioritizedDevices
-        devices.swapAt(currentIndex, currentIndex + 1)
-        updatePriorities(devices)
-    }
-    
-    private func updatePriorities(_ devices: [PrioritizedDevice]) {
-        let updatedDevices = devices.enumerated().map { index, device in
-            PrioritizedDevice(id: device.id, name: device.name, priority: index)
-        }
+    private func moveDeviceDown(_ device: VoiceInkAudioInputPriorityDevice) {
+        let updatedDevices = VoiceInkAudioInputPriorityPolicy.moveDevice(
+            id: device.id,
+            direction: .down,
+            in: audioDeviceManager.prioritizedDevices
+        )
+        guard updatedDevices != audioDeviceManager.prioritizedDevices else { return }
         audioDeviceManager.updatePriorities(devices: updatedDevices)
     }
 }

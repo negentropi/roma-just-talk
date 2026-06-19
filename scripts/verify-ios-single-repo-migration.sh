@@ -798,6 +798,27 @@ reject_pattern \
   '"Audio level visualizer"' \
   iOS/VoiceInk-ios/AudioVisualizerView.swift
 
+require_pattern \
+  "shared audio input priority policy lives in VoiceInkCore" \
+  'VoiceInkAudioInputPriorityDevice|VoiceInkAudioInputPriorityPolicy|VoiceInkAudioInputPriorityMoveDirection|firstAvailablePriorityDeviceID|reindexed' \
+  VoiceInkCore/Sources/VoiceInkCore/AudioInputPriorityPolicy.swift
+
+require_pattern \
+  "macOS audio device manager uses shared input priority policy" \
+  'VoiceInkAudioInputPriorityDevice|VoiceInkAudioInputPriorityPolicy\.(addDevice|removeDevice|reindexed|sortedDevices|firstAvailablePriorityDeviceID)' \
+  VoiceInk/Services/AudioDeviceManager.swift
+
+require_pattern \
+  "macOS audio input settings uses shared priority move policy" \
+  'VoiceInkAudioInputPriorityPolicy\.(sortedDevices|moveDevice)|VoiceInkAudioInputPriorityDevice' \
+  VoiceInk/Views/Settings/AudioInputSettingsView.swift
+
+reject_pattern \
+  "macOS audio input priority avoids shell-only priority mutation" \
+  'struct +PrioritizedDevice|prioritizedDevices\.sorted|sorted *\{ *\$0\.priority < \$1\.priority *\}|swapAt\(currentIndex|prioritizedDevices\.append|prioritizedDevices\.removeAll|map *\{ *\$0\.priority *\}\.max' \
+  VoiceInk/Services/AudioDeviceManager.swift \
+  VoiceInk/Views/Settings/AudioInputSettingsView.swift
+
 reject_pattern \
   "iOS note views avoid shell-only transcript presentation wrappers" \
   'private var +(transcriptText|statusBadgeText|relativeTimestamp|displayedTranscriptText|transcriptionStatusTitle) *:' \

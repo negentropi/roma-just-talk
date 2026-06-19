@@ -4,12 +4,6 @@ import AVFoundation
 import os
 import VoiceInkCore
 
-struct PrioritizedDevice: Codable, Identifiable {
-    let id: String
-    let name: String
-    let priority: Int
-}
-
 enum AudioInputMode: String, CaseIterable {
     case systemDefault = "System Default"
     case custom = "Custom Device"
@@ -27,7 +21,7 @@ class AudioDeviceManager: ObservableObject {
     @Published var availableDevices: [(id: AudioDeviceID, uid: String, name: String)] = []
     @Published var selectedDeviceID: AudioDeviceID?
     @Published var inputMode: AudioInputMode = .custom
-    @Published var prioritizedDevices: [PrioritizedDevice] = []
+    @Published var prioritizedDevices: [VoiceInkAudioInputPriorityDevice] = []
 
     var isRecordingActive: Bool = false
 
@@ -303,7 +297,7 @@ class AudioDeviceManager: ObservableObject {
             }
             return findBestAvailableDevice() ?? 0
         case .prioritized:
-            let sortedDevices = prioritizedDevices.sorted { $0.priority < $1.priority }
+            let sortedDevices = VoiceInkAudioInputPriorityPolicy.sortedDevices(prioritizedDevices)
             for device in sortedDevices {
                 if let available = availableDevices.first(where: { $0.uid == device.id }) {
                     return available.id
@@ -315,7 +309,7 @@ class AudioDeviceManager: ObservableObject {
     
     private func loadPrioritizedDevices() {
         if let data = UserDefaults.standard.data(forKey: UserDefaultsKey.prioritizedDevices),
-           let devices = try? JSONDecoder().decode([PrioritizedDevice].self, from: data) {
+           let devices = try? JSONDecoder().decode([VoiceInkAudioInputPriorityDevice].self, from: data) {
             prioritizedDevices = devices
         }
     }
@@ -327,22 +321,20 @@ class AudioDeviceManager: ObservableObject {
     }
     
     func addPrioritizedDevice(uid: String, name: String) {
-        guard !prioritizedDevices.contains(where: { $0.id == uid }) else { return }
-        let nextPriority = (prioritizedDevices.map { $0.priority }.max() ?? -1) + 1
-        let device = PrioritizedDevice(id: uid, name: name, priority: nextPriority)
-        prioritizedDevices.append(device)
+        let updatedDevices = VoiceInkAudioInputPriorityPolicy.addDevice(
+            uid: uid,
+            name: name,
+            to: prioritizedDevices
+        )
+        guard updatedDevices != prioritizedDevices else { return }
+
+        prioritizedDevices = updatedDevices
         savePrioritizedDevices()
     }
     
     func removePrioritizedDevice(id: String) {
         let wasSelected = selectedDeviceID == availableDevices.first(where: { $0.uid == id })?.id
-        prioritizedDevices.removeAll { $0.id == id }
-        
-        let updatedDevices = prioritizedDevices.enumerated().map { index, device in
-            PrioritizedDevice(id: device.id, name: device.name, priority: index)
-        }
-        
-        prioritizedDevices = updatedDevices
+        prioritizedDevices = VoiceInkAudioInputPriorityPolicy.removeDevice(id: id, from: prioritizedDevices)
         savePrioritizedDevices()
         
         if wasSelected && inputMode == .prioritized {
@@ -350,8 +342,8 @@ class AudioDeviceManager: ObservableObject {
         }
     }
     
-    func updatePriorities(devices: [PrioritizedDevice]) {
-        prioritizedDevices = devices
+    func updatePriorities(devices: [VoiceInkAudioInputPriorityDevice]) {
+        prioritizedDevices = VoiceInkAudioInputPriorityPolicy.reindexed(devices)
         savePrioritizedDevices()
         
         if inputMode == .prioritized {
@@ -362,7 +354,7 @@ class AudioDeviceManager: ObservableObject {
     }
     
     private func selectHighestPriorityAvailableDevice() {
-        let sortedDevices = prioritizedDevices.sorted { $0.priority < $1.priority }
+        let sortedDevices = VoiceInkAudioInputPriorityPolicy.sortedDevices(prioritizedDevices)
 
         for device in sortedDevices {
             if let availableDevice = availableDevices.first(where: { $0.uid == device.id }) {
@@ -462,10 +454,13 @@ class AudioDeviceManager: ObservableObject {
 
                     let newDeviceID: AudioDeviceID?
                     if self.inputMode == .prioritized {
-                        let sortedDevices = self.prioritizedDevices.sorted { $0.priority < $1.priority }
-                        let priorityDeviceID = sortedDevices.compactMap { device in
-                            self.availableDevices.first(where: { $0.uid == device.id })?.id
-                        }.first
+                        let availableDeviceUIDs = Set(self.availableDevices.map(\.uid))
+                        let priorityDeviceID = VoiceInkAudioInputPriorityPolicy.firstAvailablePriorityDeviceID(
+                            in: self.prioritizedDevices,
+                            availableDeviceIDs: availableDeviceUIDs
+                        ).flatMap { priorityUID in
+                            self.availableDevices.first(where: { $0.uid == priorityUID })?.id
+                        }
 
                         if let deviceID = priorityDeviceID {
                             newDeviceID = deviceID

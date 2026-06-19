@@ -135,6 +135,64 @@ public struct PowerModeConfig: Codable, Identifiable, Equatable, Sendable {
     }
 }
 
+public struct VoiceInkPowerModeConfigurationDraft: Equatable, Sendable {
+    public var id: UUID
+    public var name: String
+    public var emoji: String
+    public var appConfigs: [VoiceInkPowerModeAppConfig]
+    public var urlConfigs: [VoiceInkPowerModeURLConfig]
+    public var isAIEnhancementEnabled: Bool
+    public var selectedPromptId: UUID?
+    public var selectedTranscriptionModelName: String?
+    public var selectedLanguage: String?
+    public var useScreenCapture: Bool
+    public var isTextFormattingEnabled: Bool
+    public var punctuationCleanupMode: PunctuationCleanupMode
+    public var lowercaseTranscription: Bool
+    public var selectedAIProvider: String?
+    public var selectedAIModel: String?
+    public var autoSendKey: VoiceInkAutoSendKey
+    public var isDefault: Bool
+
+    public init(
+        id: UUID,
+        name: String,
+        emoji: String,
+        appConfigs: [VoiceInkPowerModeAppConfig] = [],
+        urlConfigs: [VoiceInkPowerModeURLConfig] = [],
+        isAIEnhancementEnabled: Bool,
+        selectedPromptId: UUID? = nil,
+        selectedTranscriptionModelName: String? = nil,
+        selectedLanguage: String? = nil,
+        useScreenCapture: Bool = false,
+        isTextFormattingEnabled: Bool = false,
+        punctuationCleanupMode: PunctuationCleanupMode = .keep,
+        lowercaseTranscription: Bool = false,
+        selectedAIProvider: String? = nil,
+        selectedAIModel: String? = nil,
+        autoSendKey: VoiceInkAutoSendKey = .none,
+        isDefault: Bool = false
+    ) {
+        self.id = id
+        self.name = name
+        self.emoji = emoji
+        self.appConfigs = appConfigs
+        self.urlConfigs = urlConfigs
+        self.isAIEnhancementEnabled = isAIEnhancementEnabled
+        self.selectedPromptId = selectedPromptId
+        self.selectedTranscriptionModelName = selectedTranscriptionModelName
+        self.selectedLanguage = selectedLanguage
+        self.useScreenCapture = useScreenCapture
+        self.isTextFormattingEnabled = isTextFormattingEnabled
+        self.punctuationCleanupMode = punctuationCleanupMode
+        self.lowercaseTranscription = lowercaseTranscription
+        self.selectedAIProvider = selectedAIProvider
+        self.selectedAIModel = selectedAIModel
+        self.autoSendKey = autoSendKey
+        self.isDefault = isDefault
+    }
+}
+
 public struct VoiceInkPowerModeApplicationState: Codable, Equatable, Sendable {
     public var isEnhancementEnabled: Bool
     public var useScreenCaptureContext: Bool
@@ -678,6 +736,53 @@ public enum VoiceInkPowerModePolicy {
 
     public static func canSaveConfigurationName(_ name: String) -> Bool {
         !name.isEmpty
+    }
+
+    public static func configuration(
+        from draft: VoiceInkPowerModeConfigurationDraft,
+        mode: VoiceInkPowerModeConfigurationMode
+    ) -> PowerModeConfig {
+        switch mode {
+        case .add:
+            return PowerModeConfig(
+                id: draft.id,
+                name: draft.name,
+                emoji: draft.emoji,
+                appConfigs: draft.appConfigs.isEmpty ? nil : draft.appConfigs,
+                urlConfigs: draft.urlConfigs.isEmpty ? nil : draft.urlConfigs,
+                isAIEnhancementEnabled: draft.isAIEnhancementEnabled,
+                selectedPrompt: draft.selectedPromptId?.uuidString,
+                selectedTranscriptionModelName: draft.selectedTranscriptionModelName,
+                selectedLanguage: draft.selectedLanguage,
+                useScreenCapture: draft.useScreenCapture,
+                isTextFormattingEnabled: draft.isTextFormattingEnabled,
+                punctuationCleanupMode: draft.punctuationCleanupMode,
+                lowercaseTranscription: draft.lowercaseTranscription,
+                selectedAIProvider: draft.selectedAIProvider,
+                selectedAIModel: draft.selectedAIModel,
+                autoSendKey: draft.autoSendKey,
+                isDefault: draft.isDefault
+            )
+        case .edit(let config):
+            var updatedConfig = config
+            updatedConfig.name = draft.name
+            updatedConfig.emoji = draft.emoji
+            updatedConfig.isAIEnhancementEnabled = draft.isAIEnhancementEnabled
+            updatedConfig.selectedPrompt = draft.selectedPromptId?.uuidString
+            updatedConfig.selectedTranscriptionModelName = draft.selectedTranscriptionModelName
+            updatedConfig.selectedLanguage = draft.selectedLanguage
+            updatedConfig.isTextFormattingEnabled = draft.isTextFormattingEnabled
+            updatedConfig.punctuationCleanupMode = draft.punctuationCleanupMode
+            updatedConfig.lowercaseTranscription = draft.lowercaseTranscription
+            updatedConfig.appConfigs = draft.appConfigs.isEmpty ? nil : draft.appConfigs
+            updatedConfig.urlConfigs = draft.urlConfigs.isEmpty ? nil : draft.urlConfigs
+            updatedConfig.useScreenCapture = draft.useScreenCapture
+            updatedConfig.autoSendKey = draft.autoSendKey
+            updatedConfig.selectedAIProvider = draft.selectedAIProvider
+            updatedConfig.selectedAIModel = draft.selectedAIModel
+            updatedConfig.isDefault = draft.isDefault
+            return updatedConfig
+        }
     }
 
     public static func hasEnabledAutomaticRules(in rules: [VoiceInkPowerModeRule]) -> Bool {

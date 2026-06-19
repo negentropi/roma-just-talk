@@ -140,6 +140,118 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertFalse(config.isDefault)
     }
 
+    func testConfigurationDraftBuildsAddConfigurationWithStoredFormSemantics() {
+        let id = UUID()
+        let promptID = UUID()
+        let appConfig = VoiceInkPowerModeAppConfig(
+            bundleIdentifier: "com.example.App",
+            appName: "Example"
+        )
+        let urlConfig = VoiceInkPowerModeURLConfig(url: "example.com")
+        let draft = VoiceInkPowerModeConfigurationDraft(
+            id: id,
+            name: "Writing",
+            emoji: "W",
+            appConfigs: [appConfig],
+            urlConfigs: [urlConfig],
+            isAIEnhancementEnabled: true,
+            selectedPromptId: promptID,
+            selectedTranscriptionModelName: "ggml-base",
+            selectedLanguage: "fr",
+            useScreenCapture: true,
+            isTextFormattingEnabled: true,
+            punctuationCleanupMode: .removeAll,
+            lowercaseTranscription: true,
+            selectedAIProvider: "openai",
+            selectedAIModel: "gpt-4o",
+            autoSendKey: .commandEnter,
+            isDefault: true
+        )
+
+        let config = VoiceInkPowerModePolicy.configuration(from: draft, mode: .add)
+
+        XCTAssertEqual(config.id, id)
+        XCTAssertEqual(config.name, "Writing")
+        XCTAssertEqual(config.emoji, "W")
+        XCTAssertEqual(config.appConfigs, [appConfig])
+        XCTAssertEqual(config.urlConfigs, [urlConfig])
+        XCTAssertTrue(config.isAIEnhancementEnabled)
+        XCTAssertEqual(config.selectedPrompt, promptID.uuidString)
+        XCTAssertEqual(config.selectedTranscriptionModelName, "ggml-base")
+        XCTAssertEqual(config.selectedLanguage, "fr")
+        XCTAssertTrue(config.useScreenCapture)
+        XCTAssertTrue(config.isTextFormattingEnabled)
+        XCTAssertEqual(config.punctuationCleanupMode, .removeAll)
+        XCTAssertTrue(config.lowercaseTranscription)
+        XCTAssertEqual(config.selectedAIProvider, "openai")
+        XCTAssertEqual(config.selectedAIModel, "gpt-4o")
+        XCTAssertEqual(config.autoSendKey, .commandEnter)
+        XCTAssertTrue(config.isEnabled)
+        XCTAssertTrue(config.isDefault)
+    }
+
+    func testConfigurationDraftBuildsEditConfigurationWithoutReplacingIdentityOrEnablement() {
+        let existingID = UUID()
+        let existing = PowerModeConfig(
+            id: existingID,
+            name: "Old",
+            emoji: "O",
+            appConfigs: [VoiceInkPowerModeAppConfig(bundleIdentifier: "com.example.Old", appName: "Old")],
+            urlConfigs: [VoiceInkPowerModeURLConfig(url: "old.example.com")],
+            isAIEnhancementEnabled: true,
+            selectedPrompt: "old-prompt",
+            selectedTranscriptionModelName: "old-model",
+            selectedLanguage: "en",
+            useScreenCapture: true,
+            isTextFormattingEnabled: true,
+            punctuationCleanupMode: .removeAll,
+            lowercaseTranscription: true,
+            selectedAIProvider: "old-provider",
+            selectedAIModel: "old-model",
+            autoSendKey: .enter,
+            isEnabled: false,
+            isDefault: false
+        )
+        let draft = VoiceInkPowerModeConfigurationDraft(
+            id: UUID(),
+            name: "New",
+            emoji: "N",
+            isAIEnhancementEnabled: false,
+            selectedPromptId: nil,
+            selectedTranscriptionModelName: nil,
+            selectedLanguage: nil,
+            useScreenCapture: false,
+            isTextFormattingEnabled: false,
+            punctuationCleanupMode: .keep,
+            lowercaseTranscription: false,
+            selectedAIProvider: nil,
+            selectedAIModel: nil,
+            autoSendKey: .none,
+            isDefault: true
+        )
+
+        let config = VoiceInkPowerModePolicy.configuration(from: draft, mode: .edit(existing))
+
+        XCTAssertEqual(config.id, existingID)
+        XCTAssertEqual(config.name, "New")
+        XCTAssertEqual(config.emoji, "N")
+        XCTAssertNil(config.appConfigs)
+        XCTAssertNil(config.urlConfigs)
+        XCTAssertFalse(config.isAIEnhancementEnabled)
+        XCTAssertNil(config.selectedPrompt)
+        XCTAssertNil(config.selectedTranscriptionModelName)
+        XCTAssertNil(config.selectedLanguage)
+        XCTAssertFalse(config.useScreenCapture)
+        XCTAssertFalse(config.isTextFormattingEnabled)
+        XCTAssertEqual(config.punctuationCleanupMode, .keep)
+        XCTAssertFalse(config.lowercaseTranscription)
+        XCTAssertNil(config.selectedAIProvider)
+        XCTAssertNil(config.selectedAIModel)
+        XCTAssertEqual(config.autoSendKey, .none)
+        XCTAssertFalse(config.isEnabled)
+        XCTAssertTrue(config.isDefault)
+    }
+
     func testPowerModeApplicationStatePreservesStoredShapeAndCleanupKeys() throws {
         let state = VoiceInkPowerModeApplicationState(
             isEnhancementEnabled: true,

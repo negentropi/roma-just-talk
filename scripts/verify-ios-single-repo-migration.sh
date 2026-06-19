@@ -2139,6 +2139,16 @@ require_pattern \
   'VoiceInkPowerModePolicy\.canSaveConfigurationName' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
+require_pattern \
+  "shared Power Mode form draft construction lives in VoiceInkCore" \
+  'struct VoiceInkPowerModeConfigurationDraft|from draft: VoiceInkPowerModeConfigurationDraft' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "macOS Power Mode form consumes shared draft construction" \
+  'VoiceInkPowerModeConfigurationDraft|VoiceInkPowerModePolicy\.configuration\(from: draft, mode: mode\)' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
 reject_pattern \
   "macOS Power Mode form avoids shell-only website config construction" \
   'normalizedWebsiteURL\(newWebsiteURL\)|VoiceInkPowerModeURLConfig\(url:' \
@@ -2147,6 +2157,11 @@ reject_pattern \
 reject_pattern \
   "macOS Power Mode form avoids shell-only configuration-name saveability" \
   '!configName\.isEmpty' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+reject_pattern \
+  "macOS Power Mode form avoids shell-only stored config construction" \
+  'PowerModeConfig\(|selectedPromptId\?\.uuidString|var updatedConfig = config|selectedAppConfigs\.isEmpty \? nil : selectedAppConfigs|websiteConfigs\.isEmpty \? nil : websiteConfigs' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
 require_pattern \

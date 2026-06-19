@@ -635,47 +635,27 @@ struct ConfigurationView: View {
     }
 
     private func getConfigForForm() -> PowerModeConfig {
-        switch mode {
-        case .add:
-            return PowerModeConfig(
-                id: powerModeConfigId,
-                name: configName,
-                emoji: selectedEmoji,
-                appConfigs: selectedAppConfigs.isEmpty ? nil : selectedAppConfigs,
-                urlConfigs: websiteConfigs.isEmpty ? nil : websiteConfigs,
-                isAIEnhancementEnabled: isAIEnhancementEnabled,
-                selectedPrompt: selectedPromptId?.uuidString,
-                selectedTranscriptionModelName: selectedTranscriptionModelName,
-                selectedLanguage: selectedLanguage,
-                useScreenCapture: useScreenCapture,
-                isTextFormattingEnabled: isTextFormattingEnabled,
-                punctuationCleanupMode: punctuationCleanupMode,
-                lowercaseTranscription: lowercaseTranscription,
-                selectedAIProvider: selectedAIProvider,
-                selectedAIModel: selectedAIModel,
-                autoSendKey: autoSendKey,
-                isDefault: isDefault
-            )
-        case .edit(let config):
-            var updatedConfig = config
-            updatedConfig.name = configName
-            updatedConfig.emoji = selectedEmoji
-            updatedConfig.isAIEnhancementEnabled = isAIEnhancementEnabled
-            updatedConfig.selectedPrompt = selectedPromptId?.uuidString
-            updatedConfig.selectedTranscriptionModelName = selectedTranscriptionModelName
-            updatedConfig.selectedLanguage = selectedLanguage
-            updatedConfig.isTextFormattingEnabled = isTextFormattingEnabled
-            updatedConfig.punctuationCleanupMode = punctuationCleanupMode
-            updatedConfig.lowercaseTranscription = lowercaseTranscription
-            updatedConfig.appConfigs = selectedAppConfigs.isEmpty ? nil : selectedAppConfigs
-            updatedConfig.urlConfigs = websiteConfigs.isEmpty ? nil : websiteConfigs
-            updatedConfig.useScreenCapture = useScreenCapture
-            updatedConfig.autoSendKey = autoSendKey
-            updatedConfig.selectedAIProvider = selectedAIProvider
-            updatedConfig.selectedAIModel = selectedAIModel
-            updatedConfig.isDefault = isDefault
-            return updatedConfig
-        }
+        let draft = VoiceInkPowerModeConfigurationDraft(
+            id: powerModeConfigId,
+            name: configName,
+            emoji: selectedEmoji,
+            appConfigs: selectedAppConfigs,
+            urlConfigs: websiteConfigs,
+            isAIEnhancementEnabled: isAIEnhancementEnabled,
+            selectedPromptId: selectedPromptId,
+            selectedTranscriptionModelName: selectedTranscriptionModelName,
+            selectedLanguage: selectedLanguage,
+            useScreenCapture: useScreenCapture,
+            isTextFormattingEnabled: isTextFormattingEnabled,
+            punctuationCleanupMode: punctuationCleanupMode,
+            lowercaseTranscription: lowercaseTranscription,
+            selectedAIProvider: selectedAIProvider,
+            selectedAIModel: selectedAIModel,
+            autoSendKey: autoSendKey,
+            isDefault: isDefault
+        )
+
+        return VoiceInkPowerModePolicy.configuration(from: draft, mode: mode)
     }
 
     private func loadInstalledApps() {

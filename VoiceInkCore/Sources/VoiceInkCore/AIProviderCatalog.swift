@@ -21,6 +21,13 @@ public enum VoiceInkAIEnhancementModelCatalogSource: Sendable, Equatable {
     case none
 }
 
+public enum VoiceInkAIEnhancementSettingsSurface: Sendable, Equatable {
+    case apiKey
+    case ollama
+    case localCLI
+    case custom
+}
+
 public struct VoiceInkAIEnhancementAPIKeyDraft: Equatable, Sendable {
     private let provider: VoiceInkAIEnhancementProviderKind
     private let providerKeyDraft: VoiceInkProviderAPIKeyDraft
@@ -272,6 +279,19 @@ public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
 
     public var supportsUserInitiatedTextEnhancementModelRefresh: Bool {
         textEnhancementModelCatalogSource == .openRouterRemote
+    }
+
+    public var textEnhancementSettingsSurface: VoiceInkAIEnhancementSettingsSurface {
+        switch self {
+        case .ollama:
+            return .ollama
+        case .localCLI:
+            return .localCLI
+        case .custom:
+            return .custom
+        case .anthropic, .assemblyAI, .cerebras, .deepgram, .elevenLabs, .groq, .gemini, .mistral, .openAI, .openRouter, .soniox, .speechmatics:
+            return .apiKey
+        }
     }
 
     public func textEnhancementAvailableModels(

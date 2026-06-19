@@ -2215,6 +2215,16 @@ require_pattern \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
 
 require_pattern \
+  "shared AI enhancement settings surface policy lives in VoiceInkCore" \
+  'VoiceInkAIEnhancementSettingsSurface|textEnhancementSettingsSurface' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+require_pattern \
+  "macOS AI settings provider surfaces use shared policy" \
+  'textEnhancementSettingsSurface|selectedProviderSettingsSurface' \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+
+require_pattern \
   "macOS Power Mode model refresh display uses shared policy" \
   'supportsUserInitiatedTextEnhancementModelRefresh' \
   VoiceInk/PowerMode/PowerModeConfigView.swift \
@@ -2318,6 +2328,11 @@ reject_pattern \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift \
   VoiceInk/PowerMode/PowerModeConfigView.swift \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
+
+reject_pattern \
+  "macOS AI settings avoid duplicate provider settings-surface policy" \
+  'selectedProvider (==|!=) \.(ollama|localCLI|custom)' \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
 
 reject_pattern \
   "macOS AI service avoids duplicate refresh model-selection policy" \

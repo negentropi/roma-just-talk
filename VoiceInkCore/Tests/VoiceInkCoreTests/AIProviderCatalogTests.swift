@@ -491,6 +491,32 @@ final class AIProviderCatalogTests: XCTestCase {
         XCTAssertFalse(VoiceInkAIEnhancementProviderKind.custom.supportsUserInitiatedTextEnhancementModelRefresh)
     }
 
+    func testMacOSAIEnhancementSettingsSurfacesAreShared() {
+        let expectedSurfaces: [VoiceInkAIEnhancementProviderKind: VoiceInkAIEnhancementSettingsSurface] = [
+            .anthropic: .apiKey,
+            .assemblyAI: .apiKey,
+            .cerebras: .apiKey,
+            .custom: .custom,
+            .deepgram: .apiKey,
+            .elevenLabs: .apiKey,
+            .gemini: .apiKey,
+            .groq: .apiKey,
+            .localCLI: .localCLI,
+            .mistral: .apiKey,
+            .ollama: .ollama,
+            .openAI: .apiKey,
+            .openRouter: .apiKey,
+            .soniox: .apiKey,
+            .speechmatics: .apiKey
+        ]
+
+        XCTAssertEqual(VoiceInkAIEnhancementProviderKind.allCases.count, expectedSurfaces.count)
+
+        for (provider, surface) in expectedSurfaces {
+            XCTAssertEqual(provider.textEnhancementSettingsSurface, surface)
+        }
+    }
+
     func testMacOSAIEnhancementRequestURLSelectionIsShared() {
         withIsolatedDefaults { defaults in
             XCTAssertEqual(

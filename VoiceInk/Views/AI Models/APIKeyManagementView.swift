@@ -33,6 +33,10 @@ struct APIKeyManagementView: View {
     private var obfuscatedSelectedAPIKey: String {
         VoiceInkSecretPresentation.obfuscatedAPIKeyOrPlaceholder(aiService.apiKey)
     }
+
+    private var selectedProviderSettingsSurface: VoiceInkAIEnhancementSettingsSurface {
+        aiService.selectedProvider.textEnhancementSettingsSurface
+    }
     
     var body: some View {
         Section("AI Provider Integration") {
@@ -45,7 +49,7 @@ struct APIKeyManagementView: View {
                 .pickerStyle(.automatic)
                 .tint(.blue)
                 
-                if aiService.isAPIKeyValid && aiService.selectedProvider != .ollama {
+                if aiService.isAPIKeyValid && selectedProviderSettingsSurface != .ollama {
                     Spacer()
                     Circle()
                         .fill(Color.green)
@@ -53,7 +57,7 @@ struct APIKeyManagementView: View {
                     Text("Connected")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
-                } else if aiService.selectedProvider == .ollama {
+                } else if selectedProviderSettingsSurface == .ollama {
                     Spacer()
                     if isCheckingOllama {
                         ProgressView()
@@ -75,13 +79,8 @@ struct APIKeyManagementView: View {
                     }
                 }
             }
-            .onChange(of: aiService.selectedProvider) { oldValue, newValue in
-                if aiService.selectedProvider == .ollama {
-                    checkOllamaConnection()
-                }
-                if aiService.selectedProvider == .localCLI {
-                    syncLocalCLIStateFromService()
-                }
+            .onChange(of: aiService.selectedProvider) { _, _ in
+                syncSelectedProviderSettingsSurface()
             }
 
             VStack(alignment: .leading, spacing: 12) {
@@ -135,7 +134,7 @@ struct APIKeyManagementView: View {
                     }
                 }
 
-                if aiService.selectedProvider == .ollama {
+                if selectedProviderSettingsSurface == .ollama {
                     if isEditingURL {
                         HStack {
                             TextField("Base URL", text: $ollamaBaseURL)
@@ -176,7 +175,7 @@ struct APIKeyManagementView: View {
                         }
                     }
 
-                } else if aiService.selectedProvider == .localCLI {
+                } else if selectedProviderSettingsSurface == .localCLI {
                     VStack(alignment: .leading, spacing: 6) {
                         HStack {
                             Text("Command")
@@ -238,7 +237,7 @@ struct APIKeyManagementView: View {
                             .foregroundColor(.orange)
                     }
 
-                } else if aiService.selectedProvider == .custom {
+                } else if selectedProviderSettingsSurface == .custom {
                     TextField("API Endpoint URL", text: $aiService.customBaseURL, prompt: Text("e.g. https://api.openai.com/v1/chat/completions"))
                         .textFieldStyle(.roundedBorder)
 
@@ -339,12 +338,18 @@ struct APIKeyManagementView: View {
             Text(alertMessage)
         }
         .onAppear {
-            if aiService.selectedProvider == .ollama {
-                checkOllamaConnection()
-            }
-            if aiService.selectedProvider == .localCLI {
-                syncLocalCLIStateFromService()
-            }
+            syncSelectedProviderSettingsSurface()
+        }
+    }
+
+    private func syncSelectedProviderSettingsSurface() {
+        switch selectedProviderSettingsSurface {
+        case .ollama:
+            checkOllamaConnection()
+        case .localCLI:
+            syncLocalCLIStateFromService()
+        case .apiKey, .custom:
+            break
         }
     }
 

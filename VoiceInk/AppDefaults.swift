@@ -37,9 +37,6 @@ enum AppDefaults {
             "IsMenuBarOnly": true,
             Keys.showMenuBarIcon: showMenuBarIconDefault,
             "DidApplyLaunchAtLoginDefault": false,
-
-            // Shortcuts
-            SpecialShortcutSettings.pasteLastTranscriptOnEmptyTapKey: true,
         ]
 
         platformDefaults.merge(VoiceInkModelRuntimePreference.registeredDefaults) { _, sharedValue in sharedValue }

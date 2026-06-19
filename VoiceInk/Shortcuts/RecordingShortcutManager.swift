@@ -7,10 +7,6 @@ struct SpecialShortcutOptions: Equatable {
     var pasteLastTranscriptOnEmptyTap = true
 }
 
-enum SpecialShortcutSettings {
-    static let pasteLastTranscriptOnEmptyTapKey = "specialShortcutPasteLastTranscriptOnEmptyTap"
-}
-
 @MainActor
 class RecordingShortcutManager: ObservableObject {
     @Published var primaryRecordingShortcut: ShortcutSelection {
@@ -55,7 +51,7 @@ class RecordingShortcutManager: ObservableObject {
     }
     @Published var specialShortcutPasteLastTranscriptOnEmptyTap: Bool {
         didSet {
-            UserDefaults.standard.set(specialShortcutPasteLastTranscriptOnEmptyTap, forKey: SpecialShortcutSettings.pasteLastTranscriptOnEmptyTapKey)
+            VoiceInkRecordingShortcutPreference.saveShouldPasteLastTranscriptOnEmptyTap(specialShortcutPasteLastTranscriptOnEmptyTap)
             specialOptionsSource.options = specialOptions
         }
     }
@@ -112,7 +108,7 @@ class RecordingShortcutManager: ObservableObject {
 
         self.isMiddleClickToggleEnabled = VoiceInkRecordingShortcutPreference.isMiddleClickToggleEnabled()
         self.middleClickActivationDelay = VoiceInkRecordingShortcutPreference.middleClickActivationDelay()
-        let specialPasteLastTranscriptOnEmptyTap = UserDefaults.standard.bool(forKey: SpecialShortcutSettings.pasteLastTranscriptOnEmptyTapKey)
+        let specialPasteLastTranscriptOnEmptyTap = VoiceInkRecordingShortcutPreference.shouldPasteLastTranscriptOnEmptyTap()
         self.specialShortcutPasteLastTranscriptOnEmptyTap = specialPasteLastTranscriptOnEmptyTap
 
         let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "RecordingShortcutManager")

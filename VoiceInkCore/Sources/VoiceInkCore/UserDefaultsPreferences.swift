@@ -43,6 +43,7 @@ public enum VoiceInkUserDefaultsKey {
     public static let secondaryRecordingShortcutMode = "secondaryRecordingShortcutMode"
     public static let isMiddleClickToggleEnabled = "isMiddleClickToggleEnabled"
     public static let middleClickActivationDelay = "middleClickActivationDelay"
+    public static let specialShortcutPasteLastTranscriptOnEmptyTap = "specialShortcutPasteLastTranscriptOnEmptyTap"
     public static let selectedAIProvider = "selectedAIProvider"
     public static let openRouterModels = "openRouterModels"
     public static let ollamaBaseURL = "ollamaBaseURL"
@@ -74,6 +75,7 @@ public enum VoiceInkPreferenceDefault {
     public static let showLiveTextPreview = false
     public static let isMiddleClickToggleEnabled = false
     public static let middleClickActivationDelay = 200
+    public static let specialShortcutPasteLastTranscriptOnEmptyTap = true
     public static let ollamaBaseURL = "http://localhost:11434"
     public static let macOSSelectedTranscriptionLanguage = "en"
 }
@@ -893,7 +895,8 @@ public enum VoiceInkRecordingShortcutPreference {
     public static var registeredDefaults: [String: Any] {
         [
             VoiceInkUserDefaultsKey.isMiddleClickToggleEnabled: VoiceInkPreferenceDefault.isMiddleClickToggleEnabled,
-            VoiceInkUserDefaultsKey.middleClickActivationDelay: VoiceInkPreferenceDefault.middleClickActivationDelay
+            VoiceInkUserDefaultsKey.middleClickActivationDelay: VoiceInkPreferenceDefault.middleClickActivationDelay,
+            VoiceInkUserDefaultsKey.specialShortcutPasteLastTranscriptOnEmptyTap: VoiceInkPreferenceDefault.specialShortcutPasteLastTranscriptOnEmptyTap
         ]
     }
 
@@ -988,6 +991,18 @@ public enum VoiceInkRecordingShortcutPreference {
         defaults.set(delay, forKey: VoiceInkUserDefaultsKey.middleClickActivationDelay)
     }
 
+    public static func shouldPasteLastTranscriptOnEmptyTap(from defaults: UserDefaults = .standard) -> Bool {
+        defaults.object(forKey: VoiceInkUserDefaultsKey.specialShortcutPasteLastTranscriptOnEmptyTap) as? Bool
+            ?? VoiceInkPreferenceDefault.specialShortcutPasteLastTranscriptOnEmptyTap
+    }
+
+    public static func saveShouldPasteLastTranscriptOnEmptyTap(
+        _ shouldPaste: Bool,
+        to defaults: UserDefaults = .standard
+    ) {
+        defaults.set(shouldPaste, forKey: VoiceInkUserDefaultsKey.specialShortcutPasteLastTranscriptOnEmptyTap)
+    }
+
     public static func clear(from defaults: UserDefaults = .standard) {
         defaults.removeObject(forKey: VoiceInkUserDefaultsKey.primaryRecordingShortcut)
         defaults.removeObject(forKey: VoiceInkUserDefaultsKey.secondaryRecordingShortcut)
@@ -995,6 +1010,7 @@ public enum VoiceInkRecordingShortcutPreference {
         defaults.removeObject(forKey: VoiceInkUserDefaultsKey.secondaryRecordingShortcutMode)
         defaults.removeObject(forKey: VoiceInkUserDefaultsKey.isMiddleClickToggleEnabled)
         defaults.removeObject(forKey: VoiceInkUserDefaultsKey.middleClickActivationDelay)
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.specialShortcutPasteLastTranscriptOnEmptyTap)
     }
 }
 

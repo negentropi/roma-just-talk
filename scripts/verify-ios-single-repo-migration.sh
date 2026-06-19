@@ -3059,6 +3059,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
+  "shared special shortcut empty-tap key lives in VoiceInkCore" \
+  'specialShortcutPasteLastTranscriptOnEmptyTap = "specialShortcutPasteLastTranscriptOnEmptyTap"' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
   "shared recording shortcut selection values live in VoiceInkCore" \
   'public enum VoiceInkRecordingShortcutSelection' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
@@ -3109,6 +3114,16 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
+  "shared recording shortcut preference owns special empty-tap helper" \
+  'shouldPasteLastTranscriptOnEmptyTap' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared recording shortcut preference saves special empty-tap setting" \
+  'saveShouldPasteLastTranscriptOnEmptyTap' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
   "macOS defaults register shared recording shortcut defaults" \
   'VoiceInkRecordingShortcutPreference\.registeredDefaults' \
   VoiceInk/AppDefaults.swift
@@ -3144,6 +3159,16 @@ require_pattern \
   VoiceInk/Shortcuts/RecordingShortcutManager.swift
 
 require_pattern \
+  "macOS recording shortcut manager reads special empty-tap setting through shared preference" \
+  'VoiceInkRecordingShortcutPreference\.shouldPasteLastTranscriptOnEmptyTap' \
+  VoiceInk/Shortcuts/RecordingShortcutManager.swift
+
+require_pattern \
+  "macOS recording shortcut manager saves special empty-tap setting through shared preference" \
+  'VoiceInkRecordingShortcutPreference\.saveShouldPasteLastTranscriptOnEmptyTap' \
+  VoiceInk/Shortcuts/RecordingShortcutManager.swift
+
+require_pattern \
   "macOS shortcut migration uses shared current shortcut selection keys" \
   'VoiceInkRecordingShortcutPreference\.selectionKey' \
   VoiceInk/Shortcuts/ShortcutMigration.swift
@@ -3175,7 +3200,7 @@ require_pattern \
 
 reject_pattern \
   "macOS recording shortcut shells avoid raw current shortcut preference keys" \
-  '"(primaryRecordingShortcut|secondaryRecordingShortcut|primaryRecordingShortcutMode|secondaryRecordingShortcutMode|isMiddleClickToggleEnabled|middleClickActivationDelay)"|enum +(Mode|ShortcutSelection)' \
+  '"(primaryRecordingShortcut|secondaryRecordingShortcut|primaryRecordingShortcutMode|secondaryRecordingShortcutMode|isMiddleClickToggleEnabled|middleClickActivationDelay|specialShortcutPasteLastTranscriptOnEmptyTap)"|enum +(Mode|ShortcutSelection)|SpecialShortcutSettings' \
   VoiceInk/AppDefaults.swift \
   VoiceInk/Services/SystemInfoService.swift \
   VoiceInk/Shortcuts/RecordingShortcutManager.swift \
@@ -3183,7 +3208,7 @@ reject_pattern \
 
 require_pattern \
   "migration checklist tracks shared recording shortcut preference gate" \
-  'macOS recording shortcut selection/mode and middle-click preferences route through `VoiceInkRecordingShortcutSelection`/`VoiceInkRecordingShortcutMode`/`VoiceInkRecordingShortcutPreference`' \
+  'macOS recording shortcut selection/mode, middle-click, and special empty-tap preferences route through `VoiceInkRecordingShortcutSelection`/`VoiceInkRecordingShortcutMode`/`VoiceInkRecordingShortcutPreference`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

@@ -1078,6 +1078,10 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             VoiceInkRecordingShortcutPreference.modeKey(for: .secondary),
             VoiceInkUserDefaultsKey.secondaryRecordingShortcutMode
         )
+        XCTAssertEqual(
+            VoiceInkUserDefaultsKey.specialShortcutPasteLastTranscriptOnEmptyTap,
+            "specialShortcutPasteLastTranscriptOnEmptyTap"
+        )
         XCTAssertEqual(VoiceInkRecordingShortcutPreference.defaultSelection(for: .primary), .custom)
         XCTAssertEqual(VoiceInkRecordingShortcutPreference.defaultSelection(for: .secondary), .none)
         XCTAssertEqual(VoiceInkRecordingShortcutPreference.defaultMode(for: .primary), .special)
@@ -1089,6 +1093,10 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(
             VoiceInkRecordingShortcutPreference.registeredDefaults[VoiceInkUserDefaultsKey.middleClickActivationDelay] as? Int,
             VoiceInkPreferenceDefault.middleClickActivationDelay
+        )
+        XCTAssertEqual(
+            VoiceInkRecordingShortcutPreference.registeredDefaults[VoiceInkUserDefaultsKey.specialShortcutPasteLastTranscriptOnEmptyTap] as? Bool,
+            VoiceInkPreferenceDefault.specialShortcutPasteLastTranscriptOnEmptyTap
         )
     }
 
@@ -1102,6 +1110,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
                 VoiceInkRecordingShortcutPreference.middleClickActivationDelay(from: defaults),
                 VoiceInkPreferenceDefault.middleClickActivationDelay
             )
+            XCTAssertTrue(VoiceInkRecordingShortcutPreference.shouldPasteLastTranscriptOnEmptyTap(from: defaults))
 
             VoiceInkRecordingShortcutPreference.saveSelection(.custom, for: .primary, to: defaults)
             VoiceInkRecordingShortcutPreference.saveSelection(.none, for: .secondary, to: defaults)
@@ -1109,6 +1118,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             VoiceInkRecordingShortcutPreference.saveMode(.pushToTalk, for: .secondary, to: defaults)
             VoiceInkRecordingShortcutPreference.saveMiddleClickToggleEnabled(true, to: defaults)
             VoiceInkRecordingShortcutPreference.saveMiddleClickActivationDelay(350, to: defaults)
+            VoiceInkRecordingShortcutPreference.saveShouldPasteLastTranscriptOnEmptyTap(false, to: defaults)
 
             XCTAssertEqual(VoiceInkRecordingShortcutPreference.selection(for: .primary, from: defaults), .custom)
             XCTAssertEqual(
@@ -1119,6 +1129,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             XCTAssertEqual(VoiceInkRecordingShortcutPreference.mode(for: .secondary, from: defaults), .pushToTalk)
             XCTAssertTrue(VoiceInkRecordingShortcutPreference.isMiddleClickToggleEnabled(from: defaults))
             XCTAssertEqual(VoiceInkRecordingShortcutPreference.middleClickActivationDelay(from: defaults), 350)
+            XCTAssertFalse(VoiceInkRecordingShortcutPreference.shouldPasteLastTranscriptOnEmptyTap(from: defaults))
 
             VoiceInkRecordingShortcutPreference.clear(from: defaults)
 
@@ -1129,6 +1140,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
                 VoiceInkRecordingShortcutPreference.middleClickActivationDelay(from: defaults),
                 VoiceInkPreferenceDefault.middleClickActivationDelay
             )
+            XCTAssertTrue(VoiceInkRecordingShortcutPreference.shouldPasteLastTranscriptOnEmptyTap(from: defaults))
         }
     }
 
@@ -1181,6 +1193,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             VoiceInkRecordingShortcutPreference.saveMode(.pushToTalk, for: .secondary, to: defaults)
             VoiceInkRecordingShortcutPreference.saveMiddleClickToggleEnabled(true, to: defaults)
             VoiceInkRecordingShortcutPreference.saveMiddleClickActivationDelay(350, to: defaults)
+            VoiceInkRecordingShortcutPreference.saveShouldPasteLastTranscriptOnEmptyTap(false, to: defaults)
             let powerModeConfig = PowerModeConfig(
                 name: "Writing",
                 emoji: "W",
@@ -1286,6 +1299,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
                 VoiceInkRecordingShortcutPreference.middleClickActivationDelay(from: defaults),
                 VoiceInkPreferenceDefault.middleClickActivationDelay
             )
+            XCTAssertTrue(VoiceInkRecordingShortcutPreference.shouldPasteLastTranscriptOnEmptyTap(from: defaults))
         }
     }
 

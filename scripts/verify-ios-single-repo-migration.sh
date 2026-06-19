@@ -1346,6 +1346,12 @@ require_pattern \
   VoiceInk/Views/AI\ Models/WhisperModelCardView.swift
 
 require_pattern \
+  "macOS model cards use shared compact download status copy" \
+  'VoiceInkWhisperModelDownloadProgress\.compactDownloadingStatusText' \
+  VoiceInk/Views/AI\ Models/WhisperModelCardView.swift \
+  VoiceInk/Views/AI\ Models/FluidAudioModelCardView.swift
+
+require_pattern \
   "macOS Whisper download progress view uses shared progress presentation" \
   'VoiceInkWhisperModelDownloadProgress\.macOS' \
   VoiceInk/Transcription/Whisper/WhisperModelManager.swift
@@ -1513,6 +1519,12 @@ reject_pattern \
   'Downloading\.\.\.' \
   iOS/VoiceInk-ios/LocalModelManagementView.swift \
   iOS/VoiceInk-ios/OnboardingView.swift
+
+reject_pattern \
+  "macOS model cards avoid duplicate compact status copy" \
+  'Downloading\.\.\.' \
+  VoiceInk/Views/AI\ Models/WhisperModelCardView.swift \
+  VoiceInk/Views/AI\ Models/FluidAudioModelCardView.swift
 
 reject_pattern \
   "iOS local model shell avoids duplicate operation alert copy" \

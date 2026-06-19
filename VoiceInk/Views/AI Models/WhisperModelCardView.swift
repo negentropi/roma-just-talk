@@ -125,7 +125,11 @@ struct WhisperModelCardView: View {
             } else {
                 Button(action: downloadAction) {
                     HStack(spacing: 4) {
-                        Text(isDownloading ? "Downloading..." : "Download")
+                        Text(
+                            isDownloading
+                                ? VoiceInkWhisperModelDownloadProgress.compactDownloadingStatusText
+                                : "Download"
+                        )
                             .font(.system(size: 12, weight: .medium))
                         Image(systemName: "arrow.down.circle")
                             .font(.system(size: 12, weight: .medium))

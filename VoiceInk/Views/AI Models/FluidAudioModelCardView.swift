@@ -158,7 +158,11 @@ struct FluidAudioModelCardView: View {
                     }
                 }) {
                     HStack(spacing: 4) {
-                        Text(isDownloading ? "Downloading..." : "Download")
+                        Text(
+                            isDownloading
+                                ? VoiceInkWhisperModelDownloadProgress.compactDownloadingStatusText
+                                : "Download"
+                        )
                         Image(systemName: "arrow.down.circle")
                     }
                     .font(.system(size: 12, weight: .medium))

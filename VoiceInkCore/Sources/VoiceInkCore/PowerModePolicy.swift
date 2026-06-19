@@ -549,6 +549,59 @@ public struct VoiceInkPowerModeTranscriptionModelResourcePlan: Equatable, Sendab
     }
 }
 
+public struct VoiceInkPowerModeLanguageApplicationPlan: Equatable, Sendable {
+    public var languageToSave: String?
+
+    public var shouldPostLanguageDidChange: Bool {
+        languageToSave != nil
+    }
+
+    public init(languageToSave: String?) {
+        self.languageToSave = languageToSave
+    }
+
+    public static func plan(
+        selectedLanguage: String?,
+        preferredModelName: String?,
+        currentModelName: String?,
+        availableModels: [VoiceInkPowerModeTranscriptionModelFacts]
+    ) -> Self {
+        guard let selectedLanguage else {
+            return Self(languageToSave: nil)
+        }
+
+        guard let model = modelForLanguageApplication(
+            preferredModelName: preferredModelName,
+            currentModelName: currentModelName,
+            availableModels: availableModels
+        ) else {
+            return Self(languageToSave: selectedLanguage)
+        }
+
+        return Self(
+            languageToSave: VoiceInkTranscriptionLanguageSupport.validLanguageOrFallback(
+                selectedLanguage,
+                languages: model.languageOptions,
+                prefersNativeAppleEnglish: model.prefersNativeAppleEnglish
+            )
+        )
+    }
+
+    private static func modelForLanguageApplication(
+        preferredModelName: String?,
+        currentModelName: String?,
+        availableModels: [VoiceInkPowerModeTranscriptionModelFacts]
+    ) -> VoiceInkPowerModeTranscriptionModelFacts? {
+        if let preferredModelName,
+           let preferredModel = availableModels.first(where: { $0.name == preferredModelName }) {
+            return preferredModel
+        }
+
+        guard let currentModelName else { return nil }
+        return availableModels.first { $0.name == currentModelName }
+    }
+}
+
 public struct VoiceInkPowerModeApplicationState: Codable, Equatable, Sendable {
     public var isEnhancementEnabled: Bool
     public var useScreenCaptureContext: Bool

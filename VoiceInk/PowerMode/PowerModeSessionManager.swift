@@ -111,9 +111,13 @@ class PowerModeSessionManager {
             stateProvider: stateProvider
         )
 
-        if let language = config.selectedLanguage {
-            applyCompatibleLanguage(language, preferredModelName: config.selectedTranscriptionModelName)
-        }
+        applyLanguageApplicationPlan(
+            languageApplicationPlan(
+                selectedLanguage: config.selectedLanguage,
+                preferredModelName: config.selectedTranscriptionModelName,
+                stateProvider: stateProvider
+            )
+        )
 
         await MainActor.run {
             NotificationCenter.default.post(name: .powerModeConfigurationApplied, object: nil)
@@ -136,9 +140,13 @@ class PowerModeSessionManager {
             stateProvider: stateProvider
         )
 
-        if let language = state.selectedLanguage {
-            applyCompatibleLanguage(language, preferredModelName: state.transcriptionModelName)
-        }
+        applyLanguageApplicationPlan(
+            languageApplicationPlan(
+                selectedLanguage: state.selectedLanguage,
+                preferredModelName: state.transcriptionModelName,
+                stateProvider: stateProvider
+            )
+        )
     }
 
     private func applyPreferenceApplication(_ application: VoiceInkPowerModePreferenceApplication) {
@@ -174,24 +182,37 @@ class PowerModeSessionManager {
         }
     }
 
-    private func applyCompatibleLanguage(_ language: String, preferredModelName: String?) {
-        guard let model = model(named: preferredModelName) ?? stateProvider?.currentTranscriptionModel else {
-            VoiceInkTranscriptionLanguagePreference.saveSelectedLanguage(language)
-            NotificationCenter.default.post(name: .languageDidChange, object: nil)
-            return
-        }
-
-        VoiceInkTranscriptionLanguagePreference.saveCompatibleLanguage(
-            language,
-            languages: model.transcriptionLanguageOptions,
-            prefersNativeAppleEnglish: model.provider == .nativeApple
+    private func languageApplicationPlan(
+        selectedLanguage: String?,
+        preferredModelName: String?,
+        stateProvider: any PowerModeStateProvider
+    ) -> VoiceInkPowerModeLanguageApplicationPlan {
+        VoiceInkPowerModeLanguageApplicationPlan.plan(
+            selectedLanguage: selectedLanguage,
+            preferredModelName: preferredModelName,
+            currentModelName: stateProvider.currentTranscriptionModel?.name,
+            availableModels: stateProvider.allAvailableModels.map(transcriptionModelFacts(for:))
         )
-        NotificationCenter.default.post(name: .languageDidChange, object: nil)
     }
 
-    private func model(named modelName: String?) -> (any TranscriptionModel)? {
-        guard let modelName else { return nil }
-        return stateProvider?.allAvailableModels.first { $0.name == modelName }
+    private func transcriptionModelFacts(
+        for model: any TranscriptionModel
+    ) -> VoiceInkPowerModeTranscriptionModelFacts {
+        VoiceInkPowerModeTranscriptionModelFacts(
+            name: model.name,
+            disablesLanguageSelection: model.provider == .gemini,
+            isMultilingual: model.isMultilingualModel,
+            languageOptions: model.transcriptionLanguageOptions,
+            prefersNativeAppleEnglish: model.provider == .nativeApple
+        )
+    }
+
+    private func applyLanguageApplicationPlan(_ plan: VoiceInkPowerModeLanguageApplicationPlan) {
+        guard plan.shouldPostLanguageDidChange,
+              let languageToSave = plan.languageToSave else { return }
+
+        VoiceInkTranscriptionLanguagePreference.saveSelectedLanguage(languageToSave)
+        NotificationCenter.default.post(name: .languageDidChange, object: nil)
     }
 
     private func modelResourcePlan(

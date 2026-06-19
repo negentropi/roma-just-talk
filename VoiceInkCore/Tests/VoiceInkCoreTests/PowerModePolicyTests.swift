@@ -635,6 +635,72 @@ final class PowerModePolicyTests: XCTestCase {
         )
     }
 
+    func testPowerModeLanguageApplicationPlanSkipsMissingLanguage() {
+        let plan = VoiceInkPowerModeLanguageApplicationPlan.plan(
+            selectedLanguage: nil,
+            preferredModelName: "base",
+            currentModelName: "current",
+            availableModels: [
+                transcriptionModelFacts(name: "base")
+            ]
+        )
+
+        XCTAssertNil(plan.languageToSave)
+        XCTAssertFalse(plan.shouldPostLanguageDidChange)
+    }
+
+    func testPowerModeLanguageApplicationPlanSavesRawLanguageWithoutModel() {
+        let plan = VoiceInkPowerModeLanguageApplicationPlan.plan(
+            selectedLanguage: "fr",
+            preferredModelName: nil,
+            currentModelName: nil,
+            availableModels: []
+        )
+
+        XCTAssertEqual(plan.languageToSave, "fr")
+        XCTAssertTrue(plan.shouldPostLanguageDidChange)
+    }
+
+    func testPowerModeLanguageApplicationPlanUsesPreferredModelBeforeCurrentModel() {
+        let plan = VoiceInkPowerModeLanguageApplicationPlan.plan(
+            selectedLanguage: "fr",
+            preferredModelName: "english-only",
+            currentModelName: "multilingual",
+            availableModels: [
+                transcriptionModelFacts(
+                    name: "multilingual",
+                    languageOptions: ["en": "English", "fr": "French"]
+                ),
+                transcriptionModelFacts(
+                    name: "english-only",
+                    isMultilingual: false,
+                    languageOptions: VoiceInkLanguageCatalog.englishOnly
+                )
+            ]
+        )
+
+        XCTAssertEqual(plan.languageToSave, "en")
+        XCTAssertTrue(plan.shouldPostLanguageDidChange)
+    }
+
+    func testPowerModeLanguageApplicationPlanFallsBackToCurrentModelWhenPreferredIsMissing() {
+        let plan = VoiceInkPowerModeLanguageApplicationPlan.plan(
+            selectedLanguage: "de",
+            preferredModelName: "missing",
+            currentModelName: "native",
+            availableModels: [
+                transcriptionModelFacts(
+                    name: "native",
+                    languageOptions: ["en-US": "English (United States)"],
+                    prefersNativeAppleEnglish: true
+                )
+            ]
+        )
+
+        XCTAssertEqual(plan.languageToSave, "en-US")
+        XCTAssertTrue(plan.shouldPostLanguageDidChange)
+    }
+
     func testPowerModeTranscriptionModelResourcePlanSkipsMissingUnchangedSelection() {
         let availableModels = [
             transcriptionModelResourceFacts(name: "base", loadsLocalWhisperModel: true)
@@ -1443,13 +1509,14 @@ final class PowerModePolicyTests: XCTestCase {
     }
 
     private func transcriptionModelFacts(
+        name: String = "model",
         disablesLanguageSelection: Bool = false,
         isMultilingual: Bool = true,
         languageOptions: [String: String] = VoiceInkLanguageCatalog.all,
         prefersNativeAppleEnglish: Bool = false
     ) -> VoiceInkPowerModeTranscriptionModelFacts {
         VoiceInkPowerModeTranscriptionModelFacts(
-            name: "model",
+            name: name,
             disablesLanguageSelection: disablesLanguageSelection,
             isMultilingual: isMultilingual,
             languageOptions: languageOptions,

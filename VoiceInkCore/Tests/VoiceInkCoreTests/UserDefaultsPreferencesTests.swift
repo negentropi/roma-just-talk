@@ -327,11 +327,9 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkAudioSessionTimeoutPreference.maximumSeconds, 300)
         XCTAssertEqual(VoiceInkAudioSessionTimeoutPreference.stepSeconds, 15)
         XCTAssertEqual(VoiceInkAudioSessionTimeoutPreference.displayText(for: 90), "90s")
-        XCTAssertTrue(VoiceInkAudioSessionTimeoutPreference.shouldDeactivateImmediately(0))
-        XCTAssertTrue(VoiceInkAudioSessionTimeoutPreference.shouldDeactivateImmediately(-1))
-        XCTAssertFalse(VoiceInkAudioSessionTimeoutPreference.shouldDeactivateImmediately(1))
-        XCTAssertEqual(VoiceInkAudioSessionTimeoutPreference.deactivationInterval(for: 90), 90)
-        XCTAssertEqual(VoiceInkAudioSessionTimeoutPreference.deactivationInterval(for: -1), 0)
+        XCTAssertEqual(VoiceInkAudioSessionTimeoutPreference.deactivationPlan(for: 0), .immediate)
+        XCTAssertEqual(VoiceInkAudioSessionTimeoutPreference.deactivationPlan(for: -1), .immediate)
+        XCTAssertEqual(VoiceInkAudioSessionTimeoutPreference.deactivationPlan(for: 90), .delayed(90))
     }
 
     func testAudioSessionTimeoutPresentationPreservesIOSSettingsCopy() {

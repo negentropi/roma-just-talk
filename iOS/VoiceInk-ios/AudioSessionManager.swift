@@ -56,14 +56,15 @@ final class AudioSessionManager: ObservableObject {
         cancelScheduledDeactivation()
         
         let timeoutSeconds = settings.audioSessionTimeoutSeconds
+        let deactivationPlan = VoiceInkAudioSessionTimeoutPreference.deactivationPlan(for: timeoutSeconds)
         
-        // If timeout is 0, deactivate immediately (legacy behavior)
-        guard !VoiceInkAudioSessionTimeoutPreference.shouldDeactivateImmediately(timeoutSeconds) else {
+        switch deactivationPlan {
+        case .immediate:
             deactivateSession()
             return
+        case .delayed(let interval):
+            timeoutRemaining = interval
         }
-        
-        timeoutRemaining = VoiceInkAudioSessionTimeoutPreference.deactivationInterval(for: timeoutSeconds)
         
         // Create timer that updates every second and deactivates when done
         deactivationTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] timer in
@@ -81,7 +82,7 @@ final class AudioSessionManager: ObservableObject {
             }
         }
         
-        print("🕒 Audio session deactivation scheduled in \(timeoutSeconds) seconds")
+        print("🕒 Audio session deactivation scheduled in \(Int(timeoutRemaining)) seconds")
     }
     
     /// Immediately deactivates the session

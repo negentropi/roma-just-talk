@@ -2519,8 +2519,8 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
-  "shared audio-session timeout preference owns iOS scheduling policy" \
-  'shouldDeactivateImmediately|deactivationInterval' \
+  "shared audio-session timeout preference owns iOS deactivation plan" \
+  'VoiceInkAudioSessionDeactivationPlan|deactivationPlan' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
@@ -2554,13 +2554,13 @@ reject_pattern \
   iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \
-  "iOS audio-session manager uses shared timeout scheduling policy" \
-  'VoiceInkAudioSessionTimeoutPreference\.(shouldDeactivateImmediately|deactivationInterval)' \
+  "iOS audio-session manager uses shared deactivation plan" \
+  'VoiceInkAudioSessionTimeoutPreference\.deactivationPlan' \
   iOS/VoiceInk-ios/AudioSessionManager.swift
 
 reject_pattern \
   "iOS audio-session manager avoids shell-only timeout scheduling policy" \
-  'timeoutSeconds > 0|TimeInterval\(timeoutSeconds\)' \
+  'shouldDeactivateImmediately|deactivationInterval|timeoutSeconds > 0|TimeInterval\(timeoutSeconds\)' \
   iOS/VoiceInk-ios/AudioSessionManager.swift
 
 require_pattern \

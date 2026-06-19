@@ -254,6 +254,11 @@ public struct VoiceInkAudioSessionTimeoutPresentation: Equatable, Sendable {
     )
 }
 
+public enum VoiceInkAudioSessionDeactivationPlan: Equatable, Sendable {
+    case immediate
+    case delayed(TimeInterval)
+}
+
 public enum VoiceInkAudioSessionTimeoutPreference {
     public static let minimumSeconds = 0
     public static let maximumSeconds = 300
@@ -269,12 +274,8 @@ public enum VoiceInkAudioSessionTimeoutPreference {
         "\(seconds)s"
     }
 
-    public static func shouldDeactivateImmediately(_ seconds: Int) -> Bool {
-        seconds <= 0
-    }
-
-    public static func deactivationInterval(for seconds: Int) -> TimeInterval {
-        TimeInterval(max(seconds, 0))
+    public static func deactivationPlan(for seconds: Int) -> VoiceInkAudioSessionDeactivationPlan {
+        seconds <= 0 ? .immediate : .delayed(TimeInterval(seconds))
     }
 
     public static func saveTimeoutSeconds(_ seconds: Int, to defaults: UserDefaults = .standard) {

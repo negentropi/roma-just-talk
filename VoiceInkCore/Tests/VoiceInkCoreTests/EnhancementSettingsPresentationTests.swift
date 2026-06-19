@@ -40,6 +40,18 @@ final class EnhancementSettingsPresentationTests: XCTestCase {
             "Set how long to wait for the AI provider to respond. If no response is received within this duration, you can either fail immediately and paste the original transcription, or retry the request (up to 3 attempts)."
         )
         XCTAssertEqual(presentation.shortcutsSectionTitle, "Shortcuts")
+        XCTAssertEqual(presentation.toggleEnhancementShortcutTitle, "Toggle AI Enhancement")
+        XCTAssertEqual(
+            presentation.toggleEnhancementShortcutHelp,
+            "Quickly enable or disable AI enhancement while recording. Available only when VoiceInk is running and the recorder is visible."
+        )
+        XCTAssertEqual(presentation.switchPromptShortcutTitle, "Switch Enhancement Prompt")
+        XCTAssertEqual(
+            presentation.switchPromptShortcutHelp,
+            "Switch between your saved prompts using ⌘1 through ⌘0 to activate the corresponding prompt in the order they are saved. Available only when VoiceInk is running and the recorder is visible."
+        )
+        XCTAssertEqual(presentation.shortcutLearnMoreURLString, "https://tryvoiceink.com/docs/enhancement-shortcuts")
+        XCTAssertEqual(presentation.switchPromptKeyChipTitles, ["⌘", "1 – 0"])
     }
 
     func testMacOSEnhancementSettingsPresentationPreservesOptions() {

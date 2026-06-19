@@ -2484,13 +2484,18 @@ reject_pattern \
 
 require_pattern \
   "shared enhancement settings presentation lives in VoiceInkCore" \
-  'VoiceInkEnhancementSettingsPresentation|generalSectionTitle|enableEnhancementTitle|enableEnhancementHelp|enableEnhancementLearnMoreURLString|settingsButtonSystemImageName|settingsButtonHelp|promptsSectionTitle|shortEnhancementWordOptions|timeoutRetryOptions' \
+  'VoiceInkEnhancementSettingsPresentation|generalSectionTitle|enableEnhancementTitle|enableEnhancementHelp|enableEnhancementLearnMoreURLString|settingsButtonSystemImageName|settingsButtonHelp|promptsSectionTitle|toggleEnhancementShortcutTitle|toggleEnhancementShortcutHelp|switchPromptShortcutTitle|switchPromptShortcutHelp|shortcutLearnMoreURLString|switchPromptKeyChipTitles|shortEnhancementWordOptions|timeoutRetryOptions' \
   VoiceInkCore/Sources/VoiceInkCore/EnhancementSettingsPresentation.swift
 
 require_pattern \
   "macOS enhancement settings outer view uses shared presentation" \
   'VoiceInkEnhancementSettingsPresentation\.macOS|presentation\.(generalSectionTitle|enableEnhancementTitle|enableEnhancementHelp|enableEnhancementLearnMoreURLString|settingsButtonSystemImageName|settingsButtonHelp|promptsSectionTitle)' \
   VoiceInk/Views/EnhancementSettingsView.swift
+
+require_pattern \
+  "macOS enhancement shortcuts use shared presentation" \
+  'VoiceInkEnhancementSettingsPresentation\.macOS|presentation\.(toggleEnhancementShortcutTitle|toggleEnhancementShortcutHelp|switchPromptShortcutTitle|switchPromptShortcutHelp|shortcutLearnMoreURLString|switchPromptKeyChipTitles)' \
+  VoiceInk/Views/Settings/EnhancementShortcutsView.swift
 
 require_pattern \
   "macOS enhancement settings use shared presentation" \
@@ -2506,6 +2511,16 @@ reject_pattern \
   "macOS enhancement settings outer view avoids shell-only chrome copy" \
   '"(Enable Enhancement|AI enhancement lets you pass the transcribed audio through LLMs to post-process using different prompts suitable for different use cases like e-mails, summary, writing, etc\.|https://tryvoiceink.com/docs/enhancements-configuring-models|General|Enhancement settings|Enhancement Prompts|gear)"' \
   VoiceInk/Views/EnhancementSettingsView.swift
+
+reject_pattern \
+  "macOS enhancement shortcuts avoid shell-only row presentation copy" \
+  '"(Toggle AI Enhancement|Quickly enable or disable AI enhancement while recording|Switch Enhancement Prompt|Switch between your saved prompts using ⌘1 through ⌘0|https://tryvoiceink.com/docs/enhancement-shortcuts|⌘|1 – 0)"' \
+  VoiceInk/Views/Settings/EnhancementShortcutsView.swift
+
+require_pattern \
+  "migration checklist tracks shared enhancement settings presentation gate" \
+  'macOS enhancement settings outer chrome, labels, shortcut row copy/key-chip labels, short-transcript threshold options, timeout options, and timeout retry labels route through `VoiceInkEnhancementSettingsPresentation`' \
+  docs/ios-single-repo-migration.md
 
 require_pattern \
   "shared core owns transcription session route planning" \

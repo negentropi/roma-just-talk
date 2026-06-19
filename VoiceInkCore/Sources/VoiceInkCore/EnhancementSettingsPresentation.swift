@@ -41,6 +41,12 @@ public struct VoiceInkEnhancementSettingsPresentation: Equatable, Sendable {
     public let requestTimeoutSectionTitle: String
     public let requestTimeoutHelp: String
     public let shortcutsSectionTitle: String
+    public let toggleEnhancementShortcutTitle: String
+    public let toggleEnhancementShortcutHelp: String
+    public let switchPromptShortcutTitle: String
+    public let switchPromptShortcutHelp: String
+    public let shortcutLearnMoreURLString: String
+    public let switchPromptKeyChipTitles: [String]
 
     public static let macOS = VoiceInkEnhancementSettingsPresentation(
         title: "Enhancement Settings",
@@ -75,6 +81,12 @@ public struct VoiceInkEnhancementSettingsPresentation: Equatable, Sendable {
         ],
         requestTimeoutSectionTitle: "Request Timeout",
         requestTimeoutHelp: "Set how long to wait for the AI provider to respond. If no response is received within this duration, you can either fail immediately and paste the original transcription, or retry the request (up to 3 attempts).",
-        shortcutsSectionTitle: "Shortcuts"
+        shortcutsSectionTitle: "Shortcuts",
+        toggleEnhancementShortcutTitle: "Toggle AI Enhancement",
+        toggleEnhancementShortcutHelp: "Quickly enable or disable AI enhancement while recording. Available only when VoiceInk is running and the recorder is visible.",
+        switchPromptShortcutTitle: "Switch Enhancement Prompt",
+        switchPromptShortcutHelp: "Switch between your saved prompts using ⌘1 through ⌘0 to activate the corresponding prompt in the order they are saved. Available only when VoiceInk is running and the recorder is visible.",
+        shortcutLearnMoreURLString: "https://tryvoiceink.com/docs/enhancement-shortcuts",
+        switchPromptKeyChipTitles: ["⌘", "1 – 0"]
     )
 }

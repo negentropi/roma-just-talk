@@ -1,17 +1,19 @@
 import SwiftUI
+import VoiceInkCore
 
 struct EnhancementShortcutsView: View {
+    private let presentation = VoiceInkEnhancementSettingsPresentation.macOS
+
     var body: some View {
         VStack(spacing: 8) {
-            // Toggle AI Enhancement
             HStack(alignment: .center, spacing: 12) {
                 HStack(spacing: 4) {
-                    Text("Toggle AI Enhancement")
+                    Text(presentation.toggleEnhancementShortcutTitle)
                         .font(.system(size: 13))
 
                     InfoTip(
-                        "Quickly enable or disable AI enhancement while recording. Available only when VoiceInk is running and the recorder is visible.",
-                        learnMoreURL: "https://tryvoiceink.com/docs/enhancement-shortcuts"
+                        presentation.toggleEnhancementShortcutHelp,
+                        learnMoreURL: presentation.shortcutLearnMoreURLString
                     )
                 }
 
@@ -21,23 +23,23 @@ struct EnhancementShortcutsView: View {
                     .controlSize(.small)
             }
 
-            // Switch Enhancement Prompt
             HStack(alignment: .center, spacing: 12) {
                 HStack(spacing: 4) {
-                    Text("Switch Enhancement Prompt")
+                    Text(presentation.switchPromptShortcutTitle)
                         .font(.system(size: 13))
 
                     InfoTip(
-                        "Switch between your saved prompts using ⌘1 through ⌘0 to activate the corresponding prompt in the order they are saved. Available only when VoiceInk is running and the recorder is visible.",
-                        learnMoreURL: "https://tryvoiceink.com/docs/enhancement-shortcuts"
+                        presentation.switchPromptShortcutHelp,
+                        learnMoreURL: presentation.shortcutLearnMoreURLString
                     )
                 }
 
                 Spacer()
 
                 HStack(spacing: 4) {
-                    KeyChip(label: "⌘")
-                    KeyChip(label: "1 – 0")
+                    ForEach(presentation.switchPromptKeyChipTitles, id: \.self) { title in
+                        KeyChip(label: title)
+                    }
                 }
             }
         }

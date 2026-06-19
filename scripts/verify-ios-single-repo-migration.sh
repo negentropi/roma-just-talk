@@ -1158,6 +1158,16 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
 
 require_pattern \
+  "shared model management filter lives in VoiceInkCore" \
+  'enum VoiceInkModelManagementFilter' \
+  VoiceInkCore/Sources/VoiceInkCore/ModelManagementPresentation.swift
+
+require_pattern \
+  "shared model management copy presentation lives in VoiceInkCore" \
+  'enum VoiceInkModelManagementPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/ModelManagementPresentation.swift
+
+require_pattern \
   "shared Whisper compact download status text lives in VoiceInkCore" \
   'compactStatusText' \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
@@ -1176,6 +1186,46 @@ require_pattern \
   "macOS Whisper download progress view uses shared progress presentation" \
   'VoiceInkWhisperModelDownloadProgress\.macOS' \
   VoiceInk/Transcription/Whisper/WhisperModelManager.swift
+
+require_pattern \
+  "macOS model management uses shared filter presentation" \
+  'VoiceInkModelManagementFilter\.allCases|filter\.title' \
+  VoiceInk/Views/AI\ Models/ModelManagementView.swift
+
+require_pattern \
+  "macOS model management uses shared settings title copy" \
+  'VoiceInkModelManagementPresentation\.settingsTitle' \
+  VoiceInk/Views/AI\ Models/ModelManagementView.swift
+
+require_pattern \
+  "macOS model management uses shared default-model fallback copy" \
+  'VoiceInkModelManagementPresentation\.noModelSelectedText' \
+  VoiceInk/Views/AI\ Models/ModelManagementView.swift
+
+require_pattern \
+  "macOS model management uses shared import and custom-model copy" \
+  'VoiceInkModelManagementPresentation\.(importLocalModelTitle|customModelsLimitationText)' \
+  VoiceInk/Views/AI\ Models/ModelManagementView.swift
+
+require_pattern \
+  "iOS settings use shared local model management presentation" \
+  'VoiceInkModelManagementFilter\.local\.(settingsSectionTitle|manageSettingsTitle)' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+require_pattern \
+  "iOS settings use shared cloud model management presentation" \
+  'VoiceInkModelManagementFilter\.cloud\.(settingsSectionTitle|manageSettingsTitle)' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+require_pattern \
+  "iOS local model destination uses shared navigation title" \
+  'VoiceInkModelManagementFilter\.local\.settingsSectionTitle' \
+  iOS/VoiceInk-ios/LocalModelManagementView.swift
+
+require_pattern \
+  "iOS cloud model destination uses shared navigation title" \
+  'VoiceInkModelManagementFilter\.cloud\.settingsSectionTitle' \
+  iOS/VoiceInk-ios/APIKeysView.swift
 
 require_pattern \
   "iOS local model management uses shared download state" \
@@ -1281,6 +1331,24 @@ reject_pattern \
   iOS/VoiceInk-ios/LocalModelManager.swift \
   iOS/VoiceInk-ios/LocalModelManagementView.swift \
   iOS/VoiceInk-ios/OnboardingView.swift
+
+reject_pattern \
+  "platform model management avoids shell-only filter enum" \
+  'enum ModelFilter' \
+  VoiceInk/Views/AI\ Models/ModelManagementView.swift
+
+reject_pattern \
+  "platform model management avoids duplicate shared model copy" \
+  '"(Model Settings|Default Model|Set as Default|No model selected|Import Local Model…|Only OpenAI-compatible transcription APIs are supported\.|Local Models|Manage Local Models|Cloud Models|Manage Cloud Models)"' \
+  VoiceInk/Views/AI\ Models/ModelManagementView.swift \
+  VoiceInk/Views/AI\ Models/FluidAudioModelCardView.swift \
+  VoiceInk/Views/AI\ Models/CustomModelCardView.swift \
+  VoiceInk/Views/AI\ Models/NativeModelCardView.swift \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift \
+  VoiceInk/Views/AI\ Models/WhisperModelCardView.swift \
+  iOS/VoiceInk-ios/SettingsView.swift \
+  iOS/VoiceInk-ios/LocalModelManagementView.swift \
+  iOS/VoiceInk-ios/APIKeysView.swift
 
 require_pattern \
   "macOS cloud API-key card uses shared draft policy" \

@@ -137,7 +137,7 @@ struct FluidAudioModelCardView: View {
     private var actionSection: some View {
         HStack(spacing: 8) {
             if isCurrent {
-                Text("Default Model")
+                Text(VoiceInkModelManagementPresentation.defaultModelTitle)
                     .font(.system(size: 12))
                     .foregroundColor(Color(.secondaryLabelColor))
             } else if isDownloaded {
@@ -146,7 +146,7 @@ struct FluidAudioModelCardView: View {
                         transcriptionModelManager.setDefaultTranscriptionModel(model)
                     }
                 }) {
-                    Text("Set as Default")
+                    Text(VoiceInkModelManagementPresentation.setAsDefaultButtonTitle)
                         .font(.system(size: 12))
                 }
                 .buttonStyle(.bordered)

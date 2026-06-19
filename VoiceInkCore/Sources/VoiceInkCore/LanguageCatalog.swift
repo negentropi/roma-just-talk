@@ -21,7 +21,6 @@ public enum VoiceInkTranscriptionLanguagePresentation {
     public static let multilingualDescription = "This model supports multiple languages. Select a specific language or auto-detect(if available)"
     public static let englishOnlyLabel = "Language: English"
     public static let englishOnlyDescription = "This is an English-optimized model and only supports English transcription."
-    public static let noModelSelectedText = "No model selected"
     public static let englishOnlyMenuLabel = "Language: English (only)"
 
     public static func menuLabel(

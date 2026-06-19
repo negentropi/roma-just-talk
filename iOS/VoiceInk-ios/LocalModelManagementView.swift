@@ -18,7 +18,7 @@ struct LocalModelManagementView: View {
                 ModelRowView(model: model, modelManager: modelManager)
             }
         }
-        .navigationTitle("Local Models")
+        .navigationTitle(VoiceInkModelManagementFilter.local.settingsSectionTitle)
         .navigationBarTitleDisplayMode(.inline)
         .refreshable {
             // Refresh model status

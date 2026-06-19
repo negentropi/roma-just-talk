@@ -282,7 +282,6 @@ final class LanguageCatalogTests: XCTestCase {
             VoiceInkTranscriptionLanguagePresentation.englishOnlyDescription,
             "This is an English-optimized model and only supports English transcription."
         )
-        XCTAssertEqual(VoiceInkTranscriptionLanguagePresentation.noModelSelectedText, "No model selected")
         XCTAssertEqual(VoiceInkTranscriptionLanguagePresentation.englishOnlyMenuLabel, "Language: English (only)")
     }
 

@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import VoiceInkCore
 
 // MARK: - Native Apple Model Card View
 struct NativeAppleModelCardView: View {
@@ -75,12 +76,12 @@ struct NativeAppleModelCardView: View {
     private var actionSection: some View {
         HStack(spacing: 8) {
             if isCurrent {
-                Text("Default Model")
+                Text(VoiceInkModelManagementPresentation.defaultModelTitle)
                     .font(.system(size: 12))
                     .foregroundColor(Color(.secondaryLabelColor))
             } else {
                 Button(action: setDefaultAction) {
-                    Text("Set as Default")
+                    Text(VoiceInkModelManagementPresentation.setAsDefaultButtonTitle)
                         .font(.system(size: 12))
                 }
                 .buttonStyle(.bordered)

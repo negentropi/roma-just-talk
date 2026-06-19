@@ -3,14 +3,6 @@ import SwiftData
 import AppKit
 import UniformTypeIdentifiers
 
-enum ModelFilter: String, CaseIterable, Identifiable {
-    case recommended = "Recommended"
-    case local = "Local"
-    case cloud = "Cloud"
-    case custom = "Custom"
-    var id: String { self.rawValue }
-}
-
 struct ModelManagementView: View {
     @EnvironmentObject private var whisperModelManager: WhisperModelManager
     @EnvironmentObject private var fluidAudioModelManager: FluidAudioModelManager
@@ -23,7 +15,7 @@ struct ModelManagementView: View {
     @StateObject private var whisperPrompt = WhisperPrompt()
     @ObservedObject private var warmupCoordinator = WhisperModelWarmupCoordinator.shared
 
-    @State private var selectedFilter: ModelFilter = .recommended
+    @State private var selectedFilter: VoiceInkModelManagementFilter = .recommended
     @State private var isShowingSettings = false
 
     private let settingsPanelWidth: CGFloat = 400
@@ -72,7 +64,7 @@ struct ModelManagementView: View {
         VStack(spacing: 0) {
             // Header
             HStack(spacing: 12) {
-                Text("Model Settings")
+                Text(VoiceInkModelManagementPresentation.settingsTitle)
                     .font(.headline)
                     .fontWeight(.semibold)
                     .foregroundColor(.primary)
@@ -88,7 +80,7 @@ struct ModelManagementView: View {
                         .clipShape(Circle())
                 }
                 .buttonStyle(.plain)
-                .help("Close")
+                .help(VoiceInkModelManagementPresentation.closeButtonHelp)
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
@@ -104,10 +96,10 @@ struct ModelManagementView: View {
     
     private var defaultModelSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Default Model")
+            Text(VoiceInkModelManagementPresentation.defaultModelTitle)
                 .font(.headline)
                 .foregroundColor(.secondary)
-            Text(transcriptionModelManager.currentTranscriptionModel?.displayName ?? "No model selected")
+            Text(transcriptionModelManager.currentTranscriptionModel?.displayName ?? VoiceInkModelManagementPresentation.noModelSelectedText)
                 .font(.title2)
                 .fontWeight(.bold)
         }
@@ -126,14 +118,14 @@ struct ModelManagementView: View {
             HStack {
                 // Modern compact pill switcher
                 HStack(spacing: 12) {
-                    ForEach(ModelFilter.allCases, id: \.self) { filter in
+                    ForEach(VoiceInkModelManagementFilter.allCases, id: \.self) { filter in
                         Button(action: {
                             withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                                 selectedFilter = filter
                                 isShowingSettings = false
                             }
                         }) {
-                            Text(filter.rawValue)
+                            Text(filter.title)
                                 .font(.system(size: 14, weight: selectedFilter == filter ? .semibold : .medium))
                                 .foregroundColor(selectedFilter == filter ? .primary : .primary.opacity(0.7))
                                 .padding(.horizontal, 16)
@@ -222,7 +214,7 @@ struct ModelManagementView: View {
                             Button(action: { presentImportPanel() }) {
                                 HStack(spacing: 8) {
                                     Image(systemName: "square.and.arrow.down")
-                                    Text("Import Local Model…")
+                                    Text(VoiceInkModelManagementPresentation.importLocalModelTitle)
                                         .font(.system(size: 12, weight: .semibold))
                                 }
                                 .frame(maxWidth: .infinity)
@@ -244,7 +236,7 @@ struct ModelManagementView: View {
                         HStack(spacing: 6) {
                             Image(systemName: "info.circle")
                                 .font(.system(size: 12))
-                            Text("Only OpenAI-compatible transcription APIs are supported.")
+                            Text(VoiceInkModelManagementPresentation.customModelsLimitationText)
                                 .font(.system(size: 12))
                         }
                         .foregroundColor(.secondary)

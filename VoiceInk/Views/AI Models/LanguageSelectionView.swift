@@ -163,7 +163,7 @@ struct LanguageSelectionView: View {
                     }
                 }
             } else {
-                Text(VoiceInkTranscriptionLanguagePresentation.noModelSelectedText)
+                Text(VoiceInkModelManagementPresentation.noModelSelectedText)
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }

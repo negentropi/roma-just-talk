@@ -19,7 +19,7 @@ struct APIKeysView: View {
                 }
             }
         }
-        .navigationTitle("Cloud Models")
+        .navigationTitle(VoiceInkModelManagementFilter.cloud.settingsSectionTitle)
         .navigationBarTitleDisplayMode(.inline)
     }
 }

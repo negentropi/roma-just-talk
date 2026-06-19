@@ -42,15 +42,15 @@ struct SettingsView: View {
                 }
             }
             
-            Section(header: Text("Local Models")) {
+            Section(header: Text(VoiceInkModelManagementFilter.local.settingsSectionTitle)) {
                 NavigationLink(destination: LocalModelManagementView()) {
-                    Text("Manage Local Models")
+                    Text(VoiceInkModelManagementFilter.local.manageSettingsTitle)
                 }
             }
             
-            Section(header: Text("Cloud Models")) {
+            Section(header: Text(VoiceInkModelManagementFilter.cloud.settingsSectionTitle)) {
                 NavigationLink(destination: APIKeysView()) {
-                    Text("Manage Cloud Models")
+                    Text(VoiceInkModelManagementFilter.cloud.manageSettingsTitle)
                 }
             }
 

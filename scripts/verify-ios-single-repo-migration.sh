@@ -467,7 +467,7 @@ require_pattern \
 
 require_pattern \
   "shared macOS recorder style preference lives in VoiceInkCore" \
-  'VoiceInkRecorderStyle|VoiceInkRecorderWindowKind|VoiceInkRecorderStylePreference|userDefaultsKey = "RecorderType"|defaultRawValue|windowKind|hasVisibleRecorder' \
+  'VoiceInkRecorderStyle|VoiceInkRecorderWindowKind|VoiceInkRecorderStylePreference|VoiceInkMacOSRecorderStyleSettingsPresentation|userDefaultsKey = "RecorderType"|defaultRawValue|windowKind|hasVisibleRecorder' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
 require_pattern \
@@ -477,7 +477,7 @@ require_pattern \
 
 require_pattern \
   "macOS recorder settings uses shared recorder style catalog" \
-  'VoiceInkRecorderStyle\.allCases|style\.displayName|style\.rawValue' \
+  'VoiceInkRecorderStylePreference\.macOSSettingsPresentation|recorderStylePresentation\.(sectionTitle|pickerTitle)|VoiceInkRecorderStyle\.allCases|style\.displayName|style\.rawValue' \
   VoiceInk/Views/Settings/SettingsView.swift
 
 require_pattern \
@@ -594,11 +594,16 @@ reject_pattern \
 
 reject_pattern \
   "macOS recorder style avoids shell-owned raw policy" \
-  '"RecorderType"|"(none|notch|mini)"|recorderType != "none"|recorderType == "none"|case "(none|notch|mini)"|Text\("(None|Notch|Mini)"\)' \
+  '"RecorderType"|"(none|notch|mini)"|"(Interface|Recorder Style)"|recorderType != "none"|recorderType == "none"|case "(none|notch|mini)"|Text\("(None|Notch|Mini)"\)' \
   VoiceInk/Transcription/Engine/RecorderUIManager.swift \
   VoiceInk/Views/Settings/SettingsView.swift \
   VoiceInk/AppDefaults.swift \
   VoiceInk/Services/SystemInfoService.swift
+
+require_pattern \
+  "migration checklist tracks shared recorder style settings labels" \
+  'macOS recorder style labels, settings section/picker labels, raw storage key/default' \
+  docs/ios-single-repo-migration.md
 
 reject_pattern \
   "recording behavior avoids raw active-state equality" \

@@ -31,6 +31,7 @@ struct SettingsView: View {
     @State private var isMiddleClickExpanded = false
     @State private var isSoundFeedbackExpanded = false
     @State private var isRestoreClipboardExpanded = false
+    private static let recorderStylePresentation = VoiceInkRecorderStylePreference.macOSSettingsPresentation
     private static let recordingFeedbackPresentation = VoiceInkRecordingFeedbackPreference.macOSSettingsPresentation
     private static let pasteSettingsPresentation = VoiceInkPastePreference.macOSSettingsPresentation
     private static let resetOnboardingPresentation = VoiceInkMacOSOnboardingPresentation.resetSettingsAlert
@@ -226,8 +227,8 @@ struct SettingsView: View {
             PowerModeSection()
 
             // MARK: - Interface
-            Section("Interface") {
-                Picker("Recorder Style", selection: $recorderUIManager.recorderType) {
+            Section(Self.recorderStylePresentation.sectionTitle) {
+                Picker(Self.recorderStylePresentation.pickerTitle, selection: $recorderUIManager.recorderType) {
                     ForEach(VoiceInkRecorderStyle.allCases) { style in
                         Text(style.displayName).tag(style.rawValue)
                     }

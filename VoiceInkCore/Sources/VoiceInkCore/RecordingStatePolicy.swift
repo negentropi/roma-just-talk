@@ -40,10 +40,24 @@ public enum VoiceInkRecorderWindowKind: Equatable, Sendable {
     case mini
 }
 
+public struct VoiceInkMacOSRecorderStyleSettingsPresentation: Equatable, Sendable {
+    public let sectionTitle: String
+    public let pickerTitle: String
+
+    public init(sectionTitle: String, pickerTitle: String) {
+        self.sectionTitle = sectionTitle
+        self.pickerTitle = pickerTitle
+    }
+}
+
 public enum VoiceInkRecorderStylePreference {
     public static let userDefaultsKey = "RecorderType"
     public static let defaultStyle: VoiceInkRecorderStyle = .none
     public static let defaultRawValue = defaultStyle.rawValue
+    public static let macOSSettingsPresentation = VoiceInkMacOSRecorderStyleSettingsPresentation(
+        sectionTitle: "Interface",
+        pickerTitle: "Recorder Style"
+    )
 
     public static func rawValue(from defaults: UserDefaults = .standard) -> String {
         defaults.string(forKey: userDefaultsKey) ?? defaultRawValue

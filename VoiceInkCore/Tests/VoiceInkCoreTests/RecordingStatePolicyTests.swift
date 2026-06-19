@@ -46,6 +46,8 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertEqual(VoiceInkRecorderStyle.none.displayName, "None")
         XCTAssertEqual(VoiceInkRecorderStyle.notch.displayName, "Notch")
         XCTAssertEqual(VoiceInkRecorderStyle.mini.displayName, "Mini")
+        XCTAssertEqual(VoiceInkRecorderStylePreference.macOSSettingsPresentation.sectionTitle, "Interface")
+        XCTAssertEqual(VoiceInkRecorderStylePreference.macOSSettingsPresentation.pickerTitle, "Recorder Style")
     }
 
     func testRecorderStylePreferenceReadsAndSavesRawValues() {

@@ -1532,6 +1532,21 @@ reject_pattern \
   VoiceInk/Views/Onboarding/OnboardingModelDownloadView.swift
 
 require_pattern \
+  "shared macOS onboarding tutorial presentation lives in VoiceInkCore" \
+  'VoiceInkMacOSOnboardingTutorialPresentation|tutorial|shortcutTitle|instructionSteps|placeholderIconSystemName|placeholderText' \
+  VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift
+
+require_pattern \
+  "macOS onboarding tutorial uses shared presentation" \
+  'VoiceInkMacOSOnboardingPresentation\.tutorial|presentation\.(title|subtitle|shortcutTitle|instructionSteps|completeButtonTitle|skipButtonTitle|placeholderIconSystemName|placeholderText)' \
+  VoiceInk/Views/Onboarding/OnboardingTutorialView.swift
+
+reject_pattern \
+  "macOS onboarding tutorial avoids shell-only presentation copy" \
+  '"(Try It Out!|Let'\''s test your roma-just-talk setup\.|Your Shortcut|Complete Setup|Skip for now|Click here and start speaking\.\.\.|Click the text area on the right|Press your shortcut key|Speak something|Press your shortcut key again)"|systemName: "wand\.and\.stars"' \
+  VoiceInk/Views/Onboarding/OnboardingTutorialView.swift
+
+require_pattern \
   "shared macOS onboarding permission presentation lives in VoiceInkCore" \
   'VoiceInkMacOSOnboardingPermissionPresentation|VoiceInkMacOSOnboardingPermissionKind|relaunchRequiredMessage|canSkipWhenNotGranted|buttonTitle' \
   VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift

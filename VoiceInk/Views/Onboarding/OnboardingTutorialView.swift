@@ -1,4 +1,5 @@
 import SwiftUI
+import VoiceInkCore
 
 struct OnboardingTutorialView: View {
     @Binding var hasCompletedOnboarding: Bool
@@ -9,6 +10,7 @@ struct OnboardingTutorialView: View {
     @State private var isTextFieldFocused: Bool = false
     @State private var showingShortcutHint: Bool = true
     @FocusState private var isFocused: Bool
+    private let presentation = VoiceInkMacOSOnboardingPresentation.tutorial
     
     var body: some View {
         GeometryReader { geometry in
@@ -21,11 +23,11 @@ struct OnboardingTutorialView: View {
                     VStack(alignment: .leading, spacing: 40) {
                         // Title and description
                         VStack(alignment: .leading, spacing: 16) {
-                            Text("Try It Out!")
+                            Text(presentation.title)
                                 .font(.system(size: 44, weight: .bold, design: .rounded))
                                 .foregroundColor(.white)
                             
-                            Text("Let's test your roma-just-talk setup.")
+                            Text(presentation.subtitle)
                                 .font(.system(size: 24, weight: .medium, design: .rounded))
                                 .foregroundColor(.white.opacity(0.7))
                                 .lineSpacing(4)
@@ -34,7 +36,7 @@ struct OnboardingTutorialView: View {
                         // Keyboard shortcut display
                         VStack(alignment: .leading, spacing: 20) {
                             HStack {
-                                Text("Your Shortcut")
+                                Text(presentation.shortcutTitle)
                                     .font(.system(size: 28, weight: .semibold, design: .rounded))
                                     .foregroundColor(.white)
                                 
@@ -47,8 +49,8 @@ struct OnboardingTutorialView: View {
                         
                         // Instructions
                         VStack(alignment: .leading, spacing: 24) {
-                            ForEach(1...4, id: \.self) { step in
-                                instructionStep(number: step, text: getInstructionText(for: step))
+                            ForEach(Array(presentation.instructionSteps.enumerated()), id: \.offset) { offset, text in
+                                instructionStep(number: offset + 1, text: text)
                             }
                         }
                         
@@ -58,7 +60,7 @@ struct OnboardingTutorialView: View {
                         Button(action: {
                             hasCompletedOnboarding = true
                         }) {
-                            Text("Complete Setup")
+                            Text(presentation.completeButtonTitle)
                                 .font(.system(size: 18, weight: .semibold, design: .rounded))
                                 .foregroundColor(.white)
                                 .frame(width: 200, height: 50)
@@ -69,7 +71,7 @@ struct OnboardingTutorialView: View {
                         .opacity(transcribedText.isEmpty ? 0.5 : 1)
                         .disabled(transcribedText.isEmpty)
                         
-                        SkipButton(text: "Skip for now") {
+                        SkipButton(text: presentation.skipButtonTitle) {
                             hasCompletedOnboarding = true
                         }
                     }
@@ -112,11 +114,11 @@ struct OnboardingTutorialView: View {
                             // Placeholder text with magical appearance
                             if transcribedText.isEmpty {
                                 VStack(spacing: 16) {
-                                    Image(systemName: "wand.and.stars")
+                                    Image(systemName: presentation.placeholderIconSystemName)
                                         .font(.system(size: 36))
                                         .foregroundColor(.white.opacity(0.3))
                                     
-                                    Text("Click here and start speaking...")
+                                    Text(presentation.placeholderText)
                                         .font(.system(size: 28, weight: .semibold, design: .rounded))
                                         .foregroundColor(.white.opacity(0.5))
                                         .multilineTextAlignment(.center)
@@ -152,17 +154,7 @@ struct OnboardingTutorialView: View {
             isFocused = true
         }
     }
-    
-    private func getInstructionText(for step: Int) -> String {
-        switch step {
-        case 1: return "Click the text area on the right"
-        case 2: return "Press your shortcut key"
-        case 3: return "Speak something"
-        case 4: return "Press your shortcut key again"
-        default: return ""
-        }
-    }
-    
+
     private func instructionStep(number: Int, text: String) -> some View {
         HStack(spacing: 20) {
             Text("\(number)")

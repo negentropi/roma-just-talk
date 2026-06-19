@@ -76,6 +76,27 @@ final class OnboardingPresentationTests: XCTestCase {
         )
     }
 
+    func testMacOSOnboardingTutorialPresentationPreservesCopyAndStepOrder() {
+        let presentation = VoiceInkMacOSOnboardingPresentation.tutorial
+
+        XCTAssertEqual(presentation.title, "Try It Out!")
+        XCTAssertEqual(presentation.subtitle, "Let's test your roma-just-talk setup.")
+        XCTAssertEqual(presentation.shortcutTitle, "Your Shortcut")
+        XCTAssertEqual(
+            presentation.instructionSteps,
+            [
+                "Click the text area on the right",
+                "Press your shortcut key",
+                "Speak something",
+                "Press your shortcut key again"
+            ]
+        )
+        XCTAssertEqual(presentation.completeButtonTitle, "Complete Setup")
+        XCTAssertEqual(presentation.skipButtonTitle, "Skip for now")
+        XCTAssertEqual(presentation.placeholderIconSystemName, "wand.and.stars")
+        XCTAssertEqual(presentation.placeholderText, "Click here and start speaking...")
+    }
+
     func testIOSReadyOnboardingPresentationPreservesCopyAndStepOrder() {
         let presentation = VoiceInkIOSOnboardingPresentation.ready
 

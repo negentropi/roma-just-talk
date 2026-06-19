@@ -113,6 +113,37 @@ public struct VoiceInkMacOSOnboardingModelDownloadPresentation: Equatable, Senda
     }
 }
 
+public struct VoiceInkMacOSOnboardingTutorialPresentation: Equatable, Sendable {
+    public let title: String
+    public let subtitle: String
+    public let shortcutTitle: String
+    public let instructionSteps: [String]
+    public let completeButtonTitle: String
+    public let skipButtonTitle: String
+    public let placeholderIconSystemName: String
+    public let placeholderText: String
+
+    public init(
+        title: String,
+        subtitle: String,
+        shortcutTitle: String,
+        instructionSteps: [String],
+        completeButtonTitle: String,
+        skipButtonTitle: String,
+        placeholderIconSystemName: String,
+        placeholderText: String
+    ) {
+        self.title = title
+        self.subtitle = subtitle
+        self.shortcutTitle = shortcutTitle
+        self.instructionSteps = instructionSteps
+        self.completeButtonTitle = completeButtonTitle
+        self.skipButtonTitle = skipButtonTitle
+        self.placeholderIconSystemName = placeholderIconSystemName
+        self.placeholderText = placeholderText
+    }
+}
+
 public struct VoiceInkOnboardingReadyPresentation: Equatable, Sendable {
     public let iconSystemName: String
     public let title: String
@@ -146,6 +177,22 @@ public enum VoiceInkMacOSOnboardingPresentation {
         speedLabel: "Speed",
         accuracyLabel: "Accuracy",
         ramLabel: "RAM"
+    )
+
+    public static let tutorial = VoiceInkMacOSOnboardingTutorialPresentation(
+        title: "Try It Out!",
+        subtitle: "Let's test your roma-just-talk setup.",
+        shortcutTitle: "Your Shortcut",
+        instructionSteps: [
+            "Click the text area on the right",
+            "Press your shortcut key",
+            "Speak something",
+            "Press your shortcut key again"
+        ],
+        completeButtonTitle: "Complete Setup",
+        skipButtonTitle: "Skip for now",
+        placeholderIconSystemName: "wand.and.stars",
+        placeholderText: "Click here and start speaking..."
     )
 }
 

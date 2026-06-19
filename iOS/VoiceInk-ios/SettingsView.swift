@@ -12,10 +12,11 @@ struct SettingsView: View {
     private let cleanupPresentation = VoiceInkTranscriptionCleanupPresentation.iOS
     private let dictionaryPresentation = VoiceInkDictionarySettingsPresentation.iOS
     private let audioTimeoutPresentation = VoiceInkAudioSessionTimeoutPreference.settingsPresentation
+    private let settingsPresentation = VoiceInkSettingsPresentation.iOS
     
     var body: some View {
         List {
-            Section(header: Text("Modes")) {
+            Section(header: Text(settingsPresentation.modesSectionTitle)) {
                 ForEach(settings.modes) { mode in
                     NavigationLink(destination: ModeConfigurationView(
                         mode: mode,
@@ -34,9 +35,9 @@ struct SettingsView: View {
                     settings.addMode(newMode)
                 }) {
                     HStack {
-                        Image(systemName: "plus.circle.fill")
+                        Image(systemName: settingsPresentation.addActionSystemImageName)
                             .foregroundStyle(.blue)
-                        Text("Add New Mode")
+                        Text(settingsPresentation.addModeButtonTitle)
                             .foregroundStyle(.blue)
                     }
                 }
@@ -83,7 +84,7 @@ struct SettingsView: View {
                             .onSubmit(addFillerWord)
 
                         Button(action: addFillerWord) {
-                            Image(systemName: "plus.circle.fill")
+                            Image(systemName: settingsPresentation.addActionSystemImageName)
                         }
                         .disabled(!canAddFillerWord)
                     }
@@ -103,7 +104,7 @@ struct SettingsView: View {
                         .onSubmit(addCustomVocabularyTerm)
 
                     Button(action: addCustomVocabularyTerm) {
-                        Image(systemName: "plus.circle.fill")
+                        Image(systemName: settingsPresentation.addActionSystemImageName)
                     }
                     .disabled(!canAddCustomVocabularyTerm)
                 }
@@ -124,7 +125,10 @@ struct SettingsView: View {
                     .onSubmit(addWordReplacement)
 
                 Button(action: addWordReplacement) {
-                    Label(dictionaryPresentation.addReplacementButtonTitle, systemImage: "plus.circle.fill")
+                    Label(
+                        dictionaryPresentation.addReplacementButtonTitle,
+                        systemImage: settingsPresentation.addActionSystemImageName
+                    )
                 }
                 .disabled(!canAddWordReplacement)
 
@@ -171,16 +175,19 @@ struct SettingsView: View {
             }
 
             #if DEBUG
-            Section(header: Text("Debug")) {
+            Section(header: Text(settingsPresentation.debugSectionTitle)) {
                 Button(role: .destructive) {
                     resetAppData()
                 } label: {
-                    Label("Reset All App Data", systemImage: "trash")
+                    Label(
+                        settingsPresentation.resetAllAppDataButtonTitle,
+                        systemImage: settingsPresentation.resetAllAppDataSystemImageName
+                    )
                 }
             }
             #endif
         }
-        .navigationTitle("Settings")
+        .navigationTitle(settingsPresentation.navigationTitle)
         .onAppear {
             settings.repairSelectedTranscriptionLanguage()
         }

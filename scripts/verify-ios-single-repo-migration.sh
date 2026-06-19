@@ -471,6 +471,16 @@ require_pattern \
   'formPresentation|VoiceInkModeFormPresentation' \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
+require_pattern \
+  "shared iOS settings presentation lives in VoiceInkCore" \
+  'VoiceInkSettingsPresentation|addModeButtonTitle|resetAllAppDataButtonTitle' \
+  VoiceInkCore/Sources/VoiceInkCore/SettingsPresentation.swift
+
+require_pattern \
+  "iOS settings uses shared settings presentation" \
+  'VoiceInkSettingsPresentation\.iOS|settingsPresentation\.(navigationTitle|modesSectionTitle|addModeButtonTitle|addActionSystemImageName|debugSectionTitle|resetAllAppDataButtonTitle|resetAllAppDataSystemImageName)' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
 reject_pattern \
   "iOS mode selection views avoid shell-only mode-count picker branching" \
   'modes\.count > 1|settings\.modes\.count > 1|modes\.first|settings\.modes\.first|!settings\.modes\.isEmpty' \
@@ -485,6 +495,11 @@ reject_pattern \
 reject_pattern \
   "iOS settings mode rows avoid shell-only model summary formatting" \
   'Transcription: |Post-processing: |effectiveTranscriptionModel|effectivePostProcessingModel' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+reject_pattern \
+  "iOS settings avoids shell-only settings chrome and action copy" \
+  '"(Modes|Add New Mode|Debug|Reset All App Data|Settings|plus\.circle\.fill|trash)"' \
   iOS/VoiceInk-ios/SettingsView.swift
 
 reject_pattern \

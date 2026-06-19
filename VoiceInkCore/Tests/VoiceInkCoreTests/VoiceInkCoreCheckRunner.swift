@@ -16,6 +16,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "OnboardingPresentationTests.testIOSWelcomeOnboardingPresentationPreservesCopyAndFeatureOrder", run: { OnboardingPresentationTests().testIOSWelcomeOnboardingPresentationPreservesCopyAndFeatureOrder() }),
             VoiceInkCoreCheck(name: "OnboardingPresentationTests.testIOSModelDownloadOnboardingPresentationPreservesCopy", run: { OnboardingPresentationTests().testIOSModelDownloadOnboardingPresentationPreservesCopy() }),
             VoiceInkCoreCheck(name: "OnboardingPresentationTests.testIOSReadyOnboardingPresentationPreservesCopyAndStepOrder", run: { OnboardingPresentationTests().testIOSReadyOnboardingPresentationPreservesCopyAndStepOrder() }),
+            VoiceInkCoreCheck(name: "SettingsPresentationTests.testIOSSettingsPresentationPreservesSettingsChromeCopy", run: { SettingsPresentationTests().testIOSSettingsPresentationPreservesSettingsChromeCopy() }),
             VoiceInkCoreCheck(name: "AIPromptsTests.testFinalPromptTextReturnsRawPromptWithoutSystemInstructions", run: { AIPromptsTests().testFinalPromptTextReturnsRawPromptWithoutSystemInstructions() }),
             VoiceInkCoreCheck(name: "AIPromptsTests.testFinalPromptTextWrapsPromptWithSystemInstructions", run: { AIPromptsTests().testFinalPromptTextWrapsPromptWithSystemInstructions() }),
             VoiceInkCoreCheck(name: "AIPromptsTests.testEnhancementPromptBuilderAppendsContextSectionsInMacOSOrder", run: { AIPromptsTests().testEnhancementPromptBuilderAppendsContextSectionsInMacOSOrder() }),

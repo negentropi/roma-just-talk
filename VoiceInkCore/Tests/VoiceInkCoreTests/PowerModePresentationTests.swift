@@ -92,6 +92,19 @@ final class PowerModePresentationTests: XCTestCase {
         )
     }
 
+    func testAIEnhancementEmptyStateTextPreservesMacOSFormCopy() {
+        XCTAssertEqual(VoiceInkPowerModePresentation.noAIProvidersConnectedText, "No providers connected")
+        XCTAssertEqual(
+            VoiceInkPowerModePresentation.noAIModelsAvailableText(for: .openRouter),
+            "No models loaded"
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModePresentation.noAIModelsAvailableText(for: .gemini),
+            "No models available"
+        )
+        XCTAssertEqual(VoiceInkPowerModePresentation.noEnhancementPromptsAvailableText, "No prompts available")
+    }
+
     func testRowDetailPresentationPreservesDefaultBandWithoutVisibleChips() {
         let config = PowerModeConfig(
             name: "Writing",

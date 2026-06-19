@@ -2854,6 +2854,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
 
 require_pattern \
+  "shared Power Mode AI-enhancement empty-state copy lives in VoiceInkCore" \
+  'noAIProvidersConnectedText|noAIModelsAvailableText|noEnhancementPromptsAvailableText' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
+
+require_pattern \
   "shared Power Mode row detail presentation lives in VoiceInkCore" \
   'VoiceInkPowerModeRowDetailPresentation|rowDetailPresentation' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
@@ -2893,6 +2898,11 @@ require_pattern \
   'VoiceInkPowerModePresentation\.noTranscriptionModelsAvailableText' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
+require_pattern \
+  "macOS Power Mode edit form uses shared AI-enhancement empty-state copy" \
+  'VoiceInkPowerModePresentation\.(noAIProvidersConnectedText|noAIModelsAvailableText|noEnhancementPromptsAvailableText)' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
 reject_pattern \
   "macOS Power Mode rows avoid shell-only selected-language fallback formatting" \
   'langCode == "auto"|langCode == "en"|langCode\.uppercased\(\)' \
@@ -2901,6 +2911,11 @@ reject_pattern \
 reject_pattern \
   "macOS Power Mode edit form avoids duplicate no-transcription-models copy" \
   'No transcription models available\. Please connect to a cloud service or download a local model in the AI Models tab\.' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+reject_pattern \
+  "macOS Power Mode edit form avoids duplicate AI-enhancement empty-state copy" \
+  'No providers connected|No models loaded|No models available|No prompts available' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
 reject_pattern \

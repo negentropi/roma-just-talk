@@ -77,6 +77,10 @@ public enum VoiceInkPowerModePresentation {
     public static let contextAwarenessDisplayText = "Context Awareness"
     public static let defaultPromptDisplayText = "AI"
     public static let noTranscriptionModelsAvailableText = "No transcription models available. Please connect to a cloud service or download a local model in the AI Models tab."
+    public static let noAIProvidersConnectedText = "No providers connected"
+    public static let noAIModelsLoadedText = "No models loaded"
+    public static let noAIModelsAvailableText = "No models available"
+    public static let noEnhancementPromptsAvailableText = "No prompts available"
 
     public static func displayName(name: String?, emoji: String?) -> String {
         switch (emoji?.trimmingCharacters(in: .whitespacesAndNewlines), name?.trimmingCharacters(in: .whitespacesAndNewlines)) {
@@ -179,6 +183,10 @@ public enum VoiceInkPowerModePresentation {
         }
 
         return modelName.count > 20 ? String(modelName.prefix(18)) + "..." : modelName
+    }
+
+    public static func noAIModelsAvailableText(for provider: VoiceInkAIEnhancementProviderKind) -> String {
+        provider == .openRouter ? noAIModelsLoadedText : noAIModelsAvailableText
     }
 
     private static func triggerCountText(_ count: Int, singular: String, plural: String) -> String {

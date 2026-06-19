@@ -447,7 +447,7 @@ struct ConfigurationView: View {
                     if isAIEnhancementEnabled {
                         if aiService.connectedProviders.isEmpty {
                             LabeledContent("AI Provider") {
-                                Text("No providers connected")
+                                Text(VoiceInkPowerModePresentation.noAIProvidersConnectedText)
                                     .foregroundColor(.secondary)
                                     .italic()
                             }
@@ -471,7 +471,7 @@ struct ConfigurationView: View {
                             let models = aiService.availableModels(for: provider)
                             if models.isEmpty {
                                 LabeledContent("AI Model") {
-                                    Text(provider == .openRouter ? "No models loaded" : "No models available")
+                                    Text(VoiceInkPowerModePresentation.noAIModelsAvailableText(for: provider))
                                         .foregroundColor(.secondary)
                                         .italic()
                                 }
@@ -502,7 +502,7 @@ struct ConfigurationView: View {
 
                         if enhancementService.allPrompts.isEmpty {
                             LabeledContent("Enhancement Prompt") {
-                                Text("No prompts available")
+                                Text(VoiceInkPowerModePresentation.noEnhancementPromptsAvailableText)
                                     .foregroundColor(.secondary)
                             }
                         } else {

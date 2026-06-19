@@ -111,6 +111,17 @@ final class RecordingStatePolicyTests: XCTestCase {
         )
     }
 
+    func testRecordingNotificationPresentationPreservesMacOSRuntimeFailureCopy() {
+        let presentation = VoiceInkRecordingNotificationPresentation.runtimeFailure(
+            localizedDescription: "Device disconnected"
+        )
+
+        XCTAssertEqual(
+            presentation.title,
+            "Recording Failed: Device disconnected"
+        )
+    }
+
     func testRecordingStartFailureMapsIOSMicrophoneBusyOSStatus() {
         let alert = VoiceInkRecordingAlertPresentation.recordingStartFailure(
             domain: NSOSStatusErrorDomain,

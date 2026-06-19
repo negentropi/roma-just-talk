@@ -441,6 +441,11 @@ require_pattern \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift
 
 require_pattern \
+  "macOS recorder uses shared runtime failure notification presentation" \
+  'VoiceInkRecordingNotificationPresentation\.runtimeFailure' \
+  VoiceInk/Recorder.swift
+
+require_pattern \
   "shared mode selection presentation lives in VoiceInkCore" \
   'VoiceInkModeSelectionPresentation|controlTitle' \
   VoiceInkCore/Sources/VoiceInkCore/Mode.swift
@@ -553,6 +558,11 @@ reject_pattern \
   "macOS recording engine avoids shell-only start failure notification copy" \
   '"No AI Model Selected"|"Recording failed to start"' \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+
+reject_pattern \
+  "macOS recorder avoids shell-only runtime failure notification copy" \
+  '"Recording Failed:' \
+  VoiceInk/Recorder.swift
 
 reject_pattern \
   "iOS recording background transcription uses shared record updates" \

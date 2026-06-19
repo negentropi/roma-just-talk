@@ -41,6 +41,12 @@ public struct VoiceInkRecordingNotificationPresentation: Equatable, Sendable {
     public static let failedToStart = VoiceInkRecordingNotificationPresentation(
         title: "Recording failed to start"
     )
+
+    public static func runtimeFailure(localizedDescription: String) -> VoiceInkRecordingNotificationPresentation {
+        VoiceInkRecordingNotificationPresentation(
+            title: "Recording Failed: \(localizedDescription)"
+        )
+    }
 }
 
 public struct VoiceInkRecordingAlertPresentation: Equatable, Identifiable, Sendable {

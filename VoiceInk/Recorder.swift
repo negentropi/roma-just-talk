@@ -261,7 +261,9 @@ class Recorder: NSObject, ObservableObject {
         // Notify the user about the recording failure
         await MainActor.run {
             NotificationManager.shared.showNotification(
-                title: "Recording Failed: \(error.localizedDescription)",
+                title: VoiceInkRecordingNotificationPresentation.runtimeFailure(
+                    localizedDescription: error.localizedDescription
+                ).title,
                 type: .error
             )
         }

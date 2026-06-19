@@ -114,22 +114,26 @@ struct NotesListView: View {
     }
 
     private var emptyState: some View {
+        let presentation = VoiceInkHistoryPresentation.iOSNotesEmptyState
+
         VStack(spacing: 16) {
             ZStack {
                 Circle()
                     .fill(Color(.tertiarySystemFill))
                     .frame(width: 88, height: 88)
-                Image(systemName: "waveform")
+                Image(systemName: presentation.systemImageName)
                     .font(.system(size: 36, weight: .semibold))
                     .foregroundStyle(.secondary)
             }
-            Text("No notes yet")
+            Text(presentation.title)
                 .font(.title3.weight(.semibold))
-            Text("Tap Start Recording to capture your first note.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 24)
+            if let message = presentation.message {
+                Text(message)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 24)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(.systemGroupedBackground))

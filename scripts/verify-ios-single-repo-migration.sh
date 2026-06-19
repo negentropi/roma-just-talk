@@ -755,6 +755,73 @@ require_pattern \
   VoiceInk/Views/History/TranscriptionHistoryView.swift \
   VoiceInk/Views/History/InlineHistoryView.swift
 
+require_pattern \
+  "shared history empty-state presentation lives in VoiceInkCore" \
+  'public struct VoiceInkHistoryEmptyStatePresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+require_pattern \
+  "shared history empty-state presentation owns iOS notes state" \
+  'iOSNotesEmptyState' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+require_pattern \
+  "shared history empty-state presentation owns iOS notes title" \
+  'title: "No notes yet"' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+require_pattern \
+  "shared history empty-state presentation owns iOS notes message" \
+  'message: "Tap Start Recording to capture your first note\."' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+require_pattern \
+  "shared history empty-state presentation owns macOS inline search policy" \
+  'macOSInlineHistoryEmptyState' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+require_pattern \
+  "shared history empty-state presentation owns macOS inline empty title" \
+  'title: "No transcriptions yet"' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+require_pattern \
+  "shared history empty-state presentation owns macOS inline search title" \
+  'title: "No results found"' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+require_pattern \
+  "iOS note list uses shared history empty-state presentation" \
+  'VoiceInkHistoryPresentation\.iOSNotesEmptyState' \
+  iOS/VoiceInk-ios/NotesListView.swift
+
+require_pattern \
+  "macOS full history uses shared history empty-state presentation" \
+  'VoiceInkHistoryPresentation\.macOSHistoryListEmptyState' \
+  VoiceInk/Views/History/TranscriptionHistoryView.swift
+
+require_pattern \
+  "macOS full history uses shared no-selection presentation" \
+  'VoiceInkHistoryPresentation\.macOSNoSelectionEmptyState' \
+  VoiceInk/Views/History/TranscriptionHistoryView.swift
+
+require_pattern \
+  "macOS full history uses shared no-metadata presentation" \
+  'VoiceInkHistoryPresentation\.macOSNoMetadataEmptyState' \
+  VoiceInk/Views/History/TranscriptionHistoryView.swift
+
+require_pattern \
+  "macOS inline history uses shared history empty-state presentation" \
+  'VoiceInkHistoryPresentation\.macOSInlineHistoryEmptyState' \
+  VoiceInk/Views/History/InlineHistoryView.swift
+
+reject_pattern \
+  "history and notes views avoid shell-only empty-state copy" \
+  'No notes yet|Tap Start Recording to capture your first note\.|No transcriptions yet|No transcriptions|No results found|Your transcription history will appear here|Try a different search term|No Selection|Select a transcription to view details|No Metadata' \
+  iOS/VoiceInk-ios/NotesListView.swift \
+  VoiceInk/Views/History/TranscriptionHistoryView.swift \
+  VoiceInk/Views/History/InlineHistoryView.swift
+
 reject_pattern \
   "macOS history views avoid duplicate delete-confirmation pluralization copy" \
   'This action cannot be undone\. Are you sure you want to delete|selectedTranscriptions\.count == 1 \? "" : "s"' \

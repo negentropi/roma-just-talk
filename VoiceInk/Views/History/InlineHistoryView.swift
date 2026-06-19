@@ -236,17 +236,23 @@ struct InlineHistoryView: View {
     // MARK: - Empty State
 
     private var emptyStateView: some View {
+        let presentation = VoiceInkHistoryPresentation.macOSInlineHistoryEmptyState(
+            searchText: searchText
+        )
+
         VStack(spacing: 12) {
             Spacer()
-            Image(systemName: "doc.text.magnifyingglass")
+            Image(systemName: presentation.systemImageName)
                 .font(.system(size: 40))
                 .foregroundColor(.secondary)
-            Text(searchText.isEmpty ? "No transcriptions yet" : "No results found")
+            Text(presentation.title)
                 .font(.system(size: 16, weight: .medium))
                 .foregroundColor(.secondary)
-            Text(searchText.isEmpty ? "Your transcription history will appear here" : "Try a different search term")
-                .font(.system(size: 13))
-                .foregroundColor(.secondary.opacity(0.8))
+            if let message = presentation.message {
+                Text(message)
+                    .font(.system(size: 13))
+                    .foregroundColor(.secondary.opacity(0.8))
+            }
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

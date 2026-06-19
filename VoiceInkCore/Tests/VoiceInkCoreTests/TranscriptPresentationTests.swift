@@ -2,6 +2,61 @@ import Foundation
 @testable import VoiceInkCore
 
 final class TranscriptPresentationTests: XCTestCase {
+    func testHistoryEmptyStatePresentationPreservesIOSNotesCopy() {
+        XCTAssertEqual(
+            VoiceInkHistoryPresentation.iOSNotesEmptyState,
+            VoiceInkHistoryEmptyStatePresentation(
+                systemImageName: "waveform",
+                title: "No notes yet",
+                message: "Tap Start Recording to capture your first note."
+            )
+        )
+    }
+
+    func testHistoryEmptyStatePresentationPreservesMacOSHistoryCopy() {
+        XCTAssertEqual(
+            VoiceInkHistoryPresentation.macOSHistoryListEmptyState,
+            VoiceInkHistoryEmptyStatePresentation(
+                systemImageName: "doc.text.magnifyingglass",
+                title: "No transcriptions"
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkHistoryPresentation.macOSNoSelectionEmptyState,
+            VoiceInkHistoryEmptyStatePresentation(
+                systemImageName: "doc.text",
+                title: "No Selection",
+                message: "Select a transcription to view details"
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkHistoryPresentation.macOSNoMetadataEmptyState,
+            VoiceInkHistoryEmptyStatePresentation(
+                systemImageName: "info.circle",
+                title: "No Metadata"
+            )
+        )
+    }
+
+    func testInlineHistoryEmptyStatePresentationPreservesSearchBranching() {
+        XCTAssertEqual(
+            VoiceInkHistoryPresentation.macOSInlineHistoryEmptyState(searchText: ""),
+            VoiceInkHistoryEmptyStatePresentation(
+                systemImageName: "doc.text.magnifyingglass",
+                title: "No transcriptions yet",
+                message: "Your transcription history will appear here"
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkHistoryPresentation.macOSInlineHistoryEmptyState(searchText: "invoice"),
+            VoiceInkHistoryEmptyStatePresentation(
+                systemImageName: "doc.text.magnifyingglass",
+                title: "No results found",
+                message: "Try a different search term"
+            )
+        )
+    }
+
     func testPreferredTextUsesEnhancedTextWhenPresent() {
         XCTAssertEqual(
             VoiceInkTranscriptPresentation.preferredText(

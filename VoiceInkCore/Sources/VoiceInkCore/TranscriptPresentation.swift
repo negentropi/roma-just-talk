@@ -62,6 +62,18 @@ public struct VoiceInkTranscriptStatusPresentation: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkHistoryEmptyStatePresentation: Equatable, Sendable {
+    public let systemImageName: String
+    public let title: String
+    public let message: String?
+
+    public init(systemImageName: String, title: String, message: String? = nil) {
+        self.systemImageName = systemImageName
+        self.title = title
+        self.message = message
+    }
+}
+
 public enum VoiceInkTranscriptTextVariant: String, CaseIterable, Sendable {
     case original
     case enhanced
@@ -86,6 +98,46 @@ public enum VoiceInkTranscriptTextVariant: String, CaseIterable, Sendable {
         case .enhanced:
             return enhancedText ?? ""
         }
+    }
+}
+
+public enum VoiceInkHistoryPresentation {
+    public static let iOSNotesEmptyState = VoiceInkHistoryEmptyStatePresentation(
+        systemImageName: "waveform",
+        title: "No notes yet",
+        message: "Tap Start Recording to capture your first note."
+    )
+
+    public static let macOSHistoryListEmptyState = VoiceInkHistoryEmptyStatePresentation(
+        systemImageName: "doc.text.magnifyingglass",
+        title: "No transcriptions"
+    )
+
+    public static let macOSNoSelectionEmptyState = VoiceInkHistoryEmptyStatePresentation(
+        systemImageName: "doc.text",
+        title: "No Selection",
+        message: "Select a transcription to view details"
+    )
+
+    public static let macOSNoMetadataEmptyState = VoiceInkHistoryEmptyStatePresentation(
+        systemImageName: "info.circle",
+        title: "No Metadata"
+    )
+
+    public static func macOSInlineHistoryEmptyState(
+        searchText: String
+    ) -> VoiceInkHistoryEmptyStatePresentation {
+        searchText.isEmpty
+            ? VoiceInkHistoryEmptyStatePresentation(
+                systemImageName: "doc.text.magnifyingglass",
+                title: "No transcriptions yet",
+                message: "Your transcription history will appear here"
+            )
+            : VoiceInkHistoryEmptyStatePresentation(
+                systemImageName: "doc.text.magnifyingglass",
+                title: "No results found",
+                message: "Try a different search term"
+            )
     }
 }
 

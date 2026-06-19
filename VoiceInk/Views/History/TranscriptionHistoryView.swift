@@ -185,11 +185,13 @@ struct TranscriptionHistoryView: View {
 
             ZStack(alignment: .bottom) {
                 if displayedTranscriptions.isEmpty && !isLoading {
+                    let presentation = VoiceInkHistoryPresentation.macOSHistoryListEmptyState
+
                     VStack(spacing: 12) {
-                        Image(systemName: "doc.text.magnifyingglass")
+                        Image(systemName: presentation.systemImageName)
                             .font(.system(size: 40))
                             .foregroundColor(.secondary)
-                        Text("No transcriptions")
+                        Text(presentation.title)
                             .font(.system(size: 14, weight: .medium))
                             .foregroundColor(.secondary)
                     }
@@ -247,21 +249,25 @@ struct TranscriptionHistoryView: View {
                 })
                     .id(transcription.id)
             } else {
+                let presentation = VoiceInkHistoryPresentation.macOSNoSelectionEmptyState
+
                 ScrollView {
                     VStack(spacing: 32) {
                         Spacer()
                             .frame(minHeight: 40)
 
                         VStack(spacing: 12) {
-                            Image(systemName: "doc.text")
+                            Image(systemName: presentation.systemImageName)
                                 .font(.system(size: 50))
                                 .foregroundColor(.secondary)
-                            Text("No Selection")
+                            Text(presentation.title)
                                 .font(.system(size: 18, weight: .medium))
                                 .foregroundColor(.secondary)
-                            Text("Select a transcription to view details")
-                                .font(.system(size: 14))
-                                .foregroundColor(.secondary)
+                            if let message = presentation.message {
+                                Text(message)
+                                    .font(.system(size: 14))
+                                    .foregroundColor(.secondary)
+                            }
                         }
 
                         HistoryShortcutTipView()
@@ -285,11 +291,13 @@ struct TranscriptionHistoryView: View {
                 TranscriptionInfoPanel(transcription: transcription)
                     .id(transcription.id)
             } else {
+                let presentation = VoiceInkHistoryPresentation.macOSNoMetadataEmptyState
+
                 VStack(spacing: 12) {
-                    Image(systemName: "info.circle")
+                    Image(systemName: presentation.systemImageName)
                         .font(.system(size: 40))
                         .foregroundColor(.secondary)
-                    Text("No Metadata")
+                    Text(presentation.title)
                         .font(.system(size: 14, weight: .medium))
                         .foregroundColor(.secondary)
                 }

@@ -1516,6 +1516,21 @@ reject_pattern \
   '"app\.fill"' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
+require_pattern \
+  "shared macOS onboarding permission presentation lives in VoiceInkCore" \
+  'VoiceInkMacOSOnboardingPermissionPresentation|VoiceInkMacOSOnboardingPermissionKind|relaunchRequiredMessage|canSkipWhenNotGranted|buttonTitle' \
+  VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift
+
+require_pattern \
+  "macOS onboarding permissions use shared permission presentation" \
+  'VoiceInkMacOSOnboardingPermissionPresentation\.all|canSkipWhenNotGranted|buttonTitle\(isGranted:|screenContextInfoMessage' \
+  VoiceInk/Views/Onboarding/OnboardingPermissionsView.swift
+
+reject_pattern \
+  "macOS onboarding permissions avoid shell-only permission presentation copy" \
+  'struct +OnboardingPermission[[:space:]:{]|enum +PermissionType|"(Microphone Access|Microphone Selection|Accessibility Access|Input Monitoring|Screen Context \(Optional\)|Keyboard Shortcut|Enable your microphone to start speaking and converting your voice to text instantly\.|Select the audio input device you want to use with roma-just-talk\.|Add roma-just-talk to Accessibility, then turn its switch on\.|Allow roma-just-talk to detect your recording shortcut while other apps are active\.|Enable screen context only if you want roma-just-talk to use visible text for transcript enhancement\.|Set up a keyboard shortcut to quickly access roma-just-talk from anywhere\.|Relaunch to Apply|Set Shortcut|Grant|Enable)"' \
+  VoiceInk/Views/Onboarding/OnboardingPermissionsView.swift
+
 reject_pattern \
   "iOS model download views avoid shell-only downloaded/progress state assembly" \
   'model\.isDownloaded\(in:|modelManager\.isDownloading\[[^]]+\] == true|modelManager\.downloadProgress\[[^]]+\]' \

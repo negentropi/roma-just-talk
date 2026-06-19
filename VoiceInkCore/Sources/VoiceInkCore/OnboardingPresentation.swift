@@ -141,3 +141,109 @@ public enum VoiceInkIOSOnboardingPresentation {
         primaryButtonTitle: VoiceInkAppIdentity.startUsingTitle
     )
 }
+
+public enum VoiceInkMacOSOnboardingPermissionKind: String, Equatable, Sendable {
+    case microphone
+    case audioDeviceSelection
+    case accessibility
+    case inputMonitoring
+    case screenRecording
+    case keyboardShortcut
+}
+
+public struct VoiceInkMacOSOnboardingPermissionPresentation: Identifiable, Equatable, Sendable {
+    public let kind: VoiceInkMacOSOnboardingPermissionKind
+    public let title: String
+    public let description: String
+    public let iconSystemName: String
+
+    public var id: VoiceInkMacOSOnboardingPermissionKind { kind }
+
+    public init(
+        kind: VoiceInkMacOSOnboardingPermissionKind,
+        title: String,
+        description: String,
+        iconSystemName: String
+    ) {
+        self.kind = kind
+        self.title = title
+        self.description = description
+        self.iconSystemName = iconSystemName
+    }
+
+    public static let relaunchRequiredMessage =
+        "If you already turned this on in System Settings, relaunch roma-just-talk to activate it."
+
+    public static let screenContextInfoHelpMessage =
+        "roma-just-talk captures on-screen text to understand the context of your voice input, which significantly improves transcription accuracy. Your privacy is important: this data is processed locally and is not stored."
+
+    public static let screenContextInfoLearnMoreURLString = "https://tryvoiceink.com/docs/contextual-awareness"
+
+    public static let all = [
+        VoiceInkMacOSOnboardingPermissionPresentation(
+            kind: .microphone,
+            title: "Microphone Access",
+            description: "Enable your microphone to start speaking and converting your voice to text instantly.",
+            iconSystemName: "waveform"
+        ),
+        VoiceInkMacOSOnboardingPermissionPresentation(
+            kind: .audioDeviceSelection,
+            title: "Microphone Selection",
+            description: "Select the audio input device you want to use with roma-just-talk.",
+            iconSystemName: "headphones"
+        ),
+        VoiceInkMacOSOnboardingPermissionPresentation(
+            kind: .accessibility,
+            title: "Accessibility Access",
+            description: "Add roma-just-talk to Accessibility, then turn its switch on.",
+            iconSystemName: "accessibility"
+        ),
+        VoiceInkMacOSOnboardingPermissionPresentation(
+            kind: .inputMonitoring,
+            title: "Input Monitoring",
+            description: "Allow roma-just-talk to detect your recording shortcut while other apps are active.",
+            iconSystemName: "keyboard.badge.eye"
+        ),
+        VoiceInkMacOSOnboardingPermissionPresentation(
+            kind: .screenRecording,
+            title: "Screen Context (Optional)",
+            description: "Enable screen context only if you want roma-just-talk to use visible text for transcript enhancement.",
+            iconSystemName: "rectangle.inset.filled.and.person.filled"
+        ),
+        VoiceInkMacOSOnboardingPermissionPresentation(
+            kind: .keyboardShortcut,
+            title: "Keyboard Shortcut",
+            description: "Set up a keyboard shortcut to quickly access roma-just-talk from anywhere.",
+            iconSystemName: "keyboard"
+        )
+    ]
+
+    public var screenContextInfoMessage: String? {
+        kind == .screenRecording ? Self.screenContextInfoHelpMessage : nil
+    }
+
+    public var screenContextInfoURLString: String? {
+        kind == .screenRecording ? Self.screenContextInfoLearnMoreURLString : nil
+    }
+
+    public var canSkipWhenNotGranted: Bool {
+        kind != .keyboardShortcut && kind != .audioDeviceSelection
+    }
+
+    public func buttonTitle(isGranted: Bool, requiresRelaunch: Bool) -> String {
+        if requiresRelaunch {
+            return "Relaunch to Apply"
+        }
+
+        switch kind {
+        case .keyboardShortcut:
+            return isGranted ? "Continue" : "Set Shortcut"
+        case .audioDeviceSelection:
+            return "Continue"
+        case .screenRecording:
+            return isGranted ? "Continue" : "Enable"
+        case .microphone, .accessibility, .inputMonitoring:
+            return isGranted ? "Continue" : "Grant"
+        }
+    }
+}

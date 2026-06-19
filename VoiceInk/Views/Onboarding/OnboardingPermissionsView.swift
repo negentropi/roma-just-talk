@@ -2,86 +2,28 @@ import SwiftUI
 import AVFoundation
 import AppKit
 import PermissionFlow
-
-struct OnboardingPermission: Identifiable {
-    let id = UUID()
-    let title: String
-    let description: String
-    let icon: String
-    let type: PermissionType
-    
-    enum PermissionType {
-        case microphone
-        case audioDeviceSelection
-        case accessibility
-        case inputMonitoring
-        case screenRecording
-        case keyboardShortcut
-        
-        var systemName: String {
-            switch self {
-            case .microphone: return "mic"
-            case .audioDeviceSelection: return "headphones"
-            case .accessibility: return "accessibility"
-            case .inputMonitoring: return "keyboard.badge.eye"
-            case .screenRecording: return "rectangle.inset.filled.and.person.filled"
-            case .keyboardShortcut: return "keyboard"
-            }
-        }
-    }
-}
+import VoiceInkCore
 
 struct OnboardingPermissionsView: View {
     @Binding var hasCompletedOnboarding: Bool
     @EnvironmentObject private var recordingShortcutManager: RecordingShortcutManager
     @ObservedObject private var audioDeviceManager = AudioDeviceManager.shared
     @State private var currentPermissionIndex = 0
-    @State private var permissionStates: [Bool] = [false, false, false, false, false, false]
+    @State private var permissionStates = Array(
+        repeating: false,
+        count: VoiceInkMacOSOnboardingPermissionPresentation.all.count
+    )
     @State private var showAnimation = false
     @State private var scale: CGFloat = 0.8
     @State private var opacity: CGFloat = 0
     @State private var showModelDownload = false
-    @State private var relaunchRequiredStates: [Bool] = [false, false, false, false, false, false]
+    @State private var relaunchRequiredStates = Array(
+        repeating: false,
+        count: VoiceInkMacOSOnboardingPermissionPresentation.all.count
+    )
     @StateObject private var permissionFlowGuide = PermissionFlowGuide()
     
-    private let permissions: [OnboardingPermission] = [
-        OnboardingPermission(
-            title: "Microphone Access",
-            description: "Enable your microphone to start speaking and converting your voice to text instantly.",
-            icon: "waveform",
-            type: .microphone
-        ),
-        OnboardingPermission(
-            title: "Microphone Selection",
-            description: "Select the audio input device you want to use with roma-just-talk.",
-            icon: "headphones",
-            type: .audioDeviceSelection
-        ),
-        OnboardingPermission(
-            title: "Accessibility Access",
-            description: "Add roma-just-talk to Accessibility, then turn its switch on.",
-            icon: "accessibility",
-            type: .accessibility
-        ),
-        OnboardingPermission(
-            title: "Input Monitoring",
-            description: "Allow roma-just-talk to detect your recording shortcut while other apps are active.",
-            icon: "keyboard.badge.eye",
-            type: .inputMonitoring
-        ),
-        OnboardingPermission(
-            title: "Screen Context (Optional)",
-            description: "Enable screen context only if you want roma-just-talk to use visible text for transcript enhancement.",
-            icon: "rectangle.inset.filled.and.person.filled",
-            type: .screenRecording
-        ),
-        OnboardingPermission(
-            title: "Keyboard Shortcut",
-            description: "Set up a keyboard shortcut to quickly access roma-just-talk from anywhere.",
-            icon: "keyboard",
-            type: .keyboardShortcut
-        )
-    ]
+    private let permissions = VoiceInkMacOSOnboardingPermissionPresentation.all
     
     var body: some View {
         ZStack {
@@ -117,7 +59,7 @@ struct OnboardingPermissionsView: View {
                                         .foregroundColor(.accentColor)
                                         .transition(.scale.combined(with: .opacity))
                                 } else {
-                                    Image(systemName: permissions[currentPermissionIndex].icon)
+                                    Image(systemName: permissions[currentPermissionIndex].iconSystemName)
                                         .font(.system(size: 40))
                                         .foregroundColor(.accentColor)
                                 }
@@ -133,10 +75,10 @@ struct OnboardingPermissionsView: View {
                                         .fontWeight(.bold)
                                         .foregroundColor(.white)
                                     
-                                    if permissions[currentPermissionIndex].type == .screenRecording {
+                                    if let infoMessage = permissions[currentPermissionIndex].screenContextInfoMessage {
                                         InfoTip(
-                                            "roma-just-talk captures on-screen text to understand the context of your voice input, which significantly improves transcription accuracy. Your privacy is important: this data is processed locally and is not stored.",
-                                            learnMoreURL: "https://tryvoiceink.com/docs/contextual-awareness"
+                                            infoMessage,
+                                            learnMoreURL: permissions[currentPermissionIndex].screenContextInfoURLString
                                         )
                                     }
                                 }
@@ -151,7 +93,7 @@ struct OnboardingPermissionsView: View {
                             .opacity(opacity)
                             
                             // Audio device selection (only shown for audio device selection step)
-                            if permissions[currentPermissionIndex].type == .audioDeviceSelection {
+                            if permissions[currentPermissionIndex].kind == .audioDeviceSelection {
                                 VStack(spacing: 20) {
                                     if audioDeviceManager.availableDevices.isEmpty {
                                         VStack(spacing: 12) {
@@ -208,7 +150,7 @@ struct OnboardingPermissionsView: View {
                             }
                             
                             // Keyboard shortcut recorder (only shown for keyboard shortcut step)
-                            if permissions[currentPermissionIndex].type == .keyboardShortcut {
+                            if permissions[currentPermissionIndex].kind == .keyboardShortcut {
                                 shortcutView { isConfigured in
                                     withAnimation {
                                         permissionStates[currentPermissionIndex] = isConfigured
@@ -235,7 +177,7 @@ struct OnboardingPermissionsView: View {
                             .buttonStyle(ScaleButtonStyle())
 
                             if relaunchRequiredStates[currentPermissionIndex] {
-                                Text("If you already turned this on in System Settings, relaunch roma-just-talk to activate it.")
+                                Text(VoiceInkMacOSOnboardingPermissionPresentation.relaunchRequiredMessage)
                                     .font(.caption)
                                     .foregroundColor(.white.opacity(0.65))
                                     .multilineTextAlignment(.center)
@@ -243,8 +185,7 @@ struct OnboardingPermissionsView: View {
                             }
                             
                             if !permissionStates[currentPermissionIndex] && 
-                               permissions[currentPermissionIndex].type != .keyboardShortcut &&
-                               permissions[currentPermissionIndex].type != .audioDeviceSelection {
+                               permissions[currentPermissionIndex].canSkipWhenNotGranted {
                                 SkipButton(text: "Skip for now") {
                                     moveToNext()
                                 }
@@ -319,7 +260,7 @@ struct OnboardingPermissionsView: View {
             return
         }
         
-        switch permissions[currentPermissionIndex].type {
+        switch permissions[currentPermissionIndex].kind {
         case .microphone:
             PermissionGrantCoordinator.grantMicrophone { status in
                 let granted = status == .authorized
@@ -434,20 +375,10 @@ struct OnboardingPermissionsView: View {
     }
     
     private func getButtonTitle() -> String {
-        if relaunchRequiredStates[currentPermissionIndex] {
-            return "Relaunch to Apply"
-        }
-
-        switch permissions[currentPermissionIndex].type {
-        case .keyboardShortcut:
-            return permissionStates[currentPermissionIndex] ? "Continue" : "Set Shortcut"
-        case .audioDeviceSelection:
-            return "Continue"
-        case .screenRecording:
-            return permissionStates[currentPermissionIndex] ? "Continue" : "Enable"
-        default:
-            return permissionStates[currentPermissionIndex] ? "Continue" : "Grant"
-        }
+        return permissions[currentPermissionIndex].buttonTitle(
+            isGranted: permissionStates[currentPermissionIndex],
+            requiresRelaunch: relaunchRequiredStates[currentPermissionIndex]
+        )
     }
 
     private func markRelaunchNeededIfPermissionStillInactive(at index: Int, isActive: @escaping () -> Bool) {

@@ -74,4 +74,68 @@ final class OnboardingPresentationTests: XCTestCase {
             ]
         )
     }
+
+    func testMacOSOnboardingPermissionPresentationPreservesStepOrderAndCopy() {
+        let presentations = VoiceInkMacOSOnboardingPermissionPresentation.all
+
+        XCTAssertEqual(
+            presentations.map(\.kind),
+            [.microphone, .audioDeviceSelection, .accessibility, .inputMonitoring, .screenRecording, .keyboardShortcut]
+        )
+        XCTAssertEqual(presentations[0].title, "Microphone Access")
+        XCTAssertEqual(
+            presentations[0].description,
+            "Enable your microphone to start speaking and converting your voice to text instantly."
+        )
+        XCTAssertEqual(presentations[0].iconSystemName, "waveform")
+        XCTAssertEqual(presentations[1].title, "Microphone Selection")
+        XCTAssertEqual(
+            presentations[1].description,
+            "Select the audio input device you want to use with roma-just-talk."
+        )
+        XCTAssertEqual(presentations[2].title, "Accessibility Access")
+        XCTAssertEqual(presentations[3].title, "Input Monitoring")
+        XCTAssertEqual(presentations[4].title, "Screen Context (Optional)")
+        XCTAssertEqual(
+            presentations[4].description,
+            "Enable screen context only if you want roma-just-talk to use visible text for transcript enhancement."
+        )
+        XCTAssertEqual(
+            presentations[4].screenContextInfoMessage,
+            VoiceInkMacOSOnboardingPermissionPresentation.screenContextInfoHelpMessage
+        )
+        XCTAssertEqual(
+            presentations[4].screenContextInfoURLString,
+            "https://tryvoiceink.com/docs/contextual-awareness"
+        )
+        XCTAssertEqual(presentations[5].title, "Keyboard Shortcut")
+        XCTAssertEqual(presentations[5].iconSystemName, "keyboard")
+    }
+
+    func testMacOSOnboardingPermissionButtonTitlesAndSkipPolicy() {
+        let presentations = VoiceInkMacOSOnboardingPermissionPresentation.all
+        let microphone = presentations[0]
+        let audioDeviceSelection = presentations[1]
+        let screenRecording = presentations[4]
+        let keyboardShortcut = presentations[5]
+
+        XCTAssertEqual(microphone.buttonTitle(isGranted: false, requiresRelaunch: false), "Grant")
+        XCTAssertEqual(microphone.buttonTitle(isGranted: true, requiresRelaunch: false), "Continue")
+        XCTAssertEqual(
+            microphone.buttonTitle(isGranted: true, requiresRelaunch: true),
+            "Relaunch to Apply"
+        )
+        XCTAssertEqual(audioDeviceSelection.buttonTitle(isGranted: false, requiresRelaunch: false), "Continue")
+        XCTAssertEqual(screenRecording.buttonTitle(isGranted: false, requiresRelaunch: false), "Enable")
+        XCTAssertEqual(keyboardShortcut.buttonTitle(isGranted: false, requiresRelaunch: false), "Set Shortcut")
+
+        XCTAssertTrue(microphone.canSkipWhenNotGranted)
+        XCTAssertTrue(screenRecording.canSkipWhenNotGranted)
+        XCTAssertFalse(audioDeviceSelection.canSkipWhenNotGranted)
+        XCTAssertFalse(keyboardShortcut.canSkipWhenNotGranted)
+        XCTAssertEqual(
+            VoiceInkMacOSOnboardingPermissionPresentation.relaunchRequiredMessage,
+            "If you already turned this on in System Settings, relaunch roma-just-talk to activate it."
+        )
+    }
 }

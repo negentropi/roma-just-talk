@@ -2,6 +2,7 @@ import Foundation
 
 public enum VoiceInkAppIdentity {
     public static let bundleIdentifier = "com.prakashjoshipax.VoiceInk"
+    public static let loggingSubsystem = "com.prakashjoshipax.voiceink"
     public static let displayName = "roma just talk"
     public static let compactDisplayName = "roma-just-talk"
     public static let sidebarSubtitle = "speak before hotkey"

@@ -12,7 +12,7 @@ import os
 actor WhisperContext {
     private var context: OpaquePointer?
     private var vadModelPath: String?
-    private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "WhisperContext")
+    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "WhisperContext")
 
     private init() {}
 

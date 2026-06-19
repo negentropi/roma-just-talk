@@ -4,6 +4,7 @@ import Foundation
 final class AppIdentityTests: XCTestCase {
     func testAppIdentityPreservesSharedVisibleNames() {
         XCTAssertEqual(VoiceInkAppIdentity.bundleIdentifier, "com.prakashjoshipax.VoiceInk")
+        XCTAssertEqual(VoiceInkAppIdentity.loggingSubsystem, "com.prakashjoshipax.voiceink")
         XCTAssertEqual(VoiceInkAppIdentity.displayName, "roma just talk")
         XCTAssertEqual(VoiceInkAppIdentity.compactDisplayName, "roma-just-talk")
         XCTAssertEqual(VoiceInkAppIdentity.sidebarSubtitle, "speak before hotkey")

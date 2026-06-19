@@ -3263,7 +3263,7 @@ require_plist_value \
 
 require_pattern \
   "shared app identity presentation lives in VoiceInkCore" \
-  'VoiceInkAppIdentity|bundleIdentifier = "com\.prakashjoshipax\.VoiceInk"|displayName = "roma just talk"|compactDisplayName = "roma-just-talk"|macOSApplicationSupportDirectory' \
+  'VoiceInkAppIdentity|bundleIdentifier = "com\.prakashjoshipax\.VoiceInk"|loggingSubsystem = "com\.prakashjoshipax\.voiceink"|displayName = "roma just talk"|compactDisplayName = "roma-just-talk"|macOSApplicationSupportDirectory' \
   VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift
 
 require_pattern \
@@ -3320,6 +3320,22 @@ require_pattern \
   "iOS onboarding presentation uses shared app identity presentation" \
   'VoiceInkAppIdentity\.(welcomeTitle|startUsingTitle)' \
   VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift
+
+require_pattern \
+  "macOS local Whisper logging uses shared app identity" \
+  'Logger\(subsystem: VoiceInkAppIdentity\.loggingSubsystem, category: "WhisperContext"\)' \
+  VoiceInk/Transcription/Whisper/LibWhisper.swift
+
+require_pattern \
+  "iOS local Whisper logging uses shared app identity" \
+  'Logger\(subsystem: VoiceInkAppIdentity\.loggingSubsystem, category: "WhisperContext"\)' \
+  iOS/VoiceInk-ios/LibWhisper.swift
+
+reject_pattern \
+  "local Whisper adapters avoid duplicate logging subsystem literal" \
+  '"com\.prakashjoshipax\.voiceink"' \
+  VoiceInk/Transcription/Whisper/LibWhisper.swift \
+  iOS/VoiceInk-ios/LibWhisper.swift
 
 reject_pattern \
   "Swift UI avoids duplicate app identity literals" \

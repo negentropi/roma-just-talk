@@ -96,30 +96,11 @@ class PowerModeSessionManager {
     }
 
     private func applyConfiguration(_ config: PowerModeConfig) async {
-        guard let enhancementService = enhancementService,
+        guard enhancementService != nil,
               let stateProvider = stateProvider else { return }
 
         await MainActor.run {
-            enhancementService.isEnhancementEnabled = config.isAIEnhancementEnabled
-            enhancementService.useScreenCaptureContext = config.useScreenCapture
-
-            if config.isAIEnhancementEnabled {
-                if let selectedPromptUUID = config.selectedPromptUUID {
-                    enhancementService.selectedPromptId = selectedPromptUUID
-                }
-
-                let aiService = enhancementService.getAIService()
-                if let provider = config.selectedAIProviderKind {
-                    aiService.selectedProvider = provider
-                }
-                if let model = config.selectedAIModel {
-                    aiService.selectModel(model)
-                }
-            }
-
-            VoiceInkTranscriptionCleanupPreferenceStorage.saveTextFormattingEnabled(config.isTextFormattingEnabled)
-            PunctuationCleanupMode.setCurrent(config.punctuationCleanupMode)
-            VoiceInkTranscriptionCleanupPreferenceStorage.saveLowercaseTranscription(config.lowercaseTranscription)
+            applyPreferenceApplication(config.powerModePreferenceApplication)
         }
 
         if let modelName = config.selectedTranscriptionModelName,
@@ -138,32 +119,11 @@ class PowerModeSessionManager {
     }
 
     private func restoreState(_ state: VoiceInkPowerModeApplicationState) async {
-        guard let enhancementService = enhancementService,
+        guard enhancementService != nil,
               let stateProvider = stateProvider else { return }
 
         await MainActor.run {
-            enhancementService.isEnhancementEnabled = state.isEnhancementEnabled
-            enhancementService.useScreenCaptureContext = state.useScreenCaptureContext
-            enhancementService.selectedPromptId = state.selectedPromptUUID
-
-            let aiService = enhancementService.getAIService()
-            if let provider = state.selectedAIProviderKind {
-                aiService.selectedProvider = provider
-            }
-            if let model = state.selectedAIModel {
-                aiService.selectModel(model)
-            }
-
-            let cleanupRestore = state.cleanupRestore
-            if let isTextFormattingEnabled = cleanupRestore.isTextFormattingEnabled {
-                VoiceInkTranscriptionCleanupPreferenceStorage.saveTextFormattingEnabled(isTextFormattingEnabled)
-            }
-            if let punctuationCleanupMode = cleanupRestore.punctuationMode {
-                PunctuationCleanupMode.setCurrent(punctuationCleanupMode)
-            }
-            if let lowercaseTranscription = cleanupRestore.lowercaseTranscription {
-                VoiceInkTranscriptionCleanupPreferenceStorage.saveLowercaseTranscription(lowercaseTranscription)
-            }
+            applyPreferenceApplication(state.powerModePreferenceRestore)
         }
 
         if let modelName = state.transcriptionModelName,
@@ -174,6 +134,39 @@ class PowerModeSessionManager {
 
         if let language = state.selectedLanguage {
             applyCompatibleLanguage(language, preferredModelName: state.transcriptionModelName)
+        }
+    }
+
+    private func applyPreferenceApplication(_ application: VoiceInkPowerModePreferenceApplication) {
+        guard let enhancementService else { return }
+
+        enhancementService.isEnhancementEnabled = application.isEnhancementEnabled
+        enhancementService.useScreenCaptureContext = application.useScreenCaptureContext
+
+        switch application.promptSelection {
+        case .leaveUnchanged:
+            break
+        case .set(let selectedPromptId):
+            enhancementService.selectedPromptId = selectedPromptId
+        }
+
+        let aiService = enhancementService.getAIService()
+        if let provider = application.selectedAIProvider {
+            aiService.selectedProvider = provider
+        }
+        if let model = application.selectedAIModel {
+            aiService.selectModel(model)
+        }
+
+        let cleanupRestore = application.cleanupRestore
+        if let isTextFormattingEnabled = cleanupRestore.isTextFormattingEnabled {
+            VoiceInkTranscriptionCleanupPreferenceStorage.saveTextFormattingEnabled(isTextFormattingEnabled)
+        }
+        if let punctuationCleanupMode = cleanupRestore.punctuationMode {
+            PunctuationCleanupMode.setCurrent(punctuationCleanupMode)
+        }
+        if let lowercaseTranscription = cleanupRestore.lowercaseTranscription {
+            VoiceInkTranscriptionCleanupPreferenceStorage.saveLowercaseTranscription(lowercaseTranscription)
         }
     }
 

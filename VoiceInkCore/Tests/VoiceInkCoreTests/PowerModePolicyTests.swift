@@ -779,6 +779,109 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertNil(state.lowercaseTranscription)
     }
 
+    func testPowerModeConfigBuildsPreferenceApplicationWhenEnhancementIsEnabled() {
+        let promptID = UUID()
+        let config = PowerModeConfig(
+            name: "Enhanced",
+            emoji: "E",
+            isAIEnhancementEnabled: true,
+            selectedPrompt: promptID.uuidString,
+            useScreenCapture: true,
+            isTextFormattingEnabled: true,
+            punctuationCleanupMode: .removeTrailingPeriod,
+            lowercaseTranscription: true,
+            selectedAIProvider: "GROQ",
+            selectedAIModel: "llama-3.3"
+        )
+
+        let application = config.powerModePreferenceApplication
+
+        XCTAssertTrue(application.isEnhancementEnabled)
+        XCTAssertTrue(application.useScreenCaptureContext)
+        XCTAssertEqual(application.promptSelection, .set(promptID))
+        XCTAssertEqual(application.selectedAIProvider, .groq)
+        XCTAssertEqual(application.selectedAIModel, "llama-3.3")
+        XCTAssertEqual(
+            application.cleanupRestore,
+            VoiceInkPowerModeCleanupRestore(
+                isTextFormattingEnabled: true,
+                punctuationMode: .removeTrailingPeriod,
+                lowercaseTranscription: true
+            )
+        )
+    }
+
+    func testPowerModeConfigPreferenceApplicationLeavesEnhancementDetailsWhenDisabled() {
+        let promptID = UUID()
+        let config = PowerModeConfig(
+            name: "Disabled",
+            emoji: "D",
+            isAIEnhancementEnabled: false,
+            selectedPrompt: promptID.uuidString,
+            useScreenCapture: true,
+            selectedAIProvider: "GROQ",
+            selectedAIModel: "llama-3.3"
+        )
+
+        let application = config.powerModePreferenceApplication
+
+        XCTAssertFalse(application.isEnhancementEnabled)
+        XCTAssertTrue(application.useScreenCaptureContext)
+        XCTAssertEqual(application.promptSelection, .leaveUnchanged)
+        XCTAssertNil(application.selectedAIProvider)
+        XCTAssertNil(application.selectedAIModel)
+        XCTAssertEqual(application.cleanupRestore.punctuationMode, .keep)
+    }
+
+    func testPowerModeApplicationStateBuildsPreferenceRestoreApplication() {
+        let promptID = UUID()
+        let state = VoiceInkPowerModeApplicationState(
+            isEnhancementEnabled: true,
+            useScreenCaptureContext: true,
+            selectedPromptId: promptID.uuidString,
+            selectedAIProvider: "GROQ",
+            selectedAIModel: "llama-3.3",
+            isTextFormattingEnabled: false,
+            punctuationCleanupMode: .removeAll,
+            lowercaseTranscription: true
+        )
+
+        let application = state.powerModePreferenceRestore
+
+        XCTAssertTrue(application.isEnhancementEnabled)
+        XCTAssertTrue(application.useScreenCaptureContext)
+        XCTAssertEqual(application.promptSelection, .set(promptID))
+        XCTAssertEqual(application.selectedAIProvider, .groq)
+        XCTAssertEqual(application.selectedAIModel, "llama-3.3")
+        XCTAssertEqual(
+            application.cleanupRestore,
+            VoiceInkPowerModeCleanupRestore(
+                isTextFormattingEnabled: false,
+                punctuationMode: .removeAll,
+                lowercaseTranscription: true
+            )
+        )
+    }
+
+    func testPowerModeApplicationStatePreferenceRestoreClearsInvalidPromptAndKeepsLegacyCleanup() {
+        let state = VoiceInkPowerModeApplicationState(
+            isEnhancementEnabled: false,
+            useScreenCaptureContext: false,
+            selectedPromptId: "not-a-uuid",
+            selectedAIProvider: "MissingProvider",
+            removePunctuation: true
+        )
+
+        let application = state.powerModePreferenceRestore
+
+        XCTAssertFalse(application.isEnhancementEnabled)
+        XCTAssertFalse(application.useScreenCaptureContext)
+        XCTAssertEqual(application.promptSelection, .set(nil))
+        XCTAssertNil(application.selectedAIProvider)
+        XCTAssertNil(application.selectedAIModel)
+        XCTAssertEqual(application.cleanupRestore.punctuationMode, .removeAll)
+    }
+
     func testPowerModeSessionPreservesStoredShapeAndOriginalState() throws {
         let id = UUID()
         let startTime = Date(timeIntervalSince1970: 1_700_000_000)

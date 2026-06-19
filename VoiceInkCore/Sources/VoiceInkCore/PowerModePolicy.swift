@@ -635,6 +635,70 @@ public struct VoiceInkPowerModeCleanupRestore: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkPowerModePromptSelectionApplication: Equatable, Sendable {
+    case leaveUnchanged
+    case set(UUID?)
+}
+
+public struct VoiceInkPowerModePreferenceApplication: Equatable, Sendable {
+    public let isEnhancementEnabled: Bool
+    public let useScreenCaptureContext: Bool
+    public let promptSelection: VoiceInkPowerModePromptSelectionApplication
+    public let selectedAIProvider: VoiceInkAIEnhancementProviderKind?
+    public let selectedAIModel: String?
+    public let cleanupRestore: VoiceInkPowerModeCleanupRestore
+
+    public init(
+        isEnhancementEnabled: Bool,
+        useScreenCaptureContext: Bool,
+        promptSelection: VoiceInkPowerModePromptSelectionApplication,
+        selectedAIProvider: VoiceInkAIEnhancementProviderKind?,
+        selectedAIModel: String?,
+        cleanupRestore: VoiceInkPowerModeCleanupRestore
+    ) {
+        self.isEnhancementEnabled = isEnhancementEnabled
+        self.useScreenCaptureContext = useScreenCaptureContext
+        self.promptSelection = promptSelection
+        self.selectedAIProvider = selectedAIProvider
+        self.selectedAIModel = selectedAIModel
+        self.cleanupRestore = cleanupRestore
+    }
+}
+
+public extension PowerModeConfig {
+    var powerModePreferenceApplication: VoiceInkPowerModePreferenceApplication {
+        let appliesEnhancementSettings = isAIEnhancementEnabled
+
+        return VoiceInkPowerModePreferenceApplication(
+            isEnhancementEnabled: isAIEnhancementEnabled,
+            useScreenCaptureContext: useScreenCapture,
+            promptSelection: appliesEnhancementSettings
+                ? selectedPromptUUID.map { .set($0) } ?? .leaveUnchanged
+                : .leaveUnchanged,
+            selectedAIProvider: appliesEnhancementSettings ? selectedAIProviderKind : nil,
+            selectedAIModel: appliesEnhancementSettings ? selectedAIModel : nil,
+            cleanupRestore: VoiceInkPowerModeCleanupRestore(
+                isTextFormattingEnabled: isTextFormattingEnabled,
+                punctuationMode: punctuationCleanupMode,
+                lowercaseTranscription: lowercaseTranscription
+            )
+        )
+    }
+}
+
+public extension VoiceInkPowerModeApplicationState {
+    var powerModePreferenceRestore: VoiceInkPowerModePreferenceApplication {
+        VoiceInkPowerModePreferenceApplication(
+            isEnhancementEnabled: isEnhancementEnabled,
+            useScreenCaptureContext: useScreenCaptureContext,
+            promptSelection: .set(selectedPromptUUID),
+            selectedAIProvider: selectedAIProviderKind,
+            selectedAIModel: selectedAIModel,
+            cleanupRestore: cleanupRestore
+        )
+    }
+}
+
 private extension Optional where Wrapped == String {
     func isMissing(treatsEmptyAsMissing: Bool) -> Bool {
         switch self {

@@ -142,6 +142,13 @@ final class DashboardMetricsTests: XCTestCase {
         XCTAssertEqual(presentation.dashboardText, "12 words - 0:30 audio")
         XCTAssertNil(presentation.fastestModelText)
     }
+
+    func testNoteListPresentationPreservesIOSChromeCopy() {
+        XCTAssertEqual(VoiceInkNoteListPresentation.sectionTitle, "Recent")
+        XCTAssertEqual(VoiceInkNoteListPresentation.settingsSystemImageName, "gearshape")
+        XCTAssertEqual(VoiceInkNoteListPresentation.startRecordingButtonTitle, "Start Recording")
+        XCTAssertEqual(VoiceInkNoteListPresentation.startRecordingSystemImageName, "mic.fill")
+    }
 }
 
 private struct Record: VoiceInkDashboardMetricRecord {

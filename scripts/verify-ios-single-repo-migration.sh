@@ -3067,9 +3067,29 @@ require_pattern \
   'VoiceInkNoteListSummaryPresentation\.make' \
   iOS/VoiceInk-ios/NotesListView.swift
 
+require_pattern \
+  "shared note-list chrome presentation lives in VoiceInkCore" \
+  'VoiceInkNoteListPresentation|startRecordingButtonTitle|settingsSystemImageName' \
+  VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift
+
+require_pattern \
+  "iOS note-list uses shared chrome presentation" \
+  'VoiceInkNoteListPresentation\.(sectionTitle|settingsSystemImageName|startRecordingButtonTitle|startRecordingSystemImageName)' \
+  iOS/VoiceInk-ios/NotesListView.swift
+
+require_pattern \
+  "iOS recording alert fallback uses shared cancel copy" \
+  'VoiceInkRecordingSheetPresentation\.iOS\.cancelButtonTitle' \
+  iOS/VoiceInk-ios/NotesListView.swift
+
 reject_pattern \
   "iOS note-list avoids shell-only dashboard metric math" \
   'VoiceInkWordCounter|VoiceInkSessionMetricPolicy|VoiceInkDashboardMetricsAccumulator|dashboardWordCount|dashboardAudioDuration|summary\.totalWords|summary\.totalDuration|words -|reduce\(' \
+  iOS/VoiceInk-ios/NotesListView.swift
+
+reject_pattern \
+  "iOS note-list avoids shell-only chrome and action copy" \
+  '"(Recent|Start Recording|gearshape|mic\.fill|Cancel)"' \
   iOS/VoiceInk-ios/NotesListView.swift
 
 require_pattern \

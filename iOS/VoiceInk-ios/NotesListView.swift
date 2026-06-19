@@ -30,7 +30,9 @@ struct NotesListView: View {
                 .navigationBarTitleDisplayMode(.large)
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
-                        NavigationLink(destination: SettingsView()) { Image(systemName: "gearshape") }
+                        NavigationLink(destination: SettingsView()) {
+                            Image(systemName: VoiceInkNoteListPresentation.settingsSystemImageName)
+                        }
                     }
                 }
                 .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .automatic))
@@ -90,7 +92,7 @@ struct NotesListView: View {
 
         HStack {
             VStack(alignment: .leading, spacing: 2) {
-                Text("Recent")
+                Text(VoiceInkNoteListPresentation.sectionTitle)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                 Text(summaryPresentation.dashboardText)
@@ -149,7 +151,10 @@ struct NotesListView: View {
                 recordingManager.startRecordingFlow()
             }
         }) {
-            Label("Start Recording", systemImage: "mic.fill")
+            Label(
+                VoiceInkNoteListPresentation.startRecordingButtonTitle,
+                systemImage: VoiceInkNoteListPresentation.startRecordingSystemImageName
+            )
                 .fontWeight(.semibold)
                 .frame(maxWidth: .infinity)
         }
@@ -172,7 +177,9 @@ struct NotesListView: View {
                     Text(presentation.primaryButtonTitle),
                     action: recordingManager.openSettings
                 ),
-                secondaryButton: .cancel(Text(presentation.secondaryButtonTitle ?? "Cancel"))
+                secondaryButton: .cancel(Text(
+                    presentation.secondaryButtonTitle ?? VoiceInkRecordingSheetPresentation.iOS.cancelButtonTitle
+                ))
             )
         case .dismiss:
             return Alert(

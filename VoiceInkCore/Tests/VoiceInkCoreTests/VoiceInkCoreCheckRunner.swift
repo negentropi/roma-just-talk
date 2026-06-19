@@ -142,6 +142,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "DashboardMetricsTests.testAverageWordsPerMinuteDisplayTextRoundsToOneDecimalPlace", run: { DashboardMetricsTests().testAverageWordsPerMinuteDisplayTextRoundsToOneDecimalPlace() }),
             VoiceInkCoreCheck(name: "DashboardMetricsTests.testNoteListSummaryPresentationBuildsIOSHeaderText", run: { DashboardMetricsTests().testNoteListSummaryPresentationBuildsIOSHeaderText() }),
             VoiceInkCoreCheck(name: "DashboardMetricsTests.testNoteListSummaryPresentationOmitsFastestModelWhenNoTimedModelExists", run: { DashboardMetricsTests().testNoteListSummaryPresentationOmitsFastestModelWhenNoTimedModelExists() }),
+            VoiceInkCoreCheck(name: "DashboardMetricsTests.testNoteListPresentationPreservesIOSChromeCopy", run: { DashboardMetricsTests().testNoteListPresentationPreservesIOSChromeCopy() }),
             VoiceInkCoreCheck(name: "DatePresentationTests.testAbbreviatedTimestampPreservesMacOSDetailFormat", run: { DatePresentationTests().testAbbreviatedTimestampPreservesMacOSDetailFormat() }),
             VoiceInkCoreCheck(name: "DatePresentationTests.testCompactTimestampPreservesMacOSHistoryListFormat", run: { DatePresentationTests().testCompactTimestampPreservesMacOSHistoryListFormat() }),
             VoiceInkCoreCheck(name: "DatePresentationTests.testRelativeTimestampUsesShortRelativeStyle", run: { DatePresentationTests().testRelativeTimestampUsesShortRelativeStyle() }),

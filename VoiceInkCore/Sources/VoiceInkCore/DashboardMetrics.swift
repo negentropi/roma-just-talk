@@ -133,3 +133,10 @@ public struct VoiceInkNoteListSummaryPresentation: Equatable, Sendable {
         )
     }
 }
+
+public enum VoiceInkNoteListPresentation {
+    public static let sectionTitle = "Recent"
+    public static let settingsSystemImageName = "gearshape"
+    public static let startRecordingButtonTitle = "Start Recording"
+    public static let startRecordingSystemImageName = "mic.fill"
+}

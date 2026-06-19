@@ -37,8 +37,16 @@ final class PowerModePolicyTests: XCTestCase {
             "Add Emoji"
         )
         XCTAssertEqual(
+            VoiceInkPowerModeEmojiInputPresentation.addEmojiSystemImageName,
+            "plus.circle.fill"
+        )
+        XCTAssertEqual(
             VoiceInkPowerModeEmojiInputPresentation.addCustomEmojiHelpText,
             "Add custom emoji"
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeEmojiInputPresentation.removeCustomEmojiSystemImageName,
+            "xmark.circle.fill"
         )
         XCTAssertEqual(
             VoiceInkPowerModeEmojiInputPresentation.invalidPreviewMessage,

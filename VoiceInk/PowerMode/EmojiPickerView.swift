@@ -137,10 +137,7 @@ struct EmojiPickerView: View {
             emojiForAlert = emojiToRemove
             showingEmojiInUseAlert = true
         } else {
-            if emojiManager.removeCustomEmoji(emojiToRemove) {
-                if selectedEmoji == emojiToRemove {
-                }
-            }
+            _ = emojiManager.removeCustomEmoji(emojiToRemove)
         }
     }
 }
@@ -167,7 +164,7 @@ private struct EmojiButton: View {
 
             if isCustom {
                 Button(action: removeAction) {
-                    Image(systemName: "xmark.circle.fill")
+                    Image(systemName: VoiceInkPowerModeEmojiInputPresentation.removeCustomEmojiSystemImageName)
                         .symbolRenderingMode(.palette)
                         .foregroundStyle(Color.white, Color.red)
                         .font(.caption2)
@@ -185,7 +182,10 @@ private struct AddEmojiButton: View {
 
     var body: some View {
         Button(action: action) {
-            Label(VoiceInkPowerModeEmojiInputPresentation.addEmojiAccessibilityLabel, systemImage: "plus.circle.fill")
+            Label(
+                VoiceInkPowerModeEmojiInputPresentation.addEmojiAccessibilityLabel,
+                systemImage: VoiceInkPowerModeEmojiInputPresentation.addEmojiSystemImageName
+            )
                 .font(.title2)
                 .labelStyle(.iconOnly)
                 .foregroundColor(.accentColor)

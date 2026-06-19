@@ -367,6 +367,7 @@ scripts/verify-ios-single-repo-migration.sh --full-build
 40. iOS debug reset file cleanup routes through `VoiceInkAppDataResetFilePlan`, with raw recordings/models/cache/tmp deletion sequence out of `SettingsView`.
 41. iOS onboarding copy, feature rows, app-icon fallback symbol, model-download step copy, ready step copy, and button titles route through `VoiceInkIOSOnboardingPresentation`, with duplicate copy out of `OnboardingView`.
 42. iOS settings navigation title, modes/debug section titles, add-mode copy/icon, add-row icon, and reset-all-app-data copy/icon route through `VoiceInkSettingsPresentation`, with duplicate settings chrome/action copy out of `SettingsView`.
-43. A real Xcode toolchain is selected and both app targets build.
+43. macOS final paste text assembly routes trial-expired prefix and trailing-space storage through `VoiceInkTranscriptionPasteOutputPolicy`/`VoiceInkAppendTrailingSpacePreference`, with cursor paste, clipboard context, sound feedback, and auto-send timing remaining in the macOS shell.
+44. A real Xcode toolchain is selected and both app targets build.
 
 Current local blocker: `xcode-select -p` points to `/Library/Developer/CommandLineTools`, and the previously used external Xcode volume is not mounted. Full target builds are still environment-blocked until a real Xcode is selected; macOS `VoiceInk` also needs `/Users/atalphalnmomhappyhouse/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework`, and iOS `VoiceInk-ios` needs the iOS 26.2 platform installed. Until those are present, use `swift run VoiceInkCoreChecks` plus the static parse/lint gates above for local proof.

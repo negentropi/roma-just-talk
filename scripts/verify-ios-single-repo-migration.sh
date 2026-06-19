@@ -2073,6 +2073,11 @@ require_pattern \
   VoiceInk/Views/ModelSettingsView.swift
 
 require_pattern \
+  "migration checklist tracks shared paste output gate" \
+  'macOS final paste text assembly routes trial-expired prefix and trailing-space storage through `VoiceInkTranscriptionPasteOutputPolicy`/`VoiceInkAppendTrailingSpacePreference`' \
+  docs/ios-single-repo-migration.md
+
+require_pattern \
   "shared transcription run result carries post-processing enhancement result" \
   'postProcessingResult: VoiceInkAIEnhancementResult\?' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift

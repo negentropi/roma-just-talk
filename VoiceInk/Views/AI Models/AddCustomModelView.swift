@@ -2,16 +2,19 @@ import SwiftUI
 import VoiceInkCore
 
 struct AddCustomModelCardView: View {
+    private static let formPresentation = VoiceInkCustomCloudModelFormPresentation.macOS
+
     @ObservedObject var customModelManager: CustomCloudModelManager
     var onModelAdded: () -> Void
     var editingModel: CustomCloudModel? = nil
+    private let presentation = Self.formPresentation
     
     @State private var isExpanded = false
     @State private var displayName = ""
     @State private var apiEndpoint = ""
     @State private var apiKey = ""
     @State private var modelName = ""
-    @State private var isMultilingual = true
+    @State private var isMultilingual = Self.formPresentation.defaultIsMultilingual
     
     @State private var validationErrors: [String] = []
     @State private var showingAlert = false
@@ -34,18 +37,18 @@ struct AddCustomModelCardView: View {
                         } else {
                             // Pre-fill some default values when adding new
                             if apiEndpoint.isEmpty {
-                                apiEndpoint = "https://api.example.com/v1/audio/transcriptions"
+                                apiEndpoint = presentation.defaultAPIEndpoint
                             }
                             if modelName.isEmpty {
-                                modelName = "large-v3-turbo"
+                                modelName = presentation.defaultModelName
                             }
                         }
                     }
                 }) {
                     HStack(spacing: 8) {
-                        Image(systemName: "plus")
+                        Image(systemName: presentation.addButtonSystemImageName)
                             .font(.system(size: 14, weight: .medium))
-                        Text(editingModel != nil ? "Edit Model" : "Add Model")
+                        Text(presentation.buttonTitle(isEditing: editingModel != nil))
                             .font(.system(size: 14, weight: .semibold))
                     }
                     .foregroundColor(.white)
@@ -63,7 +66,7 @@ struct AddCustomModelCardView: View {
                 VStack(alignment: .leading, spacing: 20) {
                     // Header
                     HStack {
-                        Text(editingModel != nil ? "Edit Custom Model" : "Add Custom Model")
+                        Text(presentation.title(isEditing: editingModel != nil))
                             .font(.headline)
                             .foregroundColor(.primary)
                         
@@ -75,7 +78,7 @@ struct AddCustomModelCardView: View {
                                 clearForm()
                             }
                         }) {
-                            Image(systemName: "xmark")
+                            Image(systemName: presentation.closeSystemImageName)
                                 .font(.system(size: 12, weight: .medium))
                                 .foregroundColor(.secondary)
                         }
@@ -84,10 +87,10 @@ struct AddCustomModelCardView: View {
                     
                     // Disclaimer
                     HStack(spacing: 8) {
-                        Image(systemName: "exclamationmark.triangle.fill")
+                        Image(systemName: presentation.warningSystemImageName)
                             .foregroundColor(.orange)
                             .font(.caption)
-                        Text("Only OpenAI-compatible transcription APIs are supported")
+                        Text(presentation.compatibilityWarningText)
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
@@ -98,12 +101,29 @@ struct AddCustomModelCardView: View {
                     
                     // Form fields
                     VStack(alignment: .leading, spacing: 16) {
-                        FormField(title: "Display Name", text: $displayName, placeholder: "My Custom Model")
-                        FormField(title: "API Endpoint", text: $apiEndpoint, placeholder: "https://api.example.com/v1/audio/transcriptions")
-                        FormField(title: "API Key", text: $apiKey, placeholder: "your-api-key", isSecure: true)
-                        FormField(title: "Model Name", text: $modelName, placeholder: "whisper-1")
+                        FormField(
+                            title: presentation.displayNameFieldTitle,
+                            text: $displayName,
+                            placeholder: presentation.displayNamePlaceholder
+                        )
+                        FormField(
+                            title: presentation.apiEndpointFieldTitle,
+                            text: $apiEndpoint,
+                            placeholder: presentation.apiEndpointPlaceholder
+                        )
+                        FormField(
+                            title: presentation.apiKeyFieldTitle,
+                            text: $apiKey,
+                            placeholder: presentation.apiKeyPlaceholder,
+                            isSecure: true
+                        )
+                        FormField(
+                            title: presentation.modelNameFieldTitle,
+                            text: $modelName,
+                            placeholder: presentation.modelNamePlaceholder
+                        )
                         
-                        Toggle("Multilingual Model", isOn: $isMultilingual)
+                        Toggle(presentation.multilingualToggleTitle, isOn: $isMultilingual)
                     }
                     
                     // Action buttons
@@ -114,7 +134,7 @@ struct AddCustomModelCardView: View {
                                 clearForm()
                             }
                         }) {
-                            Text("Cancel")
+                            Text(presentation.cancelButtonTitle)
                                 .font(.system(size: 13, weight: .medium))
                                 .foregroundColor(.secondary)
                                 .frame(maxWidth: .infinity)
@@ -133,10 +153,10 @@ struct AddCustomModelCardView: View {
                                         .scaleEffect(0.8)
                                         .frame(width: 14, height: 14)
                                 } else {
-                                    Image(systemName: editingModel != nil ? "checkmark.circle.fill" : "plus.circle.fill")
+                                    Image(systemName: presentation.submitButtonSystemImageName(isEditing: editingModel != nil))
                                         .font(.system(size: 14))
                                 }
-                                Text(editingModel != nil ? "Update Model" : "Add Model")
+                                Text(presentation.submitButtonTitle(isEditing: editingModel != nil))
                                     .font(.system(size: 13, weight: .medium))
                             }
                             .foregroundColor(.white)
@@ -163,8 +183,8 @@ struct AddCustomModelCardView: View {
                 )
             }
         }
-        .alert("Validation Errors", isPresented: $showingAlert) {
-            Button("OK") { }
+        .alert(presentation.validationAlertTitle, isPresented: $showingAlert) {
+            Button(presentation.validationAlertDismissButtonTitle) { }
         } message: {
             Text(validationErrors.joined(separator: "\n"))
         }
@@ -203,7 +223,7 @@ struct AddCustomModelCardView: View {
         apiEndpoint = ""
         apiKey = ""
         modelName = ""
-        isMultilingual = true
+        isMultilingual = presentation.defaultIsMultilingual
     }
     
     private func addModel() {
@@ -227,7 +247,7 @@ struct AddCustomModelCardView: View {
                     id: editing.id,
                     name: draft.name,
                     displayName: draft.displayName,
-                    description: "Custom transcription model",
+                    description: presentation.defaultModelDescription,
                     apiEndpoint: draft.apiEndpoint,
                     modelName: draft.modelName,
                     isMultilingual: isMultilingual
@@ -236,7 +256,7 @@ struct AddCustomModelCardView: View {
                 if APIKeyManager.shared.saveCustomModelAPIKey(draft.apiKey, forModelId: editing.id) {
                     customModelManager.updateCustomModel(updatedModel)
                 } else {
-                    validationErrors = ["Failed to securely save API Key to Keychain. Please check your system settings or try again."]
+                    validationErrors = [presentation.keychainSaveFailureMessage]
                     showingAlert = true
                     isSaving = false
                     return
@@ -245,7 +265,7 @@ struct AddCustomModelCardView: View {
                 let customModel = CustomCloudModel(
                     name: draft.name,
                     displayName: draft.displayName,
-                    description: "Custom transcription model",
+                    description: presentation.defaultModelDescription,
                     apiEndpoint: draft.apiEndpoint,
                     modelName: draft.modelName,
                     isMultilingual: isMultilingual
@@ -254,7 +274,7 @@ struct AddCustomModelCardView: View {
                 if APIKeyManager.shared.saveCustomModelAPIKey(draft.apiKey, forModelId: customModel.id) {
                     customModelManager.addCustomModel(customModel)
                 } else {
-                    validationErrors = ["Failed to securely save API Key to Keychain. Please check your system settings or try again."]
+                    validationErrors = [presentation.keychainSaveFailureMessage]
                     showingAlert = true
                     isSaving = false
                     return

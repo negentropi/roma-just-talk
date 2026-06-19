@@ -32,6 +32,86 @@ public struct VoiceInkCustomCloudModelIdentity: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkCustomCloudModelFormPresentation: Equatable, Sendable {
+    public let defaultAPIEndpoint: String
+    public let defaultModelName: String
+    public let defaultIsMultilingual: Bool
+    public let addButtonTitle: String
+    public let editButtonTitle: String
+    public let addTitle: String
+    public let editTitle: String
+    public let addButtonSystemImageName: String
+    public let closeSystemImageName: String
+    public let warningSystemImageName: String
+    public let compatibilityWarningText: String
+    public let displayNameFieldTitle: String
+    public let displayNamePlaceholder: String
+    public let apiEndpointFieldTitle: String
+    public let apiEndpointPlaceholder: String
+    public let apiKeyFieldTitle: String
+    public let apiKeyPlaceholder: String
+    public let modelNameFieldTitle: String
+    public let modelNamePlaceholder: String
+    public let multilingualToggleTitle: String
+    public let cancelButtonTitle: String
+    public let addSubmitButtonTitle: String
+    public let editSubmitButtonTitle: String
+    public let addSubmitSystemImageName: String
+    public let editSubmitSystemImageName: String
+    public let validationAlertTitle: String
+    public let validationAlertDismissButtonTitle: String
+    public let defaultModelDescription: String
+    public let keychainSaveFailureMessage: String
+
+    public static let macOS = VoiceInkCustomCloudModelFormPresentation(
+        defaultAPIEndpoint: "https://api.example.com/v1/audio/transcriptions",
+        defaultModelName: "large-v3-turbo",
+        defaultIsMultilingual: true,
+        addButtonTitle: "Add Model",
+        editButtonTitle: "Edit Model",
+        addTitle: "Add Custom Model",
+        editTitle: "Edit Custom Model",
+        addButtonSystemImageName: "plus",
+        closeSystemImageName: "xmark",
+        warningSystemImageName: "exclamationmark.triangle.fill",
+        compatibilityWarningText: "Only OpenAI-compatible transcription APIs are supported",
+        displayNameFieldTitle: "Display Name",
+        displayNamePlaceholder: "My Custom Model",
+        apiEndpointFieldTitle: "API Endpoint",
+        apiEndpointPlaceholder: "https://api.example.com/v1/audio/transcriptions",
+        apiKeyFieldTitle: "API Key",
+        apiKeyPlaceholder: "your-api-key",
+        modelNameFieldTitle: "Model Name",
+        modelNamePlaceholder: "whisper-1",
+        multilingualToggleTitle: "Multilingual Model",
+        cancelButtonTitle: "Cancel",
+        addSubmitButtonTitle: "Add Model",
+        editSubmitButtonTitle: "Update Model",
+        addSubmitSystemImageName: "plus.circle.fill",
+        editSubmitSystemImageName: "checkmark.circle.fill",
+        validationAlertTitle: "Validation Errors",
+        validationAlertDismissButtonTitle: "OK",
+        defaultModelDescription: "Custom transcription model",
+        keychainSaveFailureMessage: "Failed to securely save API Key to Keychain. Please check your system settings or try again."
+    )
+
+    public func buttonTitle(isEditing: Bool) -> String {
+        isEditing ? editButtonTitle : addButtonTitle
+    }
+
+    public func title(isEditing: Bool) -> String {
+        isEditing ? editTitle : addTitle
+    }
+
+    public func submitButtonTitle(isEditing: Bool) -> String {
+        isEditing ? editSubmitButtonTitle : addSubmitButtonTitle
+    }
+
+    public func submitButtonSystemImageName(isEditing: Bool) -> String {
+        isEditing ? editSubmitSystemImageName : addSubmitSystemImageName
+    }
+}
+
 public struct VoiceInkCustomCloudModelBackup: Codable, Equatable, Sendable {
     public let id: UUID
     public let name: String

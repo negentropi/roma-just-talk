@@ -105,6 +105,47 @@ final class CustomCloudModelPolicyTests: XCTestCase {
         )
     }
 
+    func testMacOSFormPresentationPreservesDefaultsAndCopy() {
+        let presentation = VoiceInkCustomCloudModelFormPresentation.macOS
+
+        XCTAssertEqual(presentation.defaultAPIEndpoint, "https://api.example.com/v1/audio/transcriptions")
+        XCTAssertEqual(presentation.defaultModelName, "large-v3-turbo")
+        XCTAssertTrue(presentation.defaultIsMultilingual)
+        XCTAssertEqual(presentation.compatibilityWarningText, "Only OpenAI-compatible transcription APIs are supported")
+        XCTAssertEqual(presentation.displayNameFieldTitle, "Display Name")
+        XCTAssertEqual(presentation.displayNamePlaceholder, "My Custom Model")
+        XCTAssertEqual(presentation.apiEndpointFieldTitle, "API Endpoint")
+        XCTAssertEqual(presentation.apiEndpointPlaceholder, "https://api.example.com/v1/audio/transcriptions")
+        XCTAssertEqual(presentation.apiKeyFieldTitle, "API Key")
+        XCTAssertEqual(presentation.apiKeyPlaceholder, "your-api-key")
+        XCTAssertEqual(presentation.modelNameFieldTitle, "Model Name")
+        XCTAssertEqual(presentation.modelNamePlaceholder, "whisper-1")
+        XCTAssertEqual(presentation.multilingualToggleTitle, "Multilingual Model")
+        XCTAssertEqual(presentation.validationAlertTitle, "Validation Errors")
+        XCTAssertEqual(presentation.validationAlertDismissButtonTitle, "OK")
+        XCTAssertEqual(presentation.defaultModelDescription, "Custom transcription model")
+        XCTAssertEqual(
+            presentation.keychainSaveFailureMessage,
+            "Failed to securely save API Key to Keychain. Please check your system settings or try again."
+        )
+    }
+
+    func testMacOSFormPresentationSelectsAddAndEditLabelsAndIcons() {
+        let presentation = VoiceInkCustomCloudModelFormPresentation.macOS
+
+        XCTAssertEqual(presentation.buttonTitle(isEditing: false), "Add Model")
+        XCTAssertEqual(presentation.buttonTitle(isEditing: true), "Edit Model")
+        XCTAssertEqual(presentation.title(isEditing: false), "Add Custom Model")
+        XCTAssertEqual(presentation.title(isEditing: true), "Edit Custom Model")
+        XCTAssertEqual(presentation.submitButtonTitle(isEditing: false), "Add Model")
+        XCTAssertEqual(presentation.submitButtonTitle(isEditing: true), "Update Model")
+        XCTAssertEqual(presentation.addButtonSystemImageName, "plus")
+        XCTAssertEqual(presentation.closeSystemImageName, "xmark")
+        XCTAssertEqual(presentation.warningSystemImageName, "exclamationmark.triangle.fill")
+        XCTAssertEqual(presentation.submitButtonSystemImageName(isEditing: false), "plus.circle.fill")
+        XCTAssertEqual(presentation.submitButtonSystemImageName(isEditing: true), "checkmark.circle.fill")
+    }
+
     func testBackupRecordPreservesExistingCodableShapeAndImportNormalization() throws {
         let id = UUID(uuidString: "E31E4D7A-437B-4BD3-A4B5-9624F38F3BBE")!
         let backup = VoiceInkCustomCloudModelBackup(

@@ -99,6 +99,8 @@ final class PowerModePresentationTests: XCTestCase {
     func testPopoverAndRowActionChromePreservesMacOSCopy() {
         XCTAssertEqual(VoiceInkPowerModePresentation.popoverTitle, "Select Power Mode")
         XCTAssertEqual(VoiceInkPowerModePresentation.popoverEmptyTitle, "No Power Modes Available")
+        XCTAssertEqual(VoiceInkPowerModePresentation.popoverEmptySystemImageName, "sparkles")
+        XCTAssertEqual(VoiceInkPowerModePresentation.popoverSelectedSystemImageName, "checkmark")
         XCTAssertEqual(VoiceInkPowerModePresentation.rowEditActionTitle, "Edit")
         XCTAssertEqual(VoiceInkPowerModePresentation.rowEditActionSystemImageName, "pencil")
         XCTAssertEqual(VoiceInkPowerModePresentation.rowDeleteActionTitle, "Delete")
@@ -107,6 +109,7 @@ final class PowerModePresentationTests: XCTestCase {
 
     func testConfigurationFormChromePreservesMacOSCopy() {
         XCTAssertEqual(VoiceInkPowerModePresentation.formCloseHelpText, "Close")
+        XCTAssertEqual(VoiceInkPowerModePresentation.formCloseSystemImageName, "xmark")
         XCTAssertEqual(VoiceInkPowerModePresentation.generalSectionTitle, "General")
         XCTAssertEqual(VoiceInkPowerModePresentation.nameFieldPlaceholder, "Name")
         XCTAssertEqual(VoiceInkPowerModePresentation.triggerScenariosSectionTitle, "Trigger Scenarios")
@@ -114,6 +117,9 @@ final class PowerModePresentationTests: XCTestCase {
         XCTAssertEqual(VoiceInkPowerModePresentation.addApplicationHelpText, "Add application")
         XCTAssertEqual(VoiceInkPowerModePresentation.noApplicationsText, "No applications added")
         XCTAssertEqual(VoiceInkPowerModePresentation.appPickerSearchPlaceholder, "Search apps...")
+        XCTAssertEqual(VoiceInkPowerModePresentation.appPickerSearchSystemImageName, "magnifyingglass")
+        XCTAssertEqual(VoiceInkPowerModePresentation.appPickerClearSearchSystemImageName, "xmark.circle.fill")
+        XCTAssertEqual(VoiceInkPowerModePresentation.appPickerSelectedSystemImageName, "checkmark")
         XCTAssertEqual(VoiceInkPowerModePresentation.websitesSectionTitle, "Websites")
         XCTAssertEqual(VoiceInkPowerModePresentation.websiteURLFieldPlaceholder, "Enter website URL")
         XCTAssertEqual(VoiceInkPowerModePresentation.addWebsiteHelpText, "Add website")
@@ -122,6 +128,7 @@ final class PowerModePresentationTests: XCTestCase {
         XCTAssertEqual(VoiceInkPowerModePresentation.transcriptionModelPickerTitle, "Model")
         XCTAssertEqual(VoiceInkPowerModePresentation.transcriptionLanguageTitle, "Language")
         XCTAssertEqual(VoiceInkPowerModePresentation.autodetectedLanguageText, "Autodetected")
+        XCTAssertEqual(VoiceInkPowerModePresentation.transcriptFormattingDisclosureSystemImageName, "chevron.right")
         XCTAssertEqual(VoiceInkPowerModePresentation.aiEnhancementSectionTitle, "AI Enhancement")
         XCTAssertEqual(VoiceInkPowerModePresentation.aiEnhancementToggleTitle, "AI Enhancement")
         XCTAssertEqual(VoiceInkPowerModePresentation.advancedSectionTitle, "Advanced")
@@ -178,6 +185,7 @@ final class PowerModePresentationTests: XCTestCase {
         XCTAssertEqual(VoiceInkPowerModePresentation.noEnhancementPromptsAvailableText, "No prompts available")
         XCTAssertEqual(VoiceInkPowerModePresentation.appTriggerSystemImageName, "app.fill")
         XCTAssertEqual(VoiceInkPowerModePresentation.websiteTriggerSystemImageName, "globe")
+        XCTAssertEqual(VoiceInkPowerModePresentation.removeTriggerSystemImageName, "xmark.circle.fill")
     }
 
     func testAIEnhancementFormChromePreservesMacOSCopy() {

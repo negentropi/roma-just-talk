@@ -133,7 +133,7 @@ struct ConfigurationView: View {
                 Spacer()
 
                 Button(action: onDismiss) {
-                    Image(systemName: "xmark")
+                    Image(systemName: VoiceInkPowerModePresentation.formCloseSystemImageName)
                         .font(.system(size: 14, weight: .medium))
                         .foregroundColor(.secondary)
                         .padding(6)
@@ -209,7 +209,7 @@ struct ConfigurationView: View {
                                                 .frame(width: 44, height: 44)
                                                 .clipShape(RoundedRectangle(cornerRadius: 10))
                                         } else {
-                                            Image(systemName: "app.fill")
+                                            Image(systemName: VoiceInkPowerModePresentation.appTriggerSystemImageName)
                                                 .resizable()
                                                 .aspectRatio(contentMode: .fit)
                                                 .frame(width: 26, height: 26)
@@ -223,7 +223,7 @@ struct ConfigurationView: View {
                                         Button {
                                             selectedAppConfigs.removeAll(where: { $0.id == appConfig.id })
                                         } label: {
-                                            Image(systemName: "xmark.circle.fill")
+                                            Image(systemName: VoiceInkPowerModePresentation.removeTriggerSystemImageName)
                                                 .font(.system(size: 14))
                                                 .foregroundColor(.secondary)
                                         }
@@ -258,7 +258,7 @@ struct ConfigurationView: View {
                             LazyVGrid(columns: [GridItem(.adaptive(minimum: 140, maximum: 220), spacing: 10)], spacing: 10) {
                                 ForEach(websiteConfigs) { urlConfig in
                                     HStack(spacing: 6) {
-                                        Image(systemName: "globe")
+                                        Image(systemName: VoiceInkPowerModePresentation.websiteTriggerSystemImageName)
                                             .foregroundColor(.secondary)
                                         Text(urlConfig.url)
                                             .lineLimit(1)
@@ -266,7 +266,7 @@ struct ConfigurationView: View {
                                         Button {
                                             websiteConfigs.removeAll(where: { $0.id == urlConfig.id })
                                         } label: {
-                                            Image(systemName: "xmark.circle.fill")
+                                            Image(systemName: VoiceInkPowerModePresentation.removeTriggerSystemImageName)
                                                 .foregroundColor(.secondary)
                                         }
                                         .buttonStyle(.plain)
@@ -366,7 +366,7 @@ struct ConfigurationView: View {
                         HStack {
                             Text(cleanupPresentation.sectionTitle)
                             Spacer()
-                            Image(systemName: "chevron.right")
+                            Image(systemName: VoiceInkPowerModePresentation.transcriptFormattingDisclosureSystemImageName)
                                 .font(.system(size: 11, weight: .semibold))
                                 .foregroundColor(.secondary)
                                 .rotationEffect(.degrees(isTranscriptFormattingExpanded ? 90 : 0))

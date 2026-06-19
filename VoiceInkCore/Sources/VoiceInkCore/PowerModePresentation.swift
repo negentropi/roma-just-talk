@@ -98,9 +98,12 @@ public enum VoiceInkPowerModePresentation {
     public static let addIconButtonSystemImageName = "plus.circle.fill"
     public static let popoverTitle = "Select Power Mode"
     public static let popoverEmptyTitle = "No Power Modes Available"
+    public static let popoverEmptySystemImageName = "sparkles"
+    public static let popoverSelectedSystemImageName = "checkmark"
     public static let rowEditActionTitle = "Edit"
     public static let rowEditActionSystemImageName = "pencil"
     public static let formCloseHelpText = closeHelpText
+    public static let formCloseSystemImageName = "xmark"
     public static let generalSectionTitle = "General"
     public static let nameFieldPlaceholder = "Name"
     public static let triggerScenariosSectionTitle = "Trigger Scenarios"
@@ -108,6 +111,9 @@ public enum VoiceInkPowerModePresentation {
     public static let addApplicationHelpText = "Add application"
     public static let noApplicationsText = "No applications added"
     public static let appPickerSearchPlaceholder = "Search apps..."
+    public static let appPickerSearchSystemImageName = "magnifyingglass"
+    public static let appPickerClearSearchSystemImageName = "xmark.circle.fill"
+    public static let appPickerSelectedSystemImageName = "checkmark"
     public static let websitesSectionTitle = "Websites"
     public static let websiteURLFieldPlaceholder = "Enter website URL"
     public static let addWebsiteHelpText = "Add website"
@@ -116,6 +122,7 @@ public enum VoiceInkPowerModePresentation {
     public static let transcriptionModelPickerTitle = "Model"
     public static let transcriptionLanguageTitle = "Language"
     public static let autodetectedLanguageText = "Autodetected"
+    public static let transcriptFormattingDisclosureSystemImageName = "chevron.right"
     public static let aiEnhancementSectionTitle = "AI Enhancement"
     public static let aiEnhancementToggleTitle = aiEnhancementSectionTitle
     public static let advancedSectionTitle = "Advanced"
@@ -152,6 +159,7 @@ public enum VoiceInkPowerModePresentation {
     public static let noEnhancementPromptsAvailableText = "No prompts available"
     public static let appTriggerSystemImageName = "app.fill"
     public static let websiteTriggerSystemImageName = "globe"
+    public static let removeTriggerSystemImageName = "xmark.circle.fill"
 
     public static func displayName(name: String?, emoji: String?) -> String {
         switch (emoji?.trimmingCharacters(in: .whitespacesAndNewlines), name?.trimmingCharacters(in: .whitespacesAndNewlines)) {

@@ -4031,12 +4031,12 @@ require_pattern \
 
 require_pattern \
   "shared Power Mode panel sidebar popover chrome copy lives in VoiceInkCore" \
-  'panelTitle|panelSubtitle|panelInfoTipText|panelLearnMoreURLString|addButtonSystemImageName|reorderButtonTitle|reorderButtonSystemImageName|reorderPanelTitle|reorderPanelCloseHelpText|reorderPanelCloseSystemImageName|reorderHandleSystemImageName|defaultBadgeTitle|disabledBadgeTitle|emptyPanelTitle|emptyPanelSystemImageName|sidebarEmptyTitle|sidebarEmptyButtonTitle|sidebarEmptySystemImageName|addIconButtonSystemImageName|popoverTitle|popoverEmptyTitle|rowEditActionTitle|rowEditActionSystemImageName|rowDeleteActionTitle|rowDeleteActionSystemImageName|appTriggerSystemImageName|websiteTriggerSystemImageName' \
+  'panelTitle|panelSubtitle|panelInfoTipText|panelLearnMoreURLString|addButtonSystemImageName|reorderButtonTitle|reorderButtonSystemImageName|reorderPanelTitle|reorderPanelCloseHelpText|reorderPanelCloseSystemImageName|reorderHandleSystemImageName|defaultBadgeTitle|disabledBadgeTitle|emptyPanelTitle|emptyPanelSystemImageName|sidebarEmptyTitle|sidebarEmptyButtonTitle|sidebarEmptySystemImageName|addIconButtonSystemImageName|popoverTitle|popoverEmptyTitle|popoverEmptySystemImageName|popoverSelectedSystemImageName|rowEditActionTitle|rowEditActionSystemImageName|rowDeleteActionTitle|rowDeleteActionSystemImageName|appTriggerSystemImageName|websiteTriggerSystemImageName' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
 
 require_pattern \
   "shared Power Mode config form chrome copy lives in VoiceInkCore" \
-  'generalSectionTitle|nameFieldPlaceholder|triggerScenariosSectionTitle|applicationsSectionTitle|addApplicationHelpText|noApplicationsText|appPickerSearchPlaceholder|websitesSectionTitle|websiteURLFieldPlaceholder|addWebsiteHelpText|noWebsitesText|transcriptionSectionTitle|transcriptionModelPickerTitle|transcriptionLanguageTitle|autodetectedLanguageText|aiEnhancementSectionTitle|advancedSectionTitle|formSaveButtonTitle' \
+  'formCloseSystemImageName|generalSectionTitle|nameFieldPlaceholder|triggerScenariosSectionTitle|applicationsSectionTitle|addApplicationHelpText|noApplicationsText|appPickerSearchPlaceholder|appPickerSearchSystemImageName|appPickerClearSearchSystemImageName|appPickerSelectedSystemImageName|websitesSectionTitle|websiteURLFieldPlaceholder|addWebsiteHelpText|noWebsitesText|appTriggerSystemImageName|websiteTriggerSystemImageName|removeTriggerSystemImageName|transcriptionSectionTitle|transcriptionModelPickerTitle|transcriptionLanguageTitle|autodetectedLanguageText|transcriptFormattingDisclosureSystemImageName|aiEnhancementSectionTitle|advancedSectionTitle|formSaveButtonTitle' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
 
 require_pattern \
@@ -4076,17 +4076,17 @@ require_pattern \
 
 require_pattern \
   "macOS Power Mode popover uses shared chrome copy" \
-  'VoiceInkPowerModePresentation\.(popoverTitle|popoverEmptyTitle)' \
+  'VoiceInkPowerModePresentation\.(popoverTitle|popoverEmptyTitle|popoverEmptySystemImageName|popoverSelectedSystemImageName)' \
   VoiceInk/PowerMode/PowerModePopover.swift
 
 require_pattern \
   "macOS Power Mode config form uses shared chrome copy" \
-  'VoiceInkPowerModePresentation\.(formCloseHelpText|generalSectionTitle|nameFieldPlaceholder|triggerScenariosSectionTitle|applicationsSectionTitle|addApplicationHelpText|noApplicationsText|websitesSectionTitle|websiteURLFieldPlaceholder|addWebsiteHelpText|noWebsitesText|transcriptionSectionTitle|transcriptionModelPickerTitle|transcriptionLanguageTitle|autodetectedLanguageText|aiEnhancementSectionTitle|aiEnhancementToggleTitle|advancedSectionTitle|formDeleteButtonTitle|formCancelButtonTitle|formSaveButtonTitle)' \
+  'VoiceInkPowerModePresentation\.(formCloseHelpText|formCloseSystemImageName|generalSectionTitle|nameFieldPlaceholder|triggerScenariosSectionTitle|applicationsSectionTitle|addApplicationHelpText|noApplicationsText|websitesSectionTitle|websiteURLFieldPlaceholder|addWebsiteHelpText|noWebsitesText|appTriggerSystemImageName|websiteTriggerSystemImageName|removeTriggerSystemImageName|transcriptionSectionTitle|transcriptionModelPickerTitle|transcriptionLanguageTitle|autodetectedLanguageText|transcriptFormattingDisclosureSystemImageName|aiEnhancementSectionTitle|aiEnhancementToggleTitle|advancedSectionTitle|formDeleteButtonTitle|formCancelButtonTitle|formSaveButtonTitle)' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
 require_pattern \
   "macOS app picker uses shared search copy and app trigger selection policy" \
-  'VoiceInkPowerModePresentation\.appPickerSearchPlaceholder|selectedAppConfigs\.(containsPowerModeAppConfig|togglePowerModeAppConfig)' \
+  'VoiceInkPowerModePresentation\.(appPickerSearchPlaceholder|appPickerSearchSystemImageName|appPickerClearSearchSystemImageName|appPickerSelectedSystemImageName)|selectedAppConfigs\.(containsPowerModeAppConfig|togglePowerModeAppConfig)' \
   VoiceInk/PowerMode/AppPicker.swift
 
 require_pattern \
@@ -4151,7 +4151,7 @@ require_pattern \
 
 require_pattern \
   "migration checklist tracks shared Power Mode chrome copy gate" \
-  'macOS Power Mode panel, sidebar empty state, reorder sheet, badges, row actions, manual-selection popover copy, panel help URL, and panel/reorder/sidebar/row trigger/action symbols route through `VoiceInkPowerModePresentation`' \
+  'macOS Power Mode panel, sidebar empty state, reorder sheet, badges, row actions, manual-selection popover copy, panel help URL, and panel/reorder/sidebar/form/app-picker/popover/row trigger/action symbols route through `VoiceInkPowerModePresentation`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \
@@ -4195,8 +4195,13 @@ reject_pattern \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
 reject_pattern \
+  "macOS Power Mode config form avoids shell-only form symbol metadata" \
+  '"(xmark|app\.fill|xmark\.circle\.fill|globe|chevron\.right)"' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+reject_pattern \
   "macOS app picker avoids shell-only search copy and app trigger selection policy" \
-  '"Search apps\.\.\."|selectedAppConfigs\.(contains|firstIndex|append|remove)\(' \
+  '"Search apps\.\.\."|"(magnifyingglass|xmark\.circle\.fill|checkmark)"|selectedAppConfigs\.(contains|firstIndex|append|remove)\(' \
   VoiceInk/PowerMode/AppPicker.swift
 
 reject_pattern \
@@ -4230,6 +4235,11 @@ reject_pattern \
   '"(Power Modes|Automate your workflows with context-aware configurations\.|Reorder|Reorder Power Modes|Close|Default|Disabled|No Power Modes Yet|Create first power mode to automate your VoiceInk workflow based on apps/website you are using|No Power Modes|Add customized power modes for different contexts|Add New Power Mode|Select Power Mode|No Power Modes Available|Edit|Delete)"' \
   VoiceInk/PowerMode/PowerModeView.swift \
   VoiceInk/PowerMode/PowerModeViewComponents.swift \
+  VoiceInk/PowerMode/PowerModePopover.swift
+
+reject_pattern \
+  "macOS Power Mode popover avoids shell-only symbol metadata" \
+  '"(sparkles|checkmark)"' \
   VoiceInk/PowerMode/PowerModePopover.swift
 
 reject_pattern \

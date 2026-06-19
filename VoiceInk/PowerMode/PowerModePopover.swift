@@ -21,7 +21,7 @@ struct PowerModePopover: View {
                 VStack(alignment: .leading, spacing: 4) {
                     if enabledConfigs.isEmpty {
                         VStack(alignment: .center, spacing: 8) {
-                            Image(systemName: "sparkles")
+                            Image(systemName: VoiceInkPowerModePresentation.popoverEmptySystemImageName)
                                 .foregroundColor(.white.opacity(0.6))
                                 .font(.system(size: 16))
                             Text(VoiceInkPowerModePresentation.popoverEmptyTitle)
@@ -89,7 +89,7 @@ struct PowerModeRow: View {
 
                 if isSelected {
                     Spacer()
-                    Image(systemName: "checkmark")
+                    Image(systemName: VoiceInkPowerModePresentation.popoverSelectedSystemImageName)
                         .foregroundColor(.green)
                         .font(.system(size: 10))
                 }

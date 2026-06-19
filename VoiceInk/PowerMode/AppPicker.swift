@@ -9,7 +9,7 @@ struct AppPickerPopover: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack(spacing: 8) {
-                Image(systemName: "magnifyingglass")
+                Image(systemName: VoiceInkPowerModePresentation.appPickerSearchSystemImageName)
                     .foregroundColor(.secondary)
                     .font(.system(size: 12))
                 TextField(VoiceInkPowerModePresentation.appPickerSearchPlaceholder, text: $searchText)
@@ -17,7 +17,7 @@ struct AppPickerPopover: View {
                     .font(.system(size: 13))
                 if !searchText.isEmpty {
                     Button(action: { searchText = "" }) {
-                        Image(systemName: "xmark.circle.fill")
+                        Image(systemName: VoiceInkPowerModePresentation.appPickerClearSearchSystemImageName)
                             .foregroundColor(.secondary)
                             .font(.system(size: 12))
                     }
@@ -51,7 +51,7 @@ struct AppPickerPopover: View {
                                 Spacer()
 
                                 if isSelected {
-                                    Image(systemName: "checkmark")
+                                    Image(systemName: VoiceInkPowerModePresentation.appPickerSelectedSystemImageName)
                                         .font(.system(size: 12, weight: .semibold))
                                         .foregroundColor(.accentColor)
                                 }

@@ -352,6 +352,15 @@ final class RollingBufferPreloadCoordinator {
         configuration: VoiceInkRollingBufferPreloadConfiguration,
         perModelEnabled: Bool
     ) -> Bool {
+        switch configuration.mode {
+        case .on:
+            return true
+        case .off:
+            return false
+        case .auto:
+            break
+        }
+
         VoiceInkRollingBufferPreloadPolicy(
             configuration: configuration,
             powerState: powerStateProvider.currentPowerState()

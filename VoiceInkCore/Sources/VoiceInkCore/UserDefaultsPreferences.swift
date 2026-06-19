@@ -263,6 +263,7 @@ public enum VoiceInkAudioSessionTimeoutPreference {
     public static let minimumSeconds = 0
     public static let maximumSeconds = 300
     public static let stepSeconds = 15
+    public static let countdownUpdateInterval: TimeInterval = 1.0
     public static let settingsPresentation = VoiceInkAudioSessionTimeoutPresentation.iOS
 
     public static func timeoutSeconds(from defaults: UserDefaults = .standard) -> Int {
@@ -276,6 +277,10 @@ public enum VoiceInkAudioSessionTimeoutPreference {
 
     public static func deactivationPlan(for seconds: Int) -> VoiceInkAudioSessionDeactivationPlan {
         seconds <= 0 ? .immediate : .delayed(TimeInterval(seconds))
+    }
+
+    public static func remainingTimeAfterCountdownTick(_ remainingTime: TimeInterval) -> TimeInterval {
+        remainingTime - countdownUpdateInterval
     }
 
     public static func saveTimeoutSeconds(_ seconds: Int, to defaults: UserDefaults = .standard) {

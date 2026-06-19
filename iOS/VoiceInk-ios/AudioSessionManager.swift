@@ -66,15 +66,20 @@ final class AudioSessionManager: ObservableObject {
             timeoutRemaining = interval
         }
         
-        // Create timer that updates every second and deactivates when done
-        deactivationTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] timer in
+        // Create timer with shared countdown cadence and deactivate when done
+        deactivationTimer = Timer.scheduledTimer(
+            withTimeInterval: VoiceInkAudioSessionTimeoutPreference.countdownUpdateInterval,
+            repeats: true
+        ) { [weak self] timer in
             Task { @MainActor in
                 guard let self = self else {
                     timer.invalidate()
                     return
                 }
                 
-                self.timeoutRemaining -= 1
+                self.timeoutRemaining = VoiceInkAudioSessionTimeoutPreference.remainingTimeAfterCountdownTick(
+                    self.timeoutRemaining
+                )
                 
                 if self.timeoutRemaining <= 0 {
                     self.deactivateSession()

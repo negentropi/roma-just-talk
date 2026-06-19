@@ -2666,9 +2666,24 @@ require_pattern \
   'VoiceInkAudioSessionTimeoutPreference\.deactivationPlan' \
   iOS/VoiceInk-ios/AudioSessionManager.swift
 
+require_pattern \
+  "shared audio-session timeout owns countdown update interval" \
+  'countdownUpdateInterval' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared audio-session timeout owns countdown remaining-time policy" \
+  'remainingTimeAfterCountdownTick' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "iOS audio-session manager uses shared countdown tick policy" \
+  'VoiceInkAudioSessionTimeoutPreference\.(countdownUpdateInterval|remainingTimeAfterCountdownTick)' \
+  iOS/VoiceInk-ios/AudioSessionManager.swift
+
 reject_pattern \
   "iOS audio-session manager avoids shell-only timeout scheduling policy" \
-  'shouldDeactivateImmediately|deactivationInterval|timeoutSeconds > 0|TimeInterval\(timeoutSeconds\)' \
+  'shouldDeactivateImmediately|deactivationInterval|timeoutSeconds > 0|TimeInterval\(timeoutSeconds\)|withTimeInterval: +1\.0|timeoutRemaining -= 1' \
   iOS/VoiceInk-ios/AudioSessionManager.swift
 
 require_pattern \

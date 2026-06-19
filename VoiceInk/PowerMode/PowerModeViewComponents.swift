@@ -28,7 +28,7 @@ struct PowerModeEmptyStateView: View {
     
     var body: some View {
         VStack(spacing: 16) {
-            Image(systemName: "bolt.circle.fill")
+            Image(systemName: VoiceInkPowerModePresentation.sidebarEmptySystemImageName)
                 .font(.system(size: 48))
                 .foregroundColor(.secondary)
             
@@ -77,7 +77,7 @@ struct AddIconButton: View {
 
     var body: some View {
         Button(action: action) {
-            Image(systemName: "plus.circle.fill")
+            Image(systemName: VoiceInkPowerModePresentation.addIconButtonSystemImageName)
                 .font(.system(size: 18))
                 .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(.secondary)
@@ -185,7 +185,7 @@ struct ConfigurationRow: View {
                     HStack(spacing: 12) {
                         if appCount > 0 {
                             HStack(spacing: 4) {
-                                Image(systemName: "app.fill")
+                                Image(systemName: VoiceInkPowerModePresentation.appTriggerSystemImageName)
                                     .font(.system(size: 10))
                                 Text(appText)
                                     .font(.caption2)
@@ -194,7 +194,7 @@ struct ConfigurationRow: View {
 
                         if websiteCount > 0 {
                             HStack(spacing: 4) {
-                                Image(systemName: "globe")
+                                Image(systemName: VoiceInkPowerModePresentation.websiteTriggerSystemImageName)
                                     .font(.system(size: 10))
                                 Text(websiteText)
                                     .font(.caption2)
@@ -249,7 +249,10 @@ struct ConfigurationRow: View {
         Button(action: {
             onEditConfig(config)
         }) {
-            Label(VoiceInkPowerModePresentation.rowEditActionTitle, systemImage: "pencil")
+            Label(
+                VoiceInkPowerModePresentation.rowEditActionTitle,
+                systemImage: VoiceInkPowerModePresentation.rowEditActionSystemImageName
+            )
         }
         Button(role: .destructive, action: {
             let deleteConfirmation = VoiceInkPowerModePresentation.deleteConfirmation(configName: config.name)
@@ -265,7 +268,10 @@ struct ConfigurationRow: View {
                 powerModeManager.removeConfiguration(with: config.id)
             }
         }) {
-            Label(VoiceInkPowerModePresentation.rowDeleteActionTitle, systemImage: "trash")
+            Label(
+                VoiceInkPowerModePresentation.rowDeleteActionTitle,
+                systemImage: VoiceInkPowerModePresentation.rowDeleteActionSystemImageName
+            )
         }
     }
     }
@@ -313,7 +319,7 @@ struct PowerModeAppIcon: View {
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 20, height: 20)
         } else {
-            Image(systemName: "app.fill")
+            Image(systemName: VoiceInkPowerModePresentation.appTriggerSystemImageName)
                 .font(.system(size: 14))
                 .foregroundColor(.secondary)
                 .frame(width: 20, height: 20)

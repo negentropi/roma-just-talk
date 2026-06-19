@@ -94,9 +94,12 @@ public enum VoiceInkPowerModePresentation {
     public static let sidebarEmptyTitle = "No Power Modes"
     public static let sidebarEmptyMessage = "Add customized power modes for different contexts"
     public static let sidebarEmptyButtonTitle = "Add New Power Mode"
+    public static let sidebarEmptySystemImageName = "bolt.circle.fill"
+    public static let addIconButtonSystemImageName = "plus.circle.fill"
     public static let popoverTitle = "Select Power Mode"
     public static let popoverEmptyTitle = "No Power Modes Available"
     public static let rowEditActionTitle = "Edit"
+    public static let rowEditActionSystemImageName = "pencil"
     public static let formCloseHelpText = closeHelpText
     public static let generalSectionTitle = "General"
     public static let nameFieldPlaceholder = "Name"
@@ -123,6 +126,7 @@ public enum VoiceInkPowerModePresentation {
     public static let deleteConfirmationPrimaryButtonTitle = "Delete"
     public static let formDeleteButtonTitle = deleteConfirmationPrimaryButtonTitle
     public static let rowDeleteActionTitle = deleteConfirmationPrimaryButtonTitle
+    public static let rowDeleteActionSystemImageName = "trash"
     public static let deleteConfirmationCancelButtonTitle = "Cancel"
     public static let formCancelButtonTitle = deleteConfirmationCancelButtonTitle
     public static let validationAlertTitle = "Cannot Save Power Mode"
@@ -146,6 +150,8 @@ public enum VoiceInkPowerModePresentation {
     public static let noAIModelsLoadedText = "No models loaded"
     public static let noAIModelsAvailableText = "No models available"
     public static let noEnhancementPromptsAvailableText = "No prompts available"
+    public static let appTriggerSystemImageName = "app.fill"
+    public static let websiteTriggerSystemImageName = "globe"
 
     public static func displayName(name: String?, emoji: String?) -> String {
         switch (emoji?.trimmingCharacters(in: .whitespacesAndNewlines), name?.trimmingCharacters(in: .whitespacesAndNewlines)) {

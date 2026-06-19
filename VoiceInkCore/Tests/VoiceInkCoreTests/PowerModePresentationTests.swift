@@ -92,13 +92,17 @@ final class PowerModePresentationTests: XCTestCase {
             "Add customized power modes for different contexts"
         )
         XCTAssertEqual(VoiceInkPowerModePresentation.sidebarEmptyButtonTitle, "Add New Power Mode")
+        XCTAssertEqual(VoiceInkPowerModePresentation.sidebarEmptySystemImageName, "bolt.circle.fill")
+        XCTAssertEqual(VoiceInkPowerModePresentation.addIconButtonSystemImageName, "plus.circle.fill")
     }
 
     func testPopoverAndRowActionChromePreservesMacOSCopy() {
         XCTAssertEqual(VoiceInkPowerModePresentation.popoverTitle, "Select Power Mode")
         XCTAssertEqual(VoiceInkPowerModePresentation.popoverEmptyTitle, "No Power Modes Available")
         XCTAssertEqual(VoiceInkPowerModePresentation.rowEditActionTitle, "Edit")
+        XCTAssertEqual(VoiceInkPowerModePresentation.rowEditActionSystemImageName, "pencil")
         XCTAssertEqual(VoiceInkPowerModePresentation.rowDeleteActionTitle, "Delete")
+        XCTAssertEqual(VoiceInkPowerModePresentation.rowDeleteActionSystemImageName, "trash")
     }
 
     func testConfigurationFormChromePreservesMacOSCopy() {
@@ -172,6 +176,8 @@ final class PowerModePresentationTests: XCTestCase {
             "No models available"
         )
         XCTAssertEqual(VoiceInkPowerModePresentation.noEnhancementPromptsAvailableText, "No prompts available")
+        XCTAssertEqual(VoiceInkPowerModePresentation.appTriggerSystemImageName, "app.fill")
+        XCTAssertEqual(VoiceInkPowerModePresentation.websiteTriggerSystemImageName, "globe")
     }
 
     func testAIEnhancementFormChromePreservesMacOSCopy() {

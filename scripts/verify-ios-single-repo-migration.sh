@@ -4031,7 +4031,7 @@ require_pattern \
 
 require_pattern \
   "shared Power Mode panel sidebar popover chrome copy lives in VoiceInkCore" \
-  'panelTitle|panelSubtitle|panelInfoTipText|panelLearnMoreURLString|addButtonSystemImageName|reorderButtonTitle|reorderButtonSystemImageName|reorderPanelTitle|reorderPanelCloseHelpText|reorderPanelCloseSystemImageName|reorderHandleSystemImageName|defaultBadgeTitle|disabledBadgeTitle|emptyPanelTitle|emptyPanelSystemImageName|sidebarEmptyTitle|sidebarEmptyButtonTitle|popoverTitle|popoverEmptyTitle|rowEditActionTitle|rowDeleteActionTitle' \
+  'panelTitle|panelSubtitle|panelInfoTipText|panelLearnMoreURLString|addButtonSystemImageName|reorderButtonTitle|reorderButtonSystemImageName|reorderPanelTitle|reorderPanelCloseHelpText|reorderPanelCloseSystemImageName|reorderHandleSystemImageName|defaultBadgeTitle|disabledBadgeTitle|emptyPanelTitle|emptyPanelSystemImageName|sidebarEmptyTitle|sidebarEmptyButtonTitle|sidebarEmptySystemImageName|addIconButtonSystemImageName|popoverTitle|popoverEmptyTitle|rowEditActionTitle|rowEditActionSystemImageName|rowDeleteActionTitle|rowDeleteActionSystemImageName|appTriggerSystemImageName|websiteTriggerSystemImageName' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
 
 require_pattern \
@@ -4071,7 +4071,7 @@ require_pattern \
 
 require_pattern \
   "macOS Power Mode sidebar and row actions use shared chrome copy" \
-  'VoiceInkPowerModePresentation\.(sidebarEmptyTitle|sidebarEmptyMessage|sidebarEmptyButtonTitle|defaultBadgeTitle|rowEditActionTitle|rowDeleteActionTitle)' \
+  'VoiceInkPowerModePresentation\.(sidebarEmptyTitle|sidebarEmptyMessage|sidebarEmptyButtonTitle|sidebarEmptySystemImageName|addIconButtonSystemImageName|defaultBadgeTitle|rowEditActionTitle|rowEditActionSystemImageName|rowDeleteActionTitle|rowDeleteActionSystemImageName|appTriggerSystemImageName|websiteTriggerSystemImageName)' \
   VoiceInk/PowerMode/PowerModeViewComponents.swift
 
 require_pattern \
@@ -4151,7 +4151,7 @@ require_pattern \
 
 require_pattern \
   "migration checklist tracks shared Power Mode chrome copy gate" \
-  'macOS Power Mode panel, sidebar empty state, reorder sheet, badges, row actions, manual-selection popover copy, panel help URL, and panel/reorder action symbols route through `VoiceInkPowerModePresentation`' \
+  'macOS Power Mode panel, sidebar empty state, reorder sheet, badges, row actions, manual-selection popover copy, panel help URL, and panel/reorder/sidebar/row trigger/action symbols route through `VoiceInkPowerModePresentation`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \
@@ -4218,6 +4218,11 @@ reject_pattern \
 reject_pattern \
   "macOS Power Mode rows avoid shell-only row detail chip policy" \
   'modelName\.count > 20|prefix\(18\)|selectedPrompt\?\.title \?\? "AI"|Text\("Context Awareness"\)|model != "Default"|language != "Default"|config\.autoSendKey\.displayName|private var iconName|Image\(systemName: iconName\)|chip\.kind == \.prompt|case \.(transcriptionModel|selectedLanguage|aiModel|autoSend|contextAwareness|prompt)' \
+  VoiceInk/PowerMode/PowerModeViewComponents.swift
+
+reject_pattern \
+  "macOS Power Mode sidebar and rows avoid shell-only symbol metadata" \
+  '"(bolt\.circle\.fill|plus\.circle\.fill|app\.fill|globe|pencil|trash)"' \
   VoiceInk/PowerMode/PowerModeViewComponents.swift
 
 reject_pattern \

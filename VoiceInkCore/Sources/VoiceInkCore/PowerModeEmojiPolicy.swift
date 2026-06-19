@@ -88,8 +88,21 @@ public enum VoiceInkPowerModeEmojiCatalog {
 }
 
 public enum VoiceInkPowerModeEmojiInputPresentation {
+    public static let customEmojiFieldPlaceholder = "➕"
+    public static let addButtonTitle = "Add"
+    public static let cancelButtonTitle = "Cancel"
+    public static let tipText = "Tip: Use ⌃⌘Space for emoji picker or paste an emoji."
+    public static let addEmojiAccessibilityLabel = "Add Emoji"
+    public static let addCustomEmojiHelpText = "Add custom emoji"
     public static let emptySubmitMessage = "Emoji cannot be empty."
     public static let invalidPreviewMessage = "Invalid emoji."
     public static let invalidSubmitMessage = "Invalid emoji character."
     public static let duplicateMessage = "Emoji already exists!"
+
+    public static func isErrorMessage(_ message: String) -> Bool {
+        message == duplicateMessage
+            || message == invalidPreviewMessage
+            || message == invalidSubmitMessage
+            || message == emptySubmitMessage
+    }
 }

@@ -17,6 +17,30 @@ final class PowerModePolicyTests: XCTestCase {
             "Emoji cannot be empty."
         )
         XCTAssertEqual(
+            VoiceInkPowerModeEmojiInputPresentation.customEmojiFieldPlaceholder,
+            "➕"
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeEmojiInputPresentation.addButtonTitle,
+            "Add"
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeEmojiInputPresentation.cancelButtonTitle,
+            "Cancel"
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeEmojiInputPresentation.tipText,
+            "Tip: Use ⌃⌘Space for emoji picker or paste an emoji."
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeEmojiInputPresentation.addEmojiAccessibilityLabel,
+            "Add Emoji"
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeEmojiInputPresentation.addCustomEmojiHelpText,
+            "Add custom emoji"
+        )
+        XCTAssertEqual(
             VoiceInkPowerModeEmojiInputPresentation.invalidPreviewMessage,
             "Invalid emoji."
         )
@@ -28,6 +52,9 @@ final class PowerModePolicyTests: XCTestCase {
             VoiceInkPowerModeEmojiInputPresentation.duplicateMessage,
             "Emoji already exists!"
         )
+        XCTAssertTrue(VoiceInkPowerModeEmojiInputPresentation.isErrorMessage(VoiceInkPowerModeEmojiInputPresentation.emptySubmitMessage))
+        XCTAssertTrue(VoiceInkPowerModeEmojiInputPresentation.isErrorMessage(VoiceInkPowerModeEmojiInputPresentation.duplicateMessage))
+        XCTAssertFalse(VoiceInkPowerModeEmojiInputPresentation.isErrorMessage(""))
     }
 
     func testPowerModeEmojiCatalogValidatesAndAddsCustomEmojis() {

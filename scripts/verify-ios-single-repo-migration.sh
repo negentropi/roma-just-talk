@@ -4131,7 +4131,7 @@ require_pattern \
 
 require_pattern \
   "shared Power Mode emoji catalog and input policy lives in VoiceInkCore" \
-  'VoiceInkPowerModeEmojiCatalog|customEmojisKey = "userAddedEmojis"|defaultEmojis|addCustomEmoji|removeCustomEmoji|firstValidEmojiCharacter|VoiceInkPowerModeEmojiInputPresentation' \
+  'VoiceInkPowerModeEmojiCatalog|customEmojisKey = "userAddedEmojis"|defaultEmojis|addCustomEmoji|removeCustomEmoji|firstValidEmojiCharacter|VoiceInkPowerModeEmojiInputPresentation|customEmojiFieldPlaceholder|addButtonTitle|cancelButtonTitle|tipText|addEmojiAccessibilityLabel|addCustomEmojiHelpText|isErrorMessage' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModeEmojiPolicy.swift
 
 require_pattern \
@@ -4146,7 +4146,7 @@ require_pattern \
 
 require_pattern \
   "migration checklist tracks shared Power Mode emoji policy gate" \
-  'macOS Power Mode emoji catalog, custom emoji storage key, input validation, duplicate detection, and add/remove mutation policy route through `VoiceInkPowerModeEmojiCatalog`/`VoiceInkPowerModeEmojiInputPresentation`' \
+  'macOS Power Mode emoji catalog, custom emoji storage key, input validation, duplicate detection, add/remove mutation policy, picker action/help copy, and feedback severity route through `VoiceInkPowerModeEmojiCatalog`/`VoiceInkPowerModeEmojiInputPresentation`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \
@@ -4201,7 +4201,7 @@ reject_pattern \
 
 reject_pattern \
   "macOS Power Mode emoji shell avoids raw catalog storage and validation policy" \
-  '"userAddedEmojis"|private let +defaultEmojis|extension +String|var +isValidEmoji|func +firstValidEmojiCharacter|"(Emoji cannot be empty\.|Invalid emoji\.|Invalid emoji character\.|Emoji already exists!|Could not add emoji\.)"' \
+  '"userAddedEmojis"|private let +defaultEmojis|extension +String|var +isValidEmoji|func +firstValidEmojiCharacter|func +isErrorFeedbackMessage|TextField\("➕"|Button\("Add"\)|Button\("Cancel"\)|"(Emoji cannot be empty\.|Invalid emoji\.|Invalid emoji character\.|Emoji already exists!|Could not add emoji\.|Tip: Use ⌃⌘Space for emoji picker or paste an emoji\.|Add Emoji|Add custom emoji)"' \
   VoiceInk/PowerMode/EmojiManager.swift \
   VoiceInk/PowerMode/EmojiPickerView.swift
 

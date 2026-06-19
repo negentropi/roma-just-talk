@@ -49,7 +49,7 @@ struct EmojiPickerView: View {
             if isAddingCustomEmoji {
                 VStack(spacing: 8) {
                     HStack(spacing: 8) {
-                        TextField("➕", text: $newEmojiText)
+                        TextField(VoiceInkPowerModeEmojiInputPresentation.customEmojiFieldPlaceholder, text: $newEmojiText)
                             .textFieldStyle(.roundedBorder)
                             .font(.title2)
                             .multilineTextAlignment(.center)
@@ -71,13 +71,13 @@ struct EmojiPickerView: View {
                             }
                             .onSubmit(attemptAddCustomEmoji)
 
-                        Button("Add") {
+                        Button(VoiceInkPowerModeEmojiInputPresentation.addButtonTitle) {
                             attemptAddCustomEmoji()
                         }
                         .buttonStyle(.borderedProminent)
                         .disabled(!emojiManager.canAddCustomEmoji(newEmojiText))
 
-                        Button("Cancel") {
+                        Button(VoiceInkPowerModeEmojiInputPresentation.cancelButtonTitle) {
                             isAddingCustomEmoji = false
                             newEmojiText = ""
                             inputFeedbackMessage = ""
@@ -87,10 +87,10 @@ struct EmojiPickerView: View {
                     if !inputFeedbackMessage.isEmpty {
                         Text(inputFeedbackMessage)
                             .font(.caption)
-                            .foregroundColor(isErrorFeedbackMessage(inputFeedbackMessage) ? .red : .secondary)
+                            .foregroundColor(VoiceInkPowerModeEmojiInputPresentation.isErrorMessage(inputFeedbackMessage) ? .red : .secondary)
                             .transition(.opacity)
                     }
-                    Text("Tip: Use ⌃⌘Space for emoji picker or paste an emoji.")
+                    Text(VoiceInkPowerModeEmojiInputPresentation.tipText)
                         .font(.caption2)
                         .foregroundColor(.secondary)
                         .padding(.top, 2)
@@ -123,13 +123,6 @@ struct EmojiPickerView: View {
         case .duplicate:
             inputFeedbackMessage = VoiceInkPowerModeEmojiInputPresentation.duplicateMessage
         }
-    }
-
-    private func isErrorFeedbackMessage(_ message: String) -> Bool {
-        message == VoiceInkPowerModeEmojiInputPresentation.duplicateMessage
-            || message == VoiceInkPowerModeEmojiInputPresentation.invalidPreviewMessage
-            || message == VoiceInkPowerModeEmojiInputPresentation.invalidSubmitMessage
-            || message == VoiceInkPowerModeEmojiInputPresentation.emptySubmitMessage
     }
 
     private func attemptToRemoveCustomEmoji(_ emojiToRemove: String) {
@@ -187,7 +180,7 @@ private struct AddEmojiButton: View {
 
     var body: some View {
         Button(action: action) {
-            Label("Add Emoji", systemImage: "plus.circle.fill")
+            Label(VoiceInkPowerModeEmojiInputPresentation.addEmojiAccessibilityLabel, systemImage: "plus.circle.fill")
                 .font(.title2)
                 .labelStyle(.iconOnly)
                 .foregroundColor(.accentColor)
@@ -198,7 +191,7 @@ private struct AddEmojiButton: View {
                 )
         }
         .buttonStyle(.plain)
-        .help("Add custom emoji")
+        .help(VoiceInkPowerModeEmojiInputPresentation.addCustomEmojiHelpText)
     }
 }
 

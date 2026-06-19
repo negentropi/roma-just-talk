@@ -111,6 +111,19 @@ class PowerModeShortcutManager {
                     )
                 }
             },
+            onPressContextChanged: { [weak self] action, context in
+                Task { @MainActor in
+                    guard let self,
+                          case .powerMode = action,
+                          self.modeProvider() == .special else {
+                        return
+                    }
+                    self.shortcutModeHandler.handlePressContextChanged(
+                        action: action,
+                        context: context
+                    )
+                }
+            },
             onShortcutInterrupted: { [weak self] action, _ in
                 Task { @MainActor in
                     guard let self, case .powerMode = action else { return }

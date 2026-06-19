@@ -114,6 +114,7 @@ final class ShortcutMonitor {
     private var interruptibleActions: Set<ShortcutAction> = []
     private var onKeyDown: ((ShortcutAction, TimeInterval) -> Void)?
     private var onKeyUp: ((ShortcutAction, TimeInterval, VoiceInkShortcutPressContext) -> Void)?
+    private var onPressContextChanged: ((ShortcutAction, VoiceInkShortcutPressContext) -> Void)?
     private var onShortcutInterrupted: ((ShortcutAction, TimeInterval) -> Void)?
     private var eventTap: CFMachPort?
     private var eventTapRunLoopSource: CFRunLoopSource?
@@ -144,6 +145,7 @@ final class ShortcutMonitor {
         tracksKeyUpEvidence: Bool = false,
         onKeyDown: @escaping (ShortcutAction, TimeInterval) -> Void,
         onKeyUp: @escaping (ShortcutAction, TimeInterval, VoiceInkShortcutPressContext) -> Void,
+        onPressContextChanged: ((ShortcutAction, VoiceInkShortcutPressContext) -> Void)? = nil,
         onShortcutInterrupted: ((ShortcutAction, TimeInterval) -> Void)? = nil
     ) -> Bool {
         stop()
@@ -160,6 +162,7 @@ final class ShortcutMonitor {
         self.interruptibleActions = interruptibleActions
         self.onKeyDown = onKeyDown
         self.onKeyUp = onKeyUp
+        self.onPressContextChanged = onPressContextChanged
         self.onShortcutInterrupted = onShortcutInterrupted
         logger.notice("start: installing event tap for \(self.shortcuts.count, privacy: .public) shortcut(s)")
 
@@ -191,6 +194,7 @@ final class ShortcutMonitor {
         interruptibleActions = []
         onKeyDown = nil
         onKeyUp = nil
+        onPressContextChanged = nil
         onShortcutInterrupted = nil
         handlesModifierOnlyShortcutsInEventTap = false
     }
@@ -510,6 +514,7 @@ final class ShortcutMonitor {
 
             state.pressContext.hasReliableKeyEvidence = false
             shortcuts[action] = state
+            dispatchPressContextChanged(for: action, context: state.pressContext)
         }
     }
 
@@ -532,6 +537,7 @@ final class ShortcutMonitor {
 
             state.pressContext.didPressOtherKeyDuringPress = true
             shortcuts[action] = state
+            dispatchPressContextChanged(for: action, context: state.pressContext)
         }
     }
 
@@ -554,6 +560,7 @@ final class ShortcutMonitor {
 
             state.pressContext.didReleaseOtherKeyDuringPress = true
             shortcuts[action] = state
+            dispatchPressContextChanged(for: action, context: state.pressContext)
         }
     }
 
@@ -704,6 +711,12 @@ final class ShortcutMonitor {
         }
     }
 
+    private func dispatchPressContextChanged(for action: ShortcutAction, context: VoiceInkShortcutPressContext) {
+        DispatchQueue.main.async { [onPressContextChanged] in
+            onPressContextChanged?(action, context)
+        }
+    }
+
     private func dispatchShortcutInterrupted(for action: ShortcutAction, eventTime: TimeInterval) {
         logger.notice("dispatchShortcutInterrupted: action=\(action.storageName, privacy: .public)")
         DispatchQueue.main.async { [onShortcutInterrupted] in
@@ -798,6 +811,7 @@ extension ShortcutMonitor {
         handlesModifierOnlyShortcutsInEventTap: Bool = false,
         onKeyDown: @escaping (ShortcutAction, TimeInterval) -> Void,
         onKeyUp: @escaping (ShortcutAction, TimeInterval, VoiceInkShortcutPressContext) -> Void,
+        onPressContextChanged: ((ShortcutAction, VoiceInkShortcutPressContext) -> Void)? = nil,
         onShortcutInterrupted: ((ShortcutAction, TimeInterval) -> Void)? = nil
     ) {
         stop()
@@ -810,6 +824,7 @@ extension ShortcutMonitor {
         self.handlesModifierOnlyShortcutsInEventTap = handlesModifierOnlyShortcutsInEventTap
         self.onKeyDown = onKeyDown
         self.onKeyUp = onKeyUp
+        self.onPressContextChanged = onPressContextChanged
         self.onShortcutInterrupted = onShortcutInterrupted
     }
 

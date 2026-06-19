@@ -472,6 +472,135 @@ struct VoiceInkTests {
         #expect(!sessionActive)
     }
 
+    @Test @MainActor func specialModeLongHoldStartsRecordingPastRollingBufferDuration() async throws {
+        var recordingState = RecordingState.idle
+        var sessionActive = false
+        var toggleCount = 0
+        var cancelCount = 0
+        var prepareQuickReleaseCount = 0
+        var discardQuickReleaseCount = 0
+        var directCommitCount = 0
+
+        let handler = RecordingShortcutModeHandler(
+            logger: Logger(subsystem: "VoiceInkTests", category: "RecordingShortcutModeHandler"),
+            canHandleShortcutAction: { true },
+            isRecorderVisible: { sessionActive },
+            recordingState: { recordingState },
+            toggleMiniRecorder: { _ in
+                toggleCount += 1
+                if sessionActive {
+                    recordingState = .transcribing
+                    sessionActive = false
+                } else {
+                    recordingState = .recording
+                    sessionActive = true
+                }
+            },
+            prepareQuickReleaseContext: { _ in
+                prepareQuickReleaseCount += 1
+            },
+            discardQuickReleaseContext: {
+                discardQuickReleaseCount += 1
+            },
+            commitReadyRollingBufferPreload: { _ in
+                directCommitCount += 1
+                recordingState = .transcribing
+                return true
+            },
+            cancelRecording: {
+                cancelCount += 1
+                recordingState = .idle
+                sessionActive = false
+            },
+            specialHoldToRecordDelay: { 0.01 }
+        )
+
+        await handler.handleKeyDown(
+            action: .primaryRecording,
+            eventTime: 1,
+            mode: .special
+        )
+        try await Task.sleep(nanoseconds: 30_000_000)
+
+        await handler.handleKeyUp(
+            action: .primaryRecording,
+            eventTime: 6,
+            mode: .special,
+            context: ShortcutPressContext()
+        )
+
+        #expect(prepareQuickReleaseCount == 1)
+        #expect(discardQuickReleaseCount == 0)
+        #expect(directCommitCount == 0)
+        #expect(toggleCount == 2)
+        #expect(cancelCount == 0)
+        #expect(recordingState == .transcribing)
+        #expect(!sessionActive)
+    }
+
+    @Test @MainActor func specialModeTypingEvidenceBeforeHoldDelayKeepsPreloadDiscardOnly() async throws {
+        var recordingState = RecordingState.idle
+        var sessionActive = false
+        var toggleCount = 0
+        var cancelCount = 0
+        var prepareQuickReleaseCount = 0
+        var discardQuickReleaseCount = 0
+        var directCommitCount = 0
+
+        let handler = RecordingShortcutModeHandler(
+            logger: Logger(subsystem: "VoiceInkTests", category: "RecordingShortcutModeHandler"),
+            canHandleShortcutAction: { true },
+            isRecorderVisible: { sessionActive },
+            recordingState: { recordingState },
+            toggleMiniRecorder: { _ in
+                toggleCount += 1
+                recordingState = .recording
+                sessionActive = true
+            },
+            prepareQuickReleaseContext: { _ in
+                prepareQuickReleaseCount += 1
+            },
+            discardQuickReleaseContext: {
+                discardQuickReleaseCount += 1
+            },
+            commitReadyRollingBufferPreload: { _ in
+                directCommitCount += 1
+                recordingState = .transcribing
+                return true
+            },
+            cancelRecording: {
+                cancelCount += 1
+                recordingState = .idle
+                sessionActive = false
+            },
+            specialHoldToRecordDelay: { 0.01 }
+        )
+
+        await handler.handleKeyDown(
+            action: .primaryRecording,
+            eventTime: 1,
+            mode: .special
+        )
+        let typingContext = ShortcutPressContext(didPressOtherKeyDuringPress: true)
+        handler.handlePressContextChanged(action: .primaryRecording, context: typingContext)
+        try await Task.sleep(nanoseconds: 30_000_000)
+
+        await handler.handleKeyUp(
+            action: .primaryRecording,
+            eventTime: 6,
+            mode: .special,
+            context: typingContext
+        )
+
+        #expect(prepareQuickReleaseCount == 1)
+        #expect(discardQuickReleaseCount == 1)
+        #expect(directCommitCount == 0)
+        #expect(toggleCount == 0)
+        #expect(cancelCount == 0)
+        #expect(recordingState == .idle)
+        #expect(!sessionActive)
+    }
+
     @Test @MainActor func specialModeTypingEvidenceDiscardsWithoutStartingRecorder() async throws {
         var recordingState = RecordingState.idle
         var sessionActive = false
@@ -786,6 +915,7 @@ struct VoiceInkTests {
     @Test func modifierOnlyShortcutTracksOtherKeyDownWithoutReleaseEvidence() async throws {
         let monitor = ShortcutMonitor()
         var contexts: [ShortcutPressContext] = []
+        var contextUpdates: [ShortcutPressContext] = []
 
         monitor.configureForTesting(
             shortcuts: [
@@ -795,7 +925,8 @@ struct VoiceInkTests {
                 )
             ],
             onKeyDown: { _, _ in },
-            onKeyUp: { _, _, context in contexts.append(context) }
+            onKeyUp: { _, _, context in contexts.append(context) },
+            onPressContextChanged: { _, context in contextUpdates.append(context) }
         )
 
         monitor.handleModifierOnlyFlagsChangedForTesting(
@@ -808,6 +939,9 @@ struct VoiceInkTests {
             modifierFlags: [.shift],
             eventTime: 2
         )
+        try await Task.sleep(nanoseconds: 10_000_000)
+        #expect(contextUpdates == [ShortcutPressContext(didPressOtherKeyDuringPress: true, didReleaseOtherKeyDuringPress: false)])
+
         monitor.handleModifierOnlyFlagsChangedForTesting(
             keyCode: UInt16(kVK_Shift),
             modifierFlags: [],

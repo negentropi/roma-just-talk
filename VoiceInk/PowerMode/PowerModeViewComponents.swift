@@ -100,18 +100,18 @@ struct ConfigurationRow: View {
     
     private let maxAppIconsToShow = 5
     
-    private var selectedPrompt: VoiceInkCustomPrompt? {
+    private var selectedPromptTitle: String? {
         guard let promptId = config.selectedPrompt,
               let uuid = UUID(uuidString: promptId) else { return nil }
-        return enhancementService.allPrompts.first { $0.id == uuid }
+        return enhancementService.allPrompts.first { $0.id == uuid }?.title
     }
     
-    private var selectedModel: String? {
+    private var selectedModelDisplayText: String? {
         if let modelName = config.selectedTranscriptionModelName,
            let model = transcriptionModelManager.allAvailableModels.first(where: { $0.name == modelName }) {
             return model.displayName
         }
-        return "Default"
+        return VoiceInkPowerModePresentation.defaultOverrideDisplayText
     }
     
     private var selectedLanguage: String? {
@@ -146,6 +146,15 @@ struct ConfigurationRow: View {
     
     private var visibleAppConfigs: [VoiceInkPowerModeAppConfig] {
         return Array(config.appConfigs?.prefix(maxAppIconsToShow) ?? [])
+    }
+
+    private var rowDetailPresentation: VoiceInkPowerModeRowDetailPresentation {
+        VoiceInkPowerModePresentation.rowDetailPresentation(
+            config: config,
+            transcriptionModelDisplayText: selectedModelDisplayText,
+            selectedLanguageDisplayText: selectedLanguage,
+            selectedPromptTitle: selectedPromptTitle
+        )
     }
     
     var body: some View {
@@ -210,106 +219,12 @@ struct ConfigurationRow: View {
             .padding(.vertical, 12)
             .padding(.horizontal, 14)
             
-            if selectedModel != nil || selectedLanguage != nil || config.isAIEnhancementEnabled || config.autoSendKey.isEnabled {
+            if rowDetailPresentation.isVisible {
                 Divider()
                 
                 HStack(spacing: 8) {
-                    if let model = selectedModel, model != "Default" {
-                        HStack(spacing: 4) {
-                            Image(systemName: "waveform")
-                                .font(.system(size: 10))
-                            Text(model)
-                                .font(.caption)
-                        }
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(Capsule()
-                            .fill(Color(NSColor.controlBackgroundColor)))
-                        .overlay(
-                            Capsule()
-                                .stroke(Color(NSColor.separatorColor), lineWidth: 0.5)
-                        )
-                    }
-                    
-                    if let language = selectedLanguage, language != "Default" {
-                        HStack(spacing: 4) {
-                            Image(systemName: "globe")
-                                .font(.system(size: 10))
-                            Text(language)
-                                .font(.caption)
-                        }
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(Capsule()
-                            .fill(Color(NSColor.controlBackgroundColor)))
-                        .overlay(
-                            Capsule()
-                                .stroke(Color(NSColor.separatorColor), lineWidth: 0.5)
-                        )
-                    }
-                    
-                    if config.isAIEnhancementEnabled, let modelName = config.selectedAIModel, !modelName.isEmpty {
-                        HStack(spacing: 4) {
-                            Image(systemName: "cpu")
-                                .font(.system(size: 10))
-                            Text(modelName.count > 20 ? String(modelName.prefix(18)) + "..." : modelName)
-                                .font(.caption)
-                        }
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(Capsule()
-                            .fill(Color(NSColor.controlBackgroundColor)))
-                        .overlay(
-                            Capsule()
-                                .stroke(Color(NSColor.separatorColor), lineWidth: 0.5)
-                        )
-                    }
-                    
-                    if config.autoSendKey.isEnabled {
-                        HStack(spacing: 4) {
-                            Image(systemName: "keyboard")
-                                .font(.system(size: 10))
-                            Text(config.autoSendKey.displayName)
-                                .font(.caption)
-                        }
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(Capsule()
-                            .fill(Color(NSColor.controlBackgroundColor)))
-                        .overlay(
-                            Capsule()
-                                .stroke(Color(NSColor.separatorColor), lineWidth: 0.5)
-                        )
-                    }
-                    if config.isAIEnhancementEnabled {
-                        if config.useScreenCapture {
-                            HStack(spacing: 4) {
-                                Image(systemName: "camera.viewfinder")
-                                    .font(.system(size: 10))
-                                Text("Context Awareness")
-                                    .font(.caption)
-                            }
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(Capsule()
-                                .fill(Color(NSColor.controlBackgroundColor)))
-                            .overlay(
-                                Capsule()
-                                    .stroke(Color(NSColor.separatorColor), lineWidth: 0.5)
-                            )
-                        }
-                        
-                        HStack(spacing: 4) {
-                            Image(systemName: "sparkles")
-                                .font(.system(size: 10))
-                            Text(selectedPrompt?.title ?? "AI")
-                                .font(.caption)
-                        }
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(Capsule()
-                            .fill(Color.accentColor.opacity(0.1)))
-                        .foregroundColor(.accentColor)
+                    ForEach(rowDetailPresentation.chips) { chip in
+                        PowerModeRowDetailChipView(chip: chip)
                     }
 
                     Spacer()
@@ -359,6 +274,55 @@ struct ConfigurationRow: View {
     
     private var isSelected: Bool {
         return isEditing
+    }
+}
+
+private struct PowerModeRowDetailChipView: View {
+    let chip: VoiceInkPowerModeRowDetailChipPresentation
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: iconName)
+                .font(.system(size: 10))
+            Text(chip.text)
+                .font(.caption)
+        }
+        .padding(.horizontal, 6)
+        .padding(.vertical, 2)
+        .background(Capsule()
+            .fill(backgroundColor))
+        .overlay {
+            if !usesAccentStyle {
+                Capsule()
+                    .stroke(Color(NSColor.separatorColor), lineWidth: 0.5)
+            }
+        }
+        .foregroundColor(usesAccentStyle ? .accentColor : .primary)
+    }
+
+    private var iconName: String {
+        switch chip.kind {
+        case .transcriptionModel:
+            return "waveform"
+        case .selectedLanguage:
+            return "globe"
+        case .aiModel:
+            return "cpu"
+        case .autoSend:
+            return "keyboard"
+        case .contextAwareness:
+            return "camera.viewfinder"
+        case .prompt:
+            return "sparkles"
+        }
+    }
+
+    private var backgroundColor: Color {
+        usesAccentStyle ? Color.accentColor.opacity(0.1) : Color(NSColor.controlBackgroundColor)
+    }
+
+    private var usesAccentStyle: Bool {
+        chip.kind == .prompt
     }
 }
 

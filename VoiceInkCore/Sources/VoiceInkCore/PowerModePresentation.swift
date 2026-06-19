@@ -19,6 +19,39 @@ public struct VoiceInkPowerModeDeleteConfirmationPresentation: Equatable, Sendab
     }
 }
 
+public enum VoiceInkPowerModeRowDetailChipKind: Hashable, Sendable {
+    case transcriptionModel
+    case selectedLanguage
+    case aiModel
+    case autoSend
+    case contextAwareness
+    case prompt
+}
+
+public struct VoiceInkPowerModeRowDetailChipPresentation: Equatable, Identifiable, Sendable {
+    public let kind: VoiceInkPowerModeRowDetailChipKind
+    public let text: String
+
+    public var id: VoiceInkPowerModeRowDetailChipKind {
+        kind
+    }
+
+    public init(kind: VoiceInkPowerModeRowDetailChipKind, text: String) {
+        self.kind = kind
+        self.text = text
+    }
+}
+
+public struct VoiceInkPowerModeRowDetailPresentation: Equatable, Sendable {
+    public let isVisible: Bool
+    public let chips: [VoiceInkPowerModeRowDetailChipPresentation]
+
+    public init(isVisible: Bool, chips: [VoiceInkPowerModeRowDetailChipPresentation]) {
+        self.isVisible = isVisible
+        self.chips = chips
+    }
+}
+
 public enum VoiceInkPowerModePresentation {
     public static let defaultOverrideDisplayText = "Default"
     public static let autoLanguageDisplayText = "Auto"
@@ -26,6 +59,8 @@ public enum VoiceInkPowerModePresentation {
     public static let deleteConfirmationTitle = "Delete Power Mode?"
     public static let deleteConfirmationPrimaryButtonTitle = "Delete"
     public static let deleteConfirmationCancelButtonTitle = "Cancel"
+    public static let contextAwarenessDisplayText = "Context Awareness"
+    public static let defaultPromptDisplayText = "AI"
 
     public static func displayName(name: String?, emoji: String?) -> String {
         switch (emoji?.trimmingCharacters(in: .whitespacesAndNewlines), name?.trimmingCharacters(in: .whitespacesAndNewlines)) {
@@ -76,10 +111,63 @@ public enum VoiceInkPowerModePresentation {
         )
     }
 
+    public static func rowDetailPresentation(
+        config: PowerModeConfig,
+        transcriptionModelDisplayText: String?,
+        selectedLanguageDisplayText: String?,
+        selectedPromptTitle: String?
+    ) -> VoiceInkPowerModeRowDetailPresentation {
+        var chips: [VoiceInkPowerModeRowDetailChipPresentation] = []
+
+        if let transcriptionModelDisplayText = visibleNonDefaultDisplayText(transcriptionModelDisplayText) {
+            chips.append(VoiceInkPowerModeRowDetailChipPresentation(kind: .transcriptionModel, text: transcriptionModelDisplayText))
+        }
+
+        if let selectedLanguageDisplayText = visibleNonDefaultDisplayText(selectedLanguageDisplayText) {
+            chips.append(VoiceInkPowerModeRowDetailChipPresentation(kind: .selectedLanguage, text: selectedLanguageDisplayText))
+        }
+
+        if config.isAIEnhancementEnabled, let aiModelDisplayText = aiModelDisplayText(config.selectedAIModel) {
+            chips.append(VoiceInkPowerModeRowDetailChipPresentation(kind: .aiModel, text: aiModelDisplayText))
+        }
+
+        if config.autoSendKey.isEnabled {
+            chips.append(VoiceInkPowerModeRowDetailChipPresentation(kind: .autoSend, text: config.autoSendKey.displayName))
+        }
+
+        if config.isAIEnhancementEnabled {
+            if config.useScreenCapture {
+                chips.append(VoiceInkPowerModeRowDetailChipPresentation(kind: .contextAwareness, text: contextAwarenessDisplayText))
+            }
+
+            chips.append(VoiceInkPowerModeRowDetailChipPresentation(kind: .prompt, text: selectedPromptTitle ?? defaultPromptDisplayText))
+        }
+
+        return VoiceInkPowerModeRowDetailPresentation(
+            isVisible: transcriptionModelDisplayText != nil || selectedLanguageDisplayText != nil || config.isAIEnhancementEnabled || config.autoSendKey.isEnabled,
+            chips: chips
+        )
+    }
+
+    public static func aiModelDisplayText(_ modelName: String?) -> String? {
+        guard let modelName, !modelName.isEmpty else {
+            return nil
+        }
+
+        return modelName.count > 20 ? String(modelName.prefix(18)) + "..." : modelName
+    }
+
     private static func triggerCountText(_ count: Int, singular: String, plural: String) -> String {
         guard count > 0 else {
             return ""
         }
         return count == 1 ? "1 \(singular)" : "\(count) \(plural)"
+    }
+
+    private static func visibleNonDefaultDisplayText(_ text: String?) -> String? {
+        guard let text, text != defaultOverrideDisplayText else {
+            return nil
+        }
+        return text
     }
 }

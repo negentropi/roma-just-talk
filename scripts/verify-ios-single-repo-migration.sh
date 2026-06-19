@@ -1990,6 +1990,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
 
 require_pattern \
+  "shared Power Mode row detail presentation lives in VoiceInkCore" \
+  'VoiceInkPowerModeRowDetailPresentation|rowDetailPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
+
+require_pattern \
   "macOS Power Mode rows use shared selected-language display formatting" \
   'VoiceInkPowerModePresentation\.selectedLanguageDisplayText' \
   VoiceInk/PowerMode/PowerModeViewComponents.swift
@@ -2002,6 +2007,11 @@ require_pattern \
 require_pattern \
   "macOS Power Mode row context menu uses shared delete confirmation copy" \
   'VoiceInkPowerModePresentation\.deleteConfirmation\(configName:' \
+  VoiceInk/PowerMode/PowerModeViewComponents.swift
+
+require_pattern \
+  "macOS Power Mode rows use shared row detail presentation" \
+  'VoiceInkPowerModePresentation\.rowDetailPresentation|PowerModeRowDetailChipView' \
   VoiceInk/PowerMode/PowerModeViewComponents.swift
 
 require_pattern \
@@ -2022,6 +2032,11 @@ reject_pattern \
 reject_pattern \
   "macOS Power Mode row context menu avoids shell-only delete confirmation copy" \
   'Delete Power Mode\?|Are you sure you want to delete|This action cannot be undone|addButton\(withTitle: +"(Delete|Cancel)"' \
+  VoiceInk/PowerMode/PowerModeViewComponents.swift
+
+reject_pattern \
+  "macOS Power Mode rows avoid shell-only row detail chip policy" \
+  'modelName\.count > 20|prefix\(18\)|selectedPrompt\?\.title \?\? "AI"|Text\("Context Awareness"\)|model != "Default"|language != "Default"|config\.autoSendKey\.displayName' \
   VoiceInk/PowerMode/PowerModeViewComponents.swift
 
 reject_pattern \

@@ -68,4 +68,85 @@ final class PowerModePresentationTests: XCTestCase {
         XCTAssertEqual(confirmation.primaryButtonTitle, "Delete")
         XCTAssertEqual(confirmation.cancelButtonTitle, "Cancel")
     }
+
+    func testRowDetailPresentationPreservesDefaultBandWithoutVisibleChips() {
+        let config = PowerModeConfig(
+            name: "Writing",
+            emoji: "W",
+            isAIEnhancementEnabled: false,
+            selectedTranscriptionModelName: "base",
+            selectedLanguage: "en"
+        )
+
+        let presentation = VoiceInkPowerModePresentation.rowDetailPresentation(
+            config: config,
+            transcriptionModelDisplayText: VoiceInkPowerModePresentation.defaultOverrideDisplayText,
+            selectedLanguageDisplayText: VoiceInkPowerModePresentation.defaultOverrideDisplayText,
+            selectedPromptTitle: nil
+        )
+
+        XCTAssertTrue(presentation.isVisible)
+        XCTAssertEqual(presentation.chips, [])
+    }
+
+    func testRowDetailPresentationPreservesMacOSChipOrderAndText() {
+        let config = PowerModeConfig(
+            name: "Writing",
+            emoji: "W",
+            isAIEnhancementEnabled: true,
+            selectedTranscriptionModelName: "large",
+            selectedLanguage: "es",
+            useScreenCapture: true,
+            selectedAIModel: "abcdefghijklmnopqrstu",
+            autoSendKey: .commandEnter
+        )
+
+        let presentation = VoiceInkPowerModePresentation.rowDetailPresentation(
+            config: config,
+            transcriptionModelDisplayText: "Large",
+            selectedLanguageDisplayText: "Spanish",
+            selectedPromptTitle: "Rewrite"
+        )
+
+        XCTAssertEqual(
+            presentation.chips.map(\.kind),
+            [.transcriptionModel, .selectedLanguage, .aiModel, .autoSend, .contextAwareness, .prompt]
+        )
+        XCTAssertEqual(
+            presentation.chips.map(\.text),
+            [
+                "Large",
+                "Spanish",
+                "abcdefghijklmnopqr...",
+                VoiceInkAutoSendKey.commandEnter.displayName,
+                VoiceInkPowerModePresentation.contextAwarenessDisplayText,
+                "Rewrite"
+            ]
+        )
+    }
+
+    func testRowDetailPresentationFallsBackToDefaultPromptAndSkipsBlankAIModel() {
+        let config = PowerModeConfig(
+            name: "Writing",
+            emoji: "W",
+            isAIEnhancementEnabled: true,
+            selectedTranscriptionModelName: "base",
+            selectedLanguage: "en",
+            selectedAIModel: ""
+        )
+
+        let presentation = VoiceInkPowerModePresentation.rowDetailPresentation(
+            config: config,
+            transcriptionModelDisplayText: VoiceInkPowerModePresentation.defaultOverrideDisplayText,
+            selectedLanguageDisplayText: VoiceInkPowerModePresentation.defaultOverrideDisplayText,
+            selectedPromptTitle: nil
+        )
+
+        XCTAssertEqual(presentation.chips, [
+            VoiceInkPowerModeRowDetailChipPresentation(
+                kind: .prompt,
+                text: VoiceInkPowerModePresentation.defaultPromptDisplayText
+            )
+        ])
+    }
 }

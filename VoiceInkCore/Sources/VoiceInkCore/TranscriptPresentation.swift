@@ -74,6 +74,16 @@ public struct VoiceInkHistoryEmptyStatePresentation: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkHistoryActionPresentation: Equatable, Sendable {
+    public let title: String
+    public let systemImageName: String
+
+    public init(title: String, systemImageName: String) {
+        self.title = title
+        self.systemImageName = systemImageName
+    }
+}
+
 public enum VoiceInkTranscriptTextVariant: String, CaseIterable, Sendable {
     case original
     case enhanced
@@ -102,6 +112,31 @@ public enum VoiceInkTranscriptTextVariant: String, CaseIterable, Sendable {
 }
 
 public enum VoiceInkHistoryPresentation {
+    public static let macOSHistorySearchPrompt = "Search transcriptions"
+    public static let macOSInlineHistorySearchPrompt = "Search transcriptions..."
+    public static let loadingText = "Loading..."
+    public static let loadMoreButtonTitle = "Load More"
+    public static let selectAllButtonTitle = "Select All"
+    public static let deselectAllButtonTitle = "Deselect All"
+    public static let deleteConfirmationTitle = "Delete Selected Items?"
+    public static let deleteConfirmationPrimaryButtonTitle = "Delete"
+    public static let deleteConfirmationCancelButtonTitle = "Cancel"
+
+    public static let analyzeAction = VoiceInkHistoryActionPresentation(
+        title: "Analyze",
+        systemImageName: "chart.bar.xaxis"
+    )
+
+    public static let exportAction = VoiceInkHistoryActionPresentation(
+        title: "Export",
+        systemImageName: "square.and.arrow.up"
+    )
+
+    public static let deleteAction = VoiceInkHistoryActionPresentation(
+        title: "Delete",
+        systemImageName: "trash"
+    )
+
     public static let iOSNotesEmptyState = VoiceInkHistoryEmptyStatePresentation(
         systemImageName: "waveform",
         title: "No notes yet",
@@ -138,6 +173,14 @@ public enum VoiceInkHistoryPresentation {
                 title: "No results found",
                 message: "Try a different search term"
             )
+    }
+
+    public static func loadingOrLoadMoreText(isLoading: Bool) -> String {
+        isLoading ? loadingText : loadMoreButtonTitle
+    }
+
+    public static func selectedCountText(_ count: Int) -> String {
+        "\(count) selected"
     }
 }
 

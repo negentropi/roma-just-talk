@@ -815,10 +815,81 @@ require_pattern \
   'VoiceInkHistoryPresentation\.macOSInlineHistoryEmptyState' \
   VoiceInk/Views/History/InlineHistoryView.swift
 
+require_pattern \
+  "shared history presentation owns macOS search prompts" \
+  'macOSHistorySearchPrompt|macOSInlineHistorySearchPrompt' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+require_pattern \
+  "shared history presentation owns macOS paging labels" \
+  'loadingOrLoadMoreText|loadingText = "Loading\.\.\."|loadMoreButtonTitle = "Load More"' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+require_pattern \
+  "shared history presentation owns macOS selection labels" \
+  'selectAllButtonTitle = "Select All"|deselectAllButtonTitle = "Deselect All"|selectedCountText' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+require_pattern \
+  "shared history presentation owns macOS selection action metadata" \
+  'analyzeAction|exportAction|deleteAction|chart\.bar\.xaxis|square\.and\.arrow\.up|systemImageName: "trash"' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+require_pattern \
+  "shared history presentation owns macOS delete alert copy" \
+  'deleteConfirmationTitle = "Delete Selected Items\?"|deleteConfirmationPrimaryButtonTitle = "Delete"|deleteConfirmationCancelButtonTitle = "Cancel"' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+require_pattern \
+  "macOS full history uses shared history search prompt" \
+  'VoiceInkHistoryPresentation\.macOSHistorySearchPrompt' \
+  VoiceInk/Views/History/TranscriptionHistoryView.swift
+
+require_pattern \
+  "macOS inline history uses shared history search prompt" \
+  'VoiceInkHistoryPresentation\.macOSInlineHistorySearchPrompt' \
+  VoiceInk/Views/History/InlineHistoryView.swift
+
+require_pattern \
+  "macOS history views use shared paging labels" \
+  'VoiceInkHistoryPresentation\.loadingOrLoadMoreText' \
+  VoiceInk/Views/History/TranscriptionHistoryView.swift \
+  VoiceInk/Views/History/InlineHistoryView.swift
+
+require_pattern \
+  "macOS history views use shared selected-count text" \
+  'VoiceInkHistoryPresentation\.selectedCountText' \
+  VoiceInk/Views/History/TranscriptionHistoryView.swift \
+  VoiceInk/Views/History/InlineHistoryView.swift
+
+require_pattern \
+  "macOS history views use shared selection labels" \
+  'VoiceInkHistoryPresentation\.(selectAllButtonTitle|deselectAllButtonTitle)' \
+  VoiceInk/Views/History/TranscriptionHistoryView.swift \
+  VoiceInk/Views/History/InlineHistoryView.swift
+
+require_pattern \
+  "macOS history views use shared action metadata" \
+  'VoiceInkHistoryPresentation\.(analyzeAction|exportAction|deleteAction)' \
+  VoiceInk/Views/History/TranscriptionHistoryView.swift \
+  VoiceInk/Views/History/InlineHistoryView.swift
+
+require_pattern \
+  "macOS history views use shared delete alert copy" \
+  'VoiceInkHistoryPresentation\.deleteConfirmation(Title|PrimaryButtonTitle|CancelButtonTitle)' \
+  VoiceInk/Views/History/TranscriptionHistoryView.swift \
+  VoiceInk/Views/History/InlineHistoryView.swift
+
 reject_pattern \
   "history and notes views avoid shell-only empty-state copy" \
   'No notes yet|Tap Start Recording to capture your first note\.|No transcriptions yet|No transcriptions|No results found|Your transcription history will appear here|Try a different search term|No Selection|Select a transcription to view details|No Metadata' \
   iOS/VoiceInk-ios/NotesListView.swift \
+  VoiceInk/Views/History/TranscriptionHistoryView.swift \
+  VoiceInk/Views/History/InlineHistoryView.swift
+
+reject_pattern \
+  "macOS history views avoid shell-only history control copy" \
+  '"(Search transcriptions|Search transcriptions\.\.\.|Loading\.\.\.|Load More|Select All|Deselect All|Analyze|Export|Delete|Cancel|Delete Selected Items\?)"' \
   VoiceInk/Views/History/TranscriptionHistoryView.swift \
   VoiceInk/Views/History/InlineHistoryView.swift
 

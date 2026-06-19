@@ -57,6 +57,37 @@ final class TranscriptPresentationTests: XCTestCase {
         )
     }
 
+    func testHistoryControlPresentationPreservesMacOSSearchAndPagingCopy() {
+        XCTAssertEqual(VoiceInkHistoryPresentation.macOSHistorySearchPrompt, "Search transcriptions")
+        XCTAssertEqual(VoiceInkHistoryPresentation.macOSInlineHistorySearchPrompt, "Search transcriptions...")
+        XCTAssertEqual(VoiceInkHistoryPresentation.loadingOrLoadMoreText(isLoading: true), "Loading...")
+        XCTAssertEqual(VoiceInkHistoryPresentation.loadingOrLoadMoreText(isLoading: false), "Load More")
+    }
+
+    func testHistorySelectionPresentationPreservesMacOSCopyAndActions() {
+        XCTAssertEqual(VoiceInkHistoryPresentation.selectAllButtonTitle, "Select All")
+        XCTAssertEqual(VoiceInkHistoryPresentation.deselectAllButtonTitle, "Deselect All")
+        XCTAssertEqual(VoiceInkHistoryPresentation.selectedCountText(3), "3 selected")
+        XCTAssertEqual(
+            VoiceInkHistoryPresentation.analyzeAction,
+            VoiceInkHistoryActionPresentation(title: "Analyze", systemImageName: "chart.bar.xaxis")
+        )
+        XCTAssertEqual(
+            VoiceInkHistoryPresentation.exportAction,
+            VoiceInkHistoryActionPresentation(title: "Export", systemImageName: "square.and.arrow.up")
+        )
+        XCTAssertEqual(
+            VoiceInkHistoryPresentation.deleteAction,
+            VoiceInkHistoryActionPresentation(title: "Delete", systemImageName: "trash")
+        )
+    }
+
+    func testHistoryDeleteConfirmationPresentationPreservesMacOSAlertCopy() {
+        XCTAssertEqual(VoiceInkHistoryPresentation.deleteConfirmationTitle, "Delete Selected Items?")
+        XCTAssertEqual(VoiceInkHistoryPresentation.deleteConfirmationPrimaryButtonTitle, "Delete")
+        XCTAssertEqual(VoiceInkHistoryPresentation.deleteConfirmationCancelButtonTitle, "Cancel")
+    }
+
     func testPreferredTextUsesEnhancedTextWhenPresent() {
         XCTAssertEqual(
             VoiceInkTranscriptPresentation.preferredText(

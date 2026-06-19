@@ -62,7 +62,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - onboarding completion, iOS audio-session timeout storage/runtime policy/settings presentation, and core-owned user preference reset storage; platform shells still own first-run flow, audio-session lifecycle, keychain clearing, file deletion, and settings UI bindings
 - current transcription model preference loading/saving/clearing plus legacy `"CurrentModel"` cleanup; platform shells still own model availability and download/runtime state
 - transcript status, default transcript fallback copy, status-panel and row-badge presentation, status symbol/tone metadata, canceled-transcript paste eligibility, presentation helpers, and localized standard transcript search semantics
-- history and notes empty-state presentation for iOS notes, macOS history list, macOS no-selection, macOS no-metadata, and macOS inline history search/no-search states; platform shells still own layout, colors, and pagination
+- history and notes presentation for iOS notes, macOS history list, macOS no-selection, macOS no-metadata, macOS inline history search/no-search states, and macOS history search/pagination/selection controls; platform shells still own layout, colors, and pagination execution
 - failed-transcript state planning, including macOS stored failure text and iOS failure error detail
 - error-description presentation fallback for shared record and shell failure text
 - local transcription/model/missing-audio error vocabulary shared by macOS local Whisper, macOS retry/retranscribe surfaces, and iOS local retry transcription
@@ -204,7 +204,7 @@ Current macOS consumers of shared remote transport:
 - macOS `AppDefaults` registers core-owned default values through `VoiceInkDefaultSettings.macOS` and checks first-run onboarding storage through `VoiceInkOnboardingPreference`, while keeping macOS-specific defaults such as current model, Launch at Login, shortcuts, and UI behavior in the shell.
 - iOS app launch registers core-owned default values through `VoiceInkDefaultSettings.iOS`, while the iOS shell keeps first-run flow, app-group recording state, keyboard deep links, keychain, and file deletion.
 - macOS history/import row summaries, macOS history delete-confirmation copy, macOS audio-file row copy/save action text, macOS transcript original/enhanced tab labels, tab visibility, tab-selected display text, and iOS note detail display/retry labels use `VoiceInkTranscriptPresentation`/`VoiceInkTranscriptTextVariant` for the enhanced-text-first transcript display rule, expanded/collapsed action-text policy, shared empty-content fallback copy, and shared transcript-detail presentation copy.
-- macOS full and inline history empty/no-selection/no-metadata states use `VoiceInkHistoryPresentation` for shared copy and SF Symbol names while keeping SwiftUI layout in the macOS shell.
+- macOS full and inline history empty/no-selection/no-metadata states plus search prompts, load-more/loading text, selection labels, action labels/icons, selected-count text, and delete-alert button/title copy use `VoiceInkHistoryPresentation` while keeping SwiftUI layout and SwiftData pagination in the macOS shell.
 - macOS recorder failure records adapt `VoiceInkTranscriptionRecordFailurePlan` into the existing raw-status SwiftData model, preserving the `Transcription Failed: ...` stored text prefix without duplicating failed status/text decisions in the pipeline.
 - macOS canceled recorder records use `VoiceInkTranscriptPresentation.canceledTranscriptionText` directly; the old shell alias on `Transcription` stays deleted.
 - `VoiceInkTranscriptPresentation.matchesSearch` mirrors macOS history predicate search semantics, keeping iOS note filtering accent-insensitive through shared core while macOS SwiftData predicates keep their local query shape.
@@ -358,7 +358,7 @@ scripts/verify-ios-single-repo-migration.sh --full-build
 34. macOS and iOS duration-dependent UI stays routed through `VoiceInkDurationPresentation.shouldShowPositiveDuration`.
 35. macOS and iOS audio playback-rate controls stay routed through `VoiceInkAudioPlaybackRate`.
 36. macOS sidebar/window titles and iOS note-list/onboarding app-name copy stay routed through `VoiceInkAppIdentity`.
-37. macOS history and iOS notes empty-state copy and SF Symbol names stay routed through `VoiceInkHistoryPresentation`, with platform views only rendering the shared presentation.
+37. macOS history and iOS notes empty-state copy plus macOS history search/pagination/selection copy and SF Symbol names stay routed through `VoiceInkHistoryPresentation`, with platform views only rendering the shared presentation.
 38. A real Xcode toolchain is selected and both app targets build.
 
 Current local blocker: `xcode-select -p` points to `/Library/Developer/CommandLineTools`, and the previously used external Xcode volume is not mounted. Full target builds are still environment-blocked until a real Xcode is selected; macOS `VoiceInk` also needs `/Users/atalphalnmomhappyhouse/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework`, and iOS `VoiceInk-ios` needs the iOS 26.2 platform installed. Until those are present, use `swift run VoiceInkCoreChecks` plus the static parse/lint gates above for local proof.

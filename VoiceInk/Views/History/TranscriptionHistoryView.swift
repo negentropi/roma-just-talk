@@ -94,11 +94,11 @@ struct TranscriptionHistoryView: View {
                 }
             }
         }
-        .alert("Delete Selected Items?", isPresented: $showDeleteConfirmation) {
-            Button("Delete", role: .destructive) {
+        .alert(VoiceInkHistoryPresentation.deleteConfirmationTitle, isPresented: $showDeleteConfirmation) {
+            Button(VoiceInkHistoryPresentation.deleteConfirmationPrimaryButtonTitle, role: .destructive) {
                 deleteSelectedTranscriptions()
             }
-            Button("Cancel", role: .cancel) {}
+            Button(VoiceInkHistoryPresentation.deleteConfirmationCancelButtonTitle, role: .cancel) {}
         } message: {
             Text(VoiceInkTranscriptPresentation.deleteConfirmationMessage(selectedCount: selectedTranscriptions.count))
         }
@@ -170,7 +170,7 @@ struct TranscriptionHistoryView: View {
                 Image(systemName: "magnifyingglass")
                     .foregroundColor(.secondary)
                     .font(.system(size: 13))
-                TextField("Search transcriptions", text: $searchText)
+                TextField(VoiceInkHistoryPresentation.macOSHistorySearchPrompt, text: $searchText)
                     .textFieldStyle(PlainTextFieldStyle())
                     .font(.system(size: 13))
             }
@@ -217,7 +217,7 @@ struct TranscriptionHistoryView: View {
                                         if isLoading {
                                             ProgressView().controlSize(.small)
                                         }
-                                        Text(isLoading ? "Loading..." : "Load More")
+                                        Text(VoiceInkHistoryPresentation.loadingOrLoadMoreText(isLoading: isLoading))
                                             .font(.system(size: 13, weight: .medium))
                                     }
                                     .frame(maxWidth: .infinity)
@@ -314,14 +314,14 @@ struct TranscriptionHistoryView: View {
     private var selectionToolbar: some View {
         HStack(spacing: 12) {
             if allSelected {
-                Button("Deselect All") {
+                Button(VoiceInkHistoryPresentation.deselectAllButtonTitle) {
                     selectedTranscriptions.removeAll()
                 }
                 .buttonStyle(.plain)
                 .font(.system(size: 13))
                 .foregroundColor(.secondary)
             } else {
-                Button("Select All") {
+                Button(VoiceInkHistoryPresentation.selectAllButtonTitle) {
                     Task { await selectAllTranscriptions() }
                 }
                 .buttonStyle(.plain)
@@ -336,36 +336,36 @@ struct TranscriptionHistoryView: View {
                 Button(action: {
                     withAnimation(.smooth(duration: 0.3)) { isAnalysisPanelPresented = true }
                 }) {
-                    Image(systemName: "chart.bar.xaxis")
+                    Image(systemName: VoiceInkHistoryPresentation.analyzeAction.systemImageName)
                         .font(.system(size: 14, weight: .regular))
                         .foregroundColor(.secondary)
                 }
                 .buttonStyle(.plain)
-                .help("Analyze")
+                .help(VoiceInkHistoryPresentation.analyzeAction.title)
 
                 Button(action: {
                     exportService.exportTranscriptionsToCSV(transcriptions: Array(selectedTranscriptions))
                 }) {
-                    Image(systemName: "square.and.arrow.up")
+                    Image(systemName: VoiceInkHistoryPresentation.exportAction.systemImageName)
                         .font(.system(size: 14, weight: .regular))
                         .foregroundColor(.secondary)
                 }
                 .buttonStyle(.plain)
-                .help("Export")
+                .help(VoiceInkHistoryPresentation.exportAction.title)
 
                 Button(action: { showDeleteConfirmation = true }) {
-                    Image(systemName: "trash")
+                    Image(systemName: VoiceInkHistoryPresentation.deleteAction.systemImageName)
                         .font(.system(size: 14, weight: .regular))
                         .foregroundColor(.secondary)
                 }
                 .buttonStyle(.plain)
-                .help("Delete")
+                .help(VoiceInkHistoryPresentation.deleteAction.title)
             }
 
             Spacer()
 
             if !selectedTranscriptions.isEmpty {
-                Text("\(selectedTranscriptions.count) selected")
+                Text(VoiceInkHistoryPresentation.selectedCountText(selectedTranscriptions.count))
                     .font(.system(size: 13, weight: .medium))
                     .foregroundColor(.secondary)
             }

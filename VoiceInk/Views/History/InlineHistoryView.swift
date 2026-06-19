@@ -116,11 +116,11 @@ struct InlineHistoryView: View {
             }
         }
         .animation(.smooth(duration: 0.3), value: isPanelPresented)
-        .alert("Delete Selected Items?", isPresented: $showDeleteConfirmation) {
-            Button("Delete", role: .destructive) {
+        .alert(VoiceInkHistoryPresentation.deleteConfirmationTitle, isPresented: $showDeleteConfirmation) {
+            Button(VoiceInkHistoryPresentation.deleteConfirmationPrimaryButtonTitle, role: .destructive) {
                 deleteSelectedTranscriptions()
             }
-            Button("Cancel", role: .cancel) {}
+            Button(VoiceInkHistoryPresentation.deleteConfirmationCancelButtonTitle, role: .cancel) {}
         } message: {
             Text(VoiceInkTranscriptPresentation.deleteConfirmationMessage(selectedCount: selectedTranscriptions.count))
         }
@@ -156,7 +156,7 @@ struct InlineHistoryView: View {
                 Image(systemName: "magnifyingglass")
                     .foregroundColor(.secondary)
                     .font(.system(size: 12))
-                TextField("Search transcriptions...", text: $searchText)
+                TextField(VoiceInkHistoryPresentation.macOSInlineHistorySearchPrompt, text: $searchText)
                     .textFieldStyle(.plain)
                     .font(.system(size: 13))
             }
@@ -174,7 +174,7 @@ struct InlineHistoryView: View {
 
     private var selectionBar: some View {
         HStack(spacing: 16) {
-            Text("\(selectedTranscriptions.count) selected")
+            Text(VoiceInkHistoryPresentation.selectedCountText(selectedTranscriptions.count))
                 .font(.system(size: 13, weight: .medium))
                 .foregroundColor(.secondary)
 
@@ -184,7 +184,10 @@ struct InlineHistoryView: View {
                 panelMode = .analysis
                 withAnimation(.smooth(duration: 0.3)) { isPanelPresented = true }
             }) {
-                Label("Analyze", systemImage: "chart.bar.xaxis")
+                Label(
+                    VoiceInkHistoryPresentation.analyzeAction.title,
+                    systemImage: VoiceInkHistoryPresentation.analyzeAction.systemImageName
+                )
                     .font(.system(size: 12, weight: .medium))
             }
             .buttonStyle(.plain)
@@ -193,14 +196,20 @@ struct InlineHistoryView: View {
             Button(action: {
                 exportService.exportTranscriptionsToCSV(transcriptions: Array(selectedTranscriptions))
             }) {
-                Label("Export", systemImage: "square.and.arrow.up")
+                Label(
+                    VoiceInkHistoryPresentation.exportAction.title,
+                    systemImage: VoiceInkHistoryPresentation.exportAction.systemImageName
+                )
                     .font(.system(size: 12, weight: .medium))
             }
             .buttonStyle(.plain)
             .foregroundColor(.secondary)
 
             Button(action: { showDeleteConfirmation = true }) {
-                Label("Delete", systemImage: "trash")
+                Label(
+                    VoiceInkHistoryPresentation.deleteAction.title,
+                    systemImage: VoiceInkHistoryPresentation.deleteAction.systemImageName
+                )
                     .font(.system(size: 12, weight: .medium))
             }
             .buttonStyle(.plain)
@@ -210,14 +219,14 @@ struct InlineHistoryView: View {
                 .frame(height: 16)
 
             if allSelected {
-                Button("Deselect All") {
+                Button(VoiceInkHistoryPresentation.deselectAllButtonTitle) {
                     selectedTranscriptions.removeAll()
                 }
                 .font(.system(size: 12, weight: .medium))
                 .buttonStyle(.plain)
                 .foregroundColor(.secondary)
             } else {
-                Button("Select All") {
+                Button(VoiceInkHistoryPresentation.selectAllButtonTitle) {
                     Task { await selectAllTranscriptions() }
                 }
                 .font(.system(size: 12, weight: .medium))
@@ -294,7 +303,7 @@ struct InlineHistoryView: View {
                             if isLoading {
                                 ProgressView().controlSize(.small)
                             }
-                            Text(isLoading ? "Loading..." : "Load More")
+                            Text(VoiceInkHistoryPresentation.loadingOrLoadMoreText(isLoading: isLoading))
                                 .font(.system(size: 13, weight: .medium))
                         }
                         .frame(maxWidth: .infinity)

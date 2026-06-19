@@ -1,4 +1,5 @@
 import SwiftUI
+import VoiceInkCore
 
 struct OnboardingModelDownloadView: View {
     @Binding var hasCompletedOnboarding: Bool
@@ -11,6 +12,7 @@ struct OnboardingModelDownloadView: View {
     @State private var showTutorial = false
     
     private let defaultModel = TranscriptionModelRegistry.models.first { $0.name == "parakeet-tdt-0.6b-v2" } as! FluidAudioModel
+    private let presentation = VoiceInkMacOSOnboardingPresentation.modelDownload
     
     var body: some View {
         ZStack {
@@ -47,12 +49,12 @@ struct OnboardingModelDownloadView: View {
                             
                             // Title and description
                             VStack(spacing: 12) {
-                                Text("Download AI Model")
+                                Text(presentation.title)
                                     .font(.title2)
                                     .fontWeight(.bold)
                                     .foregroundColor(.white)
                                 
-                                Text("We'll download the optimized model to get you started.")
+                                Text(presentation.subtitle)
                                     .font(.body)
                                     .foregroundColor(.white.opacity(0.7))
                                     .multilineTextAlignment(.center)
@@ -80,8 +82,8 @@ struct OnboardingModelDownloadView: View {
                             
                             // Performance indicators in a more compact layout
                             HStack(spacing: 20) {
-                                performanceIndicator(label: "Speed", value: defaultModel.speed)
-                                performanceIndicator(label: "Accuracy", value: defaultModel.accuracy)
+                                performanceIndicator(label: presentation.speedLabel, value: defaultModel.speed)
+                                performanceIndicator(label: presentation.accuracyLabel, value: defaultModel.accuracy)
                                 ramUsageLabel(gb: defaultModel.ramUsage)
                             }
                             .frame(maxWidth: .infinity, alignment: .center)
@@ -197,15 +199,11 @@ struct OnboardingModelDownloadView: View {
     }
 
     private func getButtonTitle() -> String {
-        if isModelSet {
-            return "Continue"
-        } else if isDownloading {
-            return "Downloading..."
-        } else if fluidAudioModelManager.isFluidAudioModelDownloaded(defaultModel) {
-            return "Set as Default"
-        } else {
-            return "Download Model"
-        }
+        presentation.buttonTitle(
+            isModelSet: isModelSet,
+            isDownloading: isDownloading,
+            isModelDownloaded: fluidAudioModelManager.isFluidAudioModelDownloaded(defaultModel)
+        )
     }
     
     private func performanceIndicator(label: String, value: Double) -> some View {
@@ -226,7 +224,7 @@ struct OnboardingModelDownloadView: View {
     
     private func ramUsageLabel(gb: Double) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("RAM")
+            Text(presentation.ramLabel)
                 .font(.caption)
                 .foregroundColor(.white.opacity(0.7))
             

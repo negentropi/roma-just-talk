@@ -1517,6 +1517,21 @@ reject_pattern \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 require_pattern \
+  "shared macOS model-download onboarding presentation lives in VoiceInkCore" \
+  'VoiceInkMacOSOnboardingPresentation|VoiceInkMacOSOnboardingModelDownloadPresentation|modelDownload|speedLabel|ramLabel|buttonTitle' \
+  VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift
+
+require_pattern \
+  "macOS model-download onboarding uses shared presentation" \
+  'VoiceInkMacOSOnboardingPresentation\.modelDownload|presentation\.(title|subtitle|speedLabel|accuracyLabel|ramLabel)|buttonTitle\(isModelSet:' \
+  VoiceInk/Views/Onboarding/OnboardingModelDownloadView.swift
+
+reject_pattern \
+  "macOS model-download onboarding avoids shell-only presentation copy" \
+  '"(Download AI Model|We'\''ll download the optimized model to get you started\.|Downloading\.\.\.|Set as Default|Download Model|Speed|Accuracy|RAM)"' \
+  VoiceInk/Views/Onboarding/OnboardingModelDownloadView.swift
+
+require_pattern \
   "shared macOS onboarding permission presentation lives in VoiceInkCore" \
   'VoiceInkMacOSOnboardingPermissionPresentation|VoiceInkMacOSOnboardingPermissionKind|relaunchRequiredMessage|canSkipWhenNotGranted|buttonTitle' \
   VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift

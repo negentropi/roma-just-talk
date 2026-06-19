@@ -62,6 +62,57 @@ public struct VoiceInkOnboardingModelDownloadPresentation: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkMacOSOnboardingModelDownloadPresentation: Equatable, Sendable {
+    public let title: String
+    public let subtitle: String
+    public let continueButtonTitle: String
+    public let downloadingButtonTitle: String
+    public let setAsDefaultButtonTitle: String
+    public let downloadButtonTitle: String
+    public let speedLabel: String
+    public let accuracyLabel: String
+    public let ramLabel: String
+
+    public init(
+        title: String,
+        subtitle: String,
+        continueButtonTitle: String,
+        downloadingButtonTitle: String,
+        setAsDefaultButtonTitle: String,
+        downloadButtonTitle: String,
+        speedLabel: String,
+        accuracyLabel: String,
+        ramLabel: String
+    ) {
+        self.title = title
+        self.subtitle = subtitle
+        self.continueButtonTitle = continueButtonTitle
+        self.downloadingButtonTitle = downloadingButtonTitle
+        self.setAsDefaultButtonTitle = setAsDefaultButtonTitle
+        self.downloadButtonTitle = downloadButtonTitle
+        self.speedLabel = speedLabel
+        self.accuracyLabel = accuracyLabel
+        self.ramLabel = ramLabel
+    }
+
+    public func buttonTitle(
+        isModelSet: Bool,
+        isDownloading: Bool,
+        isModelDownloaded: Bool
+    ) -> String {
+        if isModelSet {
+            return continueButtonTitle
+        }
+        if isDownloading {
+            return downloadingButtonTitle
+        }
+        if isModelDownloaded {
+            return setAsDefaultButtonTitle
+        }
+        return downloadButtonTitle
+    }
+}
+
 public struct VoiceInkOnboardingReadyPresentation: Equatable, Sendable {
     public let iconSystemName: String
     public let title: String
@@ -82,6 +133,20 @@ public struct VoiceInkOnboardingReadyPresentation: Equatable, Sendable {
         self.steps = steps
         self.primaryButtonTitle = primaryButtonTitle
     }
+}
+
+public enum VoiceInkMacOSOnboardingPresentation {
+    public static let modelDownload = VoiceInkMacOSOnboardingModelDownloadPresentation(
+        title: "Download AI Model",
+        subtitle: "We'll download the optimized model to get you started.",
+        continueButtonTitle: "Continue",
+        downloadingButtonTitle: "Downloading...",
+        setAsDefaultButtonTitle: VoiceInkModelManagementPresentation.setAsDefaultButtonTitle,
+        downloadButtonTitle: "Download Model",
+        speedLabel: "Speed",
+        accuracyLabel: "Accuracy",
+        ramLabel: "RAM"
+    )
 }
 
 public enum VoiceInkIOSOnboardingPresentation {

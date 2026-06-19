@@ -46,6 +46,36 @@ final class OnboardingPresentationTests: XCTestCase {
         XCTAssertEqual(presentation.continueButtonTitle, "Continue")
     }
 
+    func testMacOSModelDownloadOnboardingPresentationPreservesCopyAndButtonPolicy() {
+        let presentation = VoiceInkMacOSOnboardingPresentation.modelDownload
+
+        XCTAssertEqual(presentation.title, "Download AI Model")
+        XCTAssertEqual(presentation.subtitle, "We'll download the optimized model to get you started.")
+        XCTAssertEqual(presentation.continueButtonTitle, "Continue")
+        XCTAssertEqual(presentation.downloadingButtonTitle, "Downloading...")
+        XCTAssertEqual(presentation.setAsDefaultButtonTitle, "Set as Default")
+        XCTAssertEqual(presentation.downloadButtonTitle, "Download Model")
+        XCTAssertEqual(presentation.speedLabel, "Speed")
+        XCTAssertEqual(presentation.accuracyLabel, "Accuracy")
+        XCTAssertEqual(presentation.ramLabel, "RAM")
+        XCTAssertEqual(
+            presentation.buttonTitle(isModelSet: true, isDownloading: true, isModelDownloaded: true),
+            "Continue"
+        )
+        XCTAssertEqual(
+            presentation.buttonTitle(isModelSet: false, isDownloading: true, isModelDownloaded: true),
+            "Downloading..."
+        )
+        XCTAssertEqual(
+            presentation.buttonTitle(isModelSet: false, isDownloading: false, isModelDownloaded: true),
+            "Set as Default"
+        )
+        XCTAssertEqual(
+            presentation.buttonTitle(isModelSet: false, isDownloading: false, isModelDownloaded: false),
+            "Download Model"
+        )
+    }
+
     func testIOSReadyOnboardingPresentationPreservesCopyAndStepOrder() {
         let presentation = VoiceInkIOSOnboardingPresentation.ready
 

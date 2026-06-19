@@ -306,6 +306,21 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptFileExport.swift
 
 require_pattern \
+  "shared language display fallback lives in VoiceInkCore" \
+  'displayName\(for languageCode: String|fallback: String = "Unknown"' \
+  VoiceInkCore/Sources/VoiceInkCore/LanguageCatalog.swift
+
+require_pattern \
+  "macOS language picker uses shared language display fallback" \
+  'VoiceInkLanguageCatalog\.displayName' \
+  "VoiceInk/Views/AI Models/LanguageSelectionView.swift"
+
+reject_pattern \
+  "macOS language picker avoids shell-only language display fallback" \
+  'private func +currentLanguageDisplayName|\?\? "Unknown"' \
+  "VoiceInk/Views/AI Models/LanguageSelectionView.swift"
+
+require_pattern \
   "macOS save button uses shared timestamped markdown export" \
   'VoiceInkTranscriptFileExport\.markdownContent\(for: textToSave\)' \
   VoiceInk/Views/Common/SaveIconButton.swift

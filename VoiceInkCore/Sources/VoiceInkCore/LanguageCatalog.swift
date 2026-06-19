@@ -278,6 +278,14 @@ public enum VoiceInkLanguageCatalog {
                 return lhs.code.localizedCaseInsensitiveCompare(rhs.code) == .orderedAscending
             }
     }
+
+    public static func displayName(
+        for languageCode: String,
+        in languages: [String: String],
+        fallback: String = "Unknown"
+    ) -> String {
+        languages[languageCode] ?? fallback
+    }
 }
 
 public enum VoiceInkTranscriptionLanguageSupport {

@@ -239,6 +239,31 @@ final class LanguageCatalogTests: XCTestCase {
         )
     }
 
+    func testDisplayNameUsesLanguageMapThenFallback() {
+        XCTAssertEqual(
+            VoiceInkLanguageCatalog.displayName(
+                for: "es",
+                in: ["es": "Spanish", "en": "English"]
+            ),
+            "Spanish"
+        )
+        XCTAssertEqual(
+            VoiceInkLanguageCatalog.displayName(
+                for: "bad",
+                in: ["es": "Spanish", "en": "English"]
+            ),
+            "Unknown"
+        )
+        XCTAssertEqual(
+            VoiceInkLanguageCatalog.displayName(
+                for: "bad",
+                in: ["es": "Spanish"],
+                fallback: "Unavailable"
+            ),
+            "Unavailable"
+        )
+    }
+
     func testRequestLanguageStripsAutoAndBlankValues() {
         XCTAssertNil(VoiceInkTranscriptionLanguageSupport.requestLanguage(nil))
         XCTAssertNil(VoiceInkTranscriptionLanguageSupport.requestLanguage(""))

@@ -60,11 +60,6 @@ struct LanguageSelectionView: View {
         updateLanguage(currentModel.validTranscriptionLanguageOrFallback(selectedLanguage))
     }
 
-    // Get the display name of the current language
-    private func currentLanguageDisplayName() -> String {
-        return availableLanguagesForCurrentModel()[selectedLanguage] ?? "Unknown"
-    }
-
     private var selectedLanguageBinding: Binding<String> {
         Binding(
             get: { selectedLanguage },
@@ -209,7 +204,12 @@ struct LanguageSelectionView: View {
                         }
                     } label: {
                         HStack {
-                            Text("Language: \(currentLanguageDisplayName())")
+                            Text(
+                                "Language: " + VoiceInkLanguageCatalog.displayName(
+                                    for: selectedLanguage,
+                                    in: availableLanguagesForCurrentModel()
+                                )
+                            )
                             Image(systemName: "chevron.up.chevron.down")
                                 .font(.system(size: 10))
                         }

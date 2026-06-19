@@ -56,4 +56,16 @@ final class PowerModePresentationTests: XCTestCase {
         XCTAssertEqual(VoiceInkPowerModePresentation.websiteTriggerCountText(1), "1 Website")
         XCTAssertEqual(VoiceInkPowerModePresentation.websiteTriggerCountText(3), "3 Websites")
     }
+
+    func testDeleteConfirmationPreservesPowerModeCopy() {
+        let confirmation = VoiceInkPowerModePresentation.deleteConfirmation(configName: "Writing")
+
+        XCTAssertEqual(confirmation.title, "Delete Power Mode?")
+        XCTAssertEqual(
+            confirmation.message,
+            "Are you sure you want to delete the 'Writing' power mode? This action cannot be undone."
+        )
+        XCTAssertEqual(confirmation.primaryButtonTitle, "Delete")
+        XCTAssertEqual(confirmation.cancelButtonTitle, "Cancel")
+    }
 }

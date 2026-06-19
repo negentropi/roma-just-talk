@@ -1985,6 +1985,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
 
 require_pattern \
+  "shared Power Mode delete confirmation copy lives in VoiceInkCore" \
+  'deleteConfirmationTitle|deleteConfirmation\(configName:' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
+
+require_pattern \
   "macOS Power Mode rows use shared selected-language display formatting" \
   'VoiceInkPowerModePresentation\.selectedLanguageDisplayText' \
   VoiceInk/PowerMode/PowerModeViewComponents.swift
@@ -1993,6 +1998,16 @@ require_pattern \
   "macOS Power Mode rows use shared trigger-count display formatting" \
   'VoiceInkPowerModePresentation\.(appTriggerCountText|websiteTriggerCountText)' \
   VoiceInk/PowerMode/PowerModeViewComponents.swift
+
+require_pattern \
+  "macOS Power Mode row context menu uses shared delete confirmation copy" \
+  'VoiceInkPowerModePresentation\.deleteConfirmation\(configName:' \
+  VoiceInk/PowerMode/PowerModeViewComponents.swift
+
+require_pattern \
+  "macOS Power Mode edit form uses shared delete confirmation copy" \
+  'VoiceInkPowerModePresentation\.deleteConfirmation(Title|\(configName:)' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
 
 reject_pattern \
   "macOS Power Mode rows avoid shell-only selected-language fallback formatting" \
@@ -2003,6 +2018,16 @@ reject_pattern \
   "macOS Power Mode rows avoid shell-only trigger-count pluralization" \
   'websiteCount == 1|appCount == 1|[0-9] (App|Apps|Website|Websites)' \
   VoiceInk/PowerMode/PowerModeViewComponents.swift
+
+reject_pattern \
+  "macOS Power Mode row context menu avoids shell-only delete confirmation copy" \
+  'Delete Power Mode\?|Are you sure you want to delete|This action cannot be undone|addButton\(withTitle: +"(Delete|Cancel)"' \
+  VoiceInk/PowerMode/PowerModeViewComponents.swift
+
+reject_pattern \
+  "macOS Power Mode edit form avoids shell-only delete confirmation copy" \
+  'Delete Power Mode\?|Are you sure you want to delete|This action cannot be undone' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
 
 require_pattern \
   "shared Power Mode config record lives in VoiceInkCore" \

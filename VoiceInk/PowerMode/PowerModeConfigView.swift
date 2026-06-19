@@ -536,20 +536,21 @@ struct ConfigurationView: View {
             .scrollContentBackground(.hidden)
             .background(Color(NSColor.controlBackgroundColor))
             .confirmationDialog(
-                "Delete Power Mode?",
+                VoiceInkPowerModePresentation.deleteConfirmationTitle,
                 isPresented: $isShowingDeleteConfirmation,
                 titleVisibility: .visible
             ) {
                 if case .edit(let config) = mode {
-                    Button("Delete", role: .destructive) {
+                    let deleteConfirmation = VoiceInkPowerModePresentation.deleteConfirmation(configName: config.name)
+                    Button(deleteConfirmation.primaryButtonTitle, role: .destructive) {
                         powerModeManager.removeConfiguration(with: config.id)
                         onDismiss()
                     }
                 }
-                Button("Cancel", role: .cancel) { }
+                Button(VoiceInkPowerModePresentation.deleteConfirmationCancelButtonTitle, role: .cancel) { }
             } message: {
                 if case .edit(let config) = mode {
-                    Text("Are you sure you want to delete the '\(config.name)' power mode? This action cannot be undone.")
+                    Text(VoiceInkPowerModePresentation.deleteConfirmation(configName: config.name).message)
                 }
             }
             .powerModeValidationAlert(errors: validationErrors, isPresented: $showValidationAlert)

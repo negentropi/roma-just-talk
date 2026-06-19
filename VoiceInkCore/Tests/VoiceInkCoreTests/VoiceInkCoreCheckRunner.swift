@@ -371,6 +371,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PowerModePresentationTests.testDisplayNameTrimsAndCombinesEmojiAndName", run: { PowerModePresentationTests().testDisplayNameTrimsAndCombinesEmojiAndName() }),
             VoiceInkCoreCheck(name: "PowerModePresentationTests.testSelectedLanguageDisplayTextPreservesPowerModeRowFallbacks", run: { PowerModePresentationTests().testSelectedLanguageDisplayTextPreservesPowerModeRowFallbacks() }),
             VoiceInkCoreCheck(name: "PowerModePresentationTests.testTriggerCountTextPreservesPowerModeRowPluralization", run: { PowerModePresentationTests().testTriggerCountTextPreservesPowerModeRowPluralization() }),
+            VoiceInkCoreCheck(name: "PowerModePresentationTests.testDeleteConfirmationPreservesPowerModeCopy", run: { PowerModePresentationTests().testDeleteConfirmationPreservesPowerModeCopy() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeTriggerConfigsPreserveStoredShapeAndIdEquality", run: { try PowerModePolicyTests().testPowerModeTriggerConfigsPreserveStoredShapeAndIdEquality() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeTriggerConfigsAdaptToPolicyRules", run: { PowerModePolicyTests().testPowerModeTriggerConfigsAdaptToPolicyRules() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeConfigPreservesStoredShapeEqualityAndRuleAdapter", run: { try PowerModePolicyTests().testPowerModeConfigPreservesStoredShapeEqualityAndRuleAdapter() }),

@@ -339,12 +339,13 @@ struct ConfigurationRow: View {
             Label("Edit", systemImage: "pencil")
         }
         Button(role: .destructive, action: {
+            let deleteConfirmation = VoiceInkPowerModePresentation.deleteConfirmation(configName: config.name)
             let alert = NSAlert()
-            alert.messageText = "Delete Power Mode?"
-            alert.informativeText = "Are you sure you want to delete the '\(config.name)' power mode? This action cannot be undone."
+            alert.messageText = deleteConfirmation.title
+            alert.informativeText = deleteConfirmation.message
             alert.alertStyle = .warning
-            alert.addButton(withTitle: "Delete")
-            alert.addButton(withTitle: "Cancel")
+            alert.addButton(withTitle: deleteConfirmation.primaryButtonTitle)
+            alert.addButton(withTitle: deleteConfirmation.cancelButtonTitle)
             alert.buttons[0].hasDestructiveAction = true
             
             if alert.runModal() == .alertFirstButtonReturn {

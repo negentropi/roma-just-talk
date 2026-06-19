@@ -384,6 +384,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeApplicationStatePreservesStoredShapeAndCleanupKeys", run: { try PowerModePolicyTests().testPowerModeApplicationStatePreservesStoredShapeAndCleanupKeys() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeApplicationStateDecodesLegacyRemovePunctuation", run: { try PowerModePolicyTests().testPowerModeApplicationStateDecodesLegacyRemovePunctuation() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeSessionPreservesStoredShapeAndOriginalState", run: { try PowerModePolicyTests().testPowerModeSessionPreservesStoredShapeAndOriginalState() }),
+            VoiceInkCoreCheck(name: "PowerModePolicyTests.testConfigurationModePreservesFormTitlesAndSaveModes", run: { PowerModePolicyTests().testConfigurationModePreservesFormTitlesAndSaveModes() }),
+            VoiceInkCoreCheck(name: "PowerModePolicyTests.testConfigurationModePreservesEditIdentityByConfigId", run: { PowerModePolicyTests().testConfigurationModePreservesEditIdentityByConfigId() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testAutoSendKeyPreservesStoredValuesPickerOrderAndLabels", run: { PowerModePolicyTests().testAutoSendKeyPreservesStoredValuesPickerOrderAndLabels() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testAutoSendKeyEnablementAndCodableShape", run: { try PowerModePolicyTests().testAutoSendKeyEnablementAndCodableShape() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testNormalizedWebsiteURLPreservesExistingMacOSCleanURLPolicy", run: { PowerModePolicyTests().testNormalizedWebsiteURLPreservesExistingMacOSCleanURLPolicy() }),

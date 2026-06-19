@@ -560,6 +560,36 @@ final class PowerModePolicyTests: XCTestCase {
         )
     }
 
+    func testConfigurationModePreservesFormTitlesAndSaveModes() {
+        let id = UUID()
+        let editMode = VoiceInkPowerModeConfigurationMode.edit(
+            config(id: id, name: "Writing", emoji: "W")
+        )
+
+        XCTAssertTrue(VoiceInkPowerModeConfigurationMode.add.isAdding)
+        XCTAssertFalse(editMode.isAdding)
+        XCTAssertEqual(VoiceInkPowerModeConfigurationMode.add.title, "Add Power Mode")
+        XCTAssertEqual(editMode.title, "Edit Power Mode")
+        XCTAssertEqual(VoiceInkPowerModeConfigurationMode.add.saveMode, .add)
+        XCTAssertEqual(editMode.saveMode, .edit(id))
+    }
+
+    func testConfigurationModePreservesEditIdentityByConfigId() {
+        let id = UUID()
+        let first = VoiceInkPowerModeConfigurationMode.edit(
+            config(id: id, name: "Writing", emoji: "W")
+        )
+        let renamed = VoiceInkPowerModeConfigurationMode.edit(
+            config(id: id, name: "Renamed", emoji: "R")
+        )
+        let other = VoiceInkPowerModeConfigurationMode.edit(
+            config(id: UUID(), name: "Writing", emoji: "W")
+        )
+
+        XCTAssertEqual(first, renamed)
+        XCTAssertFalse(first == other)
+    }
+
     func testValidationErrorDescriptionsPreserveMacOSAlertText() {
         XCTAssertEqual(
             VoiceInkPowerModeValidationError.emptyName.localizedDescription,

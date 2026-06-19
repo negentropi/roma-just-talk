@@ -575,6 +575,60 @@ public enum VoiceInkPowerModeSaveMode: Equatable, Sendable {
     case edit(UUID)
 }
 
+public enum VoiceInkPowerModeConfigurationMode: Hashable, Sendable {
+    case add
+    case edit(PowerModeConfig)
+
+    public var isAdding: Bool {
+        if case .add = self {
+            return true
+        }
+        return false
+    }
+
+    public var title: String {
+        switch self {
+        case .add:
+            return "Add Power Mode"
+        case .edit:
+            return "Edit Power Mode"
+        }
+    }
+
+    public var saveMode: VoiceInkPowerModeSaveMode {
+        switch self {
+        case .add:
+            return .add
+        case .edit(let config):
+            return .edit(config.id)
+        }
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        switch self {
+        case .add:
+            hasher.combine(0)
+        case .edit(let config):
+            hasher.combine(1)
+            hasher.combine(config.id)
+        }
+    }
+
+    public static func == (
+        lhs: VoiceInkPowerModeConfigurationMode,
+        rhs: VoiceInkPowerModeConfigurationMode
+    ) -> Bool {
+        switch (lhs, rhs) {
+        case (.add, .add):
+            return true
+        case (.edit(let lhsConfig), .edit(let rhsConfig)):
+            return lhsConfig.id == rhsConfig.id
+        default:
+            return false
+        }
+    }
+}
+
 public enum VoiceInkPowerModeValidationError: Error, Equatable, Identifiable, Sendable {
     case emptyName
     case duplicateName(String)

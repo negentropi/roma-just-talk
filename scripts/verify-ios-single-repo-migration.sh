@@ -2065,6 +2065,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
+  "shared Power Mode form mode lives in VoiceInkCore" \
+  'VoiceInkPowerModeConfigurationMode' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
   "shared Power Mode configuration persistence lives in VoiceInkCore" \
   'VoiceInkPowerModeConfigurationPreference|activePowerModeConfigurationId' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
@@ -2175,6 +2180,22 @@ require_pattern \
 require_pattern \
   "macOS Power Mode form consumes shared trigger config records" \
   'VoiceInkPowerMode(App|URL)Config' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+require_pattern \
+  "macOS Power Mode panel consumes shared form mode" \
+  'VoiceInkPowerModeConfigurationMode' \
+  VoiceInk/PowerMode/PowerModeView.swift
+
+require_pattern \
+  "macOS Power Mode config form consumes shared save mode" \
+  'VoiceInkPowerModeConfigurationMode|mode\.saveMode' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+reject_pattern \
+  "macOS Power Mode avoids shell-only form mode and save-mode adapters" \
+  'enum +ConfigurationMode|powerModeSaveMode' \
+  VoiceInk/PowerMode/PowerModeView.swift \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
 require_pattern \

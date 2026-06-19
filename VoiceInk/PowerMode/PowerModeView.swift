@@ -15,44 +15,6 @@ extension View {
     }
 }
 
-enum ConfigurationMode: Hashable {
-    case add
-    case edit(PowerModeConfig)
-    
-    var isAdding: Bool {
-        if case .add = self { return true }
-        return false
-    }
-    
-    var title: String {
-        switch self {
-        case .add: return "Add Power Mode"
-        case .edit: return "Edit Power Mode"
-        }
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        switch self {
-        case .add:
-            hasher.combine(0)
-        case .edit(let config):
-            hasher.combine(1)
-            hasher.combine(config.id)
-        }
-    }
-    
-    static func == (lhs: ConfigurationMode, rhs: ConfigurationMode) -> Bool {
-        switch (lhs, rhs) {
-        case (.add, .add):
-            return true
-        case (.edit(let lhsConfig), .edit(let rhsConfig)):
-            return lhsConfig.id == rhsConfig.id
-        default:
-            return false
-        }
-    }
-}
-
 enum ConfigurationType {
     case application
     case website
@@ -64,7 +26,7 @@ struct PowerModeView: View {
     @StateObject private var powerModeManager = PowerModeManager.shared
     @EnvironmentObject private var enhancementService: AIEnhancementService
     @EnvironmentObject private var aiService: AIService
-    @State private var configurationMode: ConfigurationMode?
+    @State private var configurationMode: VoiceInkPowerModeConfigurationMode?
     @State private var isPanelOpen = false
     @State private var panelID = UUID()
     @State private var isReorderPanelOpen = false
@@ -210,7 +172,7 @@ struct PowerModeView: View {
             }
     }
 
-    private func openPanel(mode: ConfigurationMode) {
+    private func openPanel(mode: VoiceInkPowerModeConfigurationMode) {
         configurationMode = mode
         panelID = UUID()
         withAnimation(.smooth(duration: 0.3)) {

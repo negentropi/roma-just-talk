@@ -2,7 +2,7 @@ import SwiftUI
 import VoiceInkCore
 
 struct ConfigurationView: View {
-    let mode: ConfigurationMode
+    let mode: VoiceInkPowerModeConfigurationMode
     let powerModeManager: PowerModeManager
     var onDismiss: () -> Void
     @EnvironmentObject var enhancementService: AIEnhancementService
@@ -70,7 +70,11 @@ struct ConfigurationView: View {
         )
     }
 
-    init(mode: ConfigurationMode, powerModeManager: PowerModeManager, onDismiss: @escaping () -> Void) {
+    init(
+        mode: VoiceInkPowerModeConfigurationMode,
+        powerModeManager: PowerModeManager,
+        onDismiss: @escaping () -> Void
+    ) {
         self.mode = mode
         self.powerModeManager = powerModeManager
         self.onDismiss = onDismiss
@@ -732,7 +736,7 @@ struct ConfigurationView: View {
         let config = getConfigForForm()
         validationErrors = VoiceInkPowerModePolicy.validateForSave(
             candidate: config.powerModePolicyRule,
-            mode: mode.powerModeSaveMode,
+            mode: mode.saveMode,
             existing: powerModeManager.configurations.powerModePolicyRules
         )
 
@@ -762,17 +766,6 @@ struct ConfigurationView: View {
         }
 
         ShortcutStore.removeShortcutStorage(for: .powerMode(powerModeConfigId))
-    }
-}
-
-private extension ConfigurationMode {
-    var powerModeSaveMode: VoiceInkPowerModeSaveMode {
-        switch self {
-        case .add:
-            return .add
-        case .edit(let config):
-            return .edit(config.id)
-        }
     }
 }
 

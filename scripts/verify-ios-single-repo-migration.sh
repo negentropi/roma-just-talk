@@ -2282,6 +2282,21 @@ reject_pattern \
   VoiceInk/Services/AudioFileTranscriptionService.swift
 
 require_pattern \
+  "shared enhancement settings presentation lives in VoiceInkCore" \
+  'VoiceInkEnhancementSettingsPresentation|shortEnhancementWordOptions|timeoutRetryOptions' \
+  VoiceInkCore/Sources/VoiceInkCore/EnhancementSettingsPresentation.swift
+
+require_pattern \
+  "macOS enhancement settings use shared presentation" \
+  'VoiceInkEnhancementSettingsPresentation\.macOS|presentation\.(skipShortEnhancementTitle|timeoutOptions|timeoutRetryOptions)' \
+  VoiceInk/Views/Components/EnhancementSettingsPanel.swift
+
+reject_pattern \
+  "macOS enhancement settings avoid shell-only presentation copy and option ranges" \
+  '"(Enhancement Settings|Close|Clipboard Context|Use clipboard text to understand context for better enhancement\.|Screen Context|Capture on-screen text to understand context for better enhancement\.|Context|Skip short transcriptions|Minimum words|Timeout duration|On timeout|Fail immediately|Retry|Request Timeout|Set how long to wait for the AI provider to respond\.|Shortcuts)"|ForEach\(1\.\.\.15|\[3, 5, 7, 10, 15, 20, 30, 40, 50, 60\]' \
+  VoiceInk/Views/Components/EnhancementSettingsPanel.swift
+
+require_pattern \
   "shared core owns transcription session route planning" \
   'VoiceInkTranscription(SessionRouteFacts|SessionRoutePlan)|VoiceInkTranscriptionStreamingAdapterKind' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionStreamingPreference.swift

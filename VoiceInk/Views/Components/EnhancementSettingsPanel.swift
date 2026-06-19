@@ -3,6 +3,7 @@ import VoiceInkCore
 
 struct EnhancementSettingsPanel: View {
     @EnvironmentObject private var enhancementService: AIEnhancementService
+    private let presentation = VoiceInkEnhancementSettingsPresentation.macOS
     @AppStorage(VoiceInkUserDefaultsKey.skipShortEnhancement)
     private var isSkipShortEnhancementEnabled = VoiceInkPreferenceDefault.skipShortEnhancement
     @AppStorage(VoiceInkUserDefaultsKey.shortEnhancementWordThreshold)
@@ -20,7 +21,7 @@ struct EnhancementSettingsPanel: View {
         VStack(spacing: 0) {
             // Header
             HStack(spacing: 12) {
-                Text("Enhancement Settings")
+                Text(presentation.title)
                     .font(.headline)
                     .fontWeight(.semibold)
                     .foregroundColor(.primary)
@@ -36,7 +37,7 @@ struct EnhancementSettingsPanel: View {
                         .clipShape(Circle())
                 }
                 .buttonStyle(.plain)
-                .help("Close")
+                .help(presentation.closeButtonHelp)
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
@@ -50,21 +51,21 @@ struct EnhancementSettingsPanel: View {
                 Section {
                     Toggle(isOn: $enhancementService.useClipboardContext) {
                         HStack(spacing: 4) {
-                            Text("Clipboard Context")
-                            InfoTip("Use clipboard text to understand context for better enhancement.")
+                            Text(presentation.clipboardContextTitle)
+                            InfoTip(presentation.clipboardContextHelp)
                         }
                     }
                     .toggleStyle(.switch)
 
                     Toggle(isOn: $enhancementService.useScreenCaptureContext) {
                         HStack(spacing: 4) {
-                            Text("Screen Context")
-                            InfoTip("Capture on-screen text to understand context for better enhancement.")
+                            Text(presentation.screenContextTitle)
+                            InfoTip(presentation.screenContextHelp)
                         }
                     }
                     .toggleStyle(.switch)
                 } header: {
-                    Text("Context")
+                    Text(presentation.contextSectionTitle)
                 }
 
                 Section {
@@ -90,15 +91,15 @@ struct EnhancementSettingsPanel: View {
                                 }
                             )) {
                                 HStack(spacing: 4) {
-                                    Text("Skip short transcriptions")
-                                    InfoTip("Automatically skip AI enhancement when the transcription has very few words. Short phrases like \"yes\", \"thank you\", or quick commands don't benefit from enhancement.")
+                                    Text(presentation.skipShortEnhancementTitle)
+                                    InfoTip(presentation.skipShortEnhancementHelp)
                                 }
                             }
                             .toggleStyle(.switch)
 
                             Spacer()
 
-                            Image(systemName: "chevron.right")
+                            Image(systemName: presentation.disclosureSystemImageName)
                                 .font(.system(size: 12, weight: .semibold))
                                 .foregroundColor(.secondary)
                                 .rotationEffect(.degrees(isSkipShortEnhancementEnabled && isShortEnhancementExpanded ? 90 : 0))
@@ -115,9 +116,9 @@ struct EnhancementSettingsPanel: View {
                         }
 
                         if isSkipShortEnhancementEnabled && isShortEnhancementExpanded {
-                            Picker("Minimum words", selection: $shortEnhancementWordThreshold) {
-                                ForEach(1...15, id: \.self) { count in
-                                    Text("\(count) \(count == 1 ? "word" : "words")").tag(count)
+                            Picker(presentation.minimumWordsPickerTitle, selection: $shortEnhancementWordThreshold) {
+                                ForEach(presentation.shortEnhancementWordOptions) { option in
+                                    Text(option.title).tag(option.value)
                                 }
                             }
                             .padding(.top, 12)
@@ -129,29 +130,30 @@ struct EnhancementSettingsPanel: View {
                 }
 
                 Section {
-                    Picker("Timeout duration", selection: $enhancementTimeoutSeconds) {
-                        ForEach([3, 5, 7, 10, 15, 20, 30, 40, 50, 60], id: \.self) { seconds in
-                            Text("\(seconds) seconds").tag(seconds)
+                    Picker(presentation.timeoutPickerTitle, selection: $enhancementTimeoutSeconds) {
+                        ForEach(presentation.timeoutOptions) { option in
+                            Text(option.title).tag(option.value)
                         }
                     }
                     .pickerStyle(.menu)
 
-                    Picker("On timeout", selection: $retryOnTimeout) {
-                        Text("Fail immediately").tag(false)
-                        Text("Retry").tag(true)
+                    Picker(presentation.timeoutRetryPickerTitle, selection: $retryOnTimeout) {
+                        ForEach(presentation.timeoutRetryOptions) { option in
+                            Text(option.title).tag(option.value)
+                        }
                     }
                     .pickerStyle(.menu)
                 } header: {
                     HStack(spacing: 4) {
-                        Text("Request Timeout")
-                        InfoTip("Set how long to wait for the AI provider to respond. If no response is received within this duration, you can either fail immediately and paste the original transcription, or retry the request (up to 3 attempts).")
+                        Text(presentation.requestTimeoutSectionTitle)
+                        InfoTip(presentation.requestTimeoutHelp)
                     }
                 }
 
                 Section {
                     EnhancementShortcutsView()
                 } header: {
-                    Text("Shortcuts")
+                    Text(presentation.shortcutsSectionTitle)
                 }
             }
             .formStyle(.grouped)

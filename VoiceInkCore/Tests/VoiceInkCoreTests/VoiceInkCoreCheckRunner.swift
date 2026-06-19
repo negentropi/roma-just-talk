@@ -213,6 +213,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "DurationPresentationTests.testCompactElapsedUsesMillisecondsForSubsecondDurations", run: { DurationPresentationTests().testCompactElapsedUsesMillisecondsForSubsecondDurations() }),
             VoiceInkCoreCheck(name: "DurationPresentationTests.testCompactElapsedUsesOneDecimalSecondsUnderOneMinute", run: { DurationPresentationTests().testCompactElapsedUsesOneDecimalSecondsUnderOneMinute() }),
             VoiceInkCoreCheck(name: "DurationPresentationTests.testCompactElapsedUsesMinutesAndRoundedSecondsFromOneMinute", run: { DurationPresentationTests().testCompactElapsedUsesMinutesAndRoundedSecondsFromOneMinute() }),
+            VoiceInkCoreCheck(name: "EnhancementSettingsPresentationTests.testMacOSEnhancementSettingsPresentationPreservesCopy", run: { EnhancementSettingsPresentationTests().testMacOSEnhancementSettingsPresentationPreservesCopy() }),
+            VoiceInkCoreCheck(name: "EnhancementSettingsPresentationTests.testMacOSEnhancementSettingsPresentationPreservesOptions", run: { EnhancementSettingsPresentationTests().testMacOSEnhancementSettingsPresentationPreservesOptions() }),
             VoiceInkCoreCheck(name: "FillerWordsTests.testDefaultWordsMatchMacOSCleanupDefaults", run: { FillerWordsTests().testDefaultWordsMatchMacOSCleanupDefaults() }),
             VoiceInkCoreCheck(name: "FillerWordsTests.testAddingNormalizesAndAppendsNewWord", run: { FillerWordsTests().testAddingNormalizesAndAppendsNewWord() }),
             VoiceInkCoreCheck(name: "FillerWordsTests.testInsertPlanNormalizesNewWords", run: { FillerWordsTests().testInsertPlanNormalizesNewWords() }),

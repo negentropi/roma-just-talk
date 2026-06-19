@@ -94,6 +94,11 @@ private struct SampleResult: Encodable {
     let index: Int
     let status: String
     let latencyMs: Double?
+    let baselineOccurrenceCount: Int
+    let visibleOccurrenceCount: Int
+    let focusedTextSource: String
+    let focusedTextRole: String?
+    let focusedTextError: String?
     let clipboardContainedExpectedText: Bool
 }
 
@@ -164,24 +169,84 @@ private let eventTapCallback: CGEventTapCallBack = { _, type, event, refcon in
 }
 
 private enum FocusedTextReader {
+    struct Snapshot {
+        let text: String?
+        let source: String
+        let role: String?
+        let error: String?
+    }
+
     static func text() -> String? {
+        snapshot().text
+    }
+
+    static func snapshot() -> Snapshot {
         let systemWideElement = AXUIElementCreateSystemWide()
+        var errors: [String] = []
+
+        if let focusedElement = axElementAttribute(
+            kAXFocusedUIElementAttribute,
+            from: systemWideElement,
+            source: "system",
+            errors: &errors
+        ) {
+            return snapshot(for: focusedElement, source: "system.focusedUIElement")
+        }
+
+        if let focusedApplication = axElementAttribute(
+            kAXFocusedApplicationAttribute,
+            from: systemWideElement,
+            source: "system",
+            errors: &errors
+        ) {
+            if let focusedElement = axElementAttribute(
+                kAXFocusedUIElementAttribute,
+                from: focusedApplication,
+                source: "focusedApplication",
+                errors: &errors
+            ) {
+                return snapshot(for: focusedElement, source: "focusedApplication.focusedUIElement")
+            }
+        }
+
+        return Snapshot(
+            text: nil,
+            source: "none",
+            role: nil,
+            error: errors.joined(separator: "; ")
+        )
+    }
+
+    private static func axElementAttribute(
+        _ attribute: String,
+        from element: AXUIElement,
+        source: String,
+        errors: inout [String]
+    ) -> AXUIElement? {
         var focusedValue: CFTypeRef?
-        guard AXUIElementCopyAttributeValue(
-            systemWideElement,
-            kAXFocusedUIElementAttribute as CFString,
-            &focusedValue
-        ) == .success,
-            let focusedValue,
-            CFGetTypeID(focusedValue) == AXUIElementGetTypeID()
-        else {
+        let result = AXUIElementCopyAttributeValue(element, attribute as CFString, &focusedValue)
+        guard result == .success else {
+            errors.append("\(source).\(attribute) failed \(result.rawValue)")
             return nil
         }
 
-        let focusedElement = focusedValue as! AXUIElement
-        return stringAttribute(kAXValueAttribute, from: focusedElement)
-            ?? stringAttribute(kAXTitleAttribute, from: focusedElement)
-            ?? stringAttribute(kAXDescriptionAttribute, from: focusedElement)
+        guard let focusedValue, CFGetTypeID(focusedValue) == AXUIElementGetTypeID() else {
+            errors.append("\(source).\(attribute) was not an AXUIElement")
+            return nil
+        }
+
+        return (focusedValue as! AXUIElement)
+    }
+
+    private static func snapshot(for element: AXUIElement, source: String) -> Snapshot {
+        let role = stringAttribute(kAXRoleAttribute, from: element)
+        let text = stringAttribute(kAXValueAttribute, from: element)
+        return Snapshot(
+            text: text,
+            source: source,
+            role: role,
+            error: text == nil ? "\(source).\(kAXValueAttribute) unreadable" : nil
+        )
     }
 
     private static func stringAttribute(_ attribute: String, from element: AXUIElement) -> String? {
@@ -305,17 +370,41 @@ private func clipboardContains(_ expectedText: String) -> Bool {
     NSPasteboard.general.string(forType: .string)?.contains(expectedText) == true
 }
 
+private struct VisibleTextObservation {
+    let latencyMs: Double
+    let occurrenceCount: Int
+    let snapshot: FocusedTextReader.Snapshot
+}
+
+private func occurrenceCount(of needle: String, in haystack: String?) -> Int {
+    guard let haystack, !needle.isEmpty else { return 0 }
+    var count = 0
+    var searchStart = haystack.startIndex
+    while let range = haystack.range(of: needle, range: searchStart..<haystack.endIndex) {
+        count += 1
+        searchStart = range.upperBound
+    }
+    return count
+}
+
 private func waitForVisibleText(
     expectedText: String,
+    baselineOccurrenceCount: Int,
     releaseTime: DispatchTime,
     timeoutMs: Double,
     pollMs: Double
-) -> Double? {
+) -> VisibleTextObservation? {
     let deadline = DispatchTime.now() + .milliseconds(Int(timeoutMs.rounded()))
     while DispatchTime.now() < deadline {
-        if FocusedTextReader.text()?.contains(expectedText) == true {
+        let snapshot = FocusedTextReader.snapshot()
+        let occurrenceCount = occurrenceCount(of: expectedText, in: snapshot.text)
+        if occurrenceCount > baselineOccurrenceCount {
             let elapsedNs = DispatchTime.now().uptimeNanoseconds - releaseTime.uptimeNanoseconds
-            return Double(elapsedNs) / 1_000_000.0
+            return VisibleTextObservation(
+                latencyMs: Double(elapsedNs) / 1_000_000.0,
+                occurrenceCount: occurrenceCount,
+                snapshot: snapshot
+            )
         }
         Thread.sleep(forTimeInterval: pollMs / 1_000.0)
     }
@@ -345,28 +434,59 @@ private func runHarness(config: HarnessConfig) -> HarnessReport {
         let waiter = KeyReleaseWaiter(trigger: config.trigger)
         guard let releaseTime = waiter.wait(timeoutMs: config.timeoutMs) else {
             let clipboardHit = clipboardContains(expectedText)
+            let snapshot = FocusedTextReader.snapshot()
+            let visibleOccurrenceCount = occurrenceCount(of: expectedText, in: snapshot.text)
             sampleResults.append(SampleResult(
                 index: sampleIndex,
                 status: "no-trigger",
                 latencyMs: nil,
+                baselineOccurrenceCount: visibleOccurrenceCount,
+                visibleOccurrenceCount: visibleOccurrenceCount,
+                focusedTextSource: snapshot.source,
+                focusedTextRole: snapshot.role,
+                focusedTextError: snapshot.error,
                 clipboardContainedExpectedText: clipboardHit
             ))
             print("FAIL no trigger release observed")
             continue
         }
 
-        let latencyMs = waitForVisibleText(
+        let baselineSnapshot = FocusedTextReader.snapshot()
+        let baselineOccurrenceCount = occurrenceCount(of: expectedText, in: baselineSnapshot.text)
+        if baselineOccurrenceCount > 0 {
+            print("Focused text already contains \(baselineOccurrenceCount) occurrence(s) at release; waiting for a new occurrence.")
+        } else if let error = baselineSnapshot.error {
+            print("Focused text unreadable at release: \(error)")
+        }
+        let observation = waitForVisibleText(
             expectedText: expectedText,
+            baselineOccurrenceCount: baselineOccurrenceCount,
             releaseTime: releaseTime,
             timeoutMs: config.timeoutMs,
             pollMs: config.pollMs
         )
+        let latencyMs = observation?.latencyMs
         let clipboardHit = clipboardContains(expectedText)
-        let sampleStatus = status(for: latencyMs, thresholdMs: config.thresholdMs, bestMs: config.bestMs)
+        let finalSnapshot = observation?.snapshot ?? FocusedTextReader.snapshot()
+        let visibleOccurrenceCount = observation?.occurrenceCount
+            ?? occurrenceCount(of: expectedText, in: finalSnapshot.text)
+        let sampleStatus: String
+        if latencyMs == nil && finalSnapshot.text == nil {
+            sampleStatus = "focused-text-unreadable"
+        } else if latencyMs == nil && clipboardHit {
+            sampleStatus = "clipboard-only"
+        } else {
+            sampleStatus = status(for: latencyMs, thresholdMs: config.thresholdMs, bestMs: config.bestMs)
+        }
         sampleResults.append(SampleResult(
             index: sampleIndex,
             status: sampleStatus,
             latencyMs: latencyMs,
+            baselineOccurrenceCount: baselineOccurrenceCount,
+            visibleOccurrenceCount: visibleOccurrenceCount,
+            focusedTextSource: finalSnapshot.source,
+            focusedTextRole: finalSnapshot.role,
+            focusedTextError: finalSnapshot.error,
             clipboardContainedExpectedText: clipboardHit
         ))
 

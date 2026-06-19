@@ -72,8 +72,19 @@ The harness fails when any sample does not make the expected text visible before
 the timeout, or when p95 visible-text latency exceeds `440ms`. Samples at or
 below `220ms` are labeled `BEST`.
 
+Each sample records the focused text field's existing marker count at hotkey
+release and only passes when that count increases. This prevents repeated
+samples from passing on marker text left by an earlier run, while still allowing
+you to launch the harness first and then focus the target app before triggering
+Roma.
+
 If the expected text reaches the clipboard but not the focused text field before
-timeout, the result is classified as a paste-target failure.
+timeout, the result is classified as `clipboard-only`.
+
+If macOS does not expose a focused `AXValue` text surface to the harness, the
+sample is classified as `focused-text-unreadable` and the JSON includes the AX
+error. This usually means the helper app still needs Accessibility, the target
+field is not focused, or the app does not expose editable text through AXValue.
 
 ## JSON Output
 

@@ -498,26 +498,24 @@ struct ExperimentalSection: View {
     @ObservedObject private var playbackController = PlaybackController.shared
     @ObservedObject private var mediaController = MediaController.shared
     @State private var isPauseMediaExpanded = false
+    private static let presentation = VoiceInkRecordingFeedbackPreference.macOSSettingsPresentation
 
     var body: some View {
         Section {
             ExpandableSettingsRow(
                 isExpanded: $isPauseMediaExpanded,
                 isEnabled: $playbackController.isPauseMediaEnabled,
-                label: "Pause Media While Recording",
-                infoMessage: "Pauses playing media when recording starts and resumes when done."
+                label: Self.presentation.pauseMediaLabel,
+                infoMessage: Self.presentation.pauseMediaInfoMessage
             ) {
-                Picker("Resume Delay", selection: $mediaController.audioResumptionDelay) {
-                    Text("0s").tag(0.0)
-                    Text("1s").tag(1.0)
-                    Text("2s").tag(2.0)
-                    Text("3s").tag(3.0)
-                    Text("4s").tag(4.0)
-                    Text("5s").tag(5.0)
+                Picker(Self.presentation.pauseMediaResumeDelayLabel, selection: $mediaController.audioResumptionDelay) {
+                    ForEach(Self.presentation.audioResumptionDelayOptions) { option in
+                        Text(option.label).tag(option.value)
+                    }
                 }
             }
         } header: {
-            Text("Experimental")
+            Text(Self.presentation.experimentalSectionTitle)
         }
     }
 }

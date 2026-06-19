@@ -37,19 +37,31 @@ public struct VoiceInkMacOSRecordingFeedbackSettingsPresentation: Equatable, Sen
     public let systemMuteModeLabel: String
     public let audioResumptionDelayLabel: String
     public let audioResumptionDelayOptions: [VoiceInkRecordingFeedbackDelayOption]
+    public let experimentalSectionTitle: String
+    public let pauseMediaLabel: String
+    public let pauseMediaInfoMessage: String
+    public let pauseMediaResumeDelayLabel: String
 
     public init(
         sectionTitle: String,
         soundFeedbackLabel: String,
         systemMuteModeLabel: String,
         audioResumptionDelayLabel: String,
-        audioResumptionDelayOptions: [VoiceInkRecordingFeedbackDelayOption]
+        audioResumptionDelayOptions: [VoiceInkRecordingFeedbackDelayOption],
+        experimentalSectionTitle: String,
+        pauseMediaLabel: String,
+        pauseMediaInfoMessage: String,
+        pauseMediaResumeDelayLabel: String
     ) {
         self.sectionTitle = sectionTitle
         self.soundFeedbackLabel = soundFeedbackLabel
         self.systemMuteModeLabel = systemMuteModeLabel
         self.audioResumptionDelayLabel = audioResumptionDelayLabel
         self.audioResumptionDelayOptions = audioResumptionDelayOptions
+        self.experimentalSectionTitle = experimentalSectionTitle
+        self.pauseMediaLabel = pauseMediaLabel
+        self.pauseMediaInfoMessage = pauseMediaInfoMessage
+        self.pauseMediaResumeDelayLabel = pauseMediaResumeDelayLabel
     }
 }
 
@@ -87,7 +99,11 @@ public enum VoiceInkRecordingFeedbackPreference {
             VoiceInkRecordingFeedbackDelayOption(label: "3s", value: 3.0),
             VoiceInkRecordingFeedbackDelayOption(label: "4s", value: 4.0),
             VoiceInkRecordingFeedbackDelayOption(label: "5s", value: 5.0)
-        ]
+        ],
+        experimentalSectionTitle: "Experimental",
+        pauseMediaLabel: "Pause Media While Recording",
+        pauseMediaInfoMessage: "Pauses playing media when recording starts and resumes when done.",
+        pauseMediaResumeDelayLabel: "Resume Delay"
     )
 
     public static func systemMuteMode(from defaults: UserDefaults = .standard) -> VoiceInkSystemMuteMode {

@@ -46,6 +46,13 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
         XCTAssertEqual(presentation.soundFeedbackLabel, "Sound Feedback")
         XCTAssertEqual(presentation.systemMuteModeLabel, "Mute Audio While Recording")
         XCTAssertEqual(presentation.audioResumptionDelayLabel, "Audio Resume Delay")
+        XCTAssertEqual(presentation.experimentalSectionTitle, "Experimental")
+        XCTAssertEqual(presentation.pauseMediaLabel, "Pause Media While Recording")
+        XCTAssertEqual(
+            presentation.pauseMediaInfoMessage,
+            "Pauses playing media when recording starts and resumes when done."
+        )
+        XCTAssertEqual(presentation.pauseMediaResumeDelayLabel, "Resume Delay")
         XCTAssertEqual(
             presentation.audioResumptionDelayOptions,
             [

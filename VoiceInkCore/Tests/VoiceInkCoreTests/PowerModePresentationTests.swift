@@ -88,6 +88,30 @@ final class PowerModePresentationTests: XCTestCase {
         XCTAssertEqual(VoiceInkPowerModePresentation.rowDeleteActionTitle, "Delete")
     }
 
+    func testConfigurationFormChromePreservesMacOSCopy() {
+        XCTAssertEqual(VoiceInkPowerModePresentation.formCloseHelpText, "Close")
+        XCTAssertEqual(VoiceInkPowerModePresentation.generalSectionTitle, "General")
+        XCTAssertEqual(VoiceInkPowerModePresentation.nameFieldPlaceholder, "Name")
+        XCTAssertEqual(VoiceInkPowerModePresentation.triggerScenariosSectionTitle, "Trigger Scenarios")
+        XCTAssertEqual(VoiceInkPowerModePresentation.applicationsSectionTitle, "Applications")
+        XCTAssertEqual(VoiceInkPowerModePresentation.addApplicationHelpText, "Add application")
+        XCTAssertEqual(VoiceInkPowerModePresentation.noApplicationsText, "No applications added")
+        XCTAssertEqual(VoiceInkPowerModePresentation.websitesSectionTitle, "Websites")
+        XCTAssertEqual(VoiceInkPowerModePresentation.websiteURLFieldPlaceholder, "Enter website URL")
+        XCTAssertEqual(VoiceInkPowerModePresentation.addWebsiteHelpText, "Add website")
+        XCTAssertEqual(VoiceInkPowerModePresentation.noWebsitesText, "No websites added")
+        XCTAssertEqual(VoiceInkPowerModePresentation.transcriptionSectionTitle, "Transcription")
+        XCTAssertEqual(VoiceInkPowerModePresentation.transcriptionModelPickerTitle, "Model")
+        XCTAssertEqual(VoiceInkPowerModePresentation.transcriptionLanguageTitle, "Language")
+        XCTAssertEqual(VoiceInkPowerModePresentation.autodetectedLanguageText, "Autodetected")
+        XCTAssertEqual(VoiceInkPowerModePresentation.aiEnhancementSectionTitle, "AI Enhancement")
+        XCTAssertEqual(VoiceInkPowerModePresentation.aiEnhancementToggleTitle, "AI Enhancement")
+        XCTAssertEqual(VoiceInkPowerModePresentation.advancedSectionTitle, "Advanced")
+        XCTAssertEqual(VoiceInkPowerModePresentation.formDeleteButtonTitle, "Delete")
+        XCTAssertEqual(VoiceInkPowerModePresentation.formCancelButtonTitle, "Cancel")
+        XCTAssertEqual(VoiceInkPowerModePresentation.formSaveButtonTitle, "Save Changes")
+    }
+
     func testDeleteConfirmationPreservesPowerModeCopy() {
         let confirmation = VoiceInkPowerModePresentation.deleteConfirmation(configName: "Writing")
 

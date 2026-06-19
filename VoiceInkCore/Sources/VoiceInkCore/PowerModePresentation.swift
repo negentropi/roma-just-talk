@@ -66,11 +66,12 @@ public struct VoiceInkPowerModeRowDetailPresentation: Equatable, Sendable {
 
 public enum VoiceInkPowerModePresentation {
     public static let defaultOverrideDisplayText = "Default"
+    public static let closeHelpText = "Close"
     public static let panelTitle = "Power Modes"
     public static let panelSubtitle = "Automate your workflows with context-aware configurations."
     public static let reorderButtonTitle = "Reorder"
     public static let reorderPanelTitle = "Reorder Power Modes"
-    public static let reorderPanelCloseHelpText = "Close"
+    public static let reorderPanelCloseHelpText = closeHelpText
     public static let defaultBadgeTitle = defaultOverrideDisplayText
     public static let disabledBadgeTitle = "Disabled"
     public static let emptyPanelTitle = "No Power Modes Yet"
@@ -81,12 +82,33 @@ public enum VoiceInkPowerModePresentation {
     public static let popoverTitle = "Select Power Mode"
     public static let popoverEmptyTitle = "No Power Modes Available"
     public static let rowEditActionTitle = "Edit"
+    public static let formCloseHelpText = closeHelpText
+    public static let generalSectionTitle = "General"
+    public static let nameFieldPlaceholder = "Name"
+    public static let triggerScenariosSectionTitle = "Trigger Scenarios"
+    public static let applicationsSectionTitle = "Applications"
+    public static let addApplicationHelpText = "Add application"
+    public static let noApplicationsText = "No applications added"
+    public static let websitesSectionTitle = "Websites"
+    public static let websiteURLFieldPlaceholder = "Enter website URL"
+    public static let addWebsiteHelpText = "Add website"
+    public static let noWebsitesText = "No websites added"
+    public static let transcriptionSectionTitle = "Transcription"
+    public static let transcriptionModelPickerTitle = "Model"
+    public static let transcriptionLanguageTitle = "Language"
+    public static let autodetectedLanguageText = "Autodetected"
+    public static let aiEnhancementSectionTitle = "AI Enhancement"
+    public static let aiEnhancementToggleTitle = aiEnhancementSectionTitle
+    public static let advancedSectionTitle = "Advanced"
+    public static let formSaveButtonTitle = "Save Changes"
     public static let autoLanguageDisplayText = "Auto"
     public static let englishLanguageDisplayText = "English"
     public static let deleteConfirmationTitle = "Delete Power Mode?"
     public static let deleteConfirmationPrimaryButtonTitle = "Delete"
+    public static let formDeleteButtonTitle = deleteConfirmationPrimaryButtonTitle
     public static let rowDeleteActionTitle = deleteConfirmationPrimaryButtonTitle
     public static let deleteConfirmationCancelButtonTitle = "Cancel"
+    public static let formCancelButtonTitle = deleteConfirmationCancelButtonTitle
     public static let validationAlertTitle = "Cannot Save Power Mode"
     public static let validationAlertButtonTitle = "OK"
     public static let validationAlertFallbackMessage = "Please fix the validation errors before saving."

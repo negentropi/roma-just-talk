@@ -207,6 +207,9 @@ public struct VoiceInkPowerModeConfigurationDraft: Equatable, Sendable {
 }
 
 public struct VoiceInkPowerModeConfigurationFormState: Equatable, Sendable {
+    public static let addDefaultName = ""
+    public static let addDefaultEmoji = "✏️"
+
     public var id: UUID
     public var name: String
     public var emoji: String
@@ -272,8 +275,8 @@ public struct VoiceInkPowerModeConfigurationFormState: Equatable, Sendable {
     ) -> Self {
         Self(
             id: id,
-            name: "",
-            emoji: "✏️",
+            name: addDefaultName,
+            emoji: addDefaultEmoji,
             isAIEnhancementEnabled: false,
             selectedAIProvider: selectedAIProvider
         )

@@ -10,8 +10,8 @@ struct ConfigurationView: View {
     @EnvironmentObject private var transcriptionModelManager: TranscriptionModelManager
     @FocusState private var isNameFieldFocused: Bool
 
-    @State private var configName: String = "New Power Mode"
-    @State private var selectedEmoji: String = "💼"
+    @State private var configName: String = VoiceInkPowerModeConfigurationFormState.addDefaultName
+    @State private var selectedEmoji: String = VoiceInkPowerModeConfigurationFormState.addDefaultEmoji
     @State private var isShowingEmojiPicker = false
     @State private var isShowingAppPicker = false
     @State private var isAIEnhancementEnabled: Bool
@@ -141,7 +141,7 @@ struct ConfigurationView: View {
                         .clipShape(Circle())
                 }
                 .buttonStyle(.plain)
-                .help("Close")
+                .help(VoiceInkPowerModePresentation.formCloseHelpText)
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
@@ -149,7 +149,7 @@ struct ConfigurationView: View {
             .overlay(Divider().opacity(0.5), alignment: .bottom)
 
             Form {
-                Section("General") {
+                Section(VoiceInkPowerModePresentation.generalSectionTitle) {
                     HStack(spacing: 12) {
                         Button {
                             isShowingEmojiPicker.toggle()
@@ -170,18 +170,18 @@ struct ConfigurationView: View {
                             )
                         }
 
-                        TextField("Name", text: $configName)
+                        TextField(VoiceInkPowerModePresentation.nameFieldPlaceholder, text: $configName)
                             .textFieldStyle(.roundedBorder)
                             .focused($isNameFieldFocused)
                     }
                 }
 
-                Section("Trigger Scenarios") {
+                Section(VoiceInkPowerModePresentation.triggerScenariosSectionTitle) {
                     VStack(alignment: .leading, spacing: 10) {
                         HStack {
-                            Text("Applications")
+                            Text(VoiceInkPowerModePresentation.applicationsSectionTitle)
                             Spacer()
-                            AddIconButton(helpText: "Add application") {
+                            AddIconButton(helpText: VoiceInkPowerModePresentation.addApplicationHelpText) {
                                 loadInstalledApps()
                                 isShowingAppPicker = true
                             }
@@ -195,7 +195,7 @@ struct ConfigurationView: View {
                         }
 
                         if selectedAppConfigs.isEmpty {
-                            Text("No applications added")
+                            Text(VoiceInkPowerModePresentation.noApplicationsText)
                                 .foregroundColor(.secondary)
                                 .font(.subheadline)
                         } else {
@@ -238,20 +238,20 @@ struct ConfigurationView: View {
                     .padding(.vertical, 2)
 
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("Websites")
+                        Text(VoiceInkPowerModePresentation.websitesSectionTitle)
 
                         HStack {
-                            TextField("Enter website URL", text: $newWebsiteURL)
+                            TextField(VoiceInkPowerModePresentation.websiteURLFieldPlaceholder, text: $newWebsiteURL)
                                 .textFieldStyle(.roundedBorder)
                                 .onSubmit { addWebsite() }
 
-                            AddIconButton(helpText: "Add website", isDisabled: newWebsiteURL.isEmpty) {
+                            AddIconButton(helpText: VoiceInkPowerModePresentation.addWebsiteHelpText, isDisabled: newWebsiteURL.isEmpty) {
                                 addWebsite()
                             }
                         }
 
                         if websiteConfigs.isEmpty {
-                            Text("No websites added")
+                            Text(VoiceInkPowerModePresentation.noWebsitesText)
                                 .foregroundColor(.secondary)
                                 .font(.subheadline)
                         } else {
@@ -285,7 +285,7 @@ struct ConfigurationView: View {
                     .padding(.vertical, 2)
                 }
 
-                Section("Transcription") {
+                Section(VoiceInkPowerModePresentation.transcriptionSectionTitle) {
                     if transcriptionModelManager.usableModels.isEmpty {
                         Text(VoiceInkPowerModePresentation.noTranscriptionModelsAvailableText)
                             .foregroundColor(.secondary)
@@ -301,7 +301,7 @@ struct ConfigurationView: View {
                             }
                         )
 
-                        Picker("Model", selection: modelBinding) {
+                        Picker(VoiceInkPowerModePresentation.transcriptionModelPickerTitle, selection: modelBinding) {
                             ForEach(transcriptionModelManager.usableModels, id: \.name) { model in
                                 Text(model.displayName).tag(model.name as String?)
                             }
@@ -323,8 +323,8 @@ struct ConfigurationView: View {
 
                         switch facts.languageControl {
                         case .disabledAutodetect:
-                            LabeledContent("Language") {
-                                Text("Autodetected")
+                            LabeledContent(VoiceInkPowerModePresentation.transcriptionLanguageTitle) {
+                                Text(VoiceInkPowerModePresentation.autodetectedLanguageText)
                                     .foregroundColor(.secondary)
                             }
                             .onAppear {
@@ -342,7 +342,7 @@ struct ConfigurationView: View {
                                 }
                             )
 
-                            Picker("Language", selection: languageBinding) {
+                            Picker(VoiceInkPowerModePresentation.transcriptionLanguageTitle, selection: languageBinding) {
                                 ForEach(VoiceInkLanguageCatalog.sortedOptions(facts.languageOptions)) { option in
                                     Text(option.name).tag(option.code as String?)
                                 }
@@ -413,8 +413,8 @@ struct ConfigurationView: View {
                     }
                 }
 
-                Section("AI Enhancement") {
-                    Toggle("AI Enhancement", isOn: $isAIEnhancementEnabled)
+                Section(VoiceInkPowerModePresentation.aiEnhancementSectionTitle) {
+                    Toggle(VoiceInkPowerModePresentation.aiEnhancementToggleTitle, isOn: $isAIEnhancementEnabled)
                         .onChange(of: isAIEnhancementEnabled) { _, newValue in
                             if newValue {
                                 applyEnhancementSelection(
@@ -511,7 +511,7 @@ struct ConfigurationView: View {
                     }
                 }
 
-                Section("Advanced") {
+                Section(VoiceInkPowerModePresentation.advancedSectionTitle) {
                     Toggle(isOn: $isDefault) {
                         HStack(spacing: 6) {
                             Text(VoiceInkPowerModePresentation.setAsDefaultToggleTitle)
@@ -605,12 +605,12 @@ struct ConfigurationView: View {
             VStack(spacing: 0) {
                 HStack {
                     if case .edit = mode {
-                        Button("Delete", role: .destructive) {
+                        Button(VoiceInkPowerModePresentation.formDeleteButtonTitle, role: .destructive) {
                             isShowingDeleteConfirmation = true
                         }
                         .buttonStyle(.bordered)
                     } else {
-                        Button("Cancel") { onDismiss() }
+                        Button(VoiceInkPowerModePresentation.formCancelButtonTitle) { onDismiss() }
                             .keyboardShortcut(.escape, modifiers: [])
                             .buttonStyle(.plain)
                             .foregroundColor(.secondary)
@@ -621,7 +621,7 @@ struct ConfigurationView: View {
                     Button {
                         saveConfiguration()
                     } label: {
-                        Text("Save Changes")
+                        Text(VoiceInkPowerModePresentation.formSaveButtonTitle)
                             .frame(minWidth: 100)
                     }
                     .buttonStyle(.borderedProminent)

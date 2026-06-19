@@ -4035,6 +4035,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
 
 require_pattern \
+  "shared Power Mode config form chrome copy lives in VoiceInkCore" \
+  'generalSectionTitle|nameFieldPlaceholder|triggerScenariosSectionTitle|applicationsSectionTitle|addApplicationHelpText|noApplicationsText|websitesSectionTitle|websiteURLFieldPlaceholder|addWebsiteHelpText|noWebsitesText|transcriptionSectionTitle|transcriptionModelPickerTitle|transcriptionLanguageTitle|autodetectedLanguageText|aiEnhancementSectionTitle|advancedSectionTitle|formSaveButtonTitle' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
+
+require_pattern \
   "macOS Power Mode rows use shared selected-language display formatting" \
   'VoiceInkPowerModePresentation\.selectedLanguageDisplayText' \
   VoiceInk/PowerMode/PowerModeViewComponents.swift
@@ -4068,6 +4073,11 @@ require_pattern \
   "macOS Power Mode popover uses shared chrome copy" \
   'VoiceInkPowerModePresentation\.(popoverTitle|popoverEmptyTitle)' \
   VoiceInk/PowerMode/PowerModePopover.swift
+
+require_pattern \
+  "macOS Power Mode config form uses shared chrome copy" \
+  'VoiceInkPowerModePresentation\.(formCloseHelpText|generalSectionTitle|nameFieldPlaceholder|triggerScenariosSectionTitle|applicationsSectionTitle|addApplicationHelpText|noApplicationsText|websitesSectionTitle|websiteURLFieldPlaceholder|addWebsiteHelpText|noWebsitesText|transcriptionSectionTitle|transcriptionModelPickerTitle|transcriptionLanguageTitle|autodetectedLanguageText|aiEnhancementSectionTitle|aiEnhancementToggleTitle|advancedSectionTitle|formDeleteButtonTitle|formCancelButtonTitle|formSaveButtonTitle)' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
 
 require_pattern \
   "macOS Power Mode edit form uses shared delete confirmation copy" \
@@ -4134,6 +4144,11 @@ require_pattern \
   'macOS Power Mode panel, sidebar empty state, reorder sheet, badges, row actions, and manual-selection popover copy route through `VoiceInkPowerModePresentation`' \
   docs/ios-single-repo-migration.md
 
+require_pattern \
+  "migration checklist tracks shared Power Mode config form chrome gate" \
+  'macOS Power Mode config form seed defaults, trigger-section labels, transcription section labels, AI toggle title, and footer actions route through `VoiceInkPowerModeConfigurationFormState`/`VoiceInkPowerModePresentation`' \
+  docs/ios-single-repo-migration.md
+
 reject_pattern \
   "macOS Power Mode rows avoid shell-only selected-language fallback formatting" \
   'langCode == "auto"|langCode == "en"|langCode\.uppercased\(\)' \
@@ -4157,6 +4172,11 @@ reject_pattern \
 reject_pattern \
   "macOS Power Mode edit form avoids duplicate advanced form chrome copy" \
   '"(Auto Send|Automatically presses a key combination after pasting text\. Useful for chat applications or forms that use different send shortcuts\.|Keyboard Shortcut|Assign a unique keyboard shortcut to instantly activate this Power Mode and start recording\.)"' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+reject_pattern \
+  "macOS Power Mode config form avoids shell-only trigger and section chrome copy" \
+  '"(New Power Mode|General|Name|Trigger Scenarios|Applications|Add application|No applications added|Websites|Enter website URL|Add website|No websites added|Transcription|Model|Language|Autodetected|AI Enhancement|Advanced|Save Changes)"|Button\("(Delete|Cancel)"|help\("Close"' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
 reject_pattern \
@@ -4383,6 +4403,16 @@ require_pattern \
   "shared Power Mode form state lives in VoiceInkCore" \
   'VoiceInkPowerModeConfigurationFormState|formState\(existingConfigurations:' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode form state owns add defaults" \
+  'addDefaultName|addDefaultEmoji' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "macOS Power Mode form seeds add defaults through shared form state" \
+  'VoiceInkPowerModeConfigurationFormState\.(addDefaultName|addDefaultEmoji)' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
 
 require_pattern \
   "macOS Power Mode form consumes shared form state" \

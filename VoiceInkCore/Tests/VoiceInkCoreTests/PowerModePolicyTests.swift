@@ -399,8 +399,10 @@ final class PowerModePolicyTests: XCTestCase {
         )
 
         XCTAssertEqual(formState.id, id)
-        XCTAssertEqual(formState.name, "")
-        XCTAssertEqual(formState.emoji, "✏️")
+        XCTAssertEqual(VoiceInkPowerModeConfigurationFormState.addDefaultName, "")
+        XCTAssertEqual(VoiceInkPowerModeConfigurationFormState.addDefaultEmoji, "✏️")
+        XCTAssertEqual(formState.name, VoiceInkPowerModeConfigurationFormState.addDefaultName)
+        XCTAssertEqual(formState.emoji, VoiceInkPowerModeConfigurationFormState.addDefaultEmoji)
         XCTAssertEqual(formState.appConfigs, [])
         XCTAssertEqual(formState.urlConfigs, [])
         XCTAssertFalse(formState.isAIEnhancementEnabled)

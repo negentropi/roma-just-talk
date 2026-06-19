@@ -543,8 +543,11 @@ struct AudioPlayerView: View {
     private func reEnhanceOnly() {
         guard let transcription = transcription else { return }
 
-        guard enhancementService.isEnhancementEnabled, enhancementService.isConfigured else {
-            showTemporaryBanner(.reEnhanceError("AI Enhancement is not enabled or configured"))
+        if let unavailableMessage = VoiceInkPostProcessingFailurePresentation.enhancementUnavailableMessage(
+            isEnabled: enhancementService.isEnhancementEnabled,
+            isConfigured: enhancementService.isConfigured
+        ) {
+            showTemporaryBanner(.reEnhanceError(unavailableMessage))
             return
         }
 

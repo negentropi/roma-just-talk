@@ -2376,9 +2376,14 @@ require_pattern \
   'VoiceInkTranscriptPresentation\.audioFile(ReEnhancement|Retranscription)(SuccessMessage|FailureMessage)' \
   VoiceInk/Views/AudioPlayerView.swift
 
+require_pattern \
+  "macOS audio player re-enhance guard uses shared post-processing presentation" \
+  'VoiceInkPostProcessingFailurePresentation\.enhancementUnavailableMessage' \
+  VoiceInk/Views/AudioPlayerView.swift
+
 reject_pattern \
-  "macOS audio player avoids shell-only action status copy" \
-  '"Retranscription successful"|"Re-enhancement successful"|"Retranscription failed"|"Re-enhancement failed"' \
+  "macOS audio player avoids shell-only action status and re-enhance guard copy" \
+  '"Retranscription successful"|"Re-enhancement successful"|"Retranscription failed"|"Re-enhancement failed"|"AI Enhancement is not enabled or configured"' \
   VoiceInk/Views/AudioPlayerView.swift
 
 require_pattern \

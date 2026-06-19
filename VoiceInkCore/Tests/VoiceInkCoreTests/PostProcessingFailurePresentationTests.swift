@@ -16,6 +16,40 @@ final class PostProcessingFailurePresentationTests: XCTestCase {
         )
     }
 
+    func testEnhancementUnavailableMessagePreservesMacOSGuardCopy() {
+        XCTAssertEqual(
+            VoiceInkPostProcessingFailurePresentation.enhancementUnavailableFallbackText,
+            "AI Enhancement is not enabled or configured"
+        )
+        XCTAssertEqual(
+            VoiceInkPostProcessingFailurePresentation.enhancementUnavailableMessage(
+                isEnabled: false,
+                isConfigured: true
+            ),
+            "AI Enhancement is not enabled or configured"
+        )
+        XCTAssertEqual(
+            VoiceInkPostProcessingFailurePresentation.enhancementUnavailableMessage(
+                isEnabled: true,
+                isConfigured: false
+            ),
+            "AI Enhancement is not enabled or configured"
+        )
+        XCTAssertEqual(
+            VoiceInkPostProcessingFailurePresentation.enhancementUnavailableMessage(
+                isEnabled: false,
+                isConfigured: false
+            ),
+            "AI Enhancement is not enabled or configured"
+        )
+        XCTAssertNil(
+            VoiceInkPostProcessingFailurePresentation.enhancementUnavailableMessage(
+                isEnabled: true,
+                isConfigured: true
+            )
+        )
+    }
+
     func testEnhancementFailureNotificationTitlePreservesEightyCharacterReasonLimit() {
         let reason = String(repeating: "a", count: 100)
         let title = VoiceInkPostProcessingFailurePresentation.enhancementFailureNotificationTitle(reason: reason)

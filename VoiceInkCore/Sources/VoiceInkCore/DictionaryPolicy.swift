@@ -119,6 +119,7 @@ public struct VoiceInkDictionarySettingsPresentation: Equatable, Sendable {
     public let wordReplacementHelpText: String?
     public let originalTextPlaceholder: String
     public let replacementTextPlaceholder: String
+    public let wordReplacementArrowSystemImageName: String
     public let addReplacementButtonTitle: String
     public let addReplacementButtonHelp: String?
     public let shortcutsSectionTitle: String?
@@ -146,6 +147,7 @@ public struct VoiceInkDictionarySettingsPresentation: Equatable, Sendable {
         wordReplacementHelpText: nil,
         originalTextPlaceholder: "Original text",
         replacementTextPlaceholder: "Replacement text",
+        wordReplacementArrowSystemImageName: "arrow.right",
         addReplacementButtonTitle: "Add Replacement",
         addReplacementButtonHelp: nil,
         shortcutsSectionTitle: nil,
@@ -174,6 +176,7 @@ public struct VoiceInkDictionarySettingsPresentation: Equatable, Sendable {
         wordReplacementHelpText: "Define word replacements to automatically replace specific words or phrases",
         originalTextPlaceholder: "Original text (use commas for multiple)",
         replacementTextPlaceholder: "Replacement text",
+        wordReplacementArrowSystemImageName: "arrow.right",
         addReplacementButtonTitle: "Add Replacement",
         addReplacementButtonHelp: "Add word replacement",
         shortcutsSectionTitle: "Shortcuts",

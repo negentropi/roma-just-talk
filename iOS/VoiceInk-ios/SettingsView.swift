@@ -135,7 +135,7 @@ struct SettingsView: View {
                 ForEach(Array(settings.wordReplacements.enumerated()), id: \.offset) { _, rule in
                     HStack(spacing: 8) {
                         Text(rule.originalText)
-                        Image(systemName: "arrow.right")
+                        Image(systemName: dictionaryPresentation.wordReplacementArrowSystemImageName)
                             .foregroundStyle(.secondary)
                         Text(rule.replacementText)
                             .foregroundStyle(.secondary)

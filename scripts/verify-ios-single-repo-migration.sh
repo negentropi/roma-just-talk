@@ -1588,7 +1588,7 @@ require_pattern \
 
 require_pattern \
   "shared dictionary settings presentation lives in VoiceInkCore" \
-  'VoiceInkDictionarySettingsPresentation|vocabularyPlaceholder|wordReplacementHelpText' \
+  'VoiceInkDictionarySettingsPresentation|vocabularyPlaceholder|wordReplacementHelpText|wordReplacementArrowSystemImageName' \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
 
 require_pattern \
@@ -1623,7 +1623,7 @@ require_pattern \
 
 require_pattern \
   "iOS settings uses shared dictionary settings presentation" \
-  'VoiceInkDictionarySettingsPresentation\.iOS|dictionaryPresentation' \
+  'VoiceInkDictionarySettingsPresentation\.iOS|dictionaryPresentation|wordReplacementArrowSystemImageName' \
   iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \
@@ -1717,6 +1717,11 @@ reject_pattern \
 reject_pattern \
   "iOS dictionary settings avoid shell-only presentation copy" \
   '"(Dictionary|Vocabulary term|Original text|Replacement text|Add Replacement)"' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+reject_pattern \
+  "iOS dictionary settings avoid duplicate word-replacement row arrow icon" \
+  '"arrow\.right"' \
   iOS/VoiceInk-ios/SettingsView.swift
 
 reject_pattern \

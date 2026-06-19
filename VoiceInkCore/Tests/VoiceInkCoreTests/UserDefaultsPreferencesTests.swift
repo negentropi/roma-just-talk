@@ -1162,6 +1162,8 @@ final class UserDefaultsPreferencesTests: XCTestCase {
                 VoiceInkWordReplacementRule(originalText: "roma", replacementText: "Roma Just Talk")
             ], to: defaults)
             VoiceInkCustomVocabularyPreference.saveTerms(["Roma", "Felix"], to: defaults)
+            VoiceInkDictionaryListSortPreference.saveVocabularySortMode(.wordDescending, to: defaults)
+            VoiceInkDictionaryListSortPreference.saveWordReplacementSortMode(.replacementDescending, to: defaults)
             VoiceInkTranscriptionLanguagePreference.saveSelectedLanguage("fr", to: defaults)
             VoiceInkTranscriptionPromptPreference.savePrompt("custom prompt", to: defaults)
             VoiceInkCurrentTranscriptionModelPreference.saveModelName("nova-3", to: defaults)
@@ -1243,6 +1245,11 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             XCTAssertEqual(VoiceInkFillerWordPreference.words(from: defaults), VoiceInkFillerWords.defaultWords)
             XCTAssertEqual(VoiceInkWordReplacementPreference.rules(from: defaults), [])
             XCTAssertEqual(VoiceInkCustomVocabularyPreference.terms(from: defaults), [])
+            XCTAssertEqual(VoiceInkDictionaryListSortPreference.vocabularySortMode(from: defaults), .wordAscending)
+            XCTAssertEqual(
+                VoiceInkDictionaryListSortPreference.wordReplacementSortMode(from: defaults),
+                .originalAscending
+            )
             XCTAssertEqual(
                 VoiceInkTranscriptionLanguagePreference.selectedLanguage(from: defaults),
                 VoiceInkLanguageCatalog.autoDetectCode

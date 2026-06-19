@@ -2049,8 +2049,13 @@ require_pattern \
 
 require_pattern \
   "shared dictionary list sort preferences live in VoiceInkCore" \
-  'VoiceInkDictionaryListSortPreference|vocabularySortModeKey = "vocabularySortMode"|wordReplacementSortModeKey = "wordReplacementSortMode"|saveVocabularySortMode|saveWordReplacementSortMode' \
+  'VoiceInkDictionaryListSortPreference|vocabularySortModeKey = "vocabularySortMode"|wordReplacementSortModeKey = "wordReplacementSortMode"|saveVocabularySortMode|saveWordReplacementSortMode|clear\(from defaults:' \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+require_pattern \
+  "shared preference reset clears dictionary sort preferences" \
+  'VoiceInkDictionaryListSortPreference\.clear' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared dictionary list sort policy lives in VoiceInkCore" \
@@ -2222,6 +2227,11 @@ reject_pattern \
 require_pattern \
   "migration checklist tracks shared dictionary sort gate" \
   'dictionary form/chrome, quick-add, word-replacement guidance, edit-sheet, list/row copy, sort mode storage/toggle/indicator policy, and vocabulary/word-replacement list sorting route through `VoiceInkDictionarySettingsPresentation`/`VoiceInkDictionaryQuickAddPresentation`/`VoiceInkWordReplacementInfoPresentation`/`VoiceInkWordReplacementEditPresentation`/`VoiceInkVocabularyListPresentation`/`VoiceInkWordReplacementListPresentation`/`VoiceInkDictionaryListSortPreference`/`VoiceInkDictionaryListSortPolicy`' \
+  docs/ios-single-repo-migration.md
+
+require_pattern \
+  "migration docs track dictionary sort reset coverage" \
+  'VoiceInkSharedPreferenceReset`, including modes, onboarding, verification flags, transcription prompt/language/model settings, cleanup settings, AI-enhancement provider/model settings, dynamic provider caches, custom prompts, VAD, dictionary sort preferences, and filler-word overrides' \
   docs/ios-single-repo-migration.md
 
 reject_pattern \

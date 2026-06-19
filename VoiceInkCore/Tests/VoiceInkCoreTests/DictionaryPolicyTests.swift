@@ -237,6 +237,11 @@ final class DictionaryPolicyTests: XCTestCase {
 
             XCTAssertEqual(VoiceInkDictionaryListSortPreference.vocabularySortMode(from: defaults), .wordDescending)
             XCTAssertEqual(VoiceInkDictionaryListSortPreference.wordReplacementSortMode(from: defaults), .replacementDescending)
+
+            VoiceInkDictionaryListSortPreference.clear(from: defaults)
+
+            XCTAssertEqual(VoiceInkDictionaryListSortPreference.vocabularySortMode(from: defaults), .wordAscending)
+            XCTAssertEqual(VoiceInkDictionaryListSortPreference.wordReplacementSortMode(from: defaults), .originalAscending)
         }
     }
 

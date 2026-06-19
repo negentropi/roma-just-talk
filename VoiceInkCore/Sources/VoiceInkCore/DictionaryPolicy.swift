@@ -437,6 +437,11 @@ public enum VoiceInkDictionaryListSortPreference {
     ) {
         defaults.set(mode.rawValue, forKey: wordReplacementSortModeKey)
     }
+
+    public static func clear(from defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: vocabularySortModeKey)
+        defaults.removeObject(forKey: wordReplacementSortModeKey)
+    }
 }
 
 public enum VoiceInkDictionaryListSortPolicy {

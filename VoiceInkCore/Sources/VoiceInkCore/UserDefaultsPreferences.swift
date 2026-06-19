@@ -1030,6 +1030,7 @@ public enum VoiceInkSharedPreferenceReset {
         VoiceInkFillerWordPreference.clearWords(from: defaults)
         VoiceInkWordReplacementPreference.clearRules(from: defaults)
         VoiceInkCustomVocabularyPreference.clearTerms(from: defaults)
+        VoiceInkDictionaryListSortPreference.clear(from: defaults)
         VoiceInkTranscriptionLanguagePreference.clearSelectedLanguage(from: defaults)
         VoiceInkCurrentTranscriptionModelPreference.clearModelName(from: defaults)
         VoiceInkAIEnhancementProviderPreference.clear(from: defaults)

@@ -457,24 +457,24 @@ struct PowerModeSection: View {
             ExpandableSettingsRow(
                 isExpanded: $isExpanded,
                 isEnabled: toggleBinding,
-                label: "Power Mode",
-                infoMessage: "Apply custom settings based on active app or website.",
-                infoURL: "https://tryvoiceink.com/docs/power-mode"
+                label: VoiceInkPowerModePresentation.settingsSectionTitle,
+                infoMessage: VoiceInkPowerModePresentation.settingsToggleHelpText,
+                infoURL: VoiceInkPowerModePresentation.panelLearnMoreURLString
             ) {
                 Toggle(isOn: $powerModePersistSettings) {
                     HStack(spacing: 4) {
-                        Text("Persist Configured Preferences")
-                        InfoTip("When enabled, Power Mode preferences stay active after you stop recording instead of reverting to your original preferences. They will only change when a different Power Mode activates.")
+                        Text(VoiceInkPowerModePresentation.persistConfiguredPreferencesTitle)
+                        InfoTip(VoiceInkPowerModePresentation.persistConfiguredPreferencesHelpText)
                     }
                 }
             }
         } header: {
-            Text("Power Mode")
+            Text(VoiceInkPowerModePresentation.settingsSectionTitle)
         }
-        .alert("Power Mode Still Active", isPresented: $showDisableAlert) {
-            Button("Got it", role: .cancel) { }
+        .alert(VoiceInkPowerModePresentation.settingsDisableAlertTitle, isPresented: $showDisableAlert) {
+            Button(VoiceInkPowerModePresentation.settingsDisableAlertButtonTitle, role: .cancel) { }
         } message: {
-            Text("Disable or remove your Power Modes first.")
+            Text(VoiceInkPowerModePresentation.settingsDisableAlertMessage)
         }
     }
 

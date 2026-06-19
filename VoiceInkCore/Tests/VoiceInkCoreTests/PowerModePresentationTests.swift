@@ -71,6 +71,22 @@ final class PowerModePresentationTests: XCTestCase {
             VoiceInkPowerModePresentation.panelLearnMoreURLString,
             "https://tryvoiceink.com/docs/power-mode"
         )
+        XCTAssertEqual(VoiceInkPowerModePresentation.settingsSectionTitle, "Power Mode")
+        XCTAssertEqual(
+            VoiceInkPowerModePresentation.settingsToggleHelpText,
+            "Apply custom settings based on active app or website."
+        )
+        XCTAssertEqual(VoiceInkPowerModePresentation.persistConfiguredPreferencesTitle, "Persist Configured Preferences")
+        XCTAssertEqual(
+            VoiceInkPowerModePresentation.persistConfiguredPreferencesHelpText,
+            "When enabled, Power Mode preferences stay active after you stop recording instead of reverting to your original preferences. They will only change when a different Power Mode activates."
+        )
+        XCTAssertEqual(VoiceInkPowerModePresentation.settingsDisableAlertTitle, "Power Mode Still Active")
+        XCTAssertEqual(VoiceInkPowerModePresentation.settingsDisableAlertButtonTitle, "Got it")
+        XCTAssertEqual(
+            VoiceInkPowerModePresentation.settingsDisableAlertMessage,
+            "Disable or remove your Power Modes first."
+        )
         XCTAssertEqual(VoiceInkPowerModePresentation.addButtonSystemImageName, "plus")
         XCTAssertEqual(VoiceInkPowerModePresentation.reorderButtonTitle, "Reorder")
         XCTAssertEqual(VoiceInkPowerModePresentation.reorderButtonSystemImageName, "arrow.up.arrow.down")

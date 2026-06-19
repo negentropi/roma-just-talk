@@ -4068,7 +4068,7 @@ require_pattern \
 
 require_pattern \
   "shared Power Mode panel sidebar popover chrome copy lives in VoiceInkCore" \
-  'panelTitle|panelSubtitle|panelInfoTipText|panelLearnMoreURLString|addButtonSystemImageName|reorderButtonTitle|reorderButtonSystemImageName|reorderPanelTitle|reorderPanelCloseHelpText|reorderPanelCloseSystemImageName|reorderHandleSystemImageName|defaultBadgeTitle|disabledBadgeTitle|emptyPanelTitle|emptyPanelSystemImageName|sidebarEmptyTitle|sidebarEmptyButtonTitle|sidebarEmptySystemImageName|addIconButtonSystemImageName|popoverTitle|popoverEmptyTitle|popoverEmptySystemImageName|popoverSelectedSystemImageName|rowEditActionTitle|rowEditActionSystemImageName|rowDeleteActionTitle|rowDeleteActionSystemImageName|appTriggerSystemImageName|websiteTriggerSystemImageName' \
+  'panelTitle|panelSubtitle|panelInfoTipText|panelLearnMoreURLString|settingsSectionTitle|settingsToggleHelpText|persistConfiguredPreferencesTitle|persistConfiguredPreferencesHelpText|settingsDisableAlertTitle|settingsDisableAlertButtonTitle|settingsDisableAlertMessage|addButtonSystemImageName|reorderButtonTitle|reorderButtonSystemImageName|reorderPanelTitle|reorderPanelCloseHelpText|reorderPanelCloseSystemImageName|reorderHandleSystemImageName|defaultBadgeTitle|disabledBadgeTitle|emptyPanelTitle|emptyPanelSystemImageName|sidebarEmptyTitle|sidebarEmptyButtonTitle|sidebarEmptySystemImageName|addIconButtonSystemImageName|popoverTitle|popoverEmptyTitle|popoverEmptySystemImageName|popoverSelectedSystemImageName|rowEditActionTitle|rowEditActionSystemImageName|rowDeleteActionTitle|rowDeleteActionSystemImageName|appTriggerSystemImageName|websiteTriggerSystemImageName' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
 
 require_pattern \
@@ -4105,6 +4105,11 @@ require_pattern \
   "macOS Power Mode panel uses shared chrome copy" \
   'VoiceInkPowerModePresentation\.(panelTitle|panelSubtitle|panelInfoTipText|panelLearnMoreURLString|addButtonSystemImageName|reorderButtonTitle|reorderButtonSystemImageName|emptyPanelTitle|emptyPanelMessage|emptyPanelSystemImageName|reorderPanelTitle|reorderPanelCloseHelpText|reorderPanelCloseSystemImageName|reorderHandleSystemImageName|defaultBadgeTitle|disabledBadgeTitle)' \
   VoiceInk/PowerMode/PowerModeView.swift
+
+require_pattern \
+  "macOS Power Mode settings uses shared presentation" \
+  'VoiceInkPowerModePresentation\.(settingsSectionTitle|settingsToggleHelpText|panelLearnMoreURLString|persistConfiguredPreferencesTitle|persistConfiguredPreferencesHelpText|settingsDisableAlertTitle|settingsDisableAlertButtonTitle|settingsDisableAlertMessage)' \
+  VoiceInk/Views/Settings/SettingsView.swift
 
 require_pattern \
   "macOS Power Mode sidebar and row actions use shared chrome copy" \
@@ -4188,7 +4193,7 @@ require_pattern \
 
 require_pattern \
   "migration checklist tracks shared Power Mode chrome copy gate" \
-  'macOS Power Mode panel, sidebar empty state, reorder sheet, badges, row actions, manual-selection popover copy, panel help URL, and panel/reorder/sidebar/form/app-picker/popover/row trigger/action symbols route through `VoiceInkPowerModePresentation`' \
+  'macOS Power Mode settings row, disable-alert copy, panel, sidebar empty state, reorder sheet, badges, row actions, manual-selection popover copy, panel help URL, and panel/reorder/sidebar/form/app-picker/popover/row trigger/action symbols route through `VoiceInkPowerModePresentation`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \
@@ -4273,6 +4278,11 @@ reject_pattern \
   VoiceInk/PowerMode/PowerModeView.swift \
   VoiceInk/PowerMode/PowerModeViewComponents.swift \
   VoiceInk/PowerMode/PowerModePopover.swift
+
+reject_pattern \
+  "macOS Power Mode settings avoid shell-only presentation copy" \
+  'label: "Power Mode"|Text\("Power Mode"\)|infoMessage: "Apply custom settings based on active app or website\."|Text\("Persist Configured Preferences"\)|InfoTip\("When enabled, Power Mode preferences stay active after you stop recording instead of reverting to your original preferences\. They will only change when a different Power Mode activates\."\)|\.alert\("Power Mode Still Active"|Button\("Got it"|Text\("Disable or remove your Power Modes first\."\)' \
+  VoiceInk/Views/Settings/SettingsView.swift
 
 reject_pattern \
   "macOS Power Mode popover avoids shell-only symbol metadata" \

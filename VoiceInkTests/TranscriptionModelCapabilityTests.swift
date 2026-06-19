@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+import VoiceInkCore
 @testable import VoiceInk
 
 private struct CapabilityTestModel: TranscriptionModel {
@@ -21,7 +22,7 @@ struct TranscriptionModelCapabilityTests {
     }
 
     @Test func localFluidAudioUsesShortFinalCommitTimeout() {
-        #expect(StreamingFinalCommitTimeout.nanoseconds(for: .fluidAudio) == 1_000_000_000)
-        #expect(StreamingFinalCommitTimeout.nanoseconds(for: .deepgram) == 10_000_000_000)
+        #expect(VoiceInkStreamingFinalCommitTimeout.nanoseconds(for: .localFluidAudio) == 1_000_000_000)
+        #expect(VoiceInkStreamingFinalCommitTimeout.nanoseconds(for: .cloud) == 10_000_000_000)
     }
 }

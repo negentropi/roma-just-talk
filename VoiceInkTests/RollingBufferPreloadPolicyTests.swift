@@ -1,6 +1,11 @@
 import Foundation
 import Testing
+import VoiceInkCore
 @testable import VoiceInk
+
+private typealias RollingBufferPreloadMode = VoiceInkRollingBufferPreloadMode
+private typealias RollingBufferPreloadPolicy = VoiceInkRollingBufferPreloadPolicy
+private typealias RollingBufferPreloadSettings = VoiceInkRollingBufferPreloadSettings
 
 private struct TestTranscriptionModel: TranscriptionModel {
     let id = UUID()
@@ -11,6 +16,12 @@ private struct TestTranscriptionModel: TranscriptionModel {
     let isMultilingualModel = true
     let supportsStreaming: Bool
     let supportedLanguages: [String: String] = [:]
+}
+
+private extension VoiceInkRollingBufferPreloadPolicy {
+    func allowsPreload(for model: any TranscriptionModel, perModelEnabled: Bool) -> Bool {
+        allowsPreload(for: model.rollingBufferPreloadSnapshot, perModelEnabled: perModelEnabled)
+    }
 }
 
 @Suite(.serialized)

@@ -4,6 +4,8 @@ import VoiceInkCore
 @testable import VoiceInk
 
 private typealias RollingBufferPowerState = VoiceInkRollingBufferPowerState
+private typealias RollingBufferPreloadMode = VoiceInkRollingBufferPreloadMode
+private typealias RollingBufferPreloadSettings = VoiceInkRollingBufferPreloadSettings
 
 private struct TestPreloadModel: TranscriptionModel {
     let id = UUID()

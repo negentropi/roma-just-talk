@@ -160,7 +160,7 @@ struct WaveformView: View {
                     HStack {
                         ProgressView()
                             .controlSize(.small)
-                        Text("Loading...")
+                        Text(VoiceInkAudioPlaybackPresentation.loadingText)
                             .font(.system(size: 10))
                             .foregroundColor(.secondary)
                     }
@@ -438,7 +438,7 @@ struct AudioPlayerView: View {
                     }
 
                     CircleIconButton(
-                        icon: playerManager.isPlaying ? "pause.fill" : "play.fill",
+                        icon: VoiceInkAudioPlaybackPresentation.playPauseSystemImageName(isPlaying: playerManager.isPlaying),
                         action: { playerManager.isPlaying ? playerManager.pause() : playerManager.play() }
                     )
                     .scaleEffect(isHovering ? 1.05 : 1.0)

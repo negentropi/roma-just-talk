@@ -2011,6 +2011,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
 
 require_pattern \
+  "shared audio playback presentation lives in VoiceInkCore" \
+  'VoiceInkAudioPlaybackPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
+
+require_pattern \
   "macOS audio player uses shared playback-rate policy" \
   'VoiceInkAudioPlaybackRate' \
   VoiceInk/Views/AudioPlayerView.swift
@@ -2025,11 +2030,27 @@ require_pattern \
   'VoiceInkAudioPlaybackRate' \
   iOS/VoiceInk-ios/AudioPlayerView.swift
 
+require_pattern \
+  "macOS audio player uses shared playback presentation" \
+  'VoiceInkAudioPlaybackPresentation' \
+  VoiceInk/Views/AudioPlayerView.swift
+
+require_pattern \
+  "iOS audio player view uses shared playback presentation" \
+  'VoiceInkAudioPlaybackPresentation' \
+  iOS/VoiceInk-ios/AudioPlayerView.swift
+
 reject_pattern \
   "platform audio players avoid raw playback-rate storage key and labels" \
   '"audioPlaybackRate"|"1×"|"1\.5×"|"2×"' \
   VoiceInk/Views/AudioPlayerView.swift \
   iOS/VoiceInk-ios/AudioPlayer.swift \
+  iOS/VoiceInk-ios/AudioPlayerView.swift
+
+reject_pattern \
+  "platform audio player views avoid duplicate loading and play-pause presentation" \
+  '"Loading\.\.\."|"pause\.fill"|"play\.fill"' \
+  VoiceInk/Views/AudioPlayerView.swift \
   iOS/VoiceInk-ios/AudioPlayerView.swift
 
 require_pattern \

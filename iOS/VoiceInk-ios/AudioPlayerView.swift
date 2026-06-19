@@ -38,7 +38,7 @@ struct AudioPlayerView: View {
                         .scaleEffect(0.8)
                         .tint(.blue)
                     
-                    Text("Loading...")
+                    Text(VoiceInkAudioPlaybackPresentation.loadingText)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                     
@@ -61,7 +61,7 @@ struct AudioPlayerView: View {
                             .fill(.blue)
                             .frame(width: 44, height: 44)
                             .overlay(
-                                Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
+                                Image(systemName: VoiceInkAudioPlaybackPresentation.playPauseSystemImageName(isPlaying: player.isPlaying))
                                     .font(.system(size: 16, weight: .semibold))
                                     .foregroundStyle(.white)
                                     .offset(x: player.isPlaying ? 0 : 1)

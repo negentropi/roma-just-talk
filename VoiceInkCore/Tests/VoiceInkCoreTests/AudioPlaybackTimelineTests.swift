@@ -82,4 +82,10 @@ final class AudioPlaybackTimelineTests: XCTestCase {
         VoiceInkAudioPlaybackRate.clear(from: defaults)
         XCTAssertEqual(VoiceInkAudioPlaybackRate.current(from: defaults), 1.0)
     }
+
+    func testPlaybackPresentationPreservesPlatformLoadingAndPlayPauseCopy() {
+        XCTAssertEqual(VoiceInkAudioPlaybackPresentation.loadingText, "Loading...")
+        XCTAssertEqual(VoiceInkAudioPlaybackPresentation.playPauseSystemImageName(isPlaying: true), "pause.fill")
+        XCTAssertEqual(VoiceInkAudioPlaybackPresentation.playPauseSystemImageName(isPlaying: false), "play.fill")
+    }
 }

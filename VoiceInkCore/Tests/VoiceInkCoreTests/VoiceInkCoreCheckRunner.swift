@@ -88,6 +88,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testPlaybackRateCyclesThroughExistingMacOSOrder", run: { AudioPlaybackTimelineTests().testPlaybackRateCyclesThroughExistingMacOSOrder() }),
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testPlaybackRateLabelsPreserveExistingMacOSPresentation", run: { AudioPlaybackTimelineTests().testPlaybackRateLabelsPreserveExistingMacOSPresentation() }),
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testPlaybackRatePreferenceUsesSharedStorageKey", run: { AudioPlaybackTimelineTests().testPlaybackRatePreferenceUsesSharedStorageKey() }),
+            VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testPlaybackPresentationPreservesPlatformLoadingAndPlayPauseCopy", run: { AudioPlaybackTimelineTests().testPlaybackPresentationPreservesPlatformLoadingAndPlayPauseCopy() }),
             VoiceInkCoreCheck(name: "AudioTranscriptionServiceFactoryTests.testRemoteProvidersUseRemoteFactory", run: { try await AudioTranscriptionServiceFactoryTests().testRemoteProvidersUseRemoteFactory() }),
             VoiceInkCoreCheck(name: "AudioTranscriptionServiceFactoryTests.testLocalWhisperProviderUsesLocalFactory", run: { try await AudioTranscriptionServiceFactoryTests().testLocalWhisperProviderUsesLocalFactory() }),
             VoiceInkCoreCheck(name: "ContextualCapitalizationFormatterTests.testLowercasesTitlecaseTextAfterMidSentencePrefix", run: { ContextualCapitalizationFormatterTests().testLowercasesTitlecaseTextAfterMidSentencePrefix() }),

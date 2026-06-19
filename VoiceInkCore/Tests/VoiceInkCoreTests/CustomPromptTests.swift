@@ -485,6 +485,7 @@ final class CustomPromptTests: XCTestCase {
         XCTAssertTrue(VoiceInkCustomPromptPresentation.iconSystemNames.contains("bubble.left.and.bubble.right.fill"))
         XCTAssertTrue(VoiceInkCustomPromptPresentation.iconSystemNames.contains("brain.head.profile"))
         XCTAssertEqual(VoiceInkCustomPromptPresentation.addPromptTitle, "Add New")
+        XCTAssertEqual(VoiceInkCustomPromptPresentation.addPromptSystemImageName, "plus.circle.fill")
         XCTAssertEqual(VoiceInkCustomPromptPresentation.promptGridEmptyText, "No prompts available")
         XCTAssertEqual(
             VoiceInkCustomPromptPresentation.promptGridHelpText,
@@ -525,9 +526,12 @@ final class CustomPromptTests: XCTestCase {
         XCTAssertEqual(VoiceInkCustomPromptPresentation.useSystemTemplateTitle, "Use System Template")
         XCTAssertEqual(VoiceInkCustomPromptPresentation.triggerWordsSectionTitle, "Trigger Words")
         XCTAssertEqual(VoiceInkCustomPromptPresentation.triggerWordPlaceholder, "Add trigger word")
+        XCTAssertEqual(VoiceInkCustomPromptPresentation.addTriggerWordSystemImageName, "plus.circle.fill")
+        XCTAssertEqual(VoiceInkCustomPromptPresentation.removeTriggerWordSystemImageName, "xmark")
         XCTAssertEqual(VoiceInkCustomPromptPresentation.noTriggerWordsText, "No trigger words added")
         XCTAssertEqual(VoiceInkCustomPromptPresentation.startWithTemplateTitle, "Start with Template")
         XCTAssertEqual(VoiceInkCustomPromptPresentation.startWithTemplateIconSystemName, "sparkles")
+        XCTAssertEqual(VoiceInkCustomPromptPresentation.closeSystemImageName, "xmark")
     }
 
     func testCustomPromptPresentationFormatsTriggerSummaryAndDeleteAlert() throws {
@@ -541,7 +545,9 @@ final class CustomPromptTests: XCTestCase {
         XCTAssertEqual(multiSummary.text, "\"email...\" +1")
 
         XCTAssertEqual(VoiceInkCustomPromptPresentation.editActionTitle, "Edit")
+        XCTAssertEqual(VoiceInkCustomPromptPresentation.editActionSystemImageName, "pencil")
         XCTAssertEqual(VoiceInkCustomPromptPresentation.deleteActionTitle, "Delete")
+        XCTAssertEqual(VoiceInkCustomPromptPresentation.deleteActionSystemImageName, "trash")
         XCTAssertEqual(VoiceInkCustomPromptPresentation.cancelActionTitle, "Cancel")
         XCTAssertEqual(VoiceInkCustomPromptPresentation.deletePromptConfirmationTitle, "Delete Prompt?")
         XCTAssertEqual(

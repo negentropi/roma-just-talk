@@ -139,7 +139,10 @@ extension VoiceInkCustomPrompt {
                     Button {
                         onEdit(self)
                     } label: {
-                        Label(VoiceInkCustomPromptPresentation.editActionTitle, systemImage: "pencil")
+                        Label(
+                            VoiceInkCustomPromptPresentation.editActionTitle,
+                            systemImage: VoiceInkCustomPromptPresentation.editActionSystemImageName
+                        )
                     }
                 }
                 
@@ -157,7 +160,10 @@ extension VoiceInkCustomPrompt {
                             onDelete(self)
                         }
                     } label: {
-                        Label(VoiceInkCustomPromptPresentation.deleteActionTitle, systemImage: "trash")
+                        Label(
+                            VoiceInkCustomPromptPresentation.deleteActionTitle,
+                            systemImage: VoiceInkCustomPromptPresentation.deleteActionSystemImageName
+                        )
                     }
                 }
             }
@@ -219,7 +225,7 @@ extension VoiceInkCustomPrompt {
                     .blur(radius: 2)
                 
                 // Plus icon with same styling as the normal icons
-                Image(systemName: "plus.circle.fill")
+                Image(systemName: VoiceInkCustomPromptPresentation.addPromptSystemImageName)
                     .font(.system(size: 20, weight: .medium))
                     .foregroundStyle(
                         LinearGradient(

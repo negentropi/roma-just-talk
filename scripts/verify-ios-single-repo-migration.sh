@@ -1886,17 +1886,17 @@ reject_pattern \
 
 require_pattern \
   "shared custom prompt presentation owns icon catalog and copy" \
-  'VoiceInkCustomPromptPresentation|iconSystemNames|promptGridHelpText|deletePromptConfirmationMessage|triggerSummary' \
+  'VoiceInkCustomPromptPresentation|iconSystemNames|promptGridHelpText|deletePromptConfirmationMessage|triggerSummary|addPromptSystemImageName|editActionSystemImageName|deleteActionSystemImageName|closeSystemImageName|addTriggerWordSystemImageName|removeTriggerWordSystemImageName' \
   VoiceInkCore/Sources/VoiceInkCore/CustomPromptPresentation.swift
 
 require_pattern \
   "macOS custom prompt cards use shared presentation" \
-  'VoiceInkCustomPromptPresentation\.(triggerSummary|editActionTitle|deletePromptConfirmationTitle|deletePromptConfirmationMessage|deleteActionTitle|cancelActionTitle|addPromptTitle)' \
+  'VoiceInkCustomPromptPresentation\.(triggerSummary|editActionTitle|editActionSystemImageName|deletePromptConfirmationTitle|deletePromptConfirmationMessage|deleteActionTitle|deleteActionSystemImageName|cancelActionTitle|addPromptTitle|addPromptSystemImageName)' \
   VoiceInk/Models/CustomPrompt.swift
 
 require_pattern \
   "macOS prompt editor uses shared presentation" \
-  'VoiceInkCustomPromptPresentation\.(editorTitle|defaultIconSystemName|promptNamePlaceholder|promptInstructionsPlaceholder|useSystemTemplateTitle|startWithTemplateTitle|triggerWordPlaceholder|noTriggerWordsText|iconSystemNames)' \
+  'VoiceInkCustomPromptPresentation\.(editorTitle|closeSystemImageName|defaultIconSystemName|promptNamePlaceholder|promptInstructionsPlaceholder|useSystemTemplateTitle|startWithTemplateTitle|triggerWordPlaceholder|addTriggerWordSystemImageName|removeTriggerWordSystemImageName|noTriggerWordsText|iconSystemNames)' \
   VoiceInk/Views/PromptEditorView.swift
 
 require_pattern \
@@ -1923,9 +1923,15 @@ reject_pattern \
   VoiceInk/Views/Components/PromptSelectionGrid.swift \
   VoiceInk/Views/EnhancementSettingsView.swift
 
+reject_pattern \
+  "macOS custom prompt card and editor avoid shell-only action symbols" \
+  '"(pencil|trash|plus\.circle\.fill|xmark)"' \
+  VoiceInk/Models/CustomPrompt.swift \
+  VoiceInk/Views/PromptEditorView.swift
+
 require_pattern \
   "migration checklist tracks shared custom prompt presentation gate" \
-  'macOS custom prompt icon catalog, prompt-card trigger summary, grid empty/help copy, editor labels/placeholders/help text, and delete confirmation copy route through `VoiceInkCustomPromptPresentation`' \
+  'macOS custom prompt icon catalog, prompt-card trigger summary/action symbols, grid empty/help copy, editor labels/placeholders/help/action symbols, and delete confirmation copy route through `VoiceInkCustomPromptPresentation`' \
   docs/ios-single-repo-migration.md
 
 reject_pattern \

@@ -94,7 +94,7 @@ struct PromptEditorView: View {
                 Spacer()
 
                 Button(action: dismissPanel) {
-                    Image(systemName: "xmark")
+                    Image(systemName: VoiceInkCustomPromptPresentation.closeSystemImageName)
                         .font(.system(size: 14, weight: .medium))
                         .foregroundColor(.secondary)
                         .padding(6)
@@ -288,7 +288,7 @@ struct TriggerWordsEditor: View {
                     .onSubmit { addTriggerWord() }
 
                 Button(action: { addTriggerWord() }) {
-                    Image(systemName: "plus.circle.fill")
+                    Image(systemName: VoiceInkCustomPromptPresentation.addTriggerWordSystemImageName)
                         .symbolRenderingMode(.hierarchical)
                         .foregroundStyle(Color.accentColor)
                         .font(.system(size: 18))
@@ -338,9 +338,9 @@ struct TriggerWordItemView: View {
                     .truncationMode(.tail)
                     .frame(maxWidth: 120, alignment: .leading)
                     .foregroundColor(.primary)
-            
+
             Button(action: onDelete) {
-                Image(systemName: "xmark")
+                Image(systemName: VoiceInkCustomPromptPresentation.removeTriggerWordSystemImageName)
                     .font(.system(size: 10, weight: .bold))
                     .foregroundColor(.secondary)
             }

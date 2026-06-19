@@ -767,6 +767,33 @@ struct RollingBufferPreloadCoordinatorTests {
     }
 
     @MainActor
+    @Test func autoCloudOptOutDoesNotPollPowerState() async {
+        let model = streamingModel(provider: .deepgram)
+        let session = FakeTranscriptionSession()
+        let powerStateProvider = CountingPowerStateProvider(
+            state: RollingBufferPowerState(isOnBattery: true, batteryLevelPercent: 1)
+        )
+
+        await withStandardRollingDefaults(for: model) { defaults in
+            setPreloadDefaults(defaults, model: model, preRunFinalization: true)
+            defaults.set(RollingBufferPreloadMode.auto.rawValue, forKey: RollingBufferPreloadSettings.modeKey)
+            defaults.set(true, forKey: RollingBufferPreloadSettings.autoDisableCloudModelsKey)
+        } run: {
+            let coordinator = makeCoordinator(
+                model: model,
+                session: session,
+                powerStateProvider: powerStateProvider,
+                detector: FakeSpeechDetector(containsSpeech: false)
+            )
+
+            await coordinator.processRollingChunkForTesting(Data(repeating: 1, count: 8_000))
+
+            #expect(powerStateProvider.callCount == 0)
+            #expect(session.chunks.snapshot().isEmpty)
+        }
+    }
+
+    @MainActor
     @Test func powerStateIsCachedBeforeVadWindows() async {
         let model = streamingModel()
         let session = FakeTranscriptionSession()

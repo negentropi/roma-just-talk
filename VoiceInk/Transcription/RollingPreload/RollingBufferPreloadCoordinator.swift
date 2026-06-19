@@ -352,20 +352,28 @@ final class RollingBufferPreloadCoordinator {
         configuration: VoiceInkRollingBufferPreloadConfiguration,
         perModelEnabled: Bool
     ) -> Bool {
+        let snapshot = model.rollingBufferPreloadSnapshot
         switch configuration.mode {
         case .on:
             return true
         case .off:
             return false
         case .auto:
-            break
+            if configuration.autoDisablesCloudModels, snapshot.isCloudTranscriptionProvider {
+                return false
+            }
+
+            guard configuration.autoDisablesLowBatteryLocalModels,
+                  snapshot.isLocalTranscriptionProvider else {
+                return true
+            }
         }
 
         VoiceInkRollingBufferPreloadPolicy(
             configuration: configuration,
             powerState: powerStateProvider.currentPowerState()
         ).allowsPreload(
-            for: model.rollingBufferPreloadSnapshot,
+            for: snapshot,
             perModelEnabled: perModelEnabled
         )
     }

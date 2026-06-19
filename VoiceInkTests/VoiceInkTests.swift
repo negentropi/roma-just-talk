@@ -889,33 +889,29 @@ struct VoiceInkTests {
             modifierFlags: [.option],
             eventTime: 1
         )
-        try await Task.sleep(nanoseconds: 10_000_000)
-        #expect(keyDownCount == 0)
+        #expect(!(await eventually { keyDownCount > 0 }))
 
         monitor.handleModifierOnlyFlagsChangedForTesting(
             keyCode: UInt16(kVK_RightOption),
             modifierFlags: [.option],
             eventTime: 2
         )
-        try await Task.sleep(nanoseconds: 10_000_000)
-        #expect(keyDownCount == 1)
+        #expect(await eventually { keyDownCount == 1 })
 
         monitor.handleModifierOnlyFlagsChangedForTesting(
             keyCode: UInt16(kVK_RightOption),
             modifierFlags: [.option],
             eventTime: 2.5
         )
-        try await Task.sleep(nanoseconds: 10_000_000)
-        #expect(keyDownCount == 1)
-        #expect(keyUpCount == 0)
+        #expect(!(await eventually { keyDownCount > 1 }))
+        #expect(!(await eventually { keyUpCount > 0 }))
 
         monitor.handleModifierOnlyFlagsChangedForTesting(
             keyCode: UInt16(kVK_RightOption),
             modifierFlags: [],
             eventTime: 3
         )
-        try await Task.sleep(nanoseconds: 10_000_000)
-        #expect(keyUpCount == 1)
+        #expect(await eventually { keyUpCount == 1 })
     }
 
     @Test func modifierOnlyShortcutTracksOtherKeyDownWithoutReleaseEvidence() async throws {

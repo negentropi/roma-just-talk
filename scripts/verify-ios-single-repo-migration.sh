@@ -2239,6 +2239,16 @@ require_pattern \
   'textEnhancementModelToSelectAfterRefresh' \
   VoiceInk/Services/OllamaService.swift
 
+require_pattern \
+  "shared AI enhancement execution route policy lives in VoiceInkCore" \
+  'VoiceInkAIEnhancementExecutionRoute|textEnhancementExecutionRoute' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+require_pattern \
+  "macOS AI enhancement service execution routing uses shared policy" \
+  'textEnhancementExecutionRoute' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
 reject_pattern \
   "macOS AI API-key path avoids shell-only key-reference and blank-key policy" \
   'VoiceInkAPIKeyReference\.resolvedValue|VoiceInkProviderCredential\.nonBlank\(apiKey\)' \
@@ -2290,6 +2300,11 @@ reject_pattern \
   "macOS AI services avoid duplicate request URL selection policy" \
   'var +baseURL: +String|selectedProvider\.baseURL' \
   VoiceInk/Services/AIEnhancement/AIService.swift \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+reject_pattern \
+  "macOS AI enhancement service avoids duplicate execution route policy" \
+  'selectedProvider == \.(ollama|localCLI)|switch +aiService\.selectedProvider|case +\.anthropic:' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
 reject_pattern \

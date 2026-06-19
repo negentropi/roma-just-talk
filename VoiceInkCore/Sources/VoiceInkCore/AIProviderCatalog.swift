@@ -7,6 +7,13 @@ public enum VoiceInkAIEnhancementAPIKeyVerificationRoute: Sendable, Equatable {
     case openRouterModels
 }
 
+public enum VoiceInkAIEnhancementExecutionRoute: Sendable, Equatable {
+    case ollama
+    case localCLI
+    case anthropicMessages
+    case openAICompatibleChatCompletions
+}
+
 public struct VoiceInkAIEnhancementAPIKeyDraft: Equatable, Sendable {
     private let provider: VoiceInkAIEnhancementProviderKind
     private let providerKeyDraft: VoiceInkProviderAPIKeyDraft
@@ -334,6 +341,19 @@ public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
             return .openRouterModels
         case .ollama, .localCLI:
             return nil
+        }
+    }
+
+    public var textEnhancementExecutionRoute: VoiceInkAIEnhancementExecutionRoute {
+        switch self {
+        case .ollama:
+            return .ollama
+        case .localCLI:
+            return .localCLI
+        case .anthropic:
+            return .anthropicMessages
+        case .assemblyAI, .cerebras, .custom, .deepgram, .elevenLabs, .gemini, .groq, .mistral, .openAI, .openRouter, .soniox, .speechmatics:
+            return .openAICompatibleChatCompletions
         }
     }
 

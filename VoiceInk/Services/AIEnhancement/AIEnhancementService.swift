@@ -183,7 +183,9 @@ class AIEnhancementService: ObservableObject {
             self.lastUserMessageSent = formattedText
         }
 
-        if aiService.selectedProvider == .ollama {
+        let executionRoute = aiService.selectedProvider.textEnhancementExecutionRoute
+        switch executionRoute {
+        case .ollama:
             do {
                 let result = try await aiService.enhanceWithOllama(
                     text: formattedText,
@@ -203,9 +205,8 @@ class AIEnhancementService: ObservableObject {
                     throw VoiceInkAIEnhancementError.customError(error.localizedDescription)
                 }
             }
-        }
 
-        if aiService.selectedProvider == .localCLI {
+        case .localCLI:
             do {
                 let result = try await aiService.enhanceWithLocalCLI(systemPrompt: systemMessage, userPrompt: formattedText)
                 return VoiceInkAIEnhancementOutputFilter.filter(result)
@@ -216,52 +217,55 @@ class AIEnhancementService: ObservableObject {
                     throw VoiceInkAIEnhancementError.customError(error.localizedDescription)
                 }
             }
-        }
 
-        try await waitForRateLimit()
+        case .anthropicMessages, .openAICompatibleChatCompletions:
+            try await waitForRateLimit()
 
-        do {
-            let result: String
-            switch aiService.selectedProvider {
-            case .anthropic:
-                result = try await AnthropicLLMClient.chatCompletion(
-                    apiKey: aiService.apiKey,
-                    model: aiService.currentModel,
-                    messages: [.user(formattedText)],
-                    systemPrompt: systemMessage,
-                    timeout: baseTimeout
-                )
-            default:
-                guard let baseURL = URL(string: aiService.selectedProvider.textEnhancementRequestURLString()) else {
-                    throw VoiceInkAIEnhancementError.customError("\(aiService.selectedProvider.rawValue) has an invalid API endpoint URL. Please update it in AI settings.")
+            do {
+                let result: String
+                switch executionRoute {
+                case .anthropicMessages:
+                    result = try await AnthropicLLMClient.chatCompletion(
+                        apiKey: aiService.apiKey,
+                        model: aiService.currentModel,
+                        messages: [.user(formattedText)],
+                        systemPrompt: systemMessage,
+                        timeout: baseTimeout
+                    )
+                case .openAICompatibleChatCompletions:
+                    guard let baseURL = URL(string: aiService.selectedProvider.textEnhancementRequestURLString()) else {
+                        throw VoiceInkAIEnhancementError.customError("\(aiService.selectedProvider.rawValue) has an invalid API endpoint URL. Please update it in AI settings.")
+                    }
+                    let temperature = VoiceInkAIReasoningConfig.temperature(forModelName: aiService.currentModel)
+                    let coreProvider = aiService.selectedProvider.aiModelProvider
+                    let reasoningEffort = coreProvider.flatMap {
+                        VoiceInkAIReasoningConfig.reasoningEffort(for: $0, modelName: aiService.currentModel)
+                    }
+                    let extraBody = coreProvider.flatMap {
+                        VoiceInkAIReasoningConfig.extraBodyParameters(for: $0, modelName: aiService.currentModel)
+                    }
+                    result = try await OpenAILLMClient.chatCompletion(
+                        baseURL: baseURL,
+                        apiKey: aiService.apiKey,
+                        model: aiService.currentModel,
+                        messages: [.user(formattedText)],
+                        systemPrompt: systemMessage,
+                        temperature: temperature,
+                        reasoningEffort: reasoningEffort,
+                        extraBody: extraBody,
+                        timeout: baseTimeout
+                    )
+                case .ollama, .localCLI:
+                    preconditionFailure("Local AI routes should return before cloud request execution.")
                 }
-                let temperature = VoiceInkAIReasoningConfig.temperature(forModelName: aiService.currentModel)
-                let coreProvider = aiService.selectedProvider.aiModelProvider
-                let reasoningEffort = coreProvider.flatMap {
-                    VoiceInkAIReasoningConfig.reasoningEffort(for: $0, modelName: aiService.currentModel)
-                }
-                let extraBody = coreProvider.flatMap {
-                    VoiceInkAIReasoningConfig.extraBodyParameters(for: $0, modelName: aiService.currentModel)
-                }
-                result = try await OpenAILLMClient.chatCompletion(
-                    baseURL: baseURL,
-                    apiKey: aiService.apiKey,
-                    model: aiService.currentModel,
-                    messages: [.user(formattedText)],
-                    systemPrompt: systemMessage,
-                    temperature: temperature,
-                    reasoningEffort: reasoningEffort,
-                    extraBody: extraBody,
-                    timeout: baseTimeout
-                )
+                return VoiceInkAIEnhancementOutputFilter.filter(result.trimmingCharacters(in: .whitespacesAndNewlines))
+            } catch let error as LLMKitError {
+                throw mapLLMKitError(error)
+            } catch let error as VoiceInkAIEnhancementError {
+                throw error
+            } catch {
+                throw VoiceInkAIEnhancementError.customError(error.localizedDescription)
             }
-            return VoiceInkAIEnhancementOutputFilter.filter(result.trimmingCharacters(in: .whitespacesAndNewlines))
-        } catch let error as LLMKitError {
-            throw mapLLMKitError(error)
-        } catch let error as VoiceInkAIEnhancementError {
-            throw error
-        } catch {
-            throw VoiceInkAIEnhancementError.customError(error.localizedDescription)
         }
     }
 

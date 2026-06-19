@@ -150,6 +150,22 @@ extension TranscriptionModel {
             prefersNativeAppleEnglish: provider == .nativeApple
         )
     }
+
+    var powerModeTranscriptionModelFacts: VoiceInkPowerModeTranscriptionModelFacts {
+        VoiceInkPowerModeTranscriptionModelFacts(
+            name: name,
+            languageSource: provider.transcriptionLanguageSource,
+            isMultilingual: isMultilingualModel,
+            languageOptions: transcriptionLanguageOptions
+        )
+    }
+
+    var powerModeTranscriptionModelResourceFacts: VoiceInkPowerModeTranscriptionModelResourceFacts {
+        VoiceInkPowerModeTranscriptionModelResourceFacts(
+            name: name,
+            languageSource: provider.transcriptionLanguageSource
+        )
+    }
 }
 
 // A new struct for Apple's native models

@@ -187,13 +187,7 @@ class PowerModeSessionManager {
     private func transcriptionModelFacts(
         for model: any TranscriptionModel
     ) -> VoiceInkPowerModeTranscriptionModelFacts {
-        VoiceInkPowerModeTranscriptionModelFacts(
-            name: model.name,
-            disablesLanguageSelection: model.provider == .gemini,
-            isMultilingual: model.isMultilingualModel,
-            languageOptions: model.transcriptionLanguageOptions,
-            prefersNativeAppleEnglish: model.provider == .nativeApple
-        )
+        model.powerModeTranscriptionModelFacts
     }
 
     private func applyLanguageApplicationPlan(_ plan: VoiceInkPowerModeLanguageApplicationPlan) {
@@ -207,10 +201,7 @@ class PowerModeSessionManager {
     private func modelResourceFacts(
         for model: any TranscriptionModel
     ) -> VoiceInkPowerModeTranscriptionModelResourceFacts {
-        VoiceInkPowerModeTranscriptionModelResourceFacts(
-            name: model.name,
-            loadsLocalWhisperModel: model.provider == .whisper
-        )
+        model.powerModeTranscriptionModelResourceFacts
     }
 
     private func applyModelResourcePlan(

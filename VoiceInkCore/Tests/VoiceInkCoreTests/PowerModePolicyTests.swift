@@ -581,6 +581,56 @@ final class PowerModePolicyTests: XCTestCase {
         )
     }
 
+    func testPowerModeTranscriptionModelFactsDeriveProviderPoliciesFromLanguageSource() {
+        let geminiFacts = VoiceInkPowerModeTranscriptionModelFacts(
+            name: "gemini",
+            languageSource: .provider(.gemini),
+            isMultilingual: true,
+            languageOptions: VoiceInkLanguageCatalog.all
+        )
+        let nativeAppleFacts = VoiceInkPowerModeTranscriptionModelFacts(
+            name: "native",
+            languageSource: .nativeApple,
+            isMultilingual: true,
+            languageOptions: VoiceInkLanguageCatalog.nativeApple
+        )
+        let whisperFacts = VoiceInkPowerModeTranscriptionModelFacts(
+            name: "base",
+            languageSource: .whisper,
+            isMultilingual: true,
+            languageOptions: VoiceInkLanguageCatalog.whisperLanguages()
+        )
+
+        XCTAssertTrue(geminiFacts.disablesLanguageSelection)
+        XCTAssertEqual(geminiFacts.languageControl, .disabledAutodetect)
+        XCTAssertFalse(geminiFacts.prefersNativeAppleEnglish)
+        XCTAssertFalse(nativeAppleFacts.disablesLanguageSelection)
+        XCTAssertTrue(nativeAppleFacts.prefersNativeAppleEnglish)
+        XCTAssertFalse(whisperFacts.disablesLanguageSelection)
+        XCTAssertFalse(whisperFacts.prefersNativeAppleEnglish)
+    }
+
+    func testPowerModeTranscriptionModelResourceFactsDeriveLocalModelPolicyFromLanguageSource() {
+        XCTAssertTrue(
+            VoiceInkPowerModeTranscriptionModelResourceFacts(
+                name: "base",
+                languageSource: .whisper
+            ).loadsLocalWhisperModel
+        )
+        XCTAssertFalse(
+            VoiceInkPowerModeTranscriptionModelResourceFacts(
+                name: "native",
+                languageSource: .nativeApple
+            ).loadsLocalWhisperModel
+        )
+        XCTAssertFalse(
+            VoiceInkPowerModeTranscriptionModelResourceFacts(
+                name: "gemini",
+                languageSource: .provider(.gemini)
+            ).loadsLocalWhisperModel
+        )
+    }
+
     func testPowerModeTranscriptionSelectionRepairsModelAndLanguageState() {
         let selection = VoiceInkPowerModeTranscriptionSelection(
             selectedModelName: nil,

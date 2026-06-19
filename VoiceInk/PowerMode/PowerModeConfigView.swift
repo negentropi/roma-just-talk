@@ -74,13 +74,7 @@ struct ConfigurationView: View {
     }
 
     private func modelFacts(for model: any TranscriptionModel) -> VoiceInkPowerModeTranscriptionModelFacts {
-        VoiceInkPowerModeTranscriptionModelFacts(
-            name: model.name,
-            disablesLanguageSelection: model.provider == .gemini,
-            isMultilingual: model.isMultilingualModel,
-            languageOptions: model.transcriptionLanguageOptions,
-            prefersNativeAppleEnglish: model.provider == .nativeApple
-        )
+        model.powerModeTranscriptionModelFacts
     }
 
     private var enhancementSelection: VoiceInkPowerModeEnhancementSelection {

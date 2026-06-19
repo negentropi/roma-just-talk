@@ -105,6 +105,20 @@ final class PowerModePresentationTests: XCTestCase {
         XCTAssertEqual(VoiceInkPowerModePresentation.noEnhancementPromptsAvailableText, "No prompts available")
     }
 
+    func testAIEnhancementFormChromePreservesMacOSCopy() {
+        XCTAssertEqual(VoiceInkPowerModePresentation.aiProviderFormTitle, "AI Provider")
+        XCTAssertEqual(VoiceInkPowerModePresentation.aiModelFormTitle, "AI Model")
+        XCTAssertEqual(VoiceInkPowerModePresentation.enhancementPromptFormTitle, "Enhancement Prompt")
+        XCTAssertEqual(VoiceInkPowerModePresentation.contextAwarenessDisplayText, "Context Awareness")
+        XCTAssertEqual(VoiceInkPowerModePresentation.refreshModelsButtonTitle, "Refresh Models")
+        XCTAssertEqual(VoiceInkPowerModePresentation.refreshModelsButtonHelp, "Refresh models")
+        XCTAssertEqual(VoiceInkPowerModePresentation.setAsDefaultToggleTitle, "Set as default")
+        XCTAssertEqual(
+            VoiceInkPowerModePresentation.setAsDefaultHelpText,
+            "Default power mode is used when no specific app or website matches are found."
+        )
+    }
+
     func testRowDetailPresentationPreservesDefaultBandWithoutVisibleChips() {
         let config = PowerModeConfig(
             name: "Writing",

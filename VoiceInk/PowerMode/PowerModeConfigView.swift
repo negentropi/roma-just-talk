@@ -446,13 +446,13 @@ struct ConfigurationView: View {
 
                     if isAIEnhancementEnabled {
                         if aiService.connectedProviders.isEmpty {
-                            LabeledContent("AI Provider") {
+                            LabeledContent(VoiceInkPowerModePresentation.aiProviderFormTitle) {
                                 Text(VoiceInkPowerModePresentation.noAIProvidersConnectedText)
                                     .foregroundColor(.secondary)
                                     .italic()
                             }
                         } else {
-                            Picker("AI Provider", selection: providerBinding) {
+                            Picker(VoiceInkPowerModePresentation.aiProviderFormTitle, selection: providerBinding) {
                                 ForEach(aiService.connectedProviders, id: \.self) { provider in
                                     Text(provider.rawValue).tag(provider)
                                 }
@@ -470,7 +470,7 @@ struct ConfigurationView: View {
                            provider != .custom {
                             let models = aiService.availableModels(for: provider)
                             if models.isEmpty {
-                                LabeledContent("AI Model") {
+                                LabeledContent(VoiceInkPowerModePresentation.aiModelFormTitle) {
                                     Text(VoiceInkPowerModePresentation.noAIModelsAvailableText(for: provider))
                                         .foregroundColor(.secondary)
                                         .italic()
@@ -485,43 +485,43 @@ struct ConfigurationView: View {
                                     }
                                 )
 
-                                Picker("AI Model", selection: modelBinding) {
+                                Picker(VoiceInkPowerModePresentation.aiModelFormTitle, selection: modelBinding) {
                                     ForEach(models, id: \.self) { model in
                                         Text(model).tag(model)
                                     }
                                 }
 
                                 if provider == .openRouter {
-                                    Button("Refresh Models") {
+                                    Button(VoiceInkPowerModePresentation.refreshModelsButtonTitle) {
                                         Task { await aiService.fetchOpenRouterModels() }
                                     }
-                                    .help("Refresh models")
+                                    .help(VoiceInkPowerModePresentation.refreshModelsButtonHelp)
                                 }
                             }
                         }
 
                         if enhancementService.allPrompts.isEmpty {
-                            LabeledContent("Enhancement Prompt") {
+                            LabeledContent(VoiceInkPowerModePresentation.enhancementPromptFormTitle) {
                                 Text(VoiceInkPowerModePresentation.noEnhancementPromptsAvailableText)
                                     .foregroundColor(.secondary)
                             }
                         } else {
-                            Picker("Enhancement Prompt", selection: $selectedPromptId) {
+                            Picker(VoiceInkPowerModePresentation.enhancementPromptFormTitle, selection: $selectedPromptId) {
                                 ForEach(enhancementService.allPrompts) { prompt in
                                     Text(prompt.title).tag(prompt.id as UUID?)
                                 }
                             }
                         }
 
-                        Toggle("Context Awareness", isOn: $useScreenCapture)
+                        Toggle(VoiceInkPowerModePresentation.contextAwarenessDisplayText, isOn: $useScreenCapture)
                     }
                 }
 
                 Section("Advanced") {
                     Toggle(isOn: $isDefault) {
                         HStack(spacing: 6) {
-                            Text("Set as default")
-                            InfoTip("Default power mode is used when no specific app or website matches are found.")
+                            Text(VoiceInkPowerModePresentation.setAsDefaultToggleTitle)
+                            InfoTip(VoiceInkPowerModePresentation.setAsDefaultHelpText)
                         }
                     }
 

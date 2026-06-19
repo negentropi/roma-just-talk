@@ -2918,6 +2918,16 @@ require_pattern \
   'VoiceInkPowerModePresentation\.(noAIProvidersConnectedText|noAIModelsAvailableText|noEnhancementPromptsAvailableText)' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
+require_pattern \
+  "shared Power Mode AI-enhancement form chrome copy lives in VoiceInkCore" \
+  'aiProviderFormTitle|aiModelFormTitle|enhancementPromptFormTitle|refreshModelsButtonTitle|refreshModelsButtonHelp|setAsDefaultToggleTitle|setAsDefaultHelpText' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
+
+require_pattern \
+  "macOS Power Mode edit form uses shared AI-enhancement form chrome copy" \
+  'VoiceInkPowerModePresentation\.(aiProviderFormTitle|aiModelFormTitle|enhancementPromptFormTitle|refreshModelsButtonTitle|refreshModelsButtonHelp|contextAwarenessDisplayText|setAsDefaultToggleTitle|setAsDefaultHelpText)' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
 reject_pattern \
   "macOS Power Mode rows avoid shell-only selected-language fallback formatting" \
   'langCode == "auto"|langCode == "en"|langCode\.uppercased\(\)' \
@@ -2931,6 +2941,11 @@ reject_pattern \
 reject_pattern \
   "macOS Power Mode edit form avoids duplicate AI-enhancement empty-state copy" \
   'No providers connected|No models loaded|No models available|No prompts available' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+reject_pattern \
+  "macOS Power Mode edit form avoids duplicate AI-enhancement form chrome copy" \
+  '"(AI Provider|AI Model|Enhancement Prompt|Context Awareness|Refresh Models|Refresh models|Set as default|Default power mode is used when no specific app or website matches are found\.)"' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
 reject_pattern \

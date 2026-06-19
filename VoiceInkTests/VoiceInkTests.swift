@@ -12,12 +12,7 @@ import SwiftData
 import AppKit
 import Carbon.HIToolbox
 import os
-import VoiceInkCore
 @testable import VoiceInk
-
-private typealias CustomPrompt = VoiceInkCustomPrompt
-private typealias RecordingState = VoiceInkRecordingState
-private typealias ShortcutPressContext = VoiceInkShortcutPressContext
 
 @Suite(.serialized)
 struct VoiceInkTests {

@@ -206,6 +206,18 @@ public struct VoiceInkPowerModeApplicationState: Codable, Equatable, Sendable {
     public var removePunctuation: Bool?
     public var lowercaseTranscription: Bool?
 
+    public var selectedPromptUUID: UUID? {
+        selectedPromptId.flatMap(UUID.init)
+    }
+
+    public var cleanupRestore: VoiceInkPowerModeCleanupRestore {
+        VoiceInkPowerModeCleanupRestore(
+            isTextFormattingEnabled: isTextFormattingEnabled,
+            punctuationMode: punctuationCleanupMode ?? removePunctuation.map { $0 ? .removeAll : .keep },
+            lowercaseTranscription: lowercaseTranscription
+        )
+    }
+
     private enum CodingKeys: String, CodingKey {
         case isEnhancementEnabled
         case useScreenCaptureContext
@@ -303,6 +315,22 @@ public struct VoiceInkPowerModeApplicationState: Codable, Equatable, Sendable {
         try container.encodeIfPresent(punctuationCleanupMode, forKey: .punctuationCleanupMode)
         try container.encodeIfPresent(removePunctuation, forKey: .removePunctuation)
         try container.encodeIfPresent(lowercaseTranscription, forKey: .lowercaseTranscription)
+    }
+}
+
+public struct VoiceInkPowerModeCleanupRestore: Equatable, Sendable {
+    public let isTextFormattingEnabled: Bool?
+    public let punctuationMode: PunctuationCleanupMode?
+    public let lowercaseTranscription: Bool?
+
+    public init(
+        isTextFormattingEnabled: Bool?,
+        punctuationMode: PunctuationCleanupMode?,
+        lowercaseTranscription: Bool?
+    ) {
+        self.isTextFormattingEnabled = isTextFormattingEnabled
+        self.punctuationMode = punctuationMode
+        self.lowercaseTranscription = lowercaseTranscription
     }
 }
 

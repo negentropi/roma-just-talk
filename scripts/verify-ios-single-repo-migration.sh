@@ -2276,6 +2276,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
+  "shared Power Mode session restore presentation exposes parsed prompt and cleanup state" \
+  'selectedPromptUUID|cleanupRestore|struct VoiceInkPowerModeCleanupRestore' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
   "shared Power Mode active-session persistence lives in VoiceInkCore" \
   'VoiceInkPowerModeSessionPreference|activePowerModeSession' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
@@ -2293,6 +2298,11 @@ reject_pattern \
 reject_pattern \
   "macOS Power Mode session manager avoids shell-only session snapshot construction" \
   'selectedPromptId: enhancementService\.selectedPromptId\?\.uuidString|isTextFormattingEnabled: cleanupSettings\.isTextFormattingEnabled|punctuationCleanupMode: cleanupSettings\.punctuationMode|removePunctuation: cleanupSettings\.removesAllPunctuation|lowercaseTranscription: cleanupSettings\.lowercaseTranscription' \
+  VoiceInk/PowerMode/PowerModeSessionManager.swift
+
+reject_pattern \
+  "macOS Power Mode session manager avoids shell-only session restore parsing" \
+  'state\.selectedPromptId\.flatMap\(UUID\.init\)|state\.punctuationCleanupMode|state\.removePunctuation|state\.isTextFormattingEnabled|state\.lowercaseTranscription' \
   VoiceInk/PowerMode/PowerModeSessionManager.swift
 
 require_pattern \

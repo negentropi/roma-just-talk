@@ -319,6 +319,55 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertEqual(state.lowercaseTranscription, true)
     }
 
+    func testPowerModeApplicationStateExposesRestoreReadyPromptUUID() {
+        let promptID = UUID()
+        let validState = VoiceInkPowerModeApplicationState(
+            isEnhancementEnabled: true,
+            useScreenCaptureContext: false,
+            selectedPromptId: promptID.uuidString
+        )
+        let invalidState = VoiceInkPowerModeApplicationState(
+            isEnhancementEnabled: true,
+            useScreenCaptureContext: false,
+            selectedPromptId: "not-a-uuid"
+        )
+
+        XCTAssertEqual(validState.selectedPromptUUID, promptID)
+        XCTAssertNil(invalidState.selectedPromptUUID)
+    }
+
+    func testPowerModeApplicationStateCleanupRestorePreservesLegacyPunctuationFallback() {
+        let explicitModeState = VoiceInkPowerModeApplicationState(
+            isEnhancementEnabled: true,
+            useScreenCaptureContext: false,
+            isTextFormattingEnabled: true,
+            punctuationCleanupMode: .removeTrailingPeriod,
+            removePunctuation: true,
+            lowercaseTranscription: false
+        )
+        let legacyRemoveAllState = VoiceInkPowerModeApplicationState(
+            isEnhancementEnabled: true,
+            useScreenCaptureContext: false,
+            removePunctuation: true
+        )
+        let legacyKeepState = VoiceInkPowerModeApplicationState(
+            isEnhancementEnabled: true,
+            useScreenCaptureContext: false,
+            removePunctuation: false
+        )
+
+        XCTAssertEqual(
+            explicitModeState.cleanupRestore,
+            VoiceInkPowerModeCleanupRestore(
+                isTextFormattingEnabled: true,
+                punctuationMode: .removeTrailingPeriod,
+                lowercaseTranscription: false
+            )
+        )
+        XCTAssertEqual(legacyRemoveAllState.cleanupRestore.punctuationMode, .removeAll)
+        XCTAssertEqual(legacyKeepState.cleanupRestore.punctuationMode, .keep)
+    }
+
     func testPowerModeApplicationStateDecodesLegacyRemovePunctuation() throws {
         let data = Data("""
         {

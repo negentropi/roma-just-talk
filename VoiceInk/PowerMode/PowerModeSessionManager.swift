@@ -144,7 +144,7 @@ class PowerModeSessionManager {
         await MainActor.run {
             enhancementService.isEnhancementEnabled = state.isEnhancementEnabled
             enhancementService.useScreenCaptureContext = state.useScreenCaptureContext
-            enhancementService.selectedPromptId = state.selectedPromptId.flatMap(UUID.init)
+            enhancementService.selectedPromptId = state.selectedPromptUUID
 
             let aiService = enhancementService.getAIService()
             if let providerName = state.selectedAIProvider, let provider = VoiceInkAIEnhancementProviderKind(storedValue: providerName) {
@@ -154,15 +154,14 @@ class PowerModeSessionManager {
                 aiService.selectModel(model)
             }
 
-            if let isTextFormattingEnabled = state.isTextFormattingEnabled {
+            let cleanupRestore = state.cleanupRestore
+            if let isTextFormattingEnabled = cleanupRestore.isTextFormattingEnabled {
                 VoiceInkTranscriptionCleanupPreferenceStorage.saveTextFormattingEnabled(isTextFormattingEnabled)
             }
-            if let punctuationCleanupMode = state.punctuationCleanupMode {
+            if let punctuationCleanupMode = cleanupRestore.punctuationMode {
                 PunctuationCleanupMode.setCurrent(punctuationCleanupMode)
-            } else if let removePunctuation = state.removePunctuation {
-                PunctuationCleanupMode.setCurrent(removePunctuation ? .removeAll : .keep)
             }
-            if let lowercaseTranscription = state.lowercaseTranscription {
+            if let lowercaseTranscription = cleanupRestore.lowercaseTranscription {
                 VoiceInkTranscriptionCleanupPreferenceStorage.saveLowercaseTranscription(lowercaseTranscription)
             }
         }

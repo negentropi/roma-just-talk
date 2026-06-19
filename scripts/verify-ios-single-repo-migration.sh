@@ -2734,6 +2734,45 @@ require_plist_value \
   "roma just talk" \
   iOS/VoiceInk-ios/Info.plist
 
+require_pattern \
+  "shared app identity presentation lives in VoiceInkCore" \
+  'VoiceInkAppIdentity|displayName = "roma just talk"|compactDisplayName = "roma-just-talk"' \
+  VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift
+
+require_pattern \
+  "macOS UI uses shared app identity presentation" \
+  'VoiceInkAppIdentity\.(compactDisplayName|sidebarSubtitle|onboardingWindowTitle|storageFailureMessage)' \
+  VoiceInk/Views/ContentView.swift
+
+require_pattern \
+  "macOS app startup uses shared app identity presentation" \
+  'VoiceInkAppIdentity\.(compactDisplayName|storageFailureMessage)' \
+  VoiceInk/VoiceInk.swift
+
+require_pattern \
+  "macOS windows use shared app identity presentation" \
+  'VoiceInkAppIdentity\.(compactDisplayName|onboardingWindowTitle)' \
+  VoiceInk/WindowManager.swift
+
+require_pattern \
+  "iOS note list uses shared app identity presentation" \
+  'VoiceInkAppIdentity\.displayName' \
+  iOS/VoiceInk-ios/NotesListView.swift
+
+require_pattern \
+  "iOS onboarding uses shared app identity presentation" \
+  'VoiceInkAppIdentity\.(welcomeTitle|startUsingTitle)' \
+  iOS/VoiceInk-ios/OnboardingView.swift
+
+reject_pattern \
+  "Swift UI avoids duplicate app identity literals" \
+  '"(roma just talk|roma-just-talk|speak before hotkey|Welcome to roma just talk|Start Using roma just talk|roma-just-talk Onboarding)"' \
+  VoiceInk/Views/ContentView.swift \
+  VoiceInk/VoiceInk.swift \
+  VoiceInk/WindowManager.swift \
+  iOS/VoiceInk-ios/NotesListView.swift \
+  iOS/VoiceInk-ios/OnboardingView.swift
+
 require_context_pattern_count_at_least \
   "iOS keyboard display name stays roma just talk" \
   'INFOPLIST_FILE = VoiceInkKeyboard/Info.plist;' \

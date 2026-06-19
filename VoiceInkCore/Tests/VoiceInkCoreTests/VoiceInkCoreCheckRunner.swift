@@ -10,6 +10,7 @@ struct VoiceInkCoreCheck {
 struct VoiceInkCoreCheckRunner {
     static func main() async {
         let checks: [VoiceInkCoreCheck] = [
+            VoiceInkCoreCheck(name: "AppIdentityTests.testAppIdentityPreservesSharedVisibleNames", run: { AppIdentityTests().testAppIdentityPreservesSharedVisibleNames() }),
             VoiceInkCoreCheck(name: "AIPromptsTests.testFinalPromptTextReturnsRawPromptWithoutSystemInstructions", run: { AIPromptsTests().testFinalPromptTextReturnsRawPromptWithoutSystemInstructions() }),
             VoiceInkCoreCheck(name: "AIPromptsTests.testFinalPromptTextWrapsPromptWithSystemInstructions", run: { AIPromptsTests().testFinalPromptTextWrapsPromptWithSystemInstructions() }),
             VoiceInkCoreCheck(name: "AIPromptsTests.testEnhancementPromptBuilderAppendsContextSectionsInMacOSOrder", run: { AIPromptsTests().testEnhancementPromptBuilderAppendsContextSectionsInMacOSOrder() }),

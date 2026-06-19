@@ -26,7 +26,7 @@ struct NotesListView: View {
     var body: some View {
         NavigationStack {
             content
-                .navigationTitle("roma just talk")
+                .navigationTitle(VoiceInkAppIdentity.displayName)
                 .navigationBarTitleDisplayMode(.large)
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {

@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 import OSLog
+import VoiceInkCore
 
 // ViewType enum with all cases
 enum ViewType: String, CaseIterable, Identifiable {
@@ -89,10 +90,10 @@ struct ContentView: View {
                         }
 
                         VStack(alignment: .leading, spacing: 1) {
-                            Text("roma-just-talk")
+                            Text(VoiceInkAppIdentity.compactDisplayName)
                                 .font(.system(size: 14, weight: .semibold))
 
-                            Text("speak before hotkey")
+                            Text(VoiceInkAppIdentity.sidebarSubtitle)
                                 .font(.system(size: 11, weight: .medium))
                                 .foregroundStyle(.secondary)
                         }
@@ -120,7 +121,7 @@ struct ContentView: View {
             }
             .listStyle(.sidebar)
             .scrollContentBackground(.hidden)
-            .navigationTitle("roma-just-talk")
+            .navigationTitle(VoiceInkAppIdentity.compactDisplayName)
             .navigationSplitViewColumnWidth(210)
         } detail: {
             if let selectedView = selectedView {

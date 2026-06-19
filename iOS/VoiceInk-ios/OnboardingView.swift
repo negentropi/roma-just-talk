@@ -45,7 +45,7 @@ struct WelcomeOnboardingView: View {
                     .shadow(color: Color.black.opacity(0.1), radius: 10, y: 5)
                 
                 VStack(spacing: 12) {
-                    Text("Welcome to roma just talk")
+                    Text(VoiceInkAppIdentity.welcomeTitle)
                         .font(.largeTitle)
                         .fontWeight(.bold)
                         .multilineTextAlignment(.center)
@@ -318,7 +318,7 @@ struct ReadyOnboardingView: View {
             
             // Start Button
             VStack {
-                Button("Start Using roma just talk") {
+                Button(VoiceInkAppIdentity.startUsingTitle) {
                     completeOnboarding()
                 }
                 .buttonStyle(OnboardingButtonStyle())

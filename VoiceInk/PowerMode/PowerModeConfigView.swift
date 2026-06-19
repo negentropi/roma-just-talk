@@ -72,6 +72,20 @@ struct ConfigurationView: View {
         )
     }
 
+    private var enhancementSelection: VoiceInkPowerModeEnhancementSelection {
+        VoiceInkPowerModeEnhancementSelection(
+            selectedPromptId: selectedPromptId,
+            selectedAIProvider: selectedAIProvider,
+            selectedAIModel: selectedAIModel
+        )
+    }
+
+    private func applyEnhancementSelection(_ selection: VoiceInkPowerModeEnhancementSelection) {
+        selectedPromptId = selection.selectedPromptId
+        selectedAIProvider = selection.selectedAIProvider
+        selectedAIModel = selection.selectedAIModel
+    }
+
     init(
         mode: VoiceInkPowerModeConfigurationMode,
         powerModeManager: PowerModeManager,
@@ -406,18 +420,15 @@ struct ConfigurationView: View {
                     Toggle("AI Enhancement", isOn: $isAIEnhancementEnabled)
                         .onChange(of: isAIEnhancementEnabled) { _, newValue in
                             if newValue {
-                                if selectedAIProvider == nil {
-                                    selectedAIProvider = aiService.selectedProvider.rawValue
-                                }
-                                if selectedAIModel == nil {
-                                    selectedAIModel = aiService.currentModel
-                                }
-                                if selectedPromptId == nil {
-                                    selectedPromptId = VoiceInkCustomPromptPolicy.selectedPromptIdAfterEnablingEnhancement(
-                                        selectedPromptId,
-                                        prompts: enhancementService.allPrompts
-                                    )
-                                }
+                                applyEnhancementSelection(
+                                    enhancementSelection
+                                        .fillingMissingProviderAndModel(
+                                            currentProvider: aiService.selectedProvider,
+                                            currentModel: aiService.currentModel,
+                                            treatsEmptyModelAsMissing: false
+                                        )
+                                        .selectingPromptAfterEnabling(prompts: enhancementService.allPrompts)
+                                )
                             }
                         }
 
@@ -563,18 +574,18 @@ struct ConfigurationView: View {
             .onAppear {
                 // Set AI provider/model after EnvironmentObjects are available
                 if case .add = mode {
-                    if selectedAIProvider == nil {
-                        selectedAIProvider = aiService.selectedProvider.rawValue
-                    }
-                    if selectedAIModel == nil || selectedAIModel?.isEmpty == true {
-                        selectedAIModel = aiService.currentModel
-                    }
+                    applyEnhancementSelection(
+                        enhancementSelection.fillingMissingProviderAndModel(
+                            currentProvider: aiService.selectedProvider,
+                            currentModel: aiService.currentModel,
+                            treatsEmptyModelAsMissing: true
+                        )
+                    )
                 }
 
                 if isAIEnhancementEnabled && selectedPromptId == nil {
-                    selectedPromptId = VoiceInkCustomPromptPolicy.selectedPromptIdAfterEnablingEnhancement(
-                        selectedPromptId,
-                        prompts: enhancementService.allPrompts
+                    applyEnhancementSelection(
+                        enhancementSelection.selectingPromptAfterEnabling(prompts: enhancementService.allPrompts)
                     )
                 }
 

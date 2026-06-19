@@ -2080,6 +2080,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
+  "shared Power Mode enhancement selection default repair lives in VoiceInkCore" \
+  'VoiceInkPowerModeEnhancementSelection|fillingMissingProviderAndModel|selectingPromptAfterEnabling' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
   "shared Power Mode form mode lives in VoiceInkCore" \
   'VoiceInkPowerModeConfigurationMode' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
@@ -2177,6 +2182,11 @@ reject_pattern \
 reject_pattern \
   "macOS Power Mode form avoids shell-only stored config construction" \
   'PowerModeConfig\(|selectedPromptId\?\.uuidString|var updatedConfig = config|selectedAppConfigs\.isEmpty \? nil : selectedAppConfigs|websiteConfigs\.isEmpty \? nil : websiteConfigs' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+reject_pattern \
+  "macOS Power Mode form avoids shell-only enhancement selection default repair" \
+  'selectedAIProvider == nil|selectedAIModel == nil|selectedAIModel\?\.isEmpty == true|VoiceInkCustomPromptPolicy\.selectedPromptIdAfterEnablingEnhancement' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
 reject_pattern \

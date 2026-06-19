@@ -206,6 +206,45 @@ public struct VoiceInkPowerModeConfigurationDraft: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkPowerModeEnhancementSelection: Equatable, Sendable {
+    public var selectedPromptId: UUID?
+    public var selectedAIProvider: String?
+    public var selectedAIModel: String?
+
+    public init(
+        selectedPromptId: UUID?,
+        selectedAIProvider: String?,
+        selectedAIModel: String?
+    ) {
+        self.selectedPromptId = selectedPromptId
+        self.selectedAIProvider = selectedAIProvider
+        self.selectedAIModel = selectedAIModel
+    }
+
+    public func fillingMissingProviderAndModel(
+        currentProvider: VoiceInkAIEnhancementProviderKind,
+        currentModel: String,
+        treatsEmptyModelAsMissing: Bool
+    ) -> Self {
+        Self(
+            selectedPromptId: selectedPromptId,
+            selectedAIProvider: selectedAIProvider ?? currentProvider.rawValue,
+            selectedAIModel: selectedAIModel.isMissing(treatsEmptyAsMissing: treatsEmptyModelAsMissing) ? currentModel : selectedAIModel
+        )
+    }
+
+    public func selectingPromptAfterEnabling(prompts: [VoiceInkCustomPrompt]) -> Self {
+        Self(
+            selectedPromptId: VoiceInkCustomPromptPolicy.selectedPromptIdAfterEnablingEnhancement(
+                selectedPromptId,
+                prompts: prompts
+            ),
+            selectedAIProvider: selectedAIProvider,
+            selectedAIModel: selectedAIModel
+        )
+    }
+}
+
 public struct VoiceInkPowerModeApplicationState: Codable, Equatable, Sendable {
     public var isEnhancementEnabled: Bool
     public var useScreenCaptureContext: Bool
@@ -348,6 +387,17 @@ public struct VoiceInkPowerModeCleanupRestore: Equatable, Sendable {
         self.isTextFormattingEnabled = isTextFormattingEnabled
         self.punctuationMode = punctuationMode
         self.lowercaseTranscription = lowercaseTranscription
+    }
+}
+
+private extension Optional where Wrapped == String {
+    func isMissing(treatsEmptyAsMissing: Bool) -> Bool {
+        switch self {
+        case .none:
+            return true
+        case .some(let value):
+            return treatsEmptyAsMissing && value.isEmpty
+        }
     }
 }
 

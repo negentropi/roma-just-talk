@@ -302,6 +302,97 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertTrue(config.isDefault)
     }
 
+    func testPowerModeEnhancementSelectionFillsMissingProviderAndModel() {
+        let nilSelection = VoiceInkPowerModeEnhancementSelection(
+            selectedPromptId: nil,
+            selectedAIProvider: nil,
+            selectedAIModel: nil
+        )
+        let emptyModelSelection = VoiceInkPowerModeEnhancementSelection(
+            selectedPromptId: nil,
+            selectedAIProvider: "OpenAI",
+            selectedAIModel: ""
+        )
+        let existingSelection = VoiceInkPowerModeEnhancementSelection(
+            selectedPromptId: nil,
+            selectedAIProvider: "OpenAI",
+            selectedAIModel: "gpt-4o"
+        )
+
+        XCTAssertEqual(
+            nilSelection.fillingMissingProviderAndModel(
+                currentProvider: .groq,
+                currentModel: "llama-3.3",
+                treatsEmptyModelAsMissing: false
+            ),
+            VoiceInkPowerModeEnhancementSelection(
+                selectedPromptId: nil,
+                selectedAIProvider: "Groq",
+                selectedAIModel: "llama-3.3"
+            )
+        )
+        XCTAssertEqual(
+            emptyModelSelection.fillingMissingProviderAndModel(
+                currentProvider: .groq,
+                currentModel: "llama-3.3",
+                treatsEmptyModelAsMissing: false
+            ).selectedAIModel,
+            ""
+        )
+        XCTAssertEqual(
+            emptyModelSelection.fillingMissingProviderAndModel(
+                currentProvider: .groq,
+                currentModel: "llama-3.3",
+                treatsEmptyModelAsMissing: true
+            ).selectedAIModel,
+            "llama-3.3"
+        )
+        XCTAssertEqual(
+            existingSelection.fillingMissingProviderAndModel(
+                currentProvider: .groq,
+                currentModel: "llama-3.3",
+                treatsEmptyModelAsMissing: true
+            ),
+            existingSelection
+        )
+    }
+
+    func testPowerModeEnhancementSelectionSelectsPromptOnlyWhenMissing() {
+        let promptID = UUID()
+        let existingPromptID = UUID()
+        let prompt = VoiceInkCustomPrompt(id: promptID, title: "Rewrite", promptText: "Rewrite this")
+
+        XCTAssertEqual(
+            VoiceInkPowerModeEnhancementSelection(
+                selectedPromptId: nil,
+                selectedAIProvider: "Groq",
+                selectedAIModel: "llama-3.3"
+            )
+            .selectingPromptAfterEnabling(prompts: [prompt])
+            .selectedPromptId,
+            promptID
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeEnhancementSelection(
+                selectedPromptId: existingPromptID,
+                selectedAIProvider: "Groq",
+                selectedAIModel: "llama-3.3"
+            )
+            .selectingPromptAfterEnabling(prompts: [prompt])
+            .selectedPromptId,
+            existingPromptID
+        )
+        XCTAssertNil(
+            VoiceInkPowerModeEnhancementSelection(
+                selectedPromptId: nil,
+                selectedAIProvider: "Groq",
+                selectedAIModel: "llama-3.3"
+            )
+            .selectingPromptAfterEnabling(prompts: [])
+            .selectedPromptId
+        )
+    }
+
     func testPowerModeApplicationStatePreservesStoredShapeAndCleanupKeys() throws {
         let state = VoiceInkPowerModeApplicationState(
             isEnhancementEnabled: true,

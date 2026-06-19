@@ -834,6 +834,66 @@ public struct VoiceInkPowerModeSession: Codable, Equatable, Sendable {
     }
 }
 
+public struct VoiceInkPowerModeSessionBeginPlan: Equatable, Sendable {
+    public var startsNewSession: Bool
+
+    public var shouldInstallSettingsObserver: Bool {
+        startsNewSession
+    }
+
+    public init(startsNewSession: Bool) {
+        self.startsNewSession = startsNewSession
+    }
+
+    public static func plan(activeSession: VoiceInkPowerModeSession?) -> Self {
+        Self(startsNewSession: activeSession == nil)
+    }
+
+    public func sessionToSave(
+        id: UUID,
+        startTime: Date,
+        originalState: @autoclosure () -> VoiceInkPowerModeApplicationState
+    ) -> VoiceInkPowerModeSession? {
+        guard startsNewSession else { return nil }
+        return VoiceInkPowerModeSession(
+            id: id,
+            startTime: startTime,
+            originalState: originalState()
+        )
+    }
+}
+
+public struct VoiceInkPowerModeSessionSnapshotPlan: Equatable, Sendable {
+    public var activeSession: VoiceInkPowerModeSession?
+
+    public var shouldCaptureCurrentState: Bool {
+        activeSession != nil
+    }
+
+    public init(activeSession: VoiceInkPowerModeSession?) {
+        self.activeSession = activeSession
+    }
+
+    public static func plan(
+        isApplyingPowerModeConfiguration: Bool,
+        activeSession: VoiceInkPowerModeSession?
+    ) -> Self {
+        guard !isApplyingPowerModeConfiguration else {
+            return Self(activeSession: nil)
+        }
+
+        return Self(activeSession: activeSession)
+    }
+
+    public func sessionToSave(
+        currentState: VoiceInkPowerModeApplicationState
+    ) -> VoiceInkPowerModeSession? {
+        guard var activeSession else { return nil }
+        activeSession.originalState = currentState
+        return activeSession
+    }
+}
+
 public extension Array where Element == PowerModeConfig {
     var powerModePolicyRules: [VoiceInkPowerModeRule] {
         map(\.powerModePolicyRule)

@@ -1069,6 +1069,93 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertEqual(decoded.originalState, originalState)
     }
 
+    func testPowerModeSessionBeginPlanCreatesSessionWhenMissing() {
+        let id = UUID()
+        let startTime = Date(timeIntervalSince1970: 1_700_000_001)
+        let originalState = powerModeApplicationState(selectedAIModel: "original")
+        let plan = VoiceInkPowerModeSessionBeginPlan.plan(activeSession: nil)
+
+        XCTAssertTrue(plan.startsNewSession)
+        XCTAssertTrue(plan.shouldInstallSettingsObserver)
+        XCTAssertEqual(
+            plan.sessionToSave(id: id, startTime: startTime, originalState: originalState),
+            VoiceInkPowerModeSession(
+                id: id,
+                startTime: startTime,
+                originalState: originalState
+            )
+        )
+    }
+
+    func testPowerModeSessionBeginPlanKeepsExistingSession() {
+        var stateBuildCount = 0
+        func newOriginalState() -> VoiceInkPowerModeApplicationState {
+            stateBuildCount += 1
+            return powerModeApplicationState(selectedAIModel: "new")
+        }
+
+        let existingSession = VoiceInkPowerModeSession(
+            id: UUID(),
+            startTime: Date(timeIntervalSince1970: 1_700_000_002),
+            originalState: powerModeApplicationState(selectedAIModel: "existing")
+        )
+        let plan = VoiceInkPowerModeSessionBeginPlan.plan(activeSession: existingSession)
+
+        XCTAssertFalse(plan.startsNewSession)
+        XCTAssertFalse(plan.shouldInstallSettingsObserver)
+        XCTAssertNil(
+            plan.sessionToSave(
+                id: UUID(),
+                startTime: Date(timeIntervalSince1970: 1_700_000_003),
+                originalState: newOriginalState()
+            )
+        )
+        XCTAssertEqual(stateBuildCount, 0)
+    }
+
+    func testPowerModeSessionSnapshotPlanSkipsApplyingOrMissingSession() {
+        let activeSession = VoiceInkPowerModeSession(
+            id: UUID(),
+            startTime: Date(timeIntervalSince1970: 1_700_000_004),
+            originalState: powerModeApplicationState(selectedAIModel: "existing")
+        )
+
+        let applyingPlan = VoiceInkPowerModeSessionSnapshotPlan.plan(
+            isApplyingPowerModeConfiguration: true,
+            activeSession: activeSession
+        )
+        let missingPlan = VoiceInkPowerModeSessionSnapshotPlan.plan(
+            isApplyingPowerModeConfiguration: false,
+            activeSession: nil
+        )
+
+        XCTAssertFalse(applyingPlan.shouldCaptureCurrentState)
+        XCTAssertNil(applyingPlan.sessionToSave(currentState: powerModeApplicationState(selectedAIModel: "ignored")))
+        XCTAssertFalse(missingPlan.shouldCaptureCurrentState)
+        XCTAssertNil(missingPlan.sessionToSave(currentState: powerModeApplicationState(selectedAIModel: "ignored")))
+    }
+
+    func testPowerModeSessionSnapshotPlanUpdatesOriginalStateWhenIdle() {
+        let id = UUID()
+        let startTime = Date(timeIntervalSince1970: 1_700_000_005)
+        let activeSession = VoiceInkPowerModeSession(
+            id: id,
+            startTime: startTime,
+            originalState: powerModeApplicationState(selectedAIModel: "old")
+        )
+        let currentState = powerModeApplicationState(selectedAIModel: "current")
+        let plan = VoiceInkPowerModeSessionSnapshotPlan.plan(
+            isApplyingPowerModeConfiguration: false,
+            activeSession: activeSession
+        )
+        let sessionToSave = plan.sessionToSave(currentState: currentState)
+
+        XCTAssertTrue(plan.shouldCaptureCurrentState)
+        XCTAssertEqual(sessionToSave?.id, id)
+        XCTAssertEqual(sessionToSave?.startTime, startTime)
+        XCTAssertEqual(sessionToSave?.originalState, currentState)
+    }
+
     func testAutoSendKeyPreservesStoredValuesPickerOrderAndLabels() {
         XCTAssertEqual(
             VoiceInkAutoSendKey.allCases,
@@ -1531,6 +1618,17 @@ final class PowerModePolicyTests: XCTestCase {
         VoiceInkPowerModeTranscriptionModelResourceFacts(
             name: name,
             loadsLocalWhisperModel: loadsLocalWhisperModel
+        )
+    }
+
+    private func powerModeApplicationState(
+        selectedAIModel: String
+    ) -> VoiceInkPowerModeApplicationState {
+        VoiceInkPowerModeApplicationState(
+            isEnhancementEnabled: true,
+            useScreenCaptureContext: false,
+            selectedAIProvider: "openai",
+            selectedAIModel: selectedAIModel
         )
     }
 

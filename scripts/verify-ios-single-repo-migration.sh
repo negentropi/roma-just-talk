@@ -2373,6 +2373,16 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
+  "shared Power Mode begin-session lifecycle plan lives in VoiceInkCore" \
+  'VoiceInkPowerModeSessionBeginPlan|shouldInstallSettingsObserver' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode snapshot-update lifecycle plan lives in VoiceInkCore" \
+  'VoiceInkPowerModeSessionSnapshotPlan|shouldCaptureCurrentState' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
   "shared Power Mode session snapshot construction consumes cleanup settings" \
   'cleanupSettings: VoiceInkTranscriptionCleanupSettings|selectedPromptId: selectedPromptId\?\.uuidString' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
@@ -2413,6 +2423,11 @@ reject_pattern \
   VoiceInk/PowerMode/PowerModeSessionManager.swift
 
 reject_pattern \
+  "macOS Power Mode session manager avoids shell-only lifecycle branching" \
+  'loadSession\(\) == nil|guard +!isApplyingPowerModeConfig|var +session = loadSession\(\)|session\.originalState = currentApplicationState|VoiceInkPowerModeSession\(' \
+  VoiceInk/PowerMode/PowerModeSessionManager.swift
+
+reject_pattern \
   "macOS Power Mode session manager avoids shell-only provider raw-value parsing" \
   'VoiceInkAIEnhancementProviderKind\(storedValue:' \
   VoiceInk/PowerMode/PowerModeSessionManager.swift
@@ -2425,6 +2440,16 @@ reject_pattern \
 require_pattern \
   "macOS Power Mode session manager consumes shared session snapshot records" \
   'VoiceInkPowerMode(ApplicationState|Session)' \
+  VoiceInk/PowerMode/PowerModeSessionManager.swift
+
+require_pattern \
+  "macOS Power Mode session manager consumes shared begin-session plan" \
+  'VoiceInkPowerModeSessionBeginPlan\.plan|beginPlan\.sessionToSave' \
+  VoiceInk/PowerMode/PowerModeSessionManager.swift
+
+require_pattern \
+  "macOS Power Mode session manager consumes shared snapshot-update plan" \
+  'VoiceInkPowerModeSessionSnapshotPlan\.plan|snapshotPlan\.sessionToSave' \
   VoiceInk/PowerMode/PowerModeSessionManager.swift
 
 require_pattern \

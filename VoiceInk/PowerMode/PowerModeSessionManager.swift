@@ -26,19 +26,20 @@ class PowerModeSessionManager {
             return
         }
 
-        // Only capture baseline if NO session exists
-        if loadSession() == nil {
-            let newSession = VoiceInkPowerModeSession(
-                id: UUID(),
-                startTime: Date(),
-                originalState: currentApplicationState(
-                    stateProvider: stateProvider,
-                    enhancementService: enhancementService
-                )
+        let beginPlan = VoiceInkPowerModeSessionBeginPlan.plan(activeSession: loadSession())
+        if let newSession = beginPlan.sessionToSave(
+            id: UUID(),
+            startTime: Date(),
+            originalState: currentApplicationState(
+                stateProvider: stateProvider,
+                enhancementService: enhancementService
             )
+        ) {
             saveSession(newSession)
 
-            NotificationCenter.default.addObserver(self, selector: #selector(updateSessionSnapshot), name: .AppSettingsDidChange, object: nil)
+            if beginPlan.shouldInstallSettingsObserver {
+                NotificationCenter.default.addObserver(self, selector: #selector(updateSessionSnapshot), name: .AppSettingsDidChange, object: nil)
+            }
         }
 
         // Always apply the new configuration
@@ -64,17 +65,22 @@ class PowerModeSessionManager {
     }
 
     @objc func updateSessionSnapshot() {
-        guard !isApplyingPowerModeConfig else { return }
-
-        guard var session = loadSession(),
+        let snapshotPlan = VoiceInkPowerModeSessionSnapshotPlan.plan(
+            isApplyingPowerModeConfiguration: isApplyingPowerModeConfig,
+            activeSession: loadSession()
+        )
+        guard snapshotPlan.shouldCaptureCurrentState,
               let stateProvider = stateProvider,
               let enhancementService = enhancementService else { return }
 
-        session.originalState = currentApplicationState(
-            stateProvider: stateProvider,
-            enhancementService: enhancementService
-        )
-        saveSession(session)
+        if let session = snapshotPlan.sessionToSave(
+            currentState: currentApplicationState(
+                stateProvider: stateProvider,
+                enhancementService: enhancementService
+            )
+        ) {
+            saveSession(session)
+        }
     }
 
     private func currentApplicationState(

@@ -14,7 +14,7 @@ public struct VoiceInkAssemblyAITranscriptionClient: Sendable {
         maxWaitSeconds: TimeInterval = 300,
         timeout: TimeInterval = 30,
         maxRetries: Int = 2,
-        errorDomain: String = "AssemblyAIAPI"
+        errorDomain: String = VoiceInkTranscriptionModelProvider.assemblyAI.requiredAPIErrorDomain
     ) async throws -> String {
         let uploadURL = try await uploadAudio(
             baseURL: baseURL,

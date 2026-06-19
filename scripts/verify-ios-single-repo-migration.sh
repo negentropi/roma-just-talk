@@ -1383,7 +1383,7 @@ reject_pattern \
 
 require_pattern \
   "shared transcription provider API error domains live in VoiceInkCore" \
-  'apiErrorDomain' \
+  'apiErrorDomain|requiredAPIErrorDomain' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift
 
 require_pattern \
@@ -1405,6 +1405,18 @@ reject_pattern \
   "shared remote transcription service avoids provider API error-domain literals" \
   '"(MistralAPI|AssemblyAIAPI|XAIAPI)"' \
   VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
+
+reject_pattern \
+  "shared remote transcription clients avoid provider API error-domain literals" \
+  '"(DeepgramAPI|GeminiAPI|MistralAPI|ElevenLabsAPI|SonioxAPI|SpeechmaticsAPI|AssemblyAIAPI|XAIAPI)"' \
+  VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/MistralTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/ElevenLabsTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionClient.swift
 
 require_pattern \
   "shared custom cloud model backup record owns export/import shape" \

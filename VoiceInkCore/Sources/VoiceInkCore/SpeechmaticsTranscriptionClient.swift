@@ -14,7 +14,7 @@ public struct VoiceInkSpeechmaticsTranscriptionClient: Sendable {
         maxWaitSeconds: TimeInterval = 300,
         timeout: TimeInterval = 30,
         maxRetries: Int = 2,
-        errorDomain: String = "SpeechmaticsAPI"
+        errorDomain: String = VoiceInkTranscriptionModelProvider.speechmatics.requiredAPIErrorDomain
     ) async throws -> String {
         let jobID = try await submitJob(
             baseURL: baseURL,

@@ -10,7 +10,7 @@ public struct VoiceInkGeminiTranscriptionClient: Sendable {
         audioData: Data,
         mimeType: String = "audio/wav",
         prompt: String = VoiceInkGeminiTranscriptionCodec.defaultPrompt,
-        errorDomain: String = "GeminiAPI",
+        errorDomain: String = VoiceInkTranscriptionModelProvider.gemini.requiredAPIErrorDomain,
         timeout: TimeInterval? = 60
     ) async throws -> String {
         let request = try VoiceInkGeminiRequestBuilder.makeTranscriptionRequest(

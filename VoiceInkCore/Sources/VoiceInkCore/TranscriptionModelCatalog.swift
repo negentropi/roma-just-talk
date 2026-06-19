@@ -153,6 +153,13 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
             return nil
         }
     }
+
+    public var requiredAPIErrorDomain: String {
+        guard let apiErrorDomain else {
+            preconditionFailure("\(rawValue) provider metadata must define an API error domain")
+        }
+        return apiErrorDomain
+    }
 }
 
 public struct VoiceInkCloudTranscriptionModelSpec: Equatable, Sendable {

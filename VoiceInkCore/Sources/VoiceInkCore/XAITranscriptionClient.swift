@@ -10,7 +10,7 @@ public struct VoiceInkXAITranscriptionClient: Sendable {
         fileName: String = "audio.wav",
         language: String? = nil,
         format: Bool = false,
-        errorDomain: String = "XAIAPI",
+        errorDomain: String = VoiceInkTranscriptionModelProvider.xai.requiredAPIErrorDomain,
         timeout: TimeInterval = 60,
         maxRetries: Int = 2
     ) async throws -> String {

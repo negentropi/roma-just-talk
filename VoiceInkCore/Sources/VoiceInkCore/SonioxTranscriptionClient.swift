@@ -13,7 +13,7 @@ public struct VoiceInkSonioxTranscriptionClient: Sendable {
         customVocabulary: [String] = [],
         maxWaitSeconds: TimeInterval = 300,
         timeout: TimeInterval = 30,
-        errorDomain: String = "SonioxAPI"
+        errorDomain: String = VoiceInkTranscriptionModelProvider.soniox.requiredAPIErrorDomain
     ) async throws -> String {
         let fileID = try await uploadFile(
             baseURL: baseURL,

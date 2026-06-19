@@ -14,7 +14,7 @@ public struct VoiceInkDeepgramTranscriptionClient: Sendable {
         paragraphs: Bool? = nil,
         diarize: Bool? = false,
         customVocabulary: [String] = [],
-        errorDomain: String = "DeepgramAPI",
+        errorDomain: String = VoiceInkTranscriptionModelProvider.deepgram.requiredAPIErrorDomain,
         timeout: TimeInterval? = nil
     ) async throws -> String {
         let request = try VoiceInkDeepgramRequestBuilder.makeTranscriptionRequest(

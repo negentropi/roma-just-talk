@@ -9,7 +9,7 @@ public struct VoiceInkMistralTranscriptionClient: Sendable {
         model: String,
         audioData: Data,
         fileName: String = "audio.wav",
-        errorDomain: String = "MistralAPI",
+        errorDomain: String = VoiceInkTranscriptionModelProvider.mistral.requiredAPIErrorDomain,
         timeout: TimeInterval = 30,
         maxRetries: Int = 2
     ) async throws -> String {

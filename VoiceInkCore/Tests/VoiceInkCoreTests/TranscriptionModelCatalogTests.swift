@@ -130,6 +130,24 @@ final class TranscriptionModelCatalogTests: XCTestCase {
         XCTAssertNil(VoiceInkTranscriptionModelProvider.local.apiErrorDomain)
     }
 
+    func testRequiredProviderAPIErrorDomainsMatchSharedMapping() {
+        let providers: [VoiceInkTranscriptionModelProvider] = [
+            .groq,
+            .deepgram,
+            .gemini,
+            .mistral,
+            .elevenLabs,
+            .soniox,
+            .speechmatics,
+            .assemblyAI,
+            .xai
+        ]
+
+        for provider in providers {
+            XCTAssertEqual(provider.requiredAPIErrorDomain, provider.apiErrorDomain)
+        }
+    }
+
     func testAssemblyAILanguageCapabilityAndModelsAreSharedProviderMetadata() {
         XCTAssertEqual(VoiceInkTranscriptionModelProvider.assemblyAI.languageCodes, ["en", "es", "de", "fr", "pt", "it"])
         XCTAssertTrue(VoiceInkTranscriptionModelProvider.assemblyAI.includesAutoDetect)

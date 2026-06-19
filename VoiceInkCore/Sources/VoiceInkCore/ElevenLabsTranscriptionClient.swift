@@ -10,7 +10,7 @@ public struct VoiceInkElevenLabsTranscriptionClient: Sendable {
         audioData: Data,
         fileName: String = "audio.wav",
         language: String? = nil,
-        errorDomain: String = "ElevenLabsAPI",
+        errorDomain: String = VoiceInkTranscriptionModelProvider.elevenLabs.requiredAPIErrorDomain,
         timeout: TimeInterval = 30,
         maxRetries: Int = 2
     ) async throws -> String {

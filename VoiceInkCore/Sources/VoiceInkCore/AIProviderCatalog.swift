@@ -14,6 +14,13 @@ public enum VoiceInkAIEnhancementExecutionRoute: Sendable, Equatable {
     case openAICompatibleChatCompletions
 }
 
+public enum VoiceInkAIEnhancementModelCatalogSource: Sendable, Equatable {
+    case staticModels
+    case ollamaRuntime
+    case openRouterRemote
+    case none
+}
+
 public struct VoiceInkAIEnhancementAPIKeyDraft: Equatable, Sendable {
     private let provider: VoiceInkAIEnhancementProviderKind
     private let providerKeyDraft: VoiceInkProviderAPIKeyDraft
@@ -250,17 +257,36 @@ public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
         }
     }
 
+    public var textEnhancementModelCatalogSource: VoiceInkAIEnhancementModelCatalogSource {
+        switch self {
+        case .ollama:
+            return .ollamaRuntime
+        case .openRouter:
+            return .openRouterRemote
+        case .localCLI, .custom:
+            return .none
+        case .anthropic, .assemblyAI, .cerebras, .deepgram, .elevenLabs, .groq, .gemini, .mistral, .openAI, .soniox, .speechmatics:
+            return .staticModels
+        }
+    }
+
+    public var supportsUserInitiatedTextEnhancementModelRefresh: Bool {
+        textEnhancementModelCatalogSource == .openRouterRemote
+    }
+
     public func textEnhancementAvailableModels(
         ollamaModels: [String],
         openRouterModels: [String]
     ) -> [String] {
-        switch self {
-        case .ollama:
+        switch textEnhancementModelCatalogSource {
+        case .ollamaRuntime:
             return ollamaModels
-        case .openRouter:
+        case .openRouterRemote:
             return openRouterModels
-        case .anthropic, .assemblyAI, .cerebras, .custom, .deepgram, .elevenLabs, .groq, .gemini, .localCLI, .mistral, .openAI, .soniox, .speechmatics:
+        case .staticModels:
             return staticTextEnhancementModels
+        case .none:
+            return []
         }
     }
 

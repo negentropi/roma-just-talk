@@ -458,6 +458,39 @@ final class AIProviderCatalogTests: XCTestCase {
         )
     }
 
+    func testMacOSAIEnhancementModelCatalogSourcePolicyIsShared() {
+        let expectedSources: [VoiceInkAIEnhancementProviderKind: VoiceInkAIEnhancementModelCatalogSource] = [
+            .anthropic: .staticModels,
+            .assemblyAI: .staticModels,
+            .cerebras: .staticModels,
+            .custom: .none,
+            .deepgram: .staticModels,
+            .elevenLabs: .staticModels,
+            .gemini: .staticModels,
+            .groq: .staticModels,
+            .localCLI: .none,
+            .mistral: .staticModels,
+            .ollama: .ollamaRuntime,
+            .openAI: .staticModels,
+            .openRouter: .openRouterRemote,
+            .soniox: .staticModels,
+            .speechmatics: .staticModels
+        ]
+
+        XCTAssertEqual(VoiceInkAIEnhancementProviderKind.allCases.count, expectedSources.count)
+
+        for (provider, source) in expectedSources {
+            XCTAssertEqual(provider.textEnhancementModelCatalogSource, source)
+        }
+    }
+
+    func testMacOSAIEnhancementUserInitiatedModelRefreshPolicyIsShared() {
+        XCTAssertTrue(VoiceInkAIEnhancementProviderKind.openRouter.supportsUserInitiatedTextEnhancementModelRefresh)
+        XCTAssertFalse(VoiceInkAIEnhancementProviderKind.ollama.supportsUserInitiatedTextEnhancementModelRefresh)
+        XCTAssertFalse(VoiceInkAIEnhancementProviderKind.groq.supportsUserInitiatedTextEnhancementModelRefresh)
+        XCTAssertFalse(VoiceInkAIEnhancementProviderKind.custom.supportsUserInitiatedTextEnhancementModelRefresh)
+    }
+
     func testMacOSAIEnhancementRequestURLSelectionIsShared() {
         withIsolatedDefaults { defaults in
             XCTAssertEqual(

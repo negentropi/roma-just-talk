@@ -86,7 +86,7 @@ struct APIKeyManagementView: View {
 
             VStack(alignment: .leading, spacing: 12) {
                 // Model Selection
-                if aiService.selectedProvider == .openRouter {
+                if aiService.selectedProvider.supportsUserInitiatedTextEnhancementModelRefresh {
                     if aiService.availableModels.isEmpty {
                         HStack {
                             Text("No models loaded")
@@ -123,9 +123,8 @@ struct APIKeyManagementView: View {
                         }
                     }
                     
-                } else if !aiService.availableModels.isEmpty &&
-                            aiService.selectedProvider != .ollama &&
-                            aiService.selectedProvider != .custom {
+                } else if aiService.selectedProvider.textEnhancementModelCatalogSource == .staticModels &&
+                            !aiService.availableModels.isEmpty {
                     Picker("Model", selection: Binding(
                         get: { aiService.currentModel },
                         set: { aiService.selectModel($0) }

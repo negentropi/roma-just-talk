@@ -197,7 +197,7 @@ public enum VoiceInkPowerModePresentation {
     }
 
     public static func noAIModelsAvailableText(for provider: VoiceInkAIEnhancementProviderKind) -> String {
-        provider == .openRouter ? noAIModelsLoadedText : noAIModelsAvailableText
+        provider.supportsUserInitiatedTextEnhancementModelRefresh ? noAIModelsLoadedText : noAIModelsAvailableText
     }
 
     private static func triggerCountText(_ count: Int, singular: String, plural: String) -> String {

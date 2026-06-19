@@ -2201,13 +2201,24 @@ require_pattern \
 
 require_pattern \
   "shared AI enhancement available-model source policy lives in VoiceInkCore" \
-  'textEnhancementAvailableModels' \
+  'VoiceInkAIEnhancementModelCatalogSource|textEnhancementModelCatalogSource|textEnhancementAvailableModels' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \
   "macOS AI service available-model source selection uses shared policy" \
   'textEnhancementAvailableModels' \
   VoiceInk/Services/AIEnhancement/AIService.swift
+
+require_pattern \
+  "macOS AI settings model-source display uses shared policy" \
+  'supportsUserInitiatedTextEnhancementModelRefresh|textEnhancementModelCatalogSource' \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+
+require_pattern \
+  "macOS Power Mode model refresh display uses shared policy" \
+  'supportsUserInitiatedTextEnhancementModelRefresh' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
 
 require_pattern \
   "shared AI enhancement request URL selection lives in VoiceInkCore" \
@@ -2300,6 +2311,13 @@ reject_pattern \
   "macOS AI service avoids duplicate available-model source policy" \
   'provider == \.(ollama|openRouter)|return +openRouterModels|return +provider\.staticTextEnhancementModels' \
   VoiceInk/Services/AIEnhancement/AIService.swift
+
+reject_pattern \
+  "macOS AI settings avoid duplicate OpenRouter model-source policy" \
+  'selectedProvider == \.openRouter|selectedProvider != \.custom|provider == \.openRouter' \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift \
+  VoiceInk/PowerMode/PowerModeConfigView.swift \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
 
 reject_pattern \
   "macOS AI service avoids duplicate refresh model-selection policy" \

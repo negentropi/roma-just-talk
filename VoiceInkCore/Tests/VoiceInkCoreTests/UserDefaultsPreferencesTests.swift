@@ -38,6 +38,12 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkUserDefaultsKey.activePowerModeSession, "powerModeActiveSession.v1")
         XCTAssertEqual(VoiceInkUserDefaultsKey.prewarmModelOnWake, "PrewarmModelOnWake")
         XCTAssertEqual(VoiceInkUserDefaultsKey.showLiveTextPreview, "showLiveTextPreview")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.primaryRecordingShortcut, "primaryRecordingShortcut")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.secondaryRecordingShortcut, "secondaryRecordingShortcut")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.primaryRecordingShortcutMode, "primaryRecordingShortcutMode")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.secondaryRecordingShortcutMode, "secondaryRecordingShortcutMode")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.isMiddleClickToggleEnabled, "isMiddleClickToggleEnabled")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.middleClickActivationDelay, "middleClickActivationDelay")
         XCTAssertEqual(VoiceInkUserDefaultsKey.selectedAIProvider, "selectedAIProvider")
         XCTAssertEqual(VoiceInkUserDefaultsKey.openRouterModels, "openRouterModels")
         XCTAssertEqual(VoiceInkUserDefaultsKey.ollamaBaseURL, "ollamaBaseURL")
@@ -95,6 +101,11 @@ final class UserDefaultsPreferencesTests: XCTestCase {
     func testSharedPreferenceDefaultsPreserveExistingMacOSRuntimeFlags() {
         XCTAssertTrue(VoiceInkPreferenceDefault.prewarmModelOnWake)
         XCTAssertFalse(VoiceInkPreferenceDefault.showLiveTextPreview)
+    }
+
+    func testSharedPreferenceDefaultsPreserveExistingRecordingShortcutFlags() {
+        XCTAssertFalse(VoiceInkPreferenceDefault.isMiddleClickToggleEnabled)
+        XCTAssertEqual(VoiceInkPreferenceDefault.middleClickActivationDelay, 200)
     }
 
     func testSharedPreferenceDefaultsPreserveExistingOllamaBaseURL() {
@@ -1032,6 +1043,95 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testRecordingShortcutSelectionPreservesRawValuesAndDisplayNames() {
+        XCTAssertEqual(VoiceInkRecordingShortcutSelection.none.rawValue, "none")
+        XCTAssertEqual(VoiceInkRecordingShortcutSelection.none.displayName, "None")
+        XCTAssertEqual(VoiceInkRecordingShortcutSelection.custom.rawValue, "custom")
+        XCTAssertEqual(VoiceInkRecordingShortcutSelection.custom.displayName, "Custom")
+    }
+
+    func testRecordingShortcutModePreservesRawValuesAndDisplayNames() {
+        XCTAssertEqual(VoiceInkRecordingShortcutMode.special.rawValue, "special")
+        XCTAssertEqual(VoiceInkRecordingShortcutMode.special.displayName, "Special")
+        XCTAssertEqual(VoiceInkRecordingShortcutMode.toggle.rawValue, "toggle")
+        XCTAssertEqual(VoiceInkRecordingShortcutMode.toggle.displayName, "Toggle")
+        XCTAssertEqual(VoiceInkRecordingShortcutMode.pushToTalk.rawValue, "pushToTalk")
+        XCTAssertEqual(VoiceInkRecordingShortcutMode.pushToTalk.displayName, "Push to Talk")
+        XCTAssertEqual(VoiceInkRecordingShortcutMode.hybrid.rawValue, "hybrid")
+        XCTAssertEqual(VoiceInkRecordingShortcutMode.hybrid.displayName, "Hybrid")
+    }
+
+    func testRecordingShortcutPreferenceKeysDefaultsAndRegisteredDefaults() {
+        XCTAssertEqual(
+            VoiceInkRecordingShortcutPreference.selectionKey(for: .primary),
+            VoiceInkUserDefaultsKey.primaryRecordingShortcut
+        )
+        XCTAssertEqual(
+            VoiceInkRecordingShortcutPreference.selectionKey(for: .secondary),
+            VoiceInkUserDefaultsKey.secondaryRecordingShortcut
+        )
+        XCTAssertEqual(
+            VoiceInkRecordingShortcutPreference.modeKey(for: .primary),
+            VoiceInkUserDefaultsKey.primaryRecordingShortcutMode
+        )
+        XCTAssertEqual(
+            VoiceInkRecordingShortcutPreference.modeKey(for: .secondary),
+            VoiceInkUserDefaultsKey.secondaryRecordingShortcutMode
+        )
+        XCTAssertEqual(VoiceInkRecordingShortcutPreference.defaultSelection(for: .primary), .custom)
+        XCTAssertEqual(VoiceInkRecordingShortcutPreference.defaultSelection(for: .secondary), .none)
+        XCTAssertEqual(VoiceInkRecordingShortcutPreference.defaultMode(for: .primary), .special)
+        XCTAssertEqual(VoiceInkRecordingShortcutPreference.defaultMode(for: .secondary), .hybrid)
+        XCTAssertEqual(
+            VoiceInkRecordingShortcutPreference.registeredDefaults[VoiceInkUserDefaultsKey.isMiddleClickToggleEnabled] as? Bool,
+            VoiceInkPreferenceDefault.isMiddleClickToggleEnabled
+        )
+        XCTAssertEqual(
+            VoiceInkRecordingShortcutPreference.registeredDefaults[VoiceInkUserDefaultsKey.middleClickActivationDelay] as? Int,
+            VoiceInkPreferenceDefault.middleClickActivationDelay
+        )
+    }
+
+    func testRecordingShortcutPreferenceReadsSavesAndClearsSettings() {
+        withIsolatedDefaults { defaults in
+            XCTAssertNil(VoiceInkRecordingShortcutPreference.selection(for: .primary, from: defaults))
+            XCTAssertEqual(VoiceInkRecordingShortcutPreference.mode(for: .primary, from: defaults), .special)
+            XCTAssertEqual(VoiceInkRecordingShortcutPreference.mode(for: .secondary, from: defaults), .hybrid)
+            XCTAssertFalse(VoiceInkRecordingShortcutPreference.isMiddleClickToggleEnabled(from: defaults))
+            XCTAssertEqual(
+                VoiceInkRecordingShortcutPreference.middleClickActivationDelay(from: defaults),
+                VoiceInkPreferenceDefault.middleClickActivationDelay
+            )
+
+            VoiceInkRecordingShortcutPreference.saveSelection(.custom, for: .primary, to: defaults)
+            VoiceInkRecordingShortcutPreference.saveSelection(.none, for: .secondary, to: defaults)
+            VoiceInkRecordingShortcutPreference.saveMode(.toggle, for: .primary, to: defaults)
+            VoiceInkRecordingShortcutPreference.saveMode(.pushToTalk, for: .secondary, to: defaults)
+            VoiceInkRecordingShortcutPreference.saveMiddleClickToggleEnabled(true, to: defaults)
+            VoiceInkRecordingShortcutPreference.saveMiddleClickActivationDelay(350, to: defaults)
+
+            XCTAssertEqual(VoiceInkRecordingShortcutPreference.selection(for: .primary, from: defaults), .custom)
+            XCTAssertEqual(
+                VoiceInkRecordingShortcutPreference.selection(for: .secondary, from: defaults),
+                VoiceInkRecordingShortcutSelection.none
+            )
+            XCTAssertEqual(VoiceInkRecordingShortcutPreference.mode(for: .primary, from: defaults), .toggle)
+            XCTAssertEqual(VoiceInkRecordingShortcutPreference.mode(for: .secondary, from: defaults), .pushToTalk)
+            XCTAssertTrue(VoiceInkRecordingShortcutPreference.isMiddleClickToggleEnabled(from: defaults))
+            XCTAssertEqual(VoiceInkRecordingShortcutPreference.middleClickActivationDelay(from: defaults), 350)
+
+            VoiceInkRecordingShortcutPreference.clear(from: defaults)
+
+            XCTAssertNil(VoiceInkRecordingShortcutPreference.selection(for: .primary, from: defaults))
+            XCTAssertEqual(VoiceInkRecordingShortcutPreference.mode(for: .primary, from: defaults), .special)
+            XCTAssertFalse(VoiceInkRecordingShortcutPreference.isMiddleClickToggleEnabled(from: defaults))
+            XCTAssertEqual(
+                VoiceInkRecordingShortcutPreference.middleClickActivationDelay(from: defaults),
+                VoiceInkPreferenceDefault.middleClickActivationDelay
+            )
+        }
+    }
+
     func testSharedPreferenceResetClearsCoreUserSettings() {
         withIsolatedDefaults { defaults in
             let mode = Mode.defaultLocalWhisper()
@@ -1075,6 +1175,12 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             VoiceInkPowerModePreference.saveShouldPersistConfiguredPreferences(true, to: defaults)
             VoiceInkModelRuntimePreference.saveShouldPrewarmModelOnWake(false, to: defaults)
             VoiceInkRecorderPreviewPreference.saveIsLiveTextPreviewEnabled(true, to: defaults)
+            VoiceInkRecordingShortcutPreference.saveSelection(.custom, for: .primary, to: defaults)
+            VoiceInkRecordingShortcutPreference.saveSelection(.none, for: .secondary, to: defaults)
+            VoiceInkRecordingShortcutPreference.saveMode(.toggle, for: .primary, to: defaults)
+            VoiceInkRecordingShortcutPreference.saveMode(.pushToTalk, for: .secondary, to: defaults)
+            VoiceInkRecordingShortcutPreference.saveMiddleClickToggleEnabled(true, to: defaults)
+            VoiceInkRecordingShortcutPreference.saveMiddleClickActivationDelay(350, to: defaults)
             let powerModeConfig = PowerModeConfig(
                 name: "Writing",
                 emoji: "W",
@@ -1173,6 +1279,13 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             XCTAssertNil(try? VoiceInkPowerModeSessionPreference.loadActiveSession(from: defaults))
             XCTAssertTrue(VoiceInkModelRuntimePreference.shouldPrewarmModelOnWake(from: defaults))
             XCTAssertFalse(VoiceInkRecorderPreviewPreference.isLiveTextPreviewEnabled(from: defaults))
+            XCTAssertNil(VoiceInkRecordingShortcutPreference.selection(for: .primary, from: defaults))
+            XCTAssertEqual(VoiceInkRecordingShortcutPreference.mode(for: .primary, from: defaults), .special)
+            XCTAssertFalse(VoiceInkRecordingShortcutPreference.isMiddleClickToggleEnabled(from: defaults))
+            XCTAssertEqual(
+                VoiceInkRecordingShortcutPreference.middleClickActivationDelay(from: defaults),
+                VoiceInkPreferenceDefault.middleClickActivationDelay
+            )
         }
     }
 

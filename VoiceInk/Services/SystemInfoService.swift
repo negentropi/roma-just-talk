@@ -37,8 +37,8 @@ class SystemInfoService {
         HOTKEY SETTINGS:
         Primary Shortcut: \(getPrimaryShortcut())
         Secondary Shortcut: \(getSecondaryShortcut())
-        Middle-Click Recording: \(UserDefaults.standard.bool(forKey: "isMiddleClickToggleEnabled"))
-        Middle-Click Activation Delay: \(UserDefaults.standard.integer(forKey: "middleClickActivationDelay")) ms
+        Middle-Click Recording: \(VoiceInkRecordingShortcutPreference.isMiddleClickToggleEnabled())
+        Middle-Click Activation Delay: \(VoiceInkRecordingShortcutPreference.middleClickActivationDelay()) ms
 
         TRANSCRIPTION SETTINGS:
         Selected Model: \(getCurrentTranscriptionModel())

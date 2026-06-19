@@ -37,6 +37,12 @@ public enum VoiceInkUserDefaultsKey {
     public static let activePowerModeSession = "powerModeActiveSession.v1"
     public static let prewarmModelOnWake = "PrewarmModelOnWake"
     public static let showLiveTextPreview = "showLiveTextPreview"
+    public static let primaryRecordingShortcut = "primaryRecordingShortcut"
+    public static let secondaryRecordingShortcut = "secondaryRecordingShortcut"
+    public static let primaryRecordingShortcutMode = "primaryRecordingShortcutMode"
+    public static let secondaryRecordingShortcutMode = "secondaryRecordingShortcutMode"
+    public static let isMiddleClickToggleEnabled = "isMiddleClickToggleEnabled"
+    public static let middleClickActivationDelay = "middleClickActivationDelay"
     public static let selectedAIProvider = "selectedAIProvider"
     public static let openRouterModels = "openRouterModels"
     public static let ollamaBaseURL = "ollamaBaseURL"
@@ -66,6 +72,8 @@ public enum VoiceInkPreferenceDefault {
     public static let powerModePersistConfiguredPreferences = false
     public static let prewarmModelOnWake = true
     public static let showLiveTextPreview = false
+    public static let isMiddleClickToggleEnabled = false
+    public static let middleClickActivationDelay = 200
     public static let ollamaBaseURL = "http://localhost:11434"
     public static let macOSSelectedTranscriptionLanguage = "en"
 }
@@ -842,6 +850,154 @@ public enum VoiceInkRecorderPreviewPreference {
     }
 }
 
+public enum VoiceInkRecordingShortcutSlot: Sendable {
+    case primary
+    case secondary
+}
+
+public enum VoiceInkRecordingShortcutSelection: String, CaseIterable, Sendable {
+    case none = "none"
+    case custom = "custom"
+
+    public var displayName: String {
+        switch self {
+        case .none:
+            return "None"
+        case .custom:
+            return "Custom"
+        }
+    }
+}
+
+public enum VoiceInkRecordingShortcutMode: String, CaseIterable, Sendable {
+    case special = "special"
+    case toggle = "toggle"
+    case pushToTalk = "pushToTalk"
+    case hybrid = "hybrid"
+
+    public var displayName: String {
+        switch self {
+        case .special:
+            return "Special"
+        case .toggle:
+            return "Toggle"
+        case .pushToTalk:
+            return "Push to Talk"
+        case .hybrid:
+            return "Hybrid"
+        }
+    }
+}
+
+public enum VoiceInkRecordingShortcutPreference {
+    public static var registeredDefaults: [String: Any] {
+        [
+            VoiceInkUserDefaultsKey.isMiddleClickToggleEnabled: VoiceInkPreferenceDefault.isMiddleClickToggleEnabled,
+            VoiceInkUserDefaultsKey.middleClickActivationDelay: VoiceInkPreferenceDefault.middleClickActivationDelay
+        ]
+    }
+
+    public static func selectionKey(for slot: VoiceInkRecordingShortcutSlot) -> String {
+        switch slot {
+        case .primary:
+            return VoiceInkUserDefaultsKey.primaryRecordingShortcut
+        case .secondary:
+            return VoiceInkUserDefaultsKey.secondaryRecordingShortcut
+        }
+    }
+
+    public static func modeKey(for slot: VoiceInkRecordingShortcutSlot) -> String {
+        switch slot {
+        case .primary:
+            return VoiceInkUserDefaultsKey.primaryRecordingShortcutMode
+        case .secondary:
+            return VoiceInkUserDefaultsKey.secondaryRecordingShortcutMode
+        }
+    }
+
+    public static func defaultSelection(for slot: VoiceInkRecordingShortcutSlot) -> VoiceInkRecordingShortcutSelection {
+        switch slot {
+        case .primary:
+            return .custom
+        case .secondary:
+            return .none
+        }
+    }
+
+    public static func defaultMode(for slot: VoiceInkRecordingShortcutSlot) -> VoiceInkRecordingShortcutMode {
+        switch slot {
+        case .primary:
+            return .special
+        case .secondary:
+            return .hybrid
+        }
+    }
+
+    public static func selection(
+        for slot: VoiceInkRecordingShortcutSlot,
+        from defaults: UserDefaults = .standard
+    ) -> VoiceInkRecordingShortcutSelection? {
+        defaults.string(forKey: selectionKey(for: slot)).flatMap(VoiceInkRecordingShortcutSelection.init(rawValue:))
+    }
+
+    public static func saveSelection(
+        _ selection: VoiceInkRecordingShortcutSelection,
+        for slot: VoiceInkRecordingShortcutSlot,
+        to defaults: UserDefaults = .standard
+    ) {
+        defaults.set(selection.rawValue, forKey: selectionKey(for: slot))
+    }
+
+    public static func mode(
+        for slot: VoiceInkRecordingShortcutSlot,
+        from defaults: UserDefaults = .standard
+    ) -> VoiceInkRecordingShortcutMode {
+        defaults.string(forKey: modeKey(for: slot)).flatMap(VoiceInkRecordingShortcutMode.init(rawValue:))
+            ?? defaultMode(for: slot)
+    }
+
+    public static func saveMode(
+        _ mode: VoiceInkRecordingShortcutMode,
+        for slot: VoiceInkRecordingShortcutSlot,
+        to defaults: UserDefaults = .standard
+    ) {
+        defaults.set(mode.rawValue, forKey: modeKey(for: slot))
+    }
+
+    public static func isMiddleClickToggleEnabled(from defaults: UserDefaults = .standard) -> Bool {
+        defaults.object(forKey: VoiceInkUserDefaultsKey.isMiddleClickToggleEnabled) as? Bool
+            ?? VoiceInkPreferenceDefault.isMiddleClickToggleEnabled
+    }
+
+    public static func saveMiddleClickToggleEnabled(
+        _ isEnabled: Bool,
+        to defaults: UserDefaults = .standard
+    ) {
+        defaults.set(isEnabled, forKey: VoiceInkUserDefaultsKey.isMiddleClickToggleEnabled)
+    }
+
+    public static func middleClickActivationDelay(from defaults: UserDefaults = .standard) -> Int {
+        defaults.object(forKey: VoiceInkUserDefaultsKey.middleClickActivationDelay) as? Int
+            ?? VoiceInkPreferenceDefault.middleClickActivationDelay
+    }
+
+    public static func saveMiddleClickActivationDelay(
+        _ delay: Int,
+        to defaults: UserDefaults = .standard
+    ) {
+        defaults.set(delay, forKey: VoiceInkUserDefaultsKey.middleClickActivationDelay)
+    }
+
+    public static func clear(from defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.primaryRecordingShortcut)
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.secondaryRecordingShortcut)
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.primaryRecordingShortcutMode)
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.secondaryRecordingShortcutMode)
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.isMiddleClickToggleEnabled)
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.middleClickActivationDelay)
+    }
+}
+
 public enum VoiceInkSharedPreferenceReset {
     public static func clearCoreUserSettings(
         from defaults: UserDefaults = .standard,
@@ -873,6 +1029,7 @@ public enum VoiceInkSharedPreferenceReset {
         VoiceInkPowerModeSessionPreference.clear(from: defaults)
         VoiceInkModelRuntimePreference.clear(from: defaults)
         VoiceInkRecorderPreviewPreference.clear(from: defaults)
+        VoiceInkRecordingShortcutPreference.clear(from: defaults)
     }
 }
 

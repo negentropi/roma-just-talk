@@ -39,13 +39,12 @@ enum AppDefaults {
             "DidApplyLaunchAtLoginDefault": false,
 
             // Shortcuts
-            "isMiddleClickToggleEnabled": false,
-            "middleClickActivationDelay": 200,
             SpecialShortcutSettings.pasteLastTranscriptOnEmptyTapKey: true,
         ]
 
         platformDefaults.merge(VoiceInkModelRuntimePreference.registeredDefaults) { _, sharedValue in sharedValue }
         platformDefaults.merge(VoiceInkRecorderPreviewPreference.registeredDefaults) { _, sharedValue in sharedValue }
+        platformDefaults.merge(VoiceInkRecordingShortcutPreference.registeredDefaults) { _, sharedValue in sharedValue }
         platformDefaults.merge(VoiceInkRecordingFeedbackPreference.registeredDefaults) { _, sharedValue in sharedValue }
         platformDefaults.merge(VoiceInkPastePreference.registeredDefaults) { _, sharedValue in sharedValue }
         platformDefaults.merge(VoiceInkPowerModePreference.registeredDefaults) { _, sharedValue in sharedValue }

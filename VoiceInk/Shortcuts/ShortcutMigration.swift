@@ -1,6 +1,7 @@
 import AppKit
 import Carbon.HIToolbox
 import Foundation
+import VoiceInkCore
 
 struct LegacyKeyboardShortcut: Codable {
     let carbonKeyCode: Int
@@ -81,8 +82,9 @@ enum ShortcutMigration {
 
         if !allowsNone {
             migrateDefaultPrimaryShortcutIfNeeded(for: action)
-            UserDefaults.standard.set(RecordingShortcutManager.ShortcutSelection.custom.rawValue, forKey: userDefaultsKey)
-            return .custom
+            let selection = VoiceInkRecordingShortcutPreference.defaultSelection(for: .primary)
+            UserDefaults.standard.set(selection.rawValue, forKey: userDefaultsKey)
+            return selection
         }
 
         return .none
@@ -108,10 +110,10 @@ enum ShortcutMigration {
         }
 
         if action == .primaryRecording {
-            return .special
+            return VoiceInkRecordingShortcutPreference.defaultMode(for: .primary)
         }
 
-        return .hybrid
+        return VoiceInkRecordingShortcutPreference.defaultMode(for: .secondary)
     }
 
     private static func shortcutSelection(
@@ -301,9 +303,9 @@ enum ShortcutMigration {
     private static func recordingShortcutKey(for action: ShortcutAction) -> String {
         switch action {
         case .primaryRecording:
-            return "primaryRecordingShortcut"
+            return VoiceInkRecordingShortcutPreference.selectionKey(for: .primary)
         case .secondaryRecording:
-            return "secondaryRecordingShortcut"
+            return VoiceInkRecordingShortcutPreference.selectionKey(for: .secondary)
         default:
             return action.userDefaultsKey
         }
@@ -323,9 +325,9 @@ enum ShortcutMigration {
     private static func recordingShortcutModeKey(for action: ShortcutAction) -> String {
         switch action {
         case .primaryRecording:
-            return "primaryRecordingShortcutMode"
+            return VoiceInkRecordingShortcutPreference.modeKey(for: .primary)
         case .secondaryRecording:
-            return "secondaryRecordingShortcutMode"
+            return VoiceInkRecordingShortcutPreference.modeKey(for: .secondary)
         default:
             return action.userDefaultsKey
         }

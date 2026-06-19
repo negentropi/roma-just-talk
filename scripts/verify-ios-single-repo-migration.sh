@@ -3029,6 +3029,164 @@ require_pattern \
   docs/ios-single-repo-migration.md
 
 require_pattern \
+  "shared primary recording shortcut selection key lives in VoiceInkCore" \
+  'primaryRecordingShortcut = "primaryRecordingShortcut"' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared secondary recording shortcut selection key lives in VoiceInkCore" \
+  'secondaryRecordingShortcut = "secondaryRecordingShortcut"' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared primary recording shortcut mode key lives in VoiceInkCore" \
+  'primaryRecordingShortcutMode = "primaryRecordingShortcutMode"' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared secondary recording shortcut mode key lives in VoiceInkCore" \
+  'secondaryRecordingShortcutMode = "secondaryRecordingShortcutMode"' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared middle-click enabled key lives in VoiceInkCore" \
+  'isMiddleClickToggleEnabled = "isMiddleClickToggleEnabled"' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared middle-click delay key lives in VoiceInkCore" \
+  'middleClickActivationDelay = "middleClickActivationDelay"' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared recording shortcut selection values live in VoiceInkCore" \
+  'public enum VoiceInkRecordingShortcutSelection' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared recording shortcut mode values live in VoiceInkCore" \
+  'public enum VoiceInkRecordingShortcutMode' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared recording shortcut preference module lives in VoiceInkCore" \
+  'public enum VoiceInkRecordingShortcutPreference' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared recording shortcut preference owns selection keys" \
+  'selectionKey' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared recording shortcut preference owns mode keys" \
+  'modeKey' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared recording shortcut preference owns default selection policy" \
+  'defaultSelection' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared recording shortcut preference owns default mode policy" \
+  'defaultMode' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared recording shortcut preference owns middle-click enabled helper" \
+  'isMiddleClickToggleEnabled' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared recording shortcut preference owns middle-click delay helper" \
+  'middleClickActivationDelay' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared recording shortcut preference saves middle-click delay" \
+  'saveMiddleClickActivationDelay' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "macOS defaults register shared recording shortcut defaults" \
+  'VoiceInkRecordingShortcutPreference\.registeredDefaults' \
+  VoiceInk/AppDefaults.swift
+
+require_pattern \
+  "macOS recording shortcut manager uses shared shortcut selection type" \
+  'typealias ShortcutSelection = VoiceInkRecordingShortcutSelection' \
+  VoiceInk/Shortcuts/RecordingShortcutManager.swift
+
+require_pattern \
+  "macOS recording shortcut manager uses shared shortcut mode type" \
+  'typealias Mode = VoiceInkRecordingShortcutMode' \
+  VoiceInk/Shortcuts/RecordingShortcutManager.swift
+
+require_pattern \
+  "macOS recording shortcut manager saves selection through shared preference" \
+  'VoiceInkRecordingShortcutPreference\.saveSelection' \
+  VoiceInk/Shortcuts/RecordingShortcutManager.swift
+
+require_pattern \
+  "macOS recording shortcut manager saves mode through shared preference" \
+  'VoiceInkRecordingShortcutPreference\.saveMode' \
+  VoiceInk/Shortcuts/RecordingShortcutManager.swift
+
+require_pattern \
+  "macOS recording shortcut manager saves middle-click enabled through shared preference" \
+  'VoiceInkRecordingShortcutPreference\.saveMiddleClickToggleEnabled' \
+  VoiceInk/Shortcuts/RecordingShortcutManager.swift
+
+require_pattern \
+  "macOS recording shortcut manager saves middle-click delay through shared preference" \
+  'VoiceInkRecordingShortcutPreference\.saveMiddleClickActivationDelay' \
+  VoiceInk/Shortcuts/RecordingShortcutManager.swift
+
+require_pattern \
+  "macOS shortcut migration uses shared current shortcut selection keys" \
+  'VoiceInkRecordingShortcutPreference\.selectionKey' \
+  VoiceInk/Shortcuts/ShortcutMigration.swift
+
+require_pattern \
+  "macOS shortcut migration uses shared current shortcut mode keys" \
+  'VoiceInkRecordingShortcutPreference\.modeKey' \
+  VoiceInk/Shortcuts/ShortcutMigration.swift
+
+require_pattern \
+  "macOS shortcut migration uses shared shortcut selection default" \
+  'VoiceInkRecordingShortcutPreference\.defaultSelection' \
+  VoiceInk/Shortcuts/ShortcutMigration.swift
+
+require_pattern \
+  "macOS shortcut migration uses shared shortcut mode default" \
+  'VoiceInkRecordingShortcutPreference\.defaultMode' \
+  VoiceInk/Shortcuts/ShortcutMigration.swift
+
+require_pattern \
+  "macOS diagnostics use shared middle-click enabled preference" \
+  'VoiceInkRecordingShortcutPreference\.isMiddleClickToggleEnabled' \
+  VoiceInk/Services/SystemInfoService.swift
+
+require_pattern \
+  "macOS diagnostics use shared middle-click delay preference" \
+  'VoiceInkRecordingShortcutPreference\.middleClickActivationDelay' \
+  VoiceInk/Services/SystemInfoService.swift
+
+reject_pattern \
+  "macOS recording shortcut shells avoid raw current shortcut preference keys" \
+  '"(primaryRecordingShortcut|secondaryRecordingShortcut|primaryRecordingShortcutMode|secondaryRecordingShortcutMode|isMiddleClickToggleEnabled|middleClickActivationDelay)"|enum +(Mode|ShortcutSelection)' \
+  VoiceInk/AppDefaults.swift \
+  VoiceInk/Services/SystemInfoService.swift \
+  VoiceInk/Shortcuts/RecordingShortcutManager.swift \
+  VoiceInk/Shortcuts/ShortcutMigration.swift
+
+require_pattern \
+  "migration checklist tracks shared recording shortcut preference gate" \
+  'macOS recording shortcut selection/mode and middle-click preferences route through `VoiceInkRecordingShortcutSelection`/`VoiceInkRecordingShortcutMode`/`VoiceInkRecordingShortcutPreference`' \
+  docs/ios-single-repo-migration.md
+
+require_pattern \
   "shared transcription run result carries post-processing enhancement result" \
   'postProcessingResult: VoiceInkAIEnhancementResult\?' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift

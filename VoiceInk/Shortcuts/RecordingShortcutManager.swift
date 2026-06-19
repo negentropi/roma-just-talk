@@ -15,7 +15,7 @@ enum SpecialShortcutSettings {
 class RecordingShortcutManager: ObservableObject {
     @Published var primaryRecordingShortcut: ShortcutSelection {
         didSet {
-            UserDefaults.standard.set(primaryRecordingShortcut.rawValue, forKey: "primaryRecordingShortcut")
+            VoiceInkRecordingShortcutPreference.saveSelection(primaryRecordingShortcut, for: .primary)
             refreshShortcutMonitoring()
         }
     }
@@ -24,13 +24,13 @@ class RecordingShortcutManager: ObservableObject {
             if secondaryRecordingShortcut == .none {
                 ShortcutStore.setShortcut(nil, for: .secondaryRecording)
             }
-            UserDefaults.standard.set(secondaryRecordingShortcut.rawValue, forKey: "secondaryRecordingShortcut")
+            VoiceInkRecordingShortcutPreference.saveSelection(secondaryRecordingShortcut, for: .secondary)
             refreshShortcutMonitoring()
         }
     }
     @Published var primaryRecordingShortcutMode: Mode {
         didSet {
-            UserDefaults.standard.set(primaryRecordingShortcutMode.rawValue, forKey: "primaryRecordingShortcutMode")
+            VoiceInkRecordingShortcutPreference.saveMode(primaryRecordingShortcutMode, for: .primary)
             primaryRecordingShortcutModeSource.primaryMode = primaryRecordingShortcutMode
             refreshShortcutMonitoring()
             NotificationCenter.default.post(name: .powerModeShortcutAvailabilityDidChange, object: nil)
@@ -38,19 +38,19 @@ class RecordingShortcutManager: ObservableObject {
     }
     @Published var secondaryRecordingShortcutMode: Mode {
         didSet {
-            UserDefaults.standard.set(secondaryRecordingShortcutMode.rawValue, forKey: "secondaryRecordingShortcutMode")
+            VoiceInkRecordingShortcutPreference.saveMode(secondaryRecordingShortcutMode, for: .secondary)
             refreshShortcutMonitoring()
         }
     }
     @Published var isMiddleClickToggleEnabled: Bool {
         didSet {
-            UserDefaults.standard.set(isMiddleClickToggleEnabled, forKey: "isMiddleClickToggleEnabled")
+            VoiceInkRecordingShortcutPreference.saveMiddleClickToggleEnabled(isMiddleClickToggleEnabled)
             refreshShortcutMonitoring()
         }
     }
     @Published var middleClickActivationDelay: Int {
         didSet {
-            UserDefaults.standard.set(middleClickActivationDelay, forKey: "middleClickActivationDelay")
+            VoiceInkRecordingShortcutPreference.saveMiddleClickActivationDelay(middleClickActivationDelay)
         }
     }
     @Published var specialShortcutPasteLastTranscriptOnEmptyTap: Bool {
@@ -83,33 +83,8 @@ class RecordingShortcutManager: ObservableObject {
     private var middleClickMonitors: [Any?] = []
     private var middleClickTask: Task<Void, Never>?
 
-    enum Mode: String, CaseIterable {
-        case special = "special"
-        case toggle = "toggle"
-        case pushToTalk = "pushToTalk"
-        case hybrid = "hybrid"
-
-        var displayName: String {
-            switch self {
-            case .special: return "Special"
-            case .toggle: return "Toggle"
-            case .pushToTalk: return "Push to Talk"
-            case .hybrid: return "Hybrid"
-            }
-        }
-    }
-
-    enum ShortcutSelection: String, CaseIterable {
-        case none = "none"
-        case custom = "custom"
-        
-        var displayName: String {
-            switch self {
-            case .none: return "None"
-            case .custom: return "Custom"
-            }
-        }
-    }
+    typealias Mode = VoiceInkRecordingShortcutMode
+    typealias ShortcutSelection = VoiceInkRecordingShortcutSelection
 
     private static func canHandleShortcutAction(for recordingState: VoiceInkRecordingState) -> Bool {
         recordingState.acceptsRecordingShortcutAction
@@ -135,8 +110,8 @@ class RecordingShortcutManager: ObservableObject {
             for: .secondaryRecording
         )
 
-        self.isMiddleClickToggleEnabled = UserDefaults.standard.bool(forKey: "isMiddleClickToggleEnabled")
-        self.middleClickActivationDelay = UserDefaults.standard.integer(forKey: "middleClickActivationDelay")
+        self.isMiddleClickToggleEnabled = VoiceInkRecordingShortcutPreference.isMiddleClickToggleEnabled()
+        self.middleClickActivationDelay = VoiceInkRecordingShortcutPreference.middleClickActivationDelay()
         let specialPasteLastTranscriptOnEmptyTap = UserDefaults.standard.bool(forKey: SpecialShortcutSettings.pasteLastTranscriptOnEmptyTapKey)
         self.specialShortcutPasteLastTranscriptOnEmptyTap = specialPasteLastTranscriptOnEmptyTap
 

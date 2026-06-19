@@ -64,34 +64,25 @@ class KeyboardViewController: KeyboardInputViewController {
     }
     
     private func configureButtonForIdleState() {
-        // Use SF Symbol for microphone
-        let microphoneConfig = UIImage.SymbolConfiguration(pointSize: 14, weight: .semibold)
-        let microphoneImage = UIImage(systemName: "mic.fill", withConfiguration: microphoneConfig)
-        
-        recordButton.setImage(microphoneImage, for: .normal)
-        recordButton.setTitle(" Record", for: .normal)
-        recordButton.backgroundColor = UIColor.systemBlue
-        recordButton.setTitleColor(.white, for: .normal)
-        recordButton.tintColor = .white
-        
-        // Ensure image and text are properly aligned
-        recordButton.semanticContentAttribute = .forceLeftToRight
-        recordButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 4)
-        recordButton.titleEdgeInsets = UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 0)
+        configureButton(
+            VoiceInkKeyboardRecordingButtonPresentation.idle,
+            backgroundColor: .systemBlue
+        )
     }
     
-    private func configureButtonForRecordingState() {
-        // Use SF Symbol for stop
-        let stopConfig = UIImage.SymbolConfiguration(pointSize: 14, weight: .semibold)
-        let stopImage = UIImage(systemName: "stop.fill", withConfiguration: stopConfig)
-        
-        recordButton.setImage(stopImage, for: .normal)
-        recordButton.setTitle(" Stop", for: .normal)
-        recordButton.backgroundColor = UIColor.systemRed
+    private func configureButton(
+        _ presentation: VoiceInkKeyboardRecordingButtonPresentation,
+        backgroundColor: UIColor
+    ) {
+        let imageConfig = UIImage.SymbolConfiguration(pointSize: 14, weight: .semibold)
+        let image = UIImage(systemName: presentation.systemImageName, withConfiguration: imageConfig)
+
+        recordButton.setImage(image, for: .normal)
+        recordButton.setTitle(presentation.title, for: .normal)
+        recordButton.backgroundColor = backgroundColor
         recordButton.setTitleColor(.white, for: .normal)
         recordButton.tintColor = .white
-        
-        // Ensure image and text are properly aligned
+
         recordButton.semanticContentAttribute = .forceLeftToRight
         recordButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 4)
         recordButton.titleEdgeInsets = UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 0)
@@ -220,14 +211,10 @@ class KeyboardViewController: KeyboardInputViewController {
     
     private func showUserMessage() {
         // Last resort: Update button to show user should open main app manually
-        let appConfig = UIImage.SymbolConfiguration(pointSize: 14, weight: .semibold)
-        let appImage = UIImage(systemName: "app", withConfiguration: appConfig)
-        
-        recordButton.setImage(appImage, for: .normal)
-        recordButton.setTitle(" Open roma just talk", for: .normal)
-        recordButton.backgroundColor = UIColor.systemOrange
-        recordButton.setTitleColor(.white, for: .normal)
-        recordButton.tintColor = .white
+        configureButton(
+            VoiceInkKeyboardRecordingButtonPresentation.openAppFallback,
+            backgroundColor: .systemOrange
+        )
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
             self.configureButtonForIdleState()
@@ -245,18 +232,17 @@ class KeyboardViewController: KeyboardInputViewController {
     }
     
     private func updateButtonAppearanceBasedOnState() {
-        let isRecording = coordinator.isRecording
+        let presentation = VoiceInkKeyboardRecordingButtonPresentation.current(
+            isRecording: coordinator.isRecording
+        )
         
         DispatchQueue.main.async { [weak self] in
             guard let self = self, let button = self.recordButton else { return }
             
-            if isRecording {
-                // Configure for recording state
-                self.configureButtonForRecordingState()
-            } else {
-                // Configure for idle state
-                self.configureButtonForIdleState()
-            }
+            self.configureButton(
+                presentation,
+                backgroundColor: presentation == .recording ? .systemRed : .systemBlue
+            )
             
             // Ensure capsule shape is maintained
             button.layer.cornerRadius = button.frame.height / 2

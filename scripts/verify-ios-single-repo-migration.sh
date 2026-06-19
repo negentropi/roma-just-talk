@@ -194,6 +194,7 @@ section "iOS ported assets and resources"
 require_file iOS/Shared/AppGroupCoordinator.swift
 require_file iOS/Shared/VoiceInkAppDeepLink.swift
 require_file iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
+require_file iOS/Shared/VoiceInkKeyboardRecordingButtonPresentation.swift
 require_file iOS/VoiceInk-ios/Transcription.swift
 require_file docs/ios-privacy-policy.md
 require_file iOS/VoiceInk-ios/PrivacyInfo.xcprivacy
@@ -3264,6 +3265,51 @@ require_pattern \
   "iOS shared coordinator owns app-local keyboard stop notification" \
   'static let stopRecordingFromKeyboard = Notification\.Name\("stopRecordingFromKeyboard"\)' \
   iOS/Shared/AppGroupCoordinator.swift
+
+require_pattern \
+  "iOS shared keyboard presentation owns button copy" \
+  'VoiceInkKeyboardRecordingButtonPresentation' \
+  iOS/Shared/VoiceInkKeyboardRecordingButtonPresentation.swift
+
+require_pattern \
+  "iOS shared keyboard presentation owns idle title" \
+  'title: " Record"' \
+  iOS/Shared/VoiceInkKeyboardRecordingButtonPresentation.swift
+
+require_pattern \
+  "iOS shared keyboard presentation owns recording title" \
+  'title: " Stop"' \
+  iOS/Shared/VoiceInkKeyboardRecordingButtonPresentation.swift
+
+require_pattern \
+  "iOS shared keyboard presentation owns fallback title" \
+  'title: " Open roma just talk"' \
+  iOS/Shared/VoiceInkKeyboardRecordingButtonPresentation.swift
+
+require_pattern \
+  "iOS shared keyboard presentation owns idle icon" \
+  'systemImageName: "mic\.fill"' \
+  iOS/Shared/VoiceInkKeyboardRecordingButtonPresentation.swift
+
+require_pattern \
+  "iOS shared keyboard presentation owns recording icon" \
+  'systemImageName: "stop\.fill"' \
+  iOS/Shared/VoiceInkKeyboardRecordingButtonPresentation.swift
+
+require_pattern \
+  "iOS shared keyboard presentation owns fallback icon" \
+  'systemImageName: "app"' \
+  iOS/Shared/VoiceInkKeyboardRecordingButtonPresentation.swift
+
+require_pattern \
+  "iOS keyboard controller uses shared button presentation" \
+  'VoiceInkKeyboardRecordingButtonPresentation\.(idle|recording|openAppFallback|current)' \
+  iOS/VoiceInkKeyboard/KeyboardViewController.swift
+
+reject_pattern \
+  "iOS keyboard controller avoids shell-owned button copy" \
+  'setTitle\("( Record| Stop| Open roma just talk)"|UIImage\(systemName: "(mic\.fill|stop\.fill|app)"' \
+  iOS/VoiceInkKeyboard/KeyboardViewController.swift
 
 reject_pattern \
   "iOS recording manager does not redeclare keyboard stop notification" \

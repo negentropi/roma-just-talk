@@ -24,6 +24,47 @@ final class AudioInputPriorityPolicyTests: XCTestCase {
         XCTAssertEqual(VoiceInkAudioInputMode.prioritized.description, "Set up device priority order")
     }
 
+    func testMacOSAudioInputSettingsPresentationPreservesCopyAndIcons() {
+        let presentation = VoiceInkMacOSAudioInputSettingsPresentation.macOS
+
+        XCTAssertEqual(presentation.heroSystemImageName, "waveform")
+        XCTAssertEqual(presentation.heroTitle, "Audio Input")
+        XCTAssertEqual(presentation.heroDescription, "Configure your microphone preferences")
+        XCTAssertEqual(presentation.inputModeSectionTitle, "Input Mode")
+        XCTAssertEqual(presentation.currentDeviceSectionTitle, "Current Device")
+        XCTAssertEqual(presentation.currentDeviceSystemImageName, "display")
+        XCTAssertEqual(presentation.noDeviceAvailableText, "No device available")
+        XCTAssertEqual(presentation.activeStatusTitle, "Active")
+        XCTAssertEqual(presentation.activeStatusSystemImageName, "wave.3.right")
+        XCTAssertEqual(presentation.availableDevicesSectionTitle, "Available Devices")
+        XCTAssertEqual(presentation.refreshButtonTitle, "Refresh")
+        XCTAssertEqual(presentation.refreshButtonSystemImageName, "arrow.clockwise")
+        XCTAssertEqual(presentation.prioritizedDevicesSectionTitle, "Prioritized Devices")
+        XCTAssertEqual(
+            presentation.prioritizedDevicesDescription,
+            "Devices will be used in order of priority. If a device is unavailable, the next one will be tried. If no prioritized device is available, the built-in microphone will be used."
+        )
+        XCTAssertEqual(presentation.noPrioritizedDevicesText, "No prioritized devices")
+        XCTAssertEqual(presentation.noAdditionalDevicesText, "No additional devices available")
+        XCTAssertEqual(presentation.emptyDevicesSystemImageName, "mic.slash.circle.fill")
+        XCTAssertEqual(presentation.emptyDevicesTitle, "No Audio Devices")
+        XCTAssertEqual(presentation.emptyDevicesDescription, "Connect an audio input device to get started")
+        XCTAssertEqual(presentation.unavailableStatusTitle, "Unavailable")
+        XCTAssertEqual(presentation.unavailableStatusSystemImageName, "exclamationmark.triangle")
+        XCTAssertEqual(presentation.addPrioritySystemImageName, "plus.circle.fill")
+        XCTAssertEqual(presentation.removePrioritySystemImageName, "minus.circle.fill")
+        XCTAssertEqual(presentation.moveUpSystemImageName, "chevron.up")
+        XCTAssertEqual(presentation.moveDownSystemImageName, "chevron.down")
+        XCTAssertEqual(presentation.unprioritizedPriorityPlaceholder, "-")
+    }
+
+    func testMacOSAudioInputSettingsPresentationFormatsPriorityDisplay() {
+        let presentation = VoiceInkMacOSAudioInputSettingsPresentation.macOS
+
+        XCTAssertEqual(presentation.priorityDisplayText(for: 0), "1")
+        XCTAssertEqual(presentation.priorityDisplayText(for: 4), "5")
+    }
+
     func testAddingPriorityDeviceAppendsNextPriorityAndKeepsDuplicatesNoOp() {
         let existing = [
             VoiceInkAudioInputPriorityDevice(id: "built-in", name: "Built-in", priority: 0),

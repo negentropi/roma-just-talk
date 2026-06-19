@@ -4,6 +4,7 @@ import VoiceInkCore
 struct AudioInputSettingsView: View {
     @ObservedObject var audioDeviceManager = AudioDeviceManager.shared
     @Environment(\.colorScheme) private var colorScheme
+    private let presentation = VoiceInkMacOSAudioInputSettingsPresentation.macOS
     
     var body: some View {
         ScrollView {
@@ -34,15 +35,15 @@ struct AudioInputSettingsView: View {
     
     private var heroSection: some View {
         CompactHeroSection(
-            icon: "waveform",
-            title: "Audio Input",
-            description: "Configure your microphone preferences"
+            icon: presentation.heroSystemImageName,
+            title: presentation.heroTitle,
+            description: presentation.heroDescription
         )
     }
     
     private var inputModeSection: some View {
         VStack(alignment: .leading, spacing: 20) {
-            Text("Input Mode")
+            Text(presentation.inputModeSectionTitle)
                 .font(.title2)
                 .fontWeight(.semibold)
             
@@ -60,20 +61,20 @@ struct AudioInputSettingsView: View {
     
     private var systemDefaultSection: some View {
         VStack(alignment: .leading, spacing: 20) {
-            Text("Current Device")
+            Text(presentation.currentDeviceSectionTitle)
                 .font(.title2)
                 .fontWeight(.semibold)
 
             HStack {
-                Image(systemName: "display")
+                Image(systemName: presentation.currentDeviceSystemImageName)
                     .foregroundStyle(.secondary)
 
-                Text(audioDeviceManager.getSystemDefaultDeviceName() ?? "No device available")
+                Text(audioDeviceManager.getSystemDefaultDeviceName() ?? presentation.noDeviceAvailableText)
                     .foregroundStyle(.primary)
 
                 Spacer()
 
-                Label("Active", systemImage: "wave.3.right")
+                Label(presentation.activeStatusTitle, systemImage: presentation.activeStatusSystemImageName)
                     .font(.caption)
                     .foregroundStyle(.green)
                     .padding(.horizontal, 10)
@@ -91,14 +92,14 @@ struct AudioInputSettingsView: View {
     private var customDeviceSection: some View {
         VStack(alignment: .leading, spacing: 20) {
             HStack {
-                Text("Available Devices")
+                Text(presentation.availableDevicesSectionTitle)
                     .font(.title2)
                     .fontWeight(.semibold)
 
                 Spacer()
 
                 Button(action: { audioDeviceManager.loadAvailableDevices() }) {
-                    Label("Refresh", systemImage: "arrow.clockwise")
+                    Label(presentation.refreshButtonTitle, systemImage: presentation.refreshButtonSystemImageName)
                 }
                 .buttonStyle(.borderless)
             }
@@ -108,7 +109,8 @@ struct AudioInputSettingsView: View {
                     DeviceSelectionCard(
                         name: device.name,
                         isSelected: audioDeviceManager.selectedDeviceID == device.id,
-                        isActive: audioDeviceManager.getCurrentDevice() == device.id
+                        isActive: audioDeviceManager.getCurrentDevice() == device.id,
+                        presentation: presentation
                     ) {
                         audioDeviceManager.selectDevice(id: device.id)
                     }
@@ -132,17 +134,17 @@ struct AudioInputSettingsView: View {
     private var prioritizedDevicesContent: some View {
         VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Prioritized Devices")
+                Text(presentation.prioritizedDevicesSectionTitle)
                     .font(.title2)
                     .fontWeight(.semibold)
-                Text("Devices will be used in order of priority. If a device is unavailable, the next one will be tried. If no prioritized device is available, the built-in microphone will be used.")
+                Text(presentation.prioritizedDevicesDescription)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
             
             if audioDeviceManager.prioritizedDevices.isEmpty {
-                Text("No prioritized devices")
+                Text(presentation.noPrioritizedDevicesText)
                     .foregroundStyle(.secondary)
                     .padding(.vertical, 8)
             } else {
@@ -153,7 +155,7 @@ struct AudioInputSettingsView: View {
     
     private var availableDevicesContent: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Available Devices")
+            Text(presentation.availableDevicesSectionTitle)
                 .font(.title2)
                 .fontWeight(.semibold)
             
@@ -163,15 +165,15 @@ struct AudioInputSettingsView: View {
     
     private var emptyDevicesState: some View {
         VStack(spacing: 16) {
-            Image(systemName: "mic.slash.circle.fill")
+            Image(systemName: presentation.emptyDevicesSystemImageName)
                 .font(.system(size: 48))
                 .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(.secondary)
             
             VStack(spacing: 8) {
-                Text("No Audio Devices")
+                Text(presentation.emptyDevicesTitle)
                     .font(.headline)
-                Text("Connect an audio input device to get started")
+                Text(presentation.emptyDevicesDescription)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
@@ -197,6 +199,7 @@ struct AudioInputSettingsView: View {
             isActive: device.map { audioDeviceManager.getCurrentDevice() == $0.id } ?? false,
             isPrioritized: true,
             isAvailable: device != nil,
+            presentation: presentation,
             canMoveUp: prioritizedDevice.priority > 0,
             canMoveDown: prioritizedDevice.priority < audioDeviceManager.prioritizedDevices.count - 1,
             onTogglePriority: { audioDeviceManager.removePrioritizedDevice(id: prioritizedDevice.id) },
@@ -212,7 +215,7 @@ struct AudioInputSettingsView: View {
         
         return Group {
             if unprioritizedDevices.isEmpty {
-                Text("No additional devices available")
+                Text(presentation.noAdditionalDevicesText)
                     .foregroundStyle(.secondary)
                     .padding(.vertical, 8)
             } else {
@@ -223,6 +226,7 @@ struct AudioInputSettingsView: View {
                         isActive: audioDeviceManager.getCurrentDevice() == device.id,
                         isPrioritized: false,
                         isAvailable: true,
+                        presentation: presentation,
                         canMoveUp: false,
                         canMoveDown: false,
                         onTogglePriority: { audioDeviceManager.addPrioritizedDevice(uid: device.uid, name: device.name) },
@@ -290,6 +294,7 @@ struct DeviceSelectionCard: View {
     let name: String
     let isSelected: Bool
     let isActive: Bool
+    let presentation: VoiceInkMacOSAudioInputSettingsPresentation
     let action: () -> Void
     
     var body: some View {
@@ -306,7 +311,7 @@ struct DeviceSelectionCard: View {
                 Spacer()
                 
                 if isActive {
-                    Label("Active", systemImage: "wave.3.right")
+                    Label(presentation.activeStatusTitle, systemImage: presentation.activeStatusSystemImageName)
                         .font(.caption)
                         .foregroundStyle(.green)
                         .padding(.horizontal, 10)
@@ -330,6 +335,7 @@ struct DevicePriorityCard: View {
     let isActive: Bool
     let isPrioritized: Bool
     let isAvailable: Bool
+    let presentation: VoiceInkMacOSAudioInputSettingsPresentation
     let canMoveUp: Bool
     let canMoveDown: Bool
     let onTogglePriority: () -> Void
@@ -340,12 +346,12 @@ struct DevicePriorityCard: View {
         HStack {
             // Priority number or dash
             if let priority = priority {
-                Text("\(priority + 1)")
+                Text(presentation.priorityDisplayText(for: priority))
                     .font(.system(size: 18, weight: .medium))
                     .foregroundStyle(.secondary)
                     .frame(width: 24)
             } else {
-                Text("-")
+                Text(presentation.unprioritizedPriorityPlaceholder)
                     .font(.system(size: 18, weight: .medium))
                     .foregroundStyle(.secondary)
                     .frame(width: 24)
@@ -361,7 +367,7 @@ struct DevicePriorityCard: View {
             HStack(spacing: 12) {
                 // Active status
                 if isActive {
-                    Label("Active", systemImage: "wave.3.right")
+                    Label(presentation.activeStatusTitle, systemImage: presentation.activeStatusSystemImageName)
                         .font(.caption)
                         .foregroundStyle(.green)
                         .padding(.horizontal, 10)
@@ -371,7 +377,7 @@ struct DevicePriorityCard: View {
                                 .fill(.green.opacity(0.1))
                         )
                 } else if !isAvailable && isPrioritized {
-                    Label("Unavailable", systemImage: "exclamationmark.triangle")
+                    Label(presentation.unavailableStatusTitle, systemImage: presentation.unavailableStatusSystemImageName)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .padding(.horizontal, 10)
@@ -386,13 +392,13 @@ struct DevicePriorityCard: View {
                 if isPrioritized {
                     HStack(spacing: 2) {
                         Button(action: onMoveUp) {
-                            Image(systemName: "chevron.up")
+                            Image(systemName: presentation.moveUpSystemImageName)
                                 .foregroundStyle(canMoveUp ? .blue : .secondary.opacity(0.5))
                         }
                         .disabled(!canMoveUp)
                         
                         Button(action: onMoveDown) {
-                            Image(systemName: "chevron.down")
+                            Image(systemName: presentation.moveDownSystemImageName)
                                 .foregroundStyle(canMoveDown ? .blue : .secondary.opacity(0.5))
                         }
                         .disabled(!canMoveDown)
@@ -401,7 +407,7 @@ struct DevicePriorityCard: View {
                 
                 // Toggle priority button
                 Button(action: onTogglePriority) {
-                    Image(systemName: isPrioritized ? "minus.circle.fill" : "plus.circle.fill")
+                    Image(systemName: isPrioritized ? presentation.removePrioritySystemImageName : presentation.addPrioritySystemImageName)
                         .symbolRenderingMode(.hierarchical)
                         .foregroundStyle(isPrioritized ? .red : .blue)
                 }

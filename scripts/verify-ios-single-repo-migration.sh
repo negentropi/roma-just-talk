@@ -804,6 +804,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AudioInputPriorityPolicy.swift
 
 require_pattern \
+  "shared macOS audio input settings presentation lives in VoiceInkCore" \
+  'VoiceInkMacOSAudioInputSettingsPresentation|heroTitle|prioritizedDevicesDescription|priorityDisplayText' \
+  VoiceInkCore/Sources/VoiceInkCore/AudioInputPriorityPolicy.swift
+
+require_pattern \
   "macOS audio device manager uses shared input mode" \
   'VoiceInkAudioInputMode|\.defaultMode|VoiceInkAudioInputMode\(rawValue:' \
   VoiceInk/Services/AudioDeviceManager.swift
@@ -815,13 +820,18 @@ require_pattern \
 
 require_pattern \
   "macOS audio input settings uses shared mode and priority policy" \
-  'VoiceInkAudioInputMode\.allCases|VoiceInkAudioInputPriorityPolicy\.(sortedDevices|moveDevice)|VoiceInkAudioInputPriorityDevice|mode\.(title|iconSystemName|description)' \
+  'VoiceInkAudioInputMode\.allCases|VoiceInkAudioInputPriorityPolicy\.(sortedDevices|moveDevice)|VoiceInkAudioInputPriorityDevice|mode\.(title|iconSystemName|description)|VoiceInkMacOSAudioInputSettingsPresentation\.macOS|presentation\.(heroTitle|activeStatusTitle|priorityDisplayText)' \
   VoiceInk/Views/Settings/AudioInputSettingsView.swift
 
 reject_pattern \
   "macOS audio input avoids shell-only mode and priority policy" \
   'enum +AudioInputMode|"(System Default|Custom Device|Prioritized|Use your Mac'\''s default input|Select a specific input device|Set up device priority order)"|return "(display|mic\.circle\.fill|list\.number)"|struct +PrioritizedDevice|prioritizedDevices\.sorted|sorted *\{ *\$0\.priority < \$1\.priority *\}|swapAt\(currentIndex|prioritizedDevices\.append|prioritizedDevices\.removeAll|map *\{ *\$0\.priority *\}\.max' \
   VoiceInk/Services/AudioDeviceManager.swift \
+  VoiceInk/Views/Settings/AudioInputSettingsView.swift
+
+reject_pattern \
+  "macOS audio input settings avoid shell-only presentation copy" \
+  '"(Audio Input|Configure your microphone preferences|Input Mode|Current Device|No device available|Active|Available Devices|Refresh|Prioritized Devices|Devices will be used in order of priority\. If a device is unavailable, the next one will be tried\. If no prioritized device is available, the built-in microphone will be used\.|No prioritized devices|No additional devices available|No Audio Devices|Connect an audio input device to get started|Unavailable)"|"waveform"|"wave\.3\.right"|"arrow\.clockwise"|"mic\.slash\.circle\.fill"|"exclamationmark\.triangle"|"plus\.circle\.fill"|"minus\.circle\.fill"|"chevron\.up"|"chevron\.down"|Text\("-"\)|Text\("\\\(\(priority \+ 1\)\\\)"\)' \
   VoiceInk/Views/Settings/AudioInputSettingsView.swift
 
 reject_pattern \

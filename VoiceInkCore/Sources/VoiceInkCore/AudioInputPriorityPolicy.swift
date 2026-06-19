@@ -123,3 +123,65 @@ public enum VoiceInkAudioInputPriorityPolicy {
         sortedDevices(devices).first { availableDeviceIDs.contains($0.id) }?.id
     }
 }
+
+public struct VoiceInkMacOSAudioInputSettingsPresentation: Equatable, Sendable {
+    public let heroSystemImageName: String
+    public let heroTitle: String
+    public let heroDescription: String
+    public let inputModeSectionTitle: String
+    public let currentDeviceSectionTitle: String
+    public let currentDeviceSystemImageName: String
+    public let noDeviceAvailableText: String
+    public let activeStatusTitle: String
+    public let activeStatusSystemImageName: String
+    public let availableDevicesSectionTitle: String
+    public let refreshButtonTitle: String
+    public let refreshButtonSystemImageName: String
+    public let prioritizedDevicesSectionTitle: String
+    public let prioritizedDevicesDescription: String
+    public let noPrioritizedDevicesText: String
+    public let noAdditionalDevicesText: String
+    public let emptyDevicesSystemImageName: String
+    public let emptyDevicesTitle: String
+    public let emptyDevicesDescription: String
+    public let unavailableStatusTitle: String
+    public let unavailableStatusSystemImageName: String
+    public let addPrioritySystemImageName: String
+    public let removePrioritySystemImageName: String
+    public let moveUpSystemImageName: String
+    public let moveDownSystemImageName: String
+    public let unprioritizedPriorityPlaceholder: String
+
+    public static let macOS = VoiceInkMacOSAudioInputSettingsPresentation(
+        heroSystemImageName: "waveform",
+        heroTitle: "Audio Input",
+        heroDescription: "Configure your microphone preferences",
+        inputModeSectionTitle: "Input Mode",
+        currentDeviceSectionTitle: "Current Device",
+        currentDeviceSystemImageName: "display",
+        noDeviceAvailableText: "No device available",
+        activeStatusTitle: "Active",
+        activeStatusSystemImageName: "wave.3.right",
+        availableDevicesSectionTitle: "Available Devices",
+        refreshButtonTitle: "Refresh",
+        refreshButtonSystemImageName: "arrow.clockwise",
+        prioritizedDevicesSectionTitle: "Prioritized Devices",
+        prioritizedDevicesDescription: "Devices will be used in order of priority. If a device is unavailable, the next one will be tried. If no prioritized device is available, the built-in microphone will be used.",
+        noPrioritizedDevicesText: "No prioritized devices",
+        noAdditionalDevicesText: "No additional devices available",
+        emptyDevicesSystemImageName: "mic.slash.circle.fill",
+        emptyDevicesTitle: "No Audio Devices",
+        emptyDevicesDescription: "Connect an audio input device to get started",
+        unavailableStatusTitle: "Unavailable",
+        unavailableStatusSystemImageName: "exclamationmark.triangle",
+        addPrioritySystemImageName: "plus.circle.fill",
+        removePrioritySystemImageName: "minus.circle.fill",
+        moveUpSystemImageName: "chevron.up",
+        moveDownSystemImageName: "chevron.down",
+        unprioritizedPriorityPlaceholder: "-"
+    )
+
+    public func priorityDisplayText(for zeroBasedPriority: Int) -> String {
+        "\(zeroBasedPriority + 1)"
+    }
+}

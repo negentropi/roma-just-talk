@@ -66,6 +66,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementModelSelectionKeepsUnavailableOllamaModel", run: { AIProviderCatalogTests().testMacOSAIEnhancementModelSelectionKeepsUnavailableOllamaModel() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementDefaultTextEnhancementModelsAreShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementDefaultTextEnhancementModelsAreShared() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementStaticTextEnhancementModelsAreShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementStaticTextEnhancementModelsAreShared() }),
+            VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementAvailableModelSourcesAreShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementAvailableModelSourcesAreShared() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementRequestURLSelectionIsShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementRequestURLSelectionIsShared() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementRefreshModelSelectionRepairIsShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementRefreshModelSelectionRepairIsShared() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementProviderVerificationRoutesAreShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementProviderVerificationRoutesAreShared() }),

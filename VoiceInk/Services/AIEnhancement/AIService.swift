@@ -83,12 +83,10 @@ class AIService: ObservableObject {
     }
 
     func availableModels(for provider: VoiceInkAIEnhancementProviderKind) -> [String] {
-        if provider == .ollama {
-            return ollamaService.availableModels.map { $0.name }
-        } else if provider == .openRouter {
-            return openRouterModels
-        }
-        return provider.staticTextEnhancementModels
+        provider.textEnhancementAvailableModels(
+            ollamaModels: ollamaService.availableModels.map { $0.name },
+            openRouterModels: openRouterModels
+        )
     }
     
     init() {

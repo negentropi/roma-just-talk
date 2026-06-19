@@ -2175,8 +2175,13 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \
-  "macOS AI service static text model list uses shared policy" \
-  'staticTextEnhancementModels' \
+  "shared AI enhancement available-model source policy lives in VoiceInkCore" \
+  'textEnhancementAvailableModels' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+require_pattern \
+  "macOS AI service available-model source selection uses shared policy" \
+  'textEnhancementAvailableModels' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 require_pattern \
@@ -2224,6 +2229,11 @@ reject_pattern \
 reject_pattern \
   "macOS AI service avoids duplicate static text model list policy" \
   'extension +VoiceInkAIEnhancementProviderKind|VoiceInkAIModelCatalog\.availableModels\(for: provider\)|provider\.availableModels' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+reject_pattern \
+  "macOS AI service avoids duplicate available-model source policy" \
+  'provider == \.(ollama|openRouter)|return +openRouterModels|return +provider\.staticTextEnhancementModels' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 reject_pattern \

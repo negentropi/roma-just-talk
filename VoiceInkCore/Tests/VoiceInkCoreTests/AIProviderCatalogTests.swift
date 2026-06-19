@@ -371,6 +371,47 @@ final class AIProviderCatalogTests: XCTestCase {
         XCTAssertEqual(VoiceInkAIEnhancementProviderKind.custom.staticTextEnhancementModels, [])
     }
 
+    func testMacOSAIEnhancementAvailableModelSourcesAreShared() {
+        let ollamaModels = ["llama3", "mistral"]
+        let openRouterModels = ["anthropic/claude-3.5-sonnet", "openai/gpt-4o"]
+
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.ollama.textEnhancementAvailableModels(
+                ollamaModels: ollamaModels,
+                openRouterModels: openRouterModels
+            ),
+            ollamaModels
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.openRouter.textEnhancementAvailableModels(
+                ollamaModels: ollamaModels,
+                openRouterModels: openRouterModels
+            ),
+            openRouterModels
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.groq.textEnhancementAvailableModels(
+                ollamaModels: ollamaModels,
+                openRouterModels: openRouterModels
+            ),
+            VoiceInkAIModelCatalog.availableModels(for: .groq)
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.localCLI.textEnhancementAvailableModels(
+                ollamaModels: ollamaModels,
+                openRouterModels: openRouterModels
+            ),
+            []
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.custom.textEnhancementAvailableModels(
+                ollamaModels: ollamaModels,
+                openRouterModels: openRouterModels
+            ),
+            []
+        )
+    }
+
     func testMacOSAIEnhancementRequestURLSelectionIsShared() {
         withIsolatedDefaults { defaults in
             XCTAssertEqual(

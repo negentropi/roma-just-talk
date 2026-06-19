@@ -369,7 +369,7 @@ final class RollingBufferPreloadCoordinator {
             }
         }
 
-        VoiceInkRollingBufferPreloadPolicy(
+        return VoiceInkRollingBufferPreloadPolicy(
             configuration: configuration,
             powerState: powerStateProvider.currentPowerState()
         ).allowsPreload(

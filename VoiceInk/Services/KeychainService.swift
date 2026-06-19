@@ -92,7 +92,7 @@ final class KeychainService {
         return true
         #else
         let status = SecItemDelete(
-            VoiceInkKeychainQuery.base(account: key, syncable: syncable) as CFDictionary
+            VoiceInkKeychainQuery.delete(account: key, syncable: syncable) as CFDictionary
         )
 
         if status == errSecSuccess || status == errSecItemNotFound {

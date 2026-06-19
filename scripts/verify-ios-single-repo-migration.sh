@@ -1088,22 +1088,28 @@ require_pattern \
 
 require_pattern \
   "shared Keychain query policy lives in VoiceInkCore" \
-  'VoiceInkKeychainQuery' \
+  'VoiceInkKeychainQuery|delete\(account:' \
   VoiceInkCore/Sources/VoiceInkCore/KeychainQuery.swift
 
 require_pattern \
   "macOS Keychain adapter uses shared query policy" \
-  'VoiceInkKeychainQuery' \
+  'VoiceInkKeychainQuery\.(add|copyData|delete|exists)' \
   VoiceInk/Services/KeychainService.swift
 
 require_pattern \
   "iOS Keychain adapter uses shared query policy" \
-  'VoiceInkKeychainQuery' \
+  'VoiceInkKeychainQuery\.(add|copyData|delete)' \
   iOS/VoiceInk-ios/KeychainService.swift
 
 reject_pattern \
   "platform Keychain adapters avoid duplicate service and syncability query policy" \
   'kSecAttrService|kSecAttrSynchronizable|kSecUseDataProtectionKeychain|com\.prakashjoshipax\.VoiceInk' \
+  VoiceInk/Services/KeychainService.swift \
+  iOS/VoiceInk-ios/KeychainService.swift
+
+reject_pattern \
+  "platform Keychain adapters avoid shell-owned delete query shape" \
+  'VoiceInkKeychainQuery\.base\(account:' \
   VoiceInk/Services/KeychainService.swift \
   iOS/VoiceInk-ios/KeychainService.swift
 

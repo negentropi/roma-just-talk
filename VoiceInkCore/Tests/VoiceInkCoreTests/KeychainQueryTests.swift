@@ -33,6 +33,19 @@ final class KeychainQueryTests: XCTestCase {
         XCTAssertEqual(query[kSecMatchLimit as String] as? String, kSecMatchLimitOne as String)
     }
 
+    func testDeleteQueryUsesBaseLookupShape() {
+        let query = VoiceInkKeychainQuery.delete(account: "provider", syncable: false)
+
+        XCTAssertEqual(query[kSecClass as String] as? String, kSecClassGenericPassword as String)
+        XCTAssertEqual(query[kSecAttrService as String] as? String, "com.prakashjoshipax.VoiceInk")
+        XCTAssertEqual(query[kSecAttrAccount as String] as? String, "provider")
+        XCTAssertEqual(booleanValue(query[kSecUseDataProtectionKeychain as String]), true)
+        XCTAssertNil(query[kSecAttrSynchronizable as String])
+        XCTAssertNil(query[kSecValueData as String])
+        XCTAssertNil(query[kSecReturnData as String])
+        XCTAssertNil(query[kSecMatchLimit as String])
+    }
+
     func testExistsQuerySuppressesDataReturn() {
         let query = VoiceInkKeychainQuery.exists(account: "provider")
 

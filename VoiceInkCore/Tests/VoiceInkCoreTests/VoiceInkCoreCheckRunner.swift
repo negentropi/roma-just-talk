@@ -77,6 +77,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "KeychainQueryTests.testBaseQueryCanDisableSyncableForMacOSCallers", run: { KeychainQueryTests().testBaseQueryCanDisableSyncableForMacOSCallers() }),
             VoiceInkCoreCheck(name: "KeychainQueryTests.testAddQueryAddsValueData", run: { KeychainQueryTests().testAddQueryAddsValueData() }),
             VoiceInkCoreCheck(name: "KeychainQueryTests.testCopyDataQueryRequestsOneDataResult", run: { KeychainQueryTests().testCopyDataQueryRequestsOneDataResult() }),
+            VoiceInkCoreCheck(name: "KeychainQueryTests.testDeleteQueryUsesBaseLookupShape", run: { KeychainQueryTests().testDeleteQueryUsesBaseLookupShape() }),
             VoiceInkCoreCheck(name: "KeychainQueryTests.testExistsQuerySuppressesDataReturn", run: { KeychainQueryTests().testExistsQuerySuppressesDataReturn() }),
             VoiceInkCoreCheck(name: "AudioMeterLevelTests.testVisualizerAccessibilityLabelPreservesIOSCopy", run: { AudioMeterLevelTests().testVisualizerAccessibilityLabelPreservesIOSCopy() }),
             VoiceInkCoreCheck(name: "AudioMeterLevelTests.testNormalizedLevelClampsBelowAndAboveVisibleDecibelRange", run: { AudioMeterLevelTests().testNormalizedLevelClampsBelowAndAboveVisibleDecibelRange() }),

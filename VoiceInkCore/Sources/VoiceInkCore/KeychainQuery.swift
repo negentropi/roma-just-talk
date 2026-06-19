@@ -42,6 +42,13 @@ public enum VoiceInkKeychainQuery {
         return query
     }
 
+    public static func delete(
+        account: String,
+        syncable: Bool = true
+    ) -> [String: Any] {
+        base(account: account, syncable: syncable)
+    }
+
     public static func exists(
         account: String,
         syncable: Bool = true

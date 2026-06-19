@@ -5,7 +5,7 @@ import VoiceInkCore
 struct KeychainService {
     
     static func save(key: String, data: Data) -> OSStatus {
-        SecItemDelete(VoiceInkKeychainQuery.base(account: key) as CFDictionary)
+        SecItemDelete(VoiceInkKeychainQuery.delete(account: key) as CFDictionary)
 
         return SecItemAdd(
             VoiceInkKeychainQuery.add(data: data, account: key) as CFDictionary,
@@ -29,6 +29,6 @@ struct KeychainService {
     }
     
     static func delete(key: String) -> OSStatus {
-        SecItemDelete(VoiceInkKeychainQuery.base(account: key) as CFDictionary)
+        SecItemDelete(VoiceInkKeychainQuery.delete(account: key) as CFDictionary)
     }
 }

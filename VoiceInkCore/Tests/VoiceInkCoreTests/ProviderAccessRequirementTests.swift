@@ -183,10 +183,14 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertEqual(presentation.apiKeySectionTitle, "Deepgram API Key")
         XCTAssertEqual(presentation.apiKeyPlaceholder, "Deepgram API Key")
         XCTAssertEqual(presentation.saveButtonTitle, "Save")
+        XCTAssertEqual(presentation.saveButtonSystemImageName, "checkmark.circle.fill")
         XCTAssertEqual(presentation.verifyButtonTitle, "Verify")
+        XCTAssertEqual(presentation.verifyButtonSystemImageName, "checkmark.seal")
         XCTAssertEqual(presentation.changeButtonTitle, "Change")
         XCTAssertEqual(presentation.consoleSectionTitle, "Get API Key")
         XCTAssertEqual(presentation.consoleLinkTitle, "Deepgram API Console")
+        XCTAssertEqual(presentation.consoleLeadingSystemImageName, "link")
+        XCTAssertEqual(presentation.consoleTrailingSystemImageName, "arrow.up.right.square")
     }
 
     func testProviderAPIKeyStateResolvesStoredRuntimeKeysAndNonUserProviders() {

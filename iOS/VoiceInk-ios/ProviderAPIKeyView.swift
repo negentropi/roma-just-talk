@@ -43,7 +43,10 @@ struct ProviderAPIKeyView: View {
                         .autocorrectionDisabled()
                     HStack {
                         Button(action: saveKey) {
-                            Label(presentation.saveButtonTitle, systemImage: "checkmark.circle.fill")
+                            Label(
+                                presentation.saveButtonTitle,
+                                systemImage: presentation.saveButtonSystemImageName
+                            )
                         }
                         .disabled(!hasEnteredAPIKey)
                         Spacer()
@@ -51,7 +54,10 @@ struct ProviderAPIKeyView: View {
                             ProgressView().progressViewStyle(.circular)
                         } else {
                             Button(action: verifyKey) {
-                                Label(presentation.verifyButtonTitle, systemImage: "checkmark.seal")
+                                Label(
+                                    presentation.verifyButtonTitle,
+                                    systemImage: presentation.verifyButtonSystemImageName
+                                )
                             }
                             .disabled(!canVerifyAPIKey)
                         }
@@ -59,7 +65,7 @@ struct ProviderAPIKeyView: View {
                 } else {
                     HStack {
                         let feedback = VoiceInkProviderAPIKeyVerificationProgress.iOSVerifiedKeyFeedback
-                        Label(feedback.text, systemImage: feedback.systemImageName ?? "checkmark.seal.fill")
+                        Label(feedback.text, systemImage: feedback.effectiveSystemImageName)
                             .foregroundStyle(color(for: feedback.tone))
                         Spacer()
                         Button(presentation.changeButtonTitle) {
@@ -76,7 +82,7 @@ struct ProviderAPIKeyView: View {
 
                 // Only show verification result when actively verifying and not already verified
                 if let feedback = verificationProgress.iOSResultFeedback, !isKeyVerified {
-                    Label(feedback.text, systemImage: feedback.systemImageName ?? "info.circle")
+                    Label(feedback.text, systemImage: feedback.effectiveSystemImageName)
                         .foregroundStyle(color(for: feedback.tone))
                 }
             }
@@ -84,10 +90,10 @@ struct ProviderAPIKeyView: View {
             Section(header: Text(presentation.consoleSectionTitle)) {
                 Link(destination: provider.consoleURL) {
                     HStack {
-                        Image(systemName: "link")
+                        Image(systemName: presentation.consoleLeadingSystemImageName)
                         Text(presentation.consoleLinkTitle)
                         Spacer()
-                        Image(systemName: "arrow.up.right.square")
+                        Image(systemName: presentation.consoleTrailingSystemImageName)
                             .foregroundStyle(.secondary)
                     }
                 }

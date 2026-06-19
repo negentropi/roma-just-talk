@@ -155,10 +155,14 @@ public struct VoiceInkProviderAPIKeyFormPresentation: Equatable, Sendable {
     public let apiKeySectionTitle: String
     public let apiKeyPlaceholder: String
     public let saveButtonTitle: String
+    public let saveButtonSystemImageName: String
     public let verifyButtonTitle: String
+    public let verifyButtonSystemImageName: String
     public let changeButtonTitle: String
     public let consoleSectionTitle: String
     public let consoleLinkTitle: String
+    public let consoleLeadingSystemImageName: String
+    public let consoleTrailingSystemImageName: String
 
     public static func make(for provider: VoiceInkProviderKind) -> Self {
         let displayName = provider.displayName
@@ -167,10 +171,14 @@ public struct VoiceInkProviderAPIKeyFormPresentation: Equatable, Sendable {
             apiKeySectionTitle: "\(displayName) API Key",
             apiKeyPlaceholder: "\(displayName) API Key",
             saveButtonTitle: "Save",
+            saveButtonSystemImageName: "checkmark.circle.fill",
             verifyButtonTitle: "Verify",
+            verifyButtonSystemImageName: "checkmark.seal",
             changeButtonTitle: "Change",
             consoleSectionTitle: "Get API Key",
-            consoleLinkTitle: "\(displayName) API Console"
+            consoleLinkTitle: "\(displayName) API Console",
+            consoleLeadingSystemImageName: "link",
+            consoleTrailingSystemImageName: "arrow.up.right.square"
         )
     }
 }
@@ -193,6 +201,10 @@ public struct VoiceInkProviderAPIKeyVerificationFeedback: Equatable, Sendable {
         self.text = text
         self.systemImageName = systemImageName
         self.tone = tone
+    }
+
+    public var effectiveSystemImageName: String {
+        systemImageName ?? "info.circle"
     }
 }
 

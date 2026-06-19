@@ -1027,7 +1027,7 @@ reject_pattern \
 
 require_pattern \
   "shared provider API-key verification progress presentation lives in VoiceInkCore" \
-  'VoiceInkProviderAPIKeyVerificationProgress|macOSVerifyButtonTitle|iOSResultFeedback' \
+  'VoiceInkProviderAPIKeyVerificationProgress|macOSVerifyButtonTitle|iOSResultFeedback|effectiveSystemImageName' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
 
 require_pattern \
@@ -1037,12 +1037,12 @@ require_pattern \
 
 require_pattern \
   "shared provider API-key form presentation lives in VoiceInkCore" \
-  'VoiceInkProviderAPIKeyFormPresentation|apiKeyFormPresentation' \
+  'VoiceInkProviderAPIKeyFormPresentation|apiKeyFormPresentation|saveButtonSystemImageName|verifyButtonSystemImageName|consoleLeadingSystemImageName|consoleTrailingSystemImageName' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
 
 require_pattern \
   "iOS API-key view uses shared verification progress presentation" \
-  'VoiceInkProviderAPIKeyVerificationProgress|verificationProgress|iOSVerifiedKeyFeedback|iOSResultFeedback' \
+  'VoiceInkProviderAPIKeyVerificationProgress|verificationProgress|iOSVerifiedKeyFeedback|iOSResultFeedback|effectiveSystemImageName' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 require_pattern \
@@ -1052,7 +1052,7 @@ require_pattern \
 
 require_pattern \
   "iOS API-key view uses shared form presentation" \
-  'apiKeyFormPresentation|VoiceInkProviderAPIKeyFormPresentation' \
+  'apiKeyFormPresentation|VoiceInkProviderAPIKeyFormPresentation|saveButtonSystemImageName|verifyButtonSystemImageName|consoleLeadingSystemImageName|consoleTrailingSystemImageName' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 require_pattern \
@@ -1095,6 +1095,11 @@ reject_pattern \
 reject_pattern \
   "iOS API-key view avoids shell-only form presentation copy" \
   '"([^"]*API Key[^"]*|[^"]*API Console[^"]*|Save|Verify|Change)"' \
+  iOS/VoiceInk-ios/ProviderAPIKeyView.swift
+
+reject_pattern \
+  "iOS API-key view avoids duplicate form and feedback icon names" \
+  '"(checkmark\.circle\.fill|checkmark\.seal|checkmark\.seal\.fill|info\.circle|link|arrow\.up\.right\.square)"' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 reject_pattern \

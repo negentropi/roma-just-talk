@@ -99,6 +99,14 @@ final class AIProviderCatalogTests: XCTestCase {
             )
         )
         XCTAssertEqual(
+            VoiceInkProviderAPIKeyVerificationProgress.iOSVerifiedKeyFeedback.effectiveSystemImageName,
+            "checkmark.seal.fill"
+        )
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyVerificationFeedback(text: "FYI", tone: .success).effectiveSystemImageName,
+            "info.circle"
+        )
+        XCTAssertEqual(
             VoiceInkProviderAPIKeyVerificationProgress.success.iOSResultFeedback,
             VoiceInkProviderAPIKeyVerificationProgress.iOSVerifiedKeyFeedback
         )

@@ -105,6 +105,12 @@ final class Transcription: VoiceInkStoredAudioRecord, VoiceInkSessionMetricSourc
         aiRequestUserMessage = nil
     }
 
+    func markAsFailedTranscription(reason: String) {
+        let plan = VoiceInkTranscriptionRecordFailurePlan(errorDescription: reason)
+        text = plan.failedTranscriptText
+        transcriptionState = plan.status
+    }
+
     var transcriptionState: VoiceInkTranscriptionStatus? {
         get {
             guard let transcriptionStatus else { return nil }

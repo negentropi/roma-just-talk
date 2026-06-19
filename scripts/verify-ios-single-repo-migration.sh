@@ -1698,13 +1698,69 @@ reject_pattern \
   VoiceInk/Views/AudioPlayerView.swift
 
 require_pattern \
-  "macOS transcription pipeline uses shared failed transcript text" \
-  'VoiceInkTranscriptPresentation\.failedTranscriptText' \
+  "shared transcription failure plan type lives in core" \
+  'public struct VoiceInkTranscriptionRecordFailurePlan' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift
+
+require_pattern \
+  "shared transcription failure plan owns failed status" \
+  'self\.status = \.failed' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift
+
+require_pattern \
+  "shared transcription failure plan owns macOS stored text" \
+  'self\.failedTranscriptText = VoiceInkTranscriptPresentation\.failedTranscriptText\(reason: errorDescription\)' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift
+
+require_pattern \
+  "iOS mutable transcription records apply shared failure plan" \
+  'let plan = VoiceInkTranscriptionRecordFailurePlan\(errorDescription: errorDescription\)' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift
+
+require_pattern \
+  "iOS mutable transcription records store shared failure status" \
+  'transcriptionStatus = plan\.status' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift
+
+require_pattern \
+  "iOS mutable transcription records store shared failure detail" \
+  'transcriptionError = plan\.errorDescription' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift
+
+require_pattern \
+  "macOS transcription model exposes shared failure adapter" \
+  'func markAsFailedTranscription\(reason: String\)' \
+  VoiceInk/Models/Transcription.swift
+
+require_pattern \
+  "macOS transcription model builds shared failure plan" \
+  'let plan = VoiceInkTranscriptionRecordFailurePlan\(errorDescription: reason\)' \
+  VoiceInk/Models/Transcription.swift
+
+require_pattern \
+  "macOS transcription model stores shared failure text" \
+  'text = plan\.failedTranscriptText' \
+  VoiceInk/Models/Transcription.swift
+
+require_pattern \
+  "macOS transcription model stores shared failure status" \
+  'transcriptionState = plan\.status' \
+  VoiceInk/Models/Transcription.swift
+
+require_pattern \
+  "macOS transcription pipeline uses shared failed record adapter" \
+  'markAsFailedTranscription\(reason: errorDescription\)' \
   VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
 
 require_pattern \
-  "macOS engine uses shared failed transcript text" \
-  'VoiceInkTranscriptPresentation\.failedTranscriptText' \
+  "macOS engine uses shared failed record adapter" \
+  'markAsFailedTranscription\(reason: "No model selected"\)' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+
+reject_pattern \
+  "macOS recorder failure state avoids direct text/status duplication" \
+  'VoiceInkTranscriptPresentation\.failedTranscriptText|transcriptionState = \.failed' \
+  VoiceInk/Transcription/Engine/TranscriptionPipeline.swift \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift
 
 reject_pattern \

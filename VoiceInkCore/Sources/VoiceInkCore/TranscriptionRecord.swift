@@ -1,5 +1,17 @@
 import Foundation
 
+public struct VoiceInkTranscriptionRecordFailurePlan: Equatable, Sendable {
+    public let errorDescription: String
+    public let status: VoiceInkTranscriptionStatus
+    public let failedTranscriptText: String
+
+    public init(errorDescription: String) {
+        self.errorDescription = errorDescription
+        self.status = .failed
+        self.failedTranscriptText = VoiceInkTranscriptPresentation.failedTranscriptText(reason: errorDescription)
+    }
+}
+
 public protocol VoiceInkMutableTranscriptionRecord: AnyObject {
     var text: String { get set }
     var enhancedText: String? { get set }
@@ -24,8 +36,9 @@ public extension VoiceInkMutableTranscriptionRecord {
     }
 
     func markTranscriptionFailed(_ errorDescription: String) {
-        transcriptionStatus = .failed
-        transcriptionError = errorDescription
+        let plan = VoiceInkTranscriptionRecordFailurePlan(errorDescription: errorDescription)
+        transcriptionStatus = plan.status
+        transcriptionError = plan.errorDescription
     }
 }
 

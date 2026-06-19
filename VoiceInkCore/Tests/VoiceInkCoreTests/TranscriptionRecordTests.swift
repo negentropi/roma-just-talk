@@ -2,6 +2,14 @@ import Foundation
 import VoiceInkCore
 
 final class TranscriptionRecordTests: XCTestCase {
+    func testFailurePlanBuildsSharedFailedStatusAndMacOSStoredText() {
+        let plan = VoiceInkTranscriptionRecordFailurePlan(errorDescription: "No model selected")
+
+        XCTAssertEqual(plan.status, .failed)
+        XCTAssertEqual(plan.errorDescription, "No model selected")
+        XCTAssertEqual(plan.failedTranscriptText, "Transcription Failed: No model selected")
+    }
+
     func testApplyCompletedRunResultStoresCompletedRecordState() {
         let record = StubMutableTranscriptionRecord()
         let result = VoiceInkTranscriptionRunResult(

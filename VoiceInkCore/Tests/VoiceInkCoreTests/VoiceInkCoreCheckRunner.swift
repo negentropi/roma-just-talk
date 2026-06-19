@@ -697,6 +697,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "TranscriptionPromptUseTests.testRecordedFilePromptUseDropsUnsupportedProviderPrompts", run: { TranscriptionPromptUseTests().testRecordedFilePromptUseDropsUnsupportedProviderPrompts() }),
             VoiceInkCoreCheck(name: "TranscriptionPromptUseTests.testStreamingPromptUseKeepsOnlyAssemblyAIPrompts", run: { TranscriptionPromptUseTests().testStreamingPromptUseKeepsOnlyAssemblyAIPrompts() }),
             VoiceInkCoreCheck(name: "TranscriptionPromptUseTests.testDirectTranscriptionPromptUseKeepsPrompt", run: { TranscriptionPromptUseTests().testDirectTranscriptionPromptUseKeepsPrompt() }),
+            VoiceInkCoreCheck(name: "TranscriptionRecordTests.testFailurePlanBuildsSharedFailedStatusAndMacOSStoredText", run: { TranscriptionRecordTests().testFailurePlanBuildsSharedFailedStatusAndMacOSStoredText() }),
             VoiceInkCoreCheck(name: "TranscriptionRecordTests.testApplyCompletedRunResultStoresCompletedRecordState", run: { TranscriptionRecordTests().testApplyCompletedRunResultStoresCompletedRecordState() }),
             VoiceInkCoreCheck(name: "TranscriptionRecordTests.testApplyCompletedRunResultClearsOldEnhancementAndErrorWhenAbsent", run: { TranscriptionRecordTests().testApplyCompletedRunResultClearsOldEnhancementAndErrorWhenAbsent() }),
             VoiceInkCoreCheck(name: "TranscriptionRecordTests.testMarkTranscriptionFailedOnlyStoresFailureState", run: { TranscriptionRecordTests().testMarkTranscriptionFailedOnlyStoresFailureState() }),

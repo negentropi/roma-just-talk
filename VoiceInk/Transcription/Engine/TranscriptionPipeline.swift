@@ -276,8 +276,7 @@ class TranscriptionPipeline {
                 }
             }
 
-            transcription.text = VoiceInkTranscriptPresentation.failedTranscriptText(reason: errorDescription)
-            transcription.transcriptionState = .failed
+            transcription.markAsFailedTranscription(reason: errorDescription)
         }
 
         func recordSessionMetricAndNotifyIfNeeded(modelDisplayName: String?) {

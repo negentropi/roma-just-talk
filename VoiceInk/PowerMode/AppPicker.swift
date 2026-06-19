@@ -12,7 +12,7 @@ struct AppPickerPopover: View {
                 Image(systemName: "magnifyingglass")
                     .foregroundColor(.secondary)
                     .font(.system(size: 12))
-                TextField("Search apps...", text: $searchText)
+                TextField(VoiceInkPowerModePresentation.appPickerSearchPlaceholder, text: $searchText)
                     .textFieldStyle(.plain)
                     .font(.system(size: 13))
                 if !searchText.isEmpty {
@@ -32,7 +32,7 @@ struct AppPickerPopover: View {
             ScrollView {
                 LazyVStack(spacing: 0) {
                     ForEach(installedApps, id: \.bundleId) { app in
-                        let isSelected = selectedAppConfigs.contains(where: { $0.bundleIdentifier == app.bundleId })
+                        let isSelected = selectedAppConfigs.containsPowerModeAppConfig(bundleIdentifier: app.bundleId)
 
                         Button {
                             toggleAppSelection(app)
@@ -71,10 +71,6 @@ struct AppPickerPopover: View {
     }
 
     private func toggleAppSelection(_ app: (url: URL, name: String, bundleId: String, icon: NSImage)) {
-        if let index = selectedAppConfigs.firstIndex(where: { $0.bundleIdentifier == app.bundleId }) {
-            selectedAppConfigs.remove(at: index)
-        } else {
-            selectedAppConfigs.append(VoiceInkPowerModeAppConfig(bundleIdentifier: app.bundleId, appName: app.name))
-        }
+        selectedAppConfigs.togglePowerModeAppConfig(bundleIdentifier: app.bundleId, appName: app.name)
     }
 }

@@ -132,6 +132,28 @@ final class PowerModePolicyTests: XCTestCase {
         )
     }
 
+    func testPowerModeAppConfigSelectionTogglesByBundleIdentifier() {
+        let existingID = UUID()
+        var configs = [
+            VoiceInkPowerModeAppConfig(
+                id: existingID,
+                bundleIdentifier: "com.example.Existing",
+                appName: "Existing"
+            )
+        ]
+
+        XCTAssertTrue(configs.containsPowerModeAppConfig(bundleIdentifier: "com.example.Existing"))
+        XCTAssertFalse(configs.containsPowerModeAppConfig(bundleIdentifier: "com.example.New"))
+
+        configs.togglePowerModeAppConfig(bundleIdentifier: "com.example.New", appName: "New")
+        XCTAssertEqual(configs.map(\.bundleIdentifier), ["com.example.Existing", "com.example.New"])
+        XCTAssertEqual(configs.last?.appName, "New")
+
+        configs.togglePowerModeAppConfig(bundleIdentifier: "com.example.Existing", appName: "Ignored")
+        XCTAssertEqual(configs.map(\.bundleIdentifier), ["com.example.New"])
+        XCTAssertFalse(configs.contains { $0.id == existingID })
+    }
+
     func testPowerModeConfigPreservesStoredShapeEqualityAndRuleAdapter() throws {
         let id = UUID()
         let config = PowerModeConfig(

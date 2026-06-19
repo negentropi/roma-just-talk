@@ -1261,6 +1261,20 @@ public struct VoiceInkPowerModeAppRule: Equatable, Sendable {
     }
 }
 
+public extension Array where Element == VoiceInkPowerModeAppConfig {
+    func containsPowerModeAppConfig(bundleIdentifier: String) -> Bool {
+        contains { $0.bundleIdentifier == bundleIdentifier }
+    }
+
+    mutating func togglePowerModeAppConfig(bundleIdentifier: String, appName: String) {
+        if let index = firstIndex(where: { $0.bundleIdentifier == bundleIdentifier }) {
+            remove(at: index)
+        } else {
+            append(VoiceInkPowerModeAppConfig(bundleIdentifier: bundleIdentifier, appName: appName))
+        }
+    }
+}
+
 public struct VoiceInkPowerModeURLConfig: Identifiable, Codable, Equatable, Sendable {
     public let id: UUID
     public var url: String

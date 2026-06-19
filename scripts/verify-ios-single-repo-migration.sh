@@ -4036,8 +4036,13 @@ require_pattern \
 
 require_pattern \
   "shared Power Mode config form chrome copy lives in VoiceInkCore" \
-  'generalSectionTitle|nameFieldPlaceholder|triggerScenariosSectionTitle|applicationsSectionTitle|addApplicationHelpText|noApplicationsText|websitesSectionTitle|websiteURLFieldPlaceholder|addWebsiteHelpText|noWebsitesText|transcriptionSectionTitle|transcriptionModelPickerTitle|transcriptionLanguageTitle|autodetectedLanguageText|aiEnhancementSectionTitle|advancedSectionTitle|formSaveButtonTitle' \
+  'generalSectionTitle|nameFieldPlaceholder|triggerScenariosSectionTitle|applicationsSectionTitle|addApplicationHelpText|noApplicationsText|appPickerSearchPlaceholder|websitesSectionTitle|websiteURLFieldPlaceholder|addWebsiteHelpText|noWebsitesText|transcriptionSectionTitle|transcriptionModelPickerTitle|transcriptionLanguageTitle|autodetectedLanguageText|aiEnhancementSectionTitle|advancedSectionTitle|formSaveButtonTitle' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
+
+require_pattern \
+  "shared Power Mode app trigger selection policy lives in VoiceInkCore" \
+  'containsPowerModeAppConfig|togglePowerModeAppConfig' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
   "macOS Power Mode rows use shared selected-language display formatting" \
@@ -4078,6 +4083,11 @@ require_pattern \
   "macOS Power Mode config form uses shared chrome copy" \
   'VoiceInkPowerModePresentation\.(formCloseHelpText|generalSectionTitle|nameFieldPlaceholder|triggerScenariosSectionTitle|applicationsSectionTitle|addApplicationHelpText|noApplicationsText|websitesSectionTitle|websiteURLFieldPlaceholder|addWebsiteHelpText|noWebsitesText|transcriptionSectionTitle|transcriptionModelPickerTitle|transcriptionLanguageTitle|autodetectedLanguageText|aiEnhancementSectionTitle|aiEnhancementToggleTitle|advancedSectionTitle|formDeleteButtonTitle|formCancelButtonTitle|formSaveButtonTitle)' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
+
+require_pattern \
+  "macOS app picker uses shared search copy and app trigger selection policy" \
+  'VoiceInkPowerModePresentation\.appPickerSearchPlaceholder|selectedAppConfigs\.(containsPowerModeAppConfig|togglePowerModeAppConfig)' \
+  VoiceInk/PowerMode/AppPicker.swift
 
 require_pattern \
   "macOS Power Mode edit form uses shared delete confirmation copy" \
@@ -4149,6 +4159,11 @@ require_pattern \
   'macOS Power Mode config form seed defaults, trigger-section labels, transcription section labels, AI toggle title, and footer actions route through `VoiceInkPowerModeConfigurationFormState`/`VoiceInkPowerModePresentation`' \
   docs/ios-single-repo-migration.md
 
+require_pattern \
+  "migration checklist tracks shared Power Mode app picker gate" \
+  'macOS Power Mode app picker search copy and app-trigger toggle policy route through `VoiceInkPowerModePresentation`/`VoiceInkPowerModeAppConfig`' \
+  docs/ios-single-repo-migration.md
+
 reject_pattern \
   "macOS Power Mode rows avoid shell-only selected-language fallback formatting" \
   'langCode == "auto"|langCode == "en"|langCode\.uppercased\(\)' \
@@ -4178,6 +4193,11 @@ reject_pattern \
   "macOS Power Mode config form avoids shell-only trigger and section chrome copy" \
   '"(New Power Mode|General|Name|Trigger Scenarios|Applications|Add application|No applications added|Websites|Enter website URL|Add website|No websites added|Transcription|Model|Language|Autodetected|AI Enhancement|Advanced|Save Changes)"|Button\("(Delete|Cancel)"|help\("Close"' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
+
+reject_pattern \
+  "macOS app picker avoids shell-only search copy and app trigger selection policy" \
+  '"Search apps\.\.\."|selectedAppConfigs\.(contains|firstIndex|append|remove)\(' \
+  VoiceInk/PowerMode/AppPicker.swift
 
 reject_pattern \
   "macOS Power Mode emoji shell avoids raw catalog storage and validation policy" \

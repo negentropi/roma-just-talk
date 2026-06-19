@@ -89,6 +89,7 @@ public enum VoiceInkPowerModePresentation {
     public static let applicationsSectionTitle = "Applications"
     public static let addApplicationHelpText = "Add application"
     public static let noApplicationsText = "No applications added"
+    public static let appPickerSearchPlaceholder = "Search apps..."
     public static let websitesSectionTitle = "Websites"
     public static let websiteURLFieldPlaceholder = "Enter website URL"
     public static let addWebsiteHelpText = "Add website"

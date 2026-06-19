@@ -96,6 +96,7 @@ final class PowerModePresentationTests: XCTestCase {
         XCTAssertEqual(VoiceInkPowerModePresentation.applicationsSectionTitle, "Applications")
         XCTAssertEqual(VoiceInkPowerModePresentation.addApplicationHelpText, "Add application")
         XCTAssertEqual(VoiceInkPowerModePresentation.noApplicationsText, "No applications added")
+        XCTAssertEqual(VoiceInkPowerModePresentation.appPickerSearchPlaceholder, "Search apps...")
         XCTAssertEqual(VoiceInkPowerModePresentation.websitesSectionTitle, "Websites")
         XCTAssertEqual(VoiceInkPowerModePresentation.websiteURLFieldPlaceholder, "Enter website URL")
         XCTAssertEqual(VoiceInkPowerModePresentation.addWebsiteHelpText, "Add website")

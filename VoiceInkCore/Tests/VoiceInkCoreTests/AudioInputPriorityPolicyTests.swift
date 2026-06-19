@@ -14,6 +14,7 @@ final class AudioInputPriorityPolicyTests: XCTestCase {
         XCTAssertEqual(VoiceInkAudioInputPreference.inputModeKey, "audioInputMode")
         XCTAssertEqual(VoiceInkAudioInputPreference.selectedDeviceUIDKey, "selectedAudioDeviceUID")
         XCTAssertEqual(VoiceInkAudioInputPreference.prioritizedDevicesKey, "prioritizedDevices")
+        XCTAssertEqual(VoiceInkAudioInputPreference.lastUsedMicrophoneDeviceIDKey, "lastUsedMicrophoneDeviceID")
         XCTAssertEqual(
             VoiceInkAudioInputPreference.registeredDefaults[VoiceInkAudioInputPreference.inputModeKey] as? String,
             VoiceInkAudioInputMode.defaultMode.rawValue
@@ -42,6 +43,15 @@ final class AudioInputPriorityPolicyTests: XCTestCase {
             XCTAssertEqual(VoiceInkAudioInputPreference.prioritizedDevices(from: defaults), [])
             VoiceInkAudioInputPreference.savePrioritizedDevices(devices, to: defaults)
             XCTAssertEqual(VoiceInkAudioInputPreference.prioritizedDevices(from: defaults), devices)
+
+            XCTAssertNil(VoiceInkAudioInputPreference.lastUsedMicrophoneDeviceID(from: defaults))
+            XCTAssertTrue(VoiceInkAudioInputPreference.shouldAnnounceMicrophoneChange(to: "123", in: defaults))
+            VoiceInkAudioInputPreference.saveLastUsedMicrophoneDeviceID("123", to: defaults)
+            XCTAssertEqual(VoiceInkAudioInputPreference.lastUsedMicrophoneDeviceID(from: defaults), "123")
+            XCTAssertFalse(VoiceInkAudioInputPreference.shouldAnnounceMicrophoneChange(to: "123", in: defaults))
+            XCTAssertTrue(VoiceInkAudioInputPreference.shouldAnnounceMicrophoneChange(to: "456", in: defaults))
+            VoiceInkAudioInputPreference.clearLastUsedMicrophoneDeviceID(from: defaults)
+            XCTAssertNil(VoiceInkAudioInputPreference.lastUsedMicrophoneDeviceID(from: defaults))
         }
     }
 

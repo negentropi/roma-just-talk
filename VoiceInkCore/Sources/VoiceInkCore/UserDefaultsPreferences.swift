@@ -1047,6 +1047,7 @@ public enum VoiceInkSharedPreferenceReset {
         VoiceInkModelRuntimePreference.clear(from: defaults)
         VoiceInkRecorderPreviewPreference.clear(from: defaults)
         VoiceInkRecordingShortcutPreference.clear(from: defaults)
+        VoiceInkAudioInputPreference.clearLastUsedMicrophoneDeviceID(from: defaults)
     }
 }
 

@@ -162,13 +162,13 @@ class Recorder: NSObject, ObservableObject {
         deviceManager.isRecordingActive = true
 
         let currentDeviceID = deviceManager.getCurrentDevice()
-        let lastDeviceID = UserDefaults.standard.string(forKey: "lastUsedMicrophoneDeviceID")
-        if String(currentDeviceID) != lastDeviceID {
+        let currentDeviceIdentifier = String(currentDeviceID)
+        if VoiceInkAudioInputPreference.shouldAnnounceMicrophoneChange(to: currentDeviceIdentifier) {
             if let deviceName = deviceManager.availableDevices.first(where: { $0.id == currentDeviceID })?.name {
                 NotificationManager.shared.showNotification(title: "Using: \(deviceName)", type: .info)
             }
         }
-        UserDefaults.standard.set(String(currentDeviceID), forKey: "lastUsedMicrophoneDeviceID")
+        VoiceInkAudioInputPreference.saveLastUsedMicrophoneDeviceID(currentDeviceIdentifier)
 
         let deviceID = currentDeviceID
 

@@ -52,6 +52,7 @@ public enum VoiceInkAudioInputPreference {
     public static let inputModeKey = "audioInputMode"
     public static let selectedDeviceUIDKey = "selectedAudioDeviceUID"
     public static let prioritizedDevicesKey = "prioritizedDevices"
+    public static let lastUsedMicrophoneDeviceIDKey = "lastUsedMicrophoneDeviceID"
 
     public static var registeredDefaults: [String: Any] {
         [
@@ -99,6 +100,28 @@ public enum VoiceInkAudioInputPreference {
     ) {
         guard let data = try? JSONEncoder().encode(devices) else { return }
         defaults.set(data, forKey: prioritizedDevicesKey)
+    }
+
+    public static func lastUsedMicrophoneDeviceID(from defaults: UserDefaults = .standard) -> String? {
+        defaults.string(forKey: lastUsedMicrophoneDeviceIDKey)
+    }
+
+    public static func saveLastUsedMicrophoneDeviceID(
+        _ deviceID: String,
+        to defaults: UserDefaults = .standard
+    ) {
+        defaults.set(deviceID, forKey: lastUsedMicrophoneDeviceIDKey)
+    }
+
+    public static func shouldAnnounceMicrophoneChange(
+        to deviceID: String,
+        in defaults: UserDefaults = .standard
+    ) -> Bool {
+        deviceID != lastUsedMicrophoneDeviceID(from: defaults)
+    }
+
+    public static func clearLastUsedMicrophoneDeviceID(from defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: lastUsedMicrophoneDeviceIDKey)
     }
 }
 

@@ -7,6 +7,7 @@
 
 import Testing
 import Foundation
+import VoiceInkCore
 import SwiftData
 import AppKit
 import Carbon.HIToolbox
@@ -28,12 +29,12 @@ struct VoiceInkTests {
     }
 
     @Test func rollingBufferPreloadPreviewStaysVisibleDuringRecording() {
-        #expect(RecordingState.idle.acceptsRollingBufferPreloadPreview)
-        #expect(RecordingState.recording.acceptsRollingBufferPreloadPreview)
-        #expect(!RecordingState.starting.acceptsRollingBufferPreloadPreview)
-        #expect(!RecordingState.transcribing.acceptsRollingBufferPreloadPreview)
-        #expect(!RecordingState.enhancing.acceptsRollingBufferPreloadPreview)
-        #expect(!RecordingState.busy.acceptsRollingBufferPreloadPreview)
+        #expect(VoiceInkRecordingState.idle.acceptsRollingBufferPreloadPreview)
+        #expect(VoiceInkRecordingState.recording.acceptsRollingBufferPreloadPreview)
+        #expect(!VoiceInkRecordingState.starting.acceptsRollingBufferPreloadPreview)
+        #expect(!VoiceInkRecordingState.transcribing.acceptsRollingBufferPreloadPreview)
+        #expect(!VoiceInkRecordingState.enhancing.acceptsRollingBufferPreloadPreview)
+        #expect(!VoiceInkRecordingState.busy.acceptsRollingBufferPreloadPreview)
     }
 
     @Test @MainActor func rollingPreloadQuickReleaseDurationUsesMono16kPCMByteCount() {
@@ -176,7 +177,7 @@ struct VoiceInkTests {
         #expect(!service.hasPromptTriggerWords)
         #expect(service.promptDetectionPrompts.isEmpty)
 
-        let triggerPrompt = CustomPrompt(
+        let triggerPrompt = VoiceInkCustomPrompt(
             title: "Fast Trigger",
             promptText: "Clean this",
             triggerWords: ["clean"]
@@ -187,7 +188,7 @@ struct VoiceInkTests {
         #expect(service.promptDetectionPrompts.map(\.id) == [triggerPrompt.id])
 
         service.customPrompts = [
-            CustomPrompt(
+            VoiceInkCustomPrompt(
                 title: "Blank Trigger",
                 promptText: "Clean this",
                 triggerWords: ["   "]
@@ -216,13 +217,13 @@ struct VoiceInkTests {
 
         let container = try makeWordReplacementContainer()
         let service = AIEnhancementService(modelContext: container.mainContext)
-        let triggerPrompt = CustomPrompt(
+        let triggerPrompt = VoiceInkCustomPrompt(
             title: "Assistant Trigger",
             promptText: "Answer directly",
             triggerWords: ["answer"]
         )
         service.customPrompts = [
-            CustomPrompt(title: "No Trigger", promptText: "Clean this"),
+            VoiceInkCustomPrompt(title: "No Trigger", promptText: "Clean this"),
             triggerPrompt
         ]
 
@@ -373,7 +374,7 @@ struct VoiceInkTests {
     }
 
     @Test @MainActor func specialModeKeyDownPreparesWithoutStartingRecorder() async throws {
-        var recordingState = RecordingState.idle
+        var recordingState = VoiceInkRecordingState.idle
         var sessionActive = false
         var toggleCount = 0
         var cancelCount = 0
@@ -424,7 +425,7 @@ struct VoiceInkTests {
     }
 
     @Test @MainActor func specialModeCleanReleaseCommitsReadyPreloadWithoutStartingRecorder() async throws {
-        var recordingState = RecordingState.idle
+        var recordingState = VoiceInkRecordingState.idle
         var sessionActive = false
         var toggleCount = 0
         var cancelCount = 0
@@ -470,7 +471,7 @@ struct VoiceInkTests {
             action: .primaryRecording,
             eventTime: 2,
             mode: .special,
-            context: ShortcutPressContext()
+            context: VoiceInkShortcutPressContext()
         )
 
         #expect(prepareQuickReleaseCount == 1)
@@ -483,7 +484,7 @@ struct VoiceInkTests {
     }
 
     @Test @MainActor func specialModeLongHoldStartsRecordingPastRollingBufferDuration() async throws {
-        var recordingState = RecordingState.idle
+        var recordingState = VoiceInkRecordingState.idle
         var sessionActive = false
         var toggleCount = 0
         var cancelCount = 0
@@ -536,7 +537,7 @@ struct VoiceInkTests {
             action: .primaryRecording,
             eventTime: 6,
             mode: .special,
-            context: ShortcutPressContext()
+            context: VoiceInkShortcutPressContext()
         )
 
         #expect(prepareQuickReleaseCount == 1)
@@ -549,7 +550,7 @@ struct VoiceInkTests {
     }
 
     @Test @MainActor func specialModeTypingEvidenceBeforeHoldDelayKeepsPreloadDiscardOnly() async throws {
-        var recordingState = RecordingState.idle
+        var recordingState = VoiceInkRecordingState.idle
         var sessionActive = false
         var toggleCount = 0
         var cancelCount = 0
@@ -591,7 +592,7 @@ struct VoiceInkTests {
             eventTime: 1,
             mode: .special
         )
-        let typingContext = ShortcutPressContext(didPressOtherKeyDuringPress: true)
+        let typingContext = VoiceInkShortcutPressContext(didPressOtherKeyDuringPress: true)
         handler.handlePressContextChanged(action: .primaryRecording, context: typingContext)
         try await Task.sleep(nanoseconds: 30_000_000)
 
@@ -612,7 +613,7 @@ struct VoiceInkTests {
     }
 
     @Test @MainActor func specialModeTypingEvidenceDiscardsWithoutStartingRecorder() async throws {
-        var recordingState = RecordingState.idle
+        var recordingState = VoiceInkRecordingState.idle
         var sessionActive = false
         var toggleCount = 0
         var cancelCount = 0
@@ -658,7 +659,7 @@ struct VoiceInkTests {
             action: .primaryRecording,
             eventTime: 2,
             mode: .special,
-            context: ShortcutPressContext(didPressOtherKeyDuringPress: true)
+            context: VoiceInkShortcutPressContext(didPressOtherKeyDuringPress: true)
         )
 
         #expect(prepareQuickReleaseCount == 1)
@@ -671,7 +672,7 @@ struct VoiceInkTests {
     }
 
     @Test @MainActor func specialModeUnreliableEvidenceDiscardsWithoutStartingRecorder() async throws {
-        var recordingState = RecordingState.idle
+        var recordingState = VoiceInkRecordingState.idle
         var sessionActive = false
         var toggleCount = 0
         var cancelCount = 0
@@ -717,7 +718,7 @@ struct VoiceInkTests {
             action: .primaryRecording,
             eventTime: 2,
             mode: .special,
-            context: ShortcutPressContext(hasReliableKeyEvidence: false)
+            context: VoiceInkShortcutPressContext(hasReliableKeyEvidence: false)
         )
 
         #expect(prepareQuickReleaseCount == 1)
@@ -733,7 +734,7 @@ struct VoiceInkTests {
         SpecialShortcutEmptyTranscriptionFallback.resetForTesting()
         defer { SpecialShortcutEmptyTranscriptionFallback.resetForTesting() }
 
-        var recordingState = RecordingState.recording
+        var recordingState = VoiceInkRecordingState.recording
         var sessionActive = true
         var toggleCount = 0
         var cancelCount = 0
@@ -785,7 +786,7 @@ struct VoiceInkTests {
     }
 
     @Test @MainActor func specialModeTypingEvidenceDoesNotCancelAlreadyVisibleRecorder() async throws {
-        var recordingState = RecordingState.recording
+        var recordingState = VoiceInkRecordingState.recording
         var sessionActive = true
         var toggleCount = 0
         var cancelCount = 0
@@ -830,7 +831,7 @@ struct VoiceInkTests {
             action: .primaryRecording,
             eventTime: 2,
             mode: .special,
-            context: ShortcutPressContext(didPressOtherKeyDuringPress: true)
+            context: VoiceInkShortcutPressContext(didPressOtherKeyDuringPress: true)
         )
 
         #expect(prepareQuickReleaseCount == 0)
@@ -924,8 +925,8 @@ struct VoiceInkTests {
 
     @Test func modifierOnlyShortcutTracksOtherKeyDownWithoutReleaseEvidence() async throws {
         let monitor = ShortcutMonitor()
-        var contexts: [ShortcutPressContext] = []
-        var contextUpdates: [ShortcutPressContext] = []
+        var contexts: [VoiceInkShortcutPressContext] = []
+        var contextUpdates: [VoiceInkShortcutPressContext] = []
 
         monitor.configureForTesting(
             shortcuts: [
@@ -950,7 +951,7 @@ struct VoiceInkTests {
             eventTime: 2
         )
         try await Task.sleep(nanoseconds: 10_000_000)
-        #expect(contextUpdates == [ShortcutPressContext(didPressOtherKeyDuringPress: true, didReleaseOtherKeyDuringPress: false)])
+        #expect(contextUpdates == [VoiceInkShortcutPressContext(didPressOtherKeyDuringPress: true, didReleaseOtherKeyDuringPress: false)])
 
         monitor.handleModifierOnlyFlagsChangedForTesting(
             keyCode: UInt16(kVK_Shift),
@@ -959,13 +960,13 @@ struct VoiceInkTests {
         )
 
         try await Task.sleep(nanoseconds: 10_000_000)
-        #expect(contexts == [ShortcutPressContext(didPressOtherKeyDuringPress: true, didReleaseOtherKeyDuringPress: false)])
+        #expect(contexts == [VoiceInkShortcutPressContext(didPressOtherKeyDuringPress: true, didReleaseOtherKeyDuringPress: false)])
     }
 
     @Test func modifierOnlyShortcutUsesEventTapOrderingWhenTrackingKeyEvidence() async throws {
         let monitor = ShortcutMonitor()
         var keyDownCount = 0
-        var contexts: [ShortcutPressContext] = []
+        var contexts: [VoiceInkShortcutPressContext] = []
 
         monitor.configureForTesting(
             shortcuts: [
@@ -997,12 +998,12 @@ struct VoiceInkTests {
 
         try await Task.sleep(nanoseconds: 10_000_000)
         #expect(keyDownCount == 1)
-        #expect(contexts == [ShortcutPressContext(didPressOtherKeyDuringPress: true, didReleaseOtherKeyDuringPress: false)])
+        #expect(contexts == [VoiceInkShortcutPressContext(didPressOtherKeyDuringPress: true, didReleaseOtherKeyDuringPress: false)])
     }
 
     @Test func modifierOnlyShortcutTracksSystemDefinedEvidenceDuringPress() async throws {
         let monitor = ShortcutMonitor()
-        var contexts: [ShortcutPressContext] = []
+        var contexts: [VoiceInkShortcutPressContext] = []
 
         monitor.configureForTesting(
             shortcuts: [
@@ -1029,12 +1030,12 @@ struct VoiceInkTests {
         )
 
         try await Task.sleep(nanoseconds: 10_000_000)
-        #expect(contexts == [ShortcutPressContext(didPressOtherKeyDuringPress: true, didReleaseOtherKeyDuringPress: false)])
+        #expect(contexts == [VoiceInkShortcutPressContext(didPressOtherKeyDuringPress: true, didReleaseOtherKeyDuringPress: false)])
     }
 
     @Test func modifierOnlyShortcutMarksSecureInputAsUnreliableEvidence() async throws {
         let monitor = ShortcutMonitor()
-        var contexts: [ShortcutPressContext] = []
+        var contexts: [VoiceInkShortcutPressContext] = []
 
         ShortcutMonitor.configureSecureEventInputClientForTesting(
             SecureEventInputState.Client(isEnabled: { true })
@@ -1068,12 +1069,12 @@ struct VoiceInkTests {
         )
 
         try await Task.sleep(nanoseconds: 10_000_000)
-        #expect(contexts == [ShortcutPressContext(hasReliableKeyEvidence: false)])
+        #expect(contexts == [VoiceInkShortcutPressContext(hasReliableKeyEvidence: false)])
     }
 
     @Test func modifierOnlyShortcutChecksPressedNonModifierKeysAtRelease() async throws {
         let monitor = ShortcutMonitor()
-        var contexts: [ShortcutPressContext] = []
+        var contexts: [VoiceInkShortcutPressContext] = []
 
         ShortcutMonitor.configureKeyboardStateClientForTesting(
             KeyboardState.Client(isKeyPressed: { keyCode in keyCode == UInt16(kVK_ANSI_X) })
@@ -1107,7 +1108,7 @@ struct VoiceInkTests {
         )
 
         try await Task.sleep(nanoseconds: 10_000_000)
-        #expect(contexts == [ShortcutPressContext(didPressOtherKeyDuringPress: true)])
+        #expect(contexts == [VoiceInkShortcutPressContext(didPressOtherKeyDuringPress: true)])
     }
 
     @Test func modifierOnlySpecialShortcutDoesNotStartWithoutKeyEvidenceTap() async throws {
@@ -1155,7 +1156,7 @@ struct VoiceInkTests {
 
     @Test func modifierOnlyShortcutMarksOtherKeyUpAsTyping() async throws {
         let monitor = ShortcutMonitor()
-        var contexts: [ShortcutPressContext] = []
+        var contexts: [VoiceInkShortcutPressContext] = []
 
         monitor.configureForTesting(
             shortcuts: [
@@ -1190,12 +1191,12 @@ struct VoiceInkTests {
         )
 
         #expect(await eventually { contexts.count == 1 })
-        #expect(contexts == [ShortcutPressContext(didPressOtherKeyDuringPress: true, didReleaseOtherKeyDuringPress: true)])
+        #expect(contexts == [VoiceInkShortcutPressContext(didPressOtherKeyDuringPress: true, didReleaseOtherKeyDuringPress: true)])
     }
 
     @Test func modifierOnlyShortcutTracksOtherModifierPressAndRelease() async throws {
         let monitor = ShortcutMonitor()
-        var contexts: [ShortcutPressContext] = []
+        var contexts: [VoiceInkShortcutPressContext] = []
 
         monitor.configureForTesting(
             shortcuts: [
@@ -1230,7 +1231,7 @@ struct VoiceInkTests {
         )
 
         #expect(await eventually { contexts.count == 1 })
-        #expect(contexts == [ShortcutPressContext(didPressOtherKeyDuringPress: true, didReleaseOtherKeyDuringPress: true)])
+        #expect(contexts == [VoiceInkShortcutPressContext(didPressOtherKeyDuringPress: true, didReleaseOtherKeyDuringPress: true)])
     }
 
     @Test @MainActor func shortcutRecorderCancelRestoresStoredShortcut() throws {

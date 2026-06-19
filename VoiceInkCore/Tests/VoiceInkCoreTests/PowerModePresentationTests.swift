@@ -119,6 +119,19 @@ final class PowerModePresentationTests: XCTestCase {
         )
     }
 
+    func testAdvancedFormChromePreservesMacOSCopy() {
+        XCTAssertEqual(VoiceInkPowerModePresentation.autoSendFormTitle, "Auto Send")
+        XCTAssertEqual(
+            VoiceInkPowerModePresentation.autoSendHelpText,
+            "Automatically presses a key combination after pasting text. Useful for chat applications or forms that use different send shortcuts."
+        )
+        XCTAssertEqual(VoiceInkPowerModePresentation.keyboardShortcutFormTitle, "Keyboard Shortcut")
+        XCTAssertEqual(
+            VoiceInkPowerModePresentation.keyboardShortcutHelpText,
+            "Assign a unique keyboard shortcut to instantly activate this Power Mode and start recording."
+        )
+    }
+
     func testRowDetailPresentationPreservesDefaultBandWithoutVisibleChips() {
         let config = PowerModeConfig(
             name: "Writing",

@@ -531,14 +531,14 @@ struct ConfigurationView: View {
                         }
                     } label: {
                         HStack(spacing: 6) {
-                            Text("Auto Send")
-                            InfoTip("Automatically presses a key combination after pasting text. Useful for chat applications or forms that use different send shortcuts.")
+                            Text(VoiceInkPowerModePresentation.autoSendFormTitle)
+                            InfoTip(VoiceInkPowerModePresentation.autoSendHelpText)
                         }
                     }
 
                     HStack {
-                        Text("Keyboard Shortcut")
-                        InfoTip("Assign a unique keyboard shortcut to instantly activate this Power Mode and start recording.")
+                        Text(VoiceInkPowerModePresentation.keyboardShortcutFormTitle)
+                        InfoTip(VoiceInkPowerModePresentation.keyboardShortcutHelpText)
 
                         Spacer()
 

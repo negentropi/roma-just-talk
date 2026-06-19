@@ -2928,6 +2928,16 @@ require_pattern \
   'VoiceInkPowerModePresentation\.(aiProviderFormTitle|aiModelFormTitle|enhancementPromptFormTitle|refreshModelsButtonTitle|refreshModelsButtonHelp|contextAwarenessDisplayText|setAsDefaultToggleTitle|setAsDefaultHelpText)' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
+require_pattern \
+  "shared Power Mode advanced form chrome copy lives in VoiceInkCore" \
+  'autoSendFormTitle|autoSendHelpText|keyboardShortcutFormTitle|keyboardShortcutHelpText' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
+
+require_pattern \
+  "macOS Power Mode edit form uses shared advanced form chrome copy" \
+  'VoiceInkPowerModePresentation\.(autoSendFormTitle|autoSendHelpText|keyboardShortcutFormTitle|keyboardShortcutHelpText)' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
 reject_pattern \
   "macOS Power Mode rows avoid shell-only selected-language fallback formatting" \
   'langCode == "auto"|langCode == "en"|langCode\.uppercased\(\)' \
@@ -2946,6 +2956,11 @@ reject_pattern \
 reject_pattern \
   "macOS Power Mode edit form avoids duplicate AI-enhancement form chrome copy" \
   '"(AI Provider|AI Model|Enhancement Prompt|Context Awareness|Refresh Models|Refresh models|Set as default|Default power mode is used when no specific app or website matches are found\.)"' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+reject_pattern \
+  "macOS Power Mode edit form avoids duplicate advanced form chrome copy" \
+  '"(Auto Send|Automatically presses a key combination after pasting text\. Useful for chat applications or forms that use different send shortcuts\.|Keyboard Shortcut|Assign a unique keyboard shortcut to instantly activate this Power Mode and start recording\.)"' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
 reject_pattern \

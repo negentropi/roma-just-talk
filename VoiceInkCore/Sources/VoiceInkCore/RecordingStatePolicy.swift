@@ -15,6 +15,63 @@ public enum VoiceInkRecorderUIToggleAction: Equatable, Sendable {
     case dismissRecorder
 }
 
+public enum VoiceInkRecorderStyle: String, CaseIterable, Identifiable, Sendable {
+    case none
+    case notch
+    case mini
+
+    public var id: String { rawValue }
+
+    public var displayName: String {
+        switch self {
+        case .none:
+            return "None"
+        case .notch:
+            return "Notch"
+        case .mini:
+            return "Mini"
+        }
+    }
+}
+
+public enum VoiceInkRecorderWindowKind: Equatable, Sendable {
+    case none
+    case notch
+    case mini
+}
+
+public enum VoiceInkRecorderStylePreference {
+    public static let userDefaultsKey = "RecorderType"
+    public static let defaultStyle: VoiceInkRecorderStyle = .none
+    public static let defaultRawValue = defaultStyle.rawValue
+
+    public static func rawValue(from defaults: UserDefaults = .standard) -> String {
+        defaults.string(forKey: userDefaultsKey) ?? defaultRawValue
+    }
+
+    public static func saveRawValue(
+        _ rawValue: String,
+        to defaults: UserDefaults = .standard
+    ) {
+        defaults.set(rawValue, forKey: userDefaultsKey)
+    }
+
+    public static func windowKind(forRawValue rawValue: String) -> VoiceInkRecorderWindowKind {
+        switch rawValue {
+        case VoiceInkRecorderStyle.none.rawValue:
+            return .none
+        case VoiceInkRecorderStyle.notch.rawValue:
+            return .notch
+        default:
+            return .mini
+        }
+    }
+
+    public static func hasVisibleRecorder(rawValue: String) -> Bool {
+        windowKind(forRawValue: rawValue) != .none
+    }
+}
+
 public struct VoiceInkRecordingSheetPresentation: Equatable, Sendable {
     public let cancelButtonTitle: String
     public let stopButtonTitle: String

@@ -466,6 +466,31 @@ require_pattern \
   VoiceInk/Recorder.swift
 
 require_pattern \
+  "shared macOS recorder style preference lives in VoiceInkCore" \
+  'VoiceInkRecorderStyle|VoiceInkRecorderWindowKind|VoiceInkRecorderStylePreference|userDefaultsKey = "RecorderType"|defaultRawValue|windowKind|hasVisibleRecorder' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "macOS recorder UI manager uses shared recorder style policy" \
+  'VoiceInkRecorderStylePreference\.(rawValue|saveRawValue|hasVisibleRecorder|windowKind)' \
+  VoiceInk/Transcription/Engine/RecorderUIManager.swift
+
+require_pattern \
+  "macOS recorder settings uses shared recorder style catalog" \
+  'VoiceInkRecorderStyle\.allCases|style\.displayName|style\.rawValue' \
+  VoiceInk/Views/Settings/SettingsView.swift
+
+require_pattern \
+  "macOS defaults register shared recorder style default" \
+  'VoiceInkRecorderStylePreference\.(userDefaultsKey|defaultRawValue)' \
+  VoiceInk/AppDefaults.swift
+
+require_pattern \
+  "macOS diagnostics use shared recorder style preference" \
+  'VoiceInkRecorderStylePreference\.rawValue\(\)' \
+  VoiceInk/Services/SystemInfoService.swift
+
+require_pattern \
   "shared mode selection presentation lives in VoiceInkCore" \
   'VoiceInkModeSelectionPresentation|controlTitle' \
   VoiceInkCore/Sources/VoiceInkCore/Mode.swift
@@ -566,6 +591,14 @@ reject_pattern \
   "iOS audio recorder avoids shell-only recording-start failure reason" \
   'Failed to start AVAudioRecorder|record\(\) method returned false|audio session is not configured correctly' \
   iOS/VoiceInk-ios/AudioRecorder.swift
+
+reject_pattern \
+  "macOS recorder style avoids shell-owned raw policy" \
+  '"RecorderType"|"(none|notch|mini)"|recorderType != "none"|recorderType == "none"|case "(none|notch|mini)"|Text\("(None|Notch|Mini)"\)' \
+  VoiceInk/Transcription/Engine/RecorderUIManager.swift \
+  VoiceInk/Views/Settings/SettingsView.swift \
+  VoiceInk/AppDefaults.swift \
+  VoiceInk/Services/SystemInfoService.swift
 
 reject_pattern \
   "recording behavior avoids raw active-state equality" \

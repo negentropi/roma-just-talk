@@ -7,17 +7,17 @@ import VoiceInkCore
 class RecorderUIManager: ObservableObject {
     @Published var miniRecorderError: String?
 
-    @Published var recorderType: String = UserDefaults.standard.string(forKey: "RecorderType") ?? "none" {
+    @Published var recorderType: String = VoiceInkRecorderStylePreference.rawValue() {
         didSet {
             if isMiniRecorderVisible {
                 destroyWindow(for: oldValue)
                 isMiniRecorderVisible = false
             }
 
-            if isRecorderSessionActive, recorderType != "none" {
+            if isRecorderSessionActive, VoiceInkRecorderStylePreference.hasVisibleRecorder(rawValue: recorderType) {
                 isMiniRecorderVisible = true
             }
-            UserDefaults.standard.set(recorderType, forKey: "RecorderType")
+            VoiceInkRecorderStylePreference.saveRawValue(recorderType)
         }
     }
 
@@ -55,15 +55,15 @@ class RecorderUIManager: ObservableObject {
         guard let engine = engine, let recorder = recorder else { return }
         logger.notice("Showing \(self.recorderType, privacy: .public) recorder")
 
-        switch recorderType {
-        case "none":
+        switch VoiceInkRecorderStylePreference.windowKind(forRawValue: recorderType) {
+        case .none:
             return
-        case "notch":
+        case .notch:
             if notchWindowManager == nil {
                 notchWindowManager = NotchWindowManager(engine: engine, recorder: recorder)
             }
             notchWindowManager?.show()
-        default:
+        case .mini:
             if miniWindowManager == nil {
                 miniWindowManager = MiniWindowManager(engine: engine, recorder: recorder)
             }
@@ -72,25 +72,25 @@ class RecorderUIManager: ObservableObject {
     }
 
     func hideRecorderPanel() {
-        switch recorderType {
-        case "notch":
+        switch VoiceInkRecorderStylePreference.windowKind(forRawValue: recorderType) {
+        case .notch:
             notchWindowManager?.hide()
-        case "mini":
+        case .mini:
             miniWindowManager?.hide()
-        default:
+        case .none:
             break
         }
     }
 
     private func destroyWindow(for recorderType: String) {
-        switch recorderType {
-        case "notch":
+        switch VoiceInkRecorderStylePreference.windowKind(forRawValue: recorderType) {
+        case .notch:
             notchWindowManager?.destroyWindow()
             notchWindowManager = nil
-        case "mini":
+        case .mini:
             miniWindowManager?.destroyWindow()
             miniWindowManager = nil
-        default:
+        case .none:
             break
         }
     }
@@ -99,16 +99,16 @@ class RecorderUIManager: ObservableObject {
 
     func beginRecorderSession() {
         isRecorderSessionActive = true
-        if recorderType == "none" {
-            isMiniRecorderVisible = false
-        } else {
+        if VoiceInkRecorderStylePreference.hasVisibleRecorder(rawValue: recorderType) {
             isMiniRecorderVisible = true
+        } else {
+            isMiniRecorderVisible = false
         }
     }
 
     func isActiveForRecordingShortcut(recordingState: VoiceInkRecordingState) -> Bool {
         VoiceInkRecorderUISessionPolicy.isActiveForRecordingShortcut(
-            hasVisibleRecorderType: recorderType != "none",
+            hasVisibleRecorderType: VoiceInkRecorderStylePreference.hasVisibleRecorder(rawValue: recorderType),
             recordingState: recordingState,
             isRecorderSessionActive: isRecorderSessionActive
         )
@@ -122,7 +122,9 @@ class RecorderUIManager: ObservableObject {
         guard let engine = engine else { return }
         logger.notice("toggleMiniRecorder called – sessionActive=\(self.isRecorderSessionActive, privacy: .public), visible=\(self.isMiniRecorderVisible, privacy: .public), state=\(String(describing: engine.recordingState), privacy: .public)")
 
-        if recorderType == "none", isRecorderSessionActive, engine.recordingState == .idle {
+        if !VoiceInkRecorderStylePreference.hasVisibleRecorder(rawValue: recorderType),
+           isRecorderSessionActive,
+           engine.recordingState == .idle {
             logger.notice("toggleMiniRecorder: clearing stale hidden recorder session before starting")
             isRecorderSessionActive = false
         }

@@ -38,6 +38,39 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertEqual(VoiceInkRecordingState.busy.recorderUIToggleAction, .dismissRecorder)
     }
 
+    func testRecorderStylePreferencePreservesMacOSStorageAndLabels() {
+        XCTAssertEqual(VoiceInkRecorderStylePreference.userDefaultsKey, "RecorderType")
+        XCTAssertEqual(VoiceInkRecorderStylePreference.defaultStyle, .none)
+        XCTAssertEqual(VoiceInkRecorderStylePreference.defaultRawValue, "none")
+        XCTAssertEqual(VoiceInkRecorderStyle.allCases, [.none, .notch, .mini])
+        XCTAssertEqual(VoiceInkRecorderStyle.none.displayName, "None")
+        XCTAssertEqual(VoiceInkRecorderStyle.notch.displayName, "Notch")
+        XCTAssertEqual(VoiceInkRecorderStyle.mini.displayName, "Mini")
+    }
+
+    func testRecorderStylePreferenceReadsAndSavesRawValues() {
+        withIsolatedDefaults { defaults in
+            XCTAssertEqual(VoiceInkRecorderStylePreference.rawValue(from: defaults), "none")
+
+            VoiceInkRecorderStylePreference.saveRawValue("notch", to: defaults)
+            XCTAssertEqual(VoiceInkRecorderStylePreference.rawValue(from: defaults), "notch")
+
+            VoiceInkRecorderStylePreference.saveRawValue("future-style", to: defaults)
+            XCTAssertEqual(VoiceInkRecorderStylePreference.rawValue(from: defaults), "future-style")
+        }
+    }
+
+    func testRecorderStyleWindowKindPreservesMacOSUnknownStyleFallback() {
+        XCTAssertEqual(VoiceInkRecorderStylePreference.windowKind(forRawValue: "none"), .none)
+        XCTAssertEqual(VoiceInkRecorderStylePreference.windowKind(forRawValue: "notch"), .notch)
+        XCTAssertEqual(VoiceInkRecorderStylePreference.windowKind(forRawValue: "mini"), .mini)
+        XCTAssertEqual(VoiceInkRecorderStylePreference.windowKind(forRawValue: "future-style"), .mini)
+        XCTAssertFalse(VoiceInkRecorderStylePreference.hasVisibleRecorder(rawValue: "none"))
+        XCTAssertTrue(VoiceInkRecorderStylePreference.hasVisibleRecorder(rawValue: "notch"))
+        XCTAssertTrue(VoiceInkRecorderStylePreference.hasVisibleRecorder(rawValue: "mini"))
+        XCTAssertTrue(VoiceInkRecorderStylePreference.hasVisibleRecorder(rawValue: "future-style"))
+    }
+
     func testRecorderSessionShortcutPolicyKeepsHiddenIdleRecorderInactive() {
         XCTAssertFalse(
             VoiceInkRecorderUISessionPolicy.isActiveForRecordingShortcut(
@@ -167,5 +200,19 @@ final class RecordingStatePolicyTests: XCTestCase {
             alert.message,
             "Could not start recording: \(VoiceInkRecordingAlertPresentation.iOSRecorderStartReturnedFalseDescription)"
         )
+    }
+
+    private func withIsolatedDefaults(_ run: (UserDefaults) -> Void) {
+        let suiteName = "VoiceInkCore.RecordingStatePolicyTests.\(UUID().uuidString)"
+        guard let defaults = UserDefaults(suiteName: suiteName) else {
+            XCTFail("Failed to create isolated defaults suite")
+            return
+        }
+
+        defer {
+            defaults.removePersistentDomain(forName: suiteName)
+        }
+
+        run(defaults)
     }
 }

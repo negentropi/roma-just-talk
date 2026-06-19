@@ -31,7 +31,7 @@ enum AppDefaults {
             VoiceInkRollingBufferPreloadSettings.bufferDurationSecondsKey: VoiceInkRollingBufferPreloadSettings.defaultBufferDurationSeconds,
             VoiceInkRollingBufferPreloadSettings.preRunFinalizationKey: VoiceInkRollingBufferPreloadSettings.defaultPreRunFinalization,
             VoiceInkRollingBufferVADSettings.modelKey: VoiceInkRollingBufferVADSettings.sileroModelName,
-            "RecorderType": "none",
+            VoiceInkRecorderStylePreference.userDefaultsKey: VoiceInkRecorderStylePreference.defaultRawValue,
 
             // UI & Behavior
             "IsMenuBarOnly": true,

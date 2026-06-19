@@ -52,7 +52,7 @@ class SystemInfoService {
 
         UI SETTINGS:
         Hide Dock Icon: \(UserDefaults.standard.bool(forKey: "IsMenuBarOnly"))
-        Recorder Style: \(UserDefaults.standard.string(forKey: "RecorderType") ?? "none")
+        Recorder Style: \(VoiceInkRecorderStylePreference.rawValue())
 
         RECORDING FEEDBACK:
         Sound Feedback: \(VoiceInkRecordingFeedbackPreference.isSoundFeedbackEnabled())

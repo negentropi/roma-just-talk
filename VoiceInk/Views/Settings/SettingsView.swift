@@ -232,9 +232,9 @@ struct SettingsView: View {
             // MARK: - Interface
             Section("Interface") {
                 Picker("Recorder Style", selection: $recorderUIManager.recorderType) {
-                    Text("None").tag("none")
-                    Text("Notch").tag("notch")
-                    Text("Mini").tag("mini")
+                    ForEach(VoiceInkRecorderStyle.allCases) { style in
+                        Text(style.displayName).tag(style.rawValue)
+                    }
                 }
                 .pickerStyle(.segmented)
 

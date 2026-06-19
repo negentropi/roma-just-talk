@@ -1546,6 +1546,21 @@ reject_pattern \
   'struct +OnboardingPermission[[:space:]:{]|enum +PermissionType|"(Microphone Access|Microphone Selection|Accessibility Access|Input Monitoring|Screen Context \(Optional\)|Keyboard Shortcut|Enable your microphone to start speaking and converting your voice to text instantly\.|Select the audio input device you want to use with roma-just-talk\.|Add roma-just-talk to Accessibility, then turn its switch on\.|Allow roma-just-talk to detect your recording shortcut while other apps are active\.|Enable screen context only if you want roma-just-talk to use visible text for transcript enhancement\.|Set up a keyboard shortcut to quickly access roma-just-talk from anywhere\.|Relaunch to Apply|Set Shortcut|Grant|Enable)"' \
   VoiceInk/Views/Onboarding/OnboardingPermissionsView.swift
 
+require_pattern \
+  "shared macOS permission settings presentation lives in VoiceInkCore" \
+  'VoiceInkMacOSPermissionSettingsPresentation|VoiceInkMacOSPermissionSettingsCardPresentation|headerIconSystemName|inputMonitoringCard|screenContextCard|relaunchRequiredMessage' \
+  VoiceInkCore/Sources/VoiceInkCore/PermissionPresentation.swift
+
+require_pattern \
+  "macOS permissions settings uses shared presentation" \
+  'VoiceInkMacOSPermissionSettingsPresentation\.(headerIconSystemName|inputMonitoringCard|microphoneCard|accessibilityCard|screenContextCard)|presentation\.buttonTitle\(requiresRelaunch:' \
+  VoiceInk/Views/PermissionsView.swift
+
+reject_pattern \
+  "macOS permissions settings avoids shell-only permission presentation copy" \
+  '"(App Permissions|Microphone and shortcut access are needed for recording\. Screen context is optional\.|Input Monitoring Access|Allow roma-just-talk to listen for your recording hotkey globally|Microphone Access|Allow roma-just-talk to record your voice for transcription|Accessibility Access|Add roma-just-talk to Accessibility, then turn its switch on|Screen Context \(Optional\)|Use visible screen text to improve transcript enhancement when you choose\.|Relaunch to Apply|Grant|Enable|If you already turned this on in System Settings, relaunch roma-just-talk to activate it\.)"|systemName: "arrow\.clockwise"|systemName: "checkmark\.seal\.fill"|systemName: "xmark\.seal\.fill"|systemName: "arrow\.right"' \
+  VoiceInk/Views/PermissionsView.swift
+
 reject_pattern \
   "iOS model download views avoid shell-only downloaded/progress state assembly" \
   'model\.isDownloaded\(in:|modelManager\.isDownloading\[[^]]+\] == true|modelManager\.downloadProgress\[[^]]+\]' \

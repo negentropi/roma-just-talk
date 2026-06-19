@@ -3,6 +3,7 @@ import AVFoundation
 import Cocoa
 import CoreGraphics
 import PermissionFlow
+import VoiceInkCore
 
 @MainActor
 class PermissionManager: ObservableObject {
@@ -169,16 +170,11 @@ class PermissionManager: ObservableObject {
 }
 
 struct PermissionCard: View {
-    let icon: String
-    let title: String
-    let description: String
+    let presentation: VoiceInkMacOSPermissionSettingsCardPresentation
     let isGranted: Bool
-    let buttonTitle: String
     let buttonAction: () -> Void
     let checkPermission: () -> Void
     var relaunchRequired: Bool = false
-    var infoTipMessage: String?
-    var infoTipLink: String?
     @State private var isRefreshing = false
 
     var body: some View {
@@ -190,7 +186,7 @@ struct PermissionCard: View {
                         .fill(isGranted ? Color.green.opacity(0.15) : Color.orange.opacity(0.15))
                         .frame(width: 44, height: 44)
 
-                    Image(systemName: isGranted ? "\(icon).fill" : icon)
+                    Image(systemName: isGranted ? presentation.grantedIconSystemName : presentation.iconSystemName)
                         .font(.system(size: 20, weight: .semibold))
                         .foregroundColor(isGranted ? .green : .orange)
                         .symbolRenderingMode(.hierarchical)
@@ -198,17 +194,17 @@ struct PermissionCard: View {
 
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {
-                        Text(title)
+                        Text(presentation.title)
                             .font(.headline)
-                        if let message = infoTipMessage {
-                            if let link = infoTipLink, !link.isEmpty {
+                        if let message = presentation.infoTipMessage {
+                            if let link = presentation.infoTipURLString, !link.isEmpty {
                                 InfoTip(message, learnMoreURL: link)
                             } else {
                                 InfoTip(message)
                             }
                         }
                     }
-                    Text(description)
+                    Text(presentation.description)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
@@ -228,7 +224,7 @@ struct PermissionCard: View {
                             isRefreshing = false
                         }
                     }) {
-                        Image(systemName: "arrow.clockwise")
+                        Image(systemName: VoiceInkMacOSPermissionSettingsPresentation.refreshButtonSystemImageName)
                             .font(.system(size: 14, weight: .medium))
                             .foregroundColor(.secondary)
                             .rotationEffect(.degrees(isRefreshing ? 360 : 0))
@@ -237,12 +233,12 @@ struct PermissionCard: View {
                     .contentShape(Rectangle())
                     
                     if isGranted {
-                        Image(systemName: "checkmark.seal.fill")
+                        Image(systemName: VoiceInkMacOSPermissionSettingsPresentation.grantedStatusSystemImageName)
                             .font(.system(size: 20))
                             .foregroundColor(.green)
                             .symbolRenderingMode(.hierarchical)
                     } else {
-                        Image(systemName: "xmark.seal.fill")
+                        Image(systemName: VoiceInkMacOSPermissionSettingsPresentation.deniedStatusSystemImageName)
                             .font(.system(size: 20))
                             .foregroundColor(.orange)
                             .symbolRenderingMode(.hierarchical)
@@ -252,16 +248,16 @@ struct PermissionCard: View {
             
             if !isGranted {
                 if relaunchRequired {
-                    Text("If you already turned this on in System Settings, relaunch roma-just-talk to activate it.")
+                    Text(VoiceInkMacOSPermissionSettingsPresentation.relaunchRequiredMessage)
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
 
                 Button(action: buttonAction) {
                     HStack {
-                        Text(buttonTitle)
+                        Text(presentation.buttonTitle(requiresRelaunch: relaunchRequired))
                         Spacer()
-                        Image(systemName: "arrow.right")
+                        Image(systemName: VoiceInkMacOSPermissionSettingsPresentation.actionSystemImageName)
                     }
                     .font(.headline)
                     .foregroundColor(.white)
@@ -288,20 +284,17 @@ struct PermissionsView: View {
             VStack(spacing: 32) {
                 // Header
                 CompactHeroSection(
-                    icon: "shield.lefthalf.filled",
-                    title: "App Permissions",
-                    description: "Microphone and shortcut access are needed for recording. Screen context is optional."
+                    icon: VoiceInkMacOSPermissionSettingsPresentation.headerIconSystemName,
+                    title: VoiceInkMacOSPermissionSettingsPresentation.headerTitle,
+                    description: VoiceInkMacOSPermissionSettingsPresentation.headerDescription
                 )
                 
                 // Permission Cards
                 VStack(spacing: 16) {
                     // Input Monitoring Permission
                     PermissionCard(
-                        icon: "keyboard.badge.eye",
-                        title: "Input Monitoring Access",
-                        description: "Allow roma-just-talk to listen for your recording hotkey globally",
+                        presentation: VoiceInkMacOSPermissionSettingsPresentation.inputMonitoringCard,
                         isGranted: permissionManager.isInputMonitoringEnabled,
-                        buttonTitle: permissionManager.inputMonitoringNeedsRelaunch ? "Relaunch to Apply" : "Grant",
                         buttonAction: {
                             if permissionManager.inputMonitoringNeedsRelaunch {
                                 AppRelauncher.relaunch()
@@ -310,17 +303,13 @@ struct PermissionsView: View {
                             }
                         },
                         checkPermission: { permissionManager.checkInputMonitoringPermission() },
-                        relaunchRequired: permissionManager.inputMonitoringNeedsRelaunch,
-                        infoTipMessage: "roma-just-talk uses Input Monitoring only to detect your configured recording shortcut while other apps are active."
+                        relaunchRequired: permissionManager.inputMonitoringNeedsRelaunch
                     )
                     
                     // Audio Permission
                     PermissionCard(
-                        icon: "mic",
-                        title: "Microphone Access",
-                        description: "Allow roma-just-talk to record your voice for transcription",
+                        presentation: VoiceInkMacOSPermissionSettingsPresentation.microphoneCard,
                         isGranted: permissionManager.audioPermissionStatus == .authorized,
-                        buttonTitle: "Grant",
                         buttonAction: {
                             permissionManager.requestAudioPermission()
                         },
@@ -329,25 +318,18 @@ struct PermissionsView: View {
                     
                     // Accessibility Permission
                     PermissionCard(
-                        icon: "hand.raised",
-                        title: "Accessibility Access",
-                        description: "Add roma-just-talk to Accessibility, then turn its switch on",
+                        presentation: VoiceInkMacOSPermissionSettingsPresentation.accessibilityCard,
                         isGranted: permissionManager.isAccessibilityEnabled,
-                        buttonTitle: "Grant",
                         buttonAction: {
                             permissionManager.requestAccessibilityPermission()
                         },
-                        checkPermission: { permissionManager.checkAccessibilityPermissions() },
-                        infoTipMessage: "macOS requires you to enable the roma-just-talk switch yourself. Dragging the app into the list only adds it when it is missing."
+                        checkPermission: { permissionManager.checkAccessibilityPermissions() }
                     )
                     
                     // Screen Recording Permission
                     PermissionCard(
-                        icon: "rectangle.on.rectangle",
-                        title: "Screen Context (Optional)",
-                        description: "Use visible screen text to improve transcript enhancement when you choose.",
+                        presentation: VoiceInkMacOSPermissionSettingsPresentation.screenContextCard,
                         isGranted: permissionManager.isScreenRecordingEnabled,
-                        buttonTitle: permissionManager.screenRecordingNeedsRelaunch ? "Relaunch to Apply" : "Enable",
                         buttonAction: {
                             if permissionManager.screenRecordingNeedsRelaunch {
                                 AppRelauncher.relaunch()
@@ -356,9 +338,7 @@ struct PermissionsView: View {
                             }
                         },
                         checkPermission: { permissionManager.checkScreenRecordingPermission() },
-                        relaunchRequired: permissionManager.screenRecordingNeedsRelaunch,
-                        infoTipMessage: "roma-just-talk captures on-screen text to understand the context of your voice input, which significantly improves transcription accuracy. Your privacy is important: this data is processed locally and is not stored.",
-                        infoTipLink: "https://tryvoiceink.com/docs/contextual-awareness"
+                        relaunchRequired: permissionManager.screenRecordingNeedsRelaunch
                     )
                 }
             }

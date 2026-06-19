@@ -43,7 +43,7 @@ final class AudioRecorder: NSObject, ObservableObject {
         guard audioRecorder?.record() == true else {
             // Provide a more descriptive error to help with debugging
             let userInfo = [NSLocalizedDescriptionKey: "Failed to start AVAudioRecorder. The record() method returned false. This often happens in the background if the audio session is not configured correctly or if there is a conflict with another app."]
-            throw NSError(domain: "com.prakashjoshipax.VoiceInk.AudioRecorder", code: 1001, userInfo: userInfo)
+            throw NSError(domain: VoiceInkAppIdentity.errorDomain(component: "AudioRecorder"), code: 1001, userInfo: userInfo)
         }
 
         currentRecordingURL = url

@@ -222,7 +222,7 @@ struct VoiceInkApp: App {
             #if LOCAL_BUILD
             let dictionaryCloudKit: ModelConfiguration.CloudKitDatabase = .none
             #else
-            let dictionaryCloudKit: ModelConfiguration.CloudKitDatabase = .private("iCloud.com.prakashjoshipax.VoiceInk")
+            let dictionaryCloudKit: ModelConfiguration.CloudKitDatabase = .private(VoiceInkAppIdentity.iCloudContainerIdentifier)
             #endif
             let dictionaryConfig = ModelConfiguration(
                 "dictionary",

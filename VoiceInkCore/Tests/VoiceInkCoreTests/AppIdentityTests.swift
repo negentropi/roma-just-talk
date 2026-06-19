@@ -8,6 +8,7 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertEqual(VoiceInkAppIdentity.displayName, "roma just talk")
         XCTAssertEqual(VoiceInkAppIdentity.compactDisplayName, "roma-just-talk")
         XCTAssertEqual(VoiceInkAppIdentity.sidebarSubtitle, "speak before hotkey")
+        XCTAssertEqual(VoiceInkAppIdentity.iCloudContainerIdentifier, "iCloud.com.prakashjoshipax.VoiceInk")
         XCTAssertEqual(VoiceInkAppIdentity.welcomeTitle, "Welcome to roma just talk")
         XCTAssertEqual(VoiceInkAppIdentity.startUsingTitle, "Start Using roma just talk")
         XCTAssertEqual(VoiceInkAppIdentity.onboardingWindowTitle, "roma-just-talk Onboarding")
@@ -23,6 +24,13 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertEqual(
             VoiceInkAppIdentity.macOSApplicationSupportDirectory(in: baseDirectory).path,
             "/tmp/Application Support/com.prakashjoshipax.VoiceInk"
+        )
+    }
+
+    func testBundleScopedErrorDomainUsesBundleIdentifier() {
+        XCTAssertEqual(
+            VoiceInkAppIdentity.errorDomain(component: "AudioRecorder"),
+            "com.prakashjoshipax.VoiceInk.AudioRecorder"
         )
     }
 }

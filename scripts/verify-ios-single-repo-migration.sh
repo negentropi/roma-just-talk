@@ -3335,13 +3335,23 @@ require_plist_value \
 
 require_pattern \
   "shared app identity presentation lives in VoiceInkCore" \
-  'VoiceInkAppIdentity|bundleIdentifier = "com\.prakashjoshipax\.VoiceInk"|loggingSubsystem = "com\.prakashjoshipax\.voiceink"|displayName = "roma just talk"|compactDisplayName = "roma-just-talk"|macOSApplicationSupportDirectory' \
+  'VoiceInkAppIdentity|bundleIdentifier = "com\.prakashjoshipax\.VoiceInk"|loggingSubsystem = "com\.prakashjoshipax\.voiceink"|displayName = "roma just talk"|compactDisplayName = "roma-just-talk"|iCloudContainerIdentifier|macOSApplicationSupportDirectory|errorDomain' \
   VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift
 
 require_pattern \
   "shared Keychain service uses shared app identity" \
   'service = VoiceInkAppIdentity\.bundleIdentifier' \
   VoiceInkCore/Sources/VoiceInkCore/KeychainQuery.swift
+
+require_pattern \
+  "macOS dictionary CloudKit uses shared app identity container" \
+  'VoiceInkAppIdentity\.iCloudContainerIdentifier' \
+  VoiceInk/VoiceInk.swift
+
+require_pattern \
+  "iOS audio recorder errors use shared app identity domain" \
+  'VoiceInkAppIdentity\.errorDomain\(component: "AudioRecorder"\)' \
+  iOS/VoiceInk-ios/AudioRecorder.swift
 
 require_pattern \
   "macOS app startup storage path uses shared app identity directory" \
@@ -3450,14 +3460,15 @@ reject_pattern \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 reject_pattern \
-  "macOS storage and Keychain paths avoid duplicate bundle identifier literals" \
-  '"com\.prakashjoshipax\.VoiceInk"|appendingPathComponent\("com\.prakashjoshipax\.VoiceInk' \
+  "storage, Keychain, and platform shell paths avoid duplicate bundle identifier literals" \
+  '"com\.prakashjoshipax\.VoiceInk"|appendingPathComponent\("com\.prakashjoshipax\.VoiceInk|iCloud\.com\.prakashjoshipax\.VoiceInk' \
   VoiceInkCore/Sources/VoiceInkCore/KeychainQuery.swift \
   VoiceInk/VoiceInk.swift \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift \
   VoiceInk/Services/AudioFileTranscriptionService.swift \
   VoiceInk/Services/AudioFileTranscriptionManager.swift \
-  VoiceInk/Services/TranscriptionAutoCleanupService.swift
+  VoiceInk/Services/TranscriptionAutoCleanupService.swift \
+  iOS/VoiceInk-ios/AudioRecorder.swift
 
 require_context_pattern_count_at_least \
   "iOS keyboard display name stays roma just talk" \

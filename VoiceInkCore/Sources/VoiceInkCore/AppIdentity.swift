@@ -7,6 +7,10 @@ public enum VoiceInkAppIdentity {
     public static let compactDisplayName = "roma-just-talk"
     public static let sidebarSubtitle = "speak before hotkey"
 
+    public static var iCloudContainerIdentifier: String {
+        "iCloud.\(bundleIdentifier)"
+    }
+
     public static var welcomeTitle: String {
         "Welcome to \(displayName)"
     }
@@ -25,5 +29,9 @@ public enum VoiceInkAppIdentity {
 
     public static func macOSApplicationSupportDirectory(in applicationSupportDirectory: URL) -> URL {
         applicationSupportDirectory.appendingPathComponent(bundleIdentifier, isDirectory: true)
+    }
+
+    public static func errorDomain(component: String) -> String {
+        "\(bundleIdentifier).\(component)"
     }
 }

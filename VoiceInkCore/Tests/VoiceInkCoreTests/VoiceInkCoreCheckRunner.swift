@@ -392,6 +392,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testWebsiteConfigForFormInputReturnsNilForRawEmptyInput", run: { PowerModePolicyTests().testWebsiteConfigForFormInputReturnsNilForRawEmptyInput() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testWebsiteConfigForFormInputNormalizesNonEmptyInput", run: { try PowerModePolicyTests().testWebsiteConfigForFormInputNormalizesNonEmptyInput() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testWebsiteConfigForFormInputPreservesWhitespaceOnlyMacOSBehavior", run: { try PowerModePolicyTests().testWebsiteConfigForFormInputPreservesWhitespaceOnlyMacOSBehavior() }),
+            VoiceInkCoreCheck(name: "PowerModePolicyTests.testConfigurationNameSaveabilityPreservesRawEmptyMacOSRule", run: { PowerModePolicyTests().testConfigurationNameSaveabilityPreservesRawEmptyMacOSRule() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testMatchingWebsiteRuleUsesEnabledOrderAndSubstringPolicy", run: { PowerModePolicyTests().testMatchingWebsiteRuleUsesEnabledOrderAndSubstringPolicy() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testMatchingWebsiteRulePreservesEmptyRuleURLRejection", run: { PowerModePolicyTests().testMatchingWebsiteRulePreservesEmptyRuleURLRejection() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testMatchingAppRuleUsesExactEnabledBundleIdentifier", run: { PowerModePolicyTests().testMatchingAppRuleUsesExactEnabledBundleIdentifier() }),

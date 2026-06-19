@@ -51,7 +51,9 @@ struct ConfigurationView: View {
         }
     }
 
-    private var canSave: Bool { !configName.isEmpty }
+    private var canSave: Bool {
+        VoiceInkPowerModePolicy.canSaveConfigurationName(configName)
+    }
 
     private func languageSelectionDisabled() -> Bool {
         guard let selectedModelName = effectiveModelName,

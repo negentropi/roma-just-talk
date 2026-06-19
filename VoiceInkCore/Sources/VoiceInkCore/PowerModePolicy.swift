@@ -676,6 +676,10 @@ public enum VoiceInkPowerModePolicy {
         return VoiceInkPowerModeURLConfig(url: normalizedWebsiteURL(input))
     }
 
+    public static func canSaveConfigurationName(_ name: String) -> Bool {
+        !name.isEmpty
+    }
+
     public static func hasEnabledAutomaticRules(in rules: [VoiceInkPowerModeRule]) -> Bool {
         rules.contains { rule in
             rule.isEnabled && (

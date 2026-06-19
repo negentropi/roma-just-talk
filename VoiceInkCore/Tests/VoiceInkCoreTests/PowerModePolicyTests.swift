@@ -295,6 +295,12 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertEqual(config.url, "")
     }
 
+    func testConfigurationNameSaveabilityPreservesRawEmptyMacOSRule() {
+        XCTAssertFalse(VoiceInkPowerModePolicy.canSaveConfigurationName(""))
+        XCTAssertTrue(VoiceInkPowerModePolicy.canSaveConfigurationName("   "))
+        XCTAssertTrue(VoiceInkPowerModePolicy.canSaveConfigurationName("Writing"))
+    }
+
     func testMatchingWebsiteRuleUsesEnabledOrderAndSubstringPolicy() {
         let disabled = rule(
             name: "Disabled",

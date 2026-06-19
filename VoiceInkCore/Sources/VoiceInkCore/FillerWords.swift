@@ -47,12 +47,29 @@ public enum VoiceInkFillerWords {
     }
 
     public static func adding(_ word: String, to words: [String]) -> [String]? {
-        let plan = insertPlan(word, existingWords: words)
-        guard plan.shouldInsert, let wordToInsert = plan.wordToInsert else {
+        var updatedWords = words
+        let errorMessage = add(word, to: &updatedWords)
+        guard errorMessage == nil, updatedWords != words else {
             return nil
         }
 
-        return words + [wordToInsert]
+        return updatedWords
+    }
+
+    @discardableResult
+    public static func add(_ word: String, to words: inout [String]) -> String? {
+        let plan = insertPlan(word, existingWords: words)
+
+        if let errorMessage = plan.errorMessage {
+            return errorMessage
+        }
+
+        guard let wordToInsert = plan.wordToInsert else {
+            return nil
+        }
+
+        words.append(wordToInsert)
+        return nil
     }
 
     public static func removing(_ word: String, from words: [String]) -> [String] {

@@ -1579,12 +1579,18 @@ require_pattern \
 
 require_pattern \
   "macOS filler-word insertion uses shared insert policy" \
-  'VoiceInkFillerWords\.insertPlan\(' \
+  'VoiceInkFillerWords\.add\(' \
   VoiceInk/Transcription/Processing/FillerWordManager.swift
 
 require_pattern \
   "iOS filler-word insertion uses shared insert policy" \
-  'VoiceInkFillerWords\.insertPlan\(' \
+  'VoiceInkFillerWords\.add\(' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+reject_pattern \
+  "platform filler-word insertion avoids shell-only insert-plan unpacking" \
+  'VoiceInkFillerWords\.insertPlan\(|wordToInsert|duplicateWordMessage' \
+  VoiceInk/Transcription/Processing/FillerWordManager.swift \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \

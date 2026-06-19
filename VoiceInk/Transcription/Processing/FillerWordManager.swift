@@ -20,18 +20,7 @@ class FillerWordManager: ObservableObject {
 
     @discardableResult
     func addWord(_ word: String) -> String? {
-        let plan = VoiceInkFillerWords.insertPlan(word, existingWords: fillerWords)
-
-        if let errorMessage = plan.errorMessage {
-            return errorMessage
-        }
-
-        guard let wordToInsert = plan.wordToInsert else {
-            return nil
-        }
-
-        fillerWords = fillerWords + [wordToInsert]
-        return nil
+        VoiceInkFillerWords.add(word, to: &fillerWords)
     }
 
     func removeWord(_ word: String) {

@@ -45,6 +45,19 @@ final class FillerWordsTests: XCTestCase {
         XCTAssertNil(VoiceInkFillerWords.adding("UM", to: ["um"]))
     }
 
+    func testAddMutatesWordsAndReturnsDuplicateMessage() {
+        var words = ["um"]
+
+        XCTAssertNil(VoiceInkFillerWords.add("  LIKE  ", to: &words))
+        XCTAssertEqual(words, ["um", "like"])
+
+        XCTAssertEqual(
+            VoiceInkFillerWords.add("LIKE", to: &words),
+            "This filler word is already in the list."
+        )
+        XCTAssertEqual(words, ["um", "like"])
+    }
+
     func testDraftAvailabilityUsesSharedNormalization() {
         XCTAssertFalse(VoiceInkFillerWords.hasDraft(" \n\t "))
         XCTAssertTrue(VoiceInkFillerWords.hasDraft(" LIKE "))

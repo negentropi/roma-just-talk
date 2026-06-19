@@ -194,18 +194,7 @@ final class AppSettings: ObservableObject {
 
     @discardableResult
     func addFillerWord(_ word: String) -> String? {
-        let plan = VoiceInkFillerWords.insertPlan(word, existingWords: fillerWords)
-
-        if let errorMessage = plan.errorMessage {
-            return errorMessage
-        }
-
-        guard let wordToInsert = plan.wordToInsert else {
-            return nil
-        }
-
-        fillerWords = fillerWords + [wordToInsert]
-        return nil
+        VoiceInkFillerWords.add(word, to: &fillerWords)
     }
 
     func removeFillerWords(at offsets: IndexSet) {

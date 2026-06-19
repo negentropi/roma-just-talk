@@ -193,6 +193,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "FillerWordsTests.testInsertPlanRejectsBlankDraftsWithoutAlert", run: { FillerWordsTests().testInsertPlanRejectsBlankDraftsWithoutAlert() }),
             VoiceInkCoreCheck(name: "FillerWordsTests.testInsertPlanRejectsCaseInsensitiveDuplicatesWithSharedMessage", run: { FillerWordsTests().testInsertPlanRejectsCaseInsensitiveDuplicatesWithSharedMessage() }),
             VoiceInkCoreCheck(name: "FillerWordsTests.testAddingRejectsBlankAndCaseInsensitiveDuplicateWords", run: { FillerWordsTests().testAddingRejectsBlankAndCaseInsensitiveDuplicateWords() }),
+            VoiceInkCoreCheck(name: "FillerWordsTests.testAddMutatesWordsAndReturnsDuplicateMessage", run: { FillerWordsTests().testAddMutatesWordsAndReturnsDuplicateMessage() }),
             VoiceInkCoreCheck(name: "FillerWordsTests.testDraftAvailabilityUsesSharedNormalization", run: { FillerWordsTests().testDraftAvailabilityUsesSharedNormalization() }),
             VoiceInkCoreCheck(name: "FillerWordsTests.testRemovingDropsWordsCaseInsensitively", run: { FillerWordsTests().testRemovingDropsWordsCaseInsensitively() }),
             VoiceInkCoreCheck(name: "FillerWordsTests.testRemovingAtOffsetsMatchesIOSListDeletion", run: { FillerWordsTests().testRemovingAtOffsetsMatchesIOSListDeletion() }),

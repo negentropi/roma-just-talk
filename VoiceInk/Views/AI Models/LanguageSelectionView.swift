@@ -29,35 +29,13 @@ struct LanguageSelectionView: View {
         NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
     }
 
-    // Function to check if current model is multilingual
-    private func isMultilingualModel() -> Bool {
-        guard let currentModel = transcriptionModelManager.currentTranscriptionModel else {
-            return false
-        }
-        return currentModel.isMultilingualModel
-    }
-
-    private func languageSelectionDisabled() -> Bool {
-        guard let provider = transcriptionModelManager.currentTranscriptionModel?.provider else {
-            return false
-        }
-        return provider == .gemini
-    }
-
-    private func isNativeAppleModelSelected() -> Bool {
-        transcriptionModelManager.currentTranscriptionModel?.provider == .nativeApple
-    }
-
-    private func availableLanguagesForCurrentModel() -> [String: String] {
-        guard let currentModel = transcriptionModelManager.currentTranscriptionModel else {
-            return ["en": "English"] // Default to English if no model found
-        }
-        return currentModel.transcriptionLanguageOptions
+    private var languageSelectionFacts: VoiceInkTranscriptionLanguageSelectionFacts? {
+        transcriptionModelManager.currentTranscriptionModel?.transcriptionLanguageSelectionFacts
     }
 
     private func useCompatibleLanguageForCurrentModel() {
-        guard let currentModel = transcriptionModelManager.currentTranscriptionModel else { return }
-        updateLanguage(currentModel.validTranscriptionLanguageOrFallback(selectedLanguage))
+        guard let facts = languageSelectionFacts else { return }
+        updateLanguage(facts.compatibleLanguage(selectedLanguage))
     }
 
     private var selectedLanguageBinding: Binding<String> {
@@ -73,6 +51,19 @@ struct LanguageSelectionView: View {
             isVisible: true
         )
         .layoutPriority(1)
+    }
+
+    private var englishOnlyMenuButton: some View {
+        Button {
+            // Do nothing, just showing info
+        } label: {
+            Text(VoiceInkTranscriptionLanguagePresentation.englishOnlyMenuLabel)
+                .foregroundColor(.secondary)
+        }
+        .disabled(true)
+        .onAppear {
+            updateLanguage("en")
+        }
     }
 
     var body: some View {
@@ -107,9 +98,9 @@ struct LanguageSelectionView: View {
             Text(VoiceInkTranscriptionLanguagePresentation.sectionTitle)
                 .font(.headline)
 
-            if transcriptionModelManager.currentTranscriptionModel != nil
-            {
-                if languageSelectionDisabled() {
+            if let facts = languageSelectionFacts {
+                switch facts.control {
+                case .disabledAutodetect:
                     VStack(alignment: .leading, spacing: 8) {
                         Text(VoiceInkTranscriptionLanguagePresentation.autoDetectedLabel)
                             .font(.subheadline)
@@ -120,20 +111,20 @@ struct LanguageSelectionView: View {
                             .foregroundColor(.secondary)
                     }
                     .disabled(true)
-                } else if isMultilingualModel() {
+                case .picker:
                     VStack(alignment: .leading, spacing: 8) {
                         HStack(spacing: 8) {
                             Picker(VoiceInkTranscriptionLanguagePresentation.menuPickerTitle, selection: selectedLanguageBinding) {
                                 ForEach(
-                                    VoiceInkLanguageCatalog.sortedOptions(availableLanguagesForCurrentModel())
+                                    VoiceInkLanguageCatalog.sortedOptions(facts.languageOptions)
                                 ) { option in
                                     Text(option.name).tag(option.code)
                                 }
                             }
                             .pickerStyle(MenuPickerStyle())
-                            .frame(maxWidth: isNativeAppleModelSelected() ? 280 : .infinity, alignment: .leading)
+                            .frame(maxWidth: facts.showsNativeAppleAssetControl ? 280 : .infinity, alignment: .leading)
 
-                            if isNativeAppleModelSelected() {
+                            if facts.showsNativeAppleAssetControl {
                                 nativeAppleAssetControl
                             }
                         }
@@ -144,7 +135,7 @@ struct LanguageSelectionView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                     }
-                } else {
+                case .hiddenDefault:
                     // For English-only models, force set language to English
                     VStack(alignment: .leading, spacing: 8) {
                         Text(VoiceInkTranscriptionLanguagePresentation.englishOnlyLabel)
@@ -177,61 +168,55 @@ struct LanguageSelectionView: View {
     // New compact view for menu bar
     private var menuItemView: some View {
         Group {
-            if languageSelectionDisabled() {
-                Button {
-                    // Do nothing, just showing info
-                } label: {
-                    Text(VoiceInkTranscriptionLanguagePresentation.autoDetectedLabel)
-                        .foregroundColor(.secondary)
-                }
-                .disabled(true)
-            } else if isMultilingualModel() {
-                HStack(spacing: 8) {
-                    Menu {
-                        ForEach(
-                            VoiceInkLanguageCatalog.sortedOptions(availableLanguagesForCurrentModel())
-                        ) { option in
-                            Button {
-                                updateLanguage(option.code)
-                            } label: {
-                                HStack {
-                                    Text(option.name)
-                                    if selectedLanguage == option.code {
-                                        Image(systemName: "checkmark")
+            if let facts = languageSelectionFacts {
+                switch facts.control {
+                case .disabledAutodetect:
+                    Button {
+                        // Do nothing, just showing info
+                    } label: {
+                        Text(VoiceInkTranscriptionLanguagePresentation.autoDetectedLabel)
+                            .foregroundColor(.secondary)
+                    }
+                    .disabled(true)
+                case .picker:
+                    HStack(spacing: 8) {
+                        Menu {
+                            ForEach(
+                                VoiceInkLanguageCatalog.sortedOptions(facts.languageOptions)
+                            ) { option in
+                                Button {
+                                    updateLanguage(option.code)
+                                } label: {
+                                    HStack {
+                                        Text(option.name)
+                                        if selectedLanguage == option.code {
+                                            Image(systemName: "checkmark")
+                                        }
                                     }
                                 }
                             }
-                        }
-                    } label: {
-                        HStack {
-                            Text(
-                                VoiceInkTranscriptionLanguagePresentation.menuLabel(
-                                    selectedLanguage: selectedLanguage,
-                                    languages: availableLanguagesForCurrentModel()
+                        } label: {
+                            HStack {
+                                Text(
+                                    VoiceInkTranscriptionLanguagePresentation.menuLabel(
+                                        selectedLanguage: selectedLanguage,
+                                        languages: facts.languageOptions
+                                    )
                                 )
-                            )
-                            Image(systemName: "chevron.up.chevron.down")
-                                .font(.system(size: 10))
+                                Image(systemName: "chevron.up.chevron.down")
+                                    .font(.system(size: 10))
+                            }
+                        }
+
+                        if facts.showsNativeAppleAssetControl {
+                            nativeAppleAssetControl
                         }
                     }
-
-                    if isNativeAppleModelSelected() {
-                        nativeAppleAssetControl
-                    }
+                case .hiddenDefault:
+                    englishOnlyMenuButton
                 }
             } else {
-                // For English-only models
-                Button {
-                    // Do nothing, just showing info
-                } label: {
-                    Text(VoiceInkTranscriptionLanguagePresentation.englishOnlyMenuLabel)
-                        .foregroundColor(.secondary)
-                }
-                .disabled(true)
-                .onAppear {
-                    // Ensure English is set for English-only models
-                    updateLanguage("en")
-                }
+                englishOnlyMenuButton
             }
         }
     }

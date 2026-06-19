@@ -427,10 +427,10 @@ public struct VoiceInkPowerModeTranscriptionModelFacts: Equatable, Sendable {
     ) {
         self.init(
             name: name,
-            disablesLanguageSelection: languageSource.disablesPowerModeLanguageSelection,
+            disablesLanguageSelection: languageSource.disablesTranscriptionLanguageSelection,
             isMultilingual: isMultilingual,
             languageOptions: languageOptions,
-            prefersNativeAppleEnglish: languageSource.prefersNativeAppleEnglishInPowerMode
+            prefersNativeAppleEnglish: languageSource.prefersNativeAppleEnglishFallback
         )
     }
 
@@ -512,27 +512,13 @@ public struct VoiceInkPowerModeTranscriptionModelResourceFacts: Equatable, Senda
     public init(name: String, languageSource: VoiceInkTranscriptionLanguageSource) {
         self.init(
             name: name,
-            loadsLocalWhisperModel: languageSource.loadsLocalWhisperModelInPowerMode
+            loadsLocalWhisperModel: languageSource.loadsLocalWhisperModelResource
         )
     }
 
     public init(name: String, loadsLocalWhisperModel: Bool) {
         self.name = name
         self.loadsLocalWhisperModel = loadsLocalWhisperModel
-    }
-}
-
-private extension VoiceInkTranscriptionLanguageSource {
-    var disablesPowerModeLanguageSelection: Bool {
-        self == .provider(.gemini)
-    }
-
-    var prefersNativeAppleEnglishInPowerMode: Bool {
-        self == .nativeApple
-    }
-
-    var loadsLocalWhisperModelInPowerMode: Bool {
-        self == .whisper
     }
 }
 

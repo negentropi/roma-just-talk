@@ -143,12 +143,16 @@ extension TranscriptionModel {
         return supportedLanguages
     }
 
-    func validTranscriptionLanguageOrFallback(_ language: String?) -> String {
-        VoiceInkTranscriptionLanguageSupport.validLanguageOrFallback(
-            language,
-            languages: transcriptionLanguageOptions,
-            prefersNativeAppleEnglish: provider == .nativeApple
+    var transcriptionLanguageSelectionFacts: VoiceInkTranscriptionLanguageSelectionFacts {
+        VoiceInkTranscriptionLanguageSelectionFacts(
+            source: provider.transcriptionLanguageSource,
+            isMultilingual: isMultilingualModel,
+            languageOptions: transcriptionLanguageOptions
         )
+    }
+
+    func validTranscriptionLanguageOrFallback(_ language: String?) -> String {
+        transcriptionLanguageSelectionFacts.compatibleLanguage(language)
     }
 
     var powerModeTranscriptionModelFacts: VoiceInkPowerModeTranscriptionModelFacts {

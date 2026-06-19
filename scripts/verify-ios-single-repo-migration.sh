@@ -336,6 +336,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/LanguageCatalog.swift
 
 require_pattern \
+  "shared transcription language selection facts live in VoiceInkCore" \
+  'VoiceInkTranscriptionLanguageSelectionFacts|VoiceInkTranscriptionLanguageSelectionControl|compatibleLanguage' \
+  VoiceInkCore/Sources/VoiceInkCore/LanguageCatalog.swift
+
+require_pattern \
   "macOS language picker uses shared language display fallback" \
   'VoiceInkTranscriptionLanguagePresentation\.menuLabel' \
   "VoiceInk/Views/AI Models/LanguageSelectionView.swift"
@@ -344,6 +349,16 @@ require_pattern \
   "macOS language picker uses shared language presentation" \
   'VoiceInkTranscriptionLanguagePresentation' \
   "VoiceInk/Views/AI Models/LanguageSelectionView.swift"
+
+require_pattern \
+  "macOS language picker uses shared selection facts" \
+  'languageSelectionFacts|facts\.control|showsNativeAppleAssetControl' \
+  "VoiceInk/Views/AI Models/LanguageSelectionView.swift"
+
+require_pattern \
+  "macOS TranscriptionModel adapts shared language selection facts" \
+  'transcriptionLanguageSelectionFacts|VoiceInkTranscriptionLanguageSelectionFacts' \
+  VoiceInk/Models/TranscriptionModel.swift
 
 require_pattern \
   "iOS language settings uses shared language presentation" \
@@ -358,6 +373,11 @@ reject_pattern \
 reject_pattern \
   "macOS language picker avoids shell-only language presentation copy" \
   '"Transcription Language"|"Select Language"|"Language: Autodetected"|"The transcription language is automatically detected by the model\."|"This model supports multiple languages\. Select a specific language or auto-detect\(if available\)"|"Language: English"|"This is an English-optimized model and only supports English transcription\."|"No model selected"|"Language: English \(only\)"' \
+  "VoiceInk/Views/AI Models/LanguageSelectionView.swift"
+
+reject_pattern \
+  "macOS language picker avoids duplicate provider selection policy" \
+  'languageSelectionDisabled|isMultilingualModel\(|isNativeAppleModelSelected|availableLanguagesForCurrentModel|provider == \.(gemini|nativeApple)' \
   "VoiceInk/Views/AI Models/LanguageSelectionView.swift"
 
 reject_pattern \
@@ -1703,8 +1723,8 @@ require_pattern \
 
 require_pattern \
   "shared Power Mode transcription facts classify provider source policy" \
-  'disablesPowerModeLanguageSelection|prefersNativeAppleEnglishInPowerMode|loadsLocalWhisperModelInPowerMode' \
-  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+  'disablesTranscriptionLanguageSelection|prefersNativeAppleEnglishFallback|loadsLocalWhisperModelResource' \
+  VoiceInkCore/Sources/VoiceInkCore/LanguageCatalog.swift
 
 require_pattern \
   "shared Power Mode transcription model resource plan lives in VoiceInkCore" \

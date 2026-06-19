@@ -39,6 +39,66 @@ public enum VoiceInkTranscriptionLanguageSource: Equatable, Sendable {
     case all
 }
 
+public enum VoiceInkTranscriptionLanguageSelectionControl: Equatable, Sendable {
+    case disabledAutodetect
+    case picker
+    case hiddenDefault
+}
+
+public struct VoiceInkTranscriptionLanguageSelectionFacts: Equatable, Sendable {
+    public var source: VoiceInkTranscriptionLanguageSource
+    public var isMultilingual: Bool
+    public var languageOptions: [String: String]
+
+    public var control: VoiceInkTranscriptionLanguageSelectionControl {
+        if source.disablesTranscriptionLanguageSelection {
+            return .disabledAutodetect
+        }
+
+        return isMultilingual ? .picker : .hiddenDefault
+    }
+
+    public var showsNativeAppleAssetControl: Bool {
+        source.showsNativeAppleAssetControl
+    }
+
+    public init(
+        source: VoiceInkTranscriptionLanguageSource,
+        isMultilingual: Bool,
+        languageOptions: [String: String]
+    ) {
+        self.source = source
+        self.isMultilingual = isMultilingual
+        self.languageOptions = languageOptions
+    }
+
+    public func compatibleLanguage(_ language: String?) -> String {
+        VoiceInkTranscriptionLanguageSupport.validLanguageOrFallback(
+            language,
+            languages: languageOptions,
+            prefersNativeAppleEnglish: source.prefersNativeAppleEnglishFallback
+        )
+    }
+}
+
+extension VoiceInkTranscriptionLanguageSource {
+    var disablesTranscriptionLanguageSelection: Bool {
+        self == .provider(.gemini)
+    }
+
+    var prefersNativeAppleEnglishFallback: Bool {
+        self == .nativeApple
+    }
+
+    var loadsLocalWhisperModelResource: Bool {
+        self == .whisper
+    }
+
+    var showsNativeAppleAssetControl: Bool {
+        self == .nativeApple
+    }
+}
+
 public enum VoiceInkLanguageCatalog {
     public static let autoDetectCode = "auto"
     public static let autoDetectName = "Auto-detect"

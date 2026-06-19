@@ -209,6 +209,54 @@ final class LanguageCatalogTests: XCTestCase {
         )
     }
 
+    func testTranscriptionLanguageSelectionFactsDeriveControlFromSource() {
+        let geminiFacts = VoiceInkTranscriptionLanguageSelectionFacts(
+            source: .provider(.gemini),
+            isMultilingual: true,
+            languageOptions: VoiceInkLanguageCatalog.all
+        )
+        let whisperFacts = VoiceInkTranscriptionLanguageSelectionFacts(
+            source: .whisper,
+            isMultilingual: true,
+            languageOptions: VoiceInkLanguageCatalog.whisperLanguages()
+        )
+        let nativeAppleFacts = VoiceInkTranscriptionLanguageSelectionFacts(
+            source: .nativeApple,
+            isMultilingual: true,
+            languageOptions: VoiceInkLanguageCatalog.nativeApple
+        )
+        let englishOnlyFacts = VoiceInkTranscriptionLanguageSelectionFacts(
+            source: .provider(.groq),
+            isMultilingual: false,
+            languageOptions: VoiceInkLanguageCatalog.englishOnly
+        )
+
+        XCTAssertEqual(geminiFacts.control, .disabledAutodetect)
+        XCTAssertFalse(geminiFacts.showsNativeAppleAssetControl)
+        XCTAssertEqual(whisperFacts.control, .picker)
+        XCTAssertFalse(whisperFacts.showsNativeAppleAssetControl)
+        XCTAssertEqual(nativeAppleFacts.control, .picker)
+        XCTAssertTrue(nativeAppleFacts.showsNativeAppleAssetControl)
+        XCTAssertEqual(englishOnlyFacts.control, .hiddenDefault)
+    }
+
+    func testTranscriptionLanguageSelectionFactsUseSharedCompatibleFallback() {
+        let nativeAppleFacts = VoiceInkTranscriptionLanguageSelectionFacts(
+            source: .nativeApple,
+            isMultilingual: true,
+            languageOptions: VoiceInkLanguageCatalog.nativeApple
+        )
+        let whisperFacts = VoiceInkTranscriptionLanguageSelectionFacts(
+            source: .whisper,
+            isMultilingual: true,
+            languageOptions: VoiceInkLanguageCatalog.whisperLanguages()
+        )
+
+        XCTAssertEqual(nativeAppleFacts.compatibleLanguage("bad"), "en-US")
+        XCTAssertEqual(whisperFacts.compatibleLanguage("bad"), VoiceInkLanguageCatalog.autoDetectCode)
+        XCTAssertEqual(whisperFacts.compatibleLanguage("fr"), "fr")
+    }
+
     func testSortedLanguageOptionsPutAutoDetectFirstThenSortByDisplayName() {
         XCTAssertEqual(
             VoiceInkLanguageCatalog.sortedOptions([

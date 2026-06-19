@@ -101,10 +101,15 @@ struct EmojiPickerView: View {
         }
         .padding()
         .frame(minWidth: 260, idealWidth: 300, maxWidth: 320, minHeight: 150, idealHeight: 280, maxHeight: 350)
-        .alert("Emoji in Use", isPresented: $showingEmojiInUseAlert, presenting: emojiForAlert) { emojiStr in
-            Button("OK", role: .cancel) { }
+        .alert(
+            VoiceInkPowerModeEmojiInputPresentation.inUseAlertTitle,
+            isPresented: $showingEmojiInUseAlert,
+            presenting: emojiForAlert
+        ) { emojiStr in
+            let presentation = VoiceInkPowerModeEmojiInputPresentation.inUseAlert(emoji: emojiStr)
+            Button(presentation.buttonTitle, role: .cancel) { }
         } message: { emojiStr in
-            Text("The emoji \"\(emojiStr)\" is currently used by one or more Power Modes and cannot be removed.")
+            Text(VoiceInkPowerModeEmojiInputPresentation.inUseAlert(emoji: emojiStr).message)
         }
     }
 

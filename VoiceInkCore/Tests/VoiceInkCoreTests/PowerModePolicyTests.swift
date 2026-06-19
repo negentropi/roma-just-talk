@@ -52,6 +52,22 @@ final class PowerModePolicyTests: XCTestCase {
             VoiceInkPowerModeEmojiInputPresentation.duplicateMessage,
             "Emoji already exists!"
         )
+        XCTAssertEqual(
+            VoiceInkPowerModeEmojiInputPresentation.inUseAlertTitle,
+            "Emoji in Use"
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeEmojiInputPresentation.inUseAlertButtonTitle,
+            "OK"
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeEmojiInputPresentation.inUseAlert(emoji: "🧪"),
+            VoiceInkPowerModeEmojiRemovalAlertPresentation(
+                title: "Emoji in Use",
+                message: "The emoji \"🧪\" is currently used by one or more Power Modes and cannot be removed.",
+                buttonTitle: "OK"
+            )
+        )
         XCTAssertTrue(VoiceInkPowerModeEmojiInputPresentation.isErrorMessage(VoiceInkPowerModeEmojiInputPresentation.emptySubmitMessage))
         XCTAssertTrue(VoiceInkPowerModeEmojiInputPresentation.isErrorMessage(VoiceInkPowerModeEmojiInputPresentation.duplicateMessage))
         XCTAssertFalse(VoiceInkPowerModeEmojiInputPresentation.isErrorMessage(""))

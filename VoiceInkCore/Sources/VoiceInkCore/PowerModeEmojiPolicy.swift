@@ -7,6 +7,18 @@ public enum VoiceInkPowerModeCustomEmojiAddResult: Equatable, Sendable {
     case duplicate
 }
 
+public struct VoiceInkPowerModeEmojiRemovalAlertPresentation: Equatable, Sendable {
+    public let title: String
+    public let message: String
+    public let buttonTitle: String
+
+    public init(title: String, message: String, buttonTitle: String) {
+        self.title = title
+        self.message = message
+        self.buttonTitle = buttonTitle
+    }
+}
+
 public enum VoiceInkPowerModeEmojiCatalog {
     public static let customEmojisKey = "userAddedEmojis"
     public static let defaultEmojis = ["🏢", "🏠", "💼", "🎮", "📱", "📺", "🎵", "📚", "✏️", "🎨", "🧠", "⚙️", "💻", "🌐", "📝", "📊", "🔍", "💬", "📈", "🔧"]
@@ -98,11 +110,21 @@ public enum VoiceInkPowerModeEmojiInputPresentation {
     public static let invalidPreviewMessage = "Invalid emoji."
     public static let invalidSubmitMessage = "Invalid emoji character."
     public static let duplicateMessage = "Emoji already exists!"
+    public static let inUseAlertTitle = "Emoji in Use"
+    public static let inUseAlertButtonTitle = "OK"
 
     public static func isErrorMessage(_ message: String) -> Bool {
         message == duplicateMessage
             || message == invalidPreviewMessage
             || message == invalidSubmitMessage
             || message == emptySubmitMessage
+    }
+
+    public static func inUseAlert(emoji: String) -> VoiceInkPowerModeEmojiRemovalAlertPresentation {
+        VoiceInkPowerModeEmojiRemovalAlertPresentation(
+            title: inUseAlertTitle,
+            message: "The emoji \"\(emoji)\" is currently used by one or more Power Modes and cannot be removed.",
+            buttonTitle: inUseAlertButtonTitle
+        )
     }
 }

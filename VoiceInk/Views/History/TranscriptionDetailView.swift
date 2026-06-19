@@ -15,10 +15,13 @@ struct TranscriptionDetailView: View {
                         isEnhanced: false
                     )
 
-                    if let enhancedText = transcription.enhancedText {
+                    if VoiceInkTranscriptTextVariant.shouldShowTabs(enhancedText: transcription.enhancedText) {
                         MessageBubble(
                             label: VoiceInkTranscriptTextVariant.enhanced.title,
-                            text: enhancedText,
+                            text: VoiceInkTranscriptTextVariant.enhanced.displayText(
+                                rawText: transcription.text,
+                                enhancedText: transcription.enhancedText
+                            ),
                             isEnhanced: true
                         )
                     }

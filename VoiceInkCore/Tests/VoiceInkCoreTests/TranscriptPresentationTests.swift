@@ -233,6 +233,36 @@ final class TranscriptPresentationTests: XCTestCase {
         XCTAssertEqual(VoiceInkTranscriptTextVariant.allCases, [.original, .enhanced])
     }
 
+    func testTranscriptTextVariantDisplayTextPreservesMacOSTabSelection() {
+        XCTAssertEqual(
+            VoiceInkTranscriptTextVariant.original.displayText(
+                rawText: "raw",
+                enhancedText: "enhanced"
+            ),
+            "raw"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptTextVariant.enhanced.displayText(
+                rawText: "raw",
+                enhancedText: "enhanced"
+            ),
+            "enhanced"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptTextVariant.enhanced.displayText(
+                rawText: "raw",
+                enhancedText: nil
+            ),
+            ""
+        )
+    }
+
+    func testTranscriptTextVariantTabVisibilityPreservesMacOSNilOnlyRule() {
+        XCTAssertFalse(VoiceInkTranscriptTextVariant.shouldShowTabs(enhancedText: nil))
+        XCTAssertTrue(VoiceInkTranscriptTextVariant.shouldShowTabs(enhancedText: ""))
+        XCTAssertTrue(VoiceInkTranscriptTextVariant.shouldShowTabs(enhancedText: "enhanced"))
+    }
+
     func testTranscriptDetailCopyPreservesIOSNoteDetailLabels() {
         XCTAssertEqual(VoiceInkTranscriptPresentation.noteDetailNavigationTitle, "Note")
         XCTAssertEqual(VoiceInkTranscriptPresentation.transcriptTitle, "Transcript")

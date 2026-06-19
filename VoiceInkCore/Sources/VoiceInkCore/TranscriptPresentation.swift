@@ -74,6 +74,19 @@ public enum VoiceInkTranscriptTextVariant: String, CaseIterable, Sendable {
             return "Enhanced"
         }
     }
+
+    public static func shouldShowTabs(enhancedText: String?) -> Bool {
+        enhancedText != nil
+    }
+
+    public func displayText(rawText: String, enhancedText: String?) -> String {
+        switch self {
+        case .original:
+            return rawText
+        case .enhanced:
+            return enhancedText ?? ""
+        }
+    }
 }
 
 public enum VoiceInkTranscriptPresentation {

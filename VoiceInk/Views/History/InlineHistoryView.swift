@@ -494,12 +494,10 @@ private struct HistoryCardRow: View {
     @State private var selectedTab: VoiceInkTranscriptTextVariant = .original
 
     private var displayText: String {
-        switch selectedTab {
-        case .original:
-            return transcription.text
-        case .enhanced:
-            return transcription.enhancedText ?? ""
-        }
+        selectedTab.displayText(
+            rawText: transcription.text,
+            enhancedText: transcription.enhancedText
+        )
     }
 
     private var hasAudioFile: Bool {
@@ -557,7 +555,7 @@ private struct HistoryCardRow: View {
     private var expandedContent: some View {
         VStack(alignment: .leading, spacing: 8) {
             // Tabs
-            if transcription.enhancedText != nil {
+            if VoiceInkTranscriptTextVariant.shouldShowTabs(enhancedText: transcription.enhancedText) {
                 HStack(spacing: 4) {
                     ForEach(VoiceInkTranscriptTextVariant.allCases, id: \.self) { tab in
                         Button {

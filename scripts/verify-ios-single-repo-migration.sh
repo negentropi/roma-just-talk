@@ -650,7 +650,7 @@ require_pattern \
 
 require_pattern \
   "shared transcript text variant presentation lives in VoiceInkCore" \
-  'VoiceInkTranscriptTextVariant|case original|case enhanced|var title' \
+  'VoiceInkTranscriptTextVariant|case original|case enhanced|var title|shouldShowTabs|displayText' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
 
 require_pattern \
@@ -695,18 +695,25 @@ require_pattern \
 
 require_pattern \
   "macOS transcription detail uses shared transcript text variant" \
-  'VoiceInkTranscriptTextVariant\.(original|enhanced)\.title' \
+  'VoiceInkTranscriptTextVariant\.(original|enhanced)\.(title|displayText)|VoiceInkTranscriptTextVariant\.shouldShowTabs' \
   VoiceInk/Views/History/TranscriptionDetailView.swift
 
 require_pattern \
   "macOS audio file row uses shared transcript text variant" \
-  'VoiceInkTranscriptTextVariant|tab\.title' \
+  'VoiceInkTranscriptTextVariant|tab\.title|selectedTab\.displayText|VoiceInkTranscriptTextVariant\.shouldShowTabs' \
   VoiceInk/Views/AudioFileRow.swift
 
 require_pattern \
   "macOS inline history uses shared transcript text variant" \
-  'VoiceInkTranscriptTextVariant|tab\.title' \
+  'VoiceInkTranscriptTextVariant|tab\.title|selectedTab\.displayText|VoiceInkTranscriptTextVariant\.shouldShowTabs' \
   VoiceInk/Views/History/InlineHistoryView.swift
+
+reject_pattern \
+  "macOS transcript variant views avoid shell-owned variant selection rules" \
+  'switch selectedTab|case \.(original|enhanced):|enhancedText != nil' \
+  VoiceInk/Views/AudioFileRow.swift \
+  VoiceInk/Views/History/InlineHistoryView.swift \
+  VoiceInk/Views/History/TranscriptionDetailView.swift
 
 reject_pattern \
   "iOS note views avoid shell-only transcript status branching" \

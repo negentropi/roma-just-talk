@@ -11,12 +11,10 @@ struct AudioFileRow: View {
     @State private var selectedTab: VoiceInkTranscriptTextVariant = .original
 
     private var displayText: String {
-        switch selectedTab {
-        case .original:
-            return item.transcription?.text ?? ""
-        case .enhanced:
-            return item.transcription?.enhancedText ?? ""
-        }
+        selectedTab.displayText(
+            rawText: item.transcription?.text ?? "",
+            enhancedText: item.transcription?.enhancedText
+        )
     }
 
     /// Text for copy/save — matches visible content regardless of expansion state.
@@ -143,7 +141,7 @@ struct AudioFileRow: View {
         .onTapGesture { onToggleExpand() }
 
         if isExpanded, let transcription = item.transcription {
-            if transcription.enhancedText != nil {
+            if VoiceInkTranscriptTextVariant.shouldShowTabs(enhancedText: transcription.enhancedText) {
                 HStack(spacing: 4) {
                     tabButton(tab: .original)
                     tabButton(tab: .enhanced)

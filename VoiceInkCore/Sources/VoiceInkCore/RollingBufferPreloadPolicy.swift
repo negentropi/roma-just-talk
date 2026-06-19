@@ -71,6 +71,42 @@ public struct VoiceInkRollingBufferPreloadModelSnapshot: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkRollingBufferPreloadSettingsPresentation: Equatable, Sendable {
+    public let sectionTitle: String
+    public let modePickerTitle: String
+    public let modePickerHelp: String
+    public let durationLabel: String
+    public let durationUnitLabel: String
+    public let preRunFinalizationTitle: String
+    public let preRunFinalizationHelp: String
+    public let vadModelPickerTitle: String
+    public let vadModelPickerHelp: String
+    public let autoDisableCloudModelsTitle: String
+    public let autoDisableCloudModelsHelp: String
+    public let autoDisableLowBatteryLocalModelsTitle: String
+    public let autoDisableLowBatteryLocalModelsHelp: String
+
+    public static let macOS = VoiceInkRollingBufferPreloadSettingsPresentation(
+        sectionTitle: "Rolling Buffer",
+        modePickerTitle: "Buffer Preload",
+        modePickerHelp: "Runs local VAD on the rolling buffer and pre-runs supported STT models before capture is finalized.",
+        durationLabel: "Rolling Duration",
+        durationUnitLabel: "s",
+        preRunFinalizationTitle: "Pre-run Finalization",
+        preRunFinalizationHelp: "When available, use the already-running preload session to finalize text instead of starting transcription from the saved WAV.",
+        vadModelPickerTitle: "Buffer VAD Model",
+        vadModelPickerHelp: "Silero runs locally on CPU and watches rolling-buffer audio for speech before STT preload starts.",
+        autoDisableCloudModelsTitle: "Auto: Disable Cloud Models",
+        autoDisableCloudModelsHelp: "When enabled, Auto keeps rolling-buffer preload local and avoids cloud streaming before capture.",
+        autoDisableLowBatteryLocalModelsTitle: "Auto: Disable Local Models on Low Battery",
+        autoDisableLowBatteryLocalModelsHelp: "When enabled, Auto stops local pre-run STT while running on battery below the cutoff."
+    )
+
+    public func batteryCutoffLabel(percent: Int) -> String {
+        "Battery cutoff: \(percent)%"
+    }
+}
+
 public enum VoiceInkRollingBufferPreloadSettings {
     public static let modeKey = "RollingBufferPreloadMode"
     public static let autoDisableCloudModelsKey = "RollingBufferPreloadAutoDisableCloudModels"
@@ -87,6 +123,7 @@ public enum VoiceInkRollingBufferPreloadSettings {
     public static let defaultBufferDurationSeconds = 3.0
     public static let defaultPreRunFinalization = true
     public static let defaultPerModelPreloadEnabled = true
+    public static let macOSSettingsPresentation = VoiceInkRollingBufferPreloadSettingsPresentation.macOS
 
     public static func configuration(in defaults: UserDefaults = .standard) -> VoiceInkRollingBufferPreloadConfiguration {
         let mode = defaults.string(forKey: modeKey)

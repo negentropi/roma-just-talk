@@ -4881,7 +4881,7 @@ require_pattern \
 
 require_pattern \
   "shared rolling-buffer VAD model settings live in VoiceInkCore" \
-  'VoiceInkRollingBufferVADModel|VoiceInkRollingBufferVADSettings|modelKey = "RollingBufferVADModel"|sileroModelName|saveImportedModel' \
+  'VoiceInkRollingBufferPreloadSettingsPresentation|VoiceInkRollingBufferVADModel|VoiceInkRollingBufferVADSettings|modelKey = "RollingBufferVADModel"|sileroModelName|saveImportedModel' \
   VoiceInkCore/Sources/VoiceInkCore/RollingBufferPreloadPolicy.swift
 
 require_pattern \
@@ -4891,8 +4891,13 @@ require_pattern \
 
 require_pattern \
   "macOS rolling-buffer settings use shared VAD model catalog" \
-  'VoiceInkRollingBufferVADSettings\.(modelKey|defaultModel)|VoiceInkRollingBufferVADModel\.allCases' \
+  'VoiceInkRollingBufferPreloadSettings\.macOSSettingsPresentation|presentation\.(modePickerTitle|modePickerHelp|durationLabel|durationUnitLabel|preRunFinalizationTitle|preRunFinalizationHelp|vadModelPickerTitle|vadModelPickerHelp|autoDisableCloudModelsTitle|autoDisableCloudModelsHelp|autoDisableLowBatteryLocalModelsTitle|autoDisableLowBatteryLocalModelsHelp|batteryCutoffLabel)|VoiceInkRollingBufferVADSettings\.(modelKey|defaultModel)|VoiceInkRollingBufferVADModel\.allCases' \
   VoiceInk/Views/Settings/RollingBufferPreloadSettingsControls.swift
+
+require_pattern \
+  "macOS settings uses shared rolling-buffer section title" \
+  'VoiceInkRollingBufferPreloadSettings\.macOSSettingsPresentation|rollingBufferPresentation\.sectionTitle' \
+  VoiceInk/Views/Settings/SettingsView.swift
 
 require_pattern \
   "macOS rolling VAD detector uses shared selected-model policy" \
@@ -4941,10 +4946,16 @@ reject_pattern \
 
 reject_pattern \
   "macOS rolling-buffer shell avoids local VAD model settings policy" \
-  'enum +RollingBufferVADSettings|\bRollingBufferVADSettings\b|Text\("Silero"\)' \
+  'enum +RollingBufferVADSettings|\bRollingBufferVADSettings\b|Text\("Silero"\)|"(Rolling Buffer|Buffer Preload|Runs local VAD on the rolling buffer and pre-runs supported STT models before capture is finalized\.|Rolling Duration|Pre-run Finalization|When available, use the already-running preload session to finalize text instead of starting transcription from the saved WAV\.|Buffer VAD Model|Silero runs locally on CPU and watches rolling-buffer audio for speech before STT preload starts\.|Auto: Disable Cloud Models|When enabled, Auto keeps rolling-buffer preload local and avoids cloud streaming before capture\.|Auto: Disable Local Models on Low Battery|When enabled, Auto stops local pre-run STT while running on battery below the cutoff\.|Battery cutoff:|s)"' \
+  VoiceInk/Views/Settings/SettingsView.swift \
   VoiceInk/Transcription/RollingPreload/RollingBufferPreloadSettings.swift \
   VoiceInk/Views/Settings/RollingBufferPreloadSettingsControls.swift \
   VoiceInk/Transcription/RollingPreload/SileroSpeechActivityDetector.swift
+
+require_pattern \
+  "migration checklist tracks shared rolling-buffer settings labels" \
+  'macOS rolling-buffer preload settings labels/help, VAD model labels, storage key/default' \
+  docs/ios-single-repo-migration.md
 
 require_pattern \
   "macOS Native Apple transcription uses shared source-compatible language fallback" \

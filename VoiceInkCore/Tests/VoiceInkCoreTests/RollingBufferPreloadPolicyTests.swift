@@ -20,6 +20,40 @@ final class RollingBufferPreloadPolicyTests: XCTestCase {
         XCTAssertTrue(VoiceInkRollingBufferPreloadSettings.defaultPerModelPreloadEnabled)
     }
 
+    func testSettingsPresentationPreservesMacOSCopy() {
+        let presentation = VoiceInkRollingBufferPreloadSettings.macOSSettingsPresentation
+
+        XCTAssertEqual(presentation.sectionTitle, "Rolling Buffer")
+        XCTAssertEqual(presentation.modePickerTitle, "Buffer Preload")
+        XCTAssertEqual(
+            presentation.modePickerHelp,
+            "Runs local VAD on the rolling buffer and pre-runs supported STT models before capture is finalized."
+        )
+        XCTAssertEqual(presentation.durationLabel, "Rolling Duration")
+        XCTAssertEqual(presentation.durationUnitLabel, "s")
+        XCTAssertEqual(presentation.preRunFinalizationTitle, "Pre-run Finalization")
+        XCTAssertEqual(
+            presentation.preRunFinalizationHelp,
+            "When available, use the already-running preload session to finalize text instead of starting transcription from the saved WAV."
+        )
+        XCTAssertEqual(presentation.vadModelPickerTitle, "Buffer VAD Model")
+        XCTAssertEqual(
+            presentation.vadModelPickerHelp,
+            "Silero runs locally on CPU and watches rolling-buffer audio for speech before STT preload starts."
+        )
+        XCTAssertEqual(presentation.autoDisableCloudModelsTitle, "Auto: Disable Cloud Models")
+        XCTAssertEqual(
+            presentation.autoDisableCloudModelsHelp,
+            "When enabled, Auto keeps rolling-buffer preload local and avoids cloud streaming before capture."
+        )
+        XCTAssertEqual(presentation.autoDisableLowBatteryLocalModelsTitle, "Auto: Disable Local Models on Low Battery")
+        XCTAssertEqual(
+            presentation.autoDisableLowBatteryLocalModelsHelp,
+            "When enabled, Auto stops local pre-run STT while running on battery below the cutoff."
+        )
+        XCTAssertEqual(presentation.batteryCutoffLabel(percent: 40), "Battery cutoff: 40%")
+    }
+
     func testVADModelSettingsPreserveExistingStorageAndSileroIdentity() {
         XCTAssertEqual(VoiceInkRollingBufferVADSettings.modelKey, "RollingBufferVADModel")
         XCTAssertEqual(VoiceInkRollingBufferVADSettings.defaultModel, .silero)

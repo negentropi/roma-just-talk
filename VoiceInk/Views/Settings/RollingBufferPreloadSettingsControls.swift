@@ -10,6 +10,7 @@ struct RollingBufferPreloadSettingsControls: View {
     @AppStorage(VoiceInkRollingBufferPreloadSettings.preRunFinalizationKey) private var preRunFinalization = VoiceInkRollingBufferPreloadSettings.defaultPreRunFinalization
     @AppStorage(VoiceInkRollingBufferVADSettings.modelKey)
     private var rollingBufferVADModel = VoiceInkRollingBufferVADSettings.defaultModel.rawValue
+    private static let presentation = VoiceInkRollingBufferPreloadSettings.macOSSettingsPresentation
 
     private var mode: Binding<VoiceInkRollingBufferPreloadMode> {
         Binding(
@@ -39,13 +40,13 @@ struct RollingBufferPreloadSettingsControls: View {
             }
         } label: {
             HStack(spacing: 4) {
-                Text("Buffer Preload")
-                InfoTip("Runs local VAD on the rolling buffer and pre-runs supported STT models before capture is finalized.")
+                Text(Self.presentation.modePickerTitle)
+                InfoTip(Self.presentation.modePickerHelp)
             }
         }
         .pickerStyle(.segmented)
 
-        LabeledContent("Rolling Duration") {
+        LabeledContent(Self.presentation.durationLabel) {
             HStack(spacing: 6) {
                 TextField("", value: $bufferDurationSeconds, formatter: durationFormatter)
                     .textFieldStyle(.roundedBorder)
@@ -54,15 +55,15 @@ struct RollingBufferPreloadSettingsControls: View {
                     .onChange(of: bufferDurationSeconds) { _, _ in
                         normalizeDuration()
                     }
-                Text("s")
+                Text(Self.presentation.durationUnitLabel)
                     .foregroundColor(.secondary)
             }
         }
 
         Toggle(isOn: $preRunFinalization) {
             HStack(spacing: 4) {
-                Text("Pre-run Finalization")
-                InfoTip("When available, use the already-running preload session to finalize text instead of starting transcription from the saved WAV.")
+                Text(Self.presentation.preRunFinalizationTitle)
+                InfoTip(Self.presentation.preRunFinalizationHelp)
             }
         }
         .toggleStyle(.switch)
@@ -74,8 +75,8 @@ struct RollingBufferPreloadSettingsControls: View {
             }
         } label: {
             HStack(spacing: 4) {
-                Text("Buffer VAD Model")
-                InfoTip("Silero runs locally on CPU and watches rolling-buffer audio for speech before STT preload starts.")
+                Text(Self.presentation.vadModelPickerTitle)
+                InfoTip(Self.presentation.vadModelPickerHelp)
             }
         }
         .pickerStyle(.menu)
@@ -84,8 +85,8 @@ struct RollingBufferPreloadSettingsControls: View {
         if mode.wrappedValue == .auto {
             Toggle(isOn: $autoDisableCloudModels) {
                 HStack(spacing: 4) {
-                    Text("Auto: Disable Cloud Models")
-                    InfoTip("When enabled, Auto keeps rolling-buffer preload local and avoids cloud streaming before capture.")
+                    Text(Self.presentation.autoDisableCloudModelsTitle)
+                    InfoTip(Self.presentation.autoDisableCloudModelsHelp)
                 }
             }
             .toggleStyle(.switch)
@@ -93,8 +94,8 @@ struct RollingBufferPreloadSettingsControls: View {
 
             Toggle(isOn: $autoDisableLowBatteryLocalModels) {
                 HStack(spacing: 4) {
-                    Text("Auto: Disable Local Models on Low Battery")
-                    InfoTip("When enabled, Auto stops local pre-run STT while running on battery below the cutoff.")
+                    Text(Self.presentation.autoDisableLowBatteryLocalModelsTitle)
+                    InfoTip(Self.presentation.autoDisableLowBatteryLocalModelsHelp)
                 }
             }
             .toggleStyle(.switch)
@@ -102,7 +103,7 @@ struct RollingBufferPreloadSettingsControls: View {
 
             if autoDisableLowBatteryLocalModels {
                 Stepper(
-                    "Battery cutoff: \(lowBatteryThresholdPercent)%",
+                    Self.presentation.batteryCutoffLabel(percent: lowBatteryThresholdPercent),
                     value: $lowBatteryThresholdPercent,
                     in: 1...100,
                     step: 1

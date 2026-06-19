@@ -1,12 +1,13 @@
 import SwiftUI
 import SwiftData
 import AppKit
+import VoiceInkCore
 
 class HistoryWindowController: NSObject, NSWindowDelegate {
     static let shared = HistoryWindowController()
 
     private var historyWindow: NSWindow?
-    private let windowIdentifier = NSUserInterfaceItemIdentifier("com.prakashjoshipax.voiceink.historyWindow")
+    private let windowIdentifier = NSUserInterfaceItemIdentifier("\(VoiceInkAppIdentity.loggingSubsystem).historyWindow")
     private let windowAutosaveName = NSWindow.FrameAutosaveName("VoiceInkHistoryWindowFrame")
 
     private override init() {

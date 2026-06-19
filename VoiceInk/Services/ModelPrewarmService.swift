@@ -1,6 +1,7 @@
 import Foundation
 import SwiftData
 import os
+import VoiceInkCore
 import AppKit
 
 @MainActor
@@ -8,7 +9,7 @@ final class ModelPrewarmService: ObservableObject {
     private let transcriptionModelManager: TranscriptionModelManager
     private let whisperModelManager: WhisperModelManager
     private let modelContext: ModelContext
-    private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "ModelPrewarm")
+    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "ModelPrewarm")
     private let serviceRegistry: TranscriptionServiceRegistry
     private let prewarmAudioURL = Bundle.main.url(forResource: "sound7", withExtension: "wav")
     private let prewarmEnabledKey = "PrewarmModelOnWake"

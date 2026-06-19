@@ -20,7 +20,7 @@ class AudioTranscriptionManager: ObservableObject {
     private var processingTask: Task<Void, Never>?
     private var processingGeneration: UInt64 = 0
     private let audioProcessor = AudioProcessor()
-    private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "AudioTranscriptionManager")
+    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "AudioTranscriptionManager")
 
     private init() {}
 

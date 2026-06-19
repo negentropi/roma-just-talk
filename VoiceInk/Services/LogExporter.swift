@@ -1,11 +1,12 @@
 import Foundation
 import OSLog
+import VoiceInkCore
 
 final class LogExporter {
     static let shared = LogExporter()
 
-    private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "LogExporter")
-    private let subsystem = "com.prakashjoshipax.voiceink"
+    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "LogExporter")
+    private let subsystem = VoiceInkAppIdentity.loggingSubsystem
     private let maxSessionsToKeep = 3
     private let sessionsKey = "logExporter.sessionStartDates.v1"
 

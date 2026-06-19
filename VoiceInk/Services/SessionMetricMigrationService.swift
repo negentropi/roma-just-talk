@@ -7,7 +7,7 @@ import VoiceInkCore
 final class SessionMetricMigrationService {
     static let shared = SessionMetricMigrationService()
 
-    private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "SessionMetricMigrationService")
+    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "SessionMetricMigrationService")
     private let completionKey = "HasCompletedStatsMigration"
     private(set) var isRunning = false
 

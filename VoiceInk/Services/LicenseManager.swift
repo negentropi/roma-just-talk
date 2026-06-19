@@ -1,12 +1,13 @@
 import Foundation
 import os
+import VoiceInkCore
 
 /// Manages license data using secure Keychain storage (non-syncable, device-local).
 final class LicenseManager {
     static let shared = LicenseManager()
 
     private let keychain = KeychainService.shared
-    private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "LicenseManager")
+    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "LicenseManager")
 
     private let licenseKeyIdentifier = "voiceink.license.key"
     private let trialStartDateIdentifier = "voiceink.license.trialStartDate"

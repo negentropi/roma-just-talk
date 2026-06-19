@@ -48,7 +48,7 @@ struct VoiceInkApp: App {
             UserDefaults.standard.set(hasEnabledPowerModes, forKey: "powerModeUIFlag")
         }
 
-        let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "Initialization")
+        let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "Initialization")
         // Keep existing model order stable; append new models after synced entities.
         let schema = Schema([
             Transcription.self,
@@ -352,7 +352,7 @@ struct VoiceInkApp: App {
                     .environmentObject(enhancementService)
                     .frame(minWidth: 880, minHeight: 780)
                     .background(WindowAccessor { window in
-                        if window.identifier == nil || window.identifier != NSUserInterfaceItemIdentifier("com.prakashjoshipax.voiceink.onboardingWindow") {
+                        if window.identifier == nil || window.identifier != NSUserInterfaceItemIdentifier("\(VoiceInkAppIdentity.loggingSubsystem).onboardingWindow") {
                             WindowManager.shared.configureOnboardingPanel(window)
                         }
                     })
@@ -406,7 +406,7 @@ struct VoiceInkApp: App {
 
 private struct MainWindowRequestHandler: View {
     @Environment(\.openWindow) private var openWindow
-    private static let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "MainWindowRequestHandler")
+    private static let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "MainWindowRequestHandler")
 
     var body: some View {
         Color.clear

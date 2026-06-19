@@ -8,7 +8,7 @@ import VoiceInkCore
 class AudioTranscriptionService {
     private let modelContext: ModelContext
     private let enhancementService: AIEnhancementService?
-    private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "AudioTranscriptionService")
+    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "AudioTranscriptionService")
     private let serviceRegistry: TranscriptionServiceRegistry
 
     init(modelContext: ModelContext, engine: VoiceInkEngine) {

@@ -26,7 +26,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 
 `VoiceInkCore` currently owns these cross-platform modules:
 
-- app identity for shared display names, compact macOS title, sidebar subtitle, stable bundle identifier, macOS transcription diagnostics and local Whisper logging subsystem, macOS Application Support subdirectory, iOS onboarding titles, and macOS storage-failure copy
+- app identity for shared display names, compact macOS title, sidebar subtitle, stable bundle identifier, macOS app diagnostics, queue/window identifiers, local Whisper logging subsystem, macOS Application Support subdirectory, iOS onboarding titles, and macOS storage-failure copy
 - prompt templates and prompt text
 - predefined prompt IDs, labels, prompt text, icons, descriptions, and system-instruction flags
 - custom prompt system-instruction wrapping
@@ -362,7 +362,7 @@ scripts/verify-ios-single-repo-migration.sh --full-build
 34. macOS and iOS duration-dependent UI plus metadata separator text stays routed through `VoiceInkDurationPresentation`.
 35. macOS and iOS audio playback-rate controls plus loading/play-pause/metadata-icon presentation stay routed through `VoiceInkAudioPlaybackRate`/`VoiceInkAudioPlaybackPresentation`.
 36. macOS sidebar/window titles and iOS note-list/onboarding app-name copy stay routed through `VoiceInkAppIdentity`.
-37. macOS transcription runtime logger subsystem and recording-startup queue labels stay routed through `VoiceInkAppIdentity.loggingSubsystem`.
+37. macOS app logger subsystems, diagnostic subsystem filters, queue labels, and window identifiers stay routed through `VoiceInkAppIdentity.loggingSubsystem`.
 38. macOS history and iOS notes empty-state copy plus macOS history search/pagination/selection copy and SF Symbol names stay routed through `VoiceInkHistoryPresentation`, with platform views only rendering the shared presentation.
 39. macOS and iOS model-management labels route through `VoiceInkModelManagementFilter` and `VoiceInkModelManagementPresentation`, with duplicate model filter/default/local/cloud/custom copy out of platform views.
 40. macOS cloud-provider and shared remote transcription API error-domain mapping stays routed through `VoiceInkTranscriptionModelProvider.apiErrorDomain`, with duplicate provider-domain switches out of the macOS shell and provider literals out of `AudioTranscriptionService` plus low-level remote clients.

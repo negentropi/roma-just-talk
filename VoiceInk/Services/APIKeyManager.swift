@@ -6,7 +6,7 @@ import VoiceInkCore
 final class APIKeyManager {
     static let shared = APIKeyManager()
 
-    private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "APIKeyManager")
+    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "APIKeyManager")
     private let keychain = KeychainService.shared
 
     private init() {}

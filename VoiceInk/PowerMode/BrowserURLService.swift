@@ -1,6 +1,7 @@
 import Foundation
 import AppKit
 import os
+import VoiceInkCore
 
 enum BrowserType {
     case safari
@@ -87,7 +88,7 @@ class BrowserURLService {
     static let shared = BrowserURLService()
     
     private let logger = Logger(
-        subsystem: "com.prakashjoshipax.voiceink",
+        subsystem: VoiceInkAppIdentity.loggingSubsystem,
         category: "browser.applescript"
     )
     

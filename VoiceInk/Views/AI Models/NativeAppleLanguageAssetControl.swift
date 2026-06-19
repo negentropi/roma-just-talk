@@ -1,5 +1,6 @@
 import SwiftUI
 import os
+import VoiceInkCore
 
 #if canImport(Speech)
 import Speech
@@ -16,7 +17,7 @@ private enum NativeAppleSpeechAssetState: Equatable {
 }
 
 struct NativeAppleLanguageAssetControl: View {
-    private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "NativeAppleLanguageAssetControl")
+    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "NativeAppleLanguageAssetControl")
 
     let localeIdentifier: String
     let isVisible: Bool

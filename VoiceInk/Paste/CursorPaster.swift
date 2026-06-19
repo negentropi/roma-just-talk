@@ -7,7 +7,7 @@ import VoiceInkCore
 class CursorPaster {
     fileprivate typealias ClipboardItemSnapshot = [(NSPasteboard.PasteboardType, Data)]
     fileprivate typealias ClipboardSnapshot = [ClipboardItemSnapshot]
-    private static let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "CursorPaster")
+    private static let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "CursorPaster")
     @MainActor private static var pasteCommandPosterForTesting: (() async -> PasteResult)?
 
     struct PreparedPasteContext {

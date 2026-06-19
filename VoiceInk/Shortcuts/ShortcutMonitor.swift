@@ -121,7 +121,7 @@ final class ShortcutMonitor {
     private var modifierOnlyGlobalMonitor: Any?
     private var modifierOnlyLocalMonitor: Any?
     private var handlesModifierOnlyShortcutsInEventTap = false
-    private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "ShortcutMonitor")
+    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "ShortcutMonitor")
 
     private static var hasRequestedListenEventAccess = false
     private static var hasRequestedAccessibilityAccess = false

@@ -1,6 +1,7 @@
 import Foundation
 import AppKit
 import os
+import VoiceInkCore
 
 @MainActor
 class LicenseViewModel: ObservableObject {
@@ -19,7 +20,7 @@ class LicenseViewModel: ObservableObject {
 
     private let trialPeriodDays = 7
     private let polarService = PolarService()
-    private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "LicenseViewModel")
+    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "LicenseViewModel")
     private let userDefaults = UserDefaults.standard
     private let licenseManager = LicenseManager.shared
 

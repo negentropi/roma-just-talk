@@ -140,7 +140,7 @@ class RecordingShortcutManager: ObservableObject {
         let specialPasteLastTranscriptOnEmptyTap = UserDefaults.standard.bool(forKey: SpecialShortcutSettings.pasteLastTranscriptOnEmptyTapKey)
         self.specialShortcutPasteLastTranscriptOnEmptyTap = specialPasteLastTranscriptOnEmptyTap
 
-        let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "RecordingShortcutManager")
+        let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "RecordingShortcutManager")
         let shortcutModeHandler = RecordingShortcutModeHandler(
             logger: logger,
             canHandleShortcutAction: {

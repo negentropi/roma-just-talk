@@ -1,6 +1,7 @@
 import Foundation
 @preconcurrency import AVFoundation
 import os
+import VoiceInkCore
 
 final class SoundPlaybackEngine: @unchecked Sendable {
     private enum Sound {
@@ -9,8 +10,8 @@ final class SoundPlaybackEngine: @unchecked Sendable {
         case esc
     }
 
-    private let queue = DispatchQueue(label: "com.prakashjoshipax.voiceink.soundPlayback", qos: .userInitiated)
-    private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "SoundPlaybackEngine")
+    private let queue = DispatchQueue(label: "\(VoiceInkAppIdentity.loggingSubsystem).soundPlayback", qos: .userInitiated)
+    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "SoundPlaybackEngine")
 
     private var startSound: AVAudioPlayer?
     private var stopSound: AVAudioPlayer?

@@ -2,9 +2,10 @@ import SwiftUI
 import SwiftData
 import AppKit
 import OSLog
+import VoiceInkCore
 
 class MenuBarManager: ObservableObject {
-    private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "MenuBarManager")
+    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "MenuBarManager")
     @Published var isMenuBarOnly: Bool {
         didSet {
             UserDefaults.standard.set(isMenuBarOnly, forKey: "IsMenuBarOnly")

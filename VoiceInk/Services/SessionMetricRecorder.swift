@@ -4,7 +4,7 @@ import OSLog
 import VoiceInkCore
 
 enum SessionMetricRecorder {
-    private static let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "SessionMetricRecorder")
+    private static let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "SessionMetricRecorder")
     private static let source = "recorder"
 
     @discardableResult

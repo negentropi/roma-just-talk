@@ -58,7 +58,7 @@ private enum DashboardMetricsLoader {
 }
 
 struct MetricsContent: View {
-    private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "MetricsContent")
+    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "MetricsContent")
     @Environment(\.colorScheme) private var colorScheme
     let modelContext: ModelContext
     let licenseState: LicenseViewModel.LicenseState

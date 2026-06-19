@@ -5,6 +5,7 @@ public enum VoiceInkAudioMeterLevel {
     public static let defaultMaximumDecibels: Float = 0
     public static let defaultPreviousLevelWeight: Float = 0.6
     public static let defaultLevelHistoryLimit = 40
+    public static let visualizerAccessibilityLabel = "Audio level visualizer"
 
     public static func normalizedLevel(
         forDecibels decibels: Float,

@@ -24,7 +24,7 @@ struct AudioVisualizerView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .frame(height: 48)
-        .accessibilityLabel("Audio level visualizer")
+        .accessibilityLabel(VoiceInkAudioMeterLevel.visualizerAccessibilityLabel)
     }
 
     private func barWidth(in size: CGSize) -> CGFloat {

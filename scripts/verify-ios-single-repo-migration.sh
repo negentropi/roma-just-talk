@@ -698,10 +698,25 @@ require_pattern \
   'VoiceInkAudioMeterLevel\.boundedHistory' \
   iOS/VoiceInk-ios/AudioRecorder.swift
 
+require_pattern \
+  "shared audio-meter visualizer accessibility label lives in VoiceInkCore" \
+  'VoiceInkAudioMeterLevel|visualizerAccessibilityLabel' \
+  VoiceInkCore/Sources/VoiceInkCore/AudioMeterLevel.swift
+
+require_pattern \
+  "iOS audio visualizer uses shared accessibility label" \
+  'VoiceInkAudioMeterLevel\.visualizerAccessibilityLabel' \
+  iOS/VoiceInk-ios/AudioVisualizerView.swift
+
 reject_pattern \
   "iOS live recording avoids shell-only audio-meter history limit" \
   'levelsHistory\.count >|removeFirst\(self\.levelsHistory\.count -|0\.\.<40' \
   iOS/VoiceInk-ios/AudioRecorder.swift \
+  iOS/VoiceInk-ios/AudioVisualizerView.swift
+
+reject_pattern \
+  "iOS audio visualizer avoids duplicate accessibility copy" \
+  '"Audio level visualizer"' \
   iOS/VoiceInk-ios/AudioVisualizerView.swift
 
 reject_pattern \

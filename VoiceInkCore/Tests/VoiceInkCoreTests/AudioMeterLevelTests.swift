@@ -2,6 +2,10 @@ import Foundation
 @testable import VoiceInkCore
 
 final class AudioMeterLevelTests: XCTestCase {
+    func testVisualizerAccessibilityLabelPreservesIOSCopy() {
+        XCTAssertEqual(VoiceInkAudioMeterLevel.visualizerAccessibilityLabel, "Audio level visualizer")
+    }
+
     func testNormalizedLevelClampsBelowAndAboveVisibleDecibelRange() {
         XCTAssertEqual(VoiceInkAudioMeterLevel.normalizedLevel(forDecibels: -80), 0)
         XCTAssertEqual(VoiceInkAudioMeterLevel.normalizedLevel(forDecibels: 0), 1)

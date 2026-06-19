@@ -166,6 +166,7 @@ obsolete_ios_clone_files=(
   DefaultModeManager.swift
   GroqTranscriptionService.swift
   Item.swift
+  KeychainService.swift
   LLMPostProcessor.swift
   Mode.swift
   ModeSelectionView.swift
@@ -211,6 +212,7 @@ reject_file iOS/PRIVACY.html
 reject_file iOS/PRIVACY.md
 reject_file iOS/app-icon.png
 reject_file iOS/VoiceInk-ios/VoiceInk-ios
+reject_file iOS/VoiceInk-ios/KeychainService.swift
 
 section "obsolete iOS clone-side duplicates stay deleted"
 for file in "${obsolete_ios_clone_files[@]}"; do
@@ -1097,21 +1099,21 @@ require_pattern \
   VoiceInk/Services/KeychainService.swift
 
 require_pattern \
-  "iOS Keychain adapter uses shared data-store policy" \
+  "iOS API-key settings use shared data-store policy directly" \
   'VoiceInkKeychainDataStore\.(saveData|loadData|delete)' \
-  iOS/VoiceInk-ios/KeychainService.swift
+  iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \
   "platform Keychain adapters avoid duplicate service and syncability query policy" \
   'kSecAttrService|kSecAttrSynchronizable|kSecUseDataProtectionKeychain|com\.prakashjoshipax\.VoiceInk' \
   VoiceInk/Services/KeychainService.swift \
-  iOS/VoiceInk-ios/KeychainService.swift
+  iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \
-  "platform Keychain adapters avoid shell-owned delete query shape" \
+  "platform Keychain shells avoid shell-owned query shape and SecItem execution" \
   'VoiceInkKeychainQuery\.|SecItem(Add|CopyMatching|Delete)' \
   VoiceInk/Services/KeychainService.swift \
-  iOS/VoiceInk-ios/KeychainService.swift
+  iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \
   "iOS API-key view avoids shell-only verification state and copy" \

@@ -30,8 +30,8 @@ jobs:
           xcodebuild -version
           swift --version
 
-      - name: Compile visible text latency harness
-        run: make latency-harness-build
+      - name: Compile visible text latency harness helper
+        run: make latency-harness-app
 
       - name: Build release app
         run: make local CONFIGURATION=Release

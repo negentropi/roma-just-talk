@@ -14,15 +14,33 @@ make latency-harness-build
 
 The binary is written to `.local-build/Tools/VisibleTextLatencyHarness`.
 
+For a stable TCC target, build the helper app:
+
+```bash
+make latency-harness-app
+```
+
+The helper app is written to `.local-build/Tools/VisibleTextLatencyHarness.app`
+with the stable bundle ID `com.happyf.roma-just-talk.VisibleTextLatencyHarness`
+and local ad-hoc signing. Grant this helper app in System Settings when Codex or
+another nonstandard launcher cannot be attributed cleanly by macOS.
+
 ## Run
 
-1. Grant Accessibility permission to the terminal app you run the harness from.
+1. Grant Accessibility permission to the normal terminal app you run the CLI
+   harness from, or grant the `VisibleTextLatencyHarness.app` helper app.
 2. Start the Roma build being tested.
 3. Focus a text field in the target app.
 4. Use a unique phrase for `LATENCY_EXPECTED`, then dictate that exact phrase.
 
 ```bash
 make latency-harness-run LATENCY_EXPECTED="roma latency marker" LATENCY_SAMPLES=10
+```
+
+Use the helper app when TCC should grant the harness itself instead of the shell:
+
+```bash
+make latency-harness-app-run LATENCY_EXPECTED="roma latency marker" LATENCY_SAMPLES=10
 ```
 
 Default trigger is `left-shift`, matching the common modifier-only shortcut.

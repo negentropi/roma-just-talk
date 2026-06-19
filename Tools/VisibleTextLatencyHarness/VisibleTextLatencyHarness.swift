@@ -202,6 +202,15 @@ private enum FocusedTextReader {
     }
 }
 
+private enum AccessibilityTrust {
+    static func isGranted(prompt: Bool) -> Bool {
+        let options = [
+            kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: prompt
+        ] as CFDictionary
+        return AXIsProcessTrustedWithOptions(options)
+    }
+}
+
 private enum Percentiles {
     static func value(_ percentile: Double, in values: [Double]) -> Double? {
         guard !values.isEmpty else { return nil }
@@ -440,8 +449,8 @@ private func printUsageAndExit(_ code: Int32) -> Never {
 
 do {
     let config = try parseArguments(CommandLine.arguments)
-    guard AXIsProcessTrusted() else {
-        fputs("Accessibility is not granted for this terminal. Grant it, restart the shell, and retry.\n", stderr)
+    guard AccessibilityTrust.isGranted(prompt: true) else {
+        fputs("Accessibility is not granted for this process. Grant the Terminal/iTerm app or the VisibleTextLatencyHarness helper app, then restart it.\n", stderr)
         exit(2)
     }
 

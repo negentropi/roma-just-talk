@@ -6,13 +6,20 @@ LOCAL_DERIVED_DATA := $(CURDIR)/.local-build
 LOCAL_APP_DEST := $(HOME)/Applications/roma just talk.app
 LATENCY_HARNESS := $(LOCAL_DERIVED_DATA)/Tools/VisibleTextLatencyHarness
 LATENCY_HARNESS_SOURCE := Tools/VisibleTextLatencyHarness/VisibleTextLatencyHarness.swift
+LATENCY_HARNESS_INFO_PLIST := Tools/VisibleTextLatencyHarness/Info.plist
+LATENCY_HARNESS_APP := $(LOCAL_DERIVED_DATA)/Tools/VisibleTextLatencyHarness.app
+LATENCY_HARNESS_APP_EXECUTABLE := $(LATENCY_HARNESS_APP)/Contents/MacOS/VisibleTextLatencyHarness
+LATENCY_HARNESS_BUNDLE_ID ?= com.happyf.roma-just-talk.VisibleTextLatencyHarness
+LATENCY_HARNESS_REPORT ?= $(LOCAL_DERIVED_DATA)/Tools/visible-text-latency.json
+LATENCY_HARNESS_STDOUT ?= $(LOCAL_DERIVED_DATA)/Tools/visible-text-latency.out.log
+LATENCY_HARNESS_STDERR ?= $(LOCAL_DERIVED_DATA)/Tools/visible-text-latency.err.log
 CONFIGURATION ?= Debug
 LATENCY_EXPECTED ?=
 LATENCY_SAMPLES ?= 5
 LATENCY_TRIGGER ?= left-shift
 LATENCY_THRESHOLD_MS ?= 440
 
-.PHONY: all clean whisper setup build local check healthcheck help dev run latency-harness-build latency-harness-run
+.PHONY: all clean whisper setup build local check healthcheck help dev run latency-harness-build latency-harness-app latency-harness-run latency-harness-app-run
 
 # Default target
 all: check build
@@ -37,6 +44,16 @@ latency-harness-build:
 		-framework ApplicationServices \
 		-o "$(LATENCY_HARNESS)"
 
+latency-harness-app: latency-harness-build
+	@rm -rf "$(LATENCY_HARNESS_APP)"
+	@mkdir -p "$(LATENCY_HARNESS_APP)/Contents/MacOS"
+	@cp "$(LATENCY_HARNESS)" "$(LATENCY_HARNESS_APP_EXECUTABLE)"
+	@cp "$(LATENCY_HARNESS_INFO_PLIST)" "$(LATENCY_HARNESS_APP)/Contents/Info.plist"
+	@plutil -replace CFBundleIdentifier -string "$(LATENCY_HARNESS_BUNDLE_ID)" "$(LATENCY_HARNESS_APP)/Contents/Info.plist"
+	@codesign --force --sign - "$(LATENCY_HARNESS_APP)" >/dev/null
+	@echo "Harness app: $(LATENCY_HARNESS_APP)"
+	@codesign -dvvv "$(LATENCY_HARNESS_APP)" 2>&1 | sed -n '1,8p'
+
 latency-harness-run: latency-harness-build
 	@if [ -z "$(LATENCY_EXPECTED)" ]; then \
 		echo "Set LATENCY_EXPECTED to a unique transcript marker."; \
@@ -48,6 +65,35 @@ latency-harness-run: latency-harness-build
 		--samples "$(LATENCY_SAMPLES)" \
 		--trigger "$(LATENCY_TRIGGER)" \
 		--threshold-ms "$(LATENCY_THRESHOLD_MS)"
+
+latency-harness-app-run: latency-harness-app
+	@if [ -z "$(LATENCY_EXPECTED)" ]; then \
+		echo "Set LATENCY_EXPECTED to a unique transcript marker."; \
+		echo "Example: make latency-harness-app-run LATENCY_EXPECTED='roma latency marker'"; \
+		exit 2; \
+	fi
+	@rm -f "$(LATENCY_HARNESS_REPORT)" "$(LATENCY_HARNESS_STDOUT)" "$(LATENCY_HARNESS_STDERR)"
+	open -W -n \
+		-o "$(LATENCY_HARNESS_STDOUT)" \
+		--stderr "$(LATENCY_HARNESS_STDERR)" \
+		"$(LATENCY_HARNESS_APP)" \
+		--args \
+		--expected "$(LATENCY_EXPECTED)" \
+		--samples "$(LATENCY_SAMPLES)" \
+		--trigger "$(LATENCY_TRIGGER)" \
+		--threshold-ms "$(LATENCY_THRESHOLD_MS)" \
+		--json-output "$(LATENCY_HARNESS_REPORT)"
+	@if [ -s "$(LATENCY_HARNESS_STDOUT)" ]; then cat "$(LATENCY_HARNESS_STDOUT)"; fi
+	@if [ -s "$(LATENCY_HARNESS_STDERR)" ]; then cat "$(LATENCY_HARNESS_STDERR)" >&2; fi
+	@if [ ! -f "$(LATENCY_HARNESS_REPORT)" ]; then \
+		echo "No latency JSON report written. Check $(LATENCY_HARNESS_STDOUT) and $(LATENCY_HARNESS_STDERR)."; \
+		exit 1; \
+	fi
+	@PASSED=$$(plutil -extract passed raw -o - "$(LATENCY_HARNESS_REPORT)" 2>/dev/null || echo false); \
+	if [ "$$PASSED" != "true" ]; then \
+		echo "Latency harness failed. Report: $(LATENCY_HARNESS_REPORT)"; \
+		exit 1; \
+	fi
 
 # Build process
 whisper:
@@ -140,6 +186,8 @@ help:
 	@echo "  dev                Build and run the app (for development)"
 	@echo "  all                Run full build process (default)"
 	@echo "  latency-harness-build  Compile real visible-text latency harness"
-	@echo "  latency-harness-run    Run opt-in real app latency samples; set LATENCY_EXPECTED"
+	@echo "  latency-harness-app    Build stable signed helper app for TCC grants"
+	@echo "  latency-harness-run    Run CLI latency samples; set LATENCY_EXPECTED"
+	@echo "  latency-harness-app-run Run helper-app latency samples; set LATENCY_EXPECTED"
 	@echo "  clean              Remove build artifacts"
 	@echo "  help               Show this help message"

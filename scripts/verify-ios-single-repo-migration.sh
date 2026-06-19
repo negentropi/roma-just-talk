@@ -2746,6 +2746,88 @@ require_pattern \
   docs/ios-single-repo-migration.md
 
 require_pattern \
+  "shared paste method preference owns raw storage key" \
+  'userDefaultsKey = "pasteMethod"' \
+  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+
+require_pattern \
+  "shared paste method preference owns legacy AppleScript migration key" \
+  'legacyAppleScriptPasteKey = "useAppleScriptPaste"' \
+  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+
+require_pattern \
+  "shared paste method preference owns display labels" \
+  'public var displayName' \
+  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+
+require_pattern \
+  "shared clipboard restore preference owns enabled storage key" \
+  'restoreClipboardAfterPasteKey = "restoreClipboardAfterPaste"' \
+  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+
+require_pattern \
+  "shared clipboard restore preference owns delay storage key" \
+  'clipboardRestoreDelayKey = "clipboardRestoreDelay"' \
+  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+
+require_pattern \
+  "shared clipboard restore preference owns bounded delay" \
+  'minimumClipboardRestoreDelay' \
+  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+
+require_pattern \
+  "macOS paste adapter uses shared paste method preference" \
+  'VoiceInkPasteMethod\.current\(\)' \
+  VoiceInk/Paste/CursorPaster.swift
+
+require_pattern \
+  "macOS paste adapter uses shared clipboard restore preference" \
+  'VoiceInkPastePreference\.(shouldRestoreClipboardAfterPaste|boundedClipboardRestoreDelay)' \
+  VoiceInk/Paste/CursorPaster.swift
+
+require_pattern \
+  "macOS settings uses shared paste preferences" \
+  'VoiceInkPastePreference\.(restoreClipboardAfterPasteKey|clipboardRestoreDelayKey|defaultRestoreClipboardAfterPaste|defaultClipboardRestoreDelay)|VoiceInkPasteMethod\.(userDefaultsKey|standard|allCases|setCurrent)' \
+  VoiceInk/Views/Settings/SettingsView.swift
+
+require_pattern \
+  "macOS defaults register shared paste defaults" \
+  'VoiceInkPastePreference\.registeredDefaults|VoiceInkPasteMethod\.migrateLegacyUserDefaultIfNeeded' \
+  VoiceInk/AppDefaults.swift
+
+require_pattern \
+  "macOS diagnostics use shared paste preferences" \
+  'VoiceInkPastePreference\.(shouldRestoreClipboardAfterPaste|clipboardRestoreDelay)|VoiceInkPasteMethod\.current' \
+  VoiceInk/Services/SystemInfoService.swift
+
+require_pattern \
+  "macOS backup export uses shared paste preferences" \
+  'VoiceInkPastePreference\.(shouldRestoreClipboardAfterPaste|clipboardRestoreDelay)' \
+  VoiceInk/Services/ImportExportService.swift
+
+require_pattern \
+  "macOS backup import uses shared paste preferences" \
+  'VoiceInkPastePreference\.save(ShouldRestoreClipboardAfterPaste|ClipboardRestoreDelay)' \
+  VoiceInk/Services/BackupImporter.swift
+
+reject_file VoiceInk/Paste/PasteMethod.swift
+
+reject_pattern \
+  "macOS paste shells avoid raw paste preference keys" \
+  '"(restoreClipboardAfterPaste|clipboardRestoreDelay|pasteMethod|useAppleScriptPaste)"|minimumClipboardRestoreDelay|(^|[^[:alnum:]_])PasteMethod([^[:alnum:]_]|$)' \
+  VoiceInk/Paste/CursorPaster.swift \
+  VoiceInk/Views/Settings/SettingsView.swift \
+  VoiceInk/AppDefaults.swift \
+  VoiceInk/Services/SystemInfoService.swift \
+  VoiceInk/Services/ImportExportService.swift \
+  VoiceInk/Services/BackupImporter.swift
+
+require_pattern \
+  "migration checklist tracks shared paste preference gate" \
+  'macOS paste method and clipboard restore settings route through `VoiceInkPasteMethod`/`VoiceInkPastePreference`' \
+  docs/ios-single-repo-migration.md
+
+require_pattern \
   "shared transcription run result carries post-processing enhancement result" \
   'postProcessingResult: VoiceInkAIEnhancementResult\?' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift

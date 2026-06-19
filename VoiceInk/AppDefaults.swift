@@ -14,14 +14,9 @@ enum AppDefaults {
             currentTranscriptionModel: "parakeet-tdt-0.6b-v2"
         )
 
-        defaults.merge([
+        var platformDefaults: [String: Any] = [
             // Onboarding & General
             "enableAnnouncements": true,
-
-            // Clipboard
-            "restoreClipboardAfterPaste": true,
-            "clipboardRestoreDelay": 2.0,
-            "useAppleScriptPaste": false,
 
             // Audio & Media
             "systemMuteMode": SystemMuteMode.automatic.rawValue,
@@ -57,7 +52,10 @@ enum AppDefaults {
 
             // Model
             "PrewarmModelOnWake": true,
-        ], uniquingKeysWith: { _, platformValue in platformValue })
+        ]
+
+        platformDefaults.merge(VoiceInkPastePreference.registeredDefaults) { _, sharedValue in sharedValue }
+        defaults.merge(platformDefaults, uniquingKeysWith: { _, platformValue in platformValue })
 
         return defaults
     }
@@ -75,6 +73,6 @@ enum AppDefaults {
         }
 
         PunctuationCleanupMode.migrateLegacyUserDefaultIfNeeded()
-        PasteMethod.migrateLegacyUserDefaultIfNeeded()
+        VoiceInkPasteMethod.migrateLegacyUserDefaultIfNeeded()
     }
 }

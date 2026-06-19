@@ -24,8 +24,6 @@ class CursorPaster {
         }
     }
 
-    private static let minimumClipboardRestoreDelay: TimeInterval = 0.25
-
     static func pasteAtCursor(_ text: String) {
         Task {
             let pasteTask = await MainActor.run {
@@ -58,7 +56,7 @@ class CursorPaster {
 
     @MainActor
     static func preparePasteContext() -> PreparedPasteContext? {
-        guard UserDefaults.standard.bool(forKey: "restoreClipboardAfterPaste") else {
+        guard VoiceInkPastePreference.shouldRestoreClipboardAfterPaste() else {
             return nil
         }
 
@@ -75,7 +73,7 @@ class CursorPaster {
         preparedContext: PreparedPasteContext? = nil
     ) async -> PasteResult {
         let pasteboard = NSPasteboard.general
-        let shouldRestoreClipboard = UserDefaults.standard.bool(forKey: "restoreClipboardAfterPaste")
+        let shouldRestoreClipboard = VoiceInkPastePreference.shouldRestoreClipboardAfterPaste()
         let savedContents: ClipboardSnapshot = if shouldRestoreClipboard {
             if let preparedContext,
                preparedContext.changeCount == pasteboard.changeCount {
@@ -129,7 +127,7 @@ class CursorPaster {
             return await pasteCommandPosterForTesting()
         }
 
-        if PasteMethod.current() == .appleScript {
+        if VoiceInkPasteMethod.current() == .appleScript {
             return pasteUsingAppleScript() ? .commandPosted : .commandNotPosted
         } else {
             return await pasteFromClipboard()
@@ -142,10 +140,7 @@ class CursorPaster {
         sessionID: String,
         on pasteboard: NSPasteboard
     ) {
-        let delay = max(
-            UserDefaults.standard.double(forKey: "clipboardRestoreDelay"),
-            minimumClipboardRestoreDelay
-        )
+        let delay = VoiceInkPastePreference.boundedClipboardRestoreDelay()
 
         Task { @MainActor in
             await wait(delay)

@@ -19,9 +19,9 @@ struct SettingsView: View {
     @ObservedObject private var playbackController = PlaybackController.shared
     @AppStorage(VoiceInkUserDefaultsKey.hasCompletedOnboarding) private var hasCompletedOnboarding = true
     @AppStorage("enableAnnouncements") private var enableAnnouncements = true
-    @AppStorage("restoreClipboardAfterPaste") private var restoreClipboardAfterPaste = true
-    @AppStorage("clipboardRestoreDelay") private var clipboardRestoreDelay = 2.0
-    @AppStorage(PasteMethod.userDefaultsKey) private var pasteMethodRawValue = PasteMethod.standard.rawValue
+    @AppStorage(VoiceInkPastePreference.restoreClipboardAfterPasteKey) private var restoreClipboardAfterPaste = VoiceInkPastePreference.defaultRestoreClipboardAfterPaste
+    @AppStorage(VoiceInkPastePreference.clipboardRestoreDelayKey) private var clipboardRestoreDelay = VoiceInkPastePreference.defaultClipboardRestoreDelay
+    @AppStorage(VoiceInkPasteMethod.userDefaultsKey) private var pasteMethodRawValue = VoiceInkPasteMethod.standard.rawValue
     @AppStorage(AppDefaults.Keys.showMenuBarIcon) private var showMenuBarIcon = AppDefaults.showMenuBarIconDefault
     @State private var showResetOnboardingAlert = false
     @State private var hasCancelRecordingShortcut = ShortcutStore.shortcut(for: .cancelRecorder) != nil
@@ -202,7 +202,7 @@ struct SettingsView: View {
 
                 // Paste Method
                 Picker(selection: $pasteMethodRawValue) {
-                    ForEach(PasteMethod.allCases) { method in
+                    ForEach(VoiceInkPasteMethod.allCases) { method in
                         Text(method.displayName).tag(method.rawValue)
                     }
                 } label: {
@@ -213,11 +213,11 @@ struct SettingsView: View {
                 }
                 .pickerStyle(.menu)
                 .onChange(of: pasteMethodRawValue) { _, newValue in
-                    guard let method = PasteMethod(rawValue: newValue) else {
-                        pasteMethodRawValue = PasteMethod.standard.rawValue
+                    guard let method = VoiceInkPasteMethod(rawValue: newValue) else {
+                        pasteMethodRawValue = VoiceInkPasteMethod.standard.rawValue
                         return
                     }
-                    PasteMethod.setCurrent(method)
+                    VoiceInkPasteMethod.setCurrent(method)
                 }
             }
 

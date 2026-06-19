@@ -61,9 +61,9 @@ class SystemInfoService {
         Audio Resumption Delay: \(UserDefaults.standard.double(forKey: "audioResumptionDelay"))s
 
         CLIPBOARD & PASTE SETTINGS:
-        Restore Clipboard After Paste: \(UserDefaults.standard.bool(forKey: "restoreClipboardAfterPaste"))
-        Clipboard Restore Delay: \(UserDefaults.standard.double(forKey: "clipboardRestoreDelay"))s
-        Paste Method: \(PasteMethod.current().displayName)
+        Restore Clipboard After Paste: \(VoiceInkPastePreference.shouldRestoreClipboardAfterPaste())
+        Clipboard Restore Delay: \(VoiceInkPastePreference.clipboardRestoreDelay())s
+        Paste Method: \(VoiceInkPasteMethod.current().displayName)
 
         POWER MODE:
         Power Mode Enabled: \(UserDefaults.standard.bool(forKey: "powerModeUIFlag"))

@@ -192,10 +192,10 @@ enum BackupImporter {
             VoiceInkTranscriptionCleanupPreferenceStorage.saveLowercaseTranscription(lowercaseTranscription)
         }
         if let restoreClipboard = general.restoreClipboardAfterPaste {
-            UserDefaults.standard.set(restoreClipboard, forKey: "restoreClipboardAfterPaste")
+            VoiceInkPastePreference.saveShouldRestoreClipboardAfterPaste(restoreClipboard)
         }
         if let clipboardDelay = general.clipboardRestoreDelay {
-            UserDefaults.standard.set(clipboardDelay, forKey: "clipboardRestoreDelay")
+            VoiceInkPastePreference.saveClipboardRestoreDelay(clipboardDelay)
         }
         importRollingBufferSettings(general)
 

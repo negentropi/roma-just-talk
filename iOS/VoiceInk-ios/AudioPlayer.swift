@@ -76,7 +76,7 @@ final class AudioPlayer: ObservableObject {
     }
     
     private func startTimer() {
-        timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
+        timer = Timer.scheduledTimer(withTimeInterval: VoiceInkAudioPlaybackTimeline.updateInterval, repeats: true) { [weak self] _ in
             Task { @MainActor in
                 guard let self = self, let player = self.audioPlayer else { return }
                 self.currentTime = player.currentTime

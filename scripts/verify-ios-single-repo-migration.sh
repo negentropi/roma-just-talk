@@ -2372,6 +2372,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
 
 require_pattern \
+  "shared audio playback timeline owns update cadence" \
+  'updateInterval' \
+  VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
+
+require_pattern \
   "shared audio playback presentation lives in VoiceInkCore" \
   'VoiceInkAudioPlaybackPresentation|timestampSystemImageName|durationSystemImageName' \
   VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
@@ -2387,6 +2392,11 @@ require_pattern \
   iOS/VoiceInk-ios/AudioPlayer.swift
 
 require_pattern \
+  "iOS audio player shell uses shared playback update cadence" \
+  'VoiceInkAudioPlaybackTimeline\.updateInterval' \
+  iOS/VoiceInk-ios/AudioPlayer.swift
+
+require_pattern \
   "iOS audio player view uses shared playback-rate policy" \
   'VoiceInkAudioPlaybackRate' \
   iOS/VoiceInk-ios/AudioPlayerView.swift
@@ -2394,6 +2404,11 @@ require_pattern \
 require_pattern \
   "macOS audio player uses shared playback presentation" \
   'VoiceInkAudioPlaybackPresentation' \
+  VoiceInk/Views/AudioPlayerView.swift
+
+require_pattern \
+  "macOS audio player uses shared playback update cadence" \
+  'VoiceInkAudioPlaybackTimeline\.updateInterval' \
   VoiceInk/Views/AudioPlayerView.swift
 
 require_pattern \
@@ -2427,6 +2442,12 @@ reject_pattern \
   VoiceInk/Views/AudioPlayerView.swift \
   iOS/VoiceInk-ios/AudioPlayer.swift \
   iOS/VoiceInk-ios/AudioPlayerView.swift
+
+reject_pattern \
+  "platform audio players avoid shell-only playback update cadence" \
+  'withTimeInterval: +0\.1' \
+  VoiceInk/Views/AudioPlayerView.swift \
+  iOS/VoiceInk-ios/AudioPlayer.swift
 
 reject_pattern \
   "platform audio player views avoid duplicate loading and play-pause presentation" \

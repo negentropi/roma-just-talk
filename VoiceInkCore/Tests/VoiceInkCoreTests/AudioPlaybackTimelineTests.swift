@@ -48,6 +48,10 @@ final class AudioPlaybackTimelineTests: XCTestCase {
         XCTAssertEqual(VoiceInkAudioPlaybackTimeline.sampleProgress(index: 1, sampleCount: 0), 0)
     }
 
+    func testTimelineUpdateIntervalPreservesPlatformAudioPlayerCadence() {
+        XCTAssertEqual(VoiceInkAudioPlaybackTimeline.updateInterval, 0.1)
+    }
+
     func testPlaybackRateRestoresExistingPositiveMacOSValues() {
         XCTAssertEqual(VoiceInkAudioPlaybackRate.restoredRate(0), 1.0)
         XCTAssertEqual(VoiceInkAudioPlaybackRate.restoredRate(-1), 1.0)

@@ -1,6 +1,8 @@
 import Foundation
 
 public enum VoiceInkAudioPlaybackTimeline {
+    public static let updateInterval: TimeInterval = 0.1
+
     public static func progress(
         currentTime: TimeInterval,
         duration: TimeInterval

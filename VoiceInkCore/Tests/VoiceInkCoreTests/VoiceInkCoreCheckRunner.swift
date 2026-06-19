@@ -96,6 +96,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testTimeAtLocationUsesClampedLocationProgress", run: { AudioPlaybackTimelineTests().testTimeAtLocationUsesClampedLocationProgress() }),
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testClampedTimeBoundsDirectSeekRequests", run: { AudioPlaybackTimelineTests().testClampedTimeBoundsDirectSeekRequests() }),
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testSampleProgressUsesStableWaveformPosition", run: { AudioPlaybackTimelineTests().testSampleProgressUsesStableWaveformPosition() }),
+            VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testTimelineUpdateIntervalPreservesPlatformAudioPlayerCadence", run: { AudioPlaybackTimelineTests().testTimelineUpdateIntervalPreservesPlatformAudioPlayerCadence() }),
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testPlaybackRateRestoresExistingPositiveMacOSValues", run: { AudioPlaybackTimelineTests().testPlaybackRateRestoresExistingPositiveMacOSValues() }),
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testPlaybackRateCyclesThroughExistingMacOSOrder", run: { AudioPlaybackTimelineTests().testPlaybackRateCyclesThroughExistingMacOSOrder() }),
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testPlaybackRateLabelsPreserveExistingMacOSPresentation", run: { AudioPlaybackTimelineTests().testPlaybackRateLabelsPreserveExistingMacOSPresentation() }),

@@ -200,6 +200,8 @@ for icon in 20.png 29.png 40.png 50.png 57.png 58.png 60.png 72.png 76.png 80.pn
   require_file "iOS/VoiceInk-ios/Assets.xcassets/AppIcon.appiconset/$icon"
 done
 reject_file iOS/.github/workflows/deploy.yml
+reject_file iOS/.nojekyll
+reject_file iOS/tasks.md
 
 section "obsolete iOS clone-side duplicates stay deleted"
 for file in "${obsolete_ios_clone_files[@]}"; do

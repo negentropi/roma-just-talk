@@ -11,7 +11,7 @@
 - iOS non-Swift app artifacts: `iOS/VoiceInk-ios/PrivacyInfo.xcprivacy`, `iOS/VoiceInk-ios/Assets.xcassets/`, and `iOS/VoiceInk-ios/Resources/ggml-silero-v5.1.2.bin`
 - shared Swift package: `VoiceInkCore/`
 - workspace entry for both app projects: `VoiceInk.xcworkspace`
-- standalone clone workflow artifacts such as `iOS/.github/workflows/deploy.yml` are intentionally absent; repo automation belongs at `VoiceInk/.github/` if it is needed later.
+- standalone clone setup/Pages artifacts such as `iOS/.github/workflows/deploy.yml`, `iOS/.nojekyll`, and `iOS/tasks.md` are intentionally absent; repo automation belongs at `VoiceInk/.github/` if it is needed later.
 
 Both app projects reference the in-repo package:
 
@@ -330,7 +330,7 @@ scripts/verify-ios-single-repo-migration.sh --full-build
 15. Obsolete clone-side Swift duplicates remain absent from `iOS/VoiceInk-ios/`.
 16. When `../VoiceInk-iOS` exists, every sibling-only Swift file under `VoiceInk-ios/` is one of the documented obsolete/replaced files above, and the sibling keyboard/unit-test/UI-test target folders have no sibling-only Swift files.
 17. Legacy same-file clone shims remain absent from the in-repo iOS app and keyboard: `TranscriptionServiceFactory`, `LLMPostProcessor`, the old local `RecordingState`, raw `voiceink://record` URL construction, `Open VoiceInk` keyboard copy, and old `AppSettings` effective-provider/model accessors.
-18. Standalone clone CI/web deployment files such as `iOS/.github/workflows/deploy.yml` remain absent from the in-repo iOS subtree.
+18. Standalone clone setup/Pages files such as `iOS/.github/workflows/deploy.yml`, `iOS/.nojekyll`, and `iOS/tasks.md` remain absent from the in-repo iOS subtree.
 19. iOS recording background transcription delegates stored-audio completion/failure updates to `VoiceInkMutableTranscriptionRecord.retranscribeStoredAudio` instead of duplicating record-state writes in `RecordingManager`.
 20. macOS and iOS live recording build pending rows through `VoiceInkRecordingTranscriptionDraft.pending`, and macOS canceled recordings build through `VoiceInkRecordingTranscriptionDraft.canceled`.
 21. iOS live recording delegates timestamped filename construction and PCM16 recorder format constants to `VoiceInkStoredAudioFile` and `VoiceInkPCM16Audio`.

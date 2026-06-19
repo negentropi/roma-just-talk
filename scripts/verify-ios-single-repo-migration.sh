@@ -296,6 +296,26 @@ reject_pattern \
   iOS/VoiceInkKeyboard
 
 require_pattern \
+  "shared transcript export owns localized date style" \
+  'dateStyle = \.medium' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptFileExport.swift
+
+require_pattern \
+  "shared transcript export owns localized time style" \
+  'timeStyle = \.short' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptFileExport.swift
+
+require_pattern \
+  "macOS save button uses shared timestamped markdown export" \
+  'VoiceInkTranscriptFileExport\.markdownContent\(for: textToSave\)' \
+  VoiceInk/Views/Common/SaveIconButton.swift
+
+reject_pattern \
+  "macOS save button avoids shell-owned transcript export date formatting" \
+  'DateFormatter|localizedString' \
+  VoiceInk/Views/Common/SaveIconButton.swift
+
+require_pattern \
   "shared recording state exposes active-recording predicate" \
   'var +isActivelyRecording: +Bool' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift

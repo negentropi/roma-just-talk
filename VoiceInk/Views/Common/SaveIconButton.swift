@@ -48,7 +48,6 @@ struct SaveIconButton: View {
     }
 
     private func markdownContent() -> String {
-        let timestamp = DateFormatter.localizedString(from: Date(), dateStyle: .medium, timeStyle: .short)
-        return VoiceInkTranscriptFileExport.markdownContent(for: textToSave, timestamp: timestamp)
+        VoiceInkTranscriptFileExport.markdownContent(for: textToSave)
     }
 }

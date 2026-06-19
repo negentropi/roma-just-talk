@@ -619,6 +619,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "TranscriptFileExportTests.testSuggestedBaseFilenamePreservesMacOSWordSelectionPolicy", run: { TranscriptFileExportTests().testSuggestedBaseFilenamePreservesMacOSWordSelectionPolicy() }),
             VoiceInkCoreCheck(name: "TranscriptFileExportTests.testSuggestedBaseFilenameSanitizesAndLimitsLength", run: { TranscriptFileExportTests().testSuggestedBaseFilenameSanitizesAndLimitsLength() }),
             VoiceInkCoreCheck(name: "TranscriptFileExportTests.testMarkdownContentPreservesMacOSBodyShape", run: { TranscriptFileExportTests().testMarkdownContentPreservesMacOSBodyShape() }),
+            VoiceInkCoreCheck(name: "TranscriptFileExportTests.testMarkdownContentFormatsTimestampInSharedCore", run: { TranscriptFileExportTests().testMarkdownContentFormatsTimestampInSharedCore() }),
             VoiceInkCoreCheck(name: "TranscriptParagraphFormatterTests.testFormatReturnsEmptyForWhitespaceOnlyInput", run: { TranscriptParagraphFormatterTests().testFormatReturnsEmptyForWhitespaceOnlyInput() }),
             VoiceInkCoreCheck(name: "TranscriptParagraphFormatterTests.testFormatTrimsAndKeepsShortTextInOneParagraph", run: { TranscriptParagraphFormatterTests().testFormatTrimsAndKeepsShortTextInOneParagraph() }),
             VoiceInkCoreCheck(name: "TranscriptParagraphFormatterTests.testFormatSplitsAfterFourSignificantSentencesWhenChunkHitsWordTarget", run: { TranscriptParagraphFormatterTests().testFormatSplitsAfterFourSignificantSentencesWhenChunkHitsWordTarget() }),

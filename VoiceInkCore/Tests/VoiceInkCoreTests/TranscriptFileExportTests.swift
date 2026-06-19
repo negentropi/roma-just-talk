@@ -62,4 +62,33 @@ final class TranscriptFileExportTests: XCTestCase {
             """
         )
     }
+
+    func testMarkdownContentFormatsTimestampInSharedCore() {
+        let timeZone = TimeZone(secondsFromGMT: 0)!
+        let date = DateComponents(
+            calendar: Calendar(identifier: .gregorian),
+            timeZone: timeZone,
+            year: 2026,
+            month: 6,
+            day: 18,
+            hour: 12,
+            minute: 34
+        ).date!
+
+        XCTAssertEqual(
+            VoiceInkTranscriptFileExport.markdownContent(
+                for: "Shared export.",
+                date: date,
+                locale: Locale(identifier: "en_GB"),
+                timeZone: timeZone
+            ),
+            """
+            # Transcription
+
+            **Date:** 18 Jun 2026 at 12:34
+
+            Shared export.
+            """
+        )
+    }
 }

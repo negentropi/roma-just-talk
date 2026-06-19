@@ -24,6 +24,18 @@ public enum VoiceInkTranscriptFileExport {
         return fileName.isEmpty ? defaultBaseFilename : String(fileName.prefix(50))
     }
 
+    public static func markdownContent(
+        for text: String,
+        date: Date = Date(),
+        locale: Locale = .current,
+        timeZone: TimeZone = .current
+    ) -> String {
+        markdownContent(
+            for: text,
+            timestamp: timestampString(for: date, locale: locale, timeZone: timeZone)
+        )
+    }
+
     public static func markdownContent(for text: String, timestamp: String) -> String {
         """
         # Transcription
@@ -32,5 +44,14 @@ public enum VoiceInkTranscriptFileExport {
 
         \(text)
         """
+    }
+
+    static func timestampString(for date: Date, locale: Locale, timeZone: TimeZone) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = locale
+        formatter.timeZone = timeZone
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        return formatter.string(from: date)
     }
 }

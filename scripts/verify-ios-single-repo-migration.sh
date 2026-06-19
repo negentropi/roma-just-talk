@@ -2834,6 +2834,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
 
 require_pattern \
+  "shared Power Mode no-transcription-models form copy lives in VoiceInkCore" \
+  'noTranscriptionModelsAvailableText' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
+
+require_pattern \
   "shared Power Mode row detail presentation lives in VoiceInkCore" \
   'VoiceInkPowerModeRowDetailPresentation|rowDetailPresentation' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
@@ -2868,10 +2873,20 @@ require_pattern \
   'VoiceInkPowerModePresentation\.validationAlert\(errors:' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
+require_pattern \
+  "macOS Power Mode edit form uses shared no-transcription-models copy" \
+  'VoiceInkPowerModePresentation\.noTranscriptionModelsAvailableText' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
 reject_pattern \
   "macOS Power Mode rows avoid shell-only selected-language fallback formatting" \
   'langCode == "auto"|langCode == "en"|langCode\.uppercased\(\)' \
   VoiceInk/PowerMode/PowerModeViewComponents.swift
+
+reject_pattern \
+  "macOS Power Mode edit form avoids duplicate no-transcription-models copy" \
+  'No transcription models available\. Please connect to a cloud service or download a local model in the AI Models tab\.' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
 
 reject_pattern \
   "macOS Power Mode rows avoid shell-only trigger-count pluralization" \

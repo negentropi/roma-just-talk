@@ -400,6 +400,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PowerModePresentationTests.testDeleteConfirmationPreservesPowerModeCopy", run: { PowerModePresentationTests().testDeleteConfirmationPreservesPowerModeCopy() }),
             VoiceInkCoreCheck(name: "PowerModePresentationTests.testValidationAlertPreservesFirstPowerModeErrorCopy", run: { PowerModePresentationTests().testValidationAlertPreservesFirstPowerModeErrorCopy() }),
             VoiceInkCoreCheck(name: "PowerModePresentationTests.testValidationAlertPreservesFallbackCopy", run: { PowerModePresentationTests().testValidationAlertPreservesFallbackCopy() }),
+            VoiceInkCoreCheck(name: "PowerModePresentationTests.testNoTranscriptionModelsAvailableTextPreservesMacOSFormCopy", run: { PowerModePresentationTests().testNoTranscriptionModelsAvailableTextPreservesMacOSFormCopy() }),
             VoiceInkCoreCheck(name: "PowerModePresentationTests.testRowDetailPresentationPreservesDefaultBandWithoutVisibleChips", run: { PowerModePresentationTests().testRowDetailPresentationPreservesDefaultBandWithoutVisibleChips() }),
             VoiceInkCoreCheck(name: "PowerModePresentationTests.testRowDetailPresentationPreservesMacOSChipOrderAndText", run: { PowerModePresentationTests().testRowDetailPresentationPreservesMacOSChipOrderAndText() }),
             VoiceInkCoreCheck(name: "PowerModePresentationTests.testRowDetailPresentationFallsBackToDefaultPromptAndSkipsBlankAIModel", run: { PowerModePresentationTests().testRowDetailPresentationFallsBackToDefaultPromptAndSkipsBlankAIModel() }),

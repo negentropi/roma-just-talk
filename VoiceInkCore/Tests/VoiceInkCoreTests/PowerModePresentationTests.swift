@@ -85,6 +85,13 @@ final class PowerModePresentationTests: XCTestCase {
         XCTAssertEqual(alert.buttonTitle, "OK")
     }
 
+    func testNoTranscriptionModelsAvailableTextPreservesMacOSFormCopy() {
+        XCTAssertEqual(
+            VoiceInkPowerModePresentation.noTranscriptionModelsAvailableText,
+            "No transcription models available. Please connect to a cloud service or download a local model in the AI Models tab."
+        )
+    }
+
     func testRowDetailPresentationPreservesDefaultBandWithoutVisibleChips() {
         let config = PowerModeConfig(
             name: "Writing",

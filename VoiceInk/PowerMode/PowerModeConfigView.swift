@@ -293,7 +293,7 @@ struct ConfigurationView: View {
 
                 Section("Transcription") {
                     if transcriptionModelManager.usableModels.isEmpty {
-                        Text("No transcription models available. Please connect to a cloud service or download a local model in the AI Models tab.")
+                        Text(VoiceInkPowerModePresentation.noTranscriptionModelsAvailableText)
                             .foregroundColor(.secondary)
                     } else {
                         let modelBinding = Binding<String?>(

@@ -76,6 +76,7 @@ public enum VoiceInkPowerModePresentation {
     public static let validationAlertFallbackMessage = "Please fix the validation errors before saving."
     public static let contextAwarenessDisplayText = "Context Awareness"
     public static let defaultPromptDisplayText = "AI"
+    public static let noTranscriptionModelsAvailableText = "No transcription models available. Please connect to a cloud service or download a local model in the AI Models tab."
 
     public static func displayName(name: String?, emoji: String?) -> String {
         switch (emoji?.trimmingCharacters(in: .whitespacesAndNewlines), name?.trimmingCharacters(in: .whitespacesAndNewlines)) {

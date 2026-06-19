@@ -434,15 +434,10 @@ struct ConfigurationView: View {
 
                     let providerBinding = Binding<VoiceInkAIEnhancementProviderKind>(
                         get: {
-                            if let providerName = selectedAIProvider,
-                               let provider = VoiceInkAIEnhancementProviderKind(storedValue: providerName) {
-                                return provider
-                            }
-                            return aiService.selectedProvider
+                            enhancementSelection.resolvedProviderForPicker(currentProvider: aiService.selectedProvider)
                         },
                         set: { newValue in
-                            selectedAIProvider = newValue.rawValue
-                            selectedAIModel = nil
+                            applyEnhancementSelection(enhancementSelection.selectingProvider(newValue))
                         }
                     )
 
@@ -459,15 +454,16 @@ struct ConfigurationView: View {
                                     Text(provider.rawValue).tag(provider)
                                 }
                             }
-                            .onChange(of: selectedAIProvider) { _, newValue in
-                                if let provider = newValue.flatMap({ VoiceInkAIEnhancementProviderKind(storedValue: $0) }) {
-                                    selectedAIModel = provider.defaultModel
-                                }
+                            .onChange(of: selectedAIProvider) { _, _ in
+                                applyEnhancementSelection(
+                                    enhancementSelection.selectingDefaultModelForSelectedProvider { provider in
+                                        provider.defaultModel
+                                    }
+                                )
                             }
                         }
 
-                        let providerName = selectedAIProvider ?? aiService.selectedProvider.rawValue
-                        if let provider = VoiceInkAIEnhancementProviderKind(storedValue: providerName),
+                        if let provider = enhancementSelection.selectedProviderForModelOptions(currentProvider: aiService.selectedProvider),
                            provider != .custom {
                             let models = aiService.availableModels(for: provider)
                             if models.isEmpty {
@@ -479,11 +475,10 @@ struct ConfigurationView: View {
                             } else {
                                 let modelBinding = Binding<String>(
                                     get: {
-                                        if let model = selectedAIModel, !model.isEmpty { return model }
-                                        return aiService.currentModel
+                                        enhancementSelection.selectedModelForPicker(currentModel: aiService.currentModel)
                                     },
                                     set: { newModelValue in
-                                        selectedAIModel = newModelValue
+                                        applyEnhancementSelection(enhancementSelection.selectingModel(newModelValue))
                                     }
                                 )
 

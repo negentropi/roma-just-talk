@@ -233,6 +233,56 @@ public struct VoiceInkPowerModeEnhancementSelection: Equatable, Sendable {
         )
     }
 
+    public func resolvedProviderForPicker(
+        currentProvider: VoiceInkAIEnhancementProviderKind
+    ) -> VoiceInkAIEnhancementProviderKind {
+        selectedProviderKind ?? currentProvider
+    }
+
+    public func selectedProviderForModelOptions(
+        currentProvider: VoiceInkAIEnhancementProviderKind
+    ) -> VoiceInkAIEnhancementProviderKind? {
+        selectedAIProvider == nil ? currentProvider : selectedProviderKind
+    }
+
+    public func selectingProvider(_ provider: VoiceInkAIEnhancementProviderKind) -> Self {
+        Self(
+            selectedPromptId: selectedPromptId,
+            selectedAIProvider: provider.rawValue,
+            selectedAIModel: nil
+        )
+    }
+
+    public func selectingDefaultModelForSelectedProvider(
+        defaultModelForProvider: (VoiceInkAIEnhancementProviderKind) -> String
+    ) -> Self {
+        guard let selectedProviderKind else {
+            return self
+        }
+
+        return Self(
+            selectedPromptId: selectedPromptId,
+            selectedAIProvider: selectedAIProvider,
+            selectedAIModel: defaultModelForProvider(selectedProviderKind)
+        )
+    }
+
+    public func selectedModelForPicker(currentModel: String) -> String {
+        guard let selectedAIModel, !selectedAIModel.isEmpty else {
+            return currentModel
+        }
+
+        return selectedAIModel
+    }
+
+    public func selectingModel(_ model: String) -> Self {
+        Self(
+            selectedPromptId: selectedPromptId,
+            selectedAIProvider: selectedAIProvider,
+            selectedAIModel: model
+        )
+    }
+
     public func selectingPromptAfterEnabling(prompts: [VoiceInkCustomPrompt]) -> Self {
         Self(
             selectedPromptId: VoiceInkCustomPromptPolicy.selectedPromptIdAfterEnablingEnhancement(
@@ -242,6 +292,10 @@ public struct VoiceInkPowerModeEnhancementSelection: Equatable, Sendable {
             selectedAIProvider: selectedAIProvider,
             selectedAIModel: selectedAIModel
         )
+    }
+
+    private var selectedProviderKind: VoiceInkAIEnhancementProviderKind? {
+        selectedAIProvider.flatMap(VoiceInkAIEnhancementProviderKind.init(storedValue:))
     }
 }
 

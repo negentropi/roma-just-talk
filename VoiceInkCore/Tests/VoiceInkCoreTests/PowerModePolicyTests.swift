@@ -393,6 +393,71 @@ final class PowerModePolicyTests: XCTestCase {
         )
     }
 
+    func testPowerModeEnhancementSelectionResolvesProviderPickerAndModelOptions() {
+        let missingSelection = VoiceInkPowerModeEnhancementSelection(
+            selectedPromptId: nil,
+            selectedAIProvider: nil,
+            selectedAIModel: nil
+        )
+        let legacySelection = VoiceInkPowerModeEnhancementSelection(
+            selectedPromptId: nil,
+            selectedAIProvider: "GROQ",
+            selectedAIModel: nil
+        )
+        let invalidSelection = VoiceInkPowerModeEnhancementSelection(
+            selectedPromptId: nil,
+            selectedAIProvider: "MissingProvider",
+            selectedAIModel: nil
+        )
+
+        XCTAssertEqual(missingSelection.resolvedProviderForPicker(currentProvider: .gemini), .gemini)
+        XCTAssertEqual(missingSelection.selectedProviderForModelOptions(currentProvider: .gemini), .gemini)
+        XCTAssertEqual(legacySelection.resolvedProviderForPicker(currentProvider: .gemini), .groq)
+        XCTAssertEqual(legacySelection.selectedProviderForModelOptions(currentProvider: .gemini), .groq)
+        XCTAssertEqual(invalidSelection.resolvedProviderForPicker(currentProvider: .gemini), .gemini)
+        XCTAssertNil(invalidSelection.selectedProviderForModelOptions(currentProvider: .gemini))
+    }
+
+    func testPowerModeEnhancementSelectionUpdatesProviderAndModelSelection() {
+        let selection = VoiceInkPowerModeEnhancementSelection(
+            selectedPromptId: UUID(),
+            selectedAIProvider: "Groq",
+            selectedAIModel: "llama-3.3"
+        )
+        let emptyModelSelection = VoiceInkPowerModeEnhancementSelection(
+            selectedPromptId: nil,
+            selectedAIProvider: "Groq",
+            selectedAIModel: ""
+        )
+        let nilModelSelection = VoiceInkPowerModeEnhancementSelection(
+            selectedPromptId: nil,
+            selectedAIProvider: "Groq",
+            selectedAIModel: nil
+        )
+        let invalidProviderSelection = VoiceInkPowerModeEnhancementSelection(
+            selectedPromptId: nil,
+            selectedAIProvider: "MissingProvider",
+            selectedAIModel: "kept"
+        )
+
+        XCTAssertEqual(selection.selectingProvider(.openAI).selectedAIProvider, "OpenAI")
+        XCTAssertNil(selection.selectingProvider(.openAI).selectedAIModel)
+        XCTAssertEqual(
+            selection.selectingProvider(.openAI)
+                .selectingDefaultModelForSelectedProvider { provider in "\(provider.rawValue)-default" }
+                .selectedAIModel,
+            "OpenAI-default"
+        )
+        XCTAssertEqual(
+            invalidProviderSelection.selectingDefaultModelForSelectedProvider { provider in "\(provider.rawValue)-default" },
+            invalidProviderSelection
+        )
+        XCTAssertEqual(selection.selectedModelForPicker(currentModel: "current"), "llama-3.3")
+        XCTAssertEqual(emptyModelSelection.selectedModelForPicker(currentModel: "current"), "current")
+        XCTAssertEqual(nilModelSelection.selectedModelForPicker(currentModel: "current"), "current")
+        XCTAssertEqual(selection.selectingModel("gpt-4.1").selectedAIModel, "gpt-4.1")
+    }
+
     func testPowerModeApplicationStatePreservesStoredShapeAndCleanupKeys() throws {
         let state = VoiceInkPowerModeApplicationState(
             isEnhancementEnabled: true,

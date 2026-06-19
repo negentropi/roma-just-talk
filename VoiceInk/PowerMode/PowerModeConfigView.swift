@@ -39,10 +39,6 @@ struct ConfigurationView: View {
     @State private var didSaveConfiguration = false
     private let cleanupPresentation = VoiceInkTranscriptionCleanupPresentation.macOS
 
-    private var effectiveModelName: String? {
-        selectedTranscriptionModelName ?? transcriptionModelManager.currentTranscriptionModel?.name
-    }
-
     private var filteredApps: [(url: URL, name: String, bundleId: String, icon: NSImage)] {
         if searchText.isEmpty { return installedApps }
         return installedApps.filter { app in
@@ -55,20 +51,35 @@ struct ConfigurationView: View {
         VoiceInkPowerModePolicy.canSaveConfigurationName(configName)
     }
 
-    private func languageSelectionDisabled() -> Bool {
-        guard let selectedModelName = effectiveModelName,
-              let model = transcriptionModelManager.allAvailableModels.first(where: { $0.name == selectedModelName })
-        else { return false }
-        return model.provider == .gemini
+    private var transcriptionSelection: VoiceInkPowerModeTranscriptionSelection {
+        VoiceInkPowerModeTranscriptionSelection(
+            selectedModelName: selectedTranscriptionModelName,
+            selectedLanguage: selectedLanguage
+        )
     }
 
-    private func availableLanguages(for model: any TranscriptionModel) -> [String: String] {
-        model.transcriptionLanguageOptions
+    private var selectedTranscriptionModel: (any TranscriptionModel)? {
+        guard let modelName = transcriptionSelection.selectedModelNameForPicker(
+            currentModelName: transcriptionModelManager.currentTranscriptionModel?.name
+        ) else {
+            return nil
+        }
+
+        return transcriptionModelManager.allAvailableModels.first { $0.name == modelName }
     }
 
-    private func useCompatibleLanguage(for model: any TranscriptionModel) {
-        selectedLanguage = model.validTranscriptionLanguageOrFallback(
-            selectedLanguage ?? VoiceInkTranscriptionLanguagePreference.storedLanguage()
+    private func applyTranscriptionSelection(_ selection: VoiceInkPowerModeTranscriptionSelection) {
+        selectedTranscriptionModelName = selection.selectedModelName
+        selectedLanguage = selection.selectedLanguage
+    }
+
+    private func modelFacts(for model: any TranscriptionModel) -> VoiceInkPowerModeTranscriptionModelFacts {
+        VoiceInkPowerModeTranscriptionModelFacts(
+            name: model.name,
+            disablesLanguageSelection: model.provider == .gemini,
+            isMultilingual: model.isMultilingualModel,
+            languageOptions: model.transcriptionLanguageOptions,
+            prefersNativeAppleEnglish: model.provider == .nativeApple
         )
     }
 
@@ -309,8 +320,14 @@ struct ConfigurationView: View {
                             .foregroundColor(.secondary)
                     } else {
                         let modelBinding = Binding<String?>(
-                            get: { selectedTranscriptionModelName ?? transcriptionModelManager.currentTranscriptionModel?.name },
-                            set: { selectedTranscriptionModelName = $0 }
+                            get: {
+                                transcriptionSelection.selectedModelNameForPicker(
+                                    currentModelName: transcriptionModelManager.currentTranscriptionModel?.name
+                                )
+                            },
+                            set: {
+                                applyTranscriptionSelection(transcriptionSelection.selectingModelName($0))
+                            }
                         )
 
                         Picker("Model", selection: modelBinding) {
@@ -318,48 +335,57 @@ struct ConfigurationView: View {
                                 Text(model.displayName).tag(model.name as String?)
                             }
                         }
-                        .onChange(of: selectedTranscriptionModelName) { _, newModelName in
-                            if let modelName = newModelName ?? transcriptionModelManager.currentTranscriptionModel?.name,
-                               let model = transcriptionModelManager.allAvailableModels.first(where: { $0.name == modelName }) {
-                                if model.provider == .gemini {
-                                    selectedLanguage = VoiceInkLanguageCatalog.autoDetectCode
-                                } else {
-                                    useCompatibleLanguage(for: model)
-                                }
+                        .onChange(of: selectedTranscriptionModelName) { _, _ in
+                            if let model = selectedTranscriptionModel {
+                                applyTranscriptionSelection(
+                                    transcriptionSelection.selectingCompatibleLanguage(
+                                        for: modelFacts(for: model),
+                                        storedLanguage: VoiceInkTranscriptionLanguagePreference.storedLanguage()
+                                    )
+                                )
                             }
                         }
                     }
 
-                    if languageSelectionDisabled() {
-                        LabeledContent("Language") {
-                            Text("Autodetected")
-                                .foregroundColor(.secondary)
-                        }
-                        .onAppear {
-                            selectedLanguage = VoiceInkLanguageCatalog.autoDetectCode
-                        }
-                    } else if let selectedModel = effectiveModelName,
-                              let modelInfo = transcriptionModelManager.allAvailableModels.first(where: { $0.name == selectedModel }),
-                              modelInfo.isMultilingualModel {
-                        let languageBinding = Binding<String?>(
-                            get: { selectedLanguage ?? VoiceInkTranscriptionLanguagePreference.selectedLanguage() },
-                            set: { selectedLanguage = $0 }
-                        )
+                    if let model = selectedTranscriptionModel {
+                        let facts = modelFacts(for: model)
 
-                        Picker("Language", selection: languageBinding) {
-                            ForEach(VoiceInkLanguageCatalog.sortedOptions(availableLanguages(for: modelInfo))) { option in
-                                Text(option.name).tag(option.code as String?)
+                        switch facts.languageControl {
+                        case .disabledAutodetect:
+                            LabeledContent("Language") {
+                                Text("Autodetected")
+                                    .foregroundColor(.secondary)
                             }
-                        }
-                    } else if let selectedModel = effectiveModelName,
-                              let modelInfo = transcriptionModelManager.allAvailableModels.first(where: { $0.name == selectedModel }),
-                              !modelInfo.isMultilingualModel {
-                        EmptyView()
                             .onAppear {
-                                if selectedLanguage == nil {
-                                    selectedLanguage = VoiceInkDefaultSettings.macOS.selectedTranscriptionLanguage
+                                applyTranscriptionSelection(transcriptionSelection.selectingAutodetectLanguage())
+                            }
+                        case .picker:
+                            let languageBinding = Binding<String?>(
+                                get: {
+                                    transcriptionSelection.selectedLanguageForPicker(
+                                        storedLanguage: VoiceInkTranscriptionLanguagePreference.selectedLanguage()
+                                    )
+                                },
+                                set: {
+                                    applyTranscriptionSelection(transcriptionSelection.selectingLanguage($0))
+                                }
+                            )
+
+                            Picker("Language", selection: languageBinding) {
+                                ForEach(VoiceInkLanguageCatalog.sortedOptions(facts.languageOptions)) { option in
+                                    Text(option.name).tag(option.code as String?)
                                 }
                             }
+                        case .hiddenDefault:
+                            EmptyView()
+                                .onAppear {
+                                    applyTranscriptionSelection(
+                                        transcriptionSelection.selectingDefaultLanguageIfMissing(
+                                            VoiceInkDefaultSettings.macOS.selectedTranscriptionLanguage
+                                        )
+                                    )
+                                }
+                        }
                     }
                     Button {
                         withAnimation(.easeInOut(duration: 0.15)) {
@@ -584,10 +610,16 @@ struct ConfigurationView: View {
                     )
                 }
 
-                if let selectedModelName = effectiveModelName,
-                   let model = transcriptionModelManager.allAvailableModels.first(where: { $0.name == selectedModelName }),
-                   model.provider != .gemini {
-                    useCompatibleLanguage(for: model)
+                if let model = selectedTranscriptionModel {
+                    let facts = modelFacts(for: model)
+                    if facts.languageControl != .disabledAutodetect {
+                        applyTranscriptionSelection(
+                            transcriptionSelection.selectingCompatibleLanguage(
+                                for: facts,
+                                storedLanguage: VoiceInkTranscriptionLanguagePreference.storedLanguage()
+                            )
+                        )
+                    }
                 }
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {

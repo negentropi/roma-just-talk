@@ -1154,6 +1154,21 @@ require_pattern \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
 require_pattern \
+  "shared Power Mode transcription selection lives in VoiceInkCore" \
+  'VoiceInkPowerModeTranscriptionSelection|VoiceInkPowerModeTranscriptionModelFacts|VoiceInkPowerModeLanguageControl' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "macOS Power Mode transcription settings use shared selection policy" \
+  'VoiceInkPowerModeTranscriptionSelection|VoiceInkPowerModeTranscriptionModelFacts|languageControl' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+reject_pattern \
+  "macOS Power Mode transcription settings avoid shell-only language repair branching" \
+  'languageSelectionDisabled\(|availableLanguages\(for:|useCompatibleLanguage\(|if +model\.provider == \.gemini|modelInfo\.isMultilingualModel|!modelInfo\.isMultilingualModel|validTranscriptionLanguageOrFallback' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+require_pattern \
   "shared dictionary alert presentation lives in VoiceInkCore" \
   'VoiceInkDictionaryAlertPresentation' \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift

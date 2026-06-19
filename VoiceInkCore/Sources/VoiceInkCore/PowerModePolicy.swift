@@ -299,6 +299,98 @@ public struct VoiceInkPowerModeEnhancementSelection: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkPowerModeLanguageControl: Equatable, Sendable {
+    case disabledAutodetect
+    case picker
+    case hiddenDefault
+}
+
+public struct VoiceInkPowerModeTranscriptionModelFacts: Equatable, Sendable {
+    public var name: String
+    public var disablesLanguageSelection: Bool
+    public var isMultilingual: Bool
+    public var languageOptions: [String: String]
+    public var prefersNativeAppleEnglish: Bool
+
+    public var languageControl: VoiceInkPowerModeLanguageControl {
+        if disablesLanguageSelection {
+            return .disabledAutodetect
+        }
+
+        return isMultilingual ? .picker : .hiddenDefault
+    }
+
+    public init(
+        name: String,
+        disablesLanguageSelection: Bool,
+        isMultilingual: Bool,
+        languageOptions: [String: String],
+        prefersNativeAppleEnglish: Bool
+    ) {
+        self.name = name
+        self.disablesLanguageSelection = disablesLanguageSelection
+        self.isMultilingual = isMultilingual
+        self.languageOptions = languageOptions
+        self.prefersNativeAppleEnglish = prefersNativeAppleEnglish
+    }
+}
+
+public struct VoiceInkPowerModeTranscriptionSelection: Equatable, Sendable {
+    public var selectedModelName: String?
+    public var selectedLanguage: String?
+
+    public init(selectedModelName: String?, selectedLanguage: String?) {
+        self.selectedModelName = selectedModelName
+        self.selectedLanguage = selectedLanguage
+    }
+
+    public func selectedModelNameForPicker(currentModelName: String?) -> String? {
+        selectedModelName ?? currentModelName
+    }
+
+    public func selectingModelName(_ modelName: String?) -> Self {
+        Self(selectedModelName: modelName, selectedLanguage: selectedLanguage)
+    }
+
+    public func selectedLanguageForPicker(storedLanguage: String) -> String? {
+        selectedLanguage ?? storedLanguage
+    }
+
+    public func selectingLanguage(_ language: String?) -> Self {
+        Self(selectedModelName: selectedModelName, selectedLanguage: language)
+    }
+
+    public func selectingAutodetectLanguage() -> Self {
+        selectingLanguage(VoiceInkLanguageCatalog.autoDetectCode)
+    }
+
+    public func selectingDefaultLanguageIfMissing(_ defaultLanguage: String) -> Self {
+        guard selectedLanguage == nil else {
+            return self
+        }
+
+        return selectingLanguage(defaultLanguage)
+    }
+
+    public func selectingCompatibleLanguage(
+        for model: VoiceInkPowerModeTranscriptionModelFacts,
+        storedLanguage: String?
+    ) -> Self {
+        switch model.languageControl {
+        case .disabledAutodetect:
+            return selectingAutodetectLanguage()
+        case .picker, .hiddenDefault:
+            return selectingLanguage(
+                VoiceInkTranscriptionLanguageSupport.validLanguageOrFallback(
+                    selectedLanguage ?? storedLanguage,
+                    languages: model.languageOptions,
+                    prefersNativeAppleEnglish: model.prefersNativeAppleEnglish
+                )
+            )
+        }
+    }
+}
+
 public struct VoiceInkPowerModeApplicationState: Codable, Equatable, Sendable {
     public var isEnhancementEnabled: Bool
     public var useScreenCaptureContext: Bool

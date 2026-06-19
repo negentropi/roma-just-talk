@@ -458,6 +458,75 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertEqual(selection.selectingModel("gpt-4.1").selectedAIModel, "gpt-4.1")
     }
 
+    func testPowerModeTranscriptionModelFactsResolveLanguageControl() {
+        XCTAssertEqual(
+            transcriptionModelFacts(disablesLanguageSelection: true, isMultilingual: true).languageControl,
+            .disabledAutodetect
+        )
+        XCTAssertEqual(
+            transcriptionModelFacts(disablesLanguageSelection: false, isMultilingual: true).languageControl,
+            .picker
+        )
+        XCTAssertEqual(
+            transcriptionModelFacts(disablesLanguageSelection: false, isMultilingual: false).languageControl,
+            .hiddenDefault
+        )
+    }
+
+    func testPowerModeTranscriptionSelectionRepairsModelAndLanguageState() {
+        let selection = VoiceInkPowerModeTranscriptionSelection(
+            selectedModelName: nil,
+            selectedLanguage: nil
+        )
+        let selectedLanguage = VoiceInkPowerModeTranscriptionSelection(
+            selectedModelName: "base",
+            selectedLanguage: "fr"
+        )
+
+        XCTAssertEqual(selection.selectedModelNameForPicker(currentModelName: "current"), "current")
+        XCTAssertEqual(selection.selectingModelName("large").selectedModelName, "large")
+        XCTAssertEqual(selection.selectedLanguageForPicker(storedLanguage: "de"), "de")
+        XCTAssertEqual(selection.selectingDefaultLanguageIfMissing("en").selectedLanguage, "en")
+        XCTAssertEqual(selectedLanguage.selectingDefaultLanguageIfMissing("en").selectedLanguage, "fr")
+        XCTAssertEqual(selectedLanguage.selectingAutodetectLanguage().selectedLanguage, VoiceInkLanguageCatalog.autoDetectCode)
+        XCTAssertEqual(
+            selectedLanguage.selectingCompatibleLanguage(
+                for: transcriptionModelFacts(disablesLanguageSelection: true),
+                storedLanguage: "de"
+            ).selectedLanguage,
+            VoiceInkLanguageCatalog.autoDetectCode
+        )
+        XCTAssertEqual(
+            selection.selectingCompatibleLanguage(
+                for: transcriptionModelFacts(
+                    languageOptions: ["en": "English", "fr": "French"]
+                ),
+                storedLanguage: "fr"
+            ).selectedLanguage,
+            "fr"
+        )
+        XCTAssertEqual(
+            selectedLanguage.selectingCompatibleLanguage(
+                for: transcriptionModelFacts(
+                    isMultilingual: false,
+                    languageOptions: VoiceInkLanguageCatalog.englishOnly
+                ),
+                storedLanguage: "de"
+            ).selectedLanguage,
+            "en"
+        )
+        XCTAssertEqual(
+            selection.selectingCompatibleLanguage(
+                for: transcriptionModelFacts(
+                    languageOptions: ["en-US": "English (United States)"],
+                    prefersNativeAppleEnglish: true
+                ),
+                storedLanguage: "de"
+            ).selectedLanguage,
+            "en-US"
+        )
+    }
+
     func testPowerModeApplicationStatePreservesStoredShapeAndCleanupKeys() throws {
         let state = VoiceInkPowerModeApplicationState(
             isEnhancementEnabled: true,
@@ -1075,6 +1144,21 @@ final class PowerModePolicyTests: XCTestCase {
             websiteRules: websiteRules,
             isEnabled: isEnabled,
             isDefault: isDefault
+        )
+    }
+
+    private func transcriptionModelFacts(
+        disablesLanguageSelection: Bool = false,
+        isMultilingual: Bool = true,
+        languageOptions: [String: String] = VoiceInkLanguageCatalog.all,
+        prefersNativeAppleEnglish: Bool = false
+    ) -> VoiceInkPowerModeTranscriptionModelFacts {
+        VoiceInkPowerModeTranscriptionModelFacts(
+            name: "model",
+            disablesLanguageSelection: disablesLanguageSelection,
+            isMultilingual: isMultilingual,
+            languageOptions: languageOptions,
+            prefersNativeAppleEnglish: prefersNativeAppleEnglish
         )
     }
 

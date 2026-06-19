@@ -605,6 +605,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "TranscriptPresentationTests.testTranscriptActionTextUsesPreferredTextWhenCollapsed", run: { TranscriptPresentationTests().testTranscriptActionTextUsesPreferredTextWhenCollapsed() }),
             VoiceInkCoreCheck(name: "TranscriptPresentationTests.testTranscriptActionTextUsesSelectedVariantWhenExpanded", run: { TranscriptPresentationTests().testTranscriptActionTextUsesSelectedVariantWhenExpanded() }),
             VoiceInkCoreCheck(name: "TranscriptPresentationTests.testTranscriptActionTextReturnsEmptyForMissingText", run: { TranscriptPresentationTests().testTranscriptActionTextReturnsEmptyForMissingText() }),
+            VoiceInkCoreCheck(name: "TranscriptPresentationTests.testDeleteConfirmationMessagePreservesHistoryPluralization", run: { TranscriptPresentationTests().testDeleteConfirmationMessagePreservesHistoryPluralization() }),
             VoiceInkCoreCheck(name: "TranscriptPresentationTests.testFailedTranscriptTextPreservesMacOSFailurePrefix", run: { TranscriptPresentationTests().testFailedTranscriptTextPreservesMacOSFailurePrefix() }),
             VoiceInkCoreCheck(name: "TranscriptPresentationTests.testMatchesSearchReturnsTrueForEmptyQuery", run: { TranscriptPresentationTests().testMatchesSearchReturnsTrueForEmptyQuery() }),
             VoiceInkCoreCheck(name: "TranscriptPresentationTests.testMatchesSearchChecksRawTextCaseInsensitively", run: { TranscriptPresentationTests().testMatchesSearchChecksRawTextCaseInsensitively() }),

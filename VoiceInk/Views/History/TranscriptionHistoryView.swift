@@ -100,7 +100,7 @@ struct TranscriptionHistoryView: View {
             }
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("This action cannot be undone. Are you sure you want to delete \(selectedTranscriptions.count) item\(selectedTranscriptions.count == 1 ? "" : "s")?")
+            Text(VoiceInkTranscriptPresentation.deleteConfirmationMessage(selectedCount: selectedTranscriptions.count))
         }
         .overlay {
             Color.black.opacity(isAnalysisPanelPresented ? 0.1 : 0)

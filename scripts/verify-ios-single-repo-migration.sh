@@ -674,6 +674,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
 
 require_pattern \
+  "shared transcript delete-confirmation copy lives in VoiceInkCore" \
+  'deleteConfirmationMessage' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+require_pattern \
   "shared transcript detail presentation copy lives in VoiceInkCore" \
   'noteDetailNavigationTitle|transcriptTitle|retranscribingDisplayText|retryTranscriptionButtonTitle' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
@@ -731,6 +736,18 @@ require_pattern \
 require_pattern \
   "macOS inline history uses shared transcript text variant" \
   'VoiceInkTranscriptTextVariant|tab\.title|selectedTab\.displayText|VoiceInkTranscriptTextVariant\.shouldShowTabs' \
+  VoiceInk/Views/History/InlineHistoryView.swift
+
+require_pattern \
+  "macOS history delete confirmation uses shared transcript presentation" \
+  'VoiceInkTranscriptPresentation\.deleteConfirmationMessage' \
+  VoiceInk/Views/History/TranscriptionHistoryView.swift \
+  VoiceInk/Views/History/InlineHistoryView.swift
+
+reject_pattern \
+  "macOS history views avoid duplicate delete-confirmation pluralization copy" \
+  'This action cannot be undone\. Are you sure you want to delete|selectedTranscriptions\.count == 1 \? "" : "s"' \
+  VoiceInk/Views/History/TranscriptionHistoryView.swift \
   VoiceInk/Views/History/InlineHistoryView.swift
 
 reject_pattern \

@@ -127,6 +127,10 @@ public enum VoiceInkTranscriptPresentation {
         return preferredText(rawText: rawText, enhancedText: enhancedText) ?? ""
     }
 
+    public static func deleteConfirmationMessage(selectedCount: Int) -> String {
+        "This action cannot be undone. Are you sure you want to delete \(selectedCount) item\(selectedCount == 1 ? "" : "s")?"
+    }
+
     public static func failedTranscriptText(reason: String) -> String {
         "Transcription Failed: \(reason)"
     }

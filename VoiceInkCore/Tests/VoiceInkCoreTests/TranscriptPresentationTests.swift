@@ -95,6 +95,21 @@ final class TranscriptPresentationTests: XCTestCase {
         )
     }
 
+    func testDeleteConfirmationMessagePreservesHistoryPluralization() {
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.deleteConfirmationMessage(selectedCount: 1),
+            "This action cannot be undone. Are you sure you want to delete 1 item?"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.deleteConfirmationMessage(selectedCount: 2),
+            "This action cannot be undone. Are you sure you want to delete 2 items?"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.deleteConfirmationMessage(selectedCount: 0),
+            "This action cannot be undone. Are you sure you want to delete 0 items?"
+        )
+    }
+
     func testFailedTranscriptTextPreservesMacOSFailurePrefix() {
         XCTAssertEqual(
             VoiceInkTranscriptPresentation.failedTranscriptText(reason: "No model selected"),

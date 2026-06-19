@@ -11,16 +11,16 @@ struct AudioPlayerView: View {
         VStack(spacing: 0) {
             if let ts = timestamp {
                 HStack(spacing: 8) {
-                    Image(systemName: "calendar")
+                    Image(systemName: VoiceInkAudioPlaybackPresentation.timestampSystemImageName)
                         .foregroundStyle(.secondary)
                     Text(VoiceInkDatePresentation.relativeTimestamp(ts))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     if VoiceInkDurationPresentation.shouldShowPositiveDuration(duration) {
-                        Text("•")
+                        Text(VoiceInkDurationPresentation.metadataSeparatorText)
                             .font(.caption)
                             .foregroundStyle(.tertiary)
-                        Image(systemName: "waveform")
+                        Image(systemName: VoiceInkAudioPlaybackPresentation.durationSystemImageName)
                             .foregroundStyle(.secondary)
                         Text(VoiceInkDurationPresentation.minutesSeconds(duration))
                             .font(.caption.monospacedDigit())

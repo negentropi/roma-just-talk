@@ -27,7 +27,7 @@ struct NoteRowView: View {
                     .foregroundStyle(.secondary)
 
                 if VoiceInkDurationPresentation.shouldShowPositiveDuration(note.duration) {
-                    Text("•")
+                    Text(VoiceInkDurationPresentation.metadataSeparatorText)
                         .font(.caption)
                         .foregroundStyle(.tertiary)
                     Text(VoiceInkDurationPresentation.minutesSeconds(

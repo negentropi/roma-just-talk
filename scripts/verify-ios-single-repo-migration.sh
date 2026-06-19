@@ -2164,7 +2164,7 @@ reject_pattern \
 
 require_pattern \
   "shared duration presentation owns positive-duration visibility" \
-  'shouldShowPositiveDuration' \
+  'shouldShowPositiveDuration|metadataSeparatorText' \
   VoiceInkCore/Sources/VoiceInkCore/DurationPresentation.swift
 
 require_pattern \
@@ -2188,13 +2188,19 @@ require_pattern \
   iOS/VoiceInk-ios/NoteRowView.swift
 
 require_pattern \
+  "iOS duration metadata uses shared separator text" \
+  'VoiceInkDurationPresentation\.metadataSeparatorText' \
+  iOS/VoiceInk-ios/AudioPlayerView.swift \
+  iOS/VoiceInk-ios/NoteRowView.swift
+
+require_pattern \
   "shared playback-rate policy lives in VoiceInkCore" \
   'VoiceInkAudioPlaybackRate' \
   VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
 
 require_pattern \
   "shared audio playback presentation lives in VoiceInkCore" \
-  'VoiceInkAudioPlaybackPresentation' \
+  'VoiceInkAudioPlaybackPresentation|timestampSystemImageName|durationSystemImageName' \
   VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
 
 require_pattern \
@@ -2222,6 +2228,11 @@ require_pattern \
   'VoiceInkAudioPlaybackPresentation' \
   iOS/VoiceInk-ios/AudioPlayerView.swift
 
+require_pattern \
+  "iOS audio player metadata uses shared playback icons" \
+  'VoiceInkAudioPlaybackPresentation\.(timestampSystemImageName|durationSystemImageName)' \
+  iOS/VoiceInk-ios/AudioPlayerView.swift
+
 reject_pattern \
   "platform audio players avoid raw playback-rate storage key and labels" \
   '"audioPlaybackRate"|"1×"|"1\.5×"|"2×"' \
@@ -2231,9 +2242,15 @@ reject_pattern \
 
 reject_pattern \
   "platform audio player views avoid duplicate loading and play-pause presentation" \
-  '"Loading\.\.\."|"pause\.fill"|"play\.fill"' \
+  '"Loading\.\.\."|"pause\.fill"|"play\.fill"|"calendar"|"waveform"' \
   VoiceInk/Views/AudioPlayerView.swift \
   iOS/VoiceInk-ios/AudioPlayerView.swift
+
+reject_pattern \
+  "iOS audio metadata views avoid duplicate separator text" \
+  'Text\("•"\)' \
+  iOS/VoiceInk-ios/AudioPlayerView.swift \
+  iOS/VoiceInk-ios/NoteRowView.swift
 
 require_pattern \
   "macOS audio-file duration UI uses shared positive-duration visibility" \

@@ -1,6 +1,8 @@
 import Foundation
 
 public enum VoiceInkDurationPresentation {
+    public static let metadataSeparatorText = "•"
+
     public static func shouldShowPositiveDuration(_ duration: TimeInterval) -> Bool {
         duration > 0
     }

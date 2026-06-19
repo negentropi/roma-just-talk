@@ -112,6 +112,8 @@ public enum VoiceInkAudioPlaybackRate {
 
 public enum VoiceInkAudioPlaybackPresentation {
     public static let loadingText = "Loading..."
+    public static let timestampSystemImageName = "calendar"
+    public static let durationSystemImageName = "waveform"
 
     public static func playPauseSystemImageName(isPlaying: Bool) -> String {
         isPlaying ? "pause.fill" : "play.fill"

@@ -85,6 +85,8 @@ final class AudioPlaybackTimelineTests: XCTestCase {
 
     func testPlaybackPresentationPreservesPlatformLoadingAndPlayPauseCopy() {
         XCTAssertEqual(VoiceInkAudioPlaybackPresentation.loadingText, "Loading...")
+        XCTAssertEqual(VoiceInkAudioPlaybackPresentation.timestampSystemImageName, "calendar")
+        XCTAssertEqual(VoiceInkAudioPlaybackPresentation.durationSystemImageName, "waveform")
         XCTAssertEqual(VoiceInkAudioPlaybackPresentation.playPauseSystemImageName(isPlaying: true), "pause.fill")
         XCTAssertEqual(VoiceInkAudioPlaybackPresentation.playPauseSystemImageName(isPlaying: false), "play.fill")
     }

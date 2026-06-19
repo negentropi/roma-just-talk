@@ -3,6 +3,7 @@ import Foundation
 
 final class DurationPresentationTests: XCTestCase {
     func testPositiveDurationVisibilityOnlyAllowsPositiveDurations() {
+        XCTAssertEqual(VoiceInkDurationPresentation.metadataSeparatorText, "•")
         XCTAssertFalse(VoiceInkDurationPresentation.shouldShowPositiveDuration(-1))
         XCTAssertFalse(VoiceInkDurationPresentation.shouldShowPositiveDuration(0))
         XCTAssertTrue(VoiceInkDurationPresentation.shouldShowPositiveDuration(0.1))

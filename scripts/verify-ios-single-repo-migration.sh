@@ -3138,7 +3138,7 @@ reject_pattern \
 
 require_pattern \
   "shared note-list summary presentation lives in VoiceInkCore" \
-  'VoiceInkNoteListSummaryPresentation' \
+  'VoiceInkNoteListSummaryPresentation|countText' \
   VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift
 
 require_pattern \
@@ -3148,7 +3148,7 @@ require_pattern \
 
 require_pattern \
   "iOS note-list uses shared summary presentation" \
-  'VoiceInkNoteListSummaryPresentation\.make' \
+  'VoiceInkNoteListSummaryPresentation\.make|summaryPresentation\.countText' \
   iOS/VoiceInk-ios/NotesListView.swift
 
 require_pattern \
@@ -3164,6 +3164,11 @@ require_pattern \
 require_pattern \
   "iOS recording alert fallback uses shared cancel copy" \
   'VoiceInkRecordingSheetPresentation\.iOS\.cancelButtonTitle' \
+  iOS/VoiceInk-ios/NotesListView.swift
+
+reject_pattern \
+  "iOS note-list avoids duplicate summary count formatting" \
+  'summaryPresentation\.summary\.totalCount|Text\("\\\(' \
   iOS/VoiceInk-ios/NotesListView.swift
 
 reject_pattern \

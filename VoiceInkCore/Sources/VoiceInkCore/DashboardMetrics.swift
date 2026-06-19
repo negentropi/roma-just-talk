@@ -104,6 +104,7 @@ public struct VoiceInkDashboardMetrics: Equatable, Sendable {
 
 public struct VoiceInkNoteListSummaryPresentation: Equatable, Sendable {
     public let summary: VoiceInkDashboardMetricsSummary
+    public let countText: String
     public let dashboardText: String
     public let fastestModelText: String?
 
@@ -112,6 +113,7 @@ public struct VoiceInkNoteListSummaryPresentation: Equatable, Sendable {
         fastestModel: VoiceInkPerformanceModelStat? = nil
     ) {
         self.summary = summary
+        self.countText = "\(summary.totalCount)"
         self.dashboardText = "\(summary.totalWords) words - \(VoiceInkDurationPresentation.minutesSeconds(summary.totalDuration)) audio"
         self.fastestModelText = fastestModel.map { "\($0.name) \($0.speedFactorRealtimeText)" }
     }

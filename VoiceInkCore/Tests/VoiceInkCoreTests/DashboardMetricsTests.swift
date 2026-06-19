@@ -119,6 +119,7 @@ final class DashboardMetricsTests: XCTestCase {
             presentation.summary,
             VoiceInkDashboardMetricsSummary(totalCount: 3, totalWords: 210, totalDuration: 95)
         )
+        XCTAssertEqual(presentation.countText, "3")
         XCTAssertEqual(presentation.dashboardText, "210 words - 1:35 audio")
         XCTAssertEqual(presentation.fastestModelText, "fast 10.0x realtime")
     }

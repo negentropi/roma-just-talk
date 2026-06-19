@@ -105,7 +105,7 @@ struct NotesListView: View {
                 }
             }
             Spacer()
-            Text("\(summaryPresentation.summary.totalCount)")
+            Text(summaryPresentation.countText)
                 .font(.caption)
                 .foregroundStyle(.tertiary)
         }

@@ -306,6 +306,7 @@ The remaining Swift files present in `../VoiceInk-iOS/VoiceInk-ios` but not in `
 - `DefaultModeManager.swift`: replaced by `AppSettings.ensureDefaultModeExists()` plus `Mode.defaultModesAndSelection()`.
 - `Mode.swift`, `PromptTemplate.swift`, `Provider.swift`: replaced by `VoiceInkCore` mode, prompt-template, and provider catalog modules.
 - `ModeSelectionView.swift`, `ModesView.swift`: obsolete iOS UI experiments; current in-repo iOS mode UI is `iOS/VoiceInk-ios/ModeConfigurationView.swift`.
+- `ContentView.swift`: obsolete clone app-root wrapper; current in-repo iOS launch path presents `NotesListView` directly after onboarding.
 - `Item.swift`: unused SwiftData template sample.
 - `VoiceInk_iosTests.swift`, `VoiceInk_iosUITests.swift`, `VoiceInk_iosUITestsLaunchTests.swift`: kept in the in-repo iOS target as real migration/runtime smoke coverage; the old stock-template assertions from the sibling clone should not be copied back.
 

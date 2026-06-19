@@ -40,7 +40,7 @@ struct VoiceInk_iosApp: App {
     var body: some Scene {
         WindowGroup {
             if hasCompletedOnboarding {
-                ContentView()
+                NotesListView()
                     .environmentObject(recordingManager)
                     .onOpenURL { url in
                         handleURL(url)

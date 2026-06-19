@@ -162,6 +162,7 @@ require_command swift
 
 obsolete_ios_clone_files=(
   AppGroupCoordinator.swift
+  ContentView.swift
   DeepgramTranscriptionService.swift
   DefaultModeManager.swift
   GroqTranscriptionService.swift

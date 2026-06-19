@@ -488,15 +488,19 @@ final class AIProviderCatalogTests: XCTestCase {
     }
 
     func testMacOSAIEnhancementRefreshModelSelectionRepairIsShared() {
-        let refreshedModels = [
+        let openRouterModels = [
             "anthropic/claude-3.5-sonnet",
             "openai/gpt-4o"
+        ]
+        let ollamaModels = [
+            "llama3",
+            "mistral"
         ]
 
         XCTAssertEqual(
             VoiceInkAIEnhancementProviderKind.openRouter.textEnhancementModelToSelectAfterRefresh(
                 currentModel: VoiceInkAIModelCatalog.defaultModel(for: .openRouter),
-                refreshedModels: refreshedModels,
+                refreshedModels: openRouterModels,
                 defaultModel: VoiceInkAIModelCatalog.defaultModel(for: .openRouter)
             ),
             "anthropic/claude-3.5-sonnet"
@@ -504,14 +508,29 @@ final class AIProviderCatalogTests: XCTestCase {
         XCTAssertNil(
             VoiceInkAIEnhancementProviderKind.openRouter.textEnhancementModelToSelectAfterRefresh(
                 currentModel: "custom/openrouter-model",
-                refreshedModels: refreshedModels,
+                refreshedModels: openRouterModels,
                 defaultModel: VoiceInkAIModelCatalog.defaultModel(for: .openRouter)
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.ollama.textEnhancementModelToSelectAfterRefresh(
+                currentModel: "missing-local-model",
+                refreshedModels: ollamaModels,
+                defaultModel: VoiceInkAIEnhancementProviderKind.defaultOllamaTextEnhancementModel
+            ),
+            "llama3"
+        )
+        XCTAssertNil(
+            VoiceInkAIEnhancementProviderKind.ollama.textEnhancementModelToSelectAfterRefresh(
+                currentModel: "mistral",
+                refreshedModels: ollamaModels,
+                defaultModel: VoiceInkAIEnhancementProviderKind.defaultOllamaTextEnhancementModel
             )
         )
         XCTAssertNil(
             VoiceInkAIEnhancementProviderKind.groq.textEnhancementModelToSelectAfterRefresh(
                 currentModel: VoiceInkAIModelCatalog.defaultModel(for: .groq),
-                refreshedModels: refreshedModels,
+                refreshedModels: openRouterModels,
                 defaultModel: VoiceInkAIModelCatalog.defaultModel(for: .groq)
             )
         )

@@ -295,12 +295,18 @@ public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
         refreshedModels: [String],
         defaultModel: String
     ) -> String? {
-        guard self == .openRouter,
-              currentModel == defaultModel else {
+        guard let firstRefreshedModel = refreshedModels.first else {
             return nil
         }
 
-        return refreshedModels.first
+        switch self {
+        case .ollama:
+            return refreshedModels.contains(currentModel) ? nil : firstRefreshedModel
+        case .openRouter:
+            return currentModel == defaultModel ? firstRefreshedModel : nil
+        case .anthropic, .assemblyAI, .cerebras, .custom, .deepgram, .elevenLabs, .groq, .gemini, .localCLI, .mistral, .openAI, .soniox, .speechmatics:
+            return nil
+        }
     }
 
     public var apiKeyVerificationRoute: VoiceInkAIEnhancementAPIKeyVerificationRoute? {

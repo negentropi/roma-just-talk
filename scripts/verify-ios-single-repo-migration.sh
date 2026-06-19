@@ -2229,6 +2229,11 @@ require_pattern \
   'textEnhancementModelToSelectAfterRefresh' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
+require_pattern \
+  "macOS Ollama service refresh model selection uses shared policy" \
+  'textEnhancementModelToSelectAfterRefresh' \
+  VoiceInk/Services/OllamaService.swift
+
 reject_pattern \
   "macOS AI API-key path avoids shell-only key-reference and blank-key policy" \
   'VoiceInkAPIKeyReference\.resolvedValue|VoiceInkProviderCredential\.nonBlank\(apiKey\)' \
@@ -2270,6 +2275,11 @@ reject_pattern \
   "macOS AI service avoids duplicate refresh model-selection policy" \
   'currentModel == .*defaultTextEnhancementModel|models\.first!' \
   VoiceInk/Services/AIEnhancement/AIService.swift
+
+reject_pattern \
+  "macOS Ollama service avoids duplicate refresh model-selection policy" \
+  'models\.contains\(where: \{ \$0\.name == selectedModel \}\)|models\[0\]\.name' \
+  VoiceInk/Services/OllamaService.swift
 
 reject_pattern \
   "macOS AI services avoid duplicate request URL selection policy" \

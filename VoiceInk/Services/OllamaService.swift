@@ -58,8 +58,12 @@ class OllamaService: ObservableObject {
             let models = try await OllamaClient.fetchModels(baseURL: url)
             availableModels = models
 
-            if !models.contains(where: { $0.name == selectedModel }) && !models.isEmpty {
-                selectedModel = models[0].name
+            if let refreshedModel = VoiceInkAIEnhancementProviderKind.ollama.textEnhancementModelToSelectAfterRefresh(
+                currentModel: selectedModel,
+                refreshedModels: models.map { $0.name },
+                defaultModel: VoiceInkAIEnhancementProviderKind.defaultOllamaTextEnhancementModel
+            ) {
+                selectedModel = refreshedModel
             }
         } catch {
             print("Error fetching models: \(error)")

@@ -105,6 +105,29 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertTrue(rule.isDefault)
     }
 
+    func testPowerModeConfigExposesParsedPromptAndProviderForApplication() {
+        let promptID = UUID()
+        let validConfig = PowerModeConfig(
+            name: "Writing",
+            emoji: "W",
+            isAIEnhancementEnabled: true,
+            selectedPrompt: promptID.uuidString,
+            selectedAIProvider: "GROQ"
+        )
+        let invalidConfig = PowerModeConfig(
+            name: "Broken",
+            emoji: "B",
+            isAIEnhancementEnabled: true,
+            selectedPrompt: "not-a-uuid",
+            selectedAIProvider: "MissingProvider"
+        )
+
+        XCTAssertEqual(validConfig.selectedPromptUUID, promptID)
+        XCTAssertEqual(validConfig.selectedAIProviderKind, .groq)
+        XCTAssertNil(invalidConfig.selectedPromptUUID)
+        XCTAssertNil(invalidConfig.selectedAIProviderKind)
+    }
+
     func testPowerModeConfigDecodesLegacyStoredKeys() throws {
         let id = UUID()
         let data = Data("""
@@ -324,16 +347,20 @@ final class PowerModePolicyTests: XCTestCase {
         let validState = VoiceInkPowerModeApplicationState(
             isEnhancementEnabled: true,
             useScreenCaptureContext: false,
-            selectedPromptId: promptID.uuidString
+            selectedPromptId: promptID.uuidString,
+            selectedAIProvider: "GROQ"
         )
         let invalidState = VoiceInkPowerModeApplicationState(
             isEnhancementEnabled: true,
             useScreenCaptureContext: false,
-            selectedPromptId: "not-a-uuid"
+            selectedPromptId: "not-a-uuid",
+            selectedAIProvider: "MissingProvider"
         )
 
         XCTAssertEqual(validState.selectedPromptUUID, promptID)
+        XCTAssertEqual(validState.selectedAIProviderKind, .groq)
         XCTAssertNil(invalidState.selectedPromptUUID)
+        XCTAssertNil(invalidState.selectedAIProviderKind)
     }
 
     func testPowerModeApplicationStateCleanupRestorePreservesLegacyPunctuationFallback() {

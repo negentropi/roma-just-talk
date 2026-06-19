@@ -20,6 +20,14 @@ public struct PowerModeConfig: Codable, Identifiable, Equatable, Sendable {
     public var isEnabled: Bool
     public var isDefault: Bool
 
+    public var selectedPromptUUID: UUID? {
+        selectedPrompt.flatMap(UUID.init)
+    }
+
+    public var selectedAIProviderKind: VoiceInkAIEnhancementProviderKind? {
+        selectedAIProvider.flatMap(VoiceInkAIEnhancementProviderKind.init(storedValue:))
+    }
+
     private enum CodingKeys: String, CodingKey {
         case id, name, emoji, appConfigs, urlConfigs, isAIEnhancementEnabled, selectedPrompt, selectedLanguage, isTextFormattingEnabled, punctuationCleanupMode, removePunctuation, lowercaseTranscription, useScreenCapture, selectedAIProvider, selectedAIModel, isAutoSendEnabled, autoSendKey, isEnabled, isDefault
         case selectedWhisperModel
@@ -208,6 +216,10 @@ public struct VoiceInkPowerModeApplicationState: Codable, Equatable, Sendable {
 
     public var selectedPromptUUID: UUID? {
         selectedPromptId.flatMap(UUID.init)
+    }
+
+    public var selectedAIProviderKind: VoiceInkAIEnhancementProviderKind? {
+        selectedAIProvider.flatMap(VoiceInkAIEnhancementProviderKind.init(storedValue:))
     }
 
     public var cleanupRestore: VoiceInkPowerModeCleanupRestore {

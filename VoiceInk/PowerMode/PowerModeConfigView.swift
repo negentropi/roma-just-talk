@@ -106,7 +106,7 @@ struct ConfigurationView: View {
             let latestConfig = powerModeManager.configurations.powerModeConfiguration(with: config.id) ?? config
             _powerModeConfigId = State(initialValue: latestConfig.id)
             _isAIEnhancementEnabled = State(initialValue: latestConfig.isAIEnhancementEnabled)
-            _selectedPromptId = State(initialValue: latestConfig.selectedPrompt.flatMap { UUID(uuidString: $0) })
+            _selectedPromptId = State(initialValue: latestConfig.selectedPromptUUID)
             _selectedTranscriptionModelName = State(initialValue: latestConfig.selectedTranscriptionModelName)
             _selectedLanguage = State(initialValue: latestConfig.selectedLanguage)
             _isTextFormattingEnabled = State(initialValue: latestConfig.isTextFormattingEnabled)

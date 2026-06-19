@@ -2065,6 +2065,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
+  "shared Power Mode config exposes parsed prompt and provider application state" \
+  'selectedPrompt\.flatMap\(UUID\.init\)|selectedAIProvider\.flatMap\(VoiceInkAIEnhancementProviderKind\.init\(storedValue:\)\)' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
   "shared Power Mode form mode lives in VoiceInkCore" \
   'VoiceInkPowerModeConfigurationMode' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
@@ -2163,6 +2168,13 @@ reject_pattern \
   "macOS Power Mode form avoids shell-only stored config construction" \
   'PowerModeConfig\(|selectedPromptId\?\.uuidString|var updatedConfig = config|selectedAppConfigs\.isEmpty \? nil : selectedAppConfigs|websiteConfigs\.isEmpty \? nil : websiteConfigs' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
+
+reject_pattern \
+  "macOS Power Mode views avoid shell-only selected-prompt UUID parsing" \
+  'UUID\(uuidString:' \
+  VoiceInk/PowerMode/PowerModeSessionManager.swift \
+  VoiceInk/PowerMode/PowerModeConfigView.swift \
+  VoiceInk/PowerMode/PowerModeViewComponents.swift
 
 require_pattern \
   "macOS Power Mode shortcuts call shared enabled-list policy directly" \
@@ -2303,6 +2315,11 @@ reject_pattern \
 reject_pattern \
   "macOS Power Mode session manager avoids shell-only session restore parsing" \
   'state\.selectedPromptId\.flatMap\(UUID\.init\)|state\.punctuationCleanupMode|state\.removePunctuation|state\.isTextFormattingEnabled|state\.lowercaseTranscription' \
+  VoiceInk/PowerMode/PowerModeSessionManager.swift
+
+reject_pattern \
+  "macOS Power Mode session manager avoids shell-only provider raw-value parsing" \
+  'VoiceInkAIEnhancementProviderKind\(storedValue:' \
   VoiceInk/PowerMode/PowerModeSessionManager.swift
 
 require_pattern \

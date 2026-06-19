@@ -104,12 +104,12 @@ class PowerModeSessionManager {
             enhancementService.useScreenCaptureContext = config.useScreenCapture
 
             if config.isAIEnhancementEnabled {
-                if let promptId = config.selectedPrompt, let uuid = UUID(uuidString: promptId) {
-                    enhancementService.selectedPromptId = uuid
+                if let selectedPromptUUID = config.selectedPromptUUID {
+                    enhancementService.selectedPromptId = selectedPromptUUID
                 }
 
                 let aiService = enhancementService.getAIService()
-                if let providerName = config.selectedAIProvider, let provider = VoiceInkAIEnhancementProviderKind(storedValue: providerName) {
+                if let provider = config.selectedAIProviderKind {
                     aiService.selectedProvider = provider
                 }
                 if let model = config.selectedAIModel {
@@ -147,7 +147,7 @@ class PowerModeSessionManager {
             enhancementService.selectedPromptId = state.selectedPromptUUID
 
             let aiService = enhancementService.getAIService()
-            if let providerName = state.selectedAIProvider, let provider = VoiceInkAIEnhancementProviderKind(storedValue: providerName) {
+            if let provider = state.selectedAIProviderKind {
                 aiService.selectedProvider = provider
             }
             if let model = state.selectedAIModel {

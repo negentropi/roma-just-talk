@@ -101,9 +101,8 @@ struct ConfigurationRow: View {
     private let maxAppIconsToShow = 5
     
     private var selectedPromptTitle: String? {
-        guard let promptId = config.selectedPrompt,
-              let uuid = UUID(uuidString: promptId) else { return nil }
-        return enhancementService.allPrompts.first { $0.id == uuid }?.title
+        guard let selectedPromptUUID = config.selectedPromptUUID else { return nil }
+        return enhancementService.allPrompts.first { $0.id == selectedPromptUUID }?.title
     }
     
     private var selectedModelDisplayText: String? {

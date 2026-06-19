@@ -54,8 +54,8 @@ struct SettingsView: View {
                 }
             }
 
-            Section(header: Text("Transcription Language")) {
-                Picker("Language", selection: selectedLanguageBinding) {
+            Section(header: Text(VoiceInkTranscriptionLanguagePresentation.sectionTitle)) {
+                Picker(VoiceInkTranscriptionLanguagePresentation.pickerTitle, selection: selectedLanguageBinding) {
                     ForEach(sortedTranscriptionLanguages) { language in
                         Text(language.name).tag(language.code)
                     }

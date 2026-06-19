@@ -12,6 +12,26 @@ public struct VoiceInkLanguageOption: Identifiable, Equatable, Sendable {
     }
 }
 
+public enum VoiceInkTranscriptionLanguagePresentation {
+    public static let sectionTitle = "Transcription Language"
+    public static let pickerTitle = "Language"
+    public static let menuPickerTitle = "Select Language"
+    public static let autoDetectedLabel = "Language: Autodetected"
+    public static let autoDetectedDescription = "The transcription language is automatically detected by the model."
+    public static let multilingualDescription = "This model supports multiple languages. Select a specific language or auto-detect(if available)"
+    public static let englishOnlyLabel = "Language: English"
+    public static let englishOnlyDescription = "This is an English-optimized model and only supports English transcription."
+    public static let noModelSelectedText = "No model selected"
+    public static let englishOnlyMenuLabel = "Language: English (only)"
+
+    public static func menuLabel(
+        selectedLanguage: String,
+        languages: [String: String]
+    ) -> String {
+        "\(pickerTitle): \(VoiceInkLanguageCatalog.displayName(for: selectedLanguage, in: languages))"
+    }
+}
+
 public enum VoiceInkTranscriptionLanguageSource: Equatable, Sendable {
     case whisper
     case nativeApple

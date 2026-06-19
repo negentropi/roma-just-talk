@@ -322,14 +322,44 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/LanguageCatalog.swift
 
 require_pattern \
-  "macOS language picker uses shared language display fallback" \
+  "shared transcription language presentation lives in VoiceInkCore" \
+  'VoiceInkTranscriptionLanguagePresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/LanguageCatalog.swift
+
+require_pattern \
+  "shared transcription language presentation uses shared display fallback" \
   'VoiceInkLanguageCatalog\.displayName' \
+  VoiceInkCore/Sources/VoiceInkCore/LanguageCatalog.swift
+
+require_pattern \
+  "macOS language picker uses shared language display fallback" \
+  'VoiceInkTranscriptionLanguagePresentation\.menuLabel' \
   "VoiceInk/Views/AI Models/LanguageSelectionView.swift"
+
+require_pattern \
+  "macOS language picker uses shared language presentation" \
+  'VoiceInkTranscriptionLanguagePresentation' \
+  "VoiceInk/Views/AI Models/LanguageSelectionView.swift"
+
+require_pattern \
+  "iOS language settings uses shared language presentation" \
+  'VoiceInkTranscriptionLanguagePresentation' \
+  iOS/VoiceInk-ios/SettingsView.swift
 
 reject_pattern \
   "macOS language picker avoids shell-only language display fallback" \
   'private func +currentLanguageDisplayName|\?\? "Unknown"' \
   "VoiceInk/Views/AI Models/LanguageSelectionView.swift"
+
+reject_pattern \
+  "macOS language picker avoids shell-only language presentation copy" \
+  '"Transcription Language"|"Select Language"|"Language: Autodetected"|"The transcription language is automatically detected by the model\."|"This model supports multiple languages\. Select a specific language or auto-detect\(if available\)"|"Language: English"|"This is an English-optimized model and only supports English transcription\."|"No model selected"|"Language: English \(only\)"' \
+  "VoiceInk/Views/AI Models/LanguageSelectionView.swift"
+
+reject_pattern \
+  "iOS language settings avoids shell-only language presentation copy" \
+  '"Transcription Language"|"Language"' \
+  iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \
   "macOS save button uses shared timestamped markdown export" \

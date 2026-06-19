@@ -201,6 +201,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "LanguageCatalogTests.testSortedLanguageOptionsPutAutoDetectFirstThenSortByDisplayName", run: { LanguageCatalogTests().testSortedLanguageOptionsPutAutoDetectFirstThenSortByDisplayName() }),
             VoiceInkCoreCheck(name: "LanguageCatalogTests.testSortedLanguageOptionsUseCodeForStableTies", run: { LanguageCatalogTests().testSortedLanguageOptionsUseCodeForStableTies() }),
             VoiceInkCoreCheck(name: "LanguageCatalogTests.testDisplayNameUsesLanguageMapThenFallback", run: { LanguageCatalogTests().testDisplayNameUsesLanguageMapThenFallback() }),
+            VoiceInkCoreCheck(name: "LanguageCatalogTests.testTranscriptionLanguagePresentationPreservesPlatformCopy", run: { LanguageCatalogTests().testTranscriptionLanguagePresentationPreservesPlatformCopy() }),
+            VoiceInkCoreCheck(name: "LanguageCatalogTests.testTranscriptionLanguagePresentationBuildsMenuLabelWithSharedDisplayName", run: { LanguageCatalogTests().testTranscriptionLanguagePresentationBuildsMenuLabelWithSharedDisplayName() }),
             VoiceInkCoreCheck(name: "LanguageCatalogTests.testRequestLanguageStripsAutoAndBlankValues", run: { LanguageCatalogTests().testRequestLanguageStripsAutoAndBlankValues() }),
             VoiceInkCoreCheck(name: "LocalWhisperPromptCatalogTests.testCustomLanguagePromptsKeyPreservesExistingMacOSStorageName", run: { LocalWhisperPromptCatalogTests().testCustomLanguagePromptsKeyPreservesExistingMacOSStorageName() }),
             VoiceInkCoreCheck(name: "LocalWhisperPromptCatalogTests.testDefaultPromptsPreserveExistingMacOSLanguageSeeds", run: { LocalWhisperPromptCatalogTests().testDefaultPromptsPreserveExistingMacOSLanguageSeeds() }),

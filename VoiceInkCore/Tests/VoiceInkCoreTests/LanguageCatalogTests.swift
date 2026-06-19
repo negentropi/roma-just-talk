@@ -264,6 +264,45 @@ final class LanguageCatalogTests: XCTestCase {
         )
     }
 
+    func testTranscriptionLanguagePresentationPreservesPlatformCopy() {
+        XCTAssertEqual(VoiceInkTranscriptionLanguagePresentation.sectionTitle, "Transcription Language")
+        XCTAssertEqual(VoiceInkTranscriptionLanguagePresentation.pickerTitle, "Language")
+        XCTAssertEqual(VoiceInkTranscriptionLanguagePresentation.menuPickerTitle, "Select Language")
+        XCTAssertEqual(VoiceInkTranscriptionLanguagePresentation.autoDetectedLabel, "Language: Autodetected")
+        XCTAssertEqual(
+            VoiceInkTranscriptionLanguagePresentation.autoDetectedDescription,
+            "The transcription language is automatically detected by the model."
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptionLanguagePresentation.multilingualDescription,
+            "This model supports multiple languages. Select a specific language or auto-detect(if available)"
+        )
+        XCTAssertEqual(VoiceInkTranscriptionLanguagePresentation.englishOnlyLabel, "Language: English")
+        XCTAssertEqual(
+            VoiceInkTranscriptionLanguagePresentation.englishOnlyDescription,
+            "This is an English-optimized model and only supports English transcription."
+        )
+        XCTAssertEqual(VoiceInkTranscriptionLanguagePresentation.noModelSelectedText, "No model selected")
+        XCTAssertEqual(VoiceInkTranscriptionLanguagePresentation.englishOnlyMenuLabel, "Language: English (only)")
+    }
+
+    func testTranscriptionLanguagePresentationBuildsMenuLabelWithSharedDisplayName() {
+        XCTAssertEqual(
+            VoiceInkTranscriptionLanguagePresentation.menuLabel(
+                selectedLanguage: "es",
+                languages: ["es": "Spanish", "en": "English"]
+            ),
+            "Language: Spanish"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptionLanguagePresentation.menuLabel(
+                selectedLanguage: "bad",
+                languages: ["es": "Spanish", "en": "English"]
+            ),
+            "Language: Unknown"
+        )
+    }
+
     func testRequestLanguageStripsAutoAndBlankValues() {
         XCTAssertNil(VoiceInkTranscriptionLanguageSupport.requestLanguage(nil))
         XCTAssertNil(VoiceInkTranscriptionLanguageSupport.requestLanguage(""))

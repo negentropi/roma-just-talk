@@ -104,18 +104,18 @@ struct LanguageSelectionView: View {
     
     private var languageSelectionSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Transcription Language")
+            Text(VoiceInkTranscriptionLanguagePresentation.sectionTitle)
                 .font(.headline)
 
             if transcriptionModelManager.currentTranscriptionModel != nil
             {
                 if languageSelectionDisabled() {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Language: Autodetected")
+                        Text(VoiceInkTranscriptionLanguagePresentation.autoDetectedLabel)
                             .font(.subheadline)
                             .foregroundColor(.primary)
 
-                        Text("The transcription language is automatically detected by the model.")
+                        Text(VoiceInkTranscriptionLanguagePresentation.autoDetectedDescription)
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
@@ -123,7 +123,7 @@ struct LanguageSelectionView: View {
                 } else if isMultilingualModel() {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack(spacing: 8) {
-                            Picker("Select Language", selection: selectedLanguageBinding) {
+                            Picker(VoiceInkTranscriptionLanguagePresentation.menuPickerTitle, selection: selectedLanguageBinding) {
                                 ForEach(
                                     VoiceInkLanguageCatalog.sortedOptions(availableLanguagesForCurrentModel())
                                 ) { option in
@@ -139,7 +139,7 @@ struct LanguageSelectionView: View {
                         }
 
                         Text(
-                            "This model supports multiple languages. Select a specific language or auto-detect(if available)"
+                            VoiceInkTranscriptionLanguagePresentation.multilingualDescription
                         )
                         .font(.caption)
                         .foregroundColor(.secondary)
@@ -147,12 +147,12 @@ struct LanguageSelectionView: View {
                 } else {
                     // For English-only models, force set language to English
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Language: English")
+                        Text(VoiceInkTranscriptionLanguagePresentation.englishOnlyLabel)
                             .font(.subheadline)
                             .foregroundColor(.primary)
 
                         Text(
-                            "This is an English-optimized model and only supports English transcription."
+                            VoiceInkTranscriptionLanguagePresentation.englishOnlyDescription
                         )
                         .font(.caption)
                         .foregroundColor(.secondary)
@@ -163,7 +163,7 @@ struct LanguageSelectionView: View {
                     }
                 }
             } else {
-                Text("No model selected")
+                Text(VoiceInkTranscriptionLanguagePresentation.noModelSelectedText)
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
@@ -181,7 +181,7 @@ struct LanguageSelectionView: View {
                 Button {
                     // Do nothing, just showing info
                 } label: {
-                    Text("Language: Autodetected")
+                    Text(VoiceInkTranscriptionLanguagePresentation.autoDetectedLabel)
                         .foregroundColor(.secondary)
                 }
                 .disabled(true)
@@ -205,9 +205,9 @@ struct LanguageSelectionView: View {
                     } label: {
                         HStack {
                             Text(
-                                "Language: " + VoiceInkLanguageCatalog.displayName(
-                                    for: selectedLanguage,
-                                    in: availableLanguagesForCurrentModel()
+                                VoiceInkTranscriptionLanguagePresentation.menuLabel(
+                                    selectedLanguage: selectedLanguage,
+                                    languages: availableLanguagesForCurrentModel()
                                 )
                             )
                             Image(systemName: "chevron.up.chevron.down")
@@ -224,7 +224,7 @@ struct LanguageSelectionView: View {
                 Button {
                     // Do nothing, just showing info
                 } label: {
-                    Text("Language: English (only)")
+                    Text(VoiceInkTranscriptionLanguagePresentation.englishOnlyMenuLabel)
                         .foregroundColor(.secondary)
                 }
                 .disabled(true)

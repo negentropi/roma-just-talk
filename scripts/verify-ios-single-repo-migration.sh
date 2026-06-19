@@ -1886,7 +1886,7 @@ reject_pattern \
 
 require_pattern \
   "shared custom prompt presentation owns icon catalog and copy" \
-  'VoiceInkCustomPromptPresentation|iconSystemNames|promptGridHelpText|deletePromptConfirmationMessage|triggerSummary|addPromptSystemImageName|editActionSystemImageName|deleteActionSystemImageName|closeSystemImageName|addTriggerWordSystemImageName|removeTriggerWordSystemImageName' \
+  'VoiceInkCustomPromptPresentation|iconSystemNames|promptGridInfoSystemImageName|promptGridHelpText|deletePromptConfirmationMessage|triggerSummary|addPromptSystemImageName|editActionSystemImageName|deleteActionSystemImageName|closeSystemImageName|addTriggerWordSystemImageName|removeTriggerWordSystemImageName' \
   VoiceInkCore/Sources/VoiceInkCore/CustomPromptPresentation.swift
 
 require_pattern \
@@ -1901,12 +1901,12 @@ require_pattern \
 
 require_pattern \
   "macOS prompt grids use shared presentation" \
-  'VoiceInkCustomPromptPresentation\.(promptGridEmptyText|promptGridHelpText|addPromptHelpText)' \
+  'VoiceInkCustomPromptPresentation\.(promptGridEmptyText|promptGridInfoSystemImageName|promptGridHelpText|addPromptHelpText)' \
   VoiceInk/Views/Components/PromptSelectionGrid.swift
 
 require_pattern \
   "macOS enhancement prompt grid uses shared presentation" \
-  'VoiceInkCustomPromptPresentation\.(promptGridEmptyText|promptGridHelpText)' \
+  'VoiceInkCustomPromptPresentation\.(promptGridEmptyText|promptGridInfoSystemImageName|promptGridHelpText|addPromptSystemImageName)' \
   VoiceInk/Views/EnhancementSettingsView.swift
 
 reject_pattern \
@@ -1929,9 +1929,15 @@ reject_pattern \
   VoiceInk/Models/CustomPrompt.swift \
   VoiceInk/Views/PromptEditorView.swift
 
+reject_pattern \
+  "macOS prompt grids avoid shell-only prompt grid action symbols" \
+  '"(info\.circle|plus\.circle\.fill)"' \
+  VoiceInk/Views/Components/PromptSelectionGrid.swift \
+  VoiceInk/Views/EnhancementSettingsView.swift
+
 require_pattern \
   "migration checklist tracks shared custom prompt presentation gate" \
-  'macOS custom prompt icon catalog, prompt-card trigger summary/action symbols, grid empty/help copy, editor labels/placeholders/help/action symbols, and delete confirmation copy route through `VoiceInkCustomPromptPresentation`' \
+  'macOS custom prompt icon catalog, prompt-card trigger summary/action symbols, grid empty/help copy and info icon, editor labels/placeholders/help/action symbols, and delete confirmation copy route through `VoiceInkCustomPromptPresentation`' \
   docs/ios-single-repo-migration.md
 
 reject_pattern \
@@ -2478,8 +2484,13 @@ reject_pattern \
 
 require_pattern \
   "shared enhancement settings presentation lives in VoiceInkCore" \
-  'VoiceInkEnhancementSettingsPresentation|shortEnhancementWordOptions|timeoutRetryOptions' \
+  'VoiceInkEnhancementSettingsPresentation|generalSectionTitle|enableEnhancementTitle|enableEnhancementHelp|enableEnhancementLearnMoreURLString|settingsButtonSystemImageName|settingsButtonHelp|promptsSectionTitle|shortEnhancementWordOptions|timeoutRetryOptions' \
   VoiceInkCore/Sources/VoiceInkCore/EnhancementSettingsPresentation.swift
+
+require_pattern \
+  "macOS enhancement settings outer view uses shared presentation" \
+  'VoiceInkEnhancementSettingsPresentation\.macOS|presentation\.(generalSectionTitle|enableEnhancementTitle|enableEnhancementHelp|enableEnhancementLearnMoreURLString|settingsButtonSystemImageName|settingsButtonHelp|promptsSectionTitle)' \
+  VoiceInk/Views/EnhancementSettingsView.swift
 
 require_pattern \
   "macOS enhancement settings use shared presentation" \
@@ -2490,6 +2501,11 @@ reject_pattern \
   "macOS enhancement settings avoid shell-only presentation copy and option ranges" \
   '"(Enhancement Settings|Close|Clipboard Context|Use clipboard text to understand context for better enhancement\.|Screen Context|Capture on-screen text to understand context for better enhancement\.|Context|Skip short transcriptions|Minimum words|Timeout duration|On timeout|Fail immediately|Retry|Request Timeout|Set how long to wait for the AI provider to respond\.|Shortcuts)"|ForEach\(1\.\.\.15|\[3, 5, 7, 10, 15, 20, 30, 40, 50, 60\]' \
   VoiceInk/Views/Components/EnhancementSettingsPanel.swift
+
+reject_pattern \
+  "macOS enhancement settings outer view avoids shell-only chrome copy" \
+  '"(Enable Enhancement|AI enhancement lets you pass the transcribed audio through LLMs to post-process using different prompts suitable for different use cases like e-mails, summary, writing, etc\.|https://tryvoiceink.com/docs/enhancements-configuring-models|General|Enhancement settings|Enhancement Prompts|gear)"' \
+  VoiceInk/Views/EnhancementSettingsView.swift
 
 require_pattern \
   "shared core owns transcription session route planning" \

@@ -17,6 +17,13 @@ public struct VoiceInkEnhancementRetryOption: Identifiable, Equatable, Sendable 
 public struct VoiceInkEnhancementSettingsPresentation: Equatable, Sendable {
     public let title: String
     public let closeButtonHelp: String
+    public let generalSectionTitle: String
+    public let enableEnhancementTitle: String
+    public let enableEnhancementHelp: String
+    public let enableEnhancementLearnMoreURLString: String
+    public let settingsButtonSystemImageName: String
+    public let settingsButtonHelp: String
+    public let promptsSectionTitle: String
     public let contextSectionTitle: String
     public let clipboardContextTitle: String
     public let clipboardContextHelp: String
@@ -38,6 +45,13 @@ public struct VoiceInkEnhancementSettingsPresentation: Equatable, Sendable {
     public static let macOS = VoiceInkEnhancementSettingsPresentation(
         title: "Enhancement Settings",
         closeButtonHelp: "Close",
+        generalSectionTitle: "General",
+        enableEnhancementTitle: "Enable Enhancement",
+        enableEnhancementHelp: "AI enhancement lets you pass the transcribed audio through LLMs to post-process using different prompts suitable for different use cases like e-mails, summary, writing, etc.",
+        enableEnhancementLearnMoreURLString: "https://tryvoiceink.com/docs/enhancements-configuring-models",
+        settingsButtonSystemImageName: "gear",
+        settingsButtonHelp: "Enhancement settings",
+        promptsSectionTitle: "Enhancement Prompts",
         contextSectionTitle: "Context",
         clipboardContextTitle: "Clipboard Context",
         clipboardContextHelp: "Use clipboard text to understand context for better enhancement.",

@@ -67,7 +67,7 @@ struct PromptSelectionGrid: View {
                 
                 // Helpful tip for users
                 HStack {
-                    Image(systemName: "info.circle")
+                    Image(systemName: VoiceInkCustomPromptPresentation.promptGridInfoSystemImageName)
                         .font(.caption)
                         .foregroundColor(.secondary)
                     

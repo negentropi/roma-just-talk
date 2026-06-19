@@ -7,6 +7,19 @@ final class EnhancementSettingsPresentationTests: XCTestCase {
 
         XCTAssertEqual(presentation.title, "Enhancement Settings")
         XCTAssertEqual(presentation.closeButtonHelp, "Close")
+        XCTAssertEqual(presentation.generalSectionTitle, "General")
+        XCTAssertEqual(presentation.enableEnhancementTitle, "Enable Enhancement")
+        XCTAssertEqual(
+            presentation.enableEnhancementHelp,
+            "AI enhancement lets you pass the transcribed audio through LLMs to post-process using different prompts suitable for different use cases like e-mails, summary, writing, etc."
+        )
+        XCTAssertEqual(
+            presentation.enableEnhancementLearnMoreURLString,
+            "https://tryvoiceink.com/docs/enhancements-configuring-models"
+        )
+        XCTAssertEqual(presentation.settingsButtonSystemImageName, "gear")
+        XCTAssertEqual(presentation.settingsButtonHelp, "Enhancement settings")
+        XCTAssertEqual(presentation.promptsSectionTitle, "Enhancement Prompts")
         XCTAssertEqual(presentation.contextSectionTitle, "Context")
         XCTAssertEqual(presentation.clipboardContextTitle, "Clipboard Context")
         XCTAssertEqual(presentation.clipboardContextHelp, "Use clipboard text to understand context for better enhancement.")

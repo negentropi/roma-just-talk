@@ -4,6 +4,7 @@ import VoiceInkCore
 
 struct EnhancementSettingsView: View {
     @EnvironmentObject private var enhancementService: AIEnhancementService
+    private let presentation = VoiceInkEnhancementSettingsPresentation.macOS
     @State private var isEditingPrompt = false
     @State private var isShowingSettings = false
     @State private var selectedPromptForEdit: VoiceInkCustomPrompt?
@@ -44,17 +45,17 @@ struct EnhancementSettingsView: View {
             Section {
                 Toggle(isOn: $enhancementService.isEnhancementEnabled) {
                     HStack(spacing: 4) {
-                        Text("Enable Enhancement")
+                        Text(presentation.enableEnhancementTitle)
                         InfoTip(
-                            "AI enhancement lets you pass the transcribed audio through LLMs to post-process using different prompts suitable for different use cases like e-mails, summary, writing, etc.",
-                            learnMoreURL: "https://tryvoiceink.com/docs/enhancements-configuring-models"
+                            presentation.enableEnhancementHelp,
+                            learnMoreURL: presentation.enableEnhancementLearnMoreURLString
                         )
                     }
                 }
                 .toggleStyle(.switch)
             } header: {
                 HStack {
-                    Text("General")
+                    Text(presentation.generalSectionTitle)
                     Spacer()
                     Button {
                         withAnimation(.smooth(duration: 0.3)) {
@@ -63,12 +64,12 @@ struct EnhancementSettingsView: View {
                             isShowingSettings.toggle()
                         }
                     } label: {
-                        Image(systemName: "gear")
+                        Image(systemName: presentation.settingsButtonSystemImageName)
                             .font(.system(size: 16, weight: .medium))
                             .foregroundColor(isShowingSettings ? .accentColor : .secondary)
                     }
                     .buttonStyle(.plain)
-                    .help("Enhancement settings")
+                    .help(presentation.settingsButtonHelp)
                 }
             }
 
@@ -94,7 +95,7 @@ struct EnhancementSettingsView: View {
                 .padding(.vertical, 8)
             } header: {
                 HStack {
-                    Text("Enhancement Prompts")
+                    Text(presentation.promptsSectionTitle)
                     Spacer()
                     Button {
                         openPromptPanel()
@@ -102,7 +103,7 @@ struct EnhancementSettingsView: View {
                             isEditingPrompt = true
                         }
                     } label: {
-                        Image(systemName: "plus.circle.fill")
+                        Image(systemName: VoiceInkCustomPromptPresentation.addPromptSystemImageName)
                             .font(.system(size: 18))
                             .symbolRenderingMode(.hierarchical)
                             .foregroundStyle(.secondary)
@@ -212,7 +213,7 @@ private struct ReorderablePromptGrid: View {
                 .padding(.horizontal, 16)
 
                 HStack {
-                    Image(systemName: "info.circle")
+                    Image(systemName: VoiceInkCustomPromptPresentation.promptGridInfoSystemImageName)
                     .font(.caption)
                     .foregroundColor(.secondary)
 

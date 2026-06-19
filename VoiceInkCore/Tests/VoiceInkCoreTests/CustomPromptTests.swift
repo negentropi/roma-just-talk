@@ -487,6 +487,7 @@ final class CustomPromptTests: XCTestCase {
         XCTAssertEqual(VoiceInkCustomPromptPresentation.addPromptTitle, "Add New")
         XCTAssertEqual(VoiceInkCustomPromptPresentation.addPromptSystemImageName, "plus.circle.fill")
         XCTAssertEqual(VoiceInkCustomPromptPresentation.promptGridEmptyText, "No prompts available")
+        XCTAssertEqual(VoiceInkCustomPromptPresentation.promptGridInfoSystemImageName, "info.circle")
         XCTAssertEqual(
             VoiceInkCustomPromptPresentation.promptGridHelpText,
             "Double-click to edit • Right-click for more options"

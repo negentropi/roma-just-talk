@@ -22,6 +22,7 @@ public enum VoiceInkCustomPromptPresentation {
     public static let cancelActionTitle = "Cancel"
     public static let deletePromptConfirmationTitle = "Delete Prompt?"
     public static let promptGridEmptyText = "No prompts available"
+    public static let promptGridInfoSystemImageName = "info.circle"
     public static let promptGridHelpText = "Double-click to edit • Right-click for more options"
     public static let addPromptHelpText = "Add new prompt"
     public static let closeHelpText = "Close"

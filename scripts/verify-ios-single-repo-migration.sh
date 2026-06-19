@@ -2170,6 +2170,16 @@ require_pattern \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
 require_pattern \
+  "shared AI enhancement static text model list policy lives in VoiceInkCore" \
+  'staticTextEnhancementModels' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+require_pattern \
+  "macOS AI service static text model list uses shared policy" \
+  'staticTextEnhancementModels' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+require_pattern \
   "shared AI enhancement request URL selection lives in VoiceInkCore" \
   'textEnhancementRequestURLString|postProcessingRequestURL' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
@@ -2200,6 +2210,11 @@ reject_pattern \
   '"(mistral|local-cli)"|ollamaSelectedModel\(fallback:' \
   VoiceInk/Services/AIEnhancement/AIService.swift \
   VoiceInk/PowerMode/PowerModeConfigView.swift
+
+reject_pattern \
+  "macOS AI service avoids duplicate static text model list policy" \
+  'extension +VoiceInkAIEnhancementProviderKind|VoiceInkAIModelCatalog\.availableModels\(for: provider\)|provider\.availableModels' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
 
 reject_pattern \
   "macOS AI services avoid duplicate request URL selection policy" \

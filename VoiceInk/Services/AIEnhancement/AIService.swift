@@ -2,26 +2,6 @@ import Foundation
 import LLMkit
 import VoiceInkCore
 
-extension VoiceInkAIEnhancementProviderKind {
-    var availableModels: [String] {
-        if let provider = aiModelProvider {
-            return VoiceInkAIModelCatalog.availableModels(for: provider)
-        }
-
-        switch self {
-        case .ollama:
-            return []
-        case .localCLI:
-            return []
-        case .custom:
-            return []
-        case .anthropic, .assemblyAI, .cerebras, .deepgram, .elevenLabs, .groq, .gemini, .mistral, .openAI, .openRouter, .soniox, .speechmatics:
-            preconditionFailure("Core-backed providers should return from VoiceInkAIModelCatalog")
-        }
-    }
-
-}
-
 class AIService: ObservableObject {
     @Published var apiKey: String = ""
     @Published var isAPIKeyValid: Bool = false
@@ -108,7 +88,7 @@ class AIService: ObservableObject {
         } else if provider == .openRouter {
             return openRouterModels
         }
-        return provider.availableModels
+        return provider.staticTextEnhancementModels
     }
     
     init() {

@@ -357,6 +357,20 @@ final class AIProviderCatalogTests: XCTestCase {
         }
     }
 
+    func testMacOSAIEnhancementStaticTextEnhancementModelsAreShared() {
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.groq.staticTextEnhancementModels,
+            VoiceInkAIModelCatalog.availableModels(for: .groq)
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.openRouter.staticTextEnhancementModels,
+            VoiceInkAIModelCatalog.availableModels(for: .openRouter)
+        )
+        XCTAssertEqual(VoiceInkAIEnhancementProviderKind.ollama.staticTextEnhancementModels, [])
+        XCTAssertEqual(VoiceInkAIEnhancementProviderKind.localCLI.staticTextEnhancementModels, [])
+        XCTAssertEqual(VoiceInkAIEnhancementProviderKind.custom.staticTextEnhancementModels, [])
+    }
+
     func testMacOSAIEnhancementRequestURLSelectionIsShared() {
         withIsolatedDefaults { defaults in
             XCTAssertEqual(

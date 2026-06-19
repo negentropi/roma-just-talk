@@ -47,6 +47,76 @@ final class TranscriptionCleanupPreferencesTests: XCTestCase {
         XCTAssertEqual(presentation.addFillerWordPlaceholder, "Add filler word")
     }
 
+    func testMacOSCleanupSettingsPresentationPreservesOptionsAndCopy() {
+        let presentation = VoiceInkMacOSCleanupSettingsPresentation.macOS
+
+        XCTAssertEqual(presentation.transcriptToggleTitle, "Auto-delete Transcripts")
+        XCTAssertEqual(
+            presentation.transcriptHelpText,
+            "Automatically delete transcript history based on the retention period you set."
+        )
+        XCTAssertEqual(presentation.transcriptRetentionPickerTitle, "Delete After")
+        XCTAssertEqual(
+            presentation.transcriptRetentionOptions,
+            [
+                VoiceInkCleanupRetentionOption(title: "Immediately", value: 0),
+                VoiceInkCleanupRetentionOption(title: "1 hour", value: 60),
+                VoiceInkCleanupRetentionOption(title: "1 day", value: 24 * 60),
+                VoiceInkCleanupRetentionOption(title: "3 days", value: 3 * 24 * 60),
+                VoiceInkCleanupRetentionOption(title: "7 days", value: 7 * 24 * 60)
+            ]
+        )
+        XCTAssertEqual(presentation.manualCleanupButtonTitle, "Run Cleanup Now")
+        XCTAssertEqual(presentation.transcriptCleanupAlertTitle, "Transcript Cleanup")
+        XCTAssertEqual(presentation.transcriptCleanupCompleteMessage, "Cleanup complete.")
+        XCTAssertEqual(presentation.audioToggleTitle, "Auto-delete Audio Files")
+        XCTAssertEqual(
+            presentation.audioHelpText,
+            "Automatically delete audio recordings while keeping text transcripts intact."
+        )
+        XCTAssertEqual(presentation.audioRetentionPickerTitle, "Keep Audio For")
+        XCTAssertEqual(
+            presentation.audioRetentionOptions,
+            [
+                VoiceInkCleanupRetentionOption(title: "1 day", value: 1),
+                VoiceInkCleanupRetentionOption(title: "3 days", value: 3),
+                VoiceInkCleanupRetentionOption(title: "7 days", value: 7),
+                VoiceInkCleanupRetentionOption(title: "14 days", value: 14),
+                VoiceInkCleanupRetentionOption(title: "30 days", value: 30)
+            ]
+        )
+        XCTAssertEqual(presentation.audioCleanupAnalyzingButtonTitle, "Analyzing...")
+        XCTAssertEqual(presentation.audioCleanupAlertTitle, "Audio Cleanup")
+        XCTAssertEqual(presentation.cancelButtonTitle, "Cancel")
+        XCTAssertEqual(presentation.deleteFilesButtonTitlePrefix, "Delete")
+        XCTAssertEqual(presentation.deleteFilesButtonTitleSuffix, "Files")
+        XCTAssertEqual(presentation.cleanupCompleteAlertTitle, "Cleanup Complete")
+        XCTAssertEqual(presentation.okButtonTitle, "OK")
+        XCTAssertEqual(presentation.disclosureSystemImageName, "chevron.right")
+    }
+
+    func testMacOSCleanupSettingsPresentationFormatsDynamicMessages() {
+        let presentation = VoiceInkMacOSCleanupSettingsPresentation.macOS
+
+        XCTAssertEqual(presentation.audioCleanupButtonTitle(isAnalyzing: false), "Run Cleanup Now")
+        XCTAssertEqual(presentation.audioCleanupButtonTitle(isAnalyzing: true), "Analyzing...")
+        XCTAssertEqual(presentation.deleteFilesButtonTitle(fileCount: 1), "Delete 1 Files")
+        XCTAssertEqual(
+            presentation.audioCleanupConfirmationMessage(fileCount: 2, totalSizeText: "12 MB"),
+            "This will delete 2 audio files (12 MB)."
+        )
+        XCTAssertEqual(presentation.noAudioFilesMessage(retentionDays: 1), "No audio files found older than 1 day.")
+        XCTAssertEqual(presentation.noAudioFilesMessage(retentionDays: 7), "No audio files found older than 7 days.")
+        XCTAssertEqual(
+            presentation.audioCleanupResultMessage(deletedCount: 3, errorCount: 0),
+            "Deleted 3 audio files."
+        )
+        XCTAssertEqual(
+            presentation.audioCleanupResultMessage(deletedCount: 3, errorCount: 1),
+            "Deleted 3 files. Failed: 1."
+        )
+    }
+
     func testCurrentFallsBackToLegacyRemovePunctuationFlag() {
         withIsolatedDefaults { defaults in
             defaults.set(true, forKey: PunctuationCleanupMode.legacyRemovePunctuationKey)

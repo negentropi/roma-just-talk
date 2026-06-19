@@ -175,6 +175,93 @@ public struct VoiceInkTranscriptionCleanupPresentation: Equatable, Sendable {
     )
 }
 
+public struct VoiceInkCleanupRetentionOption: Identifiable, Equatable, Sendable {
+    public let title: String
+    public let value: Int
+
+    public var id: Int { value }
+}
+
+public struct VoiceInkMacOSCleanupSettingsPresentation: Equatable, Sendable {
+    public let transcriptToggleTitle: String
+    public let transcriptHelpText: String
+    public let transcriptRetentionPickerTitle: String
+    public let transcriptRetentionOptions: [VoiceInkCleanupRetentionOption]
+    public let manualCleanupButtonTitle: String
+    public let transcriptCleanupAlertTitle: String
+    public let transcriptCleanupCompleteMessage: String
+    public let audioToggleTitle: String
+    public let audioHelpText: String
+    public let audioRetentionPickerTitle: String
+    public let audioRetentionOptions: [VoiceInkCleanupRetentionOption]
+    public let audioCleanupAnalyzingButtonTitle: String
+    public let audioCleanupAlertTitle: String
+    public let cancelButtonTitle: String
+    public let deleteFilesButtonTitlePrefix: String
+    public let deleteFilesButtonTitleSuffix: String
+    public let cleanupCompleteAlertTitle: String
+    public let okButtonTitle: String
+    public let disclosureSystemImageName: String
+
+    public static let macOS = VoiceInkMacOSCleanupSettingsPresentation(
+        transcriptToggleTitle: "Auto-delete Transcripts",
+        transcriptHelpText: "Automatically delete transcript history based on the retention period you set.",
+        transcriptRetentionPickerTitle: "Delete After",
+        transcriptRetentionOptions: [
+            VoiceInkCleanupRetentionOption(title: "Immediately", value: 0),
+            VoiceInkCleanupRetentionOption(title: "1 hour", value: 60),
+            VoiceInkCleanupRetentionOption(title: "1 day", value: 24 * 60),
+            VoiceInkCleanupRetentionOption(title: "3 days", value: 3 * 24 * 60),
+            VoiceInkCleanupRetentionOption(title: "7 days", value: 7 * 24 * 60)
+        ],
+        manualCleanupButtonTitle: "Run Cleanup Now",
+        transcriptCleanupAlertTitle: "Transcript Cleanup",
+        transcriptCleanupCompleteMessage: "Cleanup complete.",
+        audioToggleTitle: "Auto-delete Audio Files",
+        audioHelpText: "Automatically delete audio recordings while keeping text transcripts intact.",
+        audioRetentionPickerTitle: "Keep Audio For",
+        audioRetentionOptions: [
+            VoiceInkCleanupRetentionOption(title: "1 day", value: 1),
+            VoiceInkCleanupRetentionOption(title: "3 days", value: 3),
+            VoiceInkCleanupRetentionOption(title: "7 days", value: 7),
+            VoiceInkCleanupRetentionOption(title: "14 days", value: 14),
+            VoiceInkCleanupRetentionOption(title: "30 days", value: 30)
+        ],
+        audioCleanupAnalyzingButtonTitle: "Analyzing...",
+        audioCleanupAlertTitle: "Audio Cleanup",
+        cancelButtonTitle: "Cancel",
+        deleteFilesButtonTitlePrefix: "Delete",
+        deleteFilesButtonTitleSuffix: "Files",
+        cleanupCompleteAlertTitle: "Cleanup Complete",
+        okButtonTitle: "OK",
+        disclosureSystemImageName: "chevron.right"
+    )
+
+    public func audioCleanupButtonTitle(isAnalyzing: Bool) -> String {
+        isAnalyzing ? audioCleanupAnalyzingButtonTitle : manualCleanupButtonTitle
+    }
+
+    public func deleteFilesButtonTitle(fileCount: Int) -> String {
+        "\(deleteFilesButtonTitlePrefix) \(fileCount) \(deleteFilesButtonTitleSuffix)"
+    }
+
+    public func audioCleanupConfirmationMessage(fileCount: Int, totalSizeText: String) -> String {
+        "This will delete \(fileCount) audio files (\(totalSizeText))."
+    }
+
+    public func noAudioFilesMessage(retentionDays: Int) -> String {
+        "No audio files found older than \(retentionDays) day\(retentionDays > 1 ? "s" : "")."
+    }
+
+    public func audioCleanupResultMessage(deletedCount: Int, errorCount: Int) -> String {
+        if errorCount > 0 {
+            return "Deleted \(deletedCount) files. Failed: \(errorCount)."
+        }
+
+        return "Deleted \(deletedCount) audio files."
+    }
+}
+
 public struct VoiceInkTranscriptionCleanupConfiguration: Equatable, Sendable {
     public static let disabled = VoiceInkTranscriptionCleanupConfiguration()
 

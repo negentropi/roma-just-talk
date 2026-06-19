@@ -4,6 +4,7 @@ import VoiceInkCore
 
 struct AudioCleanupSettingsView: View {
     @Environment(\.modelContext) private var modelContext
+    private let presentation = VoiceInkMacOSCleanupSettingsPresentation.macOS
 
     // Audio cleanup settings
     @AppStorage(VoiceInkUserDefaultsKey.isTranscriptionCleanupEnabled) private var isTranscriptionCleanupEnabled = false
@@ -30,14 +31,14 @@ struct AudioCleanupSettingsView: View {
                 HStack {
                     Toggle(isOn: $isTranscriptionCleanupEnabled) {
                         HStack(spacing: 4) {
-                            Text("Auto-delete Transcripts")
-                            InfoTip("Automatically delete transcript history based on the retention period you set.")
+                            Text(presentation.transcriptToggleTitle)
+                            InfoTip(presentation.transcriptHelpText)
                         }
                     }
 
                     Spacer()
 
-                    Image(systemName: "chevron.right")
+                    Image(systemName: presentation.disclosureSystemImageName)
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundColor(.secondary)
                         .rotationEffect(.degrees(isTranscriptionCleanupEnabled && isTranscriptExpanded ? 90 : 0))
@@ -55,15 +56,13 @@ struct AudioCleanupSettingsView: View {
 
                 if isTranscriptionCleanupEnabled && isTranscriptExpanded {
                     VStack(alignment: .leading, spacing: 8) {
-                        Picker("Delete After", selection: $transcriptionRetentionMinutes) {
-                            Text("Immediately").tag(0)
-                            Text("1 hour").tag(60)
-                            Text("1 day").tag(24 * 60)
-                            Text("3 days").tag(3 * 24 * 60)
-                            Text("7 days").tag(7 * 24 * 60)
+                        Picker(presentation.transcriptRetentionPickerTitle, selection: $transcriptionRetentionMinutes) {
+                            ForEach(presentation.transcriptRetentionOptions) { option in
+                                Text(option.title).tag(option.value)
+                            }
                         }
 
-                        Button("Run Cleanup Now") {
+                        Button(presentation.manualCleanupButtonTitle) {
                             Task {
                                 await TranscriptionAutoCleanupService.shared.runManualCleanup(modelContext: modelContext)
                                 await MainActor.run {
@@ -78,10 +77,10 @@ struct AudioCleanupSettingsView: View {
                 }
             }
             .animation(.easeInOut(duration: 0.2), value: isTranscriptExpanded)
-            .alert("Transcript Cleanup", isPresented: $showTranscriptCleanupResult) {
-                Button("OK", role: .cancel) { }
+            .alert(presentation.transcriptCleanupAlertTitle, isPresented: $showTranscriptCleanupResult) {
+                Button(presentation.okButtonTitle, role: .cancel) { }
             } message: {
-                Text("Cleanup complete.")
+                Text(presentation.transcriptCleanupCompleteMessage)
             }
             .onChange(of: isTranscriptionCleanupEnabled) { _, newValue in
                 isHandlingTranscriptToggle = true
@@ -107,14 +106,14 @@ struct AudioCleanupSettingsView: View {
                     HStack {
                         Toggle(isOn: $isAudioCleanupEnabled) {
                             HStack(spacing: 4) {
-                                Text("Auto-delete Audio Files")
-                                InfoTip("Automatically delete audio recordings while keeping text transcripts intact.")
+                                Text(presentation.audioToggleTitle)
+                                InfoTip(presentation.audioHelpText)
                             }
                         }
 
                         Spacer()
 
-                        Image(systemName: "chevron.right")
+                        Image(systemName: presentation.disclosureSystemImageName)
                             .font(.system(size: 12, weight: .semibold))
                             .foregroundColor(.secondary)
                             .rotationEffect(.degrees(isAudioCleanupEnabled && isAudioExpanded ? 90 : 0))
@@ -132,15 +131,13 @@ struct AudioCleanupSettingsView: View {
 
                     if isAudioCleanupEnabled && isAudioExpanded {
                         VStack(alignment: .leading, spacing: 8) {
-                            Picker("Keep Audio For", selection: $audioRetentionPeriod) {
-                                Text("1 day").tag(1)
-                                Text("3 days").tag(3)
-                                Text("7 days").tag(7)
-                                Text("14 days").tag(14)
-                                Text("30 days").tag(30)
+                            Picker(presentation.audioRetentionPickerTitle, selection: $audioRetentionPeriod) {
+                                ForEach(presentation.audioRetentionOptions) { option in
+                                    Text(option.title).tag(option.value)
+                                }
                             }
 
-                            Button(isPerformingCleanup ? "Analyzing..." : "Run Cleanup Now") {
+                            Button(presentation.audioCleanupButtonTitle(isAnalyzing: isPerformingCleanup)) {
                                 Task {
                                     await MainActor.run { isPerformingCleanup = true }
                                     let info = await AudioCleanupManager.shared.getCleanupInfo(modelContext: modelContext)
@@ -159,11 +156,11 @@ struct AudioCleanupSettingsView: View {
                     }
                 }
                 .animation(.easeInOut(duration: 0.2), value: isAudioExpanded)
-                .alert("Audio Cleanup", isPresented: $isShowingConfirmation) {
-                    Button("Cancel", role: .cancel) { }
+                .alert(presentation.audioCleanupAlertTitle, isPresented: $isShowingConfirmation) {
+                    Button(presentation.cancelButtonTitle, role: .cancel) { }
 
                     if cleanupInfo.fileCount > 0 {
-                        Button("Delete \(cleanupInfo.fileCount) Files", role: .destructive) {
+                        Button(presentation.deleteFilesButtonTitle(fileCount: cleanupInfo.fileCount), role: .destructive) {
                             Task {
                                 await MainActor.run { isPerformingCleanup = true }
                                 let result = await AudioCleanupManager.shared.runCleanupForTranscriptions(
@@ -180,19 +177,25 @@ struct AudioCleanupSettingsView: View {
                     }
                 } message: {
                     if cleanupInfo.fileCount > 0 {
-                        Text("This will delete \(cleanupInfo.fileCount) audio files (\(AudioCleanupManager.shared.formatFileSize(cleanupInfo.totalSize))).")
+                        Text(
+                            presentation.audioCleanupConfirmationMessage(
+                                fileCount: cleanupInfo.fileCount,
+                                totalSizeText: AudioCleanupManager.shared.formatFileSize(cleanupInfo.totalSize)
+                            )
+                        )
                     } else {
-                        Text("No audio files found older than \(audioRetentionPeriod) day\(audioRetentionPeriod > 1 ? "s" : "").")
+                        Text(presentation.noAudioFilesMessage(retentionDays: audioRetentionPeriod))
                     }
                 }
-                .alert("Cleanup Complete", isPresented: $showResultAlert) {
-                    Button("OK", role: .cancel) { }
+                .alert(presentation.cleanupCompleteAlertTitle, isPresented: $showResultAlert) {
+                    Button(presentation.okButtonTitle, role: .cancel) { }
                 } message: {
-                    if cleanupResult.errorCount > 0 {
-                        Text("Deleted \(cleanupResult.deletedCount) files. Failed: \(cleanupResult.errorCount).")
-                    } else {
-                        Text("Deleted \(cleanupResult.deletedCount) audio files.")
-                    }
+                    Text(
+                        presentation.audioCleanupResultMessage(
+                            deletedCount: cleanupResult.deletedCount,
+                            errorCount: cleanupResult.errorCount
+                        )
+                    )
                 }
                 .onChange(of: isAudioCleanupEnabled) { _, newValue in
                     isHandlingAudioToggle = true

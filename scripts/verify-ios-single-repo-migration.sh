@@ -1838,6 +1838,16 @@ require_pattern \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
 require_pattern \
+  "shared macOS cleanup settings presentation lives in VoiceInkCore" \
+  'VoiceInkMacOSCleanupSettingsPresentation|transcriptRetentionOptions|audioCleanupResultMessage' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionCleanupPreferences.swift
+
+require_pattern \
+  "macOS audio cleanup settings use shared presentation" \
+  'VoiceInkMacOSCleanupSettingsPresentation\.macOS|presentation\.(transcriptToggleTitle|audioRetentionOptions|audioCleanupResultMessage)' \
+  VoiceInk/Views/Settings/AudioCleanupSettingsView.swift
+
+require_pattern \
   "shared Power Mode transcription selection lives in VoiceInkCore" \
   'VoiceInkPowerModeTranscriptionSelection|VoiceInkPowerModeTranscriptionModelFacts|VoiceInkPowerModeLanguageControl' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
@@ -2030,6 +2040,11 @@ reject_pattern \
   VoiceInk/Views/ModelSettingsView.swift \
   VoiceInk/Views/Components/FillerWordsSettingsView.swift \
   VoiceInk/PowerMode/PowerModeConfigView.swift
+
+reject_pattern \
+  "macOS audio cleanup settings avoid shell-only presentation copy" \
+  '"(Auto-delete Transcripts|Automatically delete transcript history based on the retention period you set\.|Delete After|Immediately|1 hour|1 day|3 days|7 days|Run Cleanup Now|Transcript Cleanup|Cleanup complete\.|Auto-delete Audio Files|Automatically delete audio recordings while keeping text transcripts intact\.|Keep Audio For|14 days|30 days|Analyzing\.\.\.|Audio Cleanup|Cancel|Cleanup Complete)"|Delete \\\(cleanupInfo\.fileCount\\\) Files|This will delete \\\(cleanupInfo\.fileCount\\\) audio files|No audio files found older than|Deleted \\\(cleanupResult\.deletedCount\\\)' \
+  VoiceInk/Views/Settings/AudioCleanupSettingsView.swift
 
 reject_pattern \
   "iOS dictionary settings avoid shell-only presentation copy" \

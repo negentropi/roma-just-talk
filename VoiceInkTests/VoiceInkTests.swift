@@ -11,7 +11,12 @@ import SwiftData
 import AppKit
 import Carbon.HIToolbox
 import os
+import VoiceInkCore
 @testable import VoiceInk
+
+private typealias CustomPrompt = VoiceInkCustomPrompt
+private typealias RecordingState = VoiceInkRecordingState
+private typealias ShortcutPressContext = VoiceInkShortcutPressContext
 
 @Suite(.serialized)
 struct VoiceInkTests {
@@ -32,9 +37,9 @@ struct VoiceInkTests {
     }
 
     @Test @MainActor func rollingPreloadQuickReleaseDurationUsesMono16kPCMByteCount() {
-        #expect(VoiceInkEngine.durationForMono16kPCMData(Data(count: 32_000)) == 1.0)
-        #expect(VoiceInkEngine.durationForMono16kPCMData(Data(count: 16_000)) == 0.5)
-        #expect(VoiceInkEngine.durationForMono16kPCMData(Data()) == 0)
+        #expect(VoiceInkPCM16Audio.duration(forMono16kData: Data(count: 32_000)) == 1.0)
+        #expect(VoiceInkPCM16Audio.duration(forMono16kData: Data(count: 16_000)) == 0.5)
+        #expect(VoiceInkPCM16Audio.duration(forMono16kData: Data()) == 0)
     }
 
     @Test @MainActor func failedPasteCommandDoesNotRestoreOverTranscriptClipboard() async throws {
@@ -99,10 +104,10 @@ struct VoiceInkTests {
     @Test func resolvesAPIKeyEnvironmentReference() async throws {
         let environment = ["ELEVENLABS_API_KEY": "test-key"]
 
-        #expect(APIKeyManager.resolveAPIKeyReference("$ELEVENLABS_API_KEY", environment: environment) == "test-key")
-        #expect(APIKeyManager.resolveAPIKeyReference("${ELEVENLABS_API_KEY}", environment: environment) == "test-key")
-        #expect(APIKeyManager.resolveAPIKeyReference("literal-key", environment: environment) == "literal-key")
-        #expect(APIKeyManager.resolveAPIKeyReference("$MISSING", environment: environment) == nil)
+        #expect(VoiceInkAPIKeyReference.resolvedValue("$ELEVENLABS_API_KEY", environment: environment) == "test-key")
+        #expect(VoiceInkAPIKeyReference.resolvedValue("${ELEVENLABS_API_KEY}", environment: environment) == "test-key")
+        #expect(VoiceInkAPIKeyReference.resolvedValue("literal-key", environment: environment) == "literal-key")
+        #expect(VoiceInkAPIKeyReference.resolvedValue("$MISSING", environment: environment) == nil)
     }
 
     @Test @MainActor func wordReplacementServiceUsesWarmedCacheUntilInvalidated() throws {
@@ -221,7 +226,12 @@ struct VoiceInkTests {
             triggerPrompt
         ]
 
-        let detection = PromptDetectionService().analyzeText("answer what is this?", with: service)
+        let detection = VoiceInkPromptDetectionPolicy.analyzeText(
+            "answer what is this?",
+            prompts: service.promptDetectionPrompts,
+            isEnhancementEnabled: false,
+            selectedPromptId: nil
+        )
 
         #expect(detection.shouldEnableAI)
         #expect(detection.selectedPromptId == triggerPrompt.id)

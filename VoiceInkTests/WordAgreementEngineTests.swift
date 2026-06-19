@@ -1,4 +1,5 @@
 import Testing
+import VoiceInkCore
 @testable import VoiceInk
 
 @Suite(.serialized)

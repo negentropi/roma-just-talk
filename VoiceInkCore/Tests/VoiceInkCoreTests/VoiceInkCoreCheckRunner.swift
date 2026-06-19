@@ -13,6 +13,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AppIdentityTests.testAppIdentityPreservesSharedVisibleNames", run: { AppIdentityTests().testAppIdentityPreservesSharedVisibleNames() }),
             VoiceInkCoreCheck(name: "AppDataResetTests.testIOSResetFilePlanPreservesExistingDirectoryPolicy", run: { AppDataResetTests().testIOSResetFilePlanPreservesExistingDirectoryPolicy() }),
             VoiceInkCoreCheck(name: "AppDataResetTests.testResetFilePlanRemovesDirectoriesAndEmptiesCacheDirectoriesBestEffort", run: { try AppDataResetTests().testResetFilePlanRemovesDirectoriesAndEmptiesCacheDirectoriesBestEffort() }),
+            VoiceInkCoreCheck(name: "OnboardingPresentationTests.testIOSOnboardingAppIconFallbackPreservesSymbolName", run: { OnboardingPresentationTests().testIOSOnboardingAppIconFallbackPreservesSymbolName() }),
             VoiceInkCoreCheck(name: "OnboardingPresentationTests.testIOSWelcomeOnboardingPresentationPreservesCopyAndFeatureOrder", run: { OnboardingPresentationTests().testIOSWelcomeOnboardingPresentationPreservesCopyAndFeatureOrder() }),
             VoiceInkCoreCheck(name: "OnboardingPresentationTests.testIOSModelDownloadOnboardingPresentationPreservesCopy", run: { OnboardingPresentationTests().testIOSModelDownloadOnboardingPresentationPreservesCopy() }),
             VoiceInkCoreCheck(name: "OnboardingPresentationTests.testIOSReadyOnboardingPresentationPreservesCopyAndStepOrder", run: { OnboardingPresentationTests().testIOSReadyOnboardingPresentationPreservesCopyAndStepOrder() }),

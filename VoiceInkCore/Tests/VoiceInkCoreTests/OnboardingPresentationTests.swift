@@ -2,6 +2,10 @@ import Foundation
 @testable import VoiceInkCore
 
 final class OnboardingPresentationTests: XCTestCase {
+    func testIOSOnboardingAppIconFallbackPreservesSymbolName() {
+        XCTAssertEqual(VoiceInkIOSOnboardingPresentation.appIconFallbackSystemImageName, "app.fill")
+    }
+
     func testIOSWelcomeOnboardingPresentationPreservesCopyAndFeatureOrder() {
         let presentation = VoiceInkIOSOnboardingPresentation.welcome
 

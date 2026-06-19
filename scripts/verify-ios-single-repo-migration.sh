@@ -1340,17 +1340,22 @@ require_pattern \
 
 require_pattern \
   "shared iOS onboarding presentation lives in VoiceInkCore" \
-  'VoiceInkIOSOnboardingPresentation|VoiceInkOnboardingFeaturePresentation|VoiceInkOnboardingStepPresentation' \
+  'VoiceInkIOSOnboardingPresentation|VoiceInkOnboardingFeaturePresentation|VoiceInkOnboardingStepPresentation|appIconFallbackSystemImageName' \
   VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift
 
 require_pattern \
   "iOS onboarding uses shared onboarding presentation" \
-  'VoiceInkIOSOnboardingPresentation\.(welcome|modelDownload|ready)' \
+  'VoiceInkIOSOnboardingPresentation\.(appIconFallbackSystemImageName|welcome|modelDownload|ready)' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 reject_pattern \
   "iOS onboarding avoids shell-only onboarding copy" \
   '"(Transform your thoughts into text effortlessly\.|Instant Recording|Capture your thoughts with a single tap, anytime, anywhere\.|Accurate Transcription|Leverage powerful AI models for precise speech-to-text conversion\.|Works Offline|Transcribe without an internet connection using local models\.|Get Started|Offline Transcription|Download a local model to transcribe audio even without an internet connection\.|Continue|You'\''re All Set!|Start recording your thoughts and ideas\.|Tap the record button to capture your thoughts\.|AI converts your speech to text automatically\.|Your notes are saved and ready for review\.)"' \
+  iOS/VoiceInk-ios/OnboardingView.swift
+
+reject_pattern \
+  "iOS onboarding avoids duplicate app icon fallback symbol" \
+  '"app\.fill"' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 reject_pattern \

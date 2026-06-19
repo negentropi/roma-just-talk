@@ -85,6 +85,8 @@ public struct VoiceInkOnboardingReadyPresentation: Equatable, Sendable {
 }
 
 public enum VoiceInkIOSOnboardingPresentation {
+    public static let appIconFallbackSystemImageName = "app.fill"
+
     public static let welcome = VoiceInkOnboardingWelcomePresentation(
         title: VoiceInkAppIdentity.welcomeTitle,
         subtitle: "Transform your thoughts into text effortlessly.",

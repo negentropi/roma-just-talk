@@ -408,7 +408,7 @@ struct AppIconView: View {
                 .aspectRatio(contentMode: .fit)
         } else {
             // Fallback to system icon
-            Image(systemName: "app.fill")
+            Image(systemName: VoiceInkIOSOnboardingPresentation.appIconFallbackSystemImageName)
                 .font(.system(size: 80))
                 .foregroundColor(.blue)
         }

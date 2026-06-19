@@ -108,7 +108,7 @@ struct EnhancementSettingsView: View {
                             .foregroundStyle(.secondary)
                     }
                     .buttonStyle(.plain)
-                    .help("Add new prompt")
+                    .help(VoiceInkCustomPromptPresentation.addPromptHelpText)
                 }
             }
             .opacity(enhancementService.isEnhancementEnabled ? 1.0 : 0.8)
@@ -162,7 +162,7 @@ private struct ReorderablePromptGrid: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             if enhancementService.customPrompts.isEmpty {
-                Text("No prompts available")
+                Text(VoiceInkCustomPromptPresentation.promptGridEmptyText)
                     .foregroundColor(.secondary)
                     .font(.caption)
             } else {
@@ -216,7 +216,7 @@ private struct ReorderablePromptGrid: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
 
-                    Text("Double-click to edit • Right-click for more options")
+                    Text(VoiceInkCustomPromptPresentation.promptGridHelpText)
                     .font(.caption)
                     .foregroundColor(.secondary)
                 }

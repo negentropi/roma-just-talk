@@ -33,7 +33,7 @@ struct PromptSelectionGrid: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             if prompts.isEmpty {
-                Text("No prompts available")
+                Text(VoiceInkCustomPromptPresentation.promptGridEmptyText)
                     .foregroundColor(.secondary)
                     .font(.caption)
             } else {
@@ -59,7 +59,7 @@ struct PromptSelectionGrid: View {
                         VoiceInkCustomPrompt.addNewButton {
                             onAddNewPrompt()
                         }
-                        .help("Add new prompt")
+                        .help(VoiceInkCustomPromptPresentation.addPromptHelpText)
                     }
                 }
                 .padding(.vertical, 12)
@@ -71,7 +71,7 @@ struct PromptSelectionGrid: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                     
-                    Text("Double-click to edit • Right-click for more options")
+                    Text(VoiceInkCustomPromptPresentation.promptGridHelpText)
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }

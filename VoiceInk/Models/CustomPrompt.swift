@@ -2,78 +2,6 @@ import Foundation
 import SwiftUI
 import VoiceInkCore
 
-enum PromptIcons {
-    static let allCases: [String] = [
-        // Document & Text
-        "doc.text.fill",
-        "textbox",
-        "checkmark.seal.fill",
-        
-        // Communication
-        "bubble.left.and.bubble.right.fill",
-        "message.fill",
-        "envelope.fill",
-        
-        // Professional
-        "person.2.fill",
-        "person.wave.2.fill",
-        "briefcase.fill",
-        
-        // Technical
-        "curlybraces",
-        "terminal.fill",
-        "gearshape.fill",
-        
-        // Content
-        "doc.text.image.fill",
-        "note",
-        "book.fill",
-        "bookmark.fill",
-        "pencil.circle.fill",
-        
-        // Media & Creative
-        "video.fill",
-        "mic.fill",
-        "music.note",
-        "photo.fill",
-        "paintbrush.fill",
-        
-        // Productivity & Time
-        "clock.fill",
-        "calendar",
-        "list.bullet",
-        "checkmark.circle.fill",
-        "timer",
-        "hourglass",
-        "star.fill",
-        "flag.fill",
-        "tag.fill",
-        "folder.fill",
-        "paperclip",
-        "tray.fill",
-        "chart.bar.fill",
-        "flame.fill",
-        "target",
-        "list.clipboard.fill",
-        "brain.head.profile",
-        "lightbulb.fill",
-        "megaphone.fill",
-        "heart.fill",
-        "map.fill",
-        "house.fill",
-        "camera.fill",
-        "figure.walk",
-        "dumbbell.fill",
-        "cart.fill",
-        "creditcard.fill",
-        "graduationcap.fill",
-        "airplane",
-        "leaf.fill",
-        "hand.raised.fill",
-        "hand.thumbsup.fill"
-    ]
-}
-
 // MARK: - UI Extensions
 extension VoiceInkCustomPrompt {
     func promptIcon(isSelected: Bool, onTap: @escaping () -> Void, onEdit: ((VoiceInkCustomPrompt) -> Void)? = nil, onDelete: ((VoiceInkCustomPrompt) -> Void)? = nil) -> some View {
@@ -174,23 +102,16 @@ extension VoiceInkCustomPrompt {
                 
                 // Trigger word section with consistent height
                 ZStack(alignment: .center) {
-                    if !triggerWords.isEmpty {
+                    if let triggerSummary = VoiceInkCustomPromptPresentation.triggerSummary(for: triggerWords) {
                         HStack(spacing: 2) {
-                            Image(systemName: "mic.fill")
+                            Image(systemName: triggerSummary.iconSystemName)
                                 .font(.system(size: 7))
                                 .foregroundColor(isSelected ? .accentColor.opacity(0.9) : .secondary.opacity(0.7))
-                            
-                            if triggerWords.count == 1 {
-                                Text("\"\(triggerWords[0])...\"")
-                                    .font(.system(size: 8, weight: .regular))
-                                    .foregroundColor(isSelected ? .primary.opacity(0.8) : .secondary.opacity(0.7))
-                                    .lineLimit(1)
-                            } else {
-                                Text("\"\(triggerWords[0])...\" +\(triggerWords.count - 1)")
-                                    .font(.system(size: 8, weight: .regular))
-                                    .foregroundColor(isSelected ? .primary.opacity(0.8) : .secondary.opacity(0.7))
-                                    .lineLimit(1)
-                            }
+
+                            Text(triggerSummary.text)
+                                .font(.system(size: 8, weight: .regular))
+                                .foregroundColor(isSelected ? .primary.opacity(0.8) : .secondary.opacity(0.7))
+                                .lineLimit(1)
                         }
                         .frame(maxWidth: 70)
                     }
@@ -218,32 +139,32 @@ extension VoiceInkCustomPrompt {
                     Button {
                         onEdit(self)
                     } label: {
-                        Label("Edit", systemImage: "pencil")
+                        Label(VoiceInkCustomPromptPresentation.editActionTitle, systemImage: "pencil")
                     }
                 }
                 
                 if let onDelete = onDelete, !isPredefined {
                     Button(role: .destructive) {
                         let alert = NSAlert()
-                        alert.messageText = "Delete Prompt?"
-                        alert.informativeText = "Are you sure you want to delete '\(self.title)' prompt? This action cannot be undone."
+                        alert.messageText = VoiceInkCustomPromptPresentation.deletePromptConfirmationTitle
+                        alert.informativeText = VoiceInkCustomPromptPresentation.deletePromptConfirmationMessage(promptTitle: title)
                         alert.alertStyle = .warning
-                        alert.addButton(withTitle: "Delete")
-                        alert.addButton(withTitle: "Cancel")
+                        alert.addButton(withTitle: VoiceInkCustomPromptPresentation.deleteActionTitle)
+                        alert.addButton(withTitle: VoiceInkCustomPromptPresentation.cancelActionTitle)
                         
                         let response = alert.runModal()
                         if response == .alertFirstButtonReturn {
                             onDelete(self)
                         }
                     } label: {
-                        Label("Delete", systemImage: "trash")
+                        Label(VoiceInkCustomPromptPresentation.deleteActionTitle, systemImage: "trash")
                     }
                 }
             }
         }
     }
     
-    // Static method to create an "Add New" button with the same styling as the prompt icons
+    // Static method to create the prompt-add button with the same styling as the prompt icons.
     static func addNewButton(action: @escaping () -> Void) -> some View {
         VStack(spacing: 8) {
             ZStack {
@@ -312,7 +233,7 @@ extension VoiceInkCustomPrompt {
             
             // Text label with matching styling
             VStack(spacing: 2) {
-                Text("Add New")
+                Text(VoiceInkCustomPromptPresentation.addPromptTitle)
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(.secondary)
                     .lineLimit(1)

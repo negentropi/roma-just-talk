@@ -477,4 +477,76 @@ final class CustomPromptTests: XCTestCase {
         XCTAssertEqual(object?["triggerWords"] as? [String], ["names"])
         XCTAssertEqual(object?["useSystemInstructions"] as? Bool, false)
     }
+
+    func testCustomPromptPresentationPreservesIconCatalogAndGridCopy() {
+        XCTAssertEqual(VoiceInkCustomPromptPresentation.defaultIconSystemName, "doc.text.fill")
+        XCTAssertEqual(VoiceInkCustomPromptPresentation.iconSystemNames.first, "doc.text.fill")
+        XCTAssertEqual(VoiceInkCustomPromptPresentation.iconSystemNames.last, "hand.thumbsup.fill")
+        XCTAssertTrue(VoiceInkCustomPromptPresentation.iconSystemNames.contains("bubble.left.and.bubble.right.fill"))
+        XCTAssertTrue(VoiceInkCustomPromptPresentation.iconSystemNames.contains("brain.head.profile"))
+        XCTAssertEqual(VoiceInkCustomPromptPresentation.addPromptTitle, "Add New")
+        XCTAssertEqual(VoiceInkCustomPromptPresentation.promptGridEmptyText, "No prompts available")
+        XCTAssertEqual(
+            VoiceInkCustomPromptPresentation.promptGridHelpText,
+            "Double-click to edit • Right-click for more options"
+        )
+        XCTAssertEqual(VoiceInkCustomPromptPresentation.addPromptHelpText, "Add new prompt")
+    }
+
+    func testCustomPromptPresentationPreservesEditorCopy() {
+        XCTAssertEqual(
+            VoiceInkCustomPromptPresentation.editorTitle(
+                isEditingPredefinedPrompt: true,
+                isAddingPrompt: false
+            ),
+            "Edit Trigger Words"
+        )
+        XCTAssertEqual(
+            VoiceInkCustomPromptPresentation.editorTitle(
+                isEditingPredefinedPrompt: false,
+                isAddingPrompt: true
+            ),
+            "New Prompt"
+        )
+        XCTAssertEqual(
+            VoiceInkCustomPromptPresentation.editorTitle(
+                isEditingPredefinedPrompt: false,
+                isAddingPrompt: false
+            ),
+            "Edit Prompt"
+        )
+        XCTAssertEqual(VoiceInkCustomPromptPresentation.editingHeaderTitle(for: "Assistant"), "Editing: Assistant")
+        XCTAssertEqual(VoiceInkCustomPromptPresentation.promptNamePlaceholder, "Prompt Name")
+        XCTAssertEqual(VoiceInkCustomPromptPresentation.descriptionPlaceholder, "Brief description")
+        XCTAssertEqual(
+            VoiceInkCustomPromptPresentation.promptInstructionsPlaceholder,
+            "Enter your custom prompt instructions here..."
+        )
+        XCTAssertEqual(VoiceInkCustomPromptPresentation.useSystemTemplateTitle, "Use System Template")
+        XCTAssertEqual(VoiceInkCustomPromptPresentation.triggerWordsSectionTitle, "Trigger Words")
+        XCTAssertEqual(VoiceInkCustomPromptPresentation.triggerWordPlaceholder, "Add trigger word")
+        XCTAssertEqual(VoiceInkCustomPromptPresentation.noTriggerWordsText, "No trigger words added")
+        XCTAssertEqual(VoiceInkCustomPromptPresentation.startWithTemplateTitle, "Start with Template")
+        XCTAssertEqual(VoiceInkCustomPromptPresentation.startWithTemplateIconSystemName, "sparkles")
+    }
+
+    func testCustomPromptPresentationFormatsTriggerSummaryAndDeleteAlert() throws {
+        XCTAssertNil(VoiceInkCustomPromptPresentation.triggerSummary(for: []))
+
+        let singleSummary = try XCTUnwrap(VoiceInkCustomPromptPresentation.triggerSummary(for: ["email"]))
+        XCTAssertEqual(singleSummary.iconSystemName, "mic.fill")
+        XCTAssertEqual(singleSummary.text, "\"email...\"")
+
+        let multiSummary = try XCTUnwrap(VoiceInkCustomPromptPresentation.triggerSummary(for: ["email", "reply"]))
+        XCTAssertEqual(multiSummary.text, "\"email...\" +1")
+
+        XCTAssertEqual(VoiceInkCustomPromptPresentation.editActionTitle, "Edit")
+        XCTAssertEqual(VoiceInkCustomPromptPresentation.deleteActionTitle, "Delete")
+        XCTAssertEqual(VoiceInkCustomPromptPresentation.cancelActionTitle, "Cancel")
+        XCTAssertEqual(VoiceInkCustomPromptPresentation.deletePromptConfirmationTitle, "Delete Prompt?")
+        XCTAssertEqual(
+            VoiceInkCustomPromptPresentation.deletePromptConfirmationMessage(promptTitle: "Email"),
+            "Are you sure you want to delete 'Email' prompt? This action cannot be undone."
+        )
+    }
 }

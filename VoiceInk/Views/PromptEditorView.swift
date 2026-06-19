@@ -55,7 +55,7 @@ struct PromptEditorView: View {
         case .add:
             _title = State(initialValue: "")
             _promptText = State(initialValue: "")
-            _selectedIcon = State(initialValue: "doc.text.fill")
+            _selectedIcon = State(initialValue: VoiceInkCustomPromptPresentation.defaultIconSystemName)
             _description = State(initialValue: "")
             _triggerWords = State(initialValue: [])
             _useSystemInstructions = State(initialValue: true)
@@ -81,7 +81,12 @@ struct PromptEditorView: View {
         VStack(spacing: 0) {
             // Header
             HStack(spacing: 12) {
-                Text(isEditingPredefinedPrompt ? "Edit Trigger Words" : (mode == .add ? "New Prompt" : "Edit Prompt"))
+                Text(
+                    VoiceInkCustomPromptPresentation.editorTitle(
+                        isEditingPredefinedPrompt: isEditingPredefinedPrompt,
+                        isAddingPrompt: mode == .add
+                    )
+                )
                     .font(.headline)
                     .fontWeight(.semibold)
                     .foregroundColor(.primary)
@@ -97,7 +102,7 @@ struct PromptEditorView: View {
                         .clipShape(Circle())
                 }
                 .buttonStyle(.plain)
-                .help("Close")
+                .help(VoiceInkCustomPromptPresentation.closeHelpText)
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
@@ -116,7 +121,7 @@ struct PromptEditorView: View {
             // Footer
             VStack(spacing: 0) {
                 HStack {
-                    Button("Cancel") { dismissPanel() }
+                    Button(VoiceInkCustomPromptPresentation.cancelActionTitle) { dismissPanel() }
                         .keyboardShortcut(.escape, modifiers: [])
                         .buttonStyle(.plain)
                         .foregroundColor(.secondary)
@@ -127,7 +132,7 @@ struct PromptEditorView: View {
                         save()
                         dismissPanel()
                     } label: {
-                        Text("Save Changes")
+                        Text(VoiceInkCustomPromptPresentation.saveChangesButtonTitle)
                             .frame(minWidth: 100)
                     }
                     .buttonStyle(.borderedProminent)
@@ -147,11 +152,11 @@ struct PromptEditorView: View {
     private var predefinedPromptForm: some View {
         Form {
             Section {
-                Text("You can only customize the trigger words for system prompts.")
+                Text(VoiceInkCustomPromptPresentation.predefinedPromptRestrictionText)
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             } header: {
-                Text("Editing: \(title)")
+                Text(VoiceInkCustomPromptPresentation.editingHeaderTitle(for: title))
             }
 
             Section {
@@ -185,14 +190,14 @@ struct PromptEditorView: View {
                         IconPickerPopover(selectedIcon: $selectedIcon, isPresented: $showingIconPicker)
                     }
 
-                    TextField("Prompt Name", text: $title)
+                    TextField(VoiceInkCustomPromptPresentation.promptNamePlaceholder, text: $title)
                         .textFieldStyle(.roundedBorder)
                 }
 
-                TextField("Brief description", text: $description)
+                TextField(VoiceInkCustomPromptPresentation.descriptionPlaceholder, text: $description)
                     .textFieldStyle(.roundedBorder)
             } header: {
-                Text("Details")
+                Text(VoiceInkCustomPromptPresentation.detailsSectionTitle)
             }
 
             Section {
@@ -203,7 +208,7 @@ struct PromptEditorView: View {
                         .scrollContentBackground(.hidden)
 
                     if promptText.isEmpty {
-                        Text("Enter your custom prompt instructions here...")
+                        Text(VoiceInkCustomPromptPresentation.promptInstructionsPlaceholder)
                             .font(.system(.body, design: .monospaced))
                             .foregroundStyle(.tertiary)
                             .padding(.leading, 5)
@@ -213,21 +218,21 @@ struct PromptEditorView: View {
 
                 Toggle(isOn: $useSystemInstructions) {
                     HStack(spacing: 4) {
-                        Text("Use System Template")
-                        InfoTip("If enabled, your instructions are combined with a general-purpose template to improve transcription quality.\n\nDisable for full control over the AI's system prompt (for advanced users).")
+                        Text(VoiceInkCustomPromptPresentation.useSystemTemplateTitle)
+                        InfoTip(VoiceInkCustomPromptPresentation.useSystemTemplateHelpText)
                     }
                 }
                 .toggleStyle(.switch)
             } header: {
-                Text("Instructions")
+                Text(VoiceInkCustomPromptPresentation.instructionsSectionTitle)
             }
 
             Section {
                 TriggerWordsEditor(triggerWords: $triggerWords)
             } header: {
                 HStack(spacing: 4) {
-                    Text("Trigger Words")
-                    InfoTip("Add words that automatically activate this prompt. For example, 'summarize', 'email', 'translate'.")
+                    Text(VoiceInkCustomPromptPresentation.triggerWordsSectionTitle)
+                    InfoTip(VoiceInkCustomPromptPresentation.triggerWordsHelpText)
                 }
             }
 
@@ -245,7 +250,10 @@ struct PromptEditorView: View {
                             }
                         }
                     } label: {
-                        Label("Start with Template", systemImage: "sparkles")
+                        Label(
+                            VoiceInkCustomPromptPresentation.startWithTemplateTitle,
+                            systemImage: VoiceInkCustomPromptPresentation.startWithTemplateIconSystemName
+                        )
                     }
                     .menuStyle(.borderlessButton)
                 }
@@ -275,7 +283,7 @@ struct TriggerWordsEditor: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                TextField("Add trigger word", text: $newTriggerWord)
+                TextField(VoiceInkCustomPromptPresentation.triggerWordPlaceholder, text: $newTriggerWord)
                     .textFieldStyle(.roundedBorder)
                     .onSubmit { addTriggerWord() }
 
@@ -298,7 +306,7 @@ struct TriggerWordsEditor: View {
                     }
                 }
             } else {
-                Text("No trigger words added")
+                Text(VoiceInkCustomPromptPresentation.noTriggerWordsText)
                     .font(.caption)
                     .foregroundColor(.secondary.opacity(0.7))
                     .italic()
@@ -411,7 +419,7 @@ struct IconPickerPopover: View {
         
         ScrollView {
             LazyVGrid(columns: columns, spacing: 14) {
-                ForEach(PromptIcons.allCases, id: \.self) { icon in
+                ForEach(VoiceInkCustomPromptPresentation.iconSystemNames, id: \.self) { icon in
                     Button(action: {
                         withAnimation(.spring(response: 0.2, dampingFraction: 0.7)) {
                             selectedIcon = icon

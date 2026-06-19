@@ -1815,6 +1815,50 @@ reject_pattern \
   'struct +CustomModelBackup|apiEndpoint\.trimmingCharacters|modelName\.trimmingCharacters|if let apiKey, !apiKey\.isEmpty' \
   VoiceInk/Services/BackupTypes.swift
 
+require_pattern \
+  "shared custom prompt presentation owns icon catalog and copy" \
+  'VoiceInkCustomPromptPresentation|iconSystemNames|promptGridHelpText|deletePromptConfirmationMessage|triggerSummary' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomPromptPresentation.swift
+
+require_pattern \
+  "macOS custom prompt cards use shared presentation" \
+  'VoiceInkCustomPromptPresentation\.(triggerSummary|editActionTitle|deletePromptConfirmationTitle|deletePromptConfirmationMessage|deleteActionTitle|cancelActionTitle|addPromptTitle)' \
+  VoiceInk/Models/CustomPrompt.swift
+
+require_pattern \
+  "macOS prompt editor uses shared presentation" \
+  'VoiceInkCustomPromptPresentation\.(editorTitle|defaultIconSystemName|promptNamePlaceholder|promptInstructionsPlaceholder|useSystemTemplateTitle|startWithTemplateTitle|triggerWordPlaceholder|noTriggerWordsText|iconSystemNames)' \
+  VoiceInk/Views/PromptEditorView.swift
+
+require_pattern \
+  "macOS prompt grids use shared presentation" \
+  'VoiceInkCustomPromptPresentation\.(promptGridEmptyText|promptGridHelpText|addPromptHelpText)' \
+  VoiceInk/Views/Components/PromptSelectionGrid.swift
+
+require_pattern \
+  "macOS enhancement prompt grid uses shared presentation" \
+  'VoiceInkCustomPromptPresentation\.(promptGridEmptyText|promptGridHelpText)' \
+  VoiceInk/Views/EnhancementSettingsView.swift
+
+reject_pattern \
+  "macOS custom prompt shell avoids local icon catalog" \
+  'enum +PromptIcons|PromptIcons\.allCases|"hand\.thumbsup\.fill"' \
+  VoiceInk/Models/CustomPrompt.swift \
+  VoiceInk/Views/PromptEditorView.swift
+
+reject_pattern \
+  "macOS custom prompt shell avoids duplicate prompt presentation copy" \
+  '"(Add New|No prompts available|Double-click to edit • Right-click for more options|Add new prompt|Edit Trigger Words|New Prompt|Edit Prompt|You can only customize the trigger words for system prompts\.|Prompt Name|Brief description|Enter your custom prompt instructions here\.\.\.|Use System Template|Trigger Words|Start with Template|Add trigger word|No trigger words added|Delete Prompt\\?|This action cannot be undone)"' \
+  VoiceInk/Models/CustomPrompt.swift \
+  VoiceInk/Views/PromptEditorView.swift \
+  VoiceInk/Views/Components/PromptSelectionGrid.swift \
+  VoiceInk/Views/EnhancementSettingsView.swift
+
+require_pattern \
+  "migration checklist tracks shared custom prompt presentation gate" \
+  'macOS custom prompt icon catalog, prompt-card trigger summary, grid empty/help copy, editor labels/placeholders/help text, and delete confirmation copy route through `VoiceInkCustomPromptPresentation`' \
+  docs/ios-single-repo-migration.md
+
 reject_pattern \
   "macOS and iOS filler-word settings use shared draft policy" \
   'VoiceInkFillerWords\.normalizedWord' \

@@ -190,7 +190,7 @@ struct NotesListView: View {
                 do {
                     try note.deleteExistingAudioFile()
                 } catch {
-                    print("Error deleting audio file: \(error.localizedDescription)")
+                    print(VoiceInkStoredAudioFile.deletionErrorMessage(for: error))
                 }
                 modelContext.delete(note)
             }

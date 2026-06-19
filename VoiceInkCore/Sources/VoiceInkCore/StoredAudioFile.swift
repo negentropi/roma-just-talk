@@ -158,6 +158,10 @@ public enum VoiceInkStoredAudioFile {
         existingURL(for: storedValue, relativeTo: recordingsDirectory, fileManager: fileManager) != nil
     }
 
+    public static func deletionErrorMessage(for error: Error) -> String {
+        "Error deleting audio file: \(error.localizedDescription)"
+    }
+
     @discardableResult
     public static func deleteExistingFile(
         for storedValue: String?,

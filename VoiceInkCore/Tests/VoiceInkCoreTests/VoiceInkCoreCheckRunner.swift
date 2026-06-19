@@ -645,6 +645,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "StoredAudioFileTests.testAvailabilityAudioSectionVisibilityPreservesMissingAudioIntent", run: { StoredAudioFileTests().testAvailabilityAudioSectionVisibilityPreservesMissingAudioIntent() }),
             VoiceInkCoreCheck(name: "StoredAudioFileTests.testDeleteExistingFileRemovesResolvedFileAndReturnsURL", run: { try StoredAudioFileTests().testDeleteExistingFileRemovesResolvedFileAndReturnsURL() }),
             VoiceInkCoreCheck(name: "StoredAudioFileTests.testDeleteExistingFileReturnsNilForMissingFile", run: { try StoredAudioFileTests().testDeleteExistingFileReturnsNilForMissingFile() }),
+            VoiceInkCoreCheck(name: "StoredAudioFileTests.testDeletionErrorMessagePreservesPlatformLogCopy", run: { StoredAudioFileTests().testDeletionErrorMessagePreservesPlatformLogCopy() }),
             VoiceInkCoreCheck(name: "StoredAudioFileTests.testStoredAudioRecordUsesDefaultRecordingsDirectory", run: { StoredAudioFileTests().testStoredAudioRecordUsesDefaultRecordingsDirectory() }),
             VoiceInkCoreCheck(name: "StoredAudioFileTests.testStoredAudioRecordAllowsExplicitRecordingsDirectoryOverride", run: { StoredAudioFileTests().testStoredAudioRecordAllowsExplicitRecordingsDirectoryOverride() }),
             VoiceInkCoreCheck(name: "StoredAudioFileTests.testStoredAudioRecordDeleteUsesResolvedRecordFile", run: { try StoredAudioFileTests().testStoredAudioRecordDeleteUsesResolvedRecordFile() }),

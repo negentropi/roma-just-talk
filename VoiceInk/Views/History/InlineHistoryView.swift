@@ -433,7 +433,7 @@ struct InlineHistoryView: View {
         do {
             try transcription.deleteExistingAudioFile()
         } catch {
-            print("Error deleting audio file: \(error.localizedDescription)")
+            print(VoiceInkStoredAudioFile.deletionErrorMessage(for: error))
         }
 
         if expandedId == transcription.id {

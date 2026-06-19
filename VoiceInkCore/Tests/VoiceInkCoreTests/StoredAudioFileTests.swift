@@ -220,6 +220,19 @@ final class StoredAudioFileTests: XCTestCase {
         XCTAssertNil(deletedURL)
     }
 
+    func testDeletionErrorMessagePreservesPlatformLogCopy() {
+        let error = NSError(
+            domain: NSCocoaErrorDomain,
+            code: CocoaError.fileNoSuchFile.rawValue,
+            userInfo: [NSLocalizedDescriptionKey: "file vanished"]
+        )
+
+        XCTAssertEqual(
+            VoiceInkStoredAudioFile.deletionErrorMessage(for: error),
+            "Error deleting audio file: file vanished"
+        )
+    }
+
     func testStoredAudioRecordUsesDefaultRecordingsDirectory() {
         let recordingsDirectory = URL(fileURLWithPath: "/tmp/VoiceInk/Recordings", isDirectory: true)
         let record = StubStoredAudioRecord(

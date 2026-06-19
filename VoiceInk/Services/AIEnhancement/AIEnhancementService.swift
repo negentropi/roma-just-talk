@@ -232,7 +232,7 @@ class AIEnhancementService: ObservableObject {
                     timeout: baseTimeout
                 )
             default:
-                guard let baseURL = URL(string: aiService.selectedProvider.baseURL) else {
+                guard let baseURL = URL(string: aiService.selectedProvider.textEnhancementRequestURLString()) else {
                     throw VoiceInkAIEnhancementError.customError("\(aiService.selectedProvider.rawValue) has an invalid API endpoint URL. Please update it in AI settings.")
                 }
                 let temperature = VoiceInkAIReasoningConfig.temperature(forModelName: aiService.currentModel)

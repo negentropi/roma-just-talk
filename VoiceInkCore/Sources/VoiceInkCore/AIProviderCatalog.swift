@@ -201,6 +201,23 @@ public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
         }
     }
 
+    public func textEnhancementRequestURLString(from defaults: UserDefaults = .standard) -> String {
+        if let corePostProcessingURL = aiModelProvider?.postProcessingRequestURL {
+            return corePostProcessingURL.absoluteString
+        }
+
+        switch self {
+        case .ollama:
+            return VoiceInkDynamicAIProviderPreference.ollamaBaseURL(from: defaults)
+        case .localCLI:
+            return ""
+        case .custom:
+            return VoiceInkDynamicAIProviderPreference.customProviderBaseURL(from: defaults)
+        case .anthropic, .assemblyAI, .cerebras, .deepgram, .elevenLabs, .groq, .gemini, .mistral, .openAI, .openRouter, .soniox, .speechmatics:
+            preconditionFailure("Core-backed providers should return from VoiceInkAIModelProvider.postProcessingRequestURL")
+        }
+    }
+
     public func selectedTextEnhancementModel(
         _ selectedModel: String?,
         availableModels: [String],

@@ -357,6 +357,43 @@ final class AIProviderCatalogTests: XCTestCase {
         }
     }
 
+    func testMacOSAIEnhancementRequestURLSelectionIsShared() {
+        withIsolatedDefaults { defaults in
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderKind.groq.textEnhancementRequestURLString(from: defaults),
+                VoiceInkAIModelProvider.groq.postProcessingRequestURL?.absoluteString
+            )
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderKind.openRouter.textEnhancementRequestURLString(from: defaults),
+                VoiceInkAIModelProvider.openRouter.postProcessingRequestURL?.absoluteString
+            )
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderKind.ollama.textEnhancementRequestURLString(from: defaults),
+                VoiceInkPreferenceDefault.ollamaBaseURL
+            )
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderKind.localCLI.textEnhancementRequestURLString(from: defaults),
+                ""
+            )
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderKind.custom.textEnhancementRequestURLString(from: defaults),
+                ""
+            )
+
+            VoiceInkDynamicAIProviderPreference.saveOllamaBaseURL("http://example.local:11434", to: defaults)
+            VoiceInkDynamicAIProviderPreference.saveCustomProviderBaseURL("https://api.example.com", to: defaults)
+
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderKind.ollama.textEnhancementRequestURLString(from: defaults),
+                "http://example.local:11434"
+            )
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderKind.custom.textEnhancementRequestURLString(from: defaults),
+                "https://api.example.com"
+            )
+        }
+    }
+
     func testMacOSAIEnhancementProviderVerificationRoutesAreShared() {
         let expectedRoutes: [VoiceInkAIEnhancementProviderKind: VoiceInkAIEnhancementAPIKeyVerificationRoute?] = [
             .anthropic: .anthropicMessages,

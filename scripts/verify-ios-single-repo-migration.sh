@@ -2169,6 +2169,21 @@ require_pattern \
   'defaultTextEnhancementModel' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
+require_pattern \
+  "shared AI enhancement request URL selection lives in VoiceInkCore" \
+  'textEnhancementRequestURLString|postProcessingRequestURL' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+require_pattern \
+  "macOS AI service request URL selection uses shared policy" \
+  'textEnhancementRequestURLString' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+require_pattern \
+  "macOS AI enhancement service request URL selection uses shared policy" \
+  'textEnhancementRequestURLString' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
 reject_pattern \
   "macOS AI API-key path avoids shell-only key-reference and blank-key policy" \
   'VoiceInkAPIKeyReference\.resolvedValue|VoiceInkProviderCredential\.nonBlank\(apiKey\)' \
@@ -2185,6 +2200,12 @@ reject_pattern \
   '"(mistral|local-cli)"|ollamaSelectedModel\(fallback:' \
   VoiceInk/Services/AIEnhancement/AIService.swift \
   VoiceInk/PowerMode/PowerModeConfigView.swift
+
+reject_pattern \
+  "macOS AI services avoid duplicate request URL selection policy" \
+  'var +baseURL: +String|selectedProvider\.baseURL' \
+  VoiceInk/Services/AIEnhancement/AIService.swift \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
 reject_pattern \
   "macOS AI API-key view avoids duplicate verification failure copy" \

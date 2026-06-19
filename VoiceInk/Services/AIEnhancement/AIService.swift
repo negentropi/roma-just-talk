@@ -3,23 +3,6 @@ import LLMkit
 import VoiceInkCore
 
 extension VoiceInkAIEnhancementProviderKind {
-    var baseURL: String {
-        if let corePostProcessingURL = aiModelProvider?.postProcessingRequestURL {
-            return corePostProcessingURL.absoluteString
-        }
-
-        switch self {
-        case .ollama:
-            return VoiceInkDynamicAIProviderPreference.ollamaBaseURL()
-        case .localCLI:
-            return ""
-        case .custom:
-            return VoiceInkDynamicAIProviderPreference.customProviderBaseURL()
-        case .anthropic, .assemblyAI, .cerebras, .deepgram, .elevenLabs, .groq, .gemini, .mistral, .openAI, .openRouter, .soniox, .speechmatics:
-            preconditionFailure("Core-backed providers should return from VoiceInkProviderEndpoint")
-        }
-    }
-    
     var availableModels: [String] {
         if let provider = aiModelProvider {
             return VoiceInkAIModelCatalog.availableModels(for: provider)
@@ -255,7 +238,7 @@ class AIService: ObservableObject {
             case .anthropicMessages:
                 result = await AnthropicLLMClient.verifyAPIKey(resolvedKey)
             case .openAICompatibleModels:
-                guard let baseURL = URL(string: selectedProvider.baseURL) else {
+                guard let baseURL = URL(string: selectedProvider.textEnhancementRequestURLString()) else {
                     DispatchQueue.main.async {
                         completion(false, VoiceInkAIEnhancementProviderKind.invalidOrMissingBaseURLConfigurationMessage)
                     }

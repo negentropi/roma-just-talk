@@ -302,6 +302,114 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertTrue(config.isDefault)
     }
 
+    func testPowerModeConfigurationFormStateBuildsAddDefaults() {
+        let id = UUID()
+        let formState = VoiceInkPowerModeConfigurationMode.add.formState(
+            existingConfigurations: [],
+            newID: id,
+            selectedAIProvider: "Groq"
+        )
+
+        XCTAssertEqual(formState.id, id)
+        XCTAssertEqual(formState.name, "")
+        XCTAssertEqual(formState.emoji, "✏️")
+        XCTAssertEqual(formState.appConfigs, [])
+        XCTAssertEqual(formState.urlConfigs, [])
+        XCTAssertFalse(formState.isAIEnhancementEnabled)
+        XCTAssertNil(formState.selectedPromptId)
+        XCTAssertNil(formState.selectedTranscriptionModelName)
+        XCTAssertNil(formState.selectedLanguage)
+        XCTAssertFalse(formState.useScreenCapture)
+        XCTAssertFalse(formState.isTextFormattingEnabled)
+        XCTAssertEqual(formState.punctuationCleanupMode, .keep)
+        XCTAssertFalse(formState.lowercaseTranscription)
+        XCTAssertEqual(formState.selectedAIProvider, "Groq")
+        XCTAssertNil(formState.selectedAIModel)
+        XCTAssertEqual(formState.autoSendKey, .none)
+        XCTAssertFalse(formState.isDefault)
+        XCTAssertFalse(formState.isTranscriptFormattingExpanded)
+    }
+
+    func testPowerModeConfigurationFormStateBuildsEditStateFromLatestConfig() {
+        let id = UUID()
+        let promptID = UUID()
+        let oldConfig = PowerModeConfig(
+            id: id,
+            name: "Old",
+            emoji: "O",
+            isAIEnhancementEnabled: false
+        )
+        let appConfig = VoiceInkPowerModeAppConfig(
+            bundleIdentifier: "com.example.App",
+            appName: "Example"
+        )
+        let urlConfig = VoiceInkPowerModeURLConfig(url: "example.com")
+        let latestConfig = PowerModeConfig(
+            id: id,
+            name: "Latest",
+            emoji: "L",
+            appConfigs: [appConfig],
+            urlConfigs: [urlConfig],
+            isAIEnhancementEnabled: true,
+            selectedPrompt: promptID.uuidString,
+            selectedTranscriptionModelName: "ggml-base",
+            selectedLanguage: "fr",
+            useScreenCapture: true,
+            isTextFormattingEnabled: true,
+            punctuationCleanupMode: .removeTrailingPeriod,
+            lowercaseTranscription: true,
+            selectedAIProvider: "OpenAI",
+            selectedAIModel: "gpt-4o",
+            autoSendKey: .shiftEnter,
+            isDefault: true
+        )
+
+        let formState = VoiceInkPowerModeConfigurationMode.edit(oldConfig).formState(
+            existingConfigurations: [latestConfig],
+            selectedAIProvider: "Ignored"
+        )
+
+        XCTAssertEqual(formState.id, id)
+        XCTAssertEqual(formState.name, "Latest")
+        XCTAssertEqual(formState.emoji, "L")
+        XCTAssertEqual(formState.appConfigs, [appConfig])
+        XCTAssertEqual(formState.urlConfigs, [urlConfig])
+        XCTAssertTrue(formState.isAIEnhancementEnabled)
+        XCTAssertEqual(formState.selectedPromptId, promptID)
+        XCTAssertEqual(formState.selectedTranscriptionModelName, "ggml-base")
+        XCTAssertEqual(formState.selectedLanguage, "fr")
+        XCTAssertTrue(formState.useScreenCapture)
+        XCTAssertTrue(formState.isTextFormattingEnabled)
+        XCTAssertEqual(formState.punctuationCleanupMode, .removeTrailingPeriod)
+        XCTAssertTrue(formState.lowercaseTranscription)
+        XCTAssertEqual(formState.selectedAIProvider, "OpenAI")
+        XCTAssertEqual(formState.selectedAIModel, "gpt-4o")
+        XCTAssertEqual(formState.autoSendKey, .shiftEnter)
+        XCTAssertTrue(formState.isDefault)
+        XCTAssertTrue(formState.isTranscriptFormattingExpanded)
+    }
+
+    func testPowerModeConfigurationFormStateNormalizesMissingEditCollectionsAndCollapsedFormatting() {
+        let id = UUID()
+        let config = PowerModeConfig(
+            id: id,
+            name: "Plain",
+            emoji: "P",
+            appConfigs: nil,
+            urlConfigs: nil,
+            isAIEnhancementEnabled: false,
+            isTextFormattingEnabled: false,
+            punctuationCleanupMode: .keep,
+            lowercaseTranscription: false
+        )
+
+        let formState = VoiceInkPowerModeConfigurationMode.edit(config).formState(existingConfigurations: [])
+
+        XCTAssertEqual(formState.appConfigs, [])
+        XCTAssertEqual(formState.urlConfigs, [])
+        XCTAssertFalse(formState.isTranscriptFormattingExpanded)
+    }
+
     func testPowerModeEnhancementSelectionFillsMissingProviderAndModel() {
         let nilSelection = VoiceInkPowerModeEnhancementSelection(
             selectedPromptId: nil,

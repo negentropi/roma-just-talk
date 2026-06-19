@@ -106,48 +106,25 @@ struct ConfigurationView: View {
         self.powerModeManager = powerModeManager
         self.onDismiss = onDismiss
 
-        switch mode {
-        case .add:
-            let newId = UUID()
-            _powerModeConfigId = State(initialValue: newId)
-            _isAIEnhancementEnabled = State(initialValue: false)
-            _selectedPromptId = State(initialValue: nil)
-            _selectedTranscriptionModelName = State(initialValue: nil)
-            _selectedLanguage = State(initialValue: nil)
-            _isTextFormattingEnabled = State(initialValue: false)
-            _punctuationCleanupMode = State(initialValue: .keep)
-            _lowercaseTranscription = State(initialValue: false)
-            _configName = State(initialValue: "")
-            _selectedEmoji = State(initialValue: "✏️")
-            _useScreenCapture = State(initialValue: false)
-            _autoSendKey = State(initialValue: .none)
-            _isDefault = State(initialValue: false)
-            // Use UserDefaults directly since EnvironmentObjects aren't available in init
-            _selectedAIProvider = State(initialValue: VoiceInkAIEnhancementProviderPreference.selectedProviderRawValue())
-            _selectedAIModel = State(initialValue: nil)
-            _isTranscriptFormattingExpanded = State(initialValue: false)
-        case .edit(let config):
-            // Fetch latest version in case config was modified elsewhere
-            let latestConfig = powerModeManager.configurations.powerModeConfiguration(with: config.id) ?? config
-            _powerModeConfigId = State(initialValue: latestConfig.id)
-            _isAIEnhancementEnabled = State(initialValue: latestConfig.isAIEnhancementEnabled)
-            _selectedPromptId = State(initialValue: latestConfig.selectedPromptUUID)
-            _selectedTranscriptionModelName = State(initialValue: latestConfig.selectedTranscriptionModelName)
-            _selectedLanguage = State(initialValue: latestConfig.selectedLanguage)
-            _isTextFormattingEnabled = State(initialValue: latestConfig.isTextFormattingEnabled)
-            _punctuationCleanupMode = State(initialValue: latestConfig.punctuationCleanupMode)
-            _lowercaseTranscription = State(initialValue: latestConfig.lowercaseTranscription)
-            _configName = State(initialValue: latestConfig.name)
-            _selectedEmoji = State(initialValue: latestConfig.emoji)
-            _selectedAppConfigs = State(initialValue: latestConfig.appConfigs ?? [])
-            _websiteConfigs = State(initialValue: latestConfig.urlConfigs ?? [])
-            _useScreenCapture = State(initialValue: latestConfig.useScreenCapture)
-            _autoSendKey = State(initialValue: latestConfig.autoSendKey)
-            _isDefault = State(initialValue: latestConfig.isDefault)
-            _selectedAIProvider = State(initialValue: latestConfig.selectedAIProvider)
-            _selectedAIModel = State(initialValue: latestConfig.selectedAIModel)
-            _isTranscriptFormattingExpanded = State(initialValue: latestConfig.isTextFormattingEnabled || latestConfig.punctuationCleanupMode != .keep || latestConfig.lowercaseTranscription)
-        }
+        let formState = mode.formState(existingConfigurations: powerModeManager.configurations)
+        _powerModeConfigId = State(initialValue: formState.id)
+        _isAIEnhancementEnabled = State(initialValue: formState.isAIEnhancementEnabled)
+        _selectedPromptId = State(initialValue: formState.selectedPromptId)
+        _selectedTranscriptionModelName = State(initialValue: formState.selectedTranscriptionModelName)
+        _selectedLanguage = State(initialValue: formState.selectedLanguage)
+        _isTextFormattingEnabled = State(initialValue: formState.isTextFormattingEnabled)
+        _punctuationCleanupMode = State(initialValue: formState.punctuationCleanupMode)
+        _lowercaseTranscription = State(initialValue: formState.lowercaseTranscription)
+        _configName = State(initialValue: formState.name)
+        _selectedEmoji = State(initialValue: formState.emoji)
+        _selectedAppConfigs = State(initialValue: formState.appConfigs)
+        _websiteConfigs = State(initialValue: formState.urlConfigs)
+        _useScreenCapture = State(initialValue: formState.useScreenCapture)
+        _autoSendKey = State(initialValue: formState.autoSendKey)
+        _isDefault = State(initialValue: formState.isDefault)
+        _selectedAIProvider = State(initialValue: formState.selectedAIProvider)
+        _selectedAIModel = State(initialValue: formState.selectedAIModel)
+        _isTranscriptFormattingExpanded = State(initialValue: formState.isTranscriptFormattingExpanded)
     }
 
     var body: some View {

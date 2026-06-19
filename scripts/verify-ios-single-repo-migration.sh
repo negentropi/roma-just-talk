@@ -2189,6 +2189,16 @@ require_pattern \
   'VoiceInkPowerModeConfigurationDraft|VoiceInkPowerModePolicy\.configuration\(from: draft, mode: mode\)' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
+require_pattern \
+  "shared Power Mode form state lives in VoiceInkCore" \
+  'VoiceInkPowerModeConfigurationFormState|formState\(existingConfigurations:' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "macOS Power Mode form consumes shared form state" \
+  'mode\.formState\(existingConfigurations: powerModeManager\.configurations\)' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
 reject_pattern \
   "macOS Power Mode form avoids shell-only website config construction" \
   'normalizedWebsiteURL\(newWebsiteURL\)|VoiceInkPowerModeURLConfig\(url:' \
@@ -2202,6 +2212,11 @@ reject_pattern \
 reject_pattern \
   "macOS Power Mode form avoids shell-only stored config construction" \
   'PowerModeConfig\(|selectedPromptId\?\.uuidString|var updatedConfig = config|selectedAppConfigs\.isEmpty \? nil : selectedAppConfigs|websiteConfigs\.isEmpty \? nil : websiteConfigs' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+reject_pattern \
+  "macOS Power Mode form avoids shell-only add/edit form-state policy" \
+  'let +newId += +UUID\(|let +latestConfig +=|_configName += +State\(initialValue: +""\)|_selectedEmoji += +State\(initialValue: +"✏️"\)|_selectedAppConfigs += +State\(initialValue: +latestConfig\.appConfigs +\?\? +\[\]\)|_isTranscriptFormattingExpanded += +State\(initialValue: +latestConfig' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
 reject_pattern \

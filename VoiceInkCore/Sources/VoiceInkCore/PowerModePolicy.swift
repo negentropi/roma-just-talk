@@ -206,6 +206,105 @@ public struct VoiceInkPowerModeConfigurationDraft: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkPowerModeConfigurationFormState: Equatable, Sendable {
+    public var id: UUID
+    public var name: String
+    public var emoji: String
+    public var appConfigs: [VoiceInkPowerModeAppConfig]
+    public var urlConfigs: [VoiceInkPowerModeURLConfig]
+    public var isAIEnhancementEnabled: Bool
+    public var selectedPromptId: UUID?
+    public var selectedTranscriptionModelName: String?
+    public var selectedLanguage: String?
+    public var useScreenCapture: Bool
+    public var isTextFormattingEnabled: Bool
+    public var punctuationCleanupMode: PunctuationCleanupMode
+    public var lowercaseTranscription: Bool
+    public var selectedAIProvider: String?
+    public var selectedAIModel: String?
+    public var autoSendKey: VoiceInkAutoSendKey
+    public var isDefault: Bool
+    public var isTranscriptFormattingExpanded: Bool
+
+    public init(
+        id: UUID,
+        name: String,
+        emoji: String,
+        appConfigs: [VoiceInkPowerModeAppConfig] = [],
+        urlConfigs: [VoiceInkPowerModeURLConfig] = [],
+        isAIEnhancementEnabled: Bool,
+        selectedPromptId: UUID? = nil,
+        selectedTranscriptionModelName: String? = nil,
+        selectedLanguage: String? = nil,
+        useScreenCapture: Bool = false,
+        isTextFormattingEnabled: Bool = false,
+        punctuationCleanupMode: PunctuationCleanupMode = .keep,
+        lowercaseTranscription: Bool = false,
+        selectedAIProvider: String? = nil,
+        selectedAIModel: String? = nil,
+        autoSendKey: VoiceInkAutoSendKey = .none,
+        isDefault: Bool = false,
+        isTranscriptFormattingExpanded: Bool = false
+    ) {
+        self.id = id
+        self.name = name
+        self.emoji = emoji
+        self.appConfigs = appConfigs
+        self.urlConfigs = urlConfigs
+        self.isAIEnhancementEnabled = isAIEnhancementEnabled
+        self.selectedPromptId = selectedPromptId
+        self.selectedTranscriptionModelName = selectedTranscriptionModelName
+        self.selectedLanguage = selectedLanguage
+        self.useScreenCapture = useScreenCapture
+        self.isTextFormattingEnabled = isTextFormattingEnabled
+        self.punctuationCleanupMode = punctuationCleanupMode
+        self.lowercaseTranscription = lowercaseTranscription
+        self.selectedAIProvider = selectedAIProvider
+        self.selectedAIModel = selectedAIModel
+        self.autoSendKey = autoSendKey
+        self.isDefault = isDefault
+        self.isTranscriptFormattingExpanded = isTranscriptFormattingExpanded
+    }
+
+    public static func adding(
+        id: UUID = UUID(),
+        selectedAIProvider: String? = VoiceInkAIEnhancementProviderPreference.selectedProviderRawValue()
+    ) -> Self {
+        Self(
+            id: id,
+            name: "",
+            emoji: "✏️",
+            isAIEnhancementEnabled: false,
+            selectedAIProvider: selectedAIProvider
+        )
+    }
+
+    public static func editing(_ config: PowerModeConfig) -> Self {
+        Self(
+            id: config.id,
+            name: config.name,
+            emoji: config.emoji,
+            appConfigs: config.appConfigs ?? [],
+            urlConfigs: config.urlConfigs ?? [],
+            isAIEnhancementEnabled: config.isAIEnhancementEnabled,
+            selectedPromptId: config.selectedPromptUUID,
+            selectedTranscriptionModelName: config.selectedTranscriptionModelName,
+            selectedLanguage: config.selectedLanguage,
+            useScreenCapture: config.useScreenCapture,
+            isTextFormattingEnabled: config.isTextFormattingEnabled,
+            punctuationCleanupMode: config.punctuationCleanupMode,
+            lowercaseTranscription: config.lowercaseTranscription,
+            selectedAIProvider: config.selectedAIProvider,
+            selectedAIModel: config.selectedAIModel,
+            autoSendKey: config.autoSendKey,
+            isDefault: config.isDefault,
+            isTranscriptFormattingExpanded: config.isTextFormattingEnabled
+                || config.punctuationCleanupMode != .keep
+                || config.lowercaseTranscription
+        )
+    }
+}
+
 public struct VoiceInkPowerModeEnhancementSelection: Equatable, Sendable {
     public var selectedPromptId: UUID?
     public var selectedAIProvider: String?
@@ -925,6 +1024,19 @@ public enum VoiceInkPowerModeConfigurationMode: Hashable, Sendable {
             return .add
         case .edit(let config):
             return .edit(config.id)
+        }
+    }
+
+    public func formState(
+        existingConfigurations: [PowerModeConfig],
+        newID: UUID = UUID(),
+        selectedAIProvider: String? = VoiceInkAIEnhancementProviderPreference.selectedProviderRawValue()
+    ) -> VoiceInkPowerModeConfigurationFormState {
+        switch self {
+        case .add:
+            return .adding(id: newID, selectedAIProvider: selectedAIProvider)
+        case .edit(let config):
+            return .editing(existingConfigurations.powerModeConfiguration(with: config.id) ?? config)
         }
     }
 

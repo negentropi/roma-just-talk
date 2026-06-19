@@ -597,6 +597,38 @@ reject_pattern \
   iOS/VoiceInk-ios/NoteDetailView.swift
 
 require_pattern \
+  "shared date presentation owns macOS detail timestamp format" \
+  'abbreviatedTimestamp' \
+  VoiceInkCore/Sources/VoiceInkCore/DatePresentation.swift
+
+require_pattern \
+  "shared date presentation owns macOS history timestamp format" \
+  'compactTimestamp' \
+  VoiceInkCore/Sources/VoiceInkCore/DatePresentation.swift
+
+require_pattern \
+  "macOS transcription details use shared timestamp presentation" \
+  'VoiceInkDatePresentation\.abbreviatedTimestamp' \
+  VoiceInk/Views/Common/TranscriptionInfoPanel.swift
+
+require_pattern \
+  "macOS history rows use shared timestamp presentation" \
+  'VoiceInkDatePresentation\.compactTimestamp' \
+  VoiceInk/Views/History/TranscriptionListItem.swift
+
+require_pattern \
+  "macOS inline history rows use shared timestamp presentation" \
+  'VoiceInkDatePresentation\.compactTimestamp' \
+  VoiceInk/Views/History/InlineHistoryView.swift
+
+reject_pattern \
+  "macOS transcript timestamp views avoid shell-owned date formats" \
+  'format: \.dateTime\.month\(\.abbreviated\)\.day\(\)\.hour\(\)\.minute\(\)|formatted\(date: \.abbreviated, time: \.shortened\)' \
+  VoiceInk/Views/Common/TranscriptionInfoPanel.swift \
+  VoiceInk/Views/History/TranscriptionListItem.swift \
+  VoiceInk/Views/History/InlineHistoryView.swift
+
+require_pattern \
   "shared transcript status presentation policy lives in VoiceInkCore" \
   'VoiceInkTranscriptStatusPresentation' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift

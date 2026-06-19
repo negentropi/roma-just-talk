@@ -19,7 +19,7 @@ struct TranscriptionListItem: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
-                    Text(transcription.timestamp, format: .dateTime.month(.abbreviated).day().hour().minute())
+                    Text(VoiceInkDatePresentation.compactTimestamp(transcription.timestamp))
                         .font(.system(size: 11, weight: .medium))
                         .foregroundColor(.secondary)
                     Spacer()

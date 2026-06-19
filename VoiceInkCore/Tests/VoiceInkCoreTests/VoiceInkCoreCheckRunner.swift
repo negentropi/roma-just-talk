@@ -133,6 +133,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "DashboardMetricsTests.testAverageWordsPerMinuteDisplayTextRoundsToOneDecimalPlace", run: { DashboardMetricsTests().testAverageWordsPerMinuteDisplayTextRoundsToOneDecimalPlace() }),
             VoiceInkCoreCheck(name: "DashboardMetricsTests.testNoteListSummaryPresentationBuildsIOSHeaderText", run: { DashboardMetricsTests().testNoteListSummaryPresentationBuildsIOSHeaderText() }),
             VoiceInkCoreCheck(name: "DashboardMetricsTests.testNoteListSummaryPresentationOmitsFastestModelWhenNoTimedModelExists", run: { DashboardMetricsTests().testNoteListSummaryPresentationOmitsFastestModelWhenNoTimedModelExists() }),
+            VoiceInkCoreCheck(name: "DatePresentationTests.testAbbreviatedTimestampPreservesMacOSDetailFormat", run: { DatePresentationTests().testAbbreviatedTimestampPreservesMacOSDetailFormat() }),
+            VoiceInkCoreCheck(name: "DatePresentationTests.testCompactTimestampPreservesMacOSHistoryListFormat", run: { DatePresentationTests().testCompactTimestampPreservesMacOSHistoryListFormat() }),
             VoiceInkCoreCheck(name: "DatePresentationTests.testRelativeTimestampUsesShortRelativeStyle", run: { DatePresentationTests().testRelativeTimestampUsesShortRelativeStyle() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testDictionaryAlertPresentationPreservesPlatformTitles", run: { DictionaryPolicyTests().testDictionaryAlertPresentationPreservesPlatformTitles() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testDictionaryPersistenceFailureMessagesPreservePlatformCopy", run: { DictionaryPolicyTests().testDictionaryPersistenceFailureMessagesPreservePlatformCopy() }),

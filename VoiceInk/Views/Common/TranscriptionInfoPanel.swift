@@ -22,7 +22,7 @@ struct TranscriptionInfoPanel: View {
             metadataRow(
                 icon: "calendar",
                 label: "Date",
-                value: transcription.timestamp.formatted(date: .abbreviated, time: .shortened)
+                value: VoiceInkDatePresentation.abbreviatedTimestamp(transcription.timestamp)
             )
 
             metadataRow(

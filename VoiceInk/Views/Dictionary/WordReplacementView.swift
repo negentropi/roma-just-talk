@@ -2,24 +2,12 @@ import SwiftUI
 import SwiftData
 import VoiceInkCore
 
-enum SortMode: String {
-    case originalAsc = "originalAsc"
-    case originalDesc = "originalDesc"
-    case replacementAsc = "replacementAsc"
-    case replacementDesc = "replacementDesc"
-}
-
-enum SortColumn {
-    case original
-    case replacement
-}
-
 struct WordReplacementView: View {
     @Query private var wordReplacements: [WordReplacement]
     @Environment(\.modelContext) private var modelContext
     @State private var editingReplacement: WordReplacement? = nil
     @State private var alertPresentation: VoiceInkDictionaryAlertPresentation?
-    @State private var sortMode: SortMode = .originalAsc
+    @State private var sortMode: VoiceInkWordReplacementSortMode = .defaultMode
     @State private var originalWord = ""
     @State private var replacementWord = ""
     @State private var showInfoPopover = false
@@ -27,33 +15,21 @@ struct WordReplacementView: View {
     private let listPresentation = VoiceInkWordReplacementListPresentation.macOS
 
     init() {
-        if let savedSort = UserDefaults.standard.string(forKey: "wordReplacementSortMode"),
-           let mode = SortMode(rawValue: savedSort) {
-            _sortMode = State(initialValue: mode)
-        }
+        _sortMode = State(initialValue: VoiceInkDictionaryListSortPreference.wordReplacementSortMode())
     }
 
     private var sortedReplacements: [WordReplacement] {
-        switch sortMode {
-        case .originalAsc:
-            return wordReplacements.sorted { $0.originalText.localizedCaseInsensitiveCompare($1.originalText) == .orderedAscending }
-        case .originalDesc:
-            return wordReplacements.sorted { $0.originalText.localizedCaseInsensitiveCompare($1.originalText) == .orderedDescending }
-        case .replacementAsc:
-            return wordReplacements.sorted { $0.replacementText.localizedCaseInsensitiveCompare($1.replacementText) == .orderedAscending }
-        case .replacementDesc:
-            return wordReplacements.sorted { $0.replacementText.localizedCaseInsensitiveCompare($1.replacementText) == .orderedDescending }
-        }
+        VoiceInkDictionaryListSortPolicy.sortedWordReplacements(
+            wordReplacements,
+            mode: sortMode,
+            originalText: { $0.originalText },
+            replacementText: { $0.replacementText }
+        )
     }
     
-    private func toggleSort(for column: SortColumn) {
-        switch column {
-        case .original:
-            sortMode = (sortMode == .originalAsc) ? .originalDesc : .originalAsc
-        case .replacement:
-            sortMode = (sortMode == .replacementAsc) ? .replacementDesc : .replacementAsc
-        }
-        UserDefaults.standard.set(sortMode.rawValue, forKey: "wordReplacementSortMode")
+    private func toggleSort(for column: VoiceInkWordReplacementSortColumn) {
+        sortMode = sortMode.toggled(for: column)
+        VoiceInkDictionaryListSortPreference.saveWordReplacementSortMode(sortMode)
     }
 
     private var shouldShowAddButton: Bool {
@@ -127,8 +103,8 @@ struct WordReplacementView: View {
                                     .font(.system(size: 12, weight: .medium))
                                     .foregroundColor(.secondary)
 
-                                if sortMode == .originalAsc || sortMode == .originalDesc {
-                                    Image(systemName: sortMode == .originalAsc ? "chevron.up" : "chevron.down")
+                                if sortMode.activeColumn == .original {
+                                    Image(systemName: sortMode.indicatorSystemImageName)
                                         .font(.caption)
                                         .foregroundColor(.accentColor)
                                 }
@@ -149,8 +125,8 @@ struct WordReplacementView: View {
                                     .font(.system(size: 12, weight: .medium))
                                     .foregroundColor(.secondary)
 
-                                if sortMode == .replacementAsc || sortMode == .replacementDesc {
-                                    Image(systemName: sortMode == .replacementAsc ? "chevron.up" : "chevron.down")
+                                if sortMode.activeColumn == .replacement {
+                                    Image(systemName: sortMode.indicatorSystemImageName)
                                         .font(.caption)
                                         .foregroundColor(.accentColor)
                                 }

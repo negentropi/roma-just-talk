@@ -195,6 +195,89 @@ final class DictionaryPolicyTests: XCTestCase {
         XCTAssertEqual(presentation.removeButtonHelp, "Remove replacement")
     }
 
+    func testDictionaryListSortModesPreserveStorageAndIndicatorValues() {
+        XCTAssertEqual(VoiceInkVocabularySortMode.wordAscending.rawValue, "wordAsc")
+        XCTAssertEqual(VoiceInkVocabularySortMode.wordDescending.rawValue, "wordDesc")
+        XCTAssertEqual(VoiceInkVocabularySortMode.defaultMode, .wordAscending)
+        XCTAssertEqual(VoiceInkVocabularySortMode.wordAscending.indicatorSystemImageName, "chevron.up")
+        XCTAssertEqual(VoiceInkVocabularySortMode.wordDescending.indicatorSystemImageName, "chevron.down")
+        XCTAssertEqual(VoiceInkVocabularySortMode.wordAscending.toggled(), .wordDescending)
+        XCTAssertEqual(VoiceInkVocabularySortMode.wordDescending.toggled(), .wordAscending)
+
+        XCTAssertEqual(VoiceInkWordReplacementSortMode.originalAscending.rawValue, "originalAsc")
+        XCTAssertEqual(VoiceInkWordReplacementSortMode.originalDescending.rawValue, "originalDesc")
+        XCTAssertEqual(VoiceInkWordReplacementSortMode.replacementAscending.rawValue, "replacementAsc")
+        XCTAssertEqual(VoiceInkWordReplacementSortMode.replacementDescending.rawValue, "replacementDesc")
+        XCTAssertEqual(VoiceInkWordReplacementSortMode.defaultMode, .originalAscending)
+        XCTAssertEqual(VoiceInkWordReplacementSortMode.originalAscending.activeColumn, .original)
+        XCTAssertEqual(VoiceInkWordReplacementSortMode.originalDescending.activeColumn, .original)
+        XCTAssertEqual(VoiceInkWordReplacementSortMode.replacementAscending.activeColumn, .replacement)
+        XCTAssertEqual(VoiceInkWordReplacementSortMode.replacementDescending.activeColumn, .replacement)
+        XCTAssertEqual(VoiceInkWordReplacementSortMode.originalAscending.indicatorSystemImageName, "chevron.up")
+        XCTAssertEqual(VoiceInkWordReplacementSortMode.originalDescending.indicatorSystemImageName, "chevron.down")
+        XCTAssertEqual(VoiceInkWordReplacementSortMode.originalAscending.toggled(for: .original), .originalDescending)
+        XCTAssertEqual(VoiceInkWordReplacementSortMode.originalDescending.toggled(for: .original), .originalAscending)
+        XCTAssertEqual(VoiceInkWordReplacementSortMode.originalDescending.toggled(for: .replacement), .replacementAscending)
+        XCTAssertEqual(VoiceInkWordReplacementSortMode.replacementAscending.toggled(for: .replacement), .replacementDescending)
+    }
+
+    func testDictionaryListSortPreferencesReadDefaultsAndSaveModes() {
+        withIsolatedDefaults { defaults in
+            XCTAssertEqual(VoiceInkDictionaryListSortPreference.vocabularySortMode(from: defaults), .wordAscending)
+            XCTAssertEqual(VoiceInkDictionaryListSortPreference.wordReplacementSortMode(from: defaults), .originalAscending)
+
+            defaults.set("invalid", forKey: VoiceInkDictionaryListSortPreference.vocabularySortModeKey)
+            defaults.set("invalid", forKey: VoiceInkDictionaryListSortPreference.wordReplacementSortModeKey)
+
+            XCTAssertEqual(VoiceInkDictionaryListSortPreference.vocabularySortMode(from: defaults), .wordAscending)
+            XCTAssertEqual(VoiceInkDictionaryListSortPreference.wordReplacementSortMode(from: defaults), .originalAscending)
+
+            VoiceInkDictionaryListSortPreference.saveVocabularySortMode(.wordDescending, to: defaults)
+            VoiceInkDictionaryListSortPreference.saveWordReplacementSortMode(.replacementDescending, to: defaults)
+
+            XCTAssertEqual(VoiceInkDictionaryListSortPreference.vocabularySortMode(from: defaults), .wordDescending)
+            XCTAssertEqual(VoiceInkDictionaryListSortPreference.wordReplacementSortMode(from: defaults), .replacementDescending)
+        }
+    }
+
+    func testDictionaryListSortPolicySortsVocabularyAndWordReplacements() {
+        let vocabulary = ["zeta", "Alpha", "beta"]
+
+        XCTAssertEqual(
+            VoiceInkDictionaryListSortPolicy.sortedVocabulary(vocabulary, mode: .wordAscending) { $0 },
+            ["Alpha", "beta", "zeta"]
+        )
+        XCTAssertEqual(
+            VoiceInkDictionaryListSortPolicy.sortedVocabulary(vocabulary, mode: .wordDescending) { $0 },
+            ["zeta", "beta", "Alpha"]
+        )
+
+        let replacements = [
+            VoiceInkWordReplacementRule(originalText: "voice ink", replacementText: "VoiceInk"),
+            VoiceInkWordReplacementRule(originalText: "roma", replacementText: "Roma Just Talk"),
+            VoiceInkWordReplacementRule(originalText: "alpha", replacementText: "Zed")
+        ]
+
+        XCTAssertEqual(
+            VoiceInkDictionaryListSortPolicy.sortedWordReplacements(
+                replacements,
+                mode: .originalAscending,
+                originalText: { $0.originalText },
+                replacementText: { $0.replacementText }
+            ).map(\.originalText),
+            ["alpha", "roma", "voice ink"]
+        )
+        XCTAssertEqual(
+            VoiceInkDictionaryListSortPolicy.sortedWordReplacements(
+                replacements,
+                mode: .replacementDescending,
+                originalText: { $0.originalText },
+                replacementText: { $0.replacementText }
+            ).map(\.replacementText),
+            ["Zed", "VoiceInk", "Roma Just Talk"]
+        )
+    }
+
     func testVocabularyDraftUsesSharedTokenPolicy() {
         XCTAssertFalse(VoiceInkDictionaryPolicy.hasVocabularyDraft(" , \n "))
         XCTAssertTrue(VoiceInkDictionaryPolicy.hasVocabularyDraft("Voice Ink, "))
@@ -352,5 +435,13 @@ final class DictionaryPolicyTests: XCTestCase {
             [VoiceInkWordReplacementRule(originalText: "Flow, Voice Ink", replacementText: "roma")]
         )
         XCTAssertEqual(plan.skippedInvalidReplacementCount, 2)
+    }
+
+    private func withIsolatedDefaults(_ run: (UserDefaults) -> Void) {
+        let suiteName = "VoiceInkCore.DictionaryPolicyTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defaults.removePersistentDomain(forName: suiteName)
+        run(defaults)
+        defaults.removePersistentDomain(forName: suiteName)
     }
 }

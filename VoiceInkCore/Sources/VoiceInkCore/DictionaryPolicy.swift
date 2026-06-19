@@ -336,6 +336,151 @@ public struct VoiceInkWordReplacementListPresentation: Equatable, Sendable {
     )
 }
 
+public enum VoiceInkVocabularySortMode: String, CaseIterable, Sendable {
+    case wordAscending = "wordAsc"
+    case wordDescending = "wordDesc"
+
+    public static let defaultMode: Self = .wordAscending
+
+    public var indicatorSystemImageName: String {
+        switch self {
+        case .wordAscending:
+            return "chevron.up"
+        case .wordDescending:
+            return "chevron.down"
+        }
+    }
+
+    public func toggled() -> Self {
+        switch self {
+        case .wordAscending:
+            return .wordDescending
+        case .wordDescending:
+            return .wordAscending
+        }
+    }
+}
+
+public enum VoiceInkWordReplacementSortColumn: Sendable {
+    case original
+    case replacement
+}
+
+public enum VoiceInkWordReplacementSortMode: String, CaseIterable, Sendable {
+    case originalAscending = "originalAsc"
+    case originalDescending = "originalDesc"
+    case replacementAscending = "replacementAsc"
+    case replacementDescending = "replacementDesc"
+
+    public static let defaultMode: Self = .originalAscending
+
+    public var activeColumn: VoiceInkWordReplacementSortColumn {
+        switch self {
+        case .originalAscending, .originalDescending:
+            return .original
+        case .replacementAscending, .replacementDescending:
+            return .replacement
+        }
+    }
+
+    public var indicatorSystemImageName: String {
+        switch self {
+        case .originalAscending, .replacementAscending:
+            return "chevron.up"
+        case .originalDescending, .replacementDescending:
+            return "chevron.down"
+        }
+    }
+
+    public func toggled(for column: VoiceInkWordReplacementSortColumn) -> Self {
+        switch column {
+        case .original:
+            return self == .originalAscending ? .originalDescending : .originalAscending
+        case .replacement:
+            return self == .replacementAscending ? .replacementDescending : .replacementAscending
+        }
+    }
+}
+
+public enum VoiceInkDictionaryListSortPreference {
+    public static let vocabularySortModeKey = "vocabularySortMode"
+    public static let wordReplacementSortModeKey = "wordReplacementSortMode"
+
+    public static func vocabularySortMode(from defaults: UserDefaults = .standard) -> VoiceInkVocabularySortMode {
+        guard let rawValue = defaults.string(forKey: vocabularySortModeKey),
+              let mode = VoiceInkVocabularySortMode(rawValue: rawValue) else {
+            return .defaultMode
+        }
+
+        return mode
+    }
+
+    public static func saveVocabularySortMode(
+        _ mode: VoiceInkVocabularySortMode,
+        to defaults: UserDefaults = .standard
+    ) {
+        defaults.set(mode.rawValue, forKey: vocabularySortModeKey)
+    }
+
+    public static func wordReplacementSortMode(from defaults: UserDefaults = .standard) -> VoiceInkWordReplacementSortMode {
+        guard let rawValue = defaults.string(forKey: wordReplacementSortModeKey),
+              let mode = VoiceInkWordReplacementSortMode(rawValue: rawValue) else {
+            return .defaultMode
+        }
+
+        return mode
+    }
+
+    public static func saveWordReplacementSortMode(
+        _ mode: VoiceInkWordReplacementSortMode,
+        to defaults: UserDefaults = .standard
+    ) {
+        defaults.set(mode.rawValue, forKey: wordReplacementSortModeKey)
+    }
+}
+
+public enum VoiceInkDictionaryListSortPolicy {
+    public static func sortedVocabulary<Item>(
+        _ items: [Item],
+        mode: VoiceInkVocabularySortMode,
+        word: (Item) -> String
+    ) -> [Item] {
+        items.sorted { lhs, rhs in
+            let ordering = word(lhs).localizedCaseInsensitiveCompare(word(rhs))
+            switch mode {
+            case .wordAscending:
+                return ordering == .orderedAscending
+            case .wordDescending:
+                return ordering == .orderedDescending
+            }
+        }
+    }
+
+    public static func sortedWordReplacements<Item>(
+        _ items: [Item],
+        mode: VoiceInkWordReplacementSortMode,
+        originalText: (Item) -> String,
+        replacementText: (Item) -> String
+    ) -> [Item] {
+        items.sorted { lhs, rhs in
+            let ordering: ComparisonResult
+            switch mode.activeColumn {
+            case .original:
+                ordering = originalText(lhs).localizedCaseInsensitiveCompare(originalText(rhs))
+            case .replacement:
+                ordering = replacementText(lhs).localizedCaseInsensitiveCompare(replacementText(rhs))
+            }
+
+            switch mode {
+            case .originalAscending, .replacementAscending:
+                return ordering == .orderedAscending
+            case .originalDescending, .replacementDescending:
+                return ordering == .orderedDescending
+            }
+        }
+    }
+}
+
 public enum VoiceInkDictionaryPolicy {
     public static func hasVocabularyDraft(_ input: String) -> Bool {
         !tokens(from: input).isEmpty

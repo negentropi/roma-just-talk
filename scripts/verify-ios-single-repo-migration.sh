@@ -2043,6 +2043,21 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
 
 require_pattern \
+  "shared dictionary list sort modes live in VoiceInkCore" \
+  'VoiceInkVocabularySortMode|VoiceInkWordReplacementSortMode|VoiceInkWordReplacementSortColumn|indicatorSystemImageName|toggled' \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+require_pattern \
+  "shared dictionary list sort preferences live in VoiceInkCore" \
+  'VoiceInkDictionaryListSortPreference|vocabularySortModeKey = "vocabularySortMode"|wordReplacementSortModeKey = "wordReplacementSortMode"|saveVocabularySortMode|saveWordReplacementSortMode' \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+require_pattern \
+  "shared dictionary list sort policy lives in VoiceInkCore" \
+  'VoiceInkDictionaryListSortPolicy|sortedVocabulary|sortedWordReplacements|localizedCaseInsensitiveCompare' \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+require_pattern \
   "iOS settings uses shared dictionary alert presentation" \
   'VoiceInkDictionaryAlertPresentation|dictionaryAlert|\.duplicateFillerWord|\.vocabulary|\.wordReplacement' \
   iOS/VoiceInk-ios/SettingsView.swift
@@ -2073,6 +2088,11 @@ require_pattern \
   VoiceInk/Views/Dictionary/VocabularyView.swift
 
 require_pattern \
+  "macOS vocabulary list uses shared sort policy" \
+  'VoiceInkDictionaryListSortPreference\.vocabularySortMode|VoiceInkDictionaryListSortPolicy\.sortedVocabulary|saveVocabularySortMode|indicatorSystemImageName' \
+  VoiceInk/Views/Dictionary/VocabularyView.swift
+
+require_pattern \
   "macOS word-replacement view uses shared dictionary alert presentation" \
   'VoiceInkDictionaryAlertPresentation|\.wordReplacement|failedToRemoveWordReplacement' \
   VoiceInk/Views/Dictionary/WordReplacementView.swift
@@ -2085,6 +2105,11 @@ require_pattern \
 require_pattern \
   "macOS word-replacement list uses shared list presentation" \
   'VoiceInkWordReplacementListPresentation\.macOS|listPresentation|editButtonHelp' \
+  VoiceInk/Views/Dictionary/WordReplacementView.swift
+
+require_pattern \
+  "macOS word-replacement list uses shared sort policy" \
+  'VoiceInkDictionaryListSortPreference\.wordReplacementSortMode|VoiceInkDictionaryListSortPolicy\.sortedWordReplacements|saveWordReplacementSortMode|activeColumn|indicatorSystemImageName' \
   VoiceInk/Views/Dictionary/WordReplacementView.swift
 
 require_pattern \
@@ -2187,6 +2212,17 @@ reject_pattern \
   '"(Vocabulary Words|Sort alphabetically|Remove word|Original|Replacement|Sort by original|Sort by replacement|Edit replacement|Remove replacement)"' \
   VoiceInk/Views/Dictionary/VocabularyView.swift \
   VoiceInk/Views/Dictionary/WordReplacementView.swift
+
+reject_pattern \
+  "macOS dictionary list views avoid shell-owned sort policy" \
+  'enum +(VocabularySortMode|SortMode|SortColumn)|"(vocabularySortMode|wordReplacementSortMode)"|localizedCaseInsensitiveCompare|UserDefaults\.standard\.(string|set)\(forKey:' \
+  VoiceInk/Views/Dictionary/VocabularyView.swift \
+  VoiceInk/Views/Dictionary/WordReplacementView.swift
+
+require_pattern \
+  "migration checklist tracks shared dictionary sort gate" \
+  'dictionary form/chrome, quick-add, word-replacement guidance, edit-sheet, list/row copy, sort mode storage/toggle/indicator policy, and vocabulary/word-replacement list sorting route through `VoiceInkDictionarySettingsPresentation`/`VoiceInkDictionaryQuickAddPresentation`/`VoiceInkWordReplacementInfoPresentation`/`VoiceInkWordReplacementEditPresentation`/`VoiceInkVocabularyListPresentation`/`VoiceInkWordReplacementListPresentation`/`VoiceInkDictionaryListSortPreference`/`VoiceInkDictionaryListSortPolicy`' \
+  docs/ios-single-repo-migration.md
 
 reject_pattern \
   "platform dictionary surfaces avoid duplicate alert titles and persistence failure copy" \

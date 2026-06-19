@@ -2,39 +2,26 @@ import SwiftUI
 import SwiftData
 import VoiceInkCore
 
-enum VocabularySortMode: String {
-    case wordAsc = "wordAsc"
-    case wordDesc = "wordDesc"
-}
-
 struct VocabularyView: View {
     @Query private var vocabularyWords: [VocabularyWord]
     @Environment(\.modelContext) private var modelContext
     @State private var newWord = ""
     @State private var alertPresentation: VoiceInkDictionaryAlertPresentation?
-    @State private var sortMode: VocabularySortMode = .wordAsc
+    @State private var sortMode: VoiceInkVocabularySortMode = .defaultMode
     private let dictionaryPresentation = VoiceInkDictionarySettingsPresentation.macOS
     private let listPresentation = VoiceInkVocabularyListPresentation.macOS
 
     init() {
-        if let savedSort = UserDefaults.standard.string(forKey: "vocabularySortMode"),
-           let mode = VocabularySortMode(rawValue: savedSort) {
-            _sortMode = State(initialValue: mode)
-        }
+        _sortMode = State(initialValue: VoiceInkDictionaryListSortPreference.vocabularySortMode())
     }
 
     private var sortedItems: [VocabularyWord] {
-        switch sortMode {
-        case .wordAsc:
-            return vocabularyWords.sorted { $0.word.localizedCaseInsensitiveCompare($1.word) == .orderedAscending }
-        case .wordDesc:
-            return vocabularyWords.sorted { $0.word.localizedCaseInsensitiveCompare($1.word) == .orderedDescending }
-        }
+        VoiceInkDictionaryListSortPolicy.sortedVocabulary(vocabularyWords, mode: sortMode) { $0.word }
     }
 
     private func toggleSort() {
-        sortMode = (sortMode == .wordAsc) ? .wordDesc : .wordAsc
-        UserDefaults.standard.set(sortMode.rawValue, forKey: "vocabularySortMode")
+        sortMode = sortMode.toggled()
+        VoiceInkDictionaryListSortPreference.saveVocabularySortMode(sortMode)
     }
 
     private var shouldShowAddButton: Bool {
@@ -85,7 +72,7 @@ struct VocabularyView: View {
                                 .font(.system(size: 12, weight: .medium))
                                 .foregroundColor(.secondary)
 
-                            Image(systemName: sortMode == .wordAsc ? "chevron.up" : "chevron.down")
+                            Image(systemName: sortMode.indicatorSystemImageName)
                                 .font(.caption)
                                 .foregroundColor(.accentColor)
                         }

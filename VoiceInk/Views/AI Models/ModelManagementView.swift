@@ -203,7 +203,7 @@ struct ModelManagementView: View {
                                     Task { await whisperModelManager.downloadModel(whisperModel) }
                                 }
                             },
-                            editAction: model.provider == .custom ? { customModel in
+                            editAction: modelManagementFacts(for: model).category == .custom ? { customModel in
                                 customModelToEdit = customModel
                             } : nil
                         )
@@ -297,27 +297,23 @@ struct ModelManagementView: View {
     }
 
     private var filteredModels: [any TranscriptionModel] {
-        switch selectedFilter {
-        case .recommended:
-            return transcriptionModelManager.allAvailableModels.filter {
-                let recommendedNames = ["ggml-base.en", "parakeet-tdt-0.6b-v2", "ggml-large-v3-turbo-q5_0", "whisper-large-v3-turbo"]
-                return recommendedNames.contains($0.name)
-            }.sorted { model1, model2 in
-                let recommendedOrder = ["ggml-base.en", "parakeet-tdt-0.6b-v2", "ggml-large-v3-turbo-q5_0", "whisper-large-v3-turbo"]
-                let index1 = recommendedOrder.firstIndex(of: model1.name) ?? Int.max
-                let index2 = recommendedOrder.firstIndex(of: model2.name) ?? Int.max
-                return index1 < index2
-            }
-        case .local:
-            return transcriptionModelManager.allAvailableModels.filter {
-                ($0.provider == .whisper || $0.provider == .nativeApple || $0.provider == .fluidAudio)
-                    && transcriptionModelManager.isAvailableOnCurrentOS($0)
-            }
-        case .cloud:
-            return transcriptionModelManager.allAvailableModels.filter { CloudProviderRegistry.provider(for: $0.provider) != nil }
-        case .custom:
-            return transcriptionModelManager.allAvailableModels.filter { $0.provider == .custom }
+        let models = transcriptionModelManager.allAvailableModels.filter {
+            selectedFilter.includes(modelManagementFacts(for: $0))
         }
+
+        guard selectedFilter == .recommended else {
+            return models
+        }
+
+        return models.sorted {
+            selectedFilter.sortRank(forModelName: $0.name) < selectedFilter.sortRank(forModelName: $1.name)
+        }
+    }
+
+    private func modelManagementFacts(for model: any TranscriptionModel) -> VoiceInkModelManagementModelFacts {
+        model.modelManagementFacts(
+            isAvailableOnCurrentOS: transcriptionModelManager.isAvailableOnCurrentOS(model)
+        )
     }
 
     // MARK: - Import Panel

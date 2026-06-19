@@ -1351,6 +1351,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/ModelManagementPresentation.swift
 
 require_pattern \
+  "shared model management filter owns model facts and recommended order" \
+  'VoiceInkModelManagementModelFacts|VoiceInkModelManagementModelCategory|recommendedModelNames|func +includes' \
+  VoiceInkCore/Sources/VoiceInkCore/ModelManagementPresentation.swift
+
+require_pattern \
   "shared model management copy presentation lives in VoiceInkCore" \
   'enum VoiceInkModelManagementPresentation' \
   VoiceInkCore/Sources/VoiceInkCore/ModelManagementPresentation.swift
@@ -1384,6 +1389,16 @@ require_pattern \
 require_pattern \
   "macOS model management uses shared filter presentation" \
   'VoiceInkModelManagementFilter\.allCases|filter\.title' \
+  VoiceInk/Views/AI\ Models/ModelManagementView.swift
+
+require_pattern \
+  "macOS TranscriptionModel adapts shared model-management facts" \
+  'modelManagementFacts|VoiceInkModelManagementModelFacts|modelManagementCategory' \
+  VoiceInk/Models/TranscriptionModel.swift
+
+require_pattern \
+  "macOS model management uses shared filter membership" \
+  'selectedFilter\.includes|sortRank\(forModelName:|modelManagementFacts\(for:' \
   VoiceInk/Views/AI\ Models/ModelManagementView.swift
 
 require_pattern \
@@ -1561,6 +1576,11 @@ reject_pattern \
 reject_pattern \
   "platform model management avoids shell-only filter enum" \
   'enum ModelFilter' \
+  VoiceInk/Views/AI\ Models/ModelManagementView.swift
+
+reject_pattern \
+  "macOS model management avoids shell-owned filter membership policy" \
+  'recommendedNames|recommendedOrder|provider == \.(whisper|nativeApple|fluidAudio|custom)|CloudProviderRegistry\.provider\(for:' \
   VoiceInk/Views/AI\ Models/ModelManagementView.swift
 
 reject_pattern \

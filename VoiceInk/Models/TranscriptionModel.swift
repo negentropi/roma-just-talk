@@ -87,6 +87,17 @@ extension ModelProvider {
             isMultilingual: isMultilingual
         )
     }
+
+    var modelManagementCategory: VoiceInkModelManagementModelCategory {
+        switch self {
+        case .whisper, .nativeApple, .fluidAudio:
+            return .local
+        case .custom:
+            return .custom
+        default:
+            return .cloud
+        }
+    }
 }
 
 // A unified protocol for any transcription model
@@ -168,6 +179,14 @@ extension TranscriptionModel {
         VoiceInkPowerModeTranscriptionModelResourceFacts(
             name: name,
             languageSource: provider.transcriptionLanguageSource
+        )
+    }
+
+    func modelManagementFacts(isAvailableOnCurrentOS: Bool) -> VoiceInkModelManagementModelFacts {
+        VoiceInkModelManagementModelFacts(
+            name: name,
+            category: provider.modelManagementCategory,
+            isAvailableOnCurrentOS: isAvailableOnCurrentOS
         )
     }
 }

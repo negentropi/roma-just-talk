@@ -50,7 +50,7 @@ final class AudioRecorder: NSObject, ObservableObject {
         currentRecordingURL = url
         isRecording = true
 
-        meterTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
+        meterTimer = Timer.scheduledTimer(withTimeInterval: VoiceInkAudioMeterLevel.iOSUpdateInterval, repeats: true) { [weak self] _ in
             Task { @MainActor in
                 guard let self else { return }
                 self.audioRecorder?.updateMeters()

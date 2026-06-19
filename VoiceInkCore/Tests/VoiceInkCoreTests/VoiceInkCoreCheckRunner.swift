@@ -89,6 +89,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AudioMeterLevelTests.testSmoothedLevelClampsCustomPreviousWeight", run: { AudioMeterLevelTests().testSmoothedLevelClampsCustomPreviousWeight() }),
             VoiceInkCoreCheck(name: "AudioMeterLevelTests.testBoundedHistoryKeepsMostRecentLevels", run: { AudioMeterLevelTests().testBoundedHistoryKeepsMostRecentLevels() }),
             VoiceInkCoreCheck(name: "AudioMeterLevelTests.testBoundedHistoryRejectsNonPositiveLimit", run: { AudioMeterLevelTests().testBoundedHistoryRejectsNonPositiveLimit() }),
+            VoiceInkCoreCheck(name: "AudioMeterLevelTests.testUpdateCadencesPreservePlatformAudioMeterBehavior", run: { AudioMeterLevelTests().testUpdateCadencesPreservePlatformAudioMeterBehavior() }),
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testProgressClampsCurrentTimeAgainstDuration", run: { AudioPlaybackTimelineTests().testProgressClampsCurrentTimeAgainstDuration() }),
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testProgressReturnsZeroForInvalidDuration", run: { AudioPlaybackTimelineTests().testProgressReturnsZeroForInvalidDuration() }),
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testLocationProgressClampsAgainstWidth", run: { AudioPlaybackTimelineTests().testLocationProgressClampsAgainstWidth() }),

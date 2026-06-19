@@ -727,6 +727,21 @@ require_pattern \
   iOS/VoiceInk-ios/AudioRecorder.swift
 
 require_pattern \
+  "shared audio-meter update cadences live in VoiceInkCore" \
+  'macOSUpdateIntervalMilliseconds|iOSUpdateInterval' \
+  VoiceInkCore/Sources/VoiceInkCore/AudioMeterLevel.swift
+
+require_pattern \
+  "macOS audio-meter timer uses shared update cadence" \
+  'VoiceInkAudioMeterLevel\.macOSUpdateIntervalMilliseconds' \
+  VoiceInk/Recorder.swift
+
+require_pattern \
+  "iOS audio-meter timer uses shared update cadence" \
+  'VoiceInkAudioMeterLevel\.iOSUpdateInterval' \
+  iOS/VoiceInk-ios/AudioRecorder.swift
+
+require_pattern \
   "shared audio-meter visualizer accessibility label lives in VoiceInkCore" \
   'VoiceInkAudioMeterLevel|visualizerAccessibilityLabel' \
   VoiceInkCore/Sources/VoiceInkCore/AudioMeterLevel.swift
@@ -741,6 +756,12 @@ reject_pattern \
   'levelsHistory\.count >|removeFirst\(self\.levelsHistory\.count -|0\.\.<40' \
   iOS/VoiceInk-ios/AudioRecorder.swift \
   iOS/VoiceInk-ios/AudioVisualizerView.swift
+
+reject_pattern \
+  "platform audio-meter timers avoid shell-only update cadences" \
+  'withTimeInterval: +0\.1|repeating: +\.milliseconds\(17\)' \
+  VoiceInk/Recorder.swift \
+  iOS/VoiceInk-ios/AudioRecorder.swift
 
 reject_pattern \
   "iOS audio visualizer avoids duplicate accessibility copy" \

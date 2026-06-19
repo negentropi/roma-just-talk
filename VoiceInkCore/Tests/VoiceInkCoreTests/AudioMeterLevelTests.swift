@@ -55,4 +55,9 @@ final class AudioMeterLevelTests: XCTestCase {
             []
         )
     }
+
+    func testUpdateCadencesPreservePlatformAudioMeterBehavior() {
+        XCTAssertEqual(VoiceInkAudioMeterLevel.macOSUpdateIntervalMilliseconds, 17)
+        XCTAssertEqual(VoiceInkAudioMeterLevel.iOSUpdateInterval, 0.1)
+    }
 }

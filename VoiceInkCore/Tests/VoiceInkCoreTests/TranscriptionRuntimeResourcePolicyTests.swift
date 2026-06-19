@@ -7,6 +7,7 @@ final class TranscriptionRuntimeResourcePolicyTests: XCTestCase {
 
         XCTAssertTrue(plan.shouldPrewarmModel)
         XCTAssertEqual(plan.recordingStartupLoadAction, .loadLocalWhisperModel)
+        XCTAssertEqual(plan.modelSelectionResourceAction, .preserveLocalWhisperModel)
     }
 
     func testLocalFluidAudioRoutePrewarmsAndLoadsFluidAudioAtRecordingStartup() {
@@ -14,6 +15,7 @@ final class TranscriptionRuntimeResourcePolicyTests: XCTestCase {
 
         XCTAssertTrue(plan.shouldPrewarmModel)
         XCTAssertEqual(plan.recordingStartupLoadAction, .loadLocalFluidAudioModel)
+        XCTAssertEqual(plan.modelSelectionResourceAction, .clearLocalWhisperModelAndMarkLoaded)
     }
 
     func testCloudRouteSkipsLocalRuntimeWork() {
@@ -21,6 +23,7 @@ final class TranscriptionRuntimeResourcePolicyTests: XCTestCase {
 
         XCTAssertFalse(plan.shouldPrewarmModel)
         XCTAssertEqual(plan.recordingStartupLoadAction, .none)
+        XCTAssertEqual(plan.modelSelectionResourceAction, .clearLocalWhisperModelAndMarkLoaded)
     }
 
     func testNativeAppleRouteSkipsLocalRuntimeWork() {
@@ -28,5 +31,6 @@ final class TranscriptionRuntimeResourcePolicyTests: XCTestCase {
 
         XCTAssertFalse(plan.shouldPrewarmModel)
         XCTAssertEqual(plan.recordingStartupLoadAction, .none)
+        XCTAssertEqual(plan.modelSelectionResourceAction, .clearLocalWhisperModelAndMarkLoaded)
     }
 }

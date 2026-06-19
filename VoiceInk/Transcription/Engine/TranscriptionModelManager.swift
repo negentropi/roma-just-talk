@@ -37,32 +37,11 @@ class TranscriptionModelManager: ObservableObject {
     // MARK: - Computed: usable models
 
     var usableModels: [any TranscriptionModel] {
-        allAvailableModels.filter { model in
-            switch model.provider {
-            case .whisper:
-                return whisperModelManager?.availableModels.contains { $0.name == model.name } ?? false
-            case .fluidAudio:
-                return fluidAudioModelManager?.isFluidAudioModelDownloaded(named: model.name) ?? false
-            case .nativeApple:
-                if #available(macOS 26, *) { return true } else { return false }
-            case .custom:
-                return true
-            default:
-                if CloudProviderRegistry.provider(for: model.provider) != nil {
-                    return APIKeyManager.shared.hasAPIKey(forProvider: model.provider.apiKeyProviderName)
-                }
-                return false
-            }
-        }
+        allAvailableModels.filter { availabilityFacts(for: $0).isUsable }
     }
 
     func isAvailableOnCurrentOS(_ model: any TranscriptionModel) -> Bool {
-        switch model.provider {
-        case .nativeApple:
-            if #available(macOS 26, *) { return true } else { return false }
-        default:
-            return true
-        }
+        availabilityFacts(for: model).isAvailableOnCurrentOS
     }
 
     // MARK: - Model loading from UserDefaults
@@ -97,7 +76,7 @@ class TranscriptionModelManager: ObservableObject {
         VoiceInkCurrentTranscriptionModelPreference.saveModelName(model.name)
         ensureSelectedLanguageIsSupported(by: model)
 
-        if model.provider != .whisper {
+        if model.transcriptionRuntimeResourcePlan.modelSelectionResourceAction == .clearLocalWhisperModelAndMarkLoaded {
             whisperModelManager?.loadedWhisperModel = nil
             whisperModelManager?.isModelLoaded = true
         }
@@ -117,6 +96,34 @@ class TranscriptionModelManager: ObservableObject {
         if currentLanguage != compatibleLanguage {
             VoiceInkTranscriptionLanguagePreference.saveSelectedLanguage(compatibleLanguage)
             NotificationCenter.default.post(name: .languageDidChange, object: nil)
+        }
+    }
+
+    private func availabilityFacts(for model: any TranscriptionModel) -> VoiceInkTranscriptionModelAvailabilityFacts {
+        let isAvailableOnCurrentOS = model.provider.transcriptionModelAvailabilityRequirement == .currentOSSupport
+            ? isAvailableOnCurrentOSForNativeAppleTranscription
+            : true
+
+        model.transcriptionModelAvailabilityFacts(
+            hasConfiguredAPIKey: hasConfiguredAPIKey(for: model),
+            isAvailableOnCurrentOS: isAvailableOnCurrentOS,
+            isLocalFluidAudioModelDownloaded: fluidAudioModelManager?.isFluidAudioModelDownloaded(named: model.name) ?? false,
+            isLocalWhisperModelDownloaded: whisperModelManager?.availableModels.contains { $0.name == model.name } ?? false
+        )
+    }
+
+    private func hasConfiguredAPIKey(for model: any TranscriptionModel) -> Bool {
+        guard model.provider.transcriptionModelAvailabilityRequirement == .configuredAPIKey else {
+            return false
+        }
+        return APIKeyManager.shared.hasAPIKey(forProvider: model.provider.apiKeyProviderName)
+    }
+
+    private var isAvailableOnCurrentOSForNativeAppleTranscription: Bool {
+        if #available(macOS 26, *) {
+            return true
+        } else {
+            return false
         }
     }
 

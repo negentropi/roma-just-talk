@@ -111,6 +111,21 @@ extension ModelProvider {
             return .cloud
         }
     }
+
+    var transcriptionModelAvailabilityRequirement: VoiceInkTranscriptionModelAvailabilityRequirement {
+        switch self {
+        case .whisper:
+            return .downloadedLocalWhisperModel
+        case .fluidAudio:
+            return .downloadedLocalFluidAudioModel
+        case .nativeApple:
+            return .currentOSSupport
+        case .custom:
+            return .alwaysAvailable
+        default:
+            return coreTranscriptionModelProvider == nil ? .unavailable : .configuredAPIKey
+        }
+    }
 }
 
 // A unified protocol for any transcription model
@@ -163,6 +178,21 @@ extension TranscriptionModel {
 
     var transcriptionRuntimeResourcePlan: VoiceInkTranscriptionRuntimeResourcePlan {
         VoiceInkTranscriptionRuntimeResourcePlan(serviceRoute: provider.transcriptionServiceRoute)
+    }
+
+    func transcriptionModelAvailabilityFacts(
+        hasConfiguredAPIKey: Bool = false,
+        isAvailableOnCurrentOS: Bool = true,
+        isLocalFluidAudioModelDownloaded: Bool = false,
+        isLocalWhisperModelDownloaded: Bool = false
+    ) -> VoiceInkTranscriptionModelAvailabilityFacts {
+        VoiceInkTranscriptionModelAvailabilityFacts(
+            requirement: provider.transcriptionModelAvailabilityRequirement,
+            hasConfiguredAPIKey: hasConfiguredAPIKey,
+            isAvailableOnCurrentOS: isAvailableOnCurrentOS,
+            isLocalFluidAudioModelDownloaded: isLocalFluidAudioModelDownloaded,
+            isLocalWhisperModelDownloaded: isLocalWhisperModelDownloaded
+        )
     }
 
     var transcriptionLanguageOptions: [String: String] {

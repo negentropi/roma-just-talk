@@ -2210,6 +2210,26 @@ require_pattern \
   'transcriptionRuntimeResourcePlan\.recordingStartupLoadAction' \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift
 
+require_pattern \
+  "shared core owns transcription model availability policy" \
+  'VoiceInkTranscriptionModelAvailability(Facts|Requirement)' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelAvailability.swift
+
+require_pattern \
+  "macOS model adapts shared transcription model availability facts" \
+  'transcriptionModelAvailability(Facts|Requirement)' \
+  VoiceInk/Models/TranscriptionModel.swift
+
+require_pattern \
+  "macOS transcription model manager uses shared availability facts" \
+  'availabilityFacts\(for: .*\)\.isUsable|transcriptionModelAvailabilityFacts' \
+  VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
+
+require_pattern \
+  "macOS transcription model manager uses shared selection resource action" \
+  'modelSelectionResourceAction == \.clearLocalWhisperModelAndMarkLoaded' \
+  VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
+
 reject_pattern \
   "macOS streaming session route avoids shell-only FluidAudio provider checks" \
   'model\.provider == \.fluidAudio' \
@@ -2221,6 +2241,11 @@ reject_pattern \
   'switch +model\.provider|model\.provider == \.whisper|case +\.whisper, +\.fluidAudio' \
   VoiceInk/Services/ModelPrewarmService.swift \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+
+reject_pattern \
+  "macOS transcription model manager avoids shell-owned provider availability routing" \
+  'switch +model\.provider|model\.provider != \.whisper|CloudProviderRegistry\.provider\(for: model\.provider\)|case +\.nativeApple|case +\.custom' \
+  VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
 
 reject_pattern \
   "macOS session creation avoids shell-only streaming support wrapper" \

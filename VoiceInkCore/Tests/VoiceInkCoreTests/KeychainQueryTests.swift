@@ -7,7 +7,7 @@ final class KeychainQueryTests: XCTestCase {
         let query = VoiceInkKeychainQuery.base(account: "groqAPIKey")
 
         XCTAssertEqual(query[kSecClass as String] as? String, kSecClassGenericPassword as String)
-        XCTAssertEqual(query[kSecAttrService as String] as? String, "com.prakashjoshipax.VoiceInk")
+        XCTAssertEqual(query[kSecAttrService as String] as? String, VoiceInkAppIdentity.bundleIdentifier)
         XCTAssertEqual(query[kSecAttrAccount as String] as? String, "groqAPIKey")
         XCTAssertEqual(booleanValue(query[kSecUseDataProtectionKeychain as String]), true)
         XCTAssertEqual(booleanValue(query[kSecAttrSynchronizable as String]), true)
@@ -37,7 +37,7 @@ final class KeychainQueryTests: XCTestCase {
         let query = VoiceInkKeychainQuery.delete(account: "provider", syncable: false)
 
         XCTAssertEqual(query[kSecClass as String] as? String, kSecClassGenericPassword as String)
-        XCTAssertEqual(query[kSecAttrService as String] as? String, "com.prakashjoshipax.VoiceInk")
+        XCTAssertEqual(query[kSecAttrService as String] as? String, VoiceInkAppIdentity.bundleIdentifier)
         XCTAssertEqual(query[kSecAttrAccount as String] as? String, "provider")
         XCTAssertEqual(booleanValue(query[kSecUseDataProtectionKeychain as String]), true)
         XCTAssertNil(query[kSecAttrSynchronizable as String])

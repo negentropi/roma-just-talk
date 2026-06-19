@@ -2,7 +2,7 @@ import Foundation
 import Security
 
 public enum VoiceInkKeychainQuery {
-    public static let service = "com.prakashjoshipax.VoiceInk"
+    public static let service = VoiceInkAppIdentity.bundleIdentifier
 
     public static func base(
         account: String,

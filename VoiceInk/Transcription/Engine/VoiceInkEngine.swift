@@ -67,8 +67,9 @@ class VoiceInkEngine: NSObject, ObservableObject {
         self.transcriptionModelManager = transcriptionModelManager
         self.enhancementService = enhancementService
 
-        let appSupportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("com.prakashjoshipax.VoiceInk")
+        let appSupportDirectory = VoiceInkAppIdentity.macOSApplicationSupportDirectory(
+            in: FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        )
         self.recordingsDirectory = VoiceInkStoredAudioFile.recordingsDirectory(in: appSupportDirectory)
 
         let serviceRegistry = TranscriptionServiceRegistry(

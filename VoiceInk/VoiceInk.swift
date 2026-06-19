@@ -105,8 +105,9 @@ struct VoiceInkApp: App {
         _enhancementService = StateObject(wrappedValue: enhancementService)
 
         // 1. Create modelsDirectory URL
-        let appSupportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("com.prakashjoshipax.VoiceInk")
+        let appSupportDirectory = VoiceInkAppIdentity.macOSApplicationSupportDirectory(
+            in: FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        )
         let modelsDirectory = VoiceInkWhisperModelFiles.modelsDirectory(in: appSupportDirectory)
 
         // 2. Create model managers
@@ -195,8 +196,9 @@ struct VoiceInkApp: App {
     private static func createPersistentContainer(schema: Schema, logger: Logger) -> ModelContainer? {
         do {
             // Create app-specific Application Support directory URL
-            let appSupportURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-                .appendingPathComponent("com.prakashjoshipax.VoiceInk", isDirectory: true)
+            let appSupportURL = VoiceInkAppIdentity.macOSApplicationSupportDirectory(
+                in: FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+            )
 
             // Create the directory if it doesn't exist
             try? FileManager.default.createDirectory(at: appSupportURL, withIntermediateDirectories: true)

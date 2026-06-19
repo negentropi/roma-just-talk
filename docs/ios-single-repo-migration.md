@@ -26,7 +26,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 
 `VoiceInkCore` currently owns these cross-platform modules:
 
-- app identity presentation strings for shared display names, compact macOS title, sidebar subtitle, iOS onboarding titles, and macOS storage-failure copy
+- app identity for shared display names, compact macOS title, sidebar subtitle, stable bundle identifier, macOS Application Support subdirectory, iOS onboarding titles, and macOS storage-failure copy
 - prompt templates and prompt text
 - predefined prompt IDs, labels, prompt text, icons, descriptions, and system-instruction flags
 - custom prompt system-instruction wrapping
@@ -285,7 +285,7 @@ Current iOS consumers of shared remote transport:
 
 Platform shells still own UI, OS permissions, audio capture, paste/keyboard behavior, keychain adapters, local model download storage, SwiftData models, and macOS-only orchestration. iOS-only shell code shared between the app and keyboard extension lives in `iOS/Shared/`, not `VoiceInkCore`; this currently includes App Group recording-state keys, stale-recording expiry policy, Darwin notification names, the app-local keyboard stop notification name, keyboard button presentation, and the keyboard-to-app deep-link contract.
 
-iOS app-local storage roots are kept in `iOS/VoiceInk-ios/VoiceInkIOSStorageDirectories.swift`: the iOS shell owns the Documents/Caches base directories, while `VoiceInkCore` still owns recordings/model subdirectory names and file policies.
+iOS app-local storage roots are kept in `iOS/VoiceInk-ios/VoiceInkIOSStorageDirectories.swift`: the iOS shell owns the Documents/Caches base directories, while `VoiceInkCore` owns the stable app bundle identifier, macOS Application Support subdirectory, recordings/model subdirectory names, and file policies.
 
 ## Sibling Clone Status
 

@@ -286,6 +286,39 @@ final class PowerModePolicyTests: XCTestCase {
         )
     }
 
+    func testPowerModeApplicationStateBuildsSnapshotFromPromptAndCleanupSettings() {
+        let promptID = UUID()
+        let cleanupSettings = VoiceInkTranscriptionCleanupSettings(
+            punctuationMode: .removeAll,
+            isTextFormattingEnabled: true,
+            lowercaseTranscription: true,
+            removeFillerWords: false
+        )
+
+        let state = VoiceInkPowerModeApplicationState(
+            isEnhancementEnabled: true,
+            useScreenCaptureContext: false,
+            selectedPromptId: promptID,
+            selectedAIProvider: "openai",
+            selectedAIModel: "gpt-4o",
+            selectedLanguage: "en",
+            transcriptionModelName: "ggml-base",
+            cleanupSettings: cleanupSettings
+        )
+
+        XCTAssertTrue(state.isEnhancementEnabled)
+        XCTAssertFalse(state.useScreenCaptureContext)
+        XCTAssertEqual(state.selectedPromptId, promptID.uuidString)
+        XCTAssertEqual(state.selectedAIProvider, "openai")
+        XCTAssertEqual(state.selectedAIModel, "gpt-4o")
+        XCTAssertEqual(state.selectedLanguage, "en")
+        XCTAssertEqual(state.transcriptionModelName, "ggml-base")
+        XCTAssertEqual(state.isTextFormattingEnabled, true)
+        XCTAssertEqual(state.punctuationCleanupMode, .removeAll)
+        XCTAssertEqual(state.removePunctuation, true)
+        XCTAssertEqual(state.lowercaseTranscription, true)
+    }
+
     func testPowerModeApplicationStateDecodesLegacyRemovePunctuation() throws {
         let data = Data("""
         {

@@ -28,25 +28,13 @@ class PowerModeSessionManager {
 
         // Only capture baseline if NO session exists
         if loadSession() == nil {
-            let cleanupSettings = VoiceInkTranscriptionCleanupSettings.current()
-            let originalState = VoiceInkPowerModeApplicationState(
-                isEnhancementEnabled: enhancementService.isEnhancementEnabled,
-                useScreenCaptureContext: enhancementService.useScreenCaptureContext,
-                selectedPromptId: enhancementService.selectedPromptId?.uuidString,
-                selectedAIProvider: enhancementService.getAIService().selectedProvider.rawValue,
-                selectedAIModel: enhancementService.getAIService().currentModel,
-                selectedLanguage: VoiceInkTranscriptionLanguagePreference.storedLanguage(),
-                transcriptionModelName: stateProvider.currentTranscriptionModel?.name,
-                isTextFormattingEnabled: cleanupSettings.isTextFormattingEnabled,
-                punctuationCleanupMode: cleanupSettings.punctuationMode,
-                removePunctuation: cleanupSettings.removesAllPunctuation,
-                lowercaseTranscription: cleanupSettings.lowercaseTranscription
-            )
-
             let newSession = VoiceInkPowerModeSession(
                 id: UUID(),
                 startTime: Date(),
-                originalState: originalState
+                originalState: currentApplicationState(
+                    stateProvider: stateProvider,
+                    enhancementService: enhancementService
+                )
             )
             saveSession(newSession)
 
@@ -82,23 +70,29 @@ class PowerModeSessionManager {
               let stateProvider = stateProvider,
               let enhancementService = enhancementService else { return }
 
-        let cleanupSettings = VoiceInkTranscriptionCleanupSettings.current()
-        let updatedState = VoiceInkPowerModeApplicationState(
+        session.originalState = currentApplicationState(
+            stateProvider: stateProvider,
+            enhancementService: enhancementService
+        )
+        saveSession(session)
+    }
+
+    private func currentApplicationState(
+        stateProvider: any PowerModeStateProvider,
+        enhancementService: AIEnhancementService
+    ) -> VoiceInkPowerModeApplicationState {
+        let aiService = enhancementService.getAIService()
+
+        return VoiceInkPowerModeApplicationState(
             isEnhancementEnabled: enhancementService.isEnhancementEnabled,
             useScreenCaptureContext: enhancementService.useScreenCaptureContext,
-            selectedPromptId: enhancementService.selectedPromptId?.uuidString,
-            selectedAIProvider: enhancementService.getAIService().selectedProvider.rawValue,
-            selectedAIModel: enhancementService.getAIService().currentModel,
+            selectedPromptId: enhancementService.selectedPromptId,
+            selectedAIProvider: aiService.selectedProvider.rawValue,
+            selectedAIModel: aiService.currentModel,
             selectedLanguage: VoiceInkTranscriptionLanguagePreference.storedLanguage(),
             transcriptionModelName: stateProvider.currentTranscriptionModel?.name,
-            isTextFormattingEnabled: cleanupSettings.isTextFormattingEnabled,
-            punctuationCleanupMode: cleanupSettings.punctuationMode,
-            removePunctuation: cleanupSettings.removesAllPunctuation,
-            lowercaseTranscription: cleanupSettings.lowercaseTranscription
+            cleanupSettings: VoiceInkTranscriptionCleanupSettings.current()
         )
-
-        session.originalState = updatedState
-        saveSession(session)
     }
 
     private func applyConfiguration(_ config: PowerModeConfig) async {

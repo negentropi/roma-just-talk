@@ -246,6 +246,31 @@ public struct VoiceInkPowerModeApplicationState: Codable, Equatable, Sendable {
         self.lowercaseTranscription = lowercaseTranscription
     }
 
+    public init(
+        isEnhancementEnabled: Bool,
+        useScreenCaptureContext: Bool,
+        selectedPromptId: UUID? = nil,
+        selectedAIProvider: String? = nil,
+        selectedAIModel: String? = nil,
+        selectedLanguage: String? = nil,
+        transcriptionModelName: String? = nil,
+        cleanupSettings: VoiceInkTranscriptionCleanupSettings
+    ) {
+        self.init(
+            isEnhancementEnabled: isEnhancementEnabled,
+            useScreenCaptureContext: useScreenCaptureContext,
+            selectedPromptId: selectedPromptId?.uuidString,
+            selectedAIProvider: selectedAIProvider,
+            selectedAIModel: selectedAIModel,
+            selectedLanguage: selectedLanguage,
+            transcriptionModelName: transcriptionModelName,
+            isTextFormattingEnabled: cleanupSettings.isTextFormattingEnabled,
+            punctuationCleanupMode: cleanupSettings.punctuationMode,
+            removePunctuation: cleanupSettings.removesAllPunctuation,
+            lowercaseTranscription: cleanupSettings.lowercaseTranscription
+        )
+    }
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         isEnhancementEnabled = try container.decode(Bool.self, forKey: .isEnhancementEnabled)

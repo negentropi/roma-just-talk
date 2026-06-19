@@ -1990,6 +1990,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
 
 require_pattern \
+  "shared Power Mode validation alert copy lives in VoiceInkCore" \
+  'validationAlertTitle|validationAlert\(errors:' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
+
+require_pattern \
   "shared Power Mode row detail presentation lives in VoiceInkCore" \
   'VoiceInkPowerModeRowDetailPresentation|rowDetailPresentation' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
@@ -2019,6 +2024,11 @@ require_pattern \
   'VoiceInkPowerModePresentation\.deleteConfirmation(Title|\(configName:)' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
+require_pattern \
+  "macOS Power Mode edit form uses shared validation alert copy" \
+  'VoiceInkPowerModePresentation\.validationAlert\(errors:' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
 reject_pattern \
   "macOS Power Mode rows avoid shell-only selected-language fallback formatting" \
   'langCode == "auto"|langCode == "en"|langCode\.uppercased\(\)' \
@@ -2042,6 +2052,11 @@ reject_pattern \
 reject_pattern \
   "macOS Power Mode edit form avoids shell-only delete confirmation copy" \
   'Delete Power Mode\?|Are you sure you want to delete|This action cannot be undone' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+reject_pattern \
+  "macOS Power Mode edit form avoids shell-only validation alert copy" \
+  'Cannot Save Power Mode|Please fix the validation errors before saving|firstError\.localizedDescription|Button\("OK"' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
 require_pattern \

@@ -19,6 +19,18 @@ public struct VoiceInkPowerModeDeleteConfirmationPresentation: Equatable, Sendab
     }
 }
 
+public struct VoiceInkPowerModeValidationAlertPresentation: Equatable, Sendable {
+    public let title: String
+    public let message: String
+    public let buttonTitle: String
+
+    public init(title: String, message: String, buttonTitle: String) {
+        self.title = title
+        self.message = message
+        self.buttonTitle = buttonTitle
+    }
+}
+
 public enum VoiceInkPowerModeRowDetailChipKind: Hashable, Sendable {
     case transcriptionModel
     case selectedLanguage
@@ -59,6 +71,9 @@ public enum VoiceInkPowerModePresentation {
     public static let deleteConfirmationTitle = "Delete Power Mode?"
     public static let deleteConfirmationPrimaryButtonTitle = "Delete"
     public static let deleteConfirmationCancelButtonTitle = "Cancel"
+    public static let validationAlertTitle = "Cannot Save Power Mode"
+    public static let validationAlertButtonTitle = "OK"
+    public static let validationAlertFallbackMessage = "Please fix the validation errors before saving."
     public static let contextAwarenessDisplayText = "Context Awareness"
     public static let defaultPromptDisplayText = "AI"
 
@@ -108,6 +123,14 @@ public enum VoiceInkPowerModePresentation {
             message: "Are you sure you want to delete the '\(configName)' power mode? This action cannot be undone.",
             primaryButtonTitle: deleteConfirmationPrimaryButtonTitle,
             cancelButtonTitle: deleteConfirmationCancelButtonTitle
+        )
+    }
+
+    public static func validationAlert(errors: [VoiceInkPowerModeValidationError]) -> VoiceInkPowerModeValidationAlertPresentation {
+        VoiceInkPowerModeValidationAlertPresentation(
+            title: validationAlertTitle,
+            message: errors.first?.localizedDescription ?? validationAlertFallbackMessage,
+            buttonTitle: validationAlertButtonTitle
         )
     }
 

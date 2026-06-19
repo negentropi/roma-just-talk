@@ -69,6 +69,22 @@ final class PowerModePresentationTests: XCTestCase {
         XCTAssertEqual(confirmation.cancelButtonTitle, "Cancel")
     }
 
+    func testValidationAlertPreservesFirstPowerModeErrorCopy() {
+        let alert = VoiceInkPowerModePresentation.validationAlert(errors: [.duplicateName("Writing")])
+
+        XCTAssertEqual(alert.title, "Cannot Save Power Mode")
+        XCTAssertEqual(alert.message, "A power mode with the name 'Writing' already exists.")
+        XCTAssertEqual(alert.buttonTitle, "OK")
+    }
+
+    func testValidationAlertPreservesFallbackCopy() {
+        let alert = VoiceInkPowerModePresentation.validationAlert(errors: [])
+
+        XCTAssertEqual(alert.title, "Cannot Save Power Mode")
+        XCTAssertEqual(alert.message, "Please fix the validation errors before saving.")
+        XCTAssertEqual(alert.buttonTitle, "OK")
+    }
+
     func testRowDetailPresentationPreservesDefaultBandWithoutVisibleChips() {
         let config = PowerModeConfig(
             name: "Writing",

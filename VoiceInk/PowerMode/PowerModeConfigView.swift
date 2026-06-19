@@ -781,18 +781,16 @@ extension View {
         errors: [VoiceInkPowerModeValidationError],
         isPresented: Binding<Bool>
     ) -> some View {
+        let presentation = VoiceInkPowerModePresentation.validationAlert(errors: errors)
+
         self.alert(
-            "Cannot Save Power Mode",
+            presentation.title,
             isPresented: isPresented,
             actions: {
-                Button("OK", role: .cancel) {}
+                Button(presentation.buttonTitle, role: .cancel) {}
             },
             message: {
-                if let firstError = errors.first {
-                    Text(firstError.localizedDescription)
-                } else {
-                    Text("Please fix the validation errors before saving.")
-                }
+                Text(presentation.message)
             }
         )
     }

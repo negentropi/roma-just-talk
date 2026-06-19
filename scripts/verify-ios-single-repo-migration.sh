@@ -176,6 +176,7 @@ obsolete_ios_clone_files=(
   RiffWaveUtils.swift
   TranscriptionServiceFactory.swift
   VADModelManager.swift
+  VoiceInk-ios/Transcription.swift
 )
 
 section "single-repo layout"
@@ -193,6 +194,7 @@ section "iOS ported assets and resources"
 require_file iOS/Shared/AppGroupCoordinator.swift
 require_file iOS/Shared/VoiceInkAppDeepLink.swift
 require_file iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
+require_file iOS/VoiceInk-ios/Transcription.swift
 require_file docs/ios-privacy-policy.md
 require_file iOS/VoiceInk-ios/PrivacyInfo.xcprivacy
 require_file iOS/VoiceInk-ios/Resources/ggml-silero-v5.1.2.bin
@@ -207,6 +209,7 @@ reject_file iOS/index.html
 reject_file iOS/PRIVACY.html
 reject_file iOS/PRIVACY.md
 reject_file iOS/app-icon.png
+reject_file iOS/VoiceInk-ios/VoiceInk-ios
 
 section "obsolete iOS clone-side duplicates stay deleted"
 for file in "${obsolete_ios_clone_files[@]}"; do
@@ -490,7 +493,7 @@ require_pattern \
 require_pattern \
   "iOS Transcription adapts shared recording draft" \
   'init\(recordingDraft draft: VoiceInkRecordingTranscriptionDraft\)' \
-  iOS/VoiceInk-ios/VoiceInk-ios/Transcription.swift
+  iOS/VoiceInk-ios/Transcription.swift
 
 require_pattern \
   "macOS recording rows build shared recording draft" \
@@ -2591,7 +2594,7 @@ reject_pattern \
   "macOS and iOS transcriptions use shared performance session defaults" \
   'var performance(AudioDuration|TranscriptionDuration|EnhancementDuration|EnhancedText)' \
   VoiceInk/Models/Transcription.swift \
-  iOS/VoiceInk-ios/VoiceInk-ios/Transcription.swift
+  iOS/VoiceInk-ios/Transcription.swift
 
 reject_pattern \
   "macOS metrics avoid shell-only shared performance analysis wrapper" \

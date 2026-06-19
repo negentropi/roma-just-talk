@@ -16,7 +16,7 @@ final class Transcription: VoiceInkMutableTranscriptionRecord, VoiceInkStoredAud
     var enhancementDuration: TimeInterval?
     var transcriptionStatus: VoiceInkTranscriptionStatus
     var transcriptionError: String?
-    
+
     init(text: String, duration: TimeInterval, enhancedText: String? = nil, audioFileURL: String? = nil, transcriptionModelName: String? = nil, aiEnhancementModelName: String? = nil, transcriptionDuration: TimeInterval? = nil, enhancementDuration: TimeInterval? = nil, transcriptionStatus: VoiceInkTranscriptionStatus = .pending, transcriptionError: String? = nil) {
         self.id = UUID()
         self.text = text
@@ -41,7 +41,7 @@ final class Transcription: VoiceInkMutableTranscriptionRecord, VoiceInkStoredAud
             transcriptionStatus: draft.transcriptionStatus
         )
     }
-    
+
     var storedAudioRecordingsDirectory: URL? {
         VoiceInkIOSStorageDirectories.recordingsDirectory
     }

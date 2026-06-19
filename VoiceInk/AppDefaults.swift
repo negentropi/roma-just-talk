@@ -38,7 +38,6 @@ enum AppDefaults {
             "IsMenuBarOnly": true,
             Keys.showMenuBarIcon: showMenuBarIconDefault,
             "DidApplyLaunchAtLoginDefault": false,
-            "powerModePersistConfig": false,
 
             // Shortcuts
             "isMiddleClickToggleEnabled": false,
@@ -51,6 +50,7 @@ enum AppDefaults {
 
         platformDefaults.merge(VoiceInkRecordingFeedbackPreference.registeredDefaults) { _, sharedValue in sharedValue }
         platformDefaults.merge(VoiceInkPastePreference.registeredDefaults) { _, sharedValue in sharedValue }
+        platformDefaults.merge(VoiceInkPowerModePreference.registeredDefaults) { _, sharedValue in sharedValue }
         defaults.merge(platformDefaults, uniquingKeysWith: { _, platformValue in platformValue })
 
         return defaults

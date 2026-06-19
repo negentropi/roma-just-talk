@@ -56,8 +56,9 @@ class MiniRecorderShortcutManager: ObservableObject {
     }
 
     private var canUsePowerModeShortcuts: Bool {
-        UserDefaults.standard.bool(forKey: "powerModeUIFlag") &&
-            !PowerModeManager.shared.configurations.enabledPowerModeConfigurations.isEmpty
+        VoiceInkPowerModePreference.canUseShortcuts(
+            hasEnabledConfigurations: !PowerModeManager.shared.configurations.enabledPowerModeConfigurations.isEmpty
+        )
     }
 
     private func resetEscapeState() {

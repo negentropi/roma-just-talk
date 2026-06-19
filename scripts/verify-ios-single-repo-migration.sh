@@ -3752,6 +3752,73 @@ require_pattern \
   'VoiceInkPowerModeConfigurationPreference|activePowerModeConfigurationId' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
+require_pattern \
+  "shared Power Mode top-level preference keys live in VoiceInkCore" \
+  'powerModeUIFlag = "powerModeUIFlag"|powerModePersistConfig = "powerModePersistConfig"' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared Power Mode top-level preference policy lives in VoiceInkCore" \
+  'VoiceInkPowerModePreference|initializeUIFlagIfNeeded|canUseShortcuts|shouldPersistConfiguredPreferences' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "macOS defaults register shared Power Mode top-level defaults" \
+  'VoiceInkPowerModePreference\.registeredDefaults' \
+  VoiceInk/AppDefaults.swift
+
+require_pattern \
+  "macOS startup initializes Power Mode UI flag through shared preference policy" \
+  'VoiceInkPowerModePreference\.initializeUIFlagIfNeeded' \
+  VoiceInk/VoiceInk.swift
+
+require_pattern \
+  "macOS navigation observes shared Power Mode UI flag key" \
+  'VoiceInkUserDefaultsKey\.powerModeUIFlag' \
+  VoiceInk/Views/ContentView.swift
+
+require_pattern \
+  "macOS settings observes shared Power Mode preference keys" \
+  'VoiceInkUserDefaultsKey\.(powerModeUIFlag|powerModePersistConfig)' \
+  VoiceInk/Views/Settings/SettingsView.swift
+
+require_pattern \
+  "macOS mini recorder consumes shared Power Mode shortcut eligibility" \
+  'VoiceInkPowerModePreference\.canUseShortcuts' \
+  VoiceInk/Shortcuts/MiniRecorderShortcutManager.swift
+
+require_pattern \
+  "macOS Power Mode shortcut manager consumes shared UI visibility preference" \
+  'VoiceInkPowerModePreference\.isUIEnabled' \
+  VoiceInk/Shortcuts/PowerModeShortcutManager.swift
+
+require_pattern \
+  "macOS recording finish consumes shared Power Mode persist preference" \
+  'VoiceInkPowerModePreference\.shouldPersistConfiguredPreferences' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+
+require_pattern \
+  "macOS diagnostics use shared Power Mode top-level preferences" \
+  'VoiceInkPowerModePreference\.(isUIEnabled|shouldPersistConfiguredPreferences)' \
+  VoiceInk/Services/SystemInfoService.swift
+
+reject_pattern \
+  "macOS Power Mode shells avoid raw top-level preference keys" \
+  '"(powerModeUIFlag|powerModePersistConfig)"' \
+  VoiceInk/AppDefaults.swift \
+  VoiceInk/VoiceInk.swift \
+  VoiceInk/Views/ContentView.swift \
+  VoiceInk/Views/Settings/SettingsView.swift \
+  VoiceInk/Shortcuts/MiniRecorderShortcutManager.swift \
+  VoiceInk/Shortcuts/PowerModeShortcutManager.swift \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift \
+  VoiceInk/Services/SystemInfoService.swift
+
+require_pattern \
+  "migration checklist tracks shared Power Mode top-level preference gate" \
+  'macOS top-level Power Mode visibility, persist-after-recording preference, first-run visibility repair, and shortcut eligibility route through `VoiceInkPowerModePreference`' \
+  docs/ios-single-repo-migration.md
+
 reject_pattern \
   "macOS Power Mode manager avoids shell-only config persistence mechanics" \
   'VoiceInkUserDefaultsKey\.powerModeConfigurations|activeConfigurationId|JSON(Encoder|Decoder)|data\(forKey:' \

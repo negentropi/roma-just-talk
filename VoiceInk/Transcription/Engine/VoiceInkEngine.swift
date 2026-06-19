@@ -982,7 +982,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
     }
 
     private func restorePowerModeIfNeeded() async {
-        guard !UserDefaults.standard.bool(forKey: "powerModePersistConfig") else { return }
+        guard !VoiceInkPowerModePreference.shouldPersistConfiguredPreferences() else { return }
 
         await PowerModeSessionManager.shared.endSession()
         PowerModeManager.shared.setActiveConfiguration(nil)

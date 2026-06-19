@@ -30,6 +30,8 @@ public enum VoiceInkUserDefaultsKey {
     public static let useScreenCaptureContext = "useScreenCaptureContext"
     public static let customPrompts = "customPrompts"
     public static let selectedPromptId = "selectedPromptId"
+    public static let powerModeUIFlag = "powerModeUIFlag"
+    public static let powerModePersistConfig = "powerModePersistConfig"
     public static let powerModeConfigurations = "powerModeConfigurationsV2"
     public static let activePowerModeConfigurationId = "activeConfigurationId"
     public static let activePowerModeSession = "powerModeActiveSession.v1"
@@ -58,6 +60,8 @@ public enum VoiceInkPreferenceDefault {
     public static let shortEnhancementWordThreshold = 3
     public static let enhancementTimeoutSeconds = 7
     public static let enhancementRetryOnTimeout = true
+    public static let powerModeUIEnabled = false
+    public static let powerModePersistConfiguredPreferences = false
     public static let ollamaBaseURL = "http://localhost:11434"
     public static let macOSSelectedTranscriptionLanguage = "en"
 }
@@ -812,6 +816,7 @@ public enum VoiceInkSharedPreferenceReset {
         VoiceInkAudioPlaybackRate.clear(from: defaults)
         VoiceInkCustomPromptStorage.clear(from: defaults)
         VoiceInkAIEnhancementContextPreference.clear(from: defaults)
+        VoiceInkPowerModePreference.clear(from: defaults)
         VoiceInkPowerModeConfigurationPreference.clear(from: defaults)
         VoiceInkPowerModeSessionPreference.clear(from: defaults)
     }
@@ -911,6 +916,67 @@ public enum VoiceInkPowerModeConfigurationPreference {
     public static func clear(from defaults: UserDefaults = .standard) {
         defaults.removeObject(forKey: VoiceInkUserDefaultsKey.powerModeConfigurations)
         defaults.removeObject(forKey: VoiceInkUserDefaultsKey.activePowerModeConfigurationId)
+    }
+}
+
+public enum VoiceInkPowerModePreference {
+    public static var registeredDefaults: [String: Any] {
+        [
+            VoiceInkUserDefaultsKey.powerModePersistConfig: VoiceInkPreferenceDefault.powerModePersistConfiguredPreferences
+        ]
+    }
+
+    public static func isUIEnabled(from defaults: UserDefaults = .standard) -> Bool {
+        guard defaults.object(forKey: VoiceInkUserDefaultsKey.powerModeUIFlag) != nil else {
+            return VoiceInkPreferenceDefault.powerModeUIEnabled
+        }
+
+        return defaults.bool(forKey: VoiceInkUserDefaultsKey.powerModeUIFlag)
+    }
+
+    public static func saveIsUIEnabled(
+        _ isEnabled: Bool,
+        to defaults: UserDefaults = .standard
+    ) {
+        defaults.set(isEnabled, forKey: VoiceInkUserDefaultsKey.powerModeUIFlag)
+    }
+
+    public static func initializeUIFlagIfNeeded(
+        hasEnabledConfigurations: Bool,
+        in defaults: UserDefaults = .standard
+    ) {
+        guard defaults.object(forKey: VoiceInkUserDefaultsKey.powerModeUIFlag) == nil else {
+            return
+        }
+
+        saveIsUIEnabled(hasEnabledConfigurations, to: defaults)
+    }
+
+    public static func shouldPersistConfiguredPreferences(from defaults: UserDefaults = .standard) -> Bool {
+        guard defaults.object(forKey: VoiceInkUserDefaultsKey.powerModePersistConfig) != nil else {
+            return VoiceInkPreferenceDefault.powerModePersistConfiguredPreferences
+        }
+
+        return defaults.bool(forKey: VoiceInkUserDefaultsKey.powerModePersistConfig)
+    }
+
+    public static func saveShouldPersistConfiguredPreferences(
+        _ shouldPersist: Bool,
+        to defaults: UserDefaults = .standard
+    ) {
+        defaults.set(shouldPersist, forKey: VoiceInkUserDefaultsKey.powerModePersistConfig)
+    }
+
+    public static func canUseShortcuts(
+        hasEnabledConfigurations: Bool,
+        from defaults: UserDefaults = .standard
+    ) -> Bool {
+        isUIEnabled(from: defaults) && hasEnabledConfigurations
+    }
+
+    public static func clear(from defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.powerModeUIFlag)
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.powerModePersistConfig)
     }
 }
 

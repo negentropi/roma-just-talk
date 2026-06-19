@@ -66,8 +66,8 @@ class SystemInfoService {
         Paste Method: \(VoiceInkPasteMethod.current().displayName)
 
         POWER MODE:
-        Power Mode Enabled: \(UserDefaults.standard.bool(forKey: "powerModeUIFlag"))
-        Persist Configured Preferences: \(UserDefaults.standard.bool(forKey: "powerModePersistConfig"))
+        Power Mode Enabled: \(VoiceInkPowerModePreference.isUIEnabled())
+        Persist Configured Preferences: \(VoiceInkPowerModePreference.shouldPersistConfiguredPreferences())
 
         DATA CLEANUP SETTINGS:
         Auto-Delete Transcriptions: \(transcriptionCleanup.isEnabled)

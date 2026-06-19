@@ -62,7 +62,7 @@ class PowerModeShortcutManager {
     }
 
     private func refreshPowerModeShortcuts() {
-        guard UserDefaults.standard.bool(forKey: "powerModeUIFlag") else {
+        guard VoiceInkPowerModePreference.isUIEnabled() else {
             shortcutMonitor.stop()
             return
         }

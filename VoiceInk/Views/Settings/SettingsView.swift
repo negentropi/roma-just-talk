@@ -447,8 +447,8 @@ struct ExpandableSettingsRow<Content: View>: View {
 
 struct PowerModeSection: View {
     @ObservedObject private var powerModeManager = PowerModeManager.shared
-    @AppStorage("powerModeUIFlag") private var powerModeUIFlag = false
-    @AppStorage("powerModePersistConfig") private var powerModePersistSettings = false
+    @AppStorage(VoiceInkUserDefaultsKey.powerModeUIFlag) private var powerModeUIFlag = VoiceInkPreferenceDefault.powerModeUIEnabled
+    @AppStorage(VoiceInkUserDefaultsKey.powerModePersistConfig) private var powerModePersistSettings = VoiceInkPreferenceDefault.powerModePersistConfiguredPreferences
     @State private var showDisableAlert = false
     @State private var isExpanded = false
 

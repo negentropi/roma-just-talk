@@ -31,6 +31,8 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkUserDefaultsKey.useScreenCaptureContext, "useScreenCaptureContext")
         XCTAssertEqual(VoiceInkUserDefaultsKey.customPrompts, "customPrompts")
         XCTAssertEqual(VoiceInkUserDefaultsKey.selectedPromptId, "selectedPromptId")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.powerModeUIFlag, "powerModeUIFlag")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.powerModePersistConfig, "powerModePersistConfig")
         XCTAssertEqual(VoiceInkUserDefaultsKey.powerModeConfigurations, "powerModeConfigurationsV2")
         XCTAssertEqual(VoiceInkUserDefaultsKey.activePowerModeConfigurationId, "activeConfigurationId")
         XCTAssertEqual(VoiceInkUserDefaultsKey.activePowerModeSession, "powerModeActiveSession.v1")
@@ -81,6 +83,11 @@ final class UserDefaultsPreferencesTests: XCTestCase {
     func testSharedPreferenceDefaultsPreserveExistingEnhancementTimeoutPolicy() {
         XCTAssertEqual(VoiceInkPreferenceDefault.enhancementTimeoutSeconds, 7)
         XCTAssertEqual(VoiceInkPreferenceDefault.enhancementRetryOnTimeout, true)
+    }
+
+    func testSharedPreferenceDefaultsPreserveExistingPowerModeFlags() {
+        XCTAssertFalse(VoiceInkPreferenceDefault.powerModeUIEnabled)
+        XCTAssertFalse(VoiceInkPreferenceDefault.powerModePersistConfiguredPreferences)
     }
 
     func testSharedPreferenceDefaultsPreserveExistingOllamaBaseURL() {
@@ -1019,6 +1026,8 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             VoiceInkCustomPromptStorage.saveSelectedPromptId(customPrompt.id, to: defaults)
             VoiceInkAIEnhancementContextPreference.saveUseClipboardContext(true, to: defaults)
             VoiceInkAIEnhancementContextPreference.saveUseScreenCaptureContext(true, to: defaults)
+            VoiceInkPowerModePreference.saveIsUIEnabled(true, to: defaults)
+            VoiceInkPowerModePreference.saveShouldPersistConfiguredPreferences(true, to: defaults)
             let powerModeConfig = PowerModeConfig(
                 name: "Writing",
                 emoji: "W",
@@ -1110,6 +1119,8 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             XCTAssertNil(VoiceInkCustomPromptStorage.loadSelectedPromptId(from: defaults))
             XCTAssertFalse(VoiceInkAIEnhancementContextPreference.useClipboardContext(from: defaults))
             XCTAssertFalse(VoiceInkAIEnhancementContextPreference.useScreenCaptureContext(from: defaults))
+            XCTAssertFalse(VoiceInkPowerModePreference.isUIEnabled(from: defaults))
+            XCTAssertFalse(VoiceInkPowerModePreference.shouldPersistConfiguredPreferences(from: defaults))
             XCTAssertTrue(VoiceInkPowerModeConfigurationPreference.loadConfigurations(from: defaults).isEmpty)
             XCTAssertNil(VoiceInkPowerModeConfigurationPreference.loadActiveConfigurationId(from: defaults))
             XCTAssertNil(try? VoiceInkPowerModeSessionPreference.loadActiveSession(from: defaults))
@@ -1261,6 +1272,62 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             XCTAssertNil(VoiceInkPowerModeConfigurationPreference.loadActiveConfigurationId(from: defaults))
             XCTAssertNil(defaults.object(forKey: VoiceInkUserDefaultsKey.powerModeConfigurations))
             XCTAssertNil(defaults.object(forKey: VoiceInkUserDefaultsKey.activePowerModeConfigurationId))
+        }
+    }
+
+    func testPowerModePreferenceRegisteredDefaultsPreserveUIFlagInitializationPolicy() {
+        XCTAssertNil(VoiceInkPowerModePreference.registeredDefaults[VoiceInkUserDefaultsKey.powerModeUIFlag])
+        XCTAssertEqual(
+            VoiceInkPowerModePreference.registeredDefaults[VoiceInkUserDefaultsKey.powerModePersistConfig] as? Bool,
+            false
+        )
+    }
+
+    func testPowerModePreferenceReadsAndSavesFlags() {
+        withIsolatedDefaults { defaults in
+            XCTAssertFalse(VoiceInkPowerModePreference.isUIEnabled(from: defaults))
+            XCTAssertFalse(VoiceInkPowerModePreference.shouldPersistConfiguredPreferences(from: defaults))
+
+            VoiceInkPowerModePreference.saveIsUIEnabled(true, to: defaults)
+            VoiceInkPowerModePreference.saveShouldPersistConfiguredPreferences(true, to: defaults)
+
+            XCTAssertTrue(VoiceInkPowerModePreference.isUIEnabled(from: defaults))
+            XCTAssertTrue(VoiceInkPowerModePreference.shouldPersistConfiguredPreferences(from: defaults))
+        }
+    }
+
+    func testPowerModePreferenceInitializesUIFlagFromEnabledConfigurationsWhenMissing() {
+        withIsolatedDefaults { defaults in
+            VoiceInkPowerModePreference.initializeUIFlagIfNeeded(
+                hasEnabledConfigurations: true,
+                in: defaults
+            )
+
+            XCTAssertTrue(VoiceInkPowerModePreference.isUIEnabled(from: defaults))
+        }
+    }
+
+    func testPowerModePreferenceInitializeUIFlagDoesNotOverwriteStoredValue() {
+        withIsolatedDefaults { defaults in
+            VoiceInkPowerModePreference.saveIsUIEnabled(false, to: defaults)
+
+            VoiceInkPowerModePreference.initializeUIFlagIfNeeded(
+                hasEnabledConfigurations: true,
+                in: defaults
+            )
+
+            XCTAssertFalse(VoiceInkPowerModePreference.isUIEnabled(from: defaults))
+        }
+    }
+
+    func testPowerModePreferenceShortcutEligibilityRequiresUIAndEnabledConfigurations() {
+        withIsolatedDefaults { defaults in
+            XCTAssertFalse(VoiceInkPowerModePreference.canUseShortcuts(hasEnabledConfigurations: true, from: defaults))
+
+            VoiceInkPowerModePreference.saveIsUIEnabled(true, to: defaults)
+
+            XCTAssertFalse(VoiceInkPowerModePreference.canUseShortcuts(hasEnabledConfigurations: false, from: defaults))
+            XCTAssertTrue(VoiceInkPowerModePreference.canUseShortcuts(hasEnabledConfigurations: true, from: defaults))
         }
     }
 

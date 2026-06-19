@@ -43,10 +43,9 @@ struct VoiceInkApp: App {
 
         AppDefaults.registerDefaults()
 
-        if UserDefaults.standard.object(forKey: "powerModeUIFlag") == nil {
-            let hasEnabledPowerModes = !PowerModeManager.shared.configurations.enabledPowerModeConfigurations.isEmpty
-            UserDefaults.standard.set(hasEnabledPowerModes, forKey: "powerModeUIFlag")
-        }
+        VoiceInkPowerModePreference.initializeUIFlagIfNeeded(
+            hasEnabledConfigurations: !PowerModeManager.shared.configurations.enabledPowerModeConfigurations.isEmpty
+        )
 
         let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "Initialization")
         // Keep existing model order stable; append new models after synced entities.

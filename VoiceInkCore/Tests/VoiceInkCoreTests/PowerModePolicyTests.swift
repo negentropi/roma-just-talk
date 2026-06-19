@@ -128,6 +128,33 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertNil(invalidConfig.selectedAIProviderKind)
     }
 
+    func testPowerModeConfigResolvesSelectedPromptTitle() {
+        let promptID = UUID()
+        let prompt = VoiceInkCustomPrompt(id: promptID, title: "Rewrite", promptText: "Rewrite this")
+        let matchingConfig = PowerModeConfig(
+            name: "Writing",
+            emoji: "W",
+            isAIEnhancementEnabled: true,
+            selectedPrompt: promptID.uuidString
+        )
+        let staleConfig = PowerModeConfig(
+            name: "Stale",
+            emoji: "S",
+            isAIEnhancementEnabled: true,
+            selectedPrompt: UUID().uuidString
+        )
+        let invalidConfig = PowerModeConfig(
+            name: "Invalid",
+            emoji: "I",
+            isAIEnhancementEnabled: true,
+            selectedPrompt: "not-a-uuid"
+        )
+
+        XCTAssertEqual(matchingConfig.selectedPromptTitle(in: [prompt]), "Rewrite")
+        XCTAssertNil(staleConfig.selectedPromptTitle(in: [prompt]))
+        XCTAssertNil(invalidConfig.selectedPromptTitle(in: [prompt]))
+    }
+
     func testPowerModeConfigDecodesLegacyStoredKeys() throws {
         let id = UUID()
         let data = Data("""

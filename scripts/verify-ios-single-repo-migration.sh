@@ -2050,6 +2050,11 @@ reject_pattern \
   VoiceInk/PowerMode/PowerModeViewComponents.swift
 
 reject_pattern \
+  "macOS Power Mode rows avoid shell-only selected-prompt title lookup" \
+  'allPrompts\.first|selectedPromptUUID' \
+  VoiceInk/PowerMode/PowerModeViewComponents.swift
+
+reject_pattern \
   "macOS Power Mode edit form avoids shell-only delete confirmation copy" \
   'Delete Power Mode\?|Are you sure you want to delete|This action cannot be undone' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
@@ -2067,6 +2072,11 @@ require_pattern \
 require_pattern \
   "shared Power Mode config exposes parsed prompt and provider application state" \
   'selectedPrompt\.flatMap\(UUID\.init\)|selectedAIProvider\.flatMap\(VoiceInkAIEnhancementProviderKind\.init\(storedValue:\)\)' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode config resolves selected prompt titles" \
+  'selectedPromptTitle\(in prompts: \[VoiceInkCustomPrompt\]\)' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \

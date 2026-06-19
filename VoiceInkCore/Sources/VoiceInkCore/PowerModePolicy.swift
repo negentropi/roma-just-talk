@@ -28,6 +28,11 @@ public struct PowerModeConfig: Codable, Identifiable, Equatable, Sendable {
         selectedAIProvider.flatMap(VoiceInkAIEnhancementProviderKind.init(storedValue:))
     }
 
+    public func selectedPromptTitle(in prompts: [VoiceInkCustomPrompt]) -> String? {
+        guard let selectedPromptUUID else { return nil }
+        return prompts.first { $0.id == selectedPromptUUID }?.title
+    }
+
     private enum CodingKeys: String, CodingKey {
         case id, name, emoji, appConfigs, urlConfigs, isAIEnhancementEnabled, selectedPrompt, selectedLanguage, isTextFormattingEnabled, punctuationCleanupMode, removePunctuation, lowercaseTranscription, useScreenCapture, selectedAIProvider, selectedAIModel, isAutoSendEnabled, autoSendKey, isEnabled, isDefault
         case selectedWhisperModel

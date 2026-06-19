@@ -381,6 +381,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeTriggerConfigsAdaptToPolicyRules", run: { PowerModePolicyTests().testPowerModeTriggerConfigsAdaptToPolicyRules() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeConfigPreservesStoredShapeEqualityAndRuleAdapter", run: { try PowerModePolicyTests().testPowerModeConfigPreservesStoredShapeEqualityAndRuleAdapter() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeConfigExposesParsedPromptAndProviderForApplication", run: { PowerModePolicyTests().testPowerModeConfigExposesParsedPromptAndProviderForApplication() }),
+            VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeConfigResolvesSelectedPromptTitle", run: { PowerModePolicyTests().testPowerModeConfigResolvesSelectedPromptTitle() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeConfigDecodesLegacyStoredKeys", run: { try PowerModePolicyTests().testPowerModeConfigDecodesLegacyStoredKeys() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testConfigurationDraftBuildsAddConfigurationWithStoredFormSemantics", run: { PowerModePolicyTests().testConfigurationDraftBuildsAddConfigurationWithStoredFormSemantics() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testConfigurationDraftBuildsEditConfigurationWithoutReplacingIdentityOrEnablement", run: { PowerModePolicyTests().testConfigurationDraftBuildsEditConfigurationWithoutReplacingIdentityOrEnablement() }),

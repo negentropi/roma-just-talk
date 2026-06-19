@@ -16,12 +16,14 @@ struct CloudProviderVerificationTests {
             (.assemblyAI, .assemblyAI),
             (.xai, .xai)
         ]
+        let verifier = VoiceInkProviderAPIKeyVerifier()
 
         for (modelProvider, providerKind) in expectedMappings {
-            #expect(modelProvider.coreTranscriptionModelProvider?.providerKind == providerKind)
+            let transcriptionProvider = try #require(modelProvider.coreTranscriptionModelProvider)
+            #expect(transcriptionProvider.providerKind == providerKind)
 
-            let cloudProvider = try #require(CloudProviderRegistry.provider(for: modelProvider))
-            let result = await cloudProvider.verifyAPIKey(" \n\t ")
+            #expect(CloudProviderRegistry.provider(for: modelProvider) != nil)
+            let result = await verifier.verifyAPIKeyDetailed(" \n\t ", for: providerKind)
 
             #expect(result.isValid == false)
             #expect(result.errorMessage == "API key is missing or empty.")
@@ -32,8 +34,8 @@ struct CloudProviderVerificationTests {
         #expect(ModelProvider.cartesia.coreTranscriptionModelProvider == .cartesia)
         #expect(ModelProvider.cartesia.coreTranscriptionModelProvider?.providerKind == nil)
 
-        let cloudProvider = try #require(CloudProviderRegistry.provider(for: .cartesia))
-        let result = await cloudProvider.verifyAPIKey(" \n\t ")
+        #expect(CloudProviderRegistry.provider(for: .cartesia) != nil)
+        let result = await VoiceInkProviderAPIKeyVerifier().verifyAPIKeyDetailed(" \n\t ", for: .cartesia)
 
         #expect(result.isValid == false)
         #expect(result.errorMessage == "API key is missing or empty.")

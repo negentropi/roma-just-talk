@@ -27,6 +27,22 @@ public struct VoiceInkRecordingSheetPresentation: Equatable, Sendable {
     )
 }
 
+public struct VoiceInkRecordingNotificationPresentation: Equatable, Sendable {
+    public let title: String
+
+    public init(title: String) {
+        self.title = title
+    }
+
+    public static let noTranscriptionModelSelected = VoiceInkRecordingNotificationPresentation(
+        title: "No AI Model Selected"
+    )
+
+    public static let failedToStart = VoiceInkRecordingNotificationPresentation(
+        title: "Recording failed to start"
+    )
+}
+
 public struct VoiceInkRecordingAlertPresentation: Equatable, Identifiable, Sendable {
     public enum Action: Equatable, Sendable {
         case dismiss

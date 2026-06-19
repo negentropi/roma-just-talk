@@ -401,6 +401,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
 require_pattern \
+  "shared recording notification presentation lives in VoiceInkCore" \
+  'VoiceInkRecordingNotificationPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
   "shared recording alert presentation owns iOS microphone-busy OSStatus" \
   'microphoneInUseOSStatusCode' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
@@ -424,6 +429,11 @@ require_pattern \
   "iOS recording start gate uses shared no-mode presentation" \
   'VoiceInkRecordingAlertPresentation\.noModesAvailableIfNeeded' \
   iOS/VoiceInk-ios/NotesListView.swift
+
+require_pattern \
+  "macOS recording engine uses shared recording notification presentation" \
+  'VoiceInkRecordingNotificationPresentation\.(noTranscriptionModelSelected|failedToStart)' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift
 
 require_pattern \
   "shared mode selection presentation lives in VoiceInkCore" \
@@ -528,6 +538,11 @@ reject_pattern \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift \
   VoiceInk/Views/Recorder/MiniRecorderView.swift \
   iOS/VoiceInk-ios/RecordingManager.swift
+
+reject_pattern \
+  "macOS recording engine avoids shell-only start failure notification copy" \
+  '"No AI Model Selected"|"Recording failed to start"' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift
 
 reject_pattern \
   "iOS recording background transcription uses shared record updates" \

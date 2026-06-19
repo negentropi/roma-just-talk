@@ -597,6 +597,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testRecordingAlertPresentationPreservesIOSNoModeGateCopy", run: { RecordingStatePolicyTests().testRecordingAlertPresentationPreservesIOSNoModeGateCopy() }),
             VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testRecordingAlertPresentationPreservesIOSPermissionDeniedCopy", run: { RecordingStatePolicyTests().testRecordingAlertPresentationPreservesIOSPermissionDeniedCopy() }),
             VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testRecordingSheetPresentationPreservesIOSControlsCopy", run: { RecordingStatePolicyTests().testRecordingSheetPresentationPreservesIOSControlsCopy() }),
+            VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testRecordingNotificationPresentationPreservesMacOSStartFailureCopy", run: { RecordingStatePolicyTests().testRecordingNotificationPresentationPreservesMacOSStartFailureCopy() }),
             VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testRecordingStartFailureMapsIOSMicrophoneBusyOSStatus", run: { RecordingStatePolicyTests().testRecordingStartFailureMapsIOSMicrophoneBusyOSStatus() }),
             VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testRecordingStartFailurePreservesGenericFailureCopy", run: { RecordingStatePolicyTests().testRecordingStartFailurePreservesGenericFailureCopy() }),
             VoiceInkCoreCheck(name: "RollingAudioBufferTests.testAppendKeepsChunksWithinMaxBytes", run: { RollingAudioBufferTests().testAppendKeepsChunksWithinMaxBytes() }),

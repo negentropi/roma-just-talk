@@ -100,6 +100,17 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertEqual(presentation.stopButtonSystemImageName, "stop.fill")
     }
 
+    func testRecordingNotificationPresentationPreservesMacOSStartFailureCopy() {
+        XCTAssertEqual(
+            VoiceInkRecordingNotificationPresentation.noTranscriptionModelSelected.title,
+            "No AI Model Selected"
+        )
+        XCTAssertEqual(
+            VoiceInkRecordingNotificationPresentation.failedToStart.title,
+            "Recording failed to start"
+        )
+    }
+
     func testRecordingStartFailureMapsIOSMicrophoneBusyOSStatus() {
         let alert = VoiceInkRecordingAlertPresentation.recordingStartFailure(
             domain: NSOSStatusErrorDomain,

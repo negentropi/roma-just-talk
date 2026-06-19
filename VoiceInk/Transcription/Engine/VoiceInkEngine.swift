@@ -128,7 +128,10 @@ class VoiceInkEngine: NSObject, ObservableObject {
         } else {
             logger.notice("toggleRecord: entering start-recording branch")
             guard transcriptionModelManager.currentTranscriptionModel != nil else {
-                NotificationManager.shared.showNotification(title: "No AI Model Selected", type: .error)
+                NotificationManager.shared.showNotification(
+                    title: VoiceInkRecordingNotificationPresentation.noTranscriptionModelSelected.title,
+                    type: .error
+                )
                 await recorderUIManager?.dismissMiniRecorder()
                 return
             }
@@ -294,7 +297,10 @@ class VoiceInkEngine: NSObject, ObservableObject {
                             self.activeRecordingStartID = nil
                             self.stopRequestedDuringStart = false
                             self.rollingBufferPreloadCoordinator.recordingSessionDidFinish()
-                            NotificationManager.shared.showNotification(title: "Recording failed to start", type: .error)
+                            NotificationManager.shared.showNotification(
+                                title: VoiceInkRecordingNotificationPresentation.failedToStart.title,
+                                type: .error
+                            )
                             self.logger.notice("toggleRecord: calling dismissMiniRecorder from error handler")
                             await self.recorderUIManager?.dismissMiniRecorder()
                         }

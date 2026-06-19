@@ -120,6 +120,62 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertNil(draft.keyToSaveAfterSuccessfulVerification)
     }
 
+    func testProviderAPIKeyVerificationApplicationPlanSavesEnteredKeyOnSuccess() {
+        let draft = VoiceInkProviderAPIKeyDraft(
+            enteredKey: " entered-key \n",
+            storedRuntimeKey: "stored-key"
+        )
+
+        let plan = draft.verificationApplicationPlan(for: VoiceInkAPIKeyVerificationResult(
+            isValid: true,
+            errorMessage: nil
+        ))
+
+        XCTAssertEqual(plan.progress, .success)
+        XCTAssertEqual(plan.keyToSave, "entered-key")
+        XCTAssertTrue(plan.shouldMarkKeyVerified)
+    }
+
+    func testProviderAPIKeyVerificationApplicationPlanKeepsStoredKeyOnSuccess() {
+        let draft = VoiceInkProviderAPIKeyDraft(
+            enteredKey: " \n\t ",
+            storedRuntimeKey: "stored-key"
+        )
+
+        let plan = draft.verificationApplicationPlan(for: VoiceInkAPIKeyVerificationResult(
+            isValid: true,
+            errorMessage: nil
+        ))
+
+        XCTAssertEqual(plan.progress, .success)
+        XCTAssertNil(plan.keyToSave)
+        XCTAssertTrue(plan.shouldMarkKeyVerified)
+    }
+
+    func testProviderAPIKeyVerificationApplicationPlanPreservesFailureMessage() {
+        let draft = VoiceInkProviderAPIKeyDraft(
+            enteredKey: "bad-key",
+            storedRuntimeKey: nil
+        )
+
+        let plan = draft.verificationApplicationPlan(for: VoiceInkAPIKeyVerificationResult(
+            isValid: false,
+            errorMessage: "bad request"
+        ))
+
+        XCTAssertEqual(plan.progress, .failure(message: "bad request"))
+        XCTAssertNil(plan.keyToSave)
+        XCTAssertFalse(plan.shouldMarkKeyVerified)
+    }
+
+    func testProviderAPIKeyMissingVerificationCandidatePlanFailsWithoutStorageSideEffects() {
+        let plan = VoiceInkProviderAPIKeyDraft.missingVerificationCandidatePlan()
+
+        XCTAssertEqual(plan.progress, .failure(message: nil))
+        XCTAssertNil(plan.keyToSave)
+        XCTAssertFalse(plan.shouldMarkKeyVerified)
+    }
+
     func testProviderAPIKeyFormPresentationBuildsProviderCopy() {
         let presentation = VoiceInkProviderKind.deepgram.apiKeyFormPresentation
 

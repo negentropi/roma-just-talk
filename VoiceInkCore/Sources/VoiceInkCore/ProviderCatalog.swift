@@ -104,6 +104,52 @@ public struct VoiceInkProviderAPIKeyDraft: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkProviderAPIKeyVerificationApplicationPlan: Equatable, Sendable {
+    public let progress: VoiceInkProviderAPIKeyVerificationProgress
+    public let keyToSave: String?
+    public let shouldMarkKeyVerified: Bool
+
+    public init(
+        progress: VoiceInkProviderAPIKeyVerificationProgress,
+        keyToSave: String?,
+        shouldMarkKeyVerified: Bool
+    ) {
+        self.progress = progress
+        self.keyToSave = keyToSave
+        self.shouldMarkKeyVerified = shouldMarkKeyVerified
+    }
+}
+
+public extension VoiceInkProviderAPIKeyDraft {
+    func verificationApplicationPlan(
+        for result: VoiceInkAPIKeyVerificationResult
+    ) -> VoiceInkProviderAPIKeyVerificationApplicationPlan {
+        guard result.isValid else {
+            return VoiceInkProviderAPIKeyVerificationApplicationPlan(
+                progress: .failure(message: result.errorMessage),
+                keyToSave: nil,
+                shouldMarkKeyVerified: false
+            )
+        }
+
+        return VoiceInkProviderAPIKeyVerificationApplicationPlan(
+            progress: .success,
+            keyToSave: keyToSaveAfterSuccessfulVerification,
+            shouldMarkKeyVerified: true
+        )
+    }
+
+    static func missingVerificationCandidatePlan(
+        message: String? = nil
+    ) -> VoiceInkProviderAPIKeyVerificationApplicationPlan {
+        VoiceInkProviderAPIKeyVerificationApplicationPlan(
+            progress: .failure(message: message),
+            keyToSave: nil,
+            shouldMarkKeyVerified: false
+        )
+    }
+}
+
 public struct VoiceInkProviderAPIKeyFormPresentation: Equatable, Sendable {
     public let navigationTitle: String
     public let apiKeySectionTitle: String

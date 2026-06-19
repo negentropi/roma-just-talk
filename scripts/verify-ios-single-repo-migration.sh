@@ -805,6 +805,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
 
 require_pattern \
+  "shared provider API-key verification application plan lives in VoiceInkCore" \
+  'VoiceInkProviderAPIKeyVerificationApplicationPlan|verificationApplicationPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
+
+require_pattern \
   "shared provider API-key form presentation lives in VoiceInkCore" \
   'VoiceInkProviderAPIKeyFormPresentation|apiKeyFormPresentation' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
@@ -812,6 +817,11 @@ require_pattern \
 require_pattern \
   "iOS API-key view uses shared verification progress presentation" \
   'VoiceInkProviderAPIKeyVerificationProgress|verificationProgress|iOSVerifiedKeyFeedback|iOSResultFeedback' \
+  iOS/VoiceInk-ios/ProviderAPIKeyView.swift
+
+require_pattern \
+  "iOS API-key view uses shared verification application plan" \
+  'verificationApplicationPlan|VoiceInkProviderAPIKeyDraft[[:space:]]*\.[[:space:]]*missingVerificationCandidatePlan' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 require_pattern \
@@ -853,7 +863,7 @@ reject_pattern \
 
 reject_pattern \
   "iOS API-key view avoids shell-only verification state and copy" \
-  '@State private var isVerifying|verifyResult|Key verified|Verification failed' \
+  '@State private var isVerifying|verifyResult|Key verified|Verification failed|keyToSaveAfterSuccessfulVerification|verificationProgress = ok \?|result\.isValid' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 reject_pattern \
@@ -1083,13 +1093,18 @@ require_pattern \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
 require_pattern \
+  "macOS cloud API-key card uses shared verification application plan" \
+  'verificationApplicationPlan' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift
+
+require_pattern \
   "macOS cloud API-key card uses shared stored-key verifier" \
   'verifyStoredAPIKeyDetailed\(keyToVerify, for: provider\)' \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
 reject_pattern \
   "macOS cloud API-key card avoids shell-only verification status and copy" \
-  'enum +VerificationStatus|verificationStatus|verificationError|Verifying\.\.\.|Verification failed|API key verified successfully!|Unsupported provider' \
+  'enum +VerificationStatus|verificationStatus|verificationError|Verifying\.\.\.|Verification failed|API key verified successfully!|Unsupported provider|keyToSaveAfterSuccessfulVerification|result\.isValid' \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
 reject_pattern \

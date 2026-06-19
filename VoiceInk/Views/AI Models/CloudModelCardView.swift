@@ -305,17 +305,17 @@ struct CloudModelCardView: View {
             let result = await apiKeyVerifier.verifyStoredAPIKeyDetailed(keyToVerify, for: provider)
 
             await MainActor.run {
-                if result.isValid {
-                    verificationProgress = .success
-                    if let keyToSave = draft.keyToSaveAfterSuccessfulVerification {
+                let plan = draft.verificationApplicationPlan(for: result)
+                verificationProgress = plan.progress
+
+                if plan.shouldMarkKeyVerified {
+                    if let keyToSave = plan.keyToSave {
                         APIKeyManager.shared.saveAPIKey(keyToSave, forProvider: model.provider.apiKeyProviderName)
                     }
                     transcriptionModelManager.refreshAllAvailableModels()
                     withAnimation(.easeInOut(duration: 0.3)) {
                         isExpanded = false
                     }
-                } else {
-                    verificationProgress = .failure(message: result.errorMessage)
                 }
             }
         }

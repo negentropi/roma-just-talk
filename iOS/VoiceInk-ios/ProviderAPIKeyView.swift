@@ -114,15 +114,18 @@ struct ProviderAPIKeyView: View {
             verificationProgress = .verifying
             let draft = apiKeyDraft
             guard let keyToVerify = draft.verificationCandidate else {
-                verificationProgress = .failure(message: nil)
+                verificationProgress = VoiceInkProviderAPIKeyDraft
+                    .missingVerificationCandidatePlan()
+                    .progress
                 return
             }
             
-            let ok = await apiKeyVerifier.verifyStoredAPIKey(keyToVerify, for: provider)
+            let result = await apiKeyVerifier.verifyStoredAPIKeyDetailed(keyToVerify, for: provider)
+            let plan = draft.verificationApplicationPlan(for: result)
             
-            verificationProgress = ok ? .success : .failure(message: nil)
-            if ok {
-                if let keyToSave = draft.keyToSaveAfterSuccessfulVerification {
+            verificationProgress = plan.progress
+            if plan.shouldMarkKeyVerified {
+                if let keyToSave = plan.keyToSave {
                     settings.setAPIKey(keyToSave, for: provider)
                 }
                 settings.setKeyVerified(true, for: provider)

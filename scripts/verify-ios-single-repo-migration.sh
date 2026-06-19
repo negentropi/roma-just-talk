@@ -2398,6 +2398,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
+  "shared Power Mode session application plan lives in VoiceInkCore" \
+  'VoiceInkPowerModeSessionApplicationPlan|VoiceInkPowerModeSessionApplicationFacts|shouldPostConfigurationApplied' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
   "shared Power Mode active-session persistence lives in VoiceInkCore" \
   'VoiceInkPowerModeSessionPreference|activePowerModeSession' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
@@ -2437,6 +2442,11 @@ reject_pattern \
   'if +config\.isAIEnhancementEnabled|config\.selectedPromptUUID|config\.selectedAIProviderKind|state\.selectedPromptUUID|state\.selectedAIProviderKind|state\.cleanupRestore|VoiceInkTranscriptionCleanupPreferenceStorage\.saveTextFormattingEnabled\(config\.|PunctuationCleanupMode\.setCurrent\(config\.|VoiceInkTranscriptionCleanupPreferenceStorage\.saveLowercaseTranscription\(config\.|let +cleanupRestore += +state\.cleanupRestore' \
   VoiceInk/PowerMode/PowerModeSessionManager.swift
 
+reject_pattern \
+  "macOS Power Mode session manager avoids shell-only application sequencing" \
+  'applyPreferenceApplication\(config\.powerModePreferenceApplication\)|applyPreferenceApplication\(state\.powerModePreferenceRestore\)|modelResourcePlan\(|languageApplicationPlan\(' \
+  VoiceInk/PowerMode/PowerModeSessionManager.swift
+
 require_pattern \
   "macOS Power Mode session manager consumes shared session snapshot records" \
   'VoiceInkPowerMode(ApplicationState|Session)' \
@@ -2453,13 +2463,18 @@ require_pattern \
   VoiceInk/PowerMode/PowerModeSessionManager.swift
 
 require_pattern \
+  "macOS Power Mode session manager consumes shared application plan" \
+  'VoiceInkPowerModeSessionApplicationPlan\.(applying|restoring)|applySessionApplicationPlan' \
+  VoiceInk/PowerMode/PowerModeSessionManager.swift
+
+require_pattern \
   "macOS Power Mode session manager applies configs through shared preference application plan" \
-  'applyPreferenceApplication\(config\.powerModePreferenceApplication\)' \
+  'plan\.preferenceApplication' \
   VoiceInk/PowerMode/PowerModeSessionManager.swift
 
 require_pattern \
   "macOS Power Mode session manager restores state through shared preference application plan" \
-  'applyPreferenceApplication\(state\.powerModePreferenceRestore\)' \
+  'VoiceInkPowerModeSessionApplicationPlan\.restoring' \
   VoiceInk/PowerMode/PowerModeSessionManager.swift
 
 require_pattern \

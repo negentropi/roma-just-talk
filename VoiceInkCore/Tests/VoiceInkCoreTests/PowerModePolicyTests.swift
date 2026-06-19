@@ -1032,6 +1032,94 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertEqual(application.cleanupRestore.punctuationMode, .removeAll)
     }
 
+    func testPowerModeSessionApplicationPlanBuildsConfigurationApplicationSequence() {
+        let promptID = UUID()
+        let config = PowerModeConfig(
+            name: "Coding",
+            emoji: "C",
+            isAIEnhancementEnabled: true,
+            selectedPrompt: promptID.uuidString,
+            selectedTranscriptionModelName: "base",
+            selectedLanguage: "fr",
+            useScreenCapture: true,
+            selectedAIProvider: "GROQ",
+            selectedAIModel: "llama-3.3"
+        )
+
+        let plan = VoiceInkPowerModeSessionApplicationPlan.applying(
+            config: config,
+            facts: sessionApplicationFacts(
+                currentModelName: "nova-3",
+                availableLocalModelNames: ["base"]
+            )
+        )
+
+        XCTAssertTrue(plan.preferenceApplication.isEnhancementEnabled)
+        XCTAssertTrue(plan.preferenceApplication.useScreenCaptureContext)
+        XCTAssertEqual(plan.preferenceApplication.promptSelection, .set(promptID))
+        XCTAssertEqual(plan.preferenceApplication.selectedAIProvider, .groq)
+        XCTAssertEqual(plan.preferenceApplication.selectedAIModel, "llama-3.3")
+        XCTAssertEqual(plan.modelResourcePlan.selectedModelName, "base")
+        XCTAssertEqual(plan.modelResourcePlan.action, .cleanupAndLoadLocalModel("base"))
+        XCTAssertEqual(plan.languageApplicationPlan.languageToSave, "fr")
+        XCTAssertTrue(plan.shouldPostConfigurationApplied)
+    }
+
+    func testPowerModeSessionApplicationPlanBuildsRestoreSequenceWithoutConfigurationNotification() {
+        let promptID = UUID()
+        let state = VoiceInkPowerModeApplicationState(
+            isEnhancementEnabled: false,
+            useScreenCaptureContext: false,
+            selectedPromptId: promptID.uuidString,
+            selectedAIProvider: "GROQ",
+            selectedAIModel: "llama-3.3",
+            selectedLanguage: "de",
+            transcriptionModelName: "english-only",
+            removePunctuation: true
+        )
+
+        let plan = VoiceInkPowerModeSessionApplicationPlan.restoring(
+            state: state,
+            facts: sessionApplicationFacts(
+                currentModelName: "base",
+                availableLocalModelNames: ["base"]
+            )
+        )
+
+        XCTAssertFalse(plan.preferenceApplication.isEnhancementEnabled)
+        XCTAssertFalse(plan.preferenceApplication.useScreenCaptureContext)
+        XCTAssertEqual(plan.preferenceApplication.promptSelection, .set(promptID))
+        XCTAssertEqual(plan.preferenceApplication.selectedAIProvider, .groq)
+        XCTAssertEqual(plan.preferenceApplication.selectedAIModel, "llama-3.3")
+        XCTAssertEqual(plan.preferenceApplication.cleanupRestore.punctuationMode, .removeAll)
+        XCTAssertEqual(plan.modelResourcePlan.selectedModelName, "english-only")
+        XCTAssertEqual(plan.modelResourcePlan.action, .cleanupOnly)
+        XCTAssertEqual(plan.languageApplicationPlan.languageToSave, "en")
+        XCTAssertFalse(plan.shouldPostConfigurationApplied)
+    }
+
+    func testPowerModeSessionApplicationPlanKeepsModelAndLanguageNoOpWhenRestoreSelectionsAreMissing() {
+        let state = VoiceInkPowerModeApplicationState(
+            isEnhancementEnabled: false,
+            useScreenCaptureContext: false,
+            selectedLanguage: nil,
+            transcriptionModelName: nil
+        )
+
+        let plan = VoiceInkPowerModeSessionApplicationPlan.restoring(
+            state: state,
+            facts: sessionApplicationFacts(
+                currentModelName: "base",
+                availableLocalModelNames: ["base"]
+            )
+        )
+
+        XCTAssertEqual(plan.modelResourcePlan.selectedModelName, nil)
+        XCTAssertEqual(plan.modelResourcePlan.action, .none)
+        XCTAssertNil(plan.languageApplicationPlan.languageToSave)
+        XCTAssertFalse(plan.shouldPostConfigurationApplied)
+    }
+
     func testPowerModeSessionPreservesStoredShapeAndOriginalState() throws {
         let id = UUID()
         let startTime = Date(timeIntervalSince1970: 1_700_000_000)
@@ -1629,6 +1717,36 @@ final class PowerModePolicyTests: XCTestCase {
             useScreenCaptureContext: false,
             selectedAIProvider: "openai",
             selectedAIModel: selectedAIModel
+        )
+    }
+
+    private func sessionApplicationFacts(
+        currentModelName: String?,
+        availableLocalModelNames: Set<String>
+    ) -> VoiceInkPowerModeSessionApplicationFacts {
+        VoiceInkPowerModeSessionApplicationFacts(
+            currentModelName: currentModelName,
+            availableModelResourceFacts: [
+                transcriptionModelResourceFacts(name: "base", loadsLocalWhisperModel: true),
+                transcriptionModelResourceFacts(name: "nova-3", loadsLocalWhisperModel: false),
+                transcriptionModelResourceFacts(name: "english-only", loadsLocalWhisperModel: false)
+            ],
+            availableLanguageModelFacts: [
+                transcriptionModelFacts(
+                    name: "base",
+                    languageOptions: ["en": "English", "fr": "French"]
+                ),
+                transcriptionModelFacts(
+                    name: "nova-3",
+                    languageOptions: ["en": "English", "de": "German"]
+                ),
+                transcriptionModelFacts(
+                    name: "english-only",
+                    isMultilingual: false,
+                    languageOptions: VoiceInkLanguageCatalog.englishOnly
+                )
+            ],
+            availableLocalModelNames: availableLocalModelNames
         )
     }
 

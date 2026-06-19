@@ -105,54 +105,39 @@ class PowerModeSessionManager {
         guard enhancementService != nil,
               let stateProvider = stateProvider else { return }
 
-        await MainActor.run {
-            applyPreferenceApplication(config.powerModePreferenceApplication)
-        }
-
-        await applyModelResourcePlan(
-            modelResourcePlan(
-                for: config.selectedTranscriptionModelName,
-                stateProvider: stateProvider
+        await applySessionApplicationPlan(
+            VoiceInkPowerModeSessionApplicationPlan.applying(
+                config: config,
+                facts: sessionApplicationFacts(stateProvider: stateProvider)
             ),
             stateProvider: stateProvider
         )
-
-        applyLanguageApplicationPlan(
-            languageApplicationPlan(
-                selectedLanguage: config.selectedLanguage,
-                preferredModelName: config.selectedTranscriptionModelName,
-                stateProvider: stateProvider
-            )
-        )
-
-        await MainActor.run {
-            NotificationCenter.default.post(name: .powerModeConfigurationApplied, object: nil)
-        }
     }
 
     private func restoreState(_ state: VoiceInkPowerModeApplicationState) async {
         guard enhancementService != nil,
               let stateProvider = stateProvider else { return }
 
-        await MainActor.run {
-            applyPreferenceApplication(state.powerModePreferenceRestore)
-        }
-
-        await applyModelResourcePlan(
-            modelResourcePlan(
-                for: state.transcriptionModelName,
-                stateProvider: stateProvider
+        await applySessionApplicationPlan(
+            VoiceInkPowerModeSessionApplicationPlan.restoring(
+                state: state,
+                facts: sessionApplicationFacts(stateProvider: stateProvider)
             ),
             stateProvider: stateProvider
         )
+    }
 
-        applyLanguageApplicationPlan(
-            languageApplicationPlan(
-                selectedLanguage: state.selectedLanguage,
-                preferredModelName: state.transcriptionModelName,
-                stateProvider: stateProvider
-            )
-        )
+    private func applySessionApplicationPlan(
+        _ plan: VoiceInkPowerModeSessionApplicationPlan,
+        stateProvider: any PowerModeStateProvider
+    ) async {
+        applyPreferenceApplication(plan.preferenceApplication)
+        await applyModelResourcePlan(plan.modelResourcePlan, stateProvider: stateProvider)
+        applyLanguageApplicationPlan(plan.languageApplicationPlan)
+
+        if plan.shouldPostConfigurationApplied {
+            NotificationCenter.default.post(name: .powerModeConfigurationApplied, object: nil)
+        }
     }
 
     private func applyPreferenceApplication(_ application: VoiceInkPowerModePreferenceApplication) {
@@ -188,16 +173,14 @@ class PowerModeSessionManager {
         }
     }
 
-    private func languageApplicationPlan(
-        selectedLanguage: String?,
-        preferredModelName: String?,
+    private func sessionApplicationFacts(
         stateProvider: any PowerModeStateProvider
-    ) -> VoiceInkPowerModeLanguageApplicationPlan {
-        VoiceInkPowerModeLanguageApplicationPlan.plan(
-            selectedLanguage: selectedLanguage,
-            preferredModelName: preferredModelName,
+    ) -> VoiceInkPowerModeSessionApplicationFacts {
+        VoiceInkPowerModeSessionApplicationFacts(
             currentModelName: stateProvider.currentTranscriptionModel?.name,
-            availableModels: stateProvider.allAvailableModels.map(transcriptionModelFacts(for:))
+            availableModelResourceFacts: stateProvider.allAvailableModels.map(modelResourceFacts(for:)),
+            availableLanguageModelFacts: stateProvider.allAvailableModels.map(transcriptionModelFacts(for:)),
+            availableLocalModelNames: Set(stateProvider.availableModels.map(\.name))
         )
     }
 
@@ -219,18 +202,6 @@ class PowerModeSessionManager {
 
         VoiceInkTranscriptionLanguagePreference.saveSelectedLanguage(languageToSave)
         NotificationCenter.default.post(name: .languageDidChange, object: nil)
-    }
-
-    private func modelResourcePlan(
-        for selectedModelName: String?,
-        stateProvider: any PowerModeStateProvider
-    ) -> VoiceInkPowerModeTranscriptionModelResourcePlan {
-        VoiceInkPowerModeTranscriptionModelResourcePlan.plan(
-            selectedModelName: selectedModelName,
-            currentModelName: stateProvider.currentTranscriptionModel?.name,
-            availableModels: stateProvider.allAvailableModels.map(modelResourceFacts(for:)),
-            availableLocalModelNames: Set(stateProvider.availableModels.map(\.name))
-        )
     }
 
     private func modelResourceFacts(

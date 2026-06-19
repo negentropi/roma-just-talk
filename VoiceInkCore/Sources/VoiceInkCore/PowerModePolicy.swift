@@ -602,6 +602,95 @@ public struct VoiceInkPowerModeLanguageApplicationPlan: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkPowerModeSessionApplicationFacts: Equatable, Sendable {
+    public var currentModelName: String?
+    public var availableModelResourceFacts: [VoiceInkPowerModeTranscriptionModelResourceFacts]
+    public var availableLanguageModelFacts: [VoiceInkPowerModeTranscriptionModelFacts]
+    public var availableLocalModelNames: Set<String>
+
+    public init(
+        currentModelName: String?,
+        availableModelResourceFacts: [VoiceInkPowerModeTranscriptionModelResourceFacts],
+        availableLanguageModelFacts: [VoiceInkPowerModeTranscriptionModelFacts],
+        availableLocalModelNames: Set<String>
+    ) {
+        self.currentModelName = currentModelName
+        self.availableModelResourceFacts = availableModelResourceFacts
+        self.availableLanguageModelFacts = availableLanguageModelFacts
+        self.availableLocalModelNames = availableLocalModelNames
+    }
+}
+
+public struct VoiceInkPowerModeSessionApplicationPlan: Equatable, Sendable {
+    public var preferenceApplication: VoiceInkPowerModePreferenceApplication
+    public var modelResourcePlan: VoiceInkPowerModeTranscriptionModelResourcePlan
+    public var languageApplicationPlan: VoiceInkPowerModeLanguageApplicationPlan
+    public var shouldPostConfigurationApplied: Bool
+
+    public init(
+        preferenceApplication: VoiceInkPowerModePreferenceApplication,
+        modelResourcePlan: VoiceInkPowerModeTranscriptionModelResourcePlan,
+        languageApplicationPlan: VoiceInkPowerModeLanguageApplicationPlan,
+        shouldPostConfigurationApplied: Bool
+    ) {
+        self.preferenceApplication = preferenceApplication
+        self.modelResourcePlan = modelResourcePlan
+        self.languageApplicationPlan = languageApplicationPlan
+        self.shouldPostConfigurationApplied = shouldPostConfigurationApplied
+    }
+
+    public static func applying(
+        config: PowerModeConfig,
+        facts: VoiceInkPowerModeSessionApplicationFacts
+    ) -> Self {
+        plan(
+            preferenceApplication: config.powerModePreferenceApplication,
+            selectedModelName: config.selectedTranscriptionModelName,
+            selectedLanguage: config.selectedLanguage,
+            facts: facts,
+            shouldPostConfigurationApplied: true
+        )
+    }
+
+    public static func restoring(
+        state: VoiceInkPowerModeApplicationState,
+        facts: VoiceInkPowerModeSessionApplicationFacts
+    ) -> Self {
+        plan(
+            preferenceApplication: state.powerModePreferenceRestore,
+            selectedModelName: state.transcriptionModelName,
+            selectedLanguage: state.selectedLanguage,
+            facts: facts,
+            shouldPostConfigurationApplied: false
+        )
+    }
+
+    private static func plan(
+        preferenceApplication: VoiceInkPowerModePreferenceApplication,
+        selectedModelName: String?,
+        selectedLanguage: String?,
+        facts: VoiceInkPowerModeSessionApplicationFacts,
+        shouldPostConfigurationApplied: Bool
+    ) -> Self {
+        Self(
+            preferenceApplication: preferenceApplication,
+            modelResourcePlan: VoiceInkPowerModeTranscriptionModelResourcePlan.plan(
+                selectedModelName: selectedModelName,
+                currentModelName: facts.currentModelName,
+                availableModels: facts.availableModelResourceFacts,
+                availableLocalModelNames: facts.availableLocalModelNames
+            ),
+            languageApplicationPlan: VoiceInkPowerModeLanguageApplicationPlan.plan(
+                selectedLanguage: selectedLanguage,
+                preferredModelName: selectedModelName,
+                currentModelName: facts.currentModelName,
+                availableModels: facts.availableLanguageModelFacts
+            ),
+            shouldPostConfigurationApplied: shouldPostConfigurationApplied
+        )
+    }
+}
+
 public struct VoiceInkPowerModeApplicationState: Codable, Equatable, Sendable {
     public var isEnhancementEnabled: Bool
     public var useScreenCaptureContext: Bool

@@ -115,18 +115,18 @@ struct ConfigurationRow: View {
     }
     
     private var selectedLanguage: String? {
-        if let langCode = config.selectedLanguage {
-            if langCode == "auto" { return "Auto" }
-            if langCode == "en" { return "English" }
-            
-            if let modelName = config.selectedTranscriptionModelName,
-               let model = transcriptionModelManager.allAvailableModels.first(where: { $0.name == modelName }),
-               let langName = model.transcriptionLanguageOptions[langCode] {
-                return langName
-            }
-            return langCode.uppercased()
+        let languageOptions: [String: String]
+        if let modelName = config.selectedTranscriptionModelName,
+           let model = transcriptionModelManager.allAvailableModels.first(where: { $0.name == modelName }) {
+            languageOptions = model.transcriptionLanguageOptions
+        } else {
+            languageOptions = [:]
         }
-        return "Default"
+
+        return VoiceInkPowerModePresentation.selectedLanguageDisplayText(
+            selectedLanguage: config.selectedLanguage,
+            languageOptions: languageOptions
+        )
     }
     
     private var appCount: Int { return config.appConfigs?.count ?? 0 }

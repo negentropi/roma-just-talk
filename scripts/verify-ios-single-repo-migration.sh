@@ -1958,6 +1958,21 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
+  "shared Power Mode selected-language display formatting lives in VoiceInkCore" \
+  'selectedLanguageDisplayText|defaultOverrideDisplayText|autoLanguageDisplayText|englishLanguageDisplayText' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
+
+require_pattern \
+  "macOS Power Mode rows use shared selected-language display formatting" \
+  'VoiceInkPowerModePresentation\.selectedLanguageDisplayText' \
+  VoiceInk/PowerMode/PowerModeViewComponents.swift
+
+reject_pattern \
+  "macOS Power Mode rows avoid shell-only selected-language fallback formatting" \
+  'langCode == "auto"|langCode == "en"|langCode\.uppercased\(\)' \
+  VoiceInk/PowerMode/PowerModeViewComponents.swift
+
+require_pattern \
   "shared Power Mode config record lives in VoiceInkCore" \
   'struct PowerModeConfig' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift

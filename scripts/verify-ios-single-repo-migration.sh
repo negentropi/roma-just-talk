@@ -4031,7 +4031,7 @@ require_pattern \
 
 require_pattern \
   "shared Power Mode panel sidebar popover chrome copy lives in VoiceInkCore" \
-  'panelTitle|panelSubtitle|reorderButtonTitle|reorderPanelTitle|reorderPanelCloseHelpText|defaultBadgeTitle|disabledBadgeTitle|emptyPanelTitle|sidebarEmptyTitle|sidebarEmptyButtonTitle|popoverTitle|popoverEmptyTitle|rowEditActionTitle|rowDeleteActionTitle' \
+  'panelTitle|panelSubtitle|panelInfoTipText|panelLearnMoreURLString|addButtonSystemImageName|reorderButtonTitle|reorderButtonSystemImageName|reorderPanelTitle|reorderPanelCloseHelpText|reorderPanelCloseSystemImageName|reorderHandleSystemImageName|defaultBadgeTitle|disabledBadgeTitle|emptyPanelTitle|emptyPanelSystemImageName|sidebarEmptyTitle|sidebarEmptyButtonTitle|popoverTitle|popoverEmptyTitle|rowEditActionTitle|rowDeleteActionTitle' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
 
 require_pattern \
@@ -4066,7 +4066,7 @@ require_pattern \
 
 require_pattern \
   "macOS Power Mode panel uses shared chrome copy" \
-  'VoiceInkPowerModePresentation\.(panelTitle|panelSubtitle|reorderButtonTitle|emptyPanelTitle|emptyPanelMessage|reorderPanelTitle|reorderPanelCloseHelpText|defaultBadgeTitle|disabledBadgeTitle)' \
+  'VoiceInkPowerModePresentation\.(panelTitle|panelSubtitle|panelInfoTipText|panelLearnMoreURLString|addButtonSystemImageName|reorderButtonTitle|reorderButtonSystemImageName|emptyPanelTitle|emptyPanelMessage|emptyPanelSystemImageName|reorderPanelTitle|reorderPanelCloseHelpText|reorderPanelCloseSystemImageName|reorderHandleSystemImageName|defaultBadgeTitle|disabledBadgeTitle)' \
   VoiceInk/PowerMode/PowerModeView.swift
 
 require_pattern \
@@ -4151,7 +4151,7 @@ require_pattern \
 
 require_pattern \
   "migration checklist tracks shared Power Mode chrome copy gate" \
-  'macOS Power Mode panel, sidebar empty state, reorder sheet, badges, row actions, and manual-selection popover copy route through `VoiceInkPowerModePresentation`' \
+  'macOS Power Mode panel, sidebar empty state, reorder sheet, badges, row actions, manual-selection popover copy, panel help URL, and panel/reorder action symbols route through `VoiceInkPowerModePresentation`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \
@@ -4226,6 +4226,11 @@ reject_pattern \
   VoiceInk/PowerMode/PowerModeView.swift \
   VoiceInk/PowerMode/PowerModeViewComponents.swift \
   VoiceInk/PowerMode/PowerModePopover.swift
+
+reject_pattern \
+  "macOS Power Mode panel avoids shell-only panel action metadata" \
+  '"https://tryvoiceink.com/docs/power-mode"|"plus"|"arrow\.up\.arrow\.down"|"square\.grid\.2x2\.fill"|"xmark"|"line\.3\.horizontal"' \
+  VoiceInk/PowerMode/PowerModeView.swift
 
 reject_pattern \
   "macOS Power Mode rows avoid shell-only selected-prompt title lookup" \

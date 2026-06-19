@@ -63,9 +63,21 @@ final class PowerModePresentationTests: XCTestCase {
             VoiceInkPowerModePresentation.panelSubtitle,
             "Automate your workflows with context-aware configurations."
         )
+        XCTAssertEqual(
+            VoiceInkPowerModePresentation.panelInfoTipText,
+            "Automatically apply custom configurations based on the app/website you are using."
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModePresentation.panelLearnMoreURLString,
+            "https://tryvoiceink.com/docs/power-mode"
+        )
+        XCTAssertEqual(VoiceInkPowerModePresentation.addButtonSystemImageName, "plus")
         XCTAssertEqual(VoiceInkPowerModePresentation.reorderButtonTitle, "Reorder")
+        XCTAssertEqual(VoiceInkPowerModePresentation.reorderButtonSystemImageName, "arrow.up.arrow.down")
         XCTAssertEqual(VoiceInkPowerModePresentation.reorderPanelTitle, "Reorder Power Modes")
         XCTAssertEqual(VoiceInkPowerModePresentation.reorderPanelCloseHelpText, "Close")
+        XCTAssertEqual(VoiceInkPowerModePresentation.reorderPanelCloseSystemImageName, "xmark")
+        XCTAssertEqual(VoiceInkPowerModePresentation.reorderHandleSystemImageName, "line.3.horizontal")
         XCTAssertEqual(VoiceInkPowerModePresentation.defaultBadgeTitle, "Default")
         XCTAssertEqual(VoiceInkPowerModePresentation.disabledBadgeTitle, "Disabled")
         XCTAssertEqual(VoiceInkPowerModePresentation.emptyPanelTitle, "No Power Modes Yet")
@@ -73,6 +85,7 @@ final class PowerModePresentationTests: XCTestCase {
             VoiceInkPowerModePresentation.emptyPanelMessage,
             "Create first power mode to automate your VoiceInk workflow based on apps/website you are using"
         )
+        XCTAssertEqual(VoiceInkPowerModePresentation.emptyPanelSystemImageName, "square.grid.2x2.fill")
         XCTAssertEqual(VoiceInkPowerModePresentation.sidebarEmptyTitle, "No Power Modes")
         XCTAssertEqual(
             VoiceInkPowerModePresentation.sidebarEmptyMessage,

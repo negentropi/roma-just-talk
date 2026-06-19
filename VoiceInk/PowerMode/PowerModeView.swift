@@ -23,8 +23,8 @@ struct PowerModeView: View {
                                     .foregroundColor(.primary)
                                 
                                 InfoTip(
-                                    "Automatically apply custom configurations based on the app/website you are using.",
-                                    learnMoreURL: "https://tryvoiceink.com/docs/power-mode"
+                                    VoiceInkPowerModePresentation.panelInfoTipText,
+                                    learnMoreURL: VoiceInkPowerModePresentation.panelLearnMoreURLString
                                 )
                             }
                             
@@ -40,7 +40,7 @@ struct PowerModeView: View {
                                 openPanel(mode: .add)
                             }) {
                                 HStack(spacing: 6) {
-                                    Image(systemName: "plus")
+                                    Image(systemName: VoiceInkPowerModePresentation.addButtonSystemImageName)
                                         .font(.system(size: 12, weight: .medium))
                                     Text(VoiceInkPowerModeConfigurationMode.add.title)
                                         .font(.system(size: 13, weight: .medium))
@@ -55,7 +55,7 @@ struct PowerModeView: View {
 
                             Button(action: { openReorderPanel() }) {
                                 HStack(spacing: 6) {
-                                    Image(systemName: "arrow.up.arrow.down")
+                                    Image(systemName: VoiceInkPowerModePresentation.reorderButtonSystemImageName)
                                         .font(.system(size: 12, weight: .medium))
                                     Text(VoiceInkPowerModePresentation.reorderButtonTitle)
                                         .font(.system(size: 13, weight: .medium))
@@ -91,7 +91,7 @@ struct PowerModeView: View {
                                                 .frame(height: geometry.size.height * 0.2)
                                             
                                             VStack(spacing: 16) {
-                                                Image(systemName: "square.grid.2x2.fill")
+                                                Image(systemName: VoiceInkPowerModePresentation.emptyPanelSystemImageName)
                                                     .font(.system(size: 48, weight: .regular))
                                                     .foregroundColor(.secondary.opacity(0.6))
                                                 
@@ -194,7 +194,7 @@ struct ReorderPanelView: View {
                     .foregroundColor(.primary)
                 Spacer()
                 Button(action: onDismiss) {
-                    Image(systemName: "xmark")
+                    Image(systemName: VoiceInkPowerModePresentation.reorderPanelCloseSystemImageName)
                         .font(.system(size: 14, weight: .medium))
                         .foregroundColor(.secondary)
                         .padding(6)
@@ -213,7 +213,7 @@ struct ReorderPanelView: View {
             List {
                 ForEach(powerModeManager.configurations) { config in
                     HStack(spacing: 12) {
-                        Image(systemName: "line.3.horizontal")
+                        Image(systemName: VoiceInkPowerModePresentation.reorderHandleSystemImageName)
                             .font(.system(size: 14))
                             .foregroundColor(.secondary)
 

@@ -2171,7 +2171,7 @@ require_pattern \
 
 require_pattern \
   "shared AI enhancement default text model policy lives in VoiceInkCore" \
-  'defaultTextEnhancementModel|defaultOllamaTextEnhancementModel|localCLITextEnhancementModel' \
+  'defaultTextEnhancementModel|defaultOllamaTextEnhancementModel|legacyOllamaServiceSelectedModelFallback|localCLITextEnhancementModel' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \
@@ -2188,6 +2188,11 @@ require_pattern \
   "macOS AI settings Ollama default model selection uses shared policy" \
   'defaultOllamaTextEnhancementModel' \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+
+require_pattern \
+  "macOS Ollama service selected-model fallback uses shared policy" \
+  'legacyOllamaServiceSelectedModelFallback' \
+  VoiceInk/Services/OllamaService.swift
 
 require_pattern \
   "shared AI enhancement static text model list policy lives in VoiceInkCore" \
@@ -2928,6 +2933,11 @@ require_pattern \
 reject_pattern \
   "macOS Ollama default base URL shim stays deleted" \
   'defaultBaseURL' \
+  VoiceInk/Services/OllamaService.swift
+
+reject_pattern \
+  "macOS Ollama service avoids duplicate selected-model fallback literals" \
+  '"llama2"|ollamaSelectedModel\(fallback: +"[^"]+"\)' \
   VoiceInk/Services/OllamaService.swift
 
 reject_pattern \

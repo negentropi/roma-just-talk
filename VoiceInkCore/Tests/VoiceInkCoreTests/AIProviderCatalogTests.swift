@@ -373,6 +373,10 @@ final class AIProviderCatalogTests: XCTestCase {
                 VoiceInkAIEnhancementProviderKind.defaultOllamaTextEnhancementModel
             )
             XCTAssertEqual(
+                VoiceInkAIEnhancementProviderKind.legacyOllamaServiceSelectedModelFallback,
+                "llama2"
+            )
+            XCTAssertEqual(
                 VoiceInkAIEnhancementProviderKind.localCLI.defaultTextEnhancementModel(from: defaults),
                 VoiceInkAIEnhancementProviderKind.localCLITextEnhancementModel
             )

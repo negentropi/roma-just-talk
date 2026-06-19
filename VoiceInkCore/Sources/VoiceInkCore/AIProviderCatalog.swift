@@ -63,6 +63,7 @@ public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
     public static let missingVerificationCandidateMessage = "Environment variable is missing or empty"
     public static let invalidOrMissingBaseURLConfigurationMessage = "Invalid or missing base URL configuration"
     public static let defaultOllamaTextEnhancementModel = "mistral"
+    public static let legacyOllamaServiceSelectedModelFallback = "llama2"
     public static let localCLITextEnhancementModel = "local-cli"
 
     case cerebras = "Cerebras"

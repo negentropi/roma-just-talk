@@ -50,6 +50,7 @@ public struct VoiceInkRecordingAlertPresentation: Equatable, Identifiable, Senda
     }
 
     public static let microphoneInUseOSStatusCode = 561017449
+    public static let iOSRecorderStartReturnedFalseDescription = "Failed to start AVAudioRecorder. The record() method returned false. This often happens in the background if the audio session is not configured correctly or if there is a conflict with another app."
 
     public let id: String
     public let title: String

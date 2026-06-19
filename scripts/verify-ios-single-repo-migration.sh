@@ -426,6 +426,11 @@ require_pattern \
   iOS/VoiceInk-ios/RecordingManager.swift
 
 require_pattern \
+  "iOS audio recorder uses shared recording-start failure reason" \
+  'VoiceInkRecordingAlertPresentation\.iOSRecorderStartReturnedFalseDescription' \
+  iOS/VoiceInk-ios/AudioRecorder.swift
+
+require_pattern \
   "iOS recording start gate uses shared no-mode presentation" \
   'VoiceInkRecordingAlertPresentation\.noModesAvailableIfNeeded' \
   iOS/VoiceInk-ios/NotesListView.swift
@@ -531,6 +536,11 @@ reject_pattern \
   'ActiveRecordingAlert|Microphone Access Denied|Microphone In Use|Recording Failed|No Modes Found|Please create a new mode in Settings before recording|Could not start recording:|561017449|NSOSStatusErrorDomain' \
   iOS/VoiceInk-ios/RecordingManager.swift \
   iOS/VoiceInk-ios/NotesListView.swift
+
+reject_pattern \
+  "iOS audio recorder avoids shell-only recording-start failure reason" \
+  'Failed to start AVAudioRecorder|record\(\) method returned false|audio session is not configured correctly' \
+  iOS/VoiceInk-ios/AudioRecorder.swift
 
 reject_pattern \
   "recording behavior avoids raw active-state equality" \

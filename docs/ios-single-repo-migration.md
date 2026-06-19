@@ -278,7 +278,7 @@ Current iOS consumers of shared remote transport:
 - Cartesia remains absent from iOS transcription provider selection until an iOS streaming adapter exists; it is not a batch provider.
 - The bundled `VoiceInk` provider case remains decodable and ready as a bundled service, but shared provider selectability keeps it hidden from iOS transcription and post-processing selection until a real no-key/bundled-service adapter exists. The sibling clone marked it always available while returning an empty API key, so porting that path would preserve a broken no-key mode.
 
-Platform shells still own UI, OS permissions, audio capture, paste/keyboard behavior, keychain adapters, local model download storage, SwiftData models, and macOS-only orchestration. iOS-only shell code shared between the app and keyboard extension lives in `iOS/Shared/`, not `VoiceInkCore`; this currently includes App Group recording-state keys, stale-recording expiry policy, Darwin notification names, and the keyboard-to-app deep-link contract.
+Platform shells still own UI, OS permissions, audio capture, paste/keyboard behavior, keychain adapters, local model download storage, SwiftData models, and macOS-only orchestration. iOS-only shell code shared between the app and keyboard extension lives in `iOS/Shared/`, not `VoiceInkCore`; this currently includes App Group recording-state keys, stale-recording expiry policy, Darwin notification names, the app-local keyboard stop notification name, and the keyboard-to-app deep-link contract.
 
 iOS app-local storage roots are kept in `iOS/VoiceInk-ios/VoiceInkIOSStorageDirectories.swift`: the iOS shell owns the Documents/Caches base directories, while `VoiceInkCore` still owns recordings/model subdirectory names and file policies.
 
@@ -331,7 +331,7 @@ scripts/verify-ios-single-repo-migration.sh --full-build
 10. iOS app, keyboard, unit-test, and UI-test Swift sources parse or build.
 11. `plutil -lint` passes for both project files and iOS plists/entitlements.
 12. `xmllint --noout` passes for workspace and shared scheme XML.
-13. iOS shared shell files are present under `iOS/Shared/`: `AppGroupCoordinator.swift`, `VoiceInkAppDeepLink.swift`, and `VoiceInkAppGroupRecordingBridge.swift`.
+13. iOS shared shell files are present under `iOS/Shared/`: `AppGroupCoordinator.swift`, `VoiceInkAppDeepLink.swift`, and `VoiceInkAppGroupRecordingBridge.swift`; keyboard/App Group notification names stay there instead of app-only managers.
 14. iOS non-Swift app artifacts are present: privacy manifest, app icon catalog files, and bundled Silero VAD resource.
 15. Obsolete clone-side Swift duplicates remain absent from `iOS/VoiceInk-ios/`.
 16. When `../VoiceInk-iOS` exists, every sibling-only Swift file under `VoiceInk-ios/` is one of the documented obsolete/replaced files above, and the sibling keyboard/unit-test/UI-test target folders have no sibling-only Swift files.

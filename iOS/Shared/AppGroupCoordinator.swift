@@ -1,5 +1,9 @@
 import Foundation
 
+extension Notification.Name {
+    static let stopRecordingFromKeyboard = Notification.Name("stopRecordingFromKeyboard")
+}
+
 /// Handles communication between the main VoiceInk app and the keyboard extension
 /// Uses App Groups + Darwin Notifications for reliable iOS-native communication
 final class AppGroupCoordinator {

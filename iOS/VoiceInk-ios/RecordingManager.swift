@@ -5,10 +5,6 @@ import Combine
 import UIKit
 import VoiceInkCore
 
-extension Notification.Name {
-    static let stopRecordingFromKeyboard = Notification.Name("stopRecordingFromKeyboard")
-}
-
 private enum MicrophonePermissionStatus {
     case granted, denied, undetermined
 }

@@ -2813,6 +2813,16 @@ require_pattern \
   'static let recordingStateChanged = "com\.prakashjoshipax\.VoiceInk\.recordingStateChanged"' \
   iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
 
+require_pattern \
+  "iOS shared coordinator owns app-local keyboard stop notification" \
+  'static let stopRecordingFromKeyboard = Notification\.Name\("stopRecordingFromKeyboard"\)' \
+  iOS/Shared/AppGroupCoordinator.swift
+
+reject_pattern \
+  "iOS recording manager does not redeclare keyboard stop notification" \
+  'Notification\.Name\("stopRecordingFromKeyboard"\)|extension Notification\.Name' \
+  iOS/VoiceInk-ios/RecordingManager.swift
+
 run_required "git diff has no whitespace errors" git diff --check
 
 run_required "project/plist/entitlements lint" plutil -lint \

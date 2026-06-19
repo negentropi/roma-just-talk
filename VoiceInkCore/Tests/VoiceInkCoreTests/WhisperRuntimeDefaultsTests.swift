@@ -28,6 +28,13 @@ final class WhisperRuntimeDefaultsTests: XCTestCase {
         XCTAssertEqual(VoiceInkWhisperRuntimeDefaults.vadSamplesOverlap, 0.1)
     }
 
+    func testRuntimeDiagnosticsPreserveExistingWhisperWrapperLogText() {
+        XCTAssertEqual(VoiceInkWhisperRuntimeDiagnostics.logCategory, "WhisperContext")
+        XCTAssertEqual(VoiceInkWhisperRuntimeDiagnostics.simulatorCPUModeMessage, "Running on the simulator, using CPU")
+        XCTAssertEqual(VoiceInkWhisperRuntimeDiagnostics.metalFlashAttentionMessage, "Flash attention enabled for Metal")
+        XCTAssertEqual(VoiceInkWhisperRuntimeDiagnostics.vadBundleModelLoadedMessage, "VAD model loaded from bundle resources")
+    }
+
     func testVADRuntimeConfigurationRequiresEnabledPreferenceAndModelPath() {
         XCTAssertEqual(
             VoiceInkWhisperVADRuntimeConfiguration.current(modelPath: "/tmp/vad.bin", isEnabled: true),

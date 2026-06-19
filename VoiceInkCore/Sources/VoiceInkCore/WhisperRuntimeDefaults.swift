@@ -28,6 +28,13 @@ public enum VoiceInkWhisperRuntimeDefaults {
     }
 }
 
+public enum VoiceInkWhisperRuntimeDiagnostics {
+    public static let logCategory = "WhisperContext"
+    public static let simulatorCPUModeMessage = "Running on the simulator, using CPU"
+    public static let metalFlashAttentionMessage = "Flash attention enabled for Metal"
+    public static let vadBundleModelLoadedMessage = "VAD model loaded from bundle resources"
+}
+
 public struct VoiceInkWhisperRuntimeOptions: Equatable, Sendable {
     public let printRealtime: Bool
     public let printProgress: Bool

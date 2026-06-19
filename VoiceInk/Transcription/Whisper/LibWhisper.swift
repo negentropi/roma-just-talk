@@ -12,7 +12,10 @@ import os
 actor WhisperContext {
     private var context: OpaquePointer?
     private var vadModelPath: String?
-    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "WhisperContext")
+    private let logger = Logger(
+        subsystem: VoiceInkAppIdentity.loggingSubsystem,
+        category: VoiceInkWhisperRuntimeDiagnostics.logCategory
+    )
 
     private init() {}
 
@@ -139,10 +142,10 @@ actor WhisperContext {
         var params = whisper_context_default_params()
         #if targetEnvironment(simulator)
         params.use_gpu = false
-        logger.info("Running on the simulator, using CPU")
+        logger.info("\(VoiceInkWhisperRuntimeDiagnostics.simulatorCPUModeMessage, privacy: .public)")
         #else
         params.flash_attn = true // Enable flash attention for Metal
-        logger.info("Flash attention enabled for Metal")
+        logger.info("\(VoiceInkWhisperRuntimeDiagnostics.metalFlashAttentionMessage, privacy: .public)")
         #endif
         
         let context = whisper_init_from_file_with_params(path, params)
@@ -157,7 +160,7 @@ actor WhisperContext {
     private func setVADModelPath(_ path: String?) {
         self.vadModelPath = path
         if path != nil {
-            logger.info("VAD model loaded from bundle resources")
+            logger.info("\(VoiceInkWhisperRuntimeDiagnostics.vadBundleModelLoadedMessage, privacy: .public)")
         }
     }
 

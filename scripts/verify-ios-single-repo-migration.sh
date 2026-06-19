@@ -1144,6 +1144,27 @@ require_pattern \
   iOS/VoiceInk-ios/LibWhisper.swift
 
 require_pattern \
+  "shared local Whisper diagnostics live in VoiceInkCore" \
+  'VoiceInkWhisperRuntimeDiagnostics|logCategory = "WhisperContext"|simulatorCPUModeMessage = "Running on the simulator, using CPU"|metalFlashAttentionMessage = "Flash attention enabled for Metal"|vadBundleModelLoadedMessage = "VAD model loaded from bundle resources"' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperRuntimeDefaults.swift
+
+require_pattern \
+  "macOS local Whisper uses shared diagnostics" \
+  'VoiceInkWhisperRuntimeDiagnostics\.(logCategory|simulatorCPUModeMessage|metalFlashAttentionMessage|vadBundleModelLoadedMessage)' \
+  VoiceInk/Transcription/Whisper/LibWhisper.swift
+
+require_pattern \
+  "iOS local Whisper uses shared diagnostics" \
+  'VoiceInkWhisperRuntimeDiagnostics\.(logCategory|simulatorCPUModeMessage|metalFlashAttentionMessage|vadBundleModelLoadedMessage)' \
+  iOS/VoiceInk-ios/LibWhisper.swift
+
+reject_pattern \
+  "local Whisper adapters avoid duplicate shared diagnostics literals" \
+  '"(WhisperContext|Running on the simulator, using CPU|Flash attention enabled for Metal|VAD model loaded from bundle resources)"' \
+  VoiceInk/Transcription/Whisper/LibWhisper.swift \
+  iOS/VoiceInk-ios/LibWhisper.swift
+
+require_pattern \
   "macOS local Whisper uses shared VAD resource policy" \
   'VoiceInkVADModelFiles\.sileroPath' \
   VoiceInk/Transcription/Whisper/LibWhisper.swift
@@ -3322,13 +3343,23 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift
 
 require_pattern \
-  "macOS local Whisper logging uses shared app identity" \
-  'Logger\(subsystem: VoiceInkAppIdentity\.loggingSubsystem, category: "WhisperContext"\)' \
+  "macOS local Whisper logging uses shared app identity subsystem" \
+  'subsystem: VoiceInkAppIdentity\.loggingSubsystem' \
   VoiceInk/Transcription/Whisper/LibWhisper.swift
 
 require_pattern \
-  "iOS local Whisper logging uses shared app identity" \
-  'Logger\(subsystem: VoiceInkAppIdentity\.loggingSubsystem, category: "WhisperContext"\)' \
+  "macOS local Whisper logging uses shared diagnostics category" \
+  'category: VoiceInkWhisperRuntimeDiagnostics\.logCategory' \
+  VoiceInk/Transcription/Whisper/LibWhisper.swift
+
+require_pattern \
+  "iOS local Whisper logging uses shared app identity subsystem" \
+  'subsystem: VoiceInkAppIdentity\.loggingSubsystem' \
+  iOS/VoiceInk-ios/LibWhisper.swift
+
+require_pattern \
+  "iOS local Whisper logging uses shared diagnostics category" \
+  'category: VoiceInkWhisperRuntimeDiagnostics\.logCategory' \
   iOS/VoiceInk-ios/LibWhisper.swift
 
 reject_pattern \

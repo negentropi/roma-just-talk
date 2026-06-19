@@ -23,7 +23,7 @@ enum CloudTranscriptionError: Error, LocalizedError {
         case .networkError(let error):
             return "A network error occurred: \(error.localizedDescription)"
         case .noTranscriptionReturned:
-            return "The API returned an empty or invalid response."
+            return VoiceInkTranscriptionRunError.noTranscriptionReturned.errorDescription
         }
     }
 }

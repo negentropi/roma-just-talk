@@ -446,6 +446,13 @@ final class TranscriptionRunProcessorTests: XCTestCase {
         }
     }
 
+    func testTranscriptionRunErrorsPreserveSharedDescriptions() {
+        XCTAssertEqual(
+            VoiceInkTranscriptionRunError.noTranscriptionReturned.errorDescription,
+            "The API returned an empty or invalid response."
+        )
+    }
+
     func testTranscribeRejectsEmptyRemoteTranscriptionUsingProviderPolicy() async {
         let processor = VoiceInkTranscriptionRunProcessor { _ in
             XCTFail("Post-processing should not run")

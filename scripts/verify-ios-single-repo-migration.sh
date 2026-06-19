@@ -2046,11 +2046,21 @@ require_pattern \
   'rawCustomVocabularyTerms\(from: modelContext\)' \
   VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
 
+require_pattern \
+  "macOS custom cloud empty-response error uses shared run error description" \
+  'VoiceInkTranscriptionRunError\.noTranscriptionReturned\.errorDescription' \
+  VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
+
 reject_pattern \
   "macOS cloud batch transcription avoids pre-normalized vocabulary terms" \
   'getCustomVocabularyTerms\(from: modelContext\)' \
   VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift \
   VoiceInk/Services/CustomVocabularyService.swift
+
+reject_pattern \
+  "macOS custom cloud avoids duplicate empty-response error copy" \
+  'The API returned an empty or invalid response\.' \
+  VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
 
 require_pattern \
   "shared AI enhancement vocabulary context normalizes post-processing terms" \

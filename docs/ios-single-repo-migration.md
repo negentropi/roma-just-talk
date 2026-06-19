@@ -129,7 +129,7 @@ Current macOS consumers of shared remote transport:
 
 - macOS batch cloud transcription uses `CloudProvider` default dispatch into `VoiceInkRemoteTranscriptionService` for Groq, Deepgram, Gemini, Mistral, ElevenLabs, xAI, Soniox, Speechmatics, and AssemblyAI; `CloudProviderRegistry` now maps shared provider identity to macOS streaming factories, and empty-response policy comes from `VoiceInkProviderKind`.
 - `VoiceInkRemoteTranscriptionService` and `VoiceInkRemoteTranscriptionOptions.batchDefaults` preserve macOS provider-specific batch options such as Groq JSON/temperature/retry settings, Deepgram paragraph/timeout settings, and prompt/vocabulary forwarding for providers that already used them.
-- Custom OpenAI-compatible batch transcription uses `VoiceInkOpenAICompatibleTranscriptionClient`.
+- Custom OpenAI-compatible batch transcription uses `VoiceInkOpenAICompatibleTranscriptionClient`; its empty-response error copy comes from `VoiceInkTranscriptionRunError`.
 - Cartesia API-key verification uses `VoiceInkProviderAPIKeyVerifier` through `VoiceInkTranscriptionModelProvider`; Cartesia transcription remains streaming-only in platform shell code.
 - MacOS cloud-provider API-key verification uses `VoiceInkProviderAPIKeyDraft`, `VoiceInkProviderAPIKeyVerificationProgress`, and stored-key verification through `VoiceInkProviderAPIKeyVerifier`, including transcription-model providers such as Cartesia; provider-specific streaming adapters still own transcription execution.
 - macOS local Whisper/model loading throws `VoiceInkEngineError` from `VoiceInkCore`; macOS error descriptions are covered by `VoiceInkEngineErrorTests`.

@@ -1,5 +1,41 @@
 import Foundation
 
+public enum VoiceInkAudioInputMode: String, CaseIterable, Codable, Equatable, Identifiable, Sendable {
+    case systemDefault = "System Default"
+    case custom = "Custom Device"
+    case prioritized = "Prioritized"
+
+    public var id: Self { self }
+
+    public static let defaultMode: Self = .custom
+
+    public var title: String {
+        rawValue
+    }
+
+    public var iconSystemName: String {
+        switch self {
+        case .systemDefault:
+            return "display"
+        case .custom:
+            return "mic.circle.fill"
+        case .prioritized:
+            return "list.number"
+        }
+    }
+
+    public var description: String {
+        switch self {
+        case .systemDefault:
+            return "Use your Mac's default input"
+        case .custom:
+            return "Select a specific input device"
+        case .prioritized:
+            return "Set up device priority order"
+        }
+    }
+}
+
 public struct VoiceInkAudioInputPriorityDevice: Codable, Equatable, Identifiable, Sendable {
     public let id: String
     public let name: String

@@ -100,6 +100,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "KeychainQueryTests.testDeleteQueryUsesBaseLookupShape", run: { KeychainQueryTests().testDeleteQueryUsesBaseLookupShape() }),
             VoiceInkCoreCheck(name: "KeychainQueryTests.testExistsQuerySuppressesDataReturn", run: { KeychainQueryTests().testExistsQuerySuppressesDataReturn() }),
             VoiceInkCoreCheck(name: "KeychainQueryTests.testLoadResultReportsSuccessStatus", run: { KeychainQueryTests().testLoadResultReportsSuccessStatus() }),
+            VoiceInkCoreCheck(name: "AudioInputPriorityPolicyTests.testAudioInputModePreservesRawValuesDefaultAndOrder", run: { AudioInputPriorityPolicyTests().testAudioInputModePreservesRawValuesDefaultAndOrder() }),
+            VoiceInkCoreCheck(name: "AudioInputPriorityPolicyTests.testAudioInputModePreservesSettingsPresentation", run: { AudioInputPriorityPolicyTests().testAudioInputModePreservesSettingsPresentation() }),
             VoiceInkCoreCheck(name: "AudioInputPriorityPolicyTests.testAddingPriorityDeviceAppendsNextPriorityAndKeepsDuplicatesNoOp", run: { AudioInputPriorityPolicyTests().testAddingPriorityDeviceAppendsNextPriorityAndKeepsDuplicatesNoOp() }),
             VoiceInkCoreCheck(name: "AudioInputPriorityPolicyTests.testRemovingPriorityDeviceReindexesRemainingDevices", run: { AudioInputPriorityPolicyTests().testRemovingPriorityDeviceReindexesRemainingDevices() }),
             VoiceInkCoreCheck(name: "AudioInputPriorityPolicyTests.testMovingPriorityDeviceSwapsAndReindexesWithinBounds", run: { AudioInputPriorityPolicyTests().testMovingPriorityDeviceSwapsAndReindexesWithinBounds() }),

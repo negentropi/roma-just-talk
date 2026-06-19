@@ -47,7 +47,7 @@ struct AudioInputSettingsView: View {
                 .fontWeight(.semibold)
             
             HStack(spacing: 20) {
-                ForEach(AudioInputMode.allCases, id: \.self) { mode in
+                ForEach(VoiceInkAudioInputMode.allCases) { mode in
                     InputModeCard(
                         mode: mode,
                         isSelected: audioDeviceManager.inputMode == mode,
@@ -256,39 +256,23 @@ struct AudioInputSettingsView: View {
 }
 
 struct InputModeCard: View {
-    let mode: AudioInputMode
+    let mode: VoiceInkAudioInputMode
     let isSelected: Bool
     let action: () -> Void
 
-    private var icon: String {
-        switch mode {
-        case .systemDefault: return "display"
-        case .custom: return "mic.circle.fill"
-        case .prioritized: return "list.number"
-        }
-    }
-
-    private var description: String {
-        switch mode {
-        case .systemDefault: return "Use your Mac's default input"
-        case .custom: return "Select a specific input device"
-        case .prioritized: return "Set up device priority order"
-        }
-    }
-    
     var body: some View {
         Button(action: action) {
             VStack(alignment: .leading, spacing: 12) {
-                Image(systemName: icon)
+                Image(systemName: mode.iconSystemName)
                     .font(.system(size: 28))
                     .symbolRenderingMode(.hierarchical)
                     .foregroundStyle(isSelected ? .blue : .secondary)
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(mode.rawValue)
+                    Text(mode.title)
                         .font(.headline)
                     
-                    Text(description)
+                    Text(mode.description)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)

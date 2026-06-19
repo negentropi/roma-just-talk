@@ -2,6 +2,28 @@ import Foundation
 @testable import VoiceInkCore
 
 final class AudioInputPriorityPolicyTests: XCTestCase {
+    func testAudioInputModePreservesRawValuesDefaultAndOrder() {
+        XCTAssertEqual(VoiceInkAudioInputMode.systemDefault.rawValue, "System Default")
+        XCTAssertEqual(VoiceInkAudioInputMode.custom.rawValue, "Custom Device")
+        XCTAssertEqual(VoiceInkAudioInputMode.prioritized.rawValue, "Prioritized")
+        XCTAssertEqual(VoiceInkAudioInputMode.defaultMode, .custom)
+        XCTAssertEqual(VoiceInkAudioInputMode.allCases, [.systemDefault, .custom, .prioritized])
+    }
+
+    func testAudioInputModePreservesSettingsPresentation() {
+        XCTAssertEqual(VoiceInkAudioInputMode.systemDefault.title, "System Default")
+        XCTAssertEqual(VoiceInkAudioInputMode.systemDefault.iconSystemName, "display")
+        XCTAssertEqual(VoiceInkAudioInputMode.systemDefault.description, "Use your Mac's default input")
+
+        XCTAssertEqual(VoiceInkAudioInputMode.custom.title, "Custom Device")
+        XCTAssertEqual(VoiceInkAudioInputMode.custom.iconSystemName, "mic.circle.fill")
+        XCTAssertEqual(VoiceInkAudioInputMode.custom.description, "Select a specific input device")
+
+        XCTAssertEqual(VoiceInkAudioInputMode.prioritized.title, "Prioritized")
+        XCTAssertEqual(VoiceInkAudioInputMode.prioritized.iconSystemName, "list.number")
+        XCTAssertEqual(VoiceInkAudioInputMode.prioritized.description, "Set up device priority order")
+    }
+
     func testAddingPriorityDeviceAppendsNextPriorityAndKeepsDuplicatesNoOp() {
         let existing = [
             VoiceInkAudioInputPriorityDevice(id: "built-in", name: "Built-in", priority: 0),

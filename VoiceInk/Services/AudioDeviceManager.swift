@@ -4,12 +4,6 @@ import AVFoundation
 import os
 import VoiceInkCore
 
-enum AudioInputMode: String, CaseIterable {
-    case systemDefault = "System Default"
-    case custom = "Custom Device"
-    case prioritized = "Prioritized"
-}
-
 class AudioDeviceManager: ObservableObject {
     private enum UserDefaultsKey {
         static let audioInputMode = "audioInputMode"
@@ -20,7 +14,7 @@ class AudioDeviceManager: ObservableObject {
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "AudioDeviceManager")
     @Published var availableDevices: [(id: AudioDeviceID, uid: String, name: String)] = []
     @Published var selectedDeviceID: AudioDeviceID?
-    @Published var inputMode: AudioInputMode = .custom
+    @Published var inputMode: VoiceInkAudioInputMode = .defaultMode
     @Published var prioritizedDevices: [VoiceInkAudioInputPriorityDevice] = []
 
     var isRecordingActive: Bool = false
@@ -31,10 +25,10 @@ class AudioDeviceManager: ObservableObject {
         loadPrioritizedDevices()
 
         if let savedMode = UserDefaults.standard.string(forKey: UserDefaultsKey.audioInputMode),
-           let mode = AudioInputMode(rawValue: savedMode) {
+           let mode = VoiceInkAudioInputMode(rawValue: savedMode) {
             inputMode = mode
         } else {
-            inputMode = .custom
+            inputMode = .defaultMode
         }
 
         loadAvailableDevices { [weak self] in
@@ -255,7 +249,7 @@ class AudioDeviceManager: ObservableObject {
             DispatchQueue.main.async {
                 self.inputMode = .custom
                 self.selectedDeviceID = id
-                UserDefaults.standard.set(AudioInputMode.custom.rawValue, forKey: UserDefaultsKey.audioInputMode)
+                UserDefaults.standard.set(VoiceInkAudioInputMode.custom.rawValue, forKey: UserDefaultsKey.audioInputMode)
                 UserDefaults.standard.set(uid, forKey: UserDefaultsKey.selectedAudioDeviceUID)
                 self.notifyDeviceChange()
             }
@@ -265,7 +259,7 @@ class AudioDeviceManager: ObservableObject {
         }
     }
 
-    func selectInputMode(_ mode: AudioInputMode) {
+    func selectInputMode(_ mode: VoiceInkAudioInputMode) {
         inputMode = mode
         UserDefaults.standard.set(mode.rawValue, forKey: UserDefaultsKey.audioInputMode)
 

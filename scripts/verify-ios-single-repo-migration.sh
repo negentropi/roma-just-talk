@@ -800,8 +800,13 @@ reject_pattern \
 
 require_pattern \
   "shared audio input priority policy lives in VoiceInkCore" \
-  'VoiceInkAudioInputPriorityDevice|VoiceInkAudioInputPriorityPolicy|VoiceInkAudioInputPriorityMoveDirection|firstAvailablePriorityDeviceID|reindexed' \
+  'VoiceInkAudioInputMode|VoiceInkAudioInputPriorityDevice|VoiceInkAudioInputPriorityPolicy|VoiceInkAudioInputPriorityMoveDirection|firstAvailablePriorityDeviceID|reindexed|defaultMode|iconSystemName' \
   VoiceInkCore/Sources/VoiceInkCore/AudioInputPriorityPolicy.swift
+
+require_pattern \
+  "macOS audio device manager uses shared input mode" \
+  'VoiceInkAudioInputMode|\.defaultMode|VoiceInkAudioInputMode\(rawValue:' \
+  VoiceInk/Services/AudioDeviceManager.swift
 
 require_pattern \
   "macOS audio device manager uses shared input priority policy" \
@@ -809,13 +814,13 @@ require_pattern \
   VoiceInk/Services/AudioDeviceManager.swift
 
 require_pattern \
-  "macOS audio input settings uses shared priority move policy" \
-  'VoiceInkAudioInputPriorityPolicy\.(sortedDevices|moveDevice)|VoiceInkAudioInputPriorityDevice' \
+  "macOS audio input settings uses shared mode and priority policy" \
+  'VoiceInkAudioInputMode\.allCases|VoiceInkAudioInputPriorityPolicy\.(sortedDevices|moveDevice)|VoiceInkAudioInputPriorityDevice|mode\.(title|iconSystemName|description)' \
   VoiceInk/Views/Settings/AudioInputSettingsView.swift
 
 reject_pattern \
-  "macOS audio input priority avoids shell-only priority mutation" \
-  'struct +PrioritizedDevice|prioritizedDevices\.sorted|sorted *\{ *\$0\.priority < \$1\.priority *\}|swapAt\(currentIndex|prioritizedDevices\.append|prioritizedDevices\.removeAll|map *\{ *\$0\.priority *\}\.max' \
+  "macOS audio input avoids shell-only mode and priority policy" \
+  'enum +AudioInputMode|"(System Default|Custom Device|Prioritized|Use your Mac'\''s default input|Select a specific input device|Set up device priority order)"|return "(display|mic\.circle\.fill|list\.number)"|struct +PrioritizedDevice|prioritizedDevices\.sorted|sorted *\{ *\$0\.priority < \$1\.priority *\}|swapAt\(currentIndex|prioritizedDevices\.append|prioritizedDevices\.removeAll|map *\{ *\$0\.priority *\}\.max' \
   VoiceInk/Services/AudioDeviceManager.swift \
   VoiceInk/Views/Settings/AudioInputSettingsView.swift
 

@@ -808,6 +808,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "WhisperRuntimeDefaultsTests.testThreadCountKeepsExistingBounds", run: { WhisperRuntimeDefaultsTests().testThreadCountKeepsExistingBounds() }),
             VoiceInkCoreCheck(name: "WhisperRuntimeDefaultsTests.testRuntimeConstantsMatchExistingWhisperWrappers", run: { WhisperRuntimeDefaultsTests().testRuntimeConstantsMatchExistingWhisperWrappers() }),
             VoiceInkCoreCheck(name: "WhisperRuntimeDefaultsTests.testRuntimeDiagnosticsPreserveExistingWhisperWrapperLogText", run: { WhisperRuntimeDefaultsTests().testRuntimeDiagnosticsPreserveExistingWhisperWrapperLogText() }),
+            VoiceInkCoreCheck(name: "WhisperRuntimeDefaultsTests.testContextRuntimePlanPreservesSimulatorAndDeviceInitializationPolicy", run: { WhisperRuntimeDefaultsTests().testContextRuntimePlanPreservesSimulatorAndDeviceInitializationPolicy() }),
             VoiceInkCoreCheck(name: "WhisperRuntimeDefaultsTests.testVADRuntimeConfigurationRequiresEnabledPreferenceAndModelPath", run: { WhisperRuntimeDefaultsTests().testVADRuntimeConfigurationRequiresEnabledPreferenceAndModelPath() }),
             VoiceInkCoreCheck(name: "WhisperRuntimeDefaultsTests.testRuntimeOptionsPreserveExistingWhisperCppFlags", run: { WhisperRuntimeDefaultsTests().testRuntimeOptionsPreserveExistingWhisperCppFlags() }),
             VoiceInkCoreCheck(name: "WhisperRuntimeDefaultsTests.testRuntimeConfigurationBuildsSharedWhisperInputs", run: { WhisperRuntimeDefaultsTests().testRuntimeConfigurationBuildsSharedWhisperInputs() }),

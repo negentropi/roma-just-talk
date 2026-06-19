@@ -35,6 +35,25 @@ final class WhisperRuntimeDefaultsTests: XCTestCase {
         XCTAssertEqual(VoiceInkWhisperRuntimeDiagnostics.vadBundleModelLoadedMessage, "VAD model loaded from bundle resources")
     }
 
+    func testContextRuntimePlanPreservesSimulatorAndDeviceInitializationPolicy() {
+        XCTAssertEqual(
+            VoiceInkWhisperContextRuntimePlan.current(environment: .simulator),
+            VoiceInkWhisperContextRuntimePlan(
+                useGPU: false,
+                flashAttention: nil,
+                diagnosticMessage: VoiceInkWhisperRuntimeDiagnostics.simulatorCPUModeMessage
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkWhisperContextRuntimePlan.current(environment: .device),
+            VoiceInkWhisperContextRuntimePlan(
+                useGPU: nil,
+                flashAttention: true,
+                diagnosticMessage: VoiceInkWhisperRuntimeDiagnostics.metalFlashAttentionMessage
+            )
+        )
+    }
+
     func testVADRuntimeConfigurationRequiresEnabledPreferenceAndModelPath() {
         XCTAssertEqual(
             VoiceInkWhisperVADRuntimeConfiguration.current(modelPath: "/tmp/vad.bin", isEnabled: true),

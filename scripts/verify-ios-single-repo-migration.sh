@@ -1144,6 +1144,27 @@ require_pattern \
   iOS/VoiceInk-ios/LibWhisper.swift
 
 require_pattern \
+  "shared local Whisper context runtime plan lives in VoiceInkCore" \
+  'VoiceInkWhisperContextRuntimePlan|useGPU: Bool\?|flashAttention: Bool\?' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperRuntimeDefaults.swift
+
+require_pattern \
+  "macOS local Whisper uses shared context runtime plan" \
+  'VoiceInkWhisperContextRuntimePlan\.current' \
+  VoiceInk/Transcription/Whisper/LibWhisper.swift
+
+require_pattern \
+  "iOS local Whisper uses shared context runtime plan" \
+  'VoiceInkWhisperContextRuntimePlan\.current' \
+  iOS/VoiceInk-ios/LibWhisper.swift
+
+reject_pattern \
+  "local Whisper adapters avoid shell-only context runtime policy" \
+  'params\.(use_gpu|flash_attn) = (false|true)|#if targetEnvironment\(simulator\)' \
+  VoiceInk/Transcription/Whisper/LibWhisper.swift \
+  iOS/VoiceInk-ios/LibWhisper.swift
+
+require_pattern \
   "shared local Whisper diagnostics live in VoiceInkCore" \
   'VoiceInkWhisperRuntimeDiagnostics|logCategory = "WhisperContext"|simulatorCPUModeMessage = "Running on the simulator, using CPU"|metalFlashAttentionMessage = "Flash attention enabled for Metal"|vadBundleModelLoadedMessage = "VAD model loaded from bundle resources"' \
   VoiceInkCore/Sources/VoiceInkCore/WhisperRuntimeDefaults.swift

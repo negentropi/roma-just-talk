@@ -151,13 +151,14 @@ actor WhisperContext {
     
     private func initializeModel(path: String) throws {
         var params = whisper_context_default_params()
-        #if targetEnvironment(simulator)
-        params.use_gpu = false
-        logger.info("\(VoiceInkWhisperRuntimeDiagnostics.simulatorCPUModeMessage, privacy: .public)")
-        #else
-        params.flash_attn = true // Enable flash attention for Metal
-        logger.info("\(VoiceInkWhisperRuntimeDiagnostics.metalFlashAttentionMessage, privacy: .public)")
-        #endif
+        let runtimePlan = VoiceInkWhisperContextRuntimePlan.current()
+        if let useGPU = runtimePlan.useGPU {
+            params.use_gpu = useGPU
+        }
+        if let flashAttention = runtimePlan.flashAttention {
+            params.flash_attn = flashAttention
+        }
+        logger.info("\(runtimePlan.diagnosticMessage, privacy: .public)")
         
         let context = whisper_init_from_file_with_params(path, params)
         if let context {

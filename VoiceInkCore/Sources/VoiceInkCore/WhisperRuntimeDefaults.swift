@@ -35,6 +35,54 @@ public enum VoiceInkWhisperRuntimeDiagnostics {
     public static let vadBundleModelLoadedMessage = "VAD model loaded from bundle resources"
 }
 
+public enum VoiceInkWhisperContextEnvironment: Equatable, Sendable {
+    case simulator
+    case device
+
+    public static var current: VoiceInkWhisperContextEnvironment {
+        #if targetEnvironment(simulator)
+        return .simulator
+        #else
+        return .device
+        #endif
+    }
+}
+
+public struct VoiceInkWhisperContextRuntimePlan: Equatable, Sendable {
+    public let useGPU: Bool?
+    public let flashAttention: Bool?
+    public let diagnosticMessage: String
+
+    public init(
+        useGPU: Bool?,
+        flashAttention: Bool?,
+        diagnosticMessage: String
+    ) {
+        self.useGPU = useGPU
+        self.flashAttention = flashAttention
+        self.diagnosticMessage = diagnosticMessage
+    }
+
+    public static func current(
+        environment: VoiceInkWhisperContextEnvironment = .current
+    ) -> VoiceInkWhisperContextRuntimePlan {
+        switch environment {
+        case .simulator:
+            return VoiceInkWhisperContextRuntimePlan(
+                useGPU: false,
+                flashAttention: nil,
+                diagnosticMessage: VoiceInkWhisperRuntimeDiagnostics.simulatorCPUModeMessage
+            )
+        case .device:
+            return VoiceInkWhisperContextRuntimePlan(
+                useGPU: nil,
+                flashAttention: true,
+                diagnosticMessage: VoiceInkWhisperRuntimeDiagnostics.metalFlashAttentionMessage
+            )
+        }
+    }
+}
+
 public struct VoiceInkWhisperRuntimeOptions: Equatable, Sendable {
     public let printRealtime: Bool
     public let printProgress: Bool

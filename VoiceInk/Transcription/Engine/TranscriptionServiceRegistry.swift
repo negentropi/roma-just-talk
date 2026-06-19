@@ -25,21 +25,21 @@ class TranscriptionServiceRegistry {
         self.modelContext = modelContext
     }
 
-    func service(for provider: ModelProvider) -> TranscriptionService {
-        switch provider {
-        case .whisper:
+    func service(for route: VoiceInkTranscriptionServiceRoute) -> TranscriptionService {
+        switch route {
+        case .localWhisper:
             return localTranscriptionService
-        case .fluidAudio:
+        case .localFluidAudio:
             return fluidAudioTranscriptionService
         case .nativeApple:
             return nativeAppleTranscriptionService
-        default:
+        case .cloud:
             return cloudTranscriptionService
         }
     }
 
     func transcribe(audioURL: URL, model: any TranscriptionModel) async throws -> String {
-        let service = service(for: model.provider)
+        let service = service(for: model.transcriptionSessionRouteFacts.serviceRoute)
         logger.debug("Transcribing with \(model.displayName, privacy: .public) using \(String(describing: type(of: service)), privacy: .public)")
         return try await service.transcribe(audioURL: audioURL, model: model)
     }
@@ -50,24 +50,25 @@ class TranscriptionServiceRegistry {
         onPartialTranscript: ((String) -> Void)? = nil,
         forceStreaming: Bool = false
     ) -> TranscriptionSession {
-        let shouldUseStreaming = forceStreaming
-            ? model.supportsStreaming
-            : VoiceInkTranscriptionStreamingPreference.shouldUseStreaming(for: model.streamingPreferenceSnapshot)
+        let routePlan = model.transcriptionSessionRouteFacts.plan(forceStreaming: forceStreaming)
 
-        if shouldUseStreaming {
+        if routePlan.usesStreaming {
+            guard let streamingAdapterKind = routePlan.streamingAdapterKind,
+                  let finalCommitTimeoutNanoseconds = routePlan.finalCommitTimeoutNanoseconds else {
+                fatalError("Streaming route plan missing streaming adapter details.")
+            }
             let streamingService = StreamingTranscriptionService(
                 modelContext: modelContext,
-                fluidAudioService: model.provider == .fluidAudio ? fluidAudioTranscriptionService : nil,
-                fluidAudioStreamingConfig: forceStreaming && model.provider == .fluidAudio ? .rollingPreload : nil,
-                finalCommitTimeoutNanoseconds: VoiceInkStreamingFinalCommitTimeout.nanoseconds(
-                    for: model.provider == .fluidAudio ? .localFluidAudio : .cloud
-                ),
+                streamingAdapterKind: streamingAdapterKind,
+                fluidAudioService: streamingAdapterKind == .localFluidAudio ? fluidAudioTranscriptionService : nil,
+                fluidAudioStreamingConfig: routePlan.usesRollingPreload ? .rollingPreload : nil,
+                finalCommitTimeoutNanoseconds: finalCommitTimeoutNanoseconds,
                 onPartialTranscript: onPartialTranscript
             )
-            let fallback = service(for: model.provider)
+            let fallback = service(for: routePlan.serviceRoute)
             return StreamingTranscriptionSession(streamingService: streamingService, fallbackService: fallback)
         } else {
-            return FileTranscriptionSession(service: service(for: model.provider))
+            return FileTranscriptionSession(service: service(for: routePlan.serviceRoute))
         }
     }
 

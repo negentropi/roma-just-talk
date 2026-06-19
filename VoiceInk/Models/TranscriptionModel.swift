@@ -98,6 +98,19 @@ extension ModelProvider {
             return .cloud
         }
     }
+
+    var transcriptionServiceRoute: VoiceInkTranscriptionServiceRoute {
+        switch self {
+        case .whisper:
+            return .localWhisper
+        case .fluidAudio:
+            return .localFluidAudio
+        case .nativeApple:
+            return .nativeApple
+        default:
+            return .cloud
+        }
+    }
 }
 
 // A unified protocol for any transcription model
@@ -138,6 +151,13 @@ extension TranscriptionModel {
             name: name,
             supportsStreaming: supportsStreaming,
             isStreamingOnly: CloudProviderRegistry.provider(for: provider)?.isStreamingOnly ?? false
+        )
+    }
+
+    var transcriptionSessionRouteFacts: VoiceInkTranscriptionSessionRouteFacts {
+        VoiceInkTranscriptionSessionRouteFacts(
+            serviceRoute: provider.transcriptionServiceRoute,
+            streamingSnapshot: streamingPreferenceSnapshot
         )
     }
 

@@ -2166,9 +2166,35 @@ reject_pattern \
   VoiceInk/Services/AudioFileTranscriptionService.swift
 
 require_pattern \
-  "macOS session creation uses shared streaming preference directly" \
-  'VoiceInkTranscriptionStreamingPreference\.shouldUseStreaming\(for: model\.streamingPreferenceSnapshot\)' \
+  "shared core owns transcription session route planning" \
+  'VoiceInkTranscription(SessionRouteFacts|SessionRoutePlan)|VoiceInkTranscriptionStreamingAdapterKind' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionStreamingPreference.swift
+
+require_pattern \
+  "macOS model adapts shared transcription session route facts" \
+  'transcription(SessionRouteFacts|ServiceRoute)' \
+  VoiceInk/Models/TranscriptionModel.swift
+
+require_pattern \
+  "macOS session creation uses shared transcription route plan" \
+  'transcriptionSessionRouteFacts\.plan\(forceStreaming: forceStreaming\)' \
   VoiceInk/Transcription/Engine/TranscriptionServiceRegistry.swift
+
+require_pattern \
+  "macOS session creation passes shared streaming adapter kind" \
+  'streamingAdapterKind: streamingAdapterKind' \
+  VoiceInk/Transcription/Engine/TranscriptionServiceRegistry.swift
+
+require_pattern \
+  "macOS streaming service uses shared streaming adapter kind" \
+  'VoiceInkTranscriptionStreamingAdapterKind|streamingAdapterKind' \
+  VoiceInk/Transcription/Streaming/StreamingTranscriptionService.swift
+
+reject_pattern \
+  "macOS streaming session route avoids shell-only FluidAudio provider checks" \
+  'model\.provider == \.fluidAudio' \
+  VoiceInk/Transcription/Engine/TranscriptionServiceRegistry.swift \
+  VoiceInk/Transcription/Streaming/StreamingTranscriptionService.swift
 
 reject_pattern \
   "macOS session creation avoids shell-only streaming support wrapper" \

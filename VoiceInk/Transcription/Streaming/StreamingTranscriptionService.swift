@@ -87,6 +87,7 @@ class StreamingTranscriptionService {
     private var state: StreamingState = .idle
     private var committedSegments: [String] = []
     private let modelContext: ModelContext
+    private let streamingAdapterKind: VoiceInkTranscriptionStreamingAdapterKind
     private let fluidAudioService: FluidAudioTranscriptionService?
     private let fluidAudioStreamingConfig: AgreementConfig?
     private let finalCommitTimeoutNanoseconds: UInt64
@@ -98,12 +99,14 @@ class StreamingTranscriptionService {
 
     init(
         modelContext: ModelContext,
+        streamingAdapterKind: VoiceInkTranscriptionStreamingAdapterKind,
         fluidAudioService: FluidAudioTranscriptionService? = nil,
         fluidAudioStreamingConfig: AgreementConfig? = nil,
         finalCommitTimeoutNanoseconds: UInt64 = VoiceInkStreamingFinalCommitTimeout.cloudNanoseconds,
         onPartialTranscript: ((String) -> Void)? = nil
     ) {
         self.modelContext = modelContext
+        self.streamingAdapterKind = streamingAdapterKind
         self.fluidAudioService = fluidAudioService
         self.fluidAudioStreamingConfig = fluidAudioStreamingConfig
         self.finalCommitTimeoutNanoseconds = finalCommitTimeoutNanoseconds
@@ -231,7 +234,8 @@ class StreamingTranscriptionService {
     // MARK: - Private
 
     private func createProvider(for model: any TranscriptionModel) -> StreamingTranscriptionProvider {
-        if model.provider == .fluidAudio {
+        switch streamingAdapterKind {
+        case .localFluidAudio:
             guard let fluidAudioService else {
                 fatalError("FluidAudioTranscriptionService required for FluidAudio streaming. Ensure it is passed to StreamingTranscriptionService.")
             }
@@ -239,12 +243,13 @@ class StreamingTranscriptionService {
                 fluidAudioService: fluidAudioService,
                 config: fluidAudioStreamingConfig ?? AgreementConfig()
             )
+        case .cloud:
+            guard let cloudProvider = CloudProviderRegistry.provider(for: model.provider),
+                  let streamingProvider = cloudProvider.makeStreamingProvider(modelContext: modelContext) else {
+                fatalError("Unsupported streaming provider: \(model.provider). Check supportsStreaming() before calling startStreaming().")
+            }
+            return streamingProvider
         }
-        guard let cloudProvider = CloudProviderRegistry.provider(for: model.provider),
-              let streamingProvider = cloudProvider.makeStreamingProvider(modelContext: modelContext) else {
-            fatalError("Unsupported streaming provider: \(model.provider). Check supportsStreaming() before calling startStreaming().")
-        }
-        return streamingProvider
     }
 
     /// Consumes audio chunks from the AsyncStream and sends them to the provider.

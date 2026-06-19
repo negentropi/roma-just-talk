@@ -891,7 +891,43 @@ public enum VoiceInkRecordingShortcutMode: String, CaseIterable, Sendable {
     }
 }
 
+public struct VoiceInkMacOSRecordingShortcutSettingsPresentation: Equatable, Sendable {
+    public let sectionTitle: String
+    public let primaryShortcutLabel: String
+    public let secondaryShortcutLabel: String
+    public let addSecondaryShortcutButtonTitle: String
+    public let emptyTapPasteLastTranscriptLabel: String
+    public let additionalSectionTitle: String
+    public let pasteLastTranscriptionOriginalLabel: String
+    public let pasteLastTranscriptionEnhancedLabel: String
+    public let retryLastTranscriptionLabel: String
+    public let cancelRecordingLabel: String
+    public let resetToDefaultHelp: String
+    public let middleClickRecordingLabel: String
+    public let activationDelayLabel: String
+    public let activationDelayUnitLabel: String
+
+    public static let macOS = VoiceInkMacOSRecordingShortcutSettingsPresentation(
+        sectionTitle: "Shortcuts",
+        primaryShortcutLabel: "Primary Shortcut",
+        secondaryShortcutLabel: "Secondary Shortcut",
+        addSecondaryShortcutButtonTitle: "Add Second Shortcut",
+        emptyTapPasteLastTranscriptLabel: "Empty Tap Pastes Last",
+        additionalSectionTitle: "Additional Shortcuts",
+        pasteLastTranscriptionOriginalLabel: "Paste Last Transcription (Original)",
+        pasteLastTranscriptionEnhancedLabel: "Paste Last Transcription (Enhanced)",
+        retryLastTranscriptionLabel: "Retry Last Transcription",
+        cancelRecordingLabel: "Cancel Recording",
+        resetToDefaultHelp: "Reset to default",
+        middleClickRecordingLabel: "Middle-Click Recording",
+        activationDelayLabel: "Activation Delay",
+        activationDelayUnitLabel: "ms"
+    )
+}
+
 public enum VoiceInkRecordingShortcutPreference {
+    public static let macOSSettingsPresentation = VoiceInkMacOSRecordingShortcutSettingsPresentation.macOS
+
     public static var registeredDefaults: [String: Any] {
         [
             VoiceInkUserDefaultsKey.isMiddleClickToggleEnabled: VoiceInkPreferenceDefault.isMiddleClickToggleEnabled,

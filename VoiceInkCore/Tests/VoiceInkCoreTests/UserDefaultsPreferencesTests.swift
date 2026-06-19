@@ -1061,6 +1061,25 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkRecordingShortcutMode.hybrid.displayName, "Hybrid")
     }
 
+    func testRecordingShortcutPreferencePreservesMacOSSettingsPresentation() {
+        let presentation = VoiceInkRecordingShortcutPreference.macOSSettingsPresentation
+
+        XCTAssertEqual(presentation.sectionTitle, "Shortcuts")
+        XCTAssertEqual(presentation.primaryShortcutLabel, "Primary Shortcut")
+        XCTAssertEqual(presentation.secondaryShortcutLabel, "Secondary Shortcut")
+        XCTAssertEqual(presentation.addSecondaryShortcutButtonTitle, "Add Second Shortcut")
+        XCTAssertEqual(presentation.emptyTapPasteLastTranscriptLabel, "Empty Tap Pastes Last")
+        XCTAssertEqual(presentation.additionalSectionTitle, "Additional Shortcuts")
+        XCTAssertEqual(presentation.pasteLastTranscriptionOriginalLabel, "Paste Last Transcription (Original)")
+        XCTAssertEqual(presentation.pasteLastTranscriptionEnhancedLabel, "Paste Last Transcription (Enhanced)")
+        XCTAssertEqual(presentation.retryLastTranscriptionLabel, "Retry Last Transcription")
+        XCTAssertEqual(presentation.cancelRecordingLabel, "Cancel Recording")
+        XCTAssertEqual(presentation.resetToDefaultHelp, "Reset to default")
+        XCTAssertEqual(presentation.middleClickRecordingLabel, "Middle-Click Recording")
+        XCTAssertEqual(presentation.activationDelayLabel, "Activation Delay")
+        XCTAssertEqual(presentation.activationDelayUnitLabel, "ms")
+    }
+
     func testRecordingShortcutPreferenceKeysDefaultsAndRegisteredDefaults() {
         XCTAssertEqual(
             VoiceInkRecordingShortcutPreference.selectionKey(for: .primary),

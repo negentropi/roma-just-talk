@@ -3326,6 +3326,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
+  "shared macOS recording shortcut settings presentation lives in VoiceInkCore" \
+  'VoiceInkMacOSRecordingShortcutSettingsPresentation|macOSSettingsPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
   "shared recording shortcut preference owns selection keys" \
   'selectionKey' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
@@ -3445,6 +3450,11 @@ require_pattern \
   'VoiceInkRecordingShortcutPreference\.middleClickActivationDelay' \
   VoiceInk/Services/SystemInfoService.swift
 
+require_pattern \
+  "macOS recording settings uses shared shortcut presentation" \
+  'VoiceInkRecordingShortcutPreference\.macOSSettingsPresentation|recordingShortcutPresentation\.(sectionTitle|primaryShortcutLabel|secondaryShortcutLabel|addSecondaryShortcutButtonTitle|emptyTapPasteLastTranscriptLabel|additionalSectionTitle|pasteLastTranscriptionOriginalLabel|pasteLastTranscriptionEnhancedLabel|retryLastTranscriptionLabel|cancelRecordingLabel|resetToDefaultHelp|middleClickRecordingLabel|activationDelayLabel|activationDelayUnitLabel)' \
+  VoiceInk/Views/Settings/SettingsView.swift
+
 reject_pattern \
   "macOS recording shortcut shells avoid raw current shortcut preference keys" \
   '"(primaryRecordingShortcut|secondaryRecordingShortcut|primaryRecordingShortcutMode|secondaryRecordingShortcutMode|isMiddleClickToggleEnabled|middleClickActivationDelay|specialShortcutPasteLastTranscriptOnEmptyTap)"|enum +(Mode|ShortcutSelection)|SpecialShortcutSettings' \
@@ -3453,9 +3463,14 @@ reject_pattern \
   VoiceInk/Shortcuts/RecordingShortcutManager.swift \
   VoiceInk/Shortcuts/ShortcutMigration.swift
 
+reject_pattern \
+  "macOS recording settings avoid shell-owned shortcut presentation copy" \
+  '"(Primary Shortcut|Secondary Shortcut|Add Second Shortcut|Empty Tap Pastes Last|Additional Shortcuts|Paste Last Transcription \(Original\)|Paste Last Transcription \(Enhanced\)|Retry Last Transcription|Cancel Recording|Reset to default|Middle-Click Recording|Activation Delay|ms)"' \
+  VoiceInk/Views/Settings/SettingsView.swift
+
 require_pattern \
   "migration checklist tracks shared recording shortcut preference gate" \
-  'macOS recording shortcut selection/mode, middle-click, and special empty-tap preferences route through `VoiceInkRecordingShortcutSelection`/`VoiceInkRecordingShortcutMode`/`VoiceInkRecordingShortcutPreference`' \
+  'macOS recording shortcut selection/mode, middle-click, special empty-tap preferences, and settings labels/help route through `VoiceInkRecordingShortcutSelection`/`VoiceInkRecordingShortcutMode`/`VoiceInkRecordingShortcutPreference`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

@@ -31,6 +31,7 @@ struct SettingsView: View {
     @State private var isMiddleClickExpanded = false
     @State private var isSoundFeedbackExpanded = false
     @State private var isRestoreClipboardExpanded = false
+    private static let recordingShortcutPresentation = VoiceInkRecordingShortcutPreference.macOSSettingsPresentation
     private static let recorderStylePresentation = VoiceInkRecorderStylePreference.macOSSettingsPresentation
     private static let recordingFeedbackPresentation = VoiceInkRecordingFeedbackPreference.macOSSettingsPresentation
     private static let pasteSettingsPresentation = VoiceInkPastePreference.macOSSettingsPresentation
@@ -40,7 +41,7 @@ struct SettingsView: View {
         Form {
             // MARK: - Shortcuts
             Section {
-                LabeledContent("Primary Shortcut") {
+                LabeledContent(Self.recordingShortcutPresentation.primaryShortcutLabel) {
                     HStack(spacing: 8) {
                         Spacer()
                         shortcutModePicker(binding: $recordingShortcutManager.primaryRecordingShortcutMode)
@@ -53,7 +54,7 @@ struct SettingsView: View {
                 }
 
                 if recordingShortcutManager.secondaryRecordingShortcut != .none {
-                    LabeledContent("Secondary Shortcut") {
+                    LabeledContent(Self.recordingShortcutPresentation.secondaryShortcutLabel) {
                         HStack(spacing: 8) {
                             Spacer()
                             shortcutModePicker(binding: $recordingShortcutManager.secondaryRecordingShortcutMode)
@@ -74,42 +75,45 @@ struct SettingsView: View {
                 }
 
                 if recordingShortcutManager.secondaryRecordingShortcut == .none {
-                    Button("Add Second Shortcut") {
+                    Button(Self.recordingShortcutPresentation.addSecondaryShortcutButtonTitle) {
                         withAnimation { recordingShortcutManager.secondaryRecordingShortcut = .custom }
                     }
                 }
 
                 if usesSpecialShortcutMode {
-                    Toggle("Empty Tap Pastes Last", isOn: $recordingShortcutManager.specialShortcutPasteLastTranscriptOnEmptyTap)
+                    Toggle(
+                        Self.recordingShortcutPresentation.emptyTapPasteLastTranscriptLabel,
+                        isOn: $recordingShortcutManager.specialShortcutPasteLastTranscriptOnEmptyTap
+                    )
                 }
             } header: {
-                Text("Shortcuts")
+                Text(Self.recordingShortcutPresentation.sectionTitle)
             }
 
             // MARK: - Additional Shortcuts
-            Section("Additional Shortcuts") {
-                LabeledContent("Paste Last Transcription (Original)") {
+            Section(Self.recordingShortcutPresentation.additionalSectionTitle) {
+                LabeledContent(Self.recordingShortcutPresentation.pasteLastTranscriptionOriginalLabel) {
                     ShortcutRecorder(action: .pasteLastTranscription) {
                         recordingShortcutManager.updateShortcutStatus()
                     }
                         .controlSize(.small)
                 }
 
-                LabeledContent("Paste Last Transcription (Enhanced)") {
+                LabeledContent(Self.recordingShortcutPresentation.pasteLastTranscriptionEnhancedLabel) {
                     ShortcutRecorder(action: .pasteLastEnhancement) {
                         recordingShortcutManager.updateShortcutStatus()
                     }
                         .controlSize(.small)
                 }
 
-                LabeledContent("Retry Last Transcription") {
+                LabeledContent(Self.recordingShortcutPresentation.retryLastTranscriptionLabel) {
                     ShortcutRecorder(action: .retryLastTranscription) {
                         recordingShortcutManager.updateShortcutStatus()
                     }
                         .controlSize(.small)
                 }
 
-                LabeledContent("Cancel Recording") {
+                LabeledContent(Self.recordingShortcutPresentation.cancelRecordingLabel) {
                     HStack(spacing: 8) {
                         ShortcutRecorder(
                             action: .cancelRecorder,
@@ -128,7 +132,7 @@ struct SettingsView: View {
                             Image(systemName: "arrow.counterclockwise")
                         }
                         .buttonStyle(.plain)
-                        .help("Reset to default")
+                        .help(Self.recordingShortcutPresentation.resetToDefaultHelp)
                     }
                 }
                 .onReceive(NotificationCenter.default.publisher(for: ShortcutStore.shortcutDidChange)) { notification in
@@ -140,9 +144,9 @@ struct SettingsView: View {
                 ExpandableSettingsRow(
                     isExpanded: $isMiddleClickExpanded,
                     isEnabled: $recordingShortcutManager.isMiddleClickToggleEnabled,
-                    label: "Middle-Click Recording"
+                    label: Self.recordingShortcutPresentation.middleClickRecordingLabel
                 ) {
-                    LabeledContent("Activation Delay") {
+                    LabeledContent(Self.recordingShortcutPresentation.activationDelayLabel) {
                         HStack {
                             TextField("", value: $recordingShortcutManager.middleClickActivationDelay, formatter: {
                                 let formatter = NumberFormatter()
@@ -151,7 +155,7 @@ struct SettingsView: View {
                             }())
                                 .textFieldStyle(.roundedBorder)
                                 .frame(width: 60)
-                            Text("ms")
+                            Text(Self.recordingShortcutPresentation.activationDelayUnitLabel)
                                 .foregroundColor(.secondary)
                         }
                     }

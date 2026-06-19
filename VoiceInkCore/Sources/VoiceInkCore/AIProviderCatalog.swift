@@ -49,6 +49,16 @@ public struct VoiceInkAIEnhancementAPIKeyDraft: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkAIEnhancementCredentialState: Equatable, Sendable {
+    public let apiKey: String
+    public let isAPIKeyValid: Bool
+
+    public init(apiKey: String, isAPIKeyValid: Bool) {
+        self.apiKey = apiKey
+        self.isAPIKeyValid = isAPIKeyValid
+    }
+}
+
 public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
     public static let missingVerificationCandidateMessage = "Environment variable is missing or empty"
     public static let invalidOrMissingBaseURLConfigurationMessage = "Invalid or missing base URL configuration"
@@ -131,6 +141,24 @@ public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
         case .anthropic, .assemblyAI, .cerebras, .custom, .deepgram, .elevenLabs, .gemini, .groq, .mistral, .openAI, .openRouter, .soniox, .speechmatics:
             return true
         }
+    }
+
+    public func textEnhancementCredentialState(
+        savedAPIKey: String?,
+        isLocalCLIConfigured: Bool
+    ) -> VoiceInkAIEnhancementCredentialState {
+        guard requiresUserAPIKey else {
+            return VoiceInkAIEnhancementCredentialState(
+                apiKey: "",
+                isAPIKeyValid: self == .localCLI ? isLocalCLIConfigured : true
+            )
+        }
+
+        guard let savedAPIKey else {
+            return VoiceInkAIEnhancementCredentialState(apiKey: "", isAPIKeyValid: false)
+        }
+
+        return VoiceInkAIEnhancementCredentialState(apiKey: savedAPIKey, isAPIKeyValid: true)
     }
 
     public var isSelectableForTextEnhancement: Bool {

@@ -53,6 +53,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementProviderStoredValueParsingIsShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementProviderStoredValueParsingIsShared() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementProviderMapsToSharedModelProvider", run: { AIProviderCatalogTests().testMacOSAIEnhancementProviderMapsToSharedModelProvider() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementProviderAPIKeyRequirementIsShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementProviderAPIKeyRequirementIsShared() }),
+            VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementCredentialStateIsShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementCredentialStateIsShared() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testProviderAPIKeyVerificationProgressPresentsSharedFeedback", run: { AIProviderCatalogTests().testProviderAPIKeyVerificationProgressPresentsSharedFeedback() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementAPIKeyDraftUsesSharedBlankPolicy", run: { AIProviderCatalogTests().testMacOSAIEnhancementAPIKeyDraftUsesSharedBlankPolicy() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementAPIKeyDraftResolvesEnvironmentReferences", run: { AIProviderCatalogTests().testMacOSAIEnhancementAPIKeyDraftResolvesEnvironmentReferences() }),

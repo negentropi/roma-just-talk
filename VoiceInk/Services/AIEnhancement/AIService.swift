@@ -21,22 +21,11 @@ class AIService: ObservableObject {
                 selectedProvider.rawValue,
                 to: userDefaults
             )
-            if selectedProvider.requiresUserAPIKey {
-                if let savedKey = APIKeyManager.shared.getAPIKey(forProvider: selectedProvider.rawValue) {
-                    self.apiKey = savedKey
-                    self.isAPIKeyValid = true
-                } else {
-                    self.apiKey = ""
-                    self.isAPIKeyValid = false
-                }
-            } else {
-                self.apiKey = ""
-                self.isAPIKeyValid = selectedProvider == .localCLI ? localCLIService.isConfigured : true
-                if selectedProvider == .ollama {
-                    Task {
-                        await ollamaService.checkConnection()
-                        await ollamaService.refreshModels()
-                    }
+            applyCredentialStateForSelectedProvider()
+            if selectedProvider == .ollama {
+                Task {
+                    await ollamaService.checkConnection()
+                    await ollamaService.refreshModels()
                 }
             }
             NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
@@ -95,17 +84,23 @@ class AIService: ObservableObject {
             from: userDefaults
         )
 
-        if selectedProvider.requiresUserAPIKey {
-            if let savedKey = APIKeyManager.shared.getAPIKey(forProvider: selectedProvider.rawValue) {
-                self.apiKey = savedKey
-                self.isAPIKeyValid = true
-            }
-        } else {
-            self.isAPIKeyValid = selectedProvider == .localCLI ? localCLIService.isConfigured : true
-        }
+        applyCredentialStateForSelectedProvider()
 
         loadSavedModelSelections()
         loadSavedOpenRouterModels()
+    }
+
+    private func applyCredentialStateForSelectedProvider() {
+        let savedKey = selectedProvider.requiresUserAPIKey
+            ? APIKeyManager.shared.getAPIKey(forProvider: selectedProvider.rawValue)
+            : nil
+        let credentialState = selectedProvider.textEnhancementCredentialState(
+            savedAPIKey: savedKey,
+            isLocalCLIConfigured: localCLIService.isConfigured
+        )
+
+        apiKey = credentialState.apiKey
+        isAPIKeyValid = credentialState.isAPIKeyValid
     }
     
     private func loadSavedModelSelections() {

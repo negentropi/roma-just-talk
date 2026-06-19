@@ -54,6 +54,44 @@ final class AIProviderCatalogTests: XCTestCase {
         XCTAssertTrue(VoiceInkAIEnhancementProviderKind.anthropic.requiresUserAPIKey)
     }
 
+    func testMacOSAIEnhancementCredentialStateIsShared() {
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.groq.textEnhancementCredentialState(
+                savedAPIKey: "saved-groq-key",
+                isLocalCLIConfigured: false
+            ),
+            VoiceInkAIEnhancementCredentialState(apiKey: "saved-groq-key", isAPIKeyValid: true)
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.groq.textEnhancementCredentialState(
+                savedAPIKey: nil,
+                isLocalCLIConfigured: true
+            ),
+            VoiceInkAIEnhancementCredentialState(apiKey: "", isAPIKeyValid: false)
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.localCLI.textEnhancementCredentialState(
+                savedAPIKey: "ignored-key",
+                isLocalCLIConfigured: true
+            ),
+            VoiceInkAIEnhancementCredentialState(apiKey: "", isAPIKeyValid: true)
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.localCLI.textEnhancementCredentialState(
+                savedAPIKey: nil,
+                isLocalCLIConfigured: false
+            ),
+            VoiceInkAIEnhancementCredentialState(apiKey: "", isAPIKeyValid: false)
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.ollama.textEnhancementCredentialState(
+                savedAPIKey: nil,
+                isLocalCLIConfigured: false
+            ),
+            VoiceInkAIEnhancementCredentialState(apiKey: "", isAPIKeyValid: true)
+        )
+    }
+
     func testProviderAPIKeyVerificationProgressPresentsSharedFeedback() {
         XCTAssertTrue(VoiceInkProviderAPIKeyVerificationProgress.verifying.isVerifying)
         XCTAssertFalse(VoiceInkProviderAPIKeyVerificationProgress.idle.isVerifying)

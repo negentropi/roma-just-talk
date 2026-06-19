@@ -199,6 +199,7 @@ require_file iOS/VoiceInk-ios/Assets.xcassets/AppIcon.appiconset/Contents.json
 for icon in 20.png 29.png 40.png 50.png 57.png 58.png 60.png 72.png 76.png 80.png 87.png 100.png 114.png 120.png 144.png 152.png 167.png 180.png 1024.png; do
   require_file "iOS/VoiceInk-ios/Assets.xcassets/AppIcon.appiconset/$icon"
 done
+reject_file iOS/.github/workflows/deploy.yml
 
 section "obsolete iOS clone-side duplicates stay deleted"
 for file in "${obsolete_ios_clone_files[@]}"; do

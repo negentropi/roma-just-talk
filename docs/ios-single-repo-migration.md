@@ -11,6 +11,7 @@
 - iOS non-Swift app artifacts: `iOS/VoiceInk-ios/PrivacyInfo.xcprivacy`, `iOS/VoiceInk-ios/Assets.xcassets/`, and `iOS/VoiceInk-ios/Resources/ggml-silero-v5.1.2.bin`
 - shared Swift package: `VoiceInkCore/`
 - workspace entry for both app projects: `VoiceInk.xcworkspace`
+- standalone clone workflow artifacts such as `iOS/.github/workflows/deploy.yml` are intentionally absent; repo automation belongs at `VoiceInk/.github/` if it is needed later.
 
 Both app projects reference the in-repo package:
 
@@ -329,22 +330,23 @@ scripts/verify-ios-single-repo-migration.sh --full-build
 15. Obsolete clone-side Swift duplicates remain absent from `iOS/VoiceInk-ios/`.
 16. When `../VoiceInk-iOS` exists, every sibling-only Swift file under `VoiceInk-ios/` is one of the documented obsolete/replaced files above, and the sibling keyboard/unit-test/UI-test target folders have no sibling-only Swift files.
 17. Legacy same-file clone shims remain absent from the in-repo iOS app and keyboard: `TranscriptionServiceFactory`, `LLMPostProcessor`, the old local `RecordingState`, raw `voiceink://record` URL construction, `Open VoiceInk` keyboard copy, and old `AppSettings` effective-provider/model accessors.
-18. iOS recording background transcription delegates stored-audio completion/failure updates to `VoiceInkMutableTranscriptionRecord.retranscribeStoredAudio` instead of duplicating record-state writes in `RecordingManager`.
-19. macOS and iOS live recording build pending rows through `VoiceInkRecordingTranscriptionDraft.pending`, and macOS canceled recordings build through `VoiceInkRecordingTranscriptionDraft.canceled`.
-20. iOS live recording delegates timestamped filename construction and PCM16 recorder format constants to `VoiceInkStoredAudioFile` and `VoiceInkPCM16Audio`.
-21. iOS note detail and list deletion route stored-audio availability and deletion through `VoiceInkStoredAudioRecord`/`VoiceInkStoredAudioAvailability`.
-22. iOS recording/retry mode selection, recording sheet controls, settings mode summaries, and mode-configuration form copy route presentation through `VoiceInkModeSelectionPresentation`, `VoiceInkRecordingSheetPresentation`, `VoiceInkModeSummaryPresentation`, and `VoiceInkModeFormPresentation`.
-23. iOS local model row status, operation confirmations, and failure alerts route through `VoiceInkWhisperModelDownloadRowPresentation`, `VoiceInkWhisperModelOperationConfirmationPresentation`, and `VoiceInkWhisperModelOperationAlertPresentation`.
-24. iOS API-key form copy and list status route through `VoiceInkProviderAPIKeyFormPresentation` and `VoiceInkProviderAPIKeyListRowPresentation`.
-25. macOS and iOS Keychain adapters route shared generic-password query policy through `VoiceInkKeychainQuery`, with duplicate service/syncability/data-protection query constants out of platform adapters.
-26. macOS and iOS local Whisper wrappers both consume shared runtime, VAD resource, and PCM16 WAV sample policies.
-27. macOS AI-enhancement diagnostics/context toggles, iOS audio-session timeout presentation, and first-run onboarding storage checks stay routed through shared `VoiceInkCore` preference Modules.
-28. macOS and iOS transcription-cleanup settings labels route through `VoiceInkTranscriptionCleanupPresentation`, and filler-word insertion stays routed through `VoiceInkFillerWords.insertPlan`, with duplicate copy out of platform views.
-29. iOS dictionary settings plus macOS dictionary form/chrome, quick-add, word-replacement guidance, edit-sheet, and list/row copy route through `VoiceInkDictionarySettingsPresentation`/`VoiceInkDictionaryQuickAddPresentation`/`VoiceInkWordReplacementInfoPresentation`/`VoiceInkWordReplacementEditPresentation`/`VoiceInkVocabularyListPresentation`/`VoiceInkWordReplacementListPresentation`, with duplicate labels/placeholders/help text out of platform views.
-30. macOS Native Apple language-display fallback stays routed through `VoiceInkLanguageCatalog.nativeAppleDisplayName`.
-31. iOS note-list dashboard and fastest-model summaries stay routed through `VoiceInkNoteListSummaryPresentation`.
-32. macOS and iOS duration-dependent UI stays routed through `VoiceInkDurationPresentation.shouldShowPositiveDuration`.
-33. macOS and iOS audio playback-rate controls stay routed through `VoiceInkAudioPlaybackRate`.
-34. A real Xcode toolchain is selected and both app targets build.
+18. Standalone clone CI/web deployment files such as `iOS/.github/workflows/deploy.yml` remain absent from the in-repo iOS subtree.
+19. iOS recording background transcription delegates stored-audio completion/failure updates to `VoiceInkMutableTranscriptionRecord.retranscribeStoredAudio` instead of duplicating record-state writes in `RecordingManager`.
+20. macOS and iOS live recording build pending rows through `VoiceInkRecordingTranscriptionDraft.pending`, and macOS canceled recordings build through `VoiceInkRecordingTranscriptionDraft.canceled`.
+21. iOS live recording delegates timestamped filename construction and PCM16 recorder format constants to `VoiceInkStoredAudioFile` and `VoiceInkPCM16Audio`.
+22. iOS note detail and list deletion route stored-audio availability and deletion through `VoiceInkStoredAudioRecord`/`VoiceInkStoredAudioAvailability`.
+23. iOS recording/retry mode selection, recording sheet controls, settings mode summaries, and mode-configuration form copy route presentation through `VoiceInkModeSelectionPresentation`, `VoiceInkRecordingSheetPresentation`, `VoiceInkModeSummaryPresentation`, and `VoiceInkModeFormPresentation`.
+24. iOS local model row status, operation confirmations, and failure alerts route through `VoiceInkWhisperModelDownloadRowPresentation`, `VoiceInkWhisperModelOperationConfirmationPresentation`, and `VoiceInkWhisperModelOperationAlertPresentation`.
+25. iOS API-key form copy and list status route through `VoiceInkProviderAPIKeyFormPresentation` and `VoiceInkProviderAPIKeyListRowPresentation`.
+26. macOS and iOS Keychain adapters route shared generic-password query policy through `VoiceInkKeychainQuery`, with duplicate service/syncability/data-protection query constants out of platform adapters.
+27. macOS and iOS local Whisper wrappers both consume shared runtime, VAD resource, and PCM16 WAV sample policies.
+28. macOS AI-enhancement diagnostics/context toggles, iOS audio-session timeout presentation, and first-run onboarding storage checks stay routed through shared `VoiceInkCore` preference Modules.
+29. macOS and iOS transcription-cleanup settings labels route through `VoiceInkTranscriptionCleanupPresentation`, and filler-word insertion stays routed through `VoiceInkFillerWords.insertPlan`, with duplicate copy out of platform views.
+30. iOS dictionary settings plus macOS dictionary form/chrome, quick-add, word-replacement guidance, edit-sheet, and list/row copy route through `VoiceInkDictionarySettingsPresentation`/`VoiceInkDictionaryQuickAddPresentation`/`VoiceInkWordReplacementInfoPresentation`/`VoiceInkWordReplacementEditPresentation`/`VoiceInkVocabularyListPresentation`/`VoiceInkWordReplacementListPresentation`, with duplicate labels/placeholders/help text out of platform views.
+31. macOS Native Apple language-display fallback stays routed through `VoiceInkLanguageCatalog.nativeAppleDisplayName`.
+32. iOS note-list dashboard and fastest-model summaries stay routed through `VoiceInkNoteListSummaryPresentation`.
+33. macOS and iOS duration-dependent UI stays routed through `VoiceInkDurationPresentation.shouldShowPositiveDuration`.
+34. macOS and iOS audio playback-rate controls stay routed through `VoiceInkAudioPlaybackRate`.
+35. A real Xcode toolchain is selected and both app targets build.
 
 Current local blocker: `xcode-select -p` points to `/Library/Developer/CommandLineTools`, and the previously used external Xcode volume is not mounted. Full target builds are still environment-blocked until a real Xcode is selected; macOS `VoiceInk` also needs `/Users/atalphalnmomhappyhouse/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework`, and iOS `VoiceInk-ios` needs the iOS 26.2 platform installed. Until those are present, use `swift run VoiceInkCoreChecks` plus the static parse/lint gates above for local proof.

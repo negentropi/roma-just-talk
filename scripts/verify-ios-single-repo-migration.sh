@@ -3087,6 +3087,11 @@ require_pattern \
   VoiceInk/PowerMode/PowerModeView.swift
 
 require_pattern \
+  "macOS Power Mode add button consumes shared form title" \
+  'VoiceInkPowerModeConfigurationMode\.add\.title' \
+  VoiceInk/PowerMode/PowerModeView.swift
+
+require_pattern \
   "macOS Power Mode config form consumes shared save mode" \
   'VoiceInkPowerModeConfigurationMode|mode\.saveMode' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
@@ -3096,6 +3101,11 @@ reject_pattern \
   'enum +ConfigurationMode|powerModeSaveMode' \
   VoiceInk/PowerMode/PowerModeView.swift \
   VoiceInk/PowerMode/PowerModeConfigView.swift
+
+reject_pattern \
+  "macOS Power Mode add button avoids shell-only form title" \
+  '"Add Power Mode"' \
+  VoiceInk/PowerMode/PowerModeView.swift
 
 require_pattern \
   "macOS Power Mode cards consume shared trigger config records" \

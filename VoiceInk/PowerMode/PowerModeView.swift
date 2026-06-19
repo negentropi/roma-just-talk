@@ -42,7 +42,7 @@ struct PowerModeView: View {
                                 HStack(spacing: 6) {
                                     Image(systemName: "plus")
                                         .font(.system(size: 12, weight: .medium))
-                                    Text("Add Power Mode")
+                                    Text(VoiceInkPowerModeConfigurationMode.add.title)
                                         .font(.system(size: 13, weight: .medium))
                                 }
                                 .foregroundColor(.white)

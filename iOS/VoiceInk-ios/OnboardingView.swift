@@ -32,6 +32,7 @@ struct OnboardingView: View {
 
 struct WelcomeOnboardingView: View {
     @Binding var currentStep: Int
+    private let presentation = VoiceInkIOSOnboardingPresentation.welcome
     
     var body: some View {
         VStack(spacing: 0) {
@@ -45,12 +46,12 @@ struct WelcomeOnboardingView: View {
                     .shadow(color: Color.black.opacity(0.1), radius: 10, y: 5)
                 
                 VStack(spacing: 12) {
-                    Text(VoiceInkAppIdentity.welcomeTitle)
+                    Text(presentation.title)
                         .font(.largeTitle)
                         .fontWeight(.bold)
                         .multilineTextAlignment(.center)
-                    
-                    Text("Transform your thoughts into text effortlessly.")
+
+                    Text(presentation.subtitle)
                         .font(.headline)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
@@ -62,23 +63,13 @@ struct WelcomeOnboardingView: View {
             
             // Features
             VStack(alignment: .leading, spacing: 24) {
-                FeatureRow(
-                    icon: "mic.fill",
-                    title: "Instant Recording",
-                    description: "Capture your thoughts with a single tap, anytime, anywhere."
-                )
-                
-                FeatureRow(
-                    icon: "bolt.fill",
-                    title: "Accurate Transcription",
-                    description: "Leverage powerful AI models for precise speech-to-text conversion."
-                )
-                
-                FeatureRow(
-                    icon: "icloud.slash.fill",
-                    title: "Works Offline",
-                    description: "Transcribe without an internet connection using local models."
-                )
+                ForEach(presentation.features, id: \.title) { feature in
+                    FeatureRow(
+                        icon: feature.iconSystemName,
+                        title: feature.title,
+                        description: feature.description
+                    )
+                }
             }
             .padding(.horizontal, 32)
             
@@ -86,7 +77,7 @@ struct WelcomeOnboardingView: View {
             
             // Continue Button
             VStack {
-                Button("Get Started") {
+                Button(presentation.primaryButtonTitle) {
                     withAnimation(.easeInOut(duration: 0.3)) {
                         currentStep = 1
                     }
@@ -104,6 +95,7 @@ struct ModelDownloadOnboardingView: View {
     @Binding var currentStep: Int
     @StateObject private var modelManager = LocalModelManager.shared
     @State private var showDownloadConfirmation = false
+    private let onboardingPresentation = VoiceInkIOSOnboardingPresentation.modelDownload
     
     var baseModel = VoiceInkWhisperModelFiles.baseModel
 
@@ -132,17 +124,17 @@ struct ModelDownloadOnboardingView: View {
             
             // Header
             VStack(spacing: 24) {
-                Image(systemName: "cpu")
+                Image(systemName: onboardingPresentation.iconSystemName)
                     .font(.system(size: 70))
                     .foregroundColor(.accentColor)
                 
                 VStack(spacing: 12) {
-                    Text("Offline Transcription")
+                    Text(onboardingPresentation.title)
                         .font(.largeTitle)
                         .fontWeight(.bold)
                         .multilineTextAlignment(.center)
                     
-                    Text("Download a local model to transcribe audio even without an internet connection.")
+                    Text(onboardingPresentation.subtitle)
                         .font(.headline)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
@@ -215,7 +207,7 @@ struct ModelDownloadOnboardingView: View {
                         .disabled(true)
 
                 case .downloaded:
-                    Button("Continue") {
+                    Button(onboardingPresentation.continueButtonTitle) {
                         withAnimation(.easeInOut(duration: 0.3)) {
                             currentStep = 2
                         }
@@ -266,6 +258,7 @@ struct ModelDownloadOnboardingView: View {
 
 struct ReadyOnboardingView: View {
     @Binding var isOnboardingComplete: Bool
+    private let presentation = VoiceInkIOSOnboardingPresentation.ready
     
     var body: some View {
         VStack(spacing: 0) {
@@ -273,16 +266,16 @@ struct ReadyOnboardingView: View {
             
             // Success Icon & Text
             VStack(spacing: 24) {
-                Image(systemName: "checkmark.circle.fill")
+                Image(systemName: presentation.iconSystemName)
                     .font(.system(size: 70))
                     .foregroundColor(.green)
                 
                 VStack(spacing: 12) {
-                    Text("You're All Set!")
+                    Text(presentation.title)
                         .font(.largeTitle)
                         .fontWeight(.bold)
                     
-                    Text("Start recording your thoughts and ideas.")
+                    Text(presentation.subtitle)
                         .font(.headline)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
@@ -294,23 +287,13 @@ struct ReadyOnboardingView: View {
             
             // How it works
             VStack(alignment: .leading, spacing: 24) {
-                HowItWorksStep(
-                    number: "1",
-                    title: "Record",
-                    description: "Tap the record button to capture your thoughts."
-                )
-                
-                HowItWorksStep(
-                    number: "2",
-                    title: "Transcribe",
-                    description: "AI converts your speech to text automatically."
-                )
-                
-                HowItWorksStep(
-                    number: "3",
-                    title: "Save & Organize",
-                    description: "Your notes are saved and ready for review."
-                )
+                ForEach(presentation.steps, id: \.number) { step in
+                    HowItWorksStep(
+                        number: step.number,
+                        title: step.title,
+                        description: step.description
+                    )
+                }
             }
             .padding(.horizontal, 32)
             
@@ -318,7 +301,7 @@ struct ReadyOnboardingView: View {
             
             // Start Button
             VStack {
-                Button(VoiceInkAppIdentity.startUsingTitle) {
+                Button(presentation.primaryButtonTitle) {
                     completeOnboarding()
                 }
                 .buttonStyle(OnboardingButtonStyle())

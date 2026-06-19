@@ -28,7 +28,7 @@ class LastTranscriptionService: ObservableObject {
         guard let lastTranscription = getLastTranscription(from: modelContext) else {
             Task { @MainActor in
                 NotificationManager.shared.showNotification(
-                    title: "No transcription available",
+                    title: VoiceInkTranscriptPresentation.noTranscriptionAvailableTitle,
                     type: .error
                 )
             }
@@ -45,12 +45,12 @@ class LastTranscriptionService: ObservableObject {
         Task { @MainActor in
             if success {
                 NotificationManager.shared.showNotification(
-                    title: "Last transcription copied",
+                    title: VoiceInkTranscriptPresentation.lastTranscriptionCopiedTitle,
                     type: .success
                 )
             } else {
                 NotificationManager.shared.showNotification(
-                    title: "Failed to copy transcription",
+                    title: VoiceInkTranscriptPresentation.failedToCopyTranscriptionTitle,
                     type: .error
                 )
             }
@@ -61,7 +61,7 @@ class LastTranscriptionService: ObservableObject {
         guard let lastTranscription = getLastTranscription(from: modelContext, excluding: excludedID) else {
             Task { @MainActor in
                 NotificationManager.shared.showNotification(
-                    title: "No transcription available",
+                    title: VoiceInkTranscriptPresentation.noTranscriptionAvailableTitle,
                     type: .error
                 )
             }
@@ -79,7 +79,7 @@ class LastTranscriptionService: ObservableObject {
         guard let lastTranscription = getLastTranscription(from: modelContext) else {
             Task { @MainActor in
                 NotificationManager.shared.showNotification(
-                    title: "No transcription available",
+                    title: VoiceInkTranscriptPresentation.noTranscriptionAvailableTitle,
                     type: .error
                 )
             }
@@ -117,7 +117,9 @@ class LastTranscriptionService: ObservableObject {
             guard let lastTranscription = getLastTranscription(from: modelContext),
                   let audioURL = lastTranscription.existingAudioFileURL() else {
                 NotificationManager.shared.showNotification(
-                    title: "Cannot retry: \(VoiceInkErrorDescription.text(for: VoiceInkEngineError.audioFileNotFound))",
+                    title: VoiceInkTranscriptPresentation.cannotRetryTitle(
+                        errorDescription: VoiceInkErrorDescription.text(for: VoiceInkEngineError.audioFileNotFound)
+                    ),
                     type: .error
                 )
                 return
@@ -146,13 +148,13 @@ class LastTranscriptionService: ObservableObject {
                 ClipboardManager.copyToClipboard(textToCopy)
 
                 NotificationManager.shared.showNotification(
-                    title: "Copied to clipboard",
+                    title: VoiceInkTranscriptPresentation.copiedToClipboardTitle,
                     type: .success
                 )
             } catch {
                 let errorDescription = VoiceInkErrorDescription.text(for: error)
                 NotificationManager.shared.showNotification(
-                    title: "Retry failed: \(errorDescription)",
+                    title: VoiceInkTranscriptPresentation.retryFailedTitle(errorDescription: errorDescription),
                     type: .error
                 )
             }

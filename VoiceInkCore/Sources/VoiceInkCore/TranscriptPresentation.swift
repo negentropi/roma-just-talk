@@ -197,6 +197,10 @@ public enum VoiceInkTranscriptPresentation {
     public static let retranscribingDisplayText = "Retranscribing..."
     public static let retryTranscriptionButtonTitle = "Retry Transcription"
     public static let retryTranscriptionSystemImageName = "arrow.clockwise"
+    public static let noTranscriptionAvailableTitle = "No transcription available"
+    public static let lastTranscriptionCopiedTitle = "Last transcription copied"
+    public static let failedToCopyTranscriptionTitle = "Failed to copy transcription"
+    public static let copiedToClipboardTitle = "Copied to clipboard"
 
     public static func preferredText(rawText: String, enhancedText: String?) -> String? {
         if let enhancedText, !enhancedText.isEmpty {
@@ -230,6 +234,14 @@ public enum VoiceInkTranscriptPresentation {
 
     public static func failedTranscriptText(reason: String) -> String {
         "Transcription Failed: \(reason)"
+    }
+
+    public static func cannotRetryTitle(errorDescription: String) -> String {
+        "Cannot retry: \(errorDescription)"
+    }
+
+    public static func retryFailedTitle(errorDescription: String) -> String {
+        "Retry failed: \(errorDescription)"
     }
 
     public static func matchesSearch(rawText: String, enhancedText: String?, query: String) -> Bool {

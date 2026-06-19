@@ -801,6 +801,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
 
 require_pattern \
+  "shared last-transcription notification copy lives in VoiceInkCore" \
+  'noTranscriptionAvailableTitle|lastTranscriptionCopiedTitle|failedToCopyTranscriptionTitle|cannotRetryTitle|retryFailedTitle' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+require_pattern \
   "iOS note row uses shared transcript status presentation" \
   'VoiceInkTranscriptPresentation\.statusPresentation' \
   iOS/VoiceInk-ios/NoteRowView.swift
@@ -2275,6 +2280,11 @@ require_pattern \
   VoiceInk/Services/LastTranscriptionService.swift
 
 require_pattern \
+  "macOS last-transcription notifications use shared transcript presentation" \
+  'VoiceInkTranscriptPresentation\.(noTranscriptionAvailableTitle|lastTranscriptionCopiedTitle|failedToCopyTranscriptionTitle|cannotRetryTitle|copiedToClipboardTitle|retryFailedTitle)' \
+  VoiceInk/Services/LastTranscriptionService.swift
+
+require_pattern \
   "macOS audio player retranscribe uses shared no-model error vocabulary" \
   'VoiceInkEngineError\.noTranscriptionModelSelected' \
   VoiceInk/Views/AudioPlayerView.swift
@@ -2284,6 +2294,11 @@ reject_pattern \
   'Cannot retry: Audio file not found|No transcription model selected' \
   VoiceInk/Services/LastTranscriptionService.swift \
   VoiceInk/Views/AudioPlayerView.swift
+
+reject_pattern \
+  "macOS last-transcription notifications avoid shell-only copy" \
+  '"No transcription available"|"Last transcription copied"|"Failed to copy transcription"|"Copied to clipboard"|"Cannot retry:|"Retry failed:' \
+  VoiceInk/Services/LastTranscriptionService.swift
 
 require_pattern \
   "macOS engine canceled recording uses shared canceled draft factory" \

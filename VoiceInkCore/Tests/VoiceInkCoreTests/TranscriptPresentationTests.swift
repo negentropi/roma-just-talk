@@ -427,6 +427,21 @@ final class TranscriptPresentationTests: XCTestCase {
         XCTAssertEqual(VoiceInkTranscriptPresentation.retryTranscriptionSystemImageName, "arrow.clockwise")
     }
 
+    func testLastTranscriptionPresentationPreservesMacOSNotificationCopy() {
+        XCTAssertEqual(VoiceInkTranscriptPresentation.noTranscriptionAvailableTitle, "No transcription available")
+        XCTAssertEqual(VoiceInkTranscriptPresentation.lastTranscriptionCopiedTitle, "Last transcription copied")
+        XCTAssertEqual(VoiceInkTranscriptPresentation.failedToCopyTranscriptionTitle, "Failed to copy transcription")
+        XCTAssertEqual(VoiceInkTranscriptPresentation.copiedToClipboardTitle, "Copied to clipboard")
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.cannotRetryTitle(errorDescription: "Audio file not found"),
+            "Cannot retry: Audio file not found"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.retryFailedTitle(errorDescription: "provider unavailable"),
+            "Retry failed: provider unavailable"
+        )
+    }
+
     func testDefaultPasteEligibilityRejectsCanceledTranscriptionText() {
         XCTAssertFalse(
             VoiceInkTranscriptPresentation.isPasteable(

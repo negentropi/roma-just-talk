@@ -2180,6 +2180,11 @@ require_pattern \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
 require_pattern \
+  "macOS AI settings Ollama default model selection uses shared policy" \
+  'defaultOllamaTextEnhancementModel' \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+
+require_pattern \
   "shared AI enhancement static text model list policy lives in VoiceInkCore" \
   'staticTextEnhancementModels' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
@@ -2240,6 +2245,11 @@ reject_pattern \
   '"(mistral|local-cli)"|ollamaSelectedModel\(fallback:' \
   VoiceInk/Services/AIEnhancement/AIService.swift \
   VoiceInk/PowerMode/PowerModeConfigView.swift
+
+reject_pattern \
+  "macOS AI settings avoids duplicate default text model literals" \
+  '"(mistral|local-cli)"' \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
 
 reject_pattern \
   "macOS AI service avoids duplicate static text model list policy" \

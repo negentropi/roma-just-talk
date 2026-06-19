@@ -10,7 +10,9 @@ struct APIKeyManagementView: View {
     @State private var isVerifying = false
     @State private var ollamaBaseURL: String = VoiceInkDynamicAIProviderPreference.ollamaBaseURL()
     @State private var ollamaModels: [OllamaModel] = []
-    @State private var selectedOllamaModel: String = VoiceInkDynamicAIProviderPreference.ollamaSelectedModel(fallback: "mistral")
+    @State private var selectedOllamaModel: String = VoiceInkDynamicAIProviderPreference.ollamaSelectedModel(
+        fallback: VoiceInkAIEnhancementProviderKind.defaultOllamaTextEnhancementModel
+    )
     @State private var isCheckingOllama = false
     @State private var isEditingURL = false
     @State private var localCLICommandTemplate: String = ""

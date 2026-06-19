@@ -4026,7 +4026,7 @@ require_pattern \
 
 require_pattern \
   "shared Power Mode row detail presentation lives in VoiceInkCore" \
-  'VoiceInkPowerModeRowDetailPresentation|rowDetailPresentation' \
+  'VoiceInkPowerModeRowDetailPresentation|rowDetailPresentation|systemImageName|usesAccentStyle' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
 
 require_pattern \
@@ -4061,7 +4061,7 @@ require_pattern \
 
 require_pattern \
   "macOS Power Mode rows use shared row detail presentation" \
-  'VoiceInkPowerModePresentation\.rowDetailPresentation|PowerModeRowDetailChipView' \
+  'VoiceInkPowerModePresentation\.rowDetailPresentation|PowerModeRowDetailChipView|chip\.(systemImageName|usesAccentStyle)' \
   VoiceInk/PowerMode/PowerModeViewComponents.swift
 
 require_pattern \
@@ -4217,7 +4217,7 @@ reject_pattern \
 
 reject_pattern \
   "macOS Power Mode rows avoid shell-only row detail chip policy" \
-  'modelName\.count > 20|prefix\(18\)|selectedPrompt\?\.title \?\? "AI"|Text\("Context Awareness"\)|model != "Default"|language != "Default"|config\.autoSendKey\.displayName' \
+  'modelName\.count > 20|prefix\(18\)|selectedPrompt\?\.title \?\? "AI"|Text\("Context Awareness"\)|model != "Default"|language != "Default"|config\.autoSendKey\.displayName|private var iconName|Image\(systemName: iconName\)|chip\.kind == \.prompt|case \.(transcriptionModel|selectedLanguage|aiModel|autoSend|contextAwareness|prompt)' \
   VoiceInk/PowerMode/PowerModeViewComponents.swift
 
 reject_pattern \

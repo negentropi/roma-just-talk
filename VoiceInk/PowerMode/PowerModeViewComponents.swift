@@ -280,7 +280,7 @@ private struct PowerModeRowDetailChipView: View {
 
     var body: some View {
         HStack(spacing: 4) {
-            Image(systemName: iconName)
+            Image(systemName: chip.systemImageName)
                 .font(.system(size: 10))
             Text(chip.text)
                 .font(.caption)
@@ -290,37 +290,16 @@ private struct PowerModeRowDetailChipView: View {
         .background(Capsule()
             .fill(backgroundColor))
         .overlay {
-            if !usesAccentStyle {
+            if !chip.usesAccentStyle {
                 Capsule()
                     .stroke(Color(NSColor.separatorColor), lineWidth: 0.5)
             }
         }
-        .foregroundColor(usesAccentStyle ? .accentColor : .primary)
-    }
-
-    private var iconName: String {
-        switch chip.kind {
-        case .transcriptionModel:
-            return "waveform"
-        case .selectedLanguage:
-            return "globe"
-        case .aiModel:
-            return "cpu"
-        case .autoSend:
-            return "keyboard"
-        case .contextAwareness:
-            return "camera.viewfinder"
-        case .prompt:
-            return "sparkles"
-        }
+        .foregroundColor(chip.usesAccentStyle ? .accentColor : .primary)
     }
 
     private var backgroundColor: Color {
-        usesAccentStyle ? Color.accentColor.opacity(0.1) : Color(NSColor.controlBackgroundColor)
-    }
-
-    private var usesAccentStyle: Bool {
-        chip.kind == .prompt
+        chip.usesAccentStyle ? Color.accentColor.opacity(0.1) : Color(NSColor.controlBackgroundColor)
     }
 }
 

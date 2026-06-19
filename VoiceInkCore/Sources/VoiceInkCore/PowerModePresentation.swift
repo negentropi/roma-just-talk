@@ -48,6 +48,14 @@ public struct VoiceInkPowerModeRowDetailChipPresentation: Equatable, Identifiabl
         kind
     }
 
+    public var systemImageName: String {
+        kind.systemImageName
+    }
+
+    public var usesAccentStyle: Bool {
+        kind.usesAccentStyle
+    }
+
     public init(kind: VoiceInkPowerModeRowDetailChipKind, text: String) {
         self.kind = kind
         self.text = text
@@ -251,5 +259,28 @@ public enum VoiceInkPowerModePresentation {
             return nil
         }
         return text
+    }
+}
+
+private extension VoiceInkPowerModeRowDetailChipKind {
+    var systemImageName: String {
+        switch self {
+        case .transcriptionModel:
+            return "waveform"
+        case .selectedLanguage:
+            return "globe"
+        case .aiModel:
+            return "cpu"
+        case .autoSend:
+            return "keyboard"
+        case .contextAwareness:
+            return "camera.viewfinder"
+        case .prompt:
+            return "sparkles"
+        }
+    }
+
+    var usesAccentStyle: Bool {
+        self == .prompt
     }
 }

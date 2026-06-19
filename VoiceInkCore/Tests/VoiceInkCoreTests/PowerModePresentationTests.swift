@@ -242,6 +242,14 @@ final class PowerModePresentationTests: XCTestCase {
                 "Rewrite"
             ]
         )
+        XCTAssertEqual(
+            presentation.chips.map(\.systemImageName),
+            ["waveform", "globe", "cpu", "keyboard", "camera.viewfinder", "sparkles"]
+        )
+        XCTAssertEqual(
+            presentation.chips.map(\.usesAccentStyle),
+            [false, false, false, false, false, true]
+        )
     }
 
     func testRowDetailPresentationFallsBackToDefaultPromptAndSkipsBlankAIModel() {

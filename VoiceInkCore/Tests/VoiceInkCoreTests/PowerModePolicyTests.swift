@@ -2,6 +2,94 @@ import Foundation
 import VoiceInkCore
 
 final class PowerModePolicyTests: XCTestCase {
+    func testPowerModeEmojiCatalogPreservesDefaultsStorageKeyAndCopy() {
+        XCTAssertEqual(VoiceInkPowerModeEmojiCatalog.customEmojisKey, "userAddedEmojis")
+        XCTAssertEqual(VoiceInkPowerModeEmojiCatalog.defaultEmojis.first, "🏢")
+        XCTAssertEqual(VoiceInkPowerModeEmojiCatalog.defaultEmojis.last, "🔧")
+        XCTAssertTrue(VoiceInkPowerModeEmojiCatalog.defaultEmojis.contains("✏️"))
+        XCTAssertEqual(VoiceInkPowerModeEmojiCatalog.defaultEmojis.count, 20)
+        XCTAssertEqual(
+            VoiceInkPowerModeEmojiCatalog.allEmojis(customEmojis: ["🧪"]),
+            VoiceInkPowerModeEmojiCatalog.defaultEmojis + ["🧪"]
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeEmojiInputPresentation.emptySubmitMessage,
+            "Emoji cannot be empty."
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeEmojiInputPresentation.invalidPreviewMessage,
+            "Invalid emoji."
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeEmojiInputPresentation.invalidSubmitMessage,
+            "Invalid emoji character."
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeEmojiInputPresentation.duplicateMessage,
+            "Emoji already exists!"
+        )
+    }
+
+    func testPowerModeEmojiCatalogValidatesAndAddsCustomEmojis() {
+        XCTAssertTrue(VoiceInkPowerModeEmojiCatalog.isValidEmoji("🧪"))
+        XCTAssertTrue(VoiceInkPowerModeEmojiCatalog.isValidEmoji("✏️"))
+        XCTAssertFalse(VoiceInkPowerModeEmojiCatalog.isValidEmoji(""))
+        XCTAssertFalse(VoiceInkPowerModeEmojiCatalog.isValidEmoji("A"))
+        XCTAssertFalse(VoiceInkPowerModeEmojiCatalog.isValidEmoji("🧪🧪"))
+        XCTAssertEqual(VoiceInkPowerModeEmojiCatalog.firstValidEmojiCharacter(in: "abc🧪"), "🧪")
+        XCTAssertEqual(VoiceInkPowerModeEmojiCatalog.firstValidEmojiCharacter(in: "abc"), "")
+
+        XCTAssertEqual(
+            VoiceInkPowerModeEmojiCatalog.addCustomEmoji(" 🧪 ", customEmojis: []),
+            .added(emoji: "🧪", customEmojis: ["🧪"])
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeEmojiCatalog.addCustomEmoji(" ", customEmojis: []),
+            .empty
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeEmojiCatalog.addCustomEmoji("A", customEmojis: []),
+            .invalid
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeEmojiCatalog.addCustomEmoji("🏢", customEmojis: []),
+            .duplicate
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeEmojiCatalog.addCustomEmoji("🧪", customEmojis: ["🧪"]),
+            .duplicate
+        )
+    }
+
+    func testPowerModeEmojiCatalogReadsSavesAndRemovesCustomEmojis() {
+        withIsolatedDefaults { defaults in
+            XCTAssertEqual(VoiceInkPowerModeEmojiCatalog.customEmojis(from: defaults), [])
+
+            VoiceInkPowerModeEmojiCatalog.saveCustomEmojis(["🧪", "🚀"], to: defaults)
+
+            XCTAssertEqual(VoiceInkPowerModeEmojiCatalog.customEmojis(from: defaults), ["🧪", "🚀"])
+            XCTAssertTrue(
+                VoiceInkPowerModeEmojiCatalog.isCustomEmoji(
+                    "🧪",
+                    customEmojis: VoiceInkPowerModeEmojiCatalog.customEmojis(from: defaults)
+                )
+            )
+            XCTAssertEqual(
+                VoiceInkPowerModeEmojiCatalog.removeCustomEmoji(
+                    "🧪",
+                    customEmojis: VoiceInkPowerModeEmojiCatalog.customEmojis(from: defaults)
+                ),
+                ["🚀"]
+            )
+            XCTAssertNil(
+                VoiceInkPowerModeEmojiCatalog.removeCustomEmoji(
+                    "missing",
+                    customEmojis: VoiceInkPowerModeEmojiCatalog.customEmojis(from: defaults)
+                )
+            )
+        }
+    }
+
     func testPowerModeTriggerConfigsPreserveStoredShapeAndIdEquality() throws {
         let id = UUID()
         let appConfig = VoiceInkPowerModeAppConfig(
@@ -1803,5 +1891,19 @@ final class PowerModePolicyTests: XCTestCase {
     private func jsonObject<T: Encodable>(from value: T) throws -> [String: Any] {
         let data = try JSONEncoder().encode(value)
         return try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+    }
+
+    private func withIsolatedDefaults(_ run: (UserDefaults) -> Void) {
+        let suiteName = "VoiceInkCore.PowerModePolicyTests.\(UUID().uuidString)"
+        guard let defaults = UserDefaults(suiteName: suiteName) else {
+            XCTFail("Failed to create isolated defaults suite")
+            return
+        }
+
+        defer {
+            defaults.removePersistentDomain(forName: suiteName)
+        }
+
+        run(defaults)
     }
 }

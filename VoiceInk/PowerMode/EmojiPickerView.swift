@@ -57,14 +57,14 @@ struct EmojiPickerView: View {
                             .focused($isEmojiTextFieldFocused)
                             .onChange(of: newEmojiText) { _, newValue in
                                 inputFeedbackMessage = ""
-                                let cleaned = newValue.firstValidEmojiCharacter()
+                                let cleaned = VoiceInkPowerModeEmojiCatalog.firstValidEmojiCharacter(in: newValue)
                                 if newEmojiText != cleaned {
                                     newEmojiText = cleaned
                                 }
                                 if !newEmojiText.isEmpty && emojiManager.allEmojis.contains(newEmojiText) {
-                                    inputFeedbackMessage = "Emoji already exists!"
-                                } else if !newEmojiText.isEmpty && !newEmojiText.isValidEmoji {
-                                    inputFeedbackMessage = "Invalid emoji."
+                                    inputFeedbackMessage = VoiceInkPowerModeEmojiInputPresentation.duplicateMessage
+                                } else if !newEmojiText.isEmpty && !VoiceInkPowerModeEmojiCatalog.isValidEmoji(newEmojiText) {
+                                    inputFeedbackMessage = VoiceInkPowerModeEmojiInputPresentation.invalidPreviewMessage
                                 } else {
                                     inputFeedbackMessage = ""
                                 }
@@ -75,7 +75,7 @@ struct EmojiPickerView: View {
                             attemptAddCustomEmoji()
                         }
                         .buttonStyle(.borderedProminent)
-                        .disabled(newEmojiText.isEmpty || !newEmojiText.isValidEmoji || emojiManager.allEmojis.contains(newEmojiText))
+                        .disabled(!emojiManager.canAddCustomEmoji(newEmojiText))
 
                         Button("Cancel") {
                             isAddingCustomEmoji = false
@@ -87,7 +87,7 @@ struct EmojiPickerView: View {
                     if !inputFeedbackMessage.isEmpty {
                         Text(inputFeedbackMessage)
                             .font(.caption)
-                            .foregroundColor(inputFeedbackMessage == "Emoji already exists!" || inputFeedbackMessage == "Invalid emoji." ? .red : .secondary)
+                            .foregroundColor(isErrorFeedbackMessage(inputFeedbackMessage) ? .red : .secondary)
                             .transition(.opacity)
                     }
                     Text("Tip: Use ⌃⌘Space for emoji picker or paste an emoji.")
@@ -110,27 +110,26 @@ struct EmojiPickerView: View {
 
     private func attemptAddCustomEmoji() {
         let trimmedEmoji = newEmojiText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedEmoji.isEmpty else {
-            inputFeedbackMessage = "Emoji cannot be empty."
-            return
-        }
-        guard trimmedEmoji.isValidEmoji else {
-            inputFeedbackMessage = "Invalid emoji character."
-            return
-        }
-        guard !emojiManager.allEmojis.contains(trimmedEmoji) else {
-            inputFeedbackMessage = "Emoji already exists!"
-            return
-        }
-
-        if emojiManager.addCustomEmoji(trimmedEmoji) {
-            selectedEmoji = trimmedEmoji
+        switch emojiManager.addCustomEmoji(trimmedEmoji) {
+        case .added(let emoji, _):
+            selectedEmoji = emoji
             inputFeedbackMessage = ""
             isAddingCustomEmoji = false
             newEmojiText = ""
-        } else {
-            inputFeedbackMessage = "Could not add emoji."
+        case .empty:
+            inputFeedbackMessage = VoiceInkPowerModeEmojiInputPresentation.emptySubmitMessage
+        case .invalid:
+            inputFeedbackMessage = VoiceInkPowerModeEmojiInputPresentation.invalidSubmitMessage
+        case .duplicate:
+            inputFeedbackMessage = VoiceInkPowerModeEmojiInputPresentation.duplicateMessage
         }
+    }
+
+    private func isErrorFeedbackMessage(_ message: String) -> Bool {
+        message == VoiceInkPowerModeEmojiInputPresentation.duplicateMessage
+            || message == VoiceInkPowerModeEmojiInputPresentation.invalidPreviewMessage
+            || message == VoiceInkPowerModeEmojiInputPresentation.invalidSubmitMessage
+            || message == VoiceInkPowerModeEmojiInputPresentation.emptySubmitMessage
     }
 
     private func attemptToRemoveCustomEmoji(_ emojiToRemove: String) {
@@ -159,14 +158,14 @@ private struct EmojiButton: View {
         ZStack(alignment: .topTrailing) {
             Button(action: selectAction) {
                 Text(emoji)
-                    .font(.largeTitle) 
+                    .font(.largeTitle)
                     .frame(width: 44, height: 44)
-                    .overlay( 
+                    .overlay(
                         Circle()
                             .strokeBorder(isSelected ? Color.accentColor : Color.gray.opacity(0.3), lineWidth: isSelected ? 2 : 1)
                     )
             }
-            .buttonStyle(.plain) 
+            .buttonStyle(.plain)
 
             if isCustom {
                 Button(action: removeAction) {
@@ -176,7 +175,7 @@ private struct EmojiButton: View {
                         .font(.caption2)
                         .background(Circle().fill(Color.white.opacity(0.8)))
                 }
-                .buttonStyle(.borderless) 
+                .buttonStyle(.borderless)
                 .offset(x: 6, y: -6)
             }
         }
@@ -200,26 +199,6 @@ private struct AddEmojiButton: View {
         }
         .buttonStyle(.plain)
         .help("Add custom emoji")
-    }
-}
-
-extension String {
-    var isValidEmoji: Bool {
-        guard !self.isEmpty, self.count == 1, let char = self.first else { return false }
-        let scalars = char.unicodeScalars
-        if scalars.count > 1 {
-            return scalars.contains { $0.properties.isEmoji }
-        }
-        return scalars.first?.properties.isEmojiPresentation == true
-    }
-
-    func firstValidEmojiCharacter() -> String {
-        for char in self {
-            if String(char).isValidEmoji {
-                return String(char)
-            }
-        }
-        return ""
     }
 }
 

@@ -4089,6 +4089,26 @@ require_pattern \
   'VoiceInkPowerModePresentation\.(autoSendFormTitle|autoSendHelpText|keyboardShortcutFormTitle|keyboardShortcutHelpText)' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
+require_pattern \
+  "shared Power Mode emoji catalog and input policy lives in VoiceInkCore" \
+  'VoiceInkPowerModeEmojiCatalog|customEmojisKey = "userAddedEmojis"|defaultEmojis|addCustomEmoji|removeCustomEmoji|firstValidEmojiCharacter|VoiceInkPowerModeEmojiInputPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModeEmojiPolicy.swift
+
+require_pattern \
+  "macOS Power Mode emoji manager consumes shared emoji policy" \
+  'VoiceInkPowerModeEmojiCatalog\.(allEmojis|customEmojis|saveCustomEmojis|addCustomEmoji|removeCustomEmoji|isCustomEmoji)' \
+  VoiceInk/PowerMode/EmojiManager.swift
+
+require_pattern \
+  "macOS Power Mode emoji picker consumes shared emoji validation and copy" \
+  'VoiceInkPowerModeEmojiCatalog\.(firstValidEmojiCharacter|isValidEmoji)|VoiceInkPowerModeEmojiInputPresentation' \
+  VoiceInk/PowerMode/EmojiPickerView.swift
+
+require_pattern \
+  "migration checklist tracks shared Power Mode emoji policy gate" \
+  'macOS Power Mode emoji catalog, custom emoji storage key, input validation, duplicate detection, and add/remove mutation policy route through `VoiceInkPowerModeEmojiCatalog`/`VoiceInkPowerModeEmojiInputPresentation`' \
+  docs/ios-single-repo-migration.md
+
 reject_pattern \
   "macOS Power Mode rows avoid shell-only selected-language fallback formatting" \
   'langCode == "auto"|langCode == "en"|langCode\.uppercased\(\)' \
@@ -4113,6 +4133,12 @@ reject_pattern \
   "macOS Power Mode edit form avoids duplicate advanced form chrome copy" \
   '"(Auto Send|Automatically presses a key combination after pasting text\. Useful for chat applications or forms that use different send shortcuts\.|Keyboard Shortcut|Assign a unique keyboard shortcut to instantly activate this Power Mode and start recording\.)"' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
+
+reject_pattern \
+  "macOS Power Mode emoji shell avoids raw catalog storage and validation policy" \
+  '"userAddedEmojis"|private let +defaultEmojis|extension +String|var +isValidEmoji|func +firstValidEmojiCharacter|"(Emoji cannot be empty\.|Invalid emoji\.|Invalid emoji character\.|Emoji already exists!|Could not add emoji\.)"' \
+  VoiceInk/PowerMode/EmojiManager.swift \
+  VoiceInk/PowerMode/EmojiPickerView.swift
 
 reject_pattern \
   "macOS Power Mode rows avoid shell-only trigger-count pluralization" \

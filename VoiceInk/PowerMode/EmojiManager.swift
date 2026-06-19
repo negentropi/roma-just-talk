@@ -1,53 +1,64 @@
 import Foundation
+import VoiceInkCore
 
 class EmojiManager: ObservableObject {
     static let shared = EmojiManager()
-    
-    private let defaultEmojis = ["🏢", "🏠", "💼", "🎮", "📱", "📺", "🎵", "📚", "✏️", "🎨", "🧠", "⚙️", "💻", "🌐", "📝", "📊", "🔍", "💬", "📈", "🔧"]
-    private let customEmojisKey = "userAddedEmojis"
-    
+
     @Published var customEmojis: [String] = []
-    
+
     private init() {
         loadCustomEmojis()
     }
-    
+
     var allEmojis: [String] {
-        return defaultEmojis + customEmojis
+        VoiceInkPowerModeEmojiCatalog.allEmojis(customEmojis: customEmojis)
     }
-    
-    func addCustomEmoji(_ emoji: String) -> Bool {
-        let trimmedEmoji = emoji.trimmingCharacters(in: .whitespacesAndNewlines)
-        
-        guard !trimmedEmoji.isEmpty, !allEmojis.contains(trimmedEmoji) else {
-            return false
+
+    func addCustomEmoji(_ emoji: String) -> VoiceInkPowerModeCustomEmojiAddResult {
+        let result = VoiceInkPowerModeEmojiCatalog.addCustomEmoji(
+            emoji,
+            customEmojis: customEmojis
+        )
+
+        if case .added(_, let updatedEmojis) = result {
+            customEmojis = updatedEmojis
+            saveCustomEmojis()
         }
-        
-        customEmojis.append(trimmedEmoji)
-        saveCustomEmojis()
-        return true
+
+        return result
     }
-    
+
     private func loadCustomEmojis() {
-        if let savedEmojis = UserDefaults.standard.array(forKey: customEmojisKey) as? [String] {
-            customEmojis = savedEmojis
-        }
+        customEmojis = VoiceInkPowerModeEmojiCatalog.customEmojis()
     }
-    
+
     private func saveCustomEmojis() {
-        UserDefaults.standard.set(customEmojis, forKey: customEmojisKey)
+        VoiceInkPowerModeEmojiCatalog.saveCustomEmojis(customEmojis)
     }
-    
+
     func removeCustomEmoji(_ emoji: String) -> Bool {
-        if let index = customEmojis.firstIndex(of: emoji) {
-            customEmojis.remove(at: index)
+        if let updatedEmojis = VoiceInkPowerModeEmojiCatalog.removeCustomEmoji(
+            emoji,
+            customEmojis: customEmojis
+        ) {
+            customEmojis = updatedEmojis
             saveCustomEmojis()
             return true
         }
         return false
     }
-    
+
     func isCustomEmoji(_ emoji: String) -> Bool {
-        return customEmojis.contains(emoji)
+        VoiceInkPowerModeEmojiCatalog.isCustomEmoji(emoji, customEmojis: customEmojis)
+    }
+
+    func canAddCustomEmoji(_ emoji: String) -> Bool {
+        if case .added = VoiceInkPowerModeEmojiCatalog.addCustomEmoji(
+            emoji,
+            customEmojis: customEmojis
+        ) {
+            return true
+        }
+        return false
     }
 }

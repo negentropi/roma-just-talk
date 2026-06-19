@@ -2165,6 +2165,11 @@ require_pattern \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 require_pattern \
+  "macOS AI service Local CLI credential refresh uses shared policy" \
+  'applyCredentialStateForSelectedProvider' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+require_pattern \
   "shared AI enhancement default text model policy lives in VoiceInkCore" \
   'defaultTextEnhancementModel|defaultOllamaTextEnhancementModel|localCLITextEnhancementModel' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
@@ -2237,7 +2242,7 @@ reject_pattern \
 
 reject_pattern \
   "macOS AI service avoids duplicate credential-state policy" \
-  'selectedProvider == \.localCLI \? localCLIService\.isConfigured : true' \
+  'selectedProvider == \.localCLI \? localCLIService\.isConfigured : true|isAPIKeyValid = localCLIService\.isConfigured' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 reject_pattern \

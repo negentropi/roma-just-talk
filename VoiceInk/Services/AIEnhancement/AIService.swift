@@ -288,7 +288,7 @@ class AIService: ObservableObject {
 
     private func refreshLocalCLIConfigurationState() {
         if selectedProvider == .localCLI {
-            isAPIKeyValid = localCLIService.isConfigured
+            applyCredentialStateForSelectedProvider()
         }
         objectWillChange.send()
         NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)

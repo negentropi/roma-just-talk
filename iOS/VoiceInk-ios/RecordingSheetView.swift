@@ -36,7 +36,10 @@ struct RecordingSheetView: View {
             
             // Stop Button - Matching main button style
             Button(action: onStop) {
-                Label(recordingSheetPresentation.stopButtonTitle, systemImage: "stop.fill")
+                Label(
+                    recordingSheetPresentation.stopButtonTitle,
+                    systemImage: recordingSheetPresentation.stopButtonSystemImageName
+                )
                     .fontWeight(.semibold)
                     .frame(maxWidth: .infinity)
             }

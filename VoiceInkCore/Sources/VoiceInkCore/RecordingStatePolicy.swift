@@ -18,10 +18,12 @@ public enum VoiceInkRecorderUIToggleAction: Equatable, Sendable {
 public struct VoiceInkRecordingSheetPresentation: Equatable, Sendable {
     public let cancelButtonTitle: String
     public let stopButtonTitle: String
+    public let stopButtonSystemImageName: String
 
     public static let iOS = VoiceInkRecordingSheetPresentation(
         cancelButtonTitle: "Cancel",
-        stopButtonTitle: "Stop Recording"
+        stopButtonTitle: "Stop Recording",
+        stopButtonSystemImageName: "stop.fill"
     )
 }
 

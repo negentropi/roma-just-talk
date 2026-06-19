@@ -97,6 +97,7 @@ final class RecordingStatePolicyTests: XCTestCase {
 
         XCTAssertEqual(presentation.cancelButtonTitle, "Cancel")
         XCTAssertEqual(presentation.stopButtonTitle, "Stop Recording")
+        XCTAssertEqual(presentation.stopButtonSystemImageName, "stop.fill")
     }
 
     func testRecordingStartFailureMapsIOSMicrophoneBusyOSStatus() {

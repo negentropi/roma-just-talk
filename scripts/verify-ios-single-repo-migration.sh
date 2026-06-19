@@ -429,7 +429,7 @@ require_pattern \
 
 require_pattern \
   "shared recording sheet presentation lives in VoiceInkCore" \
-  'VoiceInkRecordingSheetPresentation|cancelButtonTitle|stopButtonTitle' \
+  'VoiceInkRecordingSheetPresentation|cancelButtonTitle|stopButtonTitle|stopButtonSystemImageName' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
 require_pattern \
@@ -449,7 +449,7 @@ require_pattern \
 
 require_pattern \
   "iOS recording sheet uses shared recording sheet presentation" \
-  'VoiceInkRecordingSheetPresentation\.iOS|recordingSheetPresentation' \
+  'VoiceInkRecordingSheetPresentation\.iOS|recordingSheetPresentation\.(cancelButtonTitle|stopButtonTitle|stopButtonSystemImageName)' \
   iOS/VoiceInk-ios/RecordingSheetView.swift
 
 require_pattern \
@@ -491,6 +491,11 @@ reject_pattern \
 reject_pattern \
   "iOS recording sheet avoids shell-only recording controls copy" \
   '"(Cancel|Stop Recording|Mode)"' \
+  iOS/VoiceInk-ios/RecordingSheetView.swift
+
+reject_pattern \
+  "iOS recording sheet avoids duplicate stop-button icon" \
+  '"stop\.fill"' \
   iOS/VoiceInk-ios/RecordingSheetView.swift
 
 reject_pattern \

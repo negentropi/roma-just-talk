@@ -33,7 +33,7 @@ enum AppDefaults {
             CustomSoundManager.SoundType.stop.builtInSoundKey: CustomSoundManager.SoundType.stop.defaultBuiltInSound.rawValue,
 
             // Recording & Transcription
-            "AppendTrailingSpace": true,
+            VoiceInkUserDefaultsKey.appendTrailingSpace: VoiceInkPreferenceDefault.appendTrailingSpace,
             "showLiveTextPreview": false,
             VoiceInkRollingBufferPreloadSettings.modeKey: VoiceInkRollingBufferPreloadSettings.defaultMode.rawValue,
             VoiceInkRollingBufferPreloadSettings.autoDisableCloudModelsKey: VoiceInkRollingBufferPreloadSettings.defaultAutoDisablesCloudModels,

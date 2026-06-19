@@ -383,15 +383,17 @@ class TranscriptionPipeline {
                 )
             }
 
+            let isTrialExpired: Bool
             if case .trialExpired = licenseViewModel.licenseState {
-                textToPaste = """
-                    Your trial has expired. Upgrade to VoiceInk Pro at tryvoiceink.com/buy
-                    \n\(textToPaste)
-                    """
+                isTrialExpired = true
+            } else {
+                isTrialExpired = false
             }
-
-            let appendSpace = UserDefaults.standard.bool(forKey: "AppendTrailingSpace")
-            let pastedText = textToPaste + (appendSpace ? " " : "")
+            let pastedText = VoiceInkTranscriptionPasteOutputPolicy.finalPastedText(
+                textToPaste,
+                appendTrailingSpace: VoiceInkAppendTrailingSpacePreference.isEnabled(),
+                isTrialExpired: isTrialExpired
+            )
             if let latencyTrace {
                 logger.notice("Latency trace paste starting operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s chars=\(pastedText.count, privacy: .public)")
                 recordRollingPreloadTiming(latencyTrace, stage: .pasteStarting)

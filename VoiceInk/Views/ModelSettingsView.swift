@@ -10,7 +10,8 @@ struct ModelSettingsView: View {
     @AppStorage(PunctuationCleanupMode.userDefaultsKey) private var punctuationCleanupModeRaw = PunctuationCleanupMode.current().rawValue
     @AppStorage(VoiceInkUserDefaultsKey.lowercaseTranscription) private var lowercaseTranscription = false
     @AppStorage(VoiceInkUserDefaultsKey.isVADEnabled) private var isVADEnabled = VoiceInkPreferenceDefault.isVADEnabled
-    @AppStorage("AppendTrailingSpace") private var appendTrailingSpace = true
+    @AppStorage(VoiceInkUserDefaultsKey.appendTrailingSpace)
+    private var appendTrailingSpace = VoiceInkPreferenceDefault.appendTrailingSpace
     @AppStorage("PrewarmModelOnWake") private var prewarmModelOnWake = true
     @AppStorage("showLiveTextPreview") private var showLiveTextPreview = false
     @State private var customPrompt: String = ""

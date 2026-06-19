@@ -20,6 +20,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkUserDefaultsKey.transcriptionRetentionMinutes, "TranscriptionRetentionMinutes")
         XCTAssertEqual(VoiceInkUserDefaultsKey.isAudioCleanupEnabled, "IsAudioCleanupEnabled")
         XCTAssertEqual(VoiceInkUserDefaultsKey.audioRetentionPeriodDays, "AudioRetentionPeriod")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.appendTrailingSpace, "AppendTrailingSpace")
         XCTAssertEqual(VoiceInkUserDefaultsKey.skipShortEnhancement, "SkipShortEnhancement")
         XCTAssertEqual(VoiceInkUserDefaultsKey.shortEnhancementWordThreshold, "ShortEnhancementWordThreshold")
         XCTAssertEqual(VoiceInkUserDefaultsKey.enhancementTimeoutSeconds, "EnhancementTimeoutSeconds")
@@ -66,6 +67,10 @@ final class UserDefaultsPreferencesTests: XCTestCase {
     func testSharedPreferenceDefaultsPreserveExistingCleanupRetention() {
         XCTAssertEqual(VoiceInkPreferenceDefault.transcriptionRetentionMinutes, 24 * 60)
         XCTAssertEqual(VoiceInkPreferenceDefault.audioRetentionDays, 7)
+    }
+
+    func testSharedPreferenceDefaultsPreserveMacOSTrailingSpacePolicy() {
+        XCTAssertEqual(VoiceInkPreferenceDefault.appendTrailingSpace, true)
     }
 
     func testSharedPreferenceDefaultsPreserveExistingShortEnhancementPolicy() {

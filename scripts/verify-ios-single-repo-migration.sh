@@ -2048,6 +2048,31 @@ reject_pattern \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
 require_pattern \
+  "shared transcription paste output owns trial-expired prefix" \
+  'trialExpiredPrefix = "Your trial has expired\. Upgrade to VoiceInk Pro at tryvoiceink\.com/buy"' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionPasteOutputPolicy.swift
+
+require_pattern \
+  "shared transcription paste output owns trailing-space preference" \
+  'VoiceInkAppendTrailingSpacePreference' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionPasteOutputPolicy.swift
+
+require_pattern \
+  "macOS transcription pipeline uses shared paste output policy" \
+  'VoiceInkTranscriptionPasteOutputPolicy\.finalPastedText' \
+  VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
+
+reject_pattern \
+  "macOS transcription pipeline avoids shell-only paste output policy" \
+  'Your trial has expired|"AppendTrailingSpace"|textToPaste \+ \(appendSpace \? " " : ""\)' \
+  VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
+
+require_pattern \
+  "macOS trailing-space settings use shared preference key" \
+  'VoiceInkUserDefaultsKey\.appendTrailingSpace' \
+  VoiceInk/Views/ModelSettingsView.swift
+
+require_pattern \
   "shared transcription run result carries post-processing enhancement result" \
   'postProcessingResult: VoiceInkAIEnhancementResult\?' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift

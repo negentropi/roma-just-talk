@@ -497,13 +497,29 @@ struct AudioPlayerView: View {
                 if let state = bannerState {
                     switch state {
                     case .retranscribeSuccess:
-                        StatusBanner(message: "Retranscription successful", isError: false)
+                        StatusBanner(
+                            message: VoiceInkTranscriptPresentation.audioFileRetranscriptionSuccessMessage,
+                            isError: false
+                        )
                     case .reEnhanceSuccess:
-                        StatusBanner(message: "Re-enhancement successful", isError: false)
+                        StatusBanner(
+                            message: VoiceInkTranscriptPresentation.audioFileReEnhancementSuccessMessage,
+                            isError: false
+                        )
                     case .retranscribeError(let message):
-                        StatusBanner(message: message.isEmpty ? "Retranscription failed" : message, isError: true)
+                        StatusBanner(
+                            message: VoiceInkTranscriptPresentation.audioFileRetranscriptionFailureMessage(
+                                errorDescription: message
+                            ),
+                            isError: true
+                        )
                     case .reEnhanceError(let message):
-                        StatusBanner(message: message.isEmpty ? "Re-enhancement failed" : message, isError: true)
+                        StatusBanner(
+                            message: VoiceInkTranscriptPresentation.audioFileReEnhancementFailureMessage(
+                                errorDescription: message
+                            ),
+                            isError: true
+                        )
                     }
                 }
                 Spacer()

@@ -2372,6 +2372,16 @@ require_pattern \
   VoiceInk/Views/AudioPlayerView.swift
 
 require_pattern \
+  "macOS audio player action status uses shared transcript presentation" \
+  'VoiceInkTranscriptPresentation\.audioFile(ReEnhancement|Retranscription)(SuccessMessage|FailureMessage)' \
+  VoiceInk/Views/AudioPlayerView.swift
+
+reject_pattern \
+  "macOS audio player avoids shell-only action status copy" \
+  '"Retranscription successful"|"Re-enhancement successful"|"Retranscription failed"|"Re-enhancement failed"' \
+  VoiceInk/Views/AudioPlayerView.swift
+
+require_pattern \
   "iOS audio player view uses shared playback presentation" \
   'VoiceInkAudioPlaybackPresentation' \
   iOS/VoiceInk-ios/AudioPlayerView.swift

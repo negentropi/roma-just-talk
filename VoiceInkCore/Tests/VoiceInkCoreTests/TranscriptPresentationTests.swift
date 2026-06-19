@@ -442,6 +442,37 @@ final class TranscriptPresentationTests: XCTestCase {
         )
     }
 
+    func testAudioFileActionStatusPresentationPreservesMacOSBannerCopy() {
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.audioFileRetranscriptionSuccessMessage,
+            "Retranscription successful"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.audioFileReEnhancementSuccessMessage,
+            "Re-enhancement successful"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.audioFileRetranscriptionFailureMessage(errorDescription: ""),
+            "Retranscription failed"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.audioFileRetranscriptionFailureMessage(
+                errorDescription: "provider unavailable"
+            ),
+            "provider unavailable"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.audioFileReEnhancementFailureMessage(errorDescription: ""),
+            "Re-enhancement failed"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.audioFileReEnhancementFailureMessage(
+                errorDescription: "timeout"
+            ),
+            "timeout"
+        )
+    }
+
     func testDefaultPasteEligibilityRejectsCanceledTranscriptionText() {
         XCTAssertFalse(
             VoiceInkTranscriptPresentation.isPasteable(

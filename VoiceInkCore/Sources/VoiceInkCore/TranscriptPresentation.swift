@@ -244,6 +244,17 @@ public enum VoiceInkTranscriptPresentation {
         "Retry failed: \(errorDescription)"
     }
 
+    public static let audioFileRetranscriptionSuccessMessage = "Retranscription successful"
+    public static let audioFileReEnhancementSuccessMessage = "Re-enhancement successful"
+
+    public static func audioFileRetranscriptionFailureMessage(errorDescription: String) -> String {
+        errorDescription.isEmpty ? "Retranscription failed" : errorDescription
+    }
+
+    public static func audioFileReEnhancementFailureMessage(errorDescription: String) -> String {
+        errorDescription.isEmpty ? "Re-enhancement failed" : errorDescription
+    }
+
     public static func matchesSearch(rawText: String, enhancedText: String?, query: String) -> Bool {
         guard !query.isEmpty else {
             return true

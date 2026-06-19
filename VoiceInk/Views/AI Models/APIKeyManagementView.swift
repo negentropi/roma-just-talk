@@ -267,8 +267,7 @@ struct APIKeyManagementView: View {
                             aiService.saveAPIKey(apiKey) { success, errorMessage in
                                 isVerifying = false
                                 if !success {
-                                    alertMessage = errorMessage ?? "Verification failed"
-                                    showAlert = true
+                                    showAPIKeyVerificationFailure(errorMessage)
                                 }
                                 apiKey = ""
                             }
@@ -315,8 +314,7 @@ struct APIKeyManagementView: View {
                                 aiService.saveAPIKey(apiKey) { success, errorMessage in
                                     isVerifying = false
                                     if !success {
-                                        alertMessage = errorMessage ?? "Verification failed"
-                                        showAlert = true
+                                        showAPIKeyVerificationFailure(errorMessage)
                                     }
                                     apiKey = ""
                                 }
@@ -347,6 +345,15 @@ struct APIKeyManagementView: View {
                 syncLocalCLIStateFromService()
             }
         }
+    }
+
+    private func showAPIKeyVerificationFailure(_ errorMessage: String?) {
+        let progress = VoiceInkProviderAPIKeyVerificationProgress.failure(message: errorMessage)
+        guard let feedback = progress.macOSInlineFeedback else {
+            return
+        }
+        alertMessage = feedback.text
+        showAlert = true
     }
 
     private func syncLocalCLIStateFromService() {

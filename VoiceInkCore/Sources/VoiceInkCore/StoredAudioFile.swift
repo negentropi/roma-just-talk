@@ -5,6 +5,8 @@ public enum VoiceInkStoredAudioAvailability: Equatable, Sendable {
     case missingFile(URL)
     case missingPath
 
+    public static let unavailableSystemImageName = "exclamationmark"
+
     public var existingURL: URL? {
         guard case let .available(url) = self else {
             return nil

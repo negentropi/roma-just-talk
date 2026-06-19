@@ -421,8 +421,10 @@ final class TranscriptPresentationTests: XCTestCase {
     func testTranscriptDetailCopyPreservesIOSNoteDetailLabels() {
         XCTAssertEqual(VoiceInkTranscriptPresentation.noteDetailNavigationTitle, "Note")
         XCTAssertEqual(VoiceInkTranscriptPresentation.transcriptTitle, "Transcript")
+        XCTAssertEqual(VoiceInkTranscriptPresentation.copyTranscriptSystemImageName, "doc.on.doc")
         XCTAssertEqual(VoiceInkTranscriptPresentation.retranscribingDisplayText, "Retranscribing...")
         XCTAssertEqual(VoiceInkTranscriptPresentation.retryTranscriptionButtonTitle, "Retry Transcription")
+        XCTAssertEqual(VoiceInkTranscriptPresentation.retryTranscriptionSystemImageName, "arrow.clockwise")
     }
 
     func testDefaultPasteEligibilityRejectsCanceledTranscriptionText() {

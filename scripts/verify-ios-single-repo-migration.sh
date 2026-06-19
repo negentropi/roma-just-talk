@@ -588,8 +588,13 @@ require_pattern \
 
 require_pattern \
   "iOS note detail uses shared stored-audio availability presentation" \
-  'storedAudioAvailability\(\)|shouldShowAudioSection|unavailableTitle|unavailableDetail' \
+  'storedAudioAvailability\(\)|shouldShowAudioSection|unavailableTitle|unavailableDetail|unavailableSystemImageName' \
   iOS/VoiceInk-ios/NoteDetailView.swift
+
+require_pattern \
+  "shared stored-audio availability owns unavailable icon" \
+  'unavailableSystemImageName' \
+  VoiceInkCore/Sources/VoiceInkCore/StoredAudioFile.swift
 
 reject_pattern \
   "iOS note detail avoids shell-only stored-audio path checks" \
@@ -769,7 +774,7 @@ require_pattern \
 
 require_pattern \
   "shared transcript detail presentation copy lives in VoiceInkCore" \
-  'noteDetailNavigationTitle|transcriptTitle|retranscribingDisplayText|retryTranscriptionButtonTitle' \
+  'noteDetailNavigationTitle|transcriptTitle|copyTranscriptSystemImageName|retranscribingDisplayText|retryTranscriptionButtonTitle|retryTranscriptionSystemImageName' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
 
 require_pattern \
@@ -804,7 +809,7 @@ require_pattern \
 
 require_pattern \
   "iOS note detail uses shared transcript detail presentation copy" \
-  'VoiceInkTranscriptPresentation\.(noteDetailNavigationTitle|transcriptTitle|retranscribingDisplayText|retryTranscriptionButtonTitle)' \
+  'VoiceInkTranscriptPresentation\.(noteDetailNavigationTitle|transcriptTitle|copyTranscriptSystemImageName|retranscribingDisplayText|retryTranscriptionButtonTitle|retryTranscriptionSystemImageName)' \
   iOS/VoiceInk-ios/NoteDetailView.swift
 
 require_pattern \
@@ -1004,6 +1009,11 @@ reject_pattern \
   VoiceInk/Views/History/TranscriptionDetailView.swift \
   VoiceInk/Views/AudioFileRow.swift \
   VoiceInk/Views/History/InlineHistoryView.swift
+
+reject_pattern \
+  "iOS note detail avoids duplicate action and unavailable icon names" \
+  '"(doc\.on\.doc|arrow\.clockwise|exclamationmark)"' \
+  iOS/VoiceInk-ios/NoteDetailView.swift
 
 reject_pattern \
   "iOS API-key view avoids shell-only stored-key presentation wrappers" \

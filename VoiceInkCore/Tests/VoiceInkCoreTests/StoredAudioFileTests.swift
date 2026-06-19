@@ -177,6 +177,7 @@ final class StoredAudioFileTests: XCTestCase {
     func testAvailabilityPresentationKeepsExistingIOSMissingAudioText() {
         XCTAssertEqual(VoiceInkStoredAudioAvailability.available(URL(fileURLWithPath: "/tmp/a.wav")).unavailableTitle, nil)
         XCTAssertEqual(VoiceInkStoredAudioAvailability.available(URL(fileURLWithPath: "/tmp/a.wav")).unavailableDetail, nil)
+        XCTAssertEqual(VoiceInkStoredAudioAvailability.unavailableSystemImageName, "exclamationmark")
         XCTAssertEqual(VoiceInkStoredAudioAvailability.missingFile(URL(fileURLWithPath: "/tmp/missing.wav")).unavailableTitle, "Audio Unavailable")
         XCTAssertEqual(VoiceInkStoredAudioAvailability.missingFile(URL(fileURLWithPath: "/tmp/missing.wav")).unavailableDetail, "File not found")
         XCTAssertEqual(VoiceInkStoredAudioAvailability.missingPath.unavailableTitle, "Audio Unavailable")

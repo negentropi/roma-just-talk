@@ -63,7 +63,7 @@ struct NoteDetailView: View {
                         enhancedText: note.enhancedText
                     ))
                 }) {
-                    Image(systemName: "doc.on.doc")
+                    Image(systemName: VoiceInkTranscriptPresentation.copyTranscriptSystemImageName)
                         .font(.system(size: 16))
                         .foregroundStyle(.blue)
                 }
@@ -112,7 +112,7 @@ struct NoteDetailView: View {
                 .fill(.orange.opacity(0.2))
                 .frame(width: 40, height: 40)
                 .overlay(
-                    Image(systemName: "exclamationmark")
+                    Image(systemName: VoiceInkStoredAudioAvailability.unavailableSystemImageName)
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundStyle(.orange)
                 )
@@ -175,7 +175,10 @@ struct NoteDetailView: View {
                     Button {
                         retranscribe()
                     } label: {
-                        Label(VoiceInkTranscriptPresentation.retryTranscriptionButtonTitle, systemImage: "arrow.clockwise")
+                        Label(
+                            VoiceInkTranscriptPresentation.retryTranscriptionButtonTitle,
+                            systemImage: VoiceInkTranscriptPresentation.retryTranscriptionSystemImageName
+                        )
                             .fontWeight(.semibold)
                             .frame(maxWidth: .infinity)
                     }

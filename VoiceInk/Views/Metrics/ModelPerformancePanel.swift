@@ -2,41 +2,16 @@ import SwiftUI
 import SwiftData
 import VoiceInkCore
 
-// MARK: - Time filter
-
-enum TimeFilter: String, CaseIterable, Identifiable {
-    case last7Days  = "Last 7 Days"
-    case last30Days = "Last 30 Days"
-    case thisYear   = "This Year"
-    case allTime    = "All Time"
-
-    var id: String { rawValue }
-
-    var predicate: Predicate<SessionMetric>? {
-        let now = Date()
-        switch self {
-        case .allTime:
-            return nil
-        case .last7Days:
-            let start = now.addingTimeInterval(-7 * 24 * 3600)
-            return #Predicate<SessionMetric> { $0.timestamp >= start }
-        case .last30Days:
-            let start = now.addingTimeInterval(-30 * 24 * 3600)
-            return #Predicate<SessionMetric> { $0.timestamp >= start }
-        case .thisYear:
-            guard let start = Calendar.current.dateInterval(of: .year, for: now)?.start else { return nil }
-            return #Predicate<SessionMetric> { $0.timestamp >= start }
-        }
-    }
-}
-
 // MARK: - Panel shell (owns filter state)
 
 struct ModelPerformancePanel: View {
-    @AppStorage("modelPerfPanelFilter") private var filterRaw: String = TimeFilter.last7Days.rawValue
+    @AppStorage(VoiceInkPerformanceTimeFilter.userDefaultsKey)
+    private var filterRaw: String = VoiceInkPerformanceTimeFilter.defaultFilter.rawValue
     let onClose: () -> Void
 
-    private var filter: TimeFilter { TimeFilter(rawValue: filterRaw) ?? .last7Days }
+    private var filter: VoiceInkPerformanceTimeFilter {
+        VoiceInkPerformanceTimeFilter.storedFilter(rawValue: filterRaw)
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -57,8 +32,8 @@ struct ModelPerformancePanel: View {
                 .font(.headline.weight(.semibold))
             Spacer()
             Picker("", selection: Binding(get: { filter }, set: { filterRaw = $0.rawValue })) {
-                ForEach(TimeFilter.allCases) { f in
-                    Text(f.rawValue).tag(f)
+                ForEach(VoiceInkPerformanceTimeFilter.allCases) { f in
+                    Text(f.label).tag(f)
                 }
             }
             .pickerStyle(.menu)
@@ -82,9 +57,9 @@ struct ModelPerformancePanel: View {
 private struct ModelPerformancePanelContent: View {
     @Query private var metrics: [SessionMetric]
 
-    init(filter: TimeFilter) {
-        if let predicate = filter.predicate {
-            _metrics = Query(filter: predicate)
+    init(filter: VoiceInkPerformanceTimeFilter) {
+        if let start = filter.startDate() {
+            _metrics = Query(filter: #Predicate<SessionMetric> { $0.timestamp >= start })
         } else {
             _metrics = Query()
         }

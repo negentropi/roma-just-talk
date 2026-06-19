@@ -122,6 +122,46 @@ final class PerformanceAnalysisTests: XCTestCase {
         XCTAssertEqual(record.transcriptionModelName, "fast-local")
         XCTAssertEqual(record.aiEnhancementModelName, "cleaner")
     }
+
+    func testPerformanceTimeFilterPreservesMacOSPanelStorageAndLabels() {
+        XCTAssertEqual(VoiceInkPerformanceTimeFilter.userDefaultsKey, "modelPerfPanelFilter")
+        XCTAssertEqual(VoiceInkPerformanceTimeFilter.defaultFilter, .last7Days)
+        XCTAssertEqual(VoiceInkPerformanceTimeFilter.allCases, [.last7Days, .last30Days, .thisYear, .allTime])
+        XCTAssertEqual(VoiceInkPerformanceTimeFilter.last7Days.label, "Last 7 Days")
+        XCTAssertEqual(VoiceInkPerformanceTimeFilter.last30Days.label, "Last 30 Days")
+        XCTAssertEqual(VoiceInkPerformanceTimeFilter.thisYear.label, "This Year")
+        XCTAssertEqual(VoiceInkPerformanceTimeFilter.allTime.label, "All Time")
+        XCTAssertEqual(VoiceInkPerformanceTimeFilter.storedFilter(rawValue: "Last 30 Days"), .last30Days)
+        XCTAssertEqual(VoiceInkPerformanceTimeFilter.storedFilter(rawValue: "missing"), .last7Days)
+        XCTAssertEqual(VoiceInkPerformanceTimeFilter.storedFilter(rawValue: nil), .last7Days)
+    }
+
+    func testPerformanceTimeFilterStartDatesPreserveMacOSPanelWindows() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let now = calendar.date(from: DateComponents(
+            timeZone: calendar.timeZone,
+            year: 2026,
+            month: 6,
+            day: 19,
+            hour: 12,
+            minute: 30
+        ))!
+
+        XCTAssertEqual(
+            VoiceInkPerformanceTimeFilter.last7Days.startDate(now: now, calendar: calendar),
+            now.addingTimeInterval(-7 * 24 * 3600)
+        )
+        XCTAssertEqual(
+            VoiceInkPerformanceTimeFilter.last30Days.startDate(now: now, calendar: calendar),
+            now.addingTimeInterval(-30 * 24 * 3600)
+        )
+        XCTAssertEqual(
+            VoiceInkPerformanceTimeFilter.thisYear.startDate(now: now, calendar: calendar),
+            calendar.date(from: DateComponents(timeZone: calendar.timeZone, year: 2026, month: 1, day: 1))
+        )
+        XCTAssertNil(VoiceInkPerformanceTimeFilter.allTime.startDate(now: now, calendar: calendar))
+    }
 }
 
 private struct Record: VoiceInkPerformanceRecord {

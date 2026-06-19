@@ -51,6 +51,43 @@ public struct VoiceInkPerformanceModelStat: Identifiable, Equatable, Sendable {
     public let speedFactor: Double
 }
 
+public enum VoiceInkPerformanceTimeFilter: String, CaseIterable, Identifiable, Sendable {
+    case last7Days = "Last 7 Days"
+    case last30Days = "Last 30 Days"
+    case thisYear = "This Year"
+    case allTime = "All Time"
+
+    public static let userDefaultsKey = "modelPerfPanelFilter"
+    public static let defaultFilter: Self = .last7Days
+
+    public var id: String { rawValue }
+    public var label: String { rawValue }
+
+    public static func storedFilter(rawValue: String?) -> Self {
+        guard let rawValue, let filter = Self(rawValue: rawValue) else {
+            return defaultFilter
+        }
+
+        return filter
+    }
+
+    public func startDate(
+        now: Date = Date(),
+        calendar: Calendar = .current
+    ) -> Date? {
+        switch self {
+        case .allTime:
+            return nil
+        case .last7Days:
+            return now.addingTimeInterval(-7 * 24 * 3600)
+        case .last30Days:
+            return now.addingTimeInterval(-30 * 24 * 3600)
+        case .thisYear:
+            return calendar.dateInterval(of: .year, for: now)?.start
+        }
+    }
+}
+
 public enum VoiceInkPerformanceAnalyzer {
     public static func analyze<Record: VoiceInkPerformanceRecord>(
         records: [Record]

@@ -4753,6 +4753,26 @@ require_pattern \
   'speedFactorRealtimeText|realTimeComparisonText' \
   VoiceInkCore/Sources/VoiceInkCore/PerformanceAnalysis.swift
 
+require_pattern \
+  "shared performance time filter lives in VoiceInkCore" \
+  'VoiceInkPerformanceTimeFilter' \
+  VoiceInkCore/Sources/VoiceInkCore/PerformanceAnalysis.swift
+
+require_pattern \
+  "shared performance time filter owns macOS panel storage and windows" \
+  'userDefaultsKey = "modelPerfPanelFilter"|defaultFilter|storedFilter|startDate' \
+  VoiceInkCore/Sources/VoiceInkCore/PerformanceAnalysis.swift
+
+require_pattern \
+  "macOS model performance panel uses shared time filter" \
+  'VoiceInkPerformanceTimeFilter\.(userDefaultsKey|defaultFilter|storedFilter)|filter\.startDate\(' \
+  VoiceInk/Views/Metrics/ModelPerformancePanel.swift
+
+reject_pattern \
+  "macOS model performance panel avoids shell-only time filter policy" \
+  'enum +TimeFilter|"modelPerfPanelFilter"|"Last 7 Days"|"Last 30 Days"|"This Year"|"All Time"|addingTimeInterval\(-[0-9]+ \* 24 \* 3600\)|dateInterval\(of: \.year' \
+  VoiceInk/Views/Metrics/ModelPerformancePanel.swift
+
 reject_pattern \
   "platform metric views avoid shell-only realtime presentation text" \
   '"Faster than Real-time"|"Slower than Real-time"|speedFactor >= 1\.0|speedFactorText\) realtime' \

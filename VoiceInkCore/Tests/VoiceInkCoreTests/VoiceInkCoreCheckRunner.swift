@@ -444,6 +444,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PerformanceAnalysisTests.testDefaultStatsPreserveHistoricalAnalyzerNilOnlyFiltering", run: { PerformanceAnalysisTests().testDefaultStatsPreserveHistoricalAnalyzerNilOnlyFiltering() }),
             VoiceInkCoreCheck(name: "PerformanceAnalysisTests.testModelStatFormatsSharedPresentationText", run: { PerformanceAnalysisTests().testModelStatFormatsSharedPresentationText() }),
             VoiceInkCoreCheck(name: "PerformanceAnalysisTests.testSessionMetricSourceDefaultsPerformanceRecordFields", run: { PerformanceAnalysisTests().testSessionMetricSourceDefaultsPerformanceRecordFields() }),
+            VoiceInkCoreCheck(name: "PerformanceAnalysisTests.testPerformanceTimeFilterPreservesMacOSPanelStorageAndLabels", run: { PerformanceAnalysisTests().testPerformanceTimeFilterPreservesMacOSPanelStorageAndLabels() }),
+            VoiceInkCoreCheck(name: "PerformanceAnalysisTests.testPerformanceTimeFilterStartDatesPreserveMacOSPanelWindows", run: { PerformanceAnalysisTests().testPerformanceTimeFilterStartDatesPreserveMacOSPanelWindows() }),
             VoiceInkCoreCheck(name: "PostProcessingRequestTests.testBlankPromptReturnsNilRequest", run: { PostProcessingRequestTests().testBlankPromptReturnsNilRequest() }),
             VoiceInkCoreCheck(name: "PostProcessingRequestTests.testRequestBuildsLegacyIOSPostProcessingMessages", run: { try PostProcessingRequestTests().testRequestBuildsLegacyIOSPostProcessingMessages() }),
             VoiceInkCoreCheck(name: "PostProcessingRequestTests.testFinalizedTranscriptFallsBackWhenResponseIsEmptyAfterFiltering", run: { PostProcessingRequestTests().testFinalizedTranscriptFallsBackWhenResponseIsEmptyAfterFiltering() }),

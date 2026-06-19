@@ -2293,6 +2293,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
+  "shared app data reset file plan lives in VoiceInkCore" \
+  'VoiceInkAppDataResetFilePlan' \
+  VoiceInkCore/Sources/VoiceInkCore/AppDataReset.swift
+
+require_pattern \
   "shared current-model preference remembers legacy macOS model key" \
   'legacyModelNameKey += +"CurrentModel"' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
@@ -2377,10 +2382,20 @@ require_pattern \
   'VoiceInkDefaultSettings\.iOS\.appSettingsResetState' \
   iOS/VoiceInk-ios/AppSettings.swift
 
+require_pattern \
+  "iOS app settings reset consumes shared file reset plan" \
+  'VoiceInkAppDataResetFilePlan\.iOS' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
 reject_pattern \
   "iOS app settings reset avoids shell-only reset state assembly" \
   'let +defaults += +VoiceInkDefaultSettings\.iOS|modes += +\[\]|selectedModeId += +nil|apiKeyState += +VoiceInkProviderAPIKeyState\(\)|wordReplacements += +\[\]|customVocabularyTerms += +\[\]' \
   iOS/VoiceInk-ios/AppSettings.swift
+
+reject_pattern \
+  "iOS app settings reset avoids shell-only file reset sequence" \
+  'let +recordingsDir|let +modelsDir|let +cachesURL|let +tmpPath|contentsOfDirectory|removeItem\(atPath:' \
+  iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \
   "macOS app launch registers shared macOS default values" \

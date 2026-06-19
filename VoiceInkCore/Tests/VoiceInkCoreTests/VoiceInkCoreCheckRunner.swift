@@ -11,6 +11,8 @@ struct VoiceInkCoreCheckRunner {
     static func main() async {
         let checks: [VoiceInkCoreCheck] = [
             VoiceInkCoreCheck(name: "AppIdentityTests.testAppIdentityPreservesSharedVisibleNames", run: { AppIdentityTests().testAppIdentityPreservesSharedVisibleNames() }),
+            VoiceInkCoreCheck(name: "AppDataResetTests.testIOSResetFilePlanPreservesExistingDirectoryPolicy", run: { AppDataResetTests().testIOSResetFilePlanPreservesExistingDirectoryPolicy() }),
+            VoiceInkCoreCheck(name: "AppDataResetTests.testResetFilePlanRemovesDirectoriesAndEmptiesCacheDirectoriesBestEffort", run: { try AppDataResetTests().testResetFilePlanRemovesDirectoriesAndEmptiesCacheDirectoriesBestEffort() }),
             VoiceInkCoreCheck(name: "AIPromptsTests.testFinalPromptTextReturnsRawPromptWithoutSystemInstructions", run: { AIPromptsTests().testFinalPromptTextReturnsRawPromptWithoutSystemInstructions() }),
             VoiceInkCoreCheck(name: "AIPromptsTests.testFinalPromptTextWrapsPromptWithSystemInstructions", run: { AIPromptsTests().testFinalPromptTextWrapsPromptWithSystemInstructions() }),
             VoiceInkCoreCheck(name: "AIPromptsTests.testEnhancementPromptBuilderAppendsContextSectionsInMacOSOrder", run: { AIPromptsTests().testEnhancementPromptBuilderAppendsContextSectionsInMacOSOrder() }),

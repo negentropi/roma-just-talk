@@ -29,7 +29,7 @@ struct APIKeyManagementView: View {
     }
 
     private var obfuscatedSelectedAPIKey: String {
-        VoiceInkSecretPresentation.obfuscatedAPIKey(aiService.apiKey) ?? "••••••••"
+        VoiceInkSecretPresentation.obfuscatedAPIKeyOrPlaceholder(aiService.apiKey)
     }
     
     var body: some View {

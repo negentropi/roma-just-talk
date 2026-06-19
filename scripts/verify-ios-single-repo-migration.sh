@@ -1140,6 +1140,11 @@ require_pattern \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 require_pattern \
+  "shared API-key obfuscation fallback lives in VoiceInkCore" \
+  'obfuscatedAPIKeyOrPlaceholder|obfuscatedAPIKeyPlaceholder' \
+  VoiceInkCore/Sources/VoiceInkCore/SecretPresentation.swift
+
+require_pattern \
   "shared provider API-key list row presentation lives in VoiceInkCore" \
   'VoiceInkProviderAPIKeyListRowPresentation|listRowPresentation' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
@@ -2130,6 +2135,11 @@ require_pattern \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
 
 require_pattern \
+  "macOS AI API-key view uses shared obfuscated-key fallback" \
+  'VoiceInkSecretPresentation\.obfuscatedAPIKeyOrPlaceholder' \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+
+require_pattern \
   "macOS AI service resolves keys through shared AI draft policy" \
   'VoiceInkAIEnhancementAPIKeyDraft' \
   VoiceInk/Services/AIEnhancement/AIService.swift
@@ -2143,6 +2153,11 @@ reject_pattern \
 reject_pattern \
   "macOS AI API-key view avoids duplicate verification failure copy" \
   'Verification failed' \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+
+reject_pattern \
+  "macOS AI API-key view avoids duplicate obfuscated-key fallback copy" \
+  '••••••••' \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
 
 require_pattern \

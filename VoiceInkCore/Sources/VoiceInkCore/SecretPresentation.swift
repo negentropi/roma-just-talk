@@ -1,6 +1,8 @@
 import Foundation
 
 public enum VoiceInkSecretPresentation {
+    public static let obfuscatedAPIKeyPlaceholder = "••••••••"
+
     public static func obfuscatedAPIKey(_ key: String) -> String? {
         let trimmedKey = key.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedKey.isEmpty else {
@@ -18,5 +20,9 @@ public enum VoiceInkSecretPresentation {
         let end = trimmedKey.suffix(suffixCount)
         let middleCount = max(4, count - prefixCount - suffixCount)
         return "\(start)\(String(repeating: "•", count: middleCount))\(end)"
+    }
+
+    public static func obfuscatedAPIKeyOrPlaceholder(_ key: String) -> String {
+        obfuscatedAPIKey(key) ?? obfuscatedAPIKeyPlaceholder
     }
 }

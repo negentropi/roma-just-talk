@@ -31,4 +31,9 @@ final class SecretPresentationTests: XCTestCase {
             "abcd••••efg"
         )
     }
+
+    func testObfuscatedAPIKeyOrPlaceholderPreservesMacOSFallback() {
+        XCTAssertEqual(VoiceInkSecretPresentation.obfuscatedAPIKeyOrPlaceholder(""), "••••••••")
+        XCTAssertEqual(VoiceInkSecretPresentation.obfuscatedAPIKeyOrPlaceholder("abc123"), "••••••")
+    }
 }

@@ -24,7 +24,6 @@ enum AppDefaults {
 
             // Recording & Transcription
             VoiceInkUserDefaultsKey.appendTrailingSpace: VoiceInkPreferenceDefault.appendTrailingSpace,
-            "showLiveTextPreview": false,
             VoiceInkRollingBufferPreloadSettings.modeKey: VoiceInkRollingBufferPreloadSettings.defaultMode.rawValue,
             VoiceInkRollingBufferPreloadSettings.autoDisableCloudModelsKey: VoiceInkRollingBufferPreloadSettings.defaultAutoDisablesCloudModels,
             VoiceInkRollingBufferPreloadSettings.autoDisableLowBatteryLocalModelsKey: VoiceInkRollingBufferPreloadSettings.defaultAutoDisablesLowBatteryLocalModels,
@@ -43,11 +42,10 @@ enum AppDefaults {
             "isMiddleClickToggleEnabled": false,
             "middleClickActivationDelay": 200,
             SpecialShortcutSettings.pasteLastTranscriptOnEmptyTapKey: true,
-
-            // Model
-            "PrewarmModelOnWake": true,
         ]
 
+        platformDefaults.merge(VoiceInkModelRuntimePreference.registeredDefaults) { _, sharedValue in sharedValue }
+        platformDefaults.merge(VoiceInkRecorderPreviewPreference.registeredDefaults) { _, sharedValue in sharedValue }
         platformDefaults.merge(VoiceInkRecordingFeedbackPreference.registeredDefaults) { _, sharedValue in sharedValue }
         platformDefaults.merge(VoiceInkPastePreference.registeredDefaults) { _, sharedValue in sharedValue }
         platformDefaults.merge(VoiceInkPowerModePreference.registeredDefaults) { _, sharedValue in sharedValue }

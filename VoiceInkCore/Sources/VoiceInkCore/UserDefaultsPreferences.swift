@@ -35,6 +35,8 @@ public enum VoiceInkUserDefaultsKey {
     public static let powerModeConfigurations = "powerModeConfigurationsV2"
     public static let activePowerModeConfigurationId = "activeConfigurationId"
     public static let activePowerModeSession = "powerModeActiveSession.v1"
+    public static let prewarmModelOnWake = "PrewarmModelOnWake"
+    public static let showLiveTextPreview = "showLiveTextPreview"
     public static let selectedAIProvider = "selectedAIProvider"
     public static let openRouterModels = "openRouterModels"
     public static let ollamaBaseURL = "ollamaBaseURL"
@@ -62,6 +64,8 @@ public enum VoiceInkPreferenceDefault {
     public static let enhancementRetryOnTimeout = true
     public static let powerModeUIEnabled = false
     public static let powerModePersistConfiguredPreferences = false
+    public static let prewarmModelOnWake = true
+    public static let showLiveTextPreview = false
     public static let ollamaBaseURL = "http://localhost:11434"
     public static let macOSSelectedTranscriptionLanguage = "en"
 }
@@ -790,6 +794,54 @@ public enum VoiceInkAudioCleanupPreference {
     }
 }
 
+public enum VoiceInkModelRuntimePreference {
+    public static var registeredDefaults: [String: Any] {
+        [
+            VoiceInkUserDefaultsKey.prewarmModelOnWake: VoiceInkPreferenceDefault.prewarmModelOnWake
+        ]
+    }
+
+    public static func shouldPrewarmModelOnWake(from defaults: UserDefaults = .standard) -> Bool {
+        defaults.object(forKey: VoiceInkUserDefaultsKey.prewarmModelOnWake) as? Bool
+            ?? VoiceInkPreferenceDefault.prewarmModelOnWake
+    }
+
+    public static func saveShouldPrewarmModelOnWake(
+        _ shouldPrewarm: Bool,
+        to defaults: UserDefaults = .standard
+    ) {
+        defaults.set(shouldPrewarm, forKey: VoiceInkUserDefaultsKey.prewarmModelOnWake)
+    }
+
+    public static func clear(from defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.prewarmModelOnWake)
+    }
+}
+
+public enum VoiceInkRecorderPreviewPreference {
+    public static var registeredDefaults: [String: Any] {
+        [
+            VoiceInkUserDefaultsKey.showLiveTextPreview: VoiceInkPreferenceDefault.showLiveTextPreview
+        ]
+    }
+
+    public static func isLiveTextPreviewEnabled(from defaults: UserDefaults = .standard) -> Bool {
+        defaults.object(forKey: VoiceInkUserDefaultsKey.showLiveTextPreview) as? Bool
+            ?? VoiceInkPreferenceDefault.showLiveTextPreview
+    }
+
+    public static func saveIsLiveTextPreviewEnabled(
+        _ isEnabled: Bool,
+        to defaults: UserDefaults = .standard
+    ) {
+        defaults.set(isEnabled, forKey: VoiceInkUserDefaultsKey.showLiveTextPreview)
+    }
+
+    public static func clear(from defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.showLiveTextPreview)
+    }
+}
+
 public enum VoiceInkSharedPreferenceReset {
     public static func clearCoreUserSettings(
         from defaults: UserDefaults = .standard,
@@ -819,6 +871,8 @@ public enum VoiceInkSharedPreferenceReset {
         VoiceInkPowerModePreference.clear(from: defaults)
         VoiceInkPowerModeConfigurationPreference.clear(from: defaults)
         VoiceInkPowerModeSessionPreference.clear(from: defaults)
+        VoiceInkModelRuntimePreference.clear(from: defaults)
+        VoiceInkRecorderPreviewPreference.clear(from: defaults)
     }
 }
 

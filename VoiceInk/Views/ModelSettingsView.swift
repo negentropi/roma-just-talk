@@ -12,8 +12,10 @@ struct ModelSettingsView: View {
     @AppStorage(VoiceInkUserDefaultsKey.isVADEnabled) private var isVADEnabled = VoiceInkPreferenceDefault.isVADEnabled
     @AppStorage(VoiceInkUserDefaultsKey.appendTrailingSpace)
     private var appendTrailingSpace = VoiceInkPreferenceDefault.appendTrailingSpace
-    @AppStorage("PrewarmModelOnWake") private var prewarmModelOnWake = true
-    @AppStorage("showLiveTextPreview") private var showLiveTextPreview = false
+    @AppStorage(VoiceInkUserDefaultsKey.prewarmModelOnWake)
+    private var prewarmModelOnWake = VoiceInkPreferenceDefault.prewarmModelOnWake
+    @AppStorage(VoiceInkUserDefaultsKey.showLiveTextPreview)
+    private var showLiveTextPreview = VoiceInkPreferenceDefault.showLiveTextPreview
     @State private var customPrompt: String = ""
     @State private var isEditing: Bool = false
     private let cleanupPresentation = VoiceInkTranscriptionCleanupPresentation.macOS

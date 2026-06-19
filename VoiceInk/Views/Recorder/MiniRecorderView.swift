@@ -1,11 +1,13 @@
 import SwiftUI
+import VoiceInkCore
 
 struct MiniRecorderView<S: RecorderStateProvider & ObservableObject>: View {
     @ObservedObject var stateProvider: S
     @ObservedObject var recorder: Recorder
     @EnvironmentObject var windowManager: MiniWindowManager
     @EnvironmentObject private var enhancementService: AIEnhancementService
-    @AppStorage("showLiveTextPreview") private var showLiveTextPreview = false
+    @AppStorage(VoiceInkUserDefaultsKey.showLiveTextPreview)
+    private var showLiveTextPreview = VoiceInkPreferenceDefault.showLiveTextPreview
 
     @State private var activePopover: ActivePopoverState = .none
 

@@ -12,7 +12,6 @@ final class ModelPrewarmService: ObservableObject {
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "ModelPrewarm")
     private let serviceRegistry: TranscriptionServiceRegistry
     private let prewarmAudioURL = Bundle.main.url(forResource: "sound7", withExtension: "wav")
-    private let prewarmEnabledKey = "PrewarmModelOnWake"
 
     init(
         transcriptionModelManager: TranscriptionModelManager,
@@ -100,9 +99,7 @@ final class ModelPrewarmService: ObservableObject {
     // MARK: - Validation
 
     private func shouldPrewarm() -> Bool {
-        // Check if user has enabled prewarming
-        let isEnabled = UserDefaults.standard.bool(forKey: prewarmEnabledKey)
-        guard isEnabled else {
+        guard VoiceInkModelRuntimePreference.shouldPrewarmModelOnWake() else {
             logger.notice("Prewarm disabled by user")
             return false
         }

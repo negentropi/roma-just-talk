@@ -36,6 +36,8 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkUserDefaultsKey.powerModeConfigurations, "powerModeConfigurationsV2")
         XCTAssertEqual(VoiceInkUserDefaultsKey.activePowerModeConfigurationId, "activeConfigurationId")
         XCTAssertEqual(VoiceInkUserDefaultsKey.activePowerModeSession, "powerModeActiveSession.v1")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.prewarmModelOnWake, "PrewarmModelOnWake")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.showLiveTextPreview, "showLiveTextPreview")
         XCTAssertEqual(VoiceInkUserDefaultsKey.selectedAIProvider, "selectedAIProvider")
         XCTAssertEqual(VoiceInkUserDefaultsKey.openRouterModels, "openRouterModels")
         XCTAssertEqual(VoiceInkUserDefaultsKey.ollamaBaseURL, "ollamaBaseURL")
@@ -88,6 +90,11 @@ final class UserDefaultsPreferencesTests: XCTestCase {
     func testSharedPreferenceDefaultsPreserveExistingPowerModeFlags() {
         XCTAssertFalse(VoiceInkPreferenceDefault.powerModeUIEnabled)
         XCTAssertFalse(VoiceInkPreferenceDefault.powerModePersistConfiguredPreferences)
+    }
+
+    func testSharedPreferenceDefaultsPreserveExistingMacOSRuntimeFlags() {
+        XCTAssertTrue(VoiceInkPreferenceDefault.prewarmModelOnWake)
+        XCTAssertFalse(VoiceInkPreferenceDefault.showLiveTextPreview)
     }
 
     func testSharedPreferenceDefaultsPreserveExistingOllamaBaseURL() {
@@ -987,6 +994,44 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(configuration.cutoffDate(from: referenceDate), referenceDate)
     }
 
+    func testModelRuntimePreferenceRegisteredDefaultsPreserveMacOSPolicy() {
+        XCTAssertEqual(
+            VoiceInkModelRuntimePreference.registeredDefaults[VoiceInkUserDefaultsKey.prewarmModelOnWake] as? Bool,
+            VoiceInkPreferenceDefault.prewarmModelOnWake
+        )
+    }
+
+    func testModelRuntimePreferenceReadsSavesAndClearsPrewarmFlag() {
+        withIsolatedDefaults { defaults in
+            XCTAssertTrue(VoiceInkModelRuntimePreference.shouldPrewarmModelOnWake(from: defaults))
+
+            VoiceInkModelRuntimePreference.saveShouldPrewarmModelOnWake(false, to: defaults)
+            XCTAssertFalse(VoiceInkModelRuntimePreference.shouldPrewarmModelOnWake(from: defaults))
+
+            VoiceInkModelRuntimePreference.clear(from: defaults)
+            XCTAssertTrue(VoiceInkModelRuntimePreference.shouldPrewarmModelOnWake(from: defaults))
+        }
+    }
+
+    func testRecorderPreviewPreferenceRegisteredDefaultsPreserveMacOSPolicy() {
+        XCTAssertEqual(
+            VoiceInkRecorderPreviewPreference.registeredDefaults[VoiceInkUserDefaultsKey.showLiveTextPreview] as? Bool,
+            VoiceInkPreferenceDefault.showLiveTextPreview
+        )
+    }
+
+    func testRecorderPreviewPreferenceReadsSavesAndClearsPreviewFlag() {
+        withIsolatedDefaults { defaults in
+            XCTAssertFalse(VoiceInkRecorderPreviewPreference.isLiveTextPreviewEnabled(from: defaults))
+
+            VoiceInkRecorderPreviewPreference.saveIsLiveTextPreviewEnabled(true, to: defaults)
+            XCTAssertTrue(VoiceInkRecorderPreviewPreference.isLiveTextPreviewEnabled(from: defaults))
+
+            VoiceInkRecorderPreviewPreference.clear(from: defaults)
+            XCTAssertFalse(VoiceInkRecorderPreviewPreference.isLiveTextPreviewEnabled(from: defaults))
+        }
+    }
+
     func testSharedPreferenceResetClearsCoreUserSettings() {
         withIsolatedDefaults { defaults in
             let mode = Mode.defaultLocalWhisper()
@@ -1028,6 +1073,8 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             VoiceInkAIEnhancementContextPreference.saveUseScreenCaptureContext(true, to: defaults)
             VoiceInkPowerModePreference.saveIsUIEnabled(true, to: defaults)
             VoiceInkPowerModePreference.saveShouldPersistConfiguredPreferences(true, to: defaults)
+            VoiceInkModelRuntimePreference.saveShouldPrewarmModelOnWake(false, to: defaults)
+            VoiceInkRecorderPreviewPreference.saveIsLiveTextPreviewEnabled(true, to: defaults)
             let powerModeConfig = PowerModeConfig(
                 name: "Writing",
                 emoji: "W",
@@ -1124,6 +1171,8 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             XCTAssertTrue(VoiceInkPowerModeConfigurationPreference.loadConfigurations(from: defaults).isEmpty)
             XCTAssertNil(VoiceInkPowerModeConfigurationPreference.loadActiveConfigurationId(from: defaults))
             XCTAssertNil(try? VoiceInkPowerModeSessionPreference.loadActiveSession(from: defaults))
+            XCTAssertTrue(VoiceInkModelRuntimePreference.shouldPrewarmModelOnWake(from: defaults))
+            XCTAssertFalse(VoiceInkRecorderPreviewPreference.isLiveTextPreviewEnabled(from: defaults))
         }
     }
 

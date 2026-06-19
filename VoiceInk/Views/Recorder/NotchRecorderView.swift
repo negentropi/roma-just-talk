@@ -1,11 +1,13 @@
 import SwiftUI
+import VoiceInkCore
 
 struct NotchRecorderView<S: RecorderStateProvider & ObservableObject>: View {
     @ObservedObject var stateProvider: S
     @ObservedObject var recorder: Recorder
     @EnvironmentObject var windowManager: NotchWindowManager
     @EnvironmentObject private var enhancementService: AIEnhancementService
-    @AppStorage("showLiveTextPreview") private var showLiveTextPreview = false
+    @AppStorage(VoiceInkUserDefaultsKey.showLiveTextPreview)
+    private var showLiveTextPreview = VoiceInkPreferenceDefault.showLiveTextPreview
     @ObservedObject private var powerModeManager = PowerModeManager.shared
     @State private var activePopover: ActivePopoverState = .none
 

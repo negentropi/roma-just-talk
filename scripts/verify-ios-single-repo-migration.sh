@@ -2940,6 +2940,95 @@ require_pattern \
   docs/ios-single-repo-migration.md
 
 require_pattern \
+  "shared model runtime preference key lives in VoiceInkCore" \
+  'prewarmModelOnWake = "PrewarmModelOnWake"' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared recorder preview preference key lives in VoiceInkCore" \
+  'showLiveTextPreview = "showLiveTextPreview"' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared model runtime preference module lives in VoiceInkCore" \
+  'public enum VoiceInkModelRuntimePreference' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared model runtime preference reads policy in VoiceInkCore" \
+  'shouldPrewarmModelOnWake' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared model runtime preference saves policy in VoiceInkCore" \
+  'saveShouldPrewarmModelOnWake' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared recorder preview preference module lives in VoiceInkCore" \
+  'public enum VoiceInkRecorderPreviewPreference' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared recorder preview preference reads policy in VoiceInkCore" \
+  'isLiveTextPreviewEnabled' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared recorder preview preference saves policy in VoiceInkCore" \
+  'saveIsLiveTextPreviewEnabled' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "macOS defaults register shared model runtime defaults" \
+  'VoiceInkModelRuntimePreference\.registeredDefaults' \
+  VoiceInk/AppDefaults.swift
+
+require_pattern \
+  "macOS defaults register shared recorder preview defaults" \
+  'VoiceInkRecorderPreviewPreference\.registeredDefaults' \
+  VoiceInk/AppDefaults.swift
+
+require_pattern \
+  "macOS model prewarm uses shared model runtime preference" \
+  'VoiceInkModelRuntimePreference\.shouldPrewarmModelOnWake' \
+  VoiceInk/Services/ModelPrewarmService.swift
+
+require_pattern \
+  "macOS model settings observes shared model runtime key" \
+  'VoiceInkUserDefaultsKey\.prewarmModelOnWake' \
+  VoiceInk/Views/ModelSettingsView.swift
+
+require_pattern \
+  "macOS model settings observes shared recorder preview key" \
+  'VoiceInkUserDefaultsKey\.showLiveTextPreview' \
+  VoiceInk/Views/ModelSettingsView.swift
+
+require_pattern \
+  "macOS mini recorder observes shared recorder preview key" \
+  'VoiceInkUserDefaultsKey\.showLiveTextPreview' \
+  VoiceInk/Views/Recorder/MiniRecorderView.swift
+
+require_pattern \
+  "macOS notch recorder observes shared recorder preview key" \
+  'VoiceInkUserDefaultsKey\.showLiveTextPreview' \
+  VoiceInk/Views/Recorder/NotchRecorderView.swift
+
+reject_pattern \
+  "macOS model runtime shells avoid raw runtime preference keys" \
+  '"(PrewarmModelOnWake|showLiveTextPreview)"' \
+  VoiceInk/AppDefaults.swift \
+  VoiceInk/Services/ModelPrewarmService.swift \
+  VoiceInk/Views/ModelSettingsView.swift \
+  VoiceInk/Views/Recorder/MiniRecorderView.swift \
+  VoiceInk/Views/Recorder/NotchRecorderView.swift
+
+require_pattern \
+  "migration checklist tracks shared model runtime preference gate" \
+  'macOS model prewarm and recorder transcript-preview preferences route through `VoiceInkModelRuntimePreference`/`VoiceInkRecorderPreviewPreference`' \
+  docs/ios-single-repo-migration.md
+
+require_pattern \
   "shared transcription run result carries post-processing enhancement result" \
   'postProcessingResult: VoiceInkAIEnhancementResult\?' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift

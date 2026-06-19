@@ -133,13 +133,11 @@ struct ConfigurationRow: View {
     private var websiteCount: Int { return config.urlConfigs?.count ?? 0 }
     
     private var websiteText: String {
-        if websiteCount == 0 { return "" }
-        return websiteCount == 1 ? "1 Website" : "\(websiteCount) Websites"
+        VoiceInkPowerModePresentation.websiteTriggerCountText(websiteCount)
     }
     
     private var appText: String {
-        if appCount == 0 { return "" }
-        return appCount == 1 ? "1 App" : "\(appCount) Apps"
+        VoiceInkPowerModePresentation.appTriggerCountText(appCount)
     }
     
     private var extraAppsCount: Int {

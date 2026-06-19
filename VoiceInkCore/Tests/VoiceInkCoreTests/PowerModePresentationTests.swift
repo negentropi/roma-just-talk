@@ -46,4 +46,14 @@ final class PowerModePresentationTests: XCTestCase {
             "ZZ"
         )
     }
+
+    func testTriggerCountTextPreservesPowerModeRowPluralization() {
+        XCTAssertEqual(VoiceInkPowerModePresentation.appTriggerCountText(0), "")
+        XCTAssertEqual(VoiceInkPowerModePresentation.appTriggerCountText(1), "1 App")
+        XCTAssertEqual(VoiceInkPowerModePresentation.appTriggerCountText(2), "2 Apps")
+
+        XCTAssertEqual(VoiceInkPowerModePresentation.websiteTriggerCountText(0), "")
+        XCTAssertEqual(VoiceInkPowerModePresentation.websiteTriggerCountText(1), "1 Website")
+        XCTAssertEqual(VoiceInkPowerModePresentation.websiteTriggerCountText(3), "3 Websites")
+    }
 }

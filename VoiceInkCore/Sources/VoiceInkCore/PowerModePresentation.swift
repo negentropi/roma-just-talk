@@ -36,4 +36,19 @@ public enum VoiceInkPowerModePresentation {
 
         return languageOptions[selectedLanguage] ?? selectedLanguage.uppercased()
     }
+
+    public static func appTriggerCountText(_ count: Int) -> String {
+        triggerCountText(count, singular: "App", plural: "Apps")
+    }
+
+    public static func websiteTriggerCountText(_ count: Int) -> String {
+        triggerCountText(count, singular: "Website", plural: "Websites")
+    }
+
+    private static func triggerCountText(_ count: Int, singular: String, plural: String) -> String {
+        guard count > 0 else {
+            return ""
+        }
+        return count == 1 ? "1 \(singular)" : "\(count) \(plural)"
+    }
 }

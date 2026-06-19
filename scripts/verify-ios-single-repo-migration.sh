@@ -1980,13 +1980,28 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
 
 require_pattern \
+  "shared Power Mode trigger-count display formatting lives in VoiceInkCore" \
+  'appTriggerCountText|websiteTriggerCountText' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
+
+require_pattern \
   "macOS Power Mode rows use shared selected-language display formatting" \
   'VoiceInkPowerModePresentation\.selectedLanguageDisplayText' \
+  VoiceInk/PowerMode/PowerModeViewComponents.swift
+
+require_pattern \
+  "macOS Power Mode rows use shared trigger-count display formatting" \
+  'VoiceInkPowerModePresentation\.(appTriggerCountText|websiteTriggerCountText)' \
   VoiceInk/PowerMode/PowerModeViewComponents.swift
 
 reject_pattern \
   "macOS Power Mode rows avoid shell-only selected-language fallback formatting" \
   'langCode == "auto"|langCode == "en"|langCode\.uppercased\(\)' \
+  VoiceInk/PowerMode/PowerModeViewComponents.swift
+
+reject_pattern \
+  "macOS Power Mode rows avoid shell-only trigger-count pluralization" \
+  'websiteCount == 1|appCount == 1|[0-9] (App|Apps|Website|Websites)' \
   VoiceInk/PowerMode/PowerModeViewComponents.swift
 
 require_pattern \

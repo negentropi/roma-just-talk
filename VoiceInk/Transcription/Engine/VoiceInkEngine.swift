@@ -270,18 +270,24 @@ class VoiceInkEngine: NSObject, ObservableObject {
                             Task { @MainActor [weak self] in
                                 guard let self else { return }
 
-                                if let model = self.transcriptionModelManager.currentTranscriptionModel,
-                                   model.provider == .whisper {
-                                    if let localWhisperModel = self.whisperModelManager.availableModels.first(where: { $0.name == model.name }),
-                                       self.whisperModelManager.whisperContext == nil {
-                                        do {
-                                            try await self.whisperModelManager.loadModel(localWhisperModel)
-                                        } catch {
-                                            self.logger.error("❌ Model loading failed: \(error.localizedDescription, privacy: .public)")
+                                if let model = self.transcriptionModelManager.currentTranscriptionModel {
+                                    switch model.transcriptionRuntimeResourcePlan.recordingStartupLoadAction {
+                                    case .loadLocalWhisperModel:
+                                        if let localWhisperModel = self.whisperModelManager.availableModels.first(where: { $0.name == model.name }),
+                                           self.whisperModelManager.whisperContext == nil {
+                                            do {
+                                                try await self.whisperModelManager.loadModel(localWhisperModel)
+                                            } catch {
+                                                self.logger.error("❌ Model loading failed: \(error.localizedDescription, privacy: .public)")
+                                            }
                                         }
+                                    case .loadLocalFluidAudioModel:
+                                        if let fluidAudioModel = model as? FluidAudioModel {
+                                            try? await self.serviceRegistry.fluidAudioTranscriptionService.loadModel(for: fluidAudioModel)
+                                        }
+                                    case .none:
+                                        break
                                     }
-                                } else if let fluidAudioModel = self.transcriptionModelManager.currentTranscriptionModel as? FluidAudioModel {
-                                    try? await self.serviceRegistry.fluidAudioTranscriptionService.loadModel(for: fluidAudioModel)
                                 }
 
                                 if let enhancementService = self.enhancementService {

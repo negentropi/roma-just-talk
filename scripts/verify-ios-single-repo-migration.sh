@@ -2190,11 +2190,37 @@ require_pattern \
   'VoiceInkTranscriptionStreamingAdapterKind|streamingAdapterKind' \
   VoiceInk/Transcription/Streaming/StreamingTranscriptionService.swift
 
+require_pattern \
+  "shared core owns transcription runtime resource planning" \
+  'VoiceInkTranscriptionRuntimeResourcePlan|VoiceInkTranscriptionRecordingStartupLoadAction' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRuntimeResourcePolicy.swift
+
+require_pattern \
+  "macOS model adapts shared transcription runtime resource plan" \
+  'transcriptionRuntimeResourcePlan' \
+  VoiceInk/Models/TranscriptionModel.swift
+
+require_pattern \
+  "macOS prewarm uses shared transcription runtime resource plan" \
+  'transcriptionRuntimeResourcePlan\.shouldPrewarmModel' \
+  VoiceInk/Services/ModelPrewarmService.swift
+
+require_pattern \
+  "macOS recording startup uses shared transcription runtime load action" \
+  'transcriptionRuntimeResourcePlan\.recordingStartupLoadAction' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+
 reject_pattern \
   "macOS streaming session route avoids shell-only FluidAudio provider checks" \
   'model\.provider == \.fluidAudio' \
   VoiceInk/Transcription/Engine/TranscriptionServiceRegistry.swift \
   VoiceInk/Transcription/Streaming/StreamingTranscriptionService.swift
+
+reject_pattern \
+  "macOS runtime resource routing avoids shell-only provider checks" \
+  'switch +model\.provider|model\.provider == \.whisper|case +\.whisper, +\.fluidAudio' \
+  VoiceInk/Services/ModelPrewarmService.swift \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift
 
 reject_pattern \
   "macOS session creation avoids shell-only streaming support wrapper" \

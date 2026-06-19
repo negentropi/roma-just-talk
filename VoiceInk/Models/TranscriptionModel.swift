@@ -161,6 +161,10 @@ extension TranscriptionModel {
         )
     }
 
+    var transcriptionRuntimeResourcePlan: VoiceInkTranscriptionRuntimeResourcePlan {
+        VoiceInkTranscriptionRuntimeResourcePlan(serviceRoute: provider.transcriptionServiceRoute)
+    }
+
     var transcriptionLanguageOptions: [String: String] {
         if provider == .assemblyAI {
             return VoiceInkTranscriptionLanguageSupport.languages(

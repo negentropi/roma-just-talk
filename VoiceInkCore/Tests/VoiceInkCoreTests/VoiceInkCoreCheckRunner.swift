@@ -30,6 +30,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AIReasoningConfigTests.testTemperatureUsesRequiredGPT5Temperature", run: { AIReasoningConfigTests().testTemperatureUsesRequiredGPT5Temperature() }),
             VoiceInkCoreCheck(name: "AIReasoningConfigTests.testReasoningEffortMatchesProviderModelPolicy", run: { AIReasoningConfigTests().testReasoningEffortMatchesProviderModelPolicy() }),
             VoiceInkCoreCheck(name: "AIReasoningConfigTests.testExtraBodyParametersMatchProviderModelPolicy", run: { AIReasoningConfigTests().testExtraBodyParametersMatchProviderModelPolicy() }),
+            VoiceInkCoreCheck(name: "AIReasoningConfigTests.testChatRequestParametersCombineTemperatureAndReasoningPolicy", run: { AIReasoningConfigTests().testChatRequestParametersCombineTemperatureAndReasoningPolicy() }),
             VoiceInkCoreCheck(name: "AIReasoningConfigTests.testMacOSExtraAIProvidersUseNoSharedReasoningOverrides", run: { AIReasoningConfigTests().testMacOSExtraAIProvidersUseNoSharedReasoningOverrides() }),
             VoiceInkCoreCheck(name: "AIEnhancementErrorTests.testErrorDescriptionsPreserveExistingMacOSMessages", run: { AIEnhancementErrorTests().testErrorDescriptionsPreserveExistingMacOSMessages() }),
             VoiceInkCoreCheck(name: "AIEnhancementErrorTests.testHTTPErrorMappingPreservesMacOSRetryCategories", run: { AIEnhancementErrorTests().testHTTPErrorMappingPreservesMacOSRetryCategories() }),

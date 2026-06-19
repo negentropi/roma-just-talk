@@ -236,23 +236,19 @@ class AIEnhancementService: ObservableObject {
                     guard let baseURL = URL(string: aiService.selectedProvider.textEnhancementRequestURLString()) else {
                         throw VoiceInkAIEnhancementError.customError("\(aiService.selectedProvider.rawValue) has an invalid API endpoint URL. Please update it in AI settings.")
                     }
-                    let temperature = VoiceInkAIReasoningConfig.temperature(forModelName: aiService.currentModel)
-                    let coreProvider = aiService.selectedProvider.aiModelProvider
-                    let reasoningEffort = coreProvider.flatMap {
-                        VoiceInkAIReasoningConfig.reasoningEffort(for: $0, modelName: aiService.currentModel)
-                    }
-                    let extraBody = coreProvider.flatMap {
-                        VoiceInkAIReasoningConfig.extraBodyParameters(for: $0, modelName: aiService.currentModel)
-                    }
+                    let requestParameters = VoiceInkAIReasoningConfig.chatRequestParameters(
+                        for: aiService.selectedProvider.aiModelProvider,
+                        modelName: aiService.currentModel
+                    )
                     result = try await OpenAILLMClient.chatCompletion(
                         baseURL: baseURL,
                         apiKey: aiService.apiKey,
                         model: aiService.currentModel,
                         messages: [.user(formattedText)],
                         systemPrompt: systemMessage,
-                        temperature: temperature,
-                        reasoningEffort: reasoningEffort,
-                        extraBody: extraBody,
+                        temperature: requestParameters.temperature,
+                        reasoningEffort: requestParameters.reasoningEffort,
+                        extraBody: requestParameters.extraBodyParameters,
                         timeout: baseTimeout
                     )
                 case .ollama, .localCLI:

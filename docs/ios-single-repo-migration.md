@@ -44,7 +44,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - API-key display obfuscation policy; platform shells still own where stored keys are read and rendered
 - Keychain generic-password query and data-store policy for the shared app service, account key, syncability, data-protection keychain, add, copy-data, delete, and exists operations; platform shells still own macOS local-build fallbacks, logging, and UI state
 - API-key environment-reference resolution and typed provider runtime-key lookup/fallback policy
-- AI reasoning temperature, effort, and provider-specific hidden-reasoning request parameters for OpenAI-compatible post-processing
+- AI reasoning temperature, effort, provider-specific hidden-reasoning request parameters, and chat request-parameter planning for OpenAI-compatible post-processing/enhancement
 - AI-enhancement provider identity, persisted-name parsing, API-key requirement, text-enhancement selectability, connected-provider selection policy, credential-state policy, storage keys, model-selection key naming, and mapping to shared model providers; platform shells still own storage and execution
 - AI-enhancement API-key verification route metadata; native provider checks use shared verifier clients while macOS keeps model-specific Anthropic/OpenRouter/OpenAI-compatible verification
 - AI-enhancement model defaults, available-model source selection, static text-enhancement model lists, dynamic-provider default text-enhancement models, legacy Ollama service selected-model fallback, selected-model fallback policy, and refresh-time dynamic-provider model-selection repair for macOS AI providers; platform shells still own dynamic providers such as Ollama, OpenRouter fetching, Local CLI, and Custom
@@ -248,7 +248,7 @@ Current macOS consumers of shared remote transport:
 - macOS audio-file import and retranscription use `VoiceInkPostProcessingSkipPolicy`, matching the recorder pipeline and iOS run processor short-transcript skip behavior while preserving macOS prompt-trigger override on retry.
 - macOS `TranscriptionAutoCleanupService`, `ImportExportService`, `BackupImporter`, `SystemInfoService`, and app startup read/write transcription auto-cleanup preferences through `VoiceInkTranscriptionAutoCleanupPreference`; settings UI still binds directly through `@AppStorage`.
 - macOS `AudioCleanupManager`, audio cleanup settings, backup import/export, app defaults, and system diagnostics read/write audio-file cleanup preferences through `VoiceInkAudioCleanupPreference`; macOS still owns transcript queries, file deletion, cleanup timers, and the UI.
-- iOS retry post-processing inherits `VoiceInkAIReasoningConfig` through `VoiceInkPostProcessingClient`, aligning OpenAI-compatible reasoning controls with macOS enhancement requests.
+- iOS retry post-processing and macOS AI enhancement inherit `VoiceInkAIReasoningConfig.chatRequestParameters` for OpenAI-compatible request temperature, reasoning effort, and extra body values, keeping provider execution adapters platform-owned.
 - iOS retry post-processing failure text is produced through `VoiceInkPostProcessingFailurePresentation`, keeping the existing `"Post-processing failed:"` prefix shared with core tests.
 
 Current iOS consumers of shared remote transport:

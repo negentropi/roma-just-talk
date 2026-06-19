@@ -2249,6 +2249,21 @@ require_pattern \
   'textEnhancementExecutionRoute' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
+require_pattern \
+  "shared AI chat request parameter planning lives in VoiceInkCore" \
+  'VoiceInkAIChatRequestParameters|chatRequestParameters' \
+  VoiceInkCore/Sources/VoiceInkCore/AIReasoningConfig.swift
+
+require_pattern \
+  "macOS AI enhancement request tuning uses shared policy" \
+  'chatRequestParameters' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+require_pattern \
+  "iOS post-processing request tuning uses shared policy" \
+  'chatRequestParameters' \
+  VoiceInkCore/Sources/VoiceInkCore/PostProcessingClient.swift
+
 reject_pattern \
   "macOS AI API-key path avoids shell-only key-reference and blank-key policy" \
   'VoiceInkAPIKeyReference\.resolvedValue|VoiceInkProviderCredential\.nonBlank\(apiKey\)' \
@@ -2306,6 +2321,12 @@ reject_pattern \
   "macOS AI enhancement service avoids duplicate execution route policy" \
   'selectedProvider == \.(ollama|localCLI)|switch +aiService\.selectedProvider|case +\.anthropic:' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+reject_pattern \
+  "macOS/iOS AI request tuning avoids duplicate reasoning parameter assembly" \
+  'VoiceInkAIReasoningConfig\.(temperature|reasoningEffort|extraBodyParameters)' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift \
+  VoiceInkCore/Sources/VoiceInkCore/PostProcessingClient.swift
 
 reject_pattern \
   "macOS AI API-key view avoids duplicate verification failure copy" \

@@ -31,6 +31,35 @@ final class AIReasoningConfigTests: XCTestCase {
         XCTAssertNil(VoiceInkAIReasoningConfig.extraBodyParameters(for: .openAI, modelName: "gpt-5.4"))
     }
 
+    func testChatRequestParametersCombineTemperatureAndReasoningPolicy() {
+        let openAIParameters = VoiceInkAIReasoningConfig.chatRequestParameters(
+            for: .openAI,
+            modelName: "gpt-5.4",
+            defaultTemperature: 0.2
+        )
+        XCTAssertEqual(openAIParameters.temperature, 1)
+        XCTAssertEqual(openAIParameters.reasoningEffort, "none")
+        XCTAssertNil(openAIParameters.extraBodyParameters)
+
+        let groqParameters = VoiceInkAIReasoningConfig.chatRequestParameters(
+            for: .groq,
+            modelName: "openai/gpt-oss-120b",
+            defaultTemperature: 0.2
+        )
+        XCTAssertEqual(groqParameters.temperature, 0.2)
+        XCTAssertEqual(groqParameters.reasoningEffort, "low")
+        XCTAssertEqual(groqParameters.extraBodyParameters?["include_reasoning"] as? Bool, false)
+
+        let customParameters = VoiceInkAIReasoningConfig.chatRequestParameters(
+            for: nil,
+            modelName: "custom-model",
+            defaultTemperature: 0.2
+        )
+        XCTAssertEqual(customParameters.temperature, 0.2)
+        XCTAssertNil(customParameters.reasoningEffort)
+        XCTAssertNil(customParameters.extraBodyParameters)
+    }
+
     func testMacOSExtraAIProvidersUseNoSharedReasoningOverrides() {
         let providersWithoutOverrides: [VoiceInkAIModelProvider] = [
             .anthropic,

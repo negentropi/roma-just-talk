@@ -1,8 +1,40 @@
 import Foundation
 
+public struct VoiceInkAIChatRequestParameters {
+    public let temperature: Double
+    public let reasoningEffort: String?
+    public let extraBodyParameters: [String: Any]?
+
+    public init(
+        temperature: Double,
+        reasoningEffort: String?,
+        extraBodyParameters: [String: Any]?
+    ) {
+        self.temperature = temperature
+        self.reasoningEffort = reasoningEffort
+        self.extraBodyParameters = extraBodyParameters
+    }
+}
+
 public enum VoiceInkAIReasoningConfig {
     public static func temperature(forModelName modelName: String, defaultTemperature: Double = 0.3) -> Double {
         modelName.lowercased().hasPrefix("gpt-5") ? 1.0 : defaultTemperature
+    }
+
+    public static func chatRequestParameters(
+        for provider: VoiceInkAIModelProvider?,
+        modelName: String,
+        defaultTemperature: Double = 0.3
+    ) -> VoiceInkAIChatRequestParameters {
+        VoiceInkAIChatRequestParameters(
+            temperature: temperature(forModelName: modelName, defaultTemperature: defaultTemperature),
+            reasoningEffort: provider.flatMap {
+                reasoningEffort(for: $0, modelName: modelName)
+            },
+            extraBodyParameters: provider.flatMap {
+                extraBodyParameters(for: $0, modelName: modelName)
+            }
+        )
     }
 
     private static let geminiNoneReasoningModels: Set<String> = [

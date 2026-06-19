@@ -1345,7 +1345,7 @@ reject_pattern \
 
 reject_pattern \
   "iOS local model views avoid duplicate operation confirmation copy" \
-  '\.alert\("Download Model"|\.alert\("Delete Model"|This will remove the model from your device|Button\("Download"\)|Button\("Cancel"' \
+  '\.alert\("Download Model"|\.alert\("Delete Model"|This will remove the model from your device|Button\("Download"\)|Button\("Delete"\)|Button\("Cancel"' \
   iOS/VoiceInk-ios/LocalModelManagementView.swift \
   iOS/VoiceInk-ios/OnboardingView.swift
 

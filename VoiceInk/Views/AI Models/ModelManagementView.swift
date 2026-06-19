@@ -2,6 +2,7 @@ import SwiftUI
 import SwiftData
 import AppKit
 import UniformTypeIdentifiers
+import VoiceInkCore
 
 struct ModelManagementView: View {
     @EnvironmentObject private var whisperModelManager: WhisperModelManager

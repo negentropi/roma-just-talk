@@ -899,6 +899,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PastePreferencesTests.testMigrateLegacyUserDefaultWritesModernMethodWhenMissing", run: { PastePreferencesTests().testMigrateLegacyUserDefaultWritesModernMethodWhenMissing() }),
             VoiceInkCoreCheck(name: "PastePreferencesTests.testMigrateLegacyUserDefaultDoesNotOverwriteValidModernMethod", run: { PastePreferencesTests().testMigrateLegacyUserDefaultDoesNotOverwriteValidModernMethod() }),
             VoiceInkCoreCheck(name: "PastePreferencesTests.testPastePreferenceKeysDefaultsAndRegisteredDefaults", run: { PastePreferencesTests().testPastePreferenceKeysDefaultsAndRegisteredDefaults() }),
+            VoiceInkCoreCheck(name: "PastePreferencesTests.testMacOSPasteSettingsPresentationPreservesCopyAndRestoreDelayOptions", run: { PastePreferencesTests().testMacOSPasteSettingsPresentationPreservesCopyAndRestoreDelayOptions() }),
             VoiceInkCoreCheck(name: "PastePreferencesTests.testPastePreferenceReadsSavesAndBoundsRestoreDelay", run: { PastePreferencesTests().testPastePreferenceReadsSavesAndBoundsRestoreDelay() }),
             VoiceInkCoreCheck(name: "RecordingFeedbackPreferenceTests.testSystemMuteModePreservesRawValuesAndDisplayNames", run: { RecordingFeedbackPreferenceTests().testSystemMuteModePreservesRawValuesAndDisplayNames() }),
             VoiceInkCoreCheck(name: "RecordingFeedbackPreferenceTests.testRegisteredDefaultsPreserveMacOSStorageKeys", run: { RecordingFeedbackPreferenceTests().testRegisteredDefaultsPreserveMacOSStorageKeys() }),

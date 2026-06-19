@@ -42,6 +42,43 @@ public enum VoiceInkPasteMethod: String, CaseIterable, Identifiable, Sendable {
     }
 }
 
+public struct VoiceInkPasteDelayOption: Identifiable, Equatable, Sendable {
+    public let label: String
+    public let value: TimeInterval
+
+    public var id: TimeInterval { value }
+
+    public init(label: String, value: TimeInterval) {
+        self.label = label
+        self.value = value
+    }
+}
+
+public struct VoiceInkMacOSPasteSettingsPresentation: Equatable, Sendable {
+    public let keepClipboardContentLabel: String
+    public let keepClipboardContentInfoMessage: String
+    public let restoreDelayLabel: String
+    public let restoreDelayOptions: [VoiceInkPasteDelayOption]
+    public let pasteMethodLabel: String
+    public let pasteMethodHelpMessage: String
+
+    public init(
+        keepClipboardContentLabel: String,
+        keepClipboardContentInfoMessage: String,
+        restoreDelayLabel: String,
+        restoreDelayOptions: [VoiceInkPasteDelayOption],
+        pasteMethodLabel: String,
+        pasteMethodHelpMessage: String
+    ) {
+        self.keepClipboardContentLabel = keepClipboardContentLabel
+        self.keepClipboardContentInfoMessage = keepClipboardContentInfoMessage
+        self.restoreDelayLabel = restoreDelayLabel
+        self.restoreDelayOptions = restoreDelayOptions
+        self.pasteMethodLabel = pasteMethodLabel
+        self.pasteMethodHelpMessage = pasteMethodHelpMessage
+    }
+}
+
 public enum VoiceInkPastePreference {
     public static let restoreClipboardAfterPasteKey = "restoreClipboardAfterPaste"
     public static let clipboardRestoreDelayKey = "clipboardRestoreDelay"
@@ -56,6 +93,23 @@ public enum VoiceInkPastePreference {
             VoiceInkPasteMethod.legacyAppleScriptPasteKey: false
         ]
     }
+
+    public static let macOSSettingsPresentation = VoiceInkMacOSPasteSettingsPresentation(
+        keepClipboardContentLabel: "Keep Clipboard Content",
+        keepClipboardContentInfoMessage: "VoiceInk temporarily uses the clipboard to paste transcription. When enabled, it restores your previous clipboard content after the selected delay. When disabled, the pasted transcription stays on your clipboard.",
+        restoreDelayLabel: "Restore Delay",
+        restoreDelayOptions: [
+            VoiceInkPasteDelayOption(label: "250ms", value: 0.25),
+            VoiceInkPasteDelayOption(label: "500ms", value: 0.5),
+            VoiceInkPasteDelayOption(label: "1s", value: 1.0),
+            VoiceInkPasteDelayOption(label: "2s", value: 2.0),
+            VoiceInkPasteDelayOption(label: "3s", value: 3.0),
+            VoiceInkPasteDelayOption(label: "4s", value: 4.0),
+            VoiceInkPasteDelayOption(label: "5s", value: 5.0)
+        ],
+        pasteMethodLabel: "Paste Method",
+        pasteMethodHelpMessage: "Default uses simulated Cmd+V key events. AppleScript can help when custom keyboard layouts do not paste correctly."
+    )
 
     public static func shouldRestoreClipboardAfterPaste(from defaults: UserDefaults = .standard) -> Bool {
         defaults.bool(forKey: restoreClipboardAfterPasteKey)

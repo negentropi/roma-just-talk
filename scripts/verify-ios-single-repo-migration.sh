@@ -3032,6 +3032,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
 
 require_pattern \
+  "shared macOS paste settings presentation lives in VoiceInkCore" \
+  'VoiceInkMacOSPasteSettingsPresentation|VoiceInkPasteDelayOption|macOSSettingsPresentation|restoreDelayOptions|pasteMethodHelpMessage' \
+  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+
+require_pattern \
   "macOS paste adapter uses shared paste method preference" \
   'VoiceInkPasteMethod\.current\(\)' \
   VoiceInk/Paste/CursorPaster.swift
@@ -3044,6 +3049,11 @@ require_pattern \
 require_pattern \
   "macOS settings uses shared paste preferences" \
   'VoiceInkPastePreference\.(restoreClipboardAfterPasteKey|clipboardRestoreDelayKey|defaultRestoreClipboardAfterPaste|defaultClipboardRestoreDelay)|VoiceInkPasteMethod\.(userDefaultsKey|standard|allCases|setCurrent)' \
+  VoiceInk/Views/Settings/SettingsView.swift
+
+require_pattern \
+  "macOS settings uses shared paste settings presentation" \
+  'VoiceInkPastePreference\.macOSSettingsPresentation|pasteSettingsPresentation\.(keepClipboardContentLabel|keepClipboardContentInfoMessage|restoreDelayLabel|restoreDelayOptions|pasteMethodLabel|pasteMethodHelpMessage)' \
   VoiceInk/Views/Settings/SettingsView.swift
 
 require_pattern \
@@ -3078,9 +3088,14 @@ reject_pattern \
   VoiceInk/Services/ImportExportService.swift \
   VoiceInk/Services/BackupImporter.swift
 
+reject_pattern \
+  "macOS settings avoids shell-only paste settings presentation copy" \
+  '"(Keep Clipboard Content|Restore Delay|Paste Method|250ms|500ms|Default uses simulated Cmd\+V key events\. AppleScript can help when custom keyboard layouts do not paste correctly\.)"' \
+  VoiceInk/Views/Settings/SettingsView.swift
+
 require_pattern \
   "migration checklist tracks shared paste preference gate" \
-  'macOS paste method and clipboard restore settings route through `VoiceInkPasteMethod`/`VoiceInkPastePreference`' \
+  'macOS paste method and clipboard restore settings route through `VoiceInkPasteMethod`/`VoiceInkPastePreference`, including settings labels/options/help' \
   docs/ios-single-repo-migration.md
 
 require_file \

@@ -31,6 +31,7 @@ struct SettingsView: View {
     @State private var isMiddleClickExpanded = false
     @State private var isSoundFeedbackExpanded = false
     @State private var isRestoreClipboardExpanded = false
+    private static let pasteSettingsPresentation = VoiceInkPastePreference.macOSSettingsPresentation
     private static let resetOnboardingPresentation = VoiceInkMacOSOnboardingPresentation.resetSettingsAlert
 
     var body: some View {
@@ -187,17 +188,13 @@ struct SettingsView: View {
                 ExpandableSettingsRow(
                     isExpanded: $isRestoreClipboardExpanded,
                     isEnabled: $restoreClipboardAfterPaste,
-                    label: "Keep Clipboard Content",
-                    infoMessage: "VoiceInk temporarily uses the clipboard to paste transcription. When enabled, it restores your previous clipboard content after the selected delay. When disabled, the pasted transcription stays on your clipboard."
+                    label: Self.pasteSettingsPresentation.keepClipboardContentLabel,
+                    infoMessage: Self.pasteSettingsPresentation.keepClipboardContentInfoMessage
                 ) {
-                    Picker("Restore Delay", selection: $clipboardRestoreDelay) {
-                        Text("250ms").tag(0.25)
-                        Text("500ms").tag(0.5)
-                        Text("1s").tag(1.0)
-                        Text("2s").tag(2.0)
-                        Text("3s").tag(3.0)
-                        Text("4s").tag(4.0)
-                        Text("5s").tag(5.0)
+                    Picker(Self.pasteSettingsPresentation.restoreDelayLabel, selection: $clipboardRestoreDelay) {
+                        ForEach(Self.pasteSettingsPresentation.restoreDelayOptions) { option in
+                            Text(option.label).tag(option.value)
+                        }
                     }
                 }
 
@@ -208,8 +205,8 @@ struct SettingsView: View {
                     }
                 } label: {
                     HStack(spacing: 4) {
-                        Text("Paste Method")
-                        InfoTip("Default uses simulated Cmd+V key events. AppleScript can help when custom keyboard layouts do not paste correctly.")
+                        Text(Self.pasteSettingsPresentation.pasteMethodLabel)
+                        InfoTip(Self.pasteSettingsPresentation.pasteMethodHelpMessage)
                     }
                 }
                 .pickerStyle(.menu)

@@ -86,6 +86,34 @@ final class PastePreferencesTests: XCTestCase {
         XCTAssertNil(VoiceInkPastePreference.registeredDefaults[VoiceInkPasteMethod.userDefaultsKey])
     }
 
+    func testMacOSPasteSettingsPresentationPreservesCopyAndRestoreDelayOptions() {
+        let presentation = VoiceInkPastePreference.macOSSettingsPresentation
+
+        XCTAssertEqual(presentation.keepClipboardContentLabel, "Keep Clipboard Content")
+        XCTAssertEqual(
+            presentation.keepClipboardContentInfoMessage,
+            "VoiceInk temporarily uses the clipboard to paste transcription. When enabled, it restores your previous clipboard content after the selected delay. When disabled, the pasted transcription stays on your clipboard."
+        )
+        XCTAssertEqual(presentation.restoreDelayLabel, "Restore Delay")
+        XCTAssertEqual(
+            presentation.restoreDelayOptions,
+            [
+                VoiceInkPasteDelayOption(label: "250ms", value: 0.25),
+                VoiceInkPasteDelayOption(label: "500ms", value: 0.5),
+                VoiceInkPasteDelayOption(label: "1s", value: 1.0),
+                VoiceInkPasteDelayOption(label: "2s", value: 2.0),
+                VoiceInkPasteDelayOption(label: "3s", value: 3.0),
+                VoiceInkPasteDelayOption(label: "4s", value: 4.0),
+                VoiceInkPasteDelayOption(label: "5s", value: 5.0)
+            ]
+        )
+        XCTAssertEqual(presentation.pasteMethodLabel, "Paste Method")
+        XCTAssertEqual(
+            presentation.pasteMethodHelpMessage,
+            "Default uses simulated Cmd+V key events. AppleScript can help when custom keyboard layouts do not paste correctly."
+        )
+    }
+
     func testPastePreferenceReadsSavesAndBoundsRestoreDelay() {
         withTemporaryDefaults { defaults in
             VoiceInkPastePreference.saveShouldRestoreClipboardAfterPaste(true, to: defaults)

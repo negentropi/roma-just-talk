@@ -1,0 +1,121 @@
+import Foundation
+
+public enum VoiceInkSystemMuteMode: String, CaseIterable, Identifiable, Sendable {
+    case automatic = "auto"
+    case always = "always"
+    case never = "never"
+
+    public var id: Self { self }
+
+    public var displayName: String {
+        switch self {
+        case .automatic:
+            return "Auto"
+        case .always:
+            return "On"
+        case .never:
+            return "Off"
+        }
+    }
+}
+
+public enum VoiceInkRecordingFeedbackPreference {
+    public static let systemMuteModeKey = "systemMuteMode"
+    public static let legacyIsSystemMuteEnabledKey = "isSystemMuteEnabled"
+    public static let audioResumptionDelayKey = "audioResumptionDelay"
+    public static let isPauseMediaEnabledKey = "isPauseMediaEnabled"
+    public static let isSoundFeedbackEnabledKey = "isSoundFeedbackEnabled"
+
+    public static let defaultSystemMuteMode = VoiceInkSystemMuteMode.automatic
+    public static let defaultAudioResumptionDelay: TimeInterval = 0.0
+    public static let defaultIsPauseMediaEnabled = false
+    public static let defaultIsSoundFeedbackEnabled = false
+
+    public static var registeredDefaults: [String: Any] {
+        [
+            systemMuteModeKey: defaultSystemMuteMode.rawValue,
+            legacyIsSystemMuteEnabledKey: true,
+            audioResumptionDelayKey: defaultAudioResumptionDelay,
+            isPauseMediaEnabledKey: defaultIsPauseMediaEnabled,
+            isSoundFeedbackEnabledKey: defaultIsSoundFeedbackEnabled
+        ]
+    }
+
+    public static func systemMuteMode(from defaults: UserDefaults = .standard) -> VoiceInkSystemMuteMode {
+        if let rawValue = defaults.string(forKey: systemMuteModeKey),
+           let mode = VoiceInkSystemMuteMode(rawValue: rawValue) {
+            return mode
+        }
+
+        if let legacyEnabled = defaults.object(forKey: legacyIsSystemMuteEnabledKey) as? Bool,
+           legacyEnabled == false {
+            return .never
+        }
+
+        return defaultSystemMuteMode
+    }
+
+    public static func saveSystemMuteMode(
+        _ mode: VoiceInkSystemMuteMode,
+        to defaults: UserDefaults = .standard
+    ) {
+        defaults.set(mode.rawValue, forKey: systemMuteModeKey)
+        defaults.set(mode != .never, forKey: legacyIsSystemMuteEnabledKey)
+    }
+
+    public static func isSystemMuteEnabled(from defaults: UserDefaults = .standard) -> Bool {
+        systemMuteMode(from: defaults) != .never
+    }
+
+    public static func saveSystemMuteEnabled(
+        _ isEnabled: Bool,
+        to defaults: UserDefaults = .standard
+    ) {
+        saveSystemMuteMode(isEnabled ? .always : .never, to: defaults)
+    }
+
+    public static func audioResumptionDelay(from defaults: UserDefaults = .standard) -> TimeInterval {
+        guard defaults.object(forKey: audioResumptionDelayKey) != nil else {
+            return defaultAudioResumptionDelay
+        }
+
+        return defaults.double(forKey: audioResumptionDelayKey)
+    }
+
+    public static func saveAudioResumptionDelay(
+        _ delay: TimeInterval,
+        to defaults: UserDefaults = .standard
+    ) {
+        defaults.set(delay, forKey: audioResumptionDelayKey)
+    }
+
+    public static func isPauseMediaEnabled(from defaults: UserDefaults = .standard) -> Bool {
+        guard defaults.object(forKey: isPauseMediaEnabledKey) != nil else {
+            return defaultIsPauseMediaEnabled
+        }
+
+        return defaults.bool(forKey: isPauseMediaEnabledKey)
+    }
+
+    public static func savePauseMediaEnabled(
+        _ isEnabled: Bool,
+        to defaults: UserDefaults = .standard
+    ) {
+        defaults.set(isEnabled, forKey: isPauseMediaEnabledKey)
+    }
+
+    public static func isSoundFeedbackEnabled(from defaults: UserDefaults = .standard) -> Bool {
+        guard defaults.object(forKey: isSoundFeedbackEnabledKey) != nil else {
+            return defaultIsSoundFeedbackEnabled
+        }
+
+        return defaults.bool(forKey: isSoundFeedbackEnabledKey)
+    }
+
+    public static func saveSoundFeedbackEnabled(
+        _ isEnabled: Bool,
+        to defaults: UserDefaults = .standard
+    ) {
+        defaults.set(isEnabled, forKey: isSoundFeedbackEnabledKey)
+    }
+}

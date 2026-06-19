@@ -55,10 +55,10 @@ class SystemInfoService {
         Recorder Style: \(UserDefaults.standard.string(forKey: "RecorderType") ?? "none")
 
         RECORDING FEEDBACK:
-        Sound Feedback: \(UserDefaults.standard.bool(forKey: "isSoundFeedbackEnabled"))
-        Pause Media While Recording: \(UserDefaults.standard.bool(forKey: "isPauseMediaEnabled"))
-        Mute Audio While Recording: \(UserDefaults.standard.string(forKey: "systemMuteMode") ?? SystemMuteMode.automatic.rawValue)
-        Audio Resumption Delay: \(UserDefaults.standard.double(forKey: "audioResumptionDelay"))s
+        Sound Feedback: \(VoiceInkRecordingFeedbackPreference.isSoundFeedbackEnabled())
+        Pause Media While Recording: \(VoiceInkRecordingFeedbackPreference.isPauseMediaEnabled())
+        Mute Audio While Recording: \(VoiceInkRecordingFeedbackPreference.systemMuteMode().rawValue)
+        Audio Resumption Delay: \(VoiceInkRecordingFeedbackPreference.audioResumptionDelay())s
 
         CLIPBOARD & PASTE SETTINGS:
         Restore Clipboard After Paste: \(VoiceInkPastePreference.shouldRestoreClipboardAfterPaste())

@@ -3,6 +3,7 @@ import Combine
 import Foundation
 import SwiftUI
 import MediaRemoteAdapter
+import VoiceInkCore
 class PlaybackController: ObservableObject {
     static let shared = PlaybackController()
     private var mediaController: MediaRemoteAdapter.MediaController
@@ -12,9 +13,9 @@ class PlaybackController: ObservableObject {
     private var originalMediaAppBundleId: String?
     private var resumeTask: Task<Void, Never>?
 
-    @Published var isPauseMediaEnabled: Bool = UserDefaults.standard.bool(forKey: "isPauseMediaEnabled") {
+    @Published var isPauseMediaEnabled: Bool = VoiceInkRecordingFeedbackPreference.isPauseMediaEnabled() {
         didSet {
-            UserDefaults.standard.set(isPauseMediaEnabled, forKey: "isPauseMediaEnabled")
+            VoiceInkRecordingFeedbackPreference.savePauseMediaEnabled(isPauseMediaEnabled)
 
             if isPauseMediaEnabled {
                 startMediaTracking()
@@ -147,5 +148,4 @@ class PlaybackController: ObservableObject {
         return runningApps.contains { $0.bundleIdentifier == bundleId }
     }
 }
-
 

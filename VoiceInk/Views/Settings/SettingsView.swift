@@ -166,7 +166,7 @@ struct SettingsView: View {
                 }
 
                 Picker("Mute Audio While Recording", selection: $mediaController.systemMuteMode) {
-                    ForEach(SystemMuteMode.allCases) { mode in
+                    ForEach(VoiceInkSystemMuteMode.allCases) { mode in
                         Text(mode.displayName).tag(mode)
                     }
                 }

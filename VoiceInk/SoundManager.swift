@@ -1,12 +1,13 @@
 import Foundation
 import SwiftUI
+import VoiceInkCore
 
 @MainActor
 class SoundManager: ObservableObject {
     static let shared = SoundManager()
 
     private let playbackEngine = SoundPlaybackEngine()
-    @AppStorage("isSoundFeedbackEnabled") private var isSoundFeedbackEnabled = false
+    @AppStorage(VoiceInkRecordingFeedbackPreference.isSoundFeedbackEnabledKey) private var isSoundFeedbackEnabled = VoiceInkRecordingFeedbackPreference.defaultIsSoundFeedbackEnabled
 
     private init() {
         setupSounds()

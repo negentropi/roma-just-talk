@@ -1,21 +1,6 @@
 import Foundation
 import CoreAudio
-
-enum SystemMuteMode: String, CaseIterable, Identifiable {
-    case automatic = "auto"
-    case always = "always"
-    case never = "never"
-
-    var id: String { rawValue }
-
-    var displayName: String {
-        switch self {
-        case .automatic: return "Auto"
-        case .always: return "On"
-        case .never: return "Off"
-        }
-    }
-}
+import VoiceInkCore
 
 final class MediaController: ObservableObject {
 
@@ -26,16 +11,9 @@ final class MediaController: ObservableObject {
     private var unmuteTask: Task<Void, Never>?
     private var muteGeneration: Int = 0
 
-    @Published var systemMuteMode: SystemMuteMode = {
-        guard let rawValue = UserDefaults.standard.string(forKey: "systemMuteMode"),
-              let mode = SystemMuteMode(rawValue: rawValue) else {
-            return .automatic
-        }
-        return mode
-    }() {
+    @Published var systemMuteMode: VoiceInkSystemMuteMode = VoiceInkRecordingFeedbackPreference.systemMuteMode() {
         didSet {
-            UserDefaults.standard.set(systemMuteMode.rawValue, forKey: "systemMuteMode")
-            UserDefaults.standard.set(systemMuteMode != .never, forKey: "isSystemMuteEnabled")
+            VoiceInkRecordingFeedbackPreference.saveSystemMuteMode(systemMuteMode)
         }
     }
 
@@ -44,8 +22,10 @@ final class MediaController: ObservableObject {
         set { systemMuteMode = newValue ? .always : .never }
     }
 
-    @Published var audioResumptionDelay: Double = UserDefaults.standard.double(forKey: "audioResumptionDelay") {
-        didSet { UserDefaults.standard.set(audioResumptionDelay, forKey: "audioResumptionDelay") }
+    @Published var audioResumptionDelay: Double = VoiceInkRecordingFeedbackPreference.audioResumptionDelay() {
+        didSet {
+            VoiceInkRecordingFeedbackPreference.saveAudioResumptionDelay(audioResumptionDelay)
+        }
     }
 
     private init() {}

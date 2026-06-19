@@ -19,11 +19,6 @@ enum AppDefaults {
             "enableAnnouncements": true,
 
             // Audio & Media
-            "systemMuteMode": SystemMuteMode.automatic.rawValue,
-            "isSystemMuteEnabled": true,
-            "audioResumptionDelay": 0.0,
-            "isPauseMediaEnabled": false,
-            "isSoundFeedbackEnabled": false,
             CustomSoundManager.SoundType.start.builtInSoundKey: CustomSoundManager.SoundType.start.defaultBuiltInSound.rawValue,
             CustomSoundManager.SoundType.stop.builtInSoundKey: CustomSoundManager.SoundType.stop.defaultBuiltInSound.rawValue,
 
@@ -54,6 +49,7 @@ enum AppDefaults {
             "PrewarmModelOnWake": true,
         ]
 
+        platformDefaults.merge(VoiceInkRecordingFeedbackPreference.registeredDefaults) { _, sharedValue in sharedValue }
         platformDefaults.merge(VoiceInkPastePreference.registeredDefaults) { _, sharedValue in sharedValue }
         defaults.merge(platformDefaults, uniquingKeysWith: { _, platformValue in platformValue })
 

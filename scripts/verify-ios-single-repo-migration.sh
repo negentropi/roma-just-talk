@@ -2871,6 +2871,74 @@ require_pattern \
   'macOS paste method and clipboard restore settings route through `VoiceInkPasteMethod`/`VoiceInkPastePreference`' \
   docs/ios-single-repo-migration.md
 
+require_file \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+
+require_pattern \
+  "shared recording feedback preference owns system mute mode raw values" \
+  'enum VoiceInkSystemMuteMode: String, CaseIterable, Identifiable' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+
+require_pattern \
+  "shared recording feedback preference owns display labels" \
+  'public var displayName' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+
+require_pattern \
+  "shared recording feedback preference owns macOS storage keys" \
+  'systemMuteModeKey = "systemMuteMode"|isPauseMediaEnabledKey = "isPauseMediaEnabled"|isSoundFeedbackEnabledKey = "isSoundFeedbackEnabled"' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+
+require_pattern \
+  "shared recording feedback preference preserves legacy mute boolean compatibility" \
+  'legacyIsSystemMuteEnabledKey = "isSystemMuteEnabled"|saveSystemMuteEnabled' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+
+require_pattern \
+  "macOS media controller uses shared recording feedback preferences" \
+  'VoiceInkRecordingFeedbackPreference\.(systemMuteMode|saveSystemMuteMode|audioResumptionDelay|saveAudioResumptionDelay)' \
+  VoiceInk/MediaController.swift
+
+require_pattern \
+  "macOS playback controller uses shared pause-media preference" \
+  'VoiceInkRecordingFeedbackPreference\.(isPauseMediaEnabled|savePauseMediaEnabled)' \
+  VoiceInk/PlaybackController.swift
+
+require_pattern \
+  "macOS sound manager uses shared sound-feedback preference key" \
+  'VoiceInkRecordingFeedbackPreference\.isSoundFeedbackEnabledKey' \
+  VoiceInk/SoundManager.swift
+
+require_pattern \
+  "macOS defaults register shared recording feedback defaults" \
+  'VoiceInkRecordingFeedbackPreference\.registeredDefaults' \
+  VoiceInk/AppDefaults.swift
+
+require_pattern \
+  "macOS diagnostics use shared recording feedback preferences" \
+  'VoiceInkRecordingFeedbackPreference\.(isSoundFeedbackEnabled|isPauseMediaEnabled|systemMuteMode|audioResumptionDelay)' \
+  VoiceInk/Services/SystemInfoService.swift
+
+require_pattern \
+  "macOS settings uses shared system mute mode" \
+  'VoiceInkSystemMuteMode\.allCases' \
+  VoiceInk/Views/Settings/SettingsView.swift
+
+reject_pattern \
+  "macOS recording feedback shells avoid raw preference keys and shell-only mute enum" \
+  '"(systemMuteMode|isSystemMuteEnabled|audioResumptionDelay|isPauseMediaEnabled|isSoundFeedbackEnabled)"|enum +SystemMuteMode|(^|[^[:alnum:]_])SystemMuteMode\.' \
+  VoiceInk/MediaController.swift \
+  VoiceInk/PlaybackController.swift \
+  VoiceInk/SoundManager.swift \
+  VoiceInk/AppDefaults.swift \
+  VoiceInk/Services/SystemInfoService.swift \
+  VoiceInk/Views/Settings/SettingsView.swift
+
+require_pattern \
+  "migration checklist tracks shared recording feedback preference gate" \
+  'macOS recording feedback preferences route through `VoiceInkSystemMuteMode`/`VoiceInkRecordingFeedbackPreference`' \
+  docs/ios-single-repo-migration.md
+
 require_pattern \
   "shared transcription run result carries post-processing enhancement result" \
   'postProcessingResult: VoiceInkAIEnhancementResult\?' \

@@ -3394,6 +3394,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift
 
 require_pattern \
+  "macOS transcription diagnostics use shared app identity subsystem" \
+  'VoiceInkAppIdentity\.loggingSubsystem' \
+  VoiceInk/Transcription
+
+require_pattern \
   "macOS local Whisper logging uses shared app identity subsystem" \
   'subsystem: VoiceInkAppIdentity\.loggingSubsystem' \
   VoiceInk/Transcription/Whisper/LibWhisper.swift
@@ -3418,6 +3423,11 @@ reject_pattern \
   '"com\.prakashjoshipax\.voiceink"' \
   VoiceInk/Transcription/Whisper/LibWhisper.swift \
   iOS/VoiceInk-ios/LibWhisper.swift
+
+reject_pattern \
+  "macOS transcription diagnostics avoid duplicate logging subsystem literal" \
+  '"com\.prakashjoshipax\.voiceink"' \
+  VoiceInk/Transcription
 
 reject_pattern \
   "Swift UI avoids duplicate app identity literals" \

@@ -1,7 +1,8 @@
 import Foundation
+import VoiceInkCore
 
 final class RecordingStartupAudioRelay: @unchecked Sendable {
-    private let queue = DispatchQueue(label: "com.prakashjoshipax.voiceink.recordingStartupAudioRelay")
+    private let queue = DispatchQueue(label: "\(VoiceInkAppIdentity.loggingSubsystem).recordingStartupAudioRelay")
     private var bufferedChunks: [Data] = []
     private var sink: ((Data) -> Void)?
 

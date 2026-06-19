@@ -56,7 +56,7 @@ final class StreamingTranscriptionSession: TranscriptionSession {
     private var startupTask: Task<Void, Never>?
     private var startupTaskID: UUID?
     private var fallbackAudioReadyTask: Task<Void, Error>?
-    private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "StreamingTranscriptionSession")
+    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "StreamingTranscriptionSession")
 
     init(streamingService: StreamingTranscriptionService, fallbackService: TranscriptionService) {
         self.streamingService = streamingService

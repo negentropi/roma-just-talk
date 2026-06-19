@@ -27,7 +27,7 @@ class TranscriptionPipeline {
     private let modelContext: ModelContext
     private let serviceRegistry: TranscriptionServiceRegistry
     private let enhancementService: AIEnhancementService?
-    private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "TranscriptionPipeline")
+    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "TranscriptionPipeline")
     private static let autoSendAfterPasteDelayNanoseconds: UInt64 = 120_000_000
 
     var licenseViewModel: LicenseViewModel

@@ -4,7 +4,7 @@ import os
 import VoiceInkCore
 
 class AudioProcessor {
-    private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "AudioProcessor")
+    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "AudioProcessor")
 
     enum AudioProcessingError: LocalizedError {
         case invalidAudioFile

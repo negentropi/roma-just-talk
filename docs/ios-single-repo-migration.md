@@ -26,7 +26,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 
 `VoiceInkCore` currently owns these cross-platform modules:
 
-- app identity for shared display names, compact macOS title, sidebar subtitle, stable bundle identifier, local Whisper logging subsystem, macOS Application Support subdirectory, iOS onboarding titles, and macOS storage-failure copy
+- app identity for shared display names, compact macOS title, sidebar subtitle, stable bundle identifier, macOS transcription diagnostics and local Whisper logging subsystem, macOS Application Support subdirectory, iOS onboarding titles, and macOS storage-failure copy
 - prompt templates and prompt text
 - predefined prompt IDs, labels, prompt text, icons, descriptions, and system-instruction flags
 - custom prompt system-instruction wrapping
@@ -362,13 +362,14 @@ scripts/verify-ios-single-repo-migration.sh --full-build
 34. macOS and iOS duration-dependent UI plus metadata separator text stays routed through `VoiceInkDurationPresentation`.
 35. macOS and iOS audio playback-rate controls plus loading/play-pause/metadata-icon presentation stay routed through `VoiceInkAudioPlaybackRate`/`VoiceInkAudioPlaybackPresentation`.
 36. macOS sidebar/window titles and iOS note-list/onboarding app-name copy stay routed through `VoiceInkAppIdentity`.
-37. macOS history and iOS notes empty-state copy plus macOS history search/pagination/selection copy and SF Symbol names stay routed through `VoiceInkHistoryPresentation`, with platform views only rendering the shared presentation.
-38. macOS and iOS model-management labels route through `VoiceInkModelManagementFilter` and `VoiceInkModelManagementPresentation`, with duplicate model filter/default/local/cloud/custom copy out of platform views.
-39. macOS cloud-provider and shared remote transcription API error-domain mapping stays routed through `VoiceInkTranscriptionModelProvider.apiErrorDomain`, with duplicate provider-domain switches out of the macOS shell and provider literals out of `AudioTranscriptionService` plus low-level remote clients.
-40. iOS debug reset file cleanup routes through `VoiceInkAppDataResetFilePlan`, with raw recordings/models/cache/tmp deletion sequence out of `SettingsView`.
-41. iOS onboarding copy, feature rows, app-icon fallback symbol, model-download step copy, ready step copy, and button titles route through `VoiceInkIOSOnboardingPresentation`, with duplicate copy out of `OnboardingView`.
-42. iOS settings navigation title, modes/debug section titles, add-mode copy/icon, add-row icon, and reset-all-app-data copy/icon route through `VoiceInkSettingsPresentation`, with duplicate settings chrome/action copy out of `SettingsView`.
-43. macOS final paste text assembly routes trial-expired prefix and trailing-space storage through `VoiceInkTranscriptionPasteOutputPolicy`/`VoiceInkAppendTrailingSpacePreference`, with cursor paste, clipboard context, sound feedback, and auto-send timing remaining in the macOS shell.
-44. A real Xcode toolchain is selected and both app targets build.
+37. macOS transcription runtime logger subsystem and recording-startup queue labels stay routed through `VoiceInkAppIdentity.loggingSubsystem`.
+38. macOS history and iOS notes empty-state copy plus macOS history search/pagination/selection copy and SF Symbol names stay routed through `VoiceInkHistoryPresentation`, with platform views only rendering the shared presentation.
+39. macOS and iOS model-management labels route through `VoiceInkModelManagementFilter` and `VoiceInkModelManagementPresentation`, with duplicate model filter/default/local/cloud/custom copy out of platform views.
+40. macOS cloud-provider and shared remote transcription API error-domain mapping stays routed through `VoiceInkTranscriptionModelProvider.apiErrorDomain`, with duplicate provider-domain switches out of the macOS shell and provider literals out of `AudioTranscriptionService` plus low-level remote clients.
+41. iOS debug reset file cleanup routes through `VoiceInkAppDataResetFilePlan`, with raw recordings/models/cache/tmp deletion sequence out of `SettingsView`.
+42. iOS onboarding copy, feature rows, app-icon fallback symbol, model-download step copy, ready step copy, and button titles route through `VoiceInkIOSOnboardingPresentation`, with duplicate copy out of `OnboardingView`.
+43. iOS settings navigation title, modes/debug section titles, add-mode copy/icon, add-row icon, and reset-all-app-data copy/icon route through `VoiceInkSettingsPresentation`, with duplicate settings chrome/action copy out of `SettingsView`.
+44. macOS final paste text assembly routes trial-expired prefix and trailing-space storage through `VoiceInkTranscriptionPasteOutputPolicy`/`VoiceInkAppendTrailingSpacePreference`, with cursor paste, clipboard context, sound feedback, and auto-send timing remaining in the macOS shell.
+45. A real Xcode toolchain is selected and both app targets build.
 
 Current local blocker: `xcode-select -p` points to `/Library/Developer/CommandLineTools`, and the previously used external Xcode volume is not mounted. Full target builds are still environment-blocked until a real Xcode is selected; macOS `VoiceInk` also needs `/Users/atalphalnmomhappyhouse/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework`, and iOS `VoiceInk-ios` needs the iOS 26.2 platform installed. Until those are present, use `swift run VoiceInkCoreChecks` plus the static parse/lint gates above for local proof.

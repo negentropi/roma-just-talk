@@ -6,7 +6,7 @@ import VoiceInkCore
 class WhisperTranscriptionService: TranscriptionService {
 
     private var whisperContext: WhisperContext?
-    private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "WhisperTranscriptionService")
+    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "WhisperTranscriptionService")
     private let modelsDirectory: URL
     private weak var modelProvider: (any WhisperModelProvider)?
 

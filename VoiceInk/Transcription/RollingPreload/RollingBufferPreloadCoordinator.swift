@@ -64,7 +64,7 @@ final class RollingBufferPreloadCoordinator {
     private let sessionFactory: SessionFactory
     private let powerStateProvider: any RollingBufferPowerStateProviding
     private let source = RollingBufferChunkSource()
-    private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "RollingBufferPreload")
+    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "RollingBufferPreload")
 
     private var observeTask: Task<Void, Never>?
     private var detector: (any SpeechActivityDetecting)?

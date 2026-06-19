@@ -12,7 +12,7 @@ protocol SpeechActivityDetecting: Sendable {
 }
 
 final class SileroSpeechActivityDetector: SpeechActivityDetecting, @unchecked Sendable {
-    private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "SileroSpeechActivityDetector")
+    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "SileroSpeechActivityDetector")
     private let lock = NSLock()
     private let threshold: Float
     private var context: OpaquePointer?

@@ -54,7 +54,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
     private let pipeline: TranscriptionPipeline
     private var preparedQuickReleaseContext: PreparedQuickReleaseContext?
 
-    let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "VoiceInkEngine")
+    let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "VoiceInkEngine")
 
     init(
         modelContext: ModelContext,

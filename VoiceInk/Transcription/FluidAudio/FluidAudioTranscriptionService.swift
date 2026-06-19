@@ -11,7 +11,7 @@ class FluidAudioTranscriptionService: TranscriptionService {
     private var activeVersion: AsrModelVersion?
     private var cachedModels: AsrModels?
     private var loadingTask: (version: AsrModelVersion, task: Task<AsrModels, Error>)?
-    private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "FluidAudioTranscriptionService")
+    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "FluidAudioTranscriptionService")
 
     private func version(for model: any TranscriptionModel) -> AsrModelVersion {
         FluidAudioModelManager.asrVersion(for: model.name)

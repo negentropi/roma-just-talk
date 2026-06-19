@@ -5,30 +5,14 @@ import VoiceInkCore
 struct KeychainService {
     
     static func save(key: String, data: Data) -> OSStatus {
-        SecItemDelete(VoiceInkKeychainQuery.delete(account: key) as CFDictionary)
-
-        return SecItemAdd(
-            VoiceInkKeychainQuery.add(data: data, account: key) as CFDictionary,
-            nil
-        )
+        VoiceInkKeychainDataStore.saveData(data, account: key)
     }
     
     static func load(key: String) -> Data? {
-        var dataTypeRef: AnyObject? = nil
-        
-        let status: OSStatus = SecItemCopyMatching(
-            VoiceInkKeychainQuery.copyData(account: key) as CFDictionary,
-            &dataTypeRef
-        )
-        
-        if status == noErr {
-            return dataTypeRef as! Data?
-        } else {
-            return nil
-        }
+        VoiceInkKeychainDataStore.loadData(account: key).data
     }
     
     static func delete(key: String) -> OSStatus {
-        SecItemDelete(VoiceInkKeychainQuery.delete(account: key) as CFDictionary)
+        VoiceInkKeychainDataStore.delete(account: key)
     }
 }

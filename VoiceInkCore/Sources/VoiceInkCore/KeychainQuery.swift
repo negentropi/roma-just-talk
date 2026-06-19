@@ -58,3 +58,66 @@ public enum VoiceInkKeychainQuery {
         return query
     }
 }
+
+public struct VoiceInkKeychainLoadResult: Equatable {
+    public let status: OSStatus
+    public let data: Data?
+
+    public init(status: OSStatus, data: Data?) {
+        self.status = status
+        self.data = data
+    }
+
+    public var isSuccess: Bool {
+        status == errSecSuccess
+    }
+}
+
+public enum VoiceInkKeychainDataStore {
+    @discardableResult
+    public static func saveData(
+        _ data: Data,
+        account: String,
+        syncable: Bool = true
+    ) -> OSStatus {
+        delete(account: account, syncable: syncable)
+
+        return SecItemAdd(
+            VoiceInkKeychainQuery.add(data: data, account: account, syncable: syncable) as CFDictionary,
+            nil
+        )
+    }
+
+    public static func loadData(
+        account: String,
+        syncable: Bool = true
+    ) -> VoiceInkKeychainLoadResult {
+        var result: AnyObject?
+        let status = SecItemCopyMatching(
+            VoiceInkKeychainQuery.copyData(account: account, syncable: syncable) as CFDictionary,
+            &result
+        )
+
+        return VoiceInkKeychainLoadResult(status: status, data: result as? Data)
+    }
+
+    @discardableResult
+    public static func delete(
+        account: String,
+        syncable: Bool = true
+    ) -> OSStatus {
+        SecItemDelete(
+            VoiceInkKeychainQuery.delete(account: account, syncable: syncable) as CFDictionary
+        )
+    }
+
+    public static func exists(
+        account: String,
+        syncable: Bool = true
+    ) -> Bool {
+        SecItemCopyMatching(
+            VoiceInkKeychainQuery.exists(account: account, syncable: syncable) as CFDictionary,
+            nil
+        ) == errSecSuccess
+    }
+}

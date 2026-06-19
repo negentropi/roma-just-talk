@@ -52,6 +52,13 @@ final class KeychainQueryTests: XCTestCase {
         XCTAssertEqual(booleanValue(query[kSecReturnData as String]), false)
     }
 
+    func testLoadResultReportsSuccessStatus() {
+        let data = Data("secret".utf8)
+
+        XCTAssertTrue(VoiceInkKeychainLoadResult(status: errSecSuccess, data: data).isSuccess)
+        XCTAssertFalse(VoiceInkKeychainLoadResult(status: errSecItemNotFound, data: nil).isSuccess)
+    }
+
     private func booleanValue(_ value: Any?) -> Bool? {
         value as? Bool
     }

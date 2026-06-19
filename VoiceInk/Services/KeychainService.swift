@@ -37,13 +37,7 @@ final class KeychainService {
         defaults.set(data, forKey: localPrefix + key)
         return true
         #else
-        // First, try to delete any existing item to avoid duplicates
-        delete(forKey: key, syncable: syncable)
-
-        let status = SecItemAdd(
-            VoiceInkKeychainQuery.add(data: data, account: key, syncable: syncable) as CFDictionary,
-            nil
-        )
+        let status = VoiceInkKeychainDataStore.saveData(data, account: key, syncable: syncable)
 
         if status == errSecSuccess {
             logger.info("Successfully saved keychain item for key: \(key, privacy: .public)")
@@ -68,16 +62,12 @@ final class KeychainService {
         #if LOCAL_BUILD
         return defaults.data(forKey: localPrefix + key)
         #else
-        var result: AnyObject?
-        let status = SecItemCopyMatching(
-            VoiceInkKeychainQuery.copyData(account: key, syncable: syncable) as CFDictionary,
-            &result
-        )
+        let result = VoiceInkKeychainDataStore.loadData(account: key, syncable: syncable)
 
-        if status == errSecSuccess {
-            return result as? Data
-        } else if status != errSecItemNotFound {
-            logger.error("Failed to retrieve keychain item for key: \(key, privacy: .public), status: \(status, privacy: .public)")
+        if result.isSuccess {
+            return result.data
+        } else if result.status != errSecItemNotFound {
+            logger.error("Failed to retrieve keychain item for key: \(key, privacy: .public), status: \(result.status, privacy: .public)")
         }
 
         return nil
@@ -91,9 +81,7 @@ final class KeychainService {
         defaults.removeObject(forKey: localPrefix + key)
         return true
         #else
-        let status = SecItemDelete(
-            VoiceInkKeychainQuery.delete(account: key, syncable: syncable) as CFDictionary
-        )
+        let status = VoiceInkKeychainDataStore.delete(account: key, syncable: syncable)
 
         if status == errSecSuccess || status == errSecItemNotFound {
             if status == errSecSuccess {
@@ -112,11 +100,7 @@ final class KeychainService {
         #if LOCAL_BUILD
         return defaults.data(forKey: localPrefix + key) != nil
         #else
-        let status = SecItemCopyMatching(
-            VoiceInkKeychainQuery.exists(account: key, syncable: syncable) as CFDictionary,
-            nil
-        )
-        return status == errSecSuccess
+        return VoiceInkKeychainDataStore.exists(account: key, syncable: syncable)
         #endif
     }
 }

@@ -101,6 +101,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "KeychainQueryTests.testExistsQuerySuppressesDataReturn", run: { KeychainQueryTests().testExistsQuerySuppressesDataReturn() }),
             VoiceInkCoreCheck(name: "KeychainQueryTests.testLoadResultReportsSuccessStatus", run: { KeychainQueryTests().testLoadResultReportsSuccessStatus() }),
             VoiceInkCoreCheck(name: "AudioInputPriorityPolicyTests.testAudioInputModePreservesRawValuesDefaultAndOrder", run: { AudioInputPriorityPolicyTests().testAudioInputModePreservesRawValuesDefaultAndOrder() }),
+            VoiceInkCoreCheck(name: "AudioInputPriorityPolicyTests.testAudioInputPreferencePreservesStorageKeysDefaultsAndRoundTrips", run: { AudioInputPriorityPolicyTests().testAudioInputPreferencePreservesStorageKeysDefaultsAndRoundTrips() }),
             VoiceInkCoreCheck(name: "AudioInputPriorityPolicyTests.testAudioInputModePreservesSettingsPresentation", run: { AudioInputPriorityPolicyTests().testAudioInputModePreservesSettingsPresentation() }),
             VoiceInkCoreCheck(name: "AudioInputPriorityPolicyTests.testMacOSAudioInputSettingsPresentationPreservesCopyAndIcons", run: { AudioInputPriorityPolicyTests().testMacOSAudioInputSettingsPresentationPreservesCopyAndIcons() }),
             VoiceInkCoreCheck(name: "AudioInputPriorityPolicyTests.testMacOSAudioInputSettingsPresentationFormatsPriorityDisplay", run: { AudioInputPriorityPolicyTests().testMacOSAudioInputSettingsPresentationFormatsPriorityDisplay() }),

@@ -804,13 +804,18 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AudioInputPriorityPolicy.swift
 
 require_pattern \
+  "shared audio input preference storage lives in VoiceInkCore" \
+  'VoiceInkAudioInputPreference|inputModeKey = "audioInputMode"|selectedDeviceUIDKey = "selectedAudioDeviceUID"|prioritizedDevicesKey = "prioritizedDevices"|saveInputMode|saveSelectedDeviceUID|savePrioritizedDevices' \
+  VoiceInkCore/Sources/VoiceInkCore/AudioInputPriorityPolicy.swift
+
+require_pattern \
   "shared macOS audio input settings presentation lives in VoiceInkCore" \
   'VoiceInkMacOSAudioInputSettingsPresentation|heroTitle|prioritizedDevicesDescription|priorityDisplayText' \
   VoiceInkCore/Sources/VoiceInkCore/AudioInputPriorityPolicy.swift
 
 require_pattern \
   "macOS audio device manager uses shared input mode" \
-  'VoiceInkAudioInputMode|\.defaultMode|VoiceInkAudioInputMode\(rawValue:' \
+  'VoiceInkAudioInputMode|VoiceInkAudioInputPreference\.inputMode|VoiceInkAudioInputPreference\.saveInputMode' \
   VoiceInk/Services/AudioDeviceManager.swift
 
 require_pattern \
@@ -819,9 +824,19 @@ require_pattern \
   VoiceInk/Services/AudioDeviceManager.swift
 
 require_pattern \
+  "macOS audio device manager uses shared audio input preference storage" \
+  'VoiceInkAudioInputPreference\.(selectedDeviceUID|saveSelectedDeviceUID|clearSelectedDeviceUID|prioritizedDevices|savePrioritizedDevices)' \
+  VoiceInk/Services/AudioDeviceManager.swift
+
+require_pattern \
   "macOS audio input settings uses shared mode and priority policy" \
   'VoiceInkAudioInputMode\.allCases|VoiceInkAudioInputPriorityPolicy\.(sortedDevices|moveDevice)|VoiceInkAudioInputPriorityDevice|mode\.(title|iconSystemName|description)|VoiceInkMacOSAudioInputSettingsPresentation\.macOS|presentation\.(heroTitle|activeStatusTitle|priorityDisplayText)' \
   VoiceInk/Views/Settings/AudioInputSettingsView.swift
+
+require_pattern \
+  "macOS defaults register shared audio input defaults" \
+  'VoiceInkAudioInputPreference\.registeredDefaults' \
+  VoiceInk/AppDefaults.swift
 
 reject_pattern \
   "macOS audio input avoids shell-only mode and priority policy" \
@@ -830,9 +845,19 @@ reject_pattern \
   VoiceInk/Views/Settings/AudioInputSettingsView.swift
 
 reject_pattern \
+  "macOS audio input avoids shell-owned storage keys" \
+  'UserDefaultsKey|"(audioInputMode|selectedAudioDeviceUID|prioritizedDevices)"|JSONDecoder\(\)\.decode\(\[VoiceInkAudioInputPriorityDevice\]|JSONEncoder\(\)\.encode\(prioritizedDevices\)' \
+  VoiceInk/Services/AudioDeviceManager.swift
+
+reject_pattern \
   "macOS audio input settings avoid shell-only presentation copy" \
   '"(Audio Input|Configure your microphone preferences|Input Mode|Current Device|No device available|Active|Available Devices|Refresh|Prioritized Devices|Devices will be used in order of priority\. If a device is unavailable, the next one will be tried\. If no prioritized device is available, the built-in microphone will be used\.|No prioritized devices|No additional devices available|No Audio Devices|Connect an audio input device to get started|Unavailable)"|"waveform"|"wave\.3\.right"|"arrow\.clockwise"|"mic\.slash\.circle\.fill"|"exclamationmark\.triangle"|"plus\.circle\.fill"|"minus\.circle\.fill"|"chevron\.up"|"chevron\.down"|Text\("-"\)|Text\("\\\(\(priority \+ 1\)\\\)"\)' \
   VoiceInk/Views/Settings/AudioInputSettingsView.swift
+
+require_pattern \
+  "migration checklist tracks shared audio input preference gate" \
+  'macOS audio-input storage keys, selected-device UID persistence, priority-device JSON storage, settings labels, status copy, empty states, action icons, and priority display text route through `VoiceInkAudioInputPreference`/`VoiceInkMacOSAudioInputSettingsPresentation`' \
+  docs/ios-single-repo-migration.md
 
 reject_pattern \
   "iOS note views avoid shell-only transcript presentation wrappers" \

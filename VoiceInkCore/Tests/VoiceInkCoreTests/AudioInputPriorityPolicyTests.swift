@@ -10,6 +10,41 @@ final class AudioInputPriorityPolicyTests: XCTestCase {
         XCTAssertEqual(VoiceInkAudioInputMode.allCases, [.systemDefault, .custom, .prioritized])
     }
 
+    func testAudioInputPreferencePreservesStorageKeysDefaultsAndRoundTrips() {
+        XCTAssertEqual(VoiceInkAudioInputPreference.inputModeKey, "audioInputMode")
+        XCTAssertEqual(VoiceInkAudioInputPreference.selectedDeviceUIDKey, "selectedAudioDeviceUID")
+        XCTAssertEqual(VoiceInkAudioInputPreference.prioritizedDevicesKey, "prioritizedDevices")
+        XCTAssertEqual(
+            VoiceInkAudioInputPreference.registeredDefaults[VoiceInkAudioInputPreference.inputModeKey] as? String,
+            VoiceInkAudioInputMode.defaultMode.rawValue
+        )
+
+        withIsolatedDefaults { defaults in
+            XCTAssertEqual(VoiceInkAudioInputPreference.inputMode(from: defaults), .custom)
+
+            defaults.set("invalid", forKey: VoiceInkAudioInputPreference.inputModeKey)
+            XCTAssertEqual(VoiceInkAudioInputPreference.inputMode(from: defaults), .custom)
+
+            VoiceInkAudioInputPreference.saveInputMode(.prioritized, to: defaults)
+            XCTAssertEqual(VoiceInkAudioInputPreference.inputMode(from: defaults), .prioritized)
+
+            XCTAssertNil(VoiceInkAudioInputPreference.selectedDeviceUID(from: defaults))
+            VoiceInkAudioInputPreference.saveSelectedDeviceUID("usb-mic", to: defaults)
+            XCTAssertEqual(VoiceInkAudioInputPreference.selectedDeviceUID(from: defaults), "usb-mic")
+            VoiceInkAudioInputPreference.clearSelectedDeviceUID(from: defaults)
+            XCTAssertNil(VoiceInkAudioInputPreference.selectedDeviceUID(from: defaults))
+
+            let devices = [
+                VoiceInkAudioInputPriorityDevice(id: "built-in", name: "Built-in", priority: 0),
+                VoiceInkAudioInputPriorityDevice(id: "usb", name: "USB Mic", priority: 1)
+            ]
+
+            XCTAssertEqual(VoiceInkAudioInputPreference.prioritizedDevices(from: defaults), [])
+            VoiceInkAudioInputPreference.savePrioritizedDevices(devices, to: defaults)
+            XCTAssertEqual(VoiceInkAudioInputPreference.prioritizedDevices(from: defaults), devices)
+        }
+    }
+
     func testAudioInputModePreservesSettingsPresentation() {
         XCTAssertEqual(VoiceInkAudioInputMode.systemDefault.title, "System Default")
         XCTAssertEqual(VoiceInkAudioInputMode.systemDefault.iconSystemName, "display")
@@ -158,5 +193,13 @@ final class AudioInputPriorityPolicyTests: XCTestCase {
                 availableDeviceIDs: []
             )
         )
+    }
+
+    private func withIsolatedDefaults(_ run: (UserDefaults) -> Void) {
+        let suiteName = "VoiceInkCore.AudioInputPriorityPolicyTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defaults.removePersistentDomain(forName: suiteName)
+        run(defaults)
+        defaults.removePersistentDomain(forName: suiteName)
     }
 }

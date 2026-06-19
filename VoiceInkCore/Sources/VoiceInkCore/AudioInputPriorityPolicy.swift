@@ -48,6 +48,60 @@ public struct VoiceInkAudioInputPriorityDevice: Codable, Equatable, Identifiable
     }
 }
 
+public enum VoiceInkAudioInputPreference {
+    public static let inputModeKey = "audioInputMode"
+    public static let selectedDeviceUIDKey = "selectedAudioDeviceUID"
+    public static let prioritizedDevicesKey = "prioritizedDevices"
+
+    public static var registeredDefaults: [String: Any] {
+        [
+            inputModeKey: VoiceInkAudioInputMode.defaultMode.rawValue
+        ]
+    }
+
+    public static func inputMode(from defaults: UserDefaults = .standard) -> VoiceInkAudioInputMode {
+        guard let rawValue = defaults.string(forKey: inputModeKey),
+              let mode = VoiceInkAudioInputMode(rawValue: rawValue) else {
+            return .defaultMode
+        }
+
+        return mode
+    }
+
+    public static func saveInputMode(_ mode: VoiceInkAudioInputMode, to defaults: UserDefaults = .standard) {
+        defaults.set(mode.rawValue, forKey: inputModeKey)
+    }
+
+    public static func selectedDeviceUID(from defaults: UserDefaults = .standard) -> String? {
+        defaults.string(forKey: selectedDeviceUIDKey)
+    }
+
+    public static func saveSelectedDeviceUID(_ uid: String, to defaults: UserDefaults = .standard) {
+        defaults.set(uid, forKey: selectedDeviceUIDKey)
+    }
+
+    public static func clearSelectedDeviceUID(from defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: selectedDeviceUIDKey)
+    }
+
+    public static func prioritizedDevices(from defaults: UserDefaults = .standard) -> [VoiceInkAudioInputPriorityDevice] {
+        guard let data = defaults.data(forKey: prioritizedDevicesKey),
+              let devices = try? JSONDecoder().decode([VoiceInkAudioInputPriorityDevice].self, from: data) else {
+            return []
+        }
+
+        return devices
+    }
+
+    public static func savePrioritizedDevices(
+        _ devices: [VoiceInkAudioInputPriorityDevice],
+        to defaults: UserDefaults = .standard
+    ) {
+        guard let data = try? JSONEncoder().encode(devices) else { return }
+        defaults.set(data, forKey: prioritizedDevicesKey)
+    }
+}
+
 public enum VoiceInkAudioInputPriorityMoveDirection: Equatable, Sendable {
     case up
     case down

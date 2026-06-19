@@ -5,12 +5,6 @@ import os
 import VoiceInkCore
 
 class AudioDeviceManager: ObservableObject {
-    private enum UserDefaultsKey {
-        static let audioInputMode = "audioInputMode"
-        static let selectedAudioDeviceUID = "selectedAudioDeviceUID"
-        static let prioritizedDevices = "prioritizedDevices"
-    }
-
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "AudioDeviceManager")
     @Published var availableDevices: [(id: AudioDeviceID, uid: String, name: String)] = []
     @Published var selectedDeviceID: AudioDeviceID?
@@ -23,13 +17,7 @@ class AudioDeviceManager: ObservableObject {
 
     init() {
         loadPrioritizedDevices()
-
-        if let savedMode = UserDefaults.standard.string(forKey: UserDefaultsKey.audioInputMode),
-           let mode = VoiceInkAudioInputMode(rawValue: savedMode) {
-            inputMode = mode
-        } else {
-            inputMode = .defaultMode
-        }
+        inputMode = VoiceInkAudioInputPreference.inputMode()
 
         loadAvailableDevices { [weak self] in
             self?.initializeSelectedDevice()
@@ -76,12 +64,12 @@ class AudioDeviceManager: ObservableObject {
         case .prioritized:
             selectHighestPriorityAvailableDevice()
         case .custom:
-            if let savedUID = UserDefaults.standard.string(forKey: UserDefaultsKey.selectedAudioDeviceUID) {
+            if let savedUID = VoiceInkAudioInputPreference.selectedDeviceUID() {
                 if let device = availableDevices.first(where: { $0.uid == savedUID }) {
                     selectedDeviceID = device.id
                 } else {
                     logger.warning("🎙️ Saved device UID \(savedUID, privacy: .public) is no longer available")
-                    UserDefaults.standard.removeObject(forKey: UserDefaultsKey.selectedAudioDeviceUID)
+                    VoiceInkAudioInputPreference.clearSelectedDeviceUID()
                     fallbackToDefaultDevice()
                 }
             } else {
@@ -234,7 +222,7 @@ class AudioDeviceManager: ObservableObject {
             let uid = deviceToSelect.uid
             DispatchQueue.main.async {
                 self.selectedDeviceID = id
-                UserDefaults.standard.set(uid, forKey: UserDefaultsKey.selectedAudioDeviceUID)
+                VoiceInkAudioInputPreference.saveSelectedDeviceUID(uid)
                 self.notifyDeviceChange()
             }
         } else {
@@ -249,8 +237,8 @@ class AudioDeviceManager: ObservableObject {
             DispatchQueue.main.async {
                 self.inputMode = .custom
                 self.selectedDeviceID = id
-                UserDefaults.standard.set(VoiceInkAudioInputMode.custom.rawValue, forKey: UserDefaultsKey.audioInputMode)
-                UserDefaults.standard.set(uid, forKey: UserDefaultsKey.selectedAudioDeviceUID)
+                VoiceInkAudioInputPreference.saveInputMode(.custom)
+                VoiceInkAudioInputPreference.saveSelectedDeviceUID(uid)
                 self.notifyDeviceChange()
             }
         } else {
@@ -261,7 +249,7 @@ class AudioDeviceManager: ObservableObject {
 
     func selectInputMode(_ mode: VoiceInkAudioInputMode) {
         inputMode = mode
-        UserDefaults.standard.set(mode.rawValue, forKey: UserDefaultsKey.audioInputMode)
+        VoiceInkAudioInputPreference.saveInputMode(mode)
 
         switch mode {
         case .systemDefault:
@@ -302,16 +290,11 @@ class AudioDeviceManager: ObservableObject {
     }
     
     private func loadPrioritizedDevices() {
-        if let data = UserDefaults.standard.data(forKey: UserDefaultsKey.prioritizedDevices),
-           let devices = try? JSONDecoder().decode([VoiceInkAudioInputPriorityDevice].self, from: data) {
-            prioritizedDevices = devices
-        }
+        prioritizedDevices = VoiceInkAudioInputPreference.prioritizedDevices()
     }
     
     func savePrioritizedDevices() {
-        if let data = try? JSONEncoder().encode(prioritizedDevices) {
-            UserDefaults.standard.set(data, forKey: UserDefaultsKey.prioritizedDevices)
-        }
+        VoiceInkAudioInputPreference.savePrioritizedDevices(prioritizedDevices)
     }
     
     func addPrioritizedDevice(uid: String, name: String) {

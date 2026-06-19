@@ -52,6 +52,8 @@ public struct VoiceInkAIEnhancementAPIKeyDraft: Equatable, Sendable {
 public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
     public static let missingVerificationCandidateMessage = "Environment variable is missing or empty"
     public static let invalidOrMissingBaseURLConfigurationMessage = "Invalid or missing base URL configuration"
+    public static let defaultOllamaTextEnhancementModel = "mistral"
+    public static let localCLITextEnhancementModel = "local-cli"
 
     case cerebras = "Cerebras"
     case groq = "Groq"
@@ -177,6 +179,26 @@ public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
 
     public var preservesUnavailableSelectedTextEnhancementModel: Bool {
         self == .ollama
+    }
+
+    public func defaultTextEnhancementModel(from defaults: UserDefaults = .standard) -> String {
+        if let provider = aiModelProvider {
+            return VoiceInkAIModelCatalog.defaultModel(for: provider)
+        }
+
+        switch self {
+        case .ollama:
+            return VoiceInkDynamicAIProviderPreference.ollamaSelectedModel(
+                from: defaults,
+                fallback: Self.defaultOllamaTextEnhancementModel
+            )
+        case .localCLI:
+            return Self.localCLITextEnhancementModel
+        case .custom:
+            return VoiceInkDynamicAIProviderPreference.customProviderModel(from: defaults)
+        case .anthropic, .assemblyAI, .cerebras, .deepgram, .elevenLabs, .groq, .gemini, .mistral, .openAI, .openRouter, .soniox, .speechmatics:
+            preconditionFailure("Core-backed providers should return from VoiceInkAIModelCatalog")
+        }
     }
 
     public func selectedTextEnhancementModel(

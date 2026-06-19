@@ -320,6 +320,43 @@ final class AIProviderCatalogTests: XCTestCase {
         )
     }
 
+    func testMacOSAIEnhancementDefaultTextEnhancementModelsAreShared() {
+        withIsolatedDefaults { defaults in
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderKind.groq.defaultTextEnhancementModel(from: defaults),
+                VoiceInkAIModelCatalog.defaultModel(for: .groq)
+            )
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderKind.openRouter.defaultTextEnhancementModel(from: defaults),
+                VoiceInkAIModelCatalog.defaultModel(for: .openRouter)
+            )
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderKind.ollama.defaultTextEnhancementModel(from: defaults),
+                VoiceInkAIEnhancementProviderKind.defaultOllamaTextEnhancementModel
+            )
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderKind.localCLI.defaultTextEnhancementModel(from: defaults),
+                VoiceInkAIEnhancementProviderKind.localCLITextEnhancementModel
+            )
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderKind.custom.defaultTextEnhancementModel(from: defaults),
+                ""
+            )
+
+            VoiceInkDynamicAIProviderPreference.saveOllamaSelectedModel("llama3", to: defaults)
+            VoiceInkDynamicAIProviderPreference.saveCustomProviderModel("custom-model", to: defaults)
+
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderKind.ollama.defaultTextEnhancementModel(from: defaults),
+                "llama3"
+            )
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderKind.custom.defaultTextEnhancementModel(from: defaults),
+                "custom-model"
+            )
+        }
+    }
+
     func testMacOSAIEnhancementProviderVerificationRoutesAreShared() {
         let expectedRoutes: [VoiceInkAIEnhancementProviderKind: VoiceInkAIEnhancementAPIKeyVerificationRoute?] = [
             .anthropic: .anthropicMessages,
@@ -404,5 +441,19 @@ final class AIProviderCatalogTests: XCTestCase {
         XCTAssertNil(VoiceInkAIEnhancementProviderKind.custom.apiKeyConsoleURL)
         XCTAssertNil(VoiceInkAIEnhancementProviderKind.ollama.apiKeyConsoleURL)
         XCTAssertNil(VoiceInkAIEnhancementProviderKind.localCLI.apiKeyConsoleURL)
+    }
+
+    private func withIsolatedDefaults(_ run: (UserDefaults) -> Void) {
+        let suiteName = "VoiceInkCore.AIProviderCatalogTests.\(UUID().uuidString)"
+        guard let defaults = UserDefaults(suiteName: suiteName) else {
+            XCTFail("Unable to create isolated defaults")
+            return
+        }
+
+        defer {
+            defaults.removePersistentDomain(forName: suiteName)
+        }
+
+        run(defaults)
     }
 }

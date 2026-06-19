@@ -2154,6 +2154,21 @@ require_pattern \
   'VoiceInkAIEnhancementProviderKind\.(missingVerificationCandidateMessage|invalidOrMissingBaseURLConfigurationMessage)|selectedProvider\.unsupportedAPIKeyVerificationMessage' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
+require_pattern \
+  "shared AI enhancement default text model policy lives in VoiceInkCore" \
+  'defaultTextEnhancementModel|defaultOllamaTextEnhancementModel|localCLITextEnhancementModel' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+require_pattern \
+  "macOS AI service default text model selection uses shared policy" \
+  'defaultTextEnhancementModel' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+require_pattern \
+  "macOS Power Mode AI default text model selection uses shared policy" \
+  'defaultTextEnhancementModel' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
 reject_pattern \
   "macOS AI API-key path avoids shell-only key-reference and blank-key policy" \
   'VoiceInkAPIKeyReference\.resolvedValue|VoiceInkProviderCredential\.nonBlank\(apiKey\)' \
@@ -2164,6 +2179,12 @@ reject_pattern \
   "macOS AI service avoids duplicate API-key failure copy" \
   'Environment variable is missing or empty|Invalid or missing base URL configuration|does not support API key verification' \
   VoiceInk/Services/AIEnhancement/AIService.swift
+
+reject_pattern \
+  "macOS AI service avoids duplicate default text model policy" \
+  '"(mistral|local-cli)"|ollamaSelectedModel\(fallback:' \
+  VoiceInk/Services/AIEnhancement/AIService.swift \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
 
 reject_pattern \
   "macOS AI API-key view avoids duplicate verification failure copy" \

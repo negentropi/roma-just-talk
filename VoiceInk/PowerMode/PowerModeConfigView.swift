@@ -460,7 +460,7 @@ struct ConfigurationView: View {
                             .onChange(of: selectedAIProvider) { _, _ in
                                 applyEnhancementSelection(
                                     enhancementSelection.selectingDefaultModelForSelectedProvider { provider in
-                                        provider.defaultModel
+                                        provider.defaultTextEnhancementModel()
                                     }
                                 )
                             }

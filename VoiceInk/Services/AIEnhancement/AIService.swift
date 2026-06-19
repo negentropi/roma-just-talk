@@ -20,23 +20,6 @@ extension VoiceInkAIEnhancementProviderKind {
         }
     }
     
-    var defaultModel: String {
-        if let provider = aiModelProvider {
-            return VoiceInkAIModelCatalog.defaultModel(for: provider)
-        }
-
-        switch self {
-        case .ollama:
-            return VoiceInkDynamicAIProviderPreference.ollamaSelectedModel(fallback: "mistral")
-        case .localCLI:
-            return "local-cli"
-        case .custom:
-            return VoiceInkDynamicAIProviderPreference.customProviderModel()
-        case .anthropic, .assemblyAI, .cerebras, .deepgram, .elevenLabs, .groq, .gemini, .mistral, .openAI, .openRouter, .soniox, .speechmatics:
-            preconditionFailure("Core-backed providers should return from VoiceInkAIModelCatalog")
-        }
-    }
-    
     var availableModels: [String] {
         if let provider = aiModelProvider {
             return VoiceInkAIModelCatalog.availableModels(for: provider)
@@ -116,7 +99,7 @@ class AIService: ObservableObject {
         selectedProvider.selectedTextEnhancementModel(
             selectedModels[selectedProvider],
             availableModels: availableModels,
-            defaultModel: selectedProvider.defaultModel
+            defaultModel: selectedProvider.defaultTextEnhancementModel()
         )
     }
     
@@ -361,7 +344,7 @@ class AIService: ObservableObject {
             await MainActor.run {
                 self.openRouterModels = models
                 self.saveOpenRouterModels()
-                if self.selectedProvider == .openRouter && self.currentModel == self.selectedProvider.defaultModel && !models.isEmpty {
+                if self.selectedProvider == .openRouter && self.currentModel == self.selectedProvider.defaultTextEnhancementModel() && !models.isEmpty {
                     self.selectModel(models.first!)
                 }
                 self.objectWillChange.send()

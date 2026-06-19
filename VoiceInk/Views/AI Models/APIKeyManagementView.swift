@@ -16,7 +16,7 @@ struct APIKeyManagementView: View {
     @State private var isCheckingOllama = false
     @State private var isEditingURL = false
     @State private var localCLICommandTemplate: String = ""
-    @State private var localCLITimeoutSeconds: Double = LocalCLIService.defaultTimeoutSeconds
+    @State private var localCLITimeoutSeconds: Double = VoiceInkLocalCLIPreference.defaultTimeoutSeconds
     @State private var isSyncingLocalCLIState = false
 
     private var apiKeyDraft: VoiceInkAIEnhancementAPIKeyDraft {
@@ -183,7 +183,7 @@ struct APIKeyManagementView: View {
                                 .foregroundColor(.secondary)
                             Spacer()
                             Menu("Load Template") {
-                                ForEach(LocalCLITemplate.allCases) { template in
+                                ForEach(VoiceInkLocalCLITemplate.allCases) { template in
                                     Button(template.displayName) {
                                         aiService.loadLocalCLITemplate(template)
                                         syncLocalCLIStateFromService()
@@ -214,14 +214,9 @@ struct APIKeyManagementView: View {
                     }
 
                     Picker("Timeout", selection: $localCLITimeoutSeconds) {
-                        Text("15s").tag(15.0)
-                        Text("30s").tag(30.0)
-                        Text("45s").tag(45.0)
-                        Text("60s").tag(60.0)
-                        Text("90s").tag(90.0)
-                        Text("120s").tag(120.0)
-                        Text("180s").tag(180.0)
-                        Text("300s").tag(300.0)
+                        ForEach(VoiceInkLocalCLIPreference.timeoutOptions, id: \.self) { timeout in
+                            Text(VoiceInkLocalCLIPreference.timeoutLabel(for: timeout)).tag(timeout)
+                        }
                     }
                     .onChange(of: localCLITimeoutSeconds) { _, newValue in
                         aiService.updateLocalCLITimeoutSeconds(newValue)

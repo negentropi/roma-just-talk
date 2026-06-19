@@ -1174,6 +1174,9 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             VoiceInkDynamicAIProviderPreference.saveCustomProviderBaseURL("https://api.example.com/v1", to: defaults)
             VoiceInkDynamicAIProviderPreference.saveCustomProviderModel("custom-model", to: defaults)
             VoiceInkDynamicAIProviderPreference.saveOpenRouterModels(["openai/gpt-oss-120b"], to: defaults)
+            VoiceInkLocalCLIPreference.saveCommandTemplate("codex exec \"$VOICEINK_FULL_PROMPT\"", to: defaults)
+            VoiceInkLocalCLIPreference.saveSelectedTemplate(.codex, to: defaults)
+            VoiceInkLocalCLIPreference.saveTimeoutSeconds(90, to: defaults)
             defaults.set(15, forKey: VoiceInkUserDefaultsKey.enhancementTimeoutSeconds)
             defaults.set(false, forKey: VoiceInkUserDefaultsKey.enhancementRetryOnTimeout)
             VoiceInkTranscriptionAutoCleanupPreference.saveIsEnabled(true, to: defaults)
@@ -1270,6 +1273,9 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             XCTAssertEqual(VoiceInkDynamicAIProviderPreference.customProviderBaseURL(from: defaults), "")
             XCTAssertEqual(VoiceInkDynamicAIProviderPreference.customProviderModel(from: defaults), "")
             XCTAssertEqual(VoiceInkDynamicAIProviderPreference.openRouterModels(from: defaults), [])
+            XCTAssertEqual(VoiceInkLocalCLIPreference.commandTemplate(from: defaults), "")
+            XCTAssertEqual(VoiceInkLocalCLIPreference.selectedTemplate(from: defaults), .pi)
+            XCTAssertEqual(VoiceInkLocalCLIPreference.timeoutSeconds(from: defaults), 45)
             XCTAssertEqual(
                 VoiceInkAIEnhancementRequestPreference.timeoutSeconds(from: defaults),
                 TimeInterval(VoiceInkPreferenceDefault.enhancementTimeoutSeconds)

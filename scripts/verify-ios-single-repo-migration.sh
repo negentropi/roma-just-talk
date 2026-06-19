@@ -2590,6 +2590,36 @@ require_pattern \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 require_pattern \
+  "shared Local CLI configuration lives in VoiceInkCore" \
+  'VoiceInkLocalCLITemplate|VoiceInkLocalCLIPreference|commandTemplateKey = "localCLICommandTemplate"|selectedTemplateKey = "localCLISelectedTemplate"|timeoutSecondsKey = "localCLITimeoutSeconds"|defaultTimeoutSeconds|timeoutOptions|boundedTimeoutSeconds|isCommandConfigured|fullPrompt' \
+  VoiceInkCore/Sources/VoiceInkCore/LocalCLIConfiguration.swift
+
+require_pattern \
+  "macOS Local CLI service uses shared configuration policy" \
+  'VoiceInkLocalCLIPreference\.(saveCommandTemplate|saveSelectedTemplate|boundedTimeoutSeconds|saveTimeoutSeconds|isCommandConfigured|selectedTemplate|commandTemplate|timeoutSeconds|fullPrompt)' \
+  VoiceInk/Services/AIEnhancement/LocalCLIService.swift
+
+require_pattern \
+  "macOS AI service exposes shared Local CLI template type" \
+  'VoiceInkLocalCLITemplate' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+require_pattern \
+  "macOS AI settings use shared Local CLI templates and timeout options" \
+  'VoiceInkLocalCLITemplate\.allCases|VoiceInkLocalCLIPreference\.(defaultTimeoutSeconds|timeoutOptions|timeoutLabel)' \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+
+require_pattern \
+  "shared preference reset clears Local CLI settings" \
+  'VoiceInkLocalCLIPreference\.clear' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "migration checklist tracks shared Local CLI configuration gate" \
+  'macOS Local CLI template identity, command template catalog, command/selected-template/timeout storage, timeout default/options/clamp, configured-command predicate, and full-prompt wrapper route through `VoiceInkLocalCLITemplate`/`VoiceInkLocalCLIPreference`' \
+  docs/ios-single-repo-migration.md
+
+require_pattern \
   "shared AI enhancement default text model policy lives in VoiceInkCore" \
   'defaultTextEnhancementModel|defaultOllamaTextEnhancementModel|legacyOllamaServiceSelectedModelFallback|localCLITextEnhancementModel' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
@@ -2730,6 +2760,16 @@ reject_pattern \
   "macOS AI service avoids duplicate credential-state policy" \
   'selectedProvider == \.localCLI \? localCLIService\.isConfigured : true|isAPIKeyValid = localCLIService\.isConfigured' \
   VoiceInk/Services/AIEnhancement/AIService.swift
+
+reject_pattern \
+  "macOS Local CLI adapter avoids shell-owned template and preference policy" \
+  'enum +LocalCLITemplate|"(localCLICommandTemplate|localCLISelectedTemplate|localCLITimeoutSeconds)"|defaultTimeoutSeconds|max\(5, timeoutSeconds\)|makeFullPrompt' \
+  VoiceInk/Services/AIEnhancement/LocalCLIService.swift
+
+reject_pattern \
+  "macOS AI settings avoid duplicate Local CLI timeout options" \
+  'Text\("(15|30|45|60|90|120|180|300)s"\)' \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
 
 reject_pattern \
   "macOS AI service avoids duplicate default text model policy" \

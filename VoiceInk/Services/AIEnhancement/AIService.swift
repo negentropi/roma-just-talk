@@ -63,7 +63,7 @@ class AIService: ObservableObject {
         localCLIService.commandTemplate
     }
 
-    var localCLITemplateSelection: LocalCLITemplate {
+    var localCLITemplateSelection: VoiceInkLocalCLITemplate {
         localCLIService.selectedTemplate
     }
 
@@ -267,7 +267,7 @@ class AIService: ObservableObject {
         ollamaService.selectedModel = modelName
     }
 
-    func loadLocalCLITemplate(_ template: LocalCLITemplate) {
+    func loadLocalCLITemplate(_ template: VoiceInkLocalCLITemplate) {
         localCLIService.loadTemplate(template)
         refreshLocalCLIConfigurationState()
     }

@@ -1,83 +1,44 @@
 import Foundation
 import VoiceInkCore
 
-enum LocalCLITemplate: String, CaseIterable, Identifiable {
-    case pi
-    case claude
-    case codex
-    case copilot
-
-    var id: String { rawValue }
-
-    var displayName: String {
-        switch self {
-        case .pi: return "Pi"
-        case .claude: return "Claude"
-        case .codex: return "Codex"
-        case .copilot: return "Copilot"
-        }
-    }
-
-    var commandTemplate: String {
-        switch self {
-        case .pi:
-            return "pi -ne -ns -p --no-tools --system-prompt \"$VOICEINK_SYSTEM_PROMPT\" \"$VOICEINK_USER_PROMPT\""
-        case .claude:
-            return "claude -p \"$VOICEINK_FULL_PROMPT\""
-        case .codex:
-            return "TMPFILE=$(mktemp) && codex exec --skip-git-repo-check --output-last-message \"$TMPFILE\" \"$VOICEINK_FULL_PROMPT\" > /dev/null 2>&1 && cat \"$TMPFILE\" && rm \"$TMPFILE\""
-        case .copilot:
-            return "copilot -p \"$VOICEINK_FULL_PROMPT\" -s --no-ask-user --available-tools=__none__ 2>/dev/null"
-        }
-    }
-}
-
 final class LocalCLIService {
-    static let commandTemplateKey = "localCLICommandTemplate"
-    static let selectedTemplateKey = "localCLISelectedTemplate"
-    static let timeoutSecondsKey = "localCLITimeoutSeconds"
-    static let defaultTimeoutSeconds: Double = 45
     private static let shellPathQueue = DispatchQueue(label: "\(VoiceInkAppIdentity.loggingSubsystem).localcli.path")
     private static var cachedInteractiveLoginPATH: String?
 
     var commandTemplate: String {
         didSet {
-            UserDefaults.standard.set(commandTemplate, forKey: Self.commandTemplateKey)
+            VoiceInkLocalCLIPreference.saveCommandTemplate(commandTemplate)
         }
     }
 
-    var selectedTemplate: LocalCLITemplate {
+    var selectedTemplate: VoiceInkLocalCLITemplate {
         didSet {
-            UserDefaults.standard.set(selectedTemplate.rawValue, forKey: Self.selectedTemplateKey)
+            VoiceInkLocalCLIPreference.saveSelectedTemplate(selectedTemplate)
         }
     }
 
     var timeoutSeconds: Double {
         didSet {
-            let clamped = max(5, timeoutSeconds)
+            let clamped = VoiceInkLocalCLIPreference.boundedTimeoutSeconds(timeoutSeconds)
             if clamped != timeoutSeconds {
                 timeoutSeconds = clamped
                 return
             }
-            UserDefaults.standard.set(timeoutSeconds, forKey: Self.timeoutSecondsKey)
+            VoiceInkLocalCLIPreference.saveTimeoutSeconds(timeoutSeconds)
         }
     }
 
     var isConfigured: Bool {
-        !commandTemplate.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        VoiceInkLocalCLIPreference.isCommandConfigured(commandTemplate)
     }
 
     init() {
-        let savedTemplateRaw = UserDefaults.standard.string(forKey: Self.selectedTemplateKey) ?? ""
-        selectedTemplate = LocalCLITemplate(rawValue: savedTemplateRaw) ?? .pi
-
-        commandTemplate = UserDefaults.standard.string(forKey: Self.commandTemplateKey) ?? ""
-
-        let savedTimeout = UserDefaults.standard.double(forKey: Self.timeoutSecondsKey)
-        timeoutSeconds = savedTimeout > 0 ? savedTimeout : Self.defaultTimeoutSeconds
+        selectedTemplate = VoiceInkLocalCLIPreference.selectedTemplate()
+        commandTemplate = VoiceInkLocalCLIPreference.commandTemplate()
+        timeoutSeconds = VoiceInkLocalCLIPreference.timeoutSeconds()
     }
 
-    func loadTemplate(_ template: LocalCLITemplate) {
+    func loadTemplate(_ template: VoiceInkLocalCLITemplate) {
         selectedTemplate = template
         commandTemplate = template.commandTemplate
     }
@@ -87,7 +48,7 @@ final class LocalCLIService {
             throw LocalCLIError.commandNotConfigured
         }
 
-        let fullPrompt = Self.makeFullPrompt(systemPrompt: systemPrompt, userPrompt: userPrompt)
+        let fullPrompt = VoiceInkLocalCLIPreference.fullPrompt(systemPrompt: systemPrompt, userPrompt: userPrompt)
         return try await executeCommand(
             commandTemplate: commandTemplate,
             systemPrompt: systemPrompt,
@@ -95,18 +56,6 @@ final class LocalCLIService {
             fullPrompt: fullPrompt,
             timeout: timeoutSeconds
         )
-    }
-
-    static func makeFullPrompt(systemPrompt: String, userPrompt: String) -> String {
-        """
-        <SYSTEM_PROMPT>
-        \(systemPrompt)
-        </SYSTEM_PROMPT>
-
-        <USER_PROMPT>
-        \(userPrompt)
-        </USER_PROMPT>
-        """
     }
 
     private func executeCommand(

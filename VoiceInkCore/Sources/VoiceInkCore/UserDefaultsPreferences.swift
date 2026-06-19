@@ -1035,6 +1035,7 @@ public enum VoiceInkSharedPreferenceReset {
         VoiceInkCurrentTranscriptionModelPreference.clearModelName(from: defaults)
         VoiceInkAIEnhancementProviderPreference.clear(from: defaults)
         VoiceInkDynamicAIProviderPreference.clear(from: defaults)
+        VoiceInkLocalCLIPreference.clear(from: defaults)
         VoiceInkAIEnhancementRequestPreference.clear(from: defaults)
         VoiceInkTranscriptionAutoCleanupPreference.clear(from: defaults)
         VoiceInkAudioCleanupPreference.clear(from: defaults)

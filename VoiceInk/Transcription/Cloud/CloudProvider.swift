@@ -49,28 +49,7 @@ private extension VoiceInkCloudTranscriptionModelSpec {
 
 extension CloudProvider {
     private var apiErrorDomain: String? {
-        switch modelProvider {
-        case .groq:
-            return "GroqAPI"
-        case .deepgram:
-            return "DeepgramAPI"
-        case .gemini:
-            return "GeminiAPI"
-        case .mistral:
-            return "MistralAPI"
-        case .elevenLabs:
-            return "ElevenLabsAPI"
-        case .soniox:
-            return "SonioxAPI"
-        case .speechmatics:
-            return "SpeechmaticsAPI"
-        case .assemblyAI:
-            return "AssemblyAIAPI"
-        case .xai:
-            return "XAIAPI"
-        default:
-            return nil
-        }
+        modelProvider.coreTranscriptionModelProvider?.apiErrorDomain
     }
 
     private func remoteTranscriptionOptions(

@@ -116,6 +116,20 @@ final class TranscriptionModelCatalogTests: XCTestCase {
         XCTAssertTrue(VoiceInkTranscriptionModelProvider.local.supportsRecordedFileTranscription)
     }
 
+    func testProviderAPIErrorDomainsPreserveMacOSBatchMapping() {
+        XCTAssertEqual(VoiceInkTranscriptionModelProvider.groq.apiErrorDomain, "GroqAPI")
+        XCTAssertEqual(VoiceInkTranscriptionModelProvider.deepgram.apiErrorDomain, "DeepgramAPI")
+        XCTAssertEqual(VoiceInkTranscriptionModelProvider.gemini.apiErrorDomain, "GeminiAPI")
+        XCTAssertEqual(VoiceInkTranscriptionModelProvider.mistral.apiErrorDomain, "MistralAPI")
+        XCTAssertEqual(VoiceInkTranscriptionModelProvider.elevenLabs.apiErrorDomain, "ElevenLabsAPI")
+        XCTAssertEqual(VoiceInkTranscriptionModelProvider.soniox.apiErrorDomain, "SonioxAPI")
+        XCTAssertEqual(VoiceInkTranscriptionModelProvider.speechmatics.apiErrorDomain, "SpeechmaticsAPI")
+        XCTAssertEqual(VoiceInkTranscriptionModelProvider.assemblyAI.apiErrorDomain, "AssemblyAIAPI")
+        XCTAssertEqual(VoiceInkTranscriptionModelProvider.xai.apiErrorDomain, "XAIAPI")
+        XCTAssertNil(VoiceInkTranscriptionModelProvider.cartesia.apiErrorDomain)
+        XCTAssertNil(VoiceInkTranscriptionModelProvider.local.apiErrorDomain)
+    }
+
     func testAssemblyAILanguageCapabilityAndModelsAreSharedProviderMetadata() {
         XCTAssertEqual(VoiceInkTranscriptionModelProvider.assemblyAI.languageCodes, ["en", "es", "de", "fr", "pt", "it"])
         XCTAssertTrue(VoiceInkTranscriptionModelProvider.assemblyAI.includesAutoDetect)

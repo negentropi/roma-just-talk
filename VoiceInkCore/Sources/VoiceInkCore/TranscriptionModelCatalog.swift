@@ -128,6 +128,31 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
             return true
         }
     }
+
+    public var apiErrorDomain: String? {
+        switch self {
+        case .groq:
+            return "GroqAPI"
+        case .deepgram:
+            return "DeepgramAPI"
+        case .gemini:
+            return "GeminiAPI"
+        case .mistral:
+            return "MistralAPI"
+        case .elevenLabs:
+            return "ElevenLabsAPI"
+        case .soniox:
+            return "SonioxAPI"
+        case .speechmatics:
+            return "SpeechmaticsAPI"
+        case .assemblyAI:
+            return "AssemblyAIAPI"
+        case .xai:
+            return "XAIAPI"
+        case .openAI, .cartesia, .local:
+            return nil
+        }
+    }
 }
 
 public struct VoiceInkCloudTranscriptionModelSpec: Equatable, Sendable {

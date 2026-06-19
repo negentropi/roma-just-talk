@@ -147,6 +147,7 @@ Current macOS consumers of shared remote transport:
 - macOS API-key lookup reads fallback environment-variable names from `VoiceInkProviderAPIKeyAccount`; Keychain access remains in the macOS shell.
 - macOS cloud-provider model lists are supplied by the `CloudProvider` default adapter over `VoiceInkTranscriptionModelCatalog`; the old standalone cloud-model adapter file is folded into `CloudProvider`, so the macOS shell only owns streaming factories and platform storage context.
 - macOS cloud-provider recorded-file support is derived from `VoiceInkTranscriptionModelProvider.supportsRecordedFileTranscription`, so Cartesia remains streaming-only without a shell-only override.
+- macOS cloud-provider HTTP status error-domain mapping is derived from `VoiceInkTranscriptionModelProvider.apiErrorDomain`, so batch transport error classification shares provider metadata instead of a shell-only switch.
 - macOS Native Apple and Parakeet model structs adapt `VoiceInkTranscriptionModelCatalog` local model specs; macOS still owns OS availability and FluidAudio download/runtime code.
 - macOS language pickers and iOS language settings use `VoiceInkLanguageCatalog.sortedOptions`, `VoiceInkLanguageCatalog.displayName`, and `VoiceInkTranscriptionLanguagePresentation` so language presentation order, fallback naming, and picker copy stay shared.
 - macOS recording, audio-file transcription, and retry transcription use `VoiceInkTranscriptionCleanupConfiguration` directly for shared raw-output filtering and cleanup preferences.
@@ -361,6 +362,7 @@ scripts/verify-ios-single-repo-migration.sh --full-build
 36. macOS sidebar/window titles and iOS note-list/onboarding app-name copy stay routed through `VoiceInkAppIdentity`.
 37. macOS history and iOS notes empty-state copy plus macOS history search/pagination/selection copy and SF Symbol names stay routed through `VoiceInkHistoryPresentation`, with platform views only rendering the shared presentation.
 38. macOS and iOS model-management labels route through `VoiceInkModelManagementFilter` and `VoiceInkModelManagementPresentation`, with duplicate model filter/default/local/cloud/custom copy out of platform views.
-39. A real Xcode toolchain is selected and both app targets build.
+39. macOS cloud-provider API error-domain mapping stays routed through `VoiceInkTranscriptionModelProvider.apiErrorDomain`, with duplicate provider-domain switches out of the macOS shell.
+40. A real Xcode toolchain is selected and both app targets build.
 
 Current local blocker: `xcode-select -p` points to `/Library/Developer/CommandLineTools`, and the previously used external Xcode volume is not mounted. Full target builds are still environment-blocked until a real Xcode is selected; macOS `VoiceInk` also needs `/Users/atalphalnmomhappyhouse/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework`, and iOS `VoiceInk-ios` needs the iOS 26.2 platform installed. Until those are present, use `swift run VoiceInkCoreChecks` plus the static parse/lint gates above for local proof.

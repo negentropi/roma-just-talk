@@ -103,11 +103,13 @@ class PowerModeSessionManager {
             applyPreferenceApplication(config.powerModePreferenceApplication)
         }
 
-        if let modelName = config.selectedTranscriptionModelName,
-           let selectedModel = await stateProvider.allAvailableModels.first(where: { $0.name == modelName }),
-           stateProvider.currentTranscriptionModel?.name != modelName {
-            await handleModelChange(to: selectedModel)
-        }
+        await applyModelResourcePlan(
+            modelResourcePlan(
+                for: config.selectedTranscriptionModelName,
+                stateProvider: stateProvider
+            ),
+            stateProvider: stateProvider
+        )
 
         if let language = config.selectedLanguage {
             applyCompatibleLanguage(language, preferredModelName: config.selectedTranscriptionModelName)
@@ -126,11 +128,13 @@ class PowerModeSessionManager {
             applyPreferenceApplication(state.powerModePreferenceRestore)
         }
 
-        if let modelName = state.transcriptionModelName,
-           let selectedModel = await stateProvider.allAvailableModels.first(where: { $0.name == modelName }),
-           stateProvider.currentTranscriptionModel?.name != modelName {
-            await handleModelChange(to: selectedModel)
-        }
+        await applyModelResourcePlan(
+            modelResourcePlan(
+                for: state.transcriptionModelName,
+                stateProvider: stateProvider
+            ),
+            stateProvider: stateProvider
+        )
 
         if let language = state.selectedLanguage {
             applyCompatibleLanguage(language, preferredModelName: state.transcriptionModelName)
@@ -190,25 +194,52 @@ class PowerModeSessionManager {
         return stateProvider?.allAvailableModels.first { $0.name == modelName }
     }
 
-    private func handleModelChange(to newModel: any TranscriptionModel) async {
-        guard let stateProvider = stateProvider else { return }
+    private func modelResourcePlan(
+        for selectedModelName: String?,
+        stateProvider: any PowerModeStateProvider
+    ) -> VoiceInkPowerModeTranscriptionModelResourcePlan {
+        VoiceInkPowerModeTranscriptionModelResourcePlan.plan(
+            selectedModelName: selectedModelName,
+            currentModelName: stateProvider.currentTranscriptionModel?.name,
+            availableModels: stateProvider.allAvailableModels.map(modelResourceFacts(for:)),
+            availableLocalModelNames: Set(stateProvider.availableModels.map(\.name))
+        )
+    }
 
-        await stateProvider.setDefaultTranscriptionModel(newModel)
+    private func modelResourceFacts(
+        for model: any TranscriptionModel
+    ) -> VoiceInkPowerModeTranscriptionModelResourceFacts {
+        VoiceInkPowerModeTranscriptionModelResourceFacts(
+            name: model.name,
+            loadsLocalWhisperModel: model.provider == .whisper
+        )
+    }
 
-        switch newModel.provider {
-        case .whisper:
+    private func applyModelResourcePlan(
+        _ plan: VoiceInkPowerModeTranscriptionModelResourcePlan,
+        stateProvider: any PowerModeStateProvider
+    ) async {
+        guard let selectedModelName = plan.selectedModelName,
+              let selectedModel = stateProvider.allAvailableModels.first(where: { $0.name == selectedModelName }) else {
+            return
+        }
+
+        stateProvider.setDefaultTranscriptionModel(selectedModel)
+
+        switch plan.action {
+        case .none:
+            break
+        case .cleanupOnly:
             await stateProvider.cleanupModelResources()
-            if let whisperModel = await stateProvider.availableModels.first(where: { $0.name == newModel.name }) {
+        case .cleanupAndLoadLocalModel(let modelName):
+            await stateProvider.cleanupModelResources()
+            if let localModel = stateProvider.availableModels.first(where: { $0.name == modelName }) {
                 do {
-                    try await stateProvider.loadModel(whisperModel)
+                    try await stateProvider.loadModel(localModel)
                 } catch {
-                    print("Power Mode: Failed to load local model '\(whisperModel.name)': \(error)")
+                    print("Power Mode: Failed to load local model '\(localModel.name)': \(error)")
                 }
             }
-        case .fluidAudio:
-            await stateProvider.cleanupModelResources()
-        default:
-            await stateProvider.cleanupModelResources()
         }
     }
 

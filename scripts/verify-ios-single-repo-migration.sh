@@ -1159,14 +1159,29 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
+  "shared Power Mode transcription model resource plan lives in VoiceInkCore" \
+  'VoiceInkPowerModeTranscriptionModelResourcePlan|VoiceInkPowerModeTranscriptionModelResourceAction|VoiceInkPowerModeTranscriptionModelResourceFacts' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
   "macOS Power Mode transcription settings use shared selection policy" \
   'VoiceInkPowerModeTranscriptionSelection|VoiceInkPowerModeTranscriptionModelFacts|languageControl' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
+
+require_pattern \
+  "macOS Power Mode session uses shared model resource plan" \
+  'modelResourcePlan\(for:|applyModelResourcePlan' \
+  VoiceInk/PowerMode/PowerModeSessionManager.swift
 
 reject_pattern \
   "macOS Power Mode transcription settings avoid shell-only language repair branching" \
   'languageSelectionDisabled\(|availableLanguages\(for:|useCompatibleLanguage\(|if +model\.provider == \.gemini|modelInfo\.isMultilingualModel|!modelInfo\.isMultilingualModel|validTranscriptionLanguageOrFallback' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
+
+reject_pattern \
+  "macOS Power Mode session avoids shell-only model resource branching" \
+  'handleModelChange|switch +newModel\.provider|case +\.whisper|case +\.fluidAudio|stateProvider\.currentTranscriptionModel\?\.name != modelName' \
+  VoiceInk/PowerMode/PowerModeSessionManager.swift
 
 require_pattern \
   "shared dictionary alert presentation lives in VoiceInkCore" \

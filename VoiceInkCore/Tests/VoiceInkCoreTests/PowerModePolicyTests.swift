@@ -635,6 +635,90 @@ final class PowerModePolicyTests: XCTestCase {
         )
     }
 
+    func testPowerModeTranscriptionModelResourcePlanSkipsMissingUnchangedSelection() {
+        let availableModels = [
+            transcriptionModelResourceFacts(name: "base", loadsLocalWhisperModel: true)
+        ]
+        let expectedNoChange = VoiceInkPowerModeTranscriptionModelResourcePlan(
+            selectedModelName: nil,
+            action: .none
+        )
+
+        XCTAssertEqual(
+            VoiceInkPowerModeTranscriptionModelResourcePlan.plan(
+                selectedModelName: nil,
+                currentModelName: "current",
+                availableModels: availableModels,
+                availableLocalModelNames: []
+            ),
+            expectedNoChange
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeTranscriptionModelResourcePlan.plan(
+                selectedModelName: "missing",
+                currentModelName: "current",
+                availableModels: availableModels,
+                availableLocalModelNames: ["missing"]
+            ),
+            expectedNoChange
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeTranscriptionModelResourcePlan.plan(
+                selectedModelName: "base",
+                currentModelName: "base",
+                availableModels: availableModels,
+                availableLocalModelNames: ["base"]
+            ),
+            expectedNoChange
+        )
+        XCTAssertFalse(expectedNoChange.shouldChangeModel)
+    }
+
+    func testPowerModeTranscriptionModelResourcePlanCleansNonWhisperModels() {
+        let plan = VoiceInkPowerModeTranscriptionModelResourcePlan.plan(
+            selectedModelName: "nova-3",
+            currentModelName: "base",
+            availableModels: [
+                transcriptionModelResourceFacts(name: "nova-3", loadsLocalWhisperModel: false)
+            ],
+            availableLocalModelNames: []
+        )
+
+        XCTAssertTrue(plan.shouldChangeModel)
+        XCTAssertEqual(plan.selectedModelName, "nova-3")
+        XCTAssertEqual(plan.action, .cleanupOnly)
+    }
+
+    func testPowerModeTranscriptionModelResourcePlanLoadsDownloadedLocalWhisperModel() {
+        let plan = VoiceInkPowerModeTranscriptionModelResourcePlan.plan(
+            selectedModelName: "base",
+            currentModelName: "nova-3",
+            availableModels: [
+                transcriptionModelResourceFacts(name: "base", loadsLocalWhisperModel: true)
+            ],
+            availableLocalModelNames: ["base"]
+        )
+
+        XCTAssertTrue(plan.shouldChangeModel)
+        XCTAssertEqual(plan.selectedModelName, "base")
+        XCTAssertEqual(plan.action, .cleanupAndLoadLocalModel("base"))
+    }
+
+    func testPowerModeTranscriptionModelResourcePlanCleansMissingLocalWhisperFile() {
+        let plan = VoiceInkPowerModeTranscriptionModelResourcePlan.plan(
+            selectedModelName: "base",
+            currentModelName: "nova-3",
+            availableModels: [
+                transcriptionModelResourceFacts(name: "base", loadsLocalWhisperModel: true)
+            ],
+            availableLocalModelNames: []
+        )
+
+        XCTAssertTrue(plan.shouldChangeModel)
+        XCTAssertEqual(plan.selectedModelName, "base")
+        XCTAssertEqual(plan.action, .cleanupOnly)
+    }
+
     func testPowerModeApplicationStatePreservesStoredShapeAndCleanupKeys() throws {
         let state = VoiceInkPowerModeApplicationState(
             isEnhancementEnabled: true,
@@ -1370,6 +1454,16 @@ final class PowerModePolicyTests: XCTestCase {
             isMultilingual: isMultilingual,
             languageOptions: languageOptions,
             prefersNativeAppleEnglish: prefersNativeAppleEnglish
+        )
+    }
+
+    private func transcriptionModelResourceFacts(
+        name: String,
+        loadsLocalWhisperModel: Bool
+    ) -> VoiceInkPowerModeTranscriptionModelResourceFacts {
+        VoiceInkPowerModeTranscriptionModelResourceFacts(
+            name: name,
+            loadsLocalWhisperModel: loadsLocalWhisperModel
         )
     }
 

@@ -490,6 +490,65 @@ public struct VoiceInkPowerModeTranscriptionSelection: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkPowerModeTranscriptionModelResourceFacts: Equatable, Sendable {
+    public var name: String
+    public var loadsLocalWhisperModel: Bool
+
+    public init(name: String, loadsLocalWhisperModel: Bool) {
+        self.name = name
+        self.loadsLocalWhisperModel = loadsLocalWhisperModel
+    }
+}
+
+public enum VoiceInkPowerModeTranscriptionModelResourceAction: Equatable, Sendable {
+    case none
+    case cleanupOnly
+    case cleanupAndLoadLocalModel(String)
+}
+
+public struct VoiceInkPowerModeTranscriptionModelResourcePlan: Equatable, Sendable {
+    public var selectedModelName: String?
+    public var action: VoiceInkPowerModeTranscriptionModelResourceAction
+
+    public var shouldChangeModel: Bool {
+        selectedModelName != nil
+    }
+
+    public init(
+        selectedModelName: String?,
+        action: VoiceInkPowerModeTranscriptionModelResourceAction
+    ) {
+        self.selectedModelName = selectedModelName
+        self.action = action
+    }
+
+    public static func plan(
+        selectedModelName: String?,
+        currentModelName: String?,
+        availableModels: [VoiceInkPowerModeTranscriptionModelResourceFacts],
+        availableLocalModelNames: Set<String>
+    ) -> Self {
+        guard let selectedModelName,
+              let selectedModel = availableModels.first(where: { $0.name == selectedModelName }),
+              currentModelName != selectedModelName else {
+            return Self(selectedModelName: nil, action: .none)
+        }
+
+        guard selectedModel.loadsLocalWhisperModel else {
+            return Self(selectedModelName: selectedModelName, action: .cleanupOnly)
+        }
+
+        guard availableLocalModelNames.contains(selectedModelName) else {
+            return Self(selectedModelName: selectedModelName, action: .cleanupOnly)
+        }
+
+        return Self(
+            selectedModelName: selectedModelName,
+            action: .cleanupAndLoadLocalModel(selectedModelName)
+        )
+    }
+}
+
 public struct VoiceInkPowerModeApplicationState: Codable, Equatable, Sendable {
     public var isEnhancementEnabled: Bool
     public var useScreenCaptureContext: Bool

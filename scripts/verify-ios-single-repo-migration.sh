@@ -1160,7 +1160,7 @@ require_pattern \
 
 require_pattern \
   "shared Whisper model download row presentation lives in VoiceInkCore" \
-  'VoiceInkWhisperModelDownloadRowPresentation|rowPresentation' \
+  'VoiceInkWhisperModelDownloadRowPresentation|rowPresentation|actionSystemImageName|downloadButtonSystemImageName' \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
 
 require_pattern \
@@ -1260,7 +1260,7 @@ require_pattern \
 
 require_pattern \
   "iOS local model management uses shared model row presentation" \
-  'rowPresentation' \
+  'rowPresentation|actionSystemImageName' \
   iOS/VoiceInk-ios/LocalModelManagementView.swift
 
 require_pattern \
@@ -1300,7 +1300,7 @@ require_pattern \
 
 require_pattern \
   "iOS onboarding uses shared model row presentation" \
-  'rowPresentation' \
+  'rowPresentation|actionSystemImageName|downloadButtonSystemImageName' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 require_pattern \
@@ -1341,6 +1341,12 @@ reject_pattern \
 reject_pattern \
   "iOS model download views avoid duplicate prompt copy" \
   'To enable offline transcription, a .* model needs to be downloaded|Download Model \(' \
+  iOS/VoiceInk-ios/LocalModelManagementView.swift \
+  iOS/VoiceInk-ios/OnboardingView.swift
+
+reject_pattern \
+  "iOS model download views avoid duplicate action icon names" \
+  '"(checkmark\.circle\.fill|xmark\.circle\.fill|icloud\.and\.arrow\.down|arrow\.down\.circle\.fill)"' \
   iOS/VoiceInk-ios/LocalModelManagementView.swift \
   iOS/VoiceInk-ios/OnboardingView.swift
 

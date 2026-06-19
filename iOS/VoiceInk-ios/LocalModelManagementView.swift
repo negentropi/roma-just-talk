@@ -83,14 +83,14 @@ struct ModelRowView: View {
                 // Action button where size used to be
                 switch presentation.action {
                 case .downloaded:
-                    Image(systemName: presentation.statusSystemImageName ?? "checkmark.circle.fill")
+                    Image(systemName: presentation.actionSystemImageName)
                         .foregroundColor(.green)
                         .font(.title2)
                 case .downloading:
                     Button(action: {
                         modelManager.cancelDownload(for: model)
                     }) {
-                        Image(systemName: "xmark.circle.fill")
+                        Image(systemName: presentation.actionSystemImageName)
                             .foregroundColor(.red)
                             .font(.title2)
                     }
@@ -98,7 +98,7 @@ struct ModelRowView: View {
                     Button(action: {
                         showingDownloadConfirmation = true
                     }) {
-                        Image(systemName: presentation.statusSystemImageName ?? "icloud.and.arrow.down")
+                        Image(systemName: presentation.actionSystemImageName)
                             .foregroundColor(.blue)
                             .font(.title2)
                     }

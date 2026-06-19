@@ -348,7 +348,7 @@ scripts/verify-ios-single-repo-migration.sh --full-build
 22. iOS live recording delegates timestamped filename construction and PCM16 recorder format constants to `VoiceInkStoredAudioFile` and `VoiceInkPCM16Audio`.
 23. iOS note detail and list deletion route stored-audio availability, deletion, and failed-delete log copy through `VoiceInkStoredAudioRecord`/`VoiceInkStoredAudioAvailability`/`VoiceInkStoredAudioFile`.
 24. iOS recording/retry mode selection, recording sheet controls, settings mode summaries, and mode-configuration form copy route presentation through `VoiceInkModeSelectionPresentation`, `VoiceInkRecordingSheetPresentation`, `VoiceInkModeSummaryPresentation`, and `VoiceInkModeFormPresentation`.
-25. iOS local model row status, swipe delete action text, operation confirmations, and failure alerts route through `VoiceInkWhisperModelDownloadRowPresentation`, `VoiceInkWhisperModelOperationConfirmationPresentation`, and `VoiceInkWhisperModelOperationAlertPresentation`.
+25. iOS local model row status, model-download action icons, swipe delete action text, operation confirmations, and failure alerts route through `VoiceInkWhisperModelDownloadRowPresentation`, `VoiceInkWhisperModelOperationConfirmationPresentation`, and `VoiceInkWhisperModelOperationAlertPresentation`.
 26. iOS API-key form copy and list status route through `VoiceInkProviderAPIKeyFormPresentation` and `VoiceInkProviderAPIKeyListRowPresentation`.
 27. macOS and iOS Keychain adapters route shared generic-password query policy through `VoiceInkKeychainQuery`, with duplicate service/syncability/data-protection query constants out of platform adapters.
 28. macOS and iOS local Whisper wrappers both consume shared runtime, VAD resource, and PCM16 WAV sample policies.

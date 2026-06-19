@@ -331,7 +331,6 @@ final class WhisperModelFilesTests: XCTestCase {
                 title: model.displayName,
                 subtitle: model.description,
                 action: .downloading,
-                statusSystemImageName: nil,
                 downloadButtonTitle: VoiceInkWhisperModelDownloadProgress.downloadActionTitle(for: model),
                 progress: downloadingState.progress
             )
@@ -344,7 +343,7 @@ final class WhisperModelFilesTests: XCTestCase {
             progress: nil
         ))
         XCTAssertEqual(downloadedState.rowPresentation(for: model).action, .downloaded)
-        XCTAssertEqual(downloadedState.rowPresentation(for: model).statusSystemImageName, "checkmark.circle.fill")
+        XCTAssertEqual(downloadedState.rowPresentation(for: model).actionSystemImageName, "checkmark.circle.fill")
 
         let idleState = VoiceInkWhisperModelDownloadState(isDownloaded: false, progress: .simple(
             modelName: model.modelName,
@@ -352,8 +351,10 @@ final class WhisperModelFilesTests: XCTestCase {
             progress: nil
         ))
         XCTAssertEqual(idleState.rowPresentation(for: model).action, .download)
-        XCTAssertEqual(idleState.rowPresentation(for: model).statusSystemImageName, "icloud.and.arrow.down")
+        XCTAssertEqual(idleState.rowPresentation(for: model).actionSystemImageName, "icloud.and.arrow.down")
+        XCTAssertEqual(idleState.rowPresentation(for: model).downloadButtonSystemImageName, "arrow.down.circle.fill")
         XCTAssertFalse(idleState.rowPresentation(for: model).shouldShowProgress)
+        XCTAssertEqual(downloadingState.rowPresentation(for: model).actionSystemImageName, "xmark.circle.fill")
     }
 
     func testMacOSDownloadProgressUsesMainAndCoreMLKeys() {

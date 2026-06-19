@@ -160,14 +160,14 @@ struct ModelDownloadOnboardingView: View {
                         
                         switch presentation.action {
                         case .downloaded:
-                            Image(systemName: presentation.statusSystemImageName ?? "checkmark.circle.fill")
+                            Image(systemName: presentation.actionSystemImageName)
                                 .foregroundColor(.green)
                                 .font(.title)
                         case .downloading:
                             ProgressView()
                                 .progressViewStyle(CircularProgressViewStyle())
                         case .download:
-                            Image(systemName: presentation.statusSystemImageName ?? "icloud.and.arrow.down")
+                            Image(systemName: presentation.actionSystemImageName)
                                 .foregroundColor(.accentColor)
                                 .font(.title)
                         }
@@ -219,7 +219,7 @@ struct ModelDownloadOnboardingView: View {
                         showDownloadConfirmation = true
                     }) {
                         HStack(spacing: 8) {
-                            Image(systemName: "arrow.down.circle.fill")
+                            Image(systemName: presentation.downloadButtonSystemImageName)
                             Text(presentation.downloadButtonTitle)
                         }
                     }

@@ -84,6 +84,70 @@ final class TranscriptionStreamingPreferenceTests: XCTestCase {
         }
     }
 
+    func testStreamingModePresentationForStreamingOnlyModelsForcesStreamingToggle() {
+        let presentation = VoiceInkTranscriptionStreamingModePresentation(
+            isStreamingEnabled: false,
+            isStreamingOnly: true,
+            isPreloadEnabled: false
+        )
+
+        XCTAssertEqual(presentation.streamingToggleTitle, "Streaming")
+        XCTAssertTrue(presentation.isStreamingToggleForcedOn)
+        XCTAssertTrue(presentation.isStreamingToggleDisabled)
+        XCTAssertEqual(presentation.streamingToggleHelp, "This model only supports active-recording streaming")
+    }
+
+    func testStreamingModePresentationForEnabledBatchCapableModelUsesStreamingHelp() {
+        let presentation = VoiceInkTranscriptionStreamingModePresentation(
+            isStreamingEnabled: true,
+            isStreamingOnly: false,
+            isPreloadEnabled: false
+        )
+
+        XCTAssertFalse(presentation.isStreamingToggleForcedOn)
+        XCTAssertFalse(presentation.isStreamingToggleDisabled)
+        XCTAssertEqual(
+            presentation.streamingToggleHelp,
+            "Streams active-recording audio; click to use saved-file batch mode"
+        )
+    }
+
+    func testStreamingModePresentationForDisabledBatchCapableModelUsesBatchHelp() {
+        let presentation = VoiceInkTranscriptionStreamingModePresentation(
+            isStreamingEnabled: false,
+            isStreamingOnly: false,
+            isPreloadEnabled: false
+        )
+
+        XCTAssertFalse(presentation.isStreamingToggleForcedOn)
+        XCTAssertFalse(presentation.isStreamingToggleDisabled)
+        XCTAssertEqual(
+            presentation.streamingToggleHelp,
+            "Saved-file batch mode; click to stream active-recording audio"
+        )
+    }
+
+    func testStreamingModePresentationPreservesPreloadHelp() {
+        let enabled = VoiceInkTranscriptionStreamingModePresentation(
+            isStreamingEnabled: true,
+            isStreamingOnly: false,
+            isPreloadEnabled: true
+        )
+        let disabled = VoiceInkTranscriptionStreamingModePresentation(
+            isStreamingEnabled: true,
+            isStreamingOnly: false,
+            isPreloadEnabled: false
+        )
+
+        XCTAssertEqual(enabled.preloadToggleTitle, "Buffer Preload")
+        XCTAssertEqual(
+            enabled.preloadToggleHelp,
+            "Rolling buffer can pre-run this model when global policy allows it"
+        )
+        XCTAssertEqual(disabled.preloadToggleTitle, "Buffer Preload")
+        XCTAssertEqual(disabled.preloadToggleHelp, "Rolling buffer preload disabled for this model")
+    }
+
     func testSessionRoutePlanUsesFileTranscriptionWhenStreamingDisabled() {
         withIsolatedDefaults { defaults in
             let facts = routeFacts(serviceRoute: .cloud, modelName: "nova-3")

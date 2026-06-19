@@ -193,6 +193,17 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertEqual(presentation.consoleTrailingSystemImageName, "arrow.up.right.square")
     }
 
+    func testProviderAPIKeyCardPresentationPreservesMacOSCloudCardCopy() {
+        let presentation = VoiceInkProviderAPIKeyCardPresentation(providerDisplayName: "Cartesia")
+
+        XCTAssertEqual(presentation.configureButtonTitle, "Configure")
+        XCTAssertEqual(presentation.configureButtonSystemImageName, "gear")
+        XCTAssertEqual(presentation.removeAPIKeyButtonTitle, "Remove API Key")
+        XCTAssertEqual(presentation.removeAPIKeyButtonSystemImageName, "trash")
+        XCTAssertEqual(presentation.configurationSectionTitle, "API Key Configuration")
+        XCTAssertEqual(presentation.apiKeyFieldPlaceholder, "Enter your Cartesia API key")
+    }
+
     func testProviderAPIKeyStateResolvesStoredRuntimeKeysAndNonUserProviders() {
         let state = VoiceInkProviderAPIKeyState(
             storedKeysByProvider: [.groq: " groq-key "],

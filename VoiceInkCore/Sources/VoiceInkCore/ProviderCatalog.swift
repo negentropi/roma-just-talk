@@ -183,6 +183,24 @@ public struct VoiceInkProviderAPIKeyFormPresentation: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkProviderAPIKeyCardPresentation: Equatable, Sendable {
+    public let configureButtonTitle: String
+    public let configureButtonSystemImageName: String
+    public let removeAPIKeyButtonTitle: String
+    public let removeAPIKeyButtonSystemImageName: String
+    public let configurationSectionTitle: String
+    public let apiKeyFieldPlaceholder: String
+
+    public init(providerDisplayName: String) {
+        self.configureButtonTitle = "Configure"
+        self.configureButtonSystemImageName = "gear"
+        self.removeAPIKeyButtonTitle = "Remove API Key"
+        self.removeAPIKeyButtonSystemImageName = "trash"
+        self.configurationSectionTitle = "API Key Configuration"
+        self.apiKeyFieldPlaceholder = "Enter your \(providerDisplayName) API key"
+    }
+}
+
 public enum VoiceInkProviderAPIKeyVerificationTone: Equatable, Sendable {
     case success
     case failure

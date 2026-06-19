@@ -16,6 +16,36 @@ public struct VoiceInkTranscriptionStreamingModelSnapshot: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkTranscriptionStreamingModePresentation: Equatable, Sendable {
+    public let streamingToggleTitle: String
+    public let isStreamingToggleForcedOn: Bool
+    public let isStreamingToggleDisabled: Bool
+    public let streamingToggleHelp: String
+    public let preloadToggleTitle: String
+    public let preloadToggleHelp: String
+
+    public init(
+        isStreamingEnabled: Bool,
+        isStreamingOnly: Bool,
+        isPreloadEnabled: Bool
+    ) {
+        self.streamingToggleTitle = "Streaming"
+        self.isStreamingToggleForcedOn = isStreamingOnly
+        self.isStreamingToggleDisabled = isStreamingOnly
+        if isStreamingOnly {
+            self.streamingToggleHelp = "This model only supports active-recording streaming"
+        } else if isStreamingEnabled {
+            self.streamingToggleHelp = "Streams active-recording audio; click to use saved-file batch mode"
+        } else {
+            self.streamingToggleHelp = "Saved-file batch mode; click to stream active-recording audio"
+        }
+        self.preloadToggleTitle = "Buffer Preload"
+        self.preloadToggleHelp = isPreloadEnabled
+            ? "Rolling buffer can pre-run this model when global policy allows it"
+            : "Rolling buffer preload disabled for this model"
+    }
+}
+
 public enum VoiceInkTranscriptionStreamingPreference {
     public static let keyPrefix = "streaming-enabled-"
     public static let defaultIsEnabled = true

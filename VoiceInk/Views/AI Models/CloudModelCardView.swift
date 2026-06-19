@@ -45,6 +45,18 @@ struct CloudModelCardView: View {
     private var canVerifyAPIKey: Bool {
         apiKeyDraft.canVerify
     }
+
+    private var apiKeyCardPresentation: VoiceInkProviderAPIKeyCardPresentation {
+        VoiceInkProviderAPIKeyCardPresentation(providerDisplayName: model.provider.rawValue)
+    }
+
+    private var streamingModePresentation: VoiceInkTranscriptionStreamingModePresentation {
+        VoiceInkTranscriptionStreamingModePresentation(
+            isStreamingEnabled: streamingEnabled,
+            isStreamingOnly: isStreamingOnly,
+            isPreloadEnabled: preloadEnabled
+        )
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -91,17 +103,20 @@ struct CloudModelCardView: View {
     }
     
     private var isStreamingOnly: Bool {
-        CloudProviderRegistry.provider(for: model.provider)?.isStreamingOnly ?? false
+        model.streamingPreferenceSnapshot.isStreamingOnly
     }
 
     private var streamingModeBadge: some View {
         HStack(spacing: 8) {
-            Toggle("Streaming", isOn: isStreamingOnly ? .constant(true) : $streamingEnabled)
+            Toggle(
+                streamingModePresentation.streamingToggleTitle,
+                isOn: streamingModePresentation.isStreamingToggleForcedOn ? .constant(true) : $streamingEnabled
+            )
                 .toggleStyle(.switch)
                 .controlSize(.mini)
                 .font(.system(size: 11, weight: .medium))
                 .foregroundColor(Color(.secondaryLabelColor))
-                .disabled(isStreamingOnly)
+                .disabled(streamingModePresentation.isStreamingToggleDisabled)
                 .onChange(of: streamingEnabled) { _, newValue in
                     if !isStreamingOnly {
                         VoiceInkTranscriptionStreamingPreference.saveIsEnabled(newValue, forModelName: model.name)
@@ -109,9 +124,9 @@ struct CloudModelCardView: View {
                         NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
                     }
                 }
-                .help(isStreamingOnly ? "This model only supports active-recording streaming" : (streamingEnabled ? "Streams active-recording audio; click to use saved-file batch mode" : "Saved-file batch mode; click to stream active-recording audio"))
+                .help(streamingModePresentation.streamingToggleHelp)
 
-            Toggle("Buffer Preload", isOn: $preloadEnabled)
+            Toggle(streamingModePresentation.preloadToggleTitle, isOn: $preloadEnabled)
                 .toggleStyle(.switch)
                 .controlSize(.mini)
                 .font(.system(size: 11, weight: .medium))
@@ -120,7 +135,7 @@ struct CloudModelCardView: View {
                     VoiceInkRollingBufferPreloadSettings.savePerModelPreloadEnabled(newValue, forModelName: model.name)
                     NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
                 }
-                .help(preloadEnabled ? "Rolling buffer can pre-run this model when global policy allows it" : "Rolling buffer preload disabled for this model")
+                .help(streamingModePresentation.preloadToggleHelp)
         }
     }
 
@@ -202,9 +217,9 @@ struct CloudModelCardView: View {
                     }
                 }) {
                     HStack(spacing: 4) {
-                        Text("Configure")
+                        Text(apiKeyCardPresentation.configureButtonTitle)
                             .font(.system(size: 12, weight: .medium))
-                        Image(systemName: "gear")
+                        Image(systemName: apiKeyCardPresentation.configureButtonSystemImageName)
                             .font(.system(size: 12, weight: .medium))
                     }
                     .foregroundColor(.white)
@@ -224,7 +239,10 @@ struct CloudModelCardView: View {
                     Button {
                         clearAPIKey()
                     } label: {
-                        Label("Remove API Key", systemImage: "trash")
+                        Label(
+                            apiKeyCardPresentation.removeAPIKeyButtonTitle,
+                            systemImage: apiKeyCardPresentation.removeAPIKeyButtonSystemImageName
+                        )
                     }
                 } label: {
                     Image(systemName: "ellipsis.circle")
@@ -239,12 +257,12 @@ struct CloudModelCardView: View {
     
     private var configurationSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("API Key Configuration")
+            Text(apiKeyCardPresentation.configurationSectionTitle)
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundColor(Color(.labelColor))
             
             HStack(spacing: 8) {
-                SecureField("Enter your \(model.provider.rawValue) API key", text: $apiKey)
+                SecureField(apiKeyCardPresentation.apiKeyFieldPlaceholder, text: $apiKey)
                     .textFieldStyle(.roundedBorder)
                     .disabled(isVerifying)
                 

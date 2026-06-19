@@ -1616,9 +1616,24 @@ require_pattern \
   'verifyStoredAPIKeyDetailed\(keyToVerify, for: provider\)' \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
+require_pattern \
+  "shared cloud API-key card presentation lives in VoiceInkCore" \
+  'VoiceInkProviderAPIKeyCardPresentation|apiKeyFieldPlaceholder|configureButtonSystemImageName|removeAPIKeyButtonSystemImageName' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
+
+require_pattern \
+  "macOS cloud API-key card uses shared card presentation" \
+  'VoiceInkProviderAPIKeyCardPresentation|apiKeyCardPresentation\.(configureButtonTitle|apiKeyFieldPlaceholder|removeAPIKeyButtonTitle)' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift
+
 reject_pattern \
   "macOS cloud API-key card avoids shell-only verification status and copy" \
   'enum +VerificationStatus|verificationStatus|verificationError|Verifying\.\.\.|Verification failed|API key verified successfully!|Unsupported provider|keyToSaveAfterSuccessfulVerification|result\.isValid' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift
+
+reject_pattern \
+  "macOS cloud API-key card avoids shell-only card copy" \
+  '"(Configure|Remove API Key|API Key Configuration|Enter your .* API key)"|systemName: "gear"|systemImage: "trash"' \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
 reject_pattern \
@@ -2975,6 +2990,21 @@ reject_pattern \
   "iOS mode prompt-template editing avoids duplicate shell draft state" \
   'selectedTemplateType|customPromptText|mode\.promptTemplate = VoiceInkPostProcessingPromptTemplate' \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
+
+require_pattern \
+  "shared streaming mode presentation lives in VoiceInkCore" \
+  'VoiceInkTranscriptionStreamingModePresentation|streamingToggleHelp|preloadToggleHelp' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionStreamingPreference.swift
+
+require_pattern \
+  "macOS cloud model card uses shared streaming mode presentation" \
+  'VoiceInkTranscriptionStreamingModePresentation|streamingModePresentation\.(streamingToggleTitle|streamingToggleHelp|preloadToggleHelp)' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift
+
+reject_pattern \
+  "macOS cloud model card avoids shell-only streaming presentation and registry lookup" \
+  'CloudProviderRegistry\.provider\(for: model\.provider\)|"Streaming"|"Buffer Preload"|active-recording streaming|Saved-file batch mode|Rolling buffer can pre-run|Rolling buffer preload disabled' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
 reject_pattern \
   "macOS model cards use shared per-model preload preference API" \

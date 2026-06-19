@@ -32,16 +32,16 @@ struct PowerModeEmptyStateView: View {
                 .font(.system(size: 48))
                 .foregroundColor(.secondary)
             
-            Text("No Power Modes")
+            Text(VoiceInkPowerModePresentation.sidebarEmptyTitle)
                 .font(.title2)
                 .fontWeight(.semibold)
             
-            Text("Add customized power modes for different contexts")
+            Text(VoiceInkPowerModePresentation.sidebarEmptyMessage)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
             
             VoiceInkButton(
-                title: "Add New Power Mode",
+                title: VoiceInkPowerModePresentation.sidebarEmptyButtonTitle,
                 action: action
             )
             .frame(maxWidth: 250)
@@ -173,7 +173,7 @@ struct ConfigurationRow: View {
                             .font(.system(size: 15, weight: .semibold))
                         
                         if config.isDefault {
-                            Text("Default")
+                            Text(VoiceInkPowerModePresentation.defaultBadgeTitle)
                                 .font(.system(size: 11, weight: .medium))
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 2)
@@ -249,7 +249,7 @@ struct ConfigurationRow: View {
         Button(action: {
             onEditConfig(config)
         }) {
-            Label("Edit", systemImage: "pencil")
+            Label(VoiceInkPowerModePresentation.rowEditActionTitle, systemImage: "pencil")
         }
         Button(role: .destructive, action: {
             let deleteConfirmation = VoiceInkPowerModePresentation.deleteConfirmation(configName: config.name)
@@ -265,7 +265,7 @@ struct ConfigurationRow: View {
                 powerModeManager.removeConfiguration(with: config.id)
             }
         }) {
-            Label("Delete", systemImage: "trash")
+            Label(VoiceInkPowerModePresentation.rowDeleteActionTitle, systemImage: "trash")
         }
     }
     }

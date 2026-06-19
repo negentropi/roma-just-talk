@@ -18,7 +18,7 @@ struct PowerModeView: View {
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
                             HStack(spacing: 8) {
-                                Text("Power Modes")
+                                Text(VoiceInkPowerModePresentation.panelTitle)
                                     .font(.system(size: 28, weight: .bold, design: .default))
                                     .foregroundColor(.primary)
                                 
@@ -28,7 +28,7 @@ struct PowerModeView: View {
                                 )
                             }
                             
-                            Text("Automate your workflows with context-aware configurations.")
+                            Text(VoiceInkPowerModePresentation.panelSubtitle)
                                 .font(.system(size: 14))
                                 .foregroundColor(.secondary)
                         }
@@ -57,7 +57,7 @@ struct PowerModeView: View {
                                 HStack(spacing: 6) {
                                     Image(systemName: "arrow.up.arrow.down")
                                         .font(.system(size: 12, weight: .medium))
-                                    Text("Reorder")
+                                    Text(VoiceInkPowerModePresentation.reorderButtonTitle)
                                         .font(.system(size: 13, weight: .medium))
                                 }
                                 .foregroundColor(.primary)
@@ -96,11 +96,11 @@ struct PowerModeView: View {
                                                     .foregroundColor(.secondary.opacity(0.6))
                                                 
                                                 VStack(spacing: 8) {
-                                                    Text("No Power Modes Yet")
+                                                    Text(VoiceInkPowerModePresentation.emptyPanelTitle)
                                                         .font(.system(size: 20, weight: .medium))
                                                         .foregroundColor(.primary)
                                                     
-                                                    Text("Create first power mode to automate your VoiceInk workflow based on apps/website you are using")
+                                                    Text(VoiceInkPowerModePresentation.emptyPanelMessage)
                                                         .font(.system(size: 14))
                                                         .foregroundColor(.secondary)
                                                         .multilineTextAlignment(.center)
@@ -188,7 +188,7 @@ struct ReorderPanelView: View {
         VStack(spacing: 0) {
             // Header
             HStack(spacing: 12) {
-                Text("Reorder Power Modes")
+                Text(VoiceInkPowerModePresentation.reorderPanelTitle)
                     .font(.headline)
                     .fontWeight(.semibold)
                     .foregroundColor(.primary)
@@ -202,7 +202,7 @@ struct ReorderPanelView: View {
                         .clipShape(Circle())
                 }
                 .buttonStyle(.plain)
-                .help("Close")
+                .help(VoiceInkPowerModePresentation.reorderPanelCloseHelpText)
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
@@ -232,7 +232,7 @@ struct ReorderPanelView: View {
 
                         HStack(spacing: 6) {
                             if config.isDefault {
-                                Text("Default")
+                                Text(VoiceInkPowerModePresentation.defaultBadgeTitle)
                                     .font(.system(size: 11, weight: .medium))
                                     .padding(.horizontal, 6)
                                     .padding(.vertical, 2)
@@ -240,7 +240,7 @@ struct ReorderPanelView: View {
                                     .foregroundColor(.white)
                             }
                             if !config.isEnabled {
-                                Text("Disabled")
+                                Text(VoiceInkPowerModePresentation.disabledBadgeTitle)
                                     .font(.system(size: 11, weight: .medium))
                                     .padding(.horizontal, 8)
                                     .padding(.vertical, 4)

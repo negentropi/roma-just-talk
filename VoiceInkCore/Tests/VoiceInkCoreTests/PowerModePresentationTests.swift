@@ -57,6 +57,37 @@ final class PowerModePresentationTests: XCTestCase {
         XCTAssertEqual(VoiceInkPowerModePresentation.websiteTriggerCountText(3), "3 Websites")
     }
 
+    func testPanelAndSidebarChromePreservesMacOSCopy() {
+        XCTAssertEqual(VoiceInkPowerModePresentation.panelTitle, "Power Modes")
+        XCTAssertEqual(
+            VoiceInkPowerModePresentation.panelSubtitle,
+            "Automate your workflows with context-aware configurations."
+        )
+        XCTAssertEqual(VoiceInkPowerModePresentation.reorderButtonTitle, "Reorder")
+        XCTAssertEqual(VoiceInkPowerModePresentation.reorderPanelTitle, "Reorder Power Modes")
+        XCTAssertEqual(VoiceInkPowerModePresentation.reorderPanelCloseHelpText, "Close")
+        XCTAssertEqual(VoiceInkPowerModePresentation.defaultBadgeTitle, "Default")
+        XCTAssertEqual(VoiceInkPowerModePresentation.disabledBadgeTitle, "Disabled")
+        XCTAssertEqual(VoiceInkPowerModePresentation.emptyPanelTitle, "No Power Modes Yet")
+        XCTAssertEqual(
+            VoiceInkPowerModePresentation.emptyPanelMessage,
+            "Create first power mode to automate your VoiceInk workflow based on apps/website you are using"
+        )
+        XCTAssertEqual(VoiceInkPowerModePresentation.sidebarEmptyTitle, "No Power Modes")
+        XCTAssertEqual(
+            VoiceInkPowerModePresentation.sidebarEmptyMessage,
+            "Add customized power modes for different contexts"
+        )
+        XCTAssertEqual(VoiceInkPowerModePresentation.sidebarEmptyButtonTitle, "Add New Power Mode")
+    }
+
+    func testPopoverAndRowActionChromePreservesMacOSCopy() {
+        XCTAssertEqual(VoiceInkPowerModePresentation.popoverTitle, "Select Power Mode")
+        XCTAssertEqual(VoiceInkPowerModePresentation.popoverEmptyTitle, "No Power Modes Available")
+        XCTAssertEqual(VoiceInkPowerModePresentation.rowEditActionTitle, "Edit")
+        XCTAssertEqual(VoiceInkPowerModePresentation.rowDeleteActionTitle, "Delete")
+    }
+
     func testDeleteConfirmationPreservesPowerModeCopy() {
         let confirmation = VoiceInkPowerModePresentation.deleteConfirmation(configName: "Writing")
 

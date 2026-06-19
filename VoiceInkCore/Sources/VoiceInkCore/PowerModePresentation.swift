@@ -66,10 +66,26 @@ public struct VoiceInkPowerModeRowDetailPresentation: Equatable, Sendable {
 
 public enum VoiceInkPowerModePresentation {
     public static let defaultOverrideDisplayText = "Default"
+    public static let panelTitle = "Power Modes"
+    public static let panelSubtitle = "Automate your workflows with context-aware configurations."
+    public static let reorderButtonTitle = "Reorder"
+    public static let reorderPanelTitle = "Reorder Power Modes"
+    public static let reorderPanelCloseHelpText = "Close"
+    public static let defaultBadgeTitle = defaultOverrideDisplayText
+    public static let disabledBadgeTitle = "Disabled"
+    public static let emptyPanelTitle = "No Power Modes Yet"
+    public static let emptyPanelMessage = "Create first power mode to automate your VoiceInk workflow based on apps/website you are using"
+    public static let sidebarEmptyTitle = "No Power Modes"
+    public static let sidebarEmptyMessage = "Add customized power modes for different contexts"
+    public static let sidebarEmptyButtonTitle = "Add New Power Mode"
+    public static let popoverTitle = "Select Power Mode"
+    public static let popoverEmptyTitle = "No Power Modes Available"
+    public static let rowEditActionTitle = "Edit"
     public static let autoLanguageDisplayText = "Auto"
     public static let englishLanguageDisplayText = "English"
     public static let deleteConfirmationTitle = "Delete Power Mode?"
     public static let deleteConfirmationPrimaryButtonTitle = "Delete"
+    public static let rowDeleteActionTitle = deleteConfirmationPrimaryButtonTitle
     public static let deleteConfirmationCancelButtonTitle = "Cancel"
     public static let validationAlertTitle = "Cannot Save Power Mode"
     public static let validationAlertButtonTitle = "OK"

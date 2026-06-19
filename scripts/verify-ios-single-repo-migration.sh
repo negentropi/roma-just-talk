@@ -4030,6 +4030,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
 
 require_pattern \
+  "shared Power Mode panel sidebar popover chrome copy lives in VoiceInkCore" \
+  'panelTitle|panelSubtitle|reorderButtonTitle|reorderPanelTitle|reorderPanelCloseHelpText|defaultBadgeTitle|disabledBadgeTitle|emptyPanelTitle|sidebarEmptyTitle|sidebarEmptyButtonTitle|popoverTitle|popoverEmptyTitle|rowEditActionTitle|rowDeleteActionTitle' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
+
+require_pattern \
   "macOS Power Mode rows use shared selected-language display formatting" \
   'VoiceInkPowerModePresentation\.selectedLanguageDisplayText' \
   VoiceInk/PowerMode/PowerModeViewComponents.swift
@@ -4048,6 +4053,21 @@ require_pattern \
   "macOS Power Mode rows use shared row detail presentation" \
   'VoiceInkPowerModePresentation\.rowDetailPresentation|PowerModeRowDetailChipView' \
   VoiceInk/PowerMode/PowerModeViewComponents.swift
+
+require_pattern \
+  "macOS Power Mode panel uses shared chrome copy" \
+  'VoiceInkPowerModePresentation\.(panelTitle|panelSubtitle|reorderButtonTitle|emptyPanelTitle|emptyPanelMessage|reorderPanelTitle|reorderPanelCloseHelpText|defaultBadgeTitle|disabledBadgeTitle)' \
+  VoiceInk/PowerMode/PowerModeView.swift
+
+require_pattern \
+  "macOS Power Mode sidebar and row actions use shared chrome copy" \
+  'VoiceInkPowerModePresentation\.(sidebarEmptyTitle|sidebarEmptyMessage|sidebarEmptyButtonTitle|defaultBadgeTitle|rowEditActionTitle|rowDeleteActionTitle)' \
+  VoiceInk/PowerMode/PowerModeViewComponents.swift
+
+require_pattern \
+  "macOS Power Mode popover uses shared chrome copy" \
+  'VoiceInkPowerModePresentation\.(popoverTitle|popoverEmptyTitle)' \
+  VoiceInk/PowerMode/PowerModePopover.swift
 
 require_pattern \
   "macOS Power Mode edit form uses shared delete confirmation copy" \
@@ -4109,6 +4129,11 @@ require_pattern \
   'macOS Power Mode emoji catalog, custom emoji storage key, input validation, duplicate detection, and add/remove mutation policy route through `VoiceInkPowerModeEmojiCatalog`/`VoiceInkPowerModeEmojiInputPresentation`' \
   docs/ios-single-repo-migration.md
 
+require_pattern \
+  "migration checklist tracks shared Power Mode chrome copy gate" \
+  'macOS Power Mode panel, sidebar empty state, reorder sheet, badges, row actions, and manual-selection popover copy route through `VoiceInkPowerModePresentation`' \
+  docs/ios-single-repo-migration.md
+
 reject_pattern \
   "macOS Power Mode rows avoid shell-only selected-language fallback formatting" \
   'langCode == "auto"|langCode == "en"|langCode\.uppercased\(\)' \
@@ -4154,6 +4179,13 @@ reject_pattern \
   "macOS Power Mode rows avoid shell-only row detail chip policy" \
   'modelName\.count > 20|prefix\(18\)|selectedPrompt\?\.title \?\? "AI"|Text\("Context Awareness"\)|model != "Default"|language != "Default"|config\.autoSendKey\.displayName' \
   VoiceInk/PowerMode/PowerModeViewComponents.swift
+
+reject_pattern \
+  "macOS Power Mode views avoid shell-only panel sidebar popover chrome copy" \
+  '"(Power Modes|Automate your workflows with context-aware configurations\.|Reorder|Reorder Power Modes|Close|Default|Disabled|No Power Modes Yet|Create first power mode to automate your VoiceInk workflow based on apps/website you are using|No Power Modes|Add customized power modes for different contexts|Add New Power Mode|Select Power Mode|No Power Modes Available|Edit|Delete)"' \
+  VoiceInk/PowerMode/PowerModeView.swift \
+  VoiceInk/PowerMode/PowerModeViewComponents.swift \
+  VoiceInk/PowerMode/PowerModePopover.swift
 
 reject_pattern \
   "macOS Power Mode rows avoid shell-only selected-prompt title lookup" \

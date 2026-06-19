@@ -2228,14 +2228,25 @@ require_pattern \
 
 require_pattern \
   "macOS engine uses shared failed record adapter" \
-  'markAsFailedTranscription\(reason: "No model selected"\)' \
+  'markAsFailedTranscription\([^)]*VoiceInkModelManagementPresentation\.noModelSelectedText' \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+
+require_pattern \
+  "macOS diagnostics use shared no-model-selected copy" \
+  'VoiceInkModelManagementPresentation\.noModelSelectedText' \
+  VoiceInk/Services/SystemInfoService.swift
 
 reject_pattern \
   "macOS recorder failure state avoids direct text/status duplication" \
   'VoiceInkTranscriptPresentation\.failedTranscriptText|transcriptionState = \.failed' \
   VoiceInk/Transcription/Engine/TranscriptionPipeline.swift \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+
+reject_pattern \
+  "macOS model diagnostics avoid shell-only no-model-selected copy" \
+  '"No model selected"' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift \
+  VoiceInk/Services/SystemInfoService.swift
 
 reject_pattern \
   "macOS recorder failure text prefix stays in shared presentation policy" \

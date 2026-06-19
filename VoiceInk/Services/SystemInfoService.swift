@@ -165,7 +165,7 @@ class SystemInfoService {
             }
             return modelName
         }
-        return "No model selected"
+        return VoiceInkModelManagementPresentation.noModelSelectedText
     }
 
     private func getRollingBufferPreloadInfo() -> String {
@@ -185,7 +185,7 @@ class SystemInfoService {
             let enabled = VoiceInkRollingBufferPreloadSettings.perModelPreloadEnabled(forModelName: currentModelName)
             currentModelPreloadEnabled = "\(enabled)"
         } else {
-            currentModelPreloadEnabled = "No model selected"
+            currentModelPreloadEnabled = VoiceInkModelManagementPresentation.noModelSelectedText
         }
 
         return """

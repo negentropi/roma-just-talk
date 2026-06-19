@@ -67,6 +67,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementDefaultTextEnhancementModelsAreShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementDefaultTextEnhancementModelsAreShared() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementStaticTextEnhancementModelsAreShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementStaticTextEnhancementModelsAreShared() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementRequestURLSelectionIsShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementRequestURLSelectionIsShared() }),
+            VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementRefreshModelSelectionRepairIsShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementRefreshModelSelectionRepairIsShared() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementProviderVerificationRoutesAreShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementProviderVerificationRoutesAreShared() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementRequestURLsAreShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementRequestURLsAreShared() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementConsoleURLsAreShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementConsoleURLsAreShared() }),

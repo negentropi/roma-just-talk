@@ -307,8 +307,12 @@ class AIService: ObservableObject {
             await MainActor.run {
                 self.openRouterModels = models
                 self.saveOpenRouterModels()
-                if self.selectedProvider == .openRouter && self.currentModel == self.selectedProvider.defaultTextEnhancementModel() && !models.isEmpty {
-                    self.selectModel(models.first!)
+                if let refreshedModel = self.selectedProvider.textEnhancementModelToSelectAfterRefresh(
+                    currentModel: self.currentModel,
+                    refreshedModels: models,
+                    defaultModel: self.selectedProvider.defaultTextEnhancementModel()
+                ) {
+                    self.selectModel(refreshedModel)
                 }
                 self.objectWillChange.send()
             }

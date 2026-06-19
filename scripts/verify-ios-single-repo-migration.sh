@@ -2194,6 +2194,16 @@ require_pattern \
   'textEnhancementRequestURLString' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
+require_pattern \
+  "shared AI enhancement refresh model-selection policy lives in VoiceInkCore" \
+  'textEnhancementModelToSelectAfterRefresh' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+require_pattern \
+  "macOS AI service refresh model selection uses shared policy" \
+  'textEnhancementModelToSelectAfterRefresh' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
 reject_pattern \
   "macOS AI API-key path avoids shell-only key-reference and blank-key policy" \
   'VoiceInkAPIKeyReference\.resolvedValue|VoiceInkProviderCredential\.nonBlank\(apiKey\)' \
@@ -2214,6 +2224,11 @@ reject_pattern \
 reject_pattern \
   "macOS AI service avoids duplicate static text model list policy" \
   'extension +VoiceInkAIEnhancementProviderKind|VoiceInkAIModelCatalog\.availableModels\(for: provider\)|provider\.availableModels' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+reject_pattern \
+  "macOS AI service avoids duplicate refresh model-selection policy" \
+  'currentModel == .*defaultTextEnhancementModel|models\.first!' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 reject_pattern \

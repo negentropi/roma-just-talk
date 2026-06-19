@@ -248,6 +248,19 @@ public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
         return defaultModel
     }
 
+    public func textEnhancementModelToSelectAfterRefresh(
+        currentModel: String,
+        refreshedModels: [String],
+        defaultModel: String
+    ) -> String? {
+        guard self == .openRouter,
+              currentModel == defaultModel else {
+            return nil
+        }
+
+        return refreshedModels.first
+    }
+
     public var apiKeyVerificationRoute: VoiceInkAIEnhancementAPIKeyVerificationRoute? {
         switch self {
         case .assemblyAI:

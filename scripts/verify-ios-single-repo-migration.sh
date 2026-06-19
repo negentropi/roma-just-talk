@@ -193,6 +193,7 @@ section "iOS ported assets and resources"
 require_file iOS/Shared/AppGroupCoordinator.swift
 require_file iOS/Shared/VoiceInkAppDeepLink.swift
 require_file iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
+require_file docs/ios-privacy-policy.md
 require_file iOS/VoiceInk-ios/PrivacyInfo.xcprivacy
 require_file iOS/VoiceInk-ios/Resources/ggml-silero-v5.1.2.bin
 require_file iOS/VoiceInk-ios/Assets.xcassets/AppIcon.appiconset/Contents.json
@@ -202,6 +203,10 @@ done
 reject_file iOS/.github/workflows/deploy.yml
 reject_file iOS/.nojekyll
 reject_file iOS/tasks.md
+reject_file iOS/index.html
+reject_file iOS/PRIVACY.html
+reject_file iOS/PRIVACY.md
+reject_file iOS/app-icon.png
 
 section "obsolete iOS clone-side duplicates stay deleted"
 for file in "${obsolete_ios_clone_files[@]}"; do

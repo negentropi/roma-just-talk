@@ -1,4 +1,4 @@
-# Privacy Policy for roma just talk
+# iOS Privacy Policy for roma just talk
 
 *Last updated: June 2026*
 

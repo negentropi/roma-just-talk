@@ -9,9 +9,10 @@
 - iOS app/keyboard shared shell code: `iOS/Shared/`
 - iOS unit/UI test target sources: `iOS/VoiceInk-iosTests/`, `iOS/VoiceInk-iosUITests/`
 - iOS non-Swift app artifacts: `iOS/VoiceInk-ios/PrivacyInfo.xcprivacy`, `iOS/VoiceInk-ios/Assets.xcassets/`, and `iOS/VoiceInk-ios/Resources/ggml-silero-v5.1.2.bin`
+- iOS privacy policy source: `docs/ios-privacy-policy.md`
 - shared Swift package: `VoiceInkCore/`
 - workspace entry for both app projects: `VoiceInk.xcworkspace`
-- standalone clone setup/Pages artifacts such as `iOS/.github/workflows/deploy.yml`, `iOS/.nojekyll`, and `iOS/tasks.md` are intentionally absent; repo automation belongs at `VoiceInk/.github/` if it is needed later.
+- standalone clone setup/Pages artifacts such as `iOS/.github/workflows/deploy.yml`, `iOS/.nojekyll`, `iOS/tasks.md`, `iOS/index.html`, `iOS/PRIVACY.html`, `iOS/PRIVACY.md`, and `iOS/app-icon.png` are intentionally absent; repo automation belongs at `VoiceInk/.github/` if it is needed later.
 
 Both app projects reference the in-repo package:
 

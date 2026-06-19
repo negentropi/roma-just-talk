@@ -15,13 +15,6 @@ extension View {
     }
 }
 
-enum ConfigurationType {
-    case application
-    case website
-}
-
-let commonEmojis = ["🏢", "🏠", "💼", "🎮", "📱", "📺", "🎵", "📚", "✏️", "🎨", "🧠", "⚙️", "💻", "🌐", "📝", "📊", "🔍", "💬", "📈", "🔧"]
-
 struct PowerModeView: View {
     @StateObject private var powerModeManager = PowerModeManager.shared
     @EnvironmentObject private var enhancementService: AIEnhancementService

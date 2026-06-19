@@ -281,6 +281,10 @@ public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
         }
     }
 
+    public func textEnhancementRequestURL(from defaults: UserDefaults = .standard) -> URL? {
+        URL(string: textEnhancementRequestURLString(from: defaults))
+    }
+
     public func selectedTextEnhancementModel(
         _ selectedModel: String?,
         availableModels: [String],
@@ -359,6 +363,10 @@ public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
 
     public var unsupportedAPIKeyVerificationMessage: String {
         "\(rawValue) does not support API key verification."
+    }
+
+    public var invalidTextEnhancementRequestURLMessage: String {
+        "\(rawValue) has an invalid API endpoint URL. Please update it in AI settings."
     }
 
     public var apiKeyConsoleURL: URL? {

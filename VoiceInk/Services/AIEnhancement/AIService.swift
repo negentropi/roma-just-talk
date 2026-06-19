@@ -211,7 +211,7 @@ class AIService: ObservableObject {
             case .anthropicMessages:
                 result = await AnthropicLLMClient.verifyAPIKey(resolvedKey)
             case .openAICompatibleModels:
-                guard let baseURL = URL(string: selectedProvider.textEnhancementRequestURLString()) else {
+                guard let baseURL = selectedProvider.textEnhancementRequestURL() else {
                     DispatchQueue.main.async {
                         completion(false, VoiceInkAIEnhancementProviderKind.invalidOrMissingBaseURLConfigurationMessage)
                     }

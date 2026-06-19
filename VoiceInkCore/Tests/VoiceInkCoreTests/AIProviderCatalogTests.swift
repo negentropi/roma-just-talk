@@ -224,6 +224,10 @@ final class AIProviderCatalogTests: XCTestCase {
             VoiceInkAIEnhancementProviderKind.localCLI.unsupportedAPIKeyVerificationMessage,
             "Local CLI does not support API key verification."
         )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.custom.invalidTextEnhancementRequestURLMessage,
+            "Custom has an invalid API endpoint URL. Please update it in AI settings."
+        )
     }
 
     func testMacOSAIEnhancementSelectableTextProvidersAreShared() {
@@ -488,6 +492,15 @@ final class AIProviderCatalogTests: XCTestCase {
                 VoiceInkAIEnhancementProviderKind.custom.textEnhancementRequestURLString(from: defaults),
                 "https://api.example.com"
             )
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderKind.custom.textEnhancementRequestURL(from: defaults)?.absoluteString,
+                "https://api.example.com"
+            )
+
+            VoiceInkDynamicAIProviderPreference.saveCustomProviderBaseURL("http://[::1", to: defaults)
+
+            XCTAssertNil(VoiceInkAIEnhancementProviderKind.custom.textEnhancementRequestURL(from: defaults))
+            XCTAssertNil(VoiceInkAIEnhancementProviderKind.localCLI.textEnhancementRequestURL(from: defaults))
         }
     }
 

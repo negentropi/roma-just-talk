@@ -2211,17 +2211,17 @@ require_pattern \
 
 require_pattern \
   "shared AI enhancement request URL selection lives in VoiceInkCore" \
-  'textEnhancementRequestURLString|postProcessingRequestURL' \
+  'textEnhancementRequestURLString|textEnhancementRequestURL|invalidTextEnhancementRequestURLMessage|postProcessingRequestURL' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \
   "macOS AI service request URL selection uses shared policy" \
-  'textEnhancementRequestURLString' \
+  'textEnhancementRequestURL' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 require_pattern \
   "macOS AI enhancement service request URL selection uses shared policy" \
-  'textEnhancementRequestURLString' \
+  'textEnhancementRequestURL' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
 require_pattern \
@@ -2313,7 +2313,7 @@ reject_pattern \
 
 reject_pattern \
   "macOS AI services avoid duplicate request URL selection policy" \
-  'var +baseURL: +String|selectedProvider\.baseURL' \
+  'var +baseURL: +String|selectedProvider\.baseURL|URL\(string: .*textEnhancementRequestURLString|invalid API endpoint URL' \
   VoiceInk/Services/AIEnhancement/AIService.swift \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 

@@ -233,8 +233,8 @@ class AIEnhancementService: ObservableObject {
                         timeout: baseTimeout
                     )
                 case .openAICompatibleChatCompletions:
-                    guard let baseURL = URL(string: aiService.selectedProvider.textEnhancementRequestURLString()) else {
-                        throw VoiceInkAIEnhancementError.customError("\(aiService.selectedProvider.rawValue) has an invalid API endpoint URL. Please update it in AI settings.")
+                    guard let baseURL = aiService.selectedProvider.textEnhancementRequestURL() else {
+                        throw VoiceInkAIEnhancementError.customError(aiService.selectedProvider.invalidTextEnhancementRequestURLMessage)
                     }
                     let requestParameters = VoiceInkAIReasoningConfig.chatRequestParameters(
                         for: aiService.selectedProvider.aiModelProvider,

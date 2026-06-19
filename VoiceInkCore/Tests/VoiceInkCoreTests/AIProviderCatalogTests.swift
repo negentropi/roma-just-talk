@@ -173,6 +173,21 @@ final class AIProviderCatalogTests: XCTestCase {
         XCTAssertNil(draft.resolvedVerificationCandidate(environment: [:]))
     }
 
+    func testMacOSAIEnhancementAPIKeyFailureMessagesAreShared() {
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.missingVerificationCandidateMessage,
+            "Environment variable is missing or empty"
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.invalidOrMissingBaseURLConfigurationMessage,
+            "Invalid or missing base URL configuration"
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.localCLI.unsupportedAPIKeyVerificationMessage,
+            "Local CLI does not support API key verification."
+        )
+    }
+
     func testMacOSAIEnhancementSelectableTextProvidersAreShared() {
         XCTAssertEqual(
             VoiceInkAIEnhancementProviderKind.selectableTextEnhancementProviders,

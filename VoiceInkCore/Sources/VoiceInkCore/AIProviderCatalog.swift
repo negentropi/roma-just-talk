@@ -50,6 +50,9 @@ public struct VoiceInkAIEnhancementAPIKeyDraft: Equatable, Sendable {
 }
 
 public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
+    public static let missingVerificationCandidateMessage = "Environment variable is missing or empty"
+    public static let invalidOrMissingBaseURLConfigurationMessage = "Invalid or missing base URL configuration"
+
     case cerebras = "Cerebras"
     case groq = "Groq"
     case gemini = "Gemini"
@@ -218,6 +221,10 @@ public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
         case .ollama, .localCLI:
             return nil
         }
+    }
+
+    public var unsupportedAPIKeyVerificationMessage: String {
+        "\(rawValue) does not support API key verification."
     }
 
     public var apiKeyConsoleURL: URL? {

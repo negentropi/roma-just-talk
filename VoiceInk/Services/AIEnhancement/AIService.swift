@@ -208,7 +208,7 @@ class AIService: ObservableObject {
         }
 
         guard let resolvedKey = resolvedAPIKey(from: key) else {
-            completion(false, "Environment variable is missing or empty")
+            completion(false, VoiceInkAIEnhancementProviderKind.missingVerificationCandidateMessage)
             return
         }
 
@@ -235,7 +235,7 @@ class AIService: ObservableObject {
         }
 
         guard let resolvedKey = resolvedAPIKey(from: key) else {
-            completion(false, "Environment variable is missing or empty")
+            completion(false, VoiceInkAIEnhancementProviderKind.missingVerificationCandidateMessage)
             return
         }
 
@@ -257,7 +257,7 @@ class AIService: ObservableObject {
             let result: (isValid: Bool, errorMessage: String?)
             guard let route = selectedProvider.apiKeyVerificationRoute else {
                 DispatchQueue.main.async {
-                    completion(false, "\(self.selectedProvider.rawValue) does not support API key verification.")
+                    completion(false, self.selectedProvider.unsupportedAPIKeyVerificationMessage)
                 }
                 return
             }
@@ -274,7 +274,7 @@ class AIService: ObservableObject {
             case .openAICompatibleModels:
                 guard let baseURL = URL(string: selectedProvider.baseURL) else {
                     DispatchQueue.main.async {
-                        completion(false, "Invalid or missing base URL configuration")
+                        completion(false, VoiceInkAIEnhancementProviderKind.invalidOrMissingBaseURLConfigurationMessage)
                     }
                     return
                 }

@@ -58,6 +58,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementAPIKeyDraftResolvesEnvironmentReferences", run: { AIProviderCatalogTests().testMacOSAIEnhancementAPIKeyDraftResolvesEnvironmentReferences() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementAPIKeyDraftFallsBackToStoredRuntimeKey", run: { AIProviderCatalogTests().testMacOSAIEnhancementAPIKeyDraftFallsBackToStoredRuntimeKey() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementAPIKeyDraftRejectsNoKeyProviders", run: { AIProviderCatalogTests().testMacOSAIEnhancementAPIKeyDraftRejectsNoKeyProviders() }),
+            VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementAPIKeyFailureMessagesAreShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementAPIKeyFailureMessagesAreShared() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementSelectableTextProvidersAreShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementSelectableTextProvidersAreShared() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementConnectedProvidersUseSharedPolicy", run: { AIProviderCatalogTests().testMacOSAIEnhancementConnectedProvidersUseSharedPolicy() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementModelSelectionPreservesAvailableSelections", run: { AIProviderCatalogTests().testMacOSAIEnhancementModelSelectionPreservesAvailableSelections() }),

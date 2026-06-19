@@ -2125,6 +2125,11 @@ require_pattern \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
 
 require_pattern \
+  "shared macOS AI API-key failure messages live in VoiceInkCore" \
+  'missingVerificationCandidateMessage|invalidOrMissingBaseURLConfigurationMessage|unsupportedAPIKeyVerificationMessage' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+require_pattern \
   "macOS AI API-key view uses shared verification progress type" \
   'VoiceInkProviderAPIKeyVerificationProgress\.failure' \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
@@ -2144,11 +2149,21 @@ require_pattern \
   'VoiceInkAIEnhancementAPIKeyDraft' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
+require_pattern \
+  "macOS AI service uses shared API-key failure messages" \
+  'VoiceInkAIEnhancementProviderKind\.(missingVerificationCandidateMessage|invalidOrMissingBaseURLConfigurationMessage)|selectedProvider\.unsupportedAPIKeyVerificationMessage' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
 reject_pattern \
   "macOS AI API-key path avoids shell-only key-reference and blank-key policy" \
   'VoiceInkAPIKeyReference\.resolvedValue|VoiceInkProviderCredential\.nonBlank\(apiKey\)' \
   VoiceInk/Services/AIEnhancement/AIService.swift \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+
+reject_pattern \
+  "macOS AI service avoids duplicate API-key failure copy" \
+  'Environment variable is missing or empty|Invalid or missing base URL configuration|does not support API key verification' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
 
 reject_pattern \
   "macOS AI API-key view avoids duplicate verification failure copy" \

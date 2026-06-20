@@ -95,6 +95,6 @@ final class APIKeyManager {
 
     /// Generates Keychain identifier for custom model API key.
     private func customModelKeyIdentifier(for modelId: UUID) -> String {
-        "customModel_\(modelId.uuidString)_APIKey"
+        VoiceInkProviderAPIKeyAccount.customModelAccountIdentifier(forModelId: modelId)
     }
 }

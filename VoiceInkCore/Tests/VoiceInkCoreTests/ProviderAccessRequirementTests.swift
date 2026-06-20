@@ -51,6 +51,15 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertNil(VoiceInkProviderAPIKeyAccount.fallbackEnvironmentKey(forProviderName: "Groq"))
     }
 
+    func testCustomModelAccountIdentifierPreservesMacOSKeychainAccountShape() {
+        let id = UUID(uuidString: "E31E4D7A-437B-4BD3-A4B5-9624F38F3BBE")!
+
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyAccount.customModelAccountIdentifier(forModelId: id),
+            "customModel_E31E4D7A-437B-4BD3-A4B5-9624F38F3BBE_APIKey"
+        )
+    }
+
     func testNonUserKeyProvidersKeepTheirAccessPolicy() {
         guard case .localWhisperModel = VoiceInkProviderKind.localWhisper.accessRequirement else {
             return XCTFail("Local Whisper should use local model availability")

@@ -281,6 +281,21 @@ reject_pattern \
   VoiceInkCore/Sources/VoiceInkCore \
   VoiceInkCore/Tests/VoiceInkCoreTests
 
+require_pattern \
+  "shared custom model API-key account identifier lives in VoiceInkCore" \
+  'customModelAccountIdentifier\(forModelId:|customModel_.*_APIKey' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyAccounts.swift
+
+require_pattern \
+  "macOS API-key manager uses shared custom model account identifier" \
+  'VoiceInkProviderAPIKeyAccount\.customModelAccountIdentifier\(forModelId:' \
+  VoiceInk/Services/APIKeyManager.swift
+
+reject_pattern \
+  "macOS API-key manager avoids shell-owned custom model account strings" \
+  'customModel_.*_APIKey' \
+  VoiceInk/Services/APIKeyManager.swift
+
 reject_pattern \
   "removed shared-type shell aliases stay deleted" \
   'typealias +(CustomPrompt|PromptIcon|RollingBufferPreloadMode|RollingBufferPreloadConfiguration|RollingBufferPowerState|RollingBufferPreloadPolicy|RollingBufferPreloadSettings|AIProvider|WhisperModelFile|RecordingState|RecorderAction|ShortcutPressContext|PowerModeValidationError|StreamingTranscriptionEvent|StreamingTranscriptionError)\b|PerformanceAnalyzer\.(AnalysisResult|ModelStat)' \

@@ -1,3 +1,5 @@
+import Foundation
+
 public enum VoiceInkProviderAPIKeyAccount {
     public static let groq = "groqAPIKey"
     public static let deepgram = "deepgramAPIKey"
@@ -21,6 +23,10 @@ public enum VoiceInkProviderAPIKeyAccount {
 
     public static func fallbackEnvironmentKey(forProviderName provider: String) -> String? {
         fallbackEnvironmentKeysByProviderName[normalized(provider)]
+    }
+
+    public static func customModelAccountIdentifier(forModelId modelId: UUID) -> String {
+        "customModel_\(modelId.uuidString)_APIKey"
     }
 
     private static let knownAccountsByProviderName: [String: String] = [

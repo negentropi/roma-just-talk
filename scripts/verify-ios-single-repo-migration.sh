@@ -978,6 +978,41 @@ reject_pattern \
   VoiceInk/Views/History/InlineHistoryView.swift
 
 require_pattern \
+  "shared transcription metadata presentation policy lives in VoiceInkCore" \
+  'VoiceInkTranscriptionMetadataPresentation|VoiceInkTranscriptionMetadataRowPresentation|fullAIRequestText|shouldShowAIRequestSection' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+require_pattern \
+  "shared transcription metadata presentation owns macOS detail rows" \
+  'dateRow|durationRow|transcriptionModelRow|transcriptionTimeRow|enhancementModelRow|enhancementTimeRow|promptRow|powerModeRow' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+require_pattern \
+  "shared transcription metadata presentation owns AI request copy" \
+  'detailsSectionTitle = "Details"|aiRequestSectionTitle = "AI Request"|systemPromptLabel = "System Prompt"|userMessageLabel = "User Message"' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+require_pattern \
+  "macOS transcription details use shared metadata presentation" \
+  'VoiceInkTranscriptionMetadataPresentation\.(dateRow|durationRow|transcriptionModelRow|transcriptionTimeRow|enhancementModelRow|enhancementTimeRow|promptRow|powerModeRow|detailsSectionTitle|aiRequestSectionTitle|systemPromptLabel|userMessageLabel|fullAIRequestText|shouldShowAIRequestSection)' \
+  VoiceInk/Views/Common/TranscriptionInfoPanel.swift
+
+require_pattern \
+  "core tests pin transcription metadata presentation copy" \
+  'testTranscriptionMetadataPresentationPreservesMacOSDetailRows|testFullAIRequestTextPreservesMacOSCopyComposition' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptPresentationTests.swift
+
+require_pattern \
+  "core check runner executes transcription metadata presentation tests" \
+  'testTranscriptionMetadataPresentationPreservesMacOSDetailRows|testFullAIRequestTextPreservesMacOSCopyComposition' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "macOS transcription details avoid shell-owned metadata copy and icons" \
+  '"(Date|Duration|Transcription Model|Transcription Time|Enhancement Model|Enhancement Time|Prompt|Power Mode|Details|AI Request|System Prompt|User Message|calendar|hourglass|cpu\.fill|clock\.fill|sparkles|text\.bubble\.fill|bolt\.fill)"|System Prompt:\\n|User Message:\\n' \
+  VoiceInk/Views/Common/TranscriptionInfoPanel.swift
+
+require_pattern \
   "shared transcript status presentation policy lives in VoiceInkCore" \
   'VoiceInkTranscriptStatusPresentation' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift

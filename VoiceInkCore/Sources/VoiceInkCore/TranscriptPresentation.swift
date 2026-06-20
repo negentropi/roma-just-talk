@@ -84,6 +84,16 @@ public struct VoiceInkHistoryActionPresentation: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkTranscriptionMetadataRowPresentation: Equatable, Sendable {
+    public let label: String
+    public let systemImageName: String
+
+    public init(label: String, systemImageName: String) {
+        self.label = label
+        self.systemImageName = systemImageName
+    }
+}
+
 public enum VoiceInkTranscriptTextVariant: String, CaseIterable, Sendable {
     case original
     case enhanced
@@ -108,6 +118,74 @@ public enum VoiceInkTranscriptTextVariant: String, CaseIterable, Sendable {
         case .enhanced:
             return enhancedText ?? ""
         }
+    }
+}
+
+public enum VoiceInkTranscriptionMetadataPresentation {
+    public static let detailsSectionTitle = "Details"
+    public static let aiRequestSectionTitle = "AI Request"
+    public static let systemPromptLabel = "System Prompt"
+    public static let userMessageLabel = "User Message"
+
+    public static let dateRow = VoiceInkTranscriptionMetadataRowPresentation(
+        label: "Date",
+        systemImageName: "calendar"
+    )
+
+    public static let durationRow = VoiceInkTranscriptionMetadataRowPresentation(
+        label: "Duration",
+        systemImageName: "hourglass"
+    )
+
+    public static let transcriptionModelRow = VoiceInkTranscriptionMetadataRowPresentation(
+        label: "Transcription Model",
+        systemImageName: "cpu.fill"
+    )
+
+    public static let transcriptionTimeRow = VoiceInkTranscriptionMetadataRowPresentation(
+        label: "Transcription Time",
+        systemImageName: "clock.fill"
+    )
+
+    public static let enhancementModelRow = VoiceInkTranscriptionMetadataRowPresentation(
+        label: "Enhancement Model",
+        systemImageName: "sparkles"
+    )
+
+    public static let enhancementTimeRow = VoiceInkTranscriptionMetadataRowPresentation(
+        label: "Enhancement Time",
+        systemImageName: "clock.fill"
+    )
+
+    public static let promptRow = VoiceInkTranscriptionMetadataRowPresentation(
+        label: "Prompt",
+        systemImageName: "text.bubble.fill"
+    )
+
+    public static let powerModeRow = VoiceInkTranscriptionMetadataRowPresentation(
+        label: "Power Mode",
+        systemImageName: "bolt.fill"
+    )
+
+    public static func shouldShowAIRequestSection(
+        systemMessage: String?,
+        userMessage: String?
+    ) -> Bool {
+        systemMessage != nil || userMessage != nil
+    }
+
+    public static func fullAIRequestText(
+        systemMessage: String?,
+        userMessage: String?
+    ) -> String {
+        var parts: [String] = []
+        if let systemMessage, !systemMessage.isEmpty {
+            parts.append("\(systemPromptLabel):\n\(systemMessage)")
+        }
+        if let userMessage, !userMessage.isEmpty {
+            parts.append("\(userMessageLabel):\n\(userMessage)")
+        }
+        return parts.joined(separator: "\n\n")
     }
 }
 

@@ -20,28 +20,24 @@ struct TranscriptionInfoPanel: View {
     private var detailsSection: some View {
         Section {
             metadataRow(
-                icon: "calendar",
-                label: "Date",
+                VoiceInkTranscriptionMetadataPresentation.dateRow,
                 value: VoiceInkDatePresentation.abbreviatedTimestamp(transcription.timestamp)
             )
 
             metadataRow(
-                icon: "hourglass",
-                label: "Duration",
+                VoiceInkTranscriptionMetadataPresentation.durationRow,
                 value: VoiceInkDurationPresentation.compactElapsed(transcription.duration)
             )
 
             if let modelName = transcription.transcriptionModelName {
                 metadataRow(
-                    icon: "cpu.fill",
-                    label: "Transcription Model",
+                    VoiceInkTranscriptionMetadataPresentation.transcriptionModelRow,
                     value: modelName
                 )
 
                 if let duration = transcription.transcriptionDuration {
                     metadataRow(
-                        icon: "clock.fill",
-                        label: "Transcription Time",
+                        VoiceInkTranscriptionMetadataPresentation.transcriptionTimeRow,
                         value: VoiceInkDurationPresentation.compactElapsed(duration)
                     )
                 }
@@ -49,15 +45,13 @@ struct TranscriptionInfoPanel: View {
 
             if let aiModel = transcription.aiEnhancementModelName {
                 metadataRow(
-                    icon: "sparkles",
-                    label: "Enhancement Model",
+                    VoiceInkTranscriptionMetadataPresentation.enhancementModelRow,
                     value: aiModel
                 )
 
                 if let duration = transcription.enhancementDuration {
                     metadataRow(
-                        icon: "clock.fill",
-                        label: "Enhancement Time",
+                        VoiceInkTranscriptionMetadataPresentation.enhancementTimeRow,
                         value: VoiceInkDurationPresentation.compactElapsed(duration)
                     )
                 }
@@ -65,8 +59,7 @@ struct TranscriptionInfoPanel: View {
 
             if let promptName = transcription.promptName {
                 metadataRow(
-                    icon: "text.bubble.fill",
-                    label: "Prompt",
+                    VoiceInkTranscriptionMetadataPresentation.promptRow,
                     value: promptName
                 )
             }
@@ -77,13 +70,12 @@ struct TranscriptionInfoPanel: View {
             )
             if !powerModeValue.isEmpty {
                 metadataRow(
-                    icon: "bolt.fill",
-                    label: "Power Mode",
+                    VoiceInkTranscriptionMetadataPresentation.powerModeRow,
                     value: powerModeValue
                 )
             }
         } header: {
-            Text("Details")
+            Text(VoiceInkTranscriptionMetadataPresentation.detailsSectionTitle)
         }
     }
 
@@ -91,11 +83,14 @@ struct TranscriptionInfoPanel: View {
 
     @ViewBuilder
     private var aiRequestSection: some View {
-        if transcription.aiRequestSystemMessage != nil || transcription.aiRequestUserMessage != nil {
+        if VoiceInkTranscriptionMetadataPresentation.shouldShowAIRequestSection(
+            systemMessage: transcription.aiRequestSystemMessage,
+            userMessage: transcription.aiRequestUserMessage
+        ) {
             Section {
                 if let systemMsg = transcription.aiRequestSystemMessage, !systemMsg.isEmpty {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("System Prompt")
+                        Text(VoiceInkTranscriptionMetadataPresentation.systemPromptLabel)
                             .font(.system(size: 11, weight: .semibold))
                             .foregroundColor(.secondary)
                         Text(systemMsg)
@@ -108,7 +103,7 @@ struct TranscriptionInfoPanel: View {
 
                 if let userMsg = transcription.aiRequestUserMessage, !userMsg.isEmpty {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("User Message")
+                        Text(VoiceInkTranscriptionMetadataPresentation.userMessageLabel)
                             .font(.system(size: 11, weight: .semibold))
                             .foregroundColor(.secondary)
                         Text(userMsg)
@@ -120,7 +115,7 @@ struct TranscriptionInfoPanel: View {
                 }
             } header: {
                 HStack {
-                    Text("AI Request")
+                    Text(VoiceInkTranscriptionMetadataPresentation.aiRequestSectionTitle)
                     Spacer()
                     CopyIconButton(textToCopy: fullRequestText)
                 }
@@ -131,24 +126,23 @@ struct TranscriptionInfoPanel: View {
     // MARK: - Helpers
 
     private var fullRequestText: String {
-        var parts: [String] = []
-        if let sys = transcription.aiRequestSystemMessage, !sys.isEmpty {
-            parts.append("System Prompt:\n\(sys)")
-        }
-        if let user = transcription.aiRequestUserMessage, !user.isEmpty {
-            parts.append("User Message:\n\(user)")
-        }
-        return parts.joined(separator: "\n\n")
+        VoiceInkTranscriptionMetadataPresentation.fullAIRequestText(
+            systemMessage: transcription.aiRequestSystemMessage,
+            userMessage: transcription.aiRequestUserMessage
+        )
     }
 
-    private func metadataRow(icon: String, label: String, value: String) -> some View {
+    private func metadataRow(
+        _ presentation: VoiceInkTranscriptionMetadataRowPresentation,
+        value: String
+    ) -> some View {
         HStack(spacing: 8) {
-            Image(systemName: icon)
+            Image(systemName: presentation.systemImageName)
                 .font(.system(size: 11, weight: .medium))
                 .foregroundColor(.secondary)
                 .frame(width: 20, height: 20)
 
-            Text(label)
+            Text(presentation.label)
                 .font(.system(size: 12, weight: .medium))
                 .foregroundColor(.secondary)
 

@@ -88,6 +88,90 @@ final class TranscriptPresentationTests: XCTestCase {
         XCTAssertEqual(VoiceInkHistoryPresentation.deleteConfirmationCancelButtonTitle, "Cancel")
     }
 
+    func testTranscriptionMetadataPresentationPreservesMacOSDetailRows() {
+        XCTAssertEqual(VoiceInkTranscriptionMetadataPresentation.detailsSectionTitle, "Details")
+        XCTAssertEqual(
+            [
+                VoiceInkTranscriptionMetadataPresentation.dateRow,
+                VoiceInkTranscriptionMetadataPresentation.durationRow,
+                VoiceInkTranscriptionMetadataPresentation.transcriptionModelRow,
+                VoiceInkTranscriptionMetadataPresentation.transcriptionTimeRow,
+                VoiceInkTranscriptionMetadataPresentation.enhancementModelRow,
+                VoiceInkTranscriptionMetadataPresentation.enhancementTimeRow,
+                VoiceInkTranscriptionMetadataPresentation.promptRow,
+                VoiceInkTranscriptionMetadataPresentation.powerModeRow
+            ],
+            [
+                VoiceInkTranscriptionMetadataRowPresentation(label: "Date", systemImageName: "calendar"),
+                VoiceInkTranscriptionMetadataRowPresentation(label: "Duration", systemImageName: "hourglass"),
+                VoiceInkTranscriptionMetadataRowPresentation(label: "Transcription Model", systemImageName: "cpu.fill"),
+                VoiceInkTranscriptionMetadataRowPresentation(label: "Transcription Time", systemImageName: "clock.fill"),
+                VoiceInkTranscriptionMetadataRowPresentation(label: "Enhancement Model", systemImageName: "sparkles"),
+                VoiceInkTranscriptionMetadataRowPresentation(label: "Enhancement Time", systemImageName: "clock.fill"),
+                VoiceInkTranscriptionMetadataRowPresentation(label: "Prompt", systemImageName: "text.bubble.fill"),
+                VoiceInkTranscriptionMetadataRowPresentation(label: "Power Mode", systemImageName: "bolt.fill")
+            ]
+        )
+    }
+
+    func testTranscriptionMetadataPresentationPreservesAIRequestCopy() {
+        XCTAssertEqual(VoiceInkTranscriptionMetadataPresentation.aiRequestSectionTitle, "AI Request")
+        XCTAssertEqual(VoiceInkTranscriptionMetadataPresentation.systemPromptLabel, "System Prompt")
+        XCTAssertEqual(VoiceInkTranscriptionMetadataPresentation.userMessageLabel, "User Message")
+    }
+
+    func testTranscriptionMetadataPresentationPreservesAIRequestVisibilityRule() {
+        XCTAssertFalse(
+            VoiceInkTranscriptionMetadataPresentation.shouldShowAIRequestSection(
+                systemMessage: nil,
+                userMessage: nil
+            )
+        )
+        XCTAssertTrue(
+            VoiceInkTranscriptionMetadataPresentation.shouldShowAIRequestSection(
+                systemMessage: "",
+                userMessage: nil
+            )
+        )
+        XCTAssertTrue(
+            VoiceInkTranscriptionMetadataPresentation.shouldShowAIRequestSection(
+                systemMessage: nil,
+                userMessage: ""
+            )
+        )
+    }
+
+    func testFullAIRequestTextPreservesMacOSCopyComposition() {
+        XCTAssertEqual(
+            VoiceInkTranscriptionMetadataPresentation.fullAIRequestText(
+                systemMessage: "Follow style guide.",
+                userMessage: "Clean this transcript."
+            ),
+            "System Prompt:\nFollow style guide.\n\nUser Message:\nClean this transcript."
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptionMetadataPresentation.fullAIRequestText(
+                systemMessage: "Follow style guide.",
+                userMessage: nil
+            ),
+            "System Prompt:\nFollow style guide."
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptionMetadataPresentation.fullAIRequestText(
+                systemMessage: nil,
+                userMessage: "Clean this transcript."
+            ),
+            "User Message:\nClean this transcript."
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptionMetadataPresentation.fullAIRequestText(
+                systemMessage: "",
+                userMessage: ""
+            ),
+            ""
+        )
+    }
+
     func testPreferredTextUsesEnhancedTextWhenPresent() {
         XCTAssertEqual(
             VoiceInkTranscriptPresentation.preferredText(

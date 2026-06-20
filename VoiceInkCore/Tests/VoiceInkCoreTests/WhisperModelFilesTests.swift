@@ -382,6 +382,48 @@ final class WhisperModelFilesTests: XCTestCase {
         XCTAssertFalse(VoiceInkWhisperModelDownloadResponsePolicy.isSuccessfulResponse(nil))
     }
 
+    func testDownloadCompletionPolicyClassifiesResponseAndTemporaryFile() {
+        let url = URL(string: "https://example.com/ggml-base.bin")!
+        let temporaryURL = URL(fileURLWithPath: "/tmp/ggml-base.download")
+        func response(statusCode: Int) -> HTTPURLResponse {
+            HTTPURLResponse(
+                url: url,
+                statusCode: statusCode,
+                httpVersion: nil,
+                headerFields: nil
+            )!
+        }
+
+        XCTAssertEqual(
+            VoiceInkWhisperModelDownloadResponsePolicy.completion(
+                temporaryURL: temporaryURL,
+                response: response(statusCode: 200)
+            ),
+            .ready(temporaryURL)
+        )
+        XCTAssertEqual(
+            VoiceInkWhisperModelDownloadResponsePolicy.completion(
+                temporaryURL: temporaryURL,
+                response: response(statusCode: 500)
+            ),
+            .serverError
+        )
+        XCTAssertEqual(
+            VoiceInkWhisperModelDownloadResponsePolicy.completion(
+                temporaryURL: nil,
+                response: response(statusCode: 200)
+            ),
+            .missingTemporaryFile
+        )
+        XCTAssertEqual(
+            VoiceInkWhisperModelDownloadResponsePolicy.completion(
+                temporaryURL: nil,
+                response: nil
+            ),
+            .serverError
+        )
+    }
+
     func testSimpleDownloadProgressFormatsIOSProgress() {
         let progress = VoiceInkWhisperModelDownloadProgress.simple(
             modelName: "ggml-base",

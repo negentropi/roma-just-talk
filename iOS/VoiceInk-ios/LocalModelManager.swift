@@ -87,18 +87,29 @@ class LocalModelManager: ObservableObject {
             return
         }
         
-        guard VoiceInkWhisperModelDownloadResponsePolicy.isSuccessfulResponse(response) else {
+        switch VoiceInkWhisperModelDownloadResponsePolicy.completion(
+            temporaryURL: temporaryURL,
+            response: response
+        ) {
+        case .serverError:
             downloadError = .serverErrorDuringDownload
             print("LocalModelManager: Server error for \(model.modelName)")
             return
-        }
-        
-        guard let temporaryURL = temporaryURL else {
+
+        case .missingTemporaryFile:
             downloadError = .noFileReceived
             print("LocalModelManager: Missing downloaded file for \(model.modelName)")
             return
+
+        case .ready(let temporaryURL):
+            installDownloadedModel(model, from: temporaryURL)
         }
-        
+    }
+
+    private func installDownloadedModel(
+        _ model: VoiceInkWhisperModelFileSpec,
+        from temporaryURL: URL
+    ) {
         do {
             let finalURL = try VoiceInkWhisperModelFiles.installDownloadedModelFile(
                 model,

@@ -1659,6 +1659,21 @@ reject_pattern \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
 require_pattern \
+  "shared Whisper model download completion policy lives in VoiceInkCore" \
+  'Completion|missingTemporaryFile|completion\(temporaryURL:' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
+
+require_pattern \
+  "macOS Whisper download uses shared completion policy" \
+  'VoiceInkWhisperModelDownloadResponsePolicy\.completion\(' \
+  VoiceInk/Transcription/Whisper/WhisperModelManager.swift
+
+require_pattern \
+  "iOS local model manager uses shared completion policy" \
+  'VoiceInkWhisperModelDownloadResponsePolicy\.completion\(' \
+  iOS/VoiceInk-ios/LocalModelManager.swift
+
+require_pattern \
   "shared Whisper model download progress policy lives in VoiceInkCore" \
   'VoiceInkWhisperModelDownloadProgress|VoiceInkWhisperModelDownloadState' \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift

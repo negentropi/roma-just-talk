@@ -88,14 +88,16 @@ class WhisperModelManager: ObservableObject {
                     return
                 }
 
-                guard VoiceInkWhisperModelDownloadResponsePolicy.isSuccessfulResponse(response),
-                      let tempURL = tempURL else {
+                guard case .ready(let temporaryFileURL) = VoiceInkWhisperModelDownloadResponsePolicy.completion(
+                    temporaryURL: tempURL,
+                    response: response
+                ) else {
                     finishOnce(.failure(URLError(.badServerResponse)))
                     return
                 }
 
                 do {
-                    try FileManager.default.moveItem(at: tempURL, to: destinationURL)
+                    try FileManager.default.moveItem(at: temporaryFileURL, to: destinationURL)
                     let data = try Data(contentsOf: destinationURL, options: .mappedIfSafe)
                     finishOnce(.success(data))
                     try? FileManager.default.removeItem(at: destinationURL)

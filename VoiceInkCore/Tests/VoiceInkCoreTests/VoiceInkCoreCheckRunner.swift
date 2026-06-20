@@ -1020,6 +1020,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testWriteDownloadedModelDataUsesSharedModelNameURL", run: { try WhisperModelFilesTests().testWriteDownloadedModelDataUsesSharedModelNameURL() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testWriteDownloadedLocalModelDataBuildsSharedLocalModelFile", run: { try WhisperModelFilesTests().testWriteDownloadedLocalModelDataBuildsSharedLocalModelFile() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testDownloadResponsePolicyPreservesHTTPStatusSuccessRange", run: { WhisperModelFilesTests().testDownloadResponsePolicyPreservesHTTPStatusSuccessRange() }),
+            VoiceInkCoreCheck(name: "WhisperModelFilesTests.testDownloadCompletionPolicyClassifiesResponseAndTemporaryFile", run: { WhisperModelFilesTests().testDownloadCompletionPolicyClassifiesResponseAndTemporaryFile() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadProgressFormatsIOSProgress", run: { WhisperModelFilesTests().testSimpleDownloadProgressFormatsIOSProgress() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadStateCombinesIOSDownloadedAndProgressState", run: { try WhisperModelFilesTests().testSimpleDownloadStateCombinesIOSDownloadedAndProgressState() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadStateBuildsSharedRowPresentation", run: { WhisperModelFilesTests().testSimpleDownloadStateBuildsSharedRowPresentation() }),

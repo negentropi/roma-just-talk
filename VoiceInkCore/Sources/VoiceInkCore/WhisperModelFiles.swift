@@ -109,6 +109,12 @@ public struct VoiceInkWhisperLocalModelImportPlan: Equatable, Sendable {
 }
 
 public enum VoiceInkWhisperModelDownloadResponsePolicy {
+    public enum Completion: Equatable, Sendable {
+        case ready(URL)
+        case serverError
+        case missingTemporaryFile
+    }
+
     public static func isSuccessfulStatusCode(_ statusCode: Int) -> Bool {
         (200...299).contains(statusCode)
     }
@@ -119,6 +125,21 @@ public enum VoiceInkWhisperModelDownloadResponsePolicy {
         }
 
         return isSuccessfulStatusCode(response.statusCode)
+    }
+
+    public static func completion(
+        temporaryURL: URL?,
+        response: URLResponse?
+    ) -> Completion {
+        guard isSuccessfulResponse(response) else {
+            return .serverError
+        }
+
+        guard let temporaryURL else {
+            return .missingTemporaryFile
+        }
+
+        return .ready(temporaryURL)
     }
 }
 

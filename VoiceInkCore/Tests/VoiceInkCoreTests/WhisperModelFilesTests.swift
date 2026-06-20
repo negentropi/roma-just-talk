@@ -186,6 +186,51 @@ final class WhisperModelFilesTests: XCTestCase {
         XCTAssertFalse(VoiceInkWhisperModelFiles.isImportableModelFile(URL(fileURLWithPath: "/tmp/ggml-base.txt")))
     }
 
+    func testLocalModelImportPlanBuildsMacOSImportInputs() throws {
+        let modelsDirectory = URL(fileURLWithPath: "/tmp/VoiceInk/WhisperModels", isDirectory: true)
+        let sourceURL = URL(fileURLWithPath: "/tmp/Downloads/Custom-Whisper.BIN")
+        let plan = try XCTUnwrap(
+            VoiceInkWhisperModelFiles.localModelImportPlan(
+                from: sourceURL,
+                in: modelsDirectory
+            )
+        )
+
+        XCTAssertEqual(plan.sourceURL, sourceURL)
+        XCTAssertEqual(plan.modelName, "Custom-Whisper")
+        XCTAssertEqual(plan.modelFilename, "Custom-Whisper.bin")
+        XCTAssertEqual(plan.destinationURL.path, "/tmp/VoiceInk/WhisperModels/Custom-Whisper.bin")
+        XCTAssertEqual(plan.localModelFile.name, "Custom-Whisper")
+        XCTAssertEqual(plan.localModelFile.url, plan.destinationURL)
+        XCTAssertFalse(plan.isDuplicate)
+    }
+
+    func testLocalModelImportPlanRejectsUnsupportedFilesAndReportsDuplicates() throws {
+        let baseDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.LocalModelImportPlanTests.\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: baseDirectory) }
+
+        let modelsDirectory = try VoiceInkWhisperModelFiles.createModelsDirectory(in: baseDirectory)
+        let sourceURL = baseDirectory.appendingPathComponent("ggml-custom.bin")
+        let duplicateURL = modelsDirectory.appendingPathComponent("ggml-custom.bin")
+        try Data().write(to: duplicateURL)
+
+        XCTAssertNil(
+            VoiceInkWhisperModelFiles.localModelImportPlan(
+                from: baseDirectory.appendingPathComponent("notes.txt"),
+                in: modelsDirectory
+            )
+        )
+        XCTAssertTrue(
+            try XCTUnwrap(
+                VoiceInkWhisperModelFiles.localModelImportPlan(
+                    from: sourceURL,
+                    in: modelsDirectory
+                )
+            ).isDuplicate
+        )
+    }
+
     func testLocalModelFileUsesExistingBinOnlyNamePolicy() throws {
         let modelURL = URL(fileURLWithPath: "/tmp/VoiceInk/WhisperModels/ggml-base.bin")
         let modelFile = try XCTUnwrap(VoiceInkWhisperModelFiles.localModelFile(from: modelURL))

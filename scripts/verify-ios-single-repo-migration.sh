@@ -152,6 +152,21 @@ reject_pattern() {
   fi
 }
 
+reject_context_pattern() {
+  local description="$1"
+  local anchor="$2"
+  local pattern="$3"
+  local file="$4"
+
+  section "$description"
+  local matches
+  matches="$(rg -A 80 "$anchor" "$file" | rg -n "$pattern" || true)"
+  if [[ -n "$matches" ]]; then
+    printf '%s\n' "$matches" >&2
+    fail "$description"
+  fi
+}
+
 require_command fd
 require_command rg
 require_command git
@@ -1476,6 +1491,31 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
 
 require_pattern \
+  "shared Whisper local model import plan lives in VoiceInkCore" \
+  'VoiceInkWhisperLocalModelImportPlan|localModelImportPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
+
+require_pattern \
+  "shared Whisper local model import plan owns destination filename" \
+  'let modelFilename = filename\(forModelName: modelName\)' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
+
+require_pattern \
+  "shared Whisper local model import plan owns destination URL" \
+  'let destinationURL = fileURL\(forFilename: modelFilename, in: modelsDirectory\)' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
+
+require_pattern \
+  "shared Whisper local model import plan owns local model record" \
+  'localModelFile: VoiceInkWhisperLocalModelFile\(name: modelName, url: destinationURL\)' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
+
+require_pattern \
+  "shared Whisper local model import plan owns duplicate detection" \
+  'isDuplicate: fileManager\.fileExists\(atPath: destinationURL\.path\)' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
+
+require_pattern \
   "shared model management filter lives in VoiceInkCore" \
   'enum VoiceInkModelManagementFilter' \
   VoiceInkCore/Sources/VoiceInkCore/ModelManagementPresentation.swift
@@ -1501,8 +1541,14 @@ require_pattern \
   VoiceInk/Transcription/Whisper/WhisperModelManager.swift
 
 require_pattern \
-  "macOS Whisper local model import uses shared extension policy" \
-  'VoiceInkWhisperModelFiles\.(isImportableModelFile|filename\(forModelName:)' \
+  "macOS Whisper local model import uses shared import plan" \
+  'VoiceInkWhisperModelFiles\.localModelImportPlan\(' \
+  VoiceInk/Transcription/Whisper/WhisperModelManager.swift
+
+reject_context_pattern \
+  "macOS Whisper local model import avoids shell-owned import planning" \
+  'func importWhisperModel' \
+  'deletingPathExtension\(\)\.lastPathComponent|fileURL\(forModelName:|VoiceInkWhisperLocalModelFile\(name:|fileExists\(atPath:' \
   VoiceInk/Transcription/Whisper/WhisperModelManager.swift
 
 reject_pattern \

@@ -311,15 +311,15 @@ class WhisperModelManager: ObservableObject {
     // MARK: - Import Local Model
 
     func importWhisperModel(from sourceURL: URL) async {
-        guard VoiceInkWhisperModelFiles.isImportableModelFile(sourceURL) else { return }
+        guard let importPlan = VoiceInkWhisperModelFiles.localModelImportPlan(
+            from: sourceURL,
+            in: modelsDirectory
+        ) else { return }
 
-        let baseName = sourceURL.deletingPathExtension().lastPathComponent
-        let destinationURL = VoiceInkWhisperModelFiles.fileURL(forModelName: baseName, in: modelsDirectory)
-
-        if FileManager.default.fileExists(atPath: destinationURL.path) {
+        if importPlan.isDuplicate {
             await NotificationManager.shared.showNotification(
                 title: VoiceInkModelManagementPresentation.importedLocalModelAlreadyExistsTitle(
-                    modelFilename: VoiceInkWhisperModelFiles.filename(forModelName: baseName)
+                    modelFilename: importPlan.modelFilename
                 ),
                 type: .warning,
                 duration: 4.0
@@ -329,16 +329,15 @@ class WhisperModelManager: ObservableObject {
 
         do {
             try FileManager.default.createDirectory(at: modelsDirectory, withIntermediateDirectories: true)
-            try FileManager.default.copyItem(at: sourceURL, to: destinationURL)
+            try FileManager.default.copyItem(at: importPlan.sourceURL, to: importPlan.destinationURL)
 
-            let newWhisperModel = VoiceInkWhisperLocalModelFile(name: baseName, url: destinationURL)
-            availableModels.append(newWhisperModel)
+            availableModels.append(importPlan.localModelFile)
 
             onModelsChanged?()
 
             await NotificationManager.shared.showNotification(
                 title: VoiceInkModelManagementPresentation.importedLocalModelSuccessTitle(
-                    filename: destinationURL.lastPathComponent
+                    filename: importPlan.modelFilename
                 ),
                 type: .success,
                 duration: 3.0

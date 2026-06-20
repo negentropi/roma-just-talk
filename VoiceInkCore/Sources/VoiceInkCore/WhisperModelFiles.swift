@@ -83,6 +83,31 @@ public struct VoiceInkWhisperLocalModelFile: Equatable, Identifiable, Sendable {
     }
 }
 
+public struct VoiceInkWhisperLocalModelImportPlan: Equatable, Sendable {
+    public let sourceURL: URL
+    public let modelName: String
+    public let modelFilename: String
+    public let destinationURL: URL
+    public let localModelFile: VoiceInkWhisperLocalModelFile
+    public let isDuplicate: Bool
+
+    public init(
+        sourceURL: URL,
+        modelName: String,
+        modelFilename: String,
+        destinationURL: URL,
+        localModelFile: VoiceInkWhisperLocalModelFile,
+        isDuplicate: Bool
+    ) {
+        self.sourceURL = sourceURL
+        self.modelName = modelName
+        self.modelFilename = modelFilename
+        self.destinationURL = destinationURL
+        self.localModelFile = localModelFile
+        self.isDuplicate = isDuplicate
+    }
+}
+
 public enum VoiceInkWhisperModelDownloadResponsePolicy {
     public static func isSuccessfulStatusCode(_ statusCode: Int) -> Bool {
         (200...299).contains(statusCode)
@@ -246,6 +271,26 @@ public enum VoiceInkWhisperModelFiles {
 
     public static func isImportableModelFile(_ url: URL) -> Bool {
         url.pathExtension.lowercased() == modelFileExtension
+    }
+
+    public static func localModelImportPlan(
+        from sourceURL: URL,
+        in modelsDirectory: URL,
+        fileManager: FileManager = .default
+    ) -> VoiceInkWhisperLocalModelImportPlan? {
+        guard isImportableModelFile(sourceURL) else { return nil }
+
+        let modelName = sourceURL.deletingPathExtension().lastPathComponent
+        let modelFilename = filename(forModelName: modelName)
+        let destinationURL = fileURL(forFilename: modelFilename, in: modelsDirectory)
+        return VoiceInkWhisperLocalModelImportPlan(
+            sourceURL: sourceURL,
+            modelName: modelName,
+            modelFilename: modelFilename,
+            destinationURL: destinationURL,
+            localModelFile: VoiceInkWhisperLocalModelFile(name: modelName, url: destinationURL),
+            isDuplicate: fileManager.fileExists(atPath: destinationURL.path)
+        )
     }
 
     public static func localModelFile(from fileURL: URL) -> VoiceInkWhisperLocalModelFile? {

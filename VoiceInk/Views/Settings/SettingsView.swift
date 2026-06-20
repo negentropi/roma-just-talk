@@ -37,6 +37,7 @@ struct SettingsView: View {
     private static let pasteSettingsPresentation = VoiceInkPastePreference.macOSSettingsPresentation
     private static let rollingBufferPresentation = VoiceInkRollingBufferPreloadSettings.macOSSettingsPresentation
     private static let resetOnboardingPresentation = VoiceInkMacOSOnboardingPresentation.resetSettingsAlert
+    private static let settingsPresentation = VoiceInkMacOSSettingsPresentation.macOS
 
     var body: some View {
         Form {
@@ -246,19 +247,19 @@ struct SettingsView: View {
             ExperimentalSection()
 
             // MARK: - General
-            Section("General") {
-                Toggle("Show in Menu Bar", isOn: $showMenuBarIcon)
+            Section(Self.settingsPresentation.generalSectionTitle) {
+                Toggle(Self.settingsPresentation.showMenuBarIconTitle, isOn: $showMenuBarIcon)
 
-                Toggle("Hide Dock Icon", isOn: $menuBarManager.isMenuBarOnly)
+                Toggle(Self.settingsPresentation.hideDockIconTitle, isOn: $menuBarManager.isMenuBarOnly)
 
-                LaunchAtLogin.Toggle("Launch at Login")
+                LaunchAtLogin.Toggle(Self.settingsPresentation.launchAtLoginTitle)
 
-                Toggle("Auto-check Updates", isOn: Binding(
+                Toggle(Self.settingsPresentation.autoCheckUpdatesTitle, isOn: Binding(
                     get: { updaterViewModel.automaticallyChecksForUpdates },
                     set: { updaterViewModel.setAutomaticallyChecksForUpdates($0) }
                 ))
 
-                Toggle("Show Announcements", isOn: $enableAnnouncements)
+                Toggle(Self.settingsPresentation.showAnnouncementsTitle, isOn: $enableAnnouncements)
                     .onChange(of: enableAnnouncements) { _, newValue in
                         if newValue {
                             AnnouncementsService.shared.start()
@@ -268,7 +269,7 @@ struct SettingsView: View {
                     }
 
                 HStack {
-                    Button("Check for Updates") {
+                    Button(Self.settingsPresentation.checkForUpdatesButtonTitle) {
                         updaterViewModel.checkForUpdates()
                     }
                     .disabled(!updaterViewModel.canCheckForUpdates)
@@ -283,15 +284,15 @@ struct SettingsView: View {
             Section {
                 AudioCleanupSettingsView()
             } header: {
-                Text("Privacy")
+                Text(Self.settingsPresentation.privacySectionTitle)
             } footer: {
-                Text("Control how VoiceInk handles your transcription data and audio recordings.")
+                Text(Self.settingsPresentation.privacyFooterText)
             }
 
             // MARK: - Backup
             Section {
-                LabeledContent("Export Settings") {
-                    Button("Export") {
+                LabeledContent(Self.settingsPresentation.exportSettingsLabel) {
+                    Button(Self.settingsPresentation.exportButtonTitle) {
                         ImportExportService.shared.exportSettings(
                             enhancementService: enhancementService,
                             recordingShortcutManager: recordingShortcutManager,
@@ -305,8 +306,8 @@ struct SettingsView: View {
                     }
                 }
 
-                LabeledContent("Import Settings") {
-                    Button("Import") {
+                LabeledContent(Self.settingsPresentation.importSettingsLabel) {
+                    Button(Self.settingsPresentation.importButtonTitle) {
                         ImportExportService.shared.importSettings(
                             enhancementService: enhancementService,
                             recordingShortcutManager: recordingShortcutManager,
@@ -321,13 +322,13 @@ struct SettingsView: View {
                     }
                 }
             } header: {
-                Text("Backup")
+                Text(Self.settingsPresentation.backupSectionTitle)
             } footer: {
-                Text("Export all settings, or choose specific categories when importing a backup.")
+                Text(Self.settingsPresentation.backupFooterText)
             }
 
             // MARK: - Diagnostics
-            Section("Diagnostics") {
+            Section(Self.settingsPresentation.diagnosticsSectionTitle) {
                 DiagnosticsSettingsView()
             }
         }

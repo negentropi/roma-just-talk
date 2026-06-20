@@ -572,14 +572,24 @@ require_pattern \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
 require_pattern \
-  "shared iOS settings presentation lives in VoiceInkCore" \
-  'VoiceInkSettingsPresentation|addModeButtonTitle|resetAllAppDataButtonTitle' \
+  "shared settings presentation lives in VoiceInkCore" \
+  'VoiceInkSettingsPresentation|VoiceInkMacOSSettingsPresentation|addModeButtonTitle|resetAllAppDataButtonTitle|checkForUpdatesButtonTitle|backupFooterText' \
   VoiceInkCore/Sources/VoiceInkCore/SettingsPresentation.swift
 
 require_pattern \
   "iOS settings uses shared settings presentation" \
   'VoiceInkSettingsPresentation\.iOS|settingsPresentation\.(navigationTitle|modesSectionTitle|addModeButtonTitle|addActionSystemImageName|debugSectionTitle|resetAllAppDataButtonTitle|resetAllAppDataSystemImageName)' \
   iOS/VoiceInk-ios/SettingsView.swift
+
+require_pattern \
+  "macOS settings uses shared top-level settings presentation" \
+  'VoiceInkMacOSSettingsPresentation\.macOS|settingsPresentation\.(generalSectionTitle|showMenuBarIconTitle|hideDockIconTitle|launchAtLoginTitle|autoCheckUpdatesTitle|showAnnouncementsTitle|checkForUpdatesButtonTitle|privacySectionTitle|privacyFooterText|backupSectionTitle|backupFooterText|exportSettingsLabel|exportButtonTitle|importSettingsLabel|importButtonTitle|diagnosticsSectionTitle)' \
+  VoiceInk/Views/Settings/SettingsView.swift
+
+require_pattern \
+  "core checks execute settings presentation tests" \
+  'SettingsPresentationTests\.testIOSSettingsPresentationPreservesSettingsChromeCopy|SettingsPresentationTests\.testMacOSSettingsPresentationPreservesSettingsChromeCopy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \
   "iOS mode selection views avoid shell-only mode-count picker branching" \
@@ -606,6 +616,11 @@ reject_pattern \
   "iOS settings avoids shell-only settings chrome and action copy" \
   '"(Modes|Add New Mode|Debug|Reset All App Data|Settings|plus\.circle\.fill|trash)"' \
   iOS/VoiceInk-ios/SettingsView.swift
+
+reject_pattern \
+  "macOS settings avoids shell-only top-level settings copy" \
+  '"(Show in Menu Bar|Hide Dock Icon|Launch at Login|Auto-check Updates|Show Announcements|Check for Updates|Privacy|Control how VoiceInk handles your transcription data and audio recordings\.|Export Settings|Export|Import Settings|Import|Backup|Export all settings, or choose specific categories when importing a backup\.|Diagnostics)"' \
+  VoiceInk/Views/Settings/SettingsView.swift
 
 reject_pattern \
   "iOS mode configuration avoids shell-only form presentation copy" \

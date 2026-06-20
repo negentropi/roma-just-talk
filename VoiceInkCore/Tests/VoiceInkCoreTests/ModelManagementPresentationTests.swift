@@ -100,6 +100,11 @@ final class ModelManagementPresentationTests: XCTestCase {
             VoiceInkModelManagementPresentation.customModelsLimitationText,
             "Only OpenAI-compatible transcription APIs are supported."
         )
+        XCTAssertEqual(
+            VoiceInkModelManagementPresentation.intelMacLocalModelsWarningText,
+            "Local models don't work reliably on Intel Macs"
+        )
+        XCTAssertEqual(VoiceInkModelManagementPresentation.intelMacUseCloudButtonTitle, "Use Cloud")
         XCTAssertEqual(VoiceInkModelManagementPresentation.closeButtonHelp, "Close")
         XCTAssertEqual(
             VoiceInkModelManagementPresentation.deleteCustomModelAlertMessage(displayName: "My Model"),

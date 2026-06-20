@@ -1547,7 +1547,7 @@ require_pattern \
 
 require_pattern \
   "shared model management copy presentation lives in VoiceInkCore" \
-  'enum VoiceInkModelManagementPresentation|downloadButtonTitle|editModelButtonTitle|deleteModelButtonTitle|deleteButtonTitle|deleteCustomModelAlertTitle|deleteCustomModelAlertMessage|deleteModelAlertMessage|showInFinderButtonTitle|speedLabel|accuracyLabel|importedLocalModelDescription|customProviderLabel|openAICompatibleLabel|nativeAppleProviderLabel|onDeviceLabel|macOS26RequiredLabel|importLocalModelHelpText|importLocalModelLearnMoreURLString|importLocalModelPanelTitle|importedLocalModelFailureTitle' \
+  'enum VoiceInkModelManagementPresentation|downloadButtonTitle|editModelButtonTitle|deleteModelButtonTitle|deleteButtonTitle|deleteCustomModelAlertTitle|deleteCustomModelAlertMessage|deleteModelAlertMessage|showInFinderButtonTitle|speedLabel|accuracyLabel|importedLocalModelDescription|customProviderLabel|openAICompatibleLabel|nativeAppleProviderLabel|onDeviceLabel|macOS26RequiredLabel|importLocalModelHelpText|importLocalModelLearnMoreURLString|importLocalModelPanelTitle|intelMacLocalModelsWarningText|intelMacUseCloudButtonTitle|importedLocalModelFailureTitle' \
   VoiceInkCore/Sources/VoiceInkCore/ModelManagementPresentation.swift
 
 require_pattern \
@@ -1655,12 +1655,12 @@ require_pattern \
 
 require_pattern \
   "macOS model management uses shared import and custom-model copy" \
-  'VoiceInkModelManagementPresentation\.(importLocalModelTitle|importLocalModelHelpText|importLocalModelLearnMoreURLString|importLocalModelLearnMoreHelpText|importLocalModelPanelTitle|customModelsLimitationText)' \
+  'VoiceInkModelManagementPresentation\.(importLocalModelTitle|importLocalModelHelpText|importLocalModelLearnMoreURLString|importLocalModelLearnMoreHelpText|importLocalModelPanelTitle|customModelsLimitationText|intelMacLocalModelsWarningText|intelMacUseCloudButtonTitle)' \
   VoiceInk/Views/AI\ Models/ModelManagementView.swift
 
 reject_pattern \
   "macOS model management avoids shell-owned local import copy and file extension" \
-  'filenameExtension: "bin"|"Select a Whisper ggml \.bin model"|"Add a custom fine-tuned whisper model to use with VoiceInk\. Select the downloaded \.bin file\."|"https://tryvoiceink\.com/docs/custom-local-whisper-models"|"Read more about custom local models"' \
+  'filenameExtension: "bin"|"Select a Whisper ggml \.bin model"|"Add a custom fine-tuned whisper model to use with VoiceInk\. Select the downloaded \.bin file\."|"https://tryvoiceink\.com/docs/custom-local-whisper-models"|"Read more about custom local models"|"Local models don'"'"'t work reliably on Intel Macs"|"Use Cloud"' \
   VoiceInk/Views/AI\ Models/ModelManagementView.swift
 
 require_pattern \

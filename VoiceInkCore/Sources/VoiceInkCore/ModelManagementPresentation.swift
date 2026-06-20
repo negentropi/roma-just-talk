@@ -83,6 +83,8 @@ public enum VoiceInkModelManagementPresentation {
     public static let importLocalModelLearnMoreHelpText = "Read more about custom local models"
     public static let importLocalModelPanelTitle = "Select a Whisper ggml .bin model"
     public static let customModelsLimitationText = "Only OpenAI-compatible transcription APIs are supported."
+    public static let intelMacLocalModelsWarningText = "Local models don't work reliably on Intel Macs"
+    public static let intelMacUseCloudButtonTitle = "Use Cloud"
     public static let closeButtonHelp = "Close"
 
     public static func deleteCustomModelAlertMessage(displayName: String) -> String {

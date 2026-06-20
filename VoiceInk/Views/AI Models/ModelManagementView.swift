@@ -265,7 +265,7 @@ struct ModelManagementView: View {
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundColor(.orange)
 
-            Text("Local models don't work reliably on Intel Macs")
+            Text(VoiceInkModelManagementPresentation.intelMacLocalModelsWarningText)
                 .font(.system(size: 13, weight: .medium))
                 .foregroundColor(.primary.opacity(0.85))
 
@@ -277,7 +277,7 @@ struct ModelManagementView: View {
                 }
             }) {
                 HStack(spacing: 4) {
-                    Text("Use Cloud")
+                    Text(VoiceInkModelManagementPresentation.intelMacUseCloudButtonTitle)
                         .font(.system(size: 12, weight: .semibold))
                     Image(systemName: "arrow.right")
                         .font(.system(size: 10, weight: .bold))

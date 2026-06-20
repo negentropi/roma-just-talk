@@ -83,7 +83,7 @@ struct AudioTranscribeView: View {
             }
             .frame(maxWidth: 480, maxHeight: 200)
 
-            Text("Supports WAV, MP3, M4A, AIFF, MP4, MOV, AAC, FLAC, CAF, AMR, OGG, OPUS, 3GP")
+            Text(VoiceInkSupportedMedia.supportedFileTypesText)
                 .font(.caption)
                 .foregroundColor(.secondary)
                 .padding(.top, 12)

@@ -2,6 +2,20 @@ import Foundation
 import VoiceInkCore
 
 final class SupportedMediaTests: XCTestCase {
+    func testSupportedMediaDisplayExtensionsPreserveMacOSImportCopyOrder() {
+        XCTAssertEqual(
+            VoiceInkSupportedMedia.displayFileExtensions,
+            [
+                "WAV", "MP3", "M4A", "AIFF", "MP4", "MOV", "AAC", "FLAC", "CAF",
+                "AMR", "OGG", "OGA", "OPUS", "3GP"
+            ]
+        )
+        XCTAssertEqual(
+            VoiceInkSupportedMedia.supportedFileTypesText,
+            "Supports WAV, MP3, M4A, AIFF, MP4, MOV, AAC, FLAC, CAF, AMR, OGG, OGA, OPUS, 3GP"
+        )
+    }
+
     func testSupportedFileExtensionsPreserveMacOSImportPolicy() {
         XCTAssertEqual(
             VoiceInkSupportedMedia.fileExtensions,
@@ -9,6 +23,13 @@ final class SupportedMediaTests: XCTestCase {
                 "wav", "mp3", "m4a", "aiff", "mp4", "mov", "aac", "flac", "caf",
                 "amr", "ogg", "oga", "opus", "3gp"
             ]
+        )
+    }
+
+    func testSupportedMediaDisplayExtensionsMatchAcceptedExtensions() {
+        XCTAssertEqual(
+            Set(VoiceInkSupportedMedia.displayFileExtensions.map { $0.lowercased() }),
+            VoiceInkSupportedMedia.fileExtensions
         )
     }
 

@@ -168,11 +168,11 @@ class AIEnhancementService: ObservableObject {
             throw VoiceInkAIEnhancementError.notConfigured
         }
 
-        guard !text.isEmpty else {
+        guard let requestPayload = VoiceInkAIEnhancementRequestPayload(transcript: text) else {
             return ""
         }
 
-        let formattedText = VoiceInkAIRequestPrompts.taggedTranscript(text)
+        let formattedText = requestPayload.userMessage
         let systemMessage = await getSystemMessage()
 
         await MainActor.run {
@@ -189,7 +189,7 @@ class AIEnhancementService: ObservableObject {
                     systemPrompt: systemMessage,
                     timeout: baseTimeout
                 )
-                return VoiceInkAIEnhancementOutputFilter.filter(result)
+                return VoiceInkAIEnhancementRequestPayload.enhancedText(from: result)
             } catch {
                 if let localError = error as? LocalAIError {
                     switch localError {
@@ -206,7 +206,7 @@ class AIEnhancementService: ObservableObject {
         case .localCLI:
             do {
                 let result = try await aiService.enhanceWithLocalCLI(systemPrompt: systemMessage, userPrompt: formattedText)
-                return VoiceInkAIEnhancementOutputFilter.filter(result)
+                return VoiceInkAIEnhancementRequestPayload.enhancedText(from: result)
             } catch {
                 if let localError = error as? LocalCLIError {
                     throw VoiceInkAIEnhancementError.customError(localError.errorDescription ?? "An unknown Local CLI error occurred.")
@@ -251,7 +251,7 @@ class AIEnhancementService: ObservableObject {
                 case .ollama, .localCLI:
                     preconditionFailure("Local AI routes should return before cloud request execution.")
                 }
-                return VoiceInkAIEnhancementOutputFilter.filter(result.trimmingCharacters(in: .whitespacesAndNewlines))
+                return VoiceInkAIEnhancementRequestPayload.enhancedText(from: result)
             } catch let error as LLMKitError {
                 throw mapLLMKitError(error)
             } catch let error as VoiceInkAIEnhancementError {

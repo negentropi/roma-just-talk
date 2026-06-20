@@ -3233,6 +3233,21 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AIEnhancementRetryPolicy.swift
 
 require_pattern \
+  "shared AI enhancement request payload lives in VoiceInkCore" \
+  'VoiceInkAIEnhancementRequestPayload|taggedTranscript|enhancedText' \
+  VoiceInkCore/Sources/VoiceInkCore/AIRequestPrompts.swift
+
+require_pattern \
+  "macOS AI enhancement service uses shared request payload" \
+  'VoiceInkAIEnhancementRequestPayload\(transcript: text\)|requestPayload\.userMessage|VoiceInkAIEnhancementRequestPayload\.enhancedText' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+reject_pattern \
+  "macOS AI enhancement service avoids shell-owned request payload and output filtering" \
+  'guard +!text\.isEmpty|VoiceInkAIRequestPrompts\.taggedTranscript|VoiceInkAIEnhancementOutputFilter\.filter' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+require_pattern \
   "macOS AI enhancement service uses shared rate-limit policy" \
   'VoiceInkAIEnhancementRateLimitPolicy|delaySinceLastRequest' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift

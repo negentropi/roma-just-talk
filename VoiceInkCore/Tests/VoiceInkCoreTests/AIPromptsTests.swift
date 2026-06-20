@@ -92,4 +92,32 @@ final class AIPromptsTests: XCTestCase {
             ""
         )
     }
+
+    func testEnhancementRequestPayloadReturnsNilForEmptyTranscript() {
+        XCTAssertNil(VoiceInkAIEnhancementRequestPayload(transcript: ""))
+    }
+
+    func testEnhancementRequestPayloadPreservesMacOSWhitespaceOnlyTranscriptPolicy() throws {
+        let payload = try XCTUnwrap(VoiceInkAIEnhancementRequestPayload(transcript: "   "))
+
+        XCTAssertEqual(
+            payload.userMessage,
+            "\n<TRANSCRIPT>\n   \n</TRANSCRIPT>"
+        )
+    }
+
+    func testEnhancementRequestPayloadBuildsTaggedUserMessageAndFiltersProviderOutput() throws {
+        let payload = try XCTUnwrap(VoiceInkAIEnhancementRequestPayload(transcript: "raw text"))
+
+        XCTAssertEqual(
+            payload.userMessage,
+            "\n<TRANSCRIPT>\nraw text\n</TRANSCRIPT>"
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementRequestPayload.enhancedText(
+                from: "<thinking>draft</thinking>\nClean text"
+            ),
+            "Clean text"
+        )
+    }
 }

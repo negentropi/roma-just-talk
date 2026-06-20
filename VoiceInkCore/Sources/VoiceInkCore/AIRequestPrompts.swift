@@ -9,3 +9,19 @@ public enum VoiceInkAIRequestPrompts {
         "Prompt: \(prompt)\n\nTranscript:\n\(transcript)"
     }
 }
+
+public struct VoiceInkAIEnhancementRequestPayload: Equatable, Sendable {
+    public let userMessage: String
+
+    public init?(transcript: String) {
+        guard !transcript.isEmpty else {
+            return nil
+        }
+
+        self.userMessage = VoiceInkAIRequestPrompts.taggedTranscript(transcript)
+    }
+
+    public static func enhancedText(from providerOutput: String) -> String {
+        VoiceInkAIEnhancementOutputFilter.filter(providerOutput)
+    }
+}

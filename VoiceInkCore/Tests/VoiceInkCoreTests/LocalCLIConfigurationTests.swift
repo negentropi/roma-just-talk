@@ -2,6 +2,22 @@ import Foundation
 @testable import VoiceInkCore
 
 final class LocalCLIConfigurationTests: XCTestCase {
+    func testLocalCLISettingsPresentationPreservesMacOSCopy() {
+        let presentation = VoiceInkLocalCLIPreference.macOSSettingsPresentation
+
+        XCTAssertEqual(presentation.commandTitle, "Command")
+        XCTAssertEqual(presentation.loadTemplateButtonTitle, "Load Template")
+        XCTAssertEqual(presentation.timeoutPickerTitle, "Timeout")
+        XCTAssertEqual(
+            presentation.environmentHelpText,
+            "Environment variables available: VOICEINK_SYSTEM_PROMPT, VOICEINK_USER_PROMPT, VOICEINK_FULL_PROMPT. VoiceInk also writes VOICEINK_FULL_PROMPT to stdin for every command."
+        )
+        XCTAssertEqual(
+            presentation.configurationRequiredHelpText,
+            "Load a template or enter a command to enable Local CLI enhancement."
+        )
+    }
+
     func testLocalCLITemplatesPreserveRawValuesDisplayNamesAndCommands() {
         XCTAssertEqual(VoiceInkLocalCLITemplate.allCases, [.pi, .claude, .codex, .copilot])
         XCTAssertEqual(VoiceInkLocalCLITemplate.pi.rawValue, "pi")

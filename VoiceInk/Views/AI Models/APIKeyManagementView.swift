@@ -37,6 +37,8 @@ struct APIKeyManagementView: View {
     private var selectedProviderSettingsSurface: VoiceInkAIEnhancementSettingsSurface {
         aiService.selectedProvider.textEnhancementSettingsSurface
     }
+
+    private let localCLIPresentation = VoiceInkLocalCLIPreference.macOSSettingsPresentation
     
     var body: some View {
         Section("AI Provider Integration") {
@@ -178,11 +180,11 @@ struct APIKeyManagementView: View {
                 } else if selectedProviderSettingsSurface == .localCLI {
                     VStack(alignment: .leading, spacing: 6) {
                         HStack {
-                            Text("Command")
+                            Text(localCLIPresentation.commandTitle)
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                             Spacer()
-                            Menu("Load Template") {
+                            Menu(localCLIPresentation.loadTemplateButtonTitle) {
                                 ForEach(VoiceInkLocalCLITemplate.allCases) { template in
                                     Button(template.displayName) {
                                         aiService.loadLocalCLITemplate(template)
@@ -210,10 +212,10 @@ struct APIKeyManagementView: View {
                                 if newValue != aiService.localCLICommandTemplate {
                                     aiService.updateLocalCLICommandTemplate(newValue)
                                 }
-                            }
+                        }
                     }
 
-                    Picker("Timeout", selection: $localCLITimeoutSeconds) {
+                    Picker(localCLIPresentation.timeoutPickerTitle, selection: $localCLITimeoutSeconds) {
                         ForEach(VoiceInkLocalCLIPreference.timeoutOptions, id: \.self) { timeout in
                             Text(VoiceInkLocalCLIPreference.timeoutLabel(for: timeout)).tag(timeout)
                         }
@@ -222,12 +224,12 @@ struct APIKeyManagementView: View {
                         aiService.updateLocalCLITimeoutSeconds(newValue)
                     }
 
-                    Text("Environment variables available: VOICEINK_SYSTEM_PROMPT, VOICEINK_USER_PROMPT, VOICEINK_FULL_PROMPT. VoiceInk also writes VOICEINK_FULL_PROMPT to stdin for every command.")
+                    Text(localCLIPresentation.environmentHelpText)
                         .font(.caption)
                         .foregroundColor(.secondary)
 
                     if !aiService.isAPIKeyValid {
-                        Text("Load a template or enter a command to enable Local CLI enhancement.")
+                        Text(localCLIPresentation.configurationRequiredHelpText)
                             .font(.caption)
                             .foregroundColor(.orange)
                     }

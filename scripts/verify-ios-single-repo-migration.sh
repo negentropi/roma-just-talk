@@ -2877,7 +2877,7 @@ require_pattern \
 
 require_pattern \
   "shared Local CLI configuration lives in VoiceInkCore" \
-  'VoiceInkLocalCLITemplate|VoiceInkLocalCLIPreference|commandTemplateKey = "localCLICommandTemplate"|selectedTemplateKey = "localCLISelectedTemplate"|timeoutSecondsKey = "localCLITimeoutSeconds"|defaultTimeoutSeconds|timeoutOptions|boundedTimeoutSeconds|isCommandConfigured|fullPrompt' \
+  'VoiceInkMacOSLocalCLISettingsPresentation|macOSSettingsPresentation|VoiceInkLocalCLITemplate|VoiceInkLocalCLIPreference|commandTemplateKey = "localCLICommandTemplate"|selectedTemplateKey = "localCLISelectedTemplate"|timeoutSecondsKey = "localCLITimeoutSeconds"|defaultTimeoutSeconds|timeoutOptions|boundedTimeoutSeconds|isCommandConfigured|fullPrompt' \
   VoiceInkCore/Sources/VoiceInkCore/LocalCLIConfiguration.swift
 
 require_pattern \
@@ -2892,7 +2892,12 @@ require_pattern \
 
 require_pattern \
   "macOS AI settings use shared Local CLI templates and timeout options" \
-  'VoiceInkLocalCLITemplate\.allCases|VoiceInkLocalCLIPreference\.(defaultTimeoutSeconds|timeoutOptions|timeoutLabel)' \
+  'VoiceInkLocalCLITemplate\.allCases|VoiceInkLocalCLIPreference\.(defaultTimeoutSeconds|timeoutOptions|timeoutLabel|macOSSettingsPresentation)|localCLIPresentation\.(commandTitle|loadTemplateButtonTitle|timeoutPickerTitle|environmentHelpText|configurationRequiredHelpText)' \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+
+reject_pattern \
+  "macOS AI settings avoid shell-owned Local CLI settings copy" \
+  '"(Command|Load Template|Timeout|Environment variables available: VOICEINK_SYSTEM_PROMPT, VOICEINK_USER_PROMPT, VOICEINK_FULL_PROMPT\. VoiceInk also writes VOICEINK_FULL_PROMPT to stdin for every command\.|Load a template or enter a command to enable Local CLI enhancement\.)"' \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
 
 require_pattern \
@@ -2902,7 +2907,7 @@ require_pattern \
 
 require_pattern \
   "migration checklist tracks shared Local CLI configuration gate" \
-  'macOS Local CLI template identity, command template catalog, command/selected-template/timeout storage, timeout default/options/clamp, configured-command predicate, and full-prompt wrapper route through `VoiceInkLocalCLITemplate`/`VoiceInkLocalCLIPreference`' \
+  'macOS Local CLI template identity, settings labels/help, command template catalog, command/selected-template/timeout storage, timeout default/options/clamp, configured-command predicate, and full-prompt wrapper route through `VoiceInkLocalCLITemplate`/`VoiceInkLocalCLIPreference`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

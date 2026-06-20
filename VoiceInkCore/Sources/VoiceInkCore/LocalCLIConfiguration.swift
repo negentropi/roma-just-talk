@@ -1,5 +1,21 @@
 import Foundation
 
+public struct VoiceInkMacOSLocalCLISettingsPresentation: Equatable, Sendable {
+    public let commandTitle: String
+    public let loadTemplateButtonTitle: String
+    public let timeoutPickerTitle: String
+    public let environmentHelpText: String
+    public let configurationRequiredHelpText: String
+
+    public static let macOS = VoiceInkMacOSLocalCLISettingsPresentation(
+        commandTitle: "Command",
+        loadTemplateButtonTitle: "Load Template",
+        timeoutPickerTitle: "Timeout",
+        environmentHelpText: "Environment variables available: VOICEINK_SYSTEM_PROMPT, VOICEINK_USER_PROMPT, VOICEINK_FULL_PROMPT. VoiceInk also writes VOICEINK_FULL_PROMPT to stdin for every command.",
+        configurationRequiredHelpText: "Load a template or enter a command to enable Local CLI enhancement."
+    )
+}
+
 public enum VoiceInkLocalCLITemplate: String, CaseIterable, Identifiable, Sendable {
     case pi
     case claude
@@ -39,6 +55,7 @@ public enum VoiceInkLocalCLIPreference {
     public static let commandTemplateKey = "localCLICommandTemplate"
     public static let selectedTemplateKey = "localCLISelectedTemplate"
     public static let timeoutSecondsKey = "localCLITimeoutSeconds"
+    public static let macOSSettingsPresentation = VoiceInkMacOSLocalCLISettingsPresentation.macOS
     public static let defaultTimeoutSeconds: Double = 45
     public static let minimumTimeoutSeconds: Double = 5
     public static let timeoutOptions: [Double] = [15, 30, 45, 60, 90, 120, 180, 300]

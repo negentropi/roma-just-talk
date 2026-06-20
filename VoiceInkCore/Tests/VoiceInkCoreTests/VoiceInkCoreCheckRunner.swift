@@ -267,6 +267,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "ModelManagementPresentationTests.testModelManagementFiltersApplySharedModelFacts", run: { ModelManagementPresentationTests().testModelManagementFiltersApplySharedModelFacts() }),
             VoiceInkCoreCheck(name: "ModelManagementPresentationTests.testModelManagementRecommendedOrderIsShared", run: { ModelManagementPresentationTests().testModelManagementRecommendedOrderIsShared() }),
             VoiceInkCoreCheck(name: "ModelManagementPresentationTests.testModelManagementPresentationPreservesPlatformCopy", run: { ModelManagementPresentationTests().testModelManagementPresentationPreservesPlatformCopy() }),
+            VoiceInkCoreCheck(name: "LocalCLIConfigurationTests.testLocalCLISettingsPresentationPreservesMacOSCopy", run: { LocalCLIConfigurationTests().testLocalCLISettingsPresentationPreservesMacOSCopy() }),
             VoiceInkCoreCheck(name: "LocalCLIConfigurationTests.testLocalCLITemplatesPreserveRawValuesDisplayNamesAndCommands", run: { LocalCLIConfigurationTests().testLocalCLITemplatesPreserveRawValuesDisplayNamesAndCommands() }),
             VoiceInkCoreCheck(name: "LocalCLIConfigurationTests.testLocalCLIPreferencePreservesKeysDefaultsAndRoundTrips", run: { LocalCLIConfigurationTests().testLocalCLIPreferencePreservesKeysDefaultsAndRoundTrips() }),
             VoiceInkCoreCheck(name: "LocalCLIConfigurationTests.testLocalCLICommandConfigurationAndPromptPolicy", run: { LocalCLIConfigurationTests().testLocalCLICommandConfigurationAndPromptPolicy() }),

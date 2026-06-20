@@ -70,11 +70,12 @@ struct VoiceInkApp: App {
 
             // Show alert to user about storage issue
             DispatchQueue.main.async {
+                let presentation = VoiceInkAppIdentity.storageFallbackWarningPresentation
                 let alert = NSAlert()
-                alert.messageText = "Storage Warning"
-                alert.informativeText = "VoiceInk couldn't access its storage location. Your transcriptions will not be saved between sessions."
+                alert.messageText = presentation.title
+                alert.informativeText = presentation.message
                 alert.alertStyle = .warning
-                alert.addButton(withTitle: "OK")
+                alert.addButton(withTitle: presentation.buttonTitle)
                 alert.runModal()
             }
         }
@@ -300,11 +301,12 @@ struct VoiceInkApp: App {
                     .onAppear {
                         // Check if container initialization failed
                         if containerInitializationFailed {
+                            let presentation = VoiceInkAppIdentity.storageFailurePresentation
                             let alert = NSAlert()
-                            alert.messageText = "Critical Storage Error"
-                            alert.informativeText = VoiceInkAppIdentity.storageFailureMessage
+                            alert.messageText = presentation.title
+                            alert.informativeText = presentation.message
                             alert.alertStyle = .critical
-                            alert.addButton(withTitle: "Quit")
+                            alert.addButton(withTitle: presentation.buttonTitle)
                             alert.runModal()
 
                             NSApplication.shared.terminate(nil)

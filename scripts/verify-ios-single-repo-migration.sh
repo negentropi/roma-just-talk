@@ -6089,7 +6089,7 @@ require_plist_value \
 
 require_pattern \
   "shared app identity presentation lives in VoiceInkCore" \
-  'VoiceInkAppIdentity|bundleIdentifier = "com\.prakashjoshipax\.VoiceInk"|loggingSubsystem = "com\.prakashjoshipax\.voiceink"|displayName = "roma just talk"|compactDisplayName = "roma-just-talk"|iOSRecordDeepLinkScheme = "voiceink"|iOSRecordDeepLinkHost = "record"|iCloudContainerIdentifier|iOSAppGroupIdentifier|iOSRecordDeepLinkURL|iOSStopRecordingDarwinNotificationName|iOSRecordingStateChangedDarwinNotificationName|macOSApplicationSupportDirectory|errorDomain' \
+  'VoiceInkAppIdentity|VoiceInkMacOSStorageAlertPresentation|bundleIdentifier = "com\.prakashjoshipax\.VoiceInk"|loggingSubsystem = "com\.prakashjoshipax\.voiceink"|displayName = "roma just talk"|compactDisplayName = "roma-just-talk"|iOSRecordDeepLinkScheme = "voiceink"|iOSRecordDeepLinkHost = "record"|iCloudContainerIdentifier|iOSAppGroupIdentifier|iOSRecordDeepLinkURL|iOSStopRecordingDarwinNotificationName|iOSRecordingStateChangedDarwinNotificationName|macOSApplicationSupportDirectory|storageFallbackWarningPresentation|storageFailurePresentation|errorDomain' \
   VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift
 
 require_pattern \
@@ -6139,8 +6139,18 @@ require_pattern \
 
 require_pattern \
   "macOS app startup uses shared app identity presentation" \
-  'VoiceInkAppIdentity\.(compactDisplayName|storageFailureMessage)' \
+  'VoiceInkAppIdentity\.(compactDisplayName|storageFallbackWarningPresentation|storageFailurePresentation)' \
   VoiceInk/VoiceInk.swift
+
+reject_pattern \
+  "macOS app startup avoids shell-only storage alert copy" \
+  '"(Storage Warning|VoiceInk couldn.t access its storage location\. Your transcriptions will not be saved between sessions\.|Critical Storage Error|Quit)"' \
+  VoiceInk/VoiceInk.swift
+
+require_pattern \
+  "core checks execute app identity storage alert tests" \
+  'AppIdentityTests\.testMacOSStorageAlertPresentationPreservesStartupCopy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "macOS windows use shared app identity presentation" \

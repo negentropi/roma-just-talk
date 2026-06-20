@@ -26,7 +26,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 
 `VoiceInkCore` currently owns these cross-platform modules:
 
-- app identity for shared display names, compact macOS title, sidebar subtitle, stable bundle identifier, CloudKit container identifier, iOS App Group identifier, iOS record deep-link identifiers, iOS recording Darwin notification names, bundle-scoped error domains, macOS app diagnostics, queue/window identifiers, local Whisper logging subsystem, macOS Application Support subdirectory, iOS onboarding titles, and macOS storage-failure copy
+- app identity for shared display names, compact macOS title, sidebar subtitle, stable bundle identifier, CloudKit container identifier, iOS App Group identifier, iOS record deep-link identifiers, iOS recording Darwin notification names, bundle-scoped error domains, macOS app diagnostics, queue/window identifiers, local Whisper logging subsystem, macOS Application Support subdirectory, iOS onboarding titles, and macOS storage alert copy/buttons
 - prompt templates and prompt text
 - predefined prompt IDs, labels, prompt text, icons, descriptions, and system-instruction flags
 - custom prompt system-instruction wrapping

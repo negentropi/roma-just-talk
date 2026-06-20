@@ -1,5 +1,11 @@
 import Foundation
 
+public struct VoiceInkMacOSStorageAlertPresentation: Equatable, Sendable {
+    public let title: String
+    public let message: String
+    public let buttonTitle: String
+}
+
 public enum VoiceInkAppIdentity {
     public static let bundleIdentifier = "com.prakashjoshipax.VoiceInk"
     public static let loggingSubsystem = "com.prakashjoshipax.voiceink"
@@ -43,6 +49,20 @@ public enum VoiceInkAppIdentity {
 
     public static var storageFailureMessage: String {
         "\(compactDisplayName) cannot initialize its storage system. The app cannot continue.\n\nPlease try reinstalling the app or contact support if the issue persists."
+    }
+
+    public static let storageFallbackWarningPresentation = VoiceInkMacOSStorageAlertPresentation(
+        title: "Storage Warning",
+        message: "VoiceInk couldn't access its storage location. Your transcriptions will not be saved between sessions.",
+        buttonTitle: "OK"
+    )
+
+    public static var storageFailurePresentation: VoiceInkMacOSStorageAlertPresentation {
+        VoiceInkMacOSStorageAlertPresentation(
+            title: "Critical Storage Error",
+            message: storageFailureMessage,
+            buttonTitle: "Quit"
+        )
     }
 
     public static func macOSApplicationSupportDirectory(in applicationSupportDirectory: URL) -> URL {

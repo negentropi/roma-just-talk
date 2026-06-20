@@ -11,6 +11,7 @@ struct VoiceInkCoreCheckRunner {
     static func main() async {
         let checks: [VoiceInkCoreCheck] = [
             VoiceInkCoreCheck(name: "AppIdentityTests.testAppIdentityPreservesSharedVisibleNames", run: { AppIdentityTests().testAppIdentityPreservesSharedVisibleNames() }),
+            VoiceInkCoreCheck(name: "AppIdentityTests.testMacOSStorageAlertPresentationPreservesStartupCopy", run: { AppIdentityTests().testMacOSStorageAlertPresentationPreservesStartupCopy() }),
             VoiceInkCoreCheck(name: "AppIdentityTests.testMacOSApplicationSupportDirectoryUsesBundleIdentifier", run: { AppIdentityTests().testMacOSApplicationSupportDirectoryUsesBundleIdentifier() }),
             VoiceInkCoreCheck(name: "AppIdentityTests.testBundleScopedErrorDomainUsesBundleIdentifier", run: { AppIdentityTests().testBundleScopedErrorDomainUsesBundleIdentifier() }),
             VoiceInkCoreCheck(name: "AppDataResetTests.testIOSResetFilePlanPreservesExistingDirectoryPolicy", run: { AppDataResetTests().testIOSResetFilePlanPreservesExistingDirectoryPolicy() }),

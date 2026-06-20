@@ -30,6 +30,25 @@ final class AppIdentityTests: XCTestCase {
         )
     }
 
+    func testMacOSStorageAlertPresentationPreservesStartupCopy() {
+        XCTAssertEqual(
+            VoiceInkAppIdentity.storageFallbackWarningPresentation,
+            VoiceInkMacOSStorageAlertPresentation(
+                title: "Storage Warning",
+                message: "VoiceInk couldn't access its storage location. Your transcriptions will not be saved between sessions.",
+                buttonTitle: "OK"
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkAppIdentity.storageFailurePresentation,
+            VoiceInkMacOSStorageAlertPresentation(
+                title: "Critical Storage Error",
+                message: "roma-just-talk cannot initialize its storage system. The app cannot continue.\n\nPlease try reinstalling the app or contact support if the issue persists.",
+                buttonTitle: "Quit"
+            )
+        )
+    }
+
     func testMacOSApplicationSupportDirectoryUsesBundleIdentifier() {
         let baseDirectory = URL(fileURLWithPath: "/tmp/Application Support", isDirectory: true)
 

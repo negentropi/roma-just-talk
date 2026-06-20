@@ -1,7 +1,24 @@
 import Foundation
 
+public struct VoiceInkMacOSLocalWhisperPromptSettingsPresentation: Equatable, Sendable {
+    public let sectionTitle: String
+    public let helpText: String
+    public let learnMoreURLString: String
+    public let saveButtonTitle: String
+    public let editButtonTitle: String
+
+    public static let macOS = VoiceInkMacOSLocalWhisperPromptSettingsPresentation(
+        sectionTitle: "Output Format",
+        helpText: "Only supported for local Whisper models. Unlike GPT, Voice Models(whisper) follows the style of your prompt rather than instructions. Use examples of your desired output format instead of commands.",
+        learnMoreURLString: "https://cookbook.openai.com/examples/whisper_prompting_guide#comparison-with-gpt-prompting",
+        saveButtonTitle: "Save",
+        editButtonTitle: "Edit"
+    )
+}
+
 public enum VoiceInkLocalWhisperPromptCatalog {
     public static let customLanguagePromptsKey = "CustomLanguagePrompts"
+    public static let macOSSettingsPresentation = VoiceInkMacOSLocalWhisperPromptSettingsPresentation.macOS
 
     public static func promptForSelectedLanguage(
         from defaults: UserDefaults = .standard,

@@ -6,6 +6,22 @@ final class LocalWhisperPromptCatalogTests: XCTestCase {
         XCTAssertEqual(VoiceInkLocalWhisperPromptCatalog.customLanguagePromptsKey, "CustomLanguagePrompts")
     }
 
+    func testMacOSPromptSettingsPresentationPreservesExistingCopy() {
+        let presentation = VoiceInkLocalWhisperPromptCatalog.macOSSettingsPresentation
+
+        XCTAssertEqual(presentation.sectionTitle, "Output Format")
+        XCTAssertEqual(
+            presentation.helpText,
+            "Only supported for local Whisper models. Unlike GPT, Voice Models(whisper) follows the style of your prompt rather than instructions. Use examples of your desired output format instead of commands."
+        )
+        XCTAssertEqual(
+            presentation.learnMoreURLString,
+            "https://cookbook.openai.com/examples/whisper_prompting_guide#comparison-with-gpt-prompting"
+        )
+        XCTAssertEqual(presentation.saveButtonTitle, "Save")
+        XCTAssertEqual(presentation.editButtonTitle, "Edit")
+    }
+
     func testDefaultPromptsPreserveExistingMacOSLanguageSeeds() {
         XCTAssertEqual(
             VoiceInkLocalWhisperPromptCatalog.defaultPrompt(for: "en"),

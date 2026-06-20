@@ -4188,9 +4188,24 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/LocalWhisperPromptCatalog.swift
 
 require_pattern \
+  "shared local Whisper prompt settings presentation lives in VoiceInkCore" \
+  'VoiceInkMacOSLocalWhisperPromptSettingsPresentation|macOSSettingsPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/LocalWhisperPromptCatalog.swift
+
+require_pattern \
   "macOS local Whisper prompt persists through shared prompt preference" \
   'VoiceInkTranscriptionPromptPreference\.saveLocalWhisperPromptForSelectedLanguage\(\)' \
   VoiceInk/Transcription/Whisper/WhisperPrompt.swift
+
+require_pattern \
+  "macOS model settings uses shared local Whisper prompt presentation" \
+  'localWhisperPromptPresentation\.(sectionTitle|helpText|learnMoreURLString|saveButtonTitle|editButtonTitle)' \
+  VoiceInk/Views/ModelSettingsView.swift
+
+require_pattern \
+  "migration checklist tracks shared local Whisper prompt settings presentation" \
+  'macOS local Whisper output-format settings labels/help/actions route through `VoiceInkLocalWhisperPromptCatalog`' \
+  docs/ios-single-repo-migration.md
 
 require_pattern \
   "shared Power Mode config uses shared macOS selected-language fallback" \
@@ -5083,6 +5098,11 @@ reject_pattern \
   'selectedLanguage(: String)? = "en"' \
   VoiceInk/Views/AI\ Models/LanguageSelectionView.swift \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift \
+  VoiceInk/Views/ModelSettingsView.swift
+
+reject_pattern \
+  "macOS model settings avoids shell-only local Whisper prompt copy" \
+  '"(Output Format|Only supported for local Whisper models\. Unlike GPT, Voice Models\(whisper\) follows the style of your prompt rather than instructions\. Use examples of your desired output format instead of commands\.|https://cookbook\.openai\.com/examples/whisper_prompting_guide#comparison-with-gpt-prompting|Save|Edit)"' \
   VoiceInk/Views/ModelSettingsView.swift
 
 reject_pattern \

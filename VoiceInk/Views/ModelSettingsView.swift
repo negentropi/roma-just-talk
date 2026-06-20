@@ -22,6 +22,7 @@ struct ModelSettingsView: View {
     private let advancedSettingsPresentation = VoiceInkMacOSAdvancedTranscriptionSettingsPresentation.macOS
     private let appendTrailingSpacePresentation = VoiceInkAppendTrailingSpacePreference.macOSSettingsPresentation
     private let cleanupPresentation = VoiceInkTranscriptionCleanupPresentation.macOS
+    private let localWhisperPromptPresentation = VoiceInkLocalWhisperPromptCatalog.macOSSettingsPresentation
 
     private var punctuationCleanupMode: Binding<PunctuationCleanupMode> {
         Binding(
@@ -46,7 +47,7 @@ struct ModelSettingsView: View {
                             .fixedSize(horizontal: false, vertical: true)
                             .scrollContentBackground(.hidden)
 
-                        Button("Save") {
+                        Button(localWhisperPromptPresentation.saveButtonTitle) {
                             whisperPrompt.setCustomPrompt(customPrompt, for: selectedLanguage)
                             isEditing = false
                         }
@@ -56,7 +57,7 @@ struct ModelSettingsView: View {
                             .foregroundColor(.secondary)
                             .frame(maxWidth: .infinity, alignment: .leading)
 
-                        Button("Edit") {
+                        Button(localWhisperPromptPresentation.editButtonTitle) {
                             customPrompt = whisperPrompt.getLanguagePrompt(for: selectedLanguage)
                             isEditing = true
                         }
@@ -64,10 +65,10 @@ struct ModelSettingsView: View {
                 }
             } header: {
                 HStack(spacing: 4) {
-                    Text("Output Format")
+                    Text(localWhisperPromptPresentation.sectionTitle)
                     InfoTip(
-                        "Only supported for local Whisper models. Unlike GPT, Voice Models(whisper) follows the style of your prompt rather than instructions. Use examples of your desired output format instead of commands.",
-                        learnMoreURL: "https://cookbook.openai.com/examples/whisper_prompting_guide#comparison-with-gpt-prompting"
+                        localWhisperPromptPresentation.helpText,
+                        learnMoreURL: localWhisperPromptPresentation.learnMoreURLString
                     )
                 }
             }

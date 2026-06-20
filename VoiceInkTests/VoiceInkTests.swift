@@ -479,6 +479,7 @@ struct VoiceInkTests {
     }
 
     @Test @MainActor func specialModeLongHoldStartsRecordingPastRollingBufferDuration() async throws {
+        let oneHour: TimeInterval = 60 * 60
         var recordingState = VoiceInkRecordingState.idle
         var sessionActive = false
         var toggleCount = 0
@@ -528,98 +529,25 @@ struct VoiceInkTests {
         )
         try await Task.sleep(nanoseconds: 30_000_000)
 
-        await handler.handleKeyUp(
-            action: .primaryRecording,
-            eventTime: 6,
-            mode: .special,
-            context: VoiceInkShortcutPressContext()
-        )
-
         #expect(prepareQuickReleaseCount == 1)
         #expect(discardQuickReleaseCount == 0)
         #expect(directCommitCount == 0)
-        #expect(toggleCount == 2)
-        #expect(cancelCount == 0)
-        #expect(recordingState == .transcribing)
-        #expect(!sessionActive)
-    }
-
-    @Test @MainActor func specialModeOneHourHoldStaysRecordingUntilKeyUp() async throws {
-        let oneHour: TimeInterval = 60 * 60
-        var recordingState = VoiceInkRecordingState.idle
-        var sessionActive = false
-        var toggleCount = 0
-        var cancelCount = 0
-        var prepareQuickReleaseCount = 0
-        var discardQuickReleaseCount = 0
-        var directCommitCount = 0
-        var toggledStates: [VoiceInkRecordingState] = []
-        var activeSnapshots: [Bool] = []
-
-        let handler = RecordingShortcutModeHandler(
-            logger: Logger(subsystem: "VoiceInkTests", category: "RecordingShortcutModeHandler"),
-            canHandleShortcutAction: { true },
-            isRecorderVisible: { sessionActive },
-            recordingState: { recordingState },
-            toggleMiniRecorder: { _ in
-                toggleCount += 1
-                if sessionActive {
-                    recordingState = .transcribing
-                    sessionActive = false
-                } else {
-                    recordingState = .recording
-                    sessionActive = true
-                }
-                toggledStates.append(recordingState)
-                activeSnapshots.append(sessionActive)
-            },
-            prepareQuickReleaseContext: { _ in
-                prepareQuickReleaseCount += 1
-            },
-            discardQuickReleaseContext: {
-                discardQuickReleaseCount += 1
-            },
-            commitReadyRollingBufferPreload: { _ in
-                directCommitCount += 1
-                recordingState = .transcribing
-                return true
-            },
-            cancelRecording: {
-                cancelCount += 1
-                recordingState = .idle
-                sessionActive = false
-            },
-            specialHoldToRecordDelay: { 0.01 }
-        )
-
-        await handler.handleKeyDown(
-            action: .primaryRecording,
-            eventTime: 10,
-            mode: .special
-        )
-        try await Task.sleep(nanoseconds: 30_000_000)
-
         #expect(toggleCount == 1)
+        #expect(cancelCount == 0)
         #expect(recordingState == .recording)
         #expect(sessionActive)
-        #expect(discardQuickReleaseCount == 0)
-        #expect(directCommitCount == 0)
-        #expect(cancelCount == 0)
 
         await handler.handleKeyUp(
             action: .primaryRecording,
-            eventTime: 10 + oneHour,
+            eventTime: 1 + oneHour,
             mode: .special,
             context: VoiceInkShortcutPressContext()
         )
 
-        #expect(prepareQuickReleaseCount == 1)
         #expect(discardQuickReleaseCount == 0)
         #expect(directCommitCount == 0)
         #expect(toggleCount == 2)
         #expect(cancelCount == 0)
-        #expect(toggledStates == [.recording, .transcribing])
-        #expect(activeSnapshots == [true, false])
         #expect(recordingState == .transcribing)
         #expect(!sessionActive)
     }

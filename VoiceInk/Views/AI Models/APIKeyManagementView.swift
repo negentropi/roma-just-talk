@@ -38,6 +38,16 @@ struct APIKeyManagementView: View {
         aiService.selectedProvider.textEnhancementSettingsSurface
     }
 
+    private var connectionStatusPresentation: VoiceInkAIEnhancementConnectionStatusPresentation? {
+        providerSettingsPresentation.connectionStatus(
+            surface: selectedProviderSettingsSurface,
+            isAPIKeyValid: aiService.isAPIKeyValid,
+            isCheckingOllama: isCheckingOllama,
+            hasOllamaModels: !ollamaModels.isEmpty
+        )
+    }
+
+    private let providerSettingsPresentation = VoiceInkAIEnhancementProviderSettingsPresentation.macOS
     private let localCLIPresentation = VoiceInkLocalCLIPreference.macOSSettingsPresentation
     
     var body: some View {
@@ -50,32 +60,20 @@ struct APIKeyManagementView: View {
                 }
                 .pickerStyle(.automatic)
                 .tint(.blue)
-                
-                if aiService.isAPIKeyValid && selectedProviderSettingsSurface != .ollama {
+
+                if let connectionStatusPresentation {
                     Spacer()
-                    Circle()
-                        .fill(Color.green)
-                        .frame(width: 8, height: 8)
-                    Text("Connected")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                } else if selectedProviderSettingsSurface == .ollama {
-                    Spacer()
-                    if isCheckingOllama {
+
+                    switch connectionStatusPresentation {
+                    case .checking:
                         ProgressView()
                             .controlSize(.small)
-                    } else if !ollamaModels.isEmpty {
+
+                    case .status(let text, let tone):
                         Circle()
-                            .fill(Color.green)
+                            .fill(tone.macOSStatusColor)
                             .frame(width: 8, height: 8)
-                        Text("Connected")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                    } else {
-                        Circle()
-                            .fill(Color.red)
-                            .frame(width: 8, height: 8)
-                        Text("Disconnected")
+                        Text(text)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                     }
@@ -385,4 +383,15 @@ struct APIKeyManagementView: View {
         }
     }
     
+}
+
+private extension VoiceInkAIEnhancementConnectionStatusTone {
+    var macOSStatusColor: Color {
+        switch self {
+        case .connected:
+            return .green
+        case .disconnected:
+            return .red
+        }
+    }
 }

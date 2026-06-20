@@ -295,6 +295,66 @@ final class AIProviderCatalogTests: XCTestCase {
         )
     }
 
+    func testMacOSAIEnhancementConnectionStatusPresentationIsShared() {
+        let presentation = VoiceInkAIEnhancementProviderSettingsPresentation.macOS
+
+        XCTAssertEqual(presentation.connectedText, "Connected")
+        XCTAssertEqual(presentation.disconnectedText, "Disconnected")
+        XCTAssertEqual(
+            presentation.connectionStatus(
+                surface: .apiKey,
+                isAPIKeyValid: true,
+                isCheckingOllama: false,
+                hasOllamaModels: false
+            ),
+            .status(text: "Connected", tone: .connected)
+        )
+        XCTAssertNil(
+            presentation.connectionStatus(
+                surface: .apiKey,
+                isAPIKeyValid: false,
+                isCheckingOllama: false,
+                hasOllamaModels: false
+            )
+        )
+        XCTAssertEqual(
+            presentation.connectionStatus(
+                surface: .ollama,
+                isAPIKeyValid: false,
+                isCheckingOllama: true,
+                hasOllamaModels: false
+            ),
+            .checking
+        )
+        XCTAssertEqual(
+            presentation.connectionStatus(
+                surface: .ollama,
+                isAPIKeyValid: false,
+                isCheckingOllama: false,
+                hasOllamaModels: true
+            ),
+            .status(text: "Connected", tone: .connected)
+        )
+        XCTAssertEqual(
+            presentation.connectionStatus(
+                surface: .ollama,
+                isAPIKeyValid: false,
+                isCheckingOllama: false,
+                hasOllamaModels: false
+            ),
+            .status(text: "Disconnected", tone: .disconnected)
+        )
+        XCTAssertEqual(
+            presentation.connectionStatus(
+                surface: .localCLI,
+                isAPIKeyValid: true,
+                isCheckingOllama: false,
+                hasOllamaModels: false
+            ),
+            .status(text: "Connected", tone: .connected)
+        )
+    }
+
     func testMacOSAIEnhancementModelSelectionPreservesAvailableSelections() {
         XCTAssertEqual(
             VoiceInkAIEnhancementProviderKind.groq.selectedTextEnhancementModel(

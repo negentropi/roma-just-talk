@@ -2971,6 +2971,21 @@ require_pattern \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
 
 require_pattern \
+  "shared AI enhancement provider connection status presentation lives in VoiceInkCore" \
+  'VoiceInkAIEnhancementProviderSettingsPresentation|VoiceInkAIEnhancementConnectionStatusPresentation|connectionStatus\(' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+require_pattern \
+  "macOS AI settings provider connection status uses shared presentation" \
+  'connectionStatusPresentation|VoiceInkAIEnhancementProviderSettingsPresentation\.macOS|tone\.macOSStatusColor' \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+
+reject_pattern \
+  "macOS AI settings avoid duplicate provider connection status copy and branching" \
+  '"(Connected|Disconnected)"|selectedProviderSettingsSurface != \.ollama|else if !ollamaModels\.isEmpty' \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+
+require_pattern \
   "macOS Power Mode model refresh display uses shared policy" \
   'supportsUserInitiatedTextEnhancementModelRefresh' \
   VoiceInk/PowerMode/PowerModeConfigView.swift \

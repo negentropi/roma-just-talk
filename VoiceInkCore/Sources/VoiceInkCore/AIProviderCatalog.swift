@@ -28,6 +28,48 @@ public enum VoiceInkAIEnhancementSettingsSurface: Sendable, Equatable {
     case custom
 }
 
+public enum VoiceInkAIEnhancementConnectionStatusTone: Sendable, Equatable {
+    case connected
+    case disconnected
+}
+
+public enum VoiceInkAIEnhancementConnectionStatusPresentation: Sendable, Equatable {
+    case checking
+    case status(text: String, tone: VoiceInkAIEnhancementConnectionStatusTone)
+}
+
+public struct VoiceInkAIEnhancementProviderSettingsPresentation: Sendable, Equatable {
+    public let connectedText: String
+    public let disconnectedText: String
+
+    public static let macOS = VoiceInkAIEnhancementProviderSettingsPresentation(
+        connectedText: "Connected",
+        disconnectedText: "Disconnected"
+    )
+
+    public func connectionStatus(
+        surface: VoiceInkAIEnhancementSettingsSurface,
+        isAPIKeyValid: Bool,
+        isCheckingOllama: Bool,
+        hasOllamaModels: Bool
+    ) -> VoiceInkAIEnhancementConnectionStatusPresentation? {
+        switch surface {
+        case .ollama:
+            if isCheckingOllama {
+                return .checking
+            }
+
+            return hasOllamaModels
+                ? .status(text: connectedText, tone: .connected)
+                : .status(text: disconnectedText, tone: .disconnected)
+        case .apiKey, .localCLI, .custom:
+            return isAPIKeyValid
+                ? .status(text: connectedText, tone: .connected)
+                : nil
+        }
+    }
+}
+
 public struct VoiceInkAIEnhancementAPIKeyDraft: Equatable, Sendable {
     private let provider: VoiceInkAIEnhancementProviderKind
     private let providerKeyDraft: VoiceInkProviderAPIKeyDraft

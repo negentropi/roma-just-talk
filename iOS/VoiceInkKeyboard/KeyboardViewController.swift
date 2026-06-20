@@ -216,14 +216,16 @@ class KeyboardViewController: KeyboardInputViewController {
             backgroundColor: .systemOrange
         )
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + VoiceInkKeyboardRecordingTiming.openAppFallbackResetDelay) {
             self.configureButtonForIdleState()
         }
     }
     
     private func setupRecordingStatusMonitoring() {
-        // Monitor recording status every 0.5 seconds
-        recordingStatusTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
+        recordingStatusTimer = Timer.scheduledTimer(
+            withTimeInterval: VoiceInkKeyboardRecordingTiming.recordingStatusPollingInterval,
+            repeats: true
+        ) { [weak self] _ in
             self?.updateButtonAppearanceBasedOnState()
         }
         

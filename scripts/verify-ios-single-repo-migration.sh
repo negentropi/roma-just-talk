@@ -212,6 +212,7 @@ require_file iOS/Shared/AppGroupCoordinator.swift
 require_file iOS/Shared/VoiceInkAppDeepLink.swift
 require_file iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
 require_file iOS/Shared/VoiceInkKeyboardRecordingButtonPresentation.swift
+require_file iOS/Shared/VoiceInkKeyboardRecordingTiming.swift
 require_file iOS/VoiceInk-ios/Transcription.swift
 require_file docs/ios-privacy-policy.md
 require_file iOS/VoiceInk-ios/PrivacyInfo.xcprivacy
@@ -5915,14 +5916,50 @@ require_pattern \
   iOS/Shared/VoiceInkKeyboardRecordingButtonPresentation.swift
 
 require_pattern \
+  "iOS shared keyboard timing module exists" \
+  'VoiceInkKeyboardRecordingTiming' \
+  iOS/Shared/VoiceInkKeyboardRecordingTiming.swift
+
+require_pattern \
+  "iOS shared keyboard timing owns app launch recording delay" \
+  'appLaunchRecordingStartDelay' \
+  iOS/Shared/VoiceInkKeyboardRecordingTiming.swift
+
+require_pattern \
+  "iOS shared keyboard timing owns recording status polling interval" \
+  'recordingStatusPollingInterval' \
+  iOS/Shared/VoiceInkKeyboardRecordingTiming.swift
+
+require_pattern \
+  "iOS shared keyboard timing owns fallback reset delay" \
+  'openAppFallbackResetDelay' \
+  iOS/Shared/VoiceInkKeyboardRecordingTiming.swift
+
+require_pattern \
   "iOS keyboard controller uses shared button presentation" \
   'VoiceInkKeyboardRecordingButtonPresentation\.(idle|recording|openAppFallback|current)' \
   iOS/VoiceInkKeyboard/KeyboardViewController.swift
+
+require_pattern \
+  "iOS keyboard controller uses shared recording timing" \
+  'VoiceInkKeyboardRecordingTiming\.(recordingStatusPollingInterval|openAppFallbackResetDelay)' \
+  iOS/VoiceInkKeyboard/KeyboardViewController.swift
+
+require_pattern \
+  "iOS app deep-link recording uses shared keyboard timing" \
+  'VoiceInkKeyboardRecordingTiming\.appLaunchRecordingStartDelay' \
+  iOS/VoiceInk-ios/VoiceInk_iosApp.swift
 
 reject_pattern \
   "iOS keyboard controller avoids shell-owned button copy" \
   'setTitle\("( Record| Stop| Open roma just talk)"|UIImage\(systemName: "(mic\.fill|stop\.fill|app)"' \
   iOS/VoiceInkKeyboard/KeyboardViewController.swift
+
+reject_pattern \
+  "iOS keyboard/app recording coordination avoids raw timing literals" \
+  'withTimeInterval: +0\.5|deadline: \.now\(\) \+ (0\.5|2\.0)' \
+  iOS/VoiceInkKeyboard/KeyboardViewController.swift \
+  iOS/VoiceInk-ios/VoiceInk_iosApp.swift
 
 reject_pattern \
   "iOS recording manager does not redeclare keyboard stop notification" \

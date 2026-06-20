@@ -91,7 +91,9 @@ struct VoiceInk_iosApp: App {
 
     private func startRecordingAfterLaunchDelay() {
         // Allow the opened scene to settle before presenting recording permission/UI.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        DispatchQueue.main.asyncAfter(
+            deadline: .now() + VoiceInkKeyboardRecordingTiming.appLaunchRecordingStartDelay
+        ) {
             self.recordingManager.startRecordingFlow()
         }
     }

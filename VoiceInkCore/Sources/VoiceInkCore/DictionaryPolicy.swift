@@ -1,11 +1,26 @@
 import Foundation
 
-public struct VoiceInkVocabularyInsertPlan: Equatable, Sendable {
+public struct VoiceInkVocabularySubmissionPlan: Equatable, Sendable {
     public let wordsToInsert: [String]
-    public let errorMessage: String?
+    public let draftAfterSubmit: String
+    public let alertPresentation: VoiceInkDictionaryAlertPresentation?
 
     public var shouldInsert: Bool {
         !wordsToInsert.isEmpty
+    }
+
+    public var shouldComplete: Bool {
+        alertPresentation == nil && draftAfterSubmit.isEmpty
+    }
+
+    public init(
+        wordsToInsert: [String],
+        draftAfterSubmit: String,
+        alertPresentation: VoiceInkDictionaryAlertPresentation?
+    ) {
+        self.wordsToInsert = wordsToInsert
+        self.draftAfterSubmit = draftAfterSubmit
+        self.alertPresentation = alertPresentation
     }
 }
 
@@ -491,27 +506,36 @@ public enum VoiceInkDictionaryPolicy {
         !tokens(from: input).isEmpty
     }
 
-    public static func vocabularyInsertPlan(
+    public static func vocabularySubmissionPlan(
         input: String,
         existingWords: [String]
-    ) -> VoiceInkVocabularyInsertPlan {
+    ) -> VoiceInkVocabularySubmissionPlan {
         let words = tokens(from: input)
         guard !words.isEmpty else {
-            return VoiceInkVocabularyInsertPlan(wordsToInsert: [], errorMessage: nil)
+            return VoiceInkVocabularySubmissionPlan(
+                wordsToInsert: [],
+                draftAfterSubmit: input,
+                alertPresentation: nil
+            )
         }
 
         let existingKeys = Set(existingWords.map { $0.lowercased() })
 
         if words.count == 1, let word = words.first, existingKeys.contains(word.lowercased()) {
-            return VoiceInkVocabularyInsertPlan(
+            return VoiceInkVocabularySubmissionPlan(
                 wordsToInsert: [],
-                errorMessage: "'\(word)' is already in the vocabulary"
+                draftAfterSubmit: input,
+                alertPresentation: .vocabulary(message: "'\(word)' is already in the vocabulary")
             )
         }
 
         let wordsToInsert = vocabularyWordsToInsert(words, existingWords: existingWords)
 
-        return VoiceInkVocabularyInsertPlan(wordsToInsert: wordsToInsert, errorMessage: nil)
+        return VoiceInkVocabularySubmissionPlan(
+            wordsToInsert: wordsToInsert,
+            draftAfterSubmit: "",
+            alertPresentation: nil
+        )
     }
 
     public static func vocabularyWordsToInsert(

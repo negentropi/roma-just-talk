@@ -5,24 +5,18 @@ enum DictionaryService {
 
     // MARK: - Vocabulary
 
-    /// Adds one or more comma-separated words to vocabulary.
-    /// Returns an error message string if something went wrong, nil on success.
     @discardableResult
-    static func addVocabularyWords(
+    static func submitVocabularyDraft(
         _ input: String,
         existing: [VocabularyWord],
         context: ModelContext
-    ) -> String? {
-        let plan = VoiceInkDictionaryPolicy.vocabularyInsertPlan(
+    ) -> VoiceInkVocabularySubmissionPlan {
+        let plan = VoiceInkDictionaryPolicy.vocabularySubmissionPlan(
             input: input,
             existingWords: existing.map(\.word)
         )
 
-        if let errorMessage = plan.errorMessage {
-            return errorMessage
-        }
-
-        guard plan.shouldInsert else { return nil }
+        guard plan.shouldInsert else { return plan }
 
         var errors = [String]()
         for word in plan.wordsToInsert {
@@ -30,7 +24,14 @@ enum DictionaryService {
                 errors.append(error)
             }
         }
-        return errors.isEmpty ? nil : errors.joined(separator: "; ")
+
+        guard !errors.isEmpty else { return plan }
+
+        return VoiceInkVocabularySubmissionPlan(
+            wordsToInsert: plan.wordsToInsert,
+            draftAfterSubmit: input,
+            alertPresentation: .vocabulary(message: errors.joined(separator: "; "))
+        )
     }
 
     @discardableResult

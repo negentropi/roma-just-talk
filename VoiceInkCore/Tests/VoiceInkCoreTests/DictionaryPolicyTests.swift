@@ -288,34 +288,57 @@ final class DictionaryPolicyTests: XCTestCase {
         XCTAssertTrue(VoiceInkDictionaryPolicy.hasVocabularyDraft("Voice Ink, "))
     }
 
-    func testVocabularyPlanReturnsNoOpForBlankInput() {
-        let plan = VoiceInkDictionaryPolicy.vocabularyInsertPlan(
+    func testVocabularySubmissionPlanKeepsBlankDraftWithoutAlert() {
+        let plan = VoiceInkDictionaryPolicy.vocabularySubmissionPlan(
             input: " , \n ",
             existingWords: []
         )
 
         XCTAssertFalse(plan.shouldInsert)
-        XCTAssertNil(plan.errorMessage)
+        XCTAssertFalse(plan.shouldComplete)
+        XCTAssertEqual(plan.draftAfterSubmit, " , \n ")
+        XCTAssertNil(plan.alertPresentation)
     }
 
-    func testVocabularyPlanRejectsSingleDuplicateWithExistingMessage() {
-        let plan = VoiceInkDictionaryPolicy.vocabularyInsertPlan(
+    func testVocabularySubmissionPlanRejectsSingleDuplicateWithSharedAlert() {
+        let plan = VoiceInkDictionaryPolicy.vocabularySubmissionPlan(
             input: "Voice Ink",
             existingWords: ["voice ink"]
         )
 
         XCTAssertEqual(plan.wordsToInsert, [])
-        XCTAssertEqual(plan.errorMessage, "'Voice Ink' is already in the vocabulary")
+        XCTAssertFalse(plan.shouldComplete)
+        XCTAssertEqual(plan.draftAfterSubmit, "Voice Ink")
+        XCTAssertEqual(
+            plan.alertPresentation,
+            .vocabulary(message: "'Voice Ink' is already in the vocabulary")
+        )
     }
 
-    func testVocabularyPlanSkipsDuplicatesForMultiAdd() {
-        let plan = VoiceInkDictionaryPolicy.vocabularyInsertPlan(
+    func testVocabularySubmissionPlanSkipsDuplicatesAndClearsSubmittedDraft() {
+        let plan = VoiceInkDictionaryPolicy.vocabularySubmissionPlan(
             input: "Voice Ink, Roma, roma, Cursor",
             existingWords: ["voice ink"]
         )
 
         XCTAssertEqual(plan.wordsToInsert, ["Roma", "Cursor"])
-        XCTAssertNil(plan.errorMessage)
+        XCTAssertTrue(plan.shouldInsert)
+        XCTAssertTrue(plan.shouldComplete)
+        XCTAssertEqual(plan.draftAfterSubmit, "")
+        XCTAssertNil(plan.alertPresentation)
+    }
+
+    func testVocabularySubmissionPlanClearsAllDuplicateMultiAddAsCompletedNoOp() {
+        let plan = VoiceInkDictionaryPolicy.vocabularySubmissionPlan(
+            input: "Voice Ink, voice ink",
+            existingWords: ["voice ink"]
+        )
+
+        XCTAssertEqual(plan.wordsToInsert, [])
+        XCTAssertFalse(plan.shouldInsert)
+        XCTAssertTrue(plan.shouldComplete)
+        XCTAssertEqual(plan.draftAfterSubmit, "")
+        XCTAssertNil(plan.alertPresentation)
     }
 
     func testVocabularyWordsToInsertTrimsAndSkipsExistingAndBatchDuplicates() {

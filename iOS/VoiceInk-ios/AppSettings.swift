@@ -233,22 +233,18 @@ final class AppSettings: ObservableObject {
     }
 
     @discardableResult
-    func addCustomVocabularyTerms(_ input: String) -> String? {
-        let plan = VoiceInkDictionaryPolicy.vocabularyInsertPlan(
+    func submitCustomVocabularyDraft(_ input: String) -> VoiceInkVocabularySubmissionPlan {
+        let plan = VoiceInkDictionaryPolicy.vocabularySubmissionPlan(
             input: input,
             existingWords: customVocabularyTerms
         )
 
-        if let errorMessage = plan.errorMessage {
-            return errorMessage
-        }
-
         guard plan.shouldInsert else {
-            return nil
+            return plan
         }
 
         customVocabularyTerms.append(contentsOf: plan.wordsToInsert)
-        return nil
+        return plan
     }
 
     func removeCustomVocabularyTerms(at offsets: IndexSet) {

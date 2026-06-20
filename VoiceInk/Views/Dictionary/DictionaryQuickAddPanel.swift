@@ -331,11 +331,18 @@ struct DictionaryQuickAddView: View {
 
     private func submitVocabulary() {
         guard VoiceInkDictionaryPolicy.hasVocabularyDraft(wordInput) else { return }
-        if let error = DictionaryService.addVocabularyWords(wordInput, existing: Array(vocabularyWords), context: modelContext) {
-            errorMessage = error
+        let plan = DictionaryService.submitVocabularyDraft(
+            wordInput,
+            existing: Array(vocabularyWords),
+            context: modelContext
+        )
+        if let alertPresentation = plan.alertPresentation {
+            errorMessage = alertPresentation.message
             return
         }
-        onDismiss()
+        if plan.shouldComplete {
+            onDismiss()
+        }
     }
 
     private func submitReplacement() {

@@ -233,14 +233,9 @@ struct SettingsView: View {
     }
 
     private func addCustomVocabularyTerm() {
-        guard canAddCustomVocabularyTerm else { return }
-
-        if let error = settings.addCustomVocabularyTerms(newCustomVocabularyTerm) {
-            dictionaryAlert = .vocabulary(message: error)
-            return
-        }
-
-        newCustomVocabularyTerm = ""
+        let plan = settings.submitCustomVocabularyDraft(newCustomVocabularyTerm)
+        newCustomVocabularyTerm = plan.draftAfterSubmit
+        dictionaryAlert = plan.alertPresentation
     }
 
     private func addWordReplacement() {

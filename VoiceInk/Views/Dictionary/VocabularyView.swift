@@ -109,12 +109,13 @@ struct VocabularyView: View {
     }
     
     private func addWords() {
-        guard VoiceInkDictionaryPolicy.hasVocabularyDraft(newWord) else { return }
-        if let error = DictionaryService.addVocabularyWords(newWord, existing: Array(vocabularyWords), context: modelContext) {
-            alertPresentation = .vocabulary(message: error)
-            return
-        }
-        newWord = ""
+        let plan = DictionaryService.submitVocabularyDraft(
+            newWord,
+            existing: Array(vocabularyWords),
+            context: modelContext
+        )
+        newWord = plan.draftAfterSubmit
+        alertPresentation = plan.alertPresentation
     }
 
     private func removeWord(_ word: VocabularyWord) {

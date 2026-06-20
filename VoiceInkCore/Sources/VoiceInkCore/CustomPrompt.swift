@@ -109,6 +109,22 @@ public struct VoiceInkCustomPromptDraft: Equatable, Sendable {
 }
 
 public enum VoiceInkCustomPromptPolicy {
+    public static func startupStoreState(
+        loadedPrompts: [VoiceInkCustomPrompt],
+        selectedPromptId: UUID?,
+        isEnhancementEnabled: Bool
+    ) -> VoiceInkCustomPromptStoreState {
+        let repairedSelectedPromptId = repairedSelectedPromptId(
+            selectedPromptId,
+            isEnhancementEnabled: isEnhancementEnabled,
+            prompts: loadedPrompts
+        )
+        return VoiceInkCustomPromptStoreState(
+            prompts: repairedPredefinedPrompts(in: loadedPrompts),
+            selectedPromptId: repairedSelectedPromptId
+        )
+    }
+
     public static func isSaveableCustomPromptDraft(_ draft: VoiceInkCustomPromptDraft) -> Bool {
         !draft.title.isEmpty && !draft.promptText.isEmpty
     }

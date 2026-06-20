@@ -89,17 +89,13 @@ class AIEnhancementService: ObservableObject {
         self.isEnhancementEnabled = VoiceInkAIEnhancementPreference.isEnabled()
         self.useClipboardContext = VoiceInkAIEnhancementContextPreference.useClipboardContext()
         self.useScreenCaptureContext = VoiceInkAIEnhancementContextPreference.useScreenCaptureContext()
-        self.customPrompts = VoiceInkCustomPromptStorage.loadPrompts()
-        self.selectedPromptId = VoiceInkCustomPromptStorage.loadSelectedPromptId()
-
-        let repairedPromptId = VoiceInkCustomPromptPolicy.repairedSelectedPromptId(
-            selectedPromptId,
-            isEnhancementEnabled: isEnhancementEnabled,
-            prompts: allPrompts
+        let promptStoreState = VoiceInkCustomPromptPolicy.startupStoreState(
+            loadedPrompts: VoiceInkCustomPromptStorage.loadPrompts(),
+            selectedPromptId: VoiceInkCustomPromptStorage.loadSelectedPromptId(),
+            isEnhancementEnabled: isEnhancementEnabled
         )
-        if selectedPromptId != repairedPromptId {
-            self.selectedPromptId = repairedPromptId
-        }
+        self.customPrompts = promptStoreState.prompts
+        self.selectedPromptId = promptStoreState.selectedPromptId
 
         NotificationCenter.default.addObserver(
             self,
@@ -108,7 +104,6 @@ class AIEnhancementService: ObservableObject {
             object: nil
         )
 
-        customPrompts = VoiceInkCustomPromptPolicy.repairedPredefinedPrompts(in: customPrompts)
         refreshPromptDetectionCache()
     }
 

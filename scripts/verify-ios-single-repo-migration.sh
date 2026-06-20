@@ -2476,6 +2476,46 @@ require_pattern \
   'macOS custom prompt icon catalog, prompt-card trigger summary/action symbols, grid empty/help copy and info icon, editor labels/placeholders/help/action symbols, and delete confirmation copy route through `VoiceInkCustomPromptPresentation`' \
   docs/ios-single-repo-migration.md
 
+require_pattern \
+  "shared custom prompt policy owns startup prompt-store repair" \
+  'startupStoreState' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift
+
+require_pattern \
+  "shared custom prompt policy preserves startup repair ordering" \
+  'repairedPredefinedPrompts\(in: loadedPrompts\)' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift
+
+require_pattern \
+  "macOS AI enhancement service calls shared startup prompt store state" \
+  'VoiceInkCustomPromptPolicy\.startupStoreState' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+require_pattern \
+  "macOS AI enhancement service applies shared startup prompt list" \
+  'promptStoreState\.prompts' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+require_pattern \
+  "macOS AI enhancement service applies shared startup selected prompt" \
+  'promptStoreState\.selectedPromptId' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+reject_pattern \
+  "macOS AI enhancement service avoids shell-owned startup prompt repair" \
+  'VoiceInkCustomPromptPolicy\.(repairedSelectedPromptId|repairedPredefinedPrompts)\(' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+require_pattern \
+  "core checks execute prompt startup store-state tests" \
+  'CustomPromptTests\.testCustomPromptPolicyBuildsStartupStoreStateInMacOSRepairOrder' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "migration checklist tracks shared startup prompt-store repair" \
+  'startup prompt-store repair ordering' \
+  docs/ios-single-repo-migration.md
+
 reject_pattern \
   "macOS and iOS filler-word settings use shared draft policy" \
   'VoiceInkFillerWords\.normalizedWord' \

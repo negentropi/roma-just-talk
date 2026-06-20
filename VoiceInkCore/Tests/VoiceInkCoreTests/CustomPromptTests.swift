@@ -265,6 +265,46 @@ final class CustomPromptTests: XCTestCase {
         XCTAssertNil(VoiceInkCustomPromptPolicy.repairedSelectedPromptId(nil, isEnhancementEnabled: true, prompts: []))
     }
 
+    func testCustomPromptPolicyBuildsStartupStoreStateInMacOSRepairOrder() {
+        let storedPromptId = UUID(uuidString: "00000000-0000-0000-0000-000000000104")!
+        let stalePromptId = UUID(uuidString: "00000000-0000-0000-0000-000000000105")!
+        let storedPrompt = VoiceInkCustomPrompt(
+            id: storedPromptId,
+            title: "Stored",
+            promptText: "Stored prompt"
+        )
+
+        let repairedState = VoiceInkCustomPromptPolicy.startupStoreState(
+            loadedPrompts: [storedPrompt],
+            selectedPromptId: stalePromptId,
+            isEnhancementEnabled: true
+        )
+
+        XCTAssertEqual(
+            repairedState.prompts.map(\.id),
+            [
+                storedPromptId,
+                VoiceInkPredefinedPrompts.defaultPromptId,
+                VoiceInkPredefinedPrompts.assistantPromptId
+            ]
+        )
+        XCTAssertEqual(repairedState.selectedPromptId, storedPromptId)
+
+        let emptyState = VoiceInkCustomPromptPolicy.startupStoreState(
+            loadedPrompts: [],
+            selectedPromptId: nil,
+            isEnhancementEnabled: true
+        )
+        XCTAssertEqual(
+            emptyState.prompts.map(\.id),
+            [
+                VoiceInkPredefinedPrompts.defaultPromptId,
+                VoiceInkPredefinedPrompts.assistantPromptId
+            ]
+        )
+        XCTAssertNil(emptyState.selectedPromptId)
+    }
+
     func testCustomPromptPolicyUsesAssistantPromptWithoutSystemInstructions() throws {
         let predefined = try XCTUnwrap(
             VoiceInkPredefinedPrompts.all.first { $0.id == VoiceInkPredefinedPrompts.assistantPromptId }

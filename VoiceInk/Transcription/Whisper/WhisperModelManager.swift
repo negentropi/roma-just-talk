@@ -17,7 +17,6 @@ class WhisperModelManager: ObservableObject {
     @Published var isModelLoading = false
 
     let modelsDirectory: URL
-    let whisperPrompt = WhisperPrompt()
 
     /// Called when a model is deleted, passing the model name.
     /// TranscriptionModelManager listens to clear currentTranscriptionModel if needed.

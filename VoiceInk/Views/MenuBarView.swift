@@ -13,6 +13,7 @@ struct MenuBarView: View {
     @EnvironmentObject var enhancementService: AIEnhancementService
     @EnvironmentObject var aiService: AIService
     @ObservedObject var audioDeviceManager = AudioDeviceManager.shared
+    @StateObject private var whisperPrompt = WhisperPrompt()
     @State private var launchAtLoginEnabled = LaunchAtLogin.isEnabled
     @State private var menuRefreshTrigger = false
     @State private var isHovered = false
@@ -135,7 +136,7 @@ struct MenuBarView: View {
                 }
             }
             
-            LanguageSelectionView(transcriptionModelManager: transcriptionModelManager, displayMode: .menuItem, whisperPrompt: whisperModelManager.whisperPrompt)
+            LanguageSelectionView(transcriptionModelManager: transcriptionModelManager, displayMode: .menuItem, whisperPrompt: whisperPrompt)
 
             Menu {
                 ForEach(audioDeviceManager.availableDevices, id: \.id) { device in

@@ -4393,6 +4393,11 @@ require_pattern \
   'localWhisperPromptPresentation\.(sectionTitle|helpText|learnMoreURLString|saveButtonTitle|editButtonTitle)' \
   VoiceInk/Views/ModelSettingsView.swift
 
+reject_pattern \
+  "macOS Whisper model manager avoids owning local prompt object" \
+  'WhisperPrompt\(' \
+  VoiceInk/Transcription/Whisper/WhisperModelManager.swift
+
 require_pattern \
   "migration checklist tracks shared local Whisper prompt settings presentation" \
   'macOS local Whisper output-format settings labels/help/actions route through `VoiceInkLocalWhisperPromptCatalog`' \

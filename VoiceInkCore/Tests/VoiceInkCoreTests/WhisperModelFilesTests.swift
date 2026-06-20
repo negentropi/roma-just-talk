@@ -174,9 +174,16 @@ final class WhisperModelFilesTests: XCTestCase {
     }
 
     func testModelFileFilterMatchesExistingBinOnlyPolicy() {
+        XCTAssertEqual(VoiceInkWhisperModelFiles.modelFileExtension, "bin")
         XCTAssertTrue(VoiceInkWhisperModelFiles.isModelFile(URL(fileURLWithPath: "/tmp/ggml-base.bin")))
         XCTAssertFalse(VoiceInkWhisperModelFiles.isModelFile(URL(fileURLWithPath: "/tmp/ggml-base.BIN")))
         XCTAssertFalse(VoiceInkWhisperModelFiles.isModelFile(URL(fileURLWithPath: "/tmp/ggml-base.txt")))
+    }
+
+    func testImportableModelFilePreservesMacOSCaseInsensitiveImportPolicy() {
+        XCTAssertTrue(VoiceInkWhisperModelFiles.isImportableModelFile(URL(fileURLWithPath: "/tmp/ggml-base.bin")))
+        XCTAssertTrue(VoiceInkWhisperModelFiles.isImportableModelFile(URL(fileURLWithPath: "/tmp/ggml-base.BIN")))
+        XCTAssertFalse(VoiceInkWhisperModelFiles.isImportableModelFile(URL(fileURLWithPath: "/tmp/ggml-base.txt")))
     }
 
     func testLocalModelFileUsesExistingBinOnlyNamePolicy() throws {

@@ -78,6 +78,10 @@ public enum VoiceInkModelManagementPresentation {
     public static let macOS26RequiredLabel = "macOS 26+"
     public static let noModelSelectedText = "No model selected"
     public static let importLocalModelTitle = "Import Local Model…"
+    public static let importLocalModelHelpText = "Add a custom fine-tuned whisper model to use with VoiceInk. Select the downloaded .bin file."
+    public static let importLocalModelLearnMoreURLString = "https://tryvoiceink.com/docs/custom-local-whisper-models"
+    public static let importLocalModelLearnMoreHelpText = "Read more about custom local models"
+    public static let importLocalModelPanelTitle = "Select a Whisper ggml .bin model"
     public static let customModelsLimitationText = "Only OpenAI-compatible transcription APIs are supported."
     public static let closeButtonHelp = "Close"
 
@@ -87,5 +91,17 @@ public enum VoiceInkModelManagementPresentation {
 
     public static func deleteModelAlertMessage(modelName: String) -> String {
         "Are you sure you want to delete the model '\(modelName)'?"
+    }
+
+    public static func importedLocalModelAlreadyExistsTitle(modelFilename: String) -> String {
+        "A model named \(modelFilename) already exists"
+    }
+
+    public static func importedLocalModelSuccessTitle(filename: String) -> String {
+        "Imported \(filename)"
+    }
+
+    public static func importedLocalModelFailureTitle(errorDescription: String) -> String {
+        "Failed to import model: \(errorDescription)"
     }
 }

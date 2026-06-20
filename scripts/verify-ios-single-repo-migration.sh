@@ -1471,6 +1471,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
 
 require_pattern \
+  "shared Whisper local model import extension policy lives in VoiceInkCore" \
+  'modelFileExtension|isImportableModelFile' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
+
+require_pattern \
   "shared model management filter lives in VoiceInkCore" \
   'enum VoiceInkModelManagementFilter' \
   VoiceInkCore/Sources/VoiceInkCore/ModelManagementPresentation.swift
@@ -1482,7 +1487,7 @@ require_pattern \
 
 require_pattern \
   "shared model management copy presentation lives in VoiceInkCore" \
-  'enum VoiceInkModelManagementPresentation|downloadButtonTitle|editModelButtonTitle|deleteModelButtonTitle|deleteButtonTitle|deleteCustomModelAlertTitle|deleteCustomModelAlertMessage|deleteModelAlertMessage|showInFinderButtonTitle|speedLabel|accuracyLabel|importedLocalModelDescription|customProviderLabel|openAICompatibleLabel|nativeAppleProviderLabel|onDeviceLabel|macOS26RequiredLabel' \
+  'enum VoiceInkModelManagementPresentation|downloadButtonTitle|editModelButtonTitle|deleteModelButtonTitle|deleteButtonTitle|deleteCustomModelAlertTitle|deleteCustomModelAlertMessage|deleteModelAlertMessage|showInFinderButtonTitle|speedLabel|accuracyLabel|importedLocalModelDescription|customProviderLabel|openAICompatibleLabel|nativeAppleProviderLabel|onDeviceLabel|macOS26RequiredLabel|importLocalModelHelpText|importLocalModelLearnMoreURLString|importLocalModelPanelTitle|importedLocalModelFailureTitle' \
   VoiceInkCore/Sources/VoiceInkCore/ModelManagementPresentation.swift
 
 require_pattern \
@@ -1493,6 +1498,16 @@ require_pattern \
 require_pattern \
   "macOS Whisper downloads use shared progress keys" \
   'VoiceInkWhisperModelDownloadProgress\.(mainProgressKey|coreMLProgressKey)' \
+  VoiceInk/Transcription/Whisper/WhisperModelManager.swift
+
+require_pattern \
+  "macOS Whisper local model import uses shared extension policy" \
+  'VoiceInkWhisperModelFiles\.(isImportableModelFile|filename\(forModelName:)' \
+  VoiceInk/Transcription/Whisper/WhisperModelManager.swift
+
+reject_pattern \
+  "macOS Whisper local model import avoids shell-owned extension policy" \
+  'pathExtension\.lowercased\(\) == "bin"|"\.bin already exists"' \
   VoiceInk/Transcription/Whisper/WhisperModelManager.swift
 
 require_pattern \
@@ -1563,7 +1578,12 @@ require_pattern \
 
 require_pattern \
   "macOS model management uses shared import and custom-model copy" \
-  'VoiceInkModelManagementPresentation\.(importLocalModelTitle|customModelsLimitationText)' \
+  'VoiceInkModelManagementPresentation\.(importLocalModelTitle|importLocalModelHelpText|importLocalModelLearnMoreURLString|importLocalModelLearnMoreHelpText|importLocalModelPanelTitle|customModelsLimitationText)' \
+  VoiceInk/Views/AI\ Models/ModelManagementView.swift
+
+reject_pattern \
+  "macOS model management avoids shell-owned local import copy and file extension" \
+  'filenameExtension: "bin"|"Select a Whisper ggml \.bin model"|"Add a custom fine-tuned whisper model to use with VoiceInk\. Select the downloaded \.bin file\."|"https://tryvoiceink\.com/docs/custom-local-whisper-models"|"Read more about custom local models"' \
   VoiceInk/Views/AI\ Models/ModelManagementView.swift
 
 require_pattern \

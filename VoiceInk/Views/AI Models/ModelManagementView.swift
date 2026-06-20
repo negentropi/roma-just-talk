@@ -226,10 +226,10 @@ struct ModelManagementView: View {
                             .buttonStyle(.plain)
 
                             InfoTip(
-                                "Add a custom fine-tuned whisper model to use with VoiceInk. Select the downloaded .bin file.",
-                                learnMoreURL: "https://tryvoiceink.com/docs/custom-local-whisper-models"
+                                VoiceInkModelManagementPresentation.importLocalModelHelpText,
+                                learnMoreURL: VoiceInkModelManagementPresentation.importLocalModelLearnMoreURLString
                             )
-                            .help("Read more about custom local models")
+                            .help(VoiceInkModelManagementPresentation.importLocalModelLearnMoreHelpText)
                         }
                     }
                     
@@ -319,11 +319,11 @@ struct ModelManagementView: View {
     // MARK: - Import Panel
     private func presentImportPanel() {
         let panel = NSOpenPanel()
-        panel.allowedContentTypes = [.init(filenameExtension: "bin")!]
+        panel.allowedContentTypes = [.init(filenameExtension: VoiceInkWhisperModelFiles.modelFileExtension)!]
         panel.allowsMultipleSelection = false
         panel.canChooseDirectories = false
         panel.resolvesAliases = true
-        panel.title = "Select a Whisper ggml .bin model"
+        panel.title = VoiceInkModelManagementPresentation.importLocalModelPanelTitle
         if panel.runModal() == .OK, let url = panel.url {
             Task { @MainActor in
                 await whisperModelManager.importWhisperModel(from: url)

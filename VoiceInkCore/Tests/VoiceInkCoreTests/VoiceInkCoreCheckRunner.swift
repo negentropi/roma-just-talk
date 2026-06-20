@@ -975,6 +975,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testCoreMLSidecarURLsUseSharedModelNaming", run: { WhisperModelFilesTests().testCoreMLSidecarURLsUseSharedModelNaming() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testCoreMLSupportPolicyExcludesQuantizedModels", run: { WhisperModelFilesTests().testCoreMLSupportPolicyExcludesQuantizedModels() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testModelFileFilterMatchesExistingBinOnlyPolicy", run: { WhisperModelFilesTests().testModelFileFilterMatchesExistingBinOnlyPolicy() }),
+            VoiceInkCoreCheck(name: "WhisperModelFilesTests.testImportableModelFilePreservesMacOSCaseInsensitiveImportPolicy", run: { WhisperModelFilesTests().testImportableModelFilePreservesMacOSCaseInsensitiveImportPolicy() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testLocalModelFileUsesExistingBinOnlyNamePolicy", run: { try WhisperModelFilesTests().testLocalModelFileUsesExistingBinOnlyNamePolicy() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testLocalModelFilesReadsOnlyBinFilesFromDirectory", run: { try WhisperModelFilesTests().testLocalModelFilesReadsOnlyBinFilesFromDirectory() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testInstallDownloadedModelFileReplacesExistingModelFile", run: { try WhisperModelFilesTests().testInstallDownloadedModelFileReplacesExistingModelFile() }),

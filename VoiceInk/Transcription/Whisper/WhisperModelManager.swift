@@ -311,14 +311,16 @@ class WhisperModelManager: ObservableObject {
     // MARK: - Import Local Model
 
     func importWhisperModel(from sourceURL: URL) async {
-        guard sourceURL.pathExtension.lowercased() == "bin" else { return }
+        guard VoiceInkWhisperModelFiles.isImportableModelFile(sourceURL) else { return }
 
         let baseName = sourceURL.deletingPathExtension().lastPathComponent
         let destinationURL = VoiceInkWhisperModelFiles.fileURL(forModelName: baseName, in: modelsDirectory)
 
         if FileManager.default.fileExists(atPath: destinationURL.path) {
             await NotificationManager.shared.showNotification(
-                title: "A model named \(baseName).bin already exists",
+                title: VoiceInkModelManagementPresentation.importedLocalModelAlreadyExistsTitle(
+                    modelFilename: VoiceInkWhisperModelFiles.filename(forModelName: baseName)
+                ),
                 type: .warning,
                 duration: 4.0
             )
@@ -335,14 +337,18 @@ class WhisperModelManager: ObservableObject {
             onModelsChanged?()
 
             await NotificationManager.shared.showNotification(
-                title: "Imported \(destinationURL.lastPathComponent)",
+                title: VoiceInkModelManagementPresentation.importedLocalModelSuccessTitle(
+                    filename: destinationURL.lastPathComponent
+                ),
                 type: .success,
                 duration: 3.0
             )
         } catch {
             logError("Failed to import local model", error)
             await NotificationManager.shared.showNotification(
-                title: "Failed to import model: \(error.localizedDescription)",
+                title: VoiceInkModelManagementPresentation.importedLocalModelFailureTitle(
+                    errorDescription: error.localizedDescription
+                ),
                 type: .error,
                 duration: 5.0
             )

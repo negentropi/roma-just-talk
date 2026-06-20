@@ -81,6 +81,22 @@ final class ModelManagementPresentationTests: XCTestCase {
         XCTAssertEqual(VoiceInkModelManagementPresentation.noModelSelectedText, "No model selected")
         XCTAssertEqual(VoiceInkModelManagementPresentation.importLocalModelTitle, "Import Local Model…")
         XCTAssertEqual(
+            VoiceInkModelManagementPresentation.importLocalModelHelpText,
+            "Add a custom fine-tuned whisper model to use with VoiceInk. Select the downloaded .bin file."
+        )
+        XCTAssertEqual(
+            VoiceInkModelManagementPresentation.importLocalModelLearnMoreURLString,
+            "https://tryvoiceink.com/docs/custom-local-whisper-models"
+        )
+        XCTAssertEqual(
+            VoiceInkModelManagementPresentation.importLocalModelLearnMoreHelpText,
+            "Read more about custom local models"
+        )
+        XCTAssertEqual(
+            VoiceInkModelManagementPresentation.importLocalModelPanelTitle,
+            "Select a Whisper ggml .bin model"
+        )
+        XCTAssertEqual(
             VoiceInkModelManagementPresentation.customModelsLimitationText,
             "Only OpenAI-compatible transcription APIs are supported."
         )
@@ -92,6 +108,18 @@ final class ModelManagementPresentationTests: XCTestCase {
         XCTAssertEqual(
             VoiceInkModelManagementPresentation.deleteModelAlertMessage(modelName: "ggml-base.en"),
             "Are you sure you want to delete the model 'ggml-base.en'?"
+        )
+        XCTAssertEqual(
+            VoiceInkModelManagementPresentation.importedLocalModelAlreadyExistsTitle(modelFilename: "custom.bin"),
+            "A model named custom.bin already exists"
+        )
+        XCTAssertEqual(
+            VoiceInkModelManagementPresentation.importedLocalModelSuccessTitle(filename: "custom.bin"),
+            "Imported custom.bin"
+        )
+        XCTAssertEqual(
+            VoiceInkModelManagementPresentation.importedLocalModelFailureTitle(errorDescription: "Permission denied"),
+            "Failed to import model: Permission denied"
         )
     }
 }

@@ -99,6 +99,7 @@ public enum VoiceInkWhisperModelDownloadResponsePolicy {
 
 public enum VoiceInkWhisperModelFiles {
     public static let modelsDirectoryName = "WhisperModels"
+    public static let modelFileExtension = "bin"
 
     public static func modelsDirectory(in baseDirectory: URL) -> URL {
         baseDirectory.appendingPathComponent(modelsDirectoryName)
@@ -236,11 +237,15 @@ public enum VoiceInkWhisperModelFiles {
     }
 
     public static func filename(forModelName modelName: String) -> String {
-        "\(modelName).bin"
+        "\(modelName).\(modelFileExtension)"
     }
 
     public static func isModelFile(_ url: URL) -> Bool {
-        url.pathExtension == "bin"
+        url.pathExtension == modelFileExtension
+    }
+
+    public static func isImportableModelFile(_ url: URL) -> Bool {
+        url.pathExtension.lowercased() == modelFileExtension
     }
 
     public static func localModelFile(from fileURL: URL) -> VoiceInkWhisperLocalModelFile? {

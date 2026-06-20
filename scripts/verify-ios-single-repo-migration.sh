@@ -1400,7 +1400,12 @@ require_pattern \
 
 require_pattern \
   "shared Keychain query and data-store policy lives in VoiceInkCore" \
-  'VoiceInkKeychainQuery|VoiceInkKeychainDataStore|SecItem(Add|CopyMatching|Delete)' \
+  'VoiceInkKeychainQuery|VoiceInkKeychainDataStore|VoiceInkKeychainValueStore|SecItem(Add|CopyMatching|Delete)' \
+  VoiceInkCore/Sources/VoiceInkCore/KeychainQuery.swift
+
+require_pattern \
+  "shared Keychain string value policy lives in VoiceInkCore" \
+  'VoiceInkKeychainValueStore|VoiceInkKeychainStringLoadResult|data\(forString:|string\(from:|isSuccessfulDeleteStatus' \
   VoiceInkCore/Sources/VoiceInkCore/KeychainQuery.swift
 
 require_pattern \
@@ -1409,8 +1414,19 @@ require_pattern \
   VoiceInk/Services/KeychainService.swift
 
 require_pattern \
-  "iOS API-key settings use shared data-store policy directly" \
-  'VoiceInkKeychainDataStore\.(saveData|loadData|delete)' \
+  "macOS Keychain adapter uses shared string value policy" \
+  'VoiceInkKeychainValueStore\.(data\(forString:|saveString|loadString|deleteValue|isSuccessfulDeleteStatus|string\(from:)' \
+  VoiceInk/Services/KeychainService.swift
+
+require_pattern \
+  "iOS API-key settings use shared string value policy directly" \
+  'VoiceInkKeychainValueStore\.(saveString|loadString|deleteValue)' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+reject_pattern \
+  "platform API-key string adapters avoid shell-owned UTF-8 storage policy" \
+  'data\(using: +\.utf8\)|String\(data:.*encoding: +\.utf8\)' \
+  VoiceInk/Services/KeychainService.swift \
   iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \

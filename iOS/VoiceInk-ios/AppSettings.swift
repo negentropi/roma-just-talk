@@ -288,8 +288,7 @@ final class AppSettings: ObservableObject {
     }
 
     private func saveAPIKey(_ key: String, forKey account: String) {
-        guard let data = key.data(using: .utf8) else { return }
-        let status = VoiceInkKeychainDataStore.saveData(data, account: account)
+        guard let status = VoiceInkKeychainValueStore.saveString(key, account: account) else { return }
         if status != errSecSuccess {
             print("Error saving API key to keychain: \(status)")
         }
@@ -301,11 +300,7 @@ final class AppSettings: ObservableObject {
     }
     
     private static func loadAPIKey(forKey account: String) -> String {
-        if let data = VoiceInkKeychainDataStore.loadData(account: account).data,
-           let key = String(data: data, encoding: .utf8) {
-            return key
-        }
-        return ""
+        VoiceInkKeychainValueStore.loadString(account: account).value ?? ""
     }
 
     private static func loadAPIKey(for provider: VoiceInkProviderKind) -> String {
@@ -315,7 +310,7 @@ final class AppSettings: ObservableObject {
 
     private static func deleteAPIKey(for provider: VoiceInkProviderKind) {
         guard let account = provider.apiKeyAccount else { return }
-        VoiceInkKeychainDataStore.delete(account: account)
+        VoiceInkKeychainValueStore.deleteValue(account: account)
     }
 
     // MARK: - Debug Reset

@@ -73,6 +73,20 @@ public struct VoiceInkKeychainLoadResult: Equatable {
     }
 }
 
+public struct VoiceInkKeychainStringLoadResult: Equatable {
+    public let status: OSStatus
+    public let value: String?
+
+    public init(status: OSStatus, data: Data?) {
+        self.status = status
+        self.value = VoiceInkKeychainValueStore.string(from: data)
+    }
+
+    public var isSuccess: Bool {
+        status == errSecSuccess
+    }
+}
+
 public enum VoiceInkKeychainDataStore {
     @discardableResult
     public static func saveData(
@@ -119,5 +133,49 @@ public enum VoiceInkKeychainDataStore {
             VoiceInkKeychainQuery.exists(account: account, syncable: syncable) as CFDictionary,
             nil
         ) == errSecSuccess
+    }
+}
+
+public enum VoiceInkKeychainValueStore {
+    public static func data(forString value: String) -> Data? {
+        value.data(using: .utf8)
+    }
+
+    public static func string(from data: Data?) -> String? {
+        guard let data else { return nil }
+        return String(data: data, encoding: .utf8)
+    }
+
+    @discardableResult
+    public static func saveString(
+        _ value: String,
+        account: String,
+        syncable: Bool = true
+    ) -> OSStatus? {
+        guard let data = data(forString: value) else {
+            return nil
+        }
+
+        return VoiceInkKeychainDataStore.saveData(data, account: account, syncable: syncable)
+    }
+
+    public static func loadString(
+        account: String,
+        syncable: Bool = true
+    ) -> VoiceInkKeychainStringLoadResult {
+        let result = VoiceInkKeychainDataStore.loadData(account: account, syncable: syncable)
+        return VoiceInkKeychainStringLoadResult(status: result.status, data: result.data)
+    }
+
+    @discardableResult
+    public static func deleteValue(
+        account: String,
+        syncable: Bool = true
+    ) -> OSStatus {
+        VoiceInkKeychainDataStore.delete(account: account, syncable: syncable)
+    }
+
+    public static func isSuccessfulDeleteStatus(_ status: OSStatus) -> Bool {
+        status == errSecSuccess || status == errSecItemNotFound
     }
 }

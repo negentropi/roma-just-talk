@@ -59,6 +59,36 @@ final class KeychainQueryTests: XCTestCase {
         XCTAssertFalse(VoiceInkKeychainLoadResult(status: errSecItemNotFound, data: nil).isSuccess)
     }
 
+    func testStringLoadResultDecodesUTF8Values() {
+        let data = Data("secret".utf8)
+        let result = VoiceInkKeychainStringLoadResult(status: errSecSuccess, data: data)
+
+        XCTAssertTrue(result.isSuccess)
+        XCTAssertEqual(result.value, "secret")
+    }
+
+    func testStringLoadResultRejectsInvalidUTF8DataButKeepsStatus() {
+        let result = VoiceInkKeychainStringLoadResult(status: errSecSuccess, data: Data([0xff]))
+
+        XCTAssertTrue(result.isSuccess)
+        XCTAssertNil(result.value)
+    }
+
+    func testValueStoreStringEncodingAndDeleteStatusPolicy() {
+        XCTAssertEqual(
+            VoiceInkKeychainValueStore.data(forString: "secret"),
+            Data("secret".utf8)
+        )
+        XCTAssertEqual(
+            VoiceInkKeychainValueStore.string(from: Data("secret".utf8)),
+            "secret"
+        )
+        XCTAssertNil(VoiceInkKeychainValueStore.string(from: nil))
+        XCTAssertTrue(VoiceInkKeychainValueStore.isSuccessfulDeleteStatus(errSecSuccess))
+        XCTAssertTrue(VoiceInkKeychainValueStore.isSuccessfulDeleteStatus(errSecItemNotFound))
+        XCTAssertFalse(VoiceInkKeychainValueStore.isSuccessfulDeleteStatus(errSecAuthFailed))
+    }
+
     private func booleanValue(_ value: Any?) -> Bool? {
         value as? Bool
     }

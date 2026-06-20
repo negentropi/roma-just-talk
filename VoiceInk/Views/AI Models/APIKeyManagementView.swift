@@ -266,14 +266,7 @@ struct APIKeyManagementView: View {
                             .textFieldStyle(.roundedBorder)
 
                         Button(providerSettingsPresentation.verifyAndSaveButtonTitle) {
-                            isVerifying = true
-                            aiService.saveAPIKey(apiKey) { success, errorMessage in
-                                isVerifying = false
-                                if !success {
-                                    showAPIKeyVerificationFailure(errorMessage)
-                                }
-                                apiKey = ""
-                            }
+                            verifyAndSaveAPIKey()
                         }
                         .disabled(!providerSettingsPresentation.canSubmitCustomProvider(
                             baseURL: aiService.customBaseURL,
@@ -317,14 +310,7 @@ struct APIKeyManagementView: View {
                             Spacer()
 
                             Button(action: {
-                                isVerifying = true
-                                aiService.saveAPIKey(apiKey) { success, errorMessage in
-                                    isVerifying = false
-                                    if !success {
-                                        showAPIKeyVerificationFailure(errorMessage)
-                                    }
-                                    apiKey = ""
-                                }
+                                verifyAndSaveAPIKey()
                             }) {
                                 HStack {
                                     if isVerifying {
@@ -360,8 +346,19 @@ struct APIKeyManagementView: View {
         }
     }
 
-    private func showAPIKeyVerificationFailure(_ errorMessage: String?) {
-        let progress = VoiceInkProviderAPIKeyVerificationProgress.failure(message: errorMessage)
+    private func verifyAndSaveAPIKey() {
+        isVerifying = true
+        aiService.saveAPIKey(apiKey) { result in
+            isVerifying = false
+            if !result.isValid {
+                showAPIKeyVerificationFailure(result)
+            }
+            apiKey = ""
+        }
+    }
+
+    private func showAPIKeyVerificationFailure(_ result: VoiceInkAPIKeyVerificationResult) {
+        let progress = VoiceInkProviderAPIKeyVerificationProgress.failure(message: result.errorMessage)
         guard let feedback = progress.macOSInlineFeedback else {
             return
         }

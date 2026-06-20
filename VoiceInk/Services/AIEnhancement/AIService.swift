@@ -140,15 +140,18 @@ class AIService: ObservableObject {
         NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
     }
     
-    func saveAPIKey(_ key: String, completion: @escaping (Bool, String?) -> Void) {
+    func saveAPIKey(_ key: String, completion: @escaping (VoiceInkAPIKeyVerificationResult) -> Void) {
         guard selectedProvider.requiresUserAPIKey else {
-            completion(true, nil)
+            completion(VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: nil))
             return
         }
 
         let draft = apiKeyDraft(for: key)
         guard let resolvedKey = draft.resolvedVerificationCandidate() else {
-            completion(false, VoiceInkAIEnhancementProviderKind.missingVerificationCandidateMessage)
+            completion(VoiceInkAPIKeyVerificationResult(
+                isValid: false,
+                errorMessage: VoiceInkAIEnhancementProviderKind.missingVerificationCandidateMessage
+            ))
             return
         }
 
@@ -170,25 +173,29 @@ class AIService: ObservableObject {
                 } else {
                     self.isAPIKeyValid = plan.isValid
                 }
-                completion(plan.isValid, plan.errorMessage)
+                completion(VoiceInkAPIKeyVerificationResult(
+                    isValid: plan.isValid,
+                    errorMessage: plan.errorMessage
+                ))
             }
         }
     }
     
-    func verifyAPIKey(_ key: String, completion: @escaping (Bool, String?) -> Void) {
+    func verifyAPIKey(_ key: String, completion: @escaping (VoiceInkAPIKeyVerificationResult) -> Void) {
         guard selectedProvider.requiresUserAPIKey else {
-            completion(true, nil)
+            completion(VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: nil))
             return
         }
 
         guard let resolvedKey = apiKeyDraft(for: key).resolvedVerificationCandidate() else {
-            completion(false, VoiceInkAIEnhancementProviderKind.missingVerificationCandidateMessage)
+            completion(VoiceInkAPIKeyVerificationResult(
+                isValid: false,
+                errorMessage: VoiceInkAIEnhancementProviderKind.missingVerificationCandidateMessage
+            ))
             return
         }
 
-        verifyResolvedAPIKey(resolvedKey) { result in
-            completion(result.isValid, result.errorMessage)
-        }
+        verifyResolvedAPIKey(resolvedKey, completion: completion)
     }
 
     private func apiKeyDraft(for key: String) -> VoiceInkAIEnhancementAPIKeyDraft {

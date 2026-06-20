@@ -2871,9 +2871,24 @@ require_pattern \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 reject_pattern \
+  "macOS AI service avoids tuple-shaped API-key verification completions" \
+  'completion: @escaping \(Bool, String\?\) -> Void' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+reject_pattern \
   "macOS AI service avoids tuple-shaped API-key verification adapter results" \
   'let result: \(isValid: Bool, errorMessage: String\?\)|VoiceInkAPIKeyVerificationResult\(isValid: isValid, errorMessage: errorMessage\)' \
   VoiceInk/Services/AIEnhancement/AIService.swift
+
+require_pattern \
+  "macOS AI API-key view handles save results through shared result type" \
+  'showAPIKeyVerificationFailure\(_ result: VoiceInkAPIKeyVerificationResult\)|verifyAndSaveAPIKey\(\)' \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+
+reject_pattern \
+  "macOS AI API-key view avoids tuple-shaped save result handling" \
+  'saveAPIKey\(apiKey\) \{ success, errorMessage|showAPIKeyVerificationFailure\(errorMessage\)' \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
 
 reject_pattern \
   "macOS AI service avoids shell-only API-key verification success branching" \

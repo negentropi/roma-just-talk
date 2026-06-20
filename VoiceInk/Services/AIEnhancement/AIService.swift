@@ -152,11 +152,11 @@ class AIService: ObservableObject {
             return
         }
 
-        verifyResolvedAPIKey(resolvedKey) { [weak self] isValid, errorMessage in
+        verifyResolvedAPIKey(resolvedKey) { [weak self] result in
             guard let self = self else { return }
             DispatchQueue.main.async {
                 let plan = draft.verificationApplicationPlan(
-                    for: VoiceInkAPIKeyVerificationResult(isValid: isValid, errorMessage: errorMessage),
+                    for: result,
                     resolvedRuntimeKey: resolvedKey
                 )
 
@@ -186,7 +186,9 @@ class AIService: ObservableObject {
             return
         }
 
-        verifyResolvedAPIKey(resolvedKey, completion: completion)
+        verifyResolvedAPIKey(resolvedKey) { result in
+            completion(result.isValid, result.errorMessage)
+        }
     }
 
     private func apiKeyDraft(for key: String) -> VoiceInkAIEnhancementAPIKeyDraft {
@@ -198,13 +200,16 @@ class AIService: ObservableObject {
 
     private func verifyResolvedAPIKey(
         _ resolvedKey: String,
-        completion: @escaping (Bool, String?) -> Void
+        completion: @escaping (VoiceInkAPIKeyVerificationResult) -> Void
     ) {
         Task {
-            let result: (isValid: Bool, errorMessage: String?)
+            let result: VoiceInkAPIKeyVerificationResult
             guard let route = selectedProvider.apiKeyVerificationRoute else {
                 DispatchQueue.main.async {
-                    completion(false, self.selectedProvider.unsupportedAPIKeyVerificationMessage)
+                    completion(VoiceInkAPIKeyVerificationResult(
+                        isValid: false,
+                        errorMessage: self.selectedProvider.unsupportedAPIKeyVerificationMessage
+                    ))
                 }
                 return
             }
@@ -215,28 +220,46 @@ class AIService: ObservableObject {
                     resolvedKey,
                     for: provider
                 )
-                result = (verification.isValid, verification.errorMessage)
+                result = verification
             case .anthropicMessages:
-                result = await AnthropicLLMClient.verifyAPIKey(resolvedKey)
+                result = apiKeyVerificationResult(
+                    from: await AnthropicLLMClient.verifyAPIKey(resolvedKey)
+                )
             case .openAICompatibleModels:
                 guard let baseURL = selectedProvider.textEnhancementRequestURL() else {
                     DispatchQueue.main.async {
-                        completion(false, VoiceInkAIEnhancementProviderKind.invalidOrMissingBaseURLConfigurationMessage)
+                        completion(VoiceInkAPIKeyVerificationResult(
+                            isValid: false,
+                            errorMessage: VoiceInkAIEnhancementProviderKind.invalidOrMissingBaseURLConfigurationMessage
+                        ))
                     }
                     return
                 }
-                result = await OpenAILLMClient.verifyAPIKey(
-                    baseURL: baseURL,
-                    apiKey: resolvedKey,
-                    model: currentModel
+                result = apiKeyVerificationResult(
+                    from: await OpenAILLMClient.verifyAPIKey(
+                        baseURL: baseURL,
+                        apiKey: resolvedKey,
+                        model: currentModel
+                    )
                 )
             case .openRouterModels:
-                result = await OpenRouterClient.verifyAPIKey(resolvedKey, model: currentModel)
+                result = apiKeyVerificationResult(
+                    from: await OpenRouterClient.verifyAPIKey(
+                        resolvedKey,
+                        model: currentModel
+                    )
+                )
             }
             DispatchQueue.main.async {
-                completion(result.isValid, result.errorMessage)
+                completion(result)
             }
         }
+    }
+
+    private func apiKeyVerificationResult(
+        from legacyResult: (Bool, String?)
+    ) -> VoiceInkAPIKeyVerificationResult {
+        VoiceInkAPIKeyVerificationResult(isValid: legacyResult.0, errorMessage: legacyResult.1)
     }
     
     func clearAPIKey() {

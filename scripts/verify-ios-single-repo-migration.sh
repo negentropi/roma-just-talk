@@ -2865,6 +2865,16 @@ require_pattern \
   'verificationApplicationPlan\(|VoiceInkAPIKeyVerificationResult\(isValid:' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
+require_pattern \
+  "macOS AI service keeps private verification adapter on shared result type" \
+  'completion: @escaping \(VoiceInkAPIKeyVerificationResult\) -> Void' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+reject_pattern \
+  "macOS AI service avoids tuple-shaped API-key verification adapter results" \
+  'let result: \(isValid: Bool, errorMessage: String\?\)|VoiceInkAPIKeyVerificationResult\(isValid: isValid, errorMessage: errorMessage\)' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
 reject_pattern \
   "macOS AI service avoids shell-only API-key verification success branching" \
   'if isValid \{|self\.apiKey = resolvedKey|APIKeyManager\.shared\.saveAPIKey\(key,' \

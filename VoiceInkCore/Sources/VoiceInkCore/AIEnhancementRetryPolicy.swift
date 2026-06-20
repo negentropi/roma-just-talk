@@ -58,3 +58,20 @@ public struct VoiceInkAIEnhancementRetryState: Equatable, Sendable {
         return .retryImmediately
     }
 }
+
+public struct VoiceInkAIEnhancementRateLimitPolicy: Equatable, Sendable {
+    public let minimumInterval: TimeInterval
+
+    public init(minimumInterval: TimeInterval = 1) {
+        self.minimumInterval = max(0, minimumInterval)
+    }
+
+    public func delaySinceLastRequest(lastRequest: Date?, now: Date) -> TimeInterval? {
+        guard let lastRequest else {
+            return nil
+        }
+
+        let remainingDelay = minimumInterval - now.timeIntervalSince(lastRequest)
+        return remainingDelay > 0 ? remainingDelay : nil
+    }
+}

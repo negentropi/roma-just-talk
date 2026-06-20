@@ -3228,6 +3228,21 @@ reject_pattern \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
 
 require_pattern \
+  "shared AI enhancement rate-limit policy lives in VoiceInkCore" \
+  'VoiceInkAIEnhancementRateLimitPolicy|delaySinceLastRequest' \
+  VoiceInkCore/Sources/VoiceInkCore/AIEnhancementRetryPolicy.swift
+
+require_pattern \
+  "macOS AI enhancement service uses shared rate-limit policy" \
+  'VoiceInkAIEnhancementRateLimitPolicy|delaySinceLastRequest' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+reject_pattern \
+  "macOS AI enhancement service avoids shell-owned rate-limit timing math" \
+  'rateLimitInterval|timeSinceLastRequest|minimumInterval -' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+require_pattern \
   "macOS AI enhancement service returns shared enhancement result" \
   'VoiceInkAIEnhancementResult' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift

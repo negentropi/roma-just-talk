@@ -74,7 +74,7 @@ class AIEnhancementService: ObservableObject {
     private var baseTimeout: TimeInterval {
         VoiceInkAIEnhancementRequestPreference.timeoutSeconds()
     }
-    private let rateLimitInterval: TimeInterval = 1.0
+    private let rateLimitPolicy = VoiceInkAIEnhancementRateLimitPolicy()
     private var lastRequestTime: Date?
     private let modelContext: ModelContext
     
@@ -134,11 +134,8 @@ class AIEnhancementService: ObservableObject {
     }
 
     private func waitForRateLimit() async throws {
-        if let lastRequest = lastRequestTime {
-            let timeSinceLastRequest = Date().timeIntervalSince(lastRequest)
-            if timeSinceLastRequest < rateLimitInterval {
-                try await Task.sleep(nanoseconds: UInt64((rateLimitInterval - timeSinceLastRequest) * 1_000_000_000))
-            }
+        if let delay = rateLimitPolicy.delaySinceLastRequest(lastRequest: lastRequestTime, now: Date()) {
+            try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
         }
         lastRequestTime = Date()
     }

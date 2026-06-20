@@ -1,3 +1,4 @@
+import Foundation
 @testable import VoiceInkCore
 
 final class AIEnhancementRetryPolicyTests: XCTestCase {
@@ -67,5 +68,40 @@ final class AIEnhancementRetryPolicyTests: XCTestCase {
 
         XCTAssertEqual(state.recordTransportNetworkFailure(), .retryAfterDelay(1))
         XCTAssertEqual(state.recordTransportNetworkFailure(), .fail(.networkError))
+    }
+
+    func testRateLimitPolicySkipsDelayWithoutLastRequest() {
+        let policy = VoiceInkAIEnhancementRateLimitPolicy(minimumInterval: 1)
+
+        XCTAssertNil(policy.delaySinceLastRequest(
+            lastRequest: nil,
+            now: Date(timeIntervalSince1970: 100)
+        ))
+    }
+
+    func testRateLimitPolicyReturnsRemainingDelay() {
+        let policy = VoiceInkAIEnhancementRateLimitPolicy(minimumInterval: 1)
+        let lastRequest = Date(timeIntervalSince1970: 100)
+        let now = Date(timeIntervalSince1970: 100.25)
+
+        XCTAssertEqual(
+            policy.delaySinceLastRequest(lastRequest: lastRequest, now: now) ?? -1,
+            0.75,
+            accuracy: 0.0001
+        )
+    }
+
+    func testRateLimitPolicySkipsDelayAfterIntervalExpires() {
+        let policy = VoiceInkAIEnhancementRateLimitPolicy(minimumInterval: 1)
+        let lastRequest = Date(timeIntervalSince1970: 100)
+
+        XCTAssertNil(policy.delaySinceLastRequest(
+            lastRequest: lastRequest,
+            now: Date(timeIntervalSince1970: 101)
+        ))
+        XCTAssertNil(VoiceInkAIEnhancementRateLimitPolicy(minimumInterval: -1).delaySinceLastRequest(
+            lastRequest: lastRequest,
+            now: Date(timeIntervalSince1970: 100)
+        ))
     }
 }

@@ -65,7 +65,7 @@ struct WhisperModelCardView: View {
             
             // Speed
             HStack(spacing: 3) {
-                Text("Speed")
+                Text(VoiceInkModelManagementPresentation.speedLabel)
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(Color(.secondaryLabelColor))
                 progressDotsWithNumber(value: model.speed * 10)
@@ -75,7 +75,7 @@ struct WhisperModelCardView: View {
             
             // Accuracy
             HStack(spacing: 3) {
-                Text("Accuracy")
+                Text(VoiceInkModelManagementPresentation.accuracyLabel)
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(Color(.secondaryLabelColor))
                 progressDotsWithNumber(value: model.accuracy * 10)
@@ -128,7 +128,7 @@ struct WhisperModelCardView: View {
                         Text(
                             isDownloading
                                 ? VoiceInkWhisperModelDownloadProgress.compactDownloadingStatusText
-                                : "Download"
+                                : VoiceInkModelManagementPresentation.downloadButtonTitle
                         )
                             .font(.system(size: 12, weight: .medium))
                         Image(systemName: "arrow.down.circle")
@@ -150,7 +150,7 @@ struct WhisperModelCardView: View {
             if isDownloaded {
                 Menu {
                     Button(action: deleteAction) {
-                        Label("Delete Model", systemImage: "trash")
+                        Label(VoiceInkModelManagementPresentation.deleteModelButtonTitle, systemImage: "trash")
                     }
                     
                     Button {
@@ -158,7 +158,7 @@ struct WhisperModelCardView: View {
                             NSWorkspace.shared.selectFile(modelURL.path, inFileViewerRootedAtPath: "")
                         }
                     } label: {
-                        Label("Show in Finder", systemImage: "folder")
+                        Label(VoiceInkModelManagementPresentation.showInFinderButtonTitle, systemImage: "folder")
                     }
                 } label: {
                     Image(systemName: "ellipsis.circle")
@@ -192,7 +192,7 @@ struct ImportedWhisperModelCardView: View {
                     Spacer()
                 }
 
-                Text("Imported local model")
+                Text(VoiceInkModelManagementPresentation.importedLocalModelDescription)
                     .font(.system(size: 11))
                     .foregroundColor(Color(.secondaryLabelColor))
                     .lineLimit(2)
@@ -218,14 +218,14 @@ struct ImportedWhisperModelCardView: View {
                 if isDownloaded {
                     Menu {
                         Button(action: deleteAction) {
-                            Label("Delete Model", systemImage: "trash")
+                            Label(VoiceInkModelManagementPresentation.deleteModelButtonTitle, systemImage: "trash")
                         }
                         Button {
                             if let modelURL = modelURL {
                                 NSWorkspace.shared.selectFile(modelURL.path, inFileViewerRootedAtPath: "")
                             }
                         } label: {
-                            Label("Show in Finder", systemImage: "folder")
+                            Label(VoiceInkModelManagementPresentation.showInFinderButtonTitle, systemImage: "folder")
                         }
                     } label: {
                         Image(systemName: "ellipsis.circle")

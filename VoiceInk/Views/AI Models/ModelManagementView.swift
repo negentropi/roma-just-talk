@@ -55,7 +55,7 @@ struct ModelManagementView: View {
             Alert(
                 title: Text(alertTitle),
                 message: Text(alertMessage),
-                primaryButton: .destructive(Text("Delete"), action: deleteActionClosure),
+                primaryButton: .destructive(Text(VoiceInkModelManagementPresentation.deleteButtonTitle), action: deleteActionClosure),
                 secondaryButton: .cancel()
             )
         }
@@ -175,16 +175,16 @@ struct ModelManagementView: View {
                             isWarming: isWarming,
                             deleteAction: {
                                 if let customModel = model as? CustomCloudModel {
-                                    alertTitle = "Delete Custom Model"
-                                    alertMessage = "Are you sure you want to delete the custom model '\(customModel.displayName)'?"
+                                    alertTitle = VoiceInkModelManagementPresentation.deleteCustomModelAlertTitle
+                                    alertMessage = VoiceInkModelManagementPresentation.deleteCustomModelAlertMessage(displayName: customModel.displayName)
                                     deleteActionClosure = {
                                         customModelManager.removeCustomModel(withId: customModel.id)
                                         transcriptionModelManager.refreshAllAvailableModels()
                                     }
                                     isShowingDeleteAlert = true
                                 } else if let downloadedModel = whisperModelManager.availableModels.first(where: { $0.name == model.name }) {
-                                    alertTitle = "Delete Model"
-                                    alertMessage = "Are you sure you want to delete the model '\(downloadedModel.name)'?"
+                                    alertTitle = VoiceInkModelManagementPresentation.deleteModelButtonTitle
+                                    alertMessage = VoiceInkModelManagementPresentation.deleteModelAlertMessage(modelName: downloadedModel.name)
                                     deleteActionClosure = {
                                         Task {
                                             await whisperModelManager.deleteModel(downloadedModel)

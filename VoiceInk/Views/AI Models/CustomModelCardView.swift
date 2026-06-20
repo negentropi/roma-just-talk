@@ -41,7 +41,7 @@ struct CustomModelCardView: View {
     private var metadataSection: some View {
         HStack(spacing: 12) {
             // Provider
-            Label("Custom Provider", systemImage: "cloud")
+            Label(VoiceInkModelManagementPresentation.customProviderLabel, systemImage: "cloud")
                 .font(.system(size: 11))
                 .foregroundColor(Color(.secondaryLabelColor))
                 .lineLimit(1)
@@ -53,7 +53,7 @@ struct CustomModelCardView: View {
                 .lineLimit(1)
             
             // OpenAI Compatible
-            Label("OpenAI Compatible", systemImage: "checkmark.seal")
+            Label(VoiceInkModelManagementPresentation.openAICompatibleLabel, systemImage: "checkmark.seal")
                 .font(.system(size: 11))
                 .foregroundColor(Color(.secondaryLabelColor))
                 .lineLimit(1)
@@ -89,13 +89,13 @@ struct CustomModelCardView: View {
                 Button {
                     editAction(model)
                 } label: {
-                    Label("Edit Model", systemImage: "pencil")
+                    Label(VoiceInkModelManagementPresentation.editModelButtonTitle, systemImage: "pencil")
                 }
                 
                 Button(role: .destructive) {
                     deleteAction()
                 } label: {
-                    Label("Delete Model", systemImage: "trash")
+                    Label(VoiceInkModelManagementPresentation.deleteModelButtonTitle, systemImage: "trash")
                 }
             } label: {
                 Image(systemName: "ellipsis.circle")

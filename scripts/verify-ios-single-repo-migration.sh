@@ -1467,7 +1467,7 @@ require_pattern \
 
 require_pattern \
   "shared model management copy presentation lives in VoiceInkCore" \
-  'enum VoiceInkModelManagementPresentation' \
+  'enum VoiceInkModelManagementPresentation|downloadButtonTitle|editModelButtonTitle|deleteModelButtonTitle|deleteButtonTitle|deleteCustomModelAlertTitle|deleteCustomModelAlertMessage|deleteModelAlertMessage|showInFinderButtonTitle|speedLabel|accuracyLabel|importedLocalModelDescription|customProviderLabel|openAICompatibleLabel|nativeAppleProviderLabel|onDeviceLabel|macOS26RequiredLabel' \
   VoiceInkCore/Sources/VoiceInkCore/ModelManagementPresentation.swift
 
 require_pattern \
@@ -1490,6 +1490,31 @@ require_pattern \
   'VoiceInkWhisperModelDownloadProgress\.compactDownloadingStatusText' \
   VoiceInk/Views/AI\ Models/WhisperModelCardView.swift \
   VoiceInk/Views/AI\ Models/FluidAudioModelCardView.swift
+
+require_pattern \
+  "macOS Whisper model card uses shared model-card presentation copy" \
+  'VoiceInkModelManagementPresentation\.(speedLabel|accuracyLabel|downloadButtonTitle|deleteModelButtonTitle|showInFinderButtonTitle|importedLocalModelDescription)' \
+  VoiceInk/Views/AI\ Models/WhisperModelCardView.swift
+
+require_pattern \
+  "macOS FluidAudio model card uses shared model-card presentation copy" \
+  'VoiceInkModelManagementPresentation\.(speedLabel|accuracyLabel|downloadButtonTitle|deleteModelButtonTitle|showInFinderButtonTitle)' \
+  VoiceInk/Views/AI\ Models/FluidAudioModelCardView.swift
+
+require_pattern \
+  "macOS cloud model card uses shared model-card metric labels" \
+  'VoiceInkModelManagementPresentation\.(speedLabel|accuracyLabel)' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift
+
+require_pattern \
+  "macOS custom model card uses shared model-card presentation copy" \
+  'VoiceInkModelManagementPresentation\.(customProviderLabel|openAICompatibleLabel|editModelButtonTitle|deleteModelButtonTitle)' \
+  VoiceInk/Views/AI\ Models/CustomModelCardView.swift
+
+require_pattern \
+  "macOS Native Apple model card uses shared model-card badge copy" \
+  'VoiceInkModelManagementPresentation\.(nativeAppleProviderLabel|onDeviceLabel|macOS26RequiredLabel)' \
+  VoiceInk/Views/AI\ Models/NativeModelCardView.swift
 
 require_pattern \
   "macOS Whisper download progress view uses shared progress presentation" \
@@ -1524,6 +1549,11 @@ require_pattern \
 require_pattern \
   "macOS model management uses shared import and custom-model copy" \
   'VoiceInkModelManagementPresentation\.(importLocalModelTitle|customModelsLimitationText)' \
+  VoiceInk/Views/AI\ Models/ModelManagementView.swift
+
+require_pattern \
+  "macOS model management uses shared delete-confirmation copy" \
+  'VoiceInkModelManagementPresentation\.(deleteButtonTitle|deleteCustomModelAlertTitle|deleteCustomModelAlertMessage|deleteModelButtonTitle|deleteModelAlertMessage)' \
   VoiceInk/Views/AI\ Models/ModelManagementView.swift
 
 require_pattern \
@@ -1777,6 +1807,20 @@ reject_pattern \
   VoiceInk/Views/AI\ Models/FluidAudioModelCardView.swift
 
 reject_pattern \
+  "macOS model cards avoid shell-only model-card presentation copy" \
+  '"(Speed|Accuracy|Download|Edit Model|Delete Model|Show in Finder|Imported local model|Custom Provider|OpenAI Compatible|Native Apple|On-Device|macOS 26\+)"' \
+  VoiceInk/Views/AI\ Models/WhisperModelCardView.swift \
+  VoiceInk/Views/AI\ Models/FluidAudioModelCardView.swift \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift \
+  VoiceInk/Views/AI\ Models/CustomModelCardView.swift \
+  VoiceInk/Views/AI\ Models/NativeModelCardView.swift
+
+reject_pattern \
+  "macOS model management avoids shell-only delete-confirmation copy" \
+  '"(Delete|Delete Model|Delete Custom Model)"|Are you sure you want to delete the (custom )?model' \
+  VoiceInk/Views/AI\ Models/ModelManagementView.swift
+
+reject_pattern \
   "iOS local model shell avoids duplicate operation alert copy" \
   'Download Error|Download failed:|Server error during download|No file received|Failed to save model:|Failed to delete model:|An unknown error occurred\.' \
   iOS/VoiceInk-ios/LocalModelManager.swift \
@@ -1795,7 +1839,7 @@ reject_pattern \
 
 reject_pattern \
   "platform model management avoids duplicate shared model copy" \
-  '"(Model Settings|Default Model|Set as Default|No model selected|Import Local Model…|Only OpenAI-compatible transcription APIs are supported\.|Local Models|Manage Local Models|Cloud Models|Manage Cloud Models)"' \
+  '"(Model Settings|Default Model|Set as Default|No model selected|Import Local Model…|Only OpenAI-compatible transcription APIs are supported\.|Local Models|Manage Local Models|Cloud Models|Manage Cloud Models|Speed|Accuracy|Download|Edit Model|Delete Model|Delete Custom Model|Show in Finder|Imported local model|Custom Provider|OpenAI Compatible|Native Apple|On-Device|macOS 26\+)"|Are you sure you want to delete the (custom )?model' \
   VoiceInk/Views/AI\ Models/ModelManagementView.swift \
   VoiceInk/Views/AI\ Models/FluidAudioModelCardView.swift \
   VoiceInk/Views/AI\ Models/CustomModelCardView.swift \

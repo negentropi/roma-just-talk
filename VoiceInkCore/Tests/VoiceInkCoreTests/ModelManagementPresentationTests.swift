@@ -64,6 +64,20 @@ final class ModelManagementPresentationTests: XCTestCase {
         XCTAssertEqual(VoiceInkModelManagementPresentation.settingsTitle, "Model Settings")
         XCTAssertEqual(VoiceInkModelManagementPresentation.defaultModelTitle, "Default Model")
         XCTAssertEqual(VoiceInkModelManagementPresentation.setAsDefaultButtonTitle, "Set as Default")
+        XCTAssertEqual(VoiceInkModelManagementPresentation.downloadButtonTitle, "Download")
+        XCTAssertEqual(VoiceInkModelManagementPresentation.editModelButtonTitle, "Edit Model")
+        XCTAssertEqual(VoiceInkModelManagementPresentation.deleteModelButtonTitle, "Delete Model")
+        XCTAssertEqual(VoiceInkModelManagementPresentation.deleteButtonTitle, "Delete")
+        XCTAssertEqual(VoiceInkModelManagementPresentation.deleteCustomModelAlertTitle, "Delete Custom Model")
+        XCTAssertEqual(VoiceInkModelManagementPresentation.showInFinderButtonTitle, "Show in Finder")
+        XCTAssertEqual(VoiceInkModelManagementPresentation.speedLabel, "Speed")
+        XCTAssertEqual(VoiceInkModelManagementPresentation.accuracyLabel, "Accuracy")
+        XCTAssertEqual(VoiceInkModelManagementPresentation.importedLocalModelDescription, "Imported local model")
+        XCTAssertEqual(VoiceInkModelManagementPresentation.customProviderLabel, "Custom Provider")
+        XCTAssertEqual(VoiceInkModelManagementPresentation.openAICompatibleLabel, "OpenAI Compatible")
+        XCTAssertEqual(VoiceInkModelManagementPresentation.nativeAppleProviderLabel, "Native Apple")
+        XCTAssertEqual(VoiceInkModelManagementPresentation.onDeviceLabel, "On-Device")
+        XCTAssertEqual(VoiceInkModelManagementPresentation.macOS26RequiredLabel, "macOS 26+")
         XCTAssertEqual(VoiceInkModelManagementPresentation.noModelSelectedText, "No model selected")
         XCTAssertEqual(VoiceInkModelManagementPresentation.importLocalModelTitle, "Import Local Model…")
         XCTAssertEqual(
@@ -71,5 +85,13 @@ final class ModelManagementPresentationTests: XCTestCase {
             "Only OpenAI-compatible transcription APIs are supported."
         )
         XCTAssertEqual(VoiceInkModelManagementPresentation.closeButtonHelp, "Close")
+        XCTAssertEqual(
+            VoiceInkModelManagementPresentation.deleteCustomModelAlertMessage(displayName: "My Model"),
+            "Are you sure you want to delete the custom model 'My Model'?"
+        )
+        XCTAssertEqual(
+            VoiceInkModelManagementPresentation.deleteModelAlertMessage(modelName: "ggml-base.en"),
+            "Are you sure you want to delete the model 'ggml-base.en'?"
+        )
     }
 }

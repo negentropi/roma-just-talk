@@ -167,7 +167,7 @@ struct CloudModelCardView: View {
 
             // Speed
             HStack(spacing: 3) {
-                Text("Speed")
+                Text(VoiceInkModelManagementPresentation.speedLabel)
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(Color(.secondaryLabelColor))
                 progressDotsWithNumber(value: model.speed * 10)
@@ -177,7 +177,7 @@ struct CloudModelCardView: View {
 
             // Accuracy
             HStack(spacing: 3) {
-                Text("Accuracy")
+                Text(VoiceInkModelManagementPresentation.accuracyLabel)
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(Color(.secondaryLabelColor))
                 progressDotsWithNumber(value: model.accuracy * 10)

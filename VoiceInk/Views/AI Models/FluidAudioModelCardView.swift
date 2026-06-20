@@ -84,12 +84,12 @@ struct FluidAudioModelCardView: View {
             Label(model.language, systemImage: "globe")
             Label(model.size, systemImage: "internaldrive")
             HStack(spacing: 3) {
-                Text("Speed")
+                Text(VoiceInkModelManagementPresentation.speedLabel)
                 progressDotsWithNumber(value: model.speed * 10)
             }
             .fixedSize(horizontal: true, vertical: false)
             HStack(spacing: 3) {
-                Text("Accuracy")
+                Text(VoiceInkModelManagementPresentation.accuracyLabel)
                 progressDotsWithNumber(value: model.accuracy * 10)
             }
             .fixedSize(horizontal: true, vertical: false)
@@ -161,7 +161,7 @@ struct FluidAudioModelCardView: View {
                         Text(
                             isDownloading
                                 ? VoiceInkWhisperModelDownloadProgress.compactDownloadingStatusText
-                                : "Download"
+                                : VoiceInkModelManagementPresentation.downloadButtonTitle
                         )
                         Image(systemName: "arrow.down.circle")
                     }
@@ -180,13 +180,13 @@ struct FluidAudioModelCardView: View {
                     Button(action: {
                         fluidAudioModelManager.deleteFluidAudioModel(model)
                     }) {
-                        Label("Delete Model", systemImage: "trash")
+                        Label(VoiceInkModelManagementPresentation.deleteModelButtonTitle, systemImage: "trash")
                     }
 
                     Button {
                         fluidAudioModelManager.showFluidAudioModelInFinder(model)
                     } label: {
-                        Label("Show in Finder", systemImage: "folder")
+                        Label(VoiceInkModelManagementPresentation.showInFinderButtonTitle, systemImage: "folder")
                     }
 
                 } label: {

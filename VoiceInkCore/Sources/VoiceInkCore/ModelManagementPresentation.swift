@@ -62,8 +62,30 @@ public enum VoiceInkModelManagementPresentation {
     public static let settingsTitle = "Model Settings"
     public static let defaultModelTitle = "Default Model"
     public static let setAsDefaultButtonTitle = "Set as Default"
+    public static let downloadButtonTitle = "Download"
+    public static let editModelButtonTitle = "Edit Model"
+    public static let deleteModelButtonTitle = "Delete Model"
+    public static let deleteButtonTitle = "Delete"
+    public static let deleteCustomModelAlertTitle = "Delete Custom Model"
+    public static let showInFinderButtonTitle = "Show in Finder"
+    public static let speedLabel = "Speed"
+    public static let accuracyLabel = "Accuracy"
+    public static let importedLocalModelDescription = "Imported local model"
+    public static let customProviderLabel = "Custom Provider"
+    public static let openAICompatibleLabel = "OpenAI Compatible"
+    public static let nativeAppleProviderLabel = "Native Apple"
+    public static let onDeviceLabel = "On-Device"
+    public static let macOS26RequiredLabel = "macOS 26+"
     public static let noModelSelectedText = "No model selected"
     public static let importLocalModelTitle = "Import Local Model…"
     public static let customModelsLimitationText = "Only OpenAI-compatible transcription APIs are supported."
     public static let closeButtonHelp = "Close"
+
+    public static func deleteCustomModelAlertMessage(displayName: String) -> String {
+        "Are you sure you want to delete the custom model '\(displayName)'?"
+    }
+
+    public static func deleteModelAlertMessage(modelName: String) -> String {
+        "Are you sure you want to delete the model '\(modelName)'?"
+    }
 }

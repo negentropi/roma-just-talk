@@ -5724,14 +5724,45 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PerformanceAnalysis.swift
 
 require_pattern \
+  "shared performance panel presentation lives in VoiceInkCore" \
+  'VoiceInkPerformancePresentation|modelPerformancePanelTitle|performanceAnalysisPanelTitle|averageEnhancementTimeLabel|transcriptSampleCountText' \
+  VoiceInkCore/Sources/VoiceInkCore/PerformanceAnalysis.swift
+
+require_pattern \
   "macOS model performance panel uses shared time filter" \
   'VoiceInkPerformanceTimeFilter\.(userDefaultsKey|defaultFilter|storedFilter)|filter\.startDate\(' \
   VoiceInk/Views/Metrics/ModelPerformancePanel.swift
+
+require_pattern \
+  "macOS model performance panel uses shared presentation" \
+  'VoiceInkPerformancePresentation\.(modelPerformancePanelTitle|emptyStateSystemImageName|sessionSampleCountText|averageProcessingLabel)' \
+  VoiceInk/Views/Metrics/ModelPerformancePanel.swift
+
+require_pattern \
+  "macOS performance analysis panel uses shared presentation" \
+  'VoiceInkPerformancePresentation\.(performanceAnalysisPanelTitle|summarySectionTitle|transcriptSampleCountText|averageProcessingLabel)' \
+  VoiceInk/Views/Metrics/PerformanceAnalysisPanelView.swift
+
+require_pattern \
+  "core tests pin macOS performance panel presentation" \
+  'testPerformancePresentationPreservesMacOSPanelCopyAndIcons' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/PerformanceAnalysisTests.swift
+
+require_pattern \
+  "core check runner executes performance panel presentation tests" \
+  'PerformanceAnalysisTests\.testPerformancePresentationPreservesMacOSPanelCopyAndIcons' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \
   "macOS model performance panel avoids shell-only time filter policy" \
   'enum +TimeFilter|"modelPerfPanelFilter"|"Last 7 Days"|"Last 30 Days"|"This Year"|"All Time"|addingTimeInterval\(-[0-9]+ \* 24 \* 3600\)|dateInterval\(of: \.year' \
   VoiceInk/Views/Metrics/ModelPerformancePanel.swift
+
+reject_pattern \
+  "macOS performance panels avoid shell-only shared performance presentation copy" \
+  '"(Model Performance|Performance Analysis|No data for this period|Summary|System Information|Transcription Models|Enhancement Models|Total|Analyzable|Enhanced|Device|Processor|Memory|Avg\. Audio|Avg\. Processing|Avg\. Enhancement Time)"|systemName: "(xmark|chart\.bar\.xaxis|doc\.text\.fill|waveform\.path\.ecg|sparkles)"|sampleCount\) (sessions|transcripts)' \
+  VoiceInk/Views/Metrics/ModelPerformancePanel.swift \
+  VoiceInk/Views/Metrics/PerformanceAnalysisPanelView.swift
 
 reject_pattern \
   "platform metric views avoid shell-only realtime presentation text" \

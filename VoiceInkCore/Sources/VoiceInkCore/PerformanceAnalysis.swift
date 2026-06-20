@@ -88,6 +88,38 @@ public enum VoiceInkPerformanceTimeFilter: String, CaseIterable, Identifiable, S
     }
 }
 
+public enum VoiceInkPerformancePresentation {
+    public static let modelPerformancePanelTitle = "Model Performance"
+    public static let performanceAnalysisPanelTitle = "Performance Analysis"
+    public static let closeSystemImageName = "xmark"
+    public static let emptyStateSystemImageName = "chart.bar.xaxis"
+    public static let emptyStateTitle = "No data for this period"
+    public static let summarySectionTitle = "Summary"
+    public static let systemInformationSectionTitle = "System Information"
+    public static let transcriptionModelsSectionTitle = "Transcription Models"
+    public static let enhancementModelsSectionTitle = "Enhancement Models"
+    public static let totalSummaryIconSystemName = "doc.text.fill"
+    public static let totalSummaryLabel = "Total"
+    public static let analyzableSummaryIconSystemName = "waveform.path.ecg"
+    public static let analyzableSummaryLabel = "Analyzable"
+    public static let enhancedSummaryIconSystemName = "sparkles"
+    public static let enhancedSummaryLabel = "Enhanced"
+    public static let deviceInfoLabel = "Device"
+    public static let processorInfoLabel = "Processor"
+    public static let memoryInfoLabel = "Memory"
+    public static let averageAudioLabel = "Avg. Audio"
+    public static let averageProcessingLabel = "Avg. Processing"
+    public static let averageEnhancementTimeLabel = "Avg. Enhancement Time"
+
+    public static func sessionSampleCountText(_ count: Int) -> String {
+        "\(count) sessions"
+    }
+
+    public static func transcriptSampleCountText(_ count: Int) -> String {
+        "\(count) transcripts"
+    }
+}
+
 public enum VoiceInkPerformanceAnalyzer {
     public static func analyze<Record: VoiceInkPerformanceRecord>(
         records: [Record]

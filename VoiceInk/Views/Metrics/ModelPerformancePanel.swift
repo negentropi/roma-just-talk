@@ -28,7 +28,7 @@ struct ModelPerformancePanel: View {
 
     private var header: some View {
         HStack(spacing: 10) {
-            Text("Model Performance")
+            Text(VoiceInkPerformancePresentation.modelPerformancePanelTitle)
                 .font(.headline.weight(.semibold))
             Spacer()
             Picker("", selection: Binding(get: { filter }, set: { filterRaw = $0.rawValue })) {
@@ -40,7 +40,7 @@ struct ModelPerformancePanel: View {
             .labelsHidden()
             .fixedSize()
             Button(action: onClose) {
-                Image(systemName: "xmark")
+                Image(systemName: VoiceInkPerformancePresentation.closeSystemImageName)
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(.secondary)
                     .padding(6)
@@ -98,10 +98,10 @@ private struct ModelPerformancePanelContent: View {
 
     private var emptyState: some View {
         VStack(spacing: 8) {
-            Image(systemName: "chart.bar.xaxis")
+            Image(systemName: VoiceInkPerformancePresentation.emptyStateSystemImageName)
                 .font(.system(size: 32, weight: .light))
                 .foregroundColor(.secondary)
-            Text("No data for this period")
+            Text(VoiceInkPerformancePresentation.emptyStateTitle)
                 .font(.subheadline)
                 .foregroundColor(.secondary)
         }
@@ -112,7 +112,7 @@ private struct ModelPerformancePanelContent: View {
 
     private var modelsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            sectionHeader("Transcription Models")
+            sectionHeader(VoiceInkPerformancePresentation.transcriptionModelsSectionTitle)
             LazyVGrid(columns: gridColumns, spacing: 12) {
                 ForEach(modelStats) { stat in
                     modelTile(stat)
@@ -128,7 +128,7 @@ private struct ModelPerformancePanelContent: View {
                     .font(.system(size: 12, weight: .semibold))
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
-                Text("\(stat.sampleCount) sessions")
+                Text(VoiceInkPerformancePresentation.sessionSampleCountText(stat.sampleCount))
                     .font(.system(size: 10))
                     .foregroundColor(.secondary)
             }
@@ -150,7 +150,7 @@ private struct ModelPerformancePanelContent: View {
                     Text(VoiceInkDurationPresentation.abbreviatedMinutesSeconds(stat.avgAudioDuration))
                         .font(.system(size: 11, weight: .semibold, design: .monospaced))
                         .foregroundColor(.indigo)
-                    Text("Avg. Audio")
+                    Text(VoiceInkPerformancePresentation.averageAudioLabel)
                         .font(.system(size: 9))
                         .foregroundColor(.secondary)
                 }
@@ -164,7 +164,7 @@ private struct ModelPerformancePanelContent: View {
                     Text(stat.avgProcessingTimeCompactText)
                         .font(.system(size: 11, weight: .semibold, design: .monospaced))
                         .foregroundColor(.teal)
-                    Text("Avg. Processing")
+                    Text(VoiceInkPerformancePresentation.averageProcessingLabel)
                         .font(.system(size: 9))
                         .foregroundColor(.secondary)
                 }
@@ -180,7 +180,7 @@ private struct ModelPerformancePanelContent: View {
 
     private var enhancementSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            sectionHeader("Enhancement Models")
+            sectionHeader(VoiceInkPerformancePresentation.enhancementModelsSectionTitle)
             LazyVGrid(columns: gridColumns, spacing: 12) {
                 ForEach(enhancementStats) { stat in
                     enhancementTile(stat)
@@ -196,7 +196,7 @@ private struct ModelPerformancePanelContent: View {
                     .font(.system(size: 12, weight: .semibold))
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
-                Text("\(stat.sampleCount) sessions")
+                Text(VoiceInkPerformancePresentation.sessionSampleCountText(stat.sampleCount))
                     .font(.system(size: 10))
                     .foregroundColor(.secondary)
             }
@@ -206,7 +206,7 @@ private struct ModelPerformancePanelContent: View {
                 Text(stat.avgProcessingTimeCompactText)
                     .font(.system(size: 24, weight: .bold, design: .rounded))
                     .foregroundColor(.indigo)
-                Text("Avg. Enhancement Time")
+                Text(VoiceInkPerformancePresentation.averageEnhancementTimeLabel)
                     .font(.system(size: 10))
                     .foregroundColor(.secondary)
             }

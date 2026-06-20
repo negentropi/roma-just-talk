@@ -44,12 +44,12 @@ struct PerformanceAnalysisPanelView: View {
 
     private var header: some View {
         HStack(spacing: 12) {
-            Text("Performance Analysis")
+            Text(VoiceInkPerformancePresentation.performanceAnalysisPanelTitle)
                 .font(.headline)
                 .fontWeight(.semibold)
             Spacer()
             Button(action: onClose) {
-                Image(systemName: "xmark")
+                Image(systemName: VoiceInkPerformancePresentation.closeSystemImageName)
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(.secondary)
                     .padding(6)
@@ -64,12 +64,27 @@ struct PerformanceAnalysisPanelView: View {
 
     private var summarySection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            sectionHeader("Summary")
+            sectionHeader(VoiceInkPerformancePresentation.summarySectionTitle)
 
             HStack(spacing: 10) {
-                summaryPill(icon: "doc.text.fill", value: "\(analysis.totalTranscripts)", label: "Total", color: .indigo)
-                summaryPill(icon: "waveform.path.ecg", value: "\(analysis.totalWithTranscriptionData)", label: "Analyzable", color: .teal)
-                summaryPill(icon: "sparkles", value: "\(analysis.totalEnhancedFiles)", label: "Enhanced", color: .mint)
+                summaryPill(
+                    icon: VoiceInkPerformancePresentation.totalSummaryIconSystemName,
+                    value: "\(analysis.totalTranscripts)",
+                    label: VoiceInkPerformancePresentation.totalSummaryLabel,
+                    color: .indigo
+                )
+                summaryPill(
+                    icon: VoiceInkPerformancePresentation.analyzableSummaryIconSystemName,
+                    value: "\(analysis.totalWithTranscriptionData)",
+                    label: VoiceInkPerformancePresentation.analyzableSummaryLabel,
+                    color: .teal
+                )
+                summaryPill(
+                    icon: VoiceInkPerformancePresentation.enhancedSummaryIconSystemName,
+                    value: "\(analysis.totalEnhancedFiles)",
+                    label: VoiceInkPerformancePresentation.enhancedSummaryLabel,
+                    color: .mint
+                )
             }
         }
     }
@@ -96,14 +111,14 @@ struct PerformanceAnalysisPanelView: View {
 
     private var systemInfoSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            sectionHeader("System Information")
+            sectionHeader(VoiceInkPerformancePresentation.systemInformationSectionTitle)
 
             VStack(spacing: 0) {
-                infoRow(label: "Device", value: PerformanceAnalyzer.getMacModel())
+                infoRow(label: VoiceInkPerformancePresentation.deviceInfoLabel, value: PerformanceAnalyzer.getMacModel())
                 Divider().padding(.horizontal, 10)
-                infoRow(label: "Processor", value: PerformanceAnalyzer.getCPUInfo())
+                infoRow(label: VoiceInkPerformancePresentation.processorInfoLabel, value: PerformanceAnalyzer.getCPUInfo())
                 Divider().padding(.horizontal, 10)
-                infoRow(label: "Memory", value: PerformanceAnalyzer.getMemoryInfo())
+                infoRow(label: VoiceInkPerformancePresentation.memoryInfoLabel, value: PerformanceAnalyzer.getMemoryInfo())
             }
             .background(
                 RoundedRectangle(cornerRadius: 10)
@@ -141,7 +156,7 @@ struct PerformanceAnalysisPanelView: View {
 
     private var transcriptionModelsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            sectionHeader("Transcription Models")
+            sectionHeader(VoiceInkPerformancePresentation.transcriptionModelsSectionTitle)
 
             LazyVGrid(columns: gridColumns, spacing: 12) {
                 ForEach(analysis.transcriptionModels) { modelStat in
@@ -159,7 +174,7 @@ struct PerformanceAnalysisPanelView: View {
                     .font(.system(size: 12, weight: .semibold))
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
-                Text("\(modelStat.sampleCount) transcripts")
+                Text(VoiceInkPerformancePresentation.transcriptSampleCountText(modelStat.sampleCount))
                     .font(.system(size: 10))
                     .foregroundColor(.secondary)
             }
@@ -184,7 +199,7 @@ struct PerformanceAnalysisPanelView: View {
                     Text(VoiceInkDurationPresentation.abbreviatedMinutesSeconds(modelStat.avgAudioDuration))
                         .font(.system(size: 11, weight: .semibold, design: .monospaced))
                         .foregroundColor(.indigo)
-                    Text("Avg. Audio")
+                    Text(VoiceInkPerformancePresentation.averageAudioLabel)
                         .font(.system(size: 9))
                         .foregroundColor(.secondary)
                 }
@@ -198,7 +213,7 @@ struct PerformanceAnalysisPanelView: View {
                     Text(modelStat.avgProcessingTimeCompactText)
                         .font(.system(size: 11, weight: .semibold, design: .monospaced))
                         .foregroundColor(.teal)
-                    Text("Avg. Processing")
+                    Text(VoiceInkPerformancePresentation.averageProcessingLabel)
                         .font(.system(size: 9))
                         .foregroundColor(.secondary)
                 }
@@ -214,7 +229,7 @@ struct PerformanceAnalysisPanelView: View {
 
     private var enhancementModelsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            sectionHeader("Enhancement Models")
+            sectionHeader(VoiceInkPerformancePresentation.enhancementModelsSectionTitle)
 
             LazyVGrid(columns: gridColumns, spacing: 12) {
                 ForEach(analysis.enhancementModels) { modelStat in
@@ -232,7 +247,7 @@ struct PerformanceAnalysisPanelView: View {
                     .font(.system(size: 12, weight: .semibold))
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
-                Text("\(modelStat.sampleCount) transcripts")
+                Text(VoiceInkPerformancePresentation.transcriptSampleCountText(modelStat.sampleCount))
                     .font(.system(size: 10))
                     .foregroundColor(.secondary)
             }
@@ -243,7 +258,7 @@ struct PerformanceAnalysisPanelView: View {
                 Text(modelStat.avgProcessingTimeSpacedText)
                     .font(.system(size: 24, weight: .bold, design: .rounded))
                     .foregroundColor(.indigo)
-                Text("Avg. Enhancement Time")
+                Text(VoiceInkPerformancePresentation.averageEnhancementTimeLabel)
                     .font(.system(size: 10))
                     .foregroundColor(.secondary)
             }

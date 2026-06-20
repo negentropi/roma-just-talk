@@ -162,6 +162,32 @@ final class PerformanceAnalysisTests: XCTestCase {
         )
         XCTAssertNil(VoiceInkPerformanceTimeFilter.allTime.startDate(now: now, calendar: calendar))
     }
+
+    func testPerformancePresentationPreservesMacOSPanelCopyAndIcons() {
+        XCTAssertEqual(VoiceInkPerformancePresentation.modelPerformancePanelTitle, "Model Performance")
+        XCTAssertEqual(VoiceInkPerformancePresentation.performanceAnalysisPanelTitle, "Performance Analysis")
+        XCTAssertEqual(VoiceInkPerformancePresentation.closeSystemImageName, "xmark")
+        XCTAssertEqual(VoiceInkPerformancePresentation.emptyStateSystemImageName, "chart.bar.xaxis")
+        XCTAssertEqual(VoiceInkPerformancePresentation.emptyStateTitle, "No data for this period")
+        XCTAssertEqual(VoiceInkPerformancePresentation.summarySectionTitle, "Summary")
+        XCTAssertEqual(VoiceInkPerformancePresentation.systemInformationSectionTitle, "System Information")
+        XCTAssertEqual(VoiceInkPerformancePresentation.transcriptionModelsSectionTitle, "Transcription Models")
+        XCTAssertEqual(VoiceInkPerformancePresentation.enhancementModelsSectionTitle, "Enhancement Models")
+        XCTAssertEqual(VoiceInkPerformancePresentation.totalSummaryIconSystemName, "doc.text.fill")
+        XCTAssertEqual(VoiceInkPerformancePresentation.totalSummaryLabel, "Total")
+        XCTAssertEqual(VoiceInkPerformancePresentation.analyzableSummaryIconSystemName, "waveform.path.ecg")
+        XCTAssertEqual(VoiceInkPerformancePresentation.analyzableSummaryLabel, "Analyzable")
+        XCTAssertEqual(VoiceInkPerformancePresentation.enhancedSummaryIconSystemName, "sparkles")
+        XCTAssertEqual(VoiceInkPerformancePresentation.enhancedSummaryLabel, "Enhanced")
+        XCTAssertEqual(VoiceInkPerformancePresentation.deviceInfoLabel, "Device")
+        XCTAssertEqual(VoiceInkPerformancePresentation.processorInfoLabel, "Processor")
+        XCTAssertEqual(VoiceInkPerformancePresentation.memoryInfoLabel, "Memory")
+        XCTAssertEqual(VoiceInkPerformancePresentation.averageAudioLabel, "Avg. Audio")
+        XCTAssertEqual(VoiceInkPerformancePresentation.averageProcessingLabel, "Avg. Processing")
+        XCTAssertEqual(VoiceInkPerformancePresentation.averageEnhancementTimeLabel, "Avg. Enhancement Time")
+        XCTAssertEqual(VoiceInkPerformancePresentation.sessionSampleCountText(2), "2 sessions")
+        XCTAssertEqual(VoiceInkPerformancePresentation.transcriptSampleCountText(3), "3 transcripts")
+    }
 }
 
 private struct Record: VoiceInkPerformanceRecord {

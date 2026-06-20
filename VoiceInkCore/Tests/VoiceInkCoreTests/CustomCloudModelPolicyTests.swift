@@ -194,4 +194,66 @@ final class CustomCloudModelPolicyTests: XCTestCase {
             apiKey: ""
         ).apiKeyForImport)
     }
+
+    func testStoredRecordMigratesLegacyAPIKeyButNeverReencodesIt() throws {
+        let data = """
+        {
+          "id": "E31E4D7A-437B-4BD3-A4B5-9624F38F3BBE",
+          "name": "custom",
+          "displayName": "Custom",
+          "description": "Transcribes audio",
+          "apiEndpoint": "https://api.example.com/v1/audio/transcriptions",
+          "modelName": "whisper-1",
+          "isMultilingualModel": true,
+          "supportedLanguages": { "en": "English" },
+          "apiKey": " legacy-key "
+        }
+        """.data(using: .utf8)!
+
+        let record = try JSONDecoder().decode(VoiceInkCustomCloudModelStoredRecord.self, from: data)
+
+        XCTAssertEqual(record.legacyAPIKeyForKeychainMigration, " legacy-key ")
+        let encoded = try JSONSerialization.jsonObject(
+            with: JSONEncoder().encode(record)
+        ) as? [String: Any]
+        XCTAssertNil(encoded?["apiKey"])
+    }
+
+    func testStoredRecordSkipsOnlyMissingOrEmptyLegacyAPIKeyMigration() throws {
+        XCTAssertNil(VoiceInkCustomCloudModelStoredRecord(
+            id: UUID(),
+            name: "custom",
+            displayName: "Custom",
+            description: "",
+            apiEndpoint: "",
+            modelName: "",
+            isMultilingualModel: false,
+            supportedLanguages: [:],
+            legacyAPIKey: nil
+        ).legacyAPIKeyForKeychainMigration)
+
+        XCTAssertNil(VoiceInkCustomCloudModelStoredRecord(
+            id: UUID(),
+            name: "custom",
+            displayName: "Custom",
+            description: "",
+            apiEndpoint: "",
+            modelName: "",
+            isMultilingualModel: false,
+            supportedLanguages: [:],
+            legacyAPIKey: ""
+        ).legacyAPIKeyForKeychainMigration)
+
+        XCTAssertEqual(VoiceInkCustomCloudModelStoredRecord(
+            id: UUID(),
+            name: "custom",
+            displayName: "Custom",
+            description: "",
+            apiEndpoint: "",
+            modelName: "",
+            isMultilingualModel: false,
+            supportedLanguages: [:],
+            legacyAPIKey: " "
+        ).legacyAPIKeyForKeychainMigration, " ")
+    }
 }

@@ -161,6 +161,77 @@ public struct VoiceInkCustomCloudModelBackup: Codable, Equatable, Sendable {
     }
 }
 
+public struct VoiceInkCustomCloudModelStoredRecord: Codable, Equatable, Sendable {
+    public let id: UUID
+    public let name: String
+    public let displayName: String
+    public let description: String
+    public let apiEndpoint: String
+    public let modelName: String
+    public let isMultilingualModel: Bool
+    public let supportedLanguages: [String: String]
+    public let legacyAPIKey: String?
+
+    public init(
+        id: UUID,
+        name: String,
+        displayName: String,
+        description: String,
+        apiEndpoint: String,
+        modelName: String,
+        isMultilingualModel: Bool,
+        supportedLanguages: [String: String],
+        legacyAPIKey: String? = nil
+    ) {
+        self.id = id
+        self.name = name
+        self.displayName = displayName
+        self.description = description
+        self.apiEndpoint = apiEndpoint
+        self.modelName = modelName
+        self.isMultilingualModel = isMultilingualModel
+        self.supportedLanguages = supportedLanguages
+        self.legacyAPIKey = legacyAPIKey
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id, name, displayName, description, apiEndpoint, modelName, isMultilingualModel, supportedLanguages
+        case apiKey
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        displayName = try container.decode(String.self, forKey: .displayName)
+        description = try container.decode(String.self, forKey: .description)
+        apiEndpoint = try container.decode(String.self, forKey: .apiEndpoint)
+        modelName = try container.decode(String.self, forKey: .modelName)
+        isMultilingualModel = try container.decode(Bool.self, forKey: .isMultilingualModel)
+        supportedLanguages = try container.decode([String: String].self, forKey: .supportedLanguages)
+        legacyAPIKey = try container.decodeIfPresent(String.self, forKey: .apiKey)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(name, forKey: .name)
+        try container.encode(displayName, forKey: .displayName)
+        try container.encode(description, forKey: .description)
+        try container.encode(apiEndpoint, forKey: .apiEndpoint)
+        try container.encode(modelName, forKey: .modelName)
+        try container.encode(isMultilingualModel, forKey: .isMultilingualModel)
+        try container.encode(supportedLanguages, forKey: .supportedLanguages)
+    }
+
+    public var legacyAPIKeyForKeychainMigration: String? {
+        guard let legacyAPIKey, !legacyAPIKey.isEmpty else {
+            return nil
+        }
+        return legacyAPIKey
+    }
+}
+
 public enum VoiceInkCustomCloudModelPolicy {
     public static func generatedName(fromDisplayName displayName: String) -> String {
         displayName.lowercased().replacingOccurrences(of: " ", with: "-")

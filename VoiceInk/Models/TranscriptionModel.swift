@@ -363,38 +363,33 @@ struct CustomCloudModel: TranscriptionModel, Codable {
         self.supportedLanguages = supportedLanguages ?? ModelProvider.whisper.supportedLanguages(isMultilingual: isMultilingual)
     }
 
-    /// Custom Codable to migrate legacy apiKey from JSON to Keychain.
-    private enum CodingKeys: String, CodingKey {
-        case id, name, displayName, description, apiEndpoint, modelName, isMultilingualModel, supportedLanguages
-        case apiKey
-    }
-
     init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = try container.decode(UUID.self, forKey: .id)
-        name = try container.decode(String.self, forKey: .name)
-        displayName = try container.decode(String.self, forKey: .displayName)
-        description = try container.decode(String.self, forKey: .description)
-        apiEndpoint = try container.decode(String.self, forKey: .apiEndpoint)
-        modelName = try container.decode(String.self, forKey: .modelName)
-        isMultilingualModel = try container.decode(Bool.self, forKey: .isMultilingualModel)
-        supportedLanguages = try container.decode([String: String].self, forKey: .supportedLanguages)
+        let record = try VoiceInkCustomCloudModelStoredRecord(from: decoder)
+        id = record.id
+        name = record.name
+        displayName = record.displayName
+        description = record.description
+        apiEndpoint = record.apiEndpoint
+        modelName = record.modelName
+        isMultilingualModel = record.isMultilingualModel
+        supportedLanguages = record.supportedLanguages
 
-        if let legacyApiKey = try container.decodeIfPresent(String.self, forKey: .apiKey), !legacyApiKey.isEmpty {
-            APIKeyManager.shared.saveCustomModelAPIKey(legacyApiKey, forModelId: id)
+        if let legacyApiKey = record.legacyAPIKeyForKeychainMigration {
+            APIKeyManager.shared.saveCustomModelAPIKey(legacyApiKey, forModelId: record.id)
         }
     }
 
     func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(id, forKey: .id)
-        try container.encode(name, forKey: .name)
-        try container.encode(displayName, forKey: .displayName)
-        try container.encode(description, forKey: .description)
-        try container.encode(apiEndpoint, forKey: .apiEndpoint)
-        try container.encode(modelName, forKey: .modelName)
-        try container.encode(isMultilingualModel, forKey: .isMultilingualModel)
-        try container.encode(supportedLanguages, forKey: .supportedLanguages)
+        try VoiceInkCustomCloudModelStoredRecord(
+            id: id,
+            name: name,
+            displayName: displayName,
+            description: description,
+            apiEndpoint: apiEndpoint,
+            modelName: modelName,
+            isMultilingualModel: isMultilingualModel,
+            supportedLanguages: supportedLanguages
+        ).encode(to: encoder)
     }
 } 
 

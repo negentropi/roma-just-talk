@@ -1939,6 +1939,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
 
 require_pattern \
+  "shared custom cloud model stored record owns persistence shape and legacy API-key migration policy" \
+  'struct VoiceInkCustomCloudModelStoredRecord|legacyAPIKeyForKeychainMigration|decodeIfPresent\(String\.self, forKey: \.apiKey\)' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
+
+require_pattern \
   "shared custom cloud model form presentation owns defaults and copy" \
   'VoiceInkCustomCloudModelFormPresentation|defaultAPIEndpoint|defaultModelName|keychainSaveFailureMessage|submitButtonSystemImageName' \
   VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
@@ -1957,6 +1962,16 @@ reject_pattern \
   "macOS custom cloud model form avoids duplicate action icon names" \
   '"(plus|xmark|exclamationmark\.triangle\.fill|plus\.circle\.fill|checkmark\.circle\.fill)"' \
   "VoiceInk/Views/AI Models/AddCustomModelView.swift"
+
+require_pattern \
+  "macOS custom cloud model Codable delegates stored shape to shared core" \
+  'VoiceInkCustomCloudModelStoredRecord\(from: decoder\)|legacyAPIKeyForKeychainMigration|VoiceInkCustomCloudModelStoredRecord\(' \
+  VoiceInk/Models/TranscriptionModel.swift
+
+reject_pattern \
+  "macOS custom cloud model Codable avoids shell-owned legacy API-key decode policy" \
+  'decodeIfPresent\(String\.self, forKey: \.apiKey\)|case +apiKey' \
+  VoiceInk/Models/TranscriptionModel.swift
 
 require_pattern \
   "macOS backup file uses shared custom cloud model backup record" \

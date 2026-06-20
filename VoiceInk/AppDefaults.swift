@@ -23,7 +23,6 @@ enum AppDefaults {
             CustomSoundManager.SoundType.stop.builtInSoundKey: CustomSoundManager.SoundType.stop.defaultBuiltInSound.rawValue,
 
             // Recording & Transcription
-            VoiceInkUserDefaultsKey.appendTrailingSpace: VoiceInkPreferenceDefault.appendTrailingSpace,
             VoiceInkRollingBufferPreloadSettings.modeKey: VoiceInkRollingBufferPreloadSettings.defaultMode.rawValue,
             VoiceInkRollingBufferPreloadSettings.autoDisableCloudModelsKey: VoiceInkRollingBufferPreloadSettings.defaultAutoDisablesCloudModels,
             VoiceInkRollingBufferPreloadSettings.autoDisableLowBatteryLocalModelsKey: VoiceInkRollingBufferPreloadSettings.defaultAutoDisablesLowBatteryLocalModels,
@@ -39,6 +38,7 @@ enum AppDefaults {
             "DidApplyLaunchAtLoginDefault": false,
         ]
 
+        platformDefaults.merge(VoiceInkAppendTrailingSpacePreference.registeredDefaults) { _, sharedValue in sharedValue }
         platformDefaults.merge(VoiceInkModelRuntimePreference.registeredDefaults) { _, sharedValue in sharedValue }
         platformDefaults.merge(VoiceInkRecorderPreviewPreference.registeredDefaults) { _, sharedValue in sharedValue }
         platformDefaults.merge(VoiceInkRecordingShortcutPreference.registeredDefaults) { _, sharedValue in sharedValue }

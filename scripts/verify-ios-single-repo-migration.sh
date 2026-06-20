@@ -2987,6 +2987,26 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionPasteOutputPolicy.swift
 
 require_pattern \
+  "shared trailing-space preference owns user-defaults key" \
+  'userDefaultsKey' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionPasteOutputPolicy.swift
+
+require_pattern \
+  "shared trailing-space preference owns default value" \
+  'defaultIsEnabled' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionPasteOutputPolicy.swift
+
+require_pattern \
+  "shared trailing-space preference owns registered defaults" \
+  'registeredDefaults' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionPasteOutputPolicy.swift
+
+require_pattern \
+  "shared trailing-space preference owns macOS settings presentation" \
+  'VoiceInkMacOSAppendTrailingSpaceSettingsPresentation|macOSSettingsPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionPasteOutputPolicy.swift
+
+require_pattern \
   "macOS transcription pipeline uses shared paste output policy" \
   'VoiceInkTranscriptionPasteOutputPolicy\.finalPastedText' \
   VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
@@ -2997,13 +3017,29 @@ reject_pattern \
   VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
 
 require_pattern \
+  "macOS defaults register shared trailing-space default" \
+  'VoiceInkAppendTrailingSpacePreference\.registeredDefaults' \
+  VoiceInk/AppDefaults.swift
+
+require_pattern \
   "macOS trailing-space settings use shared preference key" \
-  'VoiceInkUserDefaultsKey\.appendTrailingSpace' \
+  'VoiceInkAppendTrailingSpacePreference\.userDefaultsKey|VoiceInkAppendTrailingSpacePreference\.defaultIsEnabled' \
+  VoiceInk/Views/ModelSettingsView.swift
+
+require_pattern \
+  "macOS trailing-space settings use shared presentation" \
+  'VoiceInkAppendTrailingSpacePreference\.macOSSettingsPresentation|appendTrailingSpacePresentation\.(toggleTitle|helpText)' \
+  VoiceInk/Views/ModelSettingsView.swift
+
+reject_pattern \
+  "macOS trailing-space shells avoid raw preference key and copy" \
+  'VoiceInkUserDefaultsKey\.appendTrailingSpace|VoiceInkPreferenceDefault\.appendTrailingSpace|"(AppendTrailingSpace|Add Space After Paste|Add a trailing space after pasted transcription output\.)"' \
+  VoiceInk/AppDefaults.swift \
   VoiceInk/Views/ModelSettingsView.swift
 
 require_pattern \
   "migration checklist tracks shared paste output gate" \
-  'macOS final paste text assembly routes trial-expired prefix and trailing-space storage through `VoiceInkTranscriptionPasteOutputPolicy`/`VoiceInkAppendTrailingSpacePreference`' \
+  'macOS final paste text assembly routes trial-expired prefix, trailing-space storage/default registration, and trailing-space settings labels/help through `VoiceInkTranscriptionPasteOutputPolicy`/`VoiceInkAppendTrailingSpacePreference`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

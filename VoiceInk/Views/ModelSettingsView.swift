@@ -10,14 +10,15 @@ struct ModelSettingsView: View {
     @AppStorage(PunctuationCleanupMode.userDefaultsKey) private var punctuationCleanupModeRaw = PunctuationCleanupMode.current().rawValue
     @AppStorage(VoiceInkUserDefaultsKey.lowercaseTranscription) private var lowercaseTranscription = false
     @AppStorage(VoiceInkUserDefaultsKey.isVADEnabled) private var isVADEnabled = VoiceInkPreferenceDefault.isVADEnabled
-    @AppStorage(VoiceInkUserDefaultsKey.appendTrailingSpace)
-    private var appendTrailingSpace = VoiceInkPreferenceDefault.appendTrailingSpace
+    @AppStorage(VoiceInkAppendTrailingSpacePreference.userDefaultsKey)
+    private var appendTrailingSpace = VoiceInkAppendTrailingSpacePreference.defaultIsEnabled
     @AppStorage(VoiceInkUserDefaultsKey.prewarmModelOnWake)
     private var prewarmModelOnWake = VoiceInkPreferenceDefault.prewarmModelOnWake
     @AppStorage(VoiceInkUserDefaultsKey.showLiveTextPreview)
     private var showLiveTextPreview = VoiceInkPreferenceDefault.showLiveTextPreview
     @State private var customPrompt: String = ""
     @State private var isEditing: Bool = false
+    private let appendTrailingSpacePresentation = VoiceInkAppendTrailingSpacePreference.macOSSettingsPresentation
     private let cleanupPresentation = VoiceInkTranscriptionCleanupPresentation.macOS
 
     private var punctuationCleanupMode: Binding<PunctuationCleanupMode> {
@@ -112,8 +113,8 @@ struct ModelSettingsView: View {
             Section {
                 Toggle(isOn: $appendTrailingSpace) {
                     HStack(spacing: 4) {
-                        Text("Add Space After Paste")
-                        InfoTip("Add a trailing space after pasted transcription output.")
+                        Text(appendTrailingSpacePresentation.toggleTitle)
+                        InfoTip(appendTrailingSpacePresentation.helpText)
                     }
                 }
                 .toggleStyle(.switch)

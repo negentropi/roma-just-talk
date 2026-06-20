@@ -121,7 +121,9 @@ class ImportExportService {
         let powerModeManager = PowerModeManager.shared
         let emojiManager = EmojiManager.shared
 
-        let exportablePrompts = enhancementService.customPrompts.filter { !$0.isPredefined }
+        let exportablePrompts = VoiceInkCustomPromptPolicy.exportedCustomPrompts(
+            from: enhancementService.customPrompts
+        )
 
         let powerConfigs = powerModeManager.configurations
         let powerModeShortcuts = Dictionary(uniqueKeysWithValues: powerConfigs.compactMap { config -> (String, ShortcutBackup)? in

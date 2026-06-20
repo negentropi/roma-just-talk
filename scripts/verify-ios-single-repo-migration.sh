@@ -2516,6 +2516,47 @@ require_pattern \
   'startup prompt-store repair ordering' \
   docs/ios-single-repo-migration.md
 
+require_pattern \
+  "shared custom prompt policy owns backup export filtering" \
+  'exportedCustomPrompts' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift
+
+require_pattern \
+  "shared custom prompt policy owns backup import merge ordering" \
+  'promptsAfterImportingCustomPrompts' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift
+
+require_pattern \
+  "macOS settings export uses shared custom prompt export policy" \
+  'VoiceInkCustomPromptPolicy\.exportedCustomPrompts' \
+  VoiceInk/Services/ImportExportService.swift
+
+require_pattern \
+  "macOS settings import uses shared custom prompt import policy" \
+  'VoiceInkCustomPromptPolicy\.promptsAfterImportingCustomPrompts' \
+  VoiceInk/Services/BackupImporter.swift
+
+reject_pattern \
+  "macOS backup shells avoid shell-owned custom prompt import/export policy" \
+  'customPrompts\.filter \{ !?\$0\.isPredefined \}|predefinedPrompts \+ backup\.customPrompts' \
+  VoiceInk/Services/ImportExportService.swift \
+  VoiceInk/Services/BackupImporter.swift
+
+require_pattern \
+  "core checks execute custom prompt backup export policy tests" \
+  'CustomPromptTests\.testCustomPromptPolicyExportsOnlyCustomPromptsInStoredOrder' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute custom prompt backup import policy tests" \
+  'CustomPromptTests\.testCustomPromptPolicyImportsBackupPromptsAfterCurrentPredefinedPrompts' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "migration checklist tracks shared custom prompt backup policy" \
+  'backup export filtering and import merge ordering' \
+  docs/ios-single-repo-migration.md
+
 reject_pattern \
   "macOS and iOS filler-word settings use shared draft policy" \
   'VoiceInkFillerWords\.normalizedWord' \

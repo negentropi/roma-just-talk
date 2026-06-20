@@ -191,6 +191,17 @@ public enum VoiceInkCustomPromptPolicy {
         return VoiceInkCustomPromptStoreState(prompts: updatedPrompts, selectedPromptId: updatedSelectedPromptId)
     }
 
+    public static func exportedCustomPrompts(from prompts: [VoiceInkCustomPrompt]) -> [VoiceInkCustomPrompt] {
+        prompts.filter { !$0.isPredefined }
+    }
+
+    public static func promptsAfterImportingCustomPrompts(
+        _ importedPrompts: [VoiceInkCustomPrompt],
+        currentPrompts: [VoiceInkCustomPrompt]
+    ) -> [VoiceInkCustomPrompt] {
+        currentPrompts.filter { $0.isPredefined } + importedPrompts
+    }
+
     public static func selectedPromptIdAfterEnablingEnhancement(
         _ selectedPromptId: UUID?,
         prompts: [VoiceInkCustomPrompt]

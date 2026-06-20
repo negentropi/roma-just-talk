@@ -220,6 +220,67 @@ final class CustomPromptTests: XCTestCase {
         XCTAssertNil(lastSelectedDeletedState.selectedPromptId)
     }
 
+    func testCustomPromptPolicyExportsOnlyCustomPromptsInStoredOrder() {
+        let predefinedPrompt = VoiceInkCustomPrompt(
+            id: VoiceInkPredefinedPrompts.defaultPromptId,
+            title: "Default",
+            promptText: "Default prompt",
+            isPredefined: true
+        )
+        let firstCustomId = UUID(uuidString: "00000000-0000-0000-0000-000000000212")!
+        let secondCustomId = UUID(uuidString: "00000000-0000-0000-0000-000000000213")!
+        let firstCustomPrompt = VoiceInkCustomPrompt(id: firstCustomId, title: "First", promptText: "First prompt")
+        let secondCustomPrompt = VoiceInkCustomPrompt(id: secondCustomId, title: "Second", promptText: "Second prompt")
+
+        XCTAssertEqual(
+            VoiceInkCustomPromptPolicy.exportedCustomPrompts(
+                from: [predefinedPrompt, firstCustomPrompt, secondCustomPrompt]
+            ).map(\.id),
+            [firstCustomId, secondCustomId]
+        )
+    }
+
+    func testCustomPromptPolicyImportsBackupPromptsAfterCurrentPredefinedPrompts() {
+        let currentCustomPrompt = VoiceInkCustomPrompt(
+            id: UUID(uuidString: "00000000-0000-0000-0000-000000000214")!,
+            title: "Current Custom",
+            promptText: "Current custom prompt"
+        )
+        let currentDefaultPrompt = VoiceInkCustomPrompt(
+            id: VoiceInkPredefinedPrompts.defaultPromptId,
+            title: "Default",
+            promptText: "Default prompt",
+            isPredefined: true
+        )
+        let importedCustomPrompt = VoiceInkCustomPrompt(
+            id: UUID(uuidString: "00000000-0000-0000-0000-000000000215")!,
+            title: "Imported Custom",
+            promptText: "Imported custom prompt"
+        )
+        let importedPredefinedPrompt = VoiceInkCustomPrompt(
+            id: VoiceInkPredefinedPrompts.assistantPromptId,
+            title: "Imported Assistant",
+            promptText: "Imported assistant prompt",
+            isPredefined: true
+        )
+
+        let importedPrompts = VoiceInkCustomPromptPolicy.promptsAfterImportingCustomPrompts(
+            [importedCustomPrompt, importedPredefinedPrompt],
+            currentPrompts: [currentCustomPrompt, currentDefaultPrompt]
+        )
+
+        XCTAssertEqual(
+            importedPrompts.map(\.id),
+            [
+                VoiceInkPredefinedPrompts.defaultPromptId,
+                importedCustomPrompt.id,
+                VoiceInkPredefinedPrompts.assistantPromptId
+            ]
+        )
+        XCTAssertEqual(importedPrompts[1].title, "Imported Custom")
+        XCTAssertEqual(importedPrompts[2].title, "Imported Assistant")
+    }
+
     func testCustomPromptPolicySelectsFirstPromptOnlyWhenEnablingEnhancementWithoutSelection() {
         let firstId = UUID(uuidString: "00000000-0000-0000-0000-000000000208")!
         let staleId = UUID(uuidString: "00000000-0000-0000-0000-000000000209")!

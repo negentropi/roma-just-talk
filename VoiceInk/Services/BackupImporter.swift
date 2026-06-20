@@ -34,8 +34,10 @@ enum BackupImporter {
         }
 
         if categories.contains(.prompts) {
-            let predefinedPrompts = enhancementService.customPrompts.filter { $0.isPredefined }
-            enhancementService.customPrompts = predefinedPrompts + backup.customPrompts
+            enhancementService.customPrompts = VoiceInkCustomPromptPolicy.promptsAfterImportingCustomPrompts(
+                backup.customPrompts,
+                currentPrompts: enhancementService.customPrompts
+            )
             print("Successfully imported \(backup.customPrompts.count) custom prompts.")
         }
 

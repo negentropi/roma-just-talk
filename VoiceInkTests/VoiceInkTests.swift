@@ -479,6 +479,7 @@ struct VoiceInkTests {
     }
 
     @Test @MainActor func specialModeLongHoldStartsRecordingPastRollingBufferDuration() async throws {
+        let oneHour: TimeInterval = 60 * 60
         var recordingState = VoiceInkRecordingState.idle
         var sessionActive = false
         var toggleCount = 0
@@ -528,14 +529,21 @@ struct VoiceInkTests {
         )
         try await Task.sleep(nanoseconds: 30_000_000)
 
+        #expect(prepareQuickReleaseCount == 1)
+        #expect(discardQuickReleaseCount == 0)
+        #expect(directCommitCount == 0)
+        #expect(toggleCount == 1)
+        #expect(cancelCount == 0)
+        #expect(recordingState == .recording)
+        #expect(sessionActive)
+
         await handler.handleKeyUp(
             action: .primaryRecording,
-            eventTime: 6,
+            eventTime: 1 + oneHour,
             mode: .special,
             context: VoiceInkShortcutPressContext()
         )
 
-        #expect(prepareQuickReleaseCount == 1)
         #expect(discardQuickReleaseCount == 0)
         #expect(directCommitCount == 0)
         #expect(toggleCount == 2)

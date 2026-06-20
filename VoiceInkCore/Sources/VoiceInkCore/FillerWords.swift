@@ -1,16 +1,21 @@
 import Foundation
 
-public struct VoiceInkFillerWordInsertPlan: Equatable, Sendable {
-    public let wordToInsert: String?
-    public let errorMessage: String?
+public struct VoiceInkFillerWordSubmissionPlan: Equatable, Sendable {
+    public let updatedWords: [String]
+    public let draftAfterSubmit: String
+    public let alertPresentation: VoiceInkDictionaryAlertPresentation?
+    public let didInsert: Bool
 
-    public var shouldInsert: Bool {
-        wordToInsert != nil && errorMessage == nil
-    }
-
-    public init(wordToInsert: String?, errorMessage: String?) {
-        self.wordToInsert = wordToInsert
-        self.errorMessage = errorMessage
+    public init(
+        updatedWords: [String],
+        draftAfterSubmit: String,
+        alertPresentation: VoiceInkDictionaryAlertPresentation?,
+        didInsert: Bool = false
+    ) {
+        self.updatedWords = updatedWords
+        self.draftAfterSubmit = draftAfterSubmit
+        self.alertPresentation = alertPresentation
+        self.didInsert = didInsert
     }
 }
 
@@ -31,45 +36,32 @@ public enum VoiceInkFillerWords {
         normalizedWord(word) != nil
     }
 
-    public static func insertPlan(
-        _ word: String,
+    public static func submissionPlan(
+        _ draft: String,
         existingWords words: [String]
-    ) -> VoiceInkFillerWordInsertPlan {
-        guard let normalized = normalizedWord(word) else {
-            return VoiceInkFillerWordInsertPlan(wordToInsert: nil, errorMessage: nil)
+    ) -> VoiceInkFillerWordSubmissionPlan {
+        guard let wordToInsert = normalizedWord(draft) else {
+            return VoiceInkFillerWordSubmissionPlan(
+                updatedWords: words,
+                draftAfterSubmit: draft,
+                alertPresentation: nil
+            )
         }
 
-        guard !words.contains(where: { $0.lowercased() == normalized }) else {
-            return VoiceInkFillerWordInsertPlan(wordToInsert: nil, errorMessage: duplicateWordMessage)
+        guard !words.contains(where: { $0.lowercased() == wordToInsert }) else {
+            return VoiceInkFillerWordSubmissionPlan(
+                updatedWords: words,
+                draftAfterSubmit: draft,
+                alertPresentation: .duplicateFillerWord(message: duplicateWordMessage)
+            )
         }
 
-        return VoiceInkFillerWordInsertPlan(wordToInsert: normalized, errorMessage: nil)
-    }
-
-    public static func adding(_ word: String, to words: [String]) -> [String]? {
-        var updatedWords = words
-        let errorMessage = add(word, to: &updatedWords)
-        guard errorMessage == nil, updatedWords != words else {
-            return nil
-        }
-
-        return updatedWords
-    }
-
-    @discardableResult
-    public static func add(_ word: String, to words: inout [String]) -> String? {
-        let plan = insertPlan(word, existingWords: words)
-
-        if let errorMessage = plan.errorMessage {
-            return errorMessage
-        }
-
-        guard let wordToInsert = plan.wordToInsert else {
-            return nil
-        }
-
-        words.append(wordToInsert)
-        return nil
+        return VoiceInkFillerWordSubmissionPlan(
+            updatedWords: words + [wordToInsert],
+            draftAfterSubmit: "",
+            alertPresentation: nil,
+            didInsert: true
+        )
     }
 
     public static func removing(_ word: String, from words: [String]) -> [String] {

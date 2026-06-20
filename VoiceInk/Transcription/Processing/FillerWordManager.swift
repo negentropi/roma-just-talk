@@ -19,8 +19,12 @@ class FillerWordManager: ObservableObject {
     }
 
     @discardableResult
-    func addWord(_ word: String) -> String? {
-        VoiceInkFillerWords.add(word, to: &fillerWords)
+    func submitWordDraft(_ draft: String) -> VoiceInkFillerWordSubmissionPlan {
+        let plan = VoiceInkFillerWords.submissionPlan(draft, existingWords: fillerWords)
+        if fillerWords != plan.updatedWords {
+            fillerWords = plan.updatedWords
+        }
+        return plan
     }
 
     func removeWord(_ word: String) {

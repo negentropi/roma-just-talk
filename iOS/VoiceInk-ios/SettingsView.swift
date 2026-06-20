@@ -227,14 +227,9 @@ struct SettingsView: View {
     }
 
     private func addFillerWord() {
-        guard canAddFillerWord else { return }
-
-        if let errorMessage = settings.addFillerWord(newFillerWord) {
-            dictionaryAlert = .duplicateFillerWord(message: errorMessage)
-            return
-        }
-
-        newFillerWord = ""
+        let plan = settings.submitFillerWordDraft(newFillerWord)
+        newFillerWord = plan.draftAfterSubmit
+        dictionaryAlert = plan.alertPresentation
     }
 
     private func addCustomVocabularyTerm() {

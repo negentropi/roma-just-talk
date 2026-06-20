@@ -2438,13 +2438,18 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/FillerWords.swift
 
 require_pattern \
-  "macOS filler-word insertion uses shared insert policy" \
-  'VoiceInkFillerWords\.add\(' \
+  "shared filler-word submission policy owns draft and alert plan" \
+  'VoiceInkFillerWordSubmissionPlan|submissionPlan|draftAfterSubmit|alertPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/FillerWords.swift
+
+require_pattern \
+  "macOS filler-word submission uses shared submission plan" \
+  'VoiceInkFillerWords\.submissionPlan' \
   VoiceInk/Transcription/Processing/FillerWordManager.swift
 
 require_pattern \
-  "iOS filler-word insertion uses shared insert policy" \
-  'VoiceInkFillerWords\.add\(' \
+  "iOS filler-word submission uses shared submission plan" \
+  'VoiceInkFillerWords\.submissionPlan' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \
@@ -2452,6 +2457,22 @@ reject_pattern \
   'VoiceInkFillerWords\.insertPlan\(|wordToInsert|duplicateWordMessage' \
   VoiceInk/Transcription/Processing/FillerWordManager.swift \
   iOS/VoiceInk-ios/AppSettings.swift
+
+require_pattern \
+  "macOS filler-word view consumes shared submission result" \
+  'submitWordDraft|draftAfterSubmit|alertPresentation' \
+  VoiceInk/Views/Components/FillerWordsSettingsView.swift
+
+require_pattern \
+  "iOS filler-word view consumes shared submission result" \
+  'submitFillerWordDraft|draftAfterSubmit|alertPresentation' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+reject_pattern \
+  "platform filler-word views avoid shell-owned duplicate alert branching" \
+  'duplicateFillerWord' \
+  VoiceInk/Views/Components/FillerWordsSettingsView.swift \
+  iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \
   "shared transcription cleanup presentation lives in VoiceInkCore" \
@@ -2606,7 +2627,7 @@ require_pattern \
 
 require_pattern \
   "iOS settings uses shared dictionary alert presentation" \
-  'VoiceInkDictionaryAlertPresentation|dictionaryAlert|\.duplicateFillerWord|\.vocabulary|\.wordReplacement' \
+  'VoiceInkDictionaryAlertPresentation|dictionaryAlert|\.vocabulary|\.wordReplacement' \
   iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \
@@ -2615,8 +2636,8 @@ require_pattern \
   iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \
-  "macOS filler-word settings uses shared dictionary alert presentation" \
-  'VoiceInkDictionaryAlertPresentation|\.duplicateFillerWord' \
+  "macOS filler-word settings consumes shared dictionary alert presentation" \
+  'VoiceInkDictionaryAlertPresentation|alertPresentation|plan\.alertPresentation' \
   VoiceInk/Views/Components/FillerWordsSettingsView.swift
 
 require_pattern \

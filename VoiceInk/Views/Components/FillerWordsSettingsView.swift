@@ -103,14 +103,9 @@ struct FillerWordsSettingsView: View {
     }
 
     private func addWord() {
-        guard canAddWord else { return }
-
-        if let errorMessage = fillerWordManager.addWord(newWord) {
-            alertPresentation = .duplicateFillerWord(message: errorMessage)
-            return
-        }
-
-        newWord = ""
+        let plan = fillerWordManager.submitWordDraft(newWord)
+        newWord = plan.draftAfterSubmit
+        alertPresentation = plan.alertPresentation
     }
 
     private var canAddWord: Bool {

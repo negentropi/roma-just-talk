@@ -9,53 +9,42 @@ final class FillerWordsTests: XCTestCase {
         )
     }
 
-    func testAddingNormalizesAndAppendsNewWord() {
+    func testSubmissionPlanInsertsWordAndClearsDraft() {
         XCTAssertEqual(
-            VoiceInkFillerWords.adding("  LIKE  ", to: ["um"]),
-            ["um", "like"]
-        )
-    }
-
-    func testInsertPlanNormalizesNewWords() {
-        XCTAssertEqual(
-            VoiceInkFillerWords.insertPlan("  LIKE  ", existingWords: ["um"]),
-            VoiceInkFillerWordInsertPlan(wordToInsert: "like", errorMessage: nil)
-        )
-    }
-
-    func testInsertPlanRejectsBlankDraftsWithoutAlert() {
-        XCTAssertEqual(
-            VoiceInkFillerWords.insertPlan("   ", existingWords: ["um"]),
-            VoiceInkFillerWordInsertPlan(wordToInsert: nil, errorMessage: nil)
-        )
-    }
-
-    func testInsertPlanRejectsCaseInsensitiveDuplicatesWithSharedMessage() {
-        XCTAssertEqual(
-            VoiceInkFillerWords.insertPlan("UM", existingWords: ["um"]),
-            VoiceInkFillerWordInsertPlan(
-                wordToInsert: nil,
-                errorMessage: "This filler word is already in the list."
+            VoiceInkFillerWords.submissionPlan("  LIKE  ", existingWords: ["um"]),
+            VoiceInkFillerWordSubmissionPlan(
+                updatedWords: ["um", "like"],
+                draftAfterSubmit: "",
+                alertPresentation: nil,
+                didInsert: true
             )
         )
+        XCTAssertTrue(VoiceInkFillerWords.submissionPlan("like", existingWords: ["um"]).didInsert)
     }
 
-    func testAddingRejectsBlankAndCaseInsensitiveDuplicateWords() {
-        XCTAssertNil(VoiceInkFillerWords.adding("   ", to: ["um"]))
-        XCTAssertNil(VoiceInkFillerWords.adding("UM", to: ["um"]))
-    }
-
-    func testAddMutatesWordsAndReturnsDuplicateMessage() {
-        var words = ["um"]
-
-        XCTAssertNil(VoiceInkFillerWords.add("  LIKE  ", to: &words))
-        XCTAssertEqual(words, ["um", "like"])
-
+    func testSubmissionPlanKeepsBlankDraftWithoutAlert() {
         XCTAssertEqual(
-            VoiceInkFillerWords.add("LIKE", to: &words),
-            "This filler word is already in the list."
+            VoiceInkFillerWords.submissionPlan("   ", existingWords: ["um"]),
+            VoiceInkFillerWordSubmissionPlan(
+                updatedWords: ["um"],
+                draftAfterSubmit: "   ",
+                alertPresentation: nil
+            )
         )
-        XCTAssertEqual(words, ["um", "like"])
+        XCTAssertFalse(VoiceInkFillerWords.submissionPlan("   ", existingWords: ["um"]).didInsert)
+        XCTAssertFalse(VoiceInkFillerWords.submissionPlan("", existingWords: ["um"]).didInsert)
+    }
+
+    func testSubmissionPlanKeepsDuplicateDraftAndBuildsSharedAlert() {
+        XCTAssertEqual(
+            VoiceInkFillerWords.submissionPlan("UM", existingWords: ["um"]),
+            VoiceInkFillerWordSubmissionPlan(
+                updatedWords: ["um"],
+                draftAfterSubmit: "UM",
+                alertPresentation: .duplicateFillerWord(message: "This filler word is already in the list.")
+            )
+        )
+        XCTAssertFalse(VoiceInkFillerWords.submissionPlan("UM", existingWords: ["um"]).didInsert)
     }
 
     func testDraftAvailabilityUsesSharedNormalization() {

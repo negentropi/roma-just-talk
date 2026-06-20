@@ -93,6 +93,69 @@ final class DashboardMetricsTests: XCTestCase {
         XCTAssertEqual(metrics.averageWordsPerMinuteDisplayText, "50.0")
     }
 
+    func testDashboardPresentationPreservesMacOSDashboardCopy() {
+        XCTAssertEqual(VoiceInkDashboardPresentation.emptyStateSystemImageName, "waveform")
+        XCTAssertEqual(VoiceInkDashboardPresentation.emptyStateTitle, "No sessions yet")
+        XCTAssertEqual(VoiceInkDashboardPresentation.emptyStateMessage, "Start a recording; your dictation rhythm will show here.")
+        XCTAssertEqual(VoiceInkDashboardPresentation.heroSectionTitle, "Dashboard")
+        XCTAssertEqual(VoiceInkDashboardPresentation.readyTitle, "Ready when you are")
+        XCTAssertEqual(VoiceInkDashboardPresentation.usageSummaryPendingSubtitle, "Your usage summary will appear here.")
+        XCTAssertEqual(VoiceInkDashboardPresentation.firstRecordingSubtitle, "Your first roma-just-talk recording starts the timeline.")
+        XCTAssertEqual(VoiceInkDashboardPresentation.timeSavedFallbackTitle, "Time savings coming soon")
+        XCTAssertEqual(VoiceInkDashboardPresentation.sessionsPillTitle, "Sessions")
+        XCTAssertEqual(VoiceInkDashboardPresentation.wordsPillTitle, "Words")
+        XCTAssertEqual(VoiceInkDashboardPresentation.modelPerformanceButtonTitle, "Model Performance")
+        XCTAssertEqual(VoiceInkDashboardPresentation.modelPerformanceSystemImageName, "gauge")
+        XCTAssertEqual(VoiceInkDashboardPresentation.modelPerformanceHelpText, "View transcription and enhancement model performance")
+    }
+
+    func testDashboardPresentationBuildsHeroTitleAndSubtitle() {
+        XCTAssertEqual(
+            VoiceInkDashboardPresentation.heroTitle(isSnapshotLoaded: false, timeSaved: 120),
+            "Ready when you are"
+        )
+        XCTAssertEqual(
+            VoiceInkDashboardPresentation.heroTitle(isSnapshotLoaded: true, timeSaved: 0),
+            "Time savings coming soon"
+        )
+        XCTAssertEqual(
+            VoiceInkDashboardPresentation.heroTitle(isSnapshotLoaded: true, timeSaved: 65),
+            "1 minute, 5 seconds"
+        )
+        XCTAssertEqual(
+            VoiceInkDashboardPresentation.heroSubtitle(
+                isSnapshotLoaded: false,
+                totalCount: 0,
+                formattedWordCount: "0"
+            ),
+            "Your usage summary will appear here."
+        )
+        XCTAssertEqual(
+            VoiceInkDashboardPresentation.heroSubtitle(
+                isSnapshotLoaded: true,
+                totalCount: 0,
+                formattedWordCount: "0"
+            ),
+            "Your first roma-just-talk recording starts the timeline."
+        )
+        XCTAssertEqual(
+            VoiceInkDashboardPresentation.heroSubtitle(
+                isSnapshotLoaded: true,
+                totalCount: 1,
+                formattedWordCount: "320"
+            ),
+            "Dictated 320 words across 1 session."
+        )
+        XCTAssertEqual(
+            VoiceInkDashboardPresentation.heroSubtitle(
+                isSnapshotLoaded: true,
+                totalCount: 2,
+                formattedWordCount: "1,200"
+            ),
+            "Dictated 1,200 words across 2 sessions."
+        )
+    }
+
     func testNoteListSummaryPresentationBuildsIOSHeaderText() {
         let presentation = VoiceInkNoteListSummaryPresentation.make(from: [
             NoteListRecord(

@@ -102,6 +102,54 @@ public struct VoiceInkDashboardMetrics: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkDashboardPresentation {
+    public static let emptyStateSystemImageName = "waveform"
+    public static let emptyStateTitle = "No sessions yet"
+    public static let emptyStateMessage = "Start a recording; your dictation rhythm will show here."
+    public static let heroSectionTitle = "Dashboard"
+    public static let readyTitle = "Ready when you are"
+    public static let usageSummaryPendingSubtitle = "Your usage summary will appear here."
+    public static let firstRecordingSubtitle = "Your first roma-just-talk recording starts the timeline."
+    public static let timeSavedFallbackTitle = "Time savings coming soon"
+    public static let sessionsPillTitle = "Sessions"
+    public static let wordsPillTitle = "Words"
+    public static let modelPerformanceButtonTitle = "Model Performance"
+    public static let modelPerformanceSystemImageName = "gauge"
+    public static let modelPerformanceHelpText = "View transcription and enhancement model performance"
+
+    public static func heroTitle(
+        isSnapshotLoaded: Bool,
+        timeSaved: TimeInterval
+    ) -> String {
+        guard isSnapshotLoaded else {
+            return readyTitle
+        }
+
+        return VoiceInkDurationPresentation.positiveDuration(
+            timeSaved,
+            style: .full,
+            fallback: timeSavedFallbackTitle
+        )
+    }
+
+    public static func heroSubtitle(
+        isSnapshotLoaded: Bool,
+        totalCount: Int,
+        formattedWordCount: String
+    ) -> String {
+        guard isSnapshotLoaded else {
+            return usageSummaryPendingSubtitle
+        }
+
+        guard totalCount > 0 else {
+            return firstRecordingSubtitle
+        }
+
+        let sessionText = totalCount == 1 ? "session" : "sessions"
+        return "Dictated \(formattedWordCount) words across \(totalCount) \(sessionText)."
+    }
+}
+
 public struct VoiceInkNoteListSummaryPresentation: Equatable, Sendable {
     public let summary: VoiceInkDashboardMetricsSummary
     public let countText: String

@@ -220,12 +220,12 @@ struct MetricsContent: View {
                     }
 
                     VStack(spacing: 20) {
-                        Image(systemName: "waveform")
+                        Image(systemName: VoiceInkDashboardPresentation.emptyStateSystemImageName)
                             .font(.system(size: 44, weight: .semibold))
                             .foregroundStyle(.secondary)
-                        Text("No sessions yet")
+                        Text(VoiceInkDashboardPresentation.emptyStateTitle)
                             .font(.title3.weight(.semibold))
-                        Text("Start a recording; your dictation rhythm will show here.")
+                        Text(VoiceInkDashboardPresentation.emptyStateMessage)
                             .foregroundColor(.secondary)
                     }
                     .padding(34)
@@ -263,13 +263,16 @@ struct MetricsContent: View {
 
     private var heroCopy: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Dashboard")
+            Text(VoiceInkDashboardPresentation.heroSectionTitle)
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(.secondary)
                 .textCase(.uppercase)
                 .tracking(0.4)
 
-            Text(hasLoadedMetricsSnapshot ? formattedTimeSaved : "Ready when you are")
+            Text(VoiceInkDashboardPresentation.heroTitle(
+                isSnapshotLoaded: hasLoadedMetricsSnapshot,
+                timeSaved: timeSaved
+            ))
                 .font(.system(size: 36, weight: .semibold, design: .rounded))
                 .foregroundStyle(.primary)
                 .lineLimit(1)
@@ -286,8 +289,14 @@ struct MetricsContent: View {
 
     private var heroStatBlock: some View {
         HStack(spacing: 10) {
-            heroPill(title: "Sessions", value: hasLoadedMetricsSnapshot ? Formatters.formattedNumber(totalCount) : "–")
-            heroPill(title: "Words", value: hasLoadedMetricsSnapshot ? Formatters.formattedNumber(totalWords) : "–")
+            heroPill(
+                title: VoiceInkDashboardPresentation.sessionsPillTitle,
+                value: hasLoadedMetricsSnapshot ? Formatters.formattedNumber(totalCount) : "–"
+            )
+            heroPill(
+                title: VoiceInkDashboardPresentation.wordsPillTitle,
+                value: hasLoadedMetricsSnapshot ? Formatters.formattedNumber(totalWords) : "–"
+            )
         }
         .frame(maxWidth: 280, alignment: .trailing)
     }
@@ -351,8 +360,8 @@ struct MetricsContent: View {
                 withAnimation(.smooth(duration: 0.3)) { isModelStatsPanelPresented = true }
             }) {
                 HStack(spacing: 8) {
-                    Image(systemName: "gauge")
-                    Text("Model Performance")
+                    Image(systemName: VoiceInkDashboardPresentation.modelPerformanceSystemImageName)
+                    Text(VoiceInkDashboardPresentation.modelPerformanceButtonTitle)
                 }
                 .font(.system(size: 13, weight: .medium))
                 .padding(.horizontal, 12)
@@ -360,33 +369,17 @@ struct MetricsContent: View {
                 .background(Capsule(style: .continuous).fill(.thinMaterial))
             }
             .buttonStyle(.plain)
-            .help("View transcription and enhancement model performance")
+            .help(VoiceInkDashboardPresentation.modelPerformanceHelpText)
             CopySystemInfoButton()
         }
     }
     
-    private var formattedTimeSaved: String {
-        let formatted = VoiceInkDurationPresentation.positiveDuration(
-            timeSaved,
-            style: .full,
-            fallback: "Time savings coming soon"
-        )
-        return formatted
-    }
-    
     private var heroSubtitle: String {
-        guard hasLoadedMetricsSnapshot else {
-            return "Your usage summary will appear here."
-        }
-
-        guard totalCount > 0 else {
-            return "Your first roma-just-talk recording starts the timeline."
-        }
-
-        let wordsText = Formatters.formattedNumber(totalWords)
-        let sessionText = totalCount == 1 ? "session" : "sessions"
-
-        return "Dictated \(wordsText) words across \(totalCount) \(sessionText)."
+        VoiceInkDashboardPresentation.heroSubtitle(
+            isSnapshotLoaded: hasLoadedMetricsSnapshot,
+            totalCount: totalCount,
+            formattedWordCount: Formatters.formattedNumber(totalWords)
+        )
     }
 
     private var metricAccent: Color {

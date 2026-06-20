@@ -199,6 +199,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "DashboardMetricsTests.testTimeSavedAndAverageWordsPerMinuteHandleZeroAndOverTypingTime", run: { DashboardMetricsTests().testTimeSavedAndAverageWordsPerMinuteHandleZeroAndOverTypingTime() }),
             VoiceInkCoreCheck(name: "DashboardMetricsTests.testDerivedMetricsCanOverrideTypingAndKeystrokeAssumptions", run: { DashboardMetricsTests().testDerivedMetricsCanOverrideTypingAndKeystrokeAssumptions() }),
             VoiceInkCoreCheck(name: "DashboardMetricsTests.testAverageWordsPerMinuteDisplayTextRoundsToOneDecimalPlace", run: { DashboardMetricsTests().testAverageWordsPerMinuteDisplayTextRoundsToOneDecimalPlace() }),
+            VoiceInkCoreCheck(name: "DashboardMetricsTests.testDashboardPresentationPreservesMacOSDashboardCopy", run: { DashboardMetricsTests().testDashboardPresentationPreservesMacOSDashboardCopy() }),
+            VoiceInkCoreCheck(name: "DashboardMetricsTests.testDashboardPresentationBuildsHeroTitleAndSubtitle", run: { DashboardMetricsTests().testDashboardPresentationBuildsHeroTitleAndSubtitle() }),
             VoiceInkCoreCheck(name: "DashboardMetricsTests.testNoteListSummaryPresentationBuildsIOSHeaderText", run: { DashboardMetricsTests().testNoteListSummaryPresentationBuildsIOSHeaderText() }),
             VoiceInkCoreCheck(name: "DashboardMetricsTests.testNoteListSummaryPresentationOmitsFastestModelWhenNoTimedModelExists", run: { DashboardMetricsTests().testNoteListSummaryPresentationOmitsFastestModelWhenNoTimedModelExists() }),
             VoiceInkCoreCheck(name: "DashboardMetricsTests.testNoteListPresentationPreservesIOSChromeCopy", run: { DashboardMetricsTests().testNoteListPresentationPreservesIOSChromeCopy() }),

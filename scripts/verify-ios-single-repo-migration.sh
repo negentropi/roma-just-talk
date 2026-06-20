@@ -5664,8 +5664,33 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift
 
 require_pattern \
+  "shared macOS dashboard presentation lives in VoiceInkCore" \
+  'VoiceInkDashboardPresentation|heroTitle|heroSubtitle|modelPerformanceButtonTitle' \
+  VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift
+
+require_pattern \
+  "macOS dashboard uses shared dashboard presentation" \
+  'VoiceInkDashboardPresentation\.(emptyStateSystemImageName|emptyStateTitle|emptyStateMessage|heroSectionTitle|heroTitle|heroSubtitle|sessionsPillTitle|wordsPillTitle|modelPerformanceButtonTitle|modelPerformanceSystemImageName|modelPerformanceHelpText)' \
+  VoiceInk/Views/Metrics/MetricsContent.swift
+
+require_pattern \
+  "core tests pin macOS dashboard presentation copy and policy" \
+  'testDashboardPresentationPreservesMacOSDashboardCopy|testDashboardPresentationBuildsHeroTitleAndSubtitle' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/DashboardMetricsTests.swift
+
+require_pattern \
+  "core check runner executes macOS dashboard presentation tests" \
+  'DashboardMetricsTests\.testDashboardPresentationPreservesMacOSDashboardCopy|DashboardMetricsTests\.testDashboardPresentationBuildsHeroTitleAndSubtitle' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "macOS dashboard uses shared average WPM display text" \
   'dashboardMetrics\.averageWordsPerMinuteDisplayText' \
+  VoiceInk/Views/Metrics/MetricsContent.swift
+
+reject_pattern \
+  "macOS dashboard avoids shell-only shared dashboard presentation copy" \
+  '"(No sessions yet|Start a recording; your dictation rhythm will show here\.|Dashboard|Ready when you are|Your usage summary will appear here\.|Your first roma-just-talk recording starts the timeline\.|Time savings coming soon|Sessions|Words|Model Performance|View transcription and enhancement model performance)"|systemName: "(waveform|gauge)"|totalCount == 1 \? "session" : "sessions"' \
   VoiceInk/Views/Metrics/MetricsContent.swift
 
 reject_pattern \

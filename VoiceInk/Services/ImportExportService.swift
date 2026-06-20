@@ -10,15 +10,15 @@ private final class BackupOptions: NSObject {
 
     private let allButton: NSButton
     private let individualButton: NSButton
-    private let categoryButtons: [BackupCategory: NSButton]
+    private let categoryButtons: [VoiceInkSettingsBackupCategory: NSButton]
 
     override init() {
         self.view = NSView(frame: NSRect(x: 0, y: 0, width: 360, height: 188))
         self.allButton = NSButton(radioButtonWithTitle: "All", target: nil, action: nil)
         self.individualButton = NSButton(radioButtonWithTitle: "Individual categories", target: nil, action: nil)
 
-        var buttons: [BackupCategory: NSButton] = [:]
-        for category in BackupCategory.allCases {
+        var buttons: [VoiceInkSettingsBackupCategory: NSButton] = [:]
+        for category in VoiceInkSettingsBackupCategory.allCases {
             let button = NSButton(checkboxWithTitle: category.title, target: nil, action: nil)
             button.state = .on
             button.isEnabled = false
@@ -47,7 +47,7 @@ private final class BackupOptions: NSObject {
         categoryStack.spacing = 6
         categoryStack.translatesAutoresizingMaskIntoConstraints = false
 
-        for category in BackupCategory.allCases {
+        for category in VoiceInkSettingsBackupCategory.allCases {
             guard let button = categoryButtons[category] else { continue }
             button.target = self
             button.action = #selector(categoryChanged(_:))
@@ -71,9 +71,9 @@ private final class BackupOptions: NSObject {
         ])
     }
 
-    var selectedCategories: Set<BackupCategory> {
+    var selectedCategories: Set<VoiceInkSettingsBackupCategory> {
         if allButton.state == .on {
-            return Set(BackupCategory.allCases)
+            return Set(VoiceInkSettingsBackupCategory.allCases)
         }
 
         return Set(categoryButtons.compactMap { category, button in
@@ -292,15 +292,15 @@ class ImportExportService {
             )
 
             showImportSuccessAlert(
-                message: "Settings imported successfully from \(url.lastPathComponent).\n\nImported: \(categorySummary(for: selectedCategories)).",
-                needsAPIKeyReminder: needsAPIKeyReminder(for: selectedCategories)
+                message: "Settings imported successfully from \(url.lastPathComponent).\n\nImported: \(VoiceInkSettingsBackupImportPolicy.categorySummary(for: selectedCategories)).",
+                needsAPIKeyReminder: VoiceInkSettingsBackupImportPolicy.needsAPIKeyReminder(for: selectedCategories)
             )
         } catch {
             showAlert(title: "Import Error", message: "Error importing settings: \(error.localizedDescription). The file might be corrupted or not in the correct format.")
         }
     }
 
-    private func presentImportSelectionDialog() -> Set<BackupCategory>? {
+    private func presentImportSelectionDialog() -> Set<VoiceInkSettingsBackupCategory>? {
         let accessory = BackupOptions()
         let alert = NSAlert()
         alert.messageText = "Import Settings"
@@ -316,21 +316,6 @@ class ImportExportService {
         }
 
         return accessory.selectedCategories
-    }
-
-    private func categorySummary(for categories: Set<BackupCategory>) -> String {
-        if categories == Set(BackupCategory.allCases) {
-            return "All settings"
-        }
-
-        return BackupCategory.allCases
-            .filter { categories.contains($0) }
-            .map(\.title)
-            .joined(separator: ", ")
-    }
-
-    private func needsAPIKeyReminder(for categories: Set<BackupCategory>) -> Bool {
-        !categories.isDisjoint(with: [.prompts, .powerMode, .customModels])
     }
 
     private func showAlert(title: String, message: String) {

@@ -1,29 +1,6 @@
 import Foundation
 import VoiceInkCore
 
-enum BackupCategory: String, CaseIterable, Hashable {
-    case general
-    case prompts
-    case powerMode
-    case dictionary
-    case customModels
-
-    var title: String {
-        switch self {
-        case .general:
-            return "General Settings"
-        case .prompts:
-            return "Custom Prompts"
-        case .powerMode:
-            return "Power Mode"
-        case .dictionary:
-            return "Dictionary"
-        case .customModels:
-            return "Custom Model Definitions"
-        }
-    }
-}
-
 extension VoiceInkCustomCloudModelBackup {
     init(model: CustomCloudModel) {
         self.init(

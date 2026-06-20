@@ -2371,6 +2371,36 @@ reject_pattern \
   VoiceInk/Services/BackupTypes.swift
 
 require_pattern \
+  "shared settings backup category policy owns taxonomy and import summary" \
+  'VoiceInkSettingsBackupCategory|VoiceInkSettingsBackupImportPolicy|categorySummary|needsAPIKeyReminder|Custom Model Definitions' \
+  VoiceInkCore/Sources/VoiceInkCore/SettingsBackupPolicy.swift
+
+require_pattern \
+  "macOS import/export uses shared settings backup category policy" \
+  'VoiceInkSettingsBackupCategory|VoiceInkSettingsBackupImportPolicy\.(categorySummary|needsAPIKeyReminder)' \
+  VoiceInk/Services/ImportExportService.swift
+
+require_pattern \
+  "macOS backup importer accepts shared settings backup categories" \
+  'Set<VoiceInkSettingsBackupCategory>' \
+  VoiceInk/Services/BackupImporter.swift
+
+reject_pattern \
+  "macOS backup types avoid shell-only backup category taxonomy" \
+  'enum +BackupCategory|"General Settings"|"Custom Prompts"|"Power Mode"|"Dictionary"|"Custom Model Definitions"' \
+  VoiceInk/Services/BackupTypes.swift
+
+require_pattern \
+  "core checks execute settings backup policy tests" \
+  'SettingsBackupPolicyTests\.testBackupCategoriesPreserveMacOSImportOrderAndTitles|SettingsBackupPolicyTests\.testBackupImportPolicySummarizesAllAndSelectedCategories|SettingsBackupPolicyTests\.testBackupImportPolicyRemindsOnlyForAPIKeyDependentCategories' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "migration checklist tracks shared settings backup policy" \
+  'settings backup category taxonomy, ordered category titles, import summary text, and API-key-reminder gate use `VoiceInkSettingsBackupCategory`/`VoiceInkSettingsBackupImportPolicy`' \
+  docs/ios-single-repo-migration.md
+
+require_pattern \
   "shared custom prompt presentation owns icon catalog and copy" \
   'VoiceInkCustomPromptPresentation|iconSystemNames|promptGridInfoSystemImageName|promptGridHelpText|deletePromptConfirmationMessage|triggerSummary|addPromptSystemImageName|editActionSystemImageName|deleteActionSystemImageName|closeSystemImageName|addTriggerWordSystemImageName|removeTriggerWordSystemImageName' \
   VoiceInkCore/Sources/VoiceInkCore/CustomPromptPresentation.swift

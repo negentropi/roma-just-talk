@@ -9,6 +9,18 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertEqual(VoiceInkAppIdentity.compactDisplayName, "roma-just-talk")
         XCTAssertEqual(VoiceInkAppIdentity.sidebarSubtitle, "speak before hotkey")
         XCTAssertEqual(VoiceInkAppIdentity.iCloudContainerIdentifier, "iCloud.com.prakashjoshipax.VoiceInk")
+        XCTAssertEqual(VoiceInkAppIdentity.iOSAppGroupIdentifier, "group.com.prakashjoshipax.VoiceInk")
+        XCTAssertEqual(VoiceInkAppIdentity.iOSRecordDeepLinkScheme, "voiceink")
+        XCTAssertEqual(VoiceInkAppIdentity.iOSRecordDeepLinkHost, "record")
+        XCTAssertEqual(VoiceInkAppIdentity.iOSRecordDeepLinkURL.absoluteString, "voiceink://record")
+        XCTAssertEqual(
+            VoiceInkAppIdentity.iOSStopRecordingDarwinNotificationName,
+            "com.prakashjoshipax.VoiceInk.stopRecording"
+        )
+        XCTAssertEqual(
+            VoiceInkAppIdentity.iOSRecordingStateChangedDarwinNotificationName,
+            "com.prakashjoshipax.VoiceInk.recordingStateChanged"
+        )
         XCTAssertEqual(VoiceInkAppIdentity.welcomeTitle, "Welcome to roma just talk")
         XCTAssertEqual(VoiceInkAppIdentity.startUsingTitle, "Start Using roma just talk")
         XCTAssertEqual(VoiceInkAppIdentity.onboardingWindowTitle, "roma-just-talk Onboarding")

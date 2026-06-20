@@ -284,8 +284,8 @@ reject_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests
 
 reject_pattern \
-  "iOS App Group keyboard shell stays out of VoiceInkCore" \
-  '\b(VoiceInkAppGroup|VoiceInkAppDeepLink|AppGroupCoordinator|CFNotificationCenter|DarwinNotify)\b|voiceink://record|group\.com\.prakashjoshipax\.VoiceInk|com\.prakashjoshipax\.VoiceInk\.(stopRecording|recordingStateChanged)' \
+  "iOS App Group keyboard bridge implementation stays out of VoiceInkCore" \
+  '\b(VoiceInkAppGroupRecordingBridge|VoiceInkAppGroupRecordingState|VoiceInkAppDeepLink|AppGroupCoordinator|CFNotificationCenter|DarwinNotify)\b' \
   VoiceInkCore/Sources/VoiceInkCore \
   VoiceInkCore/Tests/VoiceInkCoreTests
 
@@ -6054,7 +6054,7 @@ require_plist_value \
 
 require_pattern \
   "shared app identity presentation lives in VoiceInkCore" \
-  'VoiceInkAppIdentity|bundleIdentifier = "com\.prakashjoshipax\.VoiceInk"|loggingSubsystem = "com\.prakashjoshipax\.voiceink"|displayName = "roma just talk"|compactDisplayName = "roma-just-talk"|iCloudContainerIdentifier|macOSApplicationSupportDirectory|errorDomain' \
+  'VoiceInkAppIdentity|bundleIdentifier = "com\.prakashjoshipax\.VoiceInk"|loggingSubsystem = "com\.prakashjoshipax\.voiceink"|displayName = "roma just talk"|compactDisplayName = "roma-just-talk"|iOSRecordDeepLinkScheme = "voiceink"|iOSRecordDeepLinkHost = "record"|iCloudContainerIdentifier|iOSAppGroupIdentifier|iOSRecordDeepLinkURL|iOSStopRecordingDarwinNotificationName|iOSRecordingStateChangedDarwinNotificationName|macOSApplicationSupportDirectory|errorDomain' \
   VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift
 
 require_pattern \
@@ -6152,6 +6152,25 @@ require_pattern \
   'category: VoiceInkWhisperRuntimeDiagnostics\.logCategory' \
   iOS/VoiceInk-ios/LibWhisper.swift
 
+require_pattern \
+  "iOS record deep-link adapter uses shared app identity" \
+  'VoiceInkAppIdentity\.(iOSRecordDeepLinkScheme|iOSRecordDeepLinkHost|iOSRecordDeepLinkURL)' \
+  iOS/Shared/VoiceInkAppDeepLink.swift
+
+require_context_pattern_count_at_least \
+  "iOS keyboard target depends on shared app identity package product" \
+  'name = VoiceInkKeyboard;' \
+  'B10000032FA0000000000001 /\* VoiceInkCore \*/' \
+  1 \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
+
+require_context_pattern_count_at_least \
+  "iOS keyboard target links shared app identity package framework" \
+  'E18B9A4A2E600F9F0068773A /\* Frameworks \*/' \
+  'VoiceInkCore in Frameworks' \
+  1 \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
+
 reject_pattern \
   "local Whisper adapters avoid duplicate logging subsystem literal" \
   '"com\.prakashjoshipax\.voiceink"' \
@@ -6216,17 +6235,23 @@ require_plist_value \
 
 require_pattern \
   "iOS App Group bridge uses entitlement group" \
-  'static let appGroupIdentifier = "group\.com\.prakashjoshipax\.VoiceInk"' \
+  'static let appGroupIdentifier = VoiceInkAppIdentity\.iOSAppGroupIdentifier' \
   iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
 
 require_pattern \
   "iOS App Group bridge owns stop-recording Darwin notification" \
-  'static let stopRecording = "com\.prakashjoshipax\.VoiceInk\.stopRecording"' \
+  'static let stopRecording = VoiceInkAppIdentity\.iOSStopRecordingDarwinNotificationName' \
   iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
 
 require_pattern \
   "iOS App Group bridge owns recording-state Darwin notification" \
-  'static let recordingStateChanged = "com\.prakashjoshipax\.VoiceInk\.recordingStateChanged"' \
+  'static let recordingStateChanged = VoiceInkAppIdentity\.iOSRecordingStateChangedDarwinNotificationName' \
+  iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
+
+reject_pattern \
+  "iOS shared bridge avoids duplicate app identity literals" \
+  '"(voiceink|record|group\.com\.prakashjoshipax\.VoiceInk|com\.prakashjoshipax\.VoiceInk\.(stopRecording|recordingStateChanged))"' \
+  iOS/Shared/VoiceInkAppDeepLink.swift \
   iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
 
 require_pattern \

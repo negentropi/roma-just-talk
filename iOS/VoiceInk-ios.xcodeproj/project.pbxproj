@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		B10000012FA0000000000001 /* VoiceInkCore in Frameworks */ = {isa = PBXBuildFile; productRef = B10000032FA0000000000001 /* VoiceInkCore */; };
+		B10000042FA0000000000001 /* VoiceInkCore in Frameworks */ = {isa = PBXBuildFile; productRef = B10000032FA0000000000001 /* VoiceInkCore */; };
 		E14E276F2E5F5B5D00143372 /* whisper.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = E14E276E2E5F5B5D00143372 /* whisper.xcframework */; };
 		E14E27702E5F5B5D00143372 /* whisper.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E14E276E2E5F5B5D00143372 /* whisper.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E18B9A542E600F9F0068773A /* VoiceInkKeyboard.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E18B9A4D2E600F9F0068773A /* VoiceInkKeyboard.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -151,6 +152,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B10000042FA0000000000001 /* VoiceInkCore in Frameworks */,
 				E18B9A602E600FFB0068773A /* KeyboardKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -285,6 +287,7 @@
 			);
 			name = VoiceInkKeyboard;
 			packageProductDependencies = (
+				B10000032FA0000000000001 /* VoiceInkCore */,
 				E18B9A5F2E600FFB0068773A /* KeyboardKit */,
 			);
 			productName = VoiceInkKeyboard;

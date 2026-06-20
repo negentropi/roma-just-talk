@@ -1,4 +1,5 @@
 import Foundation
+import VoiceInkCore
 
 struct VoiceInkAppGroupRecordingState: Equatable {
     let isRecording: Bool
@@ -6,7 +7,7 @@ struct VoiceInkAppGroupRecordingState: Equatable {
 }
 
 enum VoiceInkAppGroupRecordingBridge {
-    static let appGroupIdentifier = "group.com.prakashjoshipax.VoiceInk"
+    static let appGroupIdentifier = VoiceInkAppIdentity.iOSAppGroupIdentifier
     static let staleRecordingInterval: TimeInterval = 30
 
     enum UserDefaultsKey {
@@ -15,8 +16,8 @@ enum VoiceInkAppGroupRecordingBridge {
     }
 
     enum NotificationName {
-        static let stopRecording = "com.prakashjoshipax.VoiceInk.stopRecording"
-        static let recordingStateChanged = "com.prakashjoshipax.VoiceInk.recordingStateChanged"
+        static let stopRecording = VoiceInkAppIdentity.iOSStopRecordingDarwinNotificationName
+        static let recordingStateChanged = VoiceInkAppIdentity.iOSRecordingStateChangedDarwinNotificationName
     }
 
     static func sharedDefaults() -> UserDefaults? {

@@ -6,7 +6,9 @@ final class VoiceInkIOSTests: XCTestCase {
     func testRecordDeepLinkRoundTripsThroughSharedShellURL() throws {
         let url = VoiceInkAppDeepLink.record.url
 
-        XCTAssertEqual(url.absoluteString, "voiceink://record")
+        XCTAssertEqual(url, VoiceInkAppIdentity.iOSRecordDeepLinkURL)
+        XCTAssertEqual(url.scheme, VoiceInkAppIdentity.iOSRecordDeepLinkScheme)
+        XCTAssertEqual(url.host, VoiceInkAppIdentity.iOSRecordDeepLinkHost)
         XCTAssertEqual(VoiceInkAppDeepLink(url: url), .record)
         XCTAssertNil(VoiceInkAppDeepLink(url: try XCTUnwrap(URL(string: "voiceink://settings"))))
     }

@@ -1,15 +1,16 @@
 import Foundation
+import VoiceInkCore
 
 enum VoiceInkAppDeepLink: Equatable {
-    private static let scheme = "voiceink"
-    private static let recordHost = "record"
+    private static let scheme = VoiceInkAppIdentity.iOSRecordDeepLinkScheme
+    private static let recordHost = VoiceInkAppIdentity.iOSRecordDeepLinkHost
 
     case record
 
     var url: URL {
         switch self {
         case .record:
-            return URL(string: "\(Self.scheme)://\(Self.recordHost)")!
+            return VoiceInkAppIdentity.iOSRecordDeepLinkURL
         }
     }
 

@@ -294,7 +294,7 @@ struct CloudModelCardView: View {
             if let feedback = verificationProgress.macOSInlineFeedback {
                 Text(feedback.text)
                     .font(.caption)
-                    .foregroundColor(color(for: feedback.tone))
+                    .foregroundColor(feedback.tone.macOSStatusColor)
             }
         }
     }
@@ -355,12 +355,4 @@ struct CloudModelCardView: View {
         }
     }
 
-    private func color(for tone: VoiceInkProviderAPIKeyVerificationTone) -> Color {
-        switch tone {
-        case .success:
-            return Color(.systemGreen)
-        case .failure:
-            return Color(.systemRed)
-        }
-    }
 }

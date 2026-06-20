@@ -2028,6 +2028,27 @@ require_pattern \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
 require_pattern \
+  "macOS provider API-key verification tone color lives in shell adapter" \
+  'extension VoiceInkProviderAPIKeyVerificationTone' \
+  VoiceInk/Views/AI\ Models/ProviderTone+macOS.swift
+
+require_pattern \
+  "macOS AI connection tone color lives in shell adapter" \
+  'extension VoiceInkAIEnhancementConnectionStatusTone' \
+  VoiceInk/Views/AI\ Models/ProviderTone+macOS.swift
+
+require_pattern \
+  "macOS provider tone adapter exposes status colors" \
+  'macOSStatusColor' \
+  VoiceInk/Views/AI\ Models/ProviderTone+macOS.swift
+
+reject_pattern \
+  "macOS provider views avoid duplicate tone color adapters" \
+  'func +color\(for tone: VoiceInkProviderAPIKeyVerificationTone\)|extension VoiceInkAIEnhancementConnectionStatusTone|var +macOSStatusColor: Color' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+
+require_pattern \
   "macOS cloud API-key card uses shared verification application plan" \
   'verificationApplicationPlan' \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift

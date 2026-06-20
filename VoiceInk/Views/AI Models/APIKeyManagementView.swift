@@ -393,14 +393,3 @@ struct APIKeyManagementView: View {
     }
     
 }
-
-private extension VoiceInkAIEnhancementConnectionStatusTone {
-    var macOSStatusColor: Color {
-        switch self {
-        case .connected:
-            return .green
-        case .disconnected:
-            return .red
-        }
-    }
-}

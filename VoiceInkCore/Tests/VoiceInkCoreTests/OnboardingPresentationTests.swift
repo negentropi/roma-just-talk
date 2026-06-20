@@ -34,6 +34,24 @@ final class OnboardingPresentationTests: XCTestCase {
         )
     }
 
+    func testMacOSWelcomeOnboardingPresentationPreservesCopyAndRoleOrder() {
+        let presentation = VoiceInkMacOSOnboardingPresentation.welcome
+
+        XCTAssertEqual(presentation.title, "Welcome to the Future of Typing")
+        XCTAssertEqual(presentation.subtitle, "A New Way to Type")
+        XCTAssertEqual(presentation.primaryButtonTitle, "Get Started")
+        XCTAssertEqual(presentation.skipButtonTitle, "Skip Tour")
+        XCTAssertEqual(
+            presentation.typewriterRoles,
+            [
+                "Your Writing Assistant",
+                "Your Vibe-Coding Assistant",
+                "Works Everywhere on Mac with a click",
+                "100% offline & private"
+            ]
+        )
+    }
+
     func testIOSModelDownloadOnboardingPresentationPreservesCopy() {
         let presentation = VoiceInkIOSOnboardingPresentation.modelDownload
 

@@ -43,6 +43,28 @@ public struct VoiceInkOnboardingWelcomePresentation: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkMacOSOnboardingWelcomePresentation: Equatable, Sendable {
+    public let title: String
+    public let subtitle: String
+    public let primaryButtonTitle: String
+    public let skipButtonTitle: String
+    public let typewriterRoles: [String]
+
+    public init(
+        title: String,
+        subtitle: String,
+        primaryButtonTitle: String,
+        skipButtonTitle: String,
+        typewriterRoles: [String]
+    ) {
+        self.title = title
+        self.subtitle = subtitle
+        self.primaryButtonTitle = primaryButtonTitle
+        self.skipButtonTitle = skipButtonTitle
+        self.typewriterRoles = typewriterRoles
+    }
+}
+
 public struct VoiceInkOnboardingModelDownloadPresentation: Equatable, Sendable {
     public let iconSystemName: String
     public let title: String
@@ -189,6 +211,19 @@ public struct VoiceInkOnboardingReadyPresentation: Equatable, Sendable {
 }
 
 public enum VoiceInkMacOSOnboardingPresentation {
+    public static let welcome = VoiceInkMacOSOnboardingWelcomePresentation(
+        title: "Welcome to the Future of Typing",
+        subtitle: "A New Way to Type",
+        primaryButtonTitle: "Get Started",
+        skipButtonTitle: "Skip Tour",
+        typewriterRoles: [
+            "Your Writing Assistant",
+            "Your Vibe-Coding Assistant",
+            "Works Everywhere on Mac with a click",
+            "100% offline & private"
+        ]
+    )
+
     public static let modelDownload = VoiceInkMacOSOnboardingModelDownloadPresentation(
         title: "Download AI Model",
         subtitle: "We'll download the optimized model to get you started.",

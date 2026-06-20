@@ -1627,6 +1627,21 @@ reject_pattern \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 require_pattern \
+  "shared macOS welcome onboarding presentation lives in VoiceInkCore" \
+  'VoiceInkMacOSOnboardingWelcomePresentation|welcome|typewriterRoles' \
+  VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift
+
+require_pattern \
+  "macOS welcome onboarding uses shared presentation" \
+  'VoiceInkMacOSOnboardingPresentation\.welcome|presentation\.(title|subtitle|primaryButtonTitle|skipButtonTitle|typewriterRoles)' \
+  VoiceInk/Views/Onboarding/OnboardingView.swift
+
+reject_pattern \
+  "macOS welcome onboarding avoids shell-only presentation copy" \
+  '"(Welcome to the Future of Typing|A New Way to Type|Get Started|Skip Tour|Your Writing Assistant|Your Vibe-Coding Assistant|Works Everywhere on Mac with a click|100% offline & private)"' \
+  VoiceInk/Views/Onboarding/OnboardingView.swift
+
+require_pattern \
   "shared macOS model-download onboarding presentation lives in VoiceInkCore" \
   'VoiceInkMacOSOnboardingPresentation|VoiceInkMacOSOnboardingModelDownloadPresentation|modelDownload|speedLabel|ramLabel|buttonTitle' \
   VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift
@@ -1674,6 +1689,11 @@ reject_pattern \
 require_pattern \
   "migration checklist tracks shared macOS reset onboarding alert presentation" \
   'macOS reset-onboarding settings alert presentation|VoiceInkMacOSOnboardingPresentation\.resetSettingsAlert' \
+  docs/ios-single-repo-migration.md
+
+require_pattern \
+  "migration checklist tracks shared macOS welcome onboarding presentation" \
+  'macOS onboarding welcome presentation|VoiceInkMacOSOnboardingPresentation\.welcome' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

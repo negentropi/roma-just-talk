@@ -310,18 +310,49 @@ public enum VoiceInkAudioSessionTimeoutPreference {
     }
 }
 
+public struct VoiceInkSettingsTogglePresentation: Equatable, Sendable {
+    public let title: String
+    public let helpText: String
+}
+
+public struct VoiceInkMacOSAdvancedTranscriptionSettingsPresentation: Equatable, Sendable {
+    public let sectionTitle: String
+    public let vad: VoiceInkSettingsTogglePresentation
+    public let modelPrewarm: VoiceInkSettingsTogglePresentation
+    public let liveTextPreview: VoiceInkSettingsTogglePresentation
+
+    public static let macOS = VoiceInkMacOSAdvancedTranscriptionSettingsPresentation(
+        sectionTitle: "Advanced",
+        vad: VoiceInkSettingsTogglePresentation(
+            title: "Voice Activity Detection (VAD)",
+            helpText: "Use VAD inside batch/final transcription when supported. Buffer preload has its own VAD model in Rolling Buffer settings."
+        ),
+        modelPrewarm: VoiceInkSettingsTogglePresentation(
+            title: "Prewarm model (Experimental)",
+            helpText: "Turn this on if transcriptions with local models are taking longer than expected. Runs silent background transcription on app launch and wake to trigger optimization."
+        ),
+        liveTextPreview: VoiceInkSettingsTogglePresentation(
+            title: "Show Transcript Preview",
+            helpText: "Displays in-progress transcript text when a model or buffer preload can provide it."
+        )
+    )
+}
+
 public enum VoiceInkVADPreference {
+    public static let userDefaultsKey = VoiceInkUserDefaultsKey.isVADEnabled
+    public static let defaultIsEnabled = VoiceInkPreferenceDefault.isVADEnabled
+    public static let macOSSettingsPresentation = VoiceInkMacOSAdvancedTranscriptionSettingsPresentation.macOS.vad
+
     public static func isEnabled(from defaults: UserDefaults = .standard) -> Bool {
-        defaults.object(forKey: VoiceInkUserDefaultsKey.isVADEnabled) as? Bool
-            ?? VoiceInkPreferenceDefault.isVADEnabled
+        defaults.object(forKey: userDefaultsKey) as? Bool ?? defaultIsEnabled
     }
 
     public static func saveIsEnabled(_ enabled: Bool, to defaults: UserDefaults = .standard) {
-        defaults.set(enabled, forKey: VoiceInkUserDefaultsKey.isVADEnabled)
+        defaults.set(enabled, forKey: userDefaultsKey)
     }
 
     public static func clear(from defaults: UserDefaults = .standard) {
-        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.isVADEnabled)
+        defaults.removeObject(forKey: userDefaultsKey)
     }
 }
 
@@ -805,50 +836,56 @@ public enum VoiceInkAudioCleanupPreference {
 }
 
 public enum VoiceInkModelRuntimePreference {
+    public static let userDefaultsKey = VoiceInkUserDefaultsKey.prewarmModelOnWake
+    public static let defaultShouldPrewarmModelOnWake = VoiceInkPreferenceDefault.prewarmModelOnWake
+    public static let macOSSettingsPresentation = VoiceInkMacOSAdvancedTranscriptionSettingsPresentation.macOS.modelPrewarm
+
     public static var registeredDefaults: [String: Any] {
         [
-            VoiceInkUserDefaultsKey.prewarmModelOnWake: VoiceInkPreferenceDefault.prewarmModelOnWake
+            userDefaultsKey: defaultShouldPrewarmModelOnWake
         ]
     }
 
     public static func shouldPrewarmModelOnWake(from defaults: UserDefaults = .standard) -> Bool {
-        defaults.object(forKey: VoiceInkUserDefaultsKey.prewarmModelOnWake) as? Bool
-            ?? VoiceInkPreferenceDefault.prewarmModelOnWake
+        defaults.object(forKey: userDefaultsKey) as? Bool ?? defaultShouldPrewarmModelOnWake
     }
 
     public static func saveShouldPrewarmModelOnWake(
         _ shouldPrewarm: Bool,
         to defaults: UserDefaults = .standard
     ) {
-        defaults.set(shouldPrewarm, forKey: VoiceInkUserDefaultsKey.prewarmModelOnWake)
+        defaults.set(shouldPrewarm, forKey: userDefaultsKey)
     }
 
     public static func clear(from defaults: UserDefaults = .standard) {
-        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.prewarmModelOnWake)
+        defaults.removeObject(forKey: userDefaultsKey)
     }
 }
 
 public enum VoiceInkRecorderPreviewPreference {
+    public static let userDefaultsKey = VoiceInkUserDefaultsKey.showLiveTextPreview
+    public static let defaultIsLiveTextPreviewEnabled = VoiceInkPreferenceDefault.showLiveTextPreview
+    public static let macOSSettingsPresentation = VoiceInkMacOSAdvancedTranscriptionSettingsPresentation.macOS.liveTextPreview
+
     public static var registeredDefaults: [String: Any] {
         [
-            VoiceInkUserDefaultsKey.showLiveTextPreview: VoiceInkPreferenceDefault.showLiveTextPreview
+            userDefaultsKey: defaultIsLiveTextPreviewEnabled
         ]
     }
 
     public static func isLiveTextPreviewEnabled(from defaults: UserDefaults = .standard) -> Bool {
-        defaults.object(forKey: VoiceInkUserDefaultsKey.showLiveTextPreview) as? Bool
-            ?? VoiceInkPreferenceDefault.showLiveTextPreview
+        defaults.object(forKey: userDefaultsKey) as? Bool ?? defaultIsLiveTextPreviewEnabled
     }
 
     public static func saveIsLiveTextPreviewEnabled(
         _ isEnabled: Bool,
         to defaults: UserDefaults = .standard
     ) {
-        defaults.set(isEnabled, forKey: VoiceInkUserDefaultsKey.showLiveTextPreview)
+        defaults.set(isEnabled, forKey: userDefaultsKey)
     }
 
     public static func clear(from defaults: UserDefaults = .standard) {
-        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.showLiveTextPreview)
+        defaults.removeObject(forKey: userDefaultsKey)
     }
 }
 

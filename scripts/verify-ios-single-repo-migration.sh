@@ -3223,18 +3223,53 @@ require_pattern \
   docs/ios-single-repo-migration.md
 
 require_pattern \
+  "shared VAD preference user-defaults key lives in VoiceInkCore" \
+  'public static let userDefaultsKey = VoiceInkUserDefaultsKey\.isVADEnabled' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared VAD preference default lives in VoiceInkCore" \
+  'public static let defaultIsEnabled = VoiceInkPreferenceDefault\.isVADEnabled' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared VAD preference settings presentation lives in VoiceInkCore" \
+  'public static let macOSSettingsPresentation = VoiceInkMacOSAdvancedTranscriptionSettingsPresentation\.macOS\.vad' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared advanced transcription settings presentation lives in VoiceInkCore" \
+  'VoiceInkMacOSAdvancedTranscriptionSettingsPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared advanced transcription settings toggle presentation lives in VoiceInkCore" \
+  'VoiceInkSettingsTogglePresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
   "shared model runtime preference key lives in VoiceInkCore" \
-  'prewarmModelOnWake = "PrewarmModelOnWake"' \
+  'public static let userDefaultsKey = VoiceInkUserDefaultsKey\.prewarmModelOnWake' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared recorder preview preference key lives in VoiceInkCore" \
-  'showLiveTextPreview = "showLiveTextPreview"' \
+  'public static let userDefaultsKey = VoiceInkUserDefaultsKey\.showLiveTextPreview' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared model runtime preference module lives in VoiceInkCore" \
   'public enum VoiceInkModelRuntimePreference' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared model runtime preference default lives in VoiceInkCore" \
+  'public static let defaultShouldPrewarmModelOnWake = VoiceInkPreferenceDefault\.prewarmModelOnWake' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared model runtime preference settings presentation lives in VoiceInkCore" \
+  'public static let macOSSettingsPresentation = VoiceInkMacOSAdvancedTranscriptionSettingsPresentation\.macOS\.modelPrewarm' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
@@ -3250,6 +3285,16 @@ require_pattern \
 require_pattern \
   "shared recorder preview preference module lives in VoiceInkCore" \
   'public enum VoiceInkRecorderPreviewPreference' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared recorder preview preference default lives in VoiceInkCore" \
+  'public static let defaultIsLiveTextPreviewEnabled = VoiceInkPreferenceDefault\.showLiveTextPreview' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared recorder preview preference settings presentation lives in VoiceInkCore" \
+  'public static let macOSSettingsPresentation = VoiceInkMacOSAdvancedTranscriptionSettingsPresentation\.macOS\.liveTextPreview' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
@@ -3278,37 +3323,52 @@ require_pattern \
   VoiceInk/Services/ModelPrewarmService.swift
 
 require_pattern \
+  "macOS model settings observes shared VAD preference key" \
+  'VoiceInkVADPreference\.userDefaultsKey|VoiceInkVADPreference\.defaultIsEnabled' \
+  VoiceInk/Views/ModelSettingsView.swift
+
+require_pattern \
   "macOS model settings observes shared model runtime key" \
-  'VoiceInkUserDefaultsKey\.prewarmModelOnWake' \
+  'VoiceInkModelRuntimePreference\.userDefaultsKey|VoiceInkModelRuntimePreference\.defaultShouldPrewarmModelOnWake' \
   VoiceInk/Views/ModelSettingsView.swift
 
 require_pattern \
   "macOS model settings observes shared recorder preview key" \
-  'VoiceInkUserDefaultsKey\.showLiveTextPreview' \
+  'VoiceInkRecorderPreviewPreference\.userDefaultsKey|VoiceInkRecorderPreviewPreference\.defaultIsLiveTextPreviewEnabled' \
+  VoiceInk/Views/ModelSettingsView.swift
+
+require_pattern \
+  "macOS model settings uses shared advanced transcription presentation" \
+  'VoiceInkMacOSAdvancedTranscriptionSettingsPresentation\.macOS|advancedSettingsPresentation\.(sectionTitle|vad|modelPrewarm|liveTextPreview)' \
   VoiceInk/Views/ModelSettingsView.swift
 
 require_pattern \
   "macOS mini recorder observes shared recorder preview key" \
-  'VoiceInkUserDefaultsKey\.showLiveTextPreview' \
+  'VoiceInkRecorderPreviewPreference\.userDefaultsKey|VoiceInkRecorderPreviewPreference\.defaultIsLiveTextPreviewEnabled' \
   VoiceInk/Views/Recorder/MiniRecorderView.swift
 
 require_pattern \
   "macOS notch recorder observes shared recorder preview key" \
-  'VoiceInkUserDefaultsKey\.showLiveTextPreview' \
+  'VoiceInkRecorderPreviewPreference\.userDefaultsKey|VoiceInkRecorderPreviewPreference\.defaultIsLiveTextPreviewEnabled' \
   VoiceInk/Views/Recorder/NotchRecorderView.swift
 
 reject_pattern \
-  "macOS model runtime shells avoid raw runtime preference keys" \
-  '"(PrewarmModelOnWake|showLiveTextPreview)"' \
+  "macOS advanced transcription shells avoid raw runtime preference keys" \
+  'VoiceInkUserDefaultsKey\.(isVADEnabled|prewarmModelOnWake|showLiveTextPreview)|VoiceInkPreferenceDefault\.(isVADEnabled|prewarmModelOnWake|showLiveTextPreview)|"(IsVADEnabled|PrewarmModelOnWake|showLiveTextPreview)"' \
   VoiceInk/AppDefaults.swift \
   VoiceInk/Services/ModelPrewarmService.swift \
   VoiceInk/Views/ModelSettingsView.swift \
   VoiceInk/Views/Recorder/MiniRecorderView.swift \
   VoiceInk/Views/Recorder/NotchRecorderView.swift
 
+reject_pattern \
+  "macOS model settings avoids shell-only advanced transcription settings copy" \
+  '"(Advanced|Voice Activity Detection \(VAD\)|Use VAD inside batch/final transcription when supported\. Buffer preload has its own VAD model in Rolling Buffer settings\.|Prewarm model \(Experimental\)|Turn this on if transcriptions with local models are taking longer than expected\. Runs silent background transcription on app launch and wake to trigger optimization\.|Show Transcript Preview|Displays in-progress transcript text when a model or buffer preload can provide it\.)"' \
+  VoiceInk/Views/ModelSettingsView.swift
+
 require_pattern \
   "migration checklist tracks shared model runtime preference gate" \
-  'macOS model prewarm and recorder transcript-preview preferences route through `VoiceInkModelRuntimePreference`/`VoiceInkRecorderPreviewPreference`' \
+  'macOS VAD, model prewarm, and recorder transcript-preview preferences route through `VoiceInkVADPreference`/`VoiceInkModelRuntimePreference`/`VoiceInkRecorderPreviewPreference` plus `VoiceInkMacOSAdvancedTranscriptionSettingsPresentation`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

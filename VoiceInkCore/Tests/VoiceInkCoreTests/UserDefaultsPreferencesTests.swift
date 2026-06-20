@@ -371,6 +371,9 @@ final class UserDefaultsPreferencesTests: XCTestCase {
     }
 
     func testVADPreferenceUsesSharedDefaultWhenMissing() {
+        XCTAssertEqual(VoiceInkVADPreference.userDefaultsKey, "IsVADEnabled")
+        XCTAssertTrue(VoiceInkVADPreference.defaultIsEnabled)
+
         withIsolatedDefaults { defaults in
             XCTAssertEqual(
                 VoiceInkVADPreference.isEnabled(from: defaults),
@@ -1006,9 +1009,11 @@ final class UserDefaultsPreferencesTests: XCTestCase {
     }
 
     func testModelRuntimePreferenceRegisteredDefaultsPreserveMacOSPolicy() {
+        XCTAssertEqual(VoiceInkModelRuntimePreference.userDefaultsKey, "PrewarmModelOnWake")
+        XCTAssertTrue(VoiceInkModelRuntimePreference.defaultShouldPrewarmModelOnWake)
         XCTAssertEqual(
-            VoiceInkModelRuntimePreference.registeredDefaults[VoiceInkUserDefaultsKey.prewarmModelOnWake] as? Bool,
-            VoiceInkPreferenceDefault.prewarmModelOnWake
+            VoiceInkModelRuntimePreference.registeredDefaults[VoiceInkModelRuntimePreference.userDefaultsKey] as? Bool,
+            true
         )
     }
 
@@ -1025,9 +1030,35 @@ final class UserDefaultsPreferencesTests: XCTestCase {
     }
 
     func testRecorderPreviewPreferenceRegisteredDefaultsPreserveMacOSPolicy() {
+        XCTAssertEqual(VoiceInkRecorderPreviewPreference.userDefaultsKey, "showLiveTextPreview")
+        XCTAssertFalse(VoiceInkRecorderPreviewPreference.defaultIsLiveTextPreviewEnabled)
         XCTAssertEqual(
-            VoiceInkRecorderPreviewPreference.registeredDefaults[VoiceInkUserDefaultsKey.showLiveTextPreview] as? Bool,
-            VoiceInkPreferenceDefault.showLiveTextPreview
+            VoiceInkRecorderPreviewPreference.registeredDefaults[VoiceInkRecorderPreviewPreference.userDefaultsKey] as? Bool,
+            false
+        )
+    }
+
+    func testMacOSAdvancedTranscriptionSettingsPresentationPreservesCopy() {
+        let presentation = VoiceInkMacOSAdvancedTranscriptionSettingsPresentation.macOS
+
+        XCTAssertEqual(presentation.sectionTitle, "Advanced")
+        XCTAssertEqual(presentation.vad, VoiceInkVADPreference.macOSSettingsPresentation)
+        XCTAssertEqual(presentation.vad.title, "Voice Activity Detection (VAD)")
+        XCTAssertEqual(
+            presentation.vad.helpText,
+            "Use VAD inside batch/final transcription when supported. Buffer preload has its own VAD model in Rolling Buffer settings."
+        )
+        XCTAssertEqual(presentation.modelPrewarm, VoiceInkModelRuntimePreference.macOSSettingsPresentation)
+        XCTAssertEqual(presentation.modelPrewarm.title, "Prewarm model (Experimental)")
+        XCTAssertEqual(
+            presentation.modelPrewarm.helpText,
+            "Turn this on if transcriptions with local models are taking longer than expected. Runs silent background transcription on app launch and wake to trigger optimization."
+        )
+        XCTAssertEqual(presentation.liveTextPreview, VoiceInkRecorderPreviewPreference.macOSSettingsPresentation)
+        XCTAssertEqual(presentation.liveTextPreview.title, "Show Transcript Preview")
+        XCTAssertEqual(
+            presentation.liveTextPreview.helpText,
+            "Displays in-progress transcript text when a model or buffer preload can provide it."
         )
     }
 

@@ -6,8 +6,8 @@ struct MiniRecorderView<S: RecorderStateProvider & ObservableObject>: View {
     @ObservedObject var recorder: Recorder
     @EnvironmentObject var windowManager: MiniWindowManager
     @EnvironmentObject private var enhancementService: AIEnhancementService
-    @AppStorage(VoiceInkUserDefaultsKey.showLiveTextPreview)
-    private var showLiveTextPreview = VoiceInkPreferenceDefault.showLiveTextPreview
+    @AppStorage(VoiceInkRecorderPreviewPreference.userDefaultsKey)
+    private var showLiveTextPreview = VoiceInkRecorderPreviewPreference.defaultIsLiveTextPreviewEnabled
 
     @State private var activePopover: ActivePopoverState = .none
 

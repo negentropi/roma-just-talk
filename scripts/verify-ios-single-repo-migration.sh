@@ -1373,6 +1373,39 @@ require_pattern \
   iOS/VoiceInk-ios/LibWhisper.swift
 
 require_pattern \
+  "shared local Whisper failure policy lives in VoiceInkCore" \
+  'VoiceInkLocalWhisperFailurePolicy|VoiceInkLocalWhisperFailure|VoiceInkLocalWhisperPlatform' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperRuntimeDefaults.swift
+
+require_pattern \
+  "macOS local Whisper service maps failures through shared policy" \
+  'VoiceInkLocalWhisperFailurePolicy\.error' \
+  VoiceInk/Transcription/Whisper/WhisperTranscriptionService.swift
+
+require_pattern \
+  "iOS local Whisper service maps failures through shared policy" \
+  'VoiceInkLocalWhisperFailurePolicy\.error' \
+  iOS/VoiceInk-ios/WhisperTranscriptionService.swift
+
+require_pattern \
+  "macOS local Whisper context maps load failures through shared policy" \
+  'VoiceInkLocalWhisperFailurePolicy\.error' \
+  VoiceInk/Transcription/Whisper/LibWhisper.swift
+
+require_pattern \
+  "iOS local Whisper context maps load failures through shared policy" \
+  'VoiceInkLocalWhisperFailurePolicy\.error' \
+  iOS/VoiceInk-ios/LibWhisper.swift
+
+reject_pattern \
+  "local Whisper adapters avoid shell-owned failure mapping" \
+  'VoiceInkEngineError\.(modelLoadFailed|localModelUnavailable|localModelLoadFailed|audioProcessingFailed|whisperCoreFailed|whisperTranscriptionFailed)' \
+  VoiceInk/Transcription/Whisper/WhisperTranscriptionService.swift \
+  VoiceInk/Transcription/Whisper/LibWhisper.swift \
+  iOS/VoiceInk-ios/WhisperTranscriptionService.swift \
+  iOS/VoiceInk-ios/LibWhisper.swift
+
+require_pattern \
   "shared local Whisper context runtime plan lives in VoiceInkCore" \
   'VoiceInkWhisperContextRuntimePlan|useGPU: Bool\?|flashAttention: Bool\?' \
   VoiceInkCore/Sources/VoiceInkCore/WhisperRuntimeDefaults.swift

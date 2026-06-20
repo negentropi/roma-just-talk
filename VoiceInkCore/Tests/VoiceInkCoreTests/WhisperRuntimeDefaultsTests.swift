@@ -130,6 +130,44 @@ final class WhisperRuntimeDefaultsTests: XCTestCase {
         }
     }
 
+    func testLocalWhisperFailurePolicyPreservesMacOSMapping() {
+        XCTAssertEqual(
+            errorName(VoiceInkLocalWhisperFailurePolicy.error(for: .modelUnavailable, platform: .macOS)),
+            "modelLoadFailed"
+        )
+        XCTAssertEqual(
+            errorName(VoiceInkLocalWhisperFailurePolicy.error(for: .modelLoadFailed, platform: .macOS)),
+            "modelLoadFailed"
+        )
+        XCTAssertEqual(
+            errorName(VoiceInkLocalWhisperFailurePolicy.error(for: .audioProcessingFailed, platform: .macOS)),
+            "audioProcessingFailed"
+        )
+        XCTAssertEqual(
+            errorName(VoiceInkLocalWhisperFailurePolicy.error(for: .transcriptionFailed, platform: .macOS)),
+            "whisperCoreFailed"
+        )
+    }
+
+    func testLocalWhisperFailurePolicyPreservesIOSMapping() {
+        XCTAssertEqual(
+            errorName(VoiceInkLocalWhisperFailurePolicy.error(for: .modelUnavailable, platform: .iOS)),
+            "localModelUnavailable"
+        )
+        XCTAssertEqual(
+            errorName(VoiceInkLocalWhisperFailurePolicy.error(for: .modelLoadFailed, platform: .iOS)),
+            "localModelLoadFailed"
+        )
+        XCTAssertEqual(
+            errorName(VoiceInkLocalWhisperFailurePolicy.error(for: .audioProcessingFailed, platform: .iOS)),
+            "audioProcessingFailed"
+        )
+        XCTAssertEqual(
+            errorName(VoiceInkLocalWhisperFailurePolicy.error(for: .transcriptionFailed, platform: .iOS)),
+            "whisperTranscriptionFailed"
+        )
+    }
+
     private func withTemporaryDefaults(_ test: (UserDefaults) -> Void) {
         let suiteName = "VoiceInkCore.WhisperRuntimeDefaultsTests.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!
@@ -137,5 +175,9 @@ final class WhisperRuntimeDefaultsTests: XCTestCase {
             defaults.removePersistentDomain(forName: suiteName)
         }
         test(defaults)
+    }
+
+    private func errorName(_ error: VoiceInkEngineError) -> String {
+        String(describing: error)
     }
 }

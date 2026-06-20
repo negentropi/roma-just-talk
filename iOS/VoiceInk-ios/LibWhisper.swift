@@ -165,7 +165,7 @@ actor WhisperContext {
             self.context = context
         } else {
             logger.error("Couldn't load model at \(path)")
-            throw VoiceInkEngineError.localModelLoadFailed
+            throw VoiceInkLocalWhisperFailurePolicy.error(for: .modelLoadFailed, platform: .iOS)
         }
     }
     

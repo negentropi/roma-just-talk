@@ -193,3 +193,37 @@ public struct VoiceInkWhisperRuntimeConfiguration: Equatable, Sendable {
         )
     }
 }
+
+public enum VoiceInkLocalWhisperFailure: Equatable, Sendable {
+    case modelUnavailable
+    case modelLoadFailed
+    case audioProcessingFailed
+    case transcriptionFailed
+}
+
+public enum VoiceInkLocalWhisperPlatform: Equatable, Sendable {
+    case macOS
+    case iOS
+}
+
+public enum VoiceInkLocalWhisperFailurePolicy {
+    public static func error(
+        for failure: VoiceInkLocalWhisperFailure,
+        platform: VoiceInkLocalWhisperPlatform
+    ) -> VoiceInkEngineError {
+        switch (platform, failure) {
+        case (.macOS, .modelUnavailable), (.macOS, .modelLoadFailed):
+            return .modelLoadFailed
+        case (.macOS, .audioProcessingFailed), (.iOS, .audioProcessingFailed):
+            return .audioProcessingFailed
+        case (.macOS, .transcriptionFailed):
+            return .whisperCoreFailed
+        case (.iOS, .modelUnavailable):
+            return .localModelUnavailable
+        case (.iOS, .modelLoadFailed):
+            return .localModelLoadFailed
+        case (.iOS, .transcriptionFailed):
+            return .whisperTranscriptionFailed
+        }
+    }
+}

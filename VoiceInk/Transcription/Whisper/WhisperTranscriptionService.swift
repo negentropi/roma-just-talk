@@ -9,6 +9,7 @@ class WhisperTranscriptionService: TranscriptionService {
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "WhisperTranscriptionService")
     private let modelsDirectory: URL
     private weak var modelProvider: (any WhisperModelProvider)?
+    private let failurePlatform = VoiceInkLocalWhisperPlatform.macOS
 
     init(modelsDirectory: URL, modelProvider: (any WhisperModelProvider)? = nil) {
         self.modelsDirectory = modelsDirectory
@@ -17,7 +18,7 @@ class WhisperTranscriptionService: TranscriptionService {
 
     func transcribe(audioURL: URL, model: any TranscriptionModel) async throws -> String {
         guard model.provider == .whisper else {
-            throw VoiceInkEngineError.modelLoadFailed
+            throw VoiceInkLocalWhisperFailurePolicy.error(for: .modelUnavailable, platform: failurePlatform)
         }
 
         logger.notice("Initiating local transcription for model: \(model.displayName, privacy: .public)")
@@ -38,7 +39,7 @@ class WhisperTranscriptionService: TranscriptionService {
                 in: availableModels
             ) else {
                 logger.error("❌ Model file not found for: \(model.name, privacy: .public)")
-                throw VoiceInkEngineError.modelLoadFailed
+                throw VoiceInkLocalWhisperFailurePolicy.error(for: .modelUnavailable, platform: failurePlatform)
             }
 
             logger.notice("Loading model: \(model.name, privacy: .public)")
@@ -46,18 +47,18 @@ class WhisperTranscriptionService: TranscriptionService {
                 whisperContext = try await WhisperContext.createContext(path: modelURL.path)
             } catch {
                 logger.error("❌ Failed to load model: \(model.name, privacy: .public) - \(error.localizedDescription, privacy: .public)")
-                throw VoiceInkEngineError.modelLoadFailed
+                throw VoiceInkLocalWhisperFailurePolicy.error(for: .modelLoadFailed, platform: failurePlatform)
             }
         }
 
         guard let whisperContext = whisperContext else {
             logger.error("❌ Cannot transcribe: Model could not be loaded")
-            throw VoiceInkEngineError.modelLoadFailed
+            throw VoiceInkLocalWhisperFailurePolicy.error(for: .modelLoadFailed, platform: failurePlatform)
         }
 
         guard let data = try VoiceInkWhisperAudioSamples.floatSamples(fromWAVFileAt: audioURL) else {
             logger.error("❌ Failed to process audio samples for local Whisper transcription.")
-            throw VoiceInkEngineError.audioProcessingFailed
+            throw VoiceInkLocalWhisperFailurePolicy.error(for: .audioProcessingFailed, platform: failurePlatform)
         }
 
         let currentPrompt = VoiceInkTranscriptionPromptPreference.localWhisperPromptForSelectedLanguage()
@@ -71,7 +72,7 @@ class WhisperTranscriptionService: TranscriptionService {
 
         guard success else {
             logger.error("❌ Core transcription engine failed (whisper_full).")
-            throw VoiceInkEngineError.whisperCoreFailed
+            throw VoiceInkLocalWhisperFailurePolicy.error(for: .transcriptionFailed, platform: failurePlatform)
         }
 
         let text = await whisperContext.getTranscription()

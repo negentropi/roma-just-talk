@@ -972,6 +972,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "WhisperRuntimeDefaultsTests.testRuntimeConfigurationBuildsSharedWhisperInputs", run: { WhisperRuntimeDefaultsTests().testRuntimeConfigurationBuildsSharedWhisperInputs() }),
             VoiceInkCoreCheck(name: "WhisperRuntimeDefaultsTests.testRuntimeConfigurationNormalizesWhisperRequestLanguage", run: { WhisperRuntimeDefaultsTests().testRuntimeConfigurationNormalizesWhisperRequestLanguage() }),
             VoiceInkCoreCheck(name: "WhisperRuntimeDefaultsTests.testRuntimeConfigurationDisablesVADWhenPreferenceIsOff", run: { WhisperRuntimeDefaultsTests().testRuntimeConfigurationDisablesVADWhenPreferenceIsOff() }),
+            VoiceInkCoreCheck(name: "WhisperRuntimeDefaultsTests.testLocalWhisperFailurePolicyPreservesMacOSMapping", run: { WhisperRuntimeDefaultsTests().testLocalWhisperFailurePolicyPreservesMacOSMapping() }),
+            VoiceInkCoreCheck(name: "WhisperRuntimeDefaultsTests.testLocalWhisperFailurePolicyPreservesIOSMapping", run: { WhisperRuntimeDefaultsTests().testLocalWhisperFailurePolicyPreservesIOSMapping() }),
             VoiceInkCoreCheck(name: "WhisperTranscriptSegmentsTests.testJoinedTextConcatenatesSegmentsWithoutSeparator", run: { WhisperTranscriptSegmentsTests().testJoinedTextConcatenatesSegmentsWithoutSeparator() }),
             VoiceInkCoreCheck(name: "WhisperTranscriptSegmentsTests.testJoinedTextPreservesMacOSRawWhitespacePolicy", run: { WhisperTranscriptSegmentsTests().testJoinedTextPreservesMacOSRawWhitespacePolicy() }),
             VoiceInkCoreCheck(name: "WhisperTranscriptSegmentsTests.testJoinedTextReturnsEmptyForNoSegments", run: { WhisperTranscriptSegmentsTests().testJoinedTextReturnsEmptyForNoSegments() }),

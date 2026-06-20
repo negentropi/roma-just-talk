@@ -1042,6 +1042,17 @@ require_pattern \
   iOS/VoiceInk-ios/NoteDetailView.swift
 
 require_pattern \
+  "iOS transcript status tone colors live in one shell adapter" \
+  'extension VoiceInkTranscriptStatusPresentation\.Tone|statusColor|badgeColor|badgeBackgroundColor' \
+  iOS/VoiceInk-ios/TranscriptStatusTone+iOS.swift
+
+reject_pattern \
+  "iOS note views avoid duplicate transcript status tone color adapters" \
+  'extension VoiceInkTranscriptStatusPresentation\.Tone|var +(statusColor|badgeColor|badgeBackgroundColor): Color' \
+  iOS/VoiceInk-ios/NoteRowView.swift \
+  iOS/VoiceInk-ios/NoteDetailView.swift
+
+require_pattern \
   "iOS note detail uses shared status panel visibility" \
   'VoiceInkTranscriptPresentation\.shouldShowStatusPanel' \
   iOS/VoiceInk-ios/NoteDetailView.swift

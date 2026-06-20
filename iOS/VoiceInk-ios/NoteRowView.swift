@@ -63,18 +63,3 @@ struct NoteRowView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
-
-private extension VoiceInkTranscriptStatusPresentation.Tone {
-    var badgeColor: Color {
-        switch self {
-        case .processing:
-            return .secondary
-        case .failure:
-            return .orange
-        }
-    }
-
-    var badgeBackgroundColor: Color {
-        badgeColor.opacity(0.12)
-    }
-}

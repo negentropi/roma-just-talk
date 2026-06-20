@@ -218,14 +218,3 @@ struct NoteDetailView: View {
     
 
 }
-
-private extension VoiceInkTranscriptStatusPresentation.Tone {
-    var statusColor: Color {
-        switch self {
-        case .processing:
-            return .orange
-        case .failure:
-            return .red
-        }
-    }
-}

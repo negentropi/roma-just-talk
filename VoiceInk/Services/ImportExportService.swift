@@ -13,9 +13,10 @@ private final class BackupOptions: NSObject {
     private let categoryButtons: [VoiceInkSettingsBackupCategory: NSButton]
 
     override init() {
+        let presentation = VoiceInkSettingsBackupPresentation.macOS
         self.view = NSView(frame: NSRect(x: 0, y: 0, width: 360, height: 188))
-        self.allButton = NSButton(radioButtonWithTitle: "All", target: nil, action: nil)
-        self.individualButton = NSButton(radioButtonWithTitle: "Individual categories", target: nil, action: nil)
+        self.allButton = NSButton(radioButtonWithTitle: presentation.allCategoriesTitle, target: nil, action: nil)
+        self.individualButton = NSButton(radioButtonWithTitle: presentation.individualCategoriesTitle, target: nil, action: nil)
 
         var buttons: [VoiceInkSettingsBackupCategory: NSButton] = [:]
         for category in VoiceInkSettingsBackupCategory.allCases {
@@ -104,6 +105,7 @@ private final class BackupOptions: NSObject {
 
 class ImportExportService {
     static let shared = ImportExportService()
+    private let backupPresentation = VoiceInkSettingsBackupPresentation.macOS
     private let currentSettingsVersion: String
 
     private init() {
@@ -215,26 +217,38 @@ class ImportExportService {
 
             let savePanel = NSSavePanel()
             savePanel.allowedContentTypes = [UTType.json]
-            savePanel.nameFieldStringValue = "VoiceInk_Settings_Backup.json"
-            savePanel.title = "Export VoiceInk Settings"
-            savePanel.message = "Choose a location to save your settings."
+            savePanel.nameFieldStringValue = backupPresentation.defaultFileName
+            savePanel.title = backupPresentation.exportPanelTitle
+            savePanel.message = backupPresentation.exportPanelMessage
 
             DispatchQueue.main.async {
                 if savePanel.runModal() == .OK {
                     if let url = savePanel.url {
                         do {
                             try jsonData.write(to: url)
-                            self.showAlert(title: "Export Successful", message: "Your settings have been successfully exported to \(url.lastPathComponent).")
+                            self.showAlert(
+                                title: self.backupPresentation.exportSuccessTitle,
+                                message: self.backupPresentation.exportSuccessMessage(fileName: url.lastPathComponent)
+                            )
                         } catch {
-                            self.showAlert(title: "Export Error", message: "Could not save settings to file: \(error.localizedDescription)")
+                            self.showAlert(
+                                title: self.backupPresentation.exportErrorTitle,
+                                message: self.backupPresentation.exportSaveFailureMessage(localizedDescription: error.localizedDescription)
+                            )
                         }
                     }
                 } else {
-                    self.showAlert(title: "Export Canceled", message: "The settings export operation was canceled.")
+                    self.showAlert(
+                        title: self.backupPresentation.exportCanceledTitle,
+                        message: self.backupPresentation.exportCanceledMessage
+                    )
                 }
             }
         } catch {
-            self.showAlert(title: "Export Error", message: "Could not encode settings to JSON: \(error.localizedDescription)")
+            self.showAlert(
+                title: backupPresentation.exportErrorTitle,
+                message: backupPresentation.exportEncodingFailureMessage(localizedDescription: error.localizedDescription)
+            )
         }
     }
 
@@ -245,16 +259,22 @@ class ImportExportService {
         openPanel.canChooseFiles = true
         openPanel.canChooseDirectories = false
         openPanel.allowsMultipleSelection = false
-        openPanel.title = "Import VoiceInk Settings"
-        openPanel.message = "Choose a settings backup, then select what you want to import."
+        openPanel.title = backupPresentation.importPanelTitle
+        openPanel.message = backupPresentation.importPanelMessage
 
         guard openPanel.runModal() == .OK else {
-            showAlert(title: "Import Canceled", message: "The settings import operation was canceled.")
+            showAlert(
+                title: backupPresentation.importCanceledTitle,
+                message: backupPresentation.importCanceledMessage
+            )
             return
         }
 
         guard let url = openPanel.url else {
-            showAlert(title: "Import Error", message: "Could not get the file URL from the open panel.")
+            showAlert(
+                title: backupPresentation.importErrorTitle,
+                message: backupPresentation.missingFileURLMessage
+            )
             return
         }
 
@@ -264,16 +284,28 @@ class ImportExportService {
             let backup = try decoder.decode(BackupFile.self, from: jsonData)
 
             if backup.version != currentSettingsVersion {
-                showAlert(title: "Version Mismatch", message: "The imported settings file (version \(backup.version)) is from a different version than your application (version \(currentSettingsVersion)). Proceeding with import, but be aware of potential incompatibilities.")
+                showAlert(
+                    title: backupPresentation.versionMismatchTitle,
+                    message: backupPresentation.versionMismatchMessage(
+                        importedVersion: backup.version,
+                        currentVersion: currentSettingsVersion
+                    )
+                )
             }
 
             guard let selectedCategories = presentImportSelectionDialog() else {
-                showAlert(title: "Import Canceled", message: "No settings were imported.")
+                showAlert(
+                    title: backupPresentation.importCanceledTitle,
+                    message: backupPresentation.noSettingsImportedMessage
+                )
                 return
             }
 
             guard !selectedCategories.isEmpty else {
-                showAlert(title: "Import Error", message: "Select at least one category to import.")
+                showAlert(
+                    title: backupPresentation.importErrorTitle,
+                    message: backupPresentation.emptyCategorySelectionMessage
+                )
                 return
             }
 
@@ -292,23 +324,26 @@ class ImportExportService {
             )
 
             showImportSuccessAlert(
-                message: "Settings imported successfully from \(url.lastPathComponent).\n\nImported: \(VoiceInkSettingsBackupImportPolicy.categorySummary(for: selectedCategories)).",
-                needsAPIKeyReminder: VoiceInkSettingsBackupImportPolicy.needsAPIKeyReminder(for: selectedCategories)
+                fileName: url.lastPathComponent,
+                categories: selectedCategories
             )
         } catch {
-            showAlert(title: "Import Error", message: "Error importing settings: \(error.localizedDescription). The file might be corrupted or not in the correct format.")
+            showAlert(
+                title: backupPresentation.importErrorTitle,
+                message: backupPresentation.importFailureMessage(localizedDescription: error.localizedDescription)
+            )
         }
     }
 
     private func presentImportSelectionDialog() -> Set<VoiceInkSettingsBackupCategory>? {
         let accessory = BackupOptions()
         let alert = NSAlert()
-        alert.messageText = "Import Settings"
-        alert.informativeText = "Choose what to import from this backup."
+        alert.messageText = backupPresentation.importSelectionTitle
+        alert.informativeText = backupPresentation.importSelectionMessage
         alert.alertStyle = .informational
         alert.accessoryView = accessory.view
-        alert.addButton(withTitle: "Import")
-        alert.addButton(withTitle: "Cancel")
+        alert.addButton(withTitle: backupPresentation.importActionTitle)
+        alert.addButton(withTitle: backupPresentation.cancelActionTitle)
 
         let response = alert.runModal()
         guard response == .alertFirstButtonReturn else {
@@ -324,25 +359,27 @@ class ImportExportService {
             alert.messageText = title
             alert.informativeText = message
             alert.alertStyle = .informational
-            alert.addButton(withTitle: "OK")
+            alert.addButton(withTitle: self.backupPresentation.okActionTitle)
             alert.runModal()
         }
     }
 
-    private func showImportSuccessAlert(message: String, needsAPIKeyReminder: Bool) {
+    private func showImportSuccessAlert(
+        fileName: String,
+        categories: Set<VoiceInkSettingsBackupCategory>
+    ) {
         DispatchQueue.main.async {
             let alert = NSAlert()
-            alert.messageText = "Import Successful"
-            var informativeText = message
-            if needsAPIKeyReminder {
-                informativeText += "\n\nIMPORTANT: If you were using AI enhancement features, please make sure to reconfigure your API keys in the Enhancement section."
-            }
-            informativeText += "\n\nIt is recommended to restart VoiceInk for all changes to take full effect."
-            alert.informativeText = informativeText
+            let needsAPIKeyReminder = VoiceInkSettingsBackupImportPolicy.needsAPIKeyReminder(for: categories)
+            alert.messageText = self.backupPresentation.importSuccessTitle
+            alert.informativeText = self.backupPresentation.importSuccessInformativeText(
+                fileName: fileName,
+                categories: categories
+            )
             alert.alertStyle = .informational
-            alert.addButton(withTitle: "OK")
+            alert.addButton(withTitle: self.backupPresentation.okActionTitle)
             if needsAPIKeyReminder {
-                alert.addButton(withTitle: "Configure API Keys")
+                alert.addButton(withTitle: self.backupPresentation.configureAPIKeysActionTitle)
             }
             
             let response = alert.runModal()

@@ -2371,13 +2371,13 @@ reject_pattern \
   VoiceInk/Services/BackupTypes.swift
 
 require_pattern \
-  "shared settings backup category policy owns taxonomy and import summary" \
-  'VoiceInkSettingsBackupCategory|VoiceInkSettingsBackupImportPolicy|categorySummary|needsAPIKeyReminder|Custom Model Definitions' \
+  "shared settings backup policy owns taxonomy, presentation, and import summary" \
+  'VoiceInkSettingsBackupCategory|VoiceInkSettingsBackupImportPolicy|VoiceInkSettingsBackupPresentation|categorySummary|needsAPIKeyReminder|defaultFileName|importSuccessInformativeText|Custom Model Definitions' \
   VoiceInkCore/Sources/VoiceInkCore/SettingsBackupPolicy.swift
 
 require_pattern \
-  "macOS import/export uses shared settings backup category policy" \
-  'VoiceInkSettingsBackupCategory|VoiceInkSettingsBackupImportPolicy\.(categorySummary|needsAPIKeyReminder)' \
+  "macOS import/export uses shared settings backup policy and presentation" \
+  'VoiceInkSettingsBackupCategory|VoiceInkSettingsBackupImportPolicy\.needsAPIKeyReminder|VoiceInkSettingsBackupPresentation\.macOS|backupPresentation\.(defaultFileName|exportPanelTitle|exportSuccessMessage|importPanelTitle|versionMismatchMessage|importSuccessInformativeText)' \
   VoiceInk/Services/ImportExportService.swift
 
 require_pattern \
@@ -2390,14 +2390,19 @@ reject_pattern \
   'enum +BackupCategory|"General Settings"|"Custom Prompts"|"Power Mode"|"Dictionary"|"Custom Model Definitions"' \
   VoiceInk/Services/BackupTypes.swift
 
+reject_pattern \
+  "macOS import/export avoids shell-only backup presentation copy" \
+  '"(VoiceInk_Settings_Backup\.json|Export VoiceInk Settings|Choose a location to save your settings\.|Export Successful|Your settings have been successfully exported to|Export Error|Could not save settings to file|Export Canceled|The settings export operation was canceled\.|Could not encode settings to JSON|Import VoiceInk Settings|Choose a settings backup, then select what you want to import\.|Import Canceled|The settings import operation was canceled\.|Import Error|Could not get the file URL from the open panel\.|Version Mismatch|Proceeding with import, but be aware of potential incompatibilities\.|No settings were imported\.|Select at least one category to import\.|Error importing settings:|The file might be corrupted or not in the correct format\.|Import Settings|Choose what to import from this backup\.|All|Individual categories|Import Successful|IMPORTANT: If you were using AI enhancement features|It is recommended to restart VoiceInk|Configure API Keys)"' \
+  VoiceInk/Services/ImportExportService.swift
+
 require_pattern \
   "core checks execute settings backup policy tests" \
-  'SettingsBackupPolicyTests\.testBackupCategoriesPreserveMacOSImportOrderAndTitles|SettingsBackupPolicyTests\.testBackupImportPolicySummarizesAllAndSelectedCategories|SettingsBackupPolicyTests\.testBackupImportPolicyRemindsOnlyForAPIKeyDependentCategories' \
+  'SettingsBackupPolicyTests\.testBackupCategoriesPreserveMacOSImportOrderAndTitles|SettingsBackupPolicyTests\.testBackupImportPolicySummarizesAllAndSelectedCategories|SettingsBackupPolicyTests\.testBackupImportPolicyRemindsOnlyForAPIKeyDependentCategories|SettingsBackupPolicyTests\.testBackupPresentationPreservesMacOSPanelAndAlertCopy|SettingsBackupPolicyTests\.testBackupPresentationBuildsDynamicExportAndImportMessages|SettingsBackupPolicyTests\.testBackupPresentationBuildsImportSuccessTextWithOptionalAPIKeyReminder' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "migration checklist tracks shared settings backup policy" \
-  'settings backup category taxonomy, ordered category titles, import summary text, and API-key-reminder gate use `VoiceInkSettingsBackupCategory`/`VoiceInkSettingsBackupImportPolicy`' \
+  'settings backup category taxonomy, ordered category titles, import/export panel copy, alert titles/messages, version-mismatch warning, import summary text, API-key-reminder gate, and restart recommendation use `VoiceInkSettingsBackupCategory`/`VoiceInkSettingsBackupImportPolicy`/`VoiceInkSettingsBackupPresentation`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

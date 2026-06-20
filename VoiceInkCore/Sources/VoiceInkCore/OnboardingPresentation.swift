@@ -188,6 +188,37 @@ public struct VoiceInkMacOSResetOnboardingPresentation: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkMacOSSetupStepKind: String, Equatable, Sendable {
+    case shortcut
+    case accessibility
+    case screenContext
+    case modelDownload
+}
+
+public struct VoiceInkMacOSSetupStepPresentation: Identifiable, Equatable, Sendable {
+    public let kind: VoiceInkMacOSSetupStepKind
+    public let isOptional: Bool
+    public let iconSystemName: String
+    public let title: String
+    public let description: String
+
+    public var id: VoiceInkMacOSSetupStepKind { kind }
+
+    public init(
+        kind: VoiceInkMacOSSetupStepKind,
+        isOptional: Bool,
+        iconSystemName: String,
+        title: String,
+        description: String
+    ) {
+        self.kind = kind
+        self.isOptional = isOptional
+        self.iconSystemName = iconSystemName
+        self.title = title
+        self.description = description
+    }
+}
+
 public struct VoiceInkOnboardingReadyPresentation: Equatable, Sendable {
     public let iconSystemName: String
     public let title: String
@@ -259,6 +290,64 @@ public enum VoiceInkMacOSOnboardingPresentation {
         confirmButtonTitle: "Reset",
         message: "You'll see the introduction screens again the next time you launch the app."
     )
+}
+
+public enum VoiceInkMacOSSetupPresentation {
+    public static let title = "Welcome to VoiceInk"
+    public static let subtitle = "Complete the setup to get started"
+    public static let helpText = "Need help? Check the Help menu for support options"
+    public static let actionSystemImageName = "arrow.right"
+    public static let completedSystemImageName = "checkmark.circle.fill"
+    public static let optionalSystemImageName = "circle"
+    public static let requiredSystemImageName = "chevron.right"
+
+    public static let steps = [
+        VoiceInkMacOSSetupStepPresentation(
+            kind: .shortcut,
+            isOptional: false,
+            iconSystemName: "command",
+            title: "Set Keyboard Shortcut",
+            description: "Use VoiceInk anywhere with a shortcut."
+        ),
+        VoiceInkMacOSSetupStepPresentation(
+            kind: .accessibility,
+            isOptional: false,
+            iconSystemName: "hand.raised.fill",
+            title: "Enable Accessibility",
+            description: "Paste transcribed text at your cursor."
+        ),
+        VoiceInkMacOSSetupStepPresentation(
+            kind: .screenContext,
+            isOptional: true,
+            iconSystemName: "video.fill",
+            title: "Screen Context (Optional)",
+            description: "Use visible text for better transcript enhancement when you choose."
+        ),
+        VoiceInkMacOSSetupStepPresentation(
+            kind: .modelDownload,
+            isOptional: false,
+            iconSystemName: "arrow.down.to.line",
+            title: "Download Model",
+            description: "Choose an AI model to start transcribing."
+        )
+    ]
+
+    public static func actionButtonTitle(
+        isShortcutConfigured: Bool,
+        isAccessibilityEnabled: Bool,
+        hasTranscriptionModel: Bool
+    ) -> String {
+        if !isShortcutConfigured {
+            return "Configure Shortcut"
+        }
+        if !isAccessibilityEnabled {
+            return "Enable Accessibility"
+        }
+        if !hasTranscriptionModel {
+            return "Download Model"
+        }
+        return "Get Started"
+    }
 }
 
 public enum VoiceInkIOSOnboardingPresentation {

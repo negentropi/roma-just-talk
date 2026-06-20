@@ -128,6 +128,87 @@ final class OnboardingPresentationTests: XCTestCase {
         )
     }
 
+    func testMacOSSetupPresentationPreservesHeaderAndStepOrder() {
+        XCTAssertEqual(VoiceInkMacOSSetupPresentation.title, "Welcome to VoiceInk")
+        XCTAssertEqual(VoiceInkMacOSSetupPresentation.subtitle, "Complete the setup to get started")
+        XCTAssertEqual(
+            VoiceInkMacOSSetupPresentation.helpText,
+            "Need help? Check the Help menu for support options"
+        )
+        XCTAssertEqual(VoiceInkMacOSSetupPresentation.actionSystemImageName, "arrow.right")
+        XCTAssertEqual(VoiceInkMacOSSetupPresentation.completedSystemImageName, "checkmark.circle.fill")
+        XCTAssertEqual(VoiceInkMacOSSetupPresentation.optionalSystemImageName, "circle")
+        XCTAssertEqual(VoiceInkMacOSSetupPresentation.requiredSystemImageName, "chevron.right")
+        XCTAssertEqual(
+            VoiceInkMacOSSetupPresentation.steps,
+            [
+                VoiceInkMacOSSetupStepPresentation(
+                    kind: .shortcut,
+                    isOptional: false,
+                    iconSystemName: "command",
+                    title: "Set Keyboard Shortcut",
+                    description: "Use VoiceInk anywhere with a shortcut."
+                ),
+                VoiceInkMacOSSetupStepPresentation(
+                    kind: .accessibility,
+                    isOptional: false,
+                    iconSystemName: "hand.raised.fill",
+                    title: "Enable Accessibility",
+                    description: "Paste transcribed text at your cursor."
+                ),
+                VoiceInkMacOSSetupStepPresentation(
+                    kind: .screenContext,
+                    isOptional: true,
+                    iconSystemName: "video.fill",
+                    title: "Screen Context (Optional)",
+                    description: "Use visible text for better transcript enhancement when you choose."
+                ),
+                VoiceInkMacOSSetupStepPresentation(
+                    kind: .modelDownload,
+                    isOptional: false,
+                    iconSystemName: "arrow.down.to.line",
+                    title: "Download Model",
+                    description: "Choose an AI model to start transcribing."
+                )
+            ]
+        )
+    }
+
+    func testMacOSSetupPresentationPreservesActionTitlePolicy() {
+        XCTAssertEqual(
+            VoiceInkMacOSSetupPresentation.actionButtonTitle(
+                isShortcutConfigured: false,
+                isAccessibilityEnabled: false,
+                hasTranscriptionModel: false
+            ),
+            "Configure Shortcut"
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSSetupPresentation.actionButtonTitle(
+                isShortcutConfigured: true,
+                isAccessibilityEnabled: false,
+                hasTranscriptionModel: false
+            ),
+            "Enable Accessibility"
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSSetupPresentation.actionButtonTitle(
+                isShortcutConfigured: true,
+                isAccessibilityEnabled: true,
+                hasTranscriptionModel: false
+            ),
+            "Download Model"
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSSetupPresentation.actionButtonTitle(
+                isShortcutConfigured: true,
+                isAccessibilityEnabled: true,
+                hasTranscriptionModel: true
+            ),
+            "Get Started"
+        )
+    }
+
     func testIOSReadyOnboardingPresentationPreservesCopyAndStepOrder() {
         let presentation = VoiceInkIOSOnboardingPresentation.ready
 

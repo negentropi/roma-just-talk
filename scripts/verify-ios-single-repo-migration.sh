@@ -1945,8 +1945,38 @@ reject_pattern \
   VoiceInk/Views/Settings/SettingsView.swift
 
 require_pattern \
+  "shared macOS setup presentation lives in VoiceInkCore" \
+  'VoiceInkMacOSSetupPresentation|VoiceInkMacOSSetupStepPresentation|actionButtonTitle' \
+  VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift
+
+require_pattern \
+  "macOS metrics setup uses shared setup presentation" \
+  'VoiceInkMacOSSetupPresentation\.(title|subtitle|steps|actionButtonTitle|helpText|completedSystemImageName|optionalSystemImageName|requiredSystemImageName)' \
+  VoiceInk/Views/Metrics/MetricsSetupView.swift
+
+require_pattern \
+  "core tests pin macOS setup presentation copy and policy" \
+  'testMacOSSetupPresentationPreservesHeaderAndStepOrder|testMacOSSetupPresentationPreservesActionTitlePolicy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/OnboardingPresentationTests.swift
+
+require_pattern \
+  "core check runner executes macOS setup presentation tests" \
+  'testMacOSSetupPresentationPreservesHeaderAndStepOrder|testMacOSSetupPresentationPreservesActionTitlePolicy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "macOS metrics setup avoids shell-only setup presentation copy" \
+  '"(Welcome to VoiceInk|Complete the setup to get started|Set Keyboard Shortcut|Use VoiceInk anywhere with a shortcut\.|Enable Accessibility|Paste transcribed text at your cursor\.|Screen Context \(Optional\)|Use visible text for better transcript enhancement when you choose\.|Download Model|Choose an AI model to start transcribing\.|Configure Shortcut|Get Started|Need help\? Check the Help menu for support options)"|systemName: "(command|hand\.raised\.fill|video\.fill|arrow\.down\.to\.line|checkmark\.circle\.fill|circle|chevron\.right)"' \
+  VoiceInk/Views/Metrics/MetricsSetupView.swift
+
+require_pattern \
   "migration checklist tracks shared macOS reset onboarding alert presentation" \
   'macOS reset-onboarding settings alert presentation|VoiceInkMacOSOnboardingPresentation\.resetSettingsAlert' \
+  docs/ios-single-repo-migration.md
+
+require_pattern \
+  "migration checklist tracks shared macOS setup presentation" \
+  'macOS metrics setup step order, icons, labels, help text, and action-title policy route through `VoiceInkMacOSSetupPresentation`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

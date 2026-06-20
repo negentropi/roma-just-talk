@@ -1,4 +1,5 @@
 import SwiftUI
+import VoiceInkCore
 
 struct MetricsSetupView: View {
     @EnvironmentObject private var transcriptionModelManager: TranscriptionModelManager
@@ -16,11 +17,11 @@ struct MetricsSetupView: View {
                         .padding(.bottom, 20)
                        
                     VStack(spacing: 4) {
-                        Text("Welcome to VoiceInk")
+                        Text(VoiceInkMacOSSetupPresentation.title)
                             .font(.system(size: 28, weight: .bold, design: .rounded))
                             .multilineTextAlignment(.center)
                         
-                        Text("Complete the setup to get started")
+                        Text(VoiceInkMacOSSetupPresentation.subtitle)
                             .font(.system(size: 16))
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
@@ -31,9 +32,9 @@ struct MetricsSetupView: View {
                 
                 // Setup Steps
                 VStack(alignment: .leading, spacing: 0) {
-                    ForEach(0..<4) { index in
-                        setupStep(for: index)
-                        if index < 3 {
+                    ForEach(Array(VoiceInkMacOSSetupPresentation.steps.enumerated()), id: \.element.id) { index, step in
+                        setupStep(step)
+                        if index < VoiceInkMacOSSetupPresentation.steps.count - 1 {
                             Divider().padding(.leading, 70)
                         }
                     }
@@ -68,73 +69,38 @@ struct MetricsSetupView: View {
         }
     }
     
-    private func setupStep(for index: Int) -> some View {
-        let stepInfo: (isCompleted: Bool, isOptional: Bool, icon: String, title: String, description: String)
-        
-        switch index {
-        case 0:
-            stepInfo = (
-                isCompleted: recordingShortcutManager.isShortcutConfigured,
-                isOptional: false,
-                icon: "command",
-                title: "Set Keyboard Shortcut",
-                description: "Use VoiceInk anywhere with a shortcut."
-            )
-        case 1:
-            stepInfo = (
-                isCompleted: isAccessibilityEnabled,
-                isOptional: false,
-                icon: "hand.raised.fill",
-                title: "Enable Accessibility",
-                description: "Paste transcribed text at your cursor."
-            )
-        case 2:
-            stepInfo = (
-                isCompleted: isScreenRecordingEnabled,
-                isOptional: true,
-                icon: "video.fill",
-                title: "Screen Context (Optional)",
-                description: "Use visible text for better transcript enhancement when you choose."
-            )
-        default:
-            stepInfo = (
-                isCompleted: transcriptionModelManager.currentTranscriptionModel != nil,
-                isOptional: false,
-                icon: "arrow.down.to.line",
-                title: "Download Model",
-                description: "Choose an AI model to start transcribing."
-            )
-        }
-        
+    private func setupStep(_ step: VoiceInkMacOSSetupStepPresentation) -> some View {
+        let isCompleted = isStepCompleted(step)
+
         return HStack(spacing: 16) {
-            Image(systemName: stepInfo.icon)
+            Image(systemName: step.iconSystemName)
                 .font(.system(size: 18))
                 .frame(width: 40, height: 40)
-                .background(stepColor(for: stepInfo).opacity(0.1))
-                .foregroundColor(stepColor(for: stepInfo))
+                .background(stepColor(isCompleted: isCompleted, isOptional: step.isOptional).opacity(0.1))
+                .foregroundColor(stepColor(isCompleted: isCompleted, isOptional: step.isOptional))
                 .clipShape(Circle())
             
             VStack(alignment: .leading, spacing: 3) {
-                Text(stepInfo.title)
+                Text(step.title)
                     .font(.headline)
                     .fontWeight(.semibold)
-                Text(stepInfo.description)
+                Text(step.description)
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
             
             Spacer()
             
-            if stepInfo.isCompleted {
-                Image(systemName: "checkmark.circle.fill")
+            if isCompleted {
+                Image(systemName: VoiceInkMacOSSetupPresentation.completedSystemImageName)
                     .font(.system(size: 24))
                     .foregroundColor(.green)
-            } else if stepInfo.isOptional {
-                Image(systemName: "circle")
+            } else if step.isOptional {
+                Image(systemName: VoiceInkMacOSSetupPresentation.optionalSystemImageName)
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundColor(.secondary)
             } else {
-                Image(systemName: "chevron.right")
+                Image(systemName: VoiceInkMacOSSetupPresentation.requiredSystemImageName)
                     .font(.system(size: 14, weight: .bold))
                     .foregroundColor(Color(NSColor.separatorColor))
             }
@@ -145,9 +111,9 @@ struct MetricsSetupView: View {
     private var actionButton: some View {
         Button(action: handleActionButton) {
             HStack {
-                Text(getActionButtonTitle())
+                Text(actionButtonTitle)
                     .fontWeight(.semibold)
-                Image(systemName: "arrow.right")
+                Image(systemName: VoiceInkMacOSSetupPresentation.actionSystemImageName)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 12)
@@ -175,19 +141,16 @@ struct MetricsSetupView: View {
         }
     }
     
-    private func getActionButtonTitle() -> String {
-        if !recordingShortcutManager.isShortcutConfigured {
-            return "Configure Shortcut"
-        } else if !isAccessibilityEnabled {
-            return "Enable Accessibility"
-        } else if transcriptionModelManager.currentTranscriptionModel == nil {
-            return "Download Model"
-        }
-        return "Get Started"
+    private var actionButtonTitle: String {
+        VoiceInkMacOSSetupPresentation.actionButtonTitle(
+            isShortcutConfigured: recordingShortcutManager.isShortcutConfigured,
+            isAccessibilityEnabled: isAccessibilityEnabled,
+            hasTranscriptionModel: transcriptionModelManager.currentTranscriptionModel != nil
+        )
     }
     
     private var helpText: some View {
-        Text("Need help? Check the Help menu for support options")
+        Text(VoiceInkMacOSSetupPresentation.helpText)
             .font(.caption)
             .foregroundColor(.secondary)
     }
@@ -202,14 +165,25 @@ struct MetricsSetupView: View {
         isScreenRecordingEnabled = CGPreflightScreenCaptureAccess()
     }
 
-    private func stepColor(
-        for stepInfo: (isCompleted: Bool, isOptional: Bool, icon: String, title: String, description: String)
-    ) -> Color {
-        if stepInfo.isCompleted {
+    private func isStepCompleted(_ step: VoiceInkMacOSSetupStepPresentation) -> Bool {
+        switch step.kind {
+        case .shortcut:
+            return recordingShortcutManager.isShortcutConfigured
+        case .accessibility:
+            return isAccessibilityEnabled
+        case .screenContext:
+            return isScreenRecordingEnabled
+        case .modelDownload:
+            return transcriptionModelManager.currentTranscriptionModel != nil
+        }
+    }
+
+    private func stepColor(isCompleted: Bool, isOptional: Bool) -> Color {
+        if isCompleted {
             return .green
         }
 
-        return stepInfo.isOptional ? .secondary : Color.accentColor
+        return isOptional ? .secondary : Color.accentColor
     }
     
     private func openSettings() {

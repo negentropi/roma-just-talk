@@ -357,7 +357,7 @@ When real Xcode, app dependencies, and the iOS platform are installed, run the s
 scripts/verify-ios-single-repo-migration.sh --full-build
 ```
 
-1. `VoiceInk.xcworkspace` includes `iOS/VoiceInk-ios.xcodeproj`.
+1. `VoiceInk.xcworkspace` includes `iOS/VoiceInk-ios.xcodeproj`, and the shared iOS scheme includes the unit-test and UI-test bundles.
 2. macOS and iOS projects both resolve `VoiceInkCore` from inside `VoiceInk/`, and the iOS app target links the `VoiceInkCore` product.
 3. `VoiceInk/` is the git root for this work, and the abandoned parent-level Swift package shape (`../VoiceInkCore`, `../Package.swift`, `../Sources/VoiceInkCore`, `../Tests/VoiceInkCoreTests`) remains absent.
 4. `VoiceInkCore` stays platform-neutral: no AppKit, UIKit, SwiftUI, SwiftData, AVFoundation, CoreAudio, IOKit, FluidAudio, KeyboardKit, LLMkit, WhisperKit, or whisper.cpp module imports in shared sources or core checks.

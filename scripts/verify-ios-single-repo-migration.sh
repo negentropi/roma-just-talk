@@ -5582,6 +5582,26 @@ require_pattern \
   VoiceInk.xcworkspace/contents.xcworkspacedata
 
 require_pattern \
+  "iOS project keeps unit test target" \
+  'VoiceInk-iosTests\.xctest' \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
+
+require_pattern \
+  "iOS project keeps UI test target" \
+  'VoiceInk-iosUITests\.xctest' \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
+
+require_pattern \
+  "iOS shared scheme includes unit tests" \
+  'BlueprintName = "VoiceInk-iosTests"' \
+  VoiceInk.xcworkspace/xcshareddata/xcschemes/VoiceInk-ios.xcscheme
+
+require_pattern \
+  "iOS shared scheme includes UI tests" \
+  'BlueprintName = "VoiceInk-iosUITests"' \
+  VoiceInk.xcworkspace/xcshareddata/xcschemes/VoiceInk-ios.xcscheme
+
+require_pattern \
   "macOS project resolves in-repo VoiceInkCore" \
   'relativePath = VoiceInkCore;' \
   VoiceInk.xcodeproj/project.pbxproj

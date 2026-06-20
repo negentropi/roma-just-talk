@@ -2606,6 +2606,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
 
 require_pattern \
+  "shared word-replacement submission policy owns draft and alert plan" \
+  'VoiceInkWordReplacementSubmissionPlan|wordReplacementSubmissionPlan|originalDraftAfterSubmit|replacementDraftAfterSubmit|shouldComplete' \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+require_pattern \
   "shared word-replacement list presentation lives in VoiceInkCore" \
   'VoiceInkWordReplacementListPresentation|originalColumnTitle|editButtonHelp' \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
@@ -2651,6 +2656,16 @@ require_pattern \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \
+  "iOS word-replacement submission uses shared submission plan" \
+  'submitWordReplacement|originalDraftAfterSubmit|replacementDraftAfterSubmit|alertPresentation' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+require_pattern \
+  "iOS word-replacement adapter uses shared submission plan" \
+  'VoiceInkDictionaryPolicy\.wordReplacementSubmissionPlan' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+require_pattern \
   "macOS filler-word settings consumes shared dictionary alert presentation" \
   'VoiceInkDictionaryAlertPresentation|alertPresentation|plan\.alertPresentation' \
   VoiceInk/Views/Components/FillerWordsSettingsView.swift
@@ -2658,6 +2673,11 @@ require_pattern \
 require_pattern \
   "macOS vocabulary adapter uses shared submission plan" \
   'VoiceInkDictionaryPolicy\.vocabularySubmissionPlan' \
+  VoiceInk/Services/DictionaryService.swift
+
+require_pattern \
+  "macOS word-replacement adapter uses shared submission plan" \
+  'VoiceInkDictionaryPolicy\.wordReplacementSubmissionPlan' \
   VoiceInk/Services/DictionaryService.swift
 
 require_pattern \
@@ -2670,6 +2690,16 @@ require_pattern \
   'submitVocabularyDraft|alertPresentation\.message|shouldComplete' \
   VoiceInk/Views/Dictionary/DictionaryQuickAddPanel.swift
 
+require_pattern \
+  "macOS word-replacement view consumes shared submission result" \
+  'submitWordReplacementDraft|originalDraftAfterSubmit|replacementDraftAfterSubmit|alertPresentation = plan\.alertPresentation' \
+  VoiceInk/Views/Dictionary/WordReplacementView.swift
+
+require_pattern \
+  "macOS quick-add word replacement consumes shared submission result" \
+  'submitWordReplacementDraft|alertPresentation\.message|shouldComplete' \
+  VoiceInk/Views/Dictionary/DictionaryQuickAddPanel.swift
+
 reject_pattern \
   "platform vocabulary submission avoids old insert-plan and shell-owned add wrappers" \
   'VoiceInkDictionaryPolicy\.vocabularyInsertPlan|VoiceInkVocabularyInsertPlan|addVocabularyWords|addCustomVocabularyTerms' \
@@ -2679,6 +2709,15 @@ reject_pattern \
   iOS/VoiceInk-ios/AppSettings.swift \
   iOS/VoiceInk-ios/SettingsView.swift \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+reject_pattern \
+  "platform word-replacement submission avoids shell-owned add wrappers" \
+  'DictionaryService\.addWordReplacement|settings\.addWordReplacement|func addWordReplacement\(' \
+  VoiceInk/Services/DictionaryService.swift \
+  VoiceInk/Views/Dictionary/WordReplacementView.swift \
+  VoiceInk/Views/Dictionary/DictionaryQuickAddPanel.swift \
+  iOS/VoiceInk-ios/AppSettings.swift \
+  iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \
   "macOS vocabulary view uses shared dictionary alert presentation" \
@@ -2829,7 +2868,7 @@ reject_pattern \
 
 require_pattern \
   "migration checklist tracks shared dictionary sort gate" \
-  'dictionary form/chrome, quick-add, word-replacement guidance, edit-sheet, list/row copy, vocabulary draft submission/reset/duplicate-alert planning, sort mode storage/toggle/indicator policy, and vocabulary/word-replacement list sorting route through `VoiceInkDictionarySettingsPresentation`/`VoiceInkDictionaryQuickAddPresentation`/`VoiceInkWordReplacementInfoPresentation`/`VoiceInkWordReplacementEditPresentation`/`VoiceInkVocabularyListPresentation`/`VoiceInkWordReplacementListPresentation`/`VoiceInkVocabularySubmissionPlan`/`VoiceInkDictionaryListSortPreference`/`VoiceInkDictionaryListSortPolicy`' \
+  'dictionary form/chrome, quick-add, word-replacement guidance, edit-sheet, list/row copy, vocabulary draft submission/reset/duplicate-alert planning, word-replacement draft submission/reset/duplicate-alert planning, sort mode storage/toggle/indicator policy, and vocabulary/word-replacement list sorting route through `VoiceInkDictionarySettingsPresentation`/`VoiceInkDictionaryQuickAddPresentation`/`VoiceInkWordReplacementInfoPresentation`/`VoiceInkWordReplacementEditPresentation`/`VoiceInkVocabularyListPresentation`/`VoiceInkWordReplacementListPresentation`/`VoiceInkVocabularySubmissionPlan`/`VoiceInkWordReplacementSubmissionPlan`/`VoiceInkDictionaryListSortPreference`/`VoiceInkDictionaryListSortPolicy`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

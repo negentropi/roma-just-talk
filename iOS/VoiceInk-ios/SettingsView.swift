@@ -117,14 +117,14 @@ struct SettingsView: View {
                 TextField(dictionaryPresentation.originalTextPlaceholder, text: $newReplacementOriginal)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
-                    .onSubmit(addWordReplacement)
+                    .onSubmit(submitWordReplacement)
 
                 TextField(dictionaryPresentation.replacementTextPlaceholder, text: $newReplacementText)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
-                    .onSubmit(addWordReplacement)
+                    .onSubmit(submitWordReplacement)
 
-                Button(action: addWordReplacement) {
+                Button(action: submitWordReplacement) {
                     Label(
                         dictionaryPresentation.addReplacementButtonTitle,
                         systemImage: settingsPresentation.addActionSystemImageName
@@ -238,19 +238,16 @@ struct SettingsView: View {
         dictionaryAlert = plan.alertPresentation
     }
 
-    private func addWordReplacement() {
+    private func submitWordReplacement() {
         guard canAddWordReplacement else { return }
 
-        if let error = settings.addWordReplacement(
+        let plan = settings.submitWordReplacementDraft(
             original: newReplacementOriginal,
             replacement: newReplacementText
-        ) {
-            dictionaryAlert = .wordReplacement(message: error)
-            return
-        }
-
-        newReplacementOriginal = ""
-        newReplacementText = ""
+        )
+        newReplacementOriginal = plan.originalDraftAfterSubmit
+        newReplacementText = plan.replacementDraftAfterSubmit
+        dictionaryAlert = plan.alertPresentation
     }
     
     private func deleteMode(at offsets: IndexSet) {

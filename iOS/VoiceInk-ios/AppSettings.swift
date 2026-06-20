@@ -206,26 +206,17 @@ final class AppSettings: ObservableObject {
     }
 
     @discardableResult
-    func addWordReplacement(original: String, replacement: String) -> String? {
-        let plan = VoiceInkDictionaryPolicy.wordReplacementInsertPlan(
+    func submitWordReplacementDraft(original: String, replacement: String) -> VoiceInkWordReplacementSubmissionPlan {
+        let plan = VoiceInkDictionaryPolicy.wordReplacementSubmissionPlan(
             original: original,
             replacement: replacement,
             existingOriginalTexts: wordReplacements.map(\.originalText)
         )
 
-        if let errorMessage = plan.errorMessage {
-            return errorMessage
-        }
+        guard let rule = plan.ruleToInsert else { return plan }
 
-        guard plan.shouldInsert else {
-            return nil
-        }
-
-        wordReplacements.append(VoiceInkWordReplacementRule(
-            originalText: plan.originalText,
-            replacementText: plan.replacementText
-        ))
-        return nil
+        wordReplacements.append(rule)
+        return plan
     }
 
     func removeWordReplacements(at offsets: IndexSet) {

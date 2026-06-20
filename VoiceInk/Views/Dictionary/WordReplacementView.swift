@@ -178,12 +178,15 @@ struct WordReplacementView: View {
     }
 
     private func addReplacement() {
-        if let error = DictionaryService.addWordReplacement(original: originalWord, replacement: replacementWord, existing: Array(wordReplacements), context: modelContext) {
-            alertPresentation = .wordReplacement(message: error)
-            return
-        }
-        originalWord = ""
-        replacementWord = ""
+        let plan = DictionaryService.submitWordReplacementDraft(
+            original: originalWord,
+            replacement: replacementWord,
+            existing: Array(wordReplacements),
+            context: modelContext
+        )
+        originalWord = plan.originalDraftAfterSubmit
+        replacementWord = plan.replacementDraftAfterSubmit
+        alertPresentation = plan.alertPresentation
     }
 
     private func removeReplacement(_ replacement: WordReplacement) {

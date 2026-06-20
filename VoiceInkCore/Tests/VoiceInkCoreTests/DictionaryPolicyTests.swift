@@ -447,6 +447,70 @@ final class DictionaryPolicyTests: XCTestCase {
         XCTAssertNil(plan.errorMessage)
     }
 
+    func testWordReplacementSubmissionPlanKeepsInvalidDraftWithoutAlert() {
+        let plan = VoiceInkDictionaryPolicy.wordReplacementSubmissionPlan(
+            original: " , ",
+            replacement: "roma",
+            existingOriginalTexts: []
+        )
+
+        XCTAssertNil(plan.ruleToInsert)
+        XCTAssertEqual(plan.originalDraftAfterSubmit, " , ")
+        XCTAssertEqual(plan.replacementDraftAfterSubmit, "roma")
+        XCTAssertNil(plan.alertPresentation)
+        XCTAssertFalse(plan.shouldInsert)
+        XCTAssertFalse(plan.shouldComplete)
+
+        let emptyPlan = VoiceInkDictionaryPolicy.wordReplacementSubmissionPlan(
+            original: "",
+            replacement: "",
+            existingOriginalTexts: []
+        )
+
+        XCTAssertNil(emptyPlan.ruleToInsert)
+        XCTAssertEqual(emptyPlan.originalDraftAfterSubmit, "")
+        XCTAssertEqual(emptyPlan.replacementDraftAfterSubmit, "")
+        XCTAssertNil(emptyPlan.alertPresentation)
+        XCTAssertFalse(emptyPlan.shouldInsert)
+        XCTAssertFalse(emptyPlan.shouldComplete)
+    }
+
+    func testWordReplacementSubmissionPlanRejectsDuplicateWithSharedAlert() {
+        let plan = VoiceInkDictionaryPolicy.wordReplacementSubmissionPlan(
+            original: "Roma",
+            replacement: "Roma Just Talk",
+            existingOriginalTexts: ["roma"]
+        )
+
+        XCTAssertNil(plan.ruleToInsert)
+        XCTAssertEqual(plan.originalDraftAfterSubmit, "Roma")
+        XCTAssertEqual(plan.replacementDraftAfterSubmit, "Roma Just Talk")
+        XCTAssertEqual(
+            plan.alertPresentation,
+            .wordReplacement(message: "'Roma' already exists in word replacements")
+        )
+        XCTAssertFalse(plan.shouldInsert)
+        XCTAssertFalse(plan.shouldComplete)
+    }
+
+    func testWordReplacementSubmissionPlanBuildsRuleAndClearsDraft() {
+        let plan = VoiceInkDictionaryPolicy.wordReplacementSubmissionPlan(
+            original: " Roma ",
+            replacement: " Roma Just Talk ",
+            existingOriginalTexts: []
+        )
+
+        XCTAssertEqual(
+            plan.ruleToInsert,
+            VoiceInkWordReplacementRule(originalText: "Roma", replacementText: "Roma Just Talk")
+        )
+        XCTAssertEqual(plan.originalDraftAfterSubmit, "")
+        XCTAssertEqual(plan.replacementDraftAfterSubmit, "")
+        XCTAssertNil(plan.alertPresentation)
+        XCTAssertTrue(plan.shouldInsert)
+        XCTAssertTrue(plan.shouldComplete)
+    }
+
     func testWordReplacementBackupImportPlanPreservesMacOSImportSemantics() {
         let plan = VoiceInkDictionaryPolicy.wordReplacementBackupImportPlan(
             from: [

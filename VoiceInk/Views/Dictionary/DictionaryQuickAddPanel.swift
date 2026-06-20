@@ -350,11 +350,19 @@ struct DictionaryQuickAddView: View {
             original: originalInput,
             replacement: replacementInput
         ) else { return }
-        if let error = DictionaryService.addWordReplacement(original: originalInput, replacement: replacementInput, existing: Array(wordReplacements), context: modelContext) {
-            errorMessage = error
+        let plan = DictionaryService.submitWordReplacementDraft(
+            original: originalInput,
+            replacement: replacementInput,
+            existing: Array(wordReplacements),
+            context: modelContext
+        )
+        if let alertPresentation = plan.alertPresentation {
+            errorMessage = alertPresentation.message
             return
         }
-        onDismiss()
+        if plan.shouldComplete {
+            onDismiss()
+        }
     }
 }
 

@@ -34,6 +34,36 @@ public struct VoiceInkWordReplacementInsertPlan: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkWordReplacementSubmissionPlan: Equatable, Sendable {
+    public let ruleToInsert: VoiceInkWordReplacementRule?
+    public let originalDraftAfterSubmit: String
+    public let replacementDraftAfterSubmit: String
+    public let alertPresentation: VoiceInkDictionaryAlertPresentation?
+
+    public var shouldInsert: Bool {
+        ruleToInsert != nil
+    }
+
+    public var shouldComplete: Bool {
+        alertPresentation == nil
+            && ruleToInsert != nil
+            && originalDraftAfterSubmit.isEmpty
+            && replacementDraftAfterSubmit.isEmpty
+    }
+
+    public init(
+        ruleToInsert: VoiceInkWordReplacementRule?,
+        originalDraftAfterSubmit: String,
+        replacementDraftAfterSubmit: String,
+        alertPresentation: VoiceInkDictionaryAlertPresentation?
+    ) {
+        self.ruleToInsert = ruleToInsert
+        self.originalDraftAfterSubmit = originalDraftAfterSubmit
+        self.replacementDraftAfterSubmit = replacementDraftAfterSubmit
+        self.alertPresentation = alertPresentation
+    }
+}
+
 public struct VoiceInkWordReplacementBackupImportPlan: Equatable, Sendable {
     public let rulesToInsert: [VoiceInkWordReplacementRule]
     public let skippedInvalidReplacementCount: Int
@@ -642,6 +672,46 @@ public enum VoiceInkDictionaryPolicy {
             originalText: trimmedOriginal,
             replacementText: trimmedReplacement,
             errorMessage: nil
+        )
+    }
+
+    public static func wordReplacementSubmissionPlan(
+        original: String,
+        replacement: String,
+        existingOriginalTexts: [String]
+    ) -> VoiceInkWordReplacementSubmissionPlan {
+        let plan = wordReplacementInsertPlan(
+            original: original,
+            replacement: replacement,
+            existingOriginalTexts: existingOriginalTexts
+        )
+
+        if let errorMessage = plan.errorMessage {
+            return VoiceInkWordReplacementSubmissionPlan(
+                ruleToInsert: nil,
+                originalDraftAfterSubmit: original,
+                replacementDraftAfterSubmit: replacement,
+                alertPresentation: .wordReplacement(message: errorMessage)
+            )
+        }
+
+        guard plan.shouldInsert else {
+            return VoiceInkWordReplacementSubmissionPlan(
+                ruleToInsert: nil,
+                originalDraftAfterSubmit: original,
+                replacementDraftAfterSubmit: replacement,
+                alertPresentation: nil
+            )
+        }
+
+        return VoiceInkWordReplacementSubmissionPlan(
+            ruleToInsert: VoiceInkWordReplacementRule(
+                originalText: plan.originalText,
+                replacementText: plan.replacementText
+            ),
+            originalDraftAfterSubmit: "",
+            replacementDraftAfterSubmit: "",
+            alertPresentation: nil
         )
     }
 

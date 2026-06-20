@@ -52,37 +52,38 @@ enum DictionaryService {
 
     // MARK: - Word Replacement
 
-    /// Adds a word replacement entry (original may be comma-separated).
-    /// Returns an error message string if something went wrong, nil on success.
     @discardableResult
-    static func addWordReplacement(
+    static func submitWordReplacementDraft(
         original: String,
         replacement: String,
         existing: [WordReplacement],
         context: ModelContext
-    ) -> String? {
-        let plan = VoiceInkDictionaryPolicy.wordReplacementInsertPlan(
+    ) -> VoiceInkWordReplacementSubmissionPlan {
+        let plan = VoiceInkDictionaryPolicy.wordReplacementSubmissionPlan(
             original: original,
             replacement: replacement,
             existingOriginalTexts: existing.map(\.originalText)
         )
 
-        if let errorMessage = plan.errorMessage {
-            return errorMessage
-        }
+        guard let rule = plan.ruleToInsert else { return plan }
 
-        guard plan.shouldInsert else { return nil }
-
-        let entry = WordReplacement(originalText: plan.originalText, replacementText: plan.replacementText)
+        let entry = WordReplacement(originalText: rule.originalText, replacementText: rule.replacementText)
         context.insert(entry)
         do {
             try context.save()
             WordReplacementService.shared.invalidateCache()
-            return nil
+            return plan
         } catch {
             context.delete(entry)
-            return VoiceInkDictionaryAlertPresentation.failedToAddWordReplacement(
-                localizedDescription: error.localizedDescription
+            return VoiceInkWordReplacementSubmissionPlan(
+                ruleToInsert: rule,
+                originalDraftAfterSubmit: original,
+                replacementDraftAfterSubmit: replacement,
+                alertPresentation: .wordReplacement(
+                    message: VoiceInkDictionaryAlertPresentation.failedToAddWordReplacement(
+                        localizedDescription: error.localizedDescription
+                    )
+                )
             )
         }
     }

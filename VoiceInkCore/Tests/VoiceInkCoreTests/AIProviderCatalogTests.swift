@@ -355,6 +355,32 @@ final class AIProviderCatalogTests: XCTestCase {
         )
     }
 
+    func testMacOSAIEnhancementSettingsChromeAndOllamaPresentationIsShared() {
+        let presentation = VoiceInkAIEnhancementProviderSettingsPresentation.macOS
+
+        XCTAssertEqual(presentation.sectionTitle, "AI Provider Integration")
+        XCTAssertEqual(presentation.providerPickerTitle, "Provider")
+        XCTAssertEqual(presentation.modelPickerTitle, "Model")
+        XCTAssertEqual(presentation.noModelsLoadedText, "No models loaded")
+        XCTAssertEqual(presentation.refreshButtonTitle, "Refresh")
+        XCTAssertEqual(presentation.defaultAPIKeyRemoveButtonTitle, "Remove")
+        XCTAssertEqual(presentation.getAPIKeyButtonTitle, "Get API Key")
+        XCTAssertEqual(presentation.errorAlertTitle, "Error")
+        XCTAssertEqual(presentation.errorAlertDismissButtonTitle, "OK")
+        XCTAssertEqual(presentation.ollamaBaseURLFieldTitle, "Base URL")
+        XCTAssertEqual(presentation.ollamaSaveButtonTitle, "Save")
+        XCTAssertEqual(presentation.ollamaEditButtonTitle, "Edit")
+        XCTAssertEqual(presentation.ollamaResetButtonHelp, "Reset to default")
+        XCTAssertEqual(
+            presentation.ollamaConnectionFailureMessage,
+            "Could not connect to Ollama. Please check if Ollama is running and the base URL is correct."
+        )
+        XCTAssertEqual(
+            presentation.ollamaServerText(baseURL: "http://localhost:11434"),
+            "Server: http://localhost:11434"
+        )
+    }
+
     func testMacOSCustomProviderSettingsPresentationAndSubmitPolicyAreShared() {
         let presentation = VoiceInkAIEnhancementProviderSettingsPresentation.macOS
 

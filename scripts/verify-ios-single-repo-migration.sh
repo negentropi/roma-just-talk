@@ -2986,6 +2986,21 @@ reject_pattern \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
 
 require_pattern \
+  "shared AI provider settings chrome and Ollama presentation lives in VoiceInkCore" \
+  'sectionTitle|providerPickerTitle|modelPickerTitle|noModelsLoadedText|refreshButtonTitle|defaultAPIKeyRemoveButtonTitle|getAPIKeyButtonTitle|errorAlertTitle|errorAlertDismissButtonTitle|ollamaBaseURLFieldTitle|ollamaSaveButtonTitle|ollamaEditButtonTitle|ollamaResetButtonHelp|ollamaConnectionFailureMessage|ollamaServerText' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+require_pattern \
+  "macOS AI settings chrome and Ollama form use shared presentation" \
+  'providerSettingsPresentation\.(sectionTitle|providerPickerTitle|modelPickerTitle|noModelsLoadedText|refreshButtonTitle|defaultAPIKeyRemoveButtonTitle|getAPIKeyButtonTitle|errorAlertTitle|errorAlertDismissButtonTitle|ollamaBaseURLFieldTitle|ollamaSaveButtonTitle|ollamaEditButtonTitle|ollamaResetButtonHelp|ollamaConnectionFailureMessage|ollamaServerText)' \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+
+reject_pattern \
+  "macOS AI settings avoid duplicate provider chrome and Ollama presentation copy" \
+  '"(AI Provider Integration|Provider|No models loaded|Refresh|Model|Base URL|Save|Edit|Reset to default|Remove|Get API Key|Error|OK)"|Server:|Could not connect to Ollama' \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+
+require_pattern \
   "shared custom provider settings presentation and submit policy lives in VoiceInkCore" \
   'apiKeyFieldTitle|verifyAndSaveButtonTitle|customProviderBaseURLFieldTitle|customProviderBaseURLPlaceholder|customProviderModelFieldTitle|customProviderModelPlaceholder|customProviderAPIKeySetText|customProviderRemoveKeyButtonTitle|canSubmitCustomProvider' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift

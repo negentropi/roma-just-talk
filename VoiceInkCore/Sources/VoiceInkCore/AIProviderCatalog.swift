@@ -39,10 +39,24 @@ public enum VoiceInkAIEnhancementConnectionStatusPresentation: Sendable, Equatab
 }
 
 public struct VoiceInkAIEnhancementProviderSettingsPresentation: Sendable, Equatable {
+    public let sectionTitle: String
+    public let providerPickerTitle: String
+    public let modelPickerTitle: String
+    public let noModelsLoadedText: String
+    public let refreshButtonTitle: String
+    public let defaultAPIKeyRemoveButtonTitle: String
+    public let getAPIKeyButtonTitle: String
+    public let errorAlertTitle: String
+    public let errorAlertDismissButtonTitle: String
     public let connectedText: String
     public let disconnectedText: String
     public let apiKeyFieldTitle: String
     public let verifyAndSaveButtonTitle: String
+    public let ollamaBaseURLFieldTitle: String
+    public let ollamaSaveButtonTitle: String
+    public let ollamaEditButtonTitle: String
+    public let ollamaResetButtonHelp: String
+    public let ollamaConnectionFailureMessage: String
     public let customProviderBaseURLFieldTitle: String
     public let customProviderBaseURLPlaceholder: String
     public let customProviderModelFieldTitle: String
@@ -51,10 +65,24 @@ public struct VoiceInkAIEnhancementProviderSettingsPresentation: Sendable, Equat
     public let customProviderRemoveKeyButtonTitle: String
 
     public static let macOS = VoiceInkAIEnhancementProviderSettingsPresentation(
+        sectionTitle: "AI Provider Integration",
+        providerPickerTitle: "Provider",
+        modelPickerTitle: "Model",
+        noModelsLoadedText: "No models loaded",
+        refreshButtonTitle: "Refresh",
+        defaultAPIKeyRemoveButtonTitle: "Remove",
+        getAPIKeyButtonTitle: "Get API Key",
+        errorAlertTitle: "Error",
+        errorAlertDismissButtonTitle: "OK",
         connectedText: "Connected",
         disconnectedText: "Disconnected",
         apiKeyFieldTitle: "API Key",
         verifyAndSaveButtonTitle: "Verify and Save",
+        ollamaBaseURLFieldTitle: "Base URL",
+        ollamaSaveButtonTitle: "Save",
+        ollamaEditButtonTitle: "Edit",
+        ollamaResetButtonHelp: "Reset to default",
+        ollamaConnectionFailureMessage: "Could not connect to Ollama. Please check if Ollama is running and the base URL is correct.",
         customProviderBaseURLFieldTitle: "API Endpoint URL",
         customProviderBaseURLPlaceholder: "e.g. https://api.openai.com/v1/chat/completions",
         customProviderModelFieldTitle: "Model Name",
@@ -83,6 +111,10 @@ public struct VoiceInkAIEnhancementProviderSettingsPresentation: Sendable, Equat
                 ? .status(text: connectedText, tone: .connected)
                 : nil
         }
+    }
+
+    public func ollamaServerText(baseURL: String) -> String {
+        "Server: \(baseURL)"
     }
 
     public func canSubmitCustomProvider(

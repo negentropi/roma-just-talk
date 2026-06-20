@@ -51,9 +51,9 @@ struct APIKeyManagementView: View {
     private let localCLIPresentation = VoiceInkLocalCLIPreference.macOSSettingsPresentation
     
     var body: some View {
-        Section("AI Provider Integration") {
+        Section(providerSettingsPresentation.sectionTitle) {
             HStack {
-                Picker("Provider", selection: $aiService.selectedProvider) {
+                Picker(providerSettingsPresentation.providerPickerTitle, selection: $aiService.selectedProvider) {
                     ForEach(VoiceInkAIEnhancementProviderKind.selectableTextEnhancementProviders, id: \.self) { provider in
                         Text(provider.rawValue).tag(provider)
                     }
@@ -88,7 +88,7 @@ struct APIKeyManagementView: View {
                 if aiService.selectedProvider.supportsUserInitiatedTextEnhancementModelRefresh {
                     if aiService.availableModels.isEmpty {
                         HStack {
-                            Text("No models loaded")
+                            Text(providerSettingsPresentation.noModelsLoadedText)
                                 .foregroundColor(.secondary)
                             Spacer()
                             Button(action: {
@@ -96,12 +96,12 @@ struct APIKeyManagementView: View {
                                     await aiService.fetchOpenRouterModels()
                                 }
                             }) {
-                                Label("Refresh", systemImage: "arrow.clockwise")
+                                Label(providerSettingsPresentation.refreshButtonTitle, systemImage: "arrow.clockwise")
                             }
                         }
                     } else {
                         HStack {
-                            Picker("Model", selection: Binding(
+                            Picker(providerSettingsPresentation.modelPickerTitle, selection: Binding(
                                 get: { aiService.currentModel },
                                 set: { aiService.selectModel($0) }
                             )) {
@@ -117,14 +117,14 @@ struct APIKeyManagementView: View {
                                     await aiService.fetchOpenRouterModels()
                                 }
                             }) {
-                                Label("Refresh", systemImage: "arrow.clockwise")
+                                Label(providerSettingsPresentation.refreshButtonTitle, systemImage: "arrow.clockwise")
                             }
                         }
                     }
                     
                 } else if aiService.selectedProvider.textEnhancementModelCatalogSource == .staticModels &&
                             !aiService.availableModels.isEmpty {
-                    Picker("Model", selection: Binding(
+                    Picker(providerSettingsPresentation.modelPickerTitle, selection: Binding(
                         get: { aiService.currentModel },
                         set: { aiService.selectModel($0) }
                     )) {
@@ -137,10 +137,10 @@ struct APIKeyManagementView: View {
                 if selectedProviderSettingsSurface == .ollama {
                     if isEditingURL {
                         HStack {
-                            TextField("Base URL", text: $ollamaBaseURL)
+                            TextField(providerSettingsPresentation.ollamaBaseURLFieldTitle, text: $ollamaBaseURL)
                                 .textFieldStyle(.roundedBorder)
                             
-                            Button("Save") {
+                            Button(providerSettingsPresentation.ollamaSaveButtonTitle) {
                                 aiService.updateOllamaBaseURL(ollamaBaseURL)
                                 checkOllamaConnection()
                                 isEditingURL = false
@@ -148,9 +148,9 @@ struct APIKeyManagementView: View {
                         }
                     } else {
                         HStack {
-                            Text("Server: \(ollamaBaseURL)")
+                            Text(providerSettingsPresentation.ollamaServerText(baseURL: ollamaBaseURL))
                             Spacer()
-                            Button("Edit") { isEditingURL = true }
+                            Button(providerSettingsPresentation.ollamaEditButtonTitle) { isEditingURL = true }
                             Button(action: {
                                 ollamaBaseURL = VoiceInkPreferenceDefault.ollamaBaseURL
                                 aiService.updateOllamaBaseURL(ollamaBaseURL)
@@ -158,14 +158,14 @@ struct APIKeyManagementView: View {
                             }) {
                                 Image(systemName: "arrow.counterclockwise")
                             }
-                            .help("Reset to default")
+                            .help(providerSettingsPresentation.ollamaResetButtonHelp)
                         }
                     }
 
                     if !ollamaModels.isEmpty {
                         Divider()
 
-                        Picker("Model", selection: $selectedOllamaModel) {
+                        Picker(providerSettingsPresentation.modelPickerTitle, selection: $selectedOllamaModel) {
                             ForEach(ollamaModels) { model in
                                 Text(model.name).tag(model.name)
                             }
@@ -289,7 +289,7 @@ struct APIKeyManagementView: View {
                             Spacer()
                             Text(obfuscatedSelectedAPIKey)
                                 .foregroundColor(.secondary)
-                            Button("Remove", role: .destructive) {
+                            Button(providerSettingsPresentation.defaultAPIKeyRemoveButtonTitle, role: .destructive) {
                                 aiService.clearAPIKey()
                             }
                         }
@@ -302,7 +302,7 @@ struct APIKeyManagementView: View {
                                 Link(destination: url) {
                                     HStack {
                                         Image(systemName: "key.fill")
-                                        Text("Get API Key")
+                                        Text(providerSettingsPresentation.getAPIKeyButtonTitle)
                                     }
                                     .font(.caption)
                                     .foregroundColor(.blue)
@@ -339,8 +339,8 @@ struct APIKeyManagementView: View {
                 }
             }
         }
-        .alert("Error", isPresented: $showAlert) {
-            Button("OK", role: .cancel) { }
+        .alert(providerSettingsPresentation.errorAlertTitle, isPresented: $showAlert) {
+            Button(providerSettingsPresentation.errorAlertDismissButtonTitle, role: .cancel) { }
         } message: {
             Text(alertMessage)
         }
@@ -389,7 +389,7 @@ struct APIKeyManagementView: View {
             } else {
                 ollamaModels = []
                 isCheckingOllama = false
-                alertMessage = "Could not connect to Ollama. Please check if Ollama is running and the base URL is correct."
+                alertMessage = providerSettingsPresentation.ollamaConnectionFailureMessage
                 showAlert = true
             }
         }

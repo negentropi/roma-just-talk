@@ -66,7 +66,7 @@ struct ProviderAPIKeyView: View {
                     HStack {
                         let feedback = VoiceInkProviderAPIKeyVerificationProgress.iOSVerifiedKeyFeedback
                         Label(feedback.text, systemImage: feedback.effectiveSystemImageName)
-                            .foregroundStyle(color(for: feedback.tone))
+                            .foregroundStyle(feedback.tone.statusColor)
                         Spacer()
                         Button(presentation.changeButtonTitle) {
                             editingKey = true
@@ -83,7 +83,7 @@ struct ProviderAPIKeyView: View {
                 // Only show verification result when actively verifying and not already verified
                 if let feedback = verificationProgress.iOSResultFeedback, !isKeyVerified {
                     Label(feedback.text, systemImage: feedback.effectiveSystemImageName)
-                        .foregroundStyle(color(for: feedback.tone))
+                        .foregroundStyle(feedback.tone.statusColor)
                 }
             }
             
@@ -140,14 +140,6 @@ struct ProviderAPIKeyView: View {
         }
     }
 
-    private func color(for tone: VoiceInkProviderAPIKeyVerificationTone) -> Color {
-        switch tone {
-        case .success:
-            return .green
-        case .failure:
-            return .red
-        }
-    }
 }
 
 #Preview {

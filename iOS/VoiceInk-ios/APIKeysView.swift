@@ -27,14 +27,3 @@ struct APIKeysView: View {
 #Preview {
     NavigationStack { APIKeysView() }
 }
-
-private extension VoiceInkProviderAPIKeyListRowTone {
-    var statusColor: Color {
-        switch self {
-        case .verified:
-            return .green
-        case .attention:
-            return .orange
-        }
-    }
-}

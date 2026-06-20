@@ -1311,6 +1311,17 @@ require_pattern \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 require_pattern \
+  "iOS provider API-key tone colors live in one shell adapter" \
+  'extension VoiceInkProviderAPIKeyListRowTone|extension VoiceInkProviderAPIKeyVerificationTone|statusColor' \
+  iOS/VoiceInk-ios/ProviderAPIKeyTone+iOS.swift
+
+reject_pattern \
+  "iOS API-key views avoid duplicate tone color adapters" \
+  'extension VoiceInkProviderAPIKeyListRowTone|func +color\(for tone: VoiceInkProviderAPIKeyVerificationTone\)|var +statusColor: Color' \
+  iOS/VoiceInk-ios/APIKeysView.swift \
+  iOS/VoiceInk-ios/ProviderAPIKeyView.swift
+
+require_pattern \
   "shared API-key obfuscation fallback lives in VoiceInkCore" \
   'obfuscatedAPIKeyOrPlaceholder|obfuscatedAPIKeyPlaceholder' \
   VoiceInkCore/Sources/VoiceInkCore/SecretPresentation.swift

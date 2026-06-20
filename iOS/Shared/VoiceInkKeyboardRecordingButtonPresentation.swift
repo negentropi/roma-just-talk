@@ -1,4 +1,5 @@
 import Foundation
+import VoiceInkCore
 
 struct VoiceInkKeyboardRecordingButtonPresentation: Equatable {
     let title: String
@@ -15,7 +16,7 @@ struct VoiceInkKeyboardRecordingButtonPresentation: Equatable {
     )
 
     static let openAppFallback = VoiceInkKeyboardRecordingButtonPresentation(
-        title: " Open roma just talk",
+        title: " Open \(VoiceInkAppIdentity.displayName)",
         systemImageName: "app"
     )
 

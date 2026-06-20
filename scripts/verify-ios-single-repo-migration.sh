@@ -6275,8 +6275,8 @@ require_pattern \
   iOS/Shared/VoiceInkKeyboardRecordingButtonPresentation.swift
 
 require_pattern \
-  "iOS shared keyboard presentation owns fallback title" \
-  'title: " Open roma just talk"' \
+  "iOS shared keyboard presentation uses shared fallback app title" \
+  'VoiceInkAppIdentity\.displayName' \
   iOS/Shared/VoiceInkKeyboardRecordingButtonPresentation.swift
 
 require_pattern \
@@ -6333,6 +6333,11 @@ reject_pattern \
   "iOS keyboard controller avoids shell-owned button copy" \
   'setTitle\("( Record| Stop| Open roma just talk)"|UIImage\(systemName: "(mic\.fill|stop\.fill|app)"' \
   iOS/VoiceInkKeyboard/KeyboardViewController.swift
+
+reject_pattern \
+  "iOS shared keyboard presentation avoids duplicate app display name" \
+  '" Open roma just talk"' \
+  iOS/Shared/VoiceInkKeyboardRecordingButtonPresentation.swift
 
 reject_pattern \
   "iOS keyboard/app recording coordination avoids raw timing literals" \

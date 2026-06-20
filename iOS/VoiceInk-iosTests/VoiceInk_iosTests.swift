@@ -13,6 +13,13 @@ final class VoiceInkIOSTests: XCTestCase {
         XCTAssertNil(VoiceInkAppDeepLink(url: try XCTUnwrap(URL(string: "voiceink://settings"))))
     }
 
+    func testKeyboardRecordingButtonPresentationUsesSharedDisplayNameForFallback() {
+        XCTAssertEqual(
+            VoiceInkKeyboardRecordingButtonPresentation.openAppFallback.title,
+            " Open \(VoiceInkAppIdentity.displayName)"
+        )
+    }
+
     func testStorageDirectoryAdaptersUseSharedCorePolicies() {
         let documentsDirectory = VoiceInkIOSStorageDirectories.documentsDirectory
 

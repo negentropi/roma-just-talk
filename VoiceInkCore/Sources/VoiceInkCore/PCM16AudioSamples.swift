@@ -10,6 +10,9 @@ public enum VoiceInkPCM16Audio {
     public static let isFloatingPoint = false
     public static let wavHeaderByteCount = 44
     private static let minimumSpeechLikeCrestFactor: Float = 6.0
+    private static let minimumSpeechLikeActiveSampleCount = 3
+    private static let minimumSpeechLikeActiveSampleDivisor = 100
+    private static let minimumSpeechLikeActiveRunSampleCount = 4
 
     public static func floatSamples(fromLittleEndianData data: Data, startingAt startByteOffset: Int = 0) -> [Float] {
         guard startByteOffset >= 0 else { return [] }
@@ -125,9 +128,19 @@ public enum VoiceInkPCM16Audio {
             return data
         }
 
-        let metrics = pcm16PeakAndRMS(inLittleEndianData: data, byteCount: sampleByteCount)
+        let metrics = pcm16Metrics(
+            inLittleEndianData: data,
+            byteCount: sampleByteCount,
+            activeThreshold: Int(noiseFloorPeak)
+        )
         let peak = metrics.peak
         guard peak > 0, peak >= Int(noiseFloorPeak), peak < Int(targetPeak) else { return data }
+        let minimumActiveSampleCount = max(
+            minimumSpeechLikeActiveSampleCount,
+            metrics.sampleCount / minimumSpeechLikeActiveSampleDivisor
+        )
+        guard metrics.activeSampleCount >= minimumActiveSampleCount else { return data }
+        guard metrics.longestActiveSampleRun >= minimumSpeechLikeActiveRunSampleCount else { return data }
         guard metrics.rms > 0,
               Float(peak) / metrics.rms >= minimumSpeechLikeCrestFactor else {
             return data
@@ -273,18 +286,17 @@ public enum VoiceInkPCM16Audio {
     }
 
     public static func littleEndianPCM16Data(fromWAVData data: Data) -> Data? {
-        if let dataChunkRange = wavDataChunkRange(in: data) {
-            return data.subdata(in: dataChunkRange)
-        }
-
-        guard !isRIFFWAVData(data), data.count > wavHeaderByteCount else { return nil }
-        return Data(data.dropFirst(wavHeaderByteCount))
+        guard let dataChunkRange = wavDataChunkRange(in: data) else { return nil }
+        return data.subdata(in: dataChunkRange)
     }
 
     public static func wavData(fromLittleEndianPCM16Data pcmData: Data) -> Data {
+        let sampleByteCount = pcmData.count - (pcmData.count % bytesPerSample)
+        let sampleData = pcmData.prefix(sampleByteCount)
+
         var wavData = Data()
         appendASCII("RIFF", to: &wavData)
-        appendUInt32LE(UInt32(36 + pcmData.count), to: &wavData)
+        appendUInt32LE(UInt32(36 + sampleData.count), to: &wavData)
         appendASCII("WAVE", to: &wavData)
         appendASCII("fmt ", to: &wavData)
         appendUInt32LE(16, to: &wavData)
@@ -295,8 +307,8 @@ public enum VoiceInkPCM16Audio {
         appendUInt16LE(UInt16(monoChannelCount * bytesPerSample), to: &wavData)
         appendUInt16LE(UInt16(bitsPerSample), to: &wavData)
         appendASCII("data", to: &wavData)
-        appendUInt32LE(UInt32(pcmData.count), to: &wavData)
-        wavData.append(pcmData)
+        appendUInt32LE(UInt32(sampleData.count), to: &wavData)
+        wavData.append(sampleData)
         return wavData
     }
 
@@ -310,6 +322,8 @@ public enum VoiceInkPCM16Audio {
                 return nil
             }
 
+            var isValidPCMFormat = false
+            var dataChunkRange: Range<Int>?
             var offset = 12
             while offset + 8 <= data.count {
                 let chunkSize = Int(littleEndianUInt32(bytes: bytes, at: offset + 4))
@@ -317,25 +331,40 @@ public enum VoiceInkPCM16Audio {
                 let chunkDataEnd = chunkDataStart + chunkSize
                 guard chunkDataEnd <= data.count else { return nil }
 
-                if matchesASCII("data", bytes: bytes, at: offset) {
-                    return chunkDataStart..<chunkDataEnd
+                if matchesASCII("fmt ", bytes: bytes, at: offset) {
+                    guard chunkSize >= 16 else { return nil }
+                    isValidPCMFormat = isMono16kPCM16Format(bytes: bytes, at: chunkDataStart)
+                } else if matchesASCII("data", bytes: bytes, at: offset) {
+                    dataChunkRange = chunkDataStart..<chunkDataEnd
                 }
 
-                offset = chunkDataEnd + (chunkSize.isMultiple(of: 2) ? 0 : 1)
+                let nextOffset = chunkDataEnd + (chunkSize.isMultiple(of: 2) ? 0 : 1)
+                guard nextOffset <= data.count else { return nil }
+                offset = nextOffset
             }
 
-            return nil
+            guard isValidPCMFormat,
+                  let dataChunkRange,
+                  dataChunkRange.count.isMultiple(of: bytesPerSample) else {
+                return nil
+            }
+            return dataChunkRange
         }
     }
 
-    private static func isRIFFWAVData(_ data: Data) -> Bool {
-        guard data.count >= 12 else { return false }
-
-        return data.withUnsafeBytes { rawBuffer in
-            guard let bytes = rawBuffer.bindMemory(to: UInt8.self).baseAddress else { return false }
-            return matchesASCII("RIFF", bytes: bytes, at: 0)
-                && matchesASCII("WAVE", bytes: bytes, at: 8)
-        }
+    private static func isMono16kPCM16Format(bytes: UnsafePointer<UInt8>, at offset: Int) -> Bool {
+        let audioFormat = littleEndianUInt16(bytes: bytes, at: offset)
+        let channelCount = littleEndianUInt16(bytes: bytes, at: offset + 2)
+        let sampleRate = littleEndianUInt32(bytes: bytes, at: offset + 4)
+        let byteRate = littleEndianUInt32(bytes: bytes, at: offset + 8)
+        let blockAlign = littleEndianUInt16(bytes: bytes, at: offset + 12)
+        let bits = littleEndianUInt16(bytes: bytes, at: offset + 14)
+        return audioFormat == 1
+            && channelCount == UInt16(monoChannelCount)
+            && sampleRate == UInt32(mono16kSampleRateHz)
+            && byteRate == UInt32(mono16kSampleRateHz * monoChannelCount * bytesPerSample)
+            && blockAlign == UInt16(monoChannelCount * bytesPerSample)
+            && bits == UInt16(bitsPerSample)
     }
 
     private static func matchesASCII(
@@ -355,6 +384,10 @@ public enum VoiceInkPCM16Audio {
             | (UInt32(bytes[offset + 1]) << 8)
             | (UInt32(bytes[offset + 2]) << 16)
             | (UInt32(bytes[offset + 3]) << 24)
+    }
+
+    private static func littleEndianUInt16(bytes: UnsafePointer<UInt8>, at offset: Int) -> UInt16 {
+        UInt16(bytes[offset]) | (UInt16(bytes[offset + 1]) << 8)
     }
 
     private static func appendASCII(_ string: String, to data: inout Data) {
@@ -381,22 +414,42 @@ public enum VoiceInkPCM16Audio {
         return Int16(clipped)
     }
 
-    private static func pcm16PeakAndRMS(inLittleEndianData data: Data, byteCount: Int) -> (peak: Int, rms: Float) {
+    private static func pcm16Metrics(
+        inLittleEndianData data: Data,
+        byteCount: Int,
+        activeThreshold: Int
+    ) -> (peak: Int, rms: Float, activeSampleCount: Int, sampleCount: Int, longestActiveSampleRun: Int) {
         data.withUnsafeBytes { rawBuffer in
-            guard let bytes = rawBuffer.bindMemory(to: UInt8.self).baseAddress else { return (0, 0) }
+            guard let bytes = rawBuffer.bindMemory(to: UInt8.self).baseAddress else { return (0, 0, 0, 0, 0) }
 
             var peak = 0
             var sumSquares = Double(0)
             var sampleCount = 0
+            var activeSampleCount = 0
+            var currentActiveSampleRun = 0
+            var longestActiveSampleRun = 0
             for byteIndex in stride(from: 0, to: byteCount, by: bytesPerSample) {
                 let sample = littleEndianPCM16Sample(bytes: bytes, byteIndex: byteIndex)
                 let magnitude = pcm16Magnitude(sample)
                 peak = max(peak, magnitude)
+                if magnitude >= activeThreshold {
+                    activeSampleCount += 1
+                    currentActiveSampleRun += 1
+                    longestActiveSampleRun = max(longestActiveSampleRun, currentActiveSampleRun)
+                } else {
+                    currentActiveSampleRun = 0
+                }
                 sumSquares += Double(sample) * Double(sample)
                 sampleCount += 1
             }
-            guard sampleCount > 0 else { return (0, 0) }
-            return (peak, Float(sqrt(sumSquares / Double(sampleCount))))
+            guard sampleCount > 0 else { return (0, 0, 0, 0, 0) }
+            return (
+                peak,
+                Float(sqrt(sumSquares / Double(sampleCount))),
+                activeSampleCount,
+                sampleCount,
+                longestActiveSampleRun
+            )
         }
     }
 

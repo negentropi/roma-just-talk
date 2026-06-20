@@ -58,6 +58,24 @@ final class PCM16AudioSamplesTests: XCTestCase {
         ])
     }
 
+    func testWAVDataDropsTrailingPartialSampleByte() {
+        let pcmData = Data([0x30, 0xF8, 0x7F])
+        let wavData = VoiceInkPCM16Audio.wavData(fromLittleEndianPCM16Data: pcmData)
+
+        XCTAssertEqual(
+            VoiceInkPCM16Audio.littleEndianPCM16Data(fromWAVData: wavData),
+            Data([0x30, 0xF8])
+        )
+    }
+
+    func testFloatSamplesRejectUnsupportedRIFFWAVFormats() {
+        XCTAssertNil(VoiceInkPCM16Audio.floatSamples(fromWAVData: riffWAVData(samples: [-1_000, 1_000], includeFmt: false)))
+        XCTAssertNil(VoiceInkPCM16Audio.floatSamples(fromWAVData: riffWAVData(samples: [-1_000, 1_000], audioFormat: 3)))
+        XCTAssertNil(VoiceInkPCM16Audio.floatSamples(fromWAVData: riffWAVData(samples: [-1_000, 1_000], channelCount: 2)))
+        XCTAssertNil(VoiceInkPCM16Audio.floatSamples(fromWAVData: riffWAVData(samples: [-1_000, 1_000], sampleRate: 48_000)))
+        XCTAssertNil(VoiceInkPCM16Audio.floatSamples(fromWAVData: riffWAVData(samples: [-1_000, 1_000], bitsPerSample: 24)))
+    }
+
     func testFloatSamplesRejectTooSmallWAVData() {
         let data = Data(repeating: 0, count: VoiceInkPCM16Audio.wavHeaderByteCount)
 
@@ -140,7 +158,9 @@ final class PCM16AudioSamplesTests: XCTestCase {
     func testWhisperAudioSamplesUseSharedLevelingDefaultsForWAVData() {
         let input = sparseSamples([
             30: -1_000,
-            100: 1_000
+            70: -500,
+            100: 500,
+            130: 1_000
         ])
         let expected = input.map { Int16(Int($0) * 12) }
 
@@ -160,7 +180,9 @@ final class PCM16AudioSamplesTests: XCTestCase {
         let fileURL = baseDirectory.appendingPathComponent("recording.wav")
         let input = sparseSamples([
             30: -1_000,
-            100: 1_000
+            70: -500,
+            100: 500,
+            130: 1_000
         ])
         let expected = input.map { Int16(Int($0) * 12) }
         try wavData(samples: input).write(to: fileURL)
@@ -291,6 +313,19 @@ final class PCM16AudioSamplesTests: XCTestCase {
         )
 
         XCTAssertEqual(leveled, noise)
+    }
+
+    func testLeveledLittleEndianDataLeavesSingleImpulseUnchanged() {
+        let impulse = pcm16Data(samples: sparseSamples([80: 100]))
+
+        let leveled = VoiceInkPCM16Audio.leveledLittleEndianData(
+            impulse,
+            targetPeak: 1_000,
+            noiseFloorPeak: 10,
+            maxGain: 20
+        )
+
+        XCTAssertEqual(leveled, impulse)
     }
 
     func testConvertedMonoPCM16SampleCountUsesExistingTruncatedResamplePolicy() {
@@ -464,7 +499,7 @@ final class PCM16AudioSamplesTests: XCTestCase {
         let pcmData = pcm16Data(samples: samples)
         var data = Data()
         appendASCII("RIFF", to: &data)
-        appendUInt32LE(UInt32(4 + 24 + 10 + 8 + pcmData.count), to: &data)
+        appendUInt32LE(UInt32(4 + 24 + 12 + 8 + pcmData.count), to: &data)
         appendASCII("WAVE", to: &data)
 
         appendASCII("fmt ", to: &data)
@@ -477,8 +512,42 @@ final class PCM16AudioSamplesTests: XCTestCase {
         appendUInt16LE(UInt16(VoiceInkPCM16Audio.bitsPerSample), to: &data)
 
         appendASCII("JUNK", to: &data)
-        appendUInt32LE(2, to: &data)
-        data.append(contentsOf: [0x12, 0x34])
+        appendUInt32LE(3, to: &data)
+        data.append(contentsOf: [0x12, 0x34, 0x56, 0])
+
+        appendASCII("data", to: &data)
+        appendUInt32LE(UInt32(pcmData.count), to: &data)
+        data.append(pcmData)
+        return data
+    }
+
+    private func riffWAVData(
+        samples: [Int16],
+        includeFmt: Bool = true,
+        audioFormat: UInt16 = 1,
+        channelCount: UInt16 = UInt16(VoiceInkPCM16Audio.monoChannelCount),
+        sampleRate: UInt32 = UInt32(VoiceInkPCM16Audio.mono16kSampleRateHz),
+        bitsPerSample: UInt16 = UInt16(VoiceInkPCM16Audio.bitsPerSample)
+    ) -> Data {
+        let blockAlign = channelCount * ((bitsPerSample + 7) / 8)
+        let byteRate = sampleRate * UInt32(blockAlign)
+        let pcmData = pcm16Data(samples: samples)
+        let formatChunkByteCount = includeFmt ? 24 : 0
+        var data = Data()
+        appendASCII("RIFF", to: &data)
+        appendUInt32LE(UInt32(4 + formatChunkByteCount + 8 + pcmData.count), to: &data)
+        appendASCII("WAVE", to: &data)
+
+        if includeFmt {
+            appendASCII("fmt ", to: &data)
+            appendUInt32LE(16, to: &data)
+            appendUInt16LE(audioFormat, to: &data)
+            appendUInt16LE(channelCount, to: &data)
+            appendUInt32LE(sampleRate, to: &data)
+            appendUInt32LE(byteRate, to: &data)
+            appendUInt16LE(blockAlign, to: &data)
+            appendUInt16LE(bitsPerSample, to: &data)
+        }
 
         appendASCII("data", to: &data)
         appendUInt32LE(UInt32(pcmData.count), to: &data)

@@ -302,7 +302,7 @@ enum AudioProofError: Error, CustomStringConvertible {
         case .invalidOptionValue(let option, let value):
             return "invalid value for \(option): \(value)"
         case .invalidWAV(let path):
-            return "expected a WAV with at least a 44-byte header: \(path)"
+            return "expected a readable mono 16 kHz PCM16 WAV data chunk: \(path)"
         }
     }
 }

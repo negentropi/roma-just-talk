@@ -52,7 +52,10 @@ class WhisperTranscriptionService: TranscriptionService {
             throw VoiceInkEngineError.modelLoadFailed
         }
 
-        let data = try VoiceInkWhisperAudioSamples.floatSamples(fromWAVFileAt: audioURL) ?? []
+        guard let data = try VoiceInkWhisperAudioSamples.floatSamples(fromWAVFileAt: audioURL) else {
+            logger.error("❌ Failed to process audio samples for local Whisper transcription.")
+            throw VoiceInkEngineError.audioProcessingFailed
+        }
 
         let currentPrompt = VoiceInkTranscriptionPromptPreference.localWhisperPromptForSelectedLanguage()
 

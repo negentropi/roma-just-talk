@@ -982,6 +982,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testLocalModelFilesReadsOnlyBinFilesFromDirectory", run: { try WhisperModelFilesTests().testLocalModelFilesReadsOnlyBinFilesFromDirectory() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testInstallDownloadedModelFileReplacesExistingModelFile", run: { try WhisperModelFilesTests().testInstallDownloadedModelFileReplacesExistingModelFile() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testWriteDownloadedModelDataUsesSharedModelNameURL", run: { try WhisperModelFilesTests().testWriteDownloadedModelDataUsesSharedModelNameURL() }),
+            VoiceInkCoreCheck(name: "WhisperModelFilesTests.testWriteDownloadedLocalModelDataBuildsSharedLocalModelFile", run: { try WhisperModelFilesTests().testWriteDownloadedLocalModelDataBuildsSharedLocalModelFile() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testDownloadResponsePolicyPreservesHTTPStatusSuccessRange", run: { WhisperModelFilesTests().testDownloadResponsePolicyPreservesHTTPStatusSuccessRange() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadProgressFormatsIOSProgress", run: { WhisperModelFilesTests().testSimpleDownloadProgressFormatsIOSProgress() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadStateCombinesIOSDownloadedAndProgressState", run: { try WhisperModelFilesTests().testSimpleDownloadStateCombinesIOSDownloadedAndProgressState() }),

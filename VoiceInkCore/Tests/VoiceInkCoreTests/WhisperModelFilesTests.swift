@@ -297,6 +297,23 @@ final class WhisperModelFilesTests: XCTestCase {
         XCTAssertEqual(String(data: try Data(contentsOf: writtenURL), encoding: .utf8), "model")
     }
 
+    func testWriteDownloadedLocalModelDataBuildsSharedLocalModelFile() throws {
+        let baseDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.WhisperModelFilesTests.\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: baseDirectory) }
+
+        let modelsDirectory = VoiceInkWhisperModelFiles.modelsDirectory(in: baseDirectory)
+        let modelFile = try VoiceInkWhisperModelFiles.writeDownloadedLocalModelData(
+            Data("model".utf8),
+            forModelName: "ggml-base",
+            in: modelsDirectory
+        )
+
+        XCTAssertEqual(modelFile.name, "ggml-base")
+        XCTAssertEqual(modelFile.url, VoiceInkWhisperModelFiles.fileURL(forModelName: "ggml-base", in: modelsDirectory))
+        XCTAssertEqual(String(data: try Data(contentsOf: modelFile.url), encoding: .utf8), "model")
+    }
+
     func testDownloadResponsePolicyPreservesHTTPStatusSuccessRange() {
         let url = URL(string: "https://example.com/ggml-base.bin")!
         func response(statusCode: Int) -> HTTPURLResponse {

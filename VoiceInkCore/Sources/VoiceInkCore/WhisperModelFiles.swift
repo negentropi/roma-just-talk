@@ -388,6 +388,22 @@ public enum VoiceInkWhisperModelFiles {
         return destinationURL
     }
 
+    @discardableResult
+    public static func writeDownloadedLocalModelData(
+        _ data: Data,
+        forModelName modelName: String,
+        in modelsDirectory: URL,
+        fileManager: FileManager = .default
+    ) throws -> VoiceInkWhisperLocalModelFile {
+        let destinationURL = try writeDownloadedModelData(
+            data,
+            forModelName: modelName,
+            in: modelsDirectory,
+            fileManager: fileManager
+        )
+        return VoiceInkWhisperLocalModelFile(name: modelName, url: destinationURL)
+    }
+
     public static func supportsCoreML(forModelName modelName: String) -> Bool {
         !modelName.contains("q5") && !modelName.contains("q8")
     }

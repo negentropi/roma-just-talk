@@ -1516,6 +1516,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
 
 require_pattern \
+  "shared Whisper downloaded local model data builds local model record" \
+  'writeDownloadedLocalModelData|VoiceInkWhisperLocalModelFile\(name: modelName, url: destinationURL\)' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
+
+require_pattern \
   "shared model management filter lives in VoiceInkCore" \
   'enum VoiceInkModelManagementFilter' \
   VoiceInkCore/Sources/VoiceInkCore/ModelManagementPresentation.swift
@@ -1538,6 +1543,17 @@ require_pattern \
 require_pattern \
   "macOS Whisper downloads use shared progress keys" \
   'VoiceInkWhisperModelDownloadProgress\.(mainProgressKey|coreMLProgressKey)' \
+  VoiceInk/Transcription/Whisper/WhisperModelManager.swift
+
+require_pattern \
+  "macOS Whisper main model download uses shared local model record" \
+  'VoiceInkWhisperModelFiles\.writeDownloadedLocalModelData\(' \
+  VoiceInk/Transcription/Whisper/WhisperModelManager.swift
+
+reject_context_pattern \
+  "macOS Whisper main model download avoids shell-owned local model record" \
+  'private func downloadMainModel' \
+  'VoiceInkWhisperLocalModelFile\(name:' \
   VoiceInk/Transcription/Whisper/WhisperModelManager.swift
 
 require_pattern \

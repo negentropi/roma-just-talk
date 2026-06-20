@@ -172,13 +172,11 @@ class WhisperModelManager: ObservableObject {
         let progressKeyMain = VoiceInkWhisperModelDownloadProgress.mainProgressKey(forModelName: model.name)
         let data = try await downloadFileWithProgress(from: url, progressKey: progressKeyMain)
 
-        let destinationURL = try VoiceInkWhisperModelFiles.writeDownloadedModelData(
+        return try VoiceInkWhisperModelFiles.writeDownloadedLocalModelData(
             data,
             forModelName: model.name,
             in: modelsDirectory
         )
-
-        return VoiceInkWhisperLocalModelFile(name: model.name, url: destinationURL)
     }
 
     private func downloadAndSetupCoreMLModel(for model: VoiceInkWhisperLocalModelFile, from url: URL) async throws -> VoiceInkWhisperLocalModelFile {

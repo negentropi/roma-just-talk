@@ -130,6 +130,47 @@ final class WhisperRuntimeDefaultsTests: XCTestCase {
         }
     }
 
+    func testRuntimeInvocationPlanKeepsWhisperCStringInputsAlive() {
+        let plan = VoiceInkWhisperRuntimeInvocationPlan(
+            configuration: VoiceInkWhisperRuntimeConfiguration(
+                language: "ja",
+                prompt: "Use Japanese punctuation.",
+                vad: VoiceInkWhisperVADRuntimeConfiguration(modelPath: "/tmp/vad.bin")
+            )
+        )
+
+        let strings = plan.withUnsafeCStringPointers { languagePointer, promptPointer, vadModelPathPointer in
+            [
+                languagePointer.map { String(cString: $0) },
+                promptPointer.map { String(cString: $0) },
+                vadModelPathPointer.map { String(cString: $0) }
+            ]
+        }
+
+        let expectedStrings: [String?] = ["ja", "Use Japanese punctuation.", "/tmp/vad.bin"]
+        XCTAssertEqual(strings, expectedStrings)
+    }
+
+    func testRuntimeInvocationPlanOmitsDisabledWhisperInputs() {
+        let plan = VoiceInkWhisperRuntimeInvocationPlan(
+            configuration: VoiceInkWhisperRuntimeConfiguration(
+                language: nil,
+                prompt: nil,
+                vad: nil
+            )
+        )
+
+        let hasPointers = plan.withUnsafeCStringPointers { languagePointer, promptPointer, vadModelPathPointer in
+            [
+                languagePointer != nil,
+                promptPointer != nil,
+                vadModelPathPointer != nil
+            ]
+        }
+
+        XCTAssertEqual(hasPointers, [false, false, false])
+    }
+
     func testLocalWhisperFailurePolicyPreservesMacOSMapping() {
         XCTAssertEqual(
             errorName(VoiceInkLocalWhisperFailurePolicy.error(for: .modelUnavailable, platform: .macOS)),

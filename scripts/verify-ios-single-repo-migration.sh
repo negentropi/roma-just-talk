@@ -1446,13 +1446,34 @@ reject_pattern \
   iOS/VoiceInk-ios/APIKeysView.swift
 
 require_pattern \
-  "macOS local Whisper uses shared runtime policy" \
-  'VoiceInkWhisperRuntimeConfiguration\.current' \
+  "macOS local Whisper uses shared runtime invocation policy" \
+  'VoiceInkWhisperRuntimeInvocationPlan\.current|withUnsafeCStringPointers' \
   VoiceInk/Transcription/Whisper/LibWhisper.swift
 
 require_pattern \
-  "iOS local Whisper uses shared runtime policy" \
-  'VoiceInkWhisperRuntimeConfiguration\.current' \
+  "iOS local Whisper uses shared runtime invocation policy" \
+  'VoiceInkWhisperRuntimeInvocationPlan\.current|withUnsafeCStringPointers' \
+  iOS/VoiceInk-ios/LibWhisper.swift
+
+require_pattern \
+  "shared local Whisper runtime invocation plan lives in VoiceInkCore" \
+  'VoiceInkWhisperRuntimeInvocationPlan|withUnsafeCStringPointers|VoiceInkWhisperRuntimeConfiguration\.current' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperRuntimeDefaults.swift
+
+require_pattern \
+  "core tests cover shared local Whisper runtime invocation plan" \
+  'testRuntimeInvocationPlanKeepsWhisperCStringInputsAlive|testRuntimeInvocationPlanOmitsDisabledWhisperInputs' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/WhisperRuntimeDefaultsTests.swift
+
+require_pattern \
+  "core check runner executes shared local Whisper runtime invocation tests" \
+  'testRuntimeInvocationPlanKeepsWhisperCStringInputsAlive|testRuntimeInvocationPlanOmitsDisabledWhisperInputs' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "local Whisper adapters avoid shell-owned optional CString lifetime wiring" \
+  'runWithPrompt|runWithLanguage|utf8CString' \
+  VoiceInk/Transcription/Whisper/LibWhisper.swift \
   iOS/VoiceInk-ios/LibWhisper.swift
 
 require_pattern \

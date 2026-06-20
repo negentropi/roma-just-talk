@@ -39,14 +39,12 @@ actor WhisperContext {
         guard let context = context else { return false }
         
         var params = whisper_full_default_params(WHISPER_SAMPLING_GREEDY)
-        let runtimeConfiguration = VoiceInkWhisperRuntimeConfiguration.current(
+        let invocationPlan = VoiceInkWhisperRuntimeInvocationPlan.current(
             language: language,
             prompt: prompt,
             vadModelPath: vadModelPath
         )
-        let languageCString = runtimeConfiguration.language.map { Array($0.utf8CString) }
-        let promptCString = runtimeConfiguration.prompt.map { Array($0.utf8CString) }
-        let vadModelPathCString = runtimeConfiguration.vad?.modelPath.utf8CString
+        let runtimeConfiguration = invocationPlan.configuration
         
         params.print_realtime = runtimeConfiguration.options.printRealtime
         params.print_progress = runtimeConfiguration.options.printProgress
@@ -77,52 +75,21 @@ actor WhisperContext {
             params.vad_model_path = nil
             logger.warning("VAD model path not found, VAD will be disabled.")
         }
-        
-        var success = true
 
-        func runWhisper() {
+        return invocationPlan.withUnsafeCStringPointers { languagePointer, promptPointer, vadModelPathPointer in
+            params.language = languagePointer
+            params.initial_prompt = promptPointer
+            params.vad_model_path = vadModelPathPointer
+
+            var success = true
             samples.withUnsafeBufferPointer { samplesBuffer in
                 if whisper_full(context, params, samplesBuffer.baseAddress, Int32(samplesBuffer.count)) != 0 {
                     logger.error("Failed to run whisper_full. VAD enabled: \(params.vad)")
                     success = false
                 }
             }
+            return success
         }
-
-        func runWithPrompt() {
-            if let promptCString {
-                promptCString.withUnsafeBufferPointer { promptBuffer in
-                    params.initial_prompt = promptBuffer.baseAddress
-                    runWhisper()
-                }
-            } else {
-                params.initial_prompt = nil
-                runWhisper()
-            }
-        }
-
-        func runWithLanguage() {
-            if let languageCString {
-                languageCString.withUnsafeBufferPointer { languageBuffer in
-                    params.language = languageBuffer.baseAddress
-                    runWithPrompt()
-                }
-            } else {
-                params.language = nil
-                runWithPrompt()
-            }
-        }
-
-        if let vadModelPathCString {
-            vadModelPathCString.withUnsafeBufferPointer { vadModelPathBuffer in
-                params.vad_model_path = vadModelPathBuffer.baseAddress
-                runWithLanguage()
-            }
-        } else {
-            runWithLanguage()
-        }
-        
-        return success
     }
 
     func getTranscription() -> String {

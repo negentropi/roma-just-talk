@@ -194,6 +194,78 @@ public struct VoiceInkWhisperRuntimeConfiguration: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkWhisperRuntimeInvocationPlan: Equatable, Sendable {
+    public let configuration: VoiceInkWhisperRuntimeConfiguration
+
+    public init(configuration: VoiceInkWhisperRuntimeConfiguration) {
+        self.configuration = configuration
+    }
+
+    public static func current(
+        language: String? = nil,
+        prompt: String? = nil,
+        vadModelPath: String? = nil,
+        defaults: UserDefaults = .standard,
+        processorCount: Int = ProcessInfo.processInfo.processorCount
+    ) -> VoiceInkWhisperRuntimeInvocationPlan {
+        VoiceInkWhisperRuntimeInvocationPlan(
+            configuration: VoiceInkWhisperRuntimeConfiguration.current(
+                language: language,
+                prompt: prompt,
+                vadModelPath: vadModelPath,
+                defaults: defaults,
+                processorCount: processorCount
+            )
+        )
+    }
+
+    public func withUnsafeCStringPointers<Result>(
+        _ body: (
+            _ languagePointer: UnsafePointer<CChar>?,
+            _ promptPointer: UnsafePointer<CChar>?,
+            _ vadModelPathPointer: UnsafePointer<CChar>?
+        ) -> Result
+    ) -> Result {
+        let languageCString = configuration.language.map { Array($0.utf8CString) }
+        let promptCString = configuration.prompt.map { Array($0.utf8CString) }
+        let vadModelPathCString = configuration.vad?.modelPath.utf8CString
+
+        func withPromptPointer(
+            languagePointer: UnsafePointer<CChar>?,
+            vadModelPathPointer: UnsafePointer<CChar>?
+        ) -> Result {
+            if let promptCString {
+                return promptCString.withUnsafeBufferPointer { promptBuffer in
+                    body(languagePointer, promptBuffer.baseAddress, vadModelPathPointer)
+                }
+            }
+
+            return body(languagePointer, nil, vadModelPathPointer)
+        }
+
+        func withLanguagePointer(vadModelPathPointer: UnsafePointer<CChar>?) -> Result {
+            if let languageCString {
+                return languageCString.withUnsafeBufferPointer { languageBuffer in
+                    withPromptPointer(
+                        languagePointer: languageBuffer.baseAddress,
+                        vadModelPathPointer: vadModelPathPointer
+                    )
+                }
+            }
+
+            return withPromptPointer(languagePointer: nil, vadModelPathPointer: vadModelPathPointer)
+        }
+
+        if let vadModelPathCString {
+            return vadModelPathCString.withUnsafeBufferPointer { vadModelPathBuffer in
+                withLanguagePointer(vadModelPathPointer: vadModelPathBuffer.baseAddress)
+            }
+        }
+
+        return withLanguagePointer(vadModelPathPointer: nil)
+    }
+}
+
 public enum VoiceInkLocalWhisperFailure: Equatable, Sendable {
     case modelUnavailable
     case modelLoadFailed

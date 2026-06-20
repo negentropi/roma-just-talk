@@ -6,7 +6,7 @@
 - Kept the dictated text on the clipboard when the paste command cannot be posted, so failed target-app pastes do not immediately restore over the transcript.
 - Kept buffered-snapshot quick releases on the recorded-file transcription path instead of starting a fresh streaming session after key-up, removing a measured post-key-up startup wait before text can paste.
 - Let held Special shortcuts promote to active recording after the rolling-buffer window, so holding the hotkey records beyond the default 3 seconds while short clean taps still use quick-release preload.
-- Boosted quiet macOS and iOS local Whisper recordings before transcription while leaving silence, noise-floor, and continuous-noise audio unchanged, improving low-volume/privacy dictation without changing saved audio.
+- Boosted quiet macOS and iOS local Whisper recordings before transcription while leaving silence, noise-floor, continuous-noise, and sparse click-like audio unchanged, improving low-volume/privacy dictation without changing saved audio.
 - Reported malformed macOS local Whisper audio as an audio-processing failure instead of silently sending an empty sample buffer to Whisper.
 - Preserved existing shortcut settings when shortcut recording is canceled, rejected, interrupted by another recorder, or dismissed before a replacement is captured.
 - Built CI release artifacts with the Release configuration and blocked debug-only binaries from packaged app uploads.

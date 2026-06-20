@@ -94,6 +94,7 @@ final class DashboardMetricsTests: XCTestCase {
     }
 
     func testDashboardPresentationPreservesMacOSDashboardCopy() {
+        XCTAssertEqual(VoiceInkDashboardPresentation.metricValuePlaceholder, "–")
         XCTAssertEqual(VoiceInkDashboardPresentation.emptyStateSystemImageName, "waveform")
         XCTAssertEqual(VoiceInkDashboardPresentation.emptyStateTitle, "No sessions yet")
         XCTAssertEqual(VoiceInkDashboardPresentation.emptyStateMessage, "Start a recording; your dictation rhythm will show here.")
@@ -153,6 +154,63 @@ final class DashboardMetricsTests: XCTestCase {
                 formattedWordCount: "1,200"
             ),
             "Dictated 1,200 words across 2 sessions."
+        )
+        XCTAssertEqual(
+            VoiceInkDashboardPresentation.heroSubtitle(
+                isSnapshotLoaded: true,
+                totalCount: 2,
+                totalWords: 1200
+            ),
+            "Dictated 1,200 words across 2 sessions."
+        )
+    }
+
+    func testDashboardPresentationBuildsMacOSMetricCards() {
+        let metrics = VoiceInkDashboardMetrics(summary: VoiceInkDashboardMetricsSummary(
+            totalCount: 2,
+            totalWords: 70,
+            totalDuration: 60
+        ))
+
+        XCTAssertEqual(
+            VoiceInkDashboardPresentation.metricCards(isSnapshotLoaded: true, metrics: metrics),
+            [
+                VoiceInkDashboardMetricCardPresentation(
+                    id: "sessions-recorded",
+                    iconSystemName: "mic.fill",
+                    title: "Sessions Recorded",
+                    value: "2",
+                    detail: "recordings completed"
+                ),
+                VoiceInkDashboardMetricCardPresentation(
+                    id: "words-dictated",
+                    iconSystemName: "text.alignleft",
+                    title: "Words Dictated",
+                    value: "70",
+                    detail: "words generated"
+                ),
+                VoiceInkDashboardMetricCardPresentation(
+                    id: "words-per-minute",
+                    iconSystemName: "speedometer",
+                    title: "Words Per Minute",
+                    value: "70.0",
+                    detail: "dictation pace"
+                ),
+                VoiceInkDashboardMetricCardPresentation(
+                    id: "keystrokes-saved",
+                    iconSystemName: "keyboard.fill",
+                    title: "Keystrokes Saved",
+                    value: "350",
+                    detail: "fewer keystrokes"
+                )
+            ]
+        )
+
+        XCTAssertEqual(
+            VoiceInkDashboardPresentation
+                .metricCards(isSnapshotLoaded: false, metrics: metrics)
+                .map(\.value),
+            Array(repeating: VoiceInkDashboardPresentation.metricValuePlaceholder, count: 4)
         )
     }
 

@@ -291,11 +291,11 @@ struct MetricsContent: View {
         HStack(spacing: 10) {
             heroPill(
                 title: VoiceInkDashboardPresentation.sessionsPillTitle,
-                value: hasLoadedMetricsSnapshot ? Formatters.formattedNumber(totalCount) : "–"
+                value: hasLoadedMetricsSnapshot ? VoiceInkDashboardPresentation.formattedNumber(totalCount) : VoiceInkDashboardPresentation.metricValuePlaceholder
             )
             heroPill(
                 title: VoiceInkDashboardPresentation.wordsPillTitle,
-                value: hasLoadedMetricsSnapshot ? Formatters.formattedNumber(totalWords) : "–"
+                value: hasLoadedMetricsSnapshot ? VoiceInkDashboardPresentation.formattedNumber(totalWords) : VoiceInkDashboardPresentation.metricValuePlaceholder
             )
         }
         .frame(maxWidth: 280, alignment: .trailing)
@@ -320,37 +320,15 @@ struct MetricsContent: View {
 
     private var metricsSection: some View {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 210), spacing: 14)], spacing: 14) {
-            MetricCard(
-                icon: "mic.fill",
-                title: "Sessions Recorded",
-                value: hasLoadedMetricsSnapshot ? "\(totalCount)" : "–",
-                detail: "recordings completed",
-                color: metricAccent
-            )
-
-            MetricCard(
-                icon: "text.alignleft",
-                title: "Words Dictated",
-                value: hasLoadedMetricsSnapshot ? Formatters.formattedNumber(totalWords) : "–",
-                detail: "words generated",
-                color: metricAccent
-            )
-            
-            MetricCard(
-                icon: "speedometer",
-                title: "Words Per Minute",
-                value: hasLoadedMetricsSnapshot ? dashboardMetrics.averageWordsPerMinuteDisplayText ?? "–" : "–",
-                detail: "dictation pace",
-                color: metricAccent
-            )
-            
-            MetricCard(
-                icon: "keyboard.fill",
-                title: "Keystrokes Saved",
-                value: hasLoadedMetricsSnapshot ? Formatters.formattedNumber(totalKeystrokesSaved) : "–",
-                detail: "fewer keystrokes",
-                color: metricAccent
-            )
+            ForEach(metricCardPresentations) { card in
+                MetricCard(
+                    icon: card.iconSystemName,
+                    title: card.title,
+                    value: card.value,
+                    detail: card.detail,
+                    color: metricAccent
+                )
+            }
         }
     }
 
@@ -378,7 +356,7 @@ struct MetricsContent: View {
         VoiceInkDashboardPresentation.heroSubtitle(
             isSnapshotLoaded: hasLoadedMetricsSnapshot,
             totalCount: totalCount,
-            formattedWordCount: Formatters.formattedNumber(totalWords)
+            totalWords: totalWords
         )
     }
 
@@ -414,21 +392,11 @@ struct MetricsContent: View {
         dashboardMetrics.timeSaved
     }
 
-    private var totalKeystrokesSaved: Int {
-        dashboardMetrics.totalKeystrokesSaved
-    }
-    
-}
-
-private enum Formatters {
-    static let numberFormatter: NumberFormatter = {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        return formatter
-    }()
-    
-    static func formattedNumber(_ value: Int) -> String {
-        return numberFormatter.string(from: NSNumber(value: value)) ?? "\(value)"
+    private var metricCardPresentations: [VoiceInkDashboardMetricCardPresentation] {
+        VoiceInkDashboardPresentation.metricCards(
+            isSnapshotLoaded: hasLoadedMetricsSnapshot,
+            metrics: dashboardMetrics
+        )
     }
 }
 

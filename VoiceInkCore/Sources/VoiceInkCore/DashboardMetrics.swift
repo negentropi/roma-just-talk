@@ -102,7 +102,30 @@ public struct VoiceInkDashboardMetrics: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkDashboardMetricCardPresentation: Equatable, Sendable, Identifiable {
+    public let id: String
+    public let iconSystemName: String
+    public let title: String
+    public let value: String
+    public let detail: String
+
+    public init(
+        id: String,
+        iconSystemName: String,
+        title: String,
+        value: String,
+        detail: String
+    ) {
+        self.id = id
+        self.iconSystemName = iconSystemName
+        self.title = title
+        self.value = value
+        self.detail = detail
+    }
+}
+
 public enum VoiceInkDashboardPresentation {
+    public static let metricValuePlaceholder = "–"
     public static let emptyStateSystemImageName = "waveform"
     public static let emptyStateTitle = "No sessions yet"
     public static let emptyStateMessage = "Start a recording; your dictation rhythm will show here."
@@ -116,6 +139,12 @@ public enum VoiceInkDashboardPresentation {
     public static let modelPerformanceButtonTitle = "Model Performance"
     public static let modelPerformanceSystemImageName = "gauge"
     public static let modelPerformanceHelpText = "View transcription and enhancement model performance"
+
+    public static func formattedNumber(_ value: Int) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        return formatter.string(from: NSNumber(value: value)) ?? "\(value)"
+    }
 
     public static func heroTitle(
         isSnapshotLoaded: Bool,
@@ -147,6 +176,54 @@ public enum VoiceInkDashboardPresentation {
 
         let sessionText = totalCount == 1 ? "session" : "sessions"
         return "Dictated \(formattedWordCount) words across \(totalCount) \(sessionText)."
+    }
+
+    public static func heroSubtitle(
+        isSnapshotLoaded: Bool,
+        totalCount: Int,
+        totalWords: Int
+    ) -> String {
+        heroSubtitle(
+            isSnapshotLoaded: isSnapshotLoaded,
+            totalCount: totalCount,
+            formattedWordCount: formattedNumber(totalWords)
+        )
+    }
+
+    public static func metricCards(
+        isSnapshotLoaded: Bool,
+        metrics: VoiceInkDashboardMetrics
+    ) -> [VoiceInkDashboardMetricCardPresentation] {
+        [
+            VoiceInkDashboardMetricCardPresentation(
+                id: "sessions-recorded",
+                iconSystemName: "mic.fill",
+                title: "Sessions Recorded",
+                value: isSnapshotLoaded ? "\(metrics.summary.totalCount)" : metricValuePlaceholder,
+                detail: "recordings completed"
+            ),
+            VoiceInkDashboardMetricCardPresentation(
+                id: "words-dictated",
+                iconSystemName: "text.alignleft",
+                title: "Words Dictated",
+                value: isSnapshotLoaded ? formattedNumber(metrics.summary.totalWords) : metricValuePlaceholder,
+                detail: "words generated"
+            ),
+            VoiceInkDashboardMetricCardPresentation(
+                id: "words-per-minute",
+                iconSystemName: "speedometer",
+                title: "Words Per Minute",
+                value: isSnapshotLoaded ? metrics.averageWordsPerMinuteDisplayText ?? metricValuePlaceholder : metricValuePlaceholder,
+                detail: "dictation pace"
+            ),
+            VoiceInkDashboardMetricCardPresentation(
+                id: "keystrokes-saved",
+                iconSystemName: "keyboard.fill",
+                title: "Keystrokes Saved",
+                value: isSnapshotLoaded ? formattedNumber(metrics.totalKeystrokesSaved) : metricValuePlaceholder,
+                detail: "fewer keystrokes"
+            )
+        ]
     }
 }
 

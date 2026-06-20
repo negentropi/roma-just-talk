@@ -135,7 +135,7 @@ require_context_pattern_count_at_least() {
 
   section "$description"
   local count
-  count="$(rg -A 20 "$anchor" "$file" | rg -c "$pattern" || true)"
+  count="$(rg -A 32 "$anchor" "$file" | rg -c "$pattern" || true)"
   if (( count < minimum_count )); then
     fail "$description: expected at least $minimum_count matching build settings, got $count"
   fi
@@ -5589,6 +5589,27 @@ require_pattern \
 require_pattern \
   "iOS project resolves in-repo VoiceInkCore from iOS/" \
   'relativePath = ../VoiceInkCore;' \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
+
+require_context_pattern_count_at_least \
+  "iOS app target links VoiceInkCore product" \
+  'E168DF042E4B464B00F133D2 /\* Frameworks \*/' \
+  'VoiceInkCore in Frameworks' \
+  1 \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
+
+require_context_pattern_count_at_least \
+  "iOS app target declares VoiceInkCore package dependency" \
+  'E168DF062E4B464B00F133D2 /\* VoiceInk-ios \*/' \
+  '/\* VoiceInkCore \*/' \
+  1 \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
+
+require_context_pattern_count_at_least \
+  "iOS app and keyboard targets include shared shell group" \
+  'fileSystemSynchronizedGroups = \(' \
+  '/\* Shared \*/' \
+  2 \
   iOS/VoiceInk-ios.xcodeproj/project.pbxproj
 
 require_pattern \

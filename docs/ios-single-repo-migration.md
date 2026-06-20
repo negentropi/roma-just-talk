@@ -358,7 +358,7 @@ scripts/verify-ios-single-repo-migration.sh --full-build
 ```
 
 1. `VoiceInk.xcworkspace` includes `iOS/VoiceInk-ios.xcodeproj`.
-2. macOS and iOS projects both resolve `VoiceInkCore` from inside `VoiceInk/`.
+2. macOS and iOS projects both resolve `VoiceInkCore` from inside `VoiceInk/`, and the iOS app target links the `VoiceInkCore` product.
 3. `VoiceInk/` is the git root for this work, and the abandoned parent-level Swift package shape (`../VoiceInkCore`, `../Package.swift`, `../Sources/VoiceInkCore`, `../Tests/VoiceInkCoreTests`) remains absent.
 4. `VoiceInkCore` stays platform-neutral: no AppKit, UIKit, SwiftUI, SwiftData, AVFoundation, CoreAudio, IOKit, FluidAudio, KeyboardKit, LLMkit, WhisperKit, or whisper.cpp module imports in shared sources or core checks.
 5. iOS App Group, Darwin notification, and keyboard-to-app deep-link shell identifiers stay out of `VoiceInkCore`.
@@ -369,7 +369,7 @@ scripts/verify-ios-single-repo-migration.sh --full-build
 10. iOS app, keyboard, unit-test, and UI-test Swift sources parse or build.
 11. `plutil -lint` passes for both project files and iOS plists/entitlements.
 12. `xmllint --noout` passes for workspace and shared scheme XML.
-13. iOS shared shell files are present under `iOS/Shared/`: `AppGroupCoordinator.swift`, `VoiceInkAppDeepLink.swift`, `VoiceInkAppGroupRecordingBridge.swift`, and `VoiceInkKeyboardRecordingButtonPresentation.swift`; keyboard/App Group notification names and keyboard button presentation stay there instead of app-only managers.
+13. iOS shared shell files are present under `iOS/Shared/` and included in both the iOS app and keyboard targets: `AppGroupCoordinator.swift`, `VoiceInkAppDeepLink.swift`, `VoiceInkAppGroupRecordingBridge.swift`, and `VoiceInkKeyboardRecordingButtonPresentation.swift`; keyboard/App Group notification names and keyboard button presentation stay there instead of app-only managers.
 14. iOS non-Swift app artifacts are present: privacy manifest, app icon catalog files, and bundled Silero VAD resource.
 15. Obsolete clone-side Swift duplicates remain absent from `iOS/VoiceInk-ios/`.
 16. When `../VoiceInk-iOS` exists, every sibling-only Swift file under `VoiceInk-ios/` is one of the documented obsolete/replaced files above, and the sibling keyboard/unit-test/UI-test target folders have no sibling-only Swift files.

@@ -2856,6 +2856,21 @@ require_pattern \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 require_pattern \
+  "shared macOS AI API-key verification application plan lives in VoiceInkCore" \
+  'VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan|verificationApplicationPlan\(' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+require_pattern \
+  "macOS AI service applies API-key verification through shared plan" \
+  'verificationApplicationPlan\(|VoiceInkAPIKeyVerificationResult\(isValid:' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+reject_pattern \
+  "macOS AI service avoids shell-only API-key verification success branching" \
+  'if isValid \{|self\.apiKey = resolvedKey|APIKeyManager\.shared\.saveAPIKey\(key,' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+require_pattern \
   "macOS AI service uses shared API-key failure messages" \
   'VoiceInkAIEnhancementProviderKind\.(missingVerificationCandidateMessage|invalidOrMissingBaseURLConfigurationMessage)|selectedProvider\.unsupportedAPIKeyVerificationMessage' \
   VoiceInk/Services/AIEnhancement/AIService.swift

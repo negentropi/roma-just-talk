@@ -166,6 +166,55 @@ public struct VoiceInkAIEnhancementAPIKeyDraft: Equatable, Sendable {
         }
         return VoiceInkAPIKeyReference.resolvedValue(candidate, environment: environment)
     }
+
+    public func verificationApplicationPlan(
+        for result: VoiceInkAPIKeyVerificationResult,
+        resolvedRuntimeKey: String
+    ) -> VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan {
+        guard provider.requiresUserAPIKey else {
+            return VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan(
+                isValid: true,
+                runtimeAPIKey: nil,
+                keyToSave: nil,
+                errorMessage: nil
+            )
+        }
+
+        guard result.isValid else {
+            return VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan(
+                isValid: false,
+                runtimeAPIKey: nil,
+                keyToSave: nil,
+                errorMessage: result.errorMessage
+            )
+        }
+
+        return VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan(
+            isValid: true,
+            runtimeAPIKey: resolvedRuntimeKey,
+            keyToSave: keyToSaveAfterSuccessfulVerification,
+            errorMessage: nil
+        )
+    }
+}
+
+public struct VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan: Equatable, Sendable {
+    public let isValid: Bool
+    public let runtimeAPIKey: String?
+    public let keyToSave: String?
+    public let errorMessage: String?
+
+    public init(
+        isValid: Bool,
+        runtimeAPIKey: String?,
+        keyToSave: String?,
+        errorMessage: String?
+    ) {
+        self.isValid = isValid
+        self.runtimeAPIKey = runtimeAPIKey
+        self.keyToSave = keyToSave
+        self.errorMessage = errorMessage
+    }
 }
 
 public struct VoiceInkAIEnhancementCredentialState: Equatable, Sendable {

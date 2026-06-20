@@ -2986,6 +2986,21 @@ reject_pattern \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
 
 require_pattern \
+  "shared custom provider settings presentation and submit policy lives in VoiceInkCore" \
+  'apiKeyFieldTitle|verifyAndSaveButtonTitle|customProviderBaseURLFieldTitle|customProviderBaseURLPlaceholder|customProviderModelFieldTitle|customProviderModelPlaceholder|customProviderAPIKeySetText|customProviderRemoveKeyButtonTitle|canSubmitCustomProvider' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+require_pattern \
+  "macOS AI settings custom provider form uses shared presentation and submit policy" \
+  'providerSettingsPresentation\.(apiKeyFieldTitle|verifyAndSaveButtonTitle|customProviderBaseURLFieldTitle|customProviderBaseURLPlaceholder|customProviderModelFieldTitle|customProviderModelPlaceholder|customProviderAPIKeySetText|customProviderRemoveKeyButtonTitle|canSubmitCustomProvider)' \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+
+reject_pattern \
+  "macOS AI settings avoid duplicate custom provider form copy and submit branching" \
+  '"(API Endpoint URL|Model Name|API Key Set|API Key|Remove Key|Verify and Save)"|"e\.g\. https://api\.openai\.com/v1/chat/completions"|"e\.g\. gemini-3\.1-pro-preview, gpt-5\.5"|customBaseURL\.isEmpty \|\| aiService\.customModel\.isEmpty' \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+
+require_pattern \
   "macOS Power Mode model refresh display uses shared policy" \
   'supportsUserInitiatedTextEnhancementModelRefresh' \
   VoiceInk/PowerMode/PowerModeConfigView.swift \

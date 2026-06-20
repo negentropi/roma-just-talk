@@ -81,6 +81,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementModelCatalogSourcePolicyIsShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementModelCatalogSourcePolicyIsShared() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementUserInitiatedModelRefreshPolicyIsShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementUserInitiatedModelRefreshPolicyIsShared() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementSettingsSurfacesAreShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementSettingsSurfacesAreShared() }),
+            VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSCustomProviderSettingsPresentationAndSubmitPolicyAreShared", run: { AIProviderCatalogTests().testMacOSCustomProviderSettingsPresentationAndSubmitPolicyAreShared() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementRequestURLSelectionIsShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementRequestURLSelectionIsShared() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementRefreshModelSelectionRepairIsShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementRefreshModelSelectionRepairIsShared() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementProviderVerificationRoutesAreShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementProviderVerificationRoutesAreShared() }),

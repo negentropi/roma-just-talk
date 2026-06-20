@@ -41,10 +41,26 @@ public enum VoiceInkAIEnhancementConnectionStatusPresentation: Sendable, Equatab
 public struct VoiceInkAIEnhancementProviderSettingsPresentation: Sendable, Equatable {
     public let connectedText: String
     public let disconnectedText: String
+    public let apiKeyFieldTitle: String
+    public let verifyAndSaveButtonTitle: String
+    public let customProviderBaseURLFieldTitle: String
+    public let customProviderBaseURLPlaceholder: String
+    public let customProviderModelFieldTitle: String
+    public let customProviderModelPlaceholder: String
+    public let customProviderAPIKeySetText: String
+    public let customProviderRemoveKeyButtonTitle: String
 
     public static let macOS = VoiceInkAIEnhancementProviderSettingsPresentation(
         connectedText: "Connected",
-        disconnectedText: "Disconnected"
+        disconnectedText: "Disconnected",
+        apiKeyFieldTitle: "API Key",
+        verifyAndSaveButtonTitle: "Verify and Save",
+        customProviderBaseURLFieldTitle: "API Endpoint URL",
+        customProviderBaseURLPlaceholder: "e.g. https://api.openai.com/v1/chat/completions",
+        customProviderModelFieldTitle: "Model Name",
+        customProviderModelPlaceholder: "e.g. gemini-3.1-pro-preview, gpt-5.5",
+        customProviderAPIKeySetText: "API Key Set",
+        customProviderRemoveKeyButtonTitle: "Remove Key"
     )
 
     public func connectionStatus(
@@ -67,6 +83,14 @@ public struct VoiceInkAIEnhancementProviderSettingsPresentation: Sendable, Equat
                 ? .status(text: connectedText, tone: .connected)
                 : nil
         }
+    }
+
+    public func canSubmitCustomProvider(
+        baseURL: String,
+        modelName: String,
+        hasDraftAPIKey: Bool
+    ) -> Bool {
+        !baseURL.isEmpty && !modelName.isEmpty && hasDraftAPIKey
     }
 }
 

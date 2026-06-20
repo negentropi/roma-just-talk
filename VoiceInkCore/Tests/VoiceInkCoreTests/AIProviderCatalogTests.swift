@@ -355,6 +355,61 @@ final class AIProviderCatalogTests: XCTestCase {
         )
     }
 
+    func testMacOSCustomProviderSettingsPresentationAndSubmitPolicyAreShared() {
+        let presentation = VoiceInkAIEnhancementProviderSettingsPresentation.macOS
+
+        XCTAssertEqual(presentation.apiKeyFieldTitle, "API Key")
+        XCTAssertEqual(presentation.verifyAndSaveButtonTitle, "Verify and Save")
+        XCTAssertEqual(presentation.customProviderBaseURLFieldTitle, "API Endpoint URL")
+        XCTAssertEqual(
+            presentation.customProviderBaseURLPlaceholder,
+            "e.g. https://api.openai.com/v1/chat/completions"
+        )
+        XCTAssertEqual(presentation.customProviderModelFieldTitle, "Model Name")
+        XCTAssertEqual(
+            presentation.customProviderModelPlaceholder,
+            "e.g. gemini-3.1-pro-preview, gpt-5.5"
+        )
+        XCTAssertEqual(presentation.customProviderAPIKeySetText, "API Key Set")
+        XCTAssertEqual(presentation.customProviderRemoveKeyButtonTitle, "Remove Key")
+
+        XCTAssertTrue(
+            presentation.canSubmitCustomProvider(
+                baseURL: "https://api.example.test/v1/chat/completions",
+                modelName: "custom-model",
+                hasDraftAPIKey: true
+            )
+        )
+        XCTAssertTrue(
+            presentation.canSubmitCustomProvider(
+                baseURL: " ",
+                modelName: " ",
+                hasDraftAPIKey: true
+            )
+        )
+        XCTAssertFalse(
+            presentation.canSubmitCustomProvider(
+                baseURL: "",
+                modelName: "custom-model",
+                hasDraftAPIKey: true
+            )
+        )
+        XCTAssertFalse(
+            presentation.canSubmitCustomProvider(
+                baseURL: "https://api.example.test/v1/chat/completions",
+                modelName: "",
+                hasDraftAPIKey: true
+            )
+        )
+        XCTAssertFalse(
+            presentation.canSubmitCustomProvider(
+                baseURL: "https://api.example.test/v1/chat/completions",
+                modelName: "custom-model",
+                hasDraftAPIKey: false
+            )
+        )
+    }
+
     func testMacOSAIEnhancementModelSelectionPreservesAvailableSelections() {
         XCTAssertEqual(
             VoiceInkAIEnhancementProviderKind.groq.selectedTextEnhancementModel(

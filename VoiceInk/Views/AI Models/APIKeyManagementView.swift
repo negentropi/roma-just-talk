@@ -233,31 +233,39 @@ struct APIKeyManagementView: View {
                     }
 
                 } else if selectedProviderSettingsSurface == .custom {
-                    TextField("API Endpoint URL", text: $aiService.customBaseURL, prompt: Text("e.g. https://api.openai.com/v1/chat/completions"))
+                    TextField(
+                        providerSettingsPresentation.customProviderBaseURLFieldTitle,
+                        text: $aiService.customBaseURL,
+                        prompt: Text(providerSettingsPresentation.customProviderBaseURLPlaceholder)
+                    )
                         .textFieldStyle(.roundedBorder)
 
                     Divider()
 
-                    TextField("Model Name", text: $aiService.customModel, prompt: Text("e.g. gemini-3.1-pro-preview, gpt-5.5"))
+                    TextField(
+                        providerSettingsPresentation.customProviderModelFieldTitle,
+                        text: $aiService.customModel,
+                        prompt: Text(providerSettingsPresentation.customProviderModelPlaceholder)
+                    )
                         .textFieldStyle(.roundedBorder)
 
                     Divider()
 
                     if aiService.isAPIKeyValid {
                         HStack {
-                            Text("API Key Set")
+                            Text(providerSettingsPresentation.customProviderAPIKeySetText)
                             Spacer()
                             Text(obfuscatedSelectedAPIKey)
                                 .foregroundColor(.secondary)
-                            Button("Remove Key", role: .destructive) {
+                            Button(providerSettingsPresentation.customProviderRemoveKeyButtonTitle, role: .destructive) {
                                 aiService.clearAPIKey()
                             }
                         }
                     } else {
-                        SecureField("API Key", text: $apiKey)
+                        SecureField(providerSettingsPresentation.apiKeyFieldTitle, text: $apiKey)
                             .textFieldStyle(.roundedBorder)
 
-                        Button("Verify and Save") {
+                        Button(providerSettingsPresentation.verifyAndSaveButtonTitle) {
                             isVerifying = true
                             aiService.saveAPIKey(apiKey) { success, errorMessage in
                                 isVerifying = false
@@ -267,13 +275,17 @@ struct APIKeyManagementView: View {
                                 apiKey = ""
                             }
                         }
-                        .disabled(aiService.customBaseURL.isEmpty || aiService.customModel.isEmpty || !hasDraftAPIKey)
+                        .disabled(!providerSettingsPresentation.canSubmitCustomProvider(
+                            baseURL: aiService.customBaseURL,
+                            modelName: aiService.customModel,
+                            hasDraftAPIKey: hasDraftAPIKey
+                        ))
                     }
                     
                 } else {
                     if aiService.isAPIKeyValid {
                         HStack {
-                            Text("API Key")
+                            Text(providerSettingsPresentation.apiKeyFieldTitle)
                             Spacer()
                             Text(obfuscatedSelectedAPIKey)
                                 .foregroundColor(.secondary)
@@ -282,7 +294,7 @@ struct APIKeyManagementView: View {
                             }
                         }
                     } else {
-                        SecureField("API Key", text: $apiKey)
+                        SecureField(providerSettingsPresentation.apiKeyFieldTitle, text: $apiKey)
                             .textFieldStyle(.roundedBorder)
 
                         HStack {
@@ -318,7 +330,7 @@ struct APIKeyManagementView: View {
                                     if isVerifying {
                                         ProgressView().controlSize(.small)
                                     }
-                                    Text("Verify and Save")
+                                    Text(providerSettingsPresentation.verifyAndSaveButtonTitle)
                                 }
                             }
                             .disabled(!hasDraftAPIKey)

@@ -980,6 +980,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testLocalModelImportPlanRejectsUnsupportedFilesAndReportsDuplicates", run: { try WhisperModelFilesTests().testLocalModelImportPlanRejectsUnsupportedFilesAndReportsDuplicates() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testLocalModelFileUsesExistingBinOnlyNamePolicy", run: { try WhisperModelFilesTests().testLocalModelFileUsesExistingBinOnlyNamePolicy() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testLocalModelFilesReadsOnlyBinFilesFromDirectory", run: { try WhisperModelFilesTests().testLocalModelFilesReadsOnlyBinFilesFromDirectory() }),
+            VoiceInkCoreCheck(name: "WhisperModelFilesTests.testAvailableLocalModelFileURLFindsExistingImportedModel", run: { try WhisperModelFilesTests().testAvailableLocalModelFileURLFindsExistingImportedModel() }),
+            VoiceInkCoreCheck(name: "WhisperModelFilesTests.testAvailableLocalModelFileURLRejectsMissingNamesAndFiles", run: { try WhisperModelFilesTests().testAvailableLocalModelFileURLRejectsMissingNamesAndFiles() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testInstallDownloadedModelFileReplacesExistingModelFile", run: { try WhisperModelFilesTests().testInstallDownloadedModelFileReplacesExistingModelFile() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testWriteDownloadedModelDataUsesSharedModelNameURL", run: { try WhisperModelFilesTests().testWriteDownloadedModelDataUsesSharedModelNameURL() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testWriteDownloadedLocalModelDataBuildsSharedLocalModelFile", run: { try WhisperModelFilesTests().testWriteDownloadedLocalModelDataBuildsSharedLocalModelFile() }),

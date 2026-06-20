@@ -310,6 +310,19 @@ public enum VoiceInkWhisperModelFiles {
             .compactMap { localModelFile(from: $0) }
     }
 
+    public static func availableLocalModelFileURL(
+        forModelName modelName: String,
+        in localModels: [VoiceInkWhisperLocalModelFile],
+        fileManager: FileManager = .default
+    ) -> URL? {
+        guard let model = localModels.first(where: { $0.name == modelName }),
+              fileManager.fileExists(atPath: model.url.path) else {
+            return nil
+        }
+
+        return model.url
+    }
+
     public static func fileURL(forFilename filename: String, in modelsDirectory: URL) -> URL {
         modelsDirectory.appendingPathComponent(filename)
     }

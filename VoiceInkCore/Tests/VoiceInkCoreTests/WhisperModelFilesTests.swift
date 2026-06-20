@@ -256,6 +256,54 @@ final class WhisperModelFilesTests: XCTestCase {
         XCTAssertEqual(Set(modelFiles.map(\.name)), ["ggml-base"])
     }
 
+    func testAvailableLocalModelFileURLFindsExistingImportedModel() throws {
+        let baseDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.WhisperModelFilesTests.\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: baseDirectory) }
+
+        let modelsDirectory = try VoiceInkWhisperModelFiles.createModelsDirectory(in: baseDirectory)
+        let modelURL = modelsDirectory.appendingPathComponent("custom-model.bin")
+        try Data("model".utf8).write(to: modelURL)
+
+        let localModels = [
+            VoiceInkWhisperLocalModelFile(name: "other-model", url: modelsDirectory.appendingPathComponent("other-model.bin")),
+            VoiceInkWhisperLocalModelFile(name: "custom-model", url: modelURL)
+        ]
+
+        XCTAssertEqual(
+            VoiceInkWhisperModelFiles.availableLocalModelFileURL(
+                forModelName: "custom-model",
+                in: localModels
+            ),
+            modelURL
+        )
+    }
+
+    func testAvailableLocalModelFileURLRejectsMissingNamesAndFiles() throws {
+        let baseDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.WhisperModelFilesTests.\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: baseDirectory) }
+
+        let modelsDirectory = try VoiceInkWhisperModelFiles.createModelsDirectory(in: baseDirectory)
+        let missingURL = modelsDirectory.appendingPathComponent("custom-model.bin")
+        let localModels = [
+            VoiceInkWhisperLocalModelFile(name: "custom-model", url: missingURL)
+        ]
+
+        XCTAssertNil(
+            VoiceInkWhisperModelFiles.availableLocalModelFileURL(
+                forModelName: "custom-model",
+                in: localModels
+            )
+        )
+        XCTAssertNil(
+            VoiceInkWhisperModelFiles.availableLocalModelFileURL(
+                forModelName: "missing-model",
+                in: localModels
+            )
+        )
+    }
+
     func testInstallDownloadedModelFileReplacesExistingModelFile() throws {
         let baseDirectory = FileManager.default.temporaryDirectory
             .appendingPathComponent("VoiceInkCore.WhisperModelFilesTests.\(UUID().uuidString)", isDirectory: true)

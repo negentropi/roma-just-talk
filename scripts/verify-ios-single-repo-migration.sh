@@ -1387,6 +1387,16 @@ require_pattern \
   'VoiceInkWhisperContextRuntimePlan\.current' \
   iOS/VoiceInk-ios/LibWhisper.swift
 
+require_pattern \
+  "macOS local Whisper uses shared local model URL resolution" \
+  'VoiceInkWhisperModelFiles\.availableLocalModelFileURL' \
+  VoiceInk/Transcription/Whisper/WhisperTranscriptionService.swift
+
+reject_pattern \
+  "macOS local Whisper avoids shell-owned local model URL resolution" \
+  'availableModels\.first\(where:|FileManager\.default\.fileExists\(atPath: modelURL\.path\)' \
+  VoiceInk/Transcription/Whisper/WhisperTranscriptionService.swift
+
 reject_pattern \
   "local Whisper adapters avoid shell-only context runtime policy" \
   'params\.(use_gpu|flash_attn) = (false|true)|#if targetEnvironment\(simulator\)' \
@@ -1518,6 +1528,11 @@ require_pattern \
 require_pattern \
   "shared Whisper downloaded local model data builds local model record" \
   'writeDownloadedLocalModelData|VoiceInkWhisperLocalModelFile\(name: modelName, url: destinationURL\)' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
+
+require_pattern \
+  "shared Whisper available local model URL resolution lives in VoiceInkCore" \
+  'availableLocalModelFileURL|localModels\.first\(where:|fileManager\.fileExists\(atPath: model\.url\.path\)' \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
 
 require_pattern \

@@ -32,8 +32,11 @@ class WhisperTranscriptionService: TranscriptionService {
             whisperContext = loadedContext
         } else {
             // Resolve the on-disk URL using the provider's availableModels (covers imports)
-            let resolvedURL: URL? = await modelProvider?.availableModels.first(where: { $0.name == model.name })?.url
-            guard let modelURL = resolvedURL, FileManager.default.fileExists(atPath: modelURL.path) else {
+            let availableModels = await modelProvider?.availableModels ?? []
+            guard let modelURL = VoiceInkWhisperModelFiles.availableLocalModelFileURL(
+                forModelName: model.name,
+                in: availableModels
+            ) else {
                 logger.error("❌ Model file not found for: \(model.name, privacy: .public)")
                 throw VoiceInkEngineError.modelLoadFailed
             }

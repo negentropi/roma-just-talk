@@ -2177,6 +2177,16 @@ require_pattern \
   'VoiceInkPCM16Audio\.duration\(forMono16kData:' \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift
 
+require_pattern \
+  "macOS rolling preload uses shared PCM16 byte-count policy" \
+  'VoiceInkPCM16Audio\.byteCount\(forMono16kDuration:' \
+  VoiceInk/Transcription/RollingPreload/RollingBufferPreloadCoordinator.swift
+
+reject_pattern \
+  "macOS rolling preload avoids shell-only PCM16 byte-count wrapper" \
+  'private +static +func +bytes\(forDuration' \
+  VoiceInk/Transcription/RollingPreload/RollingBufferPreloadCoordinator.swift
+
 reject_pattern \
   "macOS quick-release avoids shell-only PCM16 duration wrapper" \
   'durationForMono16kPCMData' \

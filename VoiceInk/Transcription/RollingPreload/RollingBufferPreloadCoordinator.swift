@@ -120,7 +120,9 @@ final class RollingBufferPreloadCoordinator {
         }
         self.powerStateProvider = powerStateProvider
         self.leadInBuffer = VoiceInkRollingAudioBuffer(
-            maxBytes: Self.bytes(forDuration: VoiceInkRollingBufferPreloadSettings.defaultBufferDurationSeconds)
+            maxBytes: VoiceInkPCM16Audio.byteCount(
+                forMono16kDuration: VoiceInkRollingBufferPreloadSettings.defaultBufferDurationSeconds
+            )
         )
     }
 
@@ -139,7 +141,9 @@ final class RollingBufferPreloadCoordinator {
         self.sessionFactory = sessionFactory
         self.powerStateProvider = powerStateProvider
         self.leadInBuffer = VoiceInkRollingAudioBuffer(
-            maxBytes: Self.bytes(forDuration: VoiceInkRollingBufferPreloadSettings.defaultBufferDurationSeconds)
+            maxBytes: VoiceInkPCM16Audio.byteCount(
+                forMono16kDuration: VoiceInkRollingBufferPreloadSettings.defaultBufferDurationSeconds
+            )
         )
     }
 
@@ -256,7 +260,9 @@ final class RollingBufferPreloadCoordinator {
         observedChunks += 1
         observedBytes += chunk.count
 
-        leadInBuffer.updateMaxBytes(Self.bytes(forDuration: configuration.bufferDurationSeconds))
+        leadInBuffer.updateMaxBytes(
+            VoiceInkPCM16Audio.byteCount(forMono16kDuration: configuration.bufferDurationSeconds)
+        )
 
         let selectedModelName = currentModelProvider()?.name
         let selectedLanguage = currentLanguageProvider()
@@ -390,11 +396,15 @@ final class RollingBufferPreloadCoordinator {
             }
         }
 
-        if activeSilenceBytes >= Self.bytes(forDuration: Self.unclaimedPreloadSilenceSeconds) {
+        if activeSilenceBytes >= VoiceInkPCM16Audio.byteCount(
+            forMono16kDuration: Self.unclaimedPreloadSilenceSeconds
+        ) {
             return "silence"
         }
 
-        if preloadedBytes >= Self.bytes(forDuration: configuration.bufferDurationSeconds + Self.unclaimedPreloadGraceSeconds) {
+        if preloadedBytes >= VoiceInkPCM16Audio.byteCount(
+            forMono16kDuration: configuration.bufferDurationSeconds + Self.unclaimedPreloadGraceSeconds
+        ) {
             return "max-duration"
         }
 
@@ -582,7 +592,4 @@ final class RollingBufferPreloadCoordinator {
         cachedPlanExpiresAt = .distantPast
     }
 
-    private static func bytes(forDuration seconds: Double) -> Int {
-        VoiceInkPCM16Audio.byteCount(forMono16kDuration: seconds)
-    }
 }

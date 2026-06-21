@@ -138,6 +138,12 @@ public enum VoiceInkAppGroupRecordingStatePolicy {
     }
 }
 
+public enum VoiceInkKeyboardRecordingTiming {
+    public static let appLaunchRecordingStartDelay: TimeInterval = 0.5
+    public static let recordingStatusPollingInterval: TimeInterval = 0.5
+    public static let openAppFallbackResetDelay: TimeInterval = 2.0
+}
+
 public enum VoiceInkRecorderStyle: String, CaseIterable, Identifiable, Sendable {
     case none
     case notch

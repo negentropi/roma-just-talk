@@ -211,7 +211,6 @@ section "iOS ported assets and resources"
 require_file iOS/Shared/AppGroupCoordinator.swift
 require_file iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
 require_file iOS/Shared/VoiceInkKeyboardRecordingButtonPresentation.swift
-require_file iOS/Shared/VoiceInkKeyboardRecordingTiming.swift
 require_file iOS/VoiceInk-ios/Transcription.swift
 require_file docs/ios-privacy-policy.md
 require_file iOS/VoiceInk-ios/PrivacyInfo.xcprivacy
@@ -228,6 +227,7 @@ reject_file iOS/PRIVACY.html
 reject_file iOS/PRIVACY.md
 reject_file iOS/app-icon.png
 reject_file iOS/Shared/VoiceInkAppDeepLink.swift
+reject_file iOS/Shared/VoiceInkKeyboardRecordingTiming.swift
 reject_file iOS/VoiceInk-ios/VoiceInk-ios
 reject_file iOS/VoiceInk-ios/KeychainService.swift
 
@@ -7746,6 +7746,16 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "VoiceInkCore owns iOS keyboard recording timing" \
+  'VoiceInkKeyboardRecordingTiming|appLaunchRecordingStartDelay|recordingStatusPollingInterval|openAppFallbackResetDelay' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "VoiceInkCore checks cover iOS keyboard recording timing" \
+  'testKeyboardRecordingTimingPreservesIOSAppAndKeyboardDelays' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "iOS App Group bridge uses entitlement group" \
   'static let appGroupIdentifier = VoiceInkAppIdentity\.iOSAppGroupIdentifier' \
   iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
@@ -7814,26 +7824,6 @@ require_pattern \
   "iOS shared keyboard presentation owns fallback icon" \
   'systemImageName: "app"' \
   iOS/Shared/VoiceInkKeyboardRecordingButtonPresentation.swift
-
-require_pattern \
-  "iOS shared keyboard timing module exists" \
-  'VoiceInkKeyboardRecordingTiming' \
-  iOS/Shared/VoiceInkKeyboardRecordingTiming.swift
-
-require_pattern \
-  "iOS shared keyboard timing owns app launch recording delay" \
-  'appLaunchRecordingStartDelay' \
-  iOS/Shared/VoiceInkKeyboardRecordingTiming.swift
-
-require_pattern \
-  "iOS shared keyboard timing owns recording status polling interval" \
-  'recordingStatusPollingInterval' \
-  iOS/Shared/VoiceInkKeyboardRecordingTiming.swift
-
-require_pattern \
-  "iOS shared keyboard timing owns fallback reset delay" \
-  'openAppFallbackResetDelay' \
-  iOS/Shared/VoiceInkKeyboardRecordingTiming.swift
 
 require_pattern \
   "iOS keyboard controller uses shared button presentation" \

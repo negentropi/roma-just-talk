@@ -920,7 +920,9 @@ class VoiceInkEngine: NSObject, ObservableObject {
         for audioURL: URL,
         duration: TimeInterval
     ) -> Transcription {
-        let powerModeMetadata = currentPowerModeMetadata()
+        let powerModeMetadata = VoiceInkPowerModeTranscriptionMetadata.active(
+            from: PowerModeManager.shared.activeConfiguration
+        )
 
         let draft = VoiceInkRecordingTranscriptionDraft.pending(
             duration: duration,
@@ -936,7 +938,9 @@ class VoiceInkEngine: NSObject, ObservableObject {
         for audioURL: URL,
         duration: TimeInterval
     ) -> Transcription {
-        let powerModeMetadata = currentPowerModeMetadata()
+        let powerModeMetadata = VoiceInkPowerModeTranscriptionMetadata.active(
+            from: PowerModeManager.shared.activeConfiguration
+        )
 
         let draft = VoiceInkRecordingTranscriptionDraft.canceled(
             duration: duration,
@@ -946,15 +950,6 @@ class VoiceInkEngine: NSObject, ObservableObject {
             powerModeEmoji: powerModeMetadata.emoji
         )
         return Transcription(recordingDraft: draft)
-    }
-
-    private func currentPowerModeMetadata() -> (name: String?, emoji: String?) {
-        guard let powerMode = PowerModeManager.shared.activeConfiguration,
-              powerMode.isEnabled else {
-            return (nil, nil)
-        }
-
-        return (powerMode.name, powerMode.emoji)
     }
 
     // MARK: - Resource Cleanup

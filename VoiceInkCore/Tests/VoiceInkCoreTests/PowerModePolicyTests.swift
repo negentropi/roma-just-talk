@@ -216,6 +216,34 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertEqual(urlObject["url"] as? String, "example.com")
     }
 
+    func testTranscriptionMetadataUsesOnlyEnabledPowerModeConfig() {
+        let enabledConfig = PowerModeConfig(
+            name: " Writing ",
+            emoji: " W ",
+            isAIEnhancementEnabled: false,
+            isEnabled: true
+        )
+        let disabledConfig = PowerModeConfig(
+            name: "Writing",
+            emoji: "W",
+            isAIEnhancementEnabled: false,
+            isEnabled: false
+        )
+
+        XCTAssertEqual(
+            VoiceInkPowerModeTranscriptionMetadata.active(from: enabledConfig),
+            VoiceInkPowerModeTranscriptionMetadata(name: " Writing ", emoji: " W ")
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeTranscriptionMetadata.active(from: disabledConfig),
+            .inactive
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeTranscriptionMetadata.active(from: nil),
+            .inactive
+        )
+    }
+
     func testPowerModeTriggerConfigsAdaptToPolicyRules() {
         XCTAssertEqual(
             VoiceInkPowerModeAppConfig(

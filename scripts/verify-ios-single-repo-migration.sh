@@ -3533,6 +3533,38 @@ require_pattern \
   VoiceInk/Services/AudioFileTranscriptionService.swift
 
 require_pattern \
+  "macOS recorder records use shared Power Mode transcription metadata" \
+  'VoiceInkPowerModeTranscriptionMetadata\.active' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+
+require_pattern \
+  "macOS audio-file import uses shared Power Mode transcription metadata" \
+  'VoiceInkPowerModeTranscriptionMetadata\.active' \
+  VoiceInk/Services/AudioFileTranscriptionManager.swift
+
+require_pattern \
+  "macOS retry transcription uses shared Power Mode transcription metadata" \
+  'VoiceInkPowerModeTranscriptionMetadata\.active' \
+  VoiceInk/Services/AudioFileTranscriptionService.swift
+
+require_pattern \
+  "core tests pin Power Mode transcription metadata selection" \
+  'testTranscriptionMetadataUsesOnlyEnabledPowerModeConfig' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/PowerModePolicyTests.swift
+
+require_pattern \
+  "core check runner executes Power Mode transcription metadata selection test" \
+  'testTranscriptionMetadataUsesOnlyEnabledPowerModeConfig' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "macOS transcription callers avoid shell-only Power Mode metadata selection" \
+  'activePowerModeConfig|currentPowerModeMetadata|\?\.isEnabled == true' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift \
+  VoiceInk/Services/AudioFileTranscriptionManager.swift \
+  VoiceInk/Services/AudioFileTranscriptionService.swift
+
+require_pattern \
   "macOS audio-file import builds completed records through shared draft" \
   'VoiceInkAudioFileTranscriptionDraft\.completed' \
   VoiceInk/Services/AudioFileTranscriptionManager.swift
@@ -5928,6 +5960,11 @@ require_pattern \
 require_pattern \
   "shared Power Mode config resolves selected prompt titles" \
   'selectedPromptTitle\(in prompts: \[VoiceInkCustomPrompt\]\)' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode transcription metadata selection lives in VoiceInkCore" \
+  'VoiceInkPowerModeTranscriptionMetadata|active\(from config: PowerModeConfig\?\)|config\.isEnabled' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \

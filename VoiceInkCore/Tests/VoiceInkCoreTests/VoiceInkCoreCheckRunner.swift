@@ -536,6 +536,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeEmojiAddResultPresentation", run: { PowerModePolicyTests().testPowerModeEmojiAddResultPresentation() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeEmojiCatalogReadsSavesAndRemovesCustomEmojis", run: { PowerModePolicyTests().testPowerModeEmojiCatalogReadsSavesAndRemovesCustomEmojis() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeTriggerConfigsPreserveStoredShapeAndIdEquality", run: { try PowerModePolicyTests().testPowerModeTriggerConfigsPreserveStoredShapeAndIdEquality() }),
+            VoiceInkCoreCheck(name: "PowerModePolicyTests.testTranscriptionMetadataUsesOnlyEnabledPowerModeConfig", run: { PowerModePolicyTests().testTranscriptionMetadataUsesOnlyEnabledPowerModeConfig() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeTriggerConfigsAdaptToPolicyRules", run: { PowerModePolicyTests().testPowerModeTriggerConfigsAdaptToPolicyRules() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeAppConfigSelectionTogglesByBundleIdentifier", run: { PowerModePolicyTests().testPowerModeAppConfigSelectionTogglesByBundleIdentifier() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeConfigPreservesStoredShapeEqualityAndRuleAdapter", run: { try PowerModePolicyTests().testPowerModeConfigPreservesStoredShapeEqualityAndRuleAdapter() }),

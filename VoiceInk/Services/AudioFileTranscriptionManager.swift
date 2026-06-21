@@ -157,9 +157,9 @@ class AudioTranscriptionManager: ObservableObject {
             let cleanupConfiguration = VoiceInkTranscriptionCleanupConfiguration.current()
             text = cleanupConfiguration.filterRawOutput(text)
 
-            let activePowerModeConfig = PowerModeManager.shared.activeConfiguration
-            let powerModeName = (activePowerModeConfig?.isEnabled == true) ? activePowerModeConfig?.name : nil
-            let powerModeEmoji = (activePowerModeConfig?.isEnabled == true) ? activePowerModeConfig?.emoji : nil
+            let powerModeMetadata = VoiceInkPowerModeTranscriptionMetadata.active(
+                from: PowerModeManager.shared.activeConfiguration
+            )
 
             let preparedRunText = VoiceInkTranscriptionRunPreparation.prepareFilteredText(
                 text,
@@ -181,8 +181,8 @@ class AudioTranscriptionManager: ObservableObject {
                 audioFileURL: permanentURL.absoluteString,
                 transcriptionModelName: currentModel.displayName,
                 transcriptionDuration: transcriptionDuration,
-                powerModeName: powerModeName,
-                powerModeEmoji: powerModeEmoji
+                powerModeName: powerModeMetadata.name,
+                powerModeEmoji: powerModeMetadata.emoji
             )
 
             // Handle enhancement if enabled

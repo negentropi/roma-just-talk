@@ -148,6 +148,30 @@ public struct PowerModeConfig: Codable, Identifiable, Equatable, Sendable {
     }
 }
 
+public struct VoiceInkPowerModeTranscriptionMetadata: Equatable, Sendable {
+    public static let inactive = VoiceInkPowerModeTranscriptionMetadata(name: nil, emoji: nil)
+
+    public let name: String?
+    public let emoji: String?
+
+    public init(name: String?, emoji: String?) {
+        self.name = name
+        self.emoji = emoji
+    }
+
+    public static func active(from config: PowerModeConfig?) -> Self {
+        guard let config,
+              config.isEnabled else {
+            return .inactive
+        }
+
+        return VoiceInkPowerModeTranscriptionMetadata(
+            name: config.name,
+            emoji: config.emoji
+        )
+    }
+}
+
 public struct VoiceInkPowerModeConfigurationDraft: Equatable, Sendable {
     public var id: UUID
     public var name: String

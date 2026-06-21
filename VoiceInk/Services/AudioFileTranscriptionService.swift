@@ -35,9 +35,9 @@ class AudioTranscriptionService {
             let cleanupConfiguration = VoiceInkTranscriptionCleanupConfiguration.current()
             text = cleanupConfiguration.filterRawOutput(text)
 
-            let activePowerModeConfig = PowerModeManager.shared.activeConfiguration
-            let powerModeName = (activePowerModeConfig?.isEnabled == true) ? activePowerModeConfig?.name : nil
-            let powerModeEmoji = (activePowerModeConfig?.isEnabled == true) ? activePowerModeConfig?.emoji : nil
+            let powerModeMetadata = VoiceInkPowerModeTranscriptionMetadata.active(
+                from: PowerModeManager.shared.activeConfiguration
+            )
 
             let preparedRunText = VoiceInkTranscriptionRunPreparation.prepareFilteredText(
                 text,
@@ -75,8 +75,8 @@ class AudioTranscriptionService {
                 audioFileURL: permanentURLString,
                 transcriptionModelName: model.displayName,
                 transcriptionDuration: transcriptionDuration,
-                powerModeName: powerModeName,
-                powerModeEmoji: powerModeEmoji
+                powerModeName: powerModeMetadata.name,
+                powerModeEmoji: powerModeMetadata.emoji
             )
             var promptDetectionResult: VoiceInkPromptDetectionResult? = nil
 

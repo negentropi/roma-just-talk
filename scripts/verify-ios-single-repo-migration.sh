@@ -3596,8 +3596,8 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelAvailability.swift
 
 require_pattern \
-  "shared core owns Native Apple availability presentation" \
-  'VoiceInkNativeAppleTranscriptionAvailabilityPresentation|unsupportedSpeechAnalyzerErrorDescription|requiresMacOS26Title' \
+  "shared core owns Native Apple transcription policy" \
+  'VoiceInkNativeAppleTranscriptionPolicy|VoiceInkNativeAppleTranscriptionFailureKind|errorDescription|resultStreamTimeout|requiresMacOS26Title' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelAvailability.swift
 
 require_pattern \
@@ -3611,18 +3611,23 @@ require_pattern \
   VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
 
 require_pattern \
-  "macOS transcription model manager uses shared Native Apple availability presentation" \
-  'VoiceInkNativeAppleTranscriptionAvailabilityPresentation\.requiresMacOS26Title' \
+  "macOS transcription model manager uses shared Native Apple transcription policy" \
+  'VoiceInkNativeAppleTranscriptionPolicy\.requiresMacOS26Title' \
   VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
 
 require_pattern \
-  "macOS Native Apple transcription uses shared unsupported-OS presentation" \
-  'VoiceInkNativeAppleTranscriptionAvailabilityPresentation\.unsupportedSpeechAnalyzerErrorDescription' \
+  "macOS Native Apple transcription uses shared failure presentation" \
+  'VoiceInkNativeAppleTranscriptionPolicy\.errorDescription|VoiceInkNativeAppleTranscriptionFailureKind' \
   VoiceInk/Transcription/Native/NativeAppleTranscriptionService.swift
 
 require_pattern \
-  "core checks execute Native Apple availability presentation test" \
-  'TranscriptionModelAvailabilityTests\.testNativeAppleAvailabilityPresentationPreservesMacOSCopy' \
+  "macOS Native Apple transcription uses shared result-stream timeout policy" \
+  'VoiceInkNativeAppleTranscriptionPolicy\.resultStreamTimeout' \
+  VoiceInk/Transcription/Native/NativeAppleTranscriptionService.swift
+
+require_pattern \
+  "core checks execute Native Apple transcription policy tests" \
+  'TranscriptionModelAvailabilityTests\.testNativeAppleTranscriptionPolicyPreservesMacOSErrorCopy|TranscriptionModelAvailabilityTests\.testNativeAppleTranscriptionPolicyPreservesSelectionAndTimeoutCopy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -3648,8 +3653,8 @@ reject_pattern \
   VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
 
 reject_pattern \
-  "macOS Native Apple availability copy avoids shell-owned literals" \
-  '"[^"]*requires macOS 26 or later\.?"' \
+  "macOS Native Apple runtime policy avoids shell-owned literals and timeout math" \
+  '"(SpeechAnalyzer requires macOS 26 or later\.|Transcription failed using SpeechAnalyzer\.|The selected language is not supported by SpeechAnalyzer\.|Invalid model type provided for Native Apple transcription\.|Download required for|Apple Speech did not finish returning transcription results\.)"|max\(20\.0|audioDuration \* 4\.0 \+ 10\.0' \
   VoiceInk/Transcription/Engine/TranscriptionModelManager.swift \
   VoiceInk/Transcription/Native/NativeAppleTranscriptionService.swift
 

@@ -19,22 +19,26 @@ class NativeAppleTranscriptionService: TranscriptionService {
         case invalidModel
         case assetDownloadRequired(String)
         case resultStreamTimedOut
-        
-        var errorDescription: String? {
+
+        var failureKind: VoiceInkNativeAppleTranscriptionFailureKind {
             switch self {
             case .unsupportedOS:
-                return VoiceInkNativeAppleTranscriptionAvailabilityPresentation.unsupportedSpeechAnalyzerErrorDescription
+                return .unsupportedOS
             case .transcriptionFailed:
-                return "Transcription failed using SpeechAnalyzer."
+                return .transcriptionFailed
             case .localeNotSupported:
-                return "The selected language is not supported by SpeechAnalyzer."
+                return .localeNotSupported
             case .invalidModel:
-                return "Invalid model type provided for Native Apple transcription."
+                return .invalidModel
             case .assetDownloadRequired(let displayName):
-                return "Download required for \(displayName)."
+                return .assetDownloadRequired(displayName: displayName)
             case .resultStreamTimedOut:
-                return "Apple Speech did not finish returning transcription results."
+                return .resultStreamTimedOut
             }
+        }
+
+        var errorDescription: String? {
+            VoiceInkNativeAppleTranscriptionPolicy.errorDescription(for: failureKind)
         }
     }
 
@@ -114,7 +118,9 @@ class NativeAppleTranscriptionService: TranscriptionService {
             throw error
         }
         
-        let resultTimeout = max(20.0, audioDuration * 4.0 + 10.0)
+        let resultTimeout = VoiceInkNativeAppleTranscriptionPolicy.resultStreamTimeout(
+            forAudioDuration: audioDuration
+        )
         let finalTranscription: String
         do {
             finalTranscription = try await waitForResultStream(

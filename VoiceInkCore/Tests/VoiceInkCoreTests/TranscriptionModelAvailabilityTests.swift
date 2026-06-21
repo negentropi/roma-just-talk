@@ -51,14 +51,40 @@ final class TranscriptionModelAvailabilityTests: XCTestCase {
         XCTAssertFalse(VoiceInkTranscriptionModelAvailabilityFacts(requirement: .unavailable).isUsable)
     }
 
-    func testNativeAppleAvailabilityPresentationPreservesMacOSCopy() {
+    func testNativeAppleTranscriptionPolicyPreservesMacOSErrorCopy() {
         XCTAssertEqual(
-            VoiceInkNativeAppleTranscriptionAvailabilityPresentation.unsupportedSpeechAnalyzerErrorDescription,
+            VoiceInkNativeAppleTranscriptionPolicy.errorDescription(for: .unsupportedOS),
             "SpeechAnalyzer requires macOS 26 or later."
         )
         XCTAssertEqual(
-            VoiceInkNativeAppleTranscriptionAvailabilityPresentation.requiresMacOS26Title(modelDisplayName: "Apple Speech"),
+            VoiceInkNativeAppleTranscriptionPolicy.errorDescription(for: .transcriptionFailed),
+            "Transcription failed using SpeechAnalyzer."
+        )
+        XCTAssertEqual(
+            VoiceInkNativeAppleTranscriptionPolicy.errorDescription(for: .localeNotSupported),
+            "The selected language is not supported by SpeechAnalyzer."
+        )
+        XCTAssertEqual(
+            VoiceInkNativeAppleTranscriptionPolicy.errorDescription(for: .invalidModel),
+            "Invalid model type provided for Native Apple transcription."
+        )
+        XCTAssertEqual(
+            VoiceInkNativeAppleTranscriptionPolicy.errorDescription(for: .assetDownloadRequired(displayName: "English")),
+            "Download required for English."
+        )
+        XCTAssertEqual(
+            VoiceInkNativeAppleTranscriptionPolicy.errorDescription(for: .resultStreamTimedOut),
+            "Apple Speech did not finish returning transcription results."
+        )
+    }
+
+    func testNativeAppleTranscriptionPolicyPreservesSelectionAndTimeoutCopy() {
+        XCTAssertEqual(
+            VoiceInkNativeAppleTranscriptionPolicy.requiresMacOS26Title(modelDisplayName: "Apple Speech"),
             "Apple Speech requires macOS 26 or later"
         )
+        XCTAssertEqual(VoiceInkNativeAppleTranscriptionPolicy.resultStreamTimeout(forAudioDuration: 0), 20.0)
+        XCTAssertEqual(VoiceInkNativeAppleTranscriptionPolicy.resultStreamTimeout(forAudioDuration: 2.0), 20.0)
+        XCTAssertEqual(VoiceInkNativeAppleTranscriptionPolicy.resultStreamTimeout(forAudioDuration: 5.0), 30.0)
     }
 }

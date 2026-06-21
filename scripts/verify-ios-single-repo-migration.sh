@@ -9286,6 +9286,22 @@ require_pattern \
   iOS/VoiceInk-ios/LibWhisper.swift
 
 require_pattern \
+  "iOS local Whisper service logging uses shared app identity subsystem" \
+  'subsystem: VoiceInkAppIdentity\.loggingSubsystem' \
+  iOS/VoiceInk-ios/WhisperTranscriptionService.swift
+
+require_pattern \
+  "iOS local model manager logging uses shared app identity subsystem" \
+  'subsystem: VoiceInkAppIdentity\.loggingSubsystem' \
+  iOS/VoiceInk-ios/LocalModelManager.swift
+
+reject_pattern \
+  "iOS local Whisper shell avoids clone print diagnostics" \
+  'print\(' \
+  iOS/VoiceInk-ios/WhisperTranscriptionService.swift \
+  iOS/VoiceInk-ios/LocalModelManager.swift
+
+require_pattern \
   "migration checklist tracks shared diagnostic log export policy" \
   'diagnostic log session storage/range/header/filename policy.*VoiceInkDiagnosticLogExportPolicy' \
   docs/ios-single-repo-migration.md

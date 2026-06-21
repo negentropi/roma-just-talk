@@ -6,9 +6,14 @@
 //
 
 import Foundation
+import os
 import VoiceInkCore
 
 struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
+    private let logger = Logger(
+        subsystem: VoiceInkAppIdentity.loggingSubsystem,
+        category: "WhisperTranscriptionService"
+    )
     private let failurePlatform = VoiceInkLocalWhisperPlatform.iOS
     
     /// Transcribe audio file using local Whisper model
@@ -20,7 +25,7 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
         prompt: String? = nil,
         customVocabulary: [String] = []
     ) async throws -> String {
-        print("WhisperTranscriptionService: Starting local transcription")
+        logger.notice("Starting local transcription.")
         let failurePlatform = self.failurePlatform
 
         let transcription = try await VoiceInkLocalWhisperTranscriptionFlow.transcribe(
@@ -40,7 +45,7 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
                         )
                     }
 
-                    print("WhisperTranscriptionService: Using model at \(modelPath)")
+                    logger.notice("Using model at \(modelPath, privacy: .public)")
 
                     do {
                         return VoiceInkLocalWhisperContextPlan(
@@ -48,7 +53,7 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
                             shouldReleaseContext: true
                         )
                     } catch {
-                        print("WhisperTranscriptionService: Failed to load model: \(error)")
+                        logger.error("Failed to load model: \(error.localizedDescription, privacy: .public)")
                         throw VoiceInkLocalWhisperFailurePolicy.error(
                             for: .modelLoadFailed,
                             platform: failurePlatform
@@ -58,13 +63,13 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
                 readAudioSamples: { audioURL in
                     do {
                         guard let samples = try VoiceInkWhisperAudioSamples.floatSamples(fromWAVFileAt: audioURL) else {
-                            print("WhisperTranscriptionService: Audio processing failed")
+                            logger.error("Audio processing failed.")
                             return nil
                         }
-                        print("WhisperTranscriptionService: Processed \(samples.count) audio samples")
+                        logger.notice("Processed \(samples.count, privacy: .public) audio samples.")
                         return samples
                     } catch {
-                        print("WhisperTranscriptionService: Audio processing failed: \(error)")
+                        logger.error("Audio processing failed: \(error.localizedDescription, privacy: .public)")
                         throw error
                     }
                 },
@@ -75,7 +80,7 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
                         prompt: prompt
                     )
                     if !success {
-                        print("WhisperTranscriptionService: Transcription failed")
+                        logger.error("Transcription failed.")
                     }
                     return success
                 },
@@ -84,12 +89,12 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
                 },
                 releaseContext: { context in
                     await context.releaseResources()
-                    print("WhisperTranscriptionService: Whisper context resources released.")
+                    logger.notice("Whisper context resources released.")
                 }
             )
         )
 
-        print("WhisperTranscriptionService: Transcription completed successfully")
+        logger.notice("Transcription completed successfully.")
         return transcription
     }
     

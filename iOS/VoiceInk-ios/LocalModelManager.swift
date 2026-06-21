@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import os
 import VoiceInkCore
 
 @MainActor
@@ -16,6 +17,10 @@ class LocalModelManager: ObservableObject {
     
     private var downloadTasks: [String: URLSessionDownloadTask] = [:]
     private var progressObservations: [String: NSKeyValueObservation] = [:]
+    private let logger = Logger(
+        subsystem: VoiceInkAppIdentity.loggingSubsystem,
+        category: "LocalModelManager"
+    )
     
     static let shared = LocalModelManager()
     
@@ -30,11 +35,11 @@ class LocalModelManager: ObservableObject {
     /// Download a specific model
     func downloadModel(_ model: VoiceInkWhisperModelFileSpec) async {
         guard startDownloadTracking(for: model) else {
-            print("LocalModelManager: Model \(model.modelName) is already being downloaded")
+            logger.notice("Model \(model.modelName, privacy: .public) is already being downloaded.")
             return
         }
         
-        print("LocalModelManager: Starting download of \(model.modelName) from \(model.downloadURL.absoluteString)")
+        logger.notice("Starting download of \(model.modelName, privacy: .public) from \(model.downloadURL.absoluteString, privacy: .public).")
         
         downloadError = nil
         
@@ -83,7 +88,7 @@ class LocalModelManager: ObservableObject {
 
         case .presentFailure(let alert):
             downloadError = alert
-            print("LocalModelManager: Download failed for \(model.modelName): \(alert.message)")
+            logger.error("Download failed for \(model.modelName, privacy: .public): \(alert.message, privacy: .public)")
         }
     }
 
@@ -98,12 +103,12 @@ class LocalModelManager: ObservableObject {
                 in: Self.modelsDirectory
             )
             
-            print("LocalModelManager: Successfully downloaded \(model.modelName) to \(finalURL.path)")
+            logger.notice("Successfully downloaded \(model.modelName, privacy: .public) to \(finalURL.path, privacy: .public).")
             updateDownloadProgress(1.0, for: model)
             
         } catch {
             downloadError = .saveFailed(for: error)
-            print("LocalModelManager: Failed to save \(model.modelName): \(error)")
+            logger.error("Failed to save \(model.modelName, privacy: .public): \(error.localizedDescription, privacy: .public)")
         }
     }
     
@@ -118,20 +123,20 @@ class LocalModelManager: ObservableObject {
     /// Delete a downloaded model
     func deleteModel(_ model: VoiceInkWhisperModelFileSpec) throws {
         guard model.isDownloaded(in: Self.modelsDirectory) else {
-            print("LocalModelManager: Model \(model.modelName) is not downloaded")
+            logger.notice("Model \(model.modelName, privacy: .public) is not downloaded.")
             return 
         }
         
         do {
             try model.deleteDownloadedFiles(in: Self.modelsDirectory)
-            print("LocalModelManager: Successfully deleted model \(model.modelName)")
+            logger.notice("Successfully deleted model \(model.modelName, privacy: .public).")
             
             // Trigger UI update
             DispatchQueue.main.async {
                 self.objectWillChange.send()
             }
         } catch {
-            print("LocalModelManager: Failed to delete model \(model.modelName): \(error)")
+            logger.error("Failed to delete model \(model.modelName, privacy: .public): \(error.localizedDescription, privacy: .public)")
             throw error
         }
     }

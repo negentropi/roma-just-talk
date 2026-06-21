@@ -1563,13 +1563,28 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
 
 require_pattern \
+  "shared provider API-key state mutation plans live in VoiceInkCore" \
+  'VoiceInkProviderAPIKeyStorageMutationPlan|VoiceInkProviderAPIKeyVerificationMutationPlan|applyStoredAPIKey|applyVerification|verificationFlagToPersist|shouldPersistVerificationFlag' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
+
+require_pattern \
   "iOS app settings loads provider API-key state through shared loader" \
   'VoiceInkProviderAPIKeyState\.loadingStoredKeys' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+require_pattern \
+  "iOS app settings applies shared provider API-key mutation plans" \
+  'applyStoredAPIKey|applyVerification|shouldPersistStoredKey|verificationFlagToPersist|shouldPersistVerificationFlag' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \
   "iOS app settings avoids shell-owned provider API-key state loading loop" \
   'uniqueKeysWithValues|userAPIKeyProviders\.map|storedKeysByProvider:' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+reject_pattern \
+  "iOS app settings avoids shell-owned provider API-key mutation decisions" \
+  'didResetVerification|setStoredAPIKey|guard +updatedState\.setVerified|provider\.requiresUserAPIKey else' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \

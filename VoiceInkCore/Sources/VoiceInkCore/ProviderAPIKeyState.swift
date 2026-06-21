@@ -11,6 +11,27 @@ public struct VoiceInkProviderAPIKeyListRowPresentation: Equatable, Sendable {
     public let tone: VoiceInkProviderAPIKeyListRowTone
 }
 
+public struct VoiceInkProviderAPIKeyStorageMutationPlan: Equatable, Sendable {
+    public let shouldPersistStoredKey: Bool
+    public let verificationFlagToPersist: Bool?
+
+    public init(
+        shouldPersistStoredKey: Bool,
+        verificationFlagToPersist: Bool?
+    ) {
+        self.shouldPersistStoredKey = shouldPersistStoredKey
+        self.verificationFlagToPersist = verificationFlagToPersist
+    }
+}
+
+public struct VoiceInkProviderAPIKeyVerificationMutationPlan: Equatable, Sendable {
+    public let shouldPersistVerificationFlag: Bool
+
+    public init(shouldPersistVerificationFlag: Bool) {
+        self.shouldPersistVerificationFlag = shouldPersistVerificationFlag
+    }
+}
+
 public struct VoiceInkProviderAPIKeyState: Equatable, Sendable {
     private var storedKeysByProvider: [VoiceInkProviderKind: String]
     private var verifiedProviders: Set<VoiceInkProviderKind>
@@ -95,33 +116,40 @@ public struct VoiceInkProviderAPIKeyState: Equatable, Sendable {
         )
     }
 
-    @discardableResult
-    public mutating func setStoredAPIKey(
+    public mutating func applyStoredAPIKey(
         _ key: String,
         for provider: VoiceInkProviderKind
-    ) -> Bool {
+    ) -> VoiceInkProviderAPIKeyStorageMutationPlan {
         guard provider.requiresUserAPIKey else {
-            return false
+            return VoiceInkProviderAPIKeyStorageMutationPlan(
+                shouldPersistStoredKey: false,
+                verificationFlagToPersist: nil
+            )
         }
 
         let oldKey = storedKeysByProvider[provider] ?? ""
         storedKeysByProvider[provider] = key
 
         guard oldKey != key else {
-            return false
+            return VoiceInkProviderAPIKeyStorageMutationPlan(
+                shouldPersistStoredKey: true,
+                verificationFlagToPersist: nil
+            )
         }
 
         verifiedProviders.remove(provider)
-        return true
+        return VoiceInkProviderAPIKeyStorageMutationPlan(
+            shouldPersistStoredKey: true,
+            verificationFlagToPersist: false
+        )
     }
 
-    @discardableResult
-    public mutating func setVerified(
+    public mutating func applyVerification(
         _ verified: Bool,
         for provider: VoiceInkProviderKind
-    ) -> Bool {
+    ) -> VoiceInkProviderAPIKeyVerificationMutationPlan {
         guard provider.requiresUserAPIKey else {
-            return false
+            return VoiceInkProviderAPIKeyVerificationMutationPlan(shouldPersistVerificationFlag: false)
         }
 
         if verified {
@@ -129,6 +157,6 @@ public struct VoiceInkProviderAPIKeyState: Equatable, Sendable {
         } else {
             verifiedProviders.remove(provider)
         }
-        return true
+        return VoiceInkProviderAPIKeyVerificationMutationPlan(shouldPersistVerificationFlag: true)
     }
 }

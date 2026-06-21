@@ -313,19 +313,56 @@ final class ProviderAccessRequirementTests: XCTestCase {
             verifiedProviders: [.groq]
         )
 
-        XCTAssertFalse(state.setStoredAPIKey("old-key", for: .groq))
+        XCTAssertEqual(
+            state.applyStoredAPIKey("old-key", for: .groq),
+            VoiceInkProviderAPIKeyStorageMutationPlan(
+                shouldPersistStoredKey: true,
+                verificationFlagToPersist: nil
+            )
+        )
         XCTAssertTrue(state.isReady(for: .groq, localWhisperModelAvailable: false))
 
-        XCTAssertTrue(state.setStoredAPIKey("new-key", for: .groq))
+        XCTAssertEqual(
+            state.applyStoredAPIKey("new-key", for: .groq),
+            VoiceInkProviderAPIKeyStorageMutationPlan(
+                shouldPersistStoredKey: true,
+                verificationFlagToPersist: false
+            )
+        )
         XCTAssertEqual(state.storedAPIKey(for: .groq), "new-key")
+        XCTAssertFalse(state.isReady(for: .groq, localWhisperModelAvailable: false))
+    }
+
+    func testProviderAPIKeyStateVerificationMutationPlanOwnsPersistenceDecision() {
+        var state = VoiceInkProviderAPIKeyState(storedKeysByProvider: [.groq: "groq-key"])
+
+        XCTAssertEqual(
+            state.applyVerification(true, for: .groq),
+            VoiceInkProviderAPIKeyVerificationMutationPlan(shouldPersistVerificationFlag: true)
+        )
+        XCTAssertTrue(state.isReady(for: .groq, localWhisperModelAvailable: false))
+
+        XCTAssertEqual(
+            state.applyVerification(false, for: .groq),
+            VoiceInkProviderAPIKeyVerificationMutationPlan(shouldPersistVerificationFlag: true)
+        )
         XCTAssertFalse(state.isReady(for: .groq, localWhisperModelAvailable: false))
     }
 
     func testProviderAPIKeyStateVerificationIgnoresNonUserKeyProviders() {
         var state = VoiceInkProviderAPIKeyState()
 
-        XCTAssertFalse(state.setVerified(true, for: .localWhisper))
-        XCTAssertFalse(state.setStoredAPIKey("ignored", for: .voiceInk))
+        XCTAssertEqual(
+            state.applyVerification(true, for: .localWhisper),
+            VoiceInkProviderAPIKeyVerificationMutationPlan(shouldPersistVerificationFlag: false)
+        )
+        XCTAssertEqual(
+            state.applyStoredAPIKey("ignored", for: .voiceInk),
+            VoiceInkProviderAPIKeyStorageMutationPlan(
+                shouldPersistStoredKey: false,
+                verificationFlagToPersist: nil
+            )
+        )
         XCTAssertEqual(state.storedAPIKey(for: .voiceInk), "")
     }
 

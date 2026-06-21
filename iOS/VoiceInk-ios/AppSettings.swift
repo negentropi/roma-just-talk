@@ -102,17 +102,14 @@ final class AppSettings: ObservableObject {
     }
 
     func setAPIKey(_ key: String, for provider: VoiceInkProviderKind) {
-        guard provider.requiresUserAPIKey else {
-            return
-        }
-
         var updatedState = apiKeyState
-        let didResetVerification = updatedState.setStoredAPIKey(key, for: provider)
+        let plan = updatedState.applyStoredAPIKey(key, for: provider)
+        guard plan.shouldPersistStoredKey else { return }
+
         apiKeyState = updatedState
         saveAPIKey(key, for: provider)
-
-        if didResetVerification {
-            VoiceInkProviderAPIKeyVerificationState.setVerified(false, for: provider)
+        if let verificationFlag = plan.verificationFlagToPersist {
+            VoiceInkProviderAPIKeyVerificationState.setVerified(verificationFlag, for: provider)
         }
     }
     
@@ -139,9 +136,8 @@ final class AppSettings: ObservableObject {
     
     func setKeyVerified(_ verified: Bool, for provider: VoiceInkProviderKind) {
         var updatedState = apiKeyState
-        guard updatedState.setVerified(verified, for: provider) else {
-            return
-        }
+        let plan = updatedState.applyVerification(verified, for: provider)
+        guard plan.shouldPersistVerificationFlag else { return }
 
         apiKeyState = updatedState
         VoiceInkProviderAPIKeyVerificationState.setVerified(verified, for: provider)

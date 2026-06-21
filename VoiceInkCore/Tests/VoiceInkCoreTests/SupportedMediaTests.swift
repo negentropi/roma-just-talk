@@ -112,6 +112,90 @@ final class SupportedMediaTests: XCTestCase {
         )
     }
 
+    func testAudioFileQueuePolicyKeepsOnlyExistingSupportedNonActivePaths() {
+        let activeURL = URL(fileURLWithPath: "/tmp/active.wav")
+        let completedURL = URL(fileURLWithPath: "/tmp/completed.wav")
+        let failedURL = URL(fileURLWithPath: "/tmp/failed.wav")
+        let processingURL = URL(fileURLWithPath: "/tmp/processing.wav")
+        let unsupportedURL = URL(fileURLWithPath: "/tmp/notes.txt")
+        let missingURL = URL(fileURLWithPath: "/tmp/missing.m4a")
+        let freshURL = URL(fileURLWithPath: "/tmp/fresh.MOV")
+
+        let existingItems = [
+            VoiceInkAudioFileQueueItemFacts(
+                id: UUID(uuidString: "00000000-0000-0000-0000-000000000001")!,
+                standardizedPath: activeURL.standardizedFileURL.path,
+                status: .pending
+            ),
+            VoiceInkAudioFileQueueItemFacts(
+                id: UUID(uuidString: "00000000-0000-0000-0000-000000000002")!,
+                standardizedPath: completedURL.standardizedFileURL.path,
+                status: .completed
+            ),
+            VoiceInkAudioFileQueueItemFacts(
+                id: UUID(uuidString: "00000000-0000-0000-0000-000000000003")!,
+                standardizedPath: failedURL.standardizedFileURL.path,
+                status: .failed(message: "No model")
+            ),
+            VoiceInkAudioFileQueueItemFacts(
+                id: UUID(uuidString: "00000000-0000-0000-0000-000000000004")!,
+                standardizedPath: processingURL.standardizedFileURL.path,
+                status: .processing(phase: .transcribing)
+            )
+        ]
+
+        let additions = VoiceInkAudioFileQueuePolicy.eligibleAdditionURLs(
+            from: [
+                VoiceInkAudioFileQueueCandidate(url: activeURL, fileExists: true, isSupported: true),
+                VoiceInkAudioFileQueueCandidate(url: completedURL, fileExists: true, isSupported: true),
+                VoiceInkAudioFileQueueCandidate(url: failedURL, fileExists: true, isSupported: true),
+                VoiceInkAudioFileQueueCandidate(url: processingURL, fileExists: true, isSupported: true),
+                VoiceInkAudioFileQueueCandidate(url: unsupportedURL, fileExists: true, isSupported: false),
+                VoiceInkAudioFileQueueCandidate(url: missingURL, fileExists: false, isSupported: true),
+                VoiceInkAudioFileQueueCandidate(url: freshURL, fileExists: true, isSupported: true)
+            ],
+            existingItems: existingItems
+        )
+
+        XCTAssertEqual(additions, [completedURL, failedURL, freshURL])
+    }
+
+    func testAudioFileQueuePolicyPreservesMutationDecisions() {
+        let pendingId = UUID(uuidString: "00000000-0000-0000-0000-000000000011")!
+        let processingId = UUID(uuidString: "00000000-0000-0000-0000-000000000012")!
+        let failedId = UUID(uuidString: "00000000-0000-0000-0000-000000000013")!
+        let missingId = UUID(uuidString: "00000000-0000-0000-0000-000000000014")!
+        let items = [
+            VoiceInkAudioFileQueueItemFacts(
+                id: processingId,
+                standardizedPath: "/tmp/processing.wav",
+                status: .processing(phase: .loading)
+            ),
+            VoiceInkAudioFileQueueItemFacts(
+                id: pendingId,
+                standardizedPath: "/tmp/pending.wav",
+                status: .pending
+            ),
+            VoiceInkAudioFileQueueItemFacts(
+                id: failedId,
+                standardizedPath: "/tmp/failed.wav",
+                status: .failed(message: "No model")
+            )
+        ]
+
+        XCTAssertTrue(VoiceInkAudioFileQueuePolicy.canRemoveItem(id: pendingId, from: items))
+        XCTAssertFalse(VoiceInkAudioFileQueuePolicy.canRemoveItem(id: failedId, from: items))
+        XCTAssertFalse(VoiceInkAudioFileQueuePolicy.canRemoveItem(id: missingId, from: items))
+        XCTAssertEqual(VoiceInkAudioFileQueuePolicy.statusAfterRetryRequest(.failed(message: "No model")), .pending)
+        XCTAssertNil(VoiceInkAudioFileQueuePolicy.statusAfterRetryRequest(.completed))
+        XCTAssertEqual(VoiceInkAudioFileQueuePolicy.nextPendingItemID(in: items), pendingId)
+        XCTAssertTrue(VoiceInkAudioFileQueuePolicy.hasPendingItems(in: items))
+        XCTAssertEqual(
+            VoiceInkAudioFileQueuePolicy.statusesAfterCancelingProcessing(items.map(\.status)),
+            [.pending, .pending, .failed(message: "No model")]
+        )
+    }
+
     func testAudioFileQueuePresentationPreservesRowCopyAndIcons() {
         XCTAssertEqual(VoiceInkAudioFileQueuePresentation.pendingStatusSystemImageName, "clock")
         XCTAssertEqual(VoiceInkAudioFileQueuePresentation.pendingStatusText, "Waiting")

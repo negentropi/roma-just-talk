@@ -102,6 +102,78 @@ public enum VoiceInkAudioFileQueueStatus: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkAudioFileQueueCandidate: Equatable, Sendable {
+    public let url: URL
+    public let fileExists: Bool
+    public let isSupported: Bool
+
+    public init(url: URL, fileExists: Bool, isSupported: Bool) {
+        self.url = url
+        self.fileExists = fileExists
+        self.isSupported = isSupported
+    }
+
+    var standardizedPath: String {
+        url.standardizedFileURL.path
+    }
+}
+
+public struct VoiceInkAudioFileQueueItemFacts<ID: Hashable & Sendable>: Equatable, Sendable {
+    public let id: ID
+    public let standardizedPath: String
+    public let status: VoiceInkAudioFileQueueStatus
+
+    public init(id: ID, standardizedPath: String, status: VoiceInkAudioFileQueueStatus) {
+        self.id = id
+        self.standardizedPath = standardizedPath
+        self.status = status
+    }
+}
+
+public enum VoiceInkAudioFileQueuePolicy {
+    public static func eligibleAdditionURLs<ID: Hashable & Sendable>(
+        from candidates: [VoiceInkAudioFileQueueCandidate],
+        existingItems: [VoiceInkAudioFileQueueItemFacts<ID>]
+    ) -> [URL] {
+        let activePaths = Set(existingItems.filter { !$0.status.isTerminal }.map(\.standardizedPath))
+
+        return candidates.compactMap { candidate in
+            guard candidate.fileExists, candidate.isSupported else { return nil }
+            guard !activePaths.contains(candidate.standardizedPath) else { return nil }
+            return candidate.url
+        }
+    }
+
+    public static func canRemoveItem<ID: Hashable & Sendable>(
+        id: ID,
+        from items: [VoiceInkAudioFileQueueItemFacts<ID>]
+    ) -> Bool {
+        items.first { $0.id == id }?.status.canRemoveFromQueue == true
+    }
+
+    public static func statusAfterRetryRequest(_ status: VoiceInkAudioFileQueueStatus) -> VoiceInkAudioFileQueueStatus? {
+        status.canRetry ? .pending : nil
+    }
+
+    public static func nextPendingItemID<ID: Hashable & Sendable>(
+        in items: [VoiceInkAudioFileQueueItemFacts<ID>]
+    ) -> ID? {
+        items.first { $0.status.isPending }?.id
+    }
+
+    public static func hasPendingItems<ID: Hashable & Sendable>(
+        in items: [VoiceInkAudioFileQueueItemFacts<ID>]
+    ) -> Bool {
+        nextPendingItemID(in: items) != nil
+    }
+
+    public static func statusesAfterCancelingProcessing(
+        _ statuses: [VoiceInkAudioFileQueueStatus]
+    ) -> [VoiceInkAudioFileQueueStatus] {
+        statuses.map(\.statusAfterCancelingProcessing)
+    }
+}
+
 public enum VoiceInkAudioImportPresentation {
     public static let dropTargetSystemImageName = "arrow.down.doc"
     public static let dropTargetTitle = "Drop audio or video files here"

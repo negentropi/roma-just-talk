@@ -28,16 +28,15 @@ class AudioTranscriptionManager: ObservableObject {
 
     /// Add one or more audio file URLs to the queue. Invalid files are silently skipped.
     func addToQueue(urls: [URL]) {
-        for url in urls {
-            guard FileManager.default.fileExists(atPath: url.path) else { continue }
-            guard VoiceInkSupportedMedia.isSupported(url: url) else { continue }
+        let candidates = urls.map {
+            VoiceInkAudioFileQueueCandidate(
+                url: $0,
+                fileExists: FileManager.default.fileExists(atPath: $0.path),
+                isSupported: VoiceInkSupportedMedia.isSupported(url: $0)
+            )
+        }
 
-            // Avoid adding the same file path twice if it's already pending/processing
-            let path = url.standardizedFileURL.path
-            if queue.contains(where: { $0.url.standardizedFileURL.path == path && !$0.status.isTerminal }) {
-                continue
-            }
-
+        for url in VoiceInkAudioFileQueuePolicy.eligibleAdditionURLs(from: candidates, existingItems: queueFacts) {
             let item = AudioFileQueueItem(url: url)
             queue.append(item)
         }
@@ -45,12 +44,8 @@ class AudioTranscriptionManager: ObservableObject {
 
     /// Remove a pending item from the queue.
     func removeFromQueue(id: UUID) {
+        guard VoiceInkAudioFileQueuePolicy.canRemoveItem(id: id, from: queueFacts) else { return }
         guard let index = queue.firstIndex(where: { $0.id == id }) else { return }
-        let item = queue[index]
-
-        // Only allow removing pending items
-        guard item.status.canRemoveFromQueue else { return }
-
         queue.remove(at: index)
     }
 
@@ -64,9 +59,9 @@ class AudioTranscriptionManager: ObservableObject {
     /// Retry a failed item by resetting it to pending and re-enqueuing.
     func retryItem(id: UUID) {
         guard let item = queue.first(where: { $0.id == id }),
-              item.status.canRetry else { return }
+              let retryStatus = VoiceInkAudioFileQueuePolicy.statusAfterRetryRequest(item.status) else { return }
 
-        item.status = .pending
+        item.status = retryStatus
     }
 
     /// Start processing pending items in the queue sequentially.
@@ -95,20 +90,31 @@ class AudioTranscriptionManager: ObservableObject {
         processingTask = nil
         isProcessingQueue = false
 
-        // Reset any in-progress items back to pending
-        for item in queue {
-            item.status = item.status.statusAfterCancelingProcessing
+        let statuses = VoiceInkAudioFileQueuePolicy.statusesAfterCancelingProcessing(queue.map(\.status))
+        for (item, status) in zip(queue, statuses) {
+            item.status = status
         }
     }
 
     var hasPendingItems: Bool {
-        queue.contains { $0.status.isPending }
+        VoiceInkAudioFileQueuePolicy.hasPendingItems(in: queueFacts)
     }
 
     // MARK: - Private
 
+    private var queueFacts: [VoiceInkAudioFileQueueItemFacts<UUID>] {
+        queue.map {
+            VoiceInkAudioFileQueueItemFacts(
+                id: $0.id,
+                standardizedPath: $0.url.standardizedFileURL.path,
+                status: $0.status
+            )
+        }
+    }
+
     private func nextPendingItem() -> AudioFileQueueItem? {
-        queue.first { $0.status.isPending }
+        guard let id = VoiceInkAudioFileQueuePolicy.nextPendingItemID(in: queueFacts) else { return nil }
+        return queue.first { $0.id == id }
     }
 
     private func processItem(_ item: AudioFileQueueItem, modelContext: ModelContext, engine: VoiceInkEngine) async {

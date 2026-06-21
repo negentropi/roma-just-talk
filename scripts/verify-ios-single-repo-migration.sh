@@ -1314,12 +1314,12 @@ require_pattern \
 
 require_pattern \
   "shared audio-file queue status and presentation live in VoiceInkCore" \
-  'VoiceInkAudioFileQueue(Status|ProcessingPhase|Presentation)|VoiceInkAudioImportPresentation' \
+  'VoiceInkAudioFileQueue(Status|ProcessingPhase|Policy|Presentation)|VoiceInkAudioImportPresentation' \
   VoiceInkCore/Sources/VoiceInkCore/SupportedMedia.swift
 
 require_pattern \
-  "shared audio-file queue status owns mutation predicates" \
-  'canRemoveFromQueue|canRetry|statusAfterCancelingProcessing|isPending|isProcessing' \
+  "shared audio-file queue policy owns mutation decisions" \
+  'VoiceInkAudioFileQueuePolicy|eligibleAdditionURLs|canRemoveItem|statusAfterRetryRequest|nextPendingItemID|hasPendingItems|statusesAfterCancelingProcessing' \
   VoiceInkCore/Sources/VoiceInkCore/SupportedMedia.swift
 
 require_pattern \
@@ -1343,8 +1343,8 @@ require_pattern \
   VoiceInk/Models/AudioFileQueueItem.swift
 
 require_pattern \
-  "macOS audio queue manager uses shared queue status predicates" \
-  'status\.(canRemoveFromQueue|canRetry|statusAfterCancelingProcessing|isPending)' \
+  "macOS audio queue manager delegates queue mutation policy" \
+  'VoiceInkAudioFileQueuePolicy\.(eligibleAdditionURLs|canRemoveItem|statusAfterRetryRequest|nextPendingItemID|hasPendingItems|statusesAfterCancelingProcessing)' \
   VoiceInk/Services/AudioFileTranscriptionManager.swift
 
 require_pattern \
@@ -1359,7 +1359,7 @@ require_pattern \
 
 require_pattern \
   "core tests pin audio-file queue status and presentation" \
-  'testAudioImportPresentationPreservesMacOSQueueCopyAndActions|testAudioFileQueueStatusPreservesTerminalAndProcessingPolicies|testAudioFileQueueStatusPreservesMutationPredicates|testAudioFileQueueStatusCancelingProcessingResetsOnlyProcessingItems|testAudioFileQueuePresentationPreservesRowCopyAndIcons' \
+  'testAudioImportPresentationPreservesMacOSQueueCopyAndActions|testAudioFileQueueStatusPreservesTerminalAndProcessingPolicies|testAudioFileQueueStatusPreservesMutationPredicates|testAudioFileQueueStatusCancelingProcessingResetsOnlyProcessingItems|testAudioFileQueuePolicyKeepsOnlyExistingSupportedNonActivePaths|testAudioFileQueuePolicyPreservesMutationDecisions|testAudioFileQueuePresentationPreservesRowCopyAndIcons' \
   VoiceInkCore/Tests/VoiceInkCoreTests/SupportedMediaTests.swift
 
 require_pattern \
@@ -1369,7 +1369,7 @@ require_pattern \
 
 require_pattern \
   "core check runner executes audio-file queue status and presentation tests" \
-  'testAudioImportPresentationPreservesMacOSQueueCopyAndActions|testAudioFileQueueStatusPreservesTerminalAndProcessingPolicies|testAudioFileQueueStatusPreservesMutationPredicates|testAudioFileQueueStatusCancelingProcessingResetsOnlyProcessingItems|testAudioFileQueuePresentationPreservesRowCopyAndIcons' \
+  'testAudioImportPresentationPreservesMacOSQueueCopyAndActions|testAudioFileQueueStatusPreservesTerminalAndProcessingPolicies|testAudioFileQueueStatusPreservesMutationPredicates|testAudioFileQueueStatusCancelingProcessingResetsOnlyProcessingItems|testAudioFileQueuePolicyKeepsOnlyExistingSupportedNonActivePaths|testAudioFileQueuePolicyPreservesMutationDecisions|testAudioFileQueuePresentationPreservesRowCopyAndIcons' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \

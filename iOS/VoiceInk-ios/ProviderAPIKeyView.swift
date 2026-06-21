@@ -17,20 +17,8 @@ struct ProviderAPIKeyView: View {
         )
     }
 
-    private var hasEnteredAPIKey: Bool {
-        apiKeyDraft.hasEnteredKey
-    }
-
-    private var canVerifyAPIKey: Bool {
-        apiKeyDraft.canVerify
-    }
-
-    private var formPresentation: VoiceInkProviderAPIKeyFormPresentation {
-        provider.apiKeyFormPresentation
-    }
-
     var body: some View {
-        let presentation = formPresentation
+        let presentation = provider.apiKeyFormPresentation
 
         Form {
             Section(header: Text(presentation.apiKeySectionTitle)) {
@@ -45,7 +33,7 @@ struct ProviderAPIKeyView: View {
                                 systemImage: presentation.saveButtonSystemImageName
                             )
                         }
-                        .disabled(!hasEnteredAPIKey)
+                        .disabled(!apiKeyDraft.hasEnteredKey)
                         Spacer()
                         if apiKeyFormState.verificationProgress.isVerifying {
                             ProgressView().progressViewStyle(.circular)
@@ -56,7 +44,7 @@ struct ProviderAPIKeyView: View {
                                     systemImage: presentation.verifyButtonSystemImageName
                                 )
                             }
-                            .disabled(!canVerifyAPIKey)
+                            .disabled(!apiKeyDraft.canVerify)
                         }
                     }
                 } else {

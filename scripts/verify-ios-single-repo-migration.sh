@@ -1735,6 +1735,11 @@ reject_pattern \
   'private func +verifiedAPIKey\(' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
+reject_pattern \
+  "iOS API-key view avoids shallow shared-form pass-through properties" \
+  'private var +(hasEnteredAPIKey|canVerifyAPIKey|formPresentation)\b' \
+  iOS/VoiceInk-ios/ProviderAPIKeyView.swift
+
 require_pattern \
   "shared provider API-key verification progress presentation lives in VoiceInkCore" \
   'VoiceInkProviderAPIKeyVerificationProgress|macOSVerifyButtonTitle|iOSResultFeedback|effectiveSystemImageName' \

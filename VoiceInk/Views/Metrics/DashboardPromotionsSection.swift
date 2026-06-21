@@ -9,7 +9,7 @@ struct DashboardPromotionsSection: View {
 
     private var promotionCards: [VoiceInkDashboardPromotionCardPresentation] {
         VoiceInkDashboardPromotionPresentation.cards(
-            for: licenseState.dashboardPromotionLicenseState,
+            for: licenseState,
             isAffiliateDismissed: isAffiliatePromotionDismissed
         )
     }
@@ -99,18 +99,5 @@ private struct DashboardPromotionCard: View {
             }
         }
         .background(CardBackground(isSelected: false, cornerRadius: 22))
-    }
-}
-
-private extension LicenseViewModel.LicenseState {
-    var dashboardPromotionLicenseState: VoiceInkDashboardPromotionLicenseState {
-        switch self {
-        case .trial(let daysRemaining):
-            return .trial(daysRemaining: daysRemaining)
-        case .trialExpired:
-            return .trialExpired
-        case .licensed:
-            return .licensed
-        }
     }
 }

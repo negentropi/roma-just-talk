@@ -268,12 +268,6 @@ public enum VoiceInkNoteListPresentation {
     public static let startRecordingSystemImageName = "mic.fill"
 }
 
-public enum VoiceInkDashboardPromotionLicenseState: Equatable, Sendable {
-    case trial(daysRemaining: Int)
-    case trialExpired
-    case licensed
-}
-
 public enum VoiceInkDashboardPromotionKind: String, Equatable, Hashable, Sendable {
     case upgrade
     case affiliate
@@ -330,7 +324,7 @@ public enum VoiceInkDashboardPromotionPresentation {
     }
 
     public static func cards(
-        for licenseState: VoiceInkDashboardPromotionLicenseState,
+        for licenseState: VoiceInkLicenseState,
         isAffiliateDismissed: Bool
     ) -> [VoiceInkDashboardPromotionCardPresentation] {
         switch licenseState {

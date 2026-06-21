@@ -8177,12 +8177,18 @@ require_pattern \
 
 require_pattern \
   "shared dashboard promotion presentation lives in VoiceInkCore" \
-  'VoiceInkDashboardPromotionPresentation|VoiceInkDashboardPromotionLicenseState|VoiceInkDashboardPromotionCardPresentation|affiliateDismissedKey = "VoiceInkAffiliatePromotionDismissed"|socialShareURLString = "https://tryvoiceink\.com/social-share"|affiliateURLString = "https://tryvoiceink\.com/affiliate"|cards\(' \
+  'VoiceInkDashboardPromotionPresentation|VoiceInkLicenseState|VoiceInkDashboardPromotionCardPresentation|affiliateDismissedKey = "VoiceInkAffiliatePromotionDismissed"|socialShareURLString = "https://tryvoiceink\.com/social-share"|affiliateURLString = "https://tryvoiceink\.com/affiliate"|cards\(' \
   VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift
 
 require_pattern \
   "macOS dashboard promotions use shared presentation" \
-  'VoiceInkDashboardPromotionPresentation\.(affiliateDismissedKey|defaultIsAffiliateDismissed|cards)|dashboardPromotionLicenseState|VoiceInkDashboardPromotionCardPresentation' \
+  'VoiceInkDashboardPromotionPresentation\.(affiliateDismissedKey|defaultIsAffiliateDismissed|cards)|VoiceInkDashboardPromotionCardPresentation' \
+  VoiceInk/Views/Metrics/DashboardPromotionsSection.swift
+
+reject_pattern \
+  "dashboard promotions avoid duplicate license state adapters" \
+  'VoiceInkDashboardPromotionLicenseState|dashboardPromotionLicenseState' \
+  VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift \
   VoiceInk/Views/Metrics/DashboardPromotionsSection.swift
 
 require_pattern \

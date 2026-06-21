@@ -2336,6 +2336,21 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
 
 require_pattern \
+  "shared custom cloud model import plan exists" \
+  'struct VoiceInkCustomCloudModelImportPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
+
+require_pattern \
+  "shared custom cloud model backup exposes import plan" \
+  'var importPlan: VoiceInkCustomCloudModelImportPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
+
+require_pattern \
+  "shared custom cloud model import plan owns API-key restore decision" \
+  'apiKeyToRestore' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
+
+require_pattern \
   "shared custom cloud model stored record owns persistence shape and legacy API-key migration policy" \
   'struct VoiceInkCustomCloudModelStoredRecord|legacyAPIKeyForKeychainMigration|decodeIfPresent\(String\.self, forKey: \.apiKey\)' \
   VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
@@ -2380,9 +2395,19 @@ require_pattern \
   'VoiceInkCustomCloudModelBackup\(model: \$0\)' \
   VoiceInk/Services/ImportExportService.swift
 
+require_pattern \
+  "macOS custom model import consumes shared import plan" \
+  'let importPlan = self\.importPlan' \
+  VoiceInk/Services/BackupTypes.swift
+
+require_pattern \
+  "macOS custom model import restores API key from shared import plan" \
+  'importPlan\.apiKeyToRestore' \
+  VoiceInk/Services/BackupTypes.swift
+
 reject_pattern \
   "macOS backup types avoid shell-only custom model backup policy" \
-  'struct +CustomModelBackup|apiEndpoint\.trimmingCharacters|modelName\.trimmingCharacters|if let apiKey, !apiKey\.isEmpty' \
+  'struct +CustomModelBackup|apiEndpoint\.trimmingCharacters|modelName\.trimmingCharacters|if let apiKey, !apiKey\.isEmpty|normalizedAPIEndpointForImport|normalizedModelNameForImport|apiKeyForImport' \
   VoiceInk/Services/BackupTypes.swift
 
 require_pattern \

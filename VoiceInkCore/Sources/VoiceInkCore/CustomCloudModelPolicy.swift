@@ -159,6 +159,54 @@ public struct VoiceInkCustomCloudModelBackup: Codable, Equatable, Sendable {
         }
         return apiKey
     }
+
+    public var importPlan: VoiceInkCustomCloudModelImportPlan {
+        VoiceInkCustomCloudModelImportPlan(
+            id: id,
+            name: name,
+            displayName: displayName,
+            description: description,
+            apiEndpoint: normalizedAPIEndpointForImport,
+            modelName: normalizedModelNameForImport,
+            isMultilingualModel: isMultilingualModel,
+            supportedLanguages: supportedLanguages,
+            apiKeyToRestore: apiKeyForImport
+        )
+    }
+}
+
+public struct VoiceInkCustomCloudModelImportPlan: Equatable, Sendable {
+    public let id: UUID
+    public let name: String
+    public let displayName: String
+    public let description: String
+    public let apiEndpoint: String
+    public let modelName: String
+    public let isMultilingualModel: Bool
+    public let supportedLanguages: [String: String]
+    public let apiKeyToRestore: String?
+
+    public init(
+        id: UUID,
+        name: String,
+        displayName: String,
+        description: String,
+        apiEndpoint: String,
+        modelName: String,
+        isMultilingualModel: Bool,
+        supportedLanguages: [String: String],
+        apiKeyToRestore: String?
+    ) {
+        self.id = id
+        self.name = name
+        self.displayName = displayName
+        self.description = description
+        self.apiEndpoint = apiEndpoint
+        self.modelName = modelName
+        self.isMultilingualModel = isMultilingualModel
+        self.supportedLanguages = supportedLanguages
+        self.apiKeyToRestore = apiKeyToRestore
+    }
 }
 
 public struct VoiceInkCustomCloudModelStoredRecord: Codable, Equatable, Sendable {

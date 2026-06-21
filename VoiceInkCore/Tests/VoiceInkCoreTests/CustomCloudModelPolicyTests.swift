@@ -169,6 +169,36 @@ final class CustomCloudModelPolicyTests: XCTestCase {
         XCTAssertEqual(decoded, backup)
     }
 
+    func testBackupRecordBuildsSharedImportPlanForMacOSAdapter() {
+        let id = UUID(uuidString: "E31E4D7A-437B-4BD3-A4B5-9624F38F3BBE")!
+        let backup = VoiceInkCustomCloudModelBackup(
+            id: id,
+            name: "custom",
+            displayName: "Custom",
+            description: "Transcribes audio",
+            apiEndpoint: " https://api.example.com/v1/audio/transcriptions ",
+            modelName: " whisper-1 ",
+            isMultilingualModel: true,
+            supportedLanguages: ["en": "English"],
+            apiKey: " "
+        )
+
+        XCTAssertEqual(
+            backup.importPlan,
+            VoiceInkCustomCloudModelImportPlan(
+                id: id,
+                name: "custom",
+                displayName: "Custom",
+                description: "Transcribes audio",
+                apiEndpoint: "https://api.example.com/v1/audio/transcriptions",
+                modelName: "whisper-1",
+                isMultilingualModel: true,
+                supportedLanguages: ["en": "English"],
+                apiKeyToRestore: " "
+            )
+        )
+    }
+
     func testBackupRecordSkipsOnlyMissingOrEmptyAPIKeyOnImport() {
         XCTAssertNil(VoiceInkCustomCloudModelBackup(
             id: UUID(),

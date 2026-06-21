@@ -22,14 +22,11 @@ struct APIKeyManagementView: View {
         apiKeyFormState.draft(for: aiService.selectedProvider)
     }
 
-    private var selectedProviderSettingsSurface: VoiceInkAIEnhancementSettingsSurface {
-        aiService.selectedProvider.textEnhancementSettingsSurface
-    }
-
     private let providerSettingsPresentation = VoiceInkAIEnhancementProviderSettingsPresentation.macOS
     private let localCLIPresentation = VoiceInkLocalCLIPreference.macOSSettingsPresentation
 
     var body: some View {
+        let selectedProviderSettingsSurface = aiService.selectedProvider.textEnhancementSettingsSurface
         let connectionStatusPresentation = providerSettingsPresentation.connectionStatus(
             surface: selectedProviderSettingsSurface,
             isAPIKeyValid: aiService.isAPIKeyValid,
@@ -322,7 +319,7 @@ struct APIKeyManagementView: View {
     }
 
     private func syncSelectedProviderSettingsSurface() {
-        switch selectedProviderSettingsSurface {
+        switch aiService.selectedProvider.textEnhancementSettingsSurface {
         case .ollama:
             checkOllamaConnection()
         case .localCLI:

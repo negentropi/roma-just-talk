@@ -5796,6 +5796,11 @@ reject_pattern \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
 
 reject_pattern \
+  "macOS AI settings avoid shallow provider-surface wrappers" \
+  'private var +selectedProviderSettingsSurface\b' \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+
+reject_pattern \
   "macOS AI settings avoid duplicate provider connection status copy and branching" \
   '"(Connected|Disconnected)"|selectedProviderSettingsSurface != \.ollama|else if !ollamaModels\.isEmpty' \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift

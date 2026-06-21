@@ -28,6 +28,37 @@ public enum VoiceInkAIEnhancementSettingsSurface: Sendable, Equatable {
     case custom
 }
 
+public struct VoiceInkAIEnhancementModelRefreshPlan: Sendable, Equatable {
+    public let cachedModels: [String]
+    public let selectedModelToSave: String?
+
+    public init(cachedModels: [String], selectedModelToSave: String?) {
+        self.cachedModels = cachedModels
+        self.selectedModelToSave = selectedModelToSave
+    }
+
+    public static func refreshed(
+        provider: VoiceInkAIEnhancementProviderKind,
+        currentModel: String,
+        refreshedModels: [String],
+        defaultModel: String
+    ) -> VoiceInkAIEnhancementModelRefreshPlan {
+        VoiceInkAIEnhancementModelRefreshPlan(
+            cachedModels: refreshedModels,
+            selectedModelToSave: provider.textEnhancementModelToSelectAfterRefresh(
+                currentModel: currentModel,
+                refreshedModels: refreshedModels,
+                defaultModel: defaultModel
+            )
+        )
+    }
+
+    public static let failed = VoiceInkAIEnhancementModelRefreshPlan(
+        cachedModels: [],
+        selectedModelToSave: nil
+    )
+}
+
 public enum VoiceInkAIEnhancementConnectionStatusTone: Sendable, Equatable {
     case connected
     case disconnected

@@ -5122,12 +5122,12 @@ require_pattern \
 
 require_pattern \
   "shared AI enhancement refresh model-selection policy lives in VoiceInkCore" \
-  'textEnhancementModelToSelectAfterRefresh' \
+  'VoiceInkAIEnhancementModelRefreshPlan|textEnhancementModelToSelectAfterRefresh' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \
-  "macOS AI service refresh model selection uses shared policy" \
-  'textEnhancementModelToSelectAfterRefresh' \
+  "macOS AI service refresh model application uses shared policy" \
+  'VoiceInkAIEnhancementModelRefreshPlan\.(refreshed|failed)' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 require_pattern \
@@ -5228,6 +5228,11 @@ reject_pattern \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 reject_pattern \
+  "macOS AI service avoids shallow OpenRouter model-saving wrapper" \
+  'private +func +saveOpenRouterModels\(' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+reject_pattern \
   "macOS AI settings avoid duplicate OpenRouter model-source policy" \
   'selectedProvider == \.openRouter|selectedProvider != \.custom|provider == \.openRouter' \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift \
@@ -5246,7 +5251,12 @@ reject_pattern \
 
 reject_pattern \
   "macOS AI service avoids duplicate refresh model-selection policy" \
-  'currentModel == .*defaultTextEnhancementModel|models\.first!' \
+  'currentModel == .*defaultTextEnhancementModel|models\.first!|textEnhancementModelToSelectAfterRefresh' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+reject_pattern \
+  "macOS AI service avoids shell-owned OpenRouter refresh cache decisions" \
+  'self\.openRouterModels = models|self\.openRouterModels = \[\]' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 reject_pattern \

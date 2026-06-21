@@ -119,6 +119,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementRequestURLsAreShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementRequestURLsAreShared() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementConsoleURLsAreShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementConsoleURLsAreShared() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testAIEnhancementProvidersExposeOptionalConsoleURLs", run: { AIProviderCatalogTests().testAIEnhancementProvidersExposeOptionalConsoleURLs() }),
+            VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementModelRefreshPlanCachesAndRepairsSelection", run: { AIProviderCatalogTests().testMacOSAIEnhancementModelRefreshPlanCachesAndRepairsSelection() }),
             VoiceInkCoreCheck(name: "APIKeyReferenceTests.testResolvedValueReturnsTrimmedLiteralKeys", run: { APIKeyReferenceTests().testResolvedValueReturnsTrimmedLiteralKeys() }),
             VoiceInkCoreCheck(name: "APIKeyReferenceTests.testResolvedValueResolvesDollarEnvironmentReference", run: { APIKeyReferenceTests().testResolvedValueResolvesDollarEnvironmentReference() }),
             VoiceInkCoreCheck(name: "APIKeyReferenceTests.testResolvedValueResolvesBracedEnvironmentReference", run: { APIKeyReferenceTests().testResolvedValueResolvesBracedEnvironmentReference() }),

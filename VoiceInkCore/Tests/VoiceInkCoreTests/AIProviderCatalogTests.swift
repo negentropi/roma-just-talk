@@ -880,6 +880,47 @@ final class AIProviderCatalogTests: XCTestCase {
         )
     }
 
+    func testMacOSAIEnhancementModelRefreshPlanCachesAndRepairsSelection() {
+        let openRouterModels = [
+            "anthropic/claude-3.5-sonnet",
+            "openai/gpt-4o"
+        ]
+
+        XCTAssertEqual(
+            VoiceInkAIEnhancementModelRefreshPlan.refreshed(
+                provider: .openRouter,
+                currentModel: VoiceInkAIModelCatalog.defaultModel(for: .openRouter),
+                refreshedModels: openRouterModels,
+                defaultModel: VoiceInkAIModelCatalog.defaultModel(for: .openRouter)
+            ),
+            VoiceInkAIEnhancementModelRefreshPlan(
+                cachedModels: openRouterModels,
+                selectedModelToSave: "anthropic/claude-3.5-sonnet"
+            )
+        )
+
+        XCTAssertEqual(
+            VoiceInkAIEnhancementModelRefreshPlan.refreshed(
+                provider: .openRouter,
+                currentModel: "custom/openrouter-model",
+                refreshedModels: openRouterModels,
+                defaultModel: VoiceInkAIModelCatalog.defaultModel(for: .openRouter)
+            ),
+            VoiceInkAIEnhancementModelRefreshPlan(
+                cachedModels: openRouterModels,
+                selectedModelToSave: nil
+            )
+        )
+
+        XCTAssertEqual(
+            VoiceInkAIEnhancementModelRefreshPlan.failed,
+            VoiceInkAIEnhancementModelRefreshPlan(
+                cachedModels: [],
+                selectedModelToSave: nil
+            )
+        )
+    }
+
     func testMacOSAIEnhancementProviderVerificationRoutesAreShared() {
         let expectedRoutes: [VoiceInkAIEnhancementProviderKind: VoiceInkAIEnhancementAPIKeyVerificationRoute?] = [
             .anthropic: .anthropicMessages,

@@ -99,11 +99,7 @@ class AIService: ObservableObject {
         apiKey = credentialState.apiKey
         isAPIKeyValid = credentialState.isAPIKeyValid
     }
-    
-    private func saveOpenRouterModels() {
-        VoiceInkDynamicAIProviderPreference.saveOpenRouterModels(openRouterModels, to: userDefaults)
-    }
-    
+
     func selectModel(_ model: String) {
         guard !model.isEmpty else { return }
         
@@ -318,21 +314,24 @@ class AIService: ObservableObject {
         do {
             let models = try await OpenRouterClient.fetchModels()
             await MainActor.run {
-                self.openRouterModels = models
-                self.saveOpenRouterModels()
-                if let refreshedModel = self.selectedProvider.textEnhancementModelToSelectAfterRefresh(
+                let plan = VoiceInkAIEnhancementModelRefreshPlan.refreshed(
+                    provider: self.selectedProvider,
                     currentModel: self.currentModel,
                     refreshedModels: models,
                     defaultModel: self.selectedProvider.defaultTextEnhancementModel()
-                ) {
+                )
+                self.openRouterModels = plan.cachedModels
+                VoiceInkDynamicAIProviderPreference.saveOpenRouterModels(plan.cachedModels, to: self.userDefaults)
+                if let refreshedModel = plan.selectedModelToSave {
                     self.selectModel(refreshedModel)
                 }
                 self.objectWillChange.send()
             }
         } catch {
             await MainActor.run {
-                self.openRouterModels = []
-                self.saveOpenRouterModels()
+                let plan = VoiceInkAIEnhancementModelRefreshPlan.failed
+                self.openRouterModels = plan.cachedModels
+                VoiceInkDynamicAIProviderPreference.saveOpenRouterModels(plan.cachedModels, to: self.userDefaults)
                 self.objectWillChange.send()
             }
         }

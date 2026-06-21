@@ -1194,6 +1194,54 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testRecordingShortcutPreferenceBuildsBackupPreferences() throws {
+        let backup = VoiceInkRecordingShortcutPreference.backupPreferences(
+            primaryRecordingShortcut: .custom,
+            secondaryRecordingShortcut: .none,
+            primaryRecordingShortcutMode: .toggle,
+            secondaryRecordingShortcutMode: .pushToTalk,
+            specialShortcutPasteLastTranscriptOnEmptyTap: false,
+            isMiddleClickToggleEnabled: true,
+            middleClickActivationDelay: 350
+        )
+
+        XCTAssertEqual(backup.primaryRecordingShortcutRawValue, "custom")
+        XCTAssertEqual(backup.secondaryRecordingShortcutRawValue, "none")
+        XCTAssertEqual(backup.primaryRecordingShortcutModeRawValue, "toggle")
+        XCTAssertEqual(backup.secondaryRecordingShortcutModeRawValue, "pushToTalk")
+        XCTAssertEqual(backup.specialShortcutPasteLastTranscriptOnEmptyTap, false)
+        XCTAssertEqual(backup.isMiddleClickToggleEnabled, true)
+        XCTAssertEqual(backup.middleClickActivationDelay, 350)
+
+        let data = try JSONEncoder().encode(backup)
+        XCTAssertEqual(
+            try JSONDecoder().decode(VoiceInkRecordingShortcutBackupPreferences.self, from: data),
+            backup
+        )
+    }
+
+    func testRecordingShortcutPreferenceBackupImportPlanSkipsInvalidRawValues() {
+        let plan = VoiceInkRecordingShortcutPreference.backupImportPlan(
+            from: VoiceInkRecordingShortcutBackupPreferences(
+                primaryRecordingShortcutRawValue: "custom",
+                secondaryRecordingShortcutRawValue: "invalid-selection",
+                primaryRecordingShortcutModeRawValue: "toggle",
+                secondaryRecordingShortcutModeRawValue: "invalid-mode",
+                specialShortcutPasteLastTranscriptOnEmptyTap: false,
+                isMiddleClickToggleEnabled: true,
+                middleClickActivationDelay: 350
+            )
+        )
+
+        XCTAssertEqual(plan.primaryRecordingShortcut, .custom)
+        XCTAssertNil(plan.secondaryRecordingShortcut)
+        XCTAssertEqual(plan.primaryRecordingShortcutMode, .toggle)
+        XCTAssertNil(plan.secondaryRecordingShortcutMode)
+        XCTAssertEqual(plan.specialShortcutPasteLastTranscriptOnEmptyTap, false)
+        XCTAssertEqual(plan.isMiddleClickToggleEnabled, true)
+        XCTAssertEqual(plan.middleClickActivationDelay, 350)
+    }
+
     func testSharedPreferenceResetClearsCoreUserSettings() {
         withIsolatedDefaults { defaults in
             let mode = Mode.defaultLocalWhisper()

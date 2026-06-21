@@ -82,6 +82,20 @@ struct GeneralBackup: Codable {
     let rollingBufferPreloadEnabledByModel: [String: Bool]?
 }
 
+extension GeneralBackup {
+    var recordingShortcutBackupPreferences: VoiceInkRecordingShortcutBackupPreferences {
+        VoiceInkRecordingShortcutBackupPreferences(
+            primaryRecordingShortcutRawValue: primaryRecordingShortcutRawValue,
+            secondaryRecordingShortcutRawValue: secondaryRecordingShortcutRawValue,
+            primaryRecordingShortcutModeRawValue: primaryRecordingShortcutModeRawValue,
+            secondaryRecordingShortcutModeRawValue: secondaryRecordingShortcutModeRawValue,
+            specialShortcutPasteLastTranscriptOnEmptyTap: specialShortcutPasteLastTranscriptOnEmptyTap,
+            isMiddleClickToggleEnabled: isMiddleClickToggleEnabled,
+            middleClickActivationDelay: middleClickActivationDelay
+        )
+    }
+}
+
 struct BackupFile: Codable {
     let version: String
     let customPrompts: [VoiceInkCustomPrompt]

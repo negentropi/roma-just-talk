@@ -153,6 +153,15 @@ class ImportExportService {
         let audioCleanup = VoiceInkAudioCleanupPreference.current()
         let rollingBufferConfiguration = VoiceInkRollingBufferPreloadSettings.configuration()
         let perModelPreloadSettings = VoiceInkRollingBufferPreloadSettings.exportedPerModelPreloadEnabled()
+        let recordingShortcutBackupPreferences = VoiceInkRecordingShortcutPreference.backupPreferences(
+            primaryRecordingShortcut: recordingShortcutManager.primaryRecordingShortcut,
+            secondaryRecordingShortcut: recordingShortcutManager.secondaryRecordingShortcut,
+            primaryRecordingShortcutMode: recordingShortcutManager.primaryRecordingShortcutMode,
+            secondaryRecordingShortcutMode: recordingShortcutManager.secondaryRecordingShortcutMode,
+            specialShortcutPasteLastTranscriptOnEmptyTap: recordingShortcutManager.specialShortcutPasteLastTranscriptOnEmptyTap,
+            isMiddleClickToggleEnabled: recordingShortcutManager.isMiddleClickToggleEnabled,
+            middleClickActivationDelay: recordingShortcutManager.middleClickActivationDelay
+        )
         let generalSettingsToExport = GeneralBackup(
             primaryRecordingShortcut: ShortcutStore.shortcut(for: .primaryRecording).map(ShortcutBackup.init),
             secondaryRecordingShortcut: ShortcutStore.shortcut(for: .secondaryRecording).map(ShortcutBackup.init),
@@ -163,13 +172,13 @@ class ImportExportService {
             openHistoryWindowShortcut: ShortcutStore.shortcut(for: .openHistoryWindow).map(ShortcutBackup.init),
             quickAddToDictionaryShortcut: ShortcutStore.shortcut(for: .quickAddToDictionary).map(ShortcutBackup.init),
             toggleEnhancementShortcut: ShortcutStore.shortcut(for: .toggleEnhancement).map(ShortcutBackup.init),
-            primaryRecordingShortcutRawValue: recordingShortcutManager.primaryRecordingShortcut.rawValue,
-            secondaryRecordingShortcutRawValue: recordingShortcutManager.secondaryRecordingShortcut.rawValue,
-            primaryRecordingShortcutModeRawValue: recordingShortcutManager.primaryRecordingShortcutMode.rawValue,
-            secondaryRecordingShortcutModeRawValue: recordingShortcutManager.secondaryRecordingShortcutMode.rawValue,
-            specialShortcutPasteLastTranscriptOnEmptyTap: recordingShortcutManager.specialShortcutPasteLastTranscriptOnEmptyTap,
-            isMiddleClickToggleEnabled: recordingShortcutManager.isMiddleClickToggleEnabled,
-            middleClickActivationDelay: recordingShortcutManager.middleClickActivationDelay,
+            primaryRecordingShortcutRawValue: recordingShortcutBackupPreferences.primaryRecordingShortcutRawValue,
+            secondaryRecordingShortcutRawValue: recordingShortcutBackupPreferences.secondaryRecordingShortcutRawValue,
+            primaryRecordingShortcutModeRawValue: recordingShortcutBackupPreferences.primaryRecordingShortcutModeRawValue,
+            secondaryRecordingShortcutModeRawValue: recordingShortcutBackupPreferences.secondaryRecordingShortcutModeRawValue,
+            specialShortcutPasteLastTranscriptOnEmptyTap: recordingShortcutBackupPreferences.specialShortcutPasteLastTranscriptOnEmptyTap,
+            isMiddleClickToggleEnabled: recordingShortcutBackupPreferences.isMiddleClickToggleEnabled,
+            middleClickActivationDelay: recordingShortcutBackupPreferences.middleClickActivationDelay,
             launchAtLoginEnabled: LaunchAtLogin.isEnabled,
             isMenuBarOnly: menuBarManager.isMenuBarOnly,
             recorderType: recorderUIManager.recorderType,

@@ -962,6 +962,62 @@ public struct VoiceInkMacOSRecordingShortcutSettingsPresentation: Equatable, Sen
     )
 }
 
+public struct VoiceInkRecordingShortcutBackupPreferences: Codable, Equatable, Sendable {
+    public let primaryRecordingShortcutRawValue: String?
+    public let secondaryRecordingShortcutRawValue: String?
+    public let primaryRecordingShortcutModeRawValue: String?
+    public let secondaryRecordingShortcutModeRawValue: String?
+    public let specialShortcutPasteLastTranscriptOnEmptyTap: Bool?
+    public let isMiddleClickToggleEnabled: Bool?
+    public let middleClickActivationDelay: Int?
+
+    public init(
+        primaryRecordingShortcutRawValue: String?,
+        secondaryRecordingShortcutRawValue: String?,
+        primaryRecordingShortcutModeRawValue: String?,
+        secondaryRecordingShortcutModeRawValue: String?,
+        specialShortcutPasteLastTranscriptOnEmptyTap: Bool?,
+        isMiddleClickToggleEnabled: Bool?,
+        middleClickActivationDelay: Int?
+    ) {
+        self.primaryRecordingShortcutRawValue = primaryRecordingShortcutRawValue
+        self.secondaryRecordingShortcutRawValue = secondaryRecordingShortcutRawValue
+        self.primaryRecordingShortcutModeRawValue = primaryRecordingShortcutModeRawValue
+        self.secondaryRecordingShortcutModeRawValue = secondaryRecordingShortcutModeRawValue
+        self.specialShortcutPasteLastTranscriptOnEmptyTap = specialShortcutPasteLastTranscriptOnEmptyTap
+        self.isMiddleClickToggleEnabled = isMiddleClickToggleEnabled
+        self.middleClickActivationDelay = middleClickActivationDelay
+    }
+}
+
+public struct VoiceInkRecordingShortcutBackupImportPlan: Equatable, Sendable {
+    public let primaryRecordingShortcut: VoiceInkRecordingShortcutSelection?
+    public let secondaryRecordingShortcut: VoiceInkRecordingShortcutSelection?
+    public let primaryRecordingShortcutMode: VoiceInkRecordingShortcutMode?
+    public let secondaryRecordingShortcutMode: VoiceInkRecordingShortcutMode?
+    public let specialShortcutPasteLastTranscriptOnEmptyTap: Bool?
+    public let isMiddleClickToggleEnabled: Bool?
+    public let middleClickActivationDelay: Int?
+
+    public init(
+        primaryRecordingShortcut: VoiceInkRecordingShortcutSelection?,
+        secondaryRecordingShortcut: VoiceInkRecordingShortcutSelection?,
+        primaryRecordingShortcutMode: VoiceInkRecordingShortcutMode?,
+        secondaryRecordingShortcutMode: VoiceInkRecordingShortcutMode?,
+        specialShortcutPasteLastTranscriptOnEmptyTap: Bool?,
+        isMiddleClickToggleEnabled: Bool?,
+        middleClickActivationDelay: Int?
+    ) {
+        self.primaryRecordingShortcut = primaryRecordingShortcut
+        self.secondaryRecordingShortcut = secondaryRecordingShortcut
+        self.primaryRecordingShortcutMode = primaryRecordingShortcutMode
+        self.secondaryRecordingShortcutMode = secondaryRecordingShortcutMode
+        self.specialShortcutPasteLastTranscriptOnEmptyTap = specialShortcutPasteLastTranscriptOnEmptyTap
+        self.isMiddleClickToggleEnabled = isMiddleClickToggleEnabled
+        self.middleClickActivationDelay = middleClickActivationDelay
+    }
+}
+
 public enum VoiceInkRecordingShortcutPreference {
     public static let macOSSettingsPresentation = VoiceInkMacOSRecordingShortcutSettingsPresentation.macOS
 
@@ -1007,6 +1063,40 @@ public enum VoiceInkRecordingShortcutPreference {
         case .secondary:
             return .hybrid
         }
+    }
+
+    public static func backupPreferences(
+        primaryRecordingShortcut: VoiceInkRecordingShortcutSelection,
+        secondaryRecordingShortcut: VoiceInkRecordingShortcutSelection,
+        primaryRecordingShortcutMode: VoiceInkRecordingShortcutMode,
+        secondaryRecordingShortcutMode: VoiceInkRecordingShortcutMode,
+        specialShortcutPasteLastTranscriptOnEmptyTap: Bool,
+        isMiddleClickToggleEnabled: Bool,
+        middleClickActivationDelay: Int
+    ) -> VoiceInkRecordingShortcutBackupPreferences {
+        VoiceInkRecordingShortcutBackupPreferences(
+            primaryRecordingShortcutRawValue: primaryRecordingShortcut.rawValue,
+            secondaryRecordingShortcutRawValue: secondaryRecordingShortcut.rawValue,
+            primaryRecordingShortcutModeRawValue: primaryRecordingShortcutMode.rawValue,
+            secondaryRecordingShortcutModeRawValue: secondaryRecordingShortcutMode.rawValue,
+            specialShortcutPasteLastTranscriptOnEmptyTap: specialShortcutPasteLastTranscriptOnEmptyTap,
+            isMiddleClickToggleEnabled: isMiddleClickToggleEnabled,
+            middleClickActivationDelay: middleClickActivationDelay
+        )
+    }
+
+    public static func backupImportPlan(
+        from backup: VoiceInkRecordingShortcutBackupPreferences
+    ) -> VoiceInkRecordingShortcutBackupImportPlan {
+        VoiceInkRecordingShortcutBackupImportPlan(
+            primaryRecordingShortcut: backup.primaryRecordingShortcutRawValue.flatMap(VoiceInkRecordingShortcutSelection.init(rawValue:)),
+            secondaryRecordingShortcut: backup.secondaryRecordingShortcutRawValue.flatMap(VoiceInkRecordingShortcutSelection.init(rawValue:)),
+            primaryRecordingShortcutMode: backup.primaryRecordingShortcutModeRawValue.flatMap(VoiceInkRecordingShortcutMode.init(rawValue:)),
+            secondaryRecordingShortcutMode: backup.secondaryRecordingShortcutModeRawValue.flatMap(VoiceInkRecordingShortcutMode.init(rawValue:)),
+            specialShortcutPasteLastTranscriptOnEmptyTap: backup.specialShortcutPasteLastTranscriptOnEmptyTap,
+            isMiddleClickToggleEnabled: backup.isMiddleClickToggleEnabled,
+            middleClickActivationDelay: backup.middleClickActivationDelay
+        )
     }
 
     public static func selection(

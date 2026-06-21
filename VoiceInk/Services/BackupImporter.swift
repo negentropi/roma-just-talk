@@ -113,30 +113,29 @@ enum BackupImporter {
             ShortcutStore.setShortcut(enhancementShortcut.shortcut, for: .toggleEnhancement)
         }
 
-        if let shortcutRawValue = general.primaryRecordingShortcutRawValue,
-           let shortcut = RecordingShortcutManager.ShortcutSelection(rawValue: shortcutRawValue) {
+        let recordingShortcutImportPlan = VoiceInkRecordingShortcutPreference.backupImportPlan(
+            from: general.recordingShortcutBackupPreferences
+        )
+        if let shortcut = recordingShortcutImportPlan.primaryRecordingShortcut {
             recordingShortcutManager.primaryRecordingShortcut = shortcut
         }
-        if let secondaryShortcutRawValue = general.secondaryRecordingShortcutRawValue,
-           let secondaryShortcut = RecordingShortcutManager.ShortcutSelection(rawValue: secondaryShortcutRawValue) {
-            recordingShortcutManager.secondaryRecordingShortcut = secondaryShortcut
+        if let shortcut = recordingShortcutImportPlan.secondaryRecordingShortcut {
+            recordingShortcutManager.secondaryRecordingShortcut = shortcut
         }
-        if let modeRawValue = general.primaryRecordingShortcutModeRawValue,
-           let mode = RecordingShortcutManager.Mode(rawValue: modeRawValue) {
+        if let mode = recordingShortcutImportPlan.primaryRecordingShortcutMode {
             recordingShortcutManager.primaryRecordingShortcutMode = mode
         }
-        if let secondaryModeRawValue = general.secondaryRecordingShortcutModeRawValue,
-           let secondaryMode = RecordingShortcutManager.Mode(rawValue: secondaryModeRawValue) {
-            recordingShortcutManager.secondaryRecordingShortcutMode = secondaryMode
+        if let mode = recordingShortcutImportPlan.secondaryRecordingShortcutMode {
+            recordingShortcutManager.secondaryRecordingShortcutMode = mode
         }
-        if let pasteLastTranscriptOnEmptyTap = general.specialShortcutPasteLastTranscriptOnEmptyTap {
+        if let pasteLastTranscriptOnEmptyTap = recordingShortcutImportPlan.specialShortcutPasteLastTranscriptOnEmptyTap {
             recordingShortcutManager.specialShortcutPasteLastTranscriptOnEmptyTap = pasteLastTranscriptOnEmptyTap
         }
-        if let middleClickEnabled = general.isMiddleClickToggleEnabled {
-            recordingShortcutManager.isMiddleClickToggleEnabled = middleClickEnabled
+        if let isMiddleClickToggleEnabled = recordingShortcutImportPlan.isMiddleClickToggleEnabled {
+            recordingShortcutManager.isMiddleClickToggleEnabled = isMiddleClickToggleEnabled
         }
-        if let middleClickDelay = general.middleClickActivationDelay {
-            recordingShortcutManager.middleClickActivationDelay = middleClickDelay
+        if let middleClickActivationDelay = recordingShortcutImportPlan.middleClickActivationDelay {
+            recordingShortcutManager.middleClickActivationDelay = middleClickActivationDelay
         }
         if let launch = general.launchAtLoginEnabled {
             LaunchAtLogin.isEnabled = launch

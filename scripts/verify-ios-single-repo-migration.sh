@@ -4284,6 +4284,26 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
+  "shared recording shortcut backup preferences live in VoiceInkCore" \
+  'VoiceInkRecordingShortcutBackupPreferences' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared recording shortcut backup import plan lives in VoiceInkCore" \
+  'VoiceInkRecordingShortcutBackupImportPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared recording shortcut preference exports backup values" \
+  'backupPreferences' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared recording shortcut preference parses backup import values" \
+  'backupImportPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
   "macOS defaults register shared recording shortcut defaults" \
   'VoiceInkRecordingShortcutPreference\.registeredDefaults' \
   VoiceInk/AppDefaults.swift
@@ -4363,6 +4383,21 @@ require_pattern \
   'VoiceInkRecordingShortcutPreference\.macOSSettingsPresentation|recordingShortcutPresentation\.(sectionTitle|primaryShortcutLabel|secondaryShortcutLabel|addSecondaryShortcutButtonTitle|emptyTapPasteLastTranscriptLabel|additionalSectionTitle|pasteLastTranscriptionOriginalLabel|pasteLastTranscriptionEnhancedLabel|retryLastTranscriptionLabel|cancelRecordingLabel|resetToDefaultHelp|middleClickRecordingLabel|activationDelayLabel|activationDelayUnitLabel)' \
   VoiceInk/Views/Settings/SettingsView.swift
 
+require_pattern \
+  "macOS general backup adapts recording shortcut values to shared preferences" \
+  'recordingShortcutBackupPreferences' \
+  VoiceInk/Services/BackupTypes.swift
+
+require_pattern \
+  "macOS backup import uses shared recording shortcut backup import plan" \
+  'VoiceInkRecordingShortcutPreference\.backupImportPlan' \
+  VoiceInk/Services/BackupImporter.swift
+
+require_pattern \
+  "macOS backup export uses shared recording shortcut backup preferences" \
+  'VoiceInkRecordingShortcutPreference\.backupPreferences' \
+  VoiceInk/Services/ImportExportService.swift
+
 reject_pattern \
   "macOS recording shortcut shells avoid raw current shortcut preference keys" \
   '"(primaryRecordingShortcut|secondaryRecordingShortcut|primaryRecordingShortcutMode|secondaryRecordingShortcutMode|isMiddleClickToggleEnabled|middleClickActivationDelay|specialShortcutPasteLastTranscriptOnEmptyTap)"|enum +(Mode|ShortcutSelection)|SpecialShortcutSettings' \
@@ -4376,9 +4411,29 @@ reject_pattern \
   '"(Primary Shortcut|Secondary Shortcut|Add Second Shortcut|Empty Tap Pastes Last|Additional Shortcuts|Paste Last Transcription \(Original\)|Paste Last Transcription \(Enhanced\)|Retry Last Transcription|Cancel Recording|Reset to default|Middle-Click Recording|Activation Delay|ms)"' \
   VoiceInk/Views/Settings/SettingsView.swift
 
+reject_pattern \
+  "macOS backup import avoids shell-only recording shortcut raw parsing" \
+  'ShortcutSelection\(rawValue:|Mode\(rawValue:' \
+  VoiceInk/Services/BackupImporter.swift
+
+reject_pattern \
+  "macOS backup export avoids shell-only recording shortcut raw emission" \
+  'recordingShortcutManager\.(primaryRecordingShortcut|secondaryRecordingShortcut|primaryRecordingShortcutMode|secondaryRecordingShortcutMode)\.rawValue' \
+  VoiceInk/Services/ImportExportService.swift
+
+require_pattern \
+  "core checks execute recording shortcut backup export policy tests" \
+  'UserDefaultsPreferencesTests\.testRecordingShortcutPreferenceBuildsBackupPreferences' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute recording shortcut backup import policy tests" \
+  'UserDefaultsPreferencesTests\.testRecordingShortcutPreferenceBackupImportPlanSkipsInvalidRawValues' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
 require_pattern \
   "migration checklist tracks shared recording shortcut preference gate" \
-  'macOS recording shortcut selection/mode, middle-click, special empty-tap preferences, and settings labels/help route through `VoiceInkRecordingShortcutSelection`/`VoiceInkRecordingShortcutMode`/`VoiceInkRecordingShortcutPreference`' \
+  'macOS recording shortcut selection/mode, middle-click, special empty-tap preferences, settings labels/help, and backup import/export value planning route through `VoiceInkRecordingShortcutSelection`/`VoiceInkRecordingShortcutMode`/`VoiceInkRecordingShortcutPreference`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

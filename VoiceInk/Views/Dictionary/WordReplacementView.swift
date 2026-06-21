@@ -22,10 +22,6 @@ struct WordReplacementView: View {
         VoiceInkDictionaryListSortPreference.saveWordReplacementSortMode(sortMode)
     }
 
-    private var shouldShowAddButton: Bool {
-        wordReplacementDraftState.hasDraft
-    }
-    
     var body: some View {
         let sortedReplacements = VoiceInkDictionaryListSortPolicy.sortedWordReplacements(
             wordReplacements,
@@ -33,6 +29,7 @@ struct WordReplacementView: View {
             originalText: { $0.originalText },
             replacementText: { $0.replacementText }
         )
+        let shouldShowAddButton = wordReplacementDraftState.hasDraft
 
         VStack(alignment: .leading, spacing: 20) {
             if let helpText = dictionaryPresentation.wordReplacementHelpText {

@@ -11,6 +11,8 @@ struct NoteDetailView: View {
     @StateObject private var settings = AppSettings.shared
 
     var body: some View {
+        let shouldShowAudioSection = audioAvailability.shouldShowAudioSection(duration: note.duration)
+
         GeometryReader { geometry in
             VStack(spacing: 0) {
                 // Main content with scroll
@@ -81,10 +83,6 @@ struct NoteDetailView: View {
         }
     }
     
-    private var shouldShowAudioSection: Bool {
-        audioAvailability.shouldShowAudioSection(duration: note.duration)
-    }
-
     private var audioAvailability: VoiceInkStoredAudioAvailability {
         note.storedAudioAvailability()
     }

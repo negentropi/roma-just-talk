@@ -20,12 +20,9 @@ struct VocabularyView: View {
         VoiceInkDictionaryListSortPreference.saveVocabularySortMode(sortMode)
     }
 
-    private var shouldShowAddButton: Bool {
-        vocabularyDraftState.canSubmit
-    }
-
     var body: some View {
         let sortedItems = VoiceInkDictionaryListSortPolicy.sortedVocabulary(vocabularyWords, mode: sortMode) { $0.word }
+        let shouldShowAddButton = vocabularyDraftState.canSubmit
 
         VStack(alignment: .leading, spacing: 20) {
             if let helpText = dictionaryPresentation.vocabularyHelpText {

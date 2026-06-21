@@ -1022,6 +1022,11 @@ require_pattern \
   'storedAudioAvailability\(\)|shouldShowAudioSection|unavailableTitle|unavailableDetail|unavailableSystemImageName' \
   iOS/VoiceInk-ios/NoteDetailView.swift
 
+reject_pattern \
+  "iOS note detail avoids shallow audio-section visibility wrappers" \
+  'private var +shouldShowAudioSection\b' \
+  iOS/VoiceInk-ios/NoteDetailView.swift
+
 require_pattern \
   "shared stored-audio availability owns unavailable icon" \
   'unavailableSystemImageName' \
@@ -4162,6 +4167,12 @@ reject_pattern \
 reject_pattern \
   "macOS dictionary list views avoid shallow sorted-list wrappers" \
   'private var +(sortedItems|sortedReplacements)\b' \
+  VoiceInk/Views/Dictionary/VocabularyView.swift \
+  VoiceInk/Views/Dictionary/WordReplacementView.swift
+
+reject_pattern \
+  "macOS dictionary form views avoid shallow add-button visibility wrappers" \
+  'private var +shouldShowAddButton\b' \
   VoiceInk/Views/Dictionary/VocabularyView.swift \
   VoiceInk/Views/Dictionary/WordReplacementView.swift
 

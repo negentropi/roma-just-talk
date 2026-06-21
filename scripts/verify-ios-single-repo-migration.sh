@@ -4159,6 +4159,12 @@ reject_pattern \
   VoiceInk/Views/Dictionary/VocabularyView.swift \
   VoiceInk/Views/Dictionary/WordReplacementView.swift
 
+reject_pattern \
+  "macOS dictionary list views avoid shallow sorted-list wrappers" \
+  'private var +(sortedItems|sortedReplacements)\b' \
+  VoiceInk/Views/Dictionary/VocabularyView.swift \
+  VoiceInk/Views/Dictionary/WordReplacementView.swift
+
 require_pattern \
   "migration checklist tracks shared dictionary sort gate" \
   'dictionary form/chrome, quick-add, word-replacement guidance, edit-sheet, list/row copy, vocabulary draft text/submit/reset/duplicate-alert planning, word-replacement draft text/visibility/submit/reset/duplicate-alert planning, word-replacement edit state/saveability/update-completion planning, accepted-submission list application, sort mode storage/toggle/indicator policy, vocabulary/word-replacement list sorting, and sorted-row deletion planning route through `VoiceInkDictionarySettingsPresentation`/`VoiceInkDictionaryQuickAddPresentation`/`VoiceInkWordReplacementInfoPresentation`/`VoiceInkWordReplacementEditPresentation`/`VoiceInkVocabularyListPresentation`/`VoiceInkWordReplacementListPresentation`/`VoiceInkVocabularyDraftState`/`VoiceInkVocabularyDraftSubmission`/`VoiceInkVocabularySubmissionPlan`/`VoiceInkWordReplacementDraftState`/`VoiceInkWordReplacementDraftSubmission`/`VoiceInkWordReplacementSubmissionPlan`/`VoiceInkWordReplacementEditState`/`VoiceInkWordReplacementEditSubmission`/`VoiceInkDictionaryListSortPreference`/`VoiceInkDictionaryListSortPolicy`' \

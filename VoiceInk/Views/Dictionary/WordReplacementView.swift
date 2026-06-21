@@ -17,15 +17,6 @@ struct WordReplacementView: View {
         _sortMode = State(initialValue: VoiceInkDictionaryListSortPreference.wordReplacementSortMode())
     }
 
-    private var sortedReplacements: [WordReplacement] {
-        VoiceInkDictionaryListSortPolicy.sortedWordReplacements(
-            wordReplacements,
-            mode: sortMode,
-            originalText: { $0.originalText },
-            replacementText: { $0.replacementText }
-        )
-    }
-    
     private func toggleSort(for column: VoiceInkWordReplacementSortColumn) {
         sortMode = sortMode.toggled(for: column)
         VoiceInkDictionaryListSortPreference.saveWordReplacementSortMode(sortMode)
@@ -36,6 +27,13 @@ struct WordReplacementView: View {
     }
     
     var body: some View {
+        let sortedReplacements = VoiceInkDictionaryListSortPolicy.sortedWordReplacements(
+            wordReplacements,
+            mode: sortMode,
+            originalText: { $0.originalText },
+            replacementText: { $0.replacementText }
+        )
+
         VStack(alignment: .leading, spacing: 20) {
             if let helpText = dictionaryPresentation.wordReplacementHelpText {
                 GroupBox {

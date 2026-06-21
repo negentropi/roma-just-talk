@@ -15,10 +15,6 @@ struct VocabularyView: View {
         _sortMode = State(initialValue: VoiceInkDictionaryListSortPreference.vocabularySortMode())
     }
 
-    private var sortedItems: [VocabularyWord] {
-        VoiceInkDictionaryListSortPolicy.sortedVocabulary(vocabularyWords, mode: sortMode) { $0.word }
-    }
-
     private func toggleSort() {
         sortMode = sortMode.toggled()
         VoiceInkDictionaryListSortPreference.saveVocabularySortMode(sortMode)
@@ -29,6 +25,8 @@ struct VocabularyView: View {
     }
 
     var body: some View {
+        let sortedItems = VoiceInkDictionaryListSortPolicy.sortedVocabulary(vocabularyWords, mode: sortMode) { $0.word }
+
         VStack(alignment: .leading, spacing: 20) {
             if let helpText = dictionaryPresentation.vocabularyHelpText {
                 GroupBox {

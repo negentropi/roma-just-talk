@@ -848,6 +848,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "StoredAudioFileTests.testStoredAudioRecordDeleteUsesResolvedRecordFile", run: { try StoredAudioFileTests().testStoredAudioRecordDeleteUsesResolvedRecordFile() }),
             VoiceInkCoreCheck(name: "StoredAudioFileTests.testStoredAudioRecordDeleteAndClearOnlyClearsReferenceWhenFileWasDeleted", run: { try StoredAudioFileTests().testStoredAudioRecordDeleteAndClearOnlyClearsReferenceWhenFileWasDeleted() }),
             VoiceInkCoreCheck(name: "SupportedMediaTests.testSupportedMediaDisplayExtensionsPreserveMacOSImportCopyOrder", run: { SupportedMediaTests().testSupportedMediaDisplayExtensionsPreserveMacOSImportCopyOrder() }),
+            VoiceInkCoreCheck(name: "SupportedMediaTests.testSupportedMediaImportTypePoliciesPreserveMacOSShellIdentifiers", run: { SupportedMediaTests().testSupportedMediaImportTypePoliciesPreserveMacOSShellIdentifiers() }),
             VoiceInkCoreCheck(name: "SupportedMediaTests.testAudioImportPresentationPreservesMacOSQueueCopyAndActions", run: { SupportedMediaTests().testAudioImportPresentationPreservesMacOSQueueCopyAndActions() }),
             VoiceInkCoreCheck(name: "SupportedMediaTests.testAudioFileQueueStatusPreservesTerminalAndProcessingPolicies", run: { SupportedMediaTests().testAudioFileQueueStatusPreservesTerminalAndProcessingPolicies() }),
             VoiceInkCoreCheck(name: "SupportedMediaTests.testAudioFileQueueStatusPreservesMutationPredicates", run: { SupportedMediaTests().testAudioFileQueueStatusPreservesMutationPredicates() }),

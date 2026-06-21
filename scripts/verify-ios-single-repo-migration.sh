@@ -842,7 +842,7 @@ require_pattern \
 
 require_pattern \
   "shared supported-media presentation lives in VoiceInkCore" \
-  'displayFileExtensions|supportedFileTypesText' \
+  'displayFileExtensions|supportedFileTypesText|openPanelContentTypes|dropContentTypes|dropProviderTypeIdentifiers' \
   VoiceInkCore/Sources/VoiceInkCore/SupportedMedia.swift
 
 require_pattern \
@@ -858,6 +858,11 @@ require_pattern \
 require_pattern \
   "macOS audio import help uses shared supported-media presentation" \
   'VoiceInkSupportedMedia\.supportedFileTypesText' \
+  VoiceInk/Views/AudioTranscribeView.swift
+
+require_pattern \
+  "macOS audio import view uses shared supported-media type identifiers" \
+  'VoiceInkSupportedMedia\.(openPanelContentTypes|dropContentTypes|dropProviderTypeIdentifiers)' \
   VoiceInk/Views/AudioTranscribeView.swift
 
 require_pattern \
@@ -882,7 +887,7 @@ require_pattern \
 
 require_pattern \
   "core tests pin supported-media presentation copy" \
-  'testSupportedMediaDisplayExtensionsPreserveMacOSImportCopyOrder|testSupportedMediaDisplayExtensionsMatchAcceptedExtensions' \
+  'testSupportedMediaDisplayExtensionsPreserveMacOSImportCopyOrder|testSupportedMediaImportTypePoliciesPreserveMacOSShellIdentifiers|testSupportedMediaDisplayExtensionsMatchAcceptedExtensions' \
   VoiceInkCore/Tests/VoiceInkCoreTests/SupportedMediaTests.swift
 
 require_pattern \
@@ -892,7 +897,7 @@ require_pattern \
 
 require_pattern \
   "core check runner executes supported-media presentation tests" \
-  'testSupportedMediaDisplayExtensionsPreserveMacOSImportCopyOrder|testSupportedMediaDisplayExtensionsMatchAcceptedExtensions' \
+  'testSupportedMediaDisplayExtensionsPreserveMacOSImportCopyOrder|testSupportedMediaImportTypePoliciesPreserveMacOSShellIdentifiers|testSupportedMediaDisplayExtensionsMatchAcceptedExtensions' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -902,7 +907,7 @@ require_pattern \
 
 reject_pattern \
   "macOS audio import view avoids shell-owned supported-media list copy" \
-  'Supports WAV|MP3, M4A|OGG, OPUS|OGG, OGA|OPUS, 3GP' \
+  'Supports WAV|MP3, M4A|OGG, OPUS|OGG, OGA|OPUS, 3GP|onDrop\(of: \[\.(fileURL|data|audio|movie)|allowedContentTypes = \[\.(audio|movie)|UTType\.(fileURL|audio|movie|data)\.identifier|"public\.file-url"' \
   VoiceInk/Views/AudioTranscribeView.swift
 
 reject_pattern \

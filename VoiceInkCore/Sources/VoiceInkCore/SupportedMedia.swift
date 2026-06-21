@@ -13,6 +13,18 @@ public enum VoiceInkSupportedMedia {
     public static let contentTypes: [UTType] = [
         .audio, .movie
     ]
+    public static let openPanelContentTypes = contentTypes
+    public static let dropContentTypes: [UTType] = [
+        .fileURL, .data, .audio, .movie
+    ]
+    public static let legacyDropFileURLTypeIdentifier = "public.file-url"
+    public static let dropProviderTypeIdentifiers = [
+        UTType.fileURL.identifier,
+        UTType.audio.identifier,
+        UTType.movie.identifier,
+        UTType.data.identifier,
+        legacyDropFileURLTypeIdentifier
+    ]
 
     public static func isSupportedFileExtension(_ fileExtension: String) -> Bool {
         fileExtensions.contains(fileExtension.lowercased())

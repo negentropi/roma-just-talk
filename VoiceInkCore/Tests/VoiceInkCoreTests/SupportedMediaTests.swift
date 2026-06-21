@@ -1,4 +1,5 @@
 import Foundation
+import UniformTypeIdentifiers
 import VoiceInkCore
 
 final class SupportedMediaTests: XCTestCase {
@@ -13,6 +14,37 @@ final class SupportedMediaTests: XCTestCase {
         XCTAssertEqual(
             VoiceInkSupportedMedia.supportedFileTypesText,
             "Supports WAV, MP3, M4A, AIFF, MP4, MOV, AAC, FLAC, CAF, AMR, OGG, OGA, OPUS, 3GP"
+        )
+    }
+
+    func testSupportedMediaImportTypePoliciesPreserveMacOSShellIdentifiers() {
+        XCTAssertEqual(
+            VoiceInkSupportedMedia.contentTypes.map { $0.identifier },
+            [UTType.audio.identifier, UTType.movie.identifier]
+        )
+        XCTAssertEqual(
+            VoiceInkSupportedMedia.openPanelContentTypes.map { $0.identifier },
+            VoiceInkSupportedMedia.contentTypes.map { $0.identifier }
+        )
+        XCTAssertEqual(
+            VoiceInkSupportedMedia.dropContentTypes.map { $0.identifier },
+            [
+                UTType.fileURL.identifier,
+                UTType.data.identifier,
+                UTType.audio.identifier,
+                UTType.movie.identifier
+            ]
+        )
+        XCTAssertEqual(VoiceInkSupportedMedia.legacyDropFileURLTypeIdentifier, "public.file-url")
+        XCTAssertEqual(
+            VoiceInkSupportedMedia.dropProviderTypeIdentifiers,
+            [
+                UTType.fileURL.identifier,
+                UTType.audio.identifier,
+                UTType.movie.identifier,
+                UTType.data.identifier,
+                "public.file-url"
+            ]
         )
     }
 

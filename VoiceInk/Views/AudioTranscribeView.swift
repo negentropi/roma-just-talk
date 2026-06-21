@@ -1,6 +1,5 @@
 import SwiftUI
 import SwiftData
-import UniformTypeIdentifiers
 import VoiceInkCore
 
 struct AudioTranscribeView: View {
@@ -23,7 +22,7 @@ struct AudioTranscribeView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(NSColor.controlBackgroundColor))
-        .onDrop(of: [.fileURL, .data, .audio, .movie], isTargeted: $isDropTargeted) { providers in
+        .onDrop(of: VoiceInkSupportedMedia.dropContentTypes, isTargeted: $isDropTargeted) { providers in
             handleDroppedFiles(providers)
             return true
         }
@@ -304,7 +303,7 @@ struct AudioTranscribeView: View {
         panel.allowsMultipleSelection = true
         panel.canChooseDirectories = false
         panel.canChooseFiles = true
-        panel.allowedContentTypes = [.audio, .movie]
+        panel.allowedContentTypes = VoiceInkSupportedMedia.openPanelContentTypes
 
         if panel.runModal() == .OK {
             transcriptionManager.addToQueue(urls: panel.urls)
@@ -312,13 +311,7 @@ struct AudioTranscribeView: View {
     }
 
     private func handleDroppedFiles(_ providers: [NSItemProvider]) {
-        let typeIdentifiers = [
-            UTType.fileURL.identifier,
-            UTType.audio.identifier,
-            UTType.movie.identifier,
-            UTType.data.identifier,
-            "public.file-url"
-        ]
+        let typeIdentifiers = VoiceInkSupportedMedia.dropProviderTypeIdentifiers
 
         for provider in providers {
             for typeIdentifier in typeIdentifiers {

@@ -72,6 +72,45 @@ final class RemoteProviderRequestTests: XCTestCase {
         )
     }
 
+    func testOpenAICompatibleClientUsesSharedHTTPResponseValidationForChatErrors() async throws {
+        var capturedPath = ""
+        RemoteProviderRequestCapturingURLProtocol.requestHandler = { request in
+            capturedPath = request.url?.path ?? ""
+            let response = try XCTUnwrap(HTTPURLResponse(
+                url: try XCTUnwrap(request.url),
+                statusCode: 429,
+                httpVersion: nil,
+                headerFields: nil
+            ))
+            return (response, Data("rate limited".utf8))
+        }
+
+        URLProtocol.registerClass(RemoteProviderRequestCapturingURLProtocol.self)
+        defer {
+            URLProtocol.unregisterClass(RemoteProviderRequestCapturingURLProtocol.self)
+            RemoteProviderRequestCapturingURLProtocol.requestHandler = nil
+        }
+
+        do {
+            _ = try await VoiceInkOpenAICompatibleClient().chatCompletion(
+                baseURL: try XCTUnwrap(URL(string: "https://api.groq.com/openai")),
+                apiKey: "llm-key",
+                model: "llama-3.3-70b-versatile",
+                messages: [
+                    VoiceInkOpenAICompatibleChatMessage(role: "user", content: "Clean this")
+                ]
+            )
+            XCTFail("Expected non-2xx chat response to throw")
+        } catch {
+            let nsError = error as NSError
+            XCTAssertEqual(nsError.domain, "LLMPostProcessing")
+            XCTAssertEqual(nsError.code, 429)
+            XCTAssertEqual(nsError.userInfo[NSLocalizedDescriptionKey] as? String, "rate limited")
+        }
+
+        XCTAssertEqual(capturedPath, "/openai/v1/chat/completions")
+    }
+
     func testOpenAICompatibleTranscriptionRequestBuilderUsesMultipartAudioRequest() throws {
         let preparedRequest = VoiceInkOpenAICompatibleTranscriptionRequestBuilder.make(
             baseURL: try XCTUnwrap(URL(string: "https://api.groq.com/openai")),

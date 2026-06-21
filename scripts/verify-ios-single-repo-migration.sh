@@ -3255,6 +3255,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionClient.swift
 
 require_pattern \
+  "shared OpenAI-compatible chat client uses shared HTTP response validation" \
+  'VoiceInkRemoteHTTPResponsePolicy\.validateSuccess' \
+  VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleClient.swift
+
+require_pattern \
   "shared remote retry helpers use shared HTTP retry classification" \
   'VoiceInkRemoteHTTPResponsePolicy\.(retryableStatusCode|apiError)' \
   VoiceInkCore/Sources/VoiceInkCore/RetriedUpload.swift \
@@ -3264,6 +3269,16 @@ require_pattern \
   "core checks execute remote HTTP response policy tests" \
   'RemoteHTTPResponsePolicyTests\.testValidateSuccessAcceptsHTTP2xxResponses|RemoteHTTPResponsePolicyTests\.testValidateSuccessRejectsNonHTTPResponses|RemoteHTTPResponsePolicyTests\.testValidateSuccessThrowsProviderNSErrorForNon2xxBody|RemoteHTTPResponsePolicyTests\.testAPIErrorUsesEmptyMessageForNonUTF8Body|RemoteHTTPResponsePolicyTests\.testRetryableStatusCodeMatchesSharedRemoteRetryPolicy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute OpenAI-compatible chat HTTP response validation test" \
+  'RemoteProviderRequestTests\.testOpenAICompatibleClientUsesSharedHTTPResponseValidationForChatErrors' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "shared OpenAI-compatible chat client avoids duplicate HTTP response validation" \
+  'guard let http = response as\? HTTPURLResponse|guard \(200..<300\)\.contains\(http\.statusCode\)|String\(data: data, encoding: \.utf8\) \?\? ""|NSError\(' \
+  VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleClient.swift
 
 reject_pattern \
   "shared remote transcription clients avoid provider-local HTTP response validators" \

@@ -130,7 +130,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - shared remote transcription provider dispatch plus batch request option defaults for provider/use-specific prompt, vocabulary, timeout, retry, and formatting parameters
 - shared API-key verification result policy plus Cartesia API-key verification request/client helper
 - shared multipart form-data construction for remote transcription clients
-- shared remote HTTP response validation, provider-domain error construction, retryable status-code classification, and retried upload helper for remote transcription clients
+- shared remote HTTP response validation, provider-domain error construction, retryable status-code classification, and retried upload helper for remote transcription clients plus OpenAI-compatible chat completion
 
 Current macOS consumers of shared remote transport:
 
@@ -155,7 +155,7 @@ Current macOS consumers of shared remote transport:
 - macOS API-key lookup reads provider fallback environment-variable names and custom-model Keychain account identifiers from `VoiceInkProviderAPIKeyAccount`; Keychain access remains in the macOS shell.
 - macOS cloud-provider model lists are supplied by the `CloudProvider` default adapter over `VoiceInkTranscriptionModelCatalog`; the old standalone cloud-model adapter file is folded into `CloudProvider`, so the macOS shell only owns streaming factories and platform storage context.
 - macOS cloud-provider recorded-file support is derived from `VoiceInkTranscriptionModelProvider.supportsRecordedFileTranscription`, so Cartesia remains streaming-only without a shell-only override.
-- macOS cloud-provider HTTP status error-domain mapping, shared remote transcription transport error domains, low-level remote client defaults, remote HTTP success validation, provider-domain NSError construction, and retryable status-code classification are derived through `VoiceInkTranscriptionModelProvider.apiErrorDomain` and `VoiceInkRemoteHTTPResponsePolicy`, so batch transport error classification shares provider metadata instead of shell-only switches or provider literals scattered through clients.
+- macOS cloud-provider HTTP status error-domain mapping, shared remote transcription transport error domains, low-level remote client defaults, remote HTTP success validation, provider-domain NSError construction, retryable status-code classification, and OpenAI-compatible chat completion response validation are derived through `VoiceInkTranscriptionModelProvider.apiErrorDomain` and `VoiceInkRemoteHTTPResponsePolicy`, so batch transport error classification shares provider metadata instead of shell-only switches or provider literals scattered through clients.
 - macOS Native Apple and Parakeet model structs adapt `VoiceInkTranscriptionModelCatalog` local model specs, and macOS Native Apple selection/runtime failure copy plus result-stream timeout math route through `VoiceInkNativeAppleTranscriptionPolicy`; macOS still owns OS availability checks and FluidAudio download/runtime code.
 - macOS language pickers and iOS language settings use `VoiceInkLanguageCatalog.sortedOptions`, `VoiceInkLanguageCatalog.displayName`, and `VoiceInkTranscriptionLanguagePresentation` so language presentation order, fallback naming, and picker copy stay shared.
 - macOS recording, audio-file transcription, and retry transcription use `VoiceInkTranscriptionCleanupConfiguration` directly for shared raw-output filtering and cleanup preferences.

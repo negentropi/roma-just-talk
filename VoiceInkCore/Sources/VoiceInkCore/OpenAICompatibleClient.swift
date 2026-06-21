@@ -41,18 +41,11 @@ public struct VoiceInkOpenAICompatibleClient: Sendable {
             extraBodyParameters: extraBodyParameters
         )
         let (data, response) = try await URLSession.shared.data(for: request)
-        guard let http = response as? HTTPURLResponse else {
-            throw URLError(.badServerResponse)
-        }
-
-        guard (200..<300).contains(http.statusCode) else {
-            let errorText = String(data: data, encoding: .utf8) ?? ""
-            throw NSError(
-                domain: "LLMPostProcessing",
-                code: http.statusCode,
-                userInfo: [NSLocalizedDescriptionKey: errorText]
-            )
-        }
+        try VoiceInkRemoteHTTPResponsePolicy.validateSuccess(
+            response: response,
+            data: data,
+            errorDomain: "LLMPostProcessing"
+        )
 
         return try VoiceInkOpenAICompatibleChatCodec.firstMessageContent(from: data)
     }

@@ -729,6 +729,20 @@ public enum VoiceInkAIEnhancementProviderPreference {
         saveSelectedModel(model, for: provider.rawValue, to: defaults)
     }
 
+    @discardableResult
+    public static func applyModelRefreshPlan(
+        _ plan: VoiceInkAIEnhancementModelRefreshPlan,
+        for provider: VoiceInkAIEnhancementProviderKind,
+        to defaults: UserDefaults = .standard
+    ) -> String? {
+        guard let selectedModel = plan.selectedModelToSave else {
+            return nil
+        }
+
+        saveSelectedModel(selectedModel, for: provider, to: defaults)
+        return selectedModel
+    }
+
     public static func clear(
         from defaults: UserDefaults = .standard,
         providers: [VoiceInkAIEnhancementProviderKind] = VoiceInkAIEnhancementProviderKind.allCases
@@ -763,6 +777,19 @@ public enum VoiceInkDynamicAIProviderPreference {
         defaults.set(model, forKey: VoiceInkUserDefaultsKey.ollamaSelectedModel)
     }
 
+    @discardableResult
+    public static func applyOllamaModelRefreshPlan(
+        _ plan: VoiceInkAIEnhancementModelRefreshPlan,
+        to defaults: UserDefaults = .standard
+    ) -> String? {
+        guard let selectedModel = plan.selectedModelToSave else {
+            return nil
+        }
+
+        saveOllamaSelectedModel(selectedModel, to: defaults)
+        return selectedModel
+    }
+
     public static func customProviderBaseURL(
         from defaults: UserDefaults = .standard,
         fallback: String = ""
@@ -791,6 +818,19 @@ public enum VoiceInkDynamicAIProviderPreference {
 
     public static func saveOpenRouterModels(_ models: [String], to defaults: UserDefaults = .standard) {
         defaults.set(models, forKey: VoiceInkUserDefaultsKey.openRouterModels)
+    }
+
+    @discardableResult
+    public static func applyOpenRouterModelRefreshPlan(
+        _ plan: VoiceInkAIEnhancementModelRefreshPlan,
+        to defaults: UserDefaults = .standard
+    ) -> String? {
+        saveOpenRouterModels(plan.refreshedModelNames, to: defaults)
+        return VoiceInkAIEnhancementProviderPreference.applyModelRefreshPlan(
+            plan,
+            for: .openRouter,
+            to: defaults
+        )
     }
 
     public static func clear(from defaults: UserDefaults = .standard) {

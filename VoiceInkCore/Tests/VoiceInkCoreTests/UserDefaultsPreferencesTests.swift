@@ -820,6 +820,40 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testAIEnhancementProviderPreferenceAppliesModelRefreshPlan() {
+        withIsolatedDefaults { defaults in
+            let appliedModel = VoiceInkAIEnhancementProviderPreference.applyModelRefreshPlan(
+                VoiceInkAIEnhancementModelRefreshPlan(
+                    refreshedModelNames: ["anthropic/claude-3.5-sonnet"],
+                    selectedModelToSave: "anthropic/claude-3.5-sonnet"
+                ),
+                for: .openRouter,
+                to: defaults
+            )
+
+            XCTAssertEqual(appliedModel, "anthropic/claude-3.5-sonnet")
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderPreference.selectedModel(for: "OpenRouter", from: defaults),
+                "anthropic/claude-3.5-sonnet"
+            )
+
+            let ignoredModel = VoiceInkAIEnhancementProviderPreference.applyModelRefreshPlan(
+                VoiceInkAIEnhancementModelRefreshPlan(
+                    refreshedModelNames: [],
+                    selectedModelToSave: nil
+                ),
+                for: .openRouter,
+                to: defaults
+            )
+
+            XCTAssertNil(ignoredModel)
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderPreference.selectedModel(for: "OpenRouter", from: defaults),
+                "anthropic/claude-3.5-sonnet"
+            )
+        }
+    }
+
     func testAIEnhancementProviderPreferenceLoadsSelectedModelsByProvider() {
         withIsolatedDefaults { defaults in
             VoiceInkAIEnhancementProviderPreference.saveSelectedModel(
@@ -949,6 +983,38 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testDynamicAIProviderPreferenceAppliesOllamaModelRefreshPlan() {
+        withIsolatedDefaults { defaults in
+            let appliedModel = VoiceInkDynamicAIProviderPreference.applyOllamaModelRefreshPlan(
+                VoiceInkAIEnhancementModelRefreshPlan(
+                    refreshedModelNames: ["llama3", "mistral"],
+                    selectedModelToSave: "llama3"
+                ),
+                to: defaults
+            )
+
+            XCTAssertEqual(appliedModel, "llama3")
+            XCTAssertEqual(
+                VoiceInkDynamicAIProviderPreference.ollamaSelectedModel(from: defaults, fallback: "mistral"),
+                "llama3"
+            )
+
+            let ignoredModel = VoiceInkDynamicAIProviderPreference.applyOllamaModelRefreshPlan(
+                VoiceInkAIEnhancementModelRefreshPlan(
+                    refreshedModelNames: ["mistral"],
+                    selectedModelToSave: nil
+                ),
+                to: defaults
+            )
+
+            XCTAssertNil(ignoredModel)
+            XCTAssertEqual(
+                VoiceInkDynamicAIProviderPreference.ollamaSelectedModel(from: defaults, fallback: "mistral"),
+                "llama3"
+            )
+        }
+    }
+
     func testDynamicAIProviderPreferenceRoundTripsCustomProviderSettings() {
         withIsolatedDefaults { defaults in
             XCTAssertEqual(VoiceInkDynamicAIProviderPreference.customProviderBaseURL(from: defaults), "")
@@ -974,6 +1040,40 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             XCTAssertEqual(
                 VoiceInkDynamicAIProviderPreference.openRouterModels(from: defaults),
                 ["openai/gpt-oss-120b", "z-ai/glm-4.5"]
+            )
+        }
+    }
+
+    func testDynamicAIProviderPreferenceAppliesOpenRouterModelRefreshPlan() {
+        withIsolatedDefaults { defaults in
+            let appliedModel = VoiceInkDynamicAIProviderPreference.applyOpenRouterModelRefreshPlan(
+                VoiceInkAIEnhancementModelRefreshPlan(
+                    refreshedModelNames: ["anthropic/claude-3.5-sonnet", "openai/gpt-4o"],
+                    selectedModelToSave: "anthropic/claude-3.5-sonnet"
+                ),
+                to: defaults
+            )
+
+            XCTAssertEqual(appliedModel, "anthropic/claude-3.5-sonnet")
+            XCTAssertEqual(
+                VoiceInkDynamicAIProviderPreference.openRouterModels(from: defaults),
+                ["anthropic/claude-3.5-sonnet", "openai/gpt-4o"]
+            )
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderPreference.selectedModel(for: "OpenRouter", from: defaults),
+                "anthropic/claude-3.5-sonnet"
+            )
+
+            let ignoredModel = VoiceInkDynamicAIProviderPreference.applyOpenRouterModelRefreshPlan(
+                .failed,
+                to: defaults
+            )
+
+            XCTAssertNil(ignoredModel)
+            XCTAssertEqual(VoiceInkDynamicAIProviderPreference.openRouterModels(from: defaults), [])
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderPreference.selectedModel(for: "OpenRouter", from: defaults),
+                "anthropic/claude-3.5-sonnet"
             )
         }
     }

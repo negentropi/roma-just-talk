@@ -320,20 +320,24 @@ class AIService: ObservableObject {
                     refreshedModels: models,
                     defaultModel: self.selectedProvider.defaultTextEnhancementModel()
                 )
-                self.openRouterModels = plan.refreshedModelNames
-                VoiceInkDynamicAIProviderPreference.saveOpenRouterModels(plan.refreshedModelNames, to: self.userDefaults)
-                if let refreshedModel = plan.selectedModelToSave {
-                    self.selectModel(refreshedModel)
-                }
-                self.objectWillChange.send()
+                self.applyOpenRouterModelRefreshPlan(plan)
             }
         } catch {
             await MainActor.run {
-                let plan = VoiceInkAIEnhancementModelRefreshPlan.failed
-                self.openRouterModels = plan.refreshedModelNames
-                VoiceInkDynamicAIProviderPreference.saveOpenRouterModels(plan.refreshedModelNames, to: self.userDefaults)
-                self.objectWillChange.send()
+                self.applyOpenRouterModelRefreshPlan(.failed)
             }
         }
+    }
+
+    private func applyOpenRouterModelRefreshPlan(_ plan: VoiceInkAIEnhancementModelRefreshPlan) {
+        openRouterModels = plan.refreshedModelNames
+        if let refreshedModel = VoiceInkDynamicAIProviderPreference.applyOpenRouterModelRefreshPlan(
+            plan,
+            to: userDefaults
+        ) {
+            selectedModels[.openRouter] = refreshedModel
+            NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
+        }
+        objectWillChange.send()
     }
 }

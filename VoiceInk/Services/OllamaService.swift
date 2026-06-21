@@ -64,7 +64,7 @@ class OllamaService: ObservableObject {
             )
             availableModels = models
 
-            if let refreshedModel = plan.selectedModelToSave {
+            if let refreshedModel = VoiceInkDynamicAIProviderPreference.applyOllamaModelRefreshPlan(plan) {
                 selectedModel = refreshedModel
             }
         } catch {

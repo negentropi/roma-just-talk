@@ -6130,13 +6130,34 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \
+  "shared AI enhancement refresh persistence application lives in VoiceInkCore" \
+  'applyModelRefreshPlan|applyOpenRouterModelRefreshPlan|applyOllamaModelRefreshPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "core tests pin shared AI enhancement refresh persistence application" \
+  'testAIEnhancementProviderPreferenceAppliesModelRefreshPlan|testDynamicAIProviderPreferenceAppliesOpenRouterModelRefreshPlan|testDynamicAIProviderPreferenceAppliesOllamaModelRefreshPlan' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/UserDefaultsPreferencesTests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "macOS AI service refresh model application uses shared policy" \
   'VoiceInkAIEnhancementModelRefreshPlan\.(refreshed|failed)' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 require_pattern \
+  "macOS AI service refresh persistence uses shared application policy" \
+  'VoiceInkDynamicAIProviderPreference\.applyOpenRouterModelRefreshPlan' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+require_pattern \
   "macOS Ollama service refresh model application uses shared policy" \
   'VoiceInkAIEnhancementModelRefreshPlan\.refreshed' \
+  VoiceInk/Services/OllamaService.swift
+
+require_pattern \
+  "macOS Ollama service refresh persistence uses shared application policy" \
+  'VoiceInkDynamicAIProviderPreference\.applyOllamaModelRefreshPlan' \
   VoiceInk/Services/OllamaService.swift
 
 require_pattern \
@@ -6257,6 +6278,12 @@ reject_pattern \
   "macOS AI service avoids duplicate refresh model-selection policy" \
   'currentModel == .*defaultTextEnhancementModel|models\.first!|textEnhancementModelToSelectAfterRefresh' \
   VoiceInk/Services/AIEnhancement/AIService.swift
+
+reject_pattern \
+  "macOS AI services avoid shell-owned refresh selected-model persistence policy" \
+  'plan\.selectedModelToSave|saveOpenRouterModels\(plan\.refreshedModelNames|saveOllamaSelectedModel\(plan\.selectedModelToSave' \
+  VoiceInk/Services/AIEnhancement/AIService.swift \
+  VoiceInk/Services/OllamaService.swift
 
 reject_pattern \
   "macOS AI service avoids shell-owned OpenRouter refresh cache decisions" \

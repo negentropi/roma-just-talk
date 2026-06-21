@@ -5537,7 +5537,7 @@ reject_pattern \
 
 require_pattern \
   "macOS AI API-key view uses shared AI draft policy" \
-  'VoiceInkAIEnhancementAPIKeyDraft' \
+  'apiKeyFormState\.draft' \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
 
 require_pattern \
@@ -5592,7 +5592,7 @@ require_pattern \
 
 reject_pattern \
   "macOS AI API-key view avoids shallow draft-key wrapper" \
-  'private +var +hasDraftAPIKey\b' \
+  'private +var +(hasDraftAPIKey|apiKeyDraft)\b' \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
 
 reject_pattern \

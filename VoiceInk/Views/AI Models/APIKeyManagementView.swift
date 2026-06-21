@@ -18,14 +18,11 @@ struct APIKeyManagementView: View {
     @State private var localCLITimeoutSeconds: Double = VoiceInkLocalCLIPreference.defaultTimeoutSeconds
     @State private var isSyncingLocalCLIState = false
 
-    private var apiKeyDraft: VoiceInkAIEnhancementAPIKeyDraft {
-        apiKeyFormState.draft(for: aiService.selectedProvider)
-    }
-
     private let providerSettingsPresentation = VoiceInkAIEnhancementProviderSettingsPresentation.macOS
     private let localCLIPresentation = VoiceInkLocalCLIPreference.macOSSettingsPresentation
 
     var body: some View {
+        let apiKeyDraft = apiKeyFormState.draft(for: aiService.selectedProvider)
         let selectedProviderSettingsSurface = aiService.selectedProvider.textEnhancementSettingsSurface
         let connectionStatusPresentation = providerSettingsPresentation.connectionStatus(
             surface: selectedProviderSettingsSurface,

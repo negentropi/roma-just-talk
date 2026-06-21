@@ -596,6 +596,11 @@ require_pattern \
   VoiceInk/Views/Common/SaveIconButton.swift
 
 reject_pattern \
+  "macOS save button avoids shallow markdown export wrapper" \
+  'private +func +markdownContent\(' \
+  VoiceInk/Views/Common/SaveIconButton.swift
+
+reject_pattern \
   "macOS save button avoids shell-owned transcript export date formatting" \
   'DateFormatter|localizedString' \
   VoiceInk/Views/Common/SaveIconButton.swift

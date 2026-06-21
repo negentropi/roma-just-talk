@@ -35,7 +35,9 @@ struct SaveIconButton: View {
         if panel.runModal() == .OK {
             guard let url = panel.url else { return }
             do {
-                let content = fileExtension == "md" ? markdownContent() : textToSave
+                let content = fileExtension == "md"
+                    ? VoiceInkTranscriptFileExport.markdownContent(for: textToSave)
+                    : textToSave
                 try content.write(to: url, atomically: true, encoding: .utf8)
                 withAnimation { saved = true }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
@@ -47,7 +49,4 @@ struct SaveIconButton: View {
         }
     }
 
-    private func markdownContent() -> String {
-        VoiceInkTranscriptFileExport.markdownContent(for: textToSave)
-    }
 }

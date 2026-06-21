@@ -117,7 +117,7 @@ public struct VoiceInkSonioxTranscriptionClient: Sendable {
             maxRetries: 2,
             errorDomain: errorDomain
         )
-        try Self.validate(response: response, data: data, errorDomain: errorDomain)
+        try VoiceInkRemoteHTTPResponsePolicy.validateSuccess(response: response, data: data, errorDomain: errorDomain)
         return try VoiceInkSonioxTranscriptionCodec.uploadedFileID(from: data)
     }
 
@@ -146,7 +146,7 @@ public struct VoiceInkSonioxTranscriptionClient: Sendable {
             maxRetries: 2,
             errorDomain: errorDomain
         )
-        try Self.validate(response: response, data: data, errorDomain: errorDomain)
+        try VoiceInkRemoteHTTPResponsePolicy.validateSuccess(response: response, data: data, errorDomain: errorDomain)
         return try VoiceInkSonioxTranscriptionCodec.createdTranscriptionID(from: data)
     }
 
@@ -167,7 +167,7 @@ public struct VoiceInkSonioxTranscriptionClient: Sendable {
                 timeout: timeout
             )
             let (data, response) = try await URLSession.shared.data(for: request)
-            try Self.validate(response: response, data: data, errorDomain: errorDomain)
+            try VoiceInkRemoteHTTPResponsePolicy.validateSuccess(response: response, data: data, errorDomain: errorDomain)
 
             if let status = try? VoiceInkSonioxTranscriptionCodec.status(from: data).lowercased() {
                 switch status {
@@ -210,24 +210,7 @@ public struct VoiceInkSonioxTranscriptionClient: Sendable {
             maxRetries: 2,
             errorDomain: errorDomain
         )
-        try Self.validate(response: response, data: data, errorDomain: errorDomain)
+        try VoiceInkRemoteHTTPResponsePolicy.validateSuccess(response: response, data: data, errorDomain: errorDomain)
         return VoiceInkSonioxTranscriptionCodec.transcript(from: data)
-    }
-
-    private static func validate(
-        response: URLResponse,
-        data: Data,
-        errorDomain: String
-    ) throws {
-        guard let http = response as? HTTPURLResponse else {
-            throw URLError(.badServerResponse)
-        }
-        guard (200..<300).contains(http.statusCode) else {
-            throw NSError(
-                domain: errorDomain,
-                code: http.statusCode,
-                userInfo: [NSLocalizedDescriptionKey: String(data: data, encoding: .utf8) ?? ""]
-            )
-        }
     }
 }

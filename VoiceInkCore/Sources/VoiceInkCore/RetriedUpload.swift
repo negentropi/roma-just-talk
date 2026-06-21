@@ -1,8 +1,6 @@
 import Foundation
 
 enum VoiceInkRetriedRequest {
-    private static let retryableStatusCodes: Set<Int> = [429, 500, 502, 503, 504]
-
     static func data(
         for request: URLRequest,
         timeout: TimeInterval,
@@ -64,13 +62,12 @@ enum VoiceInkRetriedRequest {
 
             do {
                 let (data, response) = try await operation(session, request)
-                if let http = response as? HTTPURLResponse,
-                   retryableStatusCodes.contains(http.statusCode),
+                if let statusCode = VoiceInkRemoteHTTPResponsePolicy.retryableStatusCode(in: response),
                    attempt < attempts {
-                    lastError = NSError(
-                        domain: errorDomain,
-                        code: http.statusCode,
-                        userInfo: [NSLocalizedDescriptionKey: String(data: data, encoding: .utf8) ?? ""]
+                    lastError = VoiceInkRemoteHTTPResponsePolicy.apiError(
+                        statusCode: statusCode,
+                        data: data,
+                        errorDomain: errorDomain
                     )
                     continue
                 }

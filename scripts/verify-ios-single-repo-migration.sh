@@ -227,12 +227,15 @@ run_voiceink_audio_proof_help() {
 require_pattern() {
   local description="$1"
   local pattern="$2"
-  local file="$3"
+  shift 2
 
   section "$description"
-  if ! rg -q "$pattern" "$file"; then
-    fail "$description"
-  fi
+  local file
+  for file in "$@"; do
+    if ! rg -q "$pattern" "$file"; then
+      fail "$description: missing pattern in $file"
+    fi
+  done
 }
 
 require_context_pattern_count_at_least() {
@@ -3193,6 +3196,48 @@ reject_pattern \
   VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionClient.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionClient.swift \
   VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionClient.swift
+
+require_pattern \
+  "shared remote HTTP response policy owns success, retry, and provider-domain errors" \
+  'VoiceInkRemoteHTTPResponsePolicy|successStatusCodeRange|retryableStatusCode|apiError|responseBodyText|URLError\(\.badServerResponse\)' \
+  VoiceInkCore/Sources/VoiceInkCore/RemoteHTTPResponsePolicy.swift
+
+require_pattern \
+  "shared remote transcription clients use shared HTTP response validation" \
+  'VoiceInkRemoteHTTPResponsePolicy\.validateSuccess' \
+  VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/MistralTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/ElevenLabsTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionClient.swift
+
+require_pattern \
+  "shared remote retry helpers use shared HTTP retry classification" \
+  'VoiceInkRemoteHTTPResponsePolicy\.(retryableStatusCode|apiError)' \
+  VoiceInkCore/Sources/VoiceInkCore/RetriedUpload.swift \
+  VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionClient.swift
+
+require_pattern \
+  "core checks execute remote HTTP response policy tests" \
+  'RemoteHTTPResponsePolicyTests\.testValidateSuccessAcceptsHTTP2xxResponses|RemoteHTTPResponsePolicyTests\.testValidateSuccessRejectsNonHTTPResponses|RemoteHTTPResponsePolicyTests\.testValidateSuccessThrowsProviderNSErrorForNon2xxBody|RemoteHTTPResponsePolicyTests\.testAPIErrorUsesEmptyMessageForNonUTF8Body|RemoteHTTPResponsePolicyTests\.testRetryableStatusCodeMatchesSharedRemoteRetryPolicy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "shared remote transcription clients avoid provider-local HTTP response validators" \
+  'private static func validate\(' \
+  VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionClient.swift
+
+reject_pattern \
+  "shared remote retry helpers avoid duplicate retry status sets" \
+  'private static let retryableStatusCodes' \
+  VoiceInkCore/Sources/VoiceInkCore/RetriedUpload.swift \
+  VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionClient.swift
 
 require_pattern \
   "shared custom cloud model backup record owns export/import shape" \

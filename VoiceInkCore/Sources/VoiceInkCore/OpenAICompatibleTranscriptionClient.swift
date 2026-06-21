@@ -1,8 +1,6 @@
 import Foundation
 
 public struct VoiceInkOpenAICompatibleTranscriptionClient: Sendable {
-    private static let retryableStatusCodes: Set<Int> = [429, 500, 502, 503, 504]
-
     private let modelsClient: VoiceInkOpenAICompatibleClient
 
     public init(modelsClient: VoiceInkOpenAICompatibleClient = VoiceInkOpenAICompatibleClient()) {
@@ -73,18 +71,11 @@ public struct VoiceInkOpenAICompatibleTranscriptionClient: Sendable {
             timeout: timeout,
             maxRetries: maxRetries
         )
-        guard let http = response as? HTTPURLResponse else {
-            throw URLError(.badServerResponse)
-        }
-
-        guard (200..<300).contains(http.statusCode) else {
-            let errorText = String(data: data, encoding: .utf8) ?? ""
-            throw NSError(
-                domain: errorDomain,
-                code: http.statusCode,
-                userInfo: [NSLocalizedDescriptionKey: errorText]
-            )
-        }
+        try VoiceInkRemoteHTTPResponsePolicy.validateSuccess(
+            response: response,
+            data: data,
+            errorDomain: errorDomain
+        )
 
         return VoiceInkOpenAICompatibleTranscriptionCodec.transcriptionText(
             from: data,
@@ -141,13 +132,12 @@ public struct VoiceInkOpenAICompatibleTranscriptionClient: Sendable {
 
             do {
                 let (data, response) = try await session.data(for: request)
-                if let http = response as? HTTPURLResponse,
-                   retryableStatusCodes.contains(http.statusCode),
+                if let statusCode = VoiceInkRemoteHTTPResponsePolicy.retryableStatusCode(in: response),
                    attempt < attempts {
-                    lastError = NSError(
-                        domain: "OpenAICompatibleTranscriptionAPI",
-                        code: http.statusCode,
-                        userInfo: [NSLocalizedDescriptionKey: String(data: data, encoding: .utf8) ?? ""]
+                    lastError = VoiceInkRemoteHTTPResponsePolicy.apiError(
+                        statusCode: statusCode,
+                        data: data,
+                        errorDomain: "OpenAICompatibleTranscriptionAPI"
                     )
                     continue
                 }

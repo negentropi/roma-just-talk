@@ -31,18 +31,11 @@ public struct VoiceInkElevenLabsTranscriptionClient: Sendable {
             maxRetries: maxRetries,
             errorDomain: errorDomain
         )
-        guard let http = response as? HTTPURLResponse else {
-            throw URLError(.badServerResponse)
-        }
-
-        guard (200..<300).contains(http.statusCode) else {
-            let errorText = String(data: data, encoding: .utf8) ?? ""
-            throw NSError(
-                domain: errorDomain,
-                code: http.statusCode,
-                userInfo: [NSLocalizedDescriptionKey: errorText]
-            )
-        }
+        try VoiceInkRemoteHTTPResponsePolicy.validateSuccess(
+            response: response,
+            data: data,
+            errorDomain: errorDomain
+        )
 
         return try VoiceInkElevenLabsTranscriptionCodec.transcript(from: data)
     }

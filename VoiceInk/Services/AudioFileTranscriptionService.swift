@@ -30,24 +30,23 @@ class AudioTranscriptionService {
         
         do {
             let transcriptionStart = Date()
-            var text = try await serviceRegistry.transcribe(audioURL: url, model: model)
+            let rawText = try await serviceRegistry.transcribe(audioURL: url, model: model)
             let transcriptionDuration = Date().timeIntervalSince(transcriptionStart)
             let cleanupConfiguration = VoiceInkTranscriptionCleanupConfiguration.current()
-            text = cleanupConfiguration.filterRawOutput(text)
 
             let powerModeMetadata = VoiceInkPowerModeTranscriptionMetadata.active(
                 from: PowerModeManager.shared.activeConfiguration
             )
 
-            let preparedRunText = VoiceInkTranscriptionRunPreparation.prepareFilteredText(
-                text,
+            let textPlan = VoiceInkTranscriptionRunPreparation.prepareAudioFileText(
+                rawText,
                 cleanupConfiguration: cleanupConfiguration
             ) { text in
                 WordReplacementService.shared.applyReplacements(to: text, using: modelContext)
             }
-            text = preparedRunText.wordReplacedText
+            let text = textPlan.textForEnhancement
             logger.notice("✅ Word replacements applied")
-            let cleanedText = preparedRunText.cleanedText
+            let cleanedText = textPlan.cleanedText
 
             let audioAsset = AVURLAsset(url: url)
             let duration = CMTimeGetSeconds(try await audioAsset.load(.duration))
@@ -95,10 +94,9 @@ class AudioTranscriptionService {
                 }
             }
 
-            let shouldSkipEnhancement = preparedRunText.shouldSkipPostProcessing(
+            let shouldSkipEnhancement = textPlan.shouldSkipEnhancement(
                 configuration: VoiceInkPostProcessingSkipConfiguration.current(),
-                promptTriggerForcesPostProcessing: promptDetectionResult?.shouldEnableAI == true,
-                transcriptRole: .wordReplacedText
+                promptTriggerForcesEnhancement: promptDetectionResult?.shouldEnableAI == true
             )
 
             // Apply AI enhancement if enabled

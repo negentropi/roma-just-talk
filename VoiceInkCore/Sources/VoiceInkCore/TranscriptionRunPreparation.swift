@@ -55,6 +55,31 @@ public struct VoiceInkTranscriptionRunPreparedText: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkAudioFileTranscriptionTextPlan: Equatable, Sendable {
+    public let textForEnhancement: String
+    public let cleanedText: String
+
+    public init(textForEnhancement: String, cleanedText: String) {
+        self.textForEnhancement = textForEnhancement
+        self.cleanedText = cleanedText
+    }
+
+    public func shouldSkipEnhancement(
+        configuration: VoiceInkPostProcessingSkipConfiguration?,
+        promptTriggerForcesEnhancement: Bool = false
+    ) -> Bool {
+        guard let configuration else {
+            return false
+        }
+
+        return VoiceInkPostProcessingSkipPolicy.shouldSkipPostProcessing(
+            transcript: textForEnhancement,
+            configuration: configuration,
+            promptTriggerForcesPostProcessing: promptTriggerForcesEnhancement
+        )
+    }
+}
+
 public enum VoiceInkTranscriptionRunPreparation {
     public static func prepareRawText(
         _ rawText: String,
@@ -88,6 +113,23 @@ public enum VoiceInkTranscriptionRunPreparation {
                 normalizeParagraphSpacingBeforeFormatting: normalizeParagraphSpacingBeforeFormatting,
                 applyingWordReplacements: wordReplacement
             )
+        )
+    }
+
+    public static func prepareAudioFileText(
+        _ rawText: String,
+        cleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration,
+        applyingWordReplacements wordReplacement: (String) -> String = { $0 }
+    ) -> VoiceInkAudioFileTranscriptionTextPlan {
+        let preparedText = prepareRawText(
+            rawText,
+            cleanupConfiguration: cleanupConfiguration,
+            applyingWordReplacements: wordReplacement
+        )
+
+        return VoiceInkAudioFileTranscriptionTextPlan(
+            textForEnhancement: preparedText.wordReplacedText,
+            cleanedText: preparedText.cleanedText
         )
     }
 }

@@ -152,28 +152,26 @@ class AudioTranscriptionManager: ObservableObject {
             // Phase: Transcribing
             item.status = .processing(phase: .transcribing)
             let transcriptionStart = Date()
-            var text = try await serviceRegistry.transcribe(audioURL: permanentURL, model: currentModel)
+            let rawText = try await serviceRegistry.transcribe(audioURL: permanentURL, model: currentModel)
             let transcriptionDuration = Date().timeIntervalSince(transcriptionStart)
             let cleanupConfiguration = VoiceInkTranscriptionCleanupConfiguration.current()
-            text = cleanupConfiguration.filterRawOutput(text)
 
             let powerModeMetadata = VoiceInkPowerModeTranscriptionMetadata.active(
                 from: PowerModeManager.shared.activeConfiguration
             )
 
-            let preparedRunText = VoiceInkTranscriptionRunPreparation.prepareFilteredText(
-                text,
+            let textPlan = VoiceInkTranscriptionRunPreparation.prepareAudioFileText(
+                rawText,
                 cleanupConfiguration: cleanupConfiguration
             ) { text in
                 WordReplacementService.shared.applyReplacements(to: text, using: modelContext)
             }
-            text = preparedRunText.wordReplacedText
-            let cleanedText = preparedRunText.cleanedText
+            let text = textPlan.textForEnhancement
+            let cleanedText = textPlan.cleanedText
             try Task.checkCancellation()
 
-            let shouldSkipEnhancement = preparedRunText.shouldSkipPostProcessing(
-                configuration: VoiceInkPostProcessingSkipConfiguration.current(),
-                transcriptRole: .wordReplacedText
+            let shouldSkipEnhancement = textPlan.shouldSkipEnhancement(
+                configuration: VoiceInkPostProcessingSkipConfiguration.current()
             )
             let draftContext = VoiceInkAudioFileTranscriptionDraftContext(
                 cleanedText: cleanedText,

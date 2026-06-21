@@ -3518,18 +3518,39 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/CompletedTranscriptionDraft.swift
 
 require_pattern \
+  "shared audio-file transcription text plan type lives in VoiceInkCore" \
+  'VoiceInkAudioFileTranscriptionTextPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunPreparation.swift
+
+require_pattern \
+  "shared audio-file transcription text preparation helper lives in VoiceInkCore" \
+  'prepareAudioFileText' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunPreparation.swift
+
+require_pattern \
+  "shared audio-file transcription enhancement skip helper lives in VoiceInkCore" \
+  'shouldSkipEnhancement' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunPreparation.swift
+
+require_pattern \
   "macOS live recording uses shared transcription run preparation" \
   'VoiceInkTranscriptionRunPreparation\.prepareFilteredText' \
   VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
 
 require_pattern \
-  "macOS audio-file import uses shared transcription run preparation" \
-  'VoiceInkTranscriptionRunPreparation\.prepareFilteredText' \
+  "macOS audio-file import uses shared audio-file text plan" \
+  'VoiceInkTranscriptionRunPreparation\.prepareAudioFileText' \
   VoiceInk/Services/AudioFileTranscriptionManager.swift
 
 require_pattern \
-  "macOS retry transcription uses shared transcription run preparation" \
-  'VoiceInkTranscriptionRunPreparation\.prepareFilteredText' \
+  "macOS retry transcription uses shared audio-file text plan" \
+  'VoiceInkTranscriptionRunPreparation\.prepareAudioFileText' \
+  VoiceInk/Services/AudioFileTranscriptionService.swift
+
+reject_pattern \
+  "macOS audio-file transcription callers avoid shell-owned raw text preparation and skip role" \
+  'filterRawOutput|prepareFilteredText|transcriptRole: \.wordReplacedText' \
+  VoiceInk/Services/AudioFileTranscriptionManager.swift \
   VoiceInk/Services/AudioFileTranscriptionService.swift
 
 require_pattern \
@@ -3553,8 +3574,28 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/PowerModePolicyTests.swift
 
 require_pattern \
+  "core tests pin audio-file transcription text plan output" \
+  'testAudioFileTextPlanFiltersPreparesAndSelectsEnhancementText' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationTests.swift
+
+require_pattern \
+  "core tests pin audio-file transcription text plan skip policy" \
+  'testAudioFileTextPlanSkipUsesEnhancementTextAndPromptTrigger' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationTests.swift
+
+require_pattern \
   "core check runner executes Power Mode transcription metadata selection test" \
   'testTranscriptionMetadataUsesOnlyEnabledPowerModeConfig' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core check runner executes audio-file transcription text plan output test" \
+  'testAudioFileTextPlanFiltersPreparesAndSelectsEnhancementText' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core check runner executes audio-file transcription text plan skip policy test" \
+  'testAudioFileTextPlanSkipUsesEnhancementTextAndPromptTrigger' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \

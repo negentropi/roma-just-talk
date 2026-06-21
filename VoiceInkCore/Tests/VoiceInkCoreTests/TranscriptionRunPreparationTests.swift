@@ -78,4 +78,47 @@ final class TranscriptionRunPreparationTests: XCTestCase {
             promptTriggerForcesPostProcessing: true
         ))
     }
+
+    func testAudioFileTextPlanFiltersPreparesAndSelectsEnhancementText() {
+        let configuration = VoiceInkTranscriptionCleanupConfiguration(
+            punctuationMode: .removeTrailingPeriod,
+            shouldFormatParagraphs: false,
+            shouldLowercase: true,
+            shouldRemoveFillerWords: true,
+            fillerWords: ["um"]
+        )
+
+        let plan = VoiceInkTranscriptionRunPreparation.prepareAudioFileText(
+            "Um Hello.",
+            cleanupConfiguration: configuration
+        ) { text in
+            text.replacingOccurrences(of: "Hello", with: "ROMA")
+        }
+
+        XCTAssertEqual(plan.textForEnhancement, "ROMA.")
+        XCTAssertEqual(plan.cleanedText, "roma")
+    }
+
+    func testAudioFileTextPlanSkipUsesEnhancementTextAndPromptTrigger() {
+        let configuration = VoiceInkPostProcessingSkipConfiguration(
+            isEnabled: true,
+            wordThreshold: 3
+        )
+        let longEnhancementPlan = VoiceInkAudioFileTranscriptionTextPlan(
+            textForEnhancement: "one two three four",
+            cleanedText: "one"
+        )
+        let shortEnhancementPlan = VoiceInkAudioFileTranscriptionTextPlan(
+            textForEnhancement: "one",
+            cleanedText: "one two three four"
+        )
+
+        XCTAssertFalse(longEnhancementPlan.shouldSkipEnhancement(configuration: configuration))
+        XCTAssertTrue(shortEnhancementPlan.shouldSkipEnhancement(configuration: configuration))
+        XCTAssertFalse(shortEnhancementPlan.shouldSkipEnhancement(
+            configuration: configuration,
+            promptTriggerForcesEnhancement: true
+        ))
+        XCTAssertFalse(shortEnhancementPlan.shouldSkipEnhancement(configuration: nil))
+    }
 }

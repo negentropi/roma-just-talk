@@ -283,6 +283,61 @@ final class DictionaryPolicyTests: XCTestCase {
         )
     }
 
+    func testDictionaryListSortPolicyRemovesDisplayedSortedVocabularyRows() {
+        let vocabulary = ["zeta", "Alpha", "beta", "delta"]
+
+        XCTAssertEqual(
+            VoiceInkDictionaryListSortPolicy.removingVocabulary(
+                atSortedOffsets: IndexSet([0, 2]),
+                from: vocabulary,
+                mode: .wordAscending,
+                word: { $0 }
+            ),
+            ["zeta", "delta"]
+        )
+        XCTAssertEqual(
+            VoiceInkDictionaryListSortPolicy.removingVocabulary(
+                atSortedOffsets: IndexSet([10]),
+                from: vocabulary,
+                mode: .wordAscending,
+                word: { $0 }
+            ),
+            vocabulary
+        )
+    }
+
+    func testDictionaryListSortPolicyRemovesDisplayedSortedWordReplacementRows() {
+        let replacements = [
+            VoiceInkWordReplacementRule(originalText: "voice ink", replacementText: "VoiceInk"),
+            VoiceInkWordReplacementRule(originalText: "roma", replacementText: "Roma Just Talk"),
+            VoiceInkWordReplacementRule(originalText: "alpha", replacementText: "Zed")
+        ]
+
+        XCTAssertEqual(
+            VoiceInkDictionaryListSortPolicy.removingWordReplacements(
+                atSortedOffsets: IndexSet([0]),
+                from: replacements,
+                mode: .replacementDescending,
+                originalText: { $0.originalText },
+                replacementText: { $0.replacementText }
+            ),
+            [
+                VoiceInkWordReplacementRule(originalText: "voice ink", replacementText: "VoiceInk"),
+                VoiceInkWordReplacementRule(originalText: "roma", replacementText: "Roma Just Talk")
+            ]
+        )
+        XCTAssertEqual(
+            VoiceInkDictionaryListSortPolicy.removingWordReplacements(
+                atSortedOffsets: IndexSet([8]),
+                from: replacements,
+                mode: .replacementDescending,
+                originalText: { $0.originalText },
+                replacementText: { $0.replacementText }
+            ),
+            replacements
+        )
+    }
+
     func testVocabularyDraftUsesSharedTokenPolicy() {
         XCTAssertFalse(VoiceInkDictionaryPolicy.hasVocabularyDraft(" , \n "))
         XCTAssertTrue(VoiceInkDictionaryPolicy.hasVocabularyDraft("Voice Ink, "))

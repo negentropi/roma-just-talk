@@ -679,6 +679,23 @@ public enum VoiceInkDictionaryListSortPolicy {
         }
     }
 
+    public static func removingVocabulary<Item>(
+        atSortedOffsets offsets: IndexSet,
+        from items: [Item],
+        mode: VoiceInkVocabularySortMode,
+        word: (Item) -> String
+    ) -> [Item] {
+        let indexedItems = Array(items.enumerated())
+        let sortedItems = sortedVocabulary(indexedItems, mode: mode) { word($0.element) }
+        let originalOffsets = Set(offsets.compactMap { offset in
+            sortedItems.indices.contains(offset) ? sortedItems[offset].offset : nil
+        })
+
+        return indexedItems.compactMap { item in
+            originalOffsets.contains(item.offset) ? nil : item.element
+        }
+    }
+
     public static func sortedWordReplacements<Item>(
         _ items: [Item],
         mode: VoiceInkWordReplacementSortMode,
@@ -700,6 +717,29 @@ public enum VoiceInkDictionaryListSortPolicy {
             case .originalDescending, .replacementDescending:
                 return ordering == .orderedDescending
             }
+        }
+    }
+
+    public static func removingWordReplacements<Item>(
+        atSortedOffsets offsets: IndexSet,
+        from items: [Item],
+        mode: VoiceInkWordReplacementSortMode,
+        originalText: (Item) -> String,
+        replacementText: (Item) -> String
+    ) -> [Item] {
+        let indexedItems = Array(items.enumerated())
+        let sortedItems = sortedWordReplacements(
+            indexedItems,
+            mode: mode,
+            originalText: { originalText($0.element) },
+            replacementText: { replacementText($0.element) }
+        )
+        let originalOffsets = Set(offsets.compactMap { offset in
+            sortedItems.indices.contains(offset) ? sortedItems[offset].offset : nil
+        })
+
+        return indexedItems.compactMap { item in
+            originalOffsets.contains(item.offset) ? nil : item.element
         }
     }
 }

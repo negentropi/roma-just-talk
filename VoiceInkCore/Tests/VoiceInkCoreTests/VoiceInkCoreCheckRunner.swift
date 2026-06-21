@@ -248,6 +248,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testDictionaryListSortModesPreserveStorageAndIndicatorValues", run: { DictionaryPolicyTests().testDictionaryListSortModesPreserveStorageAndIndicatorValues() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testDictionaryListSortPreferencesReadDefaultsAndSaveModes", run: { DictionaryPolicyTests().testDictionaryListSortPreferencesReadDefaultsAndSaveModes() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testDictionaryListSortPolicySortsVocabularyAndWordReplacements", run: { DictionaryPolicyTests().testDictionaryListSortPolicySortsVocabularyAndWordReplacements() }),
+            VoiceInkCoreCheck(name: "DictionaryPolicyTests.testDictionaryListSortPolicyRemovesDisplayedSortedVocabularyRows", run: { DictionaryPolicyTests().testDictionaryListSortPolicyRemovesDisplayedSortedVocabularyRows() }),
+            VoiceInkCoreCheck(name: "DictionaryPolicyTests.testDictionaryListSortPolicyRemovesDisplayedSortedWordReplacementRows", run: { DictionaryPolicyTests().testDictionaryListSortPolicyRemovesDisplayedSortedWordReplacementRows() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testVocabularyDraftUsesSharedTokenPolicy", run: { DictionaryPolicyTests().testVocabularyDraftUsesSharedTokenPolicy() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testVocabularyDraftStateUsesSharedTokenPolicy", run: { DictionaryPolicyTests().testVocabularyDraftStateUsesSharedTokenPolicy() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testVocabularyDraftStateSubmitsAndClearsAcceptedWords", run: { DictionaryPolicyTests().testVocabularyDraftStateSubmitsAndClearsAcceptedWords() }),

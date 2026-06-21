@@ -3487,6 +3487,26 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
 
 require_pattern \
+  "shared vocabulary sorted deletion policy lives in VoiceInkCore" \
+  'removingVocabulary<Item>' \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+require_pattern \
+  "shared word-replacement sorted deletion policy lives in VoiceInkCore" \
+  'removingWordReplacements<Item>' \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+require_pattern \
+  "shared vocabulary sorted deletion check runs in VoiceInkCore" \
+  'testDictionaryListSortPolicyRemovesDisplayedSortedVocabularyRows' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "shared word-replacement sorted deletion check runs in VoiceInkCore" \
+  'testDictionaryListSortPolicyRemovesDisplayedSortedWordReplacementRows' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "iOS settings uses shared dictionary alert presentation" \
   'VoiceInkDictionaryAlertPresentation|dictionaryAlert|\.vocabulary|\.wordReplacement' \
   iOS/VoiceInk-ios/SettingsView.swift
@@ -3512,6 +3532,31 @@ require_pattern \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \
+  "iOS vocabulary settings reads shared sort preference" \
+  'VoiceInkDictionaryListSortPreference\.vocabularySortMode' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+require_pattern \
+  "iOS vocabulary adapter sorts through shared list policy" \
+  'VoiceInkDictionaryListSortPolicy\.sortedVocabulary' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+require_pattern \
+  "iOS vocabulary adapter deletes displayed rows through shared list policy" \
+  'VoiceInkDictionaryListSortPolicy\.removingVocabulary' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+require_pattern \
+  "iOS vocabulary view renders sorted settings rows" \
+  'settings\.sortedCustomVocabularyTerms\(mode: vocabularySortMode\)' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+require_pattern \
+  "iOS vocabulary view deletes displayed sorted rows" \
+  'removeCustomVocabularyTerms\(atSortedOffsets: offsets, mode: vocabularySortMode\)' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+require_pattern \
   "iOS word-replacement submission uses shared draft state" \
   'VoiceInkWordReplacementDraftState|wordReplacementDraftState\.submitting|draftStateAfterSubmit|alertPresentation' \
   iOS/VoiceInk-ios/SettingsView.swift
@@ -3525,6 +3570,31 @@ require_pattern \
   "iOS word-replacement adapter applies shared submission result" \
   'plan\.applying\(to: wordReplacements\)' \
   iOS/VoiceInk-ios/AppSettings.swift
+
+require_pattern \
+  "iOS word-replacement settings reads shared sort preference" \
+  'VoiceInkDictionaryListSortPreference\.wordReplacementSortMode' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+require_pattern \
+  "iOS word-replacement adapter sorts through shared list policy" \
+  'VoiceInkDictionaryListSortPolicy\.sortedWordReplacements' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+require_pattern \
+  "iOS word-replacement adapter deletes displayed rows through shared list policy" \
+  'VoiceInkDictionaryListSortPolicy\.removingWordReplacements' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+require_pattern \
+  "iOS word-replacement view renders sorted settings rows" \
+  'settings\.sortedWordReplacements\(mode: wordReplacementSortMode\)' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+require_pattern \
+  "iOS word-replacement view deletes displayed sorted rows" \
+  'removeWordReplacements\(atSortedOffsets: offsets, mode: wordReplacementSortMode\)' \
+  iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \
   "macOS filler-word settings consumes shared dictionary alert presentation" \
@@ -3611,6 +3681,11 @@ reject_pattern \
   "iOS dictionary adapter avoids shell-owned submission-plan branching" \
   'guard +plan\.shouldInsert|guard +let +rule += +plan\.ruleToInsert|wordReplacements\.append\(rule\)|customVocabularyTerms\.append\(contentsOf: +plan\.wordsToInsert\)' \
   iOS/VoiceInk-ios/AppSettings.swift
+
+reject_pattern \
+  "iOS dictionary settings avoid raw-storage list deletes" \
+  'onDelete\(perform: settings\.remove(CustomVocabularyTerms|WordReplacements)\)' \
+  iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \
   "macOS vocabulary view uses shared dictionary alert presentation" \
@@ -3781,7 +3856,7 @@ reject_pattern \
 
 require_pattern \
   "migration checklist tracks shared dictionary sort gate" \
-  'dictionary form/chrome, quick-add, word-replacement guidance, edit-sheet, list/row copy, vocabulary draft text/submit/reset/duplicate-alert planning, word-replacement draft text/visibility/submit/reset/duplicate-alert planning, word-replacement edit state/saveability/update-completion planning, accepted-submission list application, sort mode storage/toggle/indicator policy, and vocabulary/word-replacement list sorting route through `VoiceInkDictionarySettingsPresentation`/`VoiceInkDictionaryQuickAddPresentation`/`VoiceInkWordReplacementInfoPresentation`/`VoiceInkWordReplacementEditPresentation`/`VoiceInkVocabularyListPresentation`/`VoiceInkWordReplacementListPresentation`/`VoiceInkVocabularyDraftState`/`VoiceInkVocabularyDraftSubmission`/`VoiceInkVocabularySubmissionPlan`/`VoiceInkWordReplacementDraftState`/`VoiceInkWordReplacementDraftSubmission`/`VoiceInkWordReplacementSubmissionPlan`/`VoiceInkWordReplacementEditState`/`VoiceInkWordReplacementEditSubmission`/`VoiceInkDictionaryListSortPreference`/`VoiceInkDictionaryListSortPolicy`' \
+  'dictionary form/chrome, quick-add, word-replacement guidance, edit-sheet, list/row copy, vocabulary draft text/submit/reset/duplicate-alert planning, word-replacement draft text/visibility/submit/reset/duplicate-alert planning, word-replacement edit state/saveability/update-completion planning, accepted-submission list application, sort mode storage/toggle/indicator policy, vocabulary/word-replacement list sorting, and sorted-row deletion planning route through `VoiceInkDictionarySettingsPresentation`/`VoiceInkDictionaryQuickAddPresentation`/`VoiceInkWordReplacementInfoPresentation`/`VoiceInkWordReplacementEditPresentation`/`VoiceInkVocabularyListPresentation`/`VoiceInkWordReplacementListPresentation`/`VoiceInkVocabularyDraftState`/`VoiceInkVocabularyDraftSubmission`/`VoiceInkVocabularySubmissionPlan`/`VoiceInkWordReplacementDraftState`/`VoiceInkWordReplacementDraftSubmission`/`VoiceInkWordReplacementSubmissionPlan`/`VoiceInkWordReplacementEditState`/`VoiceInkWordReplacementEditSubmission`/`VoiceInkDictionaryListSortPreference`/`VoiceInkDictionaryListSortPolicy`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

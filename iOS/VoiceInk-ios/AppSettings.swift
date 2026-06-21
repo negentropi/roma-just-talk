@@ -210,8 +210,28 @@ final class AppSettings: ObservableObject {
         }
     }
 
-    func removeWordReplacements(at offsets: IndexSet) {
-        wordReplacements = VoiceInkPreferenceList.removing(at: offsets, from: wordReplacements)
+    func sortedWordReplacements(
+        mode: VoiceInkWordReplacementSortMode
+    ) -> [VoiceInkWordReplacementRule] {
+        VoiceInkDictionaryListSortPolicy.sortedWordReplacements(
+            wordReplacements,
+            mode: mode,
+            originalText: { $0.originalText },
+            replacementText: { $0.replacementText }
+        )
+    }
+
+    func removeWordReplacements(
+        atSortedOffsets offsets: IndexSet,
+        mode: VoiceInkWordReplacementSortMode
+    ) {
+        wordReplacements = VoiceInkDictionaryListSortPolicy.removingWordReplacements(
+            atSortedOffsets: offsets,
+            from: wordReplacements,
+            mode: mode,
+            originalText: { $0.originalText },
+            replacementText: { $0.replacementText }
+        )
     }
 
     func applyCustomVocabularySubmissionPlan(_ plan: VoiceInkVocabularySubmissionPlan) {
@@ -221,8 +241,24 @@ final class AppSettings: ObservableObject {
         }
     }
 
-    func removeCustomVocabularyTerms(at offsets: IndexSet) {
-        customVocabularyTerms = VoiceInkPreferenceList.removing(at: offsets, from: customVocabularyTerms)
+    func sortedCustomVocabularyTerms(mode: VoiceInkVocabularySortMode) -> [String] {
+        VoiceInkDictionaryListSortPolicy.sortedVocabulary(
+            customVocabularyTerms,
+            mode: mode,
+            word: { $0 }
+        )
+    }
+
+    func removeCustomVocabularyTerms(
+        atSortedOffsets offsets: IndexSet,
+        mode: VoiceInkVocabularySortMode
+    ) {
+        customVocabularyTerms = VoiceInkDictionaryListSortPolicy.removingVocabulary(
+            atSortedOffsets: offsets,
+            from: customVocabularyTerms,
+            mode: mode,
+            word: { $0 }
+        )
     }
 
     var availableTranscriptionLanguages: [String: String] {

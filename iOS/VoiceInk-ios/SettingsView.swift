@@ -7,11 +7,18 @@ struct SettingsView: View {
     @State private var fillerWordDraftState = VoiceInkFillerWordDraftState()
     @State private var customVocabularyDraftState = VoiceInkVocabularyDraftState()
     @State private var wordReplacementDraftState = VoiceInkWordReplacementDraftState()
+    @State private var vocabularySortMode: VoiceInkVocabularySortMode
+    @State private var wordReplacementSortMode: VoiceInkWordReplacementSortMode
     @State private var dictionaryAlert: VoiceInkDictionaryAlertPresentation?
     private let cleanupPresentation = VoiceInkTranscriptionCleanupPresentation.iOS
     private let dictionaryPresentation = VoiceInkDictionarySettingsPresentation.iOS
     private let audioTimeoutPresentation = VoiceInkAudioSessionTimeoutPreference.settingsPresentation
     private let settingsPresentation = VoiceInkSettingsPresentation.iOS
+
+    init() {
+        _vocabularySortMode = State(initialValue: VoiceInkDictionaryListSortPreference.vocabularySortMode())
+        _wordReplacementSortMode = State(initialValue: VoiceInkDictionaryListSortPreference.wordReplacementSortMode())
+    }
     
     var body: some View {
         List {
@@ -108,10 +115,10 @@ struct SettingsView: View {
                     .disabled(!customVocabularyDraftState.canSubmit)
                 }
 
-                ForEach(settings.customVocabularyTerms, id: \.self) { term in
+                ForEach(settings.sortedCustomVocabularyTerms(mode: vocabularySortMode), id: \.self) { term in
                     Text(term)
                 }
-                .onDelete(perform: settings.removeCustomVocabularyTerms)
+                .onDelete(perform: deleteCustomVocabularyTerms)
 
                 TextField(dictionaryPresentation.originalTextPlaceholder, text: $wordReplacementDraftState.original)
                     .textInputAutocapitalization(.never)
@@ -131,7 +138,7 @@ struct SettingsView: View {
                 }
                 .disabled(!wordReplacementDraftState.canSubmit)
 
-                ForEach(Array(settings.wordReplacements.enumerated()), id: \.offset) { _, rule in
+                ForEach(Array(settings.sortedWordReplacements(mode: wordReplacementSortMode).enumerated()), id: \.offset) { _, rule in
                     HStack(spacing: 8) {
                         Text(rule.originalText)
                         Image(systemName: dictionaryPresentation.wordReplacementArrowSystemImageName)
@@ -140,7 +147,7 @@ struct SettingsView: View {
                             .foregroundStyle(.secondary)
                     }
                 }
-                .onDelete(perform: settings.removeWordReplacements)
+                .onDelete(perform: deleteWordReplacements)
             }
             
             Section(header: Text(audioTimeoutPresentation.sectionTitle)) {
@@ -233,6 +240,14 @@ struct SettingsView: View {
         settings.applyWordReplacementSubmissionPlan(submission.plan)
         wordReplacementDraftState = submission.draftStateAfterSubmit
         dictionaryAlert = submission.alertPresentation
+    }
+
+    private func deleteCustomVocabularyTerms(at offsets: IndexSet) {
+        settings.removeCustomVocabularyTerms(atSortedOffsets: offsets, mode: vocabularySortMode)
+    }
+
+    private func deleteWordReplacements(at offsets: IndexSet) {
+        settings.removeWordReplacements(atSortedOffsets: offsets, mode: wordReplacementSortMode)
     }
     
     private func deleteMode(at offsets: IndexSet) {

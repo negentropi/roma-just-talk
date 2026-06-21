@@ -115,6 +115,115 @@ run_required() {
   fi
 }
 
+swiftpm_sandbox_blocked() {
+  rg -q 'sandbox-exec: sandbox_apply: Operation not permitted' "$1"
+}
+
+build_voiceink_core_library() {
+  local build_dir="$1"
+
+  xcrun swiftc -emit-module -emit-library \
+    -enable-testing \
+    -module-name VoiceInkCore \
+    -emit-module-path "$build_dir/VoiceInkCore.swiftmodule" \
+    -o "$build_dir/libVoiceInkCore.dylib" \
+    VoiceInkCore/Sources/VoiceInkCore/*.swift
+}
+
+run_direct_voiceink_core_checks() {
+  local build_dir
+  build_dir="$(mktemp -d "${TMPDIR:-/tmp}/voiceink-core-checks.XXXXXX")"
+  local rc=0
+
+  build_voiceink_core_library "$build_dir" || rc=$?
+  if (( rc == 0 )); then
+    xcrun swiftc \
+      -I "$build_dir" \
+      -L "$build_dir" \
+      -lVoiceInkCore \
+      -Xlinker -rpath \
+      -Xlinker "$build_dir" \
+      -o "$build_dir/VoiceInkCoreChecks" \
+      VoiceInkCore/Tests/VoiceInkCoreTests/*.swift || rc=$?
+  fi
+  if (( rc == 0 )); then
+    "$build_dir/VoiceInkCoreChecks" || rc=$?
+  fi
+
+  rm -rf "$build_dir"
+  return "$rc"
+}
+
+run_voiceink_core_checks() {
+  local output_file
+  output_file="$(mktemp "${TMPDIR:-/tmp}/voiceink-core-checks-swiftpm.XXXXXX")"
+
+  if swift run --package-path VoiceInkCore VoiceInkCoreChecks >"$output_file" 2>&1; then
+    cat "$output_file"
+    rm -f "$output_file"
+    return 0
+  fi
+
+  local swiftpm_rc=$?
+  cat "$output_file" >&2
+  if swiftpm_sandbox_blocked "$output_file"; then
+    rm -f "$output_file"
+    warn "SwiftPM VoiceInkCoreChecks blocked by sandbox-exec; using direct swiftc fallback"
+    run_direct_voiceink_core_checks
+    return $?
+  fi
+
+  rm -f "$output_file"
+  return "$swiftpm_rc"
+}
+
+run_direct_voiceink_audio_proof_help() {
+  local build_dir
+  build_dir="$(mktemp -d "${TMPDIR:-/tmp}/voiceink-audio-proof.XXXXXX")"
+  local rc=0
+
+  build_voiceink_core_library "$build_dir" || rc=$?
+  if (( rc == 0 )); then
+    xcrun swiftc -parse-as-library \
+      -I "$build_dir" \
+      -L "$build_dir" \
+      -lVoiceInkCore \
+      -Xlinker -rpath \
+      -Xlinker "$build_dir" \
+      -o "$build_dir/VoiceInkAudioProof" \
+      VoiceInkCore/Sources/VoiceInkAudioProof/main.swift || rc=$?
+  fi
+  if (( rc == 0 )); then
+    "$build_dir/VoiceInkAudioProof" --help || rc=$?
+  fi
+
+  rm -rf "$build_dir"
+  return "$rc"
+}
+
+run_voiceink_audio_proof_help() {
+  local output_file
+  output_file="$(mktemp "${TMPDIR:-/tmp}/voiceink-audio-proof-swiftpm.XXXXXX")"
+
+  if swift run --package-path VoiceInkCore VoiceInkAudioProof --help >"$output_file" 2>&1; then
+    cat "$output_file"
+    rm -f "$output_file"
+    return 0
+  fi
+
+  local swiftpm_rc=$?
+  cat "$output_file" >&2
+  if swiftpm_sandbox_blocked "$output_file"; then
+    rm -f "$output_file"
+    warn "SwiftPM VoiceInkAudioProof blocked by sandbox-exec; using direct swiftc fallback"
+    run_direct_voiceink_audio_proof_help
+    return $?
+  fi
+
+  rm -f "$output_file"
+  return "$swiftpm_rc"
+}
+
 require_pattern() {
   local description="$1"
   local pattern="$2"
@@ -8110,8 +8219,8 @@ run_required "VoiceInkCore sources typecheck" xcrun swiftc -emit-module \
 
 run_required "VoiceInkCore tests typecheck" xcrun swiftc -typecheck -I /tmp VoiceInkCore/Tests/VoiceInkCoreTests/*.swift
 
-run_required "VoiceInkCoreChecks" swift run --package-path VoiceInkCore VoiceInkCoreChecks
-run_required "VoiceInkAudioProof builds" swift run --package-path VoiceInkCore VoiceInkAudioProof --help
+run_required "VoiceInkCoreChecks" run_voiceink_core_checks
+run_required "VoiceInkAudioProof builds" run_voiceink_audio_proof_help
 
 run_required "macOS Swift sources parse" fd . VoiceInk -e swift -x xcrun swiftc -parse -I /tmp '{}'
 run_required "iOS Swift sources parse" fd . \

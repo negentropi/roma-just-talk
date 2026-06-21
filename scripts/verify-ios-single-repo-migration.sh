@@ -3490,6 +3490,52 @@ require_pattern \
   VoiceInk/Transcription/Streaming/StreamingTranscriptionService.swift
 
 require_pattern \
+  "shared FluidAudio transcription policy lives in VoiceInkCore" \
+  'VoiceInkFluidAudioTranscriptionPolicy' \
+  VoiceInkCore/Sources/VoiceInkCore/FluidAudioTranscriptionPolicy.swift
+
+require_pattern \
+  "shared FluidAudio transcription policy owns trailing-silence default" \
+  'trailingSilenceSeconds: Double = 1' \
+  VoiceInkCore/Sources/VoiceInkCore/FluidAudioTranscriptionPolicy.swift
+
+require_pattern \
+  "shared FluidAudio transcription policy owns max chunk limit" \
+  'maxSingleChunkSamples = 240_000' \
+  VoiceInkCore/Sources/VoiceInkCore/FluidAudioTranscriptionPolicy.swift
+
+require_pattern \
+  "shared FluidAudio transcription policy owns local ASR helper interface" \
+  'paddedSamplesForTranscription|shouldScheduleImmediatePass|shouldRunTranscriptionPass|seekSample|bufferRelativeSeek|cachedFinalTextPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/FluidAudioTranscriptionPolicy.swift
+
+require_pattern \
+  "macOS FluidAudio batch transcription uses shared local ASR policy" \
+  'VoiceInkFluidAudioTranscriptionPolicy\.paddedSamplesForTranscription' \
+  VoiceInk/Transcription/FluidAudio/FluidAudioTranscriptionService.swift
+
+require_pattern \
+  "macOS FluidAudio streaming uses shared local ASR policy" \
+  'VoiceInkFluidAudioTranscriptionPolicy\.(shouldScheduleImmediatePass|shouldRunTranscriptionPass|seekSample|bufferRelativeSeek|paddedSamplesForTranscription|cachedFinalTextPlan)' \
+  VoiceInk/Transcription/Streaming/FluidAudioStreamingProvider.swift
+
+require_pattern \
+  "core checks execute FluidAudio transcription policy tests" \
+  'FluidAudioTranscriptionPolicyTests\.testTrailingSilenceDefaultsPreserveFluidAudioChunkPolicy|FluidAudioTranscriptionPolicyTests\.testImmediatePassSchedulingRequiresEnabledConfigNoInFlightTaskAndEnoughNewAudio|FluidAudioTranscriptionPolicyTests\.testCachedFinalTextPlanRejectsBlankAndStaleHypotheses' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "migration checklist tracks shared FluidAudio local ASR policy" \
+  'FluidAudio batch/streaming adapters consume shared local ASR pass scheduling, seek, cached-final, and trailing-silence padding policy' \
+  docs/ios-single-repo-migration.md
+
+reject_pattern \
+  "macOS FluidAudio adapters avoid shell-owned local ASR policy" \
+  '240_000|sampleCount\(forMono16kDuration: 1\)|runsImmediatePassOnBufferedAudio &&|absoluteSampleCount - last(ImmediatePassScheduled|Transcribed)SampleCount|hypothesisStartTime > 0|maxSingleChunkSamples|trailingSilenceSamples' \
+  VoiceInk/Transcription/FluidAudio/FluidAudioTranscriptionService.swift \
+  VoiceInk/Transcription/Streaming/FluidAudioStreamingProvider.swift
+
+require_pattern \
   "shared core owns transcription runtime resource planning" \
   'VoiceInkTranscriptionRuntimeResourcePlan|VoiceInkTranscriptionRecordingStartupLoadAction' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRuntimeResourcePolicy.swift

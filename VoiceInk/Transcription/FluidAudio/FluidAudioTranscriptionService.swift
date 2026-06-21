@@ -123,12 +123,7 @@ class FluidAudioTranscriptionService: TranscriptionService {
             }
         }
 
-        // Pad with 1s of silence to capture final punctuation at sequence boundary
-        let trailingSilenceSamples = VoiceInkPCM16Audio.sampleCount(forMono16kDuration: 1)
-        let maxSingleChunkSamples = 240_000
-        if speechAudio.count + trailingSilenceSamples <= maxSingleChunkSamples {
-            speechAudio += [Float](repeating: 0, count: trailingSilenceSamples)
-        }
+        speechAudio = VoiceInkFluidAudioTranscriptionPolicy.paddedSamplesForTranscription(speechAudio)
 
         var decoderState = TdtDecoderState.make(decoderLayers: await asrManager.decoderLayerCount)
         let result = try await asrManager.transcribe(

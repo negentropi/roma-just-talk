@@ -84,10 +84,14 @@ final class FluidAudioStreamingProvider: StreamingTranscriptionProvider {
         bufferLock.lock()
         audioBuffer.append(contentsOf: samples)
         let absoluteSampleCount = trimmedSampleCount + audioBuffer.count
-        shouldRunImmediatePass = config.runsImmediatePassOnBufferedAudio &&
-            immediateTranscriptionTask == nil &&
-            absoluteSampleCount >= minimumAudioSamples &&
-            absoluteSampleCount - lastImmediatePassScheduledSampleCount >= minNewSamples
+        shouldRunImmediatePass = VoiceInkFluidAudioTranscriptionPolicy.shouldScheduleImmediatePass(
+            config: config,
+            hasImmediatePassInFlight: immediateTranscriptionTask != nil,
+            absoluteSampleCount: absoluteSampleCount,
+            lastScheduledSampleCount: lastImmediatePassScheduledSampleCount,
+            minimumAudioSamples: minimumAudioSamples,
+            minimumNewSamples: minNewSamples
+        )
         if shouldRunImmediatePass {
             lastImmediatePassScheduledSampleCount = absoluteSampleCount
         }
@@ -172,20 +176,27 @@ final class FluidAudioStreamingProvider: StreamingTranscriptionProvider {
         let absoluteSampleCount = trimmedSampleCount + audioBuffer.count
         bufferLock.unlock()
 
-        guard absoluteSampleCount - lastTranscribedSampleCount >= minNewSamples else { return }
-        guard absoluteSampleCount >= minimumAudioSamples else { return }
+        guard VoiceInkFluidAudioTranscriptionPolicy.shouldRunTranscriptionPass(
+            absoluteSampleCount: absoluteSampleCount,
+            lastTranscribedSampleCount: lastTranscribedSampleCount,
+            minimumAudioSamples: minimumAudioSamples,
+            minimumNewSamples: minNewSamples
+        ) else { return }
 
         isTranscribing = true
         defer { isTranscribing = false }
 
-        // Seek to the start of the first unconfirmed word so it isn't clipped.
-        let seekTime = agreementEngine.hypothesisStartTime > 0
-            ? agreementEngine.hypothesisStartTime
-            : agreementEngine.confirmedEndTime
-        let seekSample = max(0, Int(seekTime * sampleRate))
+        let seekSample = VoiceInkFluidAudioTranscriptionPolicy.seekSample(
+            hypothesisStartTime: agreementEngine.hypothesisStartTime,
+            confirmedEndTime: agreementEngine.confirmedEndTime,
+            sampleRate: sampleRate
+        )
 
         bufferLock.lock()
-        let bufferRelativeSeek = max(0, seekSample - trimmedSampleCount)
+        let bufferRelativeSeek = VoiceInkFluidAudioTranscriptionPolicy.bufferRelativeSeek(
+            seekSample: seekSample,
+            trimmedSampleCount: trimmedSampleCount
+        )
         let sliceEnd = audioBuffer.count
         guard bufferRelativeSeek < sliceEnd else {
             bufferLock.unlock()
@@ -194,12 +205,7 @@ final class FluidAudioStreamingProvider: StreamingTranscriptionProvider {
         var audioSlice = Array(audioBuffer[bufferRelativeSeek..<sliceEnd])
         bufferLock.unlock()
 
-        // Pad with 1s trailing silence for punctuation capture
-        let maxSingleChunkSamples = 240_000
-        let trailingSilenceSamples = VoiceInkPCM16Audio.sampleCount(forMono16kDuration: 1)
-        if audioSlice.count + trailingSilenceSamples <= maxSingleChunkSamples {
-            audioSlice += [Float](repeating: 0, count: trailingSilenceSamples)
-        }
+        audioSlice = VoiceInkFluidAudioTranscriptionPolicy.paddedSamplesForTranscription(audioSlice)
 
         guard audioSlice.count >= minimumAudioSamples else { return }
 
@@ -262,13 +268,17 @@ final class FluidAudioStreamingProvider: StreamingTranscriptionProvider {
     private func transcribeRemainingAudio() async -> String? {
         guard let asrManager else { return nil }
 
-        let seekTime = agreementEngine.hypothesisStartTime > 0
-            ? agreementEngine.hypothesisStartTime
-            : agreementEngine.confirmedEndTime
-        let seekSample = max(0, Int(seekTime * sampleRate))
+        let seekSample = VoiceInkFluidAudioTranscriptionPolicy.seekSample(
+            hypothesisStartTime: agreementEngine.hypothesisStartTime,
+            confirmedEndTime: agreementEngine.confirmedEndTime,
+            sampleRate: sampleRate
+        )
 
         bufferLock.lock()
-        let bufferRelativeSeek = max(0, seekSample - trimmedSampleCount)
+        let bufferRelativeSeek = VoiceInkFluidAudioTranscriptionPolicy.bufferRelativeSeek(
+            seekSample: seekSample,
+            trimmedSampleCount: trimmedSampleCount
+        )
         guard bufferRelativeSeek < audioBuffer.count else {
             bufferLock.unlock()
             return nil
@@ -278,11 +288,7 @@ final class FluidAudioStreamingProvider: StreamingTranscriptionProvider {
 
         guard samples.count >= minimumAudioSamples else { return nil }
 
-        let trailingSilenceSamples = VoiceInkPCM16Audio.sampleCount(forMono16kDuration: 1)
-        let maxSingleChunkSamples = 240_000
-        if samples.count + trailingSilenceSamples <= maxSingleChunkSamples {
-            samples += [Float](repeating: 0, count: trailingSilenceSamples)
-        }
+        samples = VoiceInkFluidAudioTranscriptionPolicy.paddedSamplesForTranscription(samples)
 
         do {
             var state = TdtDecoderState.make(decoderLayers: decoderLayerCount)
@@ -301,16 +307,21 @@ final class FluidAudioStreamingProvider: StreamingTranscriptionProvider {
     }
 
     private func cachedFinalTextIfCurrentEnough() -> String? {
-        let cachedText = latestHypothesisText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !cachedText.isEmpty else { return nil }
-
         bufferLock.lock()
         let absoluteSampleCount = trimmedSampleCount + audioBuffer.count
         bufferLock.unlock()
 
-        let pendingSamples = max(0, absoluteSampleCount - latestHypothesisSampleCount)
-        guard pendingSamples <= maxCachedFinalizationLagSamples else {
-            logger.notice("FluidAudio cached hypothesis too stale pendingSamples=\(pendingSamples, privacy: .public) limit=\(self.maxCachedFinalizationLagSamples, privacy: .public)")
+        let plan = VoiceInkFluidAudioTranscriptionPolicy.cachedFinalTextPlan(
+            latestHypothesisText: latestHypothesisText,
+            latestHypothesisSampleCount: latestHypothesisSampleCount,
+            absoluteSampleCount: absoluteSampleCount,
+            maxCachedFinalizationLagSamples: maxCachedFinalizationLagSamples
+        )
+
+        guard let cachedText = plan.text else {
+            if plan.isTooStale {
+                logger.notice("FluidAudio cached hypothesis too stale pendingSamples=\(plan.pendingSamples, privacy: .public) limit=\(self.maxCachedFinalizationLagSamples, privacy: .public)")
+            }
             return nil
         }
 

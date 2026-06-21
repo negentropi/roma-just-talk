@@ -388,6 +388,7 @@ section "iOS ported assets and resources"
 require_file iOS/Shared/AppGroupCoordinator.swift
 require_file iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
 require_file iOS/Shared/VoiceInkIOSLogger.swift
+require_file iOS/Shared/VoiceInkKeyboardURLOpener.swift
 require_file iOS/VoiceInk-ios/Transcription.swift
 require_file docs/ios-privacy-policy.md
 require_file iOS/VoiceInk-ios/PrivacyInfo.xcprivacy
@@ -9381,9 +9382,9 @@ require_pattern \
   iOS/VoiceInk-ios iOS/Shared
 
 require_pattern \
-  "iOS keyboard diagnostics route through shared iOS logger" \
+  "iOS keyboard URL opener diagnostics route through shared iOS logger" \
   'VoiceInkIOSLogger\.keyboard' \
-  iOS/VoiceInkKeyboard/KeyboardViewController.swift
+  iOS/Shared/VoiceInkKeyboardURLOpener.swift
 
 reject_pattern \
   "iOS app and keyboard shell avoid clone print diagnostics" \
@@ -9552,6 +9553,46 @@ require_pattern \
   "VoiceInkCore checks cover iOS keyboard recording button presentation" \
   'testKeyboardRecordingButtonPresentation(PreservesIOSCopyAndIcons|SelectsCurrentState)' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "iOS keyboard URL opener lives in shared shell adapter" \
+  'VoiceInkKeyboardURLOpener' \
+  iOS/Shared/VoiceInkKeyboardURLOpener.swift
+
+require_pattern \
+  "iOS keyboard URL opener exposes one open-main-app entry point" \
+  'openMainApp' \
+  iOS/Shared/VoiceInkKeyboardURLOpener.swift
+
+require_pattern \
+  "iOS keyboard URL opener owns extension-context opening" \
+  'extensionContext\.open' \
+  iOS/Shared/VoiceInkKeyboardURLOpener.swift
+
+require_pattern \
+  "iOS keyboard URL opener owns UIApplication fallback" \
+  'UIApplication\.value' \
+  iOS/Shared/VoiceInkKeyboardURLOpener.swift
+
+require_pattern \
+  "iOS keyboard URL opener owns responder-chain fallback" \
+  'sel_registerName\("openURL:"\)' \
+  iOS/Shared/VoiceInkKeyboardURLOpener.swift
+
+require_pattern \
+  "iOS keyboard controller delegates record deep-link opening to shared adapter" \
+  'VoiceInkKeyboardURLOpener\.openMainApp' \
+  iOS/VoiceInkKeyboard/KeyboardViewController.swift
+
+require_pattern \
+  "iOS keyboard controller passes shared record deep-link to shared adapter" \
+  'VoiceInkAppDeepLink\.record\.url' \
+  iOS/VoiceInkKeyboard/KeyboardViewController.swift
+
+reject_pattern \
+  "iOS keyboard controller avoids shell-owned URL opening fallback chain" \
+  'extensionContext\??\.open|UIApplication\.value|sel_registerName\("openURL:"\)|openURL:' \
+  iOS/VoiceInkKeyboard/KeyboardViewController.swift
 
 require_pattern \
   "iOS App Group bridge uses entitlement group" \

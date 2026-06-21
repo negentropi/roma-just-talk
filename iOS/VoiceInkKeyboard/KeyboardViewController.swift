@@ -7,7 +7,6 @@
 
 import UIKit
 import KeyboardKit
-import OSLog
 import VoiceInkCore
 
 class KeyboardViewController: KeyboardInputViewController {
@@ -154,61 +153,14 @@ class KeyboardViewController: KeyboardInputViewController {
     }
     
     private func openMainAppForRecording() {
-        // iOS keyboard extensions have severe limitations with audio recording
-        // The correct approach is to simply open the main app and let user record there
-        
-        // Try multiple approaches to open the main app
-        let url = VoiceInkAppDeepLink.record.url
-        // Method 1: Try extensionContext.open (primary method)
-        extensionContext?.open(url) { success in
-            if success {
-                VoiceInkIOSLogger.keyboard.notice("Opened main app via extensionContext")
-            } else {
-                VoiceInkIOSLogger.keyboard.error("extensionContext.open failed, trying alternative methods")
-                DispatchQueue.main.async {
-                    self.tryAlternativeURLOpening(url)
-                }
+        VoiceInkKeyboardURLOpener.openMainApp(
+            url: VoiceInkAppDeepLink.record.url,
+            extensionContext: extensionContext,
+            responder: self,
+            fallback: { [weak self] in
+                self?.showUserMessage()
             }
-        }
-    }
-    
-    private func tryAlternativeURLOpening(_ url: URL) {
-        // Try UIApplication directly if available
-        if let sharedApp = UIApplication.value(forKeyPath: "sharedApplication") as? UIApplication {
-            if sharedApp.canOpenURL(url) {
-                sharedApp.open(url, options: [:]) { success in
-                    if success {
-                        VoiceInkIOSLogger.keyboard.notice("Opened main app via UIApplication.open")
-                    } else {
-                        VoiceInkIOSLogger.keyboard.error("UIApplication.open failed")
-                        self.showUserMessage()
-                    }
-                }
-                return
-            }
-        }
-        
-        // Fallback: Try responder chain method
-        openURLViaResponderChain(url)
-    }
-    
-    private func openURLViaResponderChain(_ url: URL) {
-        // iOS 18 workaround: Use responder chain to open URL
-        var responder: UIResponder? = self
-        let selector = sel_registerName("openURL:")
-        
-        while let r = responder, !r.responds(to: selector) {
-            responder = r.next
-        }
-        
-        if let responder = responder {
-            _ = responder.perform(selector, with: url)
-            VoiceInkIOSLogger.keyboard.notice("Attempted to open main app via responder chain")
-            // Don't assume success since we can't get feedback from this method
-        } else {
-            VoiceInkIOSLogger.keyboard.error("All URL opening methods failed")
-            showUserMessage()
-        }
+        )
     }
     
     private func showUserMessage() {

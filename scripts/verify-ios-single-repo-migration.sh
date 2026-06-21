@@ -4998,6 +4998,21 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
 
 require_pattern \
+  "shared dictionary backup export plan lives in VoiceInkCore" \
+  'VoiceInkDictionaryBackupExportPlan|dictionaryBackupExportPlan\(' \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+require_pattern \
+  "macOS backup export uses shared dictionary export plan" \
+  'VoiceInkDictionaryPolicy\.dictionaryBackupExportPlan\(' \
+  VoiceInk/Services/ImportExportService.swift
+
+reject_pattern \
+  "macOS backup export avoids shell-owned dictionary export planning" \
+  'var exported(DictionaryItems|WordReplacements)|vocabularyBackupRecords\(from: items\.map|Dictionary\(replacements\.map' \
+  VoiceInk/Services/ImportExportService.swift
+
+require_pattern \
   "macOS backup import uses shared dictionary import plan" \
   'VoiceInkDictionaryPolicy\.dictionaryBackupImportPlan\(' \
   VoiceInk/Services/BackupImporter.swift
@@ -5011,6 +5026,16 @@ reject_pattern \
   "macOS backup import avoids shell-only word-replacement import planning" \
   'for \(original, replacement\) in replacements|VoiceInkDictionaryPolicy\.wordReplacementInsertPlan\(|plan\.errorMessage|plan\.shouldInsert|existingOriginalTexts\.append' \
   VoiceInk/Services/BackupImporter.swift
+
+require_pattern \
+  "core checks execute dictionary backup export nil-shape test" \
+  'testDictionaryBackupExportPlanPreservesMacOSNilAndRecordShape' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute dictionary backup export duplicate-replacement test" \
+  'testDictionaryBackupExportPlanKeepsLastDuplicateReplacement' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "core checks execute dictionary backup import plan tests" \

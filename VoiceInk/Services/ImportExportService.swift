@@ -134,19 +134,17 @@ class ImportExportService {
         // Export custom models
         let customModels = CustomCloudModelManager.shared.customModels.map { VoiceInkCustomCloudModelBackup(model: $0) }
 
-        // Fetch vocabulary words from SwiftData
-        var exportedDictionaryItems: [VoiceInkVocabularyWordBackup]? = nil
         let vocabularyDescriptor = FetchDescriptor<VocabularyWord>()
-        if let items = try? modelContext.fetch(vocabularyDescriptor), !items.isEmpty {
-            exportedDictionaryItems = VoiceInkDictionaryPolicy.vocabularyBackupRecords(from: items.map(\.word))
-        }
+        let vocabularyWords = (try? modelContext.fetch(vocabularyDescriptor).map(\.word)) ?? []
 
-        // Fetch word replacements from SwiftData
-        var exportedWordReplacements: [String: String]? = nil
         let replacementsDescriptor = FetchDescriptor<WordReplacement>()
-        if let replacements = try? modelContext.fetch(replacementsDescriptor), !replacements.isEmpty {
-            exportedWordReplacements = Dictionary(replacements.map { ($0.originalText, $0.replacementText) }, uniquingKeysWith: { _, last in last })
-        }
+        let wordReplacementRules = (try? modelContext.fetch(replacementsDescriptor).map {
+            VoiceInkWordReplacementRule(originalText: $0.originalText, replacementText: $0.replacementText)
+        }) ?? []
+        let dictionaryExportPlan = VoiceInkDictionaryPolicy.dictionaryBackupExportPlan(
+            vocabularyWords: vocabularyWords,
+            wordReplacementRules: wordReplacementRules
+        )
 
         let cleanupSettings = VoiceInkTranscriptionCleanupSettings.current()
         let transcriptionCleanup = VoiceInkTranscriptionAutoCleanupPreference.current()
@@ -230,8 +228,8 @@ class ImportExportService {
             customPrompts: exportablePrompts,
             powerModeConfigs: powerConfigs,
             powerModeShortcuts: powerModeShortcuts.isEmpty ? nil : powerModeShortcuts,
-            vocabularyWords: exportedDictionaryItems,
-            wordReplacements: exportedWordReplacements,
+            vocabularyWords: dictionaryExportPlan.vocabularyBackupRecords,
+            wordReplacements: dictionaryExportPlan.wordReplacementBackupRecords,
             generalSettings: generalSettingsToExport,
             customEmojis: emojiManager.customEmojis,
             customCloudModels: customModels

@@ -481,6 +481,48 @@ final class DictionaryPolicyTests: XCTestCase {
         )
     }
 
+    func testDictionaryBackupExportPlanPreservesMacOSNilAndRecordShape() {
+        XCTAssertEqual(
+            VoiceInkDictionaryPolicy.dictionaryBackupExportPlan(
+                vocabularyWords: [],
+                wordReplacementRules: []
+            ),
+            VoiceInkDictionaryBackupExportPlan(
+                vocabularyBackupRecords: nil,
+                wordReplacementBackupRecords: nil
+            )
+        )
+
+        XCTAssertEqual(
+            VoiceInkDictionaryPolicy.dictionaryBackupExportPlan(
+                vocabularyWords: ["Roma", "VoiceInk"],
+                wordReplacementRules: [
+                    VoiceInkWordReplacementRule(originalText: "voice ink", replacementText: "VoiceInk")
+                ]
+            ),
+            VoiceInkDictionaryBackupExportPlan(
+                vocabularyBackupRecords: [
+                    VoiceInkVocabularyWordBackup(word: "Roma"),
+                    VoiceInkVocabularyWordBackup(word: "VoiceInk")
+                ],
+                wordReplacementBackupRecords: ["voice ink": "VoiceInk"]
+            )
+        )
+    }
+
+    func testDictionaryBackupExportPlanKeepsLastDuplicateReplacement() {
+        let plan = VoiceInkDictionaryPolicy.dictionaryBackupExportPlan(
+            vocabularyWords: [],
+            wordReplacementRules: [
+                VoiceInkWordReplacementRule(originalText: "voice ink", replacementText: "VoiceInk"),
+                VoiceInkWordReplacementRule(originalText: "voice ink", replacementText: "roma just talk")
+            ]
+        )
+
+        XCTAssertEqual(plan.vocabularyBackupRecords, nil)
+        XCTAssertEqual(plan.wordReplacementBackupRecords, ["voice ink": "roma just talk"])
+    }
+
     func testVocabularyBackupImportUsesSharedTrimAndDuplicatePolicy() {
         let records = [
             VoiceInkVocabularyWordBackup(word: " Roma "),

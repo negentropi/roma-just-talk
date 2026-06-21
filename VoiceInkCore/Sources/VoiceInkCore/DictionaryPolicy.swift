@@ -288,6 +288,19 @@ public struct VoiceInkDictionaryBackupImportPlan: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkDictionaryBackupExportPlan: Equatable, Sendable {
+    public let vocabularyBackupRecords: [VoiceInkVocabularyWordBackup]?
+    public let wordReplacementBackupRecords: [String: String]?
+
+    public init(
+        vocabularyBackupRecords: [VoiceInkVocabularyWordBackup]?,
+        wordReplacementBackupRecords: [String: String]?
+    ) {
+        self.vocabularyBackupRecords = vocabularyBackupRecords
+        self.wordReplacementBackupRecords = wordReplacementBackupRecords
+    }
+}
+
 public struct VoiceInkVocabularyWordBackup: Codable, Equatable, Sendable {
     public let word: String
 
@@ -881,6 +894,19 @@ public enum VoiceInkDictionaryPolicy {
             } ?? [],
             wordReplacementRulesToInsert: wordReplacementPlan.rulesToInsert,
             skippedInvalidReplacementCount: wordReplacementPlan.skippedInvalidReplacementCount
+        )
+    }
+
+    public static func dictionaryBackupExportPlan(
+        vocabularyWords: [String],
+        wordReplacementRules: [VoiceInkWordReplacementRule]
+    ) -> VoiceInkDictionaryBackupExportPlan {
+        VoiceInkDictionaryBackupExportPlan(
+            vocabularyBackupRecords: vocabularyWords.isEmpty ? nil : vocabularyBackupRecords(from: vocabularyWords),
+            wordReplacementBackupRecords: wordReplacementRules.isEmpty ? nil : Dictionary(
+                wordReplacementRules.map { ($0.originalText, $0.replacementText) },
+                uniquingKeysWith: { _, last in last }
+            )
         )
     }
 

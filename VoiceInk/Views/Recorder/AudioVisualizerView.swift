@@ -1,27 +1,17 @@
 import SwiftUI
+import VoiceInkCore
 
 struct AudioVisualizer: View {
     let audioMeter: AudioMeter
     let color: Color
     let isActive: Bool
 
-    private let barCount = 15
-    private let barWidth: CGFloat = 3
-    private let barSpacing: CGFloat = 2
-    private let minHeight: CGFloat = 4
-    private let maxHeight: CGFloat = 28
-
-    private let phases: [Double]
-
-    init(audioMeter: AudioMeter, color: Color, isActive: Bool) {
-        self.audioMeter = audioMeter
-        self.color = color
-        self.isActive = isActive
-        self.phases = (0..<barCount).map { Double($0) * 0.4 }
-    }
+    private let barCount = VoiceInkAudioMeterLevel.macOSVisualizerBarCount
+    private let barWidth = CGFloat(VoiceInkAudioMeterLevel.macOSVisualizerBarWidth)
+    private let barSpacing = CGFloat(VoiceInkAudioMeterLevel.macOSVisualizerBarSpacing)
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: 0.016)) { context in
+        TimelineView(.animation(minimumInterval: VoiceInkAudioMeterLevel.macOSVisualizerAnimationMinimumInterval)) { context in
             HStack(spacing: barSpacing) {
                 ForEach(0..<barCount, id: \.self) { index in
                     RoundedRectangle(cornerRadius: barWidth / 2)
@@ -33,24 +23,22 @@ struct AudioVisualizer: View {
     }
 
     private func barHeight(for index: Int, at date: Date) -> CGFloat {
-        guard isActive else { return minHeight }
-
-        let time = date.timeIntervalSince1970
-        let amplitude = max(0, min(1, pow(audioMeter.averagePower, 0.7))) // boosted for visibility
-        let wave = sin(time * 8 + phases[index]) * 0.5 + 0.5
-        let centerDistance = abs(Double(index) - Double(barCount) / 2) / Double(barCount / 2)
-        let centerBoost = 1.0 - (centerDistance * 0.4)
-
-        return max(minHeight, minHeight + CGFloat(amplitude * wave * centerBoost) * (maxHeight - minHeight))
+        CGFloat(VoiceInkAudioMeterLevel.macOSVisualizerBarHeight(
+            forBarAt: index,
+            time: date.timeIntervalSince1970,
+            averagePower: audioMeter.averagePower,
+            isActive: isActive,
+            barCount: barCount
+        ))
     }
 }
 
 // Flat bars shown when the recorder is idle (no audio input)
 struct StaticVisualizer: View {
-    private let barCount = 15
-    private let barWidth: CGFloat = 3
-    private let barHeight: CGFloat = 4
-    private let barSpacing: CGFloat = 2
+    private let barCount = VoiceInkAudioMeterLevel.macOSVisualizerBarCount
+    private let barWidth = CGFloat(VoiceInkAudioMeterLevel.macOSVisualizerBarWidth)
+    private let barHeight = CGFloat(VoiceInkAudioMeterLevel.macOSVisualizerMinimumBarHeight)
+    private let barSpacing = CGFloat(VoiceInkAudioMeterLevel.macOSVisualizerBarSpacing)
     let color: Color
 
     var body: some View {

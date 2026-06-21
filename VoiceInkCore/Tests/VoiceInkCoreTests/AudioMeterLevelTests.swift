@@ -61,6 +61,63 @@ final class AudioMeterLevelTests: XCTestCase {
         XCTAssertEqual(VoiceInkAudioMeterLevel.iOSUpdateInterval, 0.1)
     }
 
+    func testMacOSVisualizerGeometryPreservesExistingRecorderShape() {
+        XCTAssertEqual(VoiceInkAudioMeterLevel.macOSVisualizerAnimationMinimumInterval, 0.016)
+        XCTAssertEqual(VoiceInkAudioMeterLevel.macOSVisualizerBarCount, 15)
+        XCTAssertEqual(VoiceInkAudioMeterLevel.macOSVisualizerBarWidth, 3)
+        XCTAssertEqual(VoiceInkAudioMeterLevel.macOSVisualizerBarSpacing, 2)
+        XCTAssertEqual(VoiceInkAudioMeterLevel.macOSVisualizerMinimumBarHeight, 4)
+        XCTAssertEqual(VoiceInkAudioMeterLevel.macOSVisualizerMaximumBarHeight, 28)
+        XCTAssertEqual(VoiceInkAudioMeterLevel.macOSVisualizerPhaseStep, 0.4)
+        XCTAssertEqual(VoiceInkAudioMeterLevel.macOSVisualizerWaveFrequency, 8)
+        XCTAssertEqual(VoiceInkAudioMeterLevel.macOSVisualizerAmplitudeExponent, 0.7)
+        XCTAssertEqual(VoiceInkAudioMeterLevel.macOSVisualizerCenterBoostDropoff, 0.4)
+    }
+
+    func testMacOSVisualizerBarHeightPreservesExistingWaveAndCenterBoost() {
+        XCTAssertEqual(
+            VoiceInkAudioMeterLevel.macOSVisualizerBarHeight(
+                forBarAt: 0,
+                time: 0,
+                averagePower: 1,
+                isActive: true
+            ),
+            10.8571428571,
+            accuracy: 0.0001
+        )
+        XCTAssertEqual(
+            VoiceInkAudioMeterLevel.macOSVisualizerBarHeight(
+                forBarAt: 7,
+                time: 0,
+                averagePower: 1,
+                isActive: true
+            ),
+            19.562147579,
+            accuracy: 0.0001
+        )
+    }
+
+    func testMacOSVisualizerBarHeightUsesMinimumForIdleOrInvalidBars() {
+        XCTAssertEqual(
+            VoiceInkAudioMeterLevel.macOSVisualizerBarHeight(
+                forBarAt: 7,
+                time: 0,
+                averagePower: 1,
+                isActive: false
+            ),
+            VoiceInkAudioMeterLevel.macOSVisualizerMinimumBarHeight
+        )
+        XCTAssertEqual(
+            VoiceInkAudioMeterLevel.macOSVisualizerBarHeight(
+                forBarAt: -1,
+                time: 0,
+                averagePower: 1,
+                isActive: true
+            ),
+            VoiceInkAudioMeterLevel.macOSVisualizerMinimumBarHeight
+        )
+    }
+
     func testIOSVisualizerBarPolicyPreservesGeometryInputs() {
         XCTAssertEqual(VoiceInkAudioMeterLevel.iOSVisualizerBarCount, 8)
         XCTAssertEqual(VoiceInkAudioMeterLevel.iOSVisualizerMinimumBarHeight, 4)

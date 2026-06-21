@@ -1260,9 +1260,34 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AudioMeterLevel.swift
 
 require_pattern \
+  "shared macOS audio-meter visualizer policy lives in VoiceInkCore" \
+  'macOSVisualizerBarCount|macOSVisualizerAnimationMinimumInterval|macOSVisualizerBarHeight' \
+  VoiceInkCore/Sources/VoiceInkCore/AudioMeterLevel.swift
+
+require_pattern \
   "shared audio-meter visualizer checks run in VoiceInkCore" \
   'testIOSVisualizer(Level|BarPolicy)' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "shared macOS audio-meter visualizer checks run in VoiceInkCore" \
+  'testMacOSVisualizer(Geometry|BarHeight)' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "macOS audio visualizer uses shared geometry policy" \
+  'VoiceInkAudioMeterLevel\.macOSVisualizer(BarCount|BarWidth|BarSpacing|MinimumBarHeight)' \
+  VoiceInk/Views/Recorder/AudioVisualizerView.swift
+
+require_pattern \
+  "macOS audio visualizer uses shared animation cadence" \
+  'VoiceInkAudioMeterLevel\.macOSVisualizerAnimationMinimumInterval' \
+  VoiceInk/Views/Recorder/AudioVisualizerView.swift
+
+require_pattern \
+  "macOS audio visualizer uses shared bar-height policy" \
+  'VoiceInkAudioMeterLevel\.macOSVisualizerBarHeight' \
+  VoiceInk/Views/Recorder/AudioVisualizerView.swift
 
 require_pattern \
   "iOS audio visualizer uses shared accessibility label" \
@@ -1294,6 +1319,11 @@ reject_pattern \
   "iOS audio visualizer avoids shell-owned sample selection policy" \
   'guard +!levels\.isEmpty|levels\.count / span|sourceIndex|max\(0, min\(1, levels\[sourceIndex\]\)\)' \
   iOS/VoiceInk-ios/AudioVisualizerView.swift
+
+reject_pattern \
+  "macOS audio visualizer avoids shell-owned bar geometry and waveform math" \
+  'private let barCount = 15|private let barWidth: CGFloat = 3|private let barSpacing: CGFloat = 2|private let minHeight: CGFloat = 4|private let maxHeight: CGFloat = 28|minimumInterval: 0\.016|pow\(audioMeter\.averagePower, 0\.7\)|sin\(time \* 8|phases\[index\]' \
+  VoiceInk/Views/Recorder/AudioVisualizerView.swift
 
 reject_pattern \
   "platform audio-meter timers avoid shell-only update cadences" \

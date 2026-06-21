@@ -7,6 +7,16 @@ public enum VoiceInkAudioMeterLevel {
     public static let defaultLevelHistoryLimit = 40
     public static let macOSUpdateIntervalMilliseconds = 17
     public static let iOSUpdateInterval: TimeInterval = 0.1
+    public static let macOSVisualizerAnimationMinimumInterval: TimeInterval = 0.016
+    public static let macOSVisualizerBarCount = 15
+    public static let macOSVisualizerBarWidth: Double = 3
+    public static let macOSVisualizerBarSpacing: Double = 2
+    public static let macOSVisualizerMinimumBarHeight: Double = 4
+    public static let macOSVisualizerMaximumBarHeight: Double = 28
+    public static let macOSVisualizerPhaseStep: Double = 0.4
+    public static let macOSVisualizerWaveFrequency: Double = 8
+    public static let macOSVisualizerAmplitudeExponent: Double = 0.7
+    public static let macOSVisualizerCenterBoostDropoff: Double = 0.4
     public static let iOSVisualizerBarCount = 8
     public static let iOSVisualizerMinimumBarHeight: Double = 4
     public static let visualizerAccessibilityLabel = "Audio level visualizer"
@@ -71,5 +81,27 @@ public enum VoiceInkAudioMeterLevel {
         let sourceIndex = max(0, levels.count - 1 - index * step)
         let sourceLevel = levels[sourceIndex]
         return max(0, min(1, sourceLevel))
+    }
+
+    public static func macOSVisualizerBarHeight(
+        forBarAt index: Int,
+        time: TimeInterval,
+        averagePower: Double,
+        isActive: Bool,
+        barCount: Int = macOSVisualizerBarCount,
+        minimumHeight: Double = macOSVisualizerMinimumBarHeight,
+        maximumHeight: Double = macOSVisualizerMaximumBarHeight
+    ) -> Double {
+        guard isActive, index >= 0, index < barCount, barCount > 1, maximumHeight > minimumHeight else {
+            return minimumHeight
+        }
+
+        let amplitude = max(0, min(1, pow(averagePower, macOSVisualizerAmplitudeExponent)))
+        let phase = Double(index) * macOSVisualizerPhaseStep
+        let wave = sin(time * macOSVisualizerWaveFrequency + phase) * 0.5 + 0.5
+        let centerDistance = abs(Double(index) - Double(barCount) / 2) / Double(barCount / 2)
+        let centerBoost = 1.0 - centerDistance * macOSVisualizerCenterBoostDropoff
+
+        return max(minimumHeight, minimumHeight + amplitude * wave * centerBoost * (maximumHeight - minimumHeight))
     }
 }

@@ -185,6 +185,93 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertFalse(plan.shouldMarkKeyVerified)
     }
 
+    func testProviderAPIKeyFormStateLoadsStoredKeyAndVerificationEditingPolicy() {
+        let verifiedState = VoiceInkProviderAPIKeyFormState.loaded(
+            storedKey: "stored-key",
+            isVerified: true
+        )
+        let unverifiedState = VoiceInkProviderAPIKeyFormState.loaded(
+            storedKey: "stored-key",
+            isVerified: false
+        )
+
+        XCTAssertEqual(verifiedState.enteredKey, "stored-key")
+        XCTAssertEqual(verifiedState.verificationProgress, .idle)
+        XCTAssertFalse(verifiedState.isEditing)
+        XCTAssertEqual(unverifiedState.enteredKey, "stored-key")
+        XCTAssertEqual(unverifiedState.verificationProgress, .idle)
+        XCTAssertTrue(unverifiedState.isEditing)
+    }
+
+    func testProviderAPIKeyFormStateBuildsDraftFromCurrentEntryAndStoredRuntimeKey() {
+        let enteredState = VoiceInkProviderAPIKeyFormState(enteredKey: " entered-key \n")
+        let storedFallbackState = VoiceInkProviderAPIKeyFormState(enteredKey: " \n\t ")
+
+        let enteredDraft = enteredState.draft(storedRuntimeKey: "stored-key")
+        let storedFallbackDraft = storedFallbackState.draft(storedRuntimeKey: " stored-key ")
+
+        XCTAssertEqual(enteredDraft.verificationCandidate, "entered-key")
+        XCTAssertEqual(enteredDraft.keyToSaveAfterSuccessfulVerification, "entered-key")
+        XCTAssertEqual(storedFallbackDraft.verificationCandidate, " stored-key ")
+        XCTAssertNil(storedFallbackDraft.keyToSaveAfterSuccessfulVerification)
+    }
+
+    func testProviderAPIKeyFormStateEditingStoredKeyResetsProgressAndOpensEditing() {
+        let state = VoiceInkProviderAPIKeyFormState(
+            enteredKey: "old-key",
+            verificationProgress: .failure(message: "bad request"),
+            isEditing: false
+        )
+
+        let editingState = state.editingStoredKey("stored-key")
+
+        XCTAssertEqual(editingState.enteredKey, "stored-key")
+        XCTAssertEqual(editingState.verificationProgress, .idle)
+        XCTAssertTrue(editingState.isEditing)
+    }
+
+    func testProviderAPIKeyFormStateEditingKeyResetsProgressWithoutChangingMode() {
+        let state = VoiceInkProviderAPIKeyFormState(
+            enteredKey: "edited-key",
+            verificationProgress: .failure(message: "bad request"),
+            isEditing: true
+        )
+
+        let editedState = state.keyEdited()
+
+        XCTAssertEqual(editedState.enteredKey, "edited-key")
+        XCTAssertEqual(editedState.verificationProgress, .idle)
+        XCTAssertTrue(editedState.isEditing)
+    }
+
+    func testProviderAPIKeyFormStateAppliesVerificationPlanAndClosesEditingOnSuccess() {
+        let state = VoiceInkProviderAPIKeyFormState(
+            enteredKey: "entered-key",
+            verificationProgress: .verifying,
+            isEditing: true
+        )
+        let successPlan = VoiceInkProviderAPIKeyVerificationApplicationPlan(
+            progress: .success,
+            keyToSave: "entered-key",
+            shouldMarkKeyVerified: true
+        )
+        let failurePlan = VoiceInkProviderAPIKeyVerificationApplicationPlan(
+            progress: .failure(message: "bad request"),
+            keyToSave: nil,
+            shouldMarkKeyVerified: false
+        )
+
+        let successState = state.applyingVerificationPlan(successPlan)
+        let failureState = state.applyingVerificationPlan(failurePlan)
+
+        XCTAssertEqual(successState.enteredKey, "entered-key")
+        XCTAssertEqual(successState.verificationProgress, .success)
+        XCTAssertFalse(successState.isEditing)
+        XCTAssertEqual(failureState.enteredKey, "entered-key")
+        XCTAssertEqual(failureState.verificationProgress, .failure(message: "bad request"))
+        XCTAssertTrue(failureState.isEditing)
+    }
+
     func testProviderAPIKeyFormPresentationBuildsProviderCopy() {
         let presentation = VoiceInkProviderKind.deepgram.apiKeyFormPresentation
 

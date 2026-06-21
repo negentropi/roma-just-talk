@@ -1537,13 +1537,28 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
 
 require_pattern \
+  "shared provider API-key form state lives in VoiceInkCore" \
+  'struct +VoiceInkProviderAPIKeyFormState' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
+
+require_pattern \
+  "shared provider API-key form state owns editing transitions" \
+  'editingStoredKey|applyingVerificationPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
+
+require_pattern \
   "shared provider API-key form presentation lives in VoiceInkCore" \
   'VoiceInkProviderAPIKeyFormPresentation|apiKeyFormPresentation|saveButtonSystemImageName|verifyButtonSystemImageName|consoleLeadingSystemImageName|consoleTrailingSystemImageName' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
 
 require_pattern \
-  "iOS API-key view uses shared verification progress presentation" \
-  'VoiceInkProviderAPIKeyVerificationProgress|verificationProgress|iOSVerifiedKeyFeedback|iOSResultFeedback|effectiveSystemImageName' \
+  "iOS API-key view uses shared API-key form state" \
+  'VoiceInkProviderAPIKeyFormState|apiKeyFormState' \
+  iOS/VoiceInk-ios/ProviderAPIKeyView.swift
+
+require_pattern \
+  "iOS API-key view uses shared progress presentation through form state" \
+  'apiKeyFormState\.verificationProgress|iOSVerifiedKeyFeedback|iOSResultFeedback|effectiveSystemImageName' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 require_pattern \
@@ -1669,6 +1684,11 @@ reject_pattern \
 reject_pattern \
   "iOS API-key view avoids shell-only verification state and copy" \
   '@State private var isVerifying|verifyResult|Key verified|Verification failed|keyToSaveAfterSuccessfulVerification|verificationProgress = ok \?|result\.isValid' \
+  iOS/VoiceInk-ios/ProviderAPIKeyView.swift
+
+reject_pattern \
+  "iOS API-key view avoids shell-owned API-key form state machine fields" \
+  '@State private var +(tempKey|verificationProgress|editingKey)' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 reject_pattern \

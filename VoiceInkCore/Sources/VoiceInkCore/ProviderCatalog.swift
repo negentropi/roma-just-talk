@@ -150,6 +150,69 @@ public extension VoiceInkProviderAPIKeyDraft {
     }
 }
 
+public struct VoiceInkProviderAPIKeyFormState: Equatable, Sendable {
+    public var enteredKey: String
+    public var verificationProgress: VoiceInkProviderAPIKeyVerificationProgress
+    public var isEditing: Bool
+
+    public init(
+        enteredKey: String = "",
+        verificationProgress: VoiceInkProviderAPIKeyVerificationProgress = .idle,
+        isEditing: Bool = true
+    ) {
+        self.enteredKey = enteredKey
+        self.verificationProgress = verificationProgress
+        self.isEditing = isEditing
+    }
+
+    public static func loaded(storedKey: String, isVerified: Bool) -> Self {
+        Self(
+            enteredKey: storedKey,
+            verificationProgress: .idle,
+            isEditing: !isVerified
+        )
+    }
+
+    public func draft(storedRuntimeKey: String?) -> VoiceInkProviderAPIKeyDraft {
+        VoiceInkProviderAPIKeyDraft(
+            enteredKey: enteredKey,
+            storedRuntimeKey: storedRuntimeKey
+        )
+    }
+
+    public func editingStoredKey(_ storedKey: String) -> Self {
+        Self(
+            enteredKey: storedKey,
+            verificationProgress: .idle,
+            isEditing: true
+        )
+    }
+
+    public func keyEdited() -> Self {
+        Self(
+            enteredKey: enteredKey,
+            verificationProgress: .idle,
+            isEditing: isEditing
+        )
+    }
+
+    public func verifying() -> Self {
+        Self(
+            enteredKey: enteredKey,
+            verificationProgress: .verifying,
+            isEditing: isEditing
+        )
+    }
+
+    public func applyingVerificationPlan(_ plan: VoiceInkProviderAPIKeyVerificationApplicationPlan) -> Self {
+        Self(
+            enteredKey: enteredKey,
+            verificationProgress: plan.progress,
+            isEditing: plan.shouldMarkKeyVerified ? false : isEditing
+        )
+    }
+}
+
 public struct VoiceInkProviderAPIKeyFormPresentation: Equatable, Sendable {
     public let navigationTitle: String
     public let apiKeySectionTitle: String

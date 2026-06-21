@@ -11,12 +11,19 @@ enum DictionaryService {
         existing: [VocabularyWord],
         context: ModelContext
     ) -> VoiceInkVocabularySubmissionPlan {
-        let plan = VoiceInkDictionaryPolicy.vocabularySubmissionPlan(
-            input: input,
+        let submission = VoiceInkVocabularyDraftState(draft: input).submitting(
             existingWords: existing.map(\.word)
         )
+        return applyVocabularySubmission(submission, context: context).plan
+    }
 
-        guard plan.shouldInsert else { return plan }
+    @discardableResult
+    static func applyVocabularySubmission(
+        _ submission: VoiceInkVocabularyDraftSubmission,
+        context: ModelContext
+    ) -> VoiceInkVocabularyDraftSubmission {
+        let plan = submission.plan
+        guard plan.shouldInsert else { return submission }
 
         var errors = [String]()
         for word in plan.wordsToInsert {
@@ -25,12 +32,17 @@ enum DictionaryService {
             }
         }
 
-        guard !errors.isEmpty else { return plan }
+        guard !errors.isEmpty else { return submission }
 
-        return VoiceInkVocabularySubmissionPlan(
+        let failurePlan = VoiceInkVocabularySubmissionPlan(
             wordsToInsert: plan.wordsToInsert,
-            draftAfterSubmit: input,
+            draftAfterSubmit: submission.submittedDraft,
             alertPresentation: .vocabulary(message: errors.joined(separator: "; "))
+        )
+        return VoiceInkVocabularyDraftSubmission(
+            submittedDraft: submission.submittedDraft,
+            plan: failurePlan,
+            draftStateAfterSubmit: VoiceInkVocabularyDraftState(draft: failurePlan.draftAfterSubmit)
         )
     }
 

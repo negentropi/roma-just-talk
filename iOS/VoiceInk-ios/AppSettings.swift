@@ -222,19 +222,11 @@ final class AppSettings: ObservableObject {
         wordReplacements = VoiceInkPreferenceList.removing(at: offsets, from: wordReplacements)
     }
 
-    @discardableResult
-    func submitCustomVocabularyDraft(_ input: String) -> VoiceInkVocabularySubmissionPlan {
-        let plan = VoiceInkDictionaryPolicy.vocabularySubmissionPlan(
-            input: input,
-            existingWords: customVocabularyTerms
-        )
-
+    func applyCustomVocabularySubmissionPlan(_ plan: VoiceInkVocabularySubmissionPlan) {
         let updatedTerms = plan.applying(to: customVocabularyTerms)
         if customVocabularyTerms != updatedTerms {
             customVocabularyTerms = updatedTerms
         }
-
-        return plan
     }
 
     func removeCustomVocabularyTerms(at offsets: IndexSet) {

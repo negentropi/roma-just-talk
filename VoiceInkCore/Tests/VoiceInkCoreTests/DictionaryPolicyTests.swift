@@ -288,6 +288,34 @@ final class DictionaryPolicyTests: XCTestCase {
         XCTAssertTrue(VoiceInkDictionaryPolicy.hasVocabularyDraft("Voice Ink, "))
     }
 
+    func testVocabularyDraftStateUsesSharedTokenPolicy() {
+        XCTAssertFalse(VoiceInkVocabularyDraftState(draft: " , \n ").canSubmit)
+        XCTAssertTrue(VoiceInkVocabularyDraftState(draft: "Voice Ink, ").canSubmit)
+    }
+
+    func testVocabularyDraftStateSubmitsAndClearsAcceptedWords() {
+        let submission = VoiceInkVocabularyDraftState(draft: "Voice Ink, Roma, roma, Cursor")
+            .submitting(existingWords: ["voice ink"])
+
+        XCTAssertEqual(submission.submittedDraft, "Voice Ink, Roma, roma, Cursor")
+        XCTAssertEqual(submission.plan.wordsToInsert, ["Roma", "Cursor"])
+        XCTAssertEqual(submission.draftStateAfterSubmit, VoiceInkVocabularyDraftState())
+        XCTAssertNil(submission.alertPresentation)
+    }
+
+    func testVocabularyDraftStateKeepsDuplicateDraftAndBuildsSharedAlert() {
+        let submission = VoiceInkVocabularyDraftState(draft: "Voice Ink")
+            .submitting(existingWords: ["voice ink"])
+
+        XCTAssertEqual(submission.submittedDraft, "Voice Ink")
+        XCTAssertEqual(submission.plan.wordsToInsert, [])
+        XCTAssertEqual(submission.draftStateAfterSubmit, VoiceInkVocabularyDraftState(draft: "Voice Ink"))
+        XCTAssertEqual(
+            submission.alertPresentation,
+            .vocabulary(message: "'Voice Ink' is already in the vocabulary")
+        )
+    }
+
     func testVocabularySubmissionPlanKeepsBlankDraftWithoutAlert() {
         let plan = VoiceInkDictionaryPolicy.vocabularySubmissionPlan(
             input: " , \n ",

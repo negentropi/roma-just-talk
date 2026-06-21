@@ -5,7 +5,7 @@ import VoiceInkCore
 struct VocabularyView: View {
     @Query private var vocabularyWords: [VocabularyWord]
     @Environment(\.modelContext) private var modelContext
-    @State private var newWord = ""
+    @State private var vocabularyDraftState = VoiceInkVocabularyDraftState()
     @State private var alertPresentation: VoiceInkDictionaryAlertPresentation?
     @State private var sortMode: VoiceInkVocabularySortMode = .defaultMode
     private let dictionaryPresentation = VoiceInkDictionarySettingsPresentation.macOS
@@ -25,7 +25,7 @@ struct VocabularyView: View {
     }
 
     private var shouldShowAddButton: Bool {
-        VoiceInkDictionaryPolicy.hasVocabularyDraft(newWord)
+        vocabularyDraftState.canSubmit
     }
 
     var body: some View {
@@ -45,7 +45,7 @@ struct VocabularyView: View {
             }
 
             HStack(spacing: 8) {
-                TextField(dictionaryPresentation.vocabularyPlaceholder, text: $newWord)
+                TextField(dictionaryPresentation.vocabularyPlaceholder, text: $vocabularyDraftState.draft)
                     .textFieldStyle(.roundedBorder)
                     .font(.system(size: 13))
                     .onSubmit { addWords() }
@@ -109,13 +109,15 @@ struct VocabularyView: View {
     }
     
     private func addWords() {
-        let plan = DictionaryService.submitVocabularyDraft(
-            newWord,
-            existing: Array(vocabularyWords),
+        let submission = vocabularyDraftState.submitting(
+            existingWords: vocabularyWords.map(\.word)
+        )
+        let appliedSubmission = DictionaryService.applyVocabularySubmission(
+            submission,
             context: modelContext
         )
-        newWord = plan.draftAfterSubmit
-        alertPresentation = plan.alertPresentation
+        vocabularyDraftState = appliedSubmission.draftStateAfterSubmit
+        alertPresentation = appliedSubmission.alertPresentation
     }
 
     private func removeWord(_ word: VocabularyWord) {

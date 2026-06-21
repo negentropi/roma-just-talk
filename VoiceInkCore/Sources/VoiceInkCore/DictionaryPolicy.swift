@@ -29,6 +29,50 @@ public struct VoiceInkVocabularySubmissionPlan: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkVocabularyDraftSubmission: Equatable, Sendable {
+    public let submittedDraft: String
+    public let plan: VoiceInkVocabularySubmissionPlan
+    public let draftStateAfterSubmit: VoiceInkVocabularyDraftState
+
+    public init(
+        submittedDraft: String,
+        plan: VoiceInkVocabularySubmissionPlan,
+        draftStateAfterSubmit: VoiceInkVocabularyDraftState
+    ) {
+        self.submittedDraft = submittedDraft
+        self.plan = plan
+        self.draftStateAfterSubmit = draftStateAfterSubmit
+    }
+
+    public var alertPresentation: VoiceInkDictionaryAlertPresentation? {
+        plan.alertPresentation
+    }
+}
+
+public struct VoiceInkVocabularyDraftState: Equatable, Sendable {
+    public var draft: String
+
+    public init(draft: String = "") {
+        self.draft = draft
+    }
+
+    public var canSubmit: Bool {
+        VoiceInkDictionaryPolicy.hasVocabularyDraft(draft)
+    }
+
+    public func submitting(existingWords: [String]) -> VoiceInkVocabularyDraftSubmission {
+        let plan = VoiceInkDictionaryPolicy.vocabularySubmissionPlan(
+            input: draft,
+            existingWords: existingWords
+        )
+        return VoiceInkVocabularyDraftSubmission(
+            submittedDraft: draft,
+            plan: plan,
+            draftStateAfterSubmit: VoiceInkVocabularyDraftState(draft: plan.draftAfterSubmit)
+        )
+    }
+}
+
 public struct VoiceInkWordReplacementInsertPlan: Equatable, Sendable {
     public let originalText: String
     public let replacementText: String

@@ -5,7 +5,7 @@ import VoiceInkCore
 struct SettingsView: View {
     @StateObject private var settings = AppSettings.shared
     @State private var fillerWordDraftState = VoiceInkFillerWordDraftState()
-    @State private var newCustomVocabularyTerm = ""
+    @State private var customVocabularyDraftState = VoiceInkVocabularyDraftState()
     @State private var newReplacementOriginal = ""
     @State private var newReplacementText = ""
     @State private var dictionaryAlert: VoiceInkDictionaryAlertPresentation?
@@ -98,7 +98,7 @@ struct SettingsView: View {
 
             Section(header: Text(dictionaryPresentation.sectionTitle)) {
                 HStack {
-                    TextField(dictionaryPresentation.vocabularyPlaceholder, text: $newCustomVocabularyTerm)
+                    TextField(dictionaryPresentation.vocabularyPlaceholder, text: $customVocabularyDraftState.draft)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                         .onSubmit(addCustomVocabularyTerm)
@@ -106,7 +106,7 @@ struct SettingsView: View {
                     Button(action: addCustomVocabularyTerm) {
                         Image(systemName: settingsPresentation.addActionSystemImageName)
                     }
-                    .disabled(!canAddCustomVocabularyTerm)
+                    .disabled(!customVocabularyDraftState.canSubmit)
                 }
 
                 ForEach(settings.customVocabularyTerms, id: \.self) { term in
@@ -211,10 +211,6 @@ struct SettingsView: View {
         )
     }
 
-    private var canAddCustomVocabularyTerm: Bool {
-        VoiceInkDictionaryPolicy.hasVocabularyDraft(newCustomVocabularyTerm)
-    }
-
     private var canAddWordReplacement: Bool {
         VoiceInkDictionaryPolicy.canSaveWordReplacementDraft(
             original: newReplacementOriginal,
@@ -230,9 +226,10 @@ struct SettingsView: View {
     }
 
     private func addCustomVocabularyTerm() {
-        let plan = settings.submitCustomVocabularyDraft(newCustomVocabularyTerm)
-        newCustomVocabularyTerm = plan.draftAfterSubmit
-        dictionaryAlert = plan.alertPresentation
+        let submission = customVocabularyDraftState.submitting(existingWords: settings.customVocabularyTerms)
+        settings.applyCustomVocabularySubmissionPlan(submission.plan)
+        customVocabularyDraftState = submission.draftStateAfterSubmit
+        dictionaryAlert = submission.alertPresentation
     }
 
     private func submitWordReplacement() {

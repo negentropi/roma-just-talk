@@ -362,18 +362,17 @@ class TranscriptionPipeline {
             await restorePromptDetectionSettingsAndDismiss()
         } else if var textToPaste = finalPastedText,
            transcription.transcriptionState == .completed {
-            let shouldLowercase = VoiceInkTranscriptionCleanupPreferenceStorage.shouldLowercase()
-            if !shouldLowercase,
-               VoiceInkContextualCapitalizationFormatter.needsCursorContext(textToPaste) {
+            let cursorPastePlan = VoiceInkTranscriptionPasteOutputPolicy.cursorPasteTextPlan(
+                textToPaste,
+                shouldLowercase: VoiceInkTranscriptionCleanupPreferenceStorage.shouldLowercase()
+            )
+            if cursorPastePlan.shouldReadCursorContext {
                 let beforeCursor = if let preparedCursorTextContext {
                     await preparedCursorTextContext.value
                 } else {
                     CursorTextContextReader.textBeforeCursor()
                 }
-                textToPaste = VoiceInkContextualCapitalizationFormatter.format(
-                    textToPaste,
-                    beforeCursor: beforeCursor
-                )
+                textToPaste = cursorPastePlan.text(beforeCursor: beforeCursor)
             }
 
             let isTrialExpired: Bool

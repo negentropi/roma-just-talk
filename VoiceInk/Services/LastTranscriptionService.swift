@@ -98,17 +98,12 @@ class LastTranscriptionService: ObservableObject {
 
     @MainActor
     private static func textForCursorPaste(_ text: String) -> String {
-        guard !VoiceInkTranscriptionCleanupPreferenceStorage.shouldLowercase() else {
-            return text
-        }
-
-        guard VoiceInkContextualCapitalizationFormatter.needsCursorContext(text) else {
-            return text
-        }
-
-        return VoiceInkContextualCapitalizationFormatter.format(
+        let plan = VoiceInkTranscriptionPasteOutputPolicy.cursorPasteTextPlan(
             text,
-            beforeCursor: CursorTextContextReader.textBeforeCursor()
+            shouldLowercase: VoiceInkTranscriptionCleanupPreferenceStorage.shouldLowercase()
+        )
+        return plan.text(
+            beforeCursor: plan.shouldReadCursorContext ? CursorTextContextReader.textBeforeCursor() : nil
         )
     }
     

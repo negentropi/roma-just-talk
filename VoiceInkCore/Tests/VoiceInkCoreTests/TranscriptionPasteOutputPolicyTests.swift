@@ -35,6 +35,37 @@ final class TranscriptionPasteOutputPolicyTests: XCTestCase {
         )
     }
 
+    func testCursorPasteTextPlanSkipsCursorReadWhenLowercaseCleanupIsEnabled() {
+        let plan = VoiceInkTranscriptionPasteOutputPolicy.cursorPasteTextPlan(
+            "Hello there",
+            shouldLowercase: true
+        )
+
+        XCTAssertFalse(plan.shouldReadCursorContext)
+        XCTAssertEqual(plan.text(beforeCursor: "mid sentence "), "Hello there")
+    }
+
+    func testCursorPasteTextPlanSkipsCursorReadForUncasedText() {
+        let plan = VoiceInkTranscriptionPasteOutputPolicy.cursorPasteTextPlan(
+            "12345",
+            shouldLowercase: false
+        )
+
+        XCTAssertFalse(plan.shouldReadCursorContext)
+        XCTAssertEqual(plan.text(beforeCursor: "mid sentence "), "12345")
+    }
+
+    func testCursorPasteTextPlanAppliesSharedCapitalizationWithCursorContext() {
+        let plan = VoiceInkTranscriptionPasteOutputPolicy.cursorPasteTextPlan(
+            "Hello there",
+            shouldLowercase: false
+        )
+
+        XCTAssertTrue(plan.shouldReadCursorContext)
+        XCTAssertEqual(plan.text(beforeCursor: "mid sentence "), "hello there")
+        XCTAssertEqual(plan.text(beforeCursor: "Sentence ended. "), "Hello there")
+    }
+
     func testAppendTrailingSpacePreferencePreservesStorageAndDefault() {
         let suiteName = "VoiceInkCore.TranscriptionPasteOutputPolicyTests"
         let defaults = UserDefaults(suiteName: suiteName)!

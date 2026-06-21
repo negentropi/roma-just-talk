@@ -40,6 +40,35 @@ public enum VoiceInkAppendTrailingSpacePreference {
 public enum VoiceInkTranscriptionPasteOutputPolicy {
     public static let trialExpiredPrefix = "Your trial has expired. Upgrade to VoiceInk Pro at tryvoiceink.com/buy"
 
+    public struct CursorPasteTextPlan: Equatable, Sendable {
+        public let text: String
+        public let shouldReadCursorContext: Bool
+
+        public init(text: String, shouldReadCursorContext: Bool) {
+            self.text = text
+            self.shouldReadCursorContext = shouldReadCursorContext
+        }
+
+        public func text(beforeCursor: String?) -> String {
+            guard shouldReadCursorContext else { return text }
+            return VoiceInkContextualCapitalizationFormatter.format(
+                text,
+                beforeCursor: beforeCursor
+            )
+        }
+    }
+
+    public static func cursorPasteTextPlan(
+        _ text: String,
+        shouldLowercase: Bool
+    ) -> CursorPasteTextPlan {
+        CursorPasteTextPlan(
+            text: text,
+            shouldReadCursorContext: !shouldLowercase
+                && VoiceInkContextualCapitalizationFormatter.needsCursorContext(text)
+        )
+    }
+
     public static func finalPastedText(
         _ text: String,
         appendTrailingSpace: Bool,

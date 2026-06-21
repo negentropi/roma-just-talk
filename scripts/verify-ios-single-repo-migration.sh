@@ -2411,6 +2411,11 @@ require_pattern \
   '\.deleteFailed' \
   iOS/VoiceInk-ios/LocalModelManagementView.swift
 
+reject_pattern \
+  "iOS local model row avoids duplicate post-delete refresh" \
+  'DispatchQueue\.main\.asyncAfter|Force UI update by triggering objectWillChange' \
+  iOS/VoiceInk-ios/LocalModelManagementView.swift
+
 require_pattern \
   "iOS local model views render shared operation alert presentation" \
   'alert\(item: +\$modelManager\.downloadError' \

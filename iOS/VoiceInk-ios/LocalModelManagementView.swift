@@ -137,10 +137,6 @@ struct ModelRowView: View {
     private func deleteModel() {
         do {
             try modelManager.deleteModel(row.model)
-            // Force UI update by triggering objectWillChange
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                modelManager.objectWillChange.send()
-            }
         } catch {
             print("Delete failed: \(error)")
             modelManager.downloadError = .deleteFailed(for: error)

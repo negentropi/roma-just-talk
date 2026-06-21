@@ -112,6 +112,53 @@ public struct VoiceInkRecordingStopPlan: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkAudioRecorderStopMode: Equatable, Sendable {
+    case keepRecordingFile
+    case discardRecordingFile
+}
+
+public struct VoiceInkAudioRecorderStopPlan: Equatable, Sendable {
+    public let shouldStopRecorder: Bool
+    public let shouldInvalidateMeterTimer: Bool
+    public let isRecordingAfterStop: Bool
+    public let shouldClearAudioLevels: Bool
+    public let shouldDeleteCurrentRecordingFile: Bool
+    public let shouldClearCurrentRecordingURL: Bool
+    public let shouldScheduleSessionDeactivation: Bool
+
+    public init(
+        shouldStopRecorder: Bool,
+        shouldInvalidateMeterTimer: Bool,
+        isRecordingAfterStop: Bool,
+        shouldClearAudioLevels: Bool,
+        shouldDeleteCurrentRecordingFile: Bool,
+        shouldClearCurrentRecordingURL: Bool,
+        shouldScheduleSessionDeactivation: Bool
+    ) {
+        self.shouldStopRecorder = shouldStopRecorder
+        self.shouldInvalidateMeterTimer = shouldInvalidateMeterTimer
+        self.isRecordingAfterStop = isRecordingAfterStop
+        self.shouldClearAudioLevels = shouldClearAudioLevels
+        self.shouldDeleteCurrentRecordingFile = shouldDeleteCurrentRecordingFile
+        self.shouldClearCurrentRecordingURL = shouldClearCurrentRecordingURL
+        self.shouldScheduleSessionDeactivation = shouldScheduleSessionDeactivation
+    }
+}
+
+public enum VoiceInkAudioRecorderStopPolicy {
+    public static func plan(for mode: VoiceInkAudioRecorderStopMode) -> VoiceInkAudioRecorderStopPlan {
+        VoiceInkAudioRecorderStopPlan(
+            shouldStopRecorder: true,
+            shouldInvalidateMeterTimer: true,
+            isRecordingAfterStop: false,
+            shouldClearAudioLevels: true,
+            shouldDeleteCurrentRecordingFile: mode == .discardRecordingFile,
+            shouldClearCurrentRecordingURL: mode == .discardRecordingFile,
+            shouldScheduleSessionDeactivation: true
+        )
+    }
+}
+
 public struct VoiceInkAppGroupRecordingState: Equatable, Sendable {
     public let isRecording: Bool
     public let shouldClearStaleState: Bool

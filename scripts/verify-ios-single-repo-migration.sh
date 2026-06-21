@@ -661,6 +661,21 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "shared audio-recorder stop cleanup plan lives in VoiceInkCore" \
+  'VoiceInkAudioRecorderStopPolicy|VoiceInkAudioRecorderStopPlan|VoiceInkAudioRecorderStopMode' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "shared audio-recorder stop cleanup checks run in VoiceInkCore" \
+  'testAudioRecorderStopPolicyPreservesIOSStopCleanup|testAudioRecorderStopPolicyPreservesIOSDiscardCleanup' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "iOS audio recorder applies shared stop cleanup plan" \
+  'VoiceInkAudioRecorderStopPolicy\.plan|applyStopPlan|shouldDeleteCurrentRecordingFile|shouldClearCurrentRecordingURL' \
+  iOS/VoiceInk-ios/AudioRecorder.swift
+
+require_pattern \
   "macOS recording engine uses shared active-recording predicate" \
   'recordingState\.isActivelyRecording' \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift

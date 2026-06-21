@@ -67,32 +67,45 @@ final class AudioRecorder: NSObject, ObservableObject {
     }
 
     func stopRecording() {
-        audioRecorder?.stop()
-        audioRecorder = nil
-        meterTimer?.invalidate()
-        meterTimer = nil
-        isRecording = false
-        levelsHistory.removeAll()
-        
-        // Schedule session deactivation with timeout instead of immediate deactivation
-        sessionManager.scheduleDeactivation()
+        applyStopPlan(
+            VoiceInkAudioRecorderStopPolicy.plan(for: .keepRecordingFile)
+        )
     }
 
     func discard() {
-        audioRecorder?.stop()
-        audioRecorder = nil
-        meterTimer?.invalidate()
-        meterTimer = nil
-        isRecording = false
-        levelsHistory.removeAll()
-        
-        if let url = currentRecordingURL {
+        applyStopPlan(
+            VoiceInkAudioRecorderStopPolicy.plan(for: .discardRecordingFile)
+        )
+    }
+
+    private func applyStopPlan(_ plan: VoiceInkAudioRecorderStopPlan) {
+        if plan.shouldStopRecorder {
+            audioRecorder?.stop()
+            audioRecorder = nil
+        }
+
+        if plan.shouldInvalidateMeterTimer {
+            meterTimer?.invalidate()
+            meterTimer = nil
+        }
+
+        isRecording = plan.isRecordingAfterStop
+
+        if plan.shouldClearAudioLevels {
+            levelsHistory.removeAll()
+        }
+
+        if plan.shouldDeleteCurrentRecordingFile, let url = currentRecordingURL {
             try? FileManager.default.removeItem(at: url)
         }
-        currentRecordingURL = nil
-        
-        // Schedule session deactivation after discard as well
-        sessionManager.scheduleDeactivation()
+
+        if plan.shouldClearCurrentRecordingURL {
+            currentRecordingURL = nil
+        }
+
+        if plan.shouldScheduleSessionDeactivation {
+            sessionManager.scheduleDeactivation()
+        }
     }
 }
 

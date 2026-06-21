@@ -151,6 +151,36 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertNil(missingAudioPlan.pendingDraft)
     }
 
+    func testAudioRecorderStopPolicyPreservesIOSStopCleanup() {
+        XCTAssertEqual(
+            VoiceInkAudioRecorderStopPolicy.plan(for: .keepRecordingFile),
+            VoiceInkAudioRecorderStopPlan(
+                shouldStopRecorder: true,
+                shouldInvalidateMeterTimer: true,
+                isRecordingAfterStop: false,
+                shouldClearAudioLevels: true,
+                shouldDeleteCurrentRecordingFile: false,
+                shouldClearCurrentRecordingURL: false,
+                shouldScheduleSessionDeactivation: true
+            )
+        )
+    }
+
+    func testAudioRecorderStopPolicyPreservesIOSDiscardCleanup() {
+        XCTAssertEqual(
+            VoiceInkAudioRecorderStopPolicy.plan(for: .discardRecordingFile),
+            VoiceInkAudioRecorderStopPlan(
+                shouldStopRecorder: true,
+                shouldInvalidateMeterTimer: true,
+                isRecordingAfterStop: false,
+                shouldClearAudioLevels: true,
+                shouldDeleteCurrentRecordingFile: true,
+                shouldClearCurrentRecordingURL: true,
+                shouldScheduleSessionDeactivation: true
+            )
+        )
+    }
+
     func testRecordingFlowStatePreservesIOSStartFailureAndCancelTransitions() {
         var failedState = VoiceInkRecordingFlowState(currentDuration: 8)
         failedState.prepareRecordingStart()

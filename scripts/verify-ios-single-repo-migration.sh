@@ -4834,6 +4834,16 @@ require_pattern \
   'VoiceInkSecretPresentation\.obfuscatedAPIKeyOrPlaceholder' \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
 
+reject_pattern \
+  "macOS AI API-key view avoids shallow draft-key wrapper" \
+  'private +var +hasDraftAPIKey\b' \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+
+reject_pattern \
+  "macOS AI API-key view avoids shallow obfuscated-key wrapper" \
+  'private +var +obfuscatedSelectedAPIKey\b' \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+
 require_pattern \
   "macOS AI service resolves keys through shared AI draft policy" \
   'VoiceInkAIEnhancementAPIKeyDraft' \

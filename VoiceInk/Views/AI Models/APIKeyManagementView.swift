@@ -22,14 +22,6 @@ struct APIKeyManagementView: View {
         apiKeyFormState.draft(for: aiService.selectedProvider)
     }
 
-    private var hasDraftAPIKey: Bool {
-        apiKeyDraft.hasEnteredKey
-    }
-
-    private var obfuscatedSelectedAPIKey: String {
-        VoiceInkSecretPresentation.obfuscatedAPIKeyOrPlaceholder(aiService.apiKey)
-    }
-
     private var selectedProviderSettingsSurface: VoiceInkAIEnhancementSettingsSurface {
         aiService.selectedProvider.textEnhancementSettingsSurface
     }
@@ -249,7 +241,7 @@ struct APIKeyManagementView: View {
                         HStack {
                             Text(providerSettingsPresentation.customProviderAPIKeySetText)
                             Spacer()
-                            Text(obfuscatedSelectedAPIKey)
+                            Text(VoiceInkSecretPresentation.obfuscatedAPIKeyOrPlaceholder(aiService.apiKey))
                                 .foregroundColor(.secondary)
                             Button(providerSettingsPresentation.customProviderRemoveKeyButtonTitle, role: .destructive) {
                                 aiService.clearAPIKey()
@@ -265,7 +257,7 @@ struct APIKeyManagementView: View {
                         .disabled(!providerSettingsPresentation.canSubmitCustomProvider(
                             baseURL: aiService.customBaseURL,
                             modelName: aiService.customModel,
-                            hasDraftAPIKey: hasDraftAPIKey
+                            hasDraftAPIKey: apiKeyDraft.hasEnteredKey
                         ))
                     }
                     
@@ -274,7 +266,7 @@ struct APIKeyManagementView: View {
                         HStack {
                             Text(providerSettingsPresentation.apiKeyFieldTitle)
                             Spacer()
-                            Text(obfuscatedSelectedAPIKey)
+                            Text(VoiceInkSecretPresentation.obfuscatedAPIKeyOrPlaceholder(aiService.apiKey))
                                 .foregroundColor(.secondary)
                             Button(providerSettingsPresentation.defaultAPIKeyRemoveButtonTitle, role: .destructive) {
                                 aiService.clearAPIKey()
@@ -313,7 +305,7 @@ struct APIKeyManagementView: View {
                                     Text(providerSettingsPresentation.verifyAndSaveButtonTitle)
                                 }
                             }
-                            .disabled(!hasDraftAPIKey)
+                            .disabled(!apiKeyDraft.hasEnteredKey)
                         }
                     }
                 }

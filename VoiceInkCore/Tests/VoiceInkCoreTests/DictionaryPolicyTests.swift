@@ -293,7 +293,7 @@ final class DictionaryPolicyTests: XCTestCase {
                 mode: .wordAscending,
                 word: { $0 }
             ),
-            ["zeta", "delta"]
+            ["zeta", "beta"]
         )
         XCTAssertEqual(
             VoiceInkDictionaryListSortPolicy.removingVocabulary(

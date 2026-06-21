@@ -592,6 +592,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/Mode.swift
 
 require_pattern \
+  "shared mode list policy lives in VoiceInkCore" \
+  'VoiceInkModeListPolicy|appending\(|replacing\(|defaultModeRepairPlan|VoiceInkModeListRepairPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/Mode.swift
+
+require_pattern \
   "iOS recording sheet uses shared mode selection presentation adapter" \
   'VoiceInkModeSelectionControlView' \
   iOS/VoiceInk-ios/RecordingSheetView.swift
@@ -615,6 +620,11 @@ require_pattern \
   "iOS settings mode rows use shared summary presentation" \
   'summaryPresentation' \
   iOS/VoiceInk-ios/SettingsView.swift
+
+require_pattern \
+  "iOS AppSettings uses shared mode list policy" \
+  'VoiceInkModeListPolicy\.(appending|replacing|defaultModeRepairPlan)' \
+  iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \
   "iOS mode configuration uses shared form presentation" \
@@ -646,6 +656,11 @@ reject_pattern \
   'modes\.count > 1|settings\.modes\.count > 1|modes\.first|settings\.modes\.first|!settings\.modes\.isEmpty' \
   iOS/VoiceInk-ios/RecordingSheetView.swift \
   iOS/VoiceInk-ios/NoteDetailView.swift
+
+reject_pattern \
+  "iOS AppSettings avoids shell-owned mode list mutation policy" \
+  'modes\.append|modes\[index\]|firstIndex\(where: \{ \$0\.id == modeId \}\)|Mode\.defaultModesAndSelection\(' \
+  iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \
   "iOS recording sheet avoids shell-only recording controls copy" \

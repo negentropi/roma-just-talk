@@ -44,6 +44,64 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
         XCTAssertEqual(defaultSelection.modes.first?.transcriptionModel, VoiceInkTranscriptionModelCatalog.localBaseModel)
     }
 
+    func testModeListPolicyAppendsModeWithoutReorderingExistingModes() {
+        let localMode = Mode.defaultLocalWhisper(name: "Local")
+        let cloudMode = Mode(name: "Cloud")
+
+        let updatedModes = VoiceInkModeListPolicy.appending(cloudMode, to: [localMode])
+
+        XCTAssertEqual(updatedModes.map(\.id), [localMode.id, cloudMode.id])
+    }
+
+    func testModeListPolicyReplacesExistingModeById() throws {
+        let localMode = Mode.defaultLocalWhisper(name: "Local")
+        let cloudMode = Mode(name: "Cloud")
+        let updatedMode = Mode(name: "Updated")
+
+        let updatedModes = try XCTUnwrap(VoiceInkModeListPolicy.replacing(
+            modeId: cloudMode.id,
+            with: updatedMode,
+            in: [localMode, cloudMode]
+        ))
+
+        XCTAssertEqual(updatedModes.map(\.id), [localMode.id, updatedMode.id])
+        XCTAssertEqual(updatedModes.map(\.name), ["Local", "Updated"])
+    }
+
+    func testModeListPolicyLeavesMissingReplacementAsNoOp() {
+        let localMode = Mode.defaultLocalWhisper(name: "Local")
+        let updatedMode = Mode(name: "Updated")
+
+        XCTAssertNil(VoiceInkModeListPolicy.replacing(
+            modeId: UUID(),
+            with: updatedMode,
+            in: [localMode]
+        ))
+    }
+
+    func testModeListPolicySeedsDefaultModeWhenListIsEmpty() {
+        let plan = VoiceInkModeListPolicy.defaultModeRepairPlan(modes: [], selectedModeId: nil)
+
+        XCTAssertTrue(plan.shouldReplaceModes)
+        XCTAssertEqual(plan.modes.count, 1)
+        XCTAssertEqual(plan.modes.first?.id, plan.selectedModeId)
+        XCTAssertEqual(plan.modes.first?.transcriptionProvider, .localWhisper)
+    }
+
+    func testModeListPolicyRepairsSelectionWithoutReplacingExistingModes() {
+        let localMode = Mode.defaultLocalWhisper(name: "Local")
+        let cloudMode = Mode(name: "Cloud")
+
+        let plan = VoiceInkModeListPolicy.defaultModeRepairPlan(
+            modes: [localMode, cloudMode],
+            selectedModeId: UUID()
+        )
+
+        XCTAssertFalse(plan.shouldReplaceModes)
+        XCTAssertEqual(plan.modes.map(\.id), [localMode.id, cloudMode.id])
+        XCTAssertEqual(plan.selectedModeId, localMode.id)
+    }
+
     func testUnsupportedTranscriptionProviderDoesNotReceiveFakeFallbackModel() {
         let mode = Mode(name: "Unsupported", transcriptionProvider: .cerebras)
 

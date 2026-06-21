@@ -172,15 +172,19 @@ final class AppSettings: ObservableObject {
     }
 
     func addMode(_ mode: Mode) {
-        modes.append(mode)
+        modes = VoiceInkModeListPolicy.appending(mode, to: modes)
     }
 
     func updateMode(_ updatedMode: Mode, replacing modeId: UUID) {
-        guard let index = modes.firstIndex(where: { $0.id == modeId }) else {
+        guard let updatedModes = VoiceInkModeListPolicy.replacing(
+            modeId: modeId,
+            with: updatedMode,
+            in: modes
+        ) else {
             return
         }
 
-        modes[index] = updatedMode
+        modes = updatedModes
     }
 
     func removeModes(at offsets: IndexSet) {
@@ -259,14 +263,18 @@ final class AppSettings: ObservableObject {
     }
 
     func ensureDefaultModeExists() {
-        guard modes.isEmpty else {
-            repairSelectedModeId()
-            return
+        let plan = VoiceInkModeListPolicy.defaultModeRepairPlan(
+            modes: modes,
+            selectedModeId: selectedModeId
+        )
+
+        if plan.shouldReplaceModes {
+            modes = plan.modes
         }
 
-        let defaultSelection = Mode.defaultModesAndSelection()
-        modes = defaultSelection.modes
-        selectedModeId = defaultSelection.selectedModeId
+        if selectedModeId != plan.selectedModeId {
+            selectedModeId = plan.selectedModeId
+        }
     }
 
     func completeFirstTimeSetup() {

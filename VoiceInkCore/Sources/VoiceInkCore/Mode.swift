@@ -64,6 +64,62 @@ public struct VoiceInkModeFormPresentation: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkModeListRepairPlan {
+    public let modes: [Mode]
+    public let selectedModeId: UUID?
+    public let shouldReplaceModes: Bool
+
+    public init(
+        modes: [Mode],
+        selectedModeId: UUID?,
+        shouldReplaceModes: Bool
+    ) {
+        self.modes = modes
+        self.selectedModeId = selectedModeId
+        self.shouldReplaceModes = shouldReplaceModes
+    }
+}
+
+public enum VoiceInkModeListPolicy {
+    public static func appending(_ mode: Mode, to modes: [Mode]) -> [Mode] {
+        modes + [mode]
+    }
+
+    public static func replacing(
+        modeId: UUID,
+        with updatedMode: Mode,
+        in modes: [Mode]
+    ) -> [Mode]? {
+        guard let index = modes.firstIndex(where: { $0.id == modeId }) else {
+            return nil
+        }
+
+        var updatedModes = modes
+        updatedModes[index] = updatedMode
+        return updatedModes
+    }
+
+    public static func defaultModeRepairPlan(
+        modes: [Mode],
+        selectedModeId: UUID?
+    ) -> VoiceInkModeListRepairPlan {
+        guard !modes.isEmpty else {
+            let defaultSelection = Mode.defaultModesAndSelection()
+            return VoiceInkModeListRepairPlan(
+                modes: defaultSelection.modes,
+                selectedModeId: defaultSelection.selectedModeId,
+                shouldReplaceModes: true
+            )
+        }
+
+        return VoiceInkModeListRepairPlan(
+            modes: modes,
+            selectedModeId: modes.repairedSelectedModeId(selectedModeId),
+            shouldReplaceModes: false
+        )
+    }
+}
+
 public struct Mode: Identifiable, Codable {
     public let id: UUID
     public var name: String

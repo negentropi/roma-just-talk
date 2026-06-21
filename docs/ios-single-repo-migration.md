@@ -55,7 +55,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - transcription provider recorded-file capability, including Cartesia as streaming-only
 - Native Apple and FluidAudio local transcription model metadata, plus Native Apple unsupported-OS availability/error presentation, runtime failure copy, and result-stream timeout policy; platform shells still own availability checks, download, and runtime adapters
 - remote transcription provider dispatch for iOS retry transcription
-- mode runtime configuration, default local mode selection, provider-change and stale model repair, selected-mode repair, mode-based transcription language availability, selected-language repair, mode selection presentation for picker-vs-single-label UI, and provider model selection presentation
+- mode runtime configuration, default local mode selection, mode-list add/update/default repair, provider-change and stale model repair, selected-mode repair, mode-based transcription language availability, selected-language repair, mode selection presentation for picker-vs-single-label UI, and provider model selection presentation
 - mode provider-selection repair and draft saveability rules
 - shared UserDefaults key names, including cleanup preferences, plus iOS mode persistence helpers with stale model repair on load
 - shared preference default state, app-settings reset state, and UserDefaults registration values for core-owned keys, including platform-specific selected-language defaults; platform shells still choose current model and register OS-specific keys
@@ -339,7 +339,7 @@ The remaining Swift files present in `../VoiceInk-iOS/VoiceInk-ios` but not in `
 - `KeychainService.swift`: replaced by direct iOS `AppSettings` calls into `VoiceInkKeychainValueStore`; macOS keeps its adapter only for local-build fallback storage and logging.
 - `RiffWaveUtils.swift`: replaced by `VoiceInkPCM16AudioSamples`.
 - `VADModelManager.swift`: replaced by direct `VoiceInkVADModelFiles.sileroPath()` calls from the macOS/iOS Whisper shells and macOS rolling preload.
-- `DefaultModeManager.swift`: replaced by `AppSettings.ensureDefaultModeExists()` plus `Mode.defaultModesAndSelection()`.
+- `DefaultModeManager.swift`: replaced by `AppSettings.ensureDefaultModeExists()` plus `VoiceInkModeListPolicy.defaultModeRepairPlan`.
 - `Mode.swift`, `PromptTemplate.swift`, `Provider.swift`: replaced by `VoiceInkCore` mode, prompt-template, and provider catalog modules.
 - `ModeSelectionView.swift`, `ModesView.swift`: obsolete iOS UI experiments; current in-repo iOS mode UI is `iOS/VoiceInk-ios/ModeConfigurationView.swift`.
 - `ContentView.swift`: obsolete clone app-root wrapper; current in-repo iOS launch path presents `NotesListView` directly after onboarding.
@@ -387,7 +387,7 @@ scripts/verify-ios-single-repo-migration.sh --full-build
 21. macOS and iOS live recording build pending rows through `VoiceInkRecordingTranscriptionDraft.pending`, and macOS canceled recordings build through `VoiceInkRecordingTranscriptionDraft.canceled`.
 22. iOS live recording delegates timestamped filename construction and PCM16 recorder format constants to `VoiceInkStoredAudioFile` and `VoiceInkPCM16Audio`.
 23. iOS note detail and list deletion route stored-audio availability, unavailable icon, deletion, and failed-delete log copy through `VoiceInkStoredAudioRecord`/`VoiceInkStoredAudioAvailability`/`VoiceInkStoredAudioFile`.
-24. iOS recording flow state, recording/retry mode selection, recording sheet controls/icon, settings mode summaries, and mode-configuration form copy route through `VoiceInkRecordingFlowState`, `VoiceInkModeSelectionPresentation`, `VoiceInkRecordingSheetPresentation`, `VoiceInkModeSummaryPresentation`, and `VoiceInkModeFormPresentation`.
+24. iOS recording flow state, recording/retry mode selection, recording sheet controls/icon, settings mode list mutation/default repair, mode summaries, and mode-configuration form copy route through `VoiceInkRecordingFlowState`, `VoiceInkModeSelectionPresentation`, `VoiceInkRecordingSheetPresentation`, `VoiceInkModeListPolicy`, `VoiceInkModeSummaryPresentation`, and `VoiceInkModeFormPresentation`.
 25. iOS local model row status, model-download action icons, swipe delete action text, operation confirmations, and failure alerts route through `VoiceInkWhisperModelDownloadRowPresentation`, `VoiceInkWhisperModelOperationConfirmationPresentation`, and `VoiceInkWhisperModelOperationAlertPresentation`; macOS downloaded-local-model and imported-local-model record construction routes through `VoiceInkWhisperModelFiles`, leaving transfer execution and notifications in the macOS shell.
 25. macOS audio-file transcription queue status/phase policy, queue mutation predicates, cancel-reset policy, queue count text, drop-target copy, action labels/help, and row status/action icons route through `VoiceInkAudioFileQueueStatus`/`VoiceInkAudioImportPresentation`/`VoiceInkAudioFileQueuePresentation`, with open panels, drag/drop, queue mutation, SwiftData insertion, and transcription execution remaining in the macOS shell.
 26. iOS API-key form copy/action icons and list status route through `VoiceInkProviderAPIKeyFormPresentation` and `VoiceInkProviderAPIKeyListRowPresentation`; iOS tone colors for provider-key rows and verification feedback live in one shell adapter.

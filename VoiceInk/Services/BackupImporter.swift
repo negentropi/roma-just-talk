@@ -188,15 +188,16 @@ enum BackupImporter {
                 playbackController.isPauseMediaEnabled = false
             }
         }
-        if let textFormattingEnabled = general.isTextFormattingEnabled {
+        let transcriptionCleanupImportPlan = VoiceInkTranscriptionCleanupSettings.backupImportPlan(
+            from: general.transcriptionCleanupBackupPreferences
+        )
+        if let textFormattingEnabled = transcriptionCleanupImportPlan.isTextFormattingEnabled {
             VoiceInkTranscriptionCleanupPreferenceStorage.saveTextFormattingEnabled(textFormattingEnabled)
         }
-        if let punctuationCleanupMode = general.punctuationCleanupMode {
+        if let punctuationCleanupMode = transcriptionCleanupImportPlan.punctuationCleanupMode {
             PunctuationCleanupMode.setCurrent(punctuationCleanupMode)
-        } else if let removePunctuation = general.removePunctuation {
-            PunctuationCleanupMode.setCurrent(removePunctuation ? .removeAll : .keep)
         }
-        if let lowercaseTranscription = general.lowercaseTranscription {
+        if let lowercaseTranscription = transcriptionCleanupImportPlan.lowercaseTranscription {
             VoiceInkTranscriptionCleanupPreferenceStorage.saveLowercaseTranscription(lowercaseTranscription)
         }
         let pasteImportPlan = VoiceInkPastePreference.backupImportPlan(

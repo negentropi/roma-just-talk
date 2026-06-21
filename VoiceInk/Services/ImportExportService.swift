@@ -169,6 +169,7 @@ class ImportExportService {
             shouldRestoreClipboardAfterPaste: VoiceInkPastePreference.shouldRestoreClipboardAfterPaste(),
             clipboardRestoreDelay: VoiceInkPastePreference.clipboardRestoreDelay()
         )
+        let transcriptionCleanupBackupPreferences = cleanupSettings.backupPreferences
         let recordingShortcutBackupPreferences = VoiceInkRecordingShortcutPreference.backupPreferences(
             primaryRecordingShortcut: recordingShortcutManager.primaryRecordingShortcut,
             secondaryRecordingShortcut: recordingShortcutManager.secondaryRecordingShortcut,
@@ -207,10 +208,10 @@ class ImportExportService {
             isSystemMuteEnabled: recordingFeedbackBackupPreferences.isSystemMuteEnabled,
             isPauseMediaEnabled: recordingFeedbackBackupPreferences.isPauseMediaEnabled,
             audioResumptionDelay: recordingFeedbackBackupPreferences.audioResumptionDelay,
-            isTextFormattingEnabled: cleanupSettings.isTextFormattingEnabled,
-            punctuationCleanupMode: cleanupSettings.punctuationMode,
-            removePunctuation: cleanupSettings.removesAllPunctuation,
-            lowercaseTranscription: cleanupSettings.lowercaseTranscription,
+            isTextFormattingEnabled: transcriptionCleanupBackupPreferences.isTextFormattingEnabled,
+            punctuationCleanupMode: transcriptionCleanupBackupPreferences.punctuationCleanupMode,
+            removePunctuation: transcriptionCleanupBackupPreferences.removePunctuation,
+            lowercaseTranscription: transcriptionCleanupBackupPreferences.lowercaseTranscription,
             isExperimentalFeaturesEnabled: UserDefaults.standard.bool(forKey: "isExperimentalFeaturesEnabled"),
             restoreClipboardAfterPaste: pasteBackupPreferences.shouldRestoreClipboardAfterPaste,
             clipboardRestoreDelay: pasteBackupPreferences.clipboardRestoreDelay,

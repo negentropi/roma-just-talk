@@ -2661,6 +2661,36 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionCleanupPreferences.swift
 
 require_pattern \
+  "shared transcription cleanup backup preferences live in VoiceInkCore" \
+  'struct VoiceInkTranscriptionCleanupBackupPreferences' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionCleanupPreferences.swift
+
+require_pattern \
+  "shared transcription cleanup backup import plan lives in VoiceInkCore" \
+  'struct VoiceInkTranscriptionCleanupBackupImportPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionCleanupPreferences.swift
+
+require_pattern \
+  "shared transcription cleanup backup export policy lives in VoiceInkCore" \
+  'var backupPreferences: VoiceInkTranscriptionCleanupBackupPreferences' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionCleanupPreferences.swift
+
+require_pattern \
+  "shared transcription cleanup backup import policy lives in VoiceInkCore" \
+  'backupImportPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionCleanupPreferences.swift
+
+require_pattern \
+  "shared transcription cleanup backup import prefers modern punctuation mode" \
+  'punctuationCleanupMode: preferences\.punctuationCleanupMode' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionCleanupPreferences.swift
+
+require_pattern \
+  "shared transcription cleanup backup import keeps legacy punctuation fallback" \
+  'removePunctuation\.map' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionCleanupPreferences.swift
+
+require_pattern \
   "shared transcription auto-cleanup backup preferences live in VoiceInkCore" \
   'struct VoiceInkTranscriptionAutoCleanupBackupPreferences' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
@@ -2736,6 +2766,31 @@ require_pattern \
   VoiceInk/Services/ImportExportService.swift
 
 require_pattern \
+  "macOS backup export uses shared transcription cleanup backup preferences" \
+  'cleanupSettings\.backupPreferences' \
+  VoiceInk/Services/ImportExportService.swift
+
+require_pattern \
+  "macOS backup export applies shared transcription cleanup text preference" \
+  'isTextFormattingEnabled: transcriptionCleanupBackupPreferences\.isTextFormattingEnabled' \
+  VoiceInk/Services/ImportExportService.swift
+
+require_pattern \
+  "macOS backup export applies shared transcription cleanup punctuation preference" \
+  'punctuationCleanupMode: transcriptionCleanupBackupPreferences\.punctuationCleanupMode' \
+  VoiceInk/Services/ImportExportService.swift
+
+require_pattern \
+  "macOS backup export applies shared transcription cleanup legacy punctuation preference" \
+  'removePunctuation: transcriptionCleanupBackupPreferences\.removePunctuation' \
+  VoiceInk/Services/ImportExportService.swift
+
+require_pattern \
+  "macOS backup export applies shared transcription cleanup lowercase preference" \
+  'lowercaseTranscription: transcriptionCleanupBackupPreferences\.lowercaseTranscription' \
+  VoiceInk/Services/ImportExportService.swift
+
+require_pattern \
   "macOS backup import uses shared transcription auto-cleanup backup import plan" \
   'VoiceInkTranscriptionAutoCleanupPreference\.backupImportPlan' \
   VoiceInk/Services/BackupImporter.swift
@@ -2765,9 +2820,29 @@ require_pattern \
   'audioCleanupImportPlan\.retentionDays' \
   VoiceInk/Services/BackupImporter.swift
 
+require_pattern \
+  "macOS backup import uses shared transcription cleanup backup import plan" \
+  'VoiceInkTranscriptionCleanupSettings\.backupImportPlan' \
+  VoiceInk/Services/BackupImporter.swift
+
+require_pattern \
+  "macOS backup import applies shared transcription cleanup text plan" \
+  'transcriptionCleanupImportPlan\.isTextFormattingEnabled' \
+  VoiceInk/Services/BackupImporter.swift
+
+require_pattern \
+  "macOS backup import applies shared transcription cleanup punctuation plan" \
+  'transcriptionCleanupImportPlan\.punctuationCleanupMode' \
+  VoiceInk/Services/BackupImporter.swift
+
+require_pattern \
+  "macOS backup import applies shared transcription cleanup lowercase plan" \
+  'transcriptionCleanupImportPlan\.lowercaseTranscription' \
+  VoiceInk/Services/BackupImporter.swift
+
 reject_pattern \
   "macOS backup import avoids shell-owned cleanup backup planning" \
-  'general\.(isTranscriptionCleanupEnabled|transcriptionRetentionMinutes|isAudioCleanupEnabled|audioRetentionPeriod)' \
+  'general\.(isTranscriptionCleanupEnabled|transcriptionRetentionMinutes|isAudioCleanupEnabled|audioRetentionPeriod|isTextFormattingEnabled|punctuationCleanupMode|removePunctuation|lowercaseTranscription)' \
   VoiceInk/Services/BackupImporter.swift
 
 require_pattern \

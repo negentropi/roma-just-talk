@@ -125,6 +125,15 @@ extension GeneralBackup {
             retentionDays: audioRetentionPeriod
         )
     }
+
+    var transcriptionCleanupBackupPreferences: VoiceInkTranscriptionCleanupBackupPreferences {
+        VoiceInkTranscriptionCleanupBackupPreferences(
+            isTextFormattingEnabled: isTextFormattingEnabled,
+            punctuationCleanupMode: punctuationCleanupMode,
+            removePunctuation: removePunctuation,
+            lowercaseTranscription: lowercaseTranscription
+        )
+    }
 }
 
 struct BackupFile: Codable {

@@ -279,6 +279,93 @@ final class TranscriptionCleanupPreferencesTests: XCTestCase {
         )
     }
 
+    func testCleanupSettingsBackupPreferencesPreserveMacOSExportShape() {
+        let settings = VoiceInkTranscriptionCleanupSettings(
+            punctuationMode: .removeAll,
+            isTextFormattingEnabled: false,
+            lowercaseTranscription: true,
+            removeFillerWords: false
+        )
+
+        XCTAssertEqual(
+            settings.backupPreferences,
+            VoiceInkTranscriptionCleanupBackupPreferences(
+                isTextFormattingEnabled: false,
+                punctuationCleanupMode: .removeAll,
+                removePunctuation: true,
+                lowercaseTranscription: true
+            )
+        )
+    }
+
+    func testCleanupSettingsBackupImportPlanPrefersModernPunctuationMode() {
+        let preferences = VoiceInkTranscriptionCleanupBackupPreferences(
+            isTextFormattingEnabled: false,
+            punctuationCleanupMode: .removeTrailingPeriod,
+            removePunctuation: true,
+            lowercaseTranscription: true
+        )
+
+        XCTAssertEqual(
+            VoiceInkTranscriptionCleanupSettings.backupImportPlan(from: preferences),
+            VoiceInkTranscriptionCleanupBackupImportPlan(
+                isTextFormattingEnabled: false,
+                punctuationCleanupMode: .removeTrailingPeriod,
+                lowercaseTranscription: true
+            )
+        )
+    }
+
+    func testCleanupSettingsBackupImportPlanFallsBackToLegacyRemovePunctuation() {
+        XCTAssertEqual(
+            VoiceInkTranscriptionCleanupSettings.backupImportPlan(
+                from: VoiceInkTranscriptionCleanupBackupPreferences(
+                    isTextFormattingEnabled: true,
+                    punctuationCleanupMode: nil,
+                    removePunctuation: true,
+                    lowercaseTranscription: false
+                )
+            ),
+            VoiceInkTranscriptionCleanupBackupImportPlan(
+                isTextFormattingEnabled: true,
+                punctuationCleanupMode: .removeAll,
+                lowercaseTranscription: false
+            )
+        )
+
+        XCTAssertEqual(
+            VoiceInkTranscriptionCleanupSettings.backupImportPlan(
+                from: VoiceInkTranscriptionCleanupBackupPreferences(
+                    isTextFormattingEnabled: nil,
+                    punctuationCleanupMode: nil,
+                    removePunctuation: false,
+                    lowercaseTranscription: nil
+                )
+            ),
+            VoiceInkTranscriptionCleanupBackupImportPlan(
+                isTextFormattingEnabled: nil,
+                punctuationCleanupMode: .keep,
+                lowercaseTranscription: nil
+            )
+        )
+
+        XCTAssertEqual(
+            VoiceInkTranscriptionCleanupSettings.backupImportPlan(
+                from: VoiceInkTranscriptionCleanupBackupPreferences(
+                    isTextFormattingEnabled: nil,
+                    punctuationCleanupMode: nil,
+                    removePunctuation: nil,
+                    lowercaseTranscription: nil
+                )
+            ),
+            VoiceInkTranscriptionCleanupBackupImportPlan(
+                isTextFormattingEnabled: nil,
+                punctuationCleanupMode: nil,
+                lowercaseTranscription: nil
+            )
+        )
+    }
+
     func testRemoveTrailingPeriodPreservesEllipsisAndTrailingWhitespace() {
         XCTAssertEqual(
             VoiceInkTranscriptionCleanupPreferences.removeTrailingPeriod(from: "Ship it.  "),

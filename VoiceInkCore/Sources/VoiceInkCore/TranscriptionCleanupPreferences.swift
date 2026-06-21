@@ -134,6 +134,61 @@ public struct VoiceInkTranscriptionCleanupSettings: Equatable, Sendable {
             fillerWords: fillerWords
         )
     }
+
+    public var backupPreferences: VoiceInkTranscriptionCleanupBackupPreferences {
+        VoiceInkTranscriptionCleanupBackupPreferences(
+            isTextFormattingEnabled: isTextFormattingEnabled,
+            punctuationCleanupMode: punctuationMode,
+            removePunctuation: removesAllPunctuation,
+            lowercaseTranscription: lowercaseTranscription
+        )
+    }
+
+    public static func backupImportPlan(
+        from preferences: VoiceInkTranscriptionCleanupBackupPreferences
+    ) -> VoiceInkTranscriptionCleanupBackupImportPlan {
+        VoiceInkTranscriptionCleanupBackupImportPlan(
+            isTextFormattingEnabled: preferences.isTextFormattingEnabled,
+            punctuationCleanupMode: preferences.punctuationCleanupMode
+                ?? preferences.removePunctuation.map { $0 ? .removeAll : .keep },
+            lowercaseTranscription: preferences.lowercaseTranscription
+        )
+    }
+}
+
+public struct VoiceInkTranscriptionCleanupBackupPreferences: Codable, Equatable, Sendable {
+    public let isTextFormattingEnabled: Bool?
+    public let punctuationCleanupMode: PunctuationCleanupMode?
+    public let removePunctuation: Bool?
+    public let lowercaseTranscription: Bool?
+
+    public init(
+        isTextFormattingEnabled: Bool?,
+        punctuationCleanupMode: PunctuationCleanupMode?,
+        removePunctuation: Bool?,
+        lowercaseTranscription: Bool?
+    ) {
+        self.isTextFormattingEnabled = isTextFormattingEnabled
+        self.punctuationCleanupMode = punctuationCleanupMode
+        self.removePunctuation = removePunctuation
+        self.lowercaseTranscription = lowercaseTranscription
+    }
+}
+
+public struct VoiceInkTranscriptionCleanupBackupImportPlan: Equatable, Sendable {
+    public let isTextFormattingEnabled: Bool?
+    public let punctuationCleanupMode: PunctuationCleanupMode?
+    public let lowercaseTranscription: Bool?
+
+    public init(
+        isTextFormattingEnabled: Bool?,
+        punctuationCleanupMode: PunctuationCleanupMode?,
+        lowercaseTranscription: Bool?
+    ) {
+        self.isTextFormattingEnabled = isTextFormattingEnabled
+        self.punctuationCleanupMode = punctuationCleanupMode
+        self.lowercaseTranscription = lowercaseTranscription
+    }
 }
 
 public struct VoiceInkTranscriptionCleanupPresentation: Equatable, Sendable {

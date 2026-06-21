@@ -22,16 +22,11 @@ public struct VoiceInkMistralTranscriptionClient: Sendable {
             timeout: timeout
         )
 
-        let (data, response) = try await VoiceInkRetriedRequest.upload(
+        let data = try await VoiceInkRetriedRequest.validatedUpload(
             request: preparedRequest.request,
             body: preparedRequest.body,
             timeout: timeout,
             maxRetries: maxRetries,
-            errorDomain: errorDomain
-        )
-        try VoiceInkRemoteHTTPResponsePolicy.validateSuccess(
-            response: response,
-            data: data,
             errorDomain: errorDomain
         )
 

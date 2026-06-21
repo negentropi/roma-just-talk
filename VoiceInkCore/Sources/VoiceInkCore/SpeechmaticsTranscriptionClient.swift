@@ -87,14 +87,13 @@ public struct VoiceInkSpeechmaticsTranscriptionClient: Sendable {
             customVocabulary: customVocabulary,
             timeout: timeout
         )
-        let (data, response) = try await VoiceInkRetriedRequest.upload(
+        let data = try await VoiceInkRetriedRequest.validatedUpload(
             request: preparedRequest.request,
             body: preparedRequest.body,
             timeout: timeout,
             maxRetries: maxRetries,
             errorDomain: errorDomain
         )
-        try VoiceInkRemoteHTTPResponsePolicy.validateSuccess(response: response, data: data, errorDomain: errorDomain)
         return try VoiceInkSpeechmaticsTranscriptionCodec.submittedJobID(from: data)
     }
 
@@ -157,13 +156,12 @@ public struct VoiceInkSpeechmaticsTranscriptionClient: Sendable {
             id: id,
             timeout: timeout
         )
-        let (data, response) = try await VoiceInkRetriedRequest.data(
+        let data = try await VoiceInkRetriedRequest.validatedData(
             for: request,
             timeout: timeout,
             maxRetries: maxRetries,
             errorDomain: errorDomain
         )
-        try VoiceInkRemoteHTTPResponsePolicy.validateSuccess(response: response, data: data, errorDomain: errorDomain)
         return VoiceInkSpeechmaticsTranscriptionCodec.transcript(from: data)
     }
 }

@@ -84,14 +84,13 @@ public struct VoiceInkSonioxTranscriptionClient: Sendable {
             fileName: fileName,
             timeout: timeout
         )
-        let (data, response) = try await VoiceInkRetriedRequest.upload(
+        let data = try await VoiceInkRetriedRequest.validatedUpload(
             request: preparedRequest.request,
             body: preparedRequest.body,
             timeout: timeout,
             maxRetries: 2,
             errorDomain: errorDomain
         )
-        try VoiceInkRemoteHTTPResponsePolicy.validateSuccess(response: response, data: data, errorDomain: errorDomain)
         return try VoiceInkSonioxTranscriptionCodec.uploadedFileID(from: data)
     }
 
@@ -114,13 +113,12 @@ public struct VoiceInkSonioxTranscriptionClient: Sendable {
             customVocabulary: customVocabulary,
             timeout: timeout
         )
-        let (data, response) = try await VoiceInkRetriedRequest.data(
+        let data = try await VoiceInkRetriedRequest.validatedData(
             for: request,
             timeout: timeout,
             maxRetries: 2,
             errorDomain: errorDomain
         )
-        try VoiceInkRemoteHTTPResponsePolicy.validateSuccess(response: response, data: data, errorDomain: errorDomain)
         return try VoiceInkSonioxTranscriptionCodec.createdTranscriptionID(from: data)
     }
 
@@ -176,13 +174,12 @@ public struct VoiceInkSonioxTranscriptionClient: Sendable {
             id: id,
             timeout: timeout
         )
-        let (data, response) = try await VoiceInkRetriedRequest.data(
+        let data = try await VoiceInkRetriedRequest.validatedData(
             for: request,
             timeout: timeout,
             maxRetries: 2,
             errorDomain: errorDomain
         )
-        try VoiceInkRemoteHTTPResponsePolicy.validateSuccess(response: response, data: data, errorDomain: errorDomain)
         return VoiceInkSonioxTranscriptionCodec.transcript(from: data)
     }
 }

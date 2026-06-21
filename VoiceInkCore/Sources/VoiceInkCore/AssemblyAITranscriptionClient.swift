@@ -79,14 +79,13 @@ public struct VoiceInkAssemblyAITranscriptionClient: Sendable {
             audioData: audioData,
             timeout: timeout
         )
-        let (data, response) = try await VoiceInkRetriedRequest.upload(
+        let data = try await VoiceInkRetriedRequest.validatedUpload(
             request: preparedRequest.request,
             body: preparedRequest.body,
             timeout: timeout,
             maxRetries: maxRetries,
             errorDomain: errorDomain
         )
-        try VoiceInkRemoteHTTPResponsePolicy.validateSuccess(response: response, data: data, errorDomain: errorDomain)
         return try VoiceInkAssemblyAITranscriptionCodec.uploadedAudioURL(from: data)
     }
 
@@ -112,13 +111,12 @@ public struct VoiceInkAssemblyAITranscriptionClient: Sendable {
             customVocabulary: customVocabulary,
             timeout: timeout
         )
-        let (data, response) = try await VoiceInkRetriedRequest.data(
+        let data = try await VoiceInkRetriedRequest.validatedData(
             for: request,
             timeout: timeout,
             maxRetries: maxRetries,
             errorDomain: errorDomain
         )
-        try VoiceInkRemoteHTTPResponsePolicy.validateSuccess(response: response, data: data, errorDomain: errorDomain)
         return try VoiceInkAssemblyAITranscriptionCodec.createdTranscriptID(from: data)
     }
 

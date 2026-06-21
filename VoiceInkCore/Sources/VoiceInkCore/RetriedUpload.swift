@@ -34,6 +34,48 @@ enum VoiceInkRetriedRequest {
         }
     }
 
+    static func validatedData(
+        for request: URLRequest,
+        timeout: TimeInterval?,
+        maxRetries: Int,
+        errorDomain: String
+    ) async throws -> Data {
+        let (data, response) = try await data(
+            for: request,
+            timeout: timeout,
+            maxRetries: maxRetries,
+            errorDomain: errorDomain
+        )
+        try VoiceInkRemoteHTTPResponsePolicy.validateSuccess(
+            response: response,
+            data: data,
+            errorDomain: errorDomain
+        )
+        return data
+    }
+
+    static func validatedUpload(
+        request: URLRequest,
+        body: Data,
+        timeout: TimeInterval,
+        maxRetries: Int,
+        errorDomain: String
+    ) async throws -> Data {
+        let (data, response) = try await upload(
+            request: request,
+            body: body,
+            timeout: timeout,
+            maxRetries: maxRetries,
+            errorDomain: errorDomain
+        )
+        try VoiceInkRemoteHTTPResponsePolicy.validateSuccess(
+            response: response,
+            data: data,
+            errorDomain: errorDomain
+        )
+        return data
+    }
+
     private static func perform(
         request: URLRequest,
         timeout: TimeInterval?,

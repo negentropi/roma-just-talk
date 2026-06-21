@@ -66,15 +66,10 @@ public struct VoiceInkOpenAICompatibleTranscriptionClient: Sendable {
             temperature: temperature
         )
 
-        let (data, response) = try await VoiceInkRetriedRequest.data(
+        let data = try await VoiceInkRetriedRequest.validatedData(
             for: preparedRequest.requestWithHTTPBody(),
             timeout: timeout,
             maxRetries: maxRetries,
-            errorDomain: errorDomain
-        )
-        try VoiceInkRemoteHTTPResponsePolicy.validateSuccess(
-            response: response,
-            data: data,
             errorDomain: errorDomain
         )
 

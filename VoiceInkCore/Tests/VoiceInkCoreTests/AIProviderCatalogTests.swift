@@ -271,6 +271,59 @@ final class AIProviderCatalogTests: XCTestCase {
         )
     }
 
+    func testMacOSAIEnhancementAPIKeyFormStateBuildsDraftForSelectedProvider() {
+        let state = VoiceInkAIEnhancementAPIKeyFormState(enteredKey: " $GROQ_API_KEY ")
+        let draft = state.draft(for: .groq)
+
+        XCTAssertTrue(draft.hasEnteredKey)
+        XCTAssertTrue(draft.canVerify)
+        XCTAssertEqual(draft.keyToSaveAfterSuccessfulVerification, "$GROQ_API_KEY")
+        XCTAssertEqual(
+            draft.resolvedVerificationCandidate(environment: ["GROQ_API_KEY": "resolved-key"]),
+            "resolved-key"
+        )
+    }
+
+    func testMacOSAIEnhancementAPIKeyFormStateTracksVerificationLifecycle() {
+        let state = VoiceInkAIEnhancementAPIKeyFormState(
+            enteredKey: "entered-key",
+            verificationProgress: .failure(message: "bad request")
+        )
+
+        let verifyingState = state.verifying()
+        let completedState = verifyingState.completedVerification()
+
+        XCTAssertEqual(verifyingState.enteredKey, "entered-key")
+        XCTAssertEqual(verifyingState.verificationProgress, .verifying)
+        XCTAssertTrue(verifyingState.isVerifying)
+        XCTAssertEqual(completedState.enteredKey, "")
+        XCTAssertEqual(completedState.verificationProgress, .idle)
+        XCTAssertFalse(completedState.isVerifying)
+    }
+
+    func testMacOSAIEnhancementAPIKeyFormStateBuildsSharedFailureAlertCopy() {
+        let state = VoiceInkAIEnhancementAPIKeyFormState(enteredKey: "bad-key")
+
+        XCTAssertEqual(
+            state.verificationFailureAlertMessage(
+                for: VoiceInkAPIKeyVerificationResult(
+                    isValid: false,
+                    errorMessage: "invalid key"
+                )
+            ),
+            "invalid key"
+        )
+        XCTAssertEqual(
+            state.verificationFailureAlertMessage(
+                for: VoiceInkAPIKeyVerificationResult(
+                    isValid: false,
+                    errorMessage: nil
+                )
+            ),
+            "Verification failed"
+        )
+    }
+
     func testMacOSAIEnhancementAPIKeyFailureMessagesAreShared() {
         XCTAssertEqual(
             VoiceInkAIEnhancementProviderKind.missingVerificationCandidateMessage,

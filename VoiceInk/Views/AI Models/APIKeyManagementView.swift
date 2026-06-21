@@ -4,10 +4,9 @@ import VoiceInkCore
 
 struct APIKeyManagementView: View {
     @EnvironmentObject private var aiService: AIService
-    @State private var apiKey: String = ""
+    @State private var apiKeyFormState = VoiceInkAIEnhancementAPIKeyFormState()
     @State private var showAlert = false
     @State private var alertMessage = ""
-    @State private var isVerifying = false
     @State private var ollamaBaseURL: String = VoiceInkDynamicAIProviderPreference.ollamaBaseURL()
     @State private var ollamaModels: [OllamaModel] = []
     @State private var selectedOllamaModel: String = VoiceInkDynamicAIProviderPreference.ollamaSelectedModel(
@@ -20,10 +19,7 @@ struct APIKeyManagementView: View {
     @State private var isSyncingLocalCLIState = false
 
     private var apiKeyDraft: VoiceInkAIEnhancementAPIKeyDraft {
-        VoiceInkAIEnhancementAPIKeyDraft(
-            provider: aiService.selectedProvider,
-            enteredKey: apiKey
-        )
+        apiKeyFormState.draft(for: aiService.selectedProvider)
     }
 
     private var hasDraftAPIKey: Bool {
@@ -262,7 +258,7 @@ struct APIKeyManagementView: View {
                             }
                         }
                     } else {
-                        SecureField(providerSettingsPresentation.apiKeyFieldTitle, text: $apiKey)
+                        SecureField(providerSettingsPresentation.apiKeyFieldTitle, text: $apiKeyFormState.enteredKey)
                             .textFieldStyle(.roundedBorder)
 
                         Button(providerSettingsPresentation.verifyAndSaveButtonTitle) {
@@ -287,7 +283,7 @@ struct APIKeyManagementView: View {
                             }
                         }
                     } else {
-                        SecureField(providerSettingsPresentation.apiKeyFieldTitle, text: $apiKey)
+                        SecureField(providerSettingsPresentation.apiKeyFieldTitle, text: $apiKeyFormState.enteredKey)
                             .textFieldStyle(.roundedBorder)
 
                         HStack {
@@ -313,7 +309,7 @@ struct APIKeyManagementView: View {
                                 verifyAndSaveAPIKey()
                             }) {
                                 HStack {
-                                    if isVerifying {
+                                    if apiKeyFormState.isVerifying {
                                         ProgressView().controlSize(.small)
                                     }
                                     Text(providerSettingsPresentation.verifyAndSaveButtonTitle)
@@ -347,22 +343,23 @@ struct APIKeyManagementView: View {
     }
 
     private func verifyAndSaveAPIKey() {
-        isVerifying = true
-        aiService.saveAPIKey(apiKey) { result in
-            isVerifying = false
+        apiKeyFormState = apiKeyFormState.verifying()
+        aiService.saveAPIKey(apiKeyFormState.enteredKey) { result in
+            let completedFormState = apiKeyFormState.completedVerification()
             if !result.isValid {
-                showAPIKeyVerificationFailure(result)
+                showAPIKeyVerificationFailure(
+                    apiKeyFormState.verificationFailureAlertMessage(for: result)
+                )
             }
-            apiKey = ""
+            apiKeyFormState = completedFormState
         }
     }
 
-    private func showAPIKeyVerificationFailure(_ result: VoiceInkAPIKeyVerificationResult) {
-        let progress = VoiceInkProviderAPIKeyVerificationProgress.failure(message: result.errorMessage)
-        guard let feedback = progress.macOSInlineFeedback else {
+    private func showAPIKeyVerificationFailure(_ message: String?) {
+        guard let message else {
             return
         }
-        alertMessage = feedback.text
+        alertMessage = message
         showAlert = true
     }
 

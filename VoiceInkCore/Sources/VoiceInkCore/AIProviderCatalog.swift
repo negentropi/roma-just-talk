@@ -217,6 +217,51 @@ public struct VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan: Equatable,
     }
 }
 
+public struct VoiceInkAIEnhancementAPIKeyFormState: Equatable, Sendable {
+    public var enteredKey: String
+    public var verificationProgress: VoiceInkProviderAPIKeyVerificationProgress
+
+    public init(
+        enteredKey: String = "",
+        verificationProgress: VoiceInkProviderAPIKeyVerificationProgress = .idle
+    ) {
+        self.enteredKey = enteredKey
+        self.verificationProgress = verificationProgress
+    }
+
+    public var isVerifying: Bool {
+        verificationProgress.isVerifying
+    }
+
+    public func draft(
+        for provider: VoiceInkAIEnhancementProviderKind,
+        storedRuntimeKey: String? = nil
+    ) -> VoiceInkAIEnhancementAPIKeyDraft {
+        VoiceInkAIEnhancementAPIKeyDraft(
+            provider: provider,
+            enteredKey: enteredKey,
+            storedRuntimeKey: storedRuntimeKey
+        )
+    }
+
+    public func verifying() -> Self {
+        Self(
+            enteredKey: enteredKey,
+            verificationProgress: .verifying
+        )
+    }
+
+    public func completedVerification() -> Self {
+        Self()
+    }
+
+    public func verificationFailureAlertMessage(for result: VoiceInkAPIKeyVerificationResult) -> String? {
+        VoiceInkProviderAPIKeyVerificationProgress.failure(message: result.errorMessage)
+            .macOSInlineFeedback?
+            .text
+    }
+}
+
 public struct VoiceInkAIEnhancementCredentialState: Equatable, Sendable {
     public let apiKey: String
     public let isAPIKeyValid: Bool

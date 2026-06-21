@@ -4149,19 +4149,49 @@ require_pattern \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
 
 require_pattern \
+  "shared macOS AI API-key form state lives in VoiceInkCore" \
+  'struct +VoiceInkAIEnhancementAPIKeyFormState' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+require_pattern \
+  "shared macOS AI API-key form state owns verification start" \
+  'verifying\(\)' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+require_pattern \
+  "shared macOS AI API-key form state owns verification completion" \
+  'completedVerification' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+require_pattern \
+  "shared macOS AI API-key form state owns failure copy" \
+  'verificationFailureAlertMessage' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+require_pattern \
+  "macOS AI API-key view uses shared AI form state" \
+  'VoiceInkAIEnhancementAPIKeyFormState' \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+
+require_pattern \
+  "macOS AI API-key view routes entry through shared AI form state" \
+  'apiKeyFormState\.(draft|enteredKey|isVerifying|verifying|completedVerification)' \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+
+require_pattern \
   "shared macOS AI API-key failure messages live in VoiceInkCore" \
   'missingVerificationCandidateMessage|invalidOrMissingBaseURLConfigurationMessage|unsupportedAPIKeyVerificationMessage' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \
-  "macOS AI API-key view uses shared verification progress type" \
+  "shared macOS AI API-key form state uses shared verification progress type" \
   'VoiceInkProviderAPIKeyVerificationProgress\.failure' \
-  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \
-  "macOS AI API-key view uses shared verification feedback copy" \
+  "shared macOS AI API-key form state uses shared verification feedback copy" \
   'macOSInlineFeedback' \
-  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \
   "macOS AI API-key view uses shared obfuscated-key fallback" \
@@ -4199,13 +4229,28 @@ reject_pattern \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 require_pattern \
-  "macOS AI API-key view handles save results through shared result type" \
-  'showAPIKeyVerificationFailure\(_ result: VoiceInkAPIKeyVerificationResult\)|verifyAndSaveAPIKey\(\)' \
+  "macOS AI API-key view submits shared AI form state key" \
+  'saveAPIKey\(apiKeyFormState\.enteredKey\)' \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+
+require_pattern \
+  "macOS AI API-key view handles save failures through shared form state" \
+  'verificationFailureAlertMessage\(for: result\)' \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
 
 reject_pattern \
   "macOS AI API-key view avoids tuple-shaped save result handling" \
   'saveAPIKey\(apiKey\) \{ success, errorMessage|showAPIKeyVerificationFailure\(errorMessage\)' \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+
+reject_pattern \
+  "macOS AI API-key view avoids shell-owned API-key form state machine fields" \
+  '@State private var +(apiKey|isVerifying)\b' \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+
+reject_pattern \
+  "macOS AI API-key view avoids shell-owned verification failure presentation" \
+  'VoiceInkProviderAPIKeyVerificationProgress\.failure|macOSInlineFeedback' \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
 
 reject_pattern \

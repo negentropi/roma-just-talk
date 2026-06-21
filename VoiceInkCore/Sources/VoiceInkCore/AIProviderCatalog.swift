@@ -307,6 +307,33 @@ public struct VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan: Equatable,
     }
 }
 
+public struct VoiceInkAIEnhancementAPIKeyClearPlan: Equatable, Sendable {
+    public let provider: VoiceInkAIEnhancementProviderKind
+    public let credentialStateAfterClear: VoiceInkAIEnhancementCredentialState
+
+    public init(
+        provider: VoiceInkAIEnhancementProviderKind,
+        credentialStateAfterClear: VoiceInkAIEnhancementCredentialState
+    ) {
+        self.provider = provider
+        self.credentialStateAfterClear = credentialStateAfterClear
+    }
+
+    public static func clearing(
+        provider: VoiceInkAIEnhancementProviderKind
+    ) -> VoiceInkAIEnhancementAPIKeyClearPlan? {
+        guard provider.requiresUserAPIKey else { return nil }
+
+        return VoiceInkAIEnhancementAPIKeyClearPlan(
+            provider: provider,
+            credentialStateAfterClear: VoiceInkAIEnhancementCredentialState(
+                apiKey: "",
+                isAPIKeyValid: false
+            )
+        )
+    }
+}
+
 public struct VoiceInkAIEnhancementAPIKeyFormState: Equatable, Sendable {
     public var enteredKey: String
     public var verificationProgress: VoiceInkProviderAPIKeyVerificationProgress

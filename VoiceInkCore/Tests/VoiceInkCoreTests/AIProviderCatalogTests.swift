@@ -271,6 +271,33 @@ final class AIProviderCatalogTests: XCTestCase {
         )
     }
 
+    func testMacOSAIEnhancementAPIKeyClearPlanIsShared() {
+        XCTAssertEqual(
+            VoiceInkAIEnhancementAPIKeyClearPlan.clearing(provider: .groq),
+            VoiceInkAIEnhancementAPIKeyClearPlan(
+                provider: .groq,
+                credentialStateAfterClear: VoiceInkAIEnhancementCredentialState(
+                    apiKey: "",
+                    isAPIKeyValid: false
+                )
+            )
+        )
+
+        XCTAssertEqual(
+            VoiceInkAIEnhancementAPIKeyClearPlan.clearing(provider: .custom),
+            VoiceInkAIEnhancementAPIKeyClearPlan(
+                provider: .custom,
+                credentialStateAfterClear: VoiceInkAIEnhancementCredentialState(
+                    apiKey: "",
+                    isAPIKeyValid: false
+                )
+            )
+        )
+
+        XCTAssertNil(VoiceInkAIEnhancementAPIKeyClearPlan.clearing(provider: .ollama))
+        XCTAssertNil(VoiceInkAIEnhancementAPIKeyClearPlan.clearing(provider: .localCLI))
+    }
+
     func testMacOSAIEnhancementAPIKeyFormStateBuildsDraftForSelectedProvider() {
         let state = VoiceInkAIEnhancementAPIKeyFormState(enteredKey: " $GROQ_API_KEY ")
         let draft = state.draft(for: .groq)

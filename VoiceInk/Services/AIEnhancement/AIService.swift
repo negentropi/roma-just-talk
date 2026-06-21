@@ -262,11 +262,19 @@ class AIService: ObservableObject {
     }
     
     func clearAPIKey() {
-        guard selectedProvider.requiresUserAPIKey else { return }
+        guard let plan = VoiceInkAIEnhancementAPIKeyClearPlan.clearing(
+            provider: selectedProvider
+        ) else {
+            return
+        }
 
-        apiKey = ""
-        isAPIKeyValid = false
-        APIKeyManager.shared.deleteAPIKey(forProvider: selectedProvider.rawValue)
+        applyTextEnhancementAPIKeyClearPlan(plan)
+    }
+
+    private func applyTextEnhancementAPIKeyClearPlan(_ plan: VoiceInkAIEnhancementAPIKeyClearPlan) {
+        apiKey = plan.credentialStateAfterClear.apiKey
+        isAPIKeyValid = plan.credentialStateAfterClear.isAPIKeyValid
+        APIKeyManager.shared.deleteAPIKey(forProvider: plan.provider.rawValue)
         NotificationCenter.default.post(name: .aiProviderKeyChanged, object: nil)
     }
     

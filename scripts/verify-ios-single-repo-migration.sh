@@ -6765,6 +6765,11 @@ require_pattern \
   'VoiceInkPowerModePresentation\.rowDetailPresentation|PowerModeRowDetailChipView|chip\.(systemImageName|usesAccentStyle)' \
   VoiceInk/PowerMode/PowerModeViewComponents.swift
 
+reject_pattern \
+  "macOS Power Mode rows avoid shallow row presentation wrappers" \
+  'private var +(selectedPromptTitle|appText|websiteText|rowDetailPresentation)\b' \
+  VoiceInk/PowerMode/PowerModeViewComponents.swift
+
 require_pattern \
   "macOS Power Mode panel uses shared chrome copy" \
   'VoiceInkPowerModePresentation\.(panelTitle|panelSubtitle|panelInfoTipText|panelLearnMoreURLString|addButtonSystemImageName|reorderButtonTitle|reorderButtonSystemImageName|emptyPanelTitle|emptyPanelMessage|emptyPanelSystemImageName|reorderPanelTitle|reorderPanelCloseHelpText|reorderPanelCloseSystemImageName|reorderHandleSystemImageName|defaultBadgeTitle|disabledBadgeTitle)' \

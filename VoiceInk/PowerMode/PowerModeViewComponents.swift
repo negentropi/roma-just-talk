@@ -5,7 +5,7 @@ struct VoiceInkButton: View {
     let title: String
     let action: () -> Void
     var isDisabled: Bool = false
-    
+
     var body: some View {
         Button(action: action) {
             Text(title)
@@ -99,11 +99,7 @@ struct ConfigurationRow: View {
     @State private var isHovering = false
     
     private let maxAppIconsToShow = 5
-    
-    private var selectedPromptTitle: String? {
-        config.selectedPromptTitle(in: enhancementService.allPrompts)
-    }
-    
+
     private var selectedModelDisplayText: String? {
         if let modelName = config.selectedTranscriptionModelName,
            let model = transcriptionModelManager.allAvailableModels.first(where: { $0.name == modelName }) {
@@ -130,14 +126,6 @@ struct ConfigurationRow: View {
     private var appCount: Int { return config.appConfigs?.count ?? 0 }
     private var websiteCount: Int { return config.urlConfigs?.count ?? 0 }
     
-    private var websiteText: String {
-        VoiceInkPowerModePresentation.websiteTriggerCountText(websiteCount)
-    }
-    
-    private var appText: String {
-        VoiceInkPowerModePresentation.appTriggerCountText(appCount)
-    }
-    
     private var extraAppsCount: Int {
         return max(0, appCount - maxAppIconsToShow)
     }
@@ -146,16 +134,14 @@ struct ConfigurationRow: View {
         return Array(config.appConfigs?.prefix(maxAppIconsToShow) ?? [])
     }
 
-    private var rowDetailPresentation: VoiceInkPowerModeRowDetailPresentation {
-        VoiceInkPowerModePresentation.rowDetailPresentation(
+    var body: some View {
+        let rowDetailPresentation = VoiceInkPowerModePresentation.rowDetailPresentation(
             config: config,
             transcriptionModelDisplayText: selectedModelDisplayText,
             selectedLanguageDisplayText: selectedLanguage,
-            selectedPromptTitle: selectedPromptTitle
+            selectedPromptTitle: config.selectedPromptTitle(in: enhancementService.allPrompts)
         )
-    }
-    
-    var body: some View {
+
         VStack(spacing: 0) {
             HStack(spacing: 12) {
                 ZStack {
@@ -187,7 +173,7 @@ struct ConfigurationRow: View {
                             HStack(spacing: 4) {
                                 Image(systemName: VoiceInkPowerModePresentation.appTriggerSystemImageName)
                                     .font(.system(size: 10))
-                                Text(appText)
+                                Text(VoiceInkPowerModePresentation.appTriggerCountText(appCount))
                                     .font(.caption2)
                             }
                         }
@@ -196,7 +182,7 @@ struct ConfigurationRow: View {
                             HStack(spacing: 4) {
                                 Image(systemName: VoiceInkPowerModePresentation.websiteTriggerSystemImageName)
                                     .font(.system(size: 10))
-                                Text(websiteText)
+                                Text(VoiceInkPowerModePresentation.websiteTriggerCountText(websiteCount))
                                     .font(.caption2)
                             }
                         }

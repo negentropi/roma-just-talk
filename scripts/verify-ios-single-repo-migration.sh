@@ -3355,7 +3355,7 @@ reject_pattern \
 
 require_pattern \
   "macOS cloud API-key card uses shared draft policy" \
-  'VoiceInkProviderAPIKeyDraft' \
+  'apiKeyFormState\.draft' \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
 require_pattern \
@@ -3417,6 +3417,11 @@ reject_pattern \
 reject_pattern \
   "macOS cloud API-key card avoids shallow API-key verification wrappers" \
   'private var +(isVerifying|canVerifyAPIKey)\b' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift
+
+reject_pattern \
+  "macOS cloud API-key card avoids shallow shared API-key pass-through properties" \
+  'private var +(apiKeyDraft|apiKeyCardPresentation)\b' \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
 reject_pattern \

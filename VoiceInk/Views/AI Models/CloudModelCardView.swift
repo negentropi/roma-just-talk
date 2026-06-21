@@ -30,17 +30,9 @@ struct CloudModelCardView: View {
         return APIKeyManager.shared.hasAPIKey(forProvider: model.provider.apiKeyProviderName)
     }
 
-    private var apiKeyDraft: VoiceInkProviderAPIKeyDraft {
-        apiKeyFormState.draft(
-            storedRuntimeKey: APIKeyManager.shared.getAPIKey(forProvider: model.provider.apiKeyProviderName)
-        )
-    }
-
-    private var apiKeyCardPresentation: VoiceInkProviderAPIKeyCardPresentation {
-        VoiceInkProviderAPIKeyCardPresentation(providerDisplayName: model.provider.rawValue)
-    }
-
     var body: some View {
+        let apiKeyCardPresentation = VoiceInkProviderAPIKeyCardPresentation(providerDisplayName: model.provider.rawValue)
+
         VStack(alignment: .leading, spacing: 0) {
             // Main card content
             HStack(alignment: .top, spacing: 16) {
@@ -51,7 +43,7 @@ struct CloudModelCardView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 
-                actionSection
+                actionSection(apiKeyCardPresentation: apiKeyCardPresentation)
             }
             .padding(16)
             
@@ -60,7 +52,7 @@ struct CloudModelCardView: View {
                 Divider()
                     .padding(.horizontal, 16)
                 
-                configurationSection
+                configurationSection(apiKeyCardPresentation: apiKeyCardPresentation)
                     .padding(16)
             }
         }
@@ -181,7 +173,9 @@ struct CloudModelCardView: View {
             .padding(.top, 4)
     }
     
-    private var actionSection: some View {
+    private func actionSection(
+        apiKeyCardPresentation: VoiceInkProviderAPIKeyCardPresentation
+    ) -> some View {
         HStack(spacing: 8) {
             if isCurrent {
                 Text(VoiceInkModelManagementPresentation.defaultModelTitle)
@@ -239,8 +233,13 @@ struct CloudModelCardView: View {
         }
     }
     
-    private var configurationSection: some View {
+    private func configurationSection(
+        apiKeyCardPresentation: VoiceInkProviderAPIKeyCardPresentation
+    ) -> some View {
         let verificationProgress = apiKeyFormState.verificationProgress
+        let apiKeyDraft = apiKeyFormState.draft(
+            storedRuntimeKey: APIKeyManager.shared.getAPIKey(forProvider: model.provider.apiKeyProviderName)
+        )
 
         return VStack(alignment: .leading, spacing: 12) {
             Text(apiKeyCardPresentation.configurationSectionTitle)

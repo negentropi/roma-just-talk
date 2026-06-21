@@ -76,4 +76,30 @@ final class AIEnhancementErrorTests: XCTestCase {
             for: NSError(domain: "VoiceInk", code: NSURLErrorTimedOut)
         ))
     }
+
+    func testOllamaEnhancementFailurePolicyPreservesMacOSMessagesAndRetryShape() {
+        let expectedMessages: [(VoiceInkOllamaEnhancementFailure, String)] = [
+            (.invalidURL, "Invalid Ollama server URL"),
+            (.serviceUnavailable, "Ollama service is not available"),
+            (.invalidResponse, "Invalid response from Ollama server"),
+            (.modelNotFound, "Selected model not found"),
+            (.serverError, "Ollama server error"),
+            (.invalidRequest, "System prompt is required"),
+            (.timeout, "Ollama request timed out")
+        ]
+
+        for (failure, message) in expectedMessages {
+            XCTAssertEqual(failure.message, message)
+            XCTAssertEqual(failure.errorDescription, message)
+        }
+
+        XCTAssertEqual(VoiceInkOllamaEnhancementFailure.httpFailure(statusCode: 404), .modelNotFound)
+        XCTAssertEqual(VoiceInkOllamaEnhancementFailure.httpFailure(statusCode: 500), .serverError)
+        XCTAssertEqual(VoiceInkOllamaEnhancementFailure.httpFailure(statusCode: 599), .invalidResponse)
+        XCTAssertEqual(VoiceInkOllamaEnhancementFailure.timeout.enhancementError, .timeout)
+        XCTAssertEqual(
+            VoiceInkOllamaEnhancementFailure.serverError.enhancementError,
+            .customError("Ollama server error")
+        )
+    }
 }

@@ -73,11 +73,11 @@ class OllamaService: ObservableObject {
 
     func enhance(_ text: String, withSystemPrompt systemPrompt: String? = nil, timeout: TimeInterval = 30) async throws -> String {
         guard let systemPrompt = systemPrompt else {
-            throw LocalAIError.invalidRequest
+            throw VoiceInkOllamaEnhancementFailure.invalidRequest.enhancementError
         }
 
         guard let url = baseURLValue else {
-            throw LocalAIError.invalidURL
+            throw VoiceInkOllamaEnhancementFailure.invalidURL.enhancementError
         }
 
         do {
@@ -91,18 +91,16 @@ class OllamaService: ObservableObject {
                 timeout: timeout
             )
         } catch let error as LLMKitError {
-            throw mapLLMKitError(error)
+            throw mapLLMKitError(error).enhancementError
         }
     }
 
-    private func mapLLMKitError(_ error: LLMKitError) -> LocalAIError {
+    private func mapLLMKitError(_ error: LLMKitError) -> VoiceInkOllamaEnhancementFailure {
         switch error {
         case .invalidURL:
             return .invalidURL
         case .httpError(let statusCode, _):
-            if statusCode == 404 { return .modelNotFound }
-            if statusCode == 500 { return .serverError }
-            return .invalidResponse
+            return VoiceInkOllamaEnhancementFailure.httpFailure(statusCode: statusCode)
         case .networkError:
             return .serviceUnavailable
         case .noResultReturned, .decodingError:
@@ -113,36 +111,6 @@ class OllamaService: ObservableObject {
             return .invalidResponse
         case .timeout:
             return .timeout
-        }
-    }
-}
-
-// MARK: - Error Types
-enum LocalAIError: Error, LocalizedError {
-    case invalidURL
-    case serviceUnavailable
-    case invalidResponse
-    case modelNotFound
-    case serverError
-    case invalidRequest
-    case timeout
-
-    var errorDescription: String? {
-        switch self {
-        case .invalidURL:
-            return "Invalid Ollama server URL"
-        case .serviceUnavailable:
-            return "Ollama service is not available"
-        case .invalidResponse:
-            return "Invalid response from Ollama server"
-        case .modelNotFound:
-            return "Selected model not found"
-        case .serverError:
-            return "Ollama server error"
-        case .invalidRequest:
-            return "System prompt is required"
-        case .timeout:
-            return "Ollama request timed out"
         }
     }
 }

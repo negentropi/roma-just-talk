@@ -185,17 +185,10 @@ class AIEnhancementService: ObservableObject {
                     timeout: baseTimeout
                 )
                 return VoiceInkAIEnhancementRequestPayload.enhancedText(from: result)
+            } catch let error as VoiceInkAIEnhancementError {
+                throw error
             } catch {
-                if let localError = error as? LocalAIError {
-                    switch localError {
-                    case .timeout:
-                        throw VoiceInkAIEnhancementError.timeout
-                    default:
-                        throw VoiceInkAIEnhancementError.customError(localError.errorDescription ?? "An unknown Ollama error occurred.")
-                    }
-                } else {
-                    throw VoiceInkAIEnhancementError.customError(error.localizedDescription)
-                }
+                throw VoiceInkAIEnhancementError.customError(error.localizedDescription)
             }
 
         case .localCLI:

@@ -4508,6 +4508,31 @@ reject_pattern \
   '"(Enhancement Settings|Close|Clipboard Context|Use clipboard text to understand context for better enhancement\.|Screen Context|Capture on-screen text to understand context for better enhancement\.|Context|Skip short transcriptions|Minimum words|Timeout duration|On timeout|Fail immediately|Retry|Request Timeout|Set how long to wait for the AI provider to respond\.|Shortcuts)"|ForEach\(1\.\.\.15|\[3, 5, 7, 10, 15, 20, 30, 40, 50, 60\]' \
   VoiceInk/Views/Components/EnhancementSettingsPanel.swift
 
+require_pattern \
+  "shared Ollama enhancement failure policy lives in VoiceInkCore" \
+  'VoiceInkOllamaEnhancementFailure|httpFailure|enhancementError|Ollama request timed out' \
+  VoiceInkCore/Sources/VoiceInkCore/AIEnhancementError.swift
+
+require_pattern \
+  "core tests pin shared Ollama enhancement failure policy" \
+  'testOllamaEnhancementFailurePolicyPreservesMacOSMessagesAndRetryShape' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AIEnhancementErrorTests.swift
+
+require_pattern \
+  "core check runner executes shared Ollama enhancement failure policy test" \
+  'testOllamaEnhancementFailurePolicyPreservesMacOSMessagesAndRetryShape' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "macOS Ollama service uses shared enhancement failure policy" \
+  'VoiceInkOllamaEnhancementFailure' \
+  VoiceInk/Services/OllamaService.swift
+
+reject_pattern \
+  "macOS Ollama service avoids shell-owned enhancement failure policy" \
+  'LocalAIError|"(Invalid Ollama server URL|Ollama service is not available|Invalid response from Ollama server|Selected model not found|Ollama server error|System prompt is required|Ollama request timed out)"' \
+  VoiceInk/Services/OllamaService.swift
+
 reject_pattern \
   "macOS enhancement settings outer view avoids shell-only chrome copy" \
   '"(Enable Enhancement|AI enhancement lets you pass the transcribed audio through LLMs to post-process using different prompts suitable for different use cases like e-mails, summary, writing, etc\.|https://tryvoiceink.com/docs/enhancements-configuring-models|General|Enhancement settings|Enhancement Prompts|gear)"' \

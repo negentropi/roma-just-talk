@@ -35,6 +35,60 @@ public enum VoiceInkAIEnhancementError: Error, Equatable, Sendable {
     }
 }
 
+public enum VoiceInkOllamaEnhancementFailure: Error, Equatable, Sendable {
+    case invalidURL
+    case serviceUnavailable
+    case invalidResponse
+    case modelNotFound
+    case serverError
+    case invalidRequest
+    case timeout
+
+    public static func httpFailure(statusCode: Int) -> VoiceInkOllamaEnhancementFailure {
+        if statusCode == 404 {
+            return .modelNotFound
+        }
+        if statusCode == 500 {
+            return .serverError
+        }
+        return .invalidResponse
+    }
+
+    public var enhancementError: VoiceInkAIEnhancementError {
+        switch self {
+        case .timeout:
+            return .timeout
+        case .invalidURL, .serviceUnavailable, .invalidResponse, .modelNotFound, .serverError, .invalidRequest:
+            return .customError(message)
+        }
+    }
+
+    public var message: String {
+        switch self {
+        case .invalidURL:
+            return "Invalid Ollama server URL"
+        case .serviceUnavailable:
+            return "Ollama service is not available"
+        case .invalidResponse:
+            return "Invalid response from Ollama server"
+        case .modelNotFound:
+            return "Selected model not found"
+        case .serverError:
+            return "Ollama server error"
+        case .invalidRequest:
+            return "System prompt is required"
+        case .timeout:
+            return "Ollama request timed out"
+        }
+    }
+}
+
+extension VoiceInkOllamaEnhancementFailure: LocalizedError {
+    public var errorDescription: String? {
+        message
+    }
+}
+
 extension VoiceInkAIEnhancementError: LocalizedError {
     public var errorDescription: String? {
         switch self {

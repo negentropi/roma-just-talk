@@ -12,7 +12,7 @@ import VoiceInkCore
 @main
 struct VoiceInk_iosApp: App {
     @State private var hasCompletedOnboarding = VoiceInkOnboardingPreference.hasCompletedOnboarding()
-    @State private var shouldStartRecordingAfterOnboarding = false
+    @State private var launchRecordingRequestState = VoiceInkLaunchRecordingRequestState()
     @StateObject private var recordingManager = RecordingManager()
     
     init() {
@@ -75,18 +75,28 @@ struct VoiceInk_iosApp: App {
     }
 
     private func requestRecordingFromDeepLink() {
-        guard hasCompletedOnboarding else {
-            shouldStartRecordingAfterOnboarding = true
-            return
-        }
-
-        startRecordingAfterLaunchDelay()
+        applyLaunchRecordingAction(
+            launchRecordingRequestState.requestRecording(
+                hasCompletedOnboarding: hasCompletedOnboarding
+            )
+        )
     }
 
     private func startPendingRecordingIfNeeded() {
-        guard shouldStartRecordingAfterOnboarding else { return }
-        shouldStartRecordingAfterOnboarding = false
-        startRecordingAfterLaunchDelay()
+        applyLaunchRecordingAction(
+            launchRecordingRequestState.consumePendingRecordingIfReady(
+                hasCompletedOnboarding: hasCompletedOnboarding
+            )
+        )
+    }
+
+    private func applyLaunchRecordingAction(_ action: VoiceInkLaunchRecordingRequestAction) {
+        switch action {
+        case .none, .deferUntilOnboardingCompletes:
+            return
+        case .startRecordingAfterLaunchDelay:
+            startRecordingAfterLaunchDelay()
+        }
     }
 
     private func startRecordingAfterLaunchDelay() {

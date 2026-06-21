@@ -192,6 +192,59 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertEqual(VoiceInkKeyboardRecordingTiming.openAppFallbackResetDelay, 2.0)
     }
 
+    func testLaunchRecordingRequestStartsImmediatelyWhenOnboardingIsComplete() {
+        var state = VoiceInkLaunchRecordingRequestState()
+
+        XCTAssertEqual(
+            state.requestRecording(hasCompletedOnboarding: true),
+            .startRecordingAfterLaunchDelay
+        )
+        XCTAssertFalse(state.hasPendingRecordingAfterOnboarding)
+    }
+
+    func testLaunchRecordingRequestDefersUntilOnboardingCompletes() {
+        var state = VoiceInkLaunchRecordingRequestState()
+
+        XCTAssertEqual(
+            state.requestRecording(hasCompletedOnboarding: false),
+            .deferUntilOnboardingCompletes
+        )
+        XCTAssertTrue(state.hasPendingRecordingAfterOnboarding)
+
+        XCTAssertEqual(
+            state.consumePendingRecordingIfReady(hasCompletedOnboarding: false),
+            .none
+        )
+        XCTAssertTrue(state.hasPendingRecordingAfterOnboarding)
+
+        XCTAssertEqual(
+            state.consumePendingRecordingIfReady(hasCompletedOnboarding: true),
+            .startRecordingAfterLaunchDelay
+        )
+        XCTAssertFalse(state.hasPendingRecordingAfterOnboarding)
+    }
+
+    func testLaunchRecordingRequestNoOpsWhenNothingIsPending() {
+        var state = VoiceInkLaunchRecordingRequestState()
+
+        XCTAssertEqual(
+            state.consumePendingRecordingIfReady(hasCompletedOnboarding: true),
+            .none
+        )
+    }
+
+    func testLaunchRecordingRequestClearsPendingStateWhenRecordingCanStartNow() {
+        var state = VoiceInkLaunchRecordingRequestState(
+            hasPendingRecordingAfterOnboarding: true
+        )
+
+        XCTAssertEqual(
+            state.requestRecording(hasCompletedOnboarding: true),
+            .startRecordingAfterLaunchDelay
+        )
+        XCTAssertFalse(state.hasPendingRecordingAfterOnboarding)
+    }
+
     func testKeyboardRecordingButtonPresentationPreservesIOSCopyAndIcons() {
         XCTAssertEqual(
             VoiceInkKeyboardRecordingButtonPresentation.idle,

@@ -7911,6 +7911,16 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "VoiceInkCore owns iOS launch recording request policy" \
+  'VoiceInkLaunchRecordingRequest(State|Action)' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "VoiceInkCore checks cover iOS launch recording request policy" \
+  'testLaunchRecordingRequest(StartsImmediatelyWhenOnboardingIsComplete|DefersUntilOnboardingCompletes|NoOpsWhenNothingIsPending|ClearsPendingStateWhenRecordingCanStartNow)' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "VoiceInkCore owns iOS keyboard recording button presentation" \
   'VoiceInkKeyboardRecordingButtonPresentation' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
@@ -8026,6 +8036,11 @@ require_pattern \
   iOS/VoiceInk-ios/VoiceInk_iosApp.swift
 
 require_pattern \
+  "iOS app deep-link recording uses shared launch request policy" \
+  'VoiceInkLaunchRecordingRequest(State|Action)|requestRecording\(hasCompletedOnboarding:|consumePendingRecordingIfReady\(hasCompletedOnboarding:' \
+  iOS/VoiceInk-ios/VoiceInk_iosApp.swift
+
+require_pattern \
   "iOS recording manager posts shared keyboard stop notification" \
   'VoiceInkAppIdentity\.iOSStopRecordingFromKeyboardNotificationName' \
   iOS/VoiceInk-ios/RecordingManager.swift
@@ -8050,6 +8065,11 @@ reject_pattern \
   "iOS keyboard/app recording coordination avoids raw timing literals" \
   'withTimeInterval: +0\.5|deadline: \.now\(\) \+ (0\.5|2\.0)' \
   iOS/VoiceInkKeyboard/KeyboardViewController.swift \
+  iOS/VoiceInk-ios/VoiceInk_iosApp.swift
+
+reject_pattern \
+  "iOS app deep-link recording avoids shell-owned deferred request flag" \
+  'shouldStartRecordingAfterOnboarding|guard hasCompletedOnboarding else' \
   iOS/VoiceInk-ios/VoiceInk_iosApp.swift
 
 reject_pattern \

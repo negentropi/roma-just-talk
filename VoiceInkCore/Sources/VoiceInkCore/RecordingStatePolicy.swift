@@ -172,6 +172,43 @@ public enum VoiceInkKeyboardRecordingTiming {
     public static let openAppFallbackResetDelay: TimeInterval = 2.0
 }
 
+public enum VoiceInkLaunchRecordingRequestAction: Equatable, Sendable {
+    case none
+    case deferUntilOnboardingCompletes
+    case startRecordingAfterLaunchDelay
+}
+
+public struct VoiceInkLaunchRecordingRequestState: Equatable, Sendable {
+    public private(set) var hasPendingRecordingAfterOnboarding: Bool
+
+    public init(hasPendingRecordingAfterOnboarding: Bool = false) {
+        self.hasPendingRecordingAfterOnboarding = hasPendingRecordingAfterOnboarding
+    }
+
+    public mutating func requestRecording(
+        hasCompletedOnboarding: Bool
+    ) -> VoiceInkLaunchRecordingRequestAction {
+        guard hasCompletedOnboarding else {
+            hasPendingRecordingAfterOnboarding = true
+            return .deferUntilOnboardingCompletes
+        }
+
+        hasPendingRecordingAfterOnboarding = false
+        return .startRecordingAfterLaunchDelay
+    }
+
+    public mutating func consumePendingRecordingIfReady(
+        hasCompletedOnboarding: Bool
+    ) -> VoiceInkLaunchRecordingRequestAction {
+        guard hasCompletedOnboarding, hasPendingRecordingAfterOnboarding else {
+            return .none
+        }
+
+        hasPendingRecordingAfterOnboarding = false
+        return .startRecordingAfterLaunchDelay
+    }
+}
+
 public struct VoiceInkKeyboardRecordingButtonPresentation: Equatable, Sendable {
     public let title: String
     public let systemImageName: String

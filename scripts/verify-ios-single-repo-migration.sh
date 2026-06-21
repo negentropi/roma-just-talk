@@ -5223,6 +5223,11 @@ reject_pattern \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 reject_pattern \
+  "macOS AI service avoids shallow OpenRouter model-loading wrapper" \
+  'private +func +loadSavedOpenRouterModels\(' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+reject_pattern \
   "macOS AI settings avoid duplicate OpenRouter model-source policy" \
   'selectedProvider == \.openRouter|selectedProvider != \.custom|provider == \.openRouter' \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift \
@@ -7680,6 +7685,11 @@ require_pattern \
 require_pattern \
   "macOS Power Mode session manager consumes shared session persistence" \
   'VoiceInkPowerModeSessionPreference\.(saveActiveSession|loadActiveSession|clear)' \
+  VoiceInk/PowerMode/PowerModeSessionManager.swift
+
+reject_pattern \
+  "macOS Power Mode session manager avoids shallow session clear wrapper" \
+  'private +func +clearSession\(' \
   VoiceInk/PowerMode/PowerModeSessionManager.swift
 
 require_pattern \

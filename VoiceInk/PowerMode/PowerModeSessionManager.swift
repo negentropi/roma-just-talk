@@ -61,7 +61,7 @@ class PowerModeSessionManager {
 
         NotificationCenter.default.removeObserver(self, name: .AppSettingsDidChange, object: nil)
 
-        clearSession()
+        VoiceInkPowerModeSessionPreference.clear()
     }
 
     @objc func updateSessionSnapshot() {
@@ -257,7 +257,4 @@ class PowerModeSessionManager {
         }
     }
 
-    private func clearSession() {
-        VoiceInkPowerModeSessionPreference.clear()
-    }
 }

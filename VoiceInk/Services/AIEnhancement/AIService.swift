@@ -84,7 +84,7 @@ class AIService: ObservableObject {
         applyCredentialStateForSelectedProvider()
 
         selectedModels = VoiceInkAIEnhancementProviderPreference.selectedModels(from: userDefaults)
-        loadSavedOpenRouterModels()
+        openRouterModels = VoiceInkDynamicAIProviderPreference.openRouterModels(from: userDefaults)
     }
 
     private func applyCredentialStateForSelectedProvider() {
@@ -98,10 +98,6 @@ class AIService: ObservableObject {
 
         apiKey = credentialState.apiKey
         isAPIKeyValid = credentialState.isAPIKeyValid
-    }
-    
-    private func loadSavedOpenRouterModels() {
-        openRouterModels = VoiceInkDynamicAIProviderPreference.openRouterModels(from: userDefaults)
     }
     
     private func saveOpenRouterModels() {

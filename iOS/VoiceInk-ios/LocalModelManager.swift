@@ -24,11 +24,7 @@ class LocalModelManager: ObservableObject {
     }
     
     private init() {
-        setupModelsDirectory()
-    }
-    
-    private func setupModelsDirectory() {
-        let _ = Self.modelsDirectory // This will create the directory
+        _ = Self.modelsDirectory
     }
     
     /// Download a specific model

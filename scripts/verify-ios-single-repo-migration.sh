@@ -2396,6 +2396,11 @@ reject_pattern \
   '@Published var +(downloadProgress|isDownloading)|isDownloading\[[^]]+\]|downloadProgress\[[^]]+\]' \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
+reject_pattern \
+  "iOS local model manager avoids shallow setup wrapper" \
+  'private func +setupModelsDirectory\(' \
+  iOS/VoiceInk-ios/LocalModelManager.swift
+
 require_pattern \
   "iOS local model management uses shared management rows" \
   'modelManager\.managementRows\(\)' \

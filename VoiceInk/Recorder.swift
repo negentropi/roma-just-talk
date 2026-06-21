@@ -286,13 +286,16 @@ class Recorder: NSObject, ObservableObject {
         let averagePower = recorder.averagePower
         let peakPower = recorder.peakPower
 
-        let normalizedAverage = VoiceInkAudioMeterLevel.normalizedLevel(forDecibels: averagePower)
-        let normalizedPeak = VoiceInkAudioMeterLevel.normalizedLevel(forDecibels: peakPower)
-
         // Apply EMA smoothing with thread-safe access
         smoothedValuesLock.lock()
-        smoothedAverage = VoiceInkAudioMeterLevel.smoothedLevel(previous: smoothedAverage, current: normalizedAverage)
-        smoothedPeak = VoiceInkAudioMeterLevel.smoothedLevel(previous: smoothedPeak, current: normalizedPeak)
+        let meterPlan = VoiceInkAudioMeterLevel.macOSMeterUpdatePlan(
+            averageDecibels: averagePower,
+            peakDecibels: peakPower,
+            previousSmoothedAverage: smoothedAverage,
+            previousSmoothedPeak: smoothedPeak
+        )
+        smoothedAverage = meterPlan.smoothedAverage
+        smoothedPeak = meterPlan.smoothedPeak
         let newAudioMeter = AudioMeter(averagePower: Double(smoothedAverage), peakPower: Double(smoothedPeak))
         smoothedValuesLock.unlock()
 

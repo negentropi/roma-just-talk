@@ -1530,9 +1530,14 @@ require_pattern \
   iOS/VoiceInk-ios/AudioRecorder.swift
 
 require_pattern \
-  "iOS live recording uses shared audio-meter history policy" \
-  'VoiceInkAudioMeterLevel\.boundedHistory' \
+  "iOS live recording uses shared audio-meter history update plan" \
+  'VoiceInkAudioMeterLevel\.iOSMeterHistoryUpdatePlan' \
   iOS/VoiceInk-ios/AudioRecorder.swift
+
+require_pattern \
+  "shared audio-meter update plans live in VoiceInkCore" \
+  'VoiceInk(MacOSAudioMeterUpdatePlan|IOSAudioMeterHistoryUpdatePlan)|macOSMeterUpdatePlan|iOSMeterHistoryUpdatePlan' \
+  VoiceInkCore/Sources/VoiceInkCore/AudioMeterLevel.swift
 
 require_pattern \
   "shared audio-meter update cadences live in VoiceInkCore" \
@@ -1547,6 +1552,16 @@ require_pattern \
 require_pattern \
   "iOS audio-meter timer uses shared update cadence" \
   'VoiceInkAudioMeterLevel\.iOSUpdateInterval' \
+  iOS/VoiceInk-ios/AudioRecorder.swift
+
+require_pattern \
+  "macOS recorder applies shared audio-meter update plan" \
+  'VoiceInkAudioMeterLevel\.macOSMeterUpdatePlan' \
+  VoiceInk/Recorder.swift
+
+require_pattern \
+  "iOS recorder applies shared audio-meter update plan" \
+  'VoiceInkAudioMeterLevel\.iOSMeterHistoryUpdatePlan' \
   iOS/VoiceInk-ios/AudioRecorder.swift
 
 require_pattern \
@@ -1572,6 +1587,11 @@ require_pattern \
 require_pattern \
   "shared macOS audio-meter visualizer checks run in VoiceInkCore" \
   'testMacOSVisualizer(Geometry|BarHeight)' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "shared audio-meter update plan checks run in VoiceInkCore" \
+  'AudioMeterLevelTests\.test(MacOSMeterUpdatePlanNormalizesAndSmoothsAverageAndPeak|IOSMeterHistoryUpdatePlanNormalizesAndBoundsHistory)' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -1616,9 +1636,15 @@ require_pattern \
 
 reject_pattern \
   "iOS live recording avoids shell-only audio-meter history limit" \
-  'levelsHistory\.count >|removeFirst\(self\.levelsHistory\.count -|0\.\.<40' \
+  'VoiceInkAudioMeterLevel\.boundedHistory|levelsHistory\.count >|removeFirst\(self\.levelsHistory\.count -|0\.\.<40' \
   iOS/VoiceInk-ios/AudioRecorder.swift \
   iOS/VoiceInk-ios/AudioVisualizerView.swift
+
+reject_pattern \
+  "platform recorders avoid shell-owned audio-meter normalization composition" \
+  'VoiceInkAudioMeterLevel\.(normalizedLevel|smoothedLevel|boundedHistory)' \
+  VoiceInk/Recorder.swift \
+  iOS/VoiceInk-ios/AudioRecorder.swift
 
 reject_pattern \
   "iOS audio visualizer avoids shell-owned sample selection policy" \

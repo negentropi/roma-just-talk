@@ -189,6 +189,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AudioMeterLevelTests.testSmoothedLevelClampsCustomPreviousWeight", run: { AudioMeterLevelTests().testSmoothedLevelClampsCustomPreviousWeight() }),
             VoiceInkCoreCheck(name: "AudioMeterLevelTests.testBoundedHistoryKeepsMostRecentLevels", run: { AudioMeterLevelTests().testBoundedHistoryKeepsMostRecentLevels() }),
             VoiceInkCoreCheck(name: "AudioMeterLevelTests.testBoundedHistoryRejectsNonPositiveLimit", run: { AudioMeterLevelTests().testBoundedHistoryRejectsNonPositiveLimit() }),
+            VoiceInkCoreCheck(name: "AudioMeterLevelTests.testMacOSMeterUpdatePlanNormalizesAndSmoothsAverageAndPeak", run: { AudioMeterLevelTests().testMacOSMeterUpdatePlanNormalizesAndSmoothsAverageAndPeak() }),
+            VoiceInkCoreCheck(name: "AudioMeterLevelTests.testIOSMeterHistoryUpdatePlanNormalizesAndBoundsHistory", run: { AudioMeterLevelTests().testIOSMeterHistoryUpdatePlanNormalizesAndBoundsHistory() }),
             VoiceInkCoreCheck(name: "AudioMeterLevelTests.testUpdateCadencesPreservePlatformAudioMeterBehavior", run: { AudioMeterLevelTests().testUpdateCadencesPreservePlatformAudioMeterBehavior() }),
             VoiceInkCoreCheck(name: "AudioMeterLevelTests.testMacOSVisualizerGeometryPreservesExistingRecorderShape", run: { AudioMeterLevelTests().testMacOSVisualizerGeometryPreservesExistingRecorderShape() }),
             VoiceInkCoreCheck(name: "AudioMeterLevelTests.testMacOSVisualizerBarHeightPreservesExistingWaveAndCenterBoost", run: { AudioMeterLevelTests().testMacOSVisualizerBarHeightPreservesExistingWaveAndCenterBoost() }),

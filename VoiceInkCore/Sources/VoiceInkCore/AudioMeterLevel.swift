@@ -73,6 +73,32 @@ public enum VoiceInkAudioMeterLevel {
         return Array(updatedHistory.suffix(limit))
     }
 
+    public static func macOSMeterUpdatePlan(
+        averageDecibels: Float,
+        peakDecibels: Float,
+        previousSmoothedAverage: Float,
+        previousSmoothedPeak: Float
+    ) -> VoiceInkMacOSAudioMeterUpdatePlan {
+        let normalizedAverage = normalizedLevel(forDecibels: averageDecibels)
+        let normalizedPeak = normalizedLevel(forDecibels: peakDecibels)
+
+        return VoiceInkMacOSAudioMeterUpdatePlan(
+            smoothedAverage: smoothedLevel(previous: previousSmoothedAverage, current: normalizedAverage),
+            smoothedPeak: smoothedLevel(previous: previousSmoothedPeak, current: normalizedPeak)
+        )
+    }
+
+    public static func iOSMeterHistoryUpdatePlan(
+        averageDecibels: Float,
+        previousHistory: [Float]
+    ) -> VoiceInkIOSAudioMeterHistoryUpdatePlan {
+        let visibleLevel = normalizedLevel(forDecibels: averageDecibels)
+        return VoiceInkIOSAudioMeterHistoryUpdatePlan(
+            normalizedLevel: visibleLevel,
+            levelsHistory: boundedHistory(appending: visibleLevel, to: previousHistory)
+        )
+    }
+
     public static func visualizerLevel(
         forBarAt index: Int,
         levels: [Float],
@@ -131,5 +157,25 @@ public enum VoiceInkAudioMeterLevel {
         let centerBoost = 1.0 - centerDistance * macOSVisualizerCenterBoostDropoff
 
         return max(minimumHeight, minimumHeight + amplitude * wave * centerBoost * (maximumHeight - minimumHeight))
+    }
+}
+
+public struct VoiceInkMacOSAudioMeterUpdatePlan: Equatable, Sendable {
+    public let smoothedAverage: Float
+    public let smoothedPeak: Float
+
+    public init(smoothedAverage: Float, smoothedPeak: Float) {
+        self.smoothedAverage = smoothedAverage
+        self.smoothedPeak = smoothedPeak
+    }
+}
+
+public struct VoiceInkIOSAudioMeterHistoryUpdatePlan: Equatable, Sendable {
+    public let normalizedLevel: Float
+    public let levelsHistory: [Float]
+
+    public init(normalizedLevel: Float, levelsHistory: [Float]) {
+        self.normalizedLevel = normalizedLevel
+        self.levelsHistory = levelsHistory
     }
 }

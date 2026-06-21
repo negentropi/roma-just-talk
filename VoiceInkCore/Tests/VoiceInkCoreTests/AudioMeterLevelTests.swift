@@ -56,6 +56,36 @@ final class AudioMeterLevelTests: XCTestCase {
         )
     }
 
+    func testMacOSMeterUpdatePlanNormalizesAndSmoothsAverageAndPeak() {
+        let plan = VoiceInkAudioMeterLevel.macOSMeterUpdatePlan(
+            averageDecibels: -30,
+            peakDecibels: -15,
+            previousSmoothedAverage: 0.25,
+            previousSmoothedPeak: 0.5
+        )
+
+        XCTAssertEqual(plan.smoothedAverage, 0.35, accuracy: 0.0001)
+        XCTAssertEqual(plan.smoothedPeak, 0.6, accuracy: 0.0001)
+    }
+
+    func testIOSMeterHistoryUpdatePlanNormalizesAndBoundsHistory() {
+        let plan = VoiceInkAudioMeterLevel.iOSMeterHistoryUpdatePlan(
+            averageDecibels: -15,
+            previousHistory: [0.1, 0.2, 0.3]
+        )
+
+        XCTAssertEqual(plan.normalizedLevel, 0.75, accuracy: 0.0001)
+        XCTAssertEqual(plan.levelsHistory, [0.1, 0.2, 0.3, 0.75])
+
+        let boundedPlan = VoiceInkAudioMeterLevel.iOSMeterHistoryUpdatePlan(
+            averageDecibels: -60,
+            previousHistory: Array(repeating: 0.5, count: VoiceInkAudioMeterLevel.defaultLevelHistoryLimit)
+        )
+
+        XCTAssertEqual(boundedPlan.levelsHistory.count, VoiceInkAudioMeterLevel.defaultLevelHistoryLimit)
+        XCTAssertEqual(boundedPlan.levelsHistory.last, 0)
+    }
+
     func testUpdateCadencesPreservePlatformAudioMeterBehavior() {
         XCTAssertEqual(VoiceInkAudioMeterLevel.macOSUpdateIntervalMilliseconds, 17)
         XCTAssertEqual(VoiceInkAudioMeterLevel.iOSUpdateInterval, 0.1)

@@ -20,15 +20,16 @@ struct NotchRecorderView<S: RecorderStateProvider & ObservableObject>: View {
     }
 
     private var displayState: DisplayState {
-        switch stateProvider.recordingState {
-        case .recording:
+        if stateProvider.recordingState.isActivelyRecording {
             let shouldShowPreview = showLiveTextPreview && !stateProvider.partialTranscript.isEmpty
             return shouldShowPreview ? .transcriptPreview : .active
-        case .transcribing, .enhancing:
-            return .active
-        default:
-            return .collapsed
         }
+
+        if stateProvider.recordingState.isPostRecordingProcessing {
+            return .active
+        }
+
+        return .collapsed
     }
 
     // MARK: - Screen Geometry

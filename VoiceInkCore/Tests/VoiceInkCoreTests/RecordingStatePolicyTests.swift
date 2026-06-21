@@ -11,6 +11,15 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertFalse(VoiceInkRecordingState.busy.isActivelyRecording)
     }
 
+    func testRecorderCaptureStatePolicyPreservesMacOSCancellationPath() {
+        XCTAssertFalse(VoiceInkRecordingState.idle.isRecorderCaptureInProgress)
+        XCTAssertTrue(VoiceInkRecordingState.starting.isRecorderCaptureInProgress)
+        XCTAssertTrue(VoiceInkRecordingState.recording.isRecorderCaptureInProgress)
+        XCTAssertFalse(VoiceInkRecordingState.transcribing.isRecorderCaptureInProgress)
+        XCTAssertFalse(VoiceInkRecordingState.enhancing.isRecorderCaptureInProgress)
+        XCTAssertFalse(VoiceInkRecordingState.busy.isRecorderCaptureInProgress)
+    }
+
     func testRollingBufferPreviewStatePolicyMatchesMacOSRecorderGate() {
         XCTAssertTrue(VoiceInkRecordingState.idle.acceptsRollingBufferPreloadPreview)
         XCTAssertTrue(VoiceInkRecordingState.recording.acceptsRollingBufferPreloadPreview)
@@ -36,6 +45,54 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertEqual(VoiceInkRecordingState.transcribing.recorderUIToggleAction, .cancelRecording)
         XCTAssertEqual(VoiceInkRecordingState.enhancing.recorderUIToggleAction, .cancelRecording)
         XCTAssertEqual(VoiceInkRecordingState.busy.recorderUIToggleAction, .dismissRecorder)
+    }
+
+    func testPostRecordingProcessingStatePolicyPreservesMacOSProcessingStates() {
+        XCTAssertFalse(VoiceInkRecordingState.idle.isPostRecordingProcessing)
+        XCTAssertFalse(VoiceInkRecordingState.starting.isPostRecordingProcessing)
+        XCTAssertFalse(VoiceInkRecordingState.recording.isPostRecordingProcessing)
+        XCTAssertTrue(VoiceInkRecordingState.transcribing.isPostRecordingProcessing)
+        XCTAssertTrue(VoiceInkRecordingState.enhancing.isPostRecordingProcessing)
+        XCTAssertFalse(VoiceInkRecordingState.busy.isPostRecordingProcessing)
+    }
+
+    func testRecorderDismissCancelableStatePolicyPreservesMacOSWindowBehavior() {
+        XCTAssertFalse(VoiceInkRecordingState.idle.isRecorderDismissCancelable)
+        XCTAssertTrue(VoiceInkRecordingState.starting.isRecorderDismissCancelable)
+        XCTAssertTrue(VoiceInkRecordingState.recording.isRecorderDismissCancelable)
+        XCTAssertTrue(VoiceInkRecordingState.transcribing.isRecorderDismissCancelable)
+        XCTAssertTrue(VoiceInkRecordingState.enhancing.isRecorderDismissCancelable)
+        XCTAssertFalse(VoiceInkRecordingState.busy.isRecorderDismissCancelable)
+    }
+
+    func testPipelineFinishIdleRepairStatePolicyPreservesMacOSEngineBehavior() {
+        XCTAssertFalse(VoiceInkRecordingState.idle.shouldReturnToIdleWhenActivePipelineFinishes)
+        XCTAssertFalse(VoiceInkRecordingState.starting.shouldReturnToIdleWhenActivePipelineFinishes)
+        XCTAssertFalse(VoiceInkRecordingState.recording.shouldReturnToIdleWhenActivePipelineFinishes)
+        XCTAssertTrue(VoiceInkRecordingState.transcribing.shouldReturnToIdleWhenActivePipelineFinishes)
+        XCTAssertTrue(VoiceInkRecordingState.enhancing.shouldReturnToIdleWhenActivePipelineFinishes)
+        XCTAssertTrue(VoiceInkRecordingState.busy.shouldReturnToIdleWhenActivePipelineFinishes)
+    }
+
+    func testRecorderProcessingPresentationPreservesMacOSCopyAndTiming() {
+        XCTAssertNil(VoiceInkRecordingState.idle.recorderProcessingPresentation)
+        XCTAssertNil(VoiceInkRecordingState.starting.recorderProcessingPresentation)
+        XCTAssertNil(VoiceInkRecordingState.recording.recorderProcessingPresentation)
+        XCTAssertEqual(
+            VoiceInkRecordingState.transcribing.recorderProcessingPresentation,
+            VoiceInkRecorderProcessingPresentation(
+                label: "Transcribing",
+                progressAnimationInterval: 0.18
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkRecordingState.enhancing.recorderProcessingPresentation,
+            VoiceInkRecorderProcessingPresentation(
+                label: "Enhancing",
+                progressAnimationInterval: 0.22
+            )
+        )
+        XCTAssertNil(VoiceInkRecordingState.busy.recorderProcessingPresentation)
     }
 
     func testRecordingFlowStatePreservesIOSStartAndStopTransitions() {

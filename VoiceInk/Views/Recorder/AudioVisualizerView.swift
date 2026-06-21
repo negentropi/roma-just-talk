@@ -55,37 +55,18 @@ struct StaticVisualizer: View {
 // MARK: - Processing Status Display
 
 struct ProcessingStatusDisplay: View {
-    enum Mode {
-        case transcribing
-        case enhancing
-    }
-
-    let mode: Mode
+    let presentation: VoiceInkRecorderProcessingPresentation
     let color: Color
-
-    private var label: String {
-        switch mode {
-        case .transcribing: return "Transcribing"
-        case .enhancing:    return "Enhancing"
-        }
-    }
-
-    private var animationSpeed: Double {
-        switch mode {
-        case .transcribing: return 0.18
-        case .enhancing:    return 0.22
-        }
-    }
 
     var body: some View {
         VStack(spacing: 4) {
-            Text(label)
+            Text(presentation.label)
                 .foregroundColor(color)
                 .font(.system(size: 11, weight: .medium))
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
 
-            ProgressAnimation(color: color, animationSpeed: animationSpeed)
+            ProgressAnimation(color: color, animationSpeed: presentation.progressAnimationInterval)
         }
         .frame(height: 28) // matches AudioVisualizer maxHeight to prevent layout shift
     }

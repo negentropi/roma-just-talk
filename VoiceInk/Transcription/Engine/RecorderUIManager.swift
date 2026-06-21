@@ -207,10 +207,9 @@ class RecorderUIManager: ObservableObject {
     @objc public func handleDismissMiniRecorder() {
         logger.notice("handleDismissMiniRecorder: .dismissMiniRecorder notification received")
         Task {
-            switch engine?.recordingState {
-            case .starting, .recording, .transcribing, .enhancing:
+            if engine?.recordingState.isRecorderDismissCancelable == true {
                 await cancelRecording()
-            case .idle, .busy, nil:
+            } else {
                 await dismissMiniRecorder()
             }
         }

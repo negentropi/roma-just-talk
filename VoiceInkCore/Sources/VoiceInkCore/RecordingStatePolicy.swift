@@ -15,6 +15,19 @@ public enum VoiceInkRecorderUIToggleAction: Equatable, Sendable {
     case dismissRecorder
 }
 
+public struct VoiceInkRecorderProcessingPresentation: Equatable, Sendable {
+    public let label: String
+    public let progressAnimationInterval: TimeInterval
+
+    public init(
+        label: String,
+        progressAnimationInterval: TimeInterval
+    ) {
+        self.label = label
+        self.progressAnimationInterval = progressAnimationInterval
+    }
+}
+
 public struct VoiceInkRecordingFlowState: Equatable, Sendable {
     public static let durationUpdateInterval: TimeInterval = 0.1
 
@@ -441,6 +454,10 @@ public extension VoiceInkRecordingState {
         self == .recording
     }
 
+    var isRecorderCaptureInProgress: Bool {
+        self == .starting || self == .recording
+    }
+
     var acceptsRollingBufferPreloadPreview: Bool {
         self == .idle || self == .recording
     }
@@ -451,6 +468,23 @@ public extension VoiceInkRecordingState {
         self != .busy
     }
 
+    var isPostRecordingProcessing: Bool {
+        recorderProcessingPresentation != nil
+    }
+
+    var isRecorderDismissCancelable: Bool {
+        switch self {
+        case .starting, .recording, .transcribing, .enhancing:
+            return true
+        case .idle, .busy:
+            return false
+        }
+    }
+
+    var shouldReturnToIdleWhenActivePipelineFinishes: Bool {
+        isPostRecordingProcessing || self == .busy
+    }
+
     var recorderUIToggleAction: VoiceInkRecorderUIToggleAction {
         switch self {
         case .recording, .starting:
@@ -459,6 +493,23 @@ public extension VoiceInkRecordingState {
             return .cancelRecording
         case .idle, .busy:
             return .dismissRecorder
+        }
+    }
+
+    var recorderProcessingPresentation: VoiceInkRecorderProcessingPresentation? {
+        switch self {
+        case .transcribing:
+            return VoiceInkRecorderProcessingPresentation(
+                label: "Transcribing",
+                progressAnimationInterval: 0.18
+            )
+        case .enhancing:
+            return VoiceInkRecorderProcessingPresentation(
+                label: "Enhancing",
+                progressAnimationInterval: 0.22
+            )
+        case .idle, .starting, .recording, .busy:
+            return nil
         }
     }
 }

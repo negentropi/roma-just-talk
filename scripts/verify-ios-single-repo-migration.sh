@@ -611,6 +611,36 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
 require_pattern \
+  "shared recording state owns recorder capture predicate" \
+  'isRecorderCaptureInProgress' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "shared recording state owns post-recording processing predicate" \
+  'isPostRecordingProcessing' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "shared recording state owns recorder dismiss policy" \
+  'isRecorderDismissCancelable' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "shared recording state owns active-pipeline finish policy" \
+  'shouldReturnToIdleWhenActivePipelineFinishes' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "shared recording state owns recorder processing presentation" \
+  'VoiceInkRecorderProcessingPresentation|recorderProcessingPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "shared recorder processing state checks run in VoiceInkCore" \
+  'testRecorderCaptureStatePolicyPreservesMacOSCancellationPath|testPostRecordingProcessingStatePolicyPreservesMacOSProcessingStates|testRecorderDismissCancelableStatePolicyPreservesMacOSWindowBehavior|testPipelineFinishIdleRepairStatePolicyPreservesMacOSEngineBehavior|testRecorderProcessingPresentationPreservesMacOSCopyAndTiming' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "shared recording flow state lives in VoiceInkCore" \
   'VoiceInkRecordingFlowState|prepareRecordingStart|completeRecordingStart|failRecordingStart|finishRecording|cancelRecording|advanceDuration' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
@@ -636,9 +666,58 @@ require_pattern \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift
 
 require_pattern \
+  "macOS recording engine uses shared recorder capture predicate" \
+  'recordingState\.isRecorderCaptureInProgress' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+
+require_pattern \
+  "macOS recording engine uses shared post-recording processing predicate" \
+  'recordingState\.isPostRecordingProcessing' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+
+require_pattern \
+  "macOS recording engine uses shared active-pipeline finish policy" \
+  'recordingState\.shouldReturnToIdleWhenActivePipelineFinishes' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+
+require_pattern \
+  "macOS recorder dismiss uses shared cancelable-state policy" \
+  'recordingState\.isRecorderDismissCancelable' \
+  VoiceInk/Transcription/Engine/RecorderUIManager.swift
+
+require_pattern \
   "macOS recorder preview uses shared active-recording predicate" \
   'recordingState\.isActivelyRecording' \
   VoiceInk/Views/Recorder/MiniRecorderView.swift
+
+require_pattern \
+  "macOS processing status display uses shared animation interval" \
+  'presentation\.progressAnimationInterval' \
+  VoiceInk/Views/Recorder/AudioVisualizerView.swift
+
+require_pattern \
+  "macOS recorder status display consumes shared processing presentation" \
+  'recorderProcessingPresentation' \
+  VoiceInk/Views/Recorder/RecorderComponents.swift
+
+require_pattern \
+  "macOS processing status display accepts shared processing presentation" \
+  'VoiceInkRecorderProcessingPresentation' \
+  VoiceInk/Views/Recorder/AudioVisualizerView.swift
+
+require_pattern \
+  "macOS notch recorder uses shared post-recording processing predicate" \
+  'recordingState\.isPostRecordingProcessing' \
+  VoiceInk/Views/Recorder/NotchRecorderView.swift
+
+reject_pattern \
+  "macOS recorder shells avoid shell-only processing state sets and copy" \
+  'recordingState == \.(transcribing|enhancing|busy)|case \.starting, \.recording, \.transcribing, \.enhancing|case \.transcribing, \.enhancing|ProcessingStatusDisplay\(mode:|"Transcribing"|"Enhancing"|return 0\.18|return 0\.22' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift \
+  VoiceInk/Transcription/Engine/RecorderUIManager.swift \
+  VoiceInk/Views/Recorder/AudioVisualizerView.swift \
+  VoiceInk/Views/Recorder/RecorderComponents.swift \
+  VoiceInk/Views/Recorder/NotchRecorderView.swift
 
 require_pattern \
   "iOS recording manager uses shared active-recording predicate" \

@@ -788,8 +788,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
         }
         canceledPipelineTranscriptionIDs.remove(transcriptionID)
 
-        if didFinishActivePipeline &&
-            (recordingState == .transcribing || recordingState == .enhancing || recordingState == .busy) {
+        if didFinishActivePipeline,
+           recordingState.shouldReturnToIdleWhenActivePipelineFinishes {
             recordingState = .idle
         }
         if didFinishActivePipeline {
@@ -834,17 +834,16 @@ class VoiceInkEngine: NSObject, ObservableObject {
         stopRequestedDuringStart = false
 
         let shouldFinishSessionImmediately: Bool
-        switch recordingState {
-        case .starting, .recording:
+        if recordingState.isRecorderCaptureInProgress {
             requestRecordingCancellation()
             await finishActiveRecorderCancellation()
             shouldFinishSessionImmediately = true
-        case .transcribing, .enhancing:
+        } else if recordingState.isPostRecordingProcessing {
             requestRecordingCancellation()
             partialTranscript = ""
             recordingState = .idle
             shouldFinishSessionImmediately = false
-        case .idle, .busy:
+        } else {
             partialTranscript = ""
             shouldCancelRecording = false
             recordingState = .idle
@@ -875,7 +874,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
     private func requestRecordingCancellation() {
         shouldCancelRecording = true
 
-        if (recordingState == .transcribing || recordingState == .enhancing),
+        if recordingState.isPostRecordingProcessing,
            let activePipelineTranscriptionID {
             canceledPipelineTranscriptionIDs.insert(activePipelineTranscriptionID)
         }

@@ -482,6 +482,49 @@ final class DictionaryPolicyTests: XCTestCase {
         )
     }
 
+    func testWordReplacementDraftStateUsesSharedVisibilityAndSaveability() {
+        XCTAssertFalse(VoiceInkWordReplacementDraftState().hasDraft)
+        XCTAssertTrue(VoiceInkWordReplacementDraftState(original: "voice ink").hasDraft)
+        XCTAssertTrue(VoiceInkWordReplacementDraftState(replacement: "Roma").hasDraft)
+        XCTAssertFalse(VoiceInkWordReplacementDraftState(original: " , ", replacement: "roma").canSubmit)
+        XCTAssertTrue(VoiceInkWordReplacementDraftState(original: "voice ink", replacement: "roma").canSubmit)
+    }
+
+    func testWordReplacementDraftStateSubmitsAndClearsAcceptedRule() {
+        let submission = VoiceInkWordReplacementDraftState(
+            original: " Roma ",
+            replacement: " Roma Just Talk "
+        )
+        .submitting(existingOriginalTexts: [])
+
+        XCTAssertEqual(submission.submittedOriginal, " Roma ")
+        XCTAssertEqual(submission.submittedReplacement, " Roma Just Talk ")
+        XCTAssertEqual(
+            submission.plan.ruleToInsert,
+            VoiceInkWordReplacementRule(originalText: "Roma", replacementText: "Roma Just Talk")
+        )
+        XCTAssertEqual(submission.draftStateAfterSubmit, VoiceInkWordReplacementDraftState())
+        XCTAssertNil(submission.alertPresentation)
+    }
+
+    func testWordReplacementDraftStateKeepsDuplicateDraftAndBuildsSharedAlert() {
+        let submission = VoiceInkWordReplacementDraftState(
+            original: "Roma",
+            replacement: "Roma Just Talk"
+        )
+        .submitting(existingOriginalTexts: ["roma"])
+
+        XCTAssertNil(submission.plan.ruleToInsert)
+        XCTAssertEqual(submission.draftStateAfterSubmit, VoiceInkWordReplacementDraftState(
+            original: "Roma",
+            replacement: "Roma Just Talk"
+        ))
+        XCTAssertEqual(
+            submission.alertPresentation,
+            .wordReplacement(message: "'Roma' already exists in word replacements")
+        )
+    }
+
     func testWordReplacementPlanRejectsDuplicateTokenAcrossCommaGroups() {
         let plan = VoiceInkDictionaryPolicy.wordReplacementInsertPlan(
             original: "Flow, Voice Ink",

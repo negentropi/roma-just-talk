@@ -8,8 +8,7 @@ struct WordReplacementView: View {
     @State private var editingReplacement: WordReplacement? = nil
     @State private var alertPresentation: VoiceInkDictionaryAlertPresentation?
     @State private var sortMode: VoiceInkWordReplacementSortMode = .defaultMode
-    @State private var originalWord = ""
-    @State private var replacementWord = ""
+    @State private var wordReplacementDraftState = VoiceInkWordReplacementDraftState()
     @State private var showInfoPopover = false
     private let dictionaryPresentation = VoiceInkDictionarySettingsPresentation.macOS
     private let listPresentation = VoiceInkWordReplacementListPresentation.macOS
@@ -33,14 +32,7 @@ struct WordReplacementView: View {
     }
 
     private var shouldShowAddButton: Bool {
-        !originalWord.isEmpty || !replacementWord.isEmpty
-    }
-
-    private var canAddReplacement: Bool {
-        VoiceInkDictionaryPolicy.canSaveWordReplacementDraft(
-            original: originalWord,
-            replacement: replacementWord
-        )
+        wordReplacementDraftState.hasDraft
     }
     
     var body: some View {
@@ -66,7 +58,7 @@ struct WordReplacementView: View {
             }
 
             HStack(spacing: 8) {
-                TextField(dictionaryPresentation.originalTextPlaceholder, text: $originalWord)
+                TextField(dictionaryPresentation.originalTextPlaceholder, text: $wordReplacementDraftState.original)
                     .textFieldStyle(.roundedBorder)
                     .font(.system(size: 13))
 
@@ -75,7 +67,7 @@ struct WordReplacementView: View {
                     .font(.system(size: 10))
                     .frame(width: 10)
 
-                TextField(dictionaryPresentation.replacementTextPlaceholder, text: $replacementWord)
+                TextField(dictionaryPresentation.replacementTextPlaceholder, text: $wordReplacementDraftState.replacement)
                     .textFieldStyle(.roundedBorder)
                     .font(.system(size: 13))
                     .onSubmit { addReplacement() }
@@ -88,7 +80,7 @@ struct WordReplacementView: View {
                             .font(.system(size: 16, weight: .semibold))
                     }
                     .buttonStyle(.borderless)
-                    .disabled(!canAddReplacement)
+                    .disabled(!wordReplacementDraftState.canSubmit)
                     .help(dictionaryPresentation.addReplacementButtonHelp ?? "")
                 }
             }
@@ -178,15 +170,15 @@ struct WordReplacementView: View {
     }
 
     private func addReplacement() {
-        let plan = DictionaryService.submitWordReplacementDraft(
-            original: originalWord,
-            replacement: replacementWord,
-            existing: Array(wordReplacements),
+        let submission = wordReplacementDraftState.submitting(
+            existingOriginalTexts: wordReplacements.map(\.originalText)
+        )
+        let appliedSubmission = DictionaryService.applyWordReplacementSubmission(
+            submission,
             context: modelContext
         )
-        originalWord = plan.originalDraftAfterSubmit
-        replacementWord = plan.replacementDraftAfterSubmit
-        alertPresentation = plan.alertPresentation
+        wordReplacementDraftState = appliedSubmission.draftStateAfterSubmit
+        alertPresentation = appliedSubmission.alertPresentation
     }
 
     private func removeReplacement(_ replacement: WordReplacement) {

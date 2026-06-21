@@ -118,6 +118,67 @@ public struct VoiceInkWordReplacementSubmissionPlan: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkWordReplacementDraftSubmission: Equatable, Sendable {
+    public let submittedOriginal: String
+    public let submittedReplacement: String
+    public let plan: VoiceInkWordReplacementSubmissionPlan
+    public let draftStateAfterSubmit: VoiceInkWordReplacementDraftState
+
+    public init(
+        submittedOriginal: String,
+        submittedReplacement: String,
+        plan: VoiceInkWordReplacementSubmissionPlan,
+        draftStateAfterSubmit: VoiceInkWordReplacementDraftState
+    ) {
+        self.submittedOriginal = submittedOriginal
+        self.submittedReplacement = submittedReplacement
+        self.plan = plan
+        self.draftStateAfterSubmit = draftStateAfterSubmit
+    }
+
+    public var alertPresentation: VoiceInkDictionaryAlertPresentation? {
+        plan.alertPresentation
+    }
+}
+
+public struct VoiceInkWordReplacementDraftState: Equatable, Sendable {
+    public var original: String
+    public var replacement: String
+
+    public init(original: String = "", replacement: String = "") {
+        self.original = original
+        self.replacement = replacement
+    }
+
+    public var hasDraft: Bool {
+        !original.isEmpty || !replacement.isEmpty
+    }
+
+    public var canSubmit: Bool {
+        VoiceInkDictionaryPolicy.canSaveWordReplacementDraft(
+            original: original,
+            replacement: replacement
+        )
+    }
+
+    public func submitting(existingOriginalTexts: [String]) -> VoiceInkWordReplacementDraftSubmission {
+        let plan = VoiceInkDictionaryPolicy.wordReplacementSubmissionPlan(
+            original: original,
+            replacement: replacement,
+            existingOriginalTexts: existingOriginalTexts
+        )
+        return VoiceInkWordReplacementDraftSubmission(
+            submittedOriginal: original,
+            submittedReplacement: replacement,
+            plan: plan,
+            draftStateAfterSubmit: VoiceInkWordReplacementDraftState(
+                original: plan.originalDraftAfterSubmit,
+                replacement: plan.replacementDraftAfterSubmit
+            )
+        )
+    }
+}
+
 public struct VoiceInkWordReplacementBackupImportPlan: Equatable, Sendable {
     public let rulesToInsert: [VoiceInkWordReplacementRule]
     public let skippedInvalidReplacementCount: Int

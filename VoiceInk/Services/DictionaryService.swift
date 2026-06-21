@@ -71,30 +71,47 @@ enum DictionaryService {
         existing: [WordReplacement],
         context: ModelContext
     ) -> VoiceInkWordReplacementSubmissionPlan {
-        let plan = VoiceInkDictionaryPolicy.wordReplacementSubmissionPlan(
+        let submission = VoiceInkWordReplacementDraftState(
             original: original,
-            replacement: replacement,
-            existingOriginalTexts: existing.map(\.originalText)
+            replacement: replacement
         )
+        .submitting(existingOriginalTexts: existing.map(\.originalText))
+        return applyWordReplacementSubmission(submission, context: context).plan
+    }
 
-        guard let rule = plan.ruleToInsert else { return plan }
+    @discardableResult
+    static func applyWordReplacementSubmission(
+        _ submission: VoiceInkWordReplacementDraftSubmission,
+        context: ModelContext
+    ) -> VoiceInkWordReplacementDraftSubmission {
+        let plan = submission.plan
+        guard let rule = plan.ruleToInsert else { return submission }
 
         let entry = WordReplacement(originalText: rule.originalText, replacementText: rule.replacementText)
         context.insert(entry)
         do {
             try context.save()
             WordReplacementService.shared.invalidateCache()
-            return plan
+            return submission
         } catch {
             context.delete(entry)
-            return VoiceInkWordReplacementSubmissionPlan(
+            let failurePlan = VoiceInkWordReplacementSubmissionPlan(
                 ruleToInsert: rule,
-                originalDraftAfterSubmit: original,
-                replacementDraftAfterSubmit: replacement,
+                originalDraftAfterSubmit: submission.submittedOriginal,
+                replacementDraftAfterSubmit: submission.submittedReplacement,
                 alertPresentation: .wordReplacement(
                     message: VoiceInkDictionaryAlertPresentation.failedToAddWordReplacement(
                         localizedDescription: error.localizedDescription
                     )
+                )
+            )
+            return VoiceInkWordReplacementDraftSubmission(
+                submittedOriginal: submission.submittedOriginal,
+                submittedReplacement: submission.submittedReplacement,
+                plan: failurePlan,
+                draftStateAfterSubmit: VoiceInkWordReplacementDraftState(
+                    original: failurePlan.originalDraftAfterSubmit,
+                    replacement: failurePlan.replacementDraftAfterSubmit
                 )
             )
         }

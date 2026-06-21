@@ -203,19 +203,11 @@ final class AppSettings: ObservableObject {
         fillerWords = VoiceInkFillerWords.removing(at: offsets, from: fillerWords)
     }
 
-    @discardableResult
-    func submitWordReplacementDraft(original: String, replacement: String) -> VoiceInkWordReplacementSubmissionPlan {
-        let plan = VoiceInkDictionaryPolicy.wordReplacementSubmissionPlan(
-            original: original,
-            replacement: replacement,
-            existingOriginalTexts: wordReplacements.map(\.originalText)
-        )
-
+    func applyWordReplacementSubmissionPlan(_ plan: VoiceInkWordReplacementSubmissionPlan) {
         let updatedRules = plan.applying(to: wordReplacements)
         if wordReplacements != updatedRules {
             wordReplacements = updatedRules
         }
-        return plan
     }
 
     func removeWordReplacements(at offsets: IndexSet) {

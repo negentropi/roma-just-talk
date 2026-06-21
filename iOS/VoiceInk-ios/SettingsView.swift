@@ -6,8 +6,7 @@ struct SettingsView: View {
     @StateObject private var settings = AppSettings.shared
     @State private var fillerWordDraftState = VoiceInkFillerWordDraftState()
     @State private var customVocabularyDraftState = VoiceInkVocabularyDraftState()
-    @State private var newReplacementOriginal = ""
-    @State private var newReplacementText = ""
+    @State private var wordReplacementDraftState = VoiceInkWordReplacementDraftState()
     @State private var dictionaryAlert: VoiceInkDictionaryAlertPresentation?
     private let cleanupPresentation = VoiceInkTranscriptionCleanupPresentation.iOS
     private let dictionaryPresentation = VoiceInkDictionarySettingsPresentation.iOS
@@ -114,12 +113,12 @@ struct SettingsView: View {
                 }
                 .onDelete(perform: settings.removeCustomVocabularyTerms)
 
-                TextField(dictionaryPresentation.originalTextPlaceholder, text: $newReplacementOriginal)
+                TextField(dictionaryPresentation.originalTextPlaceholder, text: $wordReplacementDraftState.original)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
                     .onSubmit(submitWordReplacement)
 
-                TextField(dictionaryPresentation.replacementTextPlaceholder, text: $newReplacementText)
+                TextField(dictionaryPresentation.replacementTextPlaceholder, text: $wordReplacementDraftState.replacement)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
                     .onSubmit(submitWordReplacement)
@@ -130,7 +129,7 @@ struct SettingsView: View {
                         systemImage: settingsPresentation.addActionSystemImageName
                     )
                 }
-                .disabled(!canAddWordReplacement)
+                .disabled(!wordReplacementDraftState.canSubmit)
 
                 ForEach(Array(settings.wordReplacements.enumerated()), id: \.offset) { _, rule in
                     HStack(spacing: 8) {
@@ -211,13 +210,6 @@ struct SettingsView: View {
         )
     }
 
-    private var canAddWordReplacement: Bool {
-        VoiceInkDictionaryPolicy.canSaveWordReplacementDraft(
-            original: newReplacementOriginal,
-            replacement: newReplacementText
-        )
-    }
-
     private func addFillerWord() {
         let submission = fillerWordDraftState.submitting(existingWords: settings.fillerWords)
         settings.applyFillerWordSubmissionPlan(submission.plan)
@@ -233,15 +225,14 @@ struct SettingsView: View {
     }
 
     private func submitWordReplacement() {
-        guard canAddWordReplacement else { return }
+        guard wordReplacementDraftState.canSubmit else { return }
 
-        let plan = settings.submitWordReplacementDraft(
-            original: newReplacementOriginal,
-            replacement: newReplacementText
+        let submission = wordReplacementDraftState.submitting(
+            existingOriginalTexts: settings.wordReplacements.map(\.originalText)
         )
-        newReplacementOriginal = plan.originalDraftAfterSubmit
-        newReplacementText = plan.replacementDraftAfterSubmit
-        dictionaryAlert = plan.alertPresentation
+        settings.applyWordReplacementSubmissionPlan(submission.plan)
+        wordReplacementDraftState = submission.draftStateAfterSubmit
+        dictionaryAlert = submission.alertPresentation
     }
     
     private func deleteMode(at offsets: IndexSet) {

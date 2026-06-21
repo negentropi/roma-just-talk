@@ -66,10 +66,11 @@ public struct VoiceInkOpenAICompatibleTranscriptionClient: Sendable {
             temperature: temperature
         )
 
-        let (data, response) = try await Self.data(
+        let (data, response) = try await VoiceInkRetriedRequest.data(
             for: preparedRequest.requestWithHTTPBody(),
             timeout: timeout,
-            maxRetries: maxRetries
+            maxRetries: maxRetries,
+            errorDomain: errorDomain
         )
         try VoiceInkRemoteHTTPResponsePolicy.validateSuccess(
             response: response,
@@ -97,59 +98,5 @@ public struct VoiceInkOpenAICompatibleTranscriptionClient: Sendable {
             apiKey: apiKey,
             timeout: timeout
         )
-    }
-
-    private static func data(
-        for request: URLRequest,
-        timeout: TimeInterval?,
-        maxRetries: Int
-    ) async throws -> (Data, URLResponse) {
-        let attempts = max(maxRetries, 0)
-        var lastError: (any Error)?
-
-        for attempt in 0...attempts {
-            if attempt > 0 {
-                let delay = UInt64(pow(2.0, Double(attempt - 1)) * 1_000_000_000)
-                try await Task.sleep(nanoseconds: delay)
-            }
-
-            let session: URLSession
-            if let timeout {
-                let configuration = URLSessionConfiguration.ephemeral
-                configuration.timeoutIntervalForRequest = timeout
-                configuration.timeoutIntervalForResource = timeout
-                configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
-                configuration.urlCache = nil
-                session = URLSession(configuration: configuration)
-            } else {
-                session = .shared
-            }
-            defer {
-                if timeout != nil {
-                    session.finishTasksAndInvalidate()
-                }
-            }
-
-            do {
-                let (data, response) = try await session.data(for: request)
-                if let statusCode = VoiceInkRemoteHTTPResponsePolicy.retryableStatusCode(in: response),
-                   attempt < attempts {
-                    lastError = VoiceInkRemoteHTTPResponsePolicy.apiError(
-                        statusCode: statusCode,
-                        data: data,
-                        errorDomain: "OpenAICompatibleTranscriptionAPI"
-                    )
-                    continue
-                }
-                return (data, response)
-            } catch {
-                lastError = error
-                if attempt < attempts {
-                    continue
-                }
-            }
-        }
-
-        throw lastError ?? URLError(.unknown)
     }
 }

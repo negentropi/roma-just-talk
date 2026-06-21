@@ -3,7 +3,7 @@ import Foundation
 enum VoiceInkRetriedRequest {
     static func data(
         for request: URLRequest,
-        timeout: TimeInterval,
+        timeout: TimeInterval?,
         maxRetries: Int,
         errorDomain: String
     ) async throws -> (Data, URLResponse) {
@@ -36,14 +36,16 @@ enum VoiceInkRetriedRequest {
 
     private static func perform(
         request: URLRequest,
-        timeout: TimeInterval,
+        timeout: TimeInterval?,
         maxRetries: Int,
         errorDomain: String,
         operation: (URLSession, URLRequest) async throws -> (Data, URLResponse)
     ) async throws -> (Data, URLResponse) {
         let attempts = max(maxRetries, 0)
         var request = request
-        request.timeoutInterval = timeout
+        if let timeout {
+            request.timeoutInterval = timeout
+        }
         var lastError: (any Error)?
 
         for attempt in 0...attempts {
@@ -52,13 +54,22 @@ enum VoiceInkRetriedRequest {
                 try await Task.sleep(nanoseconds: delay)
             }
 
-            let configuration = URLSessionConfiguration.ephemeral
-            configuration.timeoutIntervalForRequest = timeout
-            configuration.timeoutIntervalForResource = timeout
-            configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
-            configuration.urlCache = nil
-            let session = URLSession(configuration: configuration)
-            defer { session.finishTasksAndInvalidate() }
+            let session: URLSession
+            if let timeout {
+                let configuration = URLSessionConfiguration.ephemeral
+                configuration.timeoutIntervalForRequest = timeout
+                configuration.timeoutIntervalForResource = timeout
+                configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+                configuration.urlCache = nil
+                session = URLSession(configuration: configuration)
+            } else {
+                session = .shared
+            }
+            defer {
+                if timeout != nil {
+                    session.finishTasksAndInvalidate()
+                }
+            }
 
             do {
                 let (data, response) = try await operation(session, request)

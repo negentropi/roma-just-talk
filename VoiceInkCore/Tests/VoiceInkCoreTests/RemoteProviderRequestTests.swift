@@ -225,6 +225,43 @@ final class RemoteProviderRequestTests: XCTestCase {
         )
     }
 
+    func testOpenAICompatibleTranscriptionClientUsesSharedRetryRequest() async throws {
+        var requestCount = 0
+        RemoteProviderRequestCapturingURLProtocol.requestHandler = { request in
+            requestCount += 1
+            let statusCode = requestCount == 1 ? 429 : 200
+            let response = try XCTUnwrap(HTTPURLResponse(
+                url: try XCTUnwrap(request.url),
+                statusCode: statusCode,
+                httpVersion: nil,
+                headerFields: nil
+            ))
+            let data = requestCount == 1
+                ? Data("rate limited".utf8)
+                : Data(#"{"text":"transcribed after retry"}"#.utf8)
+            return (response, data)
+        }
+
+        URLProtocol.registerClass(RemoteProviderRequestCapturingURLProtocol.self)
+        defer {
+            URLProtocol.unregisterClass(RemoteProviderRequestCapturingURLProtocol.self)
+            RemoteProviderRequestCapturingURLProtocol.requestHandler = nil
+        }
+
+        let text = try await VoiceInkOpenAICompatibleTranscriptionClient().transcribeAudioData(
+            baseURL: try XCTUnwrap(URL(string: "https://api.groq.com/openai")),
+            apiKey: "stt-key",
+            model: "whisper-large-v3",
+            audioData: Data("WAVDATA".utf8),
+            fileName: "sample.wav",
+            errorDomain: "GroqAPI",
+            maxRetries: 1
+        )
+
+        XCTAssertEqual(text, "transcribed after retry")
+        XCTAssertEqual(requestCount, 2)
+    }
+
     func testOpenAICompatibleModelsRequestBuilderCanSetTimeout() throws {
         let request = VoiceInkOpenAICompatibleModelsRequestBuilder.make(
             baseURL: try XCTUnwrap(URL(string: "https://api.groq.com/openai")),

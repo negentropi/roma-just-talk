@@ -5141,6 +5141,16 @@ require_pattern \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
 require_pattern \
+  "macOS AI enhancement service reads shared timeout preference directly" \
+  'VoiceInkAIEnhancementRequestPreference\.timeoutSeconds\(\)' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+require_pattern \
+  "macOS AI enhancement service reads shared retry-on-timeout preference directly" \
+  'VoiceInkAIEnhancementRequestPreference\.shouldRetryOnTimeout\(\)' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+require_pattern \
   "iOS post-processing request tuning uses shared policy" \
   'chatRequestParameters' \
   VoiceInkCore/Sources/VoiceInkCore/PostProcessingClient.swift
@@ -5233,6 +5243,16 @@ reject_pattern \
 reject_pattern \
   "macOS AI enhancement service avoids duplicate execution route policy" \
   'selectedProvider == \.(ollama|localCLI)|switch +aiService\.selectedProvider|case +\.anthropic:' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+reject_pattern \
+  "macOS AI enhancement service avoids shallow timeout preference wrapper" \
+  'private +var +baseTimeout\b' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+reject_pattern \
+  "macOS AI enhancement service avoids shallow retry-on-timeout preference wrapper" \
+  'private +var +retryOnTimeout\b' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
 reject_pattern \

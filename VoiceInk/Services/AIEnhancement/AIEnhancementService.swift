@@ -71,9 +71,6 @@ class AIEnhancementService: ObservableObject {
     private let aiService: AIService
     private let screenCaptureService: ScreenCaptureService
     private let customVocabularyService: CustomVocabularyService
-    private var baseTimeout: TimeInterval {
-        VoiceInkAIEnhancementRequestPreference.timeoutSeconds()
-    }
     private let rateLimitPolicy = VoiceInkAIEnhancementRateLimitPolicy()
     private var lastRequestTime: Date?
     private let modelContext: ModelContext
@@ -182,7 +179,7 @@ class AIEnhancementService: ObservableObject {
                 let result = try await aiService.enhanceWithOllama(
                     text: formattedText,
                     systemPrompt: systemMessage,
-                    timeout: baseTimeout
+                    timeout: VoiceInkAIEnhancementRequestPreference.timeoutSeconds()
                 )
                 return VoiceInkAIEnhancementRequestPayload.enhancedText(from: result)
             } catch let error as VoiceInkAIEnhancementError {
@@ -215,7 +212,7 @@ class AIEnhancementService: ObservableObject {
                         model: aiService.currentModel,
                         messages: [.user(formattedText)],
                         systemPrompt: systemMessage,
-                        timeout: baseTimeout
+                        timeout: VoiceInkAIEnhancementRequestPreference.timeoutSeconds()
                     )
                 case .openAICompatibleChatCompletions:
                     guard let baseURL = aiService.selectedProvider.textEnhancementRequestURL() else {
@@ -234,7 +231,7 @@ class AIEnhancementService: ObservableObject {
                         temperature: requestParameters.temperature,
                         reasoningEffort: requestParameters.reasoningEffort,
                         extraBody: requestParameters.extraBodyParameters,
-                        timeout: baseTimeout
+                        timeout: VoiceInkAIEnhancementRequestPreference.timeoutSeconds()
                     )
                 case .ollama, .localCLI:
                     preconditionFailure("Local AI routes should return before cloud request execution.")
@@ -267,15 +264,11 @@ class AIEnhancementService: ObservableObject {
         }
     }
 
-    private var retryOnTimeout: Bool {
-        VoiceInkAIEnhancementRequestPreference.shouldRetryOnTimeout()
-    }
-
     private func makeRequestWithRetry(text: String, maxRetries: Int = 3, initialDelay: TimeInterval = 1.0) async throws -> String {
         var retryState = VoiceInkAIEnhancementRetryState(
             maxAttempts: maxRetries,
             initialDelay: initialDelay,
-            retryOnTimeout: retryOnTimeout
+            retryOnTimeout: VoiceInkAIEnhancementRequestPreference.shouldRetryOnTimeout()
         )
 
         while true {

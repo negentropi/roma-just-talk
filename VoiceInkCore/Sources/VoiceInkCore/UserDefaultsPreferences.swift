@@ -199,6 +199,7 @@ public struct VoiceInkAppSettingsResetState {
     public let wordReplacements: [VoiceInkWordReplacementRule]
     public let customVocabularyTerms: [String]
     public let selectedTranscriptionLanguage: String
+    public let apiKeyProvidersToDelete: [VoiceInkProviderKind]
 
     public init(
         modes: [Mode],
@@ -209,7 +210,8 @@ public struct VoiceInkAppSettingsResetState {
         fillerWords: [String],
         wordReplacements: [VoiceInkWordReplacementRule],
         customVocabularyTerms: [String],
-        selectedTranscriptionLanguage: String
+        selectedTranscriptionLanguage: String,
+        apiKeyProvidersToDelete: [VoiceInkProviderKind] = VoiceInkProviderKind.userAPIKeyProviders
     ) {
         self.modes = modes
         self.selectedModeId = selectedModeId
@@ -220,6 +222,7 @@ public struct VoiceInkAppSettingsResetState {
         self.wordReplacements = wordReplacements
         self.customVocabularyTerms = customVocabularyTerms
         self.selectedTranscriptionLanguage = selectedTranscriptionLanguage
+        self.apiKeyProvidersToDelete = apiKeyProvidersToDelete
     }
 }
 
@@ -234,7 +237,8 @@ public extension VoiceInkDefaultSettings {
             fillerWords: fillerWords,
             wordReplacements: [],
             customVocabularyTerms: [],
-            selectedTranscriptionLanguage: selectedTranscriptionLanguage
+            selectedTranscriptionLanguage: selectedTranscriptionLanguage,
+            apiKeyProvidersToDelete: VoiceInkProviderKind.userAPIKeyProviders
         )
     }
 }

@@ -11,6 +11,21 @@ public struct VoiceInkProviderAPIKeyListRowPresentation: Equatable, Sendable {
     public let tone: VoiceInkProviderAPIKeyListRowTone
 }
 
+public struct VoiceInkProviderAPIKeyListRow: Identifiable, Equatable, Sendable {
+    public let provider: VoiceInkProviderKind
+    public let presentation: VoiceInkProviderAPIKeyListRowPresentation
+
+    public var id: VoiceInkProviderKind { provider }
+
+    public init(
+        provider: VoiceInkProviderKind,
+        presentation: VoiceInkProviderAPIKeyListRowPresentation
+    ) {
+        self.provider = provider
+        self.presentation = presentation
+    }
+}
+
 public struct VoiceInkProviderAPIKeyStorageMutationPlan: Equatable, Sendable {
     public let shouldPersistStoredKey: Bool
     public let verificationFlagToPersist: Bool?
@@ -114,6 +129,23 @@ public struct VoiceInkProviderAPIKeyState: Equatable, Sendable {
                 : "exclamationmark.triangle.fill",
             tone: isReady ? .verified : .attention
         )
+    }
+
+    public func listRows(
+        for providers: [VoiceInkProviderKind] = VoiceInkProviderKind.userAPIKeyProviders,
+        localWhisperModelAvailable: Bool
+    ) -> [VoiceInkProviderAPIKeyListRow] {
+        providers
+            .filter(\.requiresUserAPIKey)
+            .map { provider in
+                VoiceInkProviderAPIKeyListRow(
+                    provider: provider,
+                    presentation: listRowPresentation(
+                        for: provider,
+                        localWhisperModelAvailable: localWhisperModelAvailable
+                    )
+                )
+            }
     }
 
     public mutating func applyStoredAPIKey(

@@ -120,9 +120,8 @@ final class AppSettings: ObservableObject {
         )
     }
 
-    func apiKeyListRowPresentation(for provider: VoiceInkProviderKind) -> VoiceInkProviderAPIKeyListRowPresentation {
-        apiKeyState.listRowPresentation(
-            for: provider,
+    func apiKeyListRows() -> [VoiceInkProviderAPIKeyListRow] {
+        apiKeyState.listRows(
             localWhisperModelAvailable: LocalModelManager.shared.hasAvailableModel
         )
     }
@@ -325,7 +324,6 @@ final class AppSettings: ObservableObject {
         selectedTranscriptionLanguage = resetState.selectedTranscriptionLanguage
         VoiceInkSharedPreferenceReset.clearCoreUserSettings()
 
-        // Clear API keys from memory and Keychain
-        VoiceInkProviderKind.userAPIKeyProviders.forEach(Self.deleteAPIKey)
+        resetState.apiKeyProvidersToDelete.forEach(Self.deleteAPIKey)
     }
 }

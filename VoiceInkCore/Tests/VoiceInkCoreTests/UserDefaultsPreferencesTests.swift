@@ -155,6 +155,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(resetState.wordReplacements, [])
         XCTAssertEqual(resetState.customVocabularyTerms, [])
         XCTAssertEqual(resetState.selectedTranscriptionLanguage, "de")
+        XCTAssertEqual(resetState.apiKeyProvidersToDelete, VoiceInkProviderKind.userAPIKeyProviders)
     }
 
     func testDefaultSettingsPreserveMacOSSelectedLanguageDefault() {

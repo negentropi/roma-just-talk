@@ -6,15 +6,13 @@ struct APIKeysView: View {
     
     var body: some View {
         List {
-            ForEach(VoiceInkProviderKind.userAPIKeyProviders) { provider in
-                NavigationLink(destination: ProviderAPIKeyView(provider: provider)) {
-                    let presentation = settings.apiKeyListRowPresentation(for: provider)
-
+            ForEach(settings.apiKeyListRows()) { row in
+                NavigationLink(destination: ProviderAPIKeyView(provider: row.provider)) {
                     HStack {
-                        Text(presentation.title)
+                        Text(row.presentation.title)
                         Spacer()
-                        Image(systemName: presentation.statusSystemImageName)
-                            .foregroundStyle(presentation.tone.statusColor)
+                        Image(systemName: row.presentation.statusSystemImageName)
+                            .foregroundStyle(row.presentation.tone.statusColor)
                     }
                 }
             }

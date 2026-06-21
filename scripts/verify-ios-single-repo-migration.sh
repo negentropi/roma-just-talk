@@ -1554,7 +1554,7 @@ require_pattern \
 
 require_pattern \
   "shared provider API-key list row presentation lives in VoiceInkCore" \
-  'VoiceInkProviderAPIKeyListRowPresentation|listRowPresentation' \
+  'VoiceInkProviderAPIKeyListRow|VoiceInkProviderAPIKeyListRowPresentation|listRows|listRowPresentation' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
 
 require_pattern \
@@ -1588,8 +1588,18 @@ reject_pattern \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \
-  "iOS API-key list uses shared row presentation" \
-  'apiKeyListRowPresentation' \
+  "iOS app settings uses shared provider API-key list rows" \
+  'listRows' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+require_pattern \
+  "iOS API-key list uses shared row list" \
+  'apiKeyListRows' \
+  iOS/VoiceInk-ios/APIKeysView.swift
+
+reject_pattern \
+  "iOS API-key list avoids shell-owned provider list and row presentation" \
+  'VoiceInkProviderKind\.userAPIKeyProviders|apiKeyListRowPresentation' \
   iOS/VoiceInk-ios/APIKeysView.swift \
   iOS/VoiceInk-ios/AppSettings.swift
 
@@ -5773,6 +5783,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
+  "shared app settings reset state owns provider-key deletion targets" \
+  'apiKeyProvidersToDelete' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
   "shared app data reset file plan lives in VoiceInkCore" \
   'VoiceInkAppDataResetFilePlan' \
   VoiceInkCore/Sources/VoiceInkCore/AppDataReset.swift
@@ -5895,6 +5910,11 @@ reject_pattern \
 require_pattern \
   "iOS app settings reset consumes shared reset state" \
   'VoiceInkDefaultSettings\.iOS\.appSettingsResetState' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+require_pattern \
+  "iOS app settings reset consumes shared provider-key deletion targets" \
+  'apiKeyProvidersToDelete' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \

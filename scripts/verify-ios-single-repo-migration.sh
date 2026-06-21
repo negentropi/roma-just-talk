@@ -3242,14 +3242,10 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/RemoteHTTPResponsePolicy.swift
 
 require_pattern \
-  "direct remote clients use shared HTTP response validation" \
-  'VoiceInkRemoteHTTPResponsePolicy\.validateSuccess' \
+  "direct remote clients use shared validated request helper" \
+  'VoiceInkRetriedRequest\.validatedData' \
   VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionClient.swift \
-  VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionClient.swift
-
-require_pattern \
-  "shared OpenAI-compatible chat client uses shared HTTP response validation" \
-  'VoiceInkRemoteHTTPResponsePolicy\.validateSuccess' \
+  VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionClient.swift \
   VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleClient.swift
 
 require_pattern \
@@ -3311,8 +3307,10 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \
-  "shared OpenAI-compatible chat client avoids duplicate HTTP response validation" \
-  'guard let http = response as\? HTTPURLResponse|guard \(200..<300\)\.contains\(http\.statusCode\)|String\(data: data, encoding: \.utf8\) \?\? ""|NSError\(' \
+  "direct remote clients avoid duplicate HTTP response validation" \
+  'URLSession\.shared\.data\(for: request\)|VoiceInkRemoteHTTPResponsePolicy\.validateSuccess|guard let http = response as\? HTTPURLResponse|guard \(200..<300\)\.contains\(http\.statusCode\)|String\(data: data, encoding: \.utf8\) \?\? ""|NSError\(' \
+  VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionClient.swift \
   VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleClient.swift
 
 reject_pattern \

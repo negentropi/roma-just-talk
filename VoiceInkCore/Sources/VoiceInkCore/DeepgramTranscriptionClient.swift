@@ -31,10 +31,10 @@ public struct VoiceInkDeepgramTranscriptionClient: Sendable {
             timeout: timeout
         )
 
-        let (data, response) = try await URLSession.shared.data(for: request)
-        try VoiceInkRemoteHTTPResponsePolicy.validateSuccess(
-            response: response,
-            data: data,
+        let data = try await VoiceInkRetriedRequest.validatedData(
+            for: request,
+            timeout: nil,
+            maxRetries: 0,
             errorDomain: errorDomain
         )
 

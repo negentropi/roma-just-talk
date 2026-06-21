@@ -841,13 +841,28 @@ require_pattern \
 
 require_pattern \
   "macOS recording engine uses shared recording notification presentation" \
-  'VoiceInkRecordingNotificationPresentation\.(noTranscriptionModelSelected|failedToStart)' \
+  'VoiceInkRecordingNotificationPresentation\.(noTranscriptionModelSelected|failedToStart|microphonePermissionRequired)' \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift
 
 require_pattern \
   "macOS recorder uses shared runtime failure notification presentation" \
   'VoiceInkRecordingNotificationPresentation\.runtimeFailure' \
   VoiceInk/Recorder.swift
+
+require_pattern \
+  "shared recording notification presentation owns macOS microphone-permission title" \
+  '"Microphone permission required"' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "shared recording notification presentation owns macOS microphone-permission duration" \
+  'duration: +8\.0' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "shared recording notification presentation owns macOS microphone-permission action copy" \
+  'actionButtonTitle: +"Grant"' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
 require_pattern \
   "shared macOS recorder style preference lives in VoiceInkCore" \
@@ -1108,7 +1123,7 @@ reject_pattern \
 
 reject_pattern \
   "macOS recording engine avoids shell-only start failure notification copy" \
-  '"No AI Model Selected"|"Recording failed to start"' \
+  '"No AI Model Selected"|"Recording failed to start"|"Microphone permission required"|label: "Grant"' \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift
 
 reject_pattern \

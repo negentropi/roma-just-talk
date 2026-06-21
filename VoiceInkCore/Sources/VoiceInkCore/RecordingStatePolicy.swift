@@ -412,9 +412,17 @@ public struct VoiceInkRecordingSheetPresentation: Equatable, Sendable {
 
 public struct VoiceInkRecordingNotificationPresentation: Equatable, Sendable {
     public let title: String
+    public let duration: TimeInterval
+    public let actionButtonTitle: String?
 
-    public init(title: String) {
+    public init(
+        title: String,
+        duration: TimeInterval = 3.0,
+        actionButtonTitle: String? = nil
+    ) {
         self.title = title
+        self.duration = duration
+        self.actionButtonTitle = actionButtonTitle
     }
 
     public static let noTranscriptionModelSelected = VoiceInkRecordingNotificationPresentation(
@@ -423,6 +431,12 @@ public struct VoiceInkRecordingNotificationPresentation: Equatable, Sendable {
 
     public static let failedToStart = VoiceInkRecordingNotificationPresentation(
         title: "Recording failed to start"
+    )
+
+    public static let microphonePermissionRequired = VoiceInkRecordingNotificationPresentation(
+        title: "Microphone permission required",
+        duration: 8.0,
+        actionButtonTitle: "Grant"
     )
 
     public static func runtimeFailure(localizedDescription: String) -> VoiceInkRecordingNotificationPresentation {

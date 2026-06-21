@@ -483,10 +483,22 @@ final class RecordingStatePolicyTests: XCTestCase {
             VoiceInkRecordingNotificationPresentation.noTranscriptionModelSelected.title,
             "No AI Model Selected"
         )
+        XCTAssertEqual(VoiceInkRecordingNotificationPresentation.noTranscriptionModelSelected.duration, 3.0)
+        XCTAssertNil(VoiceInkRecordingNotificationPresentation.noTranscriptionModelSelected.actionButtonTitle)
+
         XCTAssertEqual(
             VoiceInkRecordingNotificationPresentation.failedToStart.title,
             "Recording failed to start"
         )
+        XCTAssertEqual(VoiceInkRecordingNotificationPresentation.failedToStart.duration, 3.0)
+        XCTAssertNil(VoiceInkRecordingNotificationPresentation.failedToStart.actionButtonTitle)
+
+        XCTAssertEqual(
+            VoiceInkRecordingNotificationPresentation.microphonePermissionRequired.title,
+            "Microphone permission required"
+        )
+        XCTAssertEqual(VoiceInkRecordingNotificationPresentation.microphonePermissionRequired.duration, 8.0)
+        XCTAssertEqual(VoiceInkRecordingNotificationPresentation.microphonePermissionRequired.actionButtonTitle, "Grant")
     }
 
     func testRecordingNotificationPresentationPreservesMacOSRuntimeFailureCopy() {
@@ -498,6 +510,8 @@ final class RecordingStatePolicyTests: XCTestCase {
             presentation.title,
             "Recording Failed: Device disconnected"
         )
+        XCTAssertEqual(presentation.duration, 3.0)
+        XCTAssertNil(presentation.actionButtonTitle)
     }
 
     func testRecordingStartFailureMapsIOSMicrophoneBusyOSStatus() {

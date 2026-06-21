@@ -313,23 +313,20 @@ class VoiceInkEngine: NSObject, ObservableObject {
                     }
                 } else {
                     logger.error("❌ Recording permission denied.")
+                    let presentation = VoiceInkRecordingNotificationPresentation.microphonePermissionRequired
+                    let openMicrophonePermission: () -> Void = {
+                        Task { @MainActor in
+                            PermissionGrantCoordinator.openPermissionsAndGrantMicrophone()
+                        }
+                    }
                     NotificationManager.shared.showNotification(
-                        title: "Microphone permission required",
+                        title: presentation.title,
                         type: .error,
-                        duration: 8.0,
-                        onTap: {
-                            Task { @MainActor in
-                                PermissionGrantCoordinator.openPermissionsAndGrantMicrophone()
-                            }
-                        },
-                        actionButton: (
-                            label: "Grant",
-                            action: {
-                                Task { @MainActor in
-                                    PermissionGrantCoordinator.openPermissionsAndGrantMicrophone()
-                                }
-                            }
-                        )
+                        duration: presentation.duration,
+                        onTap: openMicrophonePermission,
+                        actionButton: presentation.actionButtonTitle.map { label in
+                            (label: label, action: openMicrophonePermission)
+                        }
                     )
                     Task { @MainActor [self] in
                         await self.recorderUIManager?.dismissMiniRecorder()

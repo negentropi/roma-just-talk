@@ -7059,6 +7059,11 @@ require_pattern \
   'VoiceInkPowerModeEmojiCatalog\.(allEmojis|customEmojis|saveCustomEmojis|addCustomEmoji|removeCustomEmoji|isCustomEmoji)|VoiceInkPowerModeEmojiInputPresentation\.inputDraft' \
   VoiceInk/PowerMode/EmojiManager.swift
 
+reject_pattern \
+  "macOS Power Mode emoji manager avoids shallow load/save wrappers" \
+  'private +func +(loadCustomEmojis|saveCustomEmojis)\(' \
+  VoiceInk/PowerMode/EmojiManager.swift
+
 require_pattern \
   "macOS Power Mode emoji picker consumes shared emoji validation and copy" \
   'emojiManager\.inputDraft|VoiceInkPowerModeEmojiInputPresentation\.(addEmojiSystemImageName|removeCustomEmojiSystemImageName|submitFeedbackMessage)' \

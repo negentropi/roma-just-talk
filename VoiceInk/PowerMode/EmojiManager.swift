@@ -7,7 +7,7 @@ class EmojiManager: ObservableObject {
     @Published var customEmojis: [String] = []
 
     private init() {
-        loadCustomEmojis()
+        customEmojis = VoiceInkPowerModeEmojiCatalog.customEmojis()
     }
 
     var allEmojis: [String] {
@@ -22,18 +22,10 @@ class EmojiManager: ObservableObject {
 
         if case .added(_, let updatedEmojis) = result {
             customEmojis = updatedEmojis
-            saveCustomEmojis()
+            VoiceInkPowerModeEmojiCatalog.saveCustomEmojis(customEmojis)
         }
 
         return result
-    }
-
-    private func loadCustomEmojis() {
-        customEmojis = VoiceInkPowerModeEmojiCatalog.customEmojis()
-    }
-
-    private func saveCustomEmojis() {
-        VoiceInkPowerModeEmojiCatalog.saveCustomEmojis(customEmojis)
     }
 
     func removeCustomEmoji(_ emoji: String) -> Bool {
@@ -42,7 +34,7 @@ class EmojiManager: ObservableObject {
             customEmojis: customEmojis
         ) {
             customEmojis = updatedEmojis
-            saveCustomEmojis()
+            VoiceInkPowerModeEmojiCatalog.saveCustomEmojis(customEmojis)
             return true
         }
         return false

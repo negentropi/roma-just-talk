@@ -1011,6 +1011,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/Mode.swift
 
 require_pattern \
+  "shared mode settings repair plan lives in VoiceInkCore" \
+  'VoiceInkModeSettingsPolicy|VoiceInkModeSettingsRepairPlan|selectedTranscriptionLanguage' \
+  VoiceInkCore/Sources/VoiceInkCore/Mode.swift
+
+require_pattern \
   "iOS recording sheet uses shared mode selection presentation adapter" \
   'VoiceInkModeSelectionControlView' \
   iOS/VoiceInk-ios/RecordingSheetView.swift
@@ -1042,7 +1047,17 @@ require_pattern \
 
 require_pattern \
   "iOS AppSettings uses shared mode list policy" \
-  'VoiceInkModeListPolicy\.(appending|replacing|defaultModeRepairPlan)' \
+  'VoiceInkModeListPolicy\.(appending|replacing)|VoiceInkModeSettingsPolicy\.defaultModeRepairPlan' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+require_pattern \
+  "iOS AppSettings delegates mode selection and language repair to shared core" \
+  'VoiceInkModeSettingsPolicy\.repairPlan|VoiceInkModeSettingsRepairPlan|applyModeSettingsRepairPlan' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+reject_pattern \
+  "iOS AppSettings avoids shell-owned mode selection and language repair sequencing" \
+  'repairedSelectedModeId|repairedSelectedTranscriptionLanguage|VoiceInkModeListPolicy\.defaultModeRepairPlan' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \

@@ -11,15 +11,14 @@ final class AppSettings: ObservableObject {
     @Published var modes: [Mode] {
         didSet {
             VoiceInkModeStorage.saveModes(modes)
-            repairSelectedModeId()
-            repairSelectedTranscriptionLanguage()
+            repairModeSettingsSelection()
         }
     }
     
     @Published var selectedModeId: UUID? {
         didSet {
             VoiceInkModeStorage.saveSelectedModeId(selectedModeId)
-            repairSelectedTranscriptionLanguage()
+            repairModeSettingsSelection()
         }
     }
     
@@ -90,8 +89,7 @@ final class AppSettings: ObservableObject {
         self.customVocabularyTerms = VoiceInkCustomVocabularyPreference.terms()
         self.selectedTranscriptionLanguage = VoiceInkTranscriptionLanguagePreference.selectedLanguage()
 
-        repairSelectedModeId()
-        repairSelectedTranscriptionLanguage()
+        repairModeSettingsSelection()
     }
 
     func apiKey(for provider: VoiceInkProviderKind) -> String {
@@ -153,11 +151,14 @@ final class AppSettings: ObservableObject {
 
     // MARK: - Modes Management
     
-    private func repairSelectedModeId() {
-        let repairedModeId = modes.repairedSelectedModeId(selectedModeId)
-        if selectedModeId != repairedModeId {
-            selectedModeId = repairedModeId
-        }
+    private func repairModeSettingsSelection() {
+        applyModeSettingsRepairPlan(
+            VoiceInkModeSettingsPolicy.repairPlan(
+                modes: modes,
+                selectedModeId: selectedModeId,
+                selectedTranscriptionLanguage: selectedTranscriptionLanguage
+            )
+        )
     }
     
     // MARK: - Mode-based Settings
@@ -272,28 +273,28 @@ final class AppSettings: ObservableObject {
     }
 
     func repairSelectedTranscriptionLanguage() {
-        let compatibleLanguage = modes.repairedSelectedTranscriptionLanguage(
-            selectedTranscriptionLanguage,
-            selectedModeId: selectedModeId
-        )
-
-        if selectedTranscriptionLanguage != compatibleLanguage {
-            selectedTranscriptionLanguage = compatibleLanguage
-        }
+        repairModeSettingsSelection()
     }
 
     func ensureDefaultModeExists() {
-        let plan = VoiceInkModeListPolicy.defaultModeRepairPlan(
+        applyModeSettingsRepairPlan(VoiceInkModeSettingsPolicy.defaultModeRepairPlan(
             modes: modes,
-            selectedModeId: selectedModeId
-        )
+            selectedModeId: selectedModeId,
+            selectedTranscriptionLanguage: selectedTranscriptionLanguage
+        ))
+    }
 
+    private func applyModeSettingsRepairPlan(_ plan: VoiceInkModeSettingsRepairPlan) {
         if plan.shouldReplaceModes {
             modes = plan.modes
         }
 
         if selectedModeId != plan.selectedModeId {
             selectedModeId = plan.selectedModeId
+        }
+
+        if selectedTranscriptionLanguage != plan.selectedTranscriptionLanguage {
+            selectedTranscriptionLanguage = plan.selectedTranscriptionLanguage
         }
     }
 

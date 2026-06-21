@@ -102,6 +102,51 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
         XCTAssertEqual(plan.selectedModeId, localMode.id)
     }
 
+    func testModeSettingsPolicyRepairsSelectionBeforeLanguageCompatibility() {
+        let localMode = Mode.defaultLocalWhisper(name: "Local")
+        let cloudMode = Mode(name: "xAI", transcriptionProvider: .xai)
+
+        let plan = VoiceInkModeSettingsPolicy.repairPlan(
+            modes: [localMode, cloudMode],
+            selectedModeId: UUID(),
+            selectedTranscriptionLanguage: "zh"
+        )
+
+        XCTAssertFalse(plan.shouldReplaceModes)
+        XCTAssertEqual(plan.modes.map(\.id), [localMode.id, cloudMode.id])
+        XCTAssertEqual(plan.selectedModeId, localMode.id)
+        XCTAssertEqual(plan.selectedTranscriptionLanguage, "zh")
+    }
+
+    func testModeSettingsPolicyRepairsLanguageForActiveMode() {
+        let localMode = Mode.defaultLocalWhisper(name: "Local")
+        let cloudMode = Mode(name: "xAI", transcriptionProvider: .xai)
+
+        let plan = VoiceInkModeSettingsPolicy.repairPlan(
+            modes: [localMode, cloudMode],
+            selectedModeId: cloudMode.id,
+            selectedTranscriptionLanguage: "zh"
+        )
+
+        XCTAssertFalse(plan.shouldReplaceModes)
+        XCTAssertEqual(plan.selectedModeId, cloudMode.id)
+        XCTAssertEqual(plan.selectedTranscriptionLanguage, VoiceInkLanguageCatalog.autoDetectCode)
+    }
+
+    func testModeSettingsPolicySeedsDefaultModeAndRepairsLanguage() {
+        let plan = VoiceInkModeSettingsPolicy.defaultModeRepairPlan(
+            modes: [],
+            selectedModeId: nil,
+            selectedTranscriptionLanguage: "not-a-language"
+        )
+
+        XCTAssertTrue(plan.shouldReplaceModes)
+        XCTAssertEqual(plan.modes.count, 1)
+        XCTAssertEqual(plan.modes.first?.id, plan.selectedModeId)
+        XCTAssertEqual(plan.modes.first?.transcriptionProvider, .localWhisper)
+        XCTAssertEqual(plan.selectedTranscriptionLanguage, VoiceInkLanguageCatalog.autoDetectCode)
+    }
+
     func testUnsupportedTranscriptionProviderDoesNotReceiveFakeFallbackModel() {
         let mode = Mode(name: "Unsupported", transcriptionProvider: .cerebras)
 

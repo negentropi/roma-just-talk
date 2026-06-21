@@ -103,6 +103,25 @@ public struct VoiceInkModeListRepairPlan {
     }
 }
 
+public struct VoiceInkModeSettingsRepairPlan {
+    public let modes: [Mode]
+    public let selectedModeId: UUID?
+    public let selectedTranscriptionLanguage: String
+    public let shouldReplaceModes: Bool
+
+    public init(
+        modes: [Mode],
+        selectedModeId: UUID?,
+        selectedTranscriptionLanguage: String,
+        shouldReplaceModes: Bool
+    ) {
+        self.modes = modes
+        self.selectedModeId = selectedModeId
+        self.selectedTranscriptionLanguage = selectedTranscriptionLanguage
+        self.shouldReplaceModes = shouldReplaceModes
+    }
+}
+
 public enum VoiceInkModeListPolicy {
     public static func appending(_ mode: Mode, to modes: [Mode]) -> [Mode] {
         modes + [mode]
@@ -139,6 +158,56 @@ public enum VoiceInkModeListPolicy {
             modes: modes,
             selectedModeId: modes.repairedSelectedModeId(selectedModeId),
             shouldReplaceModes: false
+        )
+    }
+}
+
+public enum VoiceInkModeSettingsPolicy {
+    public static func repairPlan(
+        modes: [Mode],
+        selectedModeId: UUID?,
+        selectedTranscriptionLanguage: String
+    ) -> VoiceInkModeSettingsRepairPlan {
+        makeRepairPlan(
+            modes: modes,
+            selectedModeId: modes.repairedSelectedModeId(selectedModeId),
+            selectedTranscriptionLanguage: selectedTranscriptionLanguage,
+            shouldReplaceModes: false
+        )
+    }
+
+    public static func defaultModeRepairPlan(
+        modes: [Mode],
+        selectedModeId: UUID?,
+        selectedTranscriptionLanguage: String
+    ) -> VoiceInkModeSettingsRepairPlan {
+        let listPlan = VoiceInkModeListPolicy.defaultModeRepairPlan(
+            modes: modes,
+            selectedModeId: selectedModeId
+        )
+
+        return makeRepairPlan(
+            modes: listPlan.modes,
+            selectedModeId: listPlan.selectedModeId,
+            selectedTranscriptionLanguage: selectedTranscriptionLanguage,
+            shouldReplaceModes: listPlan.shouldReplaceModes
+        )
+    }
+
+    private static func makeRepairPlan(
+        modes: [Mode],
+        selectedModeId: UUID?,
+        selectedTranscriptionLanguage: String,
+        shouldReplaceModes: Bool
+    ) -> VoiceInkModeSettingsRepairPlan {
+        VoiceInkModeSettingsRepairPlan(
+            modes: modes,
+            selectedModeId: selectedModeId,
+            selectedTranscriptionLanguage: modes.repairedSelectedTranscriptionLanguage(
+                selectedTranscriptionLanguage,
+                selectedModeId: selectedModeId
+            ),
+            shouldReplaceModes: shouldReplaceModes
         )
     }
 }

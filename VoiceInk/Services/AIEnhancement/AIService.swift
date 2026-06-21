@@ -17,10 +17,7 @@ class AIService: ObservableObject {
     }
     @Published var selectedProvider: VoiceInkAIEnhancementProviderKind {
         didSet {
-            VoiceInkAIEnhancementProviderPreference.saveSelectedProviderRawValue(
-                selectedProvider.rawValue,
-                to: userDefaults
-            )
+            VoiceInkAIEnhancementProviderPreference.saveSelectedProvider(selectedProvider, to: userDefaults)
             applyCredentialStateForSelectedProvider()
             if selectedProvider.textEnhancementModelCatalogSource == .ollamaRuntime {
                 Task {
@@ -86,7 +83,7 @@ class AIService: ObservableObject {
 
         applyCredentialStateForSelectedProvider()
 
-        loadSavedModelSelections()
+        selectedModels = VoiceInkAIEnhancementProviderPreference.selectedModels(from: userDefaults)
         loadSavedOpenRouterModels()
     }
 
@@ -103,17 +100,6 @@ class AIService: ObservableObject {
         isAPIKeyValid = credentialState.isAPIKeyValid
     }
     
-    private func loadSavedModelSelections() {
-        for provider in VoiceInkAIEnhancementProviderKind.allCases {
-            if let savedModel = VoiceInkAIEnhancementProviderPreference.selectedModel(
-                for: provider.rawValue,
-                from: userDefaults
-            ) {
-                selectedModels[provider] = savedModel
-            }
-        }
-    }
-    
     private func loadSavedOpenRouterModels() {
         openRouterModels = VoiceInkDynamicAIProviderPreference.openRouterModels(from: userDefaults)
     }
@@ -128,7 +114,7 @@ class AIService: ObservableObject {
         selectedModels[selectedProvider] = model
         VoiceInkAIEnhancementProviderPreference.saveSelectedModel(
             model,
-            for: selectedProvider.rawValue,
+            for: selectedProvider,
             to: userDefaults
         )
         

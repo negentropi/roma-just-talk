@@ -6655,6 +6655,16 @@ require_pattern \
   'VoiceInkAIEnhancementProviderPreference\.selectedModelDiagnosticDescription\(\)' \
   VoiceInk/Services/SystemInfoService.swift
 
+require_pattern \
+  "macOS AI service consumes shared selected AI model map" \
+  'selectedModels = VoiceInkAIEnhancementProviderPreference\.selectedModels\(from: userDefaults\)' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+reject_pattern \
+  "macOS AI service avoids shell-only selected model loading loop" \
+  'loadSavedModelSelections|for provider in VoiceInkAIEnhancementProviderKind\.allCases' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
 reject_pattern \
   "macOS diagnostics avoid shell-only AI preference presentation" \
   'getAI(EnhancementStatus|Provider|Model)|VoiceInkUserDefaultsKey\.isAIEnhancementEnabled|selectedProviderRawValue\(\)|selectedModel\(for:' \

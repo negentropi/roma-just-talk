@@ -674,6 +674,18 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testAIEnhancementProviderPreferenceSavesEnumProvider() {
+        withIsolatedDefaults { defaults in
+            VoiceInkAIEnhancementProviderPreference.saveSelectedProvider(.openRouter, to: defaults)
+
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderPreference.selectedProviderRawValue(from: defaults),
+                VoiceInkAIEnhancementProviderKind.openRouter.rawValue
+            )
+            XCTAssertEqual(VoiceInkAIEnhancementProviderPreference.selectedProvider(from: defaults), .openRouter)
+        }
+    }
+
     func testAIEnhancementProviderPreferenceRoundTripsSelectedModel() {
         withIsolatedDefaults { defaults in
             XCTAssertNil(
@@ -689,6 +701,33 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             XCTAssertEqual(
                 VoiceInkAIEnhancementProviderPreference.selectedModel(for: "Groq", from: defaults),
                 "llama-3.3-70b-versatile"
+            )
+        }
+    }
+
+    func testAIEnhancementProviderPreferenceLoadsSelectedModelsByProvider() {
+        withIsolatedDefaults { defaults in
+            VoiceInkAIEnhancementProviderPreference.saveSelectedModel(
+                "llama-3.3-70b-versatile",
+                for: .groq,
+                to: defaults
+            )
+            VoiceInkAIEnhancementProviderPreference.saveSelectedModel(
+                "openai/gpt-4o",
+                for: .openAI,
+                to: defaults
+            )
+            defaults.set("", forKey: VoiceInkUserDefaultsKey.selectedAIProviderModel("OpenRouter"))
+
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderPreference.selectedModels(
+                    for: [.groq, .openRouter, .openAI],
+                    from: defaults
+                ),
+                [
+                    .groq: "llama-3.3-70b-versatile",
+                    .openAI: "openai/gpt-4o"
+                ]
             )
         }
     }

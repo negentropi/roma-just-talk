@@ -541,6 +541,13 @@ public enum VoiceInkAIEnhancementProviderPreference {
         defaults.set(rawValue, forKey: VoiceInkUserDefaultsKey.selectedAIProvider)
     }
 
+    public static func saveSelectedProvider(
+        _ provider: VoiceInkAIEnhancementProviderKind,
+        to defaults: UserDefaults = .standard
+    ) {
+        saveSelectedProviderRawValue(provider.rawValue, to: defaults)
+    }
+
     public static func selectedProvider(
         default defaultProvider: VoiceInkAIEnhancementProviderKind = .gemini,
         from defaults: UserDefaults = .standard
@@ -556,6 +563,17 @@ public enum VoiceInkAIEnhancementProviderPreference {
         }
 
         return provider
+    }
+
+    public static func selectedModels(
+        for providers: [VoiceInkAIEnhancementProviderKind] = VoiceInkAIEnhancementProviderKind.allCases,
+        from defaults: UserDefaults = .standard
+    ) -> [VoiceInkAIEnhancementProviderKind: String] {
+        providers.reduce(into: [:]) { models, provider in
+            if let model = selectedModel(for: provider.rawValue, from: defaults) {
+                models[provider] = model
+            }
+        }
     }
 
     public static func selectedModel(
@@ -581,6 +599,14 @@ public enum VoiceInkAIEnhancementProviderPreference {
     ) {
         guard !model.isEmpty else { return }
         defaults.set(model, forKey: VoiceInkUserDefaultsKey.selectedAIProviderModel(providerRawValue))
+    }
+
+    public static func saveSelectedModel(
+        _ model: String,
+        for provider: VoiceInkAIEnhancementProviderKind,
+        to defaults: UserDefaults = .standard
+    ) {
+        saveSelectedModel(model, for: provider.rawValue, to: defaults)
     }
 
     public static func clear(

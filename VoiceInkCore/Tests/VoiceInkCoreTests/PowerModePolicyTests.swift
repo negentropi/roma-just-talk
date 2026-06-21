@@ -1763,6 +1763,54 @@ final class PowerModePolicyTests: XCTestCase {
         )
     }
 
+    func testPowerModeBackupExportPlanPreservesMacOSExportInputs() {
+        let firstId = UUID(uuidString: "00000000-0000-0000-0000-000000000501")!
+        let secondId = UUID(uuidString: "00000000-0000-0000-0000-000000000502")!
+        let configurations = [
+            config(id: firstId, name: "First", emoji: "F"),
+            config(id: secondId, name: "Second", emoji: "S")
+        ]
+
+        let plan = VoiceInkPowerModePolicy.powerModeBackupExportPlan(
+            configurations: configurations,
+            customEmojis: ["F", "S"]
+        )
+
+        XCTAssertEqual(plan.configurationsToExport, configurations)
+        XCTAssertEqual(
+            plan.shortcutRequests,
+            [
+                VoiceInkPowerModeShortcutExportRequest(backupKey: firstId.uuidString, id: firstId),
+                VoiceInkPowerModeShortcutExportRequest(backupKey: secondId.uuidString, id: secondId)
+            ]
+        )
+        XCTAssertEqual(plan.customEmojisToExport, ["F", "S"])
+        XCTAssertEqual(plan.exportedConfigurationCount, 2)
+    }
+
+    func testPowerModeShortcutBackupsReturnNilWhenNoShortcutsExist() {
+        let firstId = UUID(uuidString: "00000000-0000-0000-0000-000000000601")!
+        let secondId = UUID(uuidString: "00000000-0000-0000-0000-000000000602")!
+        let requests = [
+            VoiceInkPowerModeShortcutExportRequest(backupKey: firstId.uuidString, id: firstId),
+            VoiceInkPowerModeShortcutExportRequest(backupKey: secondId.uuidString, id: secondId)
+        ]
+
+        let backups: [String: String]? = VoiceInkPowerModePolicy.powerModeShortcutBackups(
+            for: requests,
+            backupForConfiguration: { id in
+                id == secondId ? "Second Shortcut" : nil
+            }
+        )
+        XCTAssertEqual(backups, [secondId.uuidString: "Second Shortcut"])
+
+        let missingBackups: [String: String]? = VoiceInkPowerModePolicy.powerModeShortcutBackups(
+            for: requests,
+            backupForConfiguration: { _ in nil }
+        )
+        XCTAssertNil(missingBackups)
+    }
+
     func testPowerModeBackupImportPlanPreservesMacOSImportSequencingInputs() {
         let existingId = UUID(uuidString: "00000000-0000-0000-0000-000000000401")!
         let secondExistingId = UUID(uuidString: "00000000-0000-0000-0000-000000000402")!

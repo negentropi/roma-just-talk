@@ -8272,6 +8272,36 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
+  "shared Power Mode backup export plan record lives in VoiceInkCore" \
+  'VoiceInkPowerModeBackupExportPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode backup export plan policy lives in VoiceInkCore" \
+  'powerModeBackupExportPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode backup shortcut export adapter lives in VoiceInkCore" \
+  'powerModeShortcutBackups' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "macOS backup export uses shared Power Mode export plan" \
+  'VoiceInkPowerModePolicy\.powerModeBackupExportPlan' \
+  VoiceInk/Services/ImportExportService.swift
+
+require_pattern \
+  "macOS backup export uses shared Power Mode shortcut backup adapter" \
+  'VoiceInkPowerModePolicy\.powerModeShortcutBackups' \
+  VoiceInk/Services/ImportExportService.swift
+
+reject_pattern \
+  "macOS backup export avoids shell-owned Power Mode shortcut backup planning" \
+  'let +powerConfigs = powerModeManager\.configurations|Dictionary\(uniqueKeysWithValues: powerConfigs\.compactMap|return +\(config\.id\.uuidString|powerModeShortcuts\.isEmpty \? nil : powerModeShortcuts' \
+  VoiceInk/Services/ImportExportService.swift
+
+require_pattern \
   "shared Power Mode backup import plan record lives in VoiceInkCore" \
   'VoiceInkPowerModeBackupImportPlan' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
@@ -8302,6 +8332,16 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "core checks execute Power Mode backup export plan tests" \
+  'PowerModePolicyTests\.testPowerModeBackupExportPlanPreservesMacOSExportInputs' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute Power Mode shortcut export adapter tests" \
+  'PowerModePolicyTests\.testPowerModeShortcutBackupsReturnNilWhenNoShortcutsExist' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "core checks execute Power Mode backup import sequence policy tests" \
   'PowerModePolicyTests\.testPowerModeBackupImportPlanPreservesMacOSImportSequencingInputs' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
@@ -8312,8 +8352,8 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
-  "migration checklist tracks shared Power Mode backup import policy" \
-  'Power Mode backup import plan' \
+  "migration checklist tracks shared Power Mode backup import and export policy" \
+  'Power Mode backup import/export plan' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

@@ -703,6 +703,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testDefaultAndRulePresenceRequireEnabledRules", run: { PowerModePolicyTests().testDefaultAndRulePresenceRequireEnabledRules() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeConfigurationListQueriesUseSharedRulePolicy", run: { PowerModePolicyTests().testPowerModeConfigurationListQueriesUseSharedRulePolicy() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeShortcutImportPlanKeepsOnlyImportedConfigurationKeys", run: { PowerModePolicyTests().testPowerModeShortcutImportPlanKeepsOnlyImportedConfigurationKeys() }),
+            VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeBackupExportPlanPreservesMacOSExportInputs", run: { PowerModePolicyTests().testPowerModeBackupExportPlanPreservesMacOSExportInputs() }),
+            VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeShortcutBackupsReturnNilWhenNoShortcutsExist", run: { PowerModePolicyTests().testPowerModeShortcutBackupsReturnNilWhenNoShortcutsExist() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeBackupImportPlanPreservesMacOSImportSequencingInputs", run: { PowerModePolicyTests().testPowerModeBackupImportPlanPreservesMacOSImportSequencingInputs() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeBackupImportPlanTreatsMissingCustomEmojiRecordsAsNoOps", run: { PowerModePolicyTests().testPowerModeBackupImportPlanTreatsMissingCustomEmojiRecordsAsNoOps() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testResolvedPowerModeConfigurationPreservesAutomaticResolutionOrder", run: { PowerModePolicyTests().testResolvedPowerModeConfigurationPreservesAutomaticResolutionOrder() }),

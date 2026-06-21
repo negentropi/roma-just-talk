@@ -125,11 +125,16 @@ class ImportExportService {
             from: enhancementService.customPrompts
         )
 
-        let powerConfigs = powerModeManager.configurations
-        let powerModeShortcuts = Dictionary(uniqueKeysWithValues: powerConfigs.compactMap { config -> (String, ShortcutBackup)? in
-            guard let shortcut = ShortcutStore.shortcut(for: .powerMode(config.id)) else { return nil }
-            return (config.id.uuidString, ShortcutBackup(shortcut))
-        })
+        let powerModeExportPlan = VoiceInkPowerModePolicy.powerModeBackupExportPlan(
+            configurations: powerModeManager.configurations,
+            customEmojis: emojiManager.customEmojis
+        )
+        let powerModeShortcuts = VoiceInkPowerModePolicy.powerModeShortcutBackups(
+            for: powerModeExportPlan.shortcutRequests,
+            backupForConfiguration: { id in
+                ShortcutStore.shortcut(for: .powerMode(id)).map(ShortcutBackup.init)
+            }
+        )
 
         // Export custom models
         let customModels = CustomCloudModelManager.shared.customModels.map { VoiceInkCustomCloudModelBackup(model: $0) }
@@ -226,12 +231,12 @@ class ImportExportService {
         let exportedSettings = BackupFile(
             version: currentSettingsVersion,
             customPrompts: exportablePrompts,
-            powerModeConfigs: powerConfigs,
-            powerModeShortcuts: powerModeShortcuts.isEmpty ? nil : powerModeShortcuts,
+            powerModeConfigs: powerModeExportPlan.configurationsToExport,
+            powerModeShortcuts: powerModeShortcuts,
             vocabularyWords: dictionaryExportPlan.vocabularyBackupRecords,
             wordReplacements: dictionaryExportPlan.wordReplacementBackupRecords,
             generalSettings: generalSettingsToExport,
-            customEmojis: emojiManager.customEmojis,
+            customEmojis: powerModeExportPlan.customEmojisToExport,
             customCloudModels: customModels
         )
 

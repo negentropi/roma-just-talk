@@ -7,7 +7,6 @@
 
 import Foundation
 import Combine
-import os
 import VoiceInkCore
 
 @MainActor
@@ -17,10 +16,7 @@ class LocalModelManager: ObservableObject {
     
     private var downloadTasks: [String: URLSessionDownloadTask] = [:]
     private var progressObservations: [String: NSKeyValueObservation] = [:]
-    private let logger = Logger(
-        subsystem: VoiceInkAppIdentity.loggingSubsystem,
-        category: "LocalModelManager"
-    )
+    private let logger = VoiceInkIOSLogger.localModelManagement
     
     static let shared = LocalModelManager()
     

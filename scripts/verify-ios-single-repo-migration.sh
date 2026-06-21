@@ -9340,12 +9340,18 @@ require_pattern \
 
 require_pattern \
   "iOS local Whisper service logging uses shared app identity subsystem" \
-  'subsystem: VoiceInkAppIdentity\.loggingSubsystem' \
+  'VoiceInkIOSLogger\.localWhisper' \
   iOS/VoiceInk-ios/WhisperTranscriptionService.swift
 
 require_pattern \
   "iOS local model manager logging uses shared app identity subsystem" \
-  'subsystem: VoiceInkAppIdentity\.loggingSubsystem' \
+  'VoiceInkIOSLogger\.localModelManagement' \
+  iOS/VoiceInk-ios/LocalModelManager.swift
+
+reject_pattern \
+  "iOS local Whisper and model shells avoid ad-hoc Logger construction" \
+  'Logger\(subsystem: VoiceInkAppIdentity\.loggingSubsystem' \
+  iOS/VoiceInk-ios/WhisperTranscriptionService.swift \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
 reject_pattern \
@@ -9360,8 +9366,18 @@ require_pattern \
   iOS/Shared/VoiceInkIOSLogger.swift
 
 require_pattern \
+  "iOS shell logging adapter owns local Whisper logger" \
+  'localWhisper = Logger\(subsystem: VoiceInkAppIdentity\.loggingSubsystem' \
+  iOS/Shared/VoiceInkIOSLogger.swift
+
+require_pattern \
+  "iOS shell logging adapter owns local model manager logger" \
+  'localModelManagement = Logger\(subsystem: VoiceInkAppIdentity\.loggingSubsystem' \
+  iOS/Shared/VoiceInkIOSLogger.swift
+
+require_pattern \
   "iOS app shell diagnostics route through shared iOS logger" \
-  'VoiceInkIOSLogger\.(app|appGroup|audioPlayback|audioSession|localModelManagement|notes|recording|settings)' \
+  'VoiceInkIOSLogger\.(app|appGroup|audioPlayback|audioSession|localWhisper|localModelManagement|notes|recording|settings)' \
   iOS/VoiceInk-ios iOS/Shared
 
 require_pattern \

@@ -6,14 +6,10 @@
 //
 
 import Foundation
-import os
 import VoiceInkCore
 
 struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
-    private let logger = Logger(
-        subsystem: VoiceInkAppIdentity.loggingSubsystem,
-        category: "WhisperTranscriptionService"
-    )
+    private let logger = VoiceInkIOSLogger.localWhisper
     private let failurePlatform = VoiceInkLocalWhisperPlatform.iOS
     
     /// Transcribe audio file using local Whisper model

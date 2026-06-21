@@ -8215,6 +8215,31 @@ reject_pattern \
   'VoiceInkWordCounter|VoiceInkSessionMetricPolicy|VoiceInkDashboardMetricsAccumulator|dashboardWordCount|dashboardAudioDuration|summary\.totalWords|summary\.totalDuration|words -|reduce\(' \
   iOS/VoiceInk-ios/NotesListView.swift
 
+require_pattern \
+  "shared session metric migration preference lives in VoiceInkCore" \
+  'VoiceInkSessionMetricMigrationPreference|completionKey = "HasCompletedStatsMigration"' \
+  VoiceInkCore/Sources/VoiceInkCore/SessionMetricPolicy.swift
+
+require_pattern \
+  "macOS stats migration uses shared completion preference" \
+  'VoiceInkSessionMetricMigrationPreference\.(isCompleted|markCompleted)' \
+  VoiceInk/Services/SessionMetricMigrationService.swift
+
+reject_pattern \
+  "macOS stats migration avoids raw completion preference" \
+  'HasCompletedStatsMigration|UserDefaults\.standard' \
+  VoiceInk/Services/SessionMetricMigrationService.swift
+
+require_pattern \
+  "core checks execute session metric migration preference test" \
+  'SessionMetricPolicyTests\.testMigrationPreferencePreservesCompletionStorageKey' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "migration checklist tracks shared session metric migration preference" \
+  'stats-migration completion storage through `VoiceInkSessionMetricPolicy`/`VoiceInkSessionMetricMigrationPreference`' \
+  docs/ios-single-repo-migration.md
+
 reject_pattern \
   "iOS note-list avoids shell-only chrome and action copy" \
   '"(Recent|Start Recording|gearshape|mic\.fill|Cancel)"' \

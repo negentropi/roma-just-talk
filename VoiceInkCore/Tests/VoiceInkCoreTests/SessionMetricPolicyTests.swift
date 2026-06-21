@@ -44,6 +44,27 @@ final class SessionMetricPolicyTests: XCTestCase {
         XCTAssertNil(values.speedFactor)
         XCTAssertNil(values.enhancementDuration)
     }
+
+    func testMigrationPreferencePreservesCompletionStorageKey() {
+        withTemporaryDefaults { defaults in
+            XCTAssertEqual(VoiceInkSessionMetricMigrationPreference.completionKey, "HasCompletedStatsMigration")
+            XCTAssertFalse(VoiceInkSessionMetricMigrationPreference.isCompleted(in: defaults))
+
+            VoiceInkSessionMetricMigrationPreference.markCompleted(in: defaults)
+
+            XCTAssertTrue(VoiceInkSessionMetricMigrationPreference.isCompleted(in: defaults))
+            XCTAssertTrue(defaults.bool(forKey: "HasCompletedStatsMigration"))
+        }
+    }
+
+    private func withTemporaryDefaults(_ test: (UserDefaults) -> Void) {
+        let suiteName = "VoiceInkCore.SessionMetricPolicyTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer {
+            defaults.removePersistentDomain(forName: suiteName)
+        }
+        test(defaults)
+    }
 }
 
 private struct Source: VoiceInkSessionMetricSource {

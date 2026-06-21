@@ -8,18 +8,16 @@ final class SessionMetricMigrationService {
     static let shared = SessionMetricMigrationService()
 
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "SessionMetricMigrationService")
-    private let completionKey = "HasCompletedStatsMigration"
     private(set) var isRunning = false
 
     private init() {}
 
     @discardableResult
     func runIfNeeded(modelContainer: ModelContainer) -> Task<Void, Never>? {
-        guard !UserDefaults.standard.bool(forKey: completionKey), !isRunning else { return nil }
+        guard !VoiceInkSessionMetricMigrationPreference.isCompleted(), !isRunning else { return nil }
         isRunning = true
 
         let logger = self.logger
-        let completionKey = self.completionKey
 
         return Task.detached(priority: .utility) {
             let backgroundContext = ModelContext(modelContainer)
@@ -64,7 +62,7 @@ final class SessionMetricMigrationService {
                     try backgroundContext.save()
                 }
 
-                UserDefaults.standard.set(true, forKey: completionKey)
+                VoiceInkSessionMetricMigrationPreference.markCompleted()
                 logger.notice("Completed stats migration with \(insertedCount, privacy: .public) session metric(s)")
             } catch {
                 logger.error("Stats migration failed: \(error.localizedDescription, privacy: .public)")

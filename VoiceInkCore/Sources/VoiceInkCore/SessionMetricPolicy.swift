@@ -48,3 +48,15 @@ public enum VoiceInkSessionMetricPolicy {
         duration.flatMap { $0 > 0 ? $0 : nil }
     }
 }
+
+public enum VoiceInkSessionMetricMigrationPreference {
+    public static let completionKey = "HasCompletedStatsMigration"
+
+    public static func isCompleted(in defaults: UserDefaults = .standard) -> Bool {
+        defaults.bool(forKey: completionKey)
+    }
+
+    public static func markCompleted(in defaults: UserDefaults = .standard) {
+        defaults.set(true, forKey: completionKey)
+    }
+}

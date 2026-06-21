@@ -1,5 +1,6 @@
 import SwiftUI
 import LaunchAtLogin
+import VoiceInkCore
 
 struct MenuBarView: View {
     @Environment(\.openWindow) private var openWindow
@@ -17,7 +18,7 @@ struct MenuBarView: View {
     @State private var launchAtLoginEnabled = LaunchAtLogin.isEnabled
     @State private var menuRefreshTrigger = false
     @State private var isHovered = false
-    @AppStorage(AppDefaults.Keys.showMenuBarIcon) private var showMenuBarIcon = AppDefaults.showMenuBarIconDefault
+    @AppStorage(VoiceInkMenuBarPreference.showMenuBarIconKey) private var showMenuBarIcon = VoiceInkMenuBarPreference.defaultShowMenuBarIcon
     
     var body: some View {
         VStack {

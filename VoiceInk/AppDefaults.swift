@@ -3,12 +3,6 @@ import LaunchAtLogin
 import VoiceInkCore
 
 enum AppDefaults {
-    enum Keys {
-        static let showMenuBarIcon = "ShowMenuBarIcon"
-    }
-
-    static let showMenuBarIconDefault = false
-
     static var registeredDefaults: [String: Any] {
         var defaults = VoiceInkDefaultSettings.macOS.registeredUserDefaults(
             currentTranscriptionModel: "parakeet-tdt-0.6b-v2"
@@ -33,11 +27,10 @@ enum AppDefaults {
             VoiceInkRecorderStylePreference.userDefaultsKey: VoiceInkRecorderStylePreference.defaultRawValue,
 
             // UI & Behavior
-            "IsMenuBarOnly": true,
-            Keys.showMenuBarIcon: showMenuBarIconDefault,
             "DidApplyLaunchAtLoginDefault": false,
         ]
 
+        platformDefaults.merge(VoiceInkMenuBarPreference.registeredDefaults) { _, sharedValue in sharedValue }
         platformDefaults.merge(VoiceInkAppendTrailingSpacePreference.registeredDefaults) { _, sharedValue in sharedValue }
         platformDefaults.merge(VoiceInkModelRuntimePreference.registeredDefaults) { _, sharedValue in sharedValue }
         platformDefaults.merge(VoiceInkRecorderPreviewPreference.registeredDefaults) { _, sharedValue in sharedValue }

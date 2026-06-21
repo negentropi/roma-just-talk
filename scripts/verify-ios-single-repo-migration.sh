@@ -8299,6 +8299,56 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift
 
 require_pattern \
+  "shared menu bar preference lives in VoiceInkCore" \
+  'VoiceInkMenuBarPreference|showMenuBarIconKey|isMenuBarOnlyKey|defaultShowMenuBarIcon|defaultIsMenuBarOnly|registeredDefaults|saveIsMenuBarOnly' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "macOS defaults register shared menu bar preference" \
+  'VoiceInkMenuBarPreference\.registeredDefaults' \
+  VoiceInk/AppDefaults.swift
+
+require_pattern \
+  "macOS menu bar manager uses shared menu bar preference" \
+  'VoiceInkMenuBarPreference\.(saveIsMenuBarOnly|isMenuBarOnly)' \
+  VoiceInk/MenuBarManager.swift
+
+require_pattern \
+  "macOS app scene uses shared menu bar icon preference" \
+  'VoiceInkMenuBarPreference\.(showMenuBarIconKey|defaultShowMenuBarIcon)' \
+  VoiceInk/VoiceInk.swift
+
+require_pattern \
+  "macOS menu bar view uses shared menu bar icon preference" \
+  'VoiceInkMenuBarPreference\.(showMenuBarIconKey|defaultShowMenuBarIcon)' \
+  VoiceInk/Views/MenuBarView.swift
+
+require_pattern \
+  "macOS settings uses shared menu bar icon preference" \
+  'VoiceInkMenuBarPreference\.(showMenuBarIconKey|defaultShowMenuBarIcon)' \
+  VoiceInk/Views/Settings/SettingsView.swift
+
+require_pattern \
+  "macOS diagnostics use shared menu bar preference" \
+  'VoiceInkMenuBarPreference\.isMenuBarOnly' \
+  VoiceInk/Services/SystemInfoService.swift
+
+require_pattern \
+  "core checks execute menu bar preference tests" \
+  'testSharedPreferenceDefaultsPreserveExistingMacOSMenuBarPolicy|testMenuBarPreferencePreservesRegisteredDefaultsAndStorage' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "macOS menu bar shell avoids raw menu bar preference keys" \
+  '"(IsMenuBarOnly|ShowMenuBarIcon)"|AppDefaults\.Keys\.showMenuBarIcon|showMenuBarIconDefault' \
+  VoiceInk/AppDefaults.swift \
+  VoiceInk/MenuBarManager.swift \
+  VoiceInk/VoiceInk.swift \
+  VoiceInk/Views/MenuBarView.swift \
+  VoiceInk/Views/Settings/SettingsView.swift \
+  VoiceInk/Services/SystemInfoService.swift
+
+require_pattern \
   "shared Keychain service uses shared app identity" \
   'service = VoiceInkAppIdentity\.bundleIdentifier' \
   VoiceInkCore/Sources/VoiceInkCore/KeychainQuery.swift

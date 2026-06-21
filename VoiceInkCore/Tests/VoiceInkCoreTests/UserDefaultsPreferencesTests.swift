@@ -50,6 +50,8 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkUserDefaultsKey.ollamaSelectedModel, "ollamaSelectedModel")
         XCTAssertEqual(VoiceInkUserDefaultsKey.customProviderBaseURL, "customProviderBaseURL")
         XCTAssertEqual(VoiceInkUserDefaultsKey.customProviderModel, "customProviderModel")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.showMenuBarIcon, "ShowMenuBarIcon")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.isMenuBarOnly, "IsMenuBarOnly")
     }
 
     func testAIProviderModelSelectionKeyPreservesExistingProviderRawValuePattern() {
@@ -101,6 +103,11 @@ final class UserDefaultsPreferencesTests: XCTestCase {
     func testSharedPreferenceDefaultsPreserveExistingMacOSRuntimeFlags() {
         XCTAssertTrue(VoiceInkPreferenceDefault.prewarmModelOnWake)
         XCTAssertFalse(VoiceInkPreferenceDefault.showLiveTextPreview)
+    }
+
+    func testSharedPreferenceDefaultsPreserveExistingMacOSMenuBarPolicy() {
+        XCTAssertFalse(VoiceInkPreferenceDefault.showMenuBarIcon)
+        XCTAssertTrue(VoiceInkPreferenceDefault.isMenuBarOnly)
     }
 
     func testSharedPreferenceDefaultsPreserveExistingRecordingShortcutFlags() {
@@ -270,6 +277,41 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             completedRemovePunctuationDefaults[PunctuationCleanupMode.legacyRemovePunctuationKey] as? Bool,
             true
         )
+    }
+
+    func testMenuBarPreferencePreservesRegisteredDefaultsAndStorage() {
+        withIsolatedDefaults { defaults in
+            XCTAssertEqual(
+                VoiceInkMenuBarPreference.showMenuBarIconKey,
+                VoiceInkUserDefaultsKey.showMenuBarIcon
+            )
+            XCTAssertEqual(
+                VoiceInkMenuBarPreference.isMenuBarOnlyKey,
+                VoiceInkUserDefaultsKey.isMenuBarOnly
+            )
+            XCTAssertEqual(
+                VoiceInkMenuBarPreference.registeredDefaults[VoiceInkUserDefaultsKey.showMenuBarIcon] as? Bool,
+                VoiceInkPreferenceDefault.showMenuBarIcon
+            )
+            XCTAssertEqual(
+                VoiceInkMenuBarPreference.registeredDefaults[VoiceInkUserDefaultsKey.isMenuBarOnly] as? Bool,
+                VoiceInkPreferenceDefault.isMenuBarOnly
+            )
+
+            XCTAssertFalse(VoiceInkMenuBarPreference.shouldShowMenuBarIcon(from: defaults))
+            XCTAssertFalse(VoiceInkMenuBarPreference.isMenuBarOnly(from: defaults))
+
+            defaults.register(defaults: VoiceInkMenuBarPreference.registeredDefaults)
+
+            XCTAssertFalse(VoiceInkMenuBarPreference.shouldShowMenuBarIcon(from: defaults))
+            XCTAssertTrue(VoiceInkMenuBarPreference.isMenuBarOnly(from: defaults))
+
+            VoiceInkMenuBarPreference.saveShowMenuBarIcon(true, to: defaults)
+            VoiceInkMenuBarPreference.saveIsMenuBarOnly(false, to: defaults)
+
+            XCTAssertTrue(VoiceInkMenuBarPreference.shouldShowMenuBarIcon(from: defaults))
+            XCTAssertFalse(VoiceInkMenuBarPreference.isMenuBarOnly(from: defaults))
+        }
     }
 
     func testDefaultSettingsRegisterUserDefaultsForPlatformSelections() {

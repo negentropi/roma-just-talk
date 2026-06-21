@@ -26,7 +26,7 @@ struct VoiceInkApp: App {
     @StateObject private var activeWindowService = ActiveWindowService.shared
     @AppStorage(VoiceInkUserDefaultsKey.hasCompletedOnboarding) private var hasCompletedOnboarding = false
     @AppStorage("enableAnnouncements") private var enableAnnouncements = true
-    @AppStorage(AppDefaults.Keys.showMenuBarIcon) private var showMenuBarIcon = AppDefaults.showMenuBarIconDefault
+    @AppStorage(VoiceInkMenuBarPreference.showMenuBarIconKey) private var showMenuBarIcon = VoiceInkMenuBarPreference.defaultShowMenuBarIcon
 
     // Audio cleanup manager for automatic deletion of old audio files
     private let audioCleanupManager = AudioCleanupManager.shared

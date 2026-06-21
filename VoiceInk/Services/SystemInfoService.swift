@@ -51,7 +51,7 @@ class SystemInfoService {
         \(getRollingBufferPreloadInfo())
 
         UI SETTINGS:
-        Hide Dock Icon: \(UserDefaults.standard.bool(forKey: "IsMenuBarOnly"))
+        Hide Dock Icon: \(VoiceInkMenuBarPreference.isMenuBarOnly())
         Recorder Style: \(VoiceInkRecorderStylePreference.rawValue())
 
         RECORDING FEEDBACK:

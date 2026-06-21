@@ -8,7 +8,7 @@ class MenuBarManager: ObservableObject {
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "MenuBarManager")
     @Published var isMenuBarOnly: Bool {
         didSet {
-            UserDefaults.standard.set(isMenuBarOnly, forKey: "IsMenuBarOnly")
+            VoiceInkMenuBarPreference.saveIsMenuBarOnly(isMenuBarOnly)
             updateAppActivationPolicy()
         }
     }
@@ -17,7 +17,7 @@ class MenuBarManager: ObservableObject {
     private var engine: VoiceInkEngine?
 
     init() {
-        self.isMenuBarOnly = UserDefaults.standard.bool(forKey: "IsMenuBarOnly")
+        self.isMenuBarOnly = VoiceInkMenuBarPreference.isMenuBarOnly()
         updateAppActivationPolicy()
 
         NotificationCenter.default.addObserver(

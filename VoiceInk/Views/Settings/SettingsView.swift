@@ -22,7 +22,7 @@ struct SettingsView: View {
     @AppStorage(VoiceInkPastePreference.restoreClipboardAfterPasteKey) private var restoreClipboardAfterPaste = VoiceInkPastePreference.defaultRestoreClipboardAfterPaste
     @AppStorage(VoiceInkPastePreference.clipboardRestoreDelayKey) private var clipboardRestoreDelay = VoiceInkPastePreference.defaultClipboardRestoreDelay
     @AppStorage(VoiceInkPasteMethod.userDefaultsKey) private var pasteMethodRawValue = VoiceInkPasteMethod.standard.rawValue
-    @AppStorage(AppDefaults.Keys.showMenuBarIcon) private var showMenuBarIcon = AppDefaults.showMenuBarIconDefault
+    @AppStorage(VoiceInkMenuBarPreference.showMenuBarIconKey) private var showMenuBarIcon = VoiceInkMenuBarPreference.defaultShowMenuBarIcon
     @State private var showResetOnboardingAlert = false
     @State private var hasCancelRecordingShortcut = ShortcutStore.shortcut(for: .cancelRecorder) != nil
     @State private var cancelRecordingShortcutRecorderResetID = 0

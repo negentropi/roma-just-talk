@@ -50,6 +50,8 @@ public enum VoiceInkUserDefaultsKey {
     public static let ollamaSelectedModel = "ollamaSelectedModel"
     public static let customProviderBaseURL = "customProviderBaseURL"
     public static let customProviderModel = "customProviderModel"
+    public static let showMenuBarIcon = "ShowMenuBarIcon"
+    public static let isMenuBarOnly = "IsMenuBarOnly"
 
     public static func selectedAIProviderModel(_ providerRawValue: String) -> String {
         "\(providerRawValue)SelectedModel"
@@ -78,6 +80,8 @@ public enum VoiceInkPreferenceDefault {
     public static let specialShortcutPasteLastTranscriptOnEmptyTap = true
     public static let ollamaBaseURL = "http://localhost:11434"
     public static let macOSSelectedTranscriptionLanguage = "en"
+    public static let showMenuBarIcon = false
+    public static let isMenuBarOnly = true
 }
 
 public struct VoiceInkDefaultSettings: Equatable, Sendable {
@@ -279,6 +283,36 @@ public struct VoiceInkAudioSessionTimeoutPresentation: Equatable, Sendable {
 public enum VoiceInkAudioSessionDeactivationPlan: Equatable, Sendable {
     case immediate
     case delayed(TimeInterval)
+}
+
+public enum VoiceInkMenuBarPreference {
+    public static let showMenuBarIconKey = VoiceInkUserDefaultsKey.showMenuBarIcon
+    public static let isMenuBarOnlyKey = VoiceInkUserDefaultsKey.isMenuBarOnly
+    public static let defaultShowMenuBarIcon = VoiceInkPreferenceDefault.showMenuBarIcon
+    public static let defaultIsMenuBarOnly = VoiceInkPreferenceDefault.isMenuBarOnly
+
+    public static var registeredDefaults: [String: Any] {
+        [
+            showMenuBarIconKey: defaultShowMenuBarIcon,
+            isMenuBarOnlyKey: defaultIsMenuBarOnly
+        ]
+    }
+
+    public static func shouldShowMenuBarIcon(from defaults: UserDefaults = .standard) -> Bool {
+        defaults.bool(forKey: showMenuBarIconKey)
+    }
+
+    public static func saveShowMenuBarIcon(_ shouldShow: Bool, to defaults: UserDefaults = .standard) {
+        defaults.set(shouldShow, forKey: showMenuBarIconKey)
+    }
+
+    public static func isMenuBarOnly(from defaults: UserDefaults = .standard) -> Bool {
+        defaults.bool(forKey: isMenuBarOnlyKey)
+    }
+
+    public static func saveIsMenuBarOnly(_ isMenuBarOnly: Bool, to defaults: UserDefaults = .standard) {
+        defaults.set(isMenuBarOnly, forKey: isMenuBarOnlyKey)
+    }
 }
 
 public enum VoiceInkAudioSessionTimeoutPreference {

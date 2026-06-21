@@ -1,7 +1,8 @@
 const repoUrl = "https://github.com/happyf-weallareeuropean/roma-just-talk";
+const repoBranch = "without/no-adhoc-macos-tcc";
 const latestReleaseUrl = `${repoUrl}/releases/latest`;
 const latestReleaseApi = "https://api.github.com/repos/happyf-weallareeuropean/roma-just-talk/releases/latest";
-const rawBase = "https://raw.githubusercontent.com/happyf-weallareeuropean/roma-just-talk/main/";
+const rawBase = `https://raw.githubusercontent.com/happyf-weallareeuropean/roma-just-talk/${repoBranch}/`;
 const discordId = "freedom_uuuuuuuuuuuuuuunion.p.f";
 const waitlistEmail = "happyfumd@icloud.com";
 
@@ -24,7 +25,7 @@ function escapeHtml(value) {
 function readmeUrl(url, mode) {
   if (/^(https?:|mailto:|#)/.test(url)) return url;
   const cleanUrl = url.replace(/^.\//, "");
-  return mode === "raw" ? `${rawBase}${cleanUrl}` : `${repoUrl}/blob/main/${cleanUrl}`;
+  return mode === "raw" ? `${rawBase}${cleanUrl}` : `${repoUrl}/blob/${repoBranch}/${cleanUrl}`;
 }
 
 async function resolveMacDownloadUrl() {

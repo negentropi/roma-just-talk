@@ -156,6 +156,12 @@ class LocalModelManager: ObservableObject {
         downloadTrackingState.downloadState(for: model, modelsDirectory: Self.modelsDirectory)
     }
 
+    func managementRows() -> [VoiceInkWhisperModelManagementRow] {
+        VoiceInkWhisperModelManagementList.rows { model in
+            downloadState(for: model)
+        }
+    }
+
     private func startDownloadTracking(for model: VoiceInkWhisperModelFileSpec) -> Bool {
         var trackingState = downloadTrackingState
         guard trackingState.startDownload(for: model) else {

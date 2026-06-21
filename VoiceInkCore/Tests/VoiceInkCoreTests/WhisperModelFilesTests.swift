@@ -599,6 +599,34 @@ final class WhisperModelFilesTests: XCTestCase {
         XCTAssertEqual(downloadingState.rowPresentation(for: model).actionSystemImageName, "xmark.circle.fill")
     }
 
+    func testSimpleDownloadManagementListBuildsSharedRows() {
+        let model = VoiceInkWhisperModelFiles.baseModel
+        let rows = VoiceInkWhisperModelManagementList.rows(for: [model]) { model in
+            VoiceInkWhisperModelDownloadState(
+                isDownloaded: true,
+                progress: .simple(modelName: model.modelName, isDownloading: false, progress: nil)
+            )
+        }
+
+        XCTAssertEqual(
+            rows,
+            [
+                VoiceInkWhisperModelManagementRow(
+                    model: model,
+                    presentation: VoiceInkWhisperModelDownloadRowPresentation(
+                        title: "Whisper Base Model",
+                        subtitle: "Multilingual model with good balance of speed and accuracy",
+                        action: .downloaded,
+                        downloadButtonTitle: "Download Model (142 MB)",
+                        progress: .simple(modelName: model.modelName, isDownloading: false, progress: nil)
+                    ),
+                    downloadConfirmation: .download(for: model),
+                    deleteConfirmation: .delete(for: model)
+                )
+            ]
+        )
+    }
+
     func testMacOSDownloadProgressUsesMainAndCoreMLKeys() {
         let startingProgress = VoiceInkWhisperModelDownloadProgress.macOS(
             modelName: "ggml-base",

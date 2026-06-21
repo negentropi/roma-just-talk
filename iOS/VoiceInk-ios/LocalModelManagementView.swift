@@ -14,8 +14,8 @@ struct LocalModelManagementView: View {
     
     var body: some View {
         List {
-            ForEach(VoiceInkWhisperModelFiles.bootstrapModels) { model in
-                ModelRowView(model: model, modelManager: modelManager)
+            ForEach(modelManager.managementRows()) { row in
+                ModelRowView(row: row, modelManager: modelManager)
             }
         }
         .navigationTitle(VoiceInkModelManagementFilter.local.settingsSectionTitle)
@@ -39,29 +39,13 @@ struct LocalModelManagementView: View {
 }
 
 struct ModelRowView: View {
-    let model: VoiceInkWhisperModelFileSpec
+    let row: VoiceInkWhisperModelManagementRow
     @ObservedObject var modelManager: LocalModelManager
     @State private var showingDeleteAlert = false
     @State private var showingDownloadConfirmation = false
-
-    private var downloadState: VoiceInkWhisperModelDownloadState {
-        modelManager.downloadState(for: model)
-    }
-
-    private var downloadConfirmation: VoiceInkWhisperModelOperationConfirmationPresentation {
-        .download(for: model)
-    }
-
-    private var deleteConfirmation: VoiceInkWhisperModelOperationConfirmationPresentation {
-        .delete(for: model)
-    }
-
-    private var rowPresentation: VoiceInkWhisperModelDownloadRowPresentation {
-        downloadState.rowPresentation(for: model)
-    }
     
     var body: some View {
-        let presentation = rowPresentation
+        let presentation = row.presentation
 
         VStack(alignment: .leading, spacing: 8) {
             HStack {
@@ -83,7 +67,7 @@ struct ModelRowView: View {
                         .font(.title2)
                 case .downloading:
                     Button(action: {
-                        modelManager.cancelDownload(for: model)
+                        modelManager.cancelDownload(for: row.model)
                     }) {
                         Image(systemName: presentation.actionSystemImageName)
                             .foregroundColor(.red)
@@ -120,39 +104,39 @@ struct ModelRowView: View {
         }
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
             if presentation.action == .downloaded {
-                Button(deleteConfirmation.primaryButtonTitle) {
+                Button(row.deleteConfirmation.primaryButtonTitle) {
                     showingDeleteAlert = true
                 }
                 .tint(.red)
             }
         }
-        .alert(deleteConfirmation.title, isPresented: $showingDeleteAlert) {
-            Button(deleteConfirmation.primaryButtonTitle, role: .destructive) {
+        .alert(row.deleteConfirmation.title, isPresented: $showingDeleteAlert) {
+            Button(row.deleteConfirmation.primaryButtonTitle, role: .destructive) {
                 deleteModel()
             }
-            Button(deleteConfirmation.cancelButtonTitle, role: .cancel) { }
+            Button(row.deleteConfirmation.cancelButtonTitle, role: .cancel) { }
         } message: {
-            Text(deleteConfirmation.message)
+            Text(row.deleteConfirmation.message)
         }
-        .alert(downloadConfirmation.title, isPresented: $showingDownloadConfirmation) {
-            Button(downloadConfirmation.primaryButtonTitle) {
+        .alert(row.downloadConfirmation.title, isPresented: $showingDownloadConfirmation) {
+            Button(row.downloadConfirmation.primaryButtonTitle) {
                 downloadModel()
             }
-            Button(downloadConfirmation.cancelButtonTitle, role: .cancel) { }
+            Button(row.downloadConfirmation.cancelButtonTitle, role: .cancel) { }
         } message: {
-            Text(downloadConfirmation.message)
+            Text(row.downloadConfirmation.message)
         }
     }
     
     private func downloadModel() {
         Task {
-            await modelManager.downloadModel(model)
+            await modelManager.downloadModel(row.model)
         }
     }
     
     private func deleteModel() {
         do {
-            try modelManager.deleteModel(model)
+            try modelManager.deleteModel(row.model)
             // Force UI update by triggering objectWillChange
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 modelManager.objectWillChange.send()

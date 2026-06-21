@@ -1915,6 +1915,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
 
 require_pattern \
+  "shared Whisper model management rows live in VoiceInkCore" \
+  'VoiceInkWhisperModelManagement(Row|List)|downloadConfirmation|deleteConfirmation' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+
+require_pattern \
   "shared Whisper model operation alert presentation lives in VoiceInkCore" \
   'VoiceInkWhisperModelOperationAlertPresentation' \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
@@ -2127,19 +2132,24 @@ require_pattern \
   'VoiceInkWhisperModelSimpleDownloadTrackingState|downloadTrackingState|downloadState\(for:' \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
+require_pattern \
+  "iOS local model manager exposes shared management rows" \
+  'VoiceInkWhisperModelManagementList\.rows|managementRows' \
+  iOS/VoiceInk-ios/LocalModelManager.swift
+
 reject_pattern \
   "iOS local model manager avoids shell-owned download state dictionaries" \
   '@Published var +(downloadProgress|isDownloading)|isDownloading\[[^]]+\]|downloadProgress\[[^]]+\]' \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
 require_pattern \
-  "iOS local model management uses shared download state" \
-  'modelManager\.downloadState\(for: model\)' \
+  "iOS local model management uses shared management rows" \
+  'modelManager\.managementRows\(\)' \
   iOS/VoiceInk-ios/LocalModelManagementView.swift
 
 require_pattern \
-  "iOS local model management uses shared operation confirmation presentation" \
-  'VoiceInkWhisperModelOperationConfirmationPresentation|downloadConfirmation|deleteConfirmation' \
+  "iOS local model management uses shared row confirmations" \
+  'row\.(downloadConfirmation|deleteConfirmation)' \
   iOS/VoiceInk-ios/LocalModelManagementView.swift
 
 require_pattern \
@@ -2149,7 +2159,12 @@ require_pattern \
 
 require_pattern \
   "iOS local model management uses shared model row presentation" \
-  'rowPresentation|actionSystemImageName' \
+  'row\.presentation|actionSystemImageName' \
+  iOS/VoiceInk-ios/LocalModelManagementView.swift
+
+reject_pattern \
+  "iOS local model management avoids shell-owned model row assembly" \
+  'VoiceInkWhisperModelFiles\.bootstrapModels|modelManager\.downloadState\(for: model\)|private var +(downloadConfirmation|deleteConfirmation|rowPresentation)|VoiceInkWhisperModelOperationConfirmationPresentation' \
   iOS/VoiceInk-ios/LocalModelManagementView.swift
 
 require_pattern \

@@ -359,6 +359,43 @@ public struct VoiceInkWhisperModelDownloadState: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkWhisperModelManagementRow: Equatable, Identifiable, Sendable {
+    public let model: VoiceInkWhisperModelFileSpec
+    public let presentation: VoiceInkWhisperModelDownloadRowPresentation
+    public let downloadConfirmation: VoiceInkWhisperModelOperationConfirmationPresentation
+    public let deleteConfirmation: VoiceInkWhisperModelOperationConfirmationPresentation
+
+    public var id: String { model.id }
+
+    public init(
+        model: VoiceInkWhisperModelFileSpec,
+        presentation: VoiceInkWhisperModelDownloadRowPresentation,
+        downloadConfirmation: VoiceInkWhisperModelOperationConfirmationPresentation,
+        deleteConfirmation: VoiceInkWhisperModelOperationConfirmationPresentation
+    ) {
+        self.model = model
+        self.presentation = presentation
+        self.downloadConfirmation = downloadConfirmation
+        self.deleteConfirmation = deleteConfirmation
+    }
+}
+
+public enum VoiceInkWhisperModelManagementList {
+    public static func rows(
+        for models: [VoiceInkWhisperModelFileSpec] = VoiceInkWhisperModelFiles.bootstrapModels,
+        downloadStateForModel: (VoiceInkWhisperModelFileSpec) -> VoiceInkWhisperModelDownloadState
+    ) -> [VoiceInkWhisperModelManagementRow] {
+        models.map { model in
+            VoiceInkWhisperModelManagementRow(
+                model: model,
+                presentation: downloadStateForModel(model).rowPresentation(for: model),
+                downloadConfirmation: .download(for: model),
+                deleteConfirmation: .delete(for: model)
+            )
+        }
+    }
+}
+
 public struct VoiceInkWhisperModelSimpleDownloadTrackingState: Equatable, Sendable {
     private var isDownloadingByModelID: [String: Bool]
     private var downloadProgressByModelID: [String: Double]

@@ -199,8 +199,7 @@ struct NotesListView: View {
     
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
-            for index in offsets {
-                let note = filteredNotes[index]
+            for note in VoiceInkTranscriptPresentation.deletionTargets(atOffsets: offsets, from: filteredNotes) {
                 do {
                     try note.deleteExistingAudioFile()
                 } catch {

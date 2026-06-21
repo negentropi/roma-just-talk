@@ -280,6 +280,26 @@ final class TranscriptPresentationTests: XCTestCase {
         )
     }
 
+    func testDeletionTargetsUseDisplayedListOffsets() {
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.deletionTargets(
+                atOffsets: IndexSet([0, 2]),
+                from: ["latest", "hidden-by-search", "oldest"]
+            ),
+            ["latest", "oldest"]
+        )
+    }
+
+    func testDeletionTargetsIgnoreStaleOffsets() {
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.deletionTargets(
+                atOffsets: IndexSet([1, 5]),
+                from: ["latest", "oldest"]
+            ),
+            ["oldest"]
+        )
+    }
+
     func testFailedTranscriptTextPreservesMacOSFailurePrefix() {
         XCTAssertEqual(
             VoiceInkTranscriptPresentation.failedTranscriptText(reason: "No model selected"),

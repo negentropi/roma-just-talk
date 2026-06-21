@@ -310,6 +310,15 @@ public enum VoiceInkTranscriptPresentation {
         "This action cannot be undone. Are you sure you want to delete \(selectedCount) item\(selectedCount == 1 ? "" : "s")?"
     }
 
+    public static func deletionTargets<Item>(atOffsets offsets: IndexSet, from displayedItems: [Item]) -> [Item] {
+        offsets.compactMap { index in
+            guard displayedItems.indices.contains(index) else {
+                return nil
+            }
+            return displayedItems[index]
+        }
+    }
+
     public static func failedTranscriptText(reason: String) -> String {
         "Transcription Failed: \(reason)"
     }

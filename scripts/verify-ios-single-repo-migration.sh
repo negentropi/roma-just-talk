@@ -1313,6 +1313,21 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
 
 require_pattern \
+  "shared transcript deletion target selection lives in VoiceInkCore" \
+  'deletionTargets.*atOffsets' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+require_pattern \
+  "core tests pin transcript deletion target selection" \
+  'testDeletionTargetsUseDisplayedListOffsets|testDeletionTargetsIgnoreStaleOffsets' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptPresentationTests.swift
+
+require_pattern \
+  "core check runner executes transcript deletion target tests" \
+  'testDeletionTargetsUseDisplayedListOffsets|testDeletionTargetsIgnoreStaleOffsets' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "shared transcript detail presentation copy lives in VoiceInkCore" \
   'noteDetailNavigationTitle|transcriptTitle|copyTranscriptSystemImageName|retranscribingDisplayText|retryTranscriptionButtonTitle|retryTranscriptionSystemImageName' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
@@ -1393,6 +1408,11 @@ require_pattern \
   'VoiceInkTranscriptPresentation\.deleteConfirmationMessage' \
   VoiceInk/Views/History/TranscriptionHistoryView.swift \
   VoiceInk/Views/History/InlineHistoryView.swift
+
+require_pattern \
+  "iOS note list uses shared deletion target selection" \
+  'VoiceInkTranscriptPresentation\.deletionTargets\(atOffsets: offsets, from: filteredNotes\)' \
+  iOS/VoiceInk-ios/NotesListView.swift
 
 require_pattern \
   "shared history empty-state presentation lives in VoiceInkCore" \
@@ -1537,6 +1557,11 @@ reject_pattern \
   'This action cannot be undone\. Are you sure you want to delete|selectedTranscriptions\.count == 1 \? "" : "s"' \
   VoiceInk/Views/History/TranscriptionHistoryView.swift \
   VoiceInk/Views/History/InlineHistoryView.swift
+
+reject_pattern \
+  "iOS note list avoids shell-owned filtered deletion indexing" \
+  'filteredNotes\[index\]' \
+  iOS/VoiceInk-ios/NotesListView.swift
 
 reject_pattern \
   "macOS audio file row avoids shell-owned transcript action text policy" \

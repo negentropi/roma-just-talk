@@ -5049,8 +5049,8 @@ reject_pattern \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift
 
 require_pattern \
-  "macOS recorder enhancement stores request metadata from shared result" \
-  'enhancement\.requestSystemMessage' \
+  "macOS recorder enhancement stores request metadata through shared record mutation" \
+  'applyEnhancementResult\(enhancement\)' \
   VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
 
 require_pattern \
@@ -5069,8 +5069,8 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/CompletedTranscriptionDraft.swift
 
 require_pattern \
-  "macOS re-enhance action stores request metadata from shared result" \
-  'enhancement\.requestSystemMessage' \
+  "macOS re-enhance action stores request metadata through shared record mutation" \
+  'applyEnhancementResult\(enhancement\)' \
   VoiceInk/Views/AudioPlayerView.swift
 
 reject_pattern \
@@ -5127,14 +5127,39 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift
 
 require_pattern \
+  "mutable transcription records expose shared enhancement result mutation" \
+  'VoiceInkMutableTranscriptionEnhancementRecord|applyEnhancementResult' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift
+
+require_pattern \
+  "mutable transcription records expose shared enhancement failure mutation" \
+  'applyEnhancementFailure' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift
+
+require_pattern \
   "core checks execute cancellation plan tests" \
   'TranscriptionRecordTests\.testCancellationPlanBuildsSharedCanceledStateAndMetadataClears|TranscriptionRecordTests\.testMarkTranscriptionCanceledClearsMutableRecordEnhancementState|TranscriptionRecordTests\.testMarkTranscriptionCanceledPreservesDurationAndModelWhenNotProvided' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute enhancement record mutation tests" \
+  'TranscriptionRecordTests\.testApplyEnhancementResultStoresTextAndMetadata|TranscriptionRecordTests\.testApplyEnhancementFailureStoresFailureTextAndClearsMetadata|TranscriptionRecordTests\.testApplyEnhancementFailureCanOmitEnhancedText' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "migration checklist tracks shared cancellation plan" \
   'canceled-record mutation routes through `VoiceInkTranscriptionRecordCancellationPlan`' \
   docs/ios-single-repo-migration.md
+
+require_pattern \
+  "migration checklist tracks shared enhancement record mutation" \
+  'apply AI enhancement success/failure metadata through `VoiceInkMutableTranscriptionEnhancementRecord`' \
+  docs/ios-single-repo-migration.md
+
+require_pattern \
+  "macOS transcription model exposes shared enhancement metadata adapter" \
+  'VoiceInkMutableTranscriptionEnhancementMetadataRecord' \
+  VoiceInk/Models/Transcription.swift
 
 require_pattern \
   "macOS transcription model exposes shared failure adapter" \
@@ -5159,6 +5184,16 @@ require_pattern \
 require_pattern \
   "macOS transcription pipeline uses shared failed record adapter" \
   'markAsFailedTranscription\(reason: errorDescription\)' \
+  VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
+
+require_pattern \
+  "macOS transcription pipeline applies enhancement result through shared record mutation" \
+  'applyEnhancementResult\(enhancement\)' \
+  VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
+
+require_pattern \
+  "macOS transcription pipeline applies enhancement failure through shared record mutation" \
+  'applyEnhancementFailure\(' \
   VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
 
 require_pattern \
@@ -5331,9 +5366,20 @@ require_pattern \
   'VoiceInkPostProcessingFailurePresentation\.enhancementUnavailableMessage' \
   VoiceInk/Views/AudioPlayerView.swift
 
+require_pattern \
+  "macOS audio player applies enhancement result through shared record mutation" \
+  'applyEnhancementResult\(enhancement\)' \
+  VoiceInk/Views/AudioPlayerView.swift
+
 reject_pattern \
   "macOS audio player avoids shell-only action status and re-enhance guard copy" \
   '"Retranscription successful"|"Re-enhancement successful"|"Retranscription failed"|"Re-enhancement failed"|"AI Enhancement is not enabled or configured"' \
+  VoiceInk/Views/AudioPlayerView.swift
+
+reject_pattern \
+  "macOS enhancement record callers avoid shell-owned enhancement metadata mutation" \
+  'transcription\.(enhancedText|aiEnhancementModelName|promptName|enhancementDuration|aiRequestSystemMessage|aiRequestUserMessage)\s*=' \
+  VoiceInk/Transcription/Engine/TranscriptionPipeline.swift \
   VoiceInk/Views/AudioPlayerView.swift
 
 require_pattern \

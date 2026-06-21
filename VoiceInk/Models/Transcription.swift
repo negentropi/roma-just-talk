@@ -3,7 +3,7 @@ import SwiftData
 import VoiceInkCore
 
 @Model
-final class Transcription: VoiceInkStoredAudioRecord, VoiceInkSessionMetricSource, VoiceInkPerformanceRecord {
+final class Transcription: VoiceInkStoredAudioRecord, VoiceInkSessionMetricSource, VoiceInkPerformanceRecord, VoiceInkMutableTranscriptionEnhancementMetadataRecord {
     var id: UUID
     var text: String
     var enhancedText: String?

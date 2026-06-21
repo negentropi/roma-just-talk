@@ -45,16 +45,61 @@ public struct VoiceInkTranscriptionRecordCancellationPlan: Equatable, Sendable {
     }
 }
 
-public protocol VoiceInkMutableTranscriptionRecord: AnyObject {
-    var text: String { get set }
+public protocol VoiceInkMutableTranscriptionEnhancementRecord: AnyObject {
     var enhancedText: String? { get set }
+    var aiEnhancementModelName: String? { get set }
+    var enhancementDuration: TimeInterval? { get set }
+}
+
+public protocol VoiceInkMutableTranscriptionEnhancementMetadataRecord: VoiceInkMutableTranscriptionEnhancementRecord {
+    var promptName: String? { get set }
+    var aiRequestSystemMessage: String? { get set }
+    var aiRequestUserMessage: String? { get set }
+}
+
+public protocol VoiceInkMutableTranscriptionRecord: VoiceInkMutableTranscriptionEnhancementRecord {
+    var text: String { get set }
     var duration: TimeInterval { get set }
     var transcriptionModelName: String? { get set }
-    var aiEnhancementModelName: String? { get set }
     var transcriptionDuration: TimeInterval? { get set }
-    var enhancementDuration: TimeInterval? { get set }
     var transcriptionStatus: VoiceInkTranscriptionStatus { get set }
     var transcriptionError: String? { get set }
+}
+
+public extension VoiceInkMutableTranscriptionEnhancementRecord {
+    func applyEnhancementResult(_ result: VoiceInkAIEnhancementResult) {
+        enhancedText = result.text
+        aiEnhancementModelName = result.modelName
+        enhancementDuration = result.duration
+
+        if let metadataRecord = self as? any VoiceInkMutableTranscriptionEnhancementMetadataRecord {
+            metadataRecord.promptName = result.promptName
+            metadataRecord.aiRequestSystemMessage = result.requestSystemMessage
+            metadataRecord.aiRequestUserMessage = result.requestUserMessage
+        }
+    }
+
+    func applyEnhancementFailure(
+        reason: String,
+        policy: VoiceInkEnhancementFailureDraftPolicy
+    ) {
+        switch policy {
+        case .omitEnhancedText:
+            enhancedText = nil
+        case .storeFailureText:
+            enhancedText = VoiceInkPostProcessingFailurePresentation.enhancementFailureText(
+                reason: reason
+            )
+        }
+        aiEnhancementModelName = nil
+        enhancementDuration = nil
+
+        if let metadataRecord = self as? any VoiceInkMutableTranscriptionEnhancementMetadataRecord {
+            metadataRecord.promptName = nil
+            metadataRecord.aiRequestSystemMessage = nil
+            metadataRecord.aiRequestUserMessage = nil
+        }
+    }
 }
 
 public extension VoiceInkMutableTranscriptionRecord {

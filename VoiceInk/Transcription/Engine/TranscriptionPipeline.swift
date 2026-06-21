@@ -237,17 +237,13 @@ class TranscriptionPipeline {
 
                 do {
                     let enhancement = try await enhancementService.enhance(textForAI)
-                    transcription.enhancedText = enhancement.text
-                    transcription.aiEnhancementModelName = enhancement.modelName
-                    transcription.promptName = enhancement.promptName
-                    transcription.enhancementDuration = enhancement.duration
-                    transcription.aiRequestSystemMessage = enhancement.requestSystemMessage
-                    transcription.aiRequestUserMessage = enhancement.requestUserMessage
+                    transcription.applyEnhancementResult(enhancement)
                     finalPastedText = enhancement.text
                 } catch {
                     let errorDescription = VoiceInkErrorDescription.text(for: error)
-                    transcription.enhancedText = VoiceInkPostProcessingFailurePresentation.enhancementFailureText(
-                        reason: errorDescription
+                    transcription.applyEnhancementFailure(
+                        reason: errorDescription,
+                        policy: .storeFailureText
                     )
                     await MainActor.run {
                         NotificationManager.shared.showNotification(

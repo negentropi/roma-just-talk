@@ -215,6 +215,67 @@ final class TranscriptionRecordTests: XCTestCase {
             XCTFail("Unexpected error: \(error)")
         }
     }
+
+    func testApplyEnhancementResultStoresTextAndMetadata() {
+        let record = StubMutableTranscriptionEnhancementMetadataRecord()
+        let result = VoiceInkAIEnhancementResult(
+            text: "Enhanced transcript",
+            duration: 1.25,
+            modelName: "gpt-5",
+            promptName: "Assistant",
+            requestSystemMessage: "system",
+            requestUserMessage: "user"
+        )
+
+        record.applyEnhancementResult(result)
+
+        XCTAssertEqual(record.enhancedText, "Enhanced transcript")
+        XCTAssertEqual(record.aiEnhancementModelName, "gpt-5")
+        XCTAssertEqual(record.promptName, "Assistant")
+        XCTAssertEqual(record.enhancementDuration, 1.25)
+        XCTAssertEqual(record.aiRequestSystemMessage, "system")
+        XCTAssertEqual(record.aiRequestUserMessage, "user")
+    }
+
+    func testApplyEnhancementFailureStoresFailureTextAndClearsMetadata() {
+        let record = StubMutableTranscriptionEnhancementMetadataRecord(
+            enhancedText: "old",
+            aiEnhancementModelName: "old-model",
+            enhancementDuration: 2,
+            promptName: "old-prompt",
+            aiRequestSystemMessage: "old-system",
+            aiRequestUserMessage: "old-user"
+        )
+
+        record.applyEnhancementFailure(reason: "timeout", policy: .storeFailureText)
+
+        XCTAssertEqual(record.enhancedText, "Enhancement failed: timeout")
+        XCTAssertNil(record.aiEnhancementModelName)
+        XCTAssertNil(record.promptName)
+        XCTAssertNil(record.enhancementDuration)
+        XCTAssertNil(record.aiRequestSystemMessage)
+        XCTAssertNil(record.aiRequestUserMessage)
+    }
+
+    func testApplyEnhancementFailureCanOmitEnhancedText() {
+        let record = StubMutableTranscriptionEnhancementMetadataRecord(
+            enhancedText: "old",
+            aiEnhancementModelName: "old-model",
+            enhancementDuration: 2,
+            promptName: "old-prompt",
+            aiRequestSystemMessage: "old-system",
+            aiRequestUserMessage: "old-user"
+        )
+
+        record.applyEnhancementFailure(reason: "timeout", policy: .omitEnhancedText)
+
+        XCTAssertNil(record.enhancedText)
+        XCTAssertNil(record.aiEnhancementModelName)
+        XCTAssertNil(record.promptName)
+        XCTAssertNil(record.enhancementDuration)
+        XCTAssertNil(record.aiRequestSystemMessage)
+        XCTAssertNil(record.aiRequestUserMessage)
+    }
 }
 
 private class StubMutableTranscriptionRecord: VoiceInkMutableTranscriptionRecord {
@@ -262,5 +323,30 @@ private final class StubStoredTranscriptionRecord: StubMutableTranscriptionRecor
         self.audioFileURL = audioFileURL
         self.storedAudioRecordingsDirectory = storedAudioRecordingsDirectory
         super.init()
+    }
+}
+
+private final class StubMutableTranscriptionEnhancementMetadataRecord: VoiceInkMutableTranscriptionEnhancementMetadataRecord {
+    var enhancedText: String?
+    var aiEnhancementModelName: String?
+    var enhancementDuration: TimeInterval?
+    var promptName: String?
+    var aiRequestSystemMessage: String?
+    var aiRequestUserMessage: String?
+
+    init(
+        enhancedText: String? = nil,
+        aiEnhancementModelName: String? = nil,
+        enhancementDuration: TimeInterval? = nil,
+        promptName: String? = nil,
+        aiRequestSystemMessage: String? = nil,
+        aiRequestUserMessage: String? = nil
+    ) {
+        self.enhancedText = enhancedText
+        self.aiEnhancementModelName = aiEnhancementModelName
+        self.enhancementDuration = enhancementDuration
+        self.promptName = promptName
+        self.aiRequestSystemMessage = aiRequestSystemMessage
+        self.aiRequestUserMessage = aiRequestUserMessage
     }
 }

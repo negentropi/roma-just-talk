@@ -7,6 +7,7 @@
 
 import UIKit
 import KeyboardKit
+import VoiceInkCore
 
 class KeyboardViewController: KeyboardInputViewController {
     

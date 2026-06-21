@@ -73,3 +73,26 @@ public enum VoiceInkAppIdentity {
         "\(bundleIdentifier).\(component)"
     }
 }
+
+public enum VoiceInkAppDeepLink: Equatable, Sendable {
+    case record
+
+    public var url: URL {
+        switch self {
+        case .record:
+            return VoiceInkAppIdentity.iOSRecordDeepLinkURL
+        }
+    }
+
+    public init?(url: URL) {
+        guard url.scheme == VoiceInkAppIdentity.iOSRecordDeepLinkScheme else {
+            return nil
+        }
+
+        guard url.host == VoiceInkAppIdentity.iOSRecordDeepLinkHost else {
+            return nil
+        }
+
+        self = .record
+    }
+}

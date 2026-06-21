@@ -14,6 +14,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AppIdentityTests.testMacOSStorageAlertPresentationPreservesStartupCopy", run: { AppIdentityTests().testMacOSStorageAlertPresentationPreservesStartupCopy() }),
             VoiceInkCoreCheck(name: "AppIdentityTests.testMacOSApplicationSupportDirectoryUsesBundleIdentifier", run: { AppIdentityTests().testMacOSApplicationSupportDirectoryUsesBundleIdentifier() }),
             VoiceInkCoreCheck(name: "AppIdentityTests.testBundleScopedErrorDomainUsesBundleIdentifier", run: { AppIdentityTests().testBundleScopedErrorDomainUsesBundleIdentifier() }),
+            VoiceInkCoreCheck(name: "AppIdentityTests.testIOSRecordDeepLinkContractRoundTripsThroughSharedCore", run: { try AppIdentityTests().testIOSRecordDeepLinkContractRoundTripsThroughSharedCore() }),
             VoiceInkCoreCheck(name: "AppDataResetTests.testIOSResetFilePlanPreservesExistingDirectoryPolicy", run: { AppDataResetTests().testIOSResetFilePlanPreservesExistingDirectoryPolicy() }),
             VoiceInkCoreCheck(name: "AppDataResetTests.testResetFilePlanRemovesDirectoriesAndEmptiesCacheDirectoriesBestEffort", run: { try AppDataResetTests().testResetFilePlanRemovesDirectoriesAndEmptiesCacheDirectoriesBestEffort() }),
             VoiceInkCoreCheck(name: "OnboardingPresentationTests.testIOSOnboardingAppIconFallbackPreservesSymbolName", run: { OnboardingPresentationTests().testIOSOnboardingAppIconFallbackPreservesSymbolName() }),

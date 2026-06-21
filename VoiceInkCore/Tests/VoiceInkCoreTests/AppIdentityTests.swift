@@ -64,4 +64,15 @@ final class AppIdentityTests: XCTestCase {
             "com.prakashjoshipax.VoiceInk.AudioRecorder"
         )
     }
+
+    func testIOSRecordDeepLinkContractRoundTripsThroughSharedCore() throws {
+        let url = VoiceInkAppDeepLink.record.url
+
+        XCTAssertEqual(url, VoiceInkAppIdentity.iOSRecordDeepLinkURL)
+        XCTAssertEqual(url.scheme, VoiceInkAppIdentity.iOSRecordDeepLinkScheme)
+        XCTAssertEqual(url.host, VoiceInkAppIdentity.iOSRecordDeepLinkHost)
+        XCTAssertEqual(VoiceInkAppDeepLink(url: url), .record)
+        XCTAssertNil(VoiceInkAppDeepLink(url: try XCTUnwrap(URL(string: "voiceink://settings"))))
+        XCTAssertNil(VoiceInkAppDeepLink(url: try XCTUnwrap(URL(string: "roma://record"))))
+    }
 }

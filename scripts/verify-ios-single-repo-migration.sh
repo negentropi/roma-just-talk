@@ -209,7 +209,6 @@ git_root="$(git rev-parse --show-toplevel)"
 
 section "iOS ported assets and resources"
 require_file iOS/Shared/AppGroupCoordinator.swift
-require_file iOS/Shared/VoiceInkAppDeepLink.swift
 require_file iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
 require_file iOS/Shared/VoiceInkKeyboardRecordingButtonPresentation.swift
 require_file iOS/Shared/VoiceInkKeyboardRecordingTiming.swift
@@ -228,6 +227,7 @@ reject_file iOS/index.html
 reject_file iOS/PRIVACY.html
 reject_file iOS/PRIVACY.md
 reject_file iOS/app-icon.png
+reject_file iOS/Shared/VoiceInkAppDeepLink.swift
 reject_file iOS/VoiceInk-ios/VoiceInk-ios
 reject_file iOS/VoiceInk-ios/KeychainService.swift
 
@@ -285,7 +285,7 @@ reject_pattern \
 
 reject_pattern \
   "iOS App Group keyboard bridge implementation stays out of VoiceInkCore" \
-  '\b(VoiceInkAppGroupRecordingBridge|VoiceInkAppDeepLink|AppGroupCoordinator|CFNotificationCenter|DarwinNotify)\b' \
+  '\b(VoiceInkAppGroupRecordingBridge|AppGroupCoordinator|CFNotificationCenter|DarwinNotify)\b' \
   VoiceInkCore/Sources/VoiceInkCore \
   VoiceInkCore/Tests/VoiceInkCoreTests
 
@@ -7650,9 +7650,14 @@ require_pattern \
   iOS/VoiceInk-ios/LibWhisper.swift
 
 require_pattern \
-  "iOS record deep-link adapter uses shared app identity" \
-  'VoiceInkAppIdentity\.(iOSRecordDeepLinkScheme|iOSRecordDeepLinkHost|iOSRecordDeepLinkURL)' \
-  iOS/Shared/VoiceInkAppDeepLink.swift
+  "VoiceInkCore owns iOS record deep-link contract" \
+  'public enum VoiceInkAppDeepLink|public init\?\(url: URL\)|VoiceInkAppIdentity\.iOSRecordDeepLinkURL' \
+  VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift
+
+require_pattern \
+  "VoiceInkCore checks cover iOS record deep-link contract" \
+  'testIOSRecordDeepLinkContractRoundTripsThroughSharedCore' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_context_pattern_count_at_least \
   "iOS keyboard target depends on shared app identity package product" \
@@ -7768,7 +7773,6 @@ require_pattern \
 reject_pattern \
   "iOS shared bridge avoids duplicate app identity literals" \
   '"(voiceink|record|group\.com\.prakashjoshipax\.VoiceInk|com\.prakashjoshipax\.VoiceInk\.(stopRecording|recordingStateChanged))"' \
-  iOS/Shared/VoiceInkAppDeepLink.swift \
   iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
 
 require_pattern \
@@ -7839,6 +7843,16 @@ require_pattern \
 require_pattern \
   "iOS keyboard controller uses shared recording timing" \
   'VoiceInkKeyboardRecordingTiming\.(recordingStatusPollingInterval|openAppFallbackResetDelay)' \
+  iOS/VoiceInkKeyboard/KeyboardViewController.swift
+
+require_pattern \
+  "iOS app deep-link recording uses shared core deep-link contract" \
+  'VoiceInkAppDeepLink\(url: url\)' \
+  iOS/VoiceInk-ios/VoiceInk_iosApp.swift
+
+require_pattern \
+  "iOS keyboard recording opens shared core record deep-link URL" \
+  'VoiceInkAppDeepLink\.record\.url' \
   iOS/VoiceInkKeyboard/KeyboardViewController.swift
 
 require_pattern \

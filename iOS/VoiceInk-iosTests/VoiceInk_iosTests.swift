@@ -3,7 +3,7 @@ import VoiceInkCore
 @testable import VoiceInk_ios
 
 final class VoiceInkIOSTests: XCTestCase {
-    func testRecordDeepLinkRoundTripsThroughSharedShellURL() throws {
+    func testRecordDeepLinkRoundTripsThroughSharedCoreURL() throws {
         let url = VoiceInkAppDeepLink.record.url
 
         XCTAssertEqual(url, VoiceInkAppIdentity.iOSRecordDeepLinkURL)

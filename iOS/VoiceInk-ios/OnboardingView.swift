@@ -143,12 +143,19 @@ struct ModelDownloadOnboardingView: View {
                         
                         Spacer()
                         
-                        if presentation.canCancelDownload {
+                        switch presentation.action {
+                        case .downloading:
                             ProgressView()
                                 .progressViewStyle(CircularProgressViewStyle())
-                        } else {
+
+                        case .downloaded:
                             Image(systemName: presentation.actionSystemImageName)
-                                .foregroundColor(presentation.isDownloaded ? .green : .accentColor)
+                                .foregroundColor(.green)
+                                .font(.title)
+
+                        case .download:
+                            Image(systemName: presentation.actionSystemImageName)
+                                .foregroundColor(.accentColor)
                                 .font(.title)
                         }
                     }
@@ -180,12 +187,13 @@ struct ModelDownloadOnboardingView: View {
             
             // Bottom Action Buttons
             VStack(spacing: 16) {
-                if presentation.canCancelDownload {
+                switch presentation.action {
+                case .downloading:
                     Button(presentation.progress.compactStatusText) {}
                         .buttonStyle(OnboardingButtonStyle())
                         .disabled(true)
 
-                } else if presentation.isDownloaded {
+                case .downloaded:
                     Button(onboardingPresentation.continueButtonTitle) {
                         withAnimation(.easeInOut(duration: 0.3)) {
                             currentStep.advance()
@@ -193,7 +201,7 @@ struct ModelDownloadOnboardingView: View {
                     }
                     .buttonStyle(OnboardingButtonStyle())
 
-                } else if presentation.canStartDownload {
+                case .download:
                     Button(action: {
                         showDownloadConfirmation = true
                     }) {

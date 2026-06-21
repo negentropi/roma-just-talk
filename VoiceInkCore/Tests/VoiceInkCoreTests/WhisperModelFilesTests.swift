@@ -604,10 +604,7 @@ final class WhisperModelFilesTests: XCTestCase {
             )
         )
         let downloadingPresentation = downloadingState.rowPresentation(for: model)
-        XCTAssertFalse(downloadingPresentation.isDownloaded)
-        XCTAssertFalse(downloadingPresentation.canStartDownload)
-        XCTAssertTrue(downloadingPresentation.canCancelDownload)
-        XCTAssertFalse(downloadingPresentation.canDeleteDownloadedModel)
+        XCTAssertEqual(downloadingPresentation.action, .downloading)
         XCTAssertTrue(downloadingPresentation.shouldShowProgress)
 
         let downloadedState = VoiceInkWhisperModelDownloadState(isDownloaded: true, progress: .simple(
@@ -618,10 +615,6 @@ final class WhisperModelFilesTests: XCTestCase {
         let downloadedPresentation = downloadedState.rowPresentation(for: model)
         XCTAssertEqual(downloadedPresentation.action, .downloaded)
         XCTAssertEqual(downloadedPresentation.actionSystemImageName, "checkmark.circle.fill")
-        XCTAssertTrue(downloadedPresentation.isDownloaded)
-        XCTAssertFalse(downloadedPresentation.canStartDownload)
-        XCTAssertFalse(downloadedPresentation.canCancelDownload)
-        XCTAssertTrue(downloadedPresentation.canDeleteDownloadedModel)
 
         let idleState = VoiceInkWhisperModelDownloadState(isDownloaded: false, progress: .simple(
             modelName: model.modelName,
@@ -632,10 +625,6 @@ final class WhisperModelFilesTests: XCTestCase {
         XCTAssertEqual(idlePresentation.action, .download)
         XCTAssertEqual(idlePresentation.actionSystemImageName, "icloud.and.arrow.down")
         XCTAssertEqual(idlePresentation.downloadButtonSystemImageName, "arrow.down.circle.fill")
-        XCTAssertFalse(idlePresentation.isDownloaded)
-        XCTAssertTrue(idlePresentation.canStartDownload)
-        XCTAssertFalse(idlePresentation.canCancelDownload)
-        XCTAssertFalse(idlePresentation.canDeleteDownloadedModel)
         XCTAssertFalse(idlePresentation.shouldShowProgress)
         XCTAssertEqual(downloadingPresentation.actionSystemImageName, "xmark.circle.fill")
     }

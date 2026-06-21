@@ -2947,13 +2947,13 @@ require_pattern \
   iOS/VoiceInk-ios/LocalModelManagementView.swift
 
 require_pattern \
-  "iOS local model management uses shared row action affordances" \
-  'isDownloaded|canStartDownload|canCancelDownload|canDeleteDownloadedModel' \
+  "iOS local model management uses shared row action enum" \
+  'presentation\.action' \
   iOS/VoiceInk-ios/LocalModelManagementView.swift
 
 reject_pattern \
-  "iOS local model management avoids shell-owned row action branching" \
-  'switch +presentation\.action|presentation\.action *==' \
+  "iOS local model management avoids shallow row action booleans" \
+  'presentation\.(isDownloaded|canStartDownload|canCancelDownload|canDeleteDownloadedModel)\b' \
   iOS/VoiceInk-ios/LocalModelManagementView.swift
 
 reject_pattern \
@@ -3017,13 +3017,13 @@ require_pattern \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 require_pattern \
-  "iOS onboarding uses shared model row action affordances" \
-  'isDownloaded|canStartDownload|canCancelDownload' \
+  "iOS onboarding uses shared model row action enum" \
+  'presentation\.action' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 reject_pattern \
-  "iOS onboarding avoids shell-owned row action branching" \
-  'switch +presentation\.action|presentation\.action *==' \
+  "iOS onboarding avoids shallow row action booleans" \
+  'presentation\.(isDownloaded|canStartDownload|canCancelDownload|canDeleteDownloadedModel)\b' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 reject_pattern \
@@ -3235,6 +3235,28 @@ reject_pattern \
 reject_pattern \
   "iOS model download views avoid raw download-state presentation branching" \
   '(downloadState|baseModelDownloadState)\.(isDownloaded|isDownloading|progress\.isActive|progress\.compactStatusText|progress\.percentText|progress\.fraction)|VoiceInkWhisperModelDownloadProgress\.downloadActionTitle' \
+  iOS/VoiceInk-ios/LocalModelManagementView.swift \
+  iOS/VoiceInk-ios/OnboardingView.swift
+
+require_pattern \
+  "shared local model row presentation exposes one action enum" \
+  'VoiceInkWhisperModelDownloadRowAction' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+
+reject_pattern \
+  "shared local model row presentation avoids shallow action booleans" \
+  'public var +(isDownloaded|canStartDownload|canCancelDownload|canDeleteDownloadedModel)\b' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+
+require_pattern \
+  "iOS model download views switch on shared row action" \
+  'switch presentation\.action' \
+  iOS/VoiceInk-ios/LocalModelManagementView.swift \
+  iOS/VoiceInk-ios/OnboardingView.swift
+
+reject_pattern \
+  "iOS model download views avoid shallow row action booleans" \
+  'presentation\.(isDownloaded|canStartDownload|canCancelDownload|canDeleteDownloadedModel)\b' \
   iOS/VoiceInk-ios/LocalModelManagementView.swift \
   iOS/VoiceInk-ios/OnboardingView.swift
 

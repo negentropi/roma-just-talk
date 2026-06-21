@@ -311,22 +311,6 @@ public struct VoiceInkWhisperModelDownloadRowPresentation: Equatable, Sendable {
         "arrow.down.circle.fill"
     }
 
-    public var isDownloaded: Bool {
-        action == .downloaded
-    }
-
-    public var canStartDownload: Bool {
-        action == .download
-    }
-
-    public var canCancelDownload: Bool {
-        action == .downloading
-    }
-
-    public var canDeleteDownloadedModel: Bool {
-        isDownloaded
-    }
-
     public var shouldShowProgress: Bool {
         progress.isActive
     }

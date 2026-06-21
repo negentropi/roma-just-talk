@@ -112,6 +112,73 @@ public struct VoiceInkAudioPlaybackTimerTickPlan: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkAudioPlaybackState: Equatable, Sendable {
+    public let isPlaying: Bool
+    public let currentTime: TimeInterval
+    public let duration: TimeInterval
+    public let playbackRate: Float
+
+    public init(
+        isPlaying: Bool,
+        currentTime: TimeInterval,
+        duration: TimeInterval,
+        playbackRate: Float
+    ) {
+        self.isPlaying = isPlaying
+        self.currentTime = currentTime
+        self.duration = duration
+        self.playbackRate = playbackRate
+    }
+
+    public func loaded(
+        duration: TimeInterval,
+        resetCurrentTime: Bool
+    ) -> VoiceInkAudioPlaybackState {
+        copy(
+            currentTime: resetCurrentTime ? 0 : currentTime,
+            duration: duration
+        )
+    }
+
+    public func playing() -> VoiceInkAudioPlaybackState {
+        copy(isPlaying: true)
+    }
+
+    public func paused() -> VoiceInkAudioPlaybackState {
+        copy(isPlaying: false)
+    }
+
+    public func stopped() -> VoiceInkAudioPlaybackState {
+        copy(isPlaying: false, currentTime: 0)
+    }
+
+    public func seeking(to time: TimeInterval) -> VoiceInkAudioPlaybackState {
+        copy(currentTime: VoiceInkAudioPlaybackTimeline.clampedTime(time, duration: duration))
+    }
+
+    public func updatingCurrentTime(_ time: TimeInterval) -> VoiceInkAudioPlaybackState {
+        copy(currentTime: time)
+    }
+
+    public func cyclingPlaybackRate() -> VoiceInkAudioPlaybackState {
+        copy(playbackRate: VoiceInkAudioPlaybackRate.next(after: playbackRate))
+    }
+
+    private func copy(
+        isPlaying: Bool? = nil,
+        currentTime: TimeInterval? = nil,
+        duration: TimeInterval? = nil,
+        playbackRate: Float? = nil
+    ) -> VoiceInkAudioPlaybackState {
+        VoiceInkAudioPlaybackState(
+            isPlaying: isPlaying ?? self.isPlaying,
+            currentTime: currentTime ?? self.currentTime,
+            duration: duration ?? self.duration,
+            playbackRate: playbackRate ?? self.playbackRate
+        )
+    }
+}
+
 public enum VoiceInkAudioPlaybackRate {
     public static let defaultRate: Float = 1.0
     public static let controlTitle = "Playback speed"

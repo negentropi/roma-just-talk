@@ -15,6 +15,31 @@ final class AudioPlayer: ObservableObject {
     
     private var audioPlayer: AVAudioPlayer?
     private var timer: Timer?
+
+    private var playbackState: VoiceInkAudioPlaybackState {
+        get {
+            VoiceInkAudioPlaybackState(
+                isPlaying: isPlaying,
+                currentTime: currentTime,
+                duration: duration,
+                playbackRate: playbackRate
+            )
+        }
+        set {
+            if isPlaying != newValue.isPlaying {
+                isPlaying = newValue.isPlaying
+            }
+            if currentTime != newValue.currentTime {
+                currentTime = newValue.currentTime
+            }
+            if duration != newValue.duration {
+                duration = newValue.duration
+            }
+            if playbackRate != newValue.playbackRate {
+                playbackRate = newValue.playbackRate
+            }
+        }
+    }
     
     func loadAudio(from path: String) {
         isLoading = true
@@ -25,8 +50,10 @@ final class AudioPlayer: ObservableObject {
             audioPlayer = try AVAudioPlayer(contentsOf: url)
             audioPlayer?.enableRate = true
             audioPlayer?.prepareToPlay()
-            duration = audioPlayer?.duration ?? 0
-            currentTime = 0
+            playbackState = playbackState.loaded(
+                duration: audioPlayer?.duration ?? 0,
+                resetCurrentTime: true
+            )
             isLoading = false
         } catch {
             print("Failed to load audio: \(error)")
@@ -43,7 +70,7 @@ final class AudioPlayer: ObservableObject {
 
             player.rate = playbackRate
             player.play()
-            isPlaying = true
+            playbackState = playbackState.playing()
             startTimer()
         } catch {
             print("Failed to play audio: \(error)")
@@ -52,27 +79,27 @@ final class AudioPlayer: ObservableObject {
     
     func pause() {
         audioPlayer?.pause()
-        isPlaying = false
+        playbackState = playbackState.paused()
         stopTimer()
     }
     
     func stop() {
         audioPlayer?.stop()
         audioPlayer?.currentTime = 0
-        currentTime = 0
-        isPlaying = false
+        playbackState = playbackState.stopped()
         stopTimer()
     }
     
     func seek(to time: TimeInterval) {
-        let clampedTime = VoiceInkAudioPlaybackTimeline.clampedTime(time, duration: duration)
-        audioPlayer?.currentTime = clampedTime
-        currentTime = clampedTime
+        let state = playbackState.seeking(to: time)
+        audioPlayer?.currentTime = state.currentTime
+        playbackState = state
     }
 
     func cyclePlaybackRate() {
-        playbackRate = VoiceInkAudioPlaybackRate.next(after: playbackRate)
-        audioPlayer?.rate = playbackRate
+        let state = playbackState.cyclingPlaybackRate()
+        playbackState = state
+        audioPlayer?.rate = state.playbackRate
     }
     
     private func startTimer() {
@@ -84,11 +111,14 @@ final class AudioPlayer: ObservableObject {
                     playerIsPlaying: player.isPlaying,
                     shellIsPlaying: self.isPlaying
                 )
-                self.currentTime = plan.currentTime
+                var state = self.playbackState.updatingCurrentTime(plan.currentTime)
 
                 if case .markStopped = plan.action {
-                    self.isPlaying = false
+                    state = state.paused()
+                    self.playbackState = state
                     self.stopTimer()
+                } else {
+                    self.playbackState = state
                 }
             }
         }

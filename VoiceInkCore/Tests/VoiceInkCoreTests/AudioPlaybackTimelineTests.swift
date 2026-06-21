@@ -79,6 +79,57 @@ final class AudioPlaybackTimelineTests: XCTestCase {
         )
     }
 
+    func testPlaybackStateLoadPreservesPlatformResetBehavior() {
+        let state = VoiceInkAudioPlaybackState(
+            isPlaying: true,
+            currentTime: 4,
+            duration: 10,
+            playbackRate: 1.5
+        )
+
+        XCTAssertEqual(
+            state.loaded(duration: 12, resetCurrentTime: true),
+            VoiceInkAudioPlaybackState(isPlaying: true, currentTime: 0, duration: 12, playbackRate: 1.5)
+        )
+        XCTAssertEqual(
+            state.loaded(duration: 12, resetCurrentTime: false),
+            VoiceInkAudioPlaybackState(isPlaying: true, currentTime: 4, duration: 12, playbackRate: 1.5)
+        )
+    }
+
+    func testPlaybackStatePlansPlayPauseStopAndTickUpdates() {
+        let state = VoiceInkAudioPlaybackState(
+            isPlaying: false,
+            currentTime: 3,
+            duration: 10,
+            playbackRate: 1
+        )
+
+        XCTAssertEqual(state.playing().isPlaying, true)
+        XCTAssertEqual(state.playing().paused().isPlaying, false)
+        XCTAssertEqual(
+            state.playing().stopped(),
+            VoiceInkAudioPlaybackState(isPlaying: false, currentTime: 0, duration: 10, playbackRate: 1)
+        )
+        XCTAssertEqual(
+            state.updatingCurrentTime(6),
+            VoiceInkAudioPlaybackState(isPlaying: false, currentTime: 6, duration: 10, playbackRate: 1)
+        )
+    }
+
+    func testPlaybackStateSeekAndRateCycleUseSharedPolicies() {
+        let state = VoiceInkAudioPlaybackState(
+            isPlaying: false,
+            currentTime: 3,
+            duration: 10,
+            playbackRate: 1
+        )
+
+        XCTAssertEqual(state.seeking(to: -2).currentTime, 0)
+        XCTAssertEqual(state.seeking(to: 14).currentTime, 10)
+        XCTAssertEqual(state.cyclingPlaybackRate().playbackRate, 1.5)
+    }
+
     func testPlaybackRateRestoresExistingPositiveMacOSValues() {
         XCTAssertEqual(VoiceInkAudioPlaybackRate.restoredRate(0), 1.0)
         XCTAssertEqual(VoiceInkAudioPlaybackRate.restoredRate(-1), 1.0)

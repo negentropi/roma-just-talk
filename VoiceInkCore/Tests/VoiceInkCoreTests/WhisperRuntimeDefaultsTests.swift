@@ -54,6 +54,24 @@ final class WhisperRuntimeDefaultsTests: XCTestCase {
         )
     }
 
+    func testContextRuntimePlanAppliesSimulatorParametersWithoutOverwritingFlashAttention() {
+        var params = StubWhisperContextParameters(use_gpu: true, flash_attn: true)
+
+        VoiceInkWhisperContextRuntimePlan.current(environment: .simulator).apply(to: &params)
+
+        XCTAssertFalse(params.use_gpu)
+        XCTAssertTrue(params.flash_attn)
+    }
+
+    func testContextRuntimePlanAppliesDeviceParametersWithoutOverwritingGPUDefault() {
+        var params = StubWhisperContextParameters(use_gpu: false, flash_attn: false)
+
+        VoiceInkWhisperContextRuntimePlan.current(environment: .device).apply(to: &params)
+
+        XCTAssertFalse(params.use_gpu)
+        XCTAssertTrue(params.flash_attn)
+    }
+
     func testVADRuntimeConfigurationRequiresEnabledPreferenceAndModelPath() {
         XCTAssertEqual(
             VoiceInkWhisperVADRuntimeConfiguration.current(modelPath: "/tmp/vad.bin", isEnabled: true),
@@ -288,6 +306,11 @@ final class WhisperRuntimeDefaultsTests: XCTestCase {
     private func errorName(_ error: VoiceInkEngineError) -> String {
         String(describing: error)
     }
+}
+
+private struct StubWhisperContextParameters: VoiceInkWhisperContextParameterSink {
+    var use_gpu: Bool
+    var flash_attn: Bool
 }
 
 private struct StubWhisperFullParameters: VoiceInkWhisperRuntimeFullParameterSink {

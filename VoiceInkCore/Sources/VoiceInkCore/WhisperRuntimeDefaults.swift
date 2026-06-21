@@ -83,6 +83,23 @@ public struct VoiceInkWhisperContextRuntimePlan: Equatable, Sendable {
     }
 }
 
+public protocol VoiceInkWhisperContextParameterSink {
+    var use_gpu: Bool { get set }
+    var flash_attn: Bool { get set }
+}
+
+public extension VoiceInkWhisperContextRuntimePlan {
+    func apply<Parameters: VoiceInkWhisperContextParameterSink>(to params: inout Parameters) {
+        if let useGPU {
+            params.use_gpu = useGPU
+        }
+
+        if let flashAttention {
+            params.flash_attn = flashAttention
+        }
+    }
+}
+
 public struct VoiceInkWhisperRuntimeOptions: Equatable, Sendable {
     public let printRealtime: Bool
     public let printProgress: Bool

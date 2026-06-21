@@ -2402,17 +2402,33 @@ reject_pattern \
 
 require_pattern \
   "shared local Whisper context runtime plan lives in VoiceInkCore" \
-  'VoiceInkWhisperContextRuntimePlan|useGPU: Bool\?|flashAttention: Bool\?' \
+  'VoiceInkWhisperContextRuntimePlan|VoiceInkWhisperContextParameterSink|func apply<Parameters: VoiceInkWhisperContextParameterSink>' \
   VoiceInkCore/Sources/VoiceInkCore/WhisperRuntimeDefaults.swift
 
 require_pattern \
+  "core tests cover shared local Whisper context parameter sink" \
+  'testContextRuntimePlanAppliesSimulatorParametersWithoutOverwritingFlashAttention|testContextRuntimePlanAppliesDeviceParametersWithoutOverwritingGPUDefault' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/WhisperRuntimeDefaultsTests.swift
+
+require_pattern \
+  "core check runner executes shared local Whisper context parameter sink tests" \
+  'testContextRuntimePlanAppliesSimulatorParametersWithoutOverwritingFlashAttention|testContextRuntimePlanAppliesDeviceParametersWithoutOverwritingGPUDefault' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "macOS local Whisper uses shared context runtime plan" \
-  'VoiceInkWhisperContextRuntimePlan\.current' \
+  'VoiceInkWhisperContextRuntimePlan\.current|whisper_context_params: VoiceInkWhisperContextParameterSink|runtimePlan\.apply\(to: &params\)' \
   VoiceInk/Transcription/Whisper/LibWhisper.swift
 
 require_pattern \
   "iOS local Whisper uses shared context runtime plan" \
-  'VoiceInkWhisperContextRuntimePlan\.current' \
+  'VoiceInkWhisperContextRuntimePlan\.current|whisper_context_params: VoiceInkWhisperContextParameterSink|runtimePlan\.apply\(to: &params\)' \
+  iOS/VoiceInk-ios/LibWhisper.swift
+
+reject_pattern \
+  "local Whisper adapters avoid shell-owned context parameter assignments" \
+  'params\.(use_gpu|flash_attn)[[:space:]]*=' \
+  VoiceInk/Transcription/Whisper/LibWhisper.swift \
   iOS/VoiceInk-ios/LibWhisper.swift
 
 require_pattern \

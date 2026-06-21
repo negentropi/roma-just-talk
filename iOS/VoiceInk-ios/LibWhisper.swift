@@ -14,6 +14,7 @@ import whisper
 #endif
 import os
 
+extension whisper_context_params: VoiceInkWhisperContextParameterSink {}
 extension whisper_full_params: VoiceInkWhisperRuntimeFullParameterSink {}
 extension whisper_vad_params: VoiceInkWhisperRuntimeVADParameterSink {}
 
@@ -97,12 +98,7 @@ actor WhisperContext {
     private func initializeModel(path: String) throws {
         var params = whisper_context_default_params()
         let runtimePlan = VoiceInkWhisperContextRuntimePlan.current()
-        if let useGPU = runtimePlan.useGPU {
-            params.use_gpu = useGPU
-        }
-        if let flashAttention = runtimePlan.flashAttention {
-            params.flash_attn = flashAttention
-        }
+        runtimePlan.apply(to: &params)
         logger.info("\(runtimePlan.diagnosticMessage, privacy: .public)")
         
         let context = whisper_init_from_file_with_params(path, params)

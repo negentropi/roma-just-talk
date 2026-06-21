@@ -61,12 +61,11 @@ struct ModelRowView: View {
                 Spacer()
                 
                 // Action button where size used to be
-                switch presentation.action {
-                case .downloaded:
+                if presentation.isDownloaded {
                     Image(systemName: presentation.actionSystemImageName)
                         .foregroundColor(.green)
                         .font(.title2)
-                case .downloading:
+                } else if presentation.canCancelDownload {
                     Button(action: {
                         modelManager.cancelDownload(for: row.model)
                     }) {
@@ -74,7 +73,7 @@ struct ModelRowView: View {
                             .foregroundColor(.red)
                             .font(.title2)
                     }
-                case .download:
+                } else if presentation.canStartDownload {
                     Button(action: {
                         showingDownloadConfirmation = true
                     }) {
@@ -104,7 +103,7 @@ struct ModelRowView: View {
             }
         }
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-            if presentation.action == .downloaded {
+            if presentation.canDeleteDownloadedModel {
                 Button(row.deleteConfirmation.primaryButtonTitle) {
                     showingDeleteAlert = true
                 }

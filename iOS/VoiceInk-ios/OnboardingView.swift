@@ -143,17 +143,12 @@ struct ModelDownloadOnboardingView: View {
                         
                         Spacer()
                         
-                        switch presentation.action {
-                        case .downloaded:
-                            Image(systemName: presentation.actionSystemImageName)
-                                .foregroundColor(.green)
-                                .font(.title)
-                        case .downloading:
+                        if presentation.canCancelDownload {
                             ProgressView()
                                 .progressViewStyle(CircularProgressViewStyle())
-                        case .download:
+                        } else {
                             Image(systemName: presentation.actionSystemImageName)
-                                .foregroundColor(.accentColor)
+                                .foregroundColor(presentation.isDownloaded ? .green : .accentColor)
                                 .font(.title)
                         }
                     }
@@ -185,13 +180,12 @@ struct ModelDownloadOnboardingView: View {
             
             // Bottom Action Buttons
             VStack(spacing: 16) {
-                switch presentation.action {
-                case .downloading:
+                if presentation.canCancelDownload {
                     Button(presentation.progress.compactStatusText) {}
                         .buttonStyle(OnboardingButtonStyle())
                         .disabled(true)
 
-                case .downloaded:
+                } else if presentation.isDownloaded {
                     Button(onboardingPresentation.continueButtonTitle) {
                         withAnimation(.easeInOut(duration: 0.3)) {
                             currentStep.advance()
@@ -199,7 +193,7 @@ struct ModelDownloadOnboardingView: View {
                     }
                     .buttonStyle(OnboardingButtonStyle())
 
-                case .download:
+                } else if presentation.canStartDownload {
                     Button(action: {
                         showDownloadConfirmation = true
                     }) {

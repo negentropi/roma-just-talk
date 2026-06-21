@@ -2898,6 +2898,16 @@ require_pattern \
   'row\.presentation|actionSystemImageName' \
   iOS/VoiceInk-ios/LocalModelManagementView.swift
 
+require_pattern \
+  "iOS local model management uses shared row action affordances" \
+  'isDownloaded|canStartDownload|canCancelDownload|canDeleteDownloadedModel' \
+  iOS/VoiceInk-ios/LocalModelManagementView.swift
+
+reject_pattern \
+  "iOS local model management avoids shell-owned row action branching" \
+  'switch +presentation\.action|presentation\.action *==' \
+  iOS/VoiceInk-ios/LocalModelManagementView.swift
+
 reject_pattern \
   "iOS local model management avoids shell-owned model row assembly" \
   'VoiceInkWhisperModelFiles\.bootstrapModels|modelManager\.downloadState\(for: model\)|private var +(downloadConfirmation|deleteConfirmation|rowPresentation)|VoiceInkWhisperModelOperationConfirmationPresentation' \
@@ -2956,6 +2966,16 @@ require_pattern \
 require_pattern \
   "iOS onboarding uses shared model row presentation" \
   'row\.presentation|actionSystemImageName|downloadButtonSystemImageName' \
+  iOS/VoiceInk-ios/OnboardingView.swift
+
+require_pattern \
+  "iOS onboarding uses shared model row action affordances" \
+  'isDownloaded|canStartDownload|canCancelDownload' \
+  iOS/VoiceInk-ios/OnboardingView.swift
+
+reject_pattern \
+  "iOS onboarding avoids shell-owned row action branching" \
+  'switch +presentation\.action|presentation\.action *==' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 reject_pattern \

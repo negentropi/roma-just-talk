@@ -603,26 +603,41 @@ final class WhisperModelFilesTests: XCTestCase {
                 progress: downloadingState.progress
             )
         )
-        XCTAssertTrue(downloadingState.rowPresentation(for: model).shouldShowProgress)
+        let downloadingPresentation = downloadingState.rowPresentation(for: model)
+        XCTAssertFalse(downloadingPresentation.isDownloaded)
+        XCTAssertFalse(downloadingPresentation.canStartDownload)
+        XCTAssertTrue(downloadingPresentation.canCancelDownload)
+        XCTAssertFalse(downloadingPresentation.canDeleteDownloadedModel)
+        XCTAssertTrue(downloadingPresentation.shouldShowProgress)
 
         let downloadedState = VoiceInkWhisperModelDownloadState(isDownloaded: true, progress: .simple(
             modelName: model.modelName,
             isDownloading: false,
             progress: nil
         ))
-        XCTAssertEqual(downloadedState.rowPresentation(for: model).action, .downloaded)
-        XCTAssertEqual(downloadedState.rowPresentation(for: model).actionSystemImageName, "checkmark.circle.fill")
+        let downloadedPresentation = downloadedState.rowPresentation(for: model)
+        XCTAssertEqual(downloadedPresentation.action, .downloaded)
+        XCTAssertEqual(downloadedPresentation.actionSystemImageName, "checkmark.circle.fill")
+        XCTAssertTrue(downloadedPresentation.isDownloaded)
+        XCTAssertFalse(downloadedPresentation.canStartDownload)
+        XCTAssertFalse(downloadedPresentation.canCancelDownload)
+        XCTAssertTrue(downloadedPresentation.canDeleteDownloadedModel)
 
         let idleState = VoiceInkWhisperModelDownloadState(isDownloaded: false, progress: .simple(
             modelName: model.modelName,
             isDownloading: false,
             progress: nil
         ))
-        XCTAssertEqual(idleState.rowPresentation(for: model).action, .download)
-        XCTAssertEqual(idleState.rowPresentation(for: model).actionSystemImageName, "icloud.and.arrow.down")
-        XCTAssertEqual(idleState.rowPresentation(for: model).downloadButtonSystemImageName, "arrow.down.circle.fill")
-        XCTAssertFalse(idleState.rowPresentation(for: model).shouldShowProgress)
-        XCTAssertEqual(downloadingState.rowPresentation(for: model).actionSystemImageName, "xmark.circle.fill")
+        let idlePresentation = idleState.rowPresentation(for: model)
+        XCTAssertEqual(idlePresentation.action, .download)
+        XCTAssertEqual(idlePresentation.actionSystemImageName, "icloud.and.arrow.down")
+        XCTAssertEqual(idlePresentation.downloadButtonSystemImageName, "arrow.down.circle.fill")
+        XCTAssertFalse(idlePresentation.isDownloaded)
+        XCTAssertTrue(idlePresentation.canStartDownload)
+        XCTAssertFalse(idlePresentation.canCancelDownload)
+        XCTAssertFalse(idlePresentation.canDeleteDownloadedModel)
+        XCTAssertFalse(idlePresentation.shouldShowProgress)
+        XCTAssertEqual(downloadingPresentation.actionSystemImageName, "xmark.circle.fill")
     }
 
     func testSimpleDownloadManagementListBuildsSharedRows() {

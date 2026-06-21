@@ -48,14 +48,6 @@ struct CloudModelCardView: View {
         VoiceInkProviderAPIKeyCardPresentation(providerDisplayName: model.provider.rawValue)
     }
 
-    private var streamingModePresentation: VoiceInkTranscriptionStreamingModePresentation {
-        VoiceInkTranscriptionStreamingModePresentation(
-            isStreamingEnabled: streamingEnabled,
-            isStreamingOnly: isStreamingOnly,
-            isPreloadEnabled: preloadEnabled
-        )
-    }
-    
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // Main card content
@@ -105,6 +97,12 @@ struct CloudModelCardView: View {
     }
 
     private var streamingModeBadge: some View {
+        let streamingModePresentation = VoiceInkTranscriptionStreamingModePresentation(
+            isStreamingEnabled: streamingEnabled,
+            isStreamingOnly: isStreamingOnly,
+            isPreloadEnabled: preloadEnabled
+        )
+
         HStack(spacing: 8) {
             Toggle(
                 streamingModePresentation.streamingToggleTitle,

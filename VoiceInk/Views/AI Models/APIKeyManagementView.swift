@@ -34,19 +34,17 @@ struct APIKeyManagementView: View {
         aiService.selectedProvider.textEnhancementSettingsSurface
     }
 
-    private var connectionStatusPresentation: VoiceInkAIEnhancementConnectionStatusPresentation? {
-        providerSettingsPresentation.connectionStatus(
+    private let providerSettingsPresentation = VoiceInkAIEnhancementProviderSettingsPresentation.macOS
+    private let localCLIPresentation = VoiceInkLocalCLIPreference.macOSSettingsPresentation
+
+    var body: some View {
+        let connectionStatusPresentation = providerSettingsPresentation.connectionStatus(
             surface: selectedProviderSettingsSurface,
             isAPIKeyValid: aiService.isAPIKeyValid,
             isCheckingOllama: isCheckingOllama,
             hasOllamaModels: !ollamaModels.isEmpty
         )
-    }
 
-    private let providerSettingsPresentation = VoiceInkAIEnhancementProviderSettingsPresentation.macOS
-    private let localCLIPresentation = VoiceInkLocalCLIPreference.macOSSettingsPresentation
-    
-    var body: some View {
         Section(providerSettingsPresentation.sectionTitle) {
             HStack {
                 Picker(providerSettingsPresentation.providerPickerTitle, selection: $aiService.selectedProvider) {

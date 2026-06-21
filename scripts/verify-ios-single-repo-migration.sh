@@ -4906,6 +4906,11 @@ require_pattern \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
 
 reject_pattern \
+  "macOS AI settings avoid shallow connection-status presentation wrappers" \
+  'private var +connectionStatusPresentation\b' \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+
+reject_pattern \
   "macOS AI settings avoid duplicate provider connection status copy and branching" \
   '"(Connected|Disconnected)"|selectedProviderSettingsSurface != \.ollama|else if !ollamaModels\.isEmpty' \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
@@ -6422,6 +6427,11 @@ require_pattern \
 require_pattern \
   "macOS cloud model card uses shared streaming mode presentation" \
   'VoiceInkTranscriptionStreamingModePresentation|streamingModePresentation\.(streamingToggleTitle|streamingToggleHelp|preloadToggleHelp)' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift
+
+reject_pattern \
+  "macOS cloud model card avoids shallow streaming presentation wrappers" \
+  'private var +streamingModePresentation\b' \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
 reject_pattern \

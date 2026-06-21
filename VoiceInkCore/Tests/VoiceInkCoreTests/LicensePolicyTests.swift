@@ -171,6 +171,108 @@ final class LicensePolicyTests: XCTestCase {
         XCTAssertFalse(VoiceInkLicenseState.trialExpired.canUseApp)
     }
 
+    func testLicenseValidationPolicyPreservesMacOSFeedbackMessages() {
+        XCTAssertEqual(
+            VoiceInkLicenseValidationPolicy.emptyKeyFeedback,
+            VoiceInkLicenseValidationFeedback(isSuccess: false, message: "Please enter a license key")
+        )
+        XCTAssertEqual(
+            VoiceInkLicenseValidationPolicy.disabledLicenseFeedback,
+            VoiceInkLicenseValidationFeedback(
+                isSuccess: false,
+                message: "This license has been revoked or disabled. Please contact support."
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkLicenseValidationPolicy.failureFeedback(for: .keyNotFound),
+            VoiceInkLicenseValidationFeedback(
+                isSuccess: false,
+                message: "License key not found. Please double-check your key and try again."
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkLicenseValidationPolicy.failureFeedback(for: .activationLimitReached),
+            VoiceInkLicenseValidationFeedback(
+                isSuccess: false,
+                message: "This license has reached its device limit. Visit the License Management Portal to deactivate other devices."
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkLicenseValidationPolicy.failureFeedback(for: .serverError(503)),
+            VoiceInkLicenseValidationFeedback(
+                isSuccess: false,
+                message: "Server error (503). Please try again later or contact support."
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkLicenseValidationPolicy.networkFailureFeedback,
+            VoiceInkLicenseValidationFeedback(
+                isSuccess: false,
+                message: "Could not reach the server. Please check your internet connection and try again."
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkLicenseValidationPolicy.unexpectedFailureFeedback,
+            VoiceInkLicenseValidationFeedback(
+                isSuccess: false,
+                message: "An unexpected error occurred. Please try again or contact support at support@tryvoiceink.com"
+            )
+        )
+    }
+
+    func testLicenseValidationApplicationPlansPreserveMacOSStorageWritesAndSuccessCopy() {
+        XCTAssertEqual(
+            VoiceInkLicenseValidationPolicy.existingActivationSuccessPlan(),
+            VoiceInkLicenseValidationApplicationPlan(
+                state: .licensed,
+                requiresActivationToSave: nil,
+                activationIdToSave: nil,
+                shouldClearActivationId: false,
+                activationsLimitToSave: nil,
+                feedback: VoiceInkLicenseValidationFeedback(
+                    isSuccess: true,
+                    message: "License activated successfully!"
+                ),
+                shouldPostLicenseStatusChanged: true
+            )
+        )
+
+        XCTAssertEqual(
+            VoiceInkLicenseValidationPolicy.activatedLicenseSuccessPlan(
+                activationId: "activation-id",
+                activationsLimit: 3
+            ),
+            VoiceInkLicenseValidationApplicationPlan(
+                state: .licensed,
+                requiresActivationToSave: true,
+                activationIdToSave: "activation-id",
+                shouldClearActivationId: false,
+                activationsLimitToSave: 3,
+                feedback: VoiceInkLicenseValidationFeedback(
+                    isSuccess: true,
+                    message: "License activated successfully!"
+                ),
+                shouldPostLicenseStatusChanged: true
+            )
+        )
+
+        XCTAssertEqual(
+            VoiceInkLicenseValidationPolicy.unlimitedLicenseSuccessPlan(activationsLimit: nil),
+            VoiceInkLicenseValidationApplicationPlan(
+                state: .licensed,
+                requiresActivationToSave: false,
+                activationIdToSave: nil,
+                shouldClearActivationId: true,
+                activationsLimitToSave: 0,
+                feedback: VoiceInkLicenseValidationFeedback(
+                    isSuccess: true,
+                    message: "License validated successfully!"
+                ),
+                shouldPostLicenseStatusChanged: true
+            )
+        )
+    }
+
     func testLicenseSecureStoragePolicyPreservesDeviceLocalAccountsAndTrialDateCodec() {
         XCTAssertEqual(
             VoiceInkLicenseSecureStorageAccount.allCases.map(\.key),

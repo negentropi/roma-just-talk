@@ -8536,7 +8536,7 @@ reject_pattern \
 
 require_pattern \
   "shared license preference policy lives in VoiceInkCore" \
-  'VoiceInkLicensePreference|requiresActivationKey|hasLaunchedBeforeKey|activationsLimitKey|deviceIdentifierKey|hasUsableStoredLicense|VoiceInkLicenseStartupPolicy|VoiceInkLicenseStartupPlan|VoiceInkLicenseState|VoiceInkLicenseServicePolicy|VoiceInkLicenseOperation|VoiceInkLicenseError|VoiceInkLicenseSecureStorageAccount|VoiceInkLicenseSecureStoragePolicy' \
+  'VoiceInkLicensePreference|requiresActivationKey|hasLaunchedBeforeKey|activationsLimitKey|deviceIdentifierKey|hasUsableStoredLicense|VoiceInkLicenseStartupPolicy|VoiceInkLicenseStartupPlan|VoiceInkLicenseState|VoiceInkLicenseValidationPolicy|VoiceInkLicenseValidationFeedback|VoiceInkLicenseValidationApplicationPlan|VoiceInkLicenseServicePolicy|VoiceInkLicenseOperation|VoiceInkLicenseError|VoiceInkLicenseSecureStorageAccount|VoiceInkLicenseSecureStoragePolicy' \
   VoiceInkCore/Sources/VoiceInkCore/LicensePolicy.swift
 
 require_pattern \
@@ -8551,7 +8551,7 @@ require_pattern \
 
 require_pattern \
   "macOS license view model catches shared license errors" \
-  'VoiceInkLicenseError\.(keyNotFound|activationLimitReached|serverError)' \
+  'catch let licenseError as VoiceInkLicenseError|failureFeedback\(for: licenseError\)' \
   VoiceInk/Models/LicenseViewModel.swift
 
 require_pattern \
@@ -8575,18 +8575,23 @@ require_pattern \
   VoiceInk/Models/LicenseViewModel.swift
 
 require_pattern \
+  "macOS license view model applies shared validation policy" \
+  'VoiceInkLicenseValidationPolicy\.(emptyKeyFeedback|disabledLicenseFeedback|existingActivationSuccessPlan|activatedLicenseSuccessPlan|unlimitedLicenseSuccessPlan|failureFeedback|networkFailureFeedback|unexpectedFailureFeedback)|VoiceInkLicenseValidation(ApplicationPlan|Feedback)' \
+  VoiceInk/Models/LicenseViewModel.swift
+
+require_pattern \
   "macOS diagnostics use shared license access policy" \
   'VoiceInkLicensePreference\.hasUsableStoredLicense' \
   VoiceInk/Services/SystemInfoService.swift
 
 require_pattern \
   "core checks execute license preference tests" \
-  'LicensePolicyTests\.testLicensePreferenceKeysPreserveExistingStorageNames|LicensePolicyTests\.testLicensePreferenceStorageRoundTripsNonSensitiveFlags|LicensePolicyTests\.testDeviceIdentifierCreatesAndStoresFallbackWhenMissing|LicensePolicyTests\.testStoredLicenseAccessPreservesExistingActivationRequirementPolicy|LicensePolicyTests\.testLicenseStartupPolicyPlansStoredLicenseAndTrialLifecycle|LicensePolicyTests\.testLicenseSecureStoragePolicyPreservesDeviceLocalAccountsAndTrialDateCodec|LicensePolicyTests\.testLicenseServicePolicyPreservesPolarEndpointsAndHeaders|LicensePolicyTests\.testLicenseHTTPStatusPolicyPreservesMacOSErrorMapping' \
+  'LicensePolicyTests\.testLicensePreferenceKeysPreserveExistingStorageNames|LicensePolicyTests\.testLicensePreferenceStorageRoundTripsNonSensitiveFlags|LicensePolicyTests\.testDeviceIdentifierCreatesAndStoresFallbackWhenMissing|LicensePolicyTests\.testStoredLicenseAccessPreservesExistingActivationRequirementPolicy|LicensePolicyTests\.testLicenseStartupPolicyPlansStoredLicenseAndTrialLifecycle|LicensePolicyTests\.testLicenseValidationPolicyPreservesMacOSFeedbackMessages|LicensePolicyTests\.testLicenseValidationApplicationPlansPreserveMacOSStorageWritesAndSuccessCopy|LicensePolicyTests\.testLicenseSecureStoragePolicyPreservesDeviceLocalAccountsAndTrialDateCodec|LicensePolicyTests\.testLicenseServicePolicyPreservesPolarEndpointsAndHeaders|LicensePolicyTests\.testLicenseHTTPStatusPolicyPreservesMacOSErrorMapping' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "migration checklist tracks shared license secure storage policy" \
-  'license startup/trial lifecycle.*license Keychain account names, trial-start timestamp coding, device-local syncability.*VoiceInkLicenseStartupPolicy`/`VoiceInkLicenseSecureStorageAccount`/`VoiceInkLicenseSecureStoragePolicy' \
+  'license startup/trial lifecycle.*validation feedback/application planning.*license Keychain account names, trial-start timestamp coding, device-local syncability.*VoiceInkLicenseStartupPolicy`/`VoiceInkLicenseValidationPolicy`/`VoiceInkLicenseSecureStorageAccount`/`VoiceInkLicenseSecureStoragePolicy' \
   docs/ios-single-repo-migration.md
 
 reject_pattern \
@@ -8594,6 +8599,11 @@ reject_pattern \
   '"(VoiceInkLicenseRequiresActivation|VoiceInkHasLaunchedBefore|VoiceInkActivationsLimit)"|extension UserDefaults|Calendar\.current\.dateComponents|daysSinceTrialStart|trialPeriodDays' \
   VoiceInk/Models/LicenseViewModel.swift \
   VoiceInk/Services/SystemInfoService.swift
+
+reject_pattern \
+  "macOS license view model avoids raw validation feedback copy" \
+  '"(Please enter a license key|This license has been revoked or disabled\. Please contact support\.|License activated successfully!|License validated successfully!|License key not found\. Please double-check your key and try again\.|This license has reached its device limit\. Visit the License Management Portal to deactivate other devices\.|Could not reach the server\. Please check your internet connection and try again\.|An unexpected error occurred\. Please try again or contact support at support@tryvoiceink\.com)"|Server error \(' \
+  VoiceInk/Models/LicenseViewModel.swift
 
 reject_pattern \
   "macOS license manager avoids raw secure license storage policy" \

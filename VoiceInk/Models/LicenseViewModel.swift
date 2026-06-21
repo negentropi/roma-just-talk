@@ -93,21 +93,19 @@ class LicenseViewModel: ObservableObject {
     
     func validateLicense() async {
         guard !licenseKey.isEmpty else {
-            validationSuccess = false
-            validationMessage = "Please enter a license key"
+            applyValidationFeedback(VoiceInkLicenseValidationPolicy.emptyKeyFeedback)
             return
         }
         
         isValidating = true
+        defer { isValidating = false }
         
         do {
             // First, check if the license is valid and if it requires activation
             let licenseCheck = try await polarService.checkLicenseRequiresActivation(licenseKey)
             
             if !licenseCheck.isValid {
-                validationSuccess = false
-                validationMessage = "This license has been revoked or disabled. Please contact support."
-                isValidating = false
+                applyValidationFeedback(VoiceInkLicenseValidationPolicy.disabledLicenseFeedback)
                 return
             }
             
@@ -120,11 +118,7 @@ class LicenseViewModel: ObservableObject {
                 if let existingActivationId = licenseManager.activationId {
                     let isValid = (try? await polarService.validateLicenseKeyWithActivation(licenseKey, activationId: existingActivationId)) ?? false
                     if isValid {
-                        licenseState = .licensed
-                        validationSuccess = true
-                        validationMessage = "License activated successfully!"
-                        NotificationCenter.default.post(name: .licenseStatusChanged, object: nil)
-                        isValidating = false
+                        applyValidationPlan(VoiceInkLicenseValidationPolicy.existingActivationSuccessPlan())
                         return
                     }
                     // Activation is stale (deleted from portal) — clear it and create a new one
@@ -135,53 +129,59 @@ class LicenseViewModel: ObservableObject {
                 let (newActivationId, limit) = try await polarService.activateLicenseKey(licenseKey)
 
                 // Store activation details
-                licenseManager.activationId = newActivationId
-                VoiceInkLicensePreference.saveRequiresActivation(true, to: userDefaults)
-                self.activationsLimit = limit
-                VoiceInkLicensePreference.saveActivationsLimit(limit, to: userDefaults)
+                applyValidationPlan(VoiceInkLicenseValidationPolicy.activatedLicenseSuccessPlan(
+                    activationId: newActivationId,
+                    activationsLimit: limit
+                ))
 
             } else {
                 // This license doesn't require activation (unlimited devices)
-                licenseManager.activationId = nil
-                VoiceInkLicensePreference.saveRequiresActivation(false, to: userDefaults)
-                self.activationsLimit = licenseCheck.activationsLimit ?? 0
-                VoiceInkLicensePreference.saveActivationsLimit(licenseCheck.activationsLimit ?? 0, to: userDefaults)
-
-                // Update the license state for unlimited license
-                licenseState = .licensed
-                validationSuccess = true
-                validationMessage = "License validated successfully!"
-                NotificationCenter.default.post(name: .licenseStatusChanged, object: nil)
-                isValidating = false
+                applyValidationPlan(VoiceInkLicenseValidationPolicy.unlimitedLicenseSuccessPlan(
+                    activationsLimit: licenseCheck.activationsLimit
+                ))
                 return
             }
-            
-            // Update the license state for activated license
-            licenseState = .licensed
-            validationSuccess = true
-            validationMessage = "License activated successfully!"
-            NotificationCenter.default.post(name: .licenseStatusChanged, object: nil)
 
-        } catch VoiceInkLicenseError.keyNotFound {
-            validationSuccess = false
-            validationMessage = "License key not found. Please double-check your key and try again."
-        } catch VoiceInkLicenseError.activationLimitReached {
-            validationSuccess = false
-            validationMessage = "This license has reached its device limit. Visit the License Management Portal to deactivate other devices."
-        } catch VoiceInkLicenseError.serverError(let code) {
-            validationSuccess = false
-            validationMessage = "Server error (\(code)). Please try again later or contact support."
+        } catch let licenseError as VoiceInkLicenseError {
+            applyValidationFeedback(VoiceInkLicenseValidationPolicy.failureFeedback(for: licenseError))
         } catch let urlError as URLError {
-            validationSuccess = false
             logger.error("🔑 License network error: \(urlError.localizedDescription, privacy: .public)")
-            validationMessage = "Could not reach the server. Please check your internet connection and try again."
+            applyValidationFeedback(VoiceInkLicenseValidationPolicy.networkFailureFeedback)
         } catch {
-            validationSuccess = false
             logger.error("🔑 Unexpected license error: \(error, privacy: .public)")
-            validationMessage = "An unexpected error occurred. Please try again or contact support at support@tryvoiceink.com"
+            applyValidationFeedback(VoiceInkLicenseValidationPolicy.unexpectedFailureFeedback)
         }
-        
-        isValidating = false
+    }
+
+    private func applyValidationPlan(_ plan: VoiceInkLicenseValidationApplicationPlan) {
+        if plan.shouldClearActivationId {
+            licenseManager.activationId = nil
+        }
+
+        if let activationId = plan.activationIdToSave {
+            licenseManager.activationId = activationId
+        }
+
+        if let requiresActivation = plan.requiresActivationToSave {
+            VoiceInkLicensePreference.saveRequiresActivation(requiresActivation, to: userDefaults)
+        }
+
+        if let activationsLimit = plan.activationsLimitToSave {
+            self.activationsLimit = activationsLimit
+            VoiceInkLicensePreference.saveActivationsLimit(activationsLimit, to: userDefaults)
+        }
+
+        licenseState = plan.state
+        applyValidationFeedback(plan.feedback)
+
+        if plan.shouldPostLicenseStatusChanged {
+            NotificationCenter.default.post(name: .licenseStatusChanged, object: nil)
+        }
+    }
+
+    private func applyValidationFeedback(_ feedback: VoiceInkLicenseValidationFeedback) {
+        validationSuccess = feedback.isSuccess
+        validationMessage = feedback.message
     }
     
     func removeLicense() {

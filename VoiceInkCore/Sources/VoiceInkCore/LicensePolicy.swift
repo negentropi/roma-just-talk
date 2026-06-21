@@ -184,6 +184,139 @@ public enum VoiceInkLicenseError: Error, Equatable {
     case serverError(Int)
 }
 
+public struct VoiceInkLicenseValidationFeedback: Equatable, Sendable {
+    public let isSuccess: Bool
+    public let message: String
+
+    public init(isSuccess: Bool, message: String) {
+        self.isSuccess = isSuccess
+        self.message = message
+    }
+}
+
+public struct VoiceInkLicenseValidationApplicationPlan: Equatable, Sendable {
+    public let state: VoiceInkLicenseState
+    public let requiresActivationToSave: Bool?
+    public let activationIdToSave: String?
+    public let shouldClearActivationId: Bool
+    public let activationsLimitToSave: Int?
+    public let feedback: VoiceInkLicenseValidationFeedback
+    public let shouldPostLicenseStatusChanged: Bool
+
+    public init(
+        state: VoiceInkLicenseState,
+        requiresActivationToSave: Bool?,
+        activationIdToSave: String?,
+        shouldClearActivationId: Bool,
+        activationsLimitToSave: Int?,
+        feedback: VoiceInkLicenseValidationFeedback,
+        shouldPostLicenseStatusChanged: Bool
+    ) {
+        self.state = state
+        self.requiresActivationToSave = requiresActivationToSave
+        self.activationIdToSave = activationIdToSave
+        self.shouldClearActivationId = shouldClearActivationId
+        self.activationsLimitToSave = activationsLimitToSave
+        self.feedback = feedback
+        self.shouldPostLicenseStatusChanged = shouldPostLicenseStatusChanged
+    }
+}
+
+public enum VoiceInkLicenseValidationPolicy {
+    public static let emptyKeyMessage = "Please enter a license key"
+    public static let disabledLicenseMessage = "This license has been revoked or disabled. Please contact support."
+    public static let activatedSuccessMessage = "License activated successfully!"
+    public static let validatedSuccessMessage = "License validated successfully!"
+    public static let keyNotFoundMessage = "License key not found. Please double-check your key and try again."
+    public static let activationLimitReachedMessage = "This license has reached its device limit. Visit the License Management Portal to deactivate other devices."
+    public static let networkFailureMessage = "Could not reach the server. Please check your internet connection and try again."
+    public static let unexpectedFailureMessage = "An unexpected error occurred. Please try again or contact support at support@tryvoiceink.com"
+
+    public static var emptyKeyFeedback: VoiceInkLicenseValidationFeedback {
+        failureFeedback(message: emptyKeyMessage)
+    }
+
+    public static var disabledLicenseFeedback: VoiceInkLicenseValidationFeedback {
+        failureFeedback(message: disabledLicenseMessage)
+    }
+
+    public static var networkFailureFeedback: VoiceInkLicenseValidationFeedback {
+        failureFeedback(message: networkFailureMessage)
+    }
+
+    public static var unexpectedFailureFeedback: VoiceInkLicenseValidationFeedback {
+        failureFeedback(message: unexpectedFailureMessage)
+    }
+
+    public static func failureFeedback(for error: VoiceInkLicenseError) -> VoiceInkLicenseValidationFeedback {
+        switch error {
+        case .keyNotFound:
+            return failureFeedback(message: keyNotFoundMessage)
+        case .activationLimitReached:
+            return failureFeedback(message: activationLimitReachedMessage)
+        case .serverError(let code):
+            return failureFeedback(message: "Server error (\(code)). Please try again later or contact support.")
+        }
+    }
+
+    public static func existingActivationSuccessPlan() -> VoiceInkLicenseValidationApplicationPlan {
+        successPlan(
+            requiresActivationToSave: nil,
+            activationIdToSave: nil,
+            shouldClearActivationId: false,
+            activationsLimitToSave: nil,
+            message: activatedSuccessMessage
+        )
+    }
+
+    public static func activatedLicenseSuccessPlan(
+        activationId: String,
+        activationsLimit: Int
+    ) -> VoiceInkLicenseValidationApplicationPlan {
+        successPlan(
+            requiresActivationToSave: true,
+            activationIdToSave: activationId,
+            shouldClearActivationId: false,
+            activationsLimitToSave: activationsLimit,
+            message: activatedSuccessMessage
+        )
+    }
+
+    public static func unlimitedLicenseSuccessPlan(
+        activationsLimit: Int?
+    ) -> VoiceInkLicenseValidationApplicationPlan {
+        successPlan(
+            requiresActivationToSave: false,
+            activationIdToSave: nil,
+            shouldClearActivationId: true,
+            activationsLimitToSave: activationsLimit ?? 0,
+            message: validatedSuccessMessage
+        )
+    }
+
+    private static func successPlan(
+        requiresActivationToSave: Bool?,
+        activationIdToSave: String?,
+        shouldClearActivationId: Bool,
+        activationsLimitToSave: Int?,
+        message: String
+    ) -> VoiceInkLicenseValidationApplicationPlan {
+        VoiceInkLicenseValidationApplicationPlan(
+            state: .licensed,
+            requiresActivationToSave: requiresActivationToSave,
+            activationIdToSave: activationIdToSave,
+            shouldClearActivationId: shouldClearActivationId,
+            activationsLimitToSave: activationsLimitToSave,
+            feedback: VoiceInkLicenseValidationFeedback(isSuccess: true, message: message),
+            shouldPostLicenseStatusChanged: true
+        )
+    }
+
+    private static func failureFeedback(message: String) -> VoiceInkLicenseValidationFeedback {
+        VoiceInkLicenseValidationFeedback(isSuccess: false, message: message)
+    }
+}
+
 public struct VoiceInkLicenseActivationResponse: Codable, Equatable {
     public let id: String
 }

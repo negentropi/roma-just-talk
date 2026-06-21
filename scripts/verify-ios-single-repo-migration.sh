@@ -3513,6 +3513,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift
 
 require_pattern \
+  "shared audio-file transcription draft plan lives in VoiceInkCore" \
+  'VoiceInkAudioFileTranscriptionDraftContext|VoiceInkAudioFileTranscriptionEnhancementOutcome|VoiceInkAudioFileTranscriptionDraft' \
+  VoiceInkCore/Sources/VoiceInkCore/CompletedTranscriptionDraft.swift
+
+require_pattern \
   "macOS live recording uses shared transcription run preparation" \
   'VoiceInkTranscriptionRunPreparation\.prepareFilteredText' \
   VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
@@ -3529,12 +3534,18 @@ require_pattern \
 
 require_pattern \
   "macOS audio-file import builds completed records through shared draft" \
-  'VoiceInkCompletedTranscriptionDraft' \
+  'VoiceInkAudioFileTranscriptionDraft\.completed' \
   VoiceInk/Services/AudioFileTranscriptionManager.swift
 
 require_pattern \
   "macOS retry transcription builds completed records through shared draft" \
-  'VoiceInkCompletedTranscriptionDraft' \
+  'VoiceInkAudioFileTranscriptionDraft\.completed' \
+  VoiceInk/Services/AudioFileTranscriptionService.swift
+
+reject_pattern \
+  "macOS audio-file transcription callers avoid shell-owned completed draft construction" \
+  'VoiceInkCompletedTranscriptionDraft\(' \
+  VoiceInk/Services/AudioFileTranscriptionManager.swift \
   VoiceInk/Services/AudioFileTranscriptionService.swift
 
 reject_pattern \
@@ -4971,12 +4982,12 @@ require_pattern \
 
 require_pattern \
   "macOS audio-file import enhancement stores request metadata from shared result" \
-  'enhancementResult: enhancement' \
+  'succeeded\(enhancement\)' \
   VoiceInk/Services/AudioFileTranscriptionManager.swift
 
 require_pattern \
   "macOS retry enhancement stores request metadata from shared result" \
-  'enhancementResult: enhancement' \
+  'succeeded\(enhancement\)' \
   VoiceInk/Services/AudioFileTranscriptionService.swift
 
 require_pattern \

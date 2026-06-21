@@ -5,6 +5,83 @@ public enum VoiceInkEnhancementFailureDraftPolicy: Equatable, Sendable {
     case storeFailureText
 }
 
+public struct VoiceInkAudioFileTranscriptionDraftContext: Equatable, Sendable {
+    public let cleanedText: String
+    public let duration: TimeInterval
+    public let audioFileURL: String?
+    public let transcriptionModelName: String?
+    public let transcriptionDuration: TimeInterval?
+    public let powerModeName: String?
+    public let powerModeEmoji: String?
+
+    public init(
+        cleanedText: String,
+        duration: TimeInterval,
+        audioFileURL: String?,
+        transcriptionModelName: String?,
+        transcriptionDuration: TimeInterval?,
+        powerModeName: String? = nil,
+        powerModeEmoji: String? = nil
+    ) {
+        self.cleanedText = cleanedText
+        self.duration = duration
+        self.audioFileURL = audioFileURL
+        self.transcriptionModelName = transcriptionModelName
+        self.transcriptionDuration = transcriptionDuration
+        self.powerModeName = powerModeName
+        self.powerModeEmoji = powerModeEmoji
+    }
+}
+
+public enum VoiceInkAudioFileTranscriptionEnhancementOutcome: Equatable, Sendable {
+    case notAttempted
+    case succeeded(VoiceInkAIEnhancementResult)
+    case failed(reason: String, policy: VoiceInkEnhancementFailureDraftPolicy)
+}
+
+public enum VoiceInkAudioFileTranscriptionDraft {
+    public static func completed(
+        context: VoiceInkAudioFileTranscriptionDraftContext,
+        enhancementOutcome: VoiceInkAudioFileTranscriptionEnhancementOutcome = .notAttempted
+    ) -> VoiceInkCompletedTranscriptionDraft {
+        switch enhancementOutcome {
+        case .notAttempted:
+            return VoiceInkCompletedTranscriptionDraft(
+                cleanedText: context.cleanedText,
+                duration: context.duration,
+                audioFileURL: context.audioFileURL,
+                transcriptionModelName: context.transcriptionModelName,
+                transcriptionDuration: context.transcriptionDuration,
+                powerModeName: context.powerModeName,
+                powerModeEmoji: context.powerModeEmoji
+            )
+        case .succeeded(let enhancementResult):
+            return VoiceInkCompletedTranscriptionDraft(
+                cleanedText: context.cleanedText,
+                duration: context.duration,
+                audioFileURL: context.audioFileURL,
+                transcriptionModelName: context.transcriptionModelName,
+                transcriptionDuration: context.transcriptionDuration,
+                powerModeName: context.powerModeName,
+                powerModeEmoji: context.powerModeEmoji,
+                enhancementResult: enhancementResult
+            )
+        case .failed(let reason, let policy):
+            return VoiceInkCompletedTranscriptionDraft(
+                cleanedText: context.cleanedText,
+                duration: context.duration,
+                audioFileURL: context.audioFileURL,
+                transcriptionModelName: context.transcriptionModelName,
+                transcriptionDuration: context.transcriptionDuration,
+                powerModeName: context.powerModeName,
+                powerModeEmoji: context.powerModeEmoji,
+                enhancementFailureReason: reason,
+                enhancementFailurePolicy: policy
+            )
+        }
+    }
+}
+
 public struct VoiceInkCompletedTranscriptionDraft: Equatable, Sendable {
     public let text: String
     public let duration: TimeInterval

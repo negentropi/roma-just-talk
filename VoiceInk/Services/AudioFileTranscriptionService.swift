@@ -69,6 +69,15 @@ class AudioTranscriptionService {
 
             // Apply prompt detection for trigger words
             let originalText = cleanedText
+            let draftContext = VoiceInkAudioFileTranscriptionDraftContext(
+                cleanedText: originalText,
+                duration: duration,
+                audioFileURL: permanentURLString,
+                transcriptionModelName: model.displayName,
+                transcriptionDuration: transcriptionDuration,
+                powerModeName: powerModeName,
+                powerModeEmoji: powerModeEmoji
+            )
             var promptDetectionResult: VoiceInkPromptDetectionResult? = nil
 
             if let enhancementService = enhancementService,
@@ -100,42 +109,26 @@ class AudioTranscriptionService {
                 do {
                     let textForAI = promptDetectionResult?.processedText ?? text
                     let enhancement = try await enhancementService.enhance(textForAI)
-                    let newTranscription = Transcription(completedDraft: VoiceInkCompletedTranscriptionDraft(
-                        cleanedText: originalText,
-                        duration: duration,
-                        audioFileURL: permanentURLString,
-                        transcriptionModelName: model.displayName,
-                        transcriptionDuration: transcriptionDuration,
-                        powerModeName: powerModeName,
-                        powerModeEmoji: powerModeEmoji,
-                        enhancementResult: enhancement
+                    let newTranscription = Transcription(completedDraft: VoiceInkAudioFileTranscriptionDraft.completed(
+                        context: draftContext,
+                        enhancementOutcome: .succeeded(enhancement)
                     ))
                     saveCompletedTranscription(newTranscription)
                     return newTranscription
                 } catch {
-                    let newTranscription = Transcription(completedDraft: VoiceInkCompletedTranscriptionDraft(
-                        cleanedText: originalText,
-                        duration: duration,
-                        audioFileURL: permanentURLString,
-                        transcriptionModelName: model.displayName,
-                        transcriptionDuration: transcriptionDuration,
-                        powerModeName: powerModeName,
-                        powerModeEmoji: powerModeEmoji,
-                        enhancementFailureReason: VoiceInkErrorDescription.text(for: error),
-                        enhancementFailurePolicy: .omitEnhancedText
+                    let newTranscription = Transcription(completedDraft: VoiceInkAudioFileTranscriptionDraft.completed(
+                        context: draftContext,
+                        enhancementOutcome: .failed(
+                            reason: VoiceInkErrorDescription.text(for: error),
+                            policy: .omitEnhancedText
+                        )
                     ))
                     saveCompletedTranscription(newTranscription)
                     return newTranscription
                 }
             } else {
-                let newTranscription = Transcription(completedDraft: VoiceInkCompletedTranscriptionDraft(
-                    cleanedText: originalText,
-                    duration: duration,
-                    audioFileURL: permanentURLString,
-                    transcriptionModelName: model.displayName,
-                    transcriptionDuration: transcriptionDuration,
-                    powerModeName: powerModeName,
-                    powerModeEmoji: powerModeEmoji
+                let newTranscription = Transcription(completedDraft: VoiceInkAudioFileTranscriptionDraft.completed(
+                    context: draftContext
                 ))
                 saveCompletedTranscription(newTranscription)
                 return newTranscription

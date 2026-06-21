@@ -175,6 +175,15 @@ class AudioTranscriptionManager: ObservableObject {
                 configuration: VoiceInkPostProcessingSkipConfiguration.current(),
                 transcriptRole: .wordReplacedText
             )
+            let draftContext = VoiceInkAudioFileTranscriptionDraftContext(
+                cleanedText: cleanedText,
+                duration: duration,
+                audioFileURL: permanentURL.absoluteString,
+                transcriptionModelName: currentModel.displayName,
+                transcriptionDuration: transcriptionDuration,
+                powerModeName: powerModeName,
+                powerModeEmoji: powerModeEmoji
+            )
 
             // Handle enhancement if enabled
             var transcription: Transcription
@@ -186,40 +195,21 @@ class AudioTranscriptionManager: ObservableObject {
                 item.status = .processing(phase: .enhancing)
                 do {
                     let enhancement = try await enhancementService.enhance(text)
-                    transcription = Transcription(completedDraft: VoiceInkCompletedTranscriptionDraft(
-                        cleanedText: cleanedText,
-                        duration: duration,
-                        audioFileURL: permanentURL.absoluteString,
-                        transcriptionModelName: currentModel.displayName,
-                        transcriptionDuration: transcriptionDuration,
-                        powerModeName: powerModeName,
-                        powerModeEmoji: powerModeEmoji,
-                        enhancementResult: enhancement
+                    transcription = Transcription(completedDraft: VoiceInkAudioFileTranscriptionDraft.completed(
+                        context: draftContext,
+                        enhancementOutcome: .succeeded(enhancement)
                     ))
                 } catch {
                     let errorDescription = VoiceInkErrorDescription.text(for: error)
                     logger.error("Enhancement failed: \(errorDescription, privacy: .public)")
-                    transcription = Transcription(completedDraft: VoiceInkCompletedTranscriptionDraft(
-                        cleanedText: cleanedText,
-                        duration: duration,
-                        audioFileURL: permanentURL.absoluteString,
-                        transcriptionModelName: currentModel.displayName,
-                        transcriptionDuration: transcriptionDuration,
-                        powerModeName: powerModeName,
-                        powerModeEmoji: powerModeEmoji,
-                        enhancementFailureReason: errorDescription,
-                        enhancementFailurePolicy: .storeFailureText
+                    transcription = Transcription(completedDraft: VoiceInkAudioFileTranscriptionDraft.completed(
+                        context: draftContext,
+                        enhancementOutcome: .failed(reason: errorDescription, policy: .storeFailureText)
                     ))
                 }
             } else {
-                transcription = Transcription(completedDraft: VoiceInkCompletedTranscriptionDraft(
-                    cleanedText: cleanedText,
-                    duration: duration,
-                    audioFileURL: permanentURL.absoluteString,
-                    transcriptionModelName: currentModel.displayName,
-                    transcriptionDuration: transcriptionDuration,
-                    powerModeName: powerModeName,
-                    powerModeEmoji: powerModeEmoji
+                transcription = Transcription(completedDraft: VoiceInkAudioFileTranscriptionDraft.completed(
+                    context: draftContext
                 ))
             }
 

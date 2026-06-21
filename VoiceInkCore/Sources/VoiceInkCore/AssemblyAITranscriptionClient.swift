@@ -130,21 +130,22 @@ public struct VoiceInkAssemblyAITranscriptionClient: Sendable {
         timeout: TimeInterval,
         errorDomain: String
     ) async throws -> String {
-        let start = Date()
-        while true {
-            let request = VoiceInkAssemblyAIRequestBuilder.makeTranscriptStatusRequest(
-                baseURL: baseURL,
-                apiKey: apiKey,
-                id: id,
-                timeout: timeout
-            )
-            let (data, response) = try await URLSession.shared.data(for: request)
-            try VoiceInkRemoteHTTPResponsePolicy.validateSuccess(response: response, data: data, errorDomain: errorDomain)
-
+        try await VoiceInkRemotePollingPolicy.pollValidatedData(
+            request: {
+                VoiceInkAssemblyAIRequestBuilder.makeTranscriptStatusRequest(
+                    baseURL: baseURL,
+                    apiKey: apiKey,
+                    id: id,
+                    timeout: timeout
+                )
+            },
+            errorDomain: errorDomain,
+            maxWaitSeconds: maxWaitSeconds
+        ) { data in
             let transcript = try VoiceInkAssemblyAITranscriptionCodec.transcriptStatus(from: data)
             switch transcript.status.lowercased() {
             case "completed":
-                return transcript.text ?? ""
+                return .finished(transcript.text ?? "")
             case "error":
                 throw NSError(
                     domain: errorDomain,
@@ -152,13 +153,8 @@ public struct VoiceInkAssemblyAITranscriptionClient: Sendable {
                     userInfo: [NSLocalizedDescriptionKey: transcript.error ?? "AssemblyAI transcription failed."]
                 )
             default:
-                break
+                return .keepPolling
             }
-
-            if Date().timeIntervalSince(start) > maxWaitSeconds {
-                throw URLError(.timedOut)
-            }
-            try await Task.sleep(nanoseconds: 1_000_000_000)
         }
     }
 

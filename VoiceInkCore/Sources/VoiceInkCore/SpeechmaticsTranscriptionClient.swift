@@ -106,21 +106,22 @@ public struct VoiceInkSpeechmaticsTranscriptionClient: Sendable {
         timeout: TimeInterval,
         errorDomain: String
     ) async throws {
-        let start = Date()
-        while true {
-            let request = VoiceInkSpeechmaticsRequestBuilder.makeJobStatusRequest(
-                baseURL: baseURL,
-                apiKey: apiKey,
-                id: id,
-                timeout: timeout
-            )
-            let (data, response) = try await URLSession.shared.data(for: request)
-            try VoiceInkRemoteHTTPResponsePolicy.validateSuccess(response: response, data: data, errorDomain: errorDomain)
-
+        try await VoiceInkRemotePollingPolicy.pollValidatedData(
+            request: {
+                VoiceInkSpeechmaticsRequestBuilder.makeJobStatusRequest(
+                    baseURL: baseURL,
+                    apiKey: apiKey,
+                    id: id,
+                    timeout: timeout
+                )
+            },
+            errorDomain: errorDomain,
+            maxWaitSeconds: maxWaitSeconds
+        ) { data in
             if let status = try? VoiceInkSpeechmaticsTranscriptionCodec.jobStatus(from: data).lowercased() {
                 switch status {
                 case "done":
-                    return
+                    return .finished(())
                 case "rejected":
                     throw NSError(
                         domain: errorDomain,
@@ -138,10 +139,7 @@ public struct VoiceInkSpeechmaticsTranscriptionClient: Sendable {
                 }
             }
 
-            if Date().timeIntervalSince(start) > maxWaitSeconds {
-                throw URLError(.timedOut)
-            }
-            try await Task.sleep(nanoseconds: 1_000_000_000)
+            return .keepPolling
         }
     }
 

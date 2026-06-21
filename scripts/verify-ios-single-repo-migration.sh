@@ -3265,6 +3265,18 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/RetriedUpload.swift
 
 require_pattern \
+  "shared remote polling policy owns timeout, cadence, and HTTP validation" \
+  'VoiceInkRemotePollingPolicy|defaultIntervalNanoseconds|pollValidatedData|VoiceInkRemoteHTTPResponsePolicy\.validateSuccess|URLError\(\.timedOut\)' \
+  VoiceInkCore/Sources/VoiceInkCore/RemotePollingPolicy.swift
+
+require_pattern \
+  "shared long-running remote transcription clients use shared polling policy" \
+  'VoiceInkRemotePollingPolicy\.pollValidatedData' \
+  VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionClient.swift
+
+require_pattern \
   "shared OpenAI-compatible transcription client uses shared retry helper" \
   'VoiceInkRetriedRequest\.data' \
   VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionClient.swift
@@ -3272,6 +3284,11 @@ require_pattern \
 require_pattern \
   "core checks execute remote HTTP response policy tests" \
   'RemoteHTTPResponsePolicyTests\.testValidateSuccessAcceptsHTTP2xxResponses|RemoteHTTPResponsePolicyTests\.testValidateSuccessRejectsNonHTTPResponses|RemoteHTTPResponsePolicyTests\.testValidateSuccessThrowsProviderNSErrorForNon2xxBody|RemoteHTTPResponsePolicyTests\.testAPIErrorUsesEmptyMessageForNonUTF8Body|RemoteHTTPResponsePolicyTests\.testRetryableStatusCodeMatchesSharedRemoteRetryPolicy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute remote polling policy tests" \
+  'RemotePollingPolicyTests\.testPollReturnsFinishedResultWithoutSleeping|RemotePollingPolicyTests\.testPollSleepsAndRetriesUntilFinished|RemotePollingPolicyTests\.testPollTimesOutAfterPendingDecision' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -3297,6 +3314,13 @@ reject_pattern \
 reject_pattern \
   "shared remote transcription clients avoid provider-local HTTP response validators" \
   'private static func validate\(' \
+  VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionClient.swift
+
+reject_pattern \
+  "long-running remote transcription clients avoid provider-local polling loops" \
+  'while true|let start = Date\(\)|Date\(\)\.timeIntervalSince\(start\)|Task\.sleep\(nanoseconds: 1_000_000_000\)|URLSession\.shared\.data\(for: request\)' \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionClient.swift \
   VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionClient.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionClient.swift

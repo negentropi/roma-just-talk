@@ -20,6 +20,11 @@ Both app projects reference the in-repo package:
 - macOS package path: `VoiceInkCore`
 - iOS package path: `../VoiceInkCore` from `iOS/`
 
+Both app projects reference the same local Whisper framework location:
+
+- `$(HOME)/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework`
+- obsolete clone-side paths such as `../Downloads/build-apple/whisper.xcframework`, `../whisper.cpp/build-apple/whisper.xcframework`, and `../build-apple/whisper.xcframework` stay absent from project files.
+
 No shared code should be added at the parent `faster-wisperflow/` workspace level.
 
 ## Shared Core
@@ -373,6 +378,7 @@ scripts/verify-ios-single-repo-migration.sh --full-build
 
 1. `VoiceInk.xcworkspace` includes `iOS/VoiceInk-ios.xcodeproj`, and the shared iOS scheme includes the unit-test and UI-test bundles.
 2. macOS and iOS projects both resolve `VoiceInkCore` from inside `VoiceInk/`, and the iOS app target links the `VoiceInkCore` product.
+   - Local Whisper framework dependency: both app projects reference `$(HOME)/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework`, and clone-side `../Downloads`, `../whisper.cpp`, and `../build-apple` framework references stay absent.
 3. `VoiceInk/` is the git root for this work, and the abandoned parent-level Swift package shape (`../VoiceInkCore`, `../Package.swift`, `../Sources/VoiceInkCore`, `../Tests/VoiceInkCoreTests`) remains absent.
 4. `VoiceInkCore` stays platform-neutral: no AppKit, UIKit, SwiftUI, SwiftData, AVFoundation, CoreAudio, IOKit, FluidAudio, KeyboardKit, LLMkit, WhisperKit, or whisper.cpp module imports in shared sources or core checks.
 5. iOS App Group recording-state keys, stale-state policy, record deep-link contract, keyboard recording timing, deferred app-launch recording request policy, keyboard button presentation, and app-local keyboard stop notification name route through `VoiceInkCore`, while Darwin notification execution, timers, UIKit rendering, and keyboard URL-opening adapters stay out of `VoiceInkCore`.
@@ -440,4 +446,4 @@ scripts/verify-ios-single-repo-migration.sh --full-build
 67. macOS license startup, diagnostics, Polar adapter, and secure-storage adapter route non-sensitive license preference keys, license startup/trial lifecycle, validation feedback/application planning, purchase/management URL policy, removal/reset planning, activation-required storage, first-launch storage, activation-limit storage, fallback device-id storage, stored-license access predicates, license Keychain account names, trial-start timestamp coding, device-local syncability, Polar endpoint/request DTOs, granted/activation-required response policy, and HTTP error mapping through `VoiceInkLicensePreference`/`VoiceInkLicenseStartupPolicy`/`VoiceInkLicenseValidationPolicy`/`VoiceInkLicenseLinks`/`VoiceInkLicenseRemovalPolicy`/`VoiceInkLicenseSecureStorageAccount`/`VoiceInkLicenseSecureStoragePolicy`/`VoiceInkLicenseServicePolicy`, with Keychain execution, serial-number lookup, `URLSession`, AppKit URL opening, notification posting, and UI state remaining in the macOS shell.
 68. A real Xcode toolchain is selected and both app targets build.
 
-Current full-build blockers: `xcode-select -p` points to `/Library/Developer/CommandLineTools`, and the previously used external Xcode volume is not mounted. Full target builds are still environment-blocked until a real Xcode is selected; macOS `VoiceInk` also needs `/Users/atalphalnmomhappyhouse/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework`, and iOS `VoiceInk-ios` needs the iOS 26.2 platform installed. Until those are present, `scripts/verify-ios-single-repo-migration.sh` is the local proof gate; when SwiftPM is blocked by `sandbox-exec`, the script builds and runs `VoiceInkCoreChecks` and `VoiceInkAudioProof` through direct `swiftc` fallback paths.
+Current full-build blockers: `xcode-select -p` points to `/Library/Developer/CommandLineTools`, and the previously used external Xcode volume is not mounted. Full target builds are still environment-blocked until a real Xcode is selected; both app projects need `/Users/atalphalnmomhappyhouse/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework`, and iOS `VoiceInk-ios` also needs the iOS 26.2 platform installed. Until those are present, `scripts/verify-ios-single-repo-migration.sh` is the local proof gate; when SwiftPM is blocked by `sandbox-exec`, the script builds and runs `VoiceInkCoreChecks` and `VoiceInkAudioProof` through direct `swiftc` fallback paths.

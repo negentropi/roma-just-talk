@@ -326,6 +326,22 @@ git_root="$(git rev-parse --show-toplevel)"
 [[ ! -d ../Sources/VoiceInkCore ]] || fail "parent-level ../Sources/VoiceInkCore exists; shared core must live inside VoiceInk/"
 [[ ! -d ../Tests/VoiceInkCoreTests ]] || fail "parent-level ../Tests/VoiceInkCoreTests exists; shared core tests must live inside VoiceInk/"
 
+require_pattern \
+  "macOS app uses shared local Whisper framework path" \
+  '\$\(HOME\)/VoiceInk-Dependencies/whisper\.cpp/build-apple/whisper\.xcframework' \
+  VoiceInk.xcodeproj/project.pbxproj
+
+require_pattern \
+  "iOS app uses shared local Whisper framework path" \
+  '\$\(HOME\)/VoiceInk-Dependencies/whisper\.cpp/build-apple/whisper\.xcframework' \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
+
+reject_pattern \
+  "app projects avoid clone-side local Whisper framework paths" \
+  '\.\./(Downloads/)?build-apple/whisper\.xcframework|\.\./whisper\.cpp/build-apple/whisper\.xcframework' \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
+
 section "iOS ported assets and resources"
 require_file iOS/Shared/AppGroupCoordinator.swift
 require_file iOS/Shared/VoiceInkAppGroupRecordingBridge.swift

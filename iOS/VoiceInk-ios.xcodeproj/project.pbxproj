@@ -65,8 +65,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		E13AB56A2E56E8950074AC55 /* whisper.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = whisper.xcframework; path = "../whisper.cpp/build-apple/whisper.xcframework"; sourceTree = "<group>"; };
-		E14E276E2E5F5B5D00143372 /* whisper.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = whisper.xcframework; path = "../Downloads/build-apple/whisper.xcframework"; sourceTree = "<group>"; };
+		E14E276E2E5F5B5D00143372 /* whisper.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = whisper.xcframework; path = "$(HOME)/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework"; sourceTree = "<group>"; };
 		E168DF072E4B464B00F133D2 /* roma just talk.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "roma just talk.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E168DF182E4B464C00F133D2 /* VoiceInk-iosTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "VoiceInk-iosTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E168DF222E4B464C00F133D2 /* VoiceInk-iosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "VoiceInk-iosUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -164,7 +163,6 @@
 			isa = PBXGroup;
 			children = (
 				E14E276E2E5F5B5D00143372 /* whisper.xcframework */,
-				E13AB56A2E56E8950074AC55 /* whisper.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

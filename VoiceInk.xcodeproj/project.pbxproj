@@ -61,8 +61,6 @@
 		E11473CD2CBE0F0B00318EE4 /* VoiceInkUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VoiceInkUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E161D4A02F41ECB90086F83D /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		E1A0BD052EB1E7B800266859 /* whisper.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = whisper.xcframework; path = "$(HOME)/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework"; sourceTree = "<group>"; };
-		E1B2DCAA2E3DE70A008DFD68 /* whisper.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = whisper.xcframework; path = "../whisper.cpp/build-apple/whisper.xcframework"; sourceTree = "<group>"; };
-		E1CE28772E4336150082B758 /* whisper.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = whisper.xcframework; path = "../build-apple/whisper.xcframework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -146,8 +144,6 @@
 			children = (
 				E161D4A02F41ECB90086F83D /* CloudKit.framework */,
 				E1A0BD052EB1E7B800266859 /* whisper.xcframework */,
-				E1CE28772E4336150082B758 /* whisper.xcframework */,
-				E1B2DCAA2E3DE70A008DFD68 /* whisper.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

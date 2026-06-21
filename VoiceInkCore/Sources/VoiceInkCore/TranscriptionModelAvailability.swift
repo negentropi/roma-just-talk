@@ -47,3 +47,11 @@ public struct VoiceInkTranscriptionModelAvailabilityFacts: Equatable, Sendable {
         }
     }
 }
+
+public enum VoiceInkNativeAppleTranscriptionAvailabilityPresentation {
+    public static let unsupportedSpeechAnalyzerErrorDescription = "SpeechAnalyzer requires macOS 26 or later."
+
+    public static func requiresMacOS26Title(modelDisplayName: String) -> String {
+        "\(modelDisplayName) requires macOS 26 or later"
+    }
+}

@@ -3596,6 +3596,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelAvailability.swift
 
 require_pattern \
+  "shared core owns Native Apple availability presentation" \
+  'VoiceInkNativeAppleTranscriptionAvailabilityPresentation|unsupportedSpeechAnalyzerErrorDescription|requiresMacOS26Title' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelAvailability.swift
+
+require_pattern \
   "macOS model adapts shared transcription model availability facts" \
   'transcriptionModelAvailability(Facts|Requirement)' \
   VoiceInk/Models/TranscriptionModel.swift
@@ -3604,6 +3609,21 @@ require_pattern \
   "macOS transcription model manager uses shared availability facts" \
   'availabilityFacts\(for: .*\)\.isUsable|transcriptionModelAvailabilityFacts' \
   VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
+
+require_pattern \
+  "macOS transcription model manager uses shared Native Apple availability presentation" \
+  'VoiceInkNativeAppleTranscriptionAvailabilityPresentation\.requiresMacOS26Title' \
+  VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
+
+require_pattern \
+  "macOS Native Apple transcription uses shared unsupported-OS presentation" \
+  'VoiceInkNativeAppleTranscriptionAvailabilityPresentation\.unsupportedSpeechAnalyzerErrorDescription' \
+  VoiceInk/Transcription/Native/NativeAppleTranscriptionService.swift
+
+require_pattern \
+  "core checks execute Native Apple availability presentation test" \
+  'TranscriptionModelAvailabilityTests\.testNativeAppleAvailabilityPresentationPreservesMacOSCopy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "macOS transcription model manager uses shared selection resource action" \
@@ -3626,6 +3646,12 @@ reject_pattern \
   "macOS transcription model manager avoids shell-owned provider availability routing" \
   'switch +model\.provider|model\.provider != \.whisper|CloudProviderRegistry\.provider\(for: model\.provider\)|case +\.nativeApple|case +\.custom' \
   VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
+
+reject_pattern \
+  "macOS Native Apple availability copy avoids shell-owned literals" \
+  '"[^"]*requires macOS 26 or later\.?"' \
+  VoiceInk/Transcription/Engine/TranscriptionModelManager.swift \
+  VoiceInk/Transcription/Native/NativeAppleTranscriptionService.swift
 
 reject_pattern \
   "macOS session creation avoids shell-only streaming support wrapper" \

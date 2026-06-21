@@ -66,7 +66,9 @@ class TranscriptionModelManager: ObservableObject {
     func setDefaultTranscriptionModel(_ model: any TranscriptionModel) {
         guard isAvailableOnCurrentOS(model) else {
             NotificationManager.shared.showNotification(
-                title: "\(model.displayName) requires macOS 26 or later",
+                title: VoiceInkNativeAppleTranscriptionAvailabilityPresentation.requiresMacOS26Title(
+                    modelDisplayName: model.displayName
+                ),
                 type: .error
             )
             return

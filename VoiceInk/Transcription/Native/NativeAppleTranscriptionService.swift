@@ -23,7 +23,7 @@ class NativeAppleTranscriptionService: TranscriptionService {
         var errorDescription: String? {
             switch self {
             case .unsupportedOS:
-                return "SpeechAnalyzer requires macOS 26 or later."
+                return VoiceInkNativeAppleTranscriptionAvailabilityPresentation.unsupportedSpeechAnalyzerErrorDescription
             case .transcriptionFailed:
                 return "Transcription failed using SpeechAnalyzer."
             case .localeNotSupported:

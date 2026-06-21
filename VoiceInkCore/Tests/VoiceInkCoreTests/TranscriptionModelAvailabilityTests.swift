@@ -50,4 +50,15 @@ final class TranscriptionModelAvailabilityTests: XCTestCase {
         XCTAssertTrue(VoiceInkTranscriptionModelAvailabilityFacts(requirement: .alwaysAvailable).isUsable)
         XCTAssertFalse(VoiceInkTranscriptionModelAvailabilityFacts(requirement: .unavailable).isUsable)
     }
+
+    func testNativeAppleAvailabilityPresentationPreservesMacOSCopy() {
+        XCTAssertEqual(
+            VoiceInkNativeAppleTranscriptionAvailabilityPresentation.unsupportedSpeechAnalyzerErrorDescription,
+            "SpeechAnalyzer requires macOS 26 or later."
+        )
+        XCTAssertEqual(
+            VoiceInkNativeAppleTranscriptionAvailabilityPresentation.requiresMacOS26Title(modelDisplayName: "Apple Speech"),
+            "Apple Speech requires macOS 26 or later"
+        )
+    }
 }

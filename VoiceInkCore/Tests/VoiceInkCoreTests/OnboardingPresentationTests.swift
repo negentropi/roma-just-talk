@@ -6,6 +6,22 @@ final class OnboardingPresentationTests: XCTestCase {
         XCTAssertEqual(VoiceInkIOSOnboardingPresentation.appIconFallbackSystemImageName, "app.fill")
     }
 
+    func testIOSOnboardingStepOrderPreservesExistingFlow() {
+        XCTAssertEqual(VoiceInkIOSOnboardingStep.initial, .welcome)
+        XCTAssertEqual(Array(VoiceInkIOSOnboardingStep.allCases), [.welcome, .modelDownload, .ready])
+        XCTAssertEqual(VoiceInkIOSOnboardingStep.welcome.nextStep, .modelDownload)
+        XCTAssertEqual(VoiceInkIOSOnboardingStep.modelDownload.nextStep, .ready)
+        XCTAssertNil(VoiceInkIOSOnboardingStep.ready.nextStep)
+
+        var step = VoiceInkIOSOnboardingStep.initial
+        step.advance()
+        XCTAssertEqual(step, .modelDownload)
+        step.advance()
+        XCTAssertEqual(step, .ready)
+        step.advance()
+        XCTAssertEqual(step, .ready)
+    }
+
     func testIOSWelcomeOnboardingPresentationPreservesCopyAndFeatureOrder() {
         let presentation = VoiceInkIOSOnboardingPresentation.welcome
 

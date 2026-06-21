@@ -2448,12 +2448,27 @@ reject_pattern \
 
 require_pattern \
   "shared iOS onboarding presentation lives in VoiceInkCore" \
-  'VoiceInkIOSOnboardingPresentation|VoiceInkOnboardingFeaturePresentation|VoiceInkOnboardingStepPresentation|appIconFallbackSystemImageName' \
+  'VoiceInkIOSOnboardingStep|VoiceInkIOSOnboardingPresentation|VoiceInkOnboardingFeaturePresentation|VoiceInkOnboardingStepPresentation|appIconFallbackSystemImageName' \
   VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift
 
 require_pattern \
   "iOS onboarding uses shared onboarding presentation" \
   'VoiceInkIOSOnboardingPresentation\.(appIconFallbackSystemImageName|welcome|modelDownload|ready)' \
+  iOS/VoiceInk-ios/OnboardingView.swift
+
+require_pattern \
+  "iOS onboarding uses shared onboarding step state" \
+  'VoiceInkIOSOnboardingStep\.initial|@Binding var currentStep: VoiceInkIOSOnboardingStep' \
+  iOS/VoiceInk-ios/OnboardingView.swift
+
+require_pattern \
+  "iOS onboarding advances through shared step policy" \
+  'currentStep\.advance\(\)' \
+  iOS/VoiceInk-ios/OnboardingView.swift
+
+reject_pattern \
+  "iOS onboarding avoids shell-owned integer step flow" \
+  '@State private var currentStep = +0|@Binding var currentStep: Int|currentStep == +(0|1|2)|currentStep = +(1|2)' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 reject_pattern \
@@ -2542,8 +2557,18 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/OnboardingPresentationTests.swift
 
 require_pattern \
+  "core tests pin iOS onboarding step flow" \
+  'testIOSOnboardingStepOrderPreservesExistingFlow' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/OnboardingPresentationTests.swift
+
+require_pattern \
   "core check runner executes macOS setup presentation tests" \
   'testMacOSSetupPresentationPreservesHeaderAndStepOrder|testMacOSSetupPresentationPreservesActionTitlePolicy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core check runner executes iOS onboarding step flow test" \
+  'testIOSOnboardingStepOrderPreservesExistingFlow' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \

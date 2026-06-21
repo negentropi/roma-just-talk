@@ -9,19 +9,20 @@ import SwiftUI
 import VoiceInkCore
 
 struct OnboardingView: View {
-    @State private var currentStep = 0
+    @State private var currentStep = VoiceInkIOSOnboardingStep.initial
     @Binding var isOnboardingComplete: Bool
     
     var body: some View {
         ZStack {
             // Step-by-step views without swiping
-            if currentStep == 0 {
+            switch currentStep {
+            case .welcome:
                 WelcomeOnboardingView(currentStep: $currentStep)
                     .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading)))
-            } else if currentStep == 1 {
+            case .modelDownload:
                 ModelDownloadOnboardingView(currentStep: $currentStep)
                     .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading)))
-            } else if currentStep == 2 {
+            case .ready:
                 ReadyOnboardingView(isOnboardingComplete: $isOnboardingComplete)
                     .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading)))
             }
@@ -31,7 +32,7 @@ struct OnboardingView: View {
 }
 
 struct WelcomeOnboardingView: View {
-    @Binding var currentStep: Int
+    @Binding var currentStep: VoiceInkIOSOnboardingStep
     private let presentation = VoiceInkIOSOnboardingPresentation.welcome
     
     var body: some View {
@@ -79,7 +80,7 @@ struct WelcomeOnboardingView: View {
             VStack {
                 Button(presentation.primaryButtonTitle) {
                     withAnimation(.easeInOut(duration: 0.3)) {
-                        currentStep = 1
+                        currentStep.advance()
                     }
                 }
                 .buttonStyle(OnboardingButtonStyle())
@@ -92,7 +93,7 @@ struct WelcomeOnboardingView: View {
 }
 
 struct ModelDownloadOnboardingView: View {
-    @Binding var currentStep: Int
+    @Binding var currentStep: VoiceInkIOSOnboardingStep
     @StateObject private var modelManager = LocalModelManager.shared
     @State private var showDownloadConfirmation = false
     private let onboardingPresentation = VoiceInkIOSOnboardingPresentation.modelDownload
@@ -197,7 +198,7 @@ struct ModelDownloadOnboardingView: View {
                 case .downloaded:
                     Button(onboardingPresentation.continueButtonTitle) {
                         withAnimation(.easeInOut(duration: 0.3)) {
-                            currentStep = 2
+                            currentStep.advance()
                         }
                     }
                     .buttonStyle(OnboardingButtonStyle())

@@ -350,6 +350,30 @@ public enum VoiceInkMacOSSetupPresentation {
     }
 }
 
+public enum VoiceInkIOSOnboardingStep: CaseIterable, Equatable, Sendable {
+    case welcome
+    case modelDownload
+    case ready
+
+    public static let initial = VoiceInkIOSOnboardingStep.welcome
+
+    public var nextStep: VoiceInkIOSOnboardingStep? {
+        switch self {
+        case .welcome:
+            return .modelDownload
+        case .modelDownload:
+            return .ready
+        case .ready:
+            return nil
+        }
+    }
+
+    public mutating func advance() {
+        guard let followingStep = nextStep else { return }
+        self = followingStep
+    }
+}
+
 public enum VoiceInkIOSOnboardingPresentation {
     public static let appIconFallbackSystemImageName = "app.fill"
 

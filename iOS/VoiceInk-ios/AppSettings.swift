@@ -132,6 +132,13 @@ final class AppSettings: ObservableObject {
             localWhisperModelAvailable: LocalModelManager.shared.hasAvailableModel
         )
     }
+
+    var modeFormProviderAvailability: VoiceInkModeFormProviderAvailability {
+        VoiceInkModeFormProviderAvailability(
+            transcriptionProviders: availableProviders(for: .transcription),
+            postProcessingProviders: availableProviders(for: .postProcessing)
+        )
+    }
     
     func setKeyVerified(_ verified: Bool, for provider: VoiceInkProviderKind) {
         var updatedState = apiKeyState

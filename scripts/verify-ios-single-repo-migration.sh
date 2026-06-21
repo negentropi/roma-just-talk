@@ -592,6 +592,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/Mode.swift
 
 require_pattern \
+  "shared mode form provider availability lives in VoiceInkCore" \
+  'VoiceInkModeFormProviderAvailability|providerAvailability' \
+  VoiceInkCore/Sources/VoiceInkCore/Mode.swift
+
+require_pattern \
   "shared mode list policy lives in VoiceInkCore" \
   'VoiceInkModeListPolicy|appending\(|replacing\(|defaultModeRepairPlan|VoiceInkModeListRepairPlan' \
   VoiceInkCore/Sources/VoiceInkCore/Mode.swift
@@ -627,8 +632,18 @@ require_pattern \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \
+  "iOS AppSettings exposes shared mode form provider availability" \
+  'VoiceInkModeFormProviderAvailability|modeFormProviderAvailability' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+require_pattern \
   "iOS mode configuration uses shared form presentation" \
   'formPresentation|VoiceInkModeFormPresentation' \
+  iOS/VoiceInk-ios/ModeConfigurationView.swift
+
+require_pattern \
+  "iOS mode configuration uses shared provider availability" \
+  'modeFormProviderAvailability|providerAvailability\.(canSave|repairedMode|transcriptionProviders|postProcessingProviders)' \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
 require_pattern \
@@ -690,6 +705,11 @@ reject_pattern \
 reject_pattern \
   "iOS mode configuration avoids shell-only form presentation copy" \
   '"(Mode Details|Mode Name|Transcription|Post-processing|Enable Post-processing|Provider|Prompt Template|Custom Prompt|Edit Mode|New Mode|Save|Model)"|Configure how the raw transcription should be processed and refined\.' \
+  iOS/VoiceInk-ios/ModeConfigurationView.swift
+
+reject_pattern \
+  "iOS mode configuration avoids shell-owned provider availability plumbing" \
+  'settings\.availableProviders\(for:|isSaveableDraft\(availableTranscriptionProviders:|repairProviderSelection\(availableTranscriptionProviders:' \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
 reject_pattern \
@@ -5727,14 +5747,14 @@ reject_pattern \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
 require_pattern \
-  "iOS mode transcription provider list uses settings adapter" \
-  'settings\.availableProviders\(for: \.transcription\)' \
+  "iOS mode provider availability uses settings adapter" \
+  'settings\.modeFormProviderAvailability' \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
 require_pattern \
-  "iOS mode post-processing provider list uses settings adapter" \
-  'settings\.availableProviders\(for: \.postProcessing\)' \
-  iOS/VoiceInk-ios/ModeConfigurationView.swift
+  "iOS settings adapter builds mode provider availability from provider-key state" \
+  'availableProviders\(for: \.(transcription|postProcessing)\)' \
+  iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \
   "shared provider model selection presentation lives in VoiceInkCore" \

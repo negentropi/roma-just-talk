@@ -64,6 +64,29 @@ public struct VoiceInkModeFormPresentation: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkModeFormProviderAvailability: Equatable, Sendable {
+    public let transcriptionProviders: [VoiceInkProviderKind]
+    public let postProcessingProviders: [VoiceInkProviderKind]
+
+    public init(
+        transcriptionProviders: [VoiceInkProviderKind],
+        postProcessingProviders: [VoiceInkProviderKind]
+    ) {
+        self.transcriptionProviders = transcriptionProviders
+        self.postProcessingProviders = postProcessingProviders
+    }
+
+    public func canSave(_ mode: Mode) -> Bool {
+        mode.isSaveableDraft(providerAvailability: self)
+    }
+
+    public func repairedMode(_ mode: Mode) -> Mode {
+        var repairedMode = mode
+        repairedMode.repairProviderSelection(providerAvailability: self)
+        return repairedMode
+    }
+}
+
 public struct VoiceInkModeListRepairPlan {
     public let modes: [Mode]
     public let selectedModeId: UUID?
@@ -228,6 +251,15 @@ public struct Mode: Identifiable, Codable {
         repairModelSelection()
     }
 
+    public mutating func repairProviderSelection(
+        providerAvailability: VoiceInkModeFormProviderAvailability
+    ) {
+        repairProviderSelection(
+            availableTranscriptionProviders: providerAvailability.transcriptionProviders,
+            availablePostProcessingProviders: providerAvailability.postProcessingProviders
+        )
+    }
+
     public static func defaultLocalWhisper(name: String = "Default") -> Mode {
         Mode(
             name: name,
@@ -270,6 +302,15 @@ public struct Mode: Identifiable, Codable {
         }
 
         return true
+    }
+
+    public func isSaveableDraft(
+        providerAvailability: VoiceInkModeFormProviderAvailability
+    ) -> Bool {
+        isSaveableDraft(
+            availableTranscriptionProviders: providerAvailability.transcriptionProviders,
+            availablePostProcessingProviders: providerAvailability.postProcessingProviders
+        )
     }
 }
 

@@ -18,21 +18,12 @@ struct ModeConfigurationView: View {
         self._mode = State(initialValue: initialMode)
     }
     
-    /// Available transcription providers (those with valid API keys or downloaded local models)
-    private var availableTranscriptionProviders: [VoiceInkProviderKind] {
-        settings.availableProviders(for: .transcription)
-    }
-    
-    /// Available post-processing providers (those with valid API keys)
-    private var availablePostProcessingProviders: [VoiceInkProviderKind] {
-        settings.availableProviders(for: .postProcessing)
+    private var providerAvailability: VoiceInkModeFormProviderAvailability {
+        settings.modeFormProviderAvailability
     }
 
     private var canSave: Bool {
-        mode.isSaveableDraft(
-            availableTranscriptionProviders: availableTranscriptionProviders,
-            availablePostProcessingProviders: availablePostProcessingProviders
-        )
+        providerAvailability.canSave(mode)
     }
 
     private var presentation: VoiceInkModeFormPresentation {
@@ -50,7 +41,7 @@ struct ModeConfigurationView: View {
             
             Section(header: Text(formPresentation.transcriptionSectionTitle)) {
                 Picker(formPresentation.providerPickerTitle, selection: $mode.transcriptionProvider) {
-                    ForEach(availableTranscriptionProviders) { provider in
+                    ForEach(providerAvailability.transcriptionProviders) { provider in
                         Text(provider.displayName).tag(provider)
                     }
                 }
@@ -71,7 +62,7 @@ struct ModeConfigurationView: View {
                 
                 if mode.isPostProcessingEnabled {
                     Picker(formPresentation.providerPickerTitle, selection: $mode.postProcessingProvider) {
-                        ForEach(availablePostProcessingProviders) { provider in
+                        ForEach(providerAvailability.postProcessingProviders) { provider in
                             Text(provider.displayName).tag(provider)
                         }
                     }
@@ -114,10 +105,7 @@ struct ModeConfigurationView: View {
             }
         }
         .onAppear(perform: repairUnavailableProviderSelections)
-        .onChange(of: availableTranscriptionProviders) { _, _ in
-            repairUnavailableProviderSelections()
-        }
-        .onChange(of: availablePostProcessingProviders) { _, _ in
+        .onChange(of: providerAvailability) { _, _ in
             repairUnavailableProviderSelections()
         }
         .onChange(of: mode.isPostProcessingEnabled) { _, _ in
@@ -132,10 +120,7 @@ struct ModeConfigurationView: View {
     }
 
     private func repairUnavailableProviderSelections() {
-        mode.repairProviderSelection(
-            availableTranscriptionProviders: availableTranscriptionProviders,
-            availablePostProcessingProviders: availablePostProcessingProviders
-        )
+        mode = providerAvailability.repairedMode(mode)
     }
 }
 

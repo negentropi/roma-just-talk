@@ -454,4 +454,46 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
             availablePostProcessingProviders: [.groq]
         ))
     }
+
+    func testModeFormProviderAvailabilityOwnsDraftSaveabilityAndRepair() {
+        let availability = VoiceInkModeFormProviderAvailability(
+            transcriptionProviders: [.localWhisper],
+            postProcessingProviders: [.gemini]
+        )
+        var mode = Mode(
+            name: "Legacy",
+            transcriptionProvider: .voiceInk,
+            transcriptionModel: "stale-transcription-model",
+            isPostProcessingEnabled: true,
+            postProcessingProvider: .voiceInk,
+            postProcessingModel: "stale-post-processing-model"
+        )
+
+        XCTAssertFalse(availability.canSave(mode))
+
+        mode.repairProviderSelection(providerAvailability: availability)
+
+        XCTAssertEqual(mode.transcriptionProvider, .localWhisper)
+        XCTAssertEqual(mode.transcriptionModel, VoiceInkTranscriptionModelCatalog.localBaseModel)
+        XCTAssertEqual(mode.postProcessingProvider, .gemini)
+        XCTAssertEqual(mode.postProcessingModel, VoiceInkAIModelCatalog.defaultModel(for: .gemini))
+        XCTAssertTrue(availability.canSave(mode))
+    }
+
+    func testModeFormProviderAvailabilityCanReturnRepairedModeWithoutMutatingOriginal() {
+        let availability = VoiceInkModeFormProviderAvailability(
+            transcriptionProviders: [.deepgram],
+            postProcessingProviders: [.groq]
+        )
+        let originalMode = Mode(
+            name: "Legacy",
+            transcriptionProvider: .localWhisper,
+            isPostProcessingEnabled: false
+        )
+
+        let repairedMode = availability.repairedMode(originalMode)
+
+        XCTAssertEqual(originalMode.transcriptionProvider, .localWhisper)
+        XCTAssertEqual(repairedMode.transcriptionProvider, .deepgram)
+    }
 }

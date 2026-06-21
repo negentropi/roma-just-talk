@@ -8155,6 +8155,26 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift
 
 require_pattern \
+  "shared dashboard promotion presentation lives in VoiceInkCore" \
+  'VoiceInkDashboardPromotionPresentation|VoiceInkDashboardPromotionLicenseState|VoiceInkDashboardPromotionCardPresentation|affiliateDismissedKey = "VoiceInkAffiliatePromotionDismissed"|socialShareURLString = "https://tryvoiceink\.com/social-share"|affiliateURLString = "https://tryvoiceink\.com/affiliate"|cards\(' \
+  VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift
+
+require_pattern \
+  "macOS dashboard promotions use shared presentation" \
+  'VoiceInkDashboardPromotionPresentation\.(affiliateDismissedKey|defaultIsAffiliateDismissed|cards)|dashboardPromotionLicenseState|VoiceInkDashboardPromotionCardPresentation' \
+  VoiceInk/Views/Metrics/DashboardPromotionsSection.swift
+
+require_pattern \
+  "core checks execute dashboard promotion tests" \
+  'DashboardMetricsTests\.testDashboardPromotionPresentationPreservesMacOSCopyURLsAndDismissalKey|DashboardMetricsTests\.testDashboardPromotionPolicyMatchesMacOSLicenseVisibilityRules' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "macOS dashboard promotions avoid shell-owned promotion policy" \
+  'VoiceInkAffiliatePromotionDismissed|https://tryvoiceink\.com/(social-share|affiliate)|"(30% OFF|Unlock VoiceInk Pro For Less|Share VoiceInk on your socials, and instantly unlock a 30% discount on VoiceInk Pro\.|Share & Unlock|AFFILIATE 30%|Earn With The VoiceInk Affiliate Program|Share VoiceInk with friends or your audience and receive 30% on every referral that upgrades\.|Explore Affiliate|Dismiss this promotion)"|shouldShow(Upgrade|Affiliate|Promotions)' \
+  VoiceInk/Views/Metrics/DashboardPromotionsSection.swift
+
+require_pattern \
   "iOS note-list uses shared chrome presentation" \
   'VoiceInkNoteListPresentation\.(sectionTitle|settingsSystemImageName|startRecordingButtonTitle|startRecordingSystemImageName)' \
   iOS/VoiceInk-ios/NotesListView.swift
@@ -8208,6 +8228,11 @@ require_pattern \
   "core check runner executes macOS dashboard presentation tests" \
   'DashboardMetricsTests\.testDashboardPresentationPreservesMacOSDashboardCopy|DashboardMetricsTests\.testDashboardPresentationBuildsHeroTitleAndSubtitle|DashboardMetricsTests\.testDashboardPresentationBuildsMacOSMetricCards' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "migration checklist tracks shared dashboard promotion presentation" \
+  'macOS dashboard hero/empty/action/stat-card/promotion presentation.*VoiceInkDashboardPromotionPresentation' \
+  docs/ios-single-repo-migration.md
 
 require_pattern \
   "macOS dashboard uses shared metric-card presentation" \

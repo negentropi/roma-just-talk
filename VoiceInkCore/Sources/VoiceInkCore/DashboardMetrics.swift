@@ -267,3 +267,102 @@ public enum VoiceInkNoteListPresentation {
     public static let startRecordingButtonTitle = "Start Recording"
     public static let startRecordingSystemImageName = "mic.fill"
 }
+
+public enum VoiceInkDashboardPromotionLicenseState: Equatable, Sendable {
+    case trial(daysRemaining: Int)
+    case trialExpired
+    case licensed
+}
+
+public enum VoiceInkDashboardPromotionKind: String, Equatable, Hashable, Sendable {
+    case upgrade
+    case affiliate
+}
+
+public struct VoiceInkDashboardPromotionCardPresentation: Equatable, Sendable, Identifiable {
+    public let id: VoiceInkDashboardPromotionKind
+    public let badge: String
+    public let title: String
+    public let message: String
+    public let actionTitle: String
+    public let actionSystemImageName: String
+    public let actionURL: URL
+    public let dismissHelpText: String?
+
+    public init(
+        id: VoiceInkDashboardPromotionKind,
+        badge: String,
+        title: String,
+        message: String,
+        actionTitle: String,
+        actionSystemImageName: String,
+        actionURL: URL,
+        dismissHelpText: String? = nil
+    ) {
+        self.id = id
+        self.badge = badge
+        self.title = title
+        self.message = message
+        self.actionTitle = actionTitle
+        self.actionSystemImageName = actionSystemImageName
+        self.actionURL = actionURL
+        self.dismissHelpText = dismissHelpText
+    }
+
+    public var isDismissible: Bool {
+        dismissHelpText != nil
+    }
+}
+
+public enum VoiceInkDashboardPromotionPresentation {
+    public static let affiliateDismissedKey = "VoiceInkAffiliatePromotionDismissed"
+    public static let defaultIsAffiliateDismissed = false
+    public static let socialShareURLString = "https://tryvoiceink.com/social-share"
+    public static let affiliateURLString = "https://tryvoiceink.com/affiliate"
+    public static let dismissHelpText = "Dismiss this promotion"
+
+    public static var socialShareURL: URL {
+        URL(string: socialShareURLString)!
+    }
+
+    public static var affiliateURL: URL {
+        URL(string: affiliateURLString)!
+    }
+
+    public static func cards(
+        for licenseState: VoiceInkDashboardPromotionLicenseState,
+        isAffiliateDismissed: Bool
+    ) -> [VoiceInkDashboardPromotionCardPresentation] {
+        switch licenseState {
+        case .trial(let daysRemaining) where daysRemaining <= 3:
+            return [upgradeCard]
+        case .trialExpired:
+            return [upgradeCard]
+        case .licensed where !isAffiliateDismissed:
+            return [affiliateCard]
+        case .trial, .licensed:
+            return []
+        }
+    }
+
+    public static let upgradeCard = VoiceInkDashboardPromotionCardPresentation(
+        id: .upgrade,
+        badge: "30% OFF",
+        title: "Unlock VoiceInk Pro For Less",
+        message: "Share VoiceInk on your socials, and instantly unlock a 30% discount on VoiceInk Pro.",
+        actionTitle: "Share & Unlock",
+        actionSystemImageName: "arrow.up.right",
+        actionURL: socialShareURL
+    )
+
+    public static let affiliateCard = VoiceInkDashboardPromotionCardPresentation(
+        id: .affiliate,
+        badge: "AFFILIATE 30%",
+        title: "Earn With The VoiceInk Affiliate Program",
+        message: "Share VoiceInk with friends or your audience and receive 30% on every referral that upgrades.",
+        actionTitle: "Explore Affiliate",
+        actionSystemImageName: "arrow.up.right",
+        actionURL: affiliateURL,
+        dismissHelpText: dismissHelpText
+    )
+}

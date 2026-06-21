@@ -1,60 +1,27 @@
 import SwiftUI
 import AppKit
+import VoiceInkCore
 
 struct DashboardPromotionsSection: View {
     let licenseState: LicenseViewModel.LicenseState
-    @AppStorage("VoiceInkAffiliatePromotionDismissed") private var isAffiliatePromotionDismissed = false
+    @AppStorage(VoiceInkDashboardPromotionPresentation.affiliateDismissedKey)
+    private var isAffiliatePromotionDismissed = VoiceInkDashboardPromotionPresentation.defaultIsAffiliateDismissed
 
-    private var shouldShowUpgradePromotion: Bool {
-        switch licenseState {
-        case .trial(let daysRemaining):
-            return daysRemaining <= 3
-        case .trialExpired:
-            return true
-        case .licensed:
-            return false
-        }
-    }
-
-    private var shouldShowAffiliatePromotion: Bool {
-        if case .licensed = licenseState {
-            return !isAffiliatePromotionDismissed
-        }
-        return false
-    }
-    
-    private var shouldShowPromotions: Bool {
-        shouldShowUpgradePromotion || shouldShowAffiliatePromotion
+    private var promotionCards: [VoiceInkDashboardPromotionCardPresentation] {
+        VoiceInkDashboardPromotionPresentation.cards(
+            for: licenseState.dashboardPromotionLicenseState,
+            isAffiliateDismissed: isAffiliatePromotionDismissed
+        )
     }
     
     var body: some View {
-        if shouldShowPromotions {
+        if !promotionCards.isEmpty {
             HStack(alignment: .top, spacing: 18) {
-                if shouldShowUpgradePromotion {
+                ForEach(promotionCards) { card in
                     DashboardPromotionCard(
-                        badge: "30% OFF",
-                        title: "Unlock VoiceInk Pro For Less",
-                        message: "Share VoiceInk on your socials, and instantly unlock a 30% discount on VoiceInk Pro.",
-                        accentSymbol: "megaphone.fill",
-                        glowColor: Color(red: 0.08, green: 0.48, blue: 0.85),
-                        actionTitle: "Share & Unlock",
-                        actionIcon: "arrow.up.right",
-                        action: openSocialShare
-                    )
-                    .frame(maxWidth: .infinity)
-                }
-                
-                if shouldShowAffiliatePromotion {
-                    DashboardPromotionCard(
-                        badge: "AFFILIATE 30%",
-                        title: "Earn With The VoiceInk Affiliate Program",
-                        message: "Share VoiceInk with friends or your audience and receive 30% on every referral that upgrades.",
-                        accentSymbol: "link.badge.plus",
-                        glowColor: Color(red: 0.08, green: 0.48, blue: 0.85),
-                        actionTitle: "Explore Affiliate",
-                        actionIcon: "arrow.up.right",
-                        action: openAffiliateProgram,
-                        onDismiss: dismissAffiliatePromotion
+                        presentation: card,
+                        action: { open(card.actionURL) },
+                        onDismiss: card.isDismissible ? dismissAffiliatePromotion : nil
                     )
                     .frame(maxWidth: .infinity)
                 }
@@ -64,17 +31,9 @@ struct DashboardPromotionsSection: View {
             EmptyView()
         }
     }
-    
-    private func openSocialShare() {
-        if let url = URL(string: "https://tryvoiceink.com/social-share") {
-            NSWorkspace.shared.open(url)
-        }
-    }
-    
-    private func openAffiliateProgram() {
-        if let url = URL(string: "https://tryvoiceink.com/affiliate") {
-            NSWorkspace.shared.open(url)
-        }
+
+    private func open(_ url: URL) {
+        NSWorkspace.shared.open(url)
     }
 
     private func dismissAffiliatePromotion() {
@@ -85,20 +44,14 @@ struct DashboardPromotionsSection: View {
 }
 
 private struct DashboardPromotionCard: View {
-    let badge: String
-    let title: String
-    let message: String
-    let accentSymbol: String
-    let glowColor: Color
-    let actionTitle: String
-    let actionIcon: String
+    let presentation: VoiceInkDashboardPromotionCardPresentation
     let action: () -> Void
     var onDismiss: (() -> Void)? = nil
     
     var body: some View {
         ZStack(alignment: .topTrailing) {
             VStack(alignment: .leading, spacing: 13) {
-                Text(badge.uppercased())
+                Text(presentation.badge.uppercased())
                     .font(.system(size: 10, weight: .bold))
                     .tracking(0.4)
                     .padding(.horizontal, 10)
@@ -107,20 +60,20 @@ private struct DashboardPromotionCard: View {
                     .clipShape(Capsule())
                     .foregroundStyle(.secondary)
 
-                Text(title)
+                Text(presentation.title)
                     .font(.system(size: 18, weight: .semibold, design: .rounded))
                     .foregroundColor(.primary)
                     .fixedSize(horizontal: false, vertical: true)
 
-                Text(message)
+                Text(presentation.message)
                     .font(.system(size: 13, weight: .medium))
                     .foregroundColor(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
 
                 Button(action: action) {
                     HStack(spacing: 6) {
-                        Text(actionTitle)
-                        Image(systemName: actionIcon)
+                        Text(presentation.actionTitle)
+                        Image(systemName: presentation.actionSystemImageName)
                     }
                     .font(.system(size: 13, weight: .semibold))
                     .padding(.horizontal, 14)
@@ -134,7 +87,7 @@ private struct DashboardPromotionCard: View {
             .padding(18)
             .frame(maxWidth: .infinity, alignment: .topLeading)
 
-            if let onDismiss = onDismiss {
+            if let onDismiss = onDismiss, let dismissHelpText = presentation.dismissHelpText {
                 Button(action: onDismiss) {
                     Image(systemName: "xmark.circle.fill")
                         .font(.system(size: 18, weight: .medium))
@@ -142,9 +95,22 @@ private struct DashboardPromotionCard: View {
                 }
                 .buttonStyle(.plain)
                 .padding(12)
-                .help("Dismiss this promotion")
+                .help(dismissHelpText)
             }
         }
         .background(CardBackground(isSelected: false, cornerRadius: 22))
+    }
+}
+
+private extension LicenseViewModel.LicenseState {
+    var dashboardPromotionLicenseState: VoiceInkDashboardPromotionLicenseState {
+        switch self {
+        case .trial(let daysRemaining):
+            return .trial(daysRemaining: daysRemaining)
+        case .trialExpired:
+            return .trialExpired
+        case .licensed:
+            return .licensed
+        }
     }
 }

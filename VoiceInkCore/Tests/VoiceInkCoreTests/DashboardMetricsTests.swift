@@ -271,6 +271,87 @@ final class DashboardMetricsTests: XCTestCase {
         XCTAssertEqual(VoiceInkNoteListPresentation.startRecordingButtonTitle, "Start Recording")
         XCTAssertEqual(VoiceInkNoteListPresentation.startRecordingSystemImageName, "mic.fill")
     }
+
+    func testDashboardPromotionPresentationPreservesMacOSCopyURLsAndDismissalKey() {
+        XCTAssertEqual(
+            VoiceInkDashboardPromotionPresentation.affiliateDismissedKey,
+            "VoiceInkAffiliatePromotionDismissed"
+        )
+        XCTAssertFalse(VoiceInkDashboardPromotionPresentation.defaultIsAffiliateDismissed)
+        XCTAssertEqual(
+            VoiceInkDashboardPromotionPresentation.socialShareURL.absoluteString,
+            "https://tryvoiceink.com/social-share"
+        )
+        XCTAssertEqual(
+            VoiceInkDashboardPromotionPresentation.affiliateURL.absoluteString,
+            "https://tryvoiceink.com/affiliate"
+        )
+        XCTAssertEqual(VoiceInkDashboardPromotionPresentation.dismissHelpText, "Dismiss this promotion")
+
+        XCTAssertEqual(
+            VoiceInkDashboardPromotionPresentation.upgradeCard,
+            VoiceInkDashboardPromotionCardPresentation(
+                id: .upgrade,
+                badge: "30% OFF",
+                title: "Unlock VoiceInk Pro For Less",
+                message: "Share VoiceInk on your socials, and instantly unlock a 30% discount on VoiceInk Pro.",
+                actionTitle: "Share & Unlock",
+                actionSystemImageName: "arrow.up.right",
+                actionURL: VoiceInkDashboardPromotionPresentation.socialShareURL
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkDashboardPromotionPresentation.affiliateCard,
+            VoiceInkDashboardPromotionCardPresentation(
+                id: .affiliate,
+                badge: "AFFILIATE 30%",
+                title: "Earn With The VoiceInk Affiliate Program",
+                message: "Share VoiceInk with friends or your audience and receive 30% on every referral that upgrades.",
+                actionTitle: "Explore Affiliate",
+                actionSystemImageName: "arrow.up.right",
+                actionURL: VoiceInkDashboardPromotionPresentation.affiliateURL,
+                dismissHelpText: "Dismiss this promotion"
+            )
+        )
+    }
+
+    func testDashboardPromotionPolicyMatchesMacOSLicenseVisibilityRules() {
+        XCTAssertEqual(
+            VoiceInkDashboardPromotionPresentation.cards(
+                for: .trial(daysRemaining: 4),
+                isAffiliateDismissed: false
+            ),
+            []
+        )
+        XCTAssertEqual(
+            VoiceInkDashboardPromotionPresentation.cards(
+                for: .trial(daysRemaining: 3),
+                isAffiliateDismissed: false
+            ),
+            [VoiceInkDashboardPromotionPresentation.upgradeCard]
+        )
+        XCTAssertEqual(
+            VoiceInkDashboardPromotionPresentation.cards(
+                for: .trialExpired,
+                isAffiliateDismissed: true
+            ),
+            [VoiceInkDashboardPromotionPresentation.upgradeCard]
+        )
+        XCTAssertEqual(
+            VoiceInkDashboardPromotionPresentation.cards(
+                for: .licensed,
+                isAffiliateDismissed: false
+            ),
+            [VoiceInkDashboardPromotionPresentation.affiliateCard]
+        )
+        XCTAssertEqual(
+            VoiceInkDashboardPromotionPresentation.cards(
+                for: .licensed,
+                isAffiliateDismissed: true
+            ),
+            []
+        )
+    }
 }
 
 private struct Record: VoiceInkDashboardMetricRecord {

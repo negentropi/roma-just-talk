@@ -261,6 +261,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "DashboardMetricsTests.testNoteListSummaryPresentationBuildsIOSHeaderText", run: { DashboardMetricsTests().testNoteListSummaryPresentationBuildsIOSHeaderText() }),
             VoiceInkCoreCheck(name: "DashboardMetricsTests.testNoteListSummaryPresentationOmitsFastestModelWhenNoTimedModelExists", run: { DashboardMetricsTests().testNoteListSummaryPresentationOmitsFastestModelWhenNoTimedModelExists() }),
             VoiceInkCoreCheck(name: "DashboardMetricsTests.testNoteListPresentationPreservesIOSChromeCopy", run: { DashboardMetricsTests().testNoteListPresentationPreservesIOSChromeCopy() }),
+            VoiceInkCoreCheck(name: "DashboardMetricsTests.testDashboardPromotionPresentationPreservesMacOSCopyURLsAndDismissalKey", run: { DashboardMetricsTests().testDashboardPromotionPresentationPreservesMacOSCopyURLsAndDismissalKey() }),
+            VoiceInkCoreCheck(name: "DashboardMetricsTests.testDashboardPromotionPolicyMatchesMacOSLicenseVisibilityRules", run: { DashboardMetricsTests().testDashboardPromotionPolicyMatchesMacOSLicenseVisibilityRules() }),
             VoiceInkCoreCheck(name: "DatePresentationTests.testAbbreviatedTimestampPreservesMacOSDetailFormat", run: { DatePresentationTests().testAbbreviatedTimestampPreservesMacOSDetailFormat() }),
             VoiceInkCoreCheck(name: "DatePresentationTests.testCompactTimestampPreservesMacOSHistoryListFormat", run: { DatePresentationTests().testCompactTimestampPreservesMacOSHistoryListFormat() }),
             VoiceInkCoreCheck(name: "DatePresentationTests.testRelativeTimestampUsesShortRelativeStyle", run: { DatePresentationTests().testRelativeTimestampUsesShortRelativeStyle() }),

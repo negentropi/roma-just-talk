@@ -387,6 +387,7 @@ reject_pattern \
 section "iOS ported assets and resources"
 require_file iOS/Shared/AppGroupCoordinator.swift
 require_file iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
+require_file iOS/Shared/VoiceInkIOSLogger.swift
 require_file iOS/VoiceInk-ios/Transcription.swift
 require_file docs/ios-privacy-policy.md
 require_file iOS/VoiceInk-ios/PrivacyInfo.xcprivacy

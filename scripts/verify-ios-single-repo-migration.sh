@@ -5503,6 +5503,16 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionStreamingPreference.swift
 
 require_pattern \
+  "shared core owns transcription session execution planning" \
+  'VoiceInkTranscriptionSessionExecutionPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionStreamingPreference.swift
+
+require_pattern \
+  "shared transcription session route plan packages concrete execution plan" \
+  'var executionPlan: VoiceInkTranscriptionSessionExecutionPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionStreamingPreference.swift
+
+require_pattern \
   "macOS model adapts shared transcription session route facts" \
   'transcription(SessionRouteFacts|ServiceRoute)' \
   VoiceInk/Models/TranscriptionModel.swift
@@ -5510,6 +5520,11 @@ require_pattern \
 require_pattern \
   "macOS session creation uses shared transcription route plan" \
   'transcriptionSessionRouteFacts\.plan\(forceStreaming: forceStreaming\)' \
+  VoiceInk/Transcription/Engine/TranscriptionServiceRegistry.swift
+
+require_pattern \
+  "macOS transcription service registry consumes shared session execution plan" \
+  'routePlan\.executionPlan|case \.streaming|case \.file' \
   VoiceInk/Transcription/Engine/TranscriptionServiceRegistry.swift
 
 require_pattern \
@@ -5660,6 +5675,21 @@ reject_pattern \
   "macOS session creation avoids shell-only streaming support wrapper" \
   'private func supportsStreaming\(model:' \
   VoiceInk/Transcription/Engine/TranscriptionServiceRegistry.swift
+
+reject_pattern \
+  "macOS transcription service registry avoids shell-owned streaming route invariant" \
+  'fatalError\("Streaming route plan missing streaming adapter details\."\)|guard let streamingAdapterKind = routePlan\.streamingAdapterKind|routePlan\.usesStreaming' \
+  VoiceInk/Transcription/Engine/TranscriptionServiceRegistry.swift
+
+require_pattern \
+  "core checks execute transcription session execution plan tests" \
+  'TranscriptionStreamingPreferenceTests\.testSessionRouteExecutionPlanUsesFileServiceWhenStreamingDisabled|TranscriptionStreamingPreferenceTests\.testSessionRouteExecutionPlanPackagesStreamingAdapterPreloadAndTimeout' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "migration checklist tracks shared transcription session execution plan" \
+  'VoiceInkTranscriptionSessionExecutionPlan' \
+  docs/ios-single-repo-migration.md
 
 require_pattern \
   "macOS AI API-key view uses shared AI draft policy" \

@@ -52,23 +52,20 @@ class TranscriptionServiceRegistry {
     ) -> TranscriptionSession {
         let routePlan = model.transcriptionSessionRouteFacts.plan(forceStreaming: forceStreaming)
 
-        if routePlan.usesStreaming {
-            guard let streamingAdapterKind = routePlan.streamingAdapterKind,
-                  let finalCommitTimeoutNanoseconds = routePlan.finalCommitTimeoutNanoseconds else {
-                fatalError("Streaming route plan missing streaming adapter details.")
-            }
+        switch routePlan.executionPlan {
+        case .streaming(let serviceRoute, let streamingAdapterKind, let usesRollingPreload, let finalCommitTimeoutNanoseconds):
             let streamingService = StreamingTranscriptionService(
                 modelContext: modelContext,
                 streamingAdapterKind: streamingAdapterKind,
                 fluidAudioService: streamingAdapterKind == .localFluidAudio ? fluidAudioTranscriptionService : nil,
-                fluidAudioStreamingConfig: routePlan.usesRollingPreload ? .rollingPreload : nil,
+                fluidAudioStreamingConfig: usesRollingPreload ? .rollingPreload : nil,
                 finalCommitTimeoutNanoseconds: finalCommitTimeoutNanoseconds,
                 onPartialTranscript: onPartialTranscript
             )
-            let fallback = service(for: routePlan.serviceRoute)
+            let fallback = service(for: serviceRoute)
             return StreamingTranscriptionSession(streamingService: streamingService, fallbackService: fallback)
-        } else {
-            return FileTranscriptionSession(service: service(for: routePlan.serviceRoute))
+        case .file(let serviceRoute):
+            return FileTranscriptionSession(service: service(for: serviceRoute))
         }
     }
 

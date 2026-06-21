@@ -116,6 +116,16 @@ public enum VoiceInkTranscriptionStreamingAdapterKind: Equatable, Sendable {
     case localFluidAudio
 }
 
+public enum VoiceInkTranscriptionSessionExecutionPlan: Equatable, Sendable {
+    case file(serviceRoute: VoiceInkTranscriptionServiceRoute)
+    case streaming(
+        serviceRoute: VoiceInkTranscriptionServiceRoute,
+        adapterKind: VoiceInkTranscriptionStreamingAdapterKind,
+        usesRollingPreload: Bool,
+        finalCommitTimeoutNanoseconds: UInt64
+    )
+}
+
 public struct VoiceInkTranscriptionSessionRouteFacts: Equatable, Sendable {
     public let serviceRoute: VoiceInkTranscriptionServiceRoute
     public let streamingSnapshot: VoiceInkTranscriptionStreamingModelSnapshot
@@ -183,5 +193,23 @@ public struct VoiceInkTranscriptionSessionRoutePlan: Equatable, Sendable {
 
     public var finalCommitTimeoutNanoseconds: UInt64? {
         finalCommitSource.map(VoiceInkStreamingFinalCommitTimeout.nanoseconds(for:))
+    }
+
+    public var executionPlan: VoiceInkTranscriptionSessionExecutionPlan {
+        guard usesStreaming else {
+            return .file(serviceRoute: serviceRoute)
+        }
+
+        guard let streamingAdapterKind,
+              let finalCommitTimeoutNanoseconds else {
+            preconditionFailure("Streaming route plan missing streaming adapter details.")
+        }
+
+        return .streaming(
+            serviceRoute: serviceRoute,
+            adapterKind: streamingAdapterKind,
+            usesRollingPreload: usesRollingPreload,
+            finalCommitTimeoutNanoseconds: finalCommitTimeoutNanoseconds
+        )
     }
 }

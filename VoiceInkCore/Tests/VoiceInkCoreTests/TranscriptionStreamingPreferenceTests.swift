@@ -246,6 +246,44 @@ final class TranscriptionStreamingPreferenceTests: XCTestCase {
         XCTAssertNil(plan.finalCommitSource)
     }
 
+    func testSessionRouteExecutionPlanUsesFileServiceWhenStreamingDisabled() {
+        withIsolatedDefaults { defaults in
+            let facts = routeFacts(serviceRoute: .cloud, modelName: "nova-3")
+            VoiceInkTranscriptionStreamingPreference.saveIsEnabled(
+                false,
+                forModelName: "nova-3",
+                to: defaults
+            )
+
+            let plan = facts.plan(forceStreaming: false, defaults: defaults)
+
+            XCTAssertEqual(plan.executionPlan, .file(serviceRoute: .cloud))
+        }
+    }
+
+    func testSessionRouteExecutionPlanPackagesStreamingAdapterPreloadAndTimeout() {
+        withIsolatedDefaults { defaults in
+            let facts = routeFacts(serviceRoute: .localFluidAudio, modelName: "parakeet-tdt-0.6b-v3")
+            VoiceInkTranscriptionStreamingPreference.saveIsEnabled(
+                false,
+                forModelName: "parakeet-tdt-0.6b-v3",
+                to: defaults
+            )
+
+            let plan = facts.plan(forceStreaming: true, defaults: defaults)
+
+            XCTAssertEqual(
+                plan.executionPlan,
+                .streaming(
+                    serviceRoute: .localFluidAudio,
+                    adapterKind: .localFluidAudio,
+                    usesRollingPreload: true,
+                    finalCommitTimeoutNanoseconds: VoiceInkStreamingFinalCommitTimeout.localFluidAudioNanoseconds
+                )
+            )
+        }
+    }
+
     private func withIsolatedDefaults(_ run: (UserDefaults) -> Void) {
         let suiteName = "VoiceInkCore.TranscriptionStreamingPreferenceTests.\(UUID().uuidString)"
         guard let defaults = UserDefaults(suiteName: suiteName) else {

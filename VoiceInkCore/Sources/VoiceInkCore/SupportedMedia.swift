@@ -58,6 +58,36 @@ public enum VoiceInkAudioFileQueueStatus: Equatable, Sendable {
             return false
         }
     }
+
+    public var isPending: Bool {
+        self == .pending
+    }
+
+    public var isProcessing: Bool {
+        switch self {
+        case .processing:
+            return true
+        case .pending, .completed, .failed:
+            return false
+        }
+    }
+
+    public var canRemoveFromQueue: Bool {
+        isPending
+    }
+
+    public var canRetry: Bool {
+        switch self {
+        case .failed:
+            return true
+        case .pending, .processing, .completed:
+            return false
+        }
+    }
+
+    public var statusAfterCancelingProcessing: Self {
+        isProcessing ? .pending : self
+    }
 }
 
 public enum VoiceInkAudioImportPresentation {

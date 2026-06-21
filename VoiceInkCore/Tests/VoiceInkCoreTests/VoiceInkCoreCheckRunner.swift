@@ -850,6 +850,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "SupportedMediaTests.testSupportedMediaDisplayExtensionsPreserveMacOSImportCopyOrder", run: { SupportedMediaTests().testSupportedMediaDisplayExtensionsPreserveMacOSImportCopyOrder() }),
             VoiceInkCoreCheck(name: "SupportedMediaTests.testAudioImportPresentationPreservesMacOSQueueCopyAndActions", run: { SupportedMediaTests().testAudioImportPresentationPreservesMacOSQueueCopyAndActions() }),
             VoiceInkCoreCheck(name: "SupportedMediaTests.testAudioFileQueueStatusPreservesTerminalAndProcessingPolicies", run: { SupportedMediaTests().testAudioFileQueueStatusPreservesTerminalAndProcessingPolicies() }),
+            VoiceInkCoreCheck(name: "SupportedMediaTests.testAudioFileQueueStatusPreservesMutationPredicates", run: { SupportedMediaTests().testAudioFileQueueStatusPreservesMutationPredicates() }),
+            VoiceInkCoreCheck(name: "SupportedMediaTests.testAudioFileQueueStatusCancelingProcessingResetsOnlyProcessingItems", run: { SupportedMediaTests().testAudioFileQueueStatusCancelingProcessingResetsOnlyProcessingItems() }),
             VoiceInkCoreCheck(name: "SupportedMediaTests.testAudioFileQueuePresentationPreservesRowCopyAndIcons", run: { SupportedMediaTests().testAudioFileQueuePresentationPreservesRowCopyAndIcons() }),
             VoiceInkCoreCheck(name: "SupportedMediaTests.testSupportedFileExtensionsPreserveMacOSImportPolicy", run: { SupportedMediaTests().testSupportedFileExtensionsPreserveMacOSImportPolicy() }),
             VoiceInkCoreCheck(name: "SupportedMediaTests.testSupportedMediaDisplayExtensionsMatchAcceptedExtensions", run: { SupportedMediaTests().testSupportedMediaDisplayExtensionsMatchAcceptedExtensions() }),

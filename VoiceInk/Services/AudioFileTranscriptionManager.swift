@@ -49,7 +49,7 @@ class AudioTranscriptionManager: ObservableObject {
         let item = queue[index]
 
         // Only allow removing pending items
-        guard case .pending = item.status else { return }
+        guard item.status.canRemoveFromQueue else { return }
 
         queue.remove(at: index)
     }
@@ -64,7 +64,7 @@ class AudioTranscriptionManager: ObservableObject {
     /// Retry a failed item by resetting it to pending and re-enqueuing.
     func retryItem(id: UUID) {
         guard let item = queue.first(where: { $0.id == id }),
-              case .failed = item.status else { return }
+              item.status.canRetry else { return }
 
         item.status = .pending
     }
@@ -97,20 +97,18 @@ class AudioTranscriptionManager: ObservableObject {
 
         // Reset any in-progress items back to pending
         for item in queue {
-            if case .processing = item.status {
-                item.status = .pending
-            }
+            item.status = item.status.statusAfterCancelingProcessing
         }
     }
 
     var hasPendingItems: Bool {
-        queue.contains { if case .pending = $0.status { return true }; return false }
+        queue.contains { $0.status.isPending }
     }
 
     // MARK: - Private
 
     private func nextPendingItem() -> AudioFileQueueItem? {
-        queue.first { if case .pending = $0.status { return true }; return false }
+        queue.first { $0.status.isPending }
     }
 
     private func processItem(_ item: AudioFileQueueItem, modelContext: ModelContext, engine: VoiceInkEngine) async {

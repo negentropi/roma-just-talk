@@ -45,10 +45,39 @@ final class SupportedMediaTests: XCTestCase {
         XCTAssertFalse(VoiceInkAudioFileQueueStatus.processing(phase: .loading).isTerminal)
         XCTAssertTrue(VoiceInkAudioFileQueueStatus.completed.isTerminal)
         XCTAssertTrue(VoiceInkAudioFileQueueStatus.failed(message: "No model").isTerminal)
+        XCTAssertTrue(VoiceInkAudioFileQueueStatus.pending.isPending)
+        XCTAssertFalse(VoiceInkAudioFileQueueStatus.completed.isPending)
+        XCTAssertTrue(VoiceInkAudioFileQueueStatus.processing(phase: .transcribing).isProcessing)
+        XCTAssertFalse(VoiceInkAudioFileQueueStatus.failed(message: "No model").isProcessing)
         XCTAssertEqual(VoiceInkAudioFileQueueProcessingPhase.loading.displayText, "Loading model...")
         XCTAssertEqual(VoiceInkAudioFileQueueProcessingPhase.processingAudio.displayText, "Processing audio...")
         XCTAssertEqual(VoiceInkAudioFileQueueProcessingPhase.transcribing.displayText, "Transcribing...")
         XCTAssertEqual(VoiceInkAudioFileQueueProcessingPhase.enhancing.displayText, "Enhancing...")
+    }
+
+    func testAudioFileQueueStatusPreservesMutationPredicates() {
+        XCTAssertTrue(VoiceInkAudioFileQueueStatus.pending.canRemoveFromQueue)
+        XCTAssertFalse(VoiceInkAudioFileQueueStatus.processing(phase: .loading).canRemoveFromQueue)
+        XCTAssertFalse(VoiceInkAudioFileQueueStatus.completed.canRemoveFromQueue)
+        XCTAssertFalse(VoiceInkAudioFileQueueStatus.failed(message: "No model").canRemoveFromQueue)
+
+        XCTAssertFalse(VoiceInkAudioFileQueueStatus.pending.canRetry)
+        XCTAssertFalse(VoiceInkAudioFileQueueStatus.processing(phase: .loading).canRetry)
+        XCTAssertFalse(VoiceInkAudioFileQueueStatus.completed.canRetry)
+        XCTAssertTrue(VoiceInkAudioFileQueueStatus.failed(message: "No model").canRetry)
+    }
+
+    func testAudioFileQueueStatusCancelingProcessingResetsOnlyProcessingItems() {
+        XCTAssertEqual(
+            VoiceInkAudioFileQueueStatus.processing(phase: .transcribing).statusAfterCancelingProcessing,
+            .pending
+        )
+        XCTAssertEqual(VoiceInkAudioFileQueueStatus.pending.statusAfterCancelingProcessing, .pending)
+        XCTAssertEqual(VoiceInkAudioFileQueueStatus.completed.statusAfterCancelingProcessing, .completed)
+        XCTAssertEqual(
+            VoiceInkAudioFileQueueStatus.failed(message: "No model").statusAfterCancelingProcessing,
+            .failed(message: "No model")
+        )
     }
 
     func testAudioFileQueuePresentationPreservesRowCopyAndIcons() {

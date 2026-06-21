@@ -56,13 +56,15 @@ class OllamaService: ObservableObject {
 
         do {
             let models = try await OllamaClient.fetchModels(baseURL: url)
-            availableModels = models
-
-            if let refreshedModel = VoiceInkAIEnhancementProviderKind.ollama.textEnhancementModelToSelectAfterRefresh(
+            let plan = VoiceInkAIEnhancementModelRefreshPlan.refreshed(
+                provider: .ollama,
                 currentModel: selectedModel,
                 refreshedModels: models.map { $0.name },
                 defaultModel: VoiceInkAIEnhancementProviderKind.defaultOllamaTextEnhancementModel
-            ) {
+            )
+            availableModels = models
+
+            if let refreshedModel = plan.selectedModelToSave {
                 selectedModel = refreshedModel
             }
         } catch {

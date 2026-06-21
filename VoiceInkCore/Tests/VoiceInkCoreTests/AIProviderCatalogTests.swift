@@ -894,7 +894,7 @@ final class AIProviderCatalogTests: XCTestCase {
                 defaultModel: VoiceInkAIModelCatalog.defaultModel(for: .openRouter)
             ),
             VoiceInkAIEnhancementModelRefreshPlan(
-                cachedModels: openRouterModels,
+                refreshedModelNames: openRouterModels,
                 selectedModelToSave: "anthropic/claude-3.5-sonnet"
             )
         )
@@ -907,15 +907,28 @@ final class AIProviderCatalogTests: XCTestCase {
                 defaultModel: VoiceInkAIModelCatalog.defaultModel(for: .openRouter)
             ),
             VoiceInkAIEnhancementModelRefreshPlan(
-                cachedModels: openRouterModels,
+                refreshedModelNames: openRouterModels,
                 selectedModelToSave: nil
+            )
+        )
+
+        XCTAssertEqual(
+            VoiceInkAIEnhancementModelRefreshPlan.refreshed(
+                provider: .ollama,
+                currentModel: "missing-local-model",
+                refreshedModels: ["llama3", "mistral"],
+                defaultModel: VoiceInkAIEnhancementProviderKind.defaultOllamaTextEnhancementModel
+            ),
+            VoiceInkAIEnhancementModelRefreshPlan(
+                refreshedModelNames: ["llama3", "mistral"],
+                selectedModelToSave: "llama3"
             )
         )
 
         XCTAssertEqual(
             VoiceInkAIEnhancementModelRefreshPlan.failed,
             VoiceInkAIEnhancementModelRefreshPlan(
-                cachedModels: [],
+                refreshedModelNames: [],
                 selectedModelToSave: nil
             )
         )

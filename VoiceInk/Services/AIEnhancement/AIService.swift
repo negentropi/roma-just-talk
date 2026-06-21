@@ -320,8 +320,8 @@ class AIService: ObservableObject {
                     refreshedModels: models,
                     defaultModel: self.selectedProvider.defaultTextEnhancementModel()
                 )
-                self.openRouterModels = plan.cachedModels
-                VoiceInkDynamicAIProviderPreference.saveOpenRouterModels(plan.cachedModels, to: self.userDefaults)
+                self.openRouterModels = plan.refreshedModelNames
+                VoiceInkDynamicAIProviderPreference.saveOpenRouterModels(plan.refreshedModelNames, to: self.userDefaults)
                 if let refreshedModel = plan.selectedModelToSave {
                     self.selectModel(refreshedModel)
                 }
@@ -330,8 +330,8 @@ class AIService: ObservableObject {
         } catch {
             await MainActor.run {
                 let plan = VoiceInkAIEnhancementModelRefreshPlan.failed
-                self.openRouterModels = plan.cachedModels
-                VoiceInkDynamicAIProviderPreference.saveOpenRouterModels(plan.cachedModels, to: self.userDefaults)
+                self.openRouterModels = plan.refreshedModelNames
+                VoiceInkDynamicAIProviderPreference.saveOpenRouterModels(plan.refreshedModelNames, to: self.userDefaults)
                 self.objectWillChange.send()
             }
         }

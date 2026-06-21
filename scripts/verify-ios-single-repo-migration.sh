@@ -5131,8 +5131,8 @@ require_pattern \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 require_pattern \
-  "macOS Ollama service refresh model selection uses shared policy" \
-  'textEnhancementModelToSelectAfterRefresh' \
+  "macOS Ollama service refresh model application uses shared policy" \
+  'VoiceInkAIEnhancementModelRefreshPlan\.refreshed' \
   VoiceInk/Services/OllamaService.swift
 
 require_pattern \
@@ -5261,7 +5261,7 @@ reject_pattern \
 
 reject_pattern \
   "macOS Ollama service avoids duplicate refresh model-selection policy" \
-  'models\.contains\(where: \{ \$0\.name == selectedModel \}\)|models\[0\]\.name' \
+  'models\.contains\(where: \{ \$0\.name == selectedModel \}\)|models\[0\]\.name|textEnhancementModelToSelectAfterRefresh' \
   VoiceInk/Services/OllamaService.swift
 
 reject_pattern \

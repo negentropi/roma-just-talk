@@ -29,11 +29,11 @@ public enum VoiceInkAIEnhancementSettingsSurface: Sendable, Equatable {
 }
 
 public struct VoiceInkAIEnhancementModelRefreshPlan: Sendable, Equatable {
-    public let cachedModels: [String]
+    public let refreshedModelNames: [String]
     public let selectedModelToSave: String?
 
-    public init(cachedModels: [String], selectedModelToSave: String?) {
-        self.cachedModels = cachedModels
+    public init(refreshedModelNames: [String], selectedModelToSave: String?) {
+        self.refreshedModelNames = refreshedModelNames
         self.selectedModelToSave = selectedModelToSave
     }
 
@@ -44,7 +44,7 @@ public struct VoiceInkAIEnhancementModelRefreshPlan: Sendable, Equatable {
         defaultModel: String
     ) -> VoiceInkAIEnhancementModelRefreshPlan {
         VoiceInkAIEnhancementModelRefreshPlan(
-            cachedModels: refreshedModels,
+            refreshedModelNames: refreshedModels,
             selectedModelToSave: provider.textEnhancementModelToSelectAfterRefresh(
                 currentModel: currentModel,
                 refreshedModels: refreshedModels,
@@ -54,7 +54,7 @@ public struct VoiceInkAIEnhancementModelRefreshPlan: Sendable, Equatable {
     }
 
     public static let failed = VoiceInkAIEnhancementModelRefreshPlan(
-        cachedModels: [],
+        refreshedModelNames: [],
         selectedModelToSave: nil
     )
 }

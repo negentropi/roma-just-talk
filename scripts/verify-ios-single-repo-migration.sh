@@ -8349,6 +8349,32 @@ reject_pattern \
   VoiceInk/Services/SystemInfoService.swift
 
 require_pattern \
+  "shared license preference policy lives in VoiceInkCore" \
+  'VoiceInkLicensePreference|requiresActivationKey|hasLaunchedBeforeKey|activationsLimitKey|hasUsableStoredLicense' \
+  VoiceInkCore/Sources/VoiceInkCore/LicensePolicy.swift
+
+require_pattern \
+  "macOS license view model uses shared license preference" \
+  'VoiceInkLicensePreference\.(hasUsableStoredLicense|activationsLimit|hasLaunchedBefore|saveHasLaunchedBefore|saveRequiresActivation|saveActivationsLimit)' \
+  VoiceInk/Models/LicenseViewModel.swift
+
+require_pattern \
+  "macOS diagnostics use shared license access policy" \
+  'VoiceInkLicensePreference\.hasUsableStoredLicense' \
+  VoiceInk/Services/SystemInfoService.swift
+
+require_pattern \
+  "core checks execute license preference tests" \
+  'LicensePolicyTests\.testLicensePreferenceKeysPreserveExistingStorageNames|LicensePolicyTests\.testLicensePreferenceStorageRoundTripsNonSensitiveFlags|LicensePolicyTests\.testStoredLicenseAccessPreservesExistingActivationRequirementPolicy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "macOS license shells avoid raw non-sensitive license preference keys" \
+  '"(VoiceInkLicenseRequiresActivation|VoiceInkHasLaunchedBefore|VoiceInkActivationsLimit)"|extension UserDefaults' \
+  VoiceInk/Models/LicenseViewModel.swift \
+  VoiceInk/Services/SystemInfoService.swift
+
+require_pattern \
   "shared Keychain service uses shared app identity" \
   'service = VoiceInkAppIdentity\.bundleIdentifier' \
   VoiceInkCore/Sources/VoiceInkCore/KeychainQuery.swift

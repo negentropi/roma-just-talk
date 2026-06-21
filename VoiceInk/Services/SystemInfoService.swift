@@ -233,10 +233,11 @@ class SystemInfoService {
         let licenseManager = LicenseManager.shared
 
         // Check for existing license key and activation
-        if licenseManager.licenseKey != nil {
-            if licenseManager.activationId != nil || !UserDefaults.standard.bool(forKey: "VoiceInkLicenseRequiresActivation") {
-                return "Licensed (Pro)"
-            }
+        if VoiceInkLicensePreference.hasUsableStoredLicense(
+            licenseKey: licenseManager.licenseKey,
+            activationId: licenseManager.activationId
+        ) {
+            return "Licensed (Pro)"
         }
 
         return "Not Licensed"

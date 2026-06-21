@@ -8410,6 +8410,28 @@ require_pattern \
   'VoiceInkAppIdentity|VoiceInkMacOSStorageAlertPresentation|bundleIdentifier = "com\.prakashjoshipax\.VoiceInk"|loggingSubsystem = "com\.prakashjoshipax\.voiceink"|displayName = "roma just talk"|compactDisplayName = "roma-just-talk"|iOSRecordDeepLinkScheme = "voiceink"|iOSRecordDeepLinkHost = "record"|iCloudContainerIdentifier|iOSAppGroupIdentifier|iOSRecordDeepLinkURL|iOSStopRecordingDarwinNotificationName|iOSRecordingStateChangedDarwinNotificationName|iOSStopRecordingFromKeyboardNotificationName|macOSApplicationSupportDirectory|storageFallbackWarningPresentation|storageFailurePresentation|errorDomain' \
   VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift
 
+require_file VoiceInkCore/Sources/VoiceInkCore/DiagnosticLogExportPolicy.swift
+
+require_pattern \
+  "shared diagnostic log export policy lives in VoiceInkCore" \
+  'VoiceInkDiagnosticLogExportPolicy|VoiceInkDiagnosticLogSessionRange|sessionStartDatesKey = "logExporter\.sessionStartDates\.v1"|maxSessionStartDatesToKeep = 3|timestampDateFormat = "yyyy-MM-dd HH:mm:ss\.SSS"|fileNameDateFormat = "yyyy-MM-dd_HH-mm-ss"|fileNamePrefix = "VoiceInk_Logs_"|headerTitle = "=== VoiceInk Diagnostic Logs ==="|noLogsFoundMessage = "No logs found for this session\."|sessionRanges|headerLines|logEntryLine|fileName' \
+  VoiceInkCore/Sources/VoiceInkCore/DiagnosticLogExportPolicy.swift
+
+require_pattern \
+  "macOS log exporter uses shared diagnostic log export policy" \
+  'VoiceInkDiagnosticLogExportPolicy\.(sessionStartDates|storedSessionStartDates|saveSessionStartDates|headerLines|sessionRanges|sessionHeaderLines|logEntryLine|noLogsFoundMessage|fileName)' \
+  VoiceInk/Services/LogExporter.swift
+
+require_pattern \
+  "core checks execute diagnostic log export policy tests" \
+  'DiagnosticLogExportPolicyTests\.testDiagnosticLogExportPolicyPreservesMacOSStorageAndFormattingConstants|DiagnosticLogExportPolicyTests\.testDiagnosticLogExportPolicyBuildsSessionRangesWithCurrentMiddleAndOldestLabels|DiagnosticLogExportPolicyTests\.testDiagnosticLogExportPolicyBuildsMacOSExportFileName' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "macOS log exporter avoids shell-owned diagnostic log export policy" \
+  'logExporter\.sessionStartDates\.v1|maxSessionsToKeep|sessionRanges:|\[Date\(\)\] \+ loadedDates|prefix\(maxSessionsToKeep\)|yyyy-MM-dd HH:mm:ss\.SSS|yyyy-MM-dd_HH-mm-ss|VoiceInk_Logs_|=== VoiceInk Diagnostic Logs ===|No logs found for this session\.|Session 1 \(Current\)|Session [0-9].*\(Oldest\)' \
+  VoiceInk/Services/LogExporter.swift
+
 require_pattern \
   "shared menu bar preference lives in VoiceInkCore" \
   'VoiceInkMenuBarPreference|showMenuBarIconKey|isMenuBarOnlyKey|defaultShowMenuBarIcon|defaultIsMenuBarOnly|registeredDefaults|saveIsMenuBarOnly' \
@@ -8606,6 +8628,11 @@ require_pattern \
   "iOS local Whisper logging uses shared diagnostics category" \
   'category: VoiceInkWhisperRuntimeDiagnostics\.logCategory' \
   iOS/VoiceInk-ios/LibWhisper.swift
+
+require_pattern \
+  "migration checklist tracks shared diagnostic log export policy" \
+  'diagnostic log session storage/range/header/filename policy.*VoiceInkDiagnosticLogExportPolicy' \
+  docs/ios-single-repo-migration.md
 
 require_pattern \
   "VoiceInkCore owns iOS record deep-link contract" \

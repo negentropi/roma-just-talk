@@ -7,29 +7,21 @@ final class LogExporter {
 
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "LogExporter")
     private let subsystem = VoiceInkAppIdentity.loggingSubsystem
-    private let maxSessionsToKeep = 3
-    private let sessionsKey = "logExporter.sessionStartDates.v1"
 
     private(set) var sessionStartDates: [Date] = []
 
     private init() {
-        var loadedDates: [Date] = []
-        if let data = UserDefaults.standard.data(forKey: sessionsKey),
-           let dates = try? JSONDecoder().decode([Date].self, from: data) {
-            loadedDates = dates
-        }
-
-        sessionStartDates = [Date()] + loadedDates
-        sessionStartDates = Array(sessionStartDates.prefix(maxSessionsToKeep))
+        sessionStartDates = VoiceInkDiagnosticLogExportPolicy.sessionStartDates(
+            starting: Date(),
+            storedDates: VoiceInkDiagnosticLogExportPolicy.storedSessionStartDates()
+        )
         saveSessions()
 
         logger.notice("🎙️ LogExporter initialized, \(self.sessionStartDates.count, privacy: .public) session(s) tracked")
     }
 
     private func saveSessions() {
-        if let data = try? JSONEncoder().encode(sessionStartDates) {
-            UserDefaults.standard.set(data, forKey: sessionsKey)
-        }
+        VoiceInkDiagnosticLogExportPolicy.saveSessionStartDates(sessionStartDates)
     }
 
     func exportLogs() async throws -> URL {
@@ -50,67 +42,37 @@ final class LogExporter {
         let store = try OSLogStore(scope: .system)
         let predicate = NSPredicate(format: "subsystem == %@", subsystem)
 
-        var logLines: [String] = []
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
-
-        logLines.append("=== VoiceInk Diagnostic Logs ===")
-        logLines.append("Export Date: \(dateFormatter.string(from: Date()))")
-        logLines.append("Subsystem: \(subsystem)")
-        logLines.append("Total Sessions: \(sessionStartDates.count)")
-        logLines.append("================================")
-        logLines.append("")
-        logLines.append(systemInfo)
-        logLines.append("")
-
-        // Build session ranges with labels
-        let totalSessions = sessionStartDates.count
-        var sessionRanges: [(label: String, start: Date, end: Date?)] = []
-
-        for i in 0..<totalSessions {
-            let start = sessionStartDates[i]
-            let end: Date? = (i == 0) ? nil : sessionStartDates[i - 1]
-            let sessionNumber = totalSessions - i
-
-            let label: String
-            if totalSessions == 1 {
-                label = "Session 1 (Current)"
-            } else if i == 0 {
-                label = "Session \(sessionNumber) (Current)"
-            } else if i == totalSessions - 1 {
-                label = "Session 1 (Oldest)"
-            } else {
-                label = "Session \(sessionNumber)"
-            }
-
-            sessionRanges.append((label, start, end))
-        }
+        var logLines = VoiceInkDiagnosticLogExportPolicy.headerLines(
+            exportDate: Date(),
+            subsystem: subsystem,
+            sessionCount: sessionStartDates.count,
+            systemInfo: systemInfo
+        )
 
         // Fetch logs for each session (oldest first for chronological order)
-        for (label, startDate, endDate) in sessionRanges.reversed() {
-            logLines.append("--- \(label) ---")
-            logLines.append("")
+        for range in VoiceInkDiagnosticLogExportPolicy.sessionRanges(from: sessionStartDates).reversed() {
+            logLines.append(contentsOf: VoiceInkDiagnosticLogExportPolicy.sessionHeaderLines(label: range.label))
 
-            let position = store.position(date: startDate)
+            let position = store.position(date: range.start)
             let entries = try store.getEntries(at: position, matching: predicate)
 
             var sessionLogCount = 0
             for entry in entries {
                 guard let logEntry = entry as? OSLogEntryLog else { continue }
 
-                if let endDate, logEntry.date >= endDate { break }
+                if let endDate = range.end, logEntry.date >= endDate { break }
 
-                let timestamp = dateFormatter.string(from: logEntry.date)
-                let level = logLevelString(logEntry.level)
-                let category = logEntry.category
-                let message = logEntry.composedMessage
-
-                logLines.append("[\(timestamp)] [\(level)] [\(category)] \(message)")
+                logLines.append(VoiceInkDiagnosticLogExportPolicy.logEntryLine(
+                    date: logEntry.date,
+                    level: logLevelString(logEntry.level),
+                    category: logEntry.category,
+                    message: logEntry.composedMessage
+                ))
                 sessionLogCount += 1
             }
 
             if sessionLogCount == 0 {
-                logLines.append("No logs found for this session.")
+                logLines.append(VoiceInkDiagnosticLogExportPolicy.noLogsFoundMessage)
             }
 
             logLines.append("")
@@ -132,10 +94,7 @@ final class LogExporter {
     }
 
     private func saveLogsToFile(_ logs: [String]) throws -> URL {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd_HH-mm-ss"
-        let timestamp = dateFormatter.string(from: Date())
-        let fileName = "VoiceInk_Logs_\(timestamp).log"
+        let fileName = VoiceInkDiagnosticLogExportPolicy.fileName(for: Date())
 
         guard let downloadsURL = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first else {
             throw NSError(domain: "LogExporter", code: 1, userInfo: [NSLocalizedDescriptionKey: "Downloads directory unavailable"])

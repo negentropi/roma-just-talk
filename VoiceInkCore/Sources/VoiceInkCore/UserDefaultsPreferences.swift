@@ -285,6 +285,30 @@ public struct VoiceInkAudioSessionTimeoutPresentation: Equatable, Sendable {
 public enum VoiceInkAudioSessionDeactivationPlan: Equatable, Sendable {
     case immediate
     case delayed(TimeInterval)
+
+    public var executionPlan: VoiceInkAudioSessionDeactivationExecutionPlan {
+        switch self {
+        case .immediate:
+            return .deactivateSession
+        case .delayed:
+            return .runCountdownTimer
+        }
+    }
+}
+
+public struct VoiceInkAudioSessionDeactivationExecutionPlan: Equatable, Sendable {
+    public let shouldDeactivateSession: Bool
+    public let shouldRunCountdownTimer: Bool
+
+    public static let deactivateSession = Self(
+        shouldDeactivateSession: true,
+        shouldRunCountdownTimer: false
+    )
+
+    public static let runCountdownTimer = Self(
+        shouldDeactivateSession: false,
+        shouldRunCountdownTimer: true
+    )
 }
 
 public enum VoiceInkMenuBarPreference {

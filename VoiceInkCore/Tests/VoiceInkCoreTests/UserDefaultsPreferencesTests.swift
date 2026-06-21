@@ -459,6 +459,21 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkAudioSessionTimeoutPreference.remainingTimeAfterCountdownTick(90), 89)
     }
 
+    func testAudioSessionDeactivationPlanOwnsShellExecutionIntent() {
+        XCTAssertEqual(
+            VoiceInkAudioSessionDeactivationPlan.immediate.executionPlan,
+            .deactivateSession
+        )
+        XCTAssertEqual(
+            VoiceInkAudioSessionDeactivationPlan.delayed(90).executionPlan,
+            .runCountdownTimer
+        )
+        XCTAssertTrue(VoiceInkAudioSessionDeactivationExecutionPlan.deactivateSession.shouldDeactivateSession)
+        XCTAssertFalse(VoiceInkAudioSessionDeactivationExecutionPlan.deactivateSession.shouldRunCountdownTimer)
+        XCTAssertFalse(VoiceInkAudioSessionDeactivationExecutionPlan.runCountdownTimer.shouldDeactivateSession)
+        XCTAssertTrue(VoiceInkAudioSessionDeactivationExecutionPlan.runCountdownTimer.shouldRunCountdownTimer)
+    }
+
     func testAudioSessionTimeoutPresentationPreservesIOSSettingsCopy() {
         let presentation = VoiceInkAudioSessionTimeoutPreference.settingsPresentation
 

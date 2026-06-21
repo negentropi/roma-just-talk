@@ -7890,6 +7890,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
+  "shared audio-session timeout preference owns iOS deactivation execution intent" \
+  'VoiceInkAudioSessionDeactivationExecutionPlan|executionPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
   "shared audio-session timeout presentation lives in VoiceInkCore" \
   'VoiceInkAudioSessionTimeoutPresentation|settingsPresentation' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
@@ -7936,7 +7941,7 @@ require_pattern \
 
 require_pattern \
   "shared audio-session lifecycle state lives in VoiceInkCore" \
-  'VoiceInkAudioSessionLifecycleState|markActivatedForRecording|scheduleDeactivation|advanceCountdown|markDeactivated' \
+  'VoiceInkAudioSessionLifecycleState|markActivatedForRecording|scheduleDeactivationExecution|advanceCountdownExecution|markDeactivated' \
   VoiceInkCore/Sources/VoiceInkCore/AudioSessionLifecycleState.swift
 
 require_pattern \
@@ -7946,12 +7951,17 @@ require_pattern \
 
 require_pattern \
   "iOS audio-session manager delegates deactivation planning to shared lifecycle state" \
-  'lifecycleState\.scheduleDeactivation\(timeoutSeconds:' \
+  'lifecycleState\.scheduleDeactivationExecution\(timeoutSeconds:' \
   iOS/VoiceInk-ios/AudioSessionManager.swift
 
 require_pattern \
   "iOS audio-session manager delegates countdown ticks to shared lifecycle state" \
-  'lifecycleState\.advanceCountdown\(\)' \
+  'lifecycleState\.advanceCountdownExecution\(\)' \
+  iOS/VoiceInk-ios/AudioSessionManager.swift
+
+reject_pattern \
+  "iOS audio-session manager avoids shell-owned deactivation-plan matching" \
+  'case \.(immediate|delayed)|== \.immediate|VoiceInkAudioSessionDeactivationPlan' \
   iOS/VoiceInk-ios/AudioSessionManager.swift
 
 reject_pattern \

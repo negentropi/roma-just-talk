@@ -28,9 +28,17 @@ public struct VoiceInkAudioSessionLifecycleState: Equatable, Sendable {
         return plan
     }
 
+    public mutating func scheduleDeactivationExecution(timeoutSeconds: Int) -> VoiceInkAudioSessionDeactivationExecutionPlan {
+        scheduleDeactivation(timeoutSeconds: timeoutSeconds).executionPlan
+    }
+
     public mutating func advanceCountdown() -> VoiceInkAudioSessionDeactivationPlan {
         timeoutRemaining = VoiceInkAudioSessionTimeoutPreference.remainingTimeAfterCountdownTick(timeoutRemaining)
         return timeoutRemaining <= 0 ? .immediate : .delayed(timeoutRemaining)
+    }
+
+    public mutating func advanceCountdownExecution() -> VoiceInkAudioSessionDeactivationExecutionPlan {
+        advanceCountdown().executionPlan
     }
 
     public mutating func cancelScheduledDeactivation() {

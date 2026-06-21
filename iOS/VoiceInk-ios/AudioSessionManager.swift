@@ -56,15 +56,14 @@ final class AudioSessionManager: ObservableObject {
         cancelScheduledDeactivation()
         
         let timeoutSeconds = settings.audioSessionTimeoutSeconds
-        let deactivationPlan = lifecycleState.scheduleDeactivation(timeoutSeconds: timeoutSeconds)
+        let deactivationPlan = lifecycleState.scheduleDeactivationExecution(timeoutSeconds: timeoutSeconds)
         
-        switch deactivationPlan {
-        case .immediate:
+        if deactivationPlan.shouldDeactivateSession {
             deactivateSession()
             return
-        case .delayed:
-            break
         }
+
+        guard deactivationPlan.shouldRunCountdownTimer else { return }
         
         // Create timer with shared countdown cadence and deactivate when done
         deactivationTimer = Timer.scheduledTimer(
@@ -77,7 +76,7 @@ final class AudioSessionManager: ObservableObject {
                     return
                 }
                 
-                if self.lifecycleState.advanceCountdown() == .immediate {
+                if self.lifecycleState.advanceCountdownExecution().shouldDeactivateSession {
                     self.deactivateSession()
                 }
             }

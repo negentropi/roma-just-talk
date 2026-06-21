@@ -103,6 +103,192 @@ public struct VoiceInkRecordingFeedbackBackupImportPlan: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkBuiltInRecordingSound: String, CaseIterable, Identifiable, Sendable {
+    case sound1
+    case sound2
+    case sound3
+    case sound4
+    case sound5
+    case sound6
+    case sound7
+
+    public var id: String { rawValue }
+
+    public var displayName: String {
+        "Sound \(number)"
+    }
+
+    public var fileExtension: String {
+        switch self {
+        case .sound1, .sound2, .sound3, .sound4, .sound7:
+            return "wav"
+        case .sound5, .sound6:
+            return "mp3"
+        }
+    }
+
+    private var number: Int {
+        Int(rawValue.replacingOccurrences(of: "sound", with: "")) ?? 0
+    }
+}
+
+public enum VoiceInkCustomSoundType: String, CaseIterable, Sendable {
+    case start
+    case stop
+
+    public var isUsingKey: String {
+        "isUsingCustom\(capitalizedRawValue)Sound"
+    }
+
+    public var filenameKey: String {
+        "custom\(capitalizedRawValue)SoundFilename"
+    }
+
+    public var builtInSoundKey: String {
+        "selected\(capitalizedRawValue)BuiltInSound"
+    }
+
+    public var standardName: String {
+        "Custom\(capitalizedRawValue)Sound"
+    }
+
+    public var defaultBuiltInSound: VoiceInkBuiltInRecordingSound {
+        switch self {
+        case .start:
+            return .sound1
+        case .stop:
+            return .sound2
+        }
+    }
+
+    private var capitalizedRawValue: String {
+        rawValue.capitalized
+    }
+}
+
+public enum VoiceInkCustomSoundError: LocalizedError, Equatable, Sendable {
+    case fileNotFound
+    case invalidAudioFile
+    case durationTooLong(duration: TimeInterval, maxDuration: TimeInterval)
+    case directoryCreationFailed
+    case fileCopyFailed
+
+    public var errorDescription: String? {
+        switch self {
+        case .fileNotFound:
+            return "Audio file not found"
+        case .invalidAudioFile:
+            return "Invalid audio file format"
+        case .durationTooLong(let duration, let maxDuration):
+            return String(
+                format: "Audio file is %.1f seconds long. Please use an audio file that is %.0f seconds or shorter for start and stop sounds.",
+                duration,
+                maxDuration
+            )
+        case .directoryCreationFailed:
+            return "Failed to create custom sounds directory"
+        case .fileCopyFailed:
+            return "Failed to copy audio file"
+        }
+    }
+}
+
+public enum VoiceInkCustomSoundPreference {
+    public static let customSoundsRelativeDirectory = "VoiceInk/CustomSounds"
+    public static let changedNotificationName = "CustomSoundsChanged"
+    public static let maxDuration: TimeInterval = 3.0
+
+    public static var registeredDefaults: [String: Any] {
+        [
+            VoiceInkCustomSoundType.start.builtInSoundKey: VoiceInkCustomSoundType.start.defaultBuiltInSound.rawValue,
+            VoiceInkCustomSoundType.stop.builtInSoundKey: VoiceInkCustomSoundType.stop.defaultBuiltInSound.rawValue
+        ]
+    }
+
+    public static func isUsingCustomSound(
+        for type: VoiceInkCustomSoundType,
+        from defaults: UserDefaults = .standard
+    ) -> Bool {
+        defaults.bool(forKey: type.isUsingKey)
+    }
+
+    public static func saveIsUsingCustomSound(
+        _ isUsingCustomSound: Bool,
+        for type: VoiceInkCustomSoundType,
+        to defaults: UserDefaults = .standard
+    ) {
+        defaults.set(isUsingCustomSound, forKey: type.isUsingKey)
+    }
+
+    public static func customFilename(
+        for type: VoiceInkCustomSoundType,
+        from defaults: UserDefaults = .standard
+    ) -> String? {
+        defaults.string(forKey: type.filenameKey)
+    }
+
+    public static func saveCustomFilename(
+        _ filename: String?,
+        for type: VoiceInkCustomSoundType,
+        to defaults: UserDefaults = .standard
+    ) {
+        if let filename {
+            defaults.set(filename, forKey: type.filenameKey)
+        } else {
+            defaults.removeObject(forKey: type.filenameKey)
+        }
+    }
+
+    public static func selectedBuiltInSound(
+        for type: VoiceInkCustomSoundType,
+        from defaults: UserDefaults = .standard
+    ) -> VoiceInkBuiltInRecordingSound {
+        if let rawValue = defaults.string(forKey: type.builtInSoundKey),
+           let sound = VoiceInkBuiltInRecordingSound(rawValue: rawValue) {
+            return sound
+        }
+
+        return type.defaultBuiltInSound
+    }
+
+    public static func saveSelectedBuiltInSound(
+        _ sound: VoiceInkBuiltInRecordingSound,
+        for type: VoiceInkCustomSoundType,
+        to defaults: UserDefaults = .standard
+    ) {
+        defaults.set(sound.rawValue, forKey: type.builtInSoundKey)
+    }
+
+    public static func isDefaultSelection(
+        for type: VoiceInkCustomSoundType,
+        isUsingCustomSound: Bool,
+        selectedBuiltInSound: VoiceInkBuiltInRecordingSound
+    ) -> Bool {
+        !isUsingCustomSound && selectedBuiltInSound == type.defaultBuiltInSound
+    }
+
+    public static func copiedFilename(
+        sourceExtension: String,
+        for type: VoiceInkCustomSoundType
+    ) -> String {
+        "\(type.standardName).\(sourceExtension)"
+    }
+
+    public static func preflightValidationError(
+        fileExists: Bool,
+        duration: TimeInterval
+    ) -> VoiceInkCustomSoundError? {
+        guard fileExists else { return .fileNotFound }
+        guard duration.isFinite && duration > 0 else { return .invalidAudioFile }
+
+        if duration > maxDuration {
+            return .durationTooLong(duration: duration, maxDuration: maxDuration)
+        }
+
+        return nil
+    }
+}
+
 public enum VoiceInkRecordingFeedbackPreference {
     public static let systemMuteModeKey = "systemMuteMode"
     public static let legacyIsSystemMuteEnabledKey = "isSystemMuteEnabled"

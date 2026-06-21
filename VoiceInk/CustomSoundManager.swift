@@ -1,79 +1,46 @@
 import Foundation
 import AVFoundation
 import SwiftUI
+import VoiceInkCore
+
+typealias CustomSoundError = VoiceInkCustomSoundError
+
+extension VoiceInkBuiltInRecordingSound {
+    var bundleURL: URL? {
+        Bundle.main.url(forResource: rawValue, withExtension: fileExtension) ??
+            Bundle.main.url(forResource: rawValue, withExtension: fileExtension, subdirectory: "Sounds")
+    }
+}
 
 class CustomSoundManager: ObservableObject {
     static let shared = CustomSoundManager()
 
-    enum BuiltInSound: String, CaseIterable, Identifiable {
-        case sound1
-        case sound2
-        case sound3
-        case sound4
-        case sound5
-        case sound6
-        case sound7
-
-        var id: String { rawValue }
-
-        var displayName: String {
-            "Sound \(number)"
-        }
-
-        var fileExtension: String {
-            switch self {
-            case .sound1, .sound2, .sound3, .sound4, .sound7:
-                return "wav"
-            case .sound5, .sound6:
-                return "mp3"
-            }
-        }
-
-        var bundleURL: URL? {
-            Bundle.main.url(forResource: rawValue, withExtension: fileExtension) ??
-                Bundle.main.url(forResource: rawValue, withExtension: fileExtension, subdirectory: "Sounds")
-        }
-
-        private var number: Int {
-            Int(rawValue.replacingOccurrences(of: "sound", with: "")) ?? 0
-        }
-    }
-
-    enum SoundType: String {
-        case start
-        case stop
-
-        var isUsingKey: String { "isUsingCustom\(rawValue.capitalized)Sound" }
-        var filenameKey: String { "custom\(rawValue.capitalized)SoundFilename" }
-        var builtInSoundKey: String { "selected\(rawValue.capitalized)BuiltInSound" }
-        var standardName: String { "Custom\(rawValue.capitalized)Sound" }
-        var defaultBuiltInSound: BuiltInSound {
-            switch self {
-            case .start:
-                return .sound1
-            case .stop:
-                return .sound2
-            }
-        }
-    }
+    typealias BuiltInSound = VoiceInkBuiltInRecordingSound
+    typealias SoundType = VoiceInkCustomSoundType
 
     @Published var isUsingCustomStartSound: Bool {
-        didSet { UserDefaults.standard.set(isUsingCustomStartSound, forKey: SoundType.start.isUsingKey) }
+        didSet {
+            VoiceInkCustomSoundPreference.saveIsUsingCustomSound(isUsingCustomStartSound, for: .start)
+        }
     }
 
     @Published var isUsingCustomStopSound: Bool {
-        didSet { UserDefaults.standard.set(isUsingCustomStopSound, forKey: SoundType.stop.isUsingKey) }
+        didSet {
+            VoiceInkCustomSoundPreference.saveIsUsingCustomSound(isUsingCustomStopSound, for: .stop)
+        }
     }
 
     @Published private(set) var selectedStartBuiltInSound: BuiltInSound {
-        didSet { UserDefaults.standard.set(selectedStartBuiltInSound.rawValue, forKey: SoundType.start.builtInSoundKey) }
+        didSet {
+            VoiceInkCustomSoundPreference.saveSelectedBuiltInSound(selectedStartBuiltInSound, for: .start)
+        }
     }
 
     @Published private(set) var selectedStopBuiltInSound: BuiltInSound {
-        didSet { UserDefaults.standard.set(selectedStopBuiltInSound.rawValue, forKey: SoundType.stop.builtInSoundKey) }
+        didSet {
+            VoiceInkCustomSoundPreference.saveSelectedBuiltInSound(selectedStopBuiltInSound, for: .stop)
+        }
     }
-
-    private let maxSoundDuration: TimeInterval = 3.0
 
     private var customStartSoundFilename: String? {
         didSet { updateFilenameInUserDefaults(filename: customStartSoundFilename, for: .start) }
@@ -84,38 +51,25 @@ class CustomSoundManager: ObservableObject {
     }
     
     private func updateFilenameInUserDefaults(filename: String?, for type: SoundType) {
-        if let filename = filename {
-            UserDefaults.standard.set(filename, forKey: type.filenameKey)
-        } else {
-            UserDefaults.standard.removeObject(forKey: type.filenameKey)
-        }
+        VoiceInkCustomSoundPreference.saveCustomFilename(filename, for: type)
     }
 
     private init() {
-        self.isUsingCustomStartSound = UserDefaults.standard.bool(forKey: SoundType.start.isUsingKey)
-        self.isUsingCustomStopSound = UserDefaults.standard.bool(forKey: SoundType.stop.isUsingKey)
-        self.selectedStartBuiltInSound = Self.savedBuiltInSound(for: .start)
-        self.selectedStopBuiltInSound = Self.savedBuiltInSound(for: .stop)
-        self.customStartSoundFilename = UserDefaults.standard.string(forKey: SoundType.start.filenameKey)
-        self.customStopSoundFilename = UserDefaults.standard.string(forKey: SoundType.stop.filenameKey)
+        self.isUsingCustomStartSound = VoiceInkCustomSoundPreference.isUsingCustomSound(for: .start)
+        self.isUsingCustomStopSound = VoiceInkCustomSoundPreference.isUsingCustomSound(for: .stop)
+        self.selectedStartBuiltInSound = VoiceInkCustomSoundPreference.selectedBuiltInSound(for: .start)
+        self.selectedStopBuiltInSound = VoiceInkCustomSoundPreference.selectedBuiltInSound(for: .stop)
+        self.customStartSoundFilename = VoiceInkCustomSoundPreference.customFilename(for: .start)
+        self.customStopSoundFilename = VoiceInkCustomSoundPreference.customFilename(for: .stop)
 
         createCustomSoundsDirectoryIfNeeded()
-    }
-
-    private static func savedBuiltInSound(for type: SoundType) -> BuiltInSound {
-        if let rawValue = UserDefaults.standard.string(forKey: type.builtInSoundKey),
-           let sound = BuiltInSound(rawValue: rawValue) {
-            return sound
-        }
-
-        return type.defaultBuiltInSound
     }
 
     private func customSoundsDirectory() -> URL? {
         guard let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
             return nil
         }
-        return appSupport.appendingPathComponent("VoiceInk/CustomSounds")
+        return appSupport.appendingPathComponent(VoiceInkCustomSoundPreference.customSoundsRelativeDirectory)
     }
 
     private func createCustomSoundsDirectoryIfNeeded() {
@@ -179,7 +133,7 @@ class CustomSoundManager: ObservableObject {
         let result = validateAudioFile(url: url)
         switch result {
         case .success:
-            let copyResult = copySoundFile(from: url, standardName: type.standardName)
+            let copyResult = copySoundFile(from: url, for: type)
             switch copyResult {
             case .success(let filename):
                 if type == .start {
@@ -220,7 +174,10 @@ class CustomSoundManager: ObservableObject {
     }
 
     private func notifyCustomSoundsChanged() {
-        NotificationCenter.default.post(name: NSNotification.Name("CustomSoundsChanged"), object: nil)
+        NotificationCenter.default.post(
+            name: NSNotification.Name(VoiceInkCustomSoundPreference.changedNotificationName),
+            object: nil
+        )
     }
 
     func getSoundDisplayName(for type: SoundType) -> String? {
@@ -229,16 +186,22 @@ class CustomSoundManager: ObservableObject {
 
     func isDefaultSelection(for type: SoundType) -> Bool {
         let isUsingCustom = (type == .start) ? isUsingCustomStartSound : isUsingCustomStopSound
-        return !isUsingCustom && selectedBuiltInSound(for: type) == type.defaultBuiltInSound
+        return VoiceInkCustomSoundPreference.isDefaultSelection(
+            for: type,
+            isUsingCustomSound: isUsingCustom,
+            selectedBuiltInSound: selectedBuiltInSound(for: type)
+        )
     }
 
-    private func copySoundFile(from sourceURL: URL, standardName: String) -> Result<String, CustomSoundError> {
+    private func copySoundFile(from sourceURL: URL, for type: SoundType) -> Result<String, CustomSoundError> {
         guard let directory = customSoundsDirectory() else {
             return .failure(.directoryCreationFailed)
         }
 
-        let fileExtension = sourceURL.pathExtension
-        let newFilename = "\(standardName).\(fileExtension)"
+        let newFilename = VoiceInkCustomSoundPreference.copiedFilename(
+            sourceExtension: sourceURL.pathExtension,
+            for: type
+        )
         let destinationURL = directory.appendingPathComponent(newFilename)
 
         if sourceURL.resolvingSymlinksInPath() == destinationURL.resolvingSymlinksInPath() {
@@ -258,19 +221,21 @@ class CustomSoundManager: ObservableObject {
     }
 
     private func validateAudioFile(url: URL) -> Result<Void, CustomSoundError> {
-        guard FileManager.default.fileExists(atPath: url.path) else {
-            return .failure(.fileNotFound)
+        let fileExists = FileManager.default.fileExists(atPath: url.path)
+        guard fileExists else {
+            return .failure(
+                VoiceInkCustomSoundPreference.preflightValidationError(fileExists: false, duration: 0) ?? .fileNotFound
+            )
         }
 
         let asset = AVAsset(url: url)
         let duration = asset.duration.seconds
 
-        guard duration.isFinite && duration > 0 else {
-            return .failure(.invalidAudioFile)
-        }
-
-        if duration > maxSoundDuration {
-            return .failure(.durationTooLong(duration: duration, maxDuration: maxSoundDuration))
+        if let error = VoiceInkCustomSoundPreference.preflightValidationError(
+            fileExists: true,
+            duration: duration
+        ) {
+            return .failure(error)
         }
 
         do {
@@ -280,28 +245,5 @@ class CustomSoundManager: ObservableObject {
         }
 
         return .success(())
-    }
-}
-
-enum CustomSoundError: LocalizedError {
-    case fileNotFound
-    case invalidAudioFile
-    case durationTooLong(duration: TimeInterval, maxDuration: TimeInterval)
-    case directoryCreationFailed
-    case fileCopyFailed
-
-    var errorDescription: String? {
-        switch self {
-        case .fileNotFound:
-            return "Audio file not found"
-        case .invalidAudioFile:
-            return "Invalid audio file format"
-        case .durationTooLong(let duration, let maxDuration):
-            return String(format: "Audio file is %.1f seconds long. Please use an audio file that is %.0f seconds or shorter for start and stop sounds.", duration, maxDuration)
-        case .directoryCreationFailed:
-            return "Failed to create custom sounds directory"
-        case .fileCopyFailed:
-            return "Failed to copy audio file"
-        }
     }
 }

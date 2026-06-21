@@ -5752,6 +5752,21 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
 
 require_pattern \
+  "shared custom recording sound catalog lives in VoiceInkCore" \
+  'enum VoiceInkBuiltInRecordingSound: String, CaseIterable, Identifiable|case sound1|case sound7|fileExtension|displayName' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+
+require_pattern \
+  "shared custom recording sound preference owns storage keys and defaults" \
+  'enum VoiceInkCustomSoundType: String, CaseIterable|isUsingKey|filenameKey|builtInSoundKey|defaultBuiltInSound|VoiceInkCustomSoundPreference|registeredDefaults|customSoundsRelativeDirectory|changedNotificationName' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+
+require_pattern \
+  "shared custom recording sound validation owns duration and error copy" \
+  'enum VoiceInkCustomSoundError: LocalizedError|durationTooLong|preflightValidationError|maxDuration|copiedFilename|Audio file is' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+
+require_pattern \
   "macOS media controller uses shared recording feedback preferences" \
   'VoiceInkRecordingFeedbackPreference\.(systemMuteMode|saveSystemMuteMode|audioResumptionDelay|saveAudioResumptionDelay)' \
   VoiceInk/MediaController.swift
@@ -5767,8 +5782,23 @@ require_pattern \
   VoiceInk/SoundManager.swift
 
 require_pattern \
+  "macOS custom sound manager uses shared custom sound policy" \
+  'VoiceInkCustomSoundPreference\.(saveIsUsingCustomSound|saveSelectedBuiltInSound|saveCustomFilename|isUsingCustomSound|selectedBuiltInSound|customFilename|customSoundsRelativeDirectory|changedNotificationName|isDefaultSelection|copiedFilename|preflightValidationError)|VoiceInkBuiltInRecordingSound|VoiceInkCustomSoundType|VoiceInkCustomSoundError' \
+  VoiceInk/CustomSoundManager.swift
+
+require_pattern \
+  "macOS sound reload uses shared custom sound notification name" \
+  'VoiceInkCustomSoundPreference\.changedNotificationName' \
+  VoiceInk/SoundManager.swift
+
+require_pattern \
   "macOS defaults register shared recording feedback defaults" \
   'VoiceInkRecordingFeedbackPreference\.registeredDefaults' \
+  VoiceInk/AppDefaults.swift
+
+require_pattern \
+  "macOS defaults register shared custom sound defaults" \
+  'VoiceInkCustomSoundPreference\.registeredDefaults' \
   VoiceInk/AppDefaults.swift
 
 require_pattern \
@@ -5817,13 +5847,20 @@ reject_pattern \
   VoiceInk/Views/Settings/SettingsView.swift
 
 reject_pattern \
+  "macOS custom sound shells avoid raw custom sound policy" \
+  '"(isUsingCustomStartSound|isUsingCustomStopSound|customStartSoundFilename|customStopSoundFilename|selectedStartBuiltInSound|selectedStopBuiltInSound|CustomStartSound|CustomStopSound|VoiceInk/CustomSounds|CustomSoundsChanged|Audio file not found|Invalid audio file format|Failed to create custom sounds directory|Failed to copy audio file)"|enum +CustomSoundError|enum +BuiltInSound|enum +SoundType|maxSoundDuration' \
+  VoiceInk/CustomSoundManager.swift \
+  VoiceInk/AppDefaults.swift \
+  VoiceInk/SoundManager.swift
+
+reject_pattern \
   "macOS settings avoids shell-only recording feedback settings presentation copy" \
   '"(Recording Feedback|Sound Feedback|Mute Audio While Recording|Audio Resume Delay|Experimental|Pause Media While Recording|Pauses playing media when recording starts and resumes when done\.|Resume Delay|0s|5s)"' \
   VoiceInk/Views/Settings/SettingsView.swift
 
 require_pattern \
   "migration checklist tracks shared recording feedback preference gate" \
-  'macOS recording feedback preferences route through `VoiceInkSystemMuteMode`/`VoiceInkRecordingFeedbackPreference`, including recording/pause-media settings labels/options/help and backup import/export plans' \
+  'macOS recording feedback preferences route through `VoiceInkSystemMuteMode`/`VoiceInkRecordingFeedbackPreference`.*VoiceInkCustomSoundPreference' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

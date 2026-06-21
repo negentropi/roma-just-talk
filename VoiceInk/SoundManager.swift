@@ -15,7 +15,7 @@ class SoundManager: ObservableObject {
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(reloadCustomSounds),
-            name: NSNotification.Name("CustomSoundsChanged"),
+            name: NSNotification.Name(VoiceInkCustomSoundPreference.changedNotificationName),
             object: nil
         )
     }

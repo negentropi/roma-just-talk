@@ -2,6 +2,137 @@ import Foundation
 @testable import VoiceInkCore
 
 final class RecordingFeedbackPreferenceTests: XCTestCase {
+    func testBuiltInRecordingSoundsPreserveCatalogNamesAndExtensions() {
+        XCTAssertEqual(
+            VoiceInkBuiltInRecordingSound.allCases.map(\.rawValue),
+            ["sound1", "sound2", "sound3", "sound4", "sound5", "sound6", "sound7"]
+        )
+        XCTAssertEqual(VoiceInkBuiltInRecordingSound.sound1.displayName, "Sound 1")
+        XCTAssertEqual(VoiceInkBuiltInRecordingSound.sound7.displayName, "Sound 7")
+        XCTAssertEqual(VoiceInkBuiltInRecordingSound.sound1.fileExtension, "wav")
+        XCTAssertEqual(VoiceInkBuiltInRecordingSound.sound4.fileExtension, "wav")
+        XCTAssertEqual(VoiceInkBuiltInRecordingSound.sound5.fileExtension, "mp3")
+        XCTAssertEqual(VoiceInkBuiltInRecordingSound.sound6.fileExtension, "mp3")
+        XCTAssertEqual(VoiceInkBuiltInRecordingSound.sound7.fileExtension, "wav")
+    }
+
+    func testCustomSoundTypePreservesExistingMacOSStorageKeys() {
+        XCTAssertEqual(VoiceInkCustomSoundType.start.isUsingKey, "isUsingCustomStartSound")
+        XCTAssertEqual(VoiceInkCustomSoundType.start.filenameKey, "customStartSoundFilename")
+        XCTAssertEqual(VoiceInkCustomSoundType.start.builtInSoundKey, "selectedStartBuiltInSound")
+        XCTAssertEqual(VoiceInkCustomSoundType.start.standardName, "CustomStartSound")
+        XCTAssertEqual(VoiceInkCustomSoundType.start.defaultBuiltInSound, .sound1)
+
+        XCTAssertEqual(VoiceInkCustomSoundType.stop.isUsingKey, "isUsingCustomStopSound")
+        XCTAssertEqual(VoiceInkCustomSoundType.stop.filenameKey, "customStopSoundFilename")
+        XCTAssertEqual(VoiceInkCustomSoundType.stop.builtInSoundKey, "selectedStopBuiltInSound")
+        XCTAssertEqual(VoiceInkCustomSoundType.stop.standardName, "CustomStopSound")
+        XCTAssertEqual(VoiceInkCustomSoundType.stop.defaultBuiltInSound, .sound2)
+    }
+
+    func testCustomSoundPreferencePreservesDefaultsAndNotificationName() {
+        XCTAssertEqual(VoiceInkCustomSoundPreference.customSoundsRelativeDirectory, "VoiceInk/CustomSounds")
+        XCTAssertEqual(VoiceInkCustomSoundPreference.changedNotificationName, "CustomSoundsChanged")
+        XCTAssertEqual(VoiceInkCustomSoundPreference.maxDuration, 3.0)
+        XCTAssertEqual(
+            VoiceInkCustomSoundPreference.registeredDefaults[VoiceInkCustomSoundType.start.builtInSoundKey] as? String,
+            Optional("sound1")
+        )
+        XCTAssertEqual(
+            VoiceInkCustomSoundPreference.registeredDefaults[VoiceInkCustomSoundType.stop.builtInSoundKey] as? String,
+            Optional("sound2")
+        )
+    }
+
+    func testCustomSoundPreferenceReadsAndSavesSelectionState() {
+        withTemporaryDefaults { defaults in
+            XCTAssertFalse(VoiceInkCustomSoundPreference.isUsingCustomSound(for: .start, from: defaults))
+            XCTAssertNil(VoiceInkCustomSoundPreference.customFilename(for: .start, from: defaults))
+            XCTAssertEqual(VoiceInkCustomSoundPreference.selectedBuiltInSound(for: .start, from: defaults), .sound1)
+
+            VoiceInkCustomSoundPreference.saveIsUsingCustomSound(true, for: .start, to: defaults)
+            VoiceInkCustomSoundPreference.saveCustomFilename("CustomStartSound.wav", for: .start, to: defaults)
+            VoiceInkCustomSoundPreference.saveSelectedBuiltInSound(.sound5, for: .start, to: defaults)
+
+            XCTAssertTrue(VoiceInkCustomSoundPreference.isUsingCustomSound(for: .start, from: defaults))
+            XCTAssertEqual(
+                VoiceInkCustomSoundPreference.customFilename(for: .start, from: defaults),
+                Optional("CustomStartSound.wav")
+            )
+            XCTAssertEqual(VoiceInkCustomSoundPreference.selectedBuiltInSound(for: .start, from: defaults), .sound5)
+
+            VoiceInkCustomSoundPreference.saveCustomFilename(nil, for: .start, to: defaults)
+
+            XCTAssertNil(VoiceInkCustomSoundPreference.customFilename(for: .start, from: defaults))
+        }
+    }
+
+    func testCustomSoundPreferenceRepairsInvalidBuiltInSelectionToDefault() {
+        withTemporaryDefaults { defaults in
+            defaults.set("bad", forKey: VoiceInkCustomSoundType.stop.builtInSoundKey)
+
+            XCTAssertEqual(VoiceInkCustomSoundPreference.selectedBuiltInSound(for: .stop, from: defaults), .sound2)
+        }
+    }
+
+    func testCustomSoundPreferencePlansDefaultSelectionAndCopyFilename() {
+        XCTAssertTrue(VoiceInkCustomSoundPreference.isDefaultSelection(
+            for: .start,
+            isUsingCustomSound: false,
+            selectedBuiltInSound: .sound1
+        ))
+        XCTAssertFalse(VoiceInkCustomSoundPreference.isDefaultSelection(
+            for: .start,
+            isUsingCustomSound: true,
+            selectedBuiltInSound: .sound1
+        ))
+        XCTAssertFalse(VoiceInkCustomSoundPreference.isDefaultSelection(
+            for: .start,
+            isUsingCustomSound: false,
+            selectedBuiltInSound: .sound3
+        ))
+        XCTAssertEqual(
+            VoiceInkCustomSoundPreference.copiedFilename(sourceExtension: "aiff", for: .stop),
+            "CustomStopSound.aiff"
+        )
+    }
+
+    func testCustomSoundValidationPreservesMacOSErrorPolicy() {
+        XCTAssertEqual(
+            VoiceInkCustomSoundPreference.preflightValidationError(fileExists: false, duration: 1.0),
+            Optional(.fileNotFound)
+        )
+        XCTAssertEqual(
+            VoiceInkCustomSoundPreference.preflightValidationError(fileExists: true, duration: 0.0),
+            Optional(.invalidAudioFile)
+        )
+        XCTAssertEqual(
+            VoiceInkCustomSoundPreference.preflightValidationError(fileExists: true, duration: .infinity),
+            Optional(.invalidAudioFile)
+        )
+        XCTAssertEqual(
+            VoiceInkCustomSoundPreference.preflightValidationError(fileExists: true, duration: 3.1),
+            Optional(.durationTooLong(duration: 3.1, maxDuration: 3.0))
+        )
+        XCTAssertNil(
+            VoiceInkCustomSoundPreference.preflightValidationError(fileExists: true, duration: 3.0)
+        )
+    }
+
+    func testCustomSoundErrorMessagesPreserveExistingCopy() {
+        XCTAssertEqual(VoiceInkCustomSoundError.fileNotFound.errorDescription, Optional("Audio file not found"))
+        XCTAssertEqual(VoiceInkCustomSoundError.invalidAudioFile.errorDescription, Optional("Invalid audio file format"))
+        XCTAssertEqual(
+            VoiceInkCustomSoundError.durationTooLong(duration: 3.4, maxDuration: 3.0).errorDescription,
+            Optional("Audio file is 3.4 seconds long. Please use an audio file that is 3 seconds or shorter for start and stop sounds.")
+        )
+        XCTAssertEqual(
+            VoiceInkCustomSoundError.directoryCreationFailed.errorDescription,
+            Optional("Failed to create custom sounds directory")
+        )
+        XCTAssertEqual(VoiceInkCustomSoundError.fileCopyFailed.errorDescription, Optional("Failed to copy audio file"))
+    }
+
     func testSystemMuteModePreservesRawValuesAndDisplayNames() {
         XCTAssertEqual(VoiceInkSystemMuteMode.automatic.rawValue, "auto")
         XCTAssertEqual(VoiceInkSystemMuteMode.always.rawValue, "always")

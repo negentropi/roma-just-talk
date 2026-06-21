@@ -12,10 +12,6 @@ enum AppDefaults {
             // Onboarding & General
             "enableAnnouncements": true,
 
-            // Audio & Media
-            CustomSoundManager.SoundType.start.builtInSoundKey: CustomSoundManager.SoundType.start.defaultBuiltInSound.rawValue,
-            CustomSoundManager.SoundType.stop.builtInSoundKey: CustomSoundManager.SoundType.stop.defaultBuiltInSound.rawValue,
-
             // Recording & Transcription
             VoiceInkRollingBufferPreloadSettings.modeKey: VoiceInkRollingBufferPreloadSettings.defaultMode.rawValue,
             VoiceInkRollingBufferPreloadSettings.autoDisableCloudModelsKey: VoiceInkRollingBufferPreloadSettings.defaultAutoDisablesCloudModels,
@@ -36,6 +32,7 @@ enum AppDefaults {
         platformDefaults.merge(VoiceInkRecorderPreviewPreference.registeredDefaults) { _, sharedValue in sharedValue }
         platformDefaults.merge(VoiceInkRecordingShortcutPreference.registeredDefaults) { _, sharedValue in sharedValue }
         platformDefaults.merge(VoiceInkRecordingFeedbackPreference.registeredDefaults) { _, sharedValue in sharedValue }
+        platformDefaults.merge(VoiceInkCustomSoundPreference.registeredDefaults) { _, sharedValue in sharedValue }
         platformDefaults.merge(VoiceInkAudioInputPreference.registeredDefaults) { _, sharedValue in sharedValue }
         platformDefaults.merge(VoiceInkPastePreference.registeredDefaults) { _, sharedValue in sharedValue }
         platformDefaults.merge(VoiceInkPowerModePreference.registeredDefaults) { _, sharedValue in sharedValue }

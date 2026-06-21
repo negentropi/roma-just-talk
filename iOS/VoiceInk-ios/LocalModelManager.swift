@@ -89,6 +89,9 @@ class LocalModelManager: ObservableObject {
         case .presentFailure(let alert):
             downloadError = alert
             logger.error("Download failed for \(model.modelName, privacy: .public): \(alert.message, privacy: .public)")
+
+        case .ignoreCancellation:
+            logger.notice("Download cancelled for \(model.modelName, privacy: .public).")
         }
     }
 

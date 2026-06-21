@@ -2642,8 +2642,18 @@ require_pattern \
 
 require_pattern \
   "shared Whisper simple download completion plan lives in VoiceInkCore" \
-  'VoiceInkWhisperModelSimpleDownloadCompletionPlan|installTemporaryFile|presentFailure' \
+  'VoiceInkWhisperModelSimpleDownloadCompletionPlan|installTemporaryFile|presentFailure|ignoreCancellation' \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+
+require_pattern \
+  "shared Whisper simple download completion plan owns cancellation outcome" \
+  'ignoreCancellation|NSURLErrorCancelled|CancellationError' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+
+require_pattern \
+  "core checks cover iOS download cancellation completion planning" \
+  'WhisperModelFilesTests\.testSimpleDownloadCompletionPlanIgnoresCancellation' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "shared Whisper model operation confirmation presentation lives in VoiceInkCore" \
@@ -2898,9 +2908,14 @@ require_pattern \
   'VoiceInkWhisperModelOperationAlertPresentation|\.(downloadFailed|serverErrorDuringDownload|noFileReceived|saveFailed)' \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
+require_pattern \
+  "iOS local model manager applies shared download cancellation outcome" \
+  'ignoreCancellation' \
+  iOS/VoiceInk-ios/LocalModelManager.swift
+
 reject_pattern \
   "iOS local model manager avoids shell-owned download completion failure mapping" \
-  'VoiceInkWhisperModelDownloadResponsePolicy\.completion|serverErrorDuringDownload|noFileReceived|downloadFailed\(for:' \
+  'VoiceInkWhisperModelDownloadResponsePolicy\.completion|serverErrorDuringDownload|noFileReceived|downloadFailed\(for:|NSURLErrorCancelled|CancellationError' \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
 require_pattern \

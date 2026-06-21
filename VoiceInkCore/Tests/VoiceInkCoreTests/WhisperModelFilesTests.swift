@@ -475,6 +475,32 @@ final class WhisperModelFilesTests: XCTestCase {
         )
     }
 
+    func testSimpleDownloadCompletionPlanIgnoresCancellation() {
+        let temporaryURL = URL(fileURLWithPath: "/tmp/ggml-base.download")
+        let cancelledURLSessionError = NSError(
+            domain: NSURLErrorDomain,
+            code: NSURLErrorCancelled
+        )
+
+        XCTAssertEqual(
+            VoiceInkWhisperModelSimpleDownloadCompletionPlan.completion(
+                temporaryURL: temporaryURL,
+                response: nil,
+                error: cancelledURLSessionError
+            ),
+            .ignoreCancellation
+        )
+
+        XCTAssertEqual(
+            VoiceInkWhisperModelSimpleDownloadCompletionPlan.completion(
+                temporaryURL: temporaryURL,
+                response: nil,
+                error: CancellationError()
+            ),
+            .ignoreCancellation
+        )
+    }
+
     func testSimpleDownloadProgressFormatsIOSProgress() {
         let progress = VoiceInkWhisperModelDownloadProgress.simple(
             modelName: "ggml-base",

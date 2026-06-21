@@ -82,6 +82,7 @@ public struct VoiceInkWhisperModelOperationAlertPresentation: Equatable, Identif
 public enum VoiceInkWhisperModelSimpleDownloadCompletionPlan: Equatable, Sendable {
     case installTemporaryFile(URL)
     case presentFailure(VoiceInkWhisperModelOperationAlertPresentation)
+    case ignoreCancellation
 
     public static func completion(
         temporaryURL: URL?,
@@ -89,6 +90,10 @@ public enum VoiceInkWhisperModelSimpleDownloadCompletionPlan: Equatable, Sendabl
         error: Error?
     ) -> Self {
         if let error {
+            if isCancellation(error) {
+                return .ignoreCancellation
+            }
+
             return .presentFailure(.downloadFailed(for: error))
         }
 
@@ -103,6 +108,15 @@ public enum VoiceInkWhisperModelSimpleDownloadCompletionPlan: Equatable, Sendabl
         case .missingTemporaryFile:
             return .presentFailure(.noFileReceived)
         }
+    }
+
+    private static func isCancellation(_ error: Error) -> Bool {
+        if error is CancellationError {
+            return true
+        }
+
+        let nsError = error as NSError
+        return nsError.domain == NSURLErrorDomain && nsError.code == NSURLErrorCancelled
     }
 }
 

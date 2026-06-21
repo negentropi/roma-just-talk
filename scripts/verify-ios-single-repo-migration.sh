@@ -546,6 +546,11 @@ reject_pattern \
   iOS/VoiceInk-ios/SettingsView.swift
 
 reject_pattern \
+  "iOS language settings avoids shallow selected-language binding wrapper" \
+  'private var +selectedLanguageBinding\b' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+reject_pattern \
   "macOS language picker avoids shell-only language display fallback" \
   'private func +currentLanguageDisplayName|\?\? "Unknown"' \
   "VoiceInk/Views/AI Models/LanguageSelectionView.swift"

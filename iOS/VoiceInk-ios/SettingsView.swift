@@ -62,7 +62,13 @@ struct SettingsView: View {
             }
 
             Section(header: Text(VoiceInkTranscriptionLanguagePresentation.sectionTitle)) {
-                Picker(VoiceInkTranscriptionLanguagePresentation.pickerTitle, selection: selectedLanguageBinding) {
+                Picker(
+                    VoiceInkTranscriptionLanguagePresentation.pickerTitle,
+                    selection: Binding(
+                        get: { settings.selectedTranscriptionLanguage },
+                        set: { settings.setSelectedTranscriptionLanguage($0) }
+                    )
+                ) {
                     ForEach(VoiceInkLanguageCatalog.sortedOptions(settings.availableTranscriptionLanguages)) { language in
                         Text(language.name).tag(language.code)
                     }
@@ -204,13 +210,6 @@ struct SettingsView: View {
                 dismissButton: .cancel(Text(alert.primaryButtonTitle))
             )
         }
-    }
-
-    private var selectedLanguageBinding: Binding<String> {
-        Binding(
-            get: { settings.selectedTranscriptionLanguage },
-            set: { settings.setSelectedTranscriptionLanguage($0) }
-        )
     }
 
     private func addFillerWord() {

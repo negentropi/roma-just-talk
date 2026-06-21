@@ -210,7 +210,6 @@ git_root="$(git rev-parse --show-toplevel)"
 section "iOS ported assets and resources"
 require_file iOS/Shared/AppGroupCoordinator.swift
 require_file iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
-require_file iOS/Shared/VoiceInkKeyboardRecordingButtonPresentation.swift
 require_file iOS/VoiceInk-ios/Transcription.swift
 require_file docs/ios-privacy-policy.md
 require_file iOS/VoiceInk-ios/PrivacyInfo.xcprivacy
@@ -227,6 +226,7 @@ reject_file iOS/PRIVACY.html
 reject_file iOS/PRIVACY.md
 reject_file iOS/app-icon.png
 reject_file iOS/Shared/VoiceInkAppDeepLink.swift
+reject_file iOS/Shared/VoiceInkKeyboardRecordingButtonPresentation.swift
 reject_file iOS/Shared/VoiceInkKeyboardRecordingTiming.swift
 reject_file iOS/VoiceInk-ios/VoiceInk-ios
 reject_file iOS/VoiceInk-ios/KeychainService.swift
@@ -7756,6 +7756,46 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "VoiceInkCore owns iOS keyboard recording button presentation" \
+  'VoiceInkKeyboardRecordingButtonPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "VoiceInkCore owns iOS keyboard idle button title" \
+  'title: " Record"' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "VoiceInkCore owns iOS keyboard recording button title" \
+  'title: " Stop"' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "VoiceInkCore uses shared iOS keyboard fallback app title" \
+  'VoiceInkAppIdentity\.displayName' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "VoiceInkCore owns iOS keyboard idle button icon" \
+  'systemImageName: "mic\.fill"' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "VoiceInkCore owns iOS keyboard recording button icon" \
+  'systemImageName: "stop\.fill"' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "VoiceInkCore owns iOS keyboard fallback button icon" \
+  'systemImageName: "app"' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "VoiceInkCore checks cover iOS keyboard recording button presentation" \
+  'testKeyboardRecordingButtonPresentation(PreservesIOSCopyAndIcons|SelectsCurrentState)' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "iOS App Group bridge uses entitlement group" \
   'static let appGroupIdentifier = VoiceInkAppIdentity\.iOSAppGroupIdentifier' \
   iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
@@ -7791,41 +7831,6 @@ require_pattern \
   iOS/Shared/AppGroupCoordinator.swift
 
 require_pattern \
-  "iOS shared keyboard presentation owns button copy" \
-  'VoiceInkKeyboardRecordingButtonPresentation' \
-  iOS/Shared/VoiceInkKeyboardRecordingButtonPresentation.swift
-
-require_pattern \
-  "iOS shared keyboard presentation owns idle title" \
-  'title: " Record"' \
-  iOS/Shared/VoiceInkKeyboardRecordingButtonPresentation.swift
-
-require_pattern \
-  "iOS shared keyboard presentation owns recording title" \
-  'title: " Stop"' \
-  iOS/Shared/VoiceInkKeyboardRecordingButtonPresentation.swift
-
-require_pattern \
-  "iOS shared keyboard presentation uses shared fallback app title" \
-  'VoiceInkAppIdentity\.displayName' \
-  iOS/Shared/VoiceInkKeyboardRecordingButtonPresentation.swift
-
-require_pattern \
-  "iOS shared keyboard presentation owns idle icon" \
-  'systemImageName: "mic\.fill"' \
-  iOS/Shared/VoiceInkKeyboardRecordingButtonPresentation.swift
-
-require_pattern \
-  "iOS shared keyboard presentation owns recording icon" \
-  'systemImageName: "stop\.fill"' \
-  iOS/Shared/VoiceInkKeyboardRecordingButtonPresentation.swift
-
-require_pattern \
-  "iOS shared keyboard presentation owns fallback icon" \
-  'systemImageName: "app"' \
-  iOS/Shared/VoiceInkKeyboardRecordingButtonPresentation.swift
-
-require_pattern \
   "iOS keyboard controller uses shared button presentation" \
   'VoiceInkKeyboardRecordingButtonPresentation\.(idle|recording|openAppFallback|current)' \
   iOS/VoiceInkKeyboard/KeyboardViewController.swift
@@ -7856,9 +7861,10 @@ reject_pattern \
   iOS/VoiceInkKeyboard/KeyboardViewController.swift
 
 reject_pattern \
-  "iOS shared keyboard presentation avoids duplicate app display name" \
+  "iOS keyboard presentation avoids duplicate app display name literal" \
   '" Open roma just talk"' \
-  iOS/Shared/VoiceInkKeyboardRecordingButtonPresentation.swift
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift \
+  iOS/VoiceInkKeyboard/KeyboardViewController.swift
 
 reject_pattern \
   "iOS keyboard/app recording coordination avoids raw timing literals" \

@@ -161,6 +161,29 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertEqual(VoiceInkKeyboardRecordingTiming.openAppFallbackResetDelay, 2.0)
     }
 
+    func testKeyboardRecordingButtonPresentationPreservesIOSCopyAndIcons() {
+        XCTAssertEqual(
+            VoiceInkKeyboardRecordingButtonPresentation.idle,
+            VoiceInkKeyboardRecordingButtonPresentation(title: " Record", systemImageName: "mic.fill")
+        )
+        XCTAssertEqual(
+            VoiceInkKeyboardRecordingButtonPresentation.recording,
+            VoiceInkKeyboardRecordingButtonPresentation(title: " Stop", systemImageName: "stop.fill")
+        )
+        XCTAssertEqual(
+            VoiceInkKeyboardRecordingButtonPresentation.openAppFallback,
+            VoiceInkKeyboardRecordingButtonPresentation(
+                title: " Open \(VoiceInkAppIdentity.displayName)",
+                systemImageName: "app"
+            )
+        )
+    }
+
+    func testKeyboardRecordingButtonPresentationSelectsCurrentState() {
+        XCTAssertEqual(VoiceInkKeyboardRecordingButtonPresentation.current(isRecording: false), .idle)
+        XCTAssertEqual(VoiceInkKeyboardRecordingButtonPresentation.current(isRecording: true), .recording)
+    }
+
     func testRecorderStylePreferencePreservesMacOSStorageAndLabels() {
         XCTAssertEqual(VoiceInkRecorderStylePreference.userDefaultsKey, "RecorderType")
         XCTAssertEqual(VoiceInkRecorderStylePreference.defaultStyle, .none)

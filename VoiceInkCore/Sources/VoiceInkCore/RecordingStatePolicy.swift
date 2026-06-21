@@ -144,6 +144,35 @@ public enum VoiceInkKeyboardRecordingTiming {
     public static let openAppFallbackResetDelay: TimeInterval = 2.0
 }
 
+public struct VoiceInkKeyboardRecordingButtonPresentation: Equatable, Sendable {
+    public let title: String
+    public let systemImageName: String
+
+    public init(title: String, systemImageName: String) {
+        self.title = title
+        self.systemImageName = systemImageName
+    }
+
+    public static let idle = VoiceInkKeyboardRecordingButtonPresentation(
+        title: " Record",
+        systemImageName: "mic.fill"
+    )
+
+    public static let recording = VoiceInkKeyboardRecordingButtonPresentation(
+        title: " Stop",
+        systemImageName: "stop.fill"
+    )
+
+    public static let openAppFallback = VoiceInkKeyboardRecordingButtonPresentation(
+        title: " Open \(VoiceInkAppIdentity.displayName)",
+        systemImageName: "app"
+    )
+
+    public static func current(isRecording: Bool) -> VoiceInkKeyboardRecordingButtonPresentation {
+        isRecording ? recording : idle
+    }
+}
+
 public enum VoiceInkRecorderStyle: String, CaseIterable, Identifiable, Sendable {
     case none
     case notch

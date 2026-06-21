@@ -52,13 +52,10 @@ class EmojiManager: ObservableObject {
         VoiceInkPowerModeEmojiCatalog.isCustomEmoji(emoji, customEmojis: customEmojis)
     }
 
-    func canAddCustomEmoji(_ emoji: String) -> Bool {
-        if case .added = VoiceInkPowerModeEmojiCatalog.addCustomEmoji(
-            emoji,
+    func inputDraft(for rawText: String) -> VoiceInkPowerModeEmojiInputDraft {
+        VoiceInkPowerModeEmojiInputPresentation.inputDraft(
+            for: rawText,
             customEmojis: customEmojis
-        ) {
-            return true
-        }
-        return false
+        )
     }
 }

@@ -525,6 +525,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PowerModePresentationTests.testRowDetailPresentationFallsBackToDefaultPromptAndSkipsBlankAIModel", run: { PowerModePresentationTests().testRowDetailPresentationFallsBackToDefaultPromptAndSkipsBlankAIModel() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeEmojiCatalogPreservesDefaultsStorageKeyAndCopy", run: { PowerModePolicyTests().testPowerModeEmojiCatalogPreservesDefaultsStorageKeyAndCopy() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeEmojiCatalogValidatesAndAddsCustomEmojis", run: { PowerModePolicyTests().testPowerModeEmojiCatalogValidatesAndAddsCustomEmojis() }),
+            VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeEmojiInputDraftBuildsPreviewFeedback", run: { PowerModePolicyTests().testPowerModeEmojiInputDraftBuildsPreviewFeedback() }),
+            VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeEmojiAddResultPresentation", run: { PowerModePolicyTests().testPowerModeEmojiAddResultPresentation() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeEmojiCatalogReadsSavesAndRemovesCustomEmojis", run: { PowerModePolicyTests().testPowerModeEmojiCatalogReadsSavesAndRemovesCustomEmojis() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeTriggerConfigsPreserveStoredShapeAndIdEquality", run: { try PowerModePolicyTests().testPowerModeTriggerConfigsPreserveStoredShapeAndIdEquality() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeTriggerConfigsAdaptToPolicyRules", run: { PowerModePolicyTests().testPowerModeTriggerConfigsAdaptToPolicyRules() }),

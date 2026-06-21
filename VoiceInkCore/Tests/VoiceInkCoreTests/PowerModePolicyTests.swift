@@ -112,6 +112,53 @@ final class PowerModePolicyTests: XCTestCase {
         )
     }
 
+    func testPowerModeEmojiInputDraftBuildsPreviewFeedback() {
+        XCTAssertEqual(
+            VoiceInkPowerModeEmojiInputPresentation.inputDraft(for: "abc🧪", customEmojis: []),
+            VoiceInkPowerModeEmojiInputDraft(text: "🧪", feedbackMessage: "", canSubmit: true)
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeEmojiInputPresentation.inputDraft(for: "abc", customEmojis: []),
+            VoiceInkPowerModeEmojiInputDraft(text: "", feedbackMessage: "", canSubmit: false)
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeEmojiInputPresentation.inputDraft(for: "🏢", customEmojis: []),
+            VoiceInkPowerModeEmojiInputDraft(
+                text: "🏢",
+                feedbackMessage: VoiceInkPowerModeEmojiInputPresentation.duplicateMessage,
+                canSubmit: false
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeEmojiInputPresentation.inputDraft(for: "🧪", customEmojis: ["🧪"]),
+            VoiceInkPowerModeEmojiInputDraft(
+                text: "🧪",
+                feedbackMessage: VoiceInkPowerModeEmojiInputPresentation.duplicateMessage,
+                canSubmit: false
+            )
+        )
+    }
+
+    func testPowerModeEmojiAddResultPresentation() {
+        let added = VoiceInkPowerModeEmojiCatalog.addCustomEmoji("🧪", customEmojis: [])
+        XCTAssertEqual(added.addedEmoji, "🧪")
+        XCTAssertEqual(VoiceInkPowerModeEmojiInputPresentation.submitFeedbackMessage(for: added), "")
+
+        XCTAssertNil(VoiceInkPowerModeCustomEmojiAddResult.empty.addedEmoji)
+        XCTAssertEqual(
+            VoiceInkPowerModeEmojiInputPresentation.submitFeedbackMessage(for: .empty),
+            VoiceInkPowerModeEmojiInputPresentation.emptySubmitMessage
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeEmojiInputPresentation.submitFeedbackMessage(for: .invalid),
+            VoiceInkPowerModeEmojiInputPresentation.invalidSubmitMessage
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeEmojiInputPresentation.submitFeedbackMessage(for: .duplicate),
+            VoiceInkPowerModeEmojiInputPresentation.duplicateMessage
+        )
+    }
+
     func testPowerModeEmojiCatalogReadsSavesAndRemovesCustomEmojis() {
         withIsolatedDefaults { defaults in
             XCTAssertEqual(VoiceInkPowerModeEmojiCatalog.customEmojis(from: defaults), [])

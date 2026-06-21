@@ -5,6 +5,13 @@ public enum VoiceInkPowerModeCustomEmojiAddResult: Equatable, Sendable {
     case empty
     case invalid
     case duplicate
+
+    public var addedEmoji: String? {
+        guard case .added(let emoji, _) = self else {
+            return nil
+        }
+        return emoji
+    }
 }
 
 public struct VoiceInkPowerModeEmojiRemovalAlertPresentation: Equatable, Sendable {
@@ -16,6 +23,18 @@ public struct VoiceInkPowerModeEmojiRemovalAlertPresentation: Equatable, Sendabl
         self.title = title
         self.message = message
         self.buttonTitle = buttonTitle
+    }
+}
+
+public struct VoiceInkPowerModeEmojiInputDraft: Equatable, Sendable {
+    public let text: String
+    public let feedbackMessage: String
+    public let canSubmit: Bool
+
+    public init(text: String, feedbackMessage: String, canSubmit: Bool) {
+        self.text = text
+        self.feedbackMessage = feedbackMessage
+        self.canSubmit = canSubmit
     }
 }
 
@@ -120,6 +139,40 @@ public enum VoiceInkPowerModeEmojiInputPresentation {
             || message == invalidPreviewMessage
             || message == invalidSubmitMessage
             || message == emptySubmitMessage
+    }
+
+    public static func inputDraft(
+        for rawText: String,
+        customEmojis: [String]
+    ) -> VoiceInkPowerModeEmojiInputDraft {
+        let text = VoiceInkPowerModeEmojiCatalog.firstValidEmojiCharacter(in: rawText)
+
+        guard !text.isEmpty else {
+            return VoiceInkPowerModeEmojiInputDraft(text: text, feedbackMessage: "", canSubmit: false)
+        }
+
+        guard !VoiceInkPowerModeEmojiCatalog.allEmojis(customEmojis: customEmojis).contains(text) else {
+            return VoiceInkPowerModeEmojiInputDraft(text: text, feedbackMessage: duplicateMessage, canSubmit: false)
+        }
+
+        guard VoiceInkPowerModeEmojiCatalog.isValidEmoji(text) else {
+            return VoiceInkPowerModeEmojiInputDraft(text: text, feedbackMessage: invalidPreviewMessage, canSubmit: false)
+        }
+
+        return VoiceInkPowerModeEmojiInputDraft(text: text, feedbackMessage: "", canSubmit: true)
+    }
+
+    public static func submitFeedbackMessage(for result: VoiceInkPowerModeCustomEmojiAddResult) -> String {
+        switch result {
+        case .added:
+            return ""
+        case .empty:
+            return emptySubmitMessage
+        case .invalid:
+            return invalidSubmitMessage
+        case .duplicate:
+            return duplicateMessage
+        }
     }
 
     public static func inUseAlert(emoji: String) -> VoiceInkPowerModeEmojiRemovalAlertPresentation {

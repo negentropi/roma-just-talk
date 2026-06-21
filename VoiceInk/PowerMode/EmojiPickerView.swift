@@ -56,17 +56,10 @@ struct EmojiPickerView: View {
                             .frame(maxWidth: 70)
                             .focused($isEmojiTextFieldFocused)
                             .onChange(of: newEmojiText) { _, newValue in
-                                inputFeedbackMessage = ""
-                                let cleaned = VoiceInkPowerModeEmojiCatalog.firstValidEmojiCharacter(in: newValue)
-                                if newEmojiText != cleaned {
-                                    newEmojiText = cleaned
-                                }
-                                if !newEmojiText.isEmpty && emojiManager.allEmojis.contains(newEmojiText) {
-                                    inputFeedbackMessage = VoiceInkPowerModeEmojiInputPresentation.duplicateMessage
-                                } else if !newEmojiText.isEmpty && !VoiceInkPowerModeEmojiCatalog.isValidEmoji(newEmojiText) {
-                                    inputFeedbackMessage = VoiceInkPowerModeEmojiInputPresentation.invalidPreviewMessage
-                                } else {
-                                    inputFeedbackMessage = ""
+                                let draft = emojiManager.inputDraft(for: newValue)
+                                inputFeedbackMessage = draft.feedbackMessage
+                                if newEmojiText != draft.text {
+                                    newEmojiText = draft.text
                                 }
                             }
                             .onSubmit(attemptAddCustomEmoji)
@@ -75,7 +68,7 @@ struct EmojiPickerView: View {
                             attemptAddCustomEmoji()
                         }
                         .buttonStyle(.borderedProminent)
-                        .disabled(!emojiManager.canAddCustomEmoji(newEmojiText))
+                        .disabled(!emojiManager.inputDraft(for: newEmojiText).canSubmit)
 
                         Button(VoiceInkPowerModeEmojiInputPresentation.cancelButtonTitle) {
                             isAddingCustomEmoji = false
@@ -114,19 +107,14 @@ struct EmojiPickerView: View {
     }
 
     private func attemptAddCustomEmoji() {
-        let trimmedEmoji = newEmojiText.trimmingCharacters(in: .whitespacesAndNewlines)
-        switch emojiManager.addCustomEmoji(trimmedEmoji) {
-        case .added(let emoji, _):
+        let result = emojiManager.addCustomEmoji(newEmojiText)
+        if let emoji = result.addedEmoji {
             selectedEmoji = emoji
             inputFeedbackMessage = ""
             isAddingCustomEmoji = false
             newEmojiText = ""
-        case .empty:
-            inputFeedbackMessage = VoiceInkPowerModeEmojiInputPresentation.emptySubmitMessage
-        case .invalid:
-            inputFeedbackMessage = VoiceInkPowerModeEmojiInputPresentation.invalidSubmitMessage
-        case .duplicate:
-            inputFeedbackMessage = VoiceInkPowerModeEmojiInputPresentation.duplicateMessage
+        } else {
+            inputFeedbackMessage = VoiceInkPowerModeEmojiInputPresentation.submitFeedbackMessage(for: result)
         }
     }
 

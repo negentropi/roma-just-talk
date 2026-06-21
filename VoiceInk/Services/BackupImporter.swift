@@ -147,16 +147,23 @@ enum BackupImporter {
             recorderUIManager.recorderType = recType
         }
 
-        if let transcriptionCleanup = general.isTranscriptionCleanupEnabled {
+        let transcriptionAutoCleanupImportPlan = VoiceInkTranscriptionAutoCleanupPreference.backupImportPlan(
+            from: general.transcriptionAutoCleanupBackupPreferences
+        )
+        if let transcriptionCleanup = transcriptionAutoCleanupImportPlan.isEnabled {
             VoiceInkTranscriptionAutoCleanupPreference.saveIsEnabled(transcriptionCleanup)
         }
-        if let transcriptionMinutes = general.transcriptionRetentionMinutes {
+        if let transcriptionMinutes = transcriptionAutoCleanupImportPlan.retentionMinutes {
             VoiceInkTranscriptionAutoCleanupPreference.saveRetentionMinutes(transcriptionMinutes)
         }
-        if let audioCleanup = general.isAudioCleanupEnabled {
+
+        let audioCleanupImportPlan = VoiceInkAudioCleanupPreference.backupImportPlan(
+            from: general.audioCleanupBackupPreferences
+        )
+        if let audioCleanup = audioCleanupImportPlan.isEnabled {
             VoiceInkAudioCleanupPreference.saveIsEnabled(audioCleanup)
         }
-        if let audioRetention = general.audioRetentionPeriod {
+        if let audioRetention = audioCleanupImportPlan.retentionDays {
             VoiceInkAudioCleanupPreference.saveRetentionDays(audioRetention)
         }
 

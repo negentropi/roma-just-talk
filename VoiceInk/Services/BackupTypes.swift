@@ -111,6 +111,20 @@ extension GeneralBackup {
             clipboardRestoreDelay: clipboardRestoreDelay
         )
     }
+
+    var transcriptionAutoCleanupBackupPreferences: VoiceInkTranscriptionAutoCleanupBackupPreferences {
+        VoiceInkTranscriptionAutoCleanupBackupPreferences(
+            isEnabled: isTranscriptionCleanupEnabled,
+            retentionMinutes: transcriptionRetentionMinutes
+        )
+    }
+
+    var audioCleanupBackupPreferences: VoiceInkAudioCleanupBackupPreferences {
+        VoiceInkAudioCleanupBackupPreferences(
+            isEnabled: isAudioCleanupEnabled,
+            retentionDays: audioRetentionPeriod
+        )
+    }
 }
 
 struct BackupFile: Codable {

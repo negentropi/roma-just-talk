@@ -2661,9 +2661,114 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionCleanupPreferences.swift
 
 require_pattern \
+  "shared transcription auto-cleanup backup preferences live in VoiceInkCore" \
+  'struct VoiceInkTranscriptionAutoCleanupBackupPreferences' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared transcription auto-cleanup backup import plan lives in VoiceInkCore" \
+  'struct VoiceInkTranscriptionAutoCleanupBackupImportPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared transcription auto-cleanup backup export policy lives in VoiceInkCore" \
+  'VoiceInkTranscriptionAutoCleanupBackupPreferences\(' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared transcription auto-cleanup backup import policy lives in VoiceInkCore" \
+  'VoiceInkTranscriptionAutoCleanupBackupImportPlan\(' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared audio cleanup backup preferences live in VoiceInkCore" \
+  'struct VoiceInkAudioCleanupBackupPreferences' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared audio cleanup backup import plan lives in VoiceInkCore" \
+  'struct VoiceInkAudioCleanupBackupImportPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared audio cleanup backup export policy lives in VoiceInkCore" \
+  'VoiceInkAudioCleanupBackupPreferences\(' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared audio cleanup backup import policy lives in VoiceInkCore" \
+  'VoiceInkAudioCleanupBackupImportPlan\(' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
   "macOS audio cleanup settings use shared presentation" \
   'VoiceInkMacOSCleanupSettingsPresentation\.macOS|presentation\.(transcriptToggleTitle|audioRetentionOptions|audioCleanupResultMessage)' \
   VoiceInk/Views/Settings/AudioCleanupSettingsView.swift
+
+require_pattern \
+  "macOS backup export uses shared transcription auto-cleanup backup preferences" \
+  'VoiceInkTranscriptionAutoCleanupPreference\.backupPreferences' \
+  VoiceInk/Services/ImportExportService.swift
+
+require_pattern \
+  "macOS backup export applies shared transcription auto-cleanup enabled preference" \
+  'isTranscriptionCleanupEnabled: transcriptionAutoCleanupBackupPreferences\.isEnabled' \
+  VoiceInk/Services/ImportExportService.swift
+
+require_pattern \
+  "macOS backup export applies shared transcription auto-cleanup retention preference" \
+  'transcriptionRetentionMinutes: transcriptionAutoCleanupBackupPreferences\.retentionMinutes' \
+  VoiceInk/Services/ImportExportService.swift
+
+require_pattern \
+  "macOS backup export uses shared audio cleanup backup preferences" \
+  'VoiceInkAudioCleanupPreference\.backupPreferences' \
+  VoiceInk/Services/ImportExportService.swift
+
+require_pattern \
+  "macOS backup export applies shared audio cleanup enabled preference" \
+  'isAudioCleanupEnabled: audioCleanupBackupPreferences\.isEnabled' \
+  VoiceInk/Services/ImportExportService.swift
+
+require_pattern \
+  "macOS backup export applies shared audio cleanup retention preference" \
+  'audioRetentionPeriod: audioCleanupBackupPreferences\.retentionDays' \
+  VoiceInk/Services/ImportExportService.swift
+
+require_pattern \
+  "macOS backup import uses shared transcription auto-cleanup backup import plan" \
+  'VoiceInkTranscriptionAutoCleanupPreference\.backupImportPlan' \
+  VoiceInk/Services/BackupImporter.swift
+
+require_pattern \
+  "macOS backup import applies shared transcription auto-cleanup enabled plan" \
+  'transcriptionAutoCleanupImportPlan\.isEnabled' \
+  VoiceInk/Services/BackupImporter.swift
+
+require_pattern \
+  "macOS backup import applies shared transcription auto-cleanup retention plan" \
+  'transcriptionAutoCleanupImportPlan\.retentionMinutes' \
+  VoiceInk/Services/BackupImporter.swift
+
+require_pattern \
+  "macOS backup import uses shared audio cleanup backup import plan" \
+  'VoiceInkAudioCleanupPreference\.backupImportPlan' \
+  VoiceInk/Services/BackupImporter.swift
+
+require_pattern \
+  "macOS backup import applies shared audio cleanup enabled plan" \
+  'audioCleanupImportPlan\.isEnabled' \
+  VoiceInk/Services/BackupImporter.swift
+
+require_pattern \
+  "macOS backup import applies shared audio cleanup retention plan" \
+  'audioCleanupImportPlan\.retentionDays' \
+  VoiceInk/Services/BackupImporter.swift
+
+reject_pattern \
+  "macOS backup import avoids shell-owned cleanup backup planning" \
+  'general\.(isTranscriptionCleanupEnabled|transcriptionRetentionMinutes|isAudioCleanupEnabled|audioRetentionPeriod)' \
+  VoiceInk/Services/BackupImporter.swift
 
 require_pattern \
   "shared Power Mode transcription selection lives in VoiceInkCore" \

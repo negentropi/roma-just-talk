@@ -752,6 +752,26 @@ public struct VoiceInkTranscriptionAutoCleanupConfiguration: Equatable, Sendable
     }
 }
 
+public struct VoiceInkTranscriptionAutoCleanupBackupPreferences: Codable, Equatable, Sendable {
+    public let isEnabled: Bool?
+    public let retentionMinutes: Int?
+
+    public init(isEnabled: Bool?, retentionMinutes: Int?) {
+        self.isEnabled = isEnabled
+        self.retentionMinutes = retentionMinutes
+    }
+}
+
+public struct VoiceInkTranscriptionAutoCleanupBackupImportPlan: Equatable, Sendable {
+    public let isEnabled: Bool?
+    public let retentionMinutes: Int?
+
+    public init(isEnabled: Bool?, retentionMinutes: Int?) {
+        self.isEnabled = isEnabled
+        self.retentionMinutes = retentionMinutes
+    }
+}
+
 public enum VoiceInkTranscriptionAutoCleanupPreference {
     public static func current(from defaults: UserDefaults = .standard) -> VoiceInkTranscriptionAutoCleanupConfiguration {
         VoiceInkTranscriptionAutoCleanupConfiguration(
@@ -781,6 +801,24 @@ public enum VoiceInkTranscriptionAutoCleanupPreference {
         defaults.removeObject(forKey: VoiceInkUserDefaultsKey.isTranscriptionCleanupEnabled)
         defaults.removeObject(forKey: VoiceInkUserDefaultsKey.transcriptionRetentionMinutes)
     }
+
+    public static func backupPreferences(
+        from configuration: VoiceInkTranscriptionAutoCleanupConfiguration
+    ) -> VoiceInkTranscriptionAutoCleanupBackupPreferences {
+        VoiceInkTranscriptionAutoCleanupBackupPreferences(
+            isEnabled: configuration.isEnabled,
+            retentionMinutes: configuration.retentionMinutes
+        )
+    }
+
+    public static func backupImportPlan(
+        from preferences: VoiceInkTranscriptionAutoCleanupBackupPreferences
+    ) -> VoiceInkTranscriptionAutoCleanupBackupImportPlan {
+        VoiceInkTranscriptionAutoCleanupBackupImportPlan(
+            isEnabled: preferences.isEnabled,
+            retentionMinutes: preferences.retentionMinutes
+        )
+    }
 }
 
 public struct VoiceInkAudioCleanupConfiguration: Equatable, Sendable {
@@ -801,6 +839,26 @@ public struct VoiceInkAudioCleanupConfiguration: Equatable, Sendable {
         calendar: Calendar = .current
     ) -> Date {
         calendar.date(byAdding: .day, value: -effectiveRetentionDays, to: referenceDate) ?? referenceDate
+    }
+}
+
+public struct VoiceInkAudioCleanupBackupPreferences: Codable, Equatable, Sendable {
+    public let isEnabled: Bool?
+    public let retentionDays: Int?
+
+    public init(isEnabled: Bool?, retentionDays: Int?) {
+        self.isEnabled = isEnabled
+        self.retentionDays = retentionDays
+    }
+}
+
+public struct VoiceInkAudioCleanupBackupImportPlan: Equatable, Sendable {
+    public let isEnabled: Bool?
+    public let retentionDays: Int?
+
+    public init(isEnabled: Bool?, retentionDays: Int?) {
+        self.isEnabled = isEnabled
+        self.retentionDays = retentionDays
     }
 }
 
@@ -832,6 +890,24 @@ public enum VoiceInkAudioCleanupPreference {
     public static func clear(from defaults: UserDefaults = .standard) {
         defaults.removeObject(forKey: VoiceInkUserDefaultsKey.isAudioCleanupEnabled)
         defaults.removeObject(forKey: VoiceInkUserDefaultsKey.audioRetentionPeriodDays)
+    }
+
+    public static func backupPreferences(
+        from configuration: VoiceInkAudioCleanupConfiguration
+    ) -> VoiceInkAudioCleanupBackupPreferences {
+        VoiceInkAudioCleanupBackupPreferences(
+            isEnabled: configuration.isEnabled,
+            retentionDays: configuration.retentionDays
+        )
+    }
+
+    public static func backupImportPlan(
+        from preferences: VoiceInkAudioCleanupBackupPreferences
+    ) -> VoiceInkAudioCleanupBackupImportPlan {
+        VoiceInkAudioCleanupBackupImportPlan(
+            isEnabled: preferences.isEnabled,
+            retentionDays: preferences.retentionDays
+        )
     }
 }
 

@@ -151,6 +151,12 @@ class ImportExportService {
         let cleanupSettings = VoiceInkTranscriptionCleanupSettings.current()
         let transcriptionCleanup = VoiceInkTranscriptionAutoCleanupPreference.current()
         let audioCleanup = VoiceInkAudioCleanupPreference.current()
+        let transcriptionAutoCleanupBackupPreferences = VoiceInkTranscriptionAutoCleanupPreference.backupPreferences(
+            from: transcriptionCleanup
+        )
+        let audioCleanupBackupPreferences = VoiceInkAudioCleanupPreference.backupPreferences(
+            from: audioCleanup
+        )
         let rollingBufferConfiguration = VoiceInkRollingBufferPreloadSettings.configuration()
         let perModelPreloadSettings = VoiceInkRollingBufferPreloadSettings.exportedPerModelPreloadEnabled()
         let recordingFeedbackBackupPreferences = VoiceInkRecordingFeedbackPreference.backupPreferences(
@@ -192,10 +198,10 @@ class ImportExportService {
             launchAtLoginEnabled: LaunchAtLogin.isEnabled,
             isMenuBarOnly: menuBarManager.isMenuBarOnly,
             recorderType: recorderUIManager.recorderType,
-            isTranscriptionCleanupEnabled: transcriptionCleanup.isEnabled,
-            transcriptionRetentionMinutes: transcriptionCleanup.retentionMinutes,
-            isAudioCleanupEnabled: audioCleanup.isEnabled,
-            audioRetentionPeriod: audioCleanup.retentionDays,
+            isTranscriptionCleanupEnabled: transcriptionAutoCleanupBackupPreferences.isEnabled,
+            transcriptionRetentionMinutes: transcriptionAutoCleanupBackupPreferences.retentionMinutes,
+            isAudioCleanupEnabled: audioCleanupBackupPreferences.isEnabled,
+            audioRetentionPeriod: audioCleanupBackupPreferences.retentionDays,
 
             isSoundFeedbackEnabled: recordingFeedbackBackupPreferences.isSoundFeedbackEnabled,
             isSystemMuteEnabled: recordingFeedbackBackupPreferences.isSystemMuteEnabled,

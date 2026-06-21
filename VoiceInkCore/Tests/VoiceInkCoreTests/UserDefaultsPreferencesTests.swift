@@ -970,6 +970,49 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(configuration.cutoffDate(from: referenceDate), Date(timeIntervalSince1970: 1_800))
     }
 
+    func testTranscriptionAutoCleanupBackupPreferencesPreserveMacOSExportShape() {
+        XCTAssertEqual(
+            VoiceInkTranscriptionAutoCleanupPreference.backupPreferences(
+                from: VoiceInkTranscriptionAutoCleanupConfiguration(
+                    isEnabled: true,
+                    retentionMinutes: 15
+                )
+            ),
+            VoiceInkTranscriptionAutoCleanupBackupPreferences(
+                isEnabled: true,
+                retentionMinutes: 15
+            )
+        )
+    }
+
+    func testTranscriptionAutoCleanupBackupImportPlanPreservesOptionalFields() {
+        XCTAssertEqual(
+            VoiceInkTranscriptionAutoCleanupPreference.backupImportPlan(
+                from: VoiceInkTranscriptionAutoCleanupBackupPreferences(
+                    isEnabled: false,
+                    retentionMinutes: 0
+                )
+            ),
+            VoiceInkTranscriptionAutoCleanupBackupImportPlan(
+                isEnabled: false,
+                retentionMinutes: 0
+            )
+        )
+
+        XCTAssertEqual(
+            VoiceInkTranscriptionAutoCleanupPreference.backupImportPlan(
+                from: VoiceInkTranscriptionAutoCleanupBackupPreferences(
+                    isEnabled: nil,
+                    retentionMinutes: nil
+                )
+            ),
+            VoiceInkTranscriptionAutoCleanupBackupImportPlan(
+                isEnabled: nil,
+                retentionMinutes: nil
+            )
+        )
+    }
+
     func testAudioCleanupPreferenceUsesSharedDefaultsWhenUnset() {
         withIsolatedDefaults { defaults in
             let configuration = VoiceInkAudioCleanupPreference.current(from: defaults)
@@ -1006,6 +1049,49 @@ final class UserDefaultsPreferencesTests: XCTestCase {
 
         XCTAssertEqual(configuration.effectiveRetentionDays, 0)
         XCTAssertEqual(configuration.cutoffDate(from: referenceDate), referenceDate)
+    }
+
+    func testAudioCleanupBackupPreferencesPreserveMacOSExportShape() {
+        XCTAssertEqual(
+            VoiceInkAudioCleanupPreference.backupPreferences(
+                from: VoiceInkAudioCleanupConfiguration(
+                    isEnabled: true,
+                    retentionDays: 14
+                )
+            ),
+            VoiceInkAudioCleanupBackupPreferences(
+                isEnabled: true,
+                retentionDays: 14
+            )
+        )
+    }
+
+    func testAudioCleanupBackupImportPlanPreservesOptionalFields() {
+        XCTAssertEqual(
+            VoiceInkAudioCleanupPreference.backupImportPlan(
+                from: VoiceInkAudioCleanupBackupPreferences(
+                    isEnabled: false,
+                    retentionDays: 0
+                )
+            ),
+            VoiceInkAudioCleanupBackupImportPlan(
+                isEnabled: false,
+                retentionDays: 0
+            )
+        )
+
+        XCTAssertEqual(
+            VoiceInkAudioCleanupPreference.backupImportPlan(
+                from: VoiceInkAudioCleanupBackupPreferences(
+                    isEnabled: nil,
+                    retentionDays: nil
+                )
+            ),
+            VoiceInkAudioCleanupBackupImportPlan(
+                isEnabled: nil,
+                retentionDays: nil
+            )
+        )
     }
 
     func testModelRuntimePreferenceRegisteredDefaultsPreserveMacOSPolicy() {

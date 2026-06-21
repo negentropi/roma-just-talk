@@ -211,6 +211,58 @@ public struct VoiceInkProviderAPIKeyFormState: Equatable, Sendable {
             isEditing: plan.shouldMarkKeyVerified ? false : isEditing
         )
     }
+
+    public func verificationStartPlan(
+        storedRuntimeKey: String?,
+        missingCandidatePolicy: VoiceInkProviderAPIKeyMissingVerificationCandidatePolicy
+    ) -> VoiceInkProviderAPIKeyVerificationStartPlan {
+        let draft = self.draft(storedRuntimeKey: storedRuntimeKey)
+        guard let candidate = draft.verificationCandidate else {
+            switch missingCandidatePolicy {
+            case .keepCurrentState:
+                return VoiceInkProviderAPIKeyVerificationStartPlan(
+                    formState: self,
+                    draft: draft,
+                    candidate: nil
+                )
+            case .applyFailurePlan:
+                return VoiceInkProviderAPIKeyVerificationStartPlan(
+                    formState: verifying().applyingVerificationPlan(
+                        VoiceInkProviderAPIKeyDraft.missingVerificationCandidatePlan()
+                    ),
+                    draft: draft,
+                    candidate: nil
+                )
+            }
+        }
+
+        return VoiceInkProviderAPIKeyVerificationStartPlan(
+            formState: verifying(),
+            draft: draft,
+            candidate: candidate
+        )
+    }
+}
+
+public enum VoiceInkProviderAPIKeyMissingVerificationCandidatePolicy: Equatable, Sendable {
+    case keepCurrentState
+    case applyFailurePlan
+}
+
+public struct VoiceInkProviderAPIKeyVerificationStartPlan: Equatable, Sendable {
+    public let formState: VoiceInkProviderAPIKeyFormState
+    public let draft: VoiceInkProviderAPIKeyDraft
+    public let candidate: String?
+
+    public init(
+        formState: VoiceInkProviderAPIKeyFormState,
+        draft: VoiceInkProviderAPIKeyDraft,
+        candidate: String?
+    ) {
+        self.formState = formState
+        self.draft = draft
+        self.candidate = candidate
+    }
 }
 
 public struct VoiceInkProviderAPIKeyFormPresentation: Equatable, Sendable {

@@ -305,10 +305,13 @@ struct CloudModelCardView: View {
     }
     
     private func verifyAPIKey() {
-        let draft = apiKeyDraft
-        guard let keyToVerify = draft.verificationCandidate else { return }
+        let startPlan = apiKeyFormState.verificationStartPlan(
+            storedRuntimeKey: APIKeyManager.shared.getAPIKey(forProvider: model.provider.apiKeyProviderName),
+            missingCandidatePolicy: .keepCurrentState
+        )
+        apiKeyFormState = startPlan.formState
+        guard let keyToVerify = startPlan.candidate else { return }
 
-        apiKeyFormState = apiKeyFormState.verifying()
         guard let provider = model.provider.coreTranscriptionModelProvider else {
             apiKeyFormState = apiKeyFormState.applyingVerificationPlan(
                 VoiceInkProviderAPIKeyVerificationApplicationPlan(
@@ -324,7 +327,7 @@ struct CloudModelCardView: View {
             let result = await apiKeyVerifier.verifyStoredAPIKeyDetailed(keyToVerify, for: provider)
 
             await MainActor.run {
-                let plan = draft.verificationApplicationPlan(for: result)
+                let plan = startPlan.draft.verificationApplicationPlan(for: result)
                 apiKeyFormState = apiKeyFormState.applyingVerificationPlan(plan)
 
                 if plan.shouldMarkKeyVerified {

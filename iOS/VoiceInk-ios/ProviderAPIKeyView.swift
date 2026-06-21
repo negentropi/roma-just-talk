@@ -97,19 +97,17 @@ struct ProviderAPIKeyView: View {
 
     private func verifyKey() {
         Task {
-            apiKeyFormState = apiKeyFormState.verifying()
-            let draft = apiKeyFormState.draft(
-                storedRuntimeKey: settings.apiKey(for: provider)
+            let startPlan = apiKeyFormState.verificationStartPlan(
+                storedRuntimeKey: settings.apiKey(for: provider),
+                missingCandidatePolicy: .applyFailurePlan
             )
-            guard let keyToVerify = draft.verificationCandidate else {
-                apiKeyFormState = apiKeyFormState.applyingVerificationPlan(
-                    VoiceInkProviderAPIKeyDraft.missingVerificationCandidatePlan()
-                )
+            apiKeyFormState = startPlan.formState
+            guard let keyToVerify = startPlan.candidate else {
                 return
             }
             
             let result = await apiKeyVerifier.verifyStoredAPIKeyDetailed(keyToVerify, for: provider)
-            let plan = draft.verificationApplicationPlan(for: result)
+            let plan = startPlan.draft.verificationApplicationPlan(for: result)
             
             apiKeyFormState = apiKeyFormState.applyingVerificationPlan(plan)
             if plan.shouldMarkKeyVerified {

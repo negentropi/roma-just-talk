@@ -2059,6 +2059,16 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
 
 require_pattern \
+  "shared provider API-key verification start plan lives in VoiceInkCore" \
+  'VoiceInkProviderAPIKeyVerificationStartPlan|verificationStartPlan|VoiceInkProviderAPIKeyMissingVerificationCandidatePolicy' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
+
+require_pattern \
+  "core checks execute provider API-key verification start plan tests" \
+  'ProviderAccessRequirementTests\.testProviderAPIKeyVerificationStartPlan(BeginsWhenCandidateExists|CanKeepStateForMissingCandidate|CanApplyFailureForMissingCandidate)' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "shared provider API-key form presentation lives in VoiceInkCore" \
   'VoiceInkProviderAPIKeyFormPresentation|apiKeyFormPresentation|saveButtonSystemImageName|verifyButtonSystemImageName|consoleLeadingSystemImageName|consoleTrailingSystemImageName' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
@@ -2076,6 +2086,11 @@ require_pattern \
 require_pattern \
   "iOS API-key view uses shared verification application plan" \
   'verificationApplicationPlan|VoiceInkProviderAPIKeyDraft[[:space:]]*\.[[:space:]]*missingVerificationCandidatePlan' \
+  iOS/VoiceInk-ios/ProviderAPIKeyView.swift
+
+require_pattern \
+  "iOS API-key view uses shared verification start plan" \
+  'verificationStartPlan|missingCandidatePolicy: \.applyFailurePlan' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 require_pattern \
@@ -2201,6 +2216,11 @@ reject_pattern \
 reject_pattern \
   "iOS API-key view avoids shell-only verification state and copy" \
   '@State private var isVerifying|verifyResult|Key verified|Verification failed|keyToSaveAfterSuccessfulVerification|verificationProgress = ok \?|result\.isValid' \
+  iOS/VoiceInk-ios/ProviderAPIKeyView.swift
+
+reject_pattern \
+  "iOS API-key view avoids shell-owned verification start branching" \
+  'apiKeyFormState = apiKeyFormState\.verifying\(\)|VoiceInkProviderAPIKeyDraft[[:space:]]*\.[[:space:]]*missingVerificationCandidatePlan' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 reject_pattern \
@@ -3219,6 +3239,11 @@ require_pattern \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
 require_pattern \
+  "macOS cloud API-key card uses shared verification start plan" \
+  'verificationStartPlan|missingCandidatePolicy: \.keepCurrentState' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift
+
+require_pattern \
   "macOS cloud API-key card uses shared stored-key verifier" \
   'verifyStoredAPIKeyDetailed\(keyToVerify, for: provider\)' \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
@@ -3226,6 +3251,11 @@ require_pattern \
 reject_pattern \
   "macOS cloud API-key card avoids shell-owned API-key form state machine fields" \
   '@State private var +(apiKey|verificationProgress)\b' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift
+
+reject_pattern \
+  "macOS cloud API-key card avoids shell-owned verification start branching" \
+  'apiKeyFormState = apiKeyFormState\.verifying\(\)|guard let keyToVerify = [A-Za-z0-9]+\.verificationCandidate' \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
 require_pattern \

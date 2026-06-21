@@ -3518,8 +3518,18 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/CompletedTranscriptionDraft.swift
 
 require_pattern \
-  "shared audio-file transcription text plan type lives in VoiceInkCore" \
+  "shared transcription enhancement text plan type lives in VoiceInkCore" \
+  'VoiceInkTranscriptionEnhancementTextPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunPreparation.swift
+
+require_pattern \
+  "shared audio-file transcription text plan aliases enhancement text plan" \
   'VoiceInkAudioFileTranscriptionTextPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunPreparation.swift
+
+require_pattern \
+  "shared transcription enhancement raw text preparation helper lives in VoiceInkCore" \
+  'prepareRawTextForEnhancement' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunPreparation.swift
 
 require_pattern \
@@ -3533,8 +3543,8 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunPreparation.swift
 
 require_pattern \
-  "macOS live recording uses shared transcription run preparation" \
-  'VoiceInkTranscriptionRunPreparation\.prepareFilteredText' \
+  "macOS live recording uses shared enhancement text plan" \
+  'VoiceInkTranscriptionRunPreparation\.prepareRawTextForEnhancement' \
   VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
 
 require_pattern \
@@ -3548,8 +3558,9 @@ require_pattern \
   VoiceInk/Services/AudioFileTranscriptionService.swift
 
 reject_pattern \
-  "macOS audio-file transcription callers avoid shell-owned raw text preparation and skip role" \
+  "macOS transcription enhancement callers avoid shell-owned raw text preparation and skip role" \
   'filterRawOutput|prepareFilteredText|transcriptRole: \.wordReplacedText' \
+  VoiceInk/Transcription/Engine/TranscriptionPipeline.swift \
   VoiceInk/Services/AudioFileTranscriptionManager.swift \
   VoiceInk/Services/AudioFileTranscriptionService.swift
 
@@ -3574,6 +3585,11 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/PowerModePolicyTests.swift
 
 require_pattern \
+  "core tests pin shared enhancement text plan output" \
+  'testEnhancementTextPlanFiltersPreparesAndSelectsEnhancementText|testEnhancementTextPlanCanUseAlreadyFilteredText' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationTests.swift
+
+require_pattern \
   "core tests pin audio-file transcription text plan output" \
   'testAudioFileTextPlanFiltersPreparesAndSelectsEnhancementText' \
   VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationTests.swift
@@ -3586,6 +3602,11 @@ require_pattern \
 require_pattern \
   "core check runner executes Power Mode transcription metadata selection test" \
   'testTranscriptionMetadataUsesOnlyEnabledPowerModeConfig' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core check runner executes shared enhancement text plan tests" \
+  'testEnhancementTextPlanFiltersPreparesAndSelectsEnhancementText|testEnhancementTextPlanCanUseAlreadyFilteredText' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \

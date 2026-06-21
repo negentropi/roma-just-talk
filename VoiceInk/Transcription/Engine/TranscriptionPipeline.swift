@@ -182,30 +182,28 @@ class TranscriptionPipeline {
 
         do {
             let transcriptionStart = Date()
-            var text: String
+            let rawText: String
             if let session {
-                text = try await session.transcribe(audioURL: audioURL)
+                rawText = try await session.transcribe(audioURL: audioURL)
             } else {
-                text = try await serviceRegistry.transcribe(audioURL: audioURL, model: model)
+                rawText = try await serviceRegistry.transcribe(audioURL: audioURL, model: model)
             }
             let cleanupConfiguration = VoiceInkTranscriptionCleanupConfiguration.current()
-            text = cleanupConfiguration.filterRawOutput(text)
             let transcriptionDuration = Date().timeIntervalSince(transcriptionStart)
-            if let latencyTrace {
-                logger.notice("Latency trace transcription ready operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s transcriptionElapsed=\(transcriptionDuration, format: .fixed(precision: 3), privacy: .public)s chars=\(text.count, privacy: .public)")
-                recordRollingPreloadTiming(latencyTrace, stage: .transcriptionReady)
-            }
-
-            if shouldCancel() { await finishCanceledTranscription(); return nil }
-
-            let preparedRunText = VoiceInkTranscriptionRunPreparation.prepareFilteredText(
-                text,
+            let textPlan = VoiceInkTranscriptionRunPreparation.prepareRawTextForEnhancement(
+                rawText,
                 cleanupConfiguration: cleanupConfiguration
             ) { text in
                 WordReplacementService.shared.applyReplacements(to: text, using: modelContext)
             }
-            text = preparedRunText.wordReplacedText
-            let cleanedText = preparedRunText.cleanedText
+            let text = textPlan.textForEnhancement
+            let cleanedText = textPlan.cleanedText
+            if let latencyTrace {
+                logger.notice("Latency trace transcription ready operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s transcriptionElapsed=\(transcriptionDuration, format: .fixed(precision: 3), privacy: .public)s chars=\((textPlan.filteredText ?? rawText).count, privacy: .public)")
+                recordRollingPreloadTiming(latencyTrace, stage: .transcriptionReady)
+            }
+
+            if shouldCancel() { await finishCanceledTranscription(); return nil }
 
             transcription.text = cleanedText
             transcription.transcriptionModelName = model.displayName
@@ -220,10 +218,9 @@ class TranscriptionPipeline {
                 enhancementService.applyPromptDetectionResult(detectionResult)
             }
 
-            let shouldSkipEnhancement = preparedRunText.shouldSkipPostProcessing(
+            let shouldSkipEnhancement = textPlan.shouldSkipEnhancement(
                 configuration: VoiceInkPostProcessingSkipConfiguration.current(),
-                promptTriggerForcesPostProcessing: promptDetectionResult?.shouldEnableAI == true,
-                transcriptRole: .wordReplacedText
+                promptTriggerForcesEnhancement: promptDetectionResult?.shouldEnableAI == true
             )
 
             if let enhancementService,

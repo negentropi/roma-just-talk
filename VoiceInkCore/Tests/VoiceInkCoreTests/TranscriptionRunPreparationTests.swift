@@ -79,6 +79,46 @@ final class TranscriptionRunPreparationTests: XCTestCase {
         ))
     }
 
+    func testEnhancementTextPlanFiltersPreparesAndSelectsEnhancementText() {
+        let configuration = VoiceInkTranscriptionCleanupConfiguration(
+            punctuationMode: .removeTrailingPeriod,
+            shouldFormatParagraphs: false,
+            shouldLowercase: true,
+            shouldRemoveFillerWords: true,
+            fillerWords: ["um"]
+        )
+
+        let plan = VoiceInkTranscriptionRunPreparation.prepareRawTextForEnhancement(
+            "Um Hello.",
+            cleanupConfiguration: configuration
+        ) { text in
+            text.replacingOccurrences(of: "Hello", with: "ROMA")
+        }
+
+        XCTAssertEqual(plan.filteredText, "Hello.")
+        XCTAssertEqual(plan.textForEnhancement, "ROMA.")
+        XCTAssertEqual(plan.cleanedText, "roma")
+    }
+
+    func testEnhancementTextPlanCanUseAlreadyFilteredText() {
+        let configuration = VoiceInkTranscriptionCleanupConfiguration(
+            shouldFormatParagraphs: false,
+            shouldLowercase: true,
+            shouldRemoveFillerWords: false
+        )
+
+        let plan = VoiceInkTranscriptionRunPreparation.prepareFilteredTextForEnhancement(
+            "Hello.",
+            cleanupConfiguration: configuration
+        ) { text in
+            text.replacingOccurrences(of: "Hello", with: "ROMA")
+        }
+
+        XCTAssertEqual(plan.filteredText, "Hello.")
+        XCTAssertEqual(plan.textForEnhancement, "ROMA.")
+        XCTAssertEqual(plan.cleanedText, "roma.")
+    }
+
     func testAudioFileTextPlanFiltersPreparesAndSelectsEnhancementText() {
         let configuration = VoiceInkTranscriptionCleanupConfiguration(
             punctuationMode: .removeTrailingPeriod,

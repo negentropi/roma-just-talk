@@ -55,11 +55,17 @@ public struct VoiceInkTranscriptionRunPreparedText: Equatable, Sendable {
     }
 }
 
-public struct VoiceInkAudioFileTranscriptionTextPlan: Equatable, Sendable {
+public struct VoiceInkTranscriptionEnhancementTextPlan: Equatable, Sendable {
+    public let filteredText: String?
     public let textForEnhancement: String
     public let cleanedText: String
 
-    public init(textForEnhancement: String, cleanedText: String) {
+    public init(
+        filteredText: String? = nil,
+        textForEnhancement: String,
+        cleanedText: String
+    ) {
+        self.filteredText = filteredText
         self.textForEnhancement = textForEnhancement
         self.cleanedText = cleanedText
     }
@@ -79,6 +85,8 @@ public struct VoiceInkAudioFileTranscriptionTextPlan: Equatable, Sendable {
         )
     }
 }
+
+public typealias VoiceInkAudioFileTranscriptionTextPlan = VoiceInkTranscriptionEnhancementTextPlan
 
 public enum VoiceInkTranscriptionRunPreparation {
     public static func prepareRawText(
@@ -121,13 +129,52 @@ public enum VoiceInkTranscriptionRunPreparation {
         cleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration,
         applyingWordReplacements wordReplacement: (String) -> String = { $0 }
     ) -> VoiceInkAudioFileTranscriptionTextPlan {
-        let preparedText = prepareRawText(
+        prepareRawTextForEnhancement(
             rawText,
             cleanupConfiguration: cleanupConfiguration,
             applyingWordReplacements: wordReplacement
         )
+    }
 
-        return VoiceInkAudioFileTranscriptionTextPlan(
+    public static func prepareRawTextForEnhancement(
+        _ rawText: String,
+        cleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration,
+        whitespacePolicy: VoiceInkTranscriptionOutputWhitespacePolicy = .collapseRuns,
+        normalizeParagraphSpacingBeforeFormatting: Bool = false,
+        applyingWordReplacements wordReplacement: (String) -> String = { $0 }
+    ) -> VoiceInkTranscriptionEnhancementTextPlan {
+        let preparedText = prepareRawText(
+            rawText,
+            cleanupConfiguration: cleanupConfiguration,
+            whitespacePolicy: whitespacePolicy,
+            normalizeParagraphSpacingBeforeFormatting: normalizeParagraphSpacingBeforeFormatting,
+            applyingWordReplacements: wordReplacement
+        )
+
+        return textPlan(from: preparedText)
+    }
+
+    public static func prepareFilteredTextForEnhancement(
+        _ filteredText: String,
+        cleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration,
+        normalizeParagraphSpacingBeforeFormatting: Bool = false,
+        applyingWordReplacements wordReplacement: (String) -> String = { $0 }
+    ) -> VoiceInkTranscriptionEnhancementTextPlan {
+        let preparedText = prepareFilteredText(
+            filteredText,
+            cleanupConfiguration: cleanupConfiguration,
+            normalizeParagraphSpacingBeforeFormatting: normalizeParagraphSpacingBeforeFormatting,
+            applyingWordReplacements: wordReplacement
+        )
+
+        return textPlan(from: preparedText)
+    }
+
+    private static func textPlan(
+        from preparedText: VoiceInkTranscriptionRunPreparedText
+    ) -> VoiceInkTranscriptionEnhancementTextPlan {
+        VoiceInkTranscriptionEnhancementTextPlan(
+            filteredText: preparedText.filteredText,
             textForEnhancement: preparedText.wordReplacedText,
             cleanedText: preparedText.cleanedText
         )

@@ -17,17 +17,14 @@ public struct VoiceInkTranscriptStatusPresentation: Equatable, Sendable {
         case failure
     }
 
+    public enum InlineAccessory: Equatable, Sendable {
+        case progress
+        case badge
+    }
+
     public let kind: Kind
     public let title: String
     public let badgeText: String
-
-    public var isProcessing: Bool {
-        kind == .processing
-    }
-
-    public var isFailure: Bool {
-        kind == .failed
-    }
 
     public var tone: Tone {
         switch kind {
@@ -47,12 +44,13 @@ public struct VoiceInkTranscriptStatusPresentation: Equatable, Sendable {
         }
     }
 
-    public var shouldShowInlineProgress: Bool {
-        kind == .processing
-    }
-
-    public var shouldShowBadge: Bool {
-        kind == .failed
+    public var inlineAccessory: InlineAccessory {
+        switch kind {
+        case .processing:
+            return .progress
+        case .failed:
+            return .badge
+        }
     }
 
     public init(kind: Kind, title: String, badgeText: String) {

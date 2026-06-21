@@ -1763,7 +1763,7 @@ require_pattern \
 
 require_pattern \
   "shared transcript status metadata lives in VoiceInkCore" \
-  'panelSystemImageName|shouldShowInlineProgress|shouldShowBadge|Tone' \
+  'panelSystemImageName|inlineAccessory|Tone' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
 
 require_pattern \
@@ -1828,7 +1828,7 @@ reject_pattern \
 
 require_pattern \
   "iOS note row uses shared transcript status metadata" \
-  'shouldShowInlineProgress|shouldShowBadge|\.tone' \
+  'inlineAccessory|\.tone' \
   iOS/VoiceInk-ios/NoteRowView.swift
 
 require_pattern \
@@ -2098,7 +2098,7 @@ reject_pattern \
 
 reject_pattern \
   "iOS note views avoid shell-only transcript status branching" \
-  'note\.transcriptionStatus *[!=]= *\.(pending|failed|completed|canceled)|transcriptionStatus\.needsTranscription|VoiceInkTranscriptPresentation\.status(Title|BadgeText)|statusPresentation\??\.is(Failure|Processing)' \
+  'note\.transcriptionStatus *[!=]= *\.(pending|failed|completed|canceled)|transcriptionStatus\.needsTranscription|VoiceInkTranscriptPresentation\.status(Title|BadgeText)|statusPresentation\??\.(is(Failure|Processing)|shouldShow(InlineProgress|Badge))' \
   iOS/VoiceInk-ios/NoteRowView.swift \
   iOS/VoiceInk-ios/NoteDetailView.swift
 

@@ -38,22 +38,25 @@ struct NoteRowView: View {
 
                 Spacer(minLength: 0)
 
-                if let statusPresentation, statusPresentation.shouldShowInlineProgress {
-                    HStack(spacing: 6) {
-                        ProgressView()
-                            .scaleEffect(0.7)
+                if let statusPresentation {
+                    switch statusPresentation.inlineAccessory {
+                    case .progress:
+                        HStack(spacing: 6) {
+                            ProgressView()
+                                .scaleEffect(0.7)
+                            Text(statusPresentation.badgeText)
+                                .font(.caption)
+                        }
+                        .foregroundStyle(.secondary)
+                    case .badge:
                         Text(statusPresentation.badgeText)
-                            .font(.caption)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(statusPresentation.tone.badgeColor)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(statusPresentation.tone.badgeBackgroundColor)
+                            .clipShape(Capsule())
                     }
-                    .foregroundStyle(.secondary)
-                } else if let statusPresentation, statusPresentation.shouldShowBadge {
-                    Text(statusPresentation.badgeText)
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(statusPresentation.tone.badgeColor)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(statusPresentation.tone.badgeBackgroundColor)
-                        .clipShape(Capsule())
                 }
             }
         }

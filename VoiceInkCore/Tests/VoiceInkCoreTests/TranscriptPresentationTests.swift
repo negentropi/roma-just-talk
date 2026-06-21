@@ -455,23 +455,17 @@ final class TranscriptPresentationTests: XCTestCase {
         XCTAssertEqual(pending?.kind, .processing)
         XCTAssertEqual(pending?.title, "Transcription Pending")
         XCTAssertEqual(pending?.badgeText, "Processing")
-        XCTAssertTrue(pending?.isProcessing == true)
-        XCTAssertFalse(pending?.isFailure == true)
         XCTAssertEqual(pending?.tone, .processing)
         XCTAssertEqual(pending?.panelSystemImageName, "clock.fill")
-        XCTAssertTrue(pending?.shouldShowInlineProgress == true)
-        XCTAssertFalse(pending?.shouldShowBadge == true)
+        XCTAssertEqual(pending?.inlineAccessory, .progress)
 
         let failed = VoiceInkTranscriptPresentation.statusPresentation(for: .failed)
         XCTAssertEqual(failed?.kind, .failed)
         XCTAssertEqual(failed?.title, "Transcription Failed")
         XCTAssertEqual(failed?.badgeText, "Failed")
-        XCTAssertFalse(failed?.isProcessing == true)
-        XCTAssertTrue(failed?.isFailure == true)
         XCTAssertEqual(failed?.tone, .failure)
         XCTAssertEqual(failed?.panelSystemImageName, "exclamationmark.triangle.fill")
-        XCTAssertFalse(failed?.shouldShowInlineProgress == true)
-        XCTAssertTrue(failed?.shouldShowBadge == true)
+        XCTAssertEqual(failed?.inlineAccessory, .badge)
     }
 
     func testStatusPresentationContentVisibilityMatchesTranscriptState() {

@@ -94,13 +94,11 @@ actor WhisperContext {
 
     func getTranscription() -> String {
         guard let context = context else { return "" }
-        var segments: [String] = []
-        for i in 0..<whisper_full_n_segments(context) {
-            if let text = whisper_full_get_segment_text(context, i) {
-                segments.append(String(cString: text))
-            }
+
+        return VoiceInkWhisperTranscriptSegments.joinedText(segmentCount: whisper_full_n_segments(context)) { index in
+            guard let text = whisper_full_get_segment_text(context, index) else { return nil }
+            return String(cString: text)
         }
-        return VoiceInkWhisperTranscriptSegments.joinedText(segments)
     }
 
     static func createContext(path: String) async throws -> WhisperContext {

@@ -2248,6 +2248,37 @@ require_pattern \
   'testRuntimeInvocationPlanKeepsWhisperCStringInputsAlive|testRuntimeInvocationPlanOmitsDisabledWhisperInputs' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
+require_pattern \
+  "shared local Whisper transcript segment policy lives in VoiceInkCore" \
+  'VoiceInkWhisperTranscriptSegments|joinedText\(segmentCount:' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperTranscriptSegments.swift
+
+require_pattern \
+  "core tests cover shared local Whisper transcript segment policy" \
+  'testJoinedTextFromSegmentLookupPreservesRawOrderAndSkipsMissingSegments|testJoinedTextFromSegmentLookupReturnsEmptyForNonPositiveCounts' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/WhisperTranscriptSegmentsTests.swift
+
+require_pattern \
+  "core check runner executes shared local Whisper transcript segment policy tests" \
+  'testJoinedTextFromSegmentLookupPreservesRawOrderAndSkipsMissingSegments|testJoinedTextFromSegmentLookupReturnsEmptyForNonPositiveCounts' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "macOS local Whisper delegates raw segment lookup to shared core" \
+  'VoiceInkWhisperTranscriptSegments\.joinedText\(segmentCount:' \
+  VoiceInk/Transcription/Whisper/LibWhisper.swift
+
+require_pattern \
+  "iOS local Whisper delegates raw segment lookup to shared core" \
+  'VoiceInkWhisperTranscriptSegments\.joinedText\(segmentCount:' \
+  iOS/VoiceInk-ios/LibWhisper.swift
+
+reject_pattern \
+  "local Whisper adapters avoid shell-owned raw segment loops" \
+  'var +segments: +\[String\]|for +.*whisper_full_n_segments|segments\.append' \
+  VoiceInk/Transcription/Whisper/LibWhisper.swift \
+  iOS/VoiceInk-ios/LibWhisper.swift
+
 reject_pattern \
   "local Whisper adapters avoid shell-owned optional CString lifetime wiring" \
   'runWithPrompt|runWithLanguage|utf8CString' \

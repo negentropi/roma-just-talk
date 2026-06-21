@@ -9279,6 +9279,56 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
+  "shared macOS shell backup preferences live in VoiceInkCore" \
+  'VoiceInkMacOSShellBackupPreferences' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared macOS shell backup import plan lives in VoiceInkCore" \
+  'VoiceInkMacOSShellBackupImportPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_context_pattern_count_at_least \
+  "shared macOS shell backup export policy lives in VoiceInkCore" \
+  'enum VoiceInkMacOSShellBackupPreference' \
+  'static func backupPreferences' \
+  1 \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_context_pattern_count_at_least \
+  "shared macOS shell backup import policy lives in VoiceInkCore" \
+  'enum VoiceInkMacOSShellBackupPreference' \
+  'static func backupImportPlan' \
+  1 \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "macOS general backup adapts shell values to shared preferences" \
+  'macOSShellBackupPreferences' \
+  VoiceInk/Services/BackupTypes.swift
+
+require_pattern \
+  "macOS backup export uses shared macOS shell backup preferences" \
+  'VoiceInkMacOSShellBackupPreference\.backupPreferences' \
+  VoiceInk/Services/ImportExportService.swift
+
+require_pattern \
+  "macOS backup import uses shared macOS shell backup import plan" \
+  'VoiceInkMacOSShellBackupPreference\.backupImportPlan' \
+  VoiceInk/Services/BackupImporter.swift
+
+reject_pattern \
+  "macOS backup import avoids shell-owned macOS shell backup planning" \
+  'general\.(launchAtLoginEnabled|isMenuBarOnly|recorderType)' \
+  VoiceInk/Services/BackupImporter.swift
+
+reject_context_pattern \
+  "macOS backup export avoids shell-owned macOS shell backup field emission" \
+  'GeneralBackup\(' \
+  'launchAtLoginEnabled: LaunchAtLogin\.isEnabled|isMenuBarOnly: menuBarManager\.isMenuBarOnly|recorderType: recorderUIManager\.recorderType' \
+  VoiceInk/Services/ImportExportService.swift
+
+require_pattern \
   "macOS defaults register shared menu bar preference" \
   'VoiceInkMenuBarPreference\.registeredDefaults' \
   VoiceInk/AppDefaults.swift
@@ -9311,6 +9361,16 @@ require_pattern \
 require_pattern \
   "core checks execute menu bar preference tests" \
   'testSharedPreferenceDefaultsPreserveExistingMacOSMenuBarPolicy|testMenuBarPreferencePreservesRegisteredDefaultsAndStorage' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute macOS shell backup export policy tests" \
+  'UserDefaultsPreferencesTests\.testMacOSShellBackupPreferencesPreserveExportShape' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute macOS shell backup import policy tests" \
+  'UserDefaultsPreferencesTests\.testMacOSShellBackupImportPlanPreservesOptionalFields' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \

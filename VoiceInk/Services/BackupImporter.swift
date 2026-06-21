@@ -138,13 +138,16 @@ enum BackupImporter {
         if let middleClickActivationDelay = recordingShortcutImportPlan.middleClickActivationDelay {
             recordingShortcutManager.middleClickActivationDelay = middleClickActivationDelay
         }
-        if let launch = general.launchAtLoginEnabled {
+        let macOSShellImportPlan = VoiceInkMacOSShellBackupPreference.backupImportPlan(
+            from: general.macOSShellBackupPreferences
+        )
+        if let launch = macOSShellImportPlan.launchAtLoginEnabled {
             LaunchAtLogin.isEnabled = launch
         }
-        if let menuOnly = general.isMenuBarOnly {
+        if let menuOnly = macOSShellImportPlan.isMenuBarOnly {
             menuBarManager.isMenuBarOnly = menuOnly
         }
-        if let recType = general.recorderType {
+        if let recType = macOSShellImportPlan.recorderType {
             recorderUIManager.recorderType = recType
         }
 

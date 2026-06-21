@@ -105,6 +105,14 @@ extension GeneralBackup {
         )
     }
 
+    var macOSShellBackupPreferences: VoiceInkMacOSShellBackupPreferences {
+        VoiceInkMacOSShellBackupPreferences(
+            launchAtLoginEnabled: launchAtLoginEnabled,
+            isMenuBarOnly: isMenuBarOnly,
+            recorderType: recorderType
+        )
+    }
+
     var pasteBackupPreferences: VoiceInkPasteBackupPreferences {
         VoiceInkPasteBackupPreferences(
             shouldRestoreClipboardAfterPaste: restoreClipboardAfterPaste,

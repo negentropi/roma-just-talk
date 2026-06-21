@@ -182,6 +182,11 @@ class ImportExportService {
             isMiddleClickToggleEnabled: recordingShortcutManager.isMiddleClickToggleEnabled,
             middleClickActivationDelay: recordingShortcutManager.middleClickActivationDelay
         )
+        let macOSShellBackupPreferences = VoiceInkMacOSShellBackupPreference.backupPreferences(
+            launchAtLoginEnabled: LaunchAtLogin.isEnabled,
+            isMenuBarOnly: menuBarManager.isMenuBarOnly,
+            recorderType: recorderUIManager.recorderType
+        )
         let generalSettingsToExport = GeneralBackup(
             primaryRecordingShortcut: ShortcutStore.shortcut(for: .primaryRecording).map(ShortcutBackup.init),
             secondaryRecordingShortcut: ShortcutStore.shortcut(for: .secondaryRecording).map(ShortcutBackup.init),
@@ -199,9 +204,9 @@ class ImportExportService {
             specialShortcutPasteLastTranscriptOnEmptyTap: recordingShortcutBackupPreferences.specialShortcutPasteLastTranscriptOnEmptyTap,
             isMiddleClickToggleEnabled: recordingShortcutBackupPreferences.isMiddleClickToggleEnabled,
             middleClickActivationDelay: recordingShortcutBackupPreferences.middleClickActivationDelay,
-            launchAtLoginEnabled: LaunchAtLogin.isEnabled,
-            isMenuBarOnly: menuBarManager.isMenuBarOnly,
-            recorderType: recorderUIManager.recorderType,
+            launchAtLoginEnabled: macOSShellBackupPreferences.launchAtLoginEnabled,
+            isMenuBarOnly: macOSShellBackupPreferences.isMenuBarOnly,
+            recorderType: macOSShellBackupPreferences.recorderType,
             isTranscriptionCleanupEnabled: transcriptionAutoCleanupBackupPreferences.isEnabled,
             transcriptionRetentionMinutes: transcriptionAutoCleanupBackupPreferences.retentionMinutes,
             isAudioCleanupEnabled: audioCleanupBackupPreferences.isEnabled,

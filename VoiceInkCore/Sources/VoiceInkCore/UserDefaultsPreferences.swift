@@ -317,6 +317,62 @@ public enum VoiceInkMenuBarPreference {
     }
 }
 
+public struct VoiceInkMacOSShellBackupPreferences: Codable, Equatable, Sendable {
+    public let launchAtLoginEnabled: Bool?
+    public let isMenuBarOnly: Bool?
+    public let recorderType: String?
+
+    public init(
+        launchAtLoginEnabled: Bool?,
+        isMenuBarOnly: Bool?,
+        recorderType: String?
+    ) {
+        self.launchAtLoginEnabled = launchAtLoginEnabled
+        self.isMenuBarOnly = isMenuBarOnly
+        self.recorderType = recorderType
+    }
+}
+
+public struct VoiceInkMacOSShellBackupImportPlan: Equatable, Sendable {
+    public let launchAtLoginEnabled: Bool?
+    public let isMenuBarOnly: Bool?
+    public let recorderType: String?
+
+    public init(
+        launchAtLoginEnabled: Bool?,
+        isMenuBarOnly: Bool?,
+        recorderType: String?
+    ) {
+        self.launchAtLoginEnabled = launchAtLoginEnabled
+        self.isMenuBarOnly = isMenuBarOnly
+        self.recorderType = recorderType
+    }
+}
+
+public enum VoiceInkMacOSShellBackupPreference {
+    public static func backupPreferences(
+        launchAtLoginEnabled: Bool,
+        isMenuBarOnly: Bool,
+        recorderType: String
+    ) -> VoiceInkMacOSShellBackupPreferences {
+        VoiceInkMacOSShellBackupPreferences(
+            launchAtLoginEnabled: launchAtLoginEnabled,
+            isMenuBarOnly: isMenuBarOnly,
+            recorderType: recorderType
+        )
+    }
+
+    public static func backupImportPlan(
+        from preferences: VoiceInkMacOSShellBackupPreferences
+    ) -> VoiceInkMacOSShellBackupImportPlan {
+        VoiceInkMacOSShellBackupImportPlan(
+            launchAtLoginEnabled: preferences.launchAtLoginEnabled,
+            isMenuBarOnly: preferences.isMenuBarOnly,
+            recorderType: preferences.recorderType
+        )
+    }
+}
+
 public enum VoiceInkAudioSessionTimeoutPreference {
     public static let minimumSeconds = 0
     public static let maximumSeconds = 300

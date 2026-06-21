@@ -314,6 +314,38 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testMacOSShellBackupPreferencesPreserveExportShape() {
+        XCTAssertEqual(
+            VoiceInkMacOSShellBackupPreference.backupPreferences(
+                launchAtLoginEnabled: true,
+                isMenuBarOnly: false,
+                recorderType: "mini"
+            ),
+            VoiceInkMacOSShellBackupPreferences(
+                launchAtLoginEnabled: true,
+                isMenuBarOnly: false,
+                recorderType: "mini"
+            )
+        )
+    }
+
+    func testMacOSShellBackupImportPlanPreservesOptionalFields() {
+        XCTAssertEqual(
+            VoiceInkMacOSShellBackupPreference.backupImportPlan(
+                from: VoiceInkMacOSShellBackupPreferences(
+                    launchAtLoginEnabled: nil,
+                    isMenuBarOnly: true,
+                    recorderType: nil
+                )
+            ),
+            VoiceInkMacOSShellBackupImportPlan(
+                launchAtLoginEnabled: nil,
+                isMenuBarOnly: true,
+                recorderType: nil
+            )
+        )
+    }
+
     func testDefaultSettingsRegisterUserDefaultsForPlatformSelections() {
         let previousRegistrationDomain = UserDefaults.standard.volatileDomain(forName: UserDefaults.registrationDomain)
         defer {

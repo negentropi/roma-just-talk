@@ -66,10 +66,7 @@ public struct VoiceInkProviderAPIKeyVerifier: Sendable {
             provider: provider,
             environment: environment
         ) else {
-            return VoiceInkAPIKeyVerificationResult(
-                isValid: false,
-                errorMessage: "API key is missing or empty."
-            )
+            return VoiceInkAPIKeyVerificationPolicy.missingAPIKeyResult
         }
 
         return await verifyAPIKeyDetailed(apiKey, for: provider)
@@ -171,10 +168,7 @@ public struct VoiceInkProviderAPIKeyVerifier: Sendable {
             providerName: providerName,
             environment: environment
         ) else {
-            return VoiceInkAPIKeyVerificationResult(
-                isValid: false,
-                errorMessage: "API key is missing or empty."
-            )
+            return VoiceInkAPIKeyVerificationPolicy.missingAPIKeyResult
         }
 
         return await verifyAPIKeyDetailed(apiKey, for: transcriptionProvider)

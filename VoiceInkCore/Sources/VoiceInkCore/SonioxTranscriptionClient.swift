@@ -59,40 +59,14 @@ public struct VoiceInkSonioxTranscriptionClient: Sendable {
         apiKey: String,
         timeout: TimeInterval = 10
     ) async -> VoiceInkAPIKeyVerificationResult {
-        guard !apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            return VoiceInkAPIKeyVerificationResult(
-                isValid: false,
-                errorMessage: "API key is missing or empty."
-            )
-        }
-
-        let request = VoiceInkSonioxRequestBuilder.makeFilesRequest(
-            baseURL: baseURL,
+        await VoiceInkAPIKeyVerificationPolicy.verify(
             apiKey: apiKey,
-            timeout: timeout
+            request: VoiceInkSonioxRequestBuilder.makeFilesRequest(
+                baseURL: baseURL,
+                apiKey: apiKey,
+                timeout: timeout
+            )
         )
-
-        do {
-            let (data, response) = try await URLSession.shared.data(for: request)
-            guard let http = response as? HTTPURLResponse else {
-                return VoiceInkAPIKeyVerificationResult(
-                    isValid: false,
-                    errorMessage: "No HTTP response received."
-                )
-            }
-            if (200..<300).contains(http.statusCode) {
-                return VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: nil)
-            }
-            return VoiceInkAPIKeyVerificationResult(
-                isValid: false,
-                errorMessage: String(data: data, encoding: .utf8) ?? "HTTP \(http.statusCode)"
-            )
-        } catch {
-            return VoiceInkAPIKeyVerificationResult(
-                isValid: false,
-                errorMessage: error.localizedDescription
-            )
-        }
     }
 
     private func uploadFile(

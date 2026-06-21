@@ -3198,6 +3198,45 @@ reject_pattern \
   VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionClient.swift
 
 require_pattern \
+  "shared API-key verification policy owns common verification result mapping" \
+  'VoiceInkAPIKeyVerificationPolicy|missingAPIKeyResult|verificationResult|missingHTTPResponseMessage|failureResult|errorMessage\(data:' \
+  VoiceInkCore/Sources/VoiceInkCore/APIKeyVerificationPolicy.swift
+
+require_pattern \
+  "shared provider verification clients use shared API-key verification policy" \
+  'VoiceInkAPIKeyVerificationPolicy\.verify' \
+  VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/MistralTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/ElevenLabsTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/CartesiaAPIKeyClient.swift
+
+require_pattern \
+  "core checks execute API-key verification policy tests" \
+  'APIKeyVerificationPolicyTests\.testBlankAPIKeyResultPreservesSharedFailureCopy|APIKeyVerificationPolicyTests\.testVerificationResultRejectsMissingHTTPResponse|APIKeyVerificationPolicyTests\.testVerificationResultAcceptsHTTP2xxResponses|APIKeyVerificationPolicyTests\.testVerificationResultReturnsHTTPBodyForFailure|APIKeyVerificationPolicyTests\.testVerificationResultFallsBackToHTTPStatusForNonUTF8FailureBody|APIKeyVerificationPolicyTests\.testFailureResultUsesLocalizedDescription' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "shared provider verification clients avoid duplicate API-key verification result mapping" \
+  'API key is missing or empty\.|No HTTP response received\.|String\(data: data, encoding: \.utf8\) \?\? "HTTP \(http\.statusCode\)"|guard !apiKey\.trimmingCharacters' \
+  VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/MistralTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/ElevenLabsTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/CartesiaAPIKeyClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyVerifier.swift
+
+require_pattern \
   "shared remote HTTP response policy owns success, retry, and provider-domain errors" \
   'VoiceInkRemoteHTTPResponsePolicy|successStatusCodeRange|retryableStatusCode|apiError|responseBodyText|URLError\(\.badServerResponse\)' \
   VoiceInkCore/Sources/VoiceInkCore/RemoteHTTPResponsePolicy.swift

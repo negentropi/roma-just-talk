@@ -1042,7 +1042,7 @@ require_pattern \
 
 reject_pattern \
   "iOS mode configuration avoids shallow form pass-through properties" \
-  'private var +(canSave|presentation)\b' \
+  'private var +(canSave|presentation|providerAvailability)\b' \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
 require_pattern \

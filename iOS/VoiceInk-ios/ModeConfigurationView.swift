@@ -18,12 +18,9 @@ struct ModeConfigurationView: View {
         self._mode = State(initialValue: initialMode)
     }
     
-    private var providerAvailability: VoiceInkModeFormProviderAvailability {
-        settings.modeFormProviderAvailability
-    }
-    
     var body: some View {
         let formPresentation = mode.formPresentation(isEditing: isEditing)
+        let providerAvailability = settings.modeFormProviderAvailability
 
         Form {
             Section(header: Text(formPresentation.modeDetailsSectionTitle)) {
@@ -112,7 +109,7 @@ struct ModeConfigurationView: View {
     }
 
     private func repairUnavailableProviderSelections() {
-        mode = providerAvailability.repairedMode(mode)
+        mode = settings.modeFormProviderAvailability.repairedMode(mode)
     }
 }
 

@@ -436,6 +436,16 @@ require_pattern \
   'VoiceInkProviderAPIKeyAccount\.customModelAccountIdentifier\(forModelId:' \
   VoiceInk/Services/APIKeyManager.swift
 
+require_pattern \
+  "macOS API-key manager uses shared provider account identifier" \
+  'VoiceInkProviderAPIKeyAccount\.accountIdentifier\(forProviderName:' \
+  VoiceInk/Services/APIKeyManager.swift
+
+reject_pattern \
+  "macOS API-key manager avoids shallow account identifier wrappers" \
+  'private func +(keychainIdentifier|customModelKeyIdentifier)\(' \
+  VoiceInk/Services/APIKeyManager.swift
+
 reject_pattern \
   "macOS API-key manager avoids shell-owned custom model account strings" \
   'customModel_.*_APIKey' \

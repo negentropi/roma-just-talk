@@ -939,6 +939,51 @@ require_pattern \
   'SettingsPresentationTests\.testIOSSettingsPresentationPreservesSettingsChromeCopy|SettingsPresentationTests\.testMacOSSettingsPresentationPreservesSettingsChromeCopy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
+require_file VoiceInkCore/Sources/VoiceInkCore/AnnouncementsPolicy.swift
+
+require_pattern \
+  "shared announcement policy owns feed and storage defaults" \
+  'VoiceInkAnnouncementPreference|isEnabledKey = VoiceInkUserDefaultsKey\.enableAnnouncements|dismissedIdsKey = "dismissedAnnouncementIds"|announcementsURLString = "https://beingpax\.github\.io/VoiceInk/announcements\.json"|refreshInterval|initialFetchDelay|requestTimeout|maxDismissedIdsToKeep' \
+  VoiceInkCore/Sources/VoiceInkCore/AnnouncementsPolicy.swift
+
+require_pattern \
+  "shared announcement policy owns dismissal and active selection" \
+  'dismissedIds\(afterDismissing|nextAnnouncement|isActive|VoiceInkAnnouncementPresentation|VoiceInkRemoteAnnouncement' \
+  VoiceInkCore/Sources/VoiceInkCore/AnnouncementsPolicy.swift
+
+require_pattern \
+  "macOS announcements service uses shared announcement policy" \
+  'VoiceInkAnnouncementPreference\.(announcementsURL|refreshInterval|initialFetchDelay|requestTimeout|dismissedIds|saveDismissedIds)|VoiceInkAnnouncementPolicy\.nextAnnouncement|VoiceInkRemoteAnnouncement' \
+  VoiceInk/Services/AnnouncementsService.swift
+
+require_pattern \
+  "macOS app uses shared announcements enablement key" \
+  '@AppStorage\(VoiceInkAnnouncementPreference\.isEnabledKey\)' \
+  VoiceInk/VoiceInk.swift
+
+require_pattern \
+  "macOS settings uses shared announcements enablement key" \
+  '@AppStorage\(VoiceInkAnnouncementPreference\.isEnabledKey\)' \
+  VoiceInk/Views/Settings/SettingsView.swift
+
+require_pattern \
+  "macOS defaults register shared announcement defaults" \
+  'VoiceInkAnnouncementPreference\.registeredDefaults' \
+  VoiceInk/AppDefaults.swift
+
+require_pattern \
+  "core checks execute announcement policy tests" \
+  'AnnouncementsPolicyTests\.testAnnouncementPreferencePreservesMacOSStorageAndFetchDefaults|AnnouncementsPolicyTests\.testNextAnnouncementSkipsDismissedAndInactiveThenReturnsFirstValidPresentation' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "macOS announcement shell avoids raw announcement policy" \
+  '"(enableAnnouncements|dismissedAnnouncementIds|https://beingpax\.github\.io/VoiceInk/announcements\.json)"|private struct RemoteAnnouncement|ISO8601DateFormatter|maxDismissedToKeep|refreshInterval: TimeInterval = 4|DispatchQueue\.main\.asyncAfter\(deadline: \.now\(\) \+ 5\)' \
+  VoiceInk/Services/AnnouncementsService.swift \
+  VoiceInk/AppDefaults.swift \
+  VoiceInk/VoiceInk.swift \
+  VoiceInk/Views/Settings/SettingsView.swift
+
 reject_pattern \
   "iOS mode selection views avoid shell-only mode-count picker branching" \
   'modes\.count > 1|settings\.modes\.count > 1|modes\.first|settings\.modes\.first|!settings\.modes\.isEmpty' \
@@ -1007,6 +1052,11 @@ reject_pattern \
 require_pattern \
   "migration checklist tracks shared recorder style settings labels" \
   'macOS recorder style labels, settings section/picker labels, raw storage key/default' \
+  docs/ios-single-repo-migration.md
+
+require_pattern \
+  "migration checklist tracks shared announcement policy gate" \
+  'macOS announcements .*VoiceInkAnnouncementPreference.*VoiceInkAnnouncementPolicy' \
   docs/ios-single-repo-migration.md
 
 reject_pattern \

@@ -52,6 +52,7 @@ public enum VoiceInkUserDefaultsKey {
     public static let customProviderModel = "customProviderModel"
     public static let showMenuBarIcon = "ShowMenuBarIcon"
     public static let isMenuBarOnly = "IsMenuBarOnly"
+    public static let enableAnnouncements = "enableAnnouncements"
 
     public static func selectedAIProviderModel(_ providerRawValue: String) -> String {
         "\(providerRawValue)SelectedModel"
@@ -82,6 +83,7 @@ public enum VoiceInkPreferenceDefault {
     public static let macOSSelectedTranscriptionLanguage = "en"
     public static let showMenuBarIcon = false
     public static let isMenuBarOnly = true
+    public static let enableAnnouncements = true
 }
 
 public struct VoiceInkDefaultSettings: Equatable, Sendable {

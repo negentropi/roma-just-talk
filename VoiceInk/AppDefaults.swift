@@ -10,7 +10,6 @@ enum AppDefaults {
 
         var platformDefaults: [String: Any] = [
             // Onboarding & General
-            "enableAnnouncements": true,
 
             // Recording & Transcription
             VoiceInkRollingBufferPreloadSettings.modeKey: VoiceInkRollingBufferPreloadSettings.defaultMode.rawValue,
@@ -36,6 +35,7 @@ enum AppDefaults {
         platformDefaults.merge(VoiceInkAudioInputPreference.registeredDefaults) { _, sharedValue in sharedValue }
         platformDefaults.merge(VoiceInkPastePreference.registeredDefaults) { _, sharedValue in sharedValue }
         platformDefaults.merge(VoiceInkPowerModePreference.registeredDefaults) { _, sharedValue in sharedValue }
+        platformDefaults.merge(VoiceInkAnnouncementPreference.registeredDefaults) { _, sharedValue in sharedValue }
         defaults.merge(platformDefaults, uniquingKeysWith: { _, platformValue in platformValue })
 
         return defaults

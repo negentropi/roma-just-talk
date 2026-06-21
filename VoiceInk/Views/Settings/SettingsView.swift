@@ -18,7 +18,7 @@ struct SettingsView: View {
     @ObservedObject private var mediaController = MediaController.shared
     @ObservedObject private var playbackController = PlaybackController.shared
     @AppStorage(VoiceInkUserDefaultsKey.hasCompletedOnboarding) private var hasCompletedOnboarding = true
-    @AppStorage("enableAnnouncements") private var enableAnnouncements = true
+    @AppStorage(VoiceInkAnnouncementPreference.isEnabledKey) private var enableAnnouncements = VoiceInkAnnouncementPreference.defaultIsEnabled
     @AppStorage(VoiceInkPastePreference.restoreClipboardAfterPasteKey) private var restoreClipboardAfterPaste = VoiceInkPastePreference.defaultRestoreClipboardAfterPaste
     @AppStorage(VoiceInkPastePreference.clipboardRestoreDelayKey) private var clipboardRestoreDelay = VoiceInkPastePreference.defaultClipboardRestoreDelay
     @AppStorage(VoiceInkPasteMethod.userDefaultsKey) private var pasteMethodRawValue = VoiceInkPasteMethod.standard.rawValue

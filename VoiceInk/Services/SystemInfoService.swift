@@ -42,7 +42,7 @@ class SystemInfoService {
 
         TRANSCRIPTION SETTINGS:
         Selected Model: \(getCurrentTranscriptionModel())
-        Selected Language: \(getCurrentLanguage())
+        Selected Language: \(VoiceInkTranscriptionLanguagePreference.selectedMacOSLanguage())
         AI Enhancement: \(VoiceInkAIEnhancementPreference.statusDiagnosticDescription())
         AI Provider: \(VoiceInkAIEnhancementProviderPreference.selectedProviderDiagnosticDescription())
         AI Model: \(VoiceInkAIEnhancementProviderPreference.selectedModelDiagnosticDescription())
@@ -240,10 +240,6 @@ class SystemInfoService {
         }
 
         return "Not Licensed"
-    }
-
-    private func getCurrentLanguage() -> String {
-        return VoiceInkTranscriptionLanguagePreference.selectedMacOSLanguage()
     }
 
 }

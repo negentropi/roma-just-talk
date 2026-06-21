@@ -7647,6 +7647,11 @@ require_pattern \
   'VoiceInkTranscriptionLanguagePreference\.selectedMacOSLanguage\(\)' \
   VoiceInk/Services/SystemInfoService.swift
 
+reject_pattern \
+  "macOS diagnostics avoid shallow selected-language wrapper" \
+  'private +func +getCurrentLanguage\(' \
+  VoiceInk/Services/SystemInfoService.swift
+
 require_pattern \
   "macOS diagnostics use shared AI enhancement status presentation" \
   'VoiceInkAIEnhancementPreference\.statusDiagnosticDescription\(\)' \

@@ -301,25 +301,17 @@ final class AppSettings: ObservableObject {
         VoiceInkOnboardingPreference.saveHasCompletedOnboarding()
     }
 
-    private func saveAPIKey(_ key: String, forKey account: String) {
+    private func saveAPIKey(_ key: String, for provider: VoiceInkProviderKind) {
+        guard let account = provider.apiKeyAccount else { return }
         guard let status = VoiceInkKeychainValueStore.saveString(key, account: account) else { return }
         if status != errSecSuccess {
             print("Error saving API key to keychain: \(status)")
         }
     }
-
-    private func saveAPIKey(_ key: String, for provider: VoiceInkProviderKind) {
-        guard let account = provider.apiKeyAccount else { return }
-        saveAPIKey(key, forKey: account)
-    }
     
-    private static func loadAPIKey(forKey account: String) -> String {
-        VoiceInkKeychainValueStore.loadString(account: account).value ?? ""
-    }
-
     private static func loadAPIKey(for provider: VoiceInkProviderKind) -> String {
         guard let account = provider.apiKeyAccount else { return "" }
-        return loadAPIKey(forKey: account)
+        return VoiceInkKeychainValueStore.loadString(account: account).value ?? ""
     }
 
     private static func deleteAPIKey(for provider: VoiceInkProviderKind) {

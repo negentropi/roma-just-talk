@@ -1938,6 +1938,11 @@ require_pattern \
   iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \
+  "iOS API-key settings avoid account-string keychain wrapper helpers" \
+  'private +(static +)?func +(saveAPIKey|loadAPIKey)\([^)]*forKey' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+reject_pattern \
   "platform API-key string adapters avoid shell-owned UTF-8 storage policy" \
   'data\(using: +\.utf8\)|String\(data:.*encoding: +\.utf8\)' \
   VoiceInk/Services/KeychainService.swift \

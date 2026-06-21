@@ -5758,9 +5758,9 @@ reject_pattern \
   iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \
-  "iOS audio-session manager uses shared deactivation plan" \
+  "shared audio-session lifecycle state uses shared deactivation plan" \
   'VoiceInkAudioSessionTimeoutPreference\.deactivationPlan' \
-  iOS/VoiceInk-ios/AudioSessionManager.swift
+  VoiceInkCore/Sources/VoiceInkCore/AudioSessionLifecycleState.swift
 
 require_pattern \
   "shared audio-session timeout owns countdown update interval" \
@@ -5773,13 +5773,33 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
-  "iOS audio-session manager uses shared countdown tick policy" \
-  'VoiceInkAudioSessionTimeoutPreference\.(countdownUpdateInterval|remainingTimeAfterCountdownTick)' \
+  "shared audio-session lifecycle state lives in VoiceInkCore" \
+  'VoiceInkAudioSessionLifecycleState|markActivatedForRecording|scheduleDeactivation|advanceCountdown|markDeactivated' \
+  VoiceInkCore/Sources/VoiceInkCore/AudioSessionLifecycleState.swift
+
+require_pattern \
+  "iOS audio-session manager uses shared lifecycle state" \
+  'VoiceInkAudioSessionLifecycleState|lifecycleState' \
+  iOS/VoiceInk-ios/AudioSessionManager.swift
+
+require_pattern \
+  "iOS audio-session manager delegates deactivation planning to shared lifecycle state" \
+  'lifecycleState\.scheduleDeactivation\(timeoutSeconds:' \
+  iOS/VoiceInk-ios/AudioSessionManager.swift
+
+require_pattern \
+  "iOS audio-session manager delegates countdown ticks to shared lifecycle state" \
+  'lifecycleState\.advanceCountdown\(\)' \
   iOS/VoiceInk-ios/AudioSessionManager.swift
 
 reject_pattern \
   "iOS audio-session manager avoids shell-only timeout scheduling policy" \
-  'shouldDeactivateImmediately|deactivationInterval|timeoutSeconds > 0|TimeInterval\(timeoutSeconds\)|withTimeInterval: +1\.0|timeoutRemaining -= 1' \
+  'shouldDeactivateImmediately|deactivationInterval|timeoutSeconds > 0|TimeInterval\(timeoutSeconds\)|withTimeInterval: +1\.0|timeoutRemaining -= 1|VoiceInkAudioSessionTimeoutPreference\.(deactivationPlan|remainingTimeAfterCountdownTick)' \
+  iOS/VoiceInk-ios/AudioSessionManager.swift
+
+reject_pattern \
+  "iOS audio-session manager avoids shell-owned lifecycle state mutation" \
+  '@Published var +(isSessionActive|timeoutRemaining)|isSessionActive =|timeoutRemaining =' \
   iOS/VoiceInk-ios/AudioSessionManager.swift
 
 require_pattern \

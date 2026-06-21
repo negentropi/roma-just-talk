@@ -15,8 +15,7 @@ import VoiceInkCore
 final class AudioSessionManager: ObservableObject {
     static let shared = AudioSessionManager()
     
-    @Published var isSessionActive: Bool = false
-    @Published var timeoutRemaining: TimeInterval = 0
+    @Published private var lifecycleState = VoiceInkAudioSessionLifecycleState()
     
     private var deactivationTimer: Timer?
     private let settings = AppSettings.shared
@@ -40,7 +39,7 @@ final class AudioSessionManager: ObservableObject {
             // Activate the session
             try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
             
-            isSessionActive = true
+            lifecycleState.markActivatedForRecording()
             cancelScheduledDeactivation()
             
             print("🎙️ Audio session activated for recording")
@@ -56,14 +55,14 @@ final class AudioSessionManager: ObservableObject {
         cancelScheduledDeactivation()
         
         let timeoutSeconds = settings.audioSessionTimeoutSeconds
-        let deactivationPlan = VoiceInkAudioSessionTimeoutPreference.deactivationPlan(for: timeoutSeconds)
+        let deactivationPlan = lifecycleState.scheduleDeactivation(timeoutSeconds: timeoutSeconds)
         
         switch deactivationPlan {
         case .immediate:
             deactivateSession()
             return
-        case .delayed(let interval):
-            timeoutRemaining = interval
+        case .delayed:
+            break
         }
         
         // Create timer with shared countdown cadence and deactivate when done
@@ -77,29 +76,24 @@ final class AudioSessionManager: ObservableObject {
                     return
                 }
                 
-                self.timeoutRemaining = VoiceInkAudioSessionTimeoutPreference.remainingTimeAfterCountdownTick(
-                    self.timeoutRemaining
-                )
-                
-                if self.timeoutRemaining <= 0 {
+                if self.lifecycleState.advanceCountdown() == .immediate {
                     self.deactivateSession()
                 }
             }
         }
         
-        print("🕒 Audio session deactivation scheduled in \(Int(timeoutRemaining)) seconds")
+        print("🕒 Audio session deactivation scheduled in \(Int(lifecycleState.timeoutRemaining)) seconds")
     }
     
     /// Immediately deactivates the session
     func deactivateSession() {
         cancelScheduledDeactivation()
         
-        guard isSessionActive else { return }
+        guard lifecycleState.isSessionActive else { return }
         
         do {
             try AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
-            isSessionActive = false
-            timeoutRemaining = 0
+            lifecycleState.markDeactivated()
             print("🔇 Audio session deactivated")
         } catch {
             print("⚠️ Failed to deactivate audio session: \(error.localizedDescription)")
@@ -111,6 +105,6 @@ final class AudioSessionManager: ObservableObject {
     private func cancelScheduledDeactivation() {
         deactivationTimer?.invalidate()
         deactivationTimer = nil
-        timeoutRemaining = 0
+        lifecycleState.cancelScheduledDeactivation()
     }
 }

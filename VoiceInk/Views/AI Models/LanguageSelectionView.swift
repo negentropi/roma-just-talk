@@ -38,13 +38,6 @@ struct LanguageSelectionView: View {
         updateLanguage(facts.compatibleLanguage(selectedLanguage))
     }
 
-    private var selectedLanguageBinding: Binding<String> {
-        Binding(
-            get: { selectedLanguage },
-            set: { updateLanguage($0) }
-        )
-    }
-
     private var nativeAppleAssetControl: some View {
         NativeAppleLanguageAssetControl(
             localeIdentifier: selectedLanguage,
@@ -114,7 +107,13 @@ struct LanguageSelectionView: View {
                 case .picker:
                     VStack(alignment: .leading, spacing: 8) {
                         HStack(spacing: 8) {
-                            Picker(VoiceInkTranscriptionLanguagePresentation.menuPickerTitle, selection: selectedLanguageBinding) {
+                            Picker(
+                                VoiceInkTranscriptionLanguagePresentation.menuPickerTitle,
+                                selection: Binding(
+                                    get: { selectedLanguage },
+                                    set: { updateLanguage($0) }
+                                )
+                            ) {
                                 ForEach(
                                     VoiceInkLanguageCatalog.sortedOptions(facts.languageOptions)
                                 ) { option in

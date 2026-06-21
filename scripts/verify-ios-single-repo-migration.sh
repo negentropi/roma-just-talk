@@ -556,6 +556,11 @@ reject_pattern \
   "VoiceInk/Views/AI Models/LanguageSelectionView.swift"
 
 reject_pattern \
+  "macOS language picker avoids shallow selected-language binding wrapper" \
+  'private var +selectedLanguageBinding\b' \
+  "VoiceInk/Views/AI Models/LanguageSelectionView.swift"
+
+reject_pattern \
   "macOS language picker avoids shell-only language presentation copy" \
   '"Transcription Language"|"Select Language"|"Language: Autodetected"|"The transcription language is automatically detected by the model\."|"This model supports multiple languages\. Select a specific language or auto-detect\(if available\)"|"Language: English"|"This is an English-optimized model and only supports English transcription\."|"No model selected"|"Language: English \(only\)"' \
   "VoiceInk/Views/AI Models/LanguageSelectionView.swift"

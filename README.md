@@ -13,12 +13,13 @@
   <a href="https://github.com/happyf-weallareeuropean/roma-just-talk/releases/latest">
     <img src="https://img.shields.io/badge/Download%20Latest-macOS%20App-blue?style=for-the-badge&logo=apple" alt="Download roma-just-talk" width="250"/>
   </a>
-   <p>-87% bin size, -83% ram (780mb → 132mb). vs Wispr Flow.</p>
-  <p>local & cloud STT solution both available.</p>
 </div>
 
 ---
-
+<div align="center">
+ <p>-87% bin size, -83% ram (780mb → 132mb). vs Wispr Flow.</p>
+  <p>Local & cloud STT solution both available.</p> 
+  </div>
 This [fork](https://github.com/Beingpax/VoiceInk) explores the other direction: keep a short rolling voice buffer, so the app can catch what you already started saying.
 
 <img src="docs/assets/roma-just-talk-how-to-use.png" alt="roma-just-talk split keyboard logo"/>

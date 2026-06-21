@@ -39,7 +39,12 @@ struct NotesListView: View {
                 .safeAreaInset(edge: .bottom) { 
                     unifiedRecordingComponent
                 }
-                .sheet(isPresented: $recordingManager.isRecordingSheetPresented) {
+                .sheet(
+                    isPresented: Binding(
+                        get: { recordingManager.isRecordingSheetPresented },
+                        set: { recordingManager.setRecordingSheetPresented($0) }
+                    )
+                ) {
                     RecordingSheetView(
                         recordingManager: recordingManager,
                         settings: settings,

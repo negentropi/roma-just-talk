@@ -15,6 +15,62 @@ public enum VoiceInkRecorderUIToggleAction: Equatable, Sendable {
     case dismissRecorder
 }
 
+public struct VoiceInkRecordingFlowState: Equatable, Sendable {
+    public static let durationUpdateInterval: TimeInterval = 0.1
+
+    public private(set) var recordingState: VoiceInkRecordingState
+    public private(set) var animate: Bool
+    public private(set) var isRecordingSheetPresented: Bool
+    public private(set) var currentDuration: TimeInterval
+
+    public init(
+        recordingState: VoiceInkRecordingState = .idle,
+        animate: Bool = false,
+        isRecordingSheetPresented: Bool = false,
+        currentDuration: TimeInterval = 0
+    ) {
+        self.recordingState = recordingState
+        self.animate = animate
+        self.isRecordingSheetPresented = isRecordingSheetPresented
+        self.currentDuration = currentDuration
+    }
+
+    public mutating func prepareRecordingStart() {
+        recordingState = .recording
+        animate = true
+    }
+
+    public mutating func completeRecordingStart() {
+        currentDuration = 0
+        isRecordingSheetPresented = true
+    }
+
+    public mutating func failRecordingStart() {
+        recordingState = .idle
+        animate = false
+        isRecordingSheetPresented = false
+    }
+
+    public mutating func finishRecording() {
+        recordingState = .idle
+        animate = false
+        isRecordingSheetPresented = false
+    }
+
+    public mutating func cancelRecording() {
+        finishRecording()
+        currentDuration = 0
+    }
+
+    public mutating func setRecordingSheetPresented(_ isPresented: Bool) {
+        isRecordingSheetPresented = isPresented
+    }
+
+    public mutating func advanceDuration(by interval: TimeInterval = durationUpdateInterval) {
+        currentDuration += interval
+    }
+}
+
 public enum VoiceInkRecorderStyle: String, CaseIterable, Identifiable, Sendable {
     case none
     case notch

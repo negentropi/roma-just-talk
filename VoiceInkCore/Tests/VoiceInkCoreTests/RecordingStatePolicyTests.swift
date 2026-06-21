@@ -38,6 +38,55 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertEqual(VoiceInkRecordingState.busy.recorderUIToggleAction, .dismissRecorder)
     }
 
+    func testRecordingFlowStatePreservesIOSStartAndStopTransitions() {
+        var flowState = VoiceInkRecordingFlowState(currentDuration: 12)
+
+        flowState.prepareRecordingStart()
+        XCTAssertEqual(flowState.recordingState, .recording)
+        XCTAssertTrue(flowState.animate)
+        XCTAssertFalse(flowState.isRecordingSheetPresented)
+        XCTAssertEqual(flowState.currentDuration, 12)
+
+        flowState.completeRecordingStart()
+        XCTAssertEqual(flowState.recordingState, .recording)
+        XCTAssertTrue(flowState.animate)
+        XCTAssertTrue(flowState.isRecordingSheetPresented)
+        XCTAssertEqual(flowState.currentDuration, 0)
+
+        flowState.advanceDuration()
+        XCTAssertEqual(flowState.currentDuration, VoiceInkRecordingFlowState.durationUpdateInterval)
+
+        flowState.finishRecording()
+        XCTAssertEqual(flowState.recordingState, .idle)
+        XCTAssertFalse(flowState.animate)
+        XCTAssertFalse(flowState.isRecordingSheetPresented)
+        XCTAssertEqual(flowState.currentDuration, VoiceInkRecordingFlowState.durationUpdateInterval)
+    }
+
+    func testRecordingFlowStatePreservesIOSStartFailureAndCancelTransitions() {
+        var failedState = VoiceInkRecordingFlowState(currentDuration: 8)
+        failedState.prepareRecordingStart()
+        failedState.failRecordingStart()
+
+        XCTAssertEqual(failedState.recordingState, .idle)
+        XCTAssertFalse(failedState.animate)
+        XCTAssertFalse(failedState.isRecordingSheetPresented)
+        XCTAssertEqual(failedState.currentDuration, 8)
+
+        var canceledState = VoiceInkRecordingFlowState(
+            recordingState: .recording,
+            animate: true,
+            isRecordingSheetPresented: true,
+            currentDuration: 4
+        )
+        canceledState.cancelRecording()
+
+        XCTAssertEqual(canceledState.recordingState, .idle)
+        XCTAssertFalse(canceledState.animate)
+        XCTAssertFalse(canceledState.isRecordingSheetPresented)
+        XCTAssertEqual(canceledState.currentDuration, 0)
+    }
+
     func testRecorderStylePreferencePreservesMacOSStorageAndLabels() {
         XCTAssertEqual(VoiceInkRecorderStylePreference.userDefaultsKey, "RecorderType")
         XCTAssertEqual(VoiceInkRecorderStylePreference.defaultStyle, .none)

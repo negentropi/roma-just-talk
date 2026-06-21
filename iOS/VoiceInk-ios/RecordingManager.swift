@@ -11,11 +11,8 @@ private enum MicrophonePermissionStatus {
  
 @MainActor
 final class RecordingManager: ObservableObject {
-    @Published var recordingState: VoiceInkRecordingState = .idle
-    @Published var animate = false
-    @Published var isRecordingSheetPresented = false
     @Published var activeRecordingAlert: VoiceInkRecordingAlertPresentation?
-    @Published var currentDuration: Double = 0
+    @Published private var flowState = VoiceInkRecordingFlowState()
     
     private let recorder = AudioRecorder()
     private let settings = AppSettings.shared
@@ -23,8 +20,24 @@ final class RecordingManager: ObservableObject {
 
     private let coordinator = AppGroupCoordinator.shared
     
+    var recordingState: VoiceInkRecordingState {
+        flowState.recordingState
+    }
+
+    var animate: Bool {
+        flowState.animate
+    }
+
+    var isRecordingSheetPresented: Bool {
+        flowState.isRecordingSheetPresented
+    }
+
     var isRecording: Bool {
         recordingState.isActivelyRecording
+    }
+
+    var currentDuration: TimeInterval {
+        flowState.currentDuration
     }
 
     var currentAudioLevels: [Float] {
@@ -76,20 +89,18 @@ final class RecordingManager: ObservableObject {
     }
     
     private func proceedToStartRecording() {
-        recordingState = .recording
-        animate = true
+        updateFlowState { $0.prepareRecordingStart() }
         
         // Update coordinator state
         coordinator.updateRecordingState(true)
         
         do {
             try recorder.startRecording()
+            updateFlowState { $0.completeRecordingStart() }
             startDurationTimer()
-            isRecordingSheetPresented = true
         } catch {
             activeRecordingAlert = VoiceInkRecordingAlertPresentation.recordingStartFailure(for: error)
-            recordingState = .idle
-            animate = false
+            updateFlowState { $0.failRecordingStart() }
             // Update coordinator state on error
             coordinator.updateRecordingState(false)
         }
@@ -114,9 +125,7 @@ final class RecordingManager: ObservableObject {
         try? modelContext.save()
         
         // Reset UI state immediately so user can continue using the app
-        recordingState = .idle
-        animate = false
-        isRecordingSheetPresented = false
+        updateFlowState { $0.finishRecording() }
         
         // Update coordinator state
         coordinator.updateRecordingState(false)
@@ -128,10 +137,7 @@ final class RecordingManager: ObservableObject {
     func cancelRecording() {
         recorder.discard()
         stopDurationTimer()
-        recordingState = .idle
-        animate = false
-        isRecordingSheetPresented = false
-        currentDuration = 0
+        updateFlowState { $0.cancelRecording() }
         
         // Update coordinator state
         coordinator.updateRecordingState(false)
@@ -163,10 +169,9 @@ final class RecordingManager: ObservableObject {
     
     // MARK: - Duration Timer
     private func startDurationTimer() {
-        currentDuration = 0
-        durationTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
+        durationTimer = Timer.scheduledTimer(withTimeInterval: VoiceInkRecordingFlowState.durationUpdateInterval, repeats: true) { [weak self] _ in
             Task { @MainActor in
-                self?.currentDuration += 0.1
+                self?.updateFlowState { $0.advanceDuration() }
             }
         }
     }
@@ -174,6 +179,16 @@ final class RecordingManager: ObservableObject {
     private func stopDurationTimer() {
         durationTimer?.invalidate()
         durationTimer = nil
+    }
+
+    func setRecordingSheetPresented(_ isPresented: Bool) {
+        updateFlowState { $0.setRecordingSheetPresented(isPresented) }
+    }
+
+    private func updateFlowState(_ update: (inout VoiceInkRecordingFlowState) -> Void) {
+        var updatedState = flowState
+        update(&updatedState)
+        flowState = updatedState
     }
     
     // MARK: - Transcription

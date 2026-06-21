@@ -452,6 +452,16 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
 require_pattern \
+  "shared recording flow state lives in VoiceInkCore" \
+  'VoiceInkRecordingFlowState|prepareRecordingStart|completeRecordingStart|failRecordingStart|finishRecording|cancelRecording|advanceDuration' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "shared recording flow state owns iOS duration tick interval" \
+  'durationUpdateInterval: +TimeInterval += +0\.1' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
   "macOS recording engine uses shared active-recording predicate" \
   'recordingState\.isActivelyRecording' \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift
@@ -464,6 +474,26 @@ require_pattern \
 require_pattern \
   "iOS recording manager uses shared active-recording predicate" \
   'recordingState\.isActivelyRecording' \
+  iOS/VoiceInk-ios/RecordingManager.swift
+
+require_pattern \
+  "iOS recording manager uses shared recording flow state" \
+  'VoiceInkRecordingFlowState|flowState|updateFlowState' \
+  iOS/VoiceInk-ios/RecordingManager.swift
+
+require_pattern \
+  "iOS recording manager delegates duration ticks to shared flow state" \
+  'VoiceInkRecordingFlowState\.durationUpdateInterval|advanceDuration' \
+  iOS/VoiceInk-ios/RecordingManager.swift
+
+reject_pattern \
+  "iOS recording manager avoids shell-owned recording flow fields" \
+  '@Published var +(recordingState|animate|isRecordingSheetPresented|currentDuration)' \
+  iOS/VoiceInk-ios/RecordingManager.swift
+
+reject_pattern \
+  "iOS recording manager avoids shell-owned recording flow mutation" \
+  '\b(recordingState|animate|isRecordingSheetPresented|currentDuration) *(=|\+=)|withTimeInterval: +0\.1' \
   iOS/VoiceInk-ios/RecordingManager.swift
 
 require_pattern \

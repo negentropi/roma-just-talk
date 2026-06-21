@@ -805,6 +805,11 @@ require_pattern \
   'modeFormProviderAvailability|providerAvailability\.(canSave|repairedMode|transcriptionProviders|postProcessingProviders)' \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
+reject_pattern \
+  "iOS mode configuration avoids shallow form pass-through properties" \
+  'private var +(canSave|presentation)\b' \
+  iOS/VoiceInk-ios/ModeConfigurationView.swift
+
 require_pattern \
   "shared settings presentation lives in VoiceInkCore" \
   'VoiceInkSettingsPresentation|VoiceInkMacOSSettingsPresentation|addModeButtonTitle|resetAllAppDataButtonTitle|checkForUpdatesButtonTitle|backupFooterText' \

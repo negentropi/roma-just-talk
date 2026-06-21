@@ -21,17 +21,9 @@ struct ModeConfigurationView: View {
     private var providerAvailability: VoiceInkModeFormProviderAvailability {
         settings.modeFormProviderAvailability
     }
-
-    private var canSave: Bool {
-        providerAvailability.canSave(mode)
-    }
-
-    private var presentation: VoiceInkModeFormPresentation {
-        mode.formPresentation(isEditing: isEditing)
-    }
     
     var body: some View {
-        let formPresentation = presentation
+        let formPresentation = mode.formPresentation(isEditing: isEditing)
 
         Form {
             Section(header: Text(formPresentation.modeDetailsSectionTitle)) {
@@ -101,7 +93,7 @@ struct ModeConfigurationView: View {
                     onSave(mode)
                     dismiss()
                 }
-                .disabled(!canSave)
+                .disabled(!providerAvailability.canSave(mode))
             }
         }
         .onAppear(perform: repairUnavailableProviderSelections)

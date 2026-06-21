@@ -8367,6 +8367,11 @@ reject_pattern \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
 reject_pattern \
+  "macOS Power Mode form avoids local configuration-name saveability wrapper" \
+  'private var +canSave\b' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+reject_pattern \
   "macOS Power Mode form avoids shell-only stored config construction" \
   'PowerModeConfig\(|selectedPromptId\?\.uuidString|var updatedConfig = config|selectedAppConfigs\.isEmpty \? nil : selectedAppConfigs|websiteConfigs\.isEmpty \? nil : websiteConfigs' \
   VoiceInk/PowerMode/PowerModeConfigView.swift

@@ -47,10 +47,6 @@ struct ConfigurationView: View {
         }
     }
 
-    private var canSave: Bool {
-        VoiceInkPowerModePolicy.canSaveConfigurationName(configName)
-    }
-
     private var transcriptionSelection: VoiceInkPowerModeTranscriptionSelection {
         VoiceInkPowerModeTranscriptionSelection(
             selectedModelName: selectedTranscriptionModelName,
@@ -631,7 +627,7 @@ struct ConfigurationView: View {
                             .frame(minWidth: 100)
                     }
                     .buttonStyle(.borderedProminent)
-                    .disabled(!canSave)
+                    .disabled(!VoiceInkPowerModePolicy.canSaveConfigurationName(configName))
                     .keyboardShortcut(.return, modifiers: .command)
                 }
                 .padding(.horizontal, 20)

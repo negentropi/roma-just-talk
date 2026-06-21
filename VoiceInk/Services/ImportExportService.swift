@@ -212,7 +212,7 @@ class ImportExportService {
             punctuationCleanupMode: transcriptionCleanupBackupPreferences.punctuationCleanupMode,
             removePunctuation: transcriptionCleanupBackupPreferences.removePunctuation,
             lowercaseTranscription: transcriptionCleanupBackupPreferences.lowercaseTranscription,
-            isExperimentalFeaturesEnabled: UserDefaults.standard.bool(forKey: "isExperimentalFeaturesEnabled"),
+            isExperimentalFeaturesEnabled: VoiceInkRecordingFeedbackPreference.isExperimentalFeaturesEnabled(),
             restoreClipboardAfterPaste: pasteBackupPreferences.shouldRestoreClipboardAfterPaste,
             clipboardRestoreDelay: pasteBackupPreferences.clipboardRestoreDelay,
             rollingBufferPreloadModeRawValue: rollingBufferConfiguration.mode.rawValue,

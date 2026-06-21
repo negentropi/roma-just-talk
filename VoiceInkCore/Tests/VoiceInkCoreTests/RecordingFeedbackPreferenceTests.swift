@@ -148,6 +148,7 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
         XCTAssertEqual(VoiceInkRecordingFeedbackPreference.audioResumptionDelayKey, "audioResumptionDelay")
         XCTAssertEqual(VoiceInkRecordingFeedbackPreference.isPauseMediaEnabledKey, "isPauseMediaEnabled")
         XCTAssertEqual(VoiceInkRecordingFeedbackPreference.isSoundFeedbackEnabledKey, "isSoundFeedbackEnabled")
+        XCTAssertEqual(VoiceInkRecordingFeedbackPreference.experimentalFeaturesEnabledKey, "isExperimentalFeaturesEnabled")
         XCTAssertEqual(
             VoiceInkRecordingFeedbackPreference.registeredDefaults[VoiceInkRecordingFeedbackPreference.systemMuteModeKey] as? String,
             "auto"
@@ -275,6 +276,56 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
             XCTAssertTrue(VoiceInkRecordingFeedbackPreference.isPauseMediaEnabled(from: defaults))
             XCTAssertTrue(VoiceInkRecordingFeedbackPreference.isSoundFeedbackEnabled(from: defaults))
         }
+    }
+
+    func testExperimentalFeaturesPreferenceReadsSavesAndPlansPauseMediaImport() {
+        withTemporaryDefaults { defaults in
+            XCTAssertFalse(VoiceInkRecordingFeedbackPreference.isExperimentalFeaturesEnabled(from: defaults))
+
+            VoiceInkRecordingFeedbackPreference.saveExperimentalFeaturesEnabled(true, to: defaults)
+            XCTAssertTrue(VoiceInkRecordingFeedbackPreference.isExperimentalFeaturesEnabled(from: defaults))
+
+            VoiceInkRecordingFeedbackPreference.saveExperimentalFeaturesEnabled(false, to: defaults)
+            XCTAssertFalse(VoiceInkRecordingFeedbackPreference.isExperimentalFeaturesEnabled(from: defaults))
+        }
+
+        let disabledImportPlan = VoiceInkRecordingFeedbackPreference.backupImportPlan(
+            from: VoiceInkRecordingFeedbackBackupPreferences(
+                isSoundFeedbackEnabled: nil,
+                isSystemMuteEnabled: nil,
+                isPauseMediaEnabled: true,
+                audioResumptionDelay: nil
+            ),
+            experimentalFeaturesEnabled: false
+        )
+
+        XCTAssertEqual(disabledImportPlan.isExperimentalFeaturesEnabled, false)
+        XCTAssertTrue(disabledImportPlan.shouldDisablePauseMediaForExperimentalImport)
+
+        let enabledImportPlan = VoiceInkRecordingFeedbackPreference.backupImportPlan(
+            from: VoiceInkRecordingFeedbackBackupPreferences(
+                isSoundFeedbackEnabled: nil,
+                isSystemMuteEnabled: nil,
+                isPauseMediaEnabled: true,
+                audioResumptionDelay: nil
+            ),
+            experimentalFeaturesEnabled: true
+        )
+
+        XCTAssertEqual(enabledImportPlan.isExperimentalFeaturesEnabled, true)
+        XCTAssertFalse(enabledImportPlan.shouldDisablePauseMediaForExperimentalImport)
+
+        let missingImportPlan = VoiceInkRecordingFeedbackPreference.backupImportPlan(
+            from: VoiceInkRecordingFeedbackBackupPreferences(
+                isSoundFeedbackEnabled: nil,
+                isSystemMuteEnabled: nil,
+                isPauseMediaEnabled: true,
+                audioResumptionDelay: nil
+            )
+        )
+
+        XCTAssertNil(missingImportPlan.isExperimentalFeaturesEnabled)
+        XCTAssertFalse(missingImportPlan.shouldDisablePauseMediaForExperimentalImport)
     }
 
     func testBackupPreferencesPreserveMacOSExportShape() {

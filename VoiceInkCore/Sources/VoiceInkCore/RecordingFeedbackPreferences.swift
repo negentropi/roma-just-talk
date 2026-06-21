@@ -89,17 +89,24 @@ public struct VoiceInkRecordingFeedbackBackupImportPlan: Equatable, Sendable {
     public let systemMuteMode: VoiceInkSystemMuteMode?
     public let isPauseMediaEnabled: Bool?
     public let audioResumptionDelay: Double?
+    public let isExperimentalFeaturesEnabled: Bool?
+
+    public var shouldDisablePauseMediaForExperimentalImport: Bool {
+        isExperimentalFeaturesEnabled == false
+    }
 
     public init(
         isSoundFeedbackEnabled: Bool?,
         systemMuteMode: VoiceInkSystemMuteMode?,
         isPauseMediaEnabled: Bool?,
-        audioResumptionDelay: Double?
+        audioResumptionDelay: Double?,
+        isExperimentalFeaturesEnabled: Bool? = nil
     ) {
         self.isSoundFeedbackEnabled = isSoundFeedbackEnabled
         self.systemMuteMode = systemMuteMode
         self.isPauseMediaEnabled = isPauseMediaEnabled
         self.audioResumptionDelay = audioResumptionDelay
+        self.isExperimentalFeaturesEnabled = isExperimentalFeaturesEnabled
     }
 }
 
@@ -295,6 +302,7 @@ public enum VoiceInkRecordingFeedbackPreference {
     public static let audioResumptionDelayKey = "audioResumptionDelay"
     public static let isPauseMediaEnabledKey = "isPauseMediaEnabled"
     public static let isSoundFeedbackEnabledKey = "isSoundFeedbackEnabled"
+    public static let experimentalFeaturesEnabledKey = "isExperimentalFeaturesEnabled"
 
     public static let defaultSystemMuteMode = VoiceInkSystemMuteMode.automatic
     public static let defaultAudioResumptionDelay: TimeInterval = 0.0
@@ -408,6 +416,17 @@ public enum VoiceInkRecordingFeedbackPreference {
         defaults.set(isEnabled, forKey: isSoundFeedbackEnabledKey)
     }
 
+    public static func isExperimentalFeaturesEnabled(from defaults: UserDefaults = .standard) -> Bool {
+        defaults.bool(forKey: experimentalFeaturesEnabledKey)
+    }
+
+    public static func saveExperimentalFeaturesEnabled(
+        _ isEnabled: Bool,
+        to defaults: UserDefaults = .standard
+    ) {
+        defaults.set(isEnabled, forKey: experimentalFeaturesEnabledKey)
+    }
+
     public static func backupPreferences(
         isSoundFeedbackEnabled: Bool,
         isSystemMuteEnabled: Bool,
@@ -423,13 +442,15 @@ public enum VoiceInkRecordingFeedbackPreference {
     }
 
     public static func backupImportPlan(
-        from preferences: VoiceInkRecordingFeedbackBackupPreferences
+        from preferences: VoiceInkRecordingFeedbackBackupPreferences,
+        experimentalFeaturesEnabled: Bool? = nil
     ) -> VoiceInkRecordingFeedbackBackupImportPlan {
         VoiceInkRecordingFeedbackBackupImportPlan(
             isSoundFeedbackEnabled: preferences.isSoundFeedbackEnabled,
             systemMuteMode: preferences.isSystemMuteEnabled.map { $0 ? .always : .never },
             isPauseMediaEnabled: preferences.isPauseMediaEnabled,
-            audioResumptionDelay: preferences.audioResumptionDelay
+            audioResumptionDelay: preferences.audioResumptionDelay,
+            isExperimentalFeaturesEnabled: experimentalFeaturesEnabled
         )
     }
 }

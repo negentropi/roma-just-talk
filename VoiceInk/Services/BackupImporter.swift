@@ -168,7 +168,8 @@ enum BackupImporter {
         }
 
         let recordingFeedbackImportPlan = VoiceInkRecordingFeedbackPreference.backupImportPlan(
-            from: general.recordingFeedbackBackupPreferences
+            from: general.recordingFeedbackBackupPreferences,
+            experimentalFeaturesEnabled: general.isExperimentalFeaturesEnabled
         )
         if let soundFeedback = recordingFeedbackImportPlan.isSoundFeedbackEnabled {
             soundManager.isEnabled = soundFeedback
@@ -182,11 +183,11 @@ enum BackupImporter {
         if let audioDelay = recordingFeedbackImportPlan.audioResumptionDelay {
             mediaController.audioResumptionDelay = audioDelay
         }
-        if let experimentalEnabled = general.isExperimentalFeaturesEnabled {
-            UserDefaults.standard.set(experimentalEnabled, forKey: "isExperimentalFeaturesEnabled")
-            if experimentalEnabled == false {
-                playbackController.isPauseMediaEnabled = false
-            }
+        if let experimentalEnabled = recordingFeedbackImportPlan.isExperimentalFeaturesEnabled {
+            VoiceInkRecordingFeedbackPreference.saveExperimentalFeaturesEnabled(experimentalEnabled)
+        }
+        if recordingFeedbackImportPlan.shouldDisablePauseMediaForExperimentalImport {
+            playbackController.isPauseMediaEnabled = false
         }
         let transcriptionCleanupImportPlan = VoiceInkTranscriptionCleanupSettings.backupImportPlan(
             from: general.transcriptionCleanupBackupPreferences

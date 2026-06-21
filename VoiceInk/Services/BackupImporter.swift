@@ -160,16 +160,19 @@ enum BackupImporter {
             VoiceInkAudioCleanupPreference.saveRetentionDays(audioRetention)
         }
 
-        if let soundFeedback = general.isSoundFeedbackEnabled {
+        let recordingFeedbackImportPlan = VoiceInkRecordingFeedbackPreference.backupImportPlan(
+            from: general.recordingFeedbackBackupPreferences
+        )
+        if let soundFeedback = recordingFeedbackImportPlan.isSoundFeedbackEnabled {
             soundManager.isEnabled = soundFeedback
         }
-        if let muteSystem = general.isSystemMuteEnabled {
-            mediaController.isSystemMuteEnabled = muteSystem
+        if let systemMuteMode = recordingFeedbackImportPlan.systemMuteMode {
+            mediaController.systemMuteMode = systemMuteMode
         }
-        if let pauseMedia = general.isPauseMediaEnabled {
+        if let pauseMedia = recordingFeedbackImportPlan.isPauseMediaEnabled {
             playbackController.isPauseMediaEnabled = pauseMedia
         }
-        if let audioDelay = general.audioResumptionDelay {
+        if let audioDelay = recordingFeedbackImportPlan.audioResumptionDelay {
             mediaController.audioResumptionDelay = audioDelay
         }
         if let experimentalEnabled = general.isExperimentalFeaturesEnabled {
@@ -189,10 +192,13 @@ enum BackupImporter {
         if let lowercaseTranscription = general.lowercaseTranscription {
             VoiceInkTranscriptionCleanupPreferenceStorage.saveLowercaseTranscription(lowercaseTranscription)
         }
-        if let restoreClipboard = general.restoreClipboardAfterPaste {
+        let pasteImportPlan = VoiceInkPastePreference.backupImportPlan(
+            from: general.pasteBackupPreferences
+        )
+        if let restoreClipboard = pasteImportPlan.shouldRestoreClipboardAfterPaste {
             VoiceInkPastePreference.saveShouldRestoreClipboardAfterPaste(restoreClipboard)
         }
-        if let clipboardDelay = general.clipboardRestoreDelay {
+        if let clipboardDelay = pasteImportPlan.clipboardRestoreDelay {
             VoiceInkPastePreference.saveClipboardRestoreDelay(clipboardDelay)
         }
         importRollingBufferSettings(general)

@@ -65,6 +65,44 @@ public struct VoiceInkMacOSRecordingFeedbackSettingsPresentation: Equatable, Sen
     }
 }
 
+public struct VoiceInkRecordingFeedbackBackupPreferences: Codable, Equatable, Sendable {
+    public let isSoundFeedbackEnabled: Bool?
+    public let isSystemMuteEnabled: Bool?
+    public let isPauseMediaEnabled: Bool?
+    public let audioResumptionDelay: Double?
+
+    public init(
+        isSoundFeedbackEnabled: Bool?,
+        isSystemMuteEnabled: Bool?,
+        isPauseMediaEnabled: Bool?,
+        audioResumptionDelay: Double?
+    ) {
+        self.isSoundFeedbackEnabled = isSoundFeedbackEnabled
+        self.isSystemMuteEnabled = isSystemMuteEnabled
+        self.isPauseMediaEnabled = isPauseMediaEnabled
+        self.audioResumptionDelay = audioResumptionDelay
+    }
+}
+
+public struct VoiceInkRecordingFeedbackBackupImportPlan: Equatable, Sendable {
+    public let isSoundFeedbackEnabled: Bool?
+    public let systemMuteMode: VoiceInkSystemMuteMode?
+    public let isPauseMediaEnabled: Bool?
+    public let audioResumptionDelay: Double?
+
+    public init(
+        isSoundFeedbackEnabled: Bool?,
+        systemMuteMode: VoiceInkSystemMuteMode?,
+        isPauseMediaEnabled: Bool?,
+        audioResumptionDelay: Double?
+    ) {
+        self.isSoundFeedbackEnabled = isSoundFeedbackEnabled
+        self.systemMuteMode = systemMuteMode
+        self.isPauseMediaEnabled = isPauseMediaEnabled
+        self.audioResumptionDelay = audioResumptionDelay
+    }
+}
+
 public enum VoiceInkRecordingFeedbackPreference {
     public static let systemMuteModeKey = "systemMuteMode"
     public static let legacyIsSystemMuteEnabledKey = "isSystemMuteEnabled"
@@ -182,5 +220,30 @@ public enum VoiceInkRecordingFeedbackPreference {
         to defaults: UserDefaults = .standard
     ) {
         defaults.set(isEnabled, forKey: isSoundFeedbackEnabledKey)
+    }
+
+    public static func backupPreferences(
+        isSoundFeedbackEnabled: Bool,
+        isSystemMuteEnabled: Bool,
+        isPauseMediaEnabled: Bool,
+        audioResumptionDelay: Double
+    ) -> VoiceInkRecordingFeedbackBackupPreferences {
+        VoiceInkRecordingFeedbackBackupPreferences(
+            isSoundFeedbackEnabled: isSoundFeedbackEnabled,
+            isSystemMuteEnabled: isSystemMuteEnabled,
+            isPauseMediaEnabled: isPauseMediaEnabled,
+            audioResumptionDelay: audioResumptionDelay
+        )
+    }
+
+    public static func backupImportPlan(
+        from preferences: VoiceInkRecordingFeedbackBackupPreferences
+    ) -> VoiceInkRecordingFeedbackBackupImportPlan {
+        VoiceInkRecordingFeedbackBackupImportPlan(
+            isSoundFeedbackEnabled: preferences.isSoundFeedbackEnabled,
+            systemMuteMode: preferences.isSystemMuteEnabled.map { $0 ? .always : .never },
+            isPauseMediaEnabled: preferences.isPauseMediaEnabled,
+            audioResumptionDelay: preferences.audioResumptionDelay
+        )
     }
 }

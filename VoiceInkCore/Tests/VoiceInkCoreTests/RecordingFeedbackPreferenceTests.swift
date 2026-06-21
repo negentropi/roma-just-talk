@@ -146,6 +146,78 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
         }
     }
 
+    func testBackupPreferencesPreserveMacOSExportShape() {
+        XCTAssertEqual(
+            VoiceInkRecordingFeedbackPreference.backupPreferences(
+                isSoundFeedbackEnabled: true,
+                isSystemMuteEnabled: false,
+                isPauseMediaEnabled: true,
+                audioResumptionDelay: 3.0
+            ),
+            VoiceInkRecordingFeedbackBackupPreferences(
+                isSoundFeedbackEnabled: true,
+                isSystemMuteEnabled: false,
+                isPauseMediaEnabled: true,
+                audioResumptionDelay: 3.0
+            )
+        )
+    }
+
+    func testBackupImportPlanMapsLegacyMuteBooleanToCurrentMode() {
+        XCTAssertEqual(
+            VoiceInkRecordingFeedbackPreference.backupImportPlan(
+                from: VoiceInkRecordingFeedbackBackupPreferences(
+                    isSoundFeedbackEnabled: true,
+                    isSystemMuteEnabled: true,
+                    isPauseMediaEnabled: false,
+                    audioResumptionDelay: 2.0
+                )
+            ),
+            VoiceInkRecordingFeedbackBackupImportPlan(
+                isSoundFeedbackEnabled: true,
+                systemMuteMode: .always,
+                isPauseMediaEnabled: false,
+                audioResumptionDelay: 2.0
+            )
+        )
+
+        XCTAssertEqual(
+            VoiceInkRecordingFeedbackPreference.backupImportPlan(
+                from: VoiceInkRecordingFeedbackBackupPreferences(
+                    isSoundFeedbackEnabled: nil,
+                    isSystemMuteEnabled: false,
+                    isPauseMediaEnabled: nil,
+                    audioResumptionDelay: nil
+                )
+            ),
+            VoiceInkRecordingFeedbackBackupImportPlan(
+                isSoundFeedbackEnabled: nil,
+                systemMuteMode: .never,
+                isPauseMediaEnabled: nil,
+                audioResumptionDelay: nil
+            )
+        )
+    }
+
+    func testBackupImportPlanLeavesMissingFieldsAsNoOps() {
+        XCTAssertEqual(
+            VoiceInkRecordingFeedbackPreference.backupImportPlan(
+                from: VoiceInkRecordingFeedbackBackupPreferences(
+                    isSoundFeedbackEnabled: nil,
+                    isSystemMuteEnabled: nil,
+                    isPauseMediaEnabled: nil,
+                    audioResumptionDelay: nil
+                )
+            ),
+            VoiceInkRecordingFeedbackBackupImportPlan(
+                isSoundFeedbackEnabled: nil,
+                systemMuteMode: nil,
+                isPauseMediaEnabled: nil,
+                audioResumptionDelay: nil
+            )
+        )
+    }
+
     private func withTemporaryDefaults(_ test: (UserDefaults) -> Void) {
         let suiteName = "VoiceInkCore.RecordingFeedbackPreferenceTests.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!

@@ -3910,6 +3910,26 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
 
 require_pattern \
+  "shared paste backup preferences live in VoiceInkCore" \
+  'struct VoiceInkPasteBackupPreferences' \
+  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+
+require_pattern \
+  "shared paste backup import plan lives in VoiceInkCore" \
+  'struct VoiceInkPasteBackupImportPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+
+require_pattern \
+  "shared paste backup export policy lives in VoiceInkCore" \
+  'static func backupPreferences' \
+  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+
+require_pattern \
+  "shared paste backup import policy lives in VoiceInkCore" \
+  'static func backupImportPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+
+require_pattern \
   "shared macOS paste settings presentation lives in VoiceInkCore" \
   'VoiceInkMacOSPasteSettingsPresentation|VoiceInkPasteDelayOption|macOSSettingsPresentation|restoreDelayOptions|pasteMethodHelpMessage' \
   VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
@@ -3946,12 +3966,22 @@ require_pattern \
 
 require_pattern \
   "macOS backup export uses shared paste preferences" \
-  'VoiceInkPastePreference\.(shouldRestoreClipboardAfterPaste|clipboardRestoreDelay)' \
+  'VoiceInkPastePreference\.backupPreferences|pasteBackupPreferences\.(shouldRestoreClipboardAfterPaste|clipboardRestoreDelay)' \
   VoiceInk/Services/ImportExportService.swift
 
 require_pattern \
   "macOS backup import uses shared paste preferences" \
-  'VoiceInkPastePreference\.save(ShouldRestoreClipboardAfterPaste|ClipboardRestoreDelay)' \
+  'VoiceInkPastePreference\.backupImportPlan' \
+  VoiceInk/Services/BackupImporter.swift
+
+require_pattern \
+  "macOS backup import applies shared paste import plan" \
+  'pasteImportPlan\.(shouldRestoreClipboardAfterPaste|clipboardRestoreDelay)' \
+  VoiceInk/Services/BackupImporter.swift
+
+reject_pattern \
+  "macOS backup import avoids shell-owned paste preference planning" \
+  'general\.(restoreClipboardAfterPaste|clipboardRestoreDelay)' \
   VoiceInk/Services/BackupImporter.swift
 
 reject_file VoiceInk/Paste/PasteMethod.swift
@@ -3973,7 +4003,7 @@ reject_pattern \
 
 require_pattern \
   "migration checklist tracks shared paste preference gate" \
-  'macOS paste method and clipboard restore settings route through `VoiceInkPasteMethod`/`VoiceInkPastePreference`, including settings labels/options/help' \
+  'macOS paste method and clipboard restore settings route through `VoiceInkPasteMethod`/`VoiceInkPastePreference`, including settings labels/options/help and backup import/export plans' \
   docs/ios-single-repo-migration.md
 
 require_file \
@@ -4005,6 +4035,31 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
 
 require_pattern \
+  "shared recording feedback backup preferences live in VoiceInkCore" \
+  'struct VoiceInkRecordingFeedbackBackupPreferences' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+
+require_pattern \
+  "shared recording feedback backup import plan lives in VoiceInkCore" \
+  'struct VoiceInkRecordingFeedbackBackupImportPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+
+require_pattern \
+  "shared recording feedback backup export policy lives in VoiceInkCore" \
+  'static func backupPreferences' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+
+require_pattern \
+  "shared recording feedback backup import policy lives in VoiceInkCore" \
+  'static func backupImportPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+
+require_pattern \
+  "shared recording feedback backup import policy maps legacy mute boolean" \
+  'systemMuteMode: preferences\.isSystemMuteEnabled\.map' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+
+require_pattern \
   "macOS media controller uses shared recording feedback preferences" \
   'VoiceInkRecordingFeedbackPreference\.(systemMuteMode|saveSystemMuteMode|audioResumptionDelay|saveAudioResumptionDelay)' \
   VoiceInk/MediaController.swift
@@ -4028,6 +4083,26 @@ require_pattern \
   "macOS diagnostics use shared recording feedback preferences" \
   'VoiceInkRecordingFeedbackPreference\.(isSoundFeedbackEnabled|isPauseMediaEnabled|systemMuteMode|audioResumptionDelay)' \
   VoiceInk/Services/SystemInfoService.swift
+
+require_pattern \
+  "macOS backup export uses shared recording feedback backup preferences" \
+  'VoiceInkRecordingFeedbackPreference\.backupPreferences|recordingFeedbackBackupPreferences\.(isSoundFeedbackEnabled|isSystemMuteEnabled|isPauseMediaEnabled|audioResumptionDelay)' \
+  VoiceInk/Services/ImportExportService.swift
+
+require_pattern \
+  "macOS backup import uses shared recording feedback backup import plan" \
+  'VoiceInkRecordingFeedbackPreference\.backupImportPlan' \
+  VoiceInk/Services/BackupImporter.swift
+
+require_pattern \
+  "macOS backup import applies shared recording feedback import plan" \
+  'recordingFeedbackImportPlan\.(isSoundFeedbackEnabled|systemMuteMode|isPauseMediaEnabled|audioResumptionDelay)' \
+  VoiceInk/Services/BackupImporter.swift
+
+reject_pattern \
+  "macOS backup import avoids shell-owned recording feedback planning" \
+  'general\.(isSoundFeedbackEnabled|isSystemMuteEnabled|isPauseMediaEnabled|audioResumptionDelay)|mediaController\.isSystemMuteEnabled' \
+  VoiceInk/Services/BackupImporter.swift
 
 require_pattern \
   "macOS settings uses shared system mute mode" \
@@ -4056,7 +4131,7 @@ reject_pattern \
 
 require_pattern \
   "migration checklist tracks shared recording feedback preference gate" \
-  'macOS recording feedback preferences route through `VoiceInkSystemMuteMode`/`VoiceInkRecordingFeedbackPreference`, including recording/pause-media settings labels/options/help' \
+  'macOS recording feedback preferences route through `VoiceInkSystemMuteMode`/`VoiceInkRecordingFeedbackPreference`, including recording/pause-media settings labels/options/help and backup import/export plans' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

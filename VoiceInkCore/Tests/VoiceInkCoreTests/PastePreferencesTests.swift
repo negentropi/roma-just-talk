@@ -128,6 +128,47 @@ final class PastePreferencesTests: XCTestCase {
         }
     }
 
+    func testBackupPreferencesPreserveMacOSExportShape() {
+        XCTAssertEqual(
+            VoiceInkPastePreference.backupPreferences(
+                shouldRestoreClipboardAfterPaste: false,
+                clipboardRestoreDelay: 4.0
+            ),
+            VoiceInkPasteBackupPreferences(
+                shouldRestoreClipboardAfterPaste: false,
+                clipboardRestoreDelay: 4.0
+            )
+        )
+    }
+
+    func testBackupImportPlanPreservesOptionalRestorePolicy() {
+        XCTAssertEqual(
+            VoiceInkPastePreference.backupImportPlan(
+                from: VoiceInkPasteBackupPreferences(
+                    shouldRestoreClipboardAfterPaste: true,
+                    clipboardRestoreDelay: 0.1
+                )
+            ),
+            VoiceInkPasteBackupImportPlan(
+                shouldRestoreClipboardAfterPaste: true,
+                clipboardRestoreDelay: 0.1
+            )
+        )
+
+        XCTAssertEqual(
+            VoiceInkPastePreference.backupImportPlan(
+                from: VoiceInkPasteBackupPreferences(
+                    shouldRestoreClipboardAfterPaste: nil,
+                    clipboardRestoreDelay: nil
+                )
+            ),
+            VoiceInkPasteBackupImportPlan(
+                shouldRestoreClipboardAfterPaste: nil,
+                clipboardRestoreDelay: nil
+            )
+        )
+    }
+
     private func withTemporaryDefaults(_ test: (UserDefaults) -> Void) {
         let suiteName = "VoiceInkCore.PastePreferencesTests.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!

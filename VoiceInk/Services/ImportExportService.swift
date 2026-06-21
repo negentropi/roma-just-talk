@@ -153,6 +153,16 @@ class ImportExportService {
         let audioCleanup = VoiceInkAudioCleanupPreference.current()
         let rollingBufferConfiguration = VoiceInkRollingBufferPreloadSettings.configuration()
         let perModelPreloadSettings = VoiceInkRollingBufferPreloadSettings.exportedPerModelPreloadEnabled()
+        let recordingFeedbackBackupPreferences = VoiceInkRecordingFeedbackPreference.backupPreferences(
+            isSoundFeedbackEnabled: soundManager.isEnabled,
+            isSystemMuteEnabled: mediaController.isSystemMuteEnabled,
+            isPauseMediaEnabled: playbackController.isPauseMediaEnabled,
+            audioResumptionDelay: mediaController.audioResumptionDelay
+        )
+        let pasteBackupPreferences = VoiceInkPastePreference.backupPreferences(
+            shouldRestoreClipboardAfterPaste: VoiceInkPastePreference.shouldRestoreClipboardAfterPaste(),
+            clipboardRestoreDelay: VoiceInkPastePreference.clipboardRestoreDelay()
+        )
         let recordingShortcutBackupPreferences = VoiceInkRecordingShortcutPreference.backupPreferences(
             primaryRecordingShortcut: recordingShortcutManager.primaryRecordingShortcut,
             secondaryRecordingShortcut: recordingShortcutManager.secondaryRecordingShortcut,
@@ -187,17 +197,17 @@ class ImportExportService {
             isAudioCleanupEnabled: audioCleanup.isEnabled,
             audioRetentionPeriod: audioCleanup.retentionDays,
 
-            isSoundFeedbackEnabled: soundManager.isEnabled,
-            isSystemMuteEnabled: mediaController.isSystemMuteEnabled,
-            isPauseMediaEnabled: playbackController.isPauseMediaEnabled,
-            audioResumptionDelay: mediaController.audioResumptionDelay,
+            isSoundFeedbackEnabled: recordingFeedbackBackupPreferences.isSoundFeedbackEnabled,
+            isSystemMuteEnabled: recordingFeedbackBackupPreferences.isSystemMuteEnabled,
+            isPauseMediaEnabled: recordingFeedbackBackupPreferences.isPauseMediaEnabled,
+            audioResumptionDelay: recordingFeedbackBackupPreferences.audioResumptionDelay,
             isTextFormattingEnabled: cleanupSettings.isTextFormattingEnabled,
             punctuationCleanupMode: cleanupSettings.punctuationMode,
             removePunctuation: cleanupSettings.removesAllPunctuation,
             lowercaseTranscription: cleanupSettings.lowercaseTranscription,
             isExperimentalFeaturesEnabled: UserDefaults.standard.bool(forKey: "isExperimentalFeaturesEnabled"),
-            restoreClipboardAfterPaste: VoiceInkPastePreference.shouldRestoreClipboardAfterPaste(),
-            clipboardRestoreDelay: VoiceInkPastePreference.clipboardRestoreDelay(),
+            restoreClipboardAfterPaste: pasteBackupPreferences.shouldRestoreClipboardAfterPaste,
+            clipboardRestoreDelay: pasteBackupPreferences.clipboardRestoreDelay,
             rollingBufferPreloadModeRawValue: rollingBufferConfiguration.mode.rawValue,
             rollingBufferPreloadAutoDisableCloudModels: rollingBufferConfiguration.autoDisablesCloudModels,
             rollingBufferPreloadAutoDisableLowBatteryLocalModels: rollingBufferConfiguration.autoDisablesLowBatteryLocalModels,

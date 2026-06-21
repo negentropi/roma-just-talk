@@ -95,6 +95,22 @@ extension GeneralBackup {
             middleClickActivationDelay: middleClickActivationDelay
         )
     }
+
+    var recordingFeedbackBackupPreferences: VoiceInkRecordingFeedbackBackupPreferences {
+        VoiceInkRecordingFeedbackBackupPreferences(
+            isSoundFeedbackEnabled: isSoundFeedbackEnabled,
+            isSystemMuteEnabled: isSystemMuteEnabled,
+            isPauseMediaEnabled: isPauseMediaEnabled,
+            audioResumptionDelay: audioResumptionDelay
+        )
+    }
+
+    var pasteBackupPreferences: VoiceInkPasteBackupPreferences {
+        VoiceInkPasteBackupPreferences(
+            shouldRestoreClipboardAfterPaste: restoreClipboardAfterPaste,
+            clipboardRestoreDelay: clipboardRestoreDelay
+        )
+    }
 }
 
 struct BackupFile: Codable {

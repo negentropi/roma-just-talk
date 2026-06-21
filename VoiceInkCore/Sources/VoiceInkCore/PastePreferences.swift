@@ -79,6 +79,32 @@ public struct VoiceInkMacOSPasteSettingsPresentation: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkPasteBackupPreferences: Codable, Equatable, Sendable {
+    public let shouldRestoreClipboardAfterPaste: Bool?
+    public let clipboardRestoreDelay: Double?
+
+    public init(
+        shouldRestoreClipboardAfterPaste: Bool?,
+        clipboardRestoreDelay: Double?
+    ) {
+        self.shouldRestoreClipboardAfterPaste = shouldRestoreClipboardAfterPaste
+        self.clipboardRestoreDelay = clipboardRestoreDelay
+    }
+}
+
+public struct VoiceInkPasteBackupImportPlan: Equatable, Sendable {
+    public let shouldRestoreClipboardAfterPaste: Bool?
+    public let clipboardRestoreDelay: Double?
+
+    public init(
+        shouldRestoreClipboardAfterPaste: Bool?,
+        clipboardRestoreDelay: Double?
+    ) {
+        self.shouldRestoreClipboardAfterPaste = shouldRestoreClipboardAfterPaste
+        self.clipboardRestoreDelay = clipboardRestoreDelay
+    }
+}
+
 public enum VoiceInkPastePreference {
     public static let restoreClipboardAfterPasteKey = "restoreClipboardAfterPaste"
     public static let clipboardRestoreDelayKey = "clipboardRestoreDelay"
@@ -135,5 +161,24 @@ public enum VoiceInkPastePreference {
         to defaults: UserDefaults = .standard
     ) {
         defaults.set(value, forKey: clipboardRestoreDelayKey)
+    }
+
+    public static func backupPreferences(
+        shouldRestoreClipboardAfterPaste: Bool,
+        clipboardRestoreDelay: Double
+    ) -> VoiceInkPasteBackupPreferences {
+        VoiceInkPasteBackupPreferences(
+            shouldRestoreClipboardAfterPaste: shouldRestoreClipboardAfterPaste,
+            clipboardRestoreDelay: clipboardRestoreDelay
+        )
+    }
+
+    public static func backupImportPlan(
+        from preferences: VoiceInkPasteBackupPreferences
+    ) -> VoiceInkPasteBackupImportPlan {
+        VoiceInkPasteBackupImportPlan(
+            shouldRestoreClipboardAfterPaste: preferences.shouldRestoreClipboardAfterPaste,
+            clipboardRestoreDelay: preferences.clipboardRestoreDelay
+        )
     }
 }

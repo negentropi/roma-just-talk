@@ -37,8 +37,7 @@ enum ShortcutMigration {
     }
 
     static func migrateLegacyKeyboardShortcutsIfNeeded() {
-        let migrationKey = "Shortcut_LegacyKeyboardShortcutsMigrated"
-        guard !UserDefaults.standard.bool(forKey: migrationKey) else {
+        guard !VoiceInkRecordingShortcutPreference.isLegacyKeyboardShortcutsMigrationComplete() else {
             return
         }
 
@@ -50,123 +49,45 @@ enum ShortcutMigration {
             migrateLegacyKeyboardShortcut(for: .powerMode(config.id))
         }
 
-        UserDefaults.standard.set(true, forKey: migrationKey)
+        VoiceInkRecordingShortcutPreference.markLegacyKeyboardShortcutsMigrationComplete()
     }
 
     static func migrateShortcutSelection(
         action: ShortcutAction,
         allowsNone: Bool
     ) -> RecordingShortcutManager.ShortcutSelection {
-        let userDefaultsKey = recordingShortcutKey(for: action)
-        let legacyKey = legacyRecordingShortcutKey(for: action)
+        let plan = VoiceInkRecordingShortcutPreference.shortcutSelectionMigrationPlan(
+            for: action.coreIdentifier,
+            allowsNone: allowsNone
+        )
 
-        if let storedValue = nonEmptyString(forKey: userDefaultsKey) {
-            return shortcutSelection(
-                from: storedValue,
-                savingTo: userDefaultsKey,
-                removing: legacyKey,
-                action: action,
-                allowsNone: allowsNone
-            )
+        if let preset = plan.presetToStore,
+           let shortcut = legacyPresetShortcut(for: preset) {
+            ShortcutStore.setShortcut(shortcut, for: action)
         }
 
-        if let legacyValue = nonEmptyString(forKey: legacyKey) {
-            return shortcutSelection(
-                from: legacyValue,
-                savingTo: userDefaultsKey,
-                removing: legacyKey,
-                action: action,
-                allowsNone: allowsNone
-            )
+        if let defaultPreset = plan.defaultPresetToStore,
+           ShortcutStore.shortcut(for: action) == nil,
+           let shortcut = legacyPresetShortcut(for: defaultPreset) {
+            ShortcutStore.setShortcut(shortcut, for: action)
         }
 
-        if !allowsNone {
-            migrateDefaultPrimaryShortcutIfNeeded(for: action)
-            let selection = VoiceInkRecordingShortcutPreference.defaultSelection(for: .primary)
-            UserDefaults.standard.set(selection.rawValue, forKey: userDefaultsKey)
-            return selection
-        }
-
-        return .none
+        VoiceInkRecordingShortcutPreference.applyShortcutSelectionMigrationPlan(plan)
+        return plan.selection
     }
 
     static func migrateShortcutMode(
         for action: ShortcutAction
     ) -> RecordingShortcutManager.Mode {
-        let userDefaultsKey = recordingShortcutModeKey(for: action)
-        let legacyKey = legacyRecordingShortcutModeKey(for: action)
-
-        if let storedValue = nonEmptyString(forKey: userDefaultsKey),
-           let mode = RecordingShortcutManager.Mode(rawValue: storedValue) {
-            UserDefaults.standard.removeObject(forKey: legacyKey)
-            return mode
-        }
-
-        if let legacyValue = nonEmptyString(forKey: legacyKey),
-           let mode = RecordingShortcutManager.Mode(rawValue: legacyValue) {
-            UserDefaults.standard.set(mode.rawValue, forKey: userDefaultsKey)
-            UserDefaults.standard.removeObject(forKey: legacyKey)
-            return mode
-        }
-
-        if action == .primaryRecording {
-            return VoiceInkRecordingShortcutPreference.defaultMode(for: .primary)
-        }
-
-        return VoiceInkRecordingShortcutPreference.defaultMode(for: .secondary)
-    }
-
-    private static func shortcutSelection(
-        from storedValue: String,
-        savingTo userDefaultsKey: String,
-        removing legacyKey: String?,
-        action: ShortcutAction,
-        allowsNone: Bool
-    ) -> RecordingShortcutManager.ShortcutSelection {
-        if storedValue == RecordingShortcutManager.ShortcutSelection.custom.rawValue {
-            saveShortcutSelection(.custom, forKey: userDefaultsKey, removing: legacyKey)
-            return .custom
-        }
-
-        if storedValue == RecordingShortcutManager.ShortcutSelection.none.rawValue {
-            let selection: RecordingShortcutManager.ShortcutSelection = allowsNone ? .none : .custom
-            saveShortcutSelection(selection, forKey: userDefaultsKey, removing: legacyKey)
-            return selection
-        }
-
-        if let shortcut = legacyPresetShortcut(for: storedValue) {
-            ShortcutStore.setShortcut(shortcut, for: action)
-            saveShortcutSelection(.custom, forKey: userDefaultsKey, removing: legacyKey)
-            return .custom
-        }
-
-        let selection: RecordingShortcutManager.ShortcutSelection = allowsNone ? .none : .custom
-        saveShortcutSelection(selection, forKey: userDefaultsKey, removing: legacyKey)
-        return selection
-    }
-
-    private static func saveShortcutSelection(
-        _ selection: RecordingShortcutManager.ShortcutSelection,
-        forKey userDefaultsKey: String,
-        removing legacyKey: String?
-    ) {
-        UserDefaults.standard.set(selection.rawValue, forKey: userDefaultsKey)
-
-        if let legacyKey {
-            UserDefaults.standard.removeObject(forKey: legacyKey)
-        }
+        VoiceInkRecordingShortcutPreference.migrateShortcutMode(for: action.coreIdentifier)
     }
 
     static func removeLegacyCustomRecordingShortcut(for action: ShortcutAction) {
-        UserDefaults.standard.removeObject(forKey: legacyCustomRecordingShortcutKey(for: action))
+        VoiceInkRecordingShortcutPreference.removeLegacyCustomRecordingShortcut(for: action.coreIdentifier)
     }
 
     static func removeLegacyKeyboardShortcut(for action: ShortcutAction) {
-        guard let legacyName = legacyKeyboardShortcutsName(for: action) else {
-            return
-        }
-
-        UserDefaults.standard.removeObject(forKey: "KeyboardShortcuts_\(legacyName)")
+        VoiceInkRecordingShortcutPreference.removeLegacyKeyboardShortcut(for: action.coreIdentifier)
     }
 
     static func migrateLegacyKeyboardShortcut(for action: ShortcutAction) {
@@ -186,16 +107,16 @@ enum ShortcutMigration {
     }
 
     private static func migrateLegacyCustomRecordingShortcutsIfNeeded() {
-        let migrationKey = "Shortcut_LegacyCustomRecordingShortcutsMigrated"
-        guard !UserDefaults.standard.bool(forKey: migrationKey) else {
+        guard !VoiceInkRecordingShortcutPreference.isLegacyCustomRecordingShortcutsMigrationComplete() else {
             return
         }
 
-        for action in [ShortcutAction.primaryRecording, .secondaryRecording] {
+        for identifier in VoiceInkShortcutActionIdentifier.legacyCustomRecordingShortcutActions {
+            let action = ShortcutAction(coreIdentifier: identifier)
             migrateLegacyCustomRecordingShortcut(for: action)
         }
 
-        UserDefaults.standard.set(true, forKey: migrationKey)
+        VoiceInkRecordingShortcutPreference.markLegacyCustomRecordingShortcutsMigrationComplete()
     }
 
     private static func migrateLegacyCustomRecordingShortcut(for action: ShortcutAction) {
@@ -206,7 +127,7 @@ enum ShortcutMigration {
         guard
             ShortcutStore.rawShortcut(for: action) == nil,
             !ShortcutStore.isShortcutCleared(for: action),
-            let data = UserDefaults.standard.data(forKey: legacyCustomRecordingShortcutKey(for: action)),
+            let data = UserDefaults.standard.data(forKey: action.coreIdentifier.legacyCustomRecordingShortcutKey),
             let shortcut = try? JSONDecoder().decode(Shortcut.self, from: data)
         else {
             return
@@ -215,143 +136,36 @@ enum ShortcutMigration {
         ShortcutStore.setShortcut(shortcut, for: action)
     }
 
-    private static func migrateDefaultPrimaryShortcutIfNeeded(for action: ShortcutAction) {
-        guard
-            action == .primaryRecording,
-            ShortcutStore.shortcut(for: action) == nil,
-            let shortcut = legacyPresetShortcut(for: "leftShift")
-        else {
-            return
-        }
-
-        ShortcutStore.setShortcut(shortcut, for: action)
-    }
-
-    private static func legacyPresetShortcut(for rawValue: String) -> Shortcut? {
-        switch rawValue {
-        case "rightOption":
+    private static func legacyPresetShortcut(for preset: VoiceInkLegacyRecordingShortcutPreset) -> Shortcut? {
+        switch preset {
+        case .rightOption:
             return .modifierOnly(keyCode: UInt16(kVK_RightOption), modifierFlags: [.option])
-        case "leftOption":
+        case .leftOption:
             return .modifierOnly(keyCode: UInt16(kVK_Option), modifierFlags: [.option])
-        case "leftControl":
+        case .leftControl:
             return .modifierOnly(keyCode: UInt16(kVK_Control), modifierFlags: [.control])
-        case "rightControl":
+        case .rightControl:
             return .modifierOnly(keyCode: UInt16(kVK_RightControl), modifierFlags: [.control])
-        case "fn":
+        case .fn:
             return .modifierOnly(keyCode: UInt16(kVK_Function), modifierFlags: [.function])
-        case "rightCommand":
+        case .rightCommand:
             return .modifierOnly(keyCode: UInt16(kVK_RightCommand), modifierFlags: [.command])
-        case "rightShift":
+        case .rightShift:
             return .modifierOnly(keyCode: UInt16(kVK_RightShift), modifierFlags: [.shift])
-        case "leftShift":
+        case .leftShift:
             return .modifierOnly(keyCode: UInt16(kVK_Shift), modifierFlags: [.shift])
-        default:
-            return nil
-        }
-    }
-
-    private static func legacyCustomRecordingShortcutKey(for action: ShortcutAction) -> String {
-        switch action {
-        case .primaryRecording:
-            return "CustomRecordingShortcut_primary"
-        case .secondaryRecording:
-            return "CustomRecordingShortcut_secondary"
-        default:
-            return "CustomRecordingShortcut_\(action.storageName)"
         }
     }
 
     private static func legacyKeyboardShortcut(for action: ShortcutAction) -> Shortcut? {
         guard
-            let legacyName = legacyKeyboardShortcutsName(for: action),
-            let data = UserDefaults.standard.string(forKey: "KeyboardShortcuts_\(legacyName)")?.data(using: .utf8),
+            let storageKey = action.coreIdentifier.legacyKeyboardShortcutStorageKey,
+            let data = UserDefaults.standard.string(forKey: storageKey)?.data(using: .utf8),
             let legacyShortcut = try? JSONDecoder().decode(LegacyKeyboardShortcut.self, from: data)
         else {
             return nil
         }
 
         return Shortcut.fromLegacyShortcut(legacyShortcut)
-    }
-
-    private static func legacyKeyboardShortcutsName(for action: ShortcutAction) -> String? {
-        switch action {
-        case .primaryRecording:
-            return "toggleMiniRecorder"
-        case .secondaryRecording:
-            return "toggleMiniRecorder2"
-        case .pasteLastTranscription:
-            return "pasteLastTranscription"
-        case .pasteLastEnhancement:
-            return "pasteLastEnhancement"
-        case .retryLastTranscription:
-            return "retryLastTranscription"
-        case .cancelRecorder:
-            return "cancelRecorder"
-        case .openHistoryWindow:
-            return "openHistoryWindow"
-        case .quickAddToDictionary:
-            return "quickAddToDictionary"
-        case .toggleEnhancement:
-            return "toggleEnhancement"
-        case .powerMode(let id):
-            return "powerMode_\(id.uuidString)"
-        case .miniRecorderEscape, .miniRecorderPrompt, .miniRecorderPowerMode:
-            return nil
-        }
-    }
-
-    private static func recordingShortcutKey(for action: ShortcutAction) -> String {
-        switch action {
-        case .primaryRecording:
-            return VoiceInkRecordingShortcutPreference.selectionKey(for: .primary)
-        case .secondaryRecording:
-            return VoiceInkRecordingShortcutPreference.selectionKey(for: .secondary)
-        default:
-            return action.userDefaultsKey
-        }
-    }
-
-    private static func legacyRecordingShortcutKey(for action: ShortcutAction) -> String {
-        switch action {
-        case .primaryRecording:
-            return "selectedHotkey1"
-        case .secondaryRecording:
-            return "selectedHotkey2"
-        default:
-            return action.userDefaultsKey
-        }
-    }
-
-    private static func recordingShortcutModeKey(for action: ShortcutAction) -> String {
-        switch action {
-        case .primaryRecording:
-            return VoiceInkRecordingShortcutPreference.modeKey(for: .primary)
-        case .secondaryRecording:
-            return VoiceInkRecordingShortcutPreference.modeKey(for: .secondary)
-        default:
-            return action.userDefaultsKey
-        }
-    }
-
-    private static func legacyRecordingShortcutModeKey(for action: ShortcutAction) -> String {
-        switch action {
-        case .primaryRecording:
-            return "hotkeyMode1"
-        case .secondaryRecording:
-            return "hotkeyMode2"
-        default:
-            return action.userDefaultsKey
-        }
-    }
-
-    private static func nonEmptyString(forKey key: String) -> String? {
-        guard
-            let value = UserDefaults.standard.string(forKey: key),
-            !value.isEmpty
-        else {
-            return nil
-        }
-
-        return value
     }
 }

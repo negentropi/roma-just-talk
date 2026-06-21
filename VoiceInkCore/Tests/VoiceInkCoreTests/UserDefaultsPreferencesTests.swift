@@ -1318,6 +1318,159 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         )
     }
 
+    func testShortcutActionIdentifierPreservesStorageAndLegacyKeys() {
+        let powerModeId = UUID(uuidString: "11111111-2222-3333-4444-555555555555")!
+
+        XCTAssertEqual(VoiceInkShortcutActionIdentifier.primaryRecording.storageName, "primaryRecording")
+        XCTAssertEqual(VoiceInkShortcutActionIdentifier.primaryRecording.shortcutStorageKey, "Shortcut_primaryRecording")
+        XCTAssertTrue(VoiceInkShortcutActionIdentifier.primaryRecording.isStoredShortcut)
+        XCTAssertEqual(VoiceInkShortcutActionIdentifier.primaryRecording.recordingShortcutSlot, .primary)
+        XCTAssertEqual(VoiceInkShortcutActionIdentifier.primaryRecording.selectionKey, VoiceInkUserDefaultsKey.primaryRecordingShortcut)
+        XCTAssertEqual(VoiceInkShortcutActionIdentifier.primaryRecording.legacySelectionKey, "selectedHotkey1")
+        XCTAssertEqual(VoiceInkShortcutActionIdentifier.primaryRecording.modeKey, VoiceInkUserDefaultsKey.primaryRecordingShortcutMode)
+        XCTAssertEqual(VoiceInkShortcutActionIdentifier.primaryRecording.legacyModeKey, "hotkeyMode1")
+        XCTAssertEqual(VoiceInkShortcutActionIdentifier.primaryRecording.legacyCustomRecordingShortcutKey, "CustomRecordingShortcut_primary")
+        XCTAssertEqual(VoiceInkShortcutActionIdentifier.primaryRecording.legacyKeyboardShortcutStorageKey, "KeyboardShortcuts_toggleMiniRecorder")
+
+        XCTAssertEqual(VoiceInkShortcutActionIdentifier.secondaryRecording.legacySelectionKey, "selectedHotkey2")
+        XCTAssertEqual(VoiceInkShortcutActionIdentifier.secondaryRecording.legacyModeKey, "hotkeyMode2")
+        XCTAssertEqual(VoiceInkShortcutActionIdentifier.secondaryRecording.legacyCustomRecordingShortcutKey, "CustomRecordingShortcut_secondary")
+        XCTAssertEqual(VoiceInkShortcutActionIdentifier.secondaryRecording.legacyKeyboardShortcutStorageKey, "KeyboardShortcuts_toggleMiniRecorder2")
+
+        let powerMode = VoiceInkShortcutActionIdentifier.powerMode(powerModeId)
+        XCTAssertEqual(powerMode.storageName, "powerMode_11111111-2222-3333-4444-555555555555")
+        XCTAssertEqual(powerMode.shortcutStorageKey, "Shortcut_powerMode_11111111-2222-3333-4444-555555555555")
+        XCTAssertEqual(powerMode.legacyKeyboardShortcutStorageKey, "KeyboardShortcuts_powerMode_11111111-2222-3333-4444-555555555555")
+
+        XCTAssertFalse(VoiceInkShortcutActionIdentifier.miniRecorderPrompt(2).isStoredShortcut)
+        XCTAssertNil(VoiceInkShortcutActionIdentifier.miniRecorderPrompt(2).legacyKeyboardShortcutStorageKey)
+        XCTAssertEqual(
+            VoiceInkShortcutActionIdentifier.legacyKeyboardShortcutActions,
+            [
+                .primaryRecording,
+                .secondaryRecording,
+                .pasteLastTranscription,
+                .pasteLastEnhancement,
+                .retryLastTranscription,
+                .cancelRecorder,
+                .openHistoryWindow,
+                .quickAddToDictionary,
+                .toggleEnhancement
+            ]
+        )
+        XCTAssertEqual(VoiceInkShortcutActionIdentifier.legacyCustomRecordingShortcutActions, [.primaryRecording, .secondaryRecording])
+    }
+
+    func testRecordingShortcutSelectionMigrationPlanMigratesCurrentPresetAndRemovesLegacyKey() {
+        withIsolatedDefaults { defaults in
+            defaults.set("rightOption", forKey: VoiceInkUserDefaultsKey.primaryRecordingShortcut)
+            defaults.set("leftShift", forKey: "selectedHotkey1")
+
+            let plan = VoiceInkRecordingShortcutPreference.shortcutSelectionMigrationPlan(
+                for: .primaryRecording,
+                allowsNone: false,
+                from: defaults
+            )
+
+            XCTAssertEqual(plan.selection, .custom)
+            XCTAssertEqual(plan.destinationKey, VoiceInkUserDefaultsKey.primaryRecordingShortcut)
+            XCTAssertEqual(plan.legacyKeyToRemove, "selectedHotkey1")
+            XCTAssertEqual(plan.presetToStore, .rightOption)
+            XCTAssertNil(plan.defaultPresetToStore)
+
+            VoiceInkRecordingShortcutPreference.applyShortcutSelectionMigrationPlan(plan, to: defaults)
+
+            XCTAssertEqual(defaults.string(forKey: VoiceInkUserDefaultsKey.primaryRecordingShortcut), "custom")
+            XCTAssertNil(defaults.object(forKey: "selectedHotkey1"))
+        }
+    }
+
+    func testRecordingShortcutSelectionMigrationPlanHandlesLegacyNoneAndAbsentDefaults() {
+        withIsolatedDefaults { defaults in
+            defaults.set("none", forKey: "selectedHotkey2")
+
+            let secondaryPlan = VoiceInkRecordingShortcutPreference.shortcutSelectionMigrationPlan(
+                for: .secondaryRecording,
+                allowsNone: true,
+                from: defaults
+            )
+
+            XCTAssertEqual(secondaryPlan.selection, .none)
+            XCTAssertEqual(secondaryPlan.destinationKey, VoiceInkUserDefaultsKey.secondaryRecordingShortcut)
+            XCTAssertEqual(secondaryPlan.legacyKeyToRemove, "selectedHotkey2")
+            XCTAssertNil(secondaryPlan.presetToStore)
+            XCTAssertNil(secondaryPlan.defaultPresetToStore)
+
+            VoiceInkRecordingShortcutPreference.applyShortcutSelectionMigrationPlan(secondaryPlan, to: defaults)
+
+            XCTAssertEqual(defaults.string(forKey: VoiceInkUserDefaultsKey.secondaryRecordingShortcut), "none")
+            XCTAssertNil(defaults.object(forKey: "selectedHotkey2"))
+        }
+
+        withIsolatedDefaults { defaults in
+            let primaryPlan = VoiceInkRecordingShortcutPreference.shortcutSelectionMigrationPlan(
+                for: .primaryRecording,
+                allowsNone: false,
+                from: defaults
+            )
+
+            XCTAssertEqual(primaryPlan.selection, .custom)
+            XCTAssertEqual(primaryPlan.destinationKey, VoiceInkUserDefaultsKey.primaryRecordingShortcut)
+            XCTAssertNil(primaryPlan.legacyKeyToRemove)
+            XCTAssertNil(primaryPlan.presetToStore)
+            XCTAssertEqual(primaryPlan.defaultPresetToStore, .leftShift)
+
+            let absentSecondaryPlan = VoiceInkRecordingShortcutPreference.shortcutSelectionMigrationPlan(
+                for: .secondaryRecording,
+                allowsNone: true,
+                from: defaults
+            )
+
+            XCTAssertEqual(absentSecondaryPlan.selection, .none)
+            XCTAssertNil(absentSecondaryPlan.destinationKey)
+            XCTAssertNil(absentSecondaryPlan.legacyKeyToRemove)
+            XCTAssertNil(absentSecondaryPlan.presetToStore)
+            XCTAssertNil(absentSecondaryPlan.defaultPresetToStore)
+        }
+    }
+
+    func testRecordingShortcutModeMigrationMovesLegacyValuesAndMarksCompletion() {
+        withIsolatedDefaults { defaults in
+            XCTAssertFalse(VoiceInkRecordingShortcutPreference.isLegacyKeyboardShortcutsMigrationComplete(in: defaults))
+            XCTAssertFalse(VoiceInkRecordingShortcutPreference.isLegacyCustomRecordingShortcutsMigrationComplete(in: defaults))
+
+            VoiceInkRecordingShortcutPreference.markLegacyKeyboardShortcutsMigrationComplete(in: defaults)
+            VoiceInkRecordingShortcutPreference.markLegacyCustomRecordingShortcutsMigrationComplete(in: defaults)
+
+            XCTAssertTrue(VoiceInkRecordingShortcutPreference.isLegacyKeyboardShortcutsMigrationComplete(in: defaults))
+            XCTAssertTrue(VoiceInkRecordingShortcutPreference.isLegacyCustomRecordingShortcutsMigrationComplete(in: defaults))
+
+            defaults.set("pushToTalk", forKey: "hotkeyMode2")
+
+            let mode = VoiceInkRecordingShortcutPreference.migrateShortcutMode(
+                for: .secondaryRecording,
+                in: defaults
+            )
+
+            XCTAssertEqual(mode, .pushToTalk)
+            XCTAssertEqual(defaults.string(forKey: VoiceInkUserDefaultsKey.secondaryRecordingShortcutMode), "pushToTalk")
+            XCTAssertNil(defaults.object(forKey: "hotkeyMode2"))
+        }
+
+        withIsolatedDefaults { defaults in
+            defaults.set("toggle", forKey: VoiceInkUserDefaultsKey.primaryRecordingShortcutMode)
+            defaults.set("hybrid", forKey: "hotkeyMode1")
+
+            let mode = VoiceInkRecordingShortcutPreference.migrateShortcutMode(
+                for: .primaryRecording,
+                in: defaults
+            )
+
+            XCTAssertEqual(mode, .toggle)
+            XCTAssertNil(defaults.object(forKey: "hotkeyMode1"))
+        }
+    }
+
     func testRecordingShortcutPreferenceReadsSavesAndClearsSettings() {
         withIsolatedDefaults { defaults in
             XCTAssertNil(VoiceInkRecordingShortcutPreference.selection(for: .primary, from: defaults))

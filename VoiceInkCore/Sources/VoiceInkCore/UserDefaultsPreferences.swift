@@ -1070,6 +1070,177 @@ public enum VoiceInkRecordingShortcutMode: String, CaseIterable, Sendable {
     }
 }
 
+public enum VoiceInkShortcutActionIdentifier: Hashable, Sendable {
+    case primaryRecording
+    case secondaryRecording
+    case pasteLastTranscription
+    case pasteLastEnhancement
+    case retryLastTranscription
+    case cancelRecorder
+    case openHistoryWindow
+    case quickAddToDictionary
+    case toggleEnhancement
+    case powerMode(UUID)
+    case miniRecorderEscape
+    case miniRecorderPrompt(Int)
+    case miniRecorderPowerMode(Int)
+
+    public var storageName: String {
+        switch self {
+        case .primaryRecording:
+            return "primaryRecording"
+        case .secondaryRecording:
+            return "secondaryRecording"
+        case .pasteLastTranscription:
+            return "pasteLastTranscription"
+        case .pasteLastEnhancement:
+            return "pasteLastEnhancement"
+        case .retryLastTranscription:
+            return "retryLastTranscription"
+        case .cancelRecorder:
+            return "cancelRecorder"
+        case .openHistoryWindow:
+            return "openHistoryWindow"
+        case .quickAddToDictionary:
+            return "quickAddToDictionary"
+        case .toggleEnhancement:
+            return "toggleEnhancement"
+        case .powerMode(let id):
+            return "powerMode_\(id.uuidString)"
+        case .miniRecorderEscape:
+            return "miniRecorderEscape"
+        case .miniRecorderPrompt(let index):
+            return "miniRecorderPrompt_\(index)"
+        case .miniRecorderPowerMode(let index):
+            return "miniRecorderPowerMode_\(index)"
+        }
+    }
+
+    public var shortcutStorageKey: String {
+        "Shortcut_\(storageName)"
+    }
+
+    public var isStoredShortcut: Bool {
+        switch self {
+        case .miniRecorderEscape, .miniRecorderPrompt, .miniRecorderPowerMode:
+            return false
+        default:
+            return true
+        }
+    }
+
+    public var recordingShortcutSlot: VoiceInkRecordingShortcutSlot? {
+        switch self {
+        case .primaryRecording:
+            return .primary
+        case .secondaryRecording:
+            return .secondary
+        default:
+            return nil
+        }
+    }
+
+    public var selectionKey: String {
+        recordingShortcutSlot.map(VoiceInkRecordingShortcutPreference.selectionKey(for:)) ?? shortcutStorageKey
+    }
+
+    public var legacySelectionKey: String {
+        switch self {
+        case .primaryRecording:
+            return "selectedHotkey1"
+        case .secondaryRecording:
+            return "selectedHotkey2"
+        default:
+            return shortcutStorageKey
+        }
+    }
+
+    public var modeKey: String {
+        recordingShortcutSlot.map(VoiceInkRecordingShortcutPreference.modeKey(for:)) ?? shortcutStorageKey
+    }
+
+    public var legacyModeKey: String {
+        switch self {
+        case .primaryRecording:
+            return "hotkeyMode1"
+        case .secondaryRecording:
+            return "hotkeyMode2"
+        default:
+            return shortcutStorageKey
+        }
+    }
+
+    public var legacyCustomRecordingShortcutKey: String {
+        switch self {
+        case .primaryRecording:
+            return "CustomRecordingShortcut_primary"
+        case .secondaryRecording:
+            return "CustomRecordingShortcut_secondary"
+        default:
+            return "CustomRecordingShortcut_\(storageName)"
+        }
+    }
+
+    public var legacyKeyboardShortcutName: String? {
+        switch self {
+        case .primaryRecording:
+            return "toggleMiniRecorder"
+        case .secondaryRecording:
+            return "toggleMiniRecorder2"
+        case .pasteLastTranscription:
+            return "pasteLastTranscription"
+        case .pasteLastEnhancement:
+            return "pasteLastEnhancement"
+        case .retryLastTranscription:
+            return "retryLastTranscription"
+        case .cancelRecorder:
+            return "cancelRecorder"
+        case .openHistoryWindow:
+            return "openHistoryWindow"
+        case .quickAddToDictionary:
+            return "quickAddToDictionary"
+        case .toggleEnhancement:
+            return "toggleEnhancement"
+        case .powerMode(let id):
+            return "powerMode_\(id.uuidString)"
+        case .miniRecorderEscape, .miniRecorderPrompt, .miniRecorderPowerMode:
+            return nil
+        }
+    }
+
+    public var legacyKeyboardShortcutStorageKey: String? {
+        legacyKeyboardShortcutName.map { "KeyboardShortcuts_\($0)" }
+    }
+
+    public static let legacyKeyboardShortcutActions: [Self] = [
+        .primaryRecording,
+        .secondaryRecording,
+        .pasteLastTranscription,
+        .pasteLastEnhancement,
+        .retryLastTranscription,
+        .cancelRecorder,
+        .openHistoryWindow,
+        .quickAddToDictionary,
+        .toggleEnhancement
+    ]
+
+    public static let legacyCustomRecordingShortcutActions: [Self] = [
+        .primaryRecording,
+        .secondaryRecording
+    ]
+}
+
+public enum VoiceInkLegacyRecordingShortcutPreset: String, CaseIterable, Sendable {
+    case rightOption
+    case leftOption
+    case leftControl
+    case rightControl
+    case fn
+    case rightCommand
+    case rightShift
+    case leftShift
+}
+
 public struct VoiceInkMacOSRecordingShortcutSettingsPresentation: Equatable, Sendable {
     public let sectionTitle: String
     public let primaryShortcutLabel: String
@@ -1170,6 +1341,28 @@ public struct VoiceInkShortcutStorageState: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkRecordingShortcutSelectionMigrationPlan: Equatable, Sendable {
+    public let selection: VoiceInkRecordingShortcutSelection
+    public let destinationKey: String?
+    public let legacyKeyToRemove: String?
+    public let presetToStore: VoiceInkLegacyRecordingShortcutPreset?
+    public let defaultPresetToStore: VoiceInkLegacyRecordingShortcutPreset?
+
+    public init(
+        selection: VoiceInkRecordingShortcutSelection,
+        destinationKey: String?,
+        legacyKeyToRemove: String?,
+        presetToStore: VoiceInkLegacyRecordingShortcutPreset?,
+        defaultPresetToStore: VoiceInkLegacyRecordingShortcutPreset?
+    ) {
+        self.selection = selection
+        self.destinationKey = destinationKey
+        self.legacyKeyToRemove = legacyKeyToRemove
+        self.presetToStore = presetToStore
+        self.defaultPresetToStore = defaultPresetToStore
+    }
+}
+
 public enum VoiceInkShortcutStoragePreference {
     public static func clearedKey(for shortcutKey: String) -> String {
         "\(shortcutKey)_cleared"
@@ -1246,6 +1439,9 @@ public enum VoiceInkShortcutStoragePreference {
 }
 
 public enum VoiceInkRecordingShortcutPreference {
+    public static let legacyKeyboardShortcutsMigrationKey = "Shortcut_LegacyKeyboardShortcutsMigrated"
+    public static let legacyCustomRecordingShortcutsMigrationKey = "Shortcut_LegacyCustomRecordingShortcutsMigrated"
+
     public static let macOSSettingsPresentation = VoiceInkMacOSRecordingShortcutSettingsPresentation.macOS
 
     public static var registeredDefaults: [String: Any] {
@@ -1254,6 +1450,137 @@ public enum VoiceInkRecordingShortcutPreference {
             VoiceInkUserDefaultsKey.middleClickActivationDelay: VoiceInkPreferenceDefault.middleClickActivationDelay,
             VoiceInkUserDefaultsKey.specialShortcutPasteLastTranscriptOnEmptyTap: VoiceInkPreferenceDefault.specialShortcutPasteLastTranscriptOnEmptyTap
         ]
+    }
+
+    public static func isLegacyKeyboardShortcutsMigrationComplete(
+        in defaults: UserDefaults = .standard
+    ) -> Bool {
+        defaults.bool(forKey: legacyKeyboardShortcutsMigrationKey)
+    }
+
+    public static func markLegacyKeyboardShortcutsMigrationComplete(
+        in defaults: UserDefaults = .standard
+    ) {
+        defaults.set(true, forKey: legacyKeyboardShortcutsMigrationKey)
+    }
+
+    public static func isLegacyCustomRecordingShortcutsMigrationComplete(
+        in defaults: UserDefaults = .standard
+    ) -> Bool {
+        defaults.bool(forKey: legacyCustomRecordingShortcutsMigrationKey)
+    }
+
+    public static func markLegacyCustomRecordingShortcutsMigrationComplete(
+        in defaults: UserDefaults = .standard
+    ) {
+        defaults.set(true, forKey: legacyCustomRecordingShortcutsMigrationKey)
+    }
+
+    public static func shortcutSelectionMigrationPlan(
+        for action: VoiceInkShortcutActionIdentifier,
+        allowsNone: Bool,
+        from defaults: UserDefaults = .standard
+    ) -> VoiceInkRecordingShortcutSelectionMigrationPlan {
+        let destinationKey = action.selectionKey
+        let legacyKey = action.legacySelectionKey
+        let legacyKeyToRemove = legacyKey == destinationKey ? nil : legacyKey
+
+        if let storedValue = nonEmptyString(forKey: destinationKey, from: defaults) {
+            return shortcutSelectionMigrationPlan(
+                from: storedValue,
+                destinationKey: destinationKey,
+                legacyKeyToRemove: legacyKeyToRemove,
+                allowsNone: allowsNone
+            )
+        }
+
+        if let legacyValue = nonEmptyString(forKey: legacyKey, from: defaults) {
+            return shortcutSelectionMigrationPlan(
+                from: legacyValue,
+                destinationKey: destinationKey,
+                legacyKeyToRemove: legacyKeyToRemove,
+                allowsNone: allowsNone
+            )
+        }
+
+        guard !allowsNone else {
+            return VoiceInkRecordingShortcutSelectionMigrationPlan(
+                selection: .none,
+                destinationKey: nil,
+                legacyKeyToRemove: nil,
+                presetToStore: nil,
+                defaultPresetToStore: nil
+            )
+        }
+
+        let slot = action.recordingShortcutSlot ?? .primary
+        return VoiceInkRecordingShortcutSelectionMigrationPlan(
+            selection: defaultSelection(for: slot),
+            destinationKey: destinationKey,
+            legacyKeyToRemove: nil,
+            presetToStore: nil,
+            defaultPresetToStore: action == .primaryRecording ? .leftShift : nil
+        )
+    }
+
+    public static func applyShortcutSelectionMigrationPlan(
+        _ plan: VoiceInkRecordingShortcutSelectionMigrationPlan,
+        to defaults: UserDefaults = .standard
+    ) {
+        if let destinationKey = plan.destinationKey {
+            defaults.set(plan.selection.rawValue, forKey: destinationKey)
+        }
+
+        if let legacyKeyToRemove = plan.legacyKeyToRemove {
+            defaults.removeObject(forKey: legacyKeyToRemove)
+        }
+    }
+
+    public static func migrateShortcutMode(
+        for action: VoiceInkShortcutActionIdentifier,
+        in defaults: UserDefaults = .standard
+    ) -> VoiceInkRecordingShortcutMode {
+        let destinationKey = action.modeKey
+        let legacyKey = action.legacyModeKey
+        let legacyKeyToRemove = legacyKey == destinationKey ? nil : legacyKey
+
+        if let storedValue = nonEmptyString(forKey: destinationKey, from: defaults),
+           let mode = VoiceInkRecordingShortcutMode(rawValue: storedValue) {
+            if let legacyKeyToRemove {
+                defaults.removeObject(forKey: legacyKeyToRemove)
+            }
+            return mode
+        }
+
+        if let legacyValue = nonEmptyString(forKey: legacyKey, from: defaults),
+           let mode = VoiceInkRecordingShortcutMode(rawValue: legacyValue) {
+            defaults.set(mode.rawValue, forKey: destinationKey)
+            if let legacyKeyToRemove {
+                defaults.removeObject(forKey: legacyKeyToRemove)
+            }
+            return mode
+        }
+
+        let slot = action.recordingShortcutSlot ?? .secondary
+        return defaultMode(for: slot)
+    }
+
+    public static func removeLegacyCustomRecordingShortcut(
+        for action: VoiceInkShortcutActionIdentifier,
+        from defaults: UserDefaults = .standard
+    ) {
+        defaults.removeObject(forKey: action.legacyCustomRecordingShortcutKey)
+    }
+
+    public static func removeLegacyKeyboardShortcut(
+        for action: VoiceInkShortcutActionIdentifier,
+        from defaults: UserDefaults = .standard
+    ) {
+        guard let key = action.legacyKeyboardShortcutStorageKey else {
+            return
+        }
+
+        defaults.removeObject(forKey: key)
     }
 
     public static func selectionKey(for slot: VoiceInkRecordingShortcutSlot) -> String {
@@ -1401,6 +1728,65 @@ public enum VoiceInkRecordingShortcutPreference {
         defaults.removeObject(forKey: VoiceInkUserDefaultsKey.isMiddleClickToggleEnabled)
         defaults.removeObject(forKey: VoiceInkUserDefaultsKey.middleClickActivationDelay)
         defaults.removeObject(forKey: VoiceInkUserDefaultsKey.specialShortcutPasteLastTranscriptOnEmptyTap)
+    }
+
+    private static func shortcutSelectionMigrationPlan(
+        from rawValue: String,
+        destinationKey: String,
+        legacyKeyToRemove: String?,
+        allowsNone: Bool
+    ) -> VoiceInkRecordingShortcutSelectionMigrationPlan {
+        if rawValue == VoiceInkRecordingShortcutSelection.custom.rawValue {
+            return VoiceInkRecordingShortcutSelectionMigrationPlan(
+                selection: .custom,
+                destinationKey: destinationKey,
+                legacyKeyToRemove: legacyKeyToRemove,
+                presetToStore: nil,
+                defaultPresetToStore: nil
+            )
+        }
+
+        if rawValue == VoiceInkRecordingShortcutSelection.none.rawValue {
+            return VoiceInkRecordingShortcutSelectionMigrationPlan(
+                selection: allowsNone ? .none : .custom,
+                destinationKey: destinationKey,
+                legacyKeyToRemove: legacyKeyToRemove,
+                presetToStore: nil,
+                defaultPresetToStore: nil
+            )
+        }
+
+        if let preset = VoiceInkLegacyRecordingShortcutPreset(rawValue: rawValue) {
+            return VoiceInkRecordingShortcutSelectionMigrationPlan(
+                selection: .custom,
+                destinationKey: destinationKey,
+                legacyKeyToRemove: legacyKeyToRemove,
+                presetToStore: preset,
+                defaultPresetToStore: nil
+            )
+        }
+
+        return VoiceInkRecordingShortcutSelectionMigrationPlan(
+            selection: allowsNone ? .none : .custom,
+            destinationKey: destinationKey,
+            legacyKeyToRemove: legacyKeyToRemove,
+            presetToStore: nil,
+            defaultPresetToStore: nil
+        )
+    }
+
+    private static func nonEmptyString(
+        forKey key: String,
+        from defaults: UserDefaults
+    ) -> String? {
+        guard
+            let value = defaults.string(forKey: key),
+            !value.isEmpty
+        else {
+            return nil
+        }
+
+        return value
     }
 }
 

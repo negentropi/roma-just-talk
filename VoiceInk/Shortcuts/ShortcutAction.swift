@@ -17,46 +17,76 @@ enum ShortcutAction: Hashable {
     case miniRecorderPowerMode(Int)
 
     var userDefaultsKey: String {
-        "Shortcut_\(storageName)"
+        coreIdentifier.shortcutStorageKey
     }
 
     var isStored: Bool {
-        switch self {
-        case .miniRecorderEscape, .miniRecorderPrompt, .miniRecorderPowerMode:
-            return false
-        default:
-            return true
-        }
+        coreIdentifier.isStoredShortcut
     }
 
     var storageName: String {
+        coreIdentifier.storageName
+    }
+
+    var coreIdentifier: VoiceInkShortcutActionIdentifier {
         switch self {
         case .primaryRecording:
-            return "primaryRecording"
+            return .primaryRecording
         case .secondaryRecording:
-            return "secondaryRecording"
+            return .secondaryRecording
         case .pasteLastTranscription:
-            return "pasteLastTranscription"
+            return .pasteLastTranscription
         case .pasteLastEnhancement:
-            return "pasteLastEnhancement"
+            return .pasteLastEnhancement
         case .retryLastTranscription:
-            return "retryLastTranscription"
+            return .retryLastTranscription
         case .cancelRecorder:
-            return "cancelRecorder"
+            return .cancelRecorder
         case .openHistoryWindow:
-            return "openHistoryWindow"
+            return .openHistoryWindow
         case .quickAddToDictionary:
-            return "quickAddToDictionary"
+            return .quickAddToDictionary
         case .toggleEnhancement:
-            return "toggleEnhancement"
+            return .toggleEnhancement
         case .powerMode(let id):
-            return "powerMode_\(id.uuidString)"
+            return .powerMode(id)
         case .miniRecorderEscape:
-            return "miniRecorderEscape"
+            return .miniRecorderEscape
         case .miniRecorderPrompt(let index):
-            return "miniRecorderPrompt_\(index)"
+            return .miniRecorderPrompt(index)
         case .miniRecorderPowerMode(let index):
-            return "miniRecorderPowerMode_\(index)"
+            return .miniRecorderPowerMode(index)
+        }
+    }
+
+    init(coreIdentifier: VoiceInkShortcutActionIdentifier) {
+        switch coreIdentifier {
+        case .primaryRecording:
+            self = .primaryRecording
+        case .secondaryRecording:
+            self = .secondaryRecording
+        case .pasteLastTranscription:
+            self = .pasteLastTranscription
+        case .pasteLastEnhancement:
+            self = .pasteLastEnhancement
+        case .retryLastTranscription:
+            self = .retryLastTranscription
+        case .cancelRecorder:
+            self = .cancelRecorder
+        case .openHistoryWindow:
+            self = .openHistoryWindow
+        case .quickAddToDictionary:
+            self = .quickAddToDictionary
+        case .toggleEnhancement:
+            self = .toggleEnhancement
+        case .powerMode(let id):
+            self = .powerMode(id)
+        case .miniRecorderEscape:
+            self = .miniRecorderEscape
+        case .miniRecorderPrompt(let index):
+            self = .miniRecorderPrompt(index)
+        case .miniRecorderPowerMode(let index):
+            self = .miniRecorderPowerMode(index)
         }
     }
 
@@ -108,17 +138,7 @@ enum ShortcutAction: Hashable {
         .toggleEnhancement
     ]
 
-    static let legacyKeyboardShortcutActions: [Self] = [
-        .primaryRecording,
-        .secondaryRecording,
-        .pasteLastTranscription,
-        .pasteLastEnhancement,
-        .retryLastTranscription,
-        .cancelRecorder,
-        .openHistoryWindow,
-        .quickAddToDictionary,
-        .toggleEnhancement
-    ]
+    static let legacyKeyboardShortcutActions = VoiceInkShortcutActionIdentifier.legacyKeyboardShortcutActions.map(Self.init(coreIdentifier:))
 
     private static func displayNumber(forMiniRecorderIndex index: Int) -> String {
         index == 9 ? "10" : "\(index + 1)"

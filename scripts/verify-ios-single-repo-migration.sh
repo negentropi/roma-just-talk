@@ -6243,23 +6243,23 @@ reject_pattern \
   VoiceInk/Shortcuts/ShortcutStore.swift
 
 require_pattern \
-  "macOS shortcut migration uses shared current shortcut selection keys" \
-  'VoiceInkRecordingShortcutPreference\.selectionKey' \
+  "macOS shortcut migration uses shared shortcut selection migration plan" \
+  'VoiceInkRecordingShortcutPreference\.shortcutSelectionMigrationPlan' \
   VoiceInk/Shortcuts/ShortcutMigration.swift
 
 require_pattern \
-  "macOS shortcut migration uses shared current shortcut mode keys" \
-  'VoiceInkRecordingShortcutPreference\.modeKey' \
+  "macOS shortcut migration applies shared shortcut selection migration plan" \
+  'VoiceInkRecordingShortcutPreference\.applyShortcutSelectionMigrationPlan' \
   VoiceInk/Shortcuts/ShortcutMigration.swift
 
 require_pattern \
-  "macOS shortcut migration uses shared shortcut selection default" \
-  'VoiceInkRecordingShortcutPreference\.defaultSelection' \
+  "macOS shortcut migration uses shared shortcut mode migration" \
+  'VoiceInkRecordingShortcutPreference\.migrateShortcutMode' \
   VoiceInk/Shortcuts/ShortcutMigration.swift
 
 require_pattern \
-  "macOS shortcut migration uses shared shortcut mode default" \
-  'VoiceInkRecordingShortcutPreference\.defaultMode' \
+  "macOS shortcut migration uses shared legacy shortcut cleanup" \
+  'VoiceInkRecordingShortcutPreference\.(removeLegacyCustomRecordingShortcut|removeLegacyKeyboardShortcut)' \
   VoiceInk/Shortcuts/ShortcutMigration.swift
 
 require_pattern \
@@ -6331,8 +6331,18 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "core checks execute shared shortcut action identifier tests" \
+  'UserDefaultsPreferencesTests\.testShortcutActionIdentifierPreservesStorageAndLegacyKeys' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute shared shortcut migration plan tests" \
+  'UserDefaultsPreferencesTests\.testRecordingShortcut(SelectionMigrationPlan|ModeMigration)' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "migration checklist tracks shared recording shortcut preference gate" \
-  'macOS recording shortcut selection/mode, raw shortcut storage, middle-click, special empty-tap preferences, settings labels/help, and backup import/export value planning route through `VoiceInkRecordingShortcutSelection`/`VoiceInkRecordingShortcutMode`/`VoiceInkRecordingShortcutPreference`/`VoiceInkShortcutStoragePreference`' \
+  'macOS recording shortcut action identifiers, selection/mode migration plans, legacy shortcut key names, raw shortcut storage, middle-click, special empty-tap preferences, settings labels/help, and backup import/export value planning route through `VoiceInkShortcutActionIdentifier`/`VoiceInkLegacyRecordingShortcutPreset`/`VoiceInkRecordingShortcutSelection`/`VoiceInkRecordingShortcutMode`/`VoiceInkRecordingShortcutPreference`/`VoiceInkShortcutStoragePreference`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
+      - without/no-adhoc-macos-tcc
     paths:
       - ".github/workflows/pages.yml"
       - "landing-vercel/**"

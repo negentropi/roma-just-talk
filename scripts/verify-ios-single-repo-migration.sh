@@ -8210,6 +8210,11 @@ require_pattern \
   'VoiceInkLaunchRecordingRequest(State|Action)|requestRecording\(hasCompletedOnboarding:|consumePendingRecordingIfReady\(hasCompletedOnboarding:' \
   iOS/VoiceInk-ios/VoiceInk_iosApp.swift
 
+reject_pattern \
+  "iOS app launch recording avoids shallow shared-policy wrappers" \
+  'private func +(requestRecordingFromDeepLink|startPendingRecordingIfNeeded)\(' \
+  iOS/VoiceInk-ios/VoiceInk_iosApp.swift
+
 require_pattern \
   "iOS recording manager posts shared keyboard stop notification" \
   'VoiceInkAppIdentity\.iOSStopRecordingFromKeyboardNotificationName' \

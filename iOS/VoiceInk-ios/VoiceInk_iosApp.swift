@@ -46,7 +46,11 @@ struct VoiceInk_iosApp: App {
                         handleURL(url)
                     }
                     .onAppear {
-                        startPendingRecordingIfNeeded()
+                        applyLaunchRecordingAction(
+                            launchRecordingRequestState.consumePendingRecordingIfReady(
+                                hasCompletedOnboarding: hasCompletedOnboarding
+                            )
+                        )
                     }
             } else {
                 OnboardingView(isOnboardingComplete: $hasCompletedOnboarding)
@@ -55,7 +59,11 @@ struct VoiceInk_iosApp: App {
                     }
                     .onChange(of: hasCompletedOnboarding) { _, completed in
                         if completed {
-                            startPendingRecordingIfNeeded()
+                            applyLaunchRecordingAction(
+                                launchRecordingRequestState.consumePendingRecordingIfReady(
+                                    hasCompletedOnboarding: hasCompletedOnboarding
+                                )
+                            )
                         }
                     }
             }
@@ -69,25 +77,13 @@ struct VoiceInk_iosApp: App {
         switch deepLink {
         case .record:
             print("🔗 URL scheme triggered: open app for recording")
-            requestRecordingFromDeepLink()
+            applyLaunchRecordingAction(
+                launchRecordingRequestState.requestRecording(
+                    hasCompletedOnboarding: hasCompletedOnboarding
+                )
+            )
             print("📱 App opened via keyboard extension - recording requested")
         }
-    }
-
-    private func requestRecordingFromDeepLink() {
-        applyLaunchRecordingAction(
-            launchRecordingRequestState.requestRecording(
-                hasCompletedOnboarding: hasCompletedOnboarding
-            )
-        )
-    }
-
-    private func startPendingRecordingIfNeeded() {
-        applyLaunchRecordingAction(
-            launchRecordingRequestState.consumePendingRecordingIfReady(
-                hasCompletedOnboarding: hasCompletedOnboarding
-            )
-        )
     }
 
     private func applyLaunchRecordingAction(_ action: VoiceInkLaunchRecordingRequestAction) {

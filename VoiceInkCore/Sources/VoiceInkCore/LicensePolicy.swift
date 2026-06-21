@@ -198,6 +198,46 @@ public enum VoiceInkLicenseLinks {
     }
 }
 
+public struct VoiceInkLicenseRemovalPlan: Equatable, Sendable {
+    public let requiresActivationToSave: Bool
+    public let hasLaunchedBeforeToSave: Bool
+    public let activationsLimitToSave: Int
+    public let state: VoiceInkLicenseState
+    public let shouldPostLicenseStatusChanged: Bool
+    public let shouldReloadStartupState: Bool
+
+    public init(
+        requiresActivationToSave: Bool,
+        hasLaunchedBeforeToSave: Bool,
+        activationsLimitToSave: Int,
+        state: VoiceInkLicenseState,
+        shouldPostLicenseStatusChanged: Bool,
+        shouldReloadStartupState: Bool
+    ) {
+        self.requiresActivationToSave = requiresActivationToSave
+        self.hasLaunchedBeforeToSave = hasLaunchedBeforeToSave
+        self.activationsLimitToSave = activationsLimitToSave
+        self.state = state
+        self.shouldPostLicenseStatusChanged = shouldPostLicenseStatusChanged
+        self.shouldReloadStartupState = shouldReloadStartupState
+    }
+}
+
+public enum VoiceInkLicenseRemovalPolicy {
+    public static func plan(
+        trialPeriodDays: Int = VoiceInkLicenseStartupPolicy.defaultTrialPeriodDays
+    ) -> VoiceInkLicenseRemovalPlan {
+        VoiceInkLicenseRemovalPlan(
+            requiresActivationToSave: false,
+            hasLaunchedBeforeToSave: false,
+            activationsLimitToSave: 0,
+            state: .trial(daysRemaining: trialPeriodDays),
+            shouldPostLicenseStatusChanged: true,
+            shouldReloadStartupState: true
+        )
+    }
+}
+
 public struct VoiceInkLicenseValidationFeedback: Equatable, Sendable {
     public let isSuccess: Bool
     public let message: String

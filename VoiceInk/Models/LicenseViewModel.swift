@@ -184,17 +184,24 @@ class LicenseViewModel: ObservableObject {
     func removeLicense() {
         // Remove all license data from Keychain
         licenseManager.removeAll()
+        let plan = VoiceInkLicenseRemovalPolicy.plan()
 
         // Reset UserDefaults flags
-        VoiceInkLicensePreference.saveRequiresActivation(false, to: userDefaults)
-        VoiceInkLicensePreference.saveHasLaunchedBefore(false, to: userDefaults)  // Allow trial to restart
-        VoiceInkLicensePreference.saveActivationsLimit(0, to: userDefaults)
+        VoiceInkLicensePreference.saveRequiresActivation(plan.requiresActivationToSave, to: userDefaults)
+        VoiceInkLicensePreference.saveHasLaunchedBefore(plan.hasLaunchedBeforeToSave, to: userDefaults)
+        VoiceInkLicensePreference.saveActivationsLimit(plan.activationsLimitToSave, to: userDefaults)
 
-        licenseState = .trial(daysRemaining: VoiceInkLicenseStartupPolicy.defaultTrialPeriodDays)
+        licenseState = plan.state
         licenseKey = ""
         validationMessage = nil
-        activationsLimit = 0
-        NotificationCenter.default.post(name: .licenseStatusChanged, object: nil)
-        loadLicenseState()
+        activationsLimit = plan.activationsLimitToSave
+
+        if plan.shouldPostLicenseStatusChanged {
+            NotificationCenter.default.post(name: .licenseStatusChanged, object: nil)
+        }
+
+        if plan.shouldReloadStartupState {
+            loadLicenseState()
+        }
     }
 }

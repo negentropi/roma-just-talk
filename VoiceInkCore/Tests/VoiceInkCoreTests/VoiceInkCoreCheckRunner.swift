@@ -32,6 +32,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "LicensePolicyTests.testLicenseValidationPolicyPreservesMacOSFeedbackMessages", run: { LicensePolicyTests().testLicenseValidationPolicyPreservesMacOSFeedbackMessages() }),
             VoiceInkCoreCheck(name: "LicensePolicyTests.testLicenseValidationApplicationPlansPreserveMacOSStorageWritesAndSuccessCopy", run: { LicensePolicyTests().testLicenseValidationApplicationPlansPreserveMacOSStorageWritesAndSuccessCopy() }),
             VoiceInkCoreCheck(name: "LicensePolicyTests.testLicenseLinksPreservePurchaseAndManagementDestinations", run: { LicensePolicyTests().testLicenseLinksPreservePurchaseAndManagementDestinations() }),
+            VoiceInkCoreCheck(name: "LicensePolicyTests.testLicenseRemovalPolicyPreservesMacOSResetPlan", run: { LicensePolicyTests().testLicenseRemovalPolicyPreservesMacOSResetPlan() }),
             VoiceInkCoreCheck(name: "LicensePolicyTests.testLicenseSecureStoragePolicyPreservesDeviceLocalAccountsAndTrialDateCodec", run: { LicensePolicyTests().testLicenseSecureStoragePolicyPreservesDeviceLocalAccountsAndTrialDateCodec() }),
             VoiceInkCoreCheck(name: "LicensePolicyTests.testLicenseServicePolicyPreservesPolarEndpointsAndHeaders", run: { LicensePolicyTests().testLicenseServicePolicyPreservesPolarEndpointsAndHeaders() }),
             VoiceInkCoreCheck(name: "LicensePolicyTests.testLicenseValidationRequestBodiesPreservePolarFieldNames", run: { LicensePolicyTests().testLicenseValidationRequestBodiesPreservePolarFieldNames() }),

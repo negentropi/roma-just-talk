@@ -287,6 +287,24 @@ final class LicensePolicyTests: XCTestCase {
         )
     }
 
+    func testLicenseRemovalPolicyPreservesMacOSResetPlan() {
+        XCTAssertEqual(
+            VoiceInkLicenseRemovalPolicy.plan(),
+            VoiceInkLicenseRemovalPlan(
+                requiresActivationToSave: false,
+                hasLaunchedBeforeToSave: false,
+                activationsLimitToSave: 0,
+                state: .trial(daysRemaining: VoiceInkLicenseStartupPolicy.defaultTrialPeriodDays),
+                shouldPostLicenseStatusChanged: true,
+                shouldReloadStartupState: true
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkLicenseRemovalPolicy.plan(trialPeriodDays: 14).state,
+            .trial(daysRemaining: 14)
+        )
+    }
+
     func testLicenseSecureStoragePolicyPreservesDeviceLocalAccountsAndTrialDateCodec() {
         XCTAssertEqual(
             VoiceInkLicenseSecureStorageAccount.allCases.map(\.key),

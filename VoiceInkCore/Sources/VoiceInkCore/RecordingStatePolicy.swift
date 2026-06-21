@@ -616,4 +616,12 @@ public enum VoiceInkRecorderUISessionPolicy {
 
         return isRecorderSessionActive
     }
+
+    public static func shouldClearStaleHiddenRecorderSession(
+        hasVisibleRecorderType: Bool,
+        recordingState: VoiceInkRecordingState,
+        isRecorderSessionActive: Bool
+    ) -> Bool {
+        !hasVisibleRecorderType && isRecorderSessionActive && recordingState == .idle
+    }
 }

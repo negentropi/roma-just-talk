@@ -447,6 +447,37 @@ final class RecordingStatePolicyTests: XCTestCase {
         )
     }
 
+    func testRecorderSessionPolicyClearsOnlyStaleHiddenIdleSessions() {
+        XCTAssertTrue(
+            VoiceInkRecorderUISessionPolicy.shouldClearStaleHiddenRecorderSession(
+                hasVisibleRecorderType: false,
+                recordingState: .idle,
+                isRecorderSessionActive: true
+            )
+        )
+        XCTAssertFalse(
+            VoiceInkRecorderUISessionPolicy.shouldClearStaleHiddenRecorderSession(
+                hasVisibleRecorderType: false,
+                recordingState: .recording,
+                isRecorderSessionActive: true
+            )
+        )
+        XCTAssertFalse(
+            VoiceInkRecorderUISessionPolicy.shouldClearStaleHiddenRecorderSession(
+                hasVisibleRecorderType: true,
+                recordingState: .idle,
+                isRecorderSessionActive: true
+            )
+        )
+        XCTAssertFalse(
+            VoiceInkRecorderUISessionPolicy.shouldClearStaleHiddenRecorderSession(
+                hasVisibleRecorderType: false,
+                recordingState: .idle,
+                isRecorderSessionActive: false
+            )
+        )
+    }
+
     func testRecordingAlertPresentationPreservesIOSNoModeGateCopy() {
         XCTAssertNil(VoiceInkRecordingAlertPresentation.noModesAvailableIfNeeded(modeCount: 1))
 

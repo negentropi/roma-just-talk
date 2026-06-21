@@ -787,6 +787,21 @@ require_pattern \
   VoiceInk/Transcription/Engine/RecorderUIManager.swift
 
 require_pattern \
+  "shared recorder UI session policy owns stale hidden session repair" \
+  'shouldClearStaleHiddenRecorderSession' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "macOS recorder UI uses shared stale hidden session policy" \
+  'VoiceInkRecorderUISessionPolicy\.shouldClearStaleHiddenRecorderSession' \
+  VoiceInk/Transcription/Engine/RecorderUIManager.swift
+
+require_pattern \
+  "core checks execute stale hidden recorder session policy test" \
+  'RecordingStatePolicyTests\.testRecorderSessionPolicyClearsOnlyStaleHiddenIdleSessions' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "macOS recorder preview uses shared active-recording predicate" \
   'recordingState\.isActivelyRecording' \
   VoiceInk/Views/Recorder/MiniRecorderView.swift
@@ -819,6 +834,11 @@ reject_pattern \
   VoiceInk/Views/Recorder/AudioVisualizerView.swift \
   VoiceInk/Views/Recorder/RecorderComponents.swift \
   VoiceInk/Views/Recorder/NotchRecorderView.swift
+
+reject_pattern \
+  "macOS recorder UI avoids shell-owned stale hidden session policy" \
+  '!VoiceInkRecorderStylePreference\.hasVisibleRecorder\(rawValue: recorderType\)|activeSessionToggleAction\(for:' \
+  VoiceInk/Transcription/Engine/RecorderUIManager.swift
 
 require_pattern \
   "iOS recording manager uses shared active-recording predicate" \
@@ -1178,6 +1198,11 @@ reject_pattern \
 require_pattern \
   "migration checklist tracks shared recorder style settings labels" \
   'macOS recorder style labels, settings section/picker labels, raw storage key/default' \
+  docs/ios-single-repo-migration.md
+
+require_pattern \
+  "migration checklist tracks shared recorder UI session policy" \
+  'stale hidden-recorder session policy routes through `VoiceInkRecorderUISessionPolicy`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

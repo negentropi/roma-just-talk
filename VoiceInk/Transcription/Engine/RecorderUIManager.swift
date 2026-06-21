@@ -114,23 +114,21 @@ class RecorderUIManager: ObservableObject {
         )
     }
 
-    func activeSessionToggleAction(for recordingState: VoiceInkRecordingState) -> VoiceInkRecorderUIToggleAction {
-        recordingState.recorderUIToggleAction
-    }
-
     func toggleMiniRecorder(powerModeId: UUID? = nil) async {
         guard let engine = engine else { return }
         logger.notice("toggleMiniRecorder called – sessionActive=\(self.isRecorderSessionActive, privacy: .public), visible=\(self.isMiniRecorderVisible, privacy: .public), state=\(String(describing: engine.recordingState), privacy: .public)")
 
-        if !VoiceInkRecorderStylePreference.hasVisibleRecorder(rawValue: recorderType),
-           isRecorderSessionActive,
-           engine.recordingState == .idle {
+        if VoiceInkRecorderUISessionPolicy.shouldClearStaleHiddenRecorderSession(
+            hasVisibleRecorderType: VoiceInkRecorderStylePreference.hasVisibleRecorder(rawValue: recorderType),
+            recordingState: engine.recordingState,
+            isRecorderSessionActive: isRecorderSessionActive
+        ) {
             logger.notice("toggleMiniRecorder: clearing stale hidden recorder session before starting")
             isRecorderSessionActive = false
         }
 
         if isRecorderSessionActive {
-            switch activeSessionToggleAction(for: engine.recordingState) {
+            switch engine.recordingState.recorderUIToggleAction {
             case .toggleRecord:
                 if engine.recordingState == .starting {
                     logger.notice("toggleMiniRecorder: deferring stop while recording starts")

@@ -2381,6 +2381,41 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
 
 require_pattern \
+  "shared custom cloud transcription policy lives in VoiceInkCore" \
+  'VoiceInkCustomCloudTranscriptionPolicy|openAICompatibleOptions' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
+
+require_pattern \
+  "shared custom cloud transcription policy owns OpenAI-compatible request defaults" \
+  'openAICompatibleResponseFormat: "json"|openAICompatibleTemperature: "0"|openAICompatibleAllowsPlainTextFallback: false' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
+
+require_pattern \
+  "shared custom cloud transcription policy owns custom endpoint and error domain copy" \
+  'apiErrorDomain = "CustomWhisperTranscriptionService"|invalidEndpointDescription = "Invalid API endpoint URL"|endpointURL' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
+
+require_pattern \
+  "shared custom cloud transcription policy owns empty-result and HTTP API error classification" \
+  'acceptsTranscriptionText|isHTTPAPIError' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
+
+require_pattern \
+  "macOS custom cloud transcription uses shared request policy" \
+  'VoiceInkCustomCloudTranscriptionPolicy\.(endpointURL|openAICompatibleOptions|acceptsTranscriptionText|isHTTPAPIError)' \
+  VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
+
+require_pattern \
+  "core checks execute custom cloud transcription policy tests" \
+  'CustomCloudModelPolicyTests\.testCustomCloudTranscriptionPolicyPreservesOpenAICompatibleRequestDefaults|CustomCloudModelPolicyTests\.testCustomCloudTranscriptionPolicyClassifiesEndpointTextAndHTTPAPIError' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "macOS custom cloud transcription avoids shell-owned request policy" \
+  '"CustomWhisperTranscriptionService"|"Invalid API endpoint URL"|responseFormat: "json"|temperature: "0"|allowPlainTextFallback: false|!text\.isEmpty|\(100\.\.\.599\)\.contains\(error\.code\)' \
+  VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
+
+require_pattern \
   "macOS custom cloud model form uses shared presentation" \
   'VoiceInkCustomCloudModelFormPresentation\.macOS|presentation\.(defaultAPIEndpoint|defaultModelName|buttonTitle|title|compatibilityWarningText|displayNameFieldTitle|apiEndpointFieldTitle|apiKeyFieldTitle|modelNameFieldTitle|multilingualToggleTitle|cancelButtonTitle|submitButtonTitle|submitButtonSystemImageName|validationAlertTitle|validationAlertDismissButtonTitle|defaultModelDescription|keychainSaveFailureMessage)' \
   "VoiceInk/Views/AI Models/AddCustomModelView.swift"

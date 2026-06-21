@@ -51,6 +51,7 @@ public struct VoiceInkRemoteTranscriptionOptions: Equatable, Sendable {
     public let openAICompatibleErrorDomain: String
     public let openAICompatibleTimeout: TimeInterval?
     public let openAICompatibleMaxRetries: Int
+    public let openAICompatibleAllowsPlainTextFallback: Bool
     public let deepgramParagraphs: Bool?
     public let deepgramDiarize: Bool?
     public let deepgramTimeout: TimeInterval?
@@ -63,6 +64,7 @@ public struct VoiceInkRemoteTranscriptionOptions: Equatable, Sendable {
         openAICompatibleErrorDomain: String = VoiceInkRemoteTranscriptionOptions.defaultOpenAICompatibleErrorDomain,
         openAICompatibleTimeout: TimeInterval? = nil,
         openAICompatibleMaxRetries: Int = 0,
+        openAICompatibleAllowsPlainTextFallback: Bool = true,
         deepgramParagraphs: Bool? = nil,
         deepgramDiarize: Bool? = false,
         deepgramTimeout: TimeInterval? = nil
@@ -74,6 +76,7 @@ public struct VoiceInkRemoteTranscriptionOptions: Equatable, Sendable {
         self.openAICompatibleErrorDomain = openAICompatibleErrorDomain
         self.openAICompatibleTimeout = openAICompatibleTimeout
         self.openAICompatibleMaxRetries = openAICompatibleMaxRetries
+        self.openAICompatibleAllowsPlainTextFallback = openAICompatibleAllowsPlainTextFallback
         self.deepgramParagraphs = deepgramParagraphs
         self.deepgramDiarize = deepgramDiarize
         self.deepgramTimeout = deepgramTimeout
@@ -308,7 +311,8 @@ public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionServ
                 temperature: options.openAICompatibleTemperature,
                 errorDomain: options.openAICompatibleErrorDomain,
                 timeout: options.openAICompatibleTimeout,
-                maxRetries: options.openAICompatibleMaxRetries
+                maxRetries: options.openAICompatibleMaxRetries,
+                allowPlainTextFallback: options.openAICompatibleAllowsPlainTextFallback
             )
         case .deepgram:
             return try await deepgramClient.transcribeAudioData(

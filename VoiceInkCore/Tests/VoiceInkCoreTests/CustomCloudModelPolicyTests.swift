@@ -286,4 +286,42 @@ final class CustomCloudModelPolicyTests: XCTestCase {
             legacyAPIKey: " "
         ).legacyAPIKeyForKeychainMigration, " ")
     }
+
+    func testCustomCloudTranscriptionPolicyPreservesOpenAICompatibleRequestDefaults() {
+        let options = VoiceInkCustomCloudTranscriptionPolicy.openAICompatibleOptions
+
+        XCTAssertEqual(VoiceInkCustomCloudTranscriptionPolicy.apiErrorDomain, "CustomWhisperTranscriptionService")
+        XCTAssertEqual(VoiceInkCustomCloudTranscriptionPolicy.invalidEndpointDescription, "Invalid API endpoint URL")
+        XCTAssertEqual(options.openAICompatibleResponseFormat, "json")
+        XCTAssertEqual(options.openAICompatibleTemperature, "0")
+        XCTAssertEqual(options.openAICompatibleErrorDomain, VoiceInkCustomCloudTranscriptionPolicy.apiErrorDomain)
+        XCTAssertFalse(options.openAICompatibleAllowsPlainTextFallback)
+    }
+
+    func testCustomCloudTranscriptionPolicyClassifiesEndpointTextAndHTTPAPIError() throws {
+        XCTAssertEqual(
+            VoiceInkCustomCloudTranscriptionPolicy.endpointURL(
+                from: "https://api.example.com/v1/audio/transcriptions"
+            )?.absoluteString,
+            "https://api.example.com/v1/audio/transcriptions"
+        )
+        XCTAssertNil(VoiceInkCustomCloudTranscriptionPolicy.endpointURL(from: "http://["))
+        XCTAssertNil(VoiceInkCustomCloudTranscriptionPolicy.endpointURL(from: ""))
+
+        XCTAssertTrue(VoiceInkCustomCloudTranscriptionPolicy.acceptsTranscriptionText("transcript"))
+        XCTAssertFalse(VoiceInkCustomCloudTranscriptionPolicy.acceptsTranscriptionText(""))
+
+        XCTAssertTrue(VoiceInkCustomCloudTranscriptionPolicy.isHTTPAPIError(NSError(
+            domain: VoiceInkCustomCloudTranscriptionPolicy.apiErrorDomain,
+            code: 429
+        )))
+        XCTAssertFalse(VoiceInkCustomCloudTranscriptionPolicy.isHTTPAPIError(NSError(
+            domain: VoiceInkCustomCloudTranscriptionPolicy.apiErrorDomain,
+            code: 99
+        )))
+        XCTAssertFalse(VoiceInkCustomCloudTranscriptionPolicy.isHTTPAPIError(NSError(
+            domain: "Other",
+            code: 429
+        )))
+    }
 }

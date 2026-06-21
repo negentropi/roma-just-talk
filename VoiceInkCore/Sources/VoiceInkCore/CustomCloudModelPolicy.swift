@@ -351,3 +351,27 @@ public enum VoiceInkCustomCloudModelPolicy {
         return url.scheme != nil && url.host != nil
     }
 }
+
+public enum VoiceInkCustomCloudTranscriptionPolicy {
+    public static let apiErrorDomain = "CustomWhisperTranscriptionService"
+    public static let invalidEndpointDescription = "Invalid API endpoint URL"
+
+    public static let openAICompatibleOptions = VoiceInkRemoteTranscriptionOptions(
+        openAICompatibleResponseFormat: "json",
+        openAICompatibleTemperature: "0",
+        openAICompatibleErrorDomain: apiErrorDomain,
+        openAICompatibleAllowsPlainTextFallback: false
+    )
+
+    public static func endpointURL(from endpoint: String) -> URL? {
+        URL(string: endpoint)
+    }
+
+    public static func acceptsTranscriptionText(_ text: String) -> Bool {
+        !text.isEmpty
+    }
+
+    public static func isHTTPAPIError(_ error: NSError) -> Bool {
+        error.domain == apiErrorDomain && (100...599).contains(error.code)
+    }
+}

@@ -101,13 +101,14 @@ class CloudTranscriptionService: TranscriptionService {
         language: String?,
         prompt: String?
     ) async throws -> String {
-        guard let url = URL(string: model.apiEndpoint) else {
+        guard let url = VoiceInkCustomCloudTranscriptionPolicy.endpointURL(from: model.apiEndpoint) else {
             throw NSError(
-                domain: "CustomWhisperTranscriptionService",
+                domain: VoiceInkCustomCloudTranscriptionPolicy.apiErrorDomain,
                 code: -1,
-                userInfo: [NSLocalizedDescriptionKey: "Invalid API endpoint URL"]
+                userInfo: [NSLocalizedDescriptionKey: VoiceInkCustomCloudTranscriptionPolicy.invalidEndpointDescription]
             )
         }
+        let options = VoiceInkCustomCloudTranscriptionPolicy.openAICompatibleOptions
 
         do {
             let text = try await openAICompatibleTranscriptionClient.transcribeAudioData(
@@ -118,19 +119,19 @@ class CloudTranscriptionService: TranscriptionService {
                 fileName: fileName,
                 language: language,
                 prompt: prompt,
-                responseFormat: "json",
-                temperature: "0",
-                errorDomain: "CustomWhisperTranscriptionService",
-                allowPlainTextFallback: false
+                responseFormat: options.openAICompatibleResponseFormat,
+                temperature: options.openAICompatibleTemperature,
+                errorDomain: options.openAICompatibleErrorDomain,
+                allowPlainTextFallback: options.openAICompatibleAllowsPlainTextFallback
             )
-            guard !text.isEmpty else {
+            guard VoiceInkCustomCloudTranscriptionPolicy.acceptsTranscriptionText(text) else {
                 throw CloudTranscriptionError.noTranscriptionReturned
             }
             return text
         } catch let error as CloudTranscriptionError {
             throw error
         } catch let error as NSError
-            where error.domain == "CustomWhisperTranscriptionService" && (100...599).contains(error.code) {
+            where VoiceInkCustomCloudTranscriptionPolicy.isHTTPAPIError(error) {
             throw CloudTranscriptionError.apiRequestFailed(
                 statusCode: error.code,
                 message: error.userInfo[NSLocalizedDescriptionKey] as? String ?? error.localizedDescription

@@ -3415,6 +3415,11 @@ reject_pattern \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
 reject_pattern \
+  "macOS cloud API-key card avoids shallow API-key verification wrappers" \
+  'private var +(isVerifying|canVerifyAPIKey)\b' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift
+
+reject_pattern \
   "macOS cloud API-key card avoids shell-owned verification start branching" \
   'apiKeyFormState = apiKeyFormState\.verifying\(\)|guard let keyToVerify = [A-Za-z0-9]+\.verificationCandidate' \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift

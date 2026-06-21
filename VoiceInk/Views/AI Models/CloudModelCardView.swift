@@ -26,10 +26,6 @@ struct CloudModelCardView: View {
     }
     private let apiKeyVerifier = VoiceInkProviderAPIKeyVerifier()
 
-    private var isVerifying: Bool {
-        apiKeyFormState.verificationProgress.isVerifying
-    }
-    
     private var isConfigured: Bool {
         return APIKeyManager.shared.hasAPIKey(forProvider: model.provider.apiKeyProviderName)
     }
@@ -38,10 +34,6 @@ struct CloudModelCardView: View {
         apiKeyFormState.draft(
             storedRuntimeKey: APIKeyManager.shared.getAPIKey(forProvider: model.provider.apiKeyProviderName)
         )
-    }
-
-    private var canVerifyAPIKey: Bool {
-        apiKeyDraft.canVerify
     }
 
     private var apiKeyCardPresentation: VoiceInkProviderAPIKeyCardPresentation {
@@ -252,7 +244,9 @@ struct CloudModelCardView: View {
     }
     
     private var configurationSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        let verificationProgress = apiKeyFormState.verificationProgress
+
+        return VStack(alignment: .leading, spacing: 12) {
             Text(apiKeyCardPresentation.configurationSectionTitle)
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundColor(Color(.labelColor))
@@ -260,19 +254,19 @@ struct CloudModelCardView: View {
             HStack(spacing: 8) {
                 SecureField(apiKeyCardPresentation.apiKeyFieldPlaceholder, text: $apiKeyFormState.enteredKey)
                     .textFieldStyle(.roundedBorder)
-                    .disabled(isVerifying)
+                    .disabled(verificationProgress.isVerifying)
                 
                 Button(action: verifyAPIKey) {
                     HStack(spacing: 4) {
-                        if isVerifying {
+                        if verificationProgress.isVerifying {
                             ProgressView()
                                 .scaleEffect(0.7)
                                 .frame(width: 12, height: 12)
                         } else {
-                            Image(systemName: apiKeyFormState.verificationProgress.macOSVerifyButtonSystemImageName)
+                            Image(systemName: verificationProgress.macOSVerifyButtonSystemImageName)
                                 .font(.system(size: 12, weight: .medium))
                         }
-                        Text(apiKeyFormState.verificationProgress.macOSVerifyButtonTitle)
+                        Text(verificationProgress.macOSVerifyButtonTitle)
                             .font(.system(size: 12, weight: .medium))
                     }
                     .foregroundColor(.white)
@@ -280,14 +274,14 @@ struct CloudModelCardView: View {
                     .padding(.vertical, 6)
                     .background(
                         Capsule()
-                            .fill(apiKeyFormState.verificationProgress.isSuccess ? Color(.systemGreen) : Color(.controlAccentColor))
+                            .fill(verificationProgress.isSuccess ? Color(.systemGreen) : Color(.controlAccentColor))
                     )
                 }
                 .buttonStyle(.plain)
-                .disabled(!canVerifyAPIKey || isVerifying)
+                .disabled(!apiKeyDraft.canVerify || verificationProgress.isVerifying)
             }
             
-            if let feedback = apiKeyFormState.verificationProgress.macOSInlineFeedback {
+            if let feedback = verificationProgress.macOSInlineFeedback {
                 Text(feedback.text)
                     .font(.caption)
                     .foregroundColor(feedback.tone.macOSStatusColor)

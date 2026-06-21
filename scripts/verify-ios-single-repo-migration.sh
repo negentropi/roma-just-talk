@@ -1891,7 +1891,7 @@ require_pattern \
 
 require_pattern \
   "iOS local model manager uses shared completion policy" \
-  'VoiceInkWhisperModelDownloadResponsePolicy\.completion\(' \
+  'VoiceInkWhisperModelSimpleDownloadCompletionPlan\.completion\(' \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
 require_pattern \
@@ -1917,6 +1917,11 @@ require_pattern \
 require_pattern \
   "shared Whisper model operation alert presentation lives in VoiceInkCore" \
   'VoiceInkWhisperModelOperationAlertPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+
+require_pattern \
+  "shared Whisper simple download completion plan lives in VoiceInkCore" \
+  'VoiceInkWhisperModelSimpleDownloadCompletionPlan|installTemporaryFile|presentFailure' \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
 
 require_pattern \
@@ -2150,6 +2155,11 @@ require_pattern \
 require_pattern \
   "iOS local model manager uses shared operation alert presentation" \
   'VoiceInkWhisperModelOperationAlertPresentation|\.(downloadFailed|serverErrorDuringDownload|noFileReceived|saveFailed)' \
+  iOS/VoiceInk-ios/LocalModelManager.swift
+
+reject_pattern \
+  "iOS local model manager avoids shell-owned download completion failure mapping" \
+  'VoiceInkWhisperModelDownloadResponsePolicy\.completion|serverErrorDuringDownload|noFileReceived|downloadFailed\(for:' \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
 require_pattern \

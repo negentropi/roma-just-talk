@@ -424,6 +424,57 @@ final class WhisperModelFilesTests: XCTestCase {
         )
     }
 
+    func testSimpleDownloadCompletionPlanOwnsIOSFailureAndInstallDecisions() {
+        let url = URL(string: "https://example.com/ggml-base.bin")!
+        let temporaryURL = URL(fileURLWithPath: "/tmp/ggml-base.download")
+        let networkError = NSError(
+            domain: "VoiceInkCoreTests",
+            code: -1,
+            userInfo: [NSLocalizedDescriptionKey: "Offline"]
+        )
+        func response(statusCode: Int) -> HTTPURLResponse {
+            HTTPURLResponse(
+                url: url,
+                statusCode: statusCode,
+                httpVersion: nil,
+                headerFields: nil
+            )!
+        }
+
+        XCTAssertEqual(
+            VoiceInkWhisperModelSimpleDownloadCompletionPlan.completion(
+                temporaryURL: temporaryURL,
+                response: response(statusCode: 200),
+                error: nil
+            ),
+            .installTemporaryFile(temporaryURL)
+        )
+        XCTAssertEqual(
+            VoiceInkWhisperModelSimpleDownloadCompletionPlan.completion(
+                temporaryURL: temporaryURL,
+                response: response(statusCode: 200),
+                error: networkError
+            ),
+            .presentFailure(.downloadFailed(localizedDescription: "Offline"))
+        )
+        XCTAssertEqual(
+            VoiceInkWhisperModelSimpleDownloadCompletionPlan.completion(
+                temporaryURL: temporaryURL,
+                response: response(statusCode: 500),
+                error: nil
+            ),
+            .presentFailure(.serverErrorDuringDownload)
+        )
+        XCTAssertEqual(
+            VoiceInkWhisperModelSimpleDownloadCompletionPlan.completion(
+                temporaryURL: nil,
+                response: response(statusCode: 200),
+                error: nil
+            ),
+            .presentFailure(.noFileReceived)
+        )
+    }
+
     func testSimpleDownloadProgressFormatsIOSProgress() {
         let progress = VoiceInkWhisperModelDownloadProgress.simple(
             modelName: "ggml-base",

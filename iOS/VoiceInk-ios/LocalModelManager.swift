@@ -77,28 +77,17 @@ class LocalModelManager: ObservableObject {
             progressObservations[model.id] = nil
         }
         
-        if let error = error {
-            downloadError = .downloadFailed(for: error)
-            print("LocalModelManager: Download failed for \(model.modelName): \(error)")
-            return
-        }
-        
-        switch VoiceInkWhisperModelDownloadResponsePolicy.completion(
+        switch VoiceInkWhisperModelSimpleDownloadCompletionPlan.completion(
             temporaryURL: temporaryURL,
-            response: response
+            response: response,
+            error: error
         ) {
-        case .serverError:
-            downloadError = .serverErrorDuringDownload
-            print("LocalModelManager: Server error for \(model.modelName)")
-            return
-
-        case .missingTemporaryFile:
-            downloadError = .noFileReceived
-            print("LocalModelManager: Missing downloaded file for \(model.modelName)")
-            return
-
-        case .ready(let temporaryURL):
+        case .installTemporaryFile(let temporaryURL):
             installDownloadedModel(model, from: temporaryURL)
+
+        case .presentFailure(let alert):
+            downloadError = alert
+            print("LocalModelManager: Download failed for \(model.modelName): \(alert.message)")
         }
     }
 

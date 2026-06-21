@@ -79,6 +79,33 @@ public struct VoiceInkWhisperModelOperationAlertPresentation: Equatable, Identif
     }
 }
 
+public enum VoiceInkWhisperModelSimpleDownloadCompletionPlan: Equatable, Sendable {
+    case installTemporaryFile(URL)
+    case presentFailure(VoiceInkWhisperModelOperationAlertPresentation)
+
+    public static func completion(
+        temporaryURL: URL?,
+        response: URLResponse?,
+        error: Error?
+    ) -> Self {
+        if let error {
+            return .presentFailure(.downloadFailed(for: error))
+        }
+
+        switch VoiceInkWhisperModelDownloadResponsePolicy.completion(
+            temporaryURL: temporaryURL,
+            response: response
+        ) {
+        case .ready(let temporaryURL):
+            return .installTemporaryFile(temporaryURL)
+        case .serverError:
+            return .presentFailure(.serverErrorDuringDownload)
+        case .missingTemporaryFile:
+            return .presentFailure(.noFileReceived)
+        }
+    }
+}
+
 public struct VoiceInkWhisperModelOperationConfirmationPresentation: Equatable, Identifiable, Sendable {
     public let id: String
     public let title: String

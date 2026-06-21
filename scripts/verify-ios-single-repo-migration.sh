@@ -4859,7 +4859,7 @@ require_pattern \
 
 require_pattern \
   "shared AI enhancement default text model policy lives in VoiceInkCore" \
-  'defaultTextEnhancementModel|defaultOllamaTextEnhancementModel|legacyOllamaServiceSelectedModelFallback|localCLITextEnhancementModel' \
+  'defaultTextEnhancementModel|defaultOllamaTextEnhancementModel|legacyOllamaServiceSelectedModelFallback|ollamaTextEnhancementRequestTemperature|localCLITextEnhancementModel' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \
@@ -4880,6 +4880,16 @@ require_pattern \
 require_pattern \
   "macOS Ollama service selected-model fallback uses shared policy" \
   'legacyOllamaServiceSelectedModelFallback' \
+  VoiceInk/Services/OllamaService.swift
+
+require_pattern \
+  "macOS Ollama service request temperature uses shared policy" \
+  'ollamaTextEnhancementRequestTemperature' \
+  VoiceInk/Services/OllamaService.swift
+
+reject_pattern \
+  "macOS Ollama service avoids duplicate request temperature policy" \
+  'defaultTemperature|temperature: +0\.3' \
   VoiceInk/Services/OllamaService.swift
 
 require_pattern \

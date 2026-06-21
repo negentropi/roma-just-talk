@@ -277,6 +277,7 @@ public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
     public static let invalidOrMissingBaseURLConfigurationMessage = "Invalid or missing base URL configuration"
     public static let defaultOllamaTextEnhancementModel = "mistral"
     public static let legacyOllamaServiceSelectedModelFallback = "llama2"
+    public static let ollamaTextEnhancementRequestTemperature: Double = 0.3
     public static let localCLITextEnhancementModel = "local-cli"
 
     case cerebras = "Cerebras"

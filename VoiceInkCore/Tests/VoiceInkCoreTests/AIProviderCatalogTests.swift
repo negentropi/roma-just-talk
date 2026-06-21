@@ -657,6 +657,13 @@ final class AIProviderCatalogTests: XCTestCase {
         }
     }
 
+    func testMacOSOllamaRequestTemperaturePolicyIsShared() {
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.ollamaTextEnhancementRequestTemperature,
+            0.3
+        )
+    }
+
     func testMacOSAIEnhancementStaticTextEnhancementModelsAreShared() {
         XCTAssertEqual(
             VoiceInkAIEnhancementProviderKind.groq.staticTextEnhancementModels,

@@ -21,8 +21,6 @@ class OllamaService: ObservableObject {
     @Published var isConnected: Bool = false
     @Published var isLoadingModels: Bool = false
 
-    private let defaultTemperature: Double = 0.3
-
     init() {
         self.baseURL = VoiceInkDynamicAIProviderPreference.ollamaBaseURL(
             fallback: VoiceInkPreferenceDefault.ollamaBaseURL
@@ -88,7 +86,7 @@ class OllamaService: ObservableObject {
                 model: selectedModel,
                 prompt: text,
                 systemPrompt: systemPrompt,
-                temperature: defaultTemperature,
+                temperature: VoiceInkAIEnhancementProviderKind.ollamaTextEnhancementRequestTemperature,
                 think: false,
                 timeout: timeout
             )

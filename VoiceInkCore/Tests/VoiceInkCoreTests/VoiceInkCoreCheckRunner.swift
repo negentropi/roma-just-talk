@@ -103,6 +103,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementModelSelectionFallsBackForBlankAndUnavailableSelections", run: { AIProviderCatalogTests().testMacOSAIEnhancementModelSelectionFallsBackForBlankAndUnavailableSelections() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementModelSelectionKeepsUnavailableOllamaModel", run: { AIProviderCatalogTests().testMacOSAIEnhancementModelSelectionKeepsUnavailableOllamaModel() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementDefaultTextEnhancementModelsAreShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementDefaultTextEnhancementModelsAreShared() }),
+            VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSOllamaRequestTemperaturePolicyIsShared", run: { AIProviderCatalogTests().testMacOSOllamaRequestTemperaturePolicyIsShared() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementStaticTextEnhancementModelsAreShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementStaticTextEnhancementModelsAreShared() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementAvailableModelSourcesAreShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementAvailableModelSourcesAreShared() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementModelCatalogSourcePolicyIsShared", run: { AIProviderCatalogTests().testMacOSAIEnhancementModelCatalogSourcePolicyIsShared() }),

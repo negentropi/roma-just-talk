@@ -53,7 +53,6 @@ enum AppDefaults {
             defaults.set(true, forKey: "DidApplyLaunchAtLoginDefault")
         }
 
-        PunctuationCleanupMode.migrateLegacyUserDefaultIfNeeded()
-        VoiceInkPasteMethod.migrateLegacyUserDefaultIfNeeded()
+        VoiceInkStartupPreferenceMigration.migrateLegacyPreferences(for: .macOS)
     }
 }

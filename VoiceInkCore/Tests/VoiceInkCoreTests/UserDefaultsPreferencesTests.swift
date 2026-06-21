@@ -349,6 +349,31 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testStartupPreferenceMigrationUsesIOSMigrationSet() {
+        withIsolatedDefaults { defaults in
+            defaults.set(true, forKey: PunctuationCleanupMode.legacyRemovePunctuationKey)
+            defaults.set(true, forKey: VoiceInkPasteMethod.legacyAppleScriptPasteKey)
+
+            VoiceInkStartupPreferenceMigration.migrateLegacyPreferences(for: .iOS, in: defaults)
+
+            XCTAssertEqual(PunctuationCleanupMode.current(in: defaults), .removeAll)
+            XCTAssertNil(defaults.string(forKey: VoiceInkPasteMethod.userDefaultsKey))
+        }
+    }
+
+    func testStartupPreferenceMigrationUsesMacOSMigrationSet() {
+        withIsolatedDefaults { defaults in
+            defaults.set(true, forKey: PunctuationCleanupMode.legacyRemovePunctuationKey)
+            defaults.set(true, forKey: VoiceInkPasteMethod.legacyAppleScriptPasteKey)
+
+            VoiceInkStartupPreferenceMigration.migrateLegacyPreferences(for: .macOS, in: defaults)
+
+            XCTAssertEqual(PunctuationCleanupMode.current(in: defaults), .removeAll)
+            XCTAssertEqual(VoiceInkPasteMethod.current(in: defaults), .appleScript)
+            XCTAssertEqual(defaults.string(forKey: VoiceInkPasteMethod.userDefaultsKey), "appleScript")
+        }
+    }
+
     func testOnboardingPreferenceUsesFalseWhenMissing() {
         withIsolatedDefaults { defaults in
             XCTAssertFalse(VoiceInkOnboardingPreference.hasStoredCompletionState(from: defaults))

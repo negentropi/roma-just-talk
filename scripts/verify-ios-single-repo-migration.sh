@@ -2239,14 +2239,45 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/WhisperRuntimeDefaults.swift
 
 require_pattern \
+  "shared local Whisper runtime parameter sink lives in VoiceInkCore" \
+  'VoiceInkWhisperRuntimeFullParameterSink|VoiceInkWhisperRuntimeVADParameterSink|func apply<Parameters: VoiceInkWhisperRuntimeFullParameterSink>' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperRuntimeDefaults.swift
+
+require_pattern \
   "core tests cover shared local Whisper runtime invocation plan" \
   'testRuntimeInvocationPlanKeepsWhisperCStringInputsAlive|testRuntimeInvocationPlanOmitsDisabledWhisperInputs' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/WhisperRuntimeDefaultsTests.swift
+
+require_pattern \
+  "core tests cover shared local Whisper runtime parameter sink" \
+  'testRuntimeConfigurationAppliesSharedWhisperFullParameterSink|testRuntimeConfigurationAppliesSharedWhisperVADParameterSink' \
   VoiceInkCore/Tests/VoiceInkCoreTests/WhisperRuntimeDefaultsTests.swift
 
 require_pattern \
   "core check runner executes shared local Whisper runtime invocation tests" \
   'testRuntimeInvocationPlanKeepsWhisperCStringInputsAlive|testRuntimeInvocationPlanOmitsDisabledWhisperInputs' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core check runner executes shared local Whisper runtime parameter sink tests" \
+  'testRuntimeConfigurationAppliesSharedWhisperFullParameterSink|testRuntimeConfigurationAppliesSharedWhisperVADParameterSink' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "macOS local Whisper adapts whisper.cpp params to shared runtime sink" \
+  'whisper_full_params: VoiceInkWhisperRuntimeFullParameterSink|whisper_vad_params: VoiceInkWhisperRuntimeVADParameterSink|runtimeConfiguration\.apply\(to: &params, makeVADParameters: whisper_vad_default_params\)' \
+  VoiceInk/Transcription/Whisper/LibWhisper.swift
+
+require_pattern \
+  "iOS local Whisper adapts whisper.cpp params to shared runtime sink" \
+  'whisper_full_params: VoiceInkWhisperRuntimeFullParameterSink|whisper_vad_params: VoiceInkWhisperRuntimeVADParameterSink|runtimeConfiguration\.apply\(to: &params, makeVADParameters: whisper_vad_default_params\)' \
+  iOS/VoiceInk-ios/LibWhisper.swift
+
+reject_pattern \
+  "local Whisper adapters avoid shell-owned runtime parameter assignments" \
+  'params\.(print_realtime|print_progress|print_timestamps|print_special|translate|n_threads|offset_ms|no_context|single_segment|temperature|vad_params)[[:space:]]*=|params\.vad[[:space:]]*=|vadParams\.' \
+  VoiceInk/Transcription/Whisper/LibWhisper.swift \
+  iOS/VoiceInk-ios/LibWhisper.swift
 
 require_pattern \
   "shared local Whisper transcript segment policy lives in VoiceInkCore" \

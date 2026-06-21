@@ -194,6 +194,73 @@ public struct VoiceInkWhisperRuntimeConfiguration: Equatable, Sendable {
     }
 }
 
+public protocol VoiceInkWhisperRuntimeVADParameterSink {
+    var threshold: Float { get set }
+    var min_speech_duration_ms: Int32 { get set }
+    var min_silence_duration_ms: Int32 { get set }
+    var max_speech_duration_s: Float { get set }
+    var speech_pad_ms: Int32 { get set }
+    var samples_overlap: Float { get set }
+}
+
+public protocol VoiceInkWhisperRuntimeFullParameterSink {
+    associatedtype VADParameters: VoiceInkWhisperRuntimeVADParameterSink
+
+    var print_realtime: Bool { get set }
+    var print_progress: Bool { get set }
+    var print_timestamps: Bool { get set }
+    var print_special: Bool { get set }
+    var translate: Bool { get set }
+    var n_threads: Int32 { get set }
+    var offset_ms: Int32 { get set }
+    var no_context: Bool { get set }
+    var single_segment: Bool { get set }
+    var temperature: Float { get set }
+    var vad: Bool { get set }
+    var vad_model_path: UnsafePointer<CChar>? { get set }
+    var vad_params: VADParameters { get set }
+}
+
+public extension VoiceInkWhisperRuntimeConfiguration {
+    func apply<Parameters: VoiceInkWhisperRuntimeFullParameterSink>(
+        to params: inout Parameters,
+        makeVADParameters: () -> Parameters.VADParameters
+    ) {
+        params.print_realtime = options.printRealtime
+        params.print_progress = options.printProgress
+        params.print_timestamps = options.printTimestamps
+        params.print_special = options.printSpecial
+        params.translate = options.translate
+        params.n_threads = threadCount
+        params.offset_ms = options.offsetMilliseconds
+        params.no_context = options.noContext
+        params.single_segment = options.singleSegment
+        params.temperature = temperature
+
+        guard let vad else {
+            params.vad = false
+            params.vad_model_path = nil
+            return
+        }
+
+        params.vad = true
+        var vadParams = makeVADParameters()
+        vad.apply(to: &vadParams)
+        params.vad_params = vadParams
+    }
+}
+
+private extension VoiceInkWhisperVADRuntimeConfiguration {
+    func apply<Parameters: VoiceInkWhisperRuntimeVADParameterSink>(to params: inout Parameters) {
+        params.threshold = threshold
+        params.min_speech_duration_ms = minSpeechDurationMs
+        params.min_silence_duration_ms = minSilenceDurationMs
+        params.max_speech_duration_s = maxSpeechDurationSeconds
+        params.speech_pad_ms = speechPadMs
+        params.samples_overlap = samplesOverlap
+    }
+}
+
 public struct VoiceInkWhisperRuntimeInvocationPlan: Equatable, Sendable {
     public let configuration: VoiceInkWhisperRuntimeConfiguration
 

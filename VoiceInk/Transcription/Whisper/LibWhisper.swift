@@ -7,6 +7,8 @@ import whisper
 #endif
 import os
 
+extension whisper_full_params: VoiceInkWhisperRuntimeFullParameterSink {}
+extension whisper_vad_params: VoiceInkWhisperRuntimeVADParameterSink {}
 
 // Meet Whisper C++ constraint: Don't access from more than one thread at a time.
 actor WhisperContext {
@@ -39,35 +41,9 @@ actor WhisperContext {
             vadModelPath: vadModelPath
         )
         let runtimeConfiguration = invocationPlan.configuration
-        
-        params.print_realtime = runtimeConfiguration.options.printRealtime
-        params.print_progress = runtimeConfiguration.options.printProgress
-        params.print_timestamps = runtimeConfiguration.options.printTimestamps
-        params.print_special = runtimeConfiguration.options.printSpecial
-        params.translate = runtimeConfiguration.options.translate
-        params.n_threads = runtimeConfiguration.threadCount
-        params.offset_ms = runtimeConfiguration.options.offsetMilliseconds
-        params.no_context = runtimeConfiguration.options.noContext
-        params.single_segment = runtimeConfiguration.options.singleSegment
-        params.temperature = runtimeConfiguration.temperature
+        runtimeConfiguration.apply(to: &params, makeVADParameters: whisper_vad_default_params)
 
         whisper_reset_timings(context)
-        
-        if let vad = runtimeConfiguration.vad {
-            params.vad = true
-            
-            var vadParams = whisper_vad_default_params()
-            vadParams.threshold = vad.threshold
-            vadParams.min_speech_duration_ms = vad.minSpeechDurationMs
-            vadParams.min_silence_duration_ms = vad.minSilenceDurationMs
-            vadParams.max_speech_duration_s = vad.maxSpeechDurationSeconds
-            vadParams.speech_pad_ms = vad.speechPadMs
-            vadParams.samples_overlap = vad.samplesOverlap
-            params.vad_params = vadParams
-        } else {
-            params.vad = false
-            params.vad_model_path = nil
-        }
 
         return invocationPlan.withUnsafeCStringPointers { languagePointer, promptPointer, vadModelPathPointer in
             params.language = languagePointer

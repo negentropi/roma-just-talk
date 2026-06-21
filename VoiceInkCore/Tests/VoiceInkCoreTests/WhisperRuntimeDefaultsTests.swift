@@ -107,6 +107,73 @@ final class WhisperRuntimeDefaultsTests: XCTestCase {
         }
     }
 
+    func testRuntimeConfigurationAppliesSharedWhisperFullParameterSink() {
+        var params = StubWhisperFullParameters()
+        var madeVADParameters = false
+        let configuration = VoiceInkWhisperRuntimeConfiguration(
+            options: VoiceInkWhisperRuntimeOptions(
+                printRealtime: false,
+                printProgress: true,
+                printTimestamps: false,
+                printSpecial: true,
+                translate: true,
+                offsetMilliseconds: 42,
+                noContext: false,
+                singleSegment: true
+            ),
+            threadCount: 3,
+            temperature: 0.7,
+            vad: nil
+        )
+
+        configuration.apply(to: &params) {
+            madeVADParameters = true
+            return StubWhisperVADParameters()
+        }
+
+        XCTAssertFalse(params.print_realtime)
+        XCTAssertTrue(params.print_progress)
+        XCTAssertFalse(params.print_timestamps)
+        XCTAssertTrue(params.print_special)
+        XCTAssertTrue(params.translate)
+        XCTAssertEqual(params.n_threads, 3)
+        XCTAssertEqual(params.offset_ms, 42)
+        XCTAssertFalse(params.no_context)
+        XCTAssertTrue(params.single_segment)
+        XCTAssertEqual(params.temperature, 0.7, accuracy: 0.0001)
+        XCTAssertFalse(params.vad)
+        XCTAssertNil(params.vad_model_path)
+        XCTAssertFalse(madeVADParameters)
+    }
+
+    func testRuntimeConfigurationAppliesSharedWhisperVADParameterSink() {
+        var params = StubWhisperFullParameters()
+        let configuration = VoiceInkWhisperRuntimeConfiguration(
+            vad: VoiceInkWhisperVADRuntimeConfiguration(
+                modelPath: "/tmp/vad.bin",
+                threshold: 0.65,
+                minSpeechDurationMs: 120,
+                minSilenceDurationMs: 230,
+                maxSpeechDurationSeconds: 45,
+                speechPadMs: 34,
+                samplesOverlap: 0.25
+            )
+        )
+
+        configuration.apply(to: &params) {
+            StubWhisperVADParameters()
+        }
+
+        XCTAssertTrue(params.vad)
+        XCTAssertNil(params.vad_model_path)
+        XCTAssertEqual(params.vad_params.threshold, 0.65, accuracy: 0.0001)
+        XCTAssertEqual(params.vad_params.min_speech_duration_ms, 120)
+        XCTAssertEqual(params.vad_params.min_silence_duration_ms, 230)
+        XCTAssertEqual(params.vad_params.max_speech_duration_s, 45, accuracy: 0.0001)
+        XCTAssertEqual(params.vad_params.speech_pad_ms, 34)
+        XCTAssertEqual(params.vad_params.samples_overlap, 0.25, accuracy: 0.0001)
+    }
+
     func testRuntimeConfigurationNormalizesWhisperRequestLanguage() {
         XCTAssertEqual(
             VoiceInkWhisperRuntimeConfiguration.current(language: " fr ").language,
@@ -221,4 +288,29 @@ final class WhisperRuntimeDefaultsTests: XCTestCase {
     private func errorName(_ error: VoiceInkEngineError) -> String {
         String(describing: error)
     }
+}
+
+private struct StubWhisperFullParameters: VoiceInkWhisperRuntimeFullParameterSink {
+    var print_realtime = true
+    var print_progress = false
+    var print_timestamps = true
+    var print_special = false
+    var translate = false
+    var n_threads: Int32 = 0
+    var offset_ms: Int32 = 0
+    var no_context = true
+    var single_segment = false
+    var temperature: Float = 0
+    var vad = true
+    var vad_model_path: UnsafePointer<CChar>?
+    var vad_params = StubWhisperVADParameters()
+}
+
+private struct StubWhisperVADParameters: VoiceInkWhisperRuntimeVADParameterSink {
+    var threshold: Float = 0
+    var min_speech_duration_ms: Int32 = 0
+    var min_silence_duration_ms: Int32 = 0
+    var max_speech_duration_s: Float = 0
+    var speech_pad_ms: Int32 = 0
+    var samples_overlap: Float = 0
 }

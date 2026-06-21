@@ -2361,6 +2361,11 @@ require_pattern \
   'VoiceInkWhisperModelDownloadProgress\.macOS' \
   VoiceInk/Transcription/Whisper/WhisperModelManager.swift
 
+reject_pattern \
+  "macOS Whisper download progress view avoids shallow progress presentation wrappers" \
+  'private var +progressPresentation\b' \
+  VoiceInk/Transcription/Whisper/WhisperModelManager.swift
+
 require_pattern \
   "macOS model management uses shared filter presentation" \
   'VoiceInkModelManagementFilter\.allCases|filter\.title' \
@@ -7771,6 +7776,11 @@ require_pattern \
 require_pattern \
   "macOS dashboard uses shared metric-card presentation" \
   'ForEach\(metricCardPresentations\)|card\.iconSystemName|card\.detail' \
+  VoiceInk/Views/Metrics/MetricsContent.swift
+
+reject_pattern \
+  "macOS dashboard avoids shallow metric-card presentation wrappers" \
+  'private var +metricCardPresentations\b' \
   VoiceInk/Views/Metrics/MetricsContent.swift
 
 reject_pattern \

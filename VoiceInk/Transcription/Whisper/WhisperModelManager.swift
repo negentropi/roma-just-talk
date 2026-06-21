@@ -373,15 +373,13 @@ struct DownloadProgressView: View {
 
     @Environment(\.colorScheme) private var colorScheme
 
-    private var progressPresentation: VoiceInkWhisperModelDownloadProgress {
-        VoiceInkWhisperModelDownloadProgress.macOS(
+    var body: some View {
+        let progressPresentation = VoiceInkWhisperModelDownloadProgress.macOS(
             modelName: modelName,
             downloadProgress: downloadProgress,
             isOptimizing: isOptimizing
         )
-    }
 
-    var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text(progressPresentation.phaseText)

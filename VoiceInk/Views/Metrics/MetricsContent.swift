@@ -319,6 +319,11 @@ struct MetricsContent: View {
     }
 
     private var metricsSection: some View {
+        let metricCardPresentations = VoiceInkDashboardPresentation.metricCards(
+            isSnapshotLoaded: hasLoadedMetricsSnapshot,
+            metrics: dashboardMetrics
+        )
+
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 210), spacing: 14)], spacing: 14) {
             ForEach(metricCardPresentations) { card in
                 MetricCard(
@@ -390,13 +395,6 @@ struct MetricsContent: View {
 
     private var timeSaved: TimeInterval {
         dashboardMetrics.timeSaved
-    }
-
-    private var metricCardPresentations: [VoiceInkDashboardMetricCardPresentation] {
-        VoiceInkDashboardPresentation.metricCards(
-            isSnapshotLoaded: hasLoadedMetricsSnapshot,
-            metrics: dashboardMetrics
-        )
     }
 }
 

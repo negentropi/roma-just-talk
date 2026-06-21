@@ -146,9 +146,8 @@ struct DictionaryQuickAddView: View {
     @Query private var wordReplacements: [WordReplacement]
 
     @State private var mode: Mode = .vocabulary
-    @State private var wordInput = ""
-    @State private var originalInput = ""
-    @State private var replacementInput = ""
+    @State private var vocabularyDraftState = VoiceInkVocabularyDraftState()
+    @State private var wordReplacementDraftState = VoiceInkWordReplacementDraftState()
     @State private var errorMessage: String?
     @FocusState private var focusedField: Field?
 
@@ -189,9 +188,8 @@ struct DictionaryQuickAddView: View {
             DispatchQueue.main.async { focusedField = .word }
         }
         .onChange(of: mode) { _, newMode in
-            wordInput = ""
-            originalInput = ""
-            replacementInput = ""
+            vocabularyDraftState = VoiceInkVocabularyDraftState()
+            wordReplacementDraftState = VoiceInkWordReplacementDraftState()
             errorMessage = nil
             DispatchQueue.main.async {
                 focusedField = newMode == .vocabulary ? .word : .original
@@ -253,7 +251,7 @@ struct DictionaryQuickAddView: View {
                 .foregroundStyle(.secondary)
             TextField(
                 "",
-                text: $wordInput,
+                text: $vocabularyDraftState.draft,
                 prompt: Text(quickAddPresentation.vocabularyPlaceholder).foregroundColor(.secondary)
             )
                 .textFieldStyle(.roundedBorder)
@@ -274,7 +272,7 @@ struct DictionaryQuickAddView: View {
                     .frame(width: 56, alignment: .trailing)
                 TextField(
                     "",
-                    text: $originalInput,
+                    text: $wordReplacementDraftState.original,
                     prompt: Text(quickAddPresentation.originalPlaceholder).foregroundColor(.secondary)
                 )
                     .textFieldStyle(.roundedBorder)
@@ -290,7 +288,7 @@ struct DictionaryQuickAddView: View {
                     .frame(width: 56, alignment: .trailing)
                 TextField(
                     "",
-                    text: $replacementInput,
+                    text: $wordReplacementDraftState.replacement,
                     prompt: Text(quickAddPresentation.replacementPlaceholder).foregroundColor(.secondary)
                 )
                     .textFieldStyle(.roundedBorder)
@@ -330,37 +328,37 @@ struct DictionaryQuickAddView: View {
     // MARK: - Actions
 
     private func submitVocabulary() {
-        guard VoiceInkDictionaryPolicy.hasVocabularyDraft(wordInput) else { return }
-        let plan = DictionaryService.submitVocabularyDraft(
-            wordInput,
-            existing: Array(vocabularyWords),
+        guard vocabularyDraftState.canSubmit else { return }
+        let submission = vocabularyDraftState.submitting(
+            existingWords: vocabularyWords.map(\.word)
+        )
+        let appliedSubmission = DictionaryService.applyVocabularySubmission(
+            submission,
             context: modelContext
         )
-        if let alertPresentation = plan.alertPresentation {
+        if let alertPresentation = appliedSubmission.alertPresentation {
             errorMessage = alertPresentation.message
             return
         }
-        if plan.shouldComplete {
+        if appliedSubmission.plan.shouldComplete {
             onDismiss()
         }
     }
 
     private func submitReplacement() {
-        guard VoiceInkDictionaryPolicy.canSaveWordReplacementDraft(
-            original: originalInput,
-            replacement: replacementInput
-        ) else { return }
-        let plan = DictionaryService.submitWordReplacementDraft(
-            original: originalInput,
-            replacement: replacementInput,
-            existing: Array(wordReplacements),
+        guard wordReplacementDraftState.canSubmit else { return }
+        let submission = wordReplacementDraftState.submitting(
+            existingOriginalTexts: wordReplacements.map(\.originalText)
+        )
+        let appliedSubmission = DictionaryService.applyWordReplacementSubmission(
+            submission,
             context: modelContext
         )
-        if let alertPresentation = plan.alertPresentation {
+        if let alertPresentation = appliedSubmission.alertPresentation {
             errorMessage = alertPresentation.message
             return
         }
-        if plan.shouldComplete {
+        if appliedSubmission.plan.shouldComplete {
             onDismiss()
         }
     }

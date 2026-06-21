@@ -3553,8 +3553,8 @@ reject_pattern \
   iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \
-  "macOS quick-add vocabulary consumes shared submission result" \
-  'submitVocabularyDraft|alertPresentation\.message|shouldComplete' \
+  "macOS quick-add vocabulary consumes shared draft state submission result" \
+  'VoiceInkVocabularyDraftState|vocabularyDraftState\.submitting|appliedSubmission\.alertPresentation|appliedSubmission\.plan\.shouldComplete' \
   VoiceInk/Views/Dictionary/DictionaryQuickAddPanel.swift
 
 require_pattern \
@@ -3569,8 +3569,13 @@ reject_pattern \
   iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \
-  "macOS quick-add word replacement consumes shared submission result" \
-  'submitWordReplacementDraft|alertPresentation\.message|shouldComplete' \
+  "macOS quick-add word replacement consumes shared draft state submission result" \
+  'VoiceInkWordReplacementDraftState|wordReplacementDraftState\.submitting|appliedSubmission\.alertPresentation|appliedSubmission\.plan\.shouldComplete' \
+  VoiceInk/Views/Dictionary/DictionaryQuickAddPanel.swift
+
+reject_pattern \
+  "macOS quick-add avoids shell-owned dictionary draft submit policy" \
+  'VoiceInkDictionaryPolicy\.(hasVocabularyDraft|canSaveWordReplacementDraft)|@State private var (wordInput|originalInput|replacementInput)\b|submitVocabularyDraft|submitWordReplacementDraft' \
   VoiceInk/Views/Dictionary/DictionaryQuickAddPanel.swift
 
 reject_pattern \

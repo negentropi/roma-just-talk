@@ -5,11 +5,10 @@ struct AudioVisualizerView: View {
     let levels: [Float]
 
     private let barCount = VoiceInkAudioMeterLevel.iOSVisualizerBarCount
-    private let barSpacing: CGFloat = 3
 
     var body: some View {
         GeometryReader { proxy in
-            HStack(alignment: .center, spacing: barSpacing) {
+            HStack(alignment: .center, spacing: CGFloat(VoiceInkAudioMeterLevel.iOSVisualizerBarSpacing)) {
                 ForEach(0..<barCount, id: \.self) { index in
                     Capsule()
                         .fill(Color.secondary.opacity(0.6))
@@ -17,29 +16,26 @@ struct AudioVisualizerView: View {
                             width: barWidth(in: proxy.size),
                             height: barHeight(for: index, in: proxy.size)
                         )
-                        .animation(.easeOut(duration: 0.12), value: levels)
+                        .animation(.easeOut(duration: VoiceInkAudioMeterLevel.iOSVisualizerAnimationDuration), value: levels)
                 }
             }
-            .padding(.horizontal, 2)
+            .padding(.horizontal, CGFloat(VoiceInkAudioMeterLevel.iOSVisualizerHorizontalPadding))
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .frame(height: 48)
+        .frame(height: CGFloat(VoiceInkAudioMeterLevel.iOSVisualizerFrameHeight))
         .accessibilityLabel(VoiceInkAudioMeterLevel.visualizerAccessibilityLabel)
     }
 
     private func barWidth(in size: CGSize) -> CGFloat {
-        max(2, (size.width - 16) / CGFloat(barCount) - barSpacing)
+        CGFloat(VoiceInkAudioMeterLevel.iOSVisualizerBarWidth(containerWidth: Double(size.width)))
     }
 
     private func barHeight(for index: Int, in size: CGSize) -> CGFloat {
-        let level = CGFloat(VoiceInkAudioMeterLevel.visualizerLevel(
+        CGFloat(VoiceInkAudioMeterLevel.iOSVisualizerBarHeight(
             forBarAt: index,
             levels: levels,
-            barCount: barCount
+            containerHeight: Double(size.height)
         ))
-        let minHeight = CGFloat(VoiceInkAudioMeterLevel.iOSVisualizerMinimumBarHeight)
-
-        return minHeight + (size.height - minHeight) * level
     }
 }
 

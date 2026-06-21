@@ -120,7 +120,13 @@ final class AudioMeterLevelTests: XCTestCase {
 
     func testIOSVisualizerBarPolicyPreservesGeometryInputs() {
         XCTAssertEqual(VoiceInkAudioMeterLevel.iOSVisualizerBarCount, 8)
+        XCTAssertEqual(VoiceInkAudioMeterLevel.iOSVisualizerBarSpacing, 3)
+        XCTAssertEqual(VoiceInkAudioMeterLevel.iOSVisualizerBarMinimumWidth, 2)
+        XCTAssertEqual(VoiceInkAudioMeterLevel.iOSVisualizerHorizontalPadding, 2)
+        XCTAssertEqual(VoiceInkAudioMeterLevel.iOSVisualizerWidthInset, 16)
+        XCTAssertEqual(VoiceInkAudioMeterLevel.iOSVisualizerFrameHeight, 48)
         XCTAssertEqual(VoiceInkAudioMeterLevel.iOSVisualizerMinimumBarHeight, 4)
+        XCTAssertEqual(VoiceInkAudioMeterLevel.iOSVisualizerAnimationDuration, 0.12)
     }
 
     func testIOSVisualizerLevelSamplesRecentHistoryAndClampsLevels() {
@@ -153,6 +159,56 @@ final class AudioMeterLevelTests: XCTestCase {
         XCTAssertEqual(
             VoiceInkAudioMeterLevel.visualizerLevel(forBarAt: -1, levels: [0.5], barCount: 1),
             0
+        )
+    }
+
+    func testIOSVisualizerBarWidthPreservesExistingLayoutMath() {
+        XCTAssertEqual(
+            VoiceInkAudioMeterLevel.iOSVisualizerBarWidth(containerWidth: 96),
+            7,
+            accuracy: 0.0001
+        )
+        XCTAssertEqual(
+            VoiceInkAudioMeterLevel.iOSVisualizerBarWidth(containerWidth: 24),
+            VoiceInkAudioMeterLevel.iOSVisualizerBarMinimumWidth,
+            accuracy: 0.0001
+        )
+        XCTAssertEqual(
+            VoiceInkAudioMeterLevel.iOSVisualizerBarWidth(containerWidth: 96, barCount: 0),
+            VoiceInkAudioMeterLevel.iOSVisualizerBarMinimumWidth,
+            accuracy: 0.0001
+        )
+    }
+
+    func testIOSVisualizerBarHeightPreservesExistingLevelMapping() {
+        let levels: [Float] = [0.2, 0.5, 1.0]
+
+        XCTAssertEqual(
+            VoiceInkAudioMeterLevel.iOSVisualizerBarHeight(
+                forBarAt: 0,
+                levels: levels,
+                containerHeight: 48
+            ),
+            48,
+            accuracy: 0.0001
+        )
+        XCTAssertEqual(
+            VoiceInkAudioMeterLevel.iOSVisualizerBarHeight(
+                forBarAt: 1,
+                levels: levels,
+                containerHeight: 48
+            ),
+            26,
+            accuracy: 0.0001
+        )
+        XCTAssertEqual(
+            VoiceInkAudioMeterLevel.iOSVisualizerBarHeight(
+                forBarAt: 0,
+                levels: [],
+                containerHeight: 48
+            ),
+            VoiceInkAudioMeterLevel.iOSVisualizerMinimumBarHeight,
+            accuracy: 0.0001
         )
     }
 }

@@ -1385,7 +1385,7 @@ require_pattern \
 
 require_pattern \
   "shared audio-meter visualizer bar policy lives in VoiceInkCore" \
-  'iOSVisualizerBarCount|iOSVisualizerMinimumBarHeight|visualizerLevel' \
+  'iOSVisualizerBarCount|iOSVisualizerBarSpacing|iOSVisualizerBarMinimumWidth|iOSVisualizerHorizontalPadding|iOSVisualizerWidthInset|iOSVisualizerFrameHeight|iOSVisualizerMinimumBarHeight|iOSVisualizerAnimationDuration|visualizerLevel|iOSVisualizerBarWidth|iOSVisualizerBarHeight' \
   VoiceInkCore/Sources/VoiceInkCore/AudioMeterLevel.swift
 
 require_pattern \
@@ -1395,7 +1395,7 @@ require_pattern \
 
 require_pattern \
   "shared audio-meter visualizer checks run in VoiceInkCore" \
-  'testIOSVisualizer(Level|BarPolicy)' \
+  'testIOSVisualizer(Level|BarPolicy|BarWidth|BarHeight)' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -1429,13 +1429,18 @@ require_pattern \
   iOS/VoiceInk-ios/AudioVisualizerView.swift
 
 require_pattern \
-  "iOS audio visualizer uses shared bar level policy" \
-  'VoiceInkAudioMeterLevel\.visualizerLevel' \
+  "iOS audio visualizer consumes shared geometry policy" \
+  'VoiceInkAudioMeterLevel\.(iOSVisualizerBarSpacing|iOSVisualizerHorizontalPadding|iOSVisualizerFrameHeight|iOSVisualizerAnimationDuration|iOSVisualizerBarWidth|iOSVisualizerBarHeight)' \
+  iOS/VoiceInk-ios/AudioVisualizerView.swift
+
+reject_pattern \
+  "iOS audio visualizer avoids shell-only geometry constants and math" \
+  'barSpacing: CGFloat = 3|duration: 0\.12|\.padding\(\.horizontal, 2\)|\.frame\(height: 48\)|size\.width - 16|max\(2,|size\.height - minHeight' \
   iOS/VoiceInk-ios/AudioVisualizerView.swift
 
 require_pattern \
-  "iOS audio visualizer uses shared minimum bar height policy" \
-  'VoiceInkAudioMeterLevel\.iOSVisualizerMinimumBarHeight' \
+  "iOS audio visualizer uses shared bar-height policy" \
+  'VoiceInkAudioMeterLevel\.iOSVisualizerBarHeight' \
   iOS/VoiceInk-ios/AudioVisualizerView.swift
 
 reject_pattern \

@@ -18,7 +18,13 @@ public enum VoiceInkAudioMeterLevel {
     public static let macOSVisualizerAmplitudeExponent: Double = 0.7
     public static let macOSVisualizerCenterBoostDropoff: Double = 0.4
     public static let iOSVisualizerBarCount = 8
+    public static let iOSVisualizerBarSpacing: Double = 3
+    public static let iOSVisualizerBarMinimumWidth: Double = 2
+    public static let iOSVisualizerHorizontalPadding: Double = 2
+    public static let iOSVisualizerWidthInset: Double = 16
+    public static let iOSVisualizerFrameHeight: Double = 48
     public static let iOSVisualizerMinimumBarHeight: Double = 4
+    public static let iOSVisualizerAnimationDuration: TimeInterval = 0.12
     public static let visualizerAccessibilityLabel = "Audio level visualizer"
 
     public static func normalizedLevel(
@@ -81,6 +87,28 @@ public enum VoiceInkAudioMeterLevel {
         let sourceIndex = max(0, levels.count - 1 - index * step)
         let sourceLevel = levels[sourceIndex]
         return max(0, min(1, sourceLevel))
+    }
+
+    public static func iOSVisualizerBarWidth(
+        containerWidth: Double,
+        barCount: Int = iOSVisualizerBarCount,
+        spacing: Double = iOSVisualizerBarSpacing,
+        widthInset: Double = iOSVisualizerWidthInset,
+        minimumWidth: Double = iOSVisualizerBarMinimumWidth
+    ) -> Double {
+        guard barCount > 0 else { return minimumWidth }
+        return max(minimumWidth, (containerWidth - widthInset) / Double(barCount) - spacing)
+    }
+
+    public static func iOSVisualizerBarHeight(
+        forBarAt index: Int,
+        levels: [Float],
+        containerHeight: Double,
+        barCount: Int = iOSVisualizerBarCount,
+        minimumHeight: Double = iOSVisualizerMinimumBarHeight
+    ) -> Double {
+        let level = Double(visualizerLevel(forBarAt: index, levels: levels, barCount: barCount))
+        return minimumHeight + (containerHeight - minimumHeight) * level
     }
 
     public static func macOSVisualizerBarHeight(

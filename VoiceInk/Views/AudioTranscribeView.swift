@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 import UniformTypeIdentifiers
+import VoiceInkCore
 
 struct AudioTranscribeView: View {
     @Environment(\.modelContext) private var modelContext
@@ -64,17 +65,17 @@ struct AudioTranscribeView: View {
                     .animation(.easeInOut(duration: 0.15), value: isDropTargeted)
 
                 VStack(spacing: 14) {
-                    Image(systemName: "arrow.down.doc")
+                    Image(systemName: VoiceInkAudioImportPresentation.dropTargetSystemImageName)
                         .font(.system(size: 32))
                         .foregroundColor(isDropTargeted ? .accentColor : .gray)
 
-                    Text("Drop audio or video files here")
+                    Text(VoiceInkAudioImportPresentation.dropTargetTitle)
                         .font(.headline)
 
-                    Text("or")
+                    Text(VoiceInkAudioImportPresentation.dropTargetDividerText)
                         .foregroundColor(.secondary)
 
-                    Button("Choose Files") {
+                    Button(VoiceInkAudioImportPresentation.chooseFilesButtonTitle) {
                         selectFiles()
                     }
                     .buttonStyle(.bordered)
@@ -130,7 +131,7 @@ struct AudioTranscribeView: View {
             .formStyle(.grouped)
             .scrollContentBackground(.hidden)
             .safeAreaInset(edge: .bottom) {
-                Text("Drop files anywhere to add more")
+                Text(VoiceInkAudioImportPresentation.dropMoreHintText)
                     .font(.caption)
                     .foregroundColor(.secondary)
                     .frame(maxWidth: .infinity)
@@ -143,7 +144,7 @@ struct AudioTranscribeView: View {
 
     private var topBar: some View {
         HStack(spacing: 10) {
-            Text("\(transcriptionManager.queue.count) file\(transcriptionManager.queue.count == 1 ? "" : "s")")
+            Text(VoiceInkAudioImportPresentation.queueCountText(transcriptionManager.queue.count))
                 .font(.subheadline)
                 .foregroundColor(.secondary)
 
@@ -151,9 +152,9 @@ struct AudioTranscribeView: View {
                 selectFiles()
             } label: {
                 HStack(spacing: 4) {
-                    Image(systemName: "plus")
+                    Image(systemName: VoiceInkAudioImportPresentation.addButtonSystemImageName)
                         .font(.system(size: 12, weight: .medium))
-                    Text("Add")
+                    Text(VoiceInkAudioImportPresentation.addButtonTitle)
                         .font(.system(size: 12, weight: .medium))
                 }
                 .foregroundColor(.secondary)
@@ -165,7 +166,7 @@ struct AudioTranscribeView: View {
                 )
             }
             .buttonStyle(.plain)
-            .help("Add files")
+            .help(VoiceInkAudioImportPresentation.addButtonHelpText)
 
             Spacer()
 
@@ -176,9 +177,9 @@ struct AudioTranscribeView: View {
                     transcriptionManager.cancelProcessing()
                 } label: {
                     HStack(spacing: 4) {
-                        Image(systemName: "stop.fill")
+                        Image(systemName: VoiceInkAudioImportPresentation.cancelButtonSystemImageName)
                             .font(.system(size: 10, weight: .medium))
-                        Text("Cancel")
+                        Text(VoiceInkAudioImportPresentation.cancelButtonTitle)
                             .font(.system(size: 12, weight: .medium))
                     }
                     .foregroundColor(.red)
@@ -190,15 +191,15 @@ struct AudioTranscribeView: View {
                     )
                 }
                 .buttonStyle(.plain)
-                .help("Cancel transcription")
+                .help(VoiceInkAudioImportPresentation.cancelButtonHelpText)
             } else if transcriptionManager.hasPendingItems {
                 Button {
                     transcriptionManager.startProcessing(modelContext: modelContext, engine: engine)
                 } label: {
                     HStack(spacing: 4) {
-                        Image(systemName: "play.fill")
+                        Image(systemName: VoiceInkAudioImportPresentation.startButtonSystemImageName)
                             .font(.system(size: 10, weight: .medium))
-                        Text("Start")
+                        Text(VoiceInkAudioImportPresentation.startButtonTitle)
                             .font(.system(size: 12, weight: .semibold))
                     }
                     .foregroundColor(.white)
@@ -220,9 +221,9 @@ struct AudioTranscribeView: View {
                 }
             } label: {
                 HStack(spacing: 4) {
-                    Image(systemName: "xmark.bin")
+                    Image(systemName: VoiceInkAudioImportPresentation.clearButtonSystemImageName)
                         .font(.system(size: 12, weight: .medium))
-                    Text("Clear")
+                    Text(VoiceInkAudioImportPresentation.clearButtonTitle)
                         .font(.system(size: 12, weight: .medium))
                 }
                 .foregroundColor(.secondary)
@@ -234,7 +235,7 @@ struct AudioTranscribeView: View {
                 )
             }
             .buttonStyle(.plain)
-            .help("Clear all items")
+            .help(VoiceInkAudioImportPresentation.clearButtonHelpText)
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 10)
@@ -242,7 +243,7 @@ struct AudioTranscribeView: View {
 
     private var enhancementControls: some View {
         HStack(spacing: 8) {
-            Toggle("AI Enhancement", isOn: $isEnhancementEnabled)
+            Toggle(VoiceInkAudioImportPresentation.enhancementToggleTitle, isOn: $isEnhancementEnabled)
                 .toggleStyle(.switch)
                 .controlSize(.small)
                 .onChange(of: isEnhancementEnabled) { _, newValue in
@@ -262,7 +263,7 @@ struct AudioTranscribeView: View {
                     }
                 )
 
-                Picker("Prompt", selection: promptBinding) {
+                Picker(VoiceInkAudioImportPresentation.promptPickerTitle, selection: promptBinding) {
                     ForEach(enhancementService.allPrompts) { prompt in
                         Text(prompt.title).tag(prompt.id)
                     }
@@ -287,7 +288,7 @@ struct AudioTranscribeView: View {
                     .fill(Color.accentColor.opacity(0.06))
             )
             .overlay {
-                Text("Drop to add files")
+                Text(VoiceInkAudioImportPresentation.dropOverlayText)
                     .font(.subheadline.weight(.medium))
                     .foregroundColor(.accentColor)
             }

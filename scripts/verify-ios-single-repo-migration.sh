@@ -846,9 +846,29 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/SupportedMedia.swift
 
 require_pattern \
+  "shared audio-file queue status and presentation live in VoiceInkCore" \
+  'VoiceInkAudioFileQueue(Status|ProcessingPhase|Presentation)|VoiceInkAudioImportPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/SupportedMedia.swift
+
+require_pattern \
   "macOS audio import help uses shared supported-media presentation" \
   'VoiceInkSupportedMedia\.supportedFileTypesText' \
   VoiceInk/Views/AudioTranscribeView.swift
+
+require_pattern \
+  "macOS audio import view uses shared queue presentation" \
+  'VoiceInkAudioImportPresentation\.(dropTargetSystemImageName|queueCountText|addButtonTitle|cancelButtonTitle|startButtonTitle|clearButtonTitle|enhancementToggleTitle|promptPickerTitle)' \
+  VoiceInk/Views/AudioTranscribeView.swift
+
+require_pattern \
+  "macOS audio queue item uses shared queue status" \
+  'VoiceInkAudioFileQueueStatus' \
+  VoiceInk/Models/AudioFileQueueItem.swift
+
+require_pattern \
+  "macOS audio file row uses shared queue presentation" \
+  'VoiceInkAudioFileQueuePresentation\.(pendingStatusSystemImageName|pendingStatusText|completedStatusSystemImageName|failedStatusSystemImageName|retryButtonSystemImageName)' \
+  VoiceInk/Views/AudioFileRow.swift
 
 require_pattern \
   "core tests pin supported-media presentation copy" \
@@ -856,14 +876,39 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/SupportedMediaTests.swift
 
 require_pattern \
+  "core tests pin audio-file queue status and presentation" \
+  'testAudioImportPresentationPreservesMacOSQueueCopyAndActions|testAudioFileQueueStatusPreservesTerminalAndProcessingPolicies|testAudioFileQueuePresentationPreservesRowCopyAndIcons' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/SupportedMediaTests.swift
+
+require_pattern \
   "core check runner executes supported-media presentation tests" \
   'testSupportedMediaDisplayExtensionsPreserveMacOSImportCopyOrder|testSupportedMediaDisplayExtensionsMatchAcceptedExtensions' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core check runner executes audio-file queue status and presentation tests" \
+  'testAudioImportPresentationPreservesMacOSQueueCopyAndActions|testAudioFileQueueStatusPreservesTerminalAndProcessingPolicies|testAudioFileQueuePresentationPreservesRowCopyAndIcons' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \
   "macOS audio import view avoids shell-owned supported-media list copy" \
   'Supports WAV|MP3, M4A|OGG, OPUS|OGG, OGA|OPUS, 3GP' \
   VoiceInk/Views/AudioTranscribeView.swift
+
+reject_pattern \
+  "macOS audio import view avoids shell-owned queue copy and action icons" \
+  '"(arrow\.down\.doc|Drop audio or video files here|or|Choose Files|Drop files anywhere to add more|Drop to add files|plus|Add|Add files|stop\.fill|Cancel|Cancel transcription|play\.fill|Start|xmark\.bin|Clear|Clear all items|AI Enhancement|Prompt)"' \
+  VoiceInk/Views/AudioTranscribeView.swift
+
+reject_pattern \
+  "macOS audio queue item avoids shell-owned queue status enum" \
+  'enum +(QueueItemStatus|ProcessingPhase)\b|case +processingAudio = "Processing audio\.\.\."' \
+  VoiceInk/Models/AudioFileQueueItem.swift
+
+reject_pattern \
+  "macOS audio file row avoids shell-owned queue copy and icons" \
+  '"(clock|Waiting|xmark\.circle\.fill|checkmark\.circle\.fill|chevron\.right|cpu|sparkles|exclamationmark\.circle\.fill|arrow\.counterclockwise)"' \
+  VoiceInk/Views/AudioFileRow.swift
 
 require_pattern \
   "macOS audio cleanup clears audio references through shared helper" \

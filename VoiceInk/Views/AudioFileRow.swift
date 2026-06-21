@@ -44,7 +44,7 @@ struct AudioFileRow: View {
 
     private var pendingRow: some View {
         HStack {
-            Image(systemName: "clock")
+            Image(systemName: VoiceInkAudioFileQueuePresentation.pendingStatusSystemImageName)
                 .foregroundColor(.secondary)
 
             Text(item.filename)
@@ -53,14 +53,14 @@ struct AudioFileRow: View {
 
             Spacer()
 
-            Text("Waiting")
+            Text(VoiceInkAudioFileQueuePresentation.pendingStatusText)
                 .font(.caption)
                 .foregroundColor(.secondary)
 
             Button {
                 onRemove()
             } label: {
-                Image(systemName: "xmark.circle.fill")
+                Image(systemName: VoiceInkAudioFileQueuePresentation.removeButtonSystemImageName)
                     .symbolRenderingMode(.hierarchical)
                     .foregroundColor(.secondary)
             }
@@ -70,7 +70,7 @@ struct AudioFileRow: View {
 
     // MARK: - Processing
 
-    private func processingRow(phase: QueueItemStatus.ProcessingPhase) -> some View {
+    private func processingRow(phase: VoiceInkAudioFileQueueProcessingPhase) -> some View {
         HStack {
             ProgressView()
                 .scaleEffect(0.5)
@@ -82,7 +82,7 @@ struct AudioFileRow: View {
 
             Spacer()
 
-            Text(phase.rawValue)
+            Text(phase.displayText)
                 .font(.caption)
                 .foregroundColor(.accentColor)
         }
@@ -93,7 +93,7 @@ struct AudioFileRow: View {
     @ViewBuilder
     private var completedRows: some View {
         HStack {
-            Image(systemName: "checkmark.circle.fill")
+            Image(systemName: VoiceInkAudioFileQueuePresentation.completedStatusSystemImageName)
                 .foregroundColor(.green)
 
             Text(item.filename)
@@ -127,7 +127,7 @@ struct AudioFileRow: View {
                 }
             }
 
-            Image(systemName: "chevron.right")
+            Image(systemName: VoiceInkAudioFileQueuePresentation.expandSystemImageName)
                 .font(.caption2.weight(.semibold))
                 .foregroundColor(.secondary)
                 .rotationEffect(.degrees(isExpanded ? 90 : 0))
@@ -155,12 +155,12 @@ struct AudioFileRow: View {
 
             HStack(spacing: 12) {
                 if let model = transcription.transcriptionModelName {
-                    Label(model, systemImage: "cpu")
+                    Label(model, systemImage: VoiceInkAudioFileQueuePresentation.transcriptionModelSystemImageName)
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
                 if let prompt = transcription.promptName {
-                    Label(prompt, systemImage: "sparkles")
+                    Label(prompt, systemImage: VoiceInkAudioFileQueuePresentation.promptSystemImageName)
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -190,7 +190,7 @@ struct AudioFileRow: View {
 
     private func failedRow(message: String) -> some View {
         HStack {
-            Image(systemName: "exclamationmark.circle.fill")
+            Image(systemName: VoiceInkAudioFileQueuePresentation.failedStatusSystemImageName)
                 .foregroundColor(.red)
 
             VStack(alignment: .leading, spacing: 2) {
@@ -209,7 +209,7 @@ struct AudioFileRow: View {
             Button {
                 onRetry()
             } label: {
-                Image(systemName: "arrow.counterclockwise")
+                Image(systemName: VoiceInkAudioFileQueuePresentation.retryButtonSystemImageName)
             }
             .buttonStyle(.bordered)
             .controlSize(.small)

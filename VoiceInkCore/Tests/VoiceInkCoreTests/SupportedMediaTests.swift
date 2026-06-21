@@ -16,6 +16,53 @@ final class SupportedMediaTests: XCTestCase {
         )
     }
 
+    func testAudioImportPresentationPreservesMacOSQueueCopyAndActions() {
+        XCTAssertEqual(VoiceInkAudioImportPresentation.dropTargetSystemImageName, "arrow.down.doc")
+        XCTAssertEqual(VoiceInkAudioImportPresentation.dropTargetTitle, "Drop audio or video files here")
+        XCTAssertEqual(VoiceInkAudioImportPresentation.dropTargetDividerText, "or")
+        XCTAssertEqual(VoiceInkAudioImportPresentation.chooseFilesButtonTitle, "Choose Files")
+        XCTAssertEqual(VoiceInkAudioImportPresentation.dropMoreHintText, "Drop files anywhere to add more")
+        XCTAssertEqual(VoiceInkAudioImportPresentation.dropOverlayText, "Drop to add files")
+        XCTAssertEqual(VoiceInkAudioImportPresentation.queueCountText(1), "1 file")
+        XCTAssertEqual(VoiceInkAudioImportPresentation.queueCountText(2), "2 files")
+        XCTAssertEqual(VoiceInkAudioImportPresentation.addButtonSystemImageName, "plus")
+        XCTAssertEqual(VoiceInkAudioImportPresentation.addButtonTitle, "Add")
+        XCTAssertEqual(VoiceInkAudioImportPresentation.addButtonHelpText, "Add files")
+        XCTAssertEqual(VoiceInkAudioImportPresentation.cancelButtonSystemImageName, "stop.fill")
+        XCTAssertEqual(VoiceInkAudioImportPresentation.cancelButtonTitle, "Cancel")
+        XCTAssertEqual(VoiceInkAudioImportPresentation.cancelButtonHelpText, "Cancel transcription")
+        XCTAssertEqual(VoiceInkAudioImportPresentation.startButtonSystemImageName, "play.fill")
+        XCTAssertEqual(VoiceInkAudioImportPresentation.startButtonTitle, "Start")
+        XCTAssertEqual(VoiceInkAudioImportPresentation.clearButtonSystemImageName, "xmark.bin")
+        XCTAssertEqual(VoiceInkAudioImportPresentation.clearButtonTitle, "Clear")
+        XCTAssertEqual(VoiceInkAudioImportPresentation.clearButtonHelpText, "Clear all items")
+        XCTAssertEqual(VoiceInkAudioImportPresentation.enhancementToggleTitle, "AI Enhancement")
+        XCTAssertEqual(VoiceInkAudioImportPresentation.promptPickerTitle, "Prompt")
+    }
+
+    func testAudioFileQueueStatusPreservesTerminalAndProcessingPolicies() {
+        XCTAssertFalse(VoiceInkAudioFileQueueStatus.pending.isTerminal)
+        XCTAssertFalse(VoiceInkAudioFileQueueStatus.processing(phase: .loading).isTerminal)
+        XCTAssertTrue(VoiceInkAudioFileQueueStatus.completed.isTerminal)
+        XCTAssertTrue(VoiceInkAudioFileQueueStatus.failed(message: "No model").isTerminal)
+        XCTAssertEqual(VoiceInkAudioFileQueueProcessingPhase.loading.displayText, "Loading model...")
+        XCTAssertEqual(VoiceInkAudioFileQueueProcessingPhase.processingAudio.displayText, "Processing audio...")
+        XCTAssertEqual(VoiceInkAudioFileQueueProcessingPhase.transcribing.displayText, "Transcribing...")
+        XCTAssertEqual(VoiceInkAudioFileQueueProcessingPhase.enhancing.displayText, "Enhancing...")
+    }
+
+    func testAudioFileQueuePresentationPreservesRowCopyAndIcons() {
+        XCTAssertEqual(VoiceInkAudioFileQueuePresentation.pendingStatusSystemImageName, "clock")
+        XCTAssertEqual(VoiceInkAudioFileQueuePresentation.pendingStatusText, "Waiting")
+        XCTAssertEqual(VoiceInkAudioFileQueuePresentation.removeButtonSystemImageName, "xmark.circle.fill")
+        XCTAssertEqual(VoiceInkAudioFileQueuePresentation.completedStatusSystemImageName, "checkmark.circle.fill")
+        XCTAssertEqual(VoiceInkAudioFileQueuePresentation.expandSystemImageName, "chevron.right")
+        XCTAssertEqual(VoiceInkAudioFileQueuePresentation.transcriptionModelSystemImageName, "cpu")
+        XCTAssertEqual(VoiceInkAudioFileQueuePresentation.promptSystemImageName, "sparkles")
+        XCTAssertEqual(VoiceInkAudioFileQueuePresentation.failedStatusSystemImageName, "exclamationmark.circle.fill")
+        XCTAssertEqual(VoiceInkAudioFileQueuePresentation.retryButtonSystemImageName, "arrow.counterclockwise")
+    }
+
     func testSupportedFileExtensionsPreserveMacOSImportPolicy() {
         XCTAssertEqual(
             VoiceInkSupportedMedia.fileExtensions,

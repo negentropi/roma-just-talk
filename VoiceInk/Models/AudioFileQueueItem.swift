@@ -1,26 +1,5 @@
 import Foundation
-
-/// Represents a single audio file in the transcription queue.
-enum QueueItemStatus: Equatable {
-    case pending
-    case processing(phase: ProcessingPhase)
-    case completed
-    case failed(message: String)
-
-    enum ProcessingPhase: String {
-        case loading = "Loading model..."
-        case processingAudio = "Processing audio..."
-        case transcribing = "Transcribing..."
-        case enhancing = "Enhancing..."
-    }
-
-    var isTerminal: Bool {
-        switch self {
-        case .completed, .failed: return true
-        default: return false
-        }
-    }
-}
+import VoiceInkCore
 
 @MainActor
 class AudioFileQueueItem: Identifiable, ObservableObject {
@@ -28,7 +7,7 @@ class AudioFileQueueItem: Identifiable, ObservableObject {
     let url: URL
     let filename: String
 
-    @Published var status: QueueItemStatus = .pending
+    @Published var status: VoiceInkAudioFileQueueStatus = .pending
     @Published var transcription: Transcription?
 
     init(url: URL) {

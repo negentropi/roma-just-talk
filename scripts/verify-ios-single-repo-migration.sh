@@ -2134,7 +2134,7 @@ require_pattern \
 
 require_pattern \
   "iOS local model manager exposes shared management rows" \
-  'VoiceInkWhisperModelManagementList\.rows|managementRows' \
+  'VoiceInkWhisperModelManagementList\.(row|rows)|managementRow' \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
 reject_pattern \
@@ -2193,13 +2193,13 @@ require_pattern \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 require_pattern \
-  "iOS onboarding uses shared download state" \
-  'modelManager\.downloadState\(for: baseModel\)' \
+  "iOS onboarding uses shared model management row" \
+  'modelManager\.managementRow\(for: baseModel\)|row\.presentation' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 require_pattern \
-  "iOS onboarding uses shared operation confirmation presentation" \
-  'VoiceInkWhisperModelOperationConfirmationPresentation|downloadConfirmation' \
+  "iOS onboarding uses shared model download confirmation" \
+  'row\.downloadConfirmation' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 require_pattern \
@@ -2209,7 +2209,12 @@ require_pattern \
 
 require_pattern \
   "iOS onboarding uses shared model row presentation" \
-  'rowPresentation|actionSystemImageName|downloadButtonSystemImageName' \
+  'row\.presentation|actionSystemImageName|downloadButtonSystemImageName' \
+  iOS/VoiceInk-ios/OnboardingView.swift
+
+reject_pattern \
+  "iOS onboarding avoids shell-owned model row assembly" \
+  'baseModelDownloadState|private var +(downloadConfirmation|rowPresentation)|VoiceInkWhisperModel(OperationConfirmation|DownloadRow)Presentation' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 require_pattern \

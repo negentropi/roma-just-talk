@@ -97,22 +97,15 @@ struct ModelDownloadOnboardingView: View {
     @State private var showDownloadConfirmation = false
     private let onboardingPresentation = VoiceInkIOSOnboardingPresentation.modelDownload
     
-    var baseModel = VoiceInkWhisperModelFiles.baseModel
+    private let baseModel = VoiceInkWhisperModelFiles.baseModel
 
-    private var baseModelDownloadState: VoiceInkWhisperModelDownloadState {
-        modelManager.downloadState(for: baseModel)
-    }
-
-    private var downloadConfirmation: VoiceInkWhisperModelOperationConfirmationPresentation {
-        .download(for: baseModel)
-    }
-
-    private var rowPresentation: VoiceInkWhisperModelDownloadRowPresentation {
-        baseModelDownloadState.rowPresentation(for: baseModel)
+    private var baseModelRow: VoiceInkWhisperModelManagementRow {
+        modelManager.managementRow(for: baseModel)
     }
     
     var body: some View {
-        let presentation = rowPresentation
+        let row = baseModelRow
+        let presentation = row.presentation
 
         VStack(spacing: 0) {
             Spacer()
@@ -234,13 +227,13 @@ struct ModelDownloadOnboardingView: View {
                 }
             )
         }
-        .alert(downloadConfirmation.title, isPresented: $showDownloadConfirmation) {
-            Button(downloadConfirmation.primaryButtonTitle) {
+        .alert(row.downloadConfirmation.title, isPresented: $showDownloadConfirmation) {
+            Button(row.downloadConfirmation.primaryButtonTitle) {
                 downloadModel()
             }
-            Button(downloadConfirmation.cancelButtonTitle, role: .cancel) { }
+            Button(row.downloadConfirmation.cancelButtonTitle, role: .cancel) { }
         } message: {
-            Text(downloadConfirmation.message)
+            Text(row.downloadConfirmation.message)
         }
     }
     

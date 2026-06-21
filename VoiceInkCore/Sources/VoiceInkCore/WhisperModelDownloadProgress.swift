@@ -381,16 +381,26 @@ public struct VoiceInkWhisperModelManagementRow: Equatable, Identifiable, Sendab
 }
 
 public enum VoiceInkWhisperModelManagementList {
+    public static func row(
+        for model: VoiceInkWhisperModelFileSpec,
+        downloadState: VoiceInkWhisperModelDownloadState
+    ) -> VoiceInkWhisperModelManagementRow {
+        VoiceInkWhisperModelManagementRow(
+            model: model,
+            presentation: downloadState.rowPresentation(for: model),
+            downloadConfirmation: .download(for: model),
+            deleteConfirmation: .delete(for: model)
+        )
+    }
+
     public static func rows(
         for models: [VoiceInkWhisperModelFileSpec] = VoiceInkWhisperModelFiles.bootstrapModels,
         downloadStateForModel: (VoiceInkWhisperModelFileSpec) -> VoiceInkWhisperModelDownloadState
     ) -> [VoiceInkWhisperModelManagementRow] {
         models.map { model in
-            VoiceInkWhisperModelManagementRow(
-                model: model,
-                presentation: downloadStateForModel(model).rowPresentation(for: model),
-                downloadConfirmation: .download(for: model),
-                deleteConfirmation: .delete(for: model)
+            row(
+                for: model,
+                downloadState: downloadStateForModel(model)
             )
         }
     }

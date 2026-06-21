@@ -4,44 +4,16 @@ import os
 import VoiceInkCore
 
 class PolarService {
-    private let organizationId = "6f3d781d-a630-4435-9dba-058486f2d936"
-    private let baseURL = "https://api.polar.sh"
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "PolarService")
 
-    private func createRequest(endpoint: String, method: String = "POST") -> URLRequest {
-        let url = URL(string: "\(baseURL)\(endpoint)")!
-        var request = URLRequest(url: url)
+    private func createRequest(operation: VoiceInkLicenseOperation, method: String = "POST") -> URLRequest {
+        var request = URLRequest(url: VoiceInkLicenseServicePolicy.requestURL(for: operation))
         request.httpMethod = method
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue(
+            VoiceInkLicenseServicePolicy.jsonContentType,
+            forHTTPHeaderField: VoiceInkLicenseServicePolicy.contentTypeHeaderName
+        )
         return request
-    }
-        
-    struct LicenseValidationResponse: Codable {
-        let status: String
-        let limit_activations: Int?
-        let id: String?
-        let activation: ActivationResponse?
-    }
-    
-    struct ActivationResponse: Codable {
-        let id: String
-    }
-    
-    struct ActivationRequest: Codable {
-        let key: String
-        let organization_id: String
-        let label: String
-        let meta: [String: String]
-    }
-    
-    struct ActivationResult: Codable {
-        let id: String
-        let license_key: LicenseKeyInfo
-    }
-    
-    struct LicenseKeyInfo: Codable {
-        let limit_activations: Int?
-        let status: String
     }
     
     private func getDeviceIdentifier() -> String {
@@ -49,14 +21,7 @@ class PolarService {
             return serialNumber
         }
 
-        let defaults = UserDefaults.standard
-        if let storedId = defaults.string(forKey: "VoiceInkDeviceIdentifier") {
-            return storedId
-        }
-
-        let newId = UUID().uuidString
-        defaults.set(newId, forKey: "VoiceInkDeviceIdentifier")
-        return newId
+        return VoiceInkLicensePreference.deviceIdentifier()
     }
 
     private func getMacSerialNumber() -> String? {
@@ -83,25 +48,19 @@ class PolarService {
     
     // Check if a license key requires activation
     func checkLicenseRequiresActivation(_ key: String) async throws -> (isValid: Bool, requiresActivation: Bool, activationsLimit: Int?) {
-        var request = createRequest(endpoint: "/v1/customer-portal/license-keys/validate")
+        var request = createRequest(operation: .validation)
 
-        let body: [String: Any] = [
-            "key": key,
-            "organization_id": organizationId
-        ]
-
-        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        request.httpBody = try JSONSerialization.data(
+            withJSONObject: VoiceInkLicenseServicePolicy.validationRequestBody(key: key)
+        )
 
         let (data, httpResponse) = try await URLSession.shared.data(for: request)
 
         if let httpResponse = httpResponse as? HTTPURLResponse {
-            if !(200...299).contains(httpResponse.statusCode) {
+            if let error = VoiceInkLicenseServicePolicy.error(forHTTPStatusCode: httpResponse.statusCode, operation: .validation) {
                 let errorMsg = String(data: data, encoding: .utf8) ?? "Unknown error"
                 logger.error("🔑 License validation failed [HTTP \(httpResponse.statusCode)]: \(errorMsg, privacy: .public)")
-                switch httpResponse.statusCode {
-                case 404: throw LicenseError.keyNotFound
-                default:  throw LicenseError.serverError(httpResponse.statusCode)
-                }
+                throw error
             }
         }
 
@@ -110,27 +69,26 @@ class PolarService {
         let statusCode = (httpResponse as? HTTPURLResponse)?.statusCode ?? 0
         logger.notice("🔑 License validation success [HTTP \(statusCode)]: \(rawResponse, privacy: .public)")
         
-        let validationResponse = try JSONDecoder().decode(LicenseValidationResponse.self, from: data)
-        let isValid = validationResponse.status == "granted"
-        
-        // If limit_activations is nil or 0, the license doesn't require activation
-        let requiresActivation = (validationResponse.limit_activations ?? 0) > 0
-        
-        return (isValid: isValid, requiresActivation: requiresActivation, activationsLimit: validationResponse.limit_activations)
+        let validationResponse = try JSONDecoder().decode(VoiceInkLicenseValidationResponse.self, from: data)
+
+        return (
+            isValid: validationResponse.isGranted,
+            requiresActivation: validationResponse.requiresActivation,
+            activationsLimit: validationResponse.limitActivations
+        )
     }
     
     // Activate a license key on this device
     func activateLicenseKey(_ key: String) async throws -> (activationId: String, activationsLimit: Int) {
-        var request = createRequest(endpoint: "/v1/customer-portal/license-keys/activate")
+        var request = createRequest(operation: .activation)
         
         let deviceId = getDeviceIdentifier()
         let hostname = Host.current().localizedName ?? "Unknown Mac"
         
-        let activationRequest = ActivationRequest(
+        let activationRequest = VoiceInkLicenseServicePolicy.activationRequestBody(
             key: key,
-            organization_id: organizationId,
             label: hostname,
-            meta: ["device_id": deviceId]
+            deviceId: deviceId
         )
         
         request.httpBody = try JSONEncoder().encode(activationRequest)
@@ -138,14 +96,10 @@ class PolarService {
         let (data, httpResponse) = try await URLSession.shared.data(for: request)
         
         if let httpResponse = httpResponse as? HTTPURLResponse {
-            if !(200...299).contains(httpResponse.statusCode) {
+            if let error = VoiceInkLicenseServicePolicy.error(forHTTPStatusCode: httpResponse.statusCode, operation: .activation) {
                 let errorMsg = String(data: data, encoding: .utf8) ?? "Unknown error"
                 logger.error("🔑 License activation failed [HTTP \(httpResponse.statusCode)]: \(errorMsg, privacy: .public)")
-                switch httpResponse.statusCode {
-                case 404: throw LicenseError.keyNotFound
-                case 403: throw LicenseError.activationLimitReached
-                default:  throw LicenseError.serverError(httpResponse.statusCode)
-                }
+                throw error
             }
         }
         
@@ -154,33 +108,29 @@ class PolarService {
         let statusCode = (httpResponse as? HTTPURLResponse)?.statusCode ?? 0
         logger.notice("🔑 License activation success [HTTP \(statusCode)]: \(rawResponse, privacy: .public)")
         
-        let activationResult = try JSONDecoder().decode(ActivationResult.self, from: data)
+        let activationResult = try JSONDecoder().decode(VoiceInkLicenseActivationResult.self, from: data)
         
-        return (activationId: activationResult.id, activationsLimit: activationResult.license_key.limit_activations ?? 0)
+        return (activationId: activationResult.id, activationsLimit: activationResult.licenseKey.limitActivations ?? 0)
     }
     
     // Validate a license key with an activation ID
     func validateLicenseKeyWithActivation(_ key: String, activationId: String) async throws -> Bool {
-        var request = createRequest(endpoint: "/v1/customer-portal/license-keys/validate")
+        var request = createRequest(operation: .validation)
         
-        let body: [String: Any] = [
-            "key": key,
-            "organization_id": organizationId,
-            "activation_id": activationId
-        ]
-        
-        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        request.httpBody = try JSONSerialization.data(
+            withJSONObject: VoiceInkLicenseServicePolicy.validationRequestBody(
+                key: key,
+                activationId: activationId
+            )
+        )
         
         let (data, httpResponse) = try await URLSession.shared.data(for: request)
         
         if let httpResponse = httpResponse as? HTTPURLResponse {
-            if !(200...299).contains(httpResponse.statusCode) {
+            if let error = VoiceInkLicenseServicePolicy.error(forHTTPStatusCode: httpResponse.statusCode, operation: .validation) {
                 let errorMsg = String(data: data, encoding: .utf8) ?? "Unknown error"
                 logger.error("🔑 License validation with activation failed [HTTP \(httpResponse.statusCode)]: \(errorMsg, privacy: .public)")
-                switch httpResponse.statusCode {
-                case 404: throw LicenseError.keyNotFound
-                default:  throw LicenseError.serverError(httpResponse.statusCode)
-                }
+                throw error
             }
         }
 
@@ -189,14 +139,8 @@ class PolarService {
         let statusCode = (httpResponse as? HTTPURLResponse)?.statusCode ?? 0
         logger.notice("🔑 License validation with activation success [HTTP \(statusCode)]: \(rawResponse, privacy: .public)")
         
-        let validationResponse = try JSONDecoder().decode(LicenseValidationResponse.self, from: data)
+        let validationResponse = try JSONDecoder().decode(VoiceInkLicenseValidationResponse.self, from: data)
         
-        return validationResponse.status == "granted"
+        return validationResponse.isGranted
     }
-}
-
-enum LicenseError: Error {
-    case keyNotFound             // 404 - key doesn't exist in this org
-    case activationLimitReached  // 403 - device limit hit
-    case serverError(Int)        // unexpected HTTP status
 }

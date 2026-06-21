@@ -8350,8 +8350,18 @@ reject_pattern \
 
 require_pattern \
   "shared license preference policy lives in VoiceInkCore" \
-  'VoiceInkLicensePreference|requiresActivationKey|hasLaunchedBeforeKey|activationsLimitKey|hasUsableStoredLicense' \
+  'VoiceInkLicensePreference|requiresActivationKey|hasLaunchedBeforeKey|activationsLimitKey|deviceIdentifierKey|hasUsableStoredLicense|VoiceInkLicenseServicePolicy|VoiceInkLicenseOperation|VoiceInkLicenseError' \
   VoiceInkCore/Sources/VoiceInkCore/LicensePolicy.swift
+
+require_pattern \
+  "macOS Polar adapter uses shared license service policy" \
+  'VoiceInkLicenseServicePolicy\.(requestURL|validationRequestBody|activationRequestBody|error)|VoiceInkLicensePreference\.deviceIdentifier|VoiceInkLicenseValidationResponse|VoiceInkLicenseActivationResult' \
+  VoiceInk/Services/PolarService.swift
+
+require_pattern \
+  "macOS license view model catches shared license errors" \
+  'VoiceInkLicenseError\.(keyNotFound|activationLimitReached|serverError)' \
+  VoiceInk/Models/LicenseViewModel.swift
 
 require_pattern \
   "macOS license view model uses shared license preference" \
@@ -8365,7 +8375,7 @@ require_pattern \
 
 require_pattern \
   "core checks execute license preference tests" \
-  'LicensePolicyTests\.testLicensePreferenceKeysPreserveExistingStorageNames|LicensePolicyTests\.testLicensePreferenceStorageRoundTripsNonSensitiveFlags|LicensePolicyTests\.testStoredLicenseAccessPreservesExistingActivationRequirementPolicy' \
+  'LicensePolicyTests\.testLicensePreferenceKeysPreserveExistingStorageNames|LicensePolicyTests\.testLicensePreferenceStorageRoundTripsNonSensitiveFlags|LicensePolicyTests\.testDeviceIdentifierCreatesAndStoresFallbackWhenMissing|LicensePolicyTests\.testStoredLicenseAccessPreservesExistingActivationRequirementPolicy|LicensePolicyTests\.testLicenseServicePolicyPreservesPolarEndpointsAndHeaders|LicensePolicyTests\.testLicenseHTTPStatusPolicyPreservesMacOSErrorMapping' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \
@@ -8373,6 +8383,12 @@ reject_pattern \
   '"(VoiceInkLicenseRequiresActivation|VoiceInkHasLaunchedBefore|VoiceInkActivationsLimit)"|extension UserDefaults' \
   VoiceInk/Models/LicenseViewModel.swift \
   VoiceInk/Services/SystemInfoService.swift
+
+reject_pattern \
+  "macOS Polar adapter avoids raw shared license service constants" \
+  '"VoiceInkDeviceIdentifier"|"https://api\.polar\.sh"|"/v1/customer-portal/license-keys/(validate|activate)"|"6f3d781d-a630-4435-9dba-058486f2d936"|enum LicenseError|(^|[^A-Za-z0-9_])LicenseError\.' \
+  VoiceInk/Services/PolarService.swift \
+  VoiceInk/Models/LicenseViewModel.swift
 
 require_pattern \
   "shared Keychain service uses shared app identity" \

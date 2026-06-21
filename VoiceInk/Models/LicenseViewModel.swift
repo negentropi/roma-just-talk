@@ -169,13 +169,13 @@ class LicenseViewModel: ObservableObject {
             validationMessage = "License activated successfully!"
             NotificationCenter.default.post(name: .licenseStatusChanged, object: nil)
 
-        } catch LicenseError.keyNotFound {
+        } catch VoiceInkLicenseError.keyNotFound {
             validationSuccess = false
             validationMessage = "License key not found. Please double-check your key and try again."
-        } catch LicenseError.activationLimitReached {
+        } catch VoiceInkLicenseError.activationLimitReached {
             validationSuccess = false
             validationMessage = "This license has reached its device limit. Visit the License Management Portal to deactivate other devices."
-        } catch LicenseError.serverError(let code) {
+        } catch VoiceInkLicenseError.serverError(let code) {
             validationSuccess = false
             validationMessage = "Server error (\(code)). Please try again later or contact support."
         } catch let urlError as URLError {

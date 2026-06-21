@@ -5522,7 +5522,7 @@ reject_pattern \
 
 require_pattern \
   "shared transcription paste output owns trial-expired prefix" \
-  'trialExpiredPrefix = "Your trial has expired\. Upgrade to VoiceInk Pro at tryvoiceink\.com/buy"' \
+  'trialExpiredPrefix = "Your trial has expired\. Upgrade to VoiceInk Pro at \\\(VoiceInkLicenseLinks\.purchaseDisplayURLString\)"' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionPasteOutputPolicy.swift
 
 require_pattern \
@@ -8536,7 +8536,7 @@ reject_pattern \
 
 require_pattern \
   "shared license preference policy lives in VoiceInkCore" \
-  'VoiceInkLicensePreference|requiresActivationKey|hasLaunchedBeforeKey|activationsLimitKey|deviceIdentifierKey|hasUsableStoredLicense|VoiceInkLicenseStartupPolicy|VoiceInkLicenseStartupPlan|VoiceInkLicenseState|VoiceInkLicenseValidationPolicy|VoiceInkLicenseValidationFeedback|VoiceInkLicenseValidationApplicationPlan|VoiceInkLicenseServicePolicy|VoiceInkLicenseOperation|VoiceInkLicenseError|VoiceInkLicenseSecureStorageAccount|VoiceInkLicenseSecureStoragePolicy' \
+  'VoiceInkLicensePreference|requiresActivationKey|hasLaunchedBeforeKey|activationsLimitKey|deviceIdentifierKey|hasUsableStoredLicense|VoiceInkLicenseStartupPolicy|VoiceInkLicenseStartupPlan|VoiceInkLicenseState|VoiceInkLicenseLinks|purchaseURLString|purchaseDisplayURLString|managementPortalURLString|VoiceInkLicenseValidationPolicy|VoiceInkLicenseValidationFeedback|VoiceInkLicenseValidationApplicationPlan|VoiceInkLicenseServicePolicy|VoiceInkLicenseOperation|VoiceInkLicenseError|VoiceInkLicenseSecureStorageAccount|VoiceInkLicenseSecureStoragePolicy' \
   VoiceInkCore/Sources/VoiceInkCore/LicensePolicy.swift
 
 require_pattern \
@@ -8580,18 +8580,33 @@ require_pattern \
   VoiceInk/Models/LicenseViewModel.swift
 
 require_pattern \
+  "macOS license view model opens shared purchase link" \
+  'VoiceInkLicenseLinks\.purchaseURL' \
+  VoiceInk/Models/LicenseViewModel.swift
+
+require_pattern \
+  "macOS license management view opens shared license links" \
+  'VoiceInkLicenseLinks\.(purchaseURL|managementPortalURL)' \
+  VoiceInk/Views/LicenseManagementView.swift
+
+require_pattern \
+  "macOS trial message opens shared purchase link" \
+  'VoiceInkLicenseLinks\.purchaseURL' \
+  VoiceInk/Views/Components/TrialMessageView.swift
+
+require_pattern \
   "macOS diagnostics use shared license access policy" \
   'VoiceInkLicensePreference\.hasUsableStoredLicense' \
   VoiceInk/Services/SystemInfoService.swift
 
 require_pattern \
   "core checks execute license preference tests" \
-  'LicensePolicyTests\.testLicensePreferenceKeysPreserveExistingStorageNames|LicensePolicyTests\.testLicensePreferenceStorageRoundTripsNonSensitiveFlags|LicensePolicyTests\.testDeviceIdentifierCreatesAndStoresFallbackWhenMissing|LicensePolicyTests\.testStoredLicenseAccessPreservesExistingActivationRequirementPolicy|LicensePolicyTests\.testLicenseStartupPolicyPlansStoredLicenseAndTrialLifecycle|LicensePolicyTests\.testLicenseValidationPolicyPreservesMacOSFeedbackMessages|LicensePolicyTests\.testLicenseValidationApplicationPlansPreserveMacOSStorageWritesAndSuccessCopy|LicensePolicyTests\.testLicenseSecureStoragePolicyPreservesDeviceLocalAccountsAndTrialDateCodec|LicensePolicyTests\.testLicenseServicePolicyPreservesPolarEndpointsAndHeaders|LicensePolicyTests\.testLicenseHTTPStatusPolicyPreservesMacOSErrorMapping' \
+  'LicensePolicyTests\.testLicensePreferenceKeysPreserveExistingStorageNames|LicensePolicyTests\.testLicensePreferenceStorageRoundTripsNonSensitiveFlags|LicensePolicyTests\.testDeviceIdentifierCreatesAndStoresFallbackWhenMissing|LicensePolicyTests\.testStoredLicenseAccessPreservesExistingActivationRequirementPolicy|LicensePolicyTests\.testLicenseStartupPolicyPlansStoredLicenseAndTrialLifecycle|LicensePolicyTests\.testLicenseValidationPolicyPreservesMacOSFeedbackMessages|LicensePolicyTests\.testLicenseValidationApplicationPlansPreserveMacOSStorageWritesAndSuccessCopy|LicensePolicyTests\.testLicenseLinksPreservePurchaseAndManagementDestinations|LicensePolicyTests\.testLicenseSecureStoragePolicyPreservesDeviceLocalAccountsAndTrialDateCodec|LicensePolicyTests\.testLicenseServicePolicyPreservesPolarEndpointsAndHeaders|LicensePolicyTests\.testLicenseHTTPStatusPolicyPreservesMacOSErrorMapping' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "migration checklist tracks shared license secure storage policy" \
-  'license startup/trial lifecycle.*validation feedback/application planning.*license Keychain account names, trial-start timestamp coding, device-local syncability.*VoiceInkLicenseStartupPolicy`/`VoiceInkLicenseValidationPolicy`/`VoiceInkLicenseSecureStorageAccount`/`VoiceInkLicenseSecureStoragePolicy' \
+  'license startup/trial lifecycle.*validation feedback/application planning.*purchase/management URL policy.*license Keychain account names, trial-start timestamp coding, device-local syncability.*VoiceInkLicenseStartupPolicy`/`VoiceInkLicenseValidationPolicy`/`VoiceInkLicenseLinks`/`VoiceInkLicenseSecureStorageAccount`/`VoiceInkLicenseSecureStoragePolicy' \
   docs/ios-single-repo-migration.md
 
 reject_pattern \
@@ -8604,6 +8619,14 @@ reject_pattern \
   "macOS license view model avoids raw validation feedback copy" \
   '"(Please enter a license key|This license has been revoked or disabled\. Please contact support\.|License activated successfully!|License validated successfully!|License key not found\. Please double-check your key and try again\.|This license has reached its device limit\. Visit the License Management Portal to deactivate other devices\.|Could not reach the server\. Please check your internet connection and try again\.|An unexpected error occurred\. Please try again or contact support at support@tryvoiceink\.com)"|Server error \(' \
   VoiceInk/Models/LicenseViewModel.swift
+
+reject_pattern \
+  "license consumers avoid raw license links" \
+  'https://tryvoiceink\.com/buy|https://polar\.sh/beingpax/portal/request' \
+  VoiceInk/Models/LicenseViewModel.swift \
+  VoiceInk/Views/LicenseManagementView.swift \
+  VoiceInk/Views/Components/TrialMessageView.swift \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionPasteOutputPolicy.swift
 
 reject_pattern \
   "macOS license manager avoids raw secure license storage policy" \

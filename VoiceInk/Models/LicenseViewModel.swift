@@ -85,10 +85,7 @@ class LicenseViewModel: ObservableObject {
     }
 
     func openPurchaseLink() {
-        if let url = URL(string: "https://tryvoiceink.com/buy") {
-            NSWorkspace.shared.open(url)
-            return
-        }
+        NSWorkspace.shared.open(VoiceInkLicenseLinks.purchaseURL)
     }
     
     func validateLicense() async {

@@ -184,6 +184,20 @@ public enum VoiceInkLicenseError: Error, Equatable {
     case serverError(Int)
 }
 
+public enum VoiceInkLicenseLinks {
+    public static let purchaseURLString = "https://tryvoiceink.com/buy"
+    public static let purchaseDisplayURLString = "tryvoiceink.com/buy"
+    public static let managementPortalURLString = "https://polar.sh/beingpax/portal/request"
+
+    public static var purchaseURL: URL {
+        URL(string: purchaseURLString)!
+    }
+
+    public static var managementPortalURL: URL {
+        URL(string: managementPortalURLString)!
+    }
+}
+
 public struct VoiceInkLicenseValidationFeedback: Equatable, Sendable {
     public let isSuccess: Bool
     public let message: String

@@ -1,4 +1,5 @@
 import SwiftUI
+import VoiceInkCore
 
 struct TrialMessageView: View {
     let message: String
@@ -37,9 +38,7 @@ struct TrialMessageView: View {
                 .buttonStyle(.bordered)
 
                 Button(action: {
-                    if let url = URL(string: "https://tryvoiceink.com/buy") {
-                        NSWorkspace.shared.open(url)
-                    }
+                    NSWorkspace.shared.open(VoiceInkLicenseLinks.purchaseURL)
                 }) {
                     Text("Buy License")
                         .font(.system(size: 13, weight: .medium))
@@ -83,4 +82,4 @@ struct TrialMessageView: View {
         case .info: return Color.blue.opacity(0.1)
         }
     }
-} 
+}

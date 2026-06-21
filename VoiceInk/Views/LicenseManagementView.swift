@@ -1,4 +1,5 @@
 import SwiftUI
+import VoiceInkCore
 
 struct LicenseManagementView: View {
     @StateObject private var licenseViewModel = LicenseViewModel()
@@ -126,9 +127,7 @@ struct LicenseManagementView: View {
                 
                 // Purchase Button 
                 Button(action: {
-                    if let url = URL(string: "https://tryvoiceink.com/buy") {
-                        NSWorkspace.shared.open(url)
-                    }
+                    NSWorkspace.shared.open(VoiceInkLicenseLinks.purchaseURL)
                 }) {
                     Text("Upgrade to VoiceInk Pro")
                         .font(.headline)
@@ -199,9 +198,7 @@ struct LicenseManagementView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
 
                     Button(action: {
-                        if let url = URL(string: "https://polar.sh/beingpax/portal/request") {
-                            NSWorkspace.shared.open(url)
-                        }
+                        NSWorkspace.shared.open(VoiceInkLicenseLinks.managementPortalURL)
                     }) {
                         Text("License Management Portal")
                             .frame(width: 180)
@@ -305,5 +302,4 @@ struct LicenseManagementView: View {
         }
     }
 }
-
 

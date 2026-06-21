@@ -38,7 +38,7 @@ public enum VoiceInkAppendTrailingSpacePreference {
 }
 
 public enum VoiceInkTranscriptionPasteOutputPolicy {
-    public static let trialExpiredPrefix = "Your trial has expired. Upgrade to VoiceInk Pro at tryvoiceink.com/buy"
+    public static let trialExpiredPrefix = "Your trial has expired. Upgrade to VoiceInk Pro at \(VoiceInkLicenseLinks.purchaseDisplayURLString)"
 
     public struct CursorPasteTextPlan: Equatable, Sendable {
         public let text: String

@@ -273,6 +273,20 @@ final class LicensePolicyTests: XCTestCase {
         )
     }
 
+    func testLicenseLinksPreservePurchaseAndManagementDestinations() {
+        XCTAssertEqual(VoiceInkLicenseLinks.purchaseURLString, "https://tryvoiceink.com/buy")
+        XCTAssertEqual(VoiceInkLicenseLinks.purchaseDisplayURLString, "tryvoiceink.com/buy")
+        XCTAssertEqual(VoiceInkLicenseLinks.purchaseURL.absoluteString, "https://tryvoiceink.com/buy")
+        XCTAssertEqual(
+            VoiceInkLicenseLinks.managementPortalURLString,
+            "https://polar.sh/beingpax/portal/request"
+        )
+        XCTAssertEqual(
+            VoiceInkLicenseLinks.managementPortalURL.absoluteString,
+            "https://polar.sh/beingpax/portal/request"
+        )
+    }
+
     func testLicenseSecureStoragePolicyPreservesDeviceLocalAccountsAndTrialDateCodec() {
         XCTAssertEqual(
             VoiceInkLicenseSecureStorageAccount.allCases.map(\.key),

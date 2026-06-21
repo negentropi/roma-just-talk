@@ -4903,7 +4903,7 @@ reject_pattern \
 
 reject_pattern \
   "macOS edit replacement sheet avoids shell-owned edit policy" \
-  'VoiceInkDictionaryPolicy\.canSaveWordReplacementDraft|@State private var (originalWord|replacementWord)\b' \
+  'VoiceInkDictionaryPolicy\.canSaveWordReplacementDraft|@State private var (originalWord|replacementWord)\b|private var +canSave\b|guard +editState\.canSave' \
   VoiceInk/Views/Dictionary/EditReplacementSheet.swift
 
 reject_pattern \

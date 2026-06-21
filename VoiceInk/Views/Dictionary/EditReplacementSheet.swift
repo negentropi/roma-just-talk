@@ -56,7 +56,7 @@ struct EditReplacementSheet: View {
             Button(editPresentation.saveButtonTitle) { saveChanges() }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.small)
-                .disabled(!canSave)
+                .disabled(!editState.canSave)
                 .keyboardShortcut(.return, modifiers: [])
         }
         .padding(.horizontal)
@@ -124,16 +124,8 @@ struct EditReplacementSheet: View {
         }
     }
 
-    private var canSave: Bool {
-        editState.canSave
-    }
-
     // MARK: – Actions
     private func saveChanges() {
-        guard canSave else {
-            return
-        }
-
         let submission = DictionaryService.updateWordReplacement(
             replacement,
             editState: editState,

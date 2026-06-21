@@ -6008,7 +6008,7 @@ reject_pattern \
 
 reject_pattern \
   "macOS AI enhancement service avoids shallow retry-on-timeout preference wrapper" \
-  'private +var +retryOnTimeout\b' \
+  'private +var +retryOnTimeout\b|case +\.timeout +where +retryOnTimeout\b' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
 reject_pattern \

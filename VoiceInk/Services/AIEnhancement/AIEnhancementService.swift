@@ -308,6 +308,7 @@ class AIEnhancementService: ObservableObject {
             logRetryFailure(
                 error,
                 attempts: state.maxAttempts,
+                retryOnTimeoutEnabled: state.retryOnTimeout,
                 transportNetworkFailure: transportNetworkFailure
             )
             throw error
@@ -317,10 +318,11 @@ class AIEnhancementService: ObservableObject {
     private func logRetryFailure(
         _ error: VoiceInkAIEnhancementError,
         attempts: Int,
+        retryOnTimeoutEnabled: Bool,
         transportNetworkFailure: Bool
     ) {
         switch error {
-        case .timeout where retryOnTimeout:
+        case .timeout where retryOnTimeoutEnabled:
             logger.error("Request timed out after \(attempts, privacy: .public) retries.")
         case .timeout:
             logger.error("Request timed out, failing immediately (retry disabled).")

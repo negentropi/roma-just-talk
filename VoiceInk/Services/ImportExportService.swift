@@ -170,7 +170,8 @@ class ImportExportService {
             isSoundFeedbackEnabled: soundManager.isEnabled,
             isSystemMuteEnabled: mediaController.isSystemMuteEnabled,
             isPauseMediaEnabled: playbackController.isPauseMediaEnabled,
-            audioResumptionDelay: mediaController.audioResumptionDelay
+            audioResumptionDelay: mediaController.audioResumptionDelay,
+            isExperimentalFeaturesEnabled: VoiceInkRecordingFeedbackPreference.isExperimentalFeaturesEnabled()
         )
         let pasteBackupPreferences = VoiceInkPastePreference.backupPreferences(
             shouldRestoreClipboardAfterPaste: VoiceInkPastePreference.shouldRestoreClipboardAfterPaste(),
@@ -237,7 +238,7 @@ class ImportExportService {
             punctuationCleanupMode: transcriptionCleanupBackupPreferences.punctuationCleanupMode,
             removePunctuation: transcriptionCleanupBackupPreferences.removePunctuation,
             lowercaseTranscription: transcriptionCleanupBackupPreferences.lowercaseTranscription,
-            isExperimentalFeaturesEnabled: VoiceInkRecordingFeedbackPreference.isExperimentalFeaturesEnabled(),
+            isExperimentalFeaturesEnabled: recordingFeedbackBackupPreferences.isExperimentalFeaturesEnabled,
             restoreClipboardAfterPaste: pasteBackupPreferences.shouldRestoreClipboardAfterPaste,
             clipboardRestoreDelay: pasteBackupPreferences.clipboardRestoreDelay,
             rollingBufferPreloadModeRawValue: rollingBufferBackupPreferences.preloadModeRawValue,

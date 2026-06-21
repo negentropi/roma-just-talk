@@ -6409,6 +6409,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
 
 require_pattern \
+  "shared recording feedback backup preferences carry experimental flag" \
+  'isExperimentalFeaturesEnabled: Bool\?' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+
+require_pattern \
   "shared recording feedback backup import plan lives in VoiceInkCore" \
   'struct VoiceInkRecordingFeedbackBackupImportPlan' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
@@ -6430,7 +6435,12 @@ require_pattern \
 
 require_pattern \
   "shared recording feedback backup import policy handles experimental pause-media fallback" \
-  'shouldDisablePauseMediaForExperimentalImport|experimentalFeaturesEnabled: Bool\?' \
+  'shouldDisablePauseMediaForExperimentalImport' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+
+require_pattern \
+  "shared recording feedback backup import policy reads experimental flag from preferences" \
+  'preferences\.isExperimentalFeaturesEnabled' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
 
 require_pattern \
@@ -6494,6 +6504,11 @@ require_pattern \
   VoiceInk/Services/ImportExportService.swift
 
 require_pattern \
+  "macOS backup export emits experimental flag from shared recording feedback preferences" \
+  'recordingFeedbackBackupPreferences\.isExperimentalFeaturesEnabled' \
+  VoiceInk/Services/ImportExportService.swift
+
+require_pattern \
   "macOS backup import uses shared recording feedback backup import plan" \
   'VoiceInkRecordingFeedbackPreference\.backupImportPlan' \
   VoiceInk/Services/BackupImporter.swift
@@ -6505,7 +6520,7 @@ require_pattern \
 
 reject_pattern \
   "macOS backup import avoids shell-owned recording feedback planning" \
-  'general\.(isSoundFeedbackEnabled|isSystemMuteEnabled|isPauseMediaEnabled|audioResumptionDelay)|mediaController\.isSystemMuteEnabled' \
+  'general\.(isSoundFeedbackEnabled|isSystemMuteEnabled|isPauseMediaEnabled|audioResumptionDelay|isExperimentalFeaturesEnabled)|mediaController\.isSystemMuteEnabled' \
   VoiceInk/Services/BackupImporter.swift
 
 reject_pattern \
@@ -6548,7 +6563,7 @@ reject_pattern \
 
 require_pattern \
   "migration checklist tracks shared recording feedback preference gate" \
-  'macOS recording feedback preferences route through `VoiceInkSystemMuteMode`/`VoiceInkRecordingFeedbackPreference`, including experimental-feature backup import fallback.*VoiceInkCustomSoundPreference' \
+  'macOS recording feedback preferences route through `VoiceInkSystemMuteMode`/`VoiceInkRecordingFeedbackPreference`, including experimental-feature backup import/export, pause-media fallback.*VoiceInkCustomSoundPreference' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

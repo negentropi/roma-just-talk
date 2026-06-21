@@ -147,8 +147,7 @@ enum BackupImporter {
         }
 
         let recordingFeedbackImportPlan = VoiceInkRecordingFeedbackPreference.backupImportPlan(
-            from: general.recordingFeedbackBackupPreferences,
-            experimentalFeaturesEnabled: general.isExperimentalFeaturesEnabled
+            from: general.recordingFeedbackBackupPreferences
         )
         if let soundFeedback = recordingFeedbackImportPlan.isSoundFeedbackEnabled {
             soundManager.isEnabled = soundFeedback

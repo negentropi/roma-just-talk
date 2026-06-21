@@ -115,7 +115,8 @@ extension GeneralBackup {
             isSoundFeedbackEnabled: isSoundFeedbackEnabled,
             isSystemMuteEnabled: isSystemMuteEnabled,
             isPauseMediaEnabled: isPauseMediaEnabled,
-            audioResumptionDelay: audioResumptionDelay
+            audioResumptionDelay: audioResumptionDelay,
+            isExperimentalFeaturesEnabled: isExperimentalFeaturesEnabled
         )
     }
 

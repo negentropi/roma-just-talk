@@ -70,17 +70,20 @@ public struct VoiceInkRecordingFeedbackBackupPreferences: Codable, Equatable, Se
     public let isSystemMuteEnabled: Bool?
     public let isPauseMediaEnabled: Bool?
     public let audioResumptionDelay: Double?
+    public let isExperimentalFeaturesEnabled: Bool?
 
     public init(
         isSoundFeedbackEnabled: Bool?,
         isSystemMuteEnabled: Bool?,
         isPauseMediaEnabled: Bool?,
-        audioResumptionDelay: Double?
+        audioResumptionDelay: Double?,
+        isExperimentalFeaturesEnabled: Bool? = nil
     ) {
         self.isSoundFeedbackEnabled = isSoundFeedbackEnabled
         self.isSystemMuteEnabled = isSystemMuteEnabled
         self.isPauseMediaEnabled = isPauseMediaEnabled
         self.audioResumptionDelay = audioResumptionDelay
+        self.isExperimentalFeaturesEnabled = isExperimentalFeaturesEnabled
     }
 }
 
@@ -431,26 +434,27 @@ public enum VoiceInkRecordingFeedbackPreference {
         isSoundFeedbackEnabled: Bool,
         isSystemMuteEnabled: Bool,
         isPauseMediaEnabled: Bool,
-        audioResumptionDelay: Double
+        audioResumptionDelay: Double,
+        isExperimentalFeaturesEnabled: Bool
     ) -> VoiceInkRecordingFeedbackBackupPreferences {
         VoiceInkRecordingFeedbackBackupPreferences(
             isSoundFeedbackEnabled: isSoundFeedbackEnabled,
             isSystemMuteEnabled: isSystemMuteEnabled,
             isPauseMediaEnabled: isPauseMediaEnabled,
-            audioResumptionDelay: audioResumptionDelay
+            audioResumptionDelay: audioResumptionDelay,
+            isExperimentalFeaturesEnabled: isExperimentalFeaturesEnabled
         )
     }
 
     public static func backupImportPlan(
-        from preferences: VoiceInkRecordingFeedbackBackupPreferences,
-        experimentalFeaturesEnabled: Bool? = nil
+        from preferences: VoiceInkRecordingFeedbackBackupPreferences
     ) -> VoiceInkRecordingFeedbackBackupImportPlan {
         VoiceInkRecordingFeedbackBackupImportPlan(
             isSoundFeedbackEnabled: preferences.isSoundFeedbackEnabled,
             systemMuteMode: preferences.isSystemMuteEnabled.map { $0 ? .always : .never },
             isPauseMediaEnabled: preferences.isPauseMediaEnabled,
             audioResumptionDelay: preferences.audioResumptionDelay,
-            isExperimentalFeaturesEnabled: experimentalFeaturesEnabled
+            isExperimentalFeaturesEnabled: preferences.isExperimentalFeaturesEnabled
         )
     }
 }

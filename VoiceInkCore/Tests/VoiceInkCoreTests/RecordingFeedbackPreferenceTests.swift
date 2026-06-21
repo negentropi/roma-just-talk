@@ -294,9 +294,9 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
                 isSoundFeedbackEnabled: nil,
                 isSystemMuteEnabled: nil,
                 isPauseMediaEnabled: true,
-                audioResumptionDelay: nil
-            ),
-            experimentalFeaturesEnabled: false
+                audioResumptionDelay: nil,
+                isExperimentalFeaturesEnabled: false
+            )
         )
 
         XCTAssertEqual(disabledImportPlan.isExperimentalFeaturesEnabled, false)
@@ -307,9 +307,9 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
                 isSoundFeedbackEnabled: nil,
                 isSystemMuteEnabled: nil,
                 isPauseMediaEnabled: true,
-                audioResumptionDelay: nil
-            ),
-            experimentalFeaturesEnabled: true
+                audioResumptionDelay: nil,
+                isExperimentalFeaturesEnabled: true
+            )
         )
 
         XCTAssertEqual(enabledImportPlan.isExperimentalFeaturesEnabled, true)
@@ -334,13 +334,15 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
                 isSoundFeedbackEnabled: true,
                 isSystemMuteEnabled: false,
                 isPauseMediaEnabled: true,
-                audioResumptionDelay: 3.0
+                audioResumptionDelay: 3.0,
+                isExperimentalFeaturesEnabled: true
             ),
             VoiceInkRecordingFeedbackBackupPreferences(
                 isSoundFeedbackEnabled: true,
                 isSystemMuteEnabled: false,
                 isPauseMediaEnabled: true,
-                audioResumptionDelay: 3.0
+                audioResumptionDelay: 3.0,
+                isExperimentalFeaturesEnabled: true
             )
         )
     }

@@ -161,4 +161,67 @@ final class TranscriptionRunPreparationTests: XCTestCase {
         ))
         XCTAssertFalse(shortEnhancementPlan.shouldSkipEnhancement(configuration: nil))
     }
+
+    func testEnhancementRequestRequiresEnabledConfiguredAndUnskippedText() {
+        let configuration = VoiceInkPostProcessingSkipConfiguration(
+            isEnabled: true,
+            wordThreshold: 3
+        )
+        let plan = VoiceInkTranscriptionEnhancementTextPlan(
+            textForEnhancement: "one two three four",
+            cleanedText: "one"
+        )
+        let shortPlan = VoiceInkTranscriptionEnhancementTextPlan(
+            textForEnhancement: "one",
+            cleanedText: "one"
+        )
+
+        XCTAssertNil(plan.enhancementRequest(
+            isEnhancementEnabled: false,
+            isEnhancementConfigured: true,
+            skipConfiguration: configuration
+        ))
+        XCTAssertNil(plan.enhancementRequest(
+            isEnhancementEnabled: true,
+            isEnhancementConfigured: false,
+            skipConfiguration: configuration
+        ))
+        XCTAssertNil(shortPlan.enhancementRequest(
+            isEnhancementEnabled: true,
+            isEnhancementConfigured: true,
+            skipConfiguration: configuration
+        ))
+        XCTAssertEqual(plan.enhancementRequest(
+            isEnhancementEnabled: true,
+            isEnhancementConfigured: true,
+            skipConfiguration: configuration
+        )?.text, "one two three four")
+    }
+
+    func testEnhancementRequestUsesPromptDetectedTextAndForcesShortText() {
+        let configuration = VoiceInkPostProcessingSkipConfiguration(
+            isEnabled: true,
+            wordThreshold: 3
+        )
+        let promptId = UUID(uuidString: "12345678-1234-1234-1234-1234567890AB")!
+        let plan = VoiceInkTranscriptionEnhancementTextPlan(
+            textForEnhancement: "trigger",
+            cleanedText: "trigger"
+        )
+        let promptDetectionResult = VoiceInkPromptDetectionResult(
+            shouldEnableAI: true,
+            selectedPromptId: promptId,
+            processedText: "without trigger",
+            detectedTriggerWord: "trigger",
+            originalEnhancementState: false,
+            originalPromptId: nil
+        )
+
+        XCTAssertEqual(plan.enhancementRequest(
+            isEnhancementEnabled: true,
+            isEnhancementConfigured: true,
+            promptDetectionResult: promptDetectionResult,
+            skipConfiguration: configuration
+        )?.text, "without trigger")
+    }
 }

@@ -84,6 +84,37 @@ public struct VoiceInkTranscriptionEnhancementTextPlan: Equatable, Sendable {
             promptTriggerForcesPostProcessing: promptTriggerForcesEnhancement
         )
     }
+
+    public func enhancementRequest(
+        isEnhancementEnabled: Bool,
+        isEnhancementConfigured: Bool,
+        promptDetectionResult: VoiceInkPromptDetectionResult? = nil,
+        skipConfiguration: VoiceInkPostProcessingSkipConfiguration? = nil
+    ) -> VoiceInkTranscriptionEnhancementRequest? {
+        guard isEnhancementEnabled, isEnhancementConfigured else {
+            return nil
+        }
+
+        let promptTriggerForcesEnhancement = promptDetectionResult?.shouldEnableAI == true
+        guard !shouldSkipEnhancement(
+            configuration: skipConfiguration,
+            promptTriggerForcesEnhancement: promptTriggerForcesEnhancement
+        ) else {
+            return nil
+        }
+
+        return VoiceInkTranscriptionEnhancementRequest(
+            text: promptDetectionResult?.processedText ?? textForEnhancement
+        )
+    }
+}
+
+public struct VoiceInkTranscriptionEnhancementRequest: Equatable, Sendable {
+    public let text: String
+
+    public init(text: String) {
+        self.text = text
+    }
 }
 
 public typealias VoiceInkAudioFileTranscriptionTextPlan = VoiceInkTranscriptionEnhancementTextPlan

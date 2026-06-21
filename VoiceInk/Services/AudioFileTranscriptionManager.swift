@@ -166,12 +166,13 @@ class AudioTranscriptionManager: ObservableObject {
             ) { text in
                 WordReplacementService.shared.applyReplacements(to: text, using: modelContext)
             }
-            let text = textPlan.textForEnhancement
             let cleanedText = textPlan.cleanedText
             try Task.checkCancellation()
 
-            let shouldSkipEnhancement = textPlan.shouldSkipEnhancement(
-                configuration: VoiceInkPostProcessingSkipConfiguration.current()
+            let enhancementRequest = textPlan.enhancementRequest(
+                isEnhancementEnabled: engine.enhancementService?.isEnhancementEnabled == true,
+                isEnhancementConfigured: engine.enhancementService?.isConfigured == true,
+                skipConfiguration: VoiceInkPostProcessingSkipConfiguration.current()
             )
             let draftContext = VoiceInkAudioFileTranscriptionDraftContext(
                 cleanedText: cleanedText,
@@ -187,12 +188,10 @@ class AudioTranscriptionManager: ObservableObject {
             var transcription: Transcription
 
             if let enhancementService = engine.enhancementService,
-               enhancementService.isEnhancementEnabled,
-               enhancementService.isConfigured,
-               !shouldSkipEnhancement {
+               let enhancementRequest {
                 item.status = .processing(phase: .enhancing)
                 do {
-                    let enhancement = try await enhancementService.enhance(text)
+                    let enhancement = try await enhancementService.enhance(enhancementRequest.text)
                     transcription = Transcription(completedDraft: VoiceInkAudioFileTranscriptionDraft.completed(
                         context: draftContext,
                         enhancementOutcome: .succeeded(enhancement)

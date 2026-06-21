@@ -94,19 +94,18 @@ class AudioTranscriptionService {
                 }
             }
 
-            let shouldSkipEnhancement = textPlan.shouldSkipEnhancement(
-                configuration: VoiceInkPostProcessingSkipConfiguration.current(),
-                promptTriggerForcesEnhancement: promptDetectionResult?.shouldEnableAI == true
+            let enhancementRequest = textPlan.enhancementRequest(
+                isEnhancementEnabled: enhancementService?.isEnhancementEnabled == true,
+                isEnhancementConfigured: enhancementService?.isConfigured == true,
+                promptDetectionResult: promptDetectionResult,
+                skipConfiguration: VoiceInkPostProcessingSkipConfiguration.current()
             )
 
             // Apply AI enhancement if enabled
             if let enhancementService = enhancementService,
-               enhancementService.isEnhancementEnabled,
-               enhancementService.isConfigured,
-               !shouldSkipEnhancement {
+               let enhancementRequest {
                 do {
-                    let textForAI = promptDetectionResult?.processedText ?? text
-                    let enhancement = try await enhancementService.enhance(textForAI)
+                    let enhancement = try await enhancementService.enhance(enhancementRequest.text)
                     let newTranscription = Transcription(completedDraft: VoiceInkAudioFileTranscriptionDraft.completed(
                         context: draftContext,
                         enhancementOutcome: .succeeded(enhancement)

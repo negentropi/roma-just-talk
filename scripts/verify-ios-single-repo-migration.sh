@@ -4377,6 +4377,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunPreparation.swift
 
 require_pattern \
+  "shared transcription enhancement request planning lives in VoiceInkCore" \
+  'VoiceInkTranscriptionEnhancementRequest' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunPreparation.swift
+
+require_pattern \
   "macOS live recording uses shared enhancement text plan" \
   'VoiceInkTranscriptionRunPreparation\.prepareRawTextForEnhancement' \
   VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
@@ -4391,9 +4396,31 @@ require_pattern \
   'VoiceInkTranscriptionRunPreparation\.prepareAudioFileText' \
   VoiceInk/Services/AudioFileTranscriptionService.swift
 
+require_pattern \
+  "macOS live recording uses shared enhancement request planning" \
+  'textPlan\.enhancementRequest' \
+  VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
+
+require_pattern \
+  "macOS audio-file import uses shared enhancement request planning" \
+  'textPlan\.enhancementRequest' \
+  VoiceInk/Services/AudioFileTranscriptionManager.swift
+
+require_pattern \
+  "macOS retry transcription uses shared enhancement request planning" \
+  'textPlan\.enhancementRequest' \
+  VoiceInk/Services/AudioFileTranscriptionService.swift
+
 reject_pattern \
   "macOS transcription enhancement callers avoid shell-owned raw text preparation and skip role" \
   'filterRawOutput|prepareFilteredText|transcriptRole: \.wordReplacedText' \
+  VoiceInk/Transcription/Engine/TranscriptionPipeline.swift \
+  VoiceInk/Services/AudioFileTranscriptionManager.swift \
+  VoiceInk/Services/AudioFileTranscriptionService.swift
+
+reject_pattern \
+  "macOS transcription enhancement callers delegate enhancement request planning to VoiceInkCore" \
+  'shouldSkipEnhancement|promptDetectionResult\?\.processedText \?\? text|!shouldSkipEnhancement' \
   VoiceInk/Transcription/Engine/TranscriptionPipeline.swift \
   VoiceInk/Services/AudioFileTranscriptionManager.swift \
   VoiceInk/Services/AudioFileTranscriptionService.swift

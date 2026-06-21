@@ -218,22 +218,21 @@ class TranscriptionPipeline {
                 enhancementService.applyPromptDetectionResult(detectionResult)
             }
 
-            let shouldSkipEnhancement = textPlan.shouldSkipEnhancement(
-                configuration: VoiceInkPostProcessingSkipConfiguration.current(),
-                promptTriggerForcesEnhancement: promptDetectionResult?.shouldEnableAI == true
+            let enhancementRequest = textPlan.enhancementRequest(
+                isEnhancementEnabled: enhancementService?.isEnhancementEnabled == true,
+                isEnhancementConfigured: enhancementService?.isConfigured == true,
+                promptDetectionResult: promptDetectionResult,
+                skipConfiguration: VoiceInkPostProcessingSkipConfiguration.current()
             )
 
             if let enhancementService,
-               enhancementService.isEnhancementEnabled,
-               enhancementService.isConfigured,
-               !shouldSkipEnhancement {
+               let enhancementRequest {
                 if shouldCancel() { await finishCanceledTranscription(); return nil }
 
                 onStateChange(.enhancing)
-                let textForAI = promptDetectionResult?.processedText ?? text
 
                 do {
-                    let enhancement = try await enhancementService.enhance(textForAI)
+                    let enhancement = try await enhancementService.enhance(enhancementRequest.text)
                     transcription.applyEnhancementResult(enhancement)
                     finalPastedText = enhancement.text
                 } catch {

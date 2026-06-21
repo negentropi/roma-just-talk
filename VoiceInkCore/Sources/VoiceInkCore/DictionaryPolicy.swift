@@ -22,6 +22,11 @@ public struct VoiceInkVocabularySubmissionPlan: Equatable, Sendable {
         self.draftAfterSubmit = draftAfterSubmit
         self.alertPresentation = alertPresentation
     }
+
+    public func applying(to existingWords: [String]) -> [String] {
+        guard alertPresentation == nil, shouldInsert else { return existingWords }
+        return existingWords + wordsToInsert
+    }
 }
 
 public struct VoiceInkWordReplacementInsertPlan: Equatable, Sendable {
@@ -61,6 +66,11 @@ public struct VoiceInkWordReplacementSubmissionPlan: Equatable, Sendable {
         self.originalDraftAfterSubmit = originalDraftAfterSubmit
         self.replacementDraftAfterSubmit = replacementDraftAfterSubmit
         self.alertPresentation = alertPresentation
+    }
+
+    public func applying(to existingRules: [VoiceInkWordReplacementRule]) -> [VoiceInkWordReplacementRule] {
+        guard alertPresentation == nil, let ruleToInsert else { return existingRules }
+        return existingRules + [ruleToInsert]
     }
 }
 

@@ -208,9 +208,10 @@ final class AppSettings: ObservableObject {
             existingOriginalTexts: wordReplacements.map(\.originalText)
         )
 
-        guard let rule = plan.ruleToInsert else { return plan }
-
-        wordReplacements.append(rule)
+        let updatedRules = plan.applying(to: wordReplacements)
+        if wordReplacements != updatedRules {
+            wordReplacements = updatedRules
+        }
         return plan
     }
 
@@ -225,11 +226,11 @@ final class AppSettings: ObservableObject {
             existingWords: customVocabularyTerms
         )
 
-        guard plan.shouldInsert else {
-            return plan
+        let updatedTerms = plan.applying(to: customVocabularyTerms)
+        if customVocabularyTerms != updatedTerms {
+            customVocabularyTerms = updatedTerms
         }
 
-        customVocabularyTerms.append(contentsOf: plan.wordsToInsert)
         return plan
     }
 

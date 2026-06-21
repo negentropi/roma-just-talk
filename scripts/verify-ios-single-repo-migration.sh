@@ -3217,8 +3217,23 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
 
 require_pattern \
+  "shared vocabulary submission policy owns list application" \
+  'func applying\(to existingWords: \[String\]\)' \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+require_pattern \
   "shared word-replacement submission policy owns draft and alert plan" \
   'VoiceInkWordReplacementSubmissionPlan|wordReplacementSubmissionPlan|originalDraftAfterSubmit|replacementDraftAfterSubmit|shouldComplete' \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+require_pattern \
+  "shared word-replacement submission policy owns list application" \
+  'func applying\(to existingRules: \[VoiceInkWordReplacementRule\]\)' \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+require_pattern \
+  "shared dictionary submission application refuses alert plans" \
+  'alertPresentation == nil, (shouldInsert|let ruleToInsert)' \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
 
 require_pattern \
@@ -3267,6 +3282,11 @@ require_pattern \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \
+  "iOS vocabulary adapter applies shared submission result" \
+  'plan\.applying\(to: customVocabularyTerms\)' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+require_pattern \
   "iOS word-replacement submission uses shared submission plan" \
   'submitWordReplacement|originalDraftAfterSubmit|replacementDraftAfterSubmit|alertPresentation' \
   iOS/VoiceInk-ios/SettingsView.swift
@@ -3274,6 +3294,11 @@ require_pattern \
 require_pattern \
   "iOS word-replacement adapter uses shared submission plan" \
   'VoiceInkDictionaryPolicy\.wordReplacementSubmissionPlan' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+require_pattern \
+  "iOS word-replacement adapter applies shared submission result" \
+  'plan\.applying\(to: wordReplacements\)' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \
@@ -3329,6 +3354,11 @@ reject_pattern \
   VoiceInk/Views/Dictionary/DictionaryQuickAddPanel.swift \
   iOS/VoiceInk-ios/AppSettings.swift \
   iOS/VoiceInk-ios/SettingsView.swift
+
+reject_pattern \
+  "iOS dictionary adapter avoids shell-owned submission-plan branching" \
+  'guard +plan\.shouldInsert|guard +let +rule += +plan\.ruleToInsert|wordReplacements\.append\(rule\)|customVocabularyTerms\.append\(contentsOf: +plan\.wordsToInsert\)' \
+  iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \
   "macOS vocabulary view uses shared dictionary alert presentation" \
@@ -3479,7 +3509,7 @@ reject_pattern \
 
 require_pattern \
   "migration checklist tracks shared dictionary sort gate" \
-  'dictionary form/chrome, quick-add, word-replacement guidance, edit-sheet, list/row copy, vocabulary draft submission/reset/duplicate-alert planning, word-replacement draft submission/reset/duplicate-alert planning, sort mode storage/toggle/indicator policy, and vocabulary/word-replacement list sorting route through `VoiceInkDictionarySettingsPresentation`/`VoiceInkDictionaryQuickAddPresentation`/`VoiceInkWordReplacementInfoPresentation`/`VoiceInkWordReplacementEditPresentation`/`VoiceInkVocabularyListPresentation`/`VoiceInkWordReplacementListPresentation`/`VoiceInkVocabularySubmissionPlan`/`VoiceInkWordReplacementSubmissionPlan`/`VoiceInkDictionaryListSortPreference`/`VoiceInkDictionaryListSortPolicy`' \
+  'dictionary form/chrome, quick-add, word-replacement guidance, edit-sheet, list/row copy, vocabulary draft submission/reset/duplicate-alert planning, word-replacement draft submission/reset/duplicate-alert planning, accepted-submission list application, sort mode storage/toggle/indicator policy, and vocabulary/word-replacement list sorting route through `VoiceInkDictionarySettingsPresentation`/`VoiceInkDictionaryQuickAddPresentation`/`VoiceInkWordReplacementInfoPresentation`/`VoiceInkWordReplacementEditPresentation`/`VoiceInkVocabularyListPresentation`/`VoiceInkWordReplacementListPresentation`/`VoiceInkVocabularySubmissionPlan`/`VoiceInkWordReplacementSubmissionPlan`/`VoiceInkDictionaryListSortPreference`/`VoiceInkDictionaryListSortPolicy`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

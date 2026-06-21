@@ -105,6 +105,10 @@ public enum VoiceInkPromptTriggerPolicy {
         return existingWords + [trimmedWord]
     }
 
+    public static func removingTriggerWord(_ word: String, from existingWords: [String]) -> [String] {
+        existingWords.filter { $0 != word }
+    }
+
     public static func detect(in text: String, triggers: [VoiceInkPromptTrigger]) -> VoiceInkPromptTriggerMatch? {
         for prompt in triggers {
             guard let result = detectAndStripTriggerWord(from: text, triggerWords: prompt.triggerWords) else {

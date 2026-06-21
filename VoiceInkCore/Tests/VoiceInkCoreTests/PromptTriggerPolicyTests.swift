@@ -112,6 +112,13 @@ final class PromptTriggerPolicyTests: XCTestCase {
         XCTAssertNil(VoiceInkPromptTriggerPolicy.addingTriggerWord("dictate", to: ["Dictate"]))
     }
 
+    func testRemovingTriggerWordPreservesExactMacOSEditingRule() {
+        XCTAssertEqual(
+            VoiceInkPromptTriggerPolicy.removingTriggerWord("Email", from: ["email", "Email", "Reply"]),
+            ["email", "Reply"]
+        )
+    }
+
     func testTriggerWordDraftUsesSharedBlankPolicy() {
         XCTAssertFalse(VoiceInkPromptTriggerPolicy.hasTriggerWordDraft(" \n\t "))
         XCTAssertTrue(VoiceInkPromptTriggerPolicy.hasTriggerWordDraft("  Roma  "))

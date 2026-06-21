@@ -1525,6 +1525,28 @@ public enum VoiceInkPowerModePolicy {
         return VoiceInkPowerModeURLConfig(url: normalizedWebsiteURL(input))
     }
 
+    public static func addingWebsiteConfig(
+        forFormInput input: String,
+        to existingConfigs: [VoiceInkPowerModeURLConfig]
+    ) -> [VoiceInkPowerModeURLConfig]? {
+        guard let websiteConfig = websiteConfigForFormInput(input) else { return nil }
+        return existingConfigs + [websiteConfig]
+    }
+
+    public static func removingAppConfig(
+        id: UUID,
+        from existingConfigs: [VoiceInkPowerModeAppConfig]
+    ) -> [VoiceInkPowerModeAppConfig] {
+        existingConfigs.filter { $0.id != id }
+    }
+
+    public static func removingWebsiteConfig(
+        id: UUID,
+        from existingConfigs: [VoiceInkPowerModeURLConfig]
+    ) -> [VoiceInkPowerModeURLConfig] {
+        existingConfigs.filter { $0.id != id }
+    }
+
     public static func canSaveConfigurationName(_ name: String) -> Bool {
         !name.isEmpty
     }

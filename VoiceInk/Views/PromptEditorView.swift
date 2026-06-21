@@ -301,7 +301,7 @@ struct TriggerWordsEditor: View {
                 TagLayout(alignment: .leading, spacing: 6) {
                     ForEach(triggerWords, id: \.self) { word in
                         TriggerWordItemView(word: word) {
-                            triggerWords.removeAll { $0 == word }
+                            triggerWords = VoiceInkPromptTriggerPolicy.removingTriggerWord(word, from: triggerWords)
                         }
                     }
                 }

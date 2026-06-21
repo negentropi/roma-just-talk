@@ -221,7 +221,10 @@ struct ConfigurationView: View {
                                         }
 
                                         Button {
-                                            selectedAppConfigs.removeAll(where: { $0.id == appConfig.id })
+                                            selectedAppConfigs = VoiceInkPowerModePolicy.removingAppConfig(
+                                                id: appConfig.id,
+                                                from: selectedAppConfigs
+                                            )
                                         } label: {
                                             Image(systemName: VoiceInkPowerModePresentation.removeTriggerSystemImageName)
                                                 .font(.system(size: 14))
@@ -264,7 +267,10 @@ struct ConfigurationView: View {
                                             .lineLimit(1)
                                         Spacer(minLength: 0)
                                         Button {
-                                            websiteConfigs.removeAll(where: { $0.id == urlConfig.id })
+                                            websiteConfigs = VoiceInkPowerModePolicy.removingWebsiteConfig(
+                                                id: urlConfig.id,
+                                                from: websiteConfigs
+                                            )
                                         } label: {
                                             Image(systemName: VoiceInkPowerModePresentation.removeTriggerSystemImageName)
                                                 .foregroundColor(.secondary)
@@ -638,8 +644,12 @@ struct ConfigurationView: View {
     // MARK: - Actions
 
     private func addWebsite() {
-        guard let websiteConfig = VoiceInkPowerModePolicy.websiteConfigForFormInput(newWebsiteURL) else { return }
-        websiteConfigs.append(websiteConfig)
+        guard let updatedConfigs = VoiceInkPowerModePolicy.addingWebsiteConfig(
+            forFormInput: newWebsiteURL,
+            to: websiteConfigs
+        ) else { return }
+
+        websiteConfigs = updatedConfigs
         newWebsiteURL = ""
     }
 

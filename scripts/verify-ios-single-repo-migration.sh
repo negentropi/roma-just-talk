@@ -3616,6 +3616,41 @@ require_pattern \
   VoiceInk/Views/PromptEditorView.swift
 
 require_pattern \
+  "shared prompt trigger-word draft validation lives in VoiceInkCore" \
+  'hasTriggerWordDraft' \
+  VoiceInkCore/Sources/VoiceInkCore/PromptTriggerPolicy.swift
+
+require_pattern \
+  "shared prompt trigger-word add policy lives in VoiceInkCore" \
+  'addingTriggerWord' \
+  VoiceInkCore/Sources/VoiceInkCore/PromptTriggerPolicy.swift
+
+require_pattern \
+  "shared prompt trigger-word removal policy lives in VoiceInkCore" \
+  'removingTriggerWord' \
+  VoiceInkCore/Sources/VoiceInkCore/PromptTriggerPolicy.swift
+
+require_pattern \
+  "macOS prompt editor consumes shared trigger-word draft validation" \
+  'VoiceInkPromptTriggerPolicy\.hasTriggerWordDraft' \
+  VoiceInk/Views/PromptEditorView.swift
+
+require_pattern \
+  "macOS prompt editor consumes shared trigger-word add policy" \
+  'VoiceInkPromptTriggerPolicy\.addingTriggerWord' \
+  VoiceInk/Views/PromptEditorView.swift
+
+require_pattern \
+  "macOS prompt editor consumes shared trigger-word removal policy" \
+  'VoiceInkPromptTriggerPolicy\.removingTriggerWord' \
+  VoiceInk/Views/PromptEditorView.swift
+
+require_pattern \
+  "core checks execute prompt trigger-word removal policy test" \
+  'PromptTriggerPolicyTests\.testRemovingTriggerWordPreservesExactMacOSEditingRule' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "macOS prompt grids use shared presentation" \
   'VoiceInkCustomPromptPresentation\.(promptGridEmptyText|promptGridInfoSystemImageName|promptGridHelpText|addPromptHelpText)' \
   VoiceInk/Views/Components/PromptSelectionGrid.swift
@@ -3629,6 +3664,11 @@ reject_pattern \
   "macOS custom prompt shell avoids local icon catalog" \
   'enum +PromptIcons|PromptIcons\.allCases|"hand\.thumbsup\.fill"' \
   VoiceInk/Models/CustomPrompt.swift \
+  VoiceInk/Views/PromptEditorView.swift
+
+reject_pattern \
+  "macOS prompt editor avoids shell-only trigger-word list editing" \
+  'triggerWords\.(append|removeAll)' \
   VoiceInk/Views/PromptEditorView.swift
 
 reject_pattern \
@@ -7607,7 +7647,7 @@ require_pattern \
 
 require_pattern \
   "migration checklist tracks shared Power Mode config form chrome gate" \
-  'macOS Power Mode config form seed defaults, trigger-section labels, transcription section labels, AI toggle title, and footer actions route through `VoiceInkPowerModeConfigurationFormState`/`VoiceInkPowerModePresentation`' \
+  'macOS Power Mode config form seed defaults, trigger-section labels, transcription section labels, AI toggle title, footer actions, website add planning, and trigger removal route through `VoiceInkPowerModeConfigurationFormState`/`VoiceInkPowerModePresentation`/`VoiceInkPowerModePolicy`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \
@@ -7906,9 +7946,44 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
-  "macOS Power Mode form consumes shared website form config policy" \
-  'VoiceInkPowerModePolicy\.websiteConfigForFormInput' \
+  "shared Power Mode website form append policy lives in VoiceInkCore" \
+  'addingWebsiteConfig' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "macOS Power Mode form consumes shared website form append policy" \
+  'VoiceInkPowerModePolicy\.addingWebsiteConfig' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
+
+require_pattern \
+  "shared Power Mode form app trigger removal policy lives in VoiceInkCore" \
+  'removingAppConfig' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode form website trigger removal policy lives in VoiceInkCore" \
+  'removingWebsiteConfig' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "macOS Power Mode form consumes shared app trigger removal policy" \
+  'VoiceInkPowerModePolicy\.removingAppConfig' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+require_pattern \
+  "macOS Power Mode form consumes shared website trigger removal policy" \
+  'VoiceInkPowerModePolicy\.removingWebsiteConfig' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+require_pattern \
+  "core checks execute Power Mode website append policy test" \
+  'PowerModePolicyTests\.testAddingWebsiteConfigAppendsSharedFormConfigAndPreservesNilInput' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute Power Mode trigger removal policy test" \
+  'PowerModePolicyTests\.testRemovingPowerModeFormTriggerConfigsUsesSharedIdPolicy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "shared Power Mode configuration-name saveability lives in VoiceInkCore" \
@@ -7952,7 +8027,12 @@ require_pattern \
 
 reject_pattern \
   "macOS Power Mode form avoids shell-only website config construction" \
-  'normalizedWebsiteURL\(newWebsiteURL\)|VoiceInkPowerModeURLConfig\(url:' \
+  'normalizedWebsiteURL\(newWebsiteURL\)|VoiceInkPowerModeURLConfig\(url:|websiteConfigs\.append' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+reject_pattern \
+  "macOS Power Mode form avoids shell-only trigger removal" \
+  '(selectedAppConfigs|websiteConfigs)\.removeAll' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
 reject_pattern \

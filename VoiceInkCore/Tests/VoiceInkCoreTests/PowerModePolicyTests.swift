@@ -1592,6 +1592,36 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertEqual(config.url, "")
     }
 
+    func testAddingWebsiteConfigAppendsSharedFormConfigAndPreservesNilInput() throws {
+        let existingConfig = VoiceInkPowerModeURLConfig(id: UUID(), url: "existing.example.com")
+
+        let configs = try XCTUnwrap(
+            VoiceInkPowerModePolicy.addingWebsiteConfig(
+                forFormInput: " HTTPS://WWW.Example.COM/docs ",
+                to: [existingConfig]
+            )
+        )
+
+        XCTAssertEqual(configs.map(\.url), ["existing.example.com", "example.com/docs"])
+        XCTAssertNil(VoiceInkPowerModePolicy.addingWebsiteConfig(forFormInput: "", to: [existingConfig]))
+    }
+
+    func testRemovingPowerModeFormTriggerConfigsUsesSharedIdPolicy() {
+        let firstApp = VoiceInkPowerModeAppConfig(id: UUID(), bundleIdentifier: "com.example.First", appName: "First")
+        let secondApp = VoiceInkPowerModeAppConfig(id: UUID(), bundleIdentifier: "com.example.Second", appName: "Second")
+        let firstWebsite = VoiceInkPowerModeURLConfig(id: UUID(), url: "first.example.com")
+        let secondWebsite = VoiceInkPowerModeURLConfig(id: UUID(), url: "second.example.com")
+
+        XCTAssertEqual(
+            VoiceInkPowerModePolicy.removingAppConfig(id: firstApp.id, from: [firstApp, secondApp]).map(\.id),
+            [secondApp.id]
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModePolicy.removingWebsiteConfig(id: secondWebsite.id, from: [firstWebsite, secondWebsite]).map(\.id),
+            [firstWebsite.id]
+        )
+    }
+
     func testConfigurationNameSaveabilityPreservesRawEmptyMacOSRule() {
         XCTAssertFalse(VoiceInkPowerModePolicy.canSaveConfigurationName(""))
         XCTAssertTrue(VoiceInkPowerModePolicy.canSaveConfigurationName("   "))

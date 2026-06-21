@@ -4595,9 +4595,25 @@ require_pattern \
   VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
 
 require_pattern \
-  "macOS custom cloud empty-response error uses shared run error description" \
+  "shared cloud transcription error lives in VoiceInkCore" \
+  'VoiceInkCloudTranscriptionError|CloudTranscriptionError|apiRequestFailed|networkError|noTranscriptionReturned' \
+  VoiceInkCore/Sources/VoiceInkCore/CloudTranscriptionError.swift
+
+require_pattern \
+  "shared cloud transcription error checks run in VoiceInkCore" \
+  'CloudTranscriptionErrorTests\.testErrorDescriptionsPreserveMacOSCloudTranscriptionCopy|CloudTranscriptionErrorTests\.testNoTranscriptionReturnedUsesSharedRunErrorDescription|CloudTranscriptionErrorTests\.testLegacyCloudTranscriptionErrorAliasResolvesToSharedCoreError' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "macOS cloud batch transcription uses shared cloud transcription error" \
+  'CloudTranscriptionError\.(unsupportedProvider|missingAPIKey|audioFileNotFound|apiRequestFailed|networkError|noTranscriptionReturned)' \
+  VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift \
+  VoiceInk/Transcription/Cloud/CloudProvider.swift
+
+require_pattern \
+  "shared cloud transcription error uses shared run error description" \
   'VoiceInkTranscriptionRunError\.noTranscriptionReturned\.errorDescription' \
-  VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
+  VoiceInkCore/Sources/VoiceInkCore/CloudTranscriptionError.swift
 
 reject_pattern \
   "macOS cloud batch transcription avoids pre-normalized vocabulary terms" \
@@ -4608,6 +4624,11 @@ reject_pattern \
 reject_pattern \
   "macOS custom cloud avoids duplicate empty-response error copy" \
   'The API returned an empty or invalid response\.' \
+  VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
+
+reject_pattern \
+  "macOS cloud transcription avoids shell-local cloud error enum" \
+  'enum +CloudTranscriptionError|var +errorDescription: +String\?' \
   VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
 
 require_pattern \

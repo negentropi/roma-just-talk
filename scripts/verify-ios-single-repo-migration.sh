@@ -3100,6 +3100,16 @@ require_pattern \
   'VoiceInkCustomCloudModelFormPresentation\.macOS|presentation\.(defaultAPIEndpoint|defaultModelName|buttonTitle|title|compatibilityWarningText|displayNameFieldTitle|apiEndpointFieldTitle|apiKeyFieldTitle|modelNameFieldTitle|multilingualToggleTitle|cancelButtonTitle|submitButtonTitle|submitButtonSystemImageName|validationAlertTitle|validationAlertDismissButtonTitle|defaultModelDescription|keychainSaveFailureMessage)' \
   "VoiceInk/Views/AI Models/AddCustomModelView.swift"
 
+require_pattern \
+  "macOS custom cloud model form uses shared required-field policy" \
+  'VoiceInkCustomCloudModelPolicy\.hasRequiredFields\(currentDraft\)' \
+  "VoiceInk/Views/AI Models/AddCustomModelView.swift"
+
+reject_pattern \
+  "macOS custom cloud model form avoids shallow validity wrapper" \
+  'private +var +isFormValid\b' \
+  "VoiceInk/Views/AI Models/AddCustomModelView.swift"
+
 reject_pattern \
   "macOS custom cloud model form avoids shell-only defaults and copy" \
   '"(https://api\.example\.com/v1/audio/transcriptions|large-v3-turbo|Add Model|Edit Model|Add Custom Model|Edit Custom Model|Only OpenAI-compatible transcription APIs are supported|Display Name|My Custom Model|API Endpoint|API Key|your-api-key|Model Name|whisper-1|Multilingual Model|Cancel|Update Model|Validation Errors|OK|Custom transcription model|Failed to securely save API Key to Keychain\. Please check your system settings or try again\.)"' \

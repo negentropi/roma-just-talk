@@ -63,6 +63,7 @@ struct AddCustomModelCardView: View {
             
             // Expandable Form Section
             if isExpanded {
+                let formHasRequiredFields = VoiceInkCustomCloudModelPolicy.hasRequiredFields(currentDraft)
                 VStack(alignment: .leading, spacing: 20) {
                     // Header
                     HStack {
@@ -164,12 +165,12 @@ struct AddCustomModelCardView: View {
                             .padding(.vertical, 10)
                             .background(
                                 RoundedRectangle(cornerRadius: 8)
-                                    .fill(isFormValid ? Color(.controlAccentColor) : Color.secondary)
-                                    .shadow(color: (isFormValid ? Color(.controlAccentColor) : Color.secondary).opacity(0.2), radius: 2, x: 0, y: 1)
+                                    .fill(formHasRequiredFields ? Color(.controlAccentColor) : Color.secondary)
+                                    .shadow(color: (formHasRequiredFields ? Color(.controlAccentColor) : Color.secondary).opacity(0.2), radius: 2, x: 0, y: 1)
                             )
                         }
                         .buttonStyle(.plain)
-                        .disabled(!isFormValid || isSaving)
+                        .disabled(!formHasRequiredFields || isSaving)
                     }
                 }
                 .padding(16)
@@ -205,10 +206,6 @@ struct AddCustomModelCardView: View {
         }
     }
     
-    private var isFormValid: Bool {
-        VoiceInkCustomCloudModelPolicy.hasRequiredFields(currentDraft)
-    }
-
     private var currentDraft: VoiceInkCustomCloudModelDraft {
         VoiceInkCustomCloudModelPolicy.normalizedDraft(
             displayName: displayName,

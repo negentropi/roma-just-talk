@@ -89,10 +89,6 @@ struct NoteDetailView: View {
         note.storedAudioAvailability()
     }
 
-    private var statusPresentation: VoiceInkTranscriptStatusPresentation? {
-        VoiceInkTranscriptPresentation.statusPresentation(for: note.transcriptionStatus)
-    }
-
     // Summary card removed per design feedback
     
     private var bottomAudioPlayer: some View {
@@ -134,6 +130,8 @@ struct NoteDetailView: View {
     
     @ViewBuilder
     private var transcriptionStatusView: some View {
+        let statusPresentation = VoiceInkTranscriptPresentation.statusPresentation(for: note.transcriptionStatus)
+
         if let statusPresentation {
             VStack(spacing: 12) {
                 HStack {

@@ -1496,6 +1496,11 @@ require_pattern \
   'VoiceInkTranscriptPresentation\.statusPresentation' \
   iOS/VoiceInk-ios/NoteDetailView.swift
 
+reject_pattern \
+  "iOS note detail avoids shallow status presentation wrapper" \
+  'private var +statusPresentation\b' \
+  iOS/VoiceInk-ios/NoteDetailView.swift
+
 require_pattern \
   "iOS note detail uses shared transcript status metadata" \
   'panelSystemImageName|\.tone' \

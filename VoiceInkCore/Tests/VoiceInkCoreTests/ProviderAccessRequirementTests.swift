@@ -244,6 +244,20 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertTrue(editedState.isEditing)
     }
 
+    func testProviderAPIKeyFormStateMarksVerificationInProgress() {
+        let state = VoiceInkProviderAPIKeyFormState(
+            enteredKey: "entered-key",
+            verificationProgress: .failure(message: "bad request"),
+            isEditing: true
+        )
+
+        let verifyingState = state.verifying()
+
+        XCTAssertEqual(verifyingState.enteredKey, "entered-key")
+        XCTAssertEqual(verifyingState.verificationProgress, .verifying)
+        XCTAssertTrue(verifyingState.isEditing)
+    }
+
     func testProviderAPIKeyFormStateAppliesVerificationPlanAndClosesEditingOnSuccess() {
         let state = VoiceInkProviderAPIKeyFormState(
             enteredKey: "entered-key",

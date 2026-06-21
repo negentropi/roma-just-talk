@@ -13,7 +13,7 @@ struct CloudModelCardView: View {
     @AppStorage(VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
     private var selectedLanguage = VoiceInkDefaultSettings.macOS.selectedTranscriptionLanguage
     @State private var isExpanded = false
-    @State private var apiKey = ""
+    @State private var apiKeyFormState = VoiceInkProviderAPIKeyFormState()
     @State private var streamingEnabled: Bool
     @State private var preloadEnabled: Bool
 
@@ -24,11 +24,10 @@ struct CloudModelCardView: View {
         _streamingEnabled = State(initialValue: VoiceInkTranscriptionStreamingPreference.isEnabled(forModelName: model.name))
         _preloadEnabled = State(initialValue: VoiceInkRollingBufferPreloadSettings.perModelPreloadEnabled(forModelName: model.name))
     }
-    @State private var verificationProgress: VoiceInkProviderAPIKeyVerificationProgress = .idle
     private let apiKeyVerifier = VoiceInkProviderAPIKeyVerifier()
 
     private var isVerifying: Bool {
-        verificationProgress.isVerifying
+        apiKeyFormState.verificationProgress.isVerifying
     }
     
     private var isConfigured: Bool {
@@ -36,8 +35,7 @@ struct CloudModelCardView: View {
     }
 
     private var apiKeyDraft: VoiceInkProviderAPIKeyDraft {
-        VoiceInkProviderAPIKeyDraft(
-            enteredKey: apiKey,
+        apiKeyFormState.draft(
             storedRuntimeKey: APIKeyManager.shared.getAPIKey(forProvider: model.provider.apiKeyProviderName)
         )
     }
@@ -262,7 +260,7 @@ struct CloudModelCardView: View {
                 .foregroundColor(Color(.labelColor))
             
             HStack(spacing: 8) {
-                SecureField(apiKeyCardPresentation.apiKeyFieldPlaceholder, text: $apiKey)
+                SecureField(apiKeyCardPresentation.apiKeyFieldPlaceholder, text: $apiKeyFormState.enteredKey)
                     .textFieldStyle(.roundedBorder)
                     .disabled(isVerifying)
                 
@@ -273,10 +271,10 @@ struct CloudModelCardView: View {
                                 .scaleEffect(0.7)
                                 .frame(width: 12, height: 12)
                         } else {
-                            Image(systemName: verificationProgress.macOSVerifyButtonSystemImageName)
+                            Image(systemName: apiKeyFormState.verificationProgress.macOSVerifyButtonSystemImageName)
                                 .font(.system(size: 12, weight: .medium))
                         }
-                        Text(verificationProgress.macOSVerifyButtonTitle)
+                        Text(apiKeyFormState.verificationProgress.macOSVerifyButtonTitle)
                             .font(.system(size: 12, weight: .medium))
                     }
                     .foregroundColor(.white)
@@ -284,14 +282,14 @@ struct CloudModelCardView: View {
                     .padding(.vertical, 6)
                     .background(
                         Capsule()
-                            .fill(verificationProgress.isSuccess ? Color(.systemGreen) : Color(.controlAccentColor))
+                            .fill(apiKeyFormState.verificationProgress.isSuccess ? Color(.systemGreen) : Color(.controlAccentColor))
                     )
                 }
                 .buttonStyle(.plain)
                 .disabled(!canVerifyAPIKey || isVerifying)
             }
             
-            if let feedback = verificationProgress.macOSInlineFeedback {
+            if let feedback = apiKeyFormState.verificationProgress.macOSInlineFeedback {
                 Text(feedback.text)
                     .font(.caption)
                     .foregroundColor(feedback.tone.macOSStatusColor)
@@ -300,22 +298,27 @@ struct CloudModelCardView: View {
     }
     
     private func loadSavedAPIKey() {
-        if let savedKey = APIKeyManager.shared.getStoredAPIKey(forProvider: model.provider.apiKeyProviderName) {
-            apiKey = savedKey
-        }
-
-        if APIKeyManager.shared.hasAPIKey(forProvider: model.provider.apiKeyProviderName) {
-            verificationProgress = .success
-        }
+        let hasSavedKey = APIKeyManager.shared.hasAPIKey(forProvider: model.provider.apiKeyProviderName)
+        apiKeyFormState = VoiceInkProviderAPIKeyFormState(
+            enteredKey: APIKeyManager.shared.getStoredAPIKey(forProvider: model.provider.apiKeyProviderName) ?? "",
+            verificationProgress: hasSavedKey ? .success : .idle,
+            isEditing: !hasSavedKey
+        )
     }
     
     private func verifyAPIKey() {
         let draft = apiKeyDraft
         guard let keyToVerify = draft.verificationCandidate else { return }
 
-        verificationProgress = .verifying
+        apiKeyFormState = apiKeyFormState.verifying()
         guard let provider = model.provider.coreTranscriptionModelProvider else {
-            verificationProgress = .unsupportedProviderFailure
+            apiKeyFormState = apiKeyFormState.applyingVerificationPlan(
+                VoiceInkProviderAPIKeyVerificationApplicationPlan(
+                    progress: .unsupportedProviderFailure,
+                    keyToSave: nil,
+                    shouldMarkKeyVerified: false
+                )
+            )
             return
         }
 
@@ -324,7 +327,7 @@ struct CloudModelCardView: View {
 
             await MainActor.run {
                 let plan = draft.verificationApplicationPlan(for: result)
-                verificationProgress = plan.progress
+                apiKeyFormState = apiKeyFormState.applyingVerificationPlan(plan)
 
                 if plan.shouldMarkKeyVerified {
                     if let keyToSave = plan.keyToSave {
@@ -341,8 +344,7 @@ struct CloudModelCardView: View {
     
     private func clearAPIKey() {
         APIKeyManager.shared.deleteAPIKey(forProvider: model.provider.apiKeyProviderName)
-        apiKey = ""
-        verificationProgress = .idle
+        apiKeyFormState = VoiceInkProviderAPIKeyFormState()
 
         if isCurrent {
             transcriptionModelManager.clearCurrentTranscriptionModel()

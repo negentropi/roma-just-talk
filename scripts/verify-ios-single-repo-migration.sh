@@ -2507,8 +2507,18 @@ require_pattern \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
 require_pattern \
+  "macOS cloud API-key card uses shared API-key form state" \
+  'VoiceInkProviderAPIKeyFormState|apiKeyFormState' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift
+
+require_pattern \
+  "macOS cloud API-key card reads verification progress through shared form state" \
+  'apiKeyFormState\.verificationProgress' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift
+
+require_pattern \
   "macOS cloud API-key card uses shared verification progress presentation" \
-  'VoiceInkProviderAPIKeyVerificationProgress|verificationProgress|macOSVerifyButtonTitle|macOSInlineFeedback' \
+  'macOSVerifyButtonTitle|macOSInlineFeedback' \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
 require_pattern \
@@ -2540,6 +2550,11 @@ require_pattern \
 require_pattern \
   "macOS cloud API-key card uses shared stored-key verifier" \
   'verifyStoredAPIKeyDetailed\(keyToVerify, for: provider\)' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift
+
+reject_pattern \
+  "macOS cloud API-key card avoids shell-owned API-key form state machine fields" \
+  '@State private var +(apiKey|verificationProgress)\b' \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
 require_pattern \

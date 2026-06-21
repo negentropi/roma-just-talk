@@ -462,6 +462,16 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
 require_pattern \
+  "shared recording stop plan lives in VoiceInkCore" \
+  'VoiceInkRecordingStopPlan|stopRecordingPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "shared recording stop plan checks run in VoiceInkCore" \
+  'testRecordingStopPlanFinishesFlowAndCreatesPendingDraftOnlyWhenAudioExists' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "macOS recording engine uses shared active-recording predicate" \
   'recordingState\.isActivelyRecording' \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift
@@ -486,6 +496,16 @@ require_pattern \
   'VoiceInkRecordingFlowState\.durationUpdateInterval|advanceDuration' \
   iOS/VoiceInk-ios/RecordingManager.swift
 
+require_pattern \
+  "iOS recording manager delegates stop result planning to shared flow state" \
+  'stopRecordingPlan' \
+  iOS/VoiceInk-ios/RecordingManager.swift
+
+require_pattern \
+  "iOS recording manager adapts recorder URL into shared stop plan" \
+  'audioFileURL: +recorder\.currentRecordingURL\?\.lastPathComponent' \
+  iOS/VoiceInk-ios/RecordingManager.swift
+
 reject_pattern \
   "iOS recording manager avoids shell-owned recording flow fields" \
   '@Published var +(recordingState|animate|isRecordingSheetPresented|currentDuration)' \
@@ -494,6 +514,11 @@ reject_pattern \
 reject_pattern \
   "iOS recording manager avoids shell-owned recording flow mutation" \
   '\b(recordingState|animate|isRecordingSheetPresented|currentDuration) *(=|\+=)|withTimeInterval: +0\.1' \
+  iOS/VoiceInk-ios/RecordingManager.swift
+
+reject_pattern \
+  "iOS recording manager avoids missing-audio early return before stop cleanup" \
+  'guard +let +fileURL += +recorder\.currentRecordingURL +else +\{ +return +\}' \
   iOS/VoiceInk-ios/RecordingManager.swift
 
 require_pattern \
@@ -819,8 +844,8 @@ reject_pattern \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift
 
 require_pattern \
-  "iOS live recording builds shared pending recording draft" \
-  'VoiceInkRecordingTranscriptionDraft\.pending' \
+  "iOS live recording receives shared stop-plan pending draft" \
+  'stopPlan\.pendingDraft' \
   iOS/VoiceInk-ios/RecordingManager.swift
 
 require_pattern \

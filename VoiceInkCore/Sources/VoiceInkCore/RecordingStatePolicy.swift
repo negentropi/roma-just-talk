@@ -69,6 +69,34 @@ public struct VoiceInkRecordingFlowState: Equatable, Sendable {
     public mutating func advanceDuration(by interval: TimeInterval = durationUpdateInterval) {
         currentDuration += interval
     }
+
+    public func stopRecordingPlan(audioFileURL: String?) -> VoiceInkRecordingStopPlan {
+        var flowStateAfterStop = self
+        flowStateAfterStop.finishRecording()
+
+        return VoiceInkRecordingStopPlan(
+            flowStateAfterStop: flowStateAfterStop,
+            pendingDraft: audioFileURL.map {
+                VoiceInkRecordingTranscriptionDraft.pending(
+                    duration: currentDuration,
+                    audioFileURL: $0
+                )
+            }
+        )
+    }
+}
+
+public struct VoiceInkRecordingStopPlan: Equatable, Sendable {
+    public let flowStateAfterStop: VoiceInkRecordingFlowState
+    public let pendingDraft: VoiceInkRecordingTranscriptionDraft?
+
+    public init(
+        flowStateAfterStop: VoiceInkRecordingFlowState,
+        pendingDraft: VoiceInkRecordingTranscriptionDraft?
+    ) {
+        self.flowStateAfterStop = flowStateAfterStop
+        self.pendingDraft = pendingDraft
+    }
 }
 
 public struct VoiceInkAppGroupRecordingState: Equatable, Sendable {

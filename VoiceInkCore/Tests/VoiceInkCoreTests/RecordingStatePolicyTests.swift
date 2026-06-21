@@ -63,6 +63,37 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertEqual(flowState.currentDuration, VoiceInkRecordingFlowState.durationUpdateInterval)
     }
 
+    func testRecordingStopPlanFinishesFlowAndCreatesPendingDraftOnlyWhenAudioExists() {
+        let recordingState = VoiceInkRecordingFlowState(
+            recordingState: .recording,
+            animate: true,
+            isRecordingSheetPresented: true,
+            currentDuration: 4.5
+        )
+
+        let savedAudioPlan = recordingState.stopRecordingPlan(audioFileURL: "recording_42.wav")
+
+        XCTAssertEqual(savedAudioPlan.flowStateAfterStop.recordingState, .idle)
+        XCTAssertFalse(savedAudioPlan.flowStateAfterStop.animate)
+        XCTAssertFalse(savedAudioPlan.flowStateAfterStop.isRecordingSheetPresented)
+        XCTAssertEqual(savedAudioPlan.flowStateAfterStop.currentDuration, 4.5)
+        XCTAssertEqual(
+            savedAudioPlan.pendingDraft,
+            VoiceInkRecordingTranscriptionDraft.pending(
+                duration: 4.5,
+                audioFileURL: "recording_42.wav"
+            )
+        )
+
+        let missingAudioPlan = recordingState.stopRecordingPlan(audioFileURL: nil)
+
+        XCTAssertEqual(missingAudioPlan.flowStateAfterStop.recordingState, .idle)
+        XCTAssertFalse(missingAudioPlan.flowStateAfterStop.animate)
+        XCTAssertFalse(missingAudioPlan.flowStateAfterStop.isRecordingSheetPresented)
+        XCTAssertEqual(missingAudioPlan.flowStateAfterStop.currentDuration, 4.5)
+        XCTAssertNil(missingAudioPlan.pendingDraft)
+    }
+
     func testRecordingFlowStatePreservesIOSStartFailureAndCancelTransitions() {
         var failedState = VoiceInkRecordingFlowState(currentDuration: 8)
         failedState.prepareRecordingStart()

@@ -110,30 +110,21 @@ final class RecordingManager: ObservableObject {
     }
     
     func stopRecording(modelContext: ModelContext) {
-        // Stop recording and get file info
+        let stopPlan = flowState.stopRecordingPlan(
+            audioFileURL: recorder.currentRecordingURL?.lastPathComponent
+        )
+
         recorder.stopRecording()
         stopDurationTimer()
-        guard let fileURL = recorder.currentRecordingURL else { return }
-        
-        // Store relative path and duration
-        let audioFileName = fileURL.lastPathComponent
-        let recordingDuration = currentDuration
-        
-        let draft = VoiceInkRecordingTranscriptionDraft.pending(
-            duration: recordingDuration,
-            audioFileURL: audioFileName
-        )
+        flowState = stopPlan.flowStateAfterStop
+        coordinator.updateRecordingState(false)
+
+        guard let draft = stopPlan.pendingDraft else { return }
+
         let note = Transcription(recordingDraft: draft)
         modelContext.insert(note)
         try? modelContext.save()
-        
-        // Reset UI state immediately so user can continue using the app
-        updateFlowState { $0.finishRecording() }
-        
-        // Update coordinator state
-        coordinator.updateRecordingState(false)
-        
-        // Start background transcription
+
         transcribeInBackground(note: note, modelContext: modelContext)
     }
     

@@ -11,6 +11,7 @@ struct NoteDetailView: View {
     @StateObject private var settings = AppSettings.shared
 
     var body: some View {
+        let audioAvailability = note.storedAudioAvailability()
         let shouldShowAudioSection = audioAvailability.shouldShowAudioSection(duration: note.duration)
 
         GeometryReader { geometry in
@@ -40,7 +41,7 @@ struct NoteDetailView: View {
 
                 // Bottom audio player (web-form style)
                 if shouldShowAudioSection {
-                    bottomAudioPlayer
+                    bottomAudioPlayer(audioAvailability: audioAvailability)
                         .background(.ultraThinMaterial)
                         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                         .padding(.horizontal)
@@ -82,14 +83,10 @@ struct NoteDetailView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 16))
         }
     }
-    
-    private var audioAvailability: VoiceInkStoredAudioAvailability {
-        note.storedAudioAvailability()
-    }
 
     // Summary card removed per design feedback
     
-    private var bottomAudioPlayer: some View {
+    private func bottomAudioPlayer(audioAvailability: VoiceInkStoredAudioAvailability) -> some View {
         VStack(spacing: 0) {
             if let audioURL = audioAvailability.existingURL {
                 AudioPlayerView(audioFilePath: audioURL.path, duration: note.duration, timestamp: note.timestamp)

@@ -1309,7 +1309,7 @@ require_pattern \
 
 reject_pattern \
   "iOS note detail avoids shallow audio-section visibility wrappers" \
-  'private var +shouldShowAudioSection\b' \
+  'private var +(shouldShowAudioSection|audioAvailability)\b' \
   iOS/VoiceInk-ios/NoteDetailView.swift
 
 require_pattern \

@@ -78,6 +78,7 @@ require_no_sibling_swift_extras() {
   local description="$1"
   local sibling_dir="$2"
   local in_repo_dir="$3"
+  shift 3
 
   section "$description"
   if [[ ! -d "$sibling_dir" ]]; then
@@ -95,6 +96,14 @@ require_no_sibling_swift_extras() {
   relative_swift_file_list "$sibling_dir" >"$sibling_files"
   relative_swift_file_list "$in_repo_dir" >"$in_repo_files"
   comm -23 "$sibling_files" "$in_repo_files" >"$extras"
+
+  local allowed_extra
+  local filtered_extras
+  for allowed_extra in "$@"; do
+    filtered_extras="$(mktemp "${TMPDIR:-/tmp}/voiceink-sibling-extras-filtered.XXXXXX")"
+    rg -F -x -v "$allowed_extra" "$extras" >"$filtered_extras" || true
+    mv "$filtered_extras" "$extras"
+  done
 
   if [[ -s "$extras" ]]; then
     printf 'Sibling-only Swift files:\n' >&2
@@ -456,7 +465,15 @@ require_no_sibling_swift_extras \
 require_no_sibling_swift_extras \
   "sibling iOS UI-test clone has no undocumented Swift extras" \
   ../VoiceInk-iOS/VoiceInk-iosUITests \
-  iOS/VoiceInk-iosUITests
+  iOS/VoiceInk-iosUITests \
+  VoiceInk_iosUITestsLaunchTests.swift
+
+require_pattern \
+  "iOS UI tests keep primary launch smoke assertion" \
+  'testLaunchShowsPrimaryIOSExperience|Expected either the notes list or first-run onboarding to be visible after launch' \
+  iOS/VoiceInk-iosUITests/VoiceInk_iosUITests.swift
+
+reject_file iOS/VoiceInk-iosUITests/VoiceInk_iosUITestsLaunchTests.swift
 
 reject_pattern \
   "VoiceInkCore stays platform-neutral" \

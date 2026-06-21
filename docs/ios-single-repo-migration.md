@@ -337,7 +337,7 @@ iOS app-local storage roots are kept in `iOS/VoiceInk-ios/VoiceInkIOSStorageDire
 
 ## Sibling Clone Status
 
-The remaining Swift files present in `../VoiceInk-iOS/VoiceInk-ios` but not in `VoiceInk/iOS/VoiceInk-ios` are old clone-side sources, except where noted. `scripts/verify-ios-single-repo-migration.sh` now fails if any of these obsolete app-target duplicates are copied back under `iOS/VoiceInk-ios/`; the sibling keyboard, unit-test, and UI-test target folders must have no sibling-only Swift files.
+The remaining Swift files present in `../VoiceInk-iOS/VoiceInk-ios` but not in `VoiceInk/iOS/VoiceInk-ios` are old clone-side sources, except where noted. `scripts/verify-ios-single-repo-migration.sh` now fails if any of these obsolete app-target duplicates are copied back under `iOS/VoiceInk-ios/`; the sibling keyboard, unit-test, and UI-test target folders must have no sibling-only Swift files except the documented obsolete UI-test launch screenshot template.
 
 - `AppGroupCoordinator.swift`: moved into `iOS/Shared/AppGroupCoordinator.swift`; start-recording requests now use `VoiceInkAppDeepLink` from `VoiceInkCore`, while `VoiceInkAppGroupRecordingStatePolicy` supplies App Group recording state decisions and the iOS shared shell still handles stop requests, UserDefaults access, URL opening, and keyboard recording-state notifications.
 
@@ -356,7 +356,8 @@ The remaining Swift files present in `../VoiceInk-iOS/VoiceInk-ios` but not in `
 - `Item.swift`: unused SwiftData template sample.
 - `VoiceInk-ios/Transcription.swift`: obsolete nested clone-side model copy; current in-repo iOS model is `iOS/VoiceInk-ios/Transcription.swift`.
 - In-repo-only iOS app Swift files are limited to `ProviderAPIKeyTone+iOS.swift`, `TranscriptStatusTone+iOS.swift`, `Transcription.swift`, and `VoiceInkIOSStorageDirectories.swift`; these are the intentional iOS shell adapters/model file after the single-repo import, not sibling clone drift.
-- `VoiceInk_iosTests.swift`, `VoiceInk_iosUITests.swift`, `VoiceInk_iosUITestsLaunchTests.swift`: kept in the in-repo iOS target as real migration/runtime smoke coverage; pure `VoiceInkCore` contract assertions stay in `VoiceInkCoreTests`, and the old stock-template assertions from the sibling clone should not be copied back.
+- `VoiceInk_iosTests.swift` and `VoiceInk_iosUITests.swift`: kept in the in-repo iOS target as real migration/runtime smoke coverage; pure `VoiceInkCore` contract assertions stay in `VoiceInkCoreTests`, and the old stock-template assertions from the sibling clone should not be copied back.
+- `VoiceInk_iosUITestsLaunchTests.swift`: obsolete stock launch-screenshot template; the real launch smoke assertion lives in `VoiceInk_iosUITests.swift`, so this file stays absent from the in-repo iOS UI-test target.
 
 Do not copy these files back into `VoiceInk/iOS`. If behavior from one appears missing, port it into `VoiceInkCore` or the appropriate platform shell with a focused test.
 
@@ -392,7 +393,7 @@ scripts/verify-ios-single-repo-migration.sh --full-build
 13. iOS shared shell files are present under `iOS/Shared/` and included in both the iOS app and keyboard targets: `AppGroupCoordinator.swift` and `VoiceInkAppGroupRecordingBridge.swift`; `VoiceInkAppGroupRecordingBridge` adapts the shared App Group recording-state policy to UserDefaults, while notification execution stays there instead of app-only managers. Deferred app-launch recording requests stay in `VoiceInkLaunchRecordingRequestState` instead of a loose app-level pending flag. The old `iOS/Shared/VoiceInkAppDeepLink.swift`, `iOS/Shared/VoiceInkKeyboardRecordingTiming.swift`, and `iOS/Shared/VoiceInkKeyboardRecordingButtonPresentation.swift` wrappers stay deleted because those contracts live in `VoiceInkCore`.
 14. iOS non-Swift app artifacts are present: privacy manifest, app icon catalog files, and bundled Silero VAD resource.
 15. Obsolete clone-side Swift duplicates remain absent from `iOS/VoiceInk-ios/`.
-16. When `../VoiceInk-iOS` exists, every sibling-only Swift file under `VoiceInk-ios/` is one of the documented obsolete/replaced files above, every in-repo-only iOS app Swift file is one of the documented intentional shell/model files above, and the sibling keyboard/unit-test/UI-test target folders have no sibling-only Swift files.
+16. When `../VoiceInk-iOS` exists, every sibling-only Swift file under `VoiceInk-ios/` is one of the documented obsolete/replaced files above, every in-repo-only iOS app Swift file is one of the documented intentional shell/model files above, and the sibling keyboard/unit-test/UI-test target folders have no sibling-only Swift files except the obsolete UI-test launch screenshot template.
 17. Legacy same-file clone shims remain absent from the in-repo iOS app and keyboard: `TranscriptionServiceFactory`, `LLMPostProcessor`, the old local `RecordingState`, raw `voiceink://record` URL construction, shell-owned keyboard button copy, `Open VoiceInk` keyboard copy, and old `AppSettings` effective-provider/model accessors.
 18. Standalone clone setup/Pages files such as `iOS/.github/workflows/deploy.yml`, `iOS/.nojekyll`, and `iOS/tasks.md` remain absent from the in-repo iOS subtree.
 19. iOS recording background transcription delegates stored-audio completion/failure updates to `VoiceInkMutableTranscriptionRecord.retranscribeStoredAudio` instead of duplicating record-state writes in `RecordingManager`.

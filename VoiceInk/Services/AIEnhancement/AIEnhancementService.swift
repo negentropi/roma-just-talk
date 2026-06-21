@@ -417,32 +417,38 @@ class AIEnhancementService: ObservableObject {
     }
 
     func applyPromptDetectionResult(_ result: VoiceInkPromptDetectionResult) {
-        guard result.shouldEnableAI else { return }
-
-        if !isEnhancementEnabled {
-            isEnhancementEnabled = true
-        }
-        if let promptId = result.selectedPromptId {
-            selectedPromptId = promptId
-        }
+        applyPromptDetectionSettingsState(
+            result.applyingSettingsState(current: promptDetectionSettingsState)
+        )
     }
 
     func restorePromptDetectionSettings(_ result: VoiceInkPromptDetectionResult) {
-        guard result.shouldEnableAI else { return }
-
-        let restoredEnhancementState = result.restoredEnhancementState(current: isEnhancementEnabled)
-        if isEnhancementEnabled != restoredEnhancementState {
-            isEnhancementEnabled = restoredEnhancementState
-        }
-
-        let restoredPromptId = result.restoredPromptId(current: selectedPromptId)
-        if selectedPromptId != restoredPromptId {
-            selectedPromptId = restoredPromptId
-        }
+        applyPromptDetectionSettingsState(
+            result.restoringSettingsState(current: promptDetectionSettingsState)
+        )
     }
 
     private func refreshPromptDetectionCache() {
         promptDetectionPrompts = VoiceInkCustomPromptPolicy.triggerDetectablePrompts(from: customPrompts)
+    }
+
+    private var promptDetectionSettingsState: VoiceInkPromptDetectionSettingsState {
+        VoiceInkPromptDetectionSettingsState(
+            isEnhancementEnabled: isEnhancementEnabled,
+            selectedPromptId: selectedPromptId
+        )
+    }
+
+    private func applyPromptDetectionSettingsState(_ state: VoiceInkPromptDetectionSettingsState?) {
+        guard let state else { return }
+
+        if isEnhancementEnabled != state.isEnhancementEnabled {
+            isEnhancementEnabled = state.isEnhancementEnabled
+        }
+
+        if selectedPromptId != state.selectedPromptId {
+            selectedPromptId = state.selectedPromptId
+        }
     }
 
     private func applyPromptStoreState(_ state: VoiceInkCustomPromptStoreState) {

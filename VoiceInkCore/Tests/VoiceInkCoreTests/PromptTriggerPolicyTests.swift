@@ -50,7 +50,35 @@ final class PromptTriggerPolicyTests: XCTestCase {
         XCTAssertEqual(result.originalPromptId, originalPromptId)
     }
 
-    func testDetectedPromptResultRestoresOriginalStateIncludingNilPrompt() {
+    func testDetectedPromptResultAppliesSettingsState() throws {
+        let detectedPromptId = UUID()
+        let currentPromptId = UUID()
+        let result = VoiceInkPromptDetectionResult(
+            shouldEnableAI: true,
+            selectedPromptId: detectedPromptId,
+            processedText: "send a follow up",
+            detectedTriggerWord: "email",
+            originalEnhancementState: false,
+            originalPromptId: nil
+        )
+
+        let state = try XCTUnwrap(result.applyingSettingsState(
+            current: VoiceInkPromptDetectionSettingsState(
+                isEnhancementEnabled: false,
+                selectedPromptId: currentPromptId
+            )
+        ))
+
+        XCTAssertEqual(
+            state,
+            VoiceInkPromptDetectionSettingsState(
+                isEnhancementEnabled: true,
+                selectedPromptId: detectedPromptId
+            )
+        )
+    }
+
+    func testDetectedPromptResultRestoresSettingsStateIncludingNilPrompt() throws {
         let detectedPromptId = UUID()
         let result = VoiceInkPromptDetectionResult(
             shouldEnableAI: true,
@@ -61,11 +89,23 @@ final class PromptTriggerPolicyTests: XCTestCase {
             originalPromptId: nil
         )
 
-        XCTAssertFalse(result.restoredEnhancementState(current: true))
-        XCTAssertNil(result.restoredPromptId(current: detectedPromptId))
+        let state = try XCTUnwrap(result.restoringSettingsState(
+            current: VoiceInkPromptDetectionSettingsState(
+                isEnhancementEnabled: true,
+                selectedPromptId: detectedPromptId
+            )
+        ))
+
+        XCTAssertEqual(
+            state,
+            VoiceInkPromptDetectionSettingsState(
+                isEnhancementEnabled: false,
+                selectedPromptId: nil
+            )
+        )
     }
 
-    func testNoMatchPromptResultKeepsCurrentStateWhenRestored() {
+    func testNoMatchPromptResultReturnsNoSettingsState() {
         let currentPromptId = UUID()
         let originalPromptId = UUID()
         let result = VoiceInkPromptDetectionResult(
@@ -77,8 +117,13 @@ final class PromptTriggerPolicyTests: XCTestCase {
             originalPromptId: originalPromptId
         )
 
-        XCTAssertTrue(result.restoredEnhancementState(current: true))
-        XCTAssertEqual(result.restoredPromptId(current: currentPromptId), currentPromptId)
+        let currentState = VoiceInkPromptDetectionSettingsState(
+            isEnhancementEnabled: true,
+            selectedPromptId: currentPromptId
+        )
+
+        XCTAssertNil(result.applyingSettingsState(current: currentState))
+        XCTAssertNil(result.restoringSettingsState(current: currentState))
     }
 
     func testPromptDetectionPolicyIgnoresPromptsWithoutTriggerWords() {

@@ -4072,6 +4072,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PromptTriggerPolicy.swift
 
 require_pattern \
+  "shared prompt-trigger settings application state lives in VoiceInkCore" \
+  'VoiceInkPromptDetectionSettingsState|applyingSettingsState|restoringSettingsState' \
+  VoiceInkCore/Sources/VoiceInkCore/PromptTriggerPolicy.swift
+
+require_pattern \
   "macOS prompt editor consumes shared trigger-word draft validation" \
   'VoiceInkPromptTriggerPolicy\.hasTriggerWordDraft' \
   VoiceInk/Views/PromptEditorView.swift
@@ -4090,6 +4095,21 @@ require_pattern \
   "core checks execute prompt trigger-word removal policy test" \
   'PromptTriggerPolicyTests\.testRemovingTriggerWordPreservesExactMacOSEditingRule' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute prompt-trigger settings state tests" \
+  'PromptTriggerPolicyTests\.testDetectedPromptResultAppliesSettingsState|PromptTriggerPolicyTests\.testDetectedPromptResultRestoresSettingsStateIncludingNilPrompt|PromptTriggerPolicyTests\.testNoMatchPromptResultReturnsNoSettingsState' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "macOS AI enhancement service consumes shared prompt-trigger settings state" \
+  'applyingSettingsState|restoringSettingsState|VoiceInkPromptDetectionSettingsState' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+reject_pattern \
+  "macOS AI enhancement service avoids shell-owned prompt-trigger settings application policy" \
+  'result\.shouldEnableAI|restoredEnhancementState|restoredPromptId|selectedPromptId = result\.selectedPromptId' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
 require_pattern \
   "macOS prompt grids use shared presentation" \

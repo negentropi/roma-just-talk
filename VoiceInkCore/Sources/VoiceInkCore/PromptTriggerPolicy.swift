@@ -47,13 +47,37 @@ public struct VoiceInkPromptDetectionResult: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkPromptDetectionSettingsState: Equatable, Sendable {
+    public let isEnhancementEnabled: Bool
+    public let selectedPromptId: UUID?
+
+    public init(isEnhancementEnabled: Bool, selectedPromptId: UUID?) {
+        self.isEnhancementEnabled = isEnhancementEnabled
+        self.selectedPromptId = selectedPromptId
+    }
+}
+
 public extension VoiceInkPromptDetectionResult {
-    func restoredEnhancementState(current: Bool) -> Bool {
-        shouldEnableAI ? originalEnhancementState : current
+    func applyingSettingsState(
+        current state: VoiceInkPromptDetectionSettingsState
+    ) -> VoiceInkPromptDetectionSettingsState? {
+        guard shouldEnableAI else { return nil }
+
+        return VoiceInkPromptDetectionSettingsState(
+            isEnhancementEnabled: true,
+            selectedPromptId: selectedPromptId ?? state.selectedPromptId
+        )
     }
 
-    func restoredPromptId(current: UUID?) -> UUID? {
-        shouldEnableAI ? originalPromptId : current
+    func restoringSettingsState(
+        current _: VoiceInkPromptDetectionSettingsState
+    ) -> VoiceInkPromptDetectionSettingsState? {
+        guard shouldEnableAI else { return nil }
+
+        return VoiceInkPromptDetectionSettingsState(
+            isEnhancementEnabled: originalEnhancementState,
+            selectedPromptId: originalPromptId
+        )
     }
 }
 

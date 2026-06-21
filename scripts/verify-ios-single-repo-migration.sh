@@ -5363,7 +5363,7 @@ require_pattern \
 
 require_pattern \
   "shared transcription paste output owns cursor-context planning" \
-  'public struct CursorPasteTextPlan|public static func cursorPasteTextPlan|shouldReadCursorContext' \
+  'public struct CursorPasteTextPlan|public static func cursorPasteTextPlan|shouldReadCursorContext|VoiceInkTranscriptionCleanupPreferenceStorage\.shouldLowercase' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionPasteOutputPolicy.swift
 
 require_pattern \
@@ -5396,6 +5396,11 @@ require_pattern \
   'VoiceInkTranscriptionPasteOutputPolicy\.cursorPasteTextPlan' \
   VoiceInk/Paste/CursorPaster.swift
 
+reject_pattern \
+  "macOS CursorPaster avoids shallow cursor-plan wrapper" \
+  'private +static +func +cursorPasteTextPlan\(' \
+  VoiceInk/Paste/CursorPaster.swift
+
 require_pattern \
   "macOS CursorPaster owns paste text preparation" \
   'preparedTextForPaste|shouldReadCursorContext' \
@@ -5405,6 +5410,11 @@ reject_pattern \
   "macOS transcription pipeline avoids shell-only paste output policy" \
   'Your trial has expired|"AppendTrailingSpace"|textToPaste \+ \(appendSpace \? " " : ""\)|VoiceInkContextualCapitalizationFormatter\.(needsCursorContext|format)|VoiceInkTranscriptionPasteOutputPolicy\.cursorPasteTextPlan' \
   VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
+
+require_pattern \
+  "core checks execute preference-backed cursor paste plan test" \
+  'TranscriptionPasteOutputPolicyTests\.testCursorPasteTextPlanReadsLowercaseCleanupPreference' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "macOS transcription pipeline uses CursorPaster paste preparation" \
@@ -5439,7 +5449,7 @@ reject_pattern \
 
 require_pattern \
   "migration checklist tracks shared paste output gate" \
-  'macOS final paste text assembly routes cursor-context capitalization planning, trial-expired prefix, trailing-space storage/default registration, and trailing-space settings labels/help through `VoiceInkTranscriptionPasteOutputPolicy`/`VoiceInkAppendTrailingSpacePreference`' \
+  'macOS final paste text assembly routes cursor-context capitalization planning, lowercase-cleanup preference gating, trial-expired prefix, trailing-space storage/default registration, and trailing-space settings labels/help through `VoiceInkTranscriptionPasteOutputPolicy`/`VoiceInkAppendTrailingSpacePreference`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

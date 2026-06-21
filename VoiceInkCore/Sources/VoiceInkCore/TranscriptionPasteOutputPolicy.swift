@@ -69,6 +69,16 @@ public enum VoiceInkTranscriptionPasteOutputPolicy {
         )
     }
 
+    public static func cursorPasteTextPlan(
+        _ text: String,
+        from defaults: UserDefaults = .standard
+    ) -> CursorPasteTextPlan {
+        cursorPasteTextPlan(
+            text,
+            shouldLowercase: VoiceInkTranscriptionCleanupPreferenceStorage.shouldLowercase(from: defaults)
+        )
+    }
+
     public static func finalPastedText(
         _ text: String,
         appendTrailingSpace: Bool,

@@ -161,6 +161,99 @@ final class RollingBufferPreloadPolicyTests: XCTestCase {
         }
     }
 
+    func testBackupPreferencesPreserveMacOSExportShape() {
+        XCTAssertEqual(
+            VoiceInkRollingBufferPreloadSettings.backupPreferences(
+                from: VoiceInkRollingBufferPreloadConfiguration(
+                    mode: .on,
+                    autoDisablesCloudModels: true,
+                    autoDisablesLowBatteryLocalModels: false,
+                    lowBatteryThresholdPercent: 55,
+                    bufferDurationSeconds: 4.5,
+                    preRunFinalization: false
+                ),
+                selectedVADModelRawValue: "silero",
+                perModelPreloadEnabled: ["parakeet": false]
+            ),
+            VoiceInkRollingBufferBackupPreferences(
+                preloadModeRawValue: "on",
+                autoDisablesCloudModels: true,
+                autoDisablesLowBatteryLocalModels: false,
+                lowBatteryThresholdPercent: 55,
+                bufferDurationSeconds: 4.5,
+                preRunFinalization: false,
+                vadModelRawValue: "silero",
+                perModelPreloadEnabled: ["parakeet": false]
+            )
+        )
+
+        XCTAssertNil(
+            VoiceInkRollingBufferPreloadSettings.backupPreferences(
+                from: configuration(mode: .auto),
+                selectedVADModelRawValue: "future-vad",
+                perModelPreloadEnabled: [:]
+            ).perModelPreloadEnabled
+        )
+    }
+
+    func testBackupImportPlanValidatesAndClampsRawValues() {
+        XCTAssertEqual(
+            VoiceInkRollingBufferPreloadSettings.backupImportPlan(
+                from: VoiceInkRollingBufferBackupPreferences(
+                    preloadModeRawValue: "on",
+                    autoDisablesCloudModels: true,
+                    autoDisablesLowBatteryLocalModels: false,
+                    lowBatteryThresholdPercent: 500,
+                    bufferDurationSeconds: 99,
+                    preRunFinalization: false,
+                    vadModelRawValue: "silero",
+                    perModelPreloadEnabled: [
+                        "parakeet": false,
+                        "": true
+                    ]
+                )
+            ),
+            VoiceInkRollingBufferBackupImportPlan(
+                mode: .on,
+                autoDisablesCloudModels: true,
+                autoDisablesLowBatteryLocalModels: false,
+                lowBatteryThresholdPercent: 100,
+                bufferDurationSeconds: 30,
+                preRunFinalization: false,
+                vadModel: .silero,
+                perModelPreloadEnabled: [
+                    "parakeet": false,
+                    "": true
+                ]
+            )
+        )
+
+        XCTAssertEqual(
+            VoiceInkRollingBufferPreloadSettings.backupImportPlan(
+                from: VoiceInkRollingBufferBackupPreferences(
+                    preloadModeRawValue: "bad",
+                    autoDisablesCloudModels: nil,
+                    autoDisablesLowBatteryLocalModels: nil,
+                    lowBatteryThresholdPercent: -1,
+                    bufferDurationSeconds: 0,
+                    preRunFinalization: nil,
+                    vadModelRawValue: "future-vad",
+                    perModelPreloadEnabled: nil
+                )
+            ),
+            VoiceInkRollingBufferBackupImportPlan(
+                mode: nil,
+                autoDisablesCloudModels: nil,
+                autoDisablesLowBatteryLocalModels: nil,
+                lowBatteryThresholdPercent: 1,
+                bufferDurationSeconds: 0.25,
+                preRunFinalization: nil,
+                vadModel: nil,
+                perModelPreloadEnabled: nil
+            )
+        )
+    }
+
     func testImportedSettingsSavePresentValuesAndClampRanges() {
         withIsolatedDefaults { defaults in
             let didSave = VoiceInkRollingBufferPreloadSettings.saveImportedSettings(
@@ -216,6 +309,39 @@ final class RollingBufferPreloadPolicyTests: XCTestCase {
                 VoiceInkRollingBufferPreloadSettings.configuration(in: defaults).mode,
                 .off
             )
+        }
+    }
+
+    func testImportedBackupPlanSavesPreloadAndVADSettings() {
+        withIsolatedDefaults { defaults in
+            let importPlan = VoiceInkRollingBufferPreloadSettings.backupImportPlan(
+                from: VoiceInkRollingBufferBackupPreferences(
+                    preloadModeRawValue: "on",
+                    autoDisablesCloudModels: true,
+                    autoDisablesLowBatteryLocalModels: false,
+                    lowBatteryThresholdPercent: 500,
+                    bufferDurationSeconds: 99,
+                    preRunFinalization: false,
+                    vadModelRawValue: "silero",
+                    perModelPreloadEnabled: ["parakeet": false]
+                )
+            )
+
+            XCTAssertTrue(VoiceInkRollingBufferPreloadSettings.saveImportedSettings(from: importPlan, to: defaults))
+            XCTAssertTrue(VoiceInkRollingBufferVADSettings.saveImportedModel(from: importPlan, to: defaults))
+
+            let configuration = VoiceInkRollingBufferPreloadSettings.configuration(in: defaults)
+            XCTAssertEqual(configuration.mode, .on)
+            XCTAssertTrue(configuration.autoDisablesCloudModels)
+            XCTAssertFalse(configuration.autoDisablesLowBatteryLocalModels)
+            XCTAssertEqual(configuration.lowBatteryThresholdPercent, 100)
+            XCTAssertEqual(configuration.bufferDurationSeconds, 30)
+            XCTAssertFalse(configuration.preRunFinalization)
+            XCTAssertFalse(VoiceInkRollingBufferPreloadSettings.perModelPreloadEnabled(
+                forModelName: "parakeet",
+                in: defaults
+            ))
+            XCTAssertEqual(VoiceInkRollingBufferVADSettings.selectedModel(in: defaults), "silero")
         }
     }
 

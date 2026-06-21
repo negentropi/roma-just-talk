@@ -8860,6 +8860,26 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/RollingBufferPreloadPolicy.swift
 
 require_pattern \
+  "shared rolling-buffer backup preferences live in VoiceInkCore" \
+  'VoiceInkRollingBufferBackupPreferences' \
+  VoiceInkCore/Sources/VoiceInkCore/RollingBufferPreloadPolicy.swift
+
+require_pattern \
+  "shared rolling-buffer backup import plan lives in VoiceInkCore" \
+  'VoiceInkRollingBufferBackupImportPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/RollingBufferPreloadPolicy.swift
+
+require_pattern \
+  "shared rolling-buffer backup export policy lives in VoiceInkCore" \
+  'static func backupPreferences' \
+  VoiceInkCore/Sources/VoiceInkCore/RollingBufferPreloadPolicy.swift
+
+require_pattern \
+  "shared rolling-buffer backup import policy lives in VoiceInkCore" \
+  'static func backupImportPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/RollingBufferPreloadPolicy.swift
+
+require_pattern \
   "macOS defaults register shared rolling-buffer VAD model default" \
   'VoiceInkRollingBufferVADSettings\.(modelKey|sileroModelName)' \
   VoiceInk/AppDefaults.swift
@@ -8890,9 +8910,19 @@ require_pattern \
   VoiceInk/Services/BackupImporter.swift
 
 require_pattern \
+  "macOS backup import uses shared rolling-buffer backup import plan" \
+  'VoiceInkRollingBufferPreloadSettings\.backupImportPlan' \
+  VoiceInk/Services/BackupImporter.swift
+
+require_pattern \
   "macOS backup import uses shared rolling-buffer VAD model import policy" \
   'VoiceInkRollingBufferVADSettings\.saveImportedModel' \
   VoiceInk/Services/BackupImporter.swift
+
+require_pattern \
+  "macOS general backup adapts rolling-buffer values to shared backup preferences" \
+  'rollingBufferBackupPreferences' \
+  VoiceInk/Services/BackupTypes.swift
 
 reject_pattern \
   "macOS backup import avoids shell-only rolling-buffer preload storage" \
@@ -8900,9 +8930,19 @@ reject_pattern \
   VoiceInk/Services/BackupImporter.swift
 
 reject_pattern \
+  "macOS backup import avoids shell-owned rolling-buffer backup field planning" \
+  'general\.(rollingBufferPreloadModeRawValue|rollingBufferPreloadAutoDisableCloudModels|rollingBufferPreloadAutoDisableLowBatteryLocalModels|rollingBufferPreloadLowBatteryThresholdPercent|rollingBufferDurationSeconds|rollingBufferPreloadFinalization|rollingBufferPreloadEnabledByModel|rollingBufferVADModel)' \
+  VoiceInk/Services/BackupImporter.swift
+
+reject_pattern \
   "macOS backup import avoids shell-only rolling-buffer VAD model policy" \
   '\bRollingBufferVADSettings\b|vadModel ==|UserDefaults\.standard\.set\(vadModel' \
   VoiceInk/Services/BackupImporter.swift
+
+require_pattern \
+  "macOS backup export uses shared rolling-buffer backup preferences" \
+  'VoiceInkRollingBufferPreloadSettings\.backupPreferences' \
+  VoiceInk/Services/ImportExportService.swift
 
 require_pattern \
   "macOS backup export uses shared rolling-buffer per-model export policy" \
@@ -8918,6 +8958,16 @@ reject_pattern \
   "macOS backup export avoids shell-only rolling-buffer per-model key scan" \
   'perModelEnabledKeyPrefix|dictionaryRepresentation\(\)|exportPerModelRollingBufferPreloadSettings|dropFirst\(prefix\.count\)' \
   VoiceInk/Services/ImportExportService.swift
+
+require_pattern \
+  "core checks execute rolling-buffer backup export policy tests" \
+  'RollingBufferPreloadPolicyTests\.testBackupPreferencesPreserveMacOSExportShape' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute rolling-buffer backup import policy tests" \
+  'RollingBufferPreloadPolicyTests\.testBackupImportPlanValidatesAndClampsRawValues|RollingBufferPreloadPolicyTests\.testImportedBackupPlanSavesPreloadAndVADSettings' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \
   "macOS rolling-buffer shell avoids local VAD model settings policy" \

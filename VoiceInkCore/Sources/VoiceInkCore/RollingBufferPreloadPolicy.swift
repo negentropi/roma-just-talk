@@ -107,6 +107,68 @@ public struct VoiceInkRollingBufferPreloadSettingsPresentation: Equatable, Senda
     }
 }
 
+public struct VoiceInkRollingBufferBackupPreferences: Codable, Equatable, Sendable {
+    public let preloadModeRawValue: String?
+    public let autoDisablesCloudModels: Bool?
+    public let autoDisablesLowBatteryLocalModels: Bool?
+    public let lowBatteryThresholdPercent: Int?
+    public let bufferDurationSeconds: Double?
+    public let preRunFinalization: Bool?
+    public let vadModelRawValue: String?
+    public let perModelPreloadEnabled: [String: Bool]?
+
+    public init(
+        preloadModeRawValue: String?,
+        autoDisablesCloudModels: Bool?,
+        autoDisablesLowBatteryLocalModels: Bool?,
+        lowBatteryThresholdPercent: Int?,
+        bufferDurationSeconds: Double?,
+        preRunFinalization: Bool?,
+        vadModelRawValue: String?,
+        perModelPreloadEnabled: [String: Bool]?
+    ) {
+        self.preloadModeRawValue = preloadModeRawValue
+        self.autoDisablesCloudModels = autoDisablesCloudModels
+        self.autoDisablesLowBatteryLocalModels = autoDisablesLowBatteryLocalModels
+        self.lowBatteryThresholdPercent = lowBatteryThresholdPercent
+        self.bufferDurationSeconds = bufferDurationSeconds
+        self.preRunFinalization = preRunFinalization
+        self.vadModelRawValue = vadModelRawValue
+        self.perModelPreloadEnabled = perModelPreloadEnabled
+    }
+}
+
+public struct VoiceInkRollingBufferBackupImportPlan: Equatable, Sendable {
+    public let mode: VoiceInkRollingBufferPreloadMode?
+    public let autoDisablesCloudModels: Bool?
+    public let autoDisablesLowBatteryLocalModels: Bool?
+    public let lowBatteryThresholdPercent: Int?
+    public let bufferDurationSeconds: Double?
+    public let preRunFinalization: Bool?
+    public let vadModel: VoiceInkRollingBufferVADModel?
+    public let perModelPreloadEnabled: [String: Bool]?
+
+    public init(
+        mode: VoiceInkRollingBufferPreloadMode?,
+        autoDisablesCloudModels: Bool?,
+        autoDisablesLowBatteryLocalModels: Bool?,
+        lowBatteryThresholdPercent: Int?,
+        bufferDurationSeconds: Double?,
+        preRunFinalization: Bool?,
+        vadModel: VoiceInkRollingBufferVADModel?,
+        perModelPreloadEnabled: [String: Bool]?
+    ) {
+        self.mode = mode
+        self.autoDisablesCloudModels = autoDisablesCloudModels
+        self.autoDisablesLowBatteryLocalModels = autoDisablesLowBatteryLocalModels
+        self.lowBatteryThresholdPercent = lowBatteryThresholdPercent
+        self.bufferDurationSeconds = bufferDurationSeconds
+        self.preRunFinalization = preRunFinalization
+        self.vadModel = vadModel
+        self.perModelPreloadEnabled = perModelPreloadEnabled
+    }
+}
+
 public enum VoiceInkRollingBufferPreloadSettings {
     public static let modeKey = "RollingBufferPreloadMode"
     public static let autoDisableCloudModelsKey = "RollingBufferPreloadAutoDisableCloudModels"
@@ -180,6 +242,38 @@ public enum VoiceInkRollingBufferPreloadSettings {
         }
     }
 
+    public static func backupPreferences(
+        from configuration: VoiceInkRollingBufferPreloadConfiguration,
+        selectedVADModelRawValue: String,
+        perModelPreloadEnabled: [String: Bool]
+    ) -> VoiceInkRollingBufferBackupPreferences {
+        VoiceInkRollingBufferBackupPreferences(
+            preloadModeRawValue: configuration.mode.rawValue,
+            autoDisablesCloudModels: configuration.autoDisablesCloudModels,
+            autoDisablesLowBatteryLocalModels: configuration.autoDisablesLowBatteryLocalModels,
+            lowBatteryThresholdPercent: configuration.lowBatteryThresholdPercent,
+            bufferDurationSeconds: configuration.bufferDurationSeconds,
+            preRunFinalization: configuration.preRunFinalization,
+            vadModelRawValue: selectedVADModelRawValue,
+            perModelPreloadEnabled: perModelPreloadEnabled.isEmpty ? nil : perModelPreloadEnabled
+        )
+    }
+
+    public static func backupImportPlan(
+        from preferences: VoiceInkRollingBufferBackupPreferences
+    ) -> VoiceInkRollingBufferBackupImportPlan {
+        VoiceInkRollingBufferBackupImportPlan(
+            mode: preferences.preloadModeRawValue.flatMap(VoiceInkRollingBufferPreloadMode.init(rawValue:)),
+            autoDisablesCloudModels: preferences.autoDisablesCloudModels,
+            autoDisablesLowBatteryLocalModels: preferences.autoDisablesLowBatteryLocalModels,
+            lowBatteryThresholdPercent: preferences.lowBatteryThresholdPercent.map { min(max($0, 1), 100) },
+            bufferDurationSeconds: preferences.bufferDurationSeconds.map { min(max($0, 0.25), 30.0) },
+            preRunFinalization: preferences.preRunFinalization,
+            vadModel: preferences.vadModelRawValue.flatMap(VoiceInkRollingBufferVADModel.init(rawValue:)),
+            perModelPreloadEnabled: preferences.perModelPreloadEnabled
+        )
+    }
+
     @discardableResult
     public static func saveImportedSettings(
         modeRawValue: String?,
@@ -191,34 +285,55 @@ public enum VoiceInkRollingBufferPreloadSettings {
         perModelPreloadEnabled: [String: Bool]?,
         to defaults: UserDefaults = .standard
     ) -> Bool {
+        saveImportedSettings(
+            from: backupImportPlan(
+                from: VoiceInkRollingBufferBackupPreferences(
+                    preloadModeRawValue: modeRawValue,
+                    autoDisablesCloudModels: autoDisablesCloudModels,
+                    autoDisablesLowBatteryLocalModels: autoDisablesLowBatteryLocalModels,
+                    lowBatteryThresholdPercent: lowBatteryThresholdPercent,
+                    bufferDurationSeconds: bufferDurationSeconds,
+                    preRunFinalization: preRunFinalization,
+                    vadModelRawValue: nil,
+                    perModelPreloadEnabled: perModelPreloadEnabled
+                )
+            ),
+            to: defaults
+        )
+    }
+
+    @discardableResult
+    public static func saveImportedSettings(
+        from importPlan: VoiceInkRollingBufferBackupImportPlan,
+        to defaults: UserDefaults = .standard
+    ) -> Bool {
         var didSave = false
 
-        if let modeRawValue,
-           let mode = VoiceInkRollingBufferPreloadMode(rawValue: modeRawValue) {
+        if let mode = importPlan.mode {
             defaults.set(mode.rawValue, forKey: modeKey)
             didSave = true
         }
-        if let autoDisablesCloudModels {
+        if let autoDisablesCloudModels = importPlan.autoDisablesCloudModels {
             defaults.set(autoDisablesCloudModels, forKey: autoDisableCloudModelsKey)
             didSave = true
         }
-        if let autoDisablesLowBatteryLocalModels {
+        if let autoDisablesLowBatteryLocalModels = importPlan.autoDisablesLowBatteryLocalModels {
             defaults.set(autoDisablesLowBatteryLocalModels, forKey: autoDisableLowBatteryLocalModelsKey)
             didSave = true
         }
-        if let lowBatteryThresholdPercent {
-            defaults.set(min(max(lowBatteryThresholdPercent, 1), 100), forKey: lowBatteryThresholdPercentKey)
+        if let lowBatteryThresholdPercent = importPlan.lowBatteryThresholdPercent {
+            defaults.set(lowBatteryThresholdPercent, forKey: lowBatteryThresholdPercentKey)
             didSave = true
         }
-        if let bufferDurationSeconds {
-            defaults.set(min(max(bufferDurationSeconds, 0.25), 30.0), forKey: bufferDurationSecondsKey)
+        if let bufferDurationSeconds = importPlan.bufferDurationSeconds {
+            defaults.set(bufferDurationSeconds, forKey: bufferDurationSecondsKey)
             didSave = true
         }
-        if let preRunFinalization {
+        if let preRunFinalization = importPlan.preRunFinalization {
             defaults.set(preRunFinalization, forKey: preRunFinalizationKey)
             didSave = true
         }
-        if let perModelPreloadEnabled {
+        if let perModelPreloadEnabled = importPlan.perModelPreloadEnabled {
             for (modelName, enabled) in perModelPreloadEnabled where !modelName.isEmpty {
                 savePerModelPreloadEnabled(enabled, forModelName: modelName, in: defaults)
             }
@@ -274,6 +389,19 @@ public enum VoiceInkRollingBufferVADSettings {
         guard let rawValue,
               let model = VoiceInkRollingBufferVADModel(rawValue: rawValue)
         else {
+            return false
+        }
+
+        saveSelectedModel(model, to: defaults)
+        return true
+    }
+
+    @discardableResult
+    public static func saveImportedModel(
+        from importPlan: VoiceInkRollingBufferBackupImportPlan,
+        to defaults: UserDefaults = .standard
+    ) -> Bool {
+        guard let model = importPlan.vadModel else {
             return false
         }
 

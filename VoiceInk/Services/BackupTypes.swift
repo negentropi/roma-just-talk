@@ -156,6 +156,19 @@ extension GeneralBackup {
             lowercaseTranscription: lowercaseTranscription
         )
     }
+
+    var rollingBufferBackupPreferences: VoiceInkRollingBufferBackupPreferences {
+        VoiceInkRollingBufferBackupPreferences(
+            preloadModeRawValue: rollingBufferPreloadModeRawValue,
+            autoDisablesCloudModels: rollingBufferPreloadAutoDisableCloudModels,
+            autoDisablesLowBatteryLocalModels: rollingBufferPreloadAutoDisableLowBatteryLocalModels,
+            lowBatteryThresholdPercent: rollingBufferPreloadLowBatteryThresholdPercent,
+            bufferDurationSeconds: rollingBufferDurationSeconds,
+            preRunFinalization: rollingBufferPreloadFinalization,
+            vadModelRawValue: rollingBufferVADModel,
+            perModelPreloadEnabled: rollingBufferPreloadEnabledByModel
+        )
+    }
 }
 
 struct BackupFile: Codable {

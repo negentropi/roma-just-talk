@@ -229,17 +229,14 @@ enum BackupImporter {
     }
 
     private static func importRollingBufferSettings(_ general: GeneralBackup) {
+        let rollingBufferImportPlan = VoiceInkRollingBufferPreloadSettings.backupImportPlan(
+            from: general.rollingBufferBackupPreferences
+        )
         var didImportRollingBufferSetting = VoiceInkRollingBufferPreloadSettings.saveImportedSettings(
-            modeRawValue: general.rollingBufferPreloadModeRawValue,
-            autoDisablesCloudModels: general.rollingBufferPreloadAutoDisableCloudModels,
-            autoDisablesLowBatteryLocalModels: general.rollingBufferPreloadAutoDisableLowBatteryLocalModels,
-            lowBatteryThresholdPercent: general.rollingBufferPreloadLowBatteryThresholdPercent,
-            bufferDurationSeconds: general.rollingBufferDurationSeconds,
-            preRunFinalization: general.rollingBufferPreloadFinalization,
-            perModelPreloadEnabled: general.rollingBufferPreloadEnabledByModel
+            from: rollingBufferImportPlan
         )
 
-        if VoiceInkRollingBufferVADSettings.saveImportedModel(rawValue: general.rollingBufferVADModel) {
+        if VoiceInkRollingBufferVADSettings.saveImportedModel(from: rollingBufferImportPlan) {
             didImportRollingBufferSetting = true
         }
 

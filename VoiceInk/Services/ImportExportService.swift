@@ -161,7 +161,11 @@ class ImportExportService {
             from: audioCleanup
         )
         let rollingBufferConfiguration = VoiceInkRollingBufferPreloadSettings.configuration()
-        let perModelPreloadSettings = VoiceInkRollingBufferPreloadSettings.exportedPerModelPreloadEnabled()
+        let rollingBufferBackupPreferences = VoiceInkRollingBufferPreloadSettings.backupPreferences(
+            from: rollingBufferConfiguration,
+            selectedVADModelRawValue: VoiceInkRollingBufferVADSettings.selectedModel(),
+            perModelPreloadEnabled: VoiceInkRollingBufferPreloadSettings.exportedPerModelPreloadEnabled()
+        )
         let recordingFeedbackBackupPreferences = VoiceInkRecordingFeedbackPreference.backupPreferences(
             isSoundFeedbackEnabled: soundManager.isEnabled,
             isSystemMuteEnabled: mediaController.isSystemMuteEnabled,
@@ -236,14 +240,14 @@ class ImportExportService {
             isExperimentalFeaturesEnabled: VoiceInkRecordingFeedbackPreference.isExperimentalFeaturesEnabled(),
             restoreClipboardAfterPaste: pasteBackupPreferences.shouldRestoreClipboardAfterPaste,
             clipboardRestoreDelay: pasteBackupPreferences.clipboardRestoreDelay,
-            rollingBufferPreloadModeRawValue: rollingBufferConfiguration.mode.rawValue,
-            rollingBufferPreloadAutoDisableCloudModels: rollingBufferConfiguration.autoDisablesCloudModels,
-            rollingBufferPreloadAutoDisableLowBatteryLocalModels: rollingBufferConfiguration.autoDisablesLowBatteryLocalModels,
-            rollingBufferPreloadLowBatteryThresholdPercent: rollingBufferConfiguration.lowBatteryThresholdPercent,
-            rollingBufferDurationSeconds: rollingBufferConfiguration.bufferDurationSeconds,
-            rollingBufferPreloadFinalization: rollingBufferConfiguration.preRunFinalization,
-            rollingBufferVADModel: VoiceInkRollingBufferVADSettings.selectedModel(),
-            rollingBufferPreloadEnabledByModel: perModelPreloadSettings.isEmpty ? nil : perModelPreloadSettings
+            rollingBufferPreloadModeRawValue: rollingBufferBackupPreferences.preloadModeRawValue,
+            rollingBufferPreloadAutoDisableCloudModels: rollingBufferBackupPreferences.autoDisablesCloudModels,
+            rollingBufferPreloadAutoDisableLowBatteryLocalModels: rollingBufferBackupPreferences.autoDisablesLowBatteryLocalModels,
+            rollingBufferPreloadLowBatteryThresholdPercent: rollingBufferBackupPreferences.lowBatteryThresholdPercent,
+            rollingBufferDurationSeconds: rollingBufferBackupPreferences.bufferDurationSeconds,
+            rollingBufferPreloadFinalization: rollingBufferBackupPreferences.preRunFinalization,
+            rollingBufferVADModel: rollingBufferBackupPreferences.vadModelRawValue,
+            rollingBufferPreloadEnabledByModel: rollingBufferBackupPreferences.perModelPreloadEnabled
         )
 
         let exportedSettings = BackupFile(

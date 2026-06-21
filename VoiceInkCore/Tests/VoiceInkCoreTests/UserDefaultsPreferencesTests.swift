@@ -801,6 +801,22 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testAIEnhancementProviderPreferenceAppliesProviderSelectionPlan() {
+        withIsolatedDefaults { defaults in
+            let appliedProvider = VoiceInkAIEnhancementProviderPreference.applyProviderSelectionPlan(
+                VoiceInkAIEnhancementProviderSelectionPlan.selecting(.openRouter),
+                to: defaults
+            )
+
+            XCTAssertEqual(appliedProvider, .openRouter)
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderPreference.selectedProviderRawValue(from: defaults),
+                VoiceInkAIEnhancementProviderKind.openRouter.rawValue
+            )
+            XCTAssertEqual(VoiceInkAIEnhancementProviderPreference.selectedProvider(from: defaults), .openRouter)
+        }
+    }
+
     func testAIEnhancementProviderPreferenceRoundTripsSelectedModel() {
         withIsolatedDefaults { defaults in
             XCTAssertNil(

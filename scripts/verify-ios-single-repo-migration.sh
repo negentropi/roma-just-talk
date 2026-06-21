@@ -5959,6 +5959,33 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \
+  "shared AI enhancement provider-selection plan lives in VoiceInkCore" \
+  'VoiceInkAIEnhancementProviderSelectionPlan|shouldRefreshOllamaRuntimeModels|selectedProviderToSave' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+require_pattern \
+  "shared AI enhancement provider-selection persistence application lives in VoiceInkCore" \
+  'applyProviderSelectionPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "core tests pin shared AI enhancement provider-selection planning" \
+  'testMacOSAIEnhancementProviderSelectionPlanIsShared|testAIEnhancementProviderPreferenceAppliesProviderSelectionPlan' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AIProviderCatalogTests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/UserDefaultsPreferencesTests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "macOS AI service selected-provider mutation uses shared plan" \
+  'VoiceInkAIEnhancementProviderSelectionPlan\.selecting|applyTextEnhancementProviderSelectionPlan|VoiceInkAIEnhancementProviderPreference\.applyProviderSelectionPlan|shouldRefreshOllamaRuntimeModels' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+require_pattern \
+  "migration checklist tracks shared AI enhancement provider-selection planning" \
+  'selected-provider mutation planning.*VoiceInkAIEnhancementProviderSelectionPlan' \
+  docs/ios-single-repo-migration.md
+
+require_pattern \
   "macOS AI service credential-state selection uses shared policy" \
   'textEnhancementCredentialState' \
   VoiceInk/Services/AIEnhancement/AIService.swift
@@ -6266,6 +6293,11 @@ reject_pattern \
 reject_pattern \
   "macOS AI service avoids duplicate credential-state policy" \
   'selectedProvider == \.localCLI \? localCLIService\.isConfigured : true|isAPIKeyValid = localCLIService\.isConfigured' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+reject_pattern \
+  "macOS AI service avoids shell-owned selected-provider mutation policy" \
+  'VoiceInkAIEnhancementProviderPreference\.saveSelectedProvider\(|selectedProvider\.textEnhancementModelCatalogSource == \.ollamaRuntime' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 reject_pattern \

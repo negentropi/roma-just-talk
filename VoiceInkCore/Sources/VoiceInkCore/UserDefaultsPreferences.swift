@@ -668,6 +668,15 @@ public enum VoiceInkAIEnhancementProviderPreference {
         saveSelectedProviderRawValue(provider.rawValue, to: defaults)
     }
 
+    @discardableResult
+    public static func applyProviderSelectionPlan(
+        _ plan: VoiceInkAIEnhancementProviderSelectionPlan,
+        to defaults: UserDefaults = .standard
+    ) -> VoiceInkAIEnhancementProviderKind {
+        saveSelectedProvider(plan.selectedProviderToSave, to: defaults)
+        return plan.selectedProviderToSave
+    }
+
     public static func selectedProvider(
         default defaultProvider: VoiceInkAIEnhancementProviderKind = .gemini,
         from defaults: UserDefaults = .standard

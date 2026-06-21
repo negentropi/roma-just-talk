@@ -549,6 +549,32 @@ final class AIProviderCatalogTests: XCTestCase {
         )
     }
 
+    func testMacOSAIEnhancementProviderSelectionPlanIsShared() {
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderSelectionPlan.selecting(.groq),
+            VoiceInkAIEnhancementProviderSelectionPlan(
+                selectedProviderToSave: .groq,
+                shouldRefreshOllamaRuntimeModels: false
+            )
+        )
+
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderSelectionPlan.selecting(.ollama),
+            VoiceInkAIEnhancementProviderSelectionPlan(
+                selectedProviderToSave: .ollama,
+                shouldRefreshOllamaRuntimeModels: true
+            )
+        )
+
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderSelectionPlan.selecting(.localCLI),
+            VoiceInkAIEnhancementProviderSelectionPlan(
+                selectedProviderToSave: .localCLI,
+                shouldRefreshOllamaRuntimeModels: false
+            )
+        )
+    }
+
     func testMacOSAIEnhancementModelSelectionPreservesAvailableSelections() {
         XCTAssertEqual(
             VoiceInkAIEnhancementProviderKind.groq.selectedTextEnhancementModel(

@@ -28,6 +28,28 @@ public enum VoiceInkAIEnhancementSettingsSurface: Sendable, Equatable {
     case custom
 }
 
+public struct VoiceInkAIEnhancementProviderSelectionPlan: Sendable, Equatable {
+    public let selectedProviderToSave: VoiceInkAIEnhancementProviderKind
+    public let shouldRefreshOllamaRuntimeModels: Bool
+
+    public init(
+        selectedProviderToSave: VoiceInkAIEnhancementProviderKind,
+        shouldRefreshOllamaRuntimeModels: Bool
+    ) {
+        self.selectedProviderToSave = selectedProviderToSave
+        self.shouldRefreshOllamaRuntimeModels = shouldRefreshOllamaRuntimeModels
+    }
+
+    public static func selecting(
+        _ provider: VoiceInkAIEnhancementProviderKind
+    ) -> VoiceInkAIEnhancementProviderSelectionPlan {
+        VoiceInkAIEnhancementProviderSelectionPlan(
+            selectedProviderToSave: provider,
+            shouldRefreshOllamaRuntimeModels: provider.textEnhancementModelCatalogSource == .ollamaRuntime
+        )
+    }
+}
+
 public struct VoiceInkAIEnhancementModelRefreshPlan: Sendable, Equatable {
     public let refreshedModelNames: [String]
     public let selectedModelToSave: String?

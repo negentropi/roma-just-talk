@@ -17,15 +17,9 @@ class AIService: ObservableObject {
     }
     @Published var selectedProvider: VoiceInkAIEnhancementProviderKind {
         didSet {
-            VoiceInkAIEnhancementProviderPreference.saveSelectedProvider(selectedProvider, to: userDefaults)
-            applyCredentialStateForSelectedProvider()
-            if selectedProvider.textEnhancementModelCatalogSource == .ollamaRuntime {
-                Task {
-                    await ollamaService.checkConnection()
-                    await ollamaService.refreshModels()
-                }
-            }
-            NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
+            applyTextEnhancementProviderSelectionPlan(
+                VoiceInkAIEnhancementProviderSelectionPlan.selecting(selectedProvider)
+            )
         }
     }
     
@@ -85,6 +79,20 @@ class AIService: ObservableObject {
 
         selectedModels = VoiceInkAIEnhancementProviderPreference.selectedModels(from: userDefaults)
         openRouterModels = VoiceInkDynamicAIProviderPreference.openRouterModels(from: userDefaults)
+    }
+
+    private func applyTextEnhancementProviderSelectionPlan(_ plan: VoiceInkAIEnhancementProviderSelectionPlan) {
+        VoiceInkAIEnhancementProviderPreference.applyProviderSelectionPlan(plan, to: userDefaults)
+        applyCredentialStateForSelectedProvider()
+
+        if plan.shouldRefreshOllamaRuntimeModels {
+            Task {
+                await ollamaService.checkConnection()
+                await ollamaService.refreshModels()
+            }
+        }
+
+        NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
     }
 
     private func applyCredentialStateForSelectedProvider() {

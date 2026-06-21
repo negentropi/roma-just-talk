@@ -85,6 +85,29 @@ final class LicensePolicyTests: XCTestCase {
         }
     }
 
+    func testLicenseSecureStoragePolicyPreservesDeviceLocalAccountsAndTrialDateCodec() {
+        XCTAssertEqual(
+            VoiceInkLicenseSecureStorageAccount.allCases.map(\.key),
+            [
+                "voiceink.license.key",
+                "voiceink.license.trialStartDate",
+                "voiceink.license.activationId"
+            ]
+        )
+        XCTAssertFalse(VoiceInkLicenseSecureStoragePolicy.isSyncable)
+
+        let trialStartDate = Date(timeIntervalSince1970: 1_700_000_000.25)
+        let timestamp = VoiceInkLicenseSecureStoragePolicy.trialStartTimestamp(for: trialStartDate)
+
+        XCTAssertEqual(timestamp, "1700000000.25")
+        XCTAssertEqual(
+            VoiceInkLicenseSecureStoragePolicy.trialStartDate(from: timestamp),
+            trialStartDate
+        )
+        XCTAssertNil(VoiceInkLicenseSecureStoragePolicy.trialStartDate(from: nil))
+        XCTAssertNil(VoiceInkLicenseSecureStoragePolicy.trialStartDate(from: "not-a-timestamp"))
+    }
+
     func testLicenseServicePolicyPreservesPolarEndpointsAndHeaders() {
         XCTAssertEqual(
             VoiceInkLicenseServicePolicy.organizationId,

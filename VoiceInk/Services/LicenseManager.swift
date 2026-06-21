@@ -1,5 +1,4 @@
 import Foundation
-import os
 import VoiceInkCore
 
 /// Manages license data using secure Keychain storage (non-syncable, device-local).
@@ -7,23 +6,30 @@ final class LicenseManager {
     static let shared = LicenseManager()
 
     private let keychain = KeychainService.shared
-    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "LicenseManager")
-
-    private let licenseKeyIdentifier = "voiceink.license.key"
-    private let trialStartDateIdentifier = "voiceink.license.trialStartDate"
-    private let activationIdIdentifier = "voiceink.license.activationId"
 
     private init() {}
 
     // MARK: - License Key
 
     var licenseKey: String? {
-        get { keychain.getString(forKey: licenseKeyIdentifier, syncable: false) }
+        get {
+            keychain.getString(
+                forKey: VoiceInkLicenseSecureStorageAccount.licenseKey.key,
+                syncable: VoiceInkLicenseSecureStoragePolicy.isSyncable
+            )
+        }
         set {
             if let value = newValue {
-                keychain.save(value, forKey: licenseKeyIdentifier, syncable: false)
+                keychain.save(
+                    value,
+                    forKey: VoiceInkLicenseSecureStorageAccount.licenseKey.key,
+                    syncable: VoiceInkLicenseSecureStoragePolicy.isSyncable
+                )
             } else {
-                keychain.delete(forKey: licenseKeyIdentifier, syncable: false)
+                keychain.delete(
+                    forKey: VoiceInkLicenseSecureStorageAccount.licenseKey.key,
+                    syncable: VoiceInkLicenseSecureStoragePolicy.isSyncable
+                )
             }
         }
     }
@@ -32,19 +38,25 @@ final class LicenseManager {
 
     var trialStartDate: Date? {
         get {
-            guard let data = keychain.getData(forKey: trialStartDateIdentifier, syncable: false),
-                  let timestamp = String(data: data, encoding: .utf8),
-                  let timeInterval = Double(timestamp) else {
-                return nil
-            }
-            return Date(timeIntervalSince1970: timeInterval)
+            VoiceInkLicenseSecureStoragePolicy.trialStartDate(
+                from: keychain.getString(
+                    forKey: VoiceInkLicenseSecureStorageAccount.trialStartDate.key,
+                    syncable: VoiceInkLicenseSecureStoragePolicy.isSyncable
+                )
+            )
         }
         set {
             if let date = newValue {
-                let timestamp = String(date.timeIntervalSince1970)
-                keychain.save(timestamp, forKey: trialStartDateIdentifier, syncable: false)
+                keychain.save(
+                    VoiceInkLicenseSecureStoragePolicy.trialStartTimestamp(for: date),
+                    forKey: VoiceInkLicenseSecureStorageAccount.trialStartDate.key,
+                    syncable: VoiceInkLicenseSecureStoragePolicy.isSyncable
+                )
             } else {
-                keychain.delete(forKey: trialStartDateIdentifier, syncable: false)
+                keychain.delete(
+                    forKey: VoiceInkLicenseSecureStorageAccount.trialStartDate.key,
+                    syncable: VoiceInkLicenseSecureStoragePolicy.isSyncable
+                )
             }
         }
     }
@@ -52,12 +64,24 @@ final class LicenseManager {
     // MARK: - Activation ID
 
     var activationId: String? {
-        get { keychain.getString(forKey: activationIdIdentifier, syncable: false) }
+        get {
+            keychain.getString(
+                forKey: VoiceInkLicenseSecureStorageAccount.activationId.key,
+                syncable: VoiceInkLicenseSecureStoragePolicy.isSyncable
+            )
+        }
         set {
             if let value = newValue {
-                keychain.save(value, forKey: activationIdIdentifier, syncable: false)
+                keychain.save(
+                    value,
+                    forKey: VoiceInkLicenseSecureStorageAccount.activationId.key,
+                    syncable: VoiceInkLicenseSecureStoragePolicy.isSyncable
+                )
             } else {
-                keychain.delete(forKey: activationIdIdentifier, syncable: false)
+                keychain.delete(
+                    forKey: VoiceInkLicenseSecureStorageAccount.activationId.key,
+                    syncable: VoiceInkLicenseSecureStoragePolicy.isSyncable
+                )
             }
         }
     }

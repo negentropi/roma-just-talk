@@ -53,6 +53,35 @@ public enum VoiceInkLicensePreference {
     }
 }
 
+public enum VoiceInkLicenseSecureStorageAccount: String, CaseIterable, Sendable {
+    case licenseKey = "voiceink.license.key"
+    case trialStartDate = "voiceink.license.trialStartDate"
+    case activationId = "voiceink.license.activationId"
+
+    public var key: String {
+        rawValue
+    }
+}
+
+public enum VoiceInkLicenseSecureStoragePolicy {
+    public static let isSyncable = false
+
+    public static func trialStartTimestamp(for date: Date) -> String {
+        String(date.timeIntervalSince1970)
+    }
+
+    public static func trialStartDate(from timestamp: String?) -> Date? {
+        guard
+            let timestamp,
+            let timeInterval = Double(timestamp)
+        else {
+            return nil
+        }
+
+        return Date(timeIntervalSince1970: timeInterval)
+    }
+}
+
 public enum VoiceInkLicenseOperation {
     case validation
     case activation

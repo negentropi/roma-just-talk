@@ -8530,13 +8530,18 @@ reject_pattern \
 
 require_pattern \
   "shared license preference policy lives in VoiceInkCore" \
-  'VoiceInkLicensePreference|requiresActivationKey|hasLaunchedBeforeKey|activationsLimitKey|deviceIdentifierKey|hasUsableStoredLicense|VoiceInkLicenseServicePolicy|VoiceInkLicenseOperation|VoiceInkLicenseError' \
+  'VoiceInkLicensePreference|requiresActivationKey|hasLaunchedBeforeKey|activationsLimitKey|deviceIdentifierKey|hasUsableStoredLicense|VoiceInkLicenseServicePolicy|VoiceInkLicenseOperation|VoiceInkLicenseError|VoiceInkLicenseSecureStorageAccount|VoiceInkLicenseSecureStoragePolicy' \
   VoiceInkCore/Sources/VoiceInkCore/LicensePolicy.swift
 
 require_pattern \
   "macOS Polar adapter uses shared license service policy" \
   'VoiceInkLicenseServicePolicy\.(requestURL|validationRequestBody|activationRequestBody|error)|VoiceInkLicensePreference\.deviceIdentifier|VoiceInkLicenseValidationResponse|VoiceInkLicenseActivationResult' \
   VoiceInk/Services/PolarService.swift
+
+require_pattern \
+  "macOS license manager uses shared secure license storage policy" \
+  'VoiceInkLicenseSecureStorage(Account|Policy)\.(licenseKey|trialStartDate|activationId|isSyncable|trialStartTimestamp)' \
+  VoiceInk/Services/LicenseManager.swift
 
 require_pattern \
   "macOS license view model catches shared license errors" \
@@ -8555,14 +8560,24 @@ require_pattern \
 
 require_pattern \
   "core checks execute license preference tests" \
-  'LicensePolicyTests\.testLicensePreferenceKeysPreserveExistingStorageNames|LicensePolicyTests\.testLicensePreferenceStorageRoundTripsNonSensitiveFlags|LicensePolicyTests\.testDeviceIdentifierCreatesAndStoresFallbackWhenMissing|LicensePolicyTests\.testStoredLicenseAccessPreservesExistingActivationRequirementPolicy|LicensePolicyTests\.testLicenseServicePolicyPreservesPolarEndpointsAndHeaders|LicensePolicyTests\.testLicenseHTTPStatusPolicyPreservesMacOSErrorMapping' \
+  'LicensePolicyTests\.testLicensePreferenceKeysPreserveExistingStorageNames|LicensePolicyTests\.testLicensePreferenceStorageRoundTripsNonSensitiveFlags|LicensePolicyTests\.testDeviceIdentifierCreatesAndStoresFallbackWhenMissing|LicensePolicyTests\.testStoredLicenseAccessPreservesExistingActivationRequirementPolicy|LicensePolicyTests\.testLicenseSecureStoragePolicyPreservesDeviceLocalAccountsAndTrialDateCodec|LicensePolicyTests\.testLicenseServicePolicyPreservesPolarEndpointsAndHeaders|LicensePolicyTests\.testLicenseHTTPStatusPolicyPreservesMacOSErrorMapping' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "migration checklist tracks shared license secure storage policy" \
+  'secure-storage adapter route .*license Keychain account names, trial-start timestamp coding, device-local syncability.*VoiceInkLicenseSecureStorageAccount`/`VoiceInkLicenseSecureStoragePolicy' \
+  docs/ios-single-repo-migration.md
 
 reject_pattern \
   "macOS license shells avoid raw non-sensitive license preference keys" \
   '"(VoiceInkLicenseRequiresActivation|VoiceInkHasLaunchedBefore|VoiceInkActivationsLimit)"|extension UserDefaults' \
   VoiceInk/Models/LicenseViewModel.swift \
   VoiceInk/Services/SystemInfoService.swift
+
+reject_pattern \
+  "macOS license manager avoids raw secure license storage policy" \
+  'voiceink\.license\.|syncable: false|String\(date\.timeIntervalSince1970\)|Date\(timeIntervalSince1970:' \
+  VoiceInk/Services/LicenseManager.swift
 
 reject_pattern \
   "macOS Polar adapter avoids raw shared license service constants" \

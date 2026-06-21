@@ -71,14 +71,9 @@ final class AppSettings: ObservableObject {
         self.selectedModeId = VoiceInkModeStorage.loadSelectedModeId()
         
 
-        let storedAPIKeys = Dictionary(
-            uniqueKeysWithValues: VoiceInkProviderKind.userAPIKeyProviders.map { provider in
-                (provider, Self.loadAPIKey(for: provider))
-            }
-        )
-        self.apiKeyState = VoiceInkProviderAPIKeyState(
-            storedKeysByProvider: storedAPIKeys,
-            verifiedProviders: VoiceInkProviderAPIKeyVerificationState.verifiedProviders()
+        self.apiKeyState = VoiceInkProviderAPIKeyState.loadingStoredKeys(
+            verifiedProviders: VoiceInkProviderAPIKeyVerificationState.verifiedProviders(),
+            loadStoredAPIKey: Self.loadAPIKey(for:)
         )
         
         // Load audio session timeout (default: 90 seconds)

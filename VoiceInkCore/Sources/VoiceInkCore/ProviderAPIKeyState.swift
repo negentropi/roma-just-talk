@@ -23,6 +23,22 @@ public struct VoiceInkProviderAPIKeyState: Equatable, Sendable {
         self.verifiedProviders = verifiedProviders.filter(\.requiresUserAPIKey)
     }
 
+    public static func loadingStoredKeys(
+        for providers: [VoiceInkProviderKind] = VoiceInkProviderKind.userAPIKeyProviders,
+        verifiedProviders: Set<VoiceInkProviderKind>,
+        loadStoredAPIKey: (VoiceInkProviderKind) -> String
+    ) -> Self {
+        let storedKeys: [VoiceInkProviderKind: String] = providers.reduce(into: [:]) { result, provider in
+            guard provider.requiresUserAPIKey else { return }
+            result[provider] = loadStoredAPIKey(provider)
+        }
+
+        return Self(
+            storedKeysByProvider: storedKeys,
+            verifiedProviders: verifiedProviders
+        )
+    }
+
     public func storedAPIKey(for provider: VoiceInkProviderKind) -> String {
         storedKeysByProvider[provider] ?? ""
     }

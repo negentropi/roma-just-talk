@@ -1513,6 +1513,21 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
 
 require_pattern \
+  "shared provider API-key state loader lives in VoiceInkCore" \
+  'loadingStoredKeys' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
+
+require_pattern \
+  "iOS app settings loads provider API-key state through shared loader" \
+  'VoiceInkProviderAPIKeyState\.loadingStoredKeys' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+reject_pattern \
+  "iOS app settings avoids shell-owned provider API-key state loading loop" \
+  'uniqueKeysWithValues|userAPIKeyProviders\.map|storedKeysByProvider:' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+require_pattern \
   "iOS API-key list uses shared row presentation" \
   'apiKeyListRowPresentation' \
   iOS/VoiceInk-ios/APIKeysView.swift \

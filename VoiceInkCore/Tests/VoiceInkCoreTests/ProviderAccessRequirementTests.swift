@@ -225,6 +225,22 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertNil(state.runtimeAPIKey(for: .voiceInk))
     }
 
+    func testProviderAPIKeyStateLoadsStoredKeysForUserKeyProvidersOnly() {
+        let state = VoiceInkProviderAPIKeyState.loadingStoredKeys(
+            for: [.groq, .localWhisper, .voiceInk, .deepgram],
+            verifiedProviders: [.groq, .localWhisper, .voiceInk],
+            loadStoredAPIKey: { "\($0.rawValue)-stored" }
+        )
+
+        XCTAssertEqual(state.storedAPIKey(for: .groq), "groq-stored")
+        XCTAssertEqual(state.storedAPIKey(for: .deepgram), "deepgram-stored")
+        XCTAssertEqual(state.storedAPIKey(for: .localWhisper), "")
+        XCTAssertEqual(state.storedAPIKey(for: .voiceInk), "")
+        XCTAssertTrue(state.isReady(for: .groq, localWhisperModelAvailable: false))
+        XCTAssertFalse(state.isReady(for: .deepgram, localWhisperModelAvailable: false))
+        XCTAssertTrue(state.isReady(for: .localWhisper, localWhisperModelAvailable: true))
+    }
+
     func testProviderAPIKeyStateReadinessUsesVerificationAndLocalModelState() {
         let state = VoiceInkProviderAPIKeyState(
             storedKeysByProvider: [.groq: "groq-key"],

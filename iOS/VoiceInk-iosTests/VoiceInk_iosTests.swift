@@ -145,7 +145,7 @@ final class VoiceInkIOSTests: XCTestCase {
         VoiceInkAppGroupRecordingBridge.writeRecordingState(true, to: defaults, now: timestamp)
         let state = VoiceInkAppGroupRecordingBridge.recordingState(
             in: defaults,
-            now: timestamp.addingTimeInterval(VoiceInkAppGroupRecordingBridge.staleRecordingInterval)
+            now: timestamp.addingTimeInterval(VoiceInkAppGroupRecordingStatePolicy.staleRecordingInterval)
         )
 
         XCTAssertEqual(state, VoiceInkAppGroupRecordingState(isRecording: true, shouldClearStaleState: false))
@@ -158,7 +158,7 @@ final class VoiceInkIOSTests: XCTestCase {
         VoiceInkAppGroupRecordingBridge.writeRecordingState(true, to: defaults, now: timestamp)
         let state = VoiceInkAppGroupRecordingBridge.recordingState(
             in: defaults,
-            now: timestamp.addingTimeInterval(VoiceInkAppGroupRecordingBridge.staleRecordingInterval + 1)
+            now: timestamp.addingTimeInterval(VoiceInkAppGroupRecordingStatePolicy.staleRecordingInterval + 1)
         )
 
         XCTAssertEqual(state, VoiceInkAppGroupRecordingState(isRecording: false, shouldClearStaleState: true))
@@ -172,9 +172,9 @@ final class VoiceInkIOSTests: XCTestCase {
         VoiceInkAppGroupRecordingBridge.writeRecordingState(true, to: defaults, now: recordingStart)
         VoiceInkAppGroupRecordingBridge.markStopRequested(in: defaults, now: stopRequest)
 
-        XCTAssertTrue(defaults.bool(forKey: VoiceInkAppGroupRecordingBridge.UserDefaultsKey.isRecording))
+        XCTAssertTrue(defaults.bool(forKey: VoiceInkAppGroupRecordingStatePolicy.UserDefaultsKey.isRecording))
         XCTAssertEqual(
-            defaults.double(forKey: VoiceInkAppGroupRecordingBridge.UserDefaultsKey.lastRecordingTimestamp),
+            defaults.double(forKey: VoiceInkAppGroupRecordingStatePolicy.UserDefaultsKey.lastRecordingTimestamp),
             stopRequest.timeIntervalSince1970
         )
     }

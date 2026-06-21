@@ -21,6 +21,10 @@ final class AppIdentityTests: XCTestCase {
             VoiceInkAppIdentity.iOSRecordingStateChangedDarwinNotificationName,
             "com.prakashjoshipax.VoiceInk.recordingStateChanged"
         )
+        XCTAssertEqual(
+            VoiceInkAppIdentity.iOSStopRecordingFromKeyboardNotificationName.rawValue,
+            "stopRecordingFromKeyboard"
+        )
         XCTAssertEqual(VoiceInkAppIdentity.welcomeTitle, "Welcome to roma just talk")
         XCTAssertEqual(VoiceInkAppIdentity.startUsingTitle, "Start Using roma just talk")
         XCTAssertEqual(VoiceInkAppIdentity.onboardingWindowTitle, "roma-just-talk Onboarding")

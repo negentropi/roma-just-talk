@@ -7541,7 +7541,7 @@ require_plist_value \
 
 require_pattern \
   "shared app identity presentation lives in VoiceInkCore" \
-  'VoiceInkAppIdentity|VoiceInkMacOSStorageAlertPresentation|bundleIdentifier = "com\.prakashjoshipax\.VoiceInk"|loggingSubsystem = "com\.prakashjoshipax\.voiceink"|displayName = "roma just talk"|compactDisplayName = "roma-just-talk"|iOSRecordDeepLinkScheme = "voiceink"|iOSRecordDeepLinkHost = "record"|iCloudContainerIdentifier|iOSAppGroupIdentifier|iOSRecordDeepLinkURL|iOSStopRecordingDarwinNotificationName|iOSRecordingStateChangedDarwinNotificationName|macOSApplicationSupportDirectory|storageFallbackWarningPresentation|storageFailurePresentation|errorDomain' \
+  'VoiceInkAppIdentity|VoiceInkMacOSStorageAlertPresentation|bundleIdentifier = "com\.prakashjoshipax\.VoiceInk"|loggingSubsystem = "com\.prakashjoshipax\.voiceink"|displayName = "roma just talk"|compactDisplayName = "roma-just-talk"|iOSRecordDeepLinkScheme = "voiceink"|iOSRecordDeepLinkHost = "record"|iCloudContainerIdentifier|iOSAppGroupIdentifier|iOSRecordDeepLinkURL|iOSStopRecordingDarwinNotificationName|iOSRecordingStateChangedDarwinNotificationName|iOSStopRecordingFromKeyboardNotificationName|macOSApplicationSupportDirectory|storageFallbackWarningPresentation|storageFailurePresentation|errorDomain' \
   VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift
 
 require_pattern \
@@ -7805,10 +7805,20 @@ require_pattern \
   'VoiceInkAppGroupRecordingStatePolicy\.(state|recordingStateWritePlan|stopRequestedWritePlan)' \
   iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
 
+require_pattern \
+  "iOS App Group bridge tests use shared recording state policy" \
+  'VoiceInkAppGroupRecordingStatePolicy\.(staleRecordingInterval|UserDefaultsKey)' \
+  iOS/VoiceInk-iosTests/VoiceInk_iosTests.swift
+
 reject_pattern \
   "iOS App Group bridge avoids shell-owned recording state policy" \
   'struct VoiceInkAppGroupRecordingState|staleRecordingInterval|enum UserDefaultsKey|static let (isRecording|lastRecordingTimestamp) = "' \
   iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
+
+reject_pattern \
+  "iOS App Group bridge tests avoid shell-owned policy aliases" \
+  'VoiceInkAppGroupRecordingBridge\.(staleRecordingInterval|UserDefaultsKey)' \
+  iOS/VoiceInk-iosTests/VoiceInk_iosTests.swift
 
 require_pattern \
   "iOS App Group bridge owns stop-recording Darwin notification" \
@@ -7826,9 +7836,14 @@ reject_pattern \
   iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
 
 require_pattern \
-  "iOS shared coordinator owns app-local keyboard stop notification" \
-  'static let stopRecordingFromKeyboard = Notification\.Name\("stopRecordingFromKeyboard"\)' \
-  iOS/Shared/AppGroupCoordinator.swift
+  "VoiceInkCore owns app-local keyboard stop notification" \
+  'iOSStopRecordingFromKeyboardNotificationName = Notification\.Name\("stopRecordingFromKeyboard"\)' \
+  VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift
+
+require_pattern \
+  "VoiceInkCore checks cover app-local keyboard stop notification" \
+  'iOSStopRecordingFromKeyboardNotificationName' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AppIdentityTests.swift
 
 require_pattern \
   "iOS keyboard controller uses shared button presentation" \
@@ -7855,6 +7870,16 @@ require_pattern \
   'VoiceInkKeyboardRecordingTiming\.appLaunchRecordingStartDelay' \
   iOS/VoiceInk-ios/VoiceInk_iosApp.swift
 
+require_pattern \
+  "iOS recording manager posts shared keyboard stop notification" \
+  'VoiceInkAppIdentity\.iOSStopRecordingFromKeyboardNotificationName' \
+  iOS/VoiceInk-ios/RecordingManager.swift
+
+require_pattern \
+  "iOS notes list observes shared keyboard stop notification" \
+  'VoiceInkAppIdentity\.iOSStopRecordingFromKeyboardNotificationName' \
+  iOS/VoiceInk-ios/NotesListView.swift
+
 reject_pattern \
   "iOS keyboard controller avoids shell-owned button copy" \
   'setTitle\("( Record| Stop| Open roma just talk)"|UIImage\(systemName: "(mic\.fill|stop\.fill|app)"' \
@@ -7873,8 +7898,10 @@ reject_pattern \
   iOS/VoiceInk-ios/VoiceInk_iosApp.swift
 
 reject_pattern \
-  "iOS recording manager does not redeclare keyboard stop notification" \
+  "iOS shell does not redeclare keyboard stop notification" \
   'Notification\.Name\("stopRecordingFromKeyboard"\)|extension Notification\.Name' \
+  iOS/Shared/AppGroupCoordinator.swift \
+  iOS/VoiceInk-ios/NotesListView.swift \
   iOS/VoiceInk-ios/RecordingManager.swift
 
 run_required "git diff has no whitespace errors" git diff --check

@@ -62,7 +62,9 @@ struct NotesListView: View {
                 .alert(item: $recordingStartAlert) { alertType in
                     alert(for: alertType)
                 }
-                .onReceive(NotificationCenter.default.publisher(for: .stopRecordingFromKeyboard)) { _ in
+                .onReceive(NotificationCenter.default.publisher(
+                    for: VoiceInkAppIdentity.iOSStopRecordingFromKeyboardNotificationName
+                )) { _ in
                     if recordingManager.isRecording {
                         recordingManager.stopRecording(modelContext: modelContext)
                     }

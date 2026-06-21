@@ -62,7 +62,10 @@ final class RecordingManager: ObservableObject {
             // This will be called when keyboard extension requests stop
             print("🛑 Stop recording requested from keyboard extension")
             // We need modelContext, so we'll handle this via a notification instead
-            NotificationCenter.default.post(name: .stopRecordingFromKeyboard, object: nil)
+            NotificationCenter.default.post(
+                name: VoiceInkAppIdentity.iOSStopRecordingFromKeyboardNotificationName,
+                object: nil
+            )
         }
     }
     

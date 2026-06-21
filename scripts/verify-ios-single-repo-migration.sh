@@ -4,6 +4,8 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
+local_whisper_xcframework_path="${HOME}/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework"
+
 full_build=0
 if [[ "${1:-}" == "--full-build" ]]; then
   full_build=1
@@ -113,6 +115,37 @@ run_required() {
   if ! "$@"; then
     fail "$description"
   fi
+}
+
+require_full_build_prerequisites() {
+  local rc=0
+  local xcode_path
+  local xcodebuild_output
+
+  if ! xcode_path="$(xcode-select -p 2>/dev/null)"; then
+    printf 'xcode-select -p failed; select a real Xcode before running --full-build.\n' >&2
+    rc=1
+  elif [[ "$xcode_path" == *CommandLineTools* ]]; then
+    printf 'xcode-select points to Command Line Tools (%s); select a real Xcode before running --full-build.\n' "$xcode_path" >&2
+    rc=1
+  fi
+
+  if ! xcodebuild_output="$(xcodebuild -version 2>&1)"; then
+    printf 'xcodebuild is unavailable: %s\n' "$xcodebuild_output" >&2
+    rc=1
+  fi
+
+  if ! xcrun --sdk iphonesimulator --show-sdk-path >/dev/null 2>&1; then
+    printf 'iphonesimulator SDK unavailable; install the iOS simulator platform before running --full-build.\n' >&2
+    rc=1
+  fi
+
+  if [[ ! -d "$local_whisper_xcframework_path" ]]; then
+    printf 'missing local Whisper framework: %s\n' "$local_whisper_xcframework_path" >&2
+    rc=1
+  fi
+
+  return "$rc"
 }
 
 swiftpm_sandbox_blocked() {
@@ -9596,9 +9629,18 @@ if ! xcrun --sdk iphonesimulator --show-sdk-path >/dev/null 2>&1; then
   warn "iphonesimulator SDK unavailable; iOS target build/test remains blocked"
 fi
 
+if [[ ! -d "$local_whisper_xcframework_path" ]]; then
+  warn "local Whisper xcframework missing at $local_whisper_xcframework_path; full app builds remain blocked"
+fi
+
 if (( full_build == 1 )); then
-  run_required "macOS app build" xcodebuild -workspace VoiceInk.xcworkspace -scheme VoiceInk -configuration Debug build
-  run_required "iOS app build" xcodebuild -workspace VoiceInk.xcworkspace -scheme VoiceInk-ios -destination "generic/platform=iOS Simulator" build
+  section "full-build prerequisites"
+  if require_full_build_prerequisites; then
+    run_required "macOS app build" xcodebuild -workspace VoiceInk.xcworkspace -scheme VoiceInk -configuration Debug build
+    run_required "iOS app build" xcodebuild -workspace VoiceInk.xcworkspace -scheme VoiceInk-ios -destination "generic/platform=iOS Simulator" build
+  else
+    fail "full app build prerequisites"
+  fi
 else
   warn "full app builds skipped; pass --full-build when real Xcode, app dependencies, and iOS platform are installed"
 fi

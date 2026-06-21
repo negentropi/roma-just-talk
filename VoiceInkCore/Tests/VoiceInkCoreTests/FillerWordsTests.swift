@@ -52,6 +52,40 @@ final class FillerWordsTests: XCTestCase {
         XCTAssertTrue(VoiceInkFillerWords.hasDraft(" LIKE "))
     }
 
+    func testDraftStateUsesSharedSubmitAvailability() {
+        XCTAssertFalse(VoiceInkFillerWordDraftState(draft: " \n\t ").canSubmit)
+        XCTAssertTrue(VoiceInkFillerWordDraftState(draft: " LIKE ").canSubmit)
+    }
+
+    func testDraftStateSubmitsAndClearsAcceptedWord() {
+        let submission = VoiceInkFillerWordDraftState(draft: " LIKE ")
+            .submitting(existingWords: ["um"])
+
+        XCTAssertEqual(
+            submission.plan,
+            VoiceInkFillerWordSubmissionPlan(
+                updatedWords: ["um", "like"],
+                draftAfterSubmit: "",
+                alertPresentation: nil,
+                didInsert: true
+            )
+        )
+        XCTAssertEqual(submission.draftStateAfterSubmit, VoiceInkFillerWordDraftState())
+        XCTAssertNil(submission.alertPresentation)
+    }
+
+    func testDraftStateKeepsDuplicateDraftAndBuildsSharedAlert() {
+        let submission = VoiceInkFillerWordDraftState(draft: "UM")
+            .submitting(existingWords: ["um"])
+
+        XCTAssertEqual(submission.plan.updatedWords, ["um"])
+        XCTAssertEqual(submission.draftStateAfterSubmit, VoiceInkFillerWordDraftState(draft: "UM"))
+        XCTAssertEqual(
+            submission.alertPresentation,
+            .duplicateFillerWord(message: "This filler word is already in the list.")
+        )
+    }
+
     func testRemovingDropsWordsCaseInsensitively() {
         XCTAssertEqual(
             VoiceInkFillerWords.removing("UM", from: ["uh", "um", "like"]),

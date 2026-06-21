@@ -193,13 +193,10 @@ final class AppSettings: ObservableObject {
         modes = VoiceInkPreferenceList.removing(at: offsets, from: modes)
     }
 
-    @discardableResult
-    func submitFillerWordDraft(_ draft: String) -> VoiceInkFillerWordSubmissionPlan {
-        let plan = VoiceInkFillerWords.submissionPlan(draft, existingWords: fillerWords)
+    func applyFillerWordSubmissionPlan(_ plan: VoiceInkFillerWordSubmissionPlan) {
         if fillerWords != plan.updatedWords {
             fillerWords = plan.updatedWords
         }
-        return plan
     }
 
     func removeFillerWords(at offsets: IndexSet) {

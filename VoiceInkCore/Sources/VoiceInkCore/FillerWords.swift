@@ -19,6 +19,43 @@ public struct VoiceInkFillerWordSubmissionPlan: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkFillerWordDraftSubmission: Equatable, Sendable {
+    public let plan: VoiceInkFillerWordSubmissionPlan
+    public let draftStateAfterSubmit: VoiceInkFillerWordDraftState
+
+    public init(
+        plan: VoiceInkFillerWordSubmissionPlan,
+        draftStateAfterSubmit: VoiceInkFillerWordDraftState
+    ) {
+        self.plan = plan
+        self.draftStateAfterSubmit = draftStateAfterSubmit
+    }
+
+    public var alertPresentation: VoiceInkDictionaryAlertPresentation? {
+        plan.alertPresentation
+    }
+}
+
+public struct VoiceInkFillerWordDraftState: Equatable, Sendable {
+    public var draft: String
+
+    public init(draft: String = "") {
+        self.draft = draft
+    }
+
+    public var canSubmit: Bool {
+        VoiceInkFillerWords.hasDraft(draft)
+    }
+
+    public func submitting(existingWords: [String]) -> VoiceInkFillerWordDraftSubmission {
+        let plan = VoiceInkFillerWords.submissionPlan(draft, existingWords: existingWords)
+        return VoiceInkFillerWordDraftSubmission(
+            plan: plan,
+            draftStateAfterSubmit: VoiceInkFillerWordDraftState(draft: plan.draftAfterSubmit)
+        )
+    }
+}
+
 public enum VoiceInkFillerWords {
     public static let duplicateWordMessage = "This filler word is already in the list."
 

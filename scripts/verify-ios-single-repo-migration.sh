@@ -2999,13 +2999,43 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/FillerWords.swift
 
 require_pattern \
-  "macOS filler-word submission uses shared submission plan" \
-  'VoiceInkFillerWords\.submissionPlan' \
+  "shared filler-word draft state lives in core" \
+  'public struct VoiceInkFillerWordDraftState' \
+  VoiceInkCore/Sources/VoiceInkCore/FillerWords.swift
+
+require_pattern \
+  "shared filler-word draft submission lives in core" \
+  'public struct VoiceInkFillerWordDraftSubmission' \
+  VoiceInkCore/Sources/VoiceInkCore/FillerWords.swift
+
+require_pattern \
+  "shared filler-word draft state owns submit availability" \
+  'public var canSubmit: Bool' \
+  VoiceInkCore/Sources/VoiceInkCore/FillerWords.swift
+
+require_pattern \
+  "shared filler-word draft state owns submission" \
+  'public func submitting\(existingWords: \[String\]\) -> VoiceInkFillerWordDraftSubmission' \
+  VoiceInkCore/Sources/VoiceInkCore/FillerWords.swift
+
+require_pattern \
+  "macOS filler-word storage receives shared submission plan" \
+  'func applySubmissionPlan\(_ plan: VoiceInkFillerWordSubmissionPlan\)' \
   VoiceInk/Transcription/Processing/FillerWordManager.swift
 
 require_pattern \
-  "iOS filler-word submission uses shared submission plan" \
-  'VoiceInkFillerWords\.submissionPlan' \
+  "macOS filler-word storage applies shared updated words" \
+  'fillerWords = plan\.updatedWords' \
+  VoiceInk/Transcription/Processing/FillerWordManager.swift
+
+require_pattern \
+  "iOS filler-word storage receives shared submission plan" \
+  'func applyFillerWordSubmissionPlan\(_ plan: VoiceInkFillerWordSubmissionPlan\)' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+require_pattern \
+  "iOS filler-word storage applies shared updated words" \
+  'fillerWords = plan\.updatedWords' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \
@@ -3015,13 +3045,13 @@ reject_pattern \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \
-  "macOS filler-word view consumes shared submission result" \
-  'submitWordDraft|draftAfterSubmit|alertPresentation' \
+  "macOS filler-word view consumes shared draft state submission result" \
+  'VoiceInkFillerWordDraftState|draftState\.submitting|draftStateAfterSubmit|alertPresentation' \
   VoiceInk/Views/Components/FillerWordsSettingsView.swift
 
 require_pattern \
-  "iOS filler-word view consumes shared submission result" \
-  'submitFillerWordDraft|draftAfterSubmit|alertPresentation' \
+  "iOS filler-word view consumes shared draft state submission result" \
+  'VoiceInkFillerWordDraftState|fillerWordDraftState\.submitting|draftStateAfterSubmit|alertPresentation' \
   iOS/VoiceInk-ios/SettingsView.swift
 
 reject_pattern \
@@ -5812,13 +5842,19 @@ reject_pattern \
   VoiceInk/Views/History/TranscriptionListItem.swift
 
 require_pattern \
-  "macOS filler-word add button uses shared draft policy" \
-  'VoiceInkFillerWords\.hasDraft\(newWord\)' \
+  "macOS filler-word add button uses shared draft state" \
+  'draftState\.canSubmit' \
   VoiceInk/Views/Components/FillerWordsSettingsView.swift
 
 require_pattern \
-  "iOS filler-word add button uses shared draft policy" \
-  'VoiceInkFillerWords\.hasDraft\(newFillerWord\)' \
+  "iOS filler-word add button uses shared draft state" \
+  'fillerWordDraftState\.canSubmit' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+reject_pattern \
+  "platform filler-word views avoid shell-owned draft submit policy" \
+  '@State private var (newWord|newFillerWord)\b|VoiceInkFillerWords\.hasDraft' \
+  VoiceInk/Views/Components/FillerWordsSettingsView.swift \
   iOS/VoiceInk-ios/SettingsView.swift
 
 reject_pattern \

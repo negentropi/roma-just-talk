@@ -42,7 +42,7 @@ struct FillerWordsSettingsView: View {
     @AppStorage(VoiceInkUserDefaultsKey.removeFillerWords)
     private var removeFillerWords = VoiceInkPreferenceDefault.removeFillerWords
     @StateObject private var fillerWordManager = FillerWordManager.shared
-    @State private var newWord = ""
+    @State private var draftState = VoiceInkFillerWordDraftState()
     @State private var alertPresentation: VoiceInkDictionaryAlertPresentation?
     private let cleanupPresentation = VoiceInkTranscriptionCleanupPresentation.macOS
 
@@ -62,7 +62,7 @@ struct FillerWordsSettingsView: View {
             if removeFillerWords {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack(spacing: 8) {
-                        TextField(cleanupPresentation.addFillerWordPlaceholder, text: $newWord)
+                        TextField(cleanupPresentation.addFillerWordPlaceholder, text: $draftState.draft)
                             .textFieldStyle(.roundedBorder)
                             .accessibilityLabel(cleanupPresentation.addFillerWordPlaceholder)
                             .onSubmit { addWord() }
@@ -75,7 +75,7 @@ struct FillerWordsSettingsView: View {
                         }
                         .buttonStyle(.borderless)
                         .accessibilityLabel(cleanupPresentation.addFillerWordPlaceholder)
-                        .disabled(!canAddWord)
+                        .disabled(!draftState.canSubmit)
                     }
                     .padding(.vertical, 4)
 
@@ -103,12 +103,9 @@ struct FillerWordsSettingsView: View {
     }
 
     private func addWord() {
-        let plan = fillerWordManager.submitWordDraft(newWord)
-        newWord = plan.draftAfterSubmit
-        alertPresentation = plan.alertPresentation
-    }
-
-    private var canAddWord: Bool {
-        VoiceInkFillerWords.hasDraft(newWord)
+        let submission = draftState.submitting(existingWords: fillerWordManager.fillerWords)
+        fillerWordManager.applySubmissionPlan(submission.plan)
+        draftState = submission.draftStateAfterSubmit
+        alertPresentation = submission.alertPresentation
     }
 }

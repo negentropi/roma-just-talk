@@ -4,7 +4,7 @@ import VoiceInkCore
 
 struct SettingsView: View {
     @StateObject private var settings = AppSettings.shared
-    @State private var newFillerWord = ""
+    @State private var fillerWordDraftState = VoiceInkFillerWordDraftState()
     @State private var newCustomVocabularyTerm = ""
     @State private var newReplacementOriginal = ""
     @State private var newReplacementText = ""
@@ -78,7 +78,7 @@ struct SettingsView: View {
 
                 if settings.removeFillerWords {
                     HStack {
-                        TextField(cleanupPresentation.addFillerWordPlaceholder, text: $newFillerWord)
+                        TextField(cleanupPresentation.addFillerWordPlaceholder, text: $fillerWordDraftState.draft)
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled()
                             .onSubmit(addFillerWord)
@@ -86,7 +86,7 @@ struct SettingsView: View {
                         Button(action: addFillerWord) {
                             Image(systemName: settingsPresentation.addActionSystemImageName)
                         }
-                        .disabled(!canAddFillerWord)
+                        .disabled(!fillerWordDraftState.canSubmit)
                     }
 
                     ForEach(settings.fillerWords, id: \.self) { word in
@@ -211,10 +211,6 @@ struct SettingsView: View {
         )
     }
 
-    private var canAddFillerWord: Bool {
-        VoiceInkFillerWords.hasDraft(newFillerWord)
-    }
-
     private var canAddCustomVocabularyTerm: Bool {
         VoiceInkDictionaryPolicy.hasVocabularyDraft(newCustomVocabularyTerm)
     }
@@ -227,9 +223,10 @@ struct SettingsView: View {
     }
 
     private func addFillerWord() {
-        let plan = settings.submitFillerWordDraft(newFillerWord)
-        newFillerWord = plan.draftAfterSubmit
-        dictionaryAlert = plan.alertPresentation
+        let submission = fillerWordDraftState.submitting(existingWords: settings.fillerWords)
+        settings.applyFillerWordSubmissionPlan(submission.plan)
+        fillerWordDraftState = submission.draftStateAfterSubmit
+        dictionaryAlert = submission.alertPresentation
     }
 
     private func addCustomVocabularyTerm() {

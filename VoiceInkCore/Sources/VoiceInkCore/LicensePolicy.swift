@@ -53,6 +53,97 @@ public enum VoiceInkLicensePreference {
     }
 }
 
+public enum VoiceInkLicenseState: Equatable, Sendable {
+    case trial(daysRemaining: Int)
+    case trialExpired
+    case licensed
+
+    public var canUseApp: Bool {
+        switch self {
+        case .licensed, .trial:
+            return true
+        case .trialExpired:
+            return false
+        }
+    }
+}
+
+public struct VoiceInkLicenseStartupPlan: Equatable, Sendable {
+    public let state: VoiceInkLicenseState
+    public let shouldSaveHasLaunchedBefore: Bool
+    public let trialStartDateToSave: Date?
+    public let shouldPostLicenseStatusChanged: Bool
+
+    public init(
+        state: VoiceInkLicenseState,
+        shouldSaveHasLaunchedBefore: Bool,
+        trialStartDateToSave: Date?,
+        shouldPostLicenseStatusChanged: Bool
+    ) {
+        self.state = state
+        self.shouldSaveHasLaunchedBefore = shouldSaveHasLaunchedBefore
+        self.trialStartDateToSave = trialStartDateToSave
+        self.shouldPostLicenseStatusChanged = shouldPostLicenseStatusChanged
+    }
+}
+
+public enum VoiceInkLicenseStartupPolicy {
+    public static let defaultTrialPeriodDays = 7
+
+    public static func plan(
+        hasUsableStoredLicense: Bool,
+        hasLaunchedBefore: Bool,
+        trialStartDate: Date?,
+        now: Date = Date(),
+        calendar: Calendar = .current,
+        trialPeriodDays: Int = defaultTrialPeriodDays
+    ) -> VoiceInkLicenseStartupPlan {
+        if hasUsableStoredLicense {
+            return VoiceInkLicenseStartupPlan(
+                state: .licensed,
+                shouldSaveHasLaunchedBefore: false,
+                trialStartDateToSave: nil,
+                shouldPostLicenseStatusChanged: false
+            )
+        }
+
+        if !hasLaunchedBefore {
+            return VoiceInkLicenseStartupPlan(
+                state: .trial(daysRemaining: trialPeriodDays),
+                shouldSaveHasLaunchedBefore: true,
+                trialStartDateToSave: trialStartDate == nil ? now : nil,
+                shouldPostLicenseStatusChanged: trialStartDate == nil
+            )
+        }
+
+        guard let trialStartDate else {
+            return VoiceInkLicenseStartupPlan(
+                state: .trial(daysRemaining: trialPeriodDays),
+                shouldSaveHasLaunchedBefore: false,
+                trialStartDateToSave: now,
+                shouldPostLicenseStatusChanged: true
+            )
+        }
+
+        let daysSinceTrialStart = calendar.dateComponents([.day], from: trialStartDate, to: now).day ?? 0
+        if daysSinceTrialStart >= trialPeriodDays {
+            return VoiceInkLicenseStartupPlan(
+                state: .trialExpired,
+                shouldSaveHasLaunchedBefore: false,
+                trialStartDateToSave: nil,
+                shouldPostLicenseStatusChanged: false
+            )
+        }
+
+        return VoiceInkLicenseStartupPlan(
+            state: .trial(daysRemaining: trialPeriodDays - daysSinceTrialStart),
+            shouldSaveHasLaunchedBefore: false,
+            trialStartDateToSave: nil,
+            shouldPostLicenseStatusChanged: false
+        )
+    }
+}
+
 public enum VoiceInkLicenseSecureStorageAccount: String, CaseIterable, Sendable {
     case licenseKey = "voiceink.license.key"
     case trialStartDate = "voiceink.license.trialStartDate"

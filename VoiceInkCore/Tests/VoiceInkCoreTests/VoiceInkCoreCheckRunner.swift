@@ -28,6 +28,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "LicensePolicyTests.testDeviceIdentifierReusesStoredValueBeforeCreatingFallback", run: { LicensePolicyTests().testDeviceIdentifierReusesStoredValueBeforeCreatingFallback() }),
             VoiceInkCoreCheck(name: "LicensePolicyTests.testDeviceIdentifierCreatesAndStoresFallbackWhenMissing", run: { LicensePolicyTests().testDeviceIdentifierCreatesAndStoresFallbackWhenMissing() }),
             VoiceInkCoreCheck(name: "LicensePolicyTests.testStoredLicenseAccessPreservesExistingActivationRequirementPolicy", run: { LicensePolicyTests().testStoredLicenseAccessPreservesExistingActivationRequirementPolicy() }),
+            VoiceInkCoreCheck(name: "LicensePolicyTests.testLicenseStartupPolicyPlansStoredLicenseAndTrialLifecycle", run: { LicensePolicyTests().testLicenseStartupPolicyPlansStoredLicenseAndTrialLifecycle() }),
             VoiceInkCoreCheck(name: "LicensePolicyTests.testLicenseSecureStoragePolicyPreservesDeviceLocalAccountsAndTrialDateCodec", run: { LicensePolicyTests().testLicenseSecureStoragePolicyPreservesDeviceLocalAccountsAndTrialDateCodec() }),
             VoiceInkCoreCheck(name: "LicensePolicyTests.testLicenseServicePolicyPreservesPolarEndpointsAndHeaders", run: { LicensePolicyTests().testLicenseServicePolicyPreservesPolarEndpointsAndHeaders() }),
             VoiceInkCoreCheck(name: "LicensePolicyTests.testLicenseValidationRequestBodiesPreservePolarFieldNames", run: { LicensePolicyTests().testLicenseValidationRequestBodiesPreservePolarFieldNames() }),

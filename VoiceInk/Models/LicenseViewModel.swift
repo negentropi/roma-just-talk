@@ -5,20 +5,17 @@ import VoiceInkCore
 
 @MainActor
 class LicenseViewModel: ObservableObject {
-    enum LicenseState: Equatable {
-        case trial(daysRemaining: Int)
-        case trialExpired
-        case licensed
-    }
+    typealias LicenseState = VoiceInkLicenseState
 
-    @Published private(set) var licenseState: LicenseState = .trial(daysRemaining: 7)  // Default to trial
+    @Published private(set) var licenseState: LicenseState = .trial(
+        daysRemaining: VoiceInkLicenseStartupPolicy.defaultTrialPeriodDays
+    )
     @Published var licenseKey: String = ""
     @Published var isValidating = false
     @Published var validationMessage: String?
     @Published var validationSuccess: Bool = false
     @Published private(set) var activationsLimit: Int = 0
 
-    private let trialPeriodDays = 7
     private let polarService = PolarService()
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "LicenseViewModel")
     private let userDefaults = UserDefaults.standard
@@ -33,68 +30,64 @@ class LicenseViewModel: ObservableObject {
     }
 
     func startTrial() {
-        // Only set trial start date if it hasn't been set before
-        if licenseManager.trialStartDate == nil {
-            licenseManager.trialStartDate = Date()
-            licenseState = .trial(daysRemaining: trialPeriodDays)
+        guard licenseManager.trialStartDate == nil else { return }
+
+        let plan = VoiceInkLicenseStartupPolicy.plan(
+            hasUsableStoredLicense: false,
+            hasLaunchedBefore: true,
+            trialStartDate: nil
+        )
+        applyStartupPlan(plan)
+    }
+
+    private func loadLicenseState() {
+        let storedLicenseKey = licenseManager.licenseKey
+        if let storedLicenseKey {
+            self.licenseKey = storedLicenseKey
+        }
+
+        let hasUsableStoredLicense = VoiceInkLicensePreference.hasUsableStoredLicense(
+            licenseKey: storedLicenseKey,
+            activationId: licenseManager.activationId,
+            from: userDefaults
+        )
+        let plan = VoiceInkLicenseStartupPolicy.plan(
+            hasUsableStoredLicense: hasUsableStoredLicense,
+            hasLaunchedBefore: VoiceInkLicensePreference.hasLaunchedBefore(from: userDefaults),
+            trialStartDate: licenseManager.trialStartDate
+        )
+
+        applyStartupPlan(plan)
+
+        if case .licensed = plan.state {
+            activationsLimit = VoiceInkLicensePreference.activationsLimit(from: userDefaults)
+        }
+    }
+
+    private func applyStartupPlan(_ plan: VoiceInkLicenseStartupPlan) {
+        if plan.shouldSaveHasLaunchedBefore {
+            VoiceInkLicensePreference.saveHasLaunchedBefore(true, to: userDefaults)
+        }
+
+        if let trialStartDate = plan.trialStartDateToSave {
+            licenseManager.trialStartDate = trialStartDate
+        }
+
+        licenseState = plan.state
+
+        if plan.shouldPostLicenseStatusChanged {
             NotificationCenter.default.post(name: .licenseStatusChanged, object: nil)
         }
     }
 
-    private func loadLicenseState() {
-        // Check for existing license key
-        if let storedLicenseKey = licenseManager.licenseKey {
-            self.licenseKey = storedLicenseKey
-
-            // If we have a license key, trust that it's licensed
-            // Skip server validation on startup
-            if VoiceInkLicensePreference.hasUsableStoredLicense(
-                licenseKey: storedLicenseKey,
-                activationId: licenseManager.activationId,
-                from: userDefaults
-            ) {
-                licenseState = .licensed
-                activationsLimit = VoiceInkLicensePreference.activationsLimit(from: userDefaults)
-                return
-            }
-        }
-
-        // Check if this is first launch
-        let hasLaunchedBefore = VoiceInkLicensePreference.hasLaunchedBefore(from: userDefaults)
-        if !hasLaunchedBefore {
-            // First launch - start trial automatically
-            VoiceInkLicensePreference.saveHasLaunchedBefore(true, to: userDefaults)
-            startTrial()
-            return
-        }
-
-        // Only check trial if not licensed and not first launch
-        if let trialStartDate = licenseManager.trialStartDate {
-            let daysSinceTrialStart = Calendar.current.dateComponents([.day], from: trialStartDate, to: Date()).day ?? 0
-
-            if daysSinceTrialStart >= trialPeriodDays {
-                licenseState = .trialExpired
-            } else {
-                licenseState = .trial(daysRemaining: trialPeriodDays - daysSinceTrialStart)
-            }
-        } else {
-            // No trial has been started yet - start it now
-            startTrial()
-        }
-    }
-    
     var canUseApp: Bool {
-        switch licenseState {
-        case .licensed, .trial:
-            return true
-        case .trialExpired:
-            return false
-        }
+        licenseState.canUseApp
     }
-    
+
     func openPurchaseLink() {
         if let url = URL(string: "https://tryvoiceink.com/buy") {
             NSWorkspace.shared.open(url)
+            return
         }
     }
     
@@ -200,7 +193,7 @@ class LicenseViewModel: ObservableObject {
         VoiceInkLicensePreference.saveHasLaunchedBefore(false, to: userDefaults)  // Allow trial to restart
         VoiceInkLicensePreference.saveActivationsLimit(0, to: userDefaults)
 
-        licenseState = .trial(daysRemaining: trialPeriodDays)  // Reset to trial state
+        licenseState = .trial(daysRemaining: VoiceInkLicenseStartupPolicy.defaultTrialPeriodDays)
         licenseKey = ""
         validationMessage = nil
         activationsLimit = 0

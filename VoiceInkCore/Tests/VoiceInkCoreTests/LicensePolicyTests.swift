@@ -85,6 +85,92 @@ final class LicensePolicyTests: XCTestCase {
         }
     }
 
+    func testLicenseStartupPolicyPlansStoredLicenseAndTrialLifecycle() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let trialStart = Date(timeIntervalSince1970: 1_700_000_000)
+        let now = calendar.date(byAdding: .day, value: 3, to: trialStart)!
+        let later = calendar.date(byAdding: .day, value: 7, to: trialStart)!
+
+        XCTAssertEqual(
+            VoiceInkLicenseStartupPolicy.plan(
+                hasUsableStoredLicense: true,
+                hasLaunchedBefore: true,
+                trialStartDate: trialStart,
+                now: now,
+                calendar: calendar
+            ),
+            VoiceInkLicenseStartupPlan(
+                state: .licensed,
+                shouldSaveHasLaunchedBefore: false,
+                trialStartDateToSave: nil,
+                shouldPostLicenseStatusChanged: false
+            )
+        )
+
+        XCTAssertEqual(
+            VoiceInkLicenseStartupPolicy.plan(
+                hasUsableStoredLicense: false,
+                hasLaunchedBefore: false,
+                trialStartDate: nil,
+                now: now,
+                calendar: calendar
+            ),
+            VoiceInkLicenseStartupPlan(
+                state: .trial(daysRemaining: VoiceInkLicenseStartupPolicy.defaultTrialPeriodDays),
+                shouldSaveHasLaunchedBefore: true,
+                trialStartDateToSave: now,
+                shouldPostLicenseStatusChanged: true
+            )
+        )
+
+        XCTAssertEqual(
+            VoiceInkLicenseStartupPolicy.plan(
+                hasUsableStoredLicense: false,
+                hasLaunchedBefore: true,
+                trialStartDate: nil,
+                now: now,
+                calendar: calendar
+            ),
+            VoiceInkLicenseStartupPlan(
+                state: .trial(daysRemaining: VoiceInkLicenseStartupPolicy.defaultTrialPeriodDays),
+                shouldSaveHasLaunchedBefore: false,
+                trialStartDateToSave: now,
+                shouldPostLicenseStatusChanged: true
+            )
+        )
+
+        XCTAssertEqual(
+            VoiceInkLicenseStartupPolicy.plan(
+                hasUsableStoredLicense: false,
+                hasLaunchedBefore: true,
+                trialStartDate: trialStart,
+                now: now,
+                calendar: calendar
+            ),
+            VoiceInkLicenseStartupPlan(
+                state: .trial(daysRemaining: 4),
+                shouldSaveHasLaunchedBefore: false,
+                trialStartDateToSave: nil,
+                shouldPostLicenseStatusChanged: false
+            )
+        )
+
+        XCTAssertEqual(
+            VoiceInkLicenseStartupPolicy.plan(
+                hasUsableStoredLicense: false,
+                hasLaunchedBefore: true,
+                trialStartDate: trialStart,
+                now: later,
+                calendar: calendar
+            ).state,
+            .trialExpired
+        )
+        XCTAssertTrue(VoiceInkLicenseState.trial(daysRemaining: 1).canUseApp)
+        XCTAssertTrue(VoiceInkLicenseState.licensed.canUseApp)
+        XCTAssertFalse(VoiceInkLicenseState.trialExpired.canUseApp)
+    }
+
     func testLicenseSecureStoragePolicyPreservesDeviceLocalAccountsAndTrialDateCodec() {
         XCTAssertEqual(
             VoiceInkLicenseSecureStorageAccount.allCases.map(\.key),

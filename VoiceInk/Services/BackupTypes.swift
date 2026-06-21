@@ -84,6 +84,56 @@ struct GeneralBackup: Codable {
 }
 
 extension GeneralBackup {
+    init(
+        shortcutBackupRecords: [VoiceInkShortcutActionIdentifier: ShortcutBackup],
+        preferences: VoiceInkGeneralSettingsBackupPreferences
+    ) {
+        self.init(
+            primaryRecordingShortcut: shortcutBackupRecords[.primaryRecording],
+            secondaryRecordingShortcut: shortcutBackupRecords[.secondaryRecording],
+            pasteLastTranscriptionShortcut: shortcutBackupRecords[.pasteLastTranscription],
+            pasteLastEnhancementShortcut: shortcutBackupRecords[.pasteLastEnhancement],
+            retryLastTranscriptionShortcut: shortcutBackupRecords[.retryLastTranscription],
+            cancelRecorderShortcut: shortcutBackupRecords[.cancelRecorder],
+            openHistoryWindowShortcut: shortcutBackupRecords[.openHistoryWindow],
+            quickAddToDictionaryShortcut: shortcutBackupRecords[.quickAddToDictionary],
+            toggleEnhancementShortcut: shortcutBackupRecords[.toggleEnhancement],
+            primaryRecordingShortcutRawValue: preferences.recordingShortcut.primaryRecordingShortcutRawValue,
+            secondaryRecordingShortcutRawValue: preferences.recordingShortcut.secondaryRecordingShortcutRawValue,
+            primaryRecordingShortcutModeRawValue: preferences.recordingShortcut.primaryRecordingShortcutModeRawValue,
+            secondaryRecordingShortcutModeRawValue: preferences.recordingShortcut.secondaryRecordingShortcutModeRawValue,
+            specialShortcutPasteLastTranscriptOnEmptyTap: preferences.recordingShortcut.specialShortcutPasteLastTranscriptOnEmptyTap,
+            isMiddleClickToggleEnabled: preferences.recordingShortcut.isMiddleClickToggleEnabled,
+            middleClickActivationDelay: preferences.recordingShortcut.middleClickActivationDelay,
+            launchAtLoginEnabled: preferences.macOSShell.launchAtLoginEnabled,
+            isMenuBarOnly: preferences.macOSShell.isMenuBarOnly,
+            recorderType: preferences.macOSShell.recorderType,
+            isTranscriptionCleanupEnabled: preferences.transcriptionAutoCleanup.isEnabled,
+            transcriptionRetentionMinutes: preferences.transcriptionAutoCleanup.retentionMinutes,
+            isAudioCleanupEnabled: preferences.audioCleanup.isEnabled,
+            audioRetentionPeriod: preferences.audioCleanup.retentionDays,
+            isSoundFeedbackEnabled: preferences.recordingFeedback.isSoundFeedbackEnabled,
+            isSystemMuteEnabled: preferences.recordingFeedback.isSystemMuteEnabled,
+            isPauseMediaEnabled: preferences.recordingFeedback.isPauseMediaEnabled,
+            audioResumptionDelay: preferences.recordingFeedback.audioResumptionDelay,
+            isTextFormattingEnabled: preferences.transcriptionCleanup.isTextFormattingEnabled,
+            punctuationCleanupMode: preferences.transcriptionCleanup.punctuationCleanupMode,
+            removePunctuation: preferences.transcriptionCleanup.removePunctuation,
+            lowercaseTranscription: preferences.transcriptionCleanup.lowercaseTranscription,
+            isExperimentalFeaturesEnabled: preferences.recordingFeedback.isExperimentalFeaturesEnabled,
+            restoreClipboardAfterPaste: preferences.paste.shouldRestoreClipboardAfterPaste,
+            clipboardRestoreDelay: preferences.paste.clipboardRestoreDelay,
+            rollingBufferPreloadModeRawValue: preferences.rollingBuffer.preloadModeRawValue,
+            rollingBufferPreloadAutoDisableCloudModels: preferences.rollingBuffer.autoDisablesCloudModels,
+            rollingBufferPreloadAutoDisableLowBatteryLocalModels: preferences.rollingBuffer.autoDisablesLowBatteryLocalModels,
+            rollingBufferPreloadLowBatteryThresholdPercent: preferences.rollingBuffer.lowBatteryThresholdPercent,
+            rollingBufferDurationSeconds: preferences.rollingBuffer.bufferDurationSeconds,
+            rollingBufferPreloadFinalization: preferences.rollingBuffer.preRunFinalization,
+            rollingBufferVADModel: preferences.rollingBuffer.vadModelRawValue,
+            rollingBufferPreloadEnabledByModel: preferences.rollingBuffer.perModelPreloadEnabled
+        )
+    }
+
     var shortcutBackupRecords: [VoiceInkShortcutActionIdentifier: ShortcutBackup] {
         var records: [VoiceInkShortcutActionIdentifier: ShortcutBackup] = [:]
         records[.primaryRecording] = primaryRecordingShortcut
@@ -96,6 +146,19 @@ extension GeneralBackup {
         records[.quickAddToDictionary] = quickAddToDictionaryShortcut
         records[.toggleEnhancement] = toggleEnhancementShortcut
         return records
+    }
+
+    var generalSettingsBackupPreferences: VoiceInkGeneralSettingsBackupPreferences {
+        VoiceInkGeneralSettingsBackupPolicy.backupPreferences(
+            recordingShortcut: recordingShortcutBackupPreferences,
+            macOSShell: macOSShellBackupPreferences,
+            transcriptionAutoCleanup: transcriptionAutoCleanupBackupPreferences,
+            audioCleanup: audioCleanupBackupPreferences,
+            recordingFeedback: recordingFeedbackBackupPreferences,
+            transcriptionCleanup: transcriptionCleanupBackupPreferences,
+            paste: pasteBackupPreferences,
+            rollingBuffer: rollingBufferBackupPreferences
+        )
     }
 
     var recordingShortcutBackupPreferences: VoiceInkRecordingShortcutBackupPreferences {

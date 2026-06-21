@@ -192,6 +192,16 @@ class ImportExportService {
             isMenuBarOnly: menuBarManager.isMenuBarOnly,
             recorderType: recorderUIManager.recorderType
         )
+        let generalSettingsBackupPreferences = VoiceInkGeneralSettingsBackupPolicy.backupPreferences(
+            recordingShortcut: recordingShortcutBackupPreferences,
+            macOSShell: macOSShellBackupPreferences,
+            transcriptionAutoCleanup: transcriptionAutoCleanupBackupPreferences,
+            audioCleanup: audioCleanupBackupPreferences,
+            recordingFeedback: recordingFeedbackBackupPreferences,
+            transcriptionCleanup: transcriptionCleanupBackupPreferences,
+            paste: pasteBackupPreferences,
+            rollingBuffer: rollingBufferBackupPreferences
+        )
         let shortcutBackupCandidates = VoiceInkShortcutBackupPolicy
             .generalBackupShortcutActionIdentifiers
             .reduce(into: [VoiceInkShortcutActionIdentifier: ShortcutBackup]()) { records, actionIdentifier in
@@ -206,49 +216,8 @@ class ImportExportService {
             records[actionIdentifier] = shortcutBackupCandidates[actionIdentifier]
         }
         let generalSettingsToExport = GeneralBackup(
-            primaryRecordingShortcut: shortcutBackupRecords[.primaryRecording],
-            secondaryRecordingShortcut: shortcutBackupRecords[.secondaryRecording],
-            pasteLastTranscriptionShortcut: shortcutBackupRecords[.pasteLastTranscription],
-            pasteLastEnhancementShortcut: shortcutBackupRecords[.pasteLastEnhancement],
-            retryLastTranscriptionShortcut: shortcutBackupRecords[.retryLastTranscription],
-            cancelRecorderShortcut: shortcutBackupRecords[.cancelRecorder],
-            openHistoryWindowShortcut: shortcutBackupRecords[.openHistoryWindow],
-            quickAddToDictionaryShortcut: shortcutBackupRecords[.quickAddToDictionary],
-            toggleEnhancementShortcut: shortcutBackupRecords[.toggleEnhancement],
-            primaryRecordingShortcutRawValue: recordingShortcutBackupPreferences.primaryRecordingShortcutRawValue,
-            secondaryRecordingShortcutRawValue: recordingShortcutBackupPreferences.secondaryRecordingShortcutRawValue,
-            primaryRecordingShortcutModeRawValue: recordingShortcutBackupPreferences.primaryRecordingShortcutModeRawValue,
-            secondaryRecordingShortcutModeRawValue: recordingShortcutBackupPreferences.secondaryRecordingShortcutModeRawValue,
-            specialShortcutPasteLastTranscriptOnEmptyTap: recordingShortcutBackupPreferences.specialShortcutPasteLastTranscriptOnEmptyTap,
-            isMiddleClickToggleEnabled: recordingShortcutBackupPreferences.isMiddleClickToggleEnabled,
-            middleClickActivationDelay: recordingShortcutBackupPreferences.middleClickActivationDelay,
-            launchAtLoginEnabled: macOSShellBackupPreferences.launchAtLoginEnabled,
-            isMenuBarOnly: macOSShellBackupPreferences.isMenuBarOnly,
-            recorderType: macOSShellBackupPreferences.recorderType,
-            isTranscriptionCleanupEnabled: transcriptionAutoCleanupBackupPreferences.isEnabled,
-            transcriptionRetentionMinutes: transcriptionAutoCleanupBackupPreferences.retentionMinutes,
-            isAudioCleanupEnabled: audioCleanupBackupPreferences.isEnabled,
-            audioRetentionPeriod: audioCleanupBackupPreferences.retentionDays,
-
-            isSoundFeedbackEnabled: recordingFeedbackBackupPreferences.isSoundFeedbackEnabled,
-            isSystemMuteEnabled: recordingFeedbackBackupPreferences.isSystemMuteEnabled,
-            isPauseMediaEnabled: recordingFeedbackBackupPreferences.isPauseMediaEnabled,
-            audioResumptionDelay: recordingFeedbackBackupPreferences.audioResumptionDelay,
-            isTextFormattingEnabled: transcriptionCleanupBackupPreferences.isTextFormattingEnabled,
-            punctuationCleanupMode: transcriptionCleanupBackupPreferences.punctuationCleanupMode,
-            removePunctuation: transcriptionCleanupBackupPreferences.removePunctuation,
-            lowercaseTranscription: transcriptionCleanupBackupPreferences.lowercaseTranscription,
-            isExperimentalFeaturesEnabled: recordingFeedbackBackupPreferences.isExperimentalFeaturesEnabled,
-            restoreClipboardAfterPaste: pasteBackupPreferences.shouldRestoreClipboardAfterPaste,
-            clipboardRestoreDelay: pasteBackupPreferences.clipboardRestoreDelay,
-            rollingBufferPreloadModeRawValue: rollingBufferBackupPreferences.preloadModeRawValue,
-            rollingBufferPreloadAutoDisableCloudModels: rollingBufferBackupPreferences.autoDisablesCloudModels,
-            rollingBufferPreloadAutoDisableLowBatteryLocalModels: rollingBufferBackupPreferences.autoDisablesLowBatteryLocalModels,
-            rollingBufferPreloadLowBatteryThresholdPercent: rollingBufferBackupPreferences.lowBatteryThresholdPercent,
-            rollingBufferDurationSeconds: rollingBufferBackupPreferences.bufferDurationSeconds,
-            rollingBufferPreloadFinalization: rollingBufferBackupPreferences.preRunFinalization,
-            rollingBufferVADModel: rollingBufferBackupPreferences.vadModelRawValue,
-            rollingBufferPreloadEnabledByModel: rollingBufferBackupPreferences.perModelPreloadEnabled
+            shortcutBackupRecords: shortcutBackupRecords,
+            preferences: generalSettingsBackupPreferences
         )
 
         let exportedSettings = BackupFile(

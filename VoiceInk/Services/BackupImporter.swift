@@ -89,9 +89,11 @@ enum BackupImporter {
             recordingShortcutManager: recordingShortcutManager
         )
 
-        let recordingShortcutImportPlan = VoiceInkRecordingShortcutPreference.backupImportPlan(
-            from: general.recordingShortcutBackupPreferences
+        let generalImportPlans = VoiceInkGeneralSettingsBackupPolicy.importPlans(
+            from: general.generalSettingsBackupPreferences
         )
+
+        let recordingShortcutImportPlan = generalImportPlans.recordingShortcut
         if let shortcut = recordingShortcutImportPlan.primaryRecordingShortcut {
             recordingShortcutManager.primaryRecordingShortcut = shortcut
         }
@@ -113,9 +115,7 @@ enum BackupImporter {
         if let middleClickActivationDelay = recordingShortcutImportPlan.middleClickActivationDelay {
             recordingShortcutManager.middleClickActivationDelay = middleClickActivationDelay
         }
-        let macOSShellImportPlan = VoiceInkMacOSShellBackupPreference.backupImportPlan(
-            from: general.macOSShellBackupPreferences
-        )
+        let macOSShellImportPlan = generalImportPlans.macOSShell
         if let launch = macOSShellImportPlan.launchAtLoginEnabled {
             LaunchAtLogin.isEnabled = launch
         }
@@ -126,9 +126,7 @@ enum BackupImporter {
             recorderUIManager.recorderType = recType
         }
 
-        let transcriptionAutoCleanupImportPlan = VoiceInkTranscriptionAutoCleanupPreference.backupImportPlan(
-            from: general.transcriptionAutoCleanupBackupPreferences
-        )
+        let transcriptionAutoCleanupImportPlan = generalImportPlans.transcriptionAutoCleanup
         if let transcriptionCleanup = transcriptionAutoCleanupImportPlan.isEnabled {
             VoiceInkTranscriptionAutoCleanupPreference.saveIsEnabled(transcriptionCleanup)
         }
@@ -136,9 +134,7 @@ enum BackupImporter {
             VoiceInkTranscriptionAutoCleanupPreference.saveRetentionMinutes(transcriptionMinutes)
         }
 
-        let audioCleanupImportPlan = VoiceInkAudioCleanupPreference.backupImportPlan(
-            from: general.audioCleanupBackupPreferences
-        )
+        let audioCleanupImportPlan = generalImportPlans.audioCleanup
         if let audioCleanup = audioCleanupImportPlan.isEnabled {
             VoiceInkAudioCleanupPreference.saveIsEnabled(audioCleanup)
         }
@@ -146,9 +142,7 @@ enum BackupImporter {
             VoiceInkAudioCleanupPreference.saveRetentionDays(audioRetention)
         }
 
-        let recordingFeedbackImportPlan = VoiceInkRecordingFeedbackPreference.backupImportPlan(
-            from: general.recordingFeedbackBackupPreferences
-        )
+        let recordingFeedbackImportPlan = generalImportPlans.recordingFeedback
         if let soundFeedback = recordingFeedbackImportPlan.isSoundFeedbackEnabled {
             soundManager.isEnabled = soundFeedback
         }
@@ -167,9 +161,7 @@ enum BackupImporter {
         if recordingFeedbackImportPlan.shouldDisablePauseMediaForExperimentalImport {
             playbackController.isPauseMediaEnabled = false
         }
-        let transcriptionCleanupImportPlan = VoiceInkTranscriptionCleanupSettings.backupImportPlan(
-            from: general.transcriptionCleanupBackupPreferences
-        )
+        let transcriptionCleanupImportPlan = generalImportPlans.transcriptionCleanup
         if let textFormattingEnabled = transcriptionCleanupImportPlan.isTextFormattingEnabled {
             VoiceInkTranscriptionCleanupPreferenceStorage.saveTextFormattingEnabled(textFormattingEnabled)
         }
@@ -179,16 +171,14 @@ enum BackupImporter {
         if let lowercaseTranscription = transcriptionCleanupImportPlan.lowercaseTranscription {
             VoiceInkTranscriptionCleanupPreferenceStorage.saveLowercaseTranscription(lowercaseTranscription)
         }
-        let pasteImportPlan = VoiceInkPastePreference.backupImportPlan(
-            from: general.pasteBackupPreferences
-        )
+        let pasteImportPlan = generalImportPlans.paste
         if let restoreClipboard = pasteImportPlan.shouldRestoreClipboardAfterPaste {
             VoiceInkPastePreference.saveShouldRestoreClipboardAfterPaste(restoreClipboard)
         }
         if let clipboardDelay = pasteImportPlan.clipboardRestoreDelay {
             VoiceInkPastePreference.saveClipboardRestoreDelay(clipboardDelay)
         }
-        importRollingBufferSettings(general)
+        importRollingBufferSettings(generalImportPlans.rollingBuffer)
 
         print("Successfully imported general settings.")
     }
@@ -227,10 +217,7 @@ enum BackupImporter {
         }
     }
 
-    private static func importRollingBufferSettings(_ general: GeneralBackup) {
-        let rollingBufferImportPlan = VoiceInkRollingBufferPreloadSettings.backupImportPlan(
-            from: general.rollingBufferBackupPreferences
-        )
+    private static func importRollingBufferSettings(_ rollingBufferImportPlan: VoiceInkRollingBufferBackupImportPlan) {
         var didImportRollingBufferSetting = VoiceInkRollingBufferPreloadSettings.saveImportedSettings(
             from: rollingBufferImportPlan
         )

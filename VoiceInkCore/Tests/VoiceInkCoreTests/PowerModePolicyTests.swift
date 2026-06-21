@@ -1630,6 +1630,34 @@ final class PowerModePolicyTests: XCTestCase {
         )
     }
 
+    func testPowerModeShortcutImportPlanKeepsOnlyImportedConfigurationKeys() {
+        let importedId = UUID(uuidString: "00000000-0000-0000-0000-000000000301")!
+        let secondImportedId = UUID(uuidString: "00000000-0000-0000-0000-000000000302")!
+        let unimportedId = UUID(uuidString: "00000000-0000-0000-0000-000000000303")!
+        let importedBackupKey = importedId.uuidString.lowercased()
+
+        let imports = VoiceInkPowerModePolicy.powerModeShortcutImports(
+            backupKeys: [
+                importedBackupKey,
+                "not-a-uuid",
+                unimportedId.uuidString,
+                secondImportedId.uuidString
+            ],
+            importedConfigurations: [
+                config(id: importedId, name: "Imported", emoji: "I"),
+                config(id: secondImportedId, name: "Second", emoji: "S")
+            ]
+        )
+
+        XCTAssertEqual(
+            imports,
+            [
+                VoiceInkPowerModeShortcutImport(backupKey: importedBackupKey, id: importedId),
+                VoiceInkPowerModeShortcutImport(backupKey: secondImportedId.uuidString, id: secondImportedId)
+            ]
+        )
+    }
+
     func testResolvedPowerModeConfigurationPreservesAutomaticResolutionOrder() {
         let explicitDisabled = config(name: "Explicit", emoji: "E", isEnabled: false)
         let appConfig = config(

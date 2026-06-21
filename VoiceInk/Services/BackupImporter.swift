@@ -48,18 +48,15 @@ enum BackupImporter {
             }
 
             powerModeManager.configurations = backup.powerModeConfigs
-            let importedPowerModeIds = Set(backup.powerModeConfigs.map(\.id))
 
             if let shortcuts = backup.powerModeShortcuts {
-                for (idString, shortcutBackup) in shortcuts {
-                    guard
-                        let id = UUID(uuidString: idString),
-                        importedPowerModeIds.contains(id)
-                    else {
-                        continue
-                    }
-
-                    ShortcutStore.setShortcut(shortcutBackup.shortcut, for: .powerMode(id))
+                let shortcutImports = VoiceInkPowerModePolicy.powerModeShortcutImports(
+                    backupKeys: Array(shortcuts.keys),
+                    importedConfigurations: backup.powerModeConfigs
+                )
+                for shortcutImport in shortcutImports {
+                    guard let shortcutBackup = shortcuts[shortcutImport.backupKey] else { continue }
+                    ShortcutStore.setShortcut(shortcutBackup.shortcut, for: .powerMode(shortcutImport.id))
                 }
             }
 

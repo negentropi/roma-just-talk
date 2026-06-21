@@ -574,6 +574,16 @@ public struct VoiceInkPowerModeTranscriptionModelResourcePlan: Equatable, Sendab
     }
 }
 
+public struct VoiceInkPowerModeShortcutImport: Equatable, Sendable {
+    public var backupKey: String
+    public var id: UUID
+
+    public init(backupKey: String, id: UUID) {
+        self.backupKey = backupKey
+        self.id = id
+    }
+}
+
 public struct VoiceInkPowerModeLanguageApplicationPlan: Equatable, Sendable {
     public var languageToSave: String?
 
@@ -1463,6 +1473,21 @@ public enum VoiceInkPowerModeValidationError: Error, Equatable, Identifiable, Se
 }
 
 public enum VoiceInkPowerModePolicy {
+    public static func powerModeShortcutImports(
+        backupKeys: [String],
+        importedConfigurations: [PowerModeConfig]
+    ) -> [VoiceInkPowerModeShortcutImport] {
+        let importedConfigurationIds = Set(importedConfigurations.map(\.id))
+        return backupKeys.compactMap { backupKey in
+            guard let id = UUID(uuidString: backupKey),
+                  importedConfigurationIds.contains(id) else {
+                return nil
+            }
+
+            return VoiceInkPowerModeShortcutImport(backupKey: backupKey, id: id)
+        }
+    }
+
     public static func normalizedWebsiteURL(_ url: String) -> String {
         url.lowercased()
             .replacingOccurrences(of: "https://", with: "")

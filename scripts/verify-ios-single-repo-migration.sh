@@ -5425,6 +5425,36 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
+  "shared Power Mode backup shortcut import record lives in VoiceInkCore" \
+  'VoiceInkPowerModeShortcutImport' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode backup shortcut import policy lives in VoiceInkCore" \
+  'powerModeShortcutImports' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "macOS backup importer uses shared Power Mode shortcut import policy" \
+  'VoiceInkPowerModePolicy\.powerModeShortcutImports' \
+  VoiceInk/Services/BackupImporter.swift
+
+reject_pattern \
+  "macOS backup importer avoids shell-only Power Mode shortcut import filtering" \
+  'for +\(idString, +shortcutBackup\) +in +shortcuts|let +importedPowerModeIds|UUID\(uuidString: idString\)|importedPowerModeIds\.contains' \
+  VoiceInk/Services/BackupImporter.swift
+
+require_pattern \
+  "core checks execute Power Mode shortcut import policy tests" \
+  'PowerModePolicyTests\.testPowerModeShortcutImportPlanKeepsOnlyImportedConfigurationKeys' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "migration checklist tracks shared Power Mode shortcut import policy" \
+  'backup shortcut import key filtering' \
+  docs/ios-single-repo-migration.md
+
+require_pattern \
   "shared Power Mode automatic resolution policy lives in VoiceInkCore" \
   'resolvedPowerModeConfiguration' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift

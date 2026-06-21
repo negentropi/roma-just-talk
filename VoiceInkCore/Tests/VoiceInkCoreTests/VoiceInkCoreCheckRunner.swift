@@ -578,6 +578,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testMatchingAppRuleUsesExactEnabledBundleIdentifier", run: { PowerModePolicyTests().testMatchingAppRuleUsesExactEnabledBundleIdentifier() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testDefaultAndRulePresenceRequireEnabledRules", run: { PowerModePolicyTests().testDefaultAndRulePresenceRequireEnabledRules() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeConfigurationListQueriesUseSharedRulePolicy", run: { PowerModePolicyTests().testPowerModeConfigurationListQueriesUseSharedRulePolicy() }),
+            VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeShortcutImportPlanKeepsOnlyImportedConfigurationKeys", run: { PowerModePolicyTests().testPowerModeShortcutImportPlanKeepsOnlyImportedConfigurationKeys() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testResolvedPowerModeConfigurationPreservesAutomaticResolutionOrder", run: { PowerModePolicyTests().testResolvedPowerModeConfigurationPreservesAutomaticResolutionOrder() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeConfigurationListMutationsPreserveManagerSemantics", run: { try PowerModePolicyTests().testPowerModeConfigurationListMutationsPreserveManagerSemantics() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testValidationRejectsBlankAndDuplicateNameWithoutNormalizingName", run: { PowerModePolicyTests().testValidationRejectsBlankAndDuplicateNameWithoutNormalizingName() }),

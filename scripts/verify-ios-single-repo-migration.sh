@@ -9302,6 +9302,28 @@ reject_pattern \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
 require_pattern \
+  "iOS shell logging adapter uses shared app identity subsystem" \
+  'Logger\(subsystem: VoiceInkAppIdentity\.loggingSubsystem' \
+  iOS/Shared/VoiceInkIOSLogger.swift
+
+require_pattern \
+  "iOS app shell diagnostics route through shared iOS logger" \
+  'VoiceInkIOSLogger\.(app|appGroup|audioPlayback|audioSession|localModelManagement|notes|recording|settings)' \
+  iOS/VoiceInk-ios iOS/Shared
+
+require_pattern \
+  "iOS keyboard diagnostics route through shared iOS logger" \
+  'VoiceInkIOSLogger\.keyboard' \
+  iOS/VoiceInkKeyboard/KeyboardViewController.swift
+
+reject_pattern \
+  "iOS app and keyboard shell avoid clone print diagnostics" \
+  'print\(' \
+  iOS/VoiceInk-ios \
+  iOS/VoiceInkKeyboard \
+  iOS/Shared
+
+require_pattern \
   "migration checklist tracks shared diagnostic log export policy" \
   'diagnostic log session storage/range/header/filename policy.*VoiceInkDiagnosticLogExportPolicy' \
   docs/ios-single-repo-migration.md

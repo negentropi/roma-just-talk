@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import OSLog
 import VoiceInkCore
 
 @main
@@ -20,7 +21,7 @@ struct VoiceInk_iosApp: App {
 
         // Clear any stale recording state on app launch
         AppGroupCoordinator.shared.updateRecordingState(false)
-        print("🧹 Cleared stale recording state on app launch")
+        VoiceInkIOSLogger.app.notice("Cleared stale recording state on app launch")
     }
     
     var sharedModelContainer: ModelContainer = {
@@ -76,13 +77,13 @@ struct VoiceInk_iosApp: App {
 
         switch deepLink {
         case .record:
-            print("🔗 URL scheme triggered: open app for recording")
+            VoiceInkIOSLogger.app.notice("URL scheme triggered: open app for recording")
             applyLaunchRecordingAction(
                 launchRecordingRequestState.requestRecording(
                     hasCompletedOnboarding: hasCompletedOnboarding
                 )
             )
-            print("📱 App opened via keyboard extension - recording requested")
+            VoiceInkIOSLogger.app.notice("App opened via keyboard extension - recording requested")
         }
     }
 

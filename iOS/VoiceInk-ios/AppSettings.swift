@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import OSLog
 import VoiceInkCore
 
 @MainActor
@@ -305,7 +306,7 @@ final class AppSettings: ObservableObject {
         guard let account = provider.apiKeyAccount else { return }
         guard let status = VoiceInkKeychainValueStore.saveString(key, account: account) else { return }
         if status != errSecSuccess {
-            print("Error saving API key to keychain: \(status)")
+            VoiceInkIOSLogger.settings.error("Error saving API key to keychain: \(status, privacy: .public)")
         }
     }
     

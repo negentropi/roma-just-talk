@@ -1,4 +1,5 @@
 import Foundation
+import OSLog
 
 /// Handles communication between the main VoiceInk app and the keyboard extension
 /// Uses App Groups + Darwin Notifications for reliable iOS-native communication
@@ -35,7 +36,7 @@ final class AppGroupCoordinator {
     var isRecording: Bool {
         let state = VoiceInkAppGroupRecordingBridge.recordingState(in: sharedDefaults)
         if state.shouldClearStaleState {
-            print("⚠️ Recording state appears stale, clearing it")
+            VoiceInkIOSLogger.appGroup.warning("Recording state appears stale, clearing it")
             updateRecordingState(false)
         }
 
@@ -51,7 +52,7 @@ final class AppGroupCoordinator {
         // Notify keyboard of state change
         postDarwinNotification(VoiceInkAppGroupRecordingBridge.NotificationName.recordingStateChanged)
         
-        print("📡 Updated recording state: \(isRecording)")
+        VoiceInkIOSLogger.appGroup.notice("Updated recording state: \(isRecording, privacy: .public)")
     }
     
     // MARK: - Darwin Notifications (Real-time Communication)

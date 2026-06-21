@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import OSLog
 import VoiceInkCore
 
 struct NotesListView: View {
@@ -199,7 +200,7 @@ struct NotesListView: View {
                 do {
                     try note.deleteExistingAudioFile()
                 } catch {
-                    print(VoiceInkStoredAudioFile.deletionErrorMessage(for: error))
+                    VoiceInkIOSLogger.notes.error("\(VoiceInkStoredAudioFile.deletionErrorMessage(for: error), privacy: .public)")
                 }
                 modelContext.delete(note)
             }

@@ -1,6 +1,7 @@
 import Foundation
 import AVFoundation
 import Combine
+import OSLog
 import VoiceInkCore
 
 @MainActor
@@ -56,7 +57,7 @@ final class AudioPlayer: ObservableObject {
             )
             isLoading = false
         } catch {
-            print("Failed to load audio: \(error)")
+            VoiceInkIOSLogger.audioPlayback.error("Failed to load audio: \(String(describing: error), privacy: .public)")
             isLoading = false
         }
     }
@@ -73,7 +74,7 @@ final class AudioPlayer: ObservableObject {
             playbackState = playbackState.playing()
             startTimer()
         } catch {
-            print("Failed to play audio: \(error)")
+            VoiceInkIOSLogger.audioPlayback.error("Failed to play audio: \(String(describing: error), privacy: .public)")
         }
     }
     

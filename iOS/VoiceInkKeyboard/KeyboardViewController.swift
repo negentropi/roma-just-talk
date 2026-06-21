@@ -7,6 +7,7 @@
 
 import UIKit
 import KeyboardKit
+import OSLog
 import VoiceInkCore
 
 class KeyboardViewController: KeyboardInputViewController {
@@ -161,9 +162,9 @@ class KeyboardViewController: KeyboardInputViewController {
         // Method 1: Try extensionContext.open (primary method)
         extensionContext?.open(url) { success in
             if success {
-                print("✅ Opened main app via extensionContext")
+                VoiceInkIOSLogger.keyboard.notice("Opened main app via extensionContext")
             } else {
-                print("❌ extensionContext.open failed, trying alternative methods")
+                VoiceInkIOSLogger.keyboard.error("extensionContext.open failed, trying alternative methods")
                 DispatchQueue.main.async {
                     self.tryAlternativeURLOpening(url)
                 }
@@ -177,9 +178,9 @@ class KeyboardViewController: KeyboardInputViewController {
             if sharedApp.canOpenURL(url) {
                 sharedApp.open(url, options: [:]) { success in
                     if success {
-                        print("✅ Opened main app via UIApplication.open")
+                        VoiceInkIOSLogger.keyboard.notice("Opened main app via UIApplication.open")
                     } else {
-                        print("❌ UIApplication.open failed")
+                        VoiceInkIOSLogger.keyboard.error("UIApplication.open failed")
                         self.showUserMessage()
                     }
                 }
@@ -202,10 +203,10 @@ class KeyboardViewController: KeyboardInputViewController {
         
         if let responder = responder {
             _ = responder.perform(selector, with: url)
-            print("✅ Attempted to open main app via responder chain")
+            VoiceInkIOSLogger.keyboard.notice("Attempted to open main app via responder chain")
             // Don't assume success since we can't get feedback from this method
         } else {
-            print("❌ All URL opening methods failed")
+            VoiceInkIOSLogger.keyboard.error("All URL opening methods failed")
             showUserMessage()
         }
     }

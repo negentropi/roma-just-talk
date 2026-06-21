@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import OSLog
 import VoiceInkCore
 
 struct SettingsView: View {
@@ -262,7 +263,7 @@ struct SettingsView: View {
             }
             try? context.save()
         } catch {
-            print("Failed to reset SwiftData: \(error)")
+            VoiceInkIOSLogger.settings.error("Failed to reset SwiftData: \(String(describing: error), privacy: .public)")
         }
 
         VoiceInkAppDataResetFilePlan.iOS(

@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Combine
+import OSLog
 import VoiceInkCore
 
 struct LocalModelManagementView: View {
@@ -134,7 +135,7 @@ struct ModelRowView: View {
         do {
             try modelManager.deleteModel(row.model)
         } catch {
-            print("Delete failed: \(error)")
+            VoiceInkIOSLogger.localModelManagement.error("Delete failed: \(String(describing: error), privacy: .public)")
             modelManager.downloadError = .deleteFailed(for: error)
         }
     }

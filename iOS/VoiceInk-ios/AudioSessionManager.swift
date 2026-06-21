@@ -9,6 +9,7 @@
 import Foundation
 import Combine
 import AVFoundation
+import OSLog
 import VoiceInkCore
 
 @MainActor
@@ -42,10 +43,10 @@ final class AudioSessionManager: ObservableObject {
             lifecycleState.markActivatedForRecording()
             cancelScheduledDeactivation()
             
-            print("🎙️ Audio session activated for recording")
+            VoiceInkIOSLogger.audioSession.notice("Audio session activated for recording")
             
         } catch let error as NSError {
-            print("⚠️ Audio session activation failed: \(error.localizedDescription) (Code: \(error.code))")
+            VoiceInkIOSLogger.audioSession.error("Audio session activation failed: \(error.localizedDescription, privacy: .public) (code: \(error.code, privacy: .public))")
             throw error
         }
     }
@@ -82,7 +83,7 @@ final class AudioSessionManager: ObservableObject {
             }
         }
         
-        print("🕒 Audio session deactivation scheduled in \(Int(lifecycleState.timeoutRemaining)) seconds")
+        VoiceInkIOSLogger.audioSession.notice("Audio session deactivation scheduled in \(Int(lifecycleState.timeoutRemaining), privacy: .public) seconds")
     }
     
     /// Immediately deactivates the session
@@ -94,9 +95,9 @@ final class AudioSessionManager: ObservableObject {
         do {
             try AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
             lifecycleState.markDeactivated()
-            print("🔇 Audio session deactivated")
+            VoiceInkIOSLogger.audioSession.notice("Audio session deactivated")
         } catch {
-            print("⚠️ Failed to deactivate audio session: \(error.localizedDescription)")
+            VoiceInkIOSLogger.audioSession.error("Failed to deactivate audio session: \(error.localizedDescription, privacy: .public)")
         }
     }
     

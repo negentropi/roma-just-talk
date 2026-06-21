@@ -4993,14 +4993,29 @@ reject_pattern \
   VoiceInk/Transcription/Processing/WordReplacementService.swift
 
 require_pattern \
-  "macOS backup import uses shared word-replacement import plan" \
-  'VoiceInkDictionaryPolicy\.wordReplacementBackupImportPlan\(' \
+  "shared dictionary backup import plan lives in VoiceInkCore" \
+  'VoiceInkDictionaryBackupImportPlan|dictionaryBackupImportPlan\(' \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+require_pattern \
+  "macOS backup import uses shared dictionary import plan" \
+  'VoiceInkDictionaryPolicy\.dictionaryBackupImportPlan\(' \
+  VoiceInk/Services/BackupImporter.swift
+
+reject_pattern \
+  "macOS backup import avoids shell-owned dictionary import counters and subplans" \
+  'var +(insertedWords|insertedReplacements|skippedInvalidReplacements)\b|VoiceInkDictionaryPolicy\.(vocabularyWordsToInsert|wordReplacementBackupImportPlan)\(' \
   VoiceInk/Services/BackupImporter.swift
 
 reject_pattern \
   "macOS backup import avoids shell-only word-replacement import planning" \
   'for \(original, replacement\) in replacements|VoiceInkDictionaryPolicy\.wordReplacementInsertPlan\(|plan\.errorMessage|plan\.shouldInsert|existingOriginalTexts\.append' \
   VoiceInk/Services/BackupImporter.swift
+
+require_pattern \
+  "core checks execute dictionary backup import plan tests" \
+  'testDictionaryBackupImportPlanCombinesVocabularyAndReplacementsForMacOSImport|testDictionaryBackupImportPlanPreservesNoDataNoSaveDecision|testDictionaryBackupImportPlanDoesNotInvalidateReplacementCacheForVocabularyOnlyImport' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \
   "iOS retry passes stored vocabulary into shared run processor" \

@@ -250,6 +250,44 @@ public struct VoiceInkWordReplacementBackupImportPlan: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkDictionaryBackupImportPlan: Equatable, Sendable {
+    public let hasVocabularyBackupRecords: Bool
+    public let hasWordReplacementBackupRecords: Bool
+    public let vocabularyWordsToInsert: [String]
+    public let wordReplacementRulesToInsert: [VoiceInkWordReplacementRule]
+    public let skippedInvalidReplacementCount: Int
+
+    public var insertedVocabularyWordCount: Int {
+        vocabularyWordsToInsert.count
+    }
+
+    public var insertedWordReplacementCount: Int {
+        wordReplacementRulesToInsert.count
+    }
+
+    public var shouldSave: Bool {
+        insertedVocabularyWordCount > 0 || insertedWordReplacementCount > 0
+    }
+
+    public var shouldInvalidateWordReplacementCache: Bool {
+        insertedWordReplacementCount > 0
+    }
+
+    public init(
+        hasVocabularyBackupRecords: Bool,
+        hasWordReplacementBackupRecords: Bool,
+        vocabularyWordsToInsert: [String],
+        wordReplacementRulesToInsert: [VoiceInkWordReplacementRule],
+        skippedInvalidReplacementCount: Int
+    ) {
+        self.hasVocabularyBackupRecords = hasVocabularyBackupRecords
+        self.hasWordReplacementBackupRecords = hasWordReplacementBackupRecords
+        self.vocabularyWordsToInsert = vocabularyWordsToInsert
+        self.wordReplacementRulesToInsert = wordReplacementRulesToInsert
+        self.skippedInvalidReplacementCount = skippedInvalidReplacementCount
+    }
+}
+
 public struct VoiceInkVocabularyWordBackup: Codable, Equatable, Sendable {
     public let word: String
 
@@ -813,6 +851,36 @@ public enum VoiceInkDictionaryPolicy {
         vocabularyWordsToInsert(
             backupRecords.map(\.word),
             existingWords: existingWords
+        )
+    }
+
+    public static func dictionaryBackupImportPlan(
+        vocabularyWords: [VoiceInkVocabularyWordBackup]?,
+        wordReplacements: [String: String]?,
+        existingWords: [String],
+        existingOriginalTexts: [String]
+    ) -> VoiceInkDictionaryBackupImportPlan {
+        let wordReplacementPlan = wordReplacements.map {
+            wordReplacementBackupImportPlan(
+                from: $0,
+                existingOriginalTexts: existingOriginalTexts
+            )
+        } ?? VoiceInkWordReplacementBackupImportPlan(
+            rulesToInsert: [],
+            skippedInvalidReplacementCount: 0
+        )
+
+        return VoiceInkDictionaryBackupImportPlan(
+            hasVocabularyBackupRecords: vocabularyWords != nil,
+            hasWordReplacementBackupRecords: wordReplacements != nil,
+            vocabularyWordsToInsert: vocabularyWords.map {
+                vocabularyWordsToInsert(
+                    from: $0,
+                    existingWords: existingWords
+                )
+            } ?? [],
+            wordReplacementRulesToInsert: wordReplacementPlan.rulesToInsert,
+            skippedInvalidReplacementCount: wordReplacementPlan.skippedInvalidReplacementCount
         )
     }
 

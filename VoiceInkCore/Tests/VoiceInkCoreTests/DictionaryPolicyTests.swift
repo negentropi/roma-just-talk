@@ -774,6 +774,70 @@ final class DictionaryPolicyTests: XCTestCase {
         XCTAssertEqual(plan.skippedInvalidReplacementCount, 2)
     }
 
+    func testDictionaryBackupImportPlanCombinesVocabularyAndReplacementsForMacOSImport() {
+        let plan = VoiceInkDictionaryPolicy.dictionaryBackupImportPlan(
+            vocabularyWords: [
+                VoiceInkVocabularyWordBackup(word: " Roma "),
+                VoiceInkVocabularyWordBackup(word: "voice ink"),
+                VoiceInkVocabularyWordBackup(word: "roma")
+            ],
+            wordReplacements: [
+                " Flow, Voice Ink ": " roma ",
+                "quick release": "duplicate",
+                "blank replacement": " \n ",
+                " , ": "ignored"
+            ],
+            existingWords: ["voice ink"],
+            existingOriginalTexts: ["quick release"]
+        )
+
+        XCTAssertTrue(plan.hasVocabularyBackupRecords)
+        XCTAssertTrue(plan.hasWordReplacementBackupRecords)
+        XCTAssertEqual(plan.vocabularyWordsToInsert, ["Roma"])
+        XCTAssertEqual(
+            plan.wordReplacementRulesToInsert,
+            [VoiceInkWordReplacementRule(originalText: "Flow, Voice Ink", replacementText: "roma")]
+        )
+        XCTAssertEqual(plan.skippedInvalidReplacementCount, 2)
+        XCTAssertEqual(plan.insertedVocabularyWordCount, 1)
+        XCTAssertEqual(plan.insertedWordReplacementCount, 1)
+        XCTAssertTrue(plan.shouldSave)
+        XCTAssertTrue(plan.shouldInvalidateWordReplacementCache)
+    }
+
+    func testDictionaryBackupImportPlanPreservesNoDataNoSaveDecision() {
+        let plan = VoiceInkDictionaryPolicy.dictionaryBackupImportPlan(
+            vocabularyWords: nil,
+            wordReplacements: nil,
+            existingWords: ["voice ink"],
+            existingOriginalTexts: ["quick release"]
+        )
+
+        XCTAssertFalse(plan.hasVocabularyBackupRecords)
+        XCTAssertFalse(plan.hasWordReplacementBackupRecords)
+        XCTAssertEqual(plan.vocabularyWordsToInsert, [])
+        XCTAssertEqual(plan.wordReplacementRulesToInsert, [])
+        XCTAssertEqual(plan.skippedInvalidReplacementCount, 0)
+        XCTAssertFalse(plan.shouldSave)
+        XCTAssertFalse(plan.shouldInvalidateWordReplacementCache)
+    }
+
+    func testDictionaryBackupImportPlanDoesNotInvalidateReplacementCacheForVocabularyOnlyImport() {
+        let plan = VoiceInkDictionaryPolicy.dictionaryBackupImportPlan(
+            vocabularyWords: [
+                VoiceInkVocabularyWordBackup(word: "Roma")
+            ],
+            wordReplacements: nil,
+            existingWords: [],
+            existingOriginalTexts: []
+        )
+
+        XCTAssertEqual(plan.vocabularyWordsToInsert, ["Roma"])
+        XCTAssertEqual(plan.wordReplacementRulesToInsert, [])
+        XCTAssertTrue(plan.shouldSave)
+        XCTAssertFalse(plan.shouldInvalidateWordReplacementCache)
+    }
+
     private func withIsolatedDefaults(_ run: (UserDefaults) -> Void) {
         let suiteName = "VoiceInkCore.DictionaryPolicyTests.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!

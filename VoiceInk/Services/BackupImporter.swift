@@ -237,60 +237,59 @@ enum BackupImporter {
 
     @MainActor
     private static func importDictionary(from backup: BackupFile, modelContext: ModelContext) throws {
-        var insertedWords = 0
-        var insertedReplacements = 0
-        var skippedInvalidReplacements = 0
-
-        if let words = backup.vocabularyWords {
+        let existingWords: [String]
+        if backup.vocabularyWords != nil {
             let descriptor = FetchDescriptor<VocabularyWord>()
-            let existingWords = try modelContext.fetch(descriptor)
-
-            let wordsToInsert = VoiceInkDictionaryPolicy.vocabularyWordsToInsert(
-                from: words,
-                existingWords: existingWords.map(\.word)
-            )
-
-            for word in wordsToInsert {
-                modelContext.insert(VocabularyWord(word: word))
-                insertedWords += 1
-            }
+            existingWords = try modelContext.fetch(descriptor).map(\.word)
         } else {
-            print("No vocabulary words found in the imported file. Existing items remain unchanged.")
+            existingWords = []
         }
 
-        if let replacements = backup.wordReplacements {
+        let existingOriginalTexts: [String]
+        if backup.wordReplacements != nil {
             let descriptor = FetchDescriptor<WordReplacement>()
-            let existingReplacements = try modelContext.fetch(descriptor)
-            let importPlan = VoiceInkDictionaryPolicy.wordReplacementBackupImportPlan(
-                from: replacements,
-                existingOriginalTexts: existingReplacements.map(\.originalText)
-            )
-
-            for rule in importPlan.rulesToInsert {
-                modelContext.insert(WordReplacement(originalText: rule.originalText, replacementText: rule.replacementText))
-            }
-            insertedReplacements = importPlan.rulesToInsert.count
-            skippedInvalidReplacements = importPlan.skippedInvalidReplacementCount
+            existingOriginalTexts = try modelContext.fetch(descriptor).map(\.originalText)
         } else {
+            existingOriginalTexts = []
+        }
+
+        let importPlan = VoiceInkDictionaryPolicy.dictionaryBackupImportPlan(
+            vocabularyWords: backup.vocabularyWords,
+            wordReplacements: backup.wordReplacements,
+            existingWords: existingWords,
+            existingOriginalTexts: existingOriginalTexts
+        )
+
+        if !importPlan.hasVocabularyBackupRecords {
+            print("No vocabulary words found in the imported file. Existing items remain unchanged.")
+        }
+        if !importPlan.hasWordReplacementBackupRecords {
             print("No word replacements found in the imported file. Existing replacements remain unchanged.")
         }
 
-        guard insertedWords > 0 || insertedReplacements > 0 else {
+        for word in importPlan.vocabularyWordsToInsert {
+            modelContext.insert(VocabularyWord(word: word))
+        }
+        for rule in importPlan.wordReplacementRulesToInsert {
+            modelContext.insert(WordReplacement(originalText: rule.originalText, replacementText: rule.replacementText))
+        }
+
+        guard importPlan.shouldSave else {
             print("No new dictionary entries were imported.")
-            if skippedInvalidReplacements > 0 {
-                print("Skipped \(skippedInvalidReplacements) invalid word replacements from the imported file.")
+            if importPlan.skippedInvalidReplacementCount > 0 {
+                print("Skipped \(importPlan.skippedInvalidReplacementCount) invalid word replacements from the imported file.")
             }
             return
         }
 
         do {
             try modelContext.save()
-            if insertedReplacements > 0 {
+            if importPlan.shouldInvalidateWordReplacementCache {
                 WordReplacementService.shared.invalidateCache()
             }
-            print("Successfully imported \(insertedWords) vocabulary words and \(insertedReplacements) word replacements to SwiftData.")
-            if skippedInvalidReplacements > 0 {
-                print("Skipped \(skippedInvalidReplacements) invalid word replacements from the imported file.")
+            print("Successfully imported \(importPlan.insertedVocabularyWordCount) vocabulary words and \(importPlan.insertedWordReplacementCount) word replacements to SwiftData.")
+            if importPlan.skippedInvalidReplacementCount > 0 {
+                print("Skipped \(importPlan.skippedInvalidReplacementCount) invalid word replacements from the imported file.")
             }
         } catch {
             modelContext.rollback()

@@ -1208,6 +1208,21 @@ reject_pattern \
   iOS/VoiceInk-ios/RecordingManager.swift
 
 require_pattern \
+  "iOS retry adapter owns stored-audio retranscription record update" \
+  'retranscribeStoredAudio' \
+  iOS/VoiceInk-ios/TranscriptionRetryService.swift
+
+require_pattern \
+  "iOS recording manager delegates background retry to retry adapter" \
+  'TranscriptionRetryService\.shared\.retranscribe\(note: note\)' \
+  iOS/VoiceInk-ios/RecordingManager.swift
+
+reject_pattern \
+  "iOS recording manager avoids direct stored-audio retry mutation seam" \
+  'retranscribeStoredAudio|TranscriptionRetryService\.shared\.transcribe\(fileURL:' \
+  iOS/VoiceInk-ios/RecordingManager.swift
+
+require_pattern \
   "shared recording transcription draft lives in VoiceInkCore" \
   'VoiceInkRecordingTranscriptionDraft' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingTranscriptionDraft.swift

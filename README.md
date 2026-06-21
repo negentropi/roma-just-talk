@@ -1,20 +1,16 @@
 <div align="center">
   <img src="docs/assets/roma-just-talk-logo.png" alt="roma-just-talk split keyboard logo" width="180" height="180" />
   <h1>roma just talk</h1>
-  <p>speak before press hotkey dictation app.</p>
-  <p>rethink UX: pre-roll voice capture, -87% bin size & -83% ram usage (780mb → 132mb), local & cloud stt solution both available.</p>
-  <p>Speak is 3~4x faster than type. Read is 2x faster & self-paced & high Seekability than listen </p>
+  <p>Turn dictation from sequential to parallel: speak while you trigger, instead of triggering before you speak.</p>
+  
 
   [![License](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
   ![Platform](https://img.shields.io/badge/platform-macOS%2014.0%2B-brightgreen)
   [![GitHub release (latest by date)](https://img.shields.io/github/v/release/happyf-weallareeuropean/roma-just-talk)](https://github.com/happyf-weallareeuropean/roma-just-talk/releases)
   ![GitHub all releases](https://img.shields.io/github/downloads/happyf-weallareeuropean/roma-just-talk/total)
   ![GitHub stars](https://img.shields.io/github/stars/happyf-weallareeuropean/roma-just-talk?style=social)
-  <p>
-    <a href="https://github.com/happyf-weallareeuropean/roma-just-talk/releases">Download</a> •
-    <a href="https://github.com/Beingpax/VoiceInk">Upstream VoiceInk</a>
-  </p>
-
+  <p>-87% bin size, -83% ram (780mb → 132mb). vs Wispr Flow.</p>
+  <p>local & cloud STT solution both available.</p>
   <a href="https://github.com/happyf-weallareeuropean/roma-just-talk/releases/latest">
     <img src="https://img.shields.io/badge/Download%20Latest-macOS%20App-blue?style=for-the-badge&logo=apple" alt="Download roma-just-talk" width="250"/>
   </a>
@@ -22,9 +18,7 @@
 
 ---
 
-Most dictation apps wait for the hotkey, then open the mic. That means you pause, prepare, press, then speak. This [fork](https://github.com/Beingpax/VoiceInk) explores the other direction: keep a short rolling voice buffer, so the app can catch what you already started saying.
-
-VoiceInk made dictation feel instant after recording starts. roma-just-talk is interested in the moment before that: speech that begins naturally, then gets committed when you press the shortcut.
+This [fork](https://github.com/Beingpax/VoiceInk) explores the other direction: keep a short rolling voice buffer, so the app can catch what you already started saying.
 
 ![roma just talk Mac App](https://github.com/user-attachments/assets/a6631a6d-1f56-43e1-be6c-88b21750c82f)
 
@@ -90,7 +84,7 @@ For build instructions, see [BUILDING.md](BUILDING.md).
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU General Public License v3.0 - [learn more](LICENSE).
 
 ## Support
 

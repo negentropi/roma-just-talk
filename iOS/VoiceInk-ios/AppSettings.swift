@@ -196,8 +196,8 @@ final class AppSettings: ObservableObject {
     }
 
     func applyFillerWordSubmissionPlan(_ plan: VoiceInkFillerWordSubmissionPlan) {
-        if fillerWords != plan.updatedWords {
-            fillerWords = plan.updatedWords
+        if let updatedWords = plan.updatedWordsIfChanged(from: fillerWords) {
+            fillerWords = updatedWords
         }
     }
 
@@ -206,8 +206,7 @@ final class AppSettings: ObservableObject {
     }
 
     func applyWordReplacementSubmissionPlan(_ plan: VoiceInkWordReplacementSubmissionPlan) {
-        let updatedRules = plan.applying(to: wordReplacements)
-        if wordReplacements != updatedRules {
+        if let updatedRules = plan.updatedRulesIfChanged(from: wordReplacements) {
             wordReplacements = updatedRules
         }
     }
@@ -237,8 +236,7 @@ final class AppSettings: ObservableObject {
     }
 
     func applyCustomVocabularySubmissionPlan(_ plan: VoiceInkVocabularySubmissionPlan) {
-        let updatedTerms = plan.applying(to: customVocabularyTerms)
-        if customVocabularyTerms != updatedTerms {
+        if let updatedTerms = plan.updatedWordsIfChanged(from: customVocabularyTerms) {
             customVocabularyTerms = updatedTerms
         }
     }

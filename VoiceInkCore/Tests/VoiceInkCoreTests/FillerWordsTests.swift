@@ -20,6 +20,11 @@ final class FillerWordsTests: XCTestCase {
             )
         )
         XCTAssertTrue(VoiceInkFillerWords.submissionPlan("like", existingWords: ["um"]).didInsert)
+        XCTAssertEqual(
+            VoiceInkFillerWords.submissionPlan("like", existingWords: ["um"])
+                .updatedWordsIfChanged(from: ["um"]),
+            ["um", "like"]
+        )
     }
 
     func testSubmissionPlanKeepsBlankDraftWithoutAlert() {
@@ -33,6 +38,10 @@ final class FillerWordsTests: XCTestCase {
         )
         XCTAssertFalse(VoiceInkFillerWords.submissionPlan("   ", existingWords: ["um"]).didInsert)
         XCTAssertFalse(VoiceInkFillerWords.submissionPlan("", existingWords: ["um"]).didInsert)
+        XCTAssertNil(
+            VoiceInkFillerWords.submissionPlan("   ", existingWords: ["um"])
+                .updatedWordsIfChanged(from: ["um"])
+        )
     }
 
     func testSubmissionPlanKeepsDuplicateDraftAndBuildsSharedAlert() {
@@ -45,6 +54,10 @@ final class FillerWordsTests: XCTestCase {
             )
         )
         XCTAssertFalse(VoiceInkFillerWords.submissionPlan("UM", existingWords: ["um"]).didInsert)
+        XCTAssertNil(
+            VoiceInkFillerWords.submissionPlan("UM", existingWords: ["um"])
+                .updatedWordsIfChanged(from: ["um"])
+        )
     }
 
     func testDraftAvailabilityUsesSharedNormalization() {

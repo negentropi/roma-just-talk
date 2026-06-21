@@ -19,8 +19,8 @@ class FillerWordManager: ObservableObject {
     }
 
     func applySubmissionPlan(_ plan: VoiceInkFillerWordSubmissionPlan) {
-        if fillerWords != plan.updatedWords {
-            fillerWords = plan.updatedWords
+        if let updatedWords = plan.updatedWordsIfChanged(from: fillerWords) {
+            fillerWords = updatedWords
         }
     }
 

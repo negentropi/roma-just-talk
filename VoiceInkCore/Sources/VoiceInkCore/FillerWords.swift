@@ -17,6 +17,10 @@ public struct VoiceInkFillerWordSubmissionPlan: Equatable, Sendable {
         self.alertPresentation = alertPresentation
         self.didInsert = didInsert
     }
+
+    public func updatedWordsIfChanged(from currentWords: [String]) -> [String]? {
+        VoiceInkPreferenceList.changedElements(from: currentWords, to: updatedWords)
+    }
 }
 
 public struct VoiceInkFillerWordDraftSubmission: Equatable, Sendable {

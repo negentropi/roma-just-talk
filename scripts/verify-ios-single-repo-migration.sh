@@ -4205,6 +4205,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/FillerWords.swift
 
 require_pattern \
+  "shared filler-word submission policy owns changed-list application" \
+  'func updatedWordsIfChanged\(from currentWords: \[String\]\)' \
+  VoiceInkCore/Sources/VoiceInkCore/FillerWords.swift
+
+require_pattern \
   "shared filler-word draft state lives in core" \
   'public struct VoiceInkFillerWordDraftState' \
   VoiceInkCore/Sources/VoiceInkCore/FillerWords.swift
@@ -4231,7 +4236,7 @@ require_pattern \
 
 require_pattern \
   "macOS filler-word storage applies shared updated words" \
-  'fillerWords = plan\.updatedWords' \
+  'plan\.updatedWordsIfChanged\(from: fillerWords\)' \
   VoiceInk/Transcription/Processing/FillerWordManager.swift
 
 require_pattern \
@@ -4241,12 +4246,18 @@ require_pattern \
 
 require_pattern \
   "iOS filler-word storage applies shared updated words" \
-  'fillerWords = plan\.updatedWords' \
+  'plan\.updatedWordsIfChanged\(from: fillerWords\)' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \
   "platform filler-word insertion avoids shell-only insert-plan unpacking" \
   'VoiceInkFillerWords\.insertPlan\(|wordToInsert|duplicateWordMessage' \
+  VoiceInk/Transcription/Processing/FillerWordManager.swift \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+reject_pattern \
+  "platform filler-word storage avoids shell-owned changed-list comparison" \
+  'fillerWords != plan\.updatedWords|fillerWords = plan\.updatedWords' \
   VoiceInk/Transcription/Processing/FillerWordManager.swift \
   iOS/VoiceInk-ios/AppSettings.swift
 
@@ -4579,7 +4590,7 @@ require_pattern \
 
 require_pattern \
   "shared vocabulary submission policy owns list application" \
-  'func applying\(to existingWords: \[String\]\)' \
+  'func updatedWordsIfChanged\(from existingWords: \[String\]\)' \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
 
 require_pattern \
@@ -4614,7 +4625,7 @@ require_pattern \
 
 require_pattern \
   "shared word-replacement submission policy owns list application" \
-  'func applying\(to existingRules: \[VoiceInkWordReplacementRule\]\)' \
+  'func updatedRulesIfChanged' \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
 
 require_pattern \
@@ -4734,7 +4745,7 @@ require_pattern \
 
 require_pattern \
   "iOS vocabulary adapter applies shared submission result" \
-  'plan\.applying\(to: customVocabularyTerms\)' \
+  'plan\.updatedWordsIfChanged\(from: customVocabularyTerms\)' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \
@@ -4774,7 +4785,12 @@ require_pattern \
 
 require_pattern \
   "iOS word-replacement adapter applies shared submission result" \
-  'plan\.applying\(to: wordReplacements\)' \
+  'plan\.updatedRulesIfChanged\(from: wordReplacements\)' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+reject_pattern \
+  "iOS dictionary adapters avoid shell-owned changed-list comparison" \
+  'let updated(Rules|Terms) = plan\.applying|wordReplacements != updatedRules|customVocabularyTerms != updatedTerms' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \

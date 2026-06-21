@@ -432,6 +432,7 @@ final class DictionaryPolicyTests: XCTestCase {
         )
 
         XCTAssertEqual(plan.applying(to: existingWords), ["Voice Ink", "Roma", "Cursor"])
+        XCTAssertEqual(plan.updatedWordsIfChanged(from: existingWords), ["Voice Ink", "Roma", "Cursor"])
     }
 
     func testVocabularySubmissionPlanLeavesStoredListUnchangedWhenNothingIsInserted() {
@@ -442,6 +443,7 @@ final class DictionaryPolicyTests: XCTestCase {
         )
 
         XCTAssertEqual(plan.applying(to: existingWords), existingWords)
+        XCTAssertNil(plan.updatedWordsIfChanged(from: existingWords))
     }
 
     func testVocabularySubmissionPlanLeavesStoredListUnchangedWhenAlertIsPresent() {
@@ -453,6 +455,7 @@ final class DictionaryPolicyTests: XCTestCase {
         )
 
         XCTAssertEqual(plan.applying(to: existingWords), existingWords)
+        XCTAssertNil(plan.updatedWordsIfChanged(from: existingWords))
     }
 
     func testVocabularyWordsToInsertTrimsAndSkipsExistingAndBatchDuplicates() {
@@ -763,6 +766,12 @@ final class DictionaryPolicyTests: XCTestCase {
                 VoiceInkWordReplacementRule(originalText: "Roma", replacementText: "Roma Just Talk")
             ]
         )
+        XCTAssertEqual(
+            plan.updatedRulesIfChanged(from: existingRules),
+            existingRules + [
+                VoiceInkWordReplacementRule(originalText: "Roma", replacementText: "Roma Just Talk")
+            ]
+        )
     }
 
     func testWordReplacementSubmissionPlanLeavesStoredListUnchangedWhenNothingIsInserted() {
@@ -782,6 +791,8 @@ final class DictionaryPolicyTests: XCTestCase {
 
         XCTAssertEqual(duplicatePlan.applying(to: existingRules), existingRules)
         XCTAssertEqual(blankPlan.applying(to: existingRules), existingRules)
+        XCTAssertNil(duplicatePlan.updatedRulesIfChanged(from: existingRules))
+        XCTAssertNil(blankPlan.updatedRulesIfChanged(from: existingRules))
     }
 
     func testWordReplacementSubmissionPlanLeavesStoredListUnchangedWhenAlertIsPresent() {
@@ -796,6 +807,7 @@ final class DictionaryPolicyTests: XCTestCase {
         )
 
         XCTAssertEqual(plan.applying(to: existingRules), existingRules)
+        XCTAssertNil(plan.updatedRulesIfChanged(from: existingRules))
     }
 
     func testWordReplacementBackupImportPlanPreservesMacOSImportSemantics() {

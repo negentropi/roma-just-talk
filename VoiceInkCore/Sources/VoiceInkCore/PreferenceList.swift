@@ -1,6 +1,13 @@
 import Foundation
 
 public enum VoiceInkPreferenceList {
+    public static func changedElements<Element: Equatable>(
+        from currentElements: [Element],
+        to proposedElements: [Element]
+    ) -> [Element]? {
+        currentElements == proposedElements ? nil : proposedElements
+    }
+
     public static func removing<Element>(at offsets: IndexSet, from elements: [Element]) -> [Element] {
         var updatedElements = elements
 

@@ -27,6 +27,11 @@ public struct VoiceInkVocabularySubmissionPlan: Equatable, Sendable {
         guard alertPresentation == nil, shouldInsert else { return existingWords }
         return existingWords + wordsToInsert
     }
+
+    public func updatedWordsIfChanged(from existingWords: [String]) -> [String]? {
+        let updatedWords = applying(to: existingWords)
+        return VoiceInkPreferenceList.changedElements(from: existingWords, to: updatedWords)
+    }
 }
 
 public struct VoiceInkVocabularyDraftSubmission: Equatable, Sendable {
@@ -115,6 +120,13 @@ public struct VoiceInkWordReplacementSubmissionPlan: Equatable, Sendable {
     public func applying(to existingRules: [VoiceInkWordReplacementRule]) -> [VoiceInkWordReplacementRule] {
         guard alertPresentation == nil, let ruleToInsert else { return existingRules }
         return existingRules + [ruleToInsert]
+    }
+
+    public func updatedRulesIfChanged(
+        from existingRules: [VoiceInkWordReplacementRule]
+    ) -> [VoiceInkWordReplacementRule]? {
+        let updatedRules = applying(to: existingRules)
+        return VoiceInkPreferenceList.changedElements(from: existingRules, to: updatedRules)
     }
 }
 

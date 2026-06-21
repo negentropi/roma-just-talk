@@ -1476,6 +1476,11 @@ require_pattern \
   'VoiceInkTranscriptPresentation\.statusPresentation' \
   iOS/VoiceInk-ios/NoteRowView.swift
 
+reject_pattern \
+  "iOS note row avoids shallow status presentation wrapper" \
+  'private var +statusPresentation\b' \
+  iOS/VoiceInk-ios/NoteRowView.swift
+
 require_pattern \
   "iOS note row uses shared transcript status metadata" \
   'shouldShowInlineProgress|shouldShowBadge|\.tone' \

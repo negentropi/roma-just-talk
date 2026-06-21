@@ -4,11 +4,9 @@ import VoiceInkCore
 struct NoteRowView: View {
     let note: Transcription
 
-    private var statusPresentation: VoiceInkTranscriptStatusPresentation? {
-        VoiceInkTranscriptPresentation.statusPresentation(for: note.transcriptionStatus)
-    }
-
     var body: some View {
+        let statusPresentation = VoiceInkTranscriptPresentation.statusPresentation(for: note.transcriptionStatus)
+
         VStack(alignment: .leading, spacing: 8) {
             Text(VoiceInkTranscriptPresentation.displayText(
                 status: note.transcriptionStatus,

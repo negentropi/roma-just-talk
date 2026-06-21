@@ -111,10 +111,14 @@ class AudioPlayerManager: ObservableObject {
     private func startTimer() {
         timer = Timer.scheduledTimer(withTimeInterval: VoiceInkAudioPlaybackTimeline.updateInterval, repeats: true) { [weak self] _ in
             guard let self = self else { return }
-            self.currentTime = self.audioPlayer?.currentTime ?? 0
-            if self.currentTime >= self.duration {
+            let plan = VoiceInkAudioPlaybackTimerTickPlan.macOS(
+                currentTime: self.audioPlayer?.currentTime ?? 0,
+                duration: self.duration
+            )
+            self.currentTime = plan.currentTime
+            if case .markStoppedAndSeek(let seekTime) = plan.action {
                 self.pause()
-                self.seek(to: 0)
+                self.seek(to: seekTime)
             }
         }
     }

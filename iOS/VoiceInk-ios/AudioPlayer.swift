@@ -79,13 +79,16 @@ final class AudioPlayer: ObservableObject {
         timer = Timer.scheduledTimer(withTimeInterval: VoiceInkAudioPlaybackTimeline.updateInterval, repeats: true) { [weak self] _ in
             Task { @MainActor in
                 guard let self = self, let player = self.audioPlayer else { return }
-                self.currentTime = player.currentTime
-                
-                if !player.isPlaying && self.isPlaying {
-                    // Playback finished
+                let plan = VoiceInkAudioPlaybackTimerTickPlan.iOS(
+                    currentTime: player.currentTime,
+                    playerIsPlaying: player.isPlaying,
+                    shellIsPlaying: self.isPlaying
+                )
+                self.currentTime = plan.currentTime
+
+                if case .markStopped = plan.action {
                     self.isPlaying = false
-                    self.timer?.invalidate()
-                    self.timer = nil
+                    self.stopTimer()
                 }
             }
         }

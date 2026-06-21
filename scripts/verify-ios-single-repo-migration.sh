@@ -6464,6 +6464,26 @@ require_pattern \
   iOS/VoiceInk-ios/AudioPlayer.swift
 
 require_pattern \
+  "shared audio player timer tick plan lives in VoiceInkCore" \
+  'VoiceInkAudioPlaybackTimerTickPlan|VoiceInkAudioPlaybackTimerTickAction' \
+  VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
+
+require_pattern \
+  "core checks execute audio player timer tick plan tests" \
+  'AudioPlaybackTimelineTests\.testTimerTickPlanPreservesPlatformCompletionBehavior' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "macOS audio player consumes shared timer tick plan" \
+  'VoiceInkAudioPlaybackTimerTickPlan\.macOS' \
+  VoiceInk/Views/AudioPlayerView.swift
+
+require_pattern \
+  "iOS audio player shell consumes shared timer tick plan" \
+  'VoiceInkAudioPlaybackTimerTickPlan\.iOS' \
+  iOS/VoiceInk-ios/AudioPlayer.swift
+
+require_pattern \
   "iOS audio player view uses shared playback-rate policy" \
   'VoiceInkAudioPlaybackRate' \
   iOS/VoiceInk-ios/AudioPlayerView.swift
@@ -6524,6 +6544,12 @@ reject_pattern \
 reject_pattern \
   "platform audio players avoid shell-only playback update cadence" \
   'withTimeInterval: +0\.1' \
+  VoiceInk/Views/AudioPlayerView.swift \
+  iOS/VoiceInk-ios/AudioPlayer.swift
+
+reject_pattern \
+  "platform audio players avoid shell-only completion tick policy" \
+  'currentTime >= .*duration|!player\.isPlaying && self\.isPlaying' \
   VoiceInk/Views/AudioPlayerView.swift \
   iOS/VoiceInk-ios/AudioPlayer.swift
 

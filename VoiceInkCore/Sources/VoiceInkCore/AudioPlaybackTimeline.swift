@@ -65,6 +65,53 @@ public enum VoiceInkAudioPlaybackTimeline {
     }
 }
 
+public enum VoiceInkAudioPlaybackTimerTickAction: Equatable, Sendable {
+    case none
+    case markStopped
+    case markStoppedAndSeek(TimeInterval)
+}
+
+public struct VoiceInkAudioPlaybackTimerTickPlan: Equatable, Sendable {
+    public let currentTime: TimeInterval
+    public let action: VoiceInkAudioPlaybackTimerTickAction
+
+    public init(
+        currentTime: TimeInterval,
+        action: VoiceInkAudioPlaybackTimerTickAction
+    ) {
+        self.currentTime = currentTime
+        self.action = action
+    }
+
+    public static func macOS(
+        currentTime: TimeInterval,
+        duration: TimeInterval
+    ) -> VoiceInkAudioPlaybackTimerTickPlan {
+        if currentTime >= duration {
+            return VoiceInkAudioPlaybackTimerTickPlan(
+                currentTime: currentTime,
+                action: .markStoppedAndSeek(0)
+            )
+        }
+
+        return VoiceInkAudioPlaybackTimerTickPlan(
+            currentTime: currentTime,
+            action: .none
+        )
+    }
+
+    public static func iOS(
+        currentTime: TimeInterval,
+        playerIsPlaying: Bool,
+        shellIsPlaying: Bool
+    ) -> VoiceInkAudioPlaybackTimerTickPlan {
+        VoiceInkAudioPlaybackTimerTickPlan(
+            currentTime: currentTime,
+            action: !playerIsPlaying && shellIsPlaying ? .markStopped : .none
+        )
+    }
+}
+
 public enum VoiceInkAudioPlaybackRate {
     public static let defaultRate: Float = 1.0
     public static let controlTitle = "Playback speed"

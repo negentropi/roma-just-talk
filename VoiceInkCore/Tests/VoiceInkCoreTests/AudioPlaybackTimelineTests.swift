@@ -52,6 +52,33 @@ final class AudioPlaybackTimelineTests: XCTestCase {
         XCTAssertEqual(VoiceInkAudioPlaybackTimeline.updateInterval, 0.1)
     }
 
+    func testTimerTickPlanPreservesPlatformCompletionBehavior() {
+        XCTAssertEqual(
+            VoiceInkAudioPlaybackTimerTickPlan.macOS(currentTime: 4, duration: 10),
+            VoiceInkAudioPlaybackTimerTickPlan(currentTime: 4, action: .none)
+        )
+        XCTAssertEqual(
+            VoiceInkAudioPlaybackTimerTickPlan.macOS(currentTime: 10, duration: 10),
+            VoiceInkAudioPlaybackTimerTickPlan(currentTime: 10, action: .markStoppedAndSeek(0))
+        )
+        XCTAssertEqual(
+            VoiceInkAudioPlaybackTimerTickPlan.iOS(
+                currentTime: 9.5,
+                playerIsPlaying: false,
+                shellIsPlaying: true
+            ),
+            VoiceInkAudioPlaybackTimerTickPlan(currentTime: 9.5, action: .markStopped)
+        )
+        XCTAssertEqual(
+            VoiceInkAudioPlaybackTimerTickPlan.iOS(
+                currentTime: 9.5,
+                playerIsPlaying: false,
+                shellIsPlaying: false
+            ),
+            VoiceInkAudioPlaybackTimerTickPlan(currentTime: 9.5, action: .none)
+        )
+    }
+
     func testPlaybackRateRestoresExistingPositiveMacOSValues() {
         XCTAssertEqual(VoiceInkAudioPlaybackRate.restoredRate(0), 1.0)
         XCTAssertEqual(VoiceInkAudioPlaybackRate.restoredRate(-1), 1.0)

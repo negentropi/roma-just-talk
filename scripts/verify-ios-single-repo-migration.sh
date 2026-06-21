@@ -582,6 +582,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/LanguageCatalog.swift
 
 require_pattern \
+  "shared transcription language repair plan lives in VoiceInkCore" \
+  'VoiceInkTranscriptionLanguageRepairPlan|repairPlan\(for selectedLanguage' \
+  VoiceInkCore/Sources/VoiceInkCore/LanguageCatalog.swift
+
+require_pattern \
   "shared Native Apple language asset presentation lives in VoiceInkCore" \
   'VoiceInkNativeAppleLanguageAsset(State|Display|Presentation)|presentation\(for state: VoiceInkNativeAppleLanguageAssetState\)' \
   VoiceInkCore/Sources/VoiceInkCore/LanguageCatalog.swift
@@ -7787,6 +7792,16 @@ reject_pattern \
   'CloudProviderRegistry\.provider\(for: model\.provider\)|"Streaming"|"Buffer Preload"|active-recording streaming|Saved-file batch mode|Rolling buffer can pre-run|Rolling buffer preload disabled' \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
+require_pattern \
+  "macOS cloud model card delegates selected-language repair planning to shared core" \
+  'transcriptionLanguageSelectionFacts\.repairPlan' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift
+
+reject_pattern \
+  "macOS cloud model card avoids shell-owned selected-language repair comparisons" \
+  'validTranscriptionLanguageOrFallback|selectedLanguage !=' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift
+
 reject_pattern \
   "macOS FluidAudio model card avoids shell-only streaming presentation copy" \
   '"Streaming"|"Buffer Preload"|active-recording streaming|Saved-file batch mode|Rolling buffer can pre-run|Rolling buffer preload disabled' \
@@ -7882,6 +7897,16 @@ require_pattern \
 reject_pattern \
   "macOS transcription model manager avoids shell-only legacy model key cleanup" \
   'removeObject\(forKey: +"CurrentModel"\)|"CurrentModel"' \
+  VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
+
+require_pattern \
+  "macOS transcription model manager delegates selected-language repair planning to shared core" \
+  'transcriptionLanguageSelectionFacts\.repairPlan' \
+  VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
+
+reject_pattern \
+  "macOS transcription model manager avoids shell-owned selected-language repair comparisons" \
+  'validTranscriptionLanguageOrFallback|currentLanguage !=|compatibleLanguage' \
   VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
 
 require_pattern \

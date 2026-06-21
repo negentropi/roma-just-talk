@@ -257,6 +257,45 @@ final class LanguageCatalogTests: XCTestCase {
         XCTAssertEqual(whisperFacts.compatibleLanguage("fr"), "fr")
     }
 
+    func testTranscriptionLanguageSelectionFactsBuildRepairPlanOnlyWhenSelectionChanges() {
+        let facts = VoiceInkTranscriptionLanguageSelectionFacts(
+            source: .whisper,
+            isMultilingual: true,
+            languageOptions: VoiceInkLanguageCatalog.whisperLanguages()
+        )
+
+        XCTAssertEqual(
+            facts.repairPlan(for: "fr"),
+            VoiceInkTranscriptionLanguageRepairPlan(
+                selectedLanguage: "fr",
+                languageToSave: nil
+            )
+        )
+        XCTAssertEqual(
+            facts.repairPlan(for: "not-a-language"),
+            VoiceInkTranscriptionLanguageRepairPlan(
+                selectedLanguage: VoiceInkLanguageCatalog.autoDetectCode,
+                languageToSave: VoiceInkLanguageCatalog.autoDetectCode
+            )
+        )
+    }
+
+    func testTranscriptionLanguageSelectionFactsRepairPlanPreservesNativeAppleEnglishFallback() {
+        let facts = VoiceInkTranscriptionLanguageSelectionFacts(
+            source: .nativeApple,
+            isMultilingual: true,
+            languageOptions: VoiceInkLanguageCatalog.nativeApple
+        )
+
+        XCTAssertEqual(
+            facts.repairPlan(for: "bad-language"),
+            VoiceInkTranscriptionLanguageRepairPlan(
+                selectedLanguage: "en-US",
+                languageToSave: "en-US"
+            )
+        )
+    }
+
     func testNativeAppleLanguageAssetPresentationPreservesProgressAndIconStates() {
         let checking = VoiceInkNativeAppleLanguageAssetPresentation.presentation(for: .checking)
         XCTAssertEqual(checking.display, .progress)

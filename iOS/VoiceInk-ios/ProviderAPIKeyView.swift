@@ -7,18 +7,12 @@ struct ProviderAPIKeyView: View {
     private let apiKeyVerifier = VoiceInkProviderAPIKeyVerifier()
     @State private var apiKeyFormState = VoiceInkProviderAPIKeyFormState()
 
-    private var isKeyVerified: Bool {
-        settings.isKeyVerified(for: provider)
-    }
-
-    private var apiKeyDraft: VoiceInkProviderAPIKeyDraft {
-        apiKeyFormState.draft(
-            storedRuntimeKey: settings.apiKey(for: provider)
-        )
-    }
-
     var body: some View {
         let presentation = provider.apiKeyFormPresentation
+        let isKeyVerified = settings.isKeyVerified(for: provider)
+        let apiKeyDraft = apiKeyFormState.draft(
+            storedRuntimeKey: settings.apiKey(for: provider)
+        )
 
         Form {
             Section(header: Text(presentation.apiKeySectionTitle)) {
@@ -89,7 +83,7 @@ struct ProviderAPIKeyView: View {
         .onAppear {
             apiKeyFormState = .loaded(
                 storedKey: settings.storedAPIKey(for: provider),
-                isVerified: isKeyVerified
+                isVerified: settings.isKeyVerified(for: provider)
             )
         }
         .onChange(of: apiKeyFormState.enteredKey) { _, _ in
@@ -104,7 +98,9 @@ struct ProviderAPIKeyView: View {
     private func verifyKey() {
         Task {
             apiKeyFormState = apiKeyFormState.verifying()
-            let draft = apiKeyDraft
+            let draft = apiKeyFormState.draft(
+                storedRuntimeKey: settings.apiKey(for: provider)
+            )
             guard let keyToVerify = draft.verificationCandidate else {
                 apiKeyFormState = apiKeyFormState.applyingVerificationPlan(
                     VoiceInkProviderAPIKeyDraft.missingVerificationCandidatePlan()

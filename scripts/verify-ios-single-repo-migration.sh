@@ -2678,6 +2678,12 @@ reject_pattern \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 reject_pattern \
+  "iOS model download views avoid shallow download task wrappers" \
+  'private func +downloadModel\(' \
+  iOS/VoiceInk-ios/LocalModelManagementView.swift \
+  iOS/VoiceInk-ios/OnboardingView.swift
+
+reject_pattern \
   "iOS model download views avoid duplicate action icon names" \
   '"(checkmark\.circle\.fill|xmark\.circle\.fill|icloud\.and\.arrow\.down|arrow\.down\.circle\.fill)"' \
   iOS/VoiceInk-ios/LocalModelManagementView.swift \

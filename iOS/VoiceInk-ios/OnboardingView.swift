@@ -230,17 +230,13 @@ struct ModelDownloadOnboardingView: View {
         }
         .alert(row.downloadConfirmation.title, isPresented: $showDownloadConfirmation) {
             Button(row.downloadConfirmation.primaryButtonTitle) {
-                downloadModel()
+                Task {
+                    await modelManager.downloadModel(baseModel)
+                }
             }
             Button(row.downloadConfirmation.cancelButtonTitle, role: .cancel) { }
         } message: {
             Text(row.downloadConfirmation.message)
-        }
-    }
-    
-    private func downloadModel() {
-        Task {
-            await modelManager.downloadModel(baseModel)
         }
     }
 }

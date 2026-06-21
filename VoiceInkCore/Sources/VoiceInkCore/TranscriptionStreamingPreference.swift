@@ -27,7 +27,8 @@ public struct VoiceInkTranscriptionStreamingModePresentation: Equatable, Sendabl
     public init(
         isStreamingEnabled: Bool,
         isStreamingOnly: Bool,
-        isPreloadEnabled: Bool
+        isPreloadEnabled: Bool,
+        preloadHelpContext: VoiceInkTranscriptionStreamingPreloadHelpContext = .cloud
     ) {
         self.streamingToggleTitle = "Streaming"
         self.isStreamingToggleForcedOn = isStreamingOnly
@@ -40,10 +41,32 @@ public struct VoiceInkTranscriptionStreamingModePresentation: Equatable, Sendabl
             self.streamingToggleHelp = "Saved-file batch mode; click to stream active-recording audio"
         }
         self.preloadToggleTitle = "Buffer Preload"
-        self.preloadToggleHelp = isPreloadEnabled
-            ? "Rolling buffer can pre-run this model when global policy allows it"
-            : "Rolling buffer preload disabled for this model"
+        self.preloadToggleHelp = Self.preloadToggleHelp(
+            isPreloadEnabled: isPreloadEnabled,
+            context: preloadHelpContext
+        )
     }
+
+    private static func preloadToggleHelp(
+        isPreloadEnabled: Bool,
+        context: VoiceInkTranscriptionStreamingPreloadHelpContext
+    ) -> String {
+        guard isPreloadEnabled else {
+            return "Rolling buffer preload disabled for this model"
+        }
+
+        switch context {
+        case .cloud:
+            return "Rolling buffer can pre-run this model when global policy allows it"
+        case .localFluidAudio:
+            return "Rolling buffer can pre-run this model"
+        }
+    }
+}
+
+public enum VoiceInkTranscriptionStreamingPreloadHelpContext: Equatable, Sendable {
+    case cloud
+    case localFluidAudio
 }
 
 public enum VoiceInkTranscriptionStreamingPreference {

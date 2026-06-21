@@ -148,6 +148,18 @@ final class TranscriptionStreamingPreferenceTests: XCTestCase {
         XCTAssertEqual(disabled.preloadToggleHelp, "Rolling buffer preload disabled for this model")
     }
 
+    func testStreamingModePresentationPreservesFluidAudioPreloadHelp() {
+        let enabled = VoiceInkTranscriptionStreamingModePresentation(
+            isStreamingEnabled: true,
+            isStreamingOnly: false,
+            isPreloadEnabled: true,
+            preloadHelpContext: .localFluidAudio
+        )
+
+        XCTAssertEqual(enabled.preloadToggleTitle, "Buffer Preload")
+        XCTAssertEqual(enabled.preloadToggleHelp, "Rolling buffer can pre-run this model")
+    }
+
     func testSessionRoutePlanUsesFileTranscriptionWhenStreamingDisabled() {
         withIsolatedDefaults { defaults in
             let facts = routeFacts(serviceRoute: .cloud, modelName: "nova-3")

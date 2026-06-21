@@ -6513,6 +6513,11 @@ require_pattern \
   'VoiceInkTranscriptionStreamingModePresentation|streamingModePresentation\.(streamingToggleTitle|streamingToggleHelp|preloadToggleHelp)' \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
+require_pattern \
+  "macOS FluidAudio model card uses shared streaming mode presentation" \
+  'VoiceInkTranscriptionStreamingModePresentation|streamingModePresentation\.(streamingToggleTitle|streamingToggleHelp|preloadToggleHelp)' \
+  VoiceInk/Views/AI\ Models/FluidAudioModelCardView.swift
+
 reject_pattern \
   "macOS cloud model card avoids shallow streaming presentation wrappers" \
   'private var +streamingModePresentation\b' \
@@ -6522,6 +6527,11 @@ reject_pattern \
   "macOS cloud model card avoids shell-only streaming presentation and registry lookup" \
   'CloudProviderRegistry\.provider\(for: model\.provider\)|"Streaming"|"Buffer Preload"|active-recording streaming|Saved-file batch mode|Rolling buffer can pre-run|Rolling buffer preload disabled' \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
+
+reject_pattern \
+  "macOS FluidAudio model card avoids shell-only streaming presentation copy" \
+  '"Streaming"|"Buffer Preload"|active-recording streaming|Saved-file batch mode|Rolling buffer can pre-run|Rolling buffer preload disabled' \
+  VoiceInk/Views/AI\ Models/FluidAudioModelCardView.swift
 
 reject_pattern \
   "macOS model cards use shared per-model preload preference API" \

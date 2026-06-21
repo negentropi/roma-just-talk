@@ -53,29 +53,48 @@ struct FluidAudioModelCardView: View {
                 .foregroundColor(Color(.labelColor))
 
             if model.supportsStreaming && isDownloaded {
-                Toggle("Streaming", isOn: $streamingEnabled)
-                    .toggleStyle(.switch)
-                    .controlSize(.mini)
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(Color(.secondaryLabelColor))
-                    .onChange(of: streamingEnabled) { _, newValue in
-                        VoiceInkTranscriptionStreamingPreference.saveIsEnabled(newValue, forModelName: model.name)
-                    }
-                    .help(streamingEnabled ? "Streams active-recording audio; click to use saved-file batch mode" : "Saved-file batch mode; click to stream active-recording audio")
-
-                Toggle("Buffer Preload", isOn: $preloadEnabled)
-                    .toggleStyle(.switch)
-                    .controlSize(.mini)
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(Color(.secondaryLabelColor))
-                    .onChange(of: preloadEnabled) { _, newValue in
-                        VoiceInkRollingBufferPreloadSettings.savePerModelPreloadEnabled(newValue, forModelName: model.name)
-                        NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
-                    }
-                    .help(preloadEnabled ? "Rolling buffer can pre-run this model" : "Rolling buffer preload disabled for this model")
+                streamingModeBadge
             }
 
             Spacer()
+        }
+    }
+
+    private var streamingModeBadge: some View {
+        let streamingModePresentation = VoiceInkTranscriptionStreamingModePresentation(
+            isStreamingEnabled: streamingEnabled,
+            isStreamingOnly: model.streamingPreferenceSnapshot.isStreamingOnly,
+            isPreloadEnabled: preloadEnabled,
+            preloadHelpContext: .localFluidAudio
+        )
+
+        return HStack(spacing: 8) {
+            Toggle(
+                streamingModePresentation.streamingToggleTitle,
+                isOn: streamingModePresentation.isStreamingToggleForcedOn ? .constant(true) : $streamingEnabled
+            )
+                .toggleStyle(.switch)
+                .controlSize(.mini)
+                .font(.system(size: 11, weight: .medium))
+                .foregroundColor(Color(.secondaryLabelColor))
+                .disabled(streamingModePresentation.isStreamingToggleDisabled)
+                .onChange(of: streamingEnabled) { _, newValue in
+                    if !streamingModePresentation.isStreamingToggleForcedOn {
+                        VoiceInkTranscriptionStreamingPreference.saveIsEnabled(newValue, forModelName: model.name)
+                    }
+                }
+                .help(streamingModePresentation.streamingToggleHelp)
+
+            Toggle(streamingModePresentation.preloadToggleTitle, isOn: $preloadEnabled)
+                .toggleStyle(.switch)
+                .controlSize(.mini)
+                .font(.system(size: 11, weight: .medium))
+                .foregroundColor(Color(.secondaryLabelColor))
+                .onChange(of: preloadEnabled) { _, newValue in
+                    VoiceInkRollingBufferPreloadSettings.savePerModelPreloadEnabled(newValue, forModelName: model.name)
+                    NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
+                }
+                .help(streamingModePresentation.preloadToggleHelp)
         }
     }
 

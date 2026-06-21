@@ -525,6 +525,43 @@ final class DictionaryPolicyTests: XCTestCase {
         )
     }
 
+    func testWordReplacementEditStateUsesSharedSaveability() {
+        XCTAssertFalse(VoiceInkWordReplacementEditState(original: " , ", replacement: "Roma").canSave)
+        XCTAssertFalse(VoiceInkWordReplacementEditState(original: "voice ink", replacement: "").canSave)
+        XCTAssertTrue(VoiceInkWordReplacementEditState(original: "voice ink", replacement: "VoiceInk").canSave)
+    }
+
+    func testWordReplacementEditStateSubmitsTrimmedAcceptedRule() {
+        let submission = VoiceInkWordReplacementEditState(
+            original: " Voice Ink ",
+            replacement: " VoiceInk "
+        )
+        .submitting(existingOriginalTexts: ["Roma"])
+
+        XCTAssertEqual(submission.submittedOriginal, " Voice Ink ")
+        XCTAssertEqual(submission.submittedReplacement, " VoiceInk ")
+        XCTAssertTrue(submission.shouldUpdate)
+        XCTAssertTrue(submission.shouldComplete)
+        XCTAssertEqual(submission.plan.originalText, "Voice Ink")
+        XCTAssertEqual(submission.plan.replacementText, "VoiceInk")
+        XCTAssertNil(submission.alertPresentation)
+    }
+
+    func testWordReplacementEditStateRejectsDuplicateWithSharedAlert() {
+        let submission = VoiceInkWordReplacementEditState(
+            original: "Voice Ink",
+            replacement: "VoiceInk"
+        )
+        .submitting(existingOriginalTexts: ["voice ink"])
+
+        XCTAssertFalse(submission.shouldUpdate)
+        XCTAssertFalse(submission.shouldComplete)
+        XCTAssertEqual(
+            submission.alertPresentation,
+            .wordReplacement(message: "'Voice Ink' already exists in word replacements")
+        )
+    }
+
     func testWordReplacementPlanRejectsDuplicateTokenAcrossCommaGroups() {
         let plan = VoiceInkDictionaryPolicy.wordReplacementInsertPlan(
             original: "Flow, Voice Ink",

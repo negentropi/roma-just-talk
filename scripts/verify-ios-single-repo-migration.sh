@@ -3447,6 +3447,16 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
 
 require_pattern \
+  "shared word-replacement edit state lives in VoiceInkCore" \
+  'public struct VoiceInkWordReplacementEditState' \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+require_pattern \
+  "shared word-replacement edit submission lives in VoiceInkCore" \
+  'public struct VoiceInkWordReplacementEditSubmission|shouldComplete' \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+require_pattern \
   "shared dictionary submission application refuses alert plans" \
   'alertPresentation == nil, (shouldInsert|let ruleToInsert)' \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
@@ -3673,6 +3683,16 @@ require_pattern \
   VoiceInk/Views/Dictionary/EditReplacementSheet.swift
 
 require_pattern \
+  "macOS edit replacement sheet uses shared edit state" \
+  'VoiceInkWordReplacementEditState|editState\.canSave|editState: editState' \
+  VoiceInk/Views/Dictionary/EditReplacementSheet.swift
+
+require_pattern \
+  "macOS dictionary adapter receives shared edit state" \
+  'editState: VoiceInkWordReplacementEditState|VoiceInkWordReplacementEditSubmission' \
+  VoiceInk/Services/DictionaryService.swift
+
+require_pattern \
   "macOS dictionary persistence failures use shared dictionary alert copy" \
   'VoiceInkDictionaryAlertPresentation\.(failedToAddVocabularyWord|failedToAddWordReplacement|failedToSaveWordReplacementChanges)' \
   VoiceInk/Services/DictionaryService.swift
@@ -3738,6 +3758,16 @@ reject_pattern \
   VoiceInk/Views/Dictionary/EditReplacementSheet.swift
 
 reject_pattern \
+  "macOS edit replacement sheet avoids shell-owned edit policy" \
+  'VoiceInkDictionaryPolicy\.canSaveWordReplacementDraft|@State private var (originalWord|replacementWord)\b' \
+  VoiceInk/Views/Dictionary/EditReplacementSheet.swift
+
+reject_pattern \
+  "macOS dictionary adapter avoids obsolete draft submit wrappers" \
+  'submitVocabularyDraft|submitWordReplacementDraft' \
+  VoiceInk/Services/DictionaryService.swift
+
+reject_pattern \
   "macOS dictionary list views avoid shell-only presentation copy" \
   '"(Vocabulary Words|Sort alphabetically|Remove word|Original|Replacement|Sort by original|Sort by replacement|Edit replacement|Remove replacement)"' \
   VoiceInk/Views/Dictionary/VocabularyView.swift \
@@ -3751,7 +3781,7 @@ reject_pattern \
 
 require_pattern \
   "migration checklist tracks shared dictionary sort gate" \
-  'dictionary form/chrome, quick-add, word-replacement guidance, edit-sheet, list/row copy, vocabulary draft text/submit/reset/duplicate-alert planning, word-replacement draft text/visibility/submit/reset/duplicate-alert planning, accepted-submission list application, sort mode storage/toggle/indicator policy, and vocabulary/word-replacement list sorting route through `VoiceInkDictionarySettingsPresentation`/`VoiceInkDictionaryQuickAddPresentation`/`VoiceInkWordReplacementInfoPresentation`/`VoiceInkWordReplacementEditPresentation`/`VoiceInkVocabularyListPresentation`/`VoiceInkWordReplacementListPresentation`/`VoiceInkVocabularyDraftState`/`VoiceInkVocabularyDraftSubmission`/`VoiceInkVocabularySubmissionPlan`/`VoiceInkWordReplacementDraftState`/`VoiceInkWordReplacementDraftSubmission`/`VoiceInkWordReplacementSubmissionPlan`/`VoiceInkDictionaryListSortPreference`/`VoiceInkDictionaryListSortPolicy`' \
+  'dictionary form/chrome, quick-add, word-replacement guidance, edit-sheet, list/row copy, vocabulary draft text/submit/reset/duplicate-alert planning, word-replacement draft text/visibility/submit/reset/duplicate-alert planning, word-replacement edit state/saveability/update-completion planning, accepted-submission list application, sort mode storage/toggle/indicator policy, and vocabulary/word-replacement list sorting route through `VoiceInkDictionarySettingsPresentation`/`VoiceInkDictionaryQuickAddPresentation`/`VoiceInkWordReplacementInfoPresentation`/`VoiceInkWordReplacementEditPresentation`/`VoiceInkVocabularyListPresentation`/`VoiceInkWordReplacementListPresentation`/`VoiceInkVocabularyDraftState`/`VoiceInkVocabularyDraftSubmission`/`VoiceInkVocabularySubmissionPlan`/`VoiceInkWordReplacementDraftState`/`VoiceInkWordReplacementDraftSubmission`/`VoiceInkWordReplacementSubmissionPlan`/`VoiceInkWordReplacementEditState`/`VoiceInkWordReplacementEditSubmission`/`VoiceInkDictionaryListSortPreference`/`VoiceInkDictionaryListSortPolicy`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

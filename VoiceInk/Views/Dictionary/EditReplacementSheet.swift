@@ -9,8 +9,7 @@ struct EditReplacementSheet: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    @State private var originalWord: String
-    @State private var replacementWord: String
+    @State private var editState: VoiceInkWordReplacementEditState
     @State private var alertPresentation: VoiceInkDictionaryAlertPresentation?
     private let editPresentation = VoiceInkWordReplacementEditPresentation.macOS
 
@@ -18,8 +17,10 @@ struct EditReplacementSheet: View {
     init(replacement: WordReplacement, modelContext: ModelContext) {
         self.replacement = replacement
         self.modelContext = modelContext
-        _originalWord = State(initialValue: replacement.originalText)
-        _replacementWord = State(initialValue: replacement.replacementText)
+        _editState = State(initialValue: VoiceInkWordReplacementEditState(
+            original: replacement.originalText,
+            replacement: replacement.replacementText
+        ))
     }
 
     var body: some View {
@@ -93,7 +94,7 @@ struct EditReplacementSheet: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
-                TextField(editPresentation.originalPlaceholder, text: $originalWord)
+                TextField(editPresentation.originalPlaceholder, text: $editState.original)
                     .textFieldStyle(.roundedBorder)
                 
             }
@@ -108,7 +109,7 @@ struct EditReplacementSheet: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
-                TextEditor(text: $replacementWord)
+                TextEditor(text: $editState.replacement)
                     .font(.body)
                     .frame(height: 100)
                     .padding(8)
@@ -124,10 +125,7 @@ struct EditReplacementSheet: View {
     }
 
     private var canSave: Bool {
-        VoiceInkDictionaryPolicy.canSaveWordReplacementDraft(
-            original: originalWord,
-            replacement: replacementWord
-        )
+        editState.canSave
     }
 
     // MARK: – Actions
@@ -136,16 +134,18 @@ struct EditReplacementSheet: View {
             return
         }
 
-        if let error = DictionaryService.updateWordReplacement(
+        let submission = DictionaryService.updateWordReplacement(
             replacement,
-            original: originalWord,
-            replacement: replacementWord,
+            editState: editState,
             context: modelContext
-        ) {
-            alertPresentation = .wordReplacement(message: error)
+        )
+        if let alert = submission.alertPresentation {
+            alertPresentation = alert
             return
         }
 
-        dismiss()
+        if submission.shouldComplete {
+            dismiss()
+        }
     }
 }

@@ -6,18 +6,6 @@ enum DictionaryService {
     // MARK: - Vocabulary
 
     @discardableResult
-    static func submitVocabularyDraft(
-        _ input: String,
-        existing: [VocabularyWord],
-        context: ModelContext
-    ) -> VoiceInkVocabularySubmissionPlan {
-        let submission = VoiceInkVocabularyDraftState(draft: input).submitting(
-            existingWords: existing.map(\.word)
-        )
-        return applyVocabularySubmission(submission, context: context).plan
-    }
-
-    @discardableResult
     static func applyVocabularySubmission(
         _ submission: VoiceInkVocabularyDraftSubmission,
         context: ModelContext
@@ -65,21 +53,6 @@ enum DictionaryService {
     // MARK: - Word Replacement
 
     @discardableResult
-    static func submitWordReplacementDraft(
-        original: String,
-        replacement: String,
-        existing: [WordReplacement],
-        context: ModelContext
-    ) -> VoiceInkWordReplacementSubmissionPlan {
-        let submission = VoiceInkWordReplacementDraftState(
-            original: original,
-            replacement: replacement
-        )
-        .submitting(existingOriginalTexts: existing.map(\.originalText))
-        return applyWordReplacementSubmission(submission, context: context).plan
-    }
-
-    @discardableResult
     static func applyWordReplacementSubmission(
         _ submission: VoiceInkWordReplacementDraftSubmission,
         context: ModelContext
@@ -120,38 +93,47 @@ enum DictionaryService {
     @discardableResult
     static func updateWordReplacement(
         _ entry: WordReplacement,
-        original: String,
-        replacement: String,
+        editState: VoiceInkWordReplacementEditState,
         context: ModelContext
-    ) -> String? {
+    ) -> VoiceInkWordReplacementEditSubmission {
         let descriptor = FetchDescriptor<WordReplacement>()
         let existing = (try? context.fetch(descriptor)) ?? []
         let existingOriginalTexts = existing
             .filter { $0.id != entry.id }
             .map(\.originalText)
 
-        let plan = VoiceInkDictionaryPolicy.wordReplacementInsertPlan(
-            original: original,
-            replacement: replacement,
+        let submission = editState.submitting(
             existingOriginalTexts: existingOriginalTexts
         )
 
-        if let errorMessage = plan.errorMessage {
-            return errorMessage
-        }
+        return applyWordReplacementEditSubmission(submission, to: entry, context: context)
+    }
 
-        guard plan.shouldInsert else { return nil }
+    @discardableResult
+    private static func applyWordReplacementEditSubmission(
+        _ submission: VoiceInkWordReplacementEditSubmission,
+        to entry: WordReplacement,
+        context: ModelContext
+    ) -> VoiceInkWordReplacementEditSubmission {
+        guard submission.shouldUpdate else { return submission }
 
-        entry.originalText = plan.originalText
-        entry.replacementText = plan.replacementText
+        entry.originalText = submission.plan.originalText
+        entry.replacementText = submission.plan.replacementText
 
         do {
             try context.save()
             WordReplacementService.shared.invalidateCache()
-            return nil
+            return submission
         } catch {
-            return VoiceInkDictionaryAlertPresentation.failedToSaveWordReplacementChanges(
-                localizedDescription: error.localizedDescription
+            return VoiceInkWordReplacementEditSubmission(
+                submittedOriginal: submission.submittedOriginal,
+                submittedReplacement: submission.submittedReplacement,
+                plan: submission.plan,
+                alertPresentation: .wordReplacement(
+                    message: VoiceInkDictionaryAlertPresentation.failedToSaveWordReplacementChanges(
+                        localizedDescription: error.localizedDescription
+                    )
+                )
             )
         }
     }

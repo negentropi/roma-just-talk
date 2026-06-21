@@ -179,6 +179,64 @@ public struct VoiceInkWordReplacementDraftState: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkWordReplacementEditSubmission: Equatable, Sendable {
+    public let submittedOriginal: String
+    public let submittedReplacement: String
+    public let plan: VoiceInkWordReplacementInsertPlan
+    public let alertPresentation: VoiceInkDictionaryAlertPresentation?
+
+    public init(
+        submittedOriginal: String,
+        submittedReplacement: String,
+        plan: VoiceInkWordReplacementInsertPlan,
+        alertPresentation: VoiceInkDictionaryAlertPresentation?
+    ) {
+        self.submittedOriginal = submittedOriginal
+        self.submittedReplacement = submittedReplacement
+        self.plan = plan
+        self.alertPresentation = alertPresentation
+    }
+
+    public var shouldUpdate: Bool {
+        alertPresentation == nil && plan.shouldInsert
+    }
+
+    public var shouldComplete: Bool {
+        shouldUpdate
+    }
+}
+
+public struct VoiceInkWordReplacementEditState: Equatable, Sendable {
+    public var original: String
+    public var replacement: String
+
+    public init(original: String, replacement: String) {
+        self.original = original
+        self.replacement = replacement
+    }
+
+    public var canSave: Bool {
+        VoiceInkDictionaryPolicy.canSaveWordReplacementDraft(
+            original: original,
+            replacement: replacement
+        )
+    }
+
+    public func submitting(existingOriginalTexts: [String]) -> VoiceInkWordReplacementEditSubmission {
+        let plan = VoiceInkDictionaryPolicy.wordReplacementInsertPlan(
+            original: original,
+            replacement: replacement,
+            existingOriginalTexts: existingOriginalTexts
+        )
+        return VoiceInkWordReplacementEditSubmission(
+            submittedOriginal: original,
+            submittedReplacement: replacement,
+            plan: plan,
+            alertPresentation: plan.errorMessage.map(VoiceInkDictionaryAlertPresentation.wordReplacement)
+        )
+    }
+}
+
 public struct VoiceInkWordReplacementBackupImportPlan: Equatable, Sendable {
     public let rulesToInsert: [VoiceInkWordReplacementRule]
     public let skippedInvalidReplacementCount: Int

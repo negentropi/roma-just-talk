@@ -63,7 +63,7 @@ final class PromptTriggerPolicyTests: XCTestCase {
         )
 
         let state = try XCTUnwrap(result.applyingSettingsState(
-            current: VoiceInkPromptDetectionSettingsState(
+            current: VoiceInkAIEnhancementPromptSettingsState(
                 isEnhancementEnabled: false,
                 selectedPromptId: currentPromptId
             )
@@ -71,7 +71,7 @@ final class PromptTriggerPolicyTests: XCTestCase {
 
         XCTAssertEqual(
             state,
-            VoiceInkPromptDetectionSettingsState(
+            VoiceInkAIEnhancementPromptSettingsState(
                 isEnhancementEnabled: true,
                 selectedPromptId: detectedPromptId
             )
@@ -90,7 +90,7 @@ final class PromptTriggerPolicyTests: XCTestCase {
         )
 
         let state = try XCTUnwrap(result.restoringSettingsState(
-            current: VoiceInkPromptDetectionSettingsState(
+            current: VoiceInkAIEnhancementPromptSettingsState(
                 isEnhancementEnabled: true,
                 selectedPromptId: detectedPromptId
             )
@@ -98,7 +98,7 @@ final class PromptTriggerPolicyTests: XCTestCase {
 
         XCTAssertEqual(
             state,
-            VoiceInkPromptDetectionSettingsState(
+            VoiceInkAIEnhancementPromptSettingsState(
                 isEnhancementEnabled: false,
                 selectedPromptId: nil
             )
@@ -117,7 +117,7 @@ final class PromptTriggerPolicyTests: XCTestCase {
             originalPromptId: originalPromptId
         )
 
-        let currentState = VoiceInkPromptDetectionSettingsState(
+        let currentState = VoiceInkAIEnhancementPromptSettingsState(
             isEnhancementEnabled: true,
             selectedPromptId: currentPromptId
         )

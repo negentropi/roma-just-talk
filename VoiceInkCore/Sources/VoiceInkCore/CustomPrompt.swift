@@ -83,6 +83,16 @@ public struct VoiceInkCustomPromptStoreState: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkAIEnhancementPromptSettingsState: Equatable, Sendable {
+    public let isEnhancementEnabled: Bool
+    public let selectedPromptId: UUID?
+
+    public init(isEnhancementEnabled: Bool, selectedPromptId: UUID?) {
+        self.isEnhancementEnabled = isEnhancementEnabled
+        self.selectedPromptId = selectedPromptId
+    }
+}
+
 public struct VoiceInkCustomPromptDraft: Equatable, Sendable {
     public let title: String
     public let promptText: String
@@ -207,6 +217,23 @@ public enum VoiceInkCustomPromptPolicy {
         prompts: [VoiceInkCustomPrompt]
     ) -> UUID? {
         selectedPromptId ?? prompts.first?.id
+    }
+
+    public static func settingsStateAfterEnhancementEnabledChange(
+        _ state: VoiceInkAIEnhancementPromptSettingsState,
+        prompts: [VoiceInkCustomPrompt]
+    ) -> VoiceInkAIEnhancementPromptSettingsState {
+        guard state.isEnhancementEnabled else {
+            return state
+        }
+
+        return VoiceInkAIEnhancementPromptSettingsState(
+            isEnhancementEnabled: true,
+            selectedPromptId: selectedPromptIdAfterEnablingEnhancement(
+                state.selectedPromptId,
+                prompts: prompts
+            )
+        )
     }
 
     public static func repairedSelectedPromptId(

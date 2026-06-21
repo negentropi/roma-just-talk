@@ -297,6 +297,52 @@ final class CustomPromptTests: XCTestCase {
         XCTAssertNil(VoiceInkCustomPromptPolicy.selectedPromptIdAfterEnablingEnhancement(nil, prompts: []))
     }
 
+    func testCustomPromptPolicyPlansPromptSelectionWhenEnablingEnhancement() {
+        let firstId = UUID(uuidString: "00000000-0000-0000-0000-000000000216")!
+        let selectedId = UUID(uuidString: "00000000-0000-0000-0000-000000000217")!
+        let firstPrompt = VoiceInkCustomPrompt(id: firstId, title: "First", promptText: "First prompt")
+
+        XCTAssertEqual(
+            VoiceInkCustomPromptPolicy.settingsStateAfterEnhancementEnabledChange(
+                VoiceInkAIEnhancementPromptSettingsState(
+                    isEnhancementEnabled: true,
+                    selectedPromptId: nil
+                ),
+                prompts: [firstPrompt]
+            ),
+            VoiceInkAIEnhancementPromptSettingsState(
+                isEnhancementEnabled: true,
+                selectedPromptId: firstId
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkCustomPromptPolicy.settingsStateAfterEnhancementEnabledChange(
+                VoiceInkAIEnhancementPromptSettingsState(
+                    isEnhancementEnabled: true,
+                    selectedPromptId: selectedId
+                ),
+                prompts: [firstPrompt]
+            ),
+            VoiceInkAIEnhancementPromptSettingsState(
+                isEnhancementEnabled: true,
+                selectedPromptId: selectedId
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkCustomPromptPolicy.settingsStateAfterEnhancementEnabledChange(
+                VoiceInkAIEnhancementPromptSettingsState(
+                    isEnhancementEnabled: false,
+                    selectedPromptId: selectedId
+                ),
+                prompts: [firstPrompt]
+            ),
+            VoiceInkAIEnhancementPromptSettingsState(
+                isEnhancementEnabled: false,
+                selectedPromptId: selectedId
+            )
+        )
+    }
+
     func testCustomPromptPolicyRepairsSelectedPromptOnlyWhenEnhancementIsEnabled() {
         let firstId = UUID(uuidString: "00000000-0000-0000-0000-000000000101")!
         let validId = UUID(uuidString: "00000000-0000-0000-0000-000000000102")!

@@ -12,12 +12,12 @@ class AIEnhancementService: ObservableObject {
     @Published var isEnhancementEnabled: Bool {
         didSet {
             VoiceInkAIEnhancementPreference.saveIsEnabled(isEnhancementEnabled)
-            if isEnhancementEnabled && selectedPromptId == nil {
-                selectedPromptId = VoiceInkCustomPromptPolicy.selectedPromptIdAfterEnablingEnhancement(
-                    selectedPromptId,
+            applyAIEnhancementPromptSettingsState(
+                VoiceInkCustomPromptPolicy.settingsStateAfterEnhancementEnabledChange(
+                    aiEnhancementPromptSettingsState,
                     prompts: customPrompts
                 )
-            }
+            )
             NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
             NotificationCenter.default.post(name: .enhancementToggleChanged, object: nil)
         }
@@ -417,14 +417,14 @@ class AIEnhancementService: ObservableObject {
     }
 
     func applyPromptDetectionResult(_ result: VoiceInkPromptDetectionResult) {
-        applyPromptDetectionSettingsState(
-            result.applyingSettingsState(current: promptDetectionSettingsState)
+        applyAIEnhancementPromptSettingsState(
+            result.applyingSettingsState(current: aiEnhancementPromptSettingsState)
         )
     }
 
     func restorePromptDetectionSettings(_ result: VoiceInkPromptDetectionResult) {
-        applyPromptDetectionSettingsState(
-            result.restoringSettingsState(current: promptDetectionSettingsState)
+        applyAIEnhancementPromptSettingsState(
+            result.restoringSettingsState(current: aiEnhancementPromptSettingsState)
         )
     }
 
@@ -432,14 +432,14 @@ class AIEnhancementService: ObservableObject {
         promptDetectionPrompts = VoiceInkCustomPromptPolicy.triggerDetectablePrompts(from: customPrompts)
     }
 
-    private var promptDetectionSettingsState: VoiceInkPromptDetectionSettingsState {
-        VoiceInkPromptDetectionSettingsState(
+    private var aiEnhancementPromptSettingsState: VoiceInkAIEnhancementPromptSettingsState {
+        VoiceInkAIEnhancementPromptSettingsState(
             isEnhancementEnabled: isEnhancementEnabled,
             selectedPromptId: selectedPromptId
         )
     }
 
-    private func applyPromptDetectionSettingsState(_ state: VoiceInkPromptDetectionSettingsState?) {
+    private func applyAIEnhancementPromptSettingsState(_ state: VoiceInkAIEnhancementPromptSettingsState?) {
         guard let state else { return }
 
         if isEnhancementEnabled != state.isEnhancementEnabled {

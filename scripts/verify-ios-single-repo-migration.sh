@@ -651,6 +651,16 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
 require_pattern \
+  "shared recording permission action policy lives in VoiceInkCore" \
+  'VoiceInkRecordingPermissionPolicy|VoiceInkRecordingPermissionStatus|VoiceInkRecordingPermissionAction' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "shared recording permission action checks run in VoiceInkCore" \
+  'testRecordingPermissionPolicyPreservesStartPermissionActions|testRecordingPermissionPolicyPreservesPermissionRequestResults' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "shared recording stop plan lives in VoiceInkCore" \
   'VoiceInkRecordingStopPlan|stopRecordingPlan' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
@@ -693,6 +703,11 @@ require_pattern \
 require_pattern \
   "macOS recording engine uses shared active-pipeline finish policy" \
   'recordingState\.shouldReturnToIdleWhenActivePipelineFinishes' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+
+require_pattern \
+  "macOS recording engine delegates microphone permission action planning to shared core" \
+  'VoiceInkRecordingPermissionPolicy\.action|VoiceInkRecordingPermissionStatus' \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift
 
 require_pattern \
@@ -750,6 +765,11 @@ require_pattern \
   iOS/VoiceInk-ios/RecordingManager.swift
 
 require_pattern \
+  "iOS recording manager delegates microphone permission action planning to shared core" \
+  'VoiceInkRecordingPermissionPolicy\.action|VoiceInkRecordingPermissionStatus|VoiceInkRecordingPermissionAction' \
+  iOS/VoiceInk-ios/RecordingManager.swift
+
+require_pattern \
   "iOS recording manager delegates stop result planning to shared flow state" \
   'stopRecordingPlan' \
   iOS/VoiceInk-ios/RecordingManager.swift
@@ -762,6 +782,11 @@ require_pattern \
 reject_pattern \
   "iOS recording manager avoids shell-owned recording flow fields" \
   '@Published var +(recordingState|animate|isRecordingSheetPresented|currentDuration)' \
+  iOS/VoiceInk-ios/RecordingManager.swift
+
+reject_pattern \
+  "iOS recording manager avoids shell-owned microphone permission action enum" \
+  'private enum MicrophonePermissionStatus|case granted, denied, undetermined' \
   iOS/VoiceInk-ios/RecordingManager.swift
 
 reject_pattern \

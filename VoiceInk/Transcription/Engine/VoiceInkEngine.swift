@@ -696,18 +696,32 @@ class VoiceInkEngine: NSObject, ObservableObject {
     }
 
     private func requestRecordPermission(response: @escaping (Bool) -> Void) {
+        let permissionStatus: VoiceInkRecordingPermissionStatus
         switch AVCaptureDevice.authorizationStatus(for: .audio) {
         case .authorized:
-            response(true)
+            permissionStatus = .granted
         case .notDetermined:
+            permissionStatus = .undetermined
+        case .denied, .restricted:
+            permissionStatus = .denied
+        @unknown default:
+            permissionStatus = .denied
+        }
+
+        switch VoiceInkRecordingPermissionPolicy.action(for: permissionStatus) {
+        case .startRecording:
+            response(true)
+        case .requestPermission:
             AVCaptureDevice.requestAccess(for: .audio) { granted in
                 DispatchQueue.main.async {
-                    response(granted)
+                    response(
+                        VoiceInkRecordingPermissionPolicy.action(
+                            afterPermissionRequestGranted: granted
+                        ) == .startRecording
+                    )
                 }
             }
-        case .denied, .restricted:
-            response(false)
-        @unknown default:
+        case .presentPermissionDenied:
             response(false)
         }
     }

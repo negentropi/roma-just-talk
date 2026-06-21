@@ -47,6 +47,32 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertEqual(VoiceInkRecordingState.busy.recorderUIToggleAction, .dismissRecorder)
     }
 
+    func testRecordingPermissionPolicyPreservesStartPermissionActions() {
+        XCTAssertEqual(
+            VoiceInkRecordingPermissionPolicy.action(for: .granted),
+            .startRecording
+        )
+        XCTAssertEqual(
+            VoiceInkRecordingPermissionPolicy.action(for: .denied),
+            .presentPermissionDenied
+        )
+        XCTAssertEqual(
+            VoiceInkRecordingPermissionPolicy.action(for: .undetermined),
+            .requestPermission
+        )
+    }
+
+    func testRecordingPermissionPolicyPreservesPermissionRequestResults() {
+        XCTAssertEqual(
+            VoiceInkRecordingPermissionPolicy.action(afterPermissionRequestGranted: true),
+            .startRecording
+        )
+        XCTAssertEqual(
+            VoiceInkRecordingPermissionPolicy.action(afterPermissionRequestGranted: false),
+            .presentPermissionDenied
+        )
+    }
+
     func testPostRecordingProcessingStatePolicyPreservesMacOSProcessingStates() {
         XCTAssertFalse(VoiceInkRecordingState.idle.isPostRecordingProcessing)
         XCTAssertFalse(VoiceInkRecordingState.starting.isPostRecordingProcessing)

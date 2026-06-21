@@ -5,10 +5,6 @@ import Combine
 import UIKit
 import VoiceInkCore
 
-private enum MicrophonePermissionStatus {
-    case granted, denied, undetermined
-}
- 
 @MainActor
 final class RecordingManager: ObservableObject {
     @Published var activeRecordingAlert: VoiceInkRecordingAlertPresentation?
@@ -75,18 +71,24 @@ final class RecordingManager: ObservableObject {
     
     // MARK: - Recording Flow
     func startRecordingFlow() {
-        switch checkPermissionStatus() {
-        case .granted:
+        applyPermissionAction(
+            VoiceInkRecordingPermissionPolicy.action(for: checkPermissionStatus())
+        )
+    }
+
+    private func applyPermissionAction(_ action: VoiceInkRecordingPermissionAction) {
+        switch action {
+        case .startRecording:
             proceedToStartRecording()
-        case .denied:
+
+        case .presentPermissionDenied:
             activeRecordingAlert = VoiceInkRecordingAlertPresentation.microphonePermissionDenied
-        case .undetermined:
+
+        case .requestPermission:
             requestPermission { [weak self] granted in
-                if granted {
-                    self?.proceedToStartRecording()
-                } else {
-                    self?.activeRecordingAlert = VoiceInkRecordingAlertPresentation.microphonePermissionDenied
-                }
+                self?.applyPermissionAction(
+                    VoiceInkRecordingPermissionPolicy.action(afterPermissionRequestGranted: granted)
+                )
             }
         }
     }
@@ -138,7 +140,7 @@ final class RecordingManager: ObservableObject {
     }
     
     // MARK: - Permissions
-    private func checkPermissionStatus() -> MicrophonePermissionStatus {
+    private func checkPermissionStatus() -> VoiceInkRecordingPermissionStatus {
         switch AVAudioSession.sharedInstance().recordPermission {
         case .granted: return .granted
         case .denied: return .denied

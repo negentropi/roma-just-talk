@@ -15,6 +15,35 @@ public enum VoiceInkRecorderUIToggleAction: Equatable, Sendable {
     case dismissRecorder
 }
 
+public enum VoiceInkRecordingPermissionStatus: Equatable, Sendable {
+    case granted
+    case denied
+    case undetermined
+}
+
+public enum VoiceInkRecordingPermissionAction: Equatable, Sendable {
+    case startRecording
+    case requestPermission
+    case presentPermissionDenied
+}
+
+public enum VoiceInkRecordingPermissionPolicy {
+    public static func action(for status: VoiceInkRecordingPermissionStatus) -> VoiceInkRecordingPermissionAction {
+        switch status {
+        case .granted:
+            return .startRecording
+        case .denied:
+            return .presentPermissionDenied
+        case .undetermined:
+            return .requestPermission
+        }
+    }
+
+    public static func action(afterPermissionRequestGranted isGranted: Bool) -> VoiceInkRecordingPermissionAction {
+        isGranted ? .startRecording : .presentPermissionDenied
+    }
+}
+
 public struct VoiceInkRecorderProcessingPresentation: Equatable, Sendable {
     public let label: String
     public let progressAnimationInterval: TimeInterval

@@ -7476,7 +7476,7 @@ require_pattern \
 
 reject_pattern \
   "macOS cloud model card avoids shallow streaming presentation wrappers" \
-  'private var +streamingModePresentation\b' \
+  'private var +(streamingModePresentation|isStreamingOnly)\b' \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
 reject_pattern \

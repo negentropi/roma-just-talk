@@ -84,14 +84,10 @@ struct CloudModelCardView: View {
         }
     }
     
-    private var isStreamingOnly: Bool {
-        model.streamingPreferenceSnapshot.isStreamingOnly
-    }
-
     private var streamingModeBadge: some View {
         let streamingModePresentation = VoiceInkTranscriptionStreamingModePresentation(
             isStreamingEnabled: streamingEnabled,
-            isStreamingOnly: isStreamingOnly,
+            isStreamingOnly: model.streamingPreferenceSnapshot.isStreamingOnly,
             isPreloadEnabled: preloadEnabled
         )
 
@@ -106,7 +102,7 @@ struct CloudModelCardView: View {
                 .foregroundColor(Color(.secondaryLabelColor))
                 .disabled(streamingModePresentation.isStreamingToggleDisabled)
                 .onChange(of: streamingEnabled) { _, newValue in
-                    if !isStreamingOnly {
+                    if !streamingModePresentation.isStreamingToggleForcedOn {
                         VoiceInkTranscriptionStreamingPreference.saveIsEnabled(newValue, forModelName: model.name)
                         ensureCurrentModelLanguageIsStillValid()
                         NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)

@@ -331,3 +331,58 @@ public struct VoiceInkWhisperModelDownloadState: Equatable, Sendable {
         )
     }
 }
+
+public struct VoiceInkWhisperModelSimpleDownloadTrackingState: Equatable, Sendable {
+    private var isDownloadingByModelID: [String: Bool]
+    private var downloadProgressByModelID: [String: Double]
+
+    public init(
+        isDownloadingByModelID: [String: Bool] = [:],
+        downloadProgressByModelID: [String: Double] = [:]
+    ) {
+        self.isDownloadingByModelID = isDownloadingByModelID
+        self.downloadProgressByModelID = downloadProgressByModelID
+    }
+
+    public func isDownloading(_ model: VoiceInkWhisperModelFileSpec) -> Bool {
+        isDownloadingByModelID[model.id, default: false]
+    }
+
+    @discardableResult
+    public mutating func startDownload(for model: VoiceInkWhisperModelFileSpec) -> Bool {
+        guard !isDownloading(model) else {
+            return false
+        }
+
+        isDownloadingByModelID[model.id] = true
+        downloadProgressByModelID[model.id] = 0
+        return true
+    }
+
+    public mutating func updateProgress(_ progress: Double, for model: VoiceInkWhisperModelFileSpec) {
+        guard isDownloading(model) else {
+            return
+        }
+
+        downloadProgressByModelID[model.id] = progress
+    }
+
+    public mutating func finishDownload(for model: VoiceInkWhisperModelFileSpec) {
+        isDownloadingByModelID[model.id] = false
+        downloadProgressByModelID[model.id] = nil
+    }
+
+    public func downloadState(
+        for model: VoiceInkWhisperModelFileSpec,
+        modelsDirectory: URL,
+        fileManager: FileManager = .default
+    ) -> VoiceInkWhisperModelDownloadState {
+        VoiceInkWhisperModelDownloadState.simple(
+            model: model,
+            modelsDirectory: modelsDirectory,
+            isDownloadingByModelID: isDownloadingByModelID,
+            downloadProgressByModelID: downloadProgressByModelID,
+            fileManager: fileManager
+        )
+    }
+}

@@ -1096,6 +1096,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testDownloadCompletionPolicyClassifiesResponseAndTemporaryFile", run: { WhisperModelFilesTests().testDownloadCompletionPolicyClassifiesResponseAndTemporaryFile() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadProgressFormatsIOSProgress", run: { WhisperModelFilesTests().testSimpleDownloadProgressFormatsIOSProgress() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadStateCombinesIOSDownloadedAndProgressState", run: { try WhisperModelFilesTests().testSimpleDownloadStateCombinesIOSDownloadedAndProgressState() }),
+            VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadTrackingStateOwnsIOSLifecycle", run: { try WhisperModelFilesTests().testSimpleDownloadTrackingStateOwnsIOSLifecycle() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadStateBuildsSharedRowPresentation", run: { WhisperModelFilesTests().testSimpleDownloadStateBuildsSharedRowPresentation() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testMacOSDownloadProgressUsesMainAndCoreMLKeys", run: { WhisperModelFilesTests().testMacOSDownloadProgressUsesMainAndCoreMLKeys() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testMacOSDownloadProgressIgnoresCoreMLForQuantizedModels", run: { WhisperModelFilesTests().testMacOSDownloadProgressIgnoresCoreMLForQuantizedModels() }),

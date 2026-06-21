@@ -100,12 +100,7 @@ struct ModelDownloadOnboardingView: View {
     var baseModel = VoiceInkWhisperModelFiles.baseModel
 
     private var baseModelDownloadState: VoiceInkWhisperModelDownloadState {
-        VoiceInkWhisperModelDownloadState.simple(
-            model: baseModel,
-            modelsDirectory: LocalModelManager.modelsDirectory,
-            isDownloadingByModelID: modelManager.isDownloading,
-            downloadProgressByModelID: modelManager.downloadProgress
-        )
+        modelManager.downloadState(for: baseModel)
     }
 
     private var downloadConfirmation: VoiceInkWhisperModelOperationConfirmationPresentation {

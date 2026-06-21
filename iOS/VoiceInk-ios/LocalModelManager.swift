@@ -11,8 +11,7 @@ import VoiceInkCore
 
 @MainActor
 class LocalModelManager: ObservableObject {
-    @Published var downloadProgress: [String: Double] = [:]
-    @Published var isDownloading: [String: Bool] = [:]
+    @Published private var downloadTrackingState = VoiceInkWhisperModelSimpleDownloadTrackingState()
     @Published var downloadError: VoiceInkWhisperModelOperationAlertPresentation?
     
     private var downloadTasks: [String: URLSessionDownloadTask] = [:]
@@ -34,15 +33,13 @@ class LocalModelManager: ObservableObject {
     
     /// Download a specific model
     func downloadModel(_ model: VoiceInkWhisperModelFileSpec) async {
-        guard !isDownloading[model.id, default: false] else {
+        guard startDownloadTracking(for: model) else {
             print("LocalModelManager: Model \(model.modelName) is already being downloaded")
             return
         }
         
         print("LocalModelManager: Starting download of \(model.modelName) from \(model.downloadURL.absoluteString)")
         
-        isDownloading[model.id] = true
-        downloadProgress[model.id] = 0.0
         downloadError = nil
         
         let downloadTask = URLSession.shared.downloadTask(with: model.downloadURL) { [weak self] temporaryURL, response, error in
@@ -59,7 +56,7 @@ class LocalModelManager: ObservableObject {
         // Track progress
         let progressObservation = downloadTask.progress.observe(\.fractionCompleted) { [weak self] progress, _ in
             Task { @MainActor in
-                self?.downloadProgress[model.id] = progress.fractionCompleted
+                self?.updateDownloadProgress(progress.fractionCompleted, for: model)
             }
         }
 
@@ -75,10 +72,9 @@ class LocalModelManager: ObservableObject {
         error: Error?
     ) {
         defer {
-            isDownloading[model.id] = false
+            finishDownloadTracking(for: model)
             downloadTasks[model.id] = nil
             progressObservations[model.id] = nil
-            downloadProgress[model.id] = nil
         }
         
         if let error = error {
@@ -118,7 +114,7 @@ class LocalModelManager: ObservableObject {
             )
             
             print("LocalModelManager: Successfully downloaded \(model.modelName) to \(finalURL.path)")
-            downloadProgress[model.id] = 1.0
+            updateDownloadProgress(1.0, for: model)
             
         } catch {
             downloadError = .saveFailed(for: error)
@@ -131,8 +127,7 @@ class LocalModelManager: ObservableObject {
         downloadTasks[model.id]?.cancel()
         downloadTasks[model.id] = nil
         progressObservations[model.id] = nil
-        isDownloading[model.id] = false
-        downloadProgress[model.id] = nil
+        finishDownloadTracking(for: model)
     }
     
     /// Delete a downloaded model
@@ -166,6 +161,35 @@ class LocalModelManager: ObservableObject {
     /// Check if any model is available for transcription
     var hasAvailableModel: Bool {
         VoiceInkWhisperModelFiles.availableBootstrapModelFileURL(in: Self.modelsDirectory) != nil
+    }
+
+    func downloadState(for model: VoiceInkWhisperModelFileSpec) -> VoiceInkWhisperModelDownloadState {
+        downloadTrackingState.downloadState(for: model, modelsDirectory: Self.modelsDirectory)
+    }
+
+    private func startDownloadTracking(for model: VoiceInkWhisperModelFileSpec) -> Bool {
+        var trackingState = downloadTrackingState
+        guard trackingState.startDownload(for: model) else {
+            return false
+        }
+
+        downloadTrackingState = trackingState
+        return true
+    }
+
+    private func updateDownloadProgress(
+        _ progress: Double,
+        for model: VoiceInkWhisperModelFileSpec
+    ) {
+        var trackingState = downloadTrackingState
+        trackingState.updateProgress(progress, for: model)
+        downloadTrackingState = trackingState
+    }
+
+    private func finishDownloadTracking(for model: VoiceInkWhisperModelFileSpec) {
+        var trackingState = downloadTrackingState
+        trackingState.finishDownload(for: model)
+        downloadTrackingState = trackingState
     }
     
 }

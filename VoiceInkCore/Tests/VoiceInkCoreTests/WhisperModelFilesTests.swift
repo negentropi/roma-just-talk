@@ -477,6 +477,38 @@ final class WhisperModelFilesTests: XCTestCase {
         XCTAssertEqual(downloadedState.progress.phase, .idle)
     }
 
+    func testSimpleDownloadTrackingStateOwnsIOSLifecycle() throws {
+        let baseDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.WhisperModelDownloadTrackingStateTests.\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: baseDirectory) }
+
+        let modelsDirectory = try VoiceInkWhisperModelFiles.createModelsDirectory(in: baseDirectory)
+        let model = VoiceInkWhisperModelFiles.baseModel
+        var trackingState = VoiceInkWhisperModelSimpleDownloadTrackingState()
+
+        XCTAssertTrue(trackingState.startDownload(for: model))
+        XCTAssertFalse(trackingState.startDownload(for: model))
+        XCTAssertTrue(trackingState.isDownloading(model))
+
+        let startedState = trackingState.downloadState(for: model, modelsDirectory: modelsDirectory)
+        XCTAssertFalse(startedState.isDownloaded)
+        XCTAssertTrue(startedState.isDownloading)
+        XCTAssertEqual(startedState.progress.fraction, 0)
+
+        trackingState.updateProgress(0.42, for: model)
+
+        let progressState = trackingState.downloadState(for: model, modelsDirectory: modelsDirectory)
+        XCTAssertEqual(progressState.progress.fraction, 0.42)
+
+        try Data().write(to: model.fileURL(in: modelsDirectory))
+        trackingState.finishDownload(for: model)
+
+        let downloadedState = trackingState.downloadState(for: model, modelsDirectory: modelsDirectory)
+        XCTAssertTrue(downloadedState.isDownloaded)
+        XCTAssertFalse(downloadedState.isDownloading)
+        XCTAssertFalse(trackingState.isDownloading(model))
+    }
+
     func testSimpleDownloadStateBuildsSharedRowPresentation() {
         let model = VoiceInkWhisperModelFiles.baseModel
         let downloadingState = VoiceInkWhisperModelDownloadState(

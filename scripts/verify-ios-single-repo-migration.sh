@@ -1835,6 +1835,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
 
 require_pattern \
+  "shared Whisper simple download tracking state lives in VoiceInkCore" \
+  'VoiceInkWhisperModelSimpleDownloadTrackingState|startDownload\(for:|finishDownload\(for:|downloadState\(for:' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+
+require_pattern \
   "shared Whisper model download row presentation lives in VoiceInkCore" \
   'VoiceInkWhisperModelDownloadRowPresentation|rowPresentation|actionSystemImageName|downloadButtonSystemImageName' \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
@@ -2043,8 +2048,18 @@ require_pattern \
   iOS/VoiceInk-ios/APIKeysView.swift
 
 require_pattern \
+  "iOS local model manager uses shared download tracking state" \
+  'VoiceInkWhisperModelSimpleDownloadTrackingState|downloadTrackingState|downloadState\(for:' \
+  iOS/VoiceInk-ios/LocalModelManager.swift
+
+reject_pattern \
+  "iOS local model manager avoids shell-owned download state dictionaries" \
+  '@Published var +(downloadProgress|isDownloading)|isDownloading\[[^]]+\]|downloadProgress\[[^]]+\]' \
+  iOS/VoiceInk-ios/LocalModelManager.swift
+
+require_pattern \
   "iOS local model management uses shared download state" \
-  'VoiceInkWhisperModelDownloadState\.simple' \
+  'modelManager\.downloadState\(for: model\)' \
   iOS/VoiceInk-ios/LocalModelManagementView.swift
 
 require_pattern \
@@ -2084,7 +2099,7 @@ require_pattern \
 
 require_pattern \
   "iOS onboarding uses shared download state" \
-  'VoiceInkWhisperModelDownloadState\.simple' \
+  'modelManager\.downloadState\(for: baseModel\)' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 require_pattern \
@@ -2254,7 +2269,7 @@ reject_pattern \
 
 reject_pattern \
   "iOS model download views avoid shell-only downloaded/progress state assembly" \
-  'model\.isDownloaded\(in:|modelManager\.isDownloading\[[^]]+\] == true|modelManager\.downloadProgress\[[^]]+\]' \
+  'VoiceInkWhisperModelDownloadState\.simple|isDownloadingByModelID|downloadProgressByModelID|model\.isDownloaded\(in:|modelManager\.isDownloading\[[^]]+\] == true|modelManager\.downloadProgress\[[^]]+\]' \
   iOS/VoiceInk-ios/LocalModelManagementView.swift \
   iOS/VoiceInk-ios/OnboardingView.swift
 

@@ -45,12 +45,7 @@ struct ModelRowView: View {
     @State private var showingDownloadConfirmation = false
 
     private var downloadState: VoiceInkWhisperModelDownloadState {
-        VoiceInkWhisperModelDownloadState.simple(
-            model: model,
-            modelsDirectory: LocalModelManager.modelsDirectory,
-            isDownloadingByModelID: modelManager.isDownloading,
-            downloadProgressByModelID: modelManager.downloadProgress
-        )
+        modelManager.downloadState(for: model)
     }
 
     private var downloadConfirmation: VoiceInkWhisperModelOperationConfirmationPresentation {

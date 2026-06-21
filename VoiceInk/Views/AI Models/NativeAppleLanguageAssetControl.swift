@@ -6,23 +6,13 @@ import VoiceInkCore
 import Speech
 #endif
 
-private enum NativeAppleSpeechAssetState: Equatable {
-    case checking
-    case downloaded
-    case needsDownload
-    case downloading
-    case notSupported
-    case assetManagementUnavailable
-    case failed(String)
-}
-
 struct NativeAppleLanguageAssetControl: View {
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "NativeAppleLanguageAssetControl")
 
     let localeIdentifier: String
     let isVisible: Bool
 
-    @State private var state: NativeAppleSpeechAssetState = .checking
+    @State private var state: VoiceInkNativeAppleLanguageAssetState = .checking
     @State private var refreshTask: Task<Void, Never>?
 
     private var refreshKey: String {
@@ -47,51 +37,32 @@ struct NativeAppleLanguageAssetControl: View {
 
     @ViewBuilder
     private var content: some View {
-        switch state {
-        case .checking:
-            ProgressView()
-                .controlSize(.small)
-                .frame(width: 28, height: 24)
-                .help("Checking Apple Speech language download status.")
-        case .downloaded:
+        let presentation = VoiceInkNativeAppleLanguageAssetPresentation.presentation(for: state)
+
+        switch presentation.display {
+        case .hidden:
             EmptyView()
-        case .needsDownload:
-            Button(action: downloadAsset) {
-                Image(systemName: "arrow.down.circle.fill")
-                    .font(.system(size: 14, weight: .semibold))
-            }
-            .buttonStyle(.plain)
-            .controlSize(.small)
-            .frame(width: 28, height: 24)
-            .help("Download this Apple Speech language before transcribing.")
-            .accessibilityLabel("Download Apple Speech language")
-        case .downloading:
+        case .progress:
             ProgressView()
                 .controlSize(.small)
                 .frame(width: 28, height: 24)
-                .help("Downloading Apple Speech language.")
-        case .notSupported:
-            Image(systemName: "exclamationmark.triangle")
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .frame(width: 28, height: 24)
-                .help("This language is not supported by Apple Speech.")
-        case .assetManagementUnavailable:
-            Image(systemName: "exclamationmark.triangle")
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .frame(width: 28, height: 24)
-                .help("Apple Speech asset management is not available on this system.")
-        case .failed(let message):
+                .help(presentation.helpText ?? "")
+        case .actionButton(let systemImageName):
             Button(action: downloadAsset) {
-                Image(systemName: "arrow.clockwise.circle.fill")
+                Image(systemName: systemImageName)
                     .font(.system(size: 14, weight: .semibold))
             }
             .buttonStyle(.plain)
             .controlSize(.small)
             .frame(width: 28, height: 24)
-            .help("Retry downloading this Apple Speech language. \(message)")
-            .accessibilityLabel("Retry Apple Speech language download")
+            .help(presentation.helpText ?? "")
+            .accessibilityLabel(presentation.accessibilityLabel ?? "")
+        case .statusIcon(let systemImageName):
+            Image(systemName: systemImageName)
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .frame(width: 28, height: 24)
+                .help(presentation.helpText ?? "")
         }
     }
 
@@ -132,7 +103,7 @@ struct NativeAppleLanguageAssetControl: View {
         }
     }
 
-    private func assetState(for localeIdentifier: String) async -> NativeAppleSpeechAssetState {
+    private func assetState(for localeIdentifier: String) async -> VoiceInkNativeAppleLanguageAssetState {
         guard #available(macOS 26, *) else {
             return .assetManagementUnavailable
         }
@@ -153,7 +124,7 @@ struct NativeAppleLanguageAssetControl: View {
         #endif
     }
 
-    private func installAsset(for localeIdentifier: String) async -> NativeAppleSpeechAssetState {
+    private func installAsset(for localeIdentifier: String) async -> VoiceInkNativeAppleLanguageAssetState {
         guard #available(macOS 26, *) else {
             logger.error("Apple Speech asset download unavailable for '\(localeIdentifier, privacy: .public)': requires macOS 26 or later.")
             return .assetManagementUnavailable

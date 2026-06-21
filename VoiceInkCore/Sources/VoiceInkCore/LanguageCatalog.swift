@@ -81,6 +81,78 @@ public struct VoiceInkTranscriptionLanguageSelectionFacts: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkNativeAppleLanguageAssetState: Equatable, Sendable {
+    case checking
+    case downloaded
+    case needsDownload
+    case downloading
+    case notSupported
+    case assetManagementUnavailable
+    case failed(String)
+}
+
+public enum VoiceInkNativeAppleLanguageAssetDisplay: Equatable, Sendable {
+    case hidden
+    case progress
+    case actionButton(systemImageName: String)
+    case statusIcon(systemImageName: String)
+}
+
+public struct VoiceInkNativeAppleLanguageAssetPresentation: Equatable, Sendable {
+    public let display: VoiceInkNativeAppleLanguageAssetDisplay
+    public let helpText: String?
+    public let accessibilityLabel: String?
+
+    public init(
+        display: VoiceInkNativeAppleLanguageAssetDisplay,
+        helpText: String? = nil,
+        accessibilityLabel: String? = nil
+    ) {
+        self.display = display
+        self.helpText = helpText
+        self.accessibilityLabel = accessibilityLabel
+    }
+
+    public static func presentation(for state: VoiceInkNativeAppleLanguageAssetState) -> Self {
+        switch state {
+        case .checking:
+            return Self(
+                display: .progress,
+                helpText: "Checking Apple Speech language download status."
+            )
+        case .downloaded:
+            return Self(display: .hidden)
+        case .needsDownload:
+            return Self(
+                display: .actionButton(systemImageName: "arrow.down.circle.fill"),
+                helpText: "Download this Apple Speech language before transcribing.",
+                accessibilityLabel: "Download Apple Speech language"
+            )
+        case .downloading:
+            return Self(
+                display: .progress,
+                helpText: "Downloading Apple Speech language."
+            )
+        case .notSupported:
+            return Self(
+                display: .statusIcon(systemImageName: "exclamationmark.triangle"),
+                helpText: "This language is not supported by Apple Speech."
+            )
+        case .assetManagementUnavailable:
+            return Self(
+                display: .statusIcon(systemImageName: "exclamationmark.triangle"),
+                helpText: "Apple Speech asset management is not available on this system."
+            )
+        case .failed(let message):
+            return Self(
+                display: .actionButton(systemImageName: "arrow.clockwise.circle.fill"),
+                helpText: "Retry downloading this Apple Speech language. \(message)",
+                accessibilityLabel: "Retry Apple Speech language download"
+            )
+        }
+    }
+}
+
 extension VoiceInkTranscriptionLanguageSource {
     var disablesTranscriptionLanguageSelection: Bool {
         self == .provider(.gemini)

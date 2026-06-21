@@ -292,6 +292,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "LanguageCatalogTests.testValidLanguageOrFallbackSupportsLanguageSourcePolicy", run: { LanguageCatalogTests().testValidLanguageOrFallbackSupportsLanguageSourcePolicy() }),
             VoiceInkCoreCheck(name: "LanguageCatalogTests.testTranscriptionLanguageSelectionFactsDeriveControlFromSource", run: { LanguageCatalogTests().testTranscriptionLanguageSelectionFactsDeriveControlFromSource() }),
             VoiceInkCoreCheck(name: "LanguageCatalogTests.testTranscriptionLanguageSelectionFactsUseSharedCompatibleFallback", run: { LanguageCatalogTests().testTranscriptionLanguageSelectionFactsUseSharedCompatibleFallback() }),
+            VoiceInkCoreCheck(name: "LanguageCatalogTests.testNativeAppleLanguageAssetPresentationPreservesProgressAndIconStates", run: { LanguageCatalogTests().testNativeAppleLanguageAssetPresentationPreservesProgressAndIconStates() }),
+            VoiceInkCoreCheck(name: "LanguageCatalogTests.testNativeAppleLanguageAssetPresentationPreservesActionStates", run: { LanguageCatalogTests().testNativeAppleLanguageAssetPresentationPreservesActionStates() }),
             VoiceInkCoreCheck(name: "LanguageCatalogTests.testSortedLanguageOptionsPutAutoDetectFirstThenSortByDisplayName", run: { LanguageCatalogTests().testSortedLanguageOptionsPutAutoDetectFirstThenSortByDisplayName() }),
             VoiceInkCoreCheck(name: "LanguageCatalogTests.testSortedLanguageOptionsUseCodeForStableTies", run: { LanguageCatalogTests().testSortedLanguageOptionsUseCodeForStableTies() }),
             VoiceInkCoreCheck(name: "LanguageCatalogTests.testDisplayNameUsesLanguageMapThenFallback", run: { LanguageCatalogTests().testDisplayNameUsesLanguageMapThenFallback() }),

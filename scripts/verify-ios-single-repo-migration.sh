@@ -372,6 +372,16 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/LanguageCatalog.swift
 
 require_pattern \
+  "shared Native Apple language asset presentation lives in VoiceInkCore" \
+  'VoiceInkNativeAppleLanguageAsset(State|Display|Presentation)|presentation\(for state: VoiceInkNativeAppleLanguageAssetState\)' \
+  VoiceInkCore/Sources/VoiceInkCore/LanguageCatalog.swift
+
+require_pattern \
+  "core checks execute Native Apple language asset presentation tests" \
+  'LanguageCatalogTests\.testNativeAppleLanguageAssetPresentationPreservesProgressAndIconStates|LanguageCatalogTests\.testNativeAppleLanguageAssetPresentationPreservesActionStates' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "macOS language picker uses shared language display fallback" \
   'VoiceInkTranscriptionLanguagePresentation\.menuLabel' \
   "VoiceInk/Views/AI Models/LanguageSelectionView.swift"
@@ -385,6 +395,11 @@ require_pattern \
   "macOS language picker uses shared selection facts" \
   'languageSelectionFacts|facts\.control|showsNativeAppleAssetControl' \
   "VoiceInk/Views/AI Models/LanguageSelectionView.swift"
+
+require_pattern \
+  "macOS Native Apple asset control uses shared presentation" \
+  'VoiceInkNativeAppleLanguageAsset(Presentation|State)|presentation\.(display|helpText|accessibilityLabel)' \
+  "VoiceInk/Views/AI Models/NativeAppleLanguageAssetControl.swift"
 
 require_pattern \
   "macOS TranscriptionModel adapts shared language selection facts" \
@@ -410,6 +425,11 @@ reject_pattern \
   "macOS language picker avoids duplicate provider selection policy" \
   'languageSelectionDisabled|isMultilingualModel\(|isNativeAppleModelSelected|availableLanguagesForCurrentModel|provider == \.(gemini|nativeApple)' \
   "VoiceInk/Views/AI Models/LanguageSelectionView.swift"
+
+reject_pattern \
+  "macOS Native Apple asset control avoids shell-owned presentation copy and icons" \
+  '"(Checking Apple Speech language download status\.|Download this Apple Speech language before transcribing\.|Download Apple Speech language|Downloading Apple Speech language\.|This language is not supported by Apple Speech\.|Apple Speech asset management is not available on this system\.|Retry downloading this Apple Speech language\.|Retry Apple Speech language download|arrow\.down\.circle\.fill|arrow\.clockwise\.circle\.fill|exclamationmark\.triangle)"' \
+  "VoiceInk/Views/AI Models/NativeAppleLanguageAssetControl.swift"
 
 reject_pattern \
   "iOS language settings avoids shell-only language presentation copy" \

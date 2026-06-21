@@ -257,6 +257,48 @@ final class LanguageCatalogTests: XCTestCase {
         XCTAssertEqual(whisperFacts.compatibleLanguage("fr"), "fr")
     }
 
+    func testNativeAppleLanguageAssetPresentationPreservesProgressAndIconStates() {
+        let checking = VoiceInkNativeAppleLanguageAssetPresentation.presentation(for: .checking)
+        XCTAssertEqual(checking.display, .progress)
+        XCTAssertEqual(checking.helpText, "Checking Apple Speech language download status.")
+        XCTAssertNil(checking.accessibilityLabel)
+
+        let downloaded = VoiceInkNativeAppleLanguageAssetPresentation.presentation(for: .downloaded)
+        XCTAssertEqual(downloaded.display, .hidden)
+        XCTAssertNil(downloaded.helpText)
+        XCTAssertNil(downloaded.accessibilityLabel)
+
+        let downloading = VoiceInkNativeAppleLanguageAssetPresentation.presentation(for: .downloading)
+        XCTAssertEqual(downloading.display, .progress)
+        XCTAssertEqual(downloading.helpText, "Downloading Apple Speech language.")
+        XCTAssertNil(downloading.accessibilityLabel)
+
+        let unsupported = VoiceInkNativeAppleLanguageAssetPresentation.presentation(for: .notSupported)
+        XCTAssertEqual(unsupported.display, .statusIcon(systemImageName: "exclamationmark.triangle"))
+        XCTAssertEqual(unsupported.helpText, "This language is not supported by Apple Speech.")
+        XCTAssertNil(unsupported.accessibilityLabel)
+
+        let unavailable = VoiceInkNativeAppleLanguageAssetPresentation.presentation(for: .assetManagementUnavailable)
+        XCTAssertEqual(unavailable.display, .statusIcon(systemImageName: "exclamationmark.triangle"))
+        XCTAssertEqual(unavailable.helpText, "Apple Speech asset management is not available on this system.")
+        XCTAssertNil(unavailable.accessibilityLabel)
+    }
+
+    func testNativeAppleLanguageAssetPresentationPreservesActionStates() {
+        let needsDownload = VoiceInkNativeAppleLanguageAssetPresentation.presentation(for: .needsDownload)
+        XCTAssertEqual(needsDownload.display, .actionButton(systemImageName: "arrow.down.circle.fill"))
+        XCTAssertEqual(needsDownload.helpText, "Download this Apple Speech language before transcribing.")
+        XCTAssertEqual(needsDownload.accessibilityLabel, "Download Apple Speech language")
+
+        let failed = VoiceInkNativeAppleLanguageAssetPresentation.presentation(for: .failed("Network unavailable"))
+        XCTAssertEqual(failed.display, .actionButton(systemImageName: "arrow.clockwise.circle.fill"))
+        XCTAssertEqual(
+            failed.helpText,
+            "Retry downloading this Apple Speech language. Network unavailable"
+        )
+        XCTAssertEqual(failed.accessibilityLabel, "Retry Apple Speech language download")
+    }
+
     func testSortedLanguageOptionsPutAutoDetectFirstThenSortByDisplayName() {
         XCTAssertEqual(
             VoiceInkLanguageCatalog.sortedOptions([

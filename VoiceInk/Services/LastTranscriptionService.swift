@@ -71,7 +71,7 @@ class LastTranscriptionService: ObservableObject {
         let textToPaste = lastTranscription.text
 
         Task { @MainActor in
-            CursorPaster.pasteAtCursor(textForCursorPaste(textToPaste))
+            CursorPaster.pasteAtCursor(CursorPaster.preparedTextForPaste(textToPaste))
         }
     }
     
@@ -92,19 +92,8 @@ class LastTranscriptionService: ObservableObject {
         ) ?? lastTranscription.text
 
         Task { @MainActor in
-            CursorPaster.pasteAtCursor(textForCursorPaste(textToPaste))
+            CursorPaster.pasteAtCursor(CursorPaster.preparedTextForPaste(textToPaste))
         }
-    }
-
-    @MainActor
-    private static func textForCursorPaste(_ text: String) -> String {
-        let plan = VoiceInkTranscriptionPasteOutputPolicy.cursorPasteTextPlan(
-            text,
-            shouldLowercase: VoiceInkTranscriptionCleanupPreferenceStorage.shouldLowercase()
-        )
-        return plan.text(
-            beforeCursor: plan.shouldReadCursorContext ? CursorTextContextReader.textBeforeCursor() : nil
-        )
     }
     
     static func retryLastTranscription(from modelContext: ModelContext, transcriptionModelManager: TranscriptionModelManager, serviceRegistry: TranscriptionServiceRegistry, enhancementService: AIEnhancementService?) {

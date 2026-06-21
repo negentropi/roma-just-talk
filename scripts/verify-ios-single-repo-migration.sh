@@ -4838,18 +4838,28 @@ require_pattern \
   VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
 
 require_pattern \
-  "macOS transcription pipeline uses shared cursor-context plan" \
-  'VoiceInkTranscriptionPasteOutputPolicy\.cursorPasteTextPlan|shouldReadCursorContext' \
-  VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
+  "macOS CursorPaster adapts shared cursor-context plan" \
+  'VoiceInkTranscriptionPasteOutputPolicy\.cursorPasteTextPlan' \
+  VoiceInk/Paste/CursorPaster.swift
+
+require_pattern \
+  "macOS CursorPaster owns paste text preparation" \
+  'preparedTextForPaste|shouldReadCursorContext' \
+  VoiceInk/Paste/CursorPaster.swift
 
 reject_pattern \
   "macOS transcription pipeline avoids shell-only paste output policy" \
-  'Your trial has expired|"AppendTrailingSpace"|textToPaste \+ \(appendSpace \? " " : ""\)|VoiceInkContextualCapitalizationFormatter\.(needsCursorContext|format)' \
+  'Your trial has expired|"AppendTrailingSpace"|textToPaste \+ \(appendSpace \? " " : ""\)|VoiceInkContextualCapitalizationFormatter\.(needsCursorContext|format)|VoiceInkTranscriptionPasteOutputPolicy\.cursorPasteTextPlan' \
   VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
 
 require_pattern \
-  "macOS last-transcription paste uses shared cursor-context plan" \
-  'VoiceInkTranscriptionPasteOutputPolicy\.cursorPasteTextPlan|shouldReadCursorContext' \
+  "macOS transcription pipeline uses CursorPaster paste preparation" \
+  'CursorPaster\.preparedTextForPaste' \
+  VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
+
+require_pattern \
+  "macOS last-transcription paste uses CursorPaster paste preparation" \
+  'CursorPaster\.preparedTextForPaste' \
   VoiceInk/Services/LastTranscriptionService.swift
 
 require_pattern \
@@ -5774,7 +5784,7 @@ reject_pattern \
 
 reject_pattern \
   "macOS last-transcription shell avoids shared policy pass-through wrappers" \
-  'private static func +isPasteable\(|static func +shouldFallback\(|VoiceInkContextualCapitalizationFormatter\.(needsCursorContext|format)' \
+  'private static func +(isPasteable|textForCursorPaste)\(|static func +shouldFallback\(|VoiceInkContextualCapitalizationFormatter\.(needsCursorContext|format)|VoiceInkTranscriptionPasteOutputPolicy\.cursorPasteTextPlan' \
   VoiceInk/Services/LastTranscriptionService.swift
 
 require_pattern \

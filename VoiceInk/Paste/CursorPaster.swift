@@ -34,6 +34,30 @@ class CursorPaster {
     }
 
     @MainActor
+    static func preparedTextForPaste(_ text: String) -> String {
+        let plan = cursorPasteTextPlan(for: text)
+        return plan.text(
+            beforeCursor: plan.shouldReadCursorContext ? CursorTextContextReader.textBeforeCursor() : nil
+        )
+    }
+
+    @MainActor
+    static func preparedTextForPaste(
+        _ text: String,
+        preparedCursorTextContext: Task<String?, Never>?
+    ) async -> String {
+        let plan = cursorPasteTextPlan(for: text)
+        guard plan.shouldReadCursorContext else { return text }
+
+        let beforeCursor = if let preparedCursorTextContext {
+            await preparedCursorTextContext.value
+        } else {
+            CursorTextContextReader.textBeforeCursor()
+        }
+        return plan.text(beforeCursor: beforeCursor)
+    }
+
+    @MainActor
     static func configurePasteCommandPosterForTesting(_ poster: (() async -> PasteResult)? = nil) {
         pasteCommandPosterForTesting = poster
     }
@@ -64,6 +88,16 @@ class CursorPaster {
         return PreparedPasteContext(
             changeCount: pasteboard.changeCount,
             savedContents: snapshotClipboard(from: pasteboard)
+        )
+    }
+
+    @MainActor
+    private static func cursorPasteTextPlan(
+        for text: String
+    ) -> VoiceInkTranscriptionPasteOutputPolicy.CursorPasteTextPlan {
+        VoiceInkTranscriptionPasteOutputPolicy.cursorPasteTextPlan(
+            text,
+            shouldLowercase: VoiceInkTranscriptionCleanupPreferenceStorage.shouldLowercase()
         )
     }
 

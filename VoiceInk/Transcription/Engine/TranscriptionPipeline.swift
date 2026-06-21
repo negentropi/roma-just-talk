@@ -362,18 +362,10 @@ class TranscriptionPipeline {
             await restorePromptDetectionSettingsAndDismiss()
         } else if var textToPaste = finalPastedText,
            transcription.transcriptionState == .completed {
-            let cursorPastePlan = VoiceInkTranscriptionPasteOutputPolicy.cursorPasteTextPlan(
+            textToPaste = await CursorPaster.preparedTextForPaste(
                 textToPaste,
-                shouldLowercase: VoiceInkTranscriptionCleanupPreferenceStorage.shouldLowercase()
+                preparedCursorTextContext: preparedCursorTextContext
             )
-            if cursorPastePlan.shouldReadCursorContext {
-                let beforeCursor = if let preparedCursorTextContext {
-                    await preparedCursorTextContext.value
-                } else {
-                    CursorTextContextReader.textBeforeCursor()
-                }
-                textToPaste = cursorPastePlan.text(beforeCursor: beforeCursor)
-            }
 
             let isTrialExpired: Bool
             if case .trialExpired = licenseViewModel.licenseState {

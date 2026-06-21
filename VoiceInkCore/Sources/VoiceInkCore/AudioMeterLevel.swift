@@ -7,6 +7,8 @@ public enum VoiceInkAudioMeterLevel {
     public static let defaultLevelHistoryLimit = 40
     public static let macOSUpdateIntervalMilliseconds = 17
     public static let iOSUpdateInterval: TimeInterval = 0.1
+    public static let iOSVisualizerBarCount = 8
+    public static let iOSVisualizerMinimumBarHeight: Double = 4
     public static let visualizerAccessibilityLabel = "Audio level visualizer"
 
     public static func normalizedLevel(
@@ -53,5 +55,21 @@ public enum VoiceInkAudioMeterLevel {
         }
 
         return Array(updatedHistory.suffix(limit))
+    }
+
+    public static func visualizerLevel(
+        forBarAt index: Int,
+        levels: [Float],
+        barCount: Int = iOSVisualizerBarCount
+    ) -> Float {
+        guard index >= 0, !levels.isEmpty, barCount > 0 else {
+            return 0
+        }
+
+        let span = max(1, min(levels.count, barCount))
+        let step = max(1, levels.count / span)
+        let sourceIndex = max(0, levels.count - 1 - index * step)
+        let sourceLevel = levels[sourceIndex]
+        return max(0, min(1, sourceLevel))
     }
 }

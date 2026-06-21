@@ -4,7 +4,7 @@ import VoiceInkCore
 struct AudioVisualizerView: View {
     let levels: [Float]
 
-    private let barCount = 8
+    private let barCount = VoiceInkAudioMeterLevel.iOSVisualizerBarCount
     private let barSpacing: CGFloat = 3
 
     var body: some View {
@@ -32,13 +32,12 @@ struct AudioVisualizerView: View {
     }
 
     private func barHeight(for index: Int, in size: CGSize) -> CGFloat {
-        guard !levels.isEmpty else { return 4 }
-
-        let span = max(1, min(levels.count, barCount))
-        let step = max(1, levels.count / span)
-        let sourceIndex = max(0, levels.count - 1 - index * step)
-        let level = CGFloat(max(0, min(1, levels[sourceIndex])))
-        let minHeight: CGFloat = 4
+        let level = CGFloat(VoiceInkAudioMeterLevel.visualizerLevel(
+            forBarAt: index,
+            levels: levels,
+            barCount: barCount
+        ))
+        let minHeight = CGFloat(VoiceInkAudioMeterLevel.iOSVisualizerMinimumBarHeight)
 
         return minHeight + (size.height - minHeight) * level
     }

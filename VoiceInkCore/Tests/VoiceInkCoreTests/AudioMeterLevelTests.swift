@@ -60,4 +60,42 @@ final class AudioMeterLevelTests: XCTestCase {
         XCTAssertEqual(VoiceInkAudioMeterLevel.macOSUpdateIntervalMilliseconds, 17)
         XCTAssertEqual(VoiceInkAudioMeterLevel.iOSUpdateInterval, 0.1)
     }
+
+    func testIOSVisualizerBarPolicyPreservesGeometryInputs() {
+        XCTAssertEqual(VoiceInkAudioMeterLevel.iOSVisualizerBarCount, 8)
+        XCTAssertEqual(VoiceInkAudioMeterLevel.iOSVisualizerMinimumBarHeight, 4)
+    }
+
+    func testIOSVisualizerLevelSamplesRecentHistoryAndClampsLevels() {
+        let levels: [Float] = [0.2, 0.5, 1.4, -0.3]
+
+        XCTAssertEqual(
+            VoiceInkAudioMeterLevel.visualizerLevel(forBarAt: 0, levels: levels, barCount: 4),
+            0
+        )
+        XCTAssertEqual(
+            VoiceInkAudioMeterLevel.visualizerLevel(forBarAt: 1, levels: levels, barCount: 4),
+            1
+        )
+        XCTAssertEqual(
+            VoiceInkAudioMeterLevel.visualizerLevel(forBarAt: 2, levels: levels, barCount: 4),
+            0.5
+        )
+        XCTAssertEqual(
+            VoiceInkAudioMeterLevel.visualizerLevel(forBarAt: 3, levels: levels, barCount: 4),
+            0.2
+        )
+    }
+
+    func testIOSVisualizerLevelHandlesEmptyHistoryAndNonPositiveBarCount() {
+        XCTAssertEqual(VoiceInkAudioMeterLevel.visualizerLevel(forBarAt: 0, levels: []), 0)
+        XCTAssertEqual(
+            VoiceInkAudioMeterLevel.visualizerLevel(forBarAt: 0, levels: [0.5], barCount: 0),
+            0
+        )
+        XCTAssertEqual(
+            VoiceInkAudioMeterLevel.visualizerLevel(forBarAt: -1, levels: [0.5], barCount: 1),
+            0
+        )
+    }
 }

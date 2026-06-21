@@ -1081,14 +1081,44 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AudioMeterLevel.swift
 
 require_pattern \
+  "shared audio-meter visualizer bar policy lives in VoiceInkCore" \
+  'iOSVisualizerBarCount|iOSVisualizerMinimumBarHeight|visualizerLevel' \
+  VoiceInkCore/Sources/VoiceInkCore/AudioMeterLevel.swift
+
+require_pattern \
+  "shared audio-meter visualizer checks run in VoiceInkCore" \
+  'testIOSVisualizer(Level|BarPolicy)' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "iOS audio visualizer uses shared accessibility label" \
   'VoiceInkAudioMeterLevel\.visualizerAccessibilityLabel' \
+  iOS/VoiceInk-ios/AudioVisualizerView.swift
+
+require_pattern \
+  "iOS audio visualizer uses shared bar count policy" \
+  'VoiceInkAudioMeterLevel\.iOSVisualizerBarCount' \
+  iOS/VoiceInk-ios/AudioVisualizerView.swift
+
+require_pattern \
+  "iOS audio visualizer uses shared bar level policy" \
+  'VoiceInkAudioMeterLevel\.visualizerLevel' \
+  iOS/VoiceInk-ios/AudioVisualizerView.swift
+
+require_pattern \
+  "iOS audio visualizer uses shared minimum bar height policy" \
+  'VoiceInkAudioMeterLevel\.iOSVisualizerMinimumBarHeight' \
   iOS/VoiceInk-ios/AudioVisualizerView.swift
 
 reject_pattern \
   "iOS live recording avoids shell-only audio-meter history limit" \
   'levelsHistory\.count >|removeFirst\(self\.levelsHistory\.count -|0\.\.<40' \
   iOS/VoiceInk-ios/AudioRecorder.swift \
+  iOS/VoiceInk-ios/AudioVisualizerView.swift
+
+reject_pattern \
+  "iOS audio visualizer avoids shell-owned sample selection policy" \
+  'guard +!levels\.isEmpty|levels\.count / span|sourceIndex|max\(0, min\(1, levels\[sourceIndex\]\)\)' \
   iOS/VoiceInk-ios/AudioVisualizerView.swift
 
 reject_pattern \

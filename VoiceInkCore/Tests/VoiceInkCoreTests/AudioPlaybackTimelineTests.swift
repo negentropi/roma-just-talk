@@ -79,6 +79,29 @@ final class AudioPlaybackTimelineTests: XCTestCase {
         )
     }
 
+    func testTimerTickPlanExposesShellSideEffectHints() {
+        XCTAssertEqual(
+            VoiceInkAudioPlaybackTimerTickPlan(currentTime: 4, action: .none).shouldStopTimer,
+            false
+        )
+        XCTAssertNil(VoiceInkAudioPlaybackTimerTickPlan(currentTime: 4, action: .none).playerSeekTime)
+
+        XCTAssertEqual(
+            VoiceInkAudioPlaybackTimerTickPlan(currentTime: 9.5, action: .markStopped).shouldStopTimer,
+            true
+        )
+        XCTAssertNil(VoiceInkAudioPlaybackTimerTickPlan(currentTime: 9.5, action: .markStopped).playerSeekTime)
+
+        XCTAssertEqual(
+            VoiceInkAudioPlaybackTimerTickPlan(currentTime: 10, action: .markStoppedAndSeek(0)).shouldStopTimer,
+            true
+        )
+        XCTAssertEqual(
+            VoiceInkAudioPlaybackTimerTickPlan(currentTime: 10, action: .markStoppedAndSeek(0)).playerSeekTime,
+            0
+        )
+    }
+
     func testPlaybackStateLoadPreservesPlatformResetBehavior() {
         let state = VoiceInkAudioPlaybackState(
             isPlaying: true,
@@ -114,6 +137,28 @@ final class AudioPlaybackTimelineTests: XCTestCase {
         XCTAssertEqual(
             state.updatingCurrentTime(6),
             VoiceInkAudioPlaybackState(isPlaying: false, currentTime: 6, duration: 10, playbackRate: 1)
+        )
+    }
+
+    func testPlaybackStateAppliesTimerTickPlanActions() {
+        let state = VoiceInkAudioPlaybackState(
+            isPlaying: true,
+            currentTime: 3,
+            duration: 10,
+            playbackRate: 1
+        )
+
+        XCTAssertEqual(
+            state.applyingTimerTickPlan(VoiceInkAudioPlaybackTimerTickPlan(currentTime: 6, action: .none)),
+            VoiceInkAudioPlaybackState(isPlaying: true, currentTime: 6, duration: 10, playbackRate: 1)
+        )
+        XCTAssertEqual(
+            state.applyingTimerTickPlan(VoiceInkAudioPlaybackTimerTickPlan(currentTime: 9.5, action: .markStopped)),
+            VoiceInkAudioPlaybackState(isPlaying: false, currentTime: 9.5, duration: 10, playbackRate: 1)
+        )
+        XCTAssertEqual(
+            state.applyingTimerTickPlan(VoiceInkAudioPlaybackTimerTickPlan(currentTime: 10, action: .markStoppedAndSeek(0))),
+            VoiceInkAudioPlaybackState(isPlaying: false, currentTime: 0, duration: 10, playbackRate: 1)
         )
     }
 

@@ -69,6 +69,24 @@ public enum VoiceInkAudioPlaybackTimerTickAction: Equatable, Sendable {
     case none
     case markStopped
     case markStoppedAndSeek(TimeInterval)
+
+    public var shouldStopTimer: Bool {
+        switch self {
+        case .none:
+            return false
+        case .markStopped, .markStoppedAndSeek:
+            return true
+        }
+    }
+
+    public var playerSeekTime: TimeInterval? {
+        switch self {
+        case .none, .markStopped:
+            return nil
+        case .markStoppedAndSeek(let seekTime):
+            return seekTime
+        }
+    }
 }
 
 public struct VoiceInkAudioPlaybackTimerTickPlan: Equatable, Sendable {
@@ -81,6 +99,14 @@ public struct VoiceInkAudioPlaybackTimerTickPlan: Equatable, Sendable {
     ) {
         self.currentTime = currentTime
         self.action = action
+    }
+
+    public var shouldStopTimer: Bool {
+        action.shouldStopTimer
+    }
+
+    public var playerSeekTime: TimeInterval? {
+        action.playerSeekTime
     }
 
     public static func macOS(
@@ -158,6 +184,19 @@ public struct VoiceInkAudioPlaybackState: Equatable, Sendable {
 
     public func updatingCurrentTime(_ time: TimeInterval) -> VoiceInkAudioPlaybackState {
         copy(currentTime: time)
+    }
+
+    public func applyingTimerTickPlan(_ plan: VoiceInkAudioPlaybackTimerTickPlan) -> VoiceInkAudioPlaybackState {
+        let updatedState = updatingCurrentTime(plan.currentTime)
+
+        switch plan.action {
+        case .none:
+            return updatedState
+        case .markStopped:
+            return updatedState.paused()
+        case .markStoppedAndSeek(let seekTime):
+            return updatedState.paused().seeking(to: seekTime)
+        }
     }
 
     public func cyclingPlaybackRate() -> VoiceInkAudioPlaybackState {

@@ -7494,13 +7494,28 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
 
 require_pattern \
+  "shared audio player tick plan exposes shell side-effect hints" \
+  'shouldStopTimer|playerSeekTime' \
+  VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
+
+require_pattern \
   "shared audio player state plan lives in VoiceInkCore" \
   'VoiceInkAudioPlaybackState' \
   VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
 
 require_pattern \
+  "shared audio playback state applies timer tick plans" \
+  'applyingTimerTickPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
+
+require_pattern \
   "core checks execute audio player timer tick plan tests" \
   'AudioPlaybackTimelineTests\.testTimerTickPlanPreservesPlatformCompletionBehavior' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute audio player timer tick side-effect tests" \
+  'AudioPlaybackTimelineTests\.testTimerTickPlanExposesShellSideEffectHints|AudioPlaybackTimelineTests\.testPlaybackStateAppliesTimerTickPlanActions' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -7524,8 +7539,18 @@ require_pattern \
   VoiceInk/Views/AudioPlayerView.swift
 
 require_pattern \
+  "macOS audio player applies shared timer tick state plan" \
+  'applyingTimerTickPlan' \
+  VoiceInk/Views/AudioPlayerView.swift
+
+require_pattern \
   "iOS audio player shell consumes shared playback state plan" \
   'VoiceInkAudioPlaybackState' \
+  iOS/VoiceInk-ios/AudioPlayer.swift
+
+require_pattern \
+  "iOS audio player applies shared timer tick state plan" \
+  'applyingTimerTickPlan' \
   iOS/VoiceInk-ios/AudioPlayer.swift
 
 require_pattern \
@@ -7595,6 +7620,12 @@ reject_pattern \
 reject_pattern \
   "platform audio players avoid shell-only completion tick policy" \
   'currentTime >= .*duration|!player\.isPlaying && self\.isPlaying' \
+  VoiceInk/Views/AudioPlayerView.swift \
+  iOS/VoiceInk-ios/AudioPlayer.swift
+
+reject_pattern \
+  "platform audio players avoid shell-owned timer tick action state branching" \
+  'case \.markStopped|case \.markStoppedAndSeek|plan\.action' \
   VoiceInk/Views/AudioPlayerView.swift \
   iOS/VoiceInk-ios/AudioPlayer.swift
 

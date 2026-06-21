@@ -112,14 +112,9 @@ final class AudioPlayer: ObservableObject {
                     playerIsPlaying: player.isPlaying,
                     shellIsPlaying: self.isPlaying
                 )
-                var state = self.playbackState.updatingCurrentTime(plan.currentTime)
-
-                if case .markStopped = plan.action {
-                    state = state.paused()
-                    self.playbackState = state
+                self.playbackState = self.playbackState.applyingTimerTickPlan(plan)
+                if plan.shouldStopTimer {
                     self.stopTimer()
-                } else {
-                    self.playbackState = state
                 }
             }
         }

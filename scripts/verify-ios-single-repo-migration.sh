@@ -2486,6 +2486,11 @@ reject_pattern \
   'baseModelDownloadState|private var +(downloadConfirmation|rowPresentation)|VoiceInkWhisperModel(OperationConfirmation|DownloadRow)Presentation' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
+reject_pattern \
+  "iOS onboarding avoids shallow base model row wrapper" \
+  'private var +baseModelRow\b' \
+  iOS/VoiceInk-ios/OnboardingView.swift
+
 require_pattern \
   "shared iOS onboarding presentation lives in VoiceInkCore" \
   'VoiceInkIOSOnboardingStep|VoiceInkIOSOnboardingPresentation|VoiceInkOnboardingFeaturePresentation|VoiceInkOnboardingStepPresentation|appIconFallbackSystemImageName' \

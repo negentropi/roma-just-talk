@@ -99,13 +99,9 @@ struct ModelDownloadOnboardingView: View {
     private let onboardingPresentation = VoiceInkIOSOnboardingPresentation.modelDownload
     
     private let baseModel = VoiceInkWhisperModelFiles.baseModel
-
-    private var baseModelRow: VoiceInkWhisperModelManagementRow {
-        modelManager.managementRow(for: baseModel)
-    }
     
     var body: some View {
-        let row = baseModelRow
+        let row = modelManager.managementRow(for: baseModel)
         let presentation = row.presentation
 
         VStack(spacing: 0) {

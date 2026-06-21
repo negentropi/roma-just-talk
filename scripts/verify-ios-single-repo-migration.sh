@@ -541,6 +541,11 @@ require_pattern \
   iOS/VoiceInk-ios/SettingsView.swift
 
 reject_pattern \
+  "iOS language settings avoids shallow sorted-language wrapper" \
+  'private var +sortedTranscriptionLanguages\b' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+reject_pattern \
   "macOS language picker avoids shell-only language display fallback" \
   'private func +currentLanguageDisplayName|\?\? "Unknown"' \
   "VoiceInk/Views/AI Models/LanguageSelectionView.swift"

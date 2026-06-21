@@ -63,7 +63,7 @@ struct SettingsView: View {
 
             Section(header: Text(VoiceInkTranscriptionLanguagePresentation.sectionTitle)) {
                 Picker(VoiceInkTranscriptionLanguagePresentation.pickerTitle, selection: selectedLanguageBinding) {
-                    ForEach(sortedTranscriptionLanguages) { language in
+                    ForEach(VoiceInkLanguageCatalog.sortedOptions(settings.availableTranscriptionLanguages)) { language in
                         Text(language.name).tag(language.code)
                     }
                 }
@@ -204,10 +204,6 @@ struct SettingsView: View {
                 dismissButton: .cancel(Text(alert.primaryButtonTitle))
             )
         }
-    }
-
-    private var sortedTranscriptionLanguages: [VoiceInkLanguageOption] {
-        VoiceInkLanguageCatalog.sortedOptions(settings.availableTranscriptionLanguages)
     }
 
     private var selectedLanguageBinding: Binding<String> {

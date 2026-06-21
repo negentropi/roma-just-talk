@@ -1676,6 +1676,56 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(plan.middleClickActivationDelay, 350)
     }
 
+    func testShortcutBackupPolicyExportsGeneralShortcutsInStableOrder() {
+        XCTAssertEqual(
+            VoiceInkShortcutBackupPolicy.generalBackupShortcutExportPlan(
+                availableActionIdentifiers: [
+                    .toggleEnhancement,
+                    .miniRecorderEscape,
+                    .primaryRecording,
+                    .retryLastTranscription,
+                    .quickAddToDictionary
+                ]
+            ),
+            [
+                .primaryRecording,
+                .retryLastTranscription,
+                .quickAddToDictionary,
+                .toggleEnhancement
+            ]
+        )
+    }
+
+    func testShortcutBackupPolicyImportsGeneralShortcutsWithRecordingSelections() {
+        XCTAssertEqual(
+            VoiceInkShortcutBackupPolicy.generalBackupShortcutImportPlan(
+                importedActionIdentifiers: [
+                    .secondaryRecording,
+                    .miniRecorderEscape,
+                    .pasteLastTranscription,
+                    .primaryRecording
+                ]
+            ),
+            [
+                VoiceInkShortcutBackupImport(
+                    actionIdentifier: .primaryRecording,
+                    recordingShortcutSlot: .primary,
+                    recordingShortcutSelection: .custom
+                ),
+                VoiceInkShortcutBackupImport(
+                    actionIdentifier: .secondaryRecording,
+                    recordingShortcutSlot: .secondary,
+                    recordingShortcutSelection: .custom
+                ),
+                VoiceInkShortcutBackupImport(
+                    actionIdentifier: .pasteLastTranscription,
+                    recordingShortcutSlot: nil,
+                    recordingShortcutSelection: nil
+                )
+            ]
+        )
+    }
+
     func testSharedPreferenceResetClearsCoreUserSettings() {
         withIsolatedDefaults { defaults in
             let mode = Mode.defaultLocalWhisper()

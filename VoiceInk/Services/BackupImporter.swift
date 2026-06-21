@@ -84,35 +84,10 @@ enum BackupImporter {
             return
         }
 
-        if let shortcut = general.primaryRecordingShortcut {
-            ShortcutStore.setShortcut(shortcut.shortcut, for: .primaryRecording)
-            recordingShortcutManager.primaryRecordingShortcut = .custom
-        }
-        if let shortcut2 = general.secondaryRecordingShortcut {
-            ShortcutStore.setShortcut(shortcut2.shortcut, for: .secondaryRecording)
-            recordingShortcutManager.secondaryRecordingShortcut = .custom
-        }
-        if let pasteShortcut = general.pasteLastTranscriptionShortcut {
-            ShortcutStore.setShortcut(pasteShortcut.shortcut, for: .pasteLastTranscription)
-        }
-        if let pasteEnhancementShortcut = general.pasteLastEnhancementShortcut {
-            ShortcutStore.setShortcut(pasteEnhancementShortcut.shortcut, for: .pasteLastEnhancement)
-        }
-        if let retryShortcut = general.retryLastTranscriptionShortcut {
-            ShortcutStore.setShortcut(retryShortcut.shortcut, for: .retryLastTranscription)
-        }
-        if let cancelShortcut = general.cancelRecorderShortcut {
-            ShortcutStore.setShortcut(cancelShortcut.shortcut, for: .cancelRecorder)
-        }
-        if let historyShortcut = general.openHistoryWindowShortcut {
-            ShortcutStore.setShortcut(historyShortcut.shortcut, for: .openHistoryWindow)
-        }
-        if let dictionaryShortcut = general.quickAddToDictionaryShortcut {
-            ShortcutStore.setShortcut(dictionaryShortcut.shortcut, for: .quickAddToDictionary)
-        }
-        if let enhancementShortcut = general.toggleEnhancementShortcut {
-            ShortcutStore.setShortcut(enhancementShortcut.shortcut, for: .toggleEnhancement)
-        }
+        importShortcutBackups(
+            general.shortcutBackupRecords,
+            recordingShortcutManager: recordingShortcutManager
+        )
 
         let recordingShortcutImportPlan = VoiceInkRecordingShortcutPreference.backupImportPlan(
             from: general.recordingShortcutBackupPreferences
@@ -217,6 +192,40 @@ enum BackupImporter {
         importRollingBufferSettings(general)
 
         print("Successfully imported general settings.")
+    }
+
+    @MainActor
+    private static func importShortcutBackups(
+        _ shortcutBackups: [VoiceInkShortcutActionIdentifier: ShortcutBackup],
+        recordingShortcutManager: RecordingShortcutManager
+    ) {
+        let shortcutImportPlan = VoiceInkShortcutBackupPolicy.generalBackupShortcutImportPlan(
+            importedActionIdentifiers: Set(shortcutBackups.keys)
+        )
+
+        for shortcutImport in shortcutImportPlan {
+            guard let shortcutBackup = shortcutBackups[shortcutImport.actionIdentifier] else {
+                continue
+            }
+
+            ShortcutStore.setShortcut(
+                shortcutBackup.shortcut,
+                for: ShortcutAction(coreIdentifier: shortcutImport.actionIdentifier)
+            )
+
+            guard let recordingShortcutSelection = shortcutImport.recordingShortcutSelection else {
+                continue
+            }
+
+            switch shortcutImport.recordingShortcutSlot {
+            case .some(.primary):
+                recordingShortcutManager.primaryRecordingShortcut = recordingShortcutSelection
+            case .some(.secondary):
+                recordingShortcutManager.secondaryRecordingShortcut = recordingShortcutSelection
+            case .none:
+                break
+            }
+        }
     }
 
     private static func importRollingBufferSettings(_ general: GeneralBackup) {

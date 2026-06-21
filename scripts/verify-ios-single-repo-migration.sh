@@ -6816,6 +6816,21 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
+  "shared shortcut backup action import plan lives in VoiceInkCore" \
+  'VoiceInkShortcutBackupImport' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared shortcut backup policy owns general backup action order" \
+  'VoiceInkShortcutBackupPolicy|generalBackupShortcutActionIdentifiers|generalBackupShortcutExportPlan|generalBackupShortcutImportPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared shortcut backup policy marks imported recording shortcuts custom" \
+  'recordingShortcutSelection: slot == nil \? nil : \.custom' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
   "shared recording shortcut preference exports backup values" \
   'backupPreferences' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
@@ -6921,13 +6936,28 @@ require_pattern \
   VoiceInk/Services/BackupTypes.swift
 
 require_pattern \
+  "macOS general backup adapts shortcut backup records for shared policy" \
+  'shortcutBackupRecords' \
+  VoiceInk/Services/BackupTypes.swift
+
+require_pattern \
   "macOS backup import uses shared recording shortcut backup import plan" \
   'VoiceInkRecordingShortcutPreference\.backupImportPlan' \
   VoiceInk/Services/BackupImporter.swift
 
 require_pattern \
+  "macOS backup import uses shared shortcut backup import plan" \
+  'VoiceInkShortcutBackupPolicy\.generalBackupShortcutImportPlan' \
+  VoiceInk/Services/BackupImporter.swift
+
+require_pattern \
   "macOS backup export uses shared recording shortcut backup preferences" \
   'VoiceInkRecordingShortcutPreference\.backupPreferences' \
+  VoiceInk/Services/ImportExportService.swift
+
+require_pattern \
+  "macOS backup export uses shared shortcut backup export plan" \
+  'VoiceInkShortcutBackupPolicy\.generalBackupShortcutExportPlan' \
   VoiceInk/Services/ImportExportService.swift
 
 reject_pattern \
@@ -6949,8 +6979,18 @@ reject_pattern \
   VoiceInk/Services/BackupImporter.swift
 
 reject_pattern \
+  "macOS backup import avoids shell-owned general shortcut backup sequence" \
+  'general\.(primaryRecordingShortcut|secondaryRecordingShortcut|pasteLastTranscriptionShortcut|pasteLastEnhancementShortcut|retryLastTranscriptionShortcut|cancelRecorderShortcut|openHistoryWindowShortcut|quickAddToDictionaryShortcut|toggleEnhancementShortcut)' \
+  VoiceInk/Services/BackupImporter.swift
+
+reject_pattern \
   "macOS backup export avoids shell-only recording shortcut raw emission" \
   'recordingShortcutManager\.(primaryRecordingShortcut|secondaryRecordingShortcut|primaryRecordingShortcutMode|secondaryRecordingShortcutMode)\.rawValue' \
+  VoiceInk/Services/ImportExportService.swift
+
+reject_pattern \
+  "macOS backup export avoids shell-owned general shortcut backup sequence" \
+  'ShortcutStore\.shortcut\(for: \.(primaryRecording|secondaryRecording|pasteLastTranscription|pasteLastEnhancement|retryLastTranscription|cancelRecorder|openHistoryWindow|quickAddToDictionary|toggleEnhancement)\)' \
   VoiceInk/Services/ImportExportService.swift
 
 require_pattern \
@@ -6961,6 +7001,16 @@ require_pattern \
 require_pattern \
   "core checks execute recording shortcut backup import policy tests" \
   'UserDefaultsPreferencesTests\.testRecordingShortcutPreferenceBackupImportPlanSkipsInvalidRawValues' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute shortcut backup export policy tests" \
+  'UserDefaultsPreferencesTests\.testShortcutBackupPolicyExportsGeneralShortcutsInStableOrder' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute shortcut backup import policy tests" \
+  'UserDefaultsPreferencesTests\.testShortcutBackupPolicyImportsGeneralShortcutsWithRecordingSelections' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -6980,7 +7030,7 @@ require_pattern \
 
 require_pattern \
   "migration checklist tracks shared recording shortcut preference gate" \
-  'macOS recording shortcut action identifiers, selection/mode migration plans, legacy shortcut key names, raw shortcut storage, middle-click, special empty-tap preferences, settings labels/help, and backup import/export value planning route through `VoiceInkShortcutActionIdentifier`/`VoiceInkLegacyRecordingShortcutPreset`/`VoiceInkRecordingShortcutSelection`/`VoiceInkRecordingShortcutMode`/`VoiceInkRecordingShortcutPreference`/`VoiceInkShortcutStoragePreference`' \
+  'macOS recording shortcut action identifiers, selection/mode migration plans, legacy shortcut key names, raw shortcut storage, middle-click, special empty-tap preferences, settings labels/help, backup import/export value planning, general-backup shortcut action ordering, and recording-shortcut selection repair when importing backed-up shortcut records route through `VoiceInkShortcutActionIdentifier`/`VoiceInkLegacyRecordingShortcutPreset`/`VoiceInkRecordingShortcutSelection`/`VoiceInkRecordingShortcutMode`/`VoiceInkRecordingShortcutPreference`/`VoiceInkShortcutStoragePreference`/`VoiceInkShortcutBackupPolicy`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

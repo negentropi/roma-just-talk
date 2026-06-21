@@ -187,16 +187,29 @@ class ImportExportService {
             isMenuBarOnly: menuBarManager.isMenuBarOnly,
             recorderType: recorderUIManager.recorderType
         )
+        let shortcutBackupCandidates = VoiceInkShortcutBackupPolicy
+            .generalBackupShortcutActionIdentifiers
+            .reduce(into: [VoiceInkShortcutActionIdentifier: ShortcutBackup]()) { records, actionIdentifier in
+                guard let shortcut = ShortcutStore.shortcut(for: ShortcutAction(coreIdentifier: actionIdentifier)) else {
+                    return
+                }
+                records[actionIdentifier] = ShortcutBackup(shortcut)
+            }
+        let shortcutBackupRecords = VoiceInkShortcutBackupPolicy.generalBackupShortcutExportPlan(
+            availableActionIdentifiers: Set(shortcutBackupCandidates.keys)
+        ).reduce(into: [VoiceInkShortcutActionIdentifier: ShortcutBackup]()) { records, actionIdentifier in
+            records[actionIdentifier] = shortcutBackupCandidates[actionIdentifier]
+        }
         let generalSettingsToExport = GeneralBackup(
-            primaryRecordingShortcut: ShortcutStore.shortcut(for: .primaryRecording).map(ShortcutBackup.init),
-            secondaryRecordingShortcut: ShortcutStore.shortcut(for: .secondaryRecording).map(ShortcutBackup.init),
-            pasteLastTranscriptionShortcut: ShortcutStore.shortcut(for: .pasteLastTranscription).map(ShortcutBackup.init),
-            pasteLastEnhancementShortcut: ShortcutStore.shortcut(for: .pasteLastEnhancement).map(ShortcutBackup.init),
-            retryLastTranscriptionShortcut: ShortcutStore.shortcut(for: .retryLastTranscription).map(ShortcutBackup.init),
-            cancelRecorderShortcut: ShortcutStore.shortcut(for: .cancelRecorder).map(ShortcutBackup.init),
-            openHistoryWindowShortcut: ShortcutStore.shortcut(for: .openHistoryWindow).map(ShortcutBackup.init),
-            quickAddToDictionaryShortcut: ShortcutStore.shortcut(for: .quickAddToDictionary).map(ShortcutBackup.init),
-            toggleEnhancementShortcut: ShortcutStore.shortcut(for: .toggleEnhancement).map(ShortcutBackup.init),
+            primaryRecordingShortcut: shortcutBackupRecords[.primaryRecording],
+            secondaryRecordingShortcut: shortcutBackupRecords[.secondaryRecording],
+            pasteLastTranscriptionShortcut: shortcutBackupRecords[.pasteLastTranscription],
+            pasteLastEnhancementShortcut: shortcutBackupRecords[.pasteLastEnhancement],
+            retryLastTranscriptionShortcut: shortcutBackupRecords[.retryLastTranscription],
+            cancelRecorderShortcut: shortcutBackupRecords[.cancelRecorder],
+            openHistoryWindowShortcut: shortcutBackupRecords[.openHistoryWindow],
+            quickAddToDictionaryShortcut: shortcutBackupRecords[.quickAddToDictionary],
+            toggleEnhancementShortcut: shortcutBackupRecords[.toggleEnhancement],
             primaryRecordingShortcutRawValue: recordingShortcutBackupPreferences.primaryRecordingShortcutRawValue,
             secondaryRecordingShortcutRawValue: recordingShortcutBackupPreferences.secondaryRecordingShortcutRawValue,
             primaryRecordingShortcutModeRawValue: recordingShortcutBackupPreferences.primaryRecordingShortcutModeRawValue,

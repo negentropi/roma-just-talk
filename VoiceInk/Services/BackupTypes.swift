@@ -84,6 +84,20 @@ struct GeneralBackup: Codable {
 }
 
 extension GeneralBackup {
+    var shortcutBackupRecords: [VoiceInkShortcutActionIdentifier: ShortcutBackup] {
+        var records: [VoiceInkShortcutActionIdentifier: ShortcutBackup] = [:]
+        records[.primaryRecording] = primaryRecordingShortcut
+        records[.secondaryRecording] = secondaryRecordingShortcut
+        records[.pasteLastTranscription] = pasteLastTranscriptionShortcut
+        records[.pasteLastEnhancement] = pasteLastEnhancementShortcut
+        records[.retryLastTranscription] = retryLastTranscriptionShortcut
+        records[.cancelRecorder] = cancelRecorderShortcut
+        records[.openHistoryWindow] = openHistoryWindowShortcut
+        records[.quickAddToDictionary] = quickAddToDictionaryShortcut
+        records[.toggleEnhancement] = toggleEnhancementShortcut
+        return records
+    }
+
     var recordingShortcutBackupPreferences: VoiceInkRecordingShortcutBackupPreferences {
         VoiceInkRecordingShortcutBackupPreferences(
             primaryRecordingShortcutRawValue: primaryRecordingShortcutRawValue,

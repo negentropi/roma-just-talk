@@ -1387,6 +1387,59 @@ public struct VoiceInkRecordingShortcutBackupImportPlan: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkShortcutBackupImport: Equatable, Sendable {
+    public let actionIdentifier: VoiceInkShortcutActionIdentifier
+    public let recordingShortcutSlot: VoiceInkRecordingShortcutSlot?
+    public let recordingShortcutSelection: VoiceInkRecordingShortcutSelection?
+
+    public init(
+        actionIdentifier: VoiceInkShortcutActionIdentifier,
+        recordingShortcutSlot: VoiceInkRecordingShortcutSlot?,
+        recordingShortcutSelection: VoiceInkRecordingShortcutSelection?
+    ) {
+        self.actionIdentifier = actionIdentifier
+        self.recordingShortcutSlot = recordingShortcutSlot
+        self.recordingShortcutSelection = recordingShortcutSelection
+    }
+}
+
+public enum VoiceInkShortcutBackupPolicy {
+    public static let generalBackupShortcutActionIdentifiers: [VoiceInkShortcutActionIdentifier] = [
+        .primaryRecording,
+        .secondaryRecording,
+        .pasteLastTranscription,
+        .pasteLastEnhancement,
+        .retryLastTranscription,
+        .cancelRecorder,
+        .openHistoryWindow,
+        .quickAddToDictionary,
+        .toggleEnhancement
+    ]
+
+    public static func generalBackupShortcutExportPlan(
+        availableActionIdentifiers: Set<VoiceInkShortcutActionIdentifier>
+    ) -> [VoiceInkShortcutActionIdentifier] {
+        generalBackupShortcutActionIdentifiers.filter(availableActionIdentifiers.contains)
+    }
+
+    public static func generalBackupShortcutImportPlan(
+        importedActionIdentifiers: Set<VoiceInkShortcutActionIdentifier>
+    ) -> [VoiceInkShortcutBackupImport] {
+        generalBackupShortcutActionIdentifiers.compactMap { actionIdentifier in
+            guard importedActionIdentifiers.contains(actionIdentifier) else {
+                return nil
+            }
+
+            let slot = actionIdentifier.recordingShortcutSlot
+            return VoiceInkShortcutBackupImport(
+                actionIdentifier: actionIdentifier,
+                recordingShortcutSlot: slot,
+                recordingShortcutSelection: slot == nil ? nil : .custom
+            )
+        }
+    }
+}
+
 public struct VoiceInkShortcutStorageState: Equatable, Sendable {
     public let shortcutData: Data?
     public let clearedValue: Bool?

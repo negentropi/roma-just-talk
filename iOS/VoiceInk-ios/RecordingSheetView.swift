@@ -68,11 +68,9 @@ struct VoiceInkModeSelectionControlView: View {
     @Binding var selectedModeId: UUID?
     var showsTitle = false
 
-    private var presentation: VoiceInkModeSelectionPresentation {
-        modes.modeSelectionPresentation
-    }
-
     var body: some View {
+        let presentation = modes.modeSelectionPresentation
+
         switch presentation {
         case .hidden:
             EmptyView()
@@ -84,13 +82,13 @@ struct VoiceInkModeSelectionControlView: View {
                         .foregroundStyle(.secondary)
                 }
 
-                selectionControl
+                selectionControl(for: presentation)
             }
         }
     }
 
     @ViewBuilder
-    private var selectionControl: some View {
+    private func selectionControl(for presentation: VoiceInkModeSelectionPresentation) -> some View {
         switch presentation {
         case .hidden:
             EmptyView()

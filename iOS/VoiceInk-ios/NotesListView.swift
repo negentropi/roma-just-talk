@@ -95,7 +95,7 @@ struct NotesListView: View {
     }
 
     private var sectionHeader: some View {
-        let summaryPresentation = noteListSummaryPresentation
+        let summaryPresentation = VoiceInkNoteListSummaryPresentation.make(from: filteredNotes)
 
         HStack {
             VStack(alignment: .leading, spacing: 2) {
@@ -116,10 +116,6 @@ struct NotesListView: View {
                 .font(.caption)
                 .foregroundStyle(.tertiary)
         }
-    }
-
-    private var noteListSummaryPresentation: VoiceInkNoteListSummaryPresentation {
-        VoiceInkNoteListSummaryPresentation.make(from: filteredNotes)
     }
 
     private var emptyState: some View {

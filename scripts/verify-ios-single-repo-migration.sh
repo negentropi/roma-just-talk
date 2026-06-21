@@ -780,6 +780,11 @@ require_pattern \
   'modeSelectionPresentation' \
   iOS/VoiceInk-ios/RecordingSheetView.swift
 
+reject_pattern \
+  "iOS mode selection adapter avoids shallow presentation wrapper" \
+  'private var +presentation\b' \
+  iOS/VoiceInk-ios/RecordingSheetView.swift
+
 require_pattern \
   "iOS settings mode rows use shared summary presentation" \
   'summaryPresentation' \
@@ -7671,6 +7676,11 @@ require_pattern \
 require_pattern \
   "iOS note-list uses shared summary presentation" \
   'VoiceInkNoteListSummaryPresentation\.make|summaryPresentation\.countText' \
+  iOS/VoiceInk-ios/NotesListView.swift
+
+reject_pattern \
+  "iOS note-list avoids shallow summary presentation wrapper" \
+  'private var +noteListSummaryPresentation\b' \
   iOS/VoiceInk-ios/NotesListView.swift
 
 require_pattern \

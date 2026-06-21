@@ -2214,6 +2214,16 @@ reject_pattern \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 require_pattern \
+  "iOS API-key view delegates verification persistence to settings adapter" \
+  'settings\.applyAPIKeyVerificationPlan\(plan, for: provider\)' \
+  iOS/VoiceInk-ios/ProviderAPIKeyView.swift
+
+reject_pattern \
+  "iOS API-key view avoids shell-owned verification persistence sequencing" \
+  'plan\.shouldMarkKeyVerified|plan\.keyToSave|settings\.setKeyVerified\(true' \
+  iOS/VoiceInk-ios/ProviderAPIKeyView.swift
+
+require_pattern \
   "shared provider API-key verification progress presentation lives in VoiceInkCore" \
   'VoiceInkProviderAPIKeyVerificationProgress|macOSVerifyButtonTitle|iOSResultFeedback|effectiveSystemImageName' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
@@ -2311,7 +2321,7 @@ require_pattern \
 
 require_pattern \
   "iOS app settings applies shared provider API-key mutation plans" \
-  'applyStoredAPIKey|applyVerification|shouldPersistStoredKey|verificationFlagToPersist|shouldPersistVerificationFlag' \
+  'applyStoredAPIKey|applyVerification|applyAPIKeyVerificationPlan|shouldPersistStoredKey|verificationFlagToPersist|shouldPersistVerificationFlag' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \

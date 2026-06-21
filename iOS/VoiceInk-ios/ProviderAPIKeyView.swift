@@ -110,12 +110,7 @@ struct ProviderAPIKeyView: View {
             let plan = startPlan.draft.verificationApplicationPlan(for: result)
             
             apiKeyFormState = apiKeyFormState.applyingVerificationPlan(plan)
-            if plan.shouldMarkKeyVerified {
-                if let keyToSave = plan.keyToSave {
-                    settings.setAPIKey(keyToSave, for: provider)
-                }
-                settings.setKeyVerified(true, for: provider)
-            }
+            settings.applyAPIKeyVerificationPlan(plan, for: provider)
         }
     }
 

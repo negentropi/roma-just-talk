@@ -148,6 +148,18 @@ final class AppSettings: ObservableObject {
         VoiceInkProviderAPIKeyVerificationState.setVerified(verified, for: provider)
     }
 
+    func applyAPIKeyVerificationPlan(
+        _ plan: VoiceInkProviderAPIKeyVerificationApplicationPlan,
+        for provider: VoiceInkProviderKind
+    ) {
+        guard plan.shouldMarkKeyVerified else { return }
+
+        if let keyToSave = plan.keyToSave {
+            setAPIKey(keyToSave, for: provider)
+        }
+
+        setKeyVerified(true, for: provider)
+    }
 
     // MARK: - Modes Management
     

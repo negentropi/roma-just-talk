@@ -1017,7 +1017,7 @@ require_pattern \
 
 require_pattern \
   "shared mode settings repair plan lives in VoiceInkCore" \
-  'VoiceInkModeSettingsPolicy|VoiceInkModeSettingsRepairPlan|selectedTranscriptionLanguage' \
+  'VoiceInkModeSettingsPolicy|VoiceInkModeSettingsRepairPlan|shouldApplySelectedModeId|shouldApplySelectedTranscriptionLanguage' \
   VoiceInkCore/Sources/VoiceInkCore/Mode.swift
 
 require_pattern \
@@ -1057,12 +1057,12 @@ require_pattern \
 
 require_pattern \
   "iOS AppSettings delegates mode selection and language repair to shared core" \
-  'VoiceInkModeSettingsPolicy\.repairPlan|VoiceInkModeSettingsRepairPlan|applyModeSettingsRepairPlan' \
+  'VoiceInkModeSettingsPolicy\.repairPlan|VoiceInkModeSettingsRepairPlan|shouldApplySelectedModeId|shouldApplySelectedTranscriptionLanguage' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \
   "iOS AppSettings avoids shell-owned mode selection and language repair sequencing" \
-  'repairedSelectedModeId|repairedSelectedTranscriptionLanguage|VoiceInkModeListPolicy\.defaultModeRepairPlan' \
+  'repairedSelectedModeId|repairedSelectedTranscriptionLanguage|VoiceInkModeListPolicy\.defaultModeRepairPlan|selectedModeId != plan\.selectedModeId|selectedTranscriptionLanguage != plan\.selectedTranscriptionLanguage' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \

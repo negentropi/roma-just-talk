@@ -287,11 +287,11 @@ final class AppSettings: ObservableObject {
             modes = plan.modes
         }
 
-        if selectedModeId != plan.selectedModeId {
+        if plan.shouldApplySelectedModeId(from: selectedModeId) {
             selectedModeId = plan.selectedModeId
         }
 
-        if selectedTranscriptionLanguage != plan.selectedTranscriptionLanguage {
+        if plan.shouldApplySelectedTranscriptionLanguage(from: selectedTranscriptionLanguage) {
             selectedTranscriptionLanguage = plan.selectedTranscriptionLanguage
         }
     }

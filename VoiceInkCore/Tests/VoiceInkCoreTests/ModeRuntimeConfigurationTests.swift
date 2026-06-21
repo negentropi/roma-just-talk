@@ -105,10 +105,11 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
     func testModeSettingsPolicyRepairsSelectionBeforeLanguageCompatibility() {
         let localMode = Mode.defaultLocalWhisper(name: "Local")
         let cloudMode = Mode(name: "xAI", transcriptionProvider: .xai)
+        let staleModeId = UUID()
 
         let plan = VoiceInkModeSettingsPolicy.repairPlan(
             modes: [localMode, cloudMode],
-            selectedModeId: UUID(),
+            selectedModeId: staleModeId,
             selectedTranscriptionLanguage: "zh"
         )
 
@@ -116,6 +117,8 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
         XCTAssertEqual(plan.modes.map(\.id), [localMode.id, cloudMode.id])
         XCTAssertEqual(plan.selectedModeId, localMode.id)
         XCTAssertEqual(plan.selectedTranscriptionLanguage, "zh")
+        XCTAssertTrue(plan.shouldApplySelectedModeId(from: staleModeId))
+        XCTAssertFalse(plan.shouldApplySelectedTranscriptionLanguage(from: "zh"))
     }
 
     func testModeSettingsPolicyRepairsLanguageForActiveMode() {
@@ -131,6 +134,8 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
         XCTAssertFalse(plan.shouldReplaceModes)
         XCTAssertEqual(plan.selectedModeId, cloudMode.id)
         XCTAssertEqual(plan.selectedTranscriptionLanguage, VoiceInkLanguageCatalog.autoDetectCode)
+        XCTAssertFalse(plan.shouldApplySelectedModeId(from: cloudMode.id))
+        XCTAssertTrue(plan.shouldApplySelectedTranscriptionLanguage(from: "zh"))
     }
 
     func testModeSettingsPolicySeedsDefaultModeAndRepairsLanguage() {
@@ -145,6 +150,8 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
         XCTAssertEqual(plan.modes.first?.id, plan.selectedModeId)
         XCTAssertEqual(plan.modes.first?.transcriptionProvider, .localWhisper)
         XCTAssertEqual(plan.selectedTranscriptionLanguage, VoiceInkLanguageCatalog.autoDetectCode)
+        XCTAssertTrue(plan.shouldApplySelectedModeId(from: nil))
+        XCTAssertTrue(plan.shouldApplySelectedTranscriptionLanguage(from: "not-a-language"))
     }
 
     func testUnsupportedTranscriptionProviderDoesNotReceiveFakeFallbackModel() {

@@ -120,6 +120,14 @@ public struct VoiceInkModeSettingsRepairPlan {
         self.selectedTranscriptionLanguage = selectedTranscriptionLanguage
         self.shouldReplaceModes = shouldReplaceModes
     }
+
+    public func shouldApplySelectedModeId(from currentSelectedModeId: UUID?) -> Bool {
+        currentSelectedModeId != selectedModeId
+    }
+
+    public func shouldApplySelectedTranscriptionLanguage(from currentLanguage: String) -> Bool {
+        currentLanguage != selectedTranscriptionLanguage
+    }
 }
 
 public enum VoiceInkModeListPolicy {

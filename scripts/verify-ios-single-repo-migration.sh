@@ -6155,6 +6155,33 @@ require_pattern \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
 require_pattern \
+  "shared AI enhancement model-selection plan lives in VoiceInkCore" \
+  'VoiceInkAIEnhancementModelSelectionPlan|ollamaModelToApply|selectedModelToSave' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+require_pattern \
+  "shared AI enhancement model-selection persistence application lives in VoiceInkCore" \
+  'applyModelSelectionPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "core tests pin shared AI enhancement model-selection planning" \
+  'testMacOSAIEnhancementModelSelectionPlanIsShared|testAIEnhancementProviderPreferenceAppliesModelSelectionPlan' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AIProviderCatalogTests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/UserDefaultsPreferencesTests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "macOS AI service selected-model mutation uses shared plan" \
+  'VoiceInkAIEnhancementModelSelectionPlan\.selecting|applyTextEnhancementModelSelectionPlan|VoiceInkAIEnhancementProviderPreference\.applyModelSelectionPlan|ollamaModelToApply' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+require_pattern \
+  "migration checklist tracks shared AI enhancement model-selection planning" \
+  'selected-model mutation planning.*VoiceInkAIEnhancementModelSelectionPlan' \
+  docs/ios-single-repo-migration.md
+
+require_pattern \
   "shared AI enhancement refresh model-selection policy lives in VoiceInkCore" \
   'VoiceInkAIEnhancementModelRefreshPlan|textEnhancementModelToSelectAfterRefresh' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
@@ -6275,6 +6302,11 @@ reject_pattern \
 reject_pattern \
   "macOS AI service avoids duplicate dynamic-provider classification policy" \
   'selectedProvider == \.(ollama|localCLI)' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+reject_pattern \
+  "macOS AI service avoids shell-owned selected-model mutation policy" \
+  'selectedModels\[selectedProvider\] = model|VoiceInkAIEnhancementProviderPreference\.saveSelectedModel\(|updateSelectedOllamaModel\(model\)' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 reject_pattern \

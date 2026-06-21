@@ -730,6 +730,15 @@ public enum VoiceInkAIEnhancementProviderPreference {
     }
 
     @discardableResult
+    public static func applyModelSelectionPlan(
+        _ plan: VoiceInkAIEnhancementModelSelectionPlan,
+        to defaults: UserDefaults = .standard
+    ) -> String {
+        saveSelectedModel(plan.selectedModelToSave, for: plan.provider, to: defaults)
+        return plan.selectedModelToSave
+    }
+
+    @discardableResult
     public static func applyModelRefreshPlan(
         _ plan: VoiceInkAIEnhancementModelRefreshPlan,
         for provider: VoiceInkAIEnhancementProviderKind,

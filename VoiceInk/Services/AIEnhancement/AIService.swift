@@ -101,19 +101,25 @@ class AIService: ObservableObject {
     }
 
     func selectModel(_ model: String) {
-        guard !model.isEmpty else { return }
-        
-        selectedModels[selectedProvider] = model
-        VoiceInkAIEnhancementProviderPreference.saveSelectedModel(
+        guard let plan = VoiceInkAIEnhancementModelSelectionPlan.selecting(
             model,
-            for: selectedProvider,
-            to: userDefaults
-        )
-        
-        if selectedProvider.textEnhancementModelCatalogSource == .ollamaRuntime {
-            updateSelectedOllamaModel(model)
+            provider: selectedProvider,
+            selectedModels: selectedModels
+        ) else {
+            return
         }
-        
+
+        applyTextEnhancementModelSelectionPlan(plan)
+    }
+
+    private func applyTextEnhancementModelSelectionPlan(_ plan: VoiceInkAIEnhancementModelSelectionPlan) {
+        selectedModels = plan.selectedModels
+        VoiceInkAIEnhancementProviderPreference.applyModelSelectionPlan(plan, to: userDefaults)
+
+        if let ollamaModelToApply = plan.ollamaModelToApply {
+            updateSelectedOllamaModel(ollamaModelToApply)
+        }
+
         objectWillChange.send()
         NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
     }

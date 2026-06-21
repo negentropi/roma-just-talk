@@ -616,6 +616,48 @@ final class AIProviderCatalogTests: XCTestCase {
         )
     }
 
+    func testMacOSAIEnhancementModelSelectionPlanIsShared() throws {
+        let initialModels: [VoiceInkAIEnhancementProviderKind: String] = [
+            .groq: "old-groq-model",
+            .openAI: "gpt-5.4"
+        ]
+
+        let groqPlan = try XCTUnwrap(
+            VoiceInkAIEnhancementModelSelectionPlan.selecting(
+                "openai/gpt-oss-120b",
+                provider: .groq,
+                selectedModels: initialModels
+            )
+        )
+
+        XCTAssertEqual(groqPlan.provider, .groq)
+        XCTAssertEqual(groqPlan.selectedModelToSave, "openai/gpt-oss-120b")
+        XCTAssertNil(groqPlan.ollamaModelToApply)
+        XCTAssertEqual(groqPlan.selectedModels[.groq], "openai/gpt-oss-120b")
+        XCTAssertEqual(groqPlan.selectedModels[.openAI], "gpt-5.4")
+
+        let ollamaPlan = try XCTUnwrap(
+            VoiceInkAIEnhancementModelSelectionPlan.selecting(
+                "llama3",
+                provider: .ollama,
+                selectedModels: initialModels
+            )
+        )
+
+        XCTAssertEqual(ollamaPlan.provider, .ollama)
+        XCTAssertEqual(ollamaPlan.selectedModelToSave, "llama3")
+        XCTAssertEqual(ollamaPlan.ollamaModelToApply, "llama3")
+        XCTAssertEqual(ollamaPlan.selectedModels[.ollama], "llama3")
+
+        XCTAssertNil(
+            VoiceInkAIEnhancementModelSelectionPlan.selecting(
+                "",
+                provider: .groq,
+                selectedModels: initialModels
+            )
+        )
+    }
+
     func testMacOSAIEnhancementDefaultTextEnhancementModelsAreShared() {
         withIsolatedDefaults { defaults in
             XCTAssertEqual(

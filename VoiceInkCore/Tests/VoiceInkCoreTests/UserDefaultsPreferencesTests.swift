@@ -820,6 +820,29 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testAIEnhancementProviderPreferenceAppliesModelSelectionPlan() throws {
+        let plan = try XCTUnwrap(
+            VoiceInkAIEnhancementModelSelectionPlan.selecting(
+                "openai/gpt-oss-120b",
+                provider: .groq,
+                selectedModels: [:]
+            )
+        )
+
+        withIsolatedDefaults { defaults in
+            let appliedModel = VoiceInkAIEnhancementProviderPreference.applyModelSelectionPlan(
+                plan,
+                to: defaults
+            )
+
+            XCTAssertEqual(appliedModel, "openai/gpt-oss-120b")
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderPreference.selectedModel(for: "Groq", from: defaults),
+                "openai/gpt-oss-120b"
+            )
+        }
+    }
+
     func testAIEnhancementProviderPreferenceAppliesModelRefreshPlan() {
         withIsolatedDefaults { defaults in
             let appliedModel = VoiceInkAIEnhancementProviderPreference.applyModelRefreshPlan(

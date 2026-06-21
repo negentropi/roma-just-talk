@@ -59,6 +59,43 @@ public struct VoiceInkAIEnhancementModelRefreshPlan: Sendable, Equatable {
     )
 }
 
+public struct VoiceInkAIEnhancementModelSelectionPlan: Sendable, Equatable {
+    public let selectedModels: [VoiceInkAIEnhancementProviderKind: String]
+    public let provider: VoiceInkAIEnhancementProviderKind
+    public let selectedModelToSave: String
+    public let ollamaModelToApply: String?
+
+    public init(
+        selectedModels: [VoiceInkAIEnhancementProviderKind: String],
+        provider: VoiceInkAIEnhancementProviderKind,
+        selectedModelToSave: String,
+        ollamaModelToApply: String?
+    ) {
+        self.selectedModels = selectedModels
+        self.provider = provider
+        self.selectedModelToSave = selectedModelToSave
+        self.ollamaModelToApply = ollamaModelToApply
+    }
+
+    public static func selecting(
+        _ model: String,
+        provider: VoiceInkAIEnhancementProviderKind,
+        selectedModels: [VoiceInkAIEnhancementProviderKind: String]
+    ) -> VoiceInkAIEnhancementModelSelectionPlan? {
+        guard !model.isEmpty else { return nil }
+
+        var updatedSelectedModels = selectedModels
+        updatedSelectedModels[provider] = model
+
+        return VoiceInkAIEnhancementModelSelectionPlan(
+            selectedModels: updatedSelectedModels,
+            provider: provider,
+            selectedModelToSave: model,
+            ollamaModelToApply: provider.textEnhancementModelCatalogSource == .ollamaRuntime ? model : nil
+        )
+    }
+}
+
 public enum VoiceInkAIEnhancementConnectionStatusTone: Sendable, Equatable {
     case connected
     case disconnected

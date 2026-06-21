@@ -287,6 +287,60 @@ final class CustomCloudModelPolicyTests: XCTestCase {
         ).legacyAPIKeyForKeychainMigration, " ")
     }
 
+    func testCustomCloudModelStorageUsesSharedDefaultsKeyAndRoundTripsRecords() throws {
+        let suiteName = "VoiceInkCore.CustomCloudModelPolicyTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let record = VoiceInkCustomCloudModelStoredRecord(
+            id: UUID(uuidString: "E31E4D7A-437B-4BD3-A4B5-9624F38F3BBE")!,
+            name: "custom",
+            displayName: "Custom",
+            description: "Transcribes audio",
+            apiEndpoint: "https://api.example.com/v1/audio/transcriptions",
+            modelName: "whisper-1",
+            isMultilingualModel: true,
+            supportedLanguages: ["en": "English"]
+        )
+
+        XCTAssertEqual(VoiceInkCustomCloudModelStorage.userDefaultsKey, "customCloudModels")
+        let missingRecords: [VoiceInkCustomCloudModelStoredRecord]? = try VoiceInkCustomCloudModelStorage.loadModels(
+            from: defaults
+        )
+        XCTAssertNil(missingRecords)
+
+        try VoiceInkCustomCloudModelStorage.saveModels([record], to: defaults)
+
+        XCTAssertTrue(defaults.data(forKey: VoiceInkCustomCloudModelStorage.userDefaultsKey) != nil)
+        let loadedRecords: [VoiceInkCustomCloudModelStoredRecord]? = try VoiceInkCustomCloudModelStorage.loadModels(
+            from: defaults
+        )
+        XCTAssertEqual(loadedRecords, [record])
+    }
+
+    func testCustomCloudModelStorageCanClearSharedDefaultsKey() throws {
+        let suiteName = "VoiceInkCore.CustomCloudModelPolicyTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        try VoiceInkCustomCloudModelStorage.saveModels([
+            VoiceInkCustomCloudModelStoredRecord(
+                id: UUID(),
+                name: "custom",
+                displayName: "Custom",
+                description: "",
+                apiEndpoint: "",
+                modelName: "",
+                isMultilingualModel: false,
+                supportedLanguages: [:]
+            )
+        ], to: defaults)
+
+        VoiceInkCustomCloudModelStorage.clear(from: defaults)
+
+        XCTAssertNil(defaults.data(forKey: VoiceInkCustomCloudModelStorage.userDefaultsKey))
+    }
+
     func testCustomCloudTranscriptionPolicyPreservesOpenAICompatibleRequestDefaults() {
         let options = VoiceInkCustomCloudTranscriptionPolicy.openAICompatibleOptions
 

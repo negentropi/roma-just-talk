@@ -280,6 +280,34 @@ public struct VoiceInkCustomCloudModelStoredRecord: Codable, Equatable, Sendable
     }
 }
 
+public enum VoiceInkCustomCloudModelStorage {
+    public static let userDefaultsKey = "customCloudModels"
+
+    public static func loadModels<Model: Decodable>(
+        from defaults: UserDefaults = .standard,
+        decoder: JSONDecoder = JSONDecoder()
+    ) throws -> [Model]? {
+        guard let data = defaults.data(forKey: userDefaultsKey) else {
+            return nil
+        }
+
+        return try decoder.decode([Model].self, from: data)
+    }
+
+    public static func saveModels<Model: Encodable>(
+        _ models: [Model],
+        to defaults: UserDefaults = .standard,
+        encoder: JSONEncoder = JSONEncoder()
+    ) throws {
+        let data = try encoder.encode(models)
+        defaults.set(data, forKey: userDefaultsKey)
+    }
+
+    public static func clear(from defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: userDefaultsKey)
+    }
+}
+
 public enum VoiceInkCustomCloudModelPolicy {
     public static func generatedName(fromDisplayName displayName: String) -> String {
         displayName.lowercased().replacingOccurrences(of: " ", with: "-")

@@ -6,8 +6,6 @@ class CustomCloudModelManager: ObservableObject {
     static let shared = CustomCloudModelManager()
     
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "CustomCloudModelManager")
-    private let userDefaults = UserDefaults.standard
-    private let customModelsKey = "customCloudModels"
     
     @Published var customModels: [CustomCloudModel] = []
     
@@ -38,12 +36,9 @@ class CustomCloudModelManager: ObservableObject {
     // MARK: - Persistence
     
     private func loadCustomModels() {
-        guard let data = userDefaults.data(forKey: customModelsKey) else {
-            return
-        }
-        
         do {
-            customModels = try JSONDecoder().decode([CustomCloudModel].self, from: data)
+            let storedModels: [CustomCloudModel]? = try VoiceInkCustomCloudModelStorage.loadModels()
+            customModels = storedModels ?? []
         } catch {
             logger.error("Failed to decode custom models: \(error.localizedDescription, privacy: .public)")
             customModels = []
@@ -52,8 +47,7 @@ class CustomCloudModelManager: ObservableObject {
     
     func saveCustomModels() {
         do {
-            let data = try JSONEncoder().encode(customModels)
-            userDefaults.set(data, forKey: customModelsKey)
+            try VoiceInkCustomCloudModelStorage.saveModels(customModels)
         } catch {
             logger.error("Failed to encode custom models: \(error.localizedDescription, privacy: .public)")
         }

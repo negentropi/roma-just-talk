@@ -2461,6 +2461,56 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
 
 require_pattern \
+  "shared custom cloud model storage owns defaults key and JSON load-save loop" \
+  'VoiceInkCustomCloudModelStorage' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
+
+require_pattern \
+  "shared custom cloud model storage owns raw defaults key" \
+  'userDefaultsKey = "customCloudModels"' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
+
+require_pattern \
+  "shared custom cloud model storage exposes JSON load helper" \
+  'func loadModels' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
+
+require_pattern \
+  "shared custom cloud model storage reads raw defaults data" \
+  'defaults\.data\(forKey: userDefaultsKey\)' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
+
+require_pattern \
+  "shared custom cloud model storage decodes model arrays" \
+  'decoder\.decode\(\[Model\]\.self, from: data\)' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
+
+require_pattern \
+  "shared custom cloud model storage exposes JSON save helper" \
+  'func saveModels' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
+
+require_pattern \
+  "shared custom cloud model storage encodes model arrays" \
+  'encoder\.encode\(models\)' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
+
+require_pattern \
+  "shared custom cloud model storage writes raw defaults data" \
+  'defaults\.set\(data, forKey: userDefaultsKey\)' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
+
+require_pattern \
+  "shared custom cloud model storage exposes clear helper" \
+  'func clear' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
+
+require_pattern \
+  "shared custom cloud model storage clears raw defaults key" \
+  'defaults\.removeObject\(forKey: userDefaultsKey\)' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
+
+require_pattern \
   "shared custom cloud model form presentation owns defaults and copy" \
   'VoiceInkCustomCloudModelFormPresentation|defaultAPIEndpoint|defaultModelName|keychainSaveFailureMessage|submitButtonSystemImageName' \
   VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
@@ -2495,6 +2545,16 @@ require_pattern \
   'CustomCloudModelPolicyTests\.testCustomCloudTranscriptionPolicyPreservesOpenAICompatibleRequestDefaults|CustomCloudModelPolicyTests\.testCustomCloudTranscriptionPolicyClassifiesEndpointTextAndHTTPAPIError' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
+require_pattern \
+  "core checks execute custom cloud model storage round-trip test" \
+  'CustomCloudModelPolicyTests\.testCustomCloudModelStorageUsesSharedDefaultsKeyAndRoundTripsRecords' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute custom cloud model storage clear test" \
+  'CustomCloudModelPolicyTests\.testCustomCloudModelStorageCanClearSharedDefaultsKey' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
 reject_pattern \
   "macOS custom cloud transcription avoids shell-owned request policy" \
   '"CustomWhisperTranscriptionService"|"Invalid API endpoint URL"|responseFormat: "json"|temperature: "0"|allowPlainTextFallback: false|!text\.isEmpty|\(100\.\.\.599\)\.contains\(error\.code\)' \
@@ -2524,6 +2584,21 @@ reject_pattern \
   "macOS custom cloud model Codable avoids shell-owned legacy API-key decode policy" \
   'decodeIfPresent\(String\.self, forKey: \.apiKey\)|case +apiKey' \
   VoiceInk/Models/TranscriptionModel.swift
+
+require_pattern \
+  "macOS custom cloud model manager uses shared storage load" \
+  'VoiceInkCustomCloudModelStorage\.loadModels' \
+  VoiceInk/Transcription/Cloud/CustomCloudModelManager.swift
+
+require_pattern \
+  "macOS custom cloud model manager uses shared storage save" \
+  'VoiceInkCustomCloudModelStorage\.saveModels' \
+  VoiceInk/Transcription/Cloud/CustomCloudModelManager.swift
+
+reject_pattern \
+  "macOS custom cloud model manager avoids shell-owned defaults key and JSON persistence loop" \
+  'customModelsKey|"customCloudModels"|UserDefaults\.standard|data\(forKey:|set\(data, forKey:|JSONDecoder\(\)\.decode|JSONEncoder\(\)\.encode' \
+  VoiceInk/Transcription/Cloud/CustomCloudModelManager.swift
 
 require_pattern \
   "macOS backup file uses shared custom cloud model backup record" \

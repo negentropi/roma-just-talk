@@ -305,6 +305,13 @@ obsolete_ios_clone_files=(
   VoiceInk-ios/Transcription.swift
 )
 
+in_repo_only_ios_app_files=(
+  ProviderAPIKeyTone+iOS.swift
+  TranscriptStatusTone+iOS.swift
+  Transcription.swift
+  VoiceInkIOSStorageDirectories.swift
+)
+
 section "single-repo layout"
 git_root="$(git rev-parse --show-toplevel)"
 [[ "$git_root" == "$ROOT" ]] || fail "VoiceInk/ must be the git root; got $git_root"
@@ -351,22 +358,35 @@ if [[ -d ../VoiceInk-iOS/VoiceInk-ios ]]; then
   in_repo_ios_files="$(mktemp "${TMPDIR:-/tmp}/voiceink-in-repo-ios.XXXXXX")"
   actual_sibling_extras="$(mktemp "${TMPDIR:-/tmp}/voiceink-actual-sibling-extras.XXXXXX")"
   expected_sibling_extras="$(mktemp "${TMPDIR:-/tmp}/voiceink-expected-sibling-extras.XXXXXX")"
+  actual_in_repo_extras="$(mktemp "${TMPDIR:-/tmp}/voiceink-actual-in-repo-extras.XXXXXX")"
+  expected_in_repo_extras="$(mktemp "${TMPDIR:-/tmp}/voiceink-expected-in-repo-extras.XXXXXX")"
 
   relative_swift_file_list ../VoiceInk-iOS/VoiceInk-ios >"$sibling_ios_files"
   relative_swift_file_list iOS/VoiceInk-ios >"$in_repo_ios_files"
   comm -23 "$sibling_ios_files" "$in_repo_ios_files" >"$actual_sibling_extras"
   printf '%s\n' "${obsolete_ios_clone_files[@]}" | sort >"$expected_sibling_extras"
+  comm -13 "$sibling_ios_files" "$in_repo_ios_files" >"$actual_in_repo_extras"
+  printf '%s\n' "${in_repo_only_ios_app_files[@]}" | sort >"$expected_in_repo_extras"
 
   if ! cmp -s "$actual_sibling_extras" "$expected_sibling_extras"; then
     printf 'Expected sibling-only Swift files:\n' >&2
     cat "$expected_sibling_extras" >&2
     printf 'Actual sibling-only Swift files:\n' >&2
     cat "$actual_sibling_extras" >&2
-    rm -f "$sibling_ios_files" "$in_repo_ios_files" "$actual_sibling_extras" "$expected_sibling_extras"
+    rm -f "$sibling_ios_files" "$in_repo_ios_files" "$actual_sibling_extras" "$expected_sibling_extras" "$actual_in_repo_extras" "$expected_in_repo_extras"
     fail "sibling iOS clone has undocumented Swift extras"
   fi
 
-  rm -f "$sibling_ios_files" "$in_repo_ios_files" "$actual_sibling_extras" "$expected_sibling_extras"
+  if ! cmp -s "$actual_in_repo_extras" "$expected_in_repo_extras"; then
+    printf 'Expected in-repo-only iOS app Swift files:\n' >&2
+    cat "$expected_in_repo_extras" >&2
+    printf 'Actual in-repo-only iOS app Swift files:\n' >&2
+    cat "$actual_in_repo_extras" >&2
+    rm -f "$sibling_ios_files" "$in_repo_ios_files" "$actual_sibling_extras" "$expected_sibling_extras" "$actual_in_repo_extras" "$expected_in_repo_extras"
+    fail "in-repo iOS app has undocumented Swift-only files"
+  fi
+
+  rm -f "$sibling_ios_files" "$in_repo_ios_files" "$actual_sibling_extras" "$expected_sibling_extras" "$actual_in_repo_extras" "$expected_in_repo_extras"
 else
   printf 'No sibling ../VoiceInk-iOS checkout; skipping optional clone-extra audit.\n'
 fi

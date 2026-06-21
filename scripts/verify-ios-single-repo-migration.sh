@@ -285,7 +285,7 @@ reject_pattern \
 
 reject_pattern \
   "iOS App Group keyboard bridge implementation stays out of VoiceInkCore" \
-  '\b(VoiceInkAppGroupRecordingBridge|VoiceInkAppGroupRecordingState|VoiceInkAppDeepLink|AppGroupCoordinator|CFNotificationCenter|DarwinNotify)\b' \
+  '\b(VoiceInkAppGroupRecordingBridge|VoiceInkAppDeepLink|AppGroupCoordinator|CFNotificationCenter|DarwinNotify)\b' \
   VoiceInkCore/Sources/VoiceInkCore \
   VoiceInkCore/Tests/VoiceInkCoreTests
 
@@ -7731,8 +7731,28 @@ require_plist_value \
   iOS/VoiceInkKeyboard/VoiceInkKeyboard.entitlements
 
 require_pattern \
+  "VoiceInkCore owns iOS App Group recording state policy" \
+  'VoiceInkAppGroupRecordingStatePolicy|staleRecordingInterval|UserDefaultsKey' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "VoiceInkCore checks cover iOS App Group recording state policy" \
+  'testAppGroupRecordingStatePolicy(PreservesIOSStorageKeysAndTimeout|KeepsFreshRecordingActive|ClearsStaleRecording|DoesNotClearInactiveRecording)|testAppGroupRecordingStateWritePlansPreserveIOSBridgeWrites' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "iOS App Group bridge uses entitlement group" \
   'static let appGroupIdentifier = VoiceInkAppIdentity\.iOSAppGroupIdentifier' \
+  iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
+
+require_pattern \
+  "iOS App Group bridge adapts shared recording state policy" \
+  'VoiceInkAppGroupRecordingStatePolicy\.(state|recordingStateWritePlan|stopRequestedWritePlan)' \
+  iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
+
+reject_pattern \
+  "iOS App Group bridge avoids shell-owned recording state policy" \
+  'struct VoiceInkAppGroupRecordingState|staleRecordingInterval|enum UserDefaultsKey|static let (isRecording|lastRecordingTimestamp) = "' \
   iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
 
 require_pattern \

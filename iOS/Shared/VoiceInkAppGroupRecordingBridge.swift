@@ -1,19 +1,8 @@
 import Foundation
 import VoiceInkCore
 
-struct VoiceInkAppGroupRecordingState: Equatable {
-    let isRecording: Bool
-    let shouldClearStaleState: Bool
-}
-
 enum VoiceInkAppGroupRecordingBridge {
     static let appGroupIdentifier = VoiceInkAppIdentity.iOSAppGroupIdentifier
-    static let staleRecordingInterval: TimeInterval = 30
-
-    enum UserDefaultsKey {
-        static let isRecording = "isRecording"
-        static let lastRecordingTimestamp = "lastRecordingTimestamp"
-    }
 
     enum NotificationName {
         static let stopRecording = VoiceInkAppIdentity.iOSStopRecordingDarwinNotificationName
@@ -28,7 +17,10 @@ enum VoiceInkAppGroupRecordingBridge {
         in defaults: UserDefaults?,
         now: Date = Date()
     ) {
-        defaults?.set(now.timeIntervalSince1970, forKey: UserDefaultsKey.lastRecordingTimestamp)
+        apply(
+            VoiceInkAppGroupRecordingStatePolicy.stopRequestedWritePlan(now: now),
+            to: defaults
+        )
     }
 
     static func writeRecordingState(
@@ -36,22 +28,44 @@ enum VoiceInkAppGroupRecordingBridge {
         to defaults: UserDefaults?,
         now: Date = Date()
     ) {
-        defaults?.set(isRecording, forKey: UserDefaultsKey.isRecording)
-        defaults?.set(now.timeIntervalSince1970, forKey: UserDefaultsKey.lastRecordingTimestamp)
+        apply(
+            VoiceInkAppGroupRecordingStatePolicy.recordingStateWritePlan(
+                isRecording: isRecording,
+                now: now
+            ),
+            to: defaults
+        )
     }
 
     static func recordingState(
         in defaults: UserDefaults?,
         now: Date = Date()
     ) -> VoiceInkAppGroupRecordingState {
-        let storedState = defaults?.bool(forKey: UserDefaultsKey.isRecording) ?? false
-        let timestamp = defaults?.double(forKey: UserDefaultsKey.lastRecordingTimestamp) ?? 0
+        VoiceInkAppGroupRecordingStatePolicy.state(
+            storedIsRecording: defaults?.bool(
+                forKey: VoiceInkAppGroupRecordingStatePolicy.UserDefaultsKey.isRecording
+            ) ?? false,
+            lastRecordingTimestamp: defaults?.double(
+                forKey: VoiceInkAppGroupRecordingStatePolicy.UserDefaultsKey.lastRecordingTimestamp
+            ) ?? 0,
+            now: now
+        )
+    }
 
-        guard storedState else {
-            return VoiceInkAppGroupRecordingState(isRecording: false, shouldClearStaleState: false)
+    private static func apply(
+        _ plan: VoiceInkAppGroupRecordingStateWritePlan,
+        to defaults: UserDefaults?
+    ) {
+        if let isRecording = plan.isRecording {
+            defaults?.set(
+                isRecording,
+                forKey: VoiceInkAppGroupRecordingStatePolicy.UserDefaultsKey.isRecording
+            )
         }
 
-        let isStale = now.timeIntervalSince1970 - timestamp > staleRecordingInterval
-        return VoiceInkAppGroupRecordingState(isRecording: !isStale, shouldClearStaleState: isStale)
+        defaults?.set(
+            plan.lastRecordingTimestamp,
+            forKey: VoiceInkAppGroupRecordingStatePolicy.UserDefaultsKey.lastRecordingTimestamp
+        )
     }
 }

@@ -71,6 +71,73 @@ public struct VoiceInkRecordingFlowState: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkAppGroupRecordingState: Equatable, Sendable {
+    public let isRecording: Bool
+    public let shouldClearStaleState: Bool
+
+    public init(isRecording: Bool, shouldClearStaleState: Bool) {
+        self.isRecording = isRecording
+        self.shouldClearStaleState = shouldClearStaleState
+    }
+}
+
+public struct VoiceInkAppGroupRecordingStateWritePlan: Equatable, Sendable {
+    public let isRecording: Bool?
+    public let lastRecordingTimestamp: TimeInterval
+
+    public init(isRecording: Bool?, lastRecordingTimestamp: TimeInterval) {
+        self.isRecording = isRecording
+        self.lastRecordingTimestamp = lastRecordingTimestamp
+    }
+}
+
+public enum VoiceInkAppGroupRecordingStatePolicy {
+    public static let staleRecordingInterval: TimeInterval = 30
+
+    public enum UserDefaultsKey {
+        public static let isRecording = "isRecording"
+        public static let lastRecordingTimestamp = "lastRecordingTimestamp"
+    }
+
+    public static func stopRequestedWritePlan(
+        now: Date = Date()
+    ) -> VoiceInkAppGroupRecordingStateWritePlan {
+        VoiceInkAppGroupRecordingStateWritePlan(
+            isRecording: nil,
+            lastRecordingTimestamp: now.timeIntervalSince1970
+        )
+    }
+
+    public static func recordingStateWritePlan(
+        isRecording: Bool,
+        now: Date = Date()
+    ) -> VoiceInkAppGroupRecordingStateWritePlan {
+        VoiceInkAppGroupRecordingStateWritePlan(
+            isRecording: isRecording,
+            lastRecordingTimestamp: now.timeIntervalSince1970
+        )
+    }
+
+    public static func state(
+        storedIsRecording: Bool,
+        lastRecordingTimestamp: TimeInterval,
+        now: Date = Date()
+    ) -> VoiceInkAppGroupRecordingState {
+        guard storedIsRecording else {
+            return VoiceInkAppGroupRecordingState(
+                isRecording: false,
+                shouldClearStaleState: false
+            )
+        }
+
+        let isStale = now.timeIntervalSince1970 - lastRecordingTimestamp > staleRecordingInterval
+        return VoiceInkAppGroupRecordingState(
+            isRecording: !isStale,
+            shouldClearStaleState: isStale
+        )
+    }
+}
+
 public enum VoiceInkRecorderStyle: String, CaseIterable, Identifiable, Sendable {
     case none
     case notch

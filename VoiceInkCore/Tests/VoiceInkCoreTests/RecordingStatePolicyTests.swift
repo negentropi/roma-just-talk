@@ -87,6 +87,74 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertEqual(canceledState.currentDuration, 0)
     }
 
+    func testAppGroupRecordingStatePolicyPreservesIOSStorageKeysAndTimeout() {
+        XCTAssertEqual(VoiceInkAppGroupRecordingStatePolicy.UserDefaultsKey.isRecording, "isRecording")
+        XCTAssertEqual(VoiceInkAppGroupRecordingStatePolicy.UserDefaultsKey.lastRecordingTimestamp, "lastRecordingTimestamp")
+        XCTAssertEqual(VoiceInkAppGroupRecordingStatePolicy.staleRecordingInterval, 30)
+    }
+
+    func testAppGroupRecordingStatePolicyKeepsFreshRecordingActive() {
+        let state = VoiceInkAppGroupRecordingStatePolicy.state(
+            storedIsRecording: true,
+            lastRecordingTimestamp: 100,
+            now: Date(timeIntervalSince1970: 129)
+        )
+
+        XCTAssertEqual(
+            state,
+            VoiceInkAppGroupRecordingState(isRecording: true, shouldClearStaleState: false)
+        )
+    }
+
+    func testAppGroupRecordingStatePolicyClearsStaleRecording() {
+        let state = VoiceInkAppGroupRecordingStatePolicy.state(
+            storedIsRecording: true,
+            lastRecordingTimestamp: 100,
+            now: Date(timeIntervalSince1970: 131)
+        )
+
+        XCTAssertEqual(
+            state,
+            VoiceInkAppGroupRecordingState(isRecording: false, shouldClearStaleState: true)
+        )
+    }
+
+    func testAppGroupRecordingStatePolicyDoesNotClearInactiveRecording() {
+        let state = VoiceInkAppGroupRecordingStatePolicy.state(
+            storedIsRecording: false,
+            lastRecordingTimestamp: 0,
+            now: Date(timeIntervalSince1970: 10_000)
+        )
+
+        XCTAssertEqual(
+            state,
+            VoiceInkAppGroupRecordingState(isRecording: false, shouldClearStaleState: false)
+        )
+    }
+
+    func testAppGroupRecordingStateWritePlansPreserveIOSBridgeWrites() {
+        XCTAssertEqual(
+            VoiceInkAppGroupRecordingStatePolicy.stopRequestedWritePlan(
+                now: Date(timeIntervalSince1970: 42)
+            ),
+            VoiceInkAppGroupRecordingStateWritePlan(
+                isRecording: nil,
+                lastRecordingTimestamp: 42
+            )
+        )
+
+        XCTAssertEqual(
+            VoiceInkAppGroupRecordingStatePolicy.recordingStateWritePlan(
+                isRecording: true,
+                now: Date(timeIntervalSince1970: 43)
+            ),
+            VoiceInkAppGroupRecordingStateWritePlan(
+                isRecording: true,
+                lastRecordingTimestamp: 43
+            )
+        )
+    }
+
     func testRecorderStylePreferencePreservesMacOSStorageAndLabels() {
         XCTAssertEqual(VoiceInkRecorderStylePreference.userDefaultsKey, "RecorderType")
         XCTAssertEqual(VoiceInkRecorderStylePreference.defaultStyle, .none)

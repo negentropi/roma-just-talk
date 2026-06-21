@@ -2671,6 +2671,11 @@ reject_pattern \
   '"(Welcome to VoiceInk|Complete the setup to get started|Set Keyboard Shortcut|Use VoiceInk anywhere with a shortcut\.|Enable Accessibility|Paste transcribed text at your cursor\.|Screen Context \(Optional\)|Use visible text for better transcript enhancement when you choose\.|Download Model|Choose an AI model to start transcribing\.|Configure Shortcut|Get Started|Need help\? Check the Help menu for support options)"|systemName: "(command|hand\.raised\.fill|video\.fill|arrow\.down\.to\.line|checkmark\.circle\.fill|circle|chevron\.right)"' \
   VoiceInk/Views/Metrics/MetricsSetupView.swift
 
+reject_pattern \
+  "macOS metrics setup avoids shallow action-title wrapper" \
+  'private var +actionButtonTitle[[:space:]]*:' \
+  VoiceInk/Views/Metrics/MetricsSetupView.swift
+
 require_pattern \
   "migration checklist tracks shared macOS reset onboarding alert presentation" \
   'macOS reset-onboarding settings alert presentation|VoiceInkMacOSOnboardingPresentation\.resetSettingsAlert' \

@@ -111,7 +111,11 @@ struct MetricsSetupView: View {
     private var actionButton: some View {
         Button(action: handleActionButton) {
             HStack {
-                Text(actionButtonTitle)
+                Text(VoiceInkMacOSSetupPresentation.actionButtonTitle(
+                    isShortcutConfigured: recordingShortcutManager.isShortcutConfigured,
+                    isAccessibilityEnabled: isAccessibilityEnabled,
+                    hasTranscriptionModel: transcriptionModelManager.currentTranscriptionModel != nil
+                ))
                     .fontWeight(.semibold)
                 Image(systemName: VoiceInkMacOSSetupPresentation.actionSystemImageName)
             }
@@ -139,14 +143,6 @@ struct MetricsSetupView: View {
                 }
             }
         }
-    }
-    
-    private var actionButtonTitle: String {
-        VoiceInkMacOSSetupPresentation.actionButtonTitle(
-            isShortcutConfigured: recordingShortcutManager.isShortcutConfigured,
-            isAccessibilityEnabled: isAccessibilityEnabled,
-            hasTranscriptionModel: transcriptionModelManager.currentTranscriptionModel != nil
-        )
     }
     
     private var helpText: some View {

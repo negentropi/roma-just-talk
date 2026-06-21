@@ -8247,13 +8247,28 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
-  "macOS backup importer uses shared Power Mode shortcut import policy" \
-  'VoiceInkPowerModePolicy\.powerModeShortcutImports' \
+  "shared Power Mode backup import plan record lives in VoiceInkCore" \
+  'VoiceInkPowerModeBackupImportPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode backup import plan policy lives in VoiceInkCore" \
+  'powerModeBackupImportPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "macOS backup importer uses shared Power Mode import plan" \
+  'VoiceInkPowerModePolicy\.powerModeBackupImportPlan' \
   VoiceInk/Services/BackupImporter.swift
 
 reject_pattern \
   "macOS backup importer avoids shell-only Power Mode shortcut import filtering" \
   'for +\(idString, +shortcutBackup\) +in +shortcuts|let +importedPowerModeIds|UUID\(uuidString: idString\)|importedPowerModeIds\.contains' \
+  VoiceInk/Services/BackupImporter.swift
+
+reject_pattern \
+  "macOS backup importer avoids shell-owned Power Mode import sequencing" \
+  'for config in powerModeManager\.configurations|powerModeManager\.configurations = backup\.powerModeConfigs|if let customEmojis = backup\.customEmojis|backup\.powerModeConfigs\.count|VoiceInkPowerModePolicy\.powerModeShortcutImports' \
   VoiceInk/Services/BackupImporter.swift
 
 require_pattern \
@@ -8262,8 +8277,18 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
-  "migration checklist tracks shared Power Mode shortcut import policy" \
-  'backup shortcut import key filtering' \
+  "core checks execute Power Mode backup import sequence policy tests" \
+  'PowerModePolicyTests\.testPowerModeBackupImportPlanPreservesMacOSImportSequencingInputs' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute Power Mode backup custom emoji policy tests" \
+  'PowerModePolicyTests\.testPowerModeBackupImportPlanTreatsMissingCustomEmojiRecordsAsNoOps' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "migration checklist tracks shared Power Mode backup import policy" \
+  'Power Mode backup import plan' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

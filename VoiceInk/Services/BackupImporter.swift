@@ -43,32 +43,33 @@ enum BackupImporter {
 
         if categories.contains(.powerMode) {
             let powerModeManager = PowerModeManager.shared
-            for config in powerModeManager.configurations {
-                ShortcutStore.removeShortcutStorage(for: .powerMode(config.id))
+            let importPlan = VoiceInkPowerModePolicy.powerModeBackupImportPlan(
+                existingConfigurations: powerModeManager.configurations,
+                importedConfigurations: backup.powerModeConfigs,
+                backupShortcutKeys: backup.powerModeShortcuts.map { Array($0.keys) } ?? [],
+                customEmojis: backup.customEmojis
+            )
+
+            for id in importPlan.existingConfigurationIdsToClear {
+                ShortcutStore.removeShortcutStorage(for: .powerMode(id))
             }
 
-            powerModeManager.configurations = backup.powerModeConfigs
+            powerModeManager.configurations = importPlan.importedConfigurations
 
-            if let shortcuts = backup.powerModeShortcuts {
-                let shortcutImports = VoiceInkPowerModePolicy.powerModeShortcutImports(
-                    backupKeys: Array(shortcuts.keys),
-                    importedConfigurations: backup.powerModeConfigs
-                )
-                for shortcutImport in shortcutImports {
-                    guard let shortcutBackup = shortcuts[shortcutImport.backupKey] else { continue }
-                    ShortcutStore.setShortcut(shortcutBackup.shortcut, for: .powerMode(shortcutImport.id))
-                }
+            for shortcutImport in importPlan.shortcutImports {
+                guard let shortcutBackup = backup.powerModeShortcuts?[shortcutImport.backupKey] else { continue }
+                ShortcutStore.setShortcut(shortcutBackup.shortcut, for: .powerMode(shortcutImport.id))
             }
 
             powerModeManager.saveConfigurations()
 
-            if let customEmojis = backup.customEmojis {
+            if importPlan.hasCustomEmojiBackupRecord {
                 let emojiManager = EmojiManager.shared
-                for emoji in customEmojis {
+                for emoji in importPlan.customEmojisToImport {
                     _ = emojiManager.addCustomEmoji(emoji)
                 }
             }
-            print("Successfully imported \(backup.powerModeConfigs.count) Power Mode configurations.")
+            print("Successfully imported \(importPlan.importedConfigurationCount) Power Mode configurations.")
         }
 
         if categories.contains(.customModels) {

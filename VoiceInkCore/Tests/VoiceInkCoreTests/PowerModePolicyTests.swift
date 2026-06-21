@@ -1763,6 +1763,62 @@ final class PowerModePolicyTests: XCTestCase {
         )
     }
 
+    func testPowerModeBackupImportPlanPreservesMacOSImportSequencingInputs() {
+        let existingId = UUID(uuidString: "00000000-0000-0000-0000-000000000401")!
+        let secondExistingId = UUID(uuidString: "00000000-0000-0000-0000-000000000402")!
+        let importedId = UUID(uuidString: "00000000-0000-0000-0000-000000000403")!
+        let secondImportedId = UUID(uuidString: "00000000-0000-0000-0000-000000000404")!
+        let unimportedId = UUID(uuidString: "00000000-0000-0000-0000-000000000405")!
+        let importedConfigurations = [
+            config(id: importedId, name: "Imported", emoji: "I"),
+            config(id: secondImportedId, name: "Second", emoji: "S")
+        ]
+
+        let plan = VoiceInkPowerModePolicy.powerModeBackupImportPlan(
+            existingConfigurations: [
+                config(id: existingId, name: "Existing", emoji: "E"),
+                config(id: secondExistingId, name: "Second Existing", emoji: "X")
+            ],
+            importedConfigurations: importedConfigurations,
+            backupShortcutKeys: [
+                importedId.uuidString.lowercased(),
+                "not-a-uuid",
+                unimportedId.uuidString,
+                secondImportedId.uuidString
+            ],
+            customEmojis: ["I", "S"]
+        )
+
+        XCTAssertEqual(plan.existingConfigurationIdsToClear, [existingId, secondExistingId])
+        XCTAssertEqual(plan.importedConfigurations, importedConfigurations)
+        XCTAssertEqual(
+            plan.shortcutImports,
+            [
+                VoiceInkPowerModeShortcutImport(backupKey: importedId.uuidString.lowercased(), id: importedId),
+                VoiceInkPowerModeShortcutImport(backupKey: secondImportedId.uuidString, id: secondImportedId)
+            ]
+        )
+        XCTAssertEqual(plan.customEmojisToImport, ["I", "S"])
+        XCTAssertTrue(plan.hasCustomEmojiBackupRecord)
+        XCTAssertEqual(plan.importedConfigurationCount, 2)
+    }
+
+    func testPowerModeBackupImportPlanTreatsMissingCustomEmojiRecordsAsNoOps() {
+        let plan = VoiceInkPowerModePolicy.powerModeBackupImportPlan(
+            existingConfigurations: [],
+            importedConfigurations: [],
+            backupShortcutKeys: [],
+            customEmojis: nil
+        )
+
+        XCTAssertEqual(plan.existingConfigurationIdsToClear, [])
+        XCTAssertEqual(plan.importedConfigurations, [])
+        XCTAssertEqual(plan.shortcutImports, [])
+        XCTAssertFalse(plan.hasCustomEmojiBackupRecord)
+        XCTAssertEqual(plan.customEmojisToImport, [])
+        XCTAssertEqual(plan.importedConfigurationCount, 0)
+    }
+
     func testResolvedPowerModeConfigurationPreservesAutomaticResolutionOrder() {
         let explicitDisabled = config(name: "Explicit", emoji: "E", isEnabled: false)
         let appConfig = config(

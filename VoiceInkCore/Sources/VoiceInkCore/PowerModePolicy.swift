@@ -608,6 +608,32 @@ public struct VoiceInkPowerModeShortcutImport: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkPowerModeBackupImportPlan: Equatable, Sendable {
+    public var existingConfigurationIdsToClear: [UUID]
+    public var importedConfigurations: [PowerModeConfig]
+    public var shortcutImports: [VoiceInkPowerModeShortcutImport]
+    public var hasCustomEmojiBackupRecord: Bool
+    public var customEmojisToImport: [String]
+
+    public var importedConfigurationCount: Int {
+        importedConfigurations.count
+    }
+
+    public init(
+        existingConfigurationIdsToClear: [UUID],
+        importedConfigurations: [PowerModeConfig],
+        shortcutImports: [VoiceInkPowerModeShortcutImport],
+        hasCustomEmojiBackupRecord: Bool,
+        customEmojisToImport: [String]
+    ) {
+        self.existingConfigurationIdsToClear = existingConfigurationIdsToClear
+        self.importedConfigurations = importedConfigurations
+        self.shortcutImports = shortcutImports
+        self.hasCustomEmojiBackupRecord = hasCustomEmojiBackupRecord
+        self.customEmojisToImport = customEmojisToImport
+    }
+}
+
 public struct VoiceInkPowerModeLanguageApplicationPlan: Equatable, Sendable {
     public var languageToSave: String?
 
@@ -1510,6 +1536,24 @@ public enum VoiceInkPowerModePolicy {
 
             return VoiceInkPowerModeShortcutImport(backupKey: backupKey, id: id)
         }
+    }
+
+    public static func powerModeBackupImportPlan(
+        existingConfigurations: [PowerModeConfig],
+        importedConfigurations: [PowerModeConfig],
+        backupShortcutKeys: [String],
+        customEmojis: [String]?
+    ) -> VoiceInkPowerModeBackupImportPlan {
+        VoiceInkPowerModeBackupImportPlan(
+            existingConfigurationIdsToClear: existingConfigurations.map(\.id),
+            importedConfigurations: importedConfigurations,
+            shortcutImports: powerModeShortcutImports(
+                backupKeys: backupShortcutKeys,
+                importedConfigurations: importedConfigurations
+            ),
+            hasCustomEmojiBackupRecord: customEmojis != nil,
+            customEmojisToImport: customEmojis ?? []
+        )
     }
 
     public static func normalizedWebsiteURL(_ url: String) -> String {

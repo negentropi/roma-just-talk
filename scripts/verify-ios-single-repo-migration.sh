@@ -4719,8 +4719,13 @@ require_pattern \
 
 reject_pattern \
   "macOS quick-add avoids shell-owned dictionary draft submit policy" \
-  'VoiceInkDictionaryPolicy\.(hasVocabularyDraft|canSaveWordReplacementDraft)|@State private var (wordInput|originalInput|replacementInput)\b|submitVocabularyDraft|submitWordReplacementDraft' \
+  'VoiceInkDictionaryPolicy\.(hasVocabularyDraft|canSaveWordReplacementDraft)|@State private var (wordInput|originalInput|replacementInput)\b|submitVocabularyDraft|submitWordReplacementDraft|guard +(vocabularyDraftState|wordReplacementDraftState)\.canSubmit' \
   VoiceInk/Views/Dictionary/DictionaryQuickAddPanel.swift
+
+reject_pattern \
+  "iOS dictionary settings avoids shell-owned draft submit guards" \
+  'guard +wordReplacementDraftState\.canSubmit' \
+  iOS/VoiceInk-ios/SettingsView.swift
 
 reject_pattern \
   "platform vocabulary submission avoids old insert-plan and shell-owned add wrappers" \

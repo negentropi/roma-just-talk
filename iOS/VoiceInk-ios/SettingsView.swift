@@ -228,8 +228,6 @@ struct SettingsView: View {
     }
 
     private func submitWordReplacement() {
-        guard wordReplacementDraftState.canSubmit else { return }
-
         let submission = wordReplacementDraftState.submitting(
             existingOriginalTexts: settings.wordReplacements.map(\.originalText)
         )

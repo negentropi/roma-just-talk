@@ -328,7 +328,6 @@ struct DictionaryQuickAddView: View {
     // MARK: - Actions
 
     private func submitVocabulary() {
-        guard vocabularyDraftState.canSubmit else { return }
         let submission = vocabularyDraftState.submitting(
             existingWords: vocabularyWords.map(\.word)
         )
@@ -346,7 +345,6 @@ struct DictionaryQuickAddView: View {
     }
 
     private func submitReplacement() {
-        guard wordReplacementDraftState.canSubmit else { return }
         let submission = wordReplacementDraftState.submitting(
             existingOriginalTexts: wordReplacements.map(\.originalText)
         )

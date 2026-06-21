@@ -4911,6 +4911,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
+  "shared shortcut storage preference lives in VoiceInkCore" \
+  'VoiceInkShortcutStorageState|VoiceInkShortcutStoragePreference|clearedKey\(for shortcutKey: String\)' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
   "shared macOS recording shortcut settings presentation lives in VoiceInkCore" \
   'VoiceInkMacOSRecordingShortcutSettingsPresentation|macOSSettingsPresentation' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
@@ -5026,6 +5031,16 @@ require_pattern \
   VoiceInk/Shortcuts/RecordingShortcutManager.swift
 
 require_pattern \
+  "macOS shortcut store consumes shared shortcut storage preference" \
+  'VoiceInkShortcutStoragePreference\.(shortcutData|saveShortcutData|markShortcutCleared|removeShortcutStorage|storedState|restoreStoredState|isShortcutCleared)' \
+  VoiceInk/Shortcuts/ShortcutStore.swift
+
+reject_pattern \
+  "macOS shortcut store avoids shell-owned shortcut UserDefaults storage mechanics" \
+  'UserDefaults\.standard|clearedUserDefaultsKey|"_cleared"' \
+  VoiceInk/Shortcuts/ShortcutStore.swift
+
+require_pattern \
   "macOS shortcut migration uses shared current shortcut selection keys" \
   'VoiceInkRecordingShortcutPreference\.selectionKey' \
   VoiceInk/Shortcuts/ShortcutMigration.swift
@@ -5109,8 +5124,13 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "core checks execute shortcut storage preference tests" \
+  'UserDefaultsPreferencesTests\.testShortcutStoragePreference(StoresDataAndClearedState|CapturesAndRestoresStoredState)' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "migration checklist tracks shared recording shortcut preference gate" \
-  'macOS recording shortcut selection/mode, middle-click, special empty-tap preferences, settings labels/help, and backup import/export value planning route through `VoiceInkRecordingShortcutSelection`/`VoiceInkRecordingShortcutMode`/`VoiceInkRecordingShortcutPreference`' \
+  'macOS recording shortcut selection/mode, raw shortcut storage, middle-click, special empty-tap preferences, settings labels/help, and backup import/export value planning route through `VoiceInkRecordingShortcutSelection`/`VoiceInkRecordingShortcutMode`/`VoiceInkRecordingShortcutPreference`/`VoiceInkShortcutStoragePreference`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

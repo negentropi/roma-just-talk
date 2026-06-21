@@ -1319,6 +1319,62 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testShortcutStoragePreferenceStoresDataAndClearedState() {
+        withIsolatedDefaults { defaults in
+            let shortcutKey = "Shortcut_primaryRecording"
+            let clearedKey = VoiceInkShortcutStoragePreference.clearedKey(for: shortcutKey)
+            let shortcutData = Data([1, 2, 3])
+
+            XCTAssertEqual(clearedKey, "Shortcut_primaryRecording_cleared")
+            XCTAssertNil(VoiceInkShortcutStoragePreference.shortcutData(for: shortcutKey, from: defaults))
+            XCTAssertFalse(VoiceInkShortcutStoragePreference.isShortcutCleared(for: shortcutKey, from: defaults))
+
+            VoiceInkShortcutStoragePreference.markShortcutCleared(for: shortcutKey, to: defaults)
+
+            XCTAssertNil(VoiceInkShortcutStoragePreference.shortcutData(for: shortcutKey, from: defaults))
+            XCTAssertTrue(VoiceInkShortcutStoragePreference.isShortcutCleared(for: shortcutKey, from: defaults))
+
+            VoiceInkShortcutStoragePreference.saveShortcutData(shortcutData, for: shortcutKey, to: defaults)
+
+            XCTAssertEqual(VoiceInkShortcutStoragePreference.shortcutData(for: shortcutKey, from: defaults), shortcutData)
+            XCTAssertNil(defaults.object(forKey: clearedKey))
+
+            VoiceInkShortcutStoragePreference.removeShortcutStorage(for: shortcutKey, from: defaults)
+
+            XCTAssertNil(VoiceInkShortcutStoragePreference.shortcutData(for: shortcutKey, from: defaults))
+            XCTAssertNil(defaults.object(forKey: clearedKey))
+        }
+    }
+
+    func testShortcutStoragePreferenceCapturesAndRestoresStoredState() {
+        withIsolatedDefaults { defaults in
+            let shortcutKey = "Shortcut_secondaryRecording"
+            let originalData = Data([9, 8, 7])
+            let replacementData = Data([1, 2, 3])
+
+            VoiceInkShortcutStoragePreference.saveShortcutData(originalData, for: shortcutKey, to: defaults)
+            let dataState = VoiceInkShortcutStoragePreference.storedState(for: shortcutKey, from: defaults)
+
+            XCTAssertEqual(dataState, VoiceInkShortcutStorageState(shortcutData: originalData, clearedValue: nil))
+
+            VoiceInkShortcutStoragePreference.markShortcutCleared(for: shortcutKey, to: defaults)
+            let clearedState = VoiceInkShortcutStoragePreference.storedState(for: shortcutKey, from: defaults)
+
+            XCTAssertEqual(clearedState, VoiceInkShortcutStorageState(shortcutData: nil, clearedValue: true))
+
+            VoiceInkShortcutStoragePreference.saveShortcutData(replacementData, for: shortcutKey, to: defaults)
+            VoiceInkShortcutStoragePreference.restoreStoredState(clearedState, for: shortcutKey, to: defaults)
+
+            XCTAssertNil(VoiceInkShortcutStoragePreference.shortcutData(for: shortcutKey, from: defaults))
+            XCTAssertTrue(VoiceInkShortcutStoragePreference.isShortcutCleared(for: shortcutKey, from: defaults))
+
+            VoiceInkShortcutStoragePreference.restoreStoredState(dataState, for: shortcutKey, to: defaults)
+
+            XCTAssertEqual(VoiceInkShortcutStoragePreference.shortcutData(for: shortcutKey, from: defaults), originalData)
+            XCTAssertNil(defaults.object(forKey: VoiceInkShortcutStoragePreference.clearedKey(for: shortcutKey)))
+        }
+    }
+
     func testRecordingShortcutPreferenceBuildsBackupPreferences() throws {
         let backup = VoiceInkRecordingShortcutPreference.backupPreferences(
             primaryRecordingShortcut: .custom,

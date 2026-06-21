@@ -1,15 +1,13 @@
 import Foundation
+import VoiceInkCore
 
 enum ShortcutStore {
     static let shortcutDidChange = Notification.Name("ShortcutStoreShortcutDidChange")
 
-    struct StoredState {
-        fileprivate let shortcutData: Data?
-        fileprivate let clearedValue: Bool?
-    }
+    typealias StoredState = VoiceInkShortcutStorageState
 
     static func rawShortcut(for action: ShortcutAction) -> Shortcut? {
-        shortcutData(for: action)
+        VoiceInkShortcutStoragePreference.shortcutData(for: action.userDefaultsKey)
             .flatMap { try? JSONDecoder().decode(Shortcut.self, from: $0) }
     }
 
@@ -36,13 +34,11 @@ enum ShortcutStore {
 
         if let shortcut,
            let data = try? JSONEncoder().encode(shortcut) {
-            UserDefaults.standard.set(data, forKey: action.userDefaultsKey)
-            UserDefaults.standard.removeObject(forKey: clearedUserDefaultsKey(for: action))
+            VoiceInkShortcutStoragePreference.saveShortcutData(data, for: action.userDefaultsKey)
             ShortcutMigration.removeLegacyCustomRecordingShortcut(for: action)
             ShortcutMigration.removeLegacyKeyboardShortcut(for: action)
         } else {
-            UserDefaults.standard.removeObject(forKey: action.userDefaultsKey)
-            UserDefaults.standard.set(true, forKey: clearedUserDefaultsKey(for: action))
+            VoiceInkShortcutStoragePreference.markShortcutCleared(for: action.userDefaultsKey)
             ShortcutMigration.removeLegacyCustomRecordingShortcut(for: action)
             ShortcutMigration.removeLegacyKeyboardShortcut(for: action)
         }
@@ -58,8 +54,7 @@ enum ShortcutStore {
             return
         }
 
-        UserDefaults.standard.removeObject(forKey: action.userDefaultsKey)
-        UserDefaults.standard.removeObject(forKey: clearedUserDefaultsKey(for: action))
+        VoiceInkShortcutStoragePreference.removeShortcutStorage(for: action.userDefaultsKey)
         ShortcutMigration.removeLegacyCustomRecordingShortcut(for: action)
         ShortcutMigration.removeLegacyKeyboardShortcut(for: action)
         NotificationCenter.default.post(
@@ -69,12 +64,7 @@ enum ShortcutStore {
     }
 
     static func storedState(for action: ShortcutAction) -> StoredState {
-        StoredState(
-            shortcutData: shortcutData(for: action),
-            clearedValue: UserDefaults.standard.object(forKey: clearedUserDefaultsKey(for: action)) == nil
-                ? nil
-                : UserDefaults.standard.bool(forKey: clearedUserDefaultsKey(for: action))
-        )
+        VoiceInkShortcutStoragePreference.storedState(for: action.userDefaultsKey)
     }
 
     static func restoreStoredState(_ state: StoredState, for action: ShortcutAction) {
@@ -82,18 +72,7 @@ enum ShortcutStore {
             return
         }
 
-        if let shortcutData = state.shortcutData {
-            UserDefaults.standard.set(shortcutData, forKey: action.userDefaultsKey)
-        } else {
-            UserDefaults.standard.removeObject(forKey: action.userDefaultsKey)
-        }
-
-        if let clearedValue = state.clearedValue {
-            UserDefaults.standard.set(clearedValue, forKey: clearedUserDefaultsKey(for: action))
-        } else {
-            UserDefaults.standard.removeObject(forKey: clearedUserDefaultsKey(for: action))
-        }
-
+        VoiceInkShortcutStoragePreference.restoreStoredState(state, for: action.userDefaultsKey)
         NotificationCenter.default.post(
             name: shortcutDidChange,
             object: action
@@ -108,15 +87,7 @@ enum ShortcutStore {
         }
     }
 
-    private static func shortcutData(for action: ShortcutAction) -> Data? {
-        UserDefaults.standard.data(forKey: action.userDefaultsKey)
-    }
-
     static func isShortcutCleared(for action: ShortcutAction) -> Bool {
-        UserDefaults.standard.bool(forKey: clearedUserDefaultsKey(for: action))
-    }
-
-    private static func clearedUserDefaultsKey(for action: ShortcutAction) -> String {
-        "\(action.userDefaultsKey)_cleared"
+        VoiceInkShortcutStoragePreference.isShortcutCleared(for: action.userDefaultsKey)
     }
 }

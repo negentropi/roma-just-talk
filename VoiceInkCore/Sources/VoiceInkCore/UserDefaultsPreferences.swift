@@ -1120,6 +1120,91 @@ public struct VoiceInkRecordingShortcutBackupImportPlan: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkShortcutStorageState: Equatable, Sendable {
+    public let shortcutData: Data?
+    public let clearedValue: Bool?
+
+    public init(shortcutData: Data?, clearedValue: Bool?) {
+        self.shortcutData = shortcutData
+        self.clearedValue = clearedValue
+    }
+}
+
+public enum VoiceInkShortcutStoragePreference {
+    public static func clearedKey(for shortcutKey: String) -> String {
+        "\(shortcutKey)_cleared"
+    }
+
+    public static func shortcutData(
+        for shortcutKey: String,
+        from defaults: UserDefaults = .standard
+    ) -> Data? {
+        defaults.data(forKey: shortcutKey)
+    }
+
+    public static func isShortcutCleared(
+        for shortcutKey: String,
+        from defaults: UserDefaults = .standard
+    ) -> Bool {
+        defaults.bool(forKey: clearedKey(for: shortcutKey))
+    }
+
+    public static func saveShortcutData(
+        _ data: Data,
+        for shortcutKey: String,
+        to defaults: UserDefaults = .standard
+    ) {
+        defaults.set(data, forKey: shortcutKey)
+        defaults.removeObject(forKey: clearedKey(for: shortcutKey))
+    }
+
+    public static func markShortcutCleared(
+        for shortcutKey: String,
+        to defaults: UserDefaults = .standard
+    ) {
+        defaults.removeObject(forKey: shortcutKey)
+        defaults.set(true, forKey: clearedKey(for: shortcutKey))
+    }
+
+    public static func removeShortcutStorage(
+        for shortcutKey: String,
+        from defaults: UserDefaults = .standard
+    ) {
+        defaults.removeObject(forKey: shortcutKey)
+        defaults.removeObject(forKey: clearedKey(for: shortcutKey))
+    }
+
+    public static func storedState(
+        for shortcutKey: String,
+        from defaults: UserDefaults = .standard
+    ) -> VoiceInkShortcutStorageState {
+        let clearedKey = clearedKey(for: shortcutKey)
+        return VoiceInkShortcutStorageState(
+            shortcutData: shortcutData(for: shortcutKey, from: defaults),
+            clearedValue: defaults.object(forKey: clearedKey) == nil ? nil : defaults.bool(forKey: clearedKey)
+        )
+    }
+
+    public static func restoreStoredState(
+        _ state: VoiceInkShortcutStorageState,
+        for shortcutKey: String,
+        to defaults: UserDefaults = .standard
+    ) {
+        if let shortcutData = state.shortcutData {
+            defaults.set(shortcutData, forKey: shortcutKey)
+        } else {
+            defaults.removeObject(forKey: shortcutKey)
+        }
+
+        let clearedKey = clearedKey(for: shortcutKey)
+        if let clearedValue = state.clearedValue {
+            defaults.set(clearedValue, forKey: clearedKey)
+        } else {
+            defaults.removeObject(forKey: clearedKey)
+        }
+    }
+}
+
 public enum VoiceInkRecordingShortcutPreference {
     public static let macOSSettingsPresentation = VoiceInkMacOSRecordingShortcutSettingsPresentation.macOS
 

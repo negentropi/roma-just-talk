@@ -3290,18 +3290,18 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
 
 require_pattern \
-  "shared custom cloud transcription policy owns empty-result and HTTP API error classification" \
-  'acceptsTranscriptionText|isHTTPAPIError' \
+  "shared custom cloud transcription policy owns empty-result policy" \
+  'acceptsTranscriptionText' \
   VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
 
 require_pattern \
   "macOS custom cloud transcription uses shared request policy" \
-  'VoiceInkCustomCloudTranscriptionPolicy\.(endpointURL|openAICompatibleOptions|acceptsTranscriptionText|isHTTPAPIError)' \
+  'VoiceInkCustomCloudTranscriptionPolicy\.(endpointURL|openAICompatibleOptions|acceptsTranscriptionText|apiErrorDomain)' \
   VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
 
 require_pattern \
   "core checks execute custom cloud transcription policy tests" \
-  'CustomCloudModelPolicyTests\.testCustomCloudTranscriptionPolicyPreservesOpenAICompatibleRequestDefaults|CustomCloudModelPolicyTests\.testCustomCloudTranscriptionPolicyClassifiesEndpointTextAndHTTPAPIError' \
+  'CustomCloudModelPolicyTests\.testCustomCloudTranscriptionPolicyPreservesOpenAICompatibleRequestDefaults|CustomCloudModelPolicyTests\.testCustomCloudTranscriptionPolicyClassifiesEndpointAndText' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -4596,17 +4596,17 @@ require_pattern \
 
 require_pattern \
   "shared cloud transcription error lives in VoiceInkCore" \
-  'VoiceInkCloudTranscriptionError|CloudTranscriptionError|apiRequestFailed|networkError|noTranscriptionReturned' \
+  'VoiceInkCloudTranscriptionError|CloudTranscriptionError|apiRequestFailure|apiStatusCodeRange|apiRequestFailed|networkError|noTranscriptionReturned' \
   VoiceInkCore/Sources/VoiceInkCore/CloudTranscriptionError.swift
 
 require_pattern \
   "shared cloud transcription error checks run in VoiceInkCore" \
-  'CloudTranscriptionErrorTests\.testErrorDescriptionsPreserveMacOSCloudTranscriptionCopy|CloudTranscriptionErrorTests\.testNoTranscriptionReturnedUsesSharedRunErrorDescription|CloudTranscriptionErrorTests\.testLegacyCloudTranscriptionErrorAliasResolvesToSharedCoreError' \
+  'CloudTranscriptionErrorTests\.testErrorDescriptionsPreserveMacOSCloudTranscriptionCopy|CloudTranscriptionErrorTests\.testNoTranscriptionReturnedUsesSharedRunErrorDescription|CloudTranscriptionErrorTests\.testAPIRequestFailureMapsMatchingHTTPNSError|CloudTranscriptionErrorTests\.testAPIRequestFailureFallsBackToLocalizedDescription|CloudTranscriptionErrorTests\.testAPIRequestFailureRejectsWrongDomainMissingDomainAndNonHTTPStatus|CloudTranscriptionErrorTests\.testLegacyCloudTranscriptionErrorAliasResolvesToSharedCoreError' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "macOS cloud batch transcription uses shared cloud transcription error" \
-  'CloudTranscriptionError\.(unsupportedProvider|missingAPIKey|audioFileNotFound|apiRequestFailed|networkError|noTranscriptionReturned)' \
+  'CloudTranscriptionError\.(unsupportedProvider|missingAPIKey|audioFileNotFound|apiRequestFailure|networkError|noTranscriptionReturned)' \
   VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift \
   VoiceInk/Transcription/Cloud/CloudProvider.swift
 
@@ -4630,6 +4630,12 @@ reject_pattern \
   "macOS cloud transcription avoids shell-local cloud error enum" \
   'enum +CloudTranscriptionError|var +errorDescription: +String\?' \
   VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
+
+reject_pattern \
+  "macOS cloud transcription avoids shell-owned HTTP API error mapping" \
+  '100\.\.\.599|userInfo\[NSLocalizedDescriptionKey\]|apiRequestFailed\(statusCode:' \
+  VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift \
+  VoiceInk/Transcription/Cloud/CloudProvider.swift
 
 require_pattern \
   "shared AI enhancement vocabulary context normalizes post-processing terms" \

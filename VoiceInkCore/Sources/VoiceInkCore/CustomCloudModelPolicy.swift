@@ -398,8 +398,4 @@ public enum VoiceInkCustomCloudTranscriptionPolicy {
     public static func acceptsTranscriptionText(_ text: String) -> Bool {
         !text.isEmpty
     }
-
-    public static func isHTTPAPIError(_ error: NSError) -> Bool {
-        error.domain == apiErrorDomain && (100...599).contains(error.code)
-    }
 }

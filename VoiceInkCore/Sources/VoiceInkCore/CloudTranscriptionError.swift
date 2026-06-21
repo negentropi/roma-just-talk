@@ -1,6 +1,8 @@
 import Foundation
 
 public enum VoiceInkCloudTranscriptionError: Error, LocalizedError {
+    public static let apiStatusCodeRange: ClosedRange<Int> = 100...599
+
     case unsupportedProvider
     case missingAPIKey
     case audioFileNotFound
@@ -23,6 +25,26 @@ public enum VoiceInkCloudTranscriptionError: Error, LocalizedError {
         case .noTranscriptionReturned:
             return VoiceInkTranscriptionRunError.noTranscriptionReturned.errorDescription
         }
+    }
+
+    public static func apiRequestFailure(
+        from error: NSError,
+        matchingErrorDomain errorDomain: String?
+    ) -> VoiceInkCloudTranscriptionError? {
+        guard let errorDomain,
+              error.domain == errorDomain,
+              apiStatusCodeRange.contains(error.code) else {
+            return nil
+        }
+
+        return .apiRequestFailed(
+            statusCode: error.code,
+            message: apiRequestFailureMessage(from: error)
+        )
+    }
+
+    public static func apiRequestFailureMessage(from error: NSError) -> String {
+        error.userInfo[NSLocalizedDescriptionKey] as? String ?? error.localizedDescription
     }
 }
 

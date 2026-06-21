@@ -352,7 +352,7 @@ final class CustomCloudModelPolicyTests: XCTestCase {
         XCTAssertFalse(options.openAICompatibleAllowsPlainTextFallback)
     }
 
-    func testCustomCloudTranscriptionPolicyClassifiesEndpointTextAndHTTPAPIError() throws {
+    func testCustomCloudTranscriptionPolicyClassifiesEndpointAndText() throws {
         XCTAssertEqual(
             VoiceInkCustomCloudTranscriptionPolicy.endpointURL(
                 from: "https://api.example.com/v1/audio/transcriptions"
@@ -364,18 +364,5 @@ final class CustomCloudModelPolicyTests: XCTestCase {
 
         XCTAssertTrue(VoiceInkCustomCloudTranscriptionPolicy.acceptsTranscriptionText("transcript"))
         XCTAssertFalse(VoiceInkCustomCloudTranscriptionPolicy.acceptsTranscriptionText(""))
-
-        XCTAssertTrue(VoiceInkCustomCloudTranscriptionPolicy.isHTTPAPIError(NSError(
-            domain: VoiceInkCustomCloudTranscriptionPolicy.apiErrorDomain,
-            code: 429
-        )))
-        XCTAssertFalse(VoiceInkCustomCloudTranscriptionPolicy.isHTTPAPIError(NSError(
-            domain: VoiceInkCustomCloudTranscriptionPolicy.apiErrorDomain,
-            code: 99
-        )))
-        XCTAssertFalse(VoiceInkCustomCloudTranscriptionPolicy.isHTTPAPIError(NSError(
-            domain: "Other",
-            code: 429
-        )))
     }
 }

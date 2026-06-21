@@ -116,12 +116,14 @@ extension CloudProvider {
             return text
         } catch let error as CloudTranscriptionError {
             throw error
-        } catch let error as NSError
-            where apiErrorDomain == error.domain && (100...599).contains(error.code) {
-            throw CloudTranscriptionError.apiRequestFailed(
-                statusCode: error.code,
-                message: error.userInfo[NSLocalizedDescriptionKey] as? String ?? error.localizedDescription
-            )
+        } catch {
+            if let apiError = CloudTranscriptionError.apiRequestFailure(
+                from: error as NSError,
+                matchingErrorDomain: apiErrorDomain
+            ) {
+                throw apiError
+            }
+            throw error
         }
     }
 

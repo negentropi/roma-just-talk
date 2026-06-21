@@ -32,6 +32,55 @@ final class CloudTranscriptionErrorTests: XCTestCase {
         )
     }
 
+    func testAPIRequestFailureMapsMatchingHTTPNSError() {
+        let error = NSError(
+            domain: "GroqAPI",
+            code: 429,
+            userInfo: [NSLocalizedDescriptionKey: "rate limited"]
+        )
+
+        XCTAssertEqual(
+            VoiceInkCloudTranscriptionError.apiRequestFailure(
+                from: error,
+                matchingErrorDomain: "GroqAPI"
+            )?.errorDescription,
+            "The API request failed with status code 429: rate limited"
+        )
+    }
+
+    func testAPIRequestFailureFallsBackToLocalizedDescription() {
+        let error = NSError(domain: "GroqAPI", code: 500)
+
+        XCTAssertEqual(
+            VoiceInkCloudTranscriptionError.apiRequestFailure(
+                from: error,
+                matchingErrorDomain: "GroqAPI"
+            )?.errorDescription,
+            "The API request failed with status code 500: \(error.localizedDescription)"
+        )
+    }
+
+    func testAPIRequestFailureRejectsWrongDomainMissingDomainAndNonHTTPStatus() {
+        XCTAssertNil(
+            VoiceInkCloudTranscriptionError.apiRequestFailure(
+                from: NSError(domain: "Other", code: 429),
+                matchingErrorDomain: "GroqAPI"
+            )
+        )
+        XCTAssertNil(
+            VoiceInkCloudTranscriptionError.apiRequestFailure(
+                from: NSError(domain: "GroqAPI", code: 429),
+                matchingErrorDomain: nil
+            )
+        )
+        XCTAssertNil(
+            VoiceInkCloudTranscriptionError.apiRequestFailure(
+                from: NSError(domain: "GroqAPI", code: 99),
+                matchingErrorDomain: "GroqAPI"
+            )
+        )
+    }
+
     func testLegacyCloudTranscriptionErrorAliasResolvesToSharedCoreError() {
         let error: CloudTranscriptionError = .missingAPIKey
 

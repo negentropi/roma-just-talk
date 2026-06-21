@@ -104,12 +104,14 @@ class CloudTranscriptionService: TranscriptionService {
             return text
         } catch let error as CloudTranscriptionError {
             throw error
-        } catch let error as NSError
-            where VoiceInkCustomCloudTranscriptionPolicy.isHTTPAPIError(error) {
-            throw CloudTranscriptionError.apiRequestFailed(
-                statusCode: error.code,
-                message: error.userInfo[NSLocalizedDescriptionKey] as? String ?? error.localizedDescription
-            )
+        } catch {
+            if let apiError = CloudTranscriptionError.apiRequestFailure(
+                from: error as NSError,
+                matchingErrorDomain: VoiceInkCustomCloudTranscriptionPolicy.apiErrorDomain
+            ) {
+                throw apiError
+            }
+            throw error
         }
     }
 }

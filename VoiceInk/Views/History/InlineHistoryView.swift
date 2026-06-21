@@ -20,42 +20,14 @@ struct InlineHistoryView: View {
     private let exportService = VoiceInkCSVExportService()
     private let pageSize = 20
 
-    @Query(Self.createLatestTranscriptionIndicatorDescriptor()) private var latestTranscriptionIndicator: [Transcription]
-
-    private static func createLatestTranscriptionIndicatorDescriptor() -> FetchDescriptor<Transcription> {
-        var descriptor = FetchDescriptor<Transcription>(
-            sortBy: [SortDescriptor(\.timestamp, order: .reverse)]
-        )
-        descriptor.fetchLimit = 1
-        return descriptor
-    }
+    @Query(TranscriptionHistoryQuery.latestIndicatorDescriptor()) private var latestTranscriptionIndicator: [Transcription]
 
     private func cursorQueryDescriptor(after timestamp: Date? = nil) -> FetchDescriptor<Transcription> {
-        var descriptor = FetchDescriptor<Transcription>(
-            sortBy: [SortDescriptor(\Transcription.timestamp, order: .reverse)]
+        TranscriptionHistoryQuery.cursorDescriptor(
+            after: timestamp,
+            searchText: searchText,
+            pageSize: pageSize
         )
-
-        if let timestamp = timestamp {
-            if !searchText.isEmpty {
-                descriptor.predicate = #Predicate<Transcription> { transcription in
-                    (transcription.text.localizedStandardContains(searchText) ||
-                    (transcription.enhancedText?.localizedStandardContains(searchText) ?? false)) &&
-                    transcription.timestamp < timestamp
-                }
-            } else {
-                descriptor.predicate = #Predicate<Transcription> { transcription in
-                    transcription.timestamp < timestamp
-                }
-            }
-        } else if !searchText.isEmpty {
-            descriptor.predicate = #Predicate<Transcription> { transcription in
-                transcription.text.localizedStandardContains(searchText) ||
-                (transcription.enhancedText?.localizedStandardContains(searchText) ?? false)
-            }
-        }
-
-        descriptor.fetchLimit = pageSize
-        return descriptor
     }
 
     private var allSelected: Bool {
@@ -468,16 +440,7 @@ struct InlineHistoryView: View {
 
     private func selectAllTranscriptions() async {
         do {
-            var allDescriptor = FetchDescriptor<Transcription>()
-
-            if !searchText.isEmpty {
-                allDescriptor.predicate = #Predicate<Transcription> { transcription in
-                    transcription.text.localizedStandardContains(searchText) ||
-                    (transcription.enhancedText?.localizedStandardContains(searchText) ?? false)
-                }
-            }
-
-            allDescriptor.propertiesToFetch = [\.id]
+            let allDescriptor = TranscriptionHistoryQuery.selectionDescriptor(searchText: searchText)
             let allTranscriptions = try modelContext.fetch(allDescriptor)
             let visibleIds = Set(displayedTranscriptions.map { $0.id })
 

@@ -2013,6 +2013,32 @@ require_pattern \
   VoiceInk/Views/History/TranscriptionHistoryView.swift \
   VoiceInk/Views/History/InlineHistoryView.swift
 
+require_pattern \
+  "macOS history query adapter owns latest indicator descriptor" \
+  'latestIndicatorDescriptor' \
+  VoiceInk/Views/History/TranscriptionHistoryQuery.swift
+
+require_pattern \
+  "macOS history query adapter owns cursor descriptor" \
+  'cursorDescriptor' \
+  VoiceInk/Views/History/TranscriptionHistoryQuery.swift
+
+require_pattern \
+  "macOS history query adapter owns select-all descriptor" \
+  'selectionDescriptor' \
+  VoiceInk/Views/History/TranscriptionHistoryQuery.swift
+
+require_pattern \
+  "macOS history query adapter owns SwiftData search predicate" \
+  'localizedStandardContains\(searchText\)' \
+  VoiceInk/Views/History/TranscriptionHistoryQuery.swift
+
+require_pattern \
+  "macOS history views delegate SwiftData query construction" \
+  'TranscriptionHistoryQuery\.(latestIndicatorDescriptor|cursorDescriptor|selectionDescriptor)' \
+  VoiceInk/Views/History/TranscriptionHistoryView.swift \
+  VoiceInk/Views/History/InlineHistoryView.swift
+
 reject_pattern \
   "history and notes views avoid shell-only empty-state copy" \
   'No notes yet|Tap Start Recording to capture your first note\.|No transcriptions yet|No transcriptions|No results found|Your transcription history will appear here|Try a different search term|No Selection|Select a transcription to view details|No Metadata' \
@@ -2029,6 +2055,12 @@ reject_pattern \
 reject_pattern \
   "macOS history views avoid duplicate delete-confirmation pluralization copy" \
   'This action cannot be undone\. Are you sure you want to delete|selectedTranscriptions\.count == 1 \? "" : "s"' \
+  VoiceInk/Views/History/TranscriptionHistoryView.swift \
+  VoiceInk/Views/History/InlineHistoryView.swift
+
+reject_pattern \
+  "macOS history views avoid duplicate SwiftData search predicate construction" \
+  '#Predicate<Transcription>|localizedStandardContains\(searchText\)' \
   VoiceInk/Views/History/TranscriptionHistoryView.swift \
   VoiceInk/Views/History/InlineHistoryView.swift
 

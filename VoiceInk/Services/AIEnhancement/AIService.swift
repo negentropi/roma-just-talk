@@ -141,12 +141,12 @@ class AIService: ObservableObject {
                     resolvedRuntimeKey: resolvedKey
                 )
 
-                if let runtimeAPIKey = plan.runtimeAPIKey {
+                if let runtimeAPIKey = APIKeyManager.shared.applyAIEnhancementVerificationPlan(
+                    plan,
+                    forProvider: self.selectedProvider.rawValue
+                ) {
                     self.apiKey = runtimeAPIKey
                     self.isAPIKeyValid = plan.isValid
-                    if let keyToSave = plan.keyToSave {
-                        APIKeyManager.shared.saveAPIKey(keyToSave, forProvider: self.selectedProvider.rawValue)
-                    }
                     NotificationCenter.default.post(name: .aiProviderKeyChanged, object: nil)
                 } else {
                     self.isAPIKeyValid = plan.isValid

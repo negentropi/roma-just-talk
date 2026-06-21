@@ -3486,6 +3486,11 @@ require_pattern \
   VoiceInk/Services/APIKeyManager.swift
 
 require_pattern \
+  "macOS API-key manager applies shared AI enhancement verification plan" \
+  'applyAIEnhancementVerificationPlan|VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan|plan\.runtimeAPIKey|plan\.keyToSave' \
+  VoiceInk/Services/APIKeyManager.swift
+
+require_pattern \
   "macOS cloud API-key card delegates verification persistence to API-key manager" \
   'APIKeyManager\.shared\.applyProviderVerificationPlan\(' \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
@@ -5856,6 +5861,16 @@ require_pattern \
 require_pattern \
   "macOS AI service applies API-key verification through shared plan" \
   'verificationApplicationPlan\(|VoiceInkAPIKeyVerificationResult\(isValid:' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+require_pattern \
+  "macOS AI service delegates verified-key persistence to API-key manager" \
+  'APIKeyManager\.shared\.applyAIEnhancementVerificationPlan\(' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+reject_pattern \
+  "macOS AI service avoids shell-owned verified-key persistence sequencing" \
+  'plan\.keyToSave|saveAPIKey\(keyToSave' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 require_pattern \

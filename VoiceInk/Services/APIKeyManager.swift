@@ -38,6 +38,20 @@ final class APIKeyManager {
         return true
     }
 
+    @discardableResult
+    func applyAIEnhancementVerificationPlan(
+        _ plan: VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan,
+        forProvider provider: String
+    ) -> String? {
+        guard let runtimeAPIKey = plan.runtimeAPIKey else { return nil }
+
+        if let keyToSave = plan.keyToSave {
+            saveAPIKey(keyToSave, forProvider: provider)
+        }
+
+        return runtimeAPIKey
+    }
+
     /// Retrieves an API key for a provider.
     func getAPIKey(forProvider provider: String) -> String? {
         let keyIdentifier = VoiceInkProviderAPIKeyAccount.accountIdentifier(forProviderName: provider)

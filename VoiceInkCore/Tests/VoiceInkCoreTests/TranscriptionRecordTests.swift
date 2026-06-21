@@ -10,6 +10,26 @@ final class TranscriptionRecordTests: XCTestCase {
         XCTAssertEqual(plan.failedTranscriptText, "Transcription Failed: No model selected")
     }
 
+    func testCancellationPlanBuildsSharedCanceledStateAndMetadataClears() {
+        let plan = VoiceInkTranscriptionRecordCancellationPlan(
+            duration: 1.25,
+            modelName: "Parakeet"
+        )
+
+        XCTAssertEqual(plan.text, VoiceInkTranscriptPresentation.canceledTranscriptionText)
+        XCTAssertNil(plan.enhancedText)
+        XCTAssertEqual(plan.status, .canceled)
+        XCTAssertEqual(plan.duration, 1.25)
+        XCTAssertEqual(plan.transcriptionModelName, "Parakeet")
+        XCTAssertNil(plan.aiEnhancementModelName)
+        XCTAssertNil(plan.promptName)
+        XCTAssertNil(plan.transcriptionDuration)
+        XCTAssertNil(plan.enhancementDuration)
+        XCTAssertNil(plan.aiRequestSystemMessage)
+        XCTAssertNil(plan.aiRequestUserMessage)
+        XCTAssertNil(plan.transcriptionError)
+    }
+
     func testApplyCompletedRunResultStoresCompletedRecordState() {
         let record = StubMutableTranscriptionRecord()
         let result = VoiceInkTranscriptionRunResult(
@@ -84,6 +104,45 @@ final class TranscriptionRecordTests: XCTestCase {
         XCTAssertEqual(record.aiEnhancementModelName, "gemini-2.5-flash")
         XCTAssertEqual(record.transcriptionStatus, .failed)
         XCTAssertEqual(record.transcriptionError, "Audio file not found")
+    }
+
+    func testMarkTranscriptionCanceledClearsMutableRecordEnhancementState() {
+        let record = StubMutableTranscriptionRecord(
+            text: "draft",
+            enhancedText: "enhanced",
+            duration: 5,
+            transcriptionModelName: "old model",
+            aiEnhancementModelName: "gemini-2.5-flash",
+            transcriptionDuration: 3,
+            enhancementDuration: 2,
+            transcriptionStatus: .completed,
+            transcriptionError: "old error"
+        )
+
+        record.markTranscriptionCanceled(duration: 1.25, modelName: "Parakeet")
+
+        XCTAssertEqual(record.text, VoiceInkTranscriptPresentation.canceledTranscriptionText)
+        XCTAssertNil(record.enhancedText)
+        XCTAssertEqual(record.duration, 1.25)
+        XCTAssertEqual(record.transcriptionModelName, "Parakeet")
+        XCTAssertNil(record.aiEnhancementModelName)
+        XCTAssertNil(record.transcriptionDuration)
+        XCTAssertNil(record.enhancementDuration)
+        XCTAssertEqual(record.transcriptionStatus, .canceled)
+        XCTAssertNil(record.transcriptionError)
+    }
+
+    func testMarkTranscriptionCanceledPreservesDurationAndModelWhenNotProvided() {
+        let record = StubMutableTranscriptionRecord(
+            duration: 5,
+            transcriptionModelName: "old model"
+        )
+
+        record.markTranscriptionCanceled()
+
+        XCTAssertEqual(record.duration, 5)
+        XCTAssertEqual(record.transcriptionModelName, "old model")
+        XCTAssertEqual(record.transcriptionStatus, .canceled)
     }
 
     func testRetranscribeStoredAudioAppliesCompletedResult() async throws {
@@ -161,6 +220,7 @@ final class TranscriptionRecordTests: XCTestCase {
 private class StubMutableTranscriptionRecord: VoiceInkMutableTranscriptionRecord {
     var text: String
     var enhancedText: String?
+    var duration: TimeInterval
     var transcriptionModelName: String?
     var aiEnhancementModelName: String?
     var transcriptionDuration: TimeInterval?
@@ -171,6 +231,7 @@ private class StubMutableTranscriptionRecord: VoiceInkMutableTranscriptionRecord
     init(
         text: String = "",
         enhancedText: String? = nil,
+        duration: TimeInterval = 0,
         transcriptionModelName: String? = nil,
         aiEnhancementModelName: String? = nil,
         transcriptionDuration: TimeInterval? = nil,
@@ -180,6 +241,7 @@ private class StubMutableTranscriptionRecord: VoiceInkMutableTranscriptionRecord
     ) {
         self.text = text
         self.enhancedText = enhancedText
+        self.duration = duration
         self.transcriptionModelName = transcriptionModelName
         self.aiEnhancementModelName = aiEnhancementModelName
         self.transcriptionDuration = transcriptionDuration

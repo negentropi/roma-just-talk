@@ -12,9 +12,43 @@ public struct VoiceInkTranscriptionRecordFailurePlan: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkTranscriptionRecordCancellationPlan: Equatable, Sendable {
+    public let text: String
+    public let enhancedText: String?
+    public let status: VoiceInkTranscriptionStatus
+    public let duration: TimeInterval?
+    public let transcriptionModelName: String?
+    public let aiEnhancementModelName: String?
+    public let promptName: String?
+    public let transcriptionDuration: TimeInterval?
+    public let enhancementDuration: TimeInterval?
+    public let aiRequestSystemMessage: String?
+    public let aiRequestUserMessage: String?
+    public let transcriptionError: String?
+
+    public init(
+        duration: TimeInterval? = nil,
+        modelName: String? = nil
+    ) {
+        self.text = VoiceInkTranscriptPresentation.canceledTranscriptionText
+        self.enhancedText = nil
+        self.status = .canceled
+        self.duration = duration
+        self.transcriptionModelName = modelName
+        self.aiEnhancementModelName = nil
+        self.promptName = nil
+        self.transcriptionDuration = nil
+        self.enhancementDuration = nil
+        self.aiRequestSystemMessage = nil
+        self.aiRequestUserMessage = nil
+        self.transcriptionError = nil
+    }
+}
+
 public protocol VoiceInkMutableTranscriptionRecord: AnyObject {
     var text: String { get set }
     var enhancedText: String? { get set }
+    var duration: TimeInterval { get set }
     var transcriptionModelName: String? { get set }
     var aiEnhancementModelName: String? { get set }
     var transcriptionDuration: TimeInterval? { get set }
@@ -39,6 +73,32 @@ public extension VoiceInkMutableTranscriptionRecord {
         let plan = VoiceInkTranscriptionRecordFailurePlan(errorDescription: errorDescription)
         transcriptionStatus = plan.status
         transcriptionError = plan.errorDescription
+    }
+
+    func applyCancellationPlan(_ plan: VoiceInkTranscriptionRecordCancellationPlan) {
+        text = plan.text
+        enhancedText = plan.enhancedText
+        if let duration = plan.duration {
+            self.duration = duration
+        }
+        if let transcriptionModelName = plan.transcriptionModelName {
+            self.transcriptionModelName = transcriptionModelName
+        }
+        aiEnhancementModelName = plan.aiEnhancementModelName
+        transcriptionDuration = plan.transcriptionDuration
+        enhancementDuration = plan.enhancementDuration
+        transcriptionStatus = plan.status
+        transcriptionError = plan.transcriptionError
+    }
+
+    func markTranscriptionCanceled(
+        duration: TimeInterval? = nil,
+        modelName: String? = nil
+    ) {
+        applyCancellationPlan(VoiceInkTranscriptionRecordCancellationPlan(
+            duration: duration,
+            modelName: modelName
+        ))
     }
 }
 

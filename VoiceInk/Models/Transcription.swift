@@ -88,21 +88,25 @@ final class Transcription: VoiceInkStoredAudioRecord, VoiceInkSessionMetricSourc
         duration: TimeInterval? = nil,
         modelName: String? = nil
     ) {
-        text = VoiceInkTranscriptPresentation.canceledTranscriptionText
-        enhancedText = nil
-        transcriptionState = .canceled
-        if let duration {
-            self.duration = duration
+        let plan = VoiceInkTranscriptionRecordCancellationPlan(
+            duration: duration,
+            modelName: modelName
+        )
+        text = plan.text
+        enhancedText = plan.enhancedText
+        transcriptionState = plan.status
+        if let plannedDuration = plan.duration {
+            self.duration = plannedDuration
         }
-        if let modelName {
-            transcriptionModelName = modelName
+        if let plannedModelName = plan.transcriptionModelName {
+            transcriptionModelName = plannedModelName
         }
-        transcriptionDuration = nil
-        enhancementDuration = nil
-        aiEnhancementModelName = nil
-        promptName = nil
-        aiRequestSystemMessage = nil
-        aiRequestUserMessage = nil
+        transcriptionDuration = plan.transcriptionDuration
+        enhancementDuration = plan.enhancementDuration
+        aiEnhancementModelName = plan.aiEnhancementModelName
+        promptName = plan.promptName
+        aiRequestSystemMessage = plan.aiRequestSystemMessage
+        aiRequestUserMessage = plan.aiRequestUserMessage
     }
 
     func markAsFailedTranscription(reason: String) {

@@ -679,6 +679,26 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/RecordingTranscriptionDraft.swift
 
 require_pattern \
+  "shared transcription cancellation plan lives in VoiceInkCore" \
+  'public struct VoiceInkTranscriptionRecordCancellationPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift
+
+require_pattern \
+  "shared transcription cancellation plan owns canceled text" \
+  'self\.text = VoiceInkTranscriptPresentation\.canceledTranscriptionText' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift
+
+require_pattern \
+  "shared transcription cancellation plan owns canceled status" \
+  'self\.status = \.canceled' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift
+
+require_pattern \
+  "shared mutable transcription records can apply cancellation plan" \
+  'applyCancellationPlan|markTranscriptionCanceled' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift
+
+require_pattern \
   "macOS Transcription adapts shared recording draft" \
   'init\(recordingDraft draft: VoiceInkRecordingTranscriptionDraft\)' \
   VoiceInk/Models/Transcription.swift
@@ -4786,6 +4806,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift
 
 require_pattern \
+  "shared transcription cancellation plan type lives in core" \
+  'public struct VoiceInkTranscriptionRecordCancellationPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift
+
+require_pattern \
   "shared transcription failure plan owns failed status" \
   'self\.status = \.failed' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift
@@ -4809,6 +4834,26 @@ require_pattern \
   "iOS mutable transcription records store shared failure detail" \
   'transcriptionError = plan\.errorDescription' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift
+
+require_pattern \
+  "mutable transcription records apply shared cancellation plan" \
+  'func applyCancellationPlan\(_ plan: VoiceInkTranscriptionRecordCancellationPlan\)' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift
+
+require_pattern \
+  "mutable transcription records expose shared cancellation helper" \
+  'func markTranscriptionCanceled\(' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift
+
+require_pattern \
+  "core checks execute cancellation plan tests" \
+  'TranscriptionRecordTests\.testCancellationPlanBuildsSharedCanceledStateAndMetadataClears|TranscriptionRecordTests\.testMarkTranscriptionCanceledClearsMutableRecordEnhancementState|TranscriptionRecordTests\.testMarkTranscriptionCanceledPreservesDurationAndModelWhenNotProvided' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "migration checklist tracks shared cancellation plan" \
+  'canceled-record mutation routes through `VoiceInkTranscriptionRecordCancellationPlan`' \
+  docs/ios-single-repo-migration.md
 
 require_pattern \
   "macOS transcription model exposes shared failure adapter" \
@@ -4864,8 +4909,13 @@ reject_pattern \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift
 
 require_pattern \
-  "macOS canceled transcription record uses shared canceled text" \
-  'VoiceInkTranscriptPresentation\.canceledTranscriptionText' \
+  "macOS canceled transcription record uses shared cancellation plan" \
+  'VoiceInkTranscriptionRecordCancellationPlan' \
+  VoiceInk/Models/Transcription.swift
+
+reject_pattern \
+  "macOS canceled transcription record avoids direct canceled policy" \
+  'VoiceInkTranscriptPresentation\.canceledTranscriptionText|transcriptionState = \.canceled|enhancedText = nil|aiEnhancementModelName = nil|promptName = nil|aiRequest(System|User)Message = nil' \
   VoiceInk/Models/Transcription.swift
 
 reject_pattern \

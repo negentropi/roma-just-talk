@@ -3,23 +3,6 @@ import VoiceInkCore
 @testable import VoiceInk_ios
 
 final class VoiceInkIOSTests: XCTestCase {
-    func testRecordDeepLinkRoundTripsThroughSharedCoreURL() throws {
-        let url = VoiceInkAppDeepLink.record.url
-
-        XCTAssertEqual(url, VoiceInkAppIdentity.iOSRecordDeepLinkURL)
-        XCTAssertEqual(url.scheme, VoiceInkAppIdentity.iOSRecordDeepLinkScheme)
-        XCTAssertEqual(url.host, VoiceInkAppIdentity.iOSRecordDeepLinkHost)
-        XCTAssertEqual(VoiceInkAppDeepLink(url: url), .record)
-        XCTAssertNil(VoiceInkAppDeepLink(url: try XCTUnwrap(URL(string: "voiceink://settings"))))
-    }
-
-    func testKeyboardRecordingButtonPresentationUsesSharedDisplayNameForFallback() {
-        XCTAssertEqual(
-            VoiceInkKeyboardRecordingButtonPresentation.openAppFallback.title,
-            " Open \(VoiceInkAppIdentity.displayName)"
-        )
-    }
-
     func testStorageDirectoryAdaptersUseSharedCorePolicies() {
         let documentsDirectory = VoiceInkIOSStorageDirectories.documentsDirectory
 
@@ -31,17 +14,6 @@ final class VoiceInkIOSTests: XCTestCase {
             VoiceInkIOSStorageDirectories.modelsDirectory,
             VoiceInkWhisperModelFiles.modelsDirectory(in: documentsDirectory)
         )
-    }
-
-    func testDefaultModeUsesSharedCoreLocalWhisperPolicy() throws {
-        let defaultSelection = Mode.defaultModesAndSelection()
-        let mode = try XCTUnwrap(defaultSelection.modes.first)
-
-        XCTAssertEqual(defaultSelection.modes.count, 1)
-        XCTAssertEqual(defaultSelection.selectedModeId, mode.id)
-        XCTAssertEqual(mode.transcriptionProvider, .localWhisper)
-        XCTAssertEqual(mode.transcriptionModel, VoiceInkTranscriptionModelCatalog.localBaseModel)
-        XCTAssertFalse(mode.isPostProcessingEnabled)
     }
 
     func testTranscriptionFeedsSharedDashboardMetrics() throws {

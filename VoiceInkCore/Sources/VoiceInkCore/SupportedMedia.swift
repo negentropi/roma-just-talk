@@ -62,43 +62,13 @@ public enum VoiceInkAudioFileQueueStatus: Equatable, Sendable {
     case completed
     case failed(message: String)
 
-    public var isTerminal: Bool {
-        switch self {
-        case .completed, .failed:
-            return true
-        case .pending, .processing:
-            return false
-        }
-    }
-
-    public var isPending: Bool {
-        self == .pending
-    }
-
-    public var isProcessing: Bool {
+    public var statusAfterCancelingProcessing: Self {
         switch self {
         case .processing:
-            return true
+            return .pending
         case .pending, .completed, .failed:
-            return false
+            return self
         }
-    }
-
-    public var canRemoveFromQueue: Bool {
-        isPending
-    }
-
-    public var canRetry: Bool {
-        switch self {
-        case .failed:
-            return true
-        case .pending, .processing, .completed:
-            return false
-        }
-    }
-
-    public var statusAfterCancelingProcessing: Self {
-        isProcessing ? .pending : self
     }
 }
 
@@ -135,7 +105,14 @@ public enum VoiceInkAudioFileQueuePolicy {
         from candidates: [VoiceInkAudioFileQueueCandidate],
         existingItems: [VoiceInkAudioFileQueueItemFacts<ID>]
     ) -> [URL] {
-        let activePaths = Set(existingItems.filter { !$0.status.isTerminal }.map(\.standardizedPath))
+        let activePaths = Set(existingItems.filter { item in
+            switch item.status {
+            case .pending, .processing:
+                return true
+            case .completed, .failed:
+                return false
+            }
+        }.map(\.standardizedPath))
 
         return candidates.compactMap { candidate in
             guard candidate.fileExists, candidate.isSupported else { return nil }
@@ -148,17 +125,37 @@ public enum VoiceInkAudioFileQueuePolicy {
         id: ID,
         from items: [VoiceInkAudioFileQueueItemFacts<ID>]
     ) -> Bool {
-        items.first { $0.id == id }?.status.canRemoveFromQueue == true
+        guard let status = items.first(where: { $0.id == id })?.status else {
+            return false
+        }
+        switch status {
+        case .pending:
+            return true
+        case .processing, .completed, .failed:
+            return false
+        }
     }
 
     public static func statusAfterRetryRequest(_ status: VoiceInkAudioFileQueueStatus) -> VoiceInkAudioFileQueueStatus? {
-        status.canRetry ? .pending : nil
+        switch status {
+        case .failed:
+            return .pending
+        case .pending, .processing, .completed:
+            return nil
+        }
     }
 
     public static func nextPendingItemID<ID: Hashable & Sendable>(
         in items: [VoiceInkAudioFileQueueItemFacts<ID>]
     ) -> ID? {
-        items.first { $0.status.isPending }?.id
+        items.first { item in
+            switch item.status {
+            case .pending:
+                return true
+            case .processing, .completed, .failed:
+                return false
+            }
+        }?.id
     }
 
     public static func hasPendingItems<ID: Hashable & Sendable>(

@@ -1389,6 +1389,11 @@ require_pattern \
   'VoiceInkAudioFileQueuePolicy|eligibleAdditionURLs|canRemoveItem|statusAfterRetryRequest|nextPendingItemID|hasPendingItems|statusesAfterCancelingProcessing' \
   VoiceInkCore/Sources/VoiceInkCore/SupportedMedia.swift
 
+reject_pattern \
+  "shared audio-file queue status avoids public predicate helpers" \
+  'public +var +(isTerminal|isPending|isProcessing|canRemoveFromQueue|canRetry) *: *Bool' \
+  VoiceInkCore/Sources/VoiceInkCore/SupportedMedia.swift
+
 require_pattern \
   "macOS audio import help uses shared supported-media presentation" \
   'VoiceInkSupportedMedia\.supportedFileTypesText' \
@@ -1426,7 +1431,7 @@ require_pattern \
 
 require_pattern \
   "core tests pin audio-file queue status and presentation" \
-  'testAudioImportPresentationPreservesMacOSQueueCopyAndActions|testAudioFileQueueStatusPreservesTerminalAndProcessingPolicies|testAudioFileQueueStatusPreservesMutationPredicates|testAudioFileQueueStatusCancelingProcessingResetsOnlyProcessingItems|testAudioFileQueuePolicyKeepsOnlyExistingSupportedNonActivePaths|testAudioFileQueuePolicyPreservesMutationDecisions|testAudioFileQueuePresentationPreservesRowCopyAndIcons' \
+  'testAudioImportPresentationPreservesMacOSQueueCopyAndActions|testAudioFileQueueProcessingPhasesPreserveCopy|testAudioFileQueueStatusCancelingProcessingResetsOnlyProcessingItems|testAudioFileQueuePolicyKeepsOnlyExistingSupportedNonActivePaths|testAudioFileQueuePolicyPreservesMutationDecisions|testAudioFileQueuePresentationPreservesRowCopyAndIcons' \
   VoiceInkCore/Tests/VoiceInkCoreTests/SupportedMediaTests.swift
 
 require_pattern \
@@ -1436,7 +1441,7 @@ require_pattern \
 
 require_pattern \
   "core check runner executes audio-file queue status and presentation tests" \
-  'testAudioImportPresentationPreservesMacOSQueueCopyAndActions|testAudioFileQueueStatusPreservesTerminalAndProcessingPolicies|testAudioFileQueueStatusPreservesMutationPredicates|testAudioFileQueueStatusCancelingProcessingResetsOnlyProcessingItems|testAudioFileQueuePolicyKeepsOnlyExistingSupportedNonActivePaths|testAudioFileQueuePolicyPreservesMutationDecisions|testAudioFileQueuePresentationPreservesRowCopyAndIcons' \
+  'testAudioImportPresentationPreservesMacOSQueueCopyAndActions|testAudioFileQueueProcessingPhasesPreserveCopy|testAudioFileQueueStatusCancelingProcessingResetsOnlyProcessingItems|testAudioFileQueuePolicyKeepsOnlyExistingSupportedNonActivePaths|testAudioFileQueuePolicyPreservesMutationDecisions|testAudioFileQueuePresentationPreservesRowCopyAndIcons' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \

@@ -24,6 +24,20 @@ final class APIKeyManager {
         return success
     }
 
+    @discardableResult
+    func applyProviderVerificationPlan(
+        _ plan: VoiceInkProviderAPIKeyVerificationApplicationPlan,
+        forProvider provider: String
+    ) -> Bool {
+        guard plan.shouldMarkKeyVerified else { return false }
+
+        if let keyToSave = plan.keyToSave {
+            saveAPIKey(keyToSave, forProvider: provider)
+        }
+
+        return true
+    }
+
     /// Retrieves an API key for a provider.
     func getAPIKey(forProvider provider: String) -> String? {
         let keyIdentifier = VoiceInkProviderAPIKeyAccount.accountIdentifier(forProviderName: provider)

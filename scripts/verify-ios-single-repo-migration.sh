@@ -3481,6 +3481,21 @@ require_pattern \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
 require_pattern \
+  "macOS API-key manager applies shared provider verification plan" \
+  'applyProviderVerificationPlan|VoiceInkProviderAPIKeyVerificationApplicationPlan|plan\.shouldMarkKeyVerified|plan\.keyToSave' \
+  VoiceInk/Services/APIKeyManager.swift
+
+require_pattern \
+  "macOS cloud API-key card delegates verification persistence to API-key manager" \
+  'APIKeyManager\.shared\.applyProviderVerificationPlan\(' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift
+
+reject_pattern \
+  "macOS cloud API-key card avoids shell-owned verification persistence sequencing" \
+  'plan\.shouldMarkKeyVerified|plan\.keyToSave|saveAPIKey\(keyToSave' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift
+
+require_pattern \
   "macOS cloud API-key card uses shared verification start plan" \
   'verificationStartPlan|missingCandidatePolicy: \.keepCurrentState' \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift

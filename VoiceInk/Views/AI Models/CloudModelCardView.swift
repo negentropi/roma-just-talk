@@ -319,10 +319,10 @@ struct CloudModelCardView: View {
                 let plan = startPlan.draft.verificationApplicationPlan(for: result)
                 apiKeyFormState = apiKeyFormState.applyingVerificationPlan(plan)
 
-                if plan.shouldMarkKeyVerified {
-                    if let keyToSave = plan.keyToSave {
-                        APIKeyManager.shared.saveAPIKey(keyToSave, forProvider: model.provider.apiKeyProviderName)
-                    }
+                if APIKeyManager.shared.applyProviderVerificationPlan(
+                    plan,
+                    forProvider: model.provider.apiKeyProviderName
+                ) {
                     transcriptionModelManager.refreshAllAvailableModels()
                     withAnimation(.easeInOut(duration: 0.3)) {
                         isExpanded = false

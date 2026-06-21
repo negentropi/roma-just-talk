@@ -88,6 +88,7 @@ public struct VoiceInkMacOSOnboardingModelDownloadPresentation: Equatable, Senda
     public let title: String
     public let subtitle: String
     public let continueButtonTitle: String
+    public let skipButtonTitle: String
     public let downloadingButtonTitle: String
     public let setAsDefaultButtonTitle: String
     public let downloadButtonTitle: String
@@ -99,6 +100,7 @@ public struct VoiceInkMacOSOnboardingModelDownloadPresentation: Equatable, Senda
         title: String,
         subtitle: String,
         continueButtonTitle: String,
+        skipButtonTitle: String,
         downloadingButtonTitle: String,
         setAsDefaultButtonTitle: String,
         downloadButtonTitle: String,
@@ -109,6 +111,7 @@ public struct VoiceInkMacOSOnboardingModelDownloadPresentation: Equatable, Senda
         self.title = title
         self.subtitle = subtitle
         self.continueButtonTitle = continueButtonTitle
+        self.skipButtonTitle = skipButtonTitle
         self.downloadingButtonTitle = downloadingButtonTitle
         self.setAsDefaultButtonTitle = setAsDefaultButtonTitle
         self.downloadButtonTitle = downloadButtonTitle
@@ -259,6 +262,7 @@ public enum VoiceInkMacOSOnboardingPresentation {
         title: "Download AI Model",
         subtitle: "We'll download the optimized model to get you started.",
         continueButtonTitle: "Continue",
+        skipButtonTitle: "Skip for now",
         downloadingButtonTitle: "Downloading...",
         setAsDefaultButtonTitle: VoiceInkModelManagementPresentation.setAsDefaultButtonTitle,
         downloadButtonTitle: "Download Model",
@@ -441,11 +445,34 @@ public enum VoiceInkMacOSOnboardingPermissionKind: String, Equatable, Sendable {
     case keyboardShortcut
 }
 
+public struct VoiceInkMacOSOnboardingAudioDeviceSelectionPresentation: Equatable, Sendable {
+    public let emptyStateTitle: String
+    public let pickerLabel: String
+    public let selectedDevicePlaceholder: String
+    public let unknownDeviceName: String
+    public let recommendationText: String
+
+    public init(
+        emptyStateTitle: String,
+        pickerLabel: String,
+        selectedDevicePlaceholder: String,
+        unknownDeviceName: String,
+        recommendationText: String
+    ) {
+        self.emptyStateTitle = emptyStateTitle
+        self.pickerLabel = pickerLabel
+        self.selectedDevicePlaceholder = selectedDevicePlaceholder
+        self.unknownDeviceName = unknownDeviceName
+        self.recommendationText = recommendationText
+    }
+}
+
 public struct VoiceInkMacOSOnboardingPermissionPresentation: Identifiable, Equatable, Sendable {
     public let kind: VoiceInkMacOSOnboardingPermissionKind
     public let title: String
     public let description: String
     public let iconSystemName: String
+    public let audioDeviceSelection: VoiceInkMacOSOnboardingAudioDeviceSelectionPresentation?
 
     public var id: VoiceInkMacOSOnboardingPermissionKind { kind }
 
@@ -453,16 +480,28 @@ public struct VoiceInkMacOSOnboardingPermissionPresentation: Identifiable, Equat
         kind: VoiceInkMacOSOnboardingPermissionKind,
         title: String,
         description: String,
-        iconSystemName: String
+        iconSystemName: String,
+        audioDeviceSelection: VoiceInkMacOSOnboardingAudioDeviceSelectionPresentation? = nil
     ) {
         self.kind = kind
         self.title = title
         self.description = description
         self.iconSystemName = iconSystemName
+        self.audioDeviceSelection = audioDeviceSelection
     }
 
     public static let relaunchRequiredMessage =
         "If you already turned this on in System Settings, relaunch roma-just-talk to activate it."
+
+    public static let skipButtonTitle = "Skip for now"
+
+    public static let audioDeviceSelectionPresentation = VoiceInkMacOSOnboardingAudioDeviceSelectionPresentation(
+        emptyStateTitle: "No microphones found",
+        pickerLabel: "Microphone:",
+        selectedDevicePlaceholder: "Select Device",
+        unknownDeviceName: "Unknown Device",
+        recommendationText: "For best results, using your Mac's built-in microphone is recommended."
+    )
 
     public static let screenContextInfoHelpMessage =
         "roma-just-talk captures on-screen text to understand the context of your voice input, which significantly improves transcription accuracy. Your privacy is important: this data is processed locally and is not stored."
@@ -480,7 +519,8 @@ public struct VoiceInkMacOSOnboardingPermissionPresentation: Identifiable, Equat
             kind: .audioDeviceSelection,
             title: "Microphone Selection",
             description: "Select the audio input device you want to use with roma-just-talk.",
-            iconSystemName: "headphones"
+            iconSystemName: "headphones",
+            audioDeviceSelection: audioDeviceSelectionPresentation
         ),
         VoiceInkMacOSOnboardingPermissionPresentation(
             kind: .accessibility,

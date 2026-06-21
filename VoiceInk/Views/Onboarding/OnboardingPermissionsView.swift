@@ -24,6 +24,11 @@ struct OnboardingPermissionsView: View {
     @StateObject private var permissionFlowGuide = PermissionFlowGuide()
     
     private let permissions = VoiceInkMacOSOnboardingPermissionPresentation.all
+
+    private var audioDeviceSelectionPresentation: VoiceInkMacOSOnboardingAudioDeviceSelectionPresentation {
+        permissions[currentPermissionIndex].audioDeviceSelection
+            ?? VoiceInkMacOSOnboardingPermissionPresentation.audioDeviceSelectionPresentation
+    }
     
     var body: some View {
         ZStack {
@@ -102,19 +107,19 @@ struct OnboardingPermissionsView: View {
                                                 .symbolRenderingMode(.hierarchical)
                                                 .foregroundStyle(.secondary)
                                             
-                                            Text("No microphones found")
+                                            Text(audioDeviceSelectionPresentation.emptyStateTitle)
                                                 .font(.subheadline)
                                                 .foregroundStyle(.secondary)
                                         }
                                         .padding()
                                     } else {
                                         styledPicker(
-                                            label: "Microphone:",
+                                            label: audioDeviceSelectionPresentation.pickerLabel,
                                             selectedValue: audioDeviceManager.selectedDeviceID ?? 0,
-                                            displayValue: audioDeviceManager.availableDevices.first { $0.id == audioDeviceManager.selectedDeviceID }?.name ?? "Select Device",
+                                            displayValue: audioDeviceManager.availableDevices.first { $0.id == audioDeviceManager.selectedDeviceID }?.name ?? audioDeviceSelectionPresentation.selectedDevicePlaceholder,
                                             options: audioDeviceManager.availableDevices.map { $0.id },
                                             optionDisplayName: { deviceId in
-                                                audioDeviceManager.availableDevices.first { $0.id == deviceId }?.name ?? "Unknown Device"
+                                                audioDeviceManager.availableDevices.first { $0.id == deviceId }?.name ?? audioDeviceSelectionPresentation.unknownDeviceName
                                             },
                                             onSelection: { deviceId in
                                                 audioDeviceManager.selectDevice(id: deviceId)
@@ -139,7 +144,7 @@ struct OnboardingPermissionsView: View {
                                         }
                                     }
                                     
-                                    Text("For best results, using your Mac's built-in microphone is recommended.")
+                                    Text(audioDeviceSelectionPresentation.recommendationText)
                                         .font(.caption)
                                         .foregroundColor(.white.opacity(0.7))
                                         .multilineTextAlignment(.center)
@@ -186,7 +191,7 @@ struct OnboardingPermissionsView: View {
                             
                             if !permissionStates[currentPermissionIndex] && 
                                permissions[currentPermissionIndex].canSkipWhenNotGranted {
-                                SkipButton(text: "Skip for now") {
+                                SkipButton(text: VoiceInkMacOSOnboardingPermissionPresentation.skipButtonTitle) {
                                     moveToNext()
                                 }
                             }

@@ -2588,17 +2588,17 @@ reject_pattern \
 
 require_pattern \
   "shared macOS model-download onboarding presentation lives in VoiceInkCore" \
-  'VoiceInkMacOSOnboardingPresentation|VoiceInkMacOSOnboardingModelDownloadPresentation|modelDownload|speedLabel|ramLabel|buttonTitle' \
+  'VoiceInkMacOSOnboardingPresentation|VoiceInkMacOSOnboardingModelDownloadPresentation|modelDownload|skipButtonTitle|speedLabel|ramLabel|buttonTitle' \
   VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift
 
 require_pattern \
   "macOS model-download onboarding uses shared presentation" \
-  'VoiceInkMacOSOnboardingPresentation\.modelDownload|presentation\.(title|subtitle|speedLabel|accuracyLabel|ramLabel)|buttonTitle\(isModelSet:' \
+  'VoiceInkMacOSOnboardingPresentation\.modelDownload|presentation\.(title|subtitle|skipButtonTitle|speedLabel|accuracyLabel|ramLabel)|buttonTitle\(isModelSet:' \
   VoiceInk/Views/Onboarding/OnboardingModelDownloadView.swift
 
 reject_pattern \
   "macOS model-download onboarding avoids shell-only presentation copy" \
-  '"(Download AI Model|We'\''ll download the optimized model to get you started\.|Downloading\.\.\.|Set as Default|Download Model|Speed|Accuracy|RAM)"' \
+  '"(Download AI Model|We'\''ll download the optimized model to get you started\.|Skip for now|Downloading\.\.\.|Set as Default|Download Model|Speed|Accuracy|RAM)"' \
   VoiceInk/Views/Onboarding/OnboardingModelDownloadView.swift
 
 require_pattern \
@@ -2683,17 +2683,17 @@ require_pattern \
 
 require_pattern \
   "shared macOS onboarding permission presentation lives in VoiceInkCore" \
-  'VoiceInkMacOSOnboardingPermissionPresentation|VoiceInkMacOSOnboardingPermissionKind|relaunchRequiredMessage|canSkipWhenNotGranted|buttonTitle' \
+  'VoiceInkMacOSOnboardingPermissionPresentation|VoiceInkMacOSOnboardingPermissionKind|VoiceInkMacOSOnboardingAudioDeviceSelectionPresentation|audioDeviceSelectionPresentation|skipButtonTitle|relaunchRequiredMessage|canSkipWhenNotGranted|buttonTitle' \
   VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift
 
 require_pattern \
   "macOS onboarding permissions use shared permission presentation" \
-  'VoiceInkMacOSOnboardingPermissionPresentation\.all|canSkipWhenNotGranted|buttonTitle\(isGranted:|screenContextInfoMessage' \
+  'VoiceInkMacOSOnboardingPermissionPresentation\.all|audioDeviceSelectionPresentation\.(emptyStateTitle|pickerLabel|selectedDevicePlaceholder|unknownDeviceName|recommendationText)|skipButtonTitle|canSkipWhenNotGranted|buttonTitle\(isGranted:|screenContextInfoMessage' \
   VoiceInk/Views/Onboarding/OnboardingPermissionsView.swift
 
 reject_pattern \
   "macOS onboarding permissions avoid shell-only permission presentation copy" \
-  'struct +OnboardingPermission[[:space:]:{]|enum +PermissionType|"(Microphone Access|Microphone Selection|Accessibility Access|Input Monitoring|Screen Context \(Optional\)|Keyboard Shortcut|Enable your microphone to start speaking and converting your voice to text instantly\.|Select the audio input device you want to use with roma-just-talk\.|Add roma-just-talk to Accessibility, then turn its switch on\.|Allow roma-just-talk to detect your recording shortcut while other apps are active\.|Enable screen context only if you want roma-just-talk to use visible text for transcript enhancement\.|Set up a keyboard shortcut to quickly access roma-just-talk from anywhere\.|Relaunch to Apply|Set Shortcut|Grant|Enable)"' \
+  'struct +OnboardingPermission[[:space:]:{]|enum +PermissionType|"(Microphone Access|Microphone Selection|Accessibility Access|Input Monitoring|Screen Context \(Optional\)|Keyboard Shortcut|Enable your microphone to start speaking and converting your voice to text instantly\.|Select the audio input device you want to use with roma-just-talk\.|Add roma-just-talk to Accessibility, then turn its switch on\.|Allow roma-just-talk to detect your recording shortcut while other apps are active\.|Enable screen context only if you want roma-just-talk to use visible text for transcript enhancement\.|Set up a keyboard shortcut to quickly access roma-just-talk from anywhere\.|No microphones found|Microphone:|Select Device|Unknown Device|For best results, using your Mac'\''s built-in microphone is recommended\.|Skip for now|Relaunch to Apply|Set Shortcut|Grant|Enable)"' \
   VoiceInk/Views/Onboarding/OnboardingPermissionsView.swift
 
 require_pattern \

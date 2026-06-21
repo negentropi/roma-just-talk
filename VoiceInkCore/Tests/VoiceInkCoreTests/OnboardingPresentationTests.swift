@@ -86,6 +86,7 @@ final class OnboardingPresentationTests: XCTestCase {
         XCTAssertEqual(presentation.title, "Download AI Model")
         XCTAssertEqual(presentation.subtitle, "We'll download the optimized model to get you started.")
         XCTAssertEqual(presentation.continueButtonTitle, "Continue")
+        XCTAssertEqual(presentation.skipButtonTitle, "Skip for now")
         XCTAssertEqual(presentation.downloadingButtonTitle, "Downloading...")
         XCTAssertEqual(presentation.setAsDefaultButtonTitle, "Set as Default")
         XCTAssertEqual(presentation.downloadButtonTitle, "Download Model")
@@ -272,6 +273,14 @@ final class OnboardingPresentationTests: XCTestCase {
             presentations[1].description,
             "Select the audio input device you want to use with roma-just-talk."
         )
+        XCTAssertEqual(presentations[1].audioDeviceSelection?.emptyStateTitle, "No microphones found")
+        XCTAssertEqual(presentations[1].audioDeviceSelection?.pickerLabel, "Microphone:")
+        XCTAssertEqual(presentations[1].audioDeviceSelection?.selectedDevicePlaceholder, "Select Device")
+        XCTAssertEqual(presentations[1].audioDeviceSelection?.unknownDeviceName, "Unknown Device")
+        XCTAssertEqual(
+            presentations[1].audioDeviceSelection?.recommendationText,
+            "For best results, using your Mac's built-in microphone is recommended."
+        )
         XCTAssertEqual(presentations[2].title, "Accessibility Access")
         XCTAssertEqual(presentations[3].title, "Input Monitoring")
         XCTAssertEqual(presentations[4].title, "Screen Context (Optional)")
@@ -312,6 +321,7 @@ final class OnboardingPresentationTests: XCTestCase {
         XCTAssertTrue(screenRecording.canSkipWhenNotGranted)
         XCTAssertFalse(audioDeviceSelection.canSkipWhenNotGranted)
         XCTAssertFalse(keyboardShortcut.canSkipWhenNotGranted)
+        XCTAssertEqual(VoiceInkMacOSOnboardingPermissionPresentation.skipButtonTitle, "Skip for now")
         XCTAssertEqual(
             VoiceInkMacOSOnboardingPermissionPresentation.relaunchRequiredMessage,
             "If you already turned this on in System Settings, relaunch roma-just-talk to activate it."

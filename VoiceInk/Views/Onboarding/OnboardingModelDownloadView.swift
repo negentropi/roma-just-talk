@@ -132,7 +132,7 @@ struct OnboardingModelDownloadView: View {
                             .disabled(isDownloading)
                             
                             if !isModelSet {
-                                SkipButton(text: "Skip for now") {
+                                SkipButton(text: presentation.skipButtonTitle) {
                                     withAnimation {
                                         showTutorial = true
                                     }

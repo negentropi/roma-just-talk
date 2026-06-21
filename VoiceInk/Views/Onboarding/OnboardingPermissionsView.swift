@@ -172,7 +172,10 @@ struct OnboardingPermissionsView: View {
                         // Action buttons
                         VStack(spacing: 16) {
                             Button(action: requestPermission) {
-                                Text(getButtonTitle())
+                                Text(permissions[currentPermissionIndex].buttonTitle(
+                                    isGranted: permissionStates[currentPermissionIndex],
+                                    requiresRelaunch: relaunchRequiredStates[currentPermissionIndex]
+                                ))
                                     .font(.headline)
                                     .foregroundColor(.white)
                                     .frame(width: 200, height: 50)
@@ -379,13 +382,6 @@ struct OnboardingPermissionsView: View {
         }
     }
     
-    private func getButtonTitle() -> String {
-        return permissions[currentPermissionIndex].buttonTitle(
-            isGranted: permissionStates[currentPermissionIndex],
-            requiresRelaunch: relaunchRequiredStates[currentPermissionIndex]
-        )
-    }
-
     private func markRelaunchNeededIfPermissionStillInactive(at index: Int, isActive: @escaping () -> Bool) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 6.0) {
             Task { @MainActor in

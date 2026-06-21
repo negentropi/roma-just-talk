@@ -121,7 +121,11 @@ struct OnboardingModelDownloadView: View {
                         // Action buttons
                         VStack(spacing: 16) {
                             Button(action: handleAction) {
-                                Text(getButtonTitle())
+                                Text(presentation.buttonTitle(
+                                    isModelSet: isModelSet,
+                                    isDownloading: isDownloading,
+                                    isModelDownloaded: fluidAudioModelManager.isFluidAudioModelDownloaded(defaultModel)
+                                ))
                                     .font(.headline)
                                     .foregroundColor(.white)
                                     .frame(width: 200, height: 50)
@@ -198,14 +202,6 @@ struct OnboardingModelDownloadView: View {
         }
     }
 
-    private func getButtonTitle() -> String {
-        presentation.buttonTitle(
-            isModelSet: isModelSet,
-            isDownloading: isDownloading,
-            isModelDownloaded: fluidAudioModelManager.isFluidAudioModelDownloaded(defaultModel)
-        )
-    }
-    
     private func performanceIndicator(label: String, value: Double) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(label)

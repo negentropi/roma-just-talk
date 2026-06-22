@@ -23,4 +23,23 @@ public struct VoiceInkAIEnhancementResult: Equatable, Sendable {
         self.requestSystemMessage = requestSystemMessage
         self.requestUserMessage = requestUserMessage
     }
+
+    public static func completed(
+        text: String,
+        startedAt startDate: Date,
+        endedAt endDate: Date,
+        modelName: String?,
+        promptName: String?,
+        requestSystemMessage: String?,
+        requestUserMessage: String?
+    ) -> VoiceInkAIEnhancementResult {
+        VoiceInkAIEnhancementResult(
+            text: text,
+            duration: endDate.timeIntervalSince(startDate),
+            modelName: modelName,
+            promptName: promptName,
+            requestSystemMessage: requestSystemMessage,
+            requestUserMessage: requestUserMessage
+        )
+    }
 }

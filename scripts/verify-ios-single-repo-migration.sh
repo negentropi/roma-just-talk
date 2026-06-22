@@ -6583,8 +6583,23 @@ reject_pattern \
 
 require_pattern \
   "macOS AI enhancement service returns shared enhancement result" \
-  'VoiceInkAIEnhancementResult' \
+  'VoiceInkAIEnhancementResult\.completed' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+reject_pattern \
+  "macOS AI enhancement service avoids shell-owned enhancement result duration math" \
+  'timeIntervalSince\(startTime\)' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+require_pattern \
+  "shared AI enhancement result construction lives in VoiceInkCore" \
+  'static func completed|endDate\.timeIntervalSince\(startDate\)' \
+  VoiceInkCore/Sources/VoiceInkCore/AIEnhancementResult.swift
+
+require_pattern \
+  "core checks execute shared AI enhancement result construction test" \
+  'AIEnhancementResultTests\.testCompletedResultDerivesDurationAndPreservesMetadata' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "macOS AI enhancement service saves enabled state through shared preference" \
@@ -7519,7 +7534,7 @@ require_pattern \
 
 require_pattern \
   "shared transcription run processor builds post-processing enhancement result" \
-  'postProcessingResult = VoiceInkAIEnhancementResult' \
+  'postProcessingResult = VoiceInkAIEnhancementResult\.completed' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift
 
 require_pattern \

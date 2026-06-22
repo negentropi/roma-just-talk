@@ -187,10 +187,11 @@ public struct VoiceInkTranscriptionRunProcessor {
                             prompt: prompt,
                             transcript: cleanedText
                         ))
-                        let enhancementDuration = currentDate().timeIntervalSince(enhancementStart)
-                        postProcessingResult = VoiceInkAIEnhancementResult(
+                        let enhancementEnd = currentDate()
+                        postProcessingResult = VoiceInkAIEnhancementResult.completed(
                             text: enhancedText,
-                            duration: enhancementDuration,
+                            startedAt: enhancementStart,
+                            endedAt: enhancementEnd,
                             modelName: llmModel,
                             promptName: nil,
                             requestSystemMessage: nil,

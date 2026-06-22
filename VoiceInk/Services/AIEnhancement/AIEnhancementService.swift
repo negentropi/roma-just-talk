@@ -338,10 +338,10 @@ class AIEnhancementService: ObservableObject {
 
         let result = try await makeRequestWithRetry(text: text)
         let endTime = Date()
-        let duration = endTime.timeIntervalSince(startTime)
-        return VoiceInkAIEnhancementResult(
+        return VoiceInkAIEnhancementResult.completed(
             text: result,
-            duration: duration,
+            startedAt: startTime,
+            endedAt: endTime,
             modelName: aiService.currentModel,
             promptName: promptName,
             requestSystemMessage: lastSystemMessageSent,

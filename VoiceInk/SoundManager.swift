@@ -23,11 +23,13 @@ class SoundManager: ObservableObject {
     private func setupSounds() {
         let customSoundManager = CustomSoundManager.shared
         playbackEngine.setup(
-            defaultStartURL: customSoundManager.builtInSoundURL(for: .start),
-            defaultStopURL: customSoundManager.builtInSoundURL(for: .stop),
-            defaultEscURL: CustomSoundManager.BuiltInSound.sound7.bundleURL,
-            customStartURL: customSoundManager.getCustomSoundURL(for: .start),
-            customStopURL: customSoundManager.getCustomSoundURL(for: .stop)
+            soundURLs: [
+                .defaultStart: customSoundManager.builtInSoundURL(for: .start),
+                .defaultStop: customSoundManager.builtInSoundURL(for: .stop),
+                .defaultEsc: CustomSoundManager.BuiltInSound.sound7.bundleURL,
+                .customStart: customSoundManager.getCustomSoundURL(for: .start),
+                .customStop: customSoundManager.getCustomSoundURL(for: .stop)
+            ]
         )
     }
 

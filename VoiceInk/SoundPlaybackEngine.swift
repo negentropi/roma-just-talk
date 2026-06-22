@@ -4,41 +4,20 @@ import os
 import VoiceInkCore
 
 final class SoundPlaybackEngine: @unchecked Sendable {
-    private enum Sound {
-        case start
-        case stop
-        case esc
-    }
-
     private let queue = DispatchQueue(label: "\(VoiceInkAppIdentity.loggingSubsystem).soundPlayback", qos: .userInitiated)
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "SoundPlaybackEngine")
 
-    private var startSound: AVAudioPlayer?
-    private var stopSound: AVAudioPlayer?
-    private var escSound: AVAudioPlayer?
-    private var customStartSound: AVAudioPlayer?
-    private var customStopSound: AVAudioPlayer?
+    private var players: [VoiceInkRecordingSoundPlayerSlot: AVAudioPlayer] = [:]
 
     func setup(
-        defaultStartURL: URL?,
-        defaultStopURL: URL?,
-        defaultEscURL: URL?,
-        customStartURL: URL?,
-        customStopURL: URL?
+        soundURLs: [VoiceInkRecordingSoundPlayerSlot: URL?]
     ) {
         queue.async { [weak self] in
             guard let self else { return }
 
-            self.startSound = self.makePlayer(from: defaultStartURL, volume: 0.4)
-            self.stopSound = self.makePlayer(from: defaultStopURL, volume: 0.4)
-            self.escSound = self.makePlayer(from: defaultEscURL, volume: 0.3)
-            self.reloadCustomSoundsOnQueue(startURL: customStartURL, stopURL: customStopURL)
-        }
-    }
-
-    func reloadCustomSounds(startURL: URL?, stopURL: URL?) {
-        queue.async { [weak self] in
-            self?.reloadCustomSoundsOnQueue(startURL: startURL, stopURL: stopURL)
+            for slot in VoiceInkRecordingSoundPlaybackPolicy.setupSlots {
+                self.players[slot] = self.makePlayer(from: soundURLs[slot] ?? nil, volume: slot.volume)
+            }
         }
     }
 
@@ -54,33 +33,15 @@ final class SoundPlaybackEngine: @unchecked Sendable {
         play(.esc)
     }
 
-    private func reloadCustomSoundsOnQueue(startURL: URL?, stopURL: URL?) {
-        if customStartSound?.isPlaying == true {
-            customStartSound?.stop()
-        }
-        if customStopSound?.isPlaying == true {
-            customStopSound?.stop()
-        }
-
-        customStartSound = makePlayer(from: startURL, volume: 0.4)
-        customStopSound = makePlayer(from: stopURL, volume: 0.4)
-    }
-
-    private func play(_ sound: Sound) {
+    private func play(_ cue: VoiceInkRecordingSoundCue) {
         queue.async { [weak self] in
             guard let self else { return }
 
-            let player: AVAudioPlayer?
-            switch sound {
-            case .start:
-                player = self.customStartSound ?? self.startSound
-            case .stop:
-                player = self.customStopSound ?? self.stopSound
-            case .esc:
-                player = self.escSound
-            }
-
-            player?.play()
+            VoiceInkRecordingSoundPlaybackPolicy.playbackSlots(for: cue)
+                .lazy
+                .compactMap { self.players[$0] }
+                .first?
+                .play()
         }
     }
 

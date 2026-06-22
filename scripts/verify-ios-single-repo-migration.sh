@@ -7456,8 +7456,18 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
 
 require_pattern \
+  "shared recording sound playback policy lives in VoiceInkCore" \
+  'VoiceInkRecordingSoundCue|VoiceInkRecordingSoundPlayerSlot|VoiceInkRecordingSoundPlaybackPolicy|setupSlots|playbackSlots|volume' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+
+require_pattern \
   "core checks cover custom sound URL and copy planning" \
   'RecordingFeedbackPreferenceTests\.testCustomSoundPreferenceBuildsCustomSoundURLs|RecordingFeedbackPreferenceTests\.testCustomSoundPreferencePlansCopyActions' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks cover recording sound playback policy" \
+  'RecordingFeedbackPreferenceTests\.testRecordingSoundPlaybackPolicyPreservesMacOSSlotsVolumesAndFallbacks' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -7489,6 +7499,21 @@ require_pattern \
   "macOS sound reload uses shared custom sound notification name" \
   'VoiceInkCustomSoundPreference\.changedNotificationName' \
   VoiceInk/SoundManager.swift
+
+require_pattern \
+  "macOS sound manager wires URLs by shared playback slots" \
+  'soundURLs:|\.defaultStart|\.defaultStop|\.defaultEsc|\.customStart|\.customStop' \
+  VoiceInk/SoundManager.swift
+
+require_pattern \
+  "macOS sound playback engine uses shared playback policy" \
+  'VoiceInkRecordingSoundPlaybackPolicy\.(setupSlots|playbackSlots)|VoiceInkRecordingSoundPlayerSlot|VoiceInkRecordingSoundCue|slot\.volume' \
+  VoiceInk/SoundPlaybackEngine.swift
+
+reject_pattern \
+  "macOS sound playback engine avoids shell-owned cue fallback and volume policy" \
+  'private enum Sound|startSound|stopSound|escSound|customStartSound|customStopSound|customStartSound \?\? startSound|customStopSound \?\? stopSound|volume: 0\.[34]' \
+  VoiceInk/SoundPlaybackEngine.swift
 
 require_pattern \
   "macOS defaults register shared recording feedback defaults" \

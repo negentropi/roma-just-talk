@@ -30,6 +30,32 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
         XCTAssertEqual(VoiceInkCustomSoundType.stop.defaultBuiltInSound, .sound2)
     }
 
+    func testRecordingSoundPlaybackPolicyPreservesMacOSSlotsVolumesAndFallbacks() {
+        XCTAssertEqual(
+            VoiceInkRecordingSoundPlaybackPolicy.setupSlots,
+            [.defaultStart, .defaultStop, .defaultEsc, .customStart, .customStop]
+        )
+
+        XCTAssertEqual(VoiceInkRecordingSoundPlayerSlot.defaultStart.volume, 0.4)
+        XCTAssertEqual(VoiceInkRecordingSoundPlayerSlot.defaultStop.volume, 0.4)
+        XCTAssertEqual(VoiceInkRecordingSoundPlayerSlot.customStart.volume, 0.4)
+        XCTAssertEqual(VoiceInkRecordingSoundPlayerSlot.customStop.volume, 0.4)
+        XCTAssertEqual(VoiceInkRecordingSoundPlayerSlot.defaultEsc.volume, 0.3)
+
+        XCTAssertEqual(
+            VoiceInkRecordingSoundPlaybackPolicy.playbackSlots(for: .start),
+            [.customStart, .defaultStart]
+        )
+        XCTAssertEqual(
+            VoiceInkRecordingSoundPlaybackPolicy.playbackSlots(for: .stop),
+            [.customStop, .defaultStop]
+        )
+        XCTAssertEqual(
+            VoiceInkRecordingSoundPlaybackPolicy.playbackSlots(for: .esc),
+            [.defaultEsc]
+        )
+    }
+
     func testCustomSoundPreferencePreservesDefaultsAndNotificationName() {
         XCTAssertEqual(VoiceInkCustomSoundPreference.customSoundsRelativeDirectory, "VoiceInk/CustomSounds")
         XCTAssertEqual(VoiceInkCustomSoundPreference.changedNotificationName, "CustomSoundsChanged")

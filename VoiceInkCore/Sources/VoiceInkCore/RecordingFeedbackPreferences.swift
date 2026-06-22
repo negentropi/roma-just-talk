@@ -176,6 +176,52 @@ public enum VoiceInkCustomSoundType: String, CaseIterable, Sendable {
     }
 }
 
+public enum VoiceInkRecordingSoundCue: CaseIterable, Sendable {
+    case start
+    case stop
+    case esc
+}
+
+public enum VoiceInkRecordingSoundPlayerSlot: CaseIterable, Hashable, Sendable {
+    case defaultStart
+    case defaultStop
+    case defaultEsc
+    case customStart
+    case customStop
+
+    public var volume: Float {
+        switch self {
+        case .defaultStart, .defaultStop, .customStart, .customStop:
+            return 0.4
+        case .defaultEsc:
+            return 0.3
+        }
+    }
+}
+
+public enum VoiceInkRecordingSoundPlaybackPolicy {
+    public static let setupSlots: [VoiceInkRecordingSoundPlayerSlot] = [
+        .defaultStart,
+        .defaultStop,
+        .defaultEsc,
+        .customStart,
+        .customStop
+    ]
+
+    public static func playbackSlots(
+        for cue: VoiceInkRecordingSoundCue
+    ) -> [VoiceInkRecordingSoundPlayerSlot] {
+        switch cue {
+        case .start:
+            return [.customStart, .defaultStart]
+        case .stop:
+            return [.customStop, .defaultStop]
+        case .esc:
+            return [.defaultEsc]
+        }
+    }
+}
+
 public enum VoiceInkCustomSoundError: LocalizedError, Equatable, Sendable {
     case fileNotFound
     case invalidAudioFile

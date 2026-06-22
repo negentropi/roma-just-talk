@@ -89,6 +89,7 @@ final class LocalCLIConfigurationTests: XCTestCase {
         XCTAssertEqual(VoiceInkLocalCLIPreference.boundedTimeoutSeconds(1), 5)
         XCTAssertEqual(VoiceInkLocalCLIPreference.boundedTimeoutSeconds(30), 30)
         XCTAssertEqual(VoiceInkLocalCLIPreference.timeoutLabel(for: 120), "120s")
+        XCTAssertEqual(VoiceInkLocalCLIPreference.cleanedOutput(" \n result \t"), "result")
 
         XCTAssertEqual(
             VoiceInkLocalCLIPreference.fullPrompt(systemPrompt: "System", userPrompt: "User"),
@@ -101,6 +102,62 @@ final class LocalCLIConfigurationTests: XCTestCase {
             User
             </USER_PROMPT>
             """
+        )
+    }
+
+    func testLocalCLIExecutionErrorsPreserveMacOSCopyAndFailureClassification() {
+        XCTAssertEqual(
+            VoiceInkLocalCLIExecutionError.commandNotConfigured.errorDescription,
+            "Local CLI command is not configured. Load a template or enter a command first."
+        )
+        XCTAssertEqual(
+            VoiceInkLocalCLIExecutionError.commandNotFound("zsh: command not found: roma").errorDescription,
+            "Local CLI command was not found. Use an absolute path or fix your shell PATH. Details: zsh: command not found: roma"
+        )
+        XCTAssertEqual(
+            VoiceInkLocalCLIExecutionError.timeout(seconds: 45.9).errorDescription,
+            "Local CLI command timed out after 45 seconds."
+        )
+        XCTAssertEqual(
+            VoiceInkLocalCLIExecutionError.nonZeroExit(status: 2, stderr: "").errorDescription,
+            "Local CLI command failed with exit code 2."
+        )
+        XCTAssertEqual(
+            VoiceInkLocalCLIExecutionError.nonZeroExit(status: 2, stderr: "bad flag").errorDescription,
+            "Local CLI command failed with exit code 2: bad flag"
+        )
+        XCTAssertEqual(
+            VoiceInkLocalCLIExecutionError.emptyOutput.errorDescription,
+            "Local CLI command returned empty output."
+        )
+        XCTAssertEqual(
+            VoiceInkLocalCLIExecutionError.executionFailed("permission denied").errorDescription,
+            "Failed to execute Local CLI command: permission denied"
+        )
+
+        XCTAssertEqual(
+            VoiceInkLocalCLIPreference.commandFailureError(
+                terminationStatus: 127,
+                stderr: "",
+                commandTemplate: "missing-cli"
+            ),
+            .commandNotFound("missing-cli")
+        )
+        XCTAssertEqual(
+            VoiceInkLocalCLIPreference.commandFailureError(
+                terminationStatus: 1,
+                stderr: " zsh: command not found: missing-cli\n",
+                commandTemplate: "missing-cli"
+            ),
+            .commandNotFound("zsh: command not found: missing-cli")
+        )
+        XCTAssertEqual(
+            VoiceInkLocalCLIPreference.commandFailureError(
+                terminationStatus: 3,
+                stderr: " bad input\n",
+                commandTemplate: "cli"
+            ),
+            .nonZeroExit(status: 3, stderr: "bad input")
         )
     }
 

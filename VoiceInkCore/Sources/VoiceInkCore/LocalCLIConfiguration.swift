@@ -51,6 +51,36 @@ public enum VoiceInkLocalCLITemplate: String, CaseIterable, Identifiable, Sendab
     }
 }
 
+public enum VoiceInkLocalCLIExecutionError: Error, LocalizedError, Equatable, Sendable {
+    case commandNotConfigured
+    case commandNotFound(String)
+    case timeout(seconds: Double)
+    case nonZeroExit(status: Int, stderr: String)
+    case emptyOutput
+    case executionFailed(String)
+
+    public var errorDescription: String? {
+        switch self {
+        case .commandNotConfigured:
+            return "Local CLI command is not configured. Load a template or enter a command first."
+        case .commandNotFound(let details):
+            return "Local CLI command was not found. Use an absolute path or fix your shell PATH. Details: \(details)"
+        case .timeout(let seconds):
+            return "Local CLI command timed out after \(Int(seconds)) seconds."
+        case .nonZeroExit(let status, let stderr):
+            if stderr.isEmpty {
+                return "Local CLI command failed with exit code \(status)."
+            }
+
+            return "Local CLI command failed with exit code \(status): \(stderr)"
+        case .emptyOutput:
+            return "Local CLI command returned empty output."
+        case .executionFailed(let message):
+            return "Failed to execute Local CLI command: \(message)"
+        }
+    }
+}
+
 public enum VoiceInkLocalCLIPreference {
     public static let commandTemplateKey = "localCLICommandTemplate"
     public static let selectedTemplateKey = "localCLISelectedTemplate"
@@ -114,6 +144,26 @@ public enum VoiceInkLocalCLIPreference {
 
     public static func isCommandConfigured(_ commandTemplate: String) -> Bool {
         !commandTemplate.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    public static func cleanedOutput(_ value: String) -> String {
+        value.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    public static func commandFailureError(
+        terminationStatus: Int,
+        stderr: String,
+        commandTemplate: String
+    ) -> VoiceInkLocalCLIExecutionError {
+        let cleanedStderr = cleanedOutput(stderr)
+        let looksLikeCommandNotFound = terminationStatus == 127 ||
+            cleanedStderr.lowercased().contains("command not found")
+
+        if looksLikeCommandNotFound {
+            return .commandNotFound(cleanedStderr.isEmpty ? commandTemplate : cleanedStderr)
+        }
+
+        return .nonZeroExit(status: terminationStatus, stderr: cleanedStderr)
     }
 
     public static func fullPrompt(systemPrompt: String, userPrompt: String) -> String {

@@ -6340,13 +6340,18 @@ require_pattern \
 
 require_pattern \
   "shared Local CLI configuration lives in VoiceInkCore" \
-  'VoiceInkMacOSLocalCLISettingsPresentation|macOSSettingsPresentation|VoiceInkLocalCLITemplate|VoiceInkLocalCLIPreference|commandTemplateKey = "localCLICommandTemplate"|selectedTemplateKey = "localCLISelectedTemplate"|timeoutSecondsKey = "localCLITimeoutSeconds"|defaultTimeoutSeconds|timeoutOptions|boundedTimeoutSeconds|isCommandConfigured|fullPrompt' \
+  'VoiceInkMacOSLocalCLISettingsPresentation|macOSSettingsPresentation|VoiceInkLocalCLITemplate|VoiceInkLocalCLIExecutionError|VoiceInkLocalCLIPreference|commandTemplateKey = "localCLICommandTemplate"|selectedTemplateKey = "localCLISelectedTemplate"|timeoutSecondsKey = "localCLITimeoutSeconds"|defaultTimeoutSeconds|timeoutOptions|boundedTimeoutSeconds|isCommandConfigured|cleanedOutput|commandFailureError|fullPrompt' \
   VoiceInkCore/Sources/VoiceInkCore/LocalCLIConfiguration.swift
 
 require_pattern \
   "macOS Local CLI service uses shared configuration policy" \
-  'VoiceInkLocalCLIPreference\.(saveCommandTemplate|saveSelectedTemplate|boundedTimeoutSeconds|saveTimeoutSeconds|isCommandConfigured|selectedTemplate|commandTemplate|timeoutSeconds|fullPrompt)' \
+  'VoiceInkLocalCLIPreference\.(saveCommandTemplate|saveSelectedTemplate|boundedTimeoutSeconds|saveTimeoutSeconds|isCommandConfigured|selectedTemplate|commandTemplate|timeoutSeconds|fullPrompt|cleanedOutput|commandFailureError)|VoiceInkLocalCLIExecutionError' \
   VoiceInk/Services/AIEnhancement/LocalCLIService.swift
+
+require_pattern \
+  "core checks execute Local CLI execution error tests" \
+  'LocalCLIConfigurationTests\.testLocalCLIExecutionErrorsPreserveMacOSCopyAndFailureClassification' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "macOS AI service exposes shared Local CLI template type" \
@@ -6370,7 +6375,7 @@ require_pattern \
 
 require_pattern \
   "migration checklist tracks shared Local CLI configuration gate" \
-  'macOS Local CLI template identity, settings labels/help, command template catalog, command/selected-template/timeout storage, timeout default/options/clamp, configured-command predicate, and full-prompt wrapper route through `VoiceInkLocalCLITemplate`/`VoiceInkLocalCLIPreference`' \
+  'macOS Local CLI template identity, settings labels/help, command template catalog, command/selected-template/timeout storage, timeout default/options/clamp, configured-command predicate, full-prompt wrapper, stdout/stderr cleanup, command-failure classification, and execution error copy route through `VoiceInkLocalCLITemplate`/`VoiceInkLocalCLIPreference`/`VoiceInkLocalCLIExecutionError`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \
@@ -6645,7 +6650,7 @@ reject_pattern \
 
 reject_pattern \
   "macOS Local CLI adapter avoids shell-owned template and preference policy" \
-  'enum +LocalCLITemplate|"(localCLICommandTemplate|localCLISelectedTemplate|localCLITimeoutSeconds)"|defaultTimeoutSeconds|max\(5, timeoutSeconds\)|makeFullPrompt' \
+  'enum +LocalCLITemplate|enum +LocalCLIError|"(localCLICommandTemplate|localCLISelectedTemplate|localCLITimeoutSeconds|Local CLI command is not configured|Local CLI command was not found|Local CLI command timed out|Local CLI command failed with exit code|Local CLI command returned empty output|Failed to execute Local CLI command)"|defaultTimeoutSeconds|max\(5, timeoutSeconds\)|makeFullPrompt|cleanOutput\(' \
   VoiceInk/Services/AIEnhancement/LocalCLIService.swift
 
 reject_pattern \

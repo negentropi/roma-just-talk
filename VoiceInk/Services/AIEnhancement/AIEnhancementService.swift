@@ -205,7 +205,7 @@ class AIEnhancementService: ObservableObject {
                 let result = try await aiService.enhanceWithLocalCLI(systemPrompt: systemMessage, userPrompt: formattedText)
                 return VoiceInkAIEnhancementRequestPayload.enhancedText(from: result)
             } catch {
-                if let localError = error as? LocalCLIError {
+                if let localError = error as? VoiceInkLocalCLIExecutionError {
                     throw VoiceInkAIEnhancementError.customError(localError.errorDescription ?? "An unknown Local CLI error occurred.")
                 } else {
                     throw VoiceInkAIEnhancementError.customError(error.localizedDescription)

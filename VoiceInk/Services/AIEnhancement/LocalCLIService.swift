@@ -45,7 +45,7 @@ final class LocalCLIService {
 
     func enhance(systemPrompt: String, userPrompt: String) async throws -> String {
         guard isConfigured else {
-            throw LocalCLIError.commandNotConfigured
+            throw VoiceInkLocalCLIExecutionError.commandNotConfigured
         }
 
         let fullPrompt = VoiceInkLocalCLIPreference.fullPrompt(systemPrompt: systemPrompt, userPrompt: userPrompt)
@@ -88,7 +88,7 @@ final class LocalCLIService {
                 do {
                     try process.run()
                 } catch {
-                    continuation.resume(throwing: LocalCLIError.executionFailed(error.localizedDescription))
+                    continuation.resume(throwing: VoiceInkLocalCLIExecutionError.executionFailed(error.localizedDescription))
                     return
                 }
 
@@ -108,29 +108,27 @@ final class LocalCLIService {
                         process.terminate()
                         _ = semaphore.wait(timeout: .now() + 2)
                     }
-                    continuation.resume(throwing: LocalCLIError.timeout(seconds: timeout))
+                    continuation.resume(throwing: VoiceInkLocalCLIExecutionError.timeout(seconds: timeout))
                     return
                 }
 
                 let stdoutData = outputPipe.fileHandleForReading.readDataToEndOfFile()
                 let stderrData = errorPipe.fileHandleForReading.readDataToEndOfFile()
 
-                let stdout = Self.cleanOutput(String(data: stdoutData, encoding: .utf8) ?? "")
-                let stderr = Self.cleanOutput(String(data: stderrData, encoding: .utf8) ?? "")
+                let stdout = VoiceInkLocalCLIPreference.cleanedOutput(String(data: stdoutData, encoding: .utf8) ?? "")
+                let stderr = VoiceInkLocalCLIPreference.cleanedOutput(String(data: stderrData, encoding: .utf8) ?? "")
 
                 if process.terminationStatus != 0 {
-                    let looksLikeCommandNotFound = process.terminationStatus == 127 ||
-                        stderr.lowercased().contains("command not found")
-                    if looksLikeCommandNotFound {
-                        continuation.resume(throwing: LocalCLIError.commandNotFound(stderr.isEmpty ? commandTemplate : stderr))
-                    } else {
-                        continuation.resume(throwing: LocalCLIError.nonZeroExit(status: Int(process.terminationStatus), stderr: stderr))
-                    }
+                    continuation.resume(throwing: VoiceInkLocalCLIPreference.commandFailureError(
+                        terminationStatus: Int(process.terminationStatus),
+                        stderr: stderr,
+                        commandTemplate: commandTemplate
+                    ))
                     return
                 }
 
                 guard !stdout.isEmpty else {
-                    continuation.resume(throwing: LocalCLIError.emptyOutput)
+                    continuation.resume(throwing: VoiceInkLocalCLIExecutionError.emptyOutput)
                     return
                 }
 
@@ -205,38 +203,5 @@ final class LocalCLIService {
         }
 
         return pathSection
-    }
-
-    private static func cleanOutput(_ value: String) -> String {
-        value.trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-}
-
-enum LocalCLIError: Error, LocalizedError {
-    case commandNotConfigured
-    case commandNotFound(String)
-    case timeout(seconds: Double)
-    case nonZeroExit(status: Int, stderr: String)
-    case emptyOutput
-    case executionFailed(String)
-
-    var errorDescription: String? {
-        switch self {
-        case .commandNotConfigured:
-            return "Local CLI command is not configured. Load a template or enter a command first."
-        case .commandNotFound(let details):
-            return "Local CLI command was not found. Use an absolute path or fix your shell PATH. Details: \(details)"
-        case .timeout(let seconds):
-            return "Local CLI command timed out after \(Int(seconds)) seconds."
-        case .nonZeroExit(let status, let stderr):
-            if stderr.isEmpty {
-                return "Local CLI command failed with exit code \(status)."
-            }
-            return "Local CLI command failed with exit code \(status): \(stderr)"
-        case .emptyOutput:
-            return "Local CLI command returned empty output."
-        case .executionFailed(let message):
-            return "Failed to execute Local CLI command: \(message)"
-        }
     }
 }

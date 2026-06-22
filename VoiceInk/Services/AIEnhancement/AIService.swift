@@ -204,17 +204,15 @@ class AIService: ObservableObject {
     ) {
         Task {
             let result: VoiceInkAPIKeyVerificationResult
-            guard let route = selectedProvider.apiKeyVerificationRoute else {
-                DispatchQueue.main.async {
-                    completion(VoiceInkAPIKeyVerificationResult(
-                        isValid: false,
-                        errorMessage: self.selectedProvider.unsupportedAPIKeyVerificationMessage
-                    ))
-                }
-                return
-            }
+            let dispatchPlan = VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan.plan(
+                provider: selectedProvider,
+                currentModel: currentModel,
+                requestURL: selectedProvider.textEnhancementRequestURL()
+            )
 
-            switch route {
+            switch dispatchPlan.action {
+            case .immediate(let immediateResult):
+                result = immediateResult
             case .sharedProvider(let provider):
                 let verification = await VoiceInkProviderAPIKeyVerifier().verifyAPIKeyDetailed(
                     resolvedKey,
@@ -225,28 +223,19 @@ class AIService: ObservableObject {
                 result = apiKeyVerificationResult(
                     from: await AnthropicLLMClient.verifyAPIKey(resolvedKey)
                 )
-            case .openAICompatibleModels:
-                guard let baseURL = selectedProvider.textEnhancementRequestURL() else {
-                    DispatchQueue.main.async {
-                        completion(VoiceInkAPIKeyVerificationResult(
-                            isValid: false,
-                            errorMessage: VoiceInkAIEnhancementProviderKind.invalidOrMissingBaseURLConfigurationMessage
-                        ))
-                    }
-                    return
-                }
+            case .openAICompatibleModels(let requestURL, let model):
                 result = apiKeyVerificationResult(
                     from: await OpenAILLMClient.verifyAPIKey(
-                        baseURL: baseURL,
+                        baseURL: requestURL,
                         apiKey: resolvedKey,
-                        model: currentModel
+                        model: model
                     )
                 )
-            case .openRouterModels:
+            case .openRouterModels(let model):
                 result = apiKeyVerificationResult(
                     from: await OpenRouterClient.verifyAPIKey(
                         resolvedKey,
-                        model: currentModel
+                        model: model
                     )
                 )
             }

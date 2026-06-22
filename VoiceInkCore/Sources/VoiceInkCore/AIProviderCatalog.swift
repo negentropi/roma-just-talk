@@ -346,6 +346,76 @@ public struct VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan: Equatable,
     }
 }
 
+public enum VoiceInkAIEnhancementAPIKeyVerificationDispatch: Equatable, Sendable {
+    case immediate(VoiceInkAPIKeyVerificationResult)
+    case sharedProvider(VoiceInkProviderKind)
+    case anthropicMessages
+    case openAICompatibleModels(requestURL: URL, model: String)
+    case openRouterModels(model: String)
+}
+
+public struct VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan: Equatable, Sendable {
+    public let provider: VoiceInkAIEnhancementProviderKind
+    public let action: VoiceInkAIEnhancementAPIKeyVerificationDispatch
+
+    public init(
+        provider: VoiceInkAIEnhancementProviderKind,
+        action: VoiceInkAIEnhancementAPIKeyVerificationDispatch
+    ) {
+        self.provider = provider
+        self.action = action
+    }
+
+    public static func plan(
+        provider: VoiceInkAIEnhancementProviderKind,
+        currentModel: String,
+        requestURL: URL?
+    ) -> VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan {
+        guard let route = provider.apiKeyVerificationRoute else {
+            return VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
+                provider: provider,
+                action: .immediate(VoiceInkAPIKeyVerificationResult(
+                    isValid: false,
+                    errorMessage: provider.unsupportedAPIKeyVerificationMessage
+                ))
+            )
+        }
+
+        switch route {
+        case .sharedProvider(let sharedProvider):
+            return VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
+                provider: provider,
+                action: .sharedProvider(sharedProvider)
+            )
+        case .anthropicMessages:
+            return VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
+                provider: provider,
+                action: .anthropicMessages
+            )
+        case .openAICompatibleModels:
+            guard let requestURL else {
+                return VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
+                    provider: provider,
+                    action: .immediate(VoiceInkAPIKeyVerificationResult(
+                        isValid: false,
+                        errorMessage: VoiceInkAIEnhancementProviderKind.invalidOrMissingBaseURLConfigurationMessage
+                    ))
+                )
+            }
+
+            return VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
+                provider: provider,
+                action: .openAICompatibleModels(requestURL: requestURL, model: currentModel)
+            )
+        case .openRouterModels:
+            return VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
+                provider: provider,
+                action: .openRouterModels(model: currentModel)
+            )
+        }
+    }
+}
+
 public struct VoiceInkAIEnhancementAPIKeyClearPlan: Equatable, Sendable {
     public let provider: VoiceInkAIEnhancementProviderKind
     public let credentialStateAfterClear: VoiceInkAIEnhancementCredentialState

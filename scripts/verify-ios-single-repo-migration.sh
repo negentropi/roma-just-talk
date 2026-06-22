@@ -5894,8 +5894,18 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \
+  "shared macOS AI API-key verification dispatch plan lives in VoiceInkCore" \
+  'VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan|VoiceInkAIEnhancementAPIKeyVerificationDispatch|openAICompatibleModels\(requestURL:|openRouterModels\(model:' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+require_pattern \
   "core checks execute shared macOS AI API-key verification request plan test" \
   'AIProviderCatalogTests\.testMacOSAIEnhancementAPIKeyVerificationRequestPlanIsShared' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute shared macOS AI API-key verification dispatch plan test" \
+  'AIProviderCatalogTests\.testMacOSAIEnhancementAPIKeyVerificationDispatchPlanIsShared' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -5919,6 +5929,11 @@ require_pattern \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 require_pattern \
+  "macOS AI service dispatches API-key verification through shared plan" \
+  'VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan\.plan|dispatchPlan\.action' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+require_pattern \
   "macOS AI service applies API-key clear through shared plan" \
   'VoiceInkAIEnhancementAPIKeyClearPlan\.clearing|applyTextEnhancementAPIKeyClearPlan|credentialStateAfterClear' \
   VoiceInk/Services/AIEnhancement/AIService.swift
@@ -5926,6 +5941,11 @@ require_pattern \
 require_pattern \
   "migration checklist tracks shared macOS AI API-key verification request plan" \
   'verification-request planning.*VoiceInkAIEnhancementAPIKeyVerificationRequestPlan' \
+  docs/ios-single-repo-migration.md
+
+require_pattern \
+  "migration checklist tracks shared macOS AI API-key verification dispatch plan" \
+  'verification-dispatch planning.*VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan' \
   docs/ios-single-repo-migration.md
 
 require_pattern \
@@ -5998,9 +6018,9 @@ reject_pattern \
   'if isValid \{|self\.apiKey = resolvedKey|APIKeyManager\.shared\.saveAPIKey\(key,' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
-require_pattern \
-  "macOS AI service uses shared API-key failure messages" \
-  'VoiceInkAIEnhancementProviderKind\.(missingVerificationCandidateMessage|invalidOrMissingBaseURLConfigurationMessage)|selectedProvider\.unsupportedAPIKeyVerificationMessage' \
+reject_pattern \
+  "macOS AI service avoids shell-owned API-key verification dispatch failure policy" \
+  'selectedProvider\.unsupportedAPIKeyVerificationMessage|invalidOrMissingBaseURLConfigurationMessage|guard let route = selectedProvider\.apiKeyVerificationRoute' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 require_pattern \

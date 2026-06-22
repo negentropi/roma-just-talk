@@ -251,6 +251,83 @@ final class AIProviderCatalogTests: XCTestCase {
         )
     }
 
+    func testMacOSAIEnhancementAPIKeyVerificationDispatchPlanIsShared() {
+        let customRequestURL = URL(string: "https://api.example.com/v1/chat/completions")!
+
+        XCTAssertEqual(
+            VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan.plan(
+                provider: .localCLI,
+                currentModel: "ignored",
+                requestURL: nil
+            ),
+            VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
+                provider: .localCLI,
+                action: .immediate(VoiceInkAPIKeyVerificationResult(
+                    isValid: false,
+                    errorMessage: VoiceInkAIEnhancementProviderKind.localCLI.unsupportedAPIKeyVerificationMessage
+                ))
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan.plan(
+                provider: .custom,
+                currentModel: "custom-model",
+                requestURL: nil
+            ),
+            VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
+                provider: .custom,
+                action: .immediate(VoiceInkAPIKeyVerificationResult(
+                    isValid: false,
+                    errorMessage: VoiceInkAIEnhancementProviderKind.invalidOrMissingBaseURLConfigurationMessage
+                ))
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan.plan(
+                provider: .custom,
+                currentModel: "custom-model",
+                requestURL: customRequestURL
+            ),
+            VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
+                provider: .custom,
+                action: .openAICompatibleModels(requestURL: customRequestURL, model: "custom-model")
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan.plan(
+                provider: .gemini,
+                currentModel: "gemini-2.5-pro",
+                requestURL: nil
+            ),
+            VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
+                provider: .gemini,
+                action: .sharedProvider(.gemini)
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan.plan(
+                provider: .anthropic,
+                currentModel: "claude-sonnet-4-20250514",
+                requestURL: nil
+            ),
+            VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
+                provider: .anthropic,
+                action: .anthropicMessages
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan.plan(
+                provider: .openRouter,
+                currentModel: "openai/gpt-5.5",
+                requestURL: nil
+            ),
+            VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
+                provider: .openRouter,
+                action: .openRouterModels(model: "openai/gpt-5.5")
+            )
+        )
+    }
+
     func testMacOSAIEnhancementAPIKeyVerificationPlanSavesEnteredReferenceAndAppliesResolvedRuntimeKey() {
         let draft = VoiceInkAIEnhancementAPIKeyDraft(
             provider: .groq,

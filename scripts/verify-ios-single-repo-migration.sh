@@ -3468,6 +3468,26 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
 
 require_pattern \
+  "shared Whisper imported local model merge plan lives in VoiceInkCore" \
+  'importedLocalModelNamesToAdd|existingModelNames|downloadedLocalModels' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
+
+require_pattern \
+  "macOS transcription model manager uses shared imported local model merge plan" \
+  'VoiceInkWhisperModelFiles\.importedLocalModelNamesToAdd' \
+  VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
+
+require_pattern \
+  "core checks execute imported local model merge plan test" \
+  'WhisperModelFilesTests\.testImportedLocalModelNamesToAddSkipsExistingRegistryModelsAndDownloadedDuplicates' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "macOS transcription model manager avoids shell-owned imported local model duplicate scan" \
+  'for +whisperModel in whisperModelManager\?\.availableModels|models\.contains\(where: \{ \$0\.name == whisperModel\.name \}\)' \
+  VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
+
+require_pattern \
   "shared Whisper available local model URL resolution lives in VoiceInkCore" \
   'availableLocalModelFileURL|localModels\.first\(where:|fileManager\.fileExists\(atPath: model\.url\.path\)' \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift

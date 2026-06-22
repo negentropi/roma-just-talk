@@ -331,6 +331,21 @@ public enum VoiceInkWhisperModelFiles {
             .compactMap { localModelFile(from: $0) }
     }
 
+    public static func importedLocalModelNamesToAdd(
+        downloadedLocalModels: [VoiceInkWhisperLocalModelFile],
+        existingModelNames: [String]
+    ) -> [String] {
+        var existingNames = Set(existingModelNames)
+        var namesToAdd: [String] = []
+
+        for model in downloadedLocalModels where !existingNames.contains(model.name) {
+            namesToAdd.append(model.name)
+            existingNames.insert(model.name)
+        }
+
+        return namesToAdd
+    }
+
     public static func availableLocalModelFileURL(
         forModelName modelName: String,
         in localModels: [VoiceInkWhisperLocalModelFile],

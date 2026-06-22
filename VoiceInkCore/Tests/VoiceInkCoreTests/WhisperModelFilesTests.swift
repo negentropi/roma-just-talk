@@ -256,6 +256,35 @@ final class WhisperModelFilesTests: XCTestCase {
         XCTAssertEqual(Set(modelFiles.map(\.name)), ["ggml-base"])
     }
 
+    func testImportedLocalModelNamesToAddSkipsExistingRegistryModelsAndDownloadedDuplicates() {
+        let localModels = [
+            VoiceInkWhisperLocalModelFile(
+                name: "ggml-base",
+                url: URL(fileURLWithPath: "/tmp/ggml-base.bin")
+            ),
+            VoiceInkWhisperLocalModelFile(
+                name: "custom-a",
+                url: URL(fileURLWithPath: "/tmp/custom-a.bin")
+            ),
+            VoiceInkWhisperLocalModelFile(
+                name: "custom-a",
+                url: URL(fileURLWithPath: "/tmp/custom-a-copy.bin")
+            ),
+            VoiceInkWhisperLocalModelFile(
+                name: "custom-b",
+                url: URL(fileURLWithPath: "/tmp/custom-b.bin")
+            )
+        ]
+
+        XCTAssertEqual(
+            VoiceInkWhisperModelFiles.importedLocalModelNamesToAdd(
+                downloadedLocalModels: localModels,
+                existingModelNames: ["ggml-base", "parakeet-tdt-0.6b-v2"]
+            ),
+            ["custom-a", "custom-b"]
+        )
+    }
+
     func testAvailableLocalModelFileURLFindsExistingImportedModel() throws {
         let baseDirectory = FileManager.default.temporaryDirectory
             .appendingPathComponent("VoiceInkCore.WhisperModelFilesTests.\(UUID().uuidString)", isDirectory: true)

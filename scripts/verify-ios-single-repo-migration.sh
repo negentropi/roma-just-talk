@@ -280,6 +280,20 @@ require_pattern() {
   done
 }
 
+require_patterns() {
+  local description="$1"
+  local file="$2"
+  shift 2
+
+  section "$description"
+  local pattern
+  for pattern in "$@"; do
+    if ! rg -q "$pattern" "$file"; then
+      fail "$description: missing pattern '$pattern' in $file"
+    fi
+  done
+}
+
 require_context_pattern_count_at_least() {
   local description="$1"
   local anchor="$2"
@@ -7450,10 +7464,18 @@ require_pattern \
   'enum VoiceInkCustomSoundType: String, CaseIterable|isUsingKey|filenameKey|builtInSoundKey|defaultBuiltInSound|VoiceInkCustomSoundPreference|registeredDefaults|customSoundsRelativeDirectory|changedNotificationName' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
 
-require_pattern \
+require_patterns \
   "shared custom recording sound settings presentation lives in VoiceInkCore" \
-  'VoiceInkCustomSoundMenuSelection|VoiceInkCustomSoundSettingsPresentation|label\(for:|customMenuTitle|openPanelTitle|testButtonSystemImageName|chooseButtonSystemImageName|resetButtonSystemImageName|invalidAudioAlertTitle' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift \
+  'VoiceInkCustomSoundMenuSelection' \
+  'VoiceInkCustomSoundSettingsPresentation' \
+  'label\(for type:' \
+  'customMenuTitle' \
+  'openPanelTitle' \
+  'testButtonSystemImageName' \
+  'chooseButtonSystemImageName' \
+  'resetButtonSystemImageName' \
+  'invalidAudioAlertTitle'
 
 require_pattern \
   "shared custom recording sound validation and file-operation planning lives in VoiceInkCore" \
@@ -7525,10 +7547,25 @@ require_pattern \
   'VoiceInkRecordingSoundPlaybackPolicy\.(setupSlots|playbackSlots)|VoiceInkRecordingSoundPlayerSlot|VoiceInkRecordingSoundCue|slot\.volume' \
   VoiceInk/SoundPlaybackEngine.swift
 
-require_pattern \
+require_patterns \
   "macOS custom sound settings view uses shared presentation" \
-  'VoiceInkCustomSoundSettingsPresentation\.(label|pickerTitle|customMenuTitle|selectSoundHelpText|testButtonHelpText|chooseButtonHelpText|resetButtonHelpText|testButtonSystemImageName|chooseButtonSystemImageName|resetButtonSystemImageName|openPanelTitle|openPanelMessage|invalidAudioAlertTitle|alertDismissButtonTitle)|VoiceInkCustomSoundMenuSelection|VoiceInkBuiltInRecordingSound\.allCases' \
-  VoiceInk/Views/Settings/CustomSoundSettingsView.swift
+  VoiceInk/Views/Settings/CustomSoundSettingsView.swift \
+  'VoiceInkCustomSoundSettingsPresentation\.label' \
+  'VoiceInkCustomSoundSettingsPresentation\.pickerTitle' \
+  'VoiceInkCustomSoundSettingsPresentation\.customMenuTitle' \
+  'VoiceInkCustomSoundSettingsPresentation\.selectSoundHelpText' \
+  'VoiceInkCustomSoundSettingsPresentation\.testButtonHelpText' \
+  'VoiceInkCustomSoundSettingsPresentation\.chooseButtonHelpText' \
+  'VoiceInkCustomSoundSettingsPresentation\.resetButtonHelpText' \
+  'VoiceInkCustomSoundSettingsPresentation\.testButtonSystemImageName' \
+  'VoiceInkCustomSoundSettingsPresentation\.chooseButtonSystemImageName' \
+  'VoiceInkCustomSoundSettingsPresentation\.resetButtonSystemImageName' \
+  'VoiceInkCustomSoundSettingsPresentation\.openPanelTitle' \
+  'VoiceInkCustomSoundSettingsPresentation\.openPanelMessage' \
+  'VoiceInkCustomSoundSettingsPresentation\.invalidAudioAlertTitle' \
+  'VoiceInkCustomSoundSettingsPresentation\.alertDismissButtonTitle' \
+  'VoiceInkCustomSoundMenuSelection' \
+  'VoiceInkBuiltInRecordingSound\.allCases'
 
 reject_pattern \
   "macOS custom sound settings view avoids shell-only presentation copy and aliases" \
@@ -10728,10 +10765,33 @@ require_pattern \
   'VoiceInkLicenseLinks\.(purchaseURL|managementPortalURL)' \
   VoiceInk/Views/LicenseManagementView.swift
 
-require_pattern \
+require_patterns \
   "macOS license management view uses shared presentation" \
-  'VoiceInkLicenseManagementPresentation\.(appVersionFallback|heroSystemImageName|heroTitle|heroSubtitle|licensedResourceLinks|purchaseFeatures|activeLicenseDeviceLimitText)|VoiceInkLicenseManagementResourceLink|VoiceInkLicenseManagementResourceID' \
-  VoiceInk/Views/LicenseManagementView.swift
+  VoiceInk/Views/LicenseManagementView.swift \
+  'VoiceInkLicenseManagementPresentation\.appVersionFallback' \
+  'VoiceInkLicenseManagementPresentation\.heroSystemImageName' \
+  'VoiceInkLicenseManagementPresentation\.heroTitle' \
+  'VoiceInkLicenseManagementPresentation\.heroSubtitle' \
+  'VoiceInkLicenseManagementPresentation\.appVersionText' \
+  'VoiceInkLicenseManagementPresentation\.licensedResourceLinks' \
+  'VoiceInkLicenseManagementPresentation\.lifetimeBadgeSystemImageName' \
+  'VoiceInkLicenseManagementPresentation\.lifetimeBadgeTitle' \
+  'VoiceInkLicenseManagementPresentation\.purchaseButtonTitle' \
+  'VoiceInkLicenseManagementPresentation\.purchaseFeatures' \
+  'VoiceInkLicenseManagementPresentation\.activationSectionTitle' \
+  'VoiceInkLicenseManagementPresentation\.licenseKeyPlaceholder' \
+  'VoiceInkLicenseManagementPresentation\.activateButtonTitle' \
+  'VoiceInkLicenseManagementPresentation\.existingLicenseSectionTitle' \
+  'VoiceInkLicenseManagementPresentation\.existingLicenseDescription' \
+  'VoiceInkLicenseManagementPresentation\.managementPortalButtonTitle' \
+  'VoiceInkLicenseManagementPresentation\.activeLicenseTitle' \
+  'VoiceInkLicenseManagementPresentation\.activeLicenseBadgeText' \
+  'VoiceInkLicenseManagementPresentation\.activeLicenseDeviceLimitText' \
+  'VoiceInkLicenseManagementPresentation\.deactivationSectionTitle' \
+  'VoiceInkLicenseManagementPresentation\.deactivateButtonTitle' \
+  'VoiceInkLicenseManagementPresentation\.deactivateSystemImageName' \
+  'VoiceInkLicenseManagementResourceLink' \
+  'VoiceInkLicenseManagementResourceID'
 
 reject_file VoiceInk/Views/LicenseView.swift
 

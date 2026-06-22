@@ -10101,6 +10101,47 @@ require_pattern \
   'resolvedPowerModeConfiguration' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
+require_patterns \
+  "shared Power Mode browser metadata lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModeBrowser.swift \
+  'VoiceInkPowerModeBrowser' \
+  'safariURL' \
+  'company\.thebrowser\.Browser' \
+  'com\.google\.Chrome' \
+  'com\.microsoft\.edgemac' \
+  'app\.zen-browser\.zen' \
+  'ru\.yandex\.desktop\.yandex-browser'
+
+require_pattern \
+  "core checks execute Power Mode browser metadata tests" \
+  'PowerModePolicyTests\.testPowerModeBrowserCatalogPreservesMacOSMetadata|PowerModePolicyTests\.testPowerModeBrowserCatalogPreservesCurrentDetectionSet' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "macOS active-window service consumes shared Power Mode browser catalog" \
+  'VoiceInkPowerModeBrowser\.allCases' \
+  VoiceInk/PowerMode/ActiveWindowService.swift
+
+require_patterns \
+  "macOS browser URL service adapts shared Power Mode browser metadata" \
+  VoiceInk/PowerMode/BrowserURLService.swift \
+  'getCurrentURL\(from browser: VoiceInkPowerModeBrowser\)' \
+  'isRunning\(_ browser: VoiceInkPowerModeBrowser\)' \
+  'browser\.scriptName' \
+  'browser\.bundleIdentifier' \
+  'browser\.displayName'
+
+reject_pattern \
+  "macOS browser URL service avoids shell-owned browser metadata" \
+  'enum +BrowserType|case +(safari|arc|chrome|edge|firefox|brave|opera|vivaldi|orion|zen|yandex)|"(safariURL|arcURL|chromeURL|edgeURL|firefoxURL|braveURL|operaURL|vivaldiURL|orionURL|zenURL|yandexURL|com\.apple\.Safari|company\.thebrowser\.Browser|com\.google\.Chrome|com\.microsoft\.edgemac|org\.mozilla\.firefox|com\.brave\.Browser|com\.operasoftware\.Opera|com\.vivaldi\.Vivaldi|com\.kagi\.kagimacOS|app\.zen-browser\.zen|ru\.yandex\.desktop\.yandex-browser|Google Chrome|Microsoft Edge|Zen Browser|Yandex Browser)"' \
+  VoiceInk/PowerMode/BrowserURLService.swift \
+  VoiceInk/PowerMode/ActiveWindowService.swift
+
+require_pattern \
+  "migration checklist tracks shared Power Mode browser metadata" \
+  'VoiceInkPowerModeBrowser|browser metadata' \
+  docs/ios-single-repo-migration.md
+
 reject_pattern \
   "macOS Power Mode avoids shell-only config record and policy adapters" \
   'struct +PowerModeConfig|extension +Array +where +Element *== *PowerModeConfig|extension +PowerModeConfig' \

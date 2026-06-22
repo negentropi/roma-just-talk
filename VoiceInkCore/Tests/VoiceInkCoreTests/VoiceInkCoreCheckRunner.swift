@@ -713,6 +713,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PowerModePresentationTests.testRowDetailPresentationPreservesDefaultBandWithoutVisibleChips", run: { PowerModePresentationTests().testRowDetailPresentationPreservesDefaultBandWithoutVisibleChips() }),
             VoiceInkCoreCheck(name: "PowerModePresentationTests.testRowDetailPresentationPreservesMacOSChipOrderAndText", run: { PowerModePresentationTests().testRowDetailPresentationPreservesMacOSChipOrderAndText() }),
             VoiceInkCoreCheck(name: "PowerModePresentationTests.testRowDetailPresentationFallsBackToDefaultPromptAndSkipsBlankAIModel", run: { PowerModePresentationTests().testRowDetailPresentationFallsBackToDefaultPromptAndSkipsBlankAIModel() }),
+            VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeBrowserCatalogPreservesMacOSMetadata", run: { PowerModePolicyTests().testPowerModeBrowserCatalogPreservesMacOSMetadata() }),
+            VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeBrowserCatalogPreservesCurrentDetectionSet", run: { PowerModePolicyTests().testPowerModeBrowserCatalogPreservesCurrentDetectionSet() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeEmojiCatalogPreservesDefaultsStorageKeyAndCopy", run: { PowerModePolicyTests().testPowerModeEmojiCatalogPreservesDefaultsStorageKeyAndCopy() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeEmojiCatalogValidatesAndAddsCustomEmojis", run: { PowerModePolicyTests().testPowerModeEmojiCatalogValidatesAndAddsCustomEmojis() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeEmojiInputDraftBuildsPreviewFeedback", run: { PowerModePolicyTests().testPowerModeEmojiInputDraftBuildsPreviewFeedback() }),

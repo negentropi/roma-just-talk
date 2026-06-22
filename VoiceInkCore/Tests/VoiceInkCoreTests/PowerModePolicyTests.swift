@@ -2,6 +2,56 @@ import Foundation
 import VoiceInkCore
 
 final class PowerModePolicyTests: XCTestCase {
+    func testPowerModeBrowserCatalogPreservesMacOSMetadata() {
+        XCTAssertEqual(VoiceInkPowerModeBrowser.safari.scriptName, "safariURL")
+        XCTAssertEqual(VoiceInkPowerModeBrowser.arc.scriptName, "arcURL")
+        XCTAssertEqual(VoiceInkPowerModeBrowser.chrome.scriptName, "chromeURL")
+        XCTAssertEqual(VoiceInkPowerModeBrowser.edge.scriptName, "edgeURL")
+        XCTAssertEqual(VoiceInkPowerModeBrowser.firefox.scriptName, "firefoxURL")
+        XCTAssertEqual(VoiceInkPowerModeBrowser.brave.scriptName, "braveURL")
+        XCTAssertEqual(VoiceInkPowerModeBrowser.opera.scriptName, "operaURL")
+        XCTAssertEqual(VoiceInkPowerModeBrowser.vivaldi.scriptName, "vivaldiURL")
+        XCTAssertEqual(VoiceInkPowerModeBrowser.orion.scriptName, "orionURL")
+        XCTAssertEqual(VoiceInkPowerModeBrowser.zen.scriptName, "zenURL")
+        XCTAssertEqual(VoiceInkPowerModeBrowser.yandex.scriptName, "yandexURL")
+
+        XCTAssertEqual(VoiceInkPowerModeBrowser.safari.bundleIdentifier, "com.apple.Safari")
+        XCTAssertEqual(VoiceInkPowerModeBrowser.arc.bundleIdentifier, "company.thebrowser.Browser")
+        XCTAssertEqual(VoiceInkPowerModeBrowser.chrome.bundleIdentifier, "com.google.Chrome")
+        XCTAssertEqual(VoiceInkPowerModeBrowser.edge.bundleIdentifier, "com.microsoft.edgemac")
+        XCTAssertEqual(VoiceInkPowerModeBrowser.firefox.bundleIdentifier, "org.mozilla.firefox")
+        XCTAssertEqual(VoiceInkPowerModeBrowser.brave.bundleIdentifier, "com.brave.Browser")
+        XCTAssertEqual(VoiceInkPowerModeBrowser.opera.bundleIdentifier, "com.operasoftware.Opera")
+        XCTAssertEqual(VoiceInkPowerModeBrowser.vivaldi.bundleIdentifier, "com.vivaldi.Vivaldi")
+        XCTAssertEqual(VoiceInkPowerModeBrowser.orion.bundleIdentifier, "com.kagi.kagimacOS")
+        XCTAssertEqual(VoiceInkPowerModeBrowser.zen.bundleIdentifier, "app.zen-browser.zen")
+        XCTAssertEqual(VoiceInkPowerModeBrowser.yandex.bundleIdentifier, "ru.yandex.desktop.yandex-browser")
+
+        XCTAssertEqual(VoiceInkPowerModeBrowser.chrome.displayName, "Google Chrome")
+        XCTAssertEqual(VoiceInkPowerModeBrowser.edge.displayName, "Microsoft Edge")
+        XCTAssertEqual(VoiceInkPowerModeBrowser.zen.displayName, "Zen Browser")
+        XCTAssertEqual(VoiceInkPowerModeBrowser.yandex.displayName, "Yandex Browser")
+    }
+
+    func testPowerModeBrowserCatalogPreservesCurrentDetectionSet() {
+        XCTAssertEqual(
+            VoiceInkPowerModeBrowser.allCases,
+            [
+                .safari,
+                .arc,
+                .chrome,
+                .edge,
+                .brave,
+                .opera,
+                .vivaldi,
+                .orion,
+                .yandex
+            ]
+        )
+        XCTAssertFalse(VoiceInkPowerModeBrowser.allCases.contains(.firefox))
+        XCTAssertFalse(VoiceInkPowerModeBrowser.allCases.contains(.zen))
+    }
+
     func testPowerModeEmojiCatalogPreservesDefaultsStorageKeyAndCopy() {
         XCTAssertEqual(VoiceInkPowerModeEmojiCatalog.customEmojisKey, "userAddedEmojis")
         XCTAssertEqual(VoiceInkPowerModeEmojiCatalog.defaultEmojis.first, "🏢")

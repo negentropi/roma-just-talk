@@ -49,7 +49,7 @@ class ActiveWindowService: ObservableObject {
         var currentWebsiteURL: String?
 
         if configurations.hasEnabledURLRules,
-           let browserType = BrowserType.allCases.first(where: { $0.bundleIdentifier == bundleIdentifier }) {
+           let browserType = VoiceInkPowerModeBrowser.allCases.first(where: { $0.bundleIdentifier == bundleIdentifier }) {
             do {
                 currentWebsiteURL = try await browserURLService.getCurrentURL(from: browserType)
             } catch {

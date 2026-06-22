@@ -4304,6 +4304,22 @@ reject_pattern \
   VoiceInk/Transcription/Cloud/CloudProvider.swift
 
 require_pattern \
+  "shared transcription provider recorded-file support lives in VoiceInkCore" \
+  'supportsRecordedFileTranscription' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift
+
+require_pattern \
+  "macOS transcription model uses shared recorded-file support policy" \
+  'coreTranscriptionModelProvider\?\.supportsRecordedFileTranscription' \
+  VoiceInk/Models/TranscriptionModel.swift
+
+reject_context_pattern \
+  "macOS transcription model avoids shell-only recorded-file support registry lookup" \
+  'var supportsRecordedFileTranscription' \
+  'guard let cloudProvider|cloudProvider\.isStreamingOnly' \
+  VoiceInk/Models/TranscriptionModel.swift
+
+require_pattern \
   "shared transcription provider API error domains live in VoiceInkCore" \
   'apiErrorDomain|requiredAPIErrorDomain' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift

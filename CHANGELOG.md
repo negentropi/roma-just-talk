@@ -13,6 +13,7 @@
 - Moved macOS batch cloud transcription provider wiring onto the shared remote transcription dispatcher used by the imported iOS retry path, preserving provider-specific prompt, vocabulary, timeout, retry, and empty-output behavior.
 - Aligned imported iOS retry remote-file transcription with shared provider batch defaults, including Groq JSON/temperature/retry settings, Deepgram paragraph settings, and prompt forwarding where supported.
 - Aligned imported iOS note search with macOS history search so accent-insensitive transcript matches now come from shared core.
+- Kept imported iOS pending notes in a processing state instead of showing retry controls before transcription fails.
 - Stripped Codex follow-up JSON payloads from Local CLI enhancement output so transcript cleanup cannot paste assistant metadata into the target app.
 - Reworked Special shortcuts so Shift-down only arms the rolling-buffer commit path; Shift+typing, secure-input, and other unreliable key evidence now discard without starting audio, canceling, saving history, or writing recorder files.
 - Removed the unsafe Special Key Down and Special Flex settings that could start recording before the app knew whether the Shift press was just normal typing.

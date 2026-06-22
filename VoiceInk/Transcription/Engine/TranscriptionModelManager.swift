@@ -117,12 +117,16 @@ class TranscriptionModelManager: ObservableObject {
         let isAvailableOnCurrentOS = availabilityRequirement.requiresCurrentOSSupport
             ? isAvailableOnCurrentOSForNativeAppleTranscription
             : true
+        let downloadedLocalWhisperModel = VoiceInkWhisperModelFiles.downloadedLocalModelFile(
+            forModelName: model.name,
+            in: whisperModelManager?.availableModels ?? []
+        )
 
         model.transcriptionModelAvailabilityFacts(
             hasConfiguredAPIKey: hasConfiguredAPIKey(for: model),
             isAvailableOnCurrentOS: isAvailableOnCurrentOS,
             isLocalFluidAudioModelDownloaded: fluidAudioModelManager?.isFluidAudioModelDownloaded(named: model.name) ?? false,
-            isLocalWhisperModelDownloaded: whisperModelManager?.availableModels.contains { $0.name == model.name } ?? false
+            isLocalWhisperModelDownloaded: downloadedLocalWhisperModel != nil
         )
     }
 

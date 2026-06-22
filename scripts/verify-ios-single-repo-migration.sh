@@ -6880,6 +6880,7 @@ require_patterns \
   "macOS transcription model manager uses shared availability facts" \
   VoiceInk/Transcription/Engine/TranscriptionModelManager.swift \
   'availabilityFacts\(for: .*\)\.isUsable|transcriptionModelAvailabilityFacts' \
+  'VoiceInkWhisperModelFiles\.downloadedLocalModelFile' \
   'requiresConfiguredAPIKey' \
   'requiresCurrentOSSupport'
 
@@ -6960,7 +6961,7 @@ reject_pattern \
 
 reject_pattern \
   "macOS transcription model manager avoids shell-owned provider availability routing" \
-  'switch +model\.provider|model\.provider != \.whisper|CloudProviderRegistry\.provider\(for: model\.provider\)|case +\.nativeApple|case +\.custom|transcriptionModelAvailabilityRequirement == \.(currentOSSupport|configuredAPIKey)' \
+  'switch +model\.provider|model\.provider != \.whisper|availableModels\.contains|CloudProviderRegistry\.provider\(for: model\.provider\)|case +\.nativeApple|case +\.custom|transcriptionModelAvailabilityRequirement == \.(currentOSSupport|configuredAPIKey)' \
   VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
 
 reject_pattern \

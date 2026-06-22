@@ -532,6 +532,54 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
         XCTAssertTrue(availability.canSave(mode))
     }
 
+    func testModeFormProviderAvailabilityOwnsFormStatePresentation() {
+        let availability = VoiceInkModeFormProviderAvailability(
+            transcriptionProviders: [.localWhisper],
+            postProcessingProviders: [.groq]
+        )
+        let rawMode = Mode(
+            name: "Raw",
+            transcriptionProvider: .localWhisper,
+            isPostProcessingEnabled: false
+        )
+        var customMode = Mode(
+            name: "Custom",
+            transcriptionProvider: .localWhisper,
+            isPostProcessingEnabled: true,
+            postProcessingProvider: .groq
+        )
+        customMode.promptTemplate.type = .custom
+        customMode.promptTemplate.customPrompt = "Clean this transcript."
+
+        var blankCustomMode = customMode
+        blankCustomMode.promptTemplate.customPrompt = "   "
+
+        XCTAssertEqual(
+            availability.formStatePresentation(for: rawMode),
+            VoiceInkModeFormStatePresentation(
+                shouldShowPostProcessingControls: false,
+                shouldShowCustomPromptField: false,
+                isSaveButtonDisabled: false
+            )
+        )
+        XCTAssertEqual(
+            availability.formStatePresentation(for: customMode),
+            VoiceInkModeFormStatePresentation(
+                shouldShowPostProcessingControls: true,
+                shouldShowCustomPromptField: true,
+                isSaveButtonDisabled: false
+            )
+        )
+        XCTAssertEqual(
+            availability.formStatePresentation(for: blankCustomMode),
+            VoiceInkModeFormStatePresentation(
+                shouldShowPostProcessingControls: true,
+                shouldShowCustomPromptField: true,
+                isSaveButtonDisabled: true
+            )
+        )
+    }
+
     func testModeFormProviderAvailabilityCanReturnRepairedModeWithoutMutatingOriginal() {
         let availability = VoiceInkModeFormProviderAvailability(
             transcriptionProviders: [.deepgram],

@@ -64,6 +64,22 @@ public struct VoiceInkModeFormPresentation: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkModeFormStatePresentation: Equatable, Sendable {
+    public let shouldShowPostProcessingControls: Bool
+    public let shouldShowCustomPromptField: Bool
+    public let isSaveButtonDisabled: Bool
+
+    public init(
+        shouldShowPostProcessingControls: Bool,
+        shouldShowCustomPromptField: Bool,
+        isSaveButtonDisabled: Bool
+    ) {
+        self.shouldShowPostProcessingControls = shouldShowPostProcessingControls
+        self.shouldShowCustomPromptField = shouldShowCustomPromptField
+        self.isSaveButtonDisabled = isSaveButtonDisabled
+    }
+}
+
 public struct VoiceInkModeFormProviderAvailability: Equatable, Sendable {
     public let transcriptionProviders: [VoiceInkProviderKind]
     public let postProcessingProviders: [VoiceInkProviderKind]
@@ -84,6 +100,14 @@ public struct VoiceInkModeFormProviderAvailability: Equatable, Sendable {
         var repairedMode = mode
         repairedMode.repairProviderSelection(providerAvailability: self)
         return repairedMode
+    }
+
+    public func formStatePresentation(for mode: Mode) -> VoiceInkModeFormStatePresentation {
+        VoiceInkModeFormStatePresentation(
+            shouldShowPostProcessingControls: mode.isPostProcessingEnabled,
+            shouldShowCustomPromptField: mode.isPostProcessingEnabled && mode.promptTemplate.type == .custom,
+            isSaveButtonDisabled: !canSave(mode)
+        )
     }
 }
 

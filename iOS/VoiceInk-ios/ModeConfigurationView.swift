@@ -21,6 +21,7 @@ struct ModeConfigurationView: View {
     var body: some View {
         let formPresentation = mode.formPresentation(isEditing: isEditing)
         let providerAvailability = settings.modeFormProviderAvailability
+        let formStatePresentation = providerAvailability.formStatePresentation(for: mode)
 
         Form {
             Section(header: Text(formPresentation.modeDetailsSectionTitle)) {
@@ -49,7 +50,7 @@ struct ModeConfigurationView: View {
             ) {
                 Toggle(formPresentation.enablePostProcessingTitle, isOn: $mode.isPostProcessingEnabled)
                 
-                if mode.isPostProcessingEnabled {
+                if formStatePresentation.shouldShowPostProcessingControls {
                     Picker(formPresentation.providerPickerTitle, selection: $mode.postProcessingProvider) {
                         ForEach(providerAvailability.postProcessingProviders) { provider in
                             Text(provider.displayName).tag(provider)
@@ -70,8 +71,7 @@ struct ModeConfigurationView: View {
                         }
                     }
                     
-                    // Show custom prompt field only when Custom is selected
-                    if mode.promptTemplate.type == .custom {
+                    if formStatePresentation.shouldShowCustomPromptField {
                         TextField(
                             formPresentation.customPromptPlaceholder,
                             text: $mode.promptTemplate.customPrompt,
@@ -90,7 +90,7 @@ struct ModeConfigurationView: View {
                     onSave(mode)
                     dismiss()
                 }
-                .disabled(!providerAvailability.canSave(mode))
+                .disabled(formStatePresentation.isSaveButtonDisabled)
             }
         }
         .onAppear(perform: repairUnavailableProviderSelections)

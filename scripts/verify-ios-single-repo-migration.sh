@@ -9658,6 +9658,29 @@ require_pattern \
   'removeObject\(forKey: legacyModelNameKey\)' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
+require_patterns \
+  "shared current-model preference owns load plan" \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift \
+  'VoiceInkCurrentTranscriptionModelLoadPlan' \
+  'VoiceInkCurrentTranscriptionModelLoadAction' \
+  'shouldRestoreSavedModel' \
+  'shouldClearStoredModelName'
+
+require_patterns \
+  "macOS transcription model manager delegates current-model load planning" \
+  VoiceInk/Transcription/Engine/TranscriptionModelManager.swift \
+  'VoiceInkCurrentTranscriptionModelPreference\.loadPlan' \
+  'loadPlan\.shouldClearStoredModelName' \
+  'loadPlan\.shouldRestoreSavedModel'
+
+require_patterns \
+  "core checks execute current-model load plan tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'UserDefaultsPreferencesTests\.testCurrentTranscriptionModelLoadPlanNoOpsWhenNoModelIsSaved' \
+  'UserDefaultsPreferencesTests\.testCurrentTranscriptionModelLoadPlanNoOpsWhenSavedModelIsMissingFromRegistry' \
+  'UserDefaultsPreferencesTests\.testCurrentTranscriptionModelLoadPlanRestoresAvailableSavedModel' \
+  'UserDefaultsPreferencesTests\.testCurrentTranscriptionModelLoadPlanClearsUnavailableSavedModel'
+
 require_pattern \
   "macOS transcription model manager clears through shared current-model preference" \
   'VoiceInkCurrentTranscriptionModelPreference\.clearModelName\(\)' \
@@ -9666,6 +9689,11 @@ require_pattern \
 reject_pattern \
   "macOS transcription model manager avoids shell-only legacy model key cleanup" \
   'removeObject\(forKey: +"CurrentModel"\)|"CurrentModel"' \
+  VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
+
+reject_pattern \
+  "macOS transcription model manager avoids shell-owned current-model load availability branch" \
+  'guard +isAvailableOnCurrentOS\(savedModel\)|if let savedModelName = VoiceInkCurrentTranscriptionModelPreference\.modelName\(\),' \
   VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
 
 require_pattern \

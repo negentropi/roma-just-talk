@@ -696,6 +696,51 @@ public enum VoiceInkCurrentTranscriptionModelPreference {
         defaults.removeObject(forKey: VoiceInkUserDefaultsKey.currentTranscriptionModel)
         defaults.removeObject(forKey: legacyModelNameKey)
     }
+
+    public static func loadPlan(
+        savedModelName: String?,
+        candidateModelExists: Bool,
+        isCandidateAvailableOnCurrentOS: Bool
+    ) -> VoiceInkCurrentTranscriptionModelLoadPlan {
+        VoiceInkCurrentTranscriptionModelLoadPlan(
+            savedModelName: savedModelName,
+            candidateModelExists: candidateModelExists,
+            isCandidateAvailableOnCurrentOS: isCandidateAvailableOnCurrentOS
+        )
+    }
+}
+
+public enum VoiceInkCurrentTranscriptionModelLoadAction: Equatable, Sendable {
+    case none
+    case restoreSavedModel
+    case clearStoredModelName
+}
+
+public struct VoiceInkCurrentTranscriptionModelLoadPlan: Equatable, Sendable {
+    public let action: VoiceInkCurrentTranscriptionModelLoadAction
+
+    public init(
+        savedModelName: String?,
+        candidateModelExists: Bool,
+        isCandidateAvailableOnCurrentOS: Bool
+    ) {
+        guard savedModelName != nil, candidateModelExists else {
+            self.action = .none
+            return
+        }
+
+        self.action = isCandidateAvailableOnCurrentOS
+            ? .restoreSavedModel
+            : .clearStoredModelName
+    }
+
+    public var shouldRestoreSavedModel: Bool {
+        action == .restoreSavedModel
+    }
+
+    public var shouldClearStoredModelName: Bool {
+        action == .clearStoredModelName
+    }
 }
 
 public enum VoiceInkAIEnhancementPreference {

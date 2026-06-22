@@ -837,6 +837,54 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testCurrentTranscriptionModelLoadPlanNoOpsWhenNoModelIsSaved() {
+        let plan = VoiceInkCurrentTranscriptionModelPreference.loadPlan(
+            savedModelName: nil,
+            candidateModelExists: false,
+            isCandidateAvailableOnCurrentOS: false
+        )
+
+        XCTAssertEqual(plan.action, .none)
+        XCTAssertFalse(plan.shouldRestoreSavedModel)
+        XCTAssertFalse(plan.shouldClearStoredModelName)
+    }
+
+    func testCurrentTranscriptionModelLoadPlanNoOpsWhenSavedModelIsMissingFromRegistry() {
+        let plan = VoiceInkCurrentTranscriptionModelPreference.loadPlan(
+            savedModelName: "missing-model",
+            candidateModelExists: false,
+            isCandidateAvailableOnCurrentOS: false
+        )
+
+        XCTAssertEqual(plan.action, .none)
+        XCTAssertFalse(plan.shouldRestoreSavedModel)
+        XCTAssertFalse(plan.shouldClearStoredModelName)
+    }
+
+    func testCurrentTranscriptionModelLoadPlanRestoresAvailableSavedModel() {
+        let plan = VoiceInkCurrentTranscriptionModelPreference.loadPlan(
+            savedModelName: "nova-3",
+            candidateModelExists: true,
+            isCandidateAvailableOnCurrentOS: true
+        )
+
+        XCTAssertEqual(plan.action, .restoreSavedModel)
+        XCTAssertTrue(plan.shouldRestoreSavedModel)
+        XCTAssertFalse(plan.shouldClearStoredModelName)
+    }
+
+    func testCurrentTranscriptionModelLoadPlanClearsUnavailableSavedModel() {
+        let plan = VoiceInkCurrentTranscriptionModelPreference.loadPlan(
+            savedModelName: "apple-speech",
+            candidateModelExists: true,
+            isCandidateAvailableOnCurrentOS: false
+        )
+
+        XCTAssertEqual(plan.action, .clearStoredModelName)
+        XCTAssertFalse(plan.shouldRestoreSavedModel)
+        XCTAssertTrue(plan.shouldClearStoredModelName)
+    }
+
     func testAIEnhancementProviderPreferenceUsesDefaultWhenMissing() {
         withIsolatedDefaults { defaults in
             XCTAssertNil(VoiceInkAIEnhancementProviderPreference.selectedProviderRawValue(from: defaults))

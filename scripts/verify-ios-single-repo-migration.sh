@@ -926,8 +926,18 @@ require_pattern \
   iOS/VoiceInk-ios/RecordingManager.swift
 
 require_pattern \
-  "iOS audio recorder uses shared recording-start failure reason" \
-  'VoiceInkRecordingAlertPresentation\.iOSRecorderStartReturnedFalseDescription' \
+  "shared iOS audio recorder start-failure error policy lives in VoiceInkCore" \
+  'VoiceInkAudioRecorderStartFailurePolicy|returnedFalseErrorCode|returnedFalseErrorDomain|returnedFalseUserInfo|returnedFalseError\(\)' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "VoiceInkCore checks cover iOS audio recorder start-failure error policy" \
+  'testAudioRecorderStartFailurePolicyBuildsIOSReturnedFalseError' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RecordingStatePolicyTests.swift
+
+require_pattern \
+  "iOS audio recorder uses shared recording-start failure error policy" \
+  'VoiceInkAudioRecorderStartFailurePolicy\.returnedFalseError\(\)' \
   iOS/VoiceInk-ios/AudioRecorder.swift
 
 require_pattern \
@@ -1218,8 +1228,8 @@ reject_pattern \
   iOS/VoiceInk-ios/NotesListView.swift
 
 reject_pattern \
-  "iOS audio recorder avoids shell-only recording-start failure reason" \
-  'Failed to start AVAudioRecorder|record\(\) method returned false|audio session is not configured correctly' \
+  "iOS audio recorder avoids shell-owned recording-start failure error policy" \
+  'Failed to start AVAudioRecorder|record\(\) method returned false|audio session is not configured correctly|NSLocalizedDescriptionKey|NSError\(domain:|code: 1001|VoiceInkAppIdentity\.errorDomain\(component: "AudioRecorder"\)' \
   iOS/VoiceInk-ios/AudioRecorder.swift
 
 reject_pattern \
@@ -10437,9 +10447,14 @@ require_pattern \
   VoiceInk/VoiceInk.swift
 
 require_pattern \
-  "iOS audio recorder errors use shared app identity domain" \
-  'VoiceInkAppIdentity\.errorDomain\(component: "AudioRecorder"\)' \
-  iOS/VoiceInk-ios/AudioRecorder.swift
+  "shared iOS audio recorder start-failure errors keep AudioRecorder domain component" \
+  'errorDomainComponent = "AudioRecorder"' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "shared iOS audio recorder start-failure errors use shared app identity domain" \
+  'VoiceInkAppIdentity\.errorDomain\(component: errorDomainComponent\)' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
 require_pattern \
   "macOS app startup storage path uses shared app identity directory" \

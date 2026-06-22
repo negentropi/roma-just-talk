@@ -630,10 +630,11 @@ final class RecordingStatePolicyTests: XCTestCase {
             "Failed to start AVAudioRecorder. The record() method returned false. This often happens in the background if the audio session is not configured correctly or if there is a conflict with another app."
         )
 
+        let error = VoiceInkAudioRecorderStartFailurePolicy.returnedFalseError()
         let alert = VoiceInkRecordingAlertPresentation.recordingStartFailure(
-            domain: VoiceInkAppIdentity.errorDomain(component: "AudioRecorder"),
-            code: 1001,
-            localizedDescription: VoiceInkRecordingAlertPresentation.iOSRecorderStartReturnedFalseDescription
+            domain: error.domain,
+            code: error.code,
+            localizedDescription: error.localizedDescription
         )
 
         XCTAssertEqual(alert.title, "Recording Failed")
@@ -641,6 +642,15 @@ final class RecordingStatePolicyTests: XCTestCase {
             alert.message,
             "Could not start recording: \(VoiceInkRecordingAlertPresentation.iOSRecorderStartReturnedFalseDescription)"
         )
+    }
+
+    func testAudioRecorderStartFailurePolicyBuildsIOSReturnedFalseError() {
+        let error = VoiceInkAudioRecorderStartFailurePolicy.returnedFalseError()
+
+        XCTAssertEqual(error.domain, VoiceInkAppIdentity.errorDomain(component: "AudioRecorder"))
+        XCTAssertEqual(error.code, VoiceInkAudioRecorderStartFailurePolicy.returnedFalseErrorCode)
+        XCTAssertEqual(error.userInfo[NSLocalizedDescriptionKey] as? String, VoiceInkAudioRecorderStartFailurePolicy.returnedFalseDescription)
+        XCTAssertEqual(error.localizedDescription, VoiceInkAudioRecorderStartFailurePolicy.returnedFalseDescription)
     }
 
     private func withIsolatedDefaults(_ run: (UserDefaults) -> Void) {

@@ -966,6 +966,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testRecordingStartFailureMapsIOSMicrophoneBusyOSStatus", run: { RecordingStatePolicyTests().testRecordingStartFailureMapsIOSMicrophoneBusyOSStatus() }),
             VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testRecordingStartFailurePreservesGenericFailureCopy", run: { RecordingStatePolicyTests().testRecordingStartFailurePreservesGenericFailureCopy() }),
             VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testRecordingStartFailurePreservesIOSRecorderStartReturnedFalseReason", run: { RecordingStatePolicyTests().testRecordingStartFailurePreservesIOSRecorderStartReturnedFalseReason() }),
+            VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testAudioRecorderStartFailurePolicyBuildsIOSReturnedFalseError", run: { RecordingStatePolicyTests().testAudioRecorderStartFailurePolicyBuildsIOSReturnedFalseError() }),
             VoiceInkCoreCheck(name: "RollingAudioBufferTests.testAppendKeepsChunksWithinMaxBytes", run: { RollingAudioBufferTests().testAppendKeepsChunksWithinMaxBytes() }),
             VoiceInkCoreCheck(name: "RollingAudioBufferTests.testAppendDropsWholeOldestChunksWhenOverflowCoversChunk", run: { RollingAudioBufferTests().testAppendDropsWholeOldestChunksWhenOverflowCoversChunk() }),
             VoiceInkCoreCheck(name: "RollingAudioBufferTests.testAppendPartiallyTrimsOldestChunkWhenOverflowIsSmallerThanChunk", run: { RollingAudioBufferTests().testAppendPartiallyTrimsOldestChunkWhenOverflowIsSmallerThanChunk() }),

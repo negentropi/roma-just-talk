@@ -188,6 +188,28 @@ public enum VoiceInkAudioRecorderStopPolicy {
     }
 }
 
+public enum VoiceInkAudioRecorderStartFailurePolicy {
+    public static let returnedFalseErrorCode = 1001
+    public static let errorDomainComponent = "AudioRecorder"
+    public static let returnedFalseDescription = "Failed to start AVAudioRecorder. The record() method returned false. This often happens in the background if the audio session is not configured correctly or if there is a conflict with another app."
+
+    public static var returnedFalseErrorDomain: String {
+        VoiceInkAppIdentity.errorDomain(component: errorDomainComponent)
+    }
+
+    public static var returnedFalseUserInfo: [String: String] {
+        [NSLocalizedDescriptionKey: returnedFalseDescription]
+    }
+
+    public static func returnedFalseError() -> NSError {
+        NSError(
+            domain: returnedFalseErrorDomain,
+            code: returnedFalseErrorCode,
+            userInfo: returnedFalseUserInfo
+        )
+    }
+}
+
 public struct VoiceInkAppGroupRecordingState: Equatable, Sendable {
     public let isRecording: Bool
     public let shouldClearStaleState: Bool
@@ -500,7 +522,7 @@ public struct VoiceInkRecordingAlertPresentation: Equatable, Identifiable, Senda
     }
 
     public static let microphoneInUseOSStatusCode = 561017449
-    public static let iOSRecorderStartReturnedFalseDescription = "Failed to start AVAudioRecorder. The record() method returned false. This often happens in the background if the audio session is not configured correctly or if there is a conflict with another app."
+    public static let iOSRecorderStartReturnedFalseDescription = VoiceInkAudioRecorderStartFailurePolicy.returnedFalseDescription
 
     public let id: String
     public let title: String

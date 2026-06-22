@@ -41,10 +41,7 @@ final class AudioRecorder: NSObject, ObservableObject {
         audioRecorder?.delegate = self
         audioRecorder?.isMeteringEnabled = true
         guard audioRecorder?.record() == true else {
-            let userInfo = [
-                NSLocalizedDescriptionKey: VoiceInkRecordingAlertPresentation.iOSRecorderStartReturnedFalseDescription
-            ]
-            throw NSError(domain: VoiceInkAppIdentity.errorDomain(component: "AudioRecorder"), code: 1001, userInfo: userInfo)
+            throw VoiceInkAudioRecorderStartFailurePolicy.returnedFalseError()
         }
 
         currentRecordingURL = url

@@ -317,6 +317,13 @@ h1 .before-word {
   box-shadow: 5px 5px 0 rgba(255, 248, 231, 0.28);
 }
 
+#talk-button .icon,
+#talk-button .keycap,
+#talk-button .command-symbol {
+  border-color: #fff8e7;
+  color: #fff8e7;
+}
+
 #talk-button:hover {
   box-shadow: 7px 7px 0 rgba(255, 248, 231, 0.28);
 }

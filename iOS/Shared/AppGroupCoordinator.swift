@@ -37,7 +37,7 @@ final class AppGroupCoordinator {
     var isRecording: Bool {
         let readPlan = VoiceInkAppGroupRecordingBridge.recordingStateReadPlan(in: sharedDefaults)
         if let mutationPlan = readPlan.staleStateRepairMutationPlan {
-            VoiceInkIOSLogger.appGroup.warning("Recording state appears stale, clearing it")
+            VoiceInkIOSLogger.appGroup.warning("\(VoiceInkAppGroupRecordingDiagnostics.staleRecordingStateClearedMessage, privacy: .public)")
             VoiceInkAppGroupRecordingBridge.apply(mutationPlan, to: sharedDefaults)
             postDarwinNotification(mutationPlan.darwinNotificationName)
         }
@@ -54,7 +54,7 @@ final class AppGroupCoordinator {
         // Notify keyboard of state change
         postDarwinNotification(mutationPlan.darwinNotificationName)
         
-        VoiceInkIOSLogger.appGroup.notice("Updated recording state: \(isRecording, privacy: .public)")
+        VoiceInkIOSLogger.appGroup.notice("\(VoiceInkAppGroupRecordingDiagnostics.updatedRecordingStateMessage(isRecording: isRecording), privacy: .public)")
     }
     
     // MARK: - Darwin Notifications (Real-time Communication)

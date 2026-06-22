@@ -454,6 +454,21 @@ final class RecordingStatePolicyTests: XCTestCase {
         )
     }
 
+    func testAppGroupRecordingDiagnosticsPreserveIOSLogCopy() {
+        XCTAssertEqual(
+            VoiceInkAppGroupRecordingDiagnostics.staleRecordingStateClearedMessage,
+            "Recording state appears stale, clearing it"
+        )
+        XCTAssertEqual(
+            VoiceInkAppGroupRecordingDiagnostics.updatedRecordingStateMessage(isRecording: true),
+            "Updated recording state: true"
+        )
+        XCTAssertEqual(
+            VoiceInkAppGroupRecordingDiagnostics.updatedRecordingStateMessage(isRecording: false),
+            "Updated recording state: false"
+        )
+    }
+
     func testKeyboardRecordingTimingPreservesIOSAppAndKeyboardDelays() {
         XCTAssertEqual(VoiceInkKeyboardRecordingTiming.appLaunchRecordingStartDelay, 0.5)
         XCTAssertEqual(VoiceInkKeyboardRecordingTiming.recordingStatusPollingInterval, 0.5)

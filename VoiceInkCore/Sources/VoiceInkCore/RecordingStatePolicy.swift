@@ -357,6 +357,14 @@ public enum VoiceInkAppGroupRecordingStatePolicy {
     }
 }
 
+public enum VoiceInkAppGroupRecordingDiagnostics {
+    public static let staleRecordingStateClearedMessage = "Recording state appears stale, clearing it"
+
+    public static func updatedRecordingStateMessage(isRecording: Bool) -> String {
+        "Updated recording state: \(isRecording)"
+    }
+}
+
 public enum VoiceInkKeyboardRecordingTiming {
     public static let appLaunchRecordingStartDelay: TimeInterval = 0.5
     public static let recordingStatusPollingInterval: TimeInterval = 0.5

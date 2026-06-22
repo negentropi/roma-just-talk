@@ -11201,9 +11201,21 @@ require_pattern \
   'VoiceInkAppGroupRecordingStatePolicy|staleRecordingInterval|UserDefaultsKey|VoiceInkAppGroupRecordingStateReadPlan|staleStateRepairMutationPlan' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
+require_patterns \
+  "VoiceInkCore owns iOS App Group recording diagnostics" \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift \
+  'VoiceInkAppGroupRecordingDiagnostics' \
+  'staleRecordingStateClearedMessage' \
+  'updatedRecordingStateMessage'
+
 require_pattern \
   "VoiceInkCore checks cover iOS App Group recording state policy" \
   'testAppGroupRecordingStatePolicy(PreservesIOSStorageKeysAndTimeout|KeepsFreshRecordingActive|ClearsStaleRecording|DoesNotClearInactiveRecording)|testAppGroupRecordingState(WritePlansPreserveIOSBridgeWrites|MutationPlansPreserveIOSBridgeNotifications)|testAppGroupRecordingStateReadPlan(DoesNotRepairFreshRecording|OwnsStaleRepairMutation)' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "VoiceInkCore checks cover iOS App Group recording diagnostics" \
+  'testAppGroupRecordingDiagnosticsPreserveIOSLogCopy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -11353,6 +11365,11 @@ require_pattern \
   iOS/Shared/AppGroupCoordinator.swift
 
 require_pattern \
+  "iOS App Group coordinator adapts shared recording diagnostics" \
+  'VoiceInkAppGroupRecordingDiagnostics\.(staleRecordingStateClearedMessage|updatedRecordingStateMessage)' \
+  iOS/Shared/AppGroupCoordinator.swift
+
+require_pattern \
   "VoiceInkCore owns App Group recording mutation notification plan" \
   'VoiceInkAppGroupRecordingStateMutationPlan|darwinNotificationName' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
@@ -11370,6 +11387,11 @@ reject_pattern \
 reject_pattern \
   "iOS App Group coordinator avoids shell-owned stale-state repair mutation" \
   'updateRecordingState\(false\)' \
+  iOS/Shared/AppGroupCoordinator.swift
+
+reject_pattern \
+  "iOS App Group coordinator avoids shell-owned recording diagnostic copy" \
+  '"(Recording state appears stale, clearing it|Updated recording state:)' \
   iOS/Shared/AppGroupCoordinator.swift
 
 reject_pattern \

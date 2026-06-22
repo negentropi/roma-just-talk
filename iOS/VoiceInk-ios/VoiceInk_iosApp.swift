@@ -34,7 +34,9 @@ struct VoiceInk_iosApp: App {
             let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
             return container
         } catch {
-            fatalError("Could not create ModelContainer: \(error)")
+            fatalError(VoiceInkStorageStartupDiagnostics.iOSModelContainerCreationFailedMessage(
+                errorDescription: String(describing: error)
+            ))
         }
     }()
 

@@ -220,6 +220,15 @@ public enum VoiceInkAppIdentity {
     }
 }
 
+public enum VoiceInkStorageStartupDiagnostics {
+    public static let modelContainerInitializationFailedMessage = "ModelContainer initialization failed"
+    public static let modelContainerUnavailablePreconditionMessage = "Unable to create ModelContainer. SwiftData is unavailable."
+
+    public static func iOSModelContainerCreationFailedMessage(errorDescription: String) -> String {
+        "Could not create ModelContainer: \(errorDescription)"
+    }
+}
+
 public enum VoiceInkIOSLogCategory {
     public static let app = "iOSApp"
     public static let appGroup = "iOSAppGroup"

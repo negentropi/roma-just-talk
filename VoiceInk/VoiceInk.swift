@@ -81,13 +81,13 @@ struct VoiceInkApp: App {
         }
         // All attempts failed
         else {
-            logger.critical("ModelContainer initialization failed")
+            logger.critical("\(VoiceInkStorageStartupDiagnostics.modelContainerInitializationFailedMessage, privacy: .public)")
             initializationFailed = true
 
             // Create minimal in-memory container to satisfy initialization
             let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
             resolvedContainer = (try? ModelContainer(for: schema, configurations: [config])) ?? {
-                preconditionFailure("Unable to create ModelContainer. SwiftData is unavailable.")
+                preconditionFailure(VoiceInkStorageStartupDiagnostics.modelContainerUnavailablePreconditionMessage)
             }()
         }
 

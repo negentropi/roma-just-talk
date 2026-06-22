@@ -66,6 +66,21 @@ final class AppIdentityTests: XCTestCase {
         )
     }
 
+    func testStorageStartupDiagnosticsPreserveAppStartupCopy() {
+        XCTAssertEqual(
+            VoiceInkStorageStartupDiagnostics.modelContainerInitializationFailedMessage,
+            "ModelContainer initialization failed"
+        )
+        XCTAssertEqual(
+            VoiceInkStorageStartupDiagnostics.modelContainerUnavailablePreconditionMessage,
+            "Unable to create ModelContainer. SwiftData is unavailable."
+        )
+        XCTAssertEqual(
+            VoiceInkStorageStartupDiagnostics.iOSModelContainerCreationFailedMessage(errorDescription: "store denied"),
+            "Could not create ModelContainer: store denied"
+        )
+    }
+
     func testMacOSNavigationRequestPreservesDestinationContract() {
         XCTAssertEqual(VoiceInkMacOSNavigationRequest.notificationName.rawValue, "navigateToDestination")
         XCTAssertEqual(VoiceInkMacOSNavigationRequest.destinationUserInfoKey, "destination")

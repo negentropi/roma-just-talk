@@ -10729,8 +10729,16 @@ require_plist_value \
 
 require_pattern \
   "shared app identity presentation lives in VoiceInkCore" \
-  'VoiceInkAppIdentity|VoiceInkMacOSStorageAlertPresentation|VoiceInkMacOSNavigationDestination|VoiceInkMacOSMainViewItem|VoiceInkMacOSNavigationRequest|VoiceInkMacOSFileTranscriptionRequest|bundleIdentifier = "com\.prakashjoshipax\.VoiceInk"|loggingSubsystem = "com\.prakashjoshipax\.voiceink"|displayName = "roma just talk"|compactDisplayName = "roma-just-talk"|iOSRecordDeepLinkScheme = "voiceink"|iOSRecordDeepLinkHost = "record"|iCloudContainerIdentifier|iOSAppGroupIdentifier|iOSRecordDeepLinkURL|iOSStopRecordingDarwinNotificationName|iOSRecordingStateChangedDarwinNotificationName|iOSStopRecordingFromKeyboardNotificationName|macOSApplicationSupportDirectory|storageFallbackWarningPresentation|storageFailurePresentation|errorDomain' \
+  'VoiceInkAppIdentity|VoiceInkStorageStartupDiagnostics|VoiceInkMacOSStorageAlertPresentation|VoiceInkMacOSNavigationDestination|VoiceInkMacOSMainViewItem|VoiceInkMacOSNavigationRequest|VoiceInkMacOSFileTranscriptionRequest|bundleIdentifier = "com\.prakashjoshipax\.VoiceInk"|loggingSubsystem = "com\.prakashjoshipax\.voiceink"|displayName = "roma just talk"|compactDisplayName = "roma-just-talk"|iOSRecordDeepLinkScheme = "voiceink"|iOSRecordDeepLinkHost = "record"|iCloudContainerIdentifier|iOSAppGroupIdentifier|iOSRecordDeepLinkURL|iOSStopRecordingDarwinNotificationName|iOSRecordingStateChangedDarwinNotificationName|iOSStopRecordingFromKeyboardNotificationName|macOSApplicationSupportDirectory|storageFallbackWarningPresentation|storageFailurePresentation|modelContainerInitializationFailedMessage|modelContainerUnavailablePreconditionMessage|iOSModelContainerCreationFailedMessage|errorDomain' \
   VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift
+
+require_patterns \
+  "shared storage startup diagnostics live in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift \
+  'VoiceInkStorageStartupDiagnostics' \
+  'modelContainerInitializationFailedMessage' \
+  'modelContainerUnavailablePreconditionMessage' \
+  'iOSModelContainerCreationFailedMessage'
 
 require_pattern \
   "shared macOS navigation request contract lives in VoiceInkCore" \
@@ -11108,18 +11116,25 @@ reject_pattern \
 
 require_pattern \
   "macOS app startup uses shared app identity presentation" \
-  'VoiceInkAppIdentity\.(compactDisplayName|storageFallbackWarningPresentation|storageFailurePresentation)' \
+  'VoiceInkAppIdentity\.(compactDisplayName|storageFallbackWarningPresentation|storageFailurePresentation)|VoiceInkStorageStartupDiagnostics\.(modelContainerInitializationFailedMessage|modelContainerUnavailablePreconditionMessage)' \
   VoiceInk/VoiceInk.swift
+
+require_patterns \
+  "macOS app startup uses shared storage startup diagnostics" \
+  VoiceInk/VoiceInk.swift \
+  'VoiceInkStorageStartupDiagnostics\.modelContainerInitializationFailedMessage' \
+  'VoiceInkStorageStartupDiagnostics\.modelContainerUnavailablePreconditionMessage'
 
 reject_pattern \
   "macOS app startup avoids shell-only storage alert copy" \
-  '"(Storage Warning|VoiceInk couldn.t access its storage location\. Your transcriptions will not be saved between sessions\.|Critical Storage Error|Quit)"' \
+  '"(Storage Warning|VoiceInk couldn.t access its storage location\. Your transcriptions will not be saved between sessions\.|Critical Storage Error|Quit|ModelContainer initialization failed|Unable to create ModelContainer\. SwiftData is unavailable\.)"' \
   VoiceInk/VoiceInk.swift
 
-require_pattern \
-  "core checks execute app identity storage alert tests" \
+require_patterns \
+  "core checks execute app identity storage startup tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
   'AppIdentityTests\.testMacOSStorageAlertPresentationPreservesStartupCopy' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  'AppIdentityTests\.testStorageStartupDiagnosticsPreserveAppStartupCopy'
 
 require_pattern \
   "core checks execute macOS navigation request contract tests" \
@@ -11641,6 +11656,16 @@ require_pattern \
 require_pattern \
   "iOS app deep-link recording uses shared launch request policy" \
   'VoiceInkLaunchRecordingRequest(State|Action)|requestRecording\(hasCompletedOnboarding:|consumePendingRecordingIfReady\(hasCompletedOnboarding:' \
+  iOS/VoiceInk-ios/VoiceInk_iosApp.swift
+
+require_pattern \
+  "iOS app startup uses shared storage startup diagnostics" \
+  'VoiceInkStorageStartupDiagnostics\.iOSModelContainerCreationFailedMessage' \
+  iOS/VoiceInk-ios/VoiceInk_iosApp.swift
+
+reject_pattern \
+  "iOS app startup avoids shell-owned storage startup diagnostics" \
+  '"Could not create ModelContainer:' \
   iOS/VoiceInk-ios/VoiceInk_iosApp.swift
 
 require_patterns \

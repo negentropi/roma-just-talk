@@ -46,7 +46,9 @@ class WaveformGenerator {
             cache.setObject(normalizedSamples as NSArray, forKey: cacheKey)
             return normalizedSamples
         } catch {
-            print("Error reading audio file: \(error)")
+            print(VoiceInkAudioPlaybackDiagnostics.macOSWaveformReadFailedMessage(
+                errorDescription: String(describing: error)
+            ))
             return []
         }
     }
@@ -108,7 +110,9 @@ class AudioPlayerManager: ObservableObject {
                 }
             }
         } catch {
-            print("Error loading audio: \(error.localizedDescription)")
+            print(VoiceInkAudioPlaybackDiagnostics.macOSLoadFailedMessage(
+                localizedDescription: error.localizedDescription
+            ))
         }
     }
     

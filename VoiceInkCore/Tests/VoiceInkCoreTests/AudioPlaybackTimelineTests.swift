@@ -13,6 +13,17 @@ final class AudioPlaybackTimelineTests: XCTestCase {
         )
     }
 
+    func testPlaybackDiagnosticsPreserveMacOSConsoleCopy() {
+        XCTAssertEqual(
+            VoiceInkAudioPlaybackDiagnostics.macOSWaveformReadFailedMessage(errorDescription: "file is corrupt"),
+            "Error reading audio file: file is corrupt"
+        )
+        XCTAssertEqual(
+            VoiceInkAudioPlaybackDiagnostics.macOSLoadFailedMessage(localizedDescription: "format unsupported"),
+            "Error loading audio: format unsupported"
+        )
+    }
+
     func testProgressClampsCurrentTimeAgainstDuration() {
         XCTAssertEqual(VoiceInkAudioPlaybackTimeline.progress(currentTime: -1, duration: 10), 0)
         XCTAssertEqual(VoiceInkAudioPlaybackTimeline.progress(currentTime: 5, duration: 10), 0.5)

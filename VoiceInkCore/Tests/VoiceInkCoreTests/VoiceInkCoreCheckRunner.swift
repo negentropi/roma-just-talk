@@ -237,6 +237,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AudioMeterLevelTests.testIOSVisualizerBarWidthPreservesExistingLayoutMath", run: { AudioMeterLevelTests().testIOSVisualizerBarWidthPreservesExistingLayoutMath() }),
             VoiceInkCoreCheck(name: "AudioMeterLevelTests.testIOSVisualizerBarHeightPreservesExistingLevelMapping", run: { AudioMeterLevelTests().testIOSVisualizerBarHeightPreservesExistingLevelMapping() }),
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testPlaybackDiagnosticsPreserveIOSLogCopy", run: { AudioPlaybackTimelineTests().testPlaybackDiagnosticsPreserveIOSLogCopy() }),
+            VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testPlaybackDiagnosticsPreserveMacOSConsoleCopy", run: { AudioPlaybackTimelineTests().testPlaybackDiagnosticsPreserveMacOSConsoleCopy() }),
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testProgressClampsCurrentTimeAgainstDuration", run: { AudioPlaybackTimelineTests().testProgressClampsCurrentTimeAgainstDuration() }),
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testProgressReturnsZeroForInvalidDuration", run: { AudioPlaybackTimelineTests().testProgressReturnsZeroForInvalidDuration() }),
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testLocationProgressClampsAgainstWidth", run: { AudioPlaybackTimelineTests().testLocationProgressClampsAgainstWidth() }),

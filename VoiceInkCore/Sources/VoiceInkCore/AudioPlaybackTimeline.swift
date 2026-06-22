@@ -8,6 +8,14 @@ public enum VoiceInkAudioPlaybackDiagnostics {
     public static func playFailedMessage(errorDescription: String) -> String {
         "Failed to play audio: \(errorDescription)"
     }
+
+    public static func macOSWaveformReadFailedMessage(errorDescription: String) -> String {
+        "Error reading audio file: \(errorDescription)"
+    }
+
+    public static func macOSLoadFailedMessage(localizedDescription: String) -> String {
+        "Error loading audio: \(localizedDescription)"
+    }
 }
 
 public enum VoiceInkAudioPlaybackTimeline {

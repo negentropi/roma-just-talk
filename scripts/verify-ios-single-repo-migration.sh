@@ -2299,6 +2299,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
 
 require_pattern \
+  "shared provider API-key form state owns iOS control presentation" \
+  'VoiceInkProviderAPIKeyFormControlPresentation|VoiceInkProviderAPIKeyVerificationControl|iOSControlPresentation\(storedRuntimeKey:' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
+
+require_pattern \
   "shared provider API-key verification start plan lives in VoiceInkCore" \
   'VoiceInkProviderAPIKeyVerificationStartPlan|verificationStartPlan|VoiceInkProviderAPIKeyMissingVerificationCandidatePolicy' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
@@ -2314,6 +2319,11 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "core checks execute provider API-key iOS control presentation test" \
+  'ProviderAccessRequirementTests\.testProviderAPIKeyFormStateOwnsIOSControlPresentation' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "shared provider API-key form presentation lives in VoiceInkCore" \
   'VoiceInkProviderAPIKeyFormPresentation|apiKeyFormPresentation|saveButtonSystemImageName|verifyButtonSystemImageName|consoleLeadingSystemImageName|consoleTrailingSystemImageName' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
@@ -2325,12 +2335,17 @@ require_pattern \
 
 require_pattern \
   "iOS API-key view uses shared progress presentation through form state" \
-  'apiKeyFormState\.(verificationProgress|iOSVisibleResultFeedback)|iOSVerifiedKeyFeedback|iOSResultFeedback|effectiveSystemImageName' \
+  'apiKeyFormState\.(iOSControlPresentation|iOSVisibleResultFeedback)|iOSVerifiedKeyFeedback|iOSResultFeedback|effectiveSystemImageName' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 reject_pattern \
   "iOS API-key view avoids shell-owned result feedback visibility gate" \
   'iOSResultFeedback.*isKeyVerified|isKeyVerified.*iOSResultFeedback' \
+  iOS/VoiceInk-ios/ProviderAPIKeyView.swift
+
+reject_pattern \
+  "iOS API-key view avoids shell-owned API-key control derivation" \
+  'let +apiKeyDraft|apiKeyDraft\.|verificationProgress\.isVerifying|!apiKeyDraft\.(hasEnteredKey|canVerify)' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 require_pattern \

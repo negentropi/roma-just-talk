@@ -366,6 +366,43 @@ final class ProviderAccessRequirementTests: XCTestCase {
         )
     }
 
+    func testProviderAPIKeyFormStateOwnsIOSControlPresentation() {
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyFormState(enteredKey: " entered-key ")
+                .iOSControlPresentation(storedRuntimeKey: nil),
+            VoiceInkProviderAPIKeyFormControlPresentation(
+                isSaveButtonDisabled: false,
+                verificationControl: .verifyButton(isDisabled: false)
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyFormState(enteredKey: " \n\t ")
+                .iOSControlPresentation(storedRuntimeKey: "stored-key"),
+            VoiceInkProviderAPIKeyFormControlPresentation(
+                isSaveButtonDisabled: true,
+                verificationControl: .verifyButton(isDisabled: false)
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyFormState(enteredKey: " \n\t ")
+                .iOSControlPresentation(storedRuntimeKey: nil),
+            VoiceInkProviderAPIKeyFormControlPresentation(
+                isSaveButtonDisabled: true,
+                verificationControl: .verifyButton(isDisabled: true)
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyFormState(
+                enteredKey: "entered-key",
+                verificationProgress: .verifying
+            ).iOSControlPresentation(storedRuntimeKey: nil),
+            VoiceInkProviderAPIKeyFormControlPresentation(
+                isSaveButtonDisabled: false,
+                verificationControl: .progress
+            )
+        )
+    }
+
     func testProviderAPIKeyFormPresentationBuildsProviderCopy() {
         let presentation = VoiceInkProviderKind.deepgram.apiKeyFormPresentation
 

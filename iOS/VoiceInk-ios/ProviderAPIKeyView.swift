@@ -10,7 +10,7 @@ struct ProviderAPIKeyView: View {
     var body: some View {
         let presentation = provider.apiKeyFormPresentation
         let isKeyVerified = settings.isKeyVerified(for: provider)
-        let apiKeyDraft = apiKeyFormState.draft(
+        let controlPresentation = apiKeyFormState.iOSControlPresentation(
             storedRuntimeKey: settings.apiKey(for: provider)
         )
 
@@ -27,18 +27,19 @@ struct ProviderAPIKeyView: View {
                                 systemImage: presentation.saveButtonSystemImageName
                             )
                         }
-                        .disabled(!apiKeyDraft.hasEnteredKey)
+                        .disabled(controlPresentation.isSaveButtonDisabled)
                         Spacer()
-                        if apiKeyFormState.verificationProgress.isVerifying {
+                        switch controlPresentation.verificationControl {
+                        case .progress:
                             ProgressView().progressViewStyle(.circular)
-                        } else {
+                        case .verifyButton(let isDisabled):
                             Button(action: verifyKey) {
                                 Label(
                                     presentation.verifyButtonTitle,
                                     systemImage: presentation.verifyButtonSystemImageName
                                 )
                             }
-                            .disabled(!apiKeyDraft.canVerify)
+                            .disabled(isDisabled)
                         }
                     }
                 } else {

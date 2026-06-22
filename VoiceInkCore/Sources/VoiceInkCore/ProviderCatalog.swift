@@ -120,6 +120,24 @@ public struct VoiceInkProviderAPIKeyVerificationApplicationPlan: Equatable, Send
     }
 }
 
+public enum VoiceInkProviderAPIKeyVerificationControl: Equatable, Sendable {
+    case progress
+    case verifyButton(isDisabled: Bool)
+}
+
+public struct VoiceInkProviderAPIKeyFormControlPresentation: Equatable, Sendable {
+    public let isSaveButtonDisabled: Bool
+    public let verificationControl: VoiceInkProviderAPIKeyVerificationControl
+
+    public init(
+        isSaveButtonDisabled: Bool,
+        verificationControl: VoiceInkProviderAPIKeyVerificationControl
+    ) {
+        self.isSaveButtonDisabled = isSaveButtonDisabled
+        self.verificationControl = verificationControl
+    }
+}
+
 public extension VoiceInkProviderAPIKeyDraft {
     func verificationApplicationPlan(
         for result: VoiceInkAPIKeyVerificationResult
@@ -249,6 +267,16 @@ public struct VoiceInkProviderAPIKeyFormState: Equatable, Sendable {
         }
 
         return verificationProgress.iOSResultFeedback
+    }
+
+    public func iOSControlPresentation(storedRuntimeKey: String?) -> VoiceInkProviderAPIKeyFormControlPresentation {
+        let draft = draft(storedRuntimeKey: storedRuntimeKey)
+        return VoiceInkProviderAPIKeyFormControlPresentation(
+            isSaveButtonDisabled: !draft.hasEnteredKey,
+            verificationControl: verificationProgress.isVerifying
+                ? .progress
+                : .verifyButton(isDisabled: !draft.canVerify)
+        )
     }
 }
 

@@ -343,6 +343,46 @@ final class CustomPromptTests: XCTestCase {
         )
     }
 
+    func testCustomPromptPolicyPlansEnhancementDisableWhenAPIKeyIsInvalid() {
+        let selectedId = UUID(uuidString: "00000000-0000-0000-0000-000000000218")!
+
+        XCTAssertNil(
+            VoiceInkCustomPromptPolicy.settingsStateAfterAPIKeyValidityChange(
+                VoiceInkAIEnhancementPromptSettingsState(
+                    isEnhancementEnabled: true,
+                    selectedPromptId: selectedId
+                ),
+                isAPIKeyValid: true
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkCustomPromptPolicy.settingsStateAfterAPIKeyValidityChange(
+                VoiceInkAIEnhancementPromptSettingsState(
+                    isEnhancementEnabled: true,
+                    selectedPromptId: selectedId
+                ),
+                isAPIKeyValid: false
+            ),
+            VoiceInkAIEnhancementPromptSettingsState(
+                isEnhancementEnabled: false,
+                selectedPromptId: selectedId
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkCustomPromptPolicy.settingsStateAfterAPIKeyValidityChange(
+                VoiceInkAIEnhancementPromptSettingsState(
+                    isEnhancementEnabled: false,
+                    selectedPromptId: selectedId
+                ),
+                isAPIKeyValid: false
+            ),
+            VoiceInkAIEnhancementPromptSettingsState(
+                isEnhancementEnabled: false,
+                selectedPromptId: selectedId
+            )
+        )
+    }
+
     func testCustomPromptPolicyRepairsSelectedPromptOnlyWhenEnhancementIsEnabled() {
         let firstId = UUID(uuidString: "00000000-0000-0000-0000-000000000101")!
         let validId = UUID(uuidString: "00000000-0000-0000-0000-000000000102")!

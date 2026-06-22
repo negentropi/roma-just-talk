@@ -4077,6 +4077,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift
 
 require_pattern \
+  "shared AI enhancement API-key validity state planning lives in VoiceInkCore" \
+  'settingsStateAfterAPIKeyValidityChange' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift
+
+require_pattern \
   "shared prompt-trigger detection settings application uses shared prompt state" \
   'applyingSettingsState|restoringSettingsState|VoiceInkAIEnhancementPromptSettingsState' \
   VoiceInkCore/Sources/VoiceInkCore/PromptTriggerPolicy.swift
@@ -4112,13 +4117,28 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "core checks execute AI enhancement API-key validity state test" \
+  'CustomPromptTests\.testCustomPromptPolicyPlansEnhancementDisableWhenAPIKeyIsInvalid' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "macOS AI enhancement service consumes shared prompt-trigger settings state" \
   'settingsStateAfterEnhancementEnabledChange|applyingSettingsState|restoringSettingsState|VoiceInkAIEnhancementPromptSettingsState' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+require_pattern \
+  "macOS AI enhancement service consumes shared API-key validity state planning" \
+  'settingsStateAfterAPIKeyValidityChange' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
 reject_pattern \
   "macOS AI enhancement service avoids shell-owned prompt-trigger settings application policy" \
   'result\.shouldEnableAI|restoredEnhancementState|restoredPromptId|selectedPromptId = result\.selectedPromptId|isEnhancementEnabled && selectedPromptId|VoiceInkCustomPromptPolicy\.selectedPromptIdAfterEnablingEnhancement' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+reject_pattern \
+  "macOS AI enhancement service avoids shell-owned API-key invalid disable policy" \
+  '!self\.aiService\.isAPIKeyValid|self\.isEnhancementEnabled = false' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
 require_pattern \
@@ -4205,6 +4225,11 @@ require_pattern \
 require_pattern \
   "migration checklist tracks shared startup prompt-store repair" \
   'startup prompt-store repair ordering' \
+  docs/ios-single-repo-migration.md
+
+require_pattern \
+  "migration checklist tracks shared API-key validity state planning" \
+  'provider-key validity changes delegate enhancement-disable state planning to `VoiceInkCustomPromptPolicy`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

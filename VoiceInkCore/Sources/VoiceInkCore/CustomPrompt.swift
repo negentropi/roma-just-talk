@@ -236,6 +236,20 @@ public enum VoiceInkCustomPromptPolicy {
         )
     }
 
+    public static func settingsStateAfterAPIKeyValidityChange(
+        _ state: VoiceInkAIEnhancementPromptSettingsState,
+        isAPIKeyValid: Bool
+    ) -> VoiceInkAIEnhancementPromptSettingsState? {
+        guard !isAPIKeyValid else {
+            return nil
+        }
+
+        return VoiceInkAIEnhancementPromptSettingsState(
+            isEnhancementEnabled: false,
+            selectedPromptId: state.selectedPromptId
+        )
+    }
+
     public static func repairedSelectedPromptId(
         _ selectedPromptId: UUID?,
         isEnhancementEnabled: Bool,

@@ -111,8 +111,14 @@ class AIEnhancementService: ObservableObject {
     @objc private func handleAPIKeyChange() {
         DispatchQueue.main.async {
             self.objectWillChange.send()
-            if !self.aiService.isAPIKeyValid {
-                self.isEnhancementEnabled = false
+            if let state = VoiceInkCustomPromptPolicy.settingsStateAfterAPIKeyValidityChange(
+                self.aiEnhancementPromptSettingsState,
+                isAPIKeyValid: self.aiService.isAPIKeyValid
+            ) {
+                self.isEnhancementEnabled = state.isEnhancementEnabled
+                if self.selectedPromptId != state.selectedPromptId {
+                    self.selectedPromptId = state.selectedPromptId
+                }
             }
         }
     }

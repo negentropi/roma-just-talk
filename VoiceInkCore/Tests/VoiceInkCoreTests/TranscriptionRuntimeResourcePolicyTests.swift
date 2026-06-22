@@ -33,4 +33,21 @@ final class TranscriptionRuntimeResourcePolicyTests: XCTestCase {
         XCTAssertEqual(plan.recordingStartupLoadAction, .none)
         XCTAssertEqual(plan.modelSelectionResourceAction, .clearLocalWhisperModelAndMarkLoaded)
     }
+
+    func testModelSelectionResourceActionOwnsLocalWhisperRuntimeUpdate() {
+        XCTAssertEqual(
+            VoiceInkTranscriptionModelSelectionResourceAction.preserveLocalWhisperModel.localWhisperRuntimeUpdate,
+            VoiceInkLocalWhisperRuntimeSelectionUpdate(
+                shouldClearLoadedModel: false,
+                isModelLoadedAfterSelection: nil
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptionModelSelectionResourceAction.clearLocalWhisperModelAndMarkLoaded.localWhisperRuntimeUpdate,
+            VoiceInkLocalWhisperRuntimeSelectionUpdate(
+                shouldClearLoadedModel: true,
+                isModelLoadedAfterSelection: true
+            )
+        )
+    }
 }

@@ -9,6 +9,34 @@ public enum VoiceInkTranscriptionRecordingStartupLoadAction: Equatable, Sendable
 public enum VoiceInkTranscriptionModelSelectionResourceAction: Equatable, Sendable {
     case preserveLocalWhisperModel
     case clearLocalWhisperModelAndMarkLoaded
+
+    public var localWhisperRuntimeUpdate: VoiceInkLocalWhisperRuntimeSelectionUpdate {
+        switch self {
+        case .preserveLocalWhisperModel:
+            return VoiceInkLocalWhisperRuntimeSelectionUpdate(
+                shouldClearLoadedModel: false,
+                isModelLoadedAfterSelection: nil
+            )
+        case .clearLocalWhisperModelAndMarkLoaded:
+            return VoiceInkLocalWhisperRuntimeSelectionUpdate(
+                shouldClearLoadedModel: true,
+                isModelLoadedAfterSelection: true
+            )
+        }
+    }
+}
+
+public struct VoiceInkLocalWhisperRuntimeSelectionUpdate: Equatable, Sendable {
+    public let shouldClearLoadedModel: Bool
+    public let isModelLoadedAfterSelection: Bool?
+
+    public init(
+        shouldClearLoadedModel: Bool,
+        isModelLoadedAfterSelection: Bool?
+    ) {
+        self.shouldClearLoadedModel = shouldClearLoadedModel
+        self.isModelLoadedAfterSelection = isModelLoadedAfterSelection
+    }
 }
 
 public struct VoiceInkTranscriptionRuntimeResourcePlan: Equatable, Sendable {

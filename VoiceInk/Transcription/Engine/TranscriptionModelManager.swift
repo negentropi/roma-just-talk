@@ -78,9 +78,15 @@ class TranscriptionModelManager: ObservableObject {
         VoiceInkCurrentTranscriptionModelPreference.saveModelName(model.name)
         ensureSelectedLanguageIsSupported(by: model)
 
-        if model.transcriptionRuntimeResourcePlan.modelSelectionResourceAction == .clearLocalWhisperModelAndMarkLoaded {
+        let localWhisperRuntimeUpdate = model
+            .transcriptionRuntimeResourcePlan
+            .modelSelectionResourceAction
+            .localWhisperRuntimeUpdate
+        if localWhisperRuntimeUpdate.shouldClearLoadedModel {
             whisperModelManager?.loadedWhisperModel = nil
-            whisperModelManager?.isModelLoaded = true
+        }
+        if let isModelLoaded = localWhisperRuntimeUpdate.isModelLoadedAfterSelection {
+            whisperModelManager?.isModelLoaded = isModelLoaded
         }
 
         notifyCurrentModelDidChange(model)

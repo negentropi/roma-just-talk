@@ -6800,10 +6800,13 @@ reject_pattern \
   VoiceInk/Transcription/FluidAudio/FluidAudioTranscriptionService.swift \
   VoiceInk/Transcription/Streaming/FluidAudioStreamingProvider.swift
 
-require_pattern \
+require_patterns \
   "shared core owns transcription runtime resource planning" \
-  'VoiceInkTranscriptionRuntimeResourcePlan|VoiceInkTranscriptionRecordingStartupLoadAction' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRuntimeResourcePolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRuntimeResourcePolicy.swift \
+  'VoiceInkTranscriptionRuntimeResourcePlan' \
+  'VoiceInkTranscriptionRecordingStartupLoadAction' \
+  'VoiceInkLocalWhisperRuntimeSelectionUpdate' \
+  'localWhisperRuntimeUpdate'
 
 require_pattern \
   "macOS model adapts shared transcription runtime resource plan" \
@@ -6876,8 +6879,20 @@ require_patterns \
   'TranscriptionModelAvailabilityTests\.testNativeAppleFailureKindIsSharedThrowableLocalizedError' \
   'TranscriptionModelAvailabilityTests\.testNativeAppleTranscriptionPolicyPreservesSelectionAndTimeoutCopy'
 
+require_patterns \
+  "macOS transcription model manager applies shared local Whisper runtime update" \
+  VoiceInk/Transcription/Engine/TranscriptionModelManager.swift \
+  'localWhisperRuntimeUpdate' \
+  'shouldClearLoadedModel' \
+  'isModelLoadedAfterSelection'
+
 require_pattern \
-  "macOS transcription model manager uses shared selection resource action" \
+  "core checks execute transcription runtime resource update test" \
+  'TranscriptionRuntimeResourcePolicyTests\.testModelSelectionResourceActionOwnsLocalWhisperRuntimeUpdate' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "macOS transcription model manager avoids shell-owned selection resource case check" \
   'modelSelectionResourceAction == \.clearLocalWhisperModelAndMarkLoaded' \
   VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
 

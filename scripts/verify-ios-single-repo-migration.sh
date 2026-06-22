@@ -5991,7 +5991,7 @@ require_pattern \
 
 require_pattern \
   "shared streaming connection model policy lives in VoiceInkCore" \
-  'streamingConnectionModelName\(for selectedModelName: String\)|scribe_v2_realtime|stt-rt-v4|selectedModelName\.contains\("standard"\) \? "standard" : "enhanced"' \
+  'streamingConnectionModelName\(for selectedModelName: String\)|scribe_v2_realtime|stt-rt-v4|voxtral-mini-transcribe-realtime-2602|selectedModelName\.contains\("standard"\) \? "standard" : "enhanced"' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift
 
 require_pattern \
@@ -6011,8 +6011,10 @@ require_pattern \
   VoiceInk/Transcription/Streaming/CartesiaStreamingProvider.swift \
   VoiceInk/Transcription/Streaming/DeepgramStreamingProvider.swift \
   VoiceInk/Transcription/Streaming/ElevenLabsStreamingProvider.swift \
+  VoiceInk/Transcription/Streaming/MistralStreamingProvider.swift \
   VoiceInk/Transcription/Streaming/SonioxStreamingProvider.swift \
-  VoiceInk/Transcription/Streaming/SpeechmaticsStreamingProvider.swift
+  VoiceInk/Transcription/Streaming/SpeechmaticsStreamingProvider.swift \
+  VoiceInk/Transcription/Streaming/XAIStreamingProvider.swift
 
 require_pattern \
   "shared streaming timeout mapping policy lives in VoiceInkCore" \
@@ -6048,13 +6050,15 @@ reject_pattern \
 
 reject_pattern \
   "macOS cloud streaming adapters avoid shell-owned connection model policy" \
-  '"scribe_v2_realtime"|"stt-rt-v4"|model\.name\.contains\("standard"\)|let +operatingPoint|model: model\.name' \
+  '"scribe_v2_realtime"|"stt-rt-v4"|"voxtral-mini-transcribe-realtime-2602"|model\.name\.contains\("standard"\)|let +operatingPoint|model: model\.name' \
   VoiceInk/Transcription/Streaming/AssemblyAIStreamingProvider.swift \
   VoiceInk/Transcription/Streaming/CartesiaStreamingProvider.swift \
   VoiceInk/Transcription/Streaming/DeepgramStreamingProvider.swift \
   VoiceInk/Transcription/Streaming/ElevenLabsStreamingProvider.swift \
+  VoiceInk/Transcription/Streaming/MistralStreamingProvider.swift \
   VoiceInk/Transcription/Streaming/SonioxStreamingProvider.swift \
-  VoiceInk/Transcription/Streaming/SpeechmaticsStreamingProvider.swift
+  VoiceInk/Transcription/Streaming/SpeechmaticsStreamingProvider.swift \
+  VoiceInk/Transcription/Streaming/XAIStreamingProvider.swift
 
 reject_pattern \
   "macOS Deepgram streaming avoids shell-only vocabulary term limit" \

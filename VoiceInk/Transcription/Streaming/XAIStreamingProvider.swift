@@ -29,7 +29,7 @@ final class XAIStreamingProvider: StreamingTranscriptionProvider {
         forwardingTask = forwardLLMKitStreamingEvents(from: client, to: eventsContinuation)
 
         do {
-            try await client.connect(apiKey: apiKey, model: model.name, language: language)
+            try await client.connect(apiKey: apiKey, model: model.streamingConnectionModelName, language: language)
         } catch {
             forwardingTask?.cancel()
             forwardingTask = nil

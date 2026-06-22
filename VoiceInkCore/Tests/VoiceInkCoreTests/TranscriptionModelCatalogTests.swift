@@ -140,8 +140,16 @@ final class TranscriptionModelCatalogTests: XCTestCase {
             "ink-whisper"
         )
         XCTAssertEqual(
+            VoiceInkTranscriptionModelProvider.mistral.streamingConnectionModelName(for: "voxtral-mini-latest"),
+            "voxtral-mini-transcribe-realtime-2602"
+        )
+        XCTAssertEqual(
             VoiceInkTranscriptionModelProvider.elevenLabs.streamingConnectionModelName(for: "scribe_v2"),
             "scribe_v2_realtime"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptionModelProvider.xai.streamingConnectionModelName(for: "grok-stt"),
+            "grok-stt"
         )
         XCTAssertEqual(
             VoiceInkTranscriptionModelProvider.soniox.streamingConnectionModelName(for: "stt-async-v4"),

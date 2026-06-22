@@ -169,7 +169,9 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
             return "stt-rt-v4"
         case .speechmatics:
             return selectedModelName.contains("standard") ? "standard" : "enhanced"
-        case .assemblyAI, .cartesia, .deepgram, .gemini, .groq, .mistral, .openAI, .xai, .local:
+        case .mistral:
+            return "voxtral-mini-transcribe-realtime-2602"
+        case .assemblyAI, .cartesia, .deepgram, .gemini, .groq, .openAI, .xai, .local:
             return selectedModelName
         }
     }

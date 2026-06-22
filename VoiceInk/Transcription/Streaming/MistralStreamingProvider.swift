@@ -30,7 +30,7 @@ final class MistralStreamingProvider: StreamingTranscriptionProvider {
         forwardingTask = forwardLLMKitStreamingEvents(from: client, to: eventsContinuation)
 
         do {
-            try await client.connect(apiKey: apiKey, model: "voxtral-mini-transcribe-realtime-2602", language: language)
+            try await client.connect(apiKey: apiKey, model: model.streamingConnectionModelName, language: language)
         } catch {
             // Clean up forwarding task on connection failure
             forwardingTask?.cancel()

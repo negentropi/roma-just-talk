@@ -11065,6 +11065,44 @@ reject_pattern \
   '"support@tryvoiceink\.com"|"VoiceInk Support Request"|SCREEN RECORDING HIGHLY RECOMMENDED|COMMON ISSUES|tryvoiceink\.com/common-issues|URL\(string: "mailto:' \
   VoiceInk/EmailSupport.swift
 
+require_file VoiceInkCore/Sources/VoiceInkCore/AppNotificationPresentation.swift
+
+require_patterns \
+  "shared app notification presentation lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/AppNotificationPresentation.swift \
+  'VoiceInkAppNotificationKind' \
+  'case error' \
+  'case warning' \
+  'case info' \
+  'case success' \
+  'defaultDisplayDuration: TimeInterval = 3\.0' \
+  'xmark\.octagon\.fill' \
+  'exclamationmark\.triangle\.fill' \
+  'info\.circle\.fill' \
+  'checkmark\.circle\.fill' \
+  'playsFailureSound'
+
+require_pattern \
+  "macOS app notification view adapts shared notification kind" \
+  'VoiceInkAppNotificationKind|type\.systemImageName|private extension VoiceInkAppNotificationKind' \
+  VoiceInk/Notifications/AppNotificationView.swift
+
+require_pattern \
+  "macOS notification manager adapts shared notification kind" \
+  'VoiceInkAppNotificationKind|defaultDisplayDuration|type\.playsFailureSound' \
+  VoiceInk/Notifications/NotificationManager.swift
+
+require_pattern \
+  "core checks execute app notification presentation tests" \
+  'AppNotificationPresentationTests\.testAppNotificationKindsPreserveCasesAndDefaultDuration|AppNotificationPresentationTests\.testAppNotificationKindsPreserveSystemImages|AppNotificationPresentationTests\.testOnlyErrorNotificationsPlayFailureSound' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "macOS notification shell avoids shell-owned notification kind policy" \
+  'enum +NotificationType|AppNotificationView\.NotificationType|duration: TimeInterval = 3\.0|type == \.error|"xmark\.octagon\.fill"|"exclamationmark\.triangle\.fill"|"info\.circle\.fill"|"checkmark\.circle\.fill"' \
+  VoiceInk/Notifications/AppNotificationView.swift \
+  VoiceInk/Notifications/NotificationManager.swift
+
 require_pattern \
   "macOS app notifications use shared navigation request contract" \
   'navigateToDestination = VoiceInkMacOSNavigationRequest\.notificationName|openFileForTranscription = VoiceInkMacOSFileTranscriptionRequest\.notificationName' \

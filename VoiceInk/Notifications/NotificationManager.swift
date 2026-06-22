@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import VoiceInkCore
 
 class NotificationManager {
     static let shared = NotificationManager()
@@ -12,8 +13,8 @@ class NotificationManager {
     @MainActor
     func showNotification(
         title: String,
-        type: AppNotificationView.NotificationType,
-        duration: TimeInterval = 3.0,
+        type: VoiceInkAppNotificationKind,
+        duration: TimeInterval = VoiceInkAppNotificationKind.defaultDisplayDuration,
         onTap: (() -> Void)? = nil,
         actionButton: (label: String, action: () -> Void)? = nil
     ) {
@@ -25,8 +26,7 @@ class NotificationManager {
             notificationWindow = nil
         }
         
-        // Play esc sound for error notifications
-        if type == .error {
+        if type.playsFailureSound {
             SoundManager.shared.playEscSound()
         }
         
@@ -116,4 +116,4 @@ class NotificationManager {
 
         })
     }
-} 
+}

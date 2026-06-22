@@ -1,8 +1,9 @@
 import SwiftUI
+import VoiceInkCore
 
 struct AppNotificationView: View {
     let title: String
-    let type: NotificationType
+    let type: VoiceInkAppNotificationKind
     let duration: TimeInterval
     let onClose: () -> Void
     let onTap: (() -> Void)?
@@ -11,36 +12,11 @@ struct AppNotificationView: View {
     @State private var progress: Double = 1.0
     @State private var timer: Timer?
 
-    enum NotificationType {
-        case error
-        case warning
-        case info
-        case success
-
-        var iconName: String {
-            switch self {
-            case .error: return "xmark.octagon.fill"
-            case .warning: return "exclamationmark.triangle.fill"
-            case .info: return "info.circle.fill"
-            case .success: return "checkmark.circle.fill"
-            }
-        }
-
-        var iconColor: Color {
-            switch self {
-            case .error: return .red
-            case .warning: return .yellow
-            case .info: return .blue
-            case .success: return .green
-            }
-        }
-    }
-
     var body: some View {
         ZStack {
             HStack(alignment: .center, spacing: 12) {
                 // Type icon
-                Image(systemName: type.iconName)
+                Image(systemName: type.systemImageName)
                     .font(.system(size: 16, weight: .medium))
                     .foregroundColor(type.iconColor)
                     .frame(width: 20, height: 20)
@@ -156,3 +132,17 @@ struct AppNotificationView: View {
     }
 }
 
+private extension VoiceInkAppNotificationKind {
+    var iconColor: Color {
+        switch self {
+        case .error:
+            return .red
+        case .warning:
+            return .yellow
+        case .info:
+            return .blue
+        case .success:
+            return .green
+        }
+    }
+}

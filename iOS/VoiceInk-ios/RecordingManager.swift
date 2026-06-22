@@ -55,14 +55,19 @@ final class RecordingManager: ObservableObject {
     // MARK: - Coordinator Setup
     private func setupCoordinatorCallbacks() {
         coordinator.onStopRecordingRequested = { [weak self] in
-            guard let self = self, self.isRecording else { return }
-            // This will be called when keyboard extension requests stop
-            VoiceInkIOSLogger.recording.notice("Stop recording requested from keyboard extension")
-            // We need modelContext, so we'll handle this via a notification instead
-            NotificationCenter.default.post(
-                name: VoiceInkAppIdentity.iOSStopRecordingFromKeyboardNotificationName,
-                object: nil
-            )
+            guard let self = self else { return }
+
+            switch VoiceInkKeyboardStopRecordingRequestPolicy.action(recordingState: self.recordingState) {
+            case .handleStopRequest:
+                // We need modelContext, so the SwiftUI shell completes the stop from this notification.
+                VoiceInkIOSLogger.recording.notice("Stop recording requested from keyboard extension")
+                NotificationCenter.default.post(
+                    name: VoiceInkAppIdentity.iOSStopRecordingFromKeyboardNotificationName,
+                    object: nil
+                )
+            case .ignore:
+                break
+            }
         }
     }
     

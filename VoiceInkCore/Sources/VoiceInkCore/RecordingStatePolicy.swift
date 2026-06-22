@@ -361,6 +361,19 @@ public enum VoiceInkKeyboardRecordingButtonTapPolicy {
     }
 }
 
+public enum VoiceInkKeyboardStopRecordingRequestAction: Equatable, Sendable {
+    case handleStopRequest
+    case ignore
+}
+
+public enum VoiceInkKeyboardStopRecordingRequestPolicy {
+    public static func action(
+        recordingState: VoiceInkRecordingState
+    ) -> VoiceInkKeyboardStopRecordingRequestAction {
+        recordingState.isActivelyRecording ? .handleStopRequest : .ignore
+    }
+}
+
 public enum VoiceInkRecorderStyle: String, CaseIterable, Identifiable, Sendable {
     case none
     case notch

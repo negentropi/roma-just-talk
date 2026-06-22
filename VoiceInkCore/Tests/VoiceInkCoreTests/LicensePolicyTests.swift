@@ -9,6 +9,10 @@ final class LicensePolicyTests: XCTestCase {
         XCTAssertEqual(VoiceInkLicensePreference.deviceIdentifierKey, "VoiceInkDeviceIdentifier")
     }
 
+    func testLicenseStatusChangeRequestPreservesMacOSNotificationName() {
+        XCTAssertEqual(VoiceInkLicenseStatusChangeRequest.notificationName, Notification.Name("licenseStatusChanged"))
+    }
+
     func testLicensePreferenceStorageRoundTripsNonSensitiveFlags() {
         withIsolatedDefaults { defaults in
             XCTAssertFalse(VoiceInkLicensePreference.requiresActivation(from: defaults))

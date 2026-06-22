@@ -1,5 +1,9 @@
 import Foundation
 
+public enum VoiceInkLicenseStatusChangeRequest {
+    public static let notificationName = Notification.Name("licenseStatusChanged")
+}
+
 public enum VoiceInkLicensePreference {
     public static let requiresActivationKey = "VoiceInkLicenseRequiresActivation"
     public static let hasLaunchedBeforeKey = "VoiceInkHasLaunchedBefore"

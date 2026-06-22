@@ -39,6 +39,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "DiagnosticLogExportPolicyTests.testDiagnosticLogExportPolicyBuildsMacOSExportFileName", run: { try DiagnosticLogExportPolicyTests().testDiagnosticLogExportPolicyBuildsMacOSExportFileName() }),
             VoiceInkCoreCheck(name: "DiagnosticLogExportPolicyTests.testDiagnosticLogExportPolicyBuildsDownloadsUnavailableError", run: { DiagnosticLogExportPolicyTests().testDiagnosticLogExportPolicyBuildsDownloadsUnavailableError() }),
             VoiceInkCoreCheck(name: "LicensePolicyTests.testLicensePreferenceKeysPreserveExistingStorageNames", run: { LicensePolicyTests().testLicensePreferenceKeysPreserveExistingStorageNames() }),
+            VoiceInkCoreCheck(name: "LicensePolicyTests.testLicenseStatusChangeRequestPreservesMacOSNotificationName", run: { LicensePolicyTests().testLicenseStatusChangeRequestPreservesMacOSNotificationName() }),
             VoiceInkCoreCheck(name: "LicensePolicyTests.testLicensePreferenceStorageRoundTripsNonSensitiveFlags", run: { LicensePolicyTests().testLicensePreferenceStorageRoundTripsNonSensitiveFlags() }),
             VoiceInkCoreCheck(name: "LicensePolicyTests.testDeviceIdentifierReusesStoredValueBeforeCreatingFallback", run: { LicensePolicyTests().testDeviceIdentifierReusesStoredValueBeforeCreatingFallback() }),
             VoiceInkCoreCheck(name: "LicensePolicyTests.testDeviceIdentifierCreatesAndStoresFallbackWhenMissing", run: { LicensePolicyTests().testDeviceIdentifierCreatesAndStoresFallbackWhenMissing() }),

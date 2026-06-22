@@ -1,10 +1,12 @@
 import AppIntents
 import Foundation
-import AppKit
+import VoiceInkCore
 
 struct ToggleMiniRecorderIntent: AppIntent {
-    static var title: LocalizedStringResource = "Toggle VoiceInk Recorder"
-    static var description = IntentDescription("Start or stop the VoiceInk mini recorder for voice transcription.")
+    private static let presentation = VoiceInkMiniRecorderAppIntentPresentation.toggle
+
+    static var title = LocalizedStringResource(stringLiteral: presentation.title)
+    static var description = IntentDescription(stringLiteral: presentation.description)
     
     static var openAppWhenRun: Bool = false
     
@@ -12,21 +14,7 @@ struct ToggleMiniRecorderIntent: AppIntent {
     func perform() async throws -> some IntentResult & ProvidesDialog {
         NotificationCenter.default.post(name: .toggleMiniRecorder, object: nil)
         
-        let dialog = IntentDialog(stringLiteral: "VoiceInk recorder toggled")
+        let dialog = IntentDialog(stringLiteral: Self.presentation.successDialog)
         return .result(dialog: dialog)
-    }
-}
-
-enum IntentError: Error, LocalizedError {
-    case appNotAvailable
-    case serviceNotAvailable
-    
-    var errorDescription: String? {
-        switch self {
-        case .appNotAvailable:
-            return "VoiceInk app is not available"
-        case .serviceNotAvailable:
-            return "VoiceInk recording service is not available"
-        }
     }
 }

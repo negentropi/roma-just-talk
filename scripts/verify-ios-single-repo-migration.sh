@@ -11236,6 +11236,42 @@ require_pattern \
   'VoiceInkAppIdentity|VoiceInkStorageStartupDiagnostics|VoiceInkMacOSStorageAlertPresentation|VoiceInkMacOSNavigationDestination|VoiceInkMacOSMainViewItem|VoiceInkMacOSNavigationRequest|VoiceInkMacOSFileTranscriptionRequest|bundleIdentifier = "com\.prakashjoshipax\.VoiceInk"|loggingSubsystem = "com\.prakashjoshipax\.voiceink"|displayName = "roma just talk"|compactDisplayName = "roma-just-talk"|iOSRecordDeepLinkScheme = "voiceink"|iOSRecordDeepLinkHost = "record"|iCloudContainerIdentifier|iOSAppGroupIdentifier|iOSRecordDeepLinkURL|iOSStopRecordingDarwinNotificationName|iOSRecordingStateChangedDarwinNotificationName|iOSStopRecordingFromKeyboardNotificationName|macOSApplicationSupportDirectory|storageFallbackWarningPresentation|storageFailurePresentation|modelContainerInitializationFailedMessage|modelContainerUnavailablePreconditionMessage|iOSModelContainerCreationFailedMessage|errorDomain' \
   VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift
 
+require_file VoiceInkCore/Sources/VoiceInkCore/AppIntentPresentation.swift
+
+require_patterns \
+  "shared macOS AppIntent presentation lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/AppIntentPresentation.swift \
+  'VoiceInkAppIntentPresentation' \
+  'VoiceInkMiniRecorderAppIntentPresentation' \
+  '"Toggle VoiceInk Recorder"' \
+  '"Start or stop the VoiceInk mini recorder for voice transcription\."' \
+  '"VoiceInk recorder toggled"' \
+  '"Dismiss VoiceInk Recorder"' \
+  '"Dismiss the VoiceInk mini recorder and cancel any active recording\."' \
+  '"VoiceInk recorder dismissed"'
+
+require_patterns \
+  "macOS mini-recorder intents use shared presentation" \
+  VoiceInk/AppIntents/ToggleMiniRecorderIntent.swift \
+  'VoiceInkMiniRecorderAppIntentPresentation\.toggle' \
+  'LocalizedStringResource\(stringLiteral: presentation\.title\)' \
+  'IntentDescription\(stringLiteral: presentation\.description\)' \
+  'IntentDialog\(stringLiteral: Self\.presentation\.successDialog\)'
+
+require_patterns \
+  "macOS dismiss-recorder intent uses shared presentation" \
+  VoiceInk/AppIntents/DismissMiniRecorderIntent.swift \
+  'VoiceInkMiniRecorderAppIntentPresentation\.dismiss' \
+  'LocalizedStringResource\(stringLiteral: presentation\.title\)' \
+  'IntentDescription\(stringLiteral: presentation\.description\)' \
+  'IntentDialog\(stringLiteral: Self\.presentation\.successDialog\)'
+
+reject_pattern \
+  "macOS mini-recorder intents avoid shell-owned presentation copy and stale error wrapper" \
+  '"(Toggle VoiceInk Recorder|Start or stop the VoiceInk mini recorder for voice transcription\.|VoiceInk recorder toggled|Dismiss VoiceInk Recorder|Dismiss the VoiceInk mini recorder and cancel any active recording\.|VoiceInk recorder dismissed|VoiceInk app is not available|VoiceInk recording service is not available)"|enum +IntentError|import AppKit' \
+  VoiceInk/AppIntents/ToggleMiniRecorderIntent.swift \
+  VoiceInk/AppIntents/DismissMiniRecorderIntent.swift
+
 require_patterns \
   "shared storage startup diagnostics live in VoiceInkCore" \
   VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift \
@@ -11704,6 +11740,11 @@ require_patterns \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
   'AppIdentityTests\.testMacOSStorageAlertPresentationPreservesStartupCopy' \
   'AppIdentityTests\.testStorageStartupDiagnosticsPreserveAppStartupCopy'
+
+require_pattern \
+  "core checks execute AppIntent presentation tests" \
+  'AppIntentPresentationTests\.testMiniRecorderIntentPresentationPreservesMacOSShortcutCopy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "core checks execute macOS navigation request contract tests" \

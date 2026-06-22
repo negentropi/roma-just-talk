@@ -300,8 +300,7 @@ h1 .before-word {
   background: var(--cyan);
 }
 
-#github-button,
-#talk-button {
+#github-button {
   background: #000;
   color: #fff8e7;
 }
@@ -309,6 +308,10 @@ h1 .before-word {
 .talk {
   margin-top: 12px;
   background: var(--coral);
+}
+
+#talk-button {
+  background: transparent;
 }
 
 .icon {

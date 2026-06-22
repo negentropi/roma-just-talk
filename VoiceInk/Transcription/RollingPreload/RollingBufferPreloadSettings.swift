@@ -15,7 +15,7 @@ extension TranscriptionModel {
     var rollingBufferPreloadSnapshot: VoiceInkRollingBufferPreloadModelSnapshot {
         VoiceInkRollingBufferPreloadModelSnapshot(
             supportsStreaming: supportsStreaming,
-            isCloudTranscriptionProvider: provider.isCloudTranscriptionProvider
+            isCloudTranscriptionProvider: provider.transcriptionServiceRoute.isCloudTranscriptionProvider
         )
     }
 }
@@ -267,20 +267,5 @@ final class RollingBufferPreloadRuntimeDiagnostics {
         lock.lock()
         defer { lock.unlock() }
         return snapshot
-    }
-}
-
-extension ModelProvider {
-    var isCloudTranscriptionProvider: Bool {
-        switch self {
-        case .groq, .elevenLabs, .deepgram, .mistral, .gemini, .soniox, .speechmatics, .assemblyAI, .xai, .cartesia, .custom:
-            return true
-        case .whisper, .fluidAudio, .nativeApple:
-            return false
-        }
-    }
-
-    var isLocalTranscriptionProvider: Bool {
-        !isCloudTranscriptionProvider
     }
 }

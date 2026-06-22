@@ -10,6 +10,17 @@ final class TranscriptionStreamingPreferenceTests: XCTestCase {
         )
     }
 
+    func testServiceRouteClassifiesCloudAndLocalProviders() {
+        XCTAssertTrue(VoiceInkTranscriptionServiceRoute.cloud.isCloudTranscriptionProvider)
+        XCTAssertFalse(VoiceInkTranscriptionServiceRoute.cloud.isLocalTranscriptionProvider)
+        XCTAssertFalse(VoiceInkTranscriptionServiceRoute.localWhisper.isCloudTranscriptionProvider)
+        XCTAssertTrue(VoiceInkTranscriptionServiceRoute.localWhisper.isLocalTranscriptionProvider)
+        XCTAssertFalse(VoiceInkTranscriptionServiceRoute.localFluidAudio.isCloudTranscriptionProvider)
+        XCTAssertTrue(VoiceInkTranscriptionServiceRoute.localFluidAudio.isLocalTranscriptionProvider)
+        XCTAssertFalse(VoiceInkTranscriptionServiceRoute.nativeApple.isCloudTranscriptionProvider)
+        XCTAssertTrue(VoiceInkTranscriptionServiceRoute.nativeApple.isLocalTranscriptionProvider)
+    }
+
     func testStreamingPreferenceDefaultsEnabledWhenUnset() {
         withIsolatedDefaults { defaults in
             XCTAssertTrue(VoiceInkTranscriptionStreamingPreference.isEnabled(

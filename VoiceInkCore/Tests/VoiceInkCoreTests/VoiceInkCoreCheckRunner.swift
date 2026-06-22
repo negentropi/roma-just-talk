@@ -1098,6 +1098,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "TranscriptionRuntimeResourcePolicyTests.testCloudRouteSkipsLocalRuntimeWork", run: { TranscriptionRuntimeResourcePolicyTests().testCloudRouteSkipsLocalRuntimeWork() }),
             VoiceInkCoreCheck(name: "TranscriptionRuntimeResourcePolicyTests.testNativeAppleRouteSkipsLocalRuntimeWork", run: { TranscriptionRuntimeResourcePolicyTests().testNativeAppleRouteSkipsLocalRuntimeWork() }),
             VoiceInkCoreCheck(name: "TranscriptionStreamingPreferenceTests.testKeyPreservesExistingPerModelPattern", run: { TranscriptionStreamingPreferenceTests().testKeyPreservesExistingPerModelPattern() }),
+            VoiceInkCoreCheck(name: "TranscriptionStreamingPreferenceTests.testServiceRouteClassifiesCloudAndLocalProviders", run: { TranscriptionStreamingPreferenceTests().testServiceRouteClassifiesCloudAndLocalProviders() }),
             VoiceInkCoreCheck(name: "TranscriptionStreamingPreferenceTests.testStreamingPreferenceDefaultsEnabledWhenUnset", run: { TranscriptionStreamingPreferenceTests().testStreamingPreferenceDefaultsEnabledWhenUnset() }),
             VoiceInkCoreCheck(name: "TranscriptionStreamingPreferenceTests.testStreamingPreferenceSavesAndReadsOverride", run: { TranscriptionStreamingPreferenceTests().testStreamingPreferenceSavesAndReadsOverride() }),
             VoiceInkCoreCheck(name: "TranscriptionStreamingPreferenceTests.testShouldUseStreamingRejectsUnsupportedModels", run: { TranscriptionStreamingPreferenceTests().testShouldUseStreamingRejectsUnsupportedModels() }),

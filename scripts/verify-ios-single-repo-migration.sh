@@ -10926,6 +10926,27 @@ require_pattern \
   'static func backupPreferences' \
   VoiceInkCore/Sources/VoiceInkCore/RollingBufferPreloadPolicy.swift
 
+require_patterns \
+  "shared transcription service route classifies cloud and local providers" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionStreamingPreference.swift \
+  'isCloudTranscriptionProvider' \
+  'isLocalTranscriptionProvider'
+
+require_pattern \
+  "macOS rolling preload snapshot uses shared service-route provider classification" \
+  'provider\.transcriptionServiceRoute\.isCloudTranscriptionProvider' \
+  VoiceInk/Transcription/RollingPreload/RollingBufferPreloadSettings.swift
+
+require_pattern \
+  "core checks execute service-route provider classification test" \
+  'TranscriptionStreamingPreferenceTests\.testServiceRouteClassifiesCloudAndLocalProviders' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "macOS rolling preload avoids shell-only provider classification list" \
+  'case \.groq, \.elevenLabs, \.deepgram|var isLocalTranscriptionProvider: Bool' \
+  VoiceInk/Transcription/RollingPreload/RollingBufferPreloadSettings.swift
+
 require_pattern \
   "shared rolling-buffer backup import policy lives in VoiceInkCore" \
   'static func backupImportPlan' \
@@ -11058,7 +11079,7 @@ reject_pattern \
 
 require_pattern \
   "migration checklist tracks shared rolling-buffer settings labels" \
-  'macOS rolling-buffer preload settings labels/help, partial-transcript preview notification contract, VAD model labels, storage key/default' \
+  'macOS rolling-buffer preload settings labels/help, partial-transcript preview notification contract, VAD model labels, storage key/default, selected-model fallback, Silero predicate, service-route provider classification' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

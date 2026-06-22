@@ -109,6 +109,14 @@ public enum VoiceInkTranscriptionServiceRoute: Equatable, Sendable {
     case localFluidAudio
     case localWhisper
     case nativeApple
+
+    public var isCloudTranscriptionProvider: Bool {
+        self == .cloud
+    }
+
+    public var isLocalTranscriptionProvider: Bool {
+        !isCloudTranscriptionProvider
+    }
 }
 
 public enum VoiceInkTranscriptionStreamingAdapterKind: Equatable, Sendable {

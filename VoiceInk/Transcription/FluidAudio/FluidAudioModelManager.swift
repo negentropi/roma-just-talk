@@ -4,14 +4,9 @@ import AppKit
 import os
 import VoiceInkCore
 
-struct FluidAudioDownloadStatus {
-    let fractionCompleted: Double
-    let message: String
-}
-
 @MainActor
 class FluidAudioModelManager: ObservableObject {
-    @Published private var downloadStatuses: [String: FluidAudioDownloadStatus] = [:]
+    @Published private var downloadStatuses: [String: VoiceInkFluidAudioDownloadStatus] = [:]
     private var activeDownloadIDs: [String: UUID] = [:]
 
     var onModelDeleted: ((String) -> Void)?
@@ -55,7 +50,7 @@ class FluidAudioModelManager: ObservableObject {
         downloadStatuses[model.name] != nil
     }
 
-    func downloadStatus(for model: FluidAudioModel) -> FluidAudioDownloadStatus? {
+    func downloadStatus(for model: FluidAudioModel) -> VoiceInkFluidAudioDownloadStatus? {
         downloadStatuses[model.name]
     }
 
@@ -69,9 +64,9 @@ class FluidAudioModelManager: ObservableObject {
         let modelName = model.name
         let downloadID = UUID()
         activeDownloadIDs[modelName] = downloadID
-        downloadStatuses[modelName] = FluidAudioDownloadStatus(
+        downloadStatuses[modelName] = VoiceInkFluidAudioDownloadStatus(
             fractionCompleted: 0.0,
-            message: "Preparing FluidAudio download..."
+            phase: .preparingDownload
         )
         defer {
             clearDownloadStatus(for: modelName, downloadID: downloadID)
@@ -141,30 +136,26 @@ class FluidAudioModelManager: ObservableObject {
     private func updateDownloadProgress(_ progress: DownloadUtils.DownloadProgress, for modelName: String, downloadID: UUID) {
         guard activeDownloadIDs[modelName] == downloadID else { return }
 
-        downloadStatuses[modelName] = FluidAudioDownloadStatus(
-            fractionCompleted: min(max(progress.fractionCompleted, 0.0), 1.0),
-            message: FluidAudioModelManager.statusMessage(for: progress)
+        downloadStatuses[modelName] = VoiceInkFluidAudioDownloadStatus(
+            fractionCompleted: progress.fractionCompleted,
+            phase: FluidAudioModelManager.downloadPhase(for: progress)
         )
     }
 
-    private static func statusMessage(for progress: DownloadUtils.DownloadProgress) -> String {
+    private static func downloadPhase(for progress: DownloadUtils.DownloadProgress) -> VoiceInkFluidAudioDownloadPhase {
         switch progress.phase {
         case .listing:
-            return "Listing files from repository..."
+            return .listingFiles
         case .downloading(let completedFiles, let totalFiles):
             guard totalFiles > 0 else {
-                return "Checking cached models..."
+                return .checkingCachedModels
             }
-            return "Downloading models: \(completedFiles)/\(totalFiles) files"
+            return .downloadingFiles(completedFiles: completedFiles, totalFiles: totalFiles)
         case .compiling(let modelName):
             guard !modelName.isEmpty else {
-                return "Finalizing models..."
+                return .finalizingModels
             }
-            return "Compiling \(displayName(forModelComponent: modelName))"
+            return .compiling(modelComponentName: modelName)
         }
-    }
-
-    private static func displayName(forModelComponent modelName: String) -> String {
-        modelName.replacingOccurrences(of: ".mlmodelc", with: "")
     }
 }

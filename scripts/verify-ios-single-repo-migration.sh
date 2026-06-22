@@ -3473,9 +3473,13 @@ require_pattern \
   VoiceInk/Views/AI\ Models/WhisperModelCardView.swift
 
 require_pattern \
-  "macOS model cards use shared compact download status copy" \
+  "macOS Whisper model card uses shared compact download status copy" \
   'VoiceInkWhisperModelDownloadProgress\.compactDownloadingStatusText' \
-  VoiceInk/Views/AI\ Models/WhisperModelCardView.swift \
+  VoiceInk/Views/AI\ Models/WhisperModelCardView.swift
+
+require_pattern \
+  "macOS FluidAudio model card uses shared compact download status copy" \
+  'VoiceInkFluidAudioDownloadStatus\.compactDownloadingStatusText' \
   VoiceInk/Views/AI\ Models/FluidAudioModelCardView.swift
 
 require_pattern \
@@ -6336,6 +6340,21 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/FluidAudioTranscriptionPolicy.swift
 
 require_pattern \
+  "shared FluidAudio download status presentation lives in VoiceInkCore" \
+  'VoiceInkFluidAudioDownloadStatus|VoiceInkFluidAudioDownloadPhase|preparingDownload|downloadingFiles|percentText' \
+  VoiceInkCore/Sources/VoiceInkCore/FluidAudioTranscriptionPolicy.swift
+
+require_pattern \
+  "macOS FluidAudio model manager maps SDK progress into shared download phases" \
+  'VoiceInkFluidAudioDownloadStatus|downloadPhase\(for:|\.preparingDownload|\.downloadingFiles' \
+  VoiceInk/Transcription/FluidAudio/FluidAudioModelManager.swift
+
+require_pattern \
+  "macOS FluidAudio model card uses shared download status presentation" \
+  'status\.percentText|VoiceInkFluidAudioDownloadStatus\.compactDownloadingStatusText' \
+  VoiceInk/Views/AI\ Models/FluidAudioModelCardView.swift
+
+require_pattern \
   "macOS FluidAudio batch transcription uses shared local ASR policy" \
   'VoiceInkFluidAudioTranscriptionPolicy\.paddedSamplesForTranscription' \
   VoiceInk/Transcription/FluidAudio/FluidAudioTranscriptionService.swift
@@ -6347,12 +6366,12 @@ require_pattern \
 
 require_pattern \
   "core checks execute FluidAudio transcription policy tests" \
-  'FluidAudioTranscriptionPolicyTests\.testTrailingSilenceDefaultsPreserveFluidAudioChunkPolicy|FluidAudioTranscriptionPolicyTests\.testImmediatePassSchedulingRequiresEnabledConfigNoInFlightTaskAndEnoughNewAudio|FluidAudioTranscriptionPolicyTests\.testCachedFinalTextPlanRejectsBlankAndStaleHypotheses' \
+  'FluidAudioTranscriptionPolicyTests\.testDownloadStatusPresentationPreservesFluidAudioDownloadCopy|FluidAudioTranscriptionPolicyTests\.testTrailingSilenceDefaultsPreserveFluidAudioChunkPolicy|FluidAudioTranscriptionPolicyTests\.testImmediatePassSchedulingRequiresEnabledConfigNoInFlightTaskAndEnoughNewAudio|FluidAudioTranscriptionPolicyTests\.testCachedFinalTextPlanRejectsBlankAndStaleHypotheses' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "migration checklist tracks shared FluidAudio local ASR policy" \
-  'FluidAudio batch/streaming adapters consume shared local ASR pass scheduling, seek, cached-final, and trailing-silence padding policy' \
+  'FluidAudio batch/streaming adapters consume shared local ASR pass scheduling, seek, cached-final, trailing-silence padding policy, and download status presentation' \
   docs/ios-single-repo-migration.md
 
 reject_pattern \
@@ -6360,6 +6379,12 @@ reject_pattern \
   '240_000|sampleCount\(forMono16kDuration: 1\)|runsImmediatePassOnBufferedAudio &&|absoluteSampleCount - last(ImmediatePassScheduled|Transcribed)SampleCount|hypothesisStartTime > 0|maxSingleChunkSamples|trailingSilenceSamples' \
   VoiceInk/Transcription/FluidAudio/FluidAudioTranscriptionService.swift \
   VoiceInk/Transcription/Streaming/FluidAudioStreamingProvider.swift
+
+reject_pattern \
+  "macOS FluidAudio download UI avoids shell-owned status copy and percent formatting" \
+  '"(Preparing FluidAudio download|Listing files from repository|Checking cached models|Downloading models:|Finalizing models|Compiling )|replacingOccurrences\(of: "\.mlmodelc"|Int\(status\.fractionCompleted \* 100\)|VoiceInkWhisperModelDownloadProgress\.compactDownloadingStatusText' \
+  VoiceInk/Transcription/FluidAudio/FluidAudioModelManager.swift \
+  VoiceInk/Views/AI\ Models/FluidAudioModelCardView.swift
 
 require_pattern \
   "shared core owns transcription runtime resource planning" \

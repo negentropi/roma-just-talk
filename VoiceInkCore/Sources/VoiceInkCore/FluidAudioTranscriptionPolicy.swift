@@ -6,6 +6,55 @@ public struct VoiceInkFluidAudioCachedFinalTextPlan: Equatable, Sendable {
     public let isTooStale: Bool
 }
 
+public enum VoiceInkFluidAudioDownloadPhase: Equatable, Sendable {
+    case preparingDownload
+    case listingFiles
+    case checkingCachedModels
+    case downloadingFiles(completedFiles: Int, totalFiles: Int)
+    case finalizingModels
+    case compiling(modelComponentName: String)
+}
+
+public struct VoiceInkFluidAudioDownloadStatus: Equatable, Sendable {
+    public static let compactDownloadingStatusText = "Downloading..."
+
+    public let fractionCompleted: Double
+    public let phase: VoiceInkFluidAudioDownloadPhase
+    public let message: String
+    public let percentText: String
+
+    public init(
+        fractionCompleted: Double,
+        phase: VoiceInkFluidAudioDownloadPhase
+    ) {
+        self.fractionCompleted = min(max(fractionCompleted, 0), 1)
+        self.phase = phase
+        self.message = Self.message(for: phase)
+        self.percentText = "\(Int(self.fractionCompleted * 100))%"
+    }
+
+    private static func message(for phase: VoiceInkFluidAudioDownloadPhase) -> String {
+        switch phase {
+        case .preparingDownload:
+            return "Preparing FluidAudio download..."
+        case .listingFiles:
+            return "Listing files from repository..."
+        case .checkingCachedModels:
+            return "Checking cached models..."
+        case .downloadingFiles(let completedFiles, let totalFiles):
+            return "Downloading models: \(completedFiles)/\(totalFiles) files"
+        case .finalizingModels:
+            return "Finalizing models..."
+        case .compiling(let modelComponentName):
+            return "Compiling \(displayName(forModelComponent: modelComponentName))"
+        }
+    }
+
+    private static func displayName(forModelComponent modelComponentName: String) -> String {
+        modelComponentName.replacingOccurrences(of: ".mlmodelc", with: "")
+    }
+}
+
 public enum VoiceInkFluidAudioTranscriptionPolicy {
     public static let trailingSilenceSeconds: Double = 1
     public static let maxSingleChunkSamples = 240_000

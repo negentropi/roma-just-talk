@@ -137,7 +137,7 @@ struct FluidAudioModelCardView: View {
 
                         Spacer()
 
-                        Text("\(Int(status.fractionCompleted * 100))%")
+                        Text(status.percentText)
                             .fontDesign(.monospaced)
                     }
                     .font(.system(size: 11, weight: .medium))
@@ -179,7 +179,7 @@ struct FluidAudioModelCardView: View {
                     HStack(spacing: 4) {
                         Text(
                             isDownloading
-                                ? VoiceInkWhisperModelDownloadProgress.compactDownloadingStatusText
+                                ? VoiceInkFluidAudioDownloadStatus.compactDownloadingStatusText
                                 : VoiceInkModelManagementPresentation.downloadButtonTitle
                         )
                         Image(systemName: "arrow.down.circle")

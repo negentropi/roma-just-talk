@@ -18,6 +18,7 @@ struct VoiceInk_iosApp: App {
     
     init() {
         VoiceInkDefaultSettings.iOS.registerUserDefaults()
+        VoiceInkStartupPreferenceMigration.migrateLegacyPreferences(for: .iOS)
 
         // Clear any stale recording state on app launch
         AppGroupCoordinator.shared.updateRecordingState(false)

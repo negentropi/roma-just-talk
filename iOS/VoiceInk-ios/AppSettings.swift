@@ -78,7 +78,6 @@ final class AppSettings: ObservableObject {
         
         // Load audio session timeout (default: 90 seconds)
         self.audioSessionTimeoutSeconds = VoiceInkAudioSessionTimeoutPreference.timeoutSeconds()
-        VoiceInkStartupPreferenceMigration.migrateLegacyPreferences(for: .iOS)
         let cleanupSettings = VoiceInkTranscriptionCleanupSettings.current()
         self.punctuationCleanupMode = cleanupSettings.punctuationMode
         self.isTextFormattingEnabled = cleanupSettings.isTextFormattingEnabled

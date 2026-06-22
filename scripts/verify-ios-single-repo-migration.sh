@@ -9205,14 +9205,20 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
-  "iOS settings uses shared startup preference migration" \
+  "iOS app launch runs shared startup preference migration" \
   'VoiceInkStartupPreferenceMigration\.migrateLegacyPreferences\(for: \.iOS\)' \
-  iOS/VoiceInk-ios/AppSettings.swift
+  iOS/VoiceInk-ios/VoiceInk_iosApp.swift
 
 reject_pattern \
   "platform shells avoid shell-owned legacy preference migration lists" \
   'PunctuationCleanupMode\.migrateLegacyUserDefaultIfNeeded|VoiceInkPasteMethod\.migrateLegacyUserDefaultIfNeeded' \
   VoiceInk/AppDefaults.swift \
+  iOS/VoiceInk-ios/VoiceInk_iosApp.swift \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+reject_pattern \
+  "iOS settings stays out of startup migration orchestration" \
+  'VoiceInkStartupPreferenceMigration\.migrateLegacyPreferences' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \

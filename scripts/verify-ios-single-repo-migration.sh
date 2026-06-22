@@ -6014,6 +6014,38 @@ require_pattern \
   VoiceInk/Transcription/Streaming/SonioxStreamingProvider.swift \
   VoiceInk/Transcription/Streaming/SpeechmaticsStreamingProvider.swift
 
+require_pattern \
+  "shared streaming timeout mapping policy lives in VoiceInkCore" \
+  'mapsStreamingTransportTimeoutToFinalTimeout|case \.assemblyAI:[[:space:]]*return true' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift
+
+require_pattern \
+  "core checks execute streaming timeout mapping policy tests" \
+  'TranscriptionModelCatalogTests\.testStreamingTimeoutMappingIsSharedProviderPolicy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "macOS transcription model adapter exposes shared streaming timeout mapping policy" \
+  'coreTranscriptionModelProvider\?\.mapsStreamingTransportTimeoutToFinalTimeout' \
+  VoiceInk/Models/TranscriptionModel.swift
+
+require_pattern \
+  "macOS AssemblyAI streaming uses shared timeout mapping policy" \
+  'model\.mapsStreamingTransportTimeoutToFinalTimeout|treatsTimeoutAsStreamingTimeout: mapsTransportTimeoutToFinalTimeout' \
+  VoiceInk/Transcription/Streaming/AssemblyAIStreamingProvider.swift
+
+reject_pattern \
+  "macOS cloud streaming adapters avoid shell-owned timeout mapping policy" \
+  'treatsTimeoutAsStreamingTimeout: true' \
+  VoiceInk/Transcription/Streaming/AssemblyAIStreamingProvider.swift \
+  VoiceInk/Transcription/Streaming/CartesiaStreamingProvider.swift \
+  VoiceInk/Transcription/Streaming/DeepgramStreamingProvider.swift \
+  VoiceInk/Transcription/Streaming/ElevenLabsStreamingProvider.swift \
+  VoiceInk/Transcription/Streaming/MistralStreamingProvider.swift \
+  VoiceInk/Transcription/Streaming/SonioxStreamingProvider.swift \
+  VoiceInk/Transcription/Streaming/SpeechmaticsStreamingProvider.swift \
+  VoiceInk/Transcription/Streaming/XAIStreamingProvider.swift
+
 reject_pattern \
   "macOS cloud streaming adapters avoid shell-owned connection model policy" \
   '"scribe_v2_realtime"|"stt-rt-v4"|model\.name\.contains\("standard"\)|let +operatingPoint|model: model\.name' \

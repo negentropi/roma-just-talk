@@ -10,6 +10,7 @@ final class AssemblyAIStreamingProvider: StreamingTranscriptionProvider {
     private var eventsContinuation: AsyncStream<VoiceInkStreamingTranscriptionEvent>.Continuation?
     private var forwardingTask: Task<Void, Never>?
     private let modelContext: ModelContext
+    private var mapsTransportTimeoutToFinalTimeout = false
 
     private(set) var transcriptionEvents: AsyncStream<VoiceInkStreamingTranscriptionEvent>
 
@@ -27,6 +28,7 @@ final class AssemblyAIStreamingProvider: StreamingTranscriptionProvider {
 
     func connect(model: any TranscriptionModel, language: String?) async throws {
         let apiKey = try apiKey(for: model)
+        mapsTransportTimeoutToFinalTimeout = model.mapsStreamingTransportTimeoutToFinalTimeout
 
         forwardingTask?.cancel()
         forwardingTask = forwardLLMKitStreamingEvents(from: client, to: eventsContinuation)
@@ -47,7 +49,7 @@ final class AssemblyAIStreamingProvider: StreamingTranscriptionProvider {
         } catch {
             forwardingTask?.cancel()
             forwardingTask = nil
-            throw mapStreamingError(error, treatsTimeoutAsStreamingTimeout: true)
+            throw mapStreamingError(error, treatsTimeoutAsStreamingTimeout: mapsTransportTimeoutToFinalTimeout)
         }
     }
 
@@ -55,7 +57,7 @@ final class AssemblyAIStreamingProvider: StreamingTranscriptionProvider {
         do {
             try await client.sendAudioChunk(data)
         } catch {
-            throw mapStreamingError(error, treatsTimeoutAsStreamingTimeout: true)
+            throw mapStreamingError(error, treatsTimeoutAsStreamingTimeout: mapsTransportTimeoutToFinalTimeout)
         }
     }
 
@@ -63,7 +65,7 @@ final class AssemblyAIStreamingProvider: StreamingTranscriptionProvider {
         do {
             try await client.commit()
         } catch {
-            throw mapStreamingError(error, treatsTimeoutAsStreamingTimeout: true)
+            throw mapStreamingError(error, treatsTimeoutAsStreamingTimeout: mapsTransportTimeoutToFinalTimeout)
         }
     }
 

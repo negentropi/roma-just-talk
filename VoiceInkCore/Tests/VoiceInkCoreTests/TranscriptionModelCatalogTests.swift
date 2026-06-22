@@ -157,6 +157,14 @@ final class TranscriptionModelCatalogTests: XCTestCase {
         )
     }
 
+    func testStreamingTimeoutMappingIsSharedProviderPolicy() {
+        XCTAssertTrue(VoiceInkTranscriptionModelProvider.assemblyAI.mapsStreamingTransportTimeoutToFinalTimeout)
+        XCTAssertFalse(VoiceInkTranscriptionModelProvider.deepgram.mapsStreamingTransportTimeoutToFinalTimeout)
+        XCTAssertFalse(VoiceInkTranscriptionModelProvider.elevenLabs.mapsStreamingTransportTimeoutToFinalTimeout)
+        XCTAssertFalse(VoiceInkTranscriptionModelProvider.soniox.mapsStreamingTransportTimeoutToFinalTimeout)
+        XCTAssertFalse(VoiceInkTranscriptionModelProvider.speechmatics.mapsStreamingTransportTimeoutToFinalTimeout)
+    }
+
     func testXAILanguageCapabilityAndModelAreSharedProviderMetadata() {
         XCTAssertEqual(VoiceInkTranscriptionModelProvider.xai.languageCodes?.first, "ar")
         XCTAssertEqual(VoiceInkTranscriptionModelProvider.xai.languageCodes?.last, "vi")

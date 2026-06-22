@@ -173,6 +173,15 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
             return selectedModelName
         }
     }
+
+    public var mapsStreamingTransportTimeoutToFinalTimeout: Bool {
+        switch self {
+        case .assemblyAI:
+            return true
+        case .cartesia, .deepgram, .elevenLabs, .gemini, .groq, .mistral, .openAI, .soniox, .speechmatics, .xai, .local:
+            return false
+        }
+    }
 }
 
 public struct VoiceInkCloudTranscriptionModelSpec: Equatable, Sendable {

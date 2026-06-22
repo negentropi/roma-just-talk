@@ -180,6 +180,10 @@ extension TranscriptionModel {
         provider.coreTranscriptionModelProvider?.streamingConnectionModelName(for: name) ?? name
     }
 
+    var mapsStreamingTransportTimeoutToFinalTimeout: Bool {
+        provider.coreTranscriptionModelProvider?.mapsStreamingTransportTimeoutToFinalTimeout ?? false
+    }
+
     var transcriptionRuntimeResourcePlan: VoiceInkTranscriptionRuntimeResourcePlan {
         VoiceInkTranscriptionRuntimeResourcePlan(serviceRoute: provider.transcriptionServiceRoute)
     }

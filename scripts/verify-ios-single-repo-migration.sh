@@ -4207,6 +4207,26 @@ require_pattern \
   VoiceInk/Services/APIKeyManager.swift
 
 require_pattern \
+  "shared AI enhancement provider-key change request lives in VoiceInkCore" \
+  'VoiceInkAIEnhancementProviderKeyChangeRequest|notificationName = Notification\.Name\("aiProviderKeyChanged"\)' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+require_pattern \
+  "macOS app notifications use shared AI enhancement provider-key request name" \
+  'aiProviderKeyChanged = VoiceInkAIEnhancementProviderKeyChangeRequest\.notificationName' \
+  VoiceInk/Notifications/AppNotifications.swift
+
+reject_pattern \
+  "macOS app notification shell avoids duplicate AI enhancement provider-key request name" \
+  'Notification\.Name\("aiProviderKeyChanged"\)' \
+  VoiceInk/Notifications/AppNotifications.swift
+
+require_pattern \
+  "core checks execute AI enhancement provider-key request test" \
+  'AIProviderCatalogTests\.testAIEnhancementProviderKeyChangeRequestPreservesMacOSNotificationName' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "macOS cloud API-key card delegates verification persistence to API-key manager" \
   'APIKeyManager\.shared\.applyProviderVerificationPlan\(' \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift

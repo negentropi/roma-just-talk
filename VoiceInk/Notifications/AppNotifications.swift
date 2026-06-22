@@ -7,7 +7,7 @@ extension Notification.Name {
     static let toggleMiniRecorder = VoiceInkMiniRecorderRequest.toggleNotificationName
     static let dismissMiniRecorder = VoiceInkMiniRecorderRequest.dismissNotificationName
     static let didChangeModel = Notification.Name("didChangeModel")
-    static let aiProviderKeyChanged = Notification.Name("aiProviderKeyChanged")
+    static let aiProviderKeyChanged = VoiceInkAIEnhancementProviderKeyChangeRequest.notificationName
     static let licenseStatusChanged = VoiceInkLicenseStatusChangeRequest.notificationName
     static let openMainWindowRequested = Notification.Name("openMainWindowRequested")
     static let navigateToDestination = VoiceInkMacOSNavigationRequest.notificationName

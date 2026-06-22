@@ -1,5 +1,9 @@
 import Foundation
 
+public enum VoiceInkAIEnhancementProviderKeyChangeRequest {
+    public static let notificationName = Notification.Name("aiProviderKeyChanged")
+}
+
 public enum VoiceInkAIEnhancementAPIKeyVerificationRoute: Sendable, Equatable {
     case sharedProvider(VoiceInkProviderKind)
     case anthropicMessages

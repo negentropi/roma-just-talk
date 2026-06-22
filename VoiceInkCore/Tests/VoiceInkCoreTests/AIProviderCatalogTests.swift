@@ -2,6 +2,13 @@ import Foundation
 @testable import VoiceInkCore
 
 final class AIProviderCatalogTests: XCTestCase {
+    func testAIEnhancementProviderKeyChangeRequestPreservesMacOSNotificationName() {
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKeyChangeRequest.notificationName,
+            Notification.Name("aiProviderKeyChanged")
+        )
+    }
+
     func testMacOSAIEnhancementProviderIdentityIsShared() {
         XCTAssertEqual(
             VoiceInkAIEnhancementProviderKind.allCases.map(\.rawValue),

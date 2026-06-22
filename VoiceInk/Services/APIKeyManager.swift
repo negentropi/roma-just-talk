@@ -40,13 +40,13 @@ final class APIKeyManager {
 
     @discardableResult
     func applyAIEnhancementVerificationPlan(
-        _ plan: VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan,
-        forProvider provider: String
+        _ plan: VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan
     ) -> String? {
         guard let runtimeAPIKey = plan.runtimeAPIKey else { return nil }
 
-        if let keyToSave = plan.keyToSave {
-            saveAPIKey(keyToSave, forProvider: provider)
+        if let keyToSave = plan.keyToSave,
+           let providerKeyStorageNameToSave = plan.providerKeyStorageNameToSave {
+            saveAPIKey(keyToSave, forProvider: providerKeyStorageNameToSave)
         }
 
         return runtimeAPIKey

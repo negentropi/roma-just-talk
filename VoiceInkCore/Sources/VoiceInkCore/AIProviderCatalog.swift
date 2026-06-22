@@ -292,6 +292,7 @@ public struct VoiceInkAIEnhancementAPIKeyDraft: Equatable, Sendable {
                 isValid: true,
                 runtimeAPIKey: nil,
                 keyToSave: nil,
+                providerKeyStorageNameToSave: nil,
                 errorMessage: nil
             )
         }
@@ -301,6 +302,7 @@ public struct VoiceInkAIEnhancementAPIKeyDraft: Equatable, Sendable {
                 isValid: false,
                 runtimeAPIKey: nil,
                 keyToSave: nil,
+                providerKeyStorageNameToSave: nil,
                 errorMessage: result.errorMessage
             )
         }
@@ -309,6 +311,7 @@ public struct VoiceInkAIEnhancementAPIKeyDraft: Equatable, Sendable {
             isValid: true,
             runtimeAPIKey: resolvedRuntimeKey,
             keyToSave: keyToSaveAfterSuccessfulVerification,
+            providerKeyStorageNameToSave: provider.userAPIKeyStorageName,
             errorMessage: nil
         )
     }
@@ -331,17 +334,20 @@ public struct VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan: Equatable,
     public let isValid: Bool
     public let runtimeAPIKey: String?
     public let keyToSave: String?
+    public let providerKeyStorageNameToSave: String?
     public let errorMessage: String?
 
     public init(
         isValid: Bool,
         runtimeAPIKey: String?,
         keyToSave: String?,
+        providerKeyStorageNameToSave: String?,
         errorMessage: String?
     ) {
         self.isValid = isValid
         self.runtimeAPIKey = runtimeAPIKey
         self.keyToSave = keyToSave
+        self.providerKeyStorageNameToSave = providerKeyStorageNameToSave
         self.errorMessage = errorMessage
     }
 }
@@ -418,23 +424,27 @@ public struct VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan: Equatable, Se
 
 public struct VoiceInkAIEnhancementAPIKeyClearPlan: Equatable, Sendable {
     public let provider: VoiceInkAIEnhancementProviderKind
+    public let providerKeyStorageNameToDelete: String
     public let credentialStateAfterClear: VoiceInkAIEnhancementCredentialState
 
     public init(
         provider: VoiceInkAIEnhancementProviderKind,
+        providerKeyStorageNameToDelete: String,
         credentialStateAfterClear: VoiceInkAIEnhancementCredentialState
     ) {
         self.provider = provider
+        self.providerKeyStorageNameToDelete = providerKeyStorageNameToDelete
         self.credentialStateAfterClear = credentialStateAfterClear
     }
 
     public static func clearing(
         provider: VoiceInkAIEnhancementProviderKind
     ) -> VoiceInkAIEnhancementAPIKeyClearPlan? {
-        guard provider.requiresUserAPIKey else { return nil }
+        guard let providerKeyStorageNameToDelete = provider.userAPIKeyStorageName else { return nil }
 
         return VoiceInkAIEnhancementAPIKeyClearPlan(
             provider: provider,
+            providerKeyStorageNameToDelete: providerKeyStorageNameToDelete,
             credentialStateAfterClear: VoiceInkAIEnhancementCredentialState(
                 apiKey: "",
                 isAPIKeyValid: false

@@ -159,8 +159,7 @@ class AIService: ObservableObject {
                 )
 
                 if let runtimeAPIKey = APIKeyManager.shared.applyAIEnhancementVerificationPlan(
-                    plan,
-                    forProvider: self.selectedProvider.rawValue
+                    plan
                 ) {
                     self.apiKey = runtimeAPIKey
                     self.isAPIKeyValid = plan.isValid
@@ -273,7 +272,7 @@ class AIService: ObservableObject {
     private func applyTextEnhancementAPIKeyClearPlan(_ plan: VoiceInkAIEnhancementAPIKeyClearPlan) {
         apiKey = plan.credentialStateAfterClear.apiKey
         isAPIKeyValid = plan.credentialStateAfterClear.isAPIKeyValid
-        APIKeyManager.shared.deleteAPIKey(forProvider: plan.provider.rawValue)
+        APIKeyManager.shared.deleteAPIKey(forProvider: plan.providerKeyStorageNameToDelete)
         NotificationCenter.default.post(name: .aiProviderKeyChanged, object: nil)
     }
     

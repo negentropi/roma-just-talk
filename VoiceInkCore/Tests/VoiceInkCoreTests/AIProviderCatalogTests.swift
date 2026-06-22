@@ -399,6 +399,7 @@ final class AIProviderCatalogTests: XCTestCase {
                 isValid: true,
                 runtimeAPIKey: "resolved-key",
                 keyToSave: "$GROQ_API_KEY",
+                providerKeyStorageNameToSave: VoiceInkAIEnhancementProviderKind.groq.rawValue,
                 errorMessage: nil
             )
         )
@@ -419,6 +420,7 @@ final class AIProviderCatalogTests: XCTestCase {
                 isValid: false,
                 runtimeAPIKey: nil,
                 keyToSave: nil,
+                providerKeyStorageNameToSave: nil,
                 errorMessage: "invalid"
             )
         )
@@ -439,6 +441,7 @@ final class AIProviderCatalogTests: XCTestCase {
                 isValid: true,
                 runtimeAPIKey: nil,
                 keyToSave: nil,
+                providerKeyStorageNameToSave: nil,
                 errorMessage: nil
             )
         )
@@ -449,6 +452,7 @@ final class AIProviderCatalogTests: XCTestCase {
             VoiceInkAIEnhancementAPIKeyClearPlan.clearing(provider: .groq),
             VoiceInkAIEnhancementAPIKeyClearPlan(
                 provider: .groq,
+                providerKeyStorageNameToDelete: VoiceInkAIEnhancementProviderKind.groq.rawValue,
                 credentialStateAfterClear: VoiceInkAIEnhancementCredentialState(
                     apiKey: "",
                     isAPIKeyValid: false
@@ -460,6 +464,7 @@ final class AIProviderCatalogTests: XCTestCase {
             VoiceInkAIEnhancementAPIKeyClearPlan.clearing(provider: .custom),
             VoiceInkAIEnhancementAPIKeyClearPlan(
                 provider: .custom,
+                providerKeyStorageNameToDelete: VoiceInkAIEnhancementProviderKind.custom.rawValue,
                 credentialStateAfterClear: VoiceInkAIEnhancementCredentialState(
                     apiKey: "",
                     isAPIKeyValid: false

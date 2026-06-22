@@ -5885,7 +5885,7 @@ require_pattern \
 
 require_pattern \
   "shared macOS AI API-key verification application plan lives in VoiceInkCore" \
-  'VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan|verificationApplicationPlan\(' \
+  'VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan|verificationApplicationPlan\(|providerKeyStorageNameToSave' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \
@@ -5910,7 +5910,7 @@ require_pattern \
 
 require_pattern \
   "shared macOS AI API-key clear plan lives in VoiceInkCore" \
-  'VoiceInkAIEnhancementAPIKeyClearPlan|credentialStateAfterClear|clearing\(provider:' \
+  'VoiceInkAIEnhancementAPIKeyClearPlan|credentialStateAfterClear|providerKeyStorageNameToDelete|clearing\(provider:' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \
@@ -5935,7 +5935,7 @@ require_pattern \
 
 require_pattern \
   "macOS AI service applies API-key clear through shared plan" \
-  'VoiceInkAIEnhancementAPIKeyClearPlan\.clearing|applyTextEnhancementAPIKeyClearPlan|credentialStateAfterClear' \
+  'VoiceInkAIEnhancementAPIKeyClearPlan\.clearing|applyTextEnhancementAPIKeyClearPlan|credentialStateAfterClear|providerKeyStorageNameToDelete' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 require_pattern \
@@ -5954,13 +5954,33 @@ require_pattern \
   docs/ios-single-repo-migration.md
 
 require_pattern \
+  "migration checklist tracks shared macOS AI API-key clear storage-name plan" \
+  'clear-key storage-name planning.*VoiceInkAIEnhancementAPIKeyClearPlan' \
+  docs/ios-single-repo-migration.md
+
+require_pattern \
   "macOS AI service delegates verified-key persistence to API-key manager" \
   'APIKeyManager\.shared\.applyAIEnhancementVerificationPlan\(' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
+require_pattern \
+  "macOS API-key manager applies AI verified-key persistence storage name from shared plan" \
+  'plan\.providerKeyStorageNameToSave|saveAPIKey\(keyToSave, forProvider: providerKeyStorageNameToSave\)' \
+  VoiceInk/Services/APIKeyManager.swift
+
+require_pattern \
+  "migration checklist tracks shared macOS AI verified-key persistence storage-name plan" \
+  'verified-key persistence storage-name planning.*VoiceInkAIEnhancementAPIKeyDraft' \
+  docs/ios-single-repo-migration.md
+
 reject_pattern \
   "macOS AI service avoids shell-owned verified-key persistence sequencing" \
   'plan\.keyToSave|saveAPIKey\(keyToSave' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+reject_pattern \
+  "macOS AI service avoids shell-owned AI API-key storage-name mapping" \
+  'selectedProvider\.rawValue|plan\.provider\.rawValue' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 reject_pattern \
@@ -5970,7 +5990,7 @@ reject_pattern \
 
 reject_pattern \
   "macOS AI service avoids shell-owned API-key clear policy" \
-  'apiKey = ""|isAPIKeyValid = false|deleteAPIKey\(forProvider: selectedProvider\.rawValue\)' \
+  'apiKey = ""|isAPIKeyValid = false|deleteAPIKey\(forProvider: (selectedProvider|plan\.provider)\.rawValue\)' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 require_pattern \

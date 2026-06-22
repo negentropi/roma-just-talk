@@ -381,6 +381,29 @@ final class ProviderAccessRequirementTests: XCTestCase {
         )
     }
 
+    func testProviderAPIKeyFormStateOwnsIOSStoredKeyPresentation() {
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyFormState(isEditing: false)
+                .iOSStoredKeyPresentation(storedKey: "abc123"),
+            VoiceInkProviderAPIKeyStoredKeyPresentation(
+                feedback: VoiceInkProviderAPIKeyVerificationProgress.iOSVerifiedKeyFeedback,
+                obfuscatedKey: "••••••"
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyFormState(isEditing: false)
+                .iOSStoredKeyPresentation(storedKey: " \n\t "),
+            VoiceInkProviderAPIKeyStoredKeyPresentation(
+                feedback: VoiceInkProviderAPIKeyVerificationProgress.iOSVerifiedKeyFeedback,
+                obfuscatedKey: nil
+            )
+        )
+        XCTAssertNil(
+            VoiceInkProviderAPIKeyFormState(isEditing: true)
+                .iOSStoredKeyPresentation(storedKey: "abc123")
+        )
+    }
+
     func testProviderAPIKeyFormStateOwnsIOSControlPresentation() {
         XCTAssertEqual(
             VoiceInkProviderAPIKeyFormState(enteredKey: " entered-key ")

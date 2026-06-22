@@ -43,23 +43,27 @@ struct ProviderAPIKeyView: View {
                         }
                     }
                 } else {
-                    HStack {
-                        let feedback = VoiceInkProviderAPIKeyVerificationProgress.iOSVerifiedKeyFeedback
-                        Label(feedback.text, systemImage: feedback.effectiveSystemImageName)
-                            .foregroundStyle(feedback.tone.statusColor)
-                        Spacer()
-                        Button(presentation.changeButtonTitle) {
-                            let editPlan = apiKeyFormState.iOSStoredKeyEditPlan(
-                                settings.storedAPIKey(for: provider)
-                            )
-                            apiKeyFormState = editPlan.formState
-                            if let verificationFlag = editPlan.verificationFlagToPersist {
-                                settings.setKeyVerified(verificationFlag, for: provider)
+                    if let storedKeyPresentation = apiKeyFormState.iOSStoredKeyPresentation(
+                        storedKey: settings.storedAPIKey(for: provider)
+                    ) {
+                        HStack {
+                            let feedback = storedKeyPresentation.feedback
+                            Label(feedback.text, systemImage: feedback.effectiveSystemImageName)
+                                .foregroundStyle(feedback.tone.statusColor)
+                            Spacer()
+                            Button(presentation.changeButtonTitle) {
+                                let editPlan = apiKeyFormState.iOSStoredKeyEditPlan(
+                                    settings.storedAPIKey(for: provider)
+                                )
+                                apiKeyFormState = editPlan.formState
+                                if let verificationFlag = editPlan.verificationFlagToPersist {
+                                    settings.setKeyVerified(verificationFlag, for: provider)
+                                }
                             }
                         }
-                    }
-                    if let existing = VoiceInkSecretPresentation.obfuscatedAPIKey(settings.storedAPIKey(for: provider)) {
-                        Text(existing).font(.caption).foregroundStyle(.secondary)
+                        if let existing = storedKeyPresentation.obfuscatedKey {
+                            Text(existing).font(.caption).foregroundStyle(.secondary)
+                        }
                     }
                 }
 

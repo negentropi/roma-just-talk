@@ -138,6 +138,19 @@ public struct VoiceInkProviderAPIKeyFormControlPresentation: Equatable, Sendable
     }
 }
 
+public struct VoiceInkProviderAPIKeyStoredKeyPresentation: Equatable, Sendable {
+    public let feedback: VoiceInkProviderAPIKeyVerificationFeedback
+    public let obfuscatedKey: String?
+
+    public init(
+        feedback: VoiceInkProviderAPIKeyVerificationFeedback,
+        obfuscatedKey: String?
+    ) {
+        self.feedback = feedback
+        self.obfuscatedKey = obfuscatedKey
+    }
+}
+
 public struct VoiceInkProviderAPIKeyEditPlan: Equatable, Sendable {
     public let formState: VoiceInkProviderAPIKeyFormState
     public let verificationFlagToPersist: Bool?
@@ -287,6 +300,17 @@ public struct VoiceInkProviderAPIKeyFormState: Equatable, Sendable {
         }
 
         return verificationProgress.iOSResultFeedback
+    }
+
+    public func iOSStoredKeyPresentation(storedKey: String) -> VoiceInkProviderAPIKeyStoredKeyPresentation? {
+        guard !isEditing else {
+            return nil
+        }
+
+        return VoiceInkProviderAPIKeyStoredKeyPresentation(
+            feedback: VoiceInkProviderAPIKeyVerificationProgress.iOSVerifiedKeyFeedback,
+            obfuscatedKey: VoiceInkSecretPresentation.obfuscatedAPIKey(storedKey)
+        )
     }
 
     public func iOSControlPresentation(storedRuntimeKey: String?) -> VoiceInkProviderAPIKeyFormControlPresentation {

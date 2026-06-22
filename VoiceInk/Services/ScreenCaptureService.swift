@@ -2,31 +2,28 @@ import Foundation
 import AppKit
 import Vision
 import ScreenCaptureKit
+import VoiceInkCore
 
 @MainActor
 class ScreenCaptureService: ObservableObject {
     @Published var isCapturing = false
     @Published var lastCapturedText: String?
 
-    private func findActiveWindow(in content: SCShareableContent) -> SCWindow? {
+    private func findActiveWindow(in content: SCShareableContent) -> (window: SCWindow, facts: VoiceInkScreenCaptureWindowFacts)? {
         let currentPID = ProcessInfo.processInfo.processIdentifier
         let frontmostPID = NSWorkspace.shared.frontmostApplication?.processIdentifier
+        let windows = content.windows
+        let windowFacts = windows.map { $0.voiceInkScreenCaptureWindowFacts }
 
-        if let frontmostPID,
-           let window = content.windows.first(where: {
-               $0.owningApplication?.processID == frontmostPID &&
-               $0.owningApplication?.processID != currentPID &&
-               $0.windowLayer == 0 &&
-               $0.isOnScreen
-           }) {
-            return window
+        guard let index = VoiceInkAIEnhancementScreenContext.preferredWindowIndex(
+            in: windowFacts,
+            currentProcessID: currentPID,
+            frontmostProcessID: frontmostPID
+        ) else {
+            return nil
         }
 
-        return content.windows.first {
-            $0.owningApplication?.processID != currentPID &&
-            $0.windowLayer == 0 &&
-            $0.isOnScreen
-        }
+        return (windows[index], windowFacts[index])
     }
 
     func captureAndExtractText() async -> String? {
@@ -40,10 +37,8 @@ class ScreenCaptureService: ObservableObject {
         do {
             let content = try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: true)
 
-            guard let window = findActiveWindow(in: content) else { return nil }
-
-            let title = window.title ?? window.owningApplication?.applicationName ?? "Unknown"
-            let appName = window.owningApplication?.applicationName ?? "Unknown"
+            guard let capturedWindow = findActiveWindow(in: content) else { return nil }
+            let window = capturedWindow.window
 
             let filter = SCContentFilter(desktopIndependentWindow: window)
 
@@ -54,19 +49,11 @@ class ScreenCaptureService: ObservableObject {
             let cgImage = try await SCScreenshotManager.captureImage(contentFilter: filter, configuration: configuration)
             let nsImage = NSImage(cgImage: cgImage, size: NSSize(width: cgImage.width, height: cgImage.height))
 
-            var contextText = """
-            Active Window: \(title)
-            Application: \(appName)
-
-            """
-
             let extractedText = await extractText(from: nsImage)
-            if let extractedText, !extractedText.isEmpty {
-                contextText += "Window Content:\n\(extractedText)"
-            } else {
-                contextText += "Window Content:\nNo text detected via OCR"
-            }
-
+            let contextText = VoiceInkAIEnhancementScreenContext.contextText(
+                window: capturedWindow.facts,
+                extractedText: extractedText
+            )
             lastCapturedText = contextText
             return contextText
 
@@ -106,5 +93,17 @@ class ScreenCaptureService: ObservableObject {
         case .success(let text): return text
         case .failure: return nil
         }
+    }
+}
+
+private extension SCWindow {
+    var voiceInkScreenCaptureWindowFacts: VoiceInkScreenCaptureWindowFacts {
+        VoiceInkScreenCaptureWindowFacts(
+            processID: owningApplication?.processID,
+            layer: windowLayer,
+            isOnScreen: isOnScreen,
+            title: title,
+            applicationName: owningApplication?.applicationName
+        )
     }
 }

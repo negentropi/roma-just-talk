@@ -123,3 +123,78 @@ public enum VoiceInkAIEnhancementVocabularyContext {
         return "Important Vocabulary: \(normalizedTerms.joined(separator: ", "))"
     }
 }
+
+public struct VoiceInkScreenCaptureWindowFacts: Equatable, Sendable {
+    public let processID: Int?
+    public let layer: Int
+    public let isOnScreen: Bool
+    public let title: String?
+    public let applicationName: String?
+
+    public init(
+        processID: Int?,
+        layer: Int,
+        isOnScreen: Bool,
+        title: String?,
+        applicationName: String?
+    ) {
+        self.processID = processID
+        self.layer = layer
+        self.isOnScreen = isOnScreen
+        self.title = title
+        self.applicationName = applicationName
+    }
+}
+
+public enum VoiceInkAIEnhancementScreenContext {
+    public static let unknownWindowValue = "Unknown"
+    public static let noTextDetectedMessage = "No text detected via OCR"
+
+    public static func preferredWindowIndex(
+        in windows: [VoiceInkScreenCaptureWindowFacts],
+        currentProcessID: Int,
+        frontmostProcessID: Int?
+    ) -> Int? {
+        if let frontmostProcessID,
+           let frontmostIndex = windows.firstIndex(where: {
+               isCaptureCandidate($0, currentProcessID: currentProcessID)
+                   && $0.processID == frontmostProcessID
+           }) {
+            return frontmostIndex
+        }
+
+        return windows.firstIndex {
+            isCaptureCandidate($0, currentProcessID: currentProcessID)
+        }
+    }
+
+    public static func contextText(
+        window: VoiceInkScreenCaptureWindowFacts,
+        extractedText: String?
+    ) -> String {
+        let title = window.title ?? window.applicationName ?? unknownWindowValue
+        let appName = window.applicationName ?? unknownWindowValue
+        let content = if let extractedText, !extractedText.isEmpty {
+            extractedText
+        } else {
+            noTextDetectedMessage
+        }
+
+        return """
+        Active Window: \(title)
+        Application: \(appName)
+
+        Window Content:
+        \(content)
+        """
+    }
+
+    private static func isCaptureCandidate(
+        _ window: VoiceInkScreenCaptureWindowFacts,
+        currentProcessID: Int
+    ) -> Bool {
+        window.processID != currentProcessID
+            && window.layer == 0
+            && window.isOnScreen
+    }
+}

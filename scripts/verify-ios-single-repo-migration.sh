@@ -7570,6 +7570,26 @@ reject_pattern \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
 require_pattern \
+  "shared AI enhancement screen-context policy lives in VoiceInkCore" \
+  'VoiceInkAIEnhancementScreenContext|VoiceInkScreenCaptureWindowFacts|preferredWindowIndex|contextText' \
+  VoiceInkCore/Sources/VoiceInkCore/AIPrompts.swift
+
+require_pattern \
+  "core checks execute shared AI enhancement screen-context policy tests" \
+  'AIPromptsTests\.testScreenContextPrefersFrontmostVisibleNonSelfWindow|AIPromptsTests\.testScreenContextFallsBackToFirstVisibleNonSelfWindow|AIPromptsTests\.testScreenContextTextPreservesMacOSCaptureCopy|AIPromptsTests\.testScreenContextTextUsesExistingFallbacks' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "macOS screen capture service adapts shared screen-context policy" \
+  'VoiceInkAIEnhancementScreenContext\.(preferredWindowIndex|contextText)|voiceInkScreenCaptureWindowFacts' \
+  VoiceInk/Services/ScreenCaptureService.swift
+
+reject_pattern \
+  "macOS screen capture service avoids shell-owned screen-context copy and selection policy" \
+  '"(Active Window:|Application:|Window Content:|No text detected via OCR|Unknown)"|content\.windows\.first|owningApplication\?\.processID == frontmostPID|owningApplication\?\.processID != currentPID|windowLayer == 0' \
+  VoiceInk/Services/ScreenCaptureService.swift
+
+require_pattern \
   "shared transcription paste output owns trial-expired prefix" \
   'trialExpiredPrefix = "Your trial has expired\. Upgrade to VoiceInk Pro at \\\(VoiceInkLicenseLinks\.purchaseDisplayURLString\)"' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionPasteOutputPolicy.swift

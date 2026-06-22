@@ -93,6 +93,78 @@ final class AIPromptsTests: XCTestCase {
         )
     }
 
+    func testScreenContextPrefersFrontmostVisibleNonSelfWindow() {
+        let windows = [
+            screenWindow(processID: 7, title: "Background"),
+            screenWindow(processID: 42, title: "Self"),
+            screenWindow(processID: 9, title: "Frontmost")
+        ]
+
+        XCTAssertEqual(
+            VoiceInkAIEnhancementScreenContext.preferredWindowIndex(
+                in: windows,
+                currentProcessID: 42,
+                frontmostProcessID: 9
+            ),
+            2
+        )
+    }
+
+    func testScreenContextFallsBackToFirstVisibleNonSelfWindow() {
+        let windows = [
+            screenWindow(processID: 42, title: "Self"),
+            screenWindow(processID: 7, layer: 1, title: "Menu"),
+            screenWindow(processID: 8, isOnScreen: false, title: "Hidden"),
+            screenWindow(processID: 10, title: "Fallback")
+        ]
+
+        XCTAssertEqual(
+            VoiceInkAIEnhancementScreenContext.preferredWindowIndex(
+                in: windows,
+                currentProcessID: 42,
+                frontmostProcessID: 99
+            ),
+            3
+        )
+    }
+
+    func testScreenContextTextPreservesMacOSCaptureCopy() {
+        XCTAssertEqual(
+            VoiceInkAIEnhancementScreenContext.contextText(
+                window: screenWindow(
+                    processID: 9,
+                    title: "Spec.md",
+                    applicationName: "Zed"
+                ),
+                extractedText: "Roadmap\nArchitecture"
+            ),
+            """
+            Active Window: Spec.md
+            Application: Zed
+
+            Window Content:
+            Roadmap
+            Architecture
+            """
+        )
+    }
+
+    func testScreenContextTextUsesExistingFallbacks() {
+        XCTAssertEqual(
+            VoiceInkAIEnhancementScreenContext.contextText(
+                window: screenWindow(processID: nil, title: nil, applicationName: nil),
+                extractedText: ""
+            ),
+            """
+            Active Window: Unknown
+            Application: Unknown
+
+            Window Content:
+            No text detected via OCR
+            """
+        )
+    }
+
     func testEnhancementRequestPayloadReturnsNilForEmptyTranscript() {
         XCTAssertNil(VoiceInkAIEnhancementRequestPayload(transcript: ""))
     }
@@ -149,4 +221,20 @@ final class AIPromptsTests: XCTestCase {
             .execute(try XCTUnwrap(VoiceInkAIEnhancementRequestPayload(transcript: "raw text")))
         )
     }
+}
+
+private func screenWindow(
+    processID: Int?,
+    layer: Int = 0,
+    isOnScreen: Bool = true,
+    title: String? = nil,
+    applicationName: String? = "App"
+) -> VoiceInkScreenCaptureWindowFacts {
+    VoiceInkScreenCaptureWindowFacts(
+        processID: processID,
+        layer: layer,
+        isOnScreen: isOnScreen,
+        title: title,
+        applicationName: applicationName
+    )
 }

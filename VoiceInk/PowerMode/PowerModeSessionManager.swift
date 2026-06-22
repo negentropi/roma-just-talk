@@ -22,7 +22,7 @@ class PowerModeSessionManager {
 
     func beginSession(with config: PowerModeConfig) async {
         guard let stateProvider = stateProvider, let enhancementService = enhancementService else {
-            print("SessionManager not configured.")
+            print(VoiceInkPowerModeSessionDiagnostics.notConfiguredMessage)
             return
         }
 
@@ -226,7 +226,12 @@ class PowerModeSessionManager {
                 do {
                     try await stateProvider.loadModel(localModel)
                 } catch {
-                    print("Power Mode: Failed to load local model '\(localModel.name)': \(error)")
+                    print(
+                        VoiceInkPowerModeSessionDiagnostics.localModelLoadFailedMessage(
+                            modelName: localModel.name,
+                            errorDescription: String(describing: error)
+                        )
+                    )
                 }
             }
         }
@@ -234,7 +239,7 @@ class PowerModeSessionManager {
 
     private func recoverSession() {
         guard let session = loadSession() else { return }
-        print("Recovering abandoned Power Mode session.")
+        print(VoiceInkPowerModeSessionDiagnostics.recoveringAbandonedSessionMessage)
         Task {
             await endSession()
         }
@@ -244,7 +249,11 @@ class PowerModeSessionManager {
         do {
             try VoiceInkPowerModeSessionPreference.saveActiveSession(session)
         } catch {
-            print("Error saving Power Mode session: \(error)")
+            print(
+                VoiceInkPowerModeSessionDiagnostics.saveFailedMessage(
+                    errorDescription: String(describing: error)
+                )
+            )
         }
     }
 
@@ -252,7 +261,11 @@ class PowerModeSessionManager {
         do {
             return try VoiceInkPowerModeSessionPreference.loadActiveSession()
         } catch {
-            print("Error loading Power Mode session: \(error)")
+            print(
+                VoiceInkPowerModeSessionDiagnostics.loadFailedMessage(
+                    errorDescription: String(describing: error)
+                )
+            )
             return nil
         }
     }

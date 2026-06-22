@@ -10467,6 +10467,16 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
+  "shared Power Mode session diagnostics live in VoiceInkCore" \
+  'VoiceInkPowerModeSessionDiagnostics|notConfiguredMessage|localModelLoadFailedMessage|recoveringAbandonedSessionMessage|saveFailedMessage|loadFailedMessage' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "core checks execute Power Mode session diagnostics tests" \
+  'PowerModePolicyTests\.testPowerModeSessionDiagnosticsPreserveMacOSConsoleCopy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "shared Power Mode active-session persistence lives in VoiceInkCore" \
   'VoiceInkPowerModeSessionPreference|activePowerModeSession' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
@@ -10546,10 +10556,25 @@ require_pattern \
   'VoiceInkPowerModeSessionPreference\.(saveActiveSession|loadActiveSession|clear)' \
   VoiceInk/PowerMode/PowerModeSessionManager.swift
 
+require_pattern \
+  "macOS Power Mode session manager consumes shared session diagnostics" \
+  'VoiceInkPowerModeSessionDiagnostics\.(notConfiguredMessage|localModelLoadFailedMessage|recoveringAbandonedSessionMessage|saveFailedMessage|loadFailedMessage)' \
+  VoiceInk/PowerMode/PowerModeSessionManager.swift
+
+reject_pattern \
+  "macOS Power Mode session manager avoids shell-owned session diagnostic copy" \
+  '"(SessionManager not configured\.|Power Mode: Failed to load local model|Recovering abandoned Power Mode session\.|Error saving Power Mode session:|Error loading Power Mode session:)' \
+  VoiceInk/PowerMode/PowerModeSessionManager.swift
+
 reject_pattern \
   "macOS Power Mode session manager avoids shallow session clear wrapper" \
   'private +func +clearSession\(' \
   VoiceInk/PowerMode/PowerModeSessionManager.swift
+
+require_pattern \
+  "migration checklist tracks shared Power Mode session diagnostics" \
+  'VoiceInkPowerModeSessionDiagnostics|session diagnostic copy' \
+  docs/ios-single-repo-migration.md
 
 require_pattern \
   "macOS Power Mode form consumes shared auto-send key state" \

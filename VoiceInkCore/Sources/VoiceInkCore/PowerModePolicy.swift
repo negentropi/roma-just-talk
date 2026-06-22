@@ -1098,6 +1098,23 @@ public struct VoiceInkPowerModeSessionSnapshotPlan: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkPowerModeSessionDiagnostics {
+    public static let notConfiguredMessage = "SessionManager not configured."
+    public static let recoveringAbandonedSessionMessage = "Recovering abandoned Power Mode session."
+
+    public static func localModelLoadFailedMessage(modelName: String, errorDescription: String) -> String {
+        "Power Mode: Failed to load local model '\(modelName)': \(errorDescription)"
+    }
+
+    public static func saveFailedMessage(errorDescription: String) -> String {
+        "Error saving Power Mode session: \(errorDescription)"
+    }
+
+    public static func loadFailedMessage(errorDescription: String) -> String {
+        "Error loading Power Mode session: \(errorDescription)"
+    }
+}
+
 public extension Array where Element == PowerModeConfig {
     var powerModePolicyRules: [VoiceInkPowerModeRule] {
         map(\.powerModePolicyRule)

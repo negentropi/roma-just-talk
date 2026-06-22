@@ -1649,6 +1649,32 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertEqual(sessionToSave?.originalState, currentState)
     }
 
+    func testPowerModeSessionDiagnosticsPreserveMacOSConsoleCopy() {
+        XCTAssertEqual(
+            VoiceInkPowerModeSessionDiagnostics.notConfiguredMessage,
+            "SessionManager not configured."
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeSessionDiagnostics.localModelLoadFailedMessage(
+                modelName: "ggml-base",
+                errorDescription: "load failed"
+            ),
+            "Power Mode: Failed to load local model 'ggml-base': load failed"
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeSessionDiagnostics.recoveringAbandonedSessionMessage,
+            "Recovering abandoned Power Mode session."
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeSessionDiagnostics.saveFailedMessage(errorDescription: "disk full"),
+            "Error saving Power Mode session: disk full"
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeSessionDiagnostics.loadFailedMessage(errorDescription: "bad data"),
+            "Error loading Power Mode session: bad data"
+        )
+    }
+
     func testAutoSendKeyPreservesStoredValuesPickerOrderAndLabels() {
         XCTAssertEqual(
             VoiceInkAutoSendKey.allCases,

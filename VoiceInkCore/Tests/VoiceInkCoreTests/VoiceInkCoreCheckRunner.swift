@@ -768,6 +768,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeSessionBeginPlanKeepsExistingSession", run: { PowerModePolicyTests().testPowerModeSessionBeginPlanKeepsExistingSession() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeSessionSnapshotPlanSkipsApplyingOrMissingSession", run: { PowerModePolicyTests().testPowerModeSessionSnapshotPlanSkipsApplyingOrMissingSession() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeSessionSnapshotPlanUpdatesOriginalStateWhenIdle", run: { PowerModePolicyTests().testPowerModeSessionSnapshotPlanUpdatesOriginalStateWhenIdle() }),
+            VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeSessionDiagnosticsPreserveMacOSConsoleCopy", run: { PowerModePolicyTests().testPowerModeSessionDiagnosticsPreserveMacOSConsoleCopy() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testConfigurationModePreservesFormTitlesAndSaveModes", run: { PowerModePolicyTests().testConfigurationModePreservesFormTitlesAndSaveModes() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testConfigurationModePreservesEditIdentityByConfigId", run: { PowerModePolicyTests().testConfigurationModePreservesEditIdentityByConfigId() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testAutoSendKeyPreservesStoredValuesPickerOrderAndLabels", run: { PowerModePolicyTests().testAutoSendKeyPreservesStoredValuesPickerOrderAndLabels() }),

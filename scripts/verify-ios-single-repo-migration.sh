@@ -6340,9 +6340,24 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/FluidAudioTranscriptionPolicy.swift
 
 require_pattern \
+  "shared FluidAudio model runtime version policy lives in VoiceInkCore" \
+  'VoiceInkFluidAudioModelVersion|modelVersion|fluidAudioModelVersion\(forModelName:|fluidAudioLanguageHintCode' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift
+
+require_pattern \
+  "core checks execute FluidAudio model runtime version policy test" \
+  'TranscriptionModelCatalogTests\.testFluidAudioRuntimeVersionAndLanguageHintPolicyIsShared' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "shared FluidAudio download status presentation lives in VoiceInkCore" \
   'VoiceInkFluidAudioDownloadStatus|VoiceInkFluidAudioDownloadPhase|preparingDownload|downloadingFiles|percentText' \
   VoiceInkCore/Sources/VoiceInkCore/FluidAudioTranscriptionPolicy.swift
+
+require_pattern \
+  "macOS FluidAudio model manager adapts shared runtime version policy" \
+  'VoiceInkTranscriptionModelCatalog\.fluidAudioModelVersion|fluidAudioLanguageHintCode|init\(_ version: VoiceInkFluidAudioModelVersion\)' \
+  VoiceInk/Transcription/FluidAudio/FluidAudioModelManager.swift
 
 require_pattern \
   "macOS FluidAudio model manager maps SDK progress into shared download phases" \
@@ -6385,6 +6400,13 @@ reject_pattern \
   '"(Preparing FluidAudio download|Listing files from repository|Checking cached models|Downloading models:|Finalizing models|Compiling )|replacingOccurrences\(of: "\.mlmodelc"|Int\(status\.fractionCompleted \* 100\)|VoiceInkWhisperModelDownloadProgress\.compactDownloadingStatusText' \
   VoiceInk/Transcription/FluidAudio/FluidAudioModelManager.swift \
   VoiceInk/Views/AI\ Models/FluidAudioModelCardView.swift
+
+reject_pattern \
+  "macOS FluidAudio adapters avoid shell-owned model version and language-hint policy" \
+  'modelVersionMap|"parakeet-tdt-0\.6b-v[23]"|languageCode != "auto"|asrVersion\(for: modelName\) == \.v3' \
+  VoiceInk/Transcription/FluidAudio/FluidAudioModelManager.swift \
+  VoiceInk/Transcription/FluidAudio/FluidAudioTranscriptionService.swift \
+  VoiceInk/Transcription/Streaming/FluidAudioStreamingProvider.swift
 
 require_pattern \
   "shared core owns transcription runtime resource planning" \

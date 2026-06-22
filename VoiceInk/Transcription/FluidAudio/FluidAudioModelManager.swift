@@ -14,23 +14,16 @@ class FluidAudioModelManager: ObservableObject {
 
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "FluidAudioModelManager")
 
-    // Add new Fluid Audio models here when support is added.
-    private static let modelVersionMap: [String: AsrModelVersion] = [
-        "parakeet-tdt-0.6b-v2": .v2,
-        "parakeet-tdt-0.6b-v3": .v3,
-    ]
-
     nonisolated static func asrVersion(for modelName: String) -> AsrModelVersion {
-        modelVersionMap[modelName] ?? .v3
+        AsrModelVersion(
+            VoiceInkTranscriptionModelCatalog.fluidAudioModelVersion(forModelName: modelName)
+        )
     }
 
     nonisolated static func languageHint(from languageCode: String?, for modelName: String) -> Language? {
-        guard asrVersion(for: modelName) == .v3,
-              let languageCode,
-              languageCode != "auto"
-        else { return nil }
-
-        return Language(rawValue: languageCode)
+        VoiceInkTranscriptionModelCatalog
+            .fluidAudioLanguageHintCode(from: languageCode, forModelName: modelName)
+            .flatMap(Language.init(rawValue:))
     }
 
     init() {}
@@ -156,6 +149,17 @@ class FluidAudioModelManager: ObservableObject {
                 return .finalizingModels
             }
             return .compiling(modelComponentName: modelName)
+        }
+    }
+}
+
+private extension AsrModelVersion {
+    init(_ version: VoiceInkFluidAudioModelVersion) {
+        switch version {
+        case .v2:
+            self = .v2
+        case .v3:
+            self = .v3
         }
     }
 }

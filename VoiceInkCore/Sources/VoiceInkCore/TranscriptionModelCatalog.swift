@@ -217,6 +217,11 @@ public struct VoiceInkNativeAppleTranscriptionModelSpec: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkFluidAudioModelVersion: String, Codable, Equatable, Sendable {
+    case v2
+    case v3
+}
+
 public struct VoiceInkFluidAudioTranscriptionModelSpec: Equatable, Sendable {
     public let name: String
     public let displayName: String
@@ -225,6 +230,7 @@ public struct VoiceInkFluidAudioTranscriptionModelSpec: Equatable, Sendable {
     public let speed: Double
     public let accuracy: Double
     public let ramUsage: Double
+    public let modelVersion: VoiceInkFluidAudioModelVersion
     public let isMultilingual: Bool
     public let supportsStreaming: Bool
 
@@ -240,6 +246,7 @@ public struct VoiceInkFluidAudioTranscriptionModelSpec: Equatable, Sendable {
         speed: Double,
         accuracy: Double,
         ramUsage: Double,
+        modelVersion: VoiceInkFluidAudioModelVersion = .v3,
         isMultilingual: Bool,
         supportsStreaming: Bool
     ) {
@@ -250,6 +257,7 @@ public struct VoiceInkFluidAudioTranscriptionModelSpec: Equatable, Sendable {
         self.speed = speed
         self.accuracy = accuracy
         self.ramUsage = ramUsage
+        self.modelVersion = modelVersion
         self.isMultilingual = isMultilingual
         self.supportsStreaming = supportsStreaming
     }
@@ -278,6 +286,7 @@ public enum VoiceInkTranscriptionModelCatalog {
             speed: 0.99,
             accuracy: 0.94,
             ramUsage: 0.8,
+            modelVersion: .v2,
             isMultilingual: false,
             supportsStreaming: true
         ),
@@ -289,10 +298,27 @@ public enum VoiceInkTranscriptionModelCatalog {
             speed: 0.99,
             accuracy: 0.94,
             ramUsage: 0.8,
+            modelVersion: .v3,
             isMultilingual: true,
             supportsStreaming: true
         )
     ]
+
+    public static func fluidAudioModelVersion(forModelName modelName: String) -> VoiceInkFluidAudioModelVersion {
+        fluidAudioModels.first { $0.name == modelName }?.modelVersion ?? .v3
+    }
+
+    public static func fluidAudioLanguageHintCode(
+        from selectedLanguage: String?,
+        forModelName modelName: String
+    ) -> String? {
+        guard fluidAudioModelVersion(forModelName: modelName) == .v3,
+              let selectedLanguage,
+              selectedLanguage != VoiceInkLanguageCatalog.autoDetectCode
+        else { return nil }
+
+        return selectedLanguage
+    }
 
     public static func modelNames(for provider: VoiceInkTranscriptionModelProvider) -> [String] {
         switch provider {

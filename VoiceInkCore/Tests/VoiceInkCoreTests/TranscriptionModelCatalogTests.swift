@@ -19,10 +19,46 @@ final class TranscriptionModelCatalogTests: XCTestCase {
         XCTAssertEqual(models.map(\.name), ["parakeet-tdt-0.6b-v2", "parakeet-tdt-0.6b-v3"])
         XCTAssertEqual(models.map(\.displayName), ["Parakeet V2", "Parakeet V3"])
         XCTAssertEqual(models.map(\.size), ["474 MB", "494 MB"])
+        XCTAssertEqual(models.map(\.modelVersion), [.v2, .v3])
         XCTAssertEqual(models.map(\.supportsStreaming), [true, true])
         XCTAssertEqual(models.map(\.isMultilingual), [false, true])
         XCTAssertEqual(models.first?.supportedLanguages, ["en": "English"])
         XCTAssertEqual(models.last?.supportedLanguages["fr"], "French")
+    }
+
+    func testFluidAudioRuntimeVersionAndLanguageHintPolicyIsShared() {
+        XCTAssertEqual(
+            VoiceInkTranscriptionModelCatalog.fluidAudioModelVersion(forModelName: "parakeet-tdt-0.6b-v2"),
+            .v2
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptionModelCatalog.fluidAudioModelVersion(forModelName: "parakeet-tdt-0.6b-v3"),
+            .v3
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptionModelCatalog.fluidAudioModelVersion(forModelName: "future-parakeet"),
+            .v3
+        )
+
+        XCTAssertNil(
+            VoiceInkTranscriptionModelCatalog.fluidAudioLanguageHintCode(
+                from: "fr",
+                forModelName: "parakeet-tdt-0.6b-v2"
+            )
+        )
+        XCTAssertNil(
+            VoiceInkTranscriptionModelCatalog.fluidAudioLanguageHintCode(
+                from: VoiceInkLanguageCatalog.autoDetectCode,
+                forModelName: "parakeet-tdt-0.6b-v3"
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptionModelCatalog.fluidAudioLanguageHintCode(
+                from: "fr",
+                forModelName: "parakeet-tdt-0.6b-v3"
+            ),
+            "fr"
+        )
     }
 
     func testDeepgramLanguageCapabilityIsSharedProviderMetadata() {

@@ -368,6 +368,20 @@ in_repo_only_ios_app_files=(
   VoiceInkIOSStorageDirectories.swift
 )
 
+xcode_metadata_files=(
+  VoiceInk.xcodeproj/project.pbxproj
+  VoiceInk.xcodeproj/project.xcworkspace/contents.xcworkspacedata
+  VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
+  VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+  VoiceInk.xcodeproj/xcshareddata/xcschemes/VoiceInk.xcscheme
+  VoiceInk.xcworkspace/contents.xcworkspacedata
+  VoiceInk.xcworkspace/xcshareddata/swiftpm/Package.resolved
+  VoiceInk.xcworkspace/xcshareddata/xcschemes/VoiceInk-ios.xcscheme
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
+  iOS/VoiceInk-ios.xcodeproj/project.xcworkspace/contents.xcworkspacedata
+  iOS/VoiceInk-ios.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+)
+
 section "single-repo layout"
 git_root="$(git rev-parse --show-toplevel)"
 [[ "$git_root" == "$ROOT" ]] || fail "VoiceInk/ must be the git root; got $git_root"
@@ -378,6 +392,11 @@ git_root="$(git rev-parse --show-toplevel)"
 [[ ! -f ../Package.swift ]] || fail "parent-level ../Package.swift exists; shared core must live inside VoiceInk/"
 [[ ! -d ../Sources/VoiceInkCore ]] || fail "parent-level ../Sources/VoiceInkCore exists; shared core must live inside VoiceInk/"
 [[ ! -d ../Tests/VoiceInkCoreTests ]] || fail "parent-level ../Tests/VoiceInkCoreTests exists; shared core tests must live inside VoiceInk/"
+
+reject_fixed_string \
+  "Xcode metadata avoids sibling VoiceInk-iOS clone references" \
+  "VoiceInk-iOS" \
+  "${xcode_metadata_files[@]}"
 
 require_pattern \
   "macOS app uses shared local Whisper framework path" \

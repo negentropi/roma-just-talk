@@ -386,7 +386,7 @@ When real Xcode, app dependencies, and the iOS platform are installed, run the s
 scripts/verify-ios-single-repo-migration.sh --full-build
 ```
 
-1. `VoiceInk.xcworkspace` includes `iOS/VoiceInk-ios.xcodeproj`, and the shared iOS scheme includes the unit-test and UI-test bundles.
+1. `VoiceInk.xcworkspace` includes `iOS/VoiceInk-ios.xcodeproj`, the shared iOS scheme includes the unit-test and UI-test bundles, and Xcode metadata does not reference the sibling `VoiceInk-iOS` clone.
 2. macOS and iOS projects both resolve `VoiceInkCore` from inside `VoiceInk/`, and the iOS app target links the `VoiceInkCore` product.
    - Local Whisper framework dependency: both app projects reference `$(HOME)/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework`, and clone-side `../Downloads`, `../whisper.cpp`, and `../build-apple` framework references stay absent.
 3. `VoiceInk/` is the git root for this work, and the abandoned parent-level Swift package shape (`../VoiceInkCore`, `../Package.swift`, `../Sources/VoiceInkCore`, `../Tests/VoiceInkCoreTests`) remains absent.

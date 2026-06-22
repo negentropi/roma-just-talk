@@ -10201,12 +10201,17 @@ require_plist_value \
 
 require_pattern \
   "shared app identity presentation lives in VoiceInkCore" \
-  'VoiceInkAppIdentity|VoiceInkMacOSStorageAlertPresentation|VoiceInkMacOSNavigationDestination|VoiceInkMacOSNavigationRequest|VoiceInkMacOSFileTranscriptionRequest|bundleIdentifier = "com\.prakashjoshipax\.VoiceInk"|loggingSubsystem = "com\.prakashjoshipax\.voiceink"|displayName = "roma just talk"|compactDisplayName = "roma-just-talk"|iOSRecordDeepLinkScheme = "voiceink"|iOSRecordDeepLinkHost = "record"|iCloudContainerIdentifier|iOSAppGroupIdentifier|iOSRecordDeepLinkURL|iOSStopRecordingDarwinNotificationName|iOSRecordingStateChangedDarwinNotificationName|iOSStopRecordingFromKeyboardNotificationName|macOSApplicationSupportDirectory|storageFallbackWarningPresentation|storageFailurePresentation|errorDomain' \
+  'VoiceInkAppIdentity|VoiceInkMacOSStorageAlertPresentation|VoiceInkMacOSNavigationDestination|VoiceInkMacOSMainViewItem|VoiceInkMacOSNavigationRequest|VoiceInkMacOSFileTranscriptionRequest|bundleIdentifier = "com\.prakashjoshipax\.VoiceInk"|loggingSubsystem = "com\.prakashjoshipax\.voiceink"|displayName = "roma just talk"|compactDisplayName = "roma-just-talk"|iOSRecordDeepLinkScheme = "voiceink"|iOSRecordDeepLinkHost = "record"|iCloudContainerIdentifier|iOSAppGroupIdentifier|iOSRecordDeepLinkURL|iOSStopRecordingDarwinNotificationName|iOSRecordingStateChangedDarwinNotificationName|iOSStopRecordingFromKeyboardNotificationName|macOSApplicationSupportDirectory|storageFallbackWarningPresentation|storageFailurePresentation|errorDomain' \
   VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift
 
 require_pattern \
   "shared macOS navigation request contract lives in VoiceInkCore" \
   'VoiceInkMacOSNavigationDestination|settings = "Settings"|aiModels = "AI Models"|license = "VoiceInk Pro"|history = "History"|permissions = "Permissions"|enhancement = "Enhancement"|transcribeAudio = "Transcribe Audio"|powerMode = "Power Mode"|notificationName = Notification\.Name\("navigateToDestination"\)|destinationUserInfoKey = "destination"|defaultDestination|destination\(from notification: Notification\)|VoiceInkMacOSFileTranscriptionRequest|notificationName = Notification\.Name\("openFileForTranscription"\)|urlUserInfoKey = "url"|url\(from notification: Notification\)' \
+  VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift
+
+require_pattern \
+  "shared macOS main view item presentation lives in VoiceInkCore" \
+  'VoiceInkMacOSMainViewItem|case metrics|case transcribeAudio|case audioInput|case dictionary|title|systemImageName|defaultSelection|emptySelectionTitle|visibleItems\(powerModeEnabled: Bool\)|item\(forNavigationDestination destination: String\)' \
   VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift
 
 require_pattern \
@@ -10540,7 +10545,12 @@ require_pattern \
 
 require_pattern \
   "macOS UI uses shared app identity presentation" \
-  'VoiceInkAppIdentity\.(compactDisplayName|sidebarSubtitle|onboardingWindowTitle|storageFailureMessage)' \
+  'VoiceInkAppIdentity\.(compactDisplayName|sidebarSubtitle|onboardingWindowTitle|storageFailureMessage)|VoiceInkMacOSMainViewItem\.(defaultSelection|visibleItems|emptySelectionTitle|item)' \
+  VoiceInk/Views/ContentView.swift
+
+reject_pattern \
+  "macOS content view avoids shell-owned main navigation presentation" \
+  'enum +ViewType|case +(metrics|transcribeAudio|history|models|enhancement|powerMode|permissions|audioInput|dictionary|settings|license) *=|"(home|manual stt|past|models|style|Power Mode|Permissions|Audio Input|Dictionary|Settings|VoiceInk Pro|Select a view)"|systemName: "(gauge\.medium|waveform\.circle\.fill|doc\.text\.fill|brain\.head\.profile|wand\.and\.stars|sparkles\.square\.fill\.on\.square|shield\.fill|mic\.fill|character\.book\.closed\.fill|gearshape\.fill|checkmark\.seal\.fill)"' \
   VoiceInk/Views/ContentView.swift
 
 require_pattern \
@@ -10560,7 +10570,7 @@ require_pattern \
 
 require_pattern \
   "core checks execute macOS navigation request contract tests" \
-  'AppIdentityTests\.testMacOSNavigationRequestPreservesDestinationContract|AppIdentityTests\.testMacOSFileTranscriptionRequestPreservesPayloadContract' \
+  'AppIdentityTests\.testMacOSNavigationRequestPreservesDestinationContract|AppIdentityTests\.testMacOSMainViewItemsPreserveSidebarPresentation|AppIdentityTests\.testMacOSMainViewItemsMapNavigationDestinationsAndLegacyTitles|AppIdentityTests\.testMacOSFileTranscriptionRequestPreservesPayloadContract' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \

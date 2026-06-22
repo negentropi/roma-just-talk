@@ -82,6 +82,73 @@ final class AppIdentityTests: XCTestCase {
         )
     }
 
+    func testMacOSMainViewItemsPreserveSidebarPresentation() {
+        XCTAssertEqual(VoiceInkMacOSMainViewItem.defaultSelection, .metrics)
+        XCTAssertEqual(VoiceInkMacOSMainViewItem.emptySelectionTitle, "Select a view")
+        XCTAssertEqual(
+            VoiceInkMacOSMainViewItem.allCases.map(\.title),
+            [
+                "home",
+                "manual stt",
+                "past",
+                "models",
+                "style",
+                "Power Mode",
+                "Permissions",
+                "Audio Input",
+                "Dictionary",
+                "Settings",
+                "VoiceInk Pro"
+            ]
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSMainViewItem.allCases.map(\.systemImageName),
+            [
+                "gauge.medium",
+                "waveform.circle.fill",
+                "doc.text.fill",
+                "brain.head.profile",
+                "wand.and.stars",
+                "sparkles.square.fill.on.square",
+                "shield.fill",
+                "mic.fill",
+                "character.book.closed.fill",
+                "gearshape.fill",
+                "checkmark.seal.fill"
+            ]
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSMainViewItem.visibleItems(powerModeEnabled: false),
+            [.metrics, .transcribeAudio, .history, .models, .enhancement, .permissions, .audioInput, .dictionary, .settings, .license]
+        )
+        XCTAssertEqual(VoiceInkMacOSMainViewItem.visibleItems(powerModeEnabled: true), VoiceInkMacOSMainViewItem.allCases)
+    }
+
+    func testMacOSMainViewItemsMapNavigationDestinationsAndLegacyTitles() {
+        XCTAssertEqual(
+            VoiceInkMacOSMainViewItem.item(forNavigationDestination: VoiceInkMacOSNavigationDestination.settings.rawValue),
+            .settings
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSMainViewItem.item(forNavigationDestination: VoiceInkMacOSNavigationDestination.aiModels.rawValue),
+            .models
+        )
+        XCTAssertEqual(VoiceInkMacOSMainViewItem.item(forNavigationDestination: "models"), .models)
+        XCTAssertEqual(VoiceInkMacOSMainViewItem.item(forNavigationDestination: "past"), .history)
+        XCTAssertEqual(VoiceInkMacOSMainViewItem.item(forNavigationDestination: "style"), .enhancement)
+        XCTAssertEqual(VoiceInkMacOSMainViewItem.item(forNavigationDestination: "manual stt"), .transcribeAudio)
+        XCTAssertEqual(
+            VoiceInkMacOSMainViewItem.item(forNavigationDestination: VoiceInkMacOSNavigationDestination.license.rawValue),
+            .license
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSMainViewItem.item(forNavigationDestination: VoiceInkMacOSNavigationDestination.powerMode.rawValue),
+            .powerMode
+        )
+        XCTAssertNil(VoiceInkMacOSMainViewItem.item(forNavigationDestination: "Audio Input"))
+        XCTAssertNil(VoiceInkMacOSMainViewItem.item(forNavigationDestination: "Dictionary"))
+    }
+
     func testMacOSFileTranscriptionRequestPreservesPayloadContract() throws {
         let url = URL(fileURLWithPath: "/tmp/sample.wav")
         let notification = Notification(

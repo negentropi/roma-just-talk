@@ -17,6 +17,108 @@ public enum VoiceInkMacOSNavigationDestination: String, CaseIterable, Sendable {
     case powerMode = "Power Mode"
 }
 
+public enum VoiceInkMacOSMainViewItem: String, CaseIterable, Identifiable, Sendable {
+    case metrics
+    case transcribeAudio
+    case history
+    case models
+    case enhancement
+    case powerMode
+    case permissions
+    case audioInput
+    case dictionary
+    case settings
+    case license
+
+    public var id: String { rawValue }
+
+    public var title: String {
+        switch self {
+        case .metrics:
+            return "home"
+        case .transcribeAudio:
+            return "manual stt"
+        case .history:
+            return "past"
+        case .models:
+            return "models"
+        case .enhancement:
+            return "style"
+        case .powerMode:
+            return "Power Mode"
+        case .permissions:
+            return "Permissions"
+        case .audioInput:
+            return "Audio Input"
+        case .dictionary:
+            return "Dictionary"
+        case .settings:
+            return "Settings"
+        case .license:
+            return "VoiceInk Pro"
+        }
+    }
+
+    public var systemImageName: String {
+        switch self {
+        case .metrics:
+            return "gauge.medium"
+        case .transcribeAudio:
+            return "waveform.circle.fill"
+        case .history:
+            return "doc.text.fill"
+        case .models:
+            return "brain.head.profile"
+        case .enhancement:
+            return "wand.and.stars"
+        case .powerMode:
+            return "sparkles.square.fill.on.square"
+        case .permissions:
+            return "shield.fill"
+        case .audioInput:
+            return "mic.fill"
+        case .dictionary:
+            return "character.book.closed.fill"
+        case .settings:
+            return "gearshape.fill"
+        case .license:
+            return "checkmark.seal.fill"
+        }
+    }
+
+    public static let defaultSelection = VoiceInkMacOSMainViewItem.metrics
+    public static let emptySelectionTitle = "Select a view"
+
+    public static func visibleItems(powerModeEnabled: Bool) -> [VoiceInkMacOSMainViewItem] {
+        allCases.filter { item in
+            item != .powerMode || powerModeEnabled
+        }
+    }
+
+    public static func item(forNavigationDestination destination: String) -> VoiceInkMacOSMainViewItem? {
+        switch destination {
+        case VoiceInkMacOSNavigationDestination.settings.rawValue:
+            return .settings
+        case VoiceInkMacOSNavigationDestination.aiModels.rawValue, VoiceInkMacOSMainViewItem.models.title:
+            return .models
+        case VoiceInkMacOSNavigationDestination.license.rawValue:
+            return .license
+        case VoiceInkMacOSNavigationDestination.history.rawValue, VoiceInkMacOSMainViewItem.history.title:
+            return .history
+        case VoiceInkMacOSNavigationDestination.permissions.rawValue:
+            return .permissions
+        case VoiceInkMacOSNavigationDestination.enhancement.rawValue, VoiceInkMacOSMainViewItem.enhancement.title:
+            return .enhancement
+        case VoiceInkMacOSNavigationDestination.transcribeAudio.rawValue, VoiceInkMacOSMainViewItem.transcribeAudio.title:
+            return .transcribeAudio
+        case VoiceInkMacOSNavigationDestination.powerMode.rawValue:
+            return .powerMode
+        default:
+            return nil
+        }
+    }
+}
+
 public enum VoiceInkMacOSNavigationRequest {
     public static let notificationName = Notification.Name("navigateToDestination")
     public static let destinationUserInfoKey = "destination"

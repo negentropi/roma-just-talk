@@ -3,39 +3,6 @@ import SwiftData
 import OSLog
 import VoiceInkCore
 
-// ViewType enum with all cases
-enum ViewType: String, CaseIterable, Identifiable {
-    case metrics = "home"
-    case transcribeAudio = "manual stt"
-    case history = "past"
-    case models = "models"
-    case enhancement = "style"
-    case powerMode = "Power Mode"
-    case permissions = "Permissions"
-    case audioInput = "Audio Input"
-    case dictionary = "Dictionary"
-    case settings = "Settings"
-    case license = "VoiceInk Pro"
-
-    var id: String { rawValue }
-
-    var icon: String {
-        switch self {
-        case .metrics: return "gauge.medium"
-        case .transcribeAudio: return "waveform.circle.fill"
-        case .history: return "doc.text.fill"
-        case .models: return "brain.head.profile"
-        case .enhancement: return "wand.and.stars"
-        case .powerMode: return "sparkles.square.fill.on.square"
-        case .permissions: return "shield.fill"
-        case .audioInput: return "mic.fill"
-        case .dictionary: return "character.book.closed.fill"
-        case .settings: return "gearshape.fill"
-        case .license: return "checkmark.seal.fill"
-        }
-    }
-}
-
 struct VisualEffectView: NSViewRepresentable {
     let material: NSVisualEffectView.Material
     let blendingMode: NSVisualEffectView.BlendingMode
@@ -63,17 +30,12 @@ struct ContentView: View {
     @EnvironmentObject private var transcriptionModelManager: TranscriptionModelManager
     @EnvironmentObject private var recordingShortcutManager: RecordingShortcutManager
     @AppStorage(VoiceInkUserDefaultsKey.powerModeUIFlag) private var powerModeUIFlag = VoiceInkPreferenceDefault.powerModeUIEnabled
-    @State private var selectedView: ViewType? = .metrics
+    @State private var selectedView: VoiceInkMacOSMainViewItem? = VoiceInkMacOSMainViewItem.defaultSelection
     let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
     @StateObject private var licenseViewModel = LicenseViewModel()
 
-    private var visibleViewTypes: [ViewType] {
-        ViewType.allCases.filter { viewType in
-            if viewType == .powerMode {
-                return powerModeUIFlag
-            }
-            return true
-        }
+    private var visibleViewTypes: [VoiceInkMacOSMainViewItem] {
+        VoiceInkMacOSMainViewItem.visibleItems(powerModeEnabled: powerModeUIFlag)
     }
 
     var body: some View {
@@ -127,9 +89,9 @@ struct ContentView: View {
             if let selectedView = selectedView {
                 detailView(for: selectedView)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .navigationTitle(selectedView.rawValue)
+                    .navigationTitle(selectedView.title)
             } else {
-                Text("Select a view")
+                Text(VoiceInkMacOSMainViewItem.emptySelectionTitle)
                     .foregroundColor(.secondary)
             }
         }
@@ -145,32 +107,15 @@ struct ContentView: View {
         .onReceive(NotificationCenter.default.publisher(for: .navigateToDestination)) { notification in
             if let destination = VoiceInkMacOSNavigationRequest.destination(from: notification) {
                 logger.notice("navigateToDestination received: \(destination, privacy: .public)")
-                switch destination {
-                case VoiceInkMacOSNavigationDestination.settings.rawValue:
-                    selectedView = .settings
-                case VoiceInkMacOSNavigationDestination.aiModels.rawValue, ViewType.models.rawValue:
-                    selectedView = .models
-                case VoiceInkMacOSNavigationDestination.license.rawValue:
-                    selectedView = .license
-                case VoiceInkMacOSNavigationDestination.history.rawValue, ViewType.history.rawValue:
-                    selectedView = .history
-                case VoiceInkMacOSNavigationDestination.permissions.rawValue:
-                    selectedView = .permissions
-                case VoiceInkMacOSNavigationDestination.enhancement.rawValue, ViewType.enhancement.rawValue:
-                    selectedView = .enhancement
-                case VoiceInkMacOSNavigationDestination.transcribeAudio.rawValue, ViewType.transcribeAudio.rawValue:
-                    selectedView = .transcribeAudio
-                case VoiceInkMacOSNavigationDestination.powerMode.rawValue:
-                    selectedView = .powerMode
-                default:
-                    break
+                if let viewItem = VoiceInkMacOSMainViewItem.item(forNavigationDestination: destination) {
+                    selectedView = viewItem
                 }
             }
         }
     }
     
     @ViewBuilder
-    private func detailView(for viewType: ViewType) -> some View {
+    private func detailView(for viewType: VoiceInkMacOSMainViewItem) -> some View {
         switch viewType {
         case .metrics:
             MetricsView()
@@ -199,15 +144,15 @@ struct ContentView: View {
 }
 
 private struct SidebarItemView: View {
-    let viewType: ViewType
+    let viewType: VoiceInkMacOSMainViewItem
 
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: viewType.icon)
+            Image(systemName: viewType.systemImageName)
                 .font(.system(size: 18, weight: .medium))
                 .frame(width: 24, height: 24)
 
-            Text(viewType.rawValue)
+            Text(viewType.title)
                 .font(.system(size: 14, weight: .medium))
 
             Spacer()

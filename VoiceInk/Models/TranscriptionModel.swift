@@ -72,7 +72,7 @@ extension ModelProvider {
     }
 
     var apiKeyProviderName: String {
-        coreTranscriptionModelProvider?.providerKind?.displayName ?? rawValue
+        coreTranscriptionModelProviderRole.apiKeyProviderName(defaultName: rawValue)
     }
 
     fileprivate var transcriptionLanguageSource: VoiceInkTranscriptionLanguageSource {
@@ -126,14 +126,14 @@ extension TranscriptionModel {
     var supportsStreaming: Bool { false }
 
     var supportsRecordedFileTranscription: Bool {
-        provider.coreTranscriptionModelProvider?.supportsRecordedFileTranscription ?? true
+        provider.coreTranscriptionModelProviderRole.supportsRecordedFileTranscription
     }
 
     var streamingPreferenceSnapshot: VoiceInkTranscriptionStreamingModelSnapshot {
         VoiceInkTranscriptionStreamingModelSnapshot(
             name: name,
             supportsStreaming: supportsStreaming,
-            isStreamingOnly: provider.coreTranscriptionModelProvider?.isStreamingOnly ?? false
+            isStreamingOnly: provider.coreTranscriptionModelProviderRole.isStreamingOnly
         )
     }
 
@@ -145,11 +145,11 @@ extension TranscriptionModel {
     }
 
     var streamingConnectionModelName: String {
-        provider.coreTranscriptionModelProvider?.streamingConnectionModelName(for: name) ?? name
+        provider.coreTranscriptionModelProviderRole.streamingConnectionModelName(for: name)
     }
 
     var mapsStreamingTransportTimeoutToFinalTimeout: Bool {
-        provider.coreTranscriptionModelProvider?.mapsStreamingTransportTimeoutToFinalTimeout ?? false
+        provider.coreTranscriptionModelProviderRole.mapsStreamingTransportTimeoutToFinalTimeout
     }
 
     var transcriptionRuntimeResourcePlan: VoiceInkTranscriptionRuntimeResourcePlan {

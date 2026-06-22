@@ -241,6 +241,23 @@ final class TranscriptionModelCatalogTests: XCTestCase {
         XCTAssertEqual(VoiceInkTranscriptionModelProviderRole.cloud(.groq).coreTranscriptionModelProvider, .groq)
         XCTAssertEqual(VoiceInkTranscriptionModelProviderRole.cloud(nil).transcriptionModelAvailabilityRequirement, .unavailable)
         XCTAssertEqual(VoiceInkTranscriptionModelProviderRole.cloud(nil).transcriptionLanguageSource, .all)
+        XCTAssertEqual(VoiceInkTranscriptionModelProviderRole.cloud(.groq).apiKeyProviderName(defaultName: "Groq"), "Groq")
+        XCTAssertEqual(VoiceInkTranscriptionModelProviderRole.customCloud.apiKeyProviderName(defaultName: "Custom"), "Custom")
+        XCTAssertTrue(VoiceInkTranscriptionModelProviderRole.localWhisper.supportsRecordedFileTranscription)
+        XCTAssertTrue(VoiceInkTranscriptionModelProviderRole.customCloud.supportsRecordedFileTranscription)
+        XCTAssertFalse(VoiceInkTranscriptionModelProviderRole.cloud(.cartesia).supportsRecordedFileTranscription)
+        XCTAssertFalse(VoiceInkTranscriptionModelProviderRole.localWhisper.isStreamingOnly)
+        XCTAssertTrue(VoiceInkTranscriptionModelProviderRole.cloud(.cartesia).isStreamingOnly)
+        XCTAssertEqual(
+            VoiceInkTranscriptionModelProviderRole.cloud(.speechmatics).streamingConnectionModelName(for: "speechmatics-standard"),
+            "standard"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptionModelProviderRole.customCloud.streamingConnectionModelName(for: "custom-model"),
+            "custom-model"
+        )
+        XCTAssertTrue(VoiceInkTranscriptionModelProviderRole.cloud(.assemblyAI).mapsStreamingTransportTimeoutToFinalTimeout)
+        XCTAssertFalse(VoiceInkTranscriptionModelProviderRole.cloud(.deepgram).mapsStreamingTransportTimeoutToFinalTimeout)
 
         let customLanguages = ["zz": "Customish"]
         XCTAssertEqual(

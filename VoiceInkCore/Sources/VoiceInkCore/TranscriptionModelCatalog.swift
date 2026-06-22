@@ -261,6 +261,26 @@ public enum VoiceInkTranscriptionModelProviderRole: Equatable, Sendable {
         }
     }
 
+    public func apiKeyProviderName(defaultName: String) -> String {
+        coreTranscriptionModelProvider?.providerKind?.displayName ?? defaultName
+    }
+
+    public var supportsRecordedFileTranscription: Bool {
+        coreTranscriptionModelProvider?.supportsRecordedFileTranscription ?? true
+    }
+
+    public var isStreamingOnly: Bool {
+        coreTranscriptionModelProvider?.isStreamingOnly ?? false
+    }
+
+    public func streamingConnectionModelName(for selectedModelName: String) -> String {
+        coreTranscriptionModelProvider?.streamingConnectionModelName(for: selectedModelName) ?? selectedModelName
+    }
+
+    public var mapsStreamingTransportTimeoutToFinalTimeout: Bool {
+        coreTranscriptionModelProvider?.mapsStreamingTransportTimeoutToFinalTimeout ?? false
+    }
+
     public func transcriptionLanguageOptions(
         defaultLanguages: [String: String],
         isMultilingual: Bool,

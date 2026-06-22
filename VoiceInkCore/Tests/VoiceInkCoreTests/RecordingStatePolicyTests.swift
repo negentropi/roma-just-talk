@@ -299,6 +299,35 @@ final class RecordingStatePolicyTests: XCTestCase {
         )
     }
 
+    func testAppGroupRecordingStateMutationPlansPreserveIOSBridgeNotifications() {
+        XCTAssertEqual(
+            VoiceInkAppGroupRecordingStatePolicy.stopRequestedMutationPlan(
+                now: Date(timeIntervalSince1970: 42)
+            ),
+            VoiceInkAppGroupRecordingStateMutationPlan(
+                writePlan: VoiceInkAppGroupRecordingStateWritePlan(
+                    isRecording: nil,
+                    lastRecordingTimestamp: 42
+                ),
+                darwinNotificationName: VoiceInkAppIdentity.iOSStopRecordingDarwinNotificationName
+            )
+        )
+
+        XCTAssertEqual(
+            VoiceInkAppGroupRecordingStatePolicy.recordingStateMutationPlan(
+                isRecording: true,
+                now: Date(timeIntervalSince1970: 43)
+            ),
+            VoiceInkAppGroupRecordingStateMutationPlan(
+                writePlan: VoiceInkAppGroupRecordingStateWritePlan(
+                    isRecording: true,
+                    lastRecordingTimestamp: 43
+                ),
+                darwinNotificationName: VoiceInkAppIdentity.iOSRecordingStateChangedDarwinNotificationName
+            )
+        )
+    }
+
     func testKeyboardRecordingTimingPreservesIOSAppAndKeyboardDelays() {
         XCTAssertEqual(VoiceInkKeyboardRecordingTiming.appLaunchRecordingStartDelay, 0.5)
         XCTAssertEqual(VoiceInkKeyboardRecordingTiming.recordingStatusPollingInterval, 0.5)

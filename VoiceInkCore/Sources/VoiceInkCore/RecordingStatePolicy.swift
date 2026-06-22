@@ -230,6 +230,19 @@ public struct VoiceInkAppGroupRecordingStateWritePlan: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkAppGroupRecordingStateMutationPlan: Equatable, Sendable {
+    public let writePlan: VoiceInkAppGroupRecordingStateWritePlan
+    public let darwinNotificationName: String
+
+    public init(
+        writePlan: VoiceInkAppGroupRecordingStateWritePlan,
+        darwinNotificationName: String
+    ) {
+        self.writePlan = writePlan
+        self.darwinNotificationName = darwinNotificationName
+    }
+}
+
 public enum VoiceInkAppGroupRecordingStatePolicy {
     public static let staleRecordingInterval: TimeInterval = 30
 
@@ -247,6 +260,15 @@ public enum VoiceInkAppGroupRecordingStatePolicy {
         )
     }
 
+    public static func stopRequestedMutationPlan(
+        now: Date = Date()
+    ) -> VoiceInkAppGroupRecordingStateMutationPlan {
+        VoiceInkAppGroupRecordingStateMutationPlan(
+            writePlan: stopRequestedWritePlan(now: now),
+            darwinNotificationName: VoiceInkAppIdentity.iOSStopRecordingDarwinNotificationName
+        )
+    }
+
     public static func recordingStateWritePlan(
         isRecording: Bool,
         now: Date = Date()
@@ -254,6 +276,16 @@ public enum VoiceInkAppGroupRecordingStatePolicy {
         VoiceInkAppGroupRecordingStateWritePlan(
             isRecording: isRecording,
             lastRecordingTimestamp: now.timeIntervalSince1970
+        )
+    }
+
+    public static func recordingStateMutationPlan(
+        isRecording: Bool,
+        now: Date = Date()
+    ) -> VoiceInkAppGroupRecordingStateMutationPlan {
+        VoiceInkAppGroupRecordingStateMutationPlan(
+            writePlan: recordingStateWritePlan(isRecording: isRecording, now: now),
+            darwinNotificationName: VoiceInkAppIdentity.iOSRecordingStateChangedDarwinNotificationName
         )
     }
 

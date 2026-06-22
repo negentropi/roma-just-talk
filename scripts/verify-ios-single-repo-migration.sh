@@ -10780,7 +10780,7 @@ require_pattern \
 
 require_pattern \
   "VoiceInkCore checks cover iOS App Group recording state policy" \
-  'testAppGroupRecordingStatePolicy(PreservesIOSStorageKeysAndTimeout|KeepsFreshRecordingActive|ClearsStaleRecording|DoesNotClearInactiveRecording)|testAppGroupRecordingStateWritePlansPreserveIOSBridgeWrites' \
+  'testAppGroupRecordingStatePolicy(PreservesIOSStorageKeysAndTimeout|KeepsFreshRecordingActive|ClearsStaleRecording|DoesNotClearInactiveRecording)|testAppGroupRecordingState(WritePlansPreserveIOSBridgeWrites|MutationPlansPreserveIOSBridgeNotifications)' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -10890,8 +10890,13 @@ require_pattern \
 
 require_pattern \
   "iOS App Group bridge adapts shared recording state policy" \
-  'VoiceInkAppGroupRecordingStatePolicy\.(state|recordingStateWritePlan|stopRequestedWritePlan)' \
+  'VoiceInkAppGroupRecordingStatePolicy\.(state|stopRequestedMutationPlan|recordingStateMutationPlan)' \
   iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
+
+require_pattern \
+  "VoiceInkCore owns App Group recording mutation notification plan" \
+  'VoiceInkAppGroupRecordingStateMutationPlan|darwinNotificationName' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
 require_pattern \
   "iOS App Group bridge tests use shared recording state policy" \
@@ -10909,14 +10914,14 @@ reject_pattern \
   iOS/VoiceInk-iosTests/VoiceInk_iosTests.swift
 
 require_pattern \
-  "iOS App Group bridge owns stop-recording Darwin notification" \
-  'static let stopRecording = VoiceInkAppIdentity\.iOSStopRecordingDarwinNotificationName' \
-  iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
+  "VoiceInkCore app group mutation plan owns stop-recording Darwin notification" \
+  'iOSStopRecordingDarwinNotificationName' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
 require_pattern \
-  "iOS App Group bridge owns recording-state Darwin notification" \
-  'static let recordingStateChanged = VoiceInkAppIdentity\.iOSRecordingStateChangedDarwinNotificationName' \
-  iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
+  "VoiceInkCore app group mutation plan owns recording-state Darwin notification" \
+  'iOSRecordingStateChangedDarwinNotificationName' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
 reject_pattern \
   "iOS shared bridge avoids duplicate app identity literals" \

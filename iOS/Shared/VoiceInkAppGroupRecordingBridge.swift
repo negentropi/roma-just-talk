@@ -4,37 +4,32 @@ import VoiceInkCore
 enum VoiceInkAppGroupRecordingBridge {
     static let appGroupIdentifier = VoiceInkAppIdentity.iOSAppGroupIdentifier
 
-    enum NotificationName {
-        static let stopRecording = VoiceInkAppIdentity.iOSStopRecordingDarwinNotificationName
-        static let recordingStateChanged = VoiceInkAppIdentity.iOSRecordingStateChangedDarwinNotificationName
-    }
-
     static func sharedDefaults() -> UserDefaults? {
         UserDefaults(suiteName: appGroupIdentifier)
     }
 
+    @discardableResult
     static func markStopRequested(
         in defaults: UserDefaults?,
         now: Date = Date()
-    ) {
-        apply(
-            VoiceInkAppGroupRecordingStatePolicy.stopRequestedWritePlan(now: now),
-            to: defaults
-        )
+    ) -> VoiceInkAppGroupRecordingStateMutationPlan {
+        let mutationPlan = VoiceInkAppGroupRecordingStatePolicy.stopRequestedMutationPlan(now: now)
+        apply(mutationPlan.writePlan, to: defaults)
+        return mutationPlan
     }
 
+    @discardableResult
     static func writeRecordingState(
         _ isRecording: Bool,
         to defaults: UserDefaults?,
         now: Date = Date()
-    ) {
-        apply(
-            VoiceInkAppGroupRecordingStatePolicy.recordingStateWritePlan(
-                isRecording: isRecording,
-                now: now
-            ),
-            to: defaults
+    ) -> VoiceInkAppGroupRecordingStateMutationPlan {
+        let mutationPlan = VoiceInkAppGroupRecordingStatePolicy.recordingStateMutationPlan(
+            isRecording: isRecording,
+            now: now
         )
+        apply(mutationPlan.writePlan, to: defaults)
+        return mutationPlan
     }
 
     static func recordingState(

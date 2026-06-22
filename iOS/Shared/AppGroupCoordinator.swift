@@ -1,5 +1,6 @@
 import Foundation
 import OSLog
+import VoiceInkCore
 
 /// Handles communication between the main VoiceInk app and the keyboard extension
 /// Uses App Groups + Darwin Notifications for reliable iOS-native communication
@@ -26,10 +27,10 @@ final class AppGroupCoordinator {
     
     /// Call this from the keyboard extension to request recording stop
     func requestStopRecording() {
-        VoiceInkAppGroupRecordingBridge.markStopRequested(in: sharedDefaults)
+        let mutationPlan = VoiceInkAppGroupRecordingBridge.markStopRequested(in: sharedDefaults)
         
         // Send immediate notification
-        postDarwinNotification(VoiceInkAppGroupRecordingBridge.NotificationName.stopRecording)
+        postDarwinNotification(mutationPlan.darwinNotificationName)
     }
     
     /// Get current recording state (for keyboard UI updates)
@@ -47,10 +48,10 @@ final class AppGroupCoordinator {
     
     /// Call this from the main app to update recording state
     func updateRecordingState(_ isRecording: Bool) {
-        VoiceInkAppGroupRecordingBridge.writeRecordingState(isRecording, to: sharedDefaults)
+        let mutationPlan = VoiceInkAppGroupRecordingBridge.writeRecordingState(isRecording, to: sharedDefaults)
         
         // Notify keyboard of state change
-        postDarwinNotification(VoiceInkAppGroupRecordingBridge.NotificationName.recordingStateChanged)
+        postDarwinNotification(mutationPlan.darwinNotificationName)
         
         VoiceInkIOSLogger.appGroup.notice("Updated recording state: \(isRecording, privacy: .public)")
     }
@@ -69,7 +70,7 @@ final class AppGroupCoordinator {
                 let coordinator = Unmanaged<AppGroupCoordinator>.fromOpaque(observer).takeUnretainedValue()
                 coordinator.handleStopRecordingNotification()
             },
-            VoiceInkAppGroupRecordingBridge.NotificationName.stopRecording as CFString,
+            VoiceInkAppIdentity.iOSStopRecordingDarwinNotificationName as CFString,
             nil,
             .deliverImmediately
         )

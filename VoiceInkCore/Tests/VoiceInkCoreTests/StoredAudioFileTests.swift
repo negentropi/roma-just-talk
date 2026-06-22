@@ -60,6 +60,30 @@ final class StoredAudioFileTests: XCTestCase {
         XCTAssertEqual(modelsDirectory.lastPathComponent, VoiceInkWhisperModelFiles.modelsDirectoryName)
     }
 
+    func testMacOSStorageDirectoriesUseApplicationSupportBaseForAppRecordingsModelsAndCustomSounds() {
+        let applicationSupportBaseDirectory = URL(fileURLWithPath: "/tmp/Application Support", isDirectory: true)
+        let appSupportDirectory = VoiceInkMacOSStorageDirectories.appSupportDirectory(
+            in: applicationSupportBaseDirectory
+        )
+
+        XCTAssertEqual(
+            appSupportDirectory,
+            VoiceInkAppIdentity.macOSApplicationSupportDirectory(in: applicationSupportBaseDirectory)
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSStorageDirectories.recordingsDirectory(in: appSupportDirectory),
+            VoiceInkStoredAudioFile.recordingsDirectory(in: appSupportDirectory)
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSStorageDirectories.modelsDirectory(in: appSupportDirectory),
+            VoiceInkWhisperModelFiles.modelsDirectory(in: appSupportDirectory)
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSStorageDirectories.customSoundsDirectory(in: applicationSupportBaseDirectory).path,
+            "/tmp/Application Support/VoiceInk/CustomSounds"
+        )
+    }
+
     func testFileURLBuildsUnderRecordingsDirectory() {
         let recordingsDirectory = URL(fileURLWithPath: "/tmp/VoiceInk/Recordings", isDirectory: true)
 

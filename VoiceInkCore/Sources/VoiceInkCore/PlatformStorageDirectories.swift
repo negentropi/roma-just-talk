@@ -53,3 +53,45 @@ public enum VoiceInkIOSStorageDirectories {
         FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
     }
 }
+
+public enum VoiceInkMacOSStorageDirectories {
+    public static var applicationSupportBaseDirectory: URL {
+        FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+    }
+
+    public static func appSupportDirectory(in applicationSupportBaseDirectory: URL) -> URL {
+        VoiceInkAppIdentity.macOSApplicationSupportDirectory(in: applicationSupportBaseDirectory)
+    }
+
+    public static var appSupportDirectory: URL {
+        appSupportDirectory(in: applicationSupportBaseDirectory)
+    }
+
+    public static func recordingsDirectory(in appSupportDirectory: URL) -> URL {
+        VoiceInkStoredAudioFile.recordingsDirectory(in: appSupportDirectory)
+    }
+
+    public static var recordingsDirectory: URL {
+        recordingsDirectory(in: appSupportDirectory)
+    }
+
+    public static func modelsDirectory(in appSupportDirectory: URL) -> URL {
+        VoiceInkWhisperModelFiles.modelsDirectory(in: appSupportDirectory)
+    }
+
+    public static var modelsDirectory: URL {
+        modelsDirectory(in: appSupportDirectory)
+    }
+
+    public static func customSoundsDirectory(in applicationSupportBaseDirectory: URL) -> URL {
+        applicationSupportBaseDirectory.appendingPathComponent(
+            VoiceInkCustomSoundPreference.customSoundsRelativeDirectory,
+            isDirectory: true
+        )
+    }
+
+    public static var customSoundsDirectory: URL? {
+        FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+            .map { customSoundsDirectory(in: $0) }
+    }
+}

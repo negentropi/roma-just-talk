@@ -360,7 +360,6 @@ reject_macos_storage_duplicate_pattern() {
   local files=()
   local file
   while IFS= read -r file; do
-    [[ "$file" == "VoiceInk/VoiceInkMacOSStorageDirectories.swift" ]] && continue
     files+=("$file")
   done < <(fd -e swift -t f . VoiceInk)
 
@@ -479,52 +478,46 @@ reject_ios_storage_duplicate_pattern \
   "iOS shell avoids duplicate recordings/model directory literals" \
   'appendingPathComponent\((VoiceInkStoredAudioFile\.recordingsDirectoryName|VoiceInkWhisperModelFiles\.modelsDirectoryName|"Recordings"|"WhisperModels")'
 
-section "macOS storage adapter stays thin"
-require_file VoiceInk/VoiceInkMacOSStorageDirectories.swift
-require_pattern \
-  "macOS storage adapter derives app support through shared app identity" \
+section "macOS storage directories live in shared core"
+reject_file VoiceInk/VoiceInkMacOSStorageDirectories.swift
+require_patterns \
+  "shared macOS storage directories live in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/PlatformStorageDirectories.swift \
+  'public enum VoiceInkMacOSStorageDirectories' \
   'VoiceInkAppIdentity\.macOSApplicationSupportDirectory\(in: applicationSupportBaseDirectory\)' \
-  VoiceInk/VoiceInkMacOSStorageDirectories.swift
-
-require_pattern \
-  "macOS storage adapter derives recordings directory through shared core" \
   'VoiceInkStoredAudioFile\.recordingsDirectory\(in: appSupportDirectory\)' \
-  VoiceInk/VoiceInkMacOSStorageDirectories.swift
-
-require_pattern \
-  "macOS storage adapter derives local model directory through shared core" \
   'VoiceInkWhisperModelFiles\.modelsDirectory\(in: appSupportDirectory\)' \
-  VoiceInk/VoiceInkMacOSStorageDirectories.swift
+  'VoiceInkCustomSoundPreference\.customSoundsRelativeDirectory'
 
 require_pattern \
-  "macOS storage adapter derives custom sound directory through shared core preference" \
-  'VoiceInkCustomSoundPreference\.customSoundsRelativeDirectory' \
-  VoiceInk/VoiceInkMacOSStorageDirectories.swift
+  "core checks execute macOS storage directory tests" \
+  'testMacOSStorageDirectoriesUseApplicationSupportBaseForAppRecordingsModelsAndCustomSounds' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
-  "macOS app startup uses storage adapter for local models" \
+  "macOS app startup uses shared storage directories for local models" \
   'VoiceInkMacOSStorageDirectories\.modelsDirectory' \
   VoiceInk/VoiceInk.swift
 
 require_pattern \
-  "macOS persistent store uses storage adapter app support" \
+  "macOS persistent store uses shared storage directories app support" \
   'VoiceInkMacOSStorageDirectories\.appSupportDirectory' \
   VoiceInk/VoiceInk.swift
 
 require_pattern \
-  "macOS recording paths use storage adapter recordings directory" \
+  "macOS recording paths use shared storage directories recordings directory" \
   'VoiceInkMacOSStorageDirectories\.recordingsDirectory' \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift \
   VoiceInk/Services/TranscriptionAutoCleanupService.swift
 
 require_pattern \
-  "macOS audio import flows use storage adapter app support" \
+  "macOS audio import flows use shared storage directories app support" \
   'VoiceInkMacOSStorageDirectories\.appSupportDirectory' \
   VoiceInk/Services/AudioFileTranscriptionService.swift \
   VoiceInk/Services/AudioFileTranscriptionManager.swift
 
 require_pattern \
-  "macOS custom sounds use storage adapter directory" \
+  "macOS custom sounds use shared storage directories" \
   'VoiceInkMacOSStorageDirectories\.customSoundsDirectory' \
   VoiceInk/CustomSoundManager.swift
 
@@ -11924,27 +11917,27 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
 require_pattern \
-  "macOS app startup storage path uses macOS storage adapter" \
+  "macOS app startup storage path uses shared macOS storage directories" \
   'VoiceInkMacOSStorageDirectories\.(modelsDirectory|appSupportDirectory)' \
   VoiceInk/VoiceInk.swift
 
 require_pattern \
-  "macOS recorder storage path uses macOS storage adapter" \
+  "macOS recorder storage path uses shared macOS storage directories" \
   'VoiceInkMacOSStorageDirectories\.recordingsDirectory' \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift
 
 require_pattern \
-  "macOS audio retry storage path uses macOS storage adapter" \
+  "macOS audio retry storage path uses shared macOS storage directories" \
   'VoiceInkMacOSStorageDirectories\.appSupportDirectory' \
   VoiceInk/Services/AudioFileTranscriptionService.swift
 
 require_pattern \
-  "macOS audio import storage path uses macOS storage adapter" \
+  "macOS audio import storage path uses shared macOS storage directories" \
   'VoiceInkMacOSStorageDirectories\.appSupportDirectory' \
   VoiceInk/Services/AudioFileTranscriptionManager.swift
 
 require_pattern \
-  "macOS transcription cleanup storage path uses macOS storage adapter" \
+  "macOS transcription cleanup storage path uses shared macOS storage directories" \
   'VoiceInkMacOSStorageDirectories\.recordingsDirectory' \
   VoiceInk/Services/TranscriptionAutoCleanupService.swift
 

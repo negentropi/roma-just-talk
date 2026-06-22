@@ -255,7 +255,7 @@ h1 .before-word {
 .button,
 .social-button {
   min-height: 52px;
-  border: 2px solid var(--ink);
+  border: 1.5px solid var(--ink);
   border-radius: 8px;
   color: var(--ink);
   cursor: pointer;
@@ -275,12 +275,12 @@ h1 .before-word {
   color: var(--button-ink);
   padding: 0 16px;
   font-weight: 800;
-  box-shadow: 5px 5px 0 var(--button-ink);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
 }
 
 .button:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 7px 7px 0 var(--button-ink);
+  transform: translateY(-1px);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.26);
 }
 
 .social-button:hover {
@@ -301,7 +301,8 @@ h1 .before-word {
 }
 
 #github-button {
-  background: #000;
+  border-color: #11100e;
+  background: #11100e;
   color: #fff8e7;
 }
 
@@ -312,20 +313,21 @@ h1 .before-word {
 
 #talk-button {
   background: transparent;
-  border-color: #fff8e7;
+  border-color: rgba(255, 248, 231, 0.86);
   color: #fff8e7;
-  box-shadow: 5px 5px 0 rgba(255, 248, 231, 0.28);
+  box-shadow: none;
 }
 
 #talk-button .icon,
 #talk-button .keycap,
 #talk-button .command-symbol {
-  border-color: #fff8e7;
+  border-color: rgba(255, 248, 231, 0.86);
   color: #fff8e7;
 }
 
 #talk-button:hover {
-  box-shadow: 7px 7px 0 rgba(255, 248, 231, 0.28);
+  background: rgba(255, 248, 231, 0.06);
+  box-shadow: none;
 }
 
 .icon {
@@ -361,6 +363,7 @@ h1 .before-word {
 .keycap {
   display: inline-flex;
   min-height: 24px;
+  min-width: 28px;
   align-items: center;
   justify-content: center;
   border: 1.5px solid currentColor;
@@ -383,7 +386,7 @@ h1 .before-word {
 .command-symbol {
   display: inline-flex;
   min-height: 24px;
-  min-width: 24px;
+  min-width: 28px;
   align-items: center;
   justify-content: center;
   border: 1.5px solid currentColor;

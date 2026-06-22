@@ -1,15 +1,15 @@
 import SwiftUI
+import VoiceInkCore
 
 struct AnnouncementView: View {
-    let title: String
-    let description: String
+    let presentation: VoiceInkAnnouncementPresentation
     let onClose: () -> Void
     let onLearnMore: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .top) {
-                Text(title)
+                Text(presentation.title)
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(.white)
                     .lineLimit(2)
@@ -18,16 +18,16 @@ struct AnnouncementView: View {
                 Spacer()
 
                 Button(action: onClose) {
-                    Image(systemName: "xmark")
+                    Image(systemName: presentation.closeButtonSystemImageName)
                         .font(.system(size: 11, weight: .medium))
                         .foregroundColor(.white.opacity(0.7))
                 }
                 .buttonStyle(PlainButtonStyle())
             }
 
-            if !description.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            if presentation.shouldShowDescription {
                 ScrollView {
-                    Text(description)
+                    Text(presentation.descriptionText)
                         .font(.system(size: 12))
                         .foregroundColor(.white.opacity(0.9))
                         .multilineTextAlignment(.leading)
@@ -38,7 +38,7 @@ struct AnnouncementView: View {
 
             HStack(spacing: 8) {
                 Button(action: onLearnMore) {
-                    Text("Learn more")
+                    Text(presentation.learnMoreButtonTitle)
                         .font(.system(size: 12, weight: .medium))
                         .foregroundColor(.black)
                         .padding(.horizontal, 10)
@@ -49,7 +49,7 @@ struct AnnouncementView: View {
                 .buttonStyle(PlainButtonStyle())
 
                 Button(action: onClose) {
-                    Text("Dismiss")
+                    Text(presentation.dismissButtonTitle)
                         .font(.system(size: 12, weight: .medium))
                         .foregroundColor(.white.opacity(0.9))
                         .padding(.horizontal, 8)
@@ -91,4 +91,3 @@ struct AnnouncementView: View {
 
 
  
-

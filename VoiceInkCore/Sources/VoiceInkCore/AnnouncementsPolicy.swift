@@ -30,12 +30,34 @@ public struct VoiceInkAnnouncementPresentation: Equatable, Sendable {
     public let title: String
     public let description: String?
     public let learnMoreURL: URL?
+    public let closeButtonSystemImageName: String
+    public let learnMoreButtonTitle: String
+    public let dismissButtonTitle: String
 
-    public init(id: String, title: String, description: String?, learnMoreURL: URL?) {
+    public init(
+        id: String,
+        title: String,
+        description: String?,
+        learnMoreURL: URL?,
+        closeButtonSystemImageName: String = "xmark",
+        learnMoreButtonTitle: String = "Learn more",
+        dismissButtonTitle: String = "Dismiss"
+    ) {
         self.id = id
         self.title = title
         self.description = description
         self.learnMoreURL = learnMoreURL
+        self.closeButtonSystemImageName = closeButtonSystemImageName
+        self.learnMoreButtonTitle = learnMoreButtonTitle
+        self.dismissButtonTitle = dismissButtonTitle
+    }
+
+    public var descriptionText: String {
+        description ?? ""
+    }
+
+    public var shouldShowDescription: Bool {
+        !descriptionText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 }
 

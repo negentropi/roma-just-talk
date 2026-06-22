@@ -89,6 +89,34 @@ final class AnnouncementsPolicyTests: XCTestCase {
         XCTAssertEqual(next?.learnMoreURL, URL(string: "https://tryvoiceink.com/docs"))
     }
 
+    func testAnnouncementPresentationPreservesMacOSActionCopyAndDescriptionVisibility() throws {
+        let now = try date("2026-06-21T12:00:00Z")
+        let visible = try XCTUnwrap(VoiceInkAnnouncementPolicy.nextAnnouncement(
+            from: [
+                announcement(id: "visible", description: " Body ", url: "https://tryvoiceink.com/docs")
+            ],
+            dismissedIds: [],
+            now: now
+        ))
+
+        XCTAssertEqual(visible.closeButtonSystemImageName, "xmark")
+        XCTAssertEqual(visible.learnMoreButtonTitle, "Learn more")
+        XCTAssertEqual(visible.dismissButtonTitle, "Dismiss")
+        XCTAssertEqual(visible.descriptionText, " Body ")
+        XCTAssertTrue(visible.shouldShowDescription)
+
+        let blank = try XCTUnwrap(VoiceInkAnnouncementPolicy.nextAnnouncement(
+            from: [
+                announcement(id: "blank", description: " \n\t ")
+            ],
+            dismissedIds: [],
+            now: now
+        ))
+
+        XCTAssertEqual(blank.descriptionText, " \n\t ")
+        XCTAssertFalse(blank.shouldShowDescription)
+    }
+
     func testNextAnnouncementReturnsNilWhenNothingIsEligible() throws {
         let now = try date("2026-06-21T12:00:00Z")
         XCTAssertNil(VoiceInkAnnouncementPolicy.nextAnnouncement(

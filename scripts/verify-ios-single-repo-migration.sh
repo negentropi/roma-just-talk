@@ -1362,13 +1362,35 @@ require_pattern \
 
 require_pattern \
   "shared announcement policy owns dismissal and active selection" \
-  'dismissedIds\(afterDismissing|nextAnnouncement|isActive|VoiceInkAnnouncementPresentation|VoiceInkRemoteAnnouncement' \
+  'dismissedIds\(afterDismissing|nextAnnouncement|isActive|VoiceInkAnnouncementPresentation|VoiceInkRemoteAnnouncement|closeButtonSystemImageName|learnMoreButtonTitle|dismissButtonTitle|shouldShowDescription' \
   VoiceInkCore/Sources/VoiceInkCore/AnnouncementsPolicy.swift
 
 require_pattern \
   "macOS announcements service uses shared announcement policy" \
   'VoiceInkAnnouncementPreference\.(announcementsURL|refreshInterval|initialFetchDelay|requestTimeout|dismissedIds|saveDismissedIds)|VoiceInkAnnouncementPolicy\.nextAnnouncement|VoiceInkRemoteAnnouncement' \
   VoiceInk/Services/AnnouncementsService.swift
+
+require_patterns \
+  "macOS announcements service passes shared announcement presentation through shell" \
+  VoiceInk/Services/AnnouncementsService.swift \
+  'AnnouncementManager\.shared\.showAnnouncement' \
+  'presentation: next'
+
+require_pattern \
+  "macOS announcement manager accepts shared announcement presentation" \
+  'showAnnouncement\(presentation: VoiceInkAnnouncementPresentation' \
+  VoiceInk/Notifications/AnnouncementManager.swift
+
+require_patterns \
+  "macOS announcement view renders shared announcement presentation" \
+  VoiceInk/Notifications/AnnouncementView.swift \
+  'let presentation: VoiceInkAnnouncementPresentation' \
+  'presentation\.title' \
+  'presentation\.descriptionText' \
+  'presentation\.shouldShowDescription' \
+  'presentation\.closeButtonSystemImageName' \
+  'presentation\.learnMoreButtonTitle' \
+  'presentation\.dismissButtonTitle'
 
 require_pattern \
   "macOS app uses shared announcements enablement key" \
@@ -1387,8 +1409,13 @@ require_pattern \
 
 require_pattern \
   "core checks execute announcement policy tests" \
-  'AnnouncementsPolicyTests\.testAnnouncementPreferencePreservesMacOSStorageAndFetchDefaults|AnnouncementsPolicyTests\.testNextAnnouncementSkipsDismissedAndInactiveThenReturnsFirstValidPresentation' \
+  'AnnouncementsPolicyTests\.testAnnouncementPreferencePreservesMacOSStorageAndFetchDefaults|AnnouncementsPolicyTests\.testNextAnnouncementSkipsDismissedAndInactiveThenReturnsFirstValidPresentation|AnnouncementsPolicyTests\.testAnnouncementPresentationPreservesMacOSActionCopyAndDescriptionVisibility' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "migration checklist tracks shared announcement presentation copy" \
+  'announcements enablement.*next-announcement presentation, action copy, close icon, and description visibility.*VoiceInkAnnouncementPreference`/`VoiceInkAnnouncementPolicy' \
+  docs/ios-single-repo-migration.md
 
 reject_pattern \
   "macOS announcement shell avoids raw announcement policy" \
@@ -1397,6 +1424,13 @@ reject_pattern \
   VoiceInk/AppDefaults.swift \
   VoiceInk/VoiceInk.swift \
   VoiceInk/Views/Settings/SettingsView.swift
+
+reject_pattern \
+  "macOS announcement shell avoids raw announcement presentation copy" \
+  '"(xmark|Learn more|Dismiss)"|trimmingCharacters\(in: \.whitespacesAndNewlines\)|description \?\? ""|title: next\.title|description: next\.description|learnMoreURL: next\.learnMoreURL' \
+  VoiceInk/Notifications/AnnouncementView.swift \
+  VoiceInk/Notifications/AnnouncementManager.swift \
+  VoiceInk/Services/AnnouncementsService.swift
 
 reject_pattern \
   "iOS mode selection views avoid shell-only mode-count picker branching" \

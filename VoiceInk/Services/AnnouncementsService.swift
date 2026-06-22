@@ -48,9 +48,7 @@ final class AnnouncementsService {
 
             DispatchQueue.main.async {
                 AnnouncementManager.shared.showAnnouncement(
-                    title: next.title,
-                    description: next.description,
-                    learnMoreURL: next.learnMoreURL,
+                    presentation: next,
                     onDismiss: {
                         let ids = VoiceInkAnnouncementPreference.dismissedIds(
                             afterDismissing: next.id,

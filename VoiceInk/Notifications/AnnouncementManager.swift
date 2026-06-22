@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import VoiceInkCore
 
 final class AnnouncementManager {
     static let shared = AnnouncementManager()
@@ -9,18 +10,17 @@ final class AnnouncementManager {
     private init() {}
 
     @MainActor
-    func showAnnouncement(title: String, description: String?, learnMoreURL: URL?, onDismiss: @escaping () -> Void) {
+    func showAnnouncement(presentation: VoiceInkAnnouncementPresentation, onDismiss: @escaping () -> Void) {
         dismiss()
 
         let view = AnnouncementView(
-            title: title,
-            description: description ?? "",
+            presentation: presentation,
             onClose: { [weak self] in
                 onDismiss()
                 self?.dismiss()
             },
             onLearnMore: { [weak self] in
-                if let url = learnMoreURL {
+                if let url = presentation.learnMoreURL {
                     NSWorkspace.shared.open(url)
                 }
                 onDismiss()
@@ -84,5 +84,4 @@ final class AnnouncementManager {
         panel.setFrameOrigin(NSPoint(x: x, y: y))
     }
 }
-
 

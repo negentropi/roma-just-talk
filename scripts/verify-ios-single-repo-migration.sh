@@ -10679,6 +10679,21 @@ require_pattern \
   iOS/VoiceInkKeyboard/KeyboardViewController.swift
 
 require_pattern \
+  "VoiceInkCore owns iOS keyboard recording button tap policy" \
+  'VoiceInkKeyboardRecordingButtonTap(Policy|Plan|Action)|plan\(isRecording:' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "VoiceInkCore checks cover iOS keyboard recording button tap policy" \
+  'testKeyboardRecordingButtonTapPlan(StopsActiveRecordingAndRefreshesState|OpensAppWhenIdleWithoutRefreshingState)' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RecordingStatePolicyTests.swift
+
+require_pattern \
+  "iOS keyboard controller delegates tap action policy to shared core" \
+  'VoiceInkKeyboardRecordingButtonTapPolicy\.plan' \
+  iOS/VoiceInkKeyboard/KeyboardViewController.swift
+
+require_pattern \
   "iOS keyboard controller uses shared recording timing" \
   'VoiceInkKeyboardRecordingTiming\.(recordingStatusPollingInterval|openAppFallbackResetDelay)' \
   iOS/VoiceInkKeyboard/KeyboardViewController.swift
@@ -10721,6 +10736,11 @@ require_pattern \
 reject_pattern \
   "iOS keyboard controller avoids shell-owned button copy" \
   'setTitle\("( Record| Stop| Open roma just talk)"|UIImage\(systemName: "(mic\.fill|stop\.fill|app)"' \
+  iOS/VoiceInkKeyboard/KeyboardViewController.swift
+
+reject_pattern \
+  "iOS keyboard controller avoids shell-owned recording tap action policy" \
+  'if +coordinator\.isRecording|else +\{[[:space:]]*openMainAppForRecording\(\)' \
   iOS/VoiceInkKeyboard/KeyboardViewController.swift
 
 reject_pattern \

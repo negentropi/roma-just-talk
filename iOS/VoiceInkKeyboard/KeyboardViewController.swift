@@ -131,12 +131,17 @@ class KeyboardViewController: KeyboardInputViewController {
         let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
         impactFeedback.impactOccurred()
         
-        if coordinator.isRecording {
-            // Stop recording
+        let tapPlan = VoiceInkKeyboardRecordingButtonTapPolicy.plan(
+            isRecording: coordinator.isRecording
+        )
+
+        switch tapPlan.action {
+        case .requestStopRecording:
             coordinator.requestStopRecording()
-            updateButtonAppearanceBasedOnState()
-        } else {
-            // Start recording by opening main app
+            if tapPlan.shouldRefreshButtonStateAfterAction {
+                updateButtonAppearanceBasedOnState()
+            }
+        case .openMainAppForRecording:
             openMainAppForRecording()
         }
     }

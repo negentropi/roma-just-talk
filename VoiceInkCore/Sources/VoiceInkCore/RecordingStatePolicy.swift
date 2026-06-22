@@ -327,6 +327,40 @@ public struct VoiceInkKeyboardRecordingButtonPresentation: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkKeyboardRecordingButtonTapAction: Equatable, Sendable {
+    case requestStopRecording
+    case openMainAppForRecording
+}
+
+public struct VoiceInkKeyboardRecordingButtonTapPlan: Equatable, Sendable {
+    public let action: VoiceInkKeyboardRecordingButtonTapAction
+    public let shouldRefreshButtonStateAfterAction: Bool
+
+    public init(
+        action: VoiceInkKeyboardRecordingButtonTapAction,
+        shouldRefreshButtonStateAfterAction: Bool
+    ) {
+        self.action = action
+        self.shouldRefreshButtonStateAfterAction = shouldRefreshButtonStateAfterAction
+    }
+}
+
+public enum VoiceInkKeyboardRecordingButtonTapPolicy {
+    public static func plan(isRecording: Bool) -> VoiceInkKeyboardRecordingButtonTapPlan {
+        if isRecording {
+            return VoiceInkKeyboardRecordingButtonTapPlan(
+                action: .requestStopRecording,
+                shouldRefreshButtonStateAfterAction: true
+            )
+        }
+
+        return VoiceInkKeyboardRecordingButtonTapPlan(
+            action: .openMainAppForRecording,
+            shouldRefreshButtonStateAfterAction: false
+        )
+    }
+}
+
 public enum VoiceInkRecorderStyle: String, CaseIterable, Identifiable, Sendable {
     case none
     case notch

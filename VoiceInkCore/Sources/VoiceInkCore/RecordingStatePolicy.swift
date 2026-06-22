@@ -451,6 +451,55 @@ public enum VoiceInkKeyboardRecordingButtonTapPolicy {
     }
 }
 
+public enum VoiceInkKeyboardOpenAppAction: Equatable, Sendable {
+    case openExtensionContext
+    case openThroughApplicationOrResponderChain
+    case finish
+    case showFallback
+}
+
+public enum VoiceInkKeyboardOpenAppApplicationAction: Equatable, Sendable {
+    case openViaApplication
+    case openViaResponderChain
+}
+
+public enum VoiceInkKeyboardOpenAppResponderAction: Equatable, Sendable {
+    case performResponderChainOpen
+    case showFallback
+}
+
+public enum VoiceInkKeyboardOpenAppPolicy {
+    public static func initialAction(hasExtensionContext: Bool) -> VoiceInkKeyboardOpenAppAction {
+        hasExtensionContext ? .openExtensionContext : .openThroughApplicationOrResponderChain
+    }
+
+    public static func actionAfterExtensionContextOpen(succeeded: Bool) -> VoiceInkKeyboardOpenAppAction {
+        succeeded ? .finish : .openThroughApplicationOrResponderChain
+    }
+
+    public static func applicationAction(canOpenURL: Bool) -> VoiceInkKeyboardOpenAppApplicationAction {
+        canOpenURL ? .openViaApplication : .openViaResponderChain
+    }
+
+    public static func actionAfterApplicationOpen(succeeded: Bool) -> VoiceInkKeyboardOpenAppAction {
+        succeeded ? .finish : .showFallback
+    }
+
+    public static func responderAction(hasResponder: Bool) -> VoiceInkKeyboardOpenAppResponderAction {
+        hasResponder ? .performResponderChainOpen : .showFallback
+    }
+}
+
+public enum VoiceInkKeyboardOpenAppDiagnostics {
+    public static let extensionContextUnavailable = "extensionContext unavailable, trying alternative methods"
+    public static let openedViaExtensionContext = "Opened main app via extensionContext"
+    public static let extensionContextOpenFailed = "extensionContext.open failed, trying alternative methods"
+    public static let openedViaApplication = "Opened main app via UIApplication.open"
+    public static let applicationOpenFailed = "UIApplication.open failed"
+    public static let attemptedViaResponderChain = "Attempted to open main app via responder chain"
+    public static let allMethodsFailed = "All URL opening methods failed"
+}
+
 public enum VoiceInkKeyboardStopRecordingRequestAction: Equatable, Sendable {
     case handleStopRequest
     case ignore

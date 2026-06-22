@@ -525,6 +525,80 @@ final class RecordingStatePolicyTests: XCTestCase {
         )
     }
 
+    func testKeyboardOpenAppPolicyPreservesFallbackOrder() {
+        XCTAssertEqual(
+            VoiceInkKeyboardOpenAppPolicy.initialAction(hasExtensionContext: true),
+            .openExtensionContext
+        )
+        XCTAssertEqual(
+            VoiceInkKeyboardOpenAppPolicy.initialAction(hasExtensionContext: false),
+            .openThroughApplicationOrResponderChain
+        )
+        XCTAssertEqual(
+            VoiceInkKeyboardOpenAppPolicy.actionAfterExtensionContextOpen(succeeded: true),
+            .finish
+        )
+        XCTAssertEqual(
+            VoiceInkKeyboardOpenAppPolicy.actionAfterExtensionContextOpen(succeeded: false),
+            .openThroughApplicationOrResponderChain
+        )
+        XCTAssertEqual(
+            VoiceInkKeyboardOpenAppPolicy.applicationAction(canOpenURL: true),
+            .openViaApplication
+        )
+        XCTAssertEqual(
+            VoiceInkKeyboardOpenAppPolicy.applicationAction(canOpenURL: false),
+            .openViaResponderChain
+        )
+        XCTAssertEqual(
+            VoiceInkKeyboardOpenAppPolicy.actionAfterApplicationOpen(succeeded: true),
+            .finish
+        )
+        XCTAssertEqual(
+            VoiceInkKeyboardOpenAppPolicy.actionAfterApplicationOpen(succeeded: false),
+            .showFallback
+        )
+        XCTAssertEqual(
+            VoiceInkKeyboardOpenAppPolicy.responderAction(hasResponder: true),
+            .performResponderChainOpen
+        )
+        XCTAssertEqual(
+            VoiceInkKeyboardOpenAppPolicy.responderAction(hasResponder: false),
+            .showFallback
+        )
+    }
+
+    func testKeyboardOpenAppDiagnosticsPreserveIOSLogCopy() {
+        XCTAssertEqual(
+            VoiceInkKeyboardOpenAppDiagnostics.extensionContextUnavailable,
+            "extensionContext unavailable, trying alternative methods"
+        )
+        XCTAssertEqual(
+            VoiceInkKeyboardOpenAppDiagnostics.openedViaExtensionContext,
+            "Opened main app via extensionContext"
+        )
+        XCTAssertEqual(
+            VoiceInkKeyboardOpenAppDiagnostics.extensionContextOpenFailed,
+            "extensionContext.open failed, trying alternative methods"
+        )
+        XCTAssertEqual(
+            VoiceInkKeyboardOpenAppDiagnostics.openedViaApplication,
+            "Opened main app via UIApplication.open"
+        )
+        XCTAssertEqual(
+            VoiceInkKeyboardOpenAppDiagnostics.applicationOpenFailed,
+            "UIApplication.open failed"
+        )
+        XCTAssertEqual(
+            VoiceInkKeyboardOpenAppDiagnostics.attemptedViaResponderChain,
+            "Attempted to open main app via responder chain"
+        )
+        XCTAssertEqual(
+            VoiceInkKeyboardOpenAppDiagnostics.allMethodsFailed,
+            "All URL opening methods failed"
+        )
+    }
+
     func testKeyboardStopRecordingRequestHandlesOnlyActiveRecording() {
         XCTAssertEqual(
             VoiceInkKeyboardStopRecordingRequestPolicy.action(recordingState: .recording),

@@ -11250,6 +11250,21 @@ require_pattern \
   'testKeyboardRecordingButtonPresentation(PreservesIOSCopyAndIcons|SelectsCurrentState)' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
+require_patterns \
+  "VoiceInkCore owns iOS keyboard open-app fallback policy and diagnostics" \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift \
+  'VoiceInkKeyboardOpenAppPolicy' \
+  'VoiceInkKeyboardOpenAppDiagnostics' \
+  'actionAfterExtensionContextOpen' \
+  'applicationAction' \
+  'responderAction'
+
+require_patterns \
+  "VoiceInkCore checks cover iOS keyboard open-app fallback policy and diagnostics" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'testKeyboardOpenAppPolicyPreservesFallbackOrder' \
+  'testKeyboardOpenAppDiagnosticsPreserveIOSLogCopy'
+
 require_pattern \
   "iOS keyboard URL opener lives in shared shell adapter" \
   'VoiceInkKeyboardURLOpener' \
@@ -11260,9 +11275,15 @@ require_pattern \
   'openMainApp' \
   iOS/Shared/VoiceInkKeyboardURLOpener.swift
 
+require_patterns \
+  "iOS keyboard URL opener adapts shared open-app policy and diagnostics" \
+  iOS/Shared/VoiceInkKeyboardURLOpener.swift \
+  'VoiceInkKeyboardOpenAppPolicy' \
+  'VoiceInkKeyboardOpenAppDiagnostics'
+
 require_pattern \
   "iOS keyboard URL opener owns extension-context opening" \
-  'extensionContext\.open' \
+  'extensionContext\??\.open' \
   iOS/Shared/VoiceInkKeyboardURLOpener.swift
 
 require_pattern \
@@ -11273,6 +11294,16 @@ require_pattern \
 require_pattern \
   "iOS keyboard URL opener owns responder-chain fallback" \
   'sel_registerName\("openURL:"\)' \
+  iOS/Shared/VoiceInkKeyboardURLOpener.swift
+
+reject_pattern \
+  "iOS keyboard URL opener avoids shell-owned fallback diagnostic copy" \
+  '"(extensionContext unavailable, trying alternative methods|Opened main app via extensionContext|extensionContext\.open failed, trying alternative methods|Opened main app via UIApplication\.open|UIApplication\.open failed|Attempted to open main app via responder chain|All URL opening methods failed)"' \
+  iOS/Shared/VoiceInkKeyboardURLOpener.swift
+
+reject_pattern \
+  "iOS keyboard URL opener avoids shell-owned open-result branching" \
+  'if +success|guard +let +extensionContext' \
   iOS/Shared/VoiceInkKeyboardURLOpener.swift
 
 require_pattern \

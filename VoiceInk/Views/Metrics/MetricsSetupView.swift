@@ -186,7 +186,7 @@ struct MetricsSetupView: View {
         NotificationCenter.default.post(
             name: .navigateToDestination,
             object: nil,
-            userInfo: ["destination": "Settings"]
+            userInfo: VoiceInkMacOSNavigationRequest.userInfo(destination: .settings)
         )
     }
     
@@ -194,7 +194,7 @@ struct MetricsSetupView: View {
         NotificationCenter.default.post(
             name: .navigateToDestination,
             object: nil,
-            userInfo: ["destination": "AI Models"]
+            userInfo: VoiceInkMacOSNavigationRequest.userInfo(destination: .aiModels)
         )
     }
 }

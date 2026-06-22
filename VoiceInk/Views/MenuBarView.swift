@@ -47,7 +47,7 @@ struct MenuBarView: View {
                 Divider()
 
                 Button("Manage Models") {
-                    openMainWindowAndNavigate(to: "AI Models")
+                    openMainWindowAndNavigate(to: VoiceInkMacOSNavigationDestination.aiModels.rawValue)
                 }
             } label: {
                 HStack {
@@ -216,11 +216,11 @@ struct MenuBarView: View {
             .keyboardShortcut("h", modifiers: [.command, .shift])
 
             Button("Permissions") {
-                openMainWindowAndNavigate(to: "Permissions")
+                openMainWindowAndNavigate(to: VoiceInkMacOSNavigationDestination.permissions.rawValue)
             }
             
             Button("Settings") {
-                openMainWindowAndNavigate(to: "Settings")
+                openMainWindowAndNavigate(to: VoiceInkMacOSNavigationDestination.settings.rawValue)
             }
             .keyboardShortcut(",", modifiers: .command)
             
@@ -266,7 +266,7 @@ struct MenuBarView: View {
             NotificationCenter.default.post(
                 name: .navigateToDestination,
                 object: nil,
-                userInfo: ["destination": destination]
+                userInfo: VoiceInkMacOSNavigationRequest.userInfo(destination: destination)
             )
         }
     }

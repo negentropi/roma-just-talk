@@ -53,6 +53,47 @@ final class AppIdentityTests: XCTestCase {
         )
     }
 
+    func testMacOSNavigationRequestPreservesDestinationContract() {
+        XCTAssertEqual(VoiceInkMacOSNavigationRequest.notificationName.rawValue, "navigateToDestination")
+        XCTAssertEqual(VoiceInkMacOSNavigationRequest.destinationUserInfoKey, "destination")
+        XCTAssertEqual(VoiceInkMacOSNavigationRequest.defaultDestination, .settings)
+        XCTAssertEqual(
+            VoiceInkMacOSNavigationDestination.allCases.map(\.rawValue),
+            [
+                "Settings",
+                "AI Models",
+                "VoiceInk Pro",
+                "History",
+                "Permissions",
+                "Enhancement",
+                "Transcribe Audio",
+                "Power Mode"
+            ]
+        )
+
+        let notification = Notification(
+            name: VoiceInkMacOSNavigationRequest.notificationName,
+            userInfo: VoiceInkMacOSNavigationRequest.userInfo(destination: .transcribeAudio)
+        )
+
+        XCTAssertEqual(
+            VoiceInkMacOSNavigationRequest.destination(from: notification),
+            "Transcribe Audio"
+        )
+    }
+
+    func testMacOSFileTranscriptionRequestPreservesPayloadContract() throws {
+        let url = URL(fileURLWithPath: "/tmp/sample.wav")
+        let notification = Notification(
+            name: VoiceInkMacOSFileTranscriptionRequest.notificationName,
+            userInfo: VoiceInkMacOSFileTranscriptionRequest.userInfo(url: url)
+        )
+
+        XCTAssertEqual(VoiceInkMacOSFileTranscriptionRequest.notificationName.rawValue, "openFileForTranscription")
+        XCTAssertEqual(VoiceInkMacOSFileTranscriptionRequest.urlUserInfoKey, "url")
+        XCTAssertEqual(VoiceInkMacOSFileTranscriptionRequest.url(from: notification), url)
+    }
+
     func testMacOSApplicationSupportDirectoryUsesBundleIdentifier() {
         let baseDirectory = URL(fileURLWithPath: "/tmp/Application Support", isDirectory: true)
 

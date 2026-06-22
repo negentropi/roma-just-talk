@@ -1,4 +1,5 @@
 import Foundation
+import VoiceInkCore
 
 extension Notification.Name {
     static let AppSettingsDidChange = Notification.Name("appSettingsDidChange")
@@ -9,7 +10,7 @@ extension Notification.Name {
     static let aiProviderKeyChanged = Notification.Name("aiProviderKeyChanged")
     static let licenseStatusChanged = Notification.Name("licenseStatusChanged")
     static let openMainWindowRequested = Notification.Name("openMainWindowRequested")
-    static let navigateToDestination = Notification.Name("navigateToDestination")
+    static let navigateToDestination = VoiceInkMacOSNavigationRequest.notificationName
     static let appPermissionsDidChange = Notification.Name("appPermissionsDidChange")
     static let promptSelectionChanged = Notification.Name("promptSelectionChanged")
     static let powerModeConfigurationApplied = Notification.Name("powerModeConfigurationApplied")
@@ -21,6 +22,6 @@ extension Notification.Name {
     static let rollingBufferPreloadPartialTranscript = Notification.Name("rollingBufferPreloadPartialTranscript")
     static let sessionMetricsDidChange = Notification.Name("sessionMetricsDidChange")
     static let enhancementToggleChanged = Notification.Name("enhancementToggleChanged")
-    static let openFileForTranscription = Notification.Name("openFileForTranscription")
+    static let openFileForTranscription = VoiceInkMacOSFileTranscriptionRequest.notificationName
     static let audioDeviceSwitchRequired = Notification.Name("audioDeviceSwitchRequired")
 }

@@ -3,6 +3,7 @@ import ApplicationServices
 import AVFoundation
 import CoreGraphics
 import PermissionFlow
+import VoiceInkCore
 
 @MainActor
 final class PermissionFlowGuide: ObservableObject {
@@ -194,7 +195,7 @@ enum PermissionGrantCoordinator {
         NotificationCenter.default.post(
             name: .openMainWindowRequested,
             object: nil,
-            userInfo: ["destination": "Permissions"]
+            userInfo: VoiceInkMacOSNavigationRequest.userInfo(destination: .permissions)
         )
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {

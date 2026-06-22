@@ -410,7 +410,7 @@ class ImportExportService {
                 NotificationCenter.default.post(
                     name: .navigateToDestination,
                     object: nil,
-                    userInfo: ["destination": "Enhancement"]
+                    userInfo: VoiceInkMacOSNavigationRequest.userInfo(destination: .enhancement)
                 )
             }
         }

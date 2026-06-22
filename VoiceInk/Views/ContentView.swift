@@ -143,24 +143,24 @@ struct ContentView: View {
             logger.notice("ContentView disappeared")
         }
         .onReceive(NotificationCenter.default.publisher(for: .navigateToDestination)) { notification in
-            if let destination = notification.userInfo?["destination"] as? String {
+            if let destination = VoiceInkMacOSNavigationRequest.destination(from: notification) {
                 logger.notice("navigateToDestination received: \(destination, privacy: .public)")
                 switch destination {
-                case "Settings":
+                case VoiceInkMacOSNavigationDestination.settings.rawValue:
                     selectedView = .settings
-                case "AI Models", ViewType.models.rawValue:
+                case VoiceInkMacOSNavigationDestination.aiModels.rawValue, ViewType.models.rawValue:
                     selectedView = .models
-                case "VoiceInk Pro":
+                case VoiceInkMacOSNavigationDestination.license.rawValue:
                     selectedView = .license
-                case "History", ViewType.history.rawValue:
+                case VoiceInkMacOSNavigationDestination.history.rawValue, ViewType.history.rawValue:
                     selectedView = .history
-                case "Permissions":
+                case VoiceInkMacOSNavigationDestination.permissions.rawValue:
                     selectedView = .permissions
-                case "Enhancement", ViewType.enhancement.rawValue:
+                case VoiceInkMacOSNavigationDestination.enhancement.rawValue, ViewType.enhancement.rawValue:
                     selectedView = .enhancement
-                case "Transcribe Audio", ViewType.transcribeAudio.rawValue:
+                case VoiceInkMacOSNavigationDestination.transcribeAudio.rawValue, ViewType.transcribeAudio.rawValue:
                     selectedView = .transcribeAudio
-                case "Power Mode":
+                case VoiceInkMacOSNavigationDestination.powerMode.rawValue:
                     selectedView = .powerMode
                 default:
                     break

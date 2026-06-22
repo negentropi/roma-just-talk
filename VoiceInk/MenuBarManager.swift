@@ -107,7 +107,7 @@ class MenuBarManager: ObservableObject {
             NotificationCenter.default.post(
                 name: .navigateToDestination,
                 object: nil,
-                userInfo: ["destination": destination]
+                userInfo: VoiceInkMacOSNavigationRequest.userInfo(destination: destination)
             )
             self?.logger.notice("openMainWindowAndNavigate: navigation notification posted for \(destination, privacy: .public)")
         }

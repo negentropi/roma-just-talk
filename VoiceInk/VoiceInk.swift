@@ -324,9 +324,17 @@ struct VoiceInkApp: App {
 
                         // Process any pending open-file request now that the main ContentView is ready.
                         if let pendingURL = appDelegate.pendingOpenFileURL {
-                            NotificationCenter.default.post(name: .navigateToDestination, object: nil, userInfo: ["destination": "Transcribe Audio"])
+                            NotificationCenter.default.post(
+                                name: .navigateToDestination,
+                                object: nil,
+                                userInfo: VoiceInkMacOSNavigationRequest.userInfo(destination: .transcribeAudio)
+                            )
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                NotificationCenter.default.post(name: .openFileForTranscription, object: nil, userInfo: ["url": pendingURL])
+                                NotificationCenter.default.post(
+                                    name: .openFileForTranscription,
+                                    object: nil,
+                                    userInfo: VoiceInkMacOSFileTranscriptionRequest.userInfo(url: pendingURL)
+                                )
                             }
                             appDelegate.pendingOpenFileURL = nil
                         }
@@ -413,7 +421,8 @@ private struct MainWindowRequestHandler: View {
         Color.clear
             .frame(width: 0, height: 0)
             .onReceive(NotificationCenter.default.publisher(for: .openMainWindowRequested)) { notification in
-                let destination = notification.userInfo?["destination"] as? String ?? "Settings"
+                let destination = VoiceInkMacOSNavigationRequest.destination(from: notification)
+                    ?? VoiceInkMacOSNavigationRequest.defaultDestination.rawValue
                 openMainWindowAndNavigate(to: destination)
             }
     }
@@ -437,7 +446,7 @@ private struct MainWindowRequestHandler: View {
             NotificationCenter.default.post(
                 name: .navigateToDestination,
                 object: nil,
-                userInfo: ["destination": destination]
+                userInfo: VoiceInkMacOSNavigationRequest.userInfo(destination: destination)
             )
             logger.notice("focusAndNavigate: navigation notification posted for \(destination, privacy: .public)")
         }

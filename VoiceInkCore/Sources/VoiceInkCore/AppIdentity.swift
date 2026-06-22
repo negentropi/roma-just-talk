@@ -6,6 +6,48 @@ public struct VoiceInkMacOSStorageAlertPresentation: Equatable, Sendable {
     public let buttonTitle: String
 }
 
+public enum VoiceInkMacOSNavigationDestination: String, CaseIterable, Sendable {
+    case settings = "Settings"
+    case aiModels = "AI Models"
+    case license = "VoiceInk Pro"
+    case history = "History"
+    case permissions = "Permissions"
+    case enhancement = "Enhancement"
+    case transcribeAudio = "Transcribe Audio"
+    case powerMode = "Power Mode"
+}
+
+public enum VoiceInkMacOSNavigationRequest {
+    public static let notificationName = Notification.Name("navigateToDestination")
+    public static let destinationUserInfoKey = "destination"
+    public static let defaultDestination = VoiceInkMacOSNavigationDestination.settings
+
+    public static func userInfo(destination: VoiceInkMacOSNavigationDestination) -> [AnyHashable: Any] {
+        userInfo(destination: destination.rawValue)
+    }
+
+    public static func userInfo(destination: String) -> [AnyHashable: Any] {
+        [destinationUserInfoKey: destination]
+    }
+
+    public static func destination(from notification: Notification) -> String? {
+        notification.userInfo?[destinationUserInfoKey] as? String
+    }
+}
+
+public enum VoiceInkMacOSFileTranscriptionRequest {
+    public static let notificationName = Notification.Name("openFileForTranscription")
+    public static let urlUserInfoKey = "url"
+
+    public static func userInfo(url: URL) -> [AnyHashable: Any] {
+        [urlUserInfoKey: url]
+    }
+
+    public static func url(from notification: Notification) -> URL? {
+        notification.userInfo?[urlUserInfoKey] as? URL
+    }
+}
+
 public enum VoiceInkAppIdentity {
     public static let bundleIdentifier = "com.prakashjoshipax.VoiceInk"
     public static let loggingSubsystem = "com.prakashjoshipax.voiceink"

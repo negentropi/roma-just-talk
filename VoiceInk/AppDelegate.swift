@@ -38,9 +38,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         } else {
             // Running: focus current window and route in-place to Transcribe Audio
             menuBarManager?.focusMainWindow()
-            NotificationCenter.default.post(name: .navigateToDestination, object: nil, userInfo: ["destination": "Transcribe Audio"])
+            NotificationCenter.default.post(
+                name: .navigateToDestination,
+                object: nil,
+                userInfo: VoiceInkMacOSNavigationRequest.userInfo(destination: .transcribeAudio)
+            )
             DispatchQueue.main.async {
-                NotificationCenter.default.post(name: .openFileForTranscription, object: nil, userInfo: ["url": url])
+                NotificationCenter.default.post(
+                    name: .openFileForTranscription,
+                    object: nil,
+                    userInfo: VoiceInkMacOSFileTranscriptionRequest.userInfo(url: url)
+                )
             }
         }
     }

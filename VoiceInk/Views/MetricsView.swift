@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 import Charts
+import VoiceInkCore
 
 struct MetricsView: View {
     @Environment(\.modelContext) private var modelContext
@@ -19,7 +20,7 @@ struct MetricsView: View {
                         NotificationCenter.default.post(
                             name: .navigateToDestination,
                             object: nil,
-                            userInfo: ["destination": "VoiceInk Pro"]
+                            userInfo: VoiceInkMacOSNavigationRequest.userInfo(destination: .license)
                         )
                     }
                 )
@@ -33,7 +34,7 @@ struct MetricsView: View {
                         NotificationCenter.default.post(
                             name: .navigateToDestination,
                             object: nil,
-                            userInfo: ["destination": "VoiceInk Pro"]
+                            userInfo: VoiceInkMacOSNavigationRequest.userInfo(destination: .license)
                         )
                     }
                 )

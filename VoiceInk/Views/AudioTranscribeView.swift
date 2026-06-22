@@ -32,7 +32,7 @@ struct AudioTranscribeView: View {
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .openFileForTranscription)) { notification in
-            if let url = notification.userInfo?["url"] as? URL {
+            if let url = VoiceInkMacOSFileTranscriptionRequest.url(from: notification) {
                 transcriptionManager.addToQueue(urls: [url])
             }
         }

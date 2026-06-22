@@ -10186,8 +10186,40 @@ require_plist_value \
 
 require_pattern \
   "shared app identity presentation lives in VoiceInkCore" \
-  'VoiceInkAppIdentity|VoiceInkMacOSStorageAlertPresentation|bundleIdentifier = "com\.prakashjoshipax\.VoiceInk"|loggingSubsystem = "com\.prakashjoshipax\.voiceink"|displayName = "roma just talk"|compactDisplayName = "roma-just-talk"|iOSRecordDeepLinkScheme = "voiceink"|iOSRecordDeepLinkHost = "record"|iCloudContainerIdentifier|iOSAppGroupIdentifier|iOSRecordDeepLinkURL|iOSStopRecordingDarwinNotificationName|iOSRecordingStateChangedDarwinNotificationName|iOSStopRecordingFromKeyboardNotificationName|macOSApplicationSupportDirectory|storageFallbackWarningPresentation|storageFailurePresentation|errorDomain' \
+  'VoiceInkAppIdentity|VoiceInkMacOSStorageAlertPresentation|VoiceInkMacOSNavigationDestination|VoiceInkMacOSNavigationRequest|VoiceInkMacOSFileTranscriptionRequest|bundleIdentifier = "com\.prakashjoshipax\.VoiceInk"|loggingSubsystem = "com\.prakashjoshipax\.voiceink"|displayName = "roma just talk"|compactDisplayName = "roma-just-talk"|iOSRecordDeepLinkScheme = "voiceink"|iOSRecordDeepLinkHost = "record"|iCloudContainerIdentifier|iOSAppGroupIdentifier|iOSRecordDeepLinkURL|iOSStopRecordingDarwinNotificationName|iOSRecordingStateChangedDarwinNotificationName|iOSStopRecordingFromKeyboardNotificationName|macOSApplicationSupportDirectory|storageFallbackWarningPresentation|storageFailurePresentation|errorDomain' \
   VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift
+
+require_pattern \
+  "shared macOS navigation request contract lives in VoiceInkCore" \
+  'VoiceInkMacOSNavigationDestination|settings = "Settings"|aiModels = "AI Models"|license = "VoiceInk Pro"|history = "History"|permissions = "Permissions"|enhancement = "Enhancement"|transcribeAudio = "Transcribe Audio"|powerMode = "Power Mode"|notificationName = Notification\.Name\("navigateToDestination"\)|destinationUserInfoKey = "destination"|defaultDestination|destination\(from notification: Notification\)|VoiceInkMacOSFileTranscriptionRequest|notificationName = Notification\.Name\("openFileForTranscription"\)|urlUserInfoKey = "url"|url\(from notification: Notification\)' \
+  VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift
+
+require_pattern \
+  "macOS app notifications use shared navigation request contract" \
+  'navigateToDestination = VoiceInkMacOSNavigationRequest\.notificationName|openFileForTranscription = VoiceInkMacOSFileTranscriptionRequest\.notificationName' \
+  VoiceInk/Notifications/AppNotifications.swift
+
+reject_pattern \
+  "macOS shell avoids duplicate navigation payload key literals" \
+  'userInfo: \["destination"|userInfo\?\["destination"\]|Notification\.Name\("navigateToDestination"\)' \
+  VoiceInk/AppDelegate.swift \
+  VoiceInk/MenuBarManager.swift \
+  VoiceInk/Notifications/AppNotifications.swift \
+  VoiceInk/Services/ImportExportService.swift \
+  VoiceInk/Services/PermissionFlowGuide.swift \
+  VoiceInk/Views/ContentView.swift \
+  VoiceInk/Views/MenuBarView.swift \
+  VoiceInk/Views/MetricsView.swift \
+  VoiceInk/Views/Metrics/MetricsSetupView.swift \
+  VoiceInk/VoiceInk.swift
+
+reject_pattern \
+  "macOS shell avoids duplicate file-transcription payload key literals" \
+  'userInfo: \["url"|userInfo\?\["url"\]|Notification\.Name\("openFileForTranscription"\)' \
+  VoiceInk/AppDelegate.swift \
+  VoiceInk/Notifications/AppNotifications.swift \
+  VoiceInk/Views/AudioTranscribeView.swift \
+  VoiceInk/VoiceInk.swift
 
 require_file VoiceInkCore/Sources/VoiceInkCore/DiagnosticLogExportPolicy.swift
 
@@ -10499,6 +10531,11 @@ reject_pattern \
 require_pattern \
   "core checks execute app identity storage alert tests" \
   'AppIdentityTests\.testMacOSStorageAlertPresentationPreservesStartupCopy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute macOS navigation request contract tests" \
+  'AppIdentityTests\.testMacOSNavigationRequestPreservesDestinationContract|AppIdentityTests\.testMacOSFileTranscriptionRequestPreservesPayloadContract' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \

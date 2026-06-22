@@ -1129,6 +1129,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "StoredAudioFileTests.testRecordingsDirectoryNameMatchesExistingStoragePath", run: { StoredAudioFileTests().testRecordingsDirectoryNameMatchesExistingStoragePath() }),
             VoiceInkCoreCheck(name: "StoredAudioFileTests.testRecordingsDirectoryBuildsUnderBaseDirectory", run: { StoredAudioFileTests().testRecordingsDirectoryBuildsUnderBaseDirectory() }),
             VoiceInkCoreCheck(name: "StoredAudioFileTests.testCreateRecordingsDirectoryCreatesDirectoryUnderBaseDirectory", run: { try StoredAudioFileTests().testCreateRecordingsDirectoryCreatesDirectoryUnderBaseDirectory() }),
+            VoiceInkCoreCheck(name: "StoredAudioFileTests.testIOSStorageDirectoriesUseDocumentsDirectoryForRecordingsAndModels", run: { StoredAudioFileTests().testIOSStorageDirectoriesUseDocumentsDirectoryForRecordingsAndModels() }),
+            VoiceInkCoreCheck(name: "StoredAudioFileTests.testIOSStorageDirectoriesPrepareRecordingAndModelDirectories", run: { try StoredAudioFileTests().testIOSStorageDirectoriesPrepareRecordingAndModelDirectories() }),
             VoiceInkCoreCheck(name: "StoredAudioFileTests.testFileURLBuildsUnderRecordingsDirectory", run: { StoredAudioFileTests().testFileURLBuildsUnderRecordingsDirectory() }),
             VoiceInkCoreCheck(name: "StoredAudioFileTests.testRecordingFileURLUsesMacOSUUIDWAVName", run: { StoredAudioFileTests().testRecordingFileURLUsesMacOSUUIDWAVName() }),
             VoiceInkCoreCheck(name: "StoredAudioFileTests.testTimestampedRecordingFileURLPreservesIOSName", run: { StoredAudioFileTests().testTimestampedRecordingFileURLPreservesIOSName() }),

@@ -339,7 +339,6 @@ reject_ios_storage_duplicate_pattern() {
   local files=()
   local file
   while IFS= read -r file; do
-    [[ "$file" == "iOS/VoiceInk-ios/VoiceInkIOSStorageDirectories.swift" ]] && continue
     files+=("$file")
   done < <(fd -e swift -t f . iOS/VoiceInk-ios iOS/Shared iOS/VoiceInkKeyboard)
 
@@ -423,7 +422,6 @@ in_repo_only_ios_app_files=(
   ProviderAPIKeyTone+iOS.swift
   TranscriptStatusTone+iOS.swift
   Transcription.swift
-  VoiceInkIOSStorageDirectories.swift
 )
 
 xcode_metadata_files=(
@@ -456,27 +454,22 @@ reject_fixed_string \
   "VoiceInk-iOS" \
   "${xcode_metadata_files[@]}"
 
-section "iOS storage adapter stays thin"
-require_file iOS/VoiceInk-ios/VoiceInkIOSStorageDirectories.swift
-require_pattern \
-  "iOS storage adapter derives recordings directory through shared core" \
+section "iOS storage directories live in shared core"
+reject_file iOS/VoiceInk-ios/VoiceInkIOSStorageDirectories.swift
+require_patterns \
+  "shared iOS storage directories live in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/PlatformStorageDirectories.swift \
+  'public enum VoiceInkIOSStorageDirectories' \
   'VoiceInkStoredAudioFile\.recordingsDirectory\(in: documentsDirectory\)' \
-  iOS/VoiceInk-ios/VoiceInkIOSStorageDirectories.swift
-
-require_pattern \
-  "iOS storage adapter prepares recordings directory through shared core" \
-  'VoiceInkStoredAudioFile\.createRecordingsDirectory\(in: documentsDirectory\)' \
-  iOS/VoiceInk-ios/VoiceInkIOSStorageDirectories.swift
-
-require_pattern \
-  "iOS storage adapter derives local model directory through shared core" \
+  'VoiceInkStoredAudioFile\.createRecordingsDirectory' \
   'VoiceInkWhisperModelFiles\.modelsDirectory\(in: documentsDirectory\)' \
-  iOS/VoiceInk-ios/VoiceInkIOSStorageDirectories.swift
+  'VoiceInkWhisperModelFiles\.createModelsDirectory' \
+  'FileManager\.default\.urls\(for: \.(documentDirectory|cachesDirectory),'
 
 require_pattern \
-  "iOS storage adapter prepares local model directory through shared core" \
-  'VoiceInkWhisperModelFiles\.createModelsDirectory\(in: documentsDirectory\)' \
-  iOS/VoiceInk-ios/VoiceInkIOSStorageDirectories.swift
+  "core checks execute iOS storage directory tests" \
+  'testIOSStorageDirectoriesUseDocumentsDirectoryForRecordingsAndModels|testIOSStorageDirectoriesPrepareRecordingAndModelDirectories' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_ios_storage_duplicate_pattern \
   "iOS shell avoids duplicate Documents/Caches directory roots" \

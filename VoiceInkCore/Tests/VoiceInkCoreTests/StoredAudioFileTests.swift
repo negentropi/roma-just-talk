@@ -28,6 +28,38 @@ final class StoredAudioFileTests: XCTestCase {
         XCTAssertEqual(directory.lastPathComponent, "Recordings")
     }
 
+    func testIOSStorageDirectoriesUseDocumentsDirectoryForRecordingsAndModels() {
+        let documentsDirectory = URL(fileURLWithPath: "/tmp/VoiceInk/Documents", isDirectory: true)
+
+        XCTAssertEqual(
+            VoiceInkIOSStorageDirectories.recordingsDirectory(in: documentsDirectory),
+            VoiceInkStoredAudioFile.recordingsDirectory(in: documentsDirectory)
+        )
+        XCTAssertEqual(
+            VoiceInkIOSStorageDirectories.modelsDirectory(in: documentsDirectory),
+            VoiceInkWhisperModelFiles.modelsDirectory(in: documentsDirectory)
+        )
+    }
+
+    func testIOSStorageDirectoriesPrepareRecordingAndModelDirectories() throws {
+        let documentsDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.IOSStorageDirectoriesTests.\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: documentsDirectory) }
+
+        let recordingsDirectory = VoiceInkIOSStorageDirectories.preparedRecordingsDirectory(in: documentsDirectory)
+        let modelsDirectory = VoiceInkIOSStorageDirectories.preparedModelsDirectory(in: documentsDirectory)
+
+        var isDirectory: ObjCBool = false
+        XCTAssertTrue(FileManager.default.fileExists(atPath: recordingsDirectory.path, isDirectory: &isDirectory))
+        XCTAssertTrue(isDirectory.boolValue)
+        XCTAssertEqual(recordingsDirectory.lastPathComponent, VoiceInkStoredAudioFile.recordingsDirectoryName)
+
+        isDirectory = false
+        XCTAssertTrue(FileManager.default.fileExists(atPath: modelsDirectory.path, isDirectory: &isDirectory))
+        XCTAssertTrue(isDirectory.boolValue)
+        XCTAssertEqual(modelsDirectory.lastPathComponent, VoiceInkWhisperModelFiles.modelsDirectoryName)
+    }
+
     func testFileURLBuildsUnderRecordingsDirectory() {
         let recordingsDirectory = URL(fileURLWithPath: "/tmp/VoiceInk/Recordings", isDirectory: true)
 

@@ -36,7 +36,14 @@ enum VoiceInkAppGroupRecordingBridge {
         in defaults: UserDefaults?,
         now: Date = Date()
     ) -> VoiceInkAppGroupRecordingState {
-        VoiceInkAppGroupRecordingStatePolicy.state(
+        recordingStateReadPlan(in: defaults, now: now).state
+    }
+
+    static func recordingStateReadPlan(
+        in defaults: UserDefaults?,
+        now: Date = Date()
+    ) -> VoiceInkAppGroupRecordingStateReadPlan {
+        VoiceInkAppGroupRecordingStatePolicy.readPlan(
             storedIsRecording: defaults?.bool(
                 forKey: VoiceInkAppGroupRecordingStatePolicy.UserDefaultsKey.isRecording
             ) ?? false,
@@ -45,6 +52,13 @@ enum VoiceInkAppGroupRecordingBridge {
             ) ?? 0,
             now: now
         )
+    }
+
+    static func apply(
+        _ mutationPlan: VoiceInkAppGroupRecordingStateMutationPlan,
+        to defaults: UserDefaults?
+    ) {
+        apply(mutationPlan.writePlan, to: defaults)
     }
 
     private static func apply(

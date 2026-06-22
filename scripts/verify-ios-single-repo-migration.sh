@@ -11182,12 +11182,12 @@ require_plist_value \
 
 require_pattern \
   "VoiceInkCore owns iOS App Group recording state policy" \
-  'VoiceInkAppGroupRecordingStatePolicy|staleRecordingInterval|UserDefaultsKey' \
+  'VoiceInkAppGroupRecordingStatePolicy|staleRecordingInterval|UserDefaultsKey|VoiceInkAppGroupRecordingStateReadPlan|staleStateRepairMutationPlan' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
 require_pattern \
   "VoiceInkCore checks cover iOS App Group recording state policy" \
-  'testAppGroupRecordingStatePolicy(PreservesIOSStorageKeysAndTimeout|KeepsFreshRecordingActive|ClearsStaleRecording|DoesNotClearInactiveRecording)|testAppGroupRecordingState(WritePlansPreserveIOSBridgeWrites|MutationPlansPreserveIOSBridgeNotifications)' \
+  'testAppGroupRecordingStatePolicy(PreservesIOSStorageKeysAndTimeout|KeepsFreshRecordingActive|ClearsStaleRecording|DoesNotClearInactiveRecording)|testAppGroupRecordingState(WritePlansPreserveIOSBridgeWrites|MutationPlansPreserveIOSBridgeNotifications)|testAppGroupRecordingStateReadPlan(DoesNotRepairFreshRecording|OwnsStaleRepairMutation)' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -11297,8 +11297,13 @@ require_pattern \
 
 require_pattern \
   "iOS App Group bridge adapts shared recording state policy" \
-  'VoiceInkAppGroupRecordingStatePolicy\.(state|stopRequestedMutationPlan|recordingStateMutationPlan)' \
+  'VoiceInkAppGroupRecordingStatePolicy\.(readPlan|stopRequestedMutationPlan|recordingStateMutationPlan)' \
   iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
+
+require_pattern \
+  "iOS App Group coordinator applies shared stale repair mutation plan" \
+  'staleStateRepairMutationPlan|VoiceInkAppGroupRecordingBridge\.apply\(mutationPlan' \
+  iOS/Shared/AppGroupCoordinator.swift
 
 require_pattern \
   "VoiceInkCore owns App Group recording mutation notification plan" \
@@ -11307,13 +11312,18 @@ require_pattern \
 
 require_pattern \
   "iOS App Group bridge tests use shared recording state policy" \
-  'VoiceInkAppGroupRecordingStatePolicy\.(staleRecordingInterval|UserDefaultsKey)' \
+  'VoiceInkAppGroupRecordingStatePolicy\.(staleRecordingInterval|UserDefaultsKey|recordingStateMutationPlan)' \
   iOS/VoiceInk-iosTests/VoiceInk_iosTests.swift
 
 reject_pattern \
   "iOS App Group bridge avoids shell-owned recording state policy" \
-  'struct VoiceInkAppGroupRecordingState|staleRecordingInterval|enum UserDefaultsKey|static let (isRecording|lastRecordingTimestamp) = "' \
+  'struct VoiceInkAppGroupRecordingState|staleRecordingInterval|enum UserDefaultsKey|static let (isRecording|lastRecordingTimestamp) = "|shouldClearStaleState' \
   iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
+
+reject_pattern \
+  "iOS App Group coordinator avoids shell-owned stale-state repair mutation" \
+  'updateRecordingState\(false\)' \
+  iOS/Shared/AppGroupCoordinator.swift
 
 reject_pattern \
   "iOS App Group bridge tests avoid shell-owned policy aliases" \

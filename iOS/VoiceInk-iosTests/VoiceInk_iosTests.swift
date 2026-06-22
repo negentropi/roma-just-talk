@@ -126,14 +126,36 @@ final class VoiceInkIOSTests: XCTestCase {
     func testAppGroupRecordingBridgeMarksStaleRecordingStateForClearing() throws {
         let defaults = try makeIsolatedDefaults()
         let timestamp = Date(timeIntervalSince1970: 100)
-
-        VoiceInkAppGroupRecordingBridge.writeRecordingState(true, to: defaults, now: timestamp)
-        let state = VoiceInkAppGroupRecordingBridge.recordingState(
-            in: defaults,
-            now: timestamp.addingTimeInterval(VoiceInkAppGroupRecordingStatePolicy.staleRecordingInterval + 1)
+        let staleReadTime = timestamp.addingTimeInterval(
+            VoiceInkAppGroupRecordingStatePolicy.staleRecordingInterval + 1
         )
 
-        XCTAssertEqual(state, VoiceInkAppGroupRecordingState(isRecording: false, shouldClearStaleState: true))
+        VoiceInkAppGroupRecordingBridge.writeRecordingState(true, to: defaults, now: timestamp)
+        let readPlan = VoiceInkAppGroupRecordingBridge.recordingStateReadPlan(
+            in: defaults,
+            now: staleReadTime
+        )
+
+        XCTAssertEqual(
+            readPlan.state,
+            VoiceInkAppGroupRecordingState(isRecording: false, shouldClearStaleState: true)
+        )
+        XCTAssertEqual(
+            readPlan.staleStateRepairMutationPlan,
+            VoiceInkAppGroupRecordingStatePolicy.recordingStateMutationPlan(
+                isRecording: false,
+                now: staleReadTime
+            )
+        )
+
+        let repairPlan = try XCTUnwrap(readPlan.staleStateRepairMutationPlan)
+        VoiceInkAppGroupRecordingBridge.apply(repairPlan, to: defaults)
+
+        XCTAssertFalse(defaults.bool(forKey: VoiceInkAppGroupRecordingStatePolicy.UserDefaultsKey.isRecording))
+        XCTAssertEqual(
+            defaults.double(forKey: VoiceInkAppGroupRecordingStatePolicy.UserDefaultsKey.lastRecordingTimestamp),
+            staleReadTime.timeIntervalSince1970
+        )
     }
 
     func testAppGroupRecordingBridgeStopRequestRefreshesTimestampWithoutChangingRecordingFlag() throws {

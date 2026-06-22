@@ -243,6 +243,19 @@ public struct VoiceInkAppGroupRecordingStateMutationPlan: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkAppGroupRecordingStateReadPlan: Equatable, Sendable {
+    public let state: VoiceInkAppGroupRecordingState
+    public let staleStateRepairMutationPlan: VoiceInkAppGroupRecordingStateMutationPlan?
+
+    public init(
+        state: VoiceInkAppGroupRecordingState,
+        staleStateRepairMutationPlan: VoiceInkAppGroupRecordingStateMutationPlan?
+    ) {
+        self.state = state
+        self.staleStateRepairMutationPlan = staleStateRepairMutationPlan
+    }
+}
+
 public enum VoiceInkAppGroupRecordingStatePolicy {
     public static let staleRecordingInterval: TimeInterval = 30
 
@@ -305,6 +318,29 @@ public enum VoiceInkAppGroupRecordingStatePolicy {
         return VoiceInkAppGroupRecordingState(
             isRecording: !isStale,
             shouldClearStaleState: isStale
+        )
+    }
+
+    public static func readPlan(
+        storedIsRecording: Bool,
+        lastRecordingTimestamp: TimeInterval,
+        now: Date = Date()
+    ) -> VoiceInkAppGroupRecordingStateReadPlan {
+        let currentState = state(
+            storedIsRecording: storedIsRecording,
+            lastRecordingTimestamp: lastRecordingTimestamp,
+            now: now
+        )
+        let repairMutationPlan: VoiceInkAppGroupRecordingStateMutationPlan?
+        if currentState.shouldClearStaleState {
+            repairMutationPlan = recordingStateMutationPlan(isRecording: false, now: now)
+        } else {
+            repairMutationPlan = nil
+        }
+
+        return VoiceInkAppGroupRecordingStateReadPlan(
+            state: currentState,
+            staleStateRepairMutationPlan: repairMutationPlan
         )
     }
 }

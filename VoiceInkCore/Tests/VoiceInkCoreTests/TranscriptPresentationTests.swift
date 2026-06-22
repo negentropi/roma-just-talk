@@ -201,6 +201,55 @@ final class TranscriptPresentationTests: XCTestCase {
         XCTAssertFalse(selection.contains(fetchedDuplicate))
     }
 
+    func testHistoryDeletionPolicyPlansSelectedTargetsAndClearsSelection() {
+        let first = HistorySelectionItem(id: 1, label: "first")
+        let second = HistorySelectionItem(id: 2, label: "second")
+
+        let plan = VoiceInkHistoryDeletionPolicy.selectedItemsDeletionPlan(
+            selectedItems: Set([first, second]),
+            id: \.id
+        )
+
+        XCTAssertEqual(Set(plan.targets), Set([first, second]))
+        XCTAssertTrue(plan.remainingSelection.isEmpty)
+        XCTAssertEqual(plan.targetIDs, Set([1, 2]))
+    }
+
+    func testHistoryDeletionPolicyPreservesUnselectedItemsWhenDeletingSubset() {
+        let selected = HistorySelectionItem(id: 1, label: "selected")
+        let kept = HistorySelectionItem(id: 2, label: "kept")
+
+        let plan = VoiceInkHistoryDeletionPolicy.deleting(
+            [selected],
+            from: Set([selected, kept]),
+            id: \.id
+        )
+
+        XCTAssertEqual(plan.targets, [selected])
+        XCTAssertEqual(plan.remainingSelection, Set([kept]))
+        XCTAssertEqual(plan.targetIDs, Set([selected.id]))
+    }
+
+    func testHistoryDeletionPolicyRepairsFocusedItemAndIDsSeparately() {
+        let visible = HistorySelectionItem(id: 1, label: "visible")
+        let sameIDFetchedInstance = HistorySelectionItem(id: 1, label: "fetched")
+        let hidden = HistorySelectionItem(id: 2, label: "hidden")
+
+        let plan = VoiceInkHistoryDeletionPolicy.deleting(
+            [visible],
+            from: Set([visible, hidden]),
+            id: \.id
+        )
+
+        XCTAssertTrue(plan.deletesItem(visible))
+        XCTAssertFalse(plan.deletesItem(sameIDFetchedInstance))
+        XCTAssertTrue(plan.deletesID(sameIDFetchedInstance.id))
+        XCTAssertFalse(plan.deletesItem(hidden))
+        XCTAssertFalse(plan.deletesID(hidden.id))
+        XCTAssertFalse(plan.deletesItem(nil))
+        XCTAssertFalse(plan.deletesID(nil))
+    }
+
     func testHistoryDeleteConfirmationPresentationPreservesMacOSAlertCopy() {
         XCTAssertEqual(VoiceInkHistoryPresentation.deleteConfirmationTitle, "Delete Selected Items?")
         XCTAssertEqual(VoiceInkHistoryPresentation.deleteConfirmationPrimaryButtonTitle, "Delete")

@@ -387,6 +387,56 @@ public enum VoiceInkHistorySelectionPolicy {
     }
 }
 
+public struct VoiceInkHistoryDeletionPlan<Item: Hashable, ID: Hashable> {
+    public let targets: [Item]
+    public let remainingSelection: Set<Item>
+    public let targetIDs: Set<ID>
+    private let targetItems: Set<Item>
+
+    init(
+        targets: [Item],
+        remainingSelection: Set<Item>,
+        targetIDs: Set<ID>
+    ) {
+        self.targets = targets
+        self.remainingSelection = remainingSelection
+        self.targetIDs = targetIDs
+        self.targetItems = Set(targets)
+    }
+
+    public func deletesItem(_ item: Item?) -> Bool {
+        guard let item else { return false }
+        return targetItems.contains(item)
+    }
+
+    public func deletesID(_ id: ID?) -> Bool {
+        guard let id else { return false }
+        return targetIDs.contains(id)
+    }
+}
+
+public enum VoiceInkHistoryDeletionPolicy {
+    public static func selectedItemsDeletionPlan<Item: Hashable, ID: Hashable>(
+        selectedItems: Set<Item>,
+        id: (Item) -> ID
+    ) -> VoiceInkHistoryDeletionPlan<Item, ID> {
+        deleting(Array(selectedItems), from: selectedItems, id: id)
+    }
+
+    public static func deleting<Item: Hashable, ID: Hashable>(
+        _ targets: [Item],
+        from selectedItems: Set<Item>,
+        id: (Item) -> ID
+    ) -> VoiceInkHistoryDeletionPlan<Item, ID> {
+        let targetItems = Set(targets)
+        return VoiceInkHistoryDeletionPlan(
+            targets: targets,
+            remainingSelection: selectedItems.subtracting(targetItems),
+            targetIDs: Set(targets.map(id))
+        )
+    }
+}
+
 public enum VoiceInkTranscriptPresentation {
     public static let pendingDisplayText = "New transcription"
     public static let failedDisplayText = "Transcription failed - tap to retry"

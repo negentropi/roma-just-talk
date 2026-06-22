@@ -420,30 +420,34 @@ struct InlineHistoryView: View {
         )
     }
 
-    private func performDeletion(for transcription: Transcription) {
+    private func deleteTranscriptionRecord(_ transcription: Transcription) {
         do {
             try transcription.deleteExistingAudioFile()
         } catch {
             print(VoiceInkStoredAudioFile.deletionErrorMessage(for: error))
         }
 
-        if expandedId == transcription.id {
-            expandedId = nil
-        }
-        if panelTranscriptionId == transcription.id {
-            panelTranscriptionId = nil
-            isPanelPresented = false
-        }
-
-        selectedTranscriptions.remove(transcription)
         modelContext.delete(transcription)
     }
 
     private func deleteSelectedTranscriptions() {
-        for transcription in selectedTranscriptions {
-            performDeletion(for: transcription)
+        let deletionPlan = VoiceInkHistoryDeletionPolicy.selectedItemsDeletionPlan(
+            selectedItems: selectedTranscriptions,
+            id: \.id
+        )
+
+        for transcription in deletionPlan.targets {
+            deleteTranscriptionRecord(transcription)
         }
-        selectedTranscriptions.removeAll()
+
+        if deletionPlan.deletesID(expandedId) {
+            expandedId = nil
+        }
+        if deletionPlan.deletesID(panelTranscriptionId) {
+            panelTranscriptionId = nil
+            isPanelPresented = false
+        }
+        selectedTranscriptions = deletionPlan.remainingSelection
 
         Task {
             do {

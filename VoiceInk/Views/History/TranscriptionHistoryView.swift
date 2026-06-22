@@ -411,18 +411,13 @@ struct TranscriptionHistoryView: View {
         isLoading = plan.isLoading
     }
 
-    private func performDeletion(for transcription: Transcription) {
+    private func deleteTranscriptionRecord(_ transcription: Transcription) {
         do {
             try transcription.deleteExistingAudioFile()
         } catch {
             print(VoiceInkStoredAudioFile.deletionErrorMessage(for: error))
         }
 
-        if selectedTranscription == transcription {
-            selectedTranscription = nil
-        }
-
-        selectedTranscriptions.remove(transcription)
         modelContext.delete(transcription)
     }
 
@@ -438,10 +433,19 @@ struct TranscriptionHistoryView: View {
     }
 
     private func deleteSelectedTranscriptions() {
-        for transcription in selectedTranscriptions {
-            performDeletion(for: transcription)
+        let deletionPlan = VoiceInkHistoryDeletionPolicy.selectedItemsDeletionPlan(
+            selectedItems: selectedTranscriptions,
+            id: \.id
+        )
+
+        for transcription in deletionPlan.targets {
+            deleteTranscriptionRecord(transcription)
         }
-        selectedTranscriptions.removeAll()
+
+        if deletionPlan.deletesItem(selectedTranscription) {
+            selectedTranscription = nil
+        }
+        selectedTranscriptions = deletionPlan.remainingSelection
 
         Task {
             await saveAndReload()

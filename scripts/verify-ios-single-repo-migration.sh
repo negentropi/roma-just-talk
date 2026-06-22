@@ -306,6 +306,17 @@ reject_pattern() {
   fi
 }
 
+reject_fixed_string() {
+  local description="$1"
+  local needle="$2"
+  shift 2
+
+  section "$description"
+  if rg -n -F "$needle" "$@"; then
+    fail "$description"
+  fi
+}
+
 reject_context_pattern() {
   local description="$1"
   local anchor="$2"
@@ -413,6 +424,14 @@ reject_file iOS/VoiceInk-ios/KeychainService.swift
 section "obsolete iOS clone-side duplicates stay deleted"
 for file in "${obsolete_ios_clone_files[@]}"; do
   reject_file "iOS/VoiceInk-ios/$file"
+done
+
+section "iOS project avoids obsolete clone-side source references"
+for file in "${obsolete_ios_clone_files[@]}" VoiceInk_iosUITestsLaunchTests.swift; do
+  reject_fixed_string \
+    "iOS project avoids obsolete clone-side source reference $file" \
+    "$file" \
+    iOS/VoiceInk-ios.xcodeproj/project.pbxproj
 done
 
 section "sibling iOS clone extras are documented obsolete files"

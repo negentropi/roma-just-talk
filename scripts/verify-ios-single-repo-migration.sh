@@ -5889,6 +5889,16 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \
+  "shared macOS AI API-key verification request plan lives in VoiceInkCore" \
+  'VoiceInkAIEnhancementAPIKeyVerificationRequestPlan|verificationRequestPlan|resolvedKeyToVerify|immediateResult' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+require_pattern \
+  "core checks execute shared macOS AI API-key verification request plan test" \
+  'AIProviderCatalogTests\.testMacOSAIEnhancementAPIKeyVerificationRequestPlanIsShared' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "shared macOS AI API-key clear plan lives in VoiceInkCore" \
   'VoiceInkAIEnhancementAPIKeyClearPlan|credentialStateAfterClear|clearing\(provider:' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
@@ -5904,9 +5914,19 @@ require_pattern \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 require_pattern \
+  "macOS AI service starts API-key verification through shared request plan" \
+  'verificationRequestPlan\(\)|resolvedKeyToVerify\(from:' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+require_pattern \
   "macOS AI service applies API-key clear through shared plan" \
   'VoiceInkAIEnhancementAPIKeyClearPlan\.clearing|applyTextEnhancementAPIKeyClearPlan|credentialStateAfterClear' \
   VoiceInk/Services/AIEnhancement/AIService.swift
+
+require_pattern \
+  "migration checklist tracks shared macOS AI API-key verification request plan" \
+  'verification-request planning.*VoiceInkAIEnhancementAPIKeyVerificationRequestPlan' \
+  docs/ios-single-repo-migration.md
 
 require_pattern \
   "migration checklist tracks shared macOS AI API-key clear plan" \
@@ -5921,6 +5941,11 @@ require_pattern \
 reject_pattern \
   "macOS AI service avoids shell-owned verified-key persistence sequencing" \
   'plan\.keyToSave|saveAPIKey\(keyToSave' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+reject_pattern \
+  "macOS AI service avoids shell-owned API-key verification start policy" \
+  'resolvedVerificationCandidate|missingVerificationCandidateMessage|guard selectedProvider\.requiresUserAPIKey' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 reject_pattern \

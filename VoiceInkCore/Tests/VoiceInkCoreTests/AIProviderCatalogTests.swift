@@ -211,6 +211,46 @@ final class AIProviderCatalogTests: XCTestCase {
         XCTAssertNil(draft.resolvedVerificationCandidate(environment: [:]))
     }
 
+    func testMacOSAIEnhancementAPIKeyVerificationRequestPlanIsShared() {
+        let environmentDraft = VoiceInkAIEnhancementAPIKeyDraft(
+            provider: .groq,
+            enteredKey: " $GROQ_API_KEY "
+        )
+        let missingDraft = VoiceInkAIEnhancementAPIKeyDraft(
+            provider: .groq,
+            enteredKey: " $MISSING_GROQ_KEY "
+        )
+        let noKeyProviderDraft = VoiceInkAIEnhancementAPIKeyDraft(
+            provider: .ollama,
+            enteredKey: "ignored-key"
+        )
+
+        XCTAssertEqual(
+            environmentDraft.verificationRequestPlan(environment: ["GROQ_API_KEY": "resolved-key"]),
+            VoiceInkAIEnhancementAPIKeyVerificationRequestPlan(
+                resolvedKeyToVerify: "resolved-key",
+                immediateResult: nil
+            )
+        )
+        XCTAssertEqual(
+            missingDraft.verificationRequestPlan(environment: [:]),
+            VoiceInkAIEnhancementAPIKeyVerificationRequestPlan(
+                resolvedKeyToVerify: nil,
+                immediateResult: VoiceInkAPIKeyVerificationResult(
+                    isValid: false,
+                    errorMessage: VoiceInkAIEnhancementProviderKind.missingVerificationCandidateMessage
+                )
+            )
+        )
+        XCTAssertEqual(
+            noKeyProviderDraft.verificationRequestPlan(environment: [:]),
+            VoiceInkAIEnhancementAPIKeyVerificationRequestPlan(
+                resolvedKeyToVerify: nil,
+                immediateResult: VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: nil)
+            )
+        )
+    }
+
     func testMacOSAIEnhancementAPIKeyVerificationPlanSavesEnteredReferenceAndAppliesResolvedRuntimeKey() {
         let draft = VoiceInkAIEnhancementAPIKeyDraft(
             provider: .groq,

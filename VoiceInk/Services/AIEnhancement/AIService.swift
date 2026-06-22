@@ -133,17 +133,11 @@ class AIService: ObservableObject {
     }
     
     func saveAPIKey(_ key: String, completion: @escaping (VoiceInkAPIKeyVerificationResult) -> Void) {
-        guard selectedProvider.requiresUserAPIKey else {
-            completion(VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: nil))
-            return
-        }
-
         let draft = apiKeyDraft(for: key)
-        guard let resolvedKey = draft.resolvedVerificationCandidate() else {
-            completion(VoiceInkAPIKeyVerificationResult(
-                isValid: false,
-                errorMessage: VoiceInkAIEnhancementProviderKind.missingVerificationCandidateMessage
-            ))
+        guard let resolvedKey = resolvedKeyToVerify(
+            from: draft.verificationRequestPlan(),
+            completion: completion
+        ) else {
             return
         }
 
@@ -174,16 +168,11 @@ class AIService: ObservableObject {
     }
     
     func verifyAPIKey(_ key: String, completion: @escaping (VoiceInkAPIKeyVerificationResult) -> Void) {
-        guard selectedProvider.requiresUserAPIKey else {
-            completion(VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: nil))
-            return
-        }
-
-        guard let resolvedKey = apiKeyDraft(for: key).resolvedVerificationCandidate() else {
-            completion(VoiceInkAPIKeyVerificationResult(
-                isValid: false,
-                errorMessage: VoiceInkAIEnhancementProviderKind.missingVerificationCandidateMessage
-            ))
+        let draft = apiKeyDraft(for: key)
+        guard let resolvedKey = resolvedKeyToVerify(
+            from: draft.verificationRequestPlan(),
+            completion: completion
+        ) else {
             return
         }
 
@@ -195,6 +184,18 @@ class AIService: ObservableObject {
             provider: selectedProvider,
             enteredKey: key
         )
+    }
+
+    private func resolvedKeyToVerify(
+        from plan: VoiceInkAIEnhancementAPIKeyVerificationRequestPlan,
+        completion: @escaping (VoiceInkAPIKeyVerificationResult) -> Void
+    ) -> String? {
+        if let immediateResult = plan.immediateResult {
+            completion(immediateResult)
+            return nil
+        }
+
+        return plan.resolvedKeyToVerify
     }
 
     private func verifyResolvedAPIKey(

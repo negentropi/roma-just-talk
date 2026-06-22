@@ -257,6 +257,32 @@ public struct VoiceInkAIEnhancementAPIKeyDraft: Equatable, Sendable {
         return VoiceInkAPIKeyReference.resolvedValue(candidate, environment: environment)
     }
 
+    public func verificationRequestPlan(
+        environment: [String: String] = ProcessInfo.processInfo.environment
+    ) -> VoiceInkAIEnhancementAPIKeyVerificationRequestPlan {
+        guard provider.requiresUserAPIKey else {
+            return VoiceInkAIEnhancementAPIKeyVerificationRequestPlan(
+                resolvedKeyToVerify: nil,
+                immediateResult: VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: nil)
+            )
+        }
+
+        guard let resolvedKey = resolvedVerificationCandidate(environment: environment) else {
+            return VoiceInkAIEnhancementAPIKeyVerificationRequestPlan(
+                resolvedKeyToVerify: nil,
+                immediateResult: VoiceInkAPIKeyVerificationResult(
+                    isValid: false,
+                    errorMessage: VoiceInkAIEnhancementProviderKind.missingVerificationCandidateMessage
+                )
+            )
+        }
+
+        return VoiceInkAIEnhancementAPIKeyVerificationRequestPlan(
+            resolvedKeyToVerify: resolvedKey,
+            immediateResult: nil
+        )
+    }
+
     public func verificationApplicationPlan(
         for result: VoiceInkAPIKeyVerificationResult,
         resolvedRuntimeKey: String
@@ -285,6 +311,19 @@ public struct VoiceInkAIEnhancementAPIKeyDraft: Equatable, Sendable {
             keyToSave: keyToSaveAfterSuccessfulVerification,
             errorMessage: nil
         )
+    }
+}
+
+public struct VoiceInkAIEnhancementAPIKeyVerificationRequestPlan: Equatable, Sendable {
+    public let resolvedKeyToVerify: String?
+    public let immediateResult: VoiceInkAPIKeyVerificationResult?
+
+    public init(
+        resolvedKeyToVerify: String?,
+        immediateResult: VoiceInkAPIKeyVerificationResult?
+    ) {
+        self.resolvedKeyToVerify = resolvedKeyToVerify
+        self.immediateResult = immediateResult
     }
 }
 

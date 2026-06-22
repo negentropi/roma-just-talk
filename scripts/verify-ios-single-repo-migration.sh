@@ -8974,8 +8974,23 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AudioSessionLifecycleState.swift
 
 require_pattern \
+  "shared audio-session diagnostics live in VoiceInkCore" \
+  'VoiceInkAudioSessionDiagnostics|activatedForRecordingMessage|activationFailedMessage|deactivationScheduledMessage|deactivatedMessage|deactivationFailedMessage' \
+  VoiceInkCore/Sources/VoiceInkCore/AudioSessionLifecycleState.swift
+
+require_pattern \
+  "VoiceInkCore check runner executes audio-session diagnostics proof" \
+  'testAudioSessionDiagnosticsPreserveIOSLogCopy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "iOS audio-session manager uses shared lifecycle state" \
   'VoiceInkAudioSessionLifecycleState|lifecycleState' \
+  iOS/VoiceInk-ios/AudioSessionManager.swift
+
+require_pattern \
+  "iOS audio-session manager adapts shared diagnostics" \
+  'VoiceInkAudioSessionDiagnostics\.(activatedForRecordingMessage|activationFailedMessage|deactivationScheduledMessage|deactivatedMessage|deactivationFailedMessage)' \
   iOS/VoiceInk-ios/AudioSessionManager.swift
 
 require_pattern \
@@ -9001,6 +9016,11 @@ reject_pattern \
 reject_pattern \
   "iOS audio-session manager avoids shell-owned lifecycle state mutation" \
   '@Published var +(isSessionActive|timeoutRemaining)|isSessionActive =|timeoutRemaining =' \
+  iOS/VoiceInk-ios/AudioSessionManager.swift
+
+reject_pattern \
+  "iOS audio-session manager avoids shell-owned diagnostic copy" \
+  '"(Audio session activated for recording|Audio session activation failed:|Audio session deactivation scheduled in|Audio session deactivated|Failed to deactivate audio session:)' \
   iOS/VoiceInk-ios/AudioSessionManager.swift
 
 require_pattern \

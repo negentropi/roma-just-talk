@@ -2,6 +2,32 @@ import Foundation
 @testable import VoiceInkCore
 
 final class AudioSessionLifecycleStateTests: XCTestCase {
+    func testAudioSessionDiagnosticsPreserveIOSLogCopy() {
+        XCTAssertEqual(
+            VoiceInkAudioSessionDiagnostics.activatedForRecordingMessage,
+            "Audio session activated for recording"
+        )
+        XCTAssertEqual(
+            VoiceInkAudioSessionDiagnostics.activationFailedMessage(
+                localizedDescription: "denied",
+                code: 561_017_449
+            ),
+            "Audio session activation failed: denied (code: 561017449)"
+        )
+        XCTAssertEqual(
+            VoiceInkAudioSessionDiagnostics.deactivationScheduledMessage(seconds: 30),
+            "Audio session deactivation scheduled in 30 seconds"
+        )
+        XCTAssertEqual(
+            VoiceInkAudioSessionDiagnostics.deactivatedMessage,
+            "Audio session deactivated"
+        )
+        XCTAssertEqual(
+            VoiceInkAudioSessionDiagnostics.deactivationFailedMessage(localizedDescription: "busy"),
+            "Failed to deactivate audio session: busy"
+        )
+    }
+
     func testAudioSessionLifecycleStatePreservesIOSActivationAndTimeoutFlow() {
         var state = VoiceInkAudioSessionLifecycleState()
 

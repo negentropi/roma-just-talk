@@ -1,5 +1,22 @@
 import Foundation
 
+public enum VoiceInkAudioSessionDiagnostics {
+    public static let activatedForRecordingMessage = "Audio session activated for recording"
+    public static let deactivatedMessage = "Audio session deactivated"
+
+    public static func activationFailedMessage(localizedDescription: String, code: Int) -> String {
+        "Audio session activation failed: \(localizedDescription) (code: \(code))"
+    }
+
+    public static func deactivationScheduledMessage(seconds: Int) -> String {
+        "Audio session deactivation scheduled in \(seconds) seconds"
+    }
+
+    public static func deactivationFailedMessage(localizedDescription: String) -> String {
+        "Failed to deactivate audio session: \(localizedDescription)"
+    }
+}
+
 public struct VoiceInkAudioSessionLifecycleState: Equatable, Sendable {
     public private(set) var isSessionActive: Bool
     public private(set) var timeoutRemaining: TimeInterval

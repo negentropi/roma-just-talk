@@ -43,10 +43,10 @@ final class AudioSessionManager: ObservableObject {
             lifecycleState.markActivatedForRecording()
             cancelScheduledDeactivation()
             
-            VoiceInkIOSLogger.audioSession.notice("Audio session activated for recording")
+            VoiceInkIOSLogger.audioSession.notice("\(VoiceInkAudioSessionDiagnostics.activatedForRecordingMessage, privacy: .public)")
             
         } catch let error as NSError {
-            VoiceInkIOSLogger.audioSession.error("Audio session activation failed: \(error.localizedDescription, privacy: .public) (code: \(error.code, privacy: .public))")
+            VoiceInkIOSLogger.audioSession.error("\(VoiceInkAudioSessionDiagnostics.activationFailedMessage(localizedDescription: error.localizedDescription, code: error.code), privacy: .public)")
             throw error
         }
     }
@@ -82,7 +82,7 @@ final class AudioSessionManager: ObservableObject {
             }
         }
         
-        VoiceInkIOSLogger.audioSession.notice("Audio session deactivation scheduled in \(Int(lifecycleState.timeoutRemaining), privacy: .public) seconds")
+        VoiceInkIOSLogger.audioSession.notice("\(VoiceInkAudioSessionDiagnostics.deactivationScheduledMessage(seconds: Int(lifecycleState.timeoutRemaining)), privacy: .public)")
     }
     
     /// Immediately deactivates the session
@@ -94,9 +94,9 @@ final class AudioSessionManager: ObservableObject {
         do {
             try AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
             lifecycleState.markDeactivated()
-            VoiceInkIOSLogger.audioSession.notice("Audio session deactivated")
+            VoiceInkIOSLogger.audioSession.notice("\(VoiceInkAudioSessionDiagnostics.deactivatedMessage, privacy: .public)")
         } catch {
-            VoiceInkIOSLogger.audioSession.error("Failed to deactivate audio session: \(error.localizedDescription, privacy: .public)")
+            VoiceInkIOSLogger.audioSession.error("\(VoiceInkAudioSessionDiagnostics.deactivationFailedMessage(localizedDescription: error.localizedDescription), privacy: .public)")
         }
     }
     

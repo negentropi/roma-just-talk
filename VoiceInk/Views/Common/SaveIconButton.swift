@@ -8,14 +8,24 @@ struct SaveIconButton: View {
 
     var body: some View {
         Menu {
-            Button("Save as TXT") {
-                saveFile(as: .plainText, extension: "txt")
+            Button(VoiceInkTranscriptPresentation.saveTranscriptAsPlainTextButtonTitle) {
+                saveFile(
+                    as: .plainText,
+                    extension: VoiceInkTranscriptFileExport.plainTextFileExtension
+                )
             }
-            Button("Save as MD") {
-                saveFile(as: .text, extension: "md")
+            Button(VoiceInkTranscriptPresentation.saveTranscriptAsMarkdownButtonTitle) {
+                saveFile(
+                    as: .text,
+                    extension: VoiceInkTranscriptFileExport.markdownFileExtension
+                )
             }
         } label: {
-            Image(systemName: saved ? "checkmark" : "square.and.arrow.down")
+            Image(
+                systemName: saved
+                    ? VoiceInkTranscriptPresentation.actionSucceededSystemImageName
+                    : VoiceInkTranscriptPresentation.saveTranscriptSystemImageName
+            )
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundColor(saved ? .green : .secondary)
                 .frame(width: 28, height: 28)
@@ -23,19 +33,19 @@ struct SaveIconButton: View {
                 .clipShape(Circle())
         }
         .buttonStyle(.plain)
-        .help("Save to file")
+        .help(VoiceInkTranscriptPresentation.saveTranscriptHelp)
     }
 
     private func saveFile(as contentType: UTType, extension fileExtension: String) {
         let panel = NSSavePanel()
         panel.allowedContentTypes = [contentType]
         panel.nameFieldStringValue = "\(VoiceInkTranscriptFileExport.suggestedBaseFilename(for: textToSave)).\(fileExtension)"
-        panel.title = "Save Transcription"
+        panel.title = VoiceInkTranscriptPresentation.saveTranscriptPanelTitle
 
         if panel.runModal() == .OK {
             guard let url = panel.url else { return }
             do {
-                let content = fileExtension == "md"
+                let content = fileExtension == VoiceInkTranscriptFileExport.markdownFileExtension
                     ? VoiceInkTranscriptFileExport.markdownContent(for: textToSave)
                     : textToSave
                 try content.write(to: url, atomically: true, encoding: .utf8)
@@ -44,7 +54,7 @@ struct SaveIconButton: View {
                     withAnimation { saved = false }
                 }
             } catch {
-                print("Failed to save file: \(error.localizedDescription)")
+                print("\(VoiceInkTranscriptPresentation.saveTranscriptFailureConsolePrefix) \(error.localizedDescription)")
             }
         }
     }

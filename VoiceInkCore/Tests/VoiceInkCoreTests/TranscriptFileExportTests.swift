@@ -2,6 +2,11 @@ import Foundation
 @testable import VoiceInkCore
 
 final class TranscriptFileExportTests: XCTestCase {
+    func testTranscriptFileExportPreservesMacOSFileExtensions() {
+        XCTAssertEqual(VoiceInkTranscriptFileExport.plainTextFileExtension, "txt")
+        XCTAssertEqual(VoiceInkTranscriptFileExport.markdownFileExtension, "md")
+    }
+
     func testSuggestedBaseFilenameUsesFallbackForBlankOrPunctuationOnlyText() {
         XCTAssertEqual(
             VoiceInkTranscriptFileExport.suggestedBaseFilename(for: " \n\t "),

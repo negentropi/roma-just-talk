@@ -2,6 +2,8 @@ import Foundation
 
 public enum VoiceInkTranscriptFileExport {
     public static let defaultBaseFilename = "transcription"
+    public static let plainTextFileExtension = "txt"
+    public static let markdownFileExtension = "md"
 
     public static func suggestedBaseFilename(for text: String) -> String {
         let cleanedText = text

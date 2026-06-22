@@ -812,6 +812,17 @@ final class TranscriptPresentationTests: XCTestCase {
         XCTAssertEqual(VoiceInkTranscriptPresentation.retryTranscriptionSystemImageName, "arrow.clockwise")
     }
 
+    func testTranscriptActionControlPresentationPreservesMacOSCopyAndSaveCopy() {
+        XCTAssertEqual(VoiceInkTranscriptPresentation.actionSucceededSystemImageName, "checkmark")
+        XCTAssertEqual(VoiceInkTranscriptPresentation.copyToClipboardHelp, "Copy to clipboard")
+        XCTAssertEqual(VoiceInkTranscriptPresentation.saveTranscriptSystemImageName, "square.and.arrow.down")
+        XCTAssertEqual(VoiceInkTranscriptPresentation.saveTranscriptAsPlainTextButtonTitle, "Save as TXT")
+        XCTAssertEqual(VoiceInkTranscriptPresentation.saveTranscriptAsMarkdownButtonTitle, "Save as MD")
+        XCTAssertEqual(VoiceInkTranscriptPresentation.saveTranscriptHelp, "Save to file")
+        XCTAssertEqual(VoiceInkTranscriptPresentation.saveTranscriptPanelTitle, "Save Transcription")
+        XCTAssertEqual(VoiceInkTranscriptPresentation.saveTranscriptFailureConsolePrefix, "Failed to save file:")
+    }
+
     func testLastTranscriptionPresentationPreservesMacOSNotificationCopy() {
         XCTAssertEqual(VoiceInkTranscriptPresentation.noTranscriptionAvailableTitle, "No transcription available")
         XCTAssertEqual(VoiceInkTranscriptPresentation.lastTranscriptionCopiedTitle, "Last transcription copied")

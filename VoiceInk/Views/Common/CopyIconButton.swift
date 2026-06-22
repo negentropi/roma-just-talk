@@ -1,4 +1,5 @@
 import SwiftUI
+import VoiceInkCore
 
 struct CopyIconButton: View {
     let textToCopy: String
@@ -6,7 +7,11 @@ struct CopyIconButton: View {
 
     var body: some View {
         Button(action: copy) {
-            Image(systemName: copied ? "checkmark" : "doc.on.doc")
+            Image(
+                systemName: copied
+                    ? VoiceInkTranscriptPresentation.actionSucceededSystemImageName
+                    : VoiceInkTranscriptPresentation.copyTranscriptSystemImageName
+            )
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundColor(copied ? .green : .secondary)
                 .frame(width: 28, height: 28)
@@ -14,7 +19,7 @@ struct CopyIconButton: View {
                 .clipShape(Circle())
         }
         .buttonStyle(.plain)
-        .help("Copy to clipboard")
+        .help(VoiceInkTranscriptPresentation.copyToClipboardHelp)
     }
 
     private func copy() {

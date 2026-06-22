@@ -730,6 +730,12 @@ require_pattern \
   'timeStyle = \.short' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptFileExport.swift
 
+require_patterns \
+  "shared transcript export owns macOS file extensions" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptFileExport.swift \
+  'plainTextFileExtension = "txt"' \
+  'markdownFileExtension = "md"'
+
 require_pattern \
   "shared language display fallback lives in VoiceInkCore" \
   'displayName\(for languageCode: String|fallback: String = "Unknown"' \
@@ -840,6 +846,26 @@ require_pattern \
   'VoiceInkTranscriptFileExport\.markdownContent\(for: textToSave\)' \
   VoiceInk/Views/Common/SaveIconButton.swift
 
+require_patterns \
+  "macOS copy button uses shared transcript action presentation" \
+  VoiceInk/Views/Common/CopyIconButton.swift \
+  'VoiceInkTranscriptPresentation\.actionSucceededSystemImageName' \
+  'VoiceInkTranscriptPresentation\.copyTranscriptSystemImageName' \
+  'VoiceInkTranscriptPresentation\.copyToClipboardHelp'
+
+require_patterns \
+  "macOS save button uses shared transcript action presentation and export extensions" \
+  VoiceInk/Views/Common/SaveIconButton.swift \
+  'VoiceInkTranscriptPresentation\.actionSucceededSystemImageName' \
+  'VoiceInkTranscriptPresentation\.saveTranscriptSystemImageName' \
+  'VoiceInkTranscriptPresentation\.saveTranscriptAsPlainTextButtonTitle' \
+  'VoiceInkTranscriptPresentation\.saveTranscriptAsMarkdownButtonTitle' \
+  'VoiceInkTranscriptPresentation\.saveTranscriptHelp' \
+  'VoiceInkTranscriptPresentation\.saveTranscriptPanelTitle' \
+  'VoiceInkTranscriptPresentation\.saveTranscriptFailureConsolePrefix' \
+  'VoiceInkTranscriptFileExport\.plainTextFileExtension' \
+  'VoiceInkTranscriptFileExport\.markdownFileExtension'
+
 reject_pattern \
   "macOS save button avoids shallow markdown export wrapper" \
   'private +func +markdownContent\(' \
@@ -849,6 +875,21 @@ reject_pattern \
   "macOS save button avoids shell-owned transcript export date formatting" \
   'DateFormatter|localizedString' \
   VoiceInk/Views/Common/SaveIconButton.swift
+
+reject_pattern \
+  "macOS copy button avoids shell-owned transcript action presentation" \
+  '"(checkmark|doc\.on\.doc|Copy to clipboard)"' \
+  VoiceInk/Views/Common/CopyIconButton.swift
+
+reject_pattern \
+  "macOS save button avoids shell-owned transcript action presentation and export extensions" \
+  '"(Save as TXT|Save as MD|Save to file|Save Transcription|Failed to save file:|checkmark|square\.and\.arrow\.down|txt|md)"' \
+  VoiceInk/Views/Common/SaveIconButton.swift
+
+require_pattern \
+  "migration docs track shared transcript action controls and export extensions" \
+  'macOS common transcript copy/save button copy/icons.*VoiceInkTranscriptPresentation.*/`VoiceInkTranscriptFileExport' \
+  docs/ios-single-repo-migration.md
 
 require_pattern \
   "shared recording state exposes active-recording predicate" \
@@ -2241,6 +2282,18 @@ require_pattern \
   'noteDetailNavigationTitle|transcriptTitle|copyTranscriptSystemImageName|retranscribingDisplayText|retryTranscriptionButtonTitle|retryTranscriptionSystemImageName' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
 
+require_patterns \
+  "shared transcript action control presentation lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift \
+  'actionSucceededSystemImageName = "checkmark"' \
+  'copyToClipboardHelp = "Copy to clipboard"' \
+  'saveTranscriptSystemImageName = "square\.and\.arrow\.down"' \
+  'saveTranscriptAsPlainTextButtonTitle = "Save as TXT"' \
+  'saveTranscriptAsMarkdownButtonTitle = "Save as MD"' \
+  'saveTranscriptHelp = "Save to file"' \
+  'saveTranscriptPanelTitle = "Save Transcription"' \
+  'saveTranscriptFailureConsolePrefix = "Failed to save file:"'
+
 require_pattern \
   "shared transcript retry controls presentation lives in VoiceInkCore" \
   'VoiceInkTranscriptRetryControlsPresentation|VoiceInkTranscriptRetryControlAction|retryControls\(isRetranscribing:' \
@@ -2254,6 +2307,16 @@ require_pattern \
 require_pattern \
   "core checks execute transcript retry controls presentation tests" \
   'testRetryControlsPresentationShows(RetryControlsWhenIdle|ProgressWhenRetranscribing)|testStatusErrorDetailShowsOnlyNonEmptyErrors' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute transcript action control presentation test" \
+  'testTranscriptActionControlPresentationPreservesMacOSCopyAndSaveCopy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute transcript export file extension test" \
+  'testTranscriptFileExportPreservesMacOSFileExtensions' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \

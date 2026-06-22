@@ -11038,6 +11038,33 @@ require_pattern \
   'VoiceInkMacOSMainViewItem|case metrics|case transcribeAudio|case audioInput|case dictionary|title|systemImageName|defaultSelection|emptySelectionTitle|visibleItems\(powerModeEnabled: Bool\)|item\(forNavigationDestination destination: String\)' \
   VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift
 
+require_file VoiceInkCore/Sources/VoiceInkCore/SupportContactPolicy.swift
+
+require_patterns \
+  "shared support contact policy lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/SupportContactPolicy.swift \
+  'VoiceInkSupportContactPolicy' \
+  'emailAddress = "support@tryvoiceink\.com"' \
+  'emailSubject = "VoiceInk Support Request"' \
+  'commonIssuesURLString = "https://tryvoiceink\.com/common-issues"' \
+  'emailBody\(systemInformation:' \
+  'mailtoURL\(subject:'
+
+require_pattern \
+  "macOS email support adapts shared support contact policy" \
+  'VoiceInkSupportContactPolicy\.(emailAddress|emailSubject|emailBody|mailtoURL)' \
+  VoiceInk/EmailSupport.swift
+
+require_pattern \
+  "core checks execute support contact policy tests" \
+  'SupportContactPolicyTests\.testSupportContactPolicyPreservesEmailIdentityAndSubject|SupportContactPolicyTests\.testSupportEmailBodyPreservesMacOSSupportCopyAndSystemInformationSlot|SupportContactPolicyTests\.testSupportMailtoURLPreservesRecipientAndEncodesSubject' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "macOS EmailSupport avoids shell-owned support contact policy" \
+  '"support@tryvoiceink\.com"|"VoiceInk Support Request"|SCREEN RECORDING HIGHLY RECOMMENDED|COMMON ISSUES|tryvoiceink\.com/common-issues|URL\(string: "mailto:' \
+  VoiceInk/EmailSupport.swift
+
 require_pattern \
   "macOS app notifications use shared navigation request contract" \
   'navigateToDestination = VoiceInkMacOSNavigationRequest\.notificationName|openFileForTranscription = VoiceInkMacOSFileTranscriptionRequest\.notificationName' \

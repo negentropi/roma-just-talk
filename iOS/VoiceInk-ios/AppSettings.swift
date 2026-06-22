@@ -73,7 +73,7 @@ final class AppSettings: ObservableObject {
 
         self.apiKeyState = VoiceInkProviderAPIKeyState.loadingStoredKeys(
             verifiedProviders: VoiceInkProviderAPIKeyVerificationState.verifiedProviders(),
-            loadStoredAPIKey: Self.loadAPIKey(for:)
+            loadStoredAPIKey: { VoiceInkProviderAPIKeyStorage.storedKey(for: $0) }
         )
         
         // Load audio session timeout (default: 90 seconds)
@@ -314,21 +314,14 @@ final class AppSettings: ObservableObject {
     }
 
     private func saveAPIKey(_ key: String, for provider: VoiceInkProviderKind) {
-        guard let account = provider.apiKeyAccount else { return }
-        guard let status = VoiceInkKeychainValueStore.saveString(key, account: account) else { return }
-        if status != errSecSuccess {
+        let result = VoiceInkProviderAPIKeyStorage.saveStoredKey(key, for: provider)
+        if result.shouldReportFailure, let status = result.status {
             VoiceInkIOSLogger.settings.error("Error saving API key to keychain: \(status, privacy: .public)")
         }
     }
-    
-    private static func loadAPIKey(for provider: VoiceInkProviderKind) -> String {
-        guard let account = provider.apiKeyAccount else { return "" }
-        return VoiceInkKeychainValueStore.loadString(account: account).value ?? ""
-    }
 
     private static func deleteAPIKey(for provider: VoiceInkProviderKind) {
-        guard let account = provider.apiKeyAccount else { return }
-        VoiceInkKeychainValueStore.deleteValue(account: account)
+        VoiceInkProviderAPIKeyStorage.deleteStoredKey(for: provider)
     }
 
     // MARK: - Debug Reset

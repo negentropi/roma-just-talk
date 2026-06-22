@@ -2315,6 +2315,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
 
 require_pattern \
+  "shared provider API-key storage lives in VoiceInkCore" \
+  'VoiceInkProviderAPIKeyStorage|storedKey\(|saveStoredKey|deleteStoredKey|shouldReportFailure' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyStorage.swift
+
+require_pattern \
   "iOS app settings loads provider API-key state through shared loader" \
   'VoiceInkProviderAPIKeyState\.loadingStoredKeys' \
   iOS/VoiceInk-ios/AppSettings.swift
@@ -2322,6 +2327,11 @@ require_pattern \
 require_pattern \
   "iOS app settings applies shared provider API-key mutation plans" \
   'applyStoredAPIKey|applyVerification|applyAPIKeyVerificationPlan|shouldPersistStoredKey|verificationFlagToPersist|shouldPersistVerificationFlag' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+require_pattern \
+  "iOS app settings delegates provider API-key storage to shared core" \
+  'VoiceInkProviderAPIKeyStorage\.(storedKey|saveStoredKey|deleteStoredKey)' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \
@@ -2332,6 +2342,11 @@ reject_pattern \
 reject_pattern \
   "iOS app settings avoids shell-owned provider API-key mutation decisions" \
   'didResetVerification|setStoredAPIKey|guard +updatedState\.setVerified|provider\.requiresUserAPIKey else' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+reject_pattern \
+  "iOS app settings avoids direct provider API-key account and Keychain storage mapping" \
+  'provider\.apiKeyAccount|VoiceInkKeychainValueStore\.(saveString|loadString|deleteValue)' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \
@@ -2371,9 +2386,14 @@ require_pattern \
   VoiceInk/Services/KeychainService.swift
 
 require_pattern \
-  "iOS API-key settings use shared string value policy directly" \
+  "shared provider API-key storage uses shared string value policy" \
   'VoiceInkKeychainValueStore\.(saveString|loadString|deleteValue)' \
-  iOS/VoiceInk-ios/AppSettings.swift
+  VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyStorage.swift
+
+require_pattern \
+  "core checks execute provider API-key storage tests" \
+  'ProviderAPIKeyStorageTests\.test(AccountUsesSharedProviderAccessRequirement|StoredKeyLoadsThroughProviderAccountAndDefaultsToEmpty|SaveStoredKeyTargetsProviderAccountAndReportsFailureStatus)' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \
   "iOS API-key settings avoid account-string keychain wrapper helpers" \

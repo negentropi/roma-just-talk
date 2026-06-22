@@ -2184,6 +2184,30 @@ require_pattern \
   'noTranscriptionAvailableTitle|lastTranscriptionCopiedTitle|failedToCopyTranscriptionTitle|cannotRetryTitle|retryFailedTitle' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
 
+require_file \
+  VoiceInkCore/Sources/VoiceInkCore/LastTranscriptionPolicy.swift
+
+require_patterns \
+  "shared last-transcription policy lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/LastTranscriptionPolicy.swift \
+  'VoiceInkLastTranscriptionPolicy' \
+  'firstPasteableCandidate' \
+  'VoiceInkLastTranscriptionTextPreference'
+
+require_patterns \
+  "core tests pin last-transcription policy" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/LastTranscriptionPolicyTests.swift \
+  'testFirstPasteableCandidateSkipsExcludedPendingBlankAndCanceledCandidates' \
+  'testPasteTextUsesOriginalOrEnhancedFallbackPolicy' \
+  'testFetchLimitPreservesMacOSLastTranscriptionFetchWindow'
+
+require_patterns \
+  "core check runner executes last-transcription policy tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'LastTranscriptionPolicyTests\.testFirstPasteableCandidateSkipsExcludedPendingBlankAndCanceledCandidates' \
+  'LastTranscriptionPolicyTests\.testPasteTextUsesOriginalOrEnhancedFallbackPolicy' \
+  'LastTranscriptionPolicyTests\.testFetchLimitPreservesMacOSLastTranscriptionFetchWindow'
+
 require_pattern \
   "iOS note row uses shared transcript status presentation" \
   'VoiceInkTranscriptPresentation\.statusPresentation' \
@@ -8508,6 +8532,23 @@ reject_pattern \
   'private static func +(isPasteable|textForCursorPaste)\(|static func +shouldFallback\(|VoiceInkContextualCapitalizationFormatter\.(needsCursorContext|format)|VoiceInkTranscriptionPasteOutputPolicy\.cursorPasteTextPlan' \
   VoiceInk/Services/LastTranscriptionService.swift
 
+require_patterns \
+  "macOS last-transcription fetch and text selection use shared policy" \
+  VoiceInk/Services/LastTranscriptionService.swift \
+  'VoiceInkLastTranscriptionPolicy\.fetchLimit' \
+  'VoiceInkLastTranscriptionPolicy\.firstPasteableCandidate' \
+  'VoiceInkLastTranscriptionPolicy\.pasteText'
+
+reject_pattern \
+  "macOS last-transcription service avoids shell-owned pasteability scan" \
+  'VoiceInkTranscriptPresentation\.isPasteable|descriptor\.fetchLimit = 20' \
+  VoiceInk/Services/LastTranscriptionService.swift
+
+reject_pattern \
+  "macOS last-transcription service avoids shell-owned preferred-text fallback" \
+  'VoiceInkTranscriptPresentation\.preferredText\(' \
+  VoiceInk/Services/LastTranscriptionService.swift
+
 require_pattern \
   "macOS last-transcription retry uses shared missing-audio error vocabulary" \
   'VoiceInkEngineError\.audioFileNotFound' \
@@ -8538,6 +8579,11 @@ reject_pattern \
   "macOS last-transcription notifications avoid shell-only copy" \
   '"No transcription available"|"Last transcription copied"|"Failed to copy transcription"|"Copied to clipboard"|"Cannot retry:|"Retry failed:' \
   VoiceInk/Services/LastTranscriptionService.swift
+
+require_pattern \
+  "migration checklist tracks shared last-transcription policy gate" \
+  'last-transcription candidate selection, fetch window, and original-vs-preferred copy/paste text selection route through `VoiceInkLastTranscriptionPolicy`' \
+  docs/ios-single-repo-migration.md
 
 require_pattern \
   "macOS engine canceled recording uses shared canceled draft factory" \

@@ -8,16 +8,17 @@ class LastTranscriptionService: ObservableObject {
         var descriptor = FetchDescriptor<Transcription>(
             sortBy: [SortDescriptor(\.timestamp, order: .reverse)]
         )
-        descriptor.fetchLimit = 20
+        descriptor.fetchLimit = VoiceInkLastTranscriptionPolicy.fetchLimit
         
         do {
             let transcriptions = try modelContext.fetch(descriptor)
-            return transcriptions.first { transcription in
-                transcription.id != excludedID && VoiceInkTranscriptPresentation.isPasteable(
-                    rawText: transcription.text,
-                    statusRawValue: transcription.transcriptionStatus
-                )
+            guard let candidate = VoiceInkLastTranscriptionPolicy.firstPasteableCandidate(
+                in: transcriptions.map(\.lastTranscriptionCandidate),
+                excluding: excludedID
+            ) else {
+                return nil
             }
+            return transcriptions.first { $0.id == candidate.id }
         } catch {
             print("Error fetching last transcription: \(error)")
             return nil
@@ -35,10 +36,10 @@ class LastTranscriptionService: ObservableObject {
             return
         }
         
-        let textToCopy = VoiceInkTranscriptPresentation.preferredText(
-            rawText: lastTranscription.text,
-            enhancedText: lastTranscription.enhancedText
-        ) ?? lastTranscription.text
+        let textToCopy = VoiceInkLastTranscriptionPolicy.pasteText(
+            for: lastTranscription.lastTranscriptionCandidate,
+            preference: .preferred
+        )
         
         let success = ClipboardManager.copyToClipboard(textToCopy)
         
@@ -68,7 +69,10 @@ class LastTranscriptionService: ObservableObject {
             return
         }
         
-        let textToPaste = lastTranscription.text
+        let textToPaste = VoiceInkLastTranscriptionPolicy.pasteText(
+            for: lastTranscription.lastTranscriptionCandidate,
+            preference: .original
+        )
 
         Task { @MainActor in
             CursorPaster.pasteAtCursor(CursorPaster.preparedTextForPaste(textToPaste))
@@ -86,10 +90,10 @@ class LastTranscriptionService: ObservableObject {
             return
         }
         
-        let textToPaste = VoiceInkTranscriptPresentation.preferredText(
-            rawText: lastTranscription.text,
-            enhancedText: lastTranscription.enhancedText
-        ) ?? lastTranscription.text
+        let textToPaste = VoiceInkLastTranscriptionPolicy.pasteText(
+            for: lastTranscription.lastTranscriptionCandidate,
+            preference: .preferred
+        )
 
         Task { @MainActor in
             CursorPaster.pasteAtCursor(CursorPaster.preparedTextForPaste(textToPaste))
@@ -125,10 +129,10 @@ class LastTranscriptionService: ObservableObject {
             do {
                 let newTranscription = try await transcriptionService.retranscribeAudio(from: audioURL, using: currentModel)
 
-                let textToCopy = VoiceInkTranscriptPresentation.preferredText(
-                    rawText: newTranscription.text,
-                    enhancedText: newTranscription.enhancedText
-                ) ?? newTranscription.text
+                let textToCopy = VoiceInkLastTranscriptionPolicy.pasteText(
+                    for: newTranscription.lastTranscriptionCandidate,
+                    preference: .preferred
+                )
                 ClipboardManager.copyToClipboard(textToCopy)
 
                 NotificationManager.shared.showNotification(
@@ -143,6 +147,17 @@ class LastTranscriptionService: ObservableObject {
                 )
             }
         }
+    }
+}
+
+private extension Transcription {
+    var lastTranscriptionCandidate: VoiceInkLastTranscriptionCandidate<UUID> {
+        VoiceInkLastTranscriptionCandidate(
+            id: id,
+            rawText: text,
+            enhancedText: enhancedText,
+            status: transcriptionState
+        )
     }
 }
 

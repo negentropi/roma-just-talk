@@ -217,4 +217,18 @@ final class AudioPlaybackTimelineTests: XCTestCase {
         XCTAssertEqual(VoiceInkAudioPlaybackPresentation.playPauseSystemImageName(isPlaying: true), "pause.fill")
         XCTAssertEqual(VoiceInkAudioPlaybackPresentation.playPauseSystemImageName(isPlaying: false), "play.fill")
     }
+
+    func testPlaybackPresentationPreservesMacOSActionHelpCopy() {
+        XCTAssertEqual(VoiceInkAudioPlaybackPresentation.showInFinderHelpText, "Show in Finder")
+        XCTAssertEqual(
+            VoiceInkAudioPlaybackPresentation.selectEnhancementPromptHelpText,
+            "Select enhancement prompt"
+        )
+        XCTAssertEqual(VoiceInkAudioPlaybackPresentation.retranscribeAudioHelpText, "Retranscribe this audio")
+        XCTAssertEqual(
+            VoiceInkAudioPlaybackPresentation.reEnhanceWithSelectedPromptHelpText,
+            "Re-enhance with selected prompt"
+        )
+        XCTAssertEqual(VoiceInkAudioPlaybackPresentation.viewDetailsHelpText, "View details")
+    }
 }

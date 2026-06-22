@@ -8095,6 +8095,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
 
 require_pattern \
+  "shared audio playback presentation owns macOS action help copy" \
+  'showInFinderHelpText|selectEnhancementPromptHelpText|retranscribeAudioHelpText|reEnhanceWithSelectedPromptHelpText|viewDetailsHelpText' \
+  VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
+
+require_pattern \
   "macOS audio player uses shared playback-rate policy" \
   'VoiceInkAudioPlaybackRate' \
   VoiceInk/Views/AudioPlayerView.swift
@@ -8185,6 +8190,11 @@ require_pattern \
   VoiceInk/Views/AudioPlayerView.swift
 
 require_pattern \
+  "macOS audio player uses shared audio action help copy" \
+  'VoiceInkAudioPlaybackPresentation\.(showInFinderHelpText|selectEnhancementPromptHelpText|retranscribeAudioHelpText|reEnhanceWithSelectedPromptHelpText|viewDetailsHelpText)' \
+  VoiceInk/Views/AudioPlayerView.swift
+
+require_pattern \
   "macOS audio player uses shared playback update cadence" \
   'VoiceInkAudioPlaybackTimeline\.updateInterval' \
   VoiceInk/Views/AudioPlayerView.swift
@@ -8261,6 +8271,11 @@ reject_pattern \
   '"Loading\.\.\."|"pause\.fill"|"play\.fill"|"calendar"|"waveform"' \
   VoiceInk/Views/AudioPlayerView.swift \
   iOS/VoiceInk-ios/AudioPlayerView.swift
+
+reject_pattern \
+  "macOS audio player avoids shell-owned action help copy" \
+  '"Show in Finder"|"Select enhancement prompt"|"Retranscribe this audio"|"Re-enhance with selected prompt"|"View details"' \
+  VoiceInk/Views/AudioPlayerView.swift
 
 reject_pattern \
   "iOS audio metadata views avoid duplicate separator text" \

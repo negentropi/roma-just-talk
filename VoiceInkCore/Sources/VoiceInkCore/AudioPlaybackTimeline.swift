@@ -269,6 +269,11 @@ public enum VoiceInkAudioPlaybackPresentation {
     public static let loadingText = "Loading..."
     public static let timestampSystemImageName = "calendar"
     public static let durationSystemImageName = "waveform"
+    public static let showInFinderHelpText = "Show in Finder"
+    public static let selectEnhancementPromptHelpText = "Select enhancement prompt"
+    public static let retranscribeAudioHelpText = "Retranscribe this audio"
+    public static let reEnhanceWithSelectedPromptHelpText = "Re-enhance with selected prompt"
+    public static let viewDetailsHelpText = "View details"
 
     public static func playPauseSystemImageName(isPlaying: Bool) -> String {
         isPlaying ? "pause.fill" : "play.fill"

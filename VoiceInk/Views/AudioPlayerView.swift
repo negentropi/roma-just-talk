@@ -447,7 +447,7 @@ struct AudioPlayerView: View {
 
                 HStack(spacing: 8) {
                     CircleIconButton(icon: "folder", action: showInFinder)
-                        .help("Show in Finder")
+                        .help(VoiceInkAudioPlaybackPresentation.showInFinderHelpText)
 
                     Button(action: { playerManager.cyclePlaybackRate() }) {
                         Circle()
@@ -467,7 +467,7 @@ struct AudioPlayerView: View {
                         action: { showPromptPopover.toggle() }
                     )
                     .opacity(enhancementService.isEnhancementEnabled ? 1.0 : 0.4)
-                    .help("Select enhancement prompt")
+                    .help(VoiceInkAudioPlaybackPresentation.selectEnhancementPromptHelpText)
                     .popover(isPresented: $showPromptPopover, arrowEdge: .bottom) {
                         EnhancementPromptPopover()
                             .environmentObject(enhancementService)
@@ -491,7 +491,7 @@ struct AudioPlayerView: View {
                         action: retranscribeAudio
                     )
                     .disabled(isOperationInProgress)
-                    .help("Retranscribe this audio")
+                    .help(VoiceInkAudioPlaybackPresentation.retranscribeAudioHelpText)
 
                     if transcription != nil {
                         AsyncCircleButton(
@@ -502,12 +502,12 @@ struct AudioPlayerView: View {
                         )
                         .disabled(isOperationInProgress || !enhancementService.isEnhancementEnabled || !enhancementService.isConfigured)
                         .opacity(enhancementService.isEnhancementEnabled && enhancementService.isConfigured ? 1.0 : 0.4)
-                        .help("Re-enhance with selected prompt")
+                        .help(VoiceInkAudioPlaybackPresentation.reEnhanceWithSelectedPromptHelpText)
                     }
 
                     if let onInfoTap {
                         CircleIconButton(icon: "info.circle", action: onInfoTap)
-                            .help("View details")
+                            .help(VoiceInkAudioPlaybackPresentation.viewDetailsHelpText)
                     }
                 }
 

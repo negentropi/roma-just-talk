@@ -22,6 +22,11 @@ struct SettingsView: View {
     }
     
     var body: some View {
+        let fillerWordEditorPresentation = VoiceInkFillerWords.editorPresentation(
+            isEnabled: settings.removeFillerWords,
+            words: settings.fillerWords
+        )
+
         List {
             Section(header: Text(settingsPresentation.modesSectionTitle)) {
                 ForEach(settings.modes) { mode in
@@ -89,7 +94,7 @@ struct SettingsView: View {
 
                 Toggle(cleanupPresentation.removeFillerWordsToggleTitle, isOn: $settings.removeFillerWords)
 
-                if settings.removeFillerWords {
+                if fillerWordEditorPresentation.shouldShowEditor {
                     HStack {
                         TextField(cleanupPresentation.addFillerWordPlaceholder, text: $fillerWordDraftState.draft)
                             .textInputAutocapitalization(.never)
@@ -102,10 +107,12 @@ struct SettingsView: View {
                         .disabled(!fillerWordDraftState.canSubmit)
                     }
 
-                    ForEach(settings.fillerWords, id: \.self) { word in
-                        Text(word)
+                    if fillerWordEditorPresentation.shouldShowWordList {
+                        ForEach(settings.fillerWords, id: \.self) { word in
+                            Text(word)
+                        }
+                        .onDelete(perform: settings.removeFillerWords)
                     }
-                    .onDelete(perform: settings.removeFillerWords)
                 }
             }
 

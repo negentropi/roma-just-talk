@@ -387,6 +387,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "FillerWordsTests.testSubmissionPlanKeepsDuplicateDraftAndBuildsSharedAlert", run: { FillerWordsTests().testSubmissionPlanKeepsDuplicateDraftAndBuildsSharedAlert() }),
             VoiceInkCoreCheck(name: "FillerWordsTests.testDraftAvailabilityUsesSharedNormalization", run: { FillerWordsTests().testDraftAvailabilityUsesSharedNormalization() }),
             VoiceInkCoreCheck(name: "FillerWordsTests.testDraftStateUsesSharedSubmitAvailability", run: { FillerWordsTests().testDraftStateUsesSharedSubmitAvailability() }),
+            VoiceInkCoreCheck(name: "FillerWordsTests.testEditorPresentationOwnsPlatformVisibilityPolicy", run: { FillerWordsTests().testEditorPresentationOwnsPlatformVisibilityPolicy() }),
             VoiceInkCoreCheck(name: "FillerWordsTests.testDraftStateSubmitsAndClearsAcceptedWord", run: { FillerWordsTests().testDraftStateSubmitsAndClearsAcceptedWord() }),
             VoiceInkCoreCheck(name: "FillerWordsTests.testDraftStateKeepsDuplicateDraftAndBuildsSharedAlert", run: { FillerWordsTests().testDraftStateKeepsDuplicateDraftAndBuildsSharedAlert() }),
             VoiceInkCoreCheck(name: "FillerWordsTests.testRemovingDropsWordsCaseInsensitively", run: { FillerWordsTests().testRemovingDropsWordsCaseInsensitively() }),

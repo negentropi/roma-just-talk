@@ -70,6 +70,30 @@ final class FillerWordsTests: XCTestCase {
         XCTAssertTrue(VoiceInkFillerWordDraftState(draft: " LIKE ").canSubmit)
     }
 
+    func testEditorPresentationOwnsPlatformVisibilityPolicy() {
+        XCTAssertEqual(
+            VoiceInkFillerWords.editorPresentation(isEnabled: false, words: ["um"]),
+            VoiceInkFillerWordEditorPresentation(
+                shouldShowEditor: false,
+                shouldShowWordList: false
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkFillerWords.editorPresentation(isEnabled: true, words: []),
+            VoiceInkFillerWordEditorPresentation(
+                shouldShowEditor: true,
+                shouldShowWordList: false
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkFillerWords.editorPresentation(isEnabled: true, words: ["um"]),
+            VoiceInkFillerWordEditorPresentation(
+                shouldShowEditor: true,
+                shouldShowWordList: true
+            )
+        )
+    }
+
     func testDraftStateSubmitsAndClearsAcceptedWord() {
         let submission = VoiceInkFillerWordDraftState(draft: " LIKE ")
             .submitting(existingWords: ["um"])

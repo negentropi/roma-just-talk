@@ -60,6 +60,19 @@ public struct VoiceInkFillerWordDraftState: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkFillerWordEditorPresentation: Equatable, Sendable {
+    public let shouldShowEditor: Bool
+    public let shouldShowWordList: Bool
+
+    public init(
+        shouldShowEditor: Bool,
+        shouldShowWordList: Bool
+    ) {
+        self.shouldShowEditor = shouldShowEditor
+        self.shouldShowWordList = shouldShowWordList
+    }
+}
+
 public enum VoiceInkFillerWords {
     public static let duplicateWordMessage = "This filler word is already in the list."
 
@@ -75,6 +88,16 @@ public enum VoiceInkFillerWords {
 
     public static func hasDraft(_ word: String) -> Bool {
         normalizedWord(word) != nil
+    }
+
+    public static func editorPresentation(
+        isEnabled: Bool,
+        words: [String]
+    ) -> VoiceInkFillerWordEditorPresentation {
+        VoiceInkFillerWordEditorPresentation(
+            shouldShowEditor: isEnabled,
+            shouldShowWordList: isEnabled && !words.isEmpty
+        )
     }
 
     public static func submissionPlan(

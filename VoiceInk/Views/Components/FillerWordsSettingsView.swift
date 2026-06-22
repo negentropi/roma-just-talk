@@ -47,6 +47,11 @@ struct FillerWordsSettingsView: View {
     private let cleanupPresentation = VoiceInkTranscriptionCleanupPresentation.macOS
 
     var body: some View {
+        let editorPresentation = VoiceInkFillerWords.editorPresentation(
+            isEnabled: removeFillerWords,
+            words: fillerWordManager.fillerWords
+        )
+
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Text(cleanupPresentation.removeFillerWordsToggleTitle)
@@ -59,7 +64,7 @@ struct FillerWordsSettingsView: View {
                     .labelsHidden()
             }
 
-            if removeFillerWords {
+            if editorPresentation.shouldShowEditor {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack(spacing: 8) {
                         TextField(cleanupPresentation.addFillerWordPlaceholder, text: $draftState.draft)
@@ -79,7 +84,7 @@ struct FillerWordsSettingsView: View {
                     }
                     .padding(.vertical, 4)
 
-                    if !fillerWordManager.fillerWords.isEmpty {
+                    if editorPresentation.shouldShowWordList {
                         FlowLayout(spacing: 6) {
                             ForEach(fillerWordManager.fillerWords, id: \.self) { word in
                                 FillerWordChip(word: word) {

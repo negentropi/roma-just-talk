@@ -104,4 +104,47 @@ final class AIEnhancementRetryPolicyTests: XCTestCase {
             now: Date(timeIntervalSince1970: 100)
         ))
     }
+
+    func testRetryFailurePresentationPreservesMacOSLogMessages() {
+        XCTAssertEqual(
+            VoiceInkAIEnhancementRetryFailurePresentation.diagnosticMessage(
+                for: .timeout,
+                attempts: 3,
+                retryOnTimeoutEnabled: true
+            ),
+            "Request timed out after 3 retries."
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementRetryFailurePresentation.diagnosticMessage(
+                for: .timeout,
+                attempts: 3,
+                retryOnTimeoutEnabled: false
+            ),
+            "Request timed out, failing immediately (retry disabled)."
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementRetryFailurePresentation.diagnosticMessage(
+                for: .networkError,
+                attempts: 3,
+                retryOnTimeoutEnabled: true,
+                transportNetworkFailure: true
+            ),
+            "Request failed after 3 retries with network error."
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementRetryFailurePresentation.diagnosticMessage(
+                for: .serverError,
+                attempts: 3,
+                retryOnTimeoutEnabled: true
+            ),
+            "Request failed after 3 retries."
+        )
+        XCTAssertNil(
+            VoiceInkAIEnhancementRetryFailurePresentation.diagnosticMessage(
+                for: .notConfigured,
+                attempts: 3,
+                retryOnTimeoutEnabled: true
+            )
+        )
+    }
 }

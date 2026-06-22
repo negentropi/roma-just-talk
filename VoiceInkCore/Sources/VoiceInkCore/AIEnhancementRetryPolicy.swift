@@ -75,3 +75,25 @@ public struct VoiceInkAIEnhancementRateLimitPolicy: Equatable, Sendable {
         return remainingDelay > 0 ? remainingDelay : nil
     }
 }
+
+public enum VoiceInkAIEnhancementRetryFailurePresentation {
+    public static func diagnosticMessage(
+        for error: VoiceInkAIEnhancementError,
+        attempts: Int,
+        retryOnTimeoutEnabled: Bool,
+        transportNetworkFailure: Bool = false
+    ) -> String? {
+        switch error {
+        case .timeout where retryOnTimeoutEnabled:
+            return "Request timed out after \(attempts) retries."
+        case .timeout:
+            return "Request timed out, failing immediately (retry disabled)."
+        case .networkError where transportNetworkFailure:
+            return "Request failed after \(attempts) retries with network error."
+        case .networkError, .serverError, .rateLimitExceeded:
+            return "Request failed after \(attempts) retries."
+        default:
+            return nil
+        }
+    }
+}

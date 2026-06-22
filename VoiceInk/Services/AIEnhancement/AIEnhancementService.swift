@@ -327,17 +327,13 @@ class AIEnhancementService: ObservableObject {
         retryOnTimeoutEnabled: Bool,
         transportNetworkFailure: Bool
     ) {
-        switch error {
-        case .timeout where retryOnTimeoutEnabled:
-            logger.error("Request timed out after \(attempts, privacy: .public) retries.")
-        case .timeout:
-            logger.error("Request timed out, failing immediately (retry disabled).")
-        case .networkError where transportNetworkFailure:
-            logger.error("Request failed after \(attempts, privacy: .public) retries with network error.")
-        case .networkError, .serverError, .rateLimitExceeded:
-            logger.error("Request failed after \(attempts, privacy: .public) retries.")
-        default:
-            break
+        if let message = VoiceInkAIEnhancementRetryFailurePresentation.diagnosticMessage(
+            for: error,
+            attempts: attempts,
+            retryOnTimeoutEnabled: retryOnTimeoutEnabled,
+            transportNetworkFailure: transportNetworkFailure
+        ) {
+            logger.error("\(message, privacy: .public)")
         }
     }
 

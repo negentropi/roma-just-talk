@@ -6582,6 +6582,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AIEnhancementRetryPolicy.swift
 
 require_pattern \
+  "shared AI enhancement retry-failure presentation lives in VoiceInkCore" \
+  'VoiceInkAIEnhancementRetryFailurePresentation|diagnosticMessage' \
+  VoiceInkCore/Sources/VoiceInkCore/AIEnhancementRetryPolicy.swift
+
+require_pattern \
   "shared AI enhancement request payload lives in VoiceInkCore" \
   'VoiceInkAIEnhancementRequestPayload|VoiceInkAIEnhancementRequestPreparation|taggedTranscript|enhancedText' \
   VoiceInkCore/Sources/VoiceInkCore/AIRequestPrompts.swift
@@ -6596,6 +6601,11 @@ require_pattern \
   'AIPromptsTests\.testEnhancementRequestPreparationPreservesMacOSPreflightPolicy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
+require_pattern \
+  "core checks execute AI enhancement retry-failure presentation test" \
+  'AIEnhancementRetryPolicyTests\.testRetryFailurePresentationPreservesMacOSLogMessages' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
 reject_pattern \
   "macOS AI enhancement service avoids shell-owned request payload and output filtering" \
   'guard +!text\.isEmpty|guard +isConfigured|VoiceInkAIEnhancementRequestPayload\(transcript: text\)|VoiceInkAIRequestPrompts\.taggedTranscript|VoiceInkAIEnhancementOutputFilter\.filter' \
@@ -6606,9 +6616,19 @@ require_pattern \
   'VoiceInkAIEnhancementRateLimitPolicy|delaySinceLastRequest' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
+require_pattern \
+  "macOS AI enhancement service uses shared retry-failure presentation" \
+  'VoiceInkAIEnhancementRetryFailurePresentation\.diagnosticMessage' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
 reject_pattern \
   "macOS AI enhancement service avoids shell-owned rate-limit timing math" \
   'rateLimitInterval|timeSinceLastRequest|minimumInterval -' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+reject_pattern \
+  "macOS AI enhancement service avoids shell-owned retry-failure log messages" \
+  'Request timed out after|Request failed after|retry disabled' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
 require_pattern \

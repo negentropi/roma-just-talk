@@ -6,6 +6,43 @@ final class OnboardingPresentationTests: XCTestCase {
         XCTAssertEqual(VoiceInkIOSOnboardingPresentation.appIconFallbackSystemImageName, "app.fill")
     }
 
+    func testIOSAppIconPolicyUsesLoadableLastBundleIcon() {
+        XCTAssertEqual(
+            VoiceInkIOSAppIconPolicy.source(
+                iconFiles: ["AppIcon40", "AppIcon60"],
+                canLoadImageNamed: { $0 == "AppIcon60" }
+            ),
+            .assetName("AppIcon60")
+        )
+    }
+
+    func testIOSAppIconPolicyFallsBackWhenLastBundleIconIsMissing() {
+        XCTAssertEqual(
+            VoiceInkIOSAppIconPolicy.source(
+                iconFiles: ["AppIcon40", "AppIcon60"],
+                canLoadImageNamed: { $0 == "AppIcon40" }
+            ),
+            .fallbackSystemImageName("app.fill")
+        )
+    }
+
+    func testIOSAppIconPolicyFallsBackWithoutBundleIconFiles() {
+        XCTAssertEqual(
+            VoiceInkIOSAppIconPolicy.source(
+                iconFiles: nil,
+                canLoadImageNamed: { _ in true }
+            ),
+            .fallbackSystemImageName("app.fill")
+        )
+        XCTAssertEqual(
+            VoiceInkIOSAppIconPolicy.source(
+                iconFiles: [],
+                canLoadImageNamed: { _ in true }
+            ),
+            .fallbackSystemImageName("app.fill")
+        )
+    }
+
     func testIOSOnboardingStepOrderPreservesExistingFlow() {
         XCTAssertEqual(VoiceInkIOSOnboardingStep.initial, .welcome)
         XCTAssertEqual(Array(VoiceInkIOSOnboardingStep.allCases), [.welcome, .modelDownload, .ready])

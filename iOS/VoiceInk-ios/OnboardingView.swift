@@ -381,21 +381,40 @@ struct HowItWorksStep: View {
 
 struct AppIconView: View {
     var body: some View {
-        // Try to get the app icon from the bundle
-        if let iconsDictionary = Bundle.main.infoDictionary?["CFBundleIcons"] as? [String: Any],
-           let primaryIconsDictionary = iconsDictionary["CFBundlePrimaryIcon"] as? [String: Any],
-           let iconFiles = primaryIconsDictionary["CFBundleIconFiles"] as? [String],
-           let lastIcon = iconFiles.last,
-           let appIcon = UIImage(named: lastIcon) {
-            Image(uiImage: appIcon)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-        } else {
-            // Fallback to system icon
-            Image(systemName: VoiceInkIOSOnboardingPresentation.appIconFallbackSystemImageName)
-                .font(.system(size: 80))
-                .foregroundColor(.blue)
+        let iconFiles = bundleAppIconFiles()
+        let iconSource = VoiceInkIOSAppIconPolicy.source(
+            iconFiles: iconFiles,
+            canLoadImageNamed: { UIImage(named: $0) != nil }
+        )
+
+        switch iconSource {
+        case .assetName(let iconName):
+            if let appIcon = UIImage(named: iconName) {
+                Image(uiImage: appIcon)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+            } else {
+                fallbackIcon(VoiceInkIOSOnboardingPresentation.appIconFallbackSystemImageName)
+            }
+
+        case .fallbackSystemImageName(let systemImageName):
+            fallbackIcon(systemImageName)
         }
+    }
+
+    private func bundleAppIconFiles() -> [String]? {
+        guard let iconsDictionary = Bundle.main.infoDictionary?["CFBundleIcons"] as? [String: Any],
+              let primaryIconsDictionary = iconsDictionary["CFBundlePrimaryIcon"] as? [String: Any] else {
+            return nil
+        }
+
+        return primaryIconsDictionary["CFBundleIconFiles"] as? [String]
+    }
+
+    private func fallbackIcon(_ systemImageName: String) -> some View {
+        Image(systemName: systemImageName)
+            .font(.system(size: 80))
+            .foregroundColor(.blue)
     }
 }
 

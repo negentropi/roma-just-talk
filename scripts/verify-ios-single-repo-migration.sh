@@ -3815,12 +3815,12 @@ reject_pattern \
 
 require_pattern \
   "shared iOS onboarding presentation lives in VoiceInkCore" \
-  'VoiceInkIOSOnboardingStep|VoiceInkIOSOnboardingPresentation|VoiceInkOnboardingFeaturePresentation|VoiceInkOnboardingStepPresentation|appIconFallbackSystemImageName' \
+  'VoiceInkIOSOnboardingStep|VoiceInkIOSOnboardingPresentation|VoiceInkOnboardingFeaturePresentation|VoiceInkOnboardingStepPresentation|VoiceInkIOSAppIconSource|VoiceInkIOSAppIconPolicy|appIconFallbackSystemImageName' \
   VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift
 
 require_pattern \
   "iOS onboarding uses shared onboarding presentation" \
-  'VoiceInkIOSOnboardingPresentation\.(appIconFallbackSystemImageName|welcome|modelDownload|ready)' \
+  'VoiceInkIOSOnboardingPresentation\.(appIconFallbackSystemImageName|welcome|modelDownload|ready)|VoiceInkIOSAppIconPolicy\.source' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 require_pattern \
@@ -3836,6 +3836,11 @@ require_pattern \
 reject_pattern \
   "iOS onboarding avoids shell-owned integer step flow" \
   '@State private var currentStep = +0|@Binding var currentStep: Int|currentStep == +(0|1|2)|currentStep = +(1|2)' \
+  iOS/VoiceInk-ios/OnboardingView.swift
+
+reject_pattern \
+  "iOS onboarding avoids shell-owned app icon source decision" \
+  'let +lastIcon += +iconFiles\.last|UIImage\(named: +lastIcon\)' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 reject_pattern \
@@ -3942,6 +3947,16 @@ require_pattern \
   "core tests pin iOS onboarding step flow" \
   'testIOSOnboardingStepOrderPreservesExistingFlow' \
   VoiceInkCore/Tests/VoiceInkCoreTests/OnboardingPresentationTests.swift
+
+require_pattern \
+  "core tests pin iOS app icon source policy" \
+  'testIOSAppIconPolicyUsesLoadableLastBundleIcon|testIOSAppIconPolicyFallsBackWhenLastBundleIconIsMissing|testIOSAppIconPolicyFallsBackWithoutBundleIconFiles' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/OnboardingPresentationTests.swift
+
+require_pattern \
+  "core check runner executes iOS app icon source policy tests" \
+  'testIOSAppIconPolicyUsesLoadableLastBundleIcon|testIOSAppIconPolicyFallsBackWhenLastBundleIconIsMissing|testIOSAppIconPolicyFallsBackWithoutBundleIconFiles' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "core check runner executes macOS setup presentation tests" \

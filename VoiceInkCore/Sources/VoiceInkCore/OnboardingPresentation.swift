@@ -458,6 +458,24 @@ public enum VoiceInkIOSOnboardingPresentation {
     )
 }
 
+public enum VoiceInkIOSAppIconSource: Equatable, Sendable {
+    case assetName(String)
+    case fallbackSystemImageName(String)
+}
+
+public enum VoiceInkIOSAppIconPolicy {
+    public static func source(
+        iconFiles: [String]?,
+        canLoadImageNamed: (String) -> Bool
+    ) -> VoiceInkIOSAppIconSource {
+        guard let iconName = iconFiles?.last, canLoadImageNamed(iconName) else {
+            return .fallbackSystemImageName(VoiceInkIOSOnboardingPresentation.appIconFallbackSystemImageName)
+        }
+
+        return .assetName(iconName)
+    }
+}
+
 public enum VoiceInkMacOSOnboardingPermissionKind: String, Equatable, Sendable {
     case microphone
     case audioDeviceSelection

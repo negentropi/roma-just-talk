@@ -232,6 +232,36 @@ public struct VoiceInkAppSettingsResetState {
     }
 }
 
+public struct VoiceInkIOSFirstTimeSetupPlan {
+    public let modeSettingsRepairPlan: VoiceInkModeSettingsRepairPlan
+    public let shouldSaveHasCompletedOnboarding: Bool
+
+    public init(
+        modeSettingsRepairPlan: VoiceInkModeSettingsRepairPlan,
+        shouldSaveHasCompletedOnboarding: Bool
+    ) {
+        self.modeSettingsRepairPlan = modeSettingsRepairPlan
+        self.shouldSaveHasCompletedOnboarding = shouldSaveHasCompletedOnboarding
+    }
+}
+
+public enum VoiceInkIOSFirstTimeSetupPolicy {
+    public static func plan(
+        modes: [Mode],
+        selectedModeId: UUID?,
+        selectedTranscriptionLanguage: String
+    ) -> VoiceInkIOSFirstTimeSetupPlan {
+        VoiceInkIOSFirstTimeSetupPlan(
+            modeSettingsRepairPlan: VoiceInkModeSettingsPolicy.defaultModeRepairPlan(
+                modes: modes,
+                selectedModeId: selectedModeId,
+                selectedTranscriptionLanguage: selectedTranscriptionLanguage
+            ),
+            shouldSaveHasCompletedOnboarding: true
+        )
+    }
+}
+
 public extension VoiceInkDefaultSettings {
     var appSettingsResetState: VoiceInkAppSettingsResetState {
         VoiceInkAppSettingsResetState(

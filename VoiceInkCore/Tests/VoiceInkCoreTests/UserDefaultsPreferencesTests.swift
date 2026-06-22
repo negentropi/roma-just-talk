@@ -165,6 +165,24 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(resetState.apiKeyProvidersToDelete, VoiceInkProviderKind.userAPIKeyProviders)
     }
 
+    func testIOSFirstTimeSetupPolicySeedsDefaultModeAndCompletionIntent() {
+        let plan = VoiceInkIOSFirstTimeSetupPolicy.plan(
+            modes: [],
+            selectedModeId: nil,
+            selectedTranscriptionLanguage: "not-a-language"
+        )
+
+        XCTAssertTrue(plan.shouldSaveHasCompletedOnboarding)
+        XCTAssertTrue(plan.modeSettingsRepairPlan.shouldReplaceModes)
+        XCTAssertEqual(plan.modeSettingsRepairPlan.modes.count, 1)
+        XCTAssertEqual(plan.modeSettingsRepairPlan.modes.first?.id, plan.modeSettingsRepairPlan.selectedModeId)
+        XCTAssertEqual(plan.modeSettingsRepairPlan.modes.first?.transcriptionProvider, .localWhisper)
+        XCTAssertEqual(
+            plan.modeSettingsRepairPlan.selectedTranscriptionLanguage,
+            VoiceInkLanguageCatalog.autoDetectCode
+        )
+    }
+
     func testDefaultSettingsPreserveMacOSSelectedLanguageDefault() {
         let defaults = VoiceInkDefaultSettings.macOS
         let registeredDefaults = defaults.registeredUserDefaults()

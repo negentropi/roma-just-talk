@@ -309,8 +309,19 @@ final class AppSettings: ObservableObject {
     }
 
     func completeFirstTimeSetup() {
-        ensureDefaultModeExists()
-        VoiceInkOnboardingPreference.saveHasCompletedOnboarding()
+        applyFirstTimeSetupPlan(VoiceInkIOSFirstTimeSetupPolicy.plan(
+            modes: modes,
+            selectedModeId: selectedModeId,
+            selectedTranscriptionLanguage: selectedTranscriptionLanguage
+        ))
+    }
+
+    private func applyFirstTimeSetupPlan(_ plan: VoiceInkIOSFirstTimeSetupPlan) {
+        applyModeSettingsRepairPlan(plan.modeSettingsRepairPlan)
+
+        if plan.shouldSaveHasCompletedOnboarding {
+            VoiceInkOnboardingPreference.saveHasCompletedOnboarding()
+        }
     }
 
     private func saveAPIKey(_ key: String, for provider: VoiceInkProviderKind) {

@@ -8821,6 +8821,20 @@ require_pattern \
   'apiKeyProvidersToDelete' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
+require_patterns \
+  "shared iOS first-time setup policy owns mode repair and onboarding completion intent" \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift \
+  'VoiceInkIOSFirstTimeSetupPolicy' \
+  'VoiceInkIOSFirstTimeSetupPlan' \
+  'modeSettingsRepairPlan' \
+  'shouldSaveHasCompletedOnboarding' \
+  'VoiceInkModeSettingsPolicy\.defaultModeRepairPlan'
+
+require_pattern \
+  "core checks execute iOS first-time setup policy test" \
+  'UserDefaultsPreferencesTests\.testIOSFirstTimeSetupPolicySeedsDefaultModeAndCompletionIntent' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
 require_pattern \
   "shared app data reset plan lives in VoiceInkCore" \
   'VoiceInkAppDataResetPlan|VoiceInkAppDataResetStep|VoiceInkAppDataResetFilePlan|deleteTranscriptionRecords|cleanFiles|resetAppSettings' \
@@ -8969,6 +8983,21 @@ reject_pattern \
 require_pattern \
   "iOS app settings reset consumes shared reset state" \
   'VoiceInkDefaultSettings\.iOS\.appSettingsResetState' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+require_patterns \
+  "iOS app settings first-time setup consumes shared setup plan" \
+  iOS/VoiceInk-ios/AppSettings.swift \
+  'VoiceInkIOSFirstTimeSetupPolicy\.plan' \
+  'VoiceInkIOSFirstTimeSetupPlan' \
+  'applyFirstTimeSetupPlan' \
+  'plan\.modeSettingsRepairPlan' \
+  'plan\.shouldSaveHasCompletedOnboarding'
+
+reject_context_pattern \
+  "iOS app settings first-time setup avoids shell-owned default-mode/onboarding sequencing" \
+  'func completeFirstTimeSetup' \
+  'ensureDefaultModeExists\(\)' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \

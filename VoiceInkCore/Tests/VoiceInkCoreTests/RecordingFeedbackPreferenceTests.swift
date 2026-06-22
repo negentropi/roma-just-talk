@@ -97,6 +97,59 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
         )
     }
 
+    func testCustomSoundPreferenceBuildsCustomSoundURLs() {
+        let directory = URL(fileURLWithPath: "/tmp/VoiceInk/CustomSounds", isDirectory: true)
+
+        XCTAssertEqual(
+            VoiceInkCustomSoundPreference.customSoundURL(
+                isUsingCustomSound: true,
+                filename: "CustomStartSound.wav",
+                in: directory
+            )?.path,
+            "/tmp/VoiceInk/CustomSounds/CustomStartSound.wav"
+        )
+        XCTAssertNil(VoiceInkCustomSoundPreference.customSoundURL(
+            isUsingCustomSound: false,
+            filename: "CustomStartSound.wav",
+            in: directory
+        ))
+        XCTAssertNil(VoiceInkCustomSoundPreference.storedCustomSoundURL(filename: nil, in: directory))
+        XCTAssertNil(VoiceInkCustomSoundPreference.storedCustomSoundURL(filename: "CustomStartSound.wav", in: nil))
+    }
+
+    func testCustomSoundPreferencePlansCopyActions() {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.CustomSoundCopyPlanTests.\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        let sourceURL = directory.deletingLastPathComponent().appendingPathComponent("start.aiff")
+
+        var plan = VoiceInkCustomSoundPreference.copyPlan(
+            sourceURL: sourceURL,
+            customSoundsDirectory: directory,
+            for: .start
+        )
+        XCTAssertEqual(plan.filename, "CustomStartSound.aiff")
+        XCTAssertEqual(plan.destinationURL, directory.appendingPathComponent("CustomStartSound.aiff"))
+        XCTAssertEqual(plan.action, .copy)
+
+        try? Data("existing".utf8).write(to: plan.destinationURL)
+        plan = VoiceInkCustomSoundPreference.copyPlan(
+            sourceURL: sourceURL,
+            customSoundsDirectory: directory,
+            for: .start
+        )
+        XCTAssertEqual(plan.action, .replaceExistingDestinationAndCopy)
+
+        let destinationURL = directory.appendingPathComponent("CustomStartSound.aiff")
+        plan = VoiceInkCustomSoundPreference.copyPlan(
+            sourceURL: destinationURL,
+            customSoundsDirectory: directory,
+            for: .start
+        )
+        XCTAssertEqual(plan.action, .useExistingDestination)
+    }
+
     func testCustomSoundValidationPreservesMacOSErrorPolicy() {
         XCTAssertEqual(
             VoiceInkCustomSoundPreference.preflightValidationError(fileExists: false, duration: 1.0),

@@ -80,11 +80,12 @@ class CustomSoundManager: ObservableObject {
     func getCustomSoundURL(for type: SoundType) -> URL? {
         let isUsing = (type == .start) ? isUsingCustomStartSound : isUsingCustomStopSound
         let filename = (type == .start) ? customStartSoundFilename : customStopSoundFilename
-        
-        guard isUsing, let filename = filename, let directory = customSoundsDirectory() else {
-            return nil
-        }
-        return directory.appendingPathComponent(filename)
+
+        return VoiceInkCustomSoundPreference.customSoundURL(
+            isUsingCustomSound: isUsing,
+            filename: filename,
+            in: customSoundsDirectory()
+        )
     }
 
     func builtInSoundURL(for type: SoundType) -> URL? {
@@ -152,9 +153,11 @@ class CustomSoundManager: ObservableObject {
 
     func resetSoundToDefault(for type: SoundType) {
         let filename = (type == .start) ? customStartSoundFilename : customStopSoundFilename
-        
-        if let filename = filename, let directory = customSoundsDirectory() {
-            let fileURL = directory.appendingPathComponent(filename)
+
+        if let fileURL = VoiceInkCustomSoundPreference.storedCustomSoundURL(
+            filename: filename,
+            in: customSoundsDirectory()
+        ) {
             try? FileManager.default.removeItem(at: fileURL)
         }
         
@@ -195,23 +198,24 @@ class CustomSoundManager: ObservableObject {
             return .failure(.directoryCreationFailed)
         }
 
-        let newFilename = VoiceInkCustomSoundPreference.copiedFilename(
-            sourceExtension: sourceURL.pathExtension,
+        let copyPlan = VoiceInkCustomSoundPreference.copyPlan(
+            sourceURL: sourceURL,
+            customSoundsDirectory: directory,
             for: type
         )
-        let destinationURL = directory.appendingPathComponent(newFilename)
 
-        if sourceURL.resolvingSymlinksInPath() == destinationURL.resolvingSymlinksInPath() {
-            return .success(newFilename)
-        }
-
-        if FileManager.default.fileExists(atPath: destinationURL.path) {
-            try? FileManager.default.removeItem(at: destinationURL)
+        switch copyPlan.action {
+        case .useExistingDestination:
+            return .success(copyPlan.filename)
+        case .replaceExistingDestinationAndCopy:
+            try? FileManager.default.removeItem(at: copyPlan.destinationURL)
+        case .copy:
+            break
         }
 
         do {
-            try FileManager.default.copyItem(at: sourceURL, to: destinationURL)
-            return .success(newFilename)
+            try FileManager.default.copyItem(at: sourceURL, to: copyPlan.destinationURL)
+            return .success(copyPlan.filename)
         } catch {
             return .failure(.fileCopyFailed)
         }

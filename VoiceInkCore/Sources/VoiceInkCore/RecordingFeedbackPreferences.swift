@@ -203,6 +203,28 @@ public enum VoiceInkCustomSoundError: LocalizedError, Equatable, Sendable {
     }
 }
 
+public enum VoiceInkCustomSoundCopyAction: Equatable, Sendable {
+    case useExistingDestination
+    case copy
+    case replaceExistingDestinationAndCopy
+}
+
+public struct VoiceInkCustomSoundCopyPlan: Equatable, Sendable {
+    public let filename: String
+    public let destinationURL: URL
+    public let action: VoiceInkCustomSoundCopyAction
+
+    public init(
+        filename: String,
+        destinationURL: URL,
+        action: VoiceInkCustomSoundCopyAction
+    ) {
+        self.filename = filename
+        self.destinationURL = destinationURL
+        self.action = action
+    }
+}
+
 public enum VoiceInkCustomSoundPreference {
     public static let customSoundsRelativeDirectory = "VoiceInk/CustomSounds"
     public static let changedNotificationName = "CustomSoundsChanged"
@@ -282,6 +304,47 @@ public enum VoiceInkCustomSoundPreference {
         for type: VoiceInkCustomSoundType
     ) -> String {
         "\(type.standardName).\(sourceExtension)"
+    }
+
+    public static func customSoundURL(
+        isUsingCustomSound: Bool,
+        filename: String?,
+        in customSoundsDirectory: URL?
+    ) -> URL? {
+        guard isUsingCustomSound else { return nil }
+        return storedCustomSoundURL(filename: filename, in: customSoundsDirectory)
+    }
+
+    public static func storedCustomSoundURL(
+        filename: String?,
+        in customSoundsDirectory: URL?
+    ) -> URL? {
+        guard let filename, let customSoundsDirectory else { return nil }
+        return customSoundsDirectory.appendingPathComponent(filename)
+    }
+
+    public static func copyPlan(
+        sourceURL: URL,
+        customSoundsDirectory: URL,
+        for type: VoiceInkCustomSoundType,
+        fileManager: FileManager = .default
+    ) -> VoiceInkCustomSoundCopyPlan {
+        let filename = copiedFilename(sourceExtension: sourceURL.pathExtension, for: type)
+        let destinationURL = customSoundsDirectory.appendingPathComponent(filename)
+
+        if sourceURL.resolvingSymlinksInPath() == destinationURL.resolvingSymlinksInPath() {
+            return VoiceInkCustomSoundCopyPlan(
+                filename: filename,
+                destinationURL: destinationURL,
+                action: .useExistingDestination
+            )
+        }
+
+        return VoiceInkCustomSoundCopyPlan(
+            filename: filename,
+            destinationURL: destinationURL,
+            action: fileManager.fileExists(atPath: destinationURL.path) ? .replaceExistingDestinationAndCopy : .copy
+        )
     }
 
     public static func preflightValidationError(

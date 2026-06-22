@@ -190,7 +190,8 @@ a {
   margin: 0 0 18px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: rgba(184, 255, 61, 0.52);
+  background: #2f2f2f;
+  color: #fff8e7;
   padding: 8px 12px;
   font-family: "IBM Plex Mono", monospace;
   font-size: 0.85rem;
@@ -291,8 +292,18 @@ h1 .before-word {
   background: var(--acid);
 }
 
+#download-button {
+  background: #ddd;
+}
+
 .secondary {
   background: var(--cyan);
+}
+
+#github-button,
+#talk-button {
+  background: #000;
+  color: #fff8e7;
 }
 
 .talk {

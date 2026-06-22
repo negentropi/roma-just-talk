@@ -21,7 +21,7 @@ struct VoiceInk_iosApp: App {
 
         // Clear any stale recording state on app launch
         AppGroupCoordinator.shared.updateRecordingState(false)
-        VoiceInkIOSLogger.app.notice("Cleared stale recording state on app launch")
+        VoiceInkIOSLogger.app.notice("\(VoiceInkIOSRecordingCoordinationDiagnostics.clearedStaleRecordingStateOnLaunchMessage, privacy: .public)")
     }
     
     var sharedModelContainer: ModelContainer = {
@@ -77,13 +77,13 @@ struct VoiceInk_iosApp: App {
 
         switch deepLink {
         case .record:
-            VoiceInkIOSLogger.app.notice("URL scheme triggered: open app for recording")
+            VoiceInkIOSLogger.app.notice("\(VoiceInkIOSRecordingCoordinationDiagnostics.recordDeepLinkOpenedMessage, privacy: .public)")
             applyLaunchRecordingAction(
                 launchRecordingRequestState.requestRecording(
                     hasCompletedOnboarding: hasCompletedOnboarding
                 )
             )
-            VoiceInkIOSLogger.app.notice("App opened via keyboard extension - recording requested")
+            VoiceInkIOSLogger.app.notice("\(VoiceInkIOSRecordingCoordinationDiagnostics.keyboardRecordingRequestOpenedMessage, privacy: .public)")
         }
     }
 

@@ -11317,6 +11317,16 @@ require_patterns \
   'staleRecordingStateClearedMessage' \
   'updatedRecordingStateMessage'
 
+require_patterns \
+  "VoiceInkCore owns iOS recording coordination diagnostics" \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift \
+  'VoiceInkIOSRecordingCoordinationDiagnostics' \
+  'clearedStaleRecordingStateOnLaunchMessage' \
+  'recordDeepLinkOpenedMessage' \
+  'keyboardRecordingRequestOpenedMessage' \
+  'recordingManagerInitializedMessage' \
+  'keyboardStopRecordingRequestedMessage'
+
 require_pattern \
   "VoiceInkCore checks cover iOS App Group recording state policy" \
   'testAppGroupRecordingStatePolicy(PreservesIOSStorageKeysAndTimeout|KeepsFreshRecordingActive|ClearsStaleRecording|DoesNotClearInactiveRecording)|testAppGroupRecordingState(WritePlansPreserveIOSBridgeWrites|MutationPlansPreserveIOSBridgeNotifications)|testAppGroupRecordingStateReadPlan(DoesNotRepairFreshRecording|OwnsStaleRepairMutation)' \
@@ -11325,6 +11335,11 @@ require_pattern \
 require_pattern \
   "VoiceInkCore checks cover iOS App Group recording diagnostics" \
   'testAppGroupRecordingDiagnosticsPreserveIOSLogCopy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "VoiceInkCore checks cover iOS recording coordination diagnostics" \
+  'testIOSRecordingCoordinationDiagnosticsPreserveIOSLogCopy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -11598,6 +11613,13 @@ require_pattern \
   'VoiceInkLaunchRecordingRequest(State|Action)|requestRecording\(hasCompletedOnboarding:|consumePendingRecordingIfReady\(hasCompletedOnboarding:' \
   iOS/VoiceInk-ios/VoiceInk_iosApp.swift
 
+require_patterns \
+  "iOS app launch recording adapts shared coordination diagnostics" \
+  iOS/VoiceInk-ios/VoiceInk_iosApp.swift \
+  'VoiceInkIOSRecordingCoordinationDiagnostics\.clearedStaleRecordingStateOnLaunchMessage' \
+  'VoiceInkIOSRecordingCoordinationDiagnostics\.recordDeepLinkOpenedMessage' \
+  'VoiceInkIOSRecordingCoordinationDiagnostics\.keyboardRecordingRequestOpenedMessage'
+
 reject_pattern \
   "iOS app launch recording avoids shallow shared-policy wrappers" \
   'private func +(requestRecordingFromDeepLink|startPendingRecordingIfNeeded)\(' \
@@ -11607,6 +11629,12 @@ require_pattern \
   "iOS recording manager posts shared keyboard stop notification" \
   'VoiceInkAppIdentity\.iOSStopRecordingFromKeyboardNotificationName' \
   iOS/VoiceInk-ios/RecordingManager.swift
+
+require_patterns \
+  "iOS recording manager adapts shared coordination diagnostics" \
+  iOS/VoiceInk-ios/RecordingManager.swift \
+  'VoiceInkIOSRecordingCoordinationDiagnostics\.recordingManagerInitializedMessage' \
+  'VoiceInkIOSRecordingCoordinationDiagnostics\.keyboardStopRecordingRequestedMessage'
 
 require_pattern \
   "iOS notes list observes shared keyboard stop notification" \
@@ -11645,6 +11673,12 @@ reject_pattern \
   "iOS app deep-link recording avoids shell-owned deferred request flag" \
   'shouldStartRecordingAfterOnboarding|guard hasCompletedOnboarding else' \
   iOS/VoiceInk-ios/VoiceInk_iosApp.swift
+
+reject_pattern \
+  "iOS recording coordination avoids shell-owned diagnostic copy" \
+  '"(Cleared stale recording state on app launch|URL scheme triggered: open app for recording|App opened via keyboard extension - recording requested|RecordingManager initialized|Stop recording requested from keyboard extension)"' \
+  iOS/VoiceInk-ios/VoiceInk_iosApp.swift \
+  iOS/VoiceInk-ios/RecordingManager.swift
 
 reject_pattern \
   "iOS shell does not redeclare keyboard stop notification" \

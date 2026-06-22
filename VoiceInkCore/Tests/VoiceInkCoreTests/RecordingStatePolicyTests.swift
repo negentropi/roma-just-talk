@@ -469,6 +469,29 @@ final class RecordingStatePolicyTests: XCTestCase {
         )
     }
 
+    func testIOSRecordingCoordinationDiagnosticsPreserveIOSLogCopy() {
+        XCTAssertEqual(
+            VoiceInkIOSRecordingCoordinationDiagnostics.clearedStaleRecordingStateOnLaunchMessage,
+            "Cleared stale recording state on app launch"
+        )
+        XCTAssertEqual(
+            VoiceInkIOSRecordingCoordinationDiagnostics.recordDeepLinkOpenedMessage,
+            "URL scheme triggered: open app for recording"
+        )
+        XCTAssertEqual(
+            VoiceInkIOSRecordingCoordinationDiagnostics.keyboardRecordingRequestOpenedMessage,
+            "App opened via keyboard extension - recording requested"
+        )
+        XCTAssertEqual(
+            VoiceInkIOSRecordingCoordinationDiagnostics.recordingManagerInitializedMessage,
+            "RecordingManager initialized"
+        )
+        XCTAssertEqual(
+            VoiceInkIOSRecordingCoordinationDiagnostics.keyboardStopRecordingRequestedMessage,
+            "Stop recording requested from keyboard extension"
+        )
+    }
+
     func testKeyboardRecordingTimingPreservesIOSAppAndKeyboardDelays() {
         XCTAssertEqual(VoiceInkKeyboardRecordingTiming.appLaunchRecordingStartDelay, 0.5)
         XCTAssertEqual(VoiceInkKeyboardRecordingTiming.recordingStatusPollingInterval, 0.5)

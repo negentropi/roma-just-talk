@@ -44,7 +44,7 @@ final class RecordingManager: ObservableObject {
     // MARK: - Initialization
     init() {
         // Simplified initialization - no complex keyboard coordination needed
-        VoiceInkIOSLogger.recording.notice("RecordingManager initialized")
+        VoiceInkIOSLogger.recording.notice("\(VoiceInkIOSRecordingCoordinationDiagnostics.recordingManagerInitializedMessage, privacy: .public)")
         setupCoordinatorCallbacks()
     }
     
@@ -60,7 +60,7 @@ final class RecordingManager: ObservableObject {
             switch VoiceInkKeyboardStopRecordingRequestPolicy.action(recordingState: self.recordingState) {
             case .handleStopRequest:
                 // We need modelContext, so the SwiftUI shell completes the stop from this notification.
-                VoiceInkIOSLogger.recording.notice("Stop recording requested from keyboard extension")
+                VoiceInkIOSLogger.recording.notice("\(VoiceInkIOSRecordingCoordinationDiagnostics.keyboardStopRecordingRequestedMessage, privacy: .public)")
                 NotificationCenter.default.post(
                     name: VoiceInkAppIdentity.iOSStopRecordingFromKeyboardNotificationName,
                     object: nil

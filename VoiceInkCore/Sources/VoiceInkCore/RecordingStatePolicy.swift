@@ -365,6 +365,14 @@ public enum VoiceInkAppGroupRecordingDiagnostics {
     }
 }
 
+public enum VoiceInkIOSRecordingCoordinationDiagnostics {
+    public static let clearedStaleRecordingStateOnLaunchMessage = "Cleared stale recording state on app launch"
+    public static let recordDeepLinkOpenedMessage = "URL scheme triggered: open app for recording"
+    public static let keyboardRecordingRequestOpenedMessage = "App opened via keyboard extension - recording requested"
+    public static let recordingManagerInitializedMessage = "RecordingManager initialized"
+    public static let keyboardStopRecordingRequestedMessage = "Stop recording requested from keyboard extension"
+}
+
 public enum VoiceInkKeyboardRecordingTiming {
     public static let appLaunchRecordingStartDelay: TimeInterval = 0.5
     public static let recordingStatusPollingInterval: TimeInterval = 0.5

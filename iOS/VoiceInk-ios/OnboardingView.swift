@@ -103,6 +103,7 @@ struct ModelDownloadOnboardingView: View {
     var body: some View {
         let row = modelManager.managementRow(for: baseModel)
         let presentation = row.presentation
+        let primaryAction = onboardingPresentation.primaryAction(for: presentation)
 
         VStack(spacing: 0) {
             Spacer()
@@ -187,27 +188,27 @@ struct ModelDownloadOnboardingView: View {
             
             // Bottom Action Buttons
             VStack(spacing: 16) {
-                switch presentation.action {
-                case .downloading:
-                    Button(presentation.progress.compactStatusText) {}
+                switch primaryAction {
+                case .waitForDownload(let title):
+                    Button(title) {}
                         .buttonStyle(OnboardingButtonStyle())
                         .disabled(true)
 
-                case .downloaded:
-                    Button(onboardingPresentation.continueButtonTitle) {
+                case .continueSetup(let title):
+                    Button(title) {
                         withAnimation(.easeInOut(duration: 0.3)) {
                             currentStep.advance()
                         }
                     }
                     .buttonStyle(OnboardingButtonStyle())
 
-                case .download:
+                case .requestDownload(let title, let systemImageName):
                     Button(action: {
                         showDownloadConfirmation = true
                     }) {
                         HStack(spacing: 8) {
-                            Image(systemName: presentation.downloadButtonSystemImageName)
-                            Text(presentation.downloadButtonTitle)
+                            Image(systemName: systemImageName)
+                            Text(title)
                         }
                     }
                     .buttonStyle(OnboardingButtonStyle())

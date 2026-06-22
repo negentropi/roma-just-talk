@@ -82,6 +82,28 @@ public struct VoiceInkOnboardingModelDownloadPresentation: Equatable, Sendable {
         self.subtitle = subtitle
         self.continueButtonTitle = continueButtonTitle
     }
+
+    public func primaryAction(
+        for rowPresentation: VoiceInkWhisperModelDownloadRowPresentation
+    ) -> VoiceInkOnboardingModelDownloadPrimaryAction {
+        switch rowPresentation.action {
+        case .downloading:
+            return .waitForDownload(title: rowPresentation.progress.compactStatusText)
+        case .downloaded:
+            return .continueSetup(title: continueButtonTitle)
+        case .download:
+            return .requestDownload(
+                title: rowPresentation.downloadButtonTitle,
+                systemImageName: rowPresentation.downloadButtonSystemImageName
+            )
+        }
+    }
+}
+
+public enum VoiceInkOnboardingModelDownloadPrimaryAction: Equatable, Sendable {
+    case waitForDownload(title: String)
+    case continueSetup(title: String)
+    case requestDownload(title: String, systemImageName: String)
 }
 
 public struct VoiceInkMacOSOnboardingModelDownloadPresentation: Equatable, Sendable {

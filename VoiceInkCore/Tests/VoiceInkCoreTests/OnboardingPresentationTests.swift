@@ -80,6 +80,38 @@ final class OnboardingPresentationTests: XCTestCase {
         XCTAssertEqual(presentation.continueButtonTitle, "Continue")
     }
 
+    func testIOSModelDownloadOnboardingPrimaryActionUsesDownloadRowState() {
+        let presentation = VoiceInkIOSOnboardingPresentation.modelDownload
+        let model = VoiceInkWhisperModelFiles.baseModel
+
+        let downloadingRow = VoiceInkWhisperModelDownloadState(
+            isDownloaded: false,
+            progress: .simple(modelName: model.modelName, isDownloading: true, progress: 0.42)
+        ).rowPresentation(for: model)
+        XCTAssertEqual(
+            presentation.primaryAction(for: downloadingRow),
+            .waitForDownload(title: "Downloading...")
+        )
+
+        let downloadedRow = VoiceInkWhisperModelDownloadState(
+            isDownloaded: true,
+            progress: .simple(modelName: model.modelName, isDownloading: false, progress: nil)
+        ).rowPresentation(for: model)
+        XCTAssertEqual(
+            presentation.primaryAction(for: downloadedRow),
+            .continueSetup(title: "Continue")
+        )
+
+        let idleRow = VoiceInkWhisperModelDownloadState(
+            isDownloaded: false,
+            progress: .simple(modelName: model.modelName, isDownloading: false, progress: nil)
+        ).rowPresentation(for: model)
+        XCTAssertEqual(
+            presentation.primaryAction(for: idleRow),
+            .requestDownload(title: "Download Model (142 MB)", systemImageName: "arrow.down.circle.fill")
+        )
+    }
+
     func testMacOSModelDownloadOnboardingPresentationPreservesCopyAndButtonPolicy() {
         let presentation = VoiceInkMacOSOnboardingPresentation.modelDownload
 

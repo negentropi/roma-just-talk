@@ -931,8 +931,23 @@ require_pattern \
   iOS/VoiceInk-ios/AudioRecorder.swift
 
 require_pattern \
-  "iOS recording start gate uses shared no-mode presentation" \
-  'VoiceInkRecordingAlertPresentation\.noModesAvailableIfNeeded' \
+  "VoiceInkCore owns iOS recording start action policy" \
+  'VoiceInkRecordingStart(Action|Policy)|action\(modeCount:' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "VoiceInkCore checks cover iOS recording start action policy" \
+  'testRecordingStartPolicy(StartsWhenModesAreAvailable|PresentsNoModeAlertWhenNoModesAreAvailable)' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RecordingStatePolicyTests.swift
+
+require_pattern \
+  "iOS recording start gate delegates mode-count policy to shared core" \
+  'VoiceInkRecordingStartPolicy\.action' \
+  iOS/VoiceInk-ios/NotesListView.swift
+
+reject_pattern \
+  "iOS recording start gate avoids shell-owned no-mode branching" \
+  'noModesAvailableIfNeeded|if +let +alert *= *VoiceInkRecordingAlertPresentation' \
   iOS/VoiceInk-ios/NotesListView.swift
 
 require_pattern \

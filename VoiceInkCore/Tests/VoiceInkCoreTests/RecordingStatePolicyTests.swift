@@ -519,16 +519,26 @@ final class RecordingStatePolicyTests: XCTestCase {
         )
     }
 
-    func testRecordingAlertPresentationPreservesIOSNoModeGateCopy() {
-        XCTAssertNil(VoiceInkRecordingAlertPresentation.noModesAvailableIfNeeded(modeCount: 1))
+    func testRecordingStartPolicyStartsWhenModesAreAvailable() {
+        XCTAssertEqual(
+            VoiceInkRecordingStartPolicy.action(modeCount: 1),
+            .startRecording
+        )
+    }
 
-        let alert = VoiceInkRecordingAlertPresentation.noModesAvailableIfNeeded(modeCount: 0)
-        XCTAssertEqual(alert?.id, "noModesAvailable")
-        XCTAssertEqual(alert?.title, "No Modes Found")
-        XCTAssertEqual(alert?.message, "Please create a new mode in Settings before recording.")
-        XCTAssertEqual(alert?.primaryButtonTitle, "OK")
-        XCTAssertNil(alert?.secondaryButtonTitle)
-        XCTAssertEqual(alert?.action, .dismiss)
+    func testRecordingStartPolicyPresentsNoModeAlertWhenNoModesAreAvailable() {
+        XCTAssertEqual(
+            VoiceInkRecordingStartPolicy.action(modeCount: 0),
+            .presentAlert(.noModesAvailable)
+        )
+
+        let alert = VoiceInkRecordingAlertPresentation.noModesAvailable
+        XCTAssertEqual(alert.id, "noModesAvailable")
+        XCTAssertEqual(alert.title, "No Modes Found")
+        XCTAssertEqual(alert.message, "Please create a new mode in Settings before recording.")
+        XCTAssertEqual(alert.primaryButtonTitle, "OK")
+        XCTAssertNil(alert.secondaryButtonTitle)
+        XCTAssertEqual(alert.action, .dismiss)
     }
 
     func testRecordingAlertPresentationPreservesIOSPermissionDeniedCopy() {

@@ -152,11 +152,10 @@ struct NotesListView: View {
 
     private var unifiedRecordingComponent: some View {
         Button(action: {
-            if let alert = VoiceInkRecordingAlertPresentation.noModesAvailableIfNeeded(
-                modeCount: settings.modes.count
-            ) {
+            switch VoiceInkRecordingStartPolicy.action(modeCount: settings.modes.count) {
+            case .presentAlert(let alert):
                 recordingStartAlert = alert
-            } else {
+            case .startRecording:
                 recordingManager.startRecordingFlow()
             }
         }) {

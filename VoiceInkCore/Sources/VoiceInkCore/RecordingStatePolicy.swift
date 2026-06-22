@@ -533,10 +533,6 @@ public struct VoiceInkRecordingAlertPresentation: Equatable, Identifiable, Senda
         )
     }
 
-    public static func noModesAvailableIfNeeded(modeCount: Int) -> VoiceInkRecordingAlertPresentation? {
-        modeCount <= 0 ? noModesAvailable : nil
-    }
-
     public static var microphonePermissionDenied: VoiceInkRecordingAlertPresentation {
         VoiceInkRecordingAlertPresentation(
             id: "microphonePermissionDenied",
@@ -583,6 +579,17 @@ public struct VoiceInkRecordingAlertPresentation: Equatable, Identifiable, Senda
             code: nsError.code,
             localizedDescription: error.localizedDescription
         )
+    }
+}
+
+public enum VoiceInkRecordingStartAction: Equatable, Sendable {
+    case startRecording
+    case presentAlert(VoiceInkRecordingAlertPresentation)
+}
+
+public enum VoiceInkRecordingStartPolicy {
+    public static func action(modeCount: Int) -> VoiceInkRecordingStartAction {
+        modeCount <= 0 ? .presentAlert(.noModesAvailable) : .startRecording
     }
 }
 

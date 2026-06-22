@@ -82,6 +82,125 @@ final class TranscriptPresentationTests: XCTestCase {
         )
     }
 
+    func testHistoryPaginationPolicyBuildsInitialPageState() {
+        let first = HistoryItem(id: 1, timestamp: Date(timeIntervalSince1970: 200))
+        let second = HistoryItem(id: 2, timestamp: Date(timeIntervalSince1970: 100))
+
+        let plan = VoiceInkHistoryPaginationPolicy.initialPage(
+            [first, second],
+            pageSize: 2,
+            timestamp: \.timestamp
+        )
+
+        XCTAssertEqual(plan.displayedItems, [first, second])
+        XCTAssertEqual(plan.lastTimestamp, second.timestamp)
+        XCTAssertTrue(plan.hasMoreContent)
+        XCTAssertFalse(plan.isLoading)
+    }
+
+    func testHistoryPaginationPolicyAppendsPageAndPreservesEmptyPageBehavior() {
+        let current = HistoryItem(id: 1, timestamp: Date(timeIntervalSince1970: 300))
+        let next = HistoryItem(id: 2, timestamp: Date(timeIntervalSince1970: 200))
+
+        let appended = VoiceInkHistoryPaginationPolicy.appendingPage(
+            currentItems: [current],
+            newItems: [next],
+            pageSize: 2,
+            timestamp: \.timestamp
+        )
+
+        XCTAssertEqual(appended.displayedItems, [current, next])
+        XCTAssertEqual(appended.lastTimestamp, next.timestamp)
+        XCTAssertFalse(appended.hasMoreContent)
+        XCTAssertFalse(appended.isLoading)
+
+        let empty = VoiceInkHistoryPaginationPolicy.appendingPage(
+            currentItems: [current],
+            newItems: [],
+            pageSize: 2,
+            timestamp: \.timestamp
+        )
+
+        XCTAssertEqual(empty.displayedItems, [current])
+        XCTAssertNil(empty.lastTimestamp)
+        XCTAssertFalse(empty.hasMoreContent)
+        XCTAssertFalse(empty.isLoading)
+    }
+
+    func testHistoryPaginationPolicyResetsAndGatesLoadMoreCursor() {
+        let timestamp = Date(timeIntervalSince1970: 100)
+        let reset: VoiceInkHistoryPaginationPlan<HistoryItem> = VoiceInkHistoryPaginationPolicy.reset()
+
+        XCTAssertTrue(reset.displayedItems.isEmpty)
+        XCTAssertNil(reset.lastTimestamp)
+        XCTAssertTrue(reset.hasMoreContent)
+        XCTAssertFalse(reset.isLoading)
+        XCTAssertEqual(
+            VoiceInkHistoryPaginationPolicy.loadMoreCursor(
+                isLoading: false,
+                hasMoreContent: true,
+                lastTimestamp: timestamp
+            ),
+            timestamp
+        )
+        XCTAssertNil(VoiceInkHistoryPaginationPolicy.loadMoreCursor(
+            isLoading: true,
+            hasMoreContent: true,
+            lastTimestamp: timestamp
+        ))
+        XCTAssertNil(VoiceInkHistoryPaginationPolicy.loadMoreCursor(
+            isLoading: false,
+            hasMoreContent: false,
+            lastTimestamp: timestamp
+        ))
+        XCTAssertNil(VoiceInkHistoryPaginationPolicy.loadMoreCursor(
+            isLoading: false,
+            hasMoreContent: true,
+            lastTimestamp: nil
+        ))
+    }
+
+    func testHistorySelectionPolicyOwnsToggleAndDisplayedSelectionState() {
+        let first = HistorySelectionItem(id: 1, label: "first")
+        let second = HistorySelectionItem(id: 2, label: "second")
+
+        XCTAssertFalse(VoiceInkHistorySelectionPolicy.areAllDisplayedItemsSelected(
+            displayedItems: [first, second],
+            selectedItems: [first]
+        ))
+        XCTAssertTrue(VoiceInkHistorySelectionPolicy.areAllDisplayedItemsSelected(
+            displayedItems: [first, second],
+            selectedItems: [first, second]
+        ))
+        XCTAssertFalse(VoiceInkHistorySelectionPolicy.areAllDisplayedItemsSelected(
+            displayedItems: [HistorySelectionItem](),
+            selectedItems: Set<HistorySelectionItem>()
+        ))
+        XCTAssertEqual(
+            VoiceInkHistorySelectionPolicy.toggling(second, in: [first]),
+            [first, second]
+        )
+        XCTAssertEqual(
+            VoiceInkHistorySelectionPolicy.toggling(first, in: [first, second]),
+            [second]
+        )
+    }
+
+    func testHistorySelectionPolicySelectsAllWhilePreservingDisplayedInstances() {
+        let visible = HistorySelectionItem(id: 1, label: "visible")
+        let fetchedDuplicate = HistorySelectionItem(id: 1, label: "fetched duplicate")
+        let hidden = HistorySelectionItem(id: 2, label: "hidden")
+
+        let selection = VoiceInkHistorySelectionPolicy.selectingAll(
+            displayedItems: [visible],
+            allItems: [fetchedDuplicate, hidden],
+            id: \.id
+        )
+
+        XCTAssertEqual(selection, Set([visible, hidden]))
+        XCTAssertFalse(selection.contains(fetchedDuplicate))
+    }
+
     func testHistoryDeleteConfirmationPresentationPreservesMacOSAlertCopy() {
         XCTAssertEqual(VoiceInkHistoryPresentation.deleteConfirmationTitle, "Delete Selected Items?")
         XCTAssertEqual(VoiceInkHistoryPresentation.deleteConfirmationPrimaryButtonTitle, "Delete")
@@ -637,4 +756,14 @@ final class TranscriptPresentationTests: XCTestCase {
             )
         )
     }
+}
+
+private struct HistoryItem: Hashable {
+    let id: Int
+    let timestamp: Date
+}
+
+private struct HistorySelectionItem: Hashable {
+    let id: Int
+    let label: String
 }

@@ -31,7 +31,10 @@ struct InlineHistoryView: View {
     }
 
     private var allSelected: Bool {
-        !displayedTranscriptions.isEmpty && displayedTranscriptions.allSatisfy { selectedTranscriptions.contains($0) }
+        VoiceInkHistorySelectionPolicy.areAllDisplayedItemsSelected(
+            displayedItems: displayedTranscriptions,
+            selectedItems: selectedTranscriptions
+        )
     }
 
     private var panelTranscription: Transcription? {
@@ -358,9 +361,13 @@ struct InlineHistoryView: View {
         do {
             lastTimestamp = nil
             let items = try modelContext.fetch(cursorQueryDescriptor())
-            displayedTranscriptions = items
-            lastTimestamp = items.last?.timestamp
-            hasMoreContent = items.count == pageSize
+            applyPaginationPlan(
+                VoiceInkHistoryPaginationPolicy.initialPage(
+                    items,
+                    pageSize: pageSize,
+                    timestamp: \.timestamp
+                )
+            )
         } catch {
             print("Error loading transcriptions: \(error)")
         }
@@ -368,16 +375,25 @@ struct InlineHistoryView: View {
 
     @MainActor
     private func loadMoreContent() async {
-        guard !isLoading, hasMoreContent, let lastTimestamp = lastTimestamp else { return }
+        guard let loadMoreTimestamp = VoiceInkHistoryPaginationPolicy.loadMoreCursor(
+            isLoading: isLoading,
+            hasMoreContent: hasMoreContent,
+            lastTimestamp: lastTimestamp
+        ) else { return }
 
         isLoading = true
         defer { isLoading = false }
 
         do {
-            let newItems = try modelContext.fetch(cursorQueryDescriptor(after: lastTimestamp))
-            displayedTranscriptions.append(contentsOf: newItems)
-            self.lastTimestamp = newItems.last?.timestamp
-            hasMoreContent = newItems.count == pageSize
+            let newItems = try modelContext.fetch(cursorQueryDescriptor(after: loadMoreTimestamp))
+            applyPaginationPlan(
+                VoiceInkHistoryPaginationPolicy.appendingPage(
+                    currentItems: displayedTranscriptions,
+                    newItems: newItems,
+                    pageSize: pageSize,
+                    timestamp: \.timestamp
+                )
+            )
         } catch {
             print("Error loading more transcriptions: \(error)")
         }
@@ -385,20 +401,23 @@ struct InlineHistoryView: View {
 
     @MainActor
     private func resetPagination() {
-        displayedTranscriptions = []
-        lastTimestamp = nil
-        hasMoreContent = true
-        isLoading = false
+        applyPaginationPlan(VoiceInkHistoryPaginationPolicy.reset())
+    }
+
+    private func applyPaginationPlan(_ plan: VoiceInkHistoryPaginationPlan<Transcription>) {
+        displayedTranscriptions = plan.displayedItems
+        lastTimestamp = plan.lastTimestamp
+        hasMoreContent = plan.hasMoreContent
+        isLoading = plan.isLoading
     }
 
     // MARK: - Selection & Deletion
 
     private func toggleSelection(_ transcription: Transcription) {
-        if selectedTranscriptions.contains(transcription) {
-            selectedTranscriptions.remove(transcription)
-        } else {
-            selectedTranscriptions.insert(transcription)
-        }
+        selectedTranscriptions = VoiceInkHistorySelectionPolicy.toggling(
+            transcription,
+            in: selectedTranscriptions
+        )
     }
 
     private func performDeletion(for transcription: Transcription) {
@@ -442,16 +461,13 @@ struct InlineHistoryView: View {
         do {
             let allDescriptor = TranscriptionHistoryQuery.selectionDescriptor(searchText: searchText)
             let allTranscriptions = try modelContext.fetch(allDescriptor)
-            let visibleIds = Set(displayedTranscriptions.map { $0.id })
 
             await MainActor.run {
-                selectedTranscriptions = Set(displayedTranscriptions)
-
-                for transcription in allTranscriptions {
-                    if !visibleIds.contains(transcription.id) {
-                        selectedTranscriptions.insert(transcription)
-                    }
-                }
+                selectedTranscriptions = VoiceInkHistorySelectionPolicy.selectingAll(
+                    displayedItems: displayedTranscriptions,
+                    allItems: allTranscriptions,
+                    id: \.id
+                )
             }
         } catch {
             print("Error selecting all transcriptions: \(error)")

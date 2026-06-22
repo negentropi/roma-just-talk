@@ -282,6 +282,111 @@ public enum VoiceInkHistoryPresentation {
     }
 }
 
+public struct VoiceInkHistoryPaginationPlan<Item> {
+    public let displayedItems: [Item]
+    public let lastTimestamp: Date?
+    public let hasMoreContent: Bool
+    public let isLoading: Bool
+
+    public init(
+        displayedItems: [Item],
+        lastTimestamp: Date?,
+        hasMoreContent: Bool,
+        isLoading: Bool
+    ) {
+        self.displayedItems = displayedItems
+        self.lastTimestamp = lastTimestamp
+        self.hasMoreContent = hasMoreContent
+        self.isLoading = isLoading
+    }
+}
+
+public enum VoiceInkHistoryPaginationPolicy {
+    public static func initialPage<Item>(
+        _ items: [Item],
+        pageSize: Int,
+        timestamp: (Item) -> Date?
+    ) -> VoiceInkHistoryPaginationPlan<Item> {
+        VoiceInkHistoryPaginationPlan(
+            displayedItems: items,
+            lastTimestamp: items.last.flatMap(timestamp),
+            hasMoreContent: items.count == pageSize,
+            isLoading: false
+        )
+    }
+
+    public static func appendingPage<Item>(
+        currentItems: [Item],
+        newItems: [Item],
+        pageSize: Int,
+        timestamp: (Item) -> Date?
+    ) -> VoiceInkHistoryPaginationPlan<Item> {
+        VoiceInkHistoryPaginationPlan(
+            displayedItems: currentItems + newItems,
+            lastTimestamp: newItems.last.flatMap(timestamp),
+            hasMoreContent: newItems.count == pageSize,
+            isLoading: false
+        )
+    }
+
+    public static func reset<Item>() -> VoiceInkHistoryPaginationPlan<Item> {
+        VoiceInkHistoryPaginationPlan(
+            displayedItems: [],
+            lastTimestamp: nil,
+            hasMoreContent: true,
+            isLoading: false
+        )
+    }
+
+    public static func loadMoreCursor(
+        isLoading: Bool,
+        hasMoreContent: Bool,
+        lastTimestamp: Date?
+    ) -> Date? {
+        guard !isLoading, hasMoreContent else {
+            return nil
+        }
+        return lastTimestamp
+    }
+}
+
+public enum VoiceInkHistorySelectionPolicy {
+    public static func areAllDisplayedItemsSelected<Item: Hashable>(
+        displayedItems: [Item],
+        selectedItems: Set<Item>
+    ) -> Bool {
+        !displayedItems.isEmpty && displayedItems.allSatisfy { selectedItems.contains($0) }
+    }
+
+    public static func toggling<Item: Hashable>(
+        _ item: Item,
+        in selectedItems: Set<Item>
+    ) -> Set<Item> {
+        var updatedSelection = selectedItems
+        if updatedSelection.contains(item) {
+            updatedSelection.remove(item)
+        } else {
+            updatedSelection.insert(item)
+        }
+        return updatedSelection
+    }
+
+    public static func selectingAll<Item: Hashable, ID: Hashable>(
+        displayedItems: [Item],
+        allItems: [Item],
+        id: (Item) -> ID
+    ) -> Set<Item> {
+        var selection = Set(displayedItems)
+        let displayedIds = Set(displayedItems.map(id))
+
+        for item in allItems where !displayedIds.contains(id(item)) {
+            selection.insert(item)
+        }
+
+        return selection
+    }
+}
+
 public enum VoiceInkTranscriptPresentation {
     public static let pendingDisplayText = "New transcription"
     public static let failedDisplayText = "Transcription failed - tap to retry"

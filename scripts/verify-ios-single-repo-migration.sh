@@ -2180,6 +2180,18 @@ require_pattern \
   VoiceInk/Views/History/TranscriptionHistoryView.swift \
   VoiceInk/Views/History/InlineHistoryView.swift
 
+require_pattern \
+  "macOS history views use shared pagination state policy" \
+  'VoiceInkHistoryPaginationPolicy\.(initialPage|appendingPage|reset|loadMoreCursor)' \
+  VoiceInk/Views/History/TranscriptionHistoryView.swift \
+  VoiceInk/Views/History/InlineHistoryView.swift
+
+require_pattern \
+  "macOS history views use shared selection state policy" \
+  'VoiceInkHistorySelectionPolicy\.(areAllDisplayedItemsSelected|toggling|selectingAll)' \
+  VoiceInk/Views/History/TranscriptionHistoryView.swift \
+  VoiceInk/Views/History/InlineHistoryView.swift
+
 reject_pattern \
   "history and notes views avoid shell-only empty-state copy" \
   'No notes yet|Tap Start Recording to capture your first note\.|No transcriptions yet|No transcriptions|No results found|Your transcription history will appear here|Try a different search term|No Selection|Select a transcription to view details|No Metadata' \
@@ -2202,6 +2214,18 @@ reject_pattern \
 reject_pattern \
   "macOS history views avoid duplicate SwiftData search predicate construction" \
   '#Predicate<Transcription>|localizedStandardContains\(searchText\)' \
+  VoiceInk/Views/History/TranscriptionHistoryView.swift \
+  VoiceInk/Views/History/InlineHistoryView.swift
+
+reject_pattern \
+  "macOS history views avoid duplicate pagination state math" \
+  'displayedTranscriptions\.append\(contentsOf:|items\.last\?\.timestamp|newItems\.last\?\.timestamp|items\.count == pageSize|newItems\.count == pageSize' \
+  VoiceInk/Views/History/TranscriptionHistoryView.swift \
+  VoiceInk/Views/History/InlineHistoryView.swift
+
+reject_pattern \
+  "macOS history views avoid duplicate selection state math" \
+  'if selectedTranscriptions\.contains\(transcription\)|Set\(displayedTranscriptions\.map|visibleIds' \
   VoiceInk/Views/History/TranscriptionHistoryView.swift \
   VoiceInk/Views/History/InlineHistoryView.swift
 

@@ -11931,8 +11931,19 @@ require_file VoiceInkCore/Sources/VoiceInkCore/DiagnosticLogExportPolicy.swift
 
 require_pattern \
   "shared diagnostic log export policy lives in VoiceInkCore" \
-  'VoiceInkDiagnosticLogExportPolicy|VoiceInkDiagnosticLogSessionRange|sessionStartDatesKey = "logExporter\.sessionStartDates\.v1"|maxSessionStartDatesToKeep = 3|timestampDateFormat = "yyyy-MM-dd HH:mm:ss\.SSS"|fileNameDateFormat = "yyyy-MM-dd_HH-mm-ss"|fileNamePrefix = "VoiceInk_Logs_"|headerTitle = "=== VoiceInk Diagnostic Logs ==="|noLogsFoundMessage = "No logs found for this session\."|exporterErrorDomain = "LogExporter"|downloadsDirectoryUnavailableErrorCode = 1|downloadsDirectoryUnavailableDescription = "Downloads directory unavailable"|sessionRanges|headerLines|logEntryLine|fileName|downloadsDirectoryUnavailableError' \
+  'VoiceInkDiagnosticsSettingsPresentation|VoiceInkDiagnosticLogExportPolicy|VoiceInkDiagnosticLogSessionRange|sessionStartDatesKey = "logExporter\.sessionStartDates\.v1"|maxSessionStartDatesToKeep = 3|timestampDateFormat = "yyyy-MM-dd HH:mm:ss\.SSS"|fileNameDateFormat = "yyyy-MM-dd_HH-mm-ss"|fileNamePrefix = "VoiceInk_Logs_"|headerTitle = "=== VoiceInk Diagnostic Logs ==="|noLogsFoundMessage = "No logs found for this session\."|exporterErrorDomain = "LogExporter"|downloadsDirectoryUnavailableErrorCode = 1|downloadsDirectoryUnavailableDescription = "Downloads directory unavailable"|sessionRanges|headerLines|logEntryLine|fileName|downloadsDirectoryUnavailableError|rollingBufferLastClaimLabel|exportFailedAlertTitle|exportedLogSuccessSystemImageName' \
   VoiceInkCore/Sources/VoiceInkCore/DiagnosticLogExportPolicy.swift
+
+require_patterns \
+  "macOS diagnostics settings uses shared diagnostics presentation" \
+  VoiceInk/Views/Settings/DiagnosticsSettingsView.swift \
+  'VoiceInkDiagnosticsSettingsPresentation\.rollingBufferLastClaimLabel' \
+  'VoiceInkDiagnosticsSettingsPresentation\.showInFinderButtonTitle' \
+  'VoiceInkDiagnosticsSettingsPresentation\.exportButtonTitle' \
+  'VoiceInkDiagnosticsSettingsPresentation\.exportLogsLabel' \
+  'VoiceInkDiagnosticsSettingsPresentation\.exportFailedAlertTitle' \
+  'VoiceInkDiagnosticsSettingsPresentation\.alertDismissButtonTitle' \
+  'VoiceInkDiagnosticsSettingsPresentation\.exportedLogSuccessSystemImageName'
 
 require_pattern \
   "macOS log exporter uses shared diagnostic log export policy" \
@@ -11941,13 +11952,23 @@ require_pattern \
 
 require_pattern \
   "core checks execute diagnostic log export policy tests" \
-  'DiagnosticLogExportPolicyTests\.testDiagnosticLogExportPolicyPreservesMacOSStorageAndFormattingConstants|DiagnosticLogExportPolicyTests\.testDiagnosticLogExportPolicyBuildsSessionRangesWithCurrentMiddleAndOldestLabels|DiagnosticLogExportPolicyTests\.testDiagnosticLogExportPolicyBuildsMacOSExportFileName|DiagnosticLogExportPolicyTests\.testDiagnosticLogExportPolicyBuildsDownloadsUnavailableError' \
+  'DiagnosticLogExportPolicyTests\.testDiagnosticsSettingsPresentationPreservesMacOSCopyAndIcons|DiagnosticLogExportPolicyTests\.testDiagnosticLogExportPolicyPreservesMacOSStorageAndFormattingConstants|DiagnosticLogExportPolicyTests\.testDiagnosticLogExportPolicyBuildsSessionRangesWithCurrentMiddleAndOldestLabels|DiagnosticLogExportPolicyTests\.testDiagnosticLogExportPolicyBuildsMacOSExportFileName|DiagnosticLogExportPolicyTests\.testDiagnosticLogExportPolicyBuildsDownloadsUnavailableError' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "migration checklist tracks shared diagnostics settings presentation" \
+  'diagnostic log session storage/range/header/filename/error policy, diagnostic settings copy/icons.*VoiceInkDiagnosticLogExportPolicy`/`VoiceInkDiagnosticsSettingsPresentation' \
+  docs/ios-single-repo-migration.md
 
 reject_pattern \
   "macOS log exporter avoids shell-owned diagnostic log export policy" \
   'logExporter\.sessionStartDates\.v1|maxSessionsToKeep|sessionRanges:|\[Date\(\)\] \+ loadedDates|prefix\(maxSessionsToKeep\)|yyyy-MM-dd HH:mm:ss\.SSS|yyyy-MM-dd_HH-mm-ss|VoiceInk_Logs_|=== VoiceInk Diagnostic Logs ===|No logs found for this session\.|Session 1 \(Current\)|Session [0-9].*\(Oldest\)|NSError\(domain: "LogExporter"|code: 1|Downloads directory unavailable|NSLocalizedDescriptionKey' \
   VoiceInk/Services/LogExporter.swift
+
+reject_pattern \
+  "macOS diagnostics settings view avoids shell-owned diagnostics presentation copy" \
+  '"(Rolling Buffer Last Claim|Show in Finder|Export|Export Logs|Export Failed|OK|checkmark\.circle\.fill)"' \
+  VoiceInk/Views/Settings/DiagnosticsSettingsView.swift
 
 require_pattern \
   "shared menu bar preference lives in VoiceInkCore" \

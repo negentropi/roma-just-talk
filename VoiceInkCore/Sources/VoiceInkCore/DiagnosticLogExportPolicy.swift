@@ -12,6 +12,16 @@ public struct VoiceInkDiagnosticLogSessionRange: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkDiagnosticsSettingsPresentation {
+    public static let rollingBufferLastClaimLabel = "Rolling Buffer Last Claim"
+    public static let showInFinderButtonTitle = "Show in Finder"
+    public static let exportButtonTitle = "Export"
+    public static let exportLogsLabel = "Export Logs"
+    public static let exportFailedAlertTitle = "Export Failed"
+    public static let alertDismissButtonTitle = "OK"
+    public static let exportedLogSuccessSystemImageName = "checkmark.circle.fill"
+}
+
 public enum VoiceInkDiagnosticLogExportPolicy {
     public static let sessionStartDatesKey = "logExporter.sessionStartDates.v1"
     public static let maxSessionStartDatesToKeep = 3

@@ -1,4 +1,5 @@
 import SwiftUI
+import VoiceInkCore
 
 struct DiagnosticsSettingsView: View {
     @State private var isExportingLogs = false
@@ -9,7 +10,7 @@ struct DiagnosticsSettingsView: View {
 
     var body: some View {
         Group {
-            LabeledContent("Rolling Buffer Last Claim") {
+            LabeledContent(VoiceInkDiagnosticsSettingsPresentation.rollingBufferLastClaimLabel) {
                 Text(rollingBufferClaim.displaySummary)
                     .foregroundStyle(.secondary)
             }
@@ -17,15 +18,15 @@ struct DiagnosticsSettingsView: View {
             LabeledContent {
                 HStack(spacing: 8) {
                     if let url = exportedLogURL {
-                        Button("Show in Finder") {
+                        Button(VoiceInkDiagnosticsSettingsPresentation.showInFinderButtonTitle) {
                             NSWorkspace.shared.activateFileViewerSelecting([url])
                         }
 
-                        Image(systemName: "checkmark.circle.fill")
+                        Image(systemName: VoiceInkDiagnosticsSettingsPresentation.exportedLogSuccessSystemImageName)
                             .foregroundColor(.green)
                     }
 
-                    Button("Export") {
+                    Button(VoiceInkDiagnosticsSettingsPresentation.exportButtonTitle) {
                         exportDiagnosticLogs()
                     }
                     .disabled(isExportingLogs)
@@ -36,13 +37,13 @@ struct DiagnosticsSettingsView: View {
                         ProgressView()
                             .controlSize(.small)
                     }
-                    Text("Export Logs")
+                    Text(VoiceInkDiagnosticsSettingsPresentation.exportLogsLabel)
                 }
             }
         }
         .onAppear(perform: refreshRollingBufferClaim)
-        .alert("Export Failed", isPresented: $showLogExportError) {
-            Button("OK", role: .cancel) { }
+        .alert(VoiceInkDiagnosticsSettingsPresentation.exportFailedAlertTitle, isPresented: $showLogExportError) {
+            Button(VoiceInkDiagnosticsSettingsPresentation.alertDismissButtonTitle, role: .cancel) { }
         } message: {
             Text(logExportError)
         }

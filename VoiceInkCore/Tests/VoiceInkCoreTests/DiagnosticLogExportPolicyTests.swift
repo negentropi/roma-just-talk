@@ -2,6 +2,19 @@ import Foundation
 @testable import VoiceInkCore
 
 final class DiagnosticLogExportPolicyTests: XCTestCase {
+    func testDiagnosticsSettingsPresentationPreservesMacOSCopyAndIcons() {
+        XCTAssertEqual(VoiceInkDiagnosticsSettingsPresentation.rollingBufferLastClaimLabel, "Rolling Buffer Last Claim")
+        XCTAssertEqual(VoiceInkDiagnosticsSettingsPresentation.showInFinderButtonTitle, "Show in Finder")
+        XCTAssertEqual(VoiceInkDiagnosticsSettingsPresentation.exportButtonTitle, "Export")
+        XCTAssertEqual(VoiceInkDiagnosticsSettingsPresentation.exportLogsLabel, "Export Logs")
+        XCTAssertEqual(VoiceInkDiagnosticsSettingsPresentation.exportFailedAlertTitle, "Export Failed")
+        XCTAssertEqual(VoiceInkDiagnosticsSettingsPresentation.alertDismissButtonTitle, "OK")
+        XCTAssertEqual(
+            VoiceInkDiagnosticsSettingsPresentation.exportedLogSuccessSystemImageName,
+            "checkmark.circle.fill"
+        )
+    }
+
     func testDiagnosticLogExportPolicyPreservesMacOSStorageAndFormattingConstants() {
         XCTAssertEqual(
             VoiceInkDiagnosticLogExportPolicy.sessionStartDatesKey,
